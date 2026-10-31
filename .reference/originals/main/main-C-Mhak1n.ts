@@ -220,6 +220,7 @@ const { createMcpSandboxNetworkRuntime } = require("./main-app/mcp-sandbox/netwo
 const { createNativeCommandCrashRuntime } = require("./main-app/diagnostics/native-command-crash.js");
 const { createBrowserSessionProbeRuntime } = require("./main-app/browser-session/browser-session-probe.js");
 const { createOpenTargetFoundation } = require("./main-app/open-target/open-target-foundation.js");
+const { createOpenTargetRegistryRuntime } = require("./main-app/open-target/open-target-registry-runtime.js");
 const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 const { createElectronPerformanceSnapshotCollectorClass } = require("./main-app/startup/electron-performance-snapshot-collector.js");
 const { MainThreadJankSampler } = require("./main-app/startup/main-thread-jank-sampler.js");
@@ -72293,113 +72294,36 @@ async function o6e({
   }
   await Zi(e, o);
 }
-var s6e = [
-  W3e,
-  K3e,
-  H3e,
-  Y4e,
-  Q4e,
-  N4e,
-  $4e,
-  M3e,
-  n6e,
-  Y3e,
-  j4e,
-  s3e,
-  F3e,
-  e3e,
-  F4e,
-  i3e,
-  q4e,
-  X3e,
-  l3e,
-  A3e,
-  r3e,
-  J3e,
-  $3e,
-  h3e,
-  g3e,
-  _3e,
-  v3e,
-  y3e,
-  b3e,
-  x3e,
-  S3e,
-  R3e,
-];
-r.i(`open-in-targets`);
-function c6e(e) {
-  return s6e.flatMap((t) => {
-    let n = t.platforms[e];
-    return n ? [{ id: t.id, ...n }] : [];
-  });
-}
-var g0 = c6e(process.platform),
-  l6e = async (e) => l.shell.readShortcutLink(e);
-function u6e(e, t = g0) {
-  return t.some((t) => t.id === e && t.kind === `editor`);
-}
-async function d6e(
-  e,
-  t,
-  {
-    appPath: n,
-    detectedCommand: r,
-    hostConfig: i,
-    location: a,
-    remotePath: o,
-    remoteWorkspaceRoot: s,
-    targets: c = g0,
-  } = {},
-) {
-  if (o != null && i?.kind === `remote-control`)
-    throw Error(`Remote control does not support open in ${e} yet.`);
-  let l = c.find((t) => t.id === e);
-  if (!l) throw Error(`Unknown open target "${e}"`);
-  let u = r ?? (await l.detect(l6e));
-  if (!u) throw Error(`Open target "${e}" is not available`);
-  if (l.open) {
-    await l.open({
-      command: u,
-      path: t,
-      appPath: n,
-      location: a,
-      hostConfig: i,
-      remoteWorkspaceRoot: s,
-      remotePath: o,
-    });
-    return;
-  }
-  await Zi(u, l.args(t, a, i, s, o), { env: l.env?.() });
-}
-var m6e = new Map([
-  [
-    `.pptx`,
-    {
-      appPath: `/Applications/Microsoft PowerPoint.app`,
-      bundleId: `com.microsoft.Powerpoint`,
-      displayName: `Microsoft PowerPoint`,
-    },
+var {
+  defaultTargets: g0,
+  isEditorTarget: u6e,
+  openWithTarget: d6e,
+  discoverNativeBrowsers: v6e,
+  discoverDocumentApplications: _6e,
+  discoverNativeApplications: g6e,
+} = createOpenTargetRegistryRuntime({
+  targetDescriptors: [
+    W3e, K3e, H3e, Y4e, Q4e, N4e, $4e, M3e, n6e, Y3e, j4e, s3e, F3e, e3e, F4e,
+    i3e, q4e, X3e, l3e, A3e, r3e, J3e, $3e, h3e, g3e, _3e, v3e, y3e, b3e, x3e, S3e, R3e,
   ],
-  [
-    `.xlsx`,
-    {
-      appPath: `/Applications/Microsoft Excel.app`,
-      bundleId: `com.microsoft.Excel`,
-      displayName: `Microsoft Excel`,
-    },
-  ],
-]);
-function h6e(e) {
-  let t = m6e.get((0, h.extname)(e).toLowerCase());
-  if (t == null) return null;
-  let n = F1([t.appPath]);
-  return n == null ? null : { ...t, appPath: n };
-}
-var A0 = 5,
-  j0 = 5,
-  M0 = new Set(a.in.values.map((e) => a.rn(e))),
-  N0 = createOpenInServiceClass({
+  platform: process.platform,
+  path: h,
+  fs: v,
+  electron: l,
+  spawn: Zi,
+  findExistingMacApplication: F1,
+  preferredBundleIdsForPath: l4e,
+  getApplicationIcon: oH,
+  includeCodexTargets: Sl,
+  listLinuxApplicationsForFile: NAe,
+  listApplicationsForFile: (options) => n.N(options, { listApplicationsForFile: Nj }),
+  discoverLinuxBrowsers: uO,
+  scanNativeBrowsers: Fj,
+  discoverKnownBrowsers: (options) => n.P(options),
+  codexBundleIds: a.in.values.map((e) => a.rn(e)),
+  uniqueBy: yu.default,
+});
+var N0 = createOpenInServiceClass({
     DisposableBase: n.Uf,
     createLogger: r.i,
     platform: process.platform,
@@ -72434,83 +72358,6 @@ var A0 = 5,
     isPathOnPlatform: n.f,
     statPath: (path, executionHost) => n.Di.stat(path, executionHost),
   });
-async function P0({ appPath: e, bundleId: t, displayName: n }) {
-  return {
-    id: `app:${e}`,
-    target: `systemDefault`,
-    label: n,
-    icon:
-      (await oH(e)) ??
-      (process.platform === `linux` ? `/apps/file-explorer.png` : `/apps/finder.png`),
-    kind: `native`,
-    appPath: e,
-    bundleId: t,
-    available: !0,
-  };
-}
-async function g6e(e) {
-  let t = await F0(e, { includeCodexTargets: Sl(e), limit: A0 });
-  return Promise.all(t.map(P0));
-}
-async function _6e(e) {
-  let t = await F0(e, { includeCodexTargets: !1, limit: void 0 }),
-    n = h6e(e),
-    r = n == null ? void 0 : (t.find(({ appPath: e }) => e === n.appPath) ?? n),
-    i = [...(r == null ? [] : [r]), ...t.filter(({ appPath: e }) => e !== r?.appPath)];
-  return (
-    i.sort((e, t) => Number(!!t.isDefault) - Number(!!e.isDefault)),
-    Promise.all(
-      i.slice(0, A0).map(async (e) => ({ ...(await P0(e)), default: e.isDefault ? !0 : void 0 })),
-    )
-  );
-}
-async function F0(e, { includeCodexTargets: t, limit: r }) {
-  let i = (
-    process.platform === `linux`
-      ? await NAe(e)
-      : await n.N(
-          {
-            filePath: e,
-            ...(t && r != null ? { limit: r } : {}),
-            order: `usage`,
-            prioritizedBundleIds: l4e(e),
-          },
-          { listApplicationsForFile: Nj },
-        )
-  ).filter((e) => t || !M0.has(e.bundleId));
-  return r == null ? i : i.slice(0, r);
-}
-async function v6e(e) {
-  let t = null;
-  process.platform === `linux` ? (t = await uO()) : e === `scan` && (t = await Fj());
-  let r = t?.applications.filter((e) => !M0.has(e.bundleId)) ?? [];
-  r.length === 0 &&
-    process.platform !== `linux` &&
-    (r = await n.P({ discovery: `known`, limit: j0, order: `usage` }));
-  let i =
-      t?.defaultApplicationPath ??
-      (process.platform === `darwin` || process.platform === `win32`
-        ? await l.app
-            .getApplicationInfoForProtocol(`https://`)
-            .then((e) => e.path)
-            .catch(() => null)
-        : null),
-    a = i == null ? null : await I0(i),
-    o = await Promise.all(
-      r.map(async (e) => ({ app: e, isDefault: a != null && (await I0(e.appPath)) === a })),
-    );
-  return Promise.all(
-    (0, yu.default)(
-      o.sort((e, t) => Number(t.isDefault) - Number(e.isDefault)),
-      ({ app: e }) => e.bundleId,
-    )
-      .slice(0, j0)
-      .map(async ({ app: e, isDefault: t }) => ({ ...(await P0(e)), default: t || void 0 })),
-  );
-}
-async function I0(e) {
-  return v.promises.realpath(e).catch(() => e);
-}
 function L0(e) {
   if (Ve(e)) return !0;
   try {

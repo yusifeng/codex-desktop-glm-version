@@ -4662,3 +4662,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 旧 helpers 433 行已删除，新生产模块 492 行；focused coverage 58 项，no-unwired gate 扩至 98 项。
   下一批继续处理仍在 main 的 32-target declaration/platform detection registry 与 native application discovery；
   不重复迁移已语义化的 filter/input/selection/launch policies。
+
+# 2026-11-01 open-target registry/discovery runtime owner
+
+- `src/main/main-app/open-target/open-target-registry-runtime.ts` 已接管 platform target projection、检测后的启动
+  分派、remote-control admission、Office fallback、native application/browser discovery、Codex bundle filtering、
+  default-browser canonicalization、排序与去重；`OpenInService` 真实消费其 `defaultTargets/openWithTarget/discover*`。
+- focused coverage 42 项，no-unwired gate 扩至 105 项。下一步继续迁移仍在 main 的 32-target 静态 descriptors
+  及其应用专用 detect/args/open adapters；共享 registry state 与 discovery 不再保留第二份实现。

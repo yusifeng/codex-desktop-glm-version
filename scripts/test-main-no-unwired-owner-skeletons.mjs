@@ -21,6 +21,7 @@ const realOwners = [
   ["src/main/main-app/diagnostics/native-command-crash.ts", "createNativeCommandCrashRuntime"],
   ["src/main/main-app/browser-session/browser-session-probe.ts", "createBrowserSessionProbeRuntime"],
   ["src/main/main-app/open-target/open-target-foundation.ts", "createOpenTargetFoundation"],
+  ["src/main/main-app/open-target/open-target-registry-runtime.ts", "createOpenTargetRegistryRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -104,6 +105,11 @@ assert.equal(main.includes("function p4e("), false, "generated remote authority 
 assert.equal(main.includes("function S4e("), false, "generated custom target parser must be removed");
 assert.equal(main.includes("function P1("), false, "generated macOS application lookup must be removed");
 assert.equal(main.includes("function U1("), false, "generated editor descriptor constructor must be removed");
+assert.equal(main.includes("createOpenTargetRegistryRuntime({"), true, "real open-target registry runtime is wired");
+assert.equal(main.includes("function c6e("), false, "generated platform target projection must be removed");
+assert.equal(main.includes("async function d6e("), false, "generated target launch dispatch must be removed");
+assert.equal(main.includes("async function P0("), false, "generated native target projection must be removed");
+assert.equal(main.includes("async function v6e("), false, "generated browser application discovery must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("98 main unwired-owner skeleton assertions passed");
+console.log("105 main unwired-owner skeleton assertions passed");

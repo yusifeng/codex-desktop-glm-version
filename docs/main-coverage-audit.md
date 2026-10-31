@@ -2645,3 +2645,14 @@ bundle/executable lookup、VS Code remote URI args、descriptor construction 与
 旧 `m1.._1`、`f4e..D1`、`S4e..A1`、`P1..K1` 共 433 行已物理删除；focused test
 `scripts/test-main-open-target-foundation-owner.mjs` 覆盖 58 项 document、remote、custom、discovery、descriptor
 和 launch 行为。后续静态 32-target registry/platform adapter 仍需整体审计，不以本 foundation 代替完成。
+
+### 增量抽取：open-target registry/discovery runtime owner
+
+main 中原 `s6e/c6e/g0/u6e/d6e` 的 32-target platform projection、editor classification、shortcut-aware
+detection、generic/custom launch 与 remote-control admission，以及 `m6e/h6e/P0/g6e/_6e/F0/v6e/I0` 的 Office
+fallback、native application/browser discovery、Codex bundle filtering、default-browser canonicalization、排序、
+去重和 limit 已迁移至 `src/main/main-app/open-target/open-target-registry-runtime.ts`。factory 接收静态 target
+descriptors 与平台 I/O adapters，输出直接接入 `OpenInService`，没有复制 registry。旧 runtime/discovery
+实现已物理删除；focused test `scripts/test-main-open-target-registry-runtime-owner.mjs` 覆盖 42 项 projection、
+detect、launch、admission、application query、fallback、browser canonicalization/dedupe 与 Linux 行为。
+剩余约 1,200 行主要是 32 个 target 的静态 platform descriptors 和各应用专用探测 adapter，继续列为待审计。
