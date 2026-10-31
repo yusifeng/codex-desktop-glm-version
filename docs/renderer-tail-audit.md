@@ -1,5 +1,10 @@
 # Renderer 尾部资产审计
 
+2026-10-31 A5 composer plugin-state consumer：确认 app-primary `po` 闭包捕获的 `Ec` 即
+app-shared 已公开且已有消费者的 `wu` plugin-state reader；home artifact templates 现直接调用
+`isActiveEntity(wu, editorState)`。semantic/hub 交叉集合缩至同属 browser registry owner 的
+`Rs/Us` 两项。
+
 2026-10-31 A5 browser-comment consumer：继续展开 app-primary `Hi` 的跨 hub 依赖，确认其完整
 语义为 annotation origin 规范化、legacy local browser 字段回退与 `browserTabId` 匹配；现已收进
 `is-browser-comment-for-tab` 并由 detached-browser host 直接消费。semantic/hub 交叉集合仅剩依赖

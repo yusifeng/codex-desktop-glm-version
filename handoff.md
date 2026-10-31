@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后确认 app-primary `po` 的闭包 registry 实为 app-shared 公共 `wu` plugin-state reader；home
+artifact templates 已显式注入真实 owner 并直连 `isActiveEntity`。semantic/hub 交叉集合现仅剩
+共享同一 browser registry owner 的 `Rs/Us`。
+
 随后解开 app-primary `Hi` 的跨 hub browser-comment 判型链：typed helper 现完整保留 annotation
 origin、五类 legacy local browser 字段和 tab metadata 匹配，detached-browser host 不再读取 `Hi`。
 semantic/hub 交叉集合仅剩依赖私有 registry 的 `po/Rs/Us`。

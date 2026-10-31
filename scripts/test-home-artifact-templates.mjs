@@ -145,6 +145,7 @@ const artifactTemplates = await loadModule({
     export const wt = "plus";
     export const Yd = "arrow";
     export const dw = "close";
+    export const wu = { getState: () => ({ active: false }) };
   `,
   "app-initial": `
     export const O5t = () => {};
@@ -156,7 +157,7 @@ const artifactTemplates = await loadModule({
     export const Ukt = true;
     export const Z6t = () => false;
     export const Gfn = () => [0, () => {}];
-    export const UZ = (_composer, _selector, fallback) => fallback === undefined ? false : "document";
+    export const UZ = (_composer, selector, fallback) => fallback === undefined ? selector({ view: { state: { doc: { descendants() {} } } } }) : "document";
     export const lEt = () => ({ forceReload: async () => {}, isLoading: false, skills: globalThis.__artifactTemplatesTest.skills });
     export const iun = (_name, _options) => ({ isPending: false, mutate: input => { globalThis.__artifactTemplatesTest.mutationInput = input; } });
     export const sun = () => async () => {};
@@ -184,7 +185,6 @@ const artifactTemplates = await loadModule({
   "app-primary": `
     export const hg = () => globalThis.__artifactTemplatesTest.active;
     export const gg = "document";
-    export const po = () => false;
     export const vg = () => "document";
     export const wi = () => {};
     export const vi = () => { globalThis.__artifactTemplatesTest.closed += 1; };

@@ -2230,7 +2230,7 @@
     "endLine": 45396,
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/is-active-entity.ts",
-    "evidence": "The pure registry-state predicate projects only the active flag and safely treats missing state as inactive; it has no JSX, store mutation, network, or lifecycle effects and is covered by a focused three-case runtime test."
+    "evidence": "The pure registry-state predicate projects only the active flag from app-shared wu; home-artifact-templates now supplies that real plugin-state owner directly instead of consuming app-primary po."
   },
   {
     "hub": "app-primary",

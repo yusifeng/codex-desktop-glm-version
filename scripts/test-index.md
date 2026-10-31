@@ -204,6 +204,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-app-primary-read-tab-state.mjs`](./test-app-primary-read-tab-state.mjs)
 - [`test-preload-annotation-shadow-root-observer-state.mjs`](./test-preload-annotation-shadow-root-observer-state.mjs)
 - [`test-app-primary-is-active-entity.mjs`](./test-app-primary-is-active-entity.mjs)
+  - Covers 3 registry-state assertions plus the home-template consumer wiring.
 - [`test-app-primary-format-skill-scope-label.mjs`](./test-app-primary-format-skill-scope-label.mjs)
 - [`test-preload-annotation-surface-observer-state.mjs`](./test-preload-annotation-surface-observer-state.mjs)
 - [`test-preload-annotation-overlay-observer-state.mjs`](./test-preload-annotation-overlay-observer-state.mjs)

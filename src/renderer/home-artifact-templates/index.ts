@@ -12,6 +12,7 @@ import {
   extractSkillKindFromDocument,
   type SkillMentionDocument,
 } from "../app-primary/runtime/extract-skill-kind";
+import { isActiveEntity } from "../app-primary/runtime/is-active-entity";
 import * as staggeredItemChunk from "@rchunk/home-suggestion-staggered-item";
 import * as templateCardChunk from "@rchunk/home-artifact-template-card";
 import type {
@@ -186,7 +187,6 @@ interface AppPrimaryBindings {
     scope: MaitaiScopeApi<unknown> | undefined,
     reason: unknown,
   ): void;
-  isComposerBlocked(state: EditorState | undefined): boolean;
   journeySignal: unknown;
   recordAttachment(
     scope: MaitaiScopeApi<unknown> | undefined,
@@ -223,6 +223,7 @@ const {
   pk: toastSignal,
   qQ: animateNumber,
   rQ: TextSelection,
+  wu: composerMentionState,
   wt: plusIcon,
 } = appSharedChunk;
 
@@ -298,7 +299,6 @@ const {
   bi: journeySignal,
   gg: templateFormatSignal,
   hg: templatesEnabledSignal,
-  po: isComposerBlocked,
   vi: closePicker,
   wi: recordOpen,
 } = appPrimaryChunk as unknown as {
@@ -309,7 +309,6 @@ const {
   bi: AppPrimaryBindings["journeySignal"];
   gg: AppPrimaryBindings["templateFormatSignal"];
   hg: AppPrimaryBindings["templatesEnabledSignal"];
-  po: AppPrimaryBindings["isComposerBlocked"];
   vi: AppPrimaryBindings["closePicker"];
   wi: AppPrimaryBindings["recordOpen"];
 };
@@ -925,7 +924,9 @@ function ArtifactTemplatePicker({
   const templateFormat = useSignal(templateFormatSignal);
   const intl = useIntl();
   const composerState =
-    selectComposer(composer, (value) => isComposerBlocked(value.view?.state)) ??
+    selectComposer(composer, (value) =>
+      isActiveEntity(composerMentionState, value.view?.state),
+    ) ??
     false;
   const selectedKind = selectComposer(
     composer,
