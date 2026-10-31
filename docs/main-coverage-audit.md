@@ -3338,3 +3338,10 @@ binding/apply schemas、viewer client 动态加载与结构校验、connection i
 append/asset/open/flush/capabilities/kind 和 native Office snapshot trust boundary。`WindowContext` 不再注入 15 个机械 parser/loader 别名，
 而是把单一协议 runtime 交给既有 host service、subscription manager 与 binding registry。主 chunk 旧 `X8/Aet/Pet/Iet/Uet/Wet/Get/Q8/$8/e5/t5/Ket/n5/qet/r5/i5/a5/o5`
 整带删除；43 条 focused 断言覆盖 wire validation、canonical base64、viewer client close-on-invalid 与真实接线，六组邻接回归保持通过。
+
+### 增量收敛：browser-window policy environment adapters
+
+新增并接回 `window/browser-window-policy-adapters.ts`，把 URL trust、renderer/webview frame trust、appearance/window options、native theme、
+renderer environment URL、error page/app name 等环境依赖一次绑定成语义 API。`browser-window-manager.ts` 的 19 个机械依赖名改为
+`rendererEntryUrl`、`sameTrustedPath`、`windowSurfaceColors` 等可读名称；主 chunk 旧 `E9/wot/Tot/Eot/Dot/D9/Pot/A9/j9/$ot/M9/est/N9/tst/P9/nst/F9/I9/rst/ist/ast/ost/sst/L9/cst/z9`
+wrapper belt 整体删除。42 条 focused 断言覆盖环境绑定、转发参数和旧 wrapper 缺席，manager 33 条生命周期回归继续通过。

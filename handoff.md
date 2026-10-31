@@ -5290,3 +5290,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   Office snapshot 全部 wire parsing；既有 host service、subscription manager、binding registry 和 WindowContext 直接消费单一 protocol runtime。
 - 主 chunk 旧 `X8/Aet/Pet/Iet/Uet/Wet/Get/Q8/$8/e5/t5/Ket/n5/qet/r5/i5/a5/o5` 已整带删除。focused suite 43 项，
   host/subscription/native-file/binding/WindowContext/lifecycle 邻接回归 201 项，no-unwired gate 扩至 564 项。
+
+# 2026-11-01 browser-window policy adapter convergence
+
+- 新增 `window/browser-window-policy-adapters.ts`，一次绑定 URL trust、renderer/webview frame trust、window appearance/native theme、
+  renderer environment 与 error-page environment；BrowserWindowManager 的 19 项机械注入已改为可读语义名。
+- 主 chunk 旧 `E9/wot/Tot/Eot/Dot/D9/Pot/A9/j9/$ot/M9/est/N9/tst/P9/nst/F9/I9/rst/ist/ast/ost/sst/L9/cst/z9`
+  wrapper belt 全部删除。focused suite 42 项、manager 生命周期回归 33 项，no-unwired gate 扩至 574 项。

@@ -101,6 +101,7 @@ const realOwners = [
   ["src/main/main-app/import/external-agent-import.ts", "createExternalAgentImportHandlers"],
   ["src/main/main-app/projects/project-write-policy.ts", "computeProjectOrderMoves"],
   ["src/main/main-app/remote-artifact/artifact-session-host-protocol.ts", "createArtifactSessionHostProtocol"],
+  ["src/main/main-app/window/browser-window-policy-adapters.ts", "createBrowserWindowPolicyAdapters"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -574,5 +575,13 @@ assert.equal(main.includes("function Q8("), false, "generated artifact update pa
 assert.equal(main.includes("function $8("), false, "generated artifact record parser must be removed");
 assert.equal(main.includes("function r5("), false, "generated artifact base64 parser must be removed");
 assert.equal(main.includes("    artifactSessionHostProtocol,"), true, "WindowContext receives the semantic Artifact Session protocol");
+assert.equal(main.includes('require("./main-app/window/browser-window-policy-adapters.js")'), true, "browser-window policy adapters are wired");
+assert.equal(main.includes("browserWindowPolicies = createBrowserWindowPolicyAdapters({"), true, "browser-window policies are bound once");
+assert.equal(main.includes("function E9("), false, "generated same-origin wrapper must be removed");
+assert.equal(main.includes("function Pot("), false, "generated window error-page wrapper must be removed");
+assert.equal(main.includes("function M9("), false, "generated renderer-entry wrapper must be removed");
+assert.equal(main.includes("function est("), false, "generated sender-frame wrapper must be removed");
+assert.equal(main.includes("function rst("), false, "generated native-window sizing wrapper must be removed");
+assert.equal(main.includes("function z9("), false, "generated window-options wrapper must be removed");
 
-console.log("564 main unwired-owner skeleton assertions passed");
+console.log("574 main unwired-owner skeleton assertions passed");

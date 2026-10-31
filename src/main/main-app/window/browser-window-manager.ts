@@ -5,7 +5,7 @@
  * The returned class owns window registries, message queues, primary selection, creation, and cleanup.
  */
 export function createBrowserWindowManagerClass(dependencies: Record<string, any>) {
-  const { n, l, a, xot, IH, A9, j9, Yot, Xot, Zot, installDisplayChangeGeometryRefresh, est, U, J, O9, initializeMcpSandbox, kot, Cot, r9, sst, z9, ost, L9, buildBrowserWindowOptions, S2e, RUe, uWe, lUe, uVe, installWindowTitlebarOverlaySync, M9, N9, Oe, De, P9, E9, MH, wot, F9, h, v, Pot, installPrimaryWindowTracking, $ot, ast, rst, ist, BH, I9, cst, bot, Not, installNativeContextMenu, installWebContentsDiagnostics, shouldRecoverRendererCrash, fT } = dependencies;
+  const { n, l, a, xot, IH, trafficLightPosition, titleBarOverlay, Yot, Xot, Zot, installDisplayChangeGeometryRefresh, isTrustedRendererSenderFrame, U, J, O9, initializeMcpSandbox, kot, Cot, r9, minimumWindowSize, windowOptions, supportsEmbeddedWebview, windowSurfaceColors, buildBrowserWindowOptions, S2e, RUe, uWe, lUe, uVe, installWindowTitlebarOverlaySync, rendererEntryUrl, rendererOrigin, Oe, De, isTrustedRendererFrameUrl, sameOrigin, MH, sameTrustedPath, isAppProtocolUrl, h, v, buildWindowErrorPage, installPrimaryWindowTracking, resolveAppearanceTheme, shouldHideInactiveWindow, isLargeEnoughForNativeWindow, shouldUseOpaqueWindows, BH, isOverlayAppearance, vibrancyForAppearance, bot, Not, installNativeContextMenu, installWebContentsDiagnostics, shouldRecoverRendererCrash, fT } = dependencies;
   return class BrowserWindowManager {
   applicationNetwork;
   options;
@@ -121,9 +121,9 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
     n == null ||
       (r !== `primary` && r !== `quickChat`) ||
       (process.platform === `darwin`
-        ? n.setWindowButtonPosition(A9(t))
+        ? n.setWindowButtonPosition(trafficLightPosition(t))
         : (process.platform === `win32` || process.platform === `linux`) &&
-          (this.windowZooms.set(n.id, t), n.setTitleBarOverlay(j9(t))));
+          (this.windowZooms.set(n.id, t), n.setTitleBarOverlay(titleBarOverlay(t))));
   }
   setHistorySwipeNavigationState(e, t) {
     let n = l.BrowserWindow.fromWebContents(e);
@@ -377,7 +377,7 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
   isTrustedIpcSender(e, t) {
     return e.id != null && !this.registeredWebContentsIds.has(e.id)
       ? !1
-      : est({ sender: e, senderFrame: t, moduleDir: this.options.moduleDir });
+      : isTrustedRendererSenderFrame({ sender: e, senderFrame: t, moduleDir: this.options.moduleDir });
   }
   isMainProcessInspectorEnabled() {
     return U.url() != null;
@@ -412,10 +412,10 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
       w = x?.x ?? (t == null ? void 0 : t.x + Math.round((t.width - S) / 2)),
       T = x?.y ?? (t == null ? void 0 : t.y + Math.round((t.height - C) / 2)),
       E = x?.isMaximized === !0,
-      D = sst(s, this.getPrimaryMinimumSize()),
+      D = minimumWindowSize(s, this.getPrimaryMinimumSize()),
       O = this.shouldAlwaysUseOpaqueWindowSurface(s),
-      k = z9({ appearance: s, opaqueWindowSurfaceEnabled: O, platform: process.platform }),
-      A = ost(s),
+      k = windowOptions({ appearance: s, opaqueWindowSurfaceEnabled: O, platform: process.platform }),
+      A = supportsEmbeddedWebview(s),
       j = A && this.options.allowMcpAppSandboxLocalDevelopment === !0,
       M = {
         preload: this.options.preloadPath,
@@ -427,7 +427,7 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
         devTools: this.options.allowDevtools,
         ...(A ? { webviewTag: !0 } : {}),
       },
-      { backgroundColor: N, backgroundMaterial: P } = L9({
+      { backgroundColor: N, backgroundMaterial: P } = windowSurfaceColors({
         platform: process.platform,
         appearance: s,
         opaqueWindowSurfaceEnabled: O,
@@ -637,7 +637,7 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
         I.once(`ready-to-show`, () => {
           I.isDestroyed() || I.maximize();
         }));
-    let re = N9();
+    let re = rendererOrigin();
     (I.webContents.setWindowOpenHandler(({ disposition: e, url: t, frameName: n }) => {
       let r = Oe(n);
       if (
@@ -645,7 +645,7 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
         this.browserCommentPopupWindowCreatedHandlers.size > 0 &&
         t === `about:blank` &&
         s === `primary` &&
-        P9(I.webContents.getURL(), this.options.moduleDir)
+        isTrustedRendererFrameUrl(I.webContents.getURL(), this.options.moduleDir)
       ) {
         let e = this.getBrowserCommentPopupOwner(I.webContents, r.conversationId, r.browserTabId),
           t = e == null ? null : l.BrowserWindow.fromWebContents(e);
@@ -657,7 +657,7 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
               overrideBrowserWindowOptions: this.createBrowserCommentPopupWindowOptions(t),
             };
       }
-      return re && E9(t, re)
+      return re && sameOrigin(t, re)
         ? { action: `allow` }
         : (MH(t) &&
             this.openLinkInPreferredTarget(
@@ -704,7 +704,7 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
           !L.isDestroyed() && L.removeListener(`before-input-event`, H));
       }),
       I.webContents.on(`will-navigate`, (e, t) => {
-        wot(t, I.webContents.getURL(), re) ||
+        sameTrustedPath(t, I.webContents.getURL(), re) ||
           (e.preventDefault(),
           MH(t) &&
             this.openLinkInPreferredTarget(
@@ -714,16 +714,16 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
             ));
       }),
       I.webContents.on(`will-frame-navigate`, (e) => {
-        !e.isMainFrame && F9(e.url) && e.preventDefault();
+        !e.isMainFrame && isAppProtocolUrl(e.url) && e.preventDefault();
       }),
       I.webContents.on(`will-redirect`, (e, t) => {
         let n = e.url ?? t;
-        !e.isMainFrame && F9(n) && e.preventDefault();
+        !e.isMainFrame && isAppProtocolUrl(n) && e.preventDefault();
       }),
       this.installNativeContextMenu(I));
     let U = a.dn(u);
     if (!l.app.isPackaged) {
-      let e = new URL(M9());
+      let e = new URL(rendererEntryUrl());
       return (
         U !== `index.html` && (e.pathname = new URL(U, e).pathname),
         u && e.searchParams.set(`initialRoute`, u),
@@ -743,7 +743,7 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
           sensitive: { documentPath: ae, error: e },
         });
       }
-    let oe = `data:text/html;charset=utf-8,${encodeURIComponent(Pot())}`;
+    let oe = `data:text/html;charset=utf-8,${encodeURIComponent(buildWindowErrorPage())}`;
     return (await I.loadURL(oe), I);
   }
   async createPrimaryWindow(e = {}) {
@@ -775,7 +775,7 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
   createBrowserCommentPopupWindowOptions(e) {
     let t = `browserCommentPopup`,
       n = this.shouldAlwaysUseOpaqueWindowSurface(t),
-      { backgroundColor: r, backgroundMaterial: i } = L9({
+      { backgroundColor: r, backgroundMaterial: i } = windowSurfaceColors({
         platform: process.platform,
         appearance: t,
         opaqueWindowSurfaceEnabled: n,
@@ -789,7 +789,7 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
       show: !1,
       backgroundColor: r,
       backgroundMaterial: i ?? void 0,
-      ...z9({ appearance: t, opaqueWindowSurfaceEnabled: n, platform: process.platform }),
+      ...windowOptions({ appearance: t, opaqueWindowSurfaceEnabled: n, platform: process.platform }),
       webPreferences: {
         contextIsolation: !0,
         nodeIntegration: !1,
@@ -924,12 +924,12 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
       nativeTheme: l.nativeTheme,
       isDestroyed: () => e.isDestroyed(),
       setTitleBarOverlay: (options) => e.setTitleBarOverlay(options),
-      getOverlay: () => j9(this.windowZooms.get(e.id)),
+      getOverlay: () => titleBarOverlay(this.windowZooms.get(e.id)),
     });
   }
   isOpaqueWindowsEnabled() {
     return (
-      ($ot(this.options.settingsStore.getEffective(n.Ha.theme.key) ?? `system`) === `light`
+      (resolveAppearanceTheme(this.options.settingsStore.getEffective(n.Ha.theme.key) ?? `system`) === `light`
         ? this.options.settingsStore.getEffective(n.Ha.lightChromeTheme.key)
         : this.options.settingsStore.getEffective(n.Ha.darkChromeTheme.key)
       )?.opaqueWindows === !0
@@ -939,8 +939,8 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
     let r = l.screen.getDisplayMatching(t);
     return (
       this.shouldAlwaysUseOpaqueWindowSurface(e) ||
-      ast({ appearance: e, isFocused: n, platform: process.platform }) ||
-      rst({
+      shouldHideInactiveWindow({ appearance: e, isFocused: n, platform: process.platform }) ||
+      isLargeEnoughForNativeWindow({
         appearance: e,
         platform: process.platform,
         scaleFactor: r.scaleFactor,
@@ -950,19 +950,19 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
   }
   shouldAlwaysUseOpaqueWindowSurface(e) {
     return (
-      ist({
+      shouldUseOpaqueWindows({
         appearance: e,
         opaqueWindowsEnabled: this.isOpaqueWindowsEnabled(),
         platform: process.platform,
       }) ||
-      (!BH() && !I9(e))
+      (!BH() && !isOverlayAppearance(e))
     );
   }
   applyWindowBackdrop(e, t, n) {
     let r = e.getBounds(),
       i = this.shouldUseOpaqueWindowSurface(t, r, e.isFocused());
     if (!n && this.opaqueWindowSurfaceModes.get(e.id) === i) return;
-    let { backgroundColor: a, backgroundMaterial: o } = L9({
+    let { backgroundColor: a, backgroundMaterial: o } = windowSurfaceColors({
       platform: process.platform,
       appearance: t,
       opaqueWindowSurfaceEnabled: i,
@@ -970,7 +970,7 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
     });
     (e.setBackgroundColor(a),
       o != null && e.setBackgroundMaterial(o),
-      process.platform === `darwin` && e.setVibrancy(cst(t, i)),
+      process.platform === `darwin` && e.setVibrancy(vibrancyForAppearance(t, i)),
       this.opaqueWindowSurfaceModes.set(e.id, i),
       this.sendMessageToWindow(e, {
         type: `electron-window-opaque-surface-changed`,

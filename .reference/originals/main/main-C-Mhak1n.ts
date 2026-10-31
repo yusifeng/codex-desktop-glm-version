@@ -236,6 +236,7 @@ const { createShortcutLinkReader } = require("./main-app/worker/shortcut-link-ca
 const { isTrayReady } = require("./main-app/tray/tray-readiness.js");
 const { HISTORY_CLEAR_ACTIONS, historyScopeAction, historyClearRange } = require("./main-app/computer-use/history-scope-actions.js");
 const rendererFrameTrust = require("./main-app/window/renderer-frame-trust.js");
+const { createBrowserWindowPolicyAdapters } = require("./main-app/window/browser-window-policy-adapters.js");
 const { isDeviceCheckPlatform: rr, isAppleSilicon: ir, isDeviceCheckSupported: ar, createDeviceAttestationHandler: or, generateDeviceCheckToken: cr } = require("./main-app/security/device-check.js");
 const remoteHost = require("./main-app/open-target/remote-host.js");
 const openTargetFilter = require("./main-app/open-target/target-filter-policy.js");
@@ -55742,24 +55743,6 @@ var {
   createUsingScope: a.en,
   initialRoute: n.oo,
 });
-function E9(e, t) {
-  return mainUrlTrust.sameOrigin(e, t);
-}
-function wot(e, t, n) {
-  return mainUrlTrust.sameTrustedPath(e, t, n ?? null);
-}
-function Tot(e, t, n) {
-  return mainUrlTrust.samePathOnOrigin(e, t, n);
-}
-function Eot(e, t) {
-  return mainUrlTrust.sameFilePath(e, t);
-}
-function Dot(e, t) {
-  return mainUrlTrust.sameAppPath(e, t);
-}
-function D9(e) {
-  return mainUrlTrust.parseUrl(e);
-}
 var kot = createThreadMetadataServiceClass({
   RpcHandlerBase: n.Uf,
   createLogger: r.r,
@@ -55775,31 +55758,34 @@ var O9 = r.i(`window-manager`),
       : process.platform === `win32`
         ? `Open in Explorer`
         : `Open in File Manager`;
-function Pot() {
-  return buildWindowErrorPage(l.app.getName());
-}
 var Yot = 5e3,
   Xot = 1e3,
   Zot = 5e3;
-function A9(e) {
-  return windowAppearance.trafficLightPosition(e);
-}
-function j9(e = 1) {
-  return windowAppearance.titleBarOverlay(e, l.nativeTheme.shouldUseDarkColors);
-}
+var browserWindowPolicies = createBrowserWindowPolicyAdapters({
+  buildErrorPage: buildWindowErrorPage,
+  getAppName: () => l.app.getName(),
+  getWebviewEntryPath: (moduleDirectory) =>
+    require("./bootstrap/protocol/app-protocol.js").getWebviewEntryPath(moduleDirectory),
+  mainUrlTrust,
+  packagedRendererUrl: Mot,
+  prefersDarkColors: () => l.nativeTheme.shouldUseDarkColors,
+  rendererEnvironmentUrl: process.env.ELECTRON_RENDERER_URL,
+  rendererFrameTrust,
+  windowAppearance,
+});
 var Qot = createBrowserWindowManagerClass({
   n,
   l,
   a,
   xot,
   IH,
-  A9,
-  j9,
+  trafficLightPosition: browserWindowPolicies.trafficLightPosition,
+  titleBarOverlay: browserWindowPolicies.titleBarOverlay,
   Yot,
   Xot,
   Zot,
   installDisplayChangeGeometryRefresh,
-  est,
+  isTrustedRendererSenderFrame: browserWindowPolicies.isTrustedRendererSenderFrame,
   U,
   J,
   O9,
@@ -55807,10 +55793,10 @@ var Qot = createBrowserWindowManagerClass({
   kot,
   Cot,
   r9,
-  sst,
-  z9,
-  ost,
-  L9,
+  minimumWindowSize: browserWindowPolicies.minimumWindowSize,
+  windowOptions: browserWindowPolicies.windowOptions,
+  supportsEmbeddedWebview: browserWindowPolicies.supportsEmbeddedWebview,
+  windowSurfaceColors: browserWindowPolicies.windowSurfaceColors,
   buildBrowserWindowOptions,
   S2e: mcpSandboxLifecycle.bindOwnerWebviews,
   RUe,
@@ -55818,26 +55804,26 @@ var Qot = createBrowserWindowManagerClass({
   lUe,
   uVe,
   installWindowTitlebarOverlaySync,
-  M9,
-  N9,
+  rendererEntryUrl: browserWindowPolicies.rendererEntryUrl,
+  rendererOrigin: browserWindowPolicies.rendererOrigin,
   Oe,
   De,
-  P9,
-  E9,
+  isTrustedRendererFrameUrl: browserWindowPolicies.isTrustedRendererFrameUrl,
+  sameOrigin: browserWindowPolicies.sameOrigin,
   MH,
-  wot,
-  F9,
+  sameTrustedPath: browserWindowPolicies.sameTrustedPath,
+  isAppProtocolUrl: browserWindowPolicies.isAppProtocolUrl,
   h,
   v,
-  Pot,
+  buildWindowErrorPage: browserWindowPolicies.buildWindowErrorPage,
   installPrimaryWindowTracking,
-  $ot,
-  ast,
-  rst,
-  ist,
+  resolveAppearanceTheme: browserWindowPolicies.resolveAppearanceTheme,
+  shouldHideInactiveWindow: browserWindowPolicies.shouldHideInactiveWindow,
+  isLargeEnoughForNativeWindow: browserWindowPolicies.isLargeEnoughForNativeWindow,
+  shouldUseOpaqueWindows: browserWindowPolicies.shouldUseOpaqueWindows,
   BH,
-  I9,
-  cst,
+  isOverlayAppearance: browserWindowPolicies.isOverlayAppearance,
+  vibrancyForAppearance: browserWindowPolicies.vibrancyForAppearance,
   bot,
   Not,
   installNativeContextMenu,
@@ -55845,57 +55831,6 @@ var Qot = createBrowserWindowManagerClass({
   shouldRecoverRendererCrash,
   fT,
 });
-function $ot(e) {
-  return windowAppearance.resolveAppearanceTheme(e, l.nativeTheme.shouldUseDarkColors);
-}
-function M9() {
-  return rendererFrameTrust.resolveRendererEntryUrl(process.env.ELECTRON_RENDERER_URL, Mot);
-}
-function est({ sender: e, senderFrame: t, moduleDir: n }) {
-  return rendererFrameTrust.isTrustedRendererSenderFrame(e, t, { rendererUrl: M9(), webviewEntryPath: tst(n) });
-}
-function N9() {
-  return rendererFrameTrust.rendererOrigin(M9());
-}
-function tst(e) {
-  return require("./bootstrap/protocol/app-protocol.js").getWebviewEntryPath(e);
-}
-function P9(e, t) {
-  return rendererFrameTrust.isTrustedRendererFrameUrl(e, { rendererUrl: M9(), webviewEntryPath: tst(t) });
-}
-function nst(e) {
-  return mainUrlTrust.isAppFrameUrl(e);
-}
-function F9(e) {
-  return mainUrlTrust.isAppProtocolUrl(e);
-}
-function I9(e) {
-  return windowAppearance.isOverlayAppearance(e);
-}
-function rst({ appearance: e, platform: t, scaleFactor: n, windowBounds: r }) {
-  return windowAppearance.isLargeEnoughForNativeWindow({ appearance: e, platform: t, scaleFactor: n, windowBounds: r });
-}
-function ist({ appearance: e, opaqueWindowsEnabled: t, platform: n }) {
-  return windowAppearance.shouldUseOpaqueWindows({ appearance: e, opaqueWindowsEnabled: t, platform: n });
-}
-function ast({ appearance: e, isFocused: t, platform: n }) {
-  return windowAppearance.shouldHideInactiveWindow({ appearance: e, isFocused: t, platform: n });
-}
-function ost(e) {
-  return windowAppearance.supportsEmbeddedWebview(e);
-}
-function sst(e, t) {
-  return windowAppearance.minimumWindowSize(e, t);
-}
-function L9({ platform: e, appearance: t, opaqueWindowSurfaceEnabled: n, prefersDarkColors: r }) {
-  return windowAppearance.windowSurfaceColors({ platform: e, appearance: t, opaqueWindowSurfaceEnabled: n, prefersDarkColors: r });
-}
-function cst(e, t) {
-  return windowAppearance.vibrancyForAppearance(e, t);
-}
-function z9({ appearance: e, opaqueWindowSurfaceEnabled: t, platform: n, windowZoom: r = 1 }) {
-  return windowAppearance.windowOptions({ appearance: e, opaqueWindowSurfaceEnabled: t, platform: n, windowZoom: r });
-}
 var lst = 2e3,
   ust = 10;
 function dst({
