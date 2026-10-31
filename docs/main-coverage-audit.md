@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 realtime recording cluster wiring
+
+既有 `src/main/main-app/realtime/session-recorder.ts` 已完整实现 `kwe/Awe/mw/Lwe`，但此前 main 仍保留重复 schema、recorder、
+rollout embed helpers 与 SQLite ledger。本轮接回 feedback/startup/voice-history consumers 并删除旧簇；focused suite 验证
+RecordingGate generation、RealtimeSessionRecorder generation retirement/root path、VoiceTimelineLedger transaction/idempotency/sequence。
+
 ## 2026-10-31 Skysight service manager wiring
 
 既有 `src/main/main-app/skysight/service-manager.ts` 已完整实现原 `Moe` 的 24-member recorder state machine，但此前无 main

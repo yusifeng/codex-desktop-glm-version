@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 realtime recording cluster：既有 `realtime/session-recorder.ts` 现已替代主 chunk 的 `kwe/Awe/mw/Lwe` 与专属 schema/
+redaction/rollout helpers。feedback log、recording generation gate、RealtimeSessionRecorder 与 VoiceTimelineLedger 均接回真实
+bootstrap consumers；旧重复录制/SQLite owner 已物理删除，focused gate 锁定 5/16/5 members 与核心代数/ledger 行为。
+
 接回 Skysight/Chronicle recorder owner：既有 `skysight/service-manager.ts` 的 `SkysightServiceManager` 现已替代主 chunk
 旧 `joe/Moe`。desired/cached state、serialized enable/pause/resume/stop、status dedupe、plugin reconciliation、失败 rollback 与
 segment closure validation 均由完整 24-member 语义 owner 持有；真实 startup consumer 继续通过 `Moe` 别名构造。
