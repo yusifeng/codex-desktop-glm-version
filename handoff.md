@@ -5025,3 +5025,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   emission、registry 注册顺序、thread 删除清理与默认 snapshot；main 旧 `lX..pX` 生命周期组已删除。
 - focused coverage 40 项，no-unwired gate 扩至 452 项。下一批从 `mX` 后的 browser window/thread state helper belt 继续审计，
   优先迁移完整 lookup/materialization 边界，不拆 generated Browser Use SDK/vendor 区域。
+
+# 2026-11-01 browser thread state runtime extraction
+
+- 新增并接回 `browser-sidebar/browser-thread-state-runtime.ts`，完整承接 tab resolution、thread/page lookup、owner-route 继承、
+  cold thread materialization 与 presentation projection；main 旧 `mX..sXe` helper belt 已删除。
+- 无调用点的 `rXe/iXe` 作为死恢复残留一并移除。focused coverage 57 项，no-unwired gate 扩至 464 项；下一批从紧随其后的
+  Browser Use route adapter helpers继续审计，优先与现有 `browser-use-route-controller.ts` 合并而不是复制 controller 状态。

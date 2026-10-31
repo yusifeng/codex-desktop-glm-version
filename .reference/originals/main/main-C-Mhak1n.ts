@@ -475,6 +475,7 @@ const {
 } = require("./main-app/browser-sidebar/browser-shortcuts.js");
 const { IabTabCandidateStore: qGe } = require("./main-app/browser-sidebar/iab-tab-candidate-store.js");
 const { createBrowserTabLifecycleRuntime } = require("./main-app/browser-sidebar/browser-tab-lifecycle-runtime.js");
+const { createBrowserThreadStateRuntime } = require("./main-app/browser-sidebar/browser-thread-state-runtime.js");
 const {
   inspect: SVe,
   back: CVe,
@@ -43748,151 +43749,23 @@ var { BrowserSessionRegistry: cX, BrowserUseHost: ZYe } = createBrowserSessionRe
   consumeAllowedDownloadSymbol: zY,
   notifyDownloadChangeSymbol: BY,
 });
-function mX(e, t, n) {
-  return n ?? (e.activeConversationId === t ? e.activeBrowserTabId : null);
-}
-function hX(e, t, n) {
-  let r = mX(e, t, n);
-  return r == null ? null : (e.threads.get(qU({ browserTabId: r, conversationId: t })) ?? null);
-}
-function gX(e, t, n) {
-  if (t == null) return null;
-  let r = hX(e, t, n ?? void 0);
-  return r?.pendingTeardown != null ||
-    r?.page?.view.webContents == null ||
-    r.page.view.webContents.isDestroyed()
-    ? null
-    : lW(e, t, r.page);
-}
-function rXe(e, t, n, r) {
-  let i = e == null ? null : r({ windowId: oX(e.window.id), conversationId: t }, n);
-  if (i == null) return null;
-  let a = hX(i, t, n);
-  return a?.page == null ? null : { page: a.page, threadState: a, windowState: i };
-}
-function iXe(e, t, n, r, i, a) {
-  if (e == null) return null;
-  let o = mX(e, t, n);
-  if (o == null) return null;
-  let s =
-    n == null
-      ? e
-      : (r({ conversationId: t, windowId: oX((e.tabSourceWindow ?? e).window.id) }, o) ?? e);
-  ((s.activeConversationId = t), (s.activeBrowserTabId = o));
-  let c = i(s, t, o);
-  return (a(s, c), { threadState: c, windowState: s });
-}
-function aXe(e, t) {
-  for (let n of e.threads.values()) if (n.conversationId === t) return !0;
-  return !1;
-}
-function _X(e, t) {
-  for (let n of e.threads.values())
-    if (n.conversationId === t && n.ownerRoutePath != null) return n.ownerRoutePath;
-  return null;
-}
-function oXe({
-  browserSessionRegistry: e,
-  browserTabId: t,
-  conversationId: r,
-  options: { isBrowserUseTab: i = !1 } = {},
-  tabBudget: a,
-  windowManager: o,
-  windows: s,
-  windowState: c,
-}) {
-  let l = qU({ browserTabId: t, conversationId: r }),
-    u = c.threads.get(l);
-  if (u != null) return u;
-  let d = vX({
-    annotationModeEnabled: !0,
-    browserStorageId: PG({ browserTabId: t, conversationId: r }),
-    browserTabId: t,
-    conversationId: r,
-    hostKind: null,
-    emulatedViewportSize: null,
-    cwd: null,
-    isBrowserUsePage: i,
-    ownerRoutePath: _X(c, r),
-    runtimeIntlConfig: n.xu,
-  });
-  return (a.markTabActivity(d), c.threads.set(l, d), fX(e, o, s, c, d), d);
-}
-function vX({
-  annotationModeEnabled: e,
-  browserStorageId: t,
-  browserTabId: n,
-  conversationId: r,
-  cwd: i,
-  emulatedViewportSize: a,
-  hostKind: o,
-  isBrowserUsePage: s,
-  ownerRoutePath: c,
-  runtimeIntlConfig: l,
-}) {
-  return {
-    browserStorageId: t,
-    browserTabId: n,
-    conversationId: r,
-    findState: oq(),
-    page: null,
-    hostKind: o,
-    pendingBrowserUsePanelOpen: !1,
-    hasPendingBrowserUseVisibilityRequest: !1,
-    pendingCommentModeActivation: null,
-    visible: !1,
-    bounds: null,
-    presented: !1,
-    hostGeneration: null,
-    mountGeneration: 0,
-    pendingTeardown: null,
-    sessionState: `cold`,
-    lastTabActivitySequence: 0,
-    lastTabActivityTime: 0,
-    lastPresentedSequence: 0,
-    lastLifecycleSequence: 0,
-    emulatedViewportSize: a,
-    viewportScale: 1,
-    cwd: i,
-    isAgentControllingBrowser: !1,
-    isAnnotationModeEnabled: e,
-    isBrowserUseActive: !1,
-    isBrowserUsePage: s,
-    isTabCaptureActive: !1,
-    browserUseTabLifetime: s ? `temporary` : `persistent`,
-    isBrowserUseNavigationRestrictionActive: !1,
-    ownerRoutePath: c,
-    commentModeBlockCheckRequestId: 0,
-    commentModeBlockCheckUrl: null,
-    themeVariant: `light`,
-    runtimeIntlConfig: l,
-    snapshot: pX(),
-  };
-}
-function sXe(e, t) {
-  ((e.hostKind = t.hostKind),
-    (e.mountGeneration = t.mountGeneration),
-    (e.presented = t.presented),
-    (e.visible = t.visible),
-    (e.viewportScale = t.viewportScale));
-  let n =
-    t.emulatedViewportSize !== void 0 &&
-    (e.emulatedViewportSize?.width !== t.emulatedViewportSize?.width ||
-      e.emulatedViewportSize?.height !== t.emulatedViewportSize?.height);
-  return (
-    t.emulatedViewportSize !== void 0 && (e.emulatedViewportSize = t.emulatedViewportSize),
-    (e.bounds =
-      t.bounds == null
-        ? null
-        : {
-            x: Math.round(t.bounds.x),
-            y: Math.round(t.bounds.y),
-            width: Math.round(t.bounds.width),
-            height: Math.round(t.bounds.height),
-          }),
-    n
-  );
-}
+var {
+  resolveBrowserTabId: mX,
+  getThreadStateForWindow: hX,
+  getPageHandleForConversation: gX,
+  hasThreadForConversation: aXe,
+  ensureThreadStateForWindow: oXe,
+  createThreadState: vX,
+  applyThreadPresentation: sXe,
+} = createBrowserThreadStateRuntime({
+  createDefaultBrowserSnapshot: pX,
+  createFindState: oq,
+  makeBrowserStorageId: PG,
+  makePageRecordKey: qU,
+  pageHandleForThread: lW,
+  registerThreadAndRecordOpened: fX,
+  runtimeIntlConfig: n.xu,
+});
 var yX = r.i(`browser-sidebar-manager`);
 function cXe(e, { conversationId: t, windowId: n }, r) {
   let i = e.getPageWindowState({ conversationId: t, windowId: n }, r);

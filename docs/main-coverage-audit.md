@@ -3072,3 +3072,11 @@ opened/closed analytics、session registry 注册顺序、thread 删除/active s
 主运行时直接解构语义 exports 供 session registry、thread materialization 和 window-state controller 继续消费；原始 chunk 中
 `lX/uX/$Ye/dX/eXe/fX/tXe/nXe/pX` 已物理删除。focused test 覆盖计数、显式 browser-use override、日志/message、注册先于
 opened、删除先于 closed 计数、active/ignored 清理、默认 snapshot 与真实接线；no-unwired gate 扩至 452 项。
+
+### 增量抽取：browser thread state runtime
+
+新增 `browser-sidebar/browser-thread-state-runtime.ts`，统一接管 active/explicit tab-id 解析、thread/page-handle lookup、owner route
+继承、cold thread materialization、browser-use lifetime、find/snapshot 初始化和 presentation/bounds 投影。主组合根继续以兼容别名
+向现有 controllers 注入同一语义实现；无 consumer 的 `rXe/iXe` 死恢复 helper 同步删除，未制造 facade。原始 chunk 中
+`mX..sXe` 约 140 行已物理删除。focused test 57 项覆盖 lookup 拒绝条件、owner route、existing/new materialization、cold state、
+viewport 变更检测、bounds rounding 与真实接线；no-unwired gate 扩至 464 项。
