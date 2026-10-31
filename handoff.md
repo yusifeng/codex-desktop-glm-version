@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+恢复 Linux applications/desktop-entry owner：新增 `platform/linux-applications.ts` 接管 XDG roots、desktop entry/可见性/TryExec、GIO MIME、
+默认浏览器、应用去重和 icon theme/inheritance/pixmaps 安全解析；`util/app-paths.ts` 的 Linux icon null stub 已接回真实 resolver。主 chunk
+`iO…vO` 约 336 行旧实现删除，以 24 条临时 XDG/GIO focused 断言覆盖。
+
 恢复完整 OpenInService owner：新增 `misc/open-in-service.ts` 接管目标发现/缓存、worker 调用、icon/enrichment、偏好规范化与持久化、URL/browser
 panel、远端/本地路径、目录、Office/native document、编辑器和文件管理器路由；WindowContext 已消费新 owner。主 chunk 原 helper/class 约 372 行
 重复实现删除，新增 42 条行为/接线断言，防未接线空壳审计同步扩展至 23 条。

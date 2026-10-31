@@ -27,6 +27,7 @@ import {
 } from "@chunk/shared";
 import { getWindowsAppIconSmall } from "../windows/native-app-icons";
 import { isNetworkDrive, supportsPersistentAcls } from "../platform/windows-account";
+import { resolveLinuxDesktopEntryIcon } from "../platform/linux-applications";
 
 const execFileAsync = promisify(execFile);
 
@@ -112,18 +113,9 @@ async function appIconDataUrl(appPath: string): Promise<string | null> {
   }
   if (process.platform === "win32") return getWindowsAppIconSmall(appPath, {});
   if (process.platform === "linux") {
-    const iconPath = linuxDesktopEntryIcon(appPath);
+    const iconPath = resolveLinuxDesktopEntryIcon(appPath);
     return iconPath == null ? null : imageFileToDataUrl(iconPath);
   }
-  return null;
-}
-
-/**
- * linux 的 desktop entry 图标（原 PAe，XDG 主题解析）。
- * TODO(R6 后续)：linux-apps 簇（71,366-71,701）落地后接入真实实现；
- * 当前返回 null（无图标），linux 上的图标走 nativeImage 直读兜底。
- */
-function linuxDesktopEntryIcon(_appPath: string): string | null {
   return null;
 }
 

@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 Linux applications and desktop-entry owner restoration
+
+新增 `platform/linux-applications.ts`，完整接管 XDG data/application roots、desktop entry 解析与显示门控、TryExec、GIO content-type/MIME、
+默认浏览器、应用去重、icon theme/inheritance/pixmaps 及 realpath containment。主 chunk 原 `iO…vO` 约 336 行实现已替换为具名 runtime；
+`util/app-paths.ts` 原永远返回 null 的 Linux icon stub 同时改接真实 resolver。24 条 focused 断言使用临时 XDG 目录和 fake GIO 执行主要分支。
+
 ## 2026-11-01 OpenInService owner restoration
 
 新增完整 `misc/open-in-service.ts`，把打开目标的发现/缓存、worker 参数、图标与目标 enrichment、偏好读取和持久化、URL/system-default、
