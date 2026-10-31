@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 application lifecycle owner
+
+原 `vrt..Nrt/Brt/Vrt` 已迁入 `src/main/main-app/startup/application-lifecycle.ts`。新 owner 保留 privacy/system-shutdown
+quit gating、local chats/active automations/pending worktrees 的 confirmation copy projection、activate attribution、menu refresh、
+foreground/background app events、single-shot will-quit、packaged Windows forced-exit arm、skip-drain policy，以及 global/settings/
+micro/tracing/context/disposables 的 ordered all-settled cleanup；真实 startup consumer 已接回，旧 constants/functions 已删除。
+
 ## 2026-10-31 About window owner
 
 原 `Hrt/Urt/Wrt/Grt/Krt/qrt/Jrt/u7/d7/f7/Yrt/Xrt/Zrt/p7/Qrt/$rt/eit/tit/m7/h7/nit/rit` 已迁入

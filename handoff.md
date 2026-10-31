@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `vrt..Nrt/Brt/Vrt` application lifecycle owner 迁入 `startup/application-lifecycle.ts`；privacy/system-shutdown
+quit gating、local/automation/pending-worktree confirmation projection、activate attribution、menu refresh、foreground/background
+events、single-shot will-quit、Windows forced-exit arm、skip-drain policy 与 ordered all-settled cleanup 均由新 owner 持有。
+真实 startup consumer 已接回，旧 constants/functions 已删除。
+
 随后将 `Hrt/Urt/Wrt/Grt/Krt/qrt/Jrt/u7/d7/f7/Yrt/Xrt/Zrt/p7/Qrt/$rt/eit/tit/m7/h7/nit/rit`
 About-window owner 迁入 `app-shell/about-dialog.ts`；singleton focus、跨平台/主题图标、localized version/release copy、
 HTML escaping/CSP、hardened BrowserWindow、navigation denial、content sizing、parent/work-area placement 与 failure cleanup

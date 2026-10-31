@@ -142,6 +142,7 @@ const { createTrayLifecycle } = require("./main-app/tray/tray-lifecycle.js");
 const { createComputerHistoryStatusItemActions } = require("./main-app/computer-use/native-status-item-actions.js");
 const { installDesktopOpenPathHandler } = require("./main-app/files/desktop-open-path-handler.js");
 const { createAboutDialog } = require("./main-app/app-shell/about-dialog.js");
+const { installApplicationLifecycle } = require("./main-app/startup/application-lifecycle.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -142714,22 +142715,6 @@ async function _rt(e) {
       });
     }
 }
-var vrt = `desktop.quitConfirmation.title`,
-  yrt = `Quit {appName}?`,
-  brt = `desktop.quitConfirmation.activeLocalTasksDetail`,
-  xrt = `Active local chats on this machine will be interrupted`,
-  Srt = `desktop.quitConfirmation.scheduledTasksDetail`,
-  Crt = `Scheduled tasks won't run while {appName} is closed`,
-  wrt = `desktop.quitConfirmation.activeLocalAndScheduledTasksDetail`,
-  Trt = `Active local chats on this machine will be interrupted and scheduled tasks won't run while {appName} is closed`,
-  Ert = `desktop.quitConfirmation.pendingWorktreeChatsDetail`,
-  Drt = `Chats still starting in new worktrees may be lost, including on remote hosts`,
-  Ort = `desktop.quitConfirmation.pendingWorktreeAndLocalChatsDetail`,
-  krt = `Chats still starting in new worktrees may be lost, including on remote hosts. Active local chats will be interrupted`,
-  Art = `desktop.quitConfirmation.pendingWorktreeAndScheduledTasksDetail`,
-  jrt = `Chats still starting in new worktrees may be lost, including on remote hosts. Scheduled tasks won't run while {appName} is closed`,
-  Mrt = `desktop.quitConfirmation.pendingWorktreeLocalAndScheduledTasksDetail`,
-  Nrt = `Chats still starting in new worktrees may be lost, including on remote hosts. Active local chats will be interrupted and scheduled tasks won't run while {appName} is closed`;
 function a7(e = Yoe) {
   (e() || l.app.relaunch(), l.app.quit());
 }
@@ -143056,148 +143041,6 @@ function zrt({ buildFlavor: e, getContextForWebContents: t, isTrustedIpcEvent: n
           r.n().warning(`Failed to start native link drag`, { safe: {}, sensitive: { error: e } });
         }
     }));
-}
-function Brt({
-  isWindows: e,
-  disableQuitConfirmationPrompt: t,
-  quitState: r,
-  windows: i,
-  applicationMenuManager: o,
-  ensureWindow: s,
-  hotkeyWindowLifecycleManager: c,
-  globalDictationLifecycleManager: u,
-  globalState: d,
-  settingsStore: f,
-  getPendingWorktrees: p,
-  stopCodexMicro: m,
-  flushTracingBeforeQuit: h,
-  flushAndDisposeContext: g,
-  disposables: _,
-  appEvent: v,
-  onAppEntrySource: y,
-  canAttributeAppReactivation: b,
-}) {
-  let x = !1,
-    S = !1;
-  (_rt(() => {
-    r.allowQuitTemporarily();
-  }),
-    l.app.on(`before-quit`, (o) => {
-      if (nc()) {
-        o.preventDefault();
-        return;
-      }
-      let s = Lce(),
-        c =
-          p()?.some(
-            (e) =>
-              e.launchMode !== `create-stable-worktree` &&
-              e.phase !== `failed` &&
-              e.conversationStartResult?.status !== `created`,
-          ) ?? !1,
-        u = n.Ar().some((e) => e.status === `ACTIVE`);
-      if (e || r.canQuitWithoutPrompt() || t || (!s && !u && !c)) {
-        ((S = !0), i.markAppQuitting());
-        return;
-      }
-      let d = l.app.getName(),
-        f = a.hn(),
-        m = f.formatMessage({ messageId: vrt, defaultMessage: yrt, values: { appName: d } });
-      if (
-        l.dialog.showMessageBoxSync({
-          type: `warning`,
-          buttons: [
-            f.formatMessage({ messageId: `desktop.quitConfirmation.quit`, defaultMessage: `Quit` }),
-            f.formatMessage({
-              messageId: `desktop.quitConfirmation.cancel`,
-              defaultMessage: `Cancel`,
-            }),
-          ],
-          defaultId: 0,
-          cancelId: 1,
-          noLink: !0,
-          title: m,
-          message: m,
-          detail: Vrt({
-            nativeIntl: f,
-            appName: d,
-            hasInProgressLocalConversation: s,
-            hasEnabledAutomations: u,
-            hasPendingWorktreeChats: c,
-          }),
-        }) !== 0
-      ) {
-        o.preventDefault();
-        return;
-      }
-      (r.markQuitApproved(), (S = !0), i.markAppQuitting());
-    }),
-    l.app.on(`activate`, () => {
-      if (!S) {
-        if (!i.windowManager.hasPendingAuxiliaryActivationTarget()) {
-          let e = b?.() === !0,
-            t = i.showLastActivePrimaryWindow();
-          t == null
-            ? s().then((t) => {
-                e &&
-                  t != null &&
-                  !t.isDestroyed() &&
-                  y?.({ channel: `shortcut`, source: `shortcut` }, t.webContents);
-              })
-            : e && y?.({ channel: `shortcut`, source: `shortcut` }, t.webContents);
-        }
-        o.refresh();
-      }
-    }),
-    l.app.on(`browser-window-blur`, () => {
-      l.BrowserWindow.getFocusedWindow() ?? v.emit(`background`);
-    }),
-    l.app.on(`browser-window-focus`, () => {
-      (v.emit(`foreground`), o.refresh());
-    }),
-    l.app.on(`will-quit`, (t) => {
-      if (((S = !0), x)) return;
-      e && l.app.isPackaged && n7();
-      let n = () => {
-        s7(g, o7).then(() => {
-          (_.dispose(), l.app.quit());
-        });
-      };
-      if (r.shouldSkipDrainBeforeQuit()) {
-        (t.preventDefault(),
-          (x = !0),
-          c.dispose(),
-          u.dispose(),
-          Promise.allSettled([d.flush(), m(), h()]).then(n));
-        return;
-      }
-      (t.preventDefault(),
-        (x = !0),
-        c.dispose(),
-        u.dispose(),
-        Promise.allSettled([d.flush(), f.flush(), m(), h()]).then(n));
-    }));
-}
-function Vrt({
-  nativeIntl: e,
-  appName: t,
-  hasInProgressLocalConversation: n,
-  hasEnabledAutomations: r,
-  hasPendingWorktreeChats: i,
-}) {
-  return i
-    ? n && r
-      ? e.formatMessage({ messageId: Mrt, defaultMessage: Nrt, values: { appName: t } })
-      : n
-        ? e.formatMessage({ messageId: Ort, defaultMessage: krt })
-        : r
-          ? e.formatMessage({ messageId: Art, defaultMessage: jrt, values: { appName: t } })
-          : e.formatMessage({ messageId: Ert, defaultMessage: Drt })
-    : n && r
-      ? e.formatMessage({ messageId: wrt, defaultMessage: Trt, values: { appName: t } })
-      : n
-        ? e.formatMessage({ messageId: brt, defaultMessage: xrt })
-        : e.formatMessage({ messageId: Srt, defaultMessage: Crt, values: { appName: t } });
 }
 var c7 = `codex.aboutDialog.title`,
   l7 = `About {appName}`;
@@ -152447,7 +152290,17 @@ async function Ust() {
         }
       }),
     ),
-    Brt({
+    installApplicationLifecycle({
+      app: l.app,
+      BrowserWindow: l.BrowserWindow,
+      showMessageBoxSync: (options) => l.dialog.showMessageBoxSync(options),
+      getNativeIntl: a.hn,
+      shouldBlockQuit: nc,
+      hasInProgressLocalConversation: Lce,
+      getAutomations: n.Ar,
+      observeSystemShutdown: _rt,
+      armWindowsForcedExit: n7,
+      waitForContextCleanup: (cleanup) => s7(cleanup, o7),
       isWindows: P,
       disableQuitConfirmationPrompt: process.env.CODEX_ELECTRON_DISABLE_QUIT_CONFIRMATION === `1`,
       quitState: ye,
