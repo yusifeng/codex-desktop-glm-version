@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 demo tools owner：既有 `debug/export-logs.ts` 的 `ChatGPTAppDemoBackend`、`DemoTools`、`DemoToolsService` 与
+`createDemoTools` 现已替代主 chunk 旧 `Bje/Hje/Uje/Wje`。5/9/8-member 生命周期、abort/origin cleanup 与仅 packaged non-Dev
+darwin 启用的工厂 gate 保持完整；`WindowContext` 真实 consumer 继续通过 `Wje` 兼容别名构造。
+
 清理 thread workspace 重复子 owner：语义 `AppServerConversationManager` 已直接构造 `ProjectlessConversations` 与
 `ThreadWorkspaceStorage`，主 chunk 旧 `owe/swe` 只剩定义且无 consumer。核对 28/12 members 精确对齐后删除旧 284 行簇；
 focused gate 覆盖 projectless 登记/提示/删除、writable roots、assignment 与真实 manager wiring。

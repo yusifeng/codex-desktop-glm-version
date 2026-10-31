@@ -145,6 +145,7 @@ const { BrowserSettingsSync } = require("./main-app/browser-use/origin-state.js"
 const { PublishedStatsig } = require("./main-app/account/statsig-adapter.js");
 const { ConversationalOnboardingService } = require("./main-app/onboarding/conversational-onboarding.js");
 const { ArtifactSessionHostLifecycle } = require("./main-app/artifact-session/host-lifecycle.js");
+const { createDemoTools } = require("./main-app/debug/export-logs.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -63112,127 +63113,7 @@ var zje = class extends n.Uf {
       );
     }
   },
-  UN = `/Applications/ChatGPT.app`,
-  WN = {
-    unavailable: `Install the internal production track in your Applications folder before opening a demo.`,
-    "launch-failed": `The demo build could not be opened. Please try again.`,
-  },
-  Bje = class {
-    pendingLaunch = null;
-    async getSetup() {
-      return { downloadUrl: Vje(process.arch), installStatus: await this.#e() };
-    }
-    openDemoBuild() {
-      return (
-        (this.pendingLaunch ??= this.#t().finally(() => {
-          this.pendingLaunch = null;
-        })),
-        this.pendingLaunch
-      );
-    }
-    async #e() {
-      try {
-        await b.access(UN);
-        let e = [(0, h.join)(UN, `Contents`, `Resources`, `app.asar`, `package.json`)];
-        return a.an(`codexBuildFlavor`, { candidates: e }) === `prod`
-          ? a.an(`codexReleaseChannel`, { candidates: e }) === `prod-internal`
-            ? `installed`
-            : `regular-production`
-          : `wrong-track`;
-      } catch {
-        return `not-installed`;
-      }
-    }
-    async #t() {
-      if ((await this.#e()) !== `installed`)
-        return { status: `error`, code: `unavailable`, message: WN.unavailable };
-      let e = (0, h.join)(l.app.getPath(`home`), `.codex-demo`),
-        t = (0, h.join)(l.app.getPath(`appData`), `Codex Demo`, `user-data`);
-      try {
-        return (
-          await Promise.all([
-            b.mkdir(e, { recursive: !0, mode: 448 }),
-            b.mkdir(t, { recursive: !0, mode: 448 }),
-          ]),
-          await (0, d.promisify)(P.execFile)(
-            `/usr/bin/open`,
-            [
-              `-n`,
-              `--env`,
-              `CODEX_HOME=` + e,
-              `--env`,
-              `CODEX_ELECTRON_USER_DATA_PATH=` + t,
-              UN,
-              `--args`,
-              `--user-data-dir=` + t,
-            ],
-            { env: n.Bi(process.env), timeout: 6e4 },
-          ),
-          { status: `launched` }
-        );
-      } catch {
-        return { status: `error`, code: `launch-failed`, message: WN[`launch-failed`] };
-      }
-    }
-  };
-function Vje(e) {
-  return `https://oaisidekickupdates.blob.core.windows.net/codex-desktop/prod-internal/${e === `x64` ? `ChatGPT-latest-x64.dmg` : `ChatGPT.dmg`}`;
-}
-var Hje = class {
-    backend;
-    logger = r.r(`demo-tools`);
-    disposed = !1;
-    constructor(e) {
-      this.backend = e;
-    }
-    createService(e) {
-      if (this.disposed) throw Error(`Demo Tools has been disposed`);
-      return new Uje(this, e);
-    }
-    async getSetup(e) {
-      return this.#e(e) ? this.backend.getSetup() : null;
-    }
-    async openDemoBuild(e) {
-      if (!this.#e(e))
-        return { status: `error`, code: `unavailable`, message: `Demo build is unavailable` };
-      try {
-        return await this.backend.openDemoBuild();
-      } catch (e) {
-        return (
-          this.logger.warning(`Failed to open demo build`, { safe: {}, sensitive: { error: e } }),
-          { status: `error`, code: `launch-failed`, message: `Unable to open demo build` }
-        );
-      }
-    }
-    dispose() {
-      this.disposed = !0;
-    }
-    #e(e) {
-      return !this.disposed && !e.aborted;
-    }
-  },
-  Uje = class extends n.Uf {
-    demoTools;
-    origin;
-    lifetime = new AbortController();
-    handleDestroyed = () => this[Symbol.dispose]();
-    constructor(e, t) {
-      (super(), (this.demoTools = e), (this.origin = t), t.once(`destroyed`, this.handleDestroyed));
-    }
-    getSetup() {
-      return this.demoTools.getSetup(this.lifetime.signal);
-    }
-    openDemoBuild() {
-      return this.demoTools.openDemoBuild(this.lifetime.signal);
-    }
-    [Symbol.dispose]() {
-      this.lifetime.signal.aborted ||
-        (this.lifetime.abort(), this.origin.removeListener(`destroyed`, this.handleDestroyed));
-    }
-  };
-function Wje({ buildFlavor: e, isPackaged: t, platform: r = process.platform }) {
-  if (t && e !== n.cu.Dev && r === `darwin`) return new Hje(new Bje());
-}
+  Wje = createDemoTools;
 var GN = PrewarmSlot;
 function KN(e) {
   e != null && !e.isDestroyed() && e.close();

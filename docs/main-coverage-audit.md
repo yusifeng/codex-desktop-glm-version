@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 demo tools owner wiring
+
+`src/main/main-app/debug/export-logs.ts` 已完整实现原 `Bje/Hje/Uje/Wje` 的 demo backend、lifecycle、per-origin service 与工厂。
+本轮接回 `WindowContext` 的真实 consumer 并删除旧 121 行簇；focused suite 锁定 5/9/8 members，并验证 packaged/build flavor/
+platform 三重 gate 与 bootstrap wiring。
+
 ## 2026-10-31 thread workspace duplicate cleanup
 
 语义 `AppServerConversationManager` 已直接导入并构造 `ProjectlessConversations` 与 `ThreadWorkspaceStorage`；主 chunk 旧
