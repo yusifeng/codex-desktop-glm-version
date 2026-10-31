@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 remote localhost navigation
+
+原 `OZ` 已迁入 `src/main/main-app/browser-sidebar/remote-localhost-navigation.ts`；local/durable/SSH host
+分流、localhost port 识别、remote port-forward、URL rewrite 和失败降级均由语义 forwarder 持有，main 唯一
+consumer 直接调用新实现，旧函数已物理删除。
+
 ## 2026-10-31 WebContents host client
 
 原 `kZ` adapter 已整体迁入 `src/main/main-app/app-server/web-contents-host-client.ts`。新 owner 保留普通/

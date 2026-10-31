@@ -67,6 +67,7 @@ const { createElectronPerformanceSnapshotCollectorClass } = require("./main-app/
 const { MainThreadJankSampler } = require("./main-app/startup/main-thread-jank-sampler.js");
 const { createProjectFolderPickerClass } = require("./main-app/workspace/project-folder-picker.js");
 const { WebContentsHostClient } = require("./main-app/app-server/web-contents-host-client.js");
+const { createRemoteLocalhostNavigationForwarder } = require("./main-app/browser-sidebar/remote-localhost-navigation.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -115665,34 +115666,13 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
     findPageStateForPageKey(...args) { return this.windowThreadStateController.findPageStateForPageKey(...args); }
     findPageStateForRuntimeSender(...args) { return this.windowThreadStateController.findPageStateForRuntimeSender(...args); }
     getThreadStateForWindow(...args) { return this.windowThreadStateController.getThreadStateForWindow(...args); }
-  },
-  nQe = r.i(`remote-localhost-navigation`);
-async function OZ({
-  appServerConnectionRegistry: e,
-  getHostConfigForHostId: t,
-  hostId: r,
-  url: i,
-}) {
-  if (r == null || r === `local`) return i;
-  let a = He(i);
-  if (r === `durable`) return a == null ? i : null;
-  let o = t(r);
-  if (!n.Os(o) || a == null) return i;
-  try {
-    let t = await e.getConnection(r).startRemoteLocalhostPortForward(a),
-      n = new URL(i);
-    return ((n.hostname = `localhost`), (n.port = String(t)), n.toString());
-  } catch (e) {
-    return (
-      nQe().warning(`browser_sidebar.remote_localhost_port_forward_failed`, {
-        safe: { remotePort: a },
-        sensitive: { error: e, hostId: r, url: i },
-      }),
-      null
-    );
-  }
-}
-var kZ = WebContentsHostClient,
+  };
+var OZ = createRemoteLocalhostNavigationForwarder({
+    createLogger: r.i,
+    getLocalhostPort: He,
+    isSshHostConfig: n.Os,
+  }),
+  kZ = WebContentsHostClient,
   iQe = createProjectFolderPickerClass({
     clearTimeout: (e) => clearTimeout(e),
     createLogger: r.i,

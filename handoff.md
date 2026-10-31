@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `OZ` remote-localhost browser navigation 转发迁入 `remote-localhost-navigation.ts`；local/durable/
+SSH host 分流、localhost port gate、app-server port-forward、URL host/port 重写与失败日志降级由语义 forwarder
+持有，`r$e.forwardBrowserNavigationUrl` 唯一 consumer 已真实接回并删除旧函数。focused test 覆盖 13 项。
+
 随后将 `kZ` WebContents host adapter 整体迁入 `app-server/web-contents-host-client.ts`；critical send、
 background-throttled avatar thread filtering、destroy subscription fanout、focus/blur subscription ownership 与
 listener cleanup 均由语义 class 持有。main 中 5 个真实 consumer 继续经稳定别名构造该 class，旧实现已删除；
