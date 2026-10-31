@@ -15,6 +15,7 @@ Function("require", "module", "exports", transpiled.code)((specifier) => {
   if (specifier === "../turns/canonical-history") return {
     conversationTurns: (conversation) => conversation.turns ?? [],
     findTurnById: (conversation, id) => (conversation.turns ?? []).find((turn) => turn.turnId === id) ?? null,
+    findDraftTurn: (conversation, predicate) => [...(conversation.turns ?? [])].reverse().find(predicate) ?? null,
     lastTurnWithTurnId: (conversation) => [...(conversation.turns ?? [])].reverse().find((turn) => turn.turnId != null) ?? null,
     mergedConversationTurns: (conversation) => conversation.turns ?? [],
     latestTurn: (conversation) => conversation.turns?.at(-1) ?? null,
@@ -184,6 +185,30 @@ equal(conversations.get("thread-2").turns[0].status, "completed");
 equal(conversations.get("thread-2").turns[0].params.approvalPolicy, "never");
 equal(conversations.get("thread-2").turns[0].items[0].type, "worktreeInit");
 
+const goalConversations = new Map([["goal-thread", {
+  id: "goal-thread", threadGoal: { status: "active", createdAt: 10 }, requests: [],
+  turns: [{ turnId: "goal-turn-1", status: "inProgress", permissionParamsSource: "explicit", params: { input: [] },
+    items: [{ id: "todo-1", type: "todo-list", plan: [{ step: "work", status: "inProgress" }] }] }],
+}]]);
+const goalListeners = {};
+const goalManager = {
+  getConversation: (id) => goalConversations.get(id),
+  updateConversationState: (id, recipe) => recipe(goalConversations.get(id)),
+  addTurnCompletedListener: (listener) => (goalListeners.completed = listener, () => {}),
+  addNotificationCallback: (_methods, listener) => (goalListeners.notification = listener, () => {}),
+  addThreadArchivedListener: (listener) => (goalListeners.archived = listener, () => {}),
+  addThreadDeletedListener: (listener) => (goalListeners.deleted = listener, () => {}),
+};
+const removeGoalCarryover = owner.subscribeToNotificationStream(goalManager, {});
+goalListeners.notification({ method: "turn/plan/updated", params: { threadId: "goal-thread", turnId: "goal-turn-1" } });
+goalConversations.get("goal-thread").turns.push({ turnId: "goal-turn-2", status: "inProgress", permissionParamsSource: "explicit", params: { input: [] }, items: [] });
+goalListeners.notification({ method: "turn/started", params: { threadId: "goal-thread", turn: { id: "goal-turn-2" } } });
+equal(goalConversations.get("goal-thread").turns[1].items[0].type, "todo-list");
+equal(goalConversations.get("goal-thread").turns[1].items[0] === goalConversations.get("goal-thread").turns[0].items[0], false);
+goalListeners.completed({ conversationId: "goal-thread", turnId: "goal-turn-2", hasPendingContinuation: false });
+equal(goalConversations.get("goal-thread").turns[1].items[0].plan[0].status, "pending");
+removeGoalCarryover();
+
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
 equal(main.includes("function nb("), false);
 equal(main.includes("function rb("), false);
@@ -199,6 +224,7 @@ equal(main.includes("Ive = class"), false);
 equal(main.includes("function Yve("), false);
 equal(main.includes("function jy("), false);
 for (const name of ["Ry", "Hy", "Uy"]) equal(main.includes(`function ${name}(`), false);
+equal(main.includes("function ib("), false);
 equal(main.includes("addWorktreeInitSyntheticTurn(e, ce, u, t.history)"), true);
 
 console.log(`${assertions} main notification reducer owner assertions passed`);

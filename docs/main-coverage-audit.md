@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 goal todo carryover subscription restoration
+
+语义 `ib` 原先错误地尝试从不存在的 requestClient 订阅通用通知，完全漏掉旧 owner 的 plan carryover 状态机。本轮恢复 plan capture、
+continuation turn 克隆、inferred/forced admission、goal identity 与 user item invalidation、archive/delete cleanup，以及终态 todo pending 化；
+focused suite 覆盖跨 turn 深拷贝和 completion 状态转换，旧 `ib` 删除。
+
 ## 2026-10-31 synthetic worktree turn and canonical append restoration
 
 旧 `Ry/Hy/Uy` 的语义 skeleton 曾把新 synthetic turn 错设为 inProgress，且 canonical-history 的 `appendConversationTurn` 仅由 consumer

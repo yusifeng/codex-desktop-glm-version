@@ -1,5 +1,8 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+恢复 goal todo carryover subscription：active goal 的最新 plan 现在跨 continuation turn 克隆，遇到 user item、goal replacement/clear、archive/delete
+时按原条件失效；无 continuation 的 turn completion 会将最后 todo 的 inProgress 归 pending。原占位订阅移除，主 chunk 旧 `ib` 删除。
+
 恢复 synthetic worktree turn owner：worktree init 现优先追加到最新 turn，无 turn 时创建 completed synthetic turn，并按
 latestThreadSettings → previous turn → defaults 继承权限。canonical history 新增真实 live-tail append 导出，turn-dispatch/realtime
 consumer 去掉动态缺失导出 shim；主 chunk 唯一 consumer 接到语义 owner，旧 `Ry/Hy/Uy` 删除。

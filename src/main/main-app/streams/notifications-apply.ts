@@ -1,5 +1,5 @@
 import { $u as normalizeThreadId, ed as requestIdOf, Zo as errorToString, kd as defaultSandboxConfig } from "@chunk/shared";
-import { appendConversationTurn, conversationTurns, findTurnById, findTurnEntryForEvent, forEachTurn, lastTurnWithTurnId, latestTurn, mergedConversationTurns, timelineEntryKey } from "../turns/canonical-history";
+import { appendConversationTurn, conversationTurns, findDraftTurn, findTurnById, findTurnEntryForEvent, forEachTurn, lastTurnWithTurnId, latestTurn, mergedConversationTurns, timelineEntryKey } from "../turns/canonical-history";
 import { applyThreadSettingsUpdate } from "../threads/patch-classification";
 import { Qv as applyPermissionsResolution, Yv as planImplementationId, Zv as applyMcpElicitationResolution } from "../requests/item-synthesis";
 import { parseAutomationUserMessage, parseHeartbeatDecision } from "../threads/automation-detector";
@@ -557,7 +557,82 @@ export function nb(context: any, method: string, params: any, automationCapabili
   if (["turn/started", "turn/completed", "item/started", "item/completed"].includes(method)) applyRealtimeTimeline(context, notification);
   notificationContext.events.emitNotification(notification);
 }
-export function ib(manager:unknown,_policy?:unknown):()=>void{const client=rec(manager).requestClient;const add=fn(client,`addNotificationListener`)??fn(client,`addNotificationCallback`);const dispose=add?.((method:string,params:unknown)=>fn(manager,`handleNotification`)?.(method,params));return typeof dispose===`function`?dispose as ()=>void:()=>undefined}
+export function ib(manager:any,policy?:unknown):()=>void{
+  const carryovers = new Map<string,{goalCreatedAt:unknown;turnId:string;todo:any}>();
+  const clear = (conversationId:string) => { carryovers.delete(conversationId); };
+  const carry = (conversationId:string,turnId:string,force=false) => {
+    const saved = carryovers.get(conversationId);
+    if(saved == null || saved.turnId === turnId) return;
+    const conversation = manager.getConversation(conversationId);
+    const target = findTurnById(conversation,turnId,policy);
+    if(target?.permissionParamsSource !== `inferred` || force){
+      if(conversation?.threadGoal?.status !== `active` ||
+        conversation.threadGoal.createdAt !== saved.goalCreatedAt ||
+        target == null || target.params.input.length > 0 ||
+        target.items.some((item:any)=>item.type === `todo-list`) ||
+        !saved.todo.plan.some((entry:any)=>entry.status === `inProgress`)){
+        clear(conversationId);
+        return;
+      }
+      manager.updateConversationState(conversationId,(state:any)=>{
+        findTurnById(state,turnId,policy)?.items.push({
+          ...saved.todo,
+          plan:saved.todo.plan.map((entry:any)=>({...entry})),
+        });
+      });
+      carryovers.set(conversationId,{...saved,turnId});
+    }
+  };
+  const removeTurnCompleted = manager.addTurnCompletedListener((event:any)=>{
+    const saved = carryovers.get(event.conversationId);
+    if(event.hasPendingContinuation){
+      if(saved?.turnId === event.turnId){
+        const conversation = manager.getConversation(event.conversationId);
+        const activeTurnId = conversation == null ? null :
+          [...mergedConversationTurns(conversation,policy)].reverse().find((turn:any)=>
+            turn.turnId != null && turn.turnId !== event.turnId && turn.status === `inProgress`)?.turnId;
+        if(activeTurnId != null) carry(event.conversationId,activeTurnId);
+      }
+      return;
+    }
+    if(saved?.turnId === event.turnId) clear(event.conversationId);
+    manager.updateConversationState(event.conversationId,(state:any)=>{
+      const turn = findDraftTurn(state,(entry:any)=>entry.items.some((item:any)=>item.type === `todo-list`));
+      const todo = [...(turn?.items ?? [])].reverse().find((item:any)=>item.type === `todo-list` && `plan` in item);
+      if(todo != null) for(const entry of todo.plan) if(entry.status === `inProgress`) entry.status = `pending`;
+    });
+  });
+  const removeNotifications = manager.addNotificationCallback(
+    [`turn/plan/updated`,`turn/started`,`item/started`,`item/completed`,`thread/goal/updated`,`thread/goal/cleared`],
+    ({method,params}:any)=>{
+      const conversationId = normalizeThreadId(params.threadId);
+      const conversation = manager.getConversation(conversationId);
+      if(method === `turn/plan/updated`){
+        const turn = conversation == null ? null : lastTurnWithTurnId(conversation);
+        const todo = [...(turn?.items ?? [])].reverse().find((item:any)=>item.type === `todo-list`);
+        const saved = carryovers.get(conversationId);
+        const goal = conversation?.threadGoal;
+        if(goal?.status === `active` && turn?.turnId === params.turnId && todo != null &&
+          (saved?.turnId !== params.turnId || saved.goalCreatedAt === goal.createdAt))
+          carryovers.set(conversationId,{goalCreatedAt:goal.createdAt,turnId:params.turnId,todo});
+        return;
+      }
+      if(method === `turn/started`){carry(conversationId,params.turn.id);return;}
+      const saved = carryovers.get(conversationId);
+      if(saved == null) return;
+      if(method === `item/started` || method === `item/completed`){
+        if(saved.turnId !== params.turnId && conversation != null && lastTurnWithTurnId(conversation)?.turnId === params.turnId)
+          params.item.type === `userMessage` ? clear(conversationId) : carry(conversationId,params.turnId,true);
+        return;
+      }
+      if(method === `thread/goal/cleared` || params.goal.status !== `active` || params.goal.createdAt !== saved.goalCreatedAt)
+        if(findTurnById(conversation,saved.turnId,policy)?.status !== `inProgress`) clear(conversationId);
+    },
+  );
+  const removeArchived = manager.addThreadArchivedListener(clear);
+  const removeDeleted = manager.addThreadDeletedListener(clear);
+  return ()=>{removeTurnCompleted();removeNotifications();removeArchived();removeDeleted();carryovers.clear();};
+}
 function mismatchTurnId(error: unknown): string | null {
   const message = errorToString(error);
   return message.match(/expected active turn id `?[^`\s]+`? but found `?([^`\s]+)`?/)?.[1] ??
