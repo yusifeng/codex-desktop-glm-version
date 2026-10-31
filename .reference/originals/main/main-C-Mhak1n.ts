@@ -252,6 +252,7 @@ const { createBrowserAnnotationAnchorPolicy } = require("./main-app/browser-side
 const { createBrowserCommentPolicy } = require("./main-app/browser-sidebar/browser-comment-policy.js");
 const { createCheckoutWebviewRuntime } = require("./main-app/browser-sidebar/checkout-webview.js");
 const { createWorkspaceSettingsWebviewRuntime } = require("./main-app/browser-sidebar/workspace-settings-webview-runtime.js");
+const { createBrowserWebviewIdentityPolicy } = require("./main-app/browser-sidebar/browser-webview-identity-policy.js");
 const {
   BROWSER_WEBVIEW_ADOPTION_LEASE: IG,
   getWebviewInstanceId: GG,
@@ -35261,6 +35262,7 @@ var computeScreenshotTarget = createScreenshotTargetResolver({
 });
 var {
   installCheckoutWebviewLifecycle: RUe,
+  isCheckoutWebContents: KW,
   updateCheckoutPresentation: LUe,
 } = createCheckoutWebviewRuntime({
   authenticateChatGptWebview: xW,
@@ -35274,6 +35276,7 @@ var {
 });
 var {
   installWorkspaceSettingsWebviewLifecycle: uWe,
+  isWorkspaceSettingsWebContents: EG,
   updateWorkspaceSettingsPresentation: lWe,
 } = createWorkspaceSettingsWebviewRuntime({
   authenticateChatGptWebview: xW,
@@ -35284,101 +35287,22 @@ var {
   openLink: IH,
   partitionPrefix: at,
 });
-var jG = new WeakSet();
-function pWe(e) {
-  jG.add(e);
-}
-function mWe(e) {
-  return jG.has(e);
-}
-function hWe(e, t, n, r, i) {
-  let a = {
-    enabled: !1,
-    siteAnnotationFeaturesEnabled: !0,
-    siteAnnotationPermissionGranted: !1,
-    canUseTweaks: !1,
-    isAgentControllingBrowser: !1,
-    isAnnotationModeActive: !1,
-  };
-  if (e.senderFrame == null || e.senderFrame !== t.mainFrame) {
-    e.returnValue = a;
-    return;
-  }
-  let o = e.senderFrame.url,
-    s = r(t, o);
-  if (s != null) {
-    e.returnValue = s;
-    return;
-  }
-  let c = i(() => {
-      let n = r(t, o);
-      n != null && (l(), (e.returnValue = n));
-    }),
-    l = () => {
-      (c(),
-        t.removeListener(`destroyed`, l),
-        t.removeListener(`render-process-gone`, l),
-        t.removeListener(`did-start-navigation`, d),
-        n.removeListener(`destroyed`, u),
-        n.removeListener(`render-process-gone`, u));
-    },
-    u = () => {
-      (l(), (e.returnValue = a));
-    },
-    d = (t, n, r, i) => {
-      i && !r && (l(), (e.returnValue = a));
-    };
-  (t.on(`destroyed`, l),
-    t.on(`render-process-gone`, l),
-    t.on(`did-start-navigation`, d),
-    n.on(`destroyed`, u),
-    n.on(`render-process-gone`, u));
-}
-function MG(e, t) {
-  return n.cu.isInternal(e) || t;
-}
-var gWe = `data-browser-sidebar-conversation-id`,
-  _We = `data-browser-sidebar-browser-tab-id`;
-function vWe(e) {
-  let t = e[gWe] ?? e[`data-conversation-id`] ?? null,
-    n = e[_We] ?? null;
-  if (typeof t == `string` && t.length > 0 && typeof n == `string` && n.length > 0)
-    return { browserTabId: a.bn(n), conversationId: t };
-  let r = NG(e.partition);
-  if (r == null || !r.startsWith(`persist:codex-browser-app-route:`)) return null;
-  try {
-    let e = decodeURIComponent(r.slice(Qe.length));
-    if (e.length === 0) return null;
-    let [t, n] = e.split(`\0`);
-    return t == null || t.length === 0 || n == null || n.length === 0
-      ? null
-      : { browserTabId: a.bn(n), conversationId: t };
-  } catch {
-    return null;
-  }
-}
-function yWe(e) {
-  let t = e.partition;
-  if (typeof t != `string`) return null;
-  let n = t.lastIndexOf($e);
-  if (n === -1) return null;
-  let r = t.slice(n + $e.length),
-    i = r.lastIndexOf(`:`);
-  if (i === -1) return null;
-  let a = r.slice(0, i),
-    o = Number(r.slice(i + 1));
-  return a.length === 0 || !Number.isInteger(o) || o <= 0
-    ? null
-    : { hostGeneration: o, rendererInstanceId: a };
-}
-function NG(e) {
-  if (e == null) return null;
-  let t = e.lastIndexOf($e);
-  return t === -1 ? e : e.slice(0, t);
-}
-function PG({ browserTabId: e, conversationId: t }) {
-  return nt(`${t}\0${e}`);
-}
+var {
+  basePartition: NG,
+  hostIdentityFromWebviewParams: yWe,
+  isTrustedSession: mWe,
+  isWebMcpEnabled: MG,
+  makeBrowserStorageId: PG,
+  markTrustedSession: pWe,
+  resolveSynchronousAnnotationPolicy: hWe,
+  routeFromWebviewParams: vWe,
+} = createBrowserWebviewIdentityPolicy({
+  browserRoutePartitionPrefix: Qe,
+  hashBrowserStorageId: nt,
+  isInternalEnvironment: n.cu.isInternal,
+  parseBrowserTabId: a.bn,
+  webviewPartitionSuffix: $e,
+});
 var FG = r.i(`browser-sidebar-manager`),
   LG = new WeakSet(),
   xWe = [

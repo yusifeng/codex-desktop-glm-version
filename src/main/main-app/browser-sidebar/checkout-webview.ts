@@ -1090,6 +1090,7 @@ export function createCheckoutWebviewRuntime({
     installCheckoutWebviewLifecycle,
     isAllowedCheckoutNavigation,
     isCheckoutAttachParams,
+    isCheckoutWebContents,
     observeCheckoutNetwork,
     updateCheckoutPresentation,
   };

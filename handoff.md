@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成 browser webview identity/admission policy：新增 `browser-sidebar/browser-webview-identity-policy.ts`，统一接管 trusted-session registry、
+webMCP environment gate、route/host identity 从 params/partition 的解析、browser storage id，以及同步 annotation policy 的 deferred wait 和
+navigation/destroy cleanup。审计同时发现 checkout/workspace factory 初版漏导出 `KW/EG` session predicates（主 chunk `ts-nocheck` 未报错），现已补回
+并由 attach admission 真实消费。主 chunk 约 100 行旧 helper 删除；focused 34 条，checkout/workspace 回归分别强化至 39/36 条。
+
 完成 workspace-settings webview owner 迁移：新增 `browser-sidebar/workspace-settings-webview-runtime.ts`，独立接管 workspace partition/session
 registry、presentation ledger、attach hardening、auth handoff 串行化、admin URL/bootstrap validation、external navigation、reload retry 与最后一个 webview
 销毁后的 cookie cleanup。BrowserWindowManager 与 ElectronMessageHandler 已真实改接，且未与 checkout owner 混用状态；主 chunk 约 271 行旧实现

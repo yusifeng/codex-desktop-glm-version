@@ -89,6 +89,8 @@ equal(preferences.disablePopups, false);
 equal("preload" in preferences, false);
 equal("disablewebsecurity" in params, false);
 equal(params.allowpopups, "");
+equal(runtime.isCheckoutWebContents({ session: preferences.session }), true);
+equal(runtime.isCheckoutWebContents({ session: sessionFor("other") }), false);
 
 for (const [url, flags, expected] of [
   ["about:blank", [false, false, false, false, false], true],

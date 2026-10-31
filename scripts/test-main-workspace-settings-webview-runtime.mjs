@@ -111,6 +111,8 @@ equal(preferences.sandbox, true);
 equal(preferences.nodeIntegrationInWorker, false);
 equal("preload" in preferences, false);
 equal(params.allowpopups, "");
+equal(runtime.isWorkspaceSettingsWebContents({ session: preferences.session }), true);
+equal(runtime.isWorkspaceSettingsWebContents({ session: sessionFor("other") }), false);
 
 const webContents = new EventEmitter();
 Object.assign(webContents, {

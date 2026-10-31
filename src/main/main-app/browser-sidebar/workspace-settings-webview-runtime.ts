@@ -338,6 +338,7 @@ export function createWorkspaceSettingsWebviewRuntime({
     isAllowedWorkspaceSettingsNavigation,
     isWorkspaceAdminUrl,
     isWorkspaceSettingsAttachParams,
+    isWorkspaceSettingsWebContents,
     parseWorkspaceSettingsBootstrap,
     updateWorkspaceSettingsPresentation,
   };

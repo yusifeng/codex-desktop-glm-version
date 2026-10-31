@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 browser webview identity and admission policy
+
+新增 `browser-sidebar/browser-webview-identity-policy.ts`，迁出 trusted session WeakSet、internal/webMCP gate、route/host identity parsing、partition suffix
+projection、storage id 与同步 annotation policy deferred lifecycle。向后 consumer 审计发现 `SWe` 仍依赖 checkout/workspace session predicates，两个
+runtime factory 已补导出并真实接回 `KW/EG`，避免 `ts-nocheck` 掩盖的运行时 ReferenceError。主 chunk `jG…PG` 旧 helper 物理删除；34 条 focused
+及强化后的 checkout/workspace 39/36 条断言通过。
+
 ## 2026-11-01 workspace settings webview owner extraction
 
 新增 `browser-sidebar/workspace-settings-webview-runtime.ts`，保持独立的 active-count/session-task/presented-partition ledgers，并迁入 attach queue、
