@@ -1,7 +1,22 @@
 import assert from "node:assert/strict";
 import { EventEmitter } from "node:events";
 import fs from "node:fs";
-import { WebContentsHostClient } from "../src/main/main-app/app-server/web-contents-host-client.ts";
+import { build } from "esbuild";
+
+const bundle = await build({
+  entryPoints: [
+    new URL("../src/main/main-app/app-server/web-contents-host-client.ts", import.meta.url).pathname,
+  ],
+  bundle: true,
+  format: "esm",
+  platform: "node",
+  target: "node22",
+  logLevel: "silent",
+  write: false,
+});
+const { WebContentsHostClient } = await import(
+  `data:text/javascript;base64,${Buffer.from(bundle.outputFiles[0].text).toString("base64")}`
+);
 
 const webContents = new EventEmitter();
 webContents.id = 17;
@@ -83,7 +98,11 @@ const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
 );
-assert.match(main, /var kZ = WebContentsHostClient/);
+assert.match(
+  main,
+  /const \{ WebContentsHostClient \} = require\("\.\/main-app\/app-server\/web-contents-host-client\.js"\)/,
+);
+assert.match(main, /kZ = WebContentsHostClient/);
 assert.doesNotMatch(main, /kZ = class/);
 
-console.log("web contents host client assertions: 25");
+console.log("web contents host client assertions: 26");

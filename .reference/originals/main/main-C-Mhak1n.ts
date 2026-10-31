@@ -222,6 +222,7 @@ const { buildBrowserWindowOptions } = require("./main-app/startup/browser-window
 const { installWindowTitlebarOverlaySync } = require("./main-app/startup/window-titlebar-overlay-sync.js");
 const { installDisplayChangeGeometryRefresh } = require("./main-app/startup/display-change-geometry-refresh.js");
 const { installPrimaryWindowTracking } = require("./main-app/window/primary-window-tracking.js");
+const { createChunkedWebContentsMessageSenderClass, installChunkedMessageAcknowledgement } = require("./main-app/window/chunked-web-contents-message-sender.js");
 const { installWebContentsDiagnostics } = require("./main-app/window/web-contents-diagnostics.js");
 const { installNativeContextMenu } = require("./main-app/window/native-context-menu.js");
 const { shouldApplyWindowsOpacityWorkaround } = require("./main-app/startup/window-presentation-policy.js");
@@ -5340,62 +5341,11 @@ function Fs({ notification: e, threadId: t, turnId: n, onTurnStarted: r, onCompl
       return;
   }
 }
-var doe = 1e3,
-  foe = class {
-    logger = r.i(`ChunkedMessageSender`);
-    sender;
-    constructor(e = {}) {
-      this.sender = new n.It({
-        ...e,
-        deliver: (e, t, n) => {
-          e.send(t.channel, n ?? t.payload);
-        },
-        getPayload: (e) => e.payload,
-        isAvailable: (e) => !e.isDestroyed(),
-        isLoading: (e) => e.isLoading?.() === !0,
-        onSendError: (e, t) => {
-          this.logger().warning(`chunked_message_send_failed`, {
-            safe: { webContentsId: e.id },
-            sensitive: { error: t },
-          });
-        },
-        retryDelayMs: doe,
-        subscribe: (e, t) => (
-          e.once?.(`destroyed`, t.onDestroyed),
-          e.on?.(`did-start-loading`, t.onLoading),
-          e.on?.(`did-stop-loading`, t.onLoaded),
-          () => {
-            (e.removeListener?.(`destroyed`, t.onDestroyed),
-              e.removeListener?.(`did-start-loading`, t.onLoading),
-              e.removeListener?.(`did-stop-loading`, t.onLoaded));
-          }
-        ),
-      });
-    }
-    send(e, t, n) {
-      e.isDestroyed() || this.sender.send(e, { channel: t, payload: n });
-    }
-    sendInline(e, t, n) {
-      e.isDestroyed() || this.sender.sendInline(e, { channel: t, payload: n });
-    }
-    sendCritical(e, t, n) {
-      e.isDestroyed() || this.sender.sendCritical(e, { channel: t, payload: n });
-    }
-    sendInlineMessageForView(e, t) {
-      this.sendInline(e, a.At, t);
-    }
-    acknowledge(e, t, n) {
-      this.sender.acknowledge(e, t, n);
-    }
-  },
-  poe = n.Af([n.Of(), n.Cf().int()]);
-function moe({ chunkedMessageSender: e, isTrustedIpcEvent: t }) {
-  l.ipcMain.on(a.Ct, (n, r, i) => {
-    if (!t(n)) return;
-    let a = poe.safeParse([r, i]);
-    a.success && e.acknowledge(n.sender, ...a.data);
-  });
-}
+var ChunkedWebContentsMessageSender = createChunkedWebContentsMessageSenderClass({
+  ChunkedMessageSenderBase: n.It,
+  createLogger: r.i,
+  inlineMessageChannel: a.At,
+});
 var gl = r.i(`codex-app-config`),
   hoe = `codex-app`,
   goe = `config.json`,
@@ -56269,7 +56219,7 @@ async function Ust() {
     }),
     ae = resolveRemoteHostedPipProcessIdentifier(F, process.env[Vst]);
   (ae != null && U.setServiceProcessIdentifier(ae), I.add(U.dispose));
-  let oe = new foe(),
+  let oe = new ChunkedWebContentsMessageSender(),
     se,
     ce = [],
     le = () => {
@@ -56353,7 +56303,7 @@ async function Ust() {
     he = () => (me ? W.ensureWindow() : Promise.resolve(null)),
     ge = (e) => (me ? W.createFreshWindow(e) : Promise.resolve(null)),
     _e = (e) => W.isTrustedIpcSender(e.sender, e.senderFrame ?? null);
-  (moe({ chunkedMessageSender: oe, isTrustedIpcEvent: _e }),
+  (installChunkedMessageAcknowledgement({ acknowledgementChannel: a.Ct, chunkedMessageSender: oe, ipcMain: l.ipcMain, isTrustedIpcEvent: _e }),
     registerStartupIpcHandlers({
       ipcMain: l.ipcMain,
       channels: {

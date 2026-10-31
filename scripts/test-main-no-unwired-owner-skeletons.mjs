@@ -4,6 +4,7 @@ import fs from "node:fs";
 const root = new URL("../", import.meta.url);
 const realOwners = [
   ["src/main/main-app/window/window-context.ts", "createWindowContextClass"],
+  ["src/main/main-app/window/chunked-web-contents-message-sender.ts", "createChunkedWebContentsMessageSenderClass"],
   ["src/main/main-app/startup/window-icon-lifecycle.ts", "createWindowIconLifecycle"],
   ["src/main/main-app/fetch-handler/electron-fetch-handler.ts", "createElectronFetchHandlerClass"],
   ["src/main/main-app/misc/open-in-service.ts", "createOpenInServiceClass"],
@@ -601,5 +602,10 @@ assert.equal(main.includes('require("./main-app/startup/window-icon-lifecycle.js
 assert.equal(main.includes("windowIconLifecycle = createWindowIconLifecycle("), true, "window host creates one semantic icon owner");
 assert.equal(main.includes("let P = iconAssetNames(r)"), false, "generated dock icon lifecycle must be removed");
 assert.equal(main.includes("let e = M();\n      if (e != null && e !== N)"), false, "generated Windows theme icon owner must be removed");
+assert.equal(main.includes('require("./main-app/window/chunked-web-contents-message-sender.js")'), true, "chunked web-contents sender is wired");
+assert.equal(main.includes("ChunkedWebContentsMessageSender = createChunkedWebContentsMessageSenderClass({"), true, "main binds the semantic chunked sender once");
+assert.equal(main.includes("foe = class"), false, "generated chunked sender owner must be removed");
+assert.equal(main.includes("poe = n.Af"), false, "generated acknowledgement schema must be removed");
+assert.equal(main.includes("function moe("), false, "generated acknowledgement IPC bridge must be removed");
 
-console.log("595 main unwired-owner skeleton assertions passed");
+console.log("601 main unwired-owner skeleton assertions passed");

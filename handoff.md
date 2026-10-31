@@ -5334,3 +5334,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 主 chunk 旧内联图标 owner 约 95 行删除；15 项 focused 断言与六组平台/窗口回归通过，no-unwired gate 扩至
   595 项。`dst` 剩余部分仍是 WindowManager、overlay、hotkey 和 primary-window 的共享装配根，继续按独立状态边界审计，
   不为数量强拆。
+
+# 2026-11-01 chunked WebContents message sender extraction
+
+- 新增并真实接回 `window/chunked-web-contents-message-sender.ts`，一次迁出原 `foe` 的 shared chunk sender 适配、三种优先级、
+  destroyed/loading/availability 状态、payload/chunk 投递、订阅清理、错误日志与 retry policy；trusted IPC acknowledgement
+  bridge 也进入同一 owner，并严格拒绝不可信事件、非 string message id 和非整数 chunk index。
+- 主 chunk 旧 `foe/poe/moe` 已删除。focused suite 15 项，相邻五组回归 168 项，no-unwired gate 扩至 601 项；同时修复
+  `test-main-web-contents-host-client.mjs` 直接 import TypeScript 导致从未实际执行的问题。下一批优先迁出 `Ust` 中独立的
+  app-entry receipt queue/delivery 状态，保留 WindowManager/startup 的纯装配顺序。

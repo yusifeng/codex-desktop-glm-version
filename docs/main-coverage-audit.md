@@ -3383,3 +3383,14 @@ Windows 深浅主题 ico 切换与存量窗口更新、Linux PNG 路径、dev do
 hotkey/overlay 装配，通过 getter 读取唯一 icon owner 的实时 Windows 路径；旧内联约 95 行已删除。
 15 项 focused 断言与 browser-window/desktop-environment/icon-flavor/startup/tray 相邻 104 项回归通过，no-unwired gate
 扩至 595 项。
+
+### 整块抽取：chunked WebContents message sender
+
+新增并接回 `window/chunked-web-contents-message-sender.ts`，完整拥有基于 shared `ChunkedMessageSender` 的 Electron
+WebContents 适配层：payload/chunk 投递、loading/availability 检查、销毁目标抑制、普通/inline/critical 优先级、订阅清理、
+发送错误日志、固定重试延迟，以及 trusted IPC acknowledgement 的 message-id/chunk-index 边界校验。主组合根原 `foe`
+匿名 subclass 与 `poe/moe` acknowledgement bridge 已删除，发送器实例和 IPC handler 均直接消费命名 owner。
+
+15 项 focused 断言覆盖发送、错误、清理、销毁与 ack 拒绝路径；相邻 WebContents host、window manager、desktop fetch、
+Electron message handler 与 Open-In 共 168 项回归通过。原本直接 import `.ts`、实际无法运行的 WebContents host 测试入口
+同步改为 esbuild 加载并恢复执行；no-unwired gate 扩至 601 项。
