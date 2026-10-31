@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 thread projection/error helpers：`threads/projection.ts` 与 `misc/thread-errors.ts` 现统一服务主 chunk、AppServer manager、
+ThreadStore 与 conversation creation；summary skeleton、subagent metadata/nickname、title/timestamps/recency/environment selection、
+thread-not-found 与 interrupt response 保持完整，旧 `V_…W_`、`Cv…Dv`、`me/Xt` 重复函数簇删除。
+
 统一 canonical voice history capability owner：conversation creation 原先动态读取 projection 中不存在的导出，会在创建线程时调用
 `undefined`；现统一复用 `automation-detector.ts` 的 `hasCanonicalVoiceHistory`，hydration/thread-store、maybe-resume、projection 与主 chunk
 `q_` consumers 共用同一实现，旧主 chunk `q_` 删除。

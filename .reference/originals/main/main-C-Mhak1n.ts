@@ -21,6 +21,8 @@ const { AppServerConversationManager } = require("./main-app/conversation/app-se
 const { O_e, zv, Bv, Vv, D_e } = require("./main-app/threads/patch-classification.js");
 const { mx, yx } = require("./main-app/threads/start-config.js");
 const { hasCanonicalVoiceHistory: q_ } = require("./main-app/threads/automation-detector.js");
+const { conversationFromThreadSummary: V_, cleanThreadTitle: Cv, truncateText: wv, threadPreviewTitle: v_e, threadTimestamps: Tv, mergedRecencyAt: Ev, environmentSelection: Dv, subAgentMetadata: H_, subAgentNickname: $ge } = require("./main-app/threads/projection.js");
+const { me, Xt } = require("./main-app/misc/thread-errors.js");
 const { AppServerManagerStreamState } = require("./main-app/threads/stream-roles.js");
 const { ThreadStore } = require("./main-app/threads/thread-store.js");
 const { PrewarmSlot, DetachedWindowPrewarmer, DetachedWindowManager, DetachedWindowService, ThreadHandoffLease, DeviceCheckCookieManager, CallIdClaimRegistry } = require("./main-app/window/detached-window-manager.js");
@@ -340,22 +342,6 @@ function W(e, t) {
 }
 var G = e.a(n.Ld()),
   pe = 6e4;
-function me(e) {
-  if (
-    (`code` in e && e.code === `thread_not_found`) ||
-    (`jsonRpcCode` in e && e.jsonRpcCode === `thread_not_found`) ||
-    ge(e.message)
-  )
-    return !0;
-  let t = `data` in e ? e.data : null;
-  return (
-    typeof t == `object` &&
-    !!t &&
-    `grpcStatusCode` in t &&
-    (t.grpcStatusCode === 5 || t.grpcStatusCode === 9) &&
-    ge(e.message.slice(e.message.indexOf(`:`) + 1).trimStart())
-  );
-}
 var he = class {
   lookups = new Map();
   nextPruneAtMs = 0;
@@ -1114,15 +1100,6 @@ function Yt(e, { maxDepth: t = 1e3, numbersAsFloat: n = !1 } = {}) {
     : r +
         `
 `;
-}
-function Xt(e, t = null, n = {}) {
-  switch (e) {
-    case `accept`:
-      return { action: e, content: n, _meta: t };
-    case `decline`:
-    case `cancel`:
-      return { action: e, content: null, _meta: t };
-  }
 }
 var cee = class {
     connections = new Map();
@@ -25372,80 +25349,6 @@ var Yge = AppServerManagerStreamState;
       return this.subscribers.get(e);
     }
   };
-function V_(e) {
-  return {
-    id: e.conversationId,
-    forkedFromId: e.forkedFromId ?? null,
-    hostId: e.hostId,
-    turns: [],
-    requests: [],
-    createdAt: e.createdAt,
-    updatedAt: e.updatedAt,
-    recencyAt: e.recencyAt ?? e.updatedAt,
-    title: e.title,
-    originator: e.originator,
-    source: e.source ?? void 0,
-    agentNickname: e.agentNickname,
-    threadSource: e.threadSource,
-    historyMode: e.historyMode,
-    canonicalVoiceHistory: e.canonicalVoiceHistory,
-    parentThreadId: e.parentThreadId == null ? null : n.$u(e.parentThreadId),
-    mode: e.mode ?? `default`,
-    threadStartKind: e.threadStartKind ?? `default`,
-    modelProvider: e.modelProvider,
-    daybreakEnabled: e.daybreakEnabled,
-    latestModel: ``,
-    latestReasoningEffort: null,
-    previousTurnModel: null,
-    latestCollaborationMode: {
-      mode: `default`,
-      settings: { developer_instructions: null, model: ``, reasoning_effort: null },
-    },
-    hasUnreadTurn: e.hasUnreadTurn,
-    threadGoal: null,
-    threadRuntimeStatus: e.threadRuntimeStatus,
-    rolloutPath: ``,
-    gitInfo: e.gitInfo,
-    resumeState: `needs_resume`,
-    latestTokenUsageInfo: null,
-    workspaceKind: e.workspaceKind,
-    cwd: e.cwd ?? void 0,
-    environments: e.environments,
-    environmentConfigId: e.environmentConfigId,
-    environmentSelectionEvidence: e.environmentSelectionEvidence,
-  };
-}
-function H_(e) {
-  if (e == null || typeof e == `string`) return null;
-  let t = Zge(e);
-  return t == null ? null : Qge(t);
-}
-function Zge(e) {
-  return `subAgent` in e ? e.subAgent : null;
-}
-function Qge(e) {
-  return typeof e == `string`
-    ? U_()
-    : `thread_spawn` in e
-      ? {
-          parentThreadId: n.$u(e.thread_spawn.parent_thread_id),
-          agentPath: e.thread_spawn.agent_path,
-          agentNickname: e.thread_spawn.agent_nickname,
-          agentRole: e.thread_spawn.agent_role,
-        }
-      : U_();
-}
-function U_() {
-  return { parentThreadId: null, agentPath: null, agentNickname: null, agentRole: null };
-}
-function $ge(e) {
-  return e == null ? null : (W_(e.agentNickname) ?? W_(H_(e.source)?.agentNickname));
-}
-function W_(e) {
-  if (e == null) return null;
-  let t = e.trim();
-  return t.length === 0 ? null : t;
-}
 function e_e(e) {
   return e.map((e) => `${e.id}:${e.recencyAt ?? e.updatedAt}`).join(`|`);
 }
@@ -26019,63 +25922,6 @@ function xv(e) {
 }
 function Sv(e) {
   return e.type === `agentMessage`;
-}
-function Cv(e) {
-  let t = e?.trim() ?? ``;
-  return Vp(t) || t || null;
-}
-function wv(e, t) {
-  let n = e.trim().replace(/\s+/g, ` `);
-  return n.length === 0 ? null : n.length <= t ? n : `${n.slice(0, t - 1).trimEnd()}…`;
-}
-function v_e(e, t) {
-  let n = t(e.name);
-  if (n != null) return n;
-  let r = e.preview,
-    i = ae(r);
-  if (i == null && r.trimStart().startsWith(`<codex_delegation>`)) return null;
-  let a = t(rm(i?.input ?? r));
-  return a == null ? null : wv(a, 60);
-}
-function Tv(e) {
-  let t = e.createdAt * 1e3,
-    n = Number.isFinite(t) ? t : Date.now(),
-    r = e.updatedAt * 1e3,
-    i = Number.isFinite(r) ? r : n,
-    a = e.recencyAt == null ? null : e.recencyAt * 1e3;
-  return { createdAt: n, updatedAt: i, recencyAt: a != null && Number.isFinite(a) ? a : null };
-}
-function Ev({ currentRecencyAt: e, threadRecencyAt: t, updatedAt: n }) {
-  return t == null ? (e ?? n) : Math.max(e ?? t, t);
-}
-var y_e = n.wf({
-  environmentConfigId: n
-    .Of()
-    .regex(/^(?:[A-Za-z0-9_-]+~)?asenvcfg_[A-Za-z0-9_-]+(?![\s\S])/)
-    .nullish(),
-});
-function Dv(e, t, n) {
-  let r =
-      e.environments == null ||
-      (n === `stored` &&
-        (t?.environmentSelectionEvidence?.source === `live` ||
-          (t?.environmentSelectionEvidence?.updatedAt ?? -1 / 0) >= e.updatedAt)),
-    i = r ? t?.environments : (e.environments ?? void 0),
-    a = i?.length === 1 ? i[0] : void 0,
-    o = y_e.safeParse(e.environments?.find((e) => e.environmentId === a?.environmentId));
-  return {
-    environmentConfigId:
-      a == null
-        ? void 0
-        : ((o.success ? o.data.environmentConfigId : void 0) ??
-          (t?.environments?.length === 1 && t.environments[0]?.environmentId === a.environmentId
-            ? t.environmentConfigId
-            : void 0)),
-    environments: i,
-    environmentSelectionEvidence: r
-      ? t?.environmentSelectionEvidence
-      : { source: n, updatedAt: e.updatedAt },
-  };
 }
 function Ov({
   thread: e,

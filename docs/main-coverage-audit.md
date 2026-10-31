@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread projection and errors owner wiring
+
+`threads/projection.ts` 的 summary/subagent/title/time/environment helpers 与 `misc/thread-errors.ts` 已有真实 semantic consumers，本轮将
+main 剩余 `V_/H_/$ge/Cv/wv/v_e/Tv/Ev/Dv/me/Xt` consumers 统一接回并删除旧重复簇；focused suite 覆盖 skeleton、投影、版本门、
+gRPC thread-not-found 与 interrupt response。
+
 ## 2026-10-31 canonical voice history owner unification
 
 conversation creation 原先把不存在的 `projectionModule.isCanonicalVoiceHistory` 强转后直接调用，是实际 thread creation 崩溃点。本轮将
