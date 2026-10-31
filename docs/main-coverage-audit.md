@@ -1,5 +1,10 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 history-swipe navigation service
+
+原 `Xnt` 已迁入 `src/main/main-app/window/history-swipe-navigation-service.ts`。新 renderer-scoped adapter 保留
+origin identity 与 window-manager history swipe state forwarding；唯一 runtime consumer 已接回，旧 class 已删除。
+
 ## 2026-10-31 visualization service
 
 原 `Vnt/Hnt/Unt/Wnt/Gnt/Knt/V5` 已整簇迁入 `src/main/main-app/visualizations/visualization-service.ts`。新 owner

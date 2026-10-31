@@ -123,6 +123,7 @@ const { createDownloadsViewPublisherClass } = require("./main-app/downloads/down
 const { createAppServerTransportPolicy } = require("./main-app/app-server/transport-policy.js");
 const { createGithubRequestClientFactory } = require("./main-app/github/github-request-client.js");
 const { createVisualizationServiceRuntime } = require("./main-app/visualizations/visualization-service.js");
+const { createHistorySwipeNavigationServiceClass } = require("./main-app/window/history-swipe-navigation-service.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -140696,16 +140697,7 @@ var { resolveAppServerWebsocketUrl: W5, resolveAppServerSocksProxyUrl: Ynt } =
     isCloudHostId: n.Cs,
     resolveHostWebsocketUrl: n.mn,
   });
-var Xnt = class extends n.Uf {
-  windowManager;
-  origin;
-  constructor(e, t) {
-    (super(), (this.windowManager = e), (this.origin = t));
-  }
-  setHistorySwipeNavigationState(e) {
-    this.windowManager.setHistorySwipeNavigationState(this.origin, e);
-  }
-};
+var Xnt = createHistorySwipeNavigationServiceClass({ RpcHandlerBase: n.Uf });
 var Znt = createGithubRequestClientFactory({ RequestClient: n.E });
 var G5 = r.r(`WindowContext`),
   Qnt = new z6e(),
