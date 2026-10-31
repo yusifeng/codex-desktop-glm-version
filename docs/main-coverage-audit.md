@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 terminal window runtime
+
+原 `Ott/ktt/Att/jtt/h5/g5/_5/v5/y5/Mtt/Ntt` 已整簇迁入
+`src/main/main-app/terminal/terminal-window-runtime.ts`。新 runtime 保留跨平台 shell discovery/command/label、
+renderer-scoped terminal attach/create/trace/control、subscription replacement/RPC-broken/origin cleanup 与 terminal
+query escape filtering；真实 service consumer 和后续 manager helper injections 均已接回，旧实现已删除。
+
 ## 2026-10-31 tab-drag preview service
 
 原 `Ctt/m5/wtt/Ttt/Ett/Dtt` 已迁入 `src/main/main-app/window/tab-drag-preview-service.ts`。新 owner 保留

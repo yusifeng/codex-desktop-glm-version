@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Ott/ktt/Att/jtt/h5/g5/_5/v5/y5/Mtt/Ntt` terminal window runtime 迁入
+`terminal/terminal-window-runtime.ts`；shell discovery/command/labels、terminal RPC/trace forwarding、subscription
+replacement/teardown 与 terminal query escape filtering 均由新 runtime 持有。service 与 manager consumers 已接回。
+focused test 覆盖 44 项。
+
 随后将 `Ctt/m5/wtt/Ttt/Ett/Dtt` tab-drag preview service 迁入 `window/tab-drag-preview-service.ts`；platform gate、
 presentation-window assembly、zoom pointer projection、visibility/fullscreen guards、strict RPC schemas 与 drag-session
 fallback 均由新 owner 持有。唯一 consumer 已接回。focused test 覆盖 31 项。
