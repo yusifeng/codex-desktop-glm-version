@@ -153,6 +153,7 @@ const { loadWindowsAccountAddon: kO, isAdministratorCapable: SO, getWindowsSyste
 const { BrowserFamilyService: MO } = require("./main-app/platform/browser-family.js");
 const { ChronicleService: IO } = require("./main-app/chronicle/service.js");
 const { ClipboardService: VO } = require("./main-app/clipboard/service.js");
+const { createQueryCacheHostServiceClass } = require("./main-app/window/query-cache-host-service.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -54172,21 +54173,7 @@ function vO(e) {
     return !1;
   }
 }
-var zO = 500,
-  BO = class extends n.p {
-    appServerConnection;
-    invalidateHostQueryCache;
-    constructor(e, t, n, r) {
-      (super(e, n, zO), (this.appServerConnection = t), (this.invalidateHostQueryCache = r));
-    }
-    invalidateQueryCache(e) {
-      return (
-        this.invalidateHostQueryCache(e.queryKey),
-        e.queryKey[0] === `plugins` && Oo(this.appServerConnection),
-        super.invalidateQueryCache(e)
-      );
-    }
-  },
+var BO = createQueryCacheHostServiceClass({ HostServiceBase: n.p, invalidatePluginCache: Oo }),
   HO = n.wf({ connection_id: n.Of(), alias: n.Of() }),
   UO = n
     .Of()

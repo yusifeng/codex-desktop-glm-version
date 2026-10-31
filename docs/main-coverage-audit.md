@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 QueryCacheHostService owner wiring
+
+新增 `src/main/main-app/window/query-cache-host-service.ts`，用显式注入 shared host base 与 plugin cache invalidator 的 factory
+替代旧 `BO`，避免把 main 私有 cache ledger 隐式复制进语义模块。focused suite 锁定 500ms base constructor 参数、host/plugins/base
+调用顺序、非 plugins 分支与 `WindowContext` 真实 wiring。
+
 ## 2026-10-31 ClipboardService owner wiring
 
 新增 `src/main/main-app/clipboard/service.ts`，与旧 `VO` 精确保持 3 members。本轮接回 `WindowContext` 的真实 clipboard RPC

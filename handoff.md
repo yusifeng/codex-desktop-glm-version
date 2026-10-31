@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 QueryCacheHostService：新增 `window/query-cache-host-service.ts`，以显式依赖工厂替代主 chunk 旧 `BO`。原四参数
+constructor、500ms 基类配置、host cache 先失效、plugins 路径 cache 条件清理、基类广播的调用顺序保持完整；
+`WindowContext.registerIpcClientForWebContents` 继续通过 `BO` 兼容别名构造真实 consumer。
+
 接回 ClipboardService：新增 `clipboard/service.ts`，以完整 3-member owner 替代主 chunk 旧 `VO`。macOS bookmark 仅在
 title/url 均非空时返回，跨平台文本读写保持原 Electron clipboard 语义；`WindowContext` 的真实 RPC consumer 继续通过
 `VO` 兼容别名构造。
