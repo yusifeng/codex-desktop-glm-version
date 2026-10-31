@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+迁出 saved-section transition owner：原 `tBe` 已迁入 `sidebar/saved-section-transition.ts`，并继续由语义 undo/redo stack
+构造。transition scope 验证、临时 replica reservation/discard/save、thread move、server change reconciliation、migration snapshot
+完整性与 disposal cleanup 均由完整 32-member owner 持有；主 chunk 旧 class 已删除。
+
 迁出 native notification manager：原 `bhe` 与 bundled/custom sound helpers 已迁入
 `notifications/native-notification-manager.ts`。dedupe、action/reply/click、completed-thread projection、dismissal、跨平台 sound
 playback 与 macOS sound staging 由完整 17-member owner 持有；真实 startup 与 NotificationsService consumers 已接回。

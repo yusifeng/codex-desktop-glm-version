@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 saved-section transition owner
+
+原 `tBe` 已迁入 `src/main/main-app/sidebar/saved-section-transition.ts`，真实 `SavedSectionUndoRedoStack` 仍通过生成别名注入并
+构造该 32-member owner。模块保留 transition/current/source guards、replica reservation/save/discard、thread membership scope、
+migration list/thread snapshots、completion conflict 检查与 disposal cleanup；focused suite 覆盖成功路径、越界拒绝与退休行为。
+
 ## 2026-10-31 native notification manager owner
 
 原 `bhe` 与 `gm/_m/vm` sound helpers 已迁入 `src/main/main-app/notifications/native-notification-manager.ts`。startup 继续构造
