@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 artifact documents owner
+
+原 `h4/g4/_4/K5e/q5e/v4/J5e/Y5e/X5e/Z5e/Q5e/y4/$5e/e7e/b4/t7e/n7e` 已整簇迁入
+`src/main/main-app/artifacts/artifact-documents.ts`。新 owner 保留 strict request schemas、workspace/exact-file
+授权、realpath/hash 重验、per-path serialization、adopt/read/append/refresh、subscriber broadcast/cleanup、pending
+staged-file recovery 与 materialization 两阶段提交/冲突/大小限制；唯一 runtime consumer 已接回，旧实现已删除。
+
 ## 2026-10-31 remote host-config runtime
 
 原 `B5e/V5e/H5e/U5e/W5e/m4/G5e` 已迁入 `src/main/main-app/remote/host-config-runtime.ts`。新 runtime
