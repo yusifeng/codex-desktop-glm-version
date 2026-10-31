@@ -4706,3 +4706,13 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - main 旧 declarations/helpers 删除 288 行，新生产模块 398 行；focused coverage 58 项，no-unwired gate
   扩至 147 项。下一批继续审计 file manager、system-default、Git Bash、GitHub Desktop 四个剩余专用 target
   及其 native shell/path controller，随后重新清点静态 target registry 的未迁边界。
+
+# 2026-11-01 native shell open-target owner
+
+- `src/main/main-app/open-target/native-shell-targets.ts` 已接管 File Manager、System Default、Git Bash、
+  GitHub Desktop 四个 descriptors，以及 nearest-existing reveal/open、local-host path translation、Windows
+  executable/shortcut/install fallback、LaunchServices 和 Linux gio desktop launch；Git Bash/GitHub Desktop
+  继续消费 terminal owner 的同一个 `directoryForTarget`。
+- main 旧 declarations/helpers 删除 144 行，新生产模块 213 行；focused coverage 38 项，no-unwired gate
+  扩至 159 项。32-target 静态 registry 的 descriptors 和专用 adapters 至此已全部迁出；下一批重新审计
+  registry 周边遗留组合根与 main 后续大型第一方 owner，不把 open-target 的完成错误外推为 main 完成。

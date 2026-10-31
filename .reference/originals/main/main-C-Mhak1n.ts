@@ -225,6 +225,7 @@ const { createJetBrainsTargetRuntime } = require("./main-app/open-target/jetbrai
 const { createTerminalTargetRuntime } = require("./main-app/open-target/terminal-targets.js");
 const { createVscodeFamilyTargetRuntime } = require("./main-app/open-target/vscode-family-targets.js");
 const { createStandaloneEditorTargetRuntime } = require("./main-app/open-target/standalone-editor-targets.js");
+const { createNativeShellTargetRuntime } = require("./main-app/open-target/native-shell-targets.js");
 const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 const { createElectronPerformanceSnapshotCollectorClass } = require("./main-app/startup/electron-performance-snapshot-collector.js");
 const { MainThreadJankSampler } = require("./main-app/startup/main-thread-jank-sampler.js");
@@ -71172,107 +71173,29 @@ var {
   getWslInfo: () => n.Ni(),
   spawn: Zi,
 });
-var e3e = H1({
-    id: `fileManager`,
-    label: `Finder`,
-    icon: `apps/finder.png`,
-    kind: `fileManager`,
-    darwin: { detect: () => `/usr/bin/open`, args: (e) => Xi(e) },
-    win32: {
-      label: `File Explorer`,
-      icon: `apps/file-explorer.png`,
-      detect: t3e,
-      args: (e) => Xi(e),
-      open: async ({ path: e, hostConfig: t, remotePath: r, remoteWorkspaceRoot: i }) =>
-        i0(t != null && n.As(t) ? n.ji(r ?? i ?? e, t.distro) : e),
-    },
-    linux: {
-      label: `File Manager`,
-      icon: `apps/file-explorer.png`,
-      detect: () => `file-manager`,
-      args: (e) => [e],
-      open: async ({ path: e }) => i0(e),
-    },
-  });
-function t3e() {
-  let e = process.env.SystemRoot ?? process.env.windir;
-  if (e) {
-    let t = (0, h.join)(e, `explorer.exe`);
-    if ((0, v.existsSync)(t)) return t;
-  }
-  return `explorer.exe`;
-}
-async function i0(e) {
-  let { shell: t } = await import(`electron`),
-    n = n3e(e);
-  if (n && (0, v.statSync)(n).isFile()) {
-    t.showItemInFolder(n);
-    return;
-  }
-  let r = n ?? e,
-    i = await t.openPath(r);
-  if (i) throw Error(i);
-}
-function n3e(e) {
-  let t = e;
-  for (;;) {
-    if ((0, v.existsSync)(t)) return t;
-    let e = (0, h.dirname)(t);
-    if (e === t) return null;
-    t = e;
-  }
-}
-var i3e = H1({
-    id: `gitBash`,
-    label: `Git Bash`,
-    icon: `apps/vscode.png`,
-    kind: `terminal`,
-    win32: { detect: a3e, iconPath: o3e, args: (e) => [`--cd=${Y1(e)}`] },
-  });
-function a3e() {
-  let e = Yi(`git-bash.exe`) ?? Yi(`git-bash`);
-  if (e) {
-    let t = na(e);
-    if (t) return ra(t, `git-bash.exe`) ?? t;
-  }
-  return ta([
-    [`Git`, `git-bash.exe`],
-    [`Git`, `bin`, `bash.exe`],
-  ]);
-}
-function o3e(e) {
-  return (
-    sa([`Git Bash.lnk`]) ||
-    ta([[`Git`, `git-bash.exe`]]) ||
-    (e ? (ra(e, `git-bash.exe`) ?? e) : null)
-  );
-}
-var s3e = H1({
-  id: `githubDesktop`,
-  label: `GitHub Desktop`,
-  icon: `apps/vscode.png`,
-  kind: `editor`,
-  win32: { detect: c3e, args: (e) => [Y1(e)] },
+var {
+  fileManager: e3e,
+  gitBash: i3e,
+  githubDesktop: s3e,
+  systemDefault: F3e,
+} = createNativeShellTargetRuntime({
+  path: h,
+  fs: v,
+  os: p,
+  env: process.env,
+  createTargetDescriptor: H1,
+  buildRevealPathArgs: Xi,
+  directoryForTarget: Y1,
+  findExecutable: Yi,
+  resolveExecutableLink: na,
+  findSiblingFile: ra,
+  findWindowsInstall: ta,
+  findStartMenuShortcut: sa,
+  isLocalHostConfig: n.As,
+  translateHostPath: (targetPath, distro) => n.ji(targetPath, distro),
+  loadElectronShell: async () => (await import(`electron`)).shell,
+  spawn: Zi,
 });
-function c3e() {
-  let e = Yi(`github.exe`) ?? Yi(`github`);
-  if (e) {
-    let t = na(e);
-    if (t) return ra(t, `GitHubDesktop.exe`) ?? t;
-  }
-  let t = process.env.LOCALAPPDATA ?? `${(0, p.homedir)()}\\AppData\\Local`;
-  for (let e of [
-    [`GitHubDesktop`, `GitHubDesktop.exe`],
-    [`GitHub Desktop`, `GitHubDesktop.exe`],
-  ]) {
-    let n = (0, h.join)(t, ...e);
-    if ((0, v.existsSync)(n)) return n;
-  }
-  return ta([
-    [`GitHub Desktop`, `GitHubDesktop.exe`],
-    [`GitHubDesktop`, `GitHubDesktop.exe`],
-  ]);
-}
 var {
   androidStudio: h3e,
   intellij: g3e,
@@ -71297,50 +71220,6 @@ var {
   findMacApplicationExecutable: I1,
   launchLinuxEditor: G1,
 });
-var F3e = H1({
-  id: `systemDefault`,
-  label: `Default app`,
-  icon: `apps/file-explorer.png`,
-  kind: `systemDefault`,
-  hidden: !0,
-  darwin: {
-    detect: () => `system-default`,
-    iconPath: () => null,
-    args: (e) => [e],
-    open: async ({ appPath: e, path: t }) => I3e(t, e),
-  },
-  win32: {
-    detect: () => `system-default`,
-    iconPath: () => null,
-    args: (e) => [e],
-    open: async ({ path: e }) => d0(e),
-  },
-  linux: {
-    detect: () => `system-default`,
-    iconPath: () => null,
-    args: (e) => [e],
-    open: async ({ appPath: e, path: t }) => L3e(t, e),
-  },
-});
-async function I3e(e, t) {
-  await Zi(`/usr/bin/open`, t == null ? [e] : [`-a`, t, e]);
-}
-async function L3e(e, t) {
-  if (t == null) {
-    await d0(e);
-    return;
-  }
-  if (!(0, h.isAbsolute)(t) || (0, h.extname)(t) !== `.desktop`)
-    throw Error(`Invalid Linux desktop application path`);
-  let n = Yi(`gio`);
-  if (n == null) throw Error(`Linux desktop application launcher is unavailable`);
-  await Zi(n, [`launch`, t, e]);
-}
-async function d0(e) {
-  let { shell: t } = await import(`electron`),
-    n = await t.openPath(e);
-  if (n) throw Error(n);
-}
 var {
   defaultTargets: g0,
   isEditorTarget: u6e,

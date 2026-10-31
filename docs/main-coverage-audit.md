@@ -2700,3 +2700,14 @@ container 上溯/launch fallback、Zed bundle activation/CLI location dispatch �
 `r0/l0/j3e/u0/N3e/P3e/z3e/U3e/h0/e6e/t6e/r6e/i6e/a6e/o6e` helpers、Xcode logger 和内联
 declarations 已物理删除。focused test `scripts/test-main-standalone-editor-targets-owner.mjs` 覆盖 58 项
 descriptor、macOS/Windows/Linux detection、remote args、container precedence 与 launch 副作用顺序。
+
+### 增量抽取：native shell open-target owner
+
+File Manager、System Default、Git Bash 与 GitHub Desktop 四个 descriptors，以及 Windows Explorer/system-root
+探测、nearest-existing path reveal/open、local-host 路径翻译、Git Bash shortcut/icon/install fallback、GitHub
+Desktop PATH/LOCALAPPDATA/install fallback、macOS LaunchServices 和 Linux desktop/gio validation 已整体迁移至
+`src/main/main-app/open-target/native-shell-targets.ts`。main 通过
+`createNativeShellTargetRuntime` 将四个 descriptors 直接交给既有 registry，并继续复用 terminal owner 的
+`directoryForTarget`，没有恢复第二份 directory policy。旧 `t3e/i0/n3e/a3e/o3e/c3e/I3e/L3e/d0` helpers 与
+内联 declarations 已物理删除。focused test `scripts/test-main-native-shell-targets-owner.mjs` 覆盖 38 项
+path traversal、file reveal、host translation、Windows fallback 与 native launch/error 行为。

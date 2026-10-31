@@ -26,6 +26,7 @@ const realOwners = [
   ["src/main/main-app/open-target/terminal-targets.ts", "createTerminalTargetRuntime"],
   ["src/main/main-app/open-target/vscode-family-targets.ts", "createVscodeFamilyTargetRuntime"],
   ["src/main/main-app/open-target/standalone-editor-targets.ts", "createStandaloneEditorTargetRuntime"],
+  ["src/main/main-app/open-target/native-shell-targets.ts", "createNativeShellTargetRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -148,6 +149,16 @@ assert.equal(main.includes("function r6e("), false, "generated Zed macOS detecto
 assert.equal(main.includes("function i6e("), false, "generated Zed Windows detector must be removed");
 assert.equal(main.includes("function a6e("), false, "generated Zed app-path parser must be removed");
 assert.equal(main.includes("async function o6e("), false, "generated Zed launcher must be removed");
+assert.equal(main.includes("createNativeShellTargetRuntime({"), true, "real native shell target owner is wired");
+assert.equal(main.includes("function t3e("), false, "generated Windows Explorer detector must be removed");
+assert.equal(main.includes("async function i0("), false, "generated native path opener must be removed");
+assert.equal(main.includes("function n3e("), false, "generated nearest-existing-path resolver must be removed");
+assert.equal(main.includes("function a3e("), false, "generated Git Bash detector must be removed");
+assert.equal(main.includes("function o3e("), false, "generated Git Bash icon resolver must be removed");
+assert.equal(main.includes("function c3e("), false, "generated GitHub Desktop detector must be removed");
+assert.equal(main.includes("async function I3e("), false, "generated macOS default launcher must be removed");
+assert.equal(main.includes("async function L3e("), false, "generated Linux default launcher must be removed");
+assert.equal(main.includes("async function d0("), false, "generated Electron shell launcher must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("147 main unwired-owner skeleton assertions passed");
+console.log("159 main unwired-owner skeleton assertions passed");
