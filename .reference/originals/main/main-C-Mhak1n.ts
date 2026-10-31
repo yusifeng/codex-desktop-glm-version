@@ -43759,152 +43759,20 @@ var {
   ensureThreadStateForWindow: oXe,
   createThreadState: vX,
   applyThreadPresentation: sXe,
+  transferConversationState: gXe,
 } = createBrowserThreadStateRuntime({
   createDefaultBrowserSnapshot: pX,
   createFindState: oq,
   makeBrowserStorageId: PG,
   makePageRecordKey: qU,
+  makePageKey: KU,
+  makePartitionKey: it,
+  makeTransferKey: n.ku,
+  normalizeWindowId: oX,
   pageHandleForThread: lW,
   registerThreadAndRecordOpened: fX,
   runtimeIntlConfig: n.xu,
 });
-function gXe({
-  browserSessionRegistry: e,
-  comments: t,
-  downloadStore: r,
-  disposeThreadState: i,
-  isBrowserUseManagedBrowserTab: a,
-  getThreadStateForWindow: o,
-  setBrowserUseActiveForRoute: s,
-  sourceBrowserTabId: c,
-  sourceConversationId: l,
-  syncRuntimeStateToPage: u,
-  syncThreadState: d,
-  targetBrowserTabId: f,
-  targetConversationId: p,
-  windowState: m,
-}) {
-  if (l === p && c === f) return;
-  let h = o(m, l, c) ?? null;
-  if (h == null) {
-    let e = { browserTabId: f, conversationId: p };
-    m.threads.get(qU(e))?.page ?? kX(m, { browserTabId: c, conversationId: l }, e);
-    return;
-  }
-  let g = h.browserTabId,
-    _ = f,
-    v = qU(h),
-    y = qU({ browserTabId: _, conversationId: p }),
-    b = n.ku(v, y);
-  if (m.transferredConversationStateKeys.has(b)) {
-    (e.recordDebugEvent({
-      browserTabId: h.browserTabId,
-      conversationId: p,
-      details: [
-        { label: `sourceConversationId`, value: l },
-        { label: `transferKey`, value: b },
-      ],
-      guestWebContentsId: h.page?.view.webContents?.id ?? null,
-      kind: `browser-route-transfer-replayed`,
-      message: `Ignored replayed Browser route transfer`,
-      ownerWebContentsId: m.owner.id,
-      pageKey: null,
-      windowId: m.window.id,
-    }),
-      m.ignoredConversationIds.add(v));
-    return;
-  }
-  let x = m.threads.get(y) ?? null;
-  if (x?.page != null) {
-    (e.recordDebugEvent({
-      browserTabId: _,
-      conversationId: p,
-      details: [{ label: `sourceConversationId`, value: l }],
-      guestWebContentsId: x.page.view.webContents?.id ?? null,
-      kind: `browser-route-transfer-target-exists`,
-      message: `Ignored Browser route transfer because target page exists`,
-      ownerWebContentsId: m.owner.id,
-      pageKey: null,
-      windowId: m.window.id,
-    }),
-      m.ignoredConversationIds.add(v),
-      m.transferredConversationStateKeys.add(b));
-    return;
-  }
-  let S = _X(m, p);
-  x != null && i(m, p, x);
-  let C = h.isBrowserUseActive,
-    w = a(l, g),
-    T = w && OX(m, l).length <= 1,
-    E = oX(m.window.id);
-  (T &&
-    e.reassignRoute({ conversationId: l, windowId: E }, { conversationId: p, windowId: E }, g, _),
-    kX(m, { browserTabId: g, conversationId: l }, { browserTabId: _, conversationId: p }),
-    m.threads.set(y, h),
-    m.threads.delete(v),
-    m.activeConversationId === l &&
-      m.activeBrowserTabId === h.browserTabId &&
-      ((m.activeConversationId = p), (m.activeBrowserTabId = _)),
-    (h.conversationId = p),
-    (h.browserTabId = _),
-    r.reassignActiveDownloadRoute(
-      { browserTabId: g, conversationId: l },
-      { browserTabId: _, conversationId: p },
-    ),
-    l !== p && (h.ownerRoutePath = S),
-    h.page != null &&
-      (!T &&
-        w &&
-        (e.recordPageClosed({ conversationId: l, browserTabId: g, windowId: E }),
-        s({ conversationId: l, windowId: E }, !1, g)),
-      (h.page.conversationId = p),
-      (h.page.browserTabId = _),
-      !T && w && e.recordPageCreated({ conversationId: p, browserTabId: _, windowId: E }),
-      C && ((h.isBrowserUseActive = !1), s({ conversationId: p, windowId: E }, !0, _))),
-    e.registerThread({ conversationId: p, windowId: E }),
-    t.transferConversation(m.owner, l, g, p, _),
-    m.ignoredConversationIds.delete(y),
-    m.ignoredConversationIds.add(v),
-    m.transferredConversationStateKeys.delete(n.ku(y, v)),
-    m.transferredConversationStateKeys.add(b),
-    e.recordDebugEvent({
-      browserTabId: _,
-      conversationId: p,
-      details: [
-        { label: `sourceBrowserTabId`, value: g },
-        { label: `sourceConversationId`, value: l },
-      ],
-      guestWebContentsId: h.page?.view.webContents?.id ?? null,
-      kind: `browser-route-transferred`,
-      message: `Transferred Browser route state`,
-      ownerWebContentsId: m.owner.id,
-      pageKey: h.page == null ? null : KU(m.owner.id, p, _),
-      windowId: m.window.id,
-    }),
-    d(m, p, h),
-    h.page != null && u(h.page, h));
-}
-function kX(e, t, n) {
-  let r = it(t.conversationId, t.browserTabId),
-    i = e.registeredWebviewHostsByRoutePartition.get(r);
-  i?.browserTabId === t.browserTabId &&
-    i.conversationId === t.conversationId &&
-    (e.registeredWebviewHostsByRoutePartition.delete(r),
-    e.registeredWebviewHostsByRoutePartition.set(it(n.conversationId, n.browserTabId), {
-      ...n,
-      pagePersistence: i.pagePersistence,
-    }));
-  for (let r of e.pendingAdoptedWebviewsByWebContentsId.values()) {
-    let e = r.route;
-    e.browserTabId === t.browserTabId && e.conversationId === t.conversationId && (r.route = n);
-  }
-  for (let [r, i] of e.pendingWebviewRoutesByInstanceId) {
-    let a = i.route;
-    a.browserTabId === t.browserTabId &&
-      a.conversationId === t.conversationId &&
-      e.pendingWebviewRoutesByInstanceId.set(r, { ...i, route: n });
-  }
-}
 var _Xe = r.i(`browser-sidebar-manager`);
 function AX(e, t) {
   return [...e].filter(

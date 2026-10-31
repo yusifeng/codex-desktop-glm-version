@@ -28,6 +28,10 @@ const runtime = createBrowserThreadStateRuntime({
   createFindState: () => { findStateCount += 1; return { query: "" }; },
   makeBrowserStorageId: ({ browserTabId, conversationId }) => `storage:${conversationId}:${browserTabId}`,
   makePageRecordKey: ({ browserTabId, conversationId }) => `${conversationId}:${browserTabId}`,
+  makePageKey: (ownerId, conversationId, browserTabId) => `${ownerId}:${conversationId}:${browserTabId}`,
+  makePartitionKey: (conversationId, browserTabId) => `partition:${conversationId}:${browserTabId}`,
+  makeTransferKey: (source, target) => `${source}->${target}`,
+  normalizeWindowId: (windowId) => `window-${windowId}`,
   pageHandleForThread: (windowState, conversationId, page) => ({ windowState, conversationId, page }),
   registerThreadAndRecordOpened: (...args) => { order.push("register"); equal(args.length, 5); },
   runtimeIntlConfig: { locale: "en" },
@@ -157,9 +161,69 @@ equal(runtime.applyThreadPresentation(presentation, {
 equal(presentation.bounds, null);
 equal(presentation.emulatedViewportSize, { width: 101, height: 200 }, "undefined viewport preserves the prior value");
 
+const transferCalls = [];
+const transferThread = {
+  browserTabId: "source-tab",
+  conversationId: "source-conversation",
+  isBrowserUseActive: false,
+  isBrowserUsePage: false,
+  ownerRoutePath: "/source",
+  page: { browserTabId: "source-tab", conversationId: "source-conversation", view: { webContents: { id: 90 } } },
+};
+const registeredHost = { browserTabId: "source-tab", conversationId: "source-conversation", pagePersistence: { id: 1 } };
+const pendingAdopted = { route: { browserTabId: "source-tab", conversationId: "source-conversation" } };
+const pendingRoute = { route: { browserTabId: "source-tab", conversationId: "source-conversation" }, token: 1 };
+const transferWindow = {
+  activeBrowserTabId: "source-tab",
+  activeConversationId: "source-conversation",
+  ignoredConversationIds: new Set(["target-conversation:target-tab"]),
+  owner: { id: 7 },
+  pendingAdoptedWebviewsByWebContentsId: new Map([[90, pendingAdopted]]),
+  pendingWebviewRoutesByInstanceId: new Map([["instance", pendingRoute]]),
+  registeredWebviewHostsByRoutePartition: new Map([["partition:source-conversation:source-tab", registeredHost]]),
+  threads: new Map([
+    ["source-conversation:source-tab", transferThread],
+    ["target-conversation:owner", { browserTabId: "owner", conversationId: "target-conversation", ownerRoutePath: "/target" }],
+  ]),
+  transferredConversationStateKeys: new Set(),
+  window: { id: 12 },
+};
+runtime.transferConversationState({
+  browserSessionRegistry: {
+    recordDebugEvent: (event) => transferCalls.push(["debug", event.kind]),
+    registerThread: (route) => transferCalls.push(["register", route]),
+  },
+  comments: { transferConversation: (...args) => transferCalls.push(["comments", ...args]) },
+  downloadStore: { reassignActiveDownloadRoute: (...args) => transferCalls.push(["download", ...args]) },
+  disposeThreadState: () => transferCalls.push(["dispose"]),
+  getThreadStateForWindow: (state, conversationId, browserTabId) => state.threads.get(`${conversationId}:${browserTabId}`) ?? null,
+  isBrowserUseManagedBrowserTab: () => false,
+  setBrowserUseActiveForRoute: (...args) => transferCalls.push(["active", ...args]),
+  sourceBrowserTabId: "source-tab",
+  sourceConversationId: "source-conversation",
+  syncRuntimeStateToPage: (...args) => transferCalls.push(["runtime-sync", ...args]),
+  syncThreadState: (...args) => transferCalls.push(["thread-sync", ...args]),
+  targetBrowserTabId: "target-tab",
+  targetConversationId: "target-conversation",
+  windowState: transferWindow,
+});
+equal(transferWindow.threads.get("target-conversation:target-tab"), transferThread);
+equal(transferWindow.threads.has("source-conversation:source-tab"), false);
+equal(transferWindow.activeConversationId, "target-conversation");
+equal(transferWindow.activeBrowserTabId, "target-tab");
+equal(transferThread.ownerRoutePath, "/target");
+equal(transferThread.page.conversationId, "target-conversation");
+equal(transferThread.page.browserTabId, "target-tab");
+equal(pendingAdopted.route, { browserTabId: "target-tab", conversationId: "target-conversation" });
+equal(transferWindow.pendingWebviewRoutesByInstanceId.get("instance").route, { browserTabId: "target-tab", conversationId: "target-conversation" });
+equal(transferWindow.registeredWebviewHostsByRoutePartition.has("partition:target-conversation:target-tab"), true);
+equal(transferWindow.ignoredConversationIds.has("source-conversation:source-tab"), true);
+equal(transferWindow.transferredConversationStateKeys.has("source-conversation:source-tab->target-conversation:target-tab"), true);
+equal(transferCalls.map(([kind]) => kind), ["download", "register", "comments", "debug", "thread-sync", "runtime-sync"]);
+
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
 equal(main.includes('require("./main-app/browser-sidebar/browser-thread-state-runtime.js")'), true);
-for (const oldOwner of ["function mX(", "function hX(", "function gX(", "function rXe(", "function iXe(", "function aXe(", "function _X(", "function oXe(", "function vX(", "function sXe("]) {
+for (const oldOwner of ["function mX(", "function hX(", "function gX(", "function rXe(", "function iXe(", "function aXe(", "function _X(", "function oXe(", "function vX(", "function sXe(", "function gXe(", "function kX("]) {
   equal(main.includes(oldOwner), false, `${oldOwner} is removed`);
 }
 

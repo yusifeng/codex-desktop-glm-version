@@ -3088,3 +3088,11 @@ viewport/capture、active/WebMCP/cursor state 的唯一 owner。panel-open 与 c
 新增 owner-route 与 Browser Use tab-id 查询 exports，主组合根补齐 conversation transfer 的 `_X/OX` 真实接线，修复迁移后可能触发的
 `_X is not defined`。原始 chunk 中 `cXe..OX` 约 480 行重复 adapter 已整带删除。focused tests 29 + 60 项覆盖 panel/cursor、
 route old-owner removal、thread queries 与 wiring；no-unwired gate 扩至 481 项。
+
+### 增量抽取：browser conversation transfer transaction
+
+`browser-thread-state-runtime.ts` 现接管 conversation/browser-tab route transfer 的完整事务：replay/target-exists guard、pending
+adopted/webview route 与 registered partition 重写、managed Browser Use session reassign、active selection、download/comments、owner route、
+page identity、ignored/transfer keys、debug event 和最终 thread/runtime sync。主组合根直接将语义 transaction 作为 `gXe` 注入
+window/thread controller；旧 `gXe/kX` 已物理删除。focused test 扩至 75 项，覆盖正常 transfer 的副作用顺序和所有 route 容器；
+no-unwired gate 扩至 483 项。

@@ -5040,3 +5040,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - thread runtime 补充 `_X/OX` 对应语义 exports，并修复 conversation transfer 仍引用 `_X` 却未接线的潜在运行时错误。
   focused coverage 29 + 60 项，no-unwired gate 扩至 481 项；下一批继续审计 `gXe` conversation transfer 及相邻 page-state helpers，
   优先复用现有 window/thread controller，不拆共享 transfer 副作用链。
+
+# 2026-11-01 browser conversation transfer transaction
+
+- `browser-thread-state-runtime.ts` 已承接 route replay/target guard、pending host/webview route reassignment、managed session、active tab、
+  download/comments、page identity、transfer keys、debug event 与 sync 的完整 conversation-transfer 事务；旧 main `gXe/kX` 已删除。
+- focused coverage 75 项，no-unwired gate 扩至 483 项。下一批继续把仅由 window/thread controller 消费的
+  `AX/vXe/yXe/bXe/xXe/SXe` window selection helpers 内聚，`jX` 暂留给 host-policy debug-owner 边界一起处理。
