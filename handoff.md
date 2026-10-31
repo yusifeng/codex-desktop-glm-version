@@ -5274,3 +5274,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 审计同时发现主 chunk 的 `VC` virtual target id schema 已在更早批次误删但六处仍引用；现从原始 commit 恢复 control/format/surrogate/
   line-separator 拒绝 regex，并由语义 policy 回接。旧 `ZG/KWe/$G/eK/tK/nK/rK/iK/aK` 和无消费者 surface schema 已删除；focused
   suite 53 项，覆盖 schema 边界、viewport、enrichment ambiguity、sanitization 和 URL 类型。
+
+# 2026-11-01 composition-residue policy convergence
+
+- 越过已确认的 `once`/stream/`yauzl`/`extract-zip`、`vscode-jsonrpc`/language-client/URI 与 SSH config parser vendor belts，
+  将夹在其间的第一方残留按真实 consumer 一次收敛：language-server protocol adapters、project LIS ordering/per-key write queue、
+  open-in URL admission、MCP sandbox event logger/bootstrap 分别进入既有语义模块或新的 `projects/project-write-policy.ts`。
+- 主 chunk 旧 `j0e/M0e/v$/N0e/H6e/d2/L0/k$/y2e` 已删除；BrowserWindowManager 依赖改用语义名，app-server/project writers、
+  open-in 与 sandbox 初始化均直接消费新导出。focused suite 30 项，相关九组回归合计 327 项，no-unwired gate 扩至 552 项。

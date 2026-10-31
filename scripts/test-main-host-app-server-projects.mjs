@@ -190,8 +190,9 @@ assert.equal(handlers.connectionDisposed, true);
 assert.equal(owner.pendingDeletions.calls.filter((call) => call[0] === "stop").length >= 2, true);
 
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
+const windowContext = fs.readFileSync(new URL("../src/main/main-app/window/window-context.ts", import.meta.url), "utf8");
 assert.match(main, /Y6e = createHostAppServerProjectsClass\(\{/);
 assert.doesNotMatch(main, /Y6e = class/);
-assert.match(main, /new Y6e\(this\.scopedState/);
+assert.match(windowContext, /new Y6e\(this\.scopedState/);
 
 console.log("host app-server projects assertions: 46");

@@ -3321,3 +3321,12 @@ focused test 实际触发 shutdown callbacks 并核对参数/state identity，�
 identity、runtime metadata/name/role enrichment、comment/design-change page sanitation 与 annotation URL equality。主 chunk 旧
 `ZG/KWe/$G/eK/tK/nK/rK/iK/aK` 删除，comment/page-command consumers 通过命名工厂回接。迁移还修复了更早批次误删 `VC` 后六处 schema
 继续引用未定义变量的问题：恢复 1..128 长度和 Unicode control/format/surrogate/line-separator 拒绝规则。53 条 focused 断言覆盖边界。
+
+### 增量收敛：组合根相邻第一方策略残留
+
+删除大型 SDK belt 后继续逐段审计相邻区域，确认 `once`/Node stream/`yauzl`/`extract-zip`、
+`vscode-jsonrpc`/language-client/URI 与 SSH config parser 均为 bundled vendor，保持原样。其间四组可独立第一方残留已迁入现有语义边界：
+`language-server/protocol-helpers.ts` 统一 file URI、hover、capabilities 与 locations 适配；新建
+`projects/project-write-policy.ts` 接管 LIS project ordering 和 per-key serialized write queue；`open-in-service.ts` 接管 URL admission；
+`mcp-sandbox/lifecycle.ts` 接管 event logger 与 network/lifecycle bootstrap。主 chunk 旧 `j0e/M0e/v$/N0e/H6e/d2/L0/k$/y2e`
+实现均已物理删除，真实 consumers 直接使用语义导出；focused suite 30 项并由 no-unwired gate 锁定接线与旧符号缺席。

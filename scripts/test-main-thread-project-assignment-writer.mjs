@@ -118,6 +118,7 @@ assert.equal(writer.pendingWrites.size, 0);
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
 assert.match(main, /W6e = createThreadProjectAssignmentWriterClass\(\{/);
 assert.doesNotMatch(main, /W6e = class/);
-assert.match(main, /async function d2\(/);
+assert.match(main, /require\("\.\/main-app\/projects\/project-write-policy\.js"\)/);
+assert.doesNotMatch(main, /async function d2\(/);
 
 console.log("thread project assignment writer assertions: 22");

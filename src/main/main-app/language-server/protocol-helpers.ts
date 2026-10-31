@@ -57,6 +57,28 @@ export function normalizeHover(contents: any, position: any, isMarkupContent: (v
   return { documentation, range: contents?.range ?? { end: position, start: position }, signature };
 }
 
+/** Binds the bundled URI implementation once for provider/session consumers. */
+export function createLanguageServerProtocolAdapters({
+  isMarkupContent,
+  uriApi,
+}: {
+  isMarkupContent(value: unknown): boolean;
+  uriApi: UriApi;
+}) {
+  return {
+    filePathToUri(path: string, pathApi: PathApi) {
+      return filePathToUri(path, pathApi, uriApi);
+    },
+    normalizeHover(hover: any, position: any) {
+      return normalizeHover(hover.contents, position, isMarkupContent);
+    },
+    resolveCapabilities,
+    resolveLocations(items: any, pathApi: PathApi) {
+      return resolveLocations(items, pathApi, uriApi);
+    },
+  };
+}
+
 function parseHoverContents(contents: any, isMarkupContent: (value: any) => boolean) {
   if (Array.isArray(contents)) {
     const values = contents.map((value) =>
@@ -88,6 +110,7 @@ function parseMarkdownHover(value: string) {
 }
 
 export const languageServerProtocolHelpers = {
+  createLanguageServerProtocolAdapters,
   resolveCapabilities,
   filePathToUri,
   uriToFilePath,

@@ -151,7 +151,7 @@ function createHarness() {
     U: { url: () => null },
     J: "local",
     O9: () => ({ info() {}, warning() {} }),
-    y2e: () => undefined,
+    initializeMcpSandbox: () => undefined,
     kot: class { constructor(globalState, notify) { this.globalState = globalState; this.notify = notify; } },
     Cot: class {},
     r9: 1200,

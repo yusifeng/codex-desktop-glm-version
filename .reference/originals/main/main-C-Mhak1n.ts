@@ -243,7 +243,7 @@ const targetInputPolicy = require("./main-app/open-target/target-input-policy.js
 const targetSelectionPolicy = require("./main-app/open-target/target-selection-policy.js");
 const targetLaunchArgs = require("./main-app/open-target/target-launch-args.js");
 const targetDescriptorPolicy = require("./main-app/open-target/target-descriptor-policy.js");
-const languageServerProtocolHelpers = require("./main-app/language-server/protocol-helpers.js");
+const { createLanguageServerProtocolAdapters } = require("./main-app/language-server/protocol-helpers.js");
 const { BrowserPermissionPromptRegistry } = require("./main-app/browser-sidebar/browser-permission-prompt-registry.js");
 const { createBrowserSessionServiceClass } = require("./main-app/browser-sidebar/browser-session-service.js");
 const { BrowserUseOpenRequestRegistry } = require("./main-app/browser-sidebar/browser-use-open-request-registry.js");
@@ -268,7 +268,7 @@ const { LanguageServerManager } = require("./main-app/language-server/language-s
 const { createLanguageServerProvidersRuntime } = require("./main-app/language-server/providers.js");
 const { createLanguageServerSessionRuntime } = require("./main-app/language-server/session-runtime.js");
 const { createLanguageServerRuntimeInstallerClass } = require("./main-app/language-server/runtime-installer.js");
-const { createMcpSandboxLifecycleRuntime } = require("./main-app/mcp-sandbox/lifecycle.js");
+const { createMcpSandboxEventLogger, createMcpSandboxLifecycleRuntime, initializeMcpSandbox } = require("./main-app/mcp-sandbox/lifecycle.js");
 const { createMcpSandboxNetworkRuntime } = require("./main-app/mcp-sandbox/network-runtime.js");
 const { createNativeCommandCrashRuntime } = require("./main-app/diagnostics/native-command-crash.js");
 const { createBrowserSessionProbeRuntime } = require("./main-app/browser-session/browser-session-probe.js");
@@ -308,7 +308,7 @@ const { createElectronFetchHandlerClass } = require("./main-app/fetch-handler/el
 const { createWindowContextClass } = require("./main-app/window/window-context.js");
 const { createDesktopCapabilityServices } = require("./main-app/window/desktop-capability-services.js");
 const { createElectronMessageHandlerClass } = require("./main-app/window/electron-message-handler.js");
-const { createOpenInServiceClass } = require("./main-app/misc/open-in-service.js");
+const { createOpenInServiceClass, isOpenableUrl } = require("./main-app/misc/open-in-service.js");
 const { createLinuxApplicationsRuntime } = require("./main-app/platform/linux-applications.js");
 const { createThreadSectionServerClass } = require("./main-app/sidebar/thread-section-server.js");
 const { createSavedSectionUndoRedoStackClass } = require("./main-app/sidebar/saved-section-undo-redo-stack.js");
@@ -333,6 +333,7 @@ const { createProjectlessDirectoryChooserClass } = require("./main-app/workspace
 const { createThreadProjectAssignmentWriterClass } = require("./main-app/thread-catalog/thread-project-assignment-writer.js");
 const { createPendingProjectDeletionSchedulerClass } = require("./main-app/projects/pending-project-deletion-scheduler.js");
 const { createHostAppServerProjectsClass } = require("./main-app/projects/host-app-server-projects.js");
+const { computeProjectOrderMoves, enqueueKeyed } = require("./main-app/projects/project-write-policy.js");
 const { createLocalProjectCacheClass } = require("./main-app/projects/local-project-cache.js");
 const { createProjectFolderConsentRuntime } = require("./main-app/projects/project-folder-consent.js");
 const { createThreadMembershipInference } = require("./main-app/projects/thread-membership-inference.js");
@@ -45221,18 +45222,15 @@ var e$ = e.t((e) => {
     (m$ = r));
 })();
 var { URI: h$ } = m$;
-function j0e(e) {
-  return languageServerProtocolHelpers.resolveCapabilities(e);
-}
-function M0e(e, t) {
-  return languageServerProtocolHelpers.resolveLocations(e, t, h$);
-}
-function v$(e, t) {
-  return languageServerProtocolHelpers.filePathToUri(e, t, h$);
-}
-function N0e(e, t) {
-  return languageServerProtocolHelpers.normalizeHover(e.contents, t, p$.MarkupContent.is);
-}
+var {
+  filePathToUri: languageServerFilePathToUri,
+  normalizeHover: normalizeLanguageServerHover,
+  resolveCapabilities: resolveLanguageServerCapabilities,
+  resolveLocations: resolveLanguageServerLocations,
+} = createLanguageServerProtocolAdapters({
+  isMarkupContent: p$.MarkupContent.is,
+  uriApi: h$,
+});
 var {
   JavaLanguageServerProvider: q1e,
   KotlinLanguageServerProvider: F0e,
@@ -45249,16 +45247,16 @@ var {
   readHostFile: (e) => n.bc(e),
   resolveElectronResourcesPath: (e) => o.t(e),
   resolveNodeExecutable: (e) => n.Ln(e),
-  filePathToUri: v$,
+  filePathToUri: languageServerFilePathToUri,
 });
 var x$ = l$();
 var { LanguageServerRpcHandler: Q0e } = createLanguageServerSessionRuntime({
   LanguageServerManager,
   RpcHandlerBase: n.Uf,
   createLogger: (e) => r.i(e),
-  filePathToUri: v$,
+  filePathToUri: languageServerFilePathToUri,
   messageTransport: x$,
-  normalizeHover: N0e,
+  normalizeHover: normalizeLanguageServerHover,
   path: h,
   protocol: p$,
   providerClasses: {
@@ -45270,8 +45268,8 @@ var { LanguageServerRpcHandler: Q0e } = createLanguageServerSessionRuntime({
     TypeScriptLanguageServerProvider: Z0e,
   },
   randomUUID: () => (0, _.randomUUID)(),
-  resolveCapabilities: j0e,
-  resolveLocations: M0e,
+  resolveCapabilities: resolveLanguageServerCapabilities,
+  resolveLocations: resolveLanguageServerLocations,
   stream: C,
 });
 var $0e = createWorktreeAttachmentHandlerClass({
@@ -45280,20 +45278,8 @@ var $0e = createWorktreeAttachmentHandlerClass({
     normalizeConversationId: (e) => n.$u(e),
     supportsFeature: (e, t) => n.Wu(e, t),
   });
-var D$ = `mcp_app_sandbox`,
-  O$ = r.i(`mcp-app-sandbox`);
-function k$(e, t, n = {}) {
-  O$().info(`${D$}.${e}`, {
-    safe: n.safe ?? {},
-    sensitive: {
-      initId: t.initId,
-      origin: t.origin,
-      ownerWebContentsId: t.ownerWebContents.id,
-      sandboxId: t.sandboxId,
-      ...n.sensitive,
-    },
-  });
-}
+var O$ = r.i(`mcp-app-sandbox`),
+  k$ = createMcpSandboxEventLogger(O$);
 var mcpSandboxNetwork = createMcpSandboxNetworkRuntime({
   RpcHandlerBase: n.Uf,
   app: l.app,
@@ -45360,9 +45346,8 @@ var _2e = (0, h.join)(__dirname, `sandbox-preload.js`),
     },
     webContentsFromId: (e) => l.webContents.fromId(e),
   });
-function y2e() {
-  (mcpSandboxNetwork.initializeDefaultSessionHeaders(), mcpSandboxLifecycle.initialize());
-}
+var initializeMcpSandboxRuntime = () =>
+  initializeMcpSandbox(mcpSandboxNetwork, mcpSandboxLifecycle);
 var e1 = n.Of().refine(n.cs),
   E2e = n.wf({ initId: e1, sandboxId: e1 }),
   D2e = mcpSandboxNetwork.McpSandboxDataHandler,
@@ -45632,7 +45617,7 @@ var N0 = createOpenInServiceClass({
     translateHostPath: Un,
     defaultCwd: Ir,
     resolvePath: pH,
-    isUrl: L0,
+    isUrl: (value) => isOpenableUrl(value, Ve),
     isHtml: ze,
     isNativeDocument: u4e,
     isDarwinNativeDocument: h1,
@@ -45648,15 +45633,6 @@ var N0 = createOpenInServiceClass({
     isPathOnPlatform: n.f,
     statPath: (path, executionHost) => n.Di.stat(path, executionHost),
   });
-function L0(e) {
-  if (Ve(e)) return !0;
-  try {
-    let t = new URL(e);
-    return t.protocol === `http:` || t.protocol === `https:`;
-  } catch {
-    return !1;
-  }
-}
 var w6e = createPluginIncentivesClientRuntime({
   runtime: n,
   authHeaders: a,
@@ -45739,38 +45715,12 @@ var V6e = createProjectlessDirectoryChooserClass({
   access: b.access,
   accessModes: v.constants,
 });
-function H6e(e, t) {
-  let n = new Map(e.map((e, t) => [e, t])),
-    r = [],
-    i = [];
-  for (let e of t) {
-    let t = n.get(e);
-    if (t == null) continue;
-    let a = [];
-    for (let e of r) e.position < t && e.ids.length > a.length && (a = e.ids);
-    let o = [...a, e];
-    (r.push({ position: t, ids: o }), o.length > i.length && (i = o));
-  }
-  let a = new Set(i);
-  return [...t.entries()]
-    .reverse()
-    .flatMap(([e, n]) => (a.has(n) ? [] : [{ projectId: n, beforeProjectId: t[e + 1] ?? null }]));
-}
-async function d2(e, t, n) {
-  let r = (e.get(t) ?? Promise.resolve()).catch(() => {}).then(n);
-  e.set(t, r);
-  try {
-    await r;
-  } finally {
-    e.get(t) === r && e.delete(t);
-  }
-}
 var U6e = 100,
   f2 = 8,
   W6e = createThreadProjectAssignmentWriterClass({
     runtime: n,
     timers: D,
-    enqueueKeyed: d2,
+    enqueueKeyed,
     pageSize: U6e,
     batchSize: f2,
   }),
@@ -45790,8 +45740,8 @@ var U6e = 100,
     createLogger: r.r,
     ThreadProjectAssignmentWriter: W6e,
     PendingProjectDeletionScheduler: K6e,
-    computeProjectOrderMoves: H6e,
-    enqueueKeyed: d2,
+    computeProjectOrderMoves,
+    enqueueKeyed,
     projectListPageSize: q6e,
     projectOrderKey: J6e,
     deletionGraceMs: Nt,
@@ -56032,7 +55982,7 @@ var Qot = createBrowserWindowManagerClass({
   U,
   J,
   O9,
-  y2e,
+  initializeMcpSandbox: initializeMcpSandboxRuntime,
   kot,
   Cot,
   r9,

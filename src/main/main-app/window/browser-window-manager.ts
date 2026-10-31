@@ -5,7 +5,7 @@
  * The returned class owns window registries, message queues, primary selection, creation, and cleanup.
  */
 export function createBrowserWindowManagerClass(dependencies: Record<string, any>) {
-  const { n, l, a, xot, IH, A9, j9, Yot, Xot, Zot, installDisplayChangeGeometryRefresh, est, U, J, O9, y2e, kot, Cot, r9, sst, z9, ost, L9, buildBrowserWindowOptions, S2e, RUe, uWe, lUe, uVe, installWindowTitlebarOverlaySync, M9, N9, Oe, De, P9, E9, MH, wot, F9, h, v, Pot, installPrimaryWindowTracking, $ot, ast, rst, ist, BH, I9, cst, bot, Not, installNativeContextMenu, installWebContentsDiagnostics, shouldRecoverRendererCrash, fT } = dependencies;
+  const { n, l, a, xot, IH, A9, j9, Yot, Xot, Zot, installDisplayChangeGeometryRefresh, est, U, J, O9, initializeMcpSandbox, kot, Cot, r9, sst, z9, ost, L9, buildBrowserWindowOptions, S2e, RUe, uWe, lUe, uVe, installWindowTitlebarOverlaySync, M9, N9, Oe, De, P9, E9, MH, wot, F9, h, v, Pot, installPrimaryWindowTracking, $ot, ast, rst, ist, BH, I9, cst, bot, Not, installNativeContextMenu, installWebContentsDiagnostics, shouldRecoverRendererCrash, fT } = dependencies;
   return class BrowserWindowManager {
   applicationNetwork;
   options;
@@ -44,7 +44,7 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
   constructor(e, t) {
     ((this.applicationNetwork = e),
       (this.options = t),
-      y2e(),
+      initializeMcpSandbox(),
       (this.threadMetadataService = new kot(t.globalState, () =>
         this.sendMessageToAllWindows({
           type: `global-state-updated`,

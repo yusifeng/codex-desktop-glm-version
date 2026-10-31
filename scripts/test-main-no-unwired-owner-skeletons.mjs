@@ -99,6 +99,7 @@ const realOwners = [
   ["src/main/main-app/environment-config/service.ts", "createEnvironmentConfigServiceClass"],
   ["src/main/main-app/device/codex-micro-service-manager.ts", "createCodexMicroServiceManagerClass"],
   ["src/main/main-app/import/external-agent-import.ts", "createExternalAgentImportHandlers"],
+  ["src/main/main-app/projects/project-write-policy.ts", "computeProjectOrderMoves"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -552,5 +553,15 @@ assert.equal(main.includes("function XE("), false, "generated remote project fin
 assert.equal(main.includes("function _Oe("), false, "generated remote project comparator must be removed");
 assert.equal(main.includes("function vOe("), false, "generated project order comparator must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
+assert.equal(main.includes('require("./main-app/projects/project-write-policy.js")'), true, "project write policy is wired");
+assert.equal(main.includes("function H6e("), false, "generated project ordering policy must be removed");
+assert.equal(main.includes("async function d2("), false, "generated keyed write queue must be removed");
+assert.equal(main.includes("function L0("), false, "generated open-in URL policy must be removed");
+assert.equal(main.includes("function j0e("), false, "generated language-server URI adapter must be removed");
+assert.equal(main.includes("function k$("), false, "generated MCP sandbox logger must be removed");
+assert.equal(main.includes("function y2e("), false, "generated MCP sandbox initializer must be removed");
+assert.equal(main.includes("createLanguageServerProtocolAdapters({"), true, "language-server protocol adapters are wired");
+assert.equal(main.includes("createMcpSandboxEventLogger(O$)"), true, "MCP sandbox event logger is wired");
+assert.equal(main.includes("initializeMcpSandbox(mcpSandboxNetwork, mcpSandboxLifecycle)"), true, "MCP sandbox initializer is wired");
 
-console.log("540 main unwired-owner skeleton assertions passed");
+console.log("552 main unwired-owner skeleton assertions passed");

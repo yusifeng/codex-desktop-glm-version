@@ -41,6 +41,32 @@ type LifecycleDependencies = {
 const USER_GESTURE_TTL_MS = 5_000;
 const ATTACHMENT_TTL_MS = 30_000;
 
+export function createMcpSandboxEventLogger(
+  logger: () => { info(message: string, tags: unknown): void },
+  namespace = "mcp_app_sandbox",
+) {
+  return function logEvent(event: string, state: SandboxState, tags: any = {}) {
+    logger().info(`${namespace}.${event}`, {
+      safe: tags.safe ?? {},
+      sensitive: {
+        initId: state.initId,
+        origin: state.origin,
+        ownerWebContentsId: state.ownerWebContents.id,
+        sandboxId: state.sandboxId,
+        ...tags.sensitive,
+      },
+    });
+  };
+}
+
+export function initializeMcpSandbox(
+  network: { initializeDefaultSessionHeaders(): void },
+  lifecycle: { initialize(): void },
+): void {
+  network.initializeDefaultSessionHeaders();
+  lifecycle.initialize();
+}
+
 /** Owns MCP sandbox guest identity, attachment admission, IPC init, and guest listeners. */
 export function createMcpSandboxLifecycleRuntime(dependencies: LifecycleDependencies) {
   const sandboxStateByGuestId = new Map<number, SandboxState>();

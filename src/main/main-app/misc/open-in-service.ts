@@ -74,6 +74,19 @@ function normalizeConfiguredTargetForLinux(
     : { ...target, supportsSsh: false };
 }
 
+export function isOpenableUrl(
+  value: string,
+  isFirstPartyUrl: (value: string) => boolean,
+): boolean {
+  if (isFirstPartyUrl(value)) return true;
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Complete owner for open-target discovery, preference persistence and open
  * dispatch. The generated chunk supplies platform adapters; this class owns
