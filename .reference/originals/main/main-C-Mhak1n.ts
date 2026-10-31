@@ -222,6 +222,7 @@ const { buildBrowserWindowOptions } = require("./main-app/startup/browser-window
 const { installWindowTitlebarOverlaySync } = require("./main-app/startup/window-titlebar-overlay-sync.js");
 const { installDisplayChangeGeometryRefresh } = require("./main-app/startup/display-change-geometry-refresh.js");
 const { installPrimaryWindowTracking } = require("./main-app/window/primary-window-tracking.js");
+const { createWindowContextLifecycle } = require("./main-app/window/window-context-lifecycle.js");
 const { createChunkedWebContentsMessageSenderClass, installChunkedMessageAcknowledgement } = require("./main-app/window/chunked-web-contents-message-sender.js");
 const { installWebContentsDiagnostics } = require("./main-app/window/web-contents-diagnostics.js");
 const { installNativeContextMenu } = require("./main-app/window/native-context-menu.js");
@@ -55773,8 +55774,6 @@ var Qot = createBrowserWindowManagerClass({
   shouldRecoverRendererCrash,
   fT,
 });
-var lst = 2e3,
-  ust = 10;
 function dst({
   applicationNetwork: e,
   chunkedMessageSender: t,
@@ -55830,7 +55829,15 @@ function dst({
         repoRoot: m,
       },
     ),
-    z = null,
+    windowContextLifecycle = createWindowContextLifecycle({
+      app: l.app,
+      BrowserWindow: l.BrowserWindow,
+      getWindowManager: () => B,
+      isWindows: _,
+      powerMonitor: l.powerMonitor,
+      shouldStartInBackground: () => process.env.CODEX_ELECTRON_START_IN_BACKGROUND === `1`,
+      startupPhases: T,
+    }),
     B = new Qot(e, {
       chunkedMessageSender: t,
       desktopRoot: f,
@@ -55848,11 +55855,11 @@ function dst({
       allowDebugMenu: s,
       allowInspectElement: o,
       errorReporter: c,
-      isDefaultBrowser: () => z?.getMessageHandler().isDefaultBrowser() === !0,
-      getChatGptWebviewAuthToken: (e) => z?.getLocalAuthToken(e) ?? Promise.resolve(null),
+      isDefaultBrowser: windowContextLifecycle.isDefaultBrowser,
+      getChatGptWebviewAuthToken: windowContextLifecycle.getLocalAuthToken,
       canHideLastWindowToTray: b,
       onWindowRegistered: (e) => {
-        (z?.registerWindow(e), C?.(e));
+        (windowContextLifecycle.registerWindow(e), C?.(e));
       },
     }),
     V = new AvatarOverlayWindowManager(B, u, x),
@@ -55870,14 +55877,7 @@ function dst({
       B,
       u,
       y,
-      () => {
-        let e = z?.appServerConnectionRegistry;
-        return (
-          T.hasReached(`background_ready`) &&
-          l.powerMonitor.getSystemIdleTime() >= ust &&
-          (e?.getAllHostIds().every((t) => e.getConnection(t).getPendingRequestCount() === 0) ?? !1)
-        );
-      },
+      windowContextLifecycle.isBackgroundReady,
       S,
     ),
     ne = new kat({
@@ -55909,7 +55909,7 @@ function dst({
       globalState: u,
       handleQuickChatAppshotShortcut: (e) => V.handleQuickChatAppshotShortcut(e),
       logger: () => r.n(),
-      onSupportChanged: () => z?.broadcastQueryCacheInvalidation([`appshot-hotkey-state`]),
+      onSupportChanged: () => windowContextLifecycle.broadcastQueryCacheInvalidation([`appshot-hotkey-state`]),
       platform: process.platform,
       registerGlobalHotkey: qV,
       setTimeout: (e, t) => setTimeout(e, t),
@@ -55930,30 +55930,6 @@ function dst({
     w.add(() => {
       (ee.dispose(), U.dispose(), re?.dispose(), ne.dispose());
     }));
-  let oe = (e) => {
-      if (!_) return;
-      let t = setTimeout(() => {
-        e.isDestroyed() ||
-          e.isVisible() ||
-          (process.env.CODEX_ELECTRON_START_IN_BACKGROUND === `1`
-            ? e.showInactive()
-            : (e.show(), e.focus()));
-      }, lst);
-      t.unref();
-      let n = () => {
-        clearTimeout(t);
-      };
-      (e.once(`show`, n), e.once(`closed`, n));
-    },
-    se = async ({ show: e, initialRoute: t }) => {
-      if (z == null) return null;
-      let n = await B.createPrimaryWindow({
-        title: l.app.getName(),
-        show: e,
-        initialRoute: t === `/` ? void 0 : t,
-      });
-      return (e || oe(n), n);
-    };
   return {
     get windowIconPath() {
       return windowIconLifecycle.windowIconPath;
@@ -55968,24 +55944,11 @@ function dst({
     quickChatController: ne,
     realtimeVoiceHotkeyController: ae,
     updateDockIcon: windowIconLifecycle.updateDockIcon,
-    setWindowContext: (e) => {
-      z = e;
-      for (let t of l.BrowserWindow.getAllWindows())
-        !t.isDestroyed() && B.isAppServiceWindow(t) && e.registerWindow(t);
-    },
-    broadcastQueryCacheInvalidation: (e) => {
-      z?.broadcastQueryCacheInvalidation(e);
-    },
-    ensureWindow: async () => {
-      let e = B.getPrimaryWindow();
-      return e
-        ? z == null
-          ? null
-          : (e.isMinimized() && e.restore(), e.show(), e.focus(), e.isDestroyed() ? null : e)
-        : se({ show: !1 });
-    },
-    createFreshWindow: async (e = `/`) => se({ show: !0, initialRoute: e }),
-    showLastActivePrimaryWindow: () => B.showLastActivePrimaryWindow(),
+    setWindowContext: windowContextLifecycle.setWindowContext,
+    broadcastQueryCacheInvalidation: windowContextLifecycle.broadcastQueryCacheInvalidation,
+    ensureWindow: windowContextLifecycle.ensureWindow,
+    createFreshWindow: windowContextLifecycle.createFreshWindow,
+    showLastActivePrimaryWindow: windowContextLifecycle.showLastActivePrimaryWindow,
     markAppQuitting: () => {
       (B.markAppQuitting(), V.markAppQuitting(), ne.dispose());
     },
@@ -55994,7 +55957,7 @@ function dst({
     sendMessageToAllRegisteredWindows: B.sendMessageToAllRegisteredWindows.bind(B),
     sendMessageToAllWindows: B.sendMessageToAllWindows.bind(B),
     getPrimaryWindow: B.getPrimaryWindow.bind(B),
-    getContextForWebContents: (e) => (B.hasRegisteredWebContents(e) ? z : null),
+    getContextForWebContents: windowContextLifecycle.getContextForWebContents,
   };
 }
 var workerMainProtocol = createWorkerMainProtocol(n);

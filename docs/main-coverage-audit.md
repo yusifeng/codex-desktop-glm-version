@@ -3406,3 +3406,15 @@ deep-link 和 initial-window-visible 生命周期均由单一 runtime 转发到 
 application lifecycle、main IPC、hotkey、native notification 与 Electron message handler 相邻 237 项回归通过。迁移同时修复
 application lifecycle、main IPC router 和 native notification 三个直接 import `.ts`、此前实际无法启动的测试入口；
 no-unwired gate 扩至 607 项。
+
+### 整块抽取：WindowContext 与 primary-window lifecycle
+
+新增并接回 `window/window-context-lifecycle.ts`，统一拥有 late-bound WindowContext、存量 app-service window 注册、
+default-browser/auth-token/cache-invalidation adapters、registered-WebContents context lookup、后台 ready/idle/pending-request 判定，
+以及 primary-window 创建、恢复和 Windows 延迟显窗。隐藏窗口仍按原顺序在 2 秒后根据 background policy 执行
+`showInactive` 或 `show→focus`，并由 `show/closed` 两个 once listener 清理同一 timer。
+
+`dst` 原 `z` context 状态、`oe/se` primary-window closures 和 `lst/ust` 机械常量已删除；WindowManager、hotkey manager
+与对外 window-services surface 全部直接消费同一 lifecycle owner。29 项 focused 断言覆盖未绑定、注册过滤、空闲判定、
+已有/新建/销毁窗口、route normalization 和 timer 分支；browser-window、hotkey-window、appshot 相邻 137 项回归通过，
+no-unwired gate 扩至 613 项。

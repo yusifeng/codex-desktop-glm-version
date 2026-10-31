@@ -5352,3 +5352,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - `Ust` 旧 `se/ce/le/ue/de/fe` 匿名状态整块删除，改为一个 `appEntryDelivery` 实例。focused suite 14 项，相邻六组
   回归 237 项，no-unwired gate 扩至 607 项；另修复 application lifecycle、main IPC router、native notification 三个
   直接 import TypeScript 而无法执行的测试入口。下一批继续审计 `Ust/dst`，只抽取能独立拥有状态与清理顺序的完整边界。
+
+# 2026-11-01 WindowContext lifecycle extraction
+
+- 新增并真实接回 `window/window-context-lifecycle.ts`，统一拥有 late-bound WindowContext、app-service window 回填注册、
+  auth/default-browser/cache adapters、background-idle 判定、primary-window ensure/create 和 Windows 2 秒 delayed reveal；
+  `show/closed` timer cleanup 与 restore→show→focus 副作用顺序保持不变。
+- `dst` 旧 `z` 状态、`oe/se` closures 和 `lst/ust` 常量已删除，WindowManager/hotkey/对外 window services 共用唯一 owner。
+  focused suite 29 项，相邻三组回归 137 项，no-unwired gate 扩至 613 项。`dst` 余下主要是 overlay、hotkey、dictation、
+  quick-chat 的构造与统一 dispose，继续审计但不强拆纯装配链。
