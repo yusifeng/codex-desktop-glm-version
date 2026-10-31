@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 unwired owner skeleton removal
+
+删除无 consumer 的 `window/window-context.ts` 与 `fetch-handler/electron-fetch-handler.ts`：两者仅是 null/no-op/throwing
+skeleton，未替代主 chunk 中真实 `ert`/`PBe` owners。focused gate 同时锁定真实 owners 仍为 authoritative，并防止三个
+已删除的 unwired skeleton 被重新加入。
+
 ## 2026-10-31 immediate-update wiring correction
 
 此前 `immediate-update-exit.ts` 虽存在但真实 `Wst` consumer 未接回；本轮已将 update-install 路径直接接到

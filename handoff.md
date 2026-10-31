@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+继续清除会制造错误完成感的死 skeleton：无任何 consumer 的 `window/window-context.ts` 与
+`fetch-handler/electron-fetch-handler.ts` 已删除；它们包含 null/no-op/`not wired` 实现，而真实 `ert`/`PBe` owners 仍在
+主 chunk。新增 focused gate 防止这两个 skeleton 和已删除的 startup skeleton 被重新引入。
+
 修正此前 immediate-update-exit 的假迁移：真实 update-install consumer 现已直接接回
 `app-shell/immediate-update-exit.ts`，旧 `Wst` body 已删除；无 consumer、仅占位且重复 startup owner 的
 `app-shell/run-main-app-startup.ts` skeleton 同步删除，避免文档/源码继续宣称未发生的入口迁移。
