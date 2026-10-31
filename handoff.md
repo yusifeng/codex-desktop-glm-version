@@ -3,6 +3,8 @@
 恢复 core notification reducer 外层 owner：`streams/notifications-apply.ts` 的 `nb` 现按旧顺序执行 reconnect reset、follower ignore、resume/
 thread-start buffering、turn-start observation、trace、realtime/lifecycle/thread/item/fs 分发与最终 emit；thread reducer 同步恢复 environment、start、
 name/settings/status、goal、archive/delete/unarchive、token usage。主 chunk 旧 `nb/rb` 删除，新增 focused suite 覆盖 buffer/ignore 与关键分支。
+同批继续恢复 `serverRequest/resolved`：MCP elicitation、permissions 与 user-input 请求均落 completed timeline item 并移除 request；旧
+`My/Ny/Py` 随已接回的 thread/resolved reducers 一并删除。
 
 修复 conversation/subagent interrupt owner：`streams/notifications-apply.ts` 现恢复 expected-turn gate、mismatch retry、no-active fallback、
 canonical/legacy 状态更新、Node REPL 10 秒清理与 background cleanup；descendant interrupt 恢复本地 snapshot 先行、远端 discovery/list-turn

@@ -5,6 +5,7 @@
 语义 `nb` 原先绕过 follower mutation gate、resume/start buffer、turn observation、lifecycle 与 item stream，仅 emit 后处理三类 archive 方法。
 本轮恢复旧 outer reducer 顺序及完整 thread notification 子 reducer，接回现有 ItemNotificationHandler/open-file/realtime consumers，删除 main
 旧 `nb/rb`；focused suite 验证 reconnect、buffer/ignore、settings/status、delta、realtime 与 fs fan-out。
+随后补齐 `serverRequest/resolved` 的三类 request completion，并删除已由 semantic reducer 覆盖的旧 `My/Ny/Py`。
 
 ## 2026-10-31 interrupt owner repair
 

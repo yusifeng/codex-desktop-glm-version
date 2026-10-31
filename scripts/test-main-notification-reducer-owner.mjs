@@ -8,19 +8,24 @@ const source = fs.readFileSync(new URL("../src/main/main-app/streams/notificatio
 const transpiled = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
 const module = { exports: {} };
 Function("require", "module", "exports", transpiled.code)((specifier) => {
-  if (specifier === "@chunk/shared") return { $u: String, Zo: (error) => error instanceof Error ? error.message : String(error) };
+  if (specifier === "@chunk/shared") return { $u: String, ed: String, Zo: (error) => error instanceof Error ? error.message : String(error) };
   if (specifier === "../turns/canonical-history") return {
     conversationTurns: (conversation) => conversation.turns ?? [], findTurnById: () => null, lastTurnWithTurnId: () => null,
+    forEachTurn: (conversation, callback) => (conversation.turns ?? []).forEach(callback),
   };
   if (specifier === "../threads/patch-classification") return {
     applyThreadSettingsUpdate: (state, settings) => { state.latestThreadSettings = settings; },
+  };
+  if (specifier === "../requests/item-synthesis") return {
+    Qv: (state, requestId) => { state.permissionResolved = requestId; },
+    Zv: (state) => { state.elicitationResolved = true; },
   };
   throw new Error(`unexpected require ${specifier}`);
 }, module, module.exports);
 const owner = module.exports;
 
 const calls = [];
-const conversations = new Map([["thread-1", { id: "thread-1" }]]);
+const conversations = new Map([["thread-1", { id: "thread-1", turns: [], requests: [] }]]);
 const context = {
   observeTurnStart: (...args) => calls.push(["observe", ...args]),
   manager: {
@@ -29,6 +34,7 @@ const context = {
     updateConversationState: (id, update) => { const state = conversations.get(id) ?? { id }; update(state); conversations.set(id, state); },
     broadcastConversationSnapshot: (id) => calls.push(["snapshot", id]),
     sendRequest: async (...args) => calls.push(["request", ...args]),
+    getMcpServerElicitationItem: () => ({ type: "mcpServerElicitation" }),
   },
   notificationContext: {
     threadStore: {
@@ -75,9 +81,17 @@ equal(calls.filter(([kind]) => kind === "emit").length, emittedBeforeIgnore);
 context.notificationContext.resumeNotificationBuffer.buffer = () => true;
 owner.applyNotification(context, "thread/name/updated", { threadId: "thread-1", threadName: "buffered" });
 equal(calls.some((entry) => entry[0] === "title" && entry[2] === "buffered"), false);
+context.notificationContext.resumeNotificationBuffer.buffer = () => false;
+conversations.get("thread-1").requests = [{ id: "request-1", method: "item/permissions/requestApproval", params: { turnId: "turn-1" } }];
+owner.applyNotification(context, "serverRequest/resolved", { threadId: "thread-1", requestId: "request-1" });
+equal(conversations.get("thread-1").permissionResolved, "request-1");
+equal(conversations.get("thread-1").requests, []);
 
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
 equal(main.includes("function nb("), false);
 equal(main.includes("function rb("), false);
+equal(main.includes("function My("), false);
+equal(main.includes("function Ny("), false);
+equal(main.includes("function Py("), false);
 
 console.log(`${assertions} main notification reducer owner assertions passed`);

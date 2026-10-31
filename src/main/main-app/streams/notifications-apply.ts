@@ -1,6 +1,7 @@
-import { $u as normalizeThreadId, Zo as errorToString } from "@chunk/shared";
-import { conversationTurns, findTurnById, lastTurnWithTurnId } from "../turns/canonical-history";
+import { $u as normalizeThreadId, ed as requestIdOf, Zo as errorToString } from "@chunk/shared";
+import { conversationTurns, findTurnById, forEachTurn, lastTurnWithTurnId } from "../turns/canonical-history";
 import { applyThreadSettingsUpdate } from "../threads/patch-classification";
+import { Qv as applyPermissionsResolution, Zv as applyMcpElicitationResolution } from "../requests/item-synthesis";
 
 type R=Record<string,unknown>;const rec=(v:unknown):R=>typeof v===`object`&&v!==null?v as R:{};const fn=(v:unknown,n:string)=>(rec(v)[n] as (((...a:unknown[])=>unknown)|undefined));
 function update(manager:unknown,id:string,callback:(state:R)=>void){fn(manager,`updateConversationState`)?.(id,callback)} function append(state:R,item:unknown){const turns=state.turns;if(Array.isArray(turns)&&turns.length>0){const turn=rec(turns[turns.length-1]);const items=Array.isArray(turn.items)?turn.items:[];turn.items=[...items,item]}}
@@ -102,6 +103,30 @@ const ITEM_STREAM_METHODS = new Set([
   "item/reasoning/textDelta", "item/commandExecution/outputDelta", "item/commandExecution/terminalInteraction",
   "item/fileChange/patchUpdated",
 ]);
+function applyServerRequestResolved(context: any, params: any): void {
+  const { manager, notificationContext } = context;
+  const conversationId = normalizeThreadId(params.threadId);
+  const request = notificationContext.threadStore.conversations.get(conversationId)?.requests.find((entry: any) => entry.id === params.requestId);
+  manager.updateConversationState(conversationId, (state: any) => {
+    const requestId = requestIdOf(params.requestId);
+    if (request?.method === "mcpServer/elicitation/request")
+      applyMcpElicitationResolution(state, request.params, manager.getMcpServerElicitationItem(requestId, request.params, true, null), manager.logger);
+    else if (request?.method === "item/permissions/requestApproval")
+      applyPermissionsResolution(state, requestId, request.params, true, null, manager.logger);
+    else if (request?.method === "item/tool/requestUserInput") {
+      forEachTurn(state, (turn: any) => {
+        if (turn.turnId !== request.params.turnId) return;
+        const item = {
+          id: `user-input-response-${requestId}`, type: "userInputResponse", requestId,
+          turnId: request.params.turnId, questions: request.params.questions, answers: {}, completed: true,
+        };
+        const index = turn.items.findIndex((entry: any) => entry.id === item.id);
+        if (index < 0) turn.items.push(item); else turn.items[index] = item;
+      });
+    }
+    state.requests = state.requests.filter((entry: any) => entry.id !== params.requestId);
+  });
+}
 export function nb(context: any, method: string, params: any, automationCapability?: unknown, shouldIgnore = false): void {
   const notification = { method, params };
   const delivery = { notification, automationCapability };
@@ -122,6 +147,7 @@ export function nb(context: any, method: string, params: any, automationCapabili
     notificationContext.lifecycle.handleNotification(notification);
   else if (THREAD_NOTIFICATION_METHODS.has(method)) applyThreadNotification(context, notification);
   else if (ITEM_STREAM_METHODS.has(method)) notificationContext.itemStreamState.handleNotification(notification);
+  else if (method === "serverRequest/resolved") applyServerRequestResolved(context, params);
   else if (method === "fs/changed")
     for (const message of notificationContext.openFileWatches.getFileChangeMessages(params.watchId)) notificationContext.events.emitOpenFileChange(message);
   notificationContext.events.emitNotification(notification);

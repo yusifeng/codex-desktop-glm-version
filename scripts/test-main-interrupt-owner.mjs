@@ -8,14 +8,16 @@ const source = fs.readFileSync(new URL("../src/main/main-app/streams/notificatio
 const transpiled = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
 const module = { exports: {} };
 Function("require", "module", "exports", transpiled.code)((specifier) => {
-  if (specifier === "@chunk/shared") return { $u: String, Zo: (error) => error instanceof Error ? error.message : String(error) };
+  if (specifier === "@chunk/shared") return { $u: String, ed: String, Zo: (error) => error instanceof Error ? error.message : String(error) };
   if (specifier === "../turns/canonical-history") return {
     conversationTurns: (conversation) => conversation.turns,
     findTurnById: (conversation, id) => conversation.turns.find((turn) => turn.turnId === id) ?? null,
     lastTurnWithTurnId: (conversation) => [...conversation.turns].reverse().find((turn) => turn.turnId != null) ?? null,
     mergedConversationTurns: (conversation) => conversation.turns,
+    forEachTurn: (conversation, callback) => (conversation.turns ?? []).forEach(callback),
   };
   if (specifier === "../threads/patch-classification") return { applyThreadSettingsUpdate() {} };
+  if (specifier === "../requests/item-synthesis") return { Qv() {}, Zv() {} };
   throw new Error(`unexpected require ${specifier}`);
 }, module, module.exports);
 const owner = module.exports;
