@@ -15,6 +15,7 @@ const realOwners = [
   ["src/main/main-app/startup/desktop-feature-availability-reconciler.ts", "createDesktopFeatureAvailabilityReconciler"],
   ["src/main/main-app/startup/app-update-lifecycle.ts", "createAppUpdateLifecycle"],
   ["src/main/main-app/startup/local-app-server-startup.ts", "runLocalAppServerStartup"],
+  ["src/main/main-app/startup/dock-menu-lifecycle.ts", "createDockMenuLifecycle"],
   ["src/main/main-app/startup/window-icon-lifecycle.ts", "createWindowIconLifecycle"],
   ["src/main/main-app/fetch-handler/electron-fetch-handler.ts", "createElectronFetchHandlerClass"],
   ["src/main/main-app/misc/open-in-service.ts", "createOpenInServiceClass"],
@@ -661,5 +662,10 @@ assert.equal(main.includes("localAppServerStartup = await runLocalAppServerStart
 assert.equal(main.includes("localAppServerStartup.closeBackfillProgress()"), true, "startup closes semantic backfill progress after window readiness");
 assert.equal(main.includes("nt = () => {}"), false, "generated backfill progress handle must be removed");
 assert.equal(main.includes("rt = !1"), false, "generated backfill progress flag must be removed");
+assert.equal(main.includes('require("./main-app/startup/dock-menu-lifecycle.js")'), true, "dock-menu lifecycle owner is wired");
+assert.equal(main.includes("dockMenuLifecycle = createDockMenuLifecycle({"), true, "startup creates one late-bound dock-menu owner");
+assert.equal(main.includes("onCompletedThreadsChanged: dockMenuLifecycle.setCompletedThreads"), true, "completed threads use the semantic owner");
+assert.equal(main.includes("getDockMenuController: dockMenuLifecycle.getController"), true, "IPC resolves the semantic dock-menu controller");
+assert.equal(main.includes("let Ce = []"), false, "generated completed-thread buffer must be removed");
 
-console.log("655 main unwired-owner skeleton assertions passed");
+console.log("661 main unwired-owner skeleton assertions passed");

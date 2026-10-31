@@ -379,6 +379,7 @@ const { installLocaleRefreshLifecycle } = require("./main-app/startup/locale-ref
 const { createDesktopFeatureAvailabilityReconciler } = require("./main-app/startup/desktop-feature-availability-reconciler.js");
 const { createAppUpdateLifecycle } = require("./main-app/startup/app-update-lifecycle.js");
 const { runLocalAppServerStartup } = require("./main-app/startup/local-app-server-startup.js");
+const { createDockMenuLifecycle } = require("./main-app/startup/dock-menu-lifecycle.js");
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
 const { createBrowserHostServiceClass } = require("./main-app/browser-sidebar/browser-host-service.js");
@@ -56313,8 +56314,14 @@ async function Ust() {
     }),
   ),
     Se.setGitWorkerTracingSampleRate(ee));
-  let Ce = [],
-    we = null,
+  let dockMenuLifecycle = createDockMenuLifecycle({
+      enabled: N,
+      createController: () =>
+        new DockMenuManager(
+          (path) => windowActivation.navigateWithAttribution(path, { navigateExistingWindow: !0 }),
+          a.hn(),
+        ),
+    }),
     Te = null,
     Ee = (e) => !1,
     De = createSqliteRecoveryConfirmationQueue({
@@ -56404,9 +56411,7 @@ async function Ust() {
     onAppServerSqliteRecovery: De.onRecovery,
     getSkysightRecorderController: () => (Tr().skysight ? be : null),
     artifactSessionHostLifecycle: Ae,
-    onCompletedThreadsChanged: (e) => {
-      ((Ce = e), we?.setCompletedThreads(e));
-    },
+    onCompletedThreadsChanged: dockMenuLifecycle.setCompletedThreads,
   });
   U.setThreadSuppressionPredicate(
     (e, t) =>
@@ -56526,7 +56531,7 @@ async function Ust() {
         getLocale: () => V.settingsStore.getEffective(n.Fa.localeOverride.key),
         loadLocale: (locale) => a.mn(V.repoRoot, locale ?? void 0),
         refreshApplicationMenu: () => Le.refreshApplicationMenu(),
-        refreshDockMenu: () => we?.refreshMenu(),
+        refreshDockMenu: dockMenuLifecycle.refreshMenu,
         refreshPipLocale: () => U.refreshLocale(),
         refreshTrayMenu: () => X9()?.refreshMenu(),
         setBrowserSessionLocale: Yc,
@@ -56576,9 +56581,7 @@ async function Ust() {
     }
     windowActivation.openSecondInstance({ channel: `shortcut`, source: `shortcut` });
   });
-  N &&
-    ((we = new DockMenuManager((e) => windowActivation.navigateWithAttribution(e, { navigateExistingWindow: !0 }), a.hn())),
-    we.setCompletedThreads(Ce));
+  dockMenuLifecycle.start();
   let We = (e) => {
       primaryWindowMessages.enqueue({ type: `computer-use-analytics-event`, event: e });
     },
@@ -56887,7 +56890,7 @@ async function Ust() {
     navigateToRoute: Le.navigateToRoute,
     setRemoteHostedPIPActiveThreadID: U.setActiveThreadForWebContents,
     setRemoteHostedPIPHostLayout: U.setHostLayoutForWebContents,
-    getDockMenuController: () => we,
+    getDockMenuController: dockMenuLifecycle.getController,
     getTrayController: X9,
     onAppEntrySource: fe,
     isTrustedIpcEvent: _e,

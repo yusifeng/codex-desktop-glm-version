@@ -5407,3 +5407,9 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   warning 与 `connect→network ready→recovery enable→finally close` 顺序；长期 backfill handle 继续在窗口 ready 后关闭。
 - `Ust` 旧 `nt/rt/it` 和 inline callbacks 删除。focused suite 24 项、相邻三组回归 91 项，no-unwired gate 扩至 655 项；
   progress-window 测试的直接 TypeScript import 同步修复。
+
+# 2026-11-01 Dock menu late-binding lifecycle extraction
+
+- 新增并真实接回 `startup/dock-menu-lifecycle.ts`，统一 macOS controller、pre-start completed-thread snapshot、首次 replay、
+  后续更新、locale refresh 与 IPC getter；disabled 与重复 start 均保持幂等。
+- `Ust` 旧 `Ce/we` 删除。focused suite 14 项、相邻三组回归 80 项，no-unwired gate 扩至 661 项。

@@ -3484,3 +3484,12 @@ backfill handle 则保持到 primary window ready 后由 caller 显式关闭。
 
 `Ust` 原 `nt/rt/it` 与 inline recovery/open callbacks 删除，失败返回仍短路整个启动。24 项 focused 断言与 progress/delayed-progress/
 state-recovery 相邻 91 项回归通过；progress-window 的直接 `.ts` import 测试入口恢复真实执行。no-unwired gate 扩至 655 项。
+
+### 整块抽取：late-bound Dock menu lifecycle
+
+新增并接回 `startup/dock-menu-lifecycle.ts`，统一拥有 macOS-only DockMenu controller、controller 创建前的 completed-threads 最新快照、
+首次创建后的状态回放、后续即时更新、locale refresh 与 IPC getter。禁用平台永不构造 controller；重复 start 幂等且不重复回放。
+
+`Ust` 原 `Ce/we` buffer/controller 状态和手工 optional chaining 删除，WindowContext completed-thread callback、locale lifecycle 与
+main IPC 均消费同一 owner。14 项 focused 断言及 dock-menu/UI lifecycle/main IPC 相邻 80 项回归通过，no-unwired gate
+扩至 661 项。
