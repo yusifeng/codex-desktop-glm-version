@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+继续审计发现既有 `misc/dock-menu.ts` 从未接入主 chunk；现已将真实 startup consumer 改接 `DockMenuManager`，
+删除旧 `Ll/ase/ose/sse/Rl/zl` 副本，并覆盖 unread/completed 去重、recent 排除、overflow submenu、Unicode 标题截断、
+projectless/empty sublabel、click routing 与 darwin Dock menu 发布。focused test 覆盖 20 项。
+
 随后将 `Cnt/wnt/Tnt/Ent/Dnt` cron-turn read-state lifecycle 迁入
 `automations/cron-turn-read-state.ts`；connection/notification subscriptions、turn correlation、agent-message fallback、
 notification-policy decision、unread writer、failure logging、start-failure 与 disposal 均由新 owner 持有。真实

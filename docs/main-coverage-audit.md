@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 dock-menu wiring repair
+
+既有 `src/main/main-app/misc/dock-menu.ts` 虽已包含完整可读实现，主 chunk 却仍实例化旧 `ose`。现已将真实 startup
+consumer 改接 `DockMenuManager`，删除旧 `Ll/ase/ose/sse/Rl/zl` 副本；行为覆盖 unread/completed path 去重、recent
+排除、三条直排与 overflow submenu、Unicode 标题截断、projectless/empty sublabel、click routing 及 darwin Dock
+menu 发布。
+
 ## 2026-10-31 cron-turn read-state lifecycle
 
 原 `Cnt/wnt/Tnt/Ent/Dnt` 已迁入 `src/main/main-app/automations/cron-turn-read-state.ts`。新 owner 保留连接前置检查、

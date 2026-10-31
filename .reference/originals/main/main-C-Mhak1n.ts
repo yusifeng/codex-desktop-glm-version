@@ -128,6 +128,7 @@ const { createSystemFontsServiceClass } = require("./main-app/window/system-font
 const { createThreadReadStateOwnerClass } = require("./main-app/thread-read-state/thread-read-state-owner.js");
 const { createThreadProjectMembershipOwnerClass } = require("./main-app/projects/thread-project-membership-owner.js");
 const { createCronTurnReadStatePreparer } = require("./main-app/automations/cron-turn-read-state.js");
+const { DockMenuManager } = require("./main-app/misc/dock-menu.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -12918,90 +12919,7 @@ var $oe = `trayMenu.openApp`,
   Nl = `trayMenu.more`,
   Pl = `More`,
   Fl = `trayMenu.projectlessThreads`,
-  Il = `Chats`,
-  Ll = 3,
-  ase = 35,
-  ose = class {
-    onOpenThread;
-    nativeIntl;
-    completedThreads = [];
-    unreadThreads = [];
-    recentThreads = [];
-    constructor(e, t) {
-      ((this.onOpenThread = e), (this.nativeIntl = t), this.refreshMenu());
-    }
-    async handleMessage(e) {
-      if (e.type === `tray-menu-threads-changed`) {
-        ((this.unreadThreads = e.trayMenuThreads.unreadThreads),
-          (this.recentThreads = e.trayMenuThreads.recentThreads),
-          this.refreshMenu());
-        return;
-      }
-    }
-    setCompletedThreads(e) {
-      ((this.completedThreads = e), this.refreshMenu());
-    }
-    refreshMenu() {
-      let e = this.nativeIntl.formatMessage({ messageId: Nl, defaultMessage: Pl }),
-        t = this.nativeIntl.formatMessage({ messageId: Fl, defaultMessage: Il }),
-        n = sse(this.unreadThreads, this.completedThreads),
-        r = new Set(n.map((e) => e.path)),
-        i = [
-          Rl({
-            label: this.nativeIntl.formatMessage({ messageId: jl, defaultMessage: Ml }),
-            moreLabel: e,
-            threads: n,
-            projectlessLabel: t,
-            onOpenThread: this.onOpenThread,
-          }),
-          Rl({
-            label: this.nativeIntl.formatMessage({ messageId: kl, defaultMessage: Al }),
-            moreLabel: e,
-            threads: this.recentThreads.filter((e) => !r.has(e.path)),
-            projectlessLabel: t,
-            onOpenThread: this.onOpenThread,
-          }),
-        ]
-          .filter((e) => e.length > 0)
-          .flatMap((e, t) => (t === 0 ? e : [{ type: `separator` }, ...e]));
-      this.setDockMenu(i);
-    }
-    setDockMenu(e) {
-      process.platform === `darwin` && l.app.dock?.setMenu(l.Menu.buildFromTemplate(e));
-    }
-  };
-function sse(e, t) {
-  let n = new Set(e.map((e) => e.path));
-  return [...e, ...t.filter((e) => !n.has(e.path))];
-}
-function Rl({ label: e, moreLabel: t, threads: n, projectlessLabel: r, onOpenThread: i }) {
-  if (n.length === 0) return [];
-  let a = n.slice(0, Ll),
-    o = n.slice(Ll);
-  return [
-    { label: e, enabled: !1 },
-    ...a.map((e) => zl({ thread: e, projectlessLabel: r, onOpenThread: i })),
-    ...(o.length > 0
-      ? [
-          {
-            label: t,
-            submenu: o.map((e) => zl({ thread: e, projectlessLabel: r, onOpenThread: i })),
-          },
-        ]
-      : []),
-  ];
-}
-function zl({ thread: e, projectlessLabel: t, onOpenThread: n }) {
-  let r = Array.from(e.title),
-    i = e.isProjectless ? t : e.projectLabel;
-  return {
-    label: r.length <= ase ? e.title : `${r.slice(0, 34).join(``).trimEnd()}…`,
-    ...(i.length > 0 ? { sublabel: i } : {}),
-    click: () => {
-      n(e.path);
-    },
-  };
-}
+  Il = `Chats`;
 var Bl = class extends Error {
     messageBytes;
     maxFrameBytes;
@@ -154099,7 +154017,7 @@ async function Ust() {
       n != null && fe({ channel: `shortcut`, source: `shortcut` }, n.webContents);
     };
   N &&
-    ((we = new ose((e) => Ue(e, { navigateExistingWindow: !0 }), a.hn())),
+    ((we = new DockMenuManager((e) => Ue(e, { navigateExistingWindow: !0 }), a.hn())),
     we.setCompletedThreads(Ce));
   let We = (e) => {
       (ce.push({ type: `computer-use-analytics-event`, event: e }), le());
