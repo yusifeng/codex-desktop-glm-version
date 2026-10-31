@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 ChronicleService owner wiring
+
+`src/main/main-app/chronicle/service.ts` 与旧 `IO` 均为 25 members，并完整包含 `LO/RO` rollback aggregation。本轮接回
+`WindowContext` consumer，删除旧 137 行 class/helper 簇；focused suite 覆盖 state、enable config、pause/resume、history、pending
+permission 分支与真实 wiring。
+
 ## 2026-10-31 BrowserFamilyService owner wiring
 
 `src/main/main-app/platform/browser-family.ts` 与旧 `MO` 均为 7 members。本轮修正非 Dev compatible-extension resolver 的

@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 ChronicleService：既有 `chronicle/service.ts` 与旧 `IO` 均为完整 25-member owner，现已替代主 chunk `IO/LO/RO`
+137 行簇。enable/disable config 写入、pending/denied/error rollback、recorder state、history/app resolution 与 eligibility/controller
+guards 保持完整；`WindowContext` 真实 consumer 继续通过 `IO` 兼容别名构造。
+
 接回 BrowserFamilyService：`platform/browser-family.ts` 的 7-member owner 现已替代主 chunk 旧 `AO/jO/MO/NO/PO/FO`。
 审计同时恢复了非 Dev `getCompatibleExtensionIds` 返回 `undefined` 的原始语义；浏览器安装探测、扩展状态/banner、默认浏览器
 registry/XDG 解析与 extension settings/URL 打开继续由 `WindowContext` 的 `new MO()` 真实 consumer 使用。
