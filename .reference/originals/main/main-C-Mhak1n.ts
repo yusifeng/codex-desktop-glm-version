@@ -87,6 +87,7 @@ const { createThreadMembershipInference } = require("./main-app/projects/thread-
 const { createProjectsManagerClass } = require("./main-app/projects/projects-manager.js");
 const { createInteractionRpcServices } = require("./main-app/window/interaction-rpc-services.js");
 const { createAirpodsMicrophoneMuteRuntime } = require("./main-app/realtime/airpods-microphone-mute.js");
+const { createRealtimeContinuityHistoryRuntime } = require("./main-app/realtime/continuity-history.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -133228,51 +133229,11 @@ var o8e = createProjectsManagerClass({
     setImmediate,
     clearImmediate,
   }),
-  p8e = `realtime-voice-continuity.json`,
-  m8e = n.wf({ role: n.df([`user`, `assistant`]), text: n.Of() }),
-  h8e = n.wf({ version: n.bf(1), threads: n.Ef(n.Of(), n.wf({ items: n.hf(m8e) })) }),
-  v2 = Promise.resolve(),
-  g8e = class extends n.Uf {
-    executionHost;
-    constructor(e) {
-      (super(), (this.executionHost = e));
-    }
-    async read({ threadId: e, maxItems: t }) {
-      return ((await y2(await this.executionHost.codexHome())).threads[e]?.items ?? []).slice(-t);
-    }
-    async record({ threadId: e, item: t, maxItems: n, maxTextLength: r }) {
-      let i = v8e(t, r);
-      i != null &&
-        ((v2 = v2
-          .catch(() => void 0)
-          .then(async () => {
-            let t = await this.executionHost.codexHome(),
-              r = await y2(t),
-              a = r.threads[e]?.items ?? [];
-            ((r.threads[e] = { items: [...a, i].slice(-n) }), await _8e(t, r));
-          })),
-        await v2);
-    }
-  };
-async function y2(e) {
-  try {
-    return h8e.parse(JSON.parse(await (0, b.readFile)(b2(e), `utf8`)));
-  } catch {
-    return { version: 1, threads: {} };
-  }
-}
-async function _8e(e, t) {
-  let n = b2(e);
-  (await (0, b.mkdir)(h.default.dirname(n), { recursive: !0 }),
-    await (0, b.writeFile)(n, `${JSON.stringify(t)}\n`, `utf8`));
-}
-function b2(e) {
-  return h.default.join(e, p8e);
-}
-function v8e(e, t) {
-  let n = e.text.trim().slice(0, t);
-  return n.length === 0 ? null : { role: e.role, text: n };
-}
+  { RealtimeContinuityHistory: g8e } = createRealtimeContinuityHistoryRuntime({
+    runtime: n,
+    fs: b,
+    path: h.default,
+  });
 var y8e = class extends n.Uf {
     executionHost;
     constructor(e) {

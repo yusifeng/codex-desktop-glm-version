@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `p8e/m8e/h8e/v2/g8e/y2/_8e/b2/v8e` realtime continuity history cluster 迁入
+`realtime/continuity-history.ts`；schema parse/fallback、Codex home path、trim/truncate、per-thread max-items、
+newline JSON write 与跨实例串行写队列/失败恢复均由新 file-backed owner 持有。唯一 voice runtime consumer
+已接回，旧 schema/helpers/class 已删除。focused test 覆盖 22 项。
+
 随后将 `l8e/u8e/d8e/f8e` AirPods microphone-mute cluster 迁入
 `realtime/airpods-microphone-mute.ts`；packaged/dev native addon 路径、macOS 14+ capability、mute acknowledge、
 power-resume/capture-change single-immediate recovery、异常日志与 idempotent stop cleanup 均由新 runtime 持有。

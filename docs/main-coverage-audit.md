@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 realtime continuity history
+
+原 `p8e/m8e/h8e/v2/g8e/y2/_8e/b2/v8e` 已整簇迁入
+`src/main/main-app/realtime/continuity-history.ts`。新 owner 保留 file schema validation/empty fallback、Codex home
+path、message trim/truncate、per-thread tail retention、directory creation/newline JSON write、process-wide serialized
+write queue 与 rejection recovery；唯一 realtime consumer 已接回，旧实现已物理删除。
+
 ## 2026-10-31 AirPods microphone mute companion
 
 原 `l8e/u8e/d8e/f8e` 已整簇迁入 `src/main/main-app/realtime/airpods-microphone-mute.ts`。新 runtime
