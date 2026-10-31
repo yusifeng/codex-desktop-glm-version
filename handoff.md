@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `F8e` app-server realtime event bridge、notification/multi-agent schemas 与独占 projection/key helpers
+整簇迁入 `realtime/app-server-event-bridge.ts`；connection registry lifecycle、session/turn/item/transcript/handoff、
+transport loss、agent-message presentations、created-thread/subagent/delegation 与 multi-agent activity projection
+均由新 owner 持有。唯一 runtime consumer 已接回，旧 624 行 cluster 已删除。focused test 覆盖 38 项。
+
 随后将 `b8e/C8e/w8e` realtime voice-history owner/service/subscription 与独占 projection helpers 整簇迁入
 `realtime/voice-history.ts`；session/transcript/turn/presentation ledger、live projection、restore interruption、
 ephemeral non-persistence/tombstone、matching subscriber broadcast、RPC-broken/unsubscribe/dispose 均保持原语义。
