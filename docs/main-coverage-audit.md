@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 saved-section state policy extraction
+
+新增 `sidebar/saved-section-policy.ts`，将 saved custom sections 的基础 state mutations、operation reducer、thread-host retention、undo/redo affected
+state diff/snapshot/identity guards、reconciliation commit、item-key projection 与 pending-deletion pruning 迁入单一纯策略 factory。既有 ThreadSectionServer、
+SavedSectionUndoRedoStack、SavedSectionReconciliation、SavedCustomSectionsManager 和 PinnedThreadsService 继续持有生命周期与 I/O，统一消费该 policy，
+不复制状态 owner。主 chunk 约 405 行旧 helper 物理删除；53 条 focused 断言及防空壳审计覆盖行为、接线与旧定义缺席。
+
 ## 2026-11-01 browser comment policy belt extraction
 
 新增 `browser-sidebar/browser-comment-policy.ts`，将截图 crop/resize/compact/record、saved-comment 与 anchor-state 投影、multi-anchor 选择、键盘输入、

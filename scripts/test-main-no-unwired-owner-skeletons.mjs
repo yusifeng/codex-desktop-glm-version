@@ -83,6 +83,7 @@ const realOwners = [
   ["src/main/main-app/browser-sidebar/browser-webview-adoption-runtime.ts", "attachPendingAdoptedWebview"],
   ["src/main/main-app/browser-sidebar/browser-annotation-anchor-policy.ts", "createBrowserAnnotationAnchorPolicy"],
   ["src/main/main-app/browser-sidebar/browser-comment-policy.ts", "createBrowserCommentPolicy"],
+  ["src/main/main-app/sidebar/saved-section-policy.ts", "createSavedSectionPolicy"],
   ["src/main/main-app/browser-sidebar/site-page-event-runtime.ts", "createSitePageEventRuntime"],
   ["src/main/main-app/browser-sidebar/browser-host-service.ts", "createBrowserHostServiceClass"],
   ["src/main/main-app/window/browser-window-rpc-services.ts", "createBrowserProfileImportServiceClass"],
@@ -170,6 +171,10 @@ assert.equal(main.includes('require("./main-app/browser-sidebar/browser-settings
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-webview-adoption-runtime.js")'), true, "browser webview adoption runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-annotation-anchor-policy.js")'), true, "browser annotation anchor policy is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-comment-policy.js")'), true, "browser comment policy is wired");
+assert.equal(main.includes('require("./main-app/sidebar/saved-section-policy.js")'), true, "saved-section policy is wired");
+for (const oldOwner of ["function Wb(", "function Gb(", "function Kb(", "function qb(", "function _H(", "function eBe(", "function vH(", "function bH(", "function wH(", "function DH(", "function OH(", "function AH("]) {
+  assert.equal(main.includes(oldOwner), false, `${oldOwner} generated saved-section policy must be removed`);
+}
 for (const oldOwner of ["function gGe(", "function HK(", "function UK(", "function WK(", "function GK(", "function KK(", "function JK(", "function kGe(", "function tq(", "function PGe("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser comment policy must be removed`);
 }

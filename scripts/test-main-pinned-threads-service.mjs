@@ -108,6 +108,6 @@ await rejects(PinnedThreadsService.getPinnedThreadIdsForWorktreeCleanup(uninitia
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
 equal(main.includes("createPinnedThreadsServiceClass({"), true);
 equal(main.includes("var jH = class"), false);
-equal(main.includes("new jH("), true);
+equal(main.includes("    jH,"), true);
 
 console.log(`${assertions} main pinned threads service assertions passed`);

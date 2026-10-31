@@ -40,7 +40,8 @@ memberQuery[Symbol.dispose]();
 await rejects(memberQuery.readMembers(), /Saved section query retired/);
 
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
+const manager = fs.readFileSync(new URL("../src/main/main-app/sidebar/saved-custom-sections-manager.ts", import.meta.url), "utf8");
 equal(main.includes("rBe = createSavedSectionReconciliationClass({"), true);
 equal(main.includes("rBe = class"), false);
-equal(main.includes("new rBe("), true);
+equal(manager.includes("new rBe("), true);
 console.log(`${assertions} main saved-section reconciliation assertions passed`);

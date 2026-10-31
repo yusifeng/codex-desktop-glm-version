@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成 Saved Sections 纯状态策略整带迁移：新增 `sidebar/saved-section-policy.ts`，统一接管 section create/rename/delete/move/reorder/replace、
+pending deletion 清理、operation reducer、thread-host 投影、undo/redo affected-state diff 与 identity guard、reconciliation commit 及 host/member 辅助。
+ThreadSectionServer、undo stack、reconciliation、custom-section manager 和 pinned service 均已真实改接同一 policy factory；主 chunk 物理删除约 405 行
+机械 helper。focused suite 执行 53 条状态/冲突/接线断言，防空壳审计锁定新 factory 与旧定义缺席。
+
 完成 Browser comment policy belt 语义化：新增 `browser-sidebar/browser-comment-policy.ts`，集中接管截图裁剪/压缩与记录、comment/anchor
 状态投影、多 anchor 编辑、键盘输入映射、design change queue/upsert/remove、CSS provenance 合并与补全、identity 判定和 runtime request 发送。
 主 chunk 已真实改接 factory，并物理删除约 470 行旧 helper 与无 consumer 的旧 comment-mode block checker；新模块 654 行，整批净增加可读实现。

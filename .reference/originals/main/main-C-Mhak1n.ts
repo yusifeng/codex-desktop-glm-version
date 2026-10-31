@@ -311,6 +311,7 @@ const { createSavedSectionUndoRedoStackClass } = require("./main-app/sidebar/sav
 const { createSavedSectionTransitionClass } = require("./main-app/sidebar/saved-section-transition.js");
 const { createSavedSectionReconciliationClass } = require("./main-app/sidebar/saved-section-reconciliation.js");
 const { createSavedCustomSectionsManagerClass } = require("./main-app/sidebar/saved-custom-sections-manager.js");
+const { createSavedSectionPolicy } = require("./main-app/sidebar/saved-section-policy.js");
 const { createWorkspaceFileServiceClass } = require("./main-app/workspace/files.js");
 const { createWorkspaceFileRuntimeSupport } = require("./main-app/workspace/file-runtime-support.js");
 const { createWindowRpcServiceAdapters } = require("./main-app/window/rpc-service-adapters.js");
@@ -14138,142 +14139,36 @@ var xb = e.t((e, t) => {
     appServerLegacySectionIds: n.hf(n.Of()).optional(),
     appServerMigratedHostIds: n.hf(n.Of()).optional(),
   });
-function Wb(e) {
-  return { ...e, sections: e.sections.map((e) => ({ ...e, appearance: null })) };
-}
-function Gb(e, t, n, r) {
-  return e.sections.some(({ id: e }) => e === t)
-    ? Kb(e, (e) => {
-        let i = e.itemKeys.filter((e) => e !== n);
-        if (e.id !== t) return i.length === e.itemKeys.length ? e : { ...e, itemKeys: i };
-        let a = r == null ? -1 : i.indexOf(r);
-        return (
-          i.splice(a === -1 ? i.length : a, 0, n),
-          {
-            ...e,
-            itemKeys: i,
-            pendingDeletionHostIdsByItemKey:
-              e.pendingDeletionHostIdsByItemKey == null
-                ? void 0
-                : (0, Bb.default)(e.pendingDeletionHostIdsByItemKey, n),
-          }
-        );
-      })
-    : e;
-}
-function Kb(e, t) {
-  let n = e.sections.map((e) => {
-    let n = t(e);
-    return n === e || n.pendingDeletionHostIdsByItemKey == null
-      ? n
-      : {
-          ...n,
-          pendingDeletionHostIdsByItemKey: (0, fp.default)(
-            n.pendingDeletionHostIdsByItemKey,
-            n.itemKeys,
-          ),
-        };
-  });
-  return n.some((t, n) => t !== e.sections[n]) ? { ...e, sections: n } : e;
-}
-function qb(e, t) {
-  let n = t.name.trim();
-  if (n.length === 0 || e.sections.some(({ id: e }) => e === t.id)) return e;
-  let r = new Set(t.itemKeys),
-    i = e.sectionOrder.findIndex((e) => e === `chats` || e === `threads`),
-    a = [...e.sectionOrder];
-  return (
-    a.splice(i === -1 ? a.length : i, 0, `custom:${t.id}`),
-    {
-      ...e,
-      sectionOrder: a,
-      sections: [
-        ...e.sections.map((e) => {
-          let t = e.itemKeys.filter((e) => !r.has(e));
-          return t.length === e.itemKeys.length
-            ? e
-            : {
-                ...e,
-                itemKeys: t,
-                pendingDeletionHostIdsByItemKey:
-                  e.pendingDeletionHostIdsByItemKey == null
-                    ? void 0
-                    : (0, fp.default)(e.pendingDeletionHostIdsByItemKey, t),
-              };
-        }),
-        { ...t, name: n },
-      ],
-    }
-  );
-}
-function Jb(e, t, n) {
-  let r = n.trim();
-  return r.length === 0 ? e : Kb(e, (e) => (e.id === t ? { ...e, name: r } : e));
-}
-function Yb(e, t) {
-  return {
-    ...e,
-    sections: e.sections.filter(({ id: e }) => e !== t),
-    collapsedSectionIds: e.collapsedSectionIds.filter((e) => e !== t),
-    sectionOrder: e.sectionOrder.filter((e) => e !== `custom:${t}`),
-  };
-}
-function Xb(e, t) {
-  return Kb(e, (e) =>
-    e.itemKeys.includes(t) ? { ...e, itemKeys: e.itemKeys.filter((e) => e !== t) } : e,
-  );
-}
-function Zb(e, t, n) {
-  let r = new Set(n);
-  return Kb(e, (e) =>
-    e.id === t
-      ? {
-          ...e,
-          itemKeys: [
-            ...n.filter((t) => e.itemKeys.includes(t)),
-            ...e.itemKeys.filter((e) => !r.has(e)),
-          ],
-        }
-      : e,
-  );
-}
-function oye(e, t) {
-  let n = t.flatMap((e) => (e.startsWith(`custom:`) ? [e.slice(7)] : [])),
-    r = new Map(e.sections.map((e) => [e.id, e])),
-    i = new Set(n);
-  return {
-    ...e,
-    sectionOrder: t,
-    sections: [
-      ...n.flatMap((e) => {
-        let t = r.get(e);
-        return t == null ? [] : [t];
-      }),
-      ...e.sections.filter(({ id: e }) => !i.has(e)),
-    ],
-  };
-}
-function sye(e, t, n) {
-  return t === n || !e.sections.some(({ itemKeys: e }) => e.includes(t))
-    ? e
-    : Kb(e, (e) =>
-        e.itemKeys.includes(t)
-          ? {
-              ...e,
-              pendingDeletionHostIdsByItemKey:
-                e.pendingDeletionHostIdsByItemKey?.[t] == null
-                  ? e.pendingDeletionHostIdsByItemKey
-                  : {
-                      ...(0, Bb.default)(e.pendingDeletionHostIdsByItemKey, t),
-                      [n]: e.pendingDeletionHostIdsByItemKey[t],
-                    },
-              itemKeys: e.itemKeys.filter((e) => e !== n).map((e) => (e === t ? n : e)),
-            }
-          : e.itemKeys.includes(n)
-            ? { ...e, itemKeys: e.itemKeys.filter((e) => e !== n) }
-            : e,
-      );
-}
+var {
+  affectedStateGuardsMatch: SH,
+  applyAffectedState: wH,
+  applyOperationWithHostIds: _H,
+  captureAffectedStateGuards: xH,
+  commitReconciledState: vH,
+  createSection: qb,
+  deleteSection: Yb,
+  describeAffectedState: bH,
+  isRpcErrorCode: gH,
+  itemKeyFromThreadId: kH,
+  mapSections: Kb,
+  moveItem: Gb,
+  projectAffectedState: CH,
+  pruneThreadHostIds: DH,
+  readPinnedThreadIds: hH,
+  removeItem: Xb,
+  renameSection: Jb,
+  reorderItems: Zb,
+  reorderSectionKeys: oye,
+  replaceItem: sye,
+  stripSectionAppearance: Wb,
+  threadIdFromItemKey: OH,
+  updateSectionItems: AH,
+} = createSavedSectionPolicy({
+  dedupe: (values) => [...new Set(values)],
+  deepEqual: G.default,
+  isInternalThreadId: n.hu,
+  pinnedThreadIdsKey: n.iu.PINNED_THREAD_IDS,
+});
 var Qb = n.Ef(n.Of(), n.Mf()),
   $b = n.df([`manual`, `priority`, `created_at`, `updated_at`]);
 function ex(e) {
@@ -35005,10 +34900,6 @@ var Zze = e.t((e, t) => {
     t.exports = i;
   }),
   mH = e.a(Zze());
-function hH(e) {
-  let t = e.get(n.iu.PINNED_THREAD_IDS);
-  return Array.isArray(t) ? (0, mH.default)(t.filter((e) => typeof e == `string`)) : [];
-}
 var Qze = n.wf({ thread: n.wf({ id: n.Of() }) }),
   $ze = createThreadSectionServerClass({
     Qze,
@@ -35022,120 +34913,6 @@ var Qze = n.wf({ thread: n.wf({ id: n.Of() }) }),
     ve,
     xe,
   });
-function gH(e, t) {
-  return (`jsonRpcCode` in e && e.jsonRpcCode === t) || (`code` in e && e.code === t);
-}
-function _H(e, t) {
-  let n = eBe(e, t);
-  if (t.type === `create` && n === e) return e;
-  let r;
-  t.type === `move` || t.type === `resolvePendingDeletion`
-    ? (r = t.itemKey)
-    : t.type === `replaceItem` && (r = t.nextItemKey);
-  let i;
-  t.type === `resolvePendingDeletion`
-    ? (i = t.hostId)
-    : (t.type === `move` || t.type === `replaceItem`) && (i = t.threadHostId);
-  let a = new Set(n.sections.flatMap(({ itemKeys: e }) => e)),
-    o = Object.fromEntries(
-      Object.entries({
-        ...e.threadHostIds,
-        ...(t.type === `create` ? t.threadHostIds : void 0),
-        ...(r?.startsWith(`codex:thread:local:`) && i != null ? { [r.slice(19)]: i } : {}),
-      }).filter(([e]) => a.has(`codex:thread:local:${e}`)),
-    );
-  return Object.keys(o).length === Object.keys(e.threadHostIds ?? {}).length &&
-    Object.entries(o).every(([t, n]) => e.threadHostIds?.[t] === n)
-    ? n
-    : { ...n, threadHostIds: Object.keys(o).length === 0 ? void 0 : o };
-}
-function eBe(e, t) {
-  switch (t.type) {
-    case `create`: {
-      let n = qb(e, { id: t.sectionId, name: t.name, itemKeys: t.itemKeys });
-      return n === e
-        ? e
-        : t.legacy
-          ? {
-              ...n,
-              appServerLegacySectionIds:
-                e.appServerLegacySectionIds == null
-                  ? void 0
-                  : [...e.appServerLegacySectionIds, t.sectionId],
-              appServerMigratedHostIds: void 0,
-            }
-          : {
-              ...n,
-              appServerLegacySectionIds:
-                e.appServerLegacySectionIds ?? e.sections.map(({ id: e }) => e),
-            };
-    }
-    case `rename`:
-      return Jb(e, t.sectionId, t.name);
-    case `delete`:
-      return Yb(e, t.sectionId);
-    case `collapse`:
-      return !e.sections.some(({ id: e }) => e === t.sectionId) ||
-        e.collapsedSectionIds.includes(t.sectionId) === t.collapsed
-        ? e
-        : {
-            ...e,
-            collapsedSectionIds: t.collapsed
-              ? [...e.collapsedSectionIds, t.sectionId]
-              : e.collapsedSectionIds.filter((e) => e !== t.sectionId),
-          };
-    case `reorder`: {
-      let n = new Set(e.sections.map(({ id: e }) => `custom:${e}`)),
-        r = new Set(t.visibleSectionKeys.filter((e) => !e.startsWith(`custom:`) || n.has(e))),
-        i = t.sectionKeys.filter((e) => r.has(e)),
-        a = 0;
-      return oye(e, [
-        ...e.sectionOrder.flatMap((e) => {
-          if (!r.has(e)) return [e];
-          let t = i[a++];
-          return t == null ? [] : [t];
-        }),
-        ...i.slice(a),
-      ]);
-    }
-    case `move`:
-      return t.onlyIfUnassigned && e.sections.some(({ itemKeys: e }) => e.includes(t.itemKey))
-        ? e
-        : Gb(e, t.sectionId, t.itemKey, t.beforeItemKey);
-    case `remove`:
-      return Xb(e, t.itemKey);
-    case `reorderItems`:
-      return Zb(e, t.sectionId, t.itemKeys);
-    case `replaceItem`:
-      return sye(e, t.previousItemKey, t.nextItemKey);
-    case `resolvePendingDeletion`: {
-      let n = e;
-      for (let r of e.sections) {
-        let e = r.pendingDeletionHostIdsByItemKey?.[t.itemKey];
-        if (e == null) continue;
-        let i = { ...r.pendingDeletionHostIdsByItemKey };
-        delete i[t.itemKey];
-        let a = e.includes(t.hostId) ? r.itemKeys.filter((e) => e !== t.itemKey) : r.itemKeys;
-        n =
-          a.length === 0 && Object.keys(r.hostSectionIds ?? {}).length === 0
-            ? Yb(n, r.id)
-            : {
-                ...n,
-                sections: n.sections.map((e) =>
-                  e.id === r.id
-                    ? {
-                        ...r,
-                        itemKeys: a,
-                        pendingDeletionHostIdsByItemKey: Object.keys(i).length === 0 ? void 0 : i,
-                      }
-                    : e,
-                ),
-              };
-      }
-      return n;
-    }
-  }
-}
 var tBe = createSavedSectionTransitionClass({
     RpcHandlerBase: n.Uf,
     createLogger: r.i,
@@ -35148,30 +34925,6 @@ var tBe = createSavedSectionTransitionClass({
     `appServerLegacySectionIds`,
     `appServerMigratedHostIds`,
   ];
-function vH(e, t, n, r, i) {
-  if (!e.isSourceCurrent()) return `unavailable`;
-  let a = bH(t, n),
-    o = e.read(),
-    s = Object.keys({ ...t.threadHostIds, ...n.threadHostIds }).filter(
-      (e) => t.threadHostIds?.[e] !== n.threadHostIds?.[e],
-    );
-  if (
-    ((a.collections = a.collections.filter((e) => e !== `threadHostIds`)),
-    !SH(o, xH(t, a)) || s.some((e) => o.threadHostIds?.[e] !== t.threadHostIds?.[e]))
-  )
-    return `conflict`;
-  if ((e.getConnection(i), (0, G.default)(t, n))) return `unchanged`;
-  let c = wH(o, n, a);
-  if (s.length !== 0) {
-    let e = { ...o.threadHostIds };
-    for (let t of s) {
-      let r = n.threadHostIds?.[t];
-      r == null ? delete e[t] : (e[t] = r);
-    }
-    c.threadHostIds = Object.keys(e).length === 0 ? void 0 : e;
-  }
-  return (e.write(c, r), `applied`);
-}
 var yH = createSavedSectionUndoRedoStackClass({
   CH,
   G,
@@ -35183,95 +34936,6 @@ var yH = createSavedSectionUndoRedoStackClass({
   wH,
   xH,
 });
-function bH(e, t) {
-  return {
-    sections: [...new Set([...e.sections, ...t.sections].map(({ id: e }) => e))].flatMap((n) => {
-      let r = e.sections.find((e) => e.id === n),
-        i = t.sections.find((e) => e.id === n);
-      return (0, G.default)(r, i) ? [] : [{ id: n, before: r, after: i }];
-    }),
-    collections: nBe.filter((n) => !(0, G.default)(e[n], t[n])),
-    structure: !(0, G.default)(
-      e.sections.map(({ id: e }) => e),
-      t.sections.map(({ id: e }) => e),
-    ),
-  };
-}
-function xH(e, t) {
-  return {
-    memberships: new Map(
-      t.sections.flatMap(({ before: t, after: n }) =>
-        [...(t?.itemKeys ?? []), ...(n?.itemKeys ?? [])].map((t) => [
-          t,
-          e.sections.filter(({ itemKeys: e }) => e.includes(t)).map(({ id: e }) => e),
-        ]),
-      ),
-    ),
-    sections: new Map(t.sections.map(({ id: t }) => [t, e.sections.find((e) => e.id === t)])),
-    collections: new Map(t.collections.map((t) => [t, e[t]])),
-    structure: t.structure ? new WeakRef(e.sections) : void 0,
-  };
-}
-function SH(e, t) {
-  return (
-    [...t.memberships].every(([t, n]) =>
-      (0, G.default)(
-        n,
-        e.sections.filter(({ itemKeys: e }) => e.includes(t)).map(({ id: e }) => e),
-      ),
-    ) &&
-    (t.structure == null || e.sections === t.structure.deref()) &&
-    [...t.collections].every(([t, n]) => e[t] === n) &&
-    [...t.sections].every(([t, n]) => e.sections.find((e) => e.id === t) === n)
-  );
-}
-function CH(e, t) {
-  let n = new Set(t.sections.map(({ id: e }) => e));
-  return {
-    sections: e.sections.filter(({ id: e }) => n.has(e)),
-    threadHostIds: t.collections.includes(`threadHostIds`) ? e.threadHostIds : void 0,
-    collapsedSectionIds: t.collections.includes(`collapsedSectionIds`) ? e.collapsedSectionIds : [],
-    sectionOrder: t.collections.includes(`sectionOrder`) ? e.sectionOrder : [],
-    appServerLegacySectionIds: t.collections.includes(`appServerLegacySectionIds`)
-      ? e.appServerLegacySectionIds
-      : void 0,
-    appServerMigratedHostIds: t.collections.includes(`appServerMigratedHostIds`)
-      ? e.appServerMigratedHostIds
-      : void 0,
-  };
-}
-function wH(e, t, n, r = t.sections.map(({ id: e }) => e)) {
-  let i = new Set(n.sections.map(({ id: e }) => e)),
-    a = n.structure
-      ? r.map((n) => {
-          let r = i.has(n)
-            ? t.sections.find(({ id: e }) => e === n)
-            : e.sections.find(({ id: e }) => e === n);
-          if (r == null) throw Error(`Saved section structure changed`);
-          return i.has(n) ? { ...r, itemKeys: [...r.itemKeys] } : r;
-        })
-      : e.sections.map((e) => {
-          if (!i.has(e.id)) return e;
-          let n = t.sections.find(({ id: t }) => t === e.id);
-          return n == null ? e : { ...n, itemKeys: [...n.itemKeys] };
-        }),
-    o = n.collections.includes(`collapsedSectionIds`)
-      ? [...t.collapsedSectionIds]
-      : e.collapsedSectionIds;
-  return {
-    ...e,
-    sections: a,
-    threadHostIds: n.collections.includes(`threadHostIds`) ? t.threadHostIds : e.threadHostIds,
-    collapsedSectionIds: n.structure ? o.filter((e) => a.some((t) => t.id === e)) : o,
-    sectionOrder: n.collections.includes(`sectionOrder`) ? [...t.sectionOrder] : e.sectionOrder,
-    appServerLegacySectionIds: n.collections.includes(`appServerLegacySectionIds`)
-      ? t.appServerLegacySectionIds?.slice()
-      : e.appServerLegacySectionIds,
-    appServerMigratedHostIds: n.collections.includes(`appServerMigratedHostIds`)
-      ? t.appServerMigratedHostIds?.slice()
-      : e.appServerMigratedHostIds,
-  };
-}
 function TH(e, t, n, r, i, a, o) {
   if (!n.hostIds.includes(t)) return e;
   let s = n.sections.filter((e) => e.hostId === t),
@@ -35396,44 +35060,6 @@ function EH(e, t, n, r, i, a) {
     { ...Object.fromEntries([...s].map((e) => [e, t])), ...i },
     a,
   );
-}
-function DH(e, t, n) {
-  let r = Object.fromEntries(
-    e.sections.flatMap(({ itemKeys: r }) =>
-      r.flatMap((r) => {
-        let i = n[r] ?? OH(r),
-          a = i == null ? void 0 : (t[i] ?? e.threadHostIds?.[i]);
-        return i == null || a == null ? [] : [[i, a]];
-      }),
-    ),
-  );
-  return { ...e, threadHostIds: Object.keys(r).length === 0 ? void 0 : r };
-}
-function OH(e) {
-  if (!e.startsWith(`codex:thread:local:`)) return null;
-  let t = e.slice(19);
-  return n.hu(t) ? null : t;
-}
-function kH(e) {
-  return `codex:thread:local:${e}`;
-}
-function AH(e, t, n, r) {
-  let i = e.pendingDeletionHostIdsByItemKey,
-    a =
-      i == null
-        ? void 0
-        : Object.fromEntries(
-            t.flatMap((e) => {
-              let t = i[e],
-                a = r[e] ?? OH(e);
-              return t == null || (a != null && n.has(a)) ? [] : [[e, t]];
-            }),
-          );
-  return {
-    ...e,
-    itemKeys: t,
-    pendingDeletionHostIdsByItemKey: a != null && Object.keys(a).length !== 0 ? a : void 0,
-  };
 }
 var rBe = createSavedSectionReconciliationClass({
   EH,
