@@ -104,9 +104,13 @@ const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
 );
+const catalogService = fs.readFileSync(
+  new URL("../src/main/main-app/thread-catalog/service.ts", import.meta.url),
+  "utf8",
+);
 equal(main.includes("int = createThreadCatalogSyncCoordinatorClass({"), true);
 equal(main.includes("int = class"), false);
-equal(main.includes("d = new int("), true);
+equal(catalogService.includes("new ThreadCatalogSyncCoordinator("), true);
 equal(main.includes("parseImportedThreadsNotification: NI"), true);
 equal(main.includes("projectThreadEntry: um"), true);
 

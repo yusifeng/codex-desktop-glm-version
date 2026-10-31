@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成 thread-catalog 上层 owner：原 `dnt` 跨 host catalog service 已迁入 `thread-catalog/service.ts`；source attach/detach、
+ownership、population lifecycle、scan-slot concurrency/fairness、host registry、page/filter/cursor validation、status/observation
+publication 与 disposal 均由具名 class 持有。真实 `WindowContext` consumer 已接回，旧 class 和专属 cursor/filter helpers 删除。
+
 开始迁出 thread-catalog 核心 owner：原 `int` 单 host sync coordinator 已迁入
 `thread-catalog/sync-coordinator.ts`；full/incremental scan、offset resume/head reconciliation、notification debounce、imported
 thread refresh、freshness/backoff、history pruning、foreground promotion 与 delta/invalidation publication 均由具名 class 持有。

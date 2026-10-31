@@ -139,8 +139,12 @@ const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
 );
+const catalogService = fs.readFileSync(
+  new URL("../src/main/main-app/thread-catalog/service.ts", import.meta.url),
+  "utf8",
+);
 equal(main.includes("E5 = createThreadCatalogPageSlotSchedulerClass({"), true);
-equal(main.includes("new E5()"), true);
+equal(catalogService.includes("new ThreadCatalogPageSlotScheduler()"), true);
 equal(main.includes("E5 = class"), false);
 equal(main.includes("Ztt = 1e3"), false);
 

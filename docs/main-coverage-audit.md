@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 cross-host thread catalog service
+
+原 `dnt` 已迁入 `src/main/main-app/thread-catalog/service.ts`。新 owner 保留 source attach/detach 与 owner counts、population
+lifecycle、per-host serialization、四路 scan admission 与 interactive/background fairness、host registry、page/filter/manual-order/
+cursor validation、status/thread observation publication 和 disposal；真实 `WindowContext` consumer 仍构造该 class，旧 class、
+cursor encoding/filter normalization/fingerprint 等专属 helpers 已从主 chunk 删除。
+
 ## 2026-10-31 thread catalog sync coordinator
 
 原 `int` 已迁入 `src/main/main-app/thread-catalog/sync-coordinator.ts`。新 owner 保留 full/incremental scan、offset
