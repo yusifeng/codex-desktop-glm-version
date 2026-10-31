@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 browser-use autocomplete/menu owner wiring
+
+`src/main/main-app/browser-use/autocomplete.ts` 已覆盖旧 `PD/yke/bke/xke/Ske/FD/ID/Cke/wke/LD`。本轮修复 favicon promise
+cache、RPC using scope 与 menu stream cleanup 三处偏差，接回 startup/WindowContext/BrowserHost 三个消费面并删除旧 361 行簇；
+focused suite 覆盖菜单投影、同 favicon 去重、异步更新、data HTML 过滤、静默关闭释放与关键 wiring。
+
 ## 2026-10-31 desktop environment owner wiring
 
 `src/main/main-app/desktop/environment.ts` 已覆盖旧 `lt/ut/iEe/aEe/wT/TT/oEe/sEe/ET/cEe/DT`，保留共享的 flavor wrappers

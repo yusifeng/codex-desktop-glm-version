@@ -10,6 +10,7 @@
 //     （webContents 生命周期 + origin/destroyed 双清理）
 //   - LD 菜单项校验投影（69,684-69,715）
 import { Uf as EventEmitterBase } from "@chunk/shared";
+import { en as usingScope } from "@chunk/bootstrap";
 import { getDesktopFeatureAvailability } from "../misc/availability";
 
 // ---------------------------------------------------------------------------
@@ -323,8 +324,8 @@ class AutocompleteManager {
             }
             return dataUrl;
           });
-          requestCache.set(key, pending);
         }
+        requestCache.set(key, pending);
       }
       return projectMatch(match, await pending);
     };
@@ -342,16 +343,19 @@ class AutocompleteManager {
   }
 
   private sendResultUpdate(request: AutocompleteRequest, result: { defaultMatch: ProjectedMatch | null; done: boolean; matches: ProjectedMatch[] }) {
+    const scope = usingScope() as unknown as { u(value: unknown): unknown; e: unknown; d(): void };
     try {
-      void request.onResult({
+      scope.u(request.onResult({
         browserTabId: request.browserTabId,
         conversationId: request.conversationId,
         editingSessionId: request.editingSessionId,
         requestId: request.requestId,
         result,
-      });
-    } catch {
-      // RPC 结果推送失败由 onRpcBroken 兜底清理。
+      }));
+    } catch (error) {
+      scope.e = error;
+    } finally {
+      scope.d();
     }
   }
 }
@@ -504,13 +508,16 @@ class ExtensionActionMenus {
         webContents.removeListener("destroyed", onWebContentsDestroyed);
         this.origin.removeListener("destroyed", onOriginDestroyed);
         if (notify && !this.origin.isDestroyed()) {
+          const scope = usingScope() as unknown as { u(value: unknown): unknown; e: unknown; d(): void };
           try {
-            void eventStream({ type: "closed", menuId });
-          } catch {
-            // RPC 失败由 onRpcBroken 兜底。
+            scope.u(eventStream({ type: "closed", menuId }));
+          } catch (error) {
+            scope.e = error;
+          } finally {
+            scope.d();
           }
-          eventStream[Symbol.dispose]();
         }
+        eventStream[Symbol.dispose]();
       }
     };
     const onClosed = (_event: unknown, info: { menuId: string }) => {

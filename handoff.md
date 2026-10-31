@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 browser-use autocomplete/menu owners：既有 `browser-use/autocomplete.ts` 现替代旧 `PD/yke/bke/xke/Ske/FD/ID/Cke/wke/LD`。
+审计恢复了非 composer favicon promise 缓存、RPC using-scope disposal、静默菜单关闭的 event stream cleanup；startup coordinator、
+WindowContext service 与 BrowserHost extension menus 三个真实 consumers 分别通过 `bke/Cke/wke` 接回，旧 361 行状态簇删除。
+
 接回 desktop environment owners：既有 `desktop/environment.ts` 现替代旧 `ut/aEe/wT/TT/oEe/sEe/ET/cEe/DT`。审计修复
 macOS packaged medium icon 错接 Windows addon 的偏差，恢复旧 `Ys`/Sky addon；同时把 browser-auth commit ledger 抽成轻量模块，
 避免服务装配加载整个 desktop-fetch。WindowContext、about dialog 与 startup icon consumers 均通过兼容别名接回。
