@@ -83,6 +83,7 @@ const { createPendingProjectDeletionSchedulerClass } = require("./main-app/proje
 const { createHostAppServerProjectsClass } = require("./main-app/projects/host-app-server-projects.js");
 const { createLocalProjectCacheClass } = require("./main-app/projects/local-project-cache.js");
 const { createProjectFolderConsentRuntime } = require("./main-app/projects/project-folder-consent.js");
+const { createThreadMembershipInference } = require("./main-app/projects/thread-membership-inference.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -133171,140 +133172,18 @@ var U6e = 100,
     BrowserWindow: l.BrowserWindow,
     normalizeProjectRoot: zn,
   }),
-  e8e = 8;
-async function t8e({
-  affectedRootPaths: e,
-  excludedThreadIds: t,
-  getGitOriginUrl: r,
-  globalState: i,
-  host: a,
-  listThreads: o,
-  matchRootsByCanonicalHostIdentity: s,
-  readThread: c,
-  threadProjectAssignments: l,
-}) {
-  let u = new Set(e);
-  if (u.size === 0) return;
-  let d = jr(i),
-    f = Array.from(new Set([...Fr(i).roots, ...u])),
-    p = n.zi(a),
-    m = await Kn(f, a, p),
-    h = s ? new Set(Object.values(m)) : null,
-    g = h == null ? null : (e) => m[e] ?? (h.has(e) ? e : n._l(e)),
-    _ = g ?? n._l,
-    v = Gn(Array.from(u), a, p),
-    y = new Set([
-      ...v,
-      ...v.flatMap((e) => {
-        let t = m[e];
-        return t == null ? [] : [t];
-      }),
-    ]),
-    b = n8e(d, m, a, p),
-    x = n.ca(i.get(n.iu.THREAD_PROJECT_ASSIGNMENTS)),
-    S = new Set(i.get(n.iu.PROJECTLESS_THREAD_IDS) ?? []),
-    C = new Set(Array.from(y, _)),
-    w = new Map();
-  for (let e of b.values()) {
-    let t = (0, re.basename)(n._l(e.rootPath)),
-      r = w.get(t);
-    r === void 0 ? w.set(t, e) : r?.projectId !== e.projectId && w.set(t, null);
-  }
-  let T = new Map(
-    Object.entries(i.get(n.iu.THREAD_WORKSPACE_ROOT_HINTS) ?? {}).filter(
-      ([e, n]) => C.has(_(n)) && x[e] == null && !t.has(e) && !S.has(e),
-    ),
-  );
-  for (let e of (0, dp.default)(Array.from(T.keys()), e8e)) {
-    let t = await Promise.all(
-      e.map(async (e) => {
-        let t;
-        try {
-          t = await c(e);
-        } catch (n) {
-          if (!(n instanceof Error) || n.message !== `thread not loaded: ${e}`) throw n;
-          t = null;
-        }
-        if (t == null) {
-          T.delete(e);
-          return;
-        }
-        let i = w.get((0, re.basename)(n._l(t.cwd))),
-          a = T.get(e),
-          o = a == null ? void 0 : b.get(n._l(a));
-        if (i != null && o?.projectId !== i.projectId) {
-          let [n, a] = await Promise.all([
-            t.gitInfo?.originUrl == null ? r(t.cwd) : Promise.resolve(t.gitInfo.originUrl),
-            r(i.rootPath),
-          ]);
-          if (n != null && n === a) {
-            T.delete(e);
-            return;
-          }
-        }
-        return t.cwd;
-      }),
-    );
-    for (let e of t) e != null && y.add(e);
-  }
-  let E = {},
-    D = [],
-    O = null;
-  do {
-    let e = await o({
-      archived: !1,
-      cursor: O,
-      cwd: Array.from(y),
-      limit: 100,
-      sourceKinds: n.pa,
-      useStateDbOnly: !0,
+  { assignUnassignedThreadsBeforeRootsChange: t8e } =
+    createThreadMembershipInference({
+      runtime: n,
+      getLocalProjects: jr,
+      getWorkspaceRootOptions: Fr,
+      canonicalizeRoots: Kn,
+      normalizeRoots: Gn,
+      basename: re.basename,
+      chunk: dp.default,
+      hintReadBatchSize: 8,
+      threadListPageSize: 100,
     });
-    for (let r of e.data) {
-      if (x[r.id] != null || t.has(r.id) || S.has(r.id) || (!C.has(_(r.cwd)) && !T.has(r.id)))
-        continue;
-      let e = T.get(r.id) ?? r.cwd,
-        i = b.get(n._l(e));
-      if (i == null || (g != null && g(i.rootPath) !== g(e))) {
-        (S.add(r.id), D.push(r.id));
-        continue;
-      }
-      let a = { projectKind: `local`, projectId: i.projectId };
-      ((x[r.id] = a), (E[n.$u(r.id)] = a));
-    }
-    O = e.nextCursor;
-  } while (O != null);
-  await l.assignIfUnassigned([
-    ...Object.entries(E).flatMap(([e, t]) =>
-      t == null ? [] : [{ threadId: n.$u(e), assignment: t, projectless: !1 }],
-    ),
-    ...D.map((e) => ({ threadId: n.$u(e), assignment: null, projectless: !0 })),
-  ]);
-}
-function n8e(e, t, r, i) {
-  let a = new Map(),
-    o = new Map();
-  for (let s of Object.values(e)) {
-    let e = Gn(s.rootPaths, r, i);
-    for (let r of e) {
-      let i = n._l(r),
-        c = t[r];
-      if (c != null) {
-        let e = n._l(c),
-          t = o.get(e);
-        t === void 0 ? o.set(e, i) : t !== i && o.set(e, null);
-      }
-      let l = { createdAt: s.createdAt, projectId: s.id, rootPath: r, rootPaths: e },
-        u = a.get(i);
-      (u == null || n.Ko(l, u)) && a.set(i, l);
-    }
-  }
-  for (let [e, t] of o) {
-    if (t == null || a.has(e)) continue;
-    let n = a.get(t);
-    n != null && a.set(e, n);
-  }
-  return a;
-}
 function m2(e, t, n) {
   if (e == null) return e;
   let r = new Set(t),

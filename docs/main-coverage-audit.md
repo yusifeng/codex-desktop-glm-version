@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread membership inference
+
+原 `t8e/n8e` 已迁入 `src/main/main-app/projects/thread-membership-inference.ts`。新模块保留 affected root
+normalization、canonical host identity alias、project root winner selection、workspace hint 批量回读、同 basename
+Git origin 排歧、app-server thread pagination、既有/排除/projectless gate，以及 assign/projectless recovery
+projection；ProjectsManager 唯一调用点真实接回，旧实现已物理删除。
+
 ## 2026-10-31 project folder consent cluster
 
 原 `X6e` schema、`Z6e` manager、`Q6e` RPC service 与 `$6e` subscription 已整簇迁入

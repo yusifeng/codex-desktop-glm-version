@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `t8e/n8e` thread membership inference cluster 迁入
+`projects/thread-membership-inference.ts`；project-root/canonical alias 索引、workspace hint 恢复、同 basename
+Git-origin 排歧、分页 thread 扫描、existing/excluded/projectless gate 与 projectless fallback 均由新算法模块
+持有。ProjectsManager 唯一调用点已接回，旧 helpers 已删除。focused test 覆盖 28 项。
+
 随后将 `Z6e/Q6e/$6e/X6e` project-folder consent cluster 整体迁入
 `projects/project-folder-consent.ts`；config trust parse、folder 去重分组、focused-window 复用、等待窗口订阅、
 confirm 串行队列、abort race、RPC-broken 与 webContents destroy cleanup 均保持在同一 runtime。主 manager 与
