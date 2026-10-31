@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 desktop authenticated fetch owner
+
+既有 `src/main/main-app/api/desktop-fetch.ts` 的完整 `DesktopFetchService` 已接回真实 `WindowContext` consumer，替代原
+`ZTe`。新 owner 保留 renderer HTTP proxy、authenticated JSON、OTel trace export、download stream、abort/progress、header/
+URL/auth policy、VS Code request bridge 与 dictation websocket credential projection；32 个 class member 与原 owner 对齐，
+主 chunk 旧 760 行 class 已删除。
+
 ## 2026-10-31 avatar overlay composition owner
 
 既有 `src/main/main-app/avatar-overlay/composition-surface.ts` 和 `realtime.ts` 已接回真实 main consumer，替代原 `Hle/rle`

@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 desktop authenticated fetch owner：完整 `api/desktop-fetch.ts` 现已替代主 chunk 的 `ZTe`；renderer HTTP proxy、
+authenticated JSON、trace export、download stream、abort/progress、VS Code bridge 与 dictation websocket auth 仍由同一个
+32-method service 持有。真实 `WindowContext` consumer 保持 `new ZTe(...)` 调用，旧 760 行 class 已物理删除。
+
 接回 avatar overlay 的完整 composition owner：既有 `avatar-overlay/composition-surface.ts` 与 `realtime.ts` 现已替代主
 chunk 的 `Hle/rle` 和模块级 voice-controller registry。接线前修正了 renderer 消费的单数 `setElementSize` API，并恢复
 starter RPC handle 的 `.dup()` 所有权语义；真实 startup、quick-chat size update 与 voice consumer 均保持原调用链，旧大类
