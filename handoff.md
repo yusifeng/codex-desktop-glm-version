@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `yit` temporary quit state owner 迁入 `startup/quit-state.ts`；prompt bypass、drain bypass、60 秒 reset、
+timer replacement/unref、approved quit 与查询接口均由新 owner 持有。真实 startup construction 已接回，旧 class 已删除。
+focused test 覆盖 20 项。
+
 随后将 `lrt/urt` Electron MessagePort RPC transport 迁入 `app-server/message-port-transport.ts`；structured-clone
 encoding、queued/pending receive、peer-close/error propagation、send、abort handshake 与 remote-main adapter 均由新模块
 持有。AppView IPC consumer 已接回，旧 function/class 已删除。focused test 覆盖 29 项。

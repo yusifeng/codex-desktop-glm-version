@@ -131,6 +131,7 @@ const { createCronTurnReadStatePreparer } = require("./main-app/automations/cron
 const { DockMenuManager } = require("./main-app/misc/dock-menu.js");
 const { createTrayMenuControllerClass, isTrayMenuThreadsChangedMessage } = require("./main-app/tray/tray-menu-controller.js");
 const { createMessagePortRemoteMainFactory } = require("./main-app/app-server/message-port-transport.js");
+const { createQuitStateClass } = require("./main-app/startup/quit-state.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -145251,31 +145252,7 @@ function vit({ threadId: e, originHostId: t, catalog: n, hasAppServerConnection:
       return a;
   return t ?? `local`;
 }
-var yit = class {
-    allowQuitWithoutPrompt = !1;
-    allowQuitResetTimer = null;
-    skipDrainBeforeQuit = !1;
-    allowQuitTemporarily(e) {
-      ((this.allowQuitWithoutPrompt = e?.allowWithoutPrompt ?? !0),
-        (this.skipDrainBeforeQuit = e?.skipDrainBeforeQuit ?? !1),
-        this.allowQuitResetTimer != null && clearTimeout(this.allowQuitResetTimer),
-        (this.allowQuitResetTimer = setTimeout(() => {
-          ((this.allowQuitWithoutPrompt = !1),
-            (this.skipDrainBeforeQuit = !1),
-            (this.allowQuitResetTimer = null));
-        }, 6e4)),
-        this.allowQuitResetTimer.unref());
-    }
-    canQuitWithoutPrompt() {
-      return this.allowQuitWithoutPrompt;
-    }
-    markQuitApproved() {
-      this.allowQuitWithoutPrompt = !0;
-    }
-    shouldSkipDrainBeforeQuit() {
-      return this.skipDrainBeforeQuit;
-    }
-  },
+var yit = createQuitStateClass(),
   bit = `codex.sqliteBackfillProgress.title`,
   xit = `Rebuilding conversation history`,
   Sit = `codex.sqliteBackfillProgress.detail`,

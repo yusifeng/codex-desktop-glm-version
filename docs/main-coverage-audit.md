@@ -1,5 +1,10 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 temporary quit-state owner
+
+原 `yit` 已迁入 `src/main/main-app/startup/quit-state.ts`。新 owner 保留 prompt bypass、drain bypass、60 秒自动 reset、
+timer replacement/unref、mark-approved 和状态查询；真实 startup construction 已接回，旧 class 已删除。
+
 ## 2026-10-31 MessagePort RPC transport
 
 原 `lrt/urt` 已迁入 `src/main/main-app/app-server/message-port-transport.ts`。新模块保留 structured-clone encoding、
