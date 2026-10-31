@@ -5082,3 +5082,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   snapshot comment policy；webview binding 的三个 consumer 使用同一 `zX/LXe` 语义实现。
 - main 旧 `zX/LXe/RXe/BX/zXe/BXe/VX/VXe` 已删除。focused coverage 24 项，no-unwired gate 扩至 524 项；下一批从
   navigation restore 与 pending-navigation usage helpers 继续审计。
+
+# 2026-11-01 browser webview navigation runtime extraction
+
+- 新增并接回 `browser-sidebar/browser-webview-navigation-runtime.ts`，统一 app-route navigation、pending Browser Use usage、history
+  restore、initial navigation 和 webview adoption lease/cleanup；page command、binding 与 session delegate 使用同一语义 runtime。
+- main 旧 `GXe/KXe/qXe/JXe/YXe/WX/GX` 已删除。focused coverage 28 项，no-unwired gate 扩至 533 项；下一批审计紧随的
+  audible/user-media state tracker `KX` 与 page materialization consumer。

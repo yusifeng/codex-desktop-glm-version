@@ -480,6 +480,7 @@ const { createBrowserDiagnosticsRuntime } = require("./main-app/browser-sidebar/
 const { createIncompleteNavigationRuntime } = require("./main-app/browser-sidebar/incomplete-navigation-service.js");
 const { createBrowserLifecycleDebugEvents } = require("./main-app/browser-sidebar/browser-lifecycle-debug-events.js");
 const { createBrowserContextMenuRuntime } = require("./main-app/browser-sidebar/browser-context-menu.js");
+const { createBrowserWebviewNavigationRuntime } = require("./main-app/browser-sidebar/browser-webview-navigation-runtime.js");
 const {
   inspect: SVe,
   back: CVe,
@@ -43810,106 +43811,23 @@ var {
   messages: browserSidebarContextMenuMessageIds,
   shared: n,
 });
-var UX = r.i(`browser-sidebar-manager`);
-function GXe(e, t, r, i, a) {
-  let o = n.dl(i);
-  return o == null || nl()
-    ? !1
-    : (a(r.page?.view.webContents?.id, i) ||
-        e.sendMessageToWebContents(t.owner, { type: `navigate-to-route`, path: o }),
-      !0);
-}
-function KXe(e) {
-  e?.pendingNavigationUsage?.source === `browser_use` && (e.pendingNavigationUsage = null);
-}
-function qXe(e, t) {
-  e != null &&
-    (e.pendingNavigationUsage = {
-      expectedUrl: Ze(t),
-      initiator: `browser_use`,
-      source: `browser_use`,
-      urlKind: ZU(t),
-    });
-}
-function JXe({ errorReporter: e, pageState: t, webContents: n }) {
-  let r = t.isColdRestore ? FHe(t.serializedPageState) : nW(t.serializedPageState),
-    i = r?.currentIndex ?? null;
-  if (r == null || i == null || i < 0 || i >= r.entries.length) return null;
-  try {
-    return n.navigationHistory
-      .restore({ entries: r.entries, index: i })
-      .then(() => !0)
-      .catch(
-        (n) => (
-          UX().warning(`failed to restore browser sidebar navigation history`, {
-            safe: { conversationId: t.conversationId },
-            sensitive: { error: n },
-          }),
-          e.reportNonFatal(n instanceof Error ? n : Error(String(n)), {
-            kind: `browser-sidebar-restore-navigation-history`,
-          }),
-          !1
-        ),
-      );
-  } catch (n) {
-    return (
-      UX().warning(`failed to start browser sidebar navigation restore`, {
-        safe: { conversationId: t.conversationId },
-        sensitive: { error: n },
-      }),
-      e.reportNonFatal(n instanceof Error ? n : Error(String(n)), {
-        kind: `browser-sidebar-restore-navigation-history`,
-      }),
-      Promise.resolve(!1)
-    );
-  }
-}
-function YXe({
-  navigatePageToUrl: e,
-  pageState: t,
-  requiresInitialManagedNavigation: n,
-  webContents: r,
-}) {
-  let i = r.getURL();
-  return !n && i.length > 0 && Ze(i) === Ze(t.pendingUrl)
-    ? !1
-    : e(t.pendingUrl, t.pendingNavigationUsage?.source, t.pendingNavigationUsage?.initiator);
-}
-function WX(e) {
-  return (
-    typeof e == `object` &&
-    !!e &&
-    `destroy` in e &&
-    typeof e.destroy == `function` &&
-    `_createWebViewAdoptionLease` in e &&
-    typeof e._createWebViewAdoptionLease == `function`
-  );
-}
-function GX(e, t, n, r) {
-  let i;
-  try {
-    if (((i = t._createWebViewAdoptionLease(e.owner)), typeof i != `string` || i.length === 0))
-      throw Error(`Owl browser sidebar webview adoption lease is empty`);
-  } catch (e) {
-    throw (t.isDestroyed() || t.destroy(), e);
-  }
-  let a = t.id,
-    o = () => {
-      (e.pendingAdoptedWebviewsByWebContentsId.delete(a), t.removeListener(`destroyed`, o));
-    };
-  return (
-    e.pendingAdoptedWebviewsByWebContentsId.set(a, {
-      adoptionLease: i,
-      webContents: t,
-      route: n,
-      initialHistoryNavigation: r,
-      acceptedHostIdentity: null,
-      stopTracking: o,
-    }),
-    t.once(`destroyed`, o),
-    i
-  );
-}
+var {
+  openRestrictedNavigationRoute: GXe,
+  clearPendingBrowserUseNavigation: KXe,
+  setPendingBrowserUseNavigation: qXe,
+  restoreNavigationHistory: JXe,
+  runInitialNavigation: YXe,
+  isAdoptableWebContents: WX,
+  adoptWebContents: GX,
+} = createBrowserWebviewNavigationRuntime({
+  classifyUrl: ZU,
+  createLogger: r.i,
+  deserializeColdHistory: FHe,
+  deserializeHistory: nW,
+  isRouteNavigationDisabled: nl,
+  normalizeUrl: Ze,
+  routePathForUrl: n.dl,
+});
 var XXe = 2e3,
   ZXe = 5e3,
   QXe = 1e3;

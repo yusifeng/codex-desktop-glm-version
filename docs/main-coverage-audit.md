@@ -3132,3 +3132,10 @@ page persistence、webview binding 与 host lifecycle 三个 consumer 继续通�
 copy/cut/paste、back/forward/reload/inspect 的菜单模板与销毁 guard，并导出 snapshot comment-eligibility policy 供 webview binding
 复用。主运行时保留 `zX/LXe` 兼容别名；旧 `zX/LXe/RXe/BX/zXe/BXe/VX/VXe` 已整带删除。focused test 24 项覆盖菜单组成、
 动作参数、password command、clipboard 与接线；no-unwired gate 扩至 524 项。
+
+### 增量抽取：browser webview navigation runtime
+
+新增 `browser-sidebar/browser-webview-navigation-runtime.ts`，接管受限 URL 的 app route 转发、Browser Use pending navigation usage、
+cold/normal serialized history restore 与错误上报、初始 managed navigation 去重、webContents adoption capability、lease 创建、pending
+registry 和 destroyed cleanup。page command、webview binding 与 Browser Use delegate 继续通过 `GXe/KXe/qXe/JXe/YXe/WX/GX`
+兼容别名共享唯一实现；旧 owner 已整带删除。focused test 28 项，no-unwired gate 扩至 533 项。
