@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 immediate-update wiring correction
+
+此前 `immediate-update-exit.ts` 虽存在但真实 `Wst` consumer 未接回；本轮已将 update-install 路径直接接到
+`cleanupForImmediateQuitOnUpdate`，注入 process-tree cleanup、window enumeration、warning 与 unconditional exit，旧 `Wst`
+删除。同时删除无 consumer 且重复 startup owner 的 `run-main-app-startup.ts` skeleton。
+
 ## 2026-10-31 global-dictation lifecycle manager
 
 原 `dat` 已迁入 `src/main/main-app/dictation/global-dictation-lifecycle-manager.ts`。新具名 class 保留 gate/force-lock、

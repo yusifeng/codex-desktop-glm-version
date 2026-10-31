@@ -1,8 +1,6 @@
 import assert from "node:assert/strict";
-import { createRequire } from "node:module";
-
-const require = createRequire(import.meta.url);
-const { cleanupForImmediateQuitOnUpdate } = require("../app/.vite/build/main-app/app-shell/immediate-update-exit.js");
+import fs from "node:fs";
+import { cleanupForImmediateQuitOnUpdate } from "../src/main/main-app/app-shell/immediate-update-exit.ts";
 
 const run = async ({ terminate, cleanup, windows = [] } = {}) => {
   const events = [];
@@ -38,4 +36,11 @@ assert.equal(result.warnings[0].message, "cleanup");
 result = await run({ terminate: () => { throw "legacy"; } });
 assert.equal(result.warnings[0].message, "legacy");
 
-console.log("4 main immediate-update-exit assertions passed");
+const main = fs.readFileSync(
+  new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
+  "utf8",
+);
+assert.equal(main.includes("cleanupForImmediateQuitOnUpdate({"), true);
+assert.equal(main.includes("async function Wst("), false);
+
+console.log("6 main immediate-update-exit assertions passed");

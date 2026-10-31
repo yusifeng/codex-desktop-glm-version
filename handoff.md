@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修正此前 immediate-update-exit 的假迁移：真实 update-install consumer 现已直接接回
+`app-shell/immediate-update-exit.ts`，旧 `Wst` body 已删除；无 consumer、仅占位且重复 startup owner 的
+`app-shell/run-main-app-startup.ts` skeleton 同步删除，避免文档/源码继续宣称未发生的入口迁移。
+
 随后将 `dat` global-dictation lifecycle state owner 迁入 `dictation/global-dictation-lifecycle-manager.ts`；gate/force-lock、
 hold/toggle hotkey registration/release watching、cross-instance ownership、overlay/pet/in-app sessions、renderer messages、
 clipboard/paste/history、abort/recovery 与 cleanup 状态均由具名 class 持有。真实 window-services consumer 已接回。

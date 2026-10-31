@@ -22,6 +22,7 @@ const { shouldRecoverRendererCrash } = require("./main-app/window/renderer-recov
 const { createStartupPhaseTracker, resolveDockIconPreference, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages } = require("./main-app/startup/startup-policy.js");
 const openPathArguments = require("./main-app/files/open-path-arguments.js");
 const { applyQuitForUpdatePolicy } = require("./main-app/startup/quit-for-update-policy.js");
+const { cleanupForImmediateQuitOnUpdate } = require("./main-app/app-shell/immediate-update-exit.js");
 const { createDelayedProgressWindow } = require("./main-app/startup/delayed-progress-window.js");
 const { resolveWindowsPackageIdentity } = require("./main-app/startup/windows-package-identity.js");
 const { isWorkerStartResult, isWorkerEventType, isWorkerNotificationType } = require("./main-app/worker/worker-event-predicates.js");
@@ -150136,7 +150137,7 @@ async function Ust() {
             a.C(),
             Se.flushAndDisposeGitWorker(),
           ]).then(() => {
-            Wst({
+            cleanupForImmediateQuitOnUpdate({
               runCleanupBeforeImmediateExit: async () => {
                 (Q9(),
                   await cleanupBeforeImmediateExit({
@@ -150147,6 +150148,14 @@ async function Ust() {
                   }));
               },
               markAppQuitting: W.markAppQuitting,
+              terminateProcessTree: hrt,
+              listWindows: () => l.BrowserWindow.getAllWindows(),
+              warn: (error) =>
+                r.n().warning(`Immediate update exit cleanup failed before process exit`, {
+                  safe: {},
+                  sensitive: { error },
+                }),
+              exit: (code) => l.app.exit(code),
             });
           });
         },
@@ -150299,29 +150308,5 @@ async function Ust() {
     await Le.deepLinks.flushPendingDeepLinks(),
     M(`pending deep links flushed`, L),
     M(`startup complete`, e));
-}
-async function Wst({ markAppQuitting: e, runCleanupBeforeImmediateExit: t }) {
-  let n;
-  try {
-    e();
-    try {
-      hrt();
-    } catch (e) {
-      n ??= e;
-    }
-    await t();
-    for (let e of l.BrowserWindow.getAllWindows()) e.isDestroyed() || e.destroy();
-    if (n != null)
-      throw n instanceof Error
-        ? n
-        : Error(typeof n == `string` ? n : `Windows update cleanup failed.`);
-  } catch (e) {
-    r.n().warning(`Immediate update exit cleanup failed before process exit`, {
-      safe: {},
-      sensitive: { error: e },
-    });
-  } finally {
-    l.app.exit(0);
-  }
 }
 ((exports.n = TV), (exports.runMainAppStartup = Ust), (exports.t = URe));
