@@ -687,7 +687,7 @@ export async function openChromiumUrl({
 }
 
 /** 打开 Chrome 扩展商店设置（原 `qne`）。 */
-async function openChromeExtensionSettings({
+export async function openChromeExtensionSettings({
   buildFlavor = BuildFlavor.resolve(),
   platform = process.platform,
   detectChromeCommand,

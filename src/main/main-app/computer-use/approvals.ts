@@ -37,6 +37,7 @@ import {
 } from "@chunk/shared";
 import { stringifyToml } from "../misc/env-toml-stringifier";
 import { getAppIconMedium, getAppIconSmall } from "../windows/native-app-icons";
+import { openChromeExtensionSettings } from "../plugins/browser-runtime-resolution";
 
 const execFileAsync = promisify(execFile);
 
@@ -661,8 +662,8 @@ class ComputerUseSettingsService extends (EventEmitterBase as new () => {}) {
     return setLockedUseInstalled(enabled);
   }
 
-  async setCuaAppshotSoundEnabled(enabled: boolean) {
-    await setCuaAppshotSoundEnabledImpl(enabled);
+  openChromeExtensionInstallPage() {
+    return openChromeExtensionSettings({});
   }
 }
 

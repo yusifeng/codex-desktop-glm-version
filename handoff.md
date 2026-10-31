@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 Computer Use settings owner：审计发现既有 `computer-use/approvals.ts` 虽与旧 `nje` 同为 17 members，但最后一个方法
+误写为 appshot sound setter；已恢复真实 `openChromeExtensionInstallPage`，复用并导出语义 browser runtime 的 Chrome extension
+settings opener，然后接回 `WindowContext` consumer。审批、Messages、sound/locked-use 与 extension install 方法面现与旧 owner 对齐。
+
 接回 avatar pet install owner：既有 `avatar/pet-install.ts` 的 `PetInstallManager` 与 `AvatarManager` 现已替代主 chunk 旧
 `wje/Eje` 及专属 schema/download/body helper。两者均为完整 7-member owner；redirect/content-type/20MiB/version validation、
 preview/install 与 execution-host avatar load 保持完整，真实 bootstrap consumer 继续通过 `Eje` 兼容别名使用。

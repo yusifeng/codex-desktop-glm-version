@@ -147,6 +147,7 @@ const { ConversationalOnboardingService } = require("./main-app/onboarding/conve
 const { ArtifactSessionHostLifecycle } = require("./main-app/artifact-session/host-lifecycle.js");
 const { DebugService, createDemoTools } = require("./main-app/debug/export-logs.js");
 const { AvatarManager } = require("./main-app/avatar/pet-install.js");
+const { ComputerUseSettingsService } = require("./main-app/computer-use/approvals.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -62512,60 +62513,7 @@ async function tje(e) {
       e ? `YES` : `NO`,
     ]));
 }
-var nje = class extends n.Uf {
-    requestComputerUseWorker;
-    constructor(e) {
-      (super(), (this.requestComputerUseWorker = e));
-    }
-    getAppApprovals() {
-      return HM();
-    }
-    removeAppApproval(e) {
-      return WM(e);
-    }
-    async searchMessagesChats(e) {
-      return process.platform !== `darwin` || this.requestComputerUseWorker == null
-        ? null
-        : this.requestComputerUseWorker({ method: `messagesSearchChats`, params: { query: e } });
-    }
-    getMessagesReadDecisions() {
-      return iN();
-    }
-    setMessagesReadAccessPolicy(e) {
-      return aN(e);
-    }
-    setMessagesReadDecision(e, t, n) {
-      return oN(e, t, n);
-    }
-    removeMessagesReadDecision(e) {
-      return sN(e);
-    }
-    getMessagesSendApprovals() {
-      return mN();
-    }
-    setMessagesSendAllowAllChats(e) {
-      return hN(e);
-    }
-    removeMessagesSendApproval(e) {
-      return gN(e);
-    }
-    getSoundMode() {
-      return $Ae();
-    }
-    setSoundMode(e) {
-      return eje(e);
-    }
-    async getLockedUseState() {
-      let [e, t] = await Promise.all([YAe(), XAe()]);
-      return { enabled: e, ...t };
-    }
-    setLockedUseEnabled(e) {
-      return ZAe(e);
-    }
-    openChromeExtensionInstallPage() {
-      return qne({});
-    }
-  },
+var nje = ComputerUseSettingsService,
   rje = class {
     windowManager;
     detachedWindows;
