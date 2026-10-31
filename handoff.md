@@ -5385,3 +5385,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - `Ust` 旧 `ve`、`G/pe` 和 inline locale subscription 删除；focused suite 16 项，相邻三组回归 127 项，no-unwired gate
   扩至 638 项。`dst` 已基本收敛为构造根，后续重点转回 `Ust` 的启动 I/O 与 feature-availability 大段，先区分可迁状态 owner
   和应保留的严格顺序装配。
+
+# 2026-11-01 desktop feature availability reconciliation extraction
+
+- 新增并真实接回 `startup/desktop-feature-availability-reconciler.ts`，统一拥有 availability before/after diff、Windows appshot
+  降级、browser settings/accelerators/cache、plugin/session/computer-use 分发、executor restart、hotkey/PiP、managed service 与
+  Chronicle recorder backend transition。
+- `Ust` 旧 `$e` inline owner 删除，IPC 直接使用 semantic reconciler。focused suite 23 项、相邻四组回归 134 项，
+  no-unwired gate 扩至 643 项；异步 plugin completion、recorder stop 顺序和两类 warning 均有行为覆盖。

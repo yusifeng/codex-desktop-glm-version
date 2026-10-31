@@ -3452,3 +3452,14 @@ application menu→dock menu→tray menu→PiP 的顺序刷新，并返回原 se
 主组合根旧 `ve` listener、`G/pe` transition state 和 inline locale subscription 已删除，所有 callbacks 以 wrapper 保持 class method
 receiver。16 项 focused 断言覆盖 light/dark、destroyed window、dispose、PiP unchanged/enable/disable 与 locale async ordering；
 avatar overlay、native status item、application menu 相邻 127 项回归通过，no-unwired gate 扩至 638 项。
+
+### 整块抽取：desktop feature-availability reconciler
+
+新增并接回 `startup/desktop-feature-availability-reconciler.ts`，完整拥有 availability 前后快照与所有 stateful consumers：
+Windows capture bridge 缺失时关闭 appshots、browser-settings sync、unified-tab accelerators/cache、settings notification、
+plugin/browser-session/computer-use 分发、四项 executor-sensitive feature diff、appshot hotkey、remote-hosted PiP、Chronicle query、
+managed Computer Use feature set，以及 recorder stop→connection reconcile 的异步顺序和两类错误日志。
+
+`Ust` 原 `$e` 大型 inline transition 已删除，IPC 直接消费 semantic reconciler。23 项 focused 断言覆盖 Windows/non-Windows、
+enable/disable、identity/no-restart、async completion 与 managed-service/recorder failure；desktop availability、plugin orchestrator、
+computer-use runtime、main IPC 相邻 134 项回归通过，no-unwired gate 扩至 643 项。

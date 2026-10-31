@@ -376,6 +376,7 @@ const { createWindowActivationRuntime } = require("./main-app/startup/window-act
 const { installNativeThemeWindowSync } = require("./main-app/startup/native-theme-window-sync.js");
 const { createRemoteHostedPipAvailabilityReconciler } = require("./main-app/startup/remote-hosted-pip-availability.js");
 const { installLocaleRefreshLifecycle } = require("./main-app/startup/locale-refresh-lifecycle.js");
+const { createDesktopFeatureAvailabilityReconciler } = require("./main-app/startup/desktop-feature-availability-reconciler.js");
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
 const { createBrowserHostServiceClass } = require("./main-app/browser-sidebar/browser-host-service.js");
@@ -56784,54 +56785,27 @@ async function Ust() {
   I.add(() => {
     (Qe.dispose(), qe.dispose());
   });
-  let $e = (e, t) => {
-    let n = Tr(),
-      i = n.skysight,
-      a = Ar(e);
-    (P && W.windowsCaptureNativeBridge == null && (a.appshotsEnabled = !1),
-      Le.setDesktopFeatureAvailability(a));
-    let o = Tr();
-    (n.browserSettingsCloudSync !== o.browserSettingsCloudSync && K.refreshBrowserSettingsSync(),
-      n.unifiedTabStrip !== o.unifiedTabStrip &&
-        (K.getBrowserHostManager().refreshOwnerCommandAccelerators(),
-        W.broadcastQueryCacheInvalidation([`vscode`, `codex-command-keymap-state`])),
-      o !== n && K.settings.notifyDesktopFeatureAvailabilityChanged());
-    let s =
-      n.browserUseTinysky !== o.browserUseTinysky ||
-      n.computerUse !== o.computerUse ||
-      n.inAppBrowserUse !== o.inAppBrowserUse ||
-      n.externalBrowserUse !== o.externalBrowserUse;
-    (Xe.setDesktopFeatureAvailability(a, t).then(() => {
-      s && K.startConversationExecutor();
-    }),
-      Qe.setDesktopFeatureAvailability(a),
-      qe.setDesktopFeatureAvailability(a),
-      P && W.appshotHotkeysService.setEnabled(o.appshotsEnabled),
-      reconcileRemoteHostedPipAvailability());
-    let c = o.skysight;
-    if ((!i && c && W.broadcastQueryCacheInvalidation([`chronicle-history`]), H != null)) {
-      let e = o.appshotsEnabled,
-        t = o.computerUse;
-      H.setEnabledFeatures({ appshotsEnabled: e, computerUseEnabled: t, skysightEnabled: c }).catch(
-        (n) => {
-          r.n().warning(`Failed to reconcile managed Computer Use service`, {
-            safe: { appshotsEnabled: e, computerUseEnabled: t, skysightEnabled: c },
-            sensitive: { error: n },
-          });
-        },
-      );
-    }
-    i !== c &&
-      be != null &&
-      (async () => {
-        (c || (await be?.stop()), Pe().reconcileChronicle());
-      })().catch((e) => {
-        r.n().warning(`Failed to transition Chronicle recorder backend`, {
-          safe: { skysightEnabled: c },
-          sensitive: { error: e },
-        });
-      });
-  };
+  let $e = createDesktopFeatureAvailabilityReconciler({
+    applyDesktopFeatureAvailability: (availability) => Le.setDesktopFeatureAvailability(availability),
+    broadcastQueryCacheInvalidation: W.broadcastQueryCacheInvalidation,
+    getDesktopFeatureAvailability: Tr,
+    getLocalAppServerConnection: Pe,
+    getLogger: r.n,
+    getManagedComputerUseService: () => H,
+    getRecorder: () => be,
+    hasWindowsCaptureBridge: () => W.windowsCaptureNativeBridge != null,
+    isWindows: P,
+    notifyDesktopFeatureAvailabilityChanged: () => K.settings.notifyDesktopFeatureAvailabilityChanged(),
+    reconcileRemoteHostedPipAvailability,
+    refreshBrowserSettingsSync: () => K.refreshBrowserSettingsSync(),
+    refreshOwnerCommandAccelerators: () => K.getBrowserHostManager().refreshOwnerCommandAccelerators(),
+    resolveDesktopFeatureAvailability: Ar,
+    setAppshotHotkeysEnabled: (enabled) => W.appshotHotkeysService.setEnabled(enabled),
+    setBrowserSessionFeatureAvailability: (availability) => Qe.setDesktopFeatureAvailability(availability),
+    setComputerUseFeatureAvailability: (availability) => qe.setDesktopFeatureAvailability(availability),
+    setPluginFeatureAvailability: (availability, reasons) => Xe.setDesktopFeatureAvailability(availability, reasons),
+    startConversationExecutor: () => K.startConversationExecutor(),
+  });
   (registerMainIpcRouter({
     app: l.app,
     ipcMain: l.ipcMain,

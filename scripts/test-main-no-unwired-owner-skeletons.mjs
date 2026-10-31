@@ -12,6 +12,7 @@ const realOwners = [
   ["src/main/main-app/startup/native-theme-window-sync.ts", "installNativeThemeWindowSync"],
   ["src/main/main-app/startup/remote-hosted-pip-availability.ts", "createRemoteHostedPipAvailabilityReconciler"],
   ["src/main/main-app/startup/locale-refresh-lifecycle.ts", "installLocaleRefreshLifecycle"],
+  ["src/main/main-app/startup/desktop-feature-availability-reconciler.ts", "createDesktopFeatureAvailabilityReconciler"],
   ["src/main/main-app/startup/window-icon-lifecycle.ts", "createWindowIconLifecycle"],
   ["src/main/main-app/fetch-handler/electron-fetch-handler.ts", "createElectronFetchHandlerClass"],
   ["src/main/main-app/misc/open-in-service.ts", "createOpenInServiceClass"],
@@ -644,5 +645,9 @@ assert.equal(main.includes("installLocaleRefreshLifecycle({"), true, "startup in
 assert.equal(main.includes("let G = re()"), false, "generated PiP availability state must be removed");
 assert.equal(main.includes("l.nativeTheme.on(`updated`, ve)"), false, "generated native-theme listener must be removed");
 assert.equal(main.includes("V.settingsStore.onDidChange(n.Fa.localeOverride.key, () =>"), false, "generated locale listener must be removed");
+assert.equal(main.includes('require("./main-app/startup/desktop-feature-availability-reconciler.js")'), true, "feature reconciler owner is wired");
+assert.equal(main.includes("$e = createDesktopFeatureAvailabilityReconciler({"), true, "startup creates one feature reconciler");
+assert.equal(main.includes("let $e = (e, t) =>"), false, "generated feature transition owner must be removed");
+assert.equal(main.includes("setDesktopFeatureAvailability: $e"), true, "IPC uses the semantic feature reconciler");
 
-console.log("638 main unwired-owner skeleton assertions passed");
+console.log("643 main unwired-owner skeleton assertions passed");
