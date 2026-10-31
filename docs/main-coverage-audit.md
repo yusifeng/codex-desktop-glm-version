@@ -3139,3 +3139,10 @@ copy/cut/paste、back/forward/reload/inspect 的菜单模板与销毁 guard，�
 cold/normal serialized history restore 与错误上报、初始 managed navigation 去重、webContents adoption capability、lease 创建、pending
 registry 和 destroyed cleanup。page command、webview binding 与 Browser Use delegate 继续通过 `GXe/KXe/qXe/JXe/YXe/WX/GX`
 兼容别名共享唯一实现；旧 owner 已整带删除。focused test 28 项，no-unwired gate 扩至 533 项。
+
+### 增量抽取：browser media state tracker
+
+新增 `browser-sidebar/browser-media-state-tracker.ts`，完整接管 audible 关闭的 2 秒消抖、user-media capture 的 5 秒最短显示与
+1 秒最短关闭延迟，并保持 timer cancellation/unref、reset、dispose 和 state-change callback 语义。page materialization 与 webview
+binding 继续通过 `KX` 兼容别名共享同一状态机；旧 `KX` 及其 timing constants 已物理删除。focused test 覆盖所有定时边界、重复
+更新、取消、reset/dispose 与真实接线；no-unwired gate 保持 533 项并覆盖新 owner。

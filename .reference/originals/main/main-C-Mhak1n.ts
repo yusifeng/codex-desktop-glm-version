@@ -481,6 +481,7 @@ const { createIncompleteNavigationRuntime } = require("./main-app/browser-sideba
 const { createBrowserLifecycleDebugEvents } = require("./main-app/browser-sidebar/browser-lifecycle-debug-events.js");
 const { createBrowserContextMenuRuntime } = require("./main-app/browser-sidebar/browser-context-menu.js");
 const { createBrowserWebviewNavigationRuntime } = require("./main-app/browser-sidebar/browser-webview-navigation-runtime.js");
+const { createBrowserMediaStateTracker: KX } = require("./main-app/browser-sidebar/browser-media-state-tracker.js");
 const {
   inspect: SVe,
   back: CVe,
@@ -43828,86 +43829,6 @@ var {
   normalizeUrl: Ze,
   routePathForUrl: n.dl,
 });
-var XXe = 2e3,
-  ZXe = 5e3,
-  QXe = 1e3;
-function KX({
-  initialState: e = { isAudible: !1, isCapturingUserMedia: !1 },
-  onStateChanged: t = () => void 0,
-} = {}) {
-  let n = { ...e },
-    r = null,
-    i = null,
-    a = n.isCapturingUserMedia ? Date.now() : null,
-    o = !1,
-    s = t,
-    c = () => {
-      r != null && (clearTimeout(r), (r = null));
-    },
-    l = () => {
-      i != null && (clearTimeout(i), (i = null));
-    },
-    u = () => {
-      (c(),
-        l(),
-        (a = null),
-        (n.isAudible = !1),
-        (n.isCapturingUserMedia = !1),
-        (n.isCapturingCamera = void 0),
-        (n.isCapturingMicrophone = void 0));
-    };
-  return {
-    state: n,
-    dispose() {
-      o || (u(), (o = !0), (s = () => void 0));
-    },
-    reset: u,
-    updateAudible(e) {
-      if (!o) {
-        if (e) {
-          (c(), n.isAudible || ((n.isAudible = !0), s()));
-          return;
-        }
-        n.isAudible &&
-          r == null &&
-          ((r = setTimeout(() => {
-            ((r = null), !o && n.isAudible && ((n.isAudible = !1), s()));
-          }, XXe)),
-          r.unref());
-      }
-    },
-    updateUserMediaCapture({
-      isCapturingCamera: e,
-      isCapturingMicrophone: t,
-      isCapturingUserMedia: r,
-    }) {
-      if (o) return;
-      if (r) {
-        (l(),
-          (a ??= Date.now()),
-          (!n.isCapturingUserMedia || n.isCapturingCamera !== e || n.isCapturingMicrophone !== t) &&
-            ((n.isCapturingUserMedia = !0),
-            (n.isCapturingCamera = e),
-            (n.isCapturingMicrophone = t),
-            s()));
-        return;
-      }
-      if (!n.isCapturingUserMedia || i != null) return;
-      let c = Math.max(QXe, ZXe - (Date.now() - (a ?? Date.now())));
-      ((a = null),
-        (i = setTimeout(() => {
-          ((i = null),
-            !o &&
-              n.isCapturingUserMedia &&
-              ((n.isCapturingUserMedia = !1),
-              (n.isCapturingCamera = void 0),
-              (n.isCapturingMicrophone = void 0),
-              s()));
-        }, c)),
-        i.unref());
-    },
-  };
-}
 function qX(e, t) {
   let n = e.siteToolsAvailability,
     r = ZX(e, n.webMcp, t.length > 0);

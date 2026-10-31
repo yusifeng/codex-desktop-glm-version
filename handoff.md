@@ -5089,3 +5089,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   restore、initial navigation 和 webview adoption lease/cleanup；page command、binding 与 session delegate 使用同一语义 runtime。
 - main 旧 `GXe/KXe/qXe/JXe/YXe/WX/GX` 已删除。focused coverage 28 项，no-unwired gate 扩至 533 项；下一批审计紧随的
   audible/user-media state tracker `KX` 与 page materialization consumer。
+
+# 2026-11-01 browser media state tracker extraction
+
+- 新增并接回 `browser-sidebar/browser-media-state-tracker.ts`，统一 audible/user-media indicator 的延迟关闭、最短 capture lifetime、
+  timer cancellation/unref、reset 与 dispose；page materialization 和 webview binding 继续共享同一 `KX` 实现。
+- main 旧 `KX` 与三个 timing constants 已删除。focused coverage 38 项，no-unwired gate 保持 533 项并覆盖新 owner；下一批审计紧随的
+  `qX/JX/YX/XX/$Xe/ZX/QX` site-tools availability 状态机，按完整 helper belt 迁移。
