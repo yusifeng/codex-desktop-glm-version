@@ -3111,3 +3111,10 @@ focused test 从 6 项扩至 19 项，覆盖 detached/source 解析、focused ow
 phase/invariant、registered host 与 persisted metadata 投影、feedback events 512 KiB 逆序保留/截断元数据，以及 exact owner route
 打开和 debug event。host-policy controller 直接消费三个语义入口；旧 `jX/DXe/OXe/kXe/AXe/jXe/MXe/NXe/PXe/FX/IX` 与重复
 restore constants 已物理删除，共享 lifecycle debug emitters 保持独立。focused tests 31 + 18 项，no-unwired gate 扩至 502 项。
+
+### 增量抽取：incomplete navigation service
+
+新增 `browser-sidebar/incomplete-navigation-service.ts`，统一接管 renderer RPC subscription 的 dup/broken/dispose 生命周期、最后订阅者
+投递与 async scope、60 秒 navigation phase timeout、finished/phase-change 去重、按阈值提取 observation，以及 webContents event listener
+安装/清理。主运行时继续以 `IXe/RX/UXe/WXe` 兼容别名服务 RPC、page lifecycle 与 webview binding；旧实现及模块级 listener stack
+已物理删除。focused test 16 项覆盖投递/断线幂等、observation timing 和 listener cleanup；no-unwired gate 扩至 508 项。

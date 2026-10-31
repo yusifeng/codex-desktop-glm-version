@@ -477,6 +477,7 @@ const { IabTabCandidateStore: qGe } = require("./main-app/browser-sidebar/iab-ta
 const { createBrowserTabLifecycleRuntime } = require("./main-app/browser-sidebar/browser-tab-lifecycle-runtime.js");
 const { createBrowserThreadStateRuntime } = require("./main-app/browser-sidebar/browser-thread-state-runtime.js");
 const { createBrowserDiagnosticsRuntime } = require("./main-app/browser-sidebar/browser-diagnostics-runtime.js");
+const { createIncompleteNavigationRuntime } = require("./main-app/browser-sidebar/incomplete-navigation-service.js");
 const {
   inspect: SVe,
   back: CVe,
@@ -43821,47 +43822,16 @@ function PX(e, t, n, r, i, a, o, s) {
     windowId: t.window.id,
   });
 }
-var FXe = r.i(`in-app-browser-incomplete-navigation-service`),
-  LX = [],
-  IXe = class extends n.Uf {
-    delivery = null;
-    listener = null;
-    constructor(e) {
-      (super(), e.once(`destroyed`, () => this[Symbol.dispose]()));
-    }
-    subscribe(e) {
-      (this.unsubscribe(),
-        (this.listener = e.dup()),
-        this.listener.onRpcBroken(() => this.unsubscribe()));
-      let t = this.listener;
-      ((this.delivery = async (e) => {
-        try {
-          var n = a.en();
-          await n.u(t(e));
-        } catch (e) {
-          n.e = e;
-        } finally {
-          n.d();
-        }
-      }),
-        LX.push(this.delivery));
-    }
-    unsubscribe() {
-      if (this.delivery != null) {
-        let e = LX.indexOf(this.delivery);
-        e !== -1 && LX.splice(e, 1);
-      }
-      ((this.delivery = null), this.listener?.[Symbol.dispose](), (this.listener = null));
-    }
-    [Symbol.dispose]() {
-      this.unsubscribe();
-    }
-  };
-function RX(e) {
-  LX.at(-1)?.(e).catch(() => {
-    FXe().info(`Failed to deliver incomplete in-app browser navigation`);
-  });
-}
+var {
+  IncompleteNavigationSubscription: IXe,
+  reportIncompleteNavigation: RX,
+  createNavigationObserver: UXe,
+  attachNavigationObserver: WXe,
+} = createIncompleteNavigationRuntime({
+  DisposableBase: n.Uf,
+  createAsyncScope: a.en,
+  createLogger: r.i,
+});
 function zX(e) {
   return e.tabType === n.lu.WEB && e.commentModeDisabledReason == null;
 }
@@ -44028,84 +43998,6 @@ function VXe(e) {
     e.linkURL.length === 0 &&
     e.srcURL.length === 0 &&
     e.selectionText.length === 0
-  );
-}
-var HXe = 6e4,
-  HX = `main-frame-navigation-stage-changed`;
-function UXe(e) {
-  let t = null,
-    n = null,
-    r = () => {
-      (t?.phaseTimeout != null && clearTimeout(t.phaseTimeout), (t = null));
-    },
-    i = (e, t) => ({
-      lastObservedPhase: e.phase,
-      totalNavigationDurationMs: t - e.navigationStartedAtMs,
-      lastObservedPhaseDurationMs: t - e.phaseStartedAtMs,
-    }),
-    a = () => {
-      let a = t;
-      a != null &&
-        (a.phaseTimeout = setTimeout(() => {
-          if (t !== a) return;
-          let o = i(a, Date.now());
-          ((n = a.navigationId), r(), e(o));
-        }, HXe));
-    },
-    o = () => {
-      (r(), (n = null));
-    };
-  return {
-    dispose: o,
-    finishCurrentNavigation: o,
-    handleStageChanged: (e) => {
-      if (e.phase === `finished`) {
-        (t?.navigationId === e.navigationId && r(), n === e.navigationId && (n = null));
-        return;
-      }
-      if (n === e.navigationId) return;
-      let i = Date.now();
-      if (t?.navigationId !== e.navigationId) {
-        (r(),
-          (n = null),
-          (t = {
-            navigationId: e.navigationId,
-            navigationStartedAtMs: i,
-            phase: e.phase,
-            phaseStartedAtMs: i,
-            phaseTimeout: null,
-          }),
-          a());
-        return;
-      }
-      t.phase !== e.phase &&
-        (t.phaseTimeout != null && clearTimeout(t.phaseTimeout),
-        (t.phase = e.phase),
-        (t.phaseStartedAtMs = i),
-        (t.phaseTimeout = null),
-        a());
-    },
-    takeObservation: (e) => {
-      let n = t;
-      if (n == null) return null;
-      let r = i(n, Date.now());
-      return (o(), r.lastObservedPhaseDurationMs > e ? r : null);
-    },
-  };
-}
-function WXe(e, t) {
-  let n = UXe(t),
-    r = (e, t) => {
-      n.handleStageChanged(t);
-    };
-  return (
-    e.on(HX, r),
-    {
-      ...n,
-      dispose: () => {
-        (e.removeListener(HX, r), n.dispose());
-      },
-    }
   );
 }
 var UX = r.i(`browser-sidebar-manager`);

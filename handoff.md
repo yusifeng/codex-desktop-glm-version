@@ -5061,3 +5061,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   restore phase/invariant、512 KiB feedback 截断和 exact owner route opening；host-policy 保持唯一 consumer。
 - main 旧 `jX/DXe/OXe/kXe/AXe/jXe/MXe/NXe/PXe/FX/IX` 与 diagnostics-only constants 已删除。focused coverage
   31 + 18 项，no-unwired gate 扩至 502 项；下一批审计相邻 lifecycle debug emitters `TXe/NX/EXe/PX` 与 incomplete-navigation owner。
+
+# 2026-11-01 incomplete navigation service extraction
+
+- 新增并接回 `browser-sidebar/incomplete-navigation-service.ts`，承接 RPC subscription stack、last-listener delivery、async scope、
+  60 秒 phase observer、threshold observation 与 webContents listener cleanup；main 旧 `IXe/RX/UXe/WXe` owner 已删除。
+- focused coverage 16 项，no-unwired gate 扩至 508 项；下一批继续迁移共享 lifecycle debug emitters `TXe/NX/EXe/PX`，随后审计
+  context-menu 与 navigation restore 边界，避免把无关 owners 混成一个模块。
