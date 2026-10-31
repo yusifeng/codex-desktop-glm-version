@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修复并接回此前缩水的 untrusted app input / image placeholder owner：`conversations/untrusted-input.ts` 现恢复严格 payload/image data URL
+校验、UTF-8 byte range、function-call/output 投影、placeholder 防篡改解码，以及 browser element/region/text/graphics、PDF 和附加图片证据文案；
+`image-placeholders.ts` 恢复 comment prompt 计数、text/image pair 识别、generated evidence 剥离、app display text 与图片数核算。主入口同时改接
+既有完整 section-markers/steering-merge owner，旧 `Up…ohe`、`Mh`、`Nh…Ih` 与 `Xhe…fg` 合计约 650 行副本删除；focused suite
+以 47 个断言执行安全边界、篡改拒绝、证据匹配和真实接线。
+
 大批迁出项目 migration 与第三方 vendor 之间的整段启动 owner：既有 `misc/remote-control-state.ts` 现成为窗口、更新安装和应用生命周期的
 唯一远控状态源；新增 React DevTools 发现/加载、legacy remote_control config 清理、SQLite recovery 串行队列、临时 SQLite 合并与 cwd repair、
 Chromium child-process-gone 诊断限流及 macOS bundled Git 环境模块。全部真实 consumer 已改接命名 owner，旧 `Ou…Oue` 约 536 行连续实现整体

@@ -1,5 +1,13 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 untrusted app input and generated image evidence owners
+
+将此前仅做字符串拼接的 `conversations/untrusted-input.ts` 与只统计表层图片的 `image-placeholders.ts` 恢复为完整 owner：严格解析 app sender/
+message/model-context attachment，校验受支持 base64 image data URL，生成并认证 text-element placeholder，按 UTF-8 字节范围防止可见文本篡改；
+browser/PDF comment evidence 现按 element/region/text/virtual、多选与目标文案生成，并能把 prompt comment sections 与相邻 image/localImage 反向
+匹配后从 raw user text 剥离。主 chunk 同时接回 `prompts/section-markers.ts` 和 `turns/steering-merge.ts` 的构造/匹配 consumer，约 650 行旧副本
+删除；47 条 focused 断言覆盖 encode/decode、拒绝路径、图片配对、占位清理与 wiring。
+
 ## 2026-11-01 startup state, recovery and platform owners
 
 新增 `startup/react-devtools-extension.ts`、`legacy-remote-control-config.ts`、`app-server/sqlite-recovery.ts`、
