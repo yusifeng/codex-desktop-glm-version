@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `V6e` projectless directory chooser 迁入 `workspace/projectless-directory-chooser.ts`；owner-aware
+dialog、configured default root、absolute/WSL validation、real-directory/non-symlink 与 RWX permission gate 均由
+新 owner 持有，唯一 runtime consumer 已接回。无 consumer 且包含多个简化伪实现的 `misc/project-sync.ts`
+已物理删除；其余真实 project-sync owners 仍在 main 待逐批迁移。focused test 覆盖 18 项。
+
 随后将 `z6e` process-memory snapshot cache 与 app-server descendant classifier 迁入
 `startup/process-memory-snapshot-cache.ts`；5 秒 cache、single-flight promise、main/electron/app-server/rollout/
 other RSS 分类与 summary projection 均由新 owner 持有，全局 `Qnt` consumer 已接回并删除旧 class/helper。

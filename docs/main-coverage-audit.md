@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 projectless directory chooser
+
+原 `V6e` 已迁入 `src/main/main-app/workspace/projectless-directory-chooser.ts`。新 owner 保留 BrowserWindow
+owner-aware open dialog、configured/default root、absolute path 与 WSL validation、lstat real-directory/
+non-symlink 检查和 R/W/X access gate；runtime 唯一 consumer 直接实例化新 class，旧实现已删除。无 consumer
+且行为不完整的 `misc/project-sync.ts` skeleton 同时删除，其余真实 sync owners 未被误标为已迁。
+
 ## 2026-10-31 process memory snapshot cache
 
 原 `z6e` 与独占 ancestor helper `B6e` 已迁入

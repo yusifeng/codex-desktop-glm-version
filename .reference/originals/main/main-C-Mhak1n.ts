@@ -77,6 +77,7 @@ const { createPluginIncentivesClientRuntime } = require("./main-app/plugins/ince
 const { createPrimaryRuntimeUpdatePollerClass } = require("./main-app/misc/primary-runtime-update-poller.js");
 const { createPrimaryRuntimeHostClass } = require("./main-app/misc/primary-runtime-host.js");
 const { createProcessMemorySnapshotCacheClass } = require("./main-app/startup/process-memory-snapshot-cache.js");
+const { createProjectlessDirectoryChooserClass } = require("./main-app/workspace/projectless-directory-chooser.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -133075,44 +133076,21 @@ var R6e = 5e3,
     processRef: process,
     cacheDurationMs: R6e,
   });
-var V6e = class extends n.Uf {
-  origin;
-  settingsStore;
-  constructor(e, t) {
-    (super(), (this.origin = e), (this.settingsStore = t));
-  }
-  async chooseDirectory() {
-    let e = {
-        defaultPath: xt({
-          configuredWorkspaceRoot: this.settingsStore.getEffective(
-            n.Fa.projectlessWorkspaceRoot.key,
-          ),
-          homeDirectory: (0, p.homedir)(),
-          path: h.default,
-        }),
-        properties: [`openDirectory`, `createDirectory`],
-        title: `Choose Projectless Task Folder`,
-      },
-      t = l.BrowserWindow.fromWebContents(this.origin),
-      r = t == null ? await l.dialog.showOpenDialog(e) : await l.dialog.showOpenDialog(t, e),
-      i = r.filePaths[0];
-    if (r.canceled || i == null) return null;
-    if (!h.default.isAbsolute(i))
-      throw Error(`Projectless chat folder must be an absolute local path`);
-    us(i, n.zi(ls));
-    let a = await (0, b.lstat)(i);
-    if (!a.isDirectory() || a.isSymbolicLink())
-      throw Error(`Projectless chat folder must be a real directory`);
-    return (
-      await Promise.all([
-        (0, b.access)(i, v.constants.R_OK),
-        (0, b.access)(i, v.constants.W_OK),
-        (0, b.access)(i, v.constants.X_OK),
-      ]),
-      i
-    );
-  }
-};
+var V6e = createProjectlessDirectoryChooserClass({
+  RpcHandlerBase: n.Uf,
+  BrowserWindow: l.BrowserWindow,
+  dialog: l.dialog,
+  settings: n.Fa,
+  getHomeDirectory: p.homedir,
+  path: h.default,
+  getDefaultWorkspaceRoot: xt,
+  validateProjectlessDirectory: us,
+  getUseWslPaths: n.zi,
+  hostConfig: ls,
+  lstat: b.lstat,
+  access: b.access,
+  accessModes: v.constants,
+});
 function H6e(e, t) {
   let n = new Map(e.map((e, t) => [e, t])),
     r = [],
