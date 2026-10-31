@@ -3185,3 +3185,9 @@ loading/retry loop 和最终 non-fatal report。原主 chunk `fZe` 及专用常�
 `browser-page-webview-binding-controller.ts` 已内聚 capture reset、window.open tab message projection，以及 pending navigation observer
 WeakMap 的 register/destroy/take 生命周期；组合根只注入 `WXe/RX` incomplete-navigation primitives。主 chunk 旧
 `fZ/pZ/mZ/pZe/mZe/sZ` 已删除，避免 binding 私有状态继续泄漏在组合根。
+
+### 增量内聚：browser window transfer transaction
+
+`BrowserPageHostLifecycle` 已直接拥有原 `gZe` 的 transfer admission、WebView transfer/receiver/abort、source→target route/state 移交、
+host metadata、annotation mode、attached-host registry、bind/runtime sync/message，以及 moved 后 bind 失败的 closed teardown。组合根只注入
+annotation/message/logger policies；旧 `gZe/hZe` 已删除。focused test 覆盖成功、预先 abort 和 moved 后 bind failure cleanup。

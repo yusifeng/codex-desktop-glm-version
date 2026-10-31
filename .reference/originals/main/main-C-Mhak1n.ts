@@ -43869,100 +43869,6 @@ var {
   securityStateForPage: dZe,
   syncBackgroundThrottling: dZ,
 } = createBrowserPagePresentationPolicy({ isFirstPartyUrl: Ve, pageUrl: QU });
-var hZe = r.i(`browser-window-transfer`);
-async function gZe(e, t, n, { content: r, receiver: i, signal: a }, o, s) {
-  let c = qU(r),
-    l = t.threads.get(c),
-    u = l?.page,
-    d = u?.view.webContents,
-    f = n.threads.get(c),
-    p = t.tabSourceWindow == null;
-  if (d?.isDestroyed()) return `closed`;
-  if (
-    a.aborted ||
-    d == null ||
-    l == null ||
-    u == null ||
-    f?.hostGeneration == null ||
-    f.page?.view.webContents != null ||
-    n.rendererInstanceId == null ||
-    n.pendingWindowTransfer != null ||
-    l.pendingTeardown != null ||
-    (p &&
-      (l.pendingWindowTransfer === !0 ||
-        l.snapshot.interactionMode !== `browse` ||
-        l.pendingCommentModeActivation != null ||
-        l.snapshot.annotationEditorMode === `design` ||
-        l.snapshot.isTweaksEditorOpen === !0))
-  )
-    return `not-moved`;
-  let m = d.createWebViewTransfer(n.owner);
-  (p && (l.pendingWindowTransfer = !0),
-    (n.pendingWindowTransfer = { token: m.token, webContents: d }));
-  let h = () => m.cancel();
-  (a.addEventListener(`abort`, h, { once: !0 }),
-    i.attach({ kind: `browser`, data: { token: m.token } }).catch(h));
-  let g = !1;
-  try {
-    let r = await m.finished;
-    if (r !== `moved`) return r;
-    g = !0;
-    let i = e.getPageLifecycleHelpers();
-    return (
-      i.comments.dismiss(t.owner, l.conversationId, l.browserTabId, l),
-      u.dispose(),
-      f.page?.dispose(),
-      t.threads.delete(c),
-      t.ignoredConversationIds.add(c),
-      e.browserPersistence.unregisterWebviewHost(t, l),
-      n.threads.set(c, l),
-      n.ignoredConversationIds.delete(c),
-      (n.tabSourceWindow = t.tabSourceWindow === n ? void 0 : t),
-      DU(l, f.isAnnotationModeEnabled),
-      (n.activeConversationId = l.conversationId),
-      (n.activeBrowserTabId = l.browserTabId),
-      t.activeConversationId === l.conversationId &&
-        t.activeBrowserTabId === l.browserTabId &&
-        ((t.activeConversationId = null), (t.activeBrowserTabId = null)),
-      (l.hostGeneration = f.hostGeneration),
-      (l.mountGeneration = f.mountGeneration),
-      (l.hostKind = f.hostKind),
-      (l.bounds = f.bounds),
-      (l.viewportScale = f.viewportScale),
-      (l.visible = f.visible),
-      (l.presented = f.presented),
-      (l.isAgentControllingBrowser = l.isBrowserUseActive),
-      (l.pendingTeardown = null),
-      !d.isDestroyed() &&
-        !n.window.isDestroyed() &&
-        (o.set(d, {
-          route: { conversationId: l.conversationId, browserTabId: l.browserTabId },
-          hostGeneration: f.hostGeneration,
-          rendererInstanceId: n.rendererInstanceId,
-          initialNavigationOwner: `transfer`,
-        }),
-        i.bindPageToWebview(n, u, d, l.themeVariant, `transfer`),
-        i.syncRuntimeStateToPage(u, l),
-        e.syncThreadState(n, l.conversationId, l),
-        WU(e.windowManager, n, {
-          type: `browser-sidebar-browser-use-state`,
-          conversationId: l.conversationId,
-          browserTabId: l.browserTabId,
-          isActive: l.isBrowserUseActive,
-        })),
-      `moved`
-    );
-  } catch (e) {
-    if (!g) throw e;
-    hZe().error(`Failed to bind transferred Browser page`, { safe: {}, sensitive: { error: e } });
-    let r = n.threads.get(c) === l ? n : t;
-    return ((u.view.webContents = d), s(r, l), `closed`);
-  } finally {
-    (p && delete l.pendingWindowTransfer,
-      a.removeEventListener(`abort`, h),
-      delete n.pendingWindowTransfer);
-  }
-}
 var CZe = n.wf({ threadId: n.Of(), item: n.wf({ type: n.bf(`mcpToolCall`), id: n.Of() }) });
 function wZe({ browserSessionRegistry: e, onMcpToolCallCompleted: t, source: n }) {
   n?.registerInternalNotificationHandler((n) => {
@@ -44606,7 +44512,9 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
           routeKey: qU,
           syncThreadState: this.syncThreadState.bind(this),
           tabBudget: this.tabBudget,
-          transferPageToWindow: gZe,
+          applyAnnotationMode: DU,
+          sendWindowMessage: WU,
+          transferLogger: r.i(`browser-window-transfer`),
           windowManager: this.windowManager,
           windows: this.windows,
         })),

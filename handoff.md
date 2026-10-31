@@ -5138,3 +5138,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   主组合根只提供 incomplete-navigation primitives，旧 `fZ/pZ/mZ/pZe/mZe/sZ` 已删除。
 - binding、navigation-context、incomplete-navigation focused tests 与全量 owner audit 均覆盖该接线。下一批从 `gZe` window-transfer
   transaction 审计现有 transfer controller 边界。
+
+# 2026-11-01 browser window transfer transaction convergence
+
+- `BrowserPageHostLifecycle` 现直接拥有 transfer admission、receiver/abort、source/target state transaction、attached-host bind 和 moved 后
+  failure teardown；主组合根仅注入 annotation/message/logger policy，旧 `gZe/hZe` 已删除。
+- host lifecycle focused coverage 扩至成功、预先 abort、bind failure/closed cleanup。下一批审计紧随的 app-server notification
+  bridge `wZe/TZe/EZe/DZe` 与 session registry consumer。

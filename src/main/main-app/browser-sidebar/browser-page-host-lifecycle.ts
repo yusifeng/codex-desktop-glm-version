@@ -25,16 +25,11 @@ export type BrowserPageHostLifecycleOptions = {
   removeClosedThread(windowManager: AnyRecord, windows: Map<unknown, AnyRecord>, windowState: AnyRecord, threadState: AnyRecord): void;
   reportIncompleteNavigation(input: AnyRecord): void;
   routeKey(route: AnyRecord): unknown;
+  applyAnnotationMode(threadState: AnyRecord, enabled: boolean): void;
+  sendWindowMessage(windowManager: AnyRecord, windowState: AnyRecord, message: AnyRecord): void;
   syncThreadState(windowState: AnyRecord, conversationId: string, threadState: AnyRecord): void;
   tabBudget: AnyRecord;
-  transferPageToWindow(
-    options: AnyRecord,
-    source: AnyRecord,
-    target: AnyRecord,
-    route: AnyRecord,
-    attachedHosts: WeakMap<object, AnyRecord>,
-    closeTransferredThread: (windowState: AnyRecord, threadState: AnyRecord) => void,
-  ): Promise<unknown>;
+  transferLogger: { error(event: string, fields: AnyRecord): void };
   windowManager: AnyRecord;
   windows: Map<unknown, AnyRecord>;
 };
@@ -49,30 +44,89 @@ export class BrowserPageHostLifecycle {
     this.options = options;
   }
 
-  transferToWindow(source: AnyRecord, target: AnyRecord, route: AnyRecord): Promise<unknown> {
-    return this.options.transferPageToWindow(
-      this.options,
-      source,
-      target,
-      route,
-      this.attachedWebviewHosts,
-      (windowState, threadState) => {
-        this.requestThreadTeardown(
-          windowState,
-          threadState.conversationId,
-          threadState,
-          "closed",
-        );
-        if (threadState.pendingTeardown != null) {
-          this.finalizeThreadTeardown(
-            windowState,
-            threadState.conversationId,
-            threadState,
-            threadState.pendingTeardown.teardownId,
-          );
-        }
-      },
-    );
+  async transferToWindow(source: AnyRecord, target: AnyRecord, request: AnyRecord): Promise<unknown> {
+    const key = this.options.routeKey(request.content);
+    const threadState = source.threads.get(key);
+    const page = threadState?.page;
+    const webContents = page?.view.webContents;
+    const targetPlaceholder = target.threads.get(key);
+    const isRootSource = source.tabSourceWindow == null;
+    if (webContents?.isDestroyed()) return `closed`;
+    if (
+      request.signal.aborted || webContents == null || threadState == null || page == null ||
+      targetPlaceholder?.hostGeneration == null || targetPlaceholder.page?.view.webContents != null ||
+      target.rendererInstanceId == null || target.pendingWindowTransfer != null || threadState.pendingTeardown != null ||
+      (isRootSource && (threadState.pendingWindowTransfer === true || threadState.snapshot.interactionMode !== `browse` ||
+        threadState.pendingCommentModeActivation != null || threadState.snapshot.annotationEditorMode === `design` ||
+        threadState.snapshot.isTweaksEditorOpen === true))
+    ) return `not-moved`;
+
+    const transfer = webContents.createWebViewTransfer(target.owner);
+    if (isRootSource) threadState.pendingWindowTransfer = true;
+    target.pendingWindowTransfer = { token: transfer.token, webContents };
+    const cancel = () => transfer.cancel();
+    request.signal.addEventListener(`abort`, cancel, { once: true });
+    request.receiver.attach({ kind: `browser`, data: { token: transfer.token } }).catch(cancel);
+    let moved = false;
+    try {
+      const result = await transfer.finished;
+      if (result !== `moved`) return result;
+      moved = true;
+      const helpers = this.options.getPageLifecycleHelpers();
+      helpers.comments.dismiss(source.owner, threadState.conversationId, threadState.browserTabId, threadState);
+      page.dispose();
+      targetPlaceholder.page?.dispose();
+      source.threads.delete(key);
+      source.ignoredConversationIds.add(key);
+      this.options.browserPersistence.unregisterWebviewHost(source, threadState);
+      target.threads.set(key, threadState);
+      target.ignoredConversationIds.delete(key);
+      target.tabSourceWindow = source.tabSourceWindow === target ? undefined : source;
+      this.options.applyAnnotationMode(threadState, targetPlaceholder.isAnnotationModeEnabled);
+      target.activeConversationId = threadState.conversationId;
+      target.activeBrowserTabId = threadState.browserTabId;
+      if (source.activeConversationId === threadState.conversationId && source.activeBrowserTabId === threadState.browserTabId) {
+        source.activeConversationId = null;
+        source.activeBrowserTabId = null;
+      }
+      threadState.hostGeneration = targetPlaceholder.hostGeneration;
+      threadState.mountGeneration = targetPlaceholder.mountGeneration;
+      threadState.hostKind = targetPlaceholder.hostKind;
+      threadState.bounds = targetPlaceholder.bounds;
+      threadState.viewportScale = targetPlaceholder.viewportScale;
+      threadState.visible = targetPlaceholder.visible;
+      threadState.presented = targetPlaceholder.presented;
+      threadState.isAgentControllingBrowser = threadState.isBrowserUseActive;
+      threadState.pendingTeardown = null;
+      if (!webContents.isDestroyed() && !target.window.isDestroyed()) {
+        this.attachedWebviewHosts.set(webContents, {
+          route: { conversationId: threadState.conversationId, browserTabId: threadState.browserTabId },
+          hostGeneration: targetPlaceholder.hostGeneration,
+          rendererInstanceId: target.rendererInstanceId,
+          initialNavigationOwner: `transfer`,
+        });
+        helpers.bindPageToWebview(target, page, webContents, threadState.themeVariant, `transfer`);
+        helpers.syncRuntimeStateToPage(page, threadState);
+        this.options.syncThreadState(target, threadState.conversationId, threadState);
+        this.options.sendWindowMessage(this.options.windowManager, target, {
+          type: `browser-sidebar-browser-use-state`, conversationId: threadState.conversationId,
+          browserTabId: threadState.browserTabId, isActive: threadState.isBrowserUseActive,
+        });
+      }
+      return `moved`;
+    } catch (error) {
+      if (!moved) throw error;
+      this.options.transferLogger.error(`Failed to bind transferred Browser page`, { safe: {}, sensitive: { error } });
+      page.view.webContents = webContents;
+      const owner = target.threads.get(key) === threadState ? target : source;
+      this.requestThreadTeardown(owner, threadState.conversationId, threadState, `closed`);
+      if (threadState.pendingTeardown != null) this.finalizeThreadTeardown(owner, threadState.conversationId, threadState, threadState.pendingTeardown.teardownId);
+      return `closed`;
+    } finally {
+      if (isRootSource) delete threadState.pendingWindowTransfer;
+      request.signal.removeEventListener(`abort`, cancel);
+      delete target.pendingWindowTransfer;
+    }
   }
 
   registerRendererSession(windowState: AnyRecord, rendererInstanceId: string): boolean {

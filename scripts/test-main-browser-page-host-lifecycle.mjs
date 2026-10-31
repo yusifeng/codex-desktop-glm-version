@@ -35,6 +35,7 @@ function createWebContents(id) {
     isDestroyed() { return this.destroyed > 0 || this.closed > 0; },
     close() { this.closed += 1; },
     destroy() { this.destroyed += 1; },
+    createWebViewTransfer() { return { token: `transfer-${id}`, cancel: () => {}, finished: Promise.resolve("moved") }; },
   };
 }
 
@@ -66,7 +67,7 @@ function createThread(overrides = {}) {
     pendingTeardown: null,
     presented: false,
     sessionState: "cold",
-    snapshot: { isSuspended: false },
+    snapshot: { isSuspended: false, interactionMode: "browse", annotationEditorMode: "browse", isTweaksEditorOpen: false },
     themeVariant: "dark",
     ...overrides,
   };
@@ -83,7 +84,7 @@ function createWindow(thread = createThread(), overrides = {}) {
     pendingWebviewRoutesByInstanceId: new Map(),
     rendererInstanceId: "renderer-1",
     threads: new Map([[key, thread]]),
-    window: { id: 20 },
+    window: { id: 20, isDestroyed: () => false },
     ...overrides,
   };
 }
@@ -116,7 +117,11 @@ function createHarness({ thread = createThread(), windowState, overrides = {} } 
       calls.push(["find", conversationId, browserTabId]);
       return target.threads.get(`${conversationId}:${browserTabId}`) ?? null;
     },
-    getPageLifecycleHelpers() { return { helper: true }; },
+    getPageLifecycleHelpers() { return {
+      comments: { dismiss: (...args) => calls.push(["dismiss", ...args]) },
+      bindPageToWebview: (...args) => { calls.push(["transferBind", ...args]); args[1].view.webContents = args[2]; },
+      syncRuntimeStateToPage: (...args) => calls.push(["runtimeSync", ...args]),
+    }; },
     iabTabMentions: { notifyInvalidated() { calls.push(["invalidated"]); } },
     logger: {
       info(event, fields) { calls.push(["info", event, fields]); },
@@ -136,7 +141,9 @@ function createHarness({ thread = createThread(), windowState, overrides = {} } 
       isTabProtectedFromSuspension() { return protectedTab; },
       recordTabSuspended(...args) { calls.push(["suspended", ...args]); },
     },
-    async transferPageToWindow(...args) { calls.push(["transfer", ...args]); return "moved"; },
+    applyAnnotationMode(...args) { calls.push(["annotation", ...args]); },
+    sendWindowMessage(...args) { calls.push(["transferMessage", ...args]); },
+    transferLogger: { error(...args) { calls.push(["transferError", ...args]); } },
     windowManager: {
       sendMessageToWebContents(...args) { calls.push(["message", ...args]); },
     },
@@ -336,11 +343,51 @@ function createHarness({ thread = createThread(), windowState, overrides = {} } 
 
 {
   const harness = createHarness();
-  const result = await harness.lifecycle.transferToWindow(harness.windowState, createWindow(createThread()), {
+  const placeholder = createThread({ hostGeneration: 9, mountGeneration: 10, page: createPage(null), isAnnotationModeEnabled: true, visible: true, presented: true });
+  const target = createWindow(placeholder, { rendererInstanceId: "renderer-2" });
+  const signal = new AbortController();
+  const result = await harness.lifecycle.transferToWindow(harness.windowState, target, {
     content: { browserTabId: "tab-1", conversationId: "conversation-1" },
+    receiver: { attach: (...args) => { harness.calls.push(["receiver", ...args]); return Promise.resolve(); } },
+    signal: signal.signal,
   });
   equal(result, "moved");
-  equal(harness.calls.filter(([name]) => name === "transfer").length, 1);
+  equal(harness.windowState.threads.size, 0);
+  equal(target.threads.get("conversation-1:tab-1"), harness.thread);
+  equal(harness.thread.hostGeneration, 9);
+  equal(harness.calls.filter(([name]) => name === "transferBind").length, 1);
+  equal(harness.calls.filter(([name]) => name === "transferMessage").length, 1);
+  equal(target.pendingWindowTransfer, undefined);
+}
+
+{
+  const harness = createHarness();
+  const placeholder = createThread({ hostGeneration: 9, page: createPage(null) });
+  const target = createWindow(placeholder, { rendererInstanceId: "renderer-2" });
+  const abort = new AbortController();
+  abort.abort();
+  equal(await harness.lifecycle.transferToWindow(harness.windowState, target, {
+    content: { browserTabId: "tab-1", conversationId: "conversation-1" },
+    receiver: { attach: () => Promise.resolve() }, signal: abort.signal,
+  }), "not-moved");
+  equal(harness.windowState.threads.get("conversation-1:tab-1"), harness.thread);
+}
+
+{
+  const harness = createHarness();
+  const placeholder = createThread({ hostGeneration: 9, page: createPage(null) });
+  const target = createWindow(placeholder, { rendererInstanceId: "renderer-2" });
+  harness.options.getPageLifecycleHelpers = () => ({
+    comments: { dismiss: () => {} },
+    bindPageToWebview: () => { throw Error("bind failed"); },
+    syncRuntimeStateToPage: () => {},
+  });
+  equal(await harness.lifecycle.transferToWindow(harness.windowState, target, {
+    content: { browserTabId: "tab-1", conversationId: "conversation-1" },
+    receiver: { attach: () => Promise.resolve() }, signal: new AbortController().signal,
+  }), "closed");
+  equal(harness.calls.filter(([name]) => name === "transferError").length, 1);
+  equal(target.pendingWindowTransfer, undefined);
 }
 
 console.log(`${assertions} main browser-page host lifecycle assertions passed`);
