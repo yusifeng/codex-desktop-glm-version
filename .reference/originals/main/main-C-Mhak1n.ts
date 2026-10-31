@@ -23,7 +23,7 @@ const { mx, yx } = require("./main-app/threads/start-config.js");
 const { hasCanonicalVoiceHistory: q_, parseHeartbeatDecision: J_, parseAutomationUserMessage: n_e, AUTOMATION_DETECTOR: Y_ } = require("./main-app/threads/automation-detector.js");
 const { conversationFromThreadSummary: V_, cleanThreadTitle: Cv, truncateText: wv, threadPreviewTitle: v_e, threadTimestamps: Tv, mergedRecencyAt: Ev, environmentSelection: Dv, subAgentMetadata: H_, subAgentNickname: $ge } = require("./main-app/threads/projection.js");
 const { me, Xt } = require("./main-app/misc/thread-errors.js");
-const { attachmentsFromInput: X_, normalizeImageGenerationItem: Z_, turnParamsFromReadResponse: $_, projectReadResponseTurns: ev, projectTurns: tv, projectItems: nv, ensureTurnFields: iv } = require("./main-app/threads/hydration.js");
+const { attachmentsFromInput: X_, normalizeImageGenerationItem: Z_, turnParamsFromReadResponse: $_, projectReadResponseTurns: ev, projectTurns: tv, projectItems: nv, ensureTurnFields: iv, registerThreadMetadata: av, activeAncestryIds: ov, isSubagentThread: sv, effectiveRuntimeStatus: cv, isDescendantOf: lv, parentThreadIdOf: uv, isSurfaceableThread: dv } = require("./main-app/threads/hydration.js");
 const { AppServerManagerStreamState } = require("./main-app/threads/stream-roles.js");
 const { ThreadStore } = require("./main-app/threads/thread-store.js");
 const { PrewarmSlot, DetachedWindowPrewarmer, DetachedWindowManager, DetachedWindowService, ThreadHandoffLease, DeviceCheckCookieManager, CallIdClaimRegistry } = require("./main-app/window/detached-window-manager.js");
@@ -25350,87 +25350,6 @@ var Yge = AppServerManagerStreamState;
       return this.subscribers.get(e);
     }
   };
-function f_e(e) {
-  return e.receiverThreadIds.map((t) => ({ threadId: t, thread: e.threadsById.get(t) ?? null }));
-}
-function av(e) {
-  e.threadsById.set(e.thread.id, { ...e.thread, turns: [] });
-  let t = n.$u(e.thread.id),
-    r = e.conversations.get(t);
-  (r != null &&
-    r.agentNickname !== e.thread.agentNickname &&
-    e.updateConversationState(t, (t) => {
-      t.agentNickname = e.thread.agentNickname;
-    }),
-    p_e({
-      threadId: e.thread.id,
-      conversations: e.conversations,
-      threadsById: e.threadsById,
-      updateConversationState: e.updateConversationState,
-    }));
-}
-function p_e(e) {
-  for (let [t, n] of e.conversations.entries())
-    Og(n).some((t) => t.items.some((t) => m_e(t) && t.receiverThreadIds.includes(e.threadId))) &&
-      e.updateConversationState(t, (t) => {
-        b_(t, (t) => {
-          for (let n of t.items) {
-            if (
-              n.type !== `collabAgentToolCall` ||
-              !(`receiverThreads` in n) ||
-              !n.receiverThreadIds.includes(e.threadId)
-            )
-              continue;
-            let t = f_e({ receiverThreadIds: n.receiverThreadIds, threadsById: e.threadsById });
-            (0, G.default)(n.receiverThreads, t) || (n.receiverThreads = hh(t));
-          }
-        });
-      });
-}
-function m_e(e) {
-  return e.type === `collabAgentToolCall` && `receiverThreads` in e;
-}
-function ov(e, t) {
-  let n = new Map(e.map((e) => [e.conversationId, e])),
-    r = new Map(t.map((e) => [e.id, e])),
-    i = new Set();
-  for (let e of new Set([...n.keys(), ...r.keys()])) {
-    let t = r.get(e),
-      a = n.get(e);
-    if (cv(a, t)?.type !== `active`) continue;
-    let o = uv(t ?? a);
-    for (; o != null && !i.has(o);) (i.add(o), (o = uv(r.get(o) ?? n.get(o))));
-  }
-  return i;
-}
-function sv(e) {
-  return uv(e) != null;
-}
-function cv(e, t) {
-  let n = t?.threadRuntimeStatus;
-  return t?.resumeState === `needs_resume` || n?.type === `notLoaded`
-    ? (e?.threadRuntimeStatus ?? n ?? void 0)
-    : (n ?? e?.threadRuntimeStatus);
-}
-function lv(e, t, n) {
-  let r = new Set(),
-    i = uv(e);
-  for (; i != null && !r.has(i);) {
-    if (i === t) return !0;
-    (r.add(i), (i = uv(n.get(i))));
-  }
-  return !1;
-}
-function uv(e) {
-  return e == null
-    ? null
-    : e.parentThreadId == null
-      ? (H_(e.source)?.parentThreadId ?? null)
-      : n.$u(e.parentThreadId);
-}
-function dv(e) {
-  return e.ephemeral !== !0 && e.threadSource !== `ambient_suggestions`;
-}
 function fv(e) {
   return e.tool === `request_environment_input`
     ? gh.safeParse(e.arguments).success

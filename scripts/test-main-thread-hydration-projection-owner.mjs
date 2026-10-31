@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import { isDeepStrictEqual } from "node:util";
 import { transform } from "esbuild";
 
 let assertions = 0;
@@ -46,14 +47,16 @@ Function("require", "module", "exports", transpiled.code)(
     if (specifier === "@chunk/shared") return shared;
     if (specifier === "./automation-detector") return { hasCanonicalVoiceHistory: () => false, AUTOMATION_DETECTOR: {} };
     if (specifier === "../vendor/immer") return { produce: (value, fn) => (fn(value), value), produceWithPatches: () => [], original: (value) => value };
-    if (specifier === "../util/lodash-interop") return { deepEqual: assert.deepEqual, findLast: (items, predicate) => items.findLast(predicate) };
+    if (specifier === "../util/lodash-interop") return { deepEqual: isDeepStrictEqual, findLast: (items, predicate) => items.findLast(predicate) };
     if (specifier === "../turns/canonical-history")
       return {
-        conversationTurns: (conversation) => conversation.turns,
-        mergedConversationTurns: (conversation) => conversation.turns,
-        historyTurnCount: (conversation) => conversation.turns.length,
-        lastTurn: (conversation) => conversation.turns.at(-1) ?? null,
+        conversationTurns: (conversation) => conversation.turnHistory?.history?.entities ?? conversation.turns,
+        mergedConversationTurns: (conversation) => conversation.turnHistory?.history?.entities ?? conversation.turns,
+        historyTurnCount: (conversation) => (conversation.turnHistory?.history?.entities ?? conversation.turns).length,
+        lastTurn: (conversation) => (conversation.turnHistory?.history?.entities ?? conversation.turns).at(-1) ?? null,
         hasCompleteHistory: () => true,
+        forEachTurn: (conversation, callback) =>
+          (conversation.turnHistory?.history?.entities ?? conversation.turns).forEach(callback),
       };
     if (specifier === "./projection")
       return {
@@ -140,6 +143,39 @@ const turn = {};
 equal(owner.ensureTurnFields(turn, "inProgress"), { status: "inProgress", items: [], hookRuns: [] });
 equal(turn, { status: "inProgress", items: [], hookRuns: [] });
 
+const receiverCall = {
+  type: "collabAgentToolCall",
+  receiverThreadIds: ["child"],
+  receiverThreads: [{ threadId: "child", thread: null }],
+};
+const parent = {
+  id: "parent",
+  turns: [],
+  turnHistory: { kind: "canonical", history: { entities: [{ items: [receiverCall] }] } },
+};
+const conversations = new Map([["parent", parent]]);
+const threadsById = new Map();
+owner.registerThreadMetadata({
+  thread: { id: "child", agentNickname: "worker" },
+  threadsById,
+  conversations,
+  updateConversationState: (id, update) => update(conversations.get(id)),
+});
+equal(threadsById.get("child"), { id: "child", agentNickname: "worker", turns: [] });
+equal(receiverCall.receiverThreads, [{
+  threadId: "child",
+  thread: { id: "child", agentNickname: "worker", turns: [] },
+}]);
+equal(owner.parentThreadIdOf({ parentThreadId: "parent" }), "parent");
+equal(owner.isSubagentThread({ parentThreadId: "parent" }), true);
+equal(owner.isDescendantOf(
+  { parentThreadId: "child" },
+  "root",
+  new Map([["child", { parentThreadId: "root" }]]),
+), true);
+equal(owner.isSurfaceableThread({ ephemeral: false, threadSource: "user" }), true);
+equal(owner.isSurfaceableThread({ ephemeral: true, threadSource: "user" }), false);
+
 const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
@@ -149,5 +185,9 @@ for (const name of ["c_e", "l_e", "X_", "Z_", "Q_", "$_", "ev", "tv", "nv", "d_e
   equal(main.includes(`function ${name}(`), false);
 equal(main.includes("var o_e ="), false);
 equal(main.includes("var u_e ="), false);
+equal(main.includes("registerThreadMetadata: av, activeAncestryIds: ov"), true);
+for (const name of ["f_e", "av", "p_e", "m_e", "ov", "sv", "cv", "lv", "uv", "dv"])
+  equal(main.includes(`function ${name}(`), false);
+equal(source.includes("forEachTurn(draft as never"), true);
 
 console.log(`${assertions} main thread hydration projection owner assertions passed`);

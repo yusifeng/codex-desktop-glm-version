@@ -41,6 +41,7 @@ import {
   historyTurnCount,
   lastTurn,
   hasCompleteHistory,
+  forEachTurn,
 } from "../turns/canonical-history";
 import {
   cleanThreadTitle,
@@ -450,14 +451,14 @@ function propagateReceiverThreads({
       )
     ) {
       updateConversationState(conversationId, (draft) => {
-        for (const turn of draft.turns) {
+        forEachTurn(draft as never, (turn: any) => {
           for (const item of turn.items) {
             if (item.type !== "collabAgentToolCall" || !("receiverThreads" in item) || !(item.receiverThreadIds as string[]).includes(threadId))
               continue;
             const updated = receiverThreadsOf({ receiverThreadIds: item.receiverThreadIds }, threadsById);
             if (!deepEqual(item.receiverThreads, updated)) item.receiverThreads = produce(updated, () => {});
           }
-        }
+        });
       });
     }
   }

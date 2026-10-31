@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 subagent metadata/ancestry owner：main 的 register+receiverThreads propagation、active ancestry、subagent/parent/descendant/runtime-status/
+surfaceability consumers 现复用 `threads/hydration.ts`；同时修复 semantic propagation 只遍历 legacy `draft.turns`、漏 canonical history
+的偏差，改用 `forEachTurn`，旧 `f_e…dv` 簇删除。
+
 接回 hydration input/turn projection owners：main 的 attachment section、image-generation src、thread/read params、turn/item projection 与
 turn field normalization consumers 现复用 `threads/hydration.ts` 的 `X_/Z_/$_/ev/tv/nv/iv`，旧 schema/private helper 簇删除；
 focused suite 覆盖文件引用、图片路径/base64、cwd、时间戳、receiverThreads 与默认字段。

@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 subagent metadata and ancestry wiring
+
+`threads/hydration.ts` 已覆盖旧 `f_e/av/p_e/m_e/ov/sv/cv/lv/uv/dv`，但 receiver propagation 的 semantic 版本只遍历 legacy turns。
+本轮修复为 canonical/legacy `forEachTurn`，将 main register/ancestry consumers 全部接回并删除旧簇；focused suite 覆盖 canonical
+receiverThreads 更新、parent/descendant/subagent 与 surfaceability。
+
 ## 2026-10-31 hydration input and turn projection wiring
 
 `threads/hydration.ts` 已完整实现旧 `o_e…iv` 的 attachment/image/read-response/turn projection 链，本轮将 main 的 `X_/Z_/$_/ev/tv/nv/iv`
