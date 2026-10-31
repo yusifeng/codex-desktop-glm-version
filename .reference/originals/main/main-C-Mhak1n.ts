@@ -46,6 +46,7 @@ const { WorkerInvocationSampler } = require("./main-app/worker/invocation-sample
 const { createWorkerBusClass } = require("./main-app/worker/worker-bus.js");
 const { createWorkerManagerClass } = require("./main-app/worker/worker-manager.js");
 const { AppEventPublisher } = require("./main-app/worker/app-event-publisher.js");
+const { createWorkerRuntime } = require("./main-app/worker/worker-runtime.js");
 const { createShortcutLinkReader } = require("./main-app/worker/shortcut-link-cache.js");
 const { isTrayReady } = require("./main-app/tray/tray-readiness.js");
 const { HISTORY_CLEAR_ACTIONS, historyScopeAction, historyClearRange } = require("./main-app/computer-use/history-scope-actions.js");
@@ -149631,218 +149632,25 @@ var yst = n.wf({ payload: n.Of(), requestId: n.Of() }),
     createRequestId: () => ree(`main-` + (0, _.randomUUID)()),
     channelForWorker: a.Jt,
   });
-function xst({ disposables: e, isTrustedIpcEvent: t, startupConfig: n, applicationNetwork: r }) {
-  let i = new AppEventPublisher(),
-    o = new pst(),
-    s = [],
-    c = new H9(`git`, {
-      startupConfig: n,
-      applicationNetwork: r,
-      hostOnlyEventTypes: new Set([
-        `create-worktree-path`,
-        `create-worktree-setup-started`,
-        `create-worktree-stream`,
-      ]),
-      singleRecipientEventTypes: new Set([
-        `git-performance-operation`,
-        `git-performance-watcher-snapshot`,
-      ]),
-      onWorkerRequestSent: () => {
-        o.recordInvocation();
-      },
-    }),
-    u = new H9(`open-in`, { startupConfig: n, applicationNetwork: r }),
-    shortcutLinkReader = createShortcutLinkReader((e) => l.shell.readShortcutLink(e));
-  u.setMainRpcHandler(async (e) => {
-    switch (e.method) {
-      case `read-shortcut-link`: {
-        return shortcutLinkReader(e.params.path);
-      }
-      case `ces-telemetry`:
-        throw Error(`Unsupported open-in worker request`);
-    }
+function xst({ disposables, isTrustedIpcEvent, startupConfig, applicationNetwork }) {
+  return createWorkerRuntime({
+    disposables,
+    isTrustedIpcEvent,
+    startupConfig,
+    applicationNetwork,
+    AppEventPublisher,
+    createGitInvocationSampler: () => new pst(),
+    WorkerBus: H9,
+    createShortcutLinkReader,
+    readShortcutLink: (path) => l.shell.readShortcutLink(path),
+    ipcMain: l.ipcMain,
+    workerChannel: a.Yt,
+    registeredWorkerIds: iee,
+    localHostId: J,
+    isWorkerStartResult,
+    isWorkerEventType,
+    isWorkerNotificationType,
   });
-  let f = new Set(),
-    p = new Map(),
-    m = new Map(),
-    h = null,
-    g = null;
-  e.add(() => {
-    p.forEach((e) => {
-      e();
-    });
-  });
-  let _ = (e, t, n, r) => {
-      ((h = { authMethod: e, userId: t, email: n, accountId: r }),
-        s.forEach((i) => {
-          i(e, t, n, r);
-        }),
-        p.forEach((i, a) => {
-          a.setSentryUser(e, t, n, r);
-        }),
-        m.forEach((i) => {
-          i.setSentryUser(e, t, n, r);
-        }));
-    },
-    v = (e) => c.requestFromHost(e),
-    y = async (e) => {
-      let t = new H9(`computer-use`, { startupConfig: n, applicationNetwork: r });
-      C(t);
-      let a = i.subscribe((e) => {
-          t.emitAppEvent(e);
-        }),
-        o = !1,
-        s = () => {
-          o || ((o = !0), a.dispose(), p.delete(t), t.dispose());
-        };
-      p.set(t, s);
-      try {
-        let n =
-          e.method === `start` && `requestId` in e.params && typeof e.params.requestId == `string`
-            ? e.params.requestId
-            : null;
-        t.startWorker();
-        let r = await t.requestFromHost(e);
-        return (
-          n != null &&
-            isWorkerStartResult(r) &&
-            b({ params: { requestId: n }, signal: e.signal }).catch(() => void 0),
-          r
-        );
-      } finally {
-        s();
-      }
-    },
-    b = (e) => w(e.params.requestId, e.signal),
-    x = (t) => {
-      (e.add(t),
-        s.push((e, n, r, i) => {
-          t.setSentryUser(e, n, r, i);
-        }),
-        e.add(
-          i.subscribe((e) => {
-            t.emitAppEvent(e);
-          }),
-        ));
-    },
-    S = (e, n) => {
-      (x(n),
-        l.ipcMain.handle(a.Yt(e), async (e, r) => {
-          t(e) && (await n.handleMessage(e.sender, r));
-        }));
-    };
-  return {
-    appEvent: i,
-    gitWorkerInvocationSampler: o,
-    flushAndDisposeGitWorker: () => c.flushAndDisposeWorker(),
-    setGitWorkerTracingSampleRate: (e) => {
-      c.setTracingSampleRate(e);
-    },
-    completeLocalGitTurn: (e) => {
-      c.emitGitTurnComplete(e, J);
-    },
-    requestComputerUseWorker: y,
-    requestComputerUseCaptureUpdate: b,
-    requestGitWorker: v,
-    requestOpenInWorker: (e) => u.requestFromHost(e),
-    subscribeComputerUseCaptureWorkerEvent: (e, t) => {
-      let n = (n) => {
-        isWorkerEventType(n, e) && t(n);
-      };
-      return (
-        f.add(n),
-        () => {
-          f.delete(n);
-        }
-      );
-    },
-    subscribeGitWorkerEvent: (e, t) =>
-      c.subscribeFromHost((n) => {
-        n.type === `worker-event` && isWorkerNotificationType(n.event, e) && t(n.event);
-      }),
-    updateWorkerSentryUser: _,
-    registerWorkerBusMessageHandlers: () => {
-      x(u);
-      for (let e of iee) {
-        if (e === `git`) {
-          S(e, c);
-          continue;
-        }
-        S(e, new H9(e, { startupConfig: n, applicationNetwork: r }));
-      }
-    },
-    setGitWorkerMainRpcTarget: (e) => {
-      c.setMainRpcTarget(e);
-    },
-    setComputerUseWorkerMainRpcHandler: (e) => {
-      ((g = e),
-        p.forEach((t, n) => {
-          n.setMainRpcHandler(e);
-        }),
-        m.forEach((t) => {
-          t.setMainRpcHandler(e);
-        }));
-    },
-  };
-  function C(e) {
-    (g != null && e.setMainRpcHandler(g),
-      h != null && e.setSentryUser(h.authMethod, h.userId, h.email, h.accountId));
-  }
-  async function w(e, t) {
-    if (m.has(e)) return;
-    let a = new H9(`computer-use`, { startupConfig: n, applicationNetwork: r });
-    (C(a), m.set(e, a));
-    let o = i.subscribe((e) => {
-        a.emitAppEvent(e);
-      }),
-      s = a.subscribeFromHost((t) => {
-        t.type === `worker-event` &&
-          (f.forEach((e) => {
-            e(t.event);
-          }),
-          t.event.type === `update` &&
-            t.event.requestId === e &&
-            ((t.event.update.type === `screenshot` &&
-              t.event.update.transitionSnapshotDataURL != null &&
-              t.event.update.transitionSnapshotDataURL.length > 0) ||
-              t.event.update.type === `completed` ||
-              t.event.update.type === `failed`) &&
-            d());
-      }),
-      c = a.subscribeWorkerExit(() => {
-        u || (p(`update_worker_exited`), d());
-      }),
-      l = () => {
-        d();
-      };
-    t?.addEventListener(`abort`, l, { once: !0 });
-    let u = !1,
-      d = () => {
-        u ||
-          ((u = !0),
-          s(),
-          c(),
-          t?.removeEventListener(`abort`, l),
-          o.dispose(),
-          m.delete(e),
-          a.dispose());
-      },
-      p = (t) => {
-        f.forEach((n) => {
-          n({ type: `update`, requestId: e, update: { type: `failed`, failureReason: t } });
-        });
-      };
-    a.startWorker();
-    try {
-      return await a.requestFromHost({
-        method: `watchUpdates`,
-        params: { requestId: e },
-        signal: t,
-      });
-    } catch (e) {
-      throw (u || (p(`update_watch_failed`), d()), e);
-    }
-  }
 }
 function Tst({ quitState: e, isAppQuitting: t, getAuthMethod: n, hasStartupPolicyChanges: i }) {
   return createWorkspacePolicyChecker({ isAppQuitting: t, getAuthMethod: n, hasStartupPolicyChanges: i, onRestartRequired: () => Est(e), onError: (error) => r.n().warning(`Failed to check workspace startup settings`, { safe: {}, sensitive: { error } }) });

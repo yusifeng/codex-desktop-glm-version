@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `xst` application worker runtime 迁入 `worker/worker-runtime.ts`；git/open-in 常驻 buses、IPC registration、
+app-event/Sentry fan-out、git sampling/turn completion，以及 computer-use one-shot worker 与 capture-update watcher 的独立
+subscription、abort、terminal update、exit/failure cleanup 均由新 owner 持有。真实 startup consumer 已接回，旧 body 删除。
+
 继续收紧 worker runtime wiring：`Sst/Cst/wst` 三个无状态 generated aliases 已删除，start-result、event-type 与
 notification-type consumers 直接使用 `worker-event-predicates.ts` 的语义 API，避免下一步 runtime 迁移携带重复 facade。
 

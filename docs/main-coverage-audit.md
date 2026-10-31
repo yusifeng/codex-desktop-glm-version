@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 application worker runtime
+
+原 `xst` 已迁入 `src/main/main-app/worker/worker-runtime.ts`。新 owner 保留 git/open-in 常驻 buses、trusted IPC
+registration、app-event/Sentry fan-out、git sampling/turn completion，以及 computer-use one-shot 与 capture-update watcher
+两套独立 lifecycle、abort、terminal update、worker-exit/failure cleanup；真实 startup consumer 已接回，旧 body 已删除。
+
 ## 2026-10-31 worker predicate wiring cleanup
 
 `Sst/Cst/wst` 三个仅转发的 generated aliases 已删除；worker runtime 直接使用
