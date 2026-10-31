@@ -23,6 +23,9 @@ const equal = (actual, expected) => {
   assertions += 1;
 };
 const calls = [];
+const messages = [];
+const warnings = [];
+const reports = [];
 let currentContext = null;
 const host = {
   navigateCurrentPageHistory: (...args) => calls.push(["history", ...args]),
@@ -35,21 +38,25 @@ const host = {
   ensureThreadStateForCommand: () => null,
   ensureThreadCommandContext: () => null,
   getBrowserSession: () => null,
+  windowManager: { sendMessageToWebContents: (...args) => messages.push(args) },
+  errorReporter: { reportNonFatal: (...args) => reports.push(args) },
+  logger: () => ({ warning: (...args) => warnings.push(args) }),
   windows: new Map(),
   browserPageHostLifecycle: { findPageStateForWebContentsId: () => null, attachedWebviewHosts: new Map() },
 };
 const deps = {
   a: { bn: (value) => value },
-  l: { clipboard: { writeText: (value) => calls.push(["copy", value]) }, BrowserWindow: { fromWebContents: () => null } },
+  l: { clipboard: { writeText: (value) => calls.push(["copy", value]), writeImage: (value) => calls.push(["image", value]) }, BrowserWindow: { fromWebContents: () => null } },
   n: { Yc: (value) => value, Zc: (value, delta) => value + delta, Xc: (value) => value / 100, lu: { NEW_TAB_PAGE: "new-tab" } },
   crypto: { randomUUID: () => "uuid" },
   hX: () => null, mU: () => "panel", pU: () => null, hU: () => "right", QU: () => "url",
-  ZZe: async () => undefined, sq: () => undefined,
+  sq: () => undefined,
   cq: () => undefined, lq: () => undefined, uq: () => undefined, fq: () => undefined,
-  sW: () => undefined, OZe: () => false, XZe: async () => undefined,
+  sW: () => undefined,
   GXe: () => false, iK: () => false, pX: () => ({}), DU: () => undefined, oX: (value) => value,
   PHe: async () => undefined, GU: async () => undefined,
   rW: (value) => value, WX: () => true, GX: () => "adoption-lease",
+  screenshotLogger: () => ({ warning: (...args) => warnings.push(args) }),
 };
 const Controller = createBrowserPageCommandControllerClass(deps);
 const controller = new Controller(host);
@@ -76,6 +83,7 @@ equal(controller.getExtensionActionMenuTarget("owner", "conversation", "tab"), {
 currentContext = null;
 host.getCurrentWindowState = () => null;
 equal(await controller.captureScreenshotToClipboard("owner", "conversation", "tab"), undefined);
+equal(messages.at(-1)[1].type, "browser-sidebar-screenshot-copy-failed");
 equal(controller.resetZoom("owner", "conversation", "tab"), undefined);
 equal(controller.stepZoom("owner", "conversation", 1, "tab"), undefined);
 equal(controller.setZoomPercent("owner", "conversation", 100, "tab"), undefined);
@@ -183,10 +191,37 @@ equal(captures, 1);
 equal(cropBounds, { x: 0, y: 0, width: 1200, height: 632 });
 equal(resizeOptions, { width: 304, height: 160, quality: "good" });
 
+let executedScript = "";
+const screenshotImage = { id: "screenshot" };
+const screenshotWebContents = {
+  isDestroyed: () => false,
+  capturePage: async () => screenshotImage,
+  executeJavaScript: async (script) => { executedScript = script; },
+};
+currentContext = { ...originalContext, page: { view: { webContents: screenshotWebContents } } };
+await controller.captureScreenshotToClipboard(owner, "conversation", "tab");
+equal(calls.at(-1), ["image", screenshotImage]);
+equal(messages.at(-1), [owner, {
+  type: "browser-sidebar-screenshot-copied",
+  conversationId: "conversation",
+  browserTabId: "tab",
+}]);
+controller.scroll(owner, "conversation", { type: "pages", count: 2 }, "tab");
+await Promise.resolve();
+equal(executedScript.includes('"type":"pages","count":2'), true);
+equal(executedScript.includes("window.innerHeight * scroll.count"), true);
+
+const captureFailure = new Error("capture failed");
+screenshotWebContents.capturePage = async () => { throw captureFailure; };
+await controller.captureScreenshotToClipboard(owner, "conversation", "tab");
+equal(warnings.at(-1)[0], "failed to capture browser sidebar screenshot");
+equal(reports.at(-1), [captureFailure, { kind: "browser-sidebar-screenshot" }]);
+equal(messages.at(-1)[1].type, "browser-sidebar-screenshot-copy-failed");
+
 const mainSource = await import("node:fs").then(({ readFileSync }) =>
   readFileSync(path.join(root, ".reference/originals/main/main-C-Mhak1n.ts"), "utf8"),
 );
-for (const oldOwner of ["function RZe(", "function zZe(", "function BZe(", "function HZe(", "function UZe(", "function WZe("]) {
+for (const oldOwner of ["function RZe(", "function zZe(", "function BZe(", "function HZe(", "function UZe(", "function WZe(", "function YZe(", "function XZe(", "function ZZe(", "function QZe("]) {
   equal(mainSource.includes(oldOwner), false);
 }
 

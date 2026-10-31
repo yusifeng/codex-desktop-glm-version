@@ -3216,3 +3216,9 @@ interaction controller 改用具名对象参数接线，IPC guarded event set �
 `browser-annotation-interaction-controller.ts` 已直接拥有 runtime annotation toggle 的 feature/page/blocklist/permission gate 与异步恢复；
 `browser-page-command-controller.ts` 已直接拥有 page-command admission/dispatch、navigate 后 identity revalidation、site-info anchor projection，
 以及 navigation-aware thumbnail capture/cache/crop/resize。主 chunk 旧 `LZe/RZe/zZe/BZe/HZe/UZe/WZe` 及 thumbnail 私有状态整带删除。
+
+### 增量内聚：permission prompt schema 与 screenshot/scroll runtime
+
+`browser-permission-prompt-registry.ts` 现直接拥有 scope/identity/strict response schemas 和 disposable subscription；组合根不再注入
+机械 parser/subscription。`browser-page-command-controller.ts` 现直接拥有 scroll script execution、screenshot capture、clipboard write、成功/失败
+消息与 non-fatal reporting。主 chunk 旧 `wZ/GZe/KZe/TZ/JZe/YZe/XZe/ZZe/QZe` 整带删除。

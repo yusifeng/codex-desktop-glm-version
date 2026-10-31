@@ -2,7 +2,7 @@
 
 /** Owns browser page command routing and host/page lifecycle orchestration. */
 export function createBrowserPageCommandControllerClass(dependencies: Record<string, any>) {
-  const { a, l, n, crypto, hX, mU, pU, hU, QU, ZZe, sq, cq, lq, uq, fq, sW, XZe, GXe, iK, pX, DU, oX, PHe, GU, rW, WX, GX } = dependencies;
+  const { a, l, n, crypto, hX, mU, pU, hU, QU, sq, cq, lq, uq, fq, sW, GXe, iK, pX, DU, oX, PHe, GU, rW, WX, GX, screenshotLogger } = dependencies;
   const thumbnailCaptures = new WeakMap();
   const thumbnailWidth = 608;
   const thumbnailHeight = 320;
@@ -125,6 +125,30 @@ export function createBrowserPageCommandControllerClass(dependencies: Record<str
       if (value == null && thumbnailCaptures.get(page) === capture) thumbnailCaptures.delete(page);
     });
     return result;
+  }
+
+  function scrollScript(scroll) {
+    return `(() => {
+    const scroll = ${JSON.stringify(scroll)};
+    const root = document.scrollingElement ?? document.documentElement;
+    switch (scroll.type) {
+      case "pixels":
+        window.scrollBy({ top: scroll.y, behavior: "auto" });
+        return;
+      case "pages":
+        window.scrollBy({
+          top: window.innerHeight * scroll.count,
+          behavior: "auto",
+        });
+        return;
+      case "edge":
+        root.scrollTo({
+          top: scroll.edge === "top" ? 0 : root.scrollHeight,
+          behavior: "auto",
+        });
+        return;
+    }
+  })();`;
   }
   return class BrowserPageCommandController {
     constructor(host: any) { this.host = host; }
@@ -328,7 +352,7 @@ export function createBrowserPageCommandControllerClass(dependencies: Record<str
     scroll(e, t, r, i) {
       let a = this.host.getPageState(e, t, i)?.view.webContents ?? null;
       a != null &&
-        ZZe(a, r).catch((e) => {
+        a.executeJavaScript(scrollScript(r)).catch((e) => {
           (this.host.logger().warning(`failed to scroll browser sidebar page`, {
             safe: { conversationId: t },
             sensitive: { error: e },
@@ -673,15 +697,39 @@ export function createBrowserPageCommandControllerClass(dependencies: Record<str
         d.view.webContents ?? this.host.syncThreadStateFromOrigin(l.owner, t, c));
     }
     async captureScreenshotToClipboard(e, t, n) {
-      this.host.getThreadState(e, t, n)?.isAnnotationModeEnabled !== !1 &&
-        (await XZe({
-          browserTabId: n,
+      if (this.host.getThreadState(e, t, n)?.isAnnotationModeEnabled === false) return;
+      const webContents = this.host.getPageState(e, t, n)?.view.webContents;
+      if (webContents == null || webContents.isDestroyed()) {
+        this.host.windowManager.sendMessageToWebContents(e, {
+          type: `browser-sidebar-screenshot-copy-failed`,
           conversationId: t,
-          errorReporter: this.host.errorReporter,
-          origin: e,
-          pageState: this.host.getPageState(e, t, n),
-          windowManager: this.host.windowManager,
-        }));
+          browserTabId: n,
+        });
+        return;
+      }
+      try {
+        const image = await webContents.capturePage();
+        l.clipboard.writeImage(image);
+        this.host.windowManager.sendMessageToWebContents(e, {
+          type: `browser-sidebar-screenshot-copied`,
+          conversationId: t,
+          browserTabId: n,
+        });
+      } catch (error) {
+        screenshotLogger().warning(`failed to capture browser sidebar screenshot`, {
+          safe: { conversationId: t },
+          sensitive: { error },
+        });
+        this.host.errorReporter.reportNonFatal(
+          error instanceof Error ? error : Error(String(error)),
+          { kind: `browser-sidebar-screenshot` },
+        );
+        this.host.windowManager.sendMessageToWebContents(e, {
+          type: `browser-sidebar-screenshot-copy-failed`,
+          conversationId: t,
+          browserTabId: n,
+        });
+      }
     }
     refreshCursor(e, t, n) {
       let r = this.host.getCurrentPageCommandContext(e, t, n);

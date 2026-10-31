@@ -5173,3 +5173,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   直接接管 command admission/dispatch、async navigate identity guard、site-info bounds 和 thumbnail capture/cache/crop/scale。
 - 主 chunk 旧 `LZe/RZe/zZe/BZe/HZe/UZe/WZe` 与 thumbnail cache globals 已删除。focused coverage 覆盖同步/异步 annotation
   permission、blocked site、wrong window、stale navigation、site-info coordinate projection、2x thumbnail crop/resize 与 cache hit。
+
+# 2026-11-01 permission prompt and screenshot/scroll convergence
+
+- permission prompt registry 直接接管 scope/identity/strict response validation 与 subscription disposal；主组合根只保留 createId/findPage
+  两个环境依赖。page command controller 直接接管 scroll JavaScript、screenshot capture、clipboard、结果消息、logger/error reporter 顺序。
+- 主 chunk 旧 `wZ/GZe/KZe/TZ/JZe/YZe/XZe/ZZe/QZe` 已删除。focused coverage 增加 strict union、invalid extra field、
+  screenshot unavailable/success/failure、clipboard、scroll projection 与 non-fatal report。

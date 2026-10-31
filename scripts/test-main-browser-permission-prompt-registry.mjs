@@ -44,29 +44,6 @@ function callbackStub(values, lifecycle) {
   return callback;
 }
 
-const scopeParser = {
-  safeParse(value) {
-    return typeof value?.browserTabId === "string" && typeof value?.conversationId === "string"
-      ? { success: true, data: value }
-      : { success: false };
-  },
-};
-const identityParser = {
-  safeParse(value) {
-    const scope = scopeParser.safeParse(value);
-    return scope.success && typeof value.id === "string" && Number.isInteger(value.mountGeneration)
-      ? { success: true, data: value }
-      : { success: false };
-  },
-};
-const responseParser = {
-  safeParse(value) {
-    return typeof value?.action === "string"
-      ? { success: true, data: value }
-      : { success: false };
-  },
-};
-
 const sourceOwner = webContents(1);
 const destinationOwner = webContents(2);
 const pageWebContents = webContents(3);
@@ -87,11 +64,7 @@ let currentEntry = { conversationId: "conversation-1", page, threadState, window
 let nextId = 1;
 const registry = new BrowserPermissionPromptRegistry({
   createId: () => `moved-${nextId++}`,
-  createSubscription: (dispose) => ({ [Symbol.dispose]: dispose }),
   findPage: (id) => id === pageWebContents.id ? currentEntry : null,
-  identityParser,
-  responseParser,
-  scopeParser,
 });
 
 let dismissed = 0;
@@ -147,6 +120,8 @@ const identity = {
 };
 assert.equal(registry.respond(sourceOwner, { ...identity, mountGeneration: 0 }, { action: "allow" }), false);
 assert.equal(registry.respond(sourceOwner, identity, { action: "block" }), false);
+assert.equal(registry.respond(sourceOwner, identity, { action: "allow", extra: true }), false);
+assert.equal(registry.respond(sourceOwner, identity, { action: "dismiss", geolocationAccuracy: "approximate" }), false);
 assert.equal(
   registry.respond(sourceOwner, identity, { action: "allow", geolocationAccuracy: "precise" }),
   false,
@@ -205,4 +180,4 @@ const invalidSubscription = registry.subscribe(
 invalidSubscription[Symbol.dispose]();
 assert.equal(invalidLifecycle.duplicates, 0);
 
-console.log("25 main browser-permission-prompt-registry assertions passed");
+console.log("27 main browser-permission-prompt-registry assertions passed");

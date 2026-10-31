@@ -1,8 +1,4 @@
-type ParseResult<T> = { success: true; data: T } | { success: false };
-
-type Parser<T> = {
-  safeParse(value: unknown): ParseResult<T>;
-};
+import { z } from "zod";
 
 type DisposableSubscription = {
   [Symbol.dispose](): void;
@@ -105,12 +101,40 @@ type PendingPrompt = {
 
 export type BrowserPermissionPromptRegistryOptions = {
   createId(): string;
-  createSubscription(dispose: () => void): DisposableSubscription;
   findPage(webContentsId: number): PageEntry | null | undefined;
-  identityParser: Parser<PermissionPromptIdentity>;
-  responseParser: Parser<PermissionResponse>;
-  scopeParser: Parser<PermissionPromptScope>;
 };
+
+export const permissionPromptScopeSchema = z.object({
+  browserTabId: z.string(),
+  conversationId: z.string(),
+});
+
+export const permissionPromptIdentitySchema = permissionPromptScopeSchema.extend({
+  id: z.string(),
+  mountGeneration: z.number().int().nonnegative(),
+});
+
+export const permissionPromptResponseSchema = z.union([
+  z
+    .object({
+      action: z.enum(["allow", "allow-this-time"]),
+      geolocationAccuracy: z.enum(["approximate", "precise"]).optional(),
+    })
+    .strict(),
+  z.object({ action: z.enum(["deny", "dismiss"]) }).strict(),
+]);
+
+class PermissionPromptSubscription implements DisposableSubscription {
+  private readonly disposeSubscription: () => void;
+
+  constructor(disposeSubscription: () => void) {
+    this.disposeSubscription = disposeSubscription;
+  }
+
+  [Symbol.dispose](): void {
+    this.disposeSubscription();
+  }
+}
 
 /** Owns browser permission prompt identity, presentation, response, and subscription lifetime. */
 export class BrowserPermissionPromptRegistry {
@@ -217,15 +241,16 @@ export class BrowserPermissionPromptRegistry {
     scopeValue: unknown,
     callback: RpcCallback<PermissionPromptSnapshot[]>,
   ): DisposableSubscription {
-    const scope = this.options.scopeParser.safeParse(scopeValue);
-    if (!scope.success) return this.options.createSubscription(() => {});
+    const scope = permissionPromptScopeSchema.safeParse(scopeValue);
+    if (!scope.success) return new PermissionPromptSubscription(() => {});
+    const parsedScope = scope.data as PermissionPromptScope;
 
     const listener = callback.dup();
     let active = true;
     let previous: PermissionPromptSnapshot[] | undefined;
     const publish = () => {
       const snapshots = [...this.pending.values()]
-        .filter((pending) => this.matches(pending, owner, scope.data))
+        .filter((pending) => this.matches(pending, owner, parsedScope))
         .map(({ snapshot }) => snapshot);
       if (
         previous?.length !== snapshots.length ||
@@ -248,23 +273,24 @@ export class BrowserPermissionPromptRegistry {
     listener.onRpcBroken(cleanup);
     if (owner.isDestroyed()) cleanup();
     else publish();
-    return this.options.createSubscription(cleanup);
+    return new PermissionPromptSubscription(cleanup);
   }
 
   respond(owner: WebContentsLike, identityValue: unknown, responseValue: unknown): unknown {
     const pending = this.getCurrent(owner, identityValue);
-    const response = this.options.responseParser.safeParse(responseValue);
+    const response = permissionPromptResponseSchema.safeParse(responseValue);
     if (pending == null || !response.success) return false;
 
     const { prompt } = pending;
-    if (!prompt.availableActions.includes(response.data.action)) return false;
+    const parsedResponse = response.data as PermissionResponse;
+    if (!prompt.availableActions.includes(parsedResponse.action)) return false;
     if (
-      response.data.geolocationAccuracy != null &&
-      !prompt.geolocation?.availableAccuracies.includes(response.data.geolocationAccuracy)
+      parsedResponse.geolocationAccuracy != null &&
+      !prompt.geolocation?.availableAccuracies.includes(parsedResponse.geolocationAccuracy)
     ) {
       return false;
     }
-    return prompt.respond(response.data);
+    return prompt.respond(parsedResponse);
   }
 
   openSystemSettings(owner: WebContentsLike, identityValue: unknown): unknown {
@@ -273,14 +299,15 @@ export class BrowserPermissionPromptRegistry {
   }
 
   private getCurrent(owner: WebContentsLike, identityValue: unknown): PendingPrompt | null {
-    const identity = this.options.identityParser.safeParse(identityValue);
+    const identity = permissionPromptIdentitySchema.safeParse(identityValue);
     if (!identity.success) return null;
-    const pending = this.pending.get(identity.data.id);
+    const parsedIdentity = identity.data as PermissionPromptIdentity;
+    const pending = this.pending.get(parsedIdentity.id);
     if (
       pending == null ||
       pending.prompt.closed ||
-      identity.data.mountGeneration !== pending.snapshot.mountGeneration ||
-      !this.matches(pending, owner, identity.data)
+      parsedIdentity.mountGeneration !== pending.snapshot.mountGeneration ||
+      !this.matches(pending, owner, parsedIdentity)
     ) {
       return null;
     }
@@ -321,4 +348,10 @@ export class BrowserPermissionPromptRegistry {
   }
 }
 
-if (typeof module !== "undefined") module.exports = { BrowserPermissionPromptRegistry };
+if (typeof module !== "undefined")
+  module.exports = {
+    BrowserPermissionPromptRegistry,
+    permissionPromptScopeSchema,
+    permissionPromptIdentitySchema,
+    permissionPromptResponseSchema,
+  };

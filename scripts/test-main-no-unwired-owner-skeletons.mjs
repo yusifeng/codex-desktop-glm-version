@@ -198,6 +198,7 @@ for (const oldOwner of ["function wZe(", "function TZe(", "function EZe(", "func
 for (const oldOwner of ["function OZe(", "function kZe("]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser command/runtime helper must be removed`);
 for (const oldOwner of ["function QHe(", "function yZ(", "function MZe(", "function FZe(", "function IZe("]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated site page-event runtime owner must be removed`);
 for (const oldOwner of ["function LZe(", "function RZe(", "function zZe(", "function BZe(", "function HZe(", "function UZe(", "function WZe("]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser command policy owner must be removed`);
+for (const oldOwner of ["function YZe(", "function XZe(", "function ZZe(", "function QZe(", "TZ = class"]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated screenshot/permission helper must be removed`);
 for (const oldOwner of ["function cXe(", "function bX(", "async function lXe(", "function uXe(", "function xX(", "function SX(", "function dXe(", "function fXe(", "function CX(", "function wX(", "function TX(", "function EX(", "function pXe(", "function DX(", "function mXe(", "function hXe(", "function OX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated Browser Use route adapter must be removed`);
 }

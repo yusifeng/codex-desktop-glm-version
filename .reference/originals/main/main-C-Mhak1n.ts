@@ -43882,96 +43882,6 @@ var { dispatchPageEvent: dispatchSitePageEvent } = createSitePageEventRuntime({
   applyWebMcpTools: qX,
   normalizeWindowId: oX,
 });
-var wZ = n.wf({ browserTabId: n.Of(), conversationId: n.Of() }),
-  GZe = wZ.extend({ id: n.Of(), mountGeneration: n.Cf().int().nonnegative() }),
-  KZe = n.jf([
-    n
-      .wf({
-        action: n.df([`allow`, `allow-this-time`]),
-        geolocationAccuracy: n.df([`approximate`, `precise`]).optional(),
-      })
-      .strict(),
-    n.wf({ action: n.df([`deny`, `dismiss`]) }).strict(),
-  ]),
-  TZ = class extends n.Uf {
-    disposeSubscription;
-    constructor(e) {
-      (super(), (this.disposeSubscription = e));
-    }
-    [Symbol.dispose]() {
-      this.disposeSubscription();
-    }
-  },
-  JZe = r.i(`browser-sidebar-screenshot`);
-async function YZe(e) {
-  let t = await e.capturePage();
-  l.clipboard.writeImage(t);
-}
-async function XZe({
-  browserTabId: e,
-  conversationId: t,
-  errorReporter: n,
-  origin: r,
-  pageState: i,
-  windowManager: a,
-}) {
-  let o = i?.view.webContents;
-  if (o == null || o.isDestroyed()) {
-    a.sendMessageToWebContents(r, {
-      type: `browser-sidebar-screenshot-copy-failed`,
-      conversationId: t,
-      browserTabId: e,
-    });
-    return;
-  }
-  try {
-    (await YZe(o),
-      a.sendMessageToWebContents(r, {
-        type: `browser-sidebar-screenshot-copied`,
-        conversationId: t,
-        browserTabId: e,
-      }));
-  } catch (i) {
-    (JZe().warning(`failed to capture browser sidebar screenshot`, {
-      safe: { conversationId: t },
-      sensitive: { error: i },
-    }),
-      n.reportNonFatal(i instanceof Error ? i : Error(String(i)), {
-        kind: `browser-sidebar-screenshot`,
-      }),
-      a.sendMessageToWebContents(r, {
-        type: `browser-sidebar-screenshot-copy-failed`,
-        conversationId: t,
-        browserTabId: e,
-      }));
-  }
-}
-async function ZZe(e, t) {
-  await e.executeJavaScript(QZe(t));
-}
-function QZe(e) {
-  return `(() => {
-    const scroll = ${JSON.stringify(e)};
-    const root = document.scrollingElement ?? document.documentElement;
-    switch (scroll.type) {
-      case "pixels":
-        window.scrollBy({ top: scroll.y, behavior: "auto" });
-        return;
-      case "pages":
-        window.scrollBy({
-          top: window.innerHeight * scroll.count,
-          behavior: "auto",
-        });
-        return;
-      case "edge":
-        root.scrollTo({
-          top: scroll.edge === "top" ? 0 : root.scrollHeight,
-          behavior: "auto",
-        });
-        return;
-    }
-  })();`;
-}
 var $Ze = createSiteAnnotationFeatureControllerClass({
     pageEventSchema: siteAnnotationFeaturesChangedSchema,
     normalizeSiteHostname,
@@ -44018,11 +43928,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
     browserSessionService;
     permissionPrompts = new BrowserPermissionPromptRegistry({
       createId: () => crypto.randomUUID(),
-      createSubscription: (e) => new TZ(e),
       findPage: (e) => this.browserPageHostLifecycle.findPageStateForWebContentsId(e),
-      identityParser: GZe,
-      responseParser: KZe,
-      scopeParser: wZ,
     });
     siteBootstrapController = new AbortController();
     getSiteBootstrapToken;
@@ -44066,7 +43972,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
         (this.commentModeBlocklistLookup = i),
         (this.browserSessionRegistry = a),
         (this.defaultBrowserUseViewportSize = o),
-        (this.pageCommandController = new (createBrowserPageCommandControllerClass({ a, l, n, crypto, hX, mU, pU, hU, QU, ZZe, sq, cq, lq, uq, fq, sW, XZe, GXe, iK, pX, DU, oX, PHe, GU, rW, WX, GX }))(this)),
+        (this.pageCommandController = new (createBrowserPageCommandControllerClass({ a, l, n, crypto, hX, mU, pU, hU, QU, sq, cq, lq, uq, fq, sW, GXe, iK, pX, DU, oX, PHe, GU, rW, WX, GX, screenshotLogger: r.i(`browser-sidebar-screenshot`) }))(this)),
         (this.browserUseRouteController = new (createBrowserUseRouteControllerClass({ hX, n, qU, oX, QU, iW, wU, aW, mX, lW, OX, dZ, WU, fq, gX, logger: r.i(`browser-sidebar-manager`) }))(this)),
         (this.commentModeController = new (createBrowserCommentModeControllerClass({ EU, cW, yVe, tq, n }))(this)),
         (this.annotationInteractionController = new (createBrowserAnnotationInteractionControllerClass({ hX, EU, dispatchPageEvent: dispatchSitePageEvent, n, SU, mVe, gVe }))(this)),
