@@ -123,6 +123,10 @@ const applicationMenuBuilder = fs.readFileSync(
   new URL("src/main/main-app/app-shell/app-menu.ts", root),
   "utf8",
 );
+const browserWindowThreadStateController = fs.readFileSync(
+  new URL("src/main/main-app/browser-sidebar/browser-window-thread-state-controller.ts", root),
+  "utf8",
+);
 assert.equal(inboxOwner.includes("export class InboxItemsFacade"), true, "InboxItemsFacade must remain a real owner");
 assert.equal(main.includes("new InboxItemsFacade({"), true, "InboxItemsFacade must remain wired");
 assert.equal(main.includes("PBe = createElectronFetchHandlerClass({"), true, "real Electron fetch owner is wired");
@@ -214,6 +218,11 @@ for (const oldOwner of ["function A1e(", "P1e = class", "async function F1e(", "
 for (const oldOwner of ["BWe = class", "function VWe(", "UWe = class"]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser session/open-request owner must be removed`);
 for (const oldOwner of ["function CWe(", "function wWe(", "function zG(", "function TWe(", "function EWe(", "function DWe(", "function BG(", "function OWe(", "function VG(", "function kWe(", "function AWe(", "function HG(", "function jWe(", "function UG(", "function MWe(", "function WG("]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser settings webview owner must be removed`);
 for (const oldOwner of ["function GG(", "function KG(", "function qG(", "function NWe(", "function PWe(", "function FWe(", "function IWe("]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated webview adoption owner must be removed`);
+assert.equal(browserWindowThreadStateController.includes("owner,"), true, "webview lifecycle must receive its owner");
+assert.equal(browserWindowThreadStateController.includes("preloadPath: EZ"), true, "webview lifecycle must receive the browser preload");
+assert.equal(browserWindowThreadStateController.includes("registerWindowShutdown("), true, "new browser windows must register shutdown persistence");
+assert.equal(browserWindowThreadStateController.includes("disposeWindowState(windowId"), true, "browser window lifecycle must retain disposal");
+assert.equal(main.includes("disposeWindowState(...args)"), true, "browser host must expose window disposal");
 for (const oldOwner of ["function cXe(", "function bX(", "async function lXe(", "function uXe(", "function xX(", "function SX(", "function dXe(", "function fXe(", "function CX(", "function wX(", "function TX(", "function EX(", "function pXe(", "function DX(", "function mXe(", "function hXe(", "function OX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated Browser Use route adapter must be removed`);
 }

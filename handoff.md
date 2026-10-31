@@ -5220,3 +5220,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   back/forward/reload 顺序和 page/webContents identity/destroyed guards 保持原语义。
 - 主 chunk 旧 `GG/KG/qG/NWe/PWe/FWe/IWe` 与 adopted-id 常量已删除，will/did-attach 两条真实路径直接消费语义模块；focused suite
   执行 66 项断言。下一批审计仍在组合根的 `SWe` owner event lifecycle，若依赖边界可保持则整段迁移，不拆散 listener teardown。
+
+# 2026-11-01 browser window lifecycle wiring repair
+
+- 对照初始恢复 commit `0c3e9e7c` 发现早先迁出 `browser-window-thread-state-controller.ts` 时丢失真实逻辑：`SWe` 调用少传
+  `owner/prepareWebviewAttach/preloadPath/recordDebugEvent/state/windowId`，新窗口也未 register session/shutdown hook，`disposeWindowState`
+  整个 owner 与主 host wrapper 均遗漏。该缺口会让真实 will-attach 读取 undefined，并让窗口关闭清理失效。
+- 已恢复原参数和副作用顺序：window map→session register→shutdown hook；关闭时 persist→mark closing→reject waits→逐 thread dispose→
+  listener/map/budget/session cleanup。focused suite 强化至 39 项并实际执行 onClosing/onClosed；no-unwired gate 增加五项结构防回归。

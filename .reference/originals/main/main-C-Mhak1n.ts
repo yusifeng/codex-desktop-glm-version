@@ -43385,7 +43385,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
 (this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, Xe, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, Se, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ, WXe, RX }))(this)),
         (this.hostPolicyController = new (createBrowserHostPolicyControllerClass({ DXe, OXe, kXe, mq, VG, Yc, Xc, DZ, hX }))(this)),
         (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
-        (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, SWe, aXe, gX, qU, oXe, vX, tq, KU, l, logger: r.i(`browser-sidebar-manager`) }))(this)),
+        (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, SWe, aXe, gX, qU, oXe, vX, tq, KU, l, EZ, logger: r.i(`browser-sidebar-manager`) }))(this)),
         (this.getSiteBootstrapToken = s.getSiteBootstrapToken),
         (this.getCommandKeymapState = s.getCommandKeymapState ?? n.Ct),
         (this.ownerCommandAccelerators = mq(this.getCommandKeymapState())),
@@ -43721,6 +43721,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
     getThreadState(...args) { return this.windowThreadStateController.getThreadState(...args); }
     ensureThreadStateForWindow(...args) { return this.windowThreadStateController.ensureThreadStateForWindow(...args); }
     disposeThreadState(...args) { return this.windowThreadStateController.disposeThreadState(...args); }
+    disposeWindowState(...args) { return this.windowThreadStateController.disposeWindowState(...args); }
     findPageStateForPageKey(...args) { return this.windowThreadStateController.findPageStateForPageKey(...args); }
     findPageStateForRuntimeSender(...args) { return this.windowThreadStateController.findPageStateForRuntimeSender(...args); }
     getThreadStateForWindow(...args) { return this.windowThreadStateController.getThreadStateForWindow(...args); }

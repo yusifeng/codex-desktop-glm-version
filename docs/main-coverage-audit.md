@@ -3257,3 +3257,10 @@ network restriction 均通过工厂返回的唯一实现消费；主 chunk 旧 `
 route consume 和 accepted-host attach transaction。transaction 保持 history clone error-pages 转移、attach、stopTracking 和 back/forward/reload
 的副作用顺序，仅在 semantic page 仍指向同一未销毁 WebContents 时 replay。`SWe` 的 will/did-attach consumer 已直接改接；主 chunk 旧
 `GG/KG/qG/NWe/PWe/FWe/IWe` 与重复常量删除，66 条 focused 断言覆盖所有 history 动作、缺失 identity、销毁与 mismatch 分支。
+
+### 增量修复：browser window lifecycle 迁移缺口
+
+以初始恢复 commit 为权威证据复核 `browser-window-thread-state-controller.ts`，确认早期迁移漏掉 `SWe` 的六项必需参数、新窗口
+session registry/shutdown persistence 注册、完整 `disposeWindowState` 及主 host wrapper。现已恢复原装配与关闭顺序：persist（仅首次）、
+closing 标记、pending open rejection、thread/page disposal、listener teardown、window map/tab budget/last-synced/session registry cleanup。
+focused test 实际触发 shutdown callbacks 并核对参数/state identity，防空壳审计锁定五项运行接线。
