@@ -1,5 +1,13 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 realtime voice host coordinator
+
+原 `I8e/L8e/R8e/F2` 已整簇迁入 `src/main/main-app/realtime/voice-host-coordinator.ts`。新 owner 保留
+static `{rpc, dispose}` contract、single renderer claim、snapshot publication、microphone/output intent queues、native
+microphone companion、dictation/real-delegation forwarding、screen capture race gates、transfer handoff、orphan stop、
+host-disconnect terminate、release/restart blockers 与 subscriber RPC cleanup；唯一 runtime consumer 已接回，旧实现
+已物理删除。
+
 ## 2026-10-31 app-server realtime event bridge
 
 原 `F8e`、`E8e/D8e/.../P8e` notification schemas 与 `O8e/k8e/T2/j2/M2/N2/P2` projection/key helpers

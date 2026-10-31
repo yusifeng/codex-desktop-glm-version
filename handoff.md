@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `I8e/L8e/R8e/F2` realtime voice host coordinator cluster 迁入
+`realtime/voice-host-coordinator.ts`；renderer claim/publish/control、mute intent queue/ack、native microphone mute、
+dictation/delegation、screen capture、transfer/cancel、orphan/terminate/release、restart blockers 与 subscriber cleanup
+均由新 owner 持有。`L8e.create` 唯一 consumer 已接回，旧 483 行 cluster 已删除。focused test 覆盖 40 项。
+
 随后将 `F8e` app-server realtime event bridge、notification/multi-agent schemas 与独占 projection/key helpers
 整簇迁入 `realtime/app-server-event-bridge.ts`；connection registry lifecycle、session/turn/item/transcript/handoff、
 transport loss、agent-message presentations、created-thread/subagent/delegation 与 multi-agent activity projection
