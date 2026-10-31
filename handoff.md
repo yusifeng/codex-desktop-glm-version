@@ -4779,3 +4779,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   recheck、localized dialog、logout retry、quit approval 与 cleanup；`observeRequirements` consumer 已真实接回。
 - main 旧 `trt/K5/q5/nrt/rrt/irt` 删除 147 行，新生产模块合计 224 行；focused coverage 合计 95 项，no-unwired
   gate 扩至 245 项。紧随其后的 `art` 是大型 app composition root，暂不强拆；下一批从其后继续寻找独立 owner。
+
+# 2026-11-01 complete application-menu builder
+
+- `src/main/main-app/app-shell/app-menu.ts` 已从未接线的五段空菜单 skeleton 替换为完整 application-menu owner，接管
+  command/keymap availability、accelerator collision、app-shell/browser routing、五段跨平台菜单、macOS app menu、updater、
+  trace/debug/zoom/deep-link/about/help actions、MenuItem insertion 与最终 publish，并暴露显式 dependency/options 类型面。
+- main 旧 `g7/iit/_7/ait/oit/sit` cluster 删除 1,225 行，新生产模块现为 1,286 行；`_it` 的
+  `ApplicationMenuManager` 继续真实消费 factory output。focused builder coverage 40 项、support runtime 19 项，
+  no-unwired gate 扩至 252 项。下一批继续审计 menu 后的 deep-link/window-service/startup composition 周边，组合根本身不强拆。

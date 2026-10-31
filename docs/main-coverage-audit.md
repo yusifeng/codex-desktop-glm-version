@@ -996,7 +996,8 @@ local-conversation deep-link consumer 已接回，旧 function 已删除。
 
 原 `v7/cit` 已迁入 `src/main/main-app/app-shell/application-menu-runtime.ts`。新模块保留跨平台 Electron accelerator
 alias 规范化、排序与 collision/exclusion comparison，以及 focus/locale/browser-state/feature consumers 共用的 refresh manager；
-真实 `sit/_it` consumers 已接回，旧 function/class 已删除。不完整的 `app-menu.ts` 骨架仍明确保持未接入。
+真实 `_it` refresh consumer 已接回，旧 function/class 已删除；完整 `sit` builder 后续已迁入
+`src/main/main-app/app-shell/app-menu.ts`，不再保留原先未接线的五段空菜单 skeleton。
 
 ## 2026-10-31 quit and bounded-cleanup runtime
 
@@ -2785,3 +2786,15 @@ classification、single-flight sequencing、active recheck、localized retry dia
 logging 已迁移至 `src/main/main-app/app-server/requirements-auth-recovery.ts`，`applicationNetwork.observeRequirements`
 继续真实消费 factory output。旧 `trt/K5/q5/nrt/rrt/irt` cluster 已物理删除。focused tests 合计 95 项，覆盖所有
 transport branches、handshake/CA failure、dialog/logout/quit races、legacy errors、single-flight cleanup 和 consumer wiring。
+
+### 增量抽取：完整 application-menu builder
+
+原约 1,000 行 `sit` 菜单 owner 连同 command label map、基础 Edit/Window role menus、home/settings/about constants 已整体
+迁移至 `src/main/main-app/app-shell/app-menu.ts`，替换原先只返回五个空 section 的未接线 skeleton。新 factory 提供显式
+`ApplicationMenuBuilderDependencies/ApplicationMenuOptions` 类型面，保留 command/keymap availability、accelerator collision、
+app-shell/browser focus routing、File/Edit/View/Window/Help/macOS app menu、updater、trace、debug、zoom、deep-link clipboard、
+Sparkle logging、MenuItem insertion 和最终 `Menu.setApplicationMenu`/trace-state publish 顺序。main 通过
+`createApplicationMenuBuilder` 生成原 `sit`，既有 `_it → ApplicationMenuManager` 唯一 consumer 真实调用该 output；旧
+`g7/iit/_7/ait/oit/sit` 与 about constants 已物理删除。focused integration test
+`scripts/test-main-application-menu-builder.mjs` 覆盖 40 项完整 build、section/role、command routing、reserved accelerator、
+project/about/help/trace/update/macOS insertion、unavailable updater 和真实 wiring 行为；support runtime 相邻 19 项通过。

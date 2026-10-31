@@ -35,9 +35,14 @@ const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
 );
+const menuBuilder = fs.readFileSync(
+  new URL("../src/main/main-app/app-shell/app-menu.ts", import.meta.url),
+  "utf8",
+);
 equal(main.includes("ApplicationMenuManager, normalizeMenuAccelerator"), true);
 equal(main.includes("new ApplicationMenuManager(() =>"), true);
-equal(main.includes("normalizeMenuAccelerator(we.accelerator, r)"), true);
+equal(main.includes("normalizeMenuAccelerator,"), true);
+equal(menuBuilder.includes("normalizeMenuAccelerator(we.accelerator, r)"), true);
 equal(main.includes("function v7("), false);
 equal(main.includes("var cit = class"), false);
 

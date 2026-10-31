@@ -35,6 +35,7 @@ const realOwners = [
   ["src/main/main-app/thread-catalog/sources.ts", "createThreadCatalogSources"],
   ["src/main/main-app/app-server/transport-factory.ts", "createAppServerTransportFactory"],
   ["src/main/main-app/app-server/requirements-auth-recovery.ts", "createRequirementsAuthRecoveryRuntime"],
+  ["src/main/main-app/app-shell/app-menu.ts", "createApplicationMenuBuilder"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -62,6 +63,10 @@ const main = fs.readFileSync(
 );
 const inboxOwner = fs.readFileSync(
   new URL("src/main/main-app/automations/inbox-items.ts", root),
+  "utf8",
+);
+const applicationMenuBuilder = fs.readFileSync(
+  new URL("src/main/main-app/app-shell/app-menu.ts", root),
   "utf8",
 );
 assert.equal(inboxOwner.includes("export class InboxItemsFacade"), true, "InboxItemsFacade must remain a real owner");
@@ -237,6 +242,11 @@ assert.equal(main.includes("var rrt = createRequirementsAuthRecoveryRuntime({"),
 assert.equal(main.includes("function rrt("), false, "generated requirements recovery factory must be removed");
 assert.equal(main.includes("async function irt("), false, "generated requirements recovery loop must be removed");
 assert.equal(main.includes("desktop.requirementsAuthRecovery.title"), false, "generated recovery message table must be removed");
+assert.equal(main.includes("var sit = createApplicationMenuBuilder({"), true, "real application-menu builder is wired");
+assert.equal(main.includes("function sit("), false, "generated application-menu builder must be removed");
+assert.equal(main.includes("function iit("), false, "generated application role-menu builder must be removed");
+assert.equal(main.includes("var g7 ="), false, "generated application-menu label map must be removed");
+assert.equal(applicationMenuBuilder.includes("return [section(\"file-menu\")"), false, "application-menu skeleton must be replaced");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("245 main unwired-owner skeleton assertions passed");
+console.log("252 main unwired-owner skeleton assertions passed");
