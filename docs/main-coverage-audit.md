@@ -1,5 +1,13 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 canonical history and history request runtime consolidation
+
+主 chunk 的 canonical island/entity 访问、tail history 构建、boundary topology/gap、conversation turn 应用与定位，以及 items/turns/timeline
+分页、durable host 全量装载、resume snapshot merge/reconcile 已统一改接 `turns/canonical-history.ts` 与 `turns/history-requests.ts`。
+原 `Eg…Gge` 连续区约 1,312 行物理删除，外部仍用的 `Eg/Og/kg/Ag/Ng/Pg/p_/m_/Ug/w_/j_/Hge/N_/P_/Gge`
+运行时符号均直接绑定命名导出；71 条 focused 断言覆盖 topology、boundary、canonical/legacy 访问、分页游标、timeline 保留和 resume 对账，
+124 条 cleanup 断言锁定旧定义缺席。
+
 ## 2026-11-01 turn/item merge owner consolidation
 
 主 chunk 的 item id/text 对齐、snapshot/prepend 锚点插入、memoryCitation 保留、turn id 分段插入、resume pagination reconnect、终态保护、

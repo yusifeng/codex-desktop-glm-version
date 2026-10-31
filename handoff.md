@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+大批接回 canonical history 与 history request 运行链：history islands/entities、tail 构建、gap/boundary、turn 定位与应用，以及 items/turns/timeline
+分页、resume merge/reconcile、durable host 装载，现统一由 `turns/canonical-history.ts` 和 `turns/history-requests.ts` 服务主 chunk consumer。
+旧 `Eg…Gge` 连续区约 1,312 行整体删除；新增 71 条行为/接线断言，conversation subowner cleanup 扩至 124 条，并复跑 canonical append、
+history policy、notification、interrupt 与 app-initial canonical history 回归。
+
 继续收拢 turn/item 合并核心：主 chunk 的 `bg/xg/Cg/xge/wg/Sge/Cge/Tg/wge` 已全部改接
 `turns/item-merge.ts`，真实覆盖历史恢复、分页 snapshot、canonical/legacy 合并和 automation turn 判定 consumer；旧实现约 246 行整体删除。
 新增 39 条 focused 行为/接线断言，并将 conversation subowner cleanup 扩至 107 条，锁定旧定义不再回流。

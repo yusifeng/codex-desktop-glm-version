@@ -232,6 +232,8 @@ for (const ownerPath of [
   "threads/reference-capability.js",
   "turns/steering-merge.js",
   "turns/item-merge.js",
+  "turns/canonical-history.js",
+  "turns/history-requests.js",
 ]) equal(main.includes(`require("./main-app/${ownerPath}")`), true);
 for (const oldDefinition of [
   "function um(",
@@ -258,6 +260,21 @@ for (const oldDefinition of [
   "function Cge(",
   "function Tg(",
   "function wge(",
+  "function Eg(",
+  "function Og(",
+  "function kg(",
+  "function Ag(",
+  "function Ng(",
+  "function Pg(",
+  "function Ug(",
+  "function p_(",
+  "function m_(",
+  "async function w_(",
+  "async function j_(",
+  "function Hge(",
+  "async function N_(",
+  "async function P_(",
+  "function Gge(",
 ]) equal(main.includes(oldDefinition), false);
 
 const referenceSource = fs.readFileSync(
