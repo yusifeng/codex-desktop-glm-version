@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Fnt` tracing RPC service 迁入 `tracing/tracing-rpc-service.ts`；trace batch export、sample-rate finite/clamp、
+desktop/git-worker/persistence 三路同步，以及 recording confirm/cancel/keep-local/submit routing 均由新 adapter 持有。
+唯一 runtime consumer 已接回，旧 class 已删除。focused test 覆盖 18 项。
+
 随后将 `Nnt/Pnt/z5/B5` thread turn-summary service 迁入 `threads/thread-turn-summary-service.ts`；principal/host-key
 authorization、identity hash、normalized/compact summaries、revision tombstones、delete sequencing、renderer subscriptions、
 host/principal invalidation 与 dispose cleanup 均由新 owner 持有。唯一 runtime construction 已接回，旧 cluster 已删除。

@@ -116,6 +116,7 @@ const { createThreadCatalogPageSlotSchedulerClass } = require("./main-app/thread
 const { createThreadMetadataGenerationServiceClass } = require("./main-app/threads/thread-metadata-generation-service.js");
 const { createThreadReadStateRpcServices } = require("./main-app/thread-read-state/rpc-services.js");
 const { createThreadTurnSummaryServiceClass } = require("./main-app/threads/thread-turn-summary-service.js");
+const { createTracingRpcServiceClass } = require("./main-app/tracing/tracing-rpc-service.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -140560,29 +140561,15 @@ var { ThreadReadStateService: jnt, ThreadReadStateSession: Mnt } =
     createHash: _.createHash,
     createUsingScope: a.en,
   });
-var Fnt = class extends n.Uf {
-    setGitWorkerTracingSampleRate;
-    saveDesktopTraceSampleRate;
-    constructor(e, t) {
-      (super(), (this.setGitWorkerTracingSampleRate = e), (this.saveDesktopTraceSampleRate = t));
-    }
-    async exportTraceBatch(e) {
-      await a.S(e);
-    }
-    async setSampleRate(e) {
-      let t = Number.isFinite(e) ? Math.min(1, Math.max(0, e)) : 0;
-      (a.E(t), this.setGitWorkerTracingSampleRate(t), this.saveDesktopTraceSampleRate(t));
-    }
-    async confirmTraceRecordingStart() {
-      return DQe();
-    }
-    async cancelTraceRecordingStart() {
-      return OQe();
-    }
-    async submitTraceRecordingDetails(e) {
-      return e.keepLocal ? jQe() : AQe({ note: e.note, conversationId: e.conversationId });
-    }
-  },
+var Fnt = createTracingRpcServiceClass({
+    RpcHandlerBase: n.Uf,
+    exportTraceBatch: a.S,
+    setDesktopTracingSampleRate: a.E,
+    confirmTraceRecordingStart: DQe,
+    cancelTraceRecordingStart: OQe,
+    keepTraceRecordingLocal: jQe,
+    submitTraceRecording: AQe,
+  }),
   Int = n.wf({
     subscriptions: n.hf(
       n.wf({

@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 tracing RPC service
+
+原 `Fnt` 已迁入 `src/main/main-app/tracing/tracing-rpc-service.ts`。新 adapter 保留 trace batch export、non-finite/
+range sample-rate normalization、desktop runtime/git worker/global-state 三路更新顺序，以及 trace recording confirm、
+cancel、keep-local 与 upload payload routing；唯一 runtime consumer 已接回，旧 class 已删除。
+
 ## 2026-10-31 thread turn-summary service
 
 原 `Nnt/Pnt/z5/B5` 已整簇迁入 `src/main/main-app/threads/thread-turn-summary-service.ts`。新 owner 保留
