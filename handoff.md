@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `l8e/u8e/d8e/f8e` AirPods microphone-mute cluster 迁入
+`realtime/airpods-microphone-mute.ts`；packaged/dev native addon 路径、macOS 14+ capability、mute acknowledge、
+power-resume/capture-change single-immediate recovery、异常日志与 idempotent stop cleanup 均由新 runtime 持有。
+voice feature-gate consumer 已真实接回，旧 loader/helper/class 已删除。focused test 覆盖 30 项。
+
 随后将 `s8e/c8e` quick-chat 与 realtime per-window RPC adapters 迁入
 `window/interaction-rpc-services.ts`；quick-chat origin forwarding、realtime starter registration、active/stopping
 stop guard、ephemeral-history gate 与 session lifecycle forwarding 均保持原语义。两个真实 service-map consumer

@@ -86,6 +86,7 @@ const { createProjectFolderConsentRuntime } = require("./main-app/projects/proje
 const { createThreadMembershipInference } = require("./main-app/projects/thread-membership-inference.js");
 const { createProjectsManagerClass } = require("./main-app/projects/projects-manager.js");
 const { createInteractionRpcServices } = require("./main-app/window/interaction-rpc-services.js");
+const { createAirpodsMicrophoneMuteRuntime } = require("./main-app/realtime/airpods-microphone-mute.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -133212,79 +133213,21 @@ var o8e = createProjectsManagerClass({
     QuickChatWindowService: s8e,
     RealtimeVoiceRuntimeService: c8e,
   } = createInteractionRpcServices({ RpcHandlerBase: n.Uf }),
-  l8e = (0, ee.createRequire)(__filename);
-function u8e() {
-  return l8e(
-    l.app.isPackaged
-      ? h.default.join(process.resourcesPath, `native`, `airpods-mute.node`)
-      : h.default.join(
-          l.app.getAppPath(),
-          `native`,
-          `airpods-mute-addon`,
-          `build`,
-          `Release-${process.arch}`,
-          `airpods_mute.node`,
-        ),
-  );
-}
-function d8e() {
-  return process.platform === `darwin` && Number.parseInt((0, p.release)(), 10) >= 23;
-}
-var f8e = class {
-    onMuteRequested;
-    logger = r.r(`airpods-microphone-mute`);
-    addon = u8e();
-    stopped = !1;
-    recovery;
-    constructor(e) {
-      ((this.onMuteRequested = e),
-        this.addon.start((e) => this.handleEvent(e)),
-        l.powerMonitor.on(`resume`, this.scheduleCaptureRecovery));
-    }
-    acknowledgeMuted(e) {
-      this.stopped || this.addon.setMuted(e);
-    }
-    stop() {
-      this.stopped ||
-        ((this.stopped = !0),
-        l.powerMonitor.removeListener(`resume`, this.scheduleCaptureRecovery),
-        this.recovery != null && clearImmediate(this.recovery),
-        (this.recovery = void 0),
-        this.addon.stop());
-    }
-    handleEvent(e) {
-      if (!this.stopped) {
-        if (e.kind === `capture-changed`) {
-          this.scheduleCaptureRecovery();
-          return;
-        }
-        try {
-          this.onMuteRequested(e.muted);
-        } catch (e) {
-          (this.stop(),
-            this.logger.warning(`Could not forward AirPods mute request`, {
-              safe: {},
-              sensitive: { error: e },
-            }));
-        }
-      }
-    }
-    scheduleCaptureRecovery = () => {
-      this.stopped ||
-        this.recovery != null ||
-        (this.recovery = setImmediate(() => {
-          if (((this.recovery = void 0), !this.stopped))
-            try {
-              this.addon.restartCapture();
-            } catch (e) {
-              this.logger.warning(`Could not recover AirPods companion capture`, {
-                safe: {},
-                sensitive: { error: e },
-              });
-            }
-        }));
-    };
-  },
+  {
+    AirpodsMicrophoneMute: f8e,
+    isAirpodsMicrophoneMuteSupported: d8e,
+  } = createAirpodsMicrophoneMuteRuntime({
+    createRequire: ee.createRequire,
+    filename: __filename,
+    app: l.app,
+    path: h.default,
+    processRef: process,
+    osRelease: p.release,
+    powerMonitor: l.powerMonitor,
+    createLogger: r.r,
+    setImmediate,
+    clearImmediate,
+  }),
   p8e = `realtime-voice-continuity.json`,
   m8e = n.wf({ role: n.df([`user`, `assistant`]), text: n.Of() }),
   h8e = n.wf({ version: n.bf(1), threads: n.Ef(n.Of(), n.wf({ items: n.hf(m8e) })) }),

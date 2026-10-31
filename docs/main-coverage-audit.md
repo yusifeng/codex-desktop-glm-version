@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 AirPods microphone mute companion
+
+原 `l8e/u8e/d8e/f8e` 已整簇迁入 `src/main/main-app/realtime/airpods-microphone-mute.ts`。新 runtime
+保留 native addon packaged/dev resolution、Darwin kernel capability gate、addon callback forwarding、mute ack、
+resume/capture-changed recovery coalescing、restart/forward failure logging、pending immediate cancellation 与
+idempotent stop；realtime voice feature-gate consumer 已接回，旧实现已物理删除。
+
 ## 2026-10-31 window interaction RPC services
 
 原 `s8e/c8e` 已迁入 `src/main/main-app/window/interaction-rpc-services.ts`。新 adapters 保留 quick-chat
