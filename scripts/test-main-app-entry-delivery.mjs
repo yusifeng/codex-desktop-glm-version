@@ -8,14 +8,19 @@ const equal = (actual, expected, message) => {
   assertions += 1;
 };
 
-const source = fs.readFileSync(
-  new URL("../src/main/main-app/startup/app-entry-delivery.ts", import.meta.url),
-  "utf8",
+const loadModule = async (path) => {
+  const source = fs.readFileSync(new URL(path, import.meta.url), "utf8");
+  const output = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+  const loaded = { exports: {} };
+  Function("module", "exports", output.code)(loaded, loaded.exports);
+  return loaded.exports;
+};
+const { createAppEntryDeliveryRuntime } = await loadModule(
+  "../src/main/main-app/startup/app-entry-delivery.ts",
 );
-const output = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
-const loaded = { exports: {} };
-Function("module", "exports", output.code)(loaded, loaded.exports);
-const { createAppEntryDeliveryRuntime } = loaded.exports;
+const { createPrimaryWindowMessageQueue } = await loadModule(
+  "../src/main/main-app/startup/primary-window-message-queue.ts",
+);
 
 let tracker;
 class FakeAttributionTracker {
@@ -51,10 +56,11 @@ class FakeAttributionTracker {
 
 const mappedWindows = new Map();
 const BrowserWindow = { fromWebContents: (webContents) => mappedWindows.get(webContents) ?? null };
+const primaryWindowMessages = createPrimaryWindowMessageQueue({ BrowserWindow });
 const runtime = createAppEntryDeliveryRuntime({
   AppEntryAttributionTracker: FakeAttributionTracker,
-  BrowserWindow,
   initialInstallerId: "installer-1",
+  primaryWindowMessages,
 });
 equal(tracker.initialInstallerId, "installer-1");
 equal([tracker.schedule, tracker.now, tracker.createId], [undefined, undefined, undefined]);
@@ -65,20 +71,24 @@ const services = {
   getPrimaryWindow: () => primaryWindow,
   sendMessageToWindow: (window, message) => sent.push([window, message]),
 };
+primaryWindowMessages.enqueue({ type: "computer-use-analytics-event", event: { id: "analytics-1" } });
 tracker.emit({ kind: "direct", id: 1 });
 equal(sent, []);
-runtime.setWindowServices(services);
-equal(sent, [[primaryWindow, { type: "desktop-app-entry-received", receipt: { kind: "direct", id: 1 } }]]);
+primaryWindowMessages.setWindowServices(services);
+equal(sent, [
+  [primaryWindow, { type: "computer-use-analytics-event", event: { id: "analytics-1" } }],
+  [primaryWindow, { type: "desktop-app-entry-received", receipt: { kind: "direct", id: 1 } }],
+]);
 tracker.emit({ kind: "foreground", id: 2 });
 equal(sent.at(-1), [primaryWindow, { type: "desktop-app-entry-received", receipt: { kind: "foreground", id: 2 } }]);
 
 primaryWindow.destroyed = true;
 tracker.emit({ kind: "foreground", id: 3 });
-equal(sent.length, 2);
-runtime.handleWindowRegistered();
-equal(sent.length, 2);
+equal(sent.length, 3);
+primaryWindowMessages.handleWindowRegistered();
+equal(sent.length, 3);
 primaryWindow.destroyed = false;
-runtime.handleWindowRegistered();
+primaryWindowMessages.handleWindowRegistered();
 equal(sent.at(-1)[1].receipt.id, 3);
 
 const targetContents = {};
@@ -111,4 +121,4 @@ equal(tracker.calls.slice(-6), [
   ["can-attribute"],
 ]);
 
-console.log(`${assertions} app-entry delivery assertions passed`);
+console.log(`${assertions} app-entry delivery and primary-window queue assertions passed`);

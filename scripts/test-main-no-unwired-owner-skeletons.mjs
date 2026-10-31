@@ -7,6 +7,7 @@ const realOwners = [
   ["src/main/main-app/window/window-context-lifecycle.ts", "createWindowContextLifecycle"],
   ["src/main/main-app/window/chunked-web-contents-message-sender.ts", "createChunkedWebContentsMessageSenderClass"],
   ["src/main/main-app/startup/app-entry-delivery.ts", "createAppEntryDeliveryRuntime"],
+  ["src/main/main-app/startup/primary-window-message-queue.ts", "createPrimaryWindowMessageQueue"],
   ["src/main/main-app/startup/window-icon-lifecycle.ts", "createWindowIconLifecycle"],
   ["src/main/main-app/fetch-handler/electron-fetch-handler.ts", "createElectronFetchHandlerClass"],
   ["src/main/main-app/misc/open-in-service.ts", "createOpenInServiceClass"],
@@ -619,5 +620,10 @@ assert.equal(main.includes("windowContextLifecycle = createWindowContextLifecycl
 assert.equal(main.includes("setWindowContext: windowContextLifecycle.setWindowContext"), true, "window services expose the semantic context lifecycle");
 assert.equal(main.includes("z?.broadcastQueryCacheInvalidation"), false, "generated window-context cache adapter must be removed");
 assert.equal(main.includes("let t = setTimeout(() => {\n        e.isDestroyed()"), false, "generated delayed primary-window reveal must be removed");
+assert.equal(main.includes('require("./main-app/startup/primary-window-message-queue.js")'), true, "primary-window message queue is wired");
+assert.equal(main.includes("primaryWindowMessages = createPrimaryWindowMessageQueue({"), true, "startup creates one shared primary-window queue");
+assert.equal(main.includes("primaryWindowMessages.enqueue({ type: `computer-use-analytics-event`"), true, "computer-use analytics uses the semantic queue");
+assert.equal(main.includes("ce.push({ type: `computer-use-analytics-event`"), false, "stale generated analytics queue consumer must be removed");
+assert.equal(main.includes("appEntryDelivery.setWindowServices"), false, "app-entry owner must not duplicate window queue state");
 
-console.log("613 main unwired-owner skeleton assertions passed");
+console.log("619 main unwired-owner skeleton assertions passed");

@@ -371,6 +371,7 @@ const { SkysightServiceManager: Moe } = require("./main-app/skysight/service-man
 const { subscribeComputerUsePipTurnLifecycle: Noe } = require("./main-app/computer-use/pip-turn-lifecycle.js");
 const { AppEntryAttributionTracker: Foe } = require("./main-app/startup/app-entry-attribution.js");
 const { createAppEntryDeliveryRuntime } = require("./main-app/startup/app-entry-delivery.js");
+const { createPrimaryWindowMessageQueue } = require("./main-app/startup/primary-window-message-queue.js");
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
 const { createBrowserHostServiceClass } = require("./main-app/browser-sidebar/browser-host-service.js");
@@ -56184,10 +56185,11 @@ async function Ust() {
     ae = resolveRemoteHostedPipProcessIdentifier(F, process.env[Vst]);
   (ae != null && U.setServiceProcessIdentifier(ae), I.add(U.dispose));
   let oe = new ChunkedWebContentsMessageSender(),
+    primaryWindowMessages = createPrimaryWindowMessageQueue({ BrowserWindow: l.BrowserWindow }),
     appEntryDelivery = createAppEntryDeliveryRuntime({
       AppEntryAttributionTracker: Foe,
-      BrowserWindow: l.BrowserWindow,
       initialInstallerId: await au()?.readPending(),
+      primaryWindowMessages,
     }),
     fe = appEntryDelivery.onAppEntrySource,
     W = dst({
@@ -56211,11 +56213,11 @@ async function Ust() {
       isRemoteHostedPIPEnabled: re,
       onAppEntrySource: fe,
       onWindowRegistered: (e) => {
-        (U.registerWindow(e), appEntryDelivery.handleWindowRegistered());
+        (U.registerWindow(e), primaryWindowMessages.handleWindowRegistered());
       },
       disposables: I,
     });
-  (appEntryDelivery.setWindowServices(W),
+  (primaryWindowMessages.setWindowServices(W),
     U.setWindowMessageSender((e) => {
       W.windowManager.sendMessageToAllWindows(e);
     }),
@@ -56611,7 +56613,7 @@ async function Ust() {
     ((we = new DockMenuManager((e) => Ue(e, { navigateExistingWindow: !0 }), a.hn())),
     we.setCompletedThreads(Ce));
   let We = (e) => {
-      (ce.push({ type: `computer-use-analytics-event`, event: e }), le());
+      primaryWindowMessages.enqueue({ type: `computer-use-analytics-event`, event: e });
     },
     Ge = async () => {
       try {

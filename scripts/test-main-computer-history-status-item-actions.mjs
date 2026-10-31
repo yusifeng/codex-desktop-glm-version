@@ -1,6 +1,15 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { createComputerHistoryStatusItemActions } from "../src/main/main-app/computer-use/native-status-item-actions.ts";
+import { transform } from "esbuild";
+
+const source = fs.readFileSync(
+  new URL("../src/main/main-app/computer-use/native-status-item-actions.ts", import.meta.url),
+  "utf8",
+);
+const output = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+const loaded = { exports: {} };
+Function("module", "exports", output.code)(loaded, loaded.exports);
+const { createComputerHistoryStatusItemActions } = loaded.exports;
 
 let assertions = 0;
 const equal = (actual, expected) => {

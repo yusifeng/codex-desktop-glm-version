@@ -3398,9 +3398,9 @@ Electron message handler 与 Open-In 共 168 项回归通过。原本直接 impo
 ### 整块抽取：app-entry attribution delivery
 
 新增并接回 `startup/app-entry-delivery.ts`，把 installer/deep-link/foreground attribution 与实际窗口投递统一到一个 owner：
-启动期 receipt 队列、primary-window flush、指定 WebContents 路由、销毁窗口抑制、source activation、background/foreground、
-deep-link 和 initial-window-visible 生命周期均由单一 runtime 转发到 `AppEntryAttributionTracker`。`Ust` 不再保存
-`se/ce/le/ue/de/fe` 六段匿名共享状态，只负责创建 runtime、注入 WindowServices 并把 callbacks 交给 consumers。
+receipt 构造、指定 WebContents 路由、销毁窗口抑制、source activation、background/foreground、deep-link 和
+initial-window-visible 生命周期均由单一 runtime 转发到 `AppEntryAttributionTracker`。启动期通用 FIFO 后续复核为 app-entry 与
+computer-use analytics 的共享边界，现由 `primary-window-message-queue.ts` 独立拥有；`Ust` 不再保存匿名投递状态。
 
 14 项 focused 断言覆盖队列、延迟 flush、目标窗口、销毁分支和全部 attribution lifecycle forwarding；attribution/PiP、
 application lifecycle、main IPC、hotkey、native notification 与 Electron message handler 相邻 237 项回归通过。迁移同时修复
@@ -3418,3 +3418,14 @@ default-browser/auth-token/cache-invalidation adapters、registered-WebContents 
 与对外 window-services surface 全部直接消费同一 lifecycle owner。29 项 focused 断言覆盖未绑定、注册过滤、空闲判定、
 已有/新建/销毁窗口、route normalization 和 timer 分支；browser-window、hotkey-window、appshot 相邻 137 项回归通过，
 no-unwired gate 扩至 613 项。
+
+### 增量修复：共享 primary-window startup message queue
+
+全量复核 `Ust` consumer 时发现，原 `ce/le` FIFO 同时承载 app-entry receipt 与 computer-use analytics；若只把它并入
+app-entry owner，analytics 会留下运行时未定义引用。现新增 `startup/primary-window-message-queue.ts` 作为唯一通用 owner，
+统一保存 WindowServices、启动期 FIFO、primary-window flush 与指定 WebContents 路由。`app-entry-delivery.ts` 改为注入该队列，
+analytics consumer 也直接 enqueue，两类消息因此恢复原共享顺序且没有复制状态。
+
+focused suite 明确以 analytics→app-entry 验证启动期 FIFO，并覆盖 destroyed primary/target window 与窗口注册后重试；
+no-unwired gate 扩至 619 项。相邻 computer-history status-item 24 项回归恢复真实执行，其直接 import `.ts`、此前无法启动的
+测试入口同步修复。

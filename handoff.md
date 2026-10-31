@@ -5346,10 +5346,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 
 # 2026-11-01 app-entry attribution delivery extraction
 
-- 新增并真实接回 `startup/app-entry-delivery.ts`，统一拥有启动期 app-entry receipt queue、primary-window flush、指定
-  WebContents 路由、destroyed suppression，以及 installer/deep-link/source/background/foreground/initial-window attribution
-  lifecycle；既有 `AppEntryAttributionTracker` 保持算法 owner，新 runtime 负责投递和组合。
-- `Ust` 旧 `se/ce/le/ue/de/fe` 匿名状态整块删除，改为一个 `appEntryDelivery` 实例。focused suite 14 项，相邻六组
+- 新增并真实接回 `startup/app-entry-delivery.ts`，统一拥有 app-entry receipt 构造、指定 WebContents 路由、destroyed
+  suppression，以及 installer/deep-link/source/background/foreground/initial-window attribution lifecycle；既有
+  `AppEntryAttributionTracker` 保持算法 owner，新 runtime 负责投递和组合，通用启动 FIFO 由后续共享 queue owner 承接。
+- `Ust` 旧 attribution/delivery 匿名状态已删除，改为 `appEntryDelivery` 实例。focused suite 14 项，相邻六组
   回归 237 项，no-unwired gate 扩至 607 项；另修复 application lifecycle、main IPC router、native notification 三个
   直接 import TypeScript 而无法执行的测试入口。下一批继续审计 `Ust/dst`，只抽取能独立拥有状态与清理顺序的完整边界。
 
@@ -5361,3 +5361,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - `dst` 旧 `z` 状态、`oe/se` closures 和 `lst/ust` 常量已删除，WindowManager/hotkey/对外 window services 共用唯一 owner。
   focused suite 29 项，相邻三组回归 137 项，no-unwired gate 扩至 613 项。`dst` 余下主要是 overlay、hotkey、dictation、
   quick-chat 的构造与统一 dispose，继续审计但不强拆纯装配链。
+
+# 2026-11-01 primary-window startup queue repair
+
+- consumer 复核发现原 `ce/le` FIFO 同时承载 app-entry 与 computer-use analytics；仅迁入 app-entry owner 会让 analytics
+  留下运行时未定义引用。新增 `startup/primary-window-message-queue.ts` 作为唯一 FIFO/WindowServices owner，app-entry 与
+  analytics 重新共享同一顺序、flush 和 destroyed-window policy，没有补回匿名状态或复制队列。
+- focused suite 明确验证 analytics→app-entry 启动顺序和延迟 flush，no-unwired gate 扩至 619 项；同步修复
+  computer-history status-item 测试直接 import TypeScript 而无法执行的问题。
