@@ -165,8 +165,8 @@ check(summary.type instanceof Function, "renders the Site summary component");
 let summaryView = summary.type(summary.props);
 check(
   summaryView.props.children[0].props.children[1].props.children ===
-    "example.com",
-  "formats the live Site host",
+    "example.com/path",
+  "formats the live Site host and path",
 );
 check(
   summaryView.props.children[1].props.children[0].type === "SiteIcon",

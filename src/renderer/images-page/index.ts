@@ -1,5 +1,6 @@
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as appPrimaryChunk from "@rchunk/app-primary";
+import { normalizeSystemHints as getSuggestionInputTypes } from "../app-primary/runtime/normalize-system-hints";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as suggestionsChunk from "@rchunk/image-suggestions-core";
 import * as composerControllerChunk from "@rchunk/use-chatgpt-composer-controller";
@@ -37,6 +38,7 @@ interface SuggestionAction {
 interface SuggestionItem {
   action?: SuggestionAction;
   id: string;
+  system_hints?: string[] | null;
 }
 
 interface SuggestionGroup {
@@ -98,7 +100,6 @@ interface AppPrimaryImagesApi {
   Ui: unknown;
   Wi(): void;
   au(): void;
-  iu(item: SuggestionItem, modes: unknown): string[];
   ko(): void;
   ru(scope: ScopeApi, conversationId: string): void;
   su(
@@ -170,7 +171,6 @@ const {
   Ui: Composer,
   Wi: initializeComposer,
   au: initializeComposerPlacement,
-  iu: getSuggestionInputTypes,
   ko: initializePageLayout,
   ru: resetImageConversation,
   su: handleSuggestionFilesUploaded,
@@ -267,7 +267,7 @@ function ImagesContent({
           const action = selection.item.action ?? selection.group.action;
           const inputTypes = getSuggestionInputTypes(
             selection.item,
-            scope.get(imageInputModes, conversationId),
+            scope.get(imageInputModes, conversationId) as string[] | undefined,
           );
           const shouldTrackSubmission =
             (action?.input_requirements?.source === "styles" &&

@@ -22,7 +22,7 @@ export function extractSkillKindFromPath(path: string | null | undefined): strin
 }
 
 export interface SkillMentionNode {
-  type: "skillMention" | "pluginMention" | string;
+  type: "skillMention" | "pluginMention" | string | { name: string };
   attrs?: { path?: unknown };
 }
 
@@ -51,7 +51,10 @@ export function extractSkillKindFromDocument(
 ): string | null {
   const mentions: SkillMentionNode[] = [];
   document.descendants((node) => {
-    if (node.type === "skillMention" || node.type === "pluginMention") mentions.push(node);
+    const type = typeof node.type === "string" ? node.type : node.type.name;
+    if (type === "skillMention" || type === "pluginMention") {
+      mentions.push({ ...node, type });
+    }
     return true;
   });
   return extractSkillKindFromMentions(mentions, preferred);

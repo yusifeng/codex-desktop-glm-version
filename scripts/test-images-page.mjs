@@ -44,7 +44,6 @@ const state = {
   fileUploads: [],
   initializers: [],
   inputModes: ["picture_v2"],
-  inputTypes: ["picture_v2"],
   marked: [],
   navigations: [],
   newAccountConversation: { conversationId: "conversation-2" },
@@ -103,7 +102,7 @@ const mocks = {
     "export const H = 'FileDropZone'; export const Oo = 'ComposerPlacement'; export const Ui = 'Composer';",
     "export const U = mark('file-drop-zone'); export const Wi = mark('composer');",
     "export const au = mark('composer-placement'); export const ko = mark('page-layout');",
-    "export const iu = () => state.inputTypes; export const tu = 'selection';",
+    "export const tu = 'selection';",
     "export const ru = (_scope, conversationId) => state.resets.push(conversationId);",
     "export const su = (_scope, conversationId, controller, selected) => state.fileUploads.push({ conversationId, controller, selected });",
   ].join("\n"),
@@ -166,7 +165,6 @@ function reset() {
   state.conversationId = "conversation-1";
   state.fileUploads = [];
   state.inputModes = ["picture_v2"];
-  state.inputTypes = ["picture_v2"];
   state.marked = [];
   state.navigations = [];
   state.newAccountConversation = { conversationId: "conversation-2" };
@@ -278,9 +276,12 @@ state.selection = { item: { id: "other" }, group: { id: "other-group" } };
 check(composerProps(stale.layout).getMessageMetadata() === undefined, "rejects metadata for a stale selection");
 
 reset();
-state.inputTypes = ["text"];
 state.selection = {
-  item: { id: "prompt-2", action: { input_requirements: { source: "prompt_only" } } },
+  item: {
+    id: "prompt-2",
+    action: { input_requirements: { source: "prompt_only" } },
+    system_hints: ["text"],
+  },
   group: { id: "group-2", presentation: "text_pill" },
 };
 state.accountConversation = { conversationId: "conversation-1" };

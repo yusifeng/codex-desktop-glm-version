@@ -168,6 +168,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-annotation-event-field-policy.mjs`](./test-preload-annotation-event-field-policy.mjs)
 - [`test-app-shared-encode-prefixed-path.mjs`](./test-app-shared-encode-prefixed-path.mjs)
 - [`test-app-shared-stable-json-stringify.mjs`](./test-app-shared-stable-json-stringify.mjs)
+  - Covers 5 plain-object, Date, and wallet consumer assertions.
 - [`test-preload-annotation-frame-chain-policy.mjs`](./test-preload-annotation-frame-chain-policy.mjs)
 - [`test-app-shared-is-layout-element.mjs`](./test-app-shared-is-layout-element.mjs)
 - [`test-app-shared-normalize-reasoning-speed.mjs`](./test-app-shared-normalize-reasoning-speed.mjs)
@@ -210,6 +211,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-annotation-feature-graph-state.mjs`](./test-preload-annotation-feature-graph-state.mjs)
 - [`test-app-primary-get-rectangle-bottom-right.mjs`](./test-app-primary-get-rectangle-bottom-right.mjs)
 - [`test-app-primary-normalize-system-hints.mjs`](./test-app-primary-normalize-system-hints.mjs)
+  - Covers 5 hint-policy and images-page consumer assertions.
 - [`test-preload-annotation-preload-disposal-state.mjs`](./test-preload-annotation-preload-disposal-state.mjs)
 - [`test-preload-annotation-runtime-mount-state.mjs`](./test-preload-annotation-runtime-mount-state.mjs)
 
@@ -357,6 +359,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-annotation-selector-token.mjs`](./test-preload-annotation-selector-token.mjs)
 - [`test-renderer-conversation-ready.mjs`](./test-renderer-conversation-ready.mjs)（14 项策略与真实 consumer 接回断言）
 - [`test-renderer-browser-url.mjs`](./test-renderer-browser-url.mjs)
+  - Covers 9 URL-formatting and appgen consumer assertions.
 
 - [`test-app-shared-command-visibility-predicates.mjs`](./test-app-shared-command-visibility-predicates.mjs)
 - [`test-worker-git-mutation-dispatch.mjs`](./test-worker-git-mutation-dispatch.mjs)
@@ -466,6 +469,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-app-primary-normalize-suggested-followups.mjs`](./test-app-primary-normalize-suggested-followups.mjs)
 - [`test-app-primary-is-site-url-match.mjs`](./test-app-primary-is-site-url-match.mjs)
 - [`test-app-primary-create-prefilled-plugin-prompt.mjs`](./test-app-primary-create-prefilled-plugin-prompt.mjs)
+  - Covers 5 prompt-formatting and start-appgen consumer assertions.
 - [`test-app-primary-plan-selection-surface.mjs`](./test-app-primary-plan-selection-surface.mjs)
 
 - [`test-worker-elicitation-protocol.mjs`](./test-worker-elicitation-protocol.mjs)
@@ -1338,6 +1342,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-turn-diff-capture-policy.mjs`](./test-worker-git-turn-diff-capture-policy.mjs)
 - [`test-app-primary-account-spend-key.mjs`](./test-app-primary-account-spend-key.mjs)
 - [`test-app-primary-extract-skill-kind-document.mjs`](./test-app-primary-extract-skill-kind-document.mjs)
+  - Covers 7 string/object node-type and home-template consumer assertions.
 - [`test-preload-annotation-surface-registry-state.mjs`](./test-preload-annotation-surface-registry-state.mjs)
 - [`test-app-primary-derive-cloud-unavailable-reason.mjs`](./test-app-primary-derive-cloud-unavailable-reason.mjs)
 - [`test-app-primary-resolve-box-file-preview.mjs`](./test-app-primary-resolve-box-file-preview.mjs)
@@ -1438,6 +1443,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-app-primary-has-query-param-value.mjs](test-app-primary-has-query-param-value.mjs)
 [test-preload-annotation-tooltip-position.mjs](test-preload-annotation-tooltip-position.mjs)
 [test-app-primary-format-beacon-action-key.mjs](test-app-primary-format-beacon-action-key.mjs)
+  - Covers 4 key-formatting and beacon consumer assertions.
 [test-preload-annotation-scroll-container-equality.mjs](test-preload-annotation-scroll-container-equality.mjs)
 [test-app-primary-partition-comment-attachments.mjs](test-app-primary-partition-comment-attachments.mjs)
 [test-app-primary-is-local-execution-target.mjs](test-app-primary-is-local-execution-target.mjs)

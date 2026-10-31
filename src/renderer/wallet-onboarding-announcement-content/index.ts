@@ -3,6 +3,7 @@
 
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
+import { stableJsonStringify as serializeQueryKey } from "../app-shared/runtime/stable-json-stringify";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as walletModalChunk from "@rchunk/wallet-onboarding-announcement-modal";
 import { buildWalletEnrollmentHtml } from "./wallet-enrollment-html";
@@ -158,7 +159,6 @@ interface AppInitialBindings {
 
 const {
   $3: initializeRuntimeLazy,
-  AZ: serializeQueryKey,
   Ah: Result,
   BX: useSignalFamilyValue,
   C_: initializeIconAsset,

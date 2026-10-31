@@ -89,7 +89,7 @@ check(
   "renders the Site title",
 );
 check(
-  details.props.children[1].props.children === "example.com",
+  details.props.children[1].props.children === "example.com/path",
   "formats the published URL",
 );
 check(settings.type === "Tooltip", "wraps settings in a tooltip");

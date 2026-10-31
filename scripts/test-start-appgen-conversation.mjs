@@ -8,7 +8,6 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const state = (globalThis.__startAppgenConversationTest = {
   initialized: [],
   formatted: [],
-  pluginPrompts: [],
   navigations: [],
 });
 const result = await esbuild.build({
@@ -52,7 +51,6 @@ const result = await esbuild.build({
                     spreadsheet: { artifact: { label: "Spreadsheet", pluginId: "spreadsheet-plugin" } },
                     presentation: { artifact: { label: "Presentation", pluginId: "presentation-plugin" } },
                   };
-                  export const Rf = (options) => { state.pluginPrompts.push(options); return "prompt:" + options.pluginDisplayName + ":" + (options.defaultPrompt ?? "none"); };
                   export const Hh = () => state.initialized.push("Hh"); export const Bf = () => state.initialized.push("Bf");
                 `,
               }[importPath] ?? "export {};",
@@ -102,12 +100,9 @@ check(
   "starts new Site conversations in the sidebar",
 );
 check(
-  options.prefillPrompt.includes("Create a website that"),
-  "builds the Site creation prompt",
-);
-check(
-  state.pluginPrompts.at(-1).pluginId === "sites-plugin",
-  "uses the Sites plugin",
+  options.prefillPrompt ===
+    "[@Sites](plugin://sites-plugin) Create a website that …",
+  "builds the Site creation prompt with the Sites plugin mention",
 );
 
 conversation.n(
@@ -122,8 +117,8 @@ check(
   "enables cloud library document creation",
 );
 check(
-  options.prefillPrompt.startsWith("prompt:Document"),
-  "uses document artifact metadata",
+  options.prefillPrompt === "[@Document](plugin://document-plugin) ",
+  "uses document artifact metadata in the plugin mention",
 );
 
 conversation.n(
@@ -138,9 +133,8 @@ check(
   "does not enable disabled cloud library creation",
 );
 check(
-  state.pluginPrompts.at(-1).pluginId === "pdf@openai-primary-runtime" &&
-    state.pluginPrompts.at(-1).pluginDisplayName === "PDF",
-  "uses the dedicated PDF runtime plugin",
+  options.prefillPrompt === "[@PDF](plugin://pdf@openai-primary-runtime) ",
+  "uses the dedicated PDF runtime plugin mention",
 );
 
 conversation.n(

@@ -8,6 +8,9 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sourcePath = path.join(root, "src/renderer/app-primary/runtime/create-prefilled-plugin-prompt.ts");
 const source = fs.readFileSync(sourcePath, "utf8");
 assert.equal(/\bany\b/.test(source), false);
+const consumerSource = fs.readFileSync(path.join(root, "src/renderer/start-appgen-conversation/index.ts"), "utf8");
+assert.match(consumerSource, /app-primary\/runtime\/create-prefilled-plugin-prompt/);
+assert.doesNotMatch(consumerSource, /\bRf\s*:\s*createPluginPrompt/);
 const result = await esbuild.build({
   entryPoints: [sourcePath],
   bundle: true,
@@ -18,7 +21,7 @@ const result = await esbuild.build({
   logLevel: "silent",
 });
 const module = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}`);
-let assertions = 1;
+let assertions = 3;
 assert.equal(
   module.createPrefilledPluginPrompt({
     defaultPrompt: "  Review the workflow  ",

@@ -5,6 +5,7 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as appPrimaryChunk from "@rchunk/app-primary";
+import { formatBrowserUrl as formatSiteLiveUrl } from "../app-primary/runtime/format-browser-url";
 
 void runtimeChunk;
 const {
@@ -26,10 +27,7 @@ const {
   a3t: initializeSiteIcon,
   i3t: SiteIcon,
 } = appInitialChunk;
-const {
-  Sf: initializeSiteUrlFormatter,
-  xf: formatSiteLiveUrl,
-} = appPrimaryChunk;
+const { Sf: initializeSiteUrlFormatter } = appPrimaryChunk;
 const jsx = getJsxRuntime();
 
 interface AppgenSiteCardProps {

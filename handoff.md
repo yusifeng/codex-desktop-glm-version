@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后扩展到 namespace 解构扫描，接回 appgen URL、home beacon key、artifact skill-kind、image
+system hints、appgen plugin prompt 与 wallet query-key serialization 共 7 条 consumer；清除
+`xf/yh/vg/iu/Rf/AZ` hub 读取。`extract-skill-kind` 补齐真实 ProseMirror `type.name` 结构，
+stable JSON 仅排序 plain object、保留 Date 的 `toJSON`。`po` 因依赖 hub 私有 registry 暂不误接。
+
 随后完成 app-shared semantic consumer 扫描发现的全部 3 个真实遗漏：pull-request-fix/resume
 错误路径改用 `format-error-message`，Codex Micro keyboard 改用 `status-to-color`，artifacts/source-summary/
 workspace-selection、terminal、image restoration 与 text thumbnail 改用 `get-path-basename`。basename

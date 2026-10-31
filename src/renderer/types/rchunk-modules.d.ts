@@ -919,8 +919,6 @@ declare module "@rchunk/app-shared" {
     THIRTY_SECONDS: number;
   };
   export type QueryKey = readonly unknown[];
-  /** hashQueryKey（app-shared/runtime/query-structural-utils.ts）。 */
-  export const AZ: (queryKey: QueryKey) => string;
   export const Am: {
     kind: "browser";
     loadDetachedRenderer(): Promise<unknown>;
@@ -5117,10 +5115,6 @@ declare module "@rchunk/app-primary" {
     beacon: unknown,
     metadata?: unknown,
   ) => void;
-  export const yh: (input: {
-    actionId: string;
-    beaconId: string;
-  }) => string;
   /** Announcement modal 候选来源注册表。 */
   export const Qp: import("@rchunk/app-shared").ScopedSignal<
     Record<string, unknown>,
@@ -5229,15 +5223,8 @@ declare module "@rchunk/app-primary" {
     "document" | "spreadsheet" | "presentation",
     ArtifactTypeDefinition
   >;
-  /** Site live URL 的主机名展示格式化器。 */
-  export const xf: (liveUrl?: string | null) => string | null;
   export const yf: (currentUrl: string, candidateUrl: string) => boolean;
   export const Sf: () => void;
-  export const Rf: (input: {
-    defaultPrompt: string | null;
-    pluginDisplayName: string;
-    pluginId: string;
-  }) => string;
   export const d: () => void; // O9：项目选择器依赖初始化器
   export const n: () => void;
   export const t: unknown;

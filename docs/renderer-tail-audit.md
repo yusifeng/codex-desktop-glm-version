@@ -1,5 +1,11 @@
 # Renderer 尾部资产审计
 
+2026-10-31 A5 namespace consumer 扫描：继续接回 `format-browser-url`（2 consumers）、
+`format-beacon-action-key`、`extract-skill-kind`、`normalize-system-hints`、
+`create-prefilled-plugin-prompt` 与 `stable-json-stringify`。后两项同时补齐 ProseMirror `type.name`
+节点与 plain-object-only JSON 排序语义。对应 `xf/yh/vg/iu/Rf/AZ` namespace 读取已清零；`po`
+仍依赖 hub 内部 registry，未伪装成可直接替换的纯函数。
+
 2026-10-31 A5 app-shared consumer 扫描：现存 semantic-business-logic 模块与真实 named hub import
 交叉检查后，确认并接回最后 3 个遗漏能力：`format-error-message`（2 consumers）、`status-to-color`
 （1 consumer）与 `get-path-basename`（6 consumers，含 namespace 解构）。对应 `IH/EX/II` hub

@@ -8,6 +8,10 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as appPrimaryChunk from "@rchunk/app-primary";
+import {
+  extractSkillKindFromDocument,
+  type SkillMentionDocument,
+} from "../app-primary/runtime/extract-skill-kind";
 import * as staggeredItemChunk from "@rchunk/home-suggestion-staggered-item";
 import * as templateCardChunk from "@rchunk/home-artifact-template-card";
 import type {
@@ -197,7 +201,6 @@ interface AppPrimaryBindings {
     scope: MaitaiScopeApi<unknown> | undefined,
     skill: ArtifactSkill,
   ): void;
-  selectedKind(document: unknown, format: unknown): TemplateKind | null;
   templateFormatSignal: ReadableSignal<unknown>;
   templatesEnabledSignal: ReadableSignal<boolean>;
 }
@@ -296,7 +299,6 @@ const {
   gg: templateFormatSignal,
   hg: templatesEnabledSignal,
   po: isComposerBlocked,
-  vg: selectedKindFromDocument,
   vi: closePicker,
   wi: recordOpen,
 } = appPrimaryChunk as unknown as {
@@ -308,7 +310,6 @@ const {
   gg: AppPrimaryBindings["templateFormatSignal"];
   hg: AppPrimaryBindings["templatesEnabledSignal"];
   po: AppPrimaryBindings["isComposerBlocked"];
-  vg: AppPrimaryBindings["selectedKind"];
   vi: AppPrimaryBindings["closePicker"];
   wi: AppPrimaryBindings["recordOpen"];
 };
@@ -329,6 +330,16 @@ type TemplateKind =
   | "product-design"
   | "email"
   | "slack";
+
+function selectedKindFromDocument(
+  document: unknown,
+  preferred: unknown,
+): TemplateKind | null {
+  return extractSkillKindFromDocument(
+    document as SkillMentionDocument,
+    typeof preferred === "string" ? preferred : null,
+  ) as TemplateKind | null;
+}
 
 interface BuiltInTemplate {
   id: string;

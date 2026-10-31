@@ -5,6 +5,7 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as appPrimaryChunk from "@rchunk/app-primary";
+import { createPrefilledPluginPrompt as createPluginPrompt } from "../app-primary/runtime/create-prefilled-plugin-prompt";
 
 void runtimeChunk;
 const { wL: initializeAppSharedRuntime } = appSharedChunk;
@@ -28,7 +29,6 @@ const {
   Bf: initializeArtifactTypes,
   Bh: artifactTypes,
   Hh: initializePluginPrompts,
-  Rf: createPluginPrompt,
 } = appPrimaryChunk;
 
 type StartAppgenRequest =

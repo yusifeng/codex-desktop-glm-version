@@ -10,6 +10,7 @@ import * as breadcrumbChunk from "@rchunk/toolbar-breadcrumb";
 import * as appgenAccessChunk from "@rchunk/appgen-access";
 import * as disabledTooltipChunk from "@rchunk/appgen-disabled-tooltip";
 import * as startConversationChunk from "@rchunk/start-appgen-conversation";
+import { formatBrowserUrl as formatSiteHost } from "../app-primary/runtime/format-browser-url";
 import type {
   IntlShape,
   JsxRuntime,
@@ -98,7 +99,6 @@ interface AppInitialBindings {
 
 interface AppPrimaryBindings {
   Sf(): void;
-  xf(url: string | null | undefined): string | null;
 }
 
 const {
@@ -162,10 +162,7 @@ const {
   vfn: automationsAvailabilityLoadingSignal,
   wan: useScreenshot,
 } = appInitialChunk as unknown as AppInitialBindings;
-const {
-  Sf: initializeAppgenFormatting,
-  xf: formatSiteHost,
-} = appPrimaryChunk as unknown as AppPrimaryBindings;
+const { Sf: initializeAppgenFormatting } = appPrimaryChunk as unknown as AppPrimaryBindings;
 const { n: initializeTabs, t: Tabs } = tabsChunk;
 const { n: initializeBreadcrumb, t: ToolbarBreadcrumb } = breadcrumbChunk;
 const {

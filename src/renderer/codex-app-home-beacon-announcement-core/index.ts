@@ -2,6 +2,7 @@
 
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as appPrimaryChunk from "@rchunk/app-primary";
+import { formatBeaconActionKey as createBeaconActionKey } from "../app-primary/runtime/format-beacon-action-key";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as homeBeaconFinanceChunk from "@rchunk/home-beacon-finance";
 import * as pcaConnectorActionChunk from "@rchunk/pca-connector-action";
@@ -53,7 +54,6 @@ const {
   th: initializeBeaconActionOverrides,
   vh: dismissBeacon,
   xh: recordBeaconView,
-  yh: createBeaconActionKey,
 } = appPrimaryChunk;
 const {
   FX: initializeSignalRuntime,
