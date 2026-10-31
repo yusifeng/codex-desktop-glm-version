@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+清理 stream-recovery 重复子 owner：语义 `AppServerConversationManager` 已真实构造 `StreamRecovery` 与
+`TurnStartObservations`，主 chunk 旧 `cSe/lSe` 只剩定义且无 consumer。本轮核对 18/20 members 对齐后物理删除旧类；focused
+gate 覆盖 turn start capture、dispatch/accept/complete 投递、observer dispose 与 manager wiring。
+
 接回 realtime recording cluster：既有 `realtime/session-recorder.ts` 现已替代主 chunk 的 `kwe/Awe/mw/Lwe` 与专属 schema/
 redaction/rollout helpers。feedback log、recording generation gate、RealtimeSessionRecorder 与 VoiceTimelineLedger 均接回真实
 bootstrap consumers；旧重复录制/SQLite owner 已物理删除，focused gate 锁定 5/16/5 members 与核心代数/ledger 行为。

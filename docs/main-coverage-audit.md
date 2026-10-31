@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 stream-recovery duplicate cleanup
+
+语义 `AppServerConversationManager` 已直接导入并构造 `StreamRecovery` 与 `TurnStartObservations`，主 chunk 旧 `cSe/lSe` 已无
+consumer。成员数分别精确对齐 18/20，本轮删除两个死重复 class；focused suite 验证 turn-start capture 到 accepted/completed
+投递及 observer disposal，并锁定真实 manager wiring。
+
 ## 2026-10-31 realtime recording cluster wiring
 
 既有 `src/main/main-app/realtime/session-recorder.ts` 已完整实现 `kwe/Awe/mw/Lwe`，但此前 main 仍保留重复 schema、recorder、
