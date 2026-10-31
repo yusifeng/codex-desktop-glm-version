@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 fork conversation skeleton wiring
+
+主 chunk 的 fork result 仍调用旧 `Ov(Av(...))`，而 `ThreadStore` 已真实消费 `threads/hydration.ts` 的 conversation skeleton 与 mode
+projection。本轮将该 consumer 接回；由于旧 `Av(thread,startKind,hostId,mode,recognition)` 忽略 hostId、语义版采用四参数签名，调用点
+同步移除多余 hostId，避免 mode 错位。旧 `Ov…Mv` 簇删除，focused suite 锁定 mode、skeleton 与调用签名。
+
 ## 2026-10-31 timeline item predicate cleanup
 
 `threads/timeline-index.ts` 已提供旧 `_v/vv/__e/yv/bv/xv/Sv` 的逐函数等价实现，并由 `ThreadItemIndex` 与 hydration 真实消费；旧主 chunk

@@ -214,6 +214,44 @@ equal(owner.pendingInteractionKind(pendingConversation("setup_codex_step", {
 equal(owner.pendingInteractionKind(pendingConversation("setup_codex_step", {
   step: "complete",
 }), () => null), null);
+equal(owner.withThreadMode({ id: "thread-1", mode: "raw" }, "forked", "remote", {}), {
+  id: "thread-1",
+  mode: "remote",
+  threadStartKind: "forked",
+});
+const newConversation = owner.newConversationFromThread({
+  thread: {
+    id: "thread-1",
+    sessionId: "session-1",
+    createdAt: 1,
+    updatedAt: 2,
+    model: "gpt",
+    reasoningEffort: "high",
+    status: { type: "idle" },
+    cwd: "/work",
+  },
+  hostId: "host-1",
+  conversationId: "thread-1",
+  turns: [],
+  threadTitle: "Thread",
+  resumeState: "needs_resume",
+  latestCollaborationMode: { mode: "default" },
+});
+equal({
+  id: newConversation.id,
+  hostId: newConversation.hostId,
+  latestModel: newConversation.latestModel,
+  latestReasoningEffort: newConversation.latestReasoningEffort,
+  workspaceKind: newConversation.workspaceKind,
+  cwd: newConversation.cwd,
+}, {
+  id: "thread-1",
+  hostId: "host-1",
+  latestModel: "gpt",
+  latestReasoningEffort: "high",
+  workspaceKind: "project",
+  cwd: "/work",
+});
 
 const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
@@ -226,10 +264,14 @@ equal(main.includes("var o_e ="), false);
 equal(main.includes("var u_e ="), false);
 equal(main.includes("registerThreadMetadata: av, activeAncestryIds: ov"), true);
 equal(main.includes("environmentInputResult: fv, pendingInteractionKind: pv, pendingInteraction: mv"), true);
+equal(main.includes("withThreadMode: Av, newConversationFromThread: Ov"), true);
+equal(main.includes("thread: Av(n.thread, e.getConversation(t)?.threadStartKind, r, i)"), true);
 for (const name of ["f_e", "av", "p_e", "m_e", "ov", "sv", "cv", "lv", "uv", "dv"])
   equal(main.includes(`function ${name}(`), false);
 for (const name of ["fv", "pv", "mv", "hv", "gv", "h_e"])
   equal(main.includes(`function ${name}(`), false);
+for (const name of ["Ov", "b_e", "x_e", "kv", "Av", "jv", "S_e", "Mv"])
+  equal(new RegExp(`(?:async )?function ${name}\\(`).test(main), false);
 equal(source.includes("forEachTurn(draft as never"), true);
 
 console.log(`${assertions} main thread hydration projection owner assertions passed`);
