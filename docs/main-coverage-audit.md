@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 queued follow-ups owner
+
+既有 `src/main/main-app/conversation/queued-follow-ups.ts` 的 `QueuedFollowUpsCoordinator` 已接回真实 `USe` factory，替代
+原 `VSe`。新 owner 保留 local/server/follower queue precedence、serialized writes、broadcast reconciliation、automatic-turn
+deferrals、queue/steer/start dispatch、execution subscriptions 与 retirement cleanup；56 个 class members 与原 owner 对齐，
+主 chunk 旧 739 行 class 已删除。
+
 ## 2026-10-31 SSH app-server transport owner
 
 既有 `src/main/main-app/app-server/transports.ts` 的 `AppServerTransportSshWebsocket` 已接回真实 transport factory 与 remote

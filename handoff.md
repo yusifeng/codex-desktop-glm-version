@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 queued follow-ups owner：`conversation/queued-follow-ups.ts` 的 `QueuedFollowUpsCoordinator` 现已替代主 chunk 的
+`VSe`。local/server/follower queues、serialized persistence、automatic-turn deferrals、steer/start fallback、execution
+subscriptions 与 disposal 保持由同一 owner 持有；真实 `USe` factory consumer 已接回，旧 739 行 class 已物理删除。
+
 接回 SSH app-server transport owner：`app-server/transports.ts` 的 `AppServerTransportSshWebsocket` 现已替代主 chunk 的
 `VE`。shell-env/proxy-command gate、remote Codex discovery/install、websocket proxy stream、timeout/error projection 与
 per-connection startup serialization 保持由 29-member owner 持有；真实 transport factory 和 remote installer consumers 已接回。
