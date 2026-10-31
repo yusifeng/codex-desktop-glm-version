@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 export-logs duplicate cleanup
+
+接回语义 `DebugService` 后，主 chunk 的 `Rje` 已无 consumer，`HN/Dje/Oje/kje/Aje/jje/Mje/Nje/Pje/Fje/Ije/Lje` 也只在
+该旧簇内部互相引用。本轮删除 126 行重复实现；`src/main/main-app/debug/export-logs.ts` 继续持有日期范围、session 文件筛选、
+save dialog 与时间戳归并管道，focused suite 覆盖时间排序、稳定 untimed 排序、空输入和旧符号清除。
+
 ## 2026-10-31 DebugService owner wiring
 
 `src/main/main-app/debug/export-logs.ts` 的 `DebugService` 与旧 `zje` 均为 19 members。本轮接回 `WindowContext` 的真实 debug
