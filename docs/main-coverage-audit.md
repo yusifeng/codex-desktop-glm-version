@@ -1,5 +1,13 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 conversation subowner duplicate cleanup
+
+语义 `AppServerConversationManager`/`ThreadStore` 已真实构造 `ConversationHistoryReader`、`TurnItemsPaginationLoader`、
+`ThreadItemIndex`、`InactiveThreadUnsubscriber`、`ItemNotificationHandler` 与 `SubagentTopology`。主 chunk 旧
+`Bge/Kge/g_e/Dve/Rve/ySe` 及只服务旧 topology 的 `bSe/_Se/vSe` 已物理删除。接线审计发现原 semantic inactive owner 只有
+9/28 members，已补齐 inactivity tracking、TTL/容量淘汰、passive hydration、retry/runtime-status 与完整 cleanup；focused suite
+锁定 class members、关键状态投影和真实 wiring。
+
 ## 2026-10-31 conversation creation cluster cleanup
 
 `src/main/main-app/conversation/conversation-creation.ts` 的 `ConversationParamsBuilder` 与 `ConversationCreationExecutor` 已由

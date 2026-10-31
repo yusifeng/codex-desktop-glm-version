@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+继续收敛 conversation 子 owner：语义 manager/thread-store 已真实消费 history reader、turn pagination、timeline index、inactive
+unsubscriber、item notification handler 与 subagent topology，因此主 chunk 旧 `Bge/Kge/g_e/Dve/Rve/ySe` 及专属版本 gate
+`bSe/_Se/vSe` 均已失去 consumer。审计同时发现既有 inactive-unsubscriber 只有 9/28 members，本轮先恢复完整 tracking、
+TTL/容量淘汰、passive hydration、retry 与 runtime-status 语义，再物理删除旧实现；focused gate 覆盖 32 项结构/行为/wiring。
+
 收敛 conversation creation cluster：语义 `conversation-creation.ts` 已由 `AppServerConversationManager` 真实构造并消费，主
 chunk 旧 `FSe/ISe/LSe/CC/RSe` 只剩内部互相引用。本轮物理删除整个重复创建/预热簇；focused suite 覆盖 initial-daybreak
 写入失败回滚、history mode 选择、完整 6-member executor 和真实 manager wiring。
