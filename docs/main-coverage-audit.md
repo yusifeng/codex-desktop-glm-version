@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 plugin marketplace runtime owner consolidation
+
+本批把 `plugins/marketplace.ts`、`chrome-native-host-sync.ts`、`cua-repl-config.ts` 与 `computer-use/app-resolution.ts` 作为一条运行链接回，
+覆盖 marketplace 选择/物化/install/reconcile/remote sync、stale cache、managed marker、native-host/skill 同步、CUA REPL 配置以及 Sky app
+路径/env 判定。主 chunk 的 `Di…Sne` 和 `wa…wo` 连续旧实现删除；`reconcileMarketplaceRoot` 补成正式导出供现存远端 consumer 使用。
+focused suite 执行真实配置文件原子更新，并验证关键选择、脱敏和安装分支及所有 runtime wiring。
+
 ## 2026-11-01 browser runtime resolution owner consolidation
 
 `plugins/browser-runtime-resolution.ts` 现独立拥有 bundled plugin 根目录/强制重载、Chrome 渠道、PATH 与 Windows 应用发现、商店链接、

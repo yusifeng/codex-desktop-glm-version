@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+大批接回 bundled plugin 核心链：marketplace 物化/reconcile/远端同步、Chrome native-host 缓存和 CUA skills 同步、CUA REPL `.mcp.json`
+原子写入，以及 computer-use app/env/marketplace 路径解析，已由四个完整语义模块共同接管。主入口约 30 个跨区 consumer 改接命名导出，
+`Di…Sne` 与 `wa…wo` 两段合计约 1,859 行旧副本整体删除；focused suite 覆盖 marketplace 选择、插件查找、日志脱敏、安装决策及真实
+临时目录中的 CUA REPL 配置写回。
+
 收拢浏览器运行时解析与 bundled content owner：主入口的 bundled marketplace 路径、插件渠道、通用命令、Windows 程序发现、Chromium
 安装/扩展探测、computer-use 音频注入和 visualize 变体物化，现统一接到完整的 `plugins/browser-runtime-resolution.ts`。三个仍被应用
 opener 直接消费的路径 helper 改为正式导出，旧 `Cne…Qne` 与 `$ne…tre` 约 619 行压缩副本整体删除；focused suite 使用真实临时目录验证

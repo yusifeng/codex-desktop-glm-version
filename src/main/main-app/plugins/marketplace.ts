@@ -448,7 +448,7 @@ export async function readChromeExtensionSyncState(options: {
 }
 
 /** 直接 reconcile 一个（远端）marketplace 根目录（原 `ore`）。 */
-async function reconcileMarketplaceRoot(options: {
+export async function reconcileMarketplaceRoot(options: {
   appServerConnection: any;
   beforeSendRequest?: () => void;
   devRuntimeRepoRoot?: string;
