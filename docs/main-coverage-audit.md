@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 global-dictation paste runtime
+
+原 `$it/eat/I7/L7/nat/B7/rat/V7/iat/aat` 已迁入 `src/main/main-app/dictation/global-paste-runtime.ts`。新 runtime
+保留 clipboard fingerprint/snapshot/format restore、pre/post paste timing、abort/change guards、macOS AX paste-menu discovery 与
+AppleScript fallback、Windows SendKeys，以及 accessibility/copy/paste failure projection；真实 dictation consumers 已接回。
+
 ## 2026-10-31 pet/avatar global-hotkey owner
 
 原 `Fit/C7` 已迁入 `src/main/main-app/hotkey/pet-hotkey-manager.ts`。新 owner 保留 access readiness/entitlement gate、

@@ -72,6 +72,7 @@ const { createRemoteLocalhostNavigationForwarder } = require("./main-app/browser
 const { createCommandSessionBackendClass } = require("./main-app/terminal/command-session-backend.js");
 const { createWorktreeServiceClass } = require("./main-app/workspace/worktree-service.js");
 const { createDictationHistoryRuntime } = require("./main-app/dictation/history.js");
+const { createGlobalPasteRuntime } = require("./main-app/dictation/global-paste-runtime.js");
 const { createWorkspaceFileServiceClass } = require("./main-app/workspace/files.js");
 const { createAuthorizedThreadCatalogServiceClass } = require("./main-app/thread-catalog/authorized-service.js");
 const { createPluginIncentivesClientRuntime } = require("./main-app/plugins/incentives-client.js");
@@ -143995,199 +143996,18 @@ var { Git, Wit } = createWindowsNativeCaptureBridgeModule({
   oH,
   fi,
 });
-var Yit = `/System/Library/Frameworks/AppKit.framework/AppKit`,
-  Xit = -25204,
-  Zit = -25205,
-  Qit = 1e3;
-async function $it(e) {
-  let { callFunction: t, fromPointer: n, NobjcLibrary: r } = await import(`objc-js`);
-  e?.throwIfAborted();
-  let i = new r(Yit),
-    a = i.NSString,
-    o = new Map(),
-    s = (e) => {
-      let t = o.get(e);
-      if (t != null) return t;
-      let n = a.stringWithUTF8String$(e);
-      return (o.set(e, n), n);
-    },
-    c = i.NSBundle.bundleWithIdentifier$(s(`com.apple.AppKit`)),
-    l = `Paste`;
-  c != null &&
-    (l = c
-      .localizedStringForKey$value$table$(s(`Paste`), s(`Paste`), s(`MenuCommands`))
-      .UTF8String());
-  let u = { callFunction: t, fromPointer: n, localizedPasteTitle: l, nativeString: s },
-    d = t(`AXUIElementCreateSystemWide`, { returns: `@`, args: [] });
-  if (d == null) throw Error(`Unable to access the macOS accessibility system.`);
-  t(`CFRelease`, { returns: `v`, args: [`@`] }, d);
-  let f = L7(u, d, `AXFocusedApplication`),
-    p = f == null ? void 0 : L7(u, f, `AXMenuBar`);
-  if (p == null) throw Error(`The foreground application does not expose an accessible menu bar.`);
-  let m = eat(u, p);
-  if (m == null)
-    throw Error(`The foreground application does not expose an enabled Paste command.`);
-  e?.throwIfAborted();
-  let h = t(`AXUIElementPerformAction`, { returns: `i`, args: [`@`, `@`] }, m, s(`AXPress`));
-  if (h !== 0 && h !== Xit && h !== Zit)
-    throw Error(
-      `Unable to activate the foreground application's Paste command (accessibility error ${h}).`,
-      { cause: h },
-    );
-}
-function eat(e, t) {
-  let n = [t],
-    r = 0,
-    i,
-    a = !1;
-  for (; n.length > 0;) {
-    let t = n.pop();
-    if (t == null) continue;
-    if (((r += 1), r > Qit)) throw Error(`The foreground application menu is too large to search.`);
-    if (I7(e, t, `AXRole`) === `AXMenuItem`) {
-      if (!L7(e, t, `AXEnabled`)?.boolValue()) continue;
-      let n = I7(e, t, `AXIdentifier`);
-      if (n != null && /(?:^|[./_-])paste:?$/iu.test(n)) return t;
-      let r = I7(e, t, `AXTitle`);
-      if (r === `Paste` || r === e.localizedPasteTitle) return t;
-      let o = I7(e, t, `AXMenuItemCmdChar`),
-        s = L7(e, t, `AXMenuItemCmdModifiers`);
-      o?.toLowerCase() === `v` && s?.intValue() === 0 && (i == null ? (i = t) : (a = !0));
-    }
-    let o = L7(e, t, `AXChildren`);
-    if (o == null) continue;
-    let s = o.count();
-    for (let e = s - 1; e >= 0; --e) {
-      let t = o.objectAtIndex$(e);
-      n.push(t);
-    }
-  }
-  return a ? void 0 : i;
-}
-function I7(e, t, n) {
-  return L7(e, t, n)?.UTF8String();
-}
-function L7(e, t, n) {
-  let r = Buffer.alloc(8);
-  if (
-    e.callFunction(
-      `AXUIElementCopyAttributeValue`,
-      { returns: `i`, args: [`@`, `@`, `^v`] },
-      t,
-      e.nativeString(n),
-      r,
-    ) !== 0 ||
-    r.readBigUInt64LE(0) === 0n
-  )
-    return;
-  let i = e.fromPointer(r);
-  return (e.callFunction(`CFRelease`, { returns: `v`, args: [`@`] }, i), i);
-}
-var tat = 150,
-  R7 = 700,
-  z7 = (0, d.promisify)(P.execFile);
-async function nat(e, t, n, i) {
-  if (i?.aborted) return null;
-  let a = process.platform === `darwin` && !l.systemPreferences.isTrustedAccessibilityClient(!1);
-  if (n != null && B7() !== n)
-    return { text: e, copied: !1, reason: a ? `accessibility` : `clipboard-changed` };
-  let o = rat();
-  l.clipboard.writeText(e);
-  let s = B7();
-  if (a) return { text: e, copied: !0, reason: `accessibility` };
-  let c = !1;
-  try {
-    let n = t != null && Number.isFinite(t) ? Math.max(0, Date.now() - t) : 0;
-    if ((await (0, D.setTimeout)(Math.max(0, tat - n)), i?.throwIfAborted(), B7() !== s))
-      return { text: e, copied: !1, reason: `clipboard-changed` };
-    ((c = !0), await aat(i), await (0, D.setTimeout)(R7));
-  } catch (t) {
-    return i?.aborted
-      ? (c && (await (0, D.setTimeout)(R7)), B7() === s && V7(o, e), null)
-      : (r.n().warning(`Global dictation paste failed`, { safe: {}, sensitive: { error: t } }),
-        {
-          text: e,
-          copied: B7() === s,
-          reason:
-            process.platform === `darwin` && !l.systemPreferences.isTrustedAccessibilityClient(!1)
-              ? `accessibility`
-              : `paste`,
-        });
-  }
-  return (B7() === s && V7(o, e), null);
-}
-function B7() {
-  let e = (0, _.createHash)(`sha256`);
-  e.update(l.clipboard.readText());
-  for (let t of l.clipboard.availableFormats().sort())
-    (e.update(t), e.update(l.clipboard.readBuffer(t)));
-  return e.digest(`hex`);
-}
-function rat() {
-  return {
-    data: {
-      text: l.clipboard.readText(),
-      html: l.clipboard.readHTML(),
-      rtf: l.clipboard.readRTF(),
-      image: l.clipboard.readImage(),
-      bookmark: l.clipboard.readBookmark().title,
-    },
-    formats: l.clipboard
-      .availableFormats()
-      .map((e) => ({ format: e, data: l.clipboard.readBuffer(e) })),
-  };
-}
-function V7(e, t) {
-  return l.clipboard.readText() === t && (iat(e), !0);
-}
-function iat(e) {
-  l.clipboard.write(e.data);
-  let t = new Set(l.clipboard.availableFormats());
-  for (let { format: n, data: r } of e.formats) t.has(n) || l.clipboard.writeBuffer(n, r);
-}
-async function aat(e) {
-  switch ((e?.throwIfAborted(), process.platform)) {
-    case `darwin`:
-      if (!l.systemPreferences.isTrustedAccessibilityClient(!1))
-        throw Error(`Accessibility permission is required to paste global dictation.`);
-      try {
-        await $it(e);
-      } catch {
-        (e?.throwIfAborted(),
-          await z7(
-            `/usr/bin/osascript`,
-            [`-e`, `tell application "System Events" to keystroke "v" using command down`],
-            { signal: e },
-          ));
-      }
-      return;
-    case `win32`:
-      await z7(
-        `powershell.exe`,
-        [
-          `-STA`,
-          `-NoProfile`,
-          `-NonInteractive`,
-          `-ExecutionPolicy`,
-          `Bypass`,
-          `-Command`,
-          `Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('^v')`,
-        ],
-        { signal: e },
-      );
-      return;
-    case `aix`:
-    case `android`:
-    case `cygwin`:
-    case `freebsd`:
-    case `haiku`:
-    case `linux`:
-    case `netbsd`:
-    case `openbsd`:
-    case `sunos`:
-      throw Error(`Global dictation paste is not supported on this OS.`);
-  }
-}
+var {
+  getClipboardFingerprint: B7,
+  pasteGlobalDictation: nat,
+} = createGlobalPasteRuntime({
+  platform: process.platform,
+  clipboard: l.clipboard,
+  isAccessibilityTrusted: () => l.systemPreferences.isTrustedAccessibilityClient(!1),
+  createHash: _.createHash,
+  delay: D.setTimeout,
+  execFile: (0, d.promisify)(P.execFile),
+  logger: r.n(),
+});
 var sat = createGlobalDictationWindowControllerClass({
     LazyWindow: GN,
     BrowserWindow: l.BrowserWindow,
