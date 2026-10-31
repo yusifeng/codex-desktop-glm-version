@@ -20,6 +20,7 @@ const realOwners = [
   ["src/main/main-app/mcp-sandbox/network-runtime.ts", "createMcpSandboxNetworkRuntime"],
   ["src/main/main-app/diagnostics/native-command-crash.ts", "createNativeCommandCrashRuntime"],
   ["src/main/main-app/browser-session/browser-session-probe.ts", "createBrowserSessionProbeRuntime"],
+  ["src/main/main-app/open-target/open-target-foundation.ts", "createOpenTargetFoundation"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -97,6 +98,12 @@ assert.equal(main.includes("e4e = class extends"), false, "generated browser ses
 assert.equal(main.includes("function U2e("), false, "generated source-window focus poller must be removed");
 assert.equal(main.includes("function t4e("), false, "generated browser callback parser must be removed");
 assert.equal(main.includes("async function r4e("), false, "generated browser challenge requester must be removed");
+assert.equal(main.includes("createOpenTargetFoundation({"), true, "real open-target foundation is wired");
+assert.equal(main.includes("var m1 = new Map(["), false, "generated native-document map owner must be removed");
+assert.equal(main.includes("function p4e("), false, "generated remote authority policy must be removed");
+assert.equal(main.includes("function S4e("), false, "generated custom target parser must be removed");
+assert.equal(main.includes("function P1("), false, "generated macOS application lookup must be removed");
+assert.equal(main.includes("function U1("), false, "generated editor descriptor constructor must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("90 main unwired-owner skeleton assertions passed");
+console.log("98 main unwired-owner skeleton assertions passed");

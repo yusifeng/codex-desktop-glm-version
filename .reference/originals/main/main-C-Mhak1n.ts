@@ -219,6 +219,7 @@ const { createMcpSandboxLifecycleRuntime } = require("./main-app/mcp-sandbox/lif
 const { createMcpSandboxNetworkRuntime } = require("./main-app/mcp-sandbox/network-runtime.js");
 const { createNativeCommandCrashRuntime } = require("./main-app/diagnostics/native-command-crash.js");
 const { createBrowserSessionProbeRuntime } = require("./main-app/browser-session/browser-session-probe.js");
+const { createOpenTargetFoundation } = require("./main-app/open-target/open-target-foundation.js");
 const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 const { createElectronPerformanceSnapshotCollectorClass } = require("./main-app/startup/electron-performance-snapshot-collector.js");
 const { MainThreadJankSampler } = require("./main-app/startup/main-thread-jank-sampler.js");
@@ -71032,440 +71033,55 @@ var { BrowserSessionProbe: e4e } = createBrowserSessionProbeRuntime({
   resolveElectronResourcesPath: o.t,
   allowDebugMenu: (e) => n.cu.allowDebugMenu(e),
 });
-var m1 = new Map([
-    [`pdf`, [`com.apple.Preview`]],
-    [`png`, [`com.apple.Preview`]],
-    [`jpg`, [`com.apple.Preview`]],
-    [`jpeg`, [`com.apple.Preview`]],
-    [`gif`, [`com.apple.Preview`]],
-    [`bmp`, [`com.apple.Preview`]],
-    [`tiff`, [`com.apple.Preview`]],
-    [`ico`, [`com.apple.Preview`]],
-    [`webp`, [`com.apple.Preview`]],
-    [`mov`, [`com.apple.QuickTimePlayerX`]],
-    [`mp4`, [`com.apple.QuickTimePlayerX`]],
-    [`m4v`, [`com.apple.QuickTimePlayerX`]],
-    [`avi`, [`com.apple.QuickTimePlayerX`]],
-    [`mkv`, [`com.apple.QuickTimePlayerX`]],
-    [`webm`, [`com.apple.QuickTimePlayerX`]],
-    [`mpg`, [`com.apple.QuickTimePlayerX`]],
-    [`mpeg`, [`com.apple.QuickTimePlayerX`]],
-    [`mp3`, [`com.apple.QuickTimePlayerX`]],
-    [`wav`, [`com.apple.QuickTimePlayerX`]],
-    [`m4a`, [`com.apple.QuickTimePlayerX`]],
-    [`aac`, [`com.apple.QuickTimePlayerX`]],
-    [`aiff`, [`com.apple.QuickTimePlayerX`]],
-    [`aif`, [`com.apple.QuickTimePlayerX`]],
-    [`flac`, [`com.apple.QuickTimePlayerX`]],
-    [`caf`, [`com.apple.QuickTimePlayerX`]],
-    [`zip`, [`com.apple.archiveutility`]],
-    [`tar`, [`com.apple.archiveutility`]],
-    [`gz`, [`com.apple.archiveutility`]],
-    [`tgz`, [`com.apple.archiveutility`]],
-    [`bz2`, [`com.apple.archiveutility`]],
-    [`tbz`, [`com.apple.archiveutility`]],
-    [`xz`, [`com.apple.archiveutility`]],
-    [`txz`, [`com.apple.archiveutility`]],
-    [`7z`, [`com.apple.archiveutility`]],
-    [`rar`, [`com.apple.archiveutility`]],
-    [`sketch`, [`com.bohemiancoding.sketch3`]],
-    [`fig`, [`com.figma.Desktop`]],
-    [`psd`, [`com.adobe.Photoshop`]],
-    [`ai`, [`com.adobe.illustrator`]],
-    [`indd`, [`com.adobe.InDesign`]],
-    [`xd`, [`com.adobe.xd`]],
-    [`doc`, [`com.microsoft.Word`, `com.apple.iWork.Pages`]],
-    [`docx`, [`com.microsoft.Word`, `com.apple.iWork.Pages`]],
-    [`xls`, [`com.microsoft.Excel`, `com.apple.iWork.Numbers`]],
-    [`xlsm`, [`com.microsoft.Excel`, `com.apple.iWork.Numbers`]],
-    [`xlsx`, [`com.microsoft.Excel`, `com.apple.iWork.Numbers`]],
-    [`csv`, [`com.microsoft.Excel`, `com.apple.iWork.Numbers`]],
-    [`ppt`, [`com.microsoft.Powerpoint`, `com.apple.iWork.Keynote`]],
-    [`pptx`, [`com.microsoft.Powerpoint`, `com.apple.iWork.Keynote`]],
-    [`key`, [`com.apple.iWork.Keynote`]],
-    [`pages`, [`com.apple.iWork.Pages`]],
-    [`numbers`, [`com.apple.iWork.Numbers`]],
-  ]),
-  c4e = new Set([...m1.keys(), `html`]);
-function l4e(e) {
-  let t = h.default.extname(e).slice(1).toLowerCase();
-  return m1.get(t) ?? [];
-}
-function h1(e, t = process.platform) {
-  return t === `darwin` && _1(e);
-}
-function g1(e, t = process.platform) {
-  return t !== `darwin` && _1(e);
-}
-function u4e(e, t = process.platform) {
-  return h1(e, t) || g1(e, t);
-}
-function _1(e) {
-  if (!(0, v.existsSync)(e) || !(0, v.statSync)(e).isFile()) return !1;
-  let t = h.default.extname(e).toLowerCase();
-  return t ? c4e.has(t.slice(1)) : !1;
-}
-function d4e({
-  requestedTarget: e,
-  requestedTargetWasFiltered: t,
-  preferredTarget: n,
-  shouldUseFileManager: r,
-  shouldUsePlatformDefaultViewer: i,
-  hasExplicitTarget: a,
-  allowPlatformFallback: o = !0,
-  platform: s,
-}) {
-  return targetSelectionPolicy.resolveRequestedTarget({
-    requestedTarget: e,
-    requestedTargetWasFiltered: t,
-    preferredTarget: n,
-    shouldUseFileManager: r,
-    shouldUsePlatformDefaultViewer: i,
-    hasExplicitTarget: a,
-    allowPlatformFallback: o,
-    platform: s,
-  });
-}
-function v1({ target: e, hasExplicitTarget: t, allowPlatformFallback: n = !0, platform: r }) {
-  return targetSelectionPolicy.resolveTargetFallback({
-    target: e,
-    hasExplicitTarget: t,
-    allowPlatformFallback: n,
-    platform: r,
-  });
-}
-var f4e = n.wf({
-  sshAlias: n.Of().nullable(),
-  sshHost: n.Of(),
-  sshPort: n.Cf().nullable(),
-  identity: n.Of().nullable(),
+var {
+  preferredBundleIdsForPath: l4e,
+  isDarwinNativeDocument: h1,
+  isPlatformDefaultViewerDocument: g1,
+  isNativeDocument: u4e,
+  resolveRequestedTarget: d4e,
+  resolveTargetFallback: v1,
+  remoteAuthorityName: p4e,
+  remoteHostLabel: y1,
+  bracketIpv6Host: g4e,
+  filterTargetIds: T1,
+  filterTargets: E1,
+  isTargetSupported: D1,
+  normalizeTargetIcon: O1,
+  parseCustomTargets: S4e,
+  macApplicationCandidates: P1,
+  findExistingMacApplication: F1,
+  findMacApplicationExecutable: I1,
+  findMacApplicationBundle: L1,
+  buildEditorArgs: R1,
+  buildVscodeRemoteArgs: z1,
+  createTargetDescriptor: H1,
+  createEditorTargetDescriptor: U1,
+  findCommandOrDesktopEntry: W1,
+  launchLinuxEditor: G1,
+} = createOpenTargetFoundation({
+  schema: n,
+  path: h,
+  fs: v,
+  os: p,
+  url: c,
+  platform: process.platform,
+  sshMetadataKey: n.cn,
+  customFileHandlersSetting: n.Ia.customFileHandlers,
+  createLogger: r.i,
+  spawn: Zi,
+  findExecutable: Yi,
+  findLinuxDesktopEntry: lO,
+  isHostConfig: n.Es,
+  isLocalHost: n.As,
+  isRemoteHost: n.Os,
+  remoteHost,
+  targetFilter: openTargetFilter,
+  targetInput: targetInputPolicy,
+  targetSelection: targetSelectionPolicy,
+  targetLaunchArgs,
+  targetDescriptors: targetDescriptorPolicy,
 });
-function p4e(e) {
-  if (e.kind === `ssh`) {
-    let t = S1(b1(e));
-    if (t) return t;
-    let n = C1(Array.isArray(e.terminal_command) ? e.terminal_command : []);
-    if (n) return n;
-  }
-  return e.name?.trim() || x1(e.id);
-}
-function y1(e) {
-  let t = b1(e),
-    n = S1(t);
-  if (n) return n;
-  if (t != null) {
-    if (t.identity?.trim()) return null;
-    let e = t.sshHost.trim();
-    if (e.length > 0) return w1(e, t.sshPort);
-  }
-  let r = Array.isArray(e.terminal_command) ? e.terminal_command : [];
-  if (h4e(r)) return null;
-  let i = C1(r);
-  return i ? w1(i, m4e(r)) : e.name?.trim() || x1(e.id);
-}
-function b1(e) {
-  let t = f4e.safeParse(e[n.cn]);
-  return t.success ? t.data : null;
-}
-function x1(e) {
-  return remoteHost.fallbackTargetIdentifier(e);
-}
-function S1(e) {
-  return remoteHost.readSshAlias(e);
-}
-function C1(e) {
-  return remoteHost.readTerminalCommandLastArg(e);
-}
-function m4e(e) {
-  return remoteHost.readTerminalCommandPort(e);
-}
-function h4e(e) {
-  return remoteHost.terminalCommandHasIdentity(e);
-}
-function w1(e, t) {
-  return remoteHost.formatHostWithPort(e, t);
-}
-function g4e(e) {
-  return remoteHost.bracketIpv6Host(e);
-}
-function T1(e, t, r) {
-  return openTargetFilter.filterTargetIdsForHost(e, t, r, {
-    isHostConfig: n.Es,
-    isLocalHost: n.As,
-    isRemoteHost: n.Os,
-    remoteHostLabel: y1,
-    platform: process.platform,
-  });
-}
-function E1(e, t) {
-  return openTargetFilter.filterTargetsForHost(t, e, {
-    isHostConfig: n.Es,
-    isLocalHost: n.As,
-    isRemoteHost: n.Os,
-    remoteHostLabel: y1,
-    platform: process.platform,
-  });
-}
-function D1(e, t) {
-  return openTargetFilter.isTargetSupported(t, e, {
-    isHostConfig: n.Es,
-    isLocalHost: n.As,
-    isRemoteHost: n.Os,
-    remoteHostLabel: y1,
-    platform: process.platform,
-  });
-}
-var _4e = `apps/`;
-function O1(e) {
-  return targetInputPolicy.normalizeAppsPath(e);
-}
-var v4e = `app://fs`,
-  y4e = `/@fs`,
-  b4e = `apps/vscode.png`,
-  x4e = n.Of().regex(/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/),
-  k1 = r.i(`open-in-targets`);
-function S4e(e, t) {
-  let r = n.Ia.customFileHandlers.schema.safeParse(e);
-  return r.success
-    ? Object.entries(r.data).flatMap(([e, n]) => {
-        let r = x4e.safeParse(e);
-        return r.success
-          ? [C4e(r.data, n, t)]
-          : (k1().warning(`Dropping invalid custom file handler`, {
-              safe: { id: e },
-              sensitive: { error: r.error },
-            }),
-            []);
-      })
-    : (e != null &&
-        k1().warning(`Dropping invalid custom file handlers config`, {
-          safe: {},
-          sensitive: { error: r.error },
-        }),
-      []);
-}
-function C4e(e, t, n) {
-  let r = `custom:${e}`;
-  return {
-    id: r,
-    configuredCommand: t.command,
-    configuredIcon: t.icon,
-    label: t.label,
-    icon: w4e(t.icon, n, !1),
-    kind: `editor`,
-    supportsSsh: t.supports_ssh,
-    detect: () => k4e(t.command, n),
-    iconPath: () => null,
-    args: () => t.args,
-    open: async ({
-      command: e,
-      path: n,
-      appPath: i,
-      location: a,
-      hostConfig: o,
-      remoteWorkspaceRoot: s,
-      remotePath: c,
-    }) => {
-      switch (t.input) {
-        case `path`:
-          await Zi(e, [...t.args, n]);
-          return;
-        case `json_argument`:
-          await Zi(e, [
-            ...t.args,
-            JSON.stringify({ target: r, path: n, appPath: i ?? null, location: a ?? null }),
-          ]);
-          return;
-        case `json_stdin`:
-          await Zi(e, t.args, {
-            stdin: JSON.stringify({
-              target: r,
-              path: n,
-              appPath: i ?? null,
-              location: a ?? null,
-              hostConfig: o ?? null,
-              remoteWorkspaceRoot: s ?? null,
-              remotePath: c ?? null,
-            }),
-          });
-          return;
-      }
-    },
-  };
-}
-function w4e(e, t, n = !0) {
-  if (D4e(e)) return O1(e);
-  if (O4e(e)) return e;
-  let r = T4e(e, t, n);
-  return r == null ? O1(b4e) : E4e(r);
-}
-function T4e(e, t, n) {
-  if (e.startsWith(`file:`))
-    try {
-      return (0, c.fileURLToPath)(e);
-    } catch {
-      return null;
-    }
-  return A1(e, t) && (t === `win32` || !n || (0, v.existsSync)(e)) ? e : null;
-}
-function E4e(e) {
-  let t = n.wl(n.Tl(e));
-  return `${v4e}${y4e}${encodeURI(t).replaceAll(`#`, `%23`).replaceAll(`?`, `%3F`)}`;
-}
-function D4e(e) {
-  return targetInputPolicy.isPackagedAppPath(e);
-}
-function O4e(e) {
-  return targetInputPolicy.isDataImage(e);
-}
-function k4e(e, t) {
-  return A1(e, t) ? ((0, v.existsSync)(e) ? e : null) : Yi(e);
-}
-function A1(e, t) {
-  return targetInputPolicy.isAbsoluteTargetPath(e, t, h.default);
-}
-var j1 = `/Applications`,
-  M1 = (0, h.join)((0, p.homedir)(), `Applications`),
-  N1 = [j1, M1];
-function P1(e) {
-  return e.startsWith(`${j1}/`) ? [e, (0, h.join)(M1, e.slice(`${j1}/`.length))] : [e];
-}
-function F1(e) {
-  if (process.platform !== `darwin`) return null;
-  for (let t of e) for (let e of P1(t)) if ((0, v.existsSync)(e)) return e;
-  return null;
-}
-function I1(e, t) {
-  if (process.platform !== `darwin`) return null;
-  let n = e.toLowerCase();
-  for (let e of N1) {
-    let r;
-    try {
-      r = (0, v.readdirSync)(e);
-    } catch {
-      continue;
-    }
-    for (let i of r) {
-      let r = i.toLowerCase();
-      if (!r.startsWith(n) || !r.endsWith(`.app`)) continue;
-      let a = (0, h.join)(e, i, `Contents`, `MacOS`, t);
-      if ((0, v.existsSync)(a)) return a;
-    }
-  }
-  return null;
-}
-function L1(e) {
-  if (process.platform !== `darwin`) return null;
-  let t = e.toLowerCase();
-  for (let e of N1) {
-    let n;
-    try {
-      n = (0, v.readdirSync)(e);
-    } catch {
-      continue;
-    }
-    for (let r of n) {
-      let n = r.toLowerCase();
-      if (!n.startsWith(t) || !n.endsWith(`.app`)) continue;
-      let i = (0, h.join)(e, r);
-      if ((0, v.existsSync)(i)) return i;
-    }
-  }
-  return null;
-}
-function R1(e, t) {
-  return targetLaunchArgs.buildEditorGotoArgs(e, t, process.platform);
-}
-function z1({ hostConfig: e, remoteWorkspaceRoot: t, remotePath: n, location: r }) {
-  if (e.kind === `remote-control`)
-    throw Error(`Remote control does not support VS Code remote open yet.`);
-  let i = `ssh-remote+${p4e(e)}`,
-    a = t?.trim() || void 0,
-    o = n?.trim() || void 0;
-  if (o != null && r != null)
-    return A4e({ remoteAuthority: i, remoteWorkspaceRoot: a, path: o, location: r });
-  let s = [];
-  return (
-    a != null && s.push(`--folder-uri`, B1(i, a)),
-    o != null && s.push(`--file-uri`, B1(i, o)),
-    s
-  );
-}
-function A4e({ remoteAuthority: e, remoteWorkspaceRoot: t, path: n, location: r }) {
-  return targetLaunchArgs.buildVscodeRemoteArgs({ remoteAuthority: e, remoteWorkspaceRoot: t, path: n, location: r });
-}
-function B1(e, t) {
-  return targetLaunchArgs.buildVscodeRemoteUri(e, t);
-}
-function V1({ label: e, icon: t, kind: n, platform: r }) {
-  return targetDescriptorPolicy.mergeTargetPlatformDescriptor({
-    label: e,
-    icon: t,
-    kind: n,
-    platform: r,
-  });
-}
-function H1({ id: e, label: t, icon: n, kind: r, hidden: i, darwin: a, win32: o, linux: s }) {
-  return targetDescriptorPolicy.createTargetDescriptor({
-    id: e,
-    label: t,
-    icon: n,
-    kind: r,
-    hidden: i,
-    darwin: a,
-    win32: o,
-    linux: s,
-  });
-}
-function U1({
-  id: e,
-  label: t,
-  icon: n,
-  darwinDetect: r,
-  win32Detect: i,
-  linuxDetect: a,
-  darwinEnv: o,
-  darwinArgs: s,
-  hidden: c,
-}) {
-  return targetDescriptorPolicy.createEditorTargetDescriptor({
-    id: e,
-    label: t,
-    icon: n,
-    darwinDetect: r,
-    win32Detect: i,
-    linuxDetect: a,
-    darwinEnv: o,
-    darwinArgs: s,
-    hidden: c,
-    defaultArgs: K1,
-    linuxOpen: (e) => G1(e, K1),
-  });
-}
-function W1(e, t) {
-  for (let t of e) {
-    let e = Yi(t);
-    if (e != null) return e;
-  }
-  return lO(t);
-}
-async function G1(
-  { command: e, path: t, location: n, hostConfig: r, remoteWorkspaceRoot: i, remotePath: a },
-  o,
-) {
-  if ((0, h.extname)(e) === `.desktop`) {
-    let n = Yi(`gio`);
-    if (n == null) throw Error(`Linux desktop application launcher is unavailable`);
-    await Zi(n, [`launch`, e, t]);
-    return;
-  }
-  await Zi(e, o(t, n, r, i, a));
-}
-var K1 = (e, t, r, i, a) =>
-    r != null && n.Es(r) && (i != null || a != null)
-      ? z1({ hostConfig: r, location: t, remotePath: a, remoteWorkspaceRoot: i })
-      : R1(e, t),
-  j4e = U1({
+var j4e = U1({
     id: `antigravity`,
     label: `Antigravity`,
     icon: `apps/antigravity.png`,

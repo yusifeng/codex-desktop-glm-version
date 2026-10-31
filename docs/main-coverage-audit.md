@@ -2633,3 +2633,15 @@ code redemption、callback URL/parameter validation 与 profile normalization �
 `u1/t4e/n4e/r4e/i4e/a4e/o4e/s4e/d1/f1/p1` helpers 共 499 行已物理删除。新生产 owner 616 行，
 `scripts/test-main-browser-session-probe-owner.mjs` 覆盖 60 项安全校验、网络 payload、native cache、
 callback server、tab guard、cancel 和 window cleanup 行为。
+
+### 增量抽取：open-target foundation owner
+
+`OpenInService` 下游原散落在 main 的 native-document extension/bundle policy、requested-target fallback、SSH
+authority/label normalization、host target filtering、custom handler validation/icon/command/launch、macOS app
+bundle/executable lookup、VS Code remote URI args、descriptor construction 与 Linux desktop/executable launch 已整体
+迁移至 `src/main/main-app/open-target/open-target-foundation.ts`。main 通过
+`createOpenTargetFoundation` 解构回原 target registry 与 `OpenInService` consumers；既有
+`remote-host`、`target-filter/input/selection/launch/descriptor` 纯 policy 模块作为依赖复用，没有复制状态。
+旧 `m1.._1`、`f4e..D1`、`S4e..A1`、`P1..K1` 共 433 行已物理删除；focused test
+`scripts/test-main-open-target-foundation-owner.mjs` 覆盖 58 项 document、remote、custom、discovery、descriptor
+和 launch 行为。后续静态 32-target registry/platform adapter 仍需整体审计，不以本 foundation 代替完成。

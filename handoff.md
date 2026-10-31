@@ -4652,3 +4652,13 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - main 中旧 class/helper 共 499 行已删除，新生产模块 616 行；focused coverage 60 项，no-unwired gate 扩至
   90 项。下一步继续审计其后 open-in target registry 的大型 detection/open controller，优先迁移共享
   cache、platform dispatch 与 editor/terminal launch owner，纯 target declarations 可随 owner 一次整体迁出。
+
+# 2026-11-01 open-target foundation owner
+
+- `src/main/main-app/open-target/open-target-foundation.ts` 已接管 native-document policy、SSH remote authority/
+  label、host filtering、custom target parse/icon/launch、macOS application discovery、VS Code remote args、target
+  descriptor construction 与 Linux editor launch；main 的静态 target registry 和 `OpenInService` 均真实消费
+  同一个 factory 输出。
+- 旧 helpers 433 行已删除，新生产模块 492 行；focused coverage 58 项，no-unwired gate 扩至 98 项。
+  下一批继续处理仍在 main 的 32-target declaration/platform detection registry 与 native application discovery；
+  不重复迁移已语义化的 filter/input/selection/launch policies。
