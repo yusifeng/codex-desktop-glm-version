@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+大批收敛 conversation/realtime/automation 链：删除主 chunk 2,489 行已被语义模块真实替代的重复实现，包括 realtime handoff parser 与
+RealtimeThreadState、resume buffer、goal resume、thread-start deferral、unread/prewarm、conversation creation helpers、queued follow-up factory、
+完整 turn-context/annotation/queued-input 副本，以及 marked extension/push registration 副本。唯一跨块 annotation fallback consumer 改接
+turn-context 命名导出；新增 InboxItemsFacade 并接回桌面启动 consumer，push register/deregister 改接现有语义模块。
+
 恢复 server request owner：permissions/file/command approval、user input/option/context picker、pending/invalid/dynamic tool dispatch、MCP elicitation
 validation/auto-approval、current time 与 legacy warning 均按原副作用顺序处理。补齐 userInputResponse synthesis 和 codex_app dynamic tool validator；
 主 chunk 旧 `Pye` 及仅由它消费的 onboarding parser/schema 簇删除。

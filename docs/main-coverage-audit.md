@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 conversation/realtime/automation large-batch consolidation
+
+本批不按微小 owner 拆提交，一次核对并移除 2,489 行 dead duplicate：realtime parser/state、stream replay buffer、goal resume、notification
+deferral、unread/prewarm、conversation creation helpers、queued-follow-up factory、turn-context 全链和 marked/push 副本。`eCe` 唯一远端 consumer
+改接 `controlFallbackValue`；原未迁出的 `xwe` 落为 `automations/inbox-items.ts`，桌面启动改接 `InboxItemsFacade`；push consumer 改接
+`notifications/push-registration.ts`。focused suites 覆盖 realtime XML、三类 deferral owner、queued factory、control fallback 与 inbox lifecycle。
+
 ## 2026-10-31 server request owner restoration
 
 语义 `Pye` 原为不读取真实 options 的空 handler。现恢复审批请求入队/事件、user input synthesis、option/context picker、codex_app pending

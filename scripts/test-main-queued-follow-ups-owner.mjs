@@ -72,13 +72,31 @@ const memberNames = classNode.body.body
 equal(memberNames.includes("sendMessage"), true);
 equal(memberNames.includes("acceptFromFollower"), true);
 
+const turnContextSource = fs.readFileSync(new URL("../src/main/main-app/conversation/turn-context.ts", import.meta.url), "utf8");
+const turnContextTranspiled = await transform(turnContextSource, { loader: "ts", format: "esm", target: "es2022" });
+const turnContextAst = acorn.parse(turnContextTranspiled.code, { ecmaVersion: "latest", sourceType: "module" });
+const fallbackNode = turnContextAst.body.find((node) => node.type === "FunctionDeclaration" && node.id?.name === "controlFallbackValue");
+assert.ok(fallbackNode, "control fallback owner should be exported from turn-context");
+assertions += 1;
+const controlFallbackValue = Function(`${turnContextTranspiled.code.slice(fallbackNode.start, fallbackNode.end)}; return controlFallbackValue;`)();
+equal(controlFallbackValue({ type: "toggle" }), false);
+equal(controlFallbackValue({ type: "color" }), "#ffffff");
+equal(controlFallbackValue({ type: "range", min: 2 }), 2);
+equal(controlFallbackValue({ type: "select", options: [{ value: "first" }] }), "first");
+equal(controlFallbackValue({ type: "toggle", currentValue: true }), true);
+
 const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
 );
 equal(main.includes('require("./main-app/conversation/queued-follow-ups.js")'), true);
-equal(main.includes("VSe = QueuedFollowUpsCoordinator"), true);
-equal(main.includes("VSe = class"), false);
-equal(main.includes("return new VSe({"), true);
+for (const generatedName of ["zSe", "BSe", "wC", "VSe", "TC", "HSe", "USe"])
+  equal(new RegExp(`\\b${generatedName}\\b`).test(main), false);
+const managerSource = fs.readFileSync(new URL("../src/main/main-app/conversation/app-server-manager.ts", import.meta.url), "utf8");
+equal(managerSource.includes('import { createQueuedFollowUps } from "./queued-follow-ups"'), true);
+equal(managerSource.includes("this.turnCoordinator = createQueuedFollowUps("), true);
+for (const generatedName of ["EC", "WSe", "DC", "GSe", "OC", "KSe", "qSe", "eCe", "zC", "XCe", "nwe", "iwe", "awe"])
+  equal(main.includes(`function ${generatedName}(`), false);
+equal(main.includes("controlFallbackValue(e) !== e.currentValue"), true);
 
 console.log(`${assertions} main queued follow-ups owner assertions passed`);

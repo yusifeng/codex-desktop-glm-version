@@ -68,6 +68,8 @@ const main = fs.readFileSync(
 );
 for (const generatedName of ["FSe", "ISe", "LSe", "CC", "RSe"])
   equal(new RegExp(`\\b${generatedName}\\b`).test(main), false);
+for (const generatedName of ["ASe", "jSe", "MSe", "NSe", "PSe"])
+  equal(new RegExp(`\\b${generatedName}\\b`).test(main), false);
 
 const manager = fs.readFileSync(
   new URL("../src/main/main-app/conversation/app-server-manager.ts", import.meta.url),

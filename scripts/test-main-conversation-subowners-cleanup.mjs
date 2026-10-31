@@ -158,6 +158,36 @@ inactiveOwner.dispose();
 equal(cleanupCalls, 4);
 equal(inactiveOwner.disposed, true);
 
+const itemNotificationSource = fs.readFileSync(
+  new URL("../src/main/main-app/streams/item-notifications.ts", import.meta.url),
+  "utf8",
+);
+const itemNotificationTranspiled = await transform(itemNotificationSource, { loader: "ts", format: "cjs", target: "es2022" });
+const itemNotificationModule = { exports: {} };
+Function("require", "module", "exports", itemNotificationTranspiled.code)((specifier) => {
+  if (specifier === "@chunk/shared") return { $u: String };
+  if (specifier === "../vendor/immer") return { freezeIdentity: (value) => value };
+  if (specifier === "../turns/canonical-history") return {};
+  if (specifier === "../turns/steering-merge") return {};
+  if (specifier === "./delta-queues") return {};
+  throw new Error(`unexpected require ${specifier}`);
+}, itemNotificationModule, itemNotificationModule.exports);
+const realtime = itemNotificationModule.exports;
+equal(realtime.parseRealtimeItemAddedItem({
+  type: "handoff_request", handoff_id: "handoff-1", item_id: "item-1",
+  input_transcript: "<realtime_delegation><input>Fix &amp; test</input><transcript_delta>assistant: prior</transcript_delta></realtime_delegation>",
+  active_transcript: [],
+}), {
+  codexItemId: "realtime-delegation-item-1", handoffId: "handoff-1", input: "Fix & test", itemId: "item-1",
+  transcriptDelta: "assistant: prior",
+});
+equal(realtime.parseRealtimeItemAddedItem({
+  type: "handoff_request", handoff_id: "handoff-2", input_transcript: "",
+  active_transcript: [{ role: "user", text: "fallback" }],
+}).input, "user: fallback");
+equal(realtime.buildRealtimeTranscriptItems("Fix <this>", "assistant: & prior")[0].text,
+  "<realtime_delegation>\n  <input>Fix &lt;this&gt;</input>\n  <transcript_delta>assistant: &amp; prior</transcript_delta>\n</realtime_delegation>");
+
 const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
@@ -168,6 +198,9 @@ for (const generatedName of ["T_e", "Iv", "E_e"])
   equal(new RegExp(`\\b${generatedName}\\b`).test(main), false);
 for (const generatedName of ["_v", "vv", "__e", "yv", "bv", "xv", "Sv"])
   equal(main.includes(`function ${generatedName}(`), false);
+for (const generatedName of ["Uve", "Cy", "wy", "Wve", "Gve", "Ty", "Kve", "qve", "Ey", "Jve", "dSe", "fSe", "yC"])
+  equal(main.includes(`function ${generatedName}(`), false);
+equal(main.includes("var pSe = class"), false);
 
 const manager = fs.readFileSync(
   new URL("../src/main/main-app/conversation/app-server-manager.ts", import.meta.url),

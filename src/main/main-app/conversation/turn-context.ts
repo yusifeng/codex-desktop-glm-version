@@ -348,7 +348,7 @@ const annotationControlsSchema = zDiscriminatedUnion({
 });
 
 /** 控件缺省值（原 eCe）。 */
-function controlFallbackValue(control: any) {
+export function controlFallbackValue(control: any) {
   let fallback = control.defaultValue ?? control.currentValue;
   if (fallback != null) return fallback;
   switch (control.type) {

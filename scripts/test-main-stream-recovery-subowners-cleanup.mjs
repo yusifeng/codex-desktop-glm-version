@@ -23,6 +23,17 @@ const classes = new Map(
 equal(classes.get("StreamRecovery")?.body.body.length, 18);
 equal(classes.get("TurnStartObservations")?.body.body.length, 20);
 
+const deferralSource = fs.readFileSync(
+  new URL("../src/main/main-app/conversation/notification-deferral.ts", import.meta.url),
+  "utf8",
+);
+const deferralTranspiled = await transform(deferralSource, { loader: "ts", format: "esm", target: "es2022" });
+const deferralAst = acorn.parse(deferralTranspiled.code, { ecmaVersion: "latest", sourceType: "module" });
+const deferralClasses = new Map(deferralAst.body.filter((node) => node.type === "ClassDeclaration").map((node) => [node.id?.name, node]));
+equal(deferralClasses.get("ThreadStartedNotificationDeferral")?.body.body.length, 18);
+equal(deferralClasses.get("UnreadTurnState")?.body.body.length, 10);
+equal(deferralClasses.get("PrewarmedThreadManager")?.body.body.length, 10);
+
 const observationNode = classes.get("TurnStartObservations");
 const observationSource = transpiled.code.slice(observationNode.start, observationNode.end);
 const TurnStartObservations = Function(
@@ -89,6 +100,8 @@ const main = fs.readFileSync(
 );
 equal(/\bcSe\b/.test(main), false);
 equal(/\blSe\b/.test(main), false);
+for (const generatedName of ["bC", "mSe", "xC", "SC", "hSe", "gSe", "xSe", "SSe", "CSe", "wSe", "TSe", "ESe", "DSe", "OSe", "kSe"])
+  equal(new RegExp(`\\b${generatedName}\\b`).test(main), false);
 
 const manager = fs.readFileSync(
   new URL("../src/main/main-app/conversation/app-server-manager.ts", import.meta.url),
