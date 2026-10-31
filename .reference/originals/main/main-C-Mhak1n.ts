@@ -114,6 +114,7 @@ const { createTerminalCommandRuntime } = require("./main-app/terminal/terminal-c
 const { createThreadArchiveServiceClass } = require("./main-app/threads/thread-archive-service.js");
 const { createThreadCatalogPageSlotSchedulerClass } = require("./main-app/thread-catalog/page-slot-scheduler.js");
 const { createThreadMetadataGenerationServiceClass } = require("./main-app/threads/thread-metadata-generation-service.js");
+const { createThreadReadStateRpcServices } = require("./main-app/thread-read-state/rpc-services.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -140550,64 +140551,8 @@ function Ant(e) {
     }
   );
 }
-var jnt = class extends n.Uf {
-    owner;
-    constructor(e) {
-      (super(), (this.owner = e));
-    }
-    async getExecutionHostKeys() {
-      return this.owner.executionHostKeysByHostId;
-    }
-    async open(e, t) {
-      let n = e.dup(),
-        r,
-        i = !1,
-        o;
-      try {
-        o = await this.owner.open((e) => {
-          try {
-            var t = a.en();
-            (t.u(n(e)), e.type === `retired` && ((i = !0), r?.unsubscribe()));
-          } catch (e) {
-            t.e = e;
-          } finally {
-            t.d();
-          }
-        }, t);
-      } catch (e) {
-        throw (n[Symbol.dispose](), e);
-      }
-      return o.status === `ready`
-        ? ((r = new Mnt(o.session, () => {
-            n[Symbol.dispose]();
-          })),
-          n.onRpcBroken(() => r?.unsubscribe()),
-          i && r.unsubscribe(),
-          { ...o, session: r })
-        : (n[Symbol.dispose](), o);
-    }
-  },
-  Mnt = class extends n.Uf {
-    session;
-    cleanup;
-    constructor(e, t) {
-      (super(), (this.session = e), (this.cleanup = t));
-    }
-    set(e) {
-      return this.session.set(e);
-    }
-    clearForLogout() {
-      return this.session.clearForLogout();
-    }
-    unsubscribe() {
-      this.session[Symbol.dispose]();
-      let e = this.cleanup;
-      ((this.cleanup = null), e?.());
-    }
-    [Symbol.dispose]() {
-      this.unsubscribe();
-    }
-  },
+var { ThreadReadStateService: jnt, ThreadReadStateSession: Mnt } =
+    createThreadReadStateRpcServices({ RpcHandlerBase: n.Uf, createUsingScope: a.en }),
   Nnt = class extends n.Uf {
     logger = r.r(`ThreadTurnSummaryService`);
     listeners = new Set();

@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread read-state RPC services
+
+原 `jnt/Mnt` 已迁入 `src/main/main-app/thread-read-state/rpc-services.ts`。新 adapters 保留 callback dup/using-scope、
+owner open failure/non-ready cleanup、ready session wrapping、retired-before-wrapper race、RPC-broken unsubscribe、set/
+clearForLogout forwarding，以及 callback cleanup-once；唯一 runtime consumer 已接回，旧 classes 已删除。
+
 ## 2026-10-31 thread metadata generation service
 
 原 `I5` 已迁入 `src/main/main-app/threads/thread-metadata-generation-service.ts`。新 owner 保留 ephemeral model
