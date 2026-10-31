@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 Skysight/Chronicle recorder owner：既有 `skysight/service-manager.ts` 的 `SkysightServiceManager` 现已替代主 chunk
+旧 `joe/Moe`。desired/cached state、serialized enable/pause/resume/stop、status dedupe、plugin reconciliation、失败 rollback 与
+segment closure validation 均由完整 24-member 语义 owner 持有；真实 startup consumer 继续通过 `Moe` 别名构造。
+
 迁出 hosted AppServerManager registry：原 `LEe` 已迁入 `app-server/hosted-manager-registry.ts`。跨 connection entry、identity
 readiness、generation race、异步 manager creation、principal/account 更新、subscriber fan-out 与 retirement/disposal 仍由完整
 19-member owner 持有；bootstrap export 继续保留生成别名，旧 class 已删除。

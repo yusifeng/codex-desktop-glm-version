@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 Skysight service manager wiring
+
+既有 `src/main/main-app/skysight/service-manager.ts` 已完整实现原 `Moe` 的 24-member recorder state machine，但此前无 main
+consumer。本轮将真实 startup `new Moe(...)` 接到 `SkysightServiceManager`，删除旧 `joe/Moe`；focused suite 覆盖 enable、
+pause/resume、disable、settings/history、失败 rollback 与未关闭 segment 拒绝。
+
 ## 2026-10-31 hosted AppServerManager registry owner
 
 原 `LEe` 已迁入 `src/main/main-app/app-server/hosted-manager-registry.ts`，bootstrap 继续以 `LEe` 导出该语义 factory class。
