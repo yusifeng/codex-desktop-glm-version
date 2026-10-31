@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 browser comment policy belt extraction
+
+新增 `browser-sidebar/browser-comment-policy.ts`，将截图 crop/resize/compact/record、saved-comment 与 anchor-state 投影、multi-anchor 选择、键盘输入、
+design change 集合操作、provenance scoring/merge/enrichment、CSS shorthand alias、identity/equality 和页面 runtime comment-mode request 统一迁入具名
+policy factory。主 chunk 的 comment controller 依赖已改接该 factory，原 helper 定义与无 consumer 的旧 block-check wrapper 已物理删除；新模块 654 行，
+整批净增加可读实现，而非仅删除代码。52 条 focused 行为/接线断言通过，防空壳审计覆盖新 owner 与旧定义缺席。
+
 ## 2026-11-01 Library projectless-output backend restoration
 
 新增 `files/library-files-backend.ts`，补齐上一批 Library 安全访问层的 upstream owner：projectless thread 分页、assignment/projectless admission、

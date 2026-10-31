@@ -82,6 +82,7 @@ const realOwners = [
   ["src/main/main-app/browser-sidebar/browser-settings-webview-runtime.ts", "createBrowserSettingsWebviewRuntime"],
   ["src/main/main-app/browser-sidebar/browser-webview-adoption-runtime.ts", "attachPendingAdoptedWebview"],
   ["src/main/main-app/browser-sidebar/browser-annotation-anchor-policy.ts", "createBrowserAnnotationAnchorPolicy"],
+  ["src/main/main-app/browser-sidebar/browser-comment-policy.ts", "createBrowserCommentPolicy"],
   ["src/main/main-app/browser-sidebar/site-page-event-runtime.ts", "createSitePageEventRuntime"],
   ["src/main/main-app/browser-sidebar/browser-host-service.ts", "createBrowserHostServiceClass"],
   ["src/main/main-app/window/browser-window-rpc-services.ts", "createBrowserProfileImportServiceClass"],
@@ -168,6 +169,10 @@ assert.equal(main.includes('require("./main-app/browser-sidebar/browser-use-open
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-settings-webview-runtime.js")'), true, "browser settings webview runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-webview-adoption-runtime.js")'), true, "browser webview adoption runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-annotation-anchor-policy.js")'), true, "browser annotation anchor policy is wired");
+assert.equal(main.includes('require("./main-app/browser-sidebar/browser-comment-policy.js")'), true, "browser comment policy is wired");
+for (const oldOwner of ["function gGe(", "function HK(", "function UK(", "function WK(", "function GK(", "function KK(", "function JK(", "function kGe(", "function tq(", "function PGe("]) {
+  assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser comment policy must be removed`);
+}
 assert.equal(main.includes('require("./main-app/language-server/runtime-installer.js")'), true, "language-server runtime installer is wired");
 for (const oldOwner of ["function lX(", "function uX(", "function $Ye(", "function dX(", "function eXe(", "function fX(", "function tXe(", "function nXe(", "function pX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser tab lifecycle owner must be removed`);

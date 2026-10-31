@@ -248,6 +248,7 @@ const { createBrowserSessionServiceClass } = require("./main-app/browser-sidebar
 const { BrowserUseOpenRequestRegistry } = require("./main-app/browser-sidebar/browser-use-open-request-registry.js");
 const { createBrowserSettingsWebviewRuntime, parseBrowserSettingsUrl: UG } = require("./main-app/browser-sidebar/browser-settings-webview-runtime.js");
 const { createBrowserAnnotationAnchorPolicy } = require("./main-app/browser-sidebar/browser-annotation-anchor-policy.js");
+const { createBrowserCommentPolicy } = require("./main-app/browser-sidebar/browser-comment-policy.js");
 const {
   BROWSER_WEBVIEW_ADOPTION_LEASE: IG,
   getWebviewInstanceId: GG,
@@ -37806,14 +37807,6 @@ var CK = n.vf(`mode`, [
                 e.openTweaks !== !0 &&
                 e.siteInitiated !== !0),
     );
-function MK(e, t) {
-  return (
-    e.anchor.kind === `virtual` &&
-    t.kind === `virtual` &&
-    n.Cu(e.anchor, t) &&
-    jK.safeParse(e).success
-  );
-}
 function NK(e, t, n, r) {
   if (e.width <= 0 || e.height <= 0 || n.width <= 0 || n.height <= 0) return null;
   let i = e.width / n.width,
@@ -37828,11 +37821,6 @@ function NK(e, t, n, r) {
 }
 var PK = r.i(`browser-sidebar-comment-controller`),
   sGe = 1e3,
-  FK = 32,
-  IK = 16,
-  LK = 1280,
-  cGe = 1024,
-  RK = 768,
   lGe = `data-codex-browser-design-group`,
   uGe = n.wf({ root: n.wf({ nodeId: n.Cf() }) }),
   dGe = n.wf({ nodeId: n.Cf() }),
@@ -37865,8 +37853,41 @@ var PK = r.i(`browser-sidebar-comment-controller`),
       inlineStyle: n.wf({ cssProperties: n.hf(zK).optional() }).optional(),
       matchedCSSRules: n.hf(pGe).optional(),
     })
-    .loose(),
-  hGe = createBrowserCommentControllerClass({
+    .loose();
+var {
+  anchorStateFromComment: KK,
+  compactCommentScreenshots: gGe,
+  createSavedComment: GK,
+  createScreenshotRecord: UK,
+  cropAnnotationScreenshot: HK,
+  enrichDesignChangeProvenance: kGe,
+  escapeAttributeSelector: NGe,
+  isVirtualDesignChangeForAnchor: MK,
+  keepPrimaryAnchorOnly: qK,
+  keyboardEventFromInput: SGe,
+  mergeProvenance: ZK,
+  provenanceComplete: TGe,
+  provenanceEquals: QK,
+  queueDesignChange: JK,
+  removeAnchorSelection: bGe,
+  removeCommentBody: wGe,
+  removeDesignChange: XK,
+  resizeImageToFit: WK,
+  sameDesignChangeIdentity: EGe,
+  sendPendingCommentModeRequestToRuntime: tq,
+  screenshotMaxDimension: LK,
+  textInputFromKeyEvent: xGe,
+  unionScreenshotRegion: VK,
+  upsertComment: YK,
+} = createBrowserCommentPolicy({
+  anchorsEqual: n.Cu,
+  browserRuntimeMessageChannel: a.At,
+  isDesignChange: (value) => jK.safeParse(value).success,
+  markerSize: n._u,
+  nativeImage: l.nativeImage,
+  projectCaptureRect: NK,
+});
+var hGe = createBrowserCommentControllerClass({
     shared: n,
     ipcChannels: a,
     electron: l,
@@ -37910,468 +37931,6 @@ var PK = r.i(`browser-sidebar-comment-controller`),
     removeCommentBody: wGe,
     textInputFromKeyEvent: xGe,
   });
-function gGe(e) {
-  let t = !1,
-    n = e.map((e) => {
-      if (
-        e.screenshot == null ||
-        e.screenshot.isCompact === !0 ||
-        (e.additionalAnchors?.length ?? 0) > 0
-      )
-        return e;
-      if (((t = !0), e.anchor.kind === `virtual`)) {
-        let t = WK(l.nativeImage.createFromDataURL(e.screenshot.dataUrl), RK);
-        return {
-          ...e,
-          screenshot: { ...e.screenshot, dataUrl: t.toDataURL(), ...t.getSize(), isCompact: !0 },
-        };
-      }
-      let n = e.screenshot.annotationViewportRect ?? e.screenshot.cropViewportRect ?? e.anchor.rect,
-        r = e.screenshot.markerViewportPoint ?? e.markerViewportPoint,
-        i = VK(n, r) ?? e.anchor.rect;
-      return {
-        ...e,
-        screenshot: UK(
-          _Ge(l.nativeImage.createFromDataURL(e.screenshot.dataUrl), e, i),
-          !0,
-          i,
-          e.screenshot.annotationViewportRect ?? e.anchor.rect,
-          r,
-        ),
-      };
-    });
-  return t ? n : e;
-}
-function _Ge(e, t, n) {
-  let r = t.screenshot;
-  return r?.cropViewportRect == null
-    ? HK(e, { annotation: t, screenshotCropRect: n, shouldUseCompactScreenshot: !0 })
-    : WK(yGe(e, r.cropViewportRect, n, t.viewportSize, r.cropPaddingPx ?? FK), RK);
-}
-function VK(e, t) {
-  let r = t == null ? null : { x: t.x - n._u / 2, y: t.y - n._u / 2, width: n._u, height: n._u };
-  if (e == null) return r;
-  if (r == null) return e;
-  let i = Math.min(e.x, r.x),
-    a = Math.min(e.y, r.y),
-    o = Math.max(e.x + e.width, r.x + r.width),
-    s = Math.max(e.y + e.height, r.y + r.height);
-  return { x: i, y: a, width: o - i, height: s - a };
-}
-function HK(e, { annotation: t, screenshotCropRect: n, shouldUseCompactScreenshot: r }) {
-  let i = t.viewportSize,
-    a = n != null && i != null && i.width > 0 && i.height > 0;
-  return WK(a ? vGe(e, n, i, r ? IK : FK) : e, r ? RK : a ? cGe : LK);
-}
-function UK(e, t, n, r, i) {
-  let { width: a, height: o } = e.getSize();
-  return {
-    annotationViewportRect: r ?? void 0,
-    ...(n == null ? {} : { cropPaddingPx: t ? IK : FK, cropViewportRect: n }),
-    dataUrl: e.toDataURL(),
-    ...(t ? { isCompact: !0 } : {}),
-    markerViewportPoint: i,
-    width: a,
-    height: o,
-  };
-}
-function vGe(e, t, n, r) {
-  let i = NK(e.getSize(), t, n, r);
-  return i == null ? e : e.crop(i);
-}
-function yGe(e, t, n, r, i) {
-  if (r == null || r.width <= 0 || r.height <= 0) return e;
-  let a = Math.max(0, t.x - i),
-    o = Math.max(0, t.y - i),
-    s = Math.min(r.width, t.x + t.width + i),
-    c = Math.min(r.height, t.y + t.height + i),
-    l = Math.max(0, n.x - IK),
-    u = Math.max(0, n.y - IK),
-    d = Math.min(r.width, n.x + n.width + IK),
-    f = Math.min(r.height, n.y + n.height + IK),
-    p = s - a,
-    m = c - o;
-  if (p <= 0 || m <= 0) return e;
-  let h = e.getSize(),
-    g = h.width / p,
-    _ = h.height / m,
-    v = Math.max(0, Math.floor((l - a) * g)),
-    y = Math.max(0, Math.floor((u - o) * _)),
-    b = Math.min(h.width, Math.ceil((d - a) * g)),
-    x = Math.min(h.height, Math.ceil((f - o) * _)),
-    S = b - v,
-    C = x - y;
-  return S <= 0 || C <= 0 ? e : e.crop({ x: v, y, width: S, height: C });
-}
-function WK(e, t) {
-  let { width: n, height: r } = e.getSize(),
-    i = Math.max(n, r);
-  if (i <= t) return e;
-  let a = t / i;
-  return e.resize({
-    width: Math.max(1, Math.round(n * a)),
-    height: Math.max(1, Math.round(r * a)),
-  });
-}
-function GK({
-  anchorState: e,
-  body: t,
-  pageInitialComment: n,
-  commentId: r,
-  attachedImages: i,
-  designChange: a,
-  screenshot: o,
-}) {
-  return {
-    id: r,
-    createdAt: new Date().toISOString(),
-    anchor: e.anchor,
-    additionalAnchors: e.additionalAnchors?.length ? e.additionalAnchors : void 0,
-    color: `blue`,
-    ...(e.anchor.kind === `element` || e.anchor.kind === `virtual`
-      ? { markerViewportPoint: e.viewportPoint }
-      : {}),
-    attachedImages: i,
-    ...(t == null || t.length === 0 ? {} : { body: t }),
-    pageInitialComment: n,
-    ...(a == null ? {} : { designChange: a }),
-    ...(o == null ? {} : { screenshot: o }),
-    themeVariant: e.themeVariant,
-    viewportSize: e.viewportSize,
-  };
-}
-function KK(e, t) {
-  return {
-    anchor: e.anchor,
-    viewportRect: e.screenshot?.annotationViewportRect ?? e.anchor.rect,
-    viewportPoint: e.markerViewportPoint ?? t.viewportPoint,
-    viewportSize: e.viewportSize,
-    themeVariant: e.themeVariant,
-  };
-}
-function bGe(e, t) {
-  if (e.anchor.kind === `text`) return null;
-  let [n, ...r] = [e.anchor, ...(e.additionalAnchors ?? [])].filter((e, n) => n !== t);
-  return n == null
-    ? null
-    : {
-        ...e,
-        anchor: n,
-        additionalAnchors: r.length === 0 ? void 0 : r,
-        cardViewportRect: t === 0 ? void 0 : e.cardViewportRect,
-      };
-}
-function qK(e) {
-  return { ...e, additionalAnchors: void 0 };
-}
-function xGe(e) {
-  return e.type !== `keyDown` ||
-    e.isComposing ||
-    e.control === !0 ||
-    e.meta === !0 ||
-    (e.alt === !0 && e.key.charCodeAt(0) <= 127) ||
-    e.key.length !== 1
-    ? null
-    : e.key;
-}
-function SGe(e) {
-  if (
-    e.isComposing ||
-    (e.type !== `keyDown` && e.type !== `keyUp`) ||
-    (e.type === `keyDown` && e.key === `Shift`) ||
-    (e.type === `keyUp` && e.key !== `Shift`)
-  )
-    return null;
-  let t = [];
-  return (
-    e.shift && t.push(`shift`),
-    e.control && t.push(`control`),
-    e.alt && t.push(`alt`),
-    e.meta && t.push(`meta`),
-    e.isAutoRepeat && t.push(`isautorepeat`),
-    { type: e.type, keyCode: CGe(e.key), modifiers: t }
-  );
-}
-function CGe(e) {
-  switch (e) {
-    case ` `:
-      return `Space`;
-    case `ArrowDown`:
-      return `Down`;
-    case `ArrowLeft`:
-      return `Left`;
-    case `ArrowRight`:
-      return `Right`;
-    case `ArrowUp`:
-      return `Up`;
-    case `Escape`:
-      return `Esc`;
-    default:
-      return e;
-  }
-}
-function JK(e, t) {
-  return {
-    ...e,
-    ...(t.length === 0 ? {} : { comment: t }),
-    status: `queued`,
-    updatedAt: new Date().toISOString(),
-  };
-}
-function YK(e, t) {
-  return e.some((e) => e.id === t.id) ? e.map((e) => (e.id === t.id ? t : e)) : [...e, t];
-}
-function XK(e) {
-  let { designChange: t, ...n } = e;
-  return n;
-}
-function wGe(e) {
-  let { body: t, ...n } = e;
-  return n;
-}
-function ZK(e, ...t) {
-  let n = new Map();
-  for (let e of t)
-    for (let t of e ?? []) {
-      let e = n.get(t.property);
-      (e == null || $K(t) >= $K(e)) && n.set(t.property, t);
-    }
-  return e.flatMap((e) => {
-    let t = n.get(e.property);
-    return t == null ? [] : [t];
-  });
-}
-function TGe(e, t) {
-  return ZK(e, t).length === e.length && t.every((e) => $K(e) > 0);
-}
-function QK(e, t) {
-  return (
-    e.length === t.length &&
-    e.every((e, n) => {
-      let r = t[n];
-      return (
-        e.property === r.property &&
-        e.selectorText === r.selectorText &&
-        e.sourceUrl === r.sourceUrl &&
-        e.sourceLine === r.sourceLine &&
-        e.sourceColumn === r.sourceColumn
-      );
-    })
-  );
-}
-function EGe(e, t) {
-  return (
-    e != null &&
-    e.id === t.id &&
-    e.createdAt === t.createdAt &&
-    e.status === t.status &&
-    e.draftAttribute === t.draftAttribute &&
-    e.selector === t.selector &&
-    e.targetLabel === t.targetLabel &&
-    n.Cu(e.anchor, t.anchor) &&
-    e.markerViewportPoint?.x === t.markerViewportPoint?.x &&
-    e.markerViewportPoint?.y === t.markerViewportPoint?.y &&
-    e.viewportSize?.width === t.viewportSize?.width &&
-    e.viewportSize?.height === t.viewportSize?.height &&
-    DGe(e.declarations, t.declarations) &&
-    OGe(e.text, t.text)
-  );
-}
-function DGe(e, t) {
-  return (
-    e.length === t.length &&
-    e.every((e, n) => {
-      let r = t[n];
-      return (
-        e.property === r.property && e.previousValue === r.previousValue && e.value === r.value
-      );
-    })
-  );
-}
-function OGe(e, t) {
-  return e == null || t == null
-    ? e == null && t == null
-    : e.previousValue === t.previousValue && e.value === t.value;
-}
-function $K(e) {
-  let t = 0;
-  return (
-    e.selectorText != null && (t += 1),
-    e.sourceUrl != null && (t += 1),
-    e.sourceLine != null && (t += 1),
-    e.sourceColumn != null && (t += 1),
-    t
-  );
-}
-function kGe(e, t) {
-  let n = e.declarations.map((e) => AGe(e, t));
-  return { ...e, provenance: n };
-}
-function AGe(e, t) {
-  let n = eq(e.property, t.inlineStyle?.cssProperties);
-  if (n != null)
-    return {
-      property: e.property,
-      selectorText: `element.style`,
-      ...(n.range == null
-        ? {}
-        : { sourceLine: n.range.startLine + 1, sourceColumn: n.range.startColumn + 1 }),
-    };
-  let r = { property: e.property };
-  for (let n of t.matchedCSSRules ?? []) {
-    let t = eq(e.property, n.rule.style?.cssProperties);
-    t != null &&
-      (r = {
-        property: e.property,
-        selectorText: n.rule.selectorList?.text,
-        sourceUrl: MGe(n),
-        ...(t.range == null
-          ? {}
-          : { sourceLine: t.range.startLine + 1, sourceColumn: t.range.startColumn + 1 }),
-      });
-  }
-  return r;
-}
-function eq(e, t) {
-  return t?.findLast((t) => jGe(e).includes(t.name) && t.disabled !== !0 && t.implicit !== !0);
-}
-function jGe(e) {
-  switch (e) {
-    case `padding-top`:
-    case `padding-right`:
-    case `padding-bottom`:
-    case `padding-left`:
-      return [e, `padding`];
-    case `margin-top`:
-    case `margin-right`:
-    case `margin-bottom`:
-    case `margin-left`:
-      return [e, `margin`];
-    case `row-gap`:
-    case `column-gap`:
-      return [e, `gap`];
-    default:
-      return [e];
-  }
-}
-function MGe(e) {
-  return (
-    e.rule.media?.findLast((e) => e.sourceURL != null)?.sourceURL ??
-    e.rule.containerQueries?.findLast((e) => e.sourceURL != null)?.sourceURL ??
-    e.rule.supports?.findLast((e) => e.sourceURL != null)?.sourceURL
-  );
-}
-function NGe(e) {
-  return e.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`);
-}
-function PGe({
-  blocklistLookup: e,
-  comments: t,
-  sendPendingCommentModeRequestToRuntime: n,
-  syncRuntimeStateToPage: r,
-  syncThreadState: i,
-  threadState: a,
-  windowState: o,
-}) {
-  let s = (e) => {
-      (e.changed || e.request != null) &&
-        (e.changed &&
-          (i(o, a.conversationId, a), e.shouldSyncRuntime && a.page != null && r(a.page, a)),
-        e.shouldPrepareComments && t.prepare(o.owner, a.conversationId, a.browserTabId, a),
-        e.request != null && a.page != null && n(a.page, e.request));
-    },
-    c = (e) => {
-      let n = !1,
-        r = null,
-        i = !1,
-        s = !1,
-        c = e ? `site-blocked` : null;
-      if (
-        (a.snapshot.commentModeDisabledReason !== c &&
-          ((a.snapshot = { ...a.snapshot, commentModeDisabledReason: c }), (n = !0)),
-        e)
-      )
-        return (
-          a.pendingCommentModeActivation != null && (a.pendingCommentModeActivation = null),
-          a.snapshot.interactionMode === `comment` &&
-            ((a.snapshot = EU(a.snapshot, `browse`)),
-            t.dismiss(o.owner, a.conversationId, a.browserTabId, a),
-            (n = !0),
-            (s = !0)),
-          { changed: n, request: r, shouldPrepareComments: i, shouldSyncRuntime: s }
-        );
-      if (a.pendingCommentModeActivation != null) {
-        let e = a.pendingCommentModeActivation;
-        ((r = e.request),
-          (a.pendingCommentModeActivation = null),
-          (a.snapshot.interactionMode !== `comment` ||
-            a.snapshot.annotationFlow !== e.annotationFlow) &&
-            ((a.snapshot = {
-              ...EU(a.snapshot, `comment`),
-              annotationFlow: e.annotationFlow,
-              annotationModeEntrySource: e.annotationModeEntrySource,
-            }),
-            (n = !0),
-            (i = !0),
-            (s = !0)));
-      }
-      return { changed: n, request: r, shouldPrepareComments: i, shouldSyncRuntime: s };
-    },
-    l = (e, t, n) => {
-      a.commentModeBlockCheckRequestId === e &&
-        ((a.commentModeBlockCheckUrl = null), cW(a) === t && s(c(n)));
-    },
-    u = cW(a);
-  a.pendingCommentModeActivation != null &&
-    (a.pendingCommentModeActivation.url !== u ||
-      a.pendingCommentModeActivation.navigationVersion !== (a.page?.navigationVersion ?? null)) &&
-    (a.pendingCommentModeActivation = {
-      ...a.pendingCommentModeActivation,
-      request: null,
-      url: u,
-      navigationVersion: a.page?.navigationVersion ?? null,
-    });
-  let d = e.cachedCommentModeBlocked(u);
-  if (d != null) {
-    s(c(d));
-    return;
-  }
-  if (a.commentModeBlockCheckUrl === u) return;
-  (a.snapshot.commentModeDisabledReason != null &&
-    a.snapshot.url !== u &&
-    (a.snapshot = { ...a.snapshot, commentModeDisabledReason: null }),
-    (a.commentModeBlockCheckUrl = u));
-  let f = ++a.commentModeBlockCheckRequestId;
-  e.isCommentModeBlocked(u).then((e) => {
-    l(f, u, e);
-  });
-}
-function tq(e, t) {
-  let n = e.view.webContents;
-  if (!(n == null || n.isDestroyed()))
-    switch (t.kind) {
-      case `comment`:
-        n.send(a.At, {
-          type: `browser-sidebar-runtime-create-comment-at-point`,
-          viewportPoint: t.viewportPoint,
-        });
-        return;
-      case `design`:
-        n.send(a.At, {
-          type: `browser-sidebar-runtime-open-design-editor-at-point`,
-          viewportPoint: t.viewportPoint,
-        });
-        return;
-      case `text`:
-        n.send(a.At, {
-          type: `browser-sidebar-runtime-create-comment-from-selection`,
-          ...(t.fallbackViewportPoint == null
-            ? {}
-            : { fallbackViewportPoint: t.fallbackViewportPoint }),
-        });
-        return;
-    }
-}
 var LGe = createDownloadStoreClass({
   electron: l,
   errorMessage: n.Zo,

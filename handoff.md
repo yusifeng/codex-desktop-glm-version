@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成 Browser comment policy belt 语义化：新增 `browser-sidebar/browser-comment-policy.ts`，集中接管截图裁剪/压缩与记录、comment/anchor
+状态投影、多 anchor 编辑、键盘输入映射、design change queue/upsert/remove、CSS provenance 合并与补全、identity 判定和 runtime request 发送。
+主 chunk 已真实改接 factory，并物理删除约 470 行旧 helper 与无 consumer 的旧 comment-mode block checker；新模块 654 行，整批净增加可读实现。
+focused suite 执行 52 条行为/接线断言，防空壳审计同步锁定 factory 接线和旧定义缺席。
+
 完成 Library projectless-output backend：新增 `files/library-files-backend.ts`，迁出 thread pagination、projectless/assignment admission、missing-thread
 promise/negative cache、workspace roots/hints、WSL path projection、shared-output attribution、realpath/symlink containment、recursive metadata scan 和
 generated-images allowlist；WindowContext 的 scope 与 Library consumers 已真实改接。主 chunk 约 260 行旧实现删除，focused suite 执行 42 条，
