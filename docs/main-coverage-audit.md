@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 saved-section undo/redo owner
+
+原 `yH` undo/redo transition owner 已迁入 `src/main/main-app/sidebar/saved-section-undo-redo-stack.ts`。新 factory class
+保留 scoped before/after snapshots、structure/order capture、transition serialization 与 migration state；真实 `iBe` manager
+consumer 已接回，主 chunk 旧 class body 已删除。
+
 ## 2026-10-31 thread section server owner
 
 原 `$ze` 462 行 ThreadSectionServer 已迁入 `src/main/main-app/sidebar/thread-section-server.ts`。新 dependency-injected class

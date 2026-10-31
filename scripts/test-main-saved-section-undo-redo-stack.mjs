@@ -1,0 +1,29 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import { createSavedSectionUndoRedoStackClass } from "../src/main/main-app/sidebar/saved-section-undo-redo-stack.ts";
+
+let assertions = 0;
+const equal = (actual, expected) => { assert.deepEqual(actual, expected); assertions += 1; };
+class DisposableBase {}
+const Stack = createSavedSectionUndoRedoStackClass({
+  CH: (state) => ({ sections: state.sections }),
+  G: () => true,
+  SH: () => ({}),
+  _H: () => ({}),
+  bH: () => ({ sections: [], collections: [], structure: false }),
+  n: { Uf: DisposableBase },
+  tBe: () => ({}),
+  wH: () => ({}),
+  xH: () => ({ snapshot: true }),
+});
+const source = {};
+const before = { sections: [], threadHostIds: {} };
+const after = { sections: [], threadHostIds: {} };
+const stack = new Stack(source, before, after, null, null);
+equal(stack instanceof DisposableBase, true);
+equal(Stack.affectedState(stack), { affectedBefore: { sections: [] }, affectedAfter: { sections: [] } });
+const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
+equal(main.includes("yH = createSavedSectionUndoRedoStackClass({"), true);
+equal(main.includes("var yH = class"), false);
+equal(main.includes("new yH("), true);
+console.log(`${assertions} main saved-section undo-redo stack assertions passed`);
