@@ -141,5 +141,3 @@ export function createBrowserHostPolicyControllerClass(dependencies: Record<stri
     }
   };
 }
-
-if (typeof module !== `undefined`) module.exports = { createBrowserHostPolicyControllerClass };

@@ -2460,7 +2460,8 @@ debug snapshot/feedback/debug-tab、MCP completion cleanup、browser-use navigat
 bootstrap cancellation 与 persistence-owner wrappers 已迁入
 `src/main/main-app/browser-sidebar/browser-host-policy-controller.ts`。`isPrimaryWindowPersistenceOwner` 现基于
 `browserPersistence.isPersistenceOwner(getCurrentWindowState(owner))`，修复原残缺实现。focused test 为
-`scripts/test-main-browser-host-policy-controller.mjs`（17 项）。
+`scripts/test-main-browser-host-policy-controller.mjs`（18 项）。后续全量审计发现组合根曾引用 factory 却缺少对应 require，
+现已补齐真实运行时 import，并由 focused/no-unwired gate 固化，避免构造 browser manager 时出现未定义引用。
 
 ### A3 main 剩余大 owner（2026-10-15）
 

@@ -1,5 +1,18 @@
 import assert from "node:assert/strict";
-import { createBrowserHostPolicyControllerClass } from "../src/main/main-app/browser-sidebar/browser-host-policy-controller.ts";
+import fs from "node:fs";
+import { build } from "esbuild";
+
+const output = await build({
+  entryPoints: [new URL("../src/main/main-app/browser-sidebar/browser-host-policy-controller.ts", import.meta.url).pathname],
+  bundle: true,
+  format: "esm",
+  platform: "node",
+  target: "node22",
+  write: false,
+});
+const { createBrowserHostPolicyControllerClass } = await import(
+  `data:text/javascript;base64,${Buffer.from(output.outputFiles[0].text).toString("base64")}`
+);
 
 const calls = [];
 const windowState = { id: 7, window: { id: 7 }, browserSettingsWebviewMountIds: new Set(), threads: new Map() };
@@ -88,4 +101,7 @@ assert.equal(controller.getDebugSnapshot().kind, "debug");
 assert.equal(controller.getFeedbackDiagnostics().kind, "feedback");
 assert.equal(controller.openDebugTabOwner({ id: "debug" }).kind, "open-debug");
 
-console.log("host policy controller assertions: 17");
+const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
+assert.equal(main.includes('require("./main-app/browser-sidebar/browser-host-policy-controller.js")'), true);
+
+console.log("host policy controller assertions: 18");

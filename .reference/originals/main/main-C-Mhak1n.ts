@@ -631,6 +631,7 @@ const { createBrowserPresentationSyncControllerClass } = require("./main-app/bro
 const { createBrowserWindowThreadStateControllerClass } = require("./main-app/browser-sidebar/browser-window-thread-state-controller.js");
 const { createBrowserNavigationContextControllerClass } = require("./main-app/browser-sidebar/browser-navigation-context-controller.js");
 const { createBrowserPageLookupControllerClass } = require("./main-app/browser-sidebar/browser-page-lookup-controller.js");
+const { createBrowserHostPolicyControllerClass } = require("./main-app/browser-sidebar/browser-host-policy-controller.js");
 const { createSiteAnnotationFeatureControllerClass } = require("./main-app/browser-sidebar/site-annotation-feature-controller.js");
 const { createSiteAnnotationPermissionControllerClass } = require("./main-app/browser-sidebar/site-annotation-permission-controller.js");
 const { createWindowsNativeCaptureBridgeModule } = require("./main-app/computer-use/windows-native-capture-bridge.js");

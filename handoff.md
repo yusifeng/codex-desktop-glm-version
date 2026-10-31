@@ -1160,6 +1160,9 @@ accelerator refresh、debug snapshot/feedback/debug-tab、MCP completion cleanup
 同时修复 `isPrimaryWindowPersistenceOwner` 的错误残实现，改为基于 page persistence controller 的 primary-owner 判断；
 focused test 为 `scripts/test-main-browser-host-policy-controller.mjs`（17 项）。
 
+2026-11-01 复核：上述 controller 虽已迁出且组合根已调用，但 main 缺失静态 require；现已补齐真实运行时接线，focused test
+增至 18 项，no-unwired gate 扩至 441 项。这是运行时 wiring 修复，不新增重复 owner。
+
 本轮将 tQe 的 page command/host orchestration 迁移至
 `src/main/main-app/browser-sidebar/browser-page-command-controller.ts`，真实接回 history、focused command、
 reload/clear/scroll/find/site-info、reset/stop/audio/print/suspend、host transfer、zoom/navigate/screenshot/debugger
