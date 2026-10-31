@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread section server owner
+
+原 `$ze` 462 行 ThreadSectionServer 已迁入 `src/main/main-app/sidebar/thread-section-server.ts`。新 dependency-injected class
+保留 connection observation、thread lookup caches、pinned section discovery/migration、section CRUD/move/list 与 host mutation
+serialization；真实 `pinned-threads-service.ts` façade 已接回，主 chunk 旧 class body 已删除。
+
 ## 2026-10-31 automations unwired island removal
 
 删除仅彼此引用、从未被 main require 的 `automation-update-tool.ts`、`habitat.ts`、`inbox-items.ts`、`index.ts` 假迁移孤岛。

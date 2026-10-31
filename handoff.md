@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+开始迁出真实 saved-section engine：原 `$ze` 462 行 ThreadSectionServer 已迁入
+`sidebar/thread-section-server.ts`，connection observation、thread lookup cache、pinned section discovery/migration、section CRUD/
+move/list 与 host mutation serialization 均由新 factory class 持有；真实 pinned façade 已接回，旧 class body 删除。
+
 清理 automations 的另一组无 consumer 假迁移：旧 `automation-update-tool.ts`、`habitat.ts`、`inbox-items.ts`、`index.ts`
 形成仅内部引用的孤岛，main 从未 require；四文件已删除。真实 update executor/habitat/inbox/scheduler 仍在主 chunk，已接线的
 `automations-service.ts` 与 `cron-turn-read-state.ts` 保留，避免把存在文件误记为已迁移 owner。
