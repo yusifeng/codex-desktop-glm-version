@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 startup attribution and PIP turn lifecycle owners
+
+新增 `startup/app-entry-attribution.ts` 与 `computer-use/pip-turn-lifecycle.ts`，分别接管原 `Foe` 激活归因状态机和 `Noe/Poe` turn cleanup；
+`browser-use/migration.ts` 与 `computer-use/app-resolution.ts` 的既有完整实现同步接回。主 chunk `rl…il`、`Coe…Voe` 两段约 300 行旧实现
+删除。focused suite 覆盖 installer 首次归因、deep-link/foreground generation、source attribution、completed/failed PIP 分流及 unsubscribe 返回契约。
+
 ## 2026-11-01 native app, PIP and browser navigation owners
 
 `windows/native-app-icons.ts` 现直接服务全部 Windows icon/Sky addon/PIP/Chrome focus consumer；新增 `browser-use/navigation-restriction.ts`

@@ -42,6 +42,14 @@ const { buildWindowErrorPage } = require("./main-app/window/error-page-html.js")
 const { shouldRecoverRendererCrash } = require("./main-app/window/renderer-recovery-policy.js");
 const { createStartupPhaseTracker, resolveDockIconPreference, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages } = require("./main-app/startup/startup-policy.js");
 const openPathArguments = require("./main-app/files/open-path-arguments.js");
+const {
+  isOpenableFilePath: Sl,
+  collectOpenableFileArguments: Cl,
+  createOpenFileDescriptors: Roe,
+  isCodexDeepLink: zoe,
+  normalizeFileArgument: Boe,
+  isAbsoluteForPlatform: Voe,
+} = openPathArguments;
 const { applyQuitForUpdatePolicy } = require("./main-app/startup/quit-for-update-policy.js");
 const { cleanupForImmediateQuitOnUpdate } = require("./main-app/app-shell/immediate-update-exit.js");
 const { createDelayedProgressWindow } = require("./main-app/startup/delayed-progress-window.js");
@@ -150,7 +158,9 @@ const { createSshConnectionRegistrationClass } = require("./main-app/remote/ssh-
 const { createNotificationsServiceClass } = require("./main-app/notifications/notifications-service.js");
 const { createShortcutCaptureServices } = require("./main-app/window/shortcut-capture-service.js");
 const { createSystemAudioSpectrumRuntime } = require("./main-app/capture/system-audio-spectrum-service.js");
-const { SkysightServiceManager } = require("./main-app/skysight/service-manager.js");
+const { SkysightServiceManager: Moe } = require("./main-app/skysight/service-manager.js");
+const { subscribeComputerUsePipTurnLifecycle: Noe } = require("./main-app/computer-use/pip-turn-lifecycle.js");
+const { AppEntryAttributionTracker: Foe } = require("./main-app/startup/app-entry-attribution.js");
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
 const { BrowserSettingsSync, BrowserUseOriginState: XOe, RemoteBrowserSettings: uke, BrowserConfigFile: pke } = require("./main-app/browser-use/origin-state.js");
@@ -364,6 +374,8 @@ const {
   resolveComputerUsePaths: Li,
   isComputerUsePluginEnabled: Ri,
   resolveComputerUsePathsForMarketplaces: zi,
+  refreshCanonicalServiceAppCopy: Toe,
+  resolveComputerUseAppPath: koe,
 } = require("./main-app/computer-use/app-resolution.js");
 const {
   getBundledPluginsResourcesPath: Hi,
@@ -4933,126 +4945,6 @@ function Fs({ notification: e, threadId: t, turnId: n, onTurnStarted: r, onCompl
       return;
   }
 }
-var rl = r.r(`BrowserUseLocalToBundledMigration`),
-  Gae = n.xf({
-    name: n.Of(),
-    source: n.xf({ path: n.Of().trim().min(1), source: n.Of() }).optional(),
-  }),
-  Kae = n.xf({ plugins: n.hf(Gae) });
-async function qae(e) {
-  try {
-    await Jae(e);
-  } catch (e) {
-    rl.warning(`browser_use_local_to_bundled_migration_failed`, {
-      safe: {},
-      sensitive: { error: e },
-    });
-  }
-}
-async function Jae(e) {
-  let t = e.marketplaceName ?? `openai-bundled`,
-    { marketplaces: r } = await e.appServerConnection.listPlugins(Di),
-    i = Ai({ marketplaces: r, marketplaceName: t, pluginName: n.ou });
-  if (i == null) {
-    rl.debug(`bundled_browser_use_plugin_missing_for_migration`, { safe: {} });
-    return;
-  }
-  let a = Yae({ codexHome: e.codexHome, marketplaces: r });
-  if (a == null) {
-    rl.debug(`local_browser_use_plugin_missing_for_migration`, { safe: {} });
-    return;
-  }
-  (await e.appServerConnection.uninstallPlugin({ pluginId: a.plugin.id }),
-    rl.info(`browser_use_local_to_bundled_migration_uninstalled_local`, { safe: {} }),
-    await e.trashItem(a.plugin.source.path),
-    rl.info(`browser_use_local_to_bundled_migration_moved_local_to_trash`, {
-      safe: {},
-      sensitive: { localPluginPath: a.plugin.source.path },
-    }),
-    await Xae({
-      codexHome: e.codexHome,
-      localPluginPath: a.plugin.source.path,
-      marketplacePath: a.marketplace.path,
-    }),
-    !i.plugin.installed &&
-      (await e.appServerConnection.installPlugin({
-        marketplacePath: i.marketplace.path,
-        pluginName: n.ou,
-      }),
-      rl.info(`browser_use_local_to_bundled_migration_installed_bundled`, {
-        safe: {},
-        sensitive: { marketplacePath: i.marketplace.path },
-      })));
-}
-function Yae(e) {
-  let t = (0, h.join)(e.codexHome, `plugins`, n.su);
-  for (let n of e.marketplaces)
-    for (let e of n.plugins)
-      if (
-        e.name === `browser-use` &&
-        e.installed &&
-        n.path != null &&
-        e.source.type === `local` &&
-        il(e.source.path, t)
-      )
-        return { marketplace: { ...n, path: n.path }, plugin: { ...e, source: e.source } };
-  return null;
-}
-async function Xae(e) {
-  try {
-    let t = await Zae(e.marketplacePath),
-      n = t.plugins.filter(
-        (t) => !Qae({ codexHome: e.codexHome, localPluginPath: e.localPluginPath, plugin: t }),
-      );
-    if (n.length === t.plugins.length) {
-      rl.debug(`browser_use_local_to_bundled_migration_marketplace_entry_missing`, {
-        safe: {},
-        sensitive: { marketplacePath: e.marketplacePath },
-      });
-      return;
-    }
-    (await b.default.writeFile(
-      e.marketplacePath,
-      JSON.stringify({ ...t, plugins: n }, null, 2) +
-        `
-`,
-      `utf8`,
-    ),
-      rl.info(`browser_use_local_to_bundled_migration_removed_marketplace_entry`, {
-        safe: {},
-        sensitive: { marketplacePath: e.marketplacePath },
-      }));
-  } catch (t) {
-    rl.warning(`browser_use_local_to_bundled_migration_marketplace_cleanup_failed`, {
-      safe: {},
-      sensitive: { error: t, marketplacePath: e.marketplacePath },
-    });
-  }
-}
-async function Zae(e) {
-  return Kae.parseAsync(JSON.parse(await b.default.readFile(e, `utf8`)));
-}
-function Qae(e) {
-  return (
-    e.plugin.name === `browser-use` &&
-    e.plugin.source?.source === `local` &&
-    $ae({
-      codexHome: e.codexHome,
-      localPluginPath: e.localPluginPath,
-      sourcePath: e.plugin.source.path,
-    })
-  );
-}
-function $ae(e) {
-  return [
-    (0, h.resolve)(e.sourcePath),
-    (0, h.resolve)(e.codexHome, e.sourcePath),
-    (0, h.resolve)((0, h.dirname)(e.codexHome), e.sourcePath),
-  ].some((t) => il(t, e.localPluginPath));
-}
-function il(e, t) {
-  return (0, h.resolve)(e) === (0, h.resolve)(t);
-}
 var doe = 1e3,
   foe = class {
     logger = r.i(`ChunkedMessageSender`);
@@ -5306,185 +5198,6 @@ function Soe(e) {
       };
   }
 }
-var Coe = `CODEX_ELECTRON_SKIP_COMPUTER_USE_CANONICAL_REFRESH`,
-  woe = (0, d.promisify)(P.execFile);
-async function Toe({ sourceServiceAppPath: e, codexHome: t }) {
-  if (process.platform !== `darwin` || process.env[Coe]?.trim() === `1` || e == null) return;
-  let n = Mi(t);
-  (await b.default.mkdir(h.default.dirname(n), { recursive: !0 }),
-    await b.default.rm(n, { force: !0, recursive: !0 }),
-    await woe(`/usr/bin/ditto`, [`--noqtn`, e, n]));
-}
-var Ooe = `CODEX_ELECTRON_COMPUTER_USE_APP_PATH`;
-function koe(e) {
-  let t = e?.env ?? process.env,
-    n = Aoe(t);
-  if (n != null) return n;
-  let r = e?.resourcesPath ?? o.t({ env: t, resourcesPath: process.resourcesPath });
-  if (r == null) return null;
-  for (let e of [
-    gne(r),
-    h.default.join(r, `cua_node`, `lib`, `node_modules`, `@oai`, `sky`, `bin`, `mac`, `normal`, ji),
-  ])
-    if ((0, v.existsSync)(e)) return bl(e);
-  return null;
-}
-function Aoe(e) {
-  let t = e[Ooe]?.trim();
-  return t ? bl(t) : null;
-}
-function bl(e) {
-  try {
-    return v.realpathSync.native(e);
-  } catch {
-    return e;
-  }
-}
-var Moe = SkysightServiceManager;
-function Noe({
-  appServerConnection: e,
-  closeActiveTurn: t,
-  completePIPThread: n = Dc,
-  invalidatePIPTurn: r = Oc,
-}) {
-  return e.registerInternalNotificationHandler((e) => {
-    Poe(e) &&
-      (e.params.turn.status === `completed`
-        ? n(e.params.threadId)
-        : r(e.params.threadId, e.params.turn.id),
-      t({ sessionId: e.params.threadId, turnId: e.params.turn.id }));
-  });
-}
-function Poe(e) {
-  return (
-    e.method === `turn/completed` &&
-    typeof e.params?.threadId == `string` &&
-    typeof e.params.turn == `object` &&
-    e.params.turn != null &&
-    `id` in e.params.turn &&
-    typeof e.params.turn.id == `string`
-  );
-}
-var Foe = class {
-    emit;
-    schedule;
-    now;
-    createId;
-    initialInstallerId;
-    constructor(
-      e,
-      t = (e) => {
-        setTimeout(e, 0);
-      },
-      n = Date.now,
-      r = _.randomUUID,
-      i,
-    ) {
-      ((this.emit = e),
-        (this.schedule = t),
-        (this.now = n),
-        (this.createId = r),
-        (this.initialInstallerId = i));
-    }
-    handleDeepLink(e) {
-      let t = `deep-link:` + e;
-      ((!this.isBackgrounded && this.hasCompletedInitialForeground) ||
-        this.pendingBackgroundSourceKey !== t) &&
-        (this.emitReceipt(`deep-link`, e), this.handleSourceBearingActivation(t));
-    }
-    handleSourceActivation(e, t = this.emit) {
-      if (!this.hasObservedInitialWindow) return !1;
-      let n =
-        e.notificationId == null && e.notificationChannelId == null
-          ? void 0
-          : [
-              `source`,
-              e.channel,
-              e.source,
-              e.notificationId ?? ``,
-              e.notificationChannelId ?? ``,
-            ].join(`\0`);
-      return n != null &&
-        (this.isBackgrounded || !this.hasCompletedInitialForeground) &&
-        this.pendingBackgroundSourceKey === n
-        ? !1
-        : (this.emitReceipt(`direct`, void 0, e, t), this.handleSourceBearingActivation(n), !0);
-    }
-    handleUnloggableDeepLinkActivation() {
-      this.handleSourceBearingActivation(void 0);
-    }
-    handleSourceBearingActivation(e) {
-      ((this.sourceGeneration += 1),
-        (this.isBackgrounded || !this.hasCompletedInitialForeground) &&
-          ((this.pendingBackgroundSourceKey = e),
-          (this.suppressNextForeground = this.isBackgrounded),
-          (this.hasCompletedInitialForeground = !0),
-          (this.activationGeneration += 1)));
-    }
-    handleInitialWindowVisible() {
-      this.hasObservedInitialWindow ||
-        ((this.hasObservedInitialWindow = !0), this.handleForeground());
-    }
-    canAttributeRuntimeActivation() {
-      return this.hasObservedInitialWindow;
-    }
-    handleBackground() {
-      this.isBackgrounded ||
-        ((this.isBackgrounded = !0),
-        (this.pendingBackgroundSourceKey = void 0),
-        (this.activationGeneration += 1));
-    }
-    handleForeground() {
-      if (
-        !this.hasObservedInitialWindow ||
-        (!this.isBackgrounded && this.hasCompletedInitialForeground)
-      )
-        return;
-      if (((this.isBackgrounded = !1), this.suppressNextForeground)) {
-        ((this.suppressNextForeground = !1),
-          (this.pendingBackgroundSourceKey = void 0),
-          (this.hasCompletedInitialForeground = !0),
-          (this.activationGeneration += 1));
-        return;
-      }
-      let e = ++this.activationGeneration,
-        t = this.sourceGeneration,
-        n = this.hasCompletedInitialForeground ? `foreground` : `direct`;
-      this.schedule(() => {
-        this.isBackgrounded ||
-          this.activationGeneration !== e ||
-          this.sourceGeneration !== t ||
-          ((this.hasCompletedInitialForeground = !0),
-          (this.pendingBackgroundSourceKey = void 0),
-          this.emitReceipt(n));
-      });
-    }
-    activationGeneration = 0;
-    sourceGeneration = 0;
-    isBackgrounded = !0;
-    hasObservedInitialWindow = !1;
-    hasCompletedInitialForeground = !1;
-    suppressNextForeground = !1;
-    pendingBackgroundSourceKey;
-    emitReceipt(e, t, n, r = this.emit) {
-      let i = e === `direct` && n == null && t == null ? this.initialInstallerId : void 0;
-      ((this.initialInstallerId = void 0),
-        r({
-          appEntryInstanceId: i ?? this.createId(),
-          appEntryReceivedTs: this.now(),
-          kind: e,
-          entryUrl: t,
-          attribution:
-            i == null ? n : { channel: `installer`, source: `chatgpt_micro_installer`, entryId: i },
-        }));
-    }
-  },
-  Sl = openPathArguments.isOpenableFilePath,
-  Cl = openPathArguments.collectOpenableFileArguments,
-  Roe = openPathArguments.createOpenFileDescriptors,
-  zoe = openPathArguments.isCodexDeepLink,
-  Boe = openPathArguments.normalizeFileArgument,
-  Voe = openPathArguments.isAbsoluteForPlatform;
 var Hoe = `CODEX_ELECTRON_DEV_PARENT_PID`,
   Uoe = `CODEX_ELECTRON_DEV_WEBVIEW_PID`,
   Woe = `CODEX_ELECTRON_DEV_RELAUNCH_MARKER_PATH`,

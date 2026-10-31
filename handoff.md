@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+恢复启动激活归因和 PIP turn 生命周期：新增 `startup/app-entry-attribution.ts`，保留 initial installer、deep-link/direct/foreground 去重、
+background 抑制与 generation 防陈旧回调；新增 `computer-use/pip-turn-lifecycle.ts`，按 turn 终态完成/失效 PIP 并关闭 active turn。Browser Use
+本地插件迁移改由既有语义模块唯一拥有，Computer Use canonical refresh/app 解析接回命名导出，旧两段合计约 300 行删除。
+
 大批接回 native app/PIP owner：Windows 图标 addon、Sky addon、frontmost window、remote-hosted PIP 包装、browser-use PIP 管理与 Chrome tab
 聚焦均改接 `windows/native-app-icons.ts`。同时新增完整 `browser-use/navigation-restriction.ts`，恢复本地 subframe 门控、Browser Use URL policy、
 chrome: 特例与 block 回调；旧 `kae…Wae` 约 1,173 行整体删除。focused suite 覆盖新 policy 状态机和实际 addon wrapper 分支。
