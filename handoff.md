@@ -5158,3 +5158,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   usage 的 preferred/page-window message 路由。主 chunk 旧 `OZe/kZe` 已删除。
 - focused coverage 增加 allowHiddenBlankTab 完整 true contract。下一批审计 site-annotation/WebMCP event validation belt
   `vZ/AZe/yZ/bZ/jZe/MZe/NZe/PZe/FZe/IZe`，优先与现有 annotation controller 合并。
+
+# 2026-11-01 site page-event runtime extraction
+
+- 新增并接回 `browser-sidebar/site-page-event-runtime.ts`，完整承接 annotation/WebMCP event schemas、site hostname policy、tool
+  count/descriptor byte budget/normalization，以及 annotation、WebMCP、generic page event 分发；annotation interaction 与 IPC guard 均改用
+  语义命名接线。
+- 主 chunk 旧 `QHe/vZ/AZe/yZ/bZ/jZe/MZe/NZe/PZe/FZe/IZe` 已删除。focused coverage 包含互斥 feature、tool 限额、cyclic JSON、
+  capability gate、sync/no-sync、destroyed window 与 generic forwarding。下一批从相邻 annotation-mode activation policy `LZe` 继续整带审计。

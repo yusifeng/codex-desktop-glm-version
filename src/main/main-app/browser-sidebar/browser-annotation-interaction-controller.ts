@@ -2,7 +2,7 @@
 
 /** Owns browser annotation ingress, design/comment interactions, and dragged-image state. */
 export function createBrowserAnnotationInteractionControllerClass(dependencies: Record<string, any>) {
-  const { hX, EU, IZe, LZe, n, SU, mVe, gVe } = dependencies;
+  const { hX, EU, dispatchPageEvent, LZe, n, SU, mVe, gVe } = dependencies;
   return class BrowserAnnotationInteractionController {
     constructor(host: any) { this.host = host; }
     host: any;
@@ -73,14 +73,14 @@ export function createBrowserAnnotationInteractionControllerClass(dependencies: 
           : void 0));
     }
     handlePageEvent(e, t) {
-      IZe(
-        e,
-        this.host.findPageStateForRuntimeSender(e),
-        t,
-        this.host.siteAnnotationFeatures,
-        this.host.browserSessionRegistry,
-        this.host.syncThreadState.bind(this),
-      );
+      dispatchPageEvent({
+        sender: e,
+        pageState: this.host.findPageStateForRuntimeSender(e),
+        event: t,
+        siteAnnotationFeatures: this.host.siteAnnotationFeatures,
+        browserSessionRegistry: this.host.browserSessionRegistry,
+        syncThreadState: this.host.syncThreadState.bind(this),
+      });
     }
     handleRuntimeToggleAnnotationMode(e, t) {
       LZe(

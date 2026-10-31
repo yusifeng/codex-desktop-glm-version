@@ -313,7 +313,8 @@ const main = fs.readFileSync(
 );
 equal(main.includes("registerMainIpcRouter"), true);
 equal(main.includes("registerMainIpcRouter({"), true);
-equal(main.includes("guardedBrowserPageEventTypes: new Set([bZ.type, vZ.type])"), true);
+equal(main.includes("WEBMCP_UI_TOOLS_CHANGED_EVENT.type"), true);
+equal(main.includes("SITE_ANNOTATION_FEATURES_CHANGED_EVENT.type"), true);
 equal(main.includes("function Rrt("), false);
 equal(main.includes("setRealtimeSessionRecordingEnabled: je.setRealtimeSessionRecordingEnabled"), false);
 

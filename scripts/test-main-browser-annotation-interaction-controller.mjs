@@ -17,6 +17,7 @@ const deepEqual = (actual, expected) => { assert.deepEqual(actual, expected); as
 const syncs = [];
 const commentCalls = [];
 const sent = [];
+const pageEvents = [];
 const page = { view: { webContents: { id: 44 } }, conversationId: "c1", browserTabId: 3 };
 const thread = {
   conversationId: "c1", browserTabId: 3, page,
@@ -65,7 +66,7 @@ const host = {
 const Controller = createBrowserAnnotationInteractionControllerClass({
   hX: () => thread,
   EU: (snapshot, mode, comments = snapshot.comments) => ({ ...snapshot, interactionMode: mode, comments }),
-  IZe: () => {},
+  dispatchPageEvent: (event) => pageEvents.push(event),
   LZe: () => {},
   n: { ju: (comments) => comments.length > 0 },
   SU: (active, browserTabId, conversationId) => active.delete(windowState.owner.id),
@@ -73,6 +74,11 @@ const Controller = createBrowserAnnotationInteractionControllerClass({
   gVe: async () => {},
 });
 const controller = new Controller(host);
+
+controller.handlePageEvent({ id: 44 }, { type: "page-ready" });
+equal(pageEvents[0].sender.id, 44);
+equal(pageEvents[0].event.type, "page-ready");
+equal(pageEvents[0].pageState.page, page);
 
 controller.clearComments(windowState.owner, "c1", 3);
 equal(thread.snapshot.interactionMode, "browse");

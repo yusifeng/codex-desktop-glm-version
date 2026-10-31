@@ -3203,3 +3203,10 @@ annotation/message/logger policies；旧 `gZe/hZe` 已删除。focused test 覆�
 `browser-page-command-controller.ts` 已直接拥有 extension action 对 hidden blank new-tab 的 route/host/renderer/active/presentation 校验；
 `browser-runtime-sync-controller.ts` 已直接拥有 preferred window→page window 的 navigation usage message 路由。旧 `OZe/kZe` 已删除，
 focused test 新增完整 allowHiddenBlankTab true contract。
+
+### 增量抽取：site page-event runtime
+
+新增 `browser-sidebar/site-page-event-runtime.ts`，一次性接管 annotation/WebMCP 事件描述符、hostname 归一化、annotation feature
+约束、WebMCP descriptor 形状/数量/UTF-8 byte budget/规范化，以及 annotation、WebMCP、generic session event 三路分发。annotation
+interaction controller 改用具名对象参数接线，IPC guarded event set 直接引用语义常量；主 chunk 旧
+`QHe/vZ/AZe/yZ/bZ/jZe/MZe/NZe/PZe/FZe/IZe` 整带删除。

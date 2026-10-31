@@ -646,6 +646,13 @@ const { createBrowserPageLookupControllerClass } = require("./main-app/browser-s
 const { createBrowserHostPolicyControllerClass } = require("./main-app/browser-sidebar/browser-host-policy-controller.js");
 const { createSiteAnnotationFeatureControllerClass } = require("./main-app/browser-sidebar/site-annotation-feature-controller.js");
 const { createSiteAnnotationPermissionControllerClass } = require("./main-app/browser-sidebar/site-annotation-permission-controller.js");
+const {
+  SITE_ANNOTATION_FEATURES_CHANGED_EVENT,
+  WEBMCP_UI_TOOLS_CHANGED_EVENT,
+  siteAnnotationFeaturesChangedSchema,
+  normalizeSiteHostname,
+  createSitePageEventRuntime,
+} = require("./main-app/browser-sidebar/site-page-event-runtime.js");
 const { createWindowsNativeCaptureBridgeModule } = require("./main-app/computer-use/windows-native-capture-bridge.js");
 const { ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER, CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD, NOTIFY_BROWSER_USE_DOWNLOAD_CHANGE, createIabBrowserUseApiClass } = require("./main-app/browser-use/iab-api.js");
 const { createSocketPeerAuthorizer } = require("./main-app/native-pipe/peer-socket-authorizer.js");
@@ -35678,9 +35685,6 @@ async function KBe(e, t, n, r = () => {}) {
       return;
   }
 }
-function QHe(e) {
-  return new TextEncoder().encode(JSON.stringify(e)).byteLength;
-}
 var NW = r.i(`checkout-webview`),
   PW = new Map(),
   FW = new WeakMap(),
@@ -43870,104 +43874,14 @@ var {
   securityStateForPage: dZe,
   syncBackgroundThrottling: dZ,
 } = createBrowserPagePresentationPolicy({ isFirstPartyUrl: Ve, pageUrl: QU });
-var vZ = { type: `site_annotation_features_changed`, version: 1 },
-  AZe = n.wf({
-    type: n.bf(vZ.type),
-    version: n.bf(vZ.version),
-    payload: n.wf({
-      features: n
-        .hf(
-          n.df([
-            `containers`,
-            `controls`,
-            `surfaces`,
-            `metadata`,
-            `metadata-with-targets`,
-            `mode-toggle`,
-            `requests`,
-            `requests-with-prompts`,
-          ]),
-        )
-        .max(6)
-        .refine((e) => !e.includes(`requests`) || !e.includes(`requests-with-prompts`))
-        .refine((e) => !e.includes(`metadata`) || !e.includes(`metadata-with-targets`)),
-    }),
-  });
-function yZ(e) {
-  let t = URL.parse(e);
-  return t?.protocol !== `http:` && t?.protocol !== `https:` ? null : t.hostname.replace(/\.$/, ``);
-}
-var bZ = { type: `webmcp_ui_tools_changed`, version: 1 },
-  jZe = FJ.omit({ registration_id: !0, input_schema: !0 })
-    .extend({ inputSchema: FJ.shape.input_schema, name: FJ.shape.name.min(1) })
-    .array();
-function MZe(e, t) {
-  if (e.length === 0) return [];
-  if (e.length > t.maxTools) return null;
-  let n = jZe.safeParse(e);
-  if (!n.success) return null;
-  let r;
-  try {
-    r = QHe(n.data);
-  } catch {
-    return null;
-  }
-  return r <= t.maxTotalDescriptorBytes ? n.data : null;
-}
-var NZe = n.wf({
-    annotations: n
-      .wf({ readOnlyHint: n.gf() })
-      .optional()
-      .catch(void 0),
-    description: n.Of().optional(),
-    inputSchema: n
-      .Ef(n.Of(), n.Mf())
-      .optional()
-      .catch(void 0),
-    name: n.Of(),
-    title: n
-      .Of()
-      .transform((e) => e || void 0)
-      .optional(),
-  }),
-  PZe = n.wf({
-    type: n.bf(bZ.type),
-    version: n.bf(bZ.version),
-    payload: n.wf({ tools: n.hf(n.Mf()) }),
-  });
-function FZe(e, t) {
-  let n = PZe.safeParse(e);
-  if (!n.success) return null;
-  let r = MZe(n.data.payload.tools, t);
-  return r == null ? null : { ...bZ, payload: { tools: r.map((e) => NZe.parse(e)) } };
-}
-function IZe(e, t, n, r, i, a) {
-  if (t == null) return;
-  let o = l.BrowserWindow.fromWebContents(t.windowState.owner);
-  if (!(o == null || o.isDestroyed())) {
-    if (n.type === vZ.type) {
-      r.handlePageEvent(t, n);
-      return;
-    }
-    if (n.type === bZ.type) {
-      let e = Tr(),
-        r = FZe(n, {
-          maxTools: e.webMcpMaxTools,
-          maxTotalDescriptorBytes: pW.maxTotalDescriptorBytes,
-        });
-      r != null &&
-        qX(t.page, MG(`prod`, e.webMcp) ? r.payload.tools : []) &&
-        a(t.windowState, t.page.conversationId, t.threadState);
-      return;
-    }
-    i.notifyPageEvent({
-      conversationId: t.page.conversationId,
-      event: n,
-      webContentsId: e.id,
-      windowId: oX(o.id),
-    });
-  }
-}
+var { dispatchPageEvent: dispatchSitePageEvent } = createSitePageEventRuntime({
+  browserWindowFromWebContents: (owner) => l.BrowserWindow.fromWebContents(owner),
+  getFeatureFlags: Tr,
+  maxTotalDescriptorBytes: pW.maxTotalDescriptorBytes,
+  isWebMcpEnabled: (flag) => MG(`prod`, flag),
+  applyWebMcpTools: qX,
+  normalizeWindowId: oX,
+});
 function LZe(e, t, n, r, i, a) {
   if (r.apiAvailability !== !0 || t.isDestroyed() || n == null || n.windowState.owner.isDestroyed())
     return;
@@ -44283,14 +44197,14 @@ function QZe(e) {
   })();`;
 }
 var $Ze = createSiteAnnotationFeatureControllerClass({
-    pageEventSchema: AZe,
-    normalizeSiteHostname: yZ,
+    pageEventSchema: siteAnnotationFeaturesChangedSchema,
+    normalizeSiteHostname,
     settings: n.Ba,
     updatePageAnnotationFeatures: JX,
   }),
   eQe = createSiteAnnotationPermissionControllerClass({
     createId: () => (0, _.randomUUID)(),
-    normalizeSiteHostname: yZ,
+    normalizeSiteHostname,
     routeKey: qU,
     settings: n.Ba,
   }),
@@ -44379,7 +44293,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
         (this.pageCommandController = new (createBrowserPageCommandControllerClass({ a, l, n, crypto, hX, mU, pU, hU, QU, RZe, ZZe, zZe, sq, cq, lq, uq, fq, sW, HZe, XZe, GXe, iK, pX, DU, oX, PHe, GU, rW, WX, GX }))(this)),
         (this.browserUseRouteController = new (createBrowserUseRouteControllerClass({ hX, n, qU, oX, QU, iW, wU, aW, mX, lW, OX, dZ, WU, fq, gX, logger: r.i(`browser-sidebar-manager`) }))(this)),
         (this.commentModeController = new (createBrowserCommentModeControllerClass({ EU, cW, yVe, tq, n }))(this)),
-        (this.annotationInteractionController = new (createBrowserAnnotationInteractionControllerClass({ hX, EU, IZe, LZe, n, SU, mVe, gVe }))(this)),
+        (this.annotationInteractionController = new (createBrowserAnnotationInteractionControllerClass({ hX, EU, dispatchPageEvent: dispatchSitePageEvent, LZe, n, SU, mVe, gVe }))(this)),
         (this.pageMaterializationController = new (createBrowserPageMaterializationControllerClass({ eW, KX, oX, n }))(this)),
         (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ hX, fq, tq, KU, EZ, lifecycleHelpersClass: createBrowserPageLifecycleHelpersControllerClass, WU, dZ, QU, Ze, n, pX, dZe, oX, dq, isEqual: G.default }))(this)),
         (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW, fq, matchesLoadError: FU, normalizeUrl: Ze, resetCaptureState: (page) => { page.isCapturingUserMedia = !1; page.isCapturingCamera = void 0; page.isCapturingMicrophone = void 0; }, clearSiteTools: XX, serializePageState: eW, shouldIgnoreLoadError: NU, shouldRetryLoadError: PU, logger: r.i, setTimer: setTimeout, retryDelayMs: 50, maxAttempts: 100 }))(this)),
@@ -65667,7 +65581,10 @@ async function Ust() {
     isSafeRoute: n.bo,
     parseBrowserSidebarMessage: (payload) => oGe.safeParse(payload),
     isBrowserPageEvent: cte,
-    guardedBrowserPageEventTypes: new Set([bZ.type, vZ.type]),
+    guardedBrowserPageEventTypes: new Set([
+      WEBMCP_UI_TOOLS_CHANGED_EVENT.type,
+      SITE_ANNOTATION_FEATURES_CHANGED_EVENT.type,
+    ]),
     resolveCodexHomeRequest: (params) => n.et({ codexHome: V.codexHome, params }),
     createMessagePortRemoteMain: lrt,
     isTrayMenuThreadsChangedMessage,
