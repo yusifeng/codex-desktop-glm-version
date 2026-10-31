@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `git` deep-link local-project selection owner 迁入 `deep-links/local-project-selector.ts`；显式 project lookup、
+root lookup/create、未知 root 广播、既有 selection 保留、global-state 更新与缺失 mutation handler 失败语义均由新 owner
+持有。真实 new-thread deep-link consumer 已接回，旧 function 已删除。
+
 随后将 `dit/fit/pit/mit/hit` deep-link workspace resolver 迁入 `deep-links/workspace-resolver.ts`；显式目录优先、
 无效路径到 origin fallback、local project/fallback roots、Git origin discovery、dir/root 映射首值语义，以及规范化
 host/owner/repo 匹配均由新 owner 持有。真实 new-thread deep-link consumer 已接回，旧五个 functions 已删除。

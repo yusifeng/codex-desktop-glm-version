@@ -151,6 +151,7 @@ const { createQuitRuntime } = require("./main-app/startup/quit-runtime.js");
 const { ApplicationMenuManager, normalizeMenuAccelerator } = require("./main-app/app-shell/application-menu-runtime.js");
 const { resolveDeepLinkThreadHost } = require("./main-app/deep-links/thread-host-resolver.js");
 const { resolveDeepLinkWorkspace } = require("./main-app/deep-links/workspace-resolver.js");
+const { selectLocalProjectForWorkspace } = require("./main-app/deep-links/local-project-selector.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -143991,12 +143992,17 @@ async function lit({
       let d =
         s == null
           ? void 0
-          : await git({
+          : await selectLocalProjectForWorkspace({
               globalState: r,
               projectsManager: c,
               projectId: o?.id,
               workspaceRoot: s,
               windowManager: l,
+              localHostId: J,
+              findProjectByRoot: Mr,
+              getSelectedProject: Nr,
+              setSelectedProject: Lr,
+              globalStateKeys: n.iu,
             });
       if (s != null && d == null) return;
       (u(e, `/`, {
@@ -144062,28 +144068,6 @@ async function uit({ listPlugins: e, route: t }) {
         : e.plugins.some((e) => e.name === t.pluginName),
     )?.path ?? null
   );
-}
-async function git({
-  globalState: e,
-  projectsManager: t,
-  projectId: r,
-  workspaceRoot: i,
-  windowManager: a,
-}) {
-  if (t == null) throw Error(`Missing local project mutation handler`);
-  let o = t.getProjectRootPathsForHost(J).includes(i),
-    s = r == null ? Mr(e, i) : t.getLocalProjects()[r];
-  if (s == null && (r != null || ((s = await t.createProjectForRoot(i)), s == null))) return;
-  o || a.sendMessageToAllWindows({ type: `workspace-root-options-updated` });
-  let c = Nr(e);
-  return c?.type === `local` && c.projectId === s.id
-    ? c
-    : (Lr(e, { type: `local`, projectId: s.id }),
-      a.sendMessageToAllWindows({
-        type: `global-state-updated`,
-        keys: [n.iu.LOCAL_PROJECTS, n.iu.PROJECT_ORDER, n.iu.SELECTED_PROJECT],
-      }),
-      { type: `local`, projectId: s.id });
 }
 function _it({
   settingsStore: e,

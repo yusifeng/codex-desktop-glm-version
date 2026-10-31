@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 deep-link local-project selector
+
+原 `git` 已迁入 `src/main/main-app/deep-links/local-project-selector.ts`。新 owner 保留显式 project lookup、root-based
+lookup/create、未知 workspace root 广播、既有 local selection identity 保留、global-state mutation/broadcast，以及缺失
+mutation handler 的失败语义；真实 new-thread deep-link consumer 已接回，旧 function 已删除。
+
 ## 2026-10-31 deep-link workspace resolver
 
 原 `dit/fit/pit/mit/hit` 已迁入 `src/main/main-app/deep-links/workspace-resolver.ts`。新 resolver 保留显式目录优先、
