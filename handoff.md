@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Frt/zrt` startup/bootstrap synchronous IPC registrar 迁入 `startup/startup-ipc.ts`；trusted/untrusted sentry
+bootstrap、build flavor、shared-object snapshot、sidebar bootstrap、file drag，以及 HTTP(S) link-drag schema、receiver binding
+和 failure logging 均由新 owner 持有。真实 startup registration 已接回，旧 schema/function 已删除。
+
 随后将 `vrt..Nrt/Brt/Vrt` application lifecycle owner 迁入 `startup/application-lifecycle.ts`；privacy/system-shutdown
 quit gating、local/automation/pending-worktree confirmation projection、activate attribution、menu refresh、foreground/background
 events、single-shot will-quit、Windows forced-exit arm、skip-drain policy 与 ordered all-settled cleanup 均由新 owner 持有。

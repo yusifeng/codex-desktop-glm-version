@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 startup synchronous IPC registrar
+
+原 `Frt/zrt` 已迁入 `src/main/main-app/startup/startup-ipc.ts`。新 registrar 保留 trusted/untrusted sentry bootstrap、
+build flavor、shared-object snapshot、initial sidebar bootstrap、file drag，以及 HTTP(S) link-drag validation、原 sender receiver
+binding 与 native drag failure logging；真实 startup registration 已接回，旧 schema/function 已删除。
+
 ## 2026-10-31 application lifecycle owner
 
 原 `vrt..Nrt/Brt/Vrt` 已迁入 `src/main/main-app/startup/application-lifecycle.ts`。新 owner 保留 privacy/system-shutdown

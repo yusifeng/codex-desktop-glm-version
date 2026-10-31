@@ -143,6 +143,7 @@ const { createComputerHistoryStatusItemActions } = require("./main-app/computer-
 const { installDesktopOpenPathHandler } = require("./main-app/files/desktop-open-path-handler.js");
 const { createAboutDialog } = require("./main-app/app-shell/about-dialog.js");
 const { installApplicationLifecycle } = require("./main-app/startup/application-lifecycle.js");
+const { registerStartupIpcHandlers } = require("./main-app/startup/startup-ipc.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -142719,8 +142720,7 @@ function a7(e = Yoe) {
   (e() || l.app.relaunch(), l.app.quit());
 }
 var Prt = 12e3,
-  o7 = 5e3,
-  Frt = n.wf({ url: n.Nf().refine((e) => /^https?:\/\//i.test(e)), title: n.Of(), html: n.Of() });
+  o7 = 5e3;
 async function Irt({
   hotkeyWindowLifecycleManager: e,
   globalDictationLifecycleManager: t,
@@ -142993,53 +142993,6 @@ function Rrt(e) {
           sensitive: { error: e },
         });
       });
-    }));
-}
-function zrt({ buildFlavor: e, getContextForWebContents: t, isTrustedIpcEvent: n }) {
-  (l.ipcMain.on(a.Rt, (e) => {
-    if (!n(e)) {
-      e.returnValue = null;
-      return;
-    }
-    e.returnValue = { ...a.Zt, appVersion: a.St(), initialDesktopTraceSampleRate: a.w() };
-  }),
-    l.ipcMain.on(a.Ft, (t) => {
-      if (!n(t)) {
-        t.returnValue = null;
-        return;
-      }
-      t.returnValue = e;
-    }),
-    l.ipcMain.on(a.zt, (e) => {
-      if (!n(e)) {
-        e.returnValue = {};
-        return;
-      }
-      e.returnValue = t(e.sender)?.getSharedObjectSnapshot() ?? {};
-    }),
-    l.ipcMain.on(a.Lt, (e) => {
-      if (!n(e)) {
-        e.returnValue = null;
-        return;
-      }
-      e.returnValue = t(e.sender)?.getInitialSidebarBootstrap() ?? null;
-    }),
-    l.ipcMain.on(a.Ht, (e, r) => {
-      if (!n(e)) {
-        e.returnValue = !1;
-        return;
-      }
-      e.returnValue = t(e.sender)?.startFileDrag(e.sender, r) ?? !1;
-    }),
-    l.ipcMain.on(a.Ut, (e, t) => {
-      if (!n(e)) return;
-      let i = Frt.safeParse(t);
-      if (i.success)
-        try {
-          Reflect.apply(e.sender.startDrag.bind(e.sender), e.sender, [i.data]);
-        } catch (e) {
-          r.n().warning(`Failed to start native link drag`, { safe: {}, sensitive: { error: e } });
-        }
     }));
 }
 var c7 = `codex.aboutDialog.title`,
@@ -151634,10 +151587,26 @@ async function Ust() {
     ge = (e) => (me ? W.createFreshWindow(e) : Promise.resolve(null)),
     _e = (e) => W.isTrustedIpcSender(e.sender, e.senderFrame ?? null);
   (moe({ chunkedMessageSender: oe, isTrustedIpcEvent: _e }),
-    zrt({
+    registerStartupIpcHandlers({
+      ipcMain: l.ipcMain,
+      channels: {
+        sentryBootstrap: a.Rt,
+        buildFlavor: a.Ft,
+        sharedObjects: a.zt,
+        sidebarBootstrap: a.Lt,
+        fileDrag: a.Ht,
+        linkDrag: a.Ut,
+      },
+      runtime: n,
       buildFlavor: s,
       getContextForWebContents: W.getContextForWebContents,
       isTrustedIpcEvent: _e,
+      getSentryBootstrap: () => ({
+        ...a.Zt,
+        appVersion: a.St(),
+        initialDesktopTraceSampleRate: a.w(),
+      }),
+      logger: r,
     }),
     l.ipcMain.on(a.Bt, (e) => {
       if (!_e(e)) {
