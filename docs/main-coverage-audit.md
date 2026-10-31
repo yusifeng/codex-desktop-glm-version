@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 IAB tab mentions owner wiring
+
+既有 `src/main/main-app/browser-sidebar/iab-tab-mentions.ts` 已完整实现原 `HOe` 的 24-member owner，但 bootstrap 仍导出旧类。
+本轮接回 `WindowContext` 的真实 browserTabs consumer，删除旧 class 与 `iD/aD/UOe/WOe/GOe`；focused suite 覆盖双源搜索、
+Chrome liveness/focus、provider lifecycle、invalidation 和 disposal。
+
 ## 2026-10-31 stream-recovery duplicate cleanup
 
 语义 `AppServerConversationManager` 已直接导入并构造 `StreamRecovery` 与 `TurnStartObservations`，主 chunk 旧 `cSe/lSe` 已无

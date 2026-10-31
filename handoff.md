@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 IAB tab mentions owner：既有 `browser-sidebar/iab-tab-mentions.ts` 现已替代主 chunk 的 `HOe` 及专属 Chrome provider
+key/connector/subscription helpers。IAB+Chrome 双源搜索、liveness/focus、5s discovery cache、profile/generation 去重、close/
+invalidation cleanup 由完整 24-member owner 持有；bootstrap export 与 WindowContext consumer 保持 `HOe` 兼容别名。
+
 清理 stream-recovery 重复子 owner：语义 `AppServerConversationManager` 已真实构造 `StreamRecovery` 与
 `TurnStartObservations`，主 chunk 旧 `cSe/lSe` 只剩定义且无 consumer。本轮核对 18/20 members 对齐后物理删除旧类；focused
 gate 覆盖 turn start capture、dispatch/accept/complete 投递、observer dispose 与 manager wiring。
