@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `iQe` project-folder picker 整体迁入 `workspace/project-folder-picker.ts`；local/remote 分流、
+Electron directory dialog、Finder hidden-files preference timeout、source normalize/stat、project create/select/
+rename 与 renderer add/pick/navigate 回执均由新 owner 持有。`r$e` 继续以原三参构造真实消费 factory，旧
+class 与 timeout 常量已删除。focused test 覆盖 25 项 local/remote/dialog/settings/接回断言。
+
 随后将 `vQe` main-thread jank timer owner 迁入 `main-thread-jank-sampler.ts`，保留 100ms tick、900ms
 drift threshold、10 次上限、suspend/resume baseline 重置、幂等 start/stop listener cleanup 与 snapshot reset；
 SamplerManager 的唯一 consumer 现显式注入 Electron powerMonitor、clock 与 timer，旧 class/default options 已删除。

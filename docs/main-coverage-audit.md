@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 project folder picker
+
+原 `iQe` project-folder picker 已整体迁入 `src/main/main-app/workspace/project-folder-picker.ts`。新 owner
+保留 remote request 路由、本地 Electron directory dialog、Finder hidden-files preference 的 100ms timeout、
+source normalize/stat、project create/select/rename 与 renderer 回执顺序；`r$e` 的唯一构造点直接实例化
+语义 factory，旧 class 和专用 timeout 常量已物理删除。
+
 ## 2026-10-31 main-thread jank sampler
 
 原 `vQe` 定时器状态 owner 已迁入 `src/main/main-app/startup/main-thread-jank-sampler.ts`；100ms tick、

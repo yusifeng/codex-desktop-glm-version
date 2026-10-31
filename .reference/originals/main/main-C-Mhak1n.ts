@@ -65,6 +65,7 @@ const { LanguageServerManager } = require("./main-app/language-server/language-s
 const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 const { createElectronPerformanceSnapshotCollectorClass } = require("./main-app/startup/electron-performance-snapshot-collector.js");
 const { MainThreadJankSampler } = require("./main-app/startup/main-thread-jank-sampler.js");
+const { createProjectFolderPickerClass } = require("./main-app/workspace/project-folder-picker.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -115791,129 +115792,20 @@ var kZ = class {
       for (let t of Array.from(this.focusChangedListeners)) t(e);
     }
   },
-  rQe = 100,
-  iQe = class {
-    host;
-    windowManager;
-    projectsManager;
-    logger = r.i(`project-folder-picker`);
-    constructor(e, t, n) {
-      ((this.host = e), (this.windowManager = t), (this.projectsManager = n));
-    }
-    async createOrSelectProject(e, t, r) {
-      if (this.host.id !== `local`) {
-        this.windowManager.sendMessageToWebContents(e, {
-          type: `remote-workspace-root-requested`,
-          mode: `add`,
-          host: this.host.display_name,
-          hostId: this.host.id,
-          setActive: !0,
-        });
-        return;
-      }
-      let i = t == null ? await this.#e(e) : [await this.#t(t)].filter((e) => e != null),
-        a = n.Wo(i);
-      if (a == null) {
-        this.windowManager.sendInlineMessageForView(e, {
-          type: `workspace-root-option-add-canceled`,
-        });
-        return;
-      }
-      let o = this.projectsManager.getLocalProjects(),
-        [s] = await this.projectsManager.createOrSelectLocalProjects([a]);
-      if (s == null) {
-        this.windowManager.sendInlineMessageForView(e, {
-          type: `workspace-root-option-add-canceled`,
-        });
-        return;
-      }
-      (r != null &&
-        o[s.id] == null &&
-        (await this.projectsManager.renameLocal({ projectId: s.id, name: r })),
-        this.windowManager.sendInlineMessageForView(e, {
-          type: `workspace-root-option-added`,
-          projectId: o[s.id] == null ? s.id : null,
-          root: zn(a, n.zi(ls)),
-          ...(o[s.id] == null ? {} : { selectedProjectId: s.id }),
-        }),
-        this.windowManager.sendInlineMessageForView(e, {
-          type: `navigate-to-route`,
-          path: `/`,
-          state: { focusComposerNonce: Date.now() },
-        }));
-    }
-    async pickProjectSources(e, t) {
-      if (this.host.id !== `local`) {
-        this.windowManager.sendMessageToWebContents(e, {
-          type: `remote-workspace-root-requested`,
-          mode: `pick`,
-          host: this.host.display_name,
-          hostId: this.host.id,
-        });
-        return;
-      }
-      for (let r of await this.#e(e, t))
-        this.windowManager.sendInlineMessageForView(e, {
-          type: `workspace-root-option-picked`,
-          root: zn(r, n.zi(ls)),
-        });
-    }
-    async #e(e, t = !1) {
-      if (this.host.id !== `local`) throw Error(`Project picker is only supported for local hosts`);
-      let n = [`openDirectory`, `createDirectory`];
-      (t && n.push(`multiSelections`), (await this.#n()) && n.push(`showHiddenFiles`));
-      let r = { properties: n, title: `Select Project Root` },
-        i = l.BrowserWindow.fromWebContents(e),
-        a = i == null ? await l.dialog.showOpenDialog(r) : await l.dialog.showOpenDialog(i, r);
-      return a.canceled
-        ? []
-        : (await Promise.all(a.filePaths.map((e) => this.#t(e)))).filter((e) => e != null);
-    }
-    async #t(e) {
-      try {
-        let t = await Xn(e, this.host);
-        return (await (0, b.stat)(t)).isDirectory() ? h.resolve(t) : null;
-      } catch (e) {
-        return (
-          this.logger().warning(`Failed to stat project source`, {
-            safe: {},
-            sensitive: { error: e },
-          }),
-          null
-        );
-      }
-    }
-    async #n() {
-      if (process.platform !== `darwin`) return !1;
-      let e = new AbortController(),
-        t = !1,
-        r = setTimeout(() => {
-          ((t = !0), e.abort());
-        }, rQe);
-      try {
-        let { stdout: r, code: i } = await n
-          .Kn({
-            args: [`/usr/bin/defaults`, `read`, `com.apple.finder`, `AppleShowAllFiles`],
-            signal: e.signal,
-          })
-          .wait();
-        if (t || i !== 0) return !1;
-        let a = r.trim().toLowerCase();
-        return a === `1` || a === `true` || a === `yes`;
-      } catch (e) {
-        return (
-          t ||
-            this.logger().warning(`Failed to read hidden files preference`, {
-              safe: {},
-              sensitive: { error: e },
-            }),
-          !1
-        );
-      } finally {
-        clearTimeout(r);
-      }
-    }
-  },
+  iQe = createProjectFolderPickerClass({
+    clearTimeout: (e) => clearTimeout(e),
+    createLogger: r.i,
+    electron: l,
+    formatProjectRoot: (e) => zn(e, n.zi(ls)),
+    normalizeProjectSource: Xn,
+    normalizeWorkspaceRoots: n.Wo,
+    now: () => Date.now(),
+    platform: process.platform,
+    resolvePath: h.resolve,
+    runCommand: n.Kn,
+    setTimeout: (e, t) => setTimeout(e, t),
+    stat: b.stat,
+  }),
   uQe = createElectronPerformanceSnapshotCollectorClass({
     basename: h.basename,
     createLogger: r.i,
