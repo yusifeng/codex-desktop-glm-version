@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 native notification manager owner
+
+原 `bhe` 与 `gm/_m/vm` sound helpers 已迁入 `src/main/main-app/notifications/native-notification-manager.ts`。startup 继续构造
+17-member manager，既有 NotificationsService 继续消费同一组 sound resolver；focused suite 覆盖 dedupe、click/action/reply、
+completed-thread projection、dismissal、unsupported host 与跨平台 sound path/command。
+
 ## 2026-10-31 download store owner
 
 原 `LGe` 连同 `FGe/IGe/rq/RGe/iq/aq` 已迁入 `src/main/main-app/downloads/download-store.ts`，真实 browser host 继续通过

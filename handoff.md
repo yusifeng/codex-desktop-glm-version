@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+迁出 native notification manager：原 `bhe` 与 bundled/custom sound helpers 已迁入
+`notifications/native-notification-manager.ts`。dedupe、action/reply/click、completed-thread projection、dismissal、跨平台 sound
+playback 与 macOS sound staging 由完整 17-member owner 持有；真实 startup 与 NotificationsService consumers 已接回。
+
 迁出 download store owner：原 `LGe` 及其 link-download/will-download 辅助簇已迁入 `downloads/download-store.ts`。native
 history/live item 合并、save-path reservation、pause/resume/cancel/open、unacknowledged/lifecycle publication、browser-use 下载准入
 与隐藏 WebContentsView link download 均由完整 49-member owner 持有；真实 browser host consumer 已接回，旧 514 行簇已删除。
