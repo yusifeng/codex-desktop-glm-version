@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Fit/C7` pet/avatar global-hotkey owner 迁入 `hotkey/pet-hotkey-manager.ts`；access-state gate、command
+binding resolution/reservation release、幂等注册、权限丢失时注销、press-time recheck、toggle failure logging、access subscription
+与 dispose 均由新 owner 持有。真实 avatar overlay startup consumer 已接回，旧 functions 已删除。
+
 随后将 `lit` deep-link route executor 迁入 `deep-links/route-executor.ts`；no-op routes、announcement/plugin/pet/
 automation/OAuth/browser/shared/library/local-conversation/new-thread/settings/skills dispatch，lookup failure logging、review/
 prompt state 与 workspace/project 子 owner 编排均由新 executor 持有。真实 `_it` navigation consumer 已接回，旧 function 删除。

@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 pet/avatar global-hotkey owner
+
+原 `Fit/C7` 已迁入 `src/main/main-app/hotkey/pet-hotkey-manager.ts`。新 owner 保留 access readiness/entitlement gate、
+command keybinding resolution/release、幂等注册、权限丢失时注销、press-time access recheck、toggle failure logging、access-state
+subscription 与 dispose；真实 avatar overlay startup consumer 已接回，旧 functions 已删除。
+
 ## 2026-10-31 deep-link route executor
 
 原 `lit` 已迁入 `src/main/main-app/deep-links/route-executor.ts`。新 executor 保留所有 parsed-route dispatch、plugin

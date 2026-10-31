@@ -11,6 +11,7 @@ const mainBusiness = require("./main-app/util/main-business.js");
 const mainUrlTrust = require("./main-app/util/url-trust.js");
 const { AppshotHotkeyManager } = require("./main-app/hotkey/appshot-hotkey-manager.js");
 const { createHotkeyWindowLifecycleManagerClass } = require("./main-app/hotkey/hotkey-window-lifecycle-manager.js");
+const { createPetHotkeyManager } = require("./main-app/hotkey/pet-hotkey-manager.js");
 const { BrowserAnnotationInteractionController } = require("./main-app/browser-sidebar/browser-annotation-interaction-controller.js");
 const { createHotkeyWindowControllerClass } = require("./main-app/hotkey/hotkey-window-controller.js");
 const { requestFinalCaptureUpdate, startMacCapture, startWindowsCapture } = require("./main-app/computer-use/capture-requests.js");
@@ -143981,66 +143982,6 @@ var yit = createQuitStateClass(),
       escapeHtml: OU.default,
       createDelayedProgressWindow,
     });
-function Fit({ toggleAvatarOverlay: e }) {
-  let t = n.bt({ commandId: `openAvatarOverlay`, isMacOS: process.platform === `darwin` }),
-    i = null,
-    a = null,
-    o = () => {
-      (a?.unregister(), (a = null), (i = null));
-    },
-    s = () => {
-      if (t == null || !C7()) {
-        o();
-        return;
-      }
-      if (i === t) return;
-      let n = qV(t, {
-        onPressed: () => {
-          if (!C7()) {
-            o();
-            return;
-          }
-          e().catch((e) => {
-            r.n().warning(`Failed to toggle pet from global hotkey`, {
-              safe: {},
-              sensitive: { error: e },
-            });
-          });
-        },
-      });
-      if (n == null) throw Error(`Unable to register pet hotkey: ${t}`);
-      (o(), (a = n), (i = t));
-    },
-    c = Dr(() => {
-      try {
-        s();
-      } catch (e) {
-        r.n().warning(`Failed to sync pet hotkey access`, { safe: {}, sensitive: { error: e } });
-      }
-    });
-  try {
-    s();
-  } catch (e) {
-    r.n().warning(`Failed to register pet hotkey`, { safe: {}, sensitive: { error: e } });
-  }
-  return {
-    dispose: () => {
-      (c(), o());
-    },
-    syncCommandKeybinding: (e) => {
-      (e != null && e !== t && YV(e), (t = e));
-      try {
-        s();
-      } catch (e) {
-        r.n().warning(`Failed to sync pet hotkey`, { safe: {}, sensitive: { error: e } });
-      }
-    },
-  };
-}
-function C7() {
-  let e = Er();
-  return e.status === `ready` && (e.codexLocalAccess || e.workCloudAccess || e.workLocalAccess);
-}
 var { Git, Wit } = createWindowsNativeCaptureBridgeModule({
   n,
   r,
@@ -149691,7 +149632,16 @@ function dst({
       },
     }),
     V = new Hle(B, u, x),
-    ee = Fit({ toggleAvatarOverlay: () => V.toggleFromHotkey() }),
+    ee = createPetHotkeyManager({
+      toggleAvatarOverlay: () => V.toggleFromHotkey(),
+      resolveCommandKeybinding: n.bt,
+      isMacOS: process.platform === `darwin`,
+      registerGlobalHotkey: qV,
+      subscribeAccessState: Dr,
+      getAccessState: Er,
+      releaseCommandKeybinding: YV,
+      logger: r.n(),
+    }),
     te = new Eat(
       B,
       u,
