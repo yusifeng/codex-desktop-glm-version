@@ -1392,6 +1392,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-app-shared-is-managed-host-source.mjs](test-app-shared-is-managed-host-source.mjs)
 [test-app-shared-format-scheduled-task-key.mjs](test-app-shared-format-scheduled-task-key.mjs)
 [test-app-shared-format-error-message.mjs](test-app-shared-format-error-message.mjs)
+  - Covers 8 formatter and real-consumer wiring assertions.
 [test-app-shared-create-chat-slug.mjs](test-app-shared-create-chat-slug.mjs)
 [test-app-shared-format-remote-control-key.mjs](test-app-shared-format-remote-control-key.mjs)
 [test-app-shared-prefix-svg-local-ids.mjs](test-app-shared-prefix-svg-local-ids.mjs)
@@ -1469,6 +1470,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-app-shared-find-case-insensitive-key.mjs](test-app-shared-find-case-insensitive-key.mjs)
 [test-app-shared-project-annotation-items.mjs](test-app-shared-project-annotation-items.mjs)
 [test-app-shared-status-to-color.mjs](test-app-shared-status-to-color.mjs)
+  - Covers 5 status mapping and Codex Micro consumer assertions.
 [test-app-shared-is-automation-update-output.mjs](test-app-shared-is-automation-update-output.mjs)
 [test-app-shared-has-queued-design-change.mjs](test-app-shared-has-queued-design-change.mjs)
 [test-app-primary-select-model-reasoning-efforts.mjs](test-app-primary-select-model-reasoning-efforts.mjs)
@@ -1506,6 +1508,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-app-shared-normalize-dropdown-overlay-side.mjs](test-app-shared-normalize-dropdown-overlay-side.mjs)
 [test-preload-annotation-queryable-root-policy.mjs](test-preload-annotation-queryable-root-policy.mjs)
 [test-app-shared-get-path-basename.mjs](test-app-shared-get-path-basename.mjs)
+  - Covers 18 POSIX, Windows, UNC, and real-consumer wiring assertions.
 [test-preload-annotation-document-access-policy.mjs](test-preload-annotation-document-access-policy.mjs)
 [test-preload-annotation-frame-element-resolver.mjs](test-preload-annotation-frame-element-resolver.mjs)
 [test-preload-annotation-frame-document-resolver.mjs](test-preload-annotation-frame-document-resolver.mjs)

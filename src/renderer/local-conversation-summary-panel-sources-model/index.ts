@@ -1,11 +1,11 @@
 import "@rchunk/rolldown-runtime";
 import {
-  II as getPathBasename,
   RI as initializeAttachmentUtilities,
   eU as getMcpAppId,
   hq as isWebMcpServer,
   wL as initializeUtilities,
 } from "@rchunk/app-shared";
+import { getPathBasename } from "../app-shared/runtime/get-path-basename";
 import {
   Brn as formatMcpServerName,
   Drn as initializeMcpServerNames,

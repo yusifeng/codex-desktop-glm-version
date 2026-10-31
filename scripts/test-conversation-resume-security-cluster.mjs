@@ -33,7 +33,7 @@ for (const directory of MODULES) {
     "utf8",
   );
   for (const match of source.matchAll(
-    /import\s*{([\s\S]*?)}\s*from\s*"@rchunk\/([^"]+)";/g,
+    /import\s*{([^;]*?)}\s*from\s*"@rchunk\/([^"]+)";/g,
   )) {
     const names = importedNamesByModule.get(match[2]) ?? new Set();
     for (const rawSpecifier of match[1].split(",")) {

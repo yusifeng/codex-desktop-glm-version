@@ -3,7 +3,6 @@ import {
   $3 as initializeJsxRuntime,
   G3 as hostMessageBridge,
   I3 as getJsxRuntime,
-  II as getPathBasename,
   K3 as useElectronMessageHandler,
   Qh as LoadingSpinner,
   Yh as Button,
@@ -12,6 +11,7 @@ import {
   type ReactRuntime,
   type RendererHostMessage,
 } from "@rchunk/app-shared";
+import { getPathBasename } from "../app-shared/runtime/get-path-basename";
 import {
   _N as useIsRemoteHost,
   o_n as useNavigate,

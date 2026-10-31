@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后完成 app-shared semantic consumer 扫描发现的全部 3 个真实遗漏：pull-request-fix/resume
+错误路径改用 `format-error-message`，Codex Micro keyboard 改用 `status-to-color`，artifacts/source-summary/
+workspace-selection、terminal、image restoration 与 text thumbnail 改用 `get-path-basename`。basename
+helper 同步补齐发布版的 Windows extended-path、UNC 与反斜杠规范化；9 个 consumer 不再读取
+`IH/EX/II`。
+
 同批 renderer 全量构建还修复了 4 个发布依赖边：为 `sort-bar-visualization` 登记既有
 motion proxy 资产别名；为 WebMCP model 与 native sandbox 保留原 hub side-effect 边；并将 lazy
 size-capture 精确绑定到其原始 `chunk-Y2CYZVJY-24cce454fd91.js`，避免误用同名 modern runtime。

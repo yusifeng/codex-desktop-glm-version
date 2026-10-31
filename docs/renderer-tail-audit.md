@@ -1,5 +1,11 @@
 # Renderer 尾部资产审计
 
+2026-10-31 A5 app-shared consumer 扫描：现存 semantic-business-logic 模块与真实 named hub import
+交叉检查后，确认并接回最后 3 个遗漏能力：`format-error-message`（2 consumers）、`status-to-color`
+（1 consumer）与 `get-path-basename`（6 consumers，含 namespace 解构）。对应 `IH/EX/II` hub
+读取已清零；basename 实现补齐发布版的 extended drive、UNC 和反斜杠规范化，focused suites
+分别为 8、5、18 项。
+
 2026-10-31 A5 consumer 接回与依赖边复核：`app-primary` 的 `w2/Ur` readiness policy 已由
 `open-local-conversation-background-agent` 真实消费语义 helper，并使用 resumed、message projection 与
 completed-history 三项原始判定。全量 renderer 构建同时发现并修复 `sort-bar-visualization` 缺失的

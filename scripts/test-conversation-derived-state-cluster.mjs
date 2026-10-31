@@ -20,7 +20,7 @@ const state = (globalThis.__conversationDerivedTest = {
 const importedNamesByModule = new Map();
 for (const directory of MODULES) {
   const source = fs.readFileSync(path.join(ROOT, "src/renderer", directory, "index.ts"), "utf8");
-  for (const match of source.matchAll(/import\s*{([\s\S]*?)}\s*from\s*"@rchunk\/([^"]+)";/g)) {
+  for (const match of source.matchAll(/import\s*{([^;]*?)}\s*from\s*"@rchunk\/([^"]+)";/g)) {
     const names = importedNamesByModule.get(match[2]) ?? new Set();
     for (const rawSpecifier of match[1].split(",")) {
       const specifier = rawSpecifier.trim();

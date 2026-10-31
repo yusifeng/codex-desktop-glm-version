@@ -1,11 +1,12 @@
 import "@rchunk/rolldown-runtime";
 import * as Shared from "@rchunk/app-shared";
 import * as Initial from "@rchunk/app-initial";
+import { getPathBasename } from "../app-shared/runtime/get-path-basename";
 
 interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>): unknown; jsxs(type: unknown, props: Record<string, unknown>): unknown }
 interface ThumbnailProps { title: string; path?: string | null; isMarkdown?: boolean; icon?: unknown; hideFilePath?: boolean; hasUnsavedChanges?: boolean; content?: string | null }
 type IconComponent = (props: Record<string, unknown>) => unknown;
-const shared = Shared as unknown as { $3(): { c(n: number): unknown[] }; I3(): JsxRuntime; II(path: string): string; K2(): void; RI(): void; Y2: unknown; gg(): void; hg(path: string): string; pg: Record<string, IconComponent> };
+const shared = Shared as unknown as { $3(): { c(n: number): unknown[] }; I3(): JsxRuntime; K2(): void; RI(): void; Y2: unknown; gg(): void; hg(path: string): string; pg: Record<string, IconComponent> };
 const initial = Initial as unknown as { J9t(path: string): string | null; Jxn(): void; X9t(path: string): boolean; Xd: unknown; Y9t(): void; Zd(): void; qxn: Array<{ id: string; aliases?: string[]; name: string }> };
 let compiler: { c(n: number): unknown[] }, jsx: JsxRuntime;
 
@@ -23,7 +24,7 @@ function markdownOutline(content: string): string | null {
 
 function TextFileThumbnail({ title, path, isMarkdown, icon, hideFilePath = false, hasUnsavedChanges, content }: ThumbnailProps): unknown {
   compiler.c(31);
-  let languageId: string | null = isMarkdown ? "markdown" : null; if (path != null) languageId = initial.J9t(path) ?? shared.II(path).toLowerCase();
+  let languageId: string | null = isMarkdown ? "markdown" : null; if (path != null) languageId = initial.J9t(path) ?? getPathBasename(path).toLowerCase();
   const language = initial.qxn.find(item => item.id === languageId || languageId != null && item.aliases?.includes(languageId))?.name;
   if ((path == null || path === title) && content == null && !hasUnsavedChanges && language == null) return null;
   const lineCount = content != null && content.length <= 65536 ? 1 + (content.match(/\r\n|\r|\n/g)?.length ?? 0) : null;

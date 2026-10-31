@@ -2,6 +2,7 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as turnEntriesChunk from "@rchunk/local-conversation-thread-turn-entries";
 import "@rchunk/rolldown-runtime";
+import { getPathBasename as basename } from "../app-shared/runtime/get-path-basename";
 
 interface RouteState { routeKind?: string; }
 interface Scope { value: RouteState; get(signal: unknown, parameter?: unknown): unknown; query: { getOrFetch(query: unknown, input: unknown): Promise<{ existingPaths: string[] }> }; }
@@ -11,11 +12,11 @@ type DurableImageIdentity = { source: "generated-image"; imageItemId: string } |
 interface PreviewOptions { durableIdentity?: DurableImageIdentity; [key: string]: unknown }
 type OpenPreview = (scope: Scope, props: Record<string, unknown>, options: PreviewOptions) => void;
 interface InitialApi { Dyt: unknown; Fut(): void; GZt: unknown; HZt(): void; LCt(): void; M_: unknown; Put: unknown; RCt: unknown; U3t(): void; Ugn(scope: Scope, host: unknown): { ensureConversationHistoryLoaded(id: string): Promise<void> }; V3t(path: string): string; Wgn(): void; bQt: unknown; byt(): void; itn(): void; k_(): void; mpn: unknown; ppn(): void; qB(input: { conversationTitle: string | null; images: GeneratedImage[]; intl: unknown }): PreviewImage[]; ttn(route: RouteState): string | null; wQt: unknown; }
-interface SharedApi { II(path: string): string; RI(): void; }
+interface SharedApi { RI(): void; }
 interface GeneratedImage { id: string; src?: string | null; [key: string]: unknown }
 interface PreviewImage { id: string; src: string; previewSrc: string; alt: string; tabTitle: string; }
 const { Dyt: currentHostIdSignal, Fut: initializeImageAttachments, GZt: historyLoadedSignal, HZt: initializeConversationModel, LCt: initializeImagePreviewRuntime, M_: turnEntriesSignal, Put: existingPathsQuery, RCt: conversationTitleSignal, U3t: initializeGeneratedImages, Ugn: conversationHistoryLoader, V3t: normalizeLocalPath, bQt: projectlessOutputDirectorySignal, byt: initializeImageUtilities, itn: initializeRouteState, k_: initializeAttachmentRuntime, mpn: intlSignal, ppn: initializePreviewTabs, qB: buildGeneratedImagePreviews, ttn: getConversationId, wQt: conversationHostSignal } = appInitialChunk as unknown as InitialApi;
-const { II: basename, RI: initializePathRuntime } = appSharedChunk as unknown as SharedApi;
+const { RI: initializePathRuntime } = appSharedChunk as unknown as SharedApi;
 const { n: collectGeneratedImageEntries, r: initializeTurnEntries } = turnEntriesChunk as unknown as { n(input: Record<string, unknown>): unknown[]; r(): void };
 function routeMatches(scope: Scope, hostId: string): boolean { return scope.value.routeKind === "local-thread" && scope.get(currentHostIdSignal) === hostId; }
 async function existingPath(scope: Scope, hostId: string, path: string): Promise<boolean> { if (!routeMatches(scope, hostId)) return false; try { const result = await scope.query.getOrFetch(existingPathsQuery, { hostId, paths: [path] }); return result.existingPaths.includes(path) && routeMatches(scope, hostId); } catch { return false; } }

@@ -1,7 +1,6 @@
 import "@rchunk/rolldown-runtime";
 import {
   BX as useSignalFamilyValue,
-  IH as getErrorMessage,
   K2 as initializeInternationalization,
   LX as useAppScope,
   e6 as getReact,
@@ -11,6 +10,7 @@ import {
   pk as toastManager,
   wL as initializeUtilities,
 } from "@rchunk/app-shared";
+import { formatErrorMessage as getErrorMessage } from "../app-shared/runtime/format-error-message";
 import {
   B8t as isMissingPullRequestTaskError,
   DZt as conversationAvailable,
@@ -66,7 +66,7 @@ function getConfigErrorDetails(error: unknown): { detail: string; location: stri
 }
 
 function shouldAutoRetryResume(error: unknown): boolean {
-  const message = getErrorMessage(error).toLowerCase();
+  const message = (getErrorMessage(error) ?? "").toLowerCase();
   return (
     getConfigErrorDetails(error) == null &&
     !isLiveWriterConflict(error) &&
@@ -192,7 +192,7 @@ function useResumeConversationIfNeeded(
         );
       } catch (error) {
         if (cancelled) return;
-        const message = getErrorMessage(error).toLowerCase();
+        const message = (getErrorMessage(error) ?? "").toLowerCase();
         if (threadAccess === "shared" && message.includes("thread not found")) {
           blocked.current = conversationId;
           setUnavailableConversationId(conversationId);

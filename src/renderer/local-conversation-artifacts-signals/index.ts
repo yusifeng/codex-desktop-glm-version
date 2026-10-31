@@ -3,7 +3,6 @@ import {
   BI as normalizeArtifactPath,
   FX as initializeSignalRuntime,
   HI as joinPath,
-  II as getPathBasename,
   OK as normalizeUrl,
   PK as isHttpUrl,
   QI as initializeQueryRuntime,
@@ -15,6 +14,7 @@ import {
   rZ as createScopedSignalFamily,
   wL as initializeUtilities,
 } from "@rchunk/app-shared";
+import { getPathBasename } from "../app-shared/runtime/get-path-basename";
 import {
   A9t as isProjectlessOutputResource,
   D9t as isWorkspaceResource,

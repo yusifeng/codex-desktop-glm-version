@@ -5,11 +5,11 @@ import "@rchunk/app-primary";
 import "@rchunk/terminal-workspace-warning-state";
 import "@rchunk/shell-label";
 import { TerminalPanel } from "@rchunk/terminal-panel";
+import { getPathBasename } from "../app-shared/runtime/get-path-basename";
 
 const {
   $3: initializeRuntimeLazy,
   I3: getJsxRuntime,
-  II: getPathBasename,
   Y2: FormattedMessage,
   Yh: Button,
   e6: getReactRuntime,

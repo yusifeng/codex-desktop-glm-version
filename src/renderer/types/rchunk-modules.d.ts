@@ -28,7 +28,6 @@ declare module "@rchunk/app-shared" {
   /** isWorkspacePath（目标应用发现前的本地路径判定）。 */
   export const NK: (value: string) => boolean;
   /** getPathBasename（来源面板的本地文件标签）。 */
-  export const II: (path: string) => string;
   /** getMcpAppId（从 MCP 调用 id 提取稳定 app id）。 */
   export const eU: (callId: string) => string;
   export interface SafeParseSuccess<T> {
@@ -265,7 +264,6 @@ declare module "@rchunk/app-shared" {
   /** initializeErrorValueToString（app-shared/runtime/error-rate-limit.ts，内部 zVe）。 */
   export const FH: () => void;
   /** errorValueToString（内部 RVe）。 */
-  export const IH: (value: unknown) => string | undefined;
   export interface MinimumIntervalGateOptions {
     minIntervalMs: number;
   }
@@ -1361,7 +1359,6 @@ declare module "@rchunk/app-shared" {
   /** getCodexMicroIdleTimeoutMs（内部 TMe）。 */
   export const TX: (timeout: CodexMicroIdleTimeout) => number | null;
   /** getCodexMicroStatusColor（内部 EMe）。 */
-  export const EX: (status: CodexMicroStatus) => number;
   /** isAutomatedReviewSource（内部 IL）。 */
   export const lX: (source: unknown) => boolean;
   /** isAutoReviewRequiredForModel（内部 FMe）。 */

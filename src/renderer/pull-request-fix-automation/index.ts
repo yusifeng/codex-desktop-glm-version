@@ -1,9 +1,9 @@
 import {
-  IH as getErrorMessage,
   lY as getConversationId,
   wL as initializeAutomationRuntime,
   zY as isAutomationDefinition,
 } from "@rchunk/app-shared";
+import { formatErrorMessage as getErrorMessage } from "../app-shared/runtime/format-error-message";
 import {
   FCt as initializeAutomationModel,
   GYt as initializeAutomationSchedule,

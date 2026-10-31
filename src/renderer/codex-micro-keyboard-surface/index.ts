@@ -1,5 +1,4 @@
 import {
-  EX as getCodexMicroStatusColor,
   G2 as defineMessages,
   I3 as getJsxRuntime,
   Y2 as FormattedMessage,
@@ -10,6 +9,7 @@ import {
   type CodexMicroStatus,
   type JsxRuntime,
 } from "@rchunk/app-shared";
+import { statusToColor as getCodexMicroStatusColor } from "../app-shared/runtime/status-to-color";
 import "@rchunk/app-initial";
 import "@rchunk/app-primary";
 import "@rchunk/play-outline";
