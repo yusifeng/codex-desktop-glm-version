@@ -39,9 +39,7 @@ import { projectlessWorkspaceInstructions, readThreadCodexConfig } from "../work
 import { resolveServiceTier, logFeatureOverrideResolved } from "../threads/start-config";
 // R3 threads/projection（Tv/wv/Dv：thread 时间戳/标题截断/环境配置选择）。
 import { threadTimestamps, truncateText, environmentSelection } from "../threads/projection";
-// q_（33,143 canonicalVoiceHistory 判定）——R3 尚未导出，落地后对齐（缺导出已记录）。
-import * as projectionModule from "../threads/projection";
-const isCanonicalVoiceHistory: (thread: any) => unknown = (projectionModule as any).isCanonicalVoiceHistory;
+import { hasCanonicalVoiceHistory as isCanonicalVoiceHistory } from "../threads/automation-detector";
 // R3 threads/patch-classification（zv/Bv/Vv：model/collab/权限状态更新）。
 import { applyModelSettingsUpdate, buildModelSettingsUpdate, permissionSettingsUpdate } from "../threads/patch-classification";
 // R3 tools/dynamic-app-tools（Dh：thread_references 可用性判定）。

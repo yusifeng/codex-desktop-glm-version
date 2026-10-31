@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 canonical voice history owner unification
+
+conversation creation 原先把不存在的 `projectionModule.isCanonicalVoiceHistory` 强转后直接调用，是实际 thread creation 崩溃点。本轮将
+creation、hydration/thread-store、maybe-resume、projection 与 main `q_` 全部统一到 `automation-detector.ts` 的版本门实现，并删除旧
+`q_`；focused suite 覆盖 fork/history/version 四重 gate 和所有关键 wiring。
+
 ## 2026-10-31 thread start/resume config owner repair
 
 `src/main/main-app/threads/start-config.ts` 的 `gx/xye` 原先仅复制输入或返回调试对象，导致新建与 resume 丢失 base config、shell policy、

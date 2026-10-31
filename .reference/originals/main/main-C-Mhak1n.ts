@@ -20,6 +20,7 @@ const { QueuedFollowUpsCoordinator } = require("./main-app/conversation/queued-f
 const { AppServerConversationManager } = require("./main-app/conversation/app-server-manager.js");
 const { O_e, zv, Bv, Vv, D_e } = require("./main-app/threads/patch-classification.js");
 const { mx, yx } = require("./main-app/threads/start-config.js");
+const { hasCanonicalVoiceHistory: q_ } = require("./main-app/threads/automation-detector.js");
 const { AppServerManagerStreamState } = require("./main-app/threads/stream-roles.js");
 const { ThreadStore } = require("./main-app/threads/thread-store.js");
 const { PrewarmSlot, DetachedWindowPrewarmer, DetachedWindowManager, DetachedWindowService, ThreadHandoffLease, DeviceCheckCookieManager, CallIdClaimRegistry } = require("./main-app/window/detached-window-manager.js");
@@ -25524,14 +25525,6 @@ function K_(e, t) {
     e.isSubagentSource === t.isSubagentSource &&
     e.subagentParentThreadId === t.subagentParentThreadId &&
     e.subagentSpinnerProjectionSignature === t.subagentSpinnerProjectionSignature
-  );
-}
-function q_(e) {
-  return (
-    e.forkedFromId == null &&
-    e.historyMode === `paginated` &&
-    e.cliVersion !== `0.0.0` &&
-    n.Wu(e.cliVersion, `threadTimeline`)
   );
 }
 function J_(e) {

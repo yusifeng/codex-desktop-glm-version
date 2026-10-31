@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+统一 canonical voice history capability owner：conversation creation 原先动态读取 projection 中不存在的导出，会在创建线程时调用
+`undefined`；现统一复用 `automation-detector.ts` 的 `hasCanonicalVoiceHistory`，hydration/thread-store、maybe-resume、projection 与主 chunk
+`q_` consumers 共用同一实现，旧主 chunk `q_` 删除。
+
 修复并统一 thread start/resume config owner：`threads/start-config.ts` 现恢复 base config、versioned feature overrides、shell environment
 policy 合并、动态工具、developer/writing instructions、resume settings/personality、permission stripping 与 token-budget config；conversation
 creation、AppServer resume 和主 chunk `mx/yx` consumers 共用语义模块，旧 `ux…Cye` 约 480 行簇删除。

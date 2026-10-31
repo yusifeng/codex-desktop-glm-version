@@ -17,7 +17,6 @@ import {
   Of as stringSchema,
   Cf as numberSchema,
   $u as threadIdOf,
-  Wu as appServerVersionSupports,
   vl as isAbsolutePathLike,
   wl as normalizeUncPath,
   Tl as normalizeSlashes,
@@ -33,6 +32,7 @@ import {
   pa as DEFAULT_THREAD_SOURCE_KINDS,
   _s as LONG_LIVED_HOST_ID,
 } from "@chunk/shared";
+import { hasCanonicalVoiceHistory as hasCanonicalVoice } from "./automation-detector";
 import { produce, produceWithPatches, original } from "../vendor/immer";
 import { deepEqual, findLast } from "../util/lodash-interop";
 import {
@@ -947,15 +947,7 @@ export function newConversationFromThread({
   };
 }
 
-/** paginated + cliVersion 支持 timeline（原 `q_` 的 ThreadStore 侧副本）。 */
-export function hasCanonicalVoice(thread: Record<string, any>): boolean {
-  return (
-    thread.forkedFromId == null &&
-    thread.historyMode === "paginated" &&
-    thread.cliVersion !== "0.0.0" &&
-    appServerVersionSupports(thread.cliVersion, "threadTimeline")
-  );
-}
+export { hasCanonicalVoice };
 
 /** 模型设置回写守卫（原 `Mv`）。 */
 export function applyModelSettings(conversation: Record<string, any>, thread: Record<string, any>, modelSettingsAtReadStart: { model: string; reasoningEffort: unknown } | null | undefined): void {

@@ -15,6 +15,7 @@ import {
 import { plainTextFromMarkdown } from "../markdown/plain-text";
 import { parseCodexDelegation } from "../misc/delegation";
 import { takeLastRequestSection } from "../prompts/section-markers";
+export { hasCanonicalVoiceHistory } from "./automation-detector";
 
 /**
  * 线程摘要 → conversation 骨架（原版 V_）：catalog/摘要侧只有元数据，
