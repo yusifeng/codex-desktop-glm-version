@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+继续拆 `PBe` 持有的真实 owner：`CMe` automations service 已迁入 `automations/automations-service.ts`；cron/worktree
+validation、canonical/habitat 双路径、delete cleanup/notification、native execution context、local-only 与 migration gates
+均由新 class 持有。真实 `PBe` consumer 已接回，旧 class body 删除。
+
 修正并接回此前未接线且语义有偏差的 `settings/workspace-settings-service.ts`：`CBe` settings owner、RPC
 subscription、agent write-confirmation broker、work-mode access policy、third-party notices reader 与 backdrop policy 均迁入
 dependency-injected runtime；真实 `PBe` consumer 已接回，旧 `sBe/cBe/xBe/SBe/RH/CBe/zH` 和 notices helpers 删除。

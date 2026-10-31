@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 automations service owner
+
+`PBe` 构造器持有的原 `CMe` 已迁入 `src/main/main-app/automations/automations-service.ts`。新 class 保留 cron/worktree
+validation、canonical/habitat 双路径、delete cleanup 与 run-update notification、native context lifetime、local-only 与 habitat
+migration gates；真实 consumer 已接回，旧 class body 已删除。
+
 ## 2026-10-31 workspace settings service wiring correction
 
 既有 `settings/workspace-settings-service.ts` 未接线，且错误假设 RPC stream 为 `.send()`、改变 open-link fallback 与 schema

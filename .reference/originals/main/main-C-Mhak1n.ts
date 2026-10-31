@@ -84,6 +84,7 @@ const { createSftpTransfers } = require("./main-app/fetch-handler/sftp.js");
 const { applySparseStateWrite, createFetchHandlerStateRuntime } = require("./main-app/fetch-handler/state-writes.js");
 const { createWorkspaceDirectoryBrowser } = require("./main-app/workspace/directory-browser.js");
 const { createThirdPartyNoticesReader, createWorkspaceSettingsServiceClass, resolveSystemBackdropSupport } = require("./main-app/settings/workspace-settings-service.js");
+const { createAutomationsServiceClass } = require("./main-app/automations/automations-service.js");
 const { createWorkspaceFileServiceClass } = require("./main-app/workspace/files.js");
 const { createAuthorizedThreadCatalogServiceClass } = require("./main-app/thread-catalog/authorized-service.js");
 const { createPluginIncentivesClientRuntime } = require("./main-app/plugins/incentives-client.js");
@@ -81973,106 +81974,18 @@ function SMe(e) {
       return `Automation was not deleted.`;
   }
 }
-var CMe = class extends n.Uf {
-  globalState;
-  appServerConnectionRegistry;
-  habitatAutomationsService;
-  constructor(e, t, n) {
-    (super(),
-      (this.globalState = e),
-      (this.appServerConnectionRegistry = t),
-      (this.habitatAutomationsService = n));
-  }
-  async create(e) {
-    return this.#e(e, null);
-  }
-  async #e(e, t) {
-    let r = e.kind === `cron` ? ms(this.globalState, e.projectId) : [];
-    (e.kind === `cron` &&
-      hs({
-        compatibilityCwds: r,
-        executionEnvironment: e.executionEnvironment,
-        projectId: e.projectId,
-      }),
-      t?.assertCurrent());
-    let i = this.habitatAutomationsService
-      ? await this.habitatAutomationsService.create(e, r)
-      : n.yr(e, r);
-    if (!i) throw Error(`Automation create failed.`);
-    return { item: i };
-  }
-  async update(e) {
-    return this.#t(e, null);
-  }
-  async #t(e, t) {
-    let r = e.kind === `cron` ? ms(this.globalState, e.projectId) : [];
-    (e.kind === `cron` &&
-      hs({
-        compatibilityCwds: r,
-        executionEnvironment: e.executionEnvironment,
-        projectId: e.projectId,
-      }),
-      t?.assertCurrent());
-    let i = this.habitatAutomationsService
-      ? await this.habitatAutomationsService.update(e, r)
-      : n.Vr(e, r);
-    if (!i) throw Error(n.md);
-    return { item: i };
-  }
-  async delete({ id: e }) {
-    return this.#n(e, null);
-  }
-  async #n(e, t) {
-    t?.assertCurrent();
-    let { item: r, status: i } = this.habitatAutomationsService
-        ? await this.habitatAutomationsService.delete(e)
-        : { item: n.xr(e), status: n.br(e) },
-      a = i === `deleted` || i === `not_found`;
-    if (a)
-      try {
-        (n.ei(e),
-          (
-            t?.connection ?? this.appServerConnectionRegistry.getConnection(`local`)
-          ).notifyAutomationRunsUpdated());
-      } catch {}
-    return { item: r, success: a, status: i };
-  }
-  executeUpdateTool(e) {
-    return this.#r(e, this);
-  }
-  executeNativeUpdateTool = (e, t) => (
-    t.assertCurrent(),
-    this.#r(e, {
-      create: (e) => this.#e(e, t),
-      update: (e) => this.#t(e, t),
-      delete: ({ id: e }) => this.#n(e, t),
-    })
-  );
-  #r(e, t) {
-    return e.hostId === `local`
-      ? this.habitatAutomationsService?.isLocalMigrationActive()
-        ? Promise.resolve({
-            response: {
-              success: !1,
-              contentItems: [
-                {
-                  type: `inputText`,
-                  text: `Local automation changes must use the Automations app after migration consent.`,
-                },
-              ],
-            },
-          })
-        : xMe(t, e, (e) => null)
-      : Promise.resolve({
-          response: {
-            success: !1,
-            contentItems: [
-              { type: `inputText`, text: `Automations are only supported for local threads.` },
-            ],
-          },
-        });
-  }
-};
+var CMe = createAutomationsServiceClass({
+  DisposableBase: n.Uf,
+  assertWorktreeTargetRequirements: hs,
+  createLocalAutomation: n.yr,
+  executeUpdateTool: xMe,
+  getLocalAutomation: n.xr,
+  missingAutomationMessage: n.md,
+  removeAutomationRegistryEntry: n.ei,
+  removeLocalAutomation: n.br,
+  resolveCompatibilityCwds: ms,
+  updateLocalAutomation: n.Vr,
+});
 function hP(e, t) {
   let n = _P(e, t);
   return n != null && yP(n, e) === yP(n, t);
