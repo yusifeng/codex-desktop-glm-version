@@ -43,6 +43,7 @@ const realOwners = [
   ["src/main/main-app/workspace/worktree-cleanup-runtime.ts", "createWorktreeCleanupRuntime"],
   ["src/main/main-app/workspace/file-runtime-support.ts", "createWorkspaceFileRuntimeSupport"],
   ["src/main/main-app/terminal/cloud-command-session.ts", "createCloudCommandSessionRuntime"],
+  ["src/main/main-app/window/rpc-service-adapters.ts", "createWindowRpcServiceAdapters"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -293,6 +294,14 @@ assert.equal(main.includes("async function J$e("), false, "generated cloud termi
 assert.equal(main.includes("q$e = n.wf"), false, "generated cloud output schema owner must be removed");
 assert.equal(main.includes("createCloudCommandSession,"), true, "cloud command consumer must use semantic output");
 assert.equal(main.includes("    J$e,"), false, "generated cloud command alias must be removed");
+assert.equal(main.includes("createWindowRpcServiceAdapters({"), true, "real WindowContext RPC adapters are wired");
+assert.equal(main.includes("var Y$e = class"), false, "generated hotkey-window service must be removed");
+assert.equal(main.includes("X$e = class extends"), false, "generated keyboard-modifier service must be removed");
+assert.equal(main.includes("var u1e = class"), false, "generated local-environments service must be removed");
+assert.equal(main.includes("y6e = class extends"), false, "generated Owl runtime-feature service must be removed");
+assert.equal(main.includes("var b6e = class"), false, "generated performance telemetry service must be removed");
+assert.equal(main.includes("var T6e = class"), false, "generated marketplace listing service must be removed");
+assert.equal(main.includes("var R0 = {}"), false, "generated runtime-feature state owner must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("305 main unwired-owner skeleton assertions passed");
+console.log("315 main unwired-owner skeleton assertions passed");

@@ -4824,3 +4824,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   WindowContext 直接消费 `createCloudCommandSession` 并复用唯一 command backend。main 旧两组实现 210 行已删除，
   新生产模块合计 385 行；focused coverage 37/40 项，邻接回归 26/19/16 项，no-unwired gate 扩至 305 项。
   下一批审计紧随其后的 hotkey/local-environment RPC owners 与 vendor stream belt，前者只在能成组迁移时处理，后者保留。
+
+# 2026-11-01 WindowContext RPC service adapters
+
+- `src/main/main-app/window/rpc-service-adapters.ts` 已整组接管 hotkey/keyboard modifier、local environment、Owl runtime
+  features、performance sampling 与 plugin marketplace listing services；WindowContext 直接消费七个语义 outputs，唯一
+  runtime-feature state/reset 也在同一 factory closure 内。
+- main 旧 classes/state 163 行已删除，新生产模块 260 行；focused coverage 58 项、WindowContext 回归 16 项，
+  no-unwired gate 扩至 315 项。相邻 stream/archive belt 已确认是 bundled vendor；下一批越过 vendor，继续审计 projects/
+  realtime 前后的第一方 helpers 与仍未迁移 owner。

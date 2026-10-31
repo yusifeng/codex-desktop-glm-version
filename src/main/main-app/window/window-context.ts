@@ -106,7 +106,7 @@ export function createWindowContextClass(dependencies) {
     STe,
     Snt,
     T,
-    T6e,
+    PluginMarketplaceListingService,
     Tr,
     U,
     Uet,
@@ -120,7 +120,7 @@ export function createWindowContextClass(dependencies) {
     Wje,
     Wtt,
     Wze,
-    X$e,
+    KeyboardModifierService,
     X8,
     XOe,
     Xc,
@@ -130,7 +130,7 @@ export function createWindowContextClass(dependencies) {
     Xnt,
     Xtt,
     Y,
-    Y$e,
+    HotkeyWindowService,
     Y6e,
     Y8e,
     YD,
@@ -154,7 +154,7 @@ export function createWindowContextClass(dependencies) {
     att,
     au,
     b,
-    b6e,
+    PerformanceTelemetryService,
     c,
     c8e,
     cA,
@@ -236,7 +236,7 @@ export function createWindowContextClass(dependencies) {
     trt,
     ttt,
     u,
-    u1e,
+    LocalEnvironmentsService,
     uQe,
     uke,
     v,
@@ -249,12 +249,12 @@ export function createWindowContextClass(dependencies) {
     x,
     xoe,
     y,
-    y6e,
+    OwlRuntimeFeaturesService,
     y8e,
     yOe,
     ytt,
     z,
-    z0,
+    resetRuntimeFeatures,
     z5e,
     zOe,
     zje,
@@ -313,7 +313,7 @@ export function createWindowContextClass(dependencies) {
       dynamicToolCalls = new eMe();
       localThreadCatalogSyncCoordinator;
       threadCatalogSyncManager;
-      keyboardModifierService = new X$e();
+      keyboardModifierService = new KeyboardModifierService();
       demoTools;
       realtime;
       initialRemoteConnectionsRefresh;
@@ -691,7 +691,7 @@ export function createWindowContextClass(dependencies) {
           () => void this.options.sparkleManager.checkForUpdates(),
         )),
           this.disposables.add(this.lsp),
-          (this.localEnvironments = new u1e(this.executionHostRegistry)),
+          (this.localEnvironments = new LocalEnvironmentsService(this.executionHostRegistry)),
           (this.managedWorktrees = new $0e(this.appServerConnectionRegistry, (e) =>
             this.messageHandler.getWorktreeService(e),
           )),
@@ -859,7 +859,7 @@ export function createWindowContextClass(dependencies) {
               let n = A ?? e;
               (n != null &&
                 (n.accountId !== t.accountId || n.userId !== t.userId) &&
-                (this.clearSitesAuthentication(), z0(), j()),
+                (this.clearSitesAuthentication(), resetRuntimeFeatures(), j()),
                 (A = t));
               let r = this.options.windowManager.getPrimaryWindow();
               r != null &&
@@ -875,7 +875,7 @@ export function createWindowContextClass(dependencies) {
                 t !== `chatgpt` &&
                   t !== `chatgptAuthTokens` &&
                   (this.browserSettingsSync.logout(), j()),
-                t ?? (this.clearSitesAuthentication(), (A = null), z0(), k.clear()));
+                t ?? (this.clearSitesAuthentication(), (A = null), resetRuntimeFeatures(), k.clear()));
             }),
           ),
           this.disposables.add(
@@ -1115,7 +1115,7 @@ export function createWindowContextClass(dependencies) {
             this.options.remoteHostedPIPContentController == null
               ? void 0
               : new z5e(this.options.remoteHostedPIPContentController, e),
-          p = new Y$e(this.options.hotkeyWindowLifecycleManager, e),
+          p = new HotkeyWindowService(this.options.hotkeyWindowLifecycleManager, e),
           m = h.default.join(
             this.options.executionCodexHome,
             `memories`,
@@ -1346,7 +1346,7 @@ export function createWindowContextClass(dependencies) {
             dictationAudio: this.dictationAudio,
             systemAudioSpectrum: ntt(e),
             dictationHistory: this.dictationHistory,
-            owlFeatures: new y6e(),
+            owlFeatures: new OwlRuntimeFeaturesService(),
             owlBrowserCrashCounter:
               this.options.windowManager.getRendererWindowLogFields(e).rendererWindowAppearance ===
               `primary`
@@ -1355,7 +1355,7 @@ export function createWindowContextClass(dependencies) {
             primaryRuntime: this.primaryRuntimeService,
             localAutomations: this.fetchHandler.automationsService,
             quickChatWindow: new s8e(this.options.quickChatController, e),
-            pluginScheduledTasks: new T6e(i),
+            pluginScheduledTasks: new PluginMarketplaceListingService(i),
             chromeNativeHost: new OAe(
               this.executionHostRegistry,
               process.env.NODE_ENV === `development` ? this.options.repoRoot : void 0,
@@ -1404,7 +1404,7 @@ export function createWindowContextClass(dependencies) {
                     },
                   )
                 : void 0,
-            performanceTelemetry: new b6e(this.messageHandler, e),
+            performanceTelemetry: new PerformanceTelemetryService(this.messageHandler, e),
             pinnedThreads: this.fetchHandler.pinnedThreadsService,
             processMemory: Qnt,
             clipboard: new VO(),

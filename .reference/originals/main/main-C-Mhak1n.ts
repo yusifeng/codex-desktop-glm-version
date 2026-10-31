@@ -262,6 +262,7 @@ const { createSavedSectionReconciliationClass } = require("./main-app/sidebar/sa
 const { createSavedCustomSectionsManagerClass } = require("./main-app/sidebar/saved-custom-sections-manager.js");
 const { createWorkspaceFileServiceClass } = require("./main-app/workspace/files.js");
 const { createWorkspaceFileRuntimeSupport } = require("./main-app/workspace/file-runtime-support.js");
+const { createWindowRpcServiceAdapters } = require("./main-app/window/rpc-service-adapters.js");
 const { createDesktopFileServicesRuntime } = require("./main-app/files/desktop-file-services.js");
 const { createLibraryFilesBackendRuntime } = require("./main-app/files/library-files-backend.js");
 const { createDictationAudioServiceClass } = require("./main-app/dictation/audio.js");
@@ -61715,63 +61716,31 @@ var { createCloudCommandSession } =
     getShellCommand: bE,
     CommandSessionBackend: NQ,
   });
-var Y$e = class extends n.Uf {
-    lifecycleManager;
-    origin;
-    constructor(e, t) {
-      (super(), (this.lifecycleManager = e), (this.origin = t));
-    }
-    getState() {
-      return this.lifecycleManager.getState();
-    }
-    setEnabled(e) {
-      this.lifecycleManager.setGateEnabled(e);
-    }
-    toggle() {
-      return this.lifecycleManager.toggle();
-    }
-    open(e) {
-      return this.lifecycleManager.openFromRenderer(this.origin, e);
-    }
-    collapseToHome() {
-      return this.lifecycleManager.collapseToHome();
-    }
-    dismiss() {
-      this.lifecycleManager.dismiss();
-    }
-    setHotkey(e) {
-      return this.lifecycleManager.setHotkey(e);
-    }
-    setDevOverrideEnabled(e) {
-      return this.lifecycleManager.setDevOverrideEnabled(e);
-    }
-    transitionDone(e) {
-      this.lifecycleManager.handleTransitionDone(this.origin, e);
-    }
-    homePointerInteractionChanged(e) {
-      this.lifecycleManager.handleHomePointerInteractionChanged(this.origin, e);
-    }
-    homeLayoutChanged(e) {
-      this.lifecycleManager.handleHomeLayoutChanged(this.origin, e);
-    }
-    homeDragStart(e) {
-      this.lifecycleManager.handleHomeDragStart(this.origin, e);
-    }
-    homeDragMove() {
-      this.lifecycleManager.handleHomeDragMove(this.origin);
-    }
-    homeDragEnd() {
-      this.lifecycleManager.handleHomeDragEnd(this.origin);
-    }
-  },
-  X$e = class extends n.Uf {
-    watchRelease(e) {
-      let t = { meta: `command`, control: `control`, alt: `alternate` };
-      return new Promise((n) => {
-        FV([t[e]], n) ?? n();
-      });
-    }
-  };
+var {
+  HotkeyWindowService,
+  KeyboardModifierService,
+  LocalEnvironmentsService,
+  OwlRuntimeFeaturesService,
+  PerformanceTelemetryService,
+  PluginMarketplaceListingService,
+  resetRuntimeFeatures,
+} = createWindowRpcServiceAdapters({
+  RpcHandlerBase: n.Uf,
+  watchKeyboardRelease: FV,
+  listLocalEnvironments: n.K,
+  readLocalEnvironment: n.q,
+  saveLocalEnvironment: n.R,
+  getUseWslPaths: n.zi,
+  isRemoteHostConfig: n.Es,
+  convertPathForDesktopHost: Vn,
+  convertPathForAgentEnvironment: zn,
+  app: l.app,
+  runtimeFeatureNames: Mt,
+  getFeatureFlags: Tr,
+  getCanonicalMarketplaceName: n.Ul,
+  isOfficialMarketplaceName: n.Wl,
+  listMarketplaceGroups: n.Vt,
+});
 var { LibraryFilesBackend: t1e, loadProjectlessWorkspaceScope: BQ } =
   createLibraryFilesBackendRuntime({
     path: h,
@@ -61788,30 +61757,7 @@ var { LibraryFilesBackend: t1e, loadProjectlessWorkspaceScope: BQ } =
     stateKeys: n.iu,
     projectlessWorkspaceRootSettingKey: n.Fa.projectlessWorkspaceRoot.key,
   });
-var u1e = class extends n.Uf {
-    executionHostRegistry;
-    constructor(e) {
-      (super(), (this.executionHostRegistry = e));
-    }
-    async list({ hostId: e, workspaceRoot: t }) {
-      let r = this.executionHostRegistry.get(e);
-      return { environments: await n.K(t, r) };
-    }
-    async read({ configPath: e, hostId: t }) {
-      let r = this.executionHostRegistry.get(t);
-      return { environment: await n.q(e, r) };
-    }
-    async saveConfig({ configPath: e, expectedRevision: t, hostId: r, raw: i }) {
-      let a = this.executionHostRegistry.get(r),
-        o = n.zi(a.hostConfig),
-        s = n.Es(a.hostConfig) ? e : Vn(e, o);
-      return {
-        configPath: zn(s, o),
-        ...(await n.R(a, { configPath: s, expectedRevision: t, raw: i })),
-      };
-    }
-  },
-  d1e = createAuthorizedThreadCatalogServiceClass({
+var d1e = createAuthorizedThreadCatalogServiceClass({
     runtime: n,
     disposalScope: a,
   }),
@@ -70681,81 +70627,10 @@ function L0(e) {
     return !1;
   }
 }
-var R0 = {},
-  y6e = class extends n.Uf {
-    async isOwlFeatureEnabled(e) {
-      try {
-        return l.app.isRuntimeFeatureEnabled(e);
-      } catch (e) {
-        if (e instanceof Error && e.message.startsWith(`Unsupported Owl feature:`)) return !1;
-        throw e;
-      }
-    }
-    async setRuntimeFeatures(e) {
-      let t = { ...R0 },
-        n = !1;
-      for (let r of Mt) {
-        let i = e[r];
-        typeof i == `boolean` && ((t[r] = i), (n = !0));
-      }
-      n && (l.app.setRuntimeFeatures(t), (R0 = t));
-    }
-  };
-function z0() {
-  ((R0 = {}), l.app.setRuntimeFeatures({}));
-}
-var b6e = class extends n.Uf {
-    messageHandler;
-    origin;
-    constructor(e, t) {
-      (super(), (this.messageHandler = e), (this.origin = t));
-    }
-    startSpanCpuSampling(e) {
-      this.messageHandler.startPerformanceSpanCpuSampling(this.origin, e);
-    }
-    cancelSpanCpuSampling(e) {
-      this.messageHandler.cancelPerformanceSpanCpuSampling(e);
-    }
-    finishSpanCpuSampling(e) {
-      return this.messageHandler.finishPerformanceSpanCpuSampling(e);
-    }
-  },
-  w6e = createPluginIncentivesClientRuntime({
-    runtime: n,
-    authHeaders: a,
-  }).PluginIncentivesClient;
-var T6e = class extends n.Uf {
-    appServer;
-    constructor(e) {
-      (super(), (this.appServer = e));
-    }
-    async list({ buildFlavor: e, cwds: t, hiddenMarketplaceNames: r, marketplaceKinds: i }) {
-      try {
-        let [{ marketplaces: a }, o, s] = await Promise.all([
-            Tr().noPluginListPhase4
-              ? this.appServer.sendAppServerRequest(
-                  `plugin/installed`,
-                  t.length > 0 ? { cwds: t } : {},
-                )
-              : this.appServer.listPlugins({
-                  ...(t.length > 0 ? { cwds: t } : {}),
-                  ...(i == null ? {} : { marketplaceKinds: i }),
-                }),
-            this.appServer.codexHome(),
-            this.appServer.platformPath(),
-          ]),
-          c = n.Ul(e);
-        return await n.Vt({
-          codexHome: o,
-          filesystem: this.appServer,
-          marketplaces: a.filter((e) => !r.includes(e.name) && (!n.Wl(e.name) || e.name === c)),
-          path: s,
-        });
-      } catch {
-        return { groups: [] };
-      }
-    }
-  };
+var w6e = createPluginIncentivesClientRuntime({
+  runtime: n,
+  authHeaders: a,
+}).PluginIncentivesClient;
 var {
   assertLocalHost: u2,
   cancelInstalls: Y0,
@@ -75967,7 +75842,7 @@ var G5 = r.r(`WindowContext`),
     STe,
     Snt,
     T,
-    T6e,
+    PluginMarketplaceListingService,
     Tr,
     U,
     Uet,
@@ -75981,7 +75856,7 @@ var G5 = r.r(`WindowContext`),
     Wje,
     Wtt,
     Wze,
-    X$e,
+    KeyboardModifierService,
     X8,
     XOe,
     Xc,
@@ -75991,7 +75866,7 @@ var G5 = r.r(`WindowContext`),
     Xnt,
     Xtt,
     Y,
-    Y$e,
+    HotkeyWindowService,
     Y6e,
     Y8e,
     YD,
@@ -76015,7 +75890,7 @@ var G5 = r.r(`WindowContext`),
     att,
     au,
     b,
-    b6e,
+    PerformanceTelemetryService,
     c,
     c8e,
     cA,
@@ -76097,7 +75972,7 @@ var G5 = r.r(`WindowContext`),
     trt,
     ttt,
     u,
-    u1e,
+    LocalEnvironmentsService,
     uQe,
     uke,
     v,
@@ -76110,12 +75985,12 @@ var G5 = r.r(`WindowContext`),
     x,
     xoe,
     y,
-    y6e,
+    OwlRuntimeFeaturesService,
     y8e,
     yOe,
     ytt,
     z,
-    z0,
+    resetRuntimeFeatures,
     z5e,
     zOe,
     zje,

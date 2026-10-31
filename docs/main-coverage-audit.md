@@ -2841,3 +2841,14 @@ output notification validation、1 MiB cap、single terminate、unregister 和 e
 `createCloudCommandSession`，并复用唯一 `CommandSessionBackend`。旧 `sQ/cQ/m$e/h$e/lQ/uQ/dQ/fQ/pQ/mQ` 与
 `K$e/J$e/q$e` 共约 210 行已物理删除。focused coverage 分别 37/40 项，邻接 workspace service 26、command backend 19、
 WindowContext 16 项回归通过。
+
+### 增量抽取：WindowContext RPC service adapters
+
+hotkey-window origin forwarding、keyboard modifier release watch、local-environment list/read/save/path conversion、Owl
+runtime-feature supported check/累积状态/reset、performance-span sampling forwarding，以及 plugin marketplace installed/list
+分支、official/hidden filtering 与 failure fallback 已整体迁移至
+`src/main/main-app/window/rpc-service-adapters.ts`。factory 返回的七个语义 outputs 由 `WindowContext` 直接实例化或在
+identity reset 时调用；runtime-feature state 只存在于新模块，没有复制 owner。旧 `Y$e/X$e/u1e/R0/y6e/z0/b6e/T6e`
+共 163 行已物理删除。focused test `scripts/test-main-window-rpc-service-adapters.mjs` 覆盖 58 项 forwarding、modifier
+settle、local/remote path、feature accumulation/reset、unsupported handling、sampling、marketplace branch/filter/fallback 与 wiring；
+WindowContext 16 项回归通过。
