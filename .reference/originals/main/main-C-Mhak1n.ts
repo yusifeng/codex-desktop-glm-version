@@ -18,7 +18,7 @@ const { validateThreadMetadataUpdate, updateThreadMetadata } = require("./main-a
 const windowAppearance = require("./main-app/window-appearance.js");
 const { buildWindowErrorPage } = require("./main-app/window/error-page-html.js");
 const { shouldRecoverRendererCrash } = require("./main-app/window/renderer-recovery-policy.js");
-const { collectStartupPathExtensions, createStartupPhaseTracker, resolveDockIconPreference, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages } = require("./main-app/startup/startup-policy.js");
+const { createStartupPhaseTracker, resolveDockIconPreference, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages } = require("./main-app/startup/startup-policy.js");
 const openPathArguments = require("./main-app/files/open-path-arguments.js");
 const { applyQuitForUpdatePolicy } = require("./main-app/startup/quit-for-update-policy.js");
 const { createDelayedProgressWindow } = require("./main-app/startup/delayed-progress-window.js");
@@ -140,6 +140,7 @@ const { createThreadMetadataServiceClass } = require("./main-app/threads/thread-
 const { createNativeStatusItemControllerClass } = require("./main-app/tray/native-status-item-controller.js");
 const { createTrayLifecycle } = require("./main-app/tray/tray-lifecycle.js");
 const { createComputerHistoryStatusItemActions } = require("./main-app/computer-use/native-status-item-actions.js");
+const { installDesktopOpenPathHandler } = require("./main-app/files/desktop-open-path-handler.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -151906,162 +151907,6 @@ function Ist(options) {
 function Lst(e) {
   return createComputerUseRpcHandler(e);
 }
-var Rst = openPathArguments.BROWSER_DOCUMENT_EXTENSIONS;
-function zst(e) {
-  let i = t.r(e.isMacOS),
-    a = [],
-    o = null,
-    s = async (t) => {
-      let r = [];
-      for (let e of t) r.includes(e) || r.push(e);
-      if (r.length === 0) return;
-      let i = e.projectsManager.getProjectRootPathsForHost(J),
-        a = [],
-        o = null,
-        s = await e.projectsManager.createProjectsForRoots(r);
-      if (s.length === 0) return;
-      for (let e of s) {
-        o = e.id;
-        let t = e.rootPaths[0];
-        t != null && !i.includes(t) && a.push({ projectId: e.id, root: t });
-      }
-      if (o == null) return;
-      let c = await e.ensureWindow();
-      if (a.length > 0) {
-        (e.windowManager.sendMessageToAllWindows({
-          type: `global-state-updated`,
-          keys: [n.iu.LOCAL_PROJECTS, n.iu.PROJECT_ORDER],
-        }),
-          e.windowManager.sendMessageToAllWindows({ type: `workspace-root-options-updated` }));
-        for (let { projectId: t, root: n } of a)
-          (e.windowManager.sendMessageToAllWindows({
-            type: `workspace-root-option-added`,
-            root: n,
-          }),
-            c != null &&
-              !c.isDestroyed() &&
-              e.windowManager.sendMessageToWindow(c, {
-                type: `workspace-root-option-added`,
-                projectId: t,
-                root: n,
-              }));
-      }
-      let l = Nr(e.globalState);
-      ((l?.type !== `local` || l.projectId !== o) &&
-        (Lr(e.globalState, { type: `local`, projectId: o }),
-        e.windowManager.sendMessageToAllWindows({
-          type: `global-state-updated`,
-          keys: [n.iu.SELECTED_PROJECT],
-        })),
-        e.windowManager.showPrimaryWindow({ stealFocus: !0 }),
-        c != null &&
-          !c.isDestroyed() &&
-          e.windowManager.sendMessageToWindow(c, {
-            type: `navigate-to-route`,
-            path: `/`,
-            state: { focusComposerNonce: Date.now(), project: { type: `local`, projectId: o } },
-          }));
-    },
-    l = async (t, n) => {
-      let i = Roe(t);
-      if (i.length === 0 && n.length === 0) return;
-      let a = await e.ensureWindow();
-      if (!(a == null || a.isDestroyed())) {
-        if ((e.windowManager.showPrimaryWindow({ stealFocus: !0 }), i.length > 0)) {
-          let n = t.some((e) => h.extname(e).toLowerCase() === `.skill`),
-            o = i.filter(({ path: e }) => h.extname(e).toLowerCase() !== `.skill`);
-          (e.windowManager.sendMessageToWindow(a, {
-            type: `new-projectless-task`,
-            files: i,
-            ...(n ? { prefillPromptKind: `install-skill` } : {}),
-            ...(o.length > 0 ? { previewFiles: o } : {}),
-          }),
-            r
-              .n()
-              .info(`Opened desktop files in projectless task`, {
-                safe: { fileCount: i.length, fileExtensions: Bst(i) },
-              }));
-        }
-        for (let t of n)
-          e.windowManager.sendMessageToWindow(a, {
-            type: `toggle-browser-panel`,
-            open: !0,
-            url: (0, c.pathToFileURL)(t).href,
-            source: `manual`,
-            initiator: `os_open`,
-          });
-      }
-    },
-    u = async (e) => {
-      let t = h.resolve(e);
-      try {
-        let e = await (0, b.stat)(t);
-        return openPathArguments.classifyDesktopOpenPath(t, e);
-      } catch (e) {
-        return (
-          r.n().warning(`Failed to stat desktop open path`, { safe: {}, sensitive: { error: e } }),
-          null
-        );
-      }
-    },
-    d = async () => {
-      if (a.length === 0 || Er().status === `loading`) return;
-      let e = a.splice(0, a.length),
-        t = await Promise.all(e.map((e) => u(e))),
-        n = [],
-        r = [],
-        i = [];
-      for (let e of t)
-        if (e != null) {
-          if (e.kind === `directory`) {
-            n.push(e.path);
-            continue;
-          }
-          if (e.kind === `browser-document`) {
-            i.push(e.path);
-            continue;
-          }
-          r.push(e.path);
-        }
-      let o = Er();
-      if (o.status === `loading`) return;
-      let { codexLocalAccess: c, workLocalAccess: f } = o;
-      ((c || f) && (await s(n)),
-        await l(c ? r : r.filter((e) => h.extname(e).toLowerCase() !== `.skill`), i),
-        a.length > 0 && (await d()));
-    },
-    f = async () => {
-      if (o) return o;
-      o = d();
-      try {
-        await o;
-      } finally {
-        o = null;
-      }
-    },
-    p = () => {
-      Er().status !== `loading` &&
-        f().catch((t) => {
-          e.errorReporter.reportNonFatal(t instanceof Error ? t : n.Zo(t), {
-            kind: `desktop-open-paths`,
-          });
-        });
-    },
-    m = (e) => {
-      (a.push(...e), p());
-    },
-    g = Dr(p),
-    _ = t.i(m);
-  return (
-    _.length > 0 && m(_),
-    () => {
-      (g(), t.t(m), i());
-    }
-  );
-}
-function Bst(e) {
-  return collectStartupPathExtensions(e, h.extname);
-}
 var Vst = `CODEX_ELECTRON_REMOTE_HOSTED_PIP_PROCESS_IDENTIFIER`,
   Hst = 3e4;
 async function Ust() {
@@ -153182,13 +153027,31 @@ async function Ust() {
       (_.reach(`window_created`),
       et ?? de.handleInitialWindowVisible(),
       I.add(
-        zst({
+        installDesktopOpenPathHandler({
           ensureWindow: W.ensureWindow,
           errorReporter: u,
           globalState: V.globalState,
           isMacOS: N,
           projectsManager: q,
           windowManager: W.windowManager,
+          installEarlyOpenPathListeners: t.r,
+          setOpenFilesHandler: t.i,
+          releaseOpenFilesHandler: t.t,
+          subscribeFeatureAvailability: Dr,
+          getFeatureAvailability: Er,
+          stat: b.stat,
+          resolvePath: h.resolve,
+          extname: h.extname,
+          pathToFileURL: c.pathToFileURL,
+          classifyDesktopOpenPath: openPathArguments.classifyDesktopOpenPath,
+          createOpenFileDescriptors: Roe,
+          collectFileExtensions: openPathArguments.collectFileExtensions,
+          getSelectedProject: Nr,
+          setSelectedProject: Lr,
+          localHostId: J,
+          globalStateKeys: n.iu,
+          normalizeError: n.Zo,
+          logger: r,
         }),
       ),
       ct !== et && Be(ct, !ze)),

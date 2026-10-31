@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 desktop open-path owner
+
+原 `Rst/zst/Bst` 已迁入 `src/main/main-app/files/desktop-open-path-handler.ts`。新 owner 保留 macOS early queue
+接管、feature-ready subscription、single-flight/递归 drain、stat/classification、directory dedupe 与 project creation/selection、
+global/window broadcasts、projectless files/skill install projection、browser documents、extension logging、failure reporting 和
+listener cleanup；真实 startup consumer 已接回，旧 dead alias/function/helper 已删除。
+
 ## 2026-10-31 Computer History native status-item actions
 
 原 `Dst/Ost/kst` 已迁入 `src/main/main-app/computer-use/native-status-item-actions.ts`。新 adapter 保留 feature、connection、

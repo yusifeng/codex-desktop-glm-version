@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Rst/zst/Bst` desktop open-path owner 迁入 `files/desktop-open-path-handler.ts`；early queue 接管、feature-ready
+调度、single-flight/递归 drain、stat/classification、directory project creation/selection/broadcast/navigation、projectless
+file/skill projection、browser document routing、logging、error reporting 与 cleanup 均由新 owner 持有。真实 startup consumer
+已接回，旧 dead alias/function/helper 已删除。
+
 随后将 `Dst/Ost/kst` Computer History native status-item action adapter 迁入
 `computer-use/native-status-item-actions.ts`；feature/connection/service state projection、service PID ensure、worker menu-state
 读取与 failure logging，以及 open/quit/stop/pause/resume/observation/clear/history/settings 全部 action routing、analytics 和
