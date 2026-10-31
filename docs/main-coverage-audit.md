@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 attachment upload owner cleanup
+
+`attachments/upload.ts` 的 `FileAttachmentUploader/ThreadGoalAttachmentDirectories` 已由 AppServer manager 使用，但 registry 读取原先只校验
+root prefix，弱于旧 `UUID/filename` 约束。本轮恢复严格 managed-path 判定并删除主 chunk 无引用 `q_e…ive` 簇；focused suite 覆盖 direct/
+SFTP、超限错误、同名命名、owned directory 和 manager wiring。
+
 ## 2026-10-31 main approval synthesis wiring
 
 修复 semantic owner 后，本轮补齐主 chunk 实际仍调用的 `Yv/Xv/L_e/Zv/Qv` 兼容面，将 plan implementation、自动 elicitation、MCP 与

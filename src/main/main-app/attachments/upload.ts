@@ -29,6 +29,15 @@ function responseRecord(value: unknown): UnknownRecord { return typeof value ===
 function missingFile(error: unknown): boolean {
   return error instanceof Error && ((`code` in error && error.code === `ENOENT`) || error.message.includes(`ENOENT`) || error.message.includes(`No such file or directory`) || /\(os error [23]\)/.test(error.message));
 }
+const MANAGED_ATTACHMENT_PATH = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/[^/]+$/i;
+function isManagedAttachmentPath(value: unknown, root: string): value is string {
+  if (typeof value !== `string`) return false;
+  const normalizedRoot = root.replaceAll(`\\`, `/`).replace(/\/+$/, ``);
+  const normalizedValue = value.replaceAll(`\\`, `/`);
+  if (!normalizedValue.startsWith(`${normalizedRoot}/`)) return false;
+  const relative = normalizedValue.slice(normalizedRoot.length + 1);
+  return MANAGED_ATTACHMENT_PATH.test(relative) && !relative.endsWith(`/.`) && !relative.endsWith(`/..`);
+}
 
 export class FileAttachmentUploader {
   private state: Promise<{ attachmentPaths: Set<string>; pendingRemovalPaths: Set<string>; textExcerptsByPath: Map<string, string> }> | null = null;
@@ -62,7 +71,7 @@ export class FileAttachmentUploader {
     throw new TypeError(`Attachment contents must be text or a Blob-like value`);
   }
   createLocalFile(source: string, label: string) { return this.createManagedFileAttachment({ filename: filename(label, this.options.host.getBasename.bind(this.options.host)), label, writeAttachment: async (path) => { await this.options.requestClient.sendRequest(`fs/copy`, { destinationPath: path, sourcePath: source }); } }); }
-  async getTextExcerpts(items?: Array<{ path: string }> | null) { const state = await this.getState(); return (items ?? []).flatMap((item) => state.textExcerptsByPath.get(item.path) ?? []); }
+  async getTextExcerpts(items?: Array<{ path: string }> | null) { if (items == null || items.length === 0) return []; const state = await this.getState(); return items.flatMap((item) => state.textExcerptsByPath.get(item.path) ?? []); }
   private createManagedFile(input: { contentsBase64: string; filename: string; label: string; textExcerpt?: string }) { return this.createManagedFileAttachment({ ...input, writeAttachment: async (path) => { await this.options.requestClient.sendRequest(`fs/writeFile`, { path, dataBase64: input.contentsBase64 }); } }); }
   private async createManagedFileAttachment(input: { filename: string; label: string; textExcerpt?: string; writeAttachment(path: string): Promise<void> }) {
     const state = await this.getState(); await this.retryPendingRemovals(state); const path = this.options.host.joinPath(await this.createAttachmentDirectory(), input.filename); await input.writeAttachment(path); state.attachmentPaths.add(path); if (input.textExcerpt) state.textExcerptsByPath.set(path, input.textExcerpt);
@@ -74,8 +83,8 @@ export class FileAttachmentUploader {
   private getState() { this.state ??= this.readState().catch((error) => { this.state = null; throw error; }); return this.state; }
   private async readState() {
     try {
-      const response = responseRecord(await this.options.requestClient.sendRequest(`fs/readFile`, { path: await this.getRegistryPath() })); const parsed = JSON.parse(this.options.host.decodeText(String(response.dataBase64 ?? ``))) as UnknownRecord; const root = (await this.getAttachmentsRoot()).replace(/\/+$/, ``);
-      const valid = (value: unknown): value is string => typeof value === `string` && value.replaceAll(`\\`, `/`).startsWith(`${root.replaceAll(`\\`, `/`)}/`); const paths = new Set((Array.isArray(parsed.attachmentPaths) ? parsed.attachmentPaths : []).filter(valid));
+      const response = responseRecord(await this.options.requestClient.sendRequest(`fs/readFile`, { path: await this.getRegistryPath() })); const parsed = JSON.parse(this.options.host.decodeText(String(response.dataBase64 ?? ``))) as UnknownRecord; const root = await this.getAttachmentsRoot();
+      const valid = (value: unknown): value is string => isManagedAttachmentPath(value, root); const paths = new Set((Array.isArray(parsed.attachmentPaths) ? parsed.attachmentPaths : []).filter(valid));
       const pending = new Set((Array.isArray(parsed.pendingRemovalPaths) ? parsed.pendingRemovalPaths : []).filter((value): value is string => valid(value) && paths.has(value))); const excerpts = new Map<string, string>(); const raw = responseRecord(parsed.textExcerptsByPath); for (const [key, value] of Object.entries(raw)) if (paths.has(key) && typeof value === `string`) excerpts.set(key, value);
       return { attachmentPaths: paths, pendingRemovalPaths: pending, textExcerptsByPath: excerpts };
     } catch (error) { if (!missingFile(error)) throw error; return { attachmentPaths: new Set<string>(), pendingRemovalPaths: new Set<string>(), textExcerptsByPath: new Map<string, string>() }; }

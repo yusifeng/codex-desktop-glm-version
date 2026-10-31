@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 attachment upload/registry owners：`attachments/upload.ts` 已由 AppServer manager 真实消费，本轮修复 registry path 校验过宽，
+恢复 `attachments/<uuid>/<single-file>` 约束；direct transfer、size limit、SFTP fallback、同名去重、pending removal 与 thread-goal owned
+directory 语义保持。主 chunk 零引用的 `q_e…ive` 约 300 行簇删除，新增 17 条 focused 断言。
+
 接回 main approval synthesis consumers：`requests/item-synthesis.ts` 新增 `Yv/Xv/L_e/Zv/Qv` 兼容导出，覆盖 plan item id、browser-use/
 messages 安全自动 elicitation 与 MCP/permission timeline 合成；主 chunk 的真实通知/plan consumers 已接线，旧 `Uv…W_e` 约 440 行
 审批/动态工具簇整体删除，focused suite 扩至 42 条断言。
