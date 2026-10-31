@@ -164,6 +164,7 @@ const { trackComputerUseActivity: ele } = require("./main-app/computer-use/activ
 const { ManagedComputerUseService: Eoe } = require("./main-app/computer-use/managed-service.js");
 const { browserUsePartitionNameForHost: Jc, applyPreferredLanguages: Yc, clearSiwcCookies: Xc, clearBrowserData: Zc, setInAppBrowserChromeUrlsAllowed: tl, isInAppBrowserChromeUrlsAllowed: nl } = require("./main-app/browser-use/site-data.js");
 const { ensureComputerUseNotifyConfig: iie } = require("./main-app/computer-use/notify-config.js");
+const { isComputerUseOverlaySettingKey: Fie, scheduleComputerUseConfigWrite: ns } = require("./main-app/computer-use/config-writer.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -7550,129 +7551,6 @@ async function $o(e) {
   return !a?.cuaReplEnabled || s?.[`mcp_servers.node_repl`] == null
     ? { ...s, ...Bi }
     : (Vi(s[`mcp_servers.node_repl`], o.cuaReplSurfaces), s);
-}
-var Die = `computerUseOverlay.usingComputer`,
-  Oie = `ChatGPT is using your computer`,
-  kie = `computerUseOverlay.escToCancel`,
-  Aie = `Esc to cancel`,
-  jie = `computer-use`,
-  es = `config.json`,
-  Mie = `#339cff`,
-  Nie = `en`,
-  ts = new Map(),
-  Pie = r.i(`computer-use-config`);
-function Fie(e) {
-  return (
-    e === `appearanceTheme` ||
-    e === `appearanceLightChromeTheme` ||
-    e === `appearanceDarkChromeTheme` ||
-    e === `localeOverride`
-  );
-}
-async function Iie({ settingsStore: e, isPackaged: t = l.app.isPackaged, repoRoot: r }) {
-  await Vie({
-    codexHome: n.Oi(),
-    config: Lie({
-      settingsStore: e,
-      locale: Rie(),
-      localesDir: Bie({ isPackaged: t, repoRoot: r }),
-      shouldUseDarkColors: zie(),
-    }),
-  });
-}
-function ns({ settingsStore: e, isPackaged: t, repoRoot: n }) {
-  Iie({ settingsStore: e, isPackaged: t, repoRoot: n }).catch((e) => {
-    Pie().warning(`Failed to write Computer Use config`, { safe: {}, sensitive: { error: e } });
-  });
-}
-function Lie({ settingsStore: e, locale: t, localesDir: r, shouldUseDarkColors: i }) {
-  let a = is(e.getEffective(n.Fa.localeOverride.key)) ?? is(t) ?? Nie,
-    o = Gie(r, a);
-  return {
-    accentColor: Uie({ settingsStore: e, shouldUseDarkColors: i }),
-    direction: Kie(a),
-    locale: a,
-    strings: { usingComputer: rs(o, Die, Oie), escToCancel: rs(o, kie, Aie) },
-  };
-}
-function Rie() {
-  return typeof l.app.getLocale == `function` ? l.app.getLocale() : `en`;
-}
-function zie() {
-  return l.nativeTheme?.shouldUseDarkColors === !0;
-}
-function Bie({ isPackaged: e, repoRoot: t }) {
-  return e
-    ? (0, h.join)(l.app.getAppPath(), `native-menu-locales`)
-    : (0, h.join)(t, `webview`, `src`, `locales`);
-}
-async function Vie({ codexHome: e, config: t }) {
-  let n = (0, h.join)(e, jie),
-    r = (0, h.join)(n, es),
-    i = (ts.get(r) ?? Promise.resolve())
-      .catch(() => {})
-      .then(() => Hie({ dir: n, configPath: r, config: t }));
-  ts.set(r, i);
-  try {
-    await i;
-  } finally {
-    ts.get(r) === i && ts.delete(r);
-  }
-  return r;
-}
-async function Hie({ dir: e, configPath: t, config: n }) {
-  let r = (0, h.join)(e, `${es}.${process.pid}.${Date.now()}.${(0, _.randomUUID)()}.tmp`);
-  await (0, b.mkdir)(e, { recursive: !0 });
-  try {
-    (await (0, b.writeFile)(r, `${JSON.stringify(n)}\n`, `utf8`), await (0, b.rename)(r, t));
-  } catch (e) {
-    throw (await (0, b.unlink)(r).catch(() => {}), e);
-  }
-}
-function Uie({ settingsStore: e, shouldUseDarkColors: t }) {
-  let r = (
-    Wie(e.getEffective(n.Ha.theme.key) ?? `system`, t) === `light`
-      ? e.getEffective(n.Ha.lightChromeTheme.key)
-      : e.getEffective(n.Ha.darkChromeTheme.key)
-  )?.accent;
-  return qie(r) ? r : Mie;
-}
-function Wie(e, t) {
-  return e === `system` ? (t ? `dark` : `light`) : e;
-}
-function Gie(e, t) {
-  let n = is(e);
-  if (n == null) return null;
-  let r = t.replaceAll(`_`, `-`),
-    i = r.split(`-`)[0],
-    a = [(0, h.join)(n, `${r}.json`), i && i !== r ? (0, h.join)(n, `${i}.json`) : null];
-  for (let e of a)
-    if (e != null)
-      try {
-        let t = JSON.parse((0, v.readFileSync)(e, `utf8`));
-        if (typeof t == `object` && t && !Array.isArray(t)) return t;
-      } catch {}
-  return null;
-}
-function rs(e, t, n) {
-  let r = e?.[t];
-  return is(typeof r == `string` ? r : null) ?? n;
-}
-function Kie(e) {
-  try {
-    let t = new Intl.Locale(e.replaceAll(`_`, `-`));
-    return (Reflect.get(t, `textInfo`)?.direction ?? t.getTextInfo?.().direction) === `rtl`
-      ? `rtl`
-      : `ltr`;
-  } catch {
-    return `ltr`;
-  }
-}
-function qie(e) {
-  return /^#[0-9a-fA-F]{6}$/.test(e ?? ``);
-}
-function is(e) {
-  return e?.trim() || null;
 }
 var as = `CODEX_APP_TOOLS_PIPE_PATH`,
   Jie = n.wf({

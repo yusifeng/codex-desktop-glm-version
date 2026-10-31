@@ -29,10 +29,6 @@ import { app, nativeTheme } from "electron";
 import { Fa as SETTINGS, Ha as APPEARANCE_SETTINGS, Oi as resolveCodexHome } from "@chunk/shared";
 import { memoizedTaggedLogger } from "@chunk/logger";
 
-// 线程启动的 browser-use/node-repl 配置覆盖（原 `$o`，8,322-8,333）由
-// misc/automation-thread-config.ts 实现；automations 按本模块路径导入，此处转发。
-export { buildThreadStartConfigOverrides } from "../misc/automation-thread-config";
-
 // ---- 常量（原 Die/Oie/kie/Aie/jie/es/Mie/Nie）------------------------------
 
 /** overlay 主文案的 config 键（原 `Die`）。 */

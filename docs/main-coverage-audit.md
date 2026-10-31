@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 Computer Use config writer wiring
+
+`src/main/main-app/computer-use/config-writer.ts` 已完整覆盖旧 `Die/Oie/kie/Aie/jie/es/Mie/Nie/ts/Pie/Fie/Iie/ns/Lie/Rie/zie/Bie/Vie/Hie/Uie/Wie/Gie/rs/Kie/qie/is`。
+本轮移除未使用且会引入 marketplace 循环加载的 automation 转发，接回 settings/fetch/startup consumers 并删除旧 123 行簇；
+focused suite 覆盖四个触发键、主题/颜色/locale direction、串行队列/原子清理静态证据、alias 与三条真实 wiring。
+
 ## 2026-10-31 Browser Settings storage/API owner wiring
 
 `src/main/main-app/browser-use/origin-state.ts` 的 `RemoteBrowserSettings`/`BrowserConfigFile` 与旧 `uke/pke` 均为 5 members。
