@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 ManagedComputerUseService wiring
+
+`src/main/main-app/computer-use/managed-service.ts` 与旧 `Eoe` 均为 24 members，并包含旧 `Doe` process/zombie probe。本轮
+接回 startup consumer，删除主 chunk 146 行旧簇；focused suite 覆盖 disabled guard、首次 spawn、live reuse/invalidation、
+stale clear、respawn pid/callback、dispose 与 executable path。
+
 ## 2026-10-31 computer-use activity tracker wiring
 
 `src/main/main-app/computer-use/activity-tracker.ts` 已完整覆盖旧 `Qce/$ce/Lu/ele`。本轮接回 startup notification consumer 并

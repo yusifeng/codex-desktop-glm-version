@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 ManagedComputerUseService：既有 `computer-use/managed-service.ts` 的完整 24-member owner 现替代主 chunk 旧 `Eoe/Doe`。
+三特性开关、serialized ensure、live/mismatched/exited pid 判定、首次 spawn/respawn callbacks、dispose 与 darwin zombie 检测保持
+完整；startup 真实 consumer 继续通过 `Eoe` 兼容别名构造。
+
 接回 computer-use activity tracker：既有 `computer-use/activity-tracker.ts` 现替代主 chunk 旧 `Qce/$ce/Lu/ele`。
 computer-use/toolSurface item started/completed、turn completion、thread archived/closed/deleted、状态去重、task deletion 与 dispose
 清场语义保持完整；startup 真实 subscription 继续通过 `ele` 兼容别名调用。
