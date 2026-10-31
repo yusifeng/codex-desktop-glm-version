@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 detached-window owner cluster
+
+既有 `src/main/main-app/window/detached-window-manager.ts` 已接回真实 consumers，替代原 `GN/qje/Jje/Yje/Xje/Qje/eMe`。
+完整 cluster 保留预热 slot/queue、open/present/detach/restore 状态机、source/receiver handoff、toolbar/chrome projection、
+thread handoff lease、DeviceCheck cookie/token lifecycle 与 1024-entry call-id claim ledger；7 个 class 的公开 member 集合与
+原 owner 对齐，主 chunk 重复实现已删除。
+
 ## 2026-10-31 desktop authenticated fetch owner
 
 既有 `src/main/main-app/api/desktop-fetch.ts` 的完整 `DesktopFetchService` 已接回真实 `WindowContext` consumer，替代原
