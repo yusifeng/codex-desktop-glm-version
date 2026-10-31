@@ -1,5 +1,13 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 Electron performance snapshot owner
+
+原 `uQe` 与其独占 `jZ/fQe/pQe/MZ` helpers 已整体迁入
+`src/main/main-app/startup/electron-performance-snapshot-collector.ts`。新 owner 保留 renderer WebContents
+按 OS process 聚合、working-set 排名与跨 snapshot delta、performance-span CPU snapshot、descendant process
+kind/root/command/rank 字段、internal build command disclosure gate 和 child-process delta；startup 唯一 consumer
+直接实例化语义 factory，main 中旧 class/helper 已物理删除。
+
 ## 2026-10-31 IAB 组合根复核
 
 `tQe` 相邻的两个独立状态 owner 已完成物理迁移：`$Ze` 的站点 annotation feature availability、

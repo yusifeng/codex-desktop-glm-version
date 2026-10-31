@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `uQe` Electron performance snapshot owner 及其独占 command/root aggregation helpers 迁入
+`electron-performance-snapshot-collector.ts`；renderer process grouping/ranking、working-set delta、main/renderer
+CPU snapshot、descendant kind/root/command/rank fields 与跨 snapshot delta 均由新 owner 持有，原 320 余行实现
+已删除并由 startup runtime 唯一 consumer 真实接回。focused test 覆盖 35 项聚合、delta、internal-field 与
+结构接回断言。
+
 本轮继续收口 IAB/browser-sidebar 组合根相邻 owner：站点 annotation feature availability/settings/runtime
 projection 已迁入 `site-annotation-feature-controller.ts`，permission request 的 pending identity、导航/销毁取消、
 同 hostname 批量完成与 settings 持久化已迁入 `site-annotation-permission-controller.ts`；原 `$Ze/eQe`

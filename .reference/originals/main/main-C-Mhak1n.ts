@@ -63,6 +63,7 @@ const { SOURCEKIT_INITIALIZATION_OPTIONS } = require("./main-app/language-server
 const { BrowserPermissionPromptRegistry } = require("./main-app/browser-sidebar/browser-permission-prompt-registry.js");
 const { LanguageServerManager } = require("./main-app/language-server/language-server-manager.js");
 const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
+const { createElectronPerformanceSnapshotCollectorClass } = require("./main-app/startup/electron-performance-snapshot-collector.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -115912,229 +115913,19 @@ var kZ = class {
       }
     }
   },
-  aQe = 5,
-  oQe = 5,
-  sQe = 5,
-  cQe = 5,
-  lQe = 5,
-  uQe = class {
-    buildFlavor;
-    gitWorkerInvocationSampler;
-    isIabWebContents;
-    logger = r.i(`electron-sampler`);
-    previousDescendantProcessSnapshot = null;
-    previousRendererWorkingSetKbTotal = null;
-    constructor(e, t, n = (e) => !1) {
-      ((this.buildFlavor = e), (this.gitWorkerInvocationSampler = t), (this.isIabWebContents = n));
-    }
-    async collectSnapshotFields(e) {
-      let t = process.memoryUsage(),
-        r = CO(),
-        i = {
-          ...n.y.snapshot(),
-          main_process_rss_bytes: t.rss,
-          main_process_heap_total_bytes: t.heapTotal,
-          main_process_heap_used_bytes: t.heapUsed,
-          main_process_external_bytes: t.external,
-          main_process_array_buffers_bytes: t.arrayBuffers,
-          system_free_memory_bytes: r?.systemFreeMemoryBytes ?? (0, p.freemem)(),
-          renderer_webcontents_id: e.id,
-        };
-      r != null &&
-        (r.mainProcessHandleCount != null &&
-          (i.main_process_handle_count = r.mainProcessHandleCount),
-        (i.system_total_memory_bytes = r.systemTotalMemoryBytes),
-        (i.system_commit_total_bytes = r.systemCommitTotalBytes),
-        (i.system_commit_limit_bytes = r.systemCommitLimitBytes),
-        (i.system_kernel_paged_pool_bytes = r.systemKernelPagedPoolBytes),
-        (i.system_kernel_nonpaged_pool_bytes = r.systemKernelNonpagedPoolBytes),
-        (i.system_handle_count = r.systemHandleCount),
-        (i.system_process_count = r.systemProcessCount),
-        (i.system_thread_count = r.systemThreadCount),
-        (i.system_uptime_ms = r.systemUptimeMs));
-      let a = e.getOSProcessId();
-      try {
-        let t = l.app.getAppMetrics(),
-          n = t.find((e) => e.pid === process.pid),
-          r = t.find((e) => e.pid === a);
-        (n && this.addMainProcessFields(i, n),
-          r && this.addRendererMemoryFields(i, r),
-          this.addRendererProcessAggregateFields(i, e, t));
-      } catch (e) {
-        this.logger().warning(`Failed to collect renderer process memory snapshot`, {
-          safe: {},
-          sensitive: { error: e },
-        });
-      }
-      let o = this.gitWorkerInvocationSampler.getSnapshot();
-      return (
-        (i.git_worker_invocations_total = o.totalInvocations),
-        (i.git_worker_invocations_last_30s = o.invocationsLast30s),
-        process.platform !== `win32` && (await this.addChildProcessFields(i)),
-        i
-      );
-    }
-    collectPerformanceSpanCpuSnapshot(e, t = `initial`) {
-      let n = R.performance.now();
-      try {
-        let r = e.getOSProcessId(),
-          i = l.app.getAppMetrics(),
-          a = i.find((e) => e.pid === process.pid),
-          o = i.find((e) => e.pid === r),
-          s,
-          c,
-          u;
-        for (let e of i) {
-          e.type === `Tab` && (u = (u ?? 0) + 1);
-          let t = e.memory?.workingSetSize;
-          t != null && ((s = (s ?? 0) + t), e.type === `Tab` && (c = (c ?? 0) + t));
-        }
-        return {
-          capturedAtMonotonicMs: n,
-          electronProcessWorkingSetKbTotal: s,
-          mainProcessCumulativeCpuSeconds: jZ(a),
-          mainProcessRssBytes: process.memoryUsage.rss(),
-          rendererProcessCount: u,
-          rendererProcessCumulativeCpuSeconds: jZ(o),
-          rendererProcessCreationTimeMs: o?.creationTime,
-          rendererProcessId: r,
-          rendererProcessWorkingSetKb: o?.memory?.workingSetSize,
-          rendererProcessWorkingSetKbTotal: c,
-          ...(t === `final` ? CO() : null),
-        };
-      } catch {
-        return { capturedAtMonotonicMs: n };
-      }
-    }
-    addMainProcessFields(e, t) {
-      let n = t.cpu;
-      n && `percentCPUUsage` in n && (e.main_process_cpu_percent = n.percentCPUUsage);
-    }
-    addRendererMemoryFields(e, t) {
-      let n = t.cpu;
-      n && `percentCPUUsage` in n && (e.renderer_process_cpu_percent = n.percentCPUUsage);
-      let r = t.memory;
-      r &&
-        (`workingSetSize` in r && (e.renderer_process_working_set_kb = r.workingSetSize),
-        `peakWorkingSetSize` in r &&
-          (e.renderer_process_peak_working_set_kb = r.peakWorkingSetSize),
-        `privateBytes` in r && (e.renderer_process_private_bytes_kb = r.privateBytes),
-        `sharedBytes` in r && (e.renderer_process_shared_bytes_kb = r.sharedBytes));
-    }
-    addRendererProcessAggregateFields(e, t, n) {
-      let r = l.webContents.getAllWebContents().filter((e) => !e.isDestroyed()),
-        i = new Map();
-      for (let e of r) {
-        let t = e.getOSProcessId();
-        if (t <= 0) continue;
-        let n = i.get(t) ?? [];
-        (n.push(e), i.set(t, n));
-      }
-      let a = new Map(n.map((e) => [e.pid, e])),
-        o = [];
-      for (let [e, n] of i) {
-        let r = a.get(e)?.memory;
-        r != null &&
-          `workingSetSize` in r &&
-          o.push({
-            hasCurrentWebContents: n.some((e) => e.id === t.id),
-            kind: this.getRendererProcessKind(n),
-            peakWorkingSetKb: `peakWorkingSetSize` in r ? r.peakWorkingSetSize : null,
-            webContentsCount: n.length,
-            workingSetKb: r.workingSetSize,
-          });
-      }
-      let s = o.reduce((e, t) => e + t.workingSetKb, 0);
-      ((e.renderer_process_count_total = o.length),
-        (e.renderer_webcontents_count_total = r.length),
-        (e.renderer_process_working_set_kb_total = s),
-        this.previousRendererWorkingSetKbTotal != null &&
-          (e.renderer_process_working_set_kb_delta_since_last_snapshot =
-            s - this.previousRendererWorkingSetKbTotal),
-        (this.previousRendererWorkingSetKbTotal = s),
-        o
-          .sort((e, t) => t.workingSetKb - e.workingSetKb)
-          .slice(0, lQe)
-          .forEach((t, n) => {
-            let r = n + 1;
-            ((e[`renderer_process_rank_${r}_working_set_kb`] = t.workingSetKb),
-              (e[`renderer_process_rank_${r}_webcontents_count`] = t.webContentsCount),
-              (e[`renderer_process_rank_${r}_has_current_webcontents`] = t.hasCurrentWebContents),
-              (e[`renderer_process_rank_${r}_kind`] = t.kind),
-              t.peakWorkingSetKb != null &&
-                (e[`renderer_process_rank_${r}_peak_working_set_kb`] = t.peakWorkingSetKb));
-          }));
-    }
-    getRendererProcessKind(e) {
-      let t = e.some(this.isIabWebContents),
-        n = e.some((e) => l.BrowserWindow.fromWebContents(e) != null);
-      return t && n ? `mixed` : t ? `iab` : n ? `main_window` : `other`;
-    }
-    async addChildProcessFields(e) {
-      try {
-        let t = await n.nn(process.pid),
-          r = n.an(t),
-          i = r.byKind.find((e) => e.kind === `app_server`) ?? null,
-          o = r.byKind.find((e) => e.kind === `git`) ?? null;
-        ((e.host_child_process_count_total = r.totalCount),
-          (e.host_child_process_rss_kb_total = r.totalRssKb),
-          (e.host_child_process_count_direct = r.directCount),
-          (e.host_child_process_rss_kb_direct = r.directRssKb),
-          (e.host_descendant_process_count_total = r.totalCount),
-          (e.host_descendant_process_rss_kb_total = r.totalRssKb),
-          (e.host_descendant_process_count_direct = r.directCount),
-          (e.host_descendant_process_rss_kb_direct = r.directRssKb),
-          (e.host_descendant_process_max_depth = t.reduce((e, t) => Math.max(e, t.depth), 0)),
-          (e.host_child_git_process_count = o?.count ?? 0),
-          (e.host_child_git_process_rss_kb = o?.rssKb ?? 0),
-          (e.host_child_app_server_process_count = i?.count ?? 0),
-          (e.host_child_app_server_rss_kb = i?.rssKb ?? 0),
-          r.oldestAgeSeconds != null &&
-            ((e.host_child_process_oldest_age_seconds = r.oldestAgeSeconds),
-            (e.host_descendant_process_oldest_age_seconds = r.oldestAgeSeconds)),
-          this.previousDescendantProcessSnapshot != null &&
-            ((e.host_descendant_process_count_delta_since_last_snapshot =
-              r.totalCount - this.previousDescendantProcessSnapshot.count),
-            (e.host_descendant_process_rss_kb_delta_since_last_snapshot =
-              r.totalRssKb - this.previousDescendantProcessSnapshot.rssKb)),
-          (this.previousDescendantProcessSnapshot = { count: r.totalCount, rssKb: r.totalRssKb }),
-          r.byKind.slice(0, aQe).forEach((t, n) => {
-            let r = n + 1;
-            ((e[`host_descendant_process_kind_${r}`] = t.kind),
-              (e[`host_descendant_process_kind_${r}_count`] = t.count),
-              (e[`host_descendant_process_kind_${r}_rss_kb`] = t.rssKb),
-              (e[`host_descendant_process_kind_${r}_direct_count`] = t.directCount),
-              (e[`host_descendant_process_kind_${r}_direct_rss_kb`] = t.directRssKb));
-          }));
-        for (let t of r.byKind)
-          ((e[`host_descendant_${t.kind}_process_count`] = t.count),
-            (e[`host_descendant_${t.kind}_rss_kb`] = t.rssKb),
-            (e[`host_descendant_${t.kind}_direct_process_count`] = t.directCount),
-            (e[`host_descendant_${t.kind}_direct_rss_kb`] = t.directRssKb));
-        let s = a.in.isInternal(this.buildFlavor);
-        (s && fQe(e, t), pQe(e, t, s));
-        let c = new Map(t.map((e) => [e.pid, e.kind]));
-        t.filter((e) => e.rssKb != null)
-          .sort((e, t) => (t.rssKb ?? 0) - (e.rssKb ?? 0))
-          .slice(0, sQe)
-          .forEach((t, n) => {
-            let r = n + 1;
-            ((e[`host_descendant_process_rank_${r}_kind`] = t.kind),
-              (e[`host_descendant_process_rank_${r}_rss_kb`] = t.rssKb ?? 0),
-              (e[`host_descendant_process_rank_${r}_depth`] = t.depth),
-              (e[`host_descendant_process_rank_${r}_root_kind`] = c.get(t.rootChildPid) ?? t.kind),
-              s && (e[`host_descendant_process_rank_${r}_command_name`] = MZ(t.command)),
-              t.ageSeconds != null &&
-                (e[`host_descendant_process_rank_${r}_age_seconds`] = t.ageSeconds));
-          });
-      } catch (e) {
-        this.logger().warning(`Failed to collect child process snapshot`, {
-          safe: {},
-          sensitive: { error: e },
-        });
-      }
-    }
-  };
+  uQe = createElectronPerformanceSnapshotCollectorClass({
+    basename: h.basename,
+    createLogger: r.i,
+    desktopSnapshot: n.y.snapshot,
+    electron: l,
+    freeMemory: p.freemem,
+    getSystemMetrics: CO,
+    isInternalBuild: a.in.isInternal,
+    listDescendantProcesses: n.nn,
+    now: () => R.performance.now(),
+    processApi: process,
+    summarizeDescendantProcesses: n.an,
+  });
 function dQe(e, t) {
   let n = AZ(e, t, (e) => e.mainProcessCumulativeCpuSeconds),
     r = AZ(
@@ -116174,70 +115965,6 @@ function AZ(e, t, n, r = () => !0) {
     a = n(t),
     o = (t.capturedAtMonotonicMs - e.capturedAtMonotonicMs) / 1e3;
   if (!(i == null || a == null || !r(e, t) || a < i || o <= 0)) return ((a - i) / o) * 100;
-}
-function jZ(e) {
-  return e?.cpu?.cumulativeCPUUsage ?? void 0;
-}
-function fQe(e, t) {
-  let n = new Map();
-  for (let e of t) {
-    let t = MZ(e.command),
-      r = n.get(t) ?? { commandName: t, count: 0, rssKb: 0 };
-    ((r.count += 1), (r.rssKb += e.rssKb ?? 0), n.set(t, r));
-  }
-  Array.from(n.values())
-    .sort((e, t) =>
-      t.rssKb === e.rssKb
-        ? t.count === e.count
-          ? e.commandName.localeCompare(t.commandName)
-          : t.count - e.count
-        : t.rssKb - e.rssKb,
-    )
-    .slice(0, oQe)
-    .forEach((t, n) => {
-      let r = n + 1;
-      ((e[`host_descendant_process_command_${r}`] = t.commandName),
-        (e[`host_descendant_process_command_${r}_count`] = t.count),
-        (e[`host_descendant_process_command_${r}_rss_kb`] = t.rssKb));
-    });
-}
-function pQe(e, t, n) {
-  let r = new Map(t.filter((e) => e.depth === 1).map((e) => [e.pid, e])),
-    i = new Map();
-  for (let e of t) {
-    let t = r.get(e.rootChildPid);
-    if (t == null) continue;
-    let n = i.get(e.rootChildPid) ?? {
-      commandName: MZ(t.command),
-      count: 0,
-      kind: t.kind,
-      rssKb: 0,
-    };
-    ((n.count += 1), (n.rssKb += e.rssKb ?? 0), i.set(e.rootChildPid, n));
-  }
-  Array.from(i.values())
-    .sort((e, t) =>
-      t.rssKb === e.rssKb
-        ? t.count === e.count
-          ? e.kind.localeCompare(t.kind)
-          : t.count - e.count
-        : t.rssKb - e.rssKb,
-    )
-    .slice(0, cQe)
-    .forEach((t, r) => {
-      let i = r + 1;
-      ((e[`host_descendant_root_${i}_kind`] = t.kind),
-        (e[`host_descendant_root_${i}_process_count`] = t.count),
-        (e[`host_descendant_root_${i}_rss_kb`] = t.rssKb),
-        n && (e[`host_descendant_root_${i}_command_name`] = t.commandName));
-    });
-}
-function MZ(e) {
-  let t = /^(?:"([^"]+)"|'([^']+)'|(\S+))/.exec(e.trim()),
-    n = t?.[1] ?? t?.[2] ?? t?.[3];
-  return n == null
-    ? `unknown`
-    : (0, h.basename)(n.replaceAll(`\\`, `/`)).replace(/^\((.+)\)$/, `$1`);
 }
 function mQe(e) {
   return e.length === 0
