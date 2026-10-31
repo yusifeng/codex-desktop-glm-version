@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮清理 preload/sandbox-preload 迁移后遗留的 CommonJS 兼容分支：
+`sandbox-guest-policy`、view-message router、connect-app-host、system-theme、PIP decoder/frame subscription
+与 worker-message subscription 共 7 个模块已确认只有 ESM import consumer，删除无消费的条件式
+`module.exports`，消除 esbuild 的 ESM/CommonJS 混用警告。7 组 focused tests、typecheck、verify-chunks
+与 12203/12203 全量 build check 均通过。
+
 本轮继续收口 tQe annotation interaction：annotation ingress、comment/design mode、presentation
 suspension、dragged-image state 与 overlay actions 已迁入
 `src/main/main-app/browser-sidebar/browser-annotation-interaction-controller.ts`，删除原内联实现约 218 行，

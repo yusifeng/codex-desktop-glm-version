@@ -42,4 +42,3 @@ function createSystemThemeVariantController(
 }
 
 export { createSystemThemeVariantController };
-if (typeof module !== `undefined`) module.exports = { createSystemThemeVariantController };

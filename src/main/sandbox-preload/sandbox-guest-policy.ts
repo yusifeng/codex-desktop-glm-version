@@ -104,5 +104,3 @@ export const sandboxGuestPolicy = {
   extractInitId,
   isValidPort,
 };
-
-if (typeof module !== "undefined") module.exports = sandboxGuestPolicy;

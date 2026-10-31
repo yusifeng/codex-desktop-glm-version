@@ -24,5 +24,3 @@ export function createConnectAppHostController(dependencies: ConnectAppHostContr
     },
   };
 }
-
-if (typeof module !== `undefined`) module.exports = { createConnectAppHostController };

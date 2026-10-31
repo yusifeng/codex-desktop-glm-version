@@ -25,4 +25,3 @@ function createViewMessageRouterController(dependencies: ViewMessageRouterDepend
 }
 
 export { createViewMessageRouterController };
-if (typeof module !== `undefined`) module.exports = { createViewMessageRouterController };

@@ -39,4 +39,3 @@ function createWorkerMessageSubscriptionController(dependencies: WorkerMessageSu
 }
 
 export { createWorkerMessageSubscriptionController };
-if (typeof module !== `undefined`) module.exports = { createWorkerMessageSubscriptionController };

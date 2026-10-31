@@ -1744,3 +1744,9 @@ Wy 的跨 frame 全局键盘、鼠标位置和 blur/focus 清理监听已迁移�
 mousemove 过滤、`Lc` viewport 投影、keydown/keyup capture、失焦清理 modifier state 以及 `dc` frame
 observer 的安装/卸载顺序；pointer selection、hover 和 region drag 仍由原 effect 持有。focused test
 `scripts/test-preload-annotation-global-input-tracking.mjs` 覆盖 8 项事件、过滤和幂等清理断言。
+### ESM/CommonJS compatibility residual cleanup（2026-10-31）
+
+preload 与 sandbox-preload 的 7 个语义模块已确认运行时 consumer 全部使用 ESM import，focused tests 也通过
+ESM import 或 esbuild CJS transform 读取命名导出。删除迁移期遗留的条件式 `module.exports` 分支，避免
+esbuild 将 ESM 文件中的 `module` 视为不可靠全局变量；不改变任何导出面、listener/decoder 生命周期或
+sandbox policy。对应 focused tests、typecheck、verify-chunks 与全量 build check 均通过。

@@ -66,4 +66,3 @@ function createPipVideoDecoderController(dependencies: PipVideoDecoderController
 }
 
 export { createPipVideoDecoderController };
-if (typeof module !== `undefined`) module.exports = { createPipVideoDecoderController };

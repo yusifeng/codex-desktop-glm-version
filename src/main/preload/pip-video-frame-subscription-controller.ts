@@ -26,5 +26,3 @@ export function createPipVideoFrameSubscriptionController(dependencies: PipVideo
     },
   };
 }
-
-if (typeof module !== `undefined`) module.exports = { createPipVideoFrameSubscriptionController };
