@@ -132,10 +132,11 @@ const composition = fs.readFileSync(
   new URL("../src/main/main-app/avatar-overlay/composition-surface.ts", import.meta.url),
   "utf8",
 );
-equal(main.includes("Hle = AvatarOverlayWindowManager"), true);
+equal(main.includes("Hle = AvatarOverlayWindowManager"), false);
 equal(main.includes("Hle = class"), false);
-equal(main.includes("V = new Hle(B, u, x)"), true);
-equal(main.includes("var zu = getVoiceController"), true);
+equal(main.includes("V = new AvatarOverlayWindowManager(B, u, x)"), true);
+equal(main.includes("var zu = getVoiceController"), false);
+equal(main.includes("ie = getVoiceController(V)"), true);
 equal(main.includes("rle = class"), false);
 equal(main.includes("function ile("), false);
 equal(composition.includes("setElementSize(webContentsId"), true);

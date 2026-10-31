@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 avatar overlay and remote-hosted PIP owner consolidation
+
+`avatar-overlay/composition-surface.ts`、`realtime.ts`、`geometry.ts` 与 `pip.ts` 已直接接回启动装配和 WindowContext，PIP 工厂显式注入视频频道；
+主 chunk `zu…Nd` 约 1,076 行几何、窗口常量、PIP visibility/native-video/host lifecycle 副本物理删除。迁移审计修复 semantic PIP
+活动 add/remove 判定、complete/invalidate turn、两类 native handler、targeted refresh、active-thread dedupe、host/thread rebinding 及 interaction/placement 参数透传；focused
+suite 执行 visibility ledger、macOS handler 安装、聚焦 host 注册和 native call 去重，并锁定旧定义缺席。
+
 ## 2026-11-01 dev process lifecycle and installer attribution owners
 
 新增 `startup/dev-process-lifecycle.ts` 接管 `Yoe/Xoe/Zoe/Qoe`，保持 signal 0 的 ESRCH 特判、父进程轮询一次性 dispose、will-quit cleanup

@@ -259,7 +259,7 @@ export function createWindowContextClass(dependencies) {
     zOe,
     zje,
     znt,
-    zu,
+    getVoiceController,
   } = dependencies;
   return class WindowContext {
       appServerConnectionRegistry;
@@ -1259,7 +1259,7 @@ export function createWindowContextClass(dependencies) {
               this.options.globalState,
             ),
             realtimeVoiceRuntime: new c8e(
-              zu(this.options.avatarOverlayManager),
+              getVoiceController(this.options.avatarOverlayManager),
               e,
               this.realtime.voice,
               (e) => this.realtime.voiceHistory.markEphemeral(e),

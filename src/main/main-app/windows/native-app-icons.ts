@@ -754,7 +754,7 @@ export function setRemoteHostedPIPContentNativeVideoReady(
 
 /** 设置呈现位置（原 `fc`，darwin）。 */
 export function setRemoteHostedPIPContentPlacement(
-  presentationIds: Array<number | string>,
+  presentationIds: string | Array<number | string>,
   placement: unknown,
   {
     addon,
@@ -775,8 +775,8 @@ export function setRemoteHostedPIPContentPlacement(
 
 /** 与呈现交互（原 `pc`，darwin；两组 id 数组均非空）。 */
 export function interactWithRemoteHostedPIPContentPresentation(
-  presentationIds: Array<number | string>,
-  interactionIds: Array<number | string>,
+  presentationIds: string | Array<number | string>,
+  interactionIds: string | Array<number | string>,
   interaction: unknown,
   {
     addon,
@@ -798,7 +798,7 @@ export function interactWithRemoteHostedPIPContentPresentation(
 
 /** 刷新呈现可见性（原 `mc`，darwin；参数缺省刷新全部）。 */
 export function refreshRemoteHostedPIPContentVisibility(
-  presentationId: number | string | null,
+  presentationId: number | string | Array<number | string> | null,
   {
     addon,
     electronAppPath = app.getAppPath(),

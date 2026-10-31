@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+大批收拢 avatar overlay/PIP 运行链：窗口 manager、语音 controller、几何/拖动和 remote-hosted PIP 全部改由既有约 5,965 行语义模块
+直接服务启动与 WindowContext consumer，旧 `zu…Nd` 约 1,076 行副本整体删除。审计时同时修复语义 PIP owner 的多处真实偏差：活动集合
+早退条件反写、turn 完成/失效原生副作用遗漏、should-show/visibility handler 接反、targeted refresh 丢失、active-thread 去重及 host/thread 换绑状态错误；补测 macOS
+handler、聚焦窗口、placement/interaction 参数透传及非 macOS 状态账本。
+
 新增 `startup/dev-process-lifecycle.ts`，恢复 dev relaunch marker、父进程存活轮询、will-quit 清理及 webview 进程组→单 PID 强杀回退；
 installer attribution 改接既有安全 owner，未被消费的内嵌 tray 文案副本同步删除。旧 `Hoe…au` 约 199 行整体移除，focused suite 覆盖
 PID admission、ESRCH/EPERM、marker 写入失败、轮询幂等清理与 webview kill fallback。
