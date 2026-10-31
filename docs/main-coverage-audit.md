@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 ThreadStore owner
+
+既有 `src/main/main-app/threads/thread-store.ts` 已接回真实 conversation manager consumer，替代原 `T_e`。新 owner 保留
+conversation/thread maps、canonical/legacy history、field subscriptions、recent summaries、hydration、title/read/archive state、
+transcript changes 与 subagent status evidence。接线审计发现并补回 `registerThreadMetadata` 方法，两处内部 registration 现会先
+记录 thread availability；132 个 class members 与原 owner 对齐，主 chunk 旧 1,963 行 class 已删除。
+
 ## 2026-10-31 app-server stream-role owner
 
 既有 `src/main/main-app/threads/stream-roles.ts` 的 `AppServerManagerStreamState` 已接回真实 conversation manager consumer，

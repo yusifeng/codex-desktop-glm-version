@@ -1663,7 +1663,7 @@ export class ThreadStore {
       source === "live" && withMetadata.daybreakEnabled == null && existing?.daybreakEnabled != null
         ? { ...withMetadata, daybreakEnabled: existing.daybreakEnabled }
         : withMetadata;
-    registerThreadMetadata({ thread: resolved, threadsById: this.threadsById, conversations: this.conversations, updateConversationState: (id, recipe) => this.updateConversationState(id, recipe) });
+    this.registerThreadMetadata(resolved);
     this.ensureRecentConversationId(conversationId);
     const title = cleanThreadTitle(resolved.name);
     const { updatedAt, recencyAt } = threadTimestamps(resolved as { createdAt: number; updatedAt: number; recencyAt?: number | null });
@@ -2261,7 +2261,7 @@ export class ThreadStore {
     const withMetadata = this.withThreadMetadata(thread);
     const conversationId = threadIdOf(withMetadata.id);
     if (this.params.isConversationArchiving(conversationId)) return conversationId;
-    registerThreadMetadata({ thread: withMetadata, threadsById: this.threadsById, conversations: this.conversations as never, updateConversationState: (id, recipe) => this.updateConversationState(id, recipe) });
+    this.registerThreadMetadata(withMetadata);
     this.ensureRecentConversationId(conversationId);
     const existing = this.conversations.get(conversationId);
     const title = cleanThreadTitle(withMetadata.name);
@@ -2319,6 +2319,16 @@ export class ThreadStore {
     this.notifyConversationCallbacks(conversationId);
     this.params.onThreadAdded?.(withMetadata);
     return conversationId;
+  }
+
+  registerThreadMetadata(thread: ThreadRecord) {
+    this.recordThreadAvailability(threadIdOf(thread.id));
+    registerThreadMetadata({
+      thread,
+      threadsById: this.threadsById,
+      conversations: this.conversations as never,
+      updateConversationState: (id, recipe) => this.updateConversationState(id, recipe),
+    });
   }
 
   shouldSurfaceRecentConversation(conversation: Conversation) {
