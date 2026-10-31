@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 avatar pet install owner wiring
+
+`src/main/main-app/avatar/pet-install.ts` 的 `PetInstallManager`/`AvatarManager` 与旧 `wje/Eje` 均为 7 members。本轮接回
+bootstrap `Eje` consumer，删除旧 schema、redirect/type/size body validation 与两个 class 的 114 行重复簇；focused suite 覆盖
+preview/install 参数与 prepared asset 传递、avatar state/id load、manager forwarding 和 wiring。
+
 ## 2026-10-31 export-logs duplicate cleanup
 
 接回语义 `DebugService` 后，主 chunk 的 `Rje` 已无 consumer，`HN/Dje/Oje/kje/Aje/jje/Mje/Nje/Pje/Fje/Ije/Lje` 也只在

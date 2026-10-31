@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 avatar pet install owner：既有 `avatar/pet-install.ts` 的 `PetInstallManager` 与 `AvatarManager` 现已替代主 chunk 旧
+`wje/Eje` 及专属 schema/download/body helper。两者均为完整 7-member owner；redirect/content-type/20MiB/version validation、
+preview/install 与 execution-host avatar load 保持完整，真实 bootstrap consumer 继续通过 `Eje` 兼容别名使用。
+
 清理 export-logs 重复 helper 簇：`DebugService` 已直接调用语义 `exportLogs` 后，主 chunk 旧 `HN…Rje` 只剩内部引用。
 本轮删除日期桶、scope 筛选、save dialog、文件读取与时间戳归并的 126 行重复实现；focused gate 验证跨文件时间排序、无时间戳
 稳定排序、空输入与全部旧符号消失。

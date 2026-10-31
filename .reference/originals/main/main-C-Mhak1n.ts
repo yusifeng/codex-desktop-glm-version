@@ -146,6 +146,7 @@ const { PublishedStatsig } = require("./main-app/account/statsig-adapter.js");
 const { ConversationalOnboardingService } = require("./main-app/onboarding/conversational-onboarding.js");
 const { ArtifactSessionHostLifecycle } = require("./main-app/artifact-session/host-lifecycle.js");
 const { DebugService, createDemoTools } = require("./main-app/debug/export-logs.js");
+const { AvatarManager } = require("./main-app/avatar/pet-install.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -62804,120 +62805,7 @@ function xje(e) {
 function RN(e) {
   return typeof e == `object` && e && `code` in e ? e.code : null;
 }
-var Sje = new Set([301, 302, 303, 307, 308]),
-  Cje = new Set([`image/png`, `image/webp`]),
-  zN = n.wf({
-    name: n.Of().trim().min(1),
-    description: n
-      .Of()
-      .nullish()
-      .transform((e) => e?.trim() || null),
-    imageUrl: n.Nf().transform((e, t) => {
-      let r = new URL(e);
-      return r.protocol !== `https:` || r.hostname === `localhost`
-        ? (t.addIssue({ code: `custom`, message: `Pet spritesheet URL is invalid` }), n.zf)
-        : r.toString();
-    }),
-    spriteVersionNumber: n.jf([n.bf(1), n.bf(2)]).optional(),
-  }),
-  wje = class {
-    fetchAsset;
-    installPreparedPet;
-    constructor({
-      appServerClient: e,
-      fetchAsset: t = (e, t) => l.net.fetch(e, t),
-      installPreparedPet: r = n.ht,
-      preferWsl: i = !1,
-    }) {
-      ((this.appServerClient = e),
-        (this.fetchAsset = t),
-        (this.installPreparedPet = r),
-        (this.preferWsl = i));
-    }
-    appServerClient;
-    preferWsl;
-    async preview({ name: e, description: t, imageUrl: n, spriteVersionNumber: r }) {
-      let i = zN.parse({ name: e, description: t, imageUrl: n, spriteVersionNumber: r }),
-        a = await BN(i.imageUrl, i.spriteVersionNumber, this.fetchAsset);
-      return {
-        displayName: i.name,
-        description: i.description,
-        spriteVersionNumber: a.spriteVersionNumber,
-        spritesheetDataUrl: a.spritesheetDataUrl,
-      };
-    }
-    async install({ name: e, description: t, imageUrl: n, spriteVersionNumber: r }) {
-      let i = zN.parse({ name: e, description: t, imageUrl: n, spriteVersionNumber: r }),
-        a = await BN(i.imageUrl, i.spriteVersionNumber, this.fetchAsset);
-      return {
-        id: await this.installPreparedPet({
-          appServerClient: this.appServerClient,
-          preferWsl: this.preferWsl,
-          name: i.name,
-          description: i.description,
-          spritesheet: a,
-        }),
-      };
-    }
-  };
-async function BN(e, t, r) {
-  let i = await r(e, { redirect: `manual` });
-  if (Sje.has(i.status)) throw Error(`Pet spritesheet redirects are not allowed`);
-  if (!i.ok) throw Error(`Pet spritesheet download failed (${i.status})`);
-  let a = await Tje(i),
-    o = t == null ? (n.vt(a, 1) ?? n.vt(a, 2)) : n.vt(a, t);
-  if (o == null) throw Error(`Pet spritesheet is invalid`);
-  return { ...o, bytes: a };
-}
-async function Tje(e) {
-  let t = e.headers.get(`content-type`)?.split(`;`)[0]?.trim().toLowerCase();
-  if (t == null || !Cje.has(t)) throw Error(`Pet spritesheet response must be an image`);
-  let n = Number(e.headers.get(`content-length`));
-  if (Number.isFinite(n) && n > 20971520) throw Error(`Pet spritesheet is too large`);
-  if (e.body == null) throw Error(`Pet spritesheet response had no body`);
-  let r = e.body.getReader(),
-    i = [],
-    a = 0;
-  for (;;) {
-    let { done: e, value: t } = await r.read();
-    if (e) break;
-    if (((a += t.byteLength), a > 20971520))
-      throw (r.cancel(), Error(`Pet spritesheet is too large`));
-    i.push(t);
-  }
-  return Buffer.concat(i, a);
-}
-var Eje = class extends n.Uf {
-    executionHostRegistry;
-    petInstallManager;
-    constructor(e) {
-      (super(),
-        (this.executionHostRegistry = e),
-        (this.petInstallManager = new wje({
-          appServerClient: e.get(),
-          preferWsl: !!process.env.WSL_DISTRO_NAME,
-        })));
-    }
-    load() {
-      return n._t({
-        appServerClient: this.executionHostRegistry.get(),
-        preferWsl: !!process.env.WSL_DISTRO_NAME,
-      });
-    }
-    loadAvatar(e) {
-      return n.gt({
-        appServerClient: this.executionHostRegistry.get(),
-        avatarId: e,
-        preferWsl: !!process.env.WSL_DISTRO_NAME,
-      });
-    }
-    previewPetInstall(e) {
-      return this.petInstallManager.preview(e);
-    }
-    installPet(e) {
-      return this.petInstallManager.install(e);
-    }
-  };
+var Eje = AvatarManager;
 var zje = DebugService,
   Wje = createDemoTools;
 var GN = PrewarmSlot;
