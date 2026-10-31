@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修正并接回此前未接线且语义有偏差的 `settings/workspace-settings-service.ts`：`CBe` settings owner、RPC
+subscription、agent write-confirmation broker、work-mode access policy、third-party notices reader 与 backdrop policy 均迁入
+dependency-injected runtime；真实 `PBe` consumer 已接回，旧 `sBe/cBe/xBe/SBe/RH/CBe/zH` 和 notices helpers 删除。
+
 继续缩小 `PBe` fetch-handler 的自由依赖面：workspace directory browse/resolution/symlink-containment cluster 已迁入
 `workspace/directory-browser.ts`，真实 handler consumer 已接回；local realpath containment、remote path semantics、hidden/
 directory filters、stable ordering 与 parent projection 均由新 runtime 持有，旧 `OBe/kBe/ABe/jBe/UH/MBe/WH` 删除。

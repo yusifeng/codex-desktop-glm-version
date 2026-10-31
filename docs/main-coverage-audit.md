@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 workspace settings service wiring correction
+
+既有 `settings/workspace-settings-service.ts` 未接线，且错误假设 RPC stream 为 `.send()`、改变 open-link fallback 与 schema
+failure 语义；本轮重写为 dependency-injected runtime 并接回真实 `PBe` consumer。新模块持有 settings base/read-all/
+agent projection、RPC subscription、write-confirmation broker、work-mode policy、third-party notices 与 backdrop policy；旧
+`sBe/cBe/xBe/SBe/RH/CBe/zH` 及 notices helpers 已删除。
+
 ## 2026-10-31 workspace directory browser
 
 `PBe` 前置的 workspace directory browse/resolution/symlink-containment cluster 已迁入

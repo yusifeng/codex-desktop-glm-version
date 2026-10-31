@@ -83,6 +83,7 @@ const { createScreenshotTargetResolver } = require("./main-app/fetch-handler/scr
 const { createSftpTransfers } = require("./main-app/fetch-handler/sftp.js");
 const { applySparseStateWrite, createFetchHandlerStateRuntime } = require("./main-app/fetch-handler/state-writes.js");
 const { createWorkspaceDirectoryBrowser } = require("./main-app/workspace/directory-browser.js");
+const { createThirdPartyNoticesReader, createWorkspaceSettingsServiceClass, resolveSystemBackdropSupport } = require("./main-app/settings/workspace-settings-service.js");
 const { createWorkspaceFileServiceClass } = require("./main-app/workspace/files.js");
 const { createAuthorizedThreadCatalogServiceClass } = require("./main-app/thread-catalog/authorized-service.js");
 const { createPluginIncentivesClientRuntime } = require("./main-app/plugins/incentives-client.js");
@@ -95076,75 +95077,7 @@ var jH = class extends n.Uf {
     authMethod: n.Of().nullable(),
     stableId: n.Of().nullable(),
     policy: n.df([`preference`, `coding`, `everyday`]),
-  }),
-  sBe = class extends n.Uf {
-    async readAll() {
-      let e = await Promise.all(this.keys().map(async (e) => [e, await this.read(e)])),
-        t = {},
-        n = {};
-      for (let [r, i] of e)
-        (Object.assign(t, { [r]: i.effective }), Object.assign(n, { [r]: i.configured }));
-      return { values: t, configuredValues: n };
-    }
-    async readForAgent(e) {
-      let t = new Set(this.keys()),
-        r = n.Aa.filter(({ key: e }) => t.has(e)),
-        i = await Promise.all(r.map(async ({ key: t }) => [t, await this.read(t, e)]));
-      return {
-        filePath: this.settingsFilePath(),
-        settings: Object.fromEntries(
-          i.flatMap(([e, t]) => (t.configured === void 0 ? [] : [[e, t.configured]])),
-        ),
-        effectiveSettings: Object.fromEntries(
-          i.flatMap(([e, t]) => (t.effective === void 0 ? [] : [[e, t.effective]])),
-        ),
-        definitions: r,
-      };
-    }
-    async subscribe(e, t) {
-      let n = t.dup(),
-        r = 0,
-        i = !0,
-        o = async () => {
-          let t = ++r,
-            o = await this.read(e);
-          if (i && t === r)
-            try {
-              var s = a.en();
-              s.u(n(o));
-            } catch (e) {
-              s.e = e;
-            } finally {
-              s.d();
-            }
-        },
-        s = this.onDidChange(e, () => {
-          o().catch(() => c.unsubscribe());
-        }),
-        c = new cBe(() => {
-          ((i = !1), s(), n[Symbol.dispose]());
-        });
-      n.onRpcBroken(() => c.unsubscribe());
-      try {
-        return (await o(), c);
-      } catch (e) {
-        throw (c.unsubscribe(), e);
-      }
-    }
-  },
-  cBe = class extends n.Uf {
-    cleanup;
-    constructor(e) {
-      (super(), (this.cleanup = e));
-    }
-    unsubscribe() {
-      let e = this.cleanup;
-      ((this.cleanup = null), e?.());
-    }
-    [Symbol.dispose]() {
-      this.unsubscribe();
-    }
-  };
+  });
 function MH(e) {
   try {
     let t = new URL(e);
@@ -95423,228 +95356,38 @@ function bBe(e) {
     return null;
   }
 }
-var xBe = class extends n.Uf {
-    pending = new Map();
-    listeners = new Map();
-    subscriptions = new Set();
-    disposed = !1;
-    request = (e, t) => {
-      if ((t.throwIfAborted(), this.disposed)) throw Error(`Settings service unavailable.`);
-      let n = RH(e.key);
-      return this.pending.has(n)
-        ? Promise.resolve(!1)
-        : new Promise((r, i) => {
-            let a = () => {
-                (t.removeEventListener(`abort`, o), this.pending.delete(n), this.#e(n));
-              },
-              o = () => {
-                (a(),
-                  i(
-                    t.reason instanceof Error
-                      ? t.reason
-                      : Error(
-                          t.aborted ? `The operation was aborted` : `Settings service unavailable.`,
-                        ),
-                  ));
-              };
-            (this.pending.set(n, {
-              request: e,
-              settle: (e) => {
-                (a(), r(e));
-              },
-              cancel: o,
-            }),
-              t.addEventListener(`abort`, o, { once: !0 }),
-              this.#e(n));
-          });
-    };
-    async subscribe(e, t) {
-      if (this.disposed) throw Error(`Settings service unavailable.`);
-      let n = RH(e),
-        r = t.dup(),
-        i = () => {
-          try {
-            var e = a.en();
-            e.u(r(this.pending.get(n)?.request ?? null)).catch(() => s.unsubscribe());
-          } catch (t) {
-            e.e = t;
-          } finally {
-            e.d();
-          }
-        },
-        o = this.listeners.get(n) ?? new Set();
-      (o.add(i), this.listeners.set(n, o));
-      let s = new SBe(() => {
-        (o.delete(i),
-          o.size === 0 && this.listeners.delete(n),
-          r[Symbol.dispose](),
-          this.subscriptions.delete(s));
-      });
-      return (this.subscriptions.add(s), r.onRpcBroken(() => s.unsubscribe()), i(), s);
-    }
-    async answer(e, t) {
-      let n = this.pending.get(RH(e));
-      return n == null || n.request.key.turnId !== e.turnId || n.request.key.callId !== e.callId
-        ? !1
-        : (n.settle(t), !0);
-    }
-    dispose = () => {
-      this.disposed = !0;
-      for (let e of this.pending.values()) e.cancel();
-      for (let e of this.subscriptions) e.unsubscribe();
-    };
-    #e(e) {
-      this.listeners.get(e)?.forEach((e) => e());
-    }
-  },
-  SBe = class extends n.Uf {
-    cleanup;
-    constructor(e) {
-      (super(), (this.cleanup = e));
-    }
-    unsubscribe() {
-      let e = this.cleanup;
-      ((this.cleanup = null), e?.());
-    }
-    [Symbol.dispose]() {
-      this.unsubscribe();
-    }
-  };
-function RH(e) {
-  return JSON.stringify([e.hostId, e.threadId]);
-}
-var CBe = class extends sBe {
-  store;
-  afterWrite;
-  statsig;
-  configWriteConfirmations = new xBe();
-  desktopFeatureAvailabilityListeners = new Set();
-  workModeAccessListeners = new Set();
-  workModeAccessByAccount = [];
-  constructor(e, t, n) {
-    (super(), (this.store = e), (this.afterWrite = t), (this.statsig = n));
-  }
-  settingsFilePath() {
-    return this.store.getStateFilePath();
-  }
-  keys() {
-    return n.ka.map(({ key: e }) => e);
-  }
-  async read(e, t) {
-    return { configured: this.store.get(e), effective: await this.getEffective(e, t) };
-  }
-  async getEffective(e, t) {
-    if (e === n.ja.conversationDetailMode.key) {
-      let r = await this.statsig?.readExecutionAssignments(),
-        i = r == null ? void 0 : this.workModeAccessByAccount.find((e) => zH(r.identity, e));
-      return r == null || i == null || (t != null && !zH(r.identity, t))
-        ? void 0
-        : i.policy === `preference`
-          ? this.store.getEffective(e)
-          : n.Oa(e, i.policy === `everyday` ? `STEPS_PROSE` : `STEPS_COMMANDS`);
-    }
-    return e === n.Ia.openLinkInTargetPreference.key
-      ? n.Oa(e, FH(this.store))
-      : this.store.getEffective(e);
-  }
-  async write(e, t) {
-    (this.store.set(e, t), this.afterWrite(e, this.store.get(e)));
-  }
-  async writeForAgent(e, t) {
-    let r = Object.entries(e).map(([e, t]) => {
-      let r = n.Ea(e);
-      if (r == null) throw Error(`Unknown setting: ${e}`);
-      if (r.agentAccess !== `read-write`) throw Error(`Setting cannot be written by Codex: ${e}`);
-      return { key: r.key, value: n.Oa(r.key, t) };
-    });
-    (await Promise.all(r.map(({ key: e, value: t }) => this.write(e, t))),
-      await this.store.flush());
-    let { settings: i, effectiveSettings: a } = await this.readForAgent(t);
-    return { settings: i, effectiveSettings: a };
-  }
-  async publish(e) {
-    let t = oBe.parse(e);
-    ((this.workModeAccessByAccount = [...this.workModeAccessByAccount.filter((e) => !zH(e, t)), t]),
-      this.workModeAccessListeners.forEach((e) => e()));
-  }
-  onDidChange(e, t) {
-    let r = this.store.onDidChange(e, t);
-    (e === n.Ia.openLinkInTargetPreference.key && this.desktopFeatureAvailabilityListeners.add(t),
-      e === n.ja.conversationDetailMode.key && this.workModeAccessListeners.add(t));
-    let i = e === n.ja.conversationDetailMode.key ? this.statsig?.onDidChange(t) : void 0;
-    return () => {
-      (r(),
-        this.desktopFeatureAvailabilityListeners.delete(t),
-        this.workModeAccessListeners.delete(t),
-        i?.());
-    };
-  }
-  notifyDesktopFeatureAvailabilityChanged() {
-    this.desktopFeatureAvailabilityListeners.forEach((e) => e());
-  }
-  dispose() {
-    (this.configWriteConfirmations.dispose(),
-      (this.workModeAccessByAccount = []),
-      this.desktopFeatureAvailabilityListeners.clear(),
-      this.workModeAccessListeners.clear());
-  }
-};
-function zH(e, t) {
-  return e.accountId == null
-    ? t.accountId == null &&
-        e.authMethod === t.authMethod &&
-        (e.authMethod != null || (e.stableId != null && e.stableId === t.stableId))
-    : e.accountId === t.accountId && e.userId === t.userId;
-}
+var CBe = createWorkspaceSettingsServiceClass({
+  DisposableBase: n.Uf,
+  agentReadableSettings: n.Aa,
+  conversationDetailModeKey: n.ja.conversationDetailMode.key,
+  createUsingScope: a.en,
+  getDefaultLinkTarget: FH,
+  normalizeSettingValue: n.Oa,
+  openLinkTargetPreferenceKey: n.Ia.openLinkInTargetPreference.key,
+  parseWorkModeAccess: (value) => oBe.parse(value),
+  settingDefinitionFor: n.Ea,
+  settingKeys: n.ka,
+});
 function BH() {
-  return process.platform === `win32` && l.app.getGPUFeatureStatus().gpu_compositing !== `enabled`
-    ? !1
-    : l.BrowserWindow.isSystemBackdropSupported();
+  return resolveSystemBackdropSupport({
+    platform: process.platform,
+    gpuFeatureStatus: () => l.app.getGPUFeatureStatus(),
+    isSupported: () => l.BrowserWindow.isSystemBackdropSupported(),
+  });
 }
-var VH = `THIRD_PARTY_NOTICES.txt`,
-  wBe = (0, d.promisify)(P.execFile),
-  HH = () => {
-    let e = process.cwd(),
-      t = [];
-    return (
-      process.resourcesPath && t.push(h.default.join(process.resourcesPath, VH)),
-      t.push(h.default.join(e, `assets`, VH)),
-      t.push(h.default.join(e, `electron`, `assets`, VH)),
-      t
-    );
-  };
-function TBe() {
-  let e = process.cwd();
-  for (;;) {
-    if ((0, v.existsSync)(h.default.join(e, `pnpm-workspace.yaml`))) return e;
-    let t = h.default.dirname(e);
-    if (t === e) return null;
-    e = t;
-  }
-}
-async function EBe() {
-  let e = TBe();
-  if (!e) return;
-  let t = h.default.join(e, `electron`, `assets`, VH);
-  (await v.promises.mkdir(h.default.dirname(t), { recursive: !0 }),
-    await wBe(
-      n.qn.resolve(`node`, { cwd: e }) ?? `node`,
-      [`./scripts/generate-third-party-notices.mjs`, `--output-file`, t],
-      { cwd: e, env: n.Bi(process.env), timeout: 12e4 },
-    ));
-}
-async function DBe() {
-  for (let e of HH()) if ((0, v.existsSync)(e)) return v.promises.readFile(e, `utf8`);
-  if (process.env.NODE_ENV !== `production`) {
-    try {
-      await EBe();
-    } catch {
-      return null;
-    }
-    for (let e of HH()) if ((0, v.existsSync)(e)) return v.promises.readFile(e, `utf8`);
-  }
-  return null;
-}
+var DBe = createThirdPartyNoticesReader({
+  cwd: () => process.cwd(),
+  dirname: h.default.dirname,
+  execFile: (0, d.promisify)(P.execFile),
+  existsSync: v.existsSync,
+  join: h.default.join,
+  mkdir: (path, options) => v.promises.mkdir(path, options),
+  nodeEnv: process.env.NODE_ENV,
+  readFile: (path, encoding) => v.promises.readFile(path, encoding),
+  resolveNodeExecutable: (cwd) => n.qn.resolve(`node`, { cwd }),
+  resourcesPath: process.resourcesPath,
+  sanitizeEnvironment: n.Bi,
+});
 var listWorkspaceDirectory = createWorkspaceDirectoryBrowser({
   fileSystem: n.Di,
   isRemoteHostConfig: n.Es,
