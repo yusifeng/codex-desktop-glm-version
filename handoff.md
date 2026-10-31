@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修复并统一 thread start/resume config owner：`threads/start-config.ts` 现恢复 base config、versioned feature overrides、shell environment
+policy 合并、动态工具、developer/writing instructions、resume settings/personality、permission stripping 与 token-budget config；conversation
+creation、AppServer resume 和主 chunk `mx/yx` consumers 共用语义模块，旧 `ux…Cye` 约 480 行簇删除。
+
 修复 default turn config owner：`threads/start-config.ts` 的 `wye` 已从进程内假 service-tier 状态恢复为 account/auth/requirements/config/
 model 联合读取、profile-aware batchWrite、串行 service-tier 写与 model+effort 写；AppServer manager 真实 consumer 保持接回，主 chunk 旧
 `wye` 66 行重复实现删除。

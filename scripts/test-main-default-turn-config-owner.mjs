@@ -30,6 +30,7 @@ Function("require", "module", "exports", transpiled.code)(
           ? config
           : { ...config, ...(config.profiles?.[config.profile] ?? {}) },
       };
+    if (specifier === "./hydration") return { turnParamsFromReadResponse: (response) => response };
     throw new Error(`unexpected require ${specifier}`);
   },
   module,

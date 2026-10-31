@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread start/resume config owner repair
+
+`src/main/main-app/threads/start-config.ts` 的 `gx/xye` 原先仅复制输入或返回调试对象，导致新建与 resume 丢失 base config、shell policy、
+dynamic tools、instructions、personality、permission preservation 与 token-budget semantics。本轮恢复完整组合链，conversation creation、
+AppServer resume 与 main `mx/yx` consumers 统一接回，删除旧 `ux…Cye` 约 480 行簇；focused suite 锁定配置合并与双 consumer wiring。
+
 ## 2026-10-31 default turn config owner repair
 
 `src/main/main-app/threads/start-config.ts` 的 `wye` 原为只存内存变量且写入错误 schema 的占位实现。本轮恢复 Copilot bypass、ChatGPT
