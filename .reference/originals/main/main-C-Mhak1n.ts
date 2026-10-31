@@ -98,6 +98,7 @@ const { createRealtimeVoiceThreadTitleCoordinatorClass } = require("./main-app/r
 const { createRemoteConnectionsHandlerClass } = require("./main-app/remote/remote-connections-handler.js");
 const { createRemoteControlDeviceKeyClientClass } = require("./main-app/remote/remote-control-device-key-client.js");
 const { createRemoteRpcServices } = require("./main-app/remote/remote-rpc-services.js");
+const { createRemoteHostConfigRuntime } = require("./main-app/remote/host-config-runtime.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -134304,98 +134305,16 @@ var F5e = createRemoteControlDeviceKeyClientClass({
 });
 var { RemoteControlEnvironmentService: R5e, RemoteHostedPipContentService: z5e } =
     createRemoteRpcServices({ RpcHandlerBase: n.Uf, getContentLayoutState: _c }),
-  B5e = `(remote) `;
-function V5e(e) {
-  let t = {
-    id: e.id,
-    display_name: e.displayName,
-    kind: `ssh`,
-    codex_cli_command: e.codexCliCommand,
-    terminal_command: e.terminalCommand,
-    default_workspaces: e.defaultWorkspaces ?? [],
-    [n.cn]: {
-      sshAlias: e.sshAlias ?? null,
-      sshHost: e.sshHost,
-      sshPort: e.sshPort,
-      identity: e.identity,
-    },
-  };
-  return (e.homeDir && (t.home_dir = e.homeDir), t);
-}
-function H5e(e) {
-  let t = n.Ss({
-    alias: e.sshAlias,
-    hostname: e.sshHost,
-    sshPort: e.sshPort,
-    identity: e.identity,
-  });
-  return V5e({
-    id: e.hostId,
-    displayName: `${B5e}${e.displayName}`,
-    sshAlias: e.sshAlias ?? null,
-    sshHost: e.sshHost,
-    sshPort: e.sshPort,
-    identity: e.identity,
-    codexCliCommand: [],
-    terminalCommand: [`ssh`, ...t],
-    defaultWorkspaces: [],
-  });
-}
-function U5e(e) {
-  return {
-    id: e.hostId,
-    display_name: e.displayName,
-    kind: n.vs,
-    codex_cli_command: [],
-    terminal_command: [],
-    default_workspaces: [],
-    env_id: e.envId,
-    host_name: e.hostName,
-    environment_kind: e.environmentKind,
-    online: e.online,
-    busy: e.busy,
-    os: e.os,
-    arch: e.arch,
-    app_server_version: e.appServerVersion,
-    last_seen_at: e.lastSeenAt,
-  };
-}
-function W5e(e) {
-  return {
-    id: e.hostId,
-    display_name: e.displayName,
-    kind: `wsl`,
-    codex_cli_command: XDe(e.distro),
-    terminal_command: [`wsl.exe`, `-d`, e.distro],
-    default_workspaces: [],
-    distro: e.distro,
-  };
-}
-function m4(e) {
-  return n.ws(e) ? U5e(e) : n.ks(e) ? W5e(e) : H5e(e);
-}
-var G5e = class extends n.Uf {
-    appServerConnectionRegistry;
-    surfaceId;
-    constructor(e, t) {
-      (super(), (this.appServerConnectionRegistry = e), (this.surfaceId = t));
-    }
-    recordConversationActivity({ conversationId: e, hostId: t }) {
-      this.appServerConnectionRegistry
-        .getConnection(t)
-        .requestUserInputAutoResolution.recordConversationActivity(this.surfaceId, e);
-    }
-    setConversationPresented({ conversationId: e, hostId: t, presented: n }) {
-      this.appServerConnectionRegistry
-        .getConnection(t)
-        .requestUserInputAutoResolution.setConversationPresented(this.surfaceId, e, n);
-    }
-    snooze({ conversationId: e, hostId: t, requestId: n }) {
-      this.appServerConnectionRegistry
-        .getConnection(t)
-        .requestUserInputAutoResolution.snoozeRequest(e, n);
-    }
-  },
+  {
+    projectSshHostConfig: V5e,
+    projectCatalogEntry: m4,
+    RequestUserInputAutoResolutionService: G5e,
+  } = createRemoteHostConfigRuntime({
+    runtime: n,
+    RpcHandlerBase: n.Uf,
+    buildSshArguments: n.Ss,
+    buildWslCodexCommand: XDe,
+  }),
   h4 = n
     .Of()
     .min(1)

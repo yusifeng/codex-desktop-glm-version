@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 remote host-config runtime
+
+原 `B5e/V5e/H5e/U5e/W5e/m4/G5e` 已迁入 `src/main/main-app/remote/host-config-runtime.ts`。新 runtime
+保留 SSH/WSL/Remote Control catalog-to-host-config projection、SSH transport args、WSL commands、remote label 与
+per-surface request-user-input activity/presentation/snooze forwarding；三个真实 consumers 已接回，旧实现已删除。
+
 ## 2026-10-31 remote RPC services
 
 原 `R5e/z5e` 已迁入 `src/main/main-app/remote/remote-rpc-services.ts`。新 adapters 保留 remote-control 默认名

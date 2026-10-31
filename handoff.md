@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `B5e/V5e/H5e/U5e/W5e/m4/G5e` remote host-config projection 与 request-user-input RPC owner 迁入
+`remote/host-config-runtime.ts`；SSH/WSL/Remote Control config shape、transport commands、label/defaults 与
+surface-scoped activity/presentation/snooze forwarding 均由新 runtime 持有。真实 consumers 已接回，旧实现已
+删除。focused test 覆盖 22 项。
+
 随后将 `R5e/z5e` remote RPC adapters 迁入 `remote/remote-rpc-services.ts`；environment rename forwarding、hosted
 PIP task/presentation/layout forwarding、native-video per-conversation ref-count 与 origin teardown cleanup 均由新
 owners 持有。两个 runtime consumers 已接回，旧 classes 已删除。focused test 覆盖 27 项。
