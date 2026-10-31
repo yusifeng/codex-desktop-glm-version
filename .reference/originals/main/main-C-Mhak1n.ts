@@ -20,7 +20,7 @@ const { QueuedFollowUpsCoordinator } = require("./main-app/conversation/queued-f
 const { AppServerConversationManager } = require("./main-app/conversation/app-server-manager.js");
 const { O_e, zv, Bv, Vv, D_e } = require("./main-app/threads/patch-classification.js");
 const { mx, yx } = require("./main-app/threads/start-config.js");
-const { hasCanonicalVoiceHistory: q_ } = require("./main-app/threads/automation-detector.js");
+const { hasCanonicalVoiceHistory: q_, parseHeartbeatDecision: J_, parseAutomationUserMessage: n_e, AUTOMATION_DETECTOR: Y_ } = require("./main-app/threads/automation-detector.js");
 const { conversationFromThreadSummary: V_, cleanThreadTitle: Cv, truncateText: wv, threadPreviewTitle: v_e, threadTimestamps: Tv, mergedRecencyAt: Ev, environmentSelection: Dv, subAgentMetadata: H_, subAgentNickname: $ge } = require("./main-app/threads/projection.js");
 const { me, Xt } = require("./main-app/misc/thread-errors.js");
 const { AppServerManagerStreamState } = require("./main-app/threads/stream-roles.js");
@@ -25349,125 +25349,7 @@ var Yge = AppServerManagerStreamState;
       return this.subscribers.get(e);
     }
   };
-function e_e(e) {
-  return e.map((e) => `${e.id}:${e.recencyAt ?? e.updatedAt}`).join(`|`);
-}
-function G_(e) {
-  let t = Ng(e),
-    n = H_(e.source),
-    r = e.parentThreadId ?? n?.parentThreadId ?? null;
-  return {
-    id: e.id,
-    environmentConfigId: e.environmentConfigId,
-    requestsRef: e.requests.map(({ method: e }) => ({ method: e })),
-    turnsLength: jg(e),
-    lastTurnId: t?.turnId ?? null,
-    lastTurnStatus: t?.status ?? null,
-    lastTurnIsSleeping: t?.status === `inProgress` && t.items.at(-1)?.type === `sleep`,
-    createdAtMs: e.createdAt,
-    updatedAtMs: e.updatedAt,
-    recencyAtMs: e.recencyAt ?? e.updatedAt,
-    title: e.title,
-    originator: e.originator,
-    source: e.source,
-    agentNickname: $ge(e),
-    mode: e.mode,
-    threadStartKind: e.threadStartKind,
-    threadSource: e.threadSource,
-    hasUnreadTurn: e.hasUnreadTurn,
-    resumeState: e.resumeState,
-    threadGoal: e.threadGoal,
-    threadRuntimeStatus: e.threadRuntimeStatus,
-    workspaceKind: e.workspaceKind,
-    cwd: e.cwd,
-    gitInfoBranch: e.gitInfo?.branch ?? null,
-    isSubagentSource: r != null,
-    subagentParentThreadId: r,
-    subagentSpinnerProjectionSignature: t_e(e),
-  };
-}
-function t_e(e) {
-  let t = [];
-  for (let n of Og(e))
-    for (let e of n.items ?? [])
-      if (e?.type === `collabAgentToolCall` && `receiverThreadIds` in e && `agentsStates` in e)
-        for (let n of e.receiverThreadIds) {
-          let r = e.agentsStates?.[n];
-          if (r == null) continue;
-          let i = r.status === `running`;
-          t.push(`${n}:${i ? `1` : `0`}`);
-        }
-  return (t.sort(), t.join(`|`));
-}
-function K_(e, t) {
-  return (
-    e.id === t.id &&
-    e.environmentConfigId === t.environmentConfigId &&
-    (0, G.default)(e.requestsRef, t.requestsRef) &&
-    e.turnsLength === t.turnsLength &&
-    e.lastTurnId === t.lastTurnId &&
-    e.lastTurnStatus === t.lastTurnStatus &&
-    e.lastTurnIsSleeping === t.lastTurnIsSleeping &&
-    e.createdAtMs === t.createdAtMs &&
-    e.updatedAtMs === t.updatedAtMs &&
-    e.recencyAtMs === t.recencyAtMs &&
-    e.title === t.title &&
-    e.originator === t.originator &&
-    e.source === t.source &&
-    e.agentNickname === t.agentNickname &&
-    e.mode === t.mode &&
-    e.threadStartKind === t.threadStartKind &&
-    e.threadSource === t.threadSource &&
-    e.hasUnreadTurn === t.hasUnreadTurn &&
-    e.resumeState === t.resumeState &&
-    (0, G.default)(e.threadGoal, t.threadGoal) &&
-    (0, G.default)(e.threadRuntimeStatus, t.threadRuntimeStatus) &&
-    e.workspaceKind === t.workspaceKind &&
-    e.cwd === t.cwd &&
-    e.gitInfoBranch === t.gitInfoBranch &&
-    e.isSubagentSource === t.isSubagentSource &&
-    e.subagentParentThreadId === t.subagentParentThreadId &&
-    e.subagentSpinnerProjectionSignature === t.subagentSpinnerProjectionSignature
-  );
-}
-function J_(e) {
-  let t = r_e(e),
-    n = i_e(e);
-  if (t == null || n == null) return null;
-  let r = n.match(/<decision>\s*(NOTIFY|DONT_NOTIFY)\s*<\/decision>/i);
-  if (r == null) return null;
-  let i = a_e(n);
-  return {
-    decision: r[1].toUpperCase() === `NOTIFY` ? `NOTIFY` : `DONT_NOTIFY`,
-    visibleText: t,
-    notificationMessage: i.length > 0 ? i : null,
-  };
-}
-function n_e(e) {
-  return (e.match(/^<!\[CDATA\[ ([\s\S]*) \]\]>$/)?.[1] ?? e).trim() === `DONT_NOTIFY`
-    ? { decision: `DONT_NOTIFY`, visibleText: ``, notificationMessage: null }
-    : J_(e);
-}
-function r_e(e) {
-  let t = e.trim(),
-    n = t
-      .replace(/```(?:xml)?\s*<heartbeat>[\s\S]*?<\/heartbeat>\s*```/gi, ``)
-      .replace(/<heartbeat>[\s\S]*?<\/heartbeat>/gi, ``)
-      .trim();
-  return n === t ? null : n;
-}
-function i_e(e) {
-  return Array.from(e.trim().matchAll(/<heartbeat>[\s\S]*?<\/heartbeat>/gi)).at(-1)?.[0] ?? null;
-}
-function a_e(e) {
-  let t = e.match(/<message>\s*([\s\S]*?)\s*<\/message>/i)?.[1]?.trim() ?? ``;
-  return t.match(/^<!\[CDATA\[([\s\S]*)\]\]>$/)?.[1]?.trim() ?? t;
-}
-var Y_ = {
-    isAutomationAssistantMessage: (e) => J_(e) != null,
-    isAutomationUserInput: (e) => n.fd(e) != null,
-  },
-  o_e = n.wf({
+var o_e = n.wf({
     currentVersion: n.Cf().int().nonnegative().optional(),
     fileId: n.Of().min(1),
     libraryFileId: n.Of().min(1),

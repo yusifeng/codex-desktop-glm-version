@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 automation and thread-error owner unification
+
+main 的 `J_/n_e/Y_` 与 `automation-detector.ts` 重复，ThreadStore 又保留了只识别 Error.code/字面 regex 的 thread-not-found 分支。
+本轮统一两类 consumers 到 semantic owners，删除旧 heartbeat helpers/detector 与无引用 meta snapshot 簇；focused suites 新增 heartbeat、
+automation input、gRPC error 和 ThreadStore alias 证据。
+
 ## 2026-10-31 thread projection and errors owner wiring
 
 `threads/projection.ts` 的 summary/subagent/title/time/environment helpers 与 `misc/thread-errors.ts` 已有真实 semantic consumers，本轮将

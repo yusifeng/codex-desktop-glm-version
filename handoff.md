@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+统一 automation/error classification owners：主 chunk 的 heartbeat decision/user-message parser 与 `Y_` detector 现复用
+`automation-detector.ts`，ThreadStore 的过窄 thread-not-found regex 改为共享 `misc/thread-errors.ts`；旧 `J_…Y_`、无引用
+`e_e/G_/t_e/K_` 簇删除，避免 resume/retry 分类分叉。
+
 接回 thread projection/error helpers：`threads/projection.ts` 与 `misc/thread-errors.ts` 现统一服务主 chunk、AppServer manager、
 ThreadStore 与 conversation creation；summary skeleton、subagent metadata/nickname、title/timestamps/recency/environment selection、
 thread-not-found 与 interrupt response 保持完整，旧 `V_…W_`、`Cv…Dv`、`me/Xt` 重复函数簇删除。

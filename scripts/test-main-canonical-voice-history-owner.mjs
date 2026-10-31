@@ -18,7 +18,7 @@ Function("require", "module", "exports", transpiled.code)(
     if (specifier === "@chunk/shared")
       return {
         Wu: (version, feature) => feature === "threadTimeline" && version === "supported",
-        fd: () => null,
+        fd: (input) => input === "automation" ? {} : null,
       };
     throw new Error(`unexpected require ${specifier}`);
   },
@@ -31,6 +31,18 @@ equal(hasCanonicalVoiceHistory({ forkedFromId: "parent", historyMode: "paginated
 equal(hasCanonicalVoiceHistory({ forkedFromId: null, historyMode: "legacy", cliVersion: "supported" }), false);
 equal(hasCanonicalVoiceHistory({ forkedFromId: null, historyMode: "paginated", cliVersion: "0.0.0" }), false);
 equal(hasCanonicalVoiceHistory({ forkedFromId: null, historyMode: "paginated", cliVersion: "old" }), false);
+equal(module.exports.parseHeartbeatDecision(
+  "Visible\n<heartbeat><decision>NOTIFY</decision><message><![CDATA[ ping ]]></message></heartbeat>",
+), { decision: "NOTIFY", visibleText: "Visible", notificationMessage: "ping" });
+equal(module.exports.parseAutomationUserMessage("<![CDATA[ DONT_NOTIFY ]]>"), {
+  decision: "DONT_NOTIFY",
+  visibleText: "",
+  notificationMessage: null,
+});
+equal(module.exports.AUTOMATION_DETECTOR.isAutomationUserInput("automation"), true);
+equal(module.exports.AUTOMATION_DETECTOR.isAutomationAssistantMessage(
+  "Visible <heartbeat><decision>DONT_NOTIFY</decision></heartbeat>",
+), true);
 
 const creation = fs.readFileSync(
   new URL("../src/main/main-app/conversation/conversation-creation.ts", import.meta.url),
@@ -58,7 +70,12 @@ const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
 );
-equal(main.includes('const { hasCanonicalVoiceHistory: q_ } = require("./main-app/threads/automation-detector.js")'), true);
+equal(main.includes('parseHeartbeatDecision: J_, parseAutomationUserMessage: n_e, AUTOMATION_DETECTOR: Y_'), true);
 equal(main.includes("function q_("), false);
+for (const name of ["J_", "n_e", "r_e", "i_e", "a_e"])
+  equal(main.includes(`function ${name}(`), false);
+equal(main.includes("var Y_ ="), false);
+for (const name of ["e_e", "G_", "t_e", "K_"])
+  equal(main.includes(`function ${name}(`), false);
 
 console.log(`${assertions} main canonical voice history owner assertions passed`);

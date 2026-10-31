@@ -106,4 +106,12 @@ for (const name of ["V_", "H_", "Zge", "Qge", "U_", "$ge", "W_", "Cv", "wv", "v_
   equal(main.includes(`function ${name}(`), false);
 equal(/^function me\(e\) \{/mu.test(main), false);
 
+const threadStore = fs.readFileSync(
+  new URL("../src/main/main-app/threads/thread-store.ts", import.meta.url),
+  "utf8",
+);
+equal(threadStore.includes('import { isThreadNotFoundError } from "../misc/thread-errors"'), true);
+equal(threadStore.includes("export const isThreadNotFound = isThreadNotFoundError"), true);
+equal(threadStore.includes("/thread_not_found/.test(error.message)"), false);
+
 console.log(`${assertions} main thread projection and errors owner assertions passed`);

@@ -36,6 +36,7 @@ import {
   updateTurnIfFound,
   applyConversationTurns,
 } from "../turns/canonical-history";
+import { isThreadNotFoundError } from "../misc/thread-errors";
 import { listDurableTurnsWithItems } from "../turns/history-requests";
 import { ThreadItemIndex } from "./timeline-index";
 import { SubscriptionRegistry } from "./stream-roles";
@@ -162,14 +163,7 @@ function memoizePromise<Key, Args extends unknown[], T>(
   });
 }
 
-/** thread_not_found 判定（原 `me` 的最小面，misc/thread-errors 落地后切换）。 */
-export function isThreadNotFound(error: unknown): boolean {
-  return (
-    error instanceof Error &&
-    ((error as Error & { code?: string }).code === "thread_not_found" ||
-      /thread_not_found/.test(error.message))
-  );
-}
+export const isThreadNotFound = isThreadNotFoundError;
 
 // ---------------------------------------------------------------------------
 // ThreadStore（原 `T_e`）
