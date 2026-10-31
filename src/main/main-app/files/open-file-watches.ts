@@ -1,4 +1,5 @@
 import { Wn as ResumeNotReadyError, Zo as errorToString } from "@chunk/shared";
+import { lastIncompleteTurn, lastTurn, mergedConversationTurns } from "../turns/canonical-history";
 
 type UnknownRecord = Record<string, unknown>;
 type StreamRole = { role: string; ownerClientId?: string } | null | undefined;
@@ -55,10 +56,47 @@ export class sve {
 }
 export const OpenFileWatchRegistry = sve;
 
-function turns(state: unknown): UnknownRecord[] { if (typeof state !== `object` || state === null) return []; const record = state as UnknownRecord; return Array.isArray(record.turns) ? record.turns.filter((turn): turn is UnknownRecord => typeof turn === `object` && turn !== null) : []; }
-export function ry(state: unknown, _policy?: unknown): string | undefined { const turn = [...turns(state)].reverse().find((entry) => entry.turnId != null); return turn?.status === `inProgress` && typeof turn.turnId === `string` ? turn.turnId : undefined; }
-export function iy(state: unknown): boolean { if (typeof state !== `object` || state === null) return false; const record = state as UnknownRecord; if (Array.isArray(record.unconfirmedTurnSubmissions) && record.unconfirmedTurnSubmissions.some((entry) => typeof entry === `object` && entry !== null && (entry as UnknownRecord).terminal !== true)) return true; if (record.resumeState === `needs_resume`) return typeof record.threadRuntimeStatus === `object` && record.threadRuntimeStatus !== null && (record.threadRuntimeStatus as UnknownRecord).type === `active`; if (turns(state).length === 0) return record.resumeState === `resuming`; return turns(state).some((turn) => turn.status === `inProgress`); }
-export function ove(state: unknown, request: unknown, _policy?: unknown): UnknownRecord | null { if (typeof state !== `object` || state === null) return null; const record = state as UnknownRecord; const requestRecord = typeof request === `object` && request !== null ? request as UnknownRecord : null; return { originator: record.originator, inProgress: iy(state), activeTurnId: ry(state) ?? null, latestModel: record.latestModel, latestReasoningEffort: record.latestReasoningEffort, threadStartKind: record.threadStartKind, threadSource: record.threadSource, requestTraceId: requestRecord?.requestTraceId }; }
+export function ry(state: unknown, policy?: unknown): string | undefined {
+  if (typeof state !== `object` || state === null) return;
+  const turn = [...mergedConversationTurns(state as never, policy as never)].reverse().find((entry) => entry.turnId != null);
+  return turn?.status === `inProgress` && typeof turn.turnId === `string` ? turn.turnId : undefined;
+}
+export function iy(state: unknown): boolean {
+  if (typeof state !== `object` || state === null) return false;
+  const record = state as UnknownRecord;
+  if (Array.isArray(record.unconfirmedTurnSubmissions) && record.unconfirmedTurnSubmissions.some((entry) => typeof entry === `object` && entry !== null && (entry as UnknownRecord).terminal !== true)) return true;
+  const turns = mergedConversationTurns(record as never, undefined as never) as UnknownRecord[];
+  if (record.resumeState === `needs_resume`) return typeof record.threadRuntimeStatus === `object` && record.threadRuntimeStatus !== null && (record.threadRuntimeStatus as UnknownRecord).type === `active`;
+  if (turns.length === 0) return record.resumeState === `resuming`;
+  return lastIncompleteTurn({ turns } as never)?.status === `inProgress`;
+}
+export function ove(state: unknown, request: unknown, policy?: unknown): UnknownRecord | null {
+  if (typeof state !== `object` || state === null) return null;
+  const record = state as UnknownRecord;
+  const turn = typeof request === `object` && request !== null ? request as UnknownRecord : null;
+  const latest = lastTurn(record as never) as UnknownRecord | null;
+  const params = turn?.params as UnknownRecord | undefined;
+  const collaboration = params?.collaborationMode as UnknownRecord | undefined;
+  const collaborationSettings = collaboration?.settings as UnknownRecord | undefined;
+  return {
+    originator: record.originator,
+    inProgress: iy(state),
+    activeTurnId: ry(state, policy) ?? null,
+    hasMisalignmentPolicyViolation: latest?.error != null &&
+      (latest.error as UnknownRecord).codexErrorInfo === `misalignmentPolicyViolation`,
+    latestModel: record.latestModel,
+    latestReasoningEffort: record.latestReasoningEffort,
+    threadStartKind: record.threadStartKind,
+    threadSource: record.threadSource,
+    requestTraceId: turn?.requestTraceId,
+    turnConfiguration: turn == null ? undefined : {
+      model: collaborationSettings?.model ?? params?.model ?? null,
+      reasoningEffort: turn.requestedReasoningEffort ??
+        collaborationSettings?.reasoning_effort ?? params?.effort ?? null,
+      serviceTier: params?.serviceTierForTurn ?? params?.serviceTier ?? null,
+    },
+  };
+}
 export async function ave(manager: unknown, conversationId: string, helpers: UnknownRecord): Promise<void> {
   const target = manager as UnknownRecord;
   const method = (name: string) => target[name] as ((...args: unknown[]) => unknown);

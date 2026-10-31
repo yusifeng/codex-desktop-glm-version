@@ -9,9 +9,16 @@ const transpiled = await transform(source, { loader: "ts", format: "cjs", target
 class ResumeNotReadyError extends Error { constructor(result) { super("not ready"); this.result = result; } }
 const module = { exports: {} };
 Function("require", "module", "exports", transpiled.code)(
-  (specifier) => specifier === "@chunk/shared"
-    ? { Wn: ResumeNotReadyError, Zo: (error) => error instanceof Error ? error.message : String(error) }
-    : (() => { throw new Error(`unexpected require ${specifier}`); })(),
+  (specifier) => {
+    if (specifier === "@chunk/shared")
+      return { Wn: ResumeNotReadyError, Zo: (error) => error instanceof Error ? error.message : String(error) };
+    if (specifier === "../turns/canonical-history") return {
+      mergedConversationTurns: (conversation) => conversation.turnHistory?.history?.entities ?? conversation.turns,
+      lastIncompleteTurn: (conversation) => [...conversation.turns].reverse().find((turn) => turn.turnId != null || !["completed", "failed"].includes(turn.status)) ?? null,
+      lastTurn: (conversation) => (conversation.turnHistory?.history?.entities ?? conversation.turns).at(-1) ?? null,
+    };
+    throw new Error(`unexpected require ${specifier}`);
+  },
   module,
   module.exports,
 );
@@ -70,9 +77,39 @@ await owner.compactThreadViaFollower(manager, "thread-4", {
 });
 equal(delegatedCalls, []);
 
+const executionState = owner.readThreadExecutionState({
+  originator: "user",
+  resumeState: "resumed",
+  latestModel: "gpt",
+  latestReasoningEffort: "high",
+  threadStartKind: "fork",
+  threadSource: "user",
+  turns: [],
+  turnHistory: { history: { entities: [{
+    turnId: "turn-5",
+    status: "inProgress",
+    error: { codexErrorInfo: "misalignmentPolicyViolation" },
+  }] } },
+}, {
+  requestTraceId: "trace-1",
+  requestedReasoningEffort: "xhigh",
+  params: {
+    model: "fallback-model",
+    collaborationMode: { settings: { model: "collab-model", reasoning_effort: "medium" } },
+    serviceTierForTurn: "fast",
+  },
+}, {});
+equal(executionState.activeTurnId, "turn-5");
+equal(executionState.inProgress, true);
+equal(executionState.hasMisalignmentPolicyViolation, true);
+equal(executionState.turnConfiguration, { model: "collab-model", reasoningEffort: "xhigh", serviceTier: "fast" });
+
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
-equal(main.includes('const { ny } = require("./main-app/files/open-file-watches.js")'), true);
+equal(main.includes('const { ny, ove, ry, iy } = require("./main-app/files/open-file-watches.js")'), true);
 equal(main.includes("async function ny({"), false);
 equal(main.includes("async function ave("), false);
+equal(main.includes("function ove("), false);
+equal(main.includes("function ry("), false);
+equal(main.includes("function iy("), false);
 
 console.log(`${assertions} main follower delegation owner assertions passed`);

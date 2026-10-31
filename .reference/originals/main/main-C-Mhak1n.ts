@@ -25,7 +25,7 @@ const { conversationFromThreadSummary: V_, cleanThreadTitle: Cv, truncateText: w
 const { me, Xt } = require("./main-app/misc/thread-errors.js");
 const { attachmentsFromInput: X_, normalizeImageGenerationItem: Z_, turnParamsFromReadResponse: $_, projectReadResponseTurns: ev, projectTurns: tv, projectItems: nv, ensureTurnFields: iv, registerThreadMetadata: av, activeAncestryIds: ov, isSubagentThread: sv, effectiveRuntimeStatus: cv, isDescendantOf: lv, parentThreadIdOf: uv, isSurfaceableThread: dv, environmentInputResult: fv, pendingInteractionKind: pv, pendingInteraction: mv, withThreadMode: Av, newConversationFromThread: Ov } = require("./main-app/threads/hydration.js");
 const { Yv, Xv, L_e, Zv, Qv } = require("./main-app/requests/item-synthesis.js");
-const { ny } = require("./main-app/files/open-file-watches.js");
+const { ny, ove, ry, iy } = require("./main-app/files/open-file-watches.js");
 const { AppServerManagerStreamState } = require("./main-app/threads/stream-roles.js");
 const { ThreadStore } = require("./main-app/threads/thread-store.js");
 const { PrewarmSlot, DetachedWindowPrewarmer, DetachedWindowManager, DetachedWindowService, ThreadHandoffLease, DeviceCheckCookieManager, CallIdClaimRegistry } = require("./main-app/window/detached-window-manager.js");
@@ -25352,48 +25352,6 @@ var Yge = AppServerManagerStreamState;
       return this.subscribers.get(e);
     }
   };
-function ove(e, t, n) {
-  return e == null
-    ? null
-    : {
-        originator: e.originator,
-        inProgress: iy(e),
-        activeTurnId: ry(e, n) ?? null,
-        hasMisalignmentPolicyViolation:
-          Ng(e)?.error?.codexErrorInfo === `misalignmentPolicyViolation`,
-        latestModel: e.latestModel,
-        latestReasoningEffort: e.latestReasoningEffort,
-        threadStartKind: e.threadStartKind,
-        threadSource: e.threadSource,
-        requestTraceId: t?.requestTraceId,
-        turnConfiguration:
-          t == null
-            ? void 0
-            : {
-                model: t.params.collaborationMode?.settings.model ?? t.params.model ?? null,
-                reasoningEffort:
-                  t.requestedReasoningEffort ??
-                  t.params.collaborationMode?.settings.reasoning_effort ??
-                  t.params.effort ??
-                  null,
-                serviceTier: t.params.serviceTierForTurn ?? t.params.serviceTier ?? null,
-              },
-      };
-}
-function ry(e, t) {
-  let n = e == null ? void 0 : (0, It.default)(kg(e, t), (e) => e.turnId != null);
-  return n?.status === `inProgress` ? (n.turnId ?? void 0) : void 0;
-}
-function iy(e) {
-  if (e.unconfirmedTurnSubmissions?.some((e) => e.terminal !== !0)) return !0;
-  let { resumeState: t, threadRuntimeStatus: n } = e,
-    r = kg(e);
-  return t === `needs_resume`
-    ? n?.type === `active`
-    : r.length === 0
-      ? t === `resuming`
-      : Fg({ turns: r })?.status === `inProgress`;
-}
 var ay = 5e3,
   sve = class {
     params;

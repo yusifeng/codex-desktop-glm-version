@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修复并接回 thread execution state projection：`files/open-file-watches.ts` 的 `ove/ry/iy` 现使用 canonical/legacy merged turns，恢复
+unconfirmed/resume/runtime-status 判定、最后 active turn、misalignment violation 与 per-turn model/effort/service-tier projection；AppServer
+manager 和 main consumers 共用该 owner，旧三函数删除，focused suite 扩至 18 条断言。
+
 修复并接回 follower delegation owner：`files/open-file-watches.ts` 的 `ny/ave` 现恢复 pending settings 等待、no-client owner recovery、
 workspace/collaboration resume inputs、owner-role gate、manual compaction register/rollback 与本地 compact fallback；修复 null follower result
 被 truthy wrapper 吞掉的实际缺陷。main 三个 `ny` consumers 接回，旧 `ny/ave` 删除，新增 11 条 focused 断言。

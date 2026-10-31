@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread execution state projection repair
+
+语义 `ove/ry/iy` 原先只看 legacy turns，且遗漏 misalignment policy violation 和 turn configuration。本轮改用 canonical-history owners，
+恢复旧 resume/runtime/unconfirmed 判定与 model/effort/service-tier precedence，将 main consumers 接回并删除旧定义；focused suite 覆盖
+canonical active turn 和完整 execution snapshot。
+
 ## 2026-10-31 follower delegation owner repair
 
 语义 `ave` 原先省略 settings wait、owner-role gate 与 local compact fallback，并把底层 null 包成 truthy `{result:null}`，导致 owner recovery
