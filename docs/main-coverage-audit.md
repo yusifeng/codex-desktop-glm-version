@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 Windows account owner wiring
+
+`src/main/main-app/platform/windows-account.ts` 已完整覆盖旧 `yO/bO/xO/SO/CO/wO/TO/EO/DO/OO/kO`。本轮以压缩名兼容别名
+接回默认浏览器注册表、workspace capabilities、system metrics 与 startup provider consumers，删除主 chunk 59 行重复 addon
+加载门面；focused suite 覆盖 platform fallback、admin/standard、diagnostics success/error 与所有关键 wiring。
+
 ## 2026-10-31 desktop log archive owner wiring
 
 `src/main/main-app/feedback/desktop-log-archive.ts` 已覆盖原 `kRe…TV`，但审计发现 Windows system diagnostics 仍为 null 占位；

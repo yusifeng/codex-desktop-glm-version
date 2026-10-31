@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 Windows account/native addon 门面：`platform/windows-account.ts` 现已替代主 chunk 旧 `yO…kO` 簇，并通过
+`kO/SO/CO/wO/TO/EO/DO` 兼容别名继续服务默认浏览器注册表、workspace ACL/network drive、startup process provider、
+system metrics 与 bootstrap consumers。addon 缓存/HKCU 校验/非 Windows fallback 和异常降级语义保持完整。
+
 接回 desktop log archive 完整管道：既有 `feedback/desktop-log-archive.ts` 原先唯一缺口是 Windows system diagnostics 的 null
 占位，现已接到 `platform/windows-account.ts` 的真实 addon snapshot。主 chunk 旧 `hV…JRe` 496 行诊断/日志枚举/tar+gzip/
 archive ledger 簇已删除，`URe/TV/wV` 三个真实 export/fetch consumer 通过兼容别名接回语义实现。

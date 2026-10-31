@@ -149,6 +149,7 @@ const { DebugService, createDemoTools } = require("./main-app/debug/export-logs.
 const { AvatarManager } = require("./main-app/avatar/pet-install.js");
 const { ComputerUseSettingsService, setCuaAppshotSoundEnabled: tje } = require("./main-app/computer-use/approvals.js");
 const { createDesktopLogArchive: URe, deleteDesktopLogArchive: TV, createFeedbackArchive: wV } = require("./main-app/feedback/desktop-log-archive.js");
+const { loadWindowsAccountAddon: kO, isAdministratorCapable: SO, getWindowsSystemDiagnostics: CO, supportsPersistentAcls: wO, isNetworkDrive: TO, readRegistryValue: EO, registerWindowsProcessListProvider: DO } = require("./main-app/platform/windows-account.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -54167,65 +54168,6 @@ function vO(e) {
   } catch {
     return !1;
   }
-}
-var yO = `HKCU\\`,
-  bO = (0, ee.createRequire)(__filename),
-  xO;
-function SO({ loadAddon: e = kO, platform: t = process.platform } = {}) {
-  if (t !== `win32`) return `unknown`;
-  try {
-    let t = e();
-    return t == null
-      ? `unknown`
-      : t.isCurrentAccountAdministratorCapable()
-        ? `administrator`
-        : `standard`;
-  } catch {
-    return `unknown`;
-  }
-}
-function CO({ loadAddon: e = kO, platform: t = process.platform } = {}) {
-  if (t !== `win32`) return null;
-  try {
-    return e()?.getSystemPerformanceSnapshot?.() ?? null;
-  } catch {
-    return null;
-  }
-}
-async function wO(e) {
-  if (process.platform !== `win32`) return !0;
-  try {
-    return (await kO()?.supportsPersistentAcls?.(e)) ?? !0;
-  } catch {
-    return !0;
-  }
-}
-function TO(e) {
-  return kO()?.isNetworkDrive?.(e) === !0;
-}
-function EO({ key: e, name: t, loadAddon: n = kO, platform: r = process.platform }) {
-  if (r !== `win32`) return null;
-  let i = OO(e);
-  return n()?.readCurrentUserRegistryStringValue?.(i, t) ?? null;
-}
-function DO({ loadAddon: e = kO, platform: t = process.platform } = {}) {
-  t === `win32` &&
-    n.in({
-      async listProcesses(t) {
-        return e()?.listProcesses?.(t) ?? [];
-      },
-    });
-}
-function OO(e) {
-  if (!e.startsWith(yO) || e.length === 5) throw Error(`Registry key must be under HKCU`);
-  return e.slice(5);
-}
-function kO() {
-  if (xO != null) return xO;
-  let e = o.t({ env: process.env, resourcesPath: process.resourcesPath });
-  if (e == null) return null;
-  let t = h.default.join(e, `native`, `windows-account.node`);
-  return (0, v.existsSync)(t) ? ((xO = bO(t)), xO) : null;
 }
 var AO = n._f((e) => typeof e == `string` && n.Bc(e)),
   jO = `HKCU\\Software\\Microsoft\\Windows\\Shell\\Associations\\UrlAssociations\\https\\UserChoice`,
