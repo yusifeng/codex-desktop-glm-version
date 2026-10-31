@@ -5075,3 +5075,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   missing-page/thread/attached debug projections；main 旧 `TXe/NX/EXe/PX` 已删除。
 - focused coverage 19 项，no-unwired gate 扩至 514 项；下一批处理 `zX/LXe..VXe` browser context-menu owner，保持其与
   navigation restore/media tracker 等后续状态边界分离。
+
+# 2026-11-01 browser context menu extraction
+
+- 新增并接回 `browser-sidebar/browser-context-menu.ts`，完整承接 annotation/image/password/link/edit/navigation/inspect 菜单与
+  snapshot comment policy；webview binding 的三个 consumer 使用同一 `zX/LXe` 语义实现。
+- main 旧 `zX/LXe/RXe/BX/zXe/BXe/VX/VXe` 已删除。focused coverage 24 项，no-unwired gate 扩至 524 项；下一批从
+  navigation restore 与 pending-navigation usage helpers 继续审计。

@@ -3125,3 +3125,10 @@ restore constants 已物理删除，共享 lifecycle debug emitters 保持独立
 attached guest event 的 session debug projection，保持 browserStorageId details、guest/owner/window ids 与有无 page 时的 page-key 语义。
 page persistence、webview binding 与 host lifecycle 三个 consumer 继续通过 `NX/EXe/TXe` 兼容别名使用同一实现；旧
 `TXe/NX/EXe/PX` 已物理删除。focused test 19 项，no-unwired gate 扩至 514 项。
+
+### 增量抽取：browser context menu
+
+新增 `browser-sidebar/browser-context-menu.ts`，接管 comment/quick-annotate、image attach、password manager、link 内外打开、
+copy/cut/paste、back/forward/reload/inspect 的菜单模板与销毁 guard，并导出 snapshot comment-eligibility policy 供 webview binding
+复用。主运行时保留 `zX/LXe` 兼容别名；旧 `zX/LXe/RXe/BX/zXe/BXe/VX/VXe` 已整带删除。focused test 24 项覆盖菜单组成、
+动作参数、password command、clipboard 与接线；no-unwired gate 扩至 524 项。

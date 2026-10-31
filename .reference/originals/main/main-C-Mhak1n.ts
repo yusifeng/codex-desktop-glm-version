@@ -479,6 +479,7 @@ const { createBrowserThreadStateRuntime } = require("./main-app/browser-sidebar/
 const { createBrowserDiagnosticsRuntime } = require("./main-app/browser-sidebar/browser-diagnostics-runtime.js");
 const { createIncompleteNavigationRuntime } = require("./main-app/browser-sidebar/incomplete-navigation-service.js");
 const { createBrowserLifecycleDebugEvents } = require("./main-app/browser-sidebar/browser-lifecycle-debug-events.js");
+const { createBrowserContextMenuRuntime } = require("./main-app/browser-sidebar/browser-context-menu.js");
 const {
   inspect: SVe,
   back: CVe,
@@ -43796,174 +43797,19 @@ var {
   createAsyncScope: a.en,
   createLogger: r.i,
 });
-function zX(e) {
-  return e.tabType === n.lu.WEB && e.commentModeDisabledReason == null;
-}
-function LXe({
-  canAttachImage: e,
-  canReload: t,
-  isAnnotationModeEnabled: r = !0,
-  isDefaultBrowser: i,
-  snapshot: o,
-  params: s,
-  webContents: c,
-  window: u,
-  onBack: d,
-  onAttachImage: f,
-  onComment: p,
-  onForward: m,
-  onInspect: h,
-  onOpenInBrowser: g,
-  onOpenExternal: _,
-  onReload: v,
-}) {
-  let y = a.hn(),
-    b = [];
-  (r &&
-    o != null &&
-    zX(o) &&
-    b.push(
-      {
-        label: y.formatMessage({ messageId: AVe, defaultMessage: `Quick annotate` }),
-        click: () => {
-          c.isDestroyed() || p({ x: s.x, y: s.y }, n.gu.QUICK, VX(s));
-        },
-      },
-      {
-        label: y.formatMessage({ messageId: kVe, defaultMessage: `Annotate` }),
-        click: () => {
-          c.isDestroyed() || p({ x: s.x, y: s.y }, n.gu.BATCH, VX(s));
-        },
-      },
-      { type: `separator` },
-    ),
-    e &&
-      hVe(s) &&
-      b.push(
-        {
-          label: y.formatMessage({ messageId: jVe, defaultMessage: `Attach image to chat` }),
-          click: () => {
-            c.isDestroyed() || f(s.srcURL);
-          },
-        },
-        { type: `separator` },
-      ));
-  let x = RXe(s, c);
-  x.length > 0 && b.push(...x, { type: `separator` });
-  let S = s.linkURL.length > 0;
-  if (S) {
-    let e = b.length,
-      t = MH(s.linkURL);
-    (t &&
-      b.push({
-        label: y.formatMessage({ messageId: EVe, defaultMessage: `Open link in new tab` }),
-        click: () => {
-          g(s.linkURL);
-        },
-      }),
-      (!i || !t) &&
-        We(s.linkURL) &&
-        b.push({
-          label: y.formatMessage({ messageId: DVe, defaultMessage: `Open in external browser` }),
-          click: () => {
-            _(s.linkURL);
-          },
-        }),
-      b.length > e && b.push({ type: `separator` }));
-  }
-  let C = BXe(s),
-    w = VX(s);
-  ((S || C || w) &&
-    (S &&
-      b.push({
-        label: y.formatMessage({ messageId: OVe, defaultMessage: `Copy link address` }),
-        click: () => {
-          l.clipboard.writeText(s.linkURL);
-        },
-      }),
-    C && b.push({ role: `cut`, enabled: s.editFlags.canCut }),
-    (C || w) && b.push({ role: `copy`, enabled: s.editFlags.canCopy }),
-    C && b.push({ role: `paste`, enabled: s.editFlags.canPaste }),
-    b.push({ type: `separator` })),
-    VXe(s) &&
-      b.push(
-        {
-          label: y.formatMessage({ messageId: CVe, defaultMessage: `Back` }),
-          enabled: c.canGoBack(),
-          click: () => {
-            c.isDestroyed() || d();
-          },
-        },
-        {
-          label: y.formatMessage({ messageId: wVe, defaultMessage: `Forward` }),
-          enabled: c.canGoForward(),
-          click: () => {
-            c.isDestroyed() || m();
-          },
-        },
-        {
-          label: y.formatMessage({ messageId: TVe, defaultMessage: `Reload` }),
-          enabled: t,
-          click: () => {
-            c.isDestroyed() || v();
-          },
-        },
-        { type: `separator` },
-      ),
-    b.push({
-      label: y.formatMessage({ messageId: SVe, defaultMessage: `Inspect` }),
-      click: () => {
-        c.isDestroyed() || h({ x: s.x, y: s.y });
-      },
-    }),
-    l.Menu.buildFromTemplate(b).popup({ window: u }));
-}
-function RXe(e, t) {
-  let n = [],
-    r = e.passwordManager;
-  return r == null
-    ? n
-    : (r.selectPassword != null &&
-        n.push({
-          label: r.selectPassword.label,
-          click: () => {
-            BX(t, `select-password`);
-          },
-        }),
-      r.suggestPassword != null &&
-        n.push({
-          label: r.suggestPassword.label,
-          click: () => {
-            BX(t, `suggest-password`);
-          },
-        }),
-      n);
-}
-function BX(e, t) {
-  !e.isDestroyed() && zXe(e) && e._executePasswordManagerContextMenuCommand(t);
-}
-function zXe(e) {
-  return (
-    `_executePasswordManagerContextMenuCommand` in e &&
-    typeof e._executePasswordManagerContextMenuCommand == `function`
-  );
-}
-function BXe(e) {
-  return e.isEditable;
-}
-function VX(e) {
-  return !e.formControlType.endsWith(`password`) && e.selectionText.trim().length > 0;
-}
-function VXe(e) {
-  return (
-    !e.isEditable &&
-    e.formControlType === `none` &&
-    e.mediaType === `none` &&
-    e.linkURL.length === 0 &&
-    e.srcURL.length === 0 &&
-    e.selectionText.length === 0
-  );
-}
+var {
+  canCommentOnSnapshot: zX,
+  showBrowserContextMenu: LXe,
+} = createBrowserContextMenuRuntime({
+  canOpenExternalUrl: We,
+  clipboard: l.clipboard,
+  getIntl: a.hn,
+  isHttpUrl: MH,
+  isImageContext: hVe,
+  menu: l.Menu,
+  messages: browserSidebarContextMenuMessageIds,
+  shared: n,
+});
 var UX = r.i(`browser-sidebar-manager`);
 function GXe(e, t, r, i, a) {
   let o = n.dl(i);

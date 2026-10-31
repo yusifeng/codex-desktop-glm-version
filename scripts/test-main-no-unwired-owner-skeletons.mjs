@@ -73,6 +73,7 @@ const realOwners = [
   ["src/main/main-app/browser-sidebar/browser-diagnostics-runtime.ts", "createBrowserDiagnosticsRuntime"],
   ["src/main/main-app/browser-sidebar/incomplete-navigation-service.ts", "createIncompleteNavigationRuntime"],
   ["src/main/main-app/browser-sidebar/browser-lifecycle-debug-events.ts", "createBrowserLifecycleDebugEvents"],
+  ["src/main/main-app/browser-sidebar/browser-context-menu.ts", "createBrowserContextMenuRuntime"],
   ["src/main/main-app/browser-sidebar/browser-host-policy-controller.ts", "createBrowserHostPolicyControllerClass"],
   ["src/main/main-app/browser-sidebar/browser-host-service.ts", "createBrowserHostServiceClass"],
   ["src/main/main-app/window/browser-window-rpc-services.ts", "createBrowserProfileImportServiceClass"],
@@ -142,6 +143,7 @@ assert.equal(main.includes('require("./main-app/browser-sidebar/browser-thread-s
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-diagnostics-runtime.js")'), true, "browser diagnostics runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/incomplete-navigation-service.js")'), true, "incomplete navigation runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-lifecycle-debug-events.js")'), true, "browser lifecycle debug events are wired");
+assert.equal(main.includes('require("./main-app/browser-sidebar/browser-context-menu.js")'), true, "browser context menu is wired");
 for (const oldOwner of ["function lX(", "function uX(", "function $Ye(", "function dX(", "function eXe(", "function fX(", "function tXe(", "function nXe(", "function pX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser tab lifecycle owner must be removed`);
 }
@@ -162,6 +164,9 @@ for (const oldOwner of ["IXe = class", "function RX(", "function UXe(", "functio
 }
 for (const oldOwner of ["function TXe(", "function NX(", "function EXe(", "function PX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated lifecycle debug emitter must be removed`);
+}
+for (const oldOwner of ["function zX(", "function LXe(", "function RXe(", "function BX(", "function zXe(", "function BXe(", "function VX(", "function VXe("]) {
+  assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser context menu owner must be removed`);
 }
 for (const oldOwner of ["function cXe(", "function bX(", "async function lXe(", "function uXe(", "function xX(", "function SX(", "function dXe(", "function fXe(", "function CX(", "function wX(", "function TX(", "function EX(", "function pXe(", "function DX(", "function mXe(", "function hXe(", "function OX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated Browser Use route adapter must be removed`);
@@ -453,4 +458,4 @@ assert.equal(main.includes("function _Oe("), false, "generated remote project co
 assert.equal(main.includes("function vOe("), false, "generated project order comparator must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("514 main unwired-owner skeleton assertions passed");
+console.log("524 main unwired-owner skeleton assertions passed");
