@@ -149,6 +149,7 @@ const { createPlatformShutdownRuntime } = require("./main-app/startup/platform-s
 const { registerMainIpcRouter } = require("./main-app/app-shell/main-ipc-router.js");
 const { createQuitRuntime } = require("./main-app/startup/quit-runtime.js");
 const { ApplicationMenuManager, normalizeMenuAccelerator } = require("./main-app/app-shell/application-menu-runtime.js");
+const { resolveDeepLinkThreadHost } = require("./main-app/deep-links/thread-host-resolver.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -144182,7 +144183,7 @@ function _it({
         }
         let n =
           t.kind === `localConversation`
-            ? vit({
+            ? resolveDeepLinkThreadHost({
                 threadId: t.conversationId,
                 originHostId: t.hostId,
                 catalog: d,
@@ -144261,13 +144262,6 @@ function _it({
       kr(e) && A();
     },
   };
-}
-function vit({ threadId: e, originHostId: t, catalog: n, hasAppServerConnection: r }) {
-  let i = new Set(n?.readStatus().hosts.map(({ hostId: e }) => e));
-  for (let a of new Set([t, n?.readThreadHostId(e), ...i]))
-    if (a != null && i.has(a) && r(a) && n?.readEntries([{ hostId: a, threadId: e }]).length)
-      return a;
-  return t ?? `local`;
 }
 var yit = createQuitStateClass(),
   { createStartupProgressWindow: x7, createDelayedStartupProgressWindow: Oit } =

@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 deep-link thread-host resolver
+
+原 `vit` 已迁入 `src/main/main-app/deep-links/thread-host-resolver.ts`。新策略保留 origin/indexed/catalog host 优先级、
+catalog membership、app-server connection availability、thread ownership lookup，以及 origin/local fallback；真实
+local-conversation deep-link consumer 已接回，旧 function 已删除。
+
 ## 2026-10-31 application-menu support runtime
 
 原 `v7/cit` 已迁入 `src/main/main-app/app-shell/application-menu-runtime.ts`。新模块保留跨平台 Electron accelerator

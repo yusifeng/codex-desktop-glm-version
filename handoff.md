@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `vit` deep-link thread-host resolver 迁入 `deep-links/thread-host-resolver.ts`；origin/indexed/catalog host
+优先级、catalog membership、connection availability、thread ownership lookup 与 origin/local fallback 均由新策略持有。
+真实 local-conversation deep-link consumer 已接回，旧 function 已删除。
+
 随后将 `v7/cit` application-menu support owner 迁入 `app-shell/application-menu-runtime.ts`；跨平台 accelerator alias
 规范化/排序/collision comparison，以及 focus/locale/browser-state/feature consumers 共用的稳定 refresh manager 均由新模块
 持有。真实 `sit/_it` consumers 已接回，旧 function/class 已删除；不完整的既有 `app-menu.ts` 骨架仍未接入。
