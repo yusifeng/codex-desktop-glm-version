@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Hrt/Urt/Wrt/Grt/Krt/qrt/Jrt/u7/d7/f7/Yrt/Xrt/Zrt/p7/Qrt/$rt/eit/tit/m7/h7/nit/rit`
+About-window owner 迁入 `app-shell/about-dialog.ts`；singleton focus、跨平台/主题图标、localized version/release copy、
+HTML escaping/CSP、hardened BrowserWindow、navigation denial、content sizing、parent/work-area placement 与 failure cleanup
+均由新 owner 持有。菜单复用的 `c7/l7` 保留，真实 About action 已接回，其余旧 cluster 已删除。
+
 随后将 `Rst/zst/Bst` desktop open-path owner 迁入 `files/desktop-open-path-handler.ts`；early queue 接管、feature-ready
 调度、single-flight/递归 drain、stat/classification、directory project creation/selection/broadcast/navigation、projectless
 file/skill projection、browser document routing、logging、error reporting 与 cleanup 均由新 owner 持有。真实 startup consumer

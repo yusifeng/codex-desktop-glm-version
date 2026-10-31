@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 About window owner
+
+原 `Hrt/Urt/Wrt/Grt/Krt/qrt/Jrt/u7/d7/f7/Yrt/Xrt/Zrt/p7/Qrt/$rt/eit/tit/m7/h7/nit/rit` 已迁入
+`src/main/main-app/app-shell/about-dialog.ts`。新 owner 保留 singleton focus/restore、macOS/Windows/Linux 与主题图标、
+localized version/release 文案、HTML escaping/CSP、BrowserWindow hardening、navigation denial、dynamic content sizing、
+parent/work-area placement 与 load failure cleanup；菜单仍复用的 `c7/l7` 留在 composition，真实 About action 已接回。
+
 ## 2026-10-31 desktop open-path owner
 
 原 `Rst/zst/Bst` 已迁入 `src/main/main-app/files/desktop-open-path-handler.ts`。新 owner 保留 macOS early queue
