@@ -127,7 +127,22 @@ const { streamRolesEqual: Jhe } = require("./main-app/threads/stream-roles.js");
 const {
   threadReferenceCapabilityKey: Oh,
 } = require("./main-app/threads/reference-capability.js");
-const { DesktopFetchService } = require("./main-app/api/desktop-fetch.js");
+const {
+  DesktopFetchService,
+  IntegrityStateStore,
+  readAccountInfoFromToken,
+  requestProfileSchema,
+  publishChatGptProfileSchema,
+  accountsCheckSchema,
+  workspaceSettingsSchema,
+  accountInputSourceSchema,
+  AuthenticatedDesktopFetchError,
+  isSameAuthIdentity,
+  UnsubscribeHandle,
+  ComposerItemsBridge,
+  PrimaryWindowActionsBridge,
+} = require("./main-app/api/desktop-fetch.js");
+const { createAccountInputsOwnerClass } = require("./main-app/account/account-inputs-owner.js");
 const { AppServerTransportSshWebsocket } = require("./main-app/app-server/transports.js");
 const { QueuedFollowUpsCoordinator } = require("./main-app/conversation/queued-follow-ups.js");
 const { AppServerConversationManager } = require("./main-app/conversation/app-server-manager.js");
@@ -309,7 +324,17 @@ const { AppEntryAttributionTracker: Foe } = require("./main-app/startup/app-entr
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
 const { BrowserSettingsSync, BrowserUseOriginState: XOe, RemoteBrowserSettings: uke, BrowserConfigFile: pke } = require("./main-app/browser-use/origin-state.js");
-const { PublishedStatsig } = require("./main-app/account/statsig-adapter.js");
+const {
+  PublishedStatsig,
+  StableIdStore,
+  getThreadSummariesDb,
+  ThreadTurnSummariesStore,
+} = require("./main-app/account/statsig-adapter.js");
+const {
+  UpdateCapabilityService,
+  AvatarOverlayService,
+  AvatarOverlayScrollHostService,
+} = require("./main-app/avatar-overlay/scroll-host.js");
 const { ConversationalOnboardingService } = require("./main-app/onboarding/conversational-onboarding.js");
 const { ArtifactSessionHostLifecycle } = require("./main-app/artifact-session/host-lifecycle.js");
 const { DebugService, createDemoTools } = require("./main-app/debug/export-logs.js");
@@ -3642,6 +3667,23 @@ var pne = class {
   };
 var J = `local`,
   ls = { id: J, display_name: `Local`, kind: `local` };
+var AccountInputsOwner = createAccountInputsOwnerClass({
+  RpcHandlerBase: n.Uf,
+  DisposableBag: n.Wr,
+  QueryClient: Nee,
+  UnsubscribeHandle,
+  stringSchema: n.Of(),
+  requestProfileSchema,
+  publishChatGptProfileSchema,
+  accountsCheckSchema,
+  workspaceSettingsSchema,
+  sourceSchema: accountInputSourceSchema,
+  localHostId: J,
+  raceWithAbortSignal: n.kc,
+  readAccountInfo: readAccountInfoFromToken,
+  identitiesEqual: isSameAuthIdentity,
+  AuthenticatedDesktopFetchError,
+});
 function us(e, t) {
   let r = zn(e, t);
   if (t) {
@@ -22608,746 +22650,6 @@ function xTe(e) {
 function tT(e, t) {
   return e === t || (0, Yw._DJB2)(t) === e || (0, Yw._DJB2)(e) === t;
 }
-var STe = PublishedStatsig;
-var iT = n.Of().min(1).max(256),
-  CTe = class extends n.Uf {
-    storage;
-    pendingImport = null;
-    constructor(e) {
-      (super(), (this.storage = e));
-    }
-    async getStableId() {
-      if (this.pendingImport != null) return this.pendingImport;
-      let e = iT.safeParse(await this.storage.read());
-      return e.success ? e.data : null;
-    }
-    async importLegacyStableId(e) {
-      let t = iT.parse(e);
-      if (this.pendingImport != null) return this.pendingImport;
-      let n = this.importOnce(t);
-      this.pendingImport = n;
-      try {
-        return await n;
-      } finally {
-        this.pendingImport === n && (this.pendingImport = null);
-      }
-    }
-    async importOnce(e) {
-      let t = iT.safeParse(await this.storage.read());
-      return t.success ? t.data : (await this.storage.write(e), e);
-    }
-  },
-  aT = 2,
-  oT = null;
-function wTe() {
-  return process.versions.electron
-    ? ((oT ??= n.ci(n.oi({ databaseFileName: ETe() }), TTe)), oT)
-    : null;
-}
-function TTe(e) {
-  let t = e.prepare(`PRAGMA user_version`).get()?.user_version ?? 0;
-  if (t > aT) throw Error(`Task summary schema ${t} is newer than supported`);
-  if (t !== aT) {
-    e.prepare(`BEGIN`).run();
-    try {
-      (t === 0
-        ? e.exec(`
-        CREATE TABLE thread_turn_summaries (
-          principal_key TEXT NOT NULL CHECK (length(principal_key) > 0),
-          host_key TEXT NOT NULL CHECK (length(host_key) > 0),
-          thread_id TEXT NOT NULL CHECK (length(thread_id) > 0),
-          summary TEXT NOT NULL CHECK (length(summary) BETWEEN 1 AND 280),
-          compact_summary TEXT CHECK (
-            compact_summary IS NULL OR length(compact_summary) BETWEEN 1 AND 60
-          ),
-          compact_summary_turn_key TEXT CHECK (
-            compact_summary_turn_key IS NULL OR
-            length(compact_summary_turn_key) > 0
-          ),
-          revision INTEGER NOT NULL CHECK (revision >= 0),
-          updated_at INTEGER NOT NULL,
-          PRIMARY KEY (principal_key, host_key, thread_id)
-        );
-      `)
-        : e.exec(`
-        ALTER TABLE thread_turn_summaries
-        ADD COLUMN compact_summary TEXT CHECK (
-          compact_summary IS NULL OR length(compact_summary) BETWEEN 1 AND 60
-        );
-        ALTER TABLE thread_turn_summaries
-        ADD COLUMN compact_summary_turn_key TEXT CHECK (
-          compact_summary_turn_key IS NULL OR
-          length(compact_summary_turn_key) > 0
-        );
-      `),
-        e.prepare(`PRAGMA user_version = ${aT}`).run(),
-        e.prepare(`COMMIT`).run());
-    } catch (t) {
-      throw (e.prepare(`ROLLBACK`).run(), t);
-    }
-  }
-}
-function ETe() {
-  let e = process.env.BUILD_FLAVOR ?? (process.env.NODE_ENV === `production` ? `prod` : `dev`);
-  return e === `prod` ? `codex-thread-summaries.db` : `codex-thread-summaries-${e}.db`;
-}
-var DTe = class {
-    db;
-    constructor(e) {
-      this.db = e;
-    }
-    readMany(e, t, n) {
-      if (n.length === 0) return [];
-      let r = n.map(() => `?`).join(`, `);
-      return this.db
-        .prepare(
-          `SELECT thread_id, summary, compact_summary, compact_summary_turn_key,
-                revision
-         FROM thread_turn_summaries
-         WHERE principal_key = ? AND host_key = ?
-           AND thread_id IN (${r})`,
-        )
-        .all(e, t, ...n)
-        .map(
-          ({
-            thread_id: e,
-            summary: t,
-            compact_summary: n,
-            compact_summary_turn_key: r,
-            revision: i,
-          }) => ({
-            threadId: e,
-            summary: t,
-            ...(n == null ? {} : { compactSummary: n }),
-            ...(r == null ? {} : { compactSummaryTurnKey: r }),
-            revision: i,
-          }),
-        );
-    }
-    set(e, t, n, r, i, a, o) {
-      if (r.length === 0 || r.length > 280)
-        throw Error(`Task summaries must contain between 1 and 280 characters`);
-      if (a != null && (a.length === 0 || a.length > 60))
-        throw Error(`Compact task summaries must contain between 1 and 60 characters`);
-      if ((a == null) != (o == null) || o?.length === 0)
-        throw Error(`Compact task summaries must include their completed turn key`);
-      if (!Number.isSafeInteger(i) || i < 0)
-        throw Error(`Task summary revisions must be non-negative safe integers`);
-      return (
-        this.db
-          .prepare(
-            `INSERT INTO thread_turn_summaries (
-           principal_key, host_key, thread_id, summary, compact_summary,
-           compact_summary_turn_key, revision, updated_at
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-         ON CONFLICT(principal_key, host_key, thread_id) DO UPDATE SET
-           summary = excluded.summary,
-           compact_summary = excluded.compact_summary,
-           compact_summary_turn_key = excluded.compact_summary_turn_key,
-           revision = excluded.revision,
-           updated_at = excluded.updated_at
-         WHERE excluded.revision > thread_turn_summaries.revision`,
-          )
-          .run(e, t, n, r, a ?? null, o ?? null, i, Date.now()).changes === 1
-      );
-    }
-    delete(e, t, n) {
-      this.db
-        .prepare(
-          `DELETE FROM thread_turn_summaries
-         WHERE principal_key = ? AND host_key = ? AND thread_id = ?`,
-        )
-        .run(e, t, n);
-    }
-  },
-  sT = n.vf(`kind`, [
-    n.wf({ kind: n.bf(`codex`), language: n.Of() }),
-    n.wf({
-      kind: n.bf(`chatgpt-native`),
-      language: n.Of(),
-      deviceId: n.Of().min(1),
-      accountId: n.Of().optional(),
-    }),
-    n.wf({
-      kind: n.bf(`chatgpt-browser`),
-      language: n.Of(),
-      deviceId: n.Of().min(1),
-      accountId: n.Of().optional(),
-      userAgent: n.Of(),
-      userAgentClientHints: n.Of(),
-      platformClientHint: n.Of(),
-    }),
-  ]),
-  OTe = n.xf({
-    beta_settings: n.Ef(n.Of(), n.gf()),
-    beta_settings_str: n.Ef(n.Of(), n.Of()).optional(),
-    permissions: n.hf(n.Of()).nullable().optional(),
-    admin_work_mode_enabled: n.gf().optional(),
-    admin_work_local_enabled: n.gf().optional(),
-    desktop_app_beta_policy: n
-      .df([`blocked`, `optional_default_off`, `optional_default_on`, `required`])
-      .optional(),
-    allow_third_party_gpts: n.df([`allow_all`, `allow_none`, `allow_specific`]).optional(),
-    usage_limit_increase_request: n
-      .vf(`kind`, [
-        n.xf({ kind: n.bf(`openai_native`) }),
-        n.xf({ kind: n.bf(`disabled`) }),
-        n.xf({
-          kind: n.bf(`custom`),
-          instructions: n.Of().nullable().optional(),
-          request_url: n.Of().nullable().optional(),
-        }),
-      ])
-      .nullable()
-      .optional(),
-    member_profiles_enabled: n.gf().optional(),
-  }),
-  kTe = n.jf([sT.options[1], sT.options[2]]),
-  ATe = n.wf({ accountId: n.Of().min(1), userId: n.Of().min(1), profile: kTe }),
-  jTe = r.i(`electron-fetch-handler`);
-async function cT(e) {
-  let t = !1;
-  try {
-    let n = await e.getConnection(J).getAuthToken({ refreshToken: !1 });
-    if (!n)
-      return {
-        accountId: null,
-        userId: null,
-        authenticatedUserId: null,
-        plan: null,
-        email: null,
-        computeResidency: null,
-        hasChatGptToken: t,
-      };
-    t = !0;
-    let [, r] = n.split(`.`);
-    if (!r) throw Error(`Missing token payload`);
-    let i = JSON.parse(Buffer.from(r, `base64url`).toString(`utf8`)),
-      a = i[`https://api.openai.com/auth`],
-      o = i[`https://api.openai.com/profile`],
-      s = a && typeof a == `object` && a ? a.chatgpt_account_id : null,
-      c = a && typeof a == `object` && a ? a.chatgpt_user_id : null,
-      l = a && typeof a == `object` && `user_id` in a ? (a.user_id ?? c) : c,
-      u = a && typeof a == `object` && a ? a.chatgpt_plan_type : null,
-      d = a && typeof a == `object` && a ? a.chatgpt_compute_residency : null,
-      f = o && typeof o == `object` && o ? o.email : null;
-    if (typeof s == `string` && typeof c == `string`)
-      return {
-        accountId: s,
-        userId: c,
-        authenticatedUserId: typeof l == `string` && l.length > 0 ? l : null,
-        plan: typeof u == `string` ? u : null,
-        email: typeof f == `string` ? f : null,
-        computeResidency: typeof d == `string` ? d : null,
-        hasChatGptToken: t,
-      };
-  } catch (e) {
-    jTe().error(`Unable to extract account id and plan from auth token`, {
-      safe: {},
-      sensitive: { error: e },
-    });
-  }
-  return {
-    accountId: null,
-    userId: null,
-    authenticatedUserId: null,
-    plan: null,
-    email: null,
-    computeResidency: null,
-    hasChatGptToken: t,
-  };
-}
-var lT = class extends Error {
-  status;
-  cause;
-  errorCode;
-  constructor(e, t, n, r) {
-    (super(e), (this.status = t), (this.cause = n), (this.errorCode = r));
-  }
-};
-function MTe(e, { inferAuth: t = !1 } = {}) {
-  let r = n.Gs(e),
-    i = n.Ys(e),
-    a = (r || t) && !n.Zs(e, `authorization`);
-  return {
-    attachAuth: a,
-    expectedAccountId: i,
-    tokenSource: a ? `pending` : `not-required`,
-    token: null,
-  };
-}
-async function NTe({
-  appServerClient: e,
-  errorStatus: t,
-  failureMessage: n,
-  refreshToken: r,
-  state: i,
-}) {
-  if (!i.attachAuth) return i;
-  if (!r) {
-    let t = e.getCachedAuthToken?.();
-    if (t !== void 0) return { ...i, tokenSource: `cached`, token: t };
-  }
-  try {
-    let t = await e.getAuthToken({ refreshToken: r });
-    return { ...i, tokenSource: r ? `refreshed` : `loaded`, token: t };
-  } catch (e) {
-    throw new lT(n, t, e);
-  }
-}
-function PTe({ desktopOriginator: e, headers: t, state: n }) {
-  if (n.attachAuth && n.token != null) {
-    if (n.expectedAccountId != null && a.yt(n.token) !== n.expectedAccountId)
-      throw new lT(
-        `The authenticated account changed before the request could be sent.`,
-        409,
-        null,
-        `account_changed`,
-      );
-    a.mt(t, n.token, { desktopOriginator: e, includeSurfaceHeaders: !1 });
-  }
-}
-function FTe(e, t) {
-  return e.attachAuth && e.token != null && t.status === 401;
-}
-var uT = `X-OAI-IS`,
-  ITe = `X-OAI-IS-Update`,
-  LTe = /^ois1\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
-function dT(e) {
-  return typeof e != `string` || e.length === 0 || e.length > 2048 || e.trim() !== e
-    ? !1
-    : LTe.test(e);
-}
-function RTe(e) {
-  let t = e.get(ITe);
-  return dT(t) ? t : null;
-}
-function zTe({ currentState: e, expectedState: t, nextState: n }) {
-  return dT(n) ? (dT(e) ? e : null) === t : !1;
-}
-var BTe = class {
-    globalState;
-    constructor(e) {
-      this.globalState = e;
-    }
-    getRequestState() {
-      let e = this.globalState.get(a.U);
-      return dT(e) ? e : null;
-    }
-    clear() {
-      this.globalState.delete(a.U);
-    }
-    storeResponseUpdate(e, t) {
-      let n = RTe(e);
-      if (!dT(n)) return !1;
-      let r = !1;
-      return (
-        this.globalState.update(a.U, (e) =>
-          zTe({ currentState: e, expectedState: t, nextState: n }) ? ((r = !0), n) : (e ?? void 0),
-        ),
-        r
-      );
-    }
-  },
-  VTe = new Set([
-    `accounts`,
-    `backend-api`,
-    `by-repo`,
-    `conversation`,
-    `environments`,
-    `account`,
-    `announcement`,
-    `data-controls`,
-    `first-run`,
-    `general-settings`,
-    `git-settings`,
-    `local-environments`,
-    `mcp-settings`,
-    `open-source-licenses`,
-    `personalization`,
-    `plan-summary`,
-    `select-workspace`,
-    `settings`,
-    `usage-analytics`,
-    `worktrees`,
-  ]);
-function fT(e) {
-  if (!URL.canParse(e)) return;
-  let t = new URL(e);
-  return t.protocol !== `http:` && t.protocol !== `https:`
-    ? t.protocol
-    : `${t.hostname.endsWith(`.chatgpt-staging.com`) ? `${t.protocol}//chatgpt-staging.com` : t.origin}/${HTe(
-        t.pathname,
-        `:param`,
-      )
-        .split(`/`)
-        .filter((e) => e.length > 0)
-        .map((e) => {
-          let t = e;
-          try {
-            t = decodeURIComponent(e);
-          } catch {}
-          let n = t.toLowerCase();
-          return n.length <= 6 || VTe.has(n) ? n : `:param`;
-        })
-        .join(`/`)}`;
-}
-function HTe(e, t) {
-  return e.replace(/(\/ws\/user\/)[^/?#\s"'<>`]+/gi, `$1${t}`);
-}
-function pT(e, t) {
-  return `${e} ${fT(t) ?? `<invalid-url>`}`;
-}
-var mT = r.i(`electron-fetch-wrapper`);
-function UTe(e) {
-  let t = new URL(e);
-  return t.searchParams.get(`include_checkpoint_cdn`) === `true`
-    ? /^\/(?:backend-api|api)\/pages$/u.test(t.pathname) ||
-        /^\/(?:backend-api|api)\/spaces\/v2$/u.test(t.pathname) ||
-        /^\/(?:backend-api|api)\/spaces\/[A-Za-z0-9._~-]{1,200}\/pages$/u.test(t.pathname)
-    : !1;
-}
-var hT = class extends Error {
-    status;
-    errorCode;
-    constructor(e, t) {
-      (super(`Authenticated desktop fetch failed (${e})`), (this.status = e), (this.errorCode = t));
-    }
-  },
-  WTe = class extends Error {
-    status;
-    constructor(e) {
-      (super(`File download failed with status ${e}`), (this.status = e));
-    }
-  },
-  GTe = `vscode://codex/`,
-  KTe = `/codex/dictation-stream-connect-info`,
-  qTe = `chatgpt-dictation`,
-  JTe = `codex-desktop`,
-  YTe = `openai-bearer.`,
-  XTe = 12e4,
-  ZTe = DesktopFetchService;
-function gT(e) {
-  return Math.round(performance.now() - e);
-}
-function QTe(e) {
-  let t = {};
-  return (
-    e.headers.forEach((e, n) => {
-      t[n] = e;
-    }),
-    t
-  );
-}
-function _T(e) {
-  if (typeof e == `object` && e && `errorCode` in e && typeof e.errorCode == `string`)
-    return e.errorCode;
-}
-var $Te = n.wf({
-    accounts: n
-      .hf(
-        n.wf({
-          id: n.Of(),
-          account_user_id: n.Of(),
-          account_user_role: n.df([
-            `account-owner`,
-            `account-admin`,
-            `analytics-viewer`,
-            `standard-user`,
-          ]),
-          structure: n.Of(),
-          plan_type: n.Of(),
-          is_zdr: n.gf(),
-          is_openai_internal: n.gf(),
-          account_residency_region: n.Of().optional(),
-          can_access_with_session: n.gf().optional(),
-          enable_account_switching: n.gf().optional(),
-          is_deactivated: n.gf().optional(),
-          is_fedramp_compliant_workspace: n.gf().optional(),
-          workspace_backend_origin: n
-            .df([`NO_CONSTRAINT`, `https://gov.chatgpt.com`])
-            .nullable()
-            .optional(),
-          account_routing_override: n.df([`NO_CONSTRAINT`, `us`, `us_cr`]).nullable().optional(),
-          sso_connection_name: n.Of().nullable().optional(),
-          name: n.Of().nullable().optional(),
-          profile_picture_url: n.Of().nullable().optional(),
-        }),
-      )
-      .optional(),
-    default_account_id: n.Of().nullable().optional(),
-    account_ordering: n.hf(n.Of()).optional(),
-  }),
-  vT = n.df([`account-info`, `accounts-check`, `workspace-settings`]),
-  yT = 1e4,
-  eEe = class extends n.Uf {
-    #e = new Nee({
-      defaultOptions: { queries: { retry: !1, gcTime: 6e4, structuralSharing: !1 } },
-    });
-    #t = new n.Wr();
-    #n = new Set();
-    #r = new n.Wr();
-    #i = new AbortController();
-    #a = !1;
-    #o = null;
-    #s;
-    #c;
-    #l;
-    #u;
-    constructor(e, t, r, i) {
-      (super(),
-        (this.#s = e),
-        (this.#c = t),
-        (this.#l = r),
-        (this.#u = i),
-        this.#t.add(
-          e.subscribe(({ hostId: e, type: t, connection: r }) => {
-            e === `local` &&
-              (this.#r.dispose(),
-              (this.#r = new n.Wr()),
-              this.#f(),
-              t === `added` &&
-                (this.#r.add(
-                  r.registerInternalAuthenticatedPrincipalChangeHandler(() => this.#f()),
-                ),
-                this.#r.add(
-                  r.registerInternalNotificationHandler((e) => {
-                    e.method === `account/updated` && this.#f();
-                  }),
-                ),
-                this.#r.add(r.registerInternalConnectionStateHandler(() => this.#f()))));
-          }),
-        ));
-    }
-    readAccountInfo(e = !1) {
-      return this.#d([`account-info`], 5e3, e, () => cT(this.#s));
-    }
-    async publishChatGptRequestProfile(e) {
-      let t = ATe.parse(e),
-        r = this.#i,
-        i = this.#s.getMaybeConnection(J);
-      if (this.#a || i !== this.#c) return !1;
-      let a;
-      try {
-        a = await n.kc(this.#l(J), AbortSignal.any([r.signal, AbortSignal.timeout(yT)]));
-      } catch (e) {
-        if (r.signal.aborted) return !1;
-        throw e;
-      }
-      return this.#a ||
-        r.signal.aborted ||
-        this.#s.getMaybeConnection(`local`) !== i ||
-        a?.identity.kind !== `chatgpt` ||
-        a.identity.accountId !== t.accountId ||
-        a.identity.userId !== t.userId
-        ? !1
-        : ((this.#o = { identity: a.identity, profile: t.profile }), !0);
-    }
-    getChatGptReadInputs = (e) => {
-      let t = this.#o;
-      return !this.#a &&
-        t != null &&
-        this.#s.getMaybeConnection(`local`) === this.#c &&
-        W(t.identity, e)
-        ? { connection: this.#c, profile: t.profile, signal: this.#i.signal }
-        : null;
-    };
-    readAccounts(e, t = !1) {
-      let r = n.Of().parse(e);
-      return this.#d([`accounts-check`, r], 6e4, t, async (e) =>
-        $Te.parse(
-          await this.#u(`/wham/accounts/check`, {
-            signal: e,
-            requestProfile: { kind: `codex`, language: r },
-          }),
-        ),
-      );
-    }
-    readWorkspaceSettings(e, t = !1) {
-      let r = n.Of().parse(e.accountId),
-        i = sT.parse(e.profile);
-      return this.#d([`workspace-settings`, r, i], t ? 0 : 6e4, !1, async (e) =>
-        OTe.parse(
-          await this.#u(`/accounts/${encodeURIComponent(r)}/settings`, {
-            signal: e,
-            requestProfile: i,
-          }),
-        ),
-      );
-    }
-    async invalidateWorkspaceSettings(e) {
-      if (this.#a) return;
-      let t = [`workspace-settings`, n.Of().parse(e)];
-      (await Promise.all([
-        this.#e.cancelQueries({ queryKey: t }),
-        this.#e.invalidateQueries({ queryKey: t }),
-      ]),
-        this.#p({ type: `query`, source: `workspace-settings`, accountId: e }));
-    }
-    async invalidate(e) {
-      if (this.#a) return;
-      let t = [vT.parse(e)];
-      (await Promise.all([
-        this.#e.cancelQueries({ queryKey: t }),
-        this.#e.invalidateQueries({ queryKey: t }),
-      ]),
-        this.#p(
-          e === `workspace-settings`
-            ? { type: `query`, source: e, accountId: void 0 }
-            : { type: `query`, source: e },
-        ));
-    }
-    async subscribe(e) {
-      if (this.#a) throw Error(`Account input owner disposed`);
-      let t = e.dup();
-      this.#n.add(t);
-      let n = new tEe(() => {
-        (this.#n.delete(t), t[Symbol.dispose]());
-      });
-      return (t.onRpcBroken(() => n.unsubscribe()), n);
-    }
-    invalidateQueryCache = (e) => {
-      if (e[0] === `accounts` && e[1] === `settings` && e.length === 3) {
-        let t = n.Of().safeParse(e[2]);
-        t.success && this.invalidateWorkspaceSettings(t.data);
-        return;
-      }
-      for (let t of vT.options) {
-        let n = {
-          "account-info": [`vscode`, `account-info`],
-          "accounts-check": [`accounts`, `check`],
-          "workspace-settings": [`accounts`, `settings`],
-        }[t];
-        e.length <= n.length && e.every((e, t) => e === n[t]) && this.invalidate(t);
-      }
-    };
-    dispose = () => {
-      ((this.#a = !0), this.#t.dispose(), this.#r.dispose(), this.#f());
-      for (let e of this.#n) e[Symbol.dispose]();
-      this.#n.clear();
-    };
-    async #d(e, t, r, i) {
-      if (this.#a) return { status: `unavailable`, reason: `retired` };
-      let a = this.#s.getMaybeConnection(J);
-      if (a == null || a !== this.#c) return { status: `unavailable`, reason: `connection` };
-      let o = this.#i,
-        s = AbortSignal.any([o.signal, AbortSignal.timeout(yT)]),
-        c = () => !this.#a && !o.signal.aborted && this.#s.getMaybeConnection(`local`) === a;
-      try {
-        let a = await n.kc(this.#l(J), s);
-        if (!c()) return { status: `unavailable`, reason: `retired` };
-        if (a == null) return { status: `unavailable`, reason: `identity` };
-        if (e[0] !== `account-info` && a.identity.kind !== `chatgpt`)
-          return { status: `unavailable`, reason: `unsupported-auth` };
-        let l = [...e, a];
-        if ((r && (await this.#e.invalidateQueries({ queryKey: l })), !c()))
-          return { status: `unavailable`, reason: `retired` };
-        let u = await n.kc(
-            this.#e.fetchQuery({
-              queryKey: l,
-              staleTime: t,
-              queryFn: ({ signal: e }) => {
-                let t = AbortSignal.any([o.signal, e, AbortSignal.timeout(yT)]);
-                return n.kc(i(t), t);
-              },
-            }),
-            s,
-          ),
-          d = await n.kc(this.#l(J), s);
-        if (!c()) return { status: `unavailable`, reason: `retired` };
-        if (d == null || d.executionHostKey !== a.executionHostKey || !W(d.identity, a.identity))
-          return (this.#f(), { status: `unavailable`, reason: `retired` });
-        let f = this.#e.getQueryState(l);
-        return f?.data !== u || f.isInvalidated
-          ? { status: `unavailable`, reason: `retired` }
-          : { status: `ready`, data: u };
-      } catch (e) {
-        return c()
-          ? {
-              status: `error`,
-              message: e instanceof Error ? e.message : `Account input read failed`,
-              httpStatus: e instanceof hT ? e.status : null,
-              errorCode: e instanceof hT ? e.errorCode : void 0,
-            }
-          : { status: `unavailable`, reason: `retired` };
-      }
-    }
-    #f() {
-      (this.#i.abort(),
-        (this.#i = new AbortController()),
-        this.#e.clear(),
-        (this.#o = null),
-        this.#p({ type: `identity` }));
-    }
-    #p(e) {
-      for (let t of this.#n) {
-        let n = t(e);
-        n.then(
-          () => n[Symbol.dispose](),
-          () => n[Symbol.dispose](),
-        );
-      }
-    }
-  },
-  tEe = class extends n.Uf {
-    cleanup;
-    constructor(e) {
-      (super(), (this.cleanup = e));
-    }
-    unsubscribe() {
-      let e = this.cleanup;
-      ((this.cleanup = null), e?.());
-    }
-    [Symbol.dispose]() {
-      this.unsubscribe();
-    }
-  },
-  nEe = class extends n.Uf {
-    appServerConnectionRegistry;
-    constructor(e) {
-      (super(), (this.appServerConnectionRegistry = e));
-    }
-    async getGenerationStatuses() {
-      return n.fi();
-    }
-    async getChatGptComposerItems({ entrypoint: e, hostId: t }) {
-      return n.li(this.appServerConnectionRegistry.getConnection(t), e);
-    }
-    async recordChatGptComposerItemInteraction({
-      entrypoint: e,
-      hostId: t,
-      interactionType: r,
-      item: i,
-    }) {
-      return n.mi(this.appServerConnectionRegistry.getConnection(t), i, r, e);
-    }
-    async hasAccessibleAndEnabledApp({ hostId: e }) {
-      return (await n.di(this.appServerConnectionRegistry.getConnection(e))).some(n.ui);
-    }
-  },
-  rEe = class extends n.Uf {
-    windowManager;
-    appViewsByWebContentsId;
-    constructor(e, t) {
-      (super(), (this.windowManager = e), (this.appViewsByWebContentsId = t));
-    }
-    isPrimaryWindowFocused() {
-      return this.windowManager.getPrimaryWindows().some((e) => e.isFocused());
-    }
-    async enqueueForThreadInPrimaryWindow(e) {
-      await (await this.getPrimaryAppView().services).appActions.enqueueForThread(e);
-    }
-    async runInPrimaryWindow(e) {
-      return (await this.getPrimaryAppView().services).appActions.run(e);
-    }
-    getPrimaryAppView() {
-      let e = this.windowManager.getPrimaryWindow();
-      if (e == null) throw Error(`No primary app window is available`);
-      let t = this.appViewsByWebContentsId.get(e.webContents.id);
-      if (t == null) throw Error(`The primary app window is not ready`);
-      return t;
-    }
-  };
 const iconBaseName = (e) => resolveFlavorIconBaseName(e, { agent: a.in.Agent, nightly: a.in.Nightly, internalAlpha: a.in.InternalAlpha, publicBeta: a.in.PublicBeta, dev: a.in.Dev, prod: a.in.Prod });
 const iconAssetNames = (e) => resolveFlavorIconAssetNames(e, { agent: a.in.Agent, nightly: a.in.Nightly, internalAlpha: a.in.InternalAlpha, publicBeta: a.in.PublicBeta, dev: a.in.Dev, prod: a.in.Prod });
 var lEe = `wss://codex-cloud-backend.chatgpt.com/`,
@@ -26676,128 +25978,7 @@ async function FOe(e, t, r, i) {
       });
     }
 }
-var IOe = class extends n.Uf {
-  origin;
-  windowManager;
-  updateCapability;
-  constructor(e, t, n) {
-    (super(), (this.origin = e), (this.windowManager = t), (this.updateCapability = n));
-  }
-  setCapability(e) {
-    this.windowManager.getPrimaryWindow()?.webContents.id === this.origin.id &&
-      this.updateCapability(e);
-  }
-};
-async function LOe(e, t) {
-  if (process.platform !== `darwin`) return null;
-  let n = l.BrowserWindow.fromWebContents(e);
-  if (n == null) return null;
-  let { NobjcLibrary: r, fromPointer: i, typedBlock: a } = await import(`objc-js`);
-  if (n.isDestroyed()) return null;
-  let o = new r(`/System/Library/Frameworks/AppKit.framework/AppKit`).NSEvent,
-    s = i(n.getNativeWindowHandle()),
-    c = s.window().windowNumber(),
-    u = o.addLocalMonitorForEventsMatchingMask$handler$(
-      2 ** 22,
-      a({ returns: `@`, args: [`@`] }, (n) => {
-        if (n.windowNumber() === c) {
-          let r = s.convertPoint$fromView$(n.locationInWindow(), null),
-            i = s.bounds(),
-            a = e.getZoomFactor();
-          t({
-            deltaX: n.scrollingDeltaX(),
-            deltaY: n.scrollingDeltaY(),
-            directionInvertedFromDevice: n.isDirectionInvertedFromDevice(),
-            hasPreciseDeltas: n.hasPreciseScrollingDeltas(),
-            momentumPhase: n.momentumPhase(),
-            phase: n.phase(),
-            pressedMouseButtons: o.pressedMouseButtons(),
-            timestampMs: n.timestamp() * 1e3,
-            x: (r.x - i.origin.x) / a,
-            y: (s.isFlipped() ? r.y - i.origin.y : i.origin.y + i.size.height - r.y) / a,
-            zoomFactor: a,
-          });
-        }
-        return n;
-      }),
-    );
-  return () => o.removeMonitor$(u);
-}
-var ROe = class extends n.Uf {
-    manager;
-    origin;
-    constructor(e, t) {
-      (super(), (this.manager = e), (this.origin = t));
-    }
-    setPointerRegions(e, t) {
-      this.manager.setPointerRegions(this.origin.id, e, t);
-    }
-    setQuickChatStashed(e) {
-      this.manager.setQuickChatStashed(this.origin.id, e);
-    }
-    completeQuickChatFocus(e, t) {
-      return this.manager.completeQuickChatFocus(this.origin.id, e, t);
-    }
-  },
-  zOe = class extends n.Uf {
-    origin;
-    logger = r.r(`AvatarOverlayScrollHostService`);
-    constructor(e) {
-      (super(), (this.origin = e));
-    }
-    async subscribeScrollEvents(e) {
-      let t = e.dup(),
-        n = null,
-        r = !1,
-        i = () => {
-          r || ((r = !0), n?.(), this.origin.removeListener(`destroyed`, i), t[Symbol.dispose]());
-        };
-      (this.origin.once(`destroyed`, i), t.onRpcBroken(i));
-      try {
-        return (
-          (n = await LOe(this.origin, (e) => {
-            (async () => {
-              try {
-                var n = a.en();
-                await n.u(t(e));
-              } catch (e) {
-                n.e = e;
-              } finally {
-                n.d();
-              }
-            })().catch(i);
-          })),
-          r
-            ? (n?.(), null)
-            : n == null
-              ? (i(), null)
-              : (this.logger.debug(`Native swipe input subscribed`), new BOe(i))
-        );
-      } catch (e) {
-        return (
-          i(),
-          this.logger.warning(`Native swipe input unavailable`, {
-            safe: {},
-            sensitive: { error: e },
-          }),
-          null
-        );
-      }
-    }
-  },
-  BOe = class extends n.Uf {
-    stop;
-    constructor(e) {
-      (super(), (this.stop = e));
-    }
-    unsubscribe() {
-      this.stop();
-    }
-    [Symbol.dispose]() {
-      this.unsubscribe();
-    }
-  },
-  VOe = 5e3,
+var VOe = 5e3,
   HOe = IabTabMentions;
 function KOe(e) {
   return e?.allowGlobalPersistentApproval !== !1;
@@ -47763,7 +46944,7 @@ var GH = !!process.env.WSL_DISTRO_NAME,
     bt,
     bundledSkillsRoot,
     cD,
-    cT,
+    cT: readAccountInfoFromToken,
     computeScreenshotTarget: (...args) => computeScreenshotTarget(...args),
     ds,
     eke,
@@ -75754,16 +74935,16 @@ var G5 = r.r(`WindowContext`),
     B8e,
     BO,
     BQ,
-    BTe,
+    IntegrityStateStore,
     C,
     C8e,
-    CTe,
+    StableIdStore,
     Cke,
     D,
     D2e,
     D5e,
     DE,
-    DTe,
+    ThreadTurnSummariesStore,
     Det,
     E,
     E5,
@@ -75791,7 +74972,7 @@ var G5 = r.r(`WindowContext`),
     I5,
     IEe,
     IO,
-    IOe,
+    UpdateCapabilityService,
     IXe,
     Iet,
     J,
@@ -75836,10 +75017,10 @@ var G5 = r.r(`WindowContext`),
     Qnt,
     R,
     R5e,
-    ROe,
+    AvatarOverlayService,
     Rnt,
     S,
-    STe,
+    PublishedStatsig,
     Snt,
     T,
     PluginMarketplaceListingService,
@@ -75874,7 +75055,7 @@ var G5 = r.r(`WindowContext`),
     Z,
     Z5e,
     Z6e,
-    ZTe,
+    DesktopFetchService,
     Zet,
     Zj,
     Zk,
@@ -75907,7 +75088,7 @@ var G5 = r.r(`WindowContext`),
     e,
     e4e,
     e5,
-    eEe,
+    AccountInputsOwner,
     eMe,
     ett,
     f,
@@ -75940,7 +75121,7 @@ var G5 = r.r(`WindowContext`),
     n,
     n5,
     nAe,
-    nEe,
+    ComposerItemsBridge,
     nje,
     ntt,
     o,
@@ -75960,7 +75141,7 @@ var G5 = r.r(`WindowContext`),
     r,
     r$e,
     r5,
-    rEe,
+    PrimaryWindowActionsBridge,
     requestFinalCaptureUpdate,
     rje,
     rr,
@@ -75980,7 +75161,7 @@ var G5 = r.r(`WindowContext`),
     vi,
     w,
     w6e,
-    wTe,
+    getThreadSummariesDb,
     wie,
     x,
     xoe,
@@ -75992,7 +75173,7 @@ var G5 = r.r(`WindowContext`),
     z,
     resetRuntimeFeatures,
     z5e,
-    zOe,
+    AvatarOverlayScrollHostService,
     zje,
     znt,
     getVoiceController,

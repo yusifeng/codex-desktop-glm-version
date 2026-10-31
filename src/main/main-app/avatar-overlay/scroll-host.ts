@@ -37,6 +37,32 @@ class UpdateCapabilityService extends (EventEmitterBase as new () => {}) {
   }
 }
 
+/** Renderer-facing avatar overlay controls scoped to one WebContents origin. */
+class AvatarOverlayService extends (EventEmitterBase as new () => {}) {
+  constructor(
+    private readonly manager: {
+      setPointerRegions(originId: number, regions: unknown, activeRegion: unknown): void;
+      setQuickChatStashed(originId: number, stashed: unknown): void;
+      completeQuickChatFocus(originId: number, requestId: unknown, focused: unknown): unknown;
+    },
+    private readonly origin: { id: number },
+  ) {
+    super();
+  }
+
+  setPointerRegions(regions: unknown, activeRegion: unknown) {
+    this.manager.setPointerRegions(this.origin.id, regions, activeRegion);
+  }
+
+  setQuickChatStashed(stashed: unknown) {
+    this.manager.setQuickChatStashed(this.origin.id, stashed);
+  }
+
+  completeQuickChatFocus(requestId: unknown, focused: unknown) {
+    return this.manager.completeQuickChatFocus(this.origin.id, requestId, focused);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // mac 原生 swipe 事件（原 `LOe`）
 // ---------------------------------------------------------------------------
@@ -202,6 +228,7 @@ class AvatarOverlayScrollHostService extends (EventEmitterBase as new () => {}) 
 
 export {
   UpdateCapabilityService,
+  AvatarOverlayService,
   subscribeMacSwipeEvents,
   StopHandle,
   AvatarOverlayScrollHostService,

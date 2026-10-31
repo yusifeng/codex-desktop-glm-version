@@ -66,7 +66,7 @@ const main = fs.readFileSync(
   "utf8",
 );
 equal(main.includes('require("./main-app/api/desktop-fetch.js")'), true);
-equal(main.includes("ZTe = DesktopFetchService"), true);
+equal(main.includes("DesktopFetchService,"), true);
 equal(main.includes("ZTe = class"), false);
 equal(main.includes("new ZTe(this.fetchHandler"), false);
 
@@ -74,6 +74,6 @@ const windowContext = fs.readFileSync(
   new URL("../src/main/main-app/window/window-context.ts", import.meta.url),
   "utf8",
 );
-equal(windowContext.includes("this.fetchWrapper = new ZTe(this.fetchHandler"), true);
+equal(windowContext.includes("this.fetchWrapper = new DesktopFetchService(this.fetchHandler"), true);
 
 console.log(`${assertions} main desktop fetch service owner assertions passed`);

@@ -2852,3 +2852,15 @@ identity reset 时调用；runtime-feature state 只存在于新模块，没有�
 共 163 行已物理删除。focused test `scripts/test-main-window-rpc-service-adapters.mjs` 覆盖 58 项 forwarding、modifier
 settle、local/remote path、feature accumulation/reset、unsupported handling、sampling、marketplace branch/filter/fallback 与 wiring；
 WindowContext 16 项回归通过。
+
+### 增量抽取：account inputs owner 与 WindowContext 语义服务接线
+
+账号输入的 QueryClient cache、local connection/identity subscriptions、identity epoch AbortController、ChatGPT profile
+publication、account/workspace query、force refresh、跨 renderer invalidation、RPC subscription cleanup 和 read 前后 identity
+一致性检查已迁移至 `src/main/main-app/account/account-inputs-owner.ts`。factory 显式注入 bundled QueryClient 和 shared
+abort/schema runtime，WindowContext 只创建一个 owner，未复制缓存或身份状态。此前已语义恢复但仍未接线的 stable ID、
+thread summary SQLite、integrity state、desktop fetch bridges 和 avatar scroll services 也已直接替换混淆 classes；原始 chunk
+内 `CTe/DTe/eEe/tEe/nEe/rEe`、整段 dead auth helper belt，以及 `IOe/LOe/ROe/zOe/BOe` 已物理删除。
+`scripts/test-main-account-inputs-owner.mjs` 覆盖 71 项 cache、force refresh、auth gating、HTTP error projection、profile
+identity、invalidations、subscription disposal、connection epoch、stable ID single-flight、summary revision validation 与真实接线；
+desktop-fetch、PublishedStatsig、avatar overlay、WindowContext 和 no-unwired 邻接回归同步更新并通过。

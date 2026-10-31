@@ -159,10 +159,10 @@ const main = fs.readFileSync(
   "utf8",
 );
 equal(
-  main.includes('const { PublishedStatsig } = require("./main-app/account/statsig-adapter.js");'),
+  main.includes('} = require("./main-app/account/statsig-adapter.js");'),
   true,
 );
-equal(main.includes("var STe = PublishedStatsig;"), true);
+equal(main.includes("PublishedStatsig,"), true);
 equal(main.includes("STe = class"), false);
 equal(main.includes("this.publishedStatsig = new STe("), false);
 
@@ -170,7 +170,7 @@ const windowContext = fs.readFileSync(
   new URL("../src/main/main-app/window/window-context.ts", import.meta.url),
   "utf8",
 );
-equal(windowContext.includes("this.publishedStatsig = new STe("), true);
+equal(windowContext.includes("this.publishedStatsig = new PublishedStatsig("), true);
 equal(windowContext.includes("this.disposables.add(this.publishedStatsig)"), true);
 
 console.log(`${assertions} main Published Statsig owner assertions passed`);

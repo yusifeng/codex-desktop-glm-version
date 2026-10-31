@@ -127,6 +127,48 @@ const publishChatGptProfileSchema = objectSchema({
   profile: chatgptRequestProfileSchema,
 });
 
+/** `/wham/accounts/check` response consumed by the account-input cache owner. */
+const accountsCheckSchema = objectSchema({
+  accounts: arraySchema(
+    objectSchema({
+      id: stringSchema(),
+      account_user_id: stringSchema(),
+      account_user_role: enumSchema([
+        "account-owner",
+        "account-admin",
+        "analytics-viewer",
+        "standard-user",
+      ]),
+      structure: stringSchema(),
+      plan_type: stringSchema(),
+      is_zdr: booleanSchema(),
+      is_openai_internal: booleanSchema(),
+      account_residency_region: stringSchema().optional(),
+      can_access_with_session: booleanSchema().optional(),
+      enable_account_switching: booleanSchema().optional(),
+      is_deactivated: booleanSchema().optional(),
+      is_fedramp_compliant_workspace: booleanSchema().optional(),
+      workspace_backend_origin: enumSchema(["NO_CONSTRAINT", "https://gov.chatgpt.com"])
+        .nullable()
+        .optional(),
+      account_routing_override: enumSchema(["NO_CONSTRAINT", "us", "us_cr"])
+        .nullable()
+        .optional(),
+      sso_connection_name: stringSchema().nullable().optional(),
+      name: stringSchema().nullable().optional(),
+      profile_picture_url: stringSchema().nullable().optional(),
+    }),
+  ).optional(),
+  default_account_id: stringSchema().nullable().optional(),
+  account_ordering: arraySchema(stringSchema()).optional(),
+});
+
+const accountInputSourceSchema = enumSchema([
+  "account-info",
+  "accounts-check",
+  "workspace-settings",
+]);
+
 const fetchHandlerLogger = memoizedTaggedLogger("electron-fetch-handler");
 const fetchWrapperLogger = memoizedTaggedLogger("electron-fetch-wrapper");
 
@@ -1594,6 +1636,8 @@ export {
   workspaceSettingsSchema,
   chatgptRequestProfileSchema,
   publishChatGptProfileSchema,
+  accountsCheckSchema,
+  accountInputSourceSchema,
   readAccountInfoFromToken,
   ApiFetchError,
   AuthenticatedDesktopFetchError,

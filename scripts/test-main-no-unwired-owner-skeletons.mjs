@@ -44,6 +44,7 @@ const realOwners = [
   ["src/main/main-app/workspace/file-runtime-support.ts", "createWorkspaceFileRuntimeSupport"],
   ["src/main/main-app/terminal/cloud-command-session.ts", "createCloudCommandSessionRuntime"],
   ["src/main/main-app/window/rpc-service-adapters.ts", "createWindowRpcServiceAdapters"],
+  ["src/main/main-app/account/account-inputs-owner.ts", "createAccountInputsOwnerClass"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -302,6 +303,18 @@ assert.equal(main.includes("y6e = class extends"), false, "generated Owl runtime
 assert.equal(main.includes("var b6e = class"), false, "generated performance telemetry service must be removed");
 assert.equal(main.includes("var T6e = class"), false, "generated marketplace listing service must be removed");
 assert.equal(main.includes("var R0 = {}"), false, "generated runtime-feature state owner must be removed");
+assert.equal(main.includes("AccountInputsOwner = createAccountInputsOwnerClass({"), true, "real account-input owner is wired");
+assert.equal(main.includes("eEe = class extends"), false, "generated account-input owner must be removed");
+assert.equal(main.includes("CTe = class extends"), false, "generated stable-id owner must be removed");
+assert.equal(main.includes("DTe = class"), false, "generated thread-summary store must be removed");
+assert.equal(main.includes("async function cT("), false, "generated token account reader must be removed");
+assert.equal(main.includes("BTe = class"), false, "generated integrity-state owner must be removed");
+assert.equal(main.includes("IOe = class extends"), false, "generated update-capability service must be removed");
+assert.equal(main.includes("async function LOe("), false, "generated native swipe adapter must be removed");
+assert.equal(main.includes("ROe = class extends"), false, "generated avatar-overlay service must be removed");
+assert.equal(main.includes("zOe = class extends"), false, "generated avatar scroll owner must be removed");
+assert.equal(main.includes("BOe = class extends"), false, "generated avatar stop handle must be removed");
+assert.equal(main.includes("PrimaryWindowActionsBridge,"), true, "semantic window action bridge must be wired");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("315 main unwired-owner skeleton assertions passed");
+console.log("329 main unwired-owner skeleton assertions passed");

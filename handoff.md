@@ -4833,3 +4833,15 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - main 旧 classes/state 163 行已删除，新生产模块 260 行；focused coverage 58 项、WindowContext 回归 16 项，
   no-unwired gate 扩至 315 项。相邻 stream/archive belt 已确认是 bundled vendor；下一批越过 vendor，继续审计 projects/
   realtime 前后的第一方 helpers 与仍未迁移 owner。
+
+# 2026-11-01 account inputs and WindowContext semantic service wiring
+
+- `src/main/main-app/account/account-inputs-owner.ts` 已接管唯一 QueryClient cache、local connection subscriptions、identity
+  epoch abort/reset、ChatGPT request profile publication、account/workspace reads、query invalidation broadcast、RPC subscription
+  cleanup 与 identity-after-read race validation；vendored QueryClient 继续作为显式 composition dependency，没有复制缓存。
+- WindowContext 已直接消费 `StableIdStore`、`ThreadTurnSummariesStore`、`IntegrityStateStore`、`DesktopFetchService`、
+  `ComposerItemsBridge`、`PrimaryWindowActionsBridge`、`AvatarOverlayService`、`AvatarOverlayScrollHostService` 和
+  `UpdateCapabilityService`。main 中旧 account/auth helper belt 与 `CTe/DTe/eEe/tEe/nEe/rEe/IOe/LOe/ROe/zOe/BOe`
+  共 877 行已删除；新生产实现/补全约 500 行。focused coverage 71 项，邻接 desktop-fetch/statsig/avatar/WindowContext
+  回归 19/25/45/16 项，no-unwired gate 扩至 329 项。下一批审计 update capability/application-menu snapshot 与相邻
+  config/environment owners，优先迁移完整状态和 consumer，不拆 vendor QueryClient。

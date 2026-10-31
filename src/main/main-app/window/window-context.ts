@@ -18,16 +18,16 @@ export function createWindowContextClass(dependencies) {
     B8e,
     BO,
     BQ,
-    BTe,
+    IntegrityStateStore,
     C,
     C8e,
-    CTe,
+    StableIdStore,
     Cke,
     D,
     D2e,
     D5e,
     DE,
-    DTe,
+    ThreadTurnSummariesStore,
     Det,
     E,
     E5,
@@ -55,7 +55,7 @@ export function createWindowContextClass(dependencies) {
     I5,
     IEe,
     IO,
-    IOe,
+    UpdateCapabilityService,
     IXe,
     Iet,
     J,
@@ -100,10 +100,10 @@ export function createWindowContextClass(dependencies) {
     Qnt,
     R,
     R5e,
-    ROe,
+    AvatarOverlayService,
     Rnt,
     S,
-    STe,
+    PublishedStatsig,
     Snt,
     T,
     PluginMarketplaceListingService,
@@ -138,7 +138,7 @@ export function createWindowContextClass(dependencies) {
     Z,
     Z5e,
     Z6e,
-    ZTe,
+    DesktopFetchService,
     Zet,
     Zj,
     Zk,
@@ -171,7 +171,7 @@ export function createWindowContextClass(dependencies) {
     e,
     e4e,
     e5,
-    eEe,
+    AccountInputsOwner,
     eMe,
     ett,
     f,
@@ -204,7 +204,7 @@ export function createWindowContextClass(dependencies) {
     n,
     n5,
     nAe,
-    nEe,
+    ComposerItemsBridge,
     nje,
     ntt,
     o,
@@ -224,7 +224,7 @@ export function createWindowContextClass(dependencies) {
     r,
     r$e,
     r5,
-    rEe,
+    PrimaryWindowActionsBridge,
     requestFinalCaptureUpdate,
     rje,
     rr,
@@ -244,7 +244,7 @@ export function createWindowContextClass(dependencies) {
     vi,
     w,
     w6e,
-    wTe,
+    getThreadSummariesDb,
     wie,
     x,
     xoe,
@@ -256,7 +256,7 @@ export function createWindowContextClass(dependencies) {
     z,
     resetRuntimeFeatures,
     z5e,
-    zOe,
+    AvatarOverlayScrollHostService,
     zje,
     znt,
     getVoiceController,
@@ -427,7 +427,7 @@ export function createWindowContextClass(dependencies) {
               () => t.dispose()
             );
           };
-        ((this.publishedStatsig = new STe(
+        ((this.publishedStatsig = new PublishedStatsig(
           this.sharedObjectRepository,
           async () => {
             let [e, t] = await Promise.all([r.getAuthenticatedPrincipal(), r.getAuthMethod()]),
@@ -445,7 +445,7 @@ export function createWindowContextClass(dependencies) {
         )),
           this.disposables.add(this.publishedStatsig),
           (this.diamondController = null),
-          (this.statsig = new CTe({
+          (this.statsig = new StableIdStore({
             read: async () => i.getStored(n.iu.STATSIG_STABLE_ID),
             write: async (e) => {
               i.set(n.iu.STATSIG_STABLE_ID, e);
@@ -529,8 +529,8 @@ export function createWindowContextClass(dependencies) {
             getPrincipal: () => r.getAuthenticatedPrincipal(),
             getStore: () => {
               if (p !== void 0) return p;
-              let e = wTe();
-              return ((p = e == null ? null : new DTe(e)), p);
+              let e = getThreadSummariesDb();
+              return ((p = e == null ? null : new ThreadTurnSummariesStore(e)), p);
             },
             getHostKey: f,
             onHostRemoved: (e) =>
@@ -734,7 +734,10 @@ export function createWindowContextClass(dependencies) {
               this.threadCatalogSyncManager?.reconcileAuthoritativeHostKind(e, t);
             },
           )),
-          (this.appActionHostService = new rEe(e.windowManager, this.appViewsByWebContentsId)),
+          (this.appActionHostService = new PrimaryWindowActionsBridge(
+            e.windowManager,
+            this.appViewsByWebContentsId,
+          )),
           (this.remoteControlEnvironmentService = new R5e(this.remoteConnectionsHandler)),
           (this.devboxService = null),
           (this.restrictedDevboxService = null));
@@ -842,7 +845,7 @@ export function createWindowContextClass(dependencies) {
         ((this.settings = O),
           this.disposables.add(() => O.dispose()),
           this.disposables.add(D.startUpdatePolling()));
-        let k = new BTe(this.scopedState),
+        let k = new IntegrityStateStore(this.scopedState),
           A = null,
           j = () => this.detachedWindowManager?.clearPrewarm();
         if (
@@ -885,7 +888,7 @@ export function createWindowContextClass(dependencies) {
                 this.clearSitesAuthentication();
             }),
           ),
-          (this.fetchWrapper = new ZTe(this.fetchHandler, {
+          (this.fetchWrapper = new DesktopFetchService(this.fetchHandler, {
             applicationNetwork: e.applicationNetwork,
             desktopOriginator: e.desktopOriginator,
             devApiBaseUrl: e.devApiBaseUrl,
@@ -904,7 +907,7 @@ export function createWindowContextClass(dependencies) {
             appServerConnectionRegistry: this.appServerConnectionRegistry,
             prodApiBaseUrl: e.prodApiBaseUrl,
           })),
-          (this.accessInputs = new eEe(
+          (this.accessInputs = new AccountInputsOwner(
             this.appServerConnectionRegistry,
             r,
             this.threadReadState.getContext,
@@ -1231,7 +1234,7 @@ export function createWindowContextClass(dependencies) {
             httpFetch: g,
             websitePreviews: _,
             pluginIncentives: v,
-            ambientSuggestions: new nEe(this.appServerConnectionRegistry),
+            ambientSuggestions: new ComposerItemsBridge(this.appServerConnectionRegistry),
             automations: this.habitatAutomationsService,
             applicationMenu: new lOe(e),
             customRuntime: void 0,
@@ -1250,8 +1253,9 @@ export function createWindowContextClass(dependencies) {
             artifactDocuments: this.artifactDocuments,
             artifactSessions: x,
             orbPicker: void 0,
-            avatarOverlay: new ROe(this.options.avatarOverlayManager, e),
-            avatarOverlayScroll: process.platform === `darwin` ? new zOe(e) : void 0,
+            avatarOverlay: new AvatarOverlayService(this.options.avatarOverlayManager, e),
+            avatarOverlayScroll:
+              process.platform === `darwin` ? new AvatarOverlayScrollHostService(e) : void 0,
             appUpdates: new cOe(
               this.options.windowManager,
               e,
@@ -1314,7 +1318,7 @@ export function createWindowContextClass(dependencies) {
             localAutomationsScheduler:
               this.options.windowManager.getRendererWindowLogFields(e).rendererWindowAppearance ===
               `primary`
-                ? new IOe(e, this.options.windowManager, (e) =>
+                ? new UpdateCapabilityService(e, this.options.windowManager, (e) =>
                     this.messageHandler.setLocalAutomationsCapability(e),
                   )
                 : void 0,
