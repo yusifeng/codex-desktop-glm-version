@@ -135,6 +135,7 @@ const { createQuitStateClass } = require("./main-app/startup/quit-state.js");
 const { createStartupProgressWindowRuntime } = require("./main-app/startup/progress-window.js");
 const { createGlobalDictationWindowControllerClass } = require("./main-app/dictation/global-dictation-window-controller.js");
 const { createRealtimeVoiceHotkeyManager } = require("./main-app/realtime/voice-hotkey-manager.js");
+const { createDebugWindowRuntime } = require("./main-app/debug/debug-window-manager.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -150664,220 +150665,17 @@ var xot = new Set([
     `mcp-server-tools-cache-v2`,
     `prompt-history`,
     `heartbeat-thread-permissions-by-id`,
-  ]),
-  Sot = class {
-    sources = new Map();
-    listeners = new Set();
-    forgetWebContents(e) {
-      this.#n(e);
-      for (let t of this.listeners)
-        (t.webContentsId === e || t.ownerWebContentsId === e) && this.#t(t);
-    }
-    registerSource(e, t) {
-      this.#n(e);
-      let n = t.dup();
-      this.sources.set(e, n);
-      let r = () => {
-        this.sources.get(e) === n && this.#n(e);
-      };
-      n.onRpcBroken(r);
-      for (let t of this.listeners) t.ownerWebContentsId === e && this.#e(t);
-      return new T9(r);
-    }
-    async runAction(e, t) {
-      let n = this.sources.get(e);
-      if (n == null) return !1;
-      try {
-        return await n.runAction(t);
-      } catch {
-        return !1;
-      }
-    }
-    setDebugWindowOwner(e, t) {
-      for (let n of this.listeners)
-        n.webContentsId === e &&
-          n.ownerWebContentsId !== t &&
-          ((n.ownerWebContentsId = t), this.#e(n));
-    }
-    subscribe(e, t, n) {
-      let r = {
-        callback: n.dup(),
-        ownerWebContentsId: e,
-        source: null,
-        subscription: null,
-        webContentsId: t,
-      };
-      return (
-        this.listeners.add(r),
-        r.callback.onRpcBroken(() => this.#t(r)),
-        this.#e(r),
-        new T9(() => this.#t(r))
-      );
-    }
-    #e(e) {
-      try {
-        var t = a.en();
-        (e.subscription?.[Symbol.dispose](), (e.subscription = null));
-        let r = this.sources.get(e.ownerWebContentsId) ?? null;
-        if (((e.source = r), r == null)) {
-          e.callback(null).catch(() => this.#t(e));
-          return;
-        }
-        let i = t.u(
-          new n.Hf((t) => {
-            this.listeners.has(e) && e.source === r && e.callback(t).catch(() => this.#t(e));
-          }),
-        );
-        r.subscribe(i).then(
-          (t) => {
-            if (!this.listeners.has(e) || e.source !== r) {
-              t[Symbol.dispose]();
-              return;
-            }
-            e.subscription = t;
-          },
-          () => {
-            this.listeners.has(e) && e.source === r && e.callback(null).catch(() => this.#t(e));
-          },
-        );
-      } catch (e) {
-        t.e = e;
-      } finally {
-        t.d();
-      }
-    }
-    #t(e) {
-      this.listeners.delete(e) &&
-        ((e.source = null), e.subscription?.[Symbol.dispose](), e.callback[Symbol.dispose]());
-    }
-    #n(e) {
-      let t = this.sources.get(e);
-      if (t != null) {
-        this.sources.delete(e);
-        for (let t of this.listeners) t.ownerWebContentsId === e && this.#e(t);
-        t[Symbol.dispose]();
-      }
-    }
-  },
-  T9 = class extends n.Uf {
-    cleanup;
-    constructor(e) {
-      (super(), (this.cleanup = e));
-    }
-    unsubscribe() {
-      this.cleanup();
-    }
-    [Symbol.dispose]() {
-      this.unsubscribe();
-    }
-  },
-  Cot = class {
-    options;
-    chatGptConversations = new Sot();
-    windowsByOwnerWebContentsId = new Map();
-    originConversationIdsByOwnerWebContentsId = new Map();
-    pendingWindowsByOwnerWebContentsId = new Map();
-    clientAnalyticsHistoryByOwnerWebContentsId = new Map();
-    constructor(e) {
-      this.options = e;
-    }
-    forgetWebContents(e) {
-      (this.chatGptConversations.forgetWebContents(e),
-        this.originConversationIdsByOwnerWebContentsId.delete(e),
-        this.clientAnalyticsHistoryByOwnerWebContentsId.delete(e));
-      let t = this.windowsByOwnerWebContentsId.get(e);
-      (this.windowsByOwnerWebContentsId.delete(e), t != null && (t.isDestroyed() || t.close()));
-    }
-    getOwnerWebContentsId(e) {
-      for (let [t, n] of this.windowsByOwnerWebContentsId)
-        if (!n.isDestroyed() && n.webContents.id === e) return t;
-      return null;
-    }
-    setOriginConversation(e, t) {
-      (this.originConversationIdsByOwnerWebContentsId.set(e.id, t),
-        this.sendOriginConversation(e.id));
-    }
-    setClientAnalyticsHistory(e, t) {
-      (this.clientAnalyticsHistoryByOwnerWebContentsId.set(e.id, t),
-        this.sendClientAnalyticsHistory(e.id));
-    }
-    async show(e) {
-      let t = this.getOwnerWebContentsId(e.id) ?? e.id,
-        n = this.windowsByOwnerWebContentsId.get(t);
-      if (n != null && !n.isDestroyed()) {
-        (this.sendOriginConversation(t),
-          this.sendClientAnalyticsHistory(t),
-          this.options.showWindow(n, { stealFocus: !0 }));
-        return;
-      }
-      let r = this.pendingWindowsByOwnerWebContentsId.get(e.id);
-      if (r != null) {
-        await r;
-        return;
-      }
-      let i = this.createDebugWindow(e);
-      this.pendingWindowsByOwnerWebContentsId.set(e.id, i);
-      try {
-        await i;
-      } finally {
-        this.pendingWindowsByOwnerWebContentsId.delete(e.id);
-      }
-    }
-    async createDebugWindow(e) {
-      let t = await this.options.createWindow({
-        title: `Debug`,
-        width: 920,
-        height: 840,
-        appearance: `secondary`,
-        initialRoute: n.oo,
-        lockTitle: !0,
-      });
-      if (e.isDestroyed()) {
-        t.close();
-        return;
-      }
-      this.windowsByOwnerWebContentsId.set(e.id, t);
-      let r = t.webContents.id;
-      (this.chatGptConversations.setDebugWindowOwner(r, e.id),
-        t.setMenuBarVisibility(!1),
-        t.center());
-      let i = () => {
-          this.windowsByOwnerWebContentsId.get(e.id) === t &&
-            this.windowsByOwnerWebContentsId.delete(e.id);
-        },
-        a = () => {
-          (i(),
-            this.originConversationIdsByOwnerWebContentsId.delete(e.id),
-            this.clientAnalyticsHistoryByOwnerWebContentsId.delete(e.id),
-            t.isDestroyed() || t.close());
-        };
-      (t.on(`closed`, () => {
-        (this.chatGptConversations.forgetWebContents(r), i(), e.removeListener(`destroyed`, a));
-      }),
-        e.once(`destroyed`, a),
-        this.sendOriginConversation(e.id),
-        this.sendClientAnalyticsHistory(e.id),
-        this.options.showWindow(t, { stealFocus: !0 }));
-    }
-    sendOriginConversation(e) {
-      let t = this.windowsByOwnerWebContentsId.get(e);
-      t == null ||
-        t.isDestroyed() ||
-        this.options.sendMessageToWindow(t, {
-          type: `debug-window-origin-conversation-changed`,
-          conversationId: this.originConversationIdsByOwnerWebContentsId.get(e) ?? null,
-        });
-    }
-    sendClientAnalyticsHistory(e) {
-      let t = this.windowsByOwnerWebContentsId.get(e);
-      t == null ||
-        t.isDestroyed() ||
-        this.options.sendMessageToWindow(t, {
-          type: `debug-window-client-analytics-history-changed`,
-          events: this.clientAnalyticsHistoryByOwnerWebContentsId.get(e) ?? [],
-        });
-    }
-  };
+  ]);
+var {
+  ChatGptConversationRegistry: Sot,
+  DebugWindowManager: Cot,
+  UnsubscribeHandle: T9,
+} = createDebugWindowRuntime({
+  RpcHandlerBase: n.Uf,
+  DisposableCallback: n.Hf,
+  createUsingScope: a.en,
+  initialRoute: n.oo,
+});
 function E9(e, t) {
   return mainUrlTrust.sameOrigin(e, t);
 }

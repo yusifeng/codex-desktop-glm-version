@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 debug-window owner
+
+原 `Sot/T9/Cot` 已迁入 `src/main/main-app/debug/debug-window-manager.ts`。新 owner 保留 conversation source/listener
+duplication、RPC broken rebinding、subscription disposal、action forwarding、owner/debug webContents mapping、single-flight
+window creation、origin conversation/client analytics projection 与双向 destruction cleanup；真实 BrowserWindow manager
+dependency 已接回，旧三 class 已删除。
+
 ## 2026-10-31 realtime-voice hotkey owner
 
 原 `Aat/jat` 已迁入 `src/main/main-app/realtime/voice-hotkey-manager.ts`。新 owner 保留 command binding、global hotkey
