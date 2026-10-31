@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 remote-control device-key client
+
+原 `M5e/N5e/P5e/d4/F5e/I5e/L5e/f4/p4` 已迁入
+`src/main/main-app/remote/remote-control-device-key-client.ts`。新 owner 保留 native addon lazy load/cache、默认
+hardware-only key、connection/enrollment audience/scopes、nonce 与 SHA-256 digest 校验、canonical payload field
+allowlist、domain-separated UTF-8 signing bytes 与 base64 projection；唯一 runtime consumer 已接回，旧实现已删除。
+
 ## 2026-10-31 remote connections handler
 
 原 `D5e/O5e/k5e/A5e/j5e/u4` 已整簇迁入

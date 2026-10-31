@@ -96,6 +96,7 @@ const { createMultiAgentActivityServiceClass } = require("./main-app/realtime/mu
 const { createRealtimePresentationCoordinatorClass } = require("./main-app/realtime/presentation-coordinator.js");
 const { createRealtimeVoiceThreadTitleCoordinatorClass } = require("./main-app/realtime/voice-thread-title-coordinator.js");
 const { createRemoteConnectionsHandlerClass } = require("./main-app/remote/remote-connections-handler.js");
+const { createRemoteControlDeviceKeyClientClass } = require("./main-app/remote/remote-control-device-key-client.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -134295,92 +134296,11 @@ var D5e = createRemoteConnectionsHandlerClass({
   pathJoin: h.join,
   setTimer: setTimeout,
 });
-var M5e = (0, ee.createRequire)(__filename),
-  N5e = `remote-control-device-key.node`,
-  P5e = `codex-device-key-sign-payload/v1`,
-  d4 = /^[A-Za-z0-9_-]+$/u,
-  F5e = class {
-    resourcesPath;
-    addon = null;
-    constructor(e) {
-      this.resourcesPath = e;
-    }
-    createDeviceKey(e) {
-      return this.getAddon().createDeviceKey(e ?? `hardware_only`);
-    }
-    deleteDeviceKey(e) {
-      return this.getAddon().deleteDeviceKey(e);
-    }
-    getDeviceKeyPublic(e) {
-      return this.getAddon().getDeviceKeyPublic(e);
-    }
-    async signDeviceKey(e, t) {
-      let n = I5e(t);
-      return {
-        ...(await this.getAddon().signDeviceKey(e, n)),
-        signedPayloadBase64: n.toString(`base64`),
-      };
-    }
-    getAddon() {
-      if (this.resourcesPath == null)
-        throw Error(`Remote control device keys require resourcesPath`);
-      return ((this.addon ??= M5e((0, h.join)(this.resourcesPath, `native`, N5e))), this.addon);
-    }
-  };
-function I5e(e) {
-  return Buffer.from(JSON.stringify({ domain: P5e, payload: L5e(e) }), `utf8`);
-}
-function L5e(e) {
-  switch (e.type) {
-    case `remoteControlClientConnection`:
-      if ((f4(e.nonce), e.audience !== `remote_control_client_websocket`))
-        throw Error(`Invalid remote-control device-key connection audience`);
-      if (e.scopes.length !== 1 || e.scopes[0] !== `remote_control_controller_websocket`)
-        throw Error(`Invalid remote-control device-key connection scopes`);
-      return (
-        p4(e.tokenSha256Base64url),
-        {
-          accountUserId: e.accountUserId,
-          audience: e.audience,
-          clientId: e.clientId,
-          nonce: e.nonce,
-          scopes: e.scopes,
-          sessionId: e.sessionId,
-          targetOrigin: e.targetOrigin,
-          targetPath: e.targetPath,
-          tokenExpiresAt: e.tokenExpiresAt,
-          tokenSha256Base64url: e.tokenSha256Base64url,
-          type: e.type,
-        }
-      );
-    case `remoteControlClientEnrollment`:
-      if ((f4(e.nonce), e.audience !== `remote_control_client_enrollment`))
-        throw Error(`Invalid remote-control device-key enrollment audience`);
-      return (
-        p4(e.deviceIdentitySha256Base64url),
-        {
-          accountUserId: e.accountUserId,
-          audience: e.audience,
-          challengeExpiresAt: e.challengeExpiresAt,
-          challengeId: e.challengeId,
-          clientId: e.clientId,
-          deviceIdentitySha256Base64url: e.deviceIdentitySha256Base64url,
-          nonce: e.nonce,
-          targetOrigin: e.targetOrigin,
-          targetPath: e.targetPath,
-          type: e.type,
-        }
-      );
-  }
-}
-function f4(e) {
-  if (!d4.test(e) || Buffer.from(e, `base64url`).length < 32)
-    throw Error(`Invalid remote-control device-key nonce`);
-}
-function p4(e) {
-  if (!d4.test(e) || Buffer.from(e, `base64url`).length !== 32)
-    throw Error(`Invalid remote-control device-key SHA-256 digest`);
-}
+var F5e = createRemoteControlDeviceKeyClientClass({
+  createRequire: ee.createRequire,
+  moduleFilename: __filename,
+  pathJoin: h.join,
+});
 var R5e = class extends n.Uf {
     remoteConnectionsHandler;
     constructor(e) {
