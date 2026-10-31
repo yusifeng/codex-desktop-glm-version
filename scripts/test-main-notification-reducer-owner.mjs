@@ -14,6 +14,9 @@ Function("require", "module", "exports", transpiled.code)((specifier) => {
     findTurnById: (conversation, id) => (conversation.turns ?? []).find((turn) => turn.turnId === id) ?? null,
     lastTurnWithTurnId: (conversation) => [...(conversation.turns ?? [])].reverse().find((turn) => turn.turnId != null) ?? null,
     mergedConversationTurns: (conversation) => conversation.turns ?? [],
+    findTurnEntryForEvent: (conversation, id) => {
+      const turn = (conversation.turns ?? []).find((entry) => entry.turnId === id); return turn == null ? null : { entityKey: `turn:${id}`, turn };
+    },
     forEachTurn: (conversation, callback) => (conversation.turns ?? []).forEach(callback),
   };
   if (specifier === "../threads/patch-classification") return {
@@ -27,7 +30,12 @@ Function("require", "module", "exports", transpiled.code)((specifier) => {
   if (specifier === "../threads/automation-detector") return {
     parseAutomationUserMessage: () => null, parseHeartbeatDecision: () => null,
   };
-  if (specifier === "../threads/hydration") return { activeAncestryIds: () => new Set() };
+  if (specifier === "../threads/hydration") return { activeAncestryIds: () => new Set(), normalizeImageGenerationItem: (item) => item };
+  if (specifier === "../turns/steering-merge") return {
+    acceptServerUserMessage: (turn, item) => turn.items.push(item), isSteeringUserMessage: (item) => item.type === "steeringUserMessage",
+    recoverSteeringOrphans() {}, upsertItem: (turn, item) => { const index = turn.items.findIndex((entry) => entry.id === item.id); index < 0 ? turn.items.push(item) : turn.items[index] = item; },
+  };
+  if (specifier === "../vendor/immer") return { freezeIdentity: (value) => value };
   throw new Error(`unexpected require ${specifier}`);
 }, module, module.exports);
 const owner = module.exports;
@@ -71,9 +79,11 @@ const context = {
     itemStreamState: {
       handleNotification: (value) => calls.push(["item", value]), drainBefore: () => false,
       clearTurnTerminalInputBuffers: (...args) => calls.push(["clear-terminal", ...args]),
+      clearItemTerminalInputBuffer: (...args) => calls.push(["clear-terminal", ...args]),
     },
     openFileWatches: { getFileChangeMessages: () => [{ type: "open-file-changed" }] },
     handleRealtimeItemAdded: (params) => calls.push(["realtime", params]),
+    hydrateCollabThreads: (...args) => calls.push(["hydrate-collab", ...args]),
     upsertConversationFromThread: (thread) => (conversations.set(thread.id, thread), thread.id),
     handleThreadArchived: (id) => calls.push(["archived", id]), handleThreadDeletion: (ids) => calls.push(["deleted", ids]),
     handleThreadUnarchived: (id) => calls.push(["unarchived", id]),
@@ -81,8 +91,11 @@ const context = {
     updateTurnState: (id, turnId, update) => context.manager.updateTurnState(id, turnId, update),
     getLastAgentMessageForTurn: () => "done",
     turnMergePolicy: {},
+    manualContextCompactions: { consumeSource: () => "manual", removePendingItemFromTurn() {} },
+    subagentTopology: { discoverForSpawn: (...args) => calls.push(["spawn", ...args]) },
   },
 };
+context.notificationContext.threadStore.threadsById = new Map();
 
 owner.applyNotification(context, "account/updated", { account: {} });
 equal(calls.some(([kind]) => kind === "reset"), true);
@@ -111,6 +124,23 @@ equal(calls.some(([kind]) => kind === "snapshot"), true);
 
 owner.applyNotification(context, "item/agentMessage/delta", { threadId: "thread-1", delta: "hello" });
 equal(calls.some(([kind]) => kind === "item"), true);
+owner.applyNotification(context, "item/started", {
+  threadId: "thread-1", turnId: "turn-1", startedAtMs: 20,
+  item: { id: "command-1", type: "commandExecution", command: "pwd" },
+});
+equal(conversations.get("thread-1").turns[0].items.some((item) => item.id === "command-1"), true);
+owner.applyNotification(context, "item/completed", {
+  threadId: "thread-1", turnId: "turn-1", completedAtMs: 30,
+  item: { id: "command-1", type: "commandExecution", command: "pwd", durationMs: 5 },
+});
+equal(conversations.get("thread-1").turns[0].commandExecutionStartedAtMsById["command-1"], 20);
+equal(calls.some((entry) => entry[0] === "clear-terminal" && entry[2] === "command-1"), true);
+owner.applyNotification(context, "item/autoApprovalReview/started", {
+  threadId: "thread-1", turnId: "turn-1", reviewId: "review-1", targetItemId: "command-1",
+  startedAtMs: 40, action: { type: "command", source: "shell", command: "pwd", cwd: "/work" },
+  review: { status: "inProgress", riskLevel: "low", userAuthorization: null, rationale: "checking" },
+});
+equal(conversations.get("thread-1").turns[0].items.some((item) => item.id === "automatic-approval-review:review-1"), true);
 owner.applyNotification(context, "thread/realtime/itemAdded", { threadId: "thread-1", item: {} });
 equal(calls.some(([kind]) => kind === "realtime"), true);
 owner.applyNotification(context, "fs/changed", { watchId: "watch-1" });
@@ -137,5 +167,9 @@ equal(main.includes("function Ny("), false);
 equal(main.includes("function Py("), false);
 for (const name of ["Fy", "Iy", "Ly", "zy", "By", "Vy", "Wy", "Gy", "Ky", "qy", "Jy", "Yy", "Xy", "Zy", "Qy", "eb", "tb"])
   equal(main.includes(`function ${name}(`), false);
+for (const name of ["vy", "yy", "xy", "Lve", "tye", "nye", "rye", "iye", "aye", "Oy", "ky", "Ay"])
+  equal(main.includes(`function ${name}(`), false);
+equal(main.includes("Fve = class"), false);
+equal(main.includes("Ive = class"), false);
 
 console.log(`${assertions} main notification reducer owner assertions passed`);

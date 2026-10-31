@@ -1,9 +1,12 @@
 import { $u as normalizeThreadId, ed as requestIdOf, Zo as errorToString } from "@chunk/shared";
-import { conversationTurns, findTurnById, forEachTurn, lastTurnWithTurnId, mergedConversationTurns } from "../turns/canonical-history";
+import { conversationTurns, findTurnById, findTurnEntryForEvent, forEachTurn, lastTurnWithTurnId, mergedConversationTurns } from "../turns/canonical-history";
 import { applyThreadSettingsUpdate } from "../threads/patch-classification";
 import { Qv as applyPermissionsResolution, Yv as planImplementationId, Zv as applyMcpElicitationResolution } from "../requests/item-synthesis";
 import { parseAutomationUserMessage, parseHeartbeatDecision } from "../threads/automation-detector";
 import { activeAncestryIds } from "../threads/hydration";
+import { normalizeImageGenerationItem } from "../threads/hydration";
+import { acceptServerUserMessage, isSteeringUserMessage, recoverSteeringOrphans, upsertItem } from "../turns/steering-merge";
+import { freezeIdentity } from "../vendor/immer";
 
 type R=Record<string,unknown>;const rec=(v:unknown):R=>typeof v===`object`&&v!==null?v as R:{};const fn=(v:unknown,n:string)=>(rec(v)[n] as (((...a:unknown[])=>unknown)|undefined));
 function update(manager:unknown,id:string,callback:(state:R)=>void){fn(manager,`updateConversationState`)?.(id,callback)} function append(state:R,item:unknown){const turns=state.turns;if(Array.isArray(turns)&&turns.length>0){const turn=rec(turns[turns.length-1]);const items=Array.isArray(turn.items)?turn.items:[];turn.items=[...items,item]}}
@@ -290,6 +293,163 @@ function applyTurnCompleted(context: any, notification: { params: any }, capabil
   });
   return "handled";
 }
+function projectNotificationItem(context: any, item: any): any {
+  if (item.type === "collabAgentToolCall") {
+    context.notificationContext.hydrateCollabThreads(item.receiverThreadIds);
+    return {
+      type: "collabAgentToolCall", id: item.id, tool: item.tool, status: item.status,
+      senderThreadId: item.senderThreadId, receiverThreadIds: item.receiverThreadIds,
+      receiverThreads: item.receiverThreadIds.map((threadId: string) => ({
+        threadId, thread: context.notificationContext.threadStore.threadsById.get(threadId) ?? null,
+      })),
+      prompt: item.prompt, model: item.model, reasoningEffort: item.reasoningEffort, agentsStates: item.agentsStates,
+    };
+  }
+  return item.type === "imageGeneration" ? normalizeImageGenerationItem(item) : item;
+}
+function reviewAction(action: any): any {
+  const sources: Record<string, string> = { shell: "shell", unifiedExec: "unified_exec" };
+  const protocols: Record<string, string> = { http: "http", https: "https", socks5Tcp: "socks5_tcp", socks5Udp: "socks5_udp" };
+  switch (action.type) {
+    case "command": return { type: "command", source: sources[action.source], command: action.command, cwd: action.cwd };
+    case "execve": return { type: "execve", source: sources[action.source], program: action.program, argv: action.argv, cwd: action.cwd };
+    case "writeStdin": return { type: "write_stdin", approval_id: action.approvalId, process_id: action.processId, stdin: action.stdin, cwd: action.cwd };
+    case "applyPatch": return { type: "apply_patch", cwd: action.cwd, files: action.files };
+    case "networkAccess": return { type: "network_access", target: action.target, host: action.host, protocol: protocols[action.protocol], port: action.port };
+    case "mcpToolCall": return { type: "mcp_tool_call", server: action.server, tool_name: action.toolName, connector_id: action.connectorId, connector_name: action.connectorName, tool_title: action.toolTitle };
+    case "requestPermissions": return { type: "request_permissions", reason: action.reason, permissions: { network: action.permissions.network, file_system: action.permissions.fileSystem } };
+  }
+}
+function automaticReviewItem(params: any): any {
+  const now = Date.now();
+  const statuses: Record<string, string> = { aborted: "aborted", approved: "approved", denied: "denied", inProgress: "in_progress", timedOut: "timed_out" };
+  return {
+    type: "automaticApprovalReview", id: `automatic-approval-review:${params.reviewId}`,
+    targetItemId: params.targetItemId, turnId: params.turnId, action: params.action,
+    startedAtMs: now, completedAtMs: params.review.status === "inProgress" ? null : now,
+    serverStartedAtMs: params.startedAtMs, serverCompletedAtMs: "completedAtMs" in params ? params.completedAtMs : null,
+    event: params.review.status === "denied" ? {
+      id: params.reviewId, target_item_id: params.targetItemId, turn_id: params.turnId,
+      status: statuses[params.review.status], risk_level: params.review.riskLevel,
+      user_authorization: params.review.userAuthorization, rationale: params.review.rationale,
+      decision_source: "decisionSource" in params ? params.decisionSource : null, action: reviewAction(params.action),
+    } : null,
+    ...params.review,
+  };
+}
+function applyAuxiliaryItemNotification(context: any, notification: { method: string; params: any }): void {
+  const { manager, createId } = context;
+  const { method, params } = notification;
+  const conversationId = normalizeThreadId(params.threadId);
+  if (method === "item/autoApprovalReview/started" || method === "item/autoApprovalReview/completed") {
+    if (manager.getConversation(conversationId) == null) {
+      manager.logger.error("Received automatic approval review for unknown conversation", { safe: { conversationId, targetItemId: params.targetItemId }, sensitive: {} });
+      return;
+    }
+    const item = automaticReviewItem(params);
+    manager.updateConversationState(conversationId, (state: any) => {
+      const turn = findTurnById(state, params.turnId); if (turn == null) return;
+      const existing = turn.items.find((entry: any) => entry.id === item.id && entry.type === "automaticApprovalReview");
+      upsertItem(turn, freezeIdentity(existing == null ? item : { ...item, startedAtMs: existing.startedAtMs ?? item.startedAtMs }));
+      state.updatedAt = Date.now();
+    });
+    return;
+  }
+  if (method === "autoApprovalReview/strictReviewRequired") {
+    if (manager.getConversation(conversationId) == null) return;
+    manager.updateConversationState(conversationId, (state: any) => {
+      const turn = findTurnById(state, params.turnId); if (turn == null) return;
+      const previous = [...turn.items].reverse().find((item: any) => item.type === "strictReviewNotice");
+      if (previous == null || params.startedAtMs - previous.startedAtMs >= 10_000)
+        turn.items.push({ type: "strictReviewNotice", id: `strict-review-notice:${params.startedAtMs}`, startedAtMs: params.startedAtMs });
+    });
+    return;
+  }
+  if (method === "guardianWarning") {
+    if (("kind" in params ? params.kind : undefined) !== "tooManyDenials" &&
+      !params.message.startsWith("Automatic approval review rejected too many approval requests for this turn")) return;
+    manager.updateConversationState(conversationId, (state: any) => {
+      const turn = lastTurnWithTurnId(state); if (turn != null) turn.items.push({ id: createId(), type: "autoReviewInterruptionWarning" });
+    });
+    return;
+  }
+  if (method === "item/mcpToolCall/progress") context.notificationContext.updateTurnState(conversationId, params.turnId, (turn: any) => {
+    const item = turn.items.find((entry: any) => entry.id === params.itemId && entry.type === "mcpToolCall");
+    if (item != null) manager.logger.debug("Ignoring mcpToolCall progress message", { safe: { itemId: params.itemId, message: params.message }, sensitive: {} });
+  });
+}
+const AUXILIARY_ITEM_METHODS = new Set([
+  "item/autoApprovalReview/started", "item/autoApprovalReview/completed", "autoApprovalReview/strictReviewRequired", "guardianWarning", "item/mcpToolCall/progress",
+]);
+function applyItemNotification(context: any, notification: { method: string; params: any }, capability: any): "deferred" | "handled" {
+  const { manager, notificationContext, createId } = context;
+  const { method, params } = notification;
+  const conversationId = normalizeThreadId(params.threadId);
+  if (method === "item/completed" && notificationContext.itemStreamState.drainBefore(() =>
+    manager.onNotification("item/completed", params, capability))) return "deferred";
+  if (!notificationContext.threadStore.conversations.has(conversationId)) {
+    manager.logger.error(`Received ${method} for unknown conversation`, { safe: { conversationId }, sensitive: {} });
+    return "handled";
+  }
+  if (method === "item/completed" && params.item.type === "commandExecution")
+    notificationContext.itemStreamState.clearItemTerminalInputBuffer(conversationId, params.item.id);
+  if (method === "item/completed" && params.item.type === "reasoning")
+    manager.logger.info("Reasoning summary item completed", {
+      safe: { summaryPartCount: params.item.summary.length },
+      sensitive: { itemId: params.item.id, summary: params.item.summary, threadId: params.threadId, turnId: params.turnId },
+    });
+  manager.updateConversationState(conversationId, (state: any) => {
+    let entry = findTurnEntryForEvent(state, params.turnId, { logger: manager.logger, createId }, {
+      rebindLatestInProgressPlaceholder: method === "item/started" && params.item.type === "contextCompaction",
+      synthesizeMissingTurn: method === "item/started",
+    });
+    if (params.item.type === "userMessage") {
+      const turns = conversationTurns(state);
+      recoverSteeringOrphans(turns);
+      let target = method === "item/completed"
+        ? turns.find((turn: any) => turn.turnId !== params.turnId && turn.items.some((item: any) => isSteeringUserMessage(item) && item.targetTurnId === params.turnId)) ?? entry?.turn
+        : entry?.turn;
+      if (target != null) acceptServerUserMessage(target, params.item, method === "item/started" ? "started" : "completed", state.modelProvider ?? null, params.turnId ?? target.turnId);
+      return;
+    }
+    const turn = entry?.turn;
+    if (turn == null) return;
+    if (method === "item/started") {
+      if (params.item.type === "agentMessage") {
+        turn.finalAssistantStartedAtMs = params.startedAtMs;
+        (turn.aeonAssistantMessageStartedAtMsById ??= {})[params.item.id] = params.startedAtMs;
+      }
+      if (params.item.type !== "hookPrompt") turn.firstTurnWorkItemStartedAtMs ??= Date.now();
+      const projected = projectNotificationItem(context, params.item);
+      if (projected.type === "commandExecution") (turn.commandExecutionStartedAtMsById ??= {})[projected.id] = params.startedAtMs;
+      const value = freezeIdentity(projected.type === "contextCompaction"
+        ? { ...projected, completed: false, source: notificationContext.manualContextCompactions.consumeSource(conversationId) }
+        : projected);
+      if (projected.type === "contextCompaction") notificationContext.manualContextCompactions.removePendingItemFromTurn(turn);
+      upsertItem(turn, value);
+      return;
+    }
+    const projected = projectNotificationItem(context, params.item);
+    let source: unknown;
+    if (projected.type === "contextCompaction") {
+      delete state.lastInjectedPassiveContextKey;
+      source = turn.items.find((item: any) => item.type === "contextCompaction" && item.id === projected.id)?.source;
+    }
+    if (projected.type === "commandExecution" && projected.durationMs != null) {
+      const starts = (turn.commandExecutionStartedAtMsById ??= {});
+      starts[projected.id] ??= params.completedAtMs - projected.durationMs;
+    }
+    if (params.item.type !== "hookPrompt") turn.firstTurnWorkItemStartedAtMs ??= Date.now();
+    upsertItem(turn, freezeIdentity(projected.type === "contextCompaction"
+      ? { ...projected, completed: true, source: source ?? "automatic" }
+      : projected));
+  });
+  if (method === "item/completed" &&
+    ((params.item.type === "collabAgentToolCall" && params.item.tool === "spawnAgent") ||
+      (params.item.type === "subAgentActivity" && params.item.kind === "started")))
+    notificationContext.subagentTopology.discoverForSpawn(conversationId, params.item);
+  return "handled";
+}
 export function nb(context: any, method: string, params: any, automationCapability?: unknown, shouldIgnore = false): void {
   const notification = { method, params };
   const delivery = { notification, automationCapability };
@@ -307,10 +467,12 @@ export function nb(context: any, method: string, params: any, automationCapabili
     return;
   }
   if (method === "turn/completed" && applyTurnCompleted(context, notification, automationCapability, shouldIgnore) === "deferred") return;
+  if ((method === "item/started" || method === "item/completed") && applyItemNotification(context, notification, automationCapability) === "deferred") return;
   if (["account/login/completed", "account/updated", "mcpServer/oauthLogin/completed", "windowsSandbox/setupCompleted"].includes(method))
     notificationContext.lifecycle.handleNotification(notification);
   else if (THREAD_NOTIFICATION_METHODS.has(method)) applyThreadNotification(context, notification);
   else if (ITEM_STREAM_METHODS.has(method)) notificationContext.itemStreamState.handleNotification(notification);
+  else if (AUXILIARY_ITEM_METHODS.has(method)) applyAuxiliaryItemNotification(context, notification);
   else if (TURN_NOTIFICATION_METHODS.has(method)) applyTurnNotification(context, notification);
   else if (method === "serverRequest/resolved") applyServerRequestResolved(context, params);
   else if (method === "fs/changed")

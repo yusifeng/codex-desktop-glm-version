@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 notification item reducer restoration
+
+item reducer 现覆盖 started/completed 的 turn 定位、steering、collab/image、compaction、计时、terminal 与 subagent 副作用，并恢复 auto-review/
+strict/guardian/MCP progress。focused suite 验证 command start/completion 和 automatic review；删除 old `ky/Ay`、review helper 与已由
+`delta-queues.ts`/`item-notifications.ts` 真实消费替代的死 delta queue，保留仍有主 chunk consumer 的 realtime parser 与 `jy`。
+
 ## 2026-10-31 notification turn completion restoration
 
 `turn/completed` 现恢复旧 `tb` 的 drain/replay、terminal cleanup、plan metrics/implementation、automation decision、goal continuation、unread 与

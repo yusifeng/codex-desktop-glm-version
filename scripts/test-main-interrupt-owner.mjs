@@ -14,12 +14,15 @@ Function("require", "module", "exports", transpiled.code)((specifier) => {
     findTurnById: (conversation, id) => conversation.turns.find((turn) => turn.turnId === id) ?? null,
     lastTurnWithTurnId: (conversation) => [...conversation.turns].reverse().find((turn) => turn.turnId != null) ?? null,
     mergedConversationTurns: (conversation) => conversation.turns,
+    findTurnEntryForEvent: () => null,
     forEachTurn: (conversation, callback) => (conversation.turns ?? []).forEach(callback),
   };
   if (specifier === "../threads/patch-classification") return { applyThreadSettingsUpdate() {} };
   if (specifier === "../requests/item-synthesis") return { Qv() {}, Yv: String, Zv() {} };
   if (specifier === "../threads/automation-detector") return { parseAutomationUserMessage: () => null, parseHeartbeatDecision: () => null };
-  if (specifier === "../threads/hydration") return { activeAncestryIds: () => new Set() };
+  if (specifier === "../threads/hydration") return { activeAncestryIds: () => new Set(), normalizeImageGenerationItem: (item) => item };
+  if (specifier === "../turns/steering-merge") return { acceptServerUserMessage() {}, isSteeringUserMessage: () => false, recoverSteeringOrphans() {}, upsertItem() {} };
+  if (specifier === "../vendor/immer") return { freezeIdentity: (value) => value };
   throw new Error(`unexpected require ${specifier}`);
 }, module, module.exports);
 const owner = module.exports;

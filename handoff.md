@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成 notification item reducer：started/completed 现恢复 drain/defer、unknown guard、turn event 重绑/合成、steering user admission、collab/image
+投影、context compaction source、command/assistant 时间、terminal buffer、subagent discovery；auto approval、strict notice、guardian warning 与 MCP
+progress 亦恢复。主 chunk 旧 `ky/Ay`、auto-review helper 与无 consumer delta queue 簇删除；realtime parser consumer 与 `jy` timeline 暂保留。
+
 完成 notification `turn/completed` reducer：恢复 delta drain/defer、unknown/unread cleanup、terminal buffer 清理、turn 状态与 automation 标注、
 incomplete plan metrics、plan implementation request、heartbeat/failed-only notification decision、goal/queued/ancestry continuation、unread、snapshot
 与 owner-only completion event。旧 `tb` 及仅由它消费的 helper、已迁移 synthetic helper 删除；`Ry/Hy/Uy` 因主 chunk 尚有真实 consumer 保留。
