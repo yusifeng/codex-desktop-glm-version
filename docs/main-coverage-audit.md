@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 app-server stream-role owner
+
+既有 `src/main/main-app/threads/stream-roles.ts` 的 `AppServerManagerStreamState` 已接回真实 conversation manager consumer，
+替代原 `Yge`。新 owner 保留 owner/follower role state、revision waiters、snapshot/patch publication、follower reconnect grace、
+window activity、transport callbacks 与 reset/disposal cleanup；53 个 class members 与原 owner 对齐，主 chunk 旧 445 行 class
+已删除。
+
 ## 2026-10-31 queued follow-ups owner
 
 既有 `src/main/main-app/conversation/queued-follow-ups.ts` 的 `QueuedFollowUpsCoordinator` 已接回真实 `USe` factory，替代

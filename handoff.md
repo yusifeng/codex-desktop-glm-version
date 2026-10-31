@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 app-server stream-role owner：`threads/stream-roles.ts` 的 `AppServerManagerStreamState` 现已替代主 chunk 的 `Yge`。
+owner/follower roles、revision waiters、snapshot/patch fan-out、reconnect grace、window activity 和 transport lifecycle 保持由
+53-member 状态机持有；真实 conversation manager consumer 已接回，旧 445 行 class 已物理删除。
+
 接回 queued follow-ups owner：`conversation/queued-follow-ups.ts` 的 `QueuedFollowUpsCoordinator` 现已替代主 chunk 的
 `VSe`。local/server/follower queues、serialized persistence、automatic-turn deferrals、steer/start fallback、execution
 subscriptions 与 disposal 保持由同一 owner 持有；真实 `USe` factory consumer 已接回，旧 739 行 class 已物理删除。
