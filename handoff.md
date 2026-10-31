@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `O6e` primary-runtime update poller 迁入 `misc/primary-runtime-update-poller.ts`；startup/scheduled/
+manual 三类触发、shared-object feature gate、jitter hour scheduling、single-flight/checkRequested 合并、cache
+status projection 与 install trigger/payload 均由新 owner 持有，真实 `L6e` host 已接回并删除旧 class。
+focused test 覆盖 28 项。
+
 随后将 `w6e` plugin incentives client、其 schemas、JWT identity predicate 与 process-wide receipt set 整簇
 迁入 `plugins/incentives-client.ts`；local/host 双 token 校验、response 后 identity recheck、401 单次 refresh、
 404/409/invalid response projection、request timeout/abort 与 dispose 均保持原语义，runtime consumer 已真实接回。

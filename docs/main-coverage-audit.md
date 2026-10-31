@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 primary runtime update poller
+
+原 `O6e` 已迁入 `src/main/main-app/misc/primary-runtime-update-poller.ts`。新 owner 保留 static/dynamic
+feature gates、startup/scheduled/manual update policy、hourly jitter persistence、single-flight 与 immediate-check
+合并、cache status 分支、install trigger/payload 和 failure logging；真实 `L6e` host 直接构造新 class，旧实现
+已物理删除。既有 `misc/primary-runtime.ts` 仍含未接回 host/installer skeleton，后续继续整簇替换。
+
 ## 2026-10-31 plugin incentives client
 
 原 `w6e`、`x6e/S6e/C6e` schemas、`V0` JWT identity predicate 与 `B0` receipt owner 已整簇迁入
