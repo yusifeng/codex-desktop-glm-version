@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 in-app browser availability owner：既有 `browser-use/availability.ts` 现替代主 chunk 旧 `Kse/qse/Jse/Yse`。
+experimentalFeature/list 的 100 项 cursor 分页、命中 enabled、异常 warning + true fallback、Deferred startup registration 均保持
+完整；startup 真实 consumer 继续通过 `Jse` 兼容别名构造 availability reader。
+
 接回 cross-instance lock owner：既有 `util/cross-instance-lock.ts` 现替代主 chunk 旧 `AN/cje…RN`。审计修复 claim 后
 owner 变化时仍可能覆盖新 owner 的 OR 竞态，恢复“token 必须未变，再判断 force/stale/priority”的旧语义；global dictation 与
 hotkey window lifecycle 两个真实 consumers 已通过 `jN/AN` 兼容别名接回，旧 119 行簇删除。

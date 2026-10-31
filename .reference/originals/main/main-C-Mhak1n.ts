@@ -159,6 +159,7 @@ const { CodexMicroHostService: cA } = require("./main-app/device/codex-micro-hos
 const { listAmbientSummaries: Yj, newAmbientSuggestions: Xj, activeSummaryIntervals: Zj, listAllApplications: Qj, listApplicationsByBundleIds: $j } = require("./main-app/computer-use/memory-summaries.js");
 const { listApplicationsForFile: Nj, appForBundleId: Pj, listWebUrlHandlers: Fj, notifyDownloadComplete: Ij, setAppIcon: Lj } = require("./main-app/mac/launch-services.js");
 const { acquireCrossInstanceLock: jN, CROSS_INSTANCE_LOCKS: AN } = require("./main-app/util/cross-instance-lock.js");
+const { registerInAppBrowserAvailabilityProbe: Jse } = require("./main-app/browser-use/availability.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -12933,37 +12934,6 @@ function Gse(e) {
   if (typeof e != `object` || !e || !(`id` in e)) return null;
   let t = e.id;
   return typeof t == `string` || typeof t == `number` ? t : null;
-}
-var Kse = `in_app_browser`,
-  qse = 100;
-function Jse(e, t) {
-  let i = n.Ac(),
-    a = () => Yse(t);
-  return (
-    e.register(i.promise, a),
-    async () => {
-      let e = await a().catch(
-        (e) => (
-          r
-            .n()
-            .warning(`Failed to read in-app browser availability`, {
-              safe: {},
-              sensitive: { error: e },
-            }),
-          !0
-        ),
-      );
-      return (i.resolve(e), e);
-    }
-  );
-}
-async function Yse(e) {
-  let t = async (n) => {
-    let r = await e({ cursor: n, limit: qse }),
-      i = r.data.find((e) => e.name === Kse);
-    return i == null ? r.nextCursor == null || t(r.nextCursor) : i.enabled;
-  };
-  return t(null);
 }
 var nu = 4096,
   Xse = 6048e5,

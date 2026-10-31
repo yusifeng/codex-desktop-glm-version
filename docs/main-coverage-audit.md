@@ -1,5 +1,10 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 in-app browser availability wiring
+
+`src/main/main-app/browser-use/availability.ts` 已完整覆盖旧 `Kse/qse/Jse/Yse`。本轮接回 startup registry consumer 并删除
+旧 30 行簇；focused suite 覆盖多页 cursor、100 limit、disabled 命中、Deferred resolve、请求异常 true fallback/warning 与真实 wiring。
+
 ## 2026-10-31 cross-instance lock owner wiring
 
 `src/main/main-app/util/cross-instance-lock.ts` 已覆盖旧 `AN/cje/lje/uje/dje/fje/pje/jN/mje/hje/MN/gje/_je/vje/NN/PN/FN/IN/yje/bje/LN/xje/RN`。
