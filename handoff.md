@@ -5180,3 +5180,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   两个环境依赖。page command controller 直接接管 scroll JavaScript、screenshot capture、clipboard、结果消息、logger/error reporter 顺序。
 - 主 chunk 旧 `wZ/GZe/KZe/TZ/JZe/YZe/XZe/ZZe/QZe` 已删除。focused coverage 增加 strict union、invalid extra field、
   screenshot unavailable/success/failure、clipboard、scroll projection 与 non-fatal report。
+
+# 2026-11-01 IAB Browser Use policy convergence
+
+- `browser-use/iab-api.ts` 直接接管 target/CDP/viewport/route-tab/URL-title/process-gone/coordinate/timer-timeout 纯策略，109-method
+  state owner 不再从组合根注入 34 个机械 helper；保留的 14 项均为 Electron/shared/bootstrap、feature flags、logger 或 command capability。
+- 主 chunk 旧 `OYe..rX` helper belt 已删除。focused coverage 新增 primary/child target、capture clip、navigation URL、NUL route key、
+  persistent/temporary URL、title/committed URL 与 timeout success；下一批审计仍在主 chunk 的 capability/command schema belt。

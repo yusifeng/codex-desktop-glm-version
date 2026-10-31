@@ -15,15 +15,271 @@ const ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER = Symbol(`addBrowserUseDownloadCh
 const CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD = Symbol(`consumeAllowedBrowserUseDownload`);
 const NOTIFY_BROWSER_USE_DOWNLOAD_CHANGE = Symbol(`notifyBrowserUseDownloadChange`);
 
+function isRecord(value: unknown): value is Record<string, any> {
+  return typeof value === `object` && value != null && !Array.isArray(value);
+}
+
+function stringField(value: Record<string, any>, key: string): string | null {
+  const field = value[key];
+  return typeof field === `string` ? field : null;
+}
+
+function objectField(value: Record<string, any>, key: string): Record<string, any> | null {
+  const field = value[key];
+  return isRecord(field) ? field : null;
+}
+
+function primaryTargetId(tab: { cdpTabId: number }): string {
+  return `browser-use-iab-tab:${tab.cdpTabId}`;
+}
+
+function serializePrimaryTarget(tab: any) {
+  const targetId = primaryTargetId(tab);
+  return {
+    attached: true,
+    canAccessOpener: false,
+    id: targetId,
+    tabId: tab.cdpTabId,
+    targetId,
+    title: tab.title,
+    type: `page`,
+    url: tab.url,
+  };
+}
+
+function targetIdFromCommand(command: any): string | null {
+  if (!isRecord(command.commandParams)) return null;
+  return typeof command.commandParams.targetId === `string`
+    ? command.commandParams.targetId
+    : null;
+}
+
+function targetIdFromTargetInfo(value: any): string | null {
+  return value == null ? null : (stringField(value, `targetId`) ?? stringField(value, `id`));
+}
+
+function isAttachableChildTarget(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  const type = stringField(value, `type`);
+  return type !== `iframe` && (type !== `other` || stringField(value, `url`) == null)
+    ? false
+    : targetIdFromTargetInfo(value) != null;
+}
+
+function isEmulatedTargetMethod(method: string): boolean {
+  return method === `Target.getTargetInfo` || method === `Target.getTargets` || method === `Target.closeTarget`;
+}
+
+function requiresDebuggerTargetSession(tab: any, target: any): boolean {
+  return target.sessionId != null ||
+    (target.targetId != null && target.targetId !== primaryTargetId(tab));
+}
+
+function assertSupportedCdpMethod(method: string): void {
+  if (
+    (method.startsWith(`Target.`) && method !== `Target.setAutoAttach`) ||
+    (method.startsWith(`Input.`) &&
+      method !== `Input.dispatchMouseEvent` &&
+      method !== `Input.dispatchKeyEvent` &&
+      method !== `Input.insertText`)
+  )
+    throw Error(`Browser Use CDP method is not supported in the in-app browser: ${method}`);
+}
+
+function navigationUrlFromCommand(command: any): string | null {
+  if (command.method !== `Page.navigate` || !isRecord(command.commandParams)) return null;
+  return typeof command.commandParams.url === `string` ? command.commandParams.url : null;
+}
+
+function historyEntryIdFromCommand(command: any): number | null {
+  if (command.method !== `Page.navigateToHistoryEntry` || !isRecord(command.commandParams)) return null;
+  return typeof command.commandParams.entryId === `number` ? command.commandParams.entryId : null;
+}
+
+function captureBeyondViewportSize(command: any): { width: number; height: number } | null {
+  if (
+    command.method !== `Page.captureScreenshot` ||
+    !isRecord(command.commandParams) ||
+    command.commandParams.captureBeyondViewport !== true ||
+    !isRecord(command.commandParams.clip)
+  )
+    return null;
+  const { width, height } = command.commandParams.clip;
+  return typeof width !== `number` ||
+    typeof height !== `number` ||
+    !Number.isFinite(width) ||
+    !Number.isFinite(height) ||
+    width <= 0 ||
+    height <= 0
+    ? null
+    : { width: Math.ceil(width), height: Math.ceil(height) };
+}
+
+function visualViewport(value: unknown): Record<string, any> | null {
+  return isRecord(value)
+    ? isRecord(value.cssVisualViewport)
+      ? value.cssVisualViewport
+      : isRecord(value.visualViewport)
+        ? value.visualViewport
+        : null
+    : null;
+}
+
+function viewportDimension(viewport: Record<string, any>, clientKey: string, fallbackKey: string): number {
+  const clientValue = viewport[clientKey];
+  if (typeof clientValue === `number`) return clientValue;
+  const fallbackValue = viewport[fallbackKey];
+  return typeof fallbackValue === `number` ? fallbackValue : 0;
+}
+
+function viewportContainsSize(layoutMetrics: unknown, size: { width: number; height: number }): boolean {
+  const viewport = visualViewport(layoutMetrics);
+  return viewport != null &&
+    viewportDimension(viewport, `clientWidth`, `width`) >= size.width &&
+    viewportDimension(viewport, `clientHeight`, `height`) >= size.height;
+}
+
+function processGoneReason(value: unknown): string | null {
+  return isRecord(value) && typeof value.reason === `string` ? value.reason : null;
+}
+
+function processGoneExitCode(value: unknown): number | null {
+  return isRecord(value) && typeof value.exitCode === `number` ? value.exitCode : null;
+}
+
+function conversationIdFromRouteKey(routeKey: string): string {
+  return routeKey.slice(routeKey.indexOf(`:`) + 1);
+}
+
+function routeTabKey(routeKey: string, browserTabId: string): string {
+  return `${routeKey}\0${browserTabId}`;
+}
+
+function browserTabIdFromRouteTabKey(
+  routeKey: string,
+  key: string,
+  brandBrowserTabId: (value: string) => any,
+) {
+  const prefix = `${routeKey}\0`;
+  return key.startsWith(prefix) ? brandBrowserTabId(key.slice(prefix.length)) : null;
+}
+
+function isAboutBlank(url: string): boolean {
+  return url === IAB_ABOUT_BLANK;
+}
+
+function isPersistentUrl(url: string, lifetime: string): boolean {
+  return lifetime === `persistent` && url.length > 0 && !isAboutBlank(url);
+}
+
+function reconcilePendingTabUrl(currentUrl: string, pendingUrl: string, lifetime: string): string {
+  return isAboutBlank(currentUrl)
+    ? isPersistentUrl(pendingUrl, lifetime)
+      ? pendingUrl
+      : IAB_ABOUT_BLANK
+    : currentUrl || pendingUrl;
+}
+
+function reconcileLiveTabUrl(
+  currentUrl: string,
+  liveUrl: string,
+  fallbackUrl: string | null | undefined,
+  lifetime = `temporary`,
+): string {
+  if (liveUrl.length === 0) return fallbackUrl ?? currentUrl;
+  if (!isAboutBlank(liveUrl)) return liveUrl;
+  return isPersistentUrl(currentUrl, lifetime)
+    ? currentUrl
+    : fallbackUrl != null && isPersistentUrl(fallbackUrl, lifetime)
+      ? fallbackUrl
+      : IAB_ABOUT_BLANK;
+}
+
+function reconcileTabTitle(currentTitle: string, tab: any): string {
+  return isPersistentUrl(tab.url, tab.lifetime) &&
+    tab.title.length > 0 &&
+    !isAboutBlank(tab.title) &&
+    (currentTitle.length === 0 || isAboutBlank(currentTitle))
+    ? tab.title
+    : currentTitle;
+}
+
+function reconcileSerializedTabTitle(
+  currentUrl: string,
+  currentPendingUrl: string,
+  committedUrl: string,
+  committedPendingUrl: string,
+): string {
+  return committedUrl.length > 0 &&
+    committedUrl !== IAB_ABOUT_BLANK &&
+    committedPendingUrl.length > 0 &&
+    committedPendingUrl !== IAB_ABOUT_BLANK &&
+    (currentUrl.length === 0 || currentUrl === IAB_ABOUT_BLANK ||
+      currentPendingUrl.length === 0 || currentPendingUrl === IAB_ABOUT_BLANK)
+    ? committedUrl
+    : currentUrl || committedUrl;
+}
+
+function assertFiniteCoordinates(operation: string, value: { x: number; y: number }): void {
+  if (!Number.isFinite(value.x) || !Number.isFinite(value.y))
+    throw Error(`${operation} requires finite x and y coordinates`);
+}
+
+function unrefTimer(timer: any): void {
+  if (typeof timer === `object` && timer != null && `unref` in timer) timer.unref();
+}
+
+async function waitUnref(delayMs: number): Promise<void> {
+  await new Promise<void>((resolve) => {
+    unrefTimer(setTimeout(resolve, delayMs));
+  });
+}
+
+function isTimeoutError(error: unknown): boolean {
+  return error instanceof Error && error.message.startsWith(`Timed out`);
+}
+
+function clampTimeout(value: unknown, maximum: number): number {
+  return typeof value === `number` && Number.isFinite(value) && value > 0
+    ? Math.min(value, maximum)
+    : maximum;
+}
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        reject(Error(message));
+      }
+    }, timeoutMs);
+    timer.unref();
+    promise.then(
+      (value) => {
+        if (!settled) {
+          settled = true;
+          clearTimeout(timer);
+          resolve(value);
+        }
+      },
+      (error) => {
+        if (!settled) {
+          settled = true;
+          clearTimeout(timer);
+          reject(error);
+        }
+      },
+    );
+  });
+}
+
 function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies) {
   const {
-    $Y, AYe, BYe, FYe, GY, HYe, HY, IYe,
-    JY, KY, LY, LYe, MYe, NYe, OYe, PYe,
-    QY, RYe, UY, UYe, VY, VYe, WY, WYe,
-    XY, YY, ZY, a, dYe, eX, gYe, hYe,
-    jYe, kYe, l, mYe, n, nX, pYe, qY,
-    rX, tX, vYe, zYe, _, _Ye, Tr,
+    LY, a, dYe, gYe, hYe, l, mYe, n, pYe,
+    vYe, _, _Ye, Tr,
   } = dependencies;
+  const brandBrowserTabId = a.bn;
   const IY = IAB_ABOUT_BLANK,
     yYe = IAB_PAGE_READY_TIMEOUT_MS,
     bYe = IAB_CDP_COMMAND_TIMEOUT_MS,
@@ -125,7 +381,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
       this.recordBrowserUseTurn(t, e);
       let n = await this.getTab(t, e.tabId);
       (await this.attachForBrowserUse(t, e),
-        e.targetId !== VY(n) && (await this.attachDebuggerTarget(n, e.targetId)));
+        e.targetId !== primaryTargetId(n) && (await this.attachDebuggerTarget(n, e.targetId)));
     }
     async detach(e) {
       let t = this.requireBrowserUseSession(e);
@@ -135,7 +391,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
       let t = this.requireBrowserUseSession(e);
       this.recordBrowserUseTurn(t, e);
       let n = await this.getTab(t, e.tabId);
-      if (e.targetId !== VY(n)) {
+      if (e.targetId !== primaryTargetId(n)) {
         await this.detachDebuggerTarget(n, e.targetId);
         return;
       }
@@ -151,7 +407,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
     async executeCdpWithCachedExpression(e) {
       this.requireBrowserUseSession(e);
       let { expressionCacheKey: t, ...n } = e,
-        r = JY(n.commandParams) ? n.commandParams : {},
+        r = isRecord(n.commandParams) ? n.commandParams : {},
         i = typeof r.expression == `string` ? r.expression : void 0;
       i != null && this.cachedCdpExpressions.set(t, i);
       let a = i ?? this.cachedCdpExpressions.get(t);
@@ -344,7 +600,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
       ((n.mark = { status: e.status, turnId: e.turn_id }), this.recordBrowserUseTurn(t, e));
     }
     async moveMouse(e) {
-      UYe(`moveMouse`, e);
+      assertFiniteCoordinates(`moveMouse`, e);
       let t = this.requireBrowserUseSession(e),
         n = await this.getTab(t, e.tabId);
       (this.recordBrowserUseTurn(t, e), this.markBrowserUseCommandForTab(t, n));
@@ -403,7 +659,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
       let t = this.hostsByRouteKey.get(e) ?? null;
       (this.hostsByRouteKey.delete(e),
         this.selectedTabIdsByRouteKey.delete(e),
-        this.usedTurnIdsByConversationId.delete(YY(e)),
+        this.usedTurnIdsByConversationId.delete(conversationIdFromRouteKey(e)),
         t != null &&
           (t.setBrowserUseCursor(null),
           t.setBrowserUseActive(!1),
@@ -429,8 +685,8 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
           (n != null && a.browserTabId !== n) ||
           this.tabsById.set(i, { ...a, browserTabId: r ?? a.browserTabId, routeKey: t });
       for (let [i, a] of Array.from(this.tabIdsByRouteTabKey.entries())) {
-        let o = zYe(e, i);
-        o == null || (n != null && o !== n) || this.moveRouteTabId(i, XY(t, r ?? o), a);
+        let o = browserTabIdFromRouteTabKey(e, i, brandBrowserTabId);
+        o == null || (n != null && o !== n) || this.moveRouteTabId(i, routeTabKey(t, r ?? o), a);
       }
     }
     dispose() {
@@ -496,7 +752,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
                 t());
             };
           ((n = setTimeout(r, this.cursorArrivalTimeoutMs)),
-            eX(n),
+            unrefTimer(n),
             this.cursorArrivalWaitersByMoveSequence.set(e, r));
         }));
     }
@@ -603,9 +859,9 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
             (r.assertBrowserUseNavigationAllowed(n.pageKey, i),
             r.trackPendingBrowserUseNavigation(n.pageKey, i),
             (a = !0)));
-        let o = OYe(t.method);
+        let o = isEmulatedTargetMethod(t.method);
         if (
-          (o || GY(t.method),
+          (o || assertSupportedCdpMethod(t.method),
           t.method !== `Target.getTargetInfo` &&
             (await this.attachForBrowserUse(e, { tabId: n.cdpTabId })),
           await this.waitForTabReadyForCdp(e, n),
@@ -616,17 +872,17 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
           return await this.executeEmulatedTargetCommand(n, t);
         if (t.method === `Page.reload`)
           return (
-            JY(t.commandParams) && t.commandParams.ignoreCache === !0
+            isRecord(t.commandParams) && t.commandParams.ignoreCache === !0
               ? n.webContents.reloadIgnoringCache()
               : n.webContents.reload(),
             {}
           );
         try {
-          let i = nX(t.timeoutMs, this.cdpCommandTimeoutMs),
+          let i = clampTimeout(t.timeoutMs, this.cdpCommandTimeoutMs),
             a = Date.now() + i;
           return (
             r?.waitForPendingDebuggerSync != null &&
-              (await rX(
+              (await withTimeout(
                 r.waitForPendingDebuggerSync(n.browserTabId),
                 i,
                 `Timed out waiting for debugger synchronization for tab ${n.cdpTabId}`,
@@ -655,7 +911,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
       } catch (e) {
         throw (
           r != null && a && r.clearPendingBrowserUseNavigation(n.pageKey),
-          tX(e)
+          isTimeoutError(e)
             ? t.preserveDebuggerOnTimeout === !0
               ? this.releasePageCapturePaintLease(n)
               : await this.cleanupDebuggerForTabBestEffort(n, `cdp-timeout`)
@@ -705,7 +961,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
       let t = new Set(),
         n = this.getBrowserHost(e);
       n != null && t.add(this.rememberBrowserHost(n));
-      for (let [n, r] of this.hostsByRouteKey.entries()) YY(n) === e.conversationId && t.add(r);
+      for (let [n, r] of this.hostsByRouteKey.entries()) conversationIdFromRouteKey(n) === e.conversationId && t.add(r);
       return [...t];
     }
     updateTabsForSession(e) {
@@ -714,7 +970,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
         n = t.getTabsForBrowserUse(),
         r = new Set(),
         i = n.map((e) => {
-          let n = XY(t.routeKey, e.browserTabId);
+          let n = routeTabKey(t.routeKey, e.browserTabId);
           r.add(n);
           let i = this.updateTabForInfo(e, t.routeKey);
           if (!e.sessionControlled) return i;
@@ -728,7 +984,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
     pruneMissingTabs(e, t) {
       for (let n of Array.from(this.tabsById.values())) {
         if (n.routeKey !== e) continue;
-        let r = XY(n.routeKey, n.browserTabId);
+        let r = routeTabKey(n.routeKey, n.browserTabId);
         t.has(r) ||
           (this.forgetRouteTabId(n),
           this.cleanupDebuggerForTabBestEffort(n, `tab-inventory-pruned`),
@@ -756,7 +1012,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
       );
     }
     updateTabForPage(e, t, n) {
-      let r = this.tabIdsByRouteTabKey.get(XY(t, e.browserTabId)),
+      let r = this.tabIdsByRouteTabKey.get(routeTabKey(t, e.browserTabId)),
         i = r == null ? null : (this.tabsById.get(r) ?? null),
         a = this.updateTabForInfo(
           {
@@ -765,7 +1021,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
             lifetime: n,
             sessionControlled: i?.sessionControlled ?? !1,
             title: e.title,
-            url: ZY(e.url, e.webContents.isDestroyed() ? `` : e.webContents.getURL(), i?.url, n),
+            url: reconcileLiveTabUrl(e.url, e.webContents.isDestroyed() ? `` : e.webContents.getURL(), i?.url, n),
           },
           t,
         ),
@@ -788,7 +1044,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
       );
     }
     updateTabForInfo(e, t) {
-      let n = XY(t, e.browserTabId),
+      let n = routeTabKey(t, e.browserTabId),
         r = this.tabIdsByRouteTabKey.get(n) ?? null,
         i = r ?? this.nextCdpTabId;
       r ?? (this.nextCdpTabId += 1);
@@ -819,9 +1075,9 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
         id: e.cdpTabId,
         providerTabId: e.browserTabId,
         sessionControlled: e.sessionControlled,
-        title: HYe(n, r, e.title, e.url),
+        title: reconcileSerializedTabTitle(n, r, e.title, e.url),
         active: e.cdpTabId === this.selectedTabIdsByRouteKey.get(e.routeKey),
-        url: BYe(r, e.url, e.lifetime),
+        url: reconcilePendingTabUrl(r, e.url, e.lifetime),
       };
     }
     markBrowserUseCommandForTab(e, t) {
@@ -930,16 +1186,16 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
         );
     }
     async getCdpNavigationUrl(e, t, n) {
-      let r = KY(n);
+      let r = navigationUrlFromCommand(n);
       if (r != null) return r;
-      let i = NYe(n);
+      let i = historyEntryIdFromCommand(n);
       return i == null ? null : this.getHistoryNavigationUrl(e, t, i);
     }
     async getHistoryNavigationUrl(e, t, n) {
       let r = t.webContents.debugger.isAttached();
       (await this.attachTab(t), await this.waitForTabReadyForCdp(e, t));
       try {
-        let e = await rX(
+        let e = await withTimeout(
             t.webContents.debugger.sendCommand(`Page.getNavigationHistory`, {}),
             this.cdpCommandTimeoutMs,
             `Timed out reading navigation history for tab ${t.cdpTabId}`,
@@ -984,7 +1240,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
       return this.getTab(e, n.id);
     }
     shouldAutoBootstrapNavigateCommand(e) {
-      return KY(e) != null;
+      return navigationUrlFromCommand(e) != null;
     }
     clearDestroyedTabRuntimes() {
       for (let e of this.tabsById.values()) {
@@ -1026,7 +1282,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
           this.selectedTabIdsByRouteKey.delete(e.routeKey));
     }
     forgetRouteTabId(e) {
-      let t = XY(e.routeKey, e.browserTabId);
+      let t = routeTabKey(e.routeKey, e.browserTabId);
       this.tabIdsByRouteTabKey.get(t) === e.cdpTabId && this.tabIdsByRouteTabKey.delete(t);
     }
     requireBrowserUseTab(e, t) {
@@ -1106,7 +1362,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
         },
         i = (t, n) => {
           let r = this.tabsById.get(e.cdpTabId) ?? null;
-          r != null && (r.title = VYe(n, r));
+          r != null && (r.title = reconcileTabTitle(n, r));
         },
         a = () => {
           this.unregisterPageStateListener(e);
@@ -1135,7 +1391,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
     }
     updateTabNavigationState(e, t) {
       let n = this.tabsById.get(e) ?? null;
-      n != null && t.length !== 0 && (n.url = ZY(n.url, t, n.url, n.lifetime));
+      n != null && t.length !== 0 && (n.url = reconcileLiveTabUrl(n.url, t, n.url, n.lifetime));
     }
     registerDebuggerListener(e) {
       if (this.debuggerListeners.has(e.cdpTabId)) return;
@@ -1144,7 +1400,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
           let o = typeof a == `string` && a.length > 0 ? a : void 0,
             s = o == null ? void 0 : this.debuggerTargetIdsBySessionId.get(o),
             c = { source: { tabId: e.cdpTabId, sessionId: o, targetId: s }, method: r };
-          (JY(i) && ((c.params = i), this.recordDebuggerTargetEvent(e, r, i)),
+          (isRecord(i) && ((c.params = i), this.recordDebuggerTargetEvent(e, r, i)),
             this.emitCdpEvent(c));
         },
         n = () => {
@@ -1153,9 +1409,9 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
         r = (t, n) => {
           (LY().info(`IAB_LIFECYCLE debugger render process gone`, {
             safe: {
-              exitCode: RYe(n),
+              exitCode: processGoneExitCode(n),
               pageKey: e.pageKey,
-              reason: LYe(n),
+              reason: processGoneReason(n),
               routeKey: e.routeKey,
               tabId: e.cdpTabId,
               webContentsId: e.webContents.id,
@@ -1207,13 +1463,13 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
     }
     recordDebuggerTargetEvent(e, t, n) {
       if (t === `Target.attachedToTarget`) {
-        let t = WY(n, `sessionId`),
-          r = UY(MYe(n, `targetInfo`));
+        let t = stringField(n, `sessionId`),
+          r = targetIdFromTargetInfo(objectField(n, `targetInfo`));
         t != null && r != null && this.rememberDebuggerTargetSession(e, r, t);
         return;
       }
       if (t === `Target.detachedFromTarget`) {
-        let e = WY(n, `sessionId`);
+        let e = stringField(n, `sessionId`);
         e != null && this.forgetDebuggerTargetSession(e);
       }
     }
@@ -1285,7 +1541,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
     async ensureTabReadyForCdp(e) {
       if (e.webContents.isDestroyed()) throw Error(`Unknown tab: ${e.cdpTabId}`);
       e.webContents.getURL().length > 0 ||
-        (await rX(
+        (await withTimeout(
           e.webContents.loadURL(this.initialPageUrl),
           this.pageReadyTimeoutMs,
           `Timed out loading initial page "${this.initialPageUrl}" for tab ${e.cdpTabId}`,
@@ -1294,7 +1550,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
     async waitForTabReadyForCdp(e, t) {
       let n = this.getBrowserHost(e);
       (n?.waitForPageReady != null &&
-        (await rX(
+        (await withTimeout(
           n.waitForPageReady(t.browserTabId),
           this.pageReadyTimeoutMs,
           `Timed out waiting for tab ${t.cdpTabId} to finish its initial navigation`,
@@ -1305,15 +1561,15 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
     async executeEmulatedTargetCommand(e, t) {
       if (t.method === `Target.getTargetInfo`) {
         if (
-          kYe(e, t.target) ||
-          (JY(t.commandParams) &&
+          requiresDebuggerTargetSession(e, t.target) ||
+          (isRecord(t.commandParams) &&
             t.commandParams.targetId !== void 0 &&
-            t.commandParams.targetId !== VY(e))
+            t.commandParams.targetId !== primaryTargetId(e))
         )
           throw Error(`Target.getTargetInfo can only read the current in-app browser tab`);
         return {
           targetInfo: {
-            ...HY(e),
+            ...serializePrimaryTarget(e),
             attached: e.webContents.debugger.isAttached(),
             url: e.webContents.getURL(),
           },
@@ -1324,12 +1580,12 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
           targetInfos: [
             ...[...this.tabsById.values()]
               .filter((t) => t.routeKey === e.routeKey)
-              .map((e) => HY(e)),
+              .map((e) => serializePrimaryTarget(e)),
             ...(await this.getDebuggerFrameTargetInfos(e)),
           ],
         };
       if (t.method === `Target.closeTarget`) {
-        if (AYe(t) !== VY(e))
+        if (targetIdFromCommand(t) !== primaryTargetId(e))
           throw Error(`Target.closeTarget can only close the current in-app browser tab`);
         return (
           await this.cleanupDebuggerForTabBestEffort(e, `target-close`),
@@ -1340,7 +1596,7 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
       throw Error(`Browser Use CDP method is not supported in the in-app browser: ${t.method}`);
     }
     async executeCdpCommandWithCaptureSurface(e, t, n) {
-      let r = PYe(n);
+      let r = captureBeyondViewportSize(n);
       if (t == null || r == null) return this.executeCdpCommand(e, n);
       t.setCaptureSurfaceForBrowserUse(r, e.browserTabId);
       try {
@@ -1351,13 +1607,13 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
     }
     async executeCdpCommand(e, t) {
       return (
-        GY(t.method),
+        assertSupportedCdpMethod(t.method),
         this.sendDebuggerCommand(
           e,
           t.method,
           t.commandParams ?? {},
           t.target,
-          nX(t.timeoutMs, this.cdpCommandTimeoutMs),
+          clampTimeout(t.timeoutMs, this.cdpCommandTimeoutMs),
         )
       );
     }
@@ -1365,9 +1621,9 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
       let a =
         r.sessionId ??
         (r.targetId == null ? void 0 : (this.debuggerSessionIdForTarget(e, r.targetId) ?? void 0));
-      if (r.targetId != null && r.targetId !== VY(e) && a == null)
+      if (r.targetId != null && r.targetId !== primaryTargetId(e) && a == null)
         throw Error(`No in-app browser debugger session is attached for target ${r.targetId}`);
-      return await rX(
+      return await withTimeout(
         e.webContents.debugger.sendCommand(t, n, a),
         i,
         `Timed out running CDP command "${t}" for tab ${e.cdpTabId}`,
@@ -1376,20 +1632,20 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
     async getDebuggerFrameTargetInfos(e) {
       let t = await this.sendDebuggerCommand(e, `Target.getTargets`, {}).catch(
         async (t) => (
-          tX(t) && (await this.cleanupDebuggerForTabBestEffort(e, `cdp-timeout`)),
+          isTimeoutError(t) && (await this.cleanupDebuggerForTabBestEffort(e, `cdp-timeout`)),
           null
         ),
       );
-      return !JY(t) || !Array.isArray(t.targetInfos)
+      return !isRecord(t) || !Array.isArray(t.targetInfos)
         ? []
-        : t.targetInfos.filter(jYe).map((t) => ({ ...t, tabId: e.cdpTabId }));
+        : t.targetInfos.filter(isAttachableChildTarget).map((t) => ({ ...t, tabId: e.cdpTabId }));
     }
     async waitForCaptureSurface(e, t) {
       let n = Date.now() + CYe;
       do {
         let r;
         try {
-          r = await rX(
+          r = await withTimeout(
             e.webContents.debugger.sendCommand(`Page.getLayoutMetrics`, {}),
             Math.max(1, n - Date.now()),
             `Timed out reading layout metrics for tab ${e.cdpTabId}`,
@@ -1397,8 +1653,8 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
         } catch {
           return;
         }
-        if (FYe(r, t)) return;
-        await WYe(wYe);
+        if (viewportContainsSize(r, t)) return;
+        await waitUnref(wYe);
       } while (Date.now() < n);
     }
     pruneExpiredAllowedDownloadGrants() {
@@ -1422,7 +1678,20 @@ export {
   IAB_PAGE_READY_TIMEOUT_MS,
   IAB_SESSION_CONTENT_KEY,
   NOTIFY_BROWSER_USE_DOWNLOAD_CHANGE,
+  browserTabIdFromRouteTabKey,
+  captureBeyondViewportSize,
   createIabBrowserUseApiClass,
+  isAttachableChildTarget,
+  isRecord,
+  navigationUrlFromCommand,
+  primaryTargetId,
+  reconcileSerializedTabTitle,
+  reconcileLiveTabUrl,
+  reconcilePendingTabUrl,
+  reconcileTabTitle,
+  routeTabKey,
+  serializePrimaryTarget,
+  withTimeout,
 };
 export type { IabBrowserUseApiDependencies };
 if (typeof module !== `undefined`) module.exports = {
@@ -1438,5 +1707,18 @@ if (typeof module !== `undefined`) module.exports = {
   IAB_PAGE_READY_TIMEOUT_MS,
   IAB_SESSION_CONTENT_KEY,
   NOTIFY_BROWSER_USE_DOWNLOAD_CHANGE,
+  browserTabIdFromRouteTabKey,
+  captureBeyondViewportSize,
   createIabBrowserUseApiClass,
+  isAttachableChildTarget,
+  isRecord,
+  navigationUrlFromCommand,
+  primaryTargetId,
+  reconcileSerializedTabTitle,
+  reconcileLiveTabUrl,
+  reconcilePendingTabUrl,
+  reconcileTabTitle,
+  routeTabKey,
+  serializePrimaryTarget,
+  withTimeout,
 };

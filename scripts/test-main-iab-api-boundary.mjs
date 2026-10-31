@@ -11,7 +11,19 @@ const {
   ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER,
   CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD,
   NOTIFY_BROWSER_USE_DOWNLOAD_CHANGE,
+  browserTabIdFromRouteTabKey,
+  captureBeyondViewportSize,
   createIabBrowserUseApiClass,
+  isAttachableChildTarget,
+  navigationUrlFromCommand,
+  primaryTargetId,
+  reconcileSerializedTabTitle,
+  reconcileLiveTabUrl,
+  reconcilePendingTabUrl,
+  reconcileTabTitle,
+  routeTabKey,
+  serializePrimaryTarget,
+  withTimeout,
 } = await import(`data:text/javascript;base64,${Buffer.from(bundle.outputFiles[0].text).toString("base64")}`);
 let assertions = 0;
 const equal = (actual, expected) => { assert.equal(actual, expected); assertions += 1; };
@@ -25,10 +37,6 @@ const dependencies = {
   l: { app: { getVersion: () => "1.0.0" } },
   a: { bn: (value) => value },
   _: { randomUUID: () => "uuid" },
-  eX() {},
-  JY: (value) => value != null && typeof value === "object" && !Array.isArray(value),
-  YY: (routeKey) => routeKey.split(":")[0],
-  XY: (routeKey, tabId) => `${routeKey}:${tabId}`,
 };
 const IabBrowserUseApi = createIabBrowserUseApiClass(dependencies);
 const browserUseActiveStates = [];
@@ -96,7 +104,8 @@ api.clearRecordedBrowserUseTurn({ conversationId: "conversation-1" }, { turn_id:
 equal(api.usedTurnIdsByConversationId.has("conversation-1"), false);
 
 const source = fs.readFileSync(modulePath, "utf8");
-const methodNames = [...source.matchAll(/^    (?:async )?(?:\[([A-Za-z_$][\w$]*)\]|([A-Za-z_$][\w$]*))\(/gm)].map((match) => match[1] ?? match[2]);
+const classSource = source.slice(source.indexOf("return class IabBrowserUseApi"));
+const methodNames = [...classSource.matchAll(/^    (?:async )?(?:\[([A-Za-z_$][\w$]*)\]|([A-Za-z_$][\w$]*))\(/gm)].map((match) => match[1] ?? match[2]);
 equal(methodNames.length, 109);
 equal(new Set(methodNames).size, 109);
 for (const name of ["createTabForBrowserUse", "executeCdpForBrowserUse", "turnEnded", "disposeRoute", "registerDebuggerListener", "executeCdpCommandWithCaptureSurface", "pruneExpiredAllowedDownloadGrants"]) {
@@ -105,11 +114,36 @@ for (const name of ["createTabForBrowserUse", "executeCdpForBrowserUse", "turnEn
 const stateContainers = [...source.matchAll(/^    ([A-Za-z_$][\w$]*) = new (?:Map|Set)\(/gm)].map((match) => match[1]);
 equal(stateContainers.length, 21);
 
+const targetTab = { cdpTabId: 7, title: "Example", url: "https://example.test" };
+equal(primaryTargetId(targetTab), "browser-use-iab-tab:7");
+deepEqual(serializePrimaryTarget(targetTab), {
+  attached: true, canAccessOpener: false, id: "browser-use-iab-tab:7", tabId: 7,
+  targetId: "browser-use-iab-tab:7", title: "Example", type: "page", url: "https://example.test",
+});
+equal(isAttachableChildTarget({ id: "frame", type: "iframe" }), true);
+equal(isAttachableChildTarget({ id: "worker", type: "other" }), false);
+equal(navigationUrlFromCommand({ method: "Page.navigate", commandParams: { url: "https://example.test" } }), "https://example.test");
+equal(navigationUrlFromCommand({ method: "Page.reload", commandParams: {} }), null);
+deepEqual(captureBeyondViewportSize({ method: "Page.captureScreenshot", commandParams: { captureBeyondViewport: true, clip: { width: 10.2, height: 20.1 } } }), { width: 11, height: 21 });
+equal(captureBeyondViewportSize({ method: "Page.captureScreenshot", commandParams: { captureBeyondViewport: true, clip: { width: 0, height: 2 } } }), null);
+const keyed = routeTabKey("window:conversation", "tab-1");
+equal(keyed, "window:conversation\0tab-1");
+equal(browserTabIdFromRouteTabKey("window:conversation", keyed, (value) => `brand:${value}`), "brand:tab-1");
+equal(reconcilePendingTabUrl("about:blank", "https://pending.test", "persistent"), "https://pending.test");
+equal(reconcilePendingTabUrl("about:blank", "https://pending.test", "temporary"), "about:blank");
+equal(reconcileLiveTabUrl("https://kept.test", "about:blank", null, "persistent"), "https://kept.test");
+equal(reconcileTabTitle("", { title: "Loaded", url: "https://example.test", lifetime: "persistent" }), "Loaded");
+equal(reconcileSerializedTabTitle("about:blank", "about:blank", "https://committed.test", "https://pending.test"), "https://committed.test");
+equal(await withTimeout(Promise.resolve("done"), 100, "timeout"), "done");
+
 const mainSource = fs.readFileSync(path.join(root, ".reference/originals/main/main-C-Mhak1n.ts"), "utf8");
 equal(mainSource.includes('require("./main-app/browser-use/iab-api.js")'), true);
 equal(mainSource.includes("DYe = createIabBrowserUseApiClass({"), true);
 equal(mainSource.includes("DYe = class"), false);
-equal((mainSource.match(/new DYe\(/g) ?? []).length, 1);
+equal((mainSource.match(/BrowserUseApi: DYe/g) ?? []).length, 1);
+for (const oldOwner of ["function OYe(", "function GY(", "function PYe(", "function XY(", "function BYe(", "function rX("]) {
+  equal(mainSource.includes(oldOwner), false);
+}
 
 api.dispose();
 equal(api.tabsById.size, 0);

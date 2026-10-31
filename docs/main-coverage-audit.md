@@ -3222,3 +3222,9 @@ interaction controller 改用具名对象参数接线，IPC guarded event set �
 `browser-permission-prompt-registry.ts` 现直接拥有 scope/identity/strict response schemas 和 disposable subscription；组合根不再注入
 机械 parser/subscription。`browser-page-command-controller.ts` 现直接拥有 scroll script execution、screenshot capture、clipboard write、成功/失败
 消息与 non-fatal reporting。主 chunk 旧 `wZ/GZe/KZe/TZ/JZe/YZe/XZe/ZZe/QZe` 整带删除。
+
+### 增量内聚：IAB Browser Use policy belt
+
+`browser-use/iab-api.ts` 现直接拥有 primary/child target projection、CDP method/navigation/history/capture policy、viewport parsing、route-tab
+identity、blank/persistent URL 与 title reconciliation、process-gone extraction、finite-coordinate guard、unref wait、timeout clamp/race。主组合根
+依赖由 46 项缩至 14 项环境/command-capability依赖；旧 `OYe..rX` 34 个纯 helper 整带删除。
