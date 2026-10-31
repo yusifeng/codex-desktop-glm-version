@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Z6e/Q6e/$6e/X6e` project-folder consent cluster 整体迁入
+`projects/project-folder-consent.ts`；config trust parse、folder 去重分组、focused-window 复用、等待窗口订阅、
+confirm 串行队列、abort race、RPC-broken 与 webContents destroy cleanup 均保持在同一 runtime。主 manager 与
+per-window service consumer 已真实接回，旧 schema/classes 已删除。focused test 覆盖 34 项。
+
 随后将 `p2` local project cache 迁入 `projects/local-project-cache.ts`；local project snapshot、create/delete
 投影、partial metadata update、updatedAt 语义与 appearance normalization 均由新 owner 持有。两个 runtime
 consumer 已真实接回，旧 class 已删除；共享 `jr/Rr` helpers 保持单一实现并注入。focused test 覆盖 21 项。

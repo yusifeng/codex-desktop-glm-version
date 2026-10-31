@@ -82,6 +82,7 @@ const { createThreadProjectAssignmentWriterClass } = require("./main-app/thread-
 const { createPendingProjectDeletionSchedulerClass } = require("./main-app/projects/pending-project-deletion-scheduler.js");
 const { createHostAppServerProjectsClass } = require("./main-app/projects/host-app-server-projects.js");
 const { createLocalProjectCacheClass } = require("./main-app/projects/local-project-cache.js");
+const { createProjectFolderConsentRuntime } = require("./main-app/projects/project-folder-consent.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -133161,130 +133162,15 @@ var U6e = 100,
     updateLocalProject: Rr,
     now: Date.now,
   }),
-  X6e = n.wf({ projects: n.Ef(n.Of(), n.wf({ trust_level: n.Of().optional() })).optional() }),
-  Z6e = class {
-    connectionForHost;
-    hostConfig;
-    ensureWindow;
-    #e = new Map();
-    #t = new Map();
-    #n = Promise.resolve();
-    constructor(e, t, n) {
-      ((this.connectionForHost = e), (this.hostConfig = t), (this.ensureWindow = n));
-    }
-    async confirm(e, t) {
-      if (t.length === 0) return !0;
-      let r = this.#n.then(async () => {
-        let { config: r } = await this.connectionForHost(e).sendAppServerRequest(`config/read`, {
-            includeLayers: !1,
-          }),
-          i = X6e.safeParse(r),
-          a = this.hostConfig(e),
-          o = n.zi(a),
-          s = [...new Set(t)].filter(
-            (e) => !i.success || i.data.projects?.[zn(e, o)]?.trust_level !== `trusted`,
-          );
-        if (s.length === 0) return !0;
-        let c = l.BrowserWindow.getFocusedWindow(),
-          u = c != null && this.#e.has(c.webContents.id) ? c : await this.ensureWindow();
-        if (u == null || u.isDestroyed()) return !1;
-        let d = u.webContents;
-        this.#e.has(d.id) ||
-          (await new Promise((e) => {
-            let t = () => {
-              (d.removeListener(`destroyed`, t),
-                d.removeListener(`render-process-gone`, t),
-                this.#t.delete(d.id),
-                e());
-            };
-            (this.#t.set(d.id, t), d.once(`destroyed`, t), d.once(`render-process-gone`, t));
-          }));
-        let f = this.#e.get(d.id);
-        if (f == null || u.isDestroyed()) return !1;
-        u.show();
-        let p = [],
-          m = [];
-        for (let e of s)
-          ((i.success ? i.data.projects?.[zn(e, o)]?.trust_level : void 0) === `untrusted`
-            ? m
-            : p
-          ).push(e);
-        for (let [t, n] of [
-          [!1, p],
-          [!0, m],
-        ]) {
-          if (n.length === 0) continue;
-          if (f.signal.aborted) return !1;
-          let r;
-          try {
-            if (
-              !(await Promise.race([
-                f.callback({
-                  hostName: e === `local` ? null : a.display_name,
-                  folders: n,
-                  explicitlyUntrusted: t,
-                }),
-                new Promise((e) => {
-                  ((r = () => e(!1)), f.signal.addEventListener(`abort`, r, { once: !0 }));
-                }),
-              ]))
-            )
-              return !1;
-          } catch {
-            return !1;
-          } finally {
-            r != null && f.signal.removeEventListener(`abort`, r);
-          }
-        }
-        return !0;
-      });
-      return (
-        (this.#n = r.then(
-          () => void 0,
-          () => void 0,
-        )),
-        r
-      );
-    }
-    serviceForWindow(e) {
-      return new Q6e((t) => {
-        let n = t.dup(),
-          r = new AbortController();
-        (this.#e.set(e.id, { callback: n, signal: r.signal }), this.#t.get(e.id)?.());
-        let i = new $6e(() => {
-            (e.removeListener(`destroyed`, a),
-              e.removeListener(`render-process-gone`, a),
-              this.#e.get(e.id)?.callback === n && this.#e.delete(e.id),
-              r.abort(),
-              n[Symbol.dispose]());
-          }),
-          a = () => i.unsubscribe();
-        return (e.once(`destroyed`, a), e.once(`render-process-gone`, a), n.onRpcBroken(a), i);
-      });
-    }
-  },
-  Q6e = class extends n.Uf {
-    register;
-    constructor(e) {
-      (super(), (this.register = e));
-    }
-    subscribe(e) {
-      return this.register(e);
-    }
-  },
-  $6e = class extends n.Uf {
-    cleanup;
-    #e = !1;
-    constructor(e) {
-      (super(), (this.cleanup = e));
-    }
-    unsubscribe() {
-      this.#e || ((this.#e = !0), this.cleanup());
-    }
-    [Symbol.dispose]() {
-      this.unsubscribe();
-    }
-  },
+  {
+    ProjectFolderConsentManager: Z6e,
+    ProjectFolderConsentService: Q6e,
+    ProjectFolderConsentSubscription: $6e,
+  } = createProjectFolderConsentRuntime({
+    runtime: n,
+    BrowserWindow: l.BrowserWindow,
+    normalizeProjectRoot: zn,
+  }),
   e8e = 8;
 async function t8e({
   affectedRootPaths: e,

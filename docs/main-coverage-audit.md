@@ -1,5 +1,13 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 project folder consent cluster
+
+原 `X6e` schema、`Z6e` manager、`Q6e` RPC service 与 `$6e` subscription 已整簇迁入
+`src/main/main-app/projects/project-folder-consent.ts`。新 runtime 保留 config trust parse、normalized folder
+dedupe、trusted skip、unknown/untrusted prompt grouping、focused-window selection、late subscription wait、confirm
+serialization、AbortSignal race、RPC broken 和 destroyed/render-process-gone cleanup；真实 manager 与窗口 service
+consumer 均已接回，旧实现已物理删除。
+
 ## 2026-10-31 local project cache
 
 原 `p2` 已迁入 `src/main/main-app/projects/local-project-cache.ts`。新 owner 保留 local-host identity、persisted
