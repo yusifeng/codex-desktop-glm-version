@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修复 default turn config owner：`threads/start-config.ts` 的 `wye` 已从进程内假 service-tier 状态恢复为 account/auth/requirements/config/
+model 联合读取、profile-aware batchWrite、串行 service-tier 写与 model+effort 写；AppServer manager 真实 consumer 保持接回，主 chunk 旧
+`wye` 66 行重复实现删除。
+
 修复并统一 thread settings patch owner：`threads/patch-classification.ts` 的 metrics、collaboration/effort 合并、permission profile 投影与
 previous-turn model ledger 已恢复原始完整语义；AppServer manager、conversation creation 和主 chunk 其他 consumers 现共享
 `O_e/zv/Bv/Vv/D_e`，旧 `D_e…Hv` 199 行函数簇删除。

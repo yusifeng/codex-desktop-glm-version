@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 default turn config owner repair
+
+`src/main/main-app/threads/start-config.ts` 的 `wye` 原为只存内存变量且写入错误 schema 的占位实现。本轮恢复 Copilot bypass、ChatGPT
+account/auth gate、fast-mode requirement、profile 合并、model tier fallback、串行 profile-aware config writes 与 model/effort 双写；
+AppServer manager consumer 保持接回并删除主 chunk 旧 `wye`，focused suite 覆盖读取门控、写串行化和变更通知折叠。
+
 ## 2026-10-31 thread settings patch owner repair
 
 `src/main/main-app/threads/patch-classification.ts` 原先把 metrics 压成三个非原始字段，并丢失 collaboration mode/effort 合并、permission

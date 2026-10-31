@@ -1,4 +1,6 @@
+import { Wa as resolveModelServiceTier } from "@chunk/shared";
 import type { AnyTurn } from "../turns/canonical-history";
+import { mergeThreadProfiles } from "../workspace/config";
 
 export const TURN_START_TIMEOUT_MS = 30_000;
 export const OWNER_WINDOW_ERROR =
@@ -162,28 +164,113 @@ export function buildResumeProduct(
 export const xye = buildResumeProduct;
 export function buildDefaultTurnConfig(
   manager: {
+    requestClient: {
+      hostId: string;
+      sendRequest(method: string, params?: unknown, options?: unknown): Promise<any>;
+    };
+    logger: { error(message: string, data?: unknown): void };
+    getHostId(): string;
+    getAccount(options: unknown): Promise<any>;
+    getAuthMethod(options: unknown): Promise<string | null>;
     sendRequest(
       method: string,
       params: unknown,
       options?: unknown,
     ): Promise<unknown>;
   },
-  _options: unknown,
+  options: {
+    runtime: { isCopilotApiAvailable(): Promise<boolean> };
+    storage: { readGlobalState(key: string): Promise<unknown> };
+  },
   assertActive: () => void,
   onChanged: () => void,
 ) {
-  let serviceTier: string | null = null;
+  let pendingWrite: Promise<unknown> | null = null;
   return {
-    readServiceTier: async () => serviceTier,
-    writeServiceTier: async (_id: string, value: string | null) => {
+    readServiceTier: async (model: string | null) => {
+      while (pendingWrite != null) await pendingWrite.catch(() => undefined);
       assertActive();
-      serviceTier = value;
-      await manager.sendRequest("config/batchWrite", {
-        edits: [{ key: "service_tier", value }],
-      });
-      onChanged();
+      try {
+        if (
+          manager.getHostId() === "local" &&
+          (await options.storage.readGlobalState("use-copilot-auth-if-available")) === true &&
+          (await options.runtime.isCopilotApiAvailable())
+        ) return null;
+        const [account, authMethod] = await Promise.all([
+          manager.getAccount({ priority: "critical" }),
+          manager.getAuthMethod({ priority: "critical" }).catch(() => null),
+        ]);
+        if (authMethod === "personalAccessToken" || account.account?.type !== "chatgpt") return null;
+        const requirements = await manager.requestClient.sendRequest(
+          "configRequirements/read",
+          undefined,
+          { priority: "critical" },
+        );
+        if (requirements.requirements?.featureRequirements?.fast_mode === false) return null;
+        const configResponse = await manager.requestClient.sendRequest(
+          "config/read",
+          { includeLayers: false, cwd: null },
+          { priority: "critical" },
+        );
+        const config = mergeThreadProfiles(configResponse.config ?? {});
+        if (config.service_tier != null)
+          return resolveModelServiceTier(null, config.service_tier);
+        const modelResponse = await manager.requestClient.sendRequest(
+          "model/list",
+          { includeHidden: true, cursor: null, limit: 100 },
+          { priority: "critical" },
+        );
+        const selectedModel = model ?? config.model;
+        const modelInfo = selectedModel == null
+          ? modelResponse.data.find((entry: any) => entry.isDefault)
+          : modelResponse.data.find((entry: any) => entry.model === selectedModel || entry.id === selectedModel);
+        return resolveModelServiceTier(modelInfo ?? null, null);
+      } catch (error) {
+        manager.logger.error("Failed to read saved service tier for request", {
+          safe: {},
+          sensitive: { error },
+        });
+        return null;
+      }
     },
-    writeModel: async () => undefined,
+    writeServiceTier: async (serviceTier: string | null, profile: string | null) => {
+      const previous = pendingWrite;
+      const write = (async () => {
+        await previous?.catch(() => undefined);
+        assertActive();
+        return manager.sendRequest("config/batchWrite", {
+          edits: [{
+            keyPath: profile == null ? "service_tier" : `profiles.${profile}.service_tier`,
+            value: serviceTier ?? "default",
+            mergeStrategy: "upsert",
+          }],
+          filePath: null,
+          expectedVersion: null,
+          reloadUserConfig: true,
+        });
+      })();
+      pendingWrite = write;
+      try {
+        return await write;
+      } finally {
+        if (pendingWrite === write) {
+          pendingWrite = null;
+          onChanged();
+        }
+      }
+    },
+    writeModel: (model: string, effort: unknown, profile: string | null) => {
+      const prefix = profile == null ? "" : `profiles.${profile}.`;
+      return manager.sendRequest("config/batchWrite", {
+        edits: [
+          { keyPath: `${prefix}model`, value: model, mergeStrategy: "upsert" },
+          { keyPath: `${prefix}model_reasoning_effort`, value: effort, mergeStrategy: "upsert" },
+        ],
+        filePath: null,
+        expectedVersion: null,
+        reloadUserConfig: true,
+      });
+    },
     readShellEnvironmentPolicy: async () => null,
   };
 }
