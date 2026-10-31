@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+开始迁出 thread-catalog 核心 owner：原 `int` 单 host sync coordinator 已迁入
+`thread-catalog/sync-coordinator.ts`；full/incremental scan、offset resume/head reconciliation、notification debounce、imported
+thread refresh、freshness/backoff、history pruning、foreground promotion 与 delta/invalidation publication 均由具名 class 持有。
+真实跨 host `dnt` consumer 已接回，旧 class、专属 timing constants 与 scan helpers 从主 chunk 删除。
+
 继续迁出真实 automations owner：原 `AOe` Habitat Automations service 已连同 hosted/local schema、RRULE normalization、
 cloud/local projection helpers 迁入 `automations/habitat-automations-service.ts`；migration consent/owner identity、serialized
 mutations、cloud save-and-verify、pagination sync、cache adoption 与 principal-change lifecycle 均由新 class 持有。真实 `NOe`

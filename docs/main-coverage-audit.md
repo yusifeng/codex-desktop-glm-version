@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread catalog sync coordinator
+
+原 `int` 已迁入 `src/main/main-app/thread-catalog/sync-coordinator.ts`。新 owner 保留 full/incremental scan、offset
+checkpoint resume、head overlap reconciliation、freshness/failure backoff、foreground promotion、notification coalescing、imported
+thread refresh、history pruning、delta/invalidation publication 与 disposal；真实 `dnt.attachSource()` 仍构造该 class，旧
+class body、专属 timing constants、watermark/anchor helpers 已从主 chunk 删除。
+
 ## 2026-10-31 Habitat Automations owner
 
 原 `AOe` 已迁入 `src/main/main-app/automations/habitat-automations-service.ts`。新 dependency-injected owner 保留 migration
