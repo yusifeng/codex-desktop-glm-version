@@ -4904,3 +4904,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   policy/validation、source focus/current URL、dialog parent、destroyed-origin gate 与 subscription cleanup 均保留。
 - main 旧 `qke/nAe/iAe/aAe` 删除，focused coverage 32 项，WindowContext/no-unwired 回归通过。下一批审计仍留在相邻
   history/top-sites service 与 detached toolbar bridge 的 owners，避免拆散共享 browser session lifecycle。
+
+# 2026-11-01 browser history and Top Sites RPC owner
+
+- `browser-sidebar/browser-history-service.ts` 已接管 browsing-data summary/clear/settings、history pagination 与 invalid-row
+  refill、favicon scale/dedupe，以及 Top Sites initial/change hydration、generation gate、origin/RPC cleanup；WindowContext 直接消费
+  `BrowserHistoryService`，没有复制 browser session 或 favicon owner。
+- main 旧 `Jke/Yke/Xke/Zke/JD` 已删除；focused coverage 36 项，no-unwired gate 扩至 353 项。下一批继续审计紧邻的
+  detached browser toolbar action proxy/attachment lifecycle owner，保持 detached context 和 suspended image attachment 的唯一状态。

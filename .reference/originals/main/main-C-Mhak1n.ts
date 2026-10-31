@@ -347,6 +347,7 @@ const { AppEntryAttributionTracker: Foe } = require("./main-app/startup/app-entr
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
 const { createBrowserHostServiceClass } = require("./main-app/browser-sidebar/browser-host-service.js");
+const { createBrowserHistoryServiceClass } = require("./main-app/browser-sidebar/browser-history-service.js");
 const {
   BrowserSettingsSync,
   BrowserUseOriginState: XOe,
@@ -23626,219 +23627,13 @@ var BrowserProfileImportService = createBrowserProfileImportServiceClass({
   parseProfileList: (value) => n.hf(n.fl).parse(value),
   parseImportResult: (value) => n.ml.parse(value),
 });
-function Jke(e, t, n) {
-  if (e == null || t.isDestroyed())
-    try {
-      var r = a.en();
-      r.u(n(null));
-      return;
-    } catch (e) {
-      r.e = e;
-    } finally {
-      r.d();
-    }
-  let i = n.dup(),
-    o = e.topSites,
-    s = !0,
-    c = 0,
-    u = (e) => {
-      if (s)
-        try {
-          var t = a.en();
-          t.u(i(e));
-        } catch (e) {
-          t.e = e;
-        } finally {
-          t.d();
-        }
-    },
-    d = async (n) => {
-      let r = ++c,
-        i = n.map((e) => ({ ...e, faviconDataURL: null }));
-      u(i);
-      let a = l.BrowserWindow.fromWebContents(t),
-        o = a == null ? void 0 : l.screen.getDisplayMatching(a.getBounds()).scaleFactor;
-      await Promise.all(
-        n.map(async ({ url: t }, n) => {
-          let a = await GD(e.faviconService, {
-            destinationURL: t,
-            iconURL: null,
-            scaleFactor: o,
-          }).catch(() => null);
-          s &&
-            c === r &&
-            a != null &&
-            ((i = i.map((e, t) => (t === n ? { ...e, faviconDataURL: a } : e))), u(i));
-        }),
-      );
-    },
-    f = (e) => {
-      d(e);
-    },
-    p = () => {
-      s && ((s = !1), o.off(`changed`, f), t.off(`destroyed`, p), i[Symbol.dispose]());
-    };
-  return (
-    o.on(`changed`, f),
-    t.once(`destroyed`, p),
-    i.onRpcBroken(p),
-    o
-      .get()
-      .then((e) => {
-        if (s && c === 0) return d(e);
-      })
-      .catch(() => {
-        c === 0 && u(null);
-      }),
-    new Yke(p)
-  );
-}
-var Yke = class extends n.Uf {
-    disposeSubscription;
-    constructor(e) {
-      (super(), (this.disposeSubscription = e));
-    }
-    [Symbol.dispose]() {
-      this.disposeSubscription();
-    }
-  },
-  Xke = class e extends n.Uf {
-    origin;
-    getBrowserSession;
-    constructor(e, t) {
-      (super(), (this.origin = e), (this.getBrowserSession = t));
-    }
-    static create(t, n) {
-      return new e(t, n);
-    }
-    async clearBrowsingData(e) {
-      return Zc(this.#e, e.dataTypes, e.timeRange);
-    }
-    async getBrowsingDataSettings() {
-      return this.#e.getBrowsingDataSettings();
-    }
-    async getBrowsingDataSummary(e) {
-      let t = Zke(e),
-        [n, r, i, a] = await Promise.all([
-          this.#e.searchHistory({
-            deduplicateByDay: !0,
-            matchingAlgorithm: `alwaysPrefix`,
-            maxResults: 0,
-            startTime: t,
-            text: ``,
-          }),
-          this.#e.cookies.get({}).catch(() => null),
-          this.#e.getCacheSize?.().catch(() => null) ?? Promise.resolve(null),
-          this.#e.getDownloadHistory().catch(() => null),
-        ]),
-        o = new Set(),
-        s = null;
-      for (let e of n) {
-        if (!JD(e)) continue;
-        let t = new URL(e.url).hostname || e.url;
-        ((s ??= t), o.add(t));
-      }
-      let c =
-        r == null
-          ? null
-          : new Set(r.flatMap(({ domain: e }) => (e == null ? [] : [e.replace(/^\./, ``)])));
-      return {
-        cache: i == null ? null : { sizeBytes: i },
-        downloads:
-          a == null
-            ? null
-            : {
-                count: a.filter(
-                  ({ startTime: e, state: n }) =>
-                    [`completed`, `cancelled`, `interrupted`].includes(n) && e * 1e3 >= t,
-                ).length,
-              },
-        history: { firstSite: s, siteCount: o.size },
-        siteData: c == null ? null : { siteCount: c.size },
-      };
-    }
-    async getFavicon(e, t) {
-      let n = await this.getBrowserSession()
-        ?.faviconService.getFavicon(e, t)
-        .catch(() => null);
-      if (n == null || n.isEmpty()) return null;
-      let r = l.BrowserWindow.fromWebContents(this.origin),
-        i = r == null ? 1 : l.screen.getDisplayMatching(r.getBounds()).scaleFactor;
-      return n.toDataURL({ scaleFactor: i });
-    }
-    async removeEntries(e) {
-      return this.#e.removeBrowsingHistoryEntries(e);
-    }
-    async searchHistory(e) {
-      let { offset: t = 0, ...n } = e,
-        r = n.maxResults ?? 100,
-        i = r === 0 ? 0 : t + r,
-        a = (e) =>
-          this.#e.searchHistory({
-            ...n,
-            ...(e === r ? {} : { maxResults: e }),
-            deduplicateByDay: !0,
-            matchingAlgorithm: `alwaysPrefix`,
-          }),
-        o = await a(i),
-        s = o.filter(JD);
-      for (; i !== 0 && o.length === i && s.length < t + r;)
-        ((i += r), (o = await a(i)), (s = o.filter(JD)));
-      let c = s.slice(t, r === 0 ? void 0 : t + r),
-        u = l.BrowserWindow.fromWebContents(this.origin),
-        d = u == null ? void 0 : l.screen.getDisplayMatching(u.getBounds()).scaleFactor,
-        f = new Map();
-      return Promise.all(
-        c.map((e) => {
-          let { lastVisitTime: t, url: n } = e,
-            r = f.get(n);
-          return (
-            r ??
-              ((r = GD(this.#e.faviconService, {
-                destinationURL: n,
-                iconURL: null,
-                scaleFactor: d,
-              }).catch(() => null)),
-              f.set(n, r)),
-            r.then((r) => ({
-              ...e,
-              faviconDataURL: r,
-              lastVisitTime: t,
-              title: e.title ?? ``,
-              url: n,
-              visitTime: e.visitTime ?? t,
-            }))
-          );
-        }),
-      );
-    }
-    subscribeTopSites(e) {
-      return Jke(this.getBrowserSession(), this.origin, e);
-    }
-    get #e() {
-      let e = this.getBrowserSession();
-      if (e == null) throw Error(`In-app browser is unavailable.`);
-      return e;
-    }
-  };
-function Zke(e) {
-  let t = Date.now();
-  switch (e) {
-    case `lastHour`:
-      return t - 36e5;
-    case `lastDay`:
-      return t - 864e5;
-    case `lastWeek`:
-      return t - 6048e5;
-    case `lastMonth`:
-      return t - 24192e5;
-    case `allTime`:
-      return 0;
-  }
-}
-function JD(e) {
-  return e.lastVisitTime != null && e.url != null;
-}
+var BrowserHistoryService = createBrowserHistoryServiceClass({
+  RpcHandlerBase: n.Uf,
+  clearBrowserData: Zc,
+  fromWebContents: (webContents) => l.BrowserWindow.fromWebContents(webContents),
+  displayScaleFactor: (window) => l.screen.getDisplayMatching(window.getBounds()).scaleFactor,
+  loadFaviconData: GD,
+});
 var Qke = {
   "open-settings": `window`,
   "open-profile-import": `window`,
@@ -71539,7 +71334,7 @@ var G5 = r.r(`WindowContext`),
     Xc,
     Xet,
     Xj,
-    Xke,
+    BrowserHistoryService,
     Xnt,
     Xtt,
     Y,

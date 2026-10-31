@@ -2934,3 +2934,12 @@ detached browser source lookup/focus/current-URL 验证，以及 downloads store
 原始 chunk 中 `qke/nAe/iAe/aAe` 已物理删除。focused test 32 项覆盖 managed-policy gating、import validation、session absence、
 detached lookup/focus/URL、dialog parent selection、destroyed-origin download gate 和 subscription idempotence，WindowContext/no-unwired
 回归通过。
+
+### 增量抽取：browser history 与 Top Sites RPC owner
+
+`src/main/main-app/browser-sidebar/browser-history-service.ts` 已接管 browsing-data clear/settings/summary、history pagination、
+无效记录补取、同 URL favicon request 去重、单 favicon 读取与 Top Sites subscription lifecycle。Top Sites 保留先发布
+`faviconDataURL: null`、逐项 hydration、change generation 竞态抑制、renderer destroy/RPC broken cleanup 和幂等 dispose；
+WindowContext 直接创建 `BrowserHistoryService` 并继续引用唯一 browser session。原始 chunk 中 `Jke/Yke/Xke/Zke/JD`
+已物理删除。focused test 36 项覆盖时间范围、summary、分页补取、favicon、callback result disposal、session absence、
+initial/change race、cleanup 与真实接线。

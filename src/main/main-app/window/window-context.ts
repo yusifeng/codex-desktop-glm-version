@@ -126,7 +126,7 @@ export function createWindowContextClass(dependencies) {
     Xc,
     Xet,
     Xj,
-    Xke,
+    BrowserHistoryService,
     Xnt,
     Xtt,
     Y,
@@ -1283,7 +1283,7 @@ export function createWindowContextClass(dependencies) {
             ),
             browserTabs: new IabTabMentions(s.iabTabMentions, e),
             browserAutocomplete: new Cke(this.messageHandler.getBrowserAutocompleteCoordinator(), e),
-            browsingHistory: Xke.create(e, () => s.getBrowserSession()),
+            browsingHistory: BrowserHistoryService.create(e, () => s.getBrowserSession()),
             debug: new zje(
               this.options.windowManager.debugWindowManager,
               s,
