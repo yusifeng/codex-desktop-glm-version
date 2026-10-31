@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 process memory snapshot cache
+
+原 `z6e` 与独占 ancestor helper `B6e` 已迁入
+`src/main/main-app/startup/process-memory-snapshot-cache.ts`。新 owner 保留 5 秒 snapshot cache、并发
+single-flight、main process projection 以及 electron/app-server/rollout/other RSS 分类；全局 runtime consumer
+`Qnt` 直接实例化新 class，旧实现已物理删除。
+
 ## 2026-10-31 primary runtime host
 
 原 `L6e` 已迁入 `src/main/main-app/misc/primary-runtime-host.ts`。新 owner 保留 local-only install/cancel/

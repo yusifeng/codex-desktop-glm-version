@@ -76,6 +76,7 @@ const { createAuthorizedThreadCatalogServiceClass } = require("./main-app/thread
 const { createPluginIncentivesClientRuntime } = require("./main-app/plugins/incentives-client.js");
 const { createPrimaryRuntimeUpdatePollerClass } = require("./main-app/misc/primary-runtime-update-poller.js");
 const { createPrimaryRuntimeHostClass } = require("./main-app/misc/primary-runtime-host.js");
+const { createProcessMemorySnapshotCacheClass } = require("./main-app/startup/process-memory-snapshot-cache.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -133068,73 +133069,12 @@ var L6e = createPrimaryRuntimeHostClass({
   retryIntervalMs: K0,
 });
 var R6e = 5e3,
-  z6e = class extends n.Uf {
-    snapshot = null;
-    snapshotExpiresAtMs = 0;
-    snapshotPromise = null;
-    async getSnapshot() {
-      let { childProcesses: e, ...t } = await this.getChildProcessesSnapshot();
-      return t;
-    }
-    async getChildProcessesSnapshot() {
-      if (this.snapshot != null && Date.now() < this.snapshotExpiresAtMs) return this.snapshot;
-      if (this.snapshotPromise != null) return this.snapshotPromise;
-      let e = this.createSnapshot();
-      this.snapshotPromise = e;
-      try {
-        return (
-          (this.snapshot = await e),
-          (this.snapshotExpiresAtMs = Date.now() + R6e),
-          this.snapshot
-        );
-      } finally {
-        this.snapshotPromise === e && (this.snapshotPromise = null);
-      }
-    }
-    async createSnapshot() {
-      let e = await n.nn(process.pid),
-        t = new Map(e.map((e) => [e.pid, e])),
-        r = {
-          ageSeconds: Math.floor(process.uptime()),
-          command: process.argv.map((e) => JSON.stringify(e)).join(` `),
-          cpuPercent: null,
-          pid: process.pid,
-          rssKb: Math.floor(process.memoryUsage().rss / 1024),
-        },
-        i = 0,
-        a = r.rssKb,
-        o = 0,
-        s = 0;
-      for (let n of e) {
-        let e = n.rssKb ?? 0;
-        n.kind === `app_server`
-          ? (i += e)
-          : B6e(n, t)
-            ? (s += e)
-            : n.kind.startsWith(`electron_`)
-              ? (a += e)
-              : (o += e);
-      }
-      return {
-        appServerRssKb: i,
-        childProcesses: e,
-        codexAppRssKb: a,
-        mainProcess: r,
-        otherChildProcessesRssKb: o,
-        processCount: e.length + 1,
-        rolloutChildProcessesRssKb: s,
-        totalRssKb: i + a + o + s,
-      };
-    }
-  };
-function B6e(e, t) {
-  let n = t.get(e.parentPid);
-  for (; n != null;) {
-    if (n.kind === `app_server`) return !0;
-    n = t.get(n.parentPid);
-  }
-  return !1;
-}
+  z6e = createProcessMemorySnapshotCacheClass({
+    RpcHandlerBase: n.Uf,
+    listChildProcesses: n.nn,
+    processRef: process,
+    cacheDurationMs: R6e,
+  });
 var V6e = class extends n.Uf {
   origin;
   settingsStore;
