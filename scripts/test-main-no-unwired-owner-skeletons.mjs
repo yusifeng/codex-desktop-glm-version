@@ -19,6 +19,7 @@ const realOwners = [
   ["src/main/main-app/mcp-sandbox/lifecycle.ts", "createMcpSandboxLifecycleRuntime"],
   ["src/main/main-app/mcp-sandbox/network-runtime.ts", "createMcpSandboxNetworkRuntime"],
   ["src/main/main-app/diagnostics/native-command-crash.ts", "createNativeCommandCrashRuntime"],
+  ["src/main/main-app/browser-session/browser-session-probe.ts", "createBrowserSessionProbeRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -91,6 +92,11 @@ assert.equal(main.includes("createNativeCommandCrashRuntime({"), true, "real nat
 assert.equal(main.includes("function P2e("), false, "generated native crash classifier must be removed");
 assert.equal(main.includes("async function F2e("), false, "generated native crash reporter must be removed");
 assert.equal(main.includes("function R2e("), false, "generated primary-runtime attribution must be removed");
+assert.equal(main.includes("createBrowserSessionProbeRuntime({"), true, "real browser session probe owner is wired");
+assert.equal(main.includes("e4e = class extends"), false, "generated browser session probe class must be removed");
+assert.equal(main.includes("function U2e("), false, "generated source-window focus poller must be removed");
+assert.equal(main.includes("function t4e("), false, "generated browser callback parser must be removed");
+assert.equal(main.includes("async function r4e("), false, "generated browser challenge requester must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("83 main unwired-owner skeleton assertions passed");
+console.log("90 main unwired-owner skeleton assertions passed");

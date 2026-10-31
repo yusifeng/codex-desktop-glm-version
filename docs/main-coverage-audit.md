@@ -2621,3 +2621,15 @@ script attribution、依赖诊断、metadata timeout、Sentry payload 与 per-it
 全局 notification registration 组合根仍留在 main。新模块新增 338 行生产实现，替换 main 中 278 行
 机械恢复代码；`scripts/test-main-native-command-crash-owner.mjs` 覆盖 62 项 signal、shell、attribution、
 suppression、diagnosis、payload、dedupe 与 normalization 行为。
+
+### 增量抽取：browser-session probe lifecycle owner
+
+原 main chunk 的 macOS/arm64/browser/DeviceCheck eligibility、native browser-state addon cache、source-window
+focus polling、per-id cancel registry、进程级 opened-tab gate、本地 loopback callback server、PKCE、challenge、
+code redemption、callback URL/parameter validation 与 profile normalization 已整体迁移至
+`src/main/main-app/browser-session/browser-session-probe.ts`。main 通过
+`createBrowserSessionProbeRuntime` 将新 `BrowserSessionProbe` 真实注入 `WindowContext` 的
+`chatGptBrowserSession` consumer；旧 `e4e` class、`H2e/U2e/W2e` lifecycle 及
+`u1/t4e/n4e/r4e/i4e/a4e/o4e/s4e/d1/f1/p1` helpers 共 499 行已物理删除。新生产 owner 616 行，
+`scripts/test-main-browser-session-probe-owner.mjs` 覆盖 60 项安全校验、网络 payload、native cache、
+callback server、tab guard、cancel 和 window cleanup 行为。

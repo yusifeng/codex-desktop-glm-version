@@ -4642,3 +4642,13 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 旧 crash constants/helpers 共 278 行已从 main 物理删除，新生产模块 338 行；focused coverage 62 项，
   no-unwired gate 扩至 83 项。下一步越过紧邻的 browser focus polling 小 helper，优先审计后续完整
   browser/native session RPC/controller 边界，避免为了数量拆分共享 Electron I/O 组合根。
+
+# 2026-11-01 browser-session probe lifecycle owner
+
+- `src/main/main-app/browser-session/browser-session-probe.ts` 已接管 browser lookup eligibility、native addon
+  cache、PKCE/DeviceCheck challenge、code redemption、loopback callback server、per-id cancel/timeout、opened-tab
+  gate 和 source-window always-on-top/focus cleanup；`WindowContext` 继续通过原 `e4e` dependency alias 实例化
+  新 owner，未复制 probe state。
+- main 中旧 class/helper 共 499 行已删除，新生产模块 616 行；focused coverage 60 项，no-unwired gate 扩至
+  90 项。下一步继续审计其后 open-in target registry 的大型 detection/open controller，优先迁移共享
+  cache、platform dispatch 与 editor/terminal launch owner，纯 target declarations 可随 owner 一次整体迁出。
