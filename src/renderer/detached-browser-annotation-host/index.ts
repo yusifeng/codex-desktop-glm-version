@@ -4,6 +4,7 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as commentPopupChunk from "@rchunk/comment-popup-portal";
 import * as registryChunk from "@rchunk/source-annotation-host-registry";
+import { projectAnnotationItems as normalizeSnapshotComments } from "../app-shared/runtime/project-annotation-items";
 
 type StateUpdater<Value> = Value | ((current: Value) => Value);
 interface MutableRef<Value> { current: Value }
@@ -12,19 +13,20 @@ interface ReactRuntime { useCallback<Callback extends (...arguments_: never[]) =
 interface Metadata { browserTabId?: string; commentId?: string; [key: string]: unknown }
 interface Comment { id?: string; localBrowserCommentMetadata?: Metadata; [key: string]: unknown }
 interface DirectCommentMessage { browserTabId: string; comment: Comment; conversationId: string; sessionId: string }
-interface BrowserSnapshot { annotationFlow?: unknown; comments: Array<{ id: string; [key: string]: unknown }>; url: string }
+interface SnapshotComment { additionalAnchors?: unknown; body?: string; designChange?: unknown; id: string; [key: string]: unknown }
+interface BrowserSnapshot { annotationFlow?: unknown; comments: SnapshotComment[]; url: string }
 interface Tab { annotationFlow?: unknown; browserSnapshot?: BrowserSnapshot | null; browserTabId?: string | null; commentAttachmentConversationId?: string | null; conversationId?: string | null; phase?: string; sourceThreadId?: string; tabId?: string }
 interface DetachedTabs { focusSourceForBrowserComment(conversationId: string, browserTabId: string): Promise<boolean> | boolean; isBrowserTabDetachedFromSource(conversationId: string, browserTabId: string): Promise<boolean> | boolean }
 interface StoreScope { get<Value>(signal: unknown): Value }
 interface PendingFocus { abort: AbortController; message: DirectCommentMessage }
 interface BrowserUiState { currentUrls: string[] }
 
-const shared = appSharedChunk as unknown as { $3?: () => void; BX: (query: unknown, input: object) => Comment[]; CJ: (flow: unknown) => { defaultSubmitMode: string }; FX?: () => void; G3: { dispatchMessage(type: string, payload: unknown): void }; HX: <Value>(signal: unknown) => Value; I3: () => JsxRuntime; K3: (event: string, callback: (message: never) => void, dependencies: readonly unknown[]) => void; LX: (scope: unknown) => StoreScope; OJ?: () => void; QI?: () => void; W3?: () => void; ZI: unknown; e6: () => ReactRuntime; iK: (comment: unknown, index: number, browserTabId: string) => Comment; wJ: (comments: unknown[], firstFlag: boolean, secondFlag: boolean) => Array<{ id: string; [key: string]: unknown }>; wL?: () => void };
+const shared = appSharedChunk as unknown as { $3?: () => void; BX: (query: unknown, input: object) => Comment[]; CJ: (flow: unknown) => { defaultSubmitMode: string }; FX?: () => void; G3: { dispatchMessage(type: string, payload: unknown): void }; HX: <Value>(signal: unknown) => Value; I3: () => JsxRuntime; K3: (event: string, callback: (message: never) => void, dependencies: readonly unknown[]) => void; LX: (scope: unknown) => StoreScope; OJ?: () => void; QI?: () => void; W3?: () => void; ZI: unknown; e6: () => ReactRuntime; iK: (comment: unknown, index: number, browserTabId: string) => Comment; wL?: () => void };
 const initial = appInitialChunk as unknown as { Q6: (scope: StoreScope, key: object, updater: (comments: Comment[]) => Comment[]) => void; RDt: unknown; X6: unknown; Y6?: () => void; ifn?: () => void; mnt?: () => void; ofn: (flag: string) => boolean; pnt?: { browserHost?: { detachedTabs: Promise<DetachedTabs | null> | DetachedTabs | null } }; zDt?: () => void };
 const primary = appPrimaryChunk as unknown as { Bs: (scope: StoreScope, conversationId: string, browserTabId: string, state: { isOpen: boolean; url: string }) => void; Hi: (comment: Comment, browserTabId: string) => boolean; Ks: (conversationId: string, browserTabId: string, signal: AbortSignal, timeout: number) => Promise<boolean>; Rs: (scope: StoreScope, conversationId: string, browserTabId: string) => BrowserUiState | null; Us: (conversationId: string, browserTabId: string) => boolean; Vi?: () => void; Vs: (message: DirectCommentMessage) => Promise<unknown> | null | undefined; Ws?: () => void; zs?: () => void };
 const popup = commentPopupChunk as unknown as { n?: () => void; t?: unknown };
 const registry = registryChunk as unknown as { i: (browserTabId: string, conversationId: string, callback: () => boolean) => (() => void) | void; n?: () => void };
-const { $3: initializeSharedRuntime, BX: queryComments, CJ: getAnnotationFlowConfig, FX: initializeSharedFeatures, G3: bridge, HX: useSignal, I3: getJsxRuntime, K3: useHostEvent, LX: useStoreScope, OJ: initializeSharedQueries, QI: initializeSharedState, W3: initializeSharedBridge, ZI: appScope, e6: getReactRuntime, iK: convertSnapshotComment, wJ: normalizeSnapshotComments, wL: initializeSharedLinks } = shared;
+const { $3: initializeSharedRuntime, BX: queryComments, CJ: getAnnotationFlowConfig, FX: initializeSharedFeatures, G3: bridge, HX: useSignal, I3: getJsxRuntime, K3: useHostEvent, LX: useStoreScope, OJ: initializeSharedQueries, QI: initializeSharedState, W3: initializeSharedBridge, ZI: appScope, e6: getReactRuntime, iK: convertSnapshotComment, wL: initializeSharedLinks } = shared;
 const { Q6: updateComments, RDt: detachedTabsSignal, X6: commentsQuery, Y6: initializeInitialQueries, ifn: initializeFlags, mnt: initializeBrowserRuntime, ofn: useFeatureFlag, pnt: browserEnvironment, zDt: initializeDetachedTabs } = initial;
 const { Bs: setBrowserUiState, Hi: belongsToBrowserTab, Ks: waitForBrowserCommentReady, Rs: getBrowserUiState, Us: isBrowserCommentBusy, Vi: initializePrimaryAnnotations, Vs: executeDirectComment, Ws: initializePrimaryBrowser, zs: initializePrimaryState } = primary;
 const { n: initializeCommentPopup, t: CommentPopupPortal } = popup;

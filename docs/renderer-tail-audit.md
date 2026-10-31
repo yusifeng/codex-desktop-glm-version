@@ -1,5 +1,10 @@
 # Renderer 尾部资产审计
 
+2026-10-31 A5 semantic consumer 交叉审计：在 namespace 批次后继续核对所有
+`semantic-business-logic` 分类与 hub 消费集合，接回 `sort-by-recency` 和
+`project-annotation-items` 两条真实 consumer。对应 app-primary `_n` 与 app-shared `wJ`
+读取已清零；同批发现的 `po/Rs/Us` 仍依赖 hub 私有 registry，未制造注入原 hub 函数的伪迁移。
+
 2026-10-31 A5 namespace consumer 扫描：继续接回 `format-browser-url`（2 consumers）、
 `format-beacon-action-key`、`extract-skill-kind`、`normalize-system-hints`、
 `create-prefilled-plugin-prompt` 与 `stable-json-stringify`。后两项同时补齐 ProseMirror `type.name`

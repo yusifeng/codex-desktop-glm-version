@@ -10,8 +10,8 @@ const source = fs.readFileSync(path.join(ROOT, "src/renderer/local-conversation-
 const state = {
   config: { model: "gpt-5.4", reasoningEffort: "high" }, enabled: true, initialized: 0, intervals: [], now: new Date(1_000_000),
   subagents: [
-    { canInteract: true, conversationId: "running-1", displayName: "Builder", objective: "Investigate the repository and implement a carefully tested semantic renderer module with detailed validation", startedAtMs: 970_000, status: "running" },
-    { conversationId: "waiting-1", displayName: "Researcher", status: "waiting", statusSummary: "Awaiting a follow-up task" },
+    { canInteract: true, conversationId: "running-1", displayName: "Builder", objective: "Investigate the repository and implement a carefully tested semantic renderer module with detailed validation", recencyAtMs: 970_000, startedAtMs: 970_000, status: "running" },
+    { conversationId: "waiting-1", displayName: "Researcher", recencyAtMs: 990_000, status: "waiting", statusSummary: "Awaiting a follow-up task" },
     { conversationId: "done-1", displayName: "Reviewer", lastAssistantMessageAtMs: 900_000, objective: null, recencyAtMs: 900_000, status: "done" },
   ],
 };
@@ -34,7 +34,7 @@ const mocks = {
     "export const N0t=value=>['none','minimal','low','medium','high','xhigh','max','ultra','persistent'].includes(value);export const Qmn=(value,length)=>value.length>length?value.slice(0,length-1)+'…':value;export const X5=model=>model==='gpt-5.4'?'GPT-5.4':model;",
     "export const Xit=duration=>Math.floor(duration/1000)+'s';export const Yit=(callback,interval)=>r.state.intervals.push({callback,interval});export const lP=()=>r.state.now;export const nN=()=>r.state.enabled;export const sjt=value=>value.trim().replace(/\\s+/g,' ');",
   ].join("\n"),
-  "app-primary": "const r=globalThis.__subagentsPanelTab;export const gn=()=>{r.state.initialized+=1};export const mn=()=>{r.state.initialized+=1};export const pn='subagent-query';export const _n=subagents=>[...subagents];",
+  "app-primary": "const r=globalThis.__subagentsPanelTab;export const gn=()=>{r.state.initialized+=1};export const mn=()=>{r.state.initialized+=1};export const pn='subagent-query';",
   "local-conversation-thread": "const r=globalThis.__subagentsPanelTab;export const s=()=>{r.state.initialized+=1};export const t=props=>({type:'local-conversation-thread',props});",
   "subagent-panel": "const runtime=globalThis.__subagentsPanelTab;export const r=()=>{runtime.state.initialized+=1};export const n=props=>({type:'subagent-panel',props});export const t=props=>({type:'subagent-header',props});",
 };
@@ -62,8 +62,9 @@ assert.equal(view.props.sections[0].visibleItemLimit, 4);
 assert.equal(view.props.sections[1].title, "Done · 1");
 assert.equal(view.props.sections[1].visibleItemLimit, 10);
 assert.equal(view.props.sections[0].items[0].preview.length <= 60, true);
-assert.equal(textContent(view.props.sections[0].items[0].trailing), "30s");
-assert.equal(textContent(view.props.sections[0].items[1].trailing), "Waiting");
+assert.equal(view.props.sections[0].items[0].label, "Researcher");
+assert.equal(textContent(view.props.sections[0].items[0].trailing), "Waiting");
+assert.equal(textContent(view.props.sections[0].items[1].trailing), "30s");
 assert.equal(walk(view.props.sections[1].items[0].trailing).some((node) => node.type === "relative-time"), true);
 view.props.onSelect("waiting-1");
 assert.deepEqual(selections.at(-1), ["waiting-1", "Researcher"]);

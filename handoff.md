@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后对全部 `semantic-business-logic` 分类与 hub consumer 做交叉审计，接回 subagent
+recency 排序和 detached-browser annotation projection，清除 app-primary `_n` 与 app-shared
+`wJ` 读取。`po/Rs/Us` 仍依赖 hub 私有 registry，保留为显式例外，不做循环依赖式伪迁移。
+
 随后扩展到 namespace 解构扫描，接回 appgen URL、home beacon key、artifact skill-kind、image
 system hints、appgen plugin prompt 与 wallet query-key serialization 共 7 条 consumer；清除
 `xf/yh/vg/iu/Rf/AZ` hub 读取。`extract-skill-kind` 补齐真实 ProseMirror `type.name` 结构，

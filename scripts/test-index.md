@@ -1404,6 +1404,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-app-primary-select-handoff-branch.mjs](test-app-primary-select-handoff-branch.mjs)
 [test-app-primary-strip-terminal-command-token.mjs](test-app-primary-strip-terminal-command-token.mjs)
 [test-app-primary-sort-by-recency.mjs](test-app-primary-sort-by-recency.mjs)
+  - Covers 3 sort-policy assertions plus the recency-ordered subagent panel consumer.
 [test-app-primary-select-foreground-image-url.mjs](test-app-primary-select-foreground-image-url.mjs)
 [test-app-primary-parse-url-or-fallback.mjs](test-app-primary-parse-url-or-fallback.mjs)
 [test-app-primary-extract-action-label.mjs](test-app-primary-extract-action-label.mjs)
@@ -1475,6 +1476,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-app-shared-split-whitespace-tokens.mjs](test-app-shared-split-whitespace-tokens.mjs)
 [test-app-shared-find-case-insensitive-key.mjs](test-app-shared-find-case-insensitive-key.mjs)
 [test-app-shared-project-annotation-items.mjs](test-app-shared-project-annotation-items.mjs)
+  - Covers 2 projection-policy assertions plus hidden-anchor removal in the detached browser consumer.
 [test-app-shared-status-to-color.mjs](test-app-shared-status-to-color.mjs)
   - Covers 5 status mapping and Codex Micro consumer assertions.
 [test-app-shared-is-automation-update-output.mjs](test-app-shared-is-automation-update-output.mjs)

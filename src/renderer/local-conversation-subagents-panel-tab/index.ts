@@ -2,6 +2,7 @@ import "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as appPrimaryChunk from "@rchunk/app-primary";
+import { sortByRecency as sortSubagents } from "../app-primary/runtime/sort-by-recency";
 import * as localConversationThreadChunk from "@rchunk/local-conversation-thread";
 import * as subagentPanelChunk from "@rchunk/subagent-panel";
 
@@ -58,12 +59,12 @@ const initialRuntime = appInitialChunk as unknown as {
   nN?(): boolean;
   sjt?(objective: string): string;
 };
-const primaryRuntime = appPrimaryChunk as unknown as { _n?(subagents: Subagent[]): Subagent[]; gn?(): void; mn?(): void; pn?: unknown };
+const primaryRuntime = appPrimaryChunk as unknown as { gn?(): void; mn?(): void; pn?: unknown };
 const threadRuntime = localConversationThreadChunk as unknown as { s?(): void; t?: (props: ThreadProps) => unknown };
 const panelRuntime = subagentPanelChunk as unknown as { n?: (props: PanelProps) => unknown; r?(): void; t?: (props: HeaderProps) => unknown };
 const { $3: initializeSharedRuntime, BX: useQueryData, FX: initializeSharedFeatures, I3: getJsxRuntime, K2: initializeSharedUi, e6: getReactRuntime, n4: useIntl } = sharedRuntime;
 const { Dpn: initializeConversationState, HZt: initializeRelativeTime, IS: RelativeTime, Jit: initializeThreadQueries, KQt: threadConfigurationQuery, Let: LoadingIndicator, M0t: initializeModels, N0t: isReasoningEffort, Qmn: truncateText, RS: initializeTimers, Ret: initializeThreadState, Vhn: initializeSubagentState, X5: modelDisplayName, Xit: formatDuration, Yit: useInterval, Zit: initializeStatus, lP: useNow, nN: useBackgroundSubagentsEnabled, ojt: initializeConversationQueries, sP: initializeDateTime, sjt: plainObjective } = initialRuntime;
-const { _n: sortSubagents, gn: initializePrimaryState, mn: initializePrimaryQueries, pn: subagentQuery } = primaryRuntime;
+const { gn: initializePrimaryState, mn: initializePrimaryQueries, pn: subagentQuery } = primaryRuntime;
 const { s: initializeLocalConversationThread, t: LocalConversationThread } = threadRuntime;
 const { n: SubagentPanel, r: initializeSubagentPanel, t: SubagentPanelHeader } = panelRuntime;
 
@@ -94,8 +95,6 @@ function displayDuration(durationMs: number): string { if (formatDuration != nul
 function isDone(subagent: Subagent): boolean { return subagent.status === "done"; }
 function isActive(subagent: Subagent): boolean { return subagent.status !== "done"; }
 function isWaiting(subagent: Subagent): boolean { return subagent.status === "waiting"; }
-function fallbackSort(subagents: Subagent[]): Subagent[] { return [...subagents].sort((left, right) => (right.recencyAtMs ?? right.startedAtMs ?? 0) - (left.recencyAtMs ?? left.startedAtMs ?? 0)); }
-
 function StatusTrailing({ subagent }: { subagent: Subagent }): unknown {
   const nowDate = useNow?.() ?? new Date();
   const [nowMs, setNowMs] = React.useState(nowDate.getTime());
@@ -112,7 +111,7 @@ function toPanelItem(subagent: Subagent): PanelItem {
   return { avatarSeed: subagent.conversationId, id: subagent.conversationId, label: subagent.displayName, preview, previewLineCount: 1, trailing: jsx.jsx(StatusTrailing, { subagent }) };
 }
 function SubagentOverview({ onSelect, subagents }: { onSelect(conversationId: string, displayName: string): void; subagents: Subagent[] }): unknown {
-  const sorted = sortSubagents?.(subagents) ?? fallbackSort(subagents);
+  const sorted = sortSubagents(subagents);
   const byId = new Map(sorted.map((subagent) => [subagent.conversationId, subagent]));
   const active = sorted.filter(isActive);
   const done = sorted.filter(isDone);
