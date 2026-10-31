@@ -2,7 +2,6 @@
 
 export function createWindowContextClass(dependencies) {
   const {
-    $,
     $0e,
     $8,
     $j,
@@ -93,7 +92,6 @@ export function createWindowContextClass(dependencies) {
     P1e,
     PBe,
     habitatAutomationHostCallbacks,
-    Q,
     Q0e,
     Qj,
     Qje,
@@ -135,7 +133,6 @@ export function createWindowContextClass(dependencies) {
     Y8e,
     findDetachedBrowserPageWebContents,
     Yj,
-    Z,
     Z5e,
     Z6e,
     DesktopFetchService,

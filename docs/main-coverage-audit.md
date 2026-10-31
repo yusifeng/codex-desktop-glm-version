@@ -3270,6 +3270,15 @@ interaction controller 改用具名对象参数接线，IPC guarded event set �
 identity、blank/persistent URL 与 title reconciliation、process-gone extraction、finite-coordinate guard、unref wait、timeout clamp/race。主组合根
 依赖由 46 项缩至 14 项环境/command-capability依赖；旧 `OYe..rX` 34 个纯 helper 整带删除。
 
+### 大批收敛：IAB capability runtime 与内嵌协议 SDK
+
+新增并接回 `browser-use/iab-capabilities.ts`，以类型明确的 runtime 唯一承接 Browser Use capability metadata、WebMCP feature gate、
+visibility/viewport command admission、严格 payload validation、host side effects、pending debugger sync 和 deferred intent projection。
+`iab-api.ts` 改为消费单一 capability runtime，不再注入 9 个机械别名。由此确认主 chunk `_q` 起始的约 4,576 行为内嵌 Zod vendor、
+未被实例化的 locator/auth/CDP/management 客户端 SDK 和已替代 handler；整带物理删除。两个未接线且行为不忠实的
+`locator-engine.ts`/`tool-schemas.ts` skeleton 同步移除，避免把死副本误计为已反编译实现。focused suite 执行 30 条元数据、feature、
+validation、side-effect ordering、debugger wait、unsupported command 与接线断言。
+
 ### 增量抽取：language-server runtime installer
 
 新增并接回 `language-server/runtime-installer.ts`，完整接管并发安装去重、过期 gate、缓存 manifest/path 验证、pinned size/SHA-256

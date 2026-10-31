@@ -37,6 +37,13 @@ const dependencies = {
   l: { app: { getVersion: () => "1.0.0" } },
   a: { bn: (value) => value },
   _: { randomUUID: () => "uuid" },
+  capabilities: {
+    browserCapabilityInfos: [],
+    dispatchCapabilityCommand() { throw new Error("unsupported test capability"); },
+    isDeferredCapabilityCommand() { return false; },
+    parseDeferredCapabilityIntent() { return null; },
+    tabCapabilityInfos() { return []; },
+  },
 };
 const IabBrowserUseApi = createIabBrowserUseApiClass(dependencies);
 const browserUseActiveStates = [];

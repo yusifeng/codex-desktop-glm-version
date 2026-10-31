@@ -5216,6 +5216,15 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 主 chunk 旧 `OYe..rX` helper belt 已删除。focused coverage 新增 primary/child target、capture clip、navigation URL、NUL route key、
   persistent/temporary URL、title/committed URL 与 timeout success；下一批审计仍在主 chunk 的 capability/command schema belt。
 
+# 2026-11-01 IAB capability/runtime SDK belt convergence
+
+- 新增并接回 `browser-use/iab-capabilities.ts`，集中拥有 capability metadata、WebMCP feature admission、visibility/viewport command
+  validation/dispatch、deferred intent 与 debugger-sync completion；`iab-api.ts` 只消费这一语义 runtime。
+- 主 chunk 从 `_q` command wrapper 到 capability handler 的约 4,576 行内嵌 Zod/vendor、零 consumer client SDK 与旧 handler 整带删除；
+  未接线且与真实协议有偏差的 `locator-engine.ts`、`tool-schemas.ts` skeleton 同步移除。focused suite 30 项，并修正 native-pipe
+  回归测试去检查已迁出的真实 session-registry consumer。下一批从删除后相邻的 Browser Session/semantic owner 后方继续审计，跳过
+  已有源码证据证明不可拆的 `SWe` attach composition root。
+
 # 2026-11-01 language-server runtime installer extraction
 
 - 新增并接回 `language-server/runtime-installer.ts`，承接 install dedupe、expiry、cache validation、size/digest download guard、三种解包、

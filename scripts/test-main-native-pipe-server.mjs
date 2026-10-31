@@ -94,7 +94,11 @@ assert.equal(main.includes("var Bl = class extends Error"), false);
 assert.equal(main.includes("async function ql("), false);
 assert.equal(main.includes("function Ql()"), false);
 assert.equal(main.includes("async function JYe("), false);
-assert.equal(main.includes("createBrowserUseNativePipeServer({"), true);
-assert.equal(main.includes("socketPeerAuthorizer: createSocketPeerAuthorizer()"), true);
+const sessionRegistry = fs.readFileSync(
+  new URL("../src/main/main-app/browser-use/session-registry.ts", import.meta.url),
+  "utf8",
+);
+assert.equal(sessionRegistry.includes("createBrowserUseNativePipeServer({"), true);
+assert.equal(sessionRegistry.includes("socketPeerAuthorizer: createSocketPeerAuthorizer()"), true);
 
 console.log("main native pipe server: 26 assertions passed");

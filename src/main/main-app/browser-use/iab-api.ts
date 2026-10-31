@@ -1,5 +1,15 @@
 // @ts-nocheck
-type IabBrowserUseApiDependencies = Record<string, any>;
+import type { IabCapabilityRuntime } from "./iab-capabilities.js";
+
+interface IabBrowserUseApiDependencies {
+  capabilities: IabCapabilityRuntime;
+  LY: () => any;
+  Tr: () => Record<string, any>;
+  _: Record<string, any>;
+  a: Record<string, any>;
+  l: Record<string, any>;
+  n: Record<string, any>;
+}
 
 const IAB_ABOUT_BLANK = `about:blank`;
 const IAB_PAGE_READY_TIMEOUT_MS = 15e3;
@@ -276,9 +286,15 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string)
 
 function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies) {
   const {
-    LY, a, dYe, gYe, hYe, l, mYe, n, pYe,
-    vYe, _, _Ye, Tr,
+    LY, a, capabilities, l, n, _, Tr,
   } = dependencies;
+  const {
+    browserCapabilityInfos,
+    dispatchCapabilityCommand,
+    isDeferredCapabilityCommand,
+    parseDeferredCapabilityIntent,
+    tabCapabilityInfos,
+  } = capabilities as IabCapabilityRuntime;
   const brandBrowserTabId = a.bn;
   const IY = IAB_ABOUT_BLANK,
     yYe = IAB_PAGE_READY_TIMEOUT_MS,
@@ -443,13 +459,13 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
           );
         let n = this.getRequiredBrowserHost(t),
           r = this.getSelectedOrFirstControlledTabForSession(t);
-        if (r == null && gYe(e)) {
-          let t = _Ye(e);
+        if (r == null && isDeferredCapabilityCommand(e)) {
+          let t = parseDeferredCapabilityIntent(e);
           if (t != null) return (this.setPendingCapabilityIntent(n.routeKey, t), {});
         }
         return (
           this.recordBrowserUseTurn(t, e),
-          hYe({ browserTabId: r?.browserTabId, host: n, payload: e })
+          dispatchCapabilityCommand({ browserTabId: r?.browserTabId, host: n, payload: e })
         );
       });
     }
@@ -531,7 +547,10 @@ function createIabBrowserUseApiClass(dependencies: IabBrowserUseApiDependencies)
             name: `Codex In-app Browser`,
             version: n.Ru(n.Uu(l.app.getVersion())),
             type: `iab`,
-            capabilities: { browser: dYe, tab: pYe(this.options.buildFlavor, Tr()) },
+            capabilities: {
+              browser: browserCapabilityInfos,
+              tab: tabCapabilityInfos(this.options.buildFlavor, Tr()),
+            },
             metadata: r,
           };
         return (

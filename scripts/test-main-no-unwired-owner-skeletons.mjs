@@ -53,6 +53,7 @@ const realOwners = [
   ["src/main/main-app/remote-control/client.ts", "authorizeRemoteControlEnvironments"],
   ["src/main/main-app/app-server/transports.ts", "AppServerTransportWslStdio"],
   ["src/main/main-app/browser-use/origin-state.ts", "BrowserSettingsSync"],
+  ["src/main/main-app/browser-use/iab-capabilities.ts", "createIabCapabilityRuntime"],
   ["src/main/main-app/automations/habitat-runtime.ts", "createHabitatAutomationRuntime"],
   ["src/main/main-app/automations/automation-update-tool.ts", "createAutomationUpdateTool"],
   ["src/main/main-app/artifacts/template-picker-runtime.ts", "createArtifactTemplatePickerRuntime"],
@@ -112,6 +113,8 @@ const removedSkeletons = [
   "src/main/main-app/sidebar/saved-sections-transactions.ts",
   "src/main/main-app/automations/habitat.ts",
   "src/main/main-app/automations/index.ts",
+  "src/main/main-app/browser-use/locator-engine.ts",
+  "src/main/main-app/browser-use/tool-schemas.ts",
 ];
 
 for (const path of removedSkeletons) {
@@ -175,6 +178,9 @@ assert.equal(main.includes('require("./main-app/browser-sidebar/browser-settings
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-webview-adoption-runtime.js")'), true, "browser webview adoption runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-annotation-anchor-policy.js")'), true, "browser annotation anchor policy is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-comment-policy.js")'), true, "browser comment policy is wired");
+assert.equal(main.includes('require("./main-app/browser-use/iab-capabilities.js")'), true, "IAB capability runtime is wired");
+assert.equal(main.includes("capabilities: iabCapabilityRuntime"), true, "IAB API consumes the semantic capability runtime");
+assert.equal(main.includes("var _q = class"), false, "embedded browser SDK/Zod belt must remain removed");
 assert.equal(main.includes('require("./main-app/sidebar/saved-section-policy.js")'), true, "saved-section policy is wired");
 assert.equal(main.includes('require("./main-app/avatar-overlay/message-dispatch.js")'), true, "avatar overlay message dispatch is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/checkout-webview.js")'), true, "checkout webview runtime is wired");
@@ -547,4 +553,4 @@ assert.equal(main.includes("function _Oe("), false, "generated remote project co
 assert.equal(main.includes("function vOe("), false, "generated project order comparator must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("533 main unwired-owner skeleton assertions passed");
+console.log("540 main unwired-owner skeleton assertions passed");
