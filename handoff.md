@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成 workspace-settings webview owner 迁移：新增 `browser-sidebar/workspace-settings-webview-runtime.ts`，独立接管 workspace partition/session
+registry、presentation ledger、attach hardening、auth handoff 串行化、admin URL/bootstrap validation、external navigation、reload retry 与最后一个 webview
+销毁后的 cookie cleanup。BrowserWindowManager 与 ElectronMessageHandler 已真实改接，且未与 checkout owner 混用状态；主 chunk 约 271 行旧实现
+物理删除。focused suite 执行 34 条 partition/bootstrap/auth/navigation/presentation/cleanup 接线断言。
+
 完成 checkout webview 全 owner 迁移：`browser-sidebar/checkout-webview.ts` 从 190 行未接线 partial 副本扩展为约 1,096 行单一 runtime factory，
 完整接管 attach queue/webPreferences hardening、partition/session ledger、presentation identity、认证 cookie 串行化、CDP request/response observation、
 订阅 plan 轮询、business/credit/rate-limit completion、navigation/popup policy 和 destroyed cleanup。BrowserWindowManager 与 ElectronMessageHandler

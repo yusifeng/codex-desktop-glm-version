@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 workspace settings webview owner extraction
+
+新增 `browser-sidebar/workspace-settings-webview-runtime.ts`，保持独立的 active-count/session-task/presented-partition ledgers，并迁入 attach queue、
+webPreferences hardening、ChatGPT auth handoff、admin/bootstrap URL policy、external-link gate、reload retry 与 cookie cleanup。BrowserWindowManager 消费
+lifecycle installer，ElectronMessageHandler 消费 presentation update；主 chunk `vG…AG` 约 271 行旧 owner 物理删除。34 条 focused 断言覆盖完整
+attach/auth/navigation/disposal 路径，防空壳审计锁定旧定义缺席。
+
 ## 2026-11-01 checkout webview complete owner extraction
 
 `browser-sidebar/checkout-webview.ts` 已扩为完整 checkout runtime factory：will/did-attach 配对、session registry、presentation URL identity、auth cookie

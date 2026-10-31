@@ -86,6 +86,7 @@ const realOwners = [
   ["src/main/main-app/sidebar/saved-section-policy.ts", "createSavedSectionPolicy"],
   ["src/main/main-app/avatar-overlay/message-dispatch.ts", "dispatchAvatarOverlayMessage"],
   ["src/main/main-app/browser-sidebar/checkout-webview.ts", "createCheckoutWebviewRuntime"],
+  ["src/main/main-app/browser-sidebar/workspace-settings-webview-runtime.ts", "createWorkspaceSettingsWebviewRuntime"],
   ["src/main/main-app/browser-sidebar/site-page-event-runtime.ts", "createSitePageEventRuntime"],
   ["src/main/main-app/browser-sidebar/browser-host-service.ts", "createBrowserHostServiceClass"],
   ["src/main/main-app/window/browser-window-rpc-services.ts", "createBrowserProfileImportServiceClass"],
@@ -176,6 +177,10 @@ assert.equal(main.includes('require("./main-app/browser-sidebar/browser-comment-
 assert.equal(main.includes('require("./main-app/sidebar/saved-section-policy.js")'), true, "saved-section policy is wired");
 assert.equal(main.includes('require("./main-app/avatar-overlay/message-dispatch.js")'), true, "avatar overlay message dispatch is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/checkout-webview.js")'), true, "checkout webview runtime is wired");
+assert.equal(main.includes('require("./main-app/browser-sidebar/workspace-settings-webview-runtime.js")'), true, "workspace settings webview runtime is wired");
+for (const oldOwner of ["var vG = r.i(`workspace-settings-webview`)", "function lWe(", "function uWe(", "function dWe(", "async function fWe(", "function OG(", "function kG("]) {
+  assert.equal(main.includes(oldOwner), false, `${oldOwner} generated workspace settings webview runtime must be removed`);
+}
 for (const oldOwner of ["var NW = r.i(`checkout-webview`)", "function IUe(", "function RUe(", "function BUe(", "function VUe(", "async function GUe(", "function sG("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated checkout webview runtime must be removed`);
 }
