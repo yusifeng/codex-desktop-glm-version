@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 native app, PIP and browser navigation owners
+
+`windows/native-app-icons.ts` 现直接服务全部 Windows icon/Sky addon/PIP/Chrome focus consumer；新增 `browser-use/navigation-restriction.ts`
+接管原先未独立落地的 `Qc/$c/Vae/Hae/Uae/Wae`，并复用语义 link-opening 本地 URL 判定与 site-data chrome URL 开关。主 chunk
+`kae…Wae` 约 1,173 行旧实现删除。focused suite 验证 local subframe、blank-like URL、active policy、block callback、平台门控及 native-video
+addon 参数转发。
+
 ## 2026-11-01 computer-use runtime chain consolidation
 
 `computer-use/native-pipe-service.ts`、`browser-use/thread-config.ts`、`misc/automation-thread-config.ts` 及两层 codex-app-tools config 已接管

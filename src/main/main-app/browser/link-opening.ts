@@ -67,7 +67,7 @@ function localHttpPort(url: string): number | null {
 }
 
 /** 本地 URL（原 `Ve`）：本地 http(s) 或本地 file:。 */
-function isLocalUrl(url: string): boolean {
+export function isLocalUrl(url: string): boolean {
   if (localHttpPort(url) != null) return true;
   let parsed: URL;
   try {

@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+大批接回 native app/PIP owner：Windows 图标 addon、Sky addon、frontmost window、remote-hosted PIP 包装、browser-use PIP 管理与 Chrome tab
+聚焦均改接 `windows/native-app-icons.ts`。同时新增完整 `browser-use/navigation-restriction.ts`，恢复本地 subframe 门控、Browser Use URL policy、
+chrome: 特例与 block 回调；旧 `kae…Wae` 约 1,173 行整体删除。focused suite 覆盖新 policy 状态机和实际 addon wrapper 分支。
+
 大批接回 computer-use 启动运行链：selection/cache、native-pipe server/client、Browser Use thread config/reconcile、自动化线程 overrides、
 codex-app-tools MCP 定义/启用覆盖，统一切到五个语义模块；旧 `To…cs` 约 1,185 行连续实现删除。focused suite 执行非 Windows client
 生命周期、plugin-change config sync、reconcile selection 复用与 codex_app enabled override，并锁定桌面启动 consumer 的真实接线。
