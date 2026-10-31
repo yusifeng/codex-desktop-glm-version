@@ -1,5 +1,13 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 realtime voice history ledger
+
+原 `b8e/C8e/w8e` 及独占 `x8e/x2/S2/S8e/C2/w2/T8e` helpers 已整簇迁入
+`src/main/main-app/realtime/voice-history.ts`。新 runtime 保留 durable timeline append、transcript accumulator、
+session/turn/item/presentation projection、restore-time interrupted/failed sealing、ephemeral in-memory records 与
+forget tombstone、live transcript merge、locator-matched subscriber updates、RPC broken/unsubscribe/dispose cleanup；
+唯一 voice-history service consumer 已接回，旧实现已物理删除。
+
 ## 2026-10-31 realtime memory summary reader
 
 原 `y8e` 已迁入 `src/main/main-app/realtime/memory-summary.ts`。新 RPC owner 保留 execution-host Codex home 与
