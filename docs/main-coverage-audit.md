@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 projects manager owner
+
+原 `o8e`、独占 project-order merge `m2` 与 `r8e/h2/g2/i8e/_2/a8e` request schemas 已整簇迁入
+`src/main/main-app/projects/projects-manager.ts`。新 owner 保留 local/remote project CRUD、duplicate/root consent、
+serialized order writes、backend move/order/delete undo、appearance、storage/workspace projection、membership inference
+delegation和 renderer global-state/workspace broadcasts；唯一运行时构造点已接回，旧实现已物理删除。
+
 ## 2026-10-31 thread membership inference
 
 原 `t8e/n8e` 已迁入 `src/main/main-app/projects/thread-membership-inference.ts`。新模块保留 affected root

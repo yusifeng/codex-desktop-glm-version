@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `o8e` ProjectsManager、独占 `m2` order merge 与六个 request schemas 整体迁入
+`projects/projects-manager.ts`；local/remote CRUD、order serialization/backend propagation、appearance、storage/root
+projection、thread membership recovery delegation 与 renderer broadcasts 均由新 owner 持有。唯一 runtime
+consumer 已真实接回，旧约 450 行 class/schema/helper 已删除。focused test 覆盖 45 项。
+
 随后将 `t8e/n8e` thread membership inference cluster 迁入
 `projects/thread-membership-inference.ts`；project-root/canonical alias 索引、workspace hint 恢复、同 basename
 Git-origin 排歧、分页 thread 扫描、existing/excluded/projectless gate 与 projectless fallback 均由新算法模块
