@@ -4744,3 +4744,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - main 旧 constants/schema/helpers 删除 372 行，新生产模块 373 行；focused coverage 53 项，no-unwired gate
   扩至 219 项。紧随其后的 serialization runtime 明确保留为 vendor/generated；下一批转向仍内联的第一方
   marketplace listing、remote 组合根或后续大型 owner，避免把 vendor codec 误算成业务迁移量。
+
+# 2026-11-01 thread read-state runtime composition
+
+- `src/main/main-app/thread-read-state/runtime.ts` 已接管 identity/account subscriptions、local connection ownership
+  recheck、host-key projection、registry/shared-object invalidation、client-coordination broadcast、protocol filtering、
+  cron owner injection、fresh context 读取和统一 cleanup；继续复用唯一 `ThreadReadStateOwner`，没有复制状态。
+- main 旧 `Ant` 组合实现删除约 130 行，新生产模块 198 行；focused coverage 54 项，no-unwired gate 扩至
+  224 项。下一批优先迁移相邻 website-preview Electron net fetch lifecycle，随后继续审计 thread-catalog sources
+  和 host transport assembly；大型 app composition root 保持证据驱动，不为增加数量强拆。

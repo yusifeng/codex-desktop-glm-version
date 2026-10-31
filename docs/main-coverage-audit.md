@@ -2744,3 +2744,13 @@ remote-control enrollment 的 issuer/env policy、PKCE verifier/challenge、auth
 `RemoteConnectionsHandler`；旧 `y5e/b5e/x5e/o4/S5e/s4/C5e/w5e/c4/T5e` helpers、schema 和 OAuth constants
 已物理删除。focused test `scripts/test-main-remote-control-step-up-owner.mjs` 覆盖 53 项 PKCE、URL、token body、
 port fallback、callback validation、OAuth error、timeout、cancel、browser-open failure 与 end-to-end cleanup 行为。
+
+### 增量抽取：thread read-state runtime composition
+
+thread read-state 的 authenticated-principal/account 通知订阅、连接所有权复核、host-config key 投影、registry 与
+shared-object host invalidation、desktop client-coordination 广播、协议版本过滤、cron owner 注入、context freshness
+检查和统一 dispose 生命周期已整体迁移至 `src/main/main-app/thread-read-state/runtime.ts`。main 通过
+`createThreadReadStateRuntime` 生成原 `Ant` consumer；它复用唯一 `ThreadReadStateOwner` 和
+`prepareCronTurnReadState`，没有创建第二份持久化状态。旧内联 `Ant` 组合实现已物理删除。focused test
+`scripts/test-main-thread-read-state-runtime.mjs` 覆盖 54 项 identity、connection race、host invalidation、broadcast、
+protocol、cron/context forwarding、failure logging 与 idempotent cleanup 行为。

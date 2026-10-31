@@ -202,7 +202,8 @@ function createHarness({ initialState = {}, currentIdentity = identity, legacyPa
 
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
 equal(main.includes("ThreadReadStateOwner: Ont"), true);
-equal(main.includes("g = new Ont({"), true);
+equal(main.includes("ThreadReadStateOwner: Ont,"), true);
+equal(main.includes("var Ant = createThreadReadStateRuntime({"), true);
 equal(main.includes("Ont = class"), false);
 equal(main.includes("function L5("), false);
 equal(main.includes("function R5("), false);

@@ -357,6 +357,7 @@ const { createVisualizationServiceRuntime } = require("./main-app/visualizations
 const { createHistorySwipeNavigationServiceClass } = require("./main-app/window/history-swipe-navigation-service.js");
 const { createSystemFontsServiceClass } = require("./main-app/window/system-fonts-service.js");
 const { createThreadReadStateOwnerClass } = require("./main-app/thread-read-state/thread-read-state-owner.js");
+const { createThreadReadStateRuntime } = require("./main-app/thread-read-state/runtime.js");
 const { createThreadProjectMembershipOwnerClass } = require("./main-app/projects/thread-project-membership-owner.js");
 const { createCronTurnReadStatePreparer } = require("./main-app/automations/cron-turn-read-state.js");
 const { DockMenuManager } = require("./main-app/misc/dock-menu.js");
@@ -76502,138 +76503,17 @@ var { ThreadReadStateOwner: Ont } = createThreadReadStateOwnerClass({
   legacyUnreadProperty: a.et,
   legacyUnreadSchema: a.nt,
 });
-var knt = r.r(`thread-read-state`);
-function Ant(e) {
-  let {
-      localConnection: t,
-      connections: r,
-      sharedObjects: i,
-      globalState: a,
-      errorReporter: o,
-      getConfiguredHostIds: s,
-      getHostConfig: c,
-      getLocalWebsocketUrl: l,
-    } = e,
-    u = new n.Wr(),
-    d = (e) => {
-      let r = new n.Wr();
-      return (
-        r.add(
-          t.registerInternalAuthenticatedPrincipalChangeHandler(({ current: t }) =>
-            e(
-              t == null
-                ? { type: `refresh` }
-                : { type: `identity`, identity: { kind: `chatgpt`, ...t } },
-            ),
-          ),
-        ),
-        r.add(
-          t.registerInternalNotificationHandler((t) => {
-            t.method === `account/updated` &&
-              e(t.params?.authMode === null ? { type: `logout` } : { type: `refresh` });
-          }),
-        ),
-        () => r.dispose()
-      );
-    },
-    f = async () => {
-      if (r.getMaybeConnection(t.hostId) !== t) return null;
-      let e = await n.sn(
-        () => t.sendAppServerRequest(`getAuthStatus`, { includeToken: !0, refreshToken: !1 }),
-        d,
-      );
-      return r.getMaybeConnection(t.hostId) === t ? e : null;
-    },
-    p = (e) => {
-      let t = r.getMaybeConnection(e)?.hostConfig ?? (s().includes(e) ? c(e) : null);
-      return t == null ? null : n.ln(t, t.kind === `local` ? l(t) : null);
-    },
-    m = () => {
-      let e = new Set([...r.getAllHostIds(), ...s()]),
-        t = [];
-      for (let n of e) {
-        let e = p(n);
-        e != null && t.push([n, e]);
-      }
-      return Object.fromEntries(t);
-    },
-    h = e.localClientCoordinationEnabled ? new n.v(`desktop`, o) : null,
-    g = new Ont({
-      globalState: a,
-      readIdentity: f,
-      getHostKey: p,
-      listHostKeys: m,
-      onIdentityChanged: d,
-      onHostsChanged: (e) => {
-        let a = new n.Wr(),
-          o = m(),
-          s = () => {
-            let t = m();
-            (0, G.default)(o, t) || ((o = t), e());
-          };
-        return (
-          a.add(
-            r.subscribe((n) => {
-              n.hostId === t.hostId && (n.type === `removed` || n.connection !== t)
-                ? ((o = m()), e())
-                : s();
-            }),
-          ),
-          a.add(
-            i.addSubscriber((e) => {
-              (e === `remote_ssh_connections` ||
-                e === `remote_wsl_connections` ||
-                e === `remote_control_connections`) &&
-                s();
-            }),
-          ),
-          () => a.dispose()
-        );
-      },
-      onAcceptedChange: (e) => {
-        h?.waitUntilInitialized({ timeoutMs: 5e3 })
-          .then(() =>
-            h.sendBroadcast(`thread-read-state-changed`, {
-              conversationId: e.threadId,
-              hostId: e.hostId,
-              hasUnreadTurn: e.hasUnreadTurn,
-              context: e.context,
-            }),
-          )
-          .catch((e) =>
-            knt.warning(`Failed to broadcast thread read state`, {
-              safe: {},
-              sensitive: { error: e },
-            }),
-          );
-      },
-    });
-  return (
-    h != null &&
-      (u.add(
-        h.addBroadcastHandler(`thread-read-state-changed`, async (e) => {
-          e.version === n.mu(`thread-read-state-changed`) &&
-            (await g.acceptBroadcast({
-              hostId: e.params.hostId,
-              threadId: e.params.conversationId,
-              hasUnreadTurn: e.params.hasUnreadTurn,
-              context: e.params.context,
-            }));
-        }),
-      ),
-      u.add(() => h.dispose())),
-    u.add(() => g.dispose()),
-    {
-      owner: g,
-      prepareCronTurnReadState: (e) => Dnt({ ...e, owner: g }),
-      async getContext(e) {
-        let t = await g.captureContext(e);
-        return t?.isCurrent() ? t.context : null;
-      },
-      dispose: () => u.dispose(),
-    }
-  );
-}
+var Ant = createThreadReadStateRuntime({
+  DisposableStore: n.Wr,
+  ThreadReadStateOwner: Ont,
+  ClientCoordination: n.v,
+  readAuthenticatedIdentity: n.sn,
+  hostConfigKey: n.ln,
+  protocolVersion: n.mu,
+  deepEqual: G.default,
+  prepareCronTurnReadState: Dnt,
+  logger: r.r(`thread-read-state`),
+});
 var { ThreadReadStateService: jnt, ThreadReadStateSession: Mnt } =
     createThreadReadStateRpcServices({ RpcHandlerBase: n.Uf, createUsingScope: a.en }),
   Nnt = createThreadTurnSummaryServiceClass({

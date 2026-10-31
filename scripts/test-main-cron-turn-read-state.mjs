@@ -230,7 +230,8 @@ const main = fs.readFileSync(
   "utf8",
 );
 equal(main.includes("Dnt = createCronTurnReadStatePreparer({"), true);
-equal(main.includes("prepareCronTurnReadState: (e) => Dnt({ ...e, owner: g })"), true);
+equal(main.includes("prepareCronTurnReadState: Dnt,"), true);
+equal(main.includes("var Ant = createThreadReadStateRuntime({"), true);
 equal(main.includes("function Dnt("), false);
 equal(main.includes("Cnt = n.wf"), false);
 equal(main.includes("Ent = r.i(`cron-turn-read-state`)"), false);

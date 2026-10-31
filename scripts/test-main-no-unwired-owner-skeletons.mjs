@@ -30,6 +30,7 @@ const realOwners = [
   ["src/main/main-app/misc/primary-runtime-installer.ts", "createPrimaryRuntimeInstaller"],
   ["src/main/main-app/remote/ssh-connection-discovery.ts", "createSshConnectionDiscovery"],
   ["src/main/main-app/remote/remote-control-step-up.ts", "createRemoteControlStepUpRuntime"],
+  ["src/main/main-app/thread-read-state/runtime.ts", "createThreadReadStateRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -216,6 +217,9 @@ assert.equal(main.includes("function c4("), false, "generated callback text resp
 assert.equal(main.includes("function T5e("), false, "generated callback success page writer must be removed");
 assert.equal(main.includes("app_EMoamEEZ73f0CkXaXp7hrann"), false, "generated OAuth client configuration must be removed");
 assert.equal(main.includes("CODEX_APP_SERVER_LOGIN_ISSUER"), false, "generated issuer environment policy must be removed");
+assert.equal(main.includes("var Ant = createThreadReadStateRuntime({"), true, "real thread read-state runtime is wired");
+assert.equal(main.includes("function Ant("), false, "generated thread read-state runtime must be removed");
+assert.equal(main.includes("g = new Ont({"), false, "generated read-state composition must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("219 main unwired-owner skeleton assertions passed");
+console.log("224 main unwired-owner skeleton assertions passed");
