@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 project local-data migration owner
+
+新增 `projects/local-data-migrations.ts`，以明确的 LocalProject/RemoteProject/store/migration 类型恢复六个按序 migration：remote string project、
+automation targets、legacy local projects、automation remap、browser download cleanup 与 metadata repair；保留每个新 automation project 的即时 flush
+及 migration ledger 的逐项 flush。启动 consumer 已改接 `runLocalDataMigrations`/`clearLegacyBrowserDownloadHistoryOnStartup`，旧 `ece…Du`
+约 634 行删除；focused suite 执行 30 个状态与接线断言。
+
 ## 2026-11-01 avatar overlay and remote-hosted PIP owner consolidation
 
 `avatar-overlay/composition-surface.ts`、`realtime.ts`、`geometry.ts` 与 `pip.ts` 已直接接回启动装配和 WindowContext，PIP 工厂显式注入视频频道；

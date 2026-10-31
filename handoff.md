@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+新增 738 行 `projects/local-data-migrations.ts`，完整接管 legacy local project 哈希/selection、remote string project 物化、automation target
+迁移与 remap、metadata repair、下载历史清理及 completed-migration ledger；启动流程直接调用语义 runtime，旧 `ece…Du` 约 634 行实现整体移除。
+focused suite 在内存 state store 中执行本地多根 selection、远端 host 优先级、automation 新建/跳过、metadata 合并、逐 migration flush 与一次性清理。
+
 大批收拢 avatar overlay/PIP 运行链：窗口 manager、语音 controller、几何/拖动和 remote-hosted PIP 全部改由既有约 5,965 行语义模块
 直接服务启动与 WindowContext consumer，旧 `zu…Nd` 约 1,076 行副本整体删除。审计时同时修复语义 PIP owner 的多处真实偏差：活动集合
 早退条件反写、turn 完成/失效原生副作用遗漏、should-show/visibility handler 接反、targeted refresh 丢失、active-thread 去重及 host/thread 换绑状态错误；补测 macOS
