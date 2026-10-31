@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 BrowserUseOriginState class wiring
+
+`src/main/main-app/browser-use/origin-state.ts` 的 `BrowserUseOriginState` 与旧 `XOe` 均为 7 members。本轮复用已加载模块接回
+`WindowContext.browserUsePermissions` 并删除旧 class，保留仍有其他 consumer 的 helper 簇；focused suite 覆盖 WebMCP/history
+forwarding、origin rules write/project、class 面与真实 wiring。
+
 ## 2026-10-31 computer-use notify config wiring
 
 `src/main/main-app/computer-use/notify-config.ts` 已覆盖旧 `zo/Bo/rie/iie/aie/oie/sie/Vo/cie/lie/uie/Ho/die`。本轮把

@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 BrowserUseOriginState class owner：已加载的 `browser-use/origin-state.ts` 现同时提供 `BrowserSettingsSync` 与完整
+7-member `BrowserUseOriginState`，替代主 chunk 旧 `XOe`。WebMCP、IAB history policy、origin rule local/remote sync 保持完整；
+`WindowContext.browserUsePermissions` 真实 consumer 继续通过 `XOe` 兼容别名构造，旧共享 helper 暂保留供其他消费者使用。
+
 接回 computer-use notify config：既有 `computer-use/notify-config.ts` 现替代主 chunk 旧 `zo…die`。审计修复了
 `--previous-notify` 只剥一层的偏差，恢复旧 `Vo` 的递归链展开；config.toml 顶层 notify 替换、installed/repaired/already-present、
 helper 识别与 native-pipe 真实 consumer 均通过 `iie` 兼容别名接回。

@@ -141,7 +141,7 @@ const { createSystemAudioSpectrumRuntime } = require("./main-app/capture/system-
 const { SkysightServiceManager } = require("./main-app/skysight/service-manager.js");
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
-const { BrowserSettingsSync } = require("./main-app/browser-use/origin-state.js");
+const { BrowserSettingsSync, BrowserUseOriginState: XOe } = require("./main-app/browser-use/origin-state.js");
 const { PublishedStatsig } = require("./main-app/account/statsig-adapter.js");
 const { ConversationalOnboardingService } = require("./main-app/onboarding/conversational-onboarding.js");
 const { ArtifactSessionHostLifecycle } = require("./main-app/artifact-session/host-lifecycle.js");
@@ -51098,39 +51098,7 @@ var qOe = r.r(`BrowserUseOriginState`),
       origin: n.Of().min(1),
       resource: n.df(JOe),
     }),
-  ),
-  XOe = class extends n.Uf {
-    codexHome;
-    getConfigRequirements;
-    syncSettings;
-    constructor(
-      e,
-      t = async () => {
-        throw Error(`Config requirements are unavailable`);
-      },
-      n,
-    ) {
-      (super(), (this.codexHome = e), (this.getConfigRequirements = t), (this.syncSettings = n));
-    }
-    async updateWebMcpEnabled(e) {
-      return nke(e, this.codexHome, this.syncSettings);
-    }
-    async updateIabHistoryApprovalMode(e) {
-      return $Oe(e, this.codexHome, this.syncSettings, () => sD(e, this.getConfigRequirements));
-    }
-    async updateOriginRules(e) {
-      let t = YOe.parse(e);
-      if (
-        await this.syncSettings?.(async () => {
-          let e = uD(await dD(this.codexHome), t);
-          return e != null && e.length > 0 ? { rule_updates: e } : null;
-        })
-      )
-        return cD(this.codexHome);
-      let n = await dD(this.codexHome);
-      return (uD(n, t) != null && (await fD(this.codexHome, n)), mD(n));
-    }
-  };
+  );
 async function sD(e, t) {
   if (e !== `neverAsk`) return;
   let { requirements: n } = await t();
