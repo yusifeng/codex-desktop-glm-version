@@ -3104,3 +3104,10 @@ owner/window 求解，以及 focused/last-synced/fallback conversation window �
 `_Xe/AX/vXe/yXe/bXe/xXe/SXe` 已删除，跨 owner 的 debug-route opener `jX` 保持在相邻 host-policy 边界等待整组迁移。
 focused test 从 6 项扩至 19 项，覆盖 detached/source 解析、focused owner、last-synced fallback 和旧 owner 删除；no-unwired gate
 扩至 489 项。
+
+### 增量抽取：browser diagnostics runtime
+
+新增 `browser-sidebar/browser-diagnostics-runtime.ts`，完整接管 session/open-request/window/tab/pending-attach debug snapshot、restore
+phase/invariant、registered host 与 persisted metadata 投影、feedback events 512 KiB 逆序保留/截断元数据，以及 exact owner route
+打开和 debug event。host-policy controller 直接消费三个语义入口；旧 `jX/DXe/OXe/kXe/AXe/jXe/MXe/NXe/PXe/FX/IX` 与重复
+restore constants 已物理删除，共享 lifecycle debug emitters 保持独立。focused tests 31 + 18 项，no-unwired gate 扩至 502 项。

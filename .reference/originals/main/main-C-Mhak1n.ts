@@ -476,6 +476,7 @@ const {
 const { IabTabCandidateStore: qGe } = require("./main-app/browser-sidebar/iab-tab-candidate-store.js");
 const { createBrowserTabLifecycleRuntime } = require("./main-app/browser-sidebar/browser-tab-lifecycle-runtime.js");
 const { createBrowserThreadStateRuntime } = require("./main-app/browser-sidebar/browser-thread-state-runtime.js");
+const { createBrowserDiagnosticsRuntime } = require("./main-app/browser-sidebar/browser-diagnostics-runtime.js");
 const {
   inspect: SVe,
   back: CVe,
@@ -43773,32 +43774,12 @@ var {
   registerThreadAndRecordOpened: fX,
   runtimeIntlConfig: n.xu,
 });
-function jX({ stealFocus: e = !1, threadState: t, windowManager: n, windowState: r }) {
-  return t.ownerRoutePath == null || r.owner.isDestroyed() || r.window.isDestroyed()
-    ? !1
-    : r.tabSourceWindow == null
-      ? (n.sendMessageToWebContents(r.owner, {
-          type: `browser-sidebar-open-panel-without-animation`,
-          browserTabId: t.browserTabId,
-          conversationId: t.conversationId,
-        }),
-        n.sendMessageToWebContents(r.owner, { type: `navigate-to-route`, path: t.ownerRoutePath }),
-        n.showWindow(r.window, { stealFocus: e }))
-      : n.showWindow(r.window, { stealFocus: e });
-}
-var CXe = r.i(`browser-sidebar-manager`),
-  MX = 524288,
-  wXe = {
-    "browser-restore-history-failed": `failed`,
-    "browser-restore-history-started": `history-restoring`,
-    "browser-restore-history-succeeded": `restored`,
-    "browser-restore-host-registered": `host-registered`,
-    "browser-restore-page-attached": `page-attached`,
-    "browser-restore-page-materialized": `page-materialized`,
-    "browser-restore-shell-synced": `shell-synced`,
-    "browser-restore-snapshot-found": `snapshot-found`,
-    "browser-restore-snapshot-missing": `snapshot-missing`,
-  };
+var {
+  getDebugSnapshot: DXe,
+  limitFeedbackDiagnostics: OXe,
+  openOwner: kXe,
+} = createBrowserDiagnosticsRuntime({ makePageKey: KU, pageUrl: QU });
+var CXe = r.i(`browser-sidebar-manager`);
 function TXe(e, t, n, r) {
   (e.recordDebugEvent({
     browserTabId: n.browserTabId,
@@ -43839,217 +43820,6 @@ function PX(e, t, n, r, i, a, o, s) {
     pageKey: i ? KU(t.owner.id, n.conversationId, n.browserTabId) : null,
     windowId: t.window.id,
   });
-}
-function DXe({
-  browserSessionRegistry: e,
-  browserUseOpenRequests: t,
-  getPersistedPageMetadata: n,
-  getThreadStateForWindow: r,
-  windows: i,
-}) {
-  let a = Array.from(i),
-    o = e.getDebugSnapshot();
-  return {
-    capturedAtMs: Date.now(),
-    events: o.events,
-    openRequests: t
-      .getDebugSnapshot()
-      .map((e) => AXe({ getThreadStateForWindow: r, request: e, windowStates: a })),
-    pendingAttaches: a.flatMap((e) => FX(e)),
-    sessionRoutes: o.sessionRoutes,
-    tabs: a.flatMap((e) =>
-      Array.from(e.threads.values()).map((t) =>
-        jXe({ events: o.events, getPersistedPageMetadata: n, threadState: t, windowState: e }),
-      ),
-    ),
-    windows: a.map((e) => PXe(e)),
-  };
-}
-function OXe(e) {
-  let t = [],
-    n = 2,
-    r = 0;
-  for (let i = e.events.length - 1; i >= 0; --i) {
-    let a = e.events[i],
-      o = Buffer.byteLength(JSON.stringify(a)),
-      s = n + o + (t.length === 0 ? 0 : 1);
-    if (s > MX) {
-      r += 1;
-      continue;
-    }
-    (t.push(a), (n = s));
-  }
-  return (
-    t.reverse(),
-    {
-      ...e,
-      events: t,
-      feedbackMetadata: {
-        eventByteLimit: MX,
-        eventsTruncated: r > 0,
-        includedEventBytes: n,
-        includedEventCount: t.length,
-        omittedEventCount: r,
-      },
-    }
-  );
-}
-function kXe({
-  browserSessionRegistry: e,
-  getLiveWindowState: t,
-  getThreadStateForWindow: n,
-  options: { browserTabId: r, conversationId: i, windowId: a },
-  windowManager: o,
-}) {
-  let s = t(a);
-  if (s == null) return { opened: !1, reason: `missing-window` };
-  let c = n(s, i, r);
-  return c == null
-    ? { opened: !1, reason: `missing-tab` }
-    : c.ownerRoutePath == null
-      ? { opened: !1, reason: `missing-owner-route` }
-      : jX({ threadState: c, windowManager: o, windowState: s })
-        ? (e.recordDebugEvent({
-            browserTabId: r,
-            conversationId: i,
-            details: [{ label: `ownerRoutePath`, value: c.ownerRoutePath }],
-            guestWebContentsId: c.page?.view.webContents?.id ?? null,
-            kind: `browser-owner-opened`,
-            message: `Opened exact Browser owner route`,
-            ownerWebContentsId: s.owner.id,
-            pageKey: c.page == null ? null : KU(s.owner.id, i, r),
-            windowId: s.window.id,
-          }),
-          { opened: !0 })
-        : { opened: !1, reason: `missing-window` };
-}
-function AXe({ getThreadStateForWindow: e, request: t, windowStates: n }) {
-  let r = n.find((e) => e.owner.id === t.ownerWebContentsId) ?? null,
-    i =
-      r == null || t.conversationId == null || t.browserTabId == null
-        ? null
-        : e(r, t.conversationId, t.browserTabId);
-  return {
-    ...t,
-    activeBrowserTabId: r?.activeBrowserTabId ?? null,
-    activeConversationId: r?.activeConversationId ?? null,
-    guestWebContentsId: i?.page?.view.webContents?.id ?? null,
-    hasPage: i == null ? null : i.page != null,
-    ownerRoutePath: i?.ownerRoutePath ?? null,
-    pendingAttachCount: r == null || i == null ? null : IX(r, i),
-    pendingBrowserUsePanelOpen: i?.pendingBrowserUsePanelOpen ?? null,
-    routeActive: r == null || i == null ? null : r.activeConversationId === i.conversationId,
-    windowId: r?.window.id ?? null,
-  };
-}
-function jXe({ events: e, getPersistedPageMetadata: t, threadState: n, windowState: r }) {
-  let i = n.page,
-    a = t(n),
-    o = Array.from(r.registeredWebviewHostsByRoutePartition.values()).some(
-      (e) =>
-        e.pagePersistence.browserStorageId === n.browserStorageId &&
-        e.browserTabId === n.browserTabId &&
-        e.conversationId === n.conversationId,
-    ),
-    s = MXe(e, n.conversationId, n.browserTabId);
-  return {
-    active: r.activeConversationId === n.conversationId && r.activeBrowserTabId === n.browserTabId,
-    bounds: n.bounds,
-    browserStorageId: n.browserStorageId,
-    browserTabId: n.browserTabId,
-    canOpenOwner: n.ownerRoutePath != null,
-    conversationId: n.conversationId,
-    guestWebContentsId: i?.view.webContents?.id ?? null,
-    hasPage: i != null,
-    hasPersistedPageState: a != null,
-    hasPendingBrowserUseVisibilityRequest: n.hasPendingBrowserUseVisibilityRequest,
-    isAgentControllingBrowser: n.isAgentControllingBrowser,
-    isBrowserUseActive: n.isBrowserUseActive,
-    isBrowserUsePage: n.isBrowserUsePage,
-    isLoading: i?.isLoading ?? n.snapshot.isLoading,
-    isRestoring: i?.isRestoring ?? !1,
-    isSuspended: i?.isSuspended ?? n.snapshot.isSuspended,
-    lastLifecycleSequence: n.lastLifecycleSequence,
-    lastPresentedSequence: n.lastPresentedSequence,
-    mountGeneration: n.mountGeneration,
-    ownerRoutePath: n.ownerRoutePath,
-    ownerWebContentsId: r.owner.id,
-    pageKey: i == null ? null : KU(r.owner.id, n.conversationId, n.browserTabId),
-    pendingAttachCount: IX(r, n),
-    pendingBrowserUsePanelOpen: n.pendingBrowserUsePanelOpen,
-    pendingTeardown: n.pendingTeardown,
-    pendingUrl: i?.pendingUrl ?? ``,
-    persistedHistoryEntryCount: a?.historyEntryCount ?? null,
-    persistedPageStateUpdatedAtMs: a?.updatedAtMs ?? null,
-    presented: n.presented,
-    restoreInvariant: NXe({
-      hasPersistedPageState: a != null,
-      isColdRestore: i?.isColdRestore === !0,
-      restorePhase: s,
-      hasPage: i != null,
-    }),
-    restorePhase: s,
-    sessionState: n.sessionState,
-    title: i?.title || n.snapshot.title,
-    url: i == null ? n.snapshot.url : QU(i),
-    visible: n.visible,
-    webviewHostRegistered: o,
-    windowId: r.window.id,
-  };
-}
-function MXe(e, t, n) {
-  let r = e.findLast(
-    (e) => e.conversationId === t && e.browserTabId === n && e.kind.startsWith(`browser-restore-`),
-  );
-  return r == null ? `idle` : (wXe[r.kind] ?? `idle`);
-}
-function NXe({ hasPage: e, hasPersistedPageState: t, isColdRestore: n, restorePhase: r }) {
-  return r === `snapshot-missing`
-    ? `Shell restored, snapshot missing`
-    : r === `failed`
-      ? `Browser history restore failed`
-      : t && !e
-        ? `Snapshot found, page not materialized`
-        : n && !t
-          ? `Cold page has no persisted snapshot`
-          : null;
-}
-function PXe(e) {
-  return {
-    activeBrowserTabId: e.activeBrowserTabId,
-    activeConversationId: e.activeConversationId,
-    ignoredConversationCount: e.ignoredConversationIds.size,
-    ownerWebContentsId: e.owner.id,
-    pendingAttachCount: e.pendingWebviewRoutesByInstanceId.size,
-    pendingAdoptedWebviewCount: e.pendingAdoptedWebviewsByWebContentsId.size,
-    transferredConversationStateCount: e.transferredConversationStateKeys.size,
-    windowId: e.window.id,
-  };
-}
-function FX(e) {
-  return [
-    ...Array.from(e.pendingAdoptedWebviewsByWebContentsId).map(([t, n]) => ({
-      browserTabId: n.route.browserTabId,
-      conversationId: n.route.conversationId,
-      hostGeneration: n.acceptedHostIdentity?.hostGeneration ?? null,
-      kind: `adopted`,
-      webContentsId: t,
-      windowId: e.window.id,
-    })),
-    ...Array.from(e.pendingWebviewRoutesByInstanceId.values()).map((t) => ({
-      browserTabId: t.route.browserTabId,
-      conversationId: t.route.conversationId,
-      hostGeneration: t.hostGeneration,
-      kind: `instance`,
-      webContentsId: null,
-      windowId: e.window.id,
-    })),
-  ];
-}
-function IX(e, t) {
-  return FX(e).filter(
-    (e) => e.browserTabId === t.browserTabId && e.conversationId === t.conversationId,
-  ).length;
 }
 var FXe = r.i(`in-app-browser-incomplete-navigation-service`),
   LX = [],

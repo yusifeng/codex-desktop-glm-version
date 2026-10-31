@@ -5054,3 +5054,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   `_Xe/AX/vXe/yXe/bXe/xXe/SXe` 已删除，controller 不再接收这些机械 helper。
 - focused coverage 19 项，no-unwired gate 扩至 489 项。`jX` 仍只服务 host-policy 的 exact owner debug open，下一批与
   diagnostics snapshot/feedback/open-owner helper belt 一起迁移，不把它错误塞进 window-state owner。
+
+# 2026-11-01 browser diagnostics runtime extraction
+
+- 新增并接回 `browser-sidebar/browser-diagnostics-runtime.ts`，承接 debug snapshot 的 open requests/tabs/windows/pending attaches、
+  restore phase/invariant、512 KiB feedback 截断和 exact owner route opening；host-policy 保持唯一 consumer。
+- main 旧 `jX/DXe/OXe/kXe/AXe/jXe/MXe/NXe/PXe/FX/IX` 与 diagnostics-only constants 已删除。focused coverage
+  31 + 18 项，no-unwired gate 扩至 502 项；下一批审计相邻 lifecycle debug emitters `TXe/NX/EXe/PX` 与 incomplete-navigation owner。
