@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 desktop log archive 完整管道：既有 `feedback/desktop-log-archive.ts` 原先唯一缺口是 Windows system diagnostics 的 null
+占位，现已接到 `platform/windows-account.ts` 的真实 addon snapshot。主 chunk 旧 `hV…JRe` 496 行诊断/日志枚举/tar+gzip/
+archive ledger 簇已删除，`URe/TV/wV` 三个真实 export/fetch consumer 通过兼容别名接回语义实现。
+
 接回 Computer Use settings owner：审计发现既有 `computer-use/approvals.ts` 虽与旧 `nje` 同为 17 members，但最后一个方法
 误写为 appshot sound setter；已恢复真实 `openChromeExtensionInstallPage`，复用并导出语义 browser runtime 的 Chrome extension
 settings opener，然后接回 `WindowContext` consumer。随后将 fetch-handler 的 `tje` 依赖接到语义 appshot sound 导出，删除旧

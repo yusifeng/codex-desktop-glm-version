@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 desktop log archive owner wiring
+
+`src/main/main-app/feedback/desktop-log-archive.ts` 已覆盖原 `kRe…TV`，但审计发现 Windows system diagnostics 仍为 null 占位；
+本轮改接 `platform/windows-account.ts#getWindowsSystemDiagnostics`，恢复旧 `CO()` 行为后，将 `URe/TV/wV` 接回 module exports 与
+fetch-handler consumer，并删除主 chunk 496 行重复归档簇。focused suite 覆盖 wrapper/null、archive ledger 删除和 export wiring。
+
 ## 2026-10-31 Computer Use settings owner wiring
 
 `src/main/main-app/computer-use/approvals.ts` 与旧 `nje` 都有 17 members，但原语义类错误地以 `setCuaAppshotSoundEnabled`

@@ -54,6 +54,7 @@ import {
 } from "@chunk/shared";
 import { memoizedTaggedLogger } from "@chunk/logger";
 import { in as BuildFlavor, Xt as desktopLogRootDir, on as appSessionId } from "@chunk/bootstrap";
+import { getWindowsSystemDiagnostics } from "../platform/windows-account";
 
 const gzipAsync = promisify(gzipCallback);
 const logger = memoizedTaggedLogger("feedback-desktop-log-archive");
@@ -610,7 +611,7 @@ async function createFeedbackArchive(now = new Date(), extraPaths: string[] = []
   const logRoot = (desktopLogRootDir as () => string)();
   const windowsDiagnostics =
     includeDesktopLogs && includeWindowsSystemDiagnostics && process.platform === "win32"
-      ? (collectWindowsSystemDiagnostics as (() => unknown) | null)()
+      ? getWindowsSystemDiagnostics()
       : null;
   const [logFiles, nativeHostDiagnostics, processMemory, appServerDiagnostics, primaryRuntime] = await Promise.all([
     includeDesktopLogs
@@ -747,10 +748,6 @@ async function deleteDesktopLogArchive(archiveId: string): Promise<boolean> {
     return false;
   }
 }
-
-// windows 系统诊断在 R5 区间（CO，71,718），该模块落地前为 null 占位。
-// 原版 wV 仅在 win32 且 includeWindowsSystemDiagnostics 时调用 CO()。
-const collectWindowsSystemDiagnostics: (() => unknown) | null = null;
 
 export {
   createDesktopLogArchive,
