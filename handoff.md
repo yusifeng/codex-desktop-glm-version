@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+恢复完整 BrowserSessionRegistry 与 BrowserUseHost：新增 `browser-use/session-registry.ts`，迁出真实 `cX/ZYe` 的 session capture/bind/
+reassign/local-Work adoption、window/page/guest snapshot、debug ledger、route/host disposal、cursor/download/page notifications、native-pipe backend
+和 host page/viewport/navigation delegation。两类保持同一状态 owner，既有 native-pipe/API/delegate 通过依赖边界复用；主 chunk 约 1,258 行
+旧区删除，focused suite 执行 39 条 route/page/host/backend 断言，防空壳审计扩至 32 条。
+
 恢复完整 browser comment controller：新增 `browser-sidebar/browser-comment-controller.ts`，迁出真实 `hGe` 的 popup/runtime/overlay 路由、
 comment/design editor、multi-anchor、direct/saved screenshot、CDP provenance、snapshot sync、waiter/abort/WeakMap 状态与清理。59-method/
 68-member owner 复用已迁 overlay manager 和 browser delegate，不复制 page/thread 状态；主 chunk 约 1,597 行旧 class 删除。focused suite

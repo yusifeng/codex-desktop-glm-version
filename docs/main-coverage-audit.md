@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 browser session registry and route host restoration
+
+新增完整 `browser-use/session-registry.ts`，将此前删除的 30-member partial skeleton 替换为真实 `cX` registry 与其唯一创建的 `ZYe`
+BrowserUseHost。session capture/bind/reassign/local-Work adoption、window/page/guest snapshots、debug ledger、route/host disposal、cursor/download/page
+notifications、native-pipe backend startup/disposal 和 host page/viewport/navigation delegation 均迁入同一状态 owner；主 chunk 原 class/helper 区约
+1,258 行删除。39 条 focused 断言执行 route/page/host/native-pipe lifecycle，防空壳审计扩至 32 条。
+
 ## 2026-11-01 browser comment controller owner restoration
 
 新增完整 `browser-sidebar/browser-comment-controller.ts`，替代此前已删除的 8-member partial skeleton，并迁出真实 `hGe` 的 59-method/

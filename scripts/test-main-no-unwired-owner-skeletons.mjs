@@ -8,6 +8,7 @@ const realOwners = [
   ["src/main/main-app/misc/open-in-service.ts", "createOpenInServiceClass"],
   ["src/main/main-app/browser-sidebar/browser-comment-overlay-manager.ts", "createBrowserCommentOverlayManagerClass"],
   ["src/main/main-app/browser-sidebar/browser-comment-controller.ts", "createBrowserCommentControllerClass"],
+  ["src/main/main-app/browser-use/session-registry.ts", "createBrowserSessionRegistryRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -23,7 +24,6 @@ const removedSkeletons = [
   "src/main/main-app/automations/automation-update-tool.ts",
   "src/main/main-app/automations/habitat.ts",
   "src/main/main-app/automations/index.ts",
-  "src/main/main-app/browser-use/session-registry.ts",
 ];
 
 for (const path of removedSkeletons) {
@@ -48,6 +48,8 @@ assert.equal(main.includes("JWe = createBrowserCommentOverlayManagerClass({"), t
 assert.equal(main.includes("JWe = class"), false, "generated browser comment overlay owner must be removed");
 assert.equal(main.includes("hGe = createBrowserCommentControllerClass({"), true, "real browser comment controller owner is wired");
 assert.equal(main.includes("hGe = class"), false, "generated browser comment controller owner must be removed");
+assert.equal(main.includes("BrowserSessionRegistry: cX, BrowserUseHost: ZYe"), true, "real browser session registry is wired");
+assert.equal(main.includes("cX = class"), false, "generated browser session registry must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("29 main unwired-owner skeleton assertions passed");
+console.log("32 main unwired-owner skeleton assertions passed");
