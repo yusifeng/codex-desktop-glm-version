@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 realtime voice thread title coordinator
+
+原 `Y8e/z2` 已迁入 `src/main/main-app/realtime/voice-thread-title-coordinator.ts`。新 owner 保留 session-id
+correlation、结束后标题生成、source/target connection lifetime guards、registry/principal/account retirement、
+execution-policy readiness/变更中止、guarded generation client、默认标题覆盖限制、失败日志与 pending generation
+cleanup；唯一 runtime consumer 已接回，旧 class/helper 已物理删除。
+
 ## 2026-10-31 realtime presentation coordinator
 
 原 `L2/H8e/U8e/W8e/G8e/K8e/q8e/J8e/R2` 已整簇迁入

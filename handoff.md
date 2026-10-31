@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Y8e/z2` realtime voice thread-title coordinator 迁入
+`realtime/voice-thread-title-coordinator.ts`；session correlation、post-session title generation、source/target
+connection retirement、principal/account/policy invalidation、guarded app-server client、默认标题保护与 abort/dispose
+cleanup 均由新 owner 持有。唯一 runtime consumer 已接回，旧 class/helper 已删除。focused test 覆盖 43 项。
+
 随后将 `L2/H8e/U8e/W8e/G8e/K8e/q8e/J8e/R2` realtime presentation coordinator cluster 迁入
 `realtime/presentation-coordinator.ts`；surface registration/eligibility/anchor、preferred surface、main↔overlay
 handoff、dock/fade/native transition、focus grace timers、toast/offset/visibility/motion 与 subscription cleanup 均由
