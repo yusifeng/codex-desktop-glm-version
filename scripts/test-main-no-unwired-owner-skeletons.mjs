@@ -9,6 +9,7 @@ const realOwners = [
   ["src/main/main-app/browser-sidebar/browser-comment-overlay-manager.ts", "createBrowserCommentOverlayManagerClass"],
   ["src/main/main-app/browser-sidebar/browser-comment-controller.ts", "createBrowserCommentControllerClass"],
   ["src/main/main-app/browser-use/session-registry.ts", "createBrowserSessionRegistryRuntime"],
+  ["src/main/main-app/window/electron-message-handler.ts", "createElectronMessageHandlerClass"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -50,6 +51,8 @@ assert.equal(main.includes("hGe = createBrowserCommentControllerClass({"), true,
 assert.equal(main.includes("hGe = class"), false, "generated browser comment controller owner must be removed");
 assert.equal(main.includes("BrowserSessionRegistry: cX, BrowserUseHost: ZYe"), true, "real browser session registry is wired");
 assert.equal(main.includes("cX = class"), false, "generated browser session registry must be removed");
+assert.equal(main.includes("r$e = createElectronMessageHandlerClass({"), true, "real Electron message handler owner is wired");
+assert.equal(main.includes("r$e = class"), false, "generated Electron message handler owner must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("32 main unwired-owner skeleton assertions passed");
+console.log("36 main unwired-owner skeleton assertions passed");

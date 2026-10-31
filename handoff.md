@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+恢复完整 ElectronMessageHandler：新增 `window/electron-message-handler.ts`，迁出真实 `r$e` 的 app-server/shared-object/dynamic-tools、project/worktree、
+browser host/session、sampling、power/focus、window restore、默认 workspace 与 disposal 全链。主 chunk 约 1,830 行旧 class/helper 删除并改为显式工厂接线；
+focused suite 执行 48 条行为/结构断言，防空壳审计扩至 36 条，并修正 sampler logger 的反编译参数遮蔽。
+
 恢复完整 BrowserSessionRegistry 与 BrowserUseHost：新增 `browser-use/session-registry.ts`，迁出真实 `cX/ZYe` 的 session capture/bind/
 reassign/local-Work adoption、window/page/guest snapshot、debug ledger、route/host disposal、cursor/download/page notifications、native-pipe backend
 和 host page/viewport/navigation delegation。两类保持同一状态 owner，既有 native-pipe/API/delegate 通过依赖边界复用；主 chunk 约 1,258 行

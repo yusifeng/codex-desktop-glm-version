@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 Electron message handler restoration
+
+新增完整 `window/electron-message-handler.ts`，迁出真实 `r$e` 的 56-method message owner：app-server request/response routing、shared-object
+subscriptions、dynamic tools、project/worktree lifecycle、browser host/session coordination、sampler、power-save/system-focus、window restore、默认 workspace
+创建及 cleanup 均保留；主 chunk 原 class/helper 区约 1,830 行删除并替换为显式依赖工厂。48 条 focused 行为/结构/接线断言通过，防空壳审计扩至
+36 条；迁移同时修正 sampler logger 的反编译参数遮蔽。
+
 ## 2026-11-01 browser session registry and route host restoration
 
 新增完整 `browser-use/session-registry.ts`，将此前删除的 30-member partial skeleton 替换为真实 `cX` registry 与其唯一创建的 `ZYe`
