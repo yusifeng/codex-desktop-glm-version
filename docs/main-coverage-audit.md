@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 turn/item merge owner consolidation
+
+主 chunk 的 item id/text 对齐、snapshot/prepend 锚点插入、memoryCitation 保留、turn id 分段插入、resume pagination reconnect、终态保护、
+steering orphan recovery 和 automation params/message 判定已统一改接 `turns/item-merge.ts`。`bg/xg/Sg/Cg/xge/wg/Sge/Cge/Tg/wge`
+约 246 行旧实现物理删除；该 owner 现同时服务主运行 chunk、canonical history、history requests/reader/policy 与 maybe-resume，不再存在双轨状态。
+focused suite 以 39 条断言执行关键合并分支，并通过 107 条 conversation subowner cleanup 接线审计。
+
 ## 2026-11-01 catalog, eviction and steering owner consolidation
 
 主 chunk 的 local thread catalog projection 已改接 `thread-catalog/schema.ts`；conversation eviction、一次性 update handle、stream role equality

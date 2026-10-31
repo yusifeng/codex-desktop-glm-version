@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+继续收拢 turn/item 合并核心：主 chunk 的 `bg/xg/Cg/xge/wg/Sge/Cge/Tg/wge` 已全部改接
+`turns/item-merge.ts`，真实覆盖历史恢复、分页 snapshot、canonical/legacy 合并和 automation turn 判定 consumer；旧实现约 246 行整体删除。
+新增 39 条 focused 行为/接线断言，并将 conversation subowner cleanup 扩至 107 条，锁定旧定义不再回流。
+
 继续消除 conversation/catalog 双轨 owner：主入口的 thread→catalog 投影切到 `thread-catalog/schema.ts`，eviction、UpdateHandle、stream-role
 相等判定和 steering opening/upsert/orphan/accept 全链切到既有语义模块；新增 `threads/reference-capability.ts`，让主入口、archive 与
 AppServer manager 共用同一 storage key owner。旧 `she…_he`、`Oh…Jhe` 与 `yge…yg` 合计约 205 行删除；conversation subowner suite
