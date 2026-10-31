@@ -3358,3 +3358,8 @@ focused suite 27 项覆盖全部 event union、拒绝分支、rolling-window 参
 terminal session 的 owner/conversation compound key 现由 `terminal-session-manager.ts` 私有拥有，不再从组合根注入单行 `S5`；native
 status item 的平台 quit label 解析迁入 `native-status-item-controller.ts` 并由真实 tray consumer 使用，旧 `e7` 删除。相邻 `_it` 经复核是
 deep-link listener、application menu manager、窗口导航与 dispose 顺序共享的装配根，保持不拆。terminal 38 项与 native controller 42 项回归通过。
+
+### 增量内聚：hotkey detail route state
+
+`hotkey-window-lifecycle-manager.ts` 现直接拥有 detail route 的 `focusComposerNonce` 创建，并保留可注入 `now` 以确定性测试；主组合根
+不再注入单行 `n9`。三条 new/detail/collapse 路径继续共享同一 owner，57 项 lifecycle 回归覆盖未配置 hotkey 时的 focus state。

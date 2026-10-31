@@ -67,7 +67,7 @@ const dependencies = {
     return lock;
   },
   clearTimeout(timer) { timer.cleared = true; },
-  createDetailRouteState: () => ({ focusComposerNonce: 123 }),
+  now: () => 123,
   crossInstanceLocks: { hotkeyWindow: "hotkey-window" },
   ensureHotkeyPermissions: (hotkey) => logEntries.push(["permission", hotkey]),
   getCommandBinding: () => commandBinding,

@@ -5311,3 +5311,8 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   解析。主 chunk 旧 `S5/e7` 删除，terminal/native focused 回归 38/42 项，no-unwired gate 扩至 589 项。
 - 相邻 `_it` 复核为 deep-link listener、application menu、窗口导航、settings 与 dispose ordering 的共享装配根，保持原边界；
   后续审计继续跳过 ANSI/string-width/electron-context-menu vendor belt和 `dst/Ust` startup composition roots。
+
+# 2026-11-01 hotkey detail-state ownership
+
+- `hotkey-window-lifecycle-manager.ts` 直接拥有 `focusComposerNonce` detail state，并通过可注入 `now` 保持测试确定性；主 chunk 旧 `n9`
+  删除，57 项 lifecycle 回归通过，no-unwired gate 扩至 590 项。

@@ -51324,7 +51324,6 @@ var Sat = createHotkeyWindowControllerClass({
 var Eat = createHotkeyWindowLifecycleManagerClass({
   HotkeyWindowController: Sat,
   acquireCrossInstanceLock: jN,
-  createDetailRouteState: n9,
   crossInstanceLocks: AN,
   ensureHotkeyPermissions: YV,
   getCommandBinding: cH,
@@ -51334,9 +51333,6 @@ var Eat = createHotkeyWindowLifecycleManagerClass({
   shared: n,
   validateHotkey: JV,
 });
-function n9() {
-  return { focusComposerNonce: Date.now() };
-}
 var r9 = 1280,
   Dat = 15e3,
   i9 = 700,

@@ -595,5 +595,6 @@ assert.equal(main.includes("var jst ="), false, "generated native status schema 
 assert.equal(main.includes("class extends WorkerInvocationSampler"), false, "generated sampler subclass must be removed");
 assert.equal(main.includes("function S5(e, t)"), false, "generated terminal session-key helper must be removed");
 assert.equal(main.includes("function e7(e)"), false, "generated native quit-label helper must be removed");
+assert.equal(main.includes("function n9()"), false, "generated hotkey detail-state helper must be removed");
 
-console.log("589 main unwired-owner skeleton assertions passed");
+console.log("590 main unwired-owner skeleton assertions passed");

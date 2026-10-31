@@ -9,7 +9,6 @@ export function createHotkeyWindowLifecycleManagerClass(dependencies: Record<str
   const {
     HotkeyWindowController: Sat,
     acquireCrossInstanceLock: jN,
-    createDetailRouteState: n9,
     crossInstanceLocks: AN,
     ensureHotkeyPermissions: YV,
     getCommandBinding: cH,
@@ -21,6 +20,8 @@ export function createHotkeyWindowLifecycleManagerClass(dependencies: Record<str
   } = dependencies;
   const setTimeout = dependencies.setTimeout ?? globalThis.setTimeout;
   const clearTimeout = dependencies.clearTimeout ?? globalThis.clearTimeout;
+  const now = dependencies.now ?? Date.now;
+  const createDetailRouteState = () => ({ focusComposerNonce: now() });
   const Tat = 1e3;
   return class HotkeyWindowLifecycleManager {
     windowManager;
@@ -95,7 +96,7 @@ export function createHotkeyWindowLifecycleManagerClass(dependencies: Record<str
       if (this.canUseHotkeyWindow() && n.yo(e)) {
         if (e === `/hotkey-window`) {
           if (this.configuredHotkeyWindowHotkey == null) {
-            await this.ensureHotkeyWindowController().openDetailRoute(n.go(!1), n9());
+            await this.ensureHotkeyWindowController().openDetailRoute(n.go(!1), createDetailRouteState());
             return;
           }
           await this.ensureHotkeyWindowController().openHome();
@@ -103,14 +104,14 @@ export function createHotkeyWindowLifecycleManagerClass(dependencies: Record<str
         }
         await this.ensureHotkeyWindowController().openDetailRoute(
           e,
-          e === n.go(!1) ? n9() : void 0,
+          e === n.go(!1) ? createDetailRouteState() : void 0,
         );
       }
     }
     async collapseToHome() {
       if (this.canUseHotkeyWindow()) {
         if (this.configuredHotkeyWindowHotkey == null) {
-          await this.getHotkeyWindowController()?.openDetailRoute(n.go(!1), n9());
+          await this.getHotkeyWindowController()?.openDetailRoute(n.go(!1), createDetailRouteState());
           return;
         }
         await this.getHotkeyWindowController()?.collapseToHome();
