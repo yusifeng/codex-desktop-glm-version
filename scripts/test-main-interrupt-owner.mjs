@@ -14,6 +14,7 @@ Function("require", "module", "exports", transpiled.code)((specifier) => {
     findTurnById: (conversation, id) => conversation.turns.find((turn) => turn.turnId === id) ?? null,
     lastTurnWithTurnId: (conversation) => [...conversation.turns].reverse().find((turn) => turn.turnId != null) ?? null,
     mergedConversationTurns: (conversation) => conversation.turns,
+    timelineEntryKey: () => "entry",
     findTurnEntryForEvent: () => null,
     forEachTurn: (conversation, callback) => (conversation.turns ?? []).forEach(callback),
   };

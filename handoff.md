@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+恢复 realtime timeline reducer：paginated canonical voice threads 现处理 transcript delta、turn started/completed、item started/completed 与 realtime
+item started/completed，保持 position、stable key upsert、completed replacement 和 realtimeItems 状态；outer reducer 按旧顺序调用。主 chunk 旧
+`Yve/jy` 删除，保留 `Cy/Wve` 等仍由主 chunk realtime consumer 使用的 parser/builders。
+
 完成 notification item reducer：started/completed 现恢复 drain/defer、unknown guard、turn event 重绑/合成、steering user admission、collab/image
 投影、context compaction source、command/assistant 时间、terminal buffer、subagent discovery；auto approval、strict notice、guardian warning 与 MCP
 progress 亦恢复。主 chunk 旧 `ky/Ay`、auto-review helper 与无 consumer delta queue 簇删除；realtime parser consumer 与 `jy` timeline 暂保留。

@@ -25456,69 +25456,6 @@ function Jve(e) {
     .replaceAll(`&apos;`, `'`)
     .replaceAll(`&amp;`, `&`);
 }
-function Yve(e) {
-  return e.method.startsWith(`thread/realtime/`);
-}
-function jy(e, t, r) {
-  if (!e.supportsThreadTimeline()) return;
-  let i = n.$u(t.params.threadId),
-    a = e.getConversation(i);
-  a?.historyMode === `paginated` &&
-    a.canonicalVoiceHistory &&
-    e.updateConversationState(i, (e) => {
-      if (t.method === `thread/realtime/item/transcript/delta`) {
-        let n = e.realtimeItems?.[t.params.itemId];
-        n?.item.type === `transcriptSegment` && !n.completed && (n.item.text += t.params.delta);
-        return;
-      }
-      if (t.method === `thread/realtime/item/started` && t.params.item.type !== `transcriptSegment`)
-        return;
-      let n = (e.itemTimeline ??= { activeRealtimeSessionAtPageStart: null, entries: [] }),
-        a = (n.entries.at(-1)?.position ?? 0) + 1,
-        o;
-      if (t.method === `turn/started` || t.method === `turn/completed`) {
-        let { turn: e } = t.params;
-        o =
-          t.method === `turn/started`
-            ? { type: `turnStarted`, position: a, turnId: e.id, startedAt: e.startedAt }
-            : {
-                type: `turnCompleted`,
-                position: a,
-                turnId: e.id,
-                status: e.status,
-                error: e.error,
-                startedAt: e.startedAt,
-                completedAt: e.completedAt,
-                durationMs: e.durationMs,
-              };
-      } else if (t.method === `item/started` || t.method === `item/completed`) {
-        let { item: e, turnId: n } = t.params;
-        o = {
-          type: `item`,
-          position: a,
-          turnId: n,
-          item: { id: e.id, type: e.type, completed: t.method === `item/completed` },
-        };
-      } else {
-        let { item: n } = t.params,
-          r = (e.realtimeItems ??= {});
-        if (r[n.id] != null && t.method === `thread/realtime/item/started`) return;
-        ((r[n.id] = hh({ item: n, completed: t.method === `thread/realtime/item/completed` })),
-          (o = { type: `realtime`, position: a, item: n }));
-      }
-      let s = Hg(o),
-        c = r.getItemTimelineEntryIndex(i, s),
-        l = c == null ? void 0 : n.entries[c];
-      l == null
-        ? n.entries.push(hh(o))
-        : l.type === `item` && o.type === `item` && o.item.completed
-          ? (l.item.completed = !0)
-          : l.type === `realtime` &&
-            o.type === `realtime` &&
-            t.method === `thread/realtime/item/completed` &&
-            (l.item = hh(o.item));
-    });
-}
 function Ry(e, t, n, r, i = `latest-turn`) {
   let a = { ...n, type: `worktreeInit` };
   if (i === `new-turn`) {

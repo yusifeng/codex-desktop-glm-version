@@ -1,5 +1,5 @@
 import { $u as normalizeThreadId, ed as requestIdOf, Zo as errorToString } from "@chunk/shared";
-import { conversationTurns, findTurnById, findTurnEntryForEvent, forEachTurn, lastTurnWithTurnId, mergedConversationTurns } from "../turns/canonical-history";
+import { conversationTurns, findTurnById, findTurnEntryForEvent, forEachTurn, lastTurnWithTurnId, mergedConversationTurns, timelineEntryKey } from "../turns/canonical-history";
 import { applyThreadSettingsUpdate } from "../threads/patch-classification";
 import { Qv as applyPermissionsResolution, Yv as planImplementationId, Zv as applyMcpElicitationResolution } from "../requests/item-synthesis";
 import { parseAutomationUserMessage, parseHeartbeatDecision } from "../threads/automation-detector";
@@ -381,6 +381,47 @@ function applyAuxiliaryItemNotification(context: any, notification: { method: st
 const AUXILIARY_ITEM_METHODS = new Set([
   "item/autoApprovalReview/started", "item/autoApprovalReview/completed", "autoApprovalReview/strictReviewRequired", "guardianWarning", "item/mcpToolCall/progress",
 ]);
+function applyRealtimeTimeline(context: any, notification: { method: string; params: any }): void {
+  const { manager, notificationContext } = context;
+  if (!manager.supportsThreadTimeline()) return;
+  const conversationId = normalizeThreadId(notification.params.threadId);
+  const conversation = manager.getConversation(conversationId);
+  if (conversation?.historyMode !== "paginated" || !conversation.canonicalVoiceHistory) return;
+  manager.updateConversationState(conversationId, (state: any) => {
+    if (notification.method === "thread/realtime/item/transcript/delta") {
+      const realtime = state.realtimeItems?.[notification.params.itemId];
+      if (realtime?.item.type === "transcriptSegment" && !realtime.completed) realtime.item.text += notification.params.delta;
+      return;
+    }
+    if (notification.method === "thread/realtime/item/started" && notification.params.item.type !== "transcriptSegment") return;
+    const timeline = (state.itemTimeline ??= { activeRealtimeSessionAtPageStart: null, entries: [] });
+    const position = (timeline.entries.at(-1)?.position ?? 0) + 1;
+    let entry: any;
+    if (notification.method === "turn/started" || notification.method === "turn/completed") {
+      const turn = notification.params.turn;
+      entry = notification.method === "turn/started"
+        ? { type: "turnStarted", position, turnId: turn.id, startedAt: turn.startedAt }
+        : { type: "turnCompleted", position, turnId: turn.id, status: turn.status, error: turn.error,
+            startedAt: turn.startedAt, completedAt: turn.completedAt, durationMs: turn.durationMs };
+    } else if (notification.method === "item/started" || notification.method === "item/completed") {
+      entry = { type: "item", position, turnId: notification.params.turnId,
+        item: { id: notification.params.item.id, type: notification.params.item.type, completed: notification.method === "item/completed" } };
+    } else {
+      const item = notification.params.item;
+      const realtimeItems = (state.realtimeItems ??= {});
+      if (realtimeItems[item.id] != null && notification.method === "thread/realtime/item/started") return;
+      realtimeItems[item.id] = freezeIdentity({ item, completed: notification.method === "thread/realtime/item/completed" });
+      entry = { type: "realtime", position, item };
+    }
+    const key = timelineEntryKey(entry);
+    const index = notificationContext.threadStore.getItemTimelineEntryIndex(conversationId, key);
+    const current = index == null ? undefined : timeline.entries[index];
+    if (current == null) timeline.entries.push(freezeIdentity(entry));
+    else if (current.type === "item" && entry.type === "item" && entry.item.completed) current.item.completed = true;
+    else if (current.type === "realtime" && entry.type === "realtime" && notification.method === "thread/realtime/item/completed")
+      current.item = freezeIdentity(entry.item);
+  });
+}
 function applyItemNotification(context: any, notification: { method: string; params: any }, capability: any): "deferred" | "handled" {
   const { manager, notificationContext, createId } = context;
   const { method, params } = notification;
@@ -462,6 +503,8 @@ export function nb(context: any, method: string, params: any, automationCapabili
   if (method !== "item/commandExecution/outputDelta")
     manager.logger.trace("Received app server notification", { safe: { method }, sensitive: {} });
   if (method.startsWith("thread/realtime/")) {
+    if (["thread/realtime/item/started", "thread/realtime/item/completed", "thread/realtime/item/transcript/delta"].includes(method))
+      applyRealtimeTimeline(context, notification);
     if (method === "thread/realtime/itemAdded") notificationContext.handleRealtimeItemAdded(params);
     notificationContext.events.emitNotification(notification);
     return;
@@ -477,6 +520,7 @@ export function nb(context: any, method: string, params: any, automationCapabili
   else if (method === "serverRequest/resolved") applyServerRequestResolved(context, params);
   else if (method === "fs/changed")
     for (const message of notificationContext.openFileWatches.getFileChangeMessages(params.watchId)) notificationContext.events.emitOpenFileChange(message);
+  if (["turn/started", "turn/completed", "item/started", "item/completed"].includes(method)) applyRealtimeTimeline(context, notification);
   notificationContext.events.emitNotification(notification);
 }
 export function ib(manager:unknown,_policy?:unknown):()=>void{const client=rec(manager).requestClient;const add=fn(client,`addNotificationListener`)??fn(client,`addNotificationCallback`);const dispose=add?.((method:string,params:unknown)=>fn(manager,`handleNotification`)?.(method,params));return typeof dispose===`function`?dispose as ()=>void:()=>undefined}

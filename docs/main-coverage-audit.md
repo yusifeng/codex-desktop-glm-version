@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 realtime timeline reducer restoration
+
+语义 outer reducer 原先完全漏掉旧 `jy`，导致 canonical voice timeline 不记录 turn/item/realtime 生命周期与 transcript delta。本轮恢复完整
+timeline upsert/replacement，focused suite 验证 turnStarted entry；删除 old `Yve/jy`，但保留仍有独立主 chunk consumer 的 realtime
+item parser/text builder，后续接线时再删除。
+
 ## 2026-10-31 notification item reducer restoration
 
 item reducer 现覆盖 started/completed 的 turn 定位、steering、collab/image、compaction、计时、terminal 与 subagent 副作用，并恢复 auto-review/

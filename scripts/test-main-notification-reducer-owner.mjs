@@ -14,6 +14,7 @@ Function("require", "module", "exports", transpiled.code)((specifier) => {
     findTurnById: (conversation, id) => (conversation.turns ?? []).find((turn) => turn.turnId === id) ?? null,
     lastTurnWithTurnId: (conversation) => [...(conversation.turns ?? [])].reverse().find((turn) => turn.turnId != null) ?? null,
     mergedConversationTurns: (conversation) => conversation.turns ?? [],
+    timelineEntryKey: (entry) => entry.type === "item" ? `item:${entry.turnId}:${entry.item.id}` : `${entry.type}:${entry.turnId ?? entry.item?.id}`,
     findTurnEntryForEvent: (conversation, id) => {
       const turn = (conversation.turns ?? []).find((entry) => entry.turnId === id); return turn == null ? null : { entityKey: `turn:${id}`, turn };
     },
@@ -52,6 +53,7 @@ const context = {
     getHostId: () => "local", getConversation: (id) => conversations.get(id) ?? null,
     getConversationOrThrow: (id) => conversations.get(id), getStreamRole: () => ({ role: "owner" }),
     isConversationStreaming: () => false,
+    supportsThreadTimeline: () => true,
     onNotification: (...args) => calls.push(["replay", ...args]),
     updateConversationState: (id, update) => { const state = conversations.get(id) ?? { id }; update(state); conversations.set(id, state); },
     updateTurnState: (id, turnId, update) => {
@@ -68,6 +70,11 @@ const context = {
       recordThreadRuntimeStatusEvidence: (...args) => (calls.push(["status", ...args]), true),
       hydrateActiveThread: (id) => calls.push(["hydrate", id]), applyThreadTitleUpdate: (...args) => calls.push(["title", ...args]),
       getThreadSummaries: () => [], getCachedConversations: () => [],
+      getItemTimelineEntryIndex: (id, key) => {
+        const entries = conversations.get(id)?.itemTimeline?.entries ?? [];
+        const index = entries.findIndex((entry) => (entry.type === "item" ? `item:${entry.turnId}:${entry.item.id}` : `${entry.type}:${entry.turnId ?? entry.item?.id}`) === key);
+        return index < 0 ? null : index;
+      },
     },
     streamState: { shouldIgnoreThreadMutationAsFollower: () => false },
     resumeNotificationBuffer: { buffer: () => false }, threadStartedNotificationDeferral: { bufferNotification: () => false },
@@ -110,9 +117,11 @@ owner.applyNotification(context, "thread/status/changed", { threadId: "thread-1"
 equal(conversations.get("thread-1").threadRuntimeStatus, { type: "active" });
 
 conversations.get("thread-1").turns = [{ turnId: "turn-1", status: "inProgress", params: { model: "gpt", effort: "high" }, items: [] }];
+Object.assign(conversations.get("thread-1"), { historyMode: "paginated", canonicalVoiceHistory: true });
 owner.applyNotification(context, "turn/started", { threadId: "thread-1", turn: { id: "turn-1", status: "inProgress", durationMs: 3, error: null } });
 equal(conversations.get("thread-1").latestModel, "gpt");
 equal(conversations.get("thread-1").turns[0].durationMs, 3);
+equal(conversations.get("thread-1").itemTimeline.entries[0].type, "turnStarted");
 owner.applyNotification(context, "turn/diff/updated", { threadId: "thread-1", turnId: "turn-1", diff: "patch" });
 equal(conversations.get("thread-1").turns[0].diff, "patch");
 owner.applyNotification(context, "turn/completed", {
@@ -171,5 +180,7 @@ for (const name of ["vy", "yy", "xy", "Lve", "tye", "nye", "rye", "iye", "aye", 
   equal(main.includes(`function ${name}(`), false);
 equal(main.includes("Fve = class"), false);
 equal(main.includes("Ive = class"), false);
+equal(main.includes("function Yve("), false);
+equal(main.includes("function jy("), false);
 
 console.log(`${assertions} main notification reducer owner assertions passed`);
