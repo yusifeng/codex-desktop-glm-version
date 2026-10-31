@@ -226,7 +226,7 @@ interface SlackArchiveTarget {
 }
 
 /** 打开偏好（原 `FH`）：设置覆盖或可用性默认。 */
-function resolveOpenLinkPreference(settingsStore: SettingsStoreLike | undefined): string {
+export function resolveOpenLinkPreference(settingsStore: SettingsStoreLike | undefined): string {
   return (
     (settingsStore?.get(openLinkTargetPreference.openLinkInTargetPreference.key) as string | undefined) ??
     (getDesktopFeatureAvailability().defaultLinkOpenTargetPreference as string)

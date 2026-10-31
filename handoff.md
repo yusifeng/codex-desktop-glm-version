@@ -4967,3 +4967,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   `hotkey/global-shortcut.ts`、`util/app-paths.ts` 四个完整语义模块已成为主运行时唯一实现；显式 keymap snapshot 查询也已补齐。
 - main 旧 `YRe..pH` 约 1,060 行整带删除，vendor 与 saved-sections 边界保持不变。focused coverage 34 项，no-unwired
   gate 扩至 386 项。下一批审计 saved-sections 后仍重复存在的 `browser/link-opening.ts` owner 与其跨模块 consumers。
+
+# 2026-11-01 link-opening runtime wiring
+
+- `browser/link-opening.ts` 现是 URL policy、打开目标、Slack native、IAB/外部浏览器分流与 external-return tracking 的唯一 owner；
+  workspace settings、window manager、message handler 和 open-in consumers 均由主组合根接入同一实现。
+- main 旧 `MH..bBe` 约 278 行已删除，saved-sections/workspace-settings 边界保持不变。focused coverage 27 项，no-unwired gate
+  扩至 391 项。下一批从 workspace settings 后的相邻第一方 owner 继续整带审计。

@@ -3008,3 +3008,12 @@ fetch-failure 节流、bare modifier/globalShortcut/键盘布局/听写 release 
 原始 chunk 中 `YRe..pH` 约 1,060 行重复实现已物理删除；tar/minipass 前段与后续 saved-sections 组合边界未拆。
 focused test 34 项覆盖注册/suspend/duplicate、插件下载/reload/search、keymap/path 和 LaTeX 路径/空编译；no-unwired gate
 扩至 386 项。
+
+### 增量接线：link-opening runtime
+
+`browser/link-opening.ts` 已成为 HTTP/本地 URL 判定、打开目标求解、Codex deep-link 分流、Slack native 深链、IAB panel 消息、
+外部返回跟踪与 `shell.openExternal` 的唯一语义 owner。workspace settings、BrowserWindow manager、Electron message handler 与
+open-in service 继续通过组合根注入同一实现；默认打开偏好 resolver 同步导出，避免组合根保留重复 policy。
+原始 chunk 中 `MH..bBe` 约 278 行重复实现已物理删除，saved-sections 与 workspace settings 组合边界保持不变。
+focused test 27 项覆盖 URL policy、route identity、IAB/deep-link/external/Slack/invalid 分支与真实接线；no-unwired gate 扩至
+391 项。
