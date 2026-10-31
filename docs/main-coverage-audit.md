@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 renderer-driven native context menu
+
+原 `J5/Y5/ort/X5/srt/crt` 已迁入 `src/main/main-app/window/renderer-context-menu.ts`。新 owner 保留 IPC trust gate、
+display scale normalization、nested SVG collection/rasterization、currentColor/template handling、data/file/absolute/search-root
+icon resolution、16px resize、nested Electron menu projection、single-result click/cancel 与 handler disposer；真实 main-message
+registration 已接回，旧 cluster 已删除。
+
 ## 2026-10-31 startup synchronous IPC registrar
 
 原 `Frt/zrt` 已迁入 `src/main/main-app/startup/startup-ipc.ts`。新 registrar 保留 trusted/untrusted sentry bootstrap、

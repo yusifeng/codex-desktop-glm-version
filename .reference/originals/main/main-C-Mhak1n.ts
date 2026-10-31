@@ -144,6 +144,7 @@ const { installDesktopOpenPathHandler } = require("./main-app/files/desktop-open
 const { createAboutDialog } = require("./main-app/app-shell/about-dialog.js");
 const { installApplicationLifecycle } = require("./main-app/startup/application-lifecycle.js");
 const { registerStartupIpcHandlers } = require("./main-app/startup/startup-ipc.js");
+const { registerRendererContextMenu } = require("./main-app/window/renderer-context-menu.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -142531,129 +142532,6 @@ function art({
     }
   );
 }
-var J5 = 16,
-  Y5 = `data:image/svg+xml`;
-async function ort(e, t, n) {
-  let r = new Set(),
-    i = (e) => {
-      for (let t of e)
-        ((t.icon?.startsWith(Y5) || (t.icon?.startsWith(`/apps/`) && t.icon.endsWith(`.svg`))) &&
-          r.add(t.icon),
-          t.submenu && i(t.submenu));
-    };
-  if ((i(t), r.size === 0)) return new Map();
-  try {
-    let t = await e.executeJavaScript(`Promise.all(${JSON.stringify([...r])}.map(async (url) => {
-        try {
-          const image = new Image();
-          if (url.startsWith(${JSON.stringify(Y5)})) {
-            const color = getComputedStyle(document.documentElement).color;
-            const separator = url.indexOf(",");
-            const encodedSvg = url.slice(separator + 1);
-            const svg = url.slice(0, separator).endsWith(";base64")
-              ? atob(encodedSvg)
-              : decodeURIComponent(encodedSvg);
-            image.src = "data:image/svg+xml;utf8," +
-              encodeURIComponent(svg.replaceAll("currentColor", color));
-          } else {
-            image.src = url;
-          }
-          await image.decode();
-          const canvas = document.createElement("canvas");
-          canvas.width = ${Math.round(J5 * n)};
-          canvas.height = ${Math.round(J5 * n)};
-          const context = canvas.getContext("2d");
-          if (context == null) return [url, null];
-          context.drawImage(image, 0, 0, canvas.width, canvas.height);
-          return [url, canvas.toDataURL("image/png")];
-        } catch {
-          return [url, null];
-        }
-      }))`);
-    if (!Array.isArray(t)) return new Map();
-    let i = [];
-    for (let e of t)
-      Array.isArray(e) &&
-        e.length === 2 &&
-        typeof e[0] == `string` &&
-        typeof e[1] == `string` &&
-        i.push([e[0], e[1]]);
-    return new Map(i);
-  } catch {
-    return new Map();
-  }
-}
-function X5(e) {
-  let { width: t, height: n } = e.getSize();
-  return !t || !n || (t <= J5 && n <= J5)
-    ? e
-    : e.resize({ width: J5, height: J5, quality: `best` });
-}
-function srt(e, t, n = !1, r) {
-  if (e)
-    try {
-      if (e.startsWith(`data:`)) {
-        let t = r == null ? l.nativeImage.createFromDataURL(e) : l.nativeImage.createEmpty();
-        r != null && t.addRepresentation({ dataURL: e, scaleFactor: r });
-        let i = X5(t);
-        return (process.platform === `darwin` && n && i.setTemplateImage(!0), i);
-      }
-      if (e.startsWith(`file://`)) return X5(l.nativeImage.createFromPath((0, c.fileURLToPath)(e)));
-      if (e.startsWith(`/`) && !e.startsWith(`/apps/`)) return X5(l.nativeImage.createFromPath(e));
-      for (let n of t) {
-        let t = e.startsWith(`/apps/`)
-          ? (0, h.join)(n, e.slice(1))
-          : new URL(e, `file://${n.endsWith(`/`) ? n : `${n}/`}`).pathname;
-        if ((0, v.existsSync)(t)) {
-          let e = l.nativeImage.createFromPath(t);
-          if (!e.isEmpty()) return X5(e);
-        }
-      }
-    } catch {}
-}
-function crt(e, t) {
-  return (
-    l.ipcMain.handle(a.Vt, async (n, r) => {
-      if (!t(n)) return { id: null };
-      let i = l.BrowserWindow.fromWebContents(n.sender),
-        a = i == null ? 1 : l.screen.getDisplayMatching(i.getBounds()).scaleFactor,
-        o = Number.isFinite(a) && a > 0 ? Math.max(1, Math.round(J5 * a)) / J5 : 1,
-        s = await ort(n.sender, r, o);
-      return new Promise((t) => {
-        let n = !1,
-          a = (e) => {
-            n || ((n = !0), t({ id: e }));
-          },
-          c = (t) =>
-            t.map((t) =>
-              t.type === `separator`
-                ? { type: `separator` }
-                : {
-                    id: t.id,
-                    type: t.type,
-                    checked: t.checked,
-                    label: t.label.replaceAll(`&`, `&&`),
-                    role: t.role,
-                    accelerator: t.accelerator,
-                    registerAccelerator: !1,
-                    enabled: t.enabled ?? !0,
-                    icon: srt(
-                      t.icon == null ? void 0 : (s.get(t.icon) ?? t.icon),
-                      e,
-                      t.icon?.startsWith(Y5),
-                      t.icon != null && s.has(t.icon) ? o : void 0,
-                    ),
-                    toolTip: t.toolTip,
-                    click: () => a(t.id),
-                    submenu: t.submenu ? c(t.submenu) : void 0,
-                  },
-            );
-        l.Menu.buildFromTemplate(c(r)).popup({ window: i ?? void 0, callback: () => a(null) });
-      });
-    }),
-    () => l.ipcMain.removeHandler(a.Vt)
-  );
-}
 var lrt = createMessagePortRemoteMainFactory({ RemoteMainTransport: n.Vf });
 var TrayMenuController = createTrayMenuControllerClass({
   Menu: l.Menu,
@@ -142767,7 +142645,20 @@ function Rrt(e) {
       isTrustedIpcEvent: M,
       requestDevRelaunch: N,
     } = e;
-  crt(f, M);
+  registerRendererContextMenu({
+    ipcMain: l.ipcMain,
+    channel: a.Vt,
+    BrowserWindow: l.BrowserWindow,
+    screen: l.screen,
+    nativeImage: l.nativeImage,
+    Menu: l.Menu,
+    platform: process.platform,
+    fileURLToPath: c.fileURLToPath,
+    join: h.join,
+    existsSync: v.existsSync,
+    iconSearchRoots: f,
+    isTrustedIpcEvent: M,
+  });
   let P = !1,
     F = !1,
     I = null;

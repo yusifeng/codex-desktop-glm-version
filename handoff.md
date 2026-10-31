@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `J5/Y5/ort/X5/srt/crt` renderer-driven native context-menu owner 迁入
+`window/renderer-context-menu.ts`；trust gate、display scale、nested SVG collection/rasterization、currentColor/template handling、
+data/file/absolute/search-root icon resolution、16px resize、menu projection、single-result click/cancel 和 disposer 均由新
+owner 持有。真实 main-message registration 已接回，旧 cluster 已删除。
+
 随后将 `Frt/zrt` startup/bootstrap synchronous IPC registrar 迁入 `startup/startup-ipc.ts`；trusted/untrusted sentry
 bootstrap、build flavor、shared-object snapshot、sidebar bootstrap、file drag，以及 HTTP(S) link-drag schema、receiver binding
 和 failure logging 均由新 owner 持有。真实 startup registration 已接回，旧 schema/function 已删除。
