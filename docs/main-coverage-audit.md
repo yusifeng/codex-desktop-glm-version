@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 computer-use activity tracker wiring
+
+`src/main/main-app/computer-use/activity-tracker.ts` 已完整覆盖旧 `Qce/$ce/Lu/ele`。本轮接回 startup notification consumer 并
+删除旧 53 行簇；focused suite 覆盖原生 computer-use、toolSurface metadata、状态去重、turn completion、thread deletion、
+onTaskDeleted、dispose 退订/清场与真实 wiring。
+
 ## 2026-10-31 in-app browser availability wiring
 
 `src/main/main-app/browser-use/availability.ts` 已完整覆盖旧 `Kse/qse/Jse/Yse`。本轮接回 startup registry consumer 并删除

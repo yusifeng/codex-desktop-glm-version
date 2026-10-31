@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 computer-use activity tracker：既有 `computer-use/activity-tracker.ts` 现替代主 chunk 旧 `Qce/$ce/Lu/ele`。
+computer-use/toolSurface item started/completed、turn completion、thread archived/closed/deleted、状态去重、task deletion 与 dispose
+清场语义保持完整；startup 真实 subscription 继续通过 `ele` 兼容别名调用。
+
 接回 in-app browser availability owner：既有 `browser-use/availability.ts` 现替代主 chunk 旧 `Kse/qse/Jse/Yse`。
 experimentalFeature/list 的 100 项 cursor 分页、命中 enabled、异常 warning + true fallback、Deferred startup registration 均保持
 完整；startup 真实 consumer 继续通过 `Jse` 兼容别名构造 availability reader。

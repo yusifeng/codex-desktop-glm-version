@@ -160,6 +160,7 @@ const { listAmbientSummaries: Yj, newAmbientSuggestions: Xj, activeSummaryInterv
 const { listApplicationsForFile: Nj, appForBundleId: Pj, listWebUrlHandlers: Fj, notifyDownloadComplete: Ij, setAppIcon: Lj } = require("./main-app/mac/launch-services.js");
 const { acquireCrossInstanceLock: jN, CROSS_INSTANCE_LOCKS: AN } = require("./main-app/util/cross-instance-lock.js");
 const { registerInAppBrowserAvailabilityProbe: Jse } = require("./main-app/browser-use/availability.js");
+const { trackComputerUseActivity: ele } = require("./main-app/computer-use/activity-tracker.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -13895,59 +13896,6 @@ async function Zce({ appServerConnection: e, globalState: t, logger: n = r.n() }
         sensitive: { error: e },
       });
     }
-}
-var Qce = n.wf({ "codex/toolSurface": n.wf({ kind: n.bf(`computerUse`) }) }),
-  $ce = n.wf({
-    params: n.wf({
-      item: n.wf({
-        result: n.wf({ _meta: n.Mf().optional() }).nullish(),
-        server: n.Of(),
-        type: n.bf(`mcpToolCall`),
-      }),
-      threadId: n.Of(),
-    }),
-  }),
-  Lu = n.wf({ params: n.wf({ threadId: n.Of() }) });
-function ele({ appServerConnection: e, onActivityChanged: t, onTaskDeleted: r }) {
-  let i = new Set(),
-    a = (e, n) => {
-      n !== i.has(e) && (n ? i.add(e) : i.delete(e), t(e, n));
-    },
-    o = e.registerInternalNotificationHandler((e) => {
-      switch (e.method) {
-        case `item/started`:
-        case `item/completed`: {
-          let t = $ce.safeParse(e);
-          if (!t.success) return;
-          let { item: r, threadId: i } = t.data.params;
-          (r.server === `computer-use` ||
-            (n.tu(r.server) && Qce.safeParse(r.result?._meta).success)) &&
-            a(i, !0);
-          return;
-        }
-        case `turn/completed`: {
-          let t = Lu.safeParse(e);
-          t.success && a(t.data.params.threadId, !1);
-          return;
-        }
-        case `thread/archived`:
-        case `thread/closed`:
-        case `thread/deleted`: {
-          let t = Lu.safeParse(e);
-          if (!t.success) return;
-          let { threadId: n } = t.data.params;
-          (a(n, !1), e.method === `thread/deleted` && r(n));
-          return;
-        }
-        default:
-          return;
-      }
-    });
-  return () => {
-    o();
-    for (let e of i) t(e, !1);
-    i.clear();
-  };
 }
 var zu = getVoiceController;
 var Bu = 720,
