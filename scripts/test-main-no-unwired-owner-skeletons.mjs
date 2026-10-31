@@ -15,6 +15,7 @@ const realOwners = [
   ["src/main/main-app/dictation/audio.ts", "createDictationAudioServiceClass"],
   ["src/main/main-app/language-server/providers.ts", "createLanguageServerProvidersRuntime"],
   ["src/main/main-app/language-server/session-runtime.ts", "createLanguageServerSessionRuntime"],
+  ["src/main/main-app/workspace/worktree-attachment-handler.ts", "createWorktreeAttachmentHandlerClass"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -72,6 +73,8 @@ assert.equal(main.includes("q1e = class"), false, "generated Java provider must 
 assert.equal(main.includes("var F0e = class"), false, "generated Kotlin provider must be removed");
 assert.equal(main.includes("z0e = class"), false, "generated language-server session must be removed");
 assert.equal(main.includes("var Q0e = class"), false, "generated language-server RPC owner must be removed");
+assert.equal(main.includes("$0e = createWorktreeAttachmentHandlerClass({"), true, "real worktree attachment owner is wired");
+assert.equal(main.includes("var $0e = class"), false, "generated worktree attachment owner must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("60 main unwired-owner skeleton assertions passed");
+console.log("64 main unwired-owner skeleton assertions passed");

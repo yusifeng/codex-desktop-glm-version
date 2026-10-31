@@ -223,6 +223,7 @@ const { WebContentsHostClient } = require("./main-app/app-server/web-contents-ho
 const { createRemoteLocalhostNavigationForwarder } = require("./main-app/browser-sidebar/remote-localhost-navigation.js");
 const { createCommandSessionBackendClass } = require("./main-app/terminal/command-session-backend.js");
 const { createWorktreeServiceClass } = require("./main-app/workspace/worktree-service.js");
+const { createWorktreeAttachmentHandlerClass } = require("./main-app/workspace/worktree-attachment-handler.js");
 const { createDictationHistoryRuntime } = require("./main-app/dictation/history.js");
 const { createGlobalPasteRuntime } = require("./main-app/dictation/global-paste-runtime.js");
 const { createGlobalDictationLifecycleManagerClass, isGlobalDictationMessage, isGlobalDictationPlatformSupported } = require("./main-app/dictation/global-dictation-lifecycle-manager.js");
@@ -70899,124 +70900,12 @@ var { LanguageServerRpcHandler: Q0e } = createLanguageServerSessionRuntime({
   resolveLocations: M0e,
   stream: C,
 });
-var $0e = class extends n.Uf {
-    connections;
-    getWorktreeService;
-    pendingCreations = new Map();
-    constructor(e, t) {
-      (super(), (this.connections = e), (this.getWorktreeService = t));
-    }
-    async createForThread(e) {
-      let t = JSON.stringify([e.hostId, e.threadId]),
-        n = this.pendingCreations.get(t) ?? new Set();
-      this.pendingCreations.set(t, n);
-      let r = this.#e(e);
-      n.add(r);
-      try {
-        return await r;
-      } finally {
-        (n.delete(r), n.size === 0 && this.pendingCreations.delete(t));
-      }
-    }
-    async removeFromThread({ hostId: e, threadId: t, root: r }) {
-      try {
-        let i = this.connections.getConnection(e);
-        if (n.Cs(e) || !n.Wu(i.appServerVersion, `threadAttachments`))
-          return { type: `error`, message: `Worktree attachments are unavailable on this host.` };
-        let a = null,
-          o;
-        do {
-          let e = await i.sendAppServerRequest(`thread/attachment/list`, {
-            threadId: t,
-            cursor: a,
-            limit: 100,
-          });
-          ((o = e.data.find(
-            (e) => e.attachmentType === `worktree` && e.identityKey === r,
-          )?.identityKey),
-            (a = e.nextCursor));
-        } while (o == null && a != null);
-        if (o == null) return { type: `removed` };
-        let s = await i.readThread(t);
-        return s == null
-          ? { type: `error`, message: `The task could not be found.` }
-          : (await this.getWorktreeService(e).archiveAttachedWorktree(t, s.cwd, r),
-            await i.sendAppServerRequest(`thread/attachment/remove`, {
-              threadId: t,
-              attachmentType: `worktree`,
-              identityKey: o,
-            }),
-            { type: `removed` });
-      } catch (e) {
-        return {
-          type: `error`,
-          message: e instanceof Error ? e.message : `Could not remove worktree.`,
-        };
-      }
-    }
-    cleanupForArchivedThread = async (e, t, n) => {
-      let r = this.pendingCreations.get(JSON.stringify([e, t.conversationId]));
-      (r != null && (await Promise.allSettled(r)),
-        n.throwIfAborted(),
-        await this.getWorktreeService(e).handleArchiveCleanup({ ...t, signal: n }));
-    };
-    async #e({ hostId: e, threadId: t, callId: r, ref: i, name: a }) {
-      if (n.Cs(e))
-        return { type: `error`, message: `Managed worktrees require a local, SSH, or WSL task.` };
-      try {
-        let o = this.connections.getConnection(e),
-          s = await o.readThread(t);
-        if (!n.Wu(o.appServerVersion, `threadAttachments`))
-          return {
-            type: `error`,
-            message: `This host must support thread attachments before creating a managed worktree.`,
-          };
-        if (s == null) return { type: `error`, message: `The calling task could not be found.` };
-        let c = this.getWorktreeService(e),
-          l = await c.createManagedWorktree({
-            hostId: e,
-            cwd: s.cwd,
-            startingState: { type: `branch`, branchName: i ?? `HEAD` },
-            name: a,
-            localEnvironmentConfigPath: null,
-            streamId: r,
-          }),
-          u =
-            (
-              await Promise.allSettled([
-                c.setOwnerThread({ worktree: l.worktreeGitRoot, conversationId: n.$u(t) }),
-                o.sendAppServerRequest(`thread/attachment/add`, {
-                  threadId: t,
-                  attachmentType: `worktree`,
-                  identityKey: l.worktreeGitRoot,
-                  payload: {
-                    root: l.worktreeGitRoot,
-                    workspaceRoot: l.worktreeWorkspaceRoot,
-                    sourceCwd: s.cwd,
-                  },
-                }),
-              ])
-            )
-              .flatMap((e) =>
-                e.status === `rejected`
-                  ? [e.reason instanceof Error ? e.reason.message : `Worktree registration failed.`]
-                  : [],
-              )
-              .join(`; `) || null;
-        return {
-          type: `created`,
-          worktreeGitRoot: l.worktreeGitRoot,
-          worktreeWorkspaceRoot: l.worktreeWorkspaceRoot,
-          registrationError: u,
-        };
-      } catch (e) {
-        return {
-          type: `error`,
-          message: e instanceof Error ? e.message : `Worktree creation failed.`,
-        };
-      }
-    }
-  },
+var $0e = createWorktreeAttachmentHandlerClass({
+    RpcHandlerBase: n.Uf,
+    isCloudHost: (e) => n.Cs(e),
+    normalizeConversationId: (e) => n.$u(e),
+    supportsFeature: (e, t) => n.Wu(e, t),
+  }),
   e2e = 5e3,
   w$ = new WeakMap();
 function T$(e) {

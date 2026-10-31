@@ -4605,3 +4605,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   updater callback 参数遮蔽全局 logger namespace 的风险；focused coverage 42 项。
 - 本批完成后优先继续审计 main chunk 紧邻的 worktree attachment、MCP sandbox 与剩余大型第一方 owner；
   vendor vscode-jsonrpc/LSP/URI runtime 保留为 generated/vendor 边界，不计作业务 owner。
+
+# 2026-11-01 managed-worktree attachment owner
+
+- `$0e` 已迁移至 `src/main/main-app/workspace/worktree-attachment-handler.ts` 并通过 factory 接回
+  WindowContext；新 owner 持有 per-thread pending creation barrier、protocol feature admission、双注册
+  failure aggregation、分页 removal 和 archive cleanup/abort 顺序，旧 generated class 已删除。
+- focused test `scripts/test-main-worktree-attachment-handler-owner.mjs` 覆盖 28 项；下一步继续审计紧邻
+  MCP sandbox 的 gesture/navigation/cache owners，组合根与 Electron event binding 只在可保持 cleanup
+  顺序时迁移。

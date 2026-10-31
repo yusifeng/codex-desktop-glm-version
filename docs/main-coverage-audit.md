@@ -2579,5 +2579,14 @@ LSP request timeout/content-modified retry、document open/change/close 串行�
 cleanup、initialize/configuration handshake 和 `Q0e` RPC owner 已迁移至
 `src/main/main-app/language-server/session-runtime.ts`。新 RPC owner 明确分离全局 logger factory 与
 local-runtime-expired 更新回调，消除机械恢复代码的参数遮蔽风险；`z0e/B0e/V0e/H0e/Q0e` 旧实现已删除。
-focused coverage 为 provider 45 项、session/RPC 42 项，另由 no-unwired gate 60 项验证真实接线及旧
+focused coverage 为 provider 45 项、session/RPC 42 项，另由 no-unwired gate 验证真实接线及旧
 owner 不得回归。
+
+### 增量抽取：managed-worktree attachment owner
+
+原 `$0e` 的 per-thread pending creation Set、create/register、分页查找、archive-before-remove 与
+archive cleanup barrier 已整体迁移至
+`src/main/main-app/workspace/worktree-attachment-handler.ts`。新 owner 保留 cloud/feature admission、
+read-before-version 顺序、owner/app-server 双注册 `allSettled` 聚合、同 thread cleanup 等待及 abort
+gate；main 通过 `createWorktreeAttachmentHandlerClass` 真实接回 WindowContext consumer 并删除旧 class。
+`scripts/test-main-worktree-attachment-handler-owner.mjs` 覆盖 28 项并发、分页、副作用顺序和错误 shape。
