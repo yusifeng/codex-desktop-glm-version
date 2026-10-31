@@ -8,11 +8,11 @@ export function createSavedCustomSectionsManagerClass(dependencies) {
     Wb,
     _H,
     a,
-    aBe,
     n,
     rBe,
     yH,
   } = dependencies;
+  const isValidSavedSectionsState = (value) => Ub.safeParse(value).success;
   return class SavedCustomSectionsManager extends n.Uf {
       #e;
       #t;
@@ -203,7 +203,7 @@ export function createSavedCustomSectionsManagerClass(dependencies) {
         let o = i.data[e];
         return o == null
           ? (t ?? { sections: [], collapsedSectionIds: [], sectionOrder: [] })
-          : aBe(o)
+            : isValidSavedSectionsState(o)
             ? o
             : null;
       }

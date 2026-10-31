@@ -93846,14 +93846,10 @@ var iBe = createSavedCustomSectionsManagerClass({
   Wb,
   _H,
   a,
-  aBe,
   n,
   rBe,
   yH,
 });
-function aBe(e) {
-  return Ub.safeParse(e).success;
-}
 var jH = createPinnedThreadsServiceClass({
     DisposableBase: n.Uf,
     PinnedThreadServer: $ze,

@@ -1,5 +1,9 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 saved-section manager helper cleanup
+
+单用途 `aBe` saved-state schema predicate 已内聚到 manager factory；主 chunk 转发 helper 与反向 dependency injection 删除。
+
 ## 2026-10-31 saved custom sections manager
 
 原 `iBe` manager 已迁入 `src/main/main-app/sidebar/saved-custom-sections-manager.ts`。新 class 保留 serialized command queue、

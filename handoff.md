@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+saved-section manager 收尾：单用途 `aBe` state-schema predicate 已内聚到 manager factory，主 chunk 转发 helper 与反向注入删除。
+
 完成 saved-section manager owner：原 `iBe` 已迁入 `sidebar/saved-custom-sections-manager.ts`；serialized command queue、
 principal/connection-bound source capture、creation reservation、legacy import、persisted-atom write/broadcast、migration 与
 reconciliation entrypoints 均由新 class 持有。真实 pinned façade consumer 已接回，旧 class body 删除。
