@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 cloud environment filesystem owner：既有 `cloud/environment-fs.ts` 现替代主 chunk 旧 `nH/Wze/rH/iH`，并导出共享的
+remote read/executor guard。hosted thread files 与 durable binary fetch 两个真实 consumers 继续通过 `Wze/rH/iH` 兼容别名使用；
+cwd/file URL、metadata sampling、workspace 越界、symlink、hidden/directory filters 和目录优先排序保持完整，旧 97 行簇删除。
+
 接回 browser-use execution host owner：既有 `browser-use/execution-host.ts` 现替代主 chunk 旧 `fte/pte/mte/hte/gte/_te`。
 按 hostId 缓存、spawn tracing、stat/dirent snapshot、child wait/kill、file-watch session dispose 与 16ms/256-path 变更批处理保持
 完整；Git worker 的真实 `setGitWorkerMainRpcTarget(new fte(...))` consumer 通过兼容别名继续使用，旧 197 行状态簇删除。

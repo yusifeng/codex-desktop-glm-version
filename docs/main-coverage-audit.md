@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 cloud environment filesystem owner wiring
+
+`src/main/main-app/cloud/environment-fs.ts` 已完整覆盖旧 `nH/Wze/rH/iH`。本轮导出并接回 hosted-thread-files 与 durable binary
+fetch 两个消费面，删除主 chunk 97 行 schema/service/helpers；focused suite 覆盖 base64、executor guard、absolute/file URL root、
+sample limit、越界/symlink 拒绝、hidden filter/sort、旧 symbols 消失与双 consumer wiring。
+
 ## 2026-10-31 browser-use execution host owner wiring
 
 `src/main/main-app/browser-use/execution-host.ts` 已完整覆盖旧 `ute/dte/fte/pte/mte/hte/gte/_te`。本轮接回 Git worker target

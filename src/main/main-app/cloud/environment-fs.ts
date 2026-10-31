@@ -167,4 +167,4 @@ function requireExecutor(environmentId: string | null | undefined): string {
   return environmentId;
 }
 
-export { CloudEnvironmentFsService };
+export { CloudEnvironmentFsService, readRemoteFile, requireExecutor };

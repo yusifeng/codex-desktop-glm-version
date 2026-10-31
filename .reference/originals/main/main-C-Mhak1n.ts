@@ -166,6 +166,7 @@ const { browserUsePartitionNameForHost: Jc, applyPreferredLanguages: Yc, clearSi
 const { ensureComputerUseNotifyConfig: iie } = require("./main-app/computer-use/notify-config.js");
 const { isComputerUseOverlaySettingKey: Fie, scheduleComputerUseConfigWrite: ns } = require("./main-app/computer-use/config-writer.js");
 const { ExecutionHostRegistry: fte } = require("./main-app/browser-use/execution-host.js");
+const { CloudEnvironmentFsService: Wze, readRemoteFile: rH, requireExecutor: iH } = require("./main-app/cloud/environment-fs.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -71426,109 +71427,6 @@ function Hze(e) {
 }
 function Uze(e, t) {
   return t === `darwin` ? eH(e).length > 0 : tH(e, t) != null;
-}
-var nH = n.wf({
-    isDirectory: n.gf(),
-    isFile: n.gf(),
-    isSymlink: n.gf(),
-    createdAtMs: n.Cf(),
-    modifiedAtMs: n.Cf(),
-  }),
-  Wze = class extends n.Uf {
-    sendRequest;
-    constructor(e) {
-      (super(), (this.sendRequest = e));
-    }
-    async getRoot({ environmentId: e, cwd: t }) {
-      if ((iH(e), t != null && h.posix.isAbsolute(t)))
-        try {
-          if (
-            nH.parse(await this.sendRequest(`fs/getMetadata`, { environmentId: e, path: t }))
-              .isDirectory
-          )
-            return t;
-        } catch (e) {
-          if (
-            !(e instanceof Error) ||
-            ![`No such file or directory (os error 2)`, `Not a directory (os error 20)`].includes(
-              e.message,
-            )
-          )
-            throw e;
-        }
-      let { cwd: r } = n
-        .wf({ cwd: n.Of().nullish() })
-        .parse(await this.sendRequest(`environment/info`, { environmentId: e }));
-      return r == null
-        ? null
-        : r.startsWith(`file:`)
-          ? (0, c.fileURLToPath)(r, { windows: !1 })
-          : h.posix.isAbsolute(r)
-            ? r
-            : null;
-    }
-    async readFile(e) {
-      return (iH(e.environmentId), { contents: (await rH(this.sendRequest, e)).toString(`utf8`) });
-    }
-    async getMetadata(e) {
-      let t = iH(e.environmentId),
-        r = nH.parse(await this.sendRequest(`fs/getMetadata`, { environmentId: t, path: e.path })),
-        i =
-          r.isFile && e.contentSampleByteLimit != null
-            ? await rH(this.sendRequest, { environmentId: t, path: e.path })
-            : null;
-      return {
-        contentKind:
-          (i != null &&
-          (e.contentSampleMaxFileBytes == null || i.byteLength <= e.contentSampleMaxFileBytes)
-            ? await n.Rs(i.subarray(0, e.contentSampleByteLimit))
-            : null) ?? void 0,
-        createdAtMs: r.createdAtMs > 0 ? r.createdAtMs : null,
-        isFile: r.isFile,
-        mtimeMs: r.modifiedAtMs,
-        sizeBytes: i?.byteLength ?? null,
-      };
-    }
-    async readDirectory(e) {
-      let t = iH(e.environmentId);
-      if (!h.posix.isAbsolute(e.workspaceRoot))
-        throw Error(`workspaceRoot must be an absolute executor path`);
-      let r = h.posix.resolve(e.workspaceRoot),
-        i = h.posix.resolve(r, e.directoryPath ?? `.`),
-        a = h.posix.relative(r, i);
-      if (a === `..` || a.startsWith(`../`))
-        throw Error(`directoryPath must stay within workspaceRoot`);
-      let o = nH.parse(await this.sendRequest(`fs/getMetadata`, { environmentId: t, path: i }));
-      if (!o.isDirectory || (a !== `` && o.isSymlink))
-        throw Error(`directoryPath must point to a directory, not a symlink`);
-      let { entries: s } = n
-        .wf({ entries: n.hf(n.wf({ fileName: n.Of(), isDirectory: n.gf(), isFile: n.gf() })) })
-        .parse(await this.sendRequest(`fs/readDirectory`, { environmentId: t, path: i }));
-      return {
-        workspaceRoot: r,
-        directoryPath: a,
-        parentPath: a === `` ? null : h.posix.dirname(a).replace(/^\.$/, ``),
-        entries: s
-          .filter((t) => e.includeHidden || !t.fileName.startsWith(`.`))
-          .filter((t) => !e.directoriesOnly || t.isDirectory)
-          .map((e) => ({
-            name: e.fileName,
-            path: h.posix.join(a, e.fileName),
-            type: e.isDirectory ? `directory` : `file`,
-          }))
-          .sort((e, t) =>
-            e.type === t.type ? e.name.localeCompare(t.name) : e.type === `directory` ? -1 : 1,
-          ),
-      };
-    }
-  };
-async function rH(e, t) {
-  let r = n.wf({ dataBase64: n.Of() }).parse(await e(`fs/readFile`, t));
-  return Buffer.from(r.dataBase64, `base64`);
-}
-function iH(e) {
-  if (e == null || e.length === 0) throw Error(`No executor is attached to this cloud task`);
-  return e;
 }
 var aH = (0, d.promisify)(P.execFile);
 async function oH(e) {
