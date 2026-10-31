@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 archived preview owner cleanup
+
+语义 `ArchivedThreadPreviewRead` 与旧 `yve` 行为逐支一致，但原模块反向导入 re-export 它的 `history-policy.ts`，形成不必要的 CJS cycle；
+同时 semantic `uy` 直接取最后 island，弱于旧 `Eg` 的 exhausted-tail 门。本轮内聚 preview helper、统一 exhausted-tail 判定并删除 main
+旧 `vve/yve/uy` 死簇；focused suite 锁定非 exhausted island 只保留本地 draft 与循环依赖消失。
+
 ## 2026-10-31 fork rollback and history owner repair
 
 `threads/fork-rollback.ts` 原实现仅循环 legacy pagination、清空少量字段并过滤 `state.turns`，遗漏 follower revision 同步、bounded durable、

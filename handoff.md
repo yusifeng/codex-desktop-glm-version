@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+收敛 archived thread preview owner：`archived-preview.ts` 不再反向导入 `history-policy.ts`，消除两模块的运行时循环；两处 unarchived-turn
+视图均恢复旧实现的 exhausted-tail 限制，避免把仍有 newer boundary 的 canonical island 当作稳定尾部。AppServer manager 继续消费语义
+preview，主 chunk 旧 `vve/yve/uy` 簇删除，history-policy focused suite 增补边界与 wiring 断言。
+
 修复 fork rollback/revert 与 history loading owner：`threads/fork-rollback.ts` 现恢复 resumed/bounded durable 校验、follower owner revision
 同步、后台/summary 分页、complete-history 验证、rollback turn 投影/分页/metadata 重建，以及 canonical island/entity revert 修剪；同时修正
 AppServer manager 的 `waitForConversationRevision` 参数错位。主 chunk 旧 `fve/pve/hve/gve/_ve/cy/ly` 簇删除，新增 focused suite。

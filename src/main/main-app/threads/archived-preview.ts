@@ -20,11 +20,23 @@ import {
   Uf as EventEmitter,
   wf as zObject,
 } from "@chunk/shared";
-import { hasCompleteHistory, mergedConversationTurns, type AnyTurn } from "../turns/canonical-history";
+import { exhaustedTailIsland, hasCompleteHistory, mergedConversationTurns, type AnyTurn } from "../turns/canonical-history";
 import { THREAD_HISTORY_REQUEST_TIMEOUT_MS, type HistoryPolicy } from "../turns/history-requests";
 import { subAgentMetadata } from "./projection";
-// uy（未归档 turn 视图）：定义于历史策略簇（38,479-39,268，尚未重写）。
-import { uy as unarchivedTurns } from "./history-policy";
+
+function unarchivedTurns(
+  conversation: any,
+  policy: { mergeTurns(left: AnyTurn[], right: AnyTurn[]): AnyTurn[] },
+): AnyTurn[] {
+  if (conversation == null) return [];
+  if (conversation.turnHistory?.kind !== "canonical") return conversation.turns ?? [];
+  const history = conversation.turnHistory.history;
+  const tail = exhaustedTailIsland(history);
+  const turns = tail?.entries
+    .map((entry) => entry.value == null ? undefined : history.entitiesByKey[entry.value])
+    .filter((turn: AnyTurn | undefined): turn is AnyTurn => turn != null) ?? [];
+  return policy.mergeTurns(turns, conversation.turns ?? []);
+}
 
 /** 预览限额 schema（原版 vve）。 */
 const previewLimitsSchema = zObject({

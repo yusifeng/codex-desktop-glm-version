@@ -3,6 +3,7 @@ import { Cs as isDurableHost } from "@chunk/shared";
 import { AUTOMATION_DETECTOR } from "./automation-detector";
 import { attachmentsFromInput, projectItems, projectTurns } from "./hydration";
 import { mergeTurnLists } from "../turns/item-merge";
+import { exhaustedTailIsland } from "../turns/canonical-history";
 type Turn = {
   turnId?: string | null;
   items: Array<Record<string, unknown>>;
@@ -58,7 +59,7 @@ export function uy(
   if (conversation == null) return [];
   if (conversation.turnHistory?.kind !== "canonical") return conversation.turns ?? [];
   const history = conversation.turnHistory.history;
-  const island = history?.islands?.at(-1);
+  const island = history == null ? null : exhaustedTailIsland(history as never);
   const turns =
     island?.entries
       .map((entry) => history?.entitiesByKey?.[entry.value])
