@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 quit and bounded-cleanup runtime
+
+原 `a7/Prt/o7/Irt/Lrt/s7` 已迁入 `src/main/main-app/startup/quit-runtime.ts`。新 runtime 保留 dev relaunch
+fallback、app quit、12 秒 service cleanup、5 秒 context cleanup，以及 hotkey/dictation/context/disposables 的 immediate-exit
+ordering；workspace policy、main IPC、normal lifecycle、micro shutdown 与 update-install consumers 均已改接，旧 cluster 删除。
+
 ## 2026-10-31 primary main IPC router
 
 原 `Rrt` 已迁入 `src/main/main-app/app-shell/main-ipc-router.ts`。新 owner 保留 avatar/PiP、update gates、desktop feature

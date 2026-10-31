@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `a7/Prt/o7/Irt/Lrt/s7` quit/cleanup runtime 迁入 `startup/quit-runtime.ts`；dev relaunch fallback、app quit、
+12 秒 service cleanup、5 秒 context cleanup，以及 hotkey/dictation/context/disposables 的 immediate-exit ordering 均由
+新 owner 持有。workspace policy、main IPC、normal lifecycle、micro shutdown 与 update-install consumers 全部改接可读 API，
+旧 constants/functions 已删除。
+
 随后将 `Rrt` primary main IPC router 迁入 `app-shell/main-ipc-router.ts`；avatar/PiP、update gates、desktop feature
 projection、menu/plugin updates、所有 main-window routes、quit/tray/dictation/context fallback、browser sidebar/page validation、
 Codex-home request、Sentry test 与 AppView MessagePort registration 均由新 owner 持有；renderer context-menu registration

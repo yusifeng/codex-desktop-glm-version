@@ -147,6 +147,7 @@ const { registerStartupIpcHandlers } = require("./main-app/startup/startup-ipc.j
 const { registerRendererContextMenu } = require("./main-app/window/renderer-context-menu.js");
 const { createPlatformShutdownRuntime } = require("./main-app/startup/platform-shutdown.js");
 const { registerMainIpcRouter } = require("./main-app/app-shell/main-ipc-router.js");
+const { createQuitRuntime } = require("./main-app/startup/quit-runtime.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -142555,25 +142556,16 @@ var {
   loadObjcJs: () => import(`objc-js`),
   logger: r,
 });
-function a7(e = Yoe) {
-  (e() || l.app.relaunch(), l.app.quit());
-}
-var Prt = 12e3,
-  o7 = 5e3;
-async function Irt({
-  hotkeyWindowLifecycleManager: e,
-  globalDictationLifecycleManager: t,
-  flushAndDisposeContext: n,
-  disposables: r,
-}) {
-  (e.dispose(), t.dispose(), await s7(n, o7), r.dispose());
-}
-function Lrt(e) {
-  return waitForCleanupWithTimeout(e, Prt);
-}
-function s7(e, t) {
-  return waitForCleanupWithTimeout(e, t);
-}
+var {
+  cleanupBeforeImmediateExit,
+  relaunchAndQuit,
+  stopServiceWithTimeout,
+  waitForContextCleanup,
+} = createQuitRuntime({
+  app: l.app,
+  defaultRequestDevRelaunch: Yoe,
+  waitForCleanupWithTimeout,
+});
 var c7 = `codex.aboutDialog.title`,
   l7 = `About {appName}`;
 var { showAboutDialog: Qrt } = createAboutDialog({
@@ -150880,7 +150872,7 @@ function Est(e) {
     getAppName: () => l.app.getName(),
     showMessageBoxSync: (options) => l.dialog.showMessageBoxSync(options),
     markQuitApproved: () => e.markQuitApproved(),
-    quit: () => a7(),
+    quit: () => relaunchAndQuit(),
     onError: (error) => r.n().warning(`Failed to show workspace policy restart dialog`, { safe: {}, sensitive: { error } }),
   });
 }
@@ -151325,7 +151317,7 @@ async function Ust() {
     I.add(() => {
       (K.setDynamicAppToolsPipePath(null), delete process.env[as], Oe.dispose());
     }));
-  let Me = () => Lrt(() => K.stopCodexMicro()),
+  let Me = () => stopServiceWithTimeout(() => K.stopCodexMicro()),
     Ne = Bce((e) => {
       V.globalState.update(a.J, (t) => ({ ...t, [Ht]: e }));
     });
@@ -151829,7 +151821,7 @@ async function Ust() {
     resolveCodexHomeRequest: (params) => n.et({ codexHome: V.codexHome, params }),
     createMessagePortRemoteMain: lrt,
     isTrayMenuThreadsChangedMessage,
-    relaunchApp: (requestDevRelaunch) => a7(requestDevRelaunch),
+    relaunchApp: relaunchAndQuit,
     desktopSentry: c,
     hotkeyWindowLifecycleManager: W.hotkeyWindowLifecycleManager,
     globalDictationLifecycleManager: W.globalDictationLifecycleManager,
@@ -151886,7 +151878,7 @@ async function Ust() {
       getAutomations: n.Ar,
       observeSystemShutdown: _rt,
       armWindowsForcedExit: n7,
-      waitForContextCleanup: (cleanup) => s7(cleanup, o7),
+      waitForContextCleanup,
       isWindows: P,
       disableQuitConfirmationPrompt: process.env.CODEX_ELECTRON_DISABLE_QUIT_CONFIRMATION === `1`,
       quitState: ye,
@@ -152026,7 +152018,7 @@ async function Ust() {
             Wst({
               runCleanupBeforeImmediateExit: async () => {
                 (Q9(),
-                  await Irt({
+                  await cleanupBeforeImmediateExit({
                     hotkeyWindowLifecycleManager: W.hotkeyWindowLifecycleManager,
                     globalDictationLifecycleManager: W.globalDictationLifecycleManager,
                     flushAndDisposeContext: je.flushAndDisposeContext,
