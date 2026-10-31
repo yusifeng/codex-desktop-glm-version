@@ -25350,39 +25350,6 @@ var Yge = AppServerManagerStreamState;
       return this.subscribers.get(e);
     }
   };
-var T_e = ThreadStore;
-function Iv(e, t) {
-  if (t == null) return { type: `fullReset` };
-  let n = new Set();
-  for (let r of t) {
-    let [t, i, a, o] = r.path;
-    if (t == null) return { type: `fullReset` };
-    if (t === `turnHistory`) {
-      if (i !== `history`) return { type: `fullReset` };
-      switch (a) {
-        case `entitiesByKey`:
-          if (
-            typeof o != `string` ||
-            e.turnHistory?.kind !== `canonical` ||
-            e.turnHistory.history.entitiesByKey[o] == null
-          )
-            return { type: `fullReset` };
-          n.add(o);
-          break;
-        case `generation`:
-        case `isComplete`:
-        case `islands`:
-          break;
-        default:
-          return { type: `fullReset` };
-      }
-    }
-  }
-  return n.size === 0 ? { type: `none` } : { type: `entityKeys`, entityKeys: [...n] };
-}
-function E_e(e, t) {
-  return (t.recencyAt ?? t.updatedAt) - (e.recencyAt ?? e.updatedAt);
-}
 function Uv(e, t) {
   let n = e.getStreamRole(t);
   return n?.role === `follower` ? n.ownerClientId : null;

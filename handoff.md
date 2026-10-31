@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+清理 ThreadStore 局部 helper 死副本：主 chunk 的 `T_e/Iv/E_e` 已零引用；`threads/thread-store.ts` 内部
+`historyInvalidationOf/byRecencyDesc` 由 patch notification 与 recent sorting 真实消费，本轮删除旧别名与两函数，并在 subowner suite
+锁定 consumer wiring。
+
 清理 transcript snapshot/delta 重复 owner：`threads/hydration.ts` 的 `itemSlots/transcriptSnapshot/historyStateOf/transcriptChanges`
 已由 `ThreadStore` 的 reset 与 patch 广播真实消费；主 chunk 无外部引用的 `C_e/Nv/w_e/Pv/Fv` 自包含死岛删除。focused suite
 新增稀疏槽位、itemsByKey、无变化与 full reset 行为覆盖。

@@ -1,5 +1,10 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 ThreadStore local helper cleanup
+
+主 chunk `T_e/Iv/E_e` 已无任何读取；等价的 history invalidation 与 recency comparator 位于语义 `ThreadStore`，分别由 canonical patch
+notification 和 recent conversation sorting 真实消费。本轮删除三个旧符号，focused suite 锁定旧符号消失及两个调用点。
+
 ## 2026-10-31 transcript snapshot/delta cleanup
 
 `threads/hydration.ts` 已完整承接旧 `C_e/Nv/w_e/Pv/Fv`，并由 `ThreadStore` 的 transcript reset/patch 路径真实消费；旧主 chunk 簇

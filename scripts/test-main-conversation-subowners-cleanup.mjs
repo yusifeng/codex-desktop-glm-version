@@ -164,6 +164,8 @@ const main = fs.readFileSync(
 );
 for (const generatedName of ["Bge", "Kge", "g_e", "Dve", "Rve", "ySe", "bSe"])
   equal(new RegExp(`\\b${generatedName}\\b`).test(main), false);
+for (const generatedName of ["T_e", "Iv", "E_e"])
+  equal(new RegExp(`\\b${generatedName}\\b`).test(main), false);
 for (const generatedName of ["_v", "vv", "__e", "yv", "bv", "xv", "Sv"])
   equal(main.includes(`function ${generatedName}(`), false);
 
@@ -184,5 +186,9 @@ const threadStore = fs.readFileSync(
 );
 equal(threadStore.includes('import { ThreadItemIndex } from "./timeline-index"'), true);
 equal(threadStore.includes("threadItemIndex = new ThreadItemIndex({"), true);
+equal(threadStore.includes("function historyInvalidationOf("), true);
+equal(threadStore.includes("const invalidation = historyInvalidationOf(next, patches)"), true);
+equal(threadStore.includes("function byRecencyDesc("), true);
+equal(threadStore.includes(".sort(byRecencyDesc as never)"), true);
 
 console.log(`${assertions} main conversation subowner cleanup assertions passed`);
