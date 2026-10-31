@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 BrowserSourceOwnerRegistry wiring
+
+新增 `src/main/main-app/window/browser-source-owner-registry.ts`，完整迁出旧 `rje/ije/EN/DN` 122 行簇。focused suite 锁定
+14/6/3-member class 面，并覆盖 account filtering、same-origin replacement、reveal/show、subscription 首次 publish、disposal 与
+`WindowContext` 真实 wiring。
+
 ## 2026-10-31 QueryCacheHostService owner wiring
 
 新增 `src/main/main-app/window/query-cache-host-service.ts`，用显式注入 shared host base 与 plugin cache invalidator 的 factory

@@ -154,6 +154,7 @@ const { BrowserFamilyService: MO } = require("./main-app/platform/browser-family
 const { ChronicleService: IO } = require("./main-app/chronicle/service.js");
 const { ClipboardService: VO } = require("./main-app/clipboard/service.js");
 const { createQueryCacheHostServiceClass } = require("./main-app/window/query-cache-host-service.js");
+const { BrowserSourceOwnerRegistry: rje } = require("./main-app/window/browser-source-owner-registry.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -61761,127 +61762,7 @@ function cM(e) {
 function lM(e) {
   return typeof e == `object` && !!e && `code` in e && e.code === `ENOENT`;
 }
-var nje = ComputerUseSettingsService,
-  rje = class {
-    windowManager;
-    detachedWindows;
-    owners = new Map();
-    listeners = new Set();
-    constructor(e, t) {
-      ((this.windowManager = e), (this.detachedWindows = t));
-    }
-    createService(e) {
-      return new ije(this, e);
-    }
-    registerOwner(e, t, n) {
-      let r = DN(t),
-        i = this.owners.get(r) ?? new Set(),
-        a = n.dup(),
-        o = new EN(() => {
-          i.delete(s) &&
-            (i.size === 0 && this.owners.get(r) === i && this.owners.delete(r),
-            a[Symbol.dispose](),
-            this.notifyOwners(t.accountId));
-        }),
-        s = { owner: t, origin: e, handler: a, registration: o };
-      (i.add(s), this.owners.set(r, i));
-      let c = !1;
-      for (let t of i) t !== s && t.origin === e && ((c = !0), t.registration[Symbol.dispose]());
-      return (c || this.notifyOwners(t.accountId), a.onRpcBroken(() => o[Symbol.dispose]()), o);
-    }
-    subscribeOwners(e, t, n) {
-      let r = n.dup(),
-        i = new EN(() => {
-          this.listeners.delete(a) && r[Symbol.dispose]();
-        }),
-        a = { accountId: t, origin: e, listener: r, registration: i };
-      return (
-        this.listeners.add(a),
-        r.onRpcBroken(() => i[Symbol.dispose]()),
-        this.publishOwners(a, this.getOwners(t)),
-        i
-      );
-    }
-    async reveal(e) {
-      let t = this.owners.get(DN(e));
-      if (t == null) return `owner-missing`;
-      let n = `owner-missing`;
-      for (let r of [...t]) {
-        if (!t.has(r)) continue;
-        let i = r.origin.isDestroyed() ? null : l.BrowserWindow.fromWebContents(r.origin);
-        if (i == null || i.isDestroyed()) {
-          r.registration[Symbol.dispose]();
-          continue;
-        }
-        n = `unavailable`;
-        try {
-          let n = await r.handler.reveal(e.tabId, e.sidebarPinnedContentTabId);
-          if (n === `cancelled`) return `cancelled`;
-          if (n === `revealed` && t.has(r) && !r.origin.isDestroyed() && !i.isDestroyed())
-            return this.detachedWindows.focus(r.origin, e.clientThreadId, e.tabId) ||
-              this.windowManager.showWindow(i, { stealFocus: !0 })
-              ? `revealed`
-              : `unavailable`;
-        } catch {
-          r.registration[Symbol.dispose]();
-        }
-      }
-      return t.size === 0 ? `owner-missing` : n;
-    }
-    removeOrigin(e) {
-      for (let t of this.listeners) t.origin === e && t.registration[Symbol.dispose]();
-      for (let t of this.owners.values())
-        for (let n of t) n.origin === e && n.registration[Symbol.dispose]();
-    }
-    dispose() {
-      for (let e of this.listeners) e.registration[Symbol.dispose]();
-      for (let e of this.owners.values()) for (let t of e) t.registration[Symbol.dispose]();
-    }
-    getOwners(e) {
-      return [...this.owners.values()].flatMap((t) =>
-        [...t].flatMap(({ owner: t }) => (t.accountId == null || t.accountId === e ? [t] : [])),
-      );
-    }
-    notifyOwners(e) {
-      let t = e == null ? null : this.getOwners(e);
-      for (let n of this.listeners)
-        (e == null || n.accountId === e) && this.publishOwners(n, t ?? this.getOwners(n.accountId));
-    }
-    publishOwners(e, t) {
-      e.listener(t).catch(() => e.registration[Symbol.dispose]());
-    }
-  },
-  ije = class extends n.Uf {
-    manager;
-    origin;
-    constructor(e, t) {
-      (super(),
-        (this.manager = e),
-        (this.origin = t),
-        t.once(`destroyed`, () => e.removeOrigin(t)));
-    }
-    async registerOwner(e, t) {
-      return this.manager.registerOwner(this.origin, e, t);
-    }
-    async subscribeOwners(e, t) {
-      return this.manager.subscribeOwners(this.origin, e, t);
-    }
-    reveal(e) {
-      return this.manager.reveal(e);
-    }
-  },
-  EN = class extends n.Uf {
-    remove;
-    constructor(e) {
-      (super(), (this.remove = e));
-    }
-    [Symbol.dispose]() {
-      this.remove();
-    }
-  };
-function DN(e) {
-  return JSON.stringify([e.accountId, e.hostId, e.threadId, e.clientThreadId]);
-}
+var nje = ComputerUseSettingsService;
 var kN = ConversationalOnboardingService,
   AN = {
     customRuntime: `custom-runtime`,

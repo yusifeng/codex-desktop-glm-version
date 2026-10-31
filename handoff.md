@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 BrowserSourceOwnerRegistry：新增 `window/browser-source-owner-registry.ts`，整体替代主 chunk 旧 `rje/ije/EN/DN`
+manager、per-origin RPC service、registration 与 owner-key 簇。same-origin 替换、RPC broken 清理、account subscription、reveal/focus、
+origin destroy/dispose 生命周期保持完整；`WindowContext` 继续通过 `rje` 兼容别名构造真实 registry。
+
 接回 QueryCacheHostService：新增 `window/query-cache-host-service.ts`，以显式依赖工厂替代主 chunk 旧 `BO`。原四参数
 constructor、500ms 基类配置、host cache 先失效、plugins 路径 cache 条件清理、基类广播的调用顺序保持完整；
 `WindowContext.registerIpcClientForWebContents` 继续通过 `BO` 兼容别名构造真实 consumer。
