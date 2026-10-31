@@ -1,5 +1,10 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 ClipboardService owner wiring
+
+新增 `src/main/main-app/clipboard/service.ts`，与旧 `VO` 精确保持 3 members。本轮接回 `WindowContext` 的真实 clipboard RPC
+consumer 并删除旧 class；focused suite 覆盖 macOS bookmark 完整/空值、非 macOS fallback、文本读写与真实 wiring。
+
 ## 2026-10-31 ChronicleService owner wiring
 
 `src/main/main-app/chronicle/service.ts` 与旧 `IO` 均为 25 members，并完整包含 `LO/RO` rollback aggregation。本轮接回

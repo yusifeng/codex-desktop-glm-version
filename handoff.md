@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 ClipboardService：新增 `clipboard/service.ts`，以完整 3-member owner 替代主 chunk 旧 `VO`。macOS bookmark 仅在
+title/url 均非空时返回，跨平台文本读写保持原 Electron clipboard 语义；`WindowContext` 的真实 RPC consumer 继续通过
+`VO` 兼容别名构造。
+
 接回 ChronicleService：既有 `chronicle/service.ts` 与旧 `IO` 均为完整 25-member owner，现已替代主 chunk `IO/LO/RO`
 137 行簇。enable/disable config 写入、pending/denied/error rollback、recorder state、history/app resolution 与 eligibility/controller
 guards 保持完整；`WindowContext` 真实 consumer 继续通过 `IO` 兼容别名构造。

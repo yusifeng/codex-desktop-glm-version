@@ -152,6 +152,7 @@ const { createDesktopLogArchive: URe, deleteDesktopLogArchive: TV, createFeedbac
 const { loadWindowsAccountAddon: kO, isAdministratorCapable: SO, getWindowsSystemDiagnostics: CO, supportsPersistentAcls: wO, isNetworkDrive: TO, readRegistryValue: EO, registerWindowsProcessListProvider: DO } = require("./main-app/platform/windows-account.js");
 const { BrowserFamilyService: MO } = require("./main-app/platform/browser-family.js");
 const { ChronicleService: IO } = require("./main-app/chronicle/service.js");
+const { ClipboardService: VO } = require("./main-app/clipboard/service.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -54184,19 +54185,6 @@ var zO = 500,
         e.queryKey[0] === `plugins` && Oo(this.appServerConnection),
         super.invalidateQueryCache(e)
       );
-    }
-  },
-  VO = class extends n.Uf {
-    get bookmark() {
-      if (process.platform !== `darwin`) return;
-      let e = l.clipboard.readBookmark();
-      return e.url && e.title ? e : void 0;
-    }
-    async readText() {
-      return l.clipboard.readText();
-    }
-    async writeText(e) {
-      l.clipboard.writeText(e);
     }
   },
   HO = n.wf({ connection_id: n.Of(), alias: n.Of() }),
