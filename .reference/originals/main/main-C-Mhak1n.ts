@@ -85,6 +85,7 @@ const { createLocalProjectCacheClass } = require("./main-app/projects/local-proj
 const { createProjectFolderConsentRuntime } = require("./main-app/projects/project-folder-consent.js");
 const { createThreadMembershipInference } = require("./main-app/projects/thread-membership-inference.js");
 const { createProjectsManagerClass } = require("./main-app/projects/projects-manager.js");
+const { createInteractionRpcServices } = require("./main-app/window/interaction-rpc-services.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -133207,80 +133208,10 @@ var o8e = createProjectsManagerClass({
   normalizeDesktopRootPaths: Hn,
   now: Date.now,
 }),
-  s8e = class extends n.Uf {
-    controller;
-    origin;
-    constructor(e, t) {
-      (super(), (this.controller = e), (this.origin = t));
-    }
-    addToComposer(e) {
-      return this.controller.addToComposer(e);
-    }
-    clearPrewarm() {
-      this.controller.clearPrewarm(this.origin);
-    }
-    open({ conversationId: e, contextSourceThread: t, popoverBounds: n }) {
-      return this.controller.open(this.origin, e, t, n);
-    }
-    prewarm() {
-      this.controller.prewarm(this.origin);
-    }
-    rendererReady(e) {
-      this.controller.handleRendererReady(this.origin, e);
-    }
-  },
-  c8e = class extends n.Uf {
-    controller;
-    origin;
-    realtimeVoice;
-    markEphemeral;
-    constructor(e, t, n, r) {
-      (super(),
-        (this.controller = e),
-        (this.origin = t),
-        (this.realtimeVoice = n),
-        (this.markEphemeral = r));
-    }
-    registerRealtimeStarter(e, t, n) {
-      let r = this.realtimeVoice;
-      this.controller.registerStarter(
-        this.origin.id,
-        e,
-        t,
-        n,
-        r == null
-          ? void 0
-          : () => {
-              let e = r.getSnapshot();
-              switch (e.phase) {
-                case `inactive`:
-                case `starting`:
-                  return !1;
-                case `active`:
-                  return (r.control(e.locator, { type: `stop` }), !0);
-                case `stopping`:
-                  return !0;
-              }
-            },
-      );
-    }
-    async requestRealtimeStart(e, t) {
-      if (e.source === `composer_button_existing_thread` && e.ephemeral === !0) {
-        if (this.markEphemeral == null) throw Error(`Ephemeral voice history is unavailable`);
-        this.markEphemeral(e.locator);
-      }
-      await this.controller.requestStart(this.origin, e, t);
-    }
-    cancelRealtimeSessionStart() {
-      return this.controller.cancelStart(this.origin);
-    }
-    completeRealtimeSession() {
-      this.controller.completeSession(this.origin.id);
-    }
-    unregisterRealtimeStarter() {
-      this.controller.unregisterStarter(this.origin.id);
-    }
-  },
+  {
+    QuickChatWindowService: s8e,
+    RealtimeVoiceRuntimeService: c8e,
+  } = createInteractionRpcServices({ RpcHandlerBase: n.Uf }),
   l8e = (0, ee.createRequire)(__filename);
 function u8e() {
   return l8e(

@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 window interaction RPC services
+
+原 `s8e/c8e` 已迁入 `src/main/main-app/window/interaction-rpc-services.ts`。新 adapters 保留 quick-chat
+controller/origin forwarding、realtime starter stop guard、active voice stop、ephemeral locator 标记与 start/cancel/
+complete/unregister lifecycle；service map 中的两个运行时构造点均已接回，旧 classes 已物理删除。
+
 ## 2026-10-31 projects manager owner
 
 原 `o8e`、独占 project-order merge `m2` 与 `r8e/h2/g2/i8e/_2/a8e` request schemas 已整簇迁入

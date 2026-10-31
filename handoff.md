@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `s8e/c8e` quick-chat 与 realtime per-window RPC adapters 迁入
+`window/interaction-rpc-services.ts`；quick-chat origin forwarding、realtime starter registration、active/stopping
+stop guard、ephemeral-history gate 与 session lifecycle forwarding 均保持原语义。两个真实 service-map consumer
+已接回，旧 classes 已删除。focused test 覆盖 24 项。
+
 随后将 `o8e` ProjectsManager、独占 `m2` order merge 与六个 request schemas 整体迁入
 `projects/projects-manager.ts`；local/remote CRUD、order serialization/backend propagation、appearance、storage/root
 projection、thread membership recovery delegation 与 renderer broadcasts 均由新 owner 持有。唯一 runtime
