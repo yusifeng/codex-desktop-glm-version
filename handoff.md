@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Mst` native macOS status-item owner 迁入 `tray/native-status-item-controller.ts`；addon creation、event parsing、
+indicator setting subscription、menu projection、native menu tracking、service-state filtering、async action/error handling、
+state refresh 与 destroy/readiness 均由新 owner 持有。真实 tray construction 已接回，旧 class 已删除。
+focused test 覆盖 40 项。
+
 继续清理 `windowAppearance` wiring：`A9/j9/I9/rst/ist/ast/ost/sst/L9/cst/z9` 已只保留真实模块 delegation，
 删除全部 early-return 后的 generated duplicate bodies、仅由这些死代码引用的 15 个常量，以及已无 consumer 的 `R9`。
 BrowserWindow manager 的现有调用边界保持不变。新 focused test 覆盖 21 项，既有 appearance 回归 18 项。

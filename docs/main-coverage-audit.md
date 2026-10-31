@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 native macOS status-item owner
+
+原 `Mst` 已迁入 `src/main/main-app/tray/native-status-item-controller.ts`。新 owner 保留 addon creation、event parsing、
+indicator setting subscription、menu projection、native menu tracking、service-state filtering、async action/error handling、
+state refresh 与 destroy/readiness；真实 tray construction 已接回，旧 class 已删除。
+
 ## 2026-10-31 window-appearance wiring skeleton cleanup
 
 `A9/j9/I9/rst/ist/ast/ost/sst/L9/cst/z9` 现仅保留对 `main-app/window-appearance.ts` 的真实 delegation；已删除

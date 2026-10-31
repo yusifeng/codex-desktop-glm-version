@@ -137,6 +137,7 @@ const { createGlobalDictationWindowControllerClass } = require("./main-app/dicta
 const { createRealtimeVoiceHotkeyManager } = require("./main-app/realtime/voice-hotkey-manager.js");
 const { createDebugWindowRuntime } = require("./main-app/debug/debug-window-manager.js");
 const { createThreadMetadataServiceClass } = require("./main-app/threads/thread-metadata-service.js");
+const { createNativeStatusItemControllerClass } = require("./main-app/tray/native-status-item-controller.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -151966,135 +151967,16 @@ var jst = n.vf(`type`, [
       computerHistoryState: n.df([`stopped`, `running`, `paused`]),
     }),
   ]),
-  Mst = class {
-    nativeIntl;
-    appName;
-    getMenuState;
-    getServiceProcessIdentifier;
-    onAction;
-    addon;
-    removeSettingsListener;
-    destroyed = !1;
-    state = {
-      computerHistoryAvailable: !1,
-      computerHistoryEnabled: !1,
-      computerHistoryIndicatorEnabled: n.Ia.chronicleMenuBarIndicatorEnabled.default,
-      computerUseAvailable: !1,
-      serviceProcessIdentifier: null,
-      menuState: null,
-    };
-    trayMenuThreads = {
-      runningThreads: [],
-      unreadThreads: [],
-      pinnedThreads: [],
-      recentThreads: [],
-      usageLimits: [],
-    };
-    constructor(e, t, r, i, a, o, s) {
-      if (
-        ((this.nativeIntl = t),
-        (this.appName = r),
-        (this.getMenuState = a),
-        (this.getServiceProcessIdentifier = o),
-        (this.onAction = s),
-        (this.addon = Vs({
-          electronAppPath: l.app.getAppPath(),
-          resourcesPath: process.resourcesPath,
-        })),
-        !this.addon.createStatusItem(e, (e) => {
-          let t = jst.safeParse(JSON.parse(e));
-          t.success && this.handleNativeEvent(t.data);
-        }))
-      )
-        throw Error(`Failed to create the native macOS status item`);
-      let c = () => {
-        ((this.state.computerHistoryIndicatorEnabled =
-          i.getEffective(n.Ia.chronicleMenuBarIndicatorEnabled.key) ??
-          n.Ia.chronicleMenuBarIndicatorEnabled.default),
-          this.refreshMenu());
-      };
-      ((this.removeSettingsListener = i.onDidChange(n.Ia.chronicleMenuBarIndicatorEnabled.key, c)),
-        c(),
-        this.updateMenuState());
-    }
-    destroy() {
-      ((this.destroyed = !0),
-        this.removeSettingsListener(),
-        this.addon.destroyStatusItem(),
-        l.app.endNativeMenuTracking());
-    }
-    isReady() {
-      return !this.destroyed;
-    }
-    waitForReady() {
-      return Promise.resolve(this.isReady());
-    }
-    async handleMessage(e) {
-      ((this.trayMenuThreads = e.trayMenuThreads), this.refreshMenu());
-    }
-    refreshMenu() {
-      this.destroyed ||
-        this.addon.updateStatusItemMenuState(
-          JSON.stringify(
-            projectNativeStatusItemMenuState({
-              appName: this.appName,
-              computerHistoryAvailable: this.state.computerHistoryAvailable,
-              computerHistoryEnabled: this.state.computerHistoryEnabled,
-              computerHistoryIndicatorEnabled: this.state.computerHistoryIndicatorEnabled,
-              computerUseAvailable: this.state.computerUseAvailable,
-              menuState: this.state.menuState,
-              trayMenuThreads: this.trayMenuThreads,
-              labels: {
-                pinned: this.nativeIntl.formatMessage({ messageId: Tl, defaultMessage: El }),
-                unread: this.nativeIntl.formatMessage({ messageId: jl, defaultMessage: Ml }),
-                running: this.nativeIntl.formatMessage({ messageId: Dl, defaultMessage: Ol }),
-                quit: e7(this.appName),
-              },
-            }),
-          ),
-        );
-    }
-    handleNativeEvent(e) {
-      if (e.type === `menu-update`) {
-        this.updateMenuState();
-        return;
-      }
-      if (e.type === `menu-open`) {
-        l.app.beginNativeMenuTracking();
-        return;
-      }
-      if (e.type === `menu-close`) {
-        l.app.endNativeMenuTracking();
-        return;
-      }
-      if (e.type === `service-state-changed`) {
-        if (e.processIdentifier !== this.getServiceProcessIdentifier()) return;
-        (this.addon.updateStatusItemState(
-          e.computerUseActive,
-          e.computerHistoryState === `running`,
-        ),
-          this.updateMenuState());
-        return;
-      }
-      this.onAction(e).catch((t) => {
-        r.n().warning(`Failed to handle a native menu-bar action`, {
-          safe: { action: e.type },
-          sensitive: { error: t },
-        });
-      });
-    }
-    async updateMenuState() {
-      try {
-        Object.assign(this.state, await this.getMenuState());
-      } catch (e) {
-        r.n().warning(`Failed to load the native menu-bar state`, {
-          safe: {},
-          sensitive: { error: e },
-        });
-      }
-      this.destroyed || this.refreshMenu();
-    }
-  },
+  Mst = createNativeStatusItemControllerClass({
+    app: l.app,
+    resourcesPath: process.resourcesPath,
+    createStatusItemAddon: Vs,
+    parseNativeEvent: (event) => jst.safeParse(event),
+    indicatorSetting: n.Ia.chronicleMenuBarIndicatorEnabled,
+    projectMenuState: projectNativeStatusItemMenuState,
+    getQuitLabel: e7,
+    logger: r,
+  }),
   W9 = 16,
   G9 = null,
   K9 = null,
