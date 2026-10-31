@@ -53,6 +53,8 @@ const realOwners = [
   ["src/main/main-app/app-server/transports.ts", "AppServerTransportWslStdio"],
   ["src/main/main-app/browser-use/origin-state.ts", "BrowserSettingsSync"],
   ["src/main/main-app/automations/habitat-runtime.ts", "createHabitatAutomationRuntime"],
+  ["src/main/main-app/automations/automation-update-tool.ts", "createAutomationUpdateTool"],
+  ["src/main/main-app/artifacts/template-picker-runtime.ts", "createArtifactTemplatePickerRuntime"],
   ["src/main/main-app/browser-sidebar/browser-host-service.ts", "createBrowserHostServiceClass"],
   ["src/main/main-app/window/browser-window-rpc-services.ts", "createBrowserProfileImportServiceClass"],
   ["src/main/main-app/browser-sidebar/browser-history-service.ts", "createBrowserHistoryServiceClass"],
@@ -74,7 +76,6 @@ const removedSkeletons = [
   "src/main/main-app/sidebar/saved-sections-service.ts",
   "src/main/main-app/sidebar/saved-sections-state.ts",
   "src/main/main-app/sidebar/saved-sections-transactions.ts",
-  "src/main/main-app/automations/automation-update-tool.ts",
   "src/main/main-app/automations/habitat.ts",
   "src/main/main-app/automations/index.ts",
 ];
@@ -99,6 +100,11 @@ assert.equal(inboxOwner.includes("export class InboxItemsFacade"), true, "InboxI
 assert.equal(main.includes("new InboxItemsFacade({"), true, "InboxItemsFacade must remain wired");
 assert.equal(main.includes("PBe = createElectronFetchHandlerClass({"), true, "real Electron fetch owner is wired");
 assert.equal(main.includes('require("./main-app/import/external-agent-import.js")'), true, "external-agent import runtime is wired");
+assert.equal(main.includes('require("./main-app/artifacts/template-picker-runtime.js")'), true, "artifact template picker runtime is wired");
+assert.equal(main.includes('require("./main-app/automations/automation-update-tool.js")'), true, "automation update tool is wired");
+assert.equal(main.includes("function JN("), false, "generated artifact template config owner must be removed");
+assert.equal(main.includes("async function iMe("), false, "generated artifact template loader must be removed");
+assert.equal(main.includes("async function xMe("), false, "generated automation update tool must be removed");
 assert.equal(main.includes("function _Ie("), false, "generated external-agent handlers must be removed");
 assert.equal(main.includes("function lIe("), false, "generated Cowork adapter wrapper must be removed");
 assert.equal(main.includes("async function VIe("), false, "generated imported-project finalizer must be removed");
@@ -356,4 +362,4 @@ assert.equal(main.includes("function _Oe("), false, "generated remote project co
 assert.equal(main.includes("function vOe("), false, "generated project order comparator must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("368 main unwired-owner skeleton assertions passed");
+console.log("374 main unwired-owner skeleton assertions passed");

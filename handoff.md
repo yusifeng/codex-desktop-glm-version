@@ -4952,3 +4952,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 修复 service 级 projectless path/record 回调未被 handler 默认采用的问题，并让 desktop adapter 内部装配路径转换。
   main 旧 `hP..VIe` 共约 5,200 行已物理删除；focused coverage 27 项，no-unwired gate 扩至 368 项。下一批从删除后的
   artifact-template picker / automation update composition 与后续 vendor belt之间继续审计，不拆 vendor stream runtime。
+
+# 2026-11-01 artifact-template picker and automation update tool
+
+- `artifacts/template-picker-runtime.ts` 现是 picker MCP config 与 skill payload limits 的唯一实现；Electron fetch handler 使用
+  `loadArtifactTemplatePickerConfig`，旧 `JN/iMe/YN` 已删除。
+- `automations/automation-update-tool.ts` 现承接 automation_update 的输入投影、安全门、mutation 与错误映射；main 仅保留
+  协议 schema 并将其注入 executor，旧 `yMe..SMe` 与死 `KN` 已删除。focused coverage 27 项，no-unwired gate 扩至
+  374 项。下一批越过紧随其后的 stream vendor belt，继续审计下一个完整第一方 owner。

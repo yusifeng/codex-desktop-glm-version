@@ -49,7 +49,7 @@ export function createElectronFetchHandlerClass(dependencies) {
     fze,
     h,
     iH,
-    iMe,
+    loadArtifactTemplatePickerConfig,
     ize,
     jH,
     kwe,
@@ -1510,7 +1510,7 @@ export function createElectronFetchHandlerClass(dependencies) {
               repoRoot: this.repoRoot,
               shouldUseWslPaths: n,
             }),
-            iMe({
+            loadArtifactTemplatePickerConfig({
               appServerConnection: t,
               cwd: e,
               desktopFeatureAvailability: r,

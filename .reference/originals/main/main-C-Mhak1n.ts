@@ -282,6 +282,7 @@ const { applySparseStateWrite, createFetchHandlerStateRuntime } = require("./mai
 const { createWorkspaceDirectoryBrowser } = require("./main-app/workspace/directory-browser.js");
 const { createThirdPartyNoticesReader, createWorkspaceSettingsServiceClass, resolveSystemBackdropSupport } = require("./main-app/settings/workspace-settings-service.js");
 const { createAutomationsServiceClass } = require("./main-app/automations/automations-service.js");
+const { createAutomationUpdateTool, normalizeAutomationToolInputMode, validateHeartbeatTarget } = require("./main-app/automations/automation-update-tool.js");
 const { createHabitatAutomationsServiceClass } = require("./main-app/automations/habitat-automations-service.js");
 const { createHabitatAutomationRuntime } = require("./main-app/automations/habitat-runtime.js");
 const { createPinnedThreadsServiceClass } = require("./main-app/sidebar/pinned-threads-service.js");
@@ -353,6 +354,7 @@ const { createExtensionRecentUseRegistryFactory } = require("./main-app/browser-
 const { createChatGptProjectFilesServiceClass } = require("./main-app/projects/chatgpt-project-files.js");
 const { createEnvironmentConfigServiceClass } = require("./main-app/environment-config/service.js");
 const { createCodexMicroServiceManagerClass } = require("./main-app/device/codex-micro-service-manager.js");
+const { createArtifactTemplatePickerRuntime } = require("./main-app/artifacts/template-picker-runtime.js");
 const {
   createExternalAgentImportAdapter,
   createExternalAgentImportHandlers,
@@ -30420,9 +30422,6 @@ var Eje = AvatarManager;
 var zje = DebugService,
   Wje = createDemoTools;
 var GN = PrewarmSlot;
-function KN(e) {
-  e != null && !e.isDestroyed() && e.close();
-}
 var Gje = 2e3,
   Kje = 3e4,
   qje = DetachedWindowPrewarmer,
@@ -30433,71 +30432,14 @@ var Gje = 2e3,
   Zje = 6e4,
   Qje = DeviceCheckCookieManager,
   $je = 1024,
-  eMe = CallIdClaimRegistry,
-  tMe = 100,
-  nMe = 24e3,
-  rMe = 600;
-function JN({ artifactTemplateSkills: e, isPackaged: t, resourcesPath: r, shouldUseWslPaths: i }) {
-  if (i) return null;
-  let a = t ? r : o.t({ env: process.env, resourcesPath: r });
-  if (a == null) return null;
-  let s = n.Ln(a),
-    c = h.default.join(a, `artifact-template-picker`, `server.mjs`);
-  if (s == null || !(0, v.existsSync)(c)) return null;
-  let l = { command: s, args: [c], env: {} };
-  if (e != null) {
-    let t = e
-        .filter(
-          (e) => e.enabled && /^(?:[^:]+:)?artifact-template-[a-z0-9][a-z0-9._-]*$/u.test(e.name),
-        )
-        .sort((e, t) => YN(e.name) - YN(t.name)),
-      n = [],
-      r = new Set(),
-      i = new Set(),
-      a = 2;
-    for (let e of t) {
-      let t = process.platform === `win32` ? e.path.toLowerCase() : e.path;
-      if (r.has(e.name) || i.has(t) || n.length === tMe) continue;
-      let o = {
-          skillName: e.name,
-          skillPath: e.path,
-          description: Array.from(
-            e.description.trim() ||
-              e.interface?.shortDescription?.trim() ||
-              e.interface?.displayName?.trim() ||
-              e.name,
-          )
-            .slice(0, rMe)
-            .join(``),
-        },
-        s = Buffer.byteLength(JSON.stringify(o), `utf8`) + +(n.length > 0);
-      a + s > nMe || (n.push(o), r.add(e.name), i.add(t), (a += s));
-    }
-    n.length > 0 && (l.env.CODEX_ARTIFACT_TEMPLATE_SKILLS = JSON.stringify(n));
-  }
-  return { "mcp_servers.openai_artifact_template_picker": l };
-}
-async function iMe({
-  appServerConnection: e,
-  cwd: t,
-  desktopFeatureAvailability: n,
-  isPackaged: r,
-  resourcesPath: i,
-  shouldUseWslPaths: a,
-}) {
-  if (!n.artifactTemplatePicker) return null;
-  let o = { isPackaged: r, resourcesPath: i, shouldUseWslPaths: a },
-    s = JN(o);
-  if (s == null) return null;
-  let c = await e
-    .listSkills(t == null ? {} : { cwds: [t] })
-    .then((e) => e.data.flatMap((e) => e.skills))
-    .catch(() => null);
-  return c == null ? s : JN({ ...o, artifactTemplateSkills: c });
-}
-function YN(e) {
-  return e.includes(`:`) ? (e.startsWith(`openai-templates:`) ? 2 : 1) : 0;
-}
+  eMe = CallIdClaimRegistry;
+var loadArtifactTemplatePickerConfig = createArtifactTemplatePickerRuntime({
+  existsSync: v.existsSync,
+  join: h.default.join,
+  platform: process.platform,
+  resolveDevResourcesPath: (resourcesPath) => o.t({ env: process.env, resourcesPath }),
+  resolveNodeExecutable: n.Ln,
+});
 var aMe = n
     .df([`ACTIVE`, `PAUSED`])
     .describe(`One of ACTIVE or PAUSED. Default to ACTIVE unless the user asks to start paused.`),
@@ -30586,9 +30528,9 @@ var aMe = n
     rrule: ZN,
   }),
   dMe = eP.extend({ mode: iP, ...oP }),
-  sP = tP.extend({ mode: iP, rrule: ZN }).superRefine(fP),
+  sP = tP.extend({ mode: iP, rrule: ZN }).superRefine(validateHeartbeatTarget),
   fMe = eP.extend({ mode: aP, id: QN, ...oP }),
-  pMe = tP.extend({ mode: aP, id: QN }).superRefine(fP),
+  pMe = tP.extend({ mode: aP, id: QN }).superRefine(validateHeartbeatTarget),
   mMe = n
     .vf(`kind`, [uMe, sP])
     .refine(({ mode: e, rrule: t }) => e !== `create` || !/(^|[;\n])\s*DTSTART\b/i.test(t), {
@@ -30607,228 +30549,15 @@ var aMe = n
     ),
   gMe = n.vf(`kind`, [dMe, sP]),
   _Me = n.vf(`mode`, [nP, gMe, cP, rP]),
-  lP = hMe.transform(dP);
-_Me.transform(dP);
+  lP = hMe.transform(normalizeAutomationToolInputMode);
+_Me.transform(normalizeAutomationToolInputMode);
 var vMe = `automation_update`;
 n.yf().parse(n.Rf(lP, { io: `input`, reused: `ref` }));
-function yMe(e, t) {
-  return e.kind === `heartbeat`
-    ? {
-        kind: `heartbeat`,
-        name: e.name ?? ``,
-        prompt: e.prompt ?? ``,
-        status: e.status,
-        targetThreadId: e.targetThreadId ?? t,
-        model: null,
-        reasoningEffort: null,
-        ...(e.notificationPolicy == null ? {} : { notificationPolicy: e.notificationPolicy }),
-        rrule: e.rrule ?? ``,
-      }
-    : {
-        kind: `cron`,
-        name: e.name ?? ``,
-        prompt: e.prompt ?? ``,
-        status: e.status,
-        projectId: e.projectId ?? null,
-        executionEnvironment: `local`,
-        localEnvironmentConfigPath: null,
-        model: e.model ?? null,
-        reasoningEffort: e.reasoningEffort ?? null,
-        ...(e.notificationPolicy == null ? {} : { notificationPolicy: e.notificationPolicy }),
-        rrule: e.rrule ?? ``,
-      };
-}
-function bMe(e, t) {
-  return e.kind === `heartbeat`
-    ? {
-        id: e.id ?? ``,
-        kind: `heartbeat`,
-        name: e.name ?? ``,
-        prompt: e.prompt ?? ``,
-        status: e.status ?? `ACTIVE`,
-        targetThreadId: e.targetThreadId ?? t,
-        model: null,
-        reasoningEffort: null,
-        ...(e.notificationPolicy === void 0 ? {} : { notificationPolicy: e.notificationPolicy }),
-        rrule: e.rrule ?? ``,
-      }
-    : {
-        id: e.id ?? ``,
-        kind: `cron`,
-        name: e.name ?? ``,
-        prompt: e.prompt ?? ``,
-        status: e.status ?? `ACTIVE`,
-        projectId: e.projectId ?? null,
-        executionEnvironment: e.executionEnvironment ?? `local`,
-        localEnvironmentConfigPath: e.localEnvironmentConfigPath,
-        model: e.model ?? null,
-        reasoningEffort: e.reasoningEffort ?? null,
-        ...(e.notificationPolicy === void 0 ? {} : { notificationPolicy: e.notificationPolicy }),
-        rrule: e.rrule ?? ``,
-      };
-}
-function uP(e) {
-  return {
-    contentItems: [
-      {
-        type: `inputText`,
-        text:
-          e == null
-            ? `Rendered automation card in the app.`
-            : e.mode === `create`
-              ? `Created automation in the app.`
-              : e.mode === `update`
-                ? `Updated automation in the app.`
-                : e.deleteStatus === `not_found`
-                  ? `Automation already does not exist in the app.`
-                  : `Deleted automation in the app.`,
-      },
-      ...(e == null ? [] : [{ type: `inputText`, text: JSON.stringify(e) }]),
-    ],
-    success: !0,
-  };
-}
-function dP(e) {
-  let t;
-  switch (e.mode) {
-    case `suggested_create`:
-      t = `suggested-create`;
-      break;
-    case `suggested_update`:
-      t = `suggested-update`;
-      break;
-    case `view`:
-    case `create`:
-    case `update`:
-    case `delete`:
-      t = e.mode;
-  }
-  return { ...e, mode: t };
-}
-function fP(e, t) {
-  e.targetThreadId == null &&
-    e.destination !== `thread` &&
-    t.addIssue({
-      code: `custom`,
-      message: `Missing targetThreadId or destination=thread`,
-      path: [`targetThreadId`],
-    });
-}
-async function xMe(e, { threadId: t, argumentsValue: n }, r) {
-  let i = lP.safeParse(n);
-  if (!i.success)
-    return pP(
-      `${vMe} received invalid arguments: ${i.error.issues.map((e) => `${e.path.join(`.`) || `arguments`}: ${e.message}`).join(`; `)}.`,
-    );
-  let a = i.data;
-  if (
-    a.kind === `cron` &&
-    a.mode === `update` &&
-    a.executionEnvironment === `worktree` &&
-    (a.localEnvironmentConfigPath === void 0 || a.localEnvironmentConfigPath != null)
-  )
-    return pP(
-      `For safety, the model cannot immediately update a worktree automation that may run a local environment setup script. Use suggested_update so the user can review it, or set localEnvironmentConfigPath to null.`,
-    );
-  if (a.mode === `create`) {
-    let n = yMe(a, t);
-    try {
-      let { item: t } = await e.create(n);
-      return {
-        response: uP({ automationId: t.id, mode: `create`, status: t.status }),
-        mutation: { mode: `create`, input: n, item: t },
-      };
-    } catch (e) {
-      return {
-        ...pP(mP(e, a.mode, r)),
-        mutation: { mode: `create`, input: n, item: null, failureReason: `host_error` },
-      };
-    }
-  }
-  if (a.mode === `update`) {
-    let n = bMe(a, t);
-    try {
-      let { item: t } = await e.update(n);
-      return {
-        response: uP({ automationId: t.id, mode: `update`, status: t.status }),
-        mutation: { mode: `update`, input: n, item: t },
-      };
-    } catch (e) {
-      return {
-        ...pP(mP(e, a.mode, r)),
-        mutation: {
-          mode: `update`,
-          input: n,
-          item: null,
-          failureReason:
-            e instanceof Error &&
-            e.message ===
-              `Automation does not exist in the app and could not be updated. It may have been deleted manually by the user.`
-              ? `missing_automation`
-              : `host_error`,
-        },
-      };
-    }
-  }
-  if (a.mode === `delete`) {
-    let t = a.id ?? ``;
-    try {
-      let { item: n, status: r, success: i } = await e.delete({ id: t });
-      return {
-        response: i
-          ? uP({
-              automationId: t,
-              mode: `delete`,
-              deleteStatus: r === `not_found` ? `not_found` : `deleted`,
-              snapshot: n == null ? null : { kind: n.kind, name: n.name, rrule: n.rrule },
-            })
-          : pP(SMe(r)).response,
-        mutation: { mode: `delete`, id: t, item: n, status: r },
-      };
-    } catch (e) {
-      return {
-        ...pP(mP(e, a.mode, r)),
-        mutation: { mode: `delete`, id: t, item: null, status: `host_error` },
-      };
-    }
-  }
-  return { response: uP() };
-}
-function pP(e) {
-  return { response: { contentItems: [{ type: `inputText`, text: e }], success: !1 } };
-}
-function mP(e, t, n) {
-  return (
-    n(e) ??
-    (e instanceof Error &&
-    (e.message ===
-      `Automation does not exist in the app and could not be updated. It may have been deleted manually by the user.` ||
-      e.message ===
-        `Automation schedule has no future runs. Check that its start time, interval, and BYHOUR/BYMINUTE/BYSECOND values can reach a future occurrence.`)
-      ? e.message
-      : `Failed to ${t} automation.`)
-  );
-}
-function SMe(e) {
-  switch (e) {
-    case `invalid_id`:
-      return `Automation id was invalid.`;
-    case `store_unavailable`:
-      return `Automation storage is unavailable.`;
-    case `state_cleanup_failed`:
-      return `Automation scheduling state could not be updated.`;
-    case `remove_failed`:
-      return `Automation still exists after the app tried to delete it.`;
-    case `deleted`:
-    case `not_found`:
-      return `Automation was not deleted.`;
-  }
-}
 var CMe = createAutomationsServiceClass({
   DisposableBase: n.Uf,
   assertWorktreeTargetRequirements: hs,
   createLocalAutomation: n.yr,
-  executeUpdateTool: xMe,
+  executeUpdateTool: createAutomationUpdateTool({ inputSchema: lP, toolName: vMe }),
   getLocalAutomation: n.xr,
   missingAutomationMessage: n.md,
   removeAutomationRegistryEntry: n.ei,
@@ -37034,7 +36763,7 @@ var GH = !!process.env.WSL_DISTRO_NAME,
     fze,
     h,
     iH,
-    iMe,
+    loadArtifactTemplatePickerConfig,
     ize,
     jH,
     kwe: readRealtimeSessionLogForFeedback,

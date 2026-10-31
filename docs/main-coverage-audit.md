@@ -2989,3 +2989,12 @@ lazy load、ownership/lock、input gestures、lifecycle transitions、dispose-be
 转换，不再要求 consumer 伪造内部依赖。原始 chunk 中 `hP..VIe` 共约 5,200 行重复实现已整带删除，后续 stream vendor belt
 保持原边界。focused test 27 项覆盖跨平台目录推导、Cursor projectless 完成通知、回调/收尾注入和真实接线；no-unwired gate
 扩至 368 项。
+
+### 增量抽取：artifact-template picker 与 automation update tool
+
+`artifacts/template-picker-runtime.ts` 已接管 picker server/node 定位、feature/WSL gate、skills 查询降级、模板 skill 名称过滤、
+source/path 去重、来源优先级排序，以及 100 项/24 KiB/600 code-point 环境载荷上限；Electron fetch handler 直接调用语义 loader。
+`automations/automation-update-tool.ts` 已接管 heartbeat target 校验、suggested mode 投影、create/update/delete 输入与 mutation、
+worktree setup-script 安全门、成功卡片和 host/delete 错误映射；Zod 协议 schema 仍留在 main 组合根并注入 executor。
+旧 `JN/iMe/YN` 与 `yMe..SMe` 已物理删除，死 helper `KN` 同步移除。focused test 27 项覆盖跨平台 picker、过滤/降级、
+automation mutation/错误/安全门与真实接线；no-unwired gate 扩至 374 项。
