@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Z5/drt/frt/prt/Q5/$5` native tray-menu owner 迁入 `tray/tray-menu-controller.ts`；Linux persistent menu、
+Windows cached menu、macOS click suppression、ready/destroy、thread sections/overflow、usage limits、platform actions 与
+quit routing 均由新 owner 持有。IPC message guard 和真实 tray construction 已接回，旧 class/helpers 已删除。
+focused test 覆盖 48 项。
+
 继续审计发现既有 `misc/dock-menu.ts` 从未接入主 chunk；现已将真实 startup consumer 改接 `DockMenuManager`，
 删除旧 `Ll/ase/ose/sse/Rl/zl` 副本，并覆盖 unread/completed 去重、recent 排除、overflow submenu、Unicode 标题截断、
 projectless/empty sublabel、click routing 与 darwin Dock menu 发布。focused test 覆盖 20 项。

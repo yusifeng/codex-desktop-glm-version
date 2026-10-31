@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 native tray-menu owner
+
+原 `Z5/drt/frt/prt/Q5/$5` 已迁入 `src/main/main-app/tray/tray-menu-controller.ts`。新 owner 保留 Linux persistent menu、
+Windows cached menu、macOS mouse/click/right-click suppression、ready/destroy、running/unread/pinned/recent sections、
+overflow submenu、usage limits、new chat/feedback/open/quit actions 与 Unicode title truncation；IPC guard 和真实 tray
+construction 均已接回，旧 cluster 已删除。
+
 ## 2026-10-31 dock-menu wiring repair
 
 既有 `src/main/main-app/misc/dock-menu.ts` 虽已包含完整可读实现，主 chunk 却仍实例化旧 `ose`。现已将真实 startup

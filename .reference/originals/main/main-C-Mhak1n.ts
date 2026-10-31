@@ -129,6 +129,7 @@ const { createThreadReadStateOwnerClass } = require("./main-app/thread-read-stat
 const { createThreadProjectMembershipOwnerClass } = require("./main-app/projects/thread-project-membership-owner.js");
 const { createCronTurnReadStatePreparer } = require("./main-app/automations/cron-turn-read-state.js");
 const { DockMenuManager } = require("./main-app/misc/dock-menu.js");
+const { createTrayMenuControllerClass, isTrayMenuThreadsChangedMessage } = require("./main-app/tray/tray-menu-controller.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -142688,263 +142689,12 @@ var urt = class {
     #a(e) {
       this.#i || ((this.#i = e), (this.#n &&= (this.#n(e), (this.#t = void 0), void 0)));
     }
-  },
-  Z5 = 3,
-  drt = 35;
-function frt(e) {
-  return e.type === `tray-menu-threads-changed`;
-}
-var prt = class {
-  tray;
-  onOpenMainWindow;
-  onTrayMenuOpenNewThread;
-  onTrayMenuOpenRecentThread;
-  onTrayMenuSendFeedback;
-  nativeIntl;
-  appName;
-  cachedWindowsTrayMenu = null;
-  nativeTrayClickSuppressionReason = null;
-  clearNativeTrayClickSuppressionTimeout = null;
-  isNativeTrayMenuOpen = !1;
-  systemQuitMenuItemLabel;
-  trayMenuThreads = {
-    runningThreads: [],
-    unreadThreads: [],
-    pinnedThreads: [],
-    recentThreads: [],
-    usageLimits: [],
   };
-  constructor(e, t, n, r, i, a, o) {
-    if (
-      ((this.tray = e),
-      (this.onOpenMainWindow = t),
-      (this.onTrayMenuOpenNewThread = n),
-      (this.onTrayMenuOpenRecentThread = r),
-      (this.onTrayMenuSendFeedback = i),
-      (this.nativeIntl = a),
-      (this.appName = o),
-      (this.systemQuitMenuItemLabel = e7(this.appName)),
-      this.refreshCachedWindowsTrayMenu(),
-      process.platform === `linux`)
-    ) {
-      (this.tray.on(`click`, () => {
-        this.onOpenMainWindow();
-      }),
-        this.updatePersistentTrayMenu());
-      return;
-    }
-    if (process.platform === `darwin`) {
-      (this.tray.on(`mouse-down`, () => {
-        if ((this.clearPendingNativeTrayClickSuppression(), this.isNativeTrayMenuOpen)) {
-          this.nativeTrayClickSuppressionReason = `close`;
-          return;
-        }
-        ((this.nativeTrayClickSuppressionReason = `open`), this.openNativeTrayMenu());
-      }),
-        this.tray.on(`click`, () => {
-          this.consumeIgnoredNativeTrayClick() || this.openNativeTrayMenu();
-        }),
-        this.tray.on(`right-click`, () => {
-          this.consumeIgnoredNativeTrayClick() || this.openNativeTrayMenu();
-        }));
-      return;
-    }
-    (this.tray.on(`click`, () => {
-      this.onOpenMainWindow();
-    }),
-      this.tray.on(`right-click`, () => {
-        this.openNativeTrayMenu();
-      }));
-  }
-  destroy() {
-    this.tray.destroy();
-  }
-  isReady() {
-    return this.tray.isReady();
-  }
-  async waitForReady() {
-    try {
-      return (await this.tray.whenReady(), !0);
-    } catch {
-      return !1;
-    }
-  }
-  async handleMessage(e) {
-    if (e.type === `tray-menu-threads-changed`) {
-      ((this.trayMenuThreads = e.trayMenuThreads), this.refreshMenu());
-      return;
-    }
-  }
-  refreshMenu() {
-    (this.refreshCachedWindowsTrayMenu(), this.updatePersistentTrayMenu());
-  }
-  consumeIgnoredNativeTrayClick() {
-    return (
-      this.nativeTrayClickSuppressionReason != null && (this.clearNativeTrayClickSuppression(), !0)
-    );
-  }
-  openNativeTrayMenu() {
-    let e = this.cachedWindowsTrayMenu ?? l.Menu.buildFromTemplate(this.getNativeTrayMenuItems());
-    (e.once(`menu-will-show`, () => {
-      this.isNativeTrayMenuOpen = !0;
-    }),
-      e.once(`menu-will-close`, () => {
-        ((this.isNativeTrayMenuOpen = !1), this.handleNativeTrayMenuClosed());
-      }),
-      this.tray.popUpContextMenu(e));
-  }
-  refreshCachedWindowsTrayMenu() {
-    if (process.platform !== `win32`) {
-      this.cachedWindowsTrayMenu = null;
-      return;
-    }
-    this.cachedWindowsTrayMenu = l.Menu.buildFromTemplate(this.getNativeTrayMenuItems());
-  }
-  updatePersistentTrayMenu() {
-    process.platform === `linux` &&
-      this.tray.setContextMenu(l.Menu.buildFromTemplate(this.getNativeTrayMenuItems()));
-  }
-  handleNativeTrayMenuClosed() {
-    if (this.nativeTrayClickSuppressionReason !== `close`) {
-      this.clearNativeTrayClickSuppression();
-      return;
-    }
-    (this.clearPendingNativeTrayClickSuppression(),
-      (this.clearNativeTrayClickSuppressionTimeout = setTimeout(() => {
-        this.nativeTrayClickSuppressionReason === `close` && this.clearNativeTrayClickSuppression();
-      }, 0)),
-      this.clearNativeTrayClickSuppressionTimeout.unref?.());
-  }
-  clearPendingNativeTrayClickSuppression() {
-    this.clearNativeTrayClickSuppressionTimeout != null &&
-      (clearTimeout(this.clearNativeTrayClickSuppressionTimeout),
-      (this.clearNativeTrayClickSuppressionTimeout = null));
-  }
-  clearNativeTrayClickSuppression() {
-    (this.clearPendingNativeTrayClickSuppression(), (this.nativeTrayClickSuppressionReason = null));
-  }
-  getNativeTrayMenuItems() {
-    let {
-        pinnedThreads: e,
-        recentThreads: t,
-        runningThreads: n,
-        unreadThreads: r,
-        usageLimits: i,
-      } = this.trayMenuThreads,
-      a = this.nativeIntl.formatMessage({ messageId: Fl, defaultMessage: Il }),
-      o = this.nativeIntl.formatMessage({ messageId: Nl, defaultMessage: Pl }),
-      s = [
-        Q5({
-          label: this.nativeIntl.formatMessage({ messageId: Dl, defaultMessage: Ol }),
-          moreLabel: o,
-          threads: n,
-          projectlessLabel: a,
-          onOpenThread: this.onTrayMenuOpenRecentThread,
-        }),
-        Q5({
-          label: this.nativeIntl.formatMessage({ messageId: jl, defaultMessage: Ml }),
-          moreLabel: o,
-          threads: r,
-          projectlessLabel: a,
-          onOpenThread: this.onTrayMenuOpenRecentThread,
-        }),
-        Q5({
-          label: this.nativeIntl.formatMessage({ messageId: Tl, defaultMessage: El }),
-          moreLabel: o,
-          threads: e,
-          projectlessLabel: a,
-          onOpenThread: this.onTrayMenuOpenRecentThread,
-        }),
-        Q5({
-          label: this.nativeIntl.formatMessage({ messageId: kl, defaultMessage: Al }),
-          moreLabel: o,
-          threads: t,
-          projectlessLabel: a,
-          onOpenThread: this.onTrayMenuOpenRecentThread,
-        }),
-        process.platform !== `darwin` || i.length === 0
-          ? []
-          : [
-              {
-                label: this.nativeIntl.formatMessage({ messageId: rse, defaultMessage: ise }),
-                enabled: !1,
-              },
-              ...i.map(({ label: e }) => ({ label: e, enabled: !1 })),
-            ],
-      ]
-        .filter((e) => e.length > 0)
-        .flatMap((e, t) => (t === 0 ? e : [{ type: `separator` }, ...e]));
-    return [
-      ...s,
-      ...(s.length > 0 ? [{ type: `separator` }] : []),
-      {
-        label: this.nativeIntl.formatMessage({ messageId: tse, defaultMessage: nse }),
-        click: () => {
-          this.onTrayMenuOpenNewThread();
-        },
-      },
-      ...(process.platform === `win32`
-        ? [
-            {
-              label: `Send Feedback`,
-              click: () => {
-                this.onTrayMenuSendFeedback();
-              },
-            },
-          ]
-        : []),
-      { type: `separator` },
-      ...(process.platform === `win32`
-        ? []
-        : [
-            {
-              label: this.nativeIntl.formatMessage({
-                messageId: $oe,
-                defaultMessage: ese,
-                values: { appName: this.appName },
-              }),
-              click: () => {
-                this.onOpenMainWindow();
-              },
-            },
-            { type: `separator` },
-          ]),
-      {
-        label: this.systemQuitMenuItemLabel,
-        click: () => {
-          l.app.quit();
-        },
-      },
-    ];
-  }
-};
-function Q5({ label: e, moreLabel: t, threads: n, projectlessLabel: r, onOpenThread: i }) {
-  if (n.length === 0) return [];
-  let a = n.slice(0, Z5),
-    o = n.slice(Z5);
-  return [
-    { label: e, enabled: !1 },
-    ...a.map((e) => $5({ thread: e, projectlessLabel: r, onOpenThread: i })),
-    ...(o.length > 0
-      ? [
-          {
-            label: t,
-            submenu: o.map((e) => $5({ thread: e, projectlessLabel: r, onOpenThread: i })),
-          },
-        ]
-      : []),
-  ];
-}
-function $5({ thread: e, projectlessLabel: t, onOpenThread: n }) {
-  let r = Array.from(e.title);
-  return {
-    label: r.length <= drt ? e.title : `${r.slice(0, 34).join(``).trimEnd()}…`,
-    sublabel: e.isProjectless ? t : e.projectLabel,
-    click: () => {
-      n(e.path);
-    },
-  };
-}
+var TrayMenuController = createTrayMenuControllerClass({
+  Menu: l.Menu,
+  app: l.app,
+  platform: process.platform,
+});
 function e7(e) {
   let t = l.Menu.buildFromTemplate([{ role: `quit` }]);
   return (Array.isArray(t) ? t : t.items)[0]?.label ?? `Quit ${e}`;
@@ -143229,7 +142979,7 @@ function Rrt(e) {
       c.relaunch === !0 ? (e.quitState?.allowQuitTemporarily(), a7(N)) : l.app.quit();
       return;
     }
-    if (frt(c)) {
+    if (isTrayMenuThreadsChangedMessage(c)) {
       ((I = c.trayMenuThreads),
         await Promise.all([A()?.handleMessage(c), k?.()?.handleMessage(c)]));
       return;
@@ -153256,7 +153006,7 @@ async function Pst(e) {
           }
         }
         r.setToolTip(l.app.getName());
-        let i = new prt(
+        let i = new TrayMenuController(
           r,
           e.onOpenMainWindow,
           e.onTrayMenuOpenNewThread,
