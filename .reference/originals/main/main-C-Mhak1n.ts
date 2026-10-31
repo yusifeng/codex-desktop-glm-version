@@ -121,6 +121,7 @@ const { createTriggerSubscriptionReaderClass } = require("./main-app/triggers/tr
 const { createUserVerificationRpcServices } = require("./main-app/user-verification/rpc-services.js");
 const { createDownloadsViewPublisherClass } = require("./main-app/downloads/downloads-view-publisher.js");
 const { createAppServerTransportPolicy } = require("./main-app/app-server/transport-policy.js");
+const { createGithubRequestClientFactory } = require("./main-app/github/github-request-client.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -140859,30 +140860,7 @@ var Xnt = class extends n.Uf {
     this.windowManager.setHistorySwipeNavigationState(this.origin, e);
   }
 };
-function Znt(e, t) {
-  return new n.E(async (n, r, i, a) => {
-    let o = t(),
-      s =
-        `repos` in r
-          ? r.repos.map((e) => e.hostId)
-          : [`account` in r ? r.account.hostId : r.hostId],
-      c = new Map([[o.id, o]]);
-    for (let e of s) {
-      let n = t(e);
-      c.set(n.id, n);
-    }
-    return e({
-      method: `github-request`,
-      params: {
-        request: { method: n, params: r },
-        hostConfig: o,
-        hostConfigs: [...c.values()],
-        operationSource: i,
-      },
-      signal: a,
-    });
-  });
-}
+var Znt = createGithubRequestClientFactory({ RequestClient: n.E });
 var G5 = r.r(`WindowContext`),
   Qnt = new z6e(),
   $nt = 100,

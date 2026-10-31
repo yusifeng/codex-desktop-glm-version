@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Znt` host-aware GitHub request client factory 迁入 `github/github-request-client.ts`；repos/account/single-host
+host discovery、default/remote config dedupe、operation-source/signal forwarding 与 main request envelope 均由新 adapter
+持有。唯一 runtime consumer 已接回，旧 helper 已删除。focused test 覆盖 18 项。
+
 随后将 `U5/W5/Ynt` app-server transport policy 迁入 `app-server/transport-policy.ts`；force-CLI override、cloud/
 remote websocket URL selection、loopback proxy bypass、cloud internal-domain allowlist 与 remote SOCKS routing 均由
 新 policy 持有。五个真实 consumers 已接回，旧 helpers/constant 已删除。focused test 覆盖 23 项。

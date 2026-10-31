@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 host-aware GitHub request client
+
+原 `Znt` 已迁入 `src/main/main-app/github/github-request-client.ts`。新 adapter 保留 repos/account/single-host
+参数的 host-id discovery、default host inclusion、config-id dedupe/order、operation source 与 AbortSignal forwarding，
+以及 `github-request` main envelope；唯一 runtime consumer 已接回，旧 helper 已删除。
+
 ## 2026-10-31 app-server transport policy
 
 原 `U5/W5/Ynt` 已迁入 `src/main/main-app/app-server/transport-policy.ts`。新 policy 保留
