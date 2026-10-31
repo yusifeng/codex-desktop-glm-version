@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 AppServerConversationManager 顶层 owner：`conversation/app-server-manager.ts` 现已替代主 chunk 的 `rw`。thread store、
+stream roles、queued follow-ups、turn start/resume/archive/auth/settings/read-state 与 20+ 子 owner 的 composition/disposal 均由
+299-member 语义类持有；真实 host assembly、inbox listener 和 disposal consumers 已接回，旧 2,004 行 class 已删除。
+
 接回 ThreadStore 核心 owner：`threads/thread-store.ts` 现已替代主 chunk 的 `T_e`，覆盖 conversation/thread maps、canonical/
 legacy history、field subscriptions、recent summaries、hydration、title/read/archive state 与 subagent evidence。接线前补回缺失的
 `registerThreadMetadata` owner 方法，并修复两处绕过 `recordThreadAvailability` 的语义偏差；132-member API 已与原类对齐。

@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 AppServerConversationManager owner
+
+既有 `src/main/main-app/conversation/app-server-manager.ts` 已接回真实 host assembly、inbox listener 与 disposal consumers，
+替代原 `rw`。新 owner 持有 ThreadStore、stream roles、queued follow-ups、turn start/resume/archive/auth/settings/read-state 与
+20+ 子 owner 的 composition/disposal；299 个 class members 数量对齐，旧私有 `e/t` 已语义化，内部 ChatGPT auth API 使用
+一致的 `ChatGPT` 拼写，主 chunk 旧 2,004 行 class 已删除。
+
 ## 2026-10-31 ThreadStore owner
 
 既有 `src/main/main-app/threads/thread-store.ts` 已接回真实 conversation manager consumer，替代原 `T_e`。新 owner 保留
