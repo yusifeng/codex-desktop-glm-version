@@ -17,7 +17,7 @@
     "endLine": 80590,
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/ensure-conversation-ready.ts",
-    "evidence": "Conversation lookup, missing-thread hydration recursion, and older-history loading are preserved as a typed readiness policy; no UI initialization side effects are copied."
+    "evidence": "Conversation lookup, missing-thread hydration recursion, resumed-state gating, empty-history completion, and older-history loading are preserved as a typed readiness policy and are directly consumed by open-local-conversation-background-agent; the consumer no longer imports app-primary Ur."
   },
   {
     "hub": "app-primary",

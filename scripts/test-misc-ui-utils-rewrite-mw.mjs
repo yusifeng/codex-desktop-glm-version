@@ -307,7 +307,7 @@ export function t() { globalThis.__mwVerifyInit = (globalThis.__mwVerifyInit ?? 
 `,
   ],
   [
-    "@rchunk/chunk-Y2CYZVJY",
+    "@rchunk/chunk-Y2CYZVJY-24cce454fd91",
     `
 export function r() { globalThis.__mwNamingInit = (globalThis.__mwNamingInit ?? 0) + 1; }
 export function n(value, name) { (globalThis.__mwNamedFunctions ??= []).push([value, name]); }

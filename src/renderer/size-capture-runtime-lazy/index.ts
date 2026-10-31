@@ -1,6 +1,6 @@
 // Mermaid node-size capture hook. Release chunk: sizeCapture-X5ZJPWSS-e07f13f62d02.js.
 import "@rchunk/rolldown-runtime";
-import * as namingRuntimeChunk from "@rchunk/chunk-Y2CYZVJY";
+import * as namingRuntimeChunk from "@rchunk/chunk-Y2CYZVJY-24cce454fd91";
 
 interface CaptureNode {
   id: string;

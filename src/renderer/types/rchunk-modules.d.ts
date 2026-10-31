@@ -3760,6 +3760,7 @@ declare module "@rchunk/app-initial" {
       ids: string[],
       options?: { includeTurns?: boolean },
     ): Promise<void>;
+    loadOlderConversationHistoryPage(conversationId: string): Promise<void>;
     sendRequest(method: string, parameters: unknown): Promise<unknown>;
   };
   export const Vgn: () => {
@@ -11300,11 +11301,6 @@ declare module "@rchunk/app-shared" {
 
 declare module "@rchunk/app-primary" {
   export const Bl: (props: Record<string, unknown>) => unknown;
-  export const Ur: (
-    scope: unknown,
-    conversationId: string,
-    hostId: string,
-  ) => boolean | Promise<boolean>;
   export const Vl: () => void;
   export const Wr: () => void;
   export const mn: () => void;
@@ -11312,6 +11308,10 @@ declare module "@rchunk/app-primary" {
 }
 
 declare module "@rchunk/app-initial" {
+  /** Returns whether a conversation can be opened without loading older history. */
+  export const Lin: (conversation: unknown) => boolean;
+  /** Projects the message items currently available for a conversation. */
+  export const Pin: (conversation: unknown) => unknown[];
   export const $b: unknown;
   export const $4t: () => void;
   export const Ag: unknown;
@@ -15665,6 +15665,7 @@ declare module "@rchunk/numerical-integration" { export const n: (source: string
 declare module "@rchunk/code-execution-sandbox-connection" { export const n: () => void; export const t: (input: Record<string, unknown> & { host: unknown; signal?: AbortSignal }) => unknown; }
 declare module "@rchunk/mermaid-function-name-runtime" { export const n: <T extends Function>(value: T, name: string) => T; export const t: (target: object, members: Record<string, PropertyKey>) => void; }
 declare module "@rchunk/chunk-Y2CYZVJY" { export const n: (value: (...arguments_: never[]) => unknown, name: string) => void; export const r: () => void; }
+declare module "@rchunk/chunk-Y2CYZVJY-24cce454fd91" { export const n: (value: (...arguments_: never[]) => unknown, name: string) => void; export const r: () => void; }
 declare module "@rchunk/parental-controls-invitation-background" { export const n: string; export const t: () => void; }
 declare module "@rchunk/codex-app-home-beacon-announcement" { export const r: () => void; export const t: () => void; }
 declare module "@rchunk/classify" { export const a: () => void; }

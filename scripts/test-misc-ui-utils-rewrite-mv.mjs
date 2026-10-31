@@ -201,7 +201,6 @@ for (const [_asset, directory] of modules) {
 const sandbox = loaded.get("native-code-execution-sandbox");
 assert.deepEqual(globalThis.__mvInitializers, [
   "sandbox-connection",
-  "sandbox-urls",
   "app-sandbox",
 ]);
 const closed = [];
@@ -230,7 +229,7 @@ assert.equal(
   null,
 );
 assert.deepEqual(webviewAttributes, [
-  ["partition", "partition:code-execution-hash-https://sandbox.test"],
+  ["partition", "codex-mcp-app-sandbox:code-execution-hash-https://sandbox.test"],
 ]);
 assert.equal(
   bootstrapInput.sourceUrl,

@@ -8,9 +8,12 @@ import {
   Ag as backgroundAgentRouteKind,
   Gvt as openSidePanelTab,
   HZt as initializeSidePanelRoutes,
+  Lin as hasCompleteConversationHistory,
   Mg as initializeBackgroundAgentModel,
   Og as initializeBackgroundAgentTabs,
+  Pin as getConversationMessages,
   RQt as activeConversationIdsByHost,
+  Ugn as getConversationHydrator,
   Wvt as initializeSidePanel,
   jg as getBackgroundAgentTabId,
   kg as createBackgroundAgentPanelDefinition,
@@ -19,10 +22,10 @@ import {
 } from "@rchunk/app-initial";
 import {
   Bl as ThreadAvatar,
-  Ur as ensureConversationAvailable,
-  Vl as initializeConversationAvailability,
-  Wr as initializeThreadAvatar,
+  Vl as initializeThreadAvatar,
+  Wr as initializeConversationSurface,
 } from "@rchunk/app-primary";
+import { ensureConversationReady } from "../app-primary/runtime/ensure-conversation-ready";
 import { r as initializeOpenTarget } from "@rchunk/open-target";
 
 export interface BackgroundAgent {
@@ -33,6 +36,14 @@ export interface BackgroundAgent {
 
 export interface BackgroundAgentScope {
   get(signal: unknown, parameter?: unknown): unknown;
+}
+
+interface ConversationState {
+  resumeState?: string;
+}
+
+interface ConversationStore {
+  getConversation(conversationId: string): ConversationState | null | undefined;
 }
 
 export interface OpenBackgroundAgentOptions {
@@ -65,10 +76,21 @@ async function openLocalConversationBackgroundAgent(
     | undefined;
   hostService?.activateThreadSummary(backgroundAgent.conversationId, { addToRecent: false });
 
-  const available = ensureConversationAvailable(
-    scope,
+  const available = ensureConversationReady(
+    {
+      getConversationStore: (requestedHostId) =>
+        scope.get(hostServiceById, requestedHostId) as ConversationStore | null | undefined,
+      getHydrationService: (requestedHostId) =>
+        getConversationHydrator(scope, requestedHostId),
+    },
     backgroundAgent.conversationId,
     hostId,
+    {
+      isResumed: (conversation) => conversation.resumeState === "resumed",
+      hasSufficientHistory: (conversation) =>
+        getConversationMessages(conversation).length > 0 ||
+        hasCompleteConversationHistory(conversation),
+    },
   );
   if (available !== true && !(await available)) return null;
 
@@ -137,7 +159,7 @@ function initializeOpenLocalConversationBackgroundAgent(): void {
   initializeSidePanelRoutes();
   initializeSidePanel();
   initializeBackgroundAgentTabs();
-  initializeConversationAvailability();
+  initializeConversationSurface();
   initializeBackgroundAgentModel();
   initializeThreadAvatar();
   getJsxRuntime();

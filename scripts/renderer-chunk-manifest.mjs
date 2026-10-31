@@ -2810,6 +2810,7 @@ export const CHUNKS = {
 // @rchunk/<语义别名> → 发布文件名的构建解析，不把这些依赖误计为已重写、
 // preserved 或 incremental hub；其文件仍由原版 transform-only 轨道产出。
 export const IMPORT_ALIASES = {
+  proxy: CHUNKS["motion-proxy-runtime"],
   "learning-block-path": "learning-block-path-74045b6d1532.js",
   "math-block-coordinate-plane": "math-block-coordinate-plane-5112206272ca.js",
   nice: "nice-2b3cc20611af.js",
@@ -2836,6 +2837,7 @@ export const IMPORT_ALIASES = {
   equation: "equation-44cf0b1d4b75.js",
   "mermaid-function-name-runtime": "chunk-Y2CYZVJY-ec17b93e265e.js",
   "chunk-Y2CYZVJY": "chunk-Y2CYZVJY-ec17b93e265e.js",
+  "chunk-Y2CYZVJY-24cce454fd91": "chunk-Y2CYZVJY-24cce454fd91.js",
   "adaptive-slider-field": "adaptive-slider-field-6d316e0b7a10.js",
   "tokenize-math-block": "tokenize-math-block-92dba400da42.js",
   "null-throws": "null-throws-c7a886463bcb.js",

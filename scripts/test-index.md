@@ -355,7 +355,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-annotation-request-context.mjs`](./test-preload-annotation-request-context.mjs)
 - [`test-preload-annotation-visibility.mjs`](./test-preload-annotation-visibility.mjs)
 - [`test-preload-annotation-selector-token.mjs`](./test-preload-annotation-selector-token.mjs)
-- [`test-renderer-conversation-ready.mjs`](./test-renderer-conversation-ready.mjs)
+- [`test-renderer-conversation-ready.mjs`](./test-renderer-conversation-ready.mjs)（14 项策略与真实 consumer 接回断言）
 - [`test-renderer-browser-url.mjs`](./test-renderer-browser-url.mjs)
 
 - [`test-app-shared-command-visibility-predicates.mjs`](./test-app-shared-command-visibility-predicates.mjs)
@@ -1017,6 +1017,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-misc-ui-utils-rewrite-my.mjs`](./test-misc-ui-utils-rewrite-my.mjs)
 - [`test-misc-ui-utils-rewrite-mz.mjs`](./test-misc-ui-utils-rewrite-mz.mjs)
 - [`test-misc-ui-utils-rewrite-na.mjs`](./test-misc-ui-utils-rewrite-na.mjs)
+  - Covers the published motion-proxy import alias used by `sort-bar-visualization`, plus source/export/runtime parity for the mixed UI utility cluster.
 - [`test-misc-ui-utils-rewrite-nb.mjs`](./test-misc-ui-utils-rewrite-nb.mjs)
 - [`test-misc-ui-utils-rewrite-nc.mjs`](./test-misc-ui-utils-rewrite-nc.mjs)
 - [`test-misc-ui-utils-rewrite-nd.mjs`](./test-misc-ui-utils-rewrite-nd.mjs)

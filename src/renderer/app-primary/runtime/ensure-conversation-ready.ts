@@ -21,7 +21,7 @@ export interface ConversationHydrationService {
 
 export interface ConversationReadiness<Conversation> {
   isResumed(conversation: Conversation): boolean;
-  hasMessages(conversation: Conversation): boolean;
+  hasSufficientHistory(conversation: Conversation): boolean;
 }
 
 export function ensureConversationReady<Conversation>(
@@ -44,7 +44,7 @@ export function ensureConversationReady<Conversation>(
       });
   }
 
-  if (!readiness.isResumed(conversation) || !readiness.hasMessages(conversation)) {
+  if (!readiness.isResumed(conversation) || !readiness.hasSufficientHistory(conversation)) {
     return scope
       .getHydrationService(hostId)
       .loadOlderConversationHistoryPage(conversationId)

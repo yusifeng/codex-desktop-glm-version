@@ -1,5 +1,12 @@
 # Renderer 尾部资产审计
 
+2026-10-31 A5 consumer 接回与依赖边复核：`app-primary` 的 `w2/Ur` readiness policy 已由
+`open-local-conversation-background-agent` 真实消费语义 helper，并使用 resumed、message projection 与
+completed-history 三项原始判定。全量 renderer 构建同时发现并修复 `sort-bar-visualization` 缺失的
+motion proxy alias，以及 WebMCP/native-sandbox 的 hub side-effect 边；lazy size-capture 使用独立的
+`chunk-Y2CYZVJY-24cce454fd91.js`，不再误解析到 modern 同名 runtime。最终 1874/1874 构建、
+1874/1874 等价性验证（0 failures）通过。
+
 2026-10-15 A5 右侧文件预览终局复核：真实 route 为 `connected-file-preview-tab -> LibraryCloudFilePreview -> LibraryFilePreviewBody`。新增 `preview-render-model.ts`、`binary-preview-url.ts` 与 `provider-preview-policy.ts`，将发布 chunk `Gn/Kn/qn/ar` 中仍未物理迁出的显示分支接回：image 使用实际 URL 渲染，PDF bytes 生成并回收 object URL，HTML 使用 sandboxed `srcDoc` iframe，Markdown 接入 `MarkdownSurface`，JSON 使用 `LibraryJsonPreview`，text 使用可聚焦文本面，artifact 继续交给已有 `ArtifactTabContent`，Google Workspace provider-owned 预览使用 no-referrer sandbox iframe。loading/error/unsupported/40 MiB/missing-size/download 状态、AbortController、generation guard 与 stale completion suppression 均有真实 consumer。focused renderer 22、state 24、loader 15、artifact flow 86 项通过。至此右侧文件的“显示预览”专属 owner 可核验清零；原 chunk 剩余边界属于通用 composer/attachment materialization、favorite/breadcrumb 和共享 header 基础设施，不再是文件内容 renderer。
 
 2026-10-14 A5 文件预览内容批次：`library-cloud-file-preview` 已接入真实内容加载器。
@@ -91,12 +98,14 @@ source symbol、行号窗口和现存资产路径，避免把未拥有的邮件 
 通过独立 bundle 对 fallback、preferred 组合做行为断言，避免把初始化副作用
 误当作可迁移策略。
 
-本轮进一步将 `app-primary` 未消费导出 `w2`（公开别名 `Ur`，约 80576 行）的
+本轮进一步将 `app-primary` 导出 `w2`（公开别名 `Ur`，约 80576 行）的
 conversation readiness 三态策略迁移至
 `src/renderer/app-primary/runtime/ensure-conversation-ready.ts`：缺失会 hydrate
-后递归确认，未 resumed 或无 messages 会加载更早历史，其余情况直接完成。该模块
-保留 Promise/`true` 返回契约，不接管 UI 初始化副作用；
-`scripts/test-renderer-conversation-ready.mjs` 覆盖 10 项状态与回调断言。
+后递归确认，未 resumed 或既无 messages 又未完成 history 会加载更早历史，其余情况直接完成。该模块
+保留 Promise/`true` 返回契约，不接管 UI 初始化副作用。2026-10-31 复核发现语义模块此前尚未接回真实
+consumer；现已由 `open-local-conversation-background-agent` 直接调用，并通过 `vZt/Ugn/Pin/Lin` 注入原
+conversation store、hydrator、message projection 与 completed-history 判定，删除该入口对 `Ur` 的依赖。
+`scripts/test-renderer-conversation-ready.mjs` 覆盖 14 项策略与真实接回断言。
 
 本轮对一个具体未消费导出做了实现级判定：`app-shared` 的 `qhe`（公开别名
 `U$`，原始定义行约 91,xxx）与其懒初始化器 `Jhe`（公开别名 `W$`）是

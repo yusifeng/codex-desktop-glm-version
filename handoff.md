@@ -1,5 +1,17 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+同批 renderer 全量构建还修复了 4 个发布依赖边：为 `sort-bar-visualization` 登记既有
+motion proxy 资产别名；为 WebMCP model 与 native sandbox 保留原 hub side-effect 边；并将 lazy
+size-capture 精确绑定到其原始 `chunk-Y2CYZVJY-24cce454fd91.js`，避免误用同名 modern runtime。
+`build-renderer` 与 `verify-renderer` 均恢复为 1874/1874，等价性验证 0 failures。
+
+本轮修复 renderer 语义模块未真实接回的问题：`app-primary` 的 `w2/Ur` conversation readiness
+此前虽已迁入 `ensure-conversation-ready.ts`，但唯一真实 consumer
+`open-local-conversation-background-agent` 仍调用混淆 hub 导出。现 consumer 已直接使用语义 helper，
+通过 app-initial 的 conversation store、hydrator、message projection 与 completed-history predicate
+保持原 resumed/history 分支，并移除 `Ur` import/declaration。focused suite 扩至 14 项，覆盖空但已完成
+history 的直接成功路径与真实接回证据。
+
 本轮清理 preload/sandbox-preload 迁移后遗留的 CommonJS 兼容分支：
 `sandbox-guest-policy`、view-message router、connect-app-host、system-theme、PIP decoder/frame subscription
 与 worker-message subscription 共 7 个模块已确认只有 ESM import consumer，删除无消费的条件式

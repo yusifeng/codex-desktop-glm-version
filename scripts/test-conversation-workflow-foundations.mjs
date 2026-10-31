@@ -71,7 +71,7 @@ for (const directory of MODULES) {
     "utf8",
   );
   for (const match of source.matchAll(
-    /import\s*{([\s\S]*?)}\s*from\s*"@rchunk\/([^"]+)";/g,
+    /import\s*{([^;]*?)}\s*from\s*"@rchunk\/([^"]+)";/g,
   )) {
     const names = importedNamesByModule.get(match[2]) ?? new Set();
     for (const specifier of match[1].split(",")) {
@@ -146,14 +146,17 @@ const overrides = {
     Eg: `(conversationId, terminalId) => conversationId + ":" + terminalId`,
     GEt: `() => ({ data: [] })`,
     Gvt: `(scope, definition, options) => ({ scope, definition, options })`,
+    Lin: `conversation => conversation?.historyComplete === true`,
     J9t: `value => String(value).split(".").at(-1)?.toLowerCase()`,
     L9t: `mime => mime === "application/pdf" ? "pdf" : null`,
     PQt: `{ id: "parent-conversation" }`,
+    Pin: `conversation => conversation?.messages ?? []`,
     Pnn: `path => Array.isArray(path) ? path.at(-1) : null`,
     ROt: `async () => ({ conversationId: "client-1", serverConversationId: "server-1" })`,
     RQt: `{ __value: [] }`,
     Tg: `"background-terminal"`,
     Thn: `source => source ?? null`,
+    Ugn: `() => ({ hydrateBackgroundThreads: async () => {}, loadOlderConversationHistoryPage: async () => {} })`,
     Vst: `"EditablePlanPanel"`,
     X4: `{ id: "queued-items" }`,
     X4t: `value => String(value).includes("drive") ? value : null`,
@@ -289,7 +292,7 @@ assert.equal(terminalTab.options.title, "npm test");
 assert.equal(terminalTab.options.durableRoute.kind, "background-terminal");
 
 const webMcp = await bundle("local-conversation-webmcp-tools-model");
-const calls = webMcp.n([{ items: [{ type: "mcpToolCall", status: "completed", server: "web", result: { _meta: [{ name: "search", id: 1 }, { name: "search", id: 2 }] } }] }]);
+const calls = webMcp.n([{ items: [{ type: "mcpToolCall", status: "completed", server: "node_repl", result: { _meta: [{ name: "search", id: 1 }, { name: "search", id: 2 }] } }] }]);
 assert.equal(calls.length, 2);
 assert.equal(calls[0].id, 2);
 assert.equal(webMcp.r(calls)[0].calls.length, 2);
@@ -306,8 +309,9 @@ assert.equal(threadBridge.t(), null);
 assert.equal(typeof threadBridge.n, "function");
 
 const backgroundAgent = await bundle("open-local-conversation-background-agent");
-let backgroundAgentGetCount = 0;
-state.scope.get = () => (backgroundAgentGetCount++ === 0 ? null : false);
+state.scope.get = () => {
+  return { activateThreadSummary: () => {}, getConversation: () => null };
+};
 assert.equal(await backgroundAgent.r(state.scope, { backgroundAgent: { canInteract: true, conversationId: "child", displayName: "Worker" }, hostId: "local" }), null);
 assert.equal(typeof backgroundAgent.n, "function");
 
