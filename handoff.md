@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成最大剩余 `ert` WindowContext owner 迁移：完整约 2,000 行 composition/state owner 已迁入真实
+`window/window-context.ts` dependency-injected factory；app-server/host registries、projects/workspaces、fetch/message handler、
+browser/realtime/artifact/automation/runtime services 与 lifecycle disposables 均由新 class 持有。真实 startup consumer 仍以
+`new ert({...})` 接回，主 chunk 旧 class body 删除；focused gate 实际跑过完整同步 constructor composition。
+
 完成主 `PBe` owner 迁移：完整 1,600+ 行 Electron fetch handler（129 handlers、constructor-owned services、settings/global
 state/config helpers、VS Code dispatch/tracing/error projection）已迁入真实
 `fetch-handler/electron-fetch-handler.ts` dependency-injected factory，真实 `ert` consumer 仍以 `new PBe(...)` 接回；主 chunk

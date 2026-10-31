@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 WindowContext owner
+
+原 `ert` 完整约 2,000 行 owner 已迁入 `src/main/main-app/window/window-context.ts`。新 dependency-injected factory 持有
+app-server/host registries、projects/workspaces、fetch/message handler、browser/realtime/artifact/automation/runtime services 与
+lifecycle disposables；真实 startup consumer 仍通过 `new ert({...})` 接回，主 chunk 旧 class body 已删除。focused suite 用
+universal boundary doubles 实际执行完整同步 composition constructor，并锁定 60+ 个 owned fields 非占位实现。
+
 ## 2026-10-31 Electron fetch handler owner
 
 原 `PBe` 完整 1,600+ 行 owner 已迁入 `src/main/main-app/fetch-handler/electron-fetch-handler.ts`。新 dependency-injected
