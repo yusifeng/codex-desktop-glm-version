@@ -79,6 +79,7 @@ const { createWorktreeServiceClass } = require("./main-app/workspace/worktree-se
 const { createDictationHistoryRuntime } = require("./main-app/dictation/history.js");
 const { createGlobalPasteRuntime } = require("./main-app/dictation/global-paste-runtime.js");
 const { createGlobalDictationLifecycleManagerClass, isGlobalDictationMessage, isGlobalDictationPlatformSupported } = require("./main-app/dictation/global-dictation-lifecycle-manager.js");
+const { createScreenshotTargetResolver } = require("./main-app/fetch-handler/screenshot-target.js");
 const { createWorkspaceFileServiceClass } = require("./main-app/workspace/files.js");
 const { createAuthorizedThreadCatalogServiceClass } = require("./main-app/thread-catalog/authorized-service.js");
 const { createPluginIncentivesClientRuntime } = require("./main-app/plugins/incentives-client.js");
@@ -96949,7 +96950,7 @@ var GH = !!process.env.WSL_DISTRO_NAME,
         signal: o,
       }) => {
         if (process.platform !== `darwin` && process.platform !== `win32`) return null;
-        let s = FBe({
+        let s = computeScreenshotTarget({
           backgroundColor: e.backgroundColor,
           cornerRadius: e.cornerRadius,
           presentationStyle: t,
@@ -97439,44 +97440,10 @@ var GH = !!process.env.WSL_DISTRO_NAME,
       }
     }
   };
-function FBe({
-  backgroundColor: e,
-  cornerRadius: t,
-  presentationStyle: n,
-  primaryTextColor: r,
-  viewportFrame: i,
-  webContents: a,
-}) {
-  if (!LBe(i) || !IBe(t)) return;
-  let o = l.BrowserWindow.fromWebContents(a);
-  if (o == null || o.isDestroyed()) return;
-  let s = a.getZoomFactor(),
-    c = o.getContentBounds(),
-    u = { x: c.x + i.x * s, y: c.y + i.y * s, width: i.width * s, height: i.height * s },
-    d = l.screen.getDisplayMatching(u);
-  return {
-    codexDisplay: {
-      bounds: ZH(d.bounds),
-      id: d.id,
-      scaleFactor: d.scaleFactor,
-      workArea: ZH(d.workArea),
-    },
-    destinationBackgroundColor: e,
-    destinationCornerRadius: t * s,
-    destinationFrame: u,
-    destinationPrimaryTextColor: r,
-    presentationStyle: n,
-  };
-}
-function IBe(e) {
-  return e >= 0;
-}
-function LBe(e) {
-  return e.width > 0 && e.height > 0;
-}
-function ZH(e) {
-  return { height: e.height, width: e.width, x: e.x, y: e.y };
-}
+var computeScreenshotTarget = createScreenshotTargetResolver({
+  fromWebContents: (webContents) => l.BrowserWindow.fromWebContents(webContents),
+  getDisplayMatching: (frame) => l.screen.getDisplayMatching(frame),
+});
 async function RBe({ sourcePath: e, targetPath: t, hostConfig: n }) {
   await QH({ command: `put`, operation: `upload`, sourcePath: e, targetPath: t, hostConfig: n });
 }

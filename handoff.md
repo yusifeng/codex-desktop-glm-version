@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修正 screenshot-target 的假迁移：模块改为 Electron-free dependency-injected resolver，真实 `PBe` screenshot consumer
+已接回；viewport/zoom/content-bounds/display projection、invalid/destroyed guards 与 rectangle normalization 均由新模块持有，
+旧 `FBe/IBe/LBe/ZH` 删除。
+
 global-dictation cluster 收尾：消息类型白名单与 darwin/win32 support policy 已并入 lifecycle 模块，主 chunk 的
 `cat/W7/G7/fat` 删除；macOS accessibility prompt 仍以副作用依赖注入，未让新 owner 反向导入 Electron。
 

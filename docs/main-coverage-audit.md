@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 screenshot-target wiring correction
+
+既有 `screenshot-target.ts` 未接回且直接导入 Electron；本轮改为 dependency-injected resolver，并将真实 `PBe`
+screenshot consumer 接回。新模块持有 viewport/zoom/content-bounds/display projection、invalid/destroyed guards 和 rectangle
+normalization；旧 `FBe/IBe/LBe/ZH` 已删除。
+
 ## 2026-10-31 global-dictation policy cleanup
 
 消息白名单与 platform support policy 已并入 `global-dictation-lifecycle-manager.ts`，旧 `cat/W7/G7/fat` 删除；
