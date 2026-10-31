@@ -4716,3 +4716,13 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - main 旧 declarations/helpers 删除 144 行，新生产模块 213 行；focused coverage 38 项，no-unwired gate
   扩至 159 项。32-target 静态 registry 的 descriptors 和专用 adapters 至此已全部迁出；下一批重新审计
   registry 周边遗留组合根与 main 后续大型第一方 owner，不把 open-target 的完成错误外推为 main 完成。
+
+# 2026-11-01 primary runtime installer owner
+
+- `src/main/main-app/misc/primary-runtime-installer.ts` 已接管 active-install registry、全局 operation queue、
+  identical-request single-flight、取消、bundle/post-install 错误归因、progress/telemetry、Windows framework、
+  plugin/skill sync、payload validation、restore、feature pagination、dependency tool 与 diagnostics；既有 update
+  poller 和 `PrimaryRuntimeHost` 真实消费同一 factory outputs。
+- main 旧状态/helpers 删除 767 行，新生产模块 748 行；focused coverage 72 项，no-unwired gate 扩至 190 项。
+  下一批从 installer 后续重新审计仍内联的 marketplace listing/class 或 project/realtime 周边组合根，跳过已经
+  真实迁出的 host/poller/project owners。

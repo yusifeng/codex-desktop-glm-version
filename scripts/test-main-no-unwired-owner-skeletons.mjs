@@ -27,6 +27,7 @@ const realOwners = [
   ["src/main/main-app/open-target/vscode-family-targets.ts", "createVscodeFamilyTargetRuntime"],
   ["src/main/main-app/open-target/standalone-editor-targets.ts", "createStandaloneEditorTargetRuntime"],
   ["src/main/main-app/open-target/native-shell-targets.ts", "createNativeShellTargetRuntime"],
+  ["src/main/main-app/misc/primary-runtime-installer.ts", "createPrimaryRuntimeInstaller"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -159,6 +160,35 @@ assert.equal(main.includes("function c3e("), false, "generated GitHub Desktop de
 assert.equal(main.includes("async function I3e("), false, "generated macOS default launcher must be removed");
 assert.equal(main.includes("async function L3e("), false, "generated Linux default launcher must be removed");
 assert.equal(main.includes("async function d0("), false, "generated Electron shell launcher must be removed");
+assert.equal(main.includes("createPrimaryRuntimeInstaller({"), true, "real primary runtime installer owner is wired");
+assert.equal(main.includes("async function D6e("), false, "generated dependency tool owner must be removed");
+assert.equal(main.includes("function U0("), false, "generated dependency tool failure builder must be removed");
+assert.equal(main.includes("function Y0("), false, "generated runtime cancellation owner must be removed");
+assert.equal(main.includes("function X0("), false, "generated runtime feature projection must be removed");
+assert.equal(main.includes("async function Z0("), false, "generated runtime feature reader must be removed");
+assert.equal(main.includes("async function Q0("), false, "generated runtime install call owner must be removed");
+assert.equal(main.includes("function $0("), false, "generated runtime outcome logger must be removed");
+assert.equal(main.includes("function e2("), false, "generated runtime skill reload helper must be removed");
+assert.equal(main.includes("async function t2("), false, "generated runtime plugin sync must be removed");
+assert.equal(main.includes("async function k6e("), false, "generated safe marketplace copy must be removed");
+assert.equal(main.includes("async function n2("), false, "generated bundled skill sync must be removed");
+assert.equal(main.includes("async function A6e("), false, "generated legacy skill migration must be removed");
+assert.equal(main.includes("function j6e("), false, "generated removed-skill path resolver must be removed");
+assert.equal(main.includes("function M6e("), false, "generated skill containment predicate must be removed");
+assert.equal(main.includes("function r2("), false, "generated filesystem error predicate must be removed");
+assert.equal(main.includes("function i2("), false, "generated runtime abort classifier must be removed");
+assert.equal(main.includes("function a2("), false, "generated runtime failure reporter must be removed");
+assert.equal(main.includes("function N6e("), false, "generated runtime restore owner must be removed");
+assert.equal(main.includes("function o2("), false, "generated Windows release selector must be removed");
+assert.equal(main.includes("function s2("), false, "generated Windows framework predicate must be removed");
+assert.equal(main.includes("function P6e("), false, "generated runtime single-flight owner must be removed");
+assert.equal(main.includes("async function F6e("), false, "generated dependency reader must be removed");
+assert.equal(main.includes("async function c2("), false, "generated runtime diagnostics owner must be removed");
+assert.equal(main.includes("function l2("), false, "generated runtime selection logger must be removed");
+assert.equal(main.includes("async function I6e("), false, "generated runtime repair owner must be removed");
+assert.equal(main.includes("function u2("), false, "generated local-host assertion must be removed");
+assert.equal(main.includes("q0 = new Map()"), false, "generated active-install registry must be removed");
+assert.equal(main.includes("J0 = Promise.resolve()"), false, "generated runtime operation queue must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("159 main unwired-owner skeleton assertions passed");
+console.log("190 main unwired-owner skeleton assertions passed");

@@ -2711,3 +2711,15 @@ Desktop PATH/LOCALAPPDATA/install fallback、macOS LaunchServices 和 Linux desk
 `directoryForTarget`，没有恢复第二份 directory policy。旧 `t3e/i0/n3e/a3e/o3e/c3e/I3e/L3e/d0` helpers 与
 内联 declarations 已物理删除。focused test `scripts/test-main-native-shell-targets-owner.mjs` 覆盖 38 项
 path traversal、file reveal、host translation、Windows fallback 与 native launch/error 行为。
+
+### 增量抽取：primary runtime installer owner
+
+primary runtime 的 active-install Map、跨 install/restore 串行 barrier、相同请求 single-flight、取消、bundle 与
+post-install 两阶段错误归因、progress/telemetry、Windows framework selection/activation、plugin marketplace 安全
+复制与 reconcile、bundled/legacy skill 同步、payload validation、feature pagination、dependency tool/diagnostics 与
+startup restore 已整体迁移至 `src/main/main-app/misc/primary-runtime-installer.ts`。main 通过
+`createPrimaryRuntimeInstaller` 将同一组 owner outputs 注入既有 update poller 与 `PrimaryRuntimeHost`，没有复制
+Map 或 queue。旧 `D6e/U0/Y0/X0/Z0/Q0/$0/e2/t2/k6e/n2/A6e/j6e/M6e/r2/i2/a2/N6e/o2/s2/P6e/F6e/
+c2/l2/I6e/u2` helpers 及 `q0/J0` 状态已物理删除。focused test
+`scripts/test-main-primary-runtime-installer-owner.mjs` 覆盖 72 项 tool、feature、path safety、plugin/skill sync、
+single-flight、cancel、failure stage、framework activation、restore 和 diagnostics 行为。
