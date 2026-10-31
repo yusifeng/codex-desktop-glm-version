@@ -29188,53 +29188,7 @@ function zve(e, t) {
   if (!(i == null || t.some((e) => e.turnId != null && e.turnId !== i.turnId)))
     return { type: `entityKeys`, entityKeys: [r] };
 }
-var Sy = `pending-manual-context-compaction`,
-  Bve = class {
-    threadStore;
-    addPendingContextCompactionSyntheticItem;
-    pendingCounts = new Map();
-    constructor(e, t) {
-      ((this.threadStore = e), (this.addPendingContextCompactionSyntheticItem = t));
-    }
-    register(e) {
-      (this.pendingCounts.set(e, (this.pendingCounts.get(e) ?? 0) + 1),
-        this.addPendingContextCompactionSyntheticItem(e, {
-          type: `contextCompaction`,
-          id: Sy,
-          completed: !1,
-          source: `manual`,
-        }));
-    }
-    remove(e) {
-      this.decrementPendingCount(e) && this.removePendingItem(e);
-    }
-    consumeSource(e) {
-      return this.pendingCounts.has(e) ? (this.decrementPendingCount(e), `manual`) : `automatic`;
-    }
-    clearConversation(e) {
-      this.pendingCounts.delete(e);
-    }
-    decrementPendingCount(e) {
-      let t = this.pendingCounts.get(e);
-      return t == null
-        ? !1
-        : t <= 1
-          ? (this.pendingCounts.delete(e), !0)
-          : (this.pendingCounts.set(e, t - 1), !1);
-    }
-    removePendingItemFromTurn(e) {
-      e.items = e.items.filter((e) => e.id !== Sy);
-    }
-    removePendingItem(e) {
-      this.threadStore.updateConversationState(e, (e) => {
-        let t = __(e, (e) => e.items.some((e) => e.id === Sy));
-        t &&
-          (this.removePendingItemFromTurn(t),
-          t.turnId == null && t.status === `inProgress` && t.items.length === 0 && x_(e, t));
-      });
-    }
-  },
-  Vve = n.wf({ role: n.Of(), text: n.Of() }),
+var Vve = n.wf({ role: n.Of(), text: n.Of() }),
   Hve = n.wf({
     type: n.bf(`handoff_request`),
     handoff_id: n.Of(),

@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 manual context compaction owner repair
+
+`src/main/main-app/threads/context-compaction.ts` 原先只遍历 legacy `conversation.turns`，会漏掉 canonical history，且不会删除清空后的
+本地 in-progress 占位 turn。本轮改为复用 `findDraftTurn/removeTurn`，恢复旧 `Bve` 的双历史路径与最后 draft 清理语义；真实 AppServer
+manager consumer 保持接回，主 chunk 无引用的 `Sy/Bve` 簇删除，focused suite 覆盖计数、source 消费、canonical 定位和空 turn 移除。
+
 ## 2026-10-31 thread history policy owner repair
 
 `src/main/main-app/threads/history-policy.ts` 的旧 `Cve` 占位实现已替换为 `AUTOMATION_DETECTOR`、`mergeTurnLists`、

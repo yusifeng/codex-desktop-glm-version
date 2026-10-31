@@ -1,14 +1,14 @@
+import {
+  findDraftTurn,
+  removeTurn,
+  type ConversationLike,
+} from "../turns/canonical-history";
+
 const PENDING_ID = "pending-manual-context-compaction";
 interface Store {
   updateConversationState(
     id: string,
-    update: (conversation: {
-      turns?: Array<{
-        turnId?: string | null;
-        status?: string;
-        items: Array<{ id?: string }>;
-      }>;
-    }) => void,
+    update: (conversation: any) => void,
   ): void;
 }
 export class ManualContextCompactionTracker {
@@ -53,8 +53,14 @@ export class ManualContextCompactionTracker {
   }
   private removePendingItem(id: string): void {
     this.threadStore.updateConversationState(id, (conversation) => {
-      for (const turn of conversation.turns ?? [])
-        turn.items = turn.items.filter((item) => item.id !== PENDING_ID);
+      const state = conversation as ConversationLike;
+      const turn = findDraftTurn(state, (candidate) =>
+        candidate.items.some((item) => item.id === PENDING_ID),
+      );
+      if (turn == null) return;
+      turn.items = turn.items.filter((item) => item.id !== PENDING_ID);
+      if (turn.turnId == null && turn.status === "inProgress" && turn.items.length === 0)
+        removeTurn(state, turn);
     });
   }
 }

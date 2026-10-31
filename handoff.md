@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修复并收敛 manual context compaction owner：`threads/context-compaction.ts` 现复用 canonical-history 的 `findDraftTurn/removeTurn`，
+恢复 canonical/legacy 双路径、只处理最后一个匹配 draft，以及空的本地 in-progress turn 清理；真实 AppServer manager consumer 保持接回，
+主 chunk 旧 `Sy/Bve` 47 行重复 owner 删除。
+
 修复并收敛 thread history policy：`threads/history-policy.ts` 的 `Cve` 原为占位 merge/map 实现，本轮改为组合真实
 `AUTOMATION_DETECTOR`、`mergeTurnLists` 与 hydration 的 items/turns/attachments 投影，恢复 oldest input attachments 与 merge options；
 真实 AppServer manager consumer 保持接回，主 chunk 旧 `Cve/wve/Tve` 47 行死簇删除。
