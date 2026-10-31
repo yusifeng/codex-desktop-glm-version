@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Ctt/m5/wtt/Ttt/Ett/Dtt` tab-drag preview service 迁入 `window/tab-drag-preview-service.ts`；platform gate、
+presentation-window assembly、zoom pointer projection、visibility/fullscreen guards、strict RPC schemas 与 drag-session
+fallback 均由新 owner 持有。唯一 consumer 已接回。focused test 覆盖 31 项。
+
 随后将 `l5/ott/stt/u5/d5/f5/ctt/ltt/utt/dtt` macOS notification permission runtime 迁入
 `notifications/mac-notification-permission.ts`；Darwin gate、objc bridge、center cache、concurrent RunLoop ref-count、
 native errors 与 lifecycle logging 均由新 owner 持有。唯一 consumer 已接回。focused test 覆盖 27 项。

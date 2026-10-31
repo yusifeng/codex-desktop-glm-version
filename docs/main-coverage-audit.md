@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 tab-drag preview service
+
+原 `Ctt/m5/wtt/Ttt/Ett/Dtt` 已迁入 `src/main/main-app/window/tab-drag-preview-service.ts`。新 owner 保留
+Darwin/Windows gate、presentation-window timer/electron 装配、zoom-aware pointer projection、visibility/fullscreen gate、
+strict point/load/cue schemas 与 drag-session creation failure fallback；唯一 consumer 已接回，旧 cluster 已删除。
+
 ## 2026-10-31 macOS notification permission runtime
 
 原 `l5/ott/stt/u5/d5/f5/ctt/ltt/utt/dtt` 已迁入

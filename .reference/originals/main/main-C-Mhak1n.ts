@@ -107,6 +107,7 @@ const { createNotificationsServiceClass } = require("./main-app/notifications/no
 const { createShortcutCaptureServices } = require("./main-app/window/shortcut-capture-service.js");
 const { createSystemAudioSpectrumRuntime } = require("./main-app/capture/system-audio-spectrum-service.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
+const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -138469,83 +138470,17 @@ var { requestNotificationAuthorization: ctt } = createMacNotificationPermissionR
   loadObjcJs: () => import(`objc-js`),
 });
 var ytt = SystemPermissionsService,
-  Ctt = TabDragPresentationWindow,
-  m5 = n.wf({ x: n.Cf(), y: n.Cf() }),
-  wtt = n.wf({
-    size: n.wf({ width: n.Cf().int().positive(), height: n.Cf().int().positive() }),
-    grabOffset: m5,
-    borderRadius: n.Cf().nonnegative(),
-    zoom: n.Cf().min(0.25).max(4),
-    markup: n.Of().min(1).max(2e6),
+  Ett = createTabDragPreviewServiceClass({
+    runtime: n,
+    platform: process.platform,
+    TabDragPresentationWindow,
+    TabDragSession,
+    electron: l,
+    setTimer: setTimeout,
+    clearTimer: clearTimeout,
+    setRepeatingTimer: setInterval,
+    clearRepeatingTimer: clearInterval,
   }),
-  Ttt = n
-    .wf({ destination: n.df([`new-window`, `left`, `right`, `bottom`, `pin`, `chat`, `new-chat`]) })
-    .nullable(),
-  Ett = class e extends n.Uf {
-    origin;
-    createPresentation;
-    constructor(e, t) {
-      (super(), (this.origin = e), (this.createPresentation = t));
-    }
-    static create(t) {
-      if (process.platform === `darwin` || process.platform === `win32`)
-        return new e(
-          t,
-          () =>
-            new Ctt({
-              clearInterval: (e) => clearInterval(e),
-              clearTimeout: (e) => clearTimeout(e),
-              createWindow: (e) => new l.BrowserWindow(e),
-              getCursorScreenPoint: () => l.screen.getCursorScreenPoint(),
-              isDarwin: process.platform === `darwin`,
-              operationTimeoutMs: 3e3,
-              setInterval: (e, t) => setInterval(e, t),
-              setTimeout: (e, t) => setTimeout(e, t),
-            }),
-        );
-    }
-    getPointerPosition() {
-      if (this.origin.isDestroyed()) return null;
-      let e = l.BrowserWindow.fromWebContents(this.origin);
-      if (e == null || e.isDestroyed() || !e.isVisible()) return null;
-      let t = l.screen.getCursorScreenPoint(),
-        n = e.getContentBounds(),
-        r = this.origin.getZoomFactor();
-      return { x: (t.x - n.x) / r, y: (t.y - n.y) / r };
-    }
-    prepare() {
-      if (this.origin.isDestroyed()) return null;
-      let e = l.BrowserWindow.fromWebContents(this.origin);
-      if (
-        e == null ||
-        e.isDestroyed() ||
-        !e.isVisible() ||
-        (process.platform === `darwin` && e.isFullScreen())
-      )
-        return null;
-      try {
-        return new Dtt({
-          owner: e,
-          parseCue: (e) => {
-            let t = Ttt.safeParse(e);
-            return t.success ? t.data : void 0;
-          },
-          parseLoad: (e) => {
-            let t = wtt.safeParse(e);
-            return t.success ? t.data : void 0;
-          },
-          parsePoint: (e) => {
-            let t = m5.safeParse(e);
-            return t.success ? t.data : void 0;
-          },
-          presentation: this.createPresentation(),
-        });
-      } catch {
-        return null;
-      }
-    }
-  },
-  Dtt = TabDragSession,
   Ott = [`powershell`, `commandPrompt`],
   ktt = [`--login`, `-i`];
 function Att() {
