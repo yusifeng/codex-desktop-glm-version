@@ -5420,3 +5420,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   observers、active-thread sync 顺序与 focus listener cleanup；重复安装保持幂等。
 - Computer Use native-pipe client 前移到 WindowContext 之前创建，analytics、active-turn、close、availability、refresh 与 dispose
   直接共享同一实例。`Ust` 旧 `Te/Ee/Re/We/qe` 晚绑定别名删除，no-unwired gate 扩至 669 项。
+
+# 2026-11-01 managed Computer Use lifecycle extraction
+
+- 新增并真实接回 `computer-use/managed-service-lifecycle.ts`，统一 macOS gate、canonical app refresh、managed service、worker
+  RPC/status-item/availability consumers、internal host-services pipe、环境变量发布和 cleanup；失败继续 warning 后降级。
+- peer-authorizer 工厂仍到 internal pipe startup 才惰性执行，外部 pipe 环境替换值不会被 cleanup 误删。`Ust` nullable `H`
+  与直接 `Eoe/Toe/koe/Go/createHostServicesServer` 装配删除；focused 29 项、相邻六组 114 项回归通过，no-unwired gate 扩至 680 项。

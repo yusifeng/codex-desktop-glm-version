@@ -17,6 +17,7 @@ const realOwners = [
   ["src/main/main-app/startup/local-app-server-startup.ts", "runLocalAppServerStartup"],
   ["src/main/main-app/startup/dock-menu-lifecycle.ts", "createDockMenuLifecycle"],
   ["src/main/main-app/startup/application-menu-refresh-lifecycle.ts", "createApplicationMenuRefreshLifecycle"],
+  ["src/main/main-app/computer-use/managed-service-lifecycle.ts", "createManagedComputerUseLifecycle"],
   ["src/main/main-app/startup/window-icon-lifecycle.ts", "createWindowIconLifecycle"],
   ["src/main/main-app/fetch-handler/electron-fetch-handler.ts", "createElectronFetchHandlerClass"],
   ["src/main/main-app/misc/open-in-service.ts", "createOpenInServiceClass"],
@@ -675,5 +676,15 @@ assert.equal(main.includes("computerUseNativePipeClient = pie({"), true, "startu
 assert.equal(main.includes("hasActiveComputerUseTurn: computerUseNativePipeClient.hasActiveTurn"), true, "window context consumes the native-pipe client directly");
 assert.equal(main.includes("Ee = (e) => !1"), false, "generated computer-use placeholder callback must be removed");
 assert.equal(main.includes("Te = null"), false, "generated menu refresh placeholder must be removed");
+assert.equal(main.includes('require("./main-app/computer-use/managed-service-lifecycle.js")'), true, "managed Computer Use lifecycle owner is wired");
+assert.equal(main.includes("managedComputerUseLifecycle = createManagedComputerUseLifecycle({"), true, "startup creates one managed Computer Use owner");
+assert.equal(main.includes("ensureManagedComputerUseService: managedComputerUseLifecycle.ensureService"), true, "worker RPC consumes the semantic lifecycle");
+assert.equal(main.includes("getManagedService: managedComputerUseLifecycle.getService"), true, "status-item actions consume the semantic lifecycle");
+assert.equal(main.includes("await managedComputerUseLifecycle.start()"), true, "startup awaits managed service initialization");
+assert.equal(main.includes("let H = null"), false, "generated managed service placeholder must be removed");
+assert.equal(main.includes('require("./main-app/computer-use/managed-service.js")'), false, "startup no longer constructs the low-level service directly");
+assert.equal(main.includes('require("./main-app/native-pipe/host-services-server.js")'), false, "startup no longer constructs the host-services server directly");
+assert.equal(main.includes("refreshCanonicalServiceAppCopy: Toe"), false, "startup no longer aliases canonical service refresh");
+assert.equal(main.includes("NODE_REPL_HOST_SERVICES_PIPE_PATH: Go"), false, "startup no longer owns the host-services environment key");
 
-console.log("669 main unwired-owner skeleton assertions passed");
+console.log("680 main unwired-owner skeleton assertions passed");

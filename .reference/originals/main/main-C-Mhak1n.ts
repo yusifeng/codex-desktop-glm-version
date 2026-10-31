@@ -582,7 +582,7 @@ const { listApplicationsForFile: Nj, appForBundleId: Pj, listWebUrlHandlers: Fj,
 const { acquireCrossInstanceLock: jN, CROSS_INSTANCE_LOCKS: AN } = require("./main-app/util/cross-instance-lock.js");
 const { registerInAppBrowserAvailabilityProbe: Jse } = require("./main-app/browser-use/availability.js");
 const { trackComputerUseActivity: ele } = require("./main-app/computer-use/activity-tracker.js");
-const { ManagedComputerUseService: Eoe } = require("./main-app/computer-use/managed-service.js");
+const { createManagedComputerUseLifecycle } = require("./main-app/computer-use/managed-service-lifecycle.js");
 const { browserUsePartitionNameForHost: Jc, applyPreferredLanguages: Yc, clearSiwcCookies: Xc, clearBrowserData: Zc, setInAppBrowserChromeUrlsAllowed: tl, isInAppBrowserChromeUrlsAllowed: nl } = require("./main-app/browser-use/site-data.js");
 const { ensureComputerUseNotifyConfig: iie } = require("./main-app/computer-use/notify-config.js");
 const { isComputerUseOverlaySettingKey: Fie, scheduleComputerUseConfigWrite: ns } = require("./main-app/computer-use/config-writer.js");
@@ -697,7 +697,6 @@ const { createIabCapabilityRuntime } = require("./main-app/browser-use/iab-capab
 const { createSocketPeerAuthorizer } = require("./main-app/native-pipe/peer-socket-authorizer.js");
 const { createBrowserUseNativePipeServer } = require("./main-app/browser-use/native-pipe-server.js");
 const { createDynamicAppToolsServer } = require("./main-app/native-pipe/dynamic-app-tools-server.js");
-const { createHostServicesServer } = require("./main-app/native-pipe/host-services-server.js");
 const {
   getWindowsAppIconSmall: Pae,
   loadSkyAddon: Vs,
@@ -741,7 +740,6 @@ const {
   createComputerUseNativePipeClient: pie,
 } = require("./main-app/computer-use/native-pipe-service.js");
 const {
-  NODE_REPL_HOST_SERVICES_PIPE_PATH: Go,
   BrowserUsePluginConfigSyncer: wie,
 } = require("./main-app/browser-use/thread-config.js");
 const {
@@ -792,8 +790,6 @@ const {
   resolveComputerUsePaths: Li,
   isComputerUsePluginEnabled: Ri,
   resolveComputerUsePathsForMarketplaces: zi,
-  refreshCanonicalServiceAppCopy: Toe,
-  resolveComputerUseAppPath: koe,
 } = require("./main-app/computer-use/app-resolution.js");
 const {
   getBundledPluginsResourcesPath: Hi,
@@ -56176,8 +56172,7 @@ async function Ust() {
     kr(Ar({}, { buildFlavor: s })));
   let ne = V.settingsStore.getEffective(n.Fa.localeOverride.key);
   await a.mn(V.repoRoot, ne ?? void 0);
-  let H = null,
-    re = () => Tr().cuaPIP,
+  let re = () => Tr().cuaPIP,
     U = createRemoteHostedPipManager({
       getAlwaysHidePictureInPicture: () =>
         V.settingsStore.getEffective(n.La.alwaysHidePictureInPicture.key) ?? !1,
@@ -56315,7 +56310,24 @@ async function Ust() {
     }),
   ),
     Se.setGitWorkerTracingSampleRate(ee));
-  let publishComputerUseAnalytics = (event) => {
+  let managedComputerUseLifecycle = createManagedComputerUseLifecycle({
+      codexHome: V.codexHome,
+      enabled: N,
+      environment: process.env,
+      internalBuild: a.in.isInternal(s),
+      logger: r.n(),
+      onServiceAvailable: (processIdentifier) => {
+        ae ?? U.setServiceProcessIdentifier(processIdentifier);
+      },
+      onServiceRespawned: () => {
+        Tr().skysight &&
+          be?.shouldReconcileAfterServiceRespawn() &&
+          K.appServerConnectionRegistry.getMaybeConnection(J)?.reconcileChronicle();
+      },
+      registerDispose: (dispose) => I.add(dispose),
+      createSocketPeerAuthorizer,
+    }),
+    publishComputerUseAnalytics = (event) => {
       primaryWindowMessages.enqueue({ type: `computer-use-analytics-event`, event });
     },
     computerUseNativePipeClient = pie({
@@ -56556,12 +56568,8 @@ async function Ust() {
     W.windowManager.setQueueCodexDeepLinkUrl(Le.deepLinks.queueCodexDeepLinkUrl),
     Se.setComputerUseWorkerMainRpcHandler(
       createComputerUseRpcHandler({
-        ensureManagedComputerUseService: () => {
-          if (H == null) throw Error(`Managed Computer Use service is unavailable`);
-          return H.ensureServicePid();
-        },
-        invalidateManagedComputerUseService: (e) =>
-          H == null ? Promise.resolve() : H.invalidateServicePid(e),
+        ensureManagedComputerUseService: managedComputerUseLifecycle.ensureService,
+        invalidateManagedComputerUseService: managedComputerUseLifecycle.invalidateService,
       }),
     ),
     Se.registerWorkerBusMessageHandlers(),
@@ -56601,7 +56609,7 @@ async function Ust() {
           ...createComputerHistoryStatusItemActions({
             getConnection: () => K.appServerConnectionRegistry.getMaybeConnection(`local`) ?? null,
             getFeatureAvailability: Tr,
-            getManagedService: () => H,
+            getManagedService: managedComputerUseLifecycle.getService,
             getRecorder: () => be,
             invalidateQuery: (e) => W.broadcastQueryCacheInvalidation(e),
             logComputerHistoryStatusItemAction: (e) =>
@@ -56727,65 +56735,11 @@ async function Ust() {
   let Ze = () => {
     Xe.reconcileExternalPluginState(`focus`);
   };
-  if (
-    (l.app.on(`browser-window-focus`, Ze),
+  (l.app.on(`browser-window-focus`, Ze),
     I.add(() => {
       l.app.off(`browser-window-focus`, Ze);
-    }),
-    N)
-  ) {
-    try {
-      await Toe({ sourceServiceAppPath: koe(), codexHome: V.codexHome });
-    } catch (e) {
-      r.n().warning(`Failed to sync canonical Computer Use service app during startup`, {
-        safe: {},
-        sensitive: { error: e },
-      });
-    }
-    if (
-      ((H = new Eoe(Mi(V.codexHome), {
-        onServiceAvailable: (e) => {
-          ae ?? U.setServiceProcessIdentifier(e);
-        },
-        onServiceRespawned: () => {
-          Tr().skysight &&
-            be?.shouldReconcileAfterServiceRespawn() &&
-            K.appServerConnectionRegistry.getMaybeConnection(J)?.reconcileChronicle();
-        },
-      })),
-      I.add(H),
-      a.in.isInternal(s))
-    ) {
-      delete process.env[Go];
-      try {
-        let e = await createHostServicesServer({
-          services: new Map([
-            [
-              `computer-use`,
-              async () => {
-                if (H == null) throw Error(`Managed Computer Use service is unavailable`);
-                return (await H.ensureServicePid(), {});
-              },
-            ],
-          ]),
-          socketPeerAuthorizer: createSocketPeerAuthorizer(),
-        });
-        ((process.env[Go] = e.pipePath),
-          I.add(() => {
-            (process.env.NODE_REPL_HOST_SERVICES_PIPE_PATH === e.pipePath && delete process.env[Go],
-              e.dispose());
-          }));
-      } catch (e) {
-        (delete process.env[Go],
-          r
-            .n()
-            .warning(`Failed to start node_repl host services native pipe`, {
-              safe: {},
-              sensitive: { error: e },
-            }));
-      }
-    }
-  }
+    }));
+  await managedComputerUseLifecycle.start();
   let Qe = new pne(K.getBrowserSessionRegistry());
   I.add(() => {
     (Qe.dispose(), computerUseNativePipeClient.dispose());
@@ -56796,7 +56750,7 @@ async function Ust() {
     getDesktopFeatureAvailability: Tr,
     getLocalAppServerConnection: Pe,
     getLogger: r.n,
-    getManagedComputerUseService: () => H,
+    getManagedComputerUseService: managedComputerUseLifecycle.getService,
     getRecorder: () => be,
     hasWindowsCaptureBridge: () => W.windowsCaptureNativeBridge != null,
     isWindows: P,

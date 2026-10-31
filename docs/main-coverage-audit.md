@@ -3503,3 +3503,15 @@ focused window active thread”的原始顺序，重复安装幂等。
 Computer Use native-pipe client 前移到 WindowContext 构造前直接创建，`hasActiveTurn`、analytics、close、feature availability、
 plugin reconcile refresh 与 dispose 均消费同一个语义实例。`Ust` 原 `Te/Ee/Re/We/qe` 晚绑定别名删除；focused 与静态 owner
 回归覆盖前置安全调用、observer 顺序/清理及直接 wiring，no-unwired gate 扩至 669 项。
+
+### 整块抽取：managed Computer Use service lifecycle
+
+新增并接回 `computer-use/managed-service-lifecycle.ts`，统一拥有 macOS enable gate、canonical service app refresh、唯一
+`ManagedComputerUseService` 实例、worker RPC ensure/invalidate、status-item/feature reconciler getter、internal host-services native pipe、
+环境变量发布与精确 cleanup。canonical copy 或 pipe listen 失败仍按原行为记录 warning 并保留 managed service；disabled 平台不触发
+任何 refresh、service construction 或 native-pipe I/O。
+
+peer-authorizer 保持在真正启动 pipe 时才调用工厂，非 internal build 不读取/覆盖外部 pipe 环境；cleanup 只删除自己发布的值，
+未提前 package metadata/native addon 副作用。`Ust` 原 nullable `H` 及直接
+`Eoe/Toe/koe/Go/createHostServicesServer` 装配删除，所有 consumer 共享 lifecycle owner。29 项 focused 断言与 managed-service、
+native-pipe、PIP、RPC、availability、status-item 相邻 114 项回归通过，no-unwired gate 扩至 680 项。

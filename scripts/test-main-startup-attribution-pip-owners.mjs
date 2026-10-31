@@ -99,13 +99,14 @@ equal(pip.isCompletedTurnNotification({ method: "turn/completed", params: { thre
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
 equal(main.includes('require("./main-app/startup/app-entry-attribution.js")'), true);
 equal(main.includes('require("./main-app/computer-use/pip-turn-lifecycle.js")'), true);
-equal(main.includes("refreshCanonicalServiceAppCopy: Toe"), true);
-equal(main.includes("resolveComputerUseAppPath: koe"), true);
+equal(main.includes("refreshCanonicalServiceAppCopy: Toe"), false);
+equal(main.includes("resolveComputerUseAppPath: koe"), false);
+equal(main.includes('require("./main-app/computer-use/managed-service-lifecycle.js")'), true);
 equal(main.includes("var rl ="), false);
 equal(main.includes("var Coe ="), false);
 equal(main.includes("var Foe = class"), false);
 equal(main.includes("AppEntryAttributionTracker: Foe"), true);
 equal(main.includes("new Foe("), false);
-equal(main.includes("I.add(Noe({"), true);
+equal(/I\.add\(\s*Noe\(\{/.test(main), true);
 
 console.log(`${assertions} main startup attribution and PIP owner assertions passed`);

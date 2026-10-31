@@ -60,8 +60,10 @@ service.dispose();
 await assert.rejects(() => service.ensureServicePid(), /not enabled/); assertions += 1;
 
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
-equal(main.includes('const { ManagedComputerUseService: Eoe } = require("./main-app/computer-use/managed-service.js");'), true);
+equal(main.includes('require("./main-app/computer-use/managed-service-lifecycle.js")'), true);
+equal(main.includes('require("./main-app/computer-use/managed-service.js")'), false);
 equal(main.includes("Eoe = class"), false);
 equal(main.includes("function Doe("), false);
-equal(main.includes("new Eoe(Mi(V.codexHome)"), true);
+equal(main.includes("managedComputerUseLifecycle = createManagedComputerUseLifecycle({"), true);
+equal(main.includes("new Eoe(Mi(V.codexHome)"), false);
 console.log(`${assertions} main managed computer-use service assertions passed`);
