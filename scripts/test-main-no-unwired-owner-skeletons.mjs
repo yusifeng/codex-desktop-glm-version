@@ -40,6 +40,7 @@ const realOwners = [
   ["src/main/main-app/worker/worker-runtime.ts", "createWorkerRuntimeFactory"],
   ["src/main/main-app/startup/workspace-policy-runtime.ts", "createWorkspacePolicyRuntime"],
   ["src/main/main-app/diagnostics/content-tracing-runtime.ts", "createContentTracingRuntime"],
+  ["src/main/main-app/workspace/worktree-cleanup-runtime.ts", "createWorktreeCleanupRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -270,6 +271,14 @@ assert.equal(main.includes("function IQe("), false, "generated trace menu lifecy
 assert.equal(main.includes("async function RQe("), false, "generated trace upload retry owner must be removed");
 assert.equal(main.includes("function GZ("), false, "generated trace buffer poller must be removed");
 assert.equal(main.includes("var PZ = null"), false, "generated trace pending-state globals must be removed");
+assert.equal(main.includes("createWorktreeCleanupRuntime({"), true, "real worktree-cleanup runtime is wired");
+assert.equal(main.includes("function Ree("), false, "generated worktree cleanup planner must be removed");
+assert.equal(main.includes("async function qZ("), false, "generated worktree thread metadata reader must be removed");
+assert.equal(main.includes("function JZ("), false, "generated pinned-thread reader must be removed");
+assert.equal(main.includes("function HQe("), false, "generated pinned-root protection must be removed");
+assert.equal(main.includes("async function WQe("), false, "generated worktree settings reader must be removed");
+assert.equal(main.includes("function GQe("), false, "generated migration protection owner must be removed");
+assert.equal(main.includes("function YZ("), false, "generated workspace-root protection must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("279 main unwired-owner skeleton assertions passed");
+console.log("289 main unwired-owner skeleton assertions passed");

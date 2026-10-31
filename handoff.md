@@ -4806,3 +4806,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - main 旧 content-tracing owner 约 378 行已物理删除，新生产模块 529 行；focused coverage 52 项，邻接 handler/menu
   回归 48/40 项，no-unwired gate 扩至 279 项。下一批重新审计 content-tracing 后的 worktree cleanup/service cluster，
   优先选择其完整状态/cleanup owner，不回退到 native-status 单 schema 微迁移。
+
+# 2026-11-01 worktree cleanup runtime
+
+- `src/main/main-app/workspace/worktree-cleanup-runtime.ts` 已接管 cleanup candidate planner、ownerless migration/newborn
+  protection、pinned/active gates、thread metadata+mtime I/O、settings override、五日保护状态与 local/remote root containment；
+  `WorktreeService` 和 Electron handler settings consumer 直接消费同一 factory outputs。
+- main 跨两个区域的旧 planner/adapters 共 143 行已物理删除，新生产模块 307 行；focused coverage 44 项，邻接
+  worktree service/handler 回归 34/48 项，no-unwired gate 扩至 289 项。下一批继续审计其后的 workspace file/terminal
+  RPC cluster，优先迁移完整 I/O lifecycle，避免只移动常量或 schema。

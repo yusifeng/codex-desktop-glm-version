@@ -42,12 +42,12 @@ function createElectronMessageHandlerClass({
   dependencies,
 }: ElectronMessageHandlerDependencies) {
   const {
-    GBe, GD, IH, KBe, LUe, Lr, MainThreadJankSampler, Mze, OZ, Vt, WQe, XQe, ZBe,
+    GBe, GD, IH, KBe, LUe, Lr, MainThreadJankSampler, Mze, OZ, Vt, XQe, ZBe,
     applySparseStateWrite, broadcastPersistedAtomUpdate, combinePerformanceSpanSnapshots,
     deletePersistedBrowserConversation, forwardBrowserNavigationUrl, lWe,
     performanceHeartbeatIntervalMs, performanceRequestTtlMs, performanceTriggerMinIntervalMs,
-    rZe, rt, setRemoteControlEnabled, setRemoteControlSessionActive, summarizeWindowAttention,
-    tee, toggleTraceRecording, uEe,
+    rZe, readHostWorktreeSettings, rt, setRemoteControlEnabled, setRemoteControlSessionActive,
+    summarizeWindowAttention, tee, toggleTraceRecording, uEe,
   } = dependencies;
 
   var eQ = createLogger(`electron-message-handler`),
@@ -352,7 +352,7 @@ class ElectronMessageHandler {
         settingsStore: this.getSettingsStore(),
         getHostConfigForHostId: this.getHostConfigForHostId,
         getHostWorktreeSettings: () =>
-          WQe({
+          readHostWorktreeSettings({
             appServerConnection: n,
             globalState: this.globalState,
             isPackaged: l.app.isPackaged,

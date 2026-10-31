@@ -2819,3 +2819,14 @@ window-attention projection 与三个 timing constants，没有复制状态。�
 jQe/IQe/UZ/LQe/RQe/WZ/GZ/KZ/zQe` helpers 及 pending/global state 已物理删除。focused test
 `scripts/test-main-content-tracing-runtime.mjs` 覆盖 52 项 CPU identity/reset、attention、confirmation/cancel、状态广播、
 buffer timer、runtime-health、upload retry、local keep 与真实 consumer wiring；Electron message handler 48 项和菜单 40 项回归通过。
+
+### 增量抽取：worktree cleanup runtime
+
+worktree 自动清理的 ownerless/owned 候选规划、pre-migration 与新建一小时保护、pinned/active thread gate、稳定排序与
+keep-count 裁剪，连同去重 thread metadata 读取、worktree path mtime 合并、pinned root 保护、packaged/override settings、
+五日迁移保护状态和 local/remote project-root containment 已整体迁移至
+`src/main/main-app/workspace/worktree-cleanup-runtime.ts`。`WorktreeService` 的 cleanup lifecycle 和
+`ElectronMessageHandler.ensureWorktreeService` settings consumer 均真实消费同一个 factory outputs；旧
+`Iee/Lee/Ree/qZ/JZ/HQe/UQe/WQe/GQe/KQe/YZ/qQe` helpers 与 cleanup logger/constants 已物理删除。
+focused test `scripts/test-main-worktree-cleanup-runtime.mjs` 覆盖 44 项 planner、cutoff/boundary、I/O failure、dedupe、
+settings、state initialization/expiry、path containment 与 wiring；worktree service 34 项和 handler 48 项回归通过。

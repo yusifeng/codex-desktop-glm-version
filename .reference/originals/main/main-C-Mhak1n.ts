@@ -236,6 +236,7 @@ const { WebContentsHostClient } = require("./main-app/app-server/web-contents-ho
 const { createRemoteLocalhostNavigationForwarder } = require("./main-app/browser-sidebar/remote-localhost-navigation.js");
 const { createCommandSessionBackendClass } = require("./main-app/terminal/command-session-backend.js");
 const { createWorktreeServiceClass } = require("./main-app/workspace/worktree-service.js");
+const { createWorktreeCleanupRuntime } = require("./main-app/workspace/worktree-cleanup-runtime.js");
 const { createWorktreeAttachmentHandlerClass } = require("./main-app/workspace/worktree-attachment-handler.js");
 const { createDictationHistoryRuntime } = require("./main-app/dictation/history.js");
 const { createGlobalPasteRuntime } = require("./main-app/dictation/global-paste-runtime.js");
@@ -2900,54 +2901,7 @@ var Mee = class extends Zt {
     clear() {
       (this.#e.clear(), this.#t.clear());
     }
-  },
-  Pee = Date.parse(`2026-02-21T00:00:00.000Z`),
-  Fee = 36e5;
-function Iee(e) {
-  return e.ownerThreadId != null || e.createdAtMs == null ? !1 : e.createdAtMs < Pee;
-}
-function Lee(e, t) {
-  return e.ownerThreadId != null || e.createdAtMs == null ? !1 : t - e.createdAtMs < Fee;
-}
-function Ree({
-  records: e,
-  keepCount: t,
-  threadMetadataById: n,
-  pinnedThreadIds: r,
-  protectPreMigrationOwnerlessWorktrees: i = !1,
-  protectedWorktreeDirs: a = [],
-  nowMs: o = Date.now(),
-}) {
-  if (e.length <= t) return { candidates: [] };
-  let s = new Set(r),
-    c = e.filter((e) => e.ownerThreadId != null),
-    l = e.filter(Iee),
-    u = e.filter((e) => e.ownerThreadId == null),
-    d = new Set(a);
-  if (i) for (let e of l) d.add(String(e.worktree.dir));
-  for (let e of u) Lee(e, o) && d.add(String(e.worktree.dir));
-  for (let e of c)
-    (s.has(e.ownerThreadId) || n[e.ownerThreadId]?.isInProgress === !0) &&
-      d.add(String(e.worktree.dir));
-  let f = (e, t) => String(e.worktree.dir).localeCompare(String(t.worktree.dir)),
-    p = (e, t) => {
-      let r = n[e.ownerThreadId]?.updatedAtMs ?? 0,
-        i = n[t.ownerThreadId]?.updatedAtMs ?? 0;
-      return r === i ? f(e, t) : r - i;
-    },
-    m = (e, t) =>
-      e.createdAtMs === t.createdAtMs
-        ? f(e, t)
-        : (e.createdAtMs ?? 2 ** 53 - 1) - (t.createdAtMs ?? 2 ** 53 - 1),
-    h = [],
-    g = [];
-  for (let e of u) d.has(String(e.worktree.dir)) || h.push(e);
-  for (let e of c) d.has(String(e.worktree.dir)) || g.push(e);
-  (h.sort(m), g.sort(p));
-  let _ = [...h, ...g],
-    v = Math.max(0, _.length - t);
-  return { candidates: _.slice(0, v) };
-}
+  };
 var zee = 12e4,
   Bee = 6e5,
   Vee = class {
@@ -61556,92 +61510,28 @@ var {
   clearTimer: clearTimeout,
   traceShortcutEnabled: process.env.CODEX_TRACE_SHORTCUT != null,
 });
-var BQe = r.r(`worktree-cleanup-service`),
-  VQe = 432e6;
-async function qZ(e, t, r) {
-  let i = Array.from(new Set(r)),
-    a = await Promise.all(
-      i.map(async (r) => {
-        try {
-          let i = await e.readThread(r, { includeTurns: !1 });
-          if (i == null) return [r, null];
-          let a = i.updatedAt * 1e3,
-            o = null;
-          if (i.path != null)
-            try {
-              let e = await n.Di.stat(i.path, t);
-              o = Number.isFinite(e.mtimeMs) ? e.mtimeMs : null;
-            } catch {}
-          let s = [Number.isFinite(a) ? a : null, o].filter((e) => e != null);
-          return [
-            r,
-            {
-              updatedAtMs: s.length === 0 ? null : Math.max(...s),
-              isInProgress: i.status.type === `active`,
-              cwd: i.cwd ?? null,
-              readFailed: !1,
-            },
-          ];
-        } catch (e) {
-          return (
-            BQe.error(`Failed to get thread metadata`, {
-              safe: { threadId: r },
-              sensitive: { error: e },
-            }),
-            [r, { updatedAtMs: Date.now(), isInProgress: !0, cwd: null, readFailed: !0 }]
-          );
-        }
-      }),
-    );
-  return Object.fromEntries(a);
-}
-function JZ(e) {
-  let t = e.get(n.iu.PINNED_THREAD_IDS);
-  return Array.isArray(t) ? t.filter((e) => typeof e == `string`) : [];
-}
-function HQe({ pinnedThreadIds: e, threadMetadataById: t, worktrees: r }) {
-  let i = e
-    .map((e) => t[e]?.cwd)
-    .filter((e) => e != null)
-    .map((e) => n.G(e).replace(/\/+$/, ``));
-  return r
-    .map((e) => e.dir)
-    .filter((e) => {
-      let t = n.G(e).replace(/\/+$/, ``);
-      return i.some((e) => e === t || e.startsWith(`${t}/`));
-    });
-}
-function UQe({ pinnedThreadIds: e, threadMetadataById: t }) {
-  return e.some((e) => {
-    let n = t[e];
-    return n == null || n.readFailed;
-  });
-}
-async function WQe({ appServerConnection: e, globalState: t, isPackaged: r = !0 }) {
-  let i = n.ms((await e.getUserSavedConfiguration()).desktop);
-  return { ...i, autoCleanupEnabled: i.autoCleanupEnabled && qQe(t, r) };
-}
-function GQe(e, t = Date.now()) {
-  let n = e.get(a.$),
-    r;
-  return (
-    typeof n == `number` && Number.isFinite(n) && n > 0 ? (r = n) : ((r = t), e.set(a.$, r)),
-    t < r + VQe
-  );
-}
-function KQe({ globalState: e, hostId: t, worktrees: n }) {
-  return n.map((e) => e.dir).filter((n) => YZ({ globalState: e, hostId: t, worktreeDir: n }));
-}
-function YZ({ globalState: e, hostId: t, worktreeDir: r }) {
-  let i = n.G(r).replace(/\/+$/, ``);
-  return (t === `local` ? Fr(e).roots : Pte(e, t).roots).some((e) => {
-    let t = n.G(e).replace(/\/+$/, ``);
-    return t === i || t.startsWith(`${i}/`);
-  });
-}
-function qQe(e, t) {
-  return t || e.get(n.iu.WORKTREE_AUTO_CLEANUP_UNPACKAGED_OVERRIDE_ENABLED) === !0;
-}
+var {
+  getPinnedProtectedRoots,
+  getPinnedThreadIds,
+  getProtectedWorkspaceRoots,
+  hasUnavailablePinnedMetadata,
+  isPreMigrationProtectionActive,
+  isProtectedWorkspaceRoot,
+  planWorktreeCleanup,
+  readHostWorktreeSettings,
+  readThreadMetadata,
+} = createWorktreeCleanupRuntime({
+  stat: n.Di.stat,
+  normalizePath: n.G,
+  parseDesktopConfiguration: n.ms,
+  getLocalProjectRoots: Fr,
+  getRemoteProjectRoots: Pte,
+  pinnedThreadIdsKey: n.iu.PINNED_THREAD_IDS,
+  autoCleanupOverrideKey: n.iu.WORKTREE_AUTO_CLEANUP_UNPACKAGED_OVERRIDE_ENABLED,
+  preMigrationProtectionStartedAtKey: a.$,
+  logger: r.r(`worktree-cleanup-service`),
+  now: Date.now,
+});
 var JQe = 32e3,
   YQe = [
     `[info] Refreshing upstream before creating worktree`,
@@ -61659,14 +61549,14 @@ var JQe = 32e3,
     logger: ZZ,
     chunkItems: dp,
     cleanupChunkSize: XZ,
-    isProtectedWorkspaceRoot: YZ,
-    readThreadMetadata: qZ,
-    hasUnavailablePinnedMetadata: UQe,
-    getPinnedProtectedRoots: HQe,
-    planWorktreeCleanup: Ree,
-    isPreMigrationProtectionActive: GQe,
-    getProtectedWorkspaceRoots: KQe,
-    getPinnedThreadIds: JZ,
+    isProtectedWorkspaceRoot,
+    readThreadMetadata,
+    hasUnavailablePinnedMetadata,
+    getPinnedProtectedRoots,
+    planWorktreeCleanup,
+    isPreMigrationProtectionActive,
+    getProtectedWorkspaceRoots,
+    getPinnedThreadIds,
     getSelectedProject: Nr,
     setSelectedProject: Lr,
     maxOutputLength: JQe,
@@ -61698,7 +61588,7 @@ var r$e = createElectronMessageHandlerClass({
     Mze,
     OZ,
     Vt,
-    WQe,
+    readHostWorktreeSettings,
     XQe,
     ZBe,
     applySparseStateWrite,

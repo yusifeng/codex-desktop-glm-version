@@ -9,14 +9,14 @@ export function createWorktreeServiceClass(dependencies: Record<string, any>) {
     logger: ZZ,
     chunkItems: dp,
     cleanupChunkSize: XZ,
-    isProtectedWorkspaceRoot: YZ,
-    readThreadMetadata: qZ,
-    hasUnavailablePinnedMetadata: UQe,
-    getPinnedProtectedRoots: HQe,
-    planWorktreeCleanup: Ree,
-    isPreMigrationProtectionActive: GQe,
-    getProtectedWorkspaceRoots: KQe,
-    getPinnedThreadIds: JZ,
+    isProtectedWorkspaceRoot,
+    readThreadMetadata,
+    hasUnavailablePinnedMetadata,
+    getPinnedProtectedRoots,
+    planWorktreeCleanup,
+    isPreMigrationProtectionActive,
+    getProtectedWorkspaceRoots,
+    getPinnedThreadIds,
     getSelectedProject: Nr,
     setSelectedProject: Lr,
     maxOutputLength,
@@ -474,7 +474,7 @@ export function createWorktreeServiceClass(dependencies: Record<string, any>) {
     }
     async cleanupArchivedWorktree(e, t, r) {
       if (
-        YZ({
+        isProtectedWorkspaceRoot({
           globalState: this.options.globalState,
           hostId: this.options.hostId,
           worktreeDir: String(t),
@@ -642,14 +642,14 @@ export function createWorktreeServiceClass(dependencies: Record<string, any>) {
         },
       });
       if (a.length <= t) return;
-      let o = KQe({
+      let o = getProtectedWorkspaceRoots({
           globalState: this.options.globalState,
           hostId: this.options.hostId,
           worktrees: a,
         }),
         s =
           this.options.getPinnedThreadIds == null
-            ? JZ(this.options.globalState)
+            ? getPinnedThreadIds(this.options.globalState)
             : await this.options.getPinnedThreadIds(),
         c = new Map(),
         l = await Promise.all(
@@ -685,8 +685,8 @@ export function createWorktreeServiceClass(dependencies: Record<string, any>) {
             ...s,
           ]),
         ),
-        d = await qZ(this.options.appServerConnection, i, u);
-      if (UQe({ pinnedThreadIds: s, threadMetadataById: d })) {
+        d = await readThreadMetadata(this.options.appServerConnection, i, u);
+      if (hasUnavailablePinnedMetadata({ pinnedThreadIds: s, threadMetadataById: d })) {
         ZZ().info(
           `[worktree-cleanup] skip-pinned-thread-metadata-unavailable`,
           {
@@ -696,18 +696,18 @@ export function createWorktreeServiceClass(dependencies: Record<string, any>) {
         );
         return;
       }
-      let f = HQe({ pinnedThreadIds: s, threadMetadataById: d, worktrees: a }),
+      let f = getPinnedProtectedRoots({ pinnedThreadIds: s, threadMetadataById: d, worktrees: a }),
         p = Array.from(
           this.statesById.values(),
           (e) => e.entry.worktreeGitRoot,
         ).filter((e) => e != null),
         m = Array.from(this.newbornWorktreeRoots),
-        h = Ree({
+        h = planWorktreeCleanup({
           records: l,
           keepCount: t,
           threadMetadataById: d,
           pinnedThreadIds: s,
-          protectPreMigrationOwnerlessWorktrees: GQe(this.options.globalState),
+          protectPreMigrationOwnerlessWorktrees: isPreMigrationProtectionActive(this.options.globalState),
           protectedWorktreeDirs: Array.from(new Set([...o, ...f, ...p, ...m])),
         }),
         g = new Set(o),
@@ -751,14 +751,14 @@ export function createWorktreeServiceClass(dependencies: Record<string, any>) {
       for (let e of (0, dp.default)(_, XZ)) {
         if (
           (this.options.getPinnedThreadIds == null
-            ? JZ(this.options.globalState)
+            ? getPinnedThreadIds(this.options.globalState)
             : await this.options.getPinnedThreadIds()
           ).some((e) => !s.includes(e))
         ) {
           this.cleanupPending = !0;
           break;
         }
-        let t = await qZ(
+        let t = await readThreadMetadata(
             this.options.appServerConnection,
             i,
             e.map((e) => e.ownerThreadId).filter((e) => e != null),
@@ -775,7 +775,7 @@ export function createWorktreeServiceClass(dependencies: Record<string, any>) {
               .filter((e) => {
                 let r = e.worktree.dir;
                 return (
-                  !YZ({
+                  !isProtectedWorkspaceRoot({
                     globalState: this.options.globalState,
                     hostId: this.options.hostId,
                     worktreeDir: r,
