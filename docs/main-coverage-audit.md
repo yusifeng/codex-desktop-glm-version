@@ -3330,3 +3330,11 @@ identity、runtime metadata/name/role enrichment、comment/design-change page sa
 `projects/project-write-policy.ts` 接管 LIS project ordering 和 per-key serialized write queue；`open-in-service.ts` 接管 URL admission；
 `mcp-sandbox/lifecycle.ts` 接管 event logger 与 network/lifecycle bootstrap。主 chunk 旧 `j0e/M0e/v$/N0e/H6e/d2/L0/k$/y2e`
 实现均已物理删除，真实 consumers 直接使用语义导出；focused suite 30 项并由 no-unwired gate 锁定接线与旧符号缺席。
+
+### 整带抽取：Artifact Session host wire protocol
+
+在明确保留完整 Yjs CRDT vendor belt 后，新增并接回 `remote-artifact/artifact-session-host-protocol.ts`，统一拥有 external-document
+binding/apply schemas、viewer client 动态加载与结构校验、connection identity、严格 record/string/version/boolean/base64 解析、document/update/event、
+append/asset/open/flush/capabilities/kind 和 native Office snapshot trust boundary。`WindowContext` 不再注入 15 个机械 parser/loader 别名，
+而是把单一协议 runtime 交给既有 host service、subscription manager 与 binding registry。主 chunk 旧 `X8/Aet/Pet/Iet/Uet/Wet/Get/Q8/$8/e5/t5/Ket/n5/qet/r5/i5/a5/o5`
+整带删除；43 条 focused 断言覆盖 wire validation、canonical base64、viewer client close-on-invalid 与真实接线，六组邻接回归保持通过。

@@ -5282,3 +5282,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   open-in URL admission、MCP sandbox event logger/bootstrap 分别进入既有语义模块或新的 `projects/project-write-policy.ts`。
 - 主 chunk 旧 `j0e/M0e/v$/N0e/H6e/d2/L0/k$/y2e` 已删除；BrowserWindowManager 依赖改用语义名，app-server/project writers、
   open-in 与 sandbox 初始化均直接消费新导出。focused suite 30 项，相关九组回归合计 327 项，no-unwired gate 扩至 552 项。
+
+# 2026-11-01 Artifact Session host protocol extraction
+
+- 跳过已确认的完整 Yjs CRDT vendor belt，新增 `remote-artifact/artifact-session-host-protocol.ts`，一次迁出 external-document schemas、
+  viewer RPC client loader/validation、connection/error/disposal policy、canonical base64、document/update/event、subscription/asset 和 native
+  Office snapshot 全部 wire parsing；既有 host service、subscription manager、binding registry 和 WindowContext 直接消费单一 protocol runtime。
+- 主 chunk 旧 `X8/Aet/Pet/Iet/Uet/Wet/Get/Q8/$8/e5/t5/Ket/n5/qet/r5/i5/a5/o5` 已整带删除。focused suite 43 项，
+  host/subscription/native-file/binding/WindowContext/lifecycle 邻接回归 201 项，no-unwired gate 扩至 564 项。

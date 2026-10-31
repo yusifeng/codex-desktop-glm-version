@@ -648,6 +648,7 @@ const { BrowserPageHostLifecycle } = require("./main-app/browser-sidebar/browser
 const { BrowserTabWorkingSetManager } = require("./main-app/browser-sidebar/browser-tab-working-set-manager.js");
 const { ArtifactSubscriptionManager } = require("./main-app/remote-artifact/artifact-subscription-manager.js");
 const { ArtifactSessionHostService } = require("./main-app/remote-artifact/artifact-session-host-service.js");
+const { createArtifactSessionHostProtocol } = require("./main-app/remote-artifact/artifact-session-host-protocol.js");
 const { createTerminalSessionManagerClass } = require("./main-app/terminal/terminal-session-manager.js");
 const { createBrowserWindowManagerClass } = require("./main-app/window/browser-window-manager.js");
 const { createBrowserPageCommandControllerClass } = require("./main-app/browser-sidebar/browser-page-command-controller.js");
@@ -50270,184 +50271,18 @@ var Det = createArtifactDocumentStoreClass({
   validateYjsUpdate: S9e,
   mergeYjsUpdates: T9e,
 });
-var X8 = n.wf({ bindingId: n.Of().min(1) }),
-  Aet = X8.extend({
-    snapshotId: n.Of().min(1),
-    invocationId: n.Of().min(1),
-    updateId: n.Of().min(1),
-    crdtUpdateBase64: n.Of(),
+var artifactSessionHostProtocol = createArtifactSessionHostProtocol({
+    maxFileBytes: Ae,
+    path: h,
+    pathToFileUrl: c.pathToFileURL,
+    schema: n,
   }),
   jet = ExternalDocumentBindingRegistry,
   {
     ExternalDocumentBindingSession: Met,
     ArtifactSessionOperationsSubscription: Het,
   } = createArtifactRpcServices({ RpcHandlerBase: n.Uf }),
-  Pet = n.vf(`artifactType`, [
-    n.wf({
-      artifactRef: n.Of().min(1),
-      artifactType: n.bf(`spreadsheet`),
-      binding: n.wf({ fileName: n.bf(`workbook.xlsx`) }),
-      byteLength: n.Cf().int().nonnegative().max(Ae),
-      contentType: n.bf(`application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`),
-      format: n.bf(`xlsx`),
-      value: n.wf({
-        path: n
-          .Of()
-          .min(1)
-          .refine((e) => (0, h.isAbsolute)(e) && (0, h.extname)(e).toLowerCase() === `.xlsx`),
-      }),
-    }),
-    n.wf({
-      artifactRef: n.Of().min(1),
-      artifactType: n.bf(`presentation`),
-      binding: n.wf({ fileName: n.bf(`presentation.pptx`) }),
-      byteLength: n.Cf().int().nonnegative().max(Ae),
-      contentType: n.bf(
-        `application/vnd.openxmlformats-officedocument.presentationml.presentation`,
-      ),
-      format: n.bf(`pptx`),
-      value: n.wf({
-        path: n
-          .Of()
-          .min(1)
-          .refine((e) => (0, h.isAbsolute)(e) && (0, h.extname)(e).toLowerCase() === `.pptx`),
-      }),
-    }),
-  ]);
-function Iet(e, t) {
-  let n = Pet.safeParse(e);
-  if (!n.success) throw Error(`Artifact Session host returned an invalid native snapshot.`);
-  if (n.data.artifactRef !== t) throw Error(`Artifact Session host returned the wrong artifact.`);
-  if ((0, h.basename)(n.data.value.path) !== n.data.binding.fileName)
-    throw Error(`Artifact Session host returned an invalid native snapshot.`);
-  return {
-    byteLength: n.data.byteLength,
-    contentType: n.data.contentType,
-    fileName: n.data.binding.fileName,
-    path: n.data.value.path,
-  };
-}
-var Vet = ArtifactSessionHostService;
-async function Uet(e) {
-  let t = await import((0, c.pathToFileURL)(e.hostClientModulePath).href);
-  if (typeof t.ArtifactSessionHostRpcClient != `function`)
-    throw Error(`Installed Artifact Session host client is invalid.`);
-  let n = new t.ArtifactSessionHostRpcClient({
-    role: `viewer`,
-    socketPath: e.socketPath,
-    token: e.token,
-  });
-  if (
-    typeof n.connect != `function` ||
-    typeof n.connectionEpoch != `number` ||
-    typeof n.onDisconnect != `function`
-  )
-    throw (
-      await n.close().catch(() => void 0),
-      Error(`Installed Artifact Session host client is invalid.`)
-    );
-  return n;
-}
-function Wet(e, t) {
-  let n = $8(t),
-    r = n.updates;
-  if (!Array.isArray(r)) throw Error(`Artifact Session host returned invalid updates.`);
-  let i = n.kind;
-  if (i !== `spreadsheet` && i !== `presentation`)
-    throw Error(`Artifact Session host returned an invalid kind.`);
-  let a = t5(n, `title`);
-  return {
-    artifactRef: e,
-    checkpointCrdtState: r5(e5(n, `checkpointCrdtStateBase64`, !0)),
-    checkpointStateVersion: n5(n, `checkpointStateVersion`),
-    initialArtifactProto: r5(e5(n, `initialArtifactProtoBase64`, !0)),
-    kind: i,
-    stateVersion: n5(n, `stateVersion`),
-    ...(a === void 0 ? {} : { title: a }),
-    updates: r.map(Q8),
-  };
-}
-function Get(e) {
-  let t = $8(e);
-  if (t.type !== `artifact-session-update-committed`)
-    throw Error(`Artifact Session host returned an invalid event.`);
-  let n = n5(t, `stateVersion`),
-    r = Q8(t.update);
-  if (n !== r.stateVersion) throw Error(`Artifact Session host returned inconsistent versions.`);
-  return { stateVersion: n, update: r };
-}
-function Q8(e) {
-  let t = $8(e),
-    n = t.source;
-  if (n !== `model` && n !== `user`)
-    throw Error(`Artifact Session host returned an invalid update source.`);
-  let r = t5(t, `summary`);
-  return {
-    baseStateVersion: n5(t, `baseStateVersion`),
-    bytes: r5(e5(t, `crdtUpdateBase64`, !0)),
-    originId: e5(t, `originId`),
-    source: n,
-    stateVersion: n5(t, `stateVersion`),
-    ...(r === void 0 ? {} : { summary: r }),
-    updateId: e5(t, `updateId`),
-  };
-}
-function $8(e) {
-  if (e == null || Array.isArray(e) || typeof e != `object`)
-    throw Error(`Artifact Session host returned an invalid object.`);
-  return e;
-}
-function e5(e, t, n = !1) {
-  let r = e[t];
-  if (typeof r != `string` || (!n && r.length === 0))
-    throw Error(`Artifact Session host returned an invalid string.`);
-  return r;
-}
-function t5(e, t) {
-  let n = e[t];
-  if (n !== void 0) {
-    if (typeof n != `string`) throw Error(`Artifact Session host returned an invalid string.`);
-    return n;
-  }
-}
-function Ket(e, t) {
-  let n = e[t];
-  if (typeof n != `boolean`) throw Error(`Artifact Session host returned an invalid boolean.`);
-  return n;
-}
-function n5(e, t) {
-  let n = e[t];
-  if (typeof n != `number` || !Number.isSafeInteger(n) || n < 0)
-    throw Error(`Artifact Session host returned an invalid version.`);
-  return n;
-}
-function qet(e) {
-  return Buffer.from(e.buffer, e.byteOffset, e.byteLength).toString(`base64`);
-}
-function r5(e) {
-  if (
-    e.length % 4 != 0 ||
-    !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(e)
-  )
-    throw Error(`Artifact Session host returned invalid base64 data.`);
-  let t = Buffer.from(e, `base64`);
-  if (t.toString(`base64`) !== e)
-    throw Error(`Artifact Session host returned non-canonical base64 data.`);
-  return Uint8Array.from(t);
-}
-function i5(e) {
-  e == null || (typeof e != `object` && typeof e != `function`) || e[Symbol.dispose]?.call(e);
-}
-function a5(e, t) {
-  return (
-    e?.hostClientModulePath === t.hostClientModulePath &&
-    e.socketPath === t.socketPath &&
-    e.token === t.token
-  );
-}
-function o5(e, t) {
-  return typeof e == `object` && !!e && `code` in e && e.code === t;
-}
+  Vet = ArtifactSessionHostService;
 var Xet = createNotificationsServiceClass({
   runtime: n,
   promisify: d.promisify,
@@ -50719,13 +50554,12 @@ var G5 = r.r(`WindowContext`),
   $nt = 100,
   ert = createWindowContextClass({
     $0e,
-    $8,
     $j,
     createDetachedBrowserKindHandler,
     $nt,
     A,
     Ae,
-    Aet,
+    artifactSessionHostProtocol,
     Ant,
     ArtifactSubscriptionManager,
     Ate,
@@ -50759,7 +50593,6 @@ var G5 = r.r(`WindowContext`),
     G5,
     G5e,
     G8e,
-    Get,
     Gnt,
     H,
     H5,
@@ -50772,14 +50605,12 @@ var G5 = r.r(`WindowContext`),
     IO,
     UpdateCapabilityService,
     IXe,
-    Iet,
     J,
     createCloudCommandSession,
     Jje,
     Jnt,
     K5,
     Kee,
-    Ket,
     EnvironmentConfigService,
     BrowserHostService,
     L,
@@ -50823,19 +50654,16 @@ var G5 = r.r(`WindowContext`),
     PluginMarketplaceListingService,
     Tr,
     U,
-    Uet,
     V,
     V6e,
     VO,
     Vet,
     W$e,
     W5,
-    Wet,
     Wje,
     Wtt,
     Wze,
     KeyboardModifierService,
-    X8,
     XOe,
     Xc,
     Xet,
@@ -50861,7 +50689,6 @@ var G5 = r.r(`WindowContext`),
     BrowserSettingsSync,
     a,
     a$e,
-    a5,
     aEe,
     ar,
     att,
@@ -50883,7 +50710,6 @@ var G5 = r.r(`WindowContext`),
     dnt,
     e,
     e4e,
-    e5,
     AccountInputsOwner,
     eMe,
     ett,
@@ -50896,7 +50722,6 @@ var G5 = r.r(`WindowContext`),
     g8e,
     h,
     i,
-    i5,
     DownloadsService,
     j,
     jet,
@@ -50915,13 +50740,11 @@ var G5 = r.r(`WindowContext`),
     m,
     m4,
     n,
-    n5,
     DetachedBrowserTabsService,
     ComposerItemsBridge,
     nje,
     ntt,
     o,
-    o5,
     o8e,
     extensionRecentUseRegistryFor,
     oEe,
@@ -50931,12 +50754,10 @@ var G5 = r.r(`WindowContext`),
     p2,
     pke,
     q,
-    qet,
     BrowserProfileImportService,
     qnt,
     r,
     r$e,
-    r5,
     PrimaryWindowActionsBridge,
     requestFinalCaptureUpdate,
     rje,

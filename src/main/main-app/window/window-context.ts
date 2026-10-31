@@ -3,13 +3,12 @@
 export function createWindowContextClass(dependencies) {
   const {
     $0e,
-    $8,
     $j,
     createDetachedBrowserKindHandler,
     $nt,
     A,
     Ae,
-    Aet,
+    artifactSessionHostProtocol,
     Ant,
     ArtifactSubscriptionManager,
     Ate,
@@ -43,7 +42,6 @@ export function createWindowContextClass(dependencies) {
     G5,
     G5e,
     G8e,
-    Get,
     Gnt,
     H,
     H5,
@@ -56,14 +54,12 @@ export function createWindowContextClass(dependencies) {
     IO,
     UpdateCapabilityService,
     IXe,
-    Iet,
     J,
     createCloudCommandSession,
     Jje,
     Jnt,
     K5,
     Kee,
-    Ket,
     EnvironmentConfigService,
     BrowserHostService,
     L,
@@ -107,19 +103,16 @@ export function createWindowContextClass(dependencies) {
     PluginMarketplaceListingService,
     Tr,
     U,
-    Uet,
     V,
     V6e,
     VO,
     Vet,
     W$e,
     W5,
-    Wet,
     Wje,
     Wtt,
     Wze,
     KeyboardModifierService,
-    X8,
     XOe,
     Xc,
     Xet,
@@ -145,7 +138,6 @@ export function createWindowContextClass(dependencies) {
     BrowserSettingsSync,
     a,
     a$e,
-    a5,
     aEe,
     ar,
     att,
@@ -167,7 +159,6 @@ export function createWindowContextClass(dependencies) {
     dnt,
     e,
     e4e,
-    e5,
     AccountInputsOwner,
     eMe,
     ett,
@@ -180,7 +171,6 @@ export function createWindowContextClass(dependencies) {
     g8e,
     h,
     i,
-    i5,
     DownloadsService,
     j,
     jet,
@@ -199,13 +189,11 @@ export function createWindowContextClass(dependencies) {
     m,
     m4,
     n,
-    n5,
     DetachedBrowserTabsService,
     ComposerItemsBridge,
     nje,
     ntt,
     o,
-    o5,
     o8e,
     extensionRecentUseRegistryFor,
     oEe,
@@ -215,12 +203,10 @@ export function createWindowContextClass(dependencies) {
     p2,
     pke,
     q,
-    qet,
     BrowserProfileImportService,
     qnt,
     r,
     r$e,
-    r5,
     PrimaryWindowActionsBridge,
     requestFinalCaptureUpdate,
     rje,
@@ -1147,15 +1133,16 @@ export function createWindowContextClass(dependencies) {
             b == null
               ? void 0
               : new Vet({
-                  compareConnectionInfo: a5,
-                  createClient: Uet,
+                  compareConnectionInfo: artifactSessionHostProtocol.compareConnectionInfo,
+                  createClient: artifactSessionHostProtocol.createViewerClient,
                   createExternalDocuments: (e) =>
                     new jet({
                       connect: e,
                       createBinding: (e, t) => new Met(e, t),
                       createId: () => (0, _.randomUUID)(),
-                      parseApplyRequest: (e) => Aet.parse(e),
-                      parseBindingRequest: (e) => X8.parse(e),
+                      parseApplyRequest: artifactSessionHostProtocol.parseExternalDocumentApplyRequest,
+                      parseBindingRequest:
+                        artifactSessionHostProtocol.parseExternalDocumentBindingRequest,
                     }),
                   createNativeFiles: (e) =>
                     new NativeArtifactFileService({
@@ -1176,48 +1163,31 @@ export function createWindowContextClass(dependencies) {
                       ...e,
                       createId: () => (0, _.randomUUID)(),
                       createSubscription: (e) => new Het(e),
-                      disposeValue: i5,
-                      isErrorCode: o5,
+                      disposeValue: artifactSessionHostProtocol.disposeValue,
+                      isErrorCode: artifactSessionHostProtocol.isErrorCode,
                       logFailure: (e, t) =>
                         r.i(`artifact-session-host-service`)().warning(e, {
                           safe: {},
                           sensitive: { error: t },
                         }),
-                      parseAppendResult: (e) => {
-                        let t = $8(e);
-                        return { applied: Ket(t, `applied`), stateVersion: n5(t, `stateVersion`) };
-                      },
-                      parseAssetResult: (e, t) => {
-                        let n = $8(e);
-                        if (e5(n, `sha256`) !== t)
-                          throw Error(`Artifact Session host returned the wrong asset.`);
-                        return r5(e5(n, `dataBase64`));
-                      },
-                      parseEvent: Get,
-                      parseFlushSubscriptionId: (e) => e5($8(e), `subscriptionId`),
-                      parseOpenResult: (e, t, n) => {
-                        let r = $8(e);
-                        if (e5(r, `subscriptionId`) !== n)
-                          throw Error(`Artifact Session host returned the wrong subscription.`);
-                        return Wet(t, r.document);
-                      },
-                      serializeBytes: qet,
+                      parseAppendResult: artifactSessionHostProtocol.parseAppendResult,
+                      parseAssetResult: artifactSessionHostProtocol.parseAssetResult,
+                      parseEvent: artifactSessionHostProtocol.parseEvent,
+                      parseFlushSubscriptionId:
+                        artifactSessionHostProtocol.parseFlushSubscriptionId,
+                      parseOpenResult: artifactSessionHostProtocol.parseOpenResult,
+                      serializeBytes: artifactSessionHostProtocol.serializeBytes,
                     }),
                   getViewerConnectionInfo: () => this.getArtifactSessionHostViewerConnectionInfo(),
-                  isErrorCode: o5,
+                  isErrorCode: artifactSessionHostProtocol.isErrorCode,
                   logFailure: (e, t) =>
                     r.i(`artifact-session-host-service`)().warning(e, {
                       safe: {},
                       sensitive: { error: t },
                     }),
-                  parseArtifactKind: (e) => {
-                    let t = e5($8(e), `kind`);
-                    if (t !== `presentation` && t !== `spreadsheet`)
-                      throw Error(`Artifact Session host returned an invalid kind.`);
-                    return t;
-                  },
-                  parseCapabilities: (e) => $8(e).capabilities,
-                  parseNativeSnapshot: Iet,
+                  parseArtifactKind: artifactSessionHostProtocol.parseArtifactKind,
+                  parseCapabilities: artifactSessionHostProtocol.parseCapabilities,
+                  parseNativeSnapshot: artifactSessionHostProtocol.parseNativeSnapshot,
                   requestConnectionReconciliation: () => b.requestViewerReconciliation(),
                   subscribeToConnectionInfo: (e) => b.onViewerConnectionInfoChanged(e),
                 });

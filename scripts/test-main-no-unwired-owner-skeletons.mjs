@@ -100,6 +100,7 @@ const realOwners = [
   ["src/main/main-app/device/codex-micro-service-manager.ts", "createCodexMicroServiceManagerClass"],
   ["src/main/main-app/import/external-agent-import.ts", "createExternalAgentImportHandlers"],
   ["src/main/main-app/projects/project-write-policy.ts", "computeProjectOrderMoves"],
+  ["src/main/main-app/remote-artifact/artifact-session-host-protocol.ts", "createArtifactSessionHostProtocol"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -563,5 +564,15 @@ assert.equal(main.includes("function y2e("), false, "generated MCP sandbox initi
 assert.equal(main.includes("createLanguageServerProtocolAdapters({"), true, "language-server protocol adapters are wired");
 assert.equal(main.includes("createMcpSandboxEventLogger(O$)"), true, "MCP sandbox event logger is wired");
 assert.equal(main.includes("initializeMcpSandbox(mcpSandboxNetwork, mcpSandboxLifecycle)"), true, "MCP sandbox initializer is wired");
+assert.equal(main.includes('require("./main-app/remote-artifact/artifact-session-host-protocol.js")'), true, "Artifact Session host protocol is wired");
+assert.equal(main.includes("artifactSessionHostProtocol = createArtifactSessionHostProtocol({"), true, "Artifact Session host protocol runtime is created");
+assert.equal(main.includes("function Iet("), false, "generated native snapshot parser must be removed");
+assert.equal(main.includes("async function Uet("), false, "generated viewer-client loader must be removed");
+assert.equal(main.includes("function Wet("), false, "generated artifact document parser must be removed");
+assert.equal(main.includes("function Get("), false, "generated artifact event parser must be removed");
+assert.equal(main.includes("function Q8("), false, "generated artifact update parser must be removed");
+assert.equal(main.includes("function $8("), false, "generated artifact record parser must be removed");
+assert.equal(main.includes("function r5("), false, "generated artifact base64 parser must be removed");
+assert.equal(main.includes("    artifactSessionHostProtocol,"), true, "WindowContext receives the semantic Artifact Session protocol");
 
-console.log("552 main unwired-owner skeleton assertions passed");
+console.log("564 main unwired-owner skeleton assertions passed");
