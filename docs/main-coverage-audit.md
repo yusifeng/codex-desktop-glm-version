@@ -3429,3 +3429,15 @@ analytics consumer 也直接 enqueue，两类消息因此恢复原共享顺序�
 focused suite 明确以 analytics→app-entry 验证启动期 FIFO，并覆盖 destroyed primary/target window 与窗口注册后重试；
 no-unwired gate 扩至 619 项。相邻 computer-history status-item 24 项回归恢复真实执行，其直接 import `.ts`、此前无法启动的
 测试入口同步修复。
+
+### 整块抽取：startup window activation runtime
+
+新增并接回 `startup/window-activation-runtime.ts`，统一拥有 app-ready gate、外部 ensure/create/show 请求、窗口呈现、
+second-instance 打开、菜单/托盘导航与 shortcut attribution。active presentation 保持 opacity workaround→restore→show→focus→
+`setImmediate` 恢复 opacity 的原顺序，inactive presentation 仍只调用 `showInactive`；现有窗口导航才调用 route change，
+新建窗口继续通过 initial route 创建，并在成功后按原顺序 dismiss notification 与发送 attribution。
+
+`Ust` 原 `me/he/ge/Be/Ve/He/Ue` 状态与 closures 已整带删除，IPC、application lifecycle、SQLite recovery、菜单、托盘和
+second-instance consumers 均使用同一 runtime，启动自身仍直接 `W.ensureWindow()` 以绕过尚未释放的外部 gate，最终阶段才
+`markReady()`。25 项 focused 断言与相邻 250 项回归通过；其中 application menu、native status-item、desktop open-path、
+startup IPC 四个直接 import `.ts` 的失效入口已修复为真实执行。no-unwired gate 扩至 626 项。

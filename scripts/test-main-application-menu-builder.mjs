@@ -1,7 +1,20 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { createApplicationMenuBuilder } from "../src/main/main-app/app-shell/app-menu.ts";
-import { normalizeMenuAccelerator } from "../src/main/main-app/app-shell/application-menu-runtime.ts";
+import { transform } from "esbuild";
+
+const loadModule = async (path) => {
+  const source = fs.readFileSync(new URL(path, import.meta.url), "utf8");
+  const output = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+  const loaded = { exports: {} };
+  Function("module", "exports", output.code)(loaded, loaded.exports);
+  return loaded.exports;
+};
+const { createApplicationMenuBuilder } = await loadModule(
+  "../src/main/main-app/app-shell/app-menu.ts",
+);
+const { normalizeMenuAccelerator } = await loadModule(
+  "../src/main/main-app/app-shell/application-menu-runtime.ts",
+);
 
 let assertions = 0;
 function equal(actual, expected, message) {

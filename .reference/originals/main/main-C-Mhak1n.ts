@@ -372,6 +372,7 @@ const { subscribeComputerUsePipTurnLifecycle: Noe } = require("./main-app/comput
 const { AppEntryAttributionTracker: Foe } = require("./main-app/startup/app-entry-attribution.js");
 const { createAppEntryDeliveryRuntime } = require("./main-app/startup/app-entry-delivery.js");
 const { createPrimaryWindowMessageQueue } = require("./main-app/startup/primary-window-message-queue.js");
+const { createWindowActivationRuntime } = require("./main-app/startup/window-activation-runtime.js");
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
 const { createBrowserHostServiceClass } = require("./main-app/browser-sidebar/browser-host-service.js");
@@ -56247,9 +56248,19 @@ async function Ust() {
           W.avatarOverlayManager.reconcileRemoteHostedPIPContentHost()),
         (G = e));
     },
-    me = !1,
-    he = () => (me ? W.ensureWindow() : Promise.resolve(null)),
-    ge = (e) => (me ? W.createFreshWindow(e) : Promise.resolve(null)),
+    windowActivation = createWindowActivationRuntime({
+      createFreshWindow: W.createFreshWindow,
+      dismissNotificationByNavigationPath: (path) => je.desktopNotificationManager.dismissByNavigationPath(path),
+      ensureWindow: W.ensureWindow,
+      getPrimaryWindow: W.getPrimaryWindow,
+      hideHotkeyWindow: () => W.hotkeyWindowLifecycleManager.hide(),
+      isWindows: P,
+      navigateToRoute: (window, path) => Le.navigateToRoute(window, path),
+      onAppEntrySource: fe,
+      reportNonFatal: (error, context) => u.reportNonFatal(error, context),
+      shouldApplyWindowsOpacityWorkaround,
+      showPrimaryWindow: (window) => W.windowManager.showPrimaryWindow(window),
+    }),
     _e = (e) => W.isTrustedIpcSender(e.sender, e.senderFrame ?? null);
   (installChunkedMessageAcknowledgement({ acknowledgementChannel: a.Ct, chunkedMessageSender: oe, ipcMain: l.ipcMain, isTrustedIpcEvent: _e }),
     registerStartupIpcHandlers({
@@ -56312,11 +56323,11 @@ async function Ust() {
     Te = null,
     Ee = (e) => !1,
     De = createSqliteRecoveryConfirmationQueue({
-      ensureWindow: he,
+      ensureWindow: windowActivation.ensureWindow,
       logger: r.n,
       showRecoveryConfirmation: (databasePath, backupFolder, window) =>
         a.f(databasePath, backupFolder, window),
-      showPrimaryWindow: (e) => me && W.windowManager.showPrimaryWindow(e),
+      showPrimaryWindow: windowActivation.showPrimaryWindow,
     });
   delete process.env[as];
   let Oe = await createDynamicAppToolsServer({
@@ -56494,8 +56505,8 @@ async function Ust() {
       },
       getLocalAppServerConnection: Pe,
       windowServices: W,
-      createFreshWindow: ge,
-      ensureWindow: he,
+      createFreshWindow: windowActivation.createFreshWindow,
+      ensureWindow: windowActivation.ensureWindow,
       getElectronMessageHandlerForWindow: je.getElectronMessageHandlerForWindow,
       allowDevtools: w,
       allowDebugMenu: E,
@@ -56547,70 +56558,22 @@ async function Ust() {
     Le.deepLinks.registerProtocolClient(),
     t.n(Cl(process.argv)),
     M(`registered deep link protocol`, L));
-  let ze = process.env.CODEX_ELECTRON_START_IN_BACKGROUND === `1`,
-    Be = (e, t = !0) => {
-      if (!t) {
-        e.showInactive();
-        return;
-      }
-    let n = shouldApplyWindowsOpacityWorkaround({
-      isWindows: P,
-      isVisible: e.isVisible(),
-      isMinimized: e.isMinimized(),
-    });
-      (n && e.setOpacity(0),
-        e.isMinimized() && e.restore(),
-        e.show(),
-        e.focus(),
-        n &&
-          setImmediate(() => {
-            e.isDestroyed() || e.setOpacity(1);
-          }));
-    },
-    Ve = async (e) => {
-      if (me)
-        try {
-          W.hotkeyWindowLifecycleManager.hide();
-          let t = W.getPrimaryWindow() ?? (await ge(`/`));
-          if (t == null) return;
-          (Be(t), e != null && fe(e, t.webContents));
-        } catch (e) {
-          u.reportNonFatal(e instanceof Error ? e : `Failed to open window on second instance`, {
-            kind: `second-instance-open-window-failed`,
-          });
-        }
-    };
+  let ze = process.env.CODEX_ELECTRON_START_IN_BACKGROUND === `1`;
   b((e) => {
     let n = Cl(e),
       r = t.n(n);
     if (Le.deepLinks.queueProcessArgs(e)) {
-      r && Ve();
+      r && windowActivation.openSecondInstance();
       return;
     }
     if (r) {
-      Ve();
+      windowActivation.openSecondInstance();
       return;
     }
-    Ve({ channel: `shortcut`, source: `shortcut` });
+    windowActivation.openSecondInstance({ channel: `shortcut`, source: `shortcut` });
   });
-  let He = async (e, t) => {
-      if (!me) return null;
-      W.hotkeyWindowLifecycleManager.hide();
-      let n = W.getPrimaryWindow(),
-        r = n ?? (await ge(e));
-      return r == null
-        ? null
-        : (je.desktopNotificationManager.dismissByNavigationPath(e),
-          n != null && t.navigateExistingWindow && Le.navigateToRoute(r, e),
-          Be(r),
-          r);
-    },
-    Ue = async (e, t) => {
-      let n = await He(e, t);
-      n != null && fe({ channel: `shortcut`, source: `shortcut` }, n.webContents);
-    };
   N &&
-    ((we = new DockMenuManager((e) => Ue(e, { navigateExistingWindow: !0 }), a.hn())),
+    ((we = new DockMenuManager((e) => windowActivation.navigateWithAttribution(e, { navigateExistingWindow: !0 }), a.hn())),
     we.setCompletedThreads(Ce));
   let We = (e) => {
       primaryWindowMessages.enqueue({ type: `computer-use-analytics-event`, event: e });
@@ -56621,11 +56584,11 @@ async function Ust() {
           buildFlavor: s,
           repoRoot: V.repoRoot,
           settingsStore: V.settingsStore,
-          onOpenMainWindow: () => Ue(`/`, { navigateExistingWindow: !1 }),
-          onTrayMenuOpenNewThread: () => Ue(`/`, { navigateExistingWindow: !0 }),
-          onTrayMenuOpenRecentThread: (e) => Ue(e, { navigateExistingWindow: !0 }),
+          onOpenMainWindow: () => windowActivation.navigateWithAttribution(`/`, { navigateExistingWindow: !1 }),
+          onTrayMenuOpenNewThread: () => windowActivation.navigateWithAttribution(`/`, { navigateExistingWindow: !0 }),
+          onTrayMenuOpenRecentThread: (e) => windowActivation.navigateWithAttribution(e, { navigateExistingWindow: !0 }),
           onTrayMenuSendFeedback: async () => {
-            await Ue(`/`, { navigateExistingWindow: !1 });
+            await windowActivation.navigateWithAttribution(`/`, { navigateExistingWindow: !1 });
             let e = W.getPrimaryWindow();
             e != null && W.sendMessageToWindow(e, { type: `run-command`, id: `feedback` });
           },
@@ -56637,7 +56600,7 @@ async function Ust() {
             invalidateQuery: (e) => W.broadcastQueryCacheInvalidation(e),
             logComputerHistoryStatusItemAction: (e) =>
               We({ type: `skysight-status-item-action-clicked`, action: e }),
-            navigate: (e) => Ue(e, { navigateExistingWindow: !0 }),
+            navigate: (e) => windowActivation.navigateWithAttribution(e, { navigateExistingWindow: !0 }),
             quit: () => l.app.quit(),
             requestComputerUseWorker: Se.requestComputerUseWorker,
             historyClearActions: HISTORY_CLEAR_ACTIONS,
@@ -56651,7 +56614,7 @@ async function Ust() {
           kind: `tray-setup-failed`,
           tags: { errorType: `tray-setup-failed` },
         }),
-          he());
+          windowActivation.ensureWindow());
       }
     },
     Ke = async (e) => {
@@ -56926,10 +56889,10 @@ async function Ust() {
     productionAppcastStateStore: v,
     getContextForWebContents: W.getContextForWebContents,
     getPrimaryWindow: W.getPrimaryWindow,
-    showPrimaryWindow: (e) => me && W.windowManager.showPrimaryWindow(e),
+    showPrimaryWindow: windowActivation.showPrimaryWindow,
     sendMessageToWindow: W.sendMessageToWindow,
-    ensureWindow: he,
-    createFreshWindow: ge,
+    ensureWindow: windowActivation.ensureWindow,
+    createFreshWindow: windowActivation.createFreshWindow,
     setDesktopFeatureAvailability: $e,
     setAvatarOverlayFeedbackDiagnosticsEnabled: (e) => {
       W.avatarOverlayManager.setFeedbackDiagnosticsEnabled(e);
@@ -56974,7 +56937,7 @@ async function Ust() {
       quitState: ye,
       windows: W,
       applicationMenuManager: Le.applicationMenuManager,
-      ensureWindow: he,
+      ensureWindow: windowActivation.ensureWindow,
       hotkeyWindowLifecycleManager: W.hotkeyWindowLifecycleManager,
       globalDictationLifecycleManager: W.globalDictationLifecycleManager,
       globalState: V.globalState,
@@ -56992,7 +56955,7 @@ async function Ust() {
     }),
     (L = Date.now()));
   let et = await W.ensureWindow();
-  (et != null && (Be(et, !ze), appEntryDelivery.handleInitialWindowVisible()),
+  (et != null && (windowActivation.presentWindow(et, !ze), appEntryDelivery.handleInitialWindowVisible()),
     M(`startup window revealed`, L, { windowVisible: et?.isVisible() ?? !1 }),
     (L = Date.now()));
   try {
@@ -57273,8 +57236,8 @@ async function Ust() {
           logger: r,
         }),
       ),
-      ct !== et && Be(ct, !ze)),
-    (me = !0),
+      ct !== et && windowActivation.presentWindow(ct, !ze)),
+    windowActivation.markReady(),
     nt(),
     M(`window ensured`, L, { windowVisible: ct?.isVisible() ?? !1 }),
     (L = Date.now()),

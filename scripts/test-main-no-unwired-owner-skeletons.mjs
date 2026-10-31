@@ -8,6 +8,7 @@ const realOwners = [
   ["src/main/main-app/window/chunked-web-contents-message-sender.ts", "createChunkedWebContentsMessageSenderClass"],
   ["src/main/main-app/startup/app-entry-delivery.ts", "createAppEntryDeliveryRuntime"],
   ["src/main/main-app/startup/primary-window-message-queue.ts", "createPrimaryWindowMessageQueue"],
+  ["src/main/main-app/startup/window-activation-runtime.ts", "createWindowActivationRuntime"],
   ["src/main/main-app/startup/window-icon-lifecycle.ts", "createWindowIconLifecycle"],
   ["src/main/main-app/fetch-handler/electron-fetch-handler.ts", "createElectronFetchHandlerClass"],
   ["src/main/main-app/misc/open-in-service.ts", "createOpenInServiceClass"],
@@ -625,5 +626,11 @@ assert.equal(main.includes("primaryWindowMessages = createPrimaryWindowMessageQu
 assert.equal(main.includes("primaryWindowMessages.enqueue({ type: `computer-use-analytics-event`"), true, "computer-use analytics uses the semantic queue");
 assert.equal(main.includes("ce.push({ type: `computer-use-analytics-event`"), false, "stale generated analytics queue consumer must be removed");
 assert.equal(main.includes("appEntryDelivery.setWindowServices"), false, "app-entry owner must not duplicate window queue state");
+assert.equal(main.includes('require("./main-app/startup/window-activation-runtime.js")'), true, "window-activation runtime is wired");
+assert.equal(main.includes("windowActivation = createWindowActivationRuntime({"), true, "startup creates one window-activation state owner");
+assert.equal(main.includes("windowActivation.markReady()"), true, "startup releases the external window gate after initialization");
+assert.equal(main.includes("me = !1"), false, "generated window readiness flag must be removed");
+assert.equal(main.includes("let He = async"), false, "generated window navigation adapter must be removed");
+assert.equal(main.includes("windowActivation.openSecondInstance"), true, "second-instance paths use the semantic activation runtime");
 
-console.log("619 main unwired-owner skeleton assertions passed");
+console.log("626 main unwired-owner skeleton assertions passed");

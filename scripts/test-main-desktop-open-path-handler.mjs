@@ -2,7 +2,16 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { installDesktopOpenPathHandler } from "../src/main/main-app/files/desktop-open-path-handler.ts";
+import { transform } from "esbuild";
+
+const source = fs.readFileSync(
+  new URL("../src/main/main-app/files/desktop-open-path-handler.ts", import.meta.url),
+  "utf8",
+);
+const output = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+const loaded = { exports: {} };
+Function("module", "exports", output.code)(loaded, loaded.exports);
+const { installDesktopOpenPathHandler } = loaded.exports;
 
 let assertions = 0;
 const equal = (actual, expected) => {

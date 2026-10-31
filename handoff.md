@@ -5369,3 +5369,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   analytics 重新共享同一顺序、flush 和 destroyed-window policy，没有补回匿名状态或复制队列。
 - focused suite 明确验证 analytics→app-entry 启动顺序和延迟 flush，no-unwired gate 扩至 619 项；同步修复
   computer-history status-item 测试直接 import TypeScript 而无法执行的问题。
+
+# 2026-11-01 startup window activation runtime extraction
+
+- 新增并真实接回 `startup/window-activation-runtime.ts`，统一拥有 app-ready gate、ensure/create/show、active/inactive presentation、
+  Windows opacity workaround、second-instance、菜单/托盘 navigation 与 shortcut attribution；启动自身仍绕过 gate，所有外部
+  consumers 到最终 `markReady()` 后才放行。
+- `Ust` 旧 `me/he/ge/Be/Ve/He/Ue` 状态与 closures 删除。focused suite 25 项、相邻回归 250 项，no-unwired gate 扩至
+  626 项；application menu、native status-item、desktop open-path、startup IPC 四个原本无法加载 `.ts` 的测试入口恢复执行。
