@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 dev process lifecycle and installer attribution owners
+
+新增 `startup/dev-process-lifecycle.ts` 接管 `Yoe/Xoe/Zoe/Qoe`，保持 signal 0 的 ESRCH 特判、父进程轮询一次性 dispose、will-quit cleanup
+和 webview process-group fallback；`misc/installer-attribution.ts` 的安全文件读取 owner 直接接回 `au` consumer。主 chunk `Hoe…au` 约 199 行
+删除，内嵌且无剩余 consumer 的 tray 文案常量一并清理。focused suite 验证所有进程与 marker 分支及启动 wiring。
+
 ## 2026-11-01 startup attribution and PIP turn lifecycle owners
 
 新增 `startup/app-entry-attribution.ts` 与 `computer-use/pip-turn-lifecycle.ts`，分别接管原 `Foe` 激活归因状态机和 `Noe/Poe` turn cleanup；

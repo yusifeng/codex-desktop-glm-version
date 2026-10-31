@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+新增 `startup/dev-process-lifecycle.ts`，恢复 dev relaunch marker、父进程存活轮询、will-quit 清理及 webview 进程组→单 PID 强杀回退；
+installer attribution 改接既有安全 owner，未被消费的内嵌 tray 文案副本同步删除。旧 `Hoe…au` 约 199 行整体移除，focused suite 覆盖
+PID admission、ESRCH/EPERM、marker 写入失败、轮询幂等清理与 webview kill fallback。
+
 恢复启动激活归因和 PIP turn 生命周期：新增 `startup/app-entry-attribution.ts`，保留 initial installer、deep-link/direct/foreground 去重、
 background 抑制与 generation 防陈旧回调；新增 `computer-use/pip-turn-lifecycle.ts`，按 turn 终态完成/失效 PIP 并关闭 active turn。Browser Use
 本地插件迁移改由既有语义模块唯一拥有，Computer Use canonical refresh/app 解析接回命名导出，旧两段合计约 300 行删除。
