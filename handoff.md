@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+继续恢复 notification turn reducer：语义 `nb` 已接回 `turn/started`、diff/plan/safety、hook lifecycle、model reroute 与 turn error；started
+路径恢复 unknown guard、placeholder/synthesized turn 绑定、最新 model/effort/collaboration 投影、旧 plan implementation completion、request 过滤与
+snapshot。focused reducer suite 覆盖 started 和 diff；旧 `tb` 暂保留作为尚待迁移的 completed 分支源码边界。
+
 恢复 core notification reducer 外层 owner：`streams/notifications-apply.ts` 的 `nb` 现按旧顺序执行 reconnect reset、follower ignore、resume/
 thread-start buffering、turn-start observation、trace、realtime/lifecycle/thread/item/fs 分发与最终 emit；thread reducer 同步恢复 environment、start、
 name/settings/status、goal、archive/delete/unarchive、token usage。主 chunk 旧 `nb/rb` 删除，新增 focused suite 覆盖 buffer/ignore 与关键分支。

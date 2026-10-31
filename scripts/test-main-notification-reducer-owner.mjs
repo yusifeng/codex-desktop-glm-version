@@ -10,7 +10,9 @@ const module = { exports: {} };
 Function("require", "module", "exports", transpiled.code)((specifier) => {
   if (specifier === "@chunk/shared") return { $u: String, ed: String, Zo: (error) => error instanceof Error ? error.message : String(error) };
   if (specifier === "../turns/canonical-history") return {
-    conversationTurns: (conversation) => conversation.turns ?? [], findTurnById: () => null, lastTurnWithTurnId: () => null,
+    conversationTurns: (conversation) => conversation.turns ?? [],
+    findTurnById: (conversation, id) => (conversation.turns ?? []).find((turn) => turn.turnId === id) ?? null,
+    lastTurnWithTurnId: (conversation) => [...(conversation.turns ?? [])].reverse().find((turn) => turn.turnId != null) ?? null,
     forEachTurn: (conversation, callback) => (conversation.turns ?? []).forEach(callback),
   };
   if (specifier === "../threads/patch-classification") return {
@@ -27,11 +29,16 @@ const owner = module.exports;
 const calls = [];
 const conversations = new Map([["thread-1", { id: "thread-1", turns: [], requests: [] }]]);
 const context = {
+  createId: () => `item-${calls.length}`,
   observeTurnStart: (...args) => calls.push(["observe", ...args]),
   manager: {
     logger: { trace: (...args) => calls.push(["trace", ...args]), info: (...args) => calls.push(["info", ...args]), warning: (...args) => calls.push(["warning", ...args]), error: (...args) => calls.push(["error", ...args]) },
     getHostId: () => "local", getConversation: (id) => conversations.get(id) ?? null,
     updateConversationState: (id, update) => { const state = conversations.get(id) ?? { id }; update(state); conversations.set(id, state); },
+    updateTurnState: (id, turnId, update) => {
+      const state = conversations.get(id); const turn = state?.turns?.find((entry) => entry.turnId === turnId);
+      if (turn != null) update(turn);
+    },
     broadcastConversationSnapshot: (id) => calls.push(["snapshot", id]),
     sendRequest: async (...args) => calls.push(["request", ...args]),
     getMcpServerElicitationItem: () => ({ type: "mcpServerElicitation" }),
@@ -66,6 +73,13 @@ owner.applyNotification(context, "thread/settings/updated", { threadId: "thread-
 equal(conversations.get("thread-1").latestThreadSettings, { model: "gpt" });
 owner.applyNotification(context, "thread/status/changed", { threadId: "thread-1", status: { type: "active" } });
 equal(conversations.get("thread-1").threadRuntimeStatus, { type: "active" });
+
+conversations.get("thread-1").turns = [{ turnId: "turn-1", status: "inProgress", params: { model: "gpt", effort: "high" }, items: [] }];
+owner.applyNotification(context, "turn/started", { threadId: "thread-1", turn: { id: "turn-1", status: "inProgress", durationMs: 3, error: null } });
+equal(conversations.get("thread-1").latestModel, "gpt");
+equal(conversations.get("thread-1").turns[0].durationMs, 3);
+owner.applyNotification(context, "turn/diff/updated", { threadId: "thread-1", turnId: "turn-1", diff: "patch" });
+equal(conversations.get("thread-1").turns[0].diff, "patch");
 
 owner.applyNotification(context, "item/agentMessage/delta", { threadId: "thread-1", delta: "hello" });
 equal(calls.some(([kind]) => kind === "item"), true);

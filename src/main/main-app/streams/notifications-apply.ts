@@ -103,6 +103,75 @@ const ITEM_STREAM_METHODS = new Set([
   "item/reasoning/textDelta", "item/commandExecution/outputDelta", "item/commandExecution/terminalInteraction",
   "item/fileChange/patchUpdated",
 ]);
+const TURN_NOTIFICATION_METHODS = new Set([
+  "turn/started", "turn/diff/updated", "turn/plan/updated", "model/safetyBuffering/updated",
+  "hook/started", "hook/completed", "model/rerouted", "error",
+]);
+function applyTurnNotification(context: any, notification: { method: string; params: any }): void {
+  const { manager, notificationContext, createId } = context;
+  const { method, params } = notification;
+  const conversationId = normalizeThreadId(params.threadId);
+  if (method === "turn/started") {
+    const conversation = notificationContext.threadStore.conversations.get(conversationId);
+    if (conversation == null) {
+      manager.logger.error("Received turn/started for unknown conversation", { safe: { conversationId }, sensitive: {} });
+      return;
+    }
+    manager.updateTurnState(conversationId, params.turn.id, (turn: any) => {
+      if (turn.status !== "inProgress") return;
+      turn.turnId = params.turn.id;
+      turn.turnStartedAtMs ??= Date.now();
+      turn.durationMs = params.turn.durationMs;
+      turn.status = params.turn.status;
+      turn.error = params.turn.error;
+    }, { rebindLatestInProgressPlaceholder: true, synthesizeMissingTurn: true });
+    manager.updateConversationState(conversationId, (state: any) => {
+      const turn = findTurnById(state, params.turn.id);
+      if (turn != null && lastTurnWithTurnId(state) === turn) {
+        state.latestModel = turn.params?.model ?? state.latestModel;
+        state.latestReasoningEffort = turn.params?.effort ?? state.latestReasoningEffort;
+        state.latestCollaborationMode = turn.params?.collaborationMode ?? state.latestCollaborationMode;
+      }
+      forEachTurn(state, (entry: any) => {
+        for (const item of entry.items ?? [])
+          if (item.type === "planImplementation" && "turnId" in item && "isCompleted" in item && item.turnId !== params.turn.id)
+            item.isCompleted = true;
+      });
+      state.requests = state.requests.filter((request: any) => request.method !== "item/plan/requestImplementation" || request.params.turnId === params.turn.id);
+    });
+    manager.broadcastConversationSnapshot(conversationId);
+    return;
+  }
+  if ((method === "hook/started" || method === "hook/completed") && !notificationContext.threadStore.conversations.has(conversationId)) {
+    manager.logger.error(`Received ${method} for unknown conversation`, { safe: { conversationId } });
+    return;
+  }
+  manager.updateTurnState(conversationId, params.turnId, (turn: any) => {
+    if (method === "turn/diff/updated") turn.diff = params.diff;
+    else if (method === "turn/plan/updated") turn.items.push({ id: createId(), type: "todo-list", explanation: params.explanation ?? null, plan: params.plan });
+    else if (method === "model/safetyBuffering/updated") {
+      const { threadId: _threadId, turnId: _turnId, model: _model, ...safetyBuffering } = params;
+      turn.safetyBuffering = safetyBuffering;
+    } else if (method === "model/rerouted")
+      turn.items.push({ id: createId(), type: "modelRerouted", fromModel: params.fromModel, toModel: params.toModel, reason: params.reason });
+    else if (method === "error")
+      turn.items.push({ id: createId(), type: "error", message: params.error.message, willRetry: params.willRetry,
+        errorInfo: params.error.codexErrorInfo, additionalDetails: params.error.additionalDetails ?? null });
+    else {
+      const runs = (turn.hookRuns ??= []);
+      let index = -1;
+      for (let cursor = runs.length - 1; cursor >= 0; cursor -= 1) {
+        const current = runs[cursor]?.run;
+        if (current?.id === params.run.id && (current.status === "running" || (params.run.completedAt != null && current.completedAt === params.run.completedAt))) { index = cursor; break; }
+      }
+      if (index >= 0) runs[index] = { id: runs[index].id, run: params.run };
+      else {
+        const count = runs.filter((entry: any) => entry.run.id === params.run.id).length;
+        runs.push({ id: count === 0 ? params.run.id : `${params.run.id}:${count}`, run: params.run });
+      }
+    }
+  }, method === "hook/started" ? { rebindLatestInProgressPlaceholder: true } : undefined);
+}
 function applyServerRequestResolved(context: any, params: any): void {
   const { manager, notificationContext } = context;
   const conversationId = normalizeThreadId(params.threadId);
@@ -147,6 +216,7 @@ export function nb(context: any, method: string, params: any, automationCapabili
     notificationContext.lifecycle.handleNotification(notification);
   else if (THREAD_NOTIFICATION_METHODS.has(method)) applyThreadNotification(context, notification);
   else if (ITEM_STREAM_METHODS.has(method)) notificationContext.itemStreamState.handleNotification(notification);
+  else if (TURN_NOTIFICATION_METHODS.has(method)) applyTurnNotification(context, notification);
   else if (method === "serverRequest/resolved") applyServerRequestResolved(context, params);
   else if (method === "fs/changed")
     for (const message of notificationContext.openFileWatches.getFileChangeMessages(params.watchId)) notificationContext.events.emitOpenFileChange(message);

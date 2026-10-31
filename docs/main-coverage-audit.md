@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 notification turn reducer restoration
+
+在 outer reducer 接回后，本轮继续恢复除 completed 外的 turn 通知：started 会重绑/合成 turn、投影最新配置、完成旧 plan implementation、
+清理跨 turn plan requests 并广播 snapshot；diff/plan/safety/hook/reroute/error 使用真实 updateTurnState consumer。旧 `tb` 仍保留，下一批
+完成 unread/automation/continuation 语义后再整体删除，避免用较窄实现冒充完整迁移。
+
 ## 2026-10-31 notification reducer outer owner repair
 
 语义 `nb` 原先绕过 follower mutation gate、resume/start buffer、turn observation、lifecycle 与 item stream，仅 emit 后处理三类 archive 方法。
