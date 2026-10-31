@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 CodexMicroHostService：新增 `device/codex-micro-host-service.ts`，整体替代主 chunk 旧 `Qk…rA/iA/cA` 的 macOS
+Input Monitoring addon 探测与 11-member per-window RPC 门面。primary-window/锁屏 ownership gate、thread-key/lighting forwarding、
+System Settings 打开与错误降级保持完整；大型 `lA` device lifecycle manager 原样保留并继续作为真实 consumer 的依赖。
+
 接回 BrowserSourceOwnerRegistry：新增 `window/browser-source-owner-registry.ts`，整体替代主 chunk 旧 `rje/ije/EN/DN`
 manager、per-origin RPC service、registration 与 owner-key 簇。same-origin 替换、RPC broken 清理、account subscription、reveal/focus、
 origin destroy/dispose 生命周期保持完整；`WindowContext` 继续通过 `rje` 兼容别名构造真实 registry。

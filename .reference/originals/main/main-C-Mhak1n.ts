@@ -155,6 +155,7 @@ const { ChronicleService: IO } = require("./main-app/chronicle/service.js");
 const { ClipboardService: VO } = require("./main-app/clipboard/service.js");
 const { createQueryCacheHostServiceClass } = require("./main-app/window/query-cache-host-service.js");
 const { BrowserSourceOwnerRegistry: rje } = require("./main-app/window/browser-source-owner-registry.js");
+const { CodexMicroHostService: cA } = require("./main-app/device/codex-micro-host-service.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -55025,82 +55026,9 @@ function Zk(e, t) {
       },
     });
 }
-var Qk = `input-monitoring-permission.node`,
-  $k = `input_monitoring_permission.node`,
-  eA = (0, ee.createRequire)(__filename);
-function tA({ addon: e, platform: t = process.platform } = {}) {
-  if (t !== `darwin`) return `unavailable`;
-  try {
-    return (e ?? nA()).hasInputMonitoringPermission() ? `granted` : `denied`;
-  } catch (e) {
-    return (
-      r
-        .n()
-        .warning(`Failed to check input monitoring access`, { safe: {}, sensitive: { error: e } }),
-      `unavailable`
-    );
-  }
-}
-function nA() {
-  let e = rA().find(v.existsSync);
-  if (e == null) throw Error(`Input Monitoring permission addon not found`);
-  return eA(e);
-}
-function rA() {
-  let e = h.default.join(
-      l.app.getAppPath(),
-      `native`,
-      `input-monitoring-permission-addon`,
-      `build`,
-      `Release-${process.arch}`,
-      $k,
-    ),
-    t = o.t({ env: process.env, resourcesPath: process.resourcesPath });
-  return t == null ? [e] : [h.default.join(t, `native`, Qk), e];
-}
-var iA = `x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent`,
-  aA = 350,
+var aA = 350,
   oA = 250,
   sA = { status: `not-detected`, transport: null, model: null, error: null, battery: null },
-  cA = class extends n.Uf {
-    serviceManager;
-    windowManager;
-    origin;
-    logger = r.r(`CodexMicroHostService`);
-    constructor(e, t, n) {
-      (super(), (this.serviceManager = e), (this.windowManager = t), (this.origin = n));
-    }
-    getState() {
-      return this.serviceManager.getState();
-    }
-    async getInputMonitoringPermissionStatus() {
-      return tA();
-    }
-    ownsPrimaryWindow() {
-      return (
-        this.windowManager.getPrimaryWindow()?.webContents === this.origin &&
-        l.powerMonitor.getSystemIdleState(1) !== `locked`
-      );
-    }
-    async openInputMonitoringSettings() {
-      try {
-        await l.shell.openExternal(iA);
-      } catch (e) {
-        this.logger.error(`Open input monitoring settings failed`, {
-          safe: {},
-          sensitive: { error: e },
-        });
-      }
-    }
-    async updateAgentThreadKeys(e, t, n = !1) {
-      return this.ownsPrimaryWindow()
-        ? (this.serviceManager.updateAgentThreadKeys(e, t, n), !0)
-        : !1;
-    }
-    async updateLighting(e) {
-      return this.ownsPrimaryWindow() ? this.serviceManager.updateLighting(e) : !1;
-    }
-  },
   lA = class {
     options;
     logger = r.r(`CodexMicroServiceManager`);

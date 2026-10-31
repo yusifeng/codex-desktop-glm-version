@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 CodexMicroHostService owner wiring
+
+新增 `src/main/main-app/device/codex-micro-host-service.ts`，迁出旧 `Qk/$k/eA/tA/nA/rA/iA/cA` addon probe 与 host service，
+保留 `lA` 大型 lifecycle manager。focused suite 锁定 11-member owner，并覆盖跨平台 permission fallback、granted/denied/error、
+primary/locked ownership、keys/lighting forwarding、settings URL 与 `WindowContext` 真实 wiring。
+
 ## 2026-10-31 BrowserSourceOwnerRegistry wiring
 
 新增 `src/main/main-app/window/browser-source-owner-registry.ts`，完整迁出旧 `rje/ije/EN/DN` 122 行簇。focused suite 锁定
