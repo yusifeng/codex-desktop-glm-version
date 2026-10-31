@@ -122,6 +122,7 @@ const { createUserVerificationRpcServices } = require("./main-app/user-verificat
 const { createDownloadsViewPublisherClass } = require("./main-app/downloads/downloads-view-publisher.js");
 const { createAppServerTransportPolicy } = require("./main-app/app-server/transport-policy.js");
 const { createGithubRequestClientFactory } = require("./main-app/github/github-request-client.js");
+const { createVisualizationServiceRuntime } = require("./main-app/visualizations/visualization-service.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -140582,173 +140583,18 @@ var Fnt = createTracingRpcServiceClass({
   }),
   { UserVerificationService: znt, UserVerificationAttempt: Bnt } =
     createUserVerificationRpcServices({ RpcHandlerBase: n.Uf }),
-  Vnt = 5e6,
-  Hnt = n.Of().regex(/^visualization-[0-9a-f]{16}$/),
-  Unt = n
-    .wf({
-      captureRect: n.wf({
-        height: n.Cf().positive(),
-        width: n.Cf().positive(),
-        x: n.Cf().nonnegative(),
-        y: n.Cf().nonnegative(),
-      }),
-      sandboxId: Hnt,
-      viewportSize: n.wf({ height: n.Cf().positive(), width: n.Cf().positive() }),
-    })
-    .refine(
-      ({ captureRect: e, viewportSize: t }) =>
-        e.x + e.width <= t.width && e.y + e.height <= t.height,
-    ),
-  Wnt = n.wf({
-    hostId: n.Of().trim().min(1).optional(),
-    path: n.Of().min(1),
-    sandboxPolicy: n
-      .wf({
-        excludeSlashTmp: n.gf(),
-        excludeTmpdirEnvVar: n.gf(),
-        type: n.bf(`workspaceWrite`),
-        writableRoots: n.hf(n.Of().min(1)),
-      })
-      .optional(),
-    threadId: n.Of().regex(/^[a-zA-Z0-9_-]+$/),
-  }),
-  Gnt = class extends n.Uf {
-    executionHostRegistry;
-    origin;
-    getThreadWorkspaceRoot;
-    constructor(e, t, n) {
-      (super(),
-        (this.executionHostRegistry = e),
-        (this.origin = t),
-        (this.getThreadWorkspaceRoot = n));
-    }
-    async copyImage(e) {
-      let t = Unt.safeParse(e);
-      if (!t.success) throw Error(`codex-inline-vis-screenshot: invalid request`);
-      let { captureRect: n, sandboxId: r, viewportSize: i } = t.data,
-        a = Z$(this.origin, r);
-      if (a == null) throw Error(`codex-inline-vis-screenshot: sandbox is unavailable`);
-      let o = await a.capturePage(),
-        s = NK(o.getSize(), n, i, Math.min(n.x, n.y));
-      if (s == null) throw Error(`codex-inline-vis-screenshot: capture is empty`);
-      let c = o.crop(s),
-        u =
-          process.platform === `win32`
-            ? l.nativeImage.createFromBitmap(c.toBitmap(), c.getSize())
-            : c;
-      l.clipboard.writeImage(u);
-    }
-    async getTemporaryRoots(e) {
-      if (!this.executionHostRegistry.get(e).isLocal) return [];
-      let t = (0, p.tmpdir)();
-      return [t, (0, v.realpathSync)(t)];
-    }
-    async read(e) {
-      let t = Wnt.safeParse(e);
-      if (!t.success) throw Error(`Invalid visualization read request`);
-      let { hostId: r, path: i, sandboxPolicy: a, threadId: o } = t.data,
-        s = this.executionHostRegistry.get(r),
-        [c, l, u] = await Promise.all([
-          s.codexHome(),
-          s.workspacesRoot().catch(() => null),
-          s.platformPath(),
-        ]),
-        d = n.qi(o);
-      if (d == null) throw Error(`Invalid visualization read request`);
-      let f = s.isLocal && u.sep === `/` ? n.Vi(c) : c,
-        m = (Tr().workspaceDir ? [l, f] : [f, l])
-          .filter((e) => e != null)
-          .map((e) => ({
-            boundary: e,
-            directory: u.join(e, `visualizations`, ...d.split(`/`), o),
-          })),
-        h = u.basename(i);
-      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*\.html$/.test(h))
-        throw Error(`Invalid visualization read request`);
-      let g = m.map(({ directory: e, boundary: t }) => ({ path: u.join(e, h), boundary: t }));
-      if (u.isAbsolute(i)) {
-        let e = u.normalize(i);
-        if (e !== i.replaceAll(`/`, u.sep)) throw Error(`Invalid visualization read request`);
-        let t = this.getThreadWorkspaceRoot?.(s.id, o),
-          n = [
-            ...(a?.excludeSlashTmp === !1 && u.sep === `/` ? [`/tmp`, `/private/tmp`] : []),
-            ...(a?.excludeTmpdirEnvVar === !1 && s.isLocal
-              ? [(0, p.tmpdir)(), (0, v.realpathSync)((0, p.tmpdir)())]
-              : []),
-          ];
-        g = [
-          await Knt(
-            e,
-            [
-              ...m,
-              ...[t, ...(a?.writableRoots ?? []), ...n]
-                .filter((e) => e != null)
-                .map((e) => ({ directory: e, boundary: e })),
-            ],
-            s,
-            u,
-          ),
-        ];
-      } else if (i !== h) throw Error(`Invalid visualization read request`);
-      for (let [e, t] of g.entries())
-        try {
-          let e = n.Ki(u.dirname(t.path), t.boundary);
-          if (e == null) throw Error(`Invalid visualization read request`);
-          let [r, ...i] = await Promise.all([
-            s.stat(t.path, { bypassCache: !0, followSymlinks: !1 }),
-            ...e.map((e) => s.stat(e, { bypassCache: !0, followSymlinks: !1 })),
-          ]);
-          if (
-            !r.isFile() ||
-            r.isSymbolicLink() ||
-            i.some((e) => !e.isDirectory() || e.isSymbolicLink())
-          )
-            throw Error(`Invalid visualization read request`);
-          let a = await s.readFile(t.path).then((e) => new Response(e).arrayBuffer());
-          return a.byteLength <= Vnt ? { contents: Buffer.from(a).toString(`utf8`) } : null;
-        } catch (t) {
-          if (!n.ds(t) || e === g.length - 1) throw t;
-        }
-      return null;
-    }
-  };
-async function Knt(e, t, r, i) {
-  let a = (0, yu.default)(
-      t.filter((e) => i.isAbsolute(e.directory)),
-      (e) => e.directory,
-    ),
-    o = a
-      .filter((t) => V5(t.directory, e, i))
-      .sort((e, t) => t.directory.length - e.directory.length)[0];
-  if (o != null) {
-    let t = (await n.Lt([o.boundary], r))[o.boundary];
-    if (t == null) throw Error(`Invalid visualization read request`);
-    return { boundary: t, path: i.join(t, i.relative(o.boundary, e)) };
-  }
-  let s = new AbortController(),
-    c = 0;
-  try {
-    return await Promise.any(
-      Array.from({ length: Math.min(4, a.length) }, async () => {
-        for (; !s.signal.aborted && c < a.length;) {
-          let t = a[c++],
-            o = (await n.Lt([t.boundary], r, s.signal))[t.boundary];
-          if (o != null && V5(i.join(o, i.relative(t.boundary, t.directory)), e, i))
-            return { boundary: o, path: e };
-        }
-        throw Error(`Invalid visualization read request`);
-      }),
-    );
-  } catch {
-    throw Error(`Invalid visualization read request`);
-  } finally {
-    s.abort();
-  }
-}
-function V5(e, t, n) {
-  let r = n.relative(e, t);
-  return r !== `..` && !r.startsWith(`..${n.sep}`) && !n.isAbsolute(r);
-}
+  { VisualizationService: Gnt } = createVisualizationServiceRuntime({
+    runtime: n,
+    RpcHandlerBase: n.Uf,
+    electron: l,
+    platform: process.platform,
+    getSandboxWebContents: Z$,
+    projectCaptureRect: NK,
+    getFeatureFlags: Tr,
+    temporaryDirectory: p.tmpdir,
+    realpathSync: v.realpathSync,
+    uniqueBy: yu.default,
+  });
 function qnt(e, { signal: t }) {
   return (
     t?.throwIfAborted(),

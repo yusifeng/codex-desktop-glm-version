@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Vnt/Hnt/Unt/Wnt/Gnt/Knt/V5` visualization service cluster 迁入
+`visualizations/visualization-service.ts`；screenshot schema/crop/clipboard、temporary roots、relative/absolute path
+authorization、realpath boundary resolution、stat/symlink guards、ENOENT fallback 与 5MB limit 均由新 owner 持有。
+唯一 runtime consumer 已接回，旧 cluster 已删除。focused test 覆盖 29 项。
+
 随后将 `Znt` host-aware GitHub request client factory 迁入 `github/github-request-client.ts`；repos/account/single-host
 host discovery、default/remote config dedupe、operation-source/signal forwarding 与 main request envelope 均由新 adapter
 持有。唯一 runtime consumer 已接回，旧 helper 已删除。focused test 覆盖 18 项。

@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 visualization service
+
+原 `Vnt/Hnt/Unt/Wnt/Gnt/Knt/V5` 已整簇迁入 `src/main/main-app/visualizations/visualization-service.ts`。新 owner
+保留 screenshot schema/crop/Windows bitmap clipboard、temporary roots、relative/absolute visualization path allowlist、
+realpath boundary resolution、ancestor/file stat 与 symlink guards、ENOENT candidate fallback 和 5MB content limit；唯一
+runtime consumer 已接回，旧 schemas/class/helpers 已删除。
+
 ## 2026-10-31 host-aware GitHub request client
 
 原 `Znt` 已迁入 `src/main/main-app/github/github-request-client.ts`。新 adapter 保留 repos/account/single-host
