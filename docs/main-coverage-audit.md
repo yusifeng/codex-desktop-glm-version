@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 desktop environment owner wiring
+
+`src/main/main-app/desktop/environment.ts` 已覆盖旧 `lt/ut/iEe/aEe/wT/TT/oEe/sEe/ET/cEe/DT`，保留共享的 flavor wrappers
+供 startup 使用。本轮新增轻量 `api/browser-auth-operations.ts`、修正 macOS medium icon 为 `getAppIconMedium`，接回 WindowContext、
+about dialog 与 startup icon consumers；focused suite 覆盖 OS/flavor、Sky icon、auth commit/failure、旧 symbols 与全部关键 wiring。
+
 ## 2026-10-31 cloud environment filesystem owner wiring
 
 `src/main/main-app/cloud/environment-fs.ts` 已完整覆盖旧 `nH/Wze/rH/iH`。本轮导出并接回 hosted-thread-files 与 durable binary

@@ -15,8 +15,8 @@ import {
   l as readWindowsOemCustomData,
   m as getMacAppIconPath,
 } from "@chunk/bootstrap";
-import { getWindowsAppIconSmall } from "../windows/native-app-icons";
-import { createBrowserAuthOperations } from "../api/desktop-fetch";
+import { getAppIconMedium } from "../windows/native-app-icons";
+import { createBrowserAuthOperations } from "../api/browser-auth-operations";
 
 // ---------------------------------------------------------------------------
 // OS 名表（原 543-551 的 `lt`/`ut`）
@@ -173,7 +173,7 @@ async function appIconMedium(flavor: string): Promise<string | null> {
       return flavor === (BuildFlavor as { Dev: string }).Dev
         ? iconToDataUrl(join(app.getAppPath(), "src", "icons", "icon-dev-outline.png"))
         : app.isPackaged
-          ? await getWindowsAppIconSmall(getMacAppIconPath() as unknown as string)
+          ? await getAppIconMedium(getMacAppIconPath() as unknown as string)
           : null;
     case "win32":
       resolved = windowsAppIconPath(flavor);

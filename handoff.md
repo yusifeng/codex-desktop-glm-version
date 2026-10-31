@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 desktop environment owners：既有 `desktop/environment.ts` 现替代旧 `ut/aEe/wT/TT/oEe/sEe/ET/cEe/DT`。审计修复
+macOS packaged medium icon 错接 Windows addon 的偏差，恢复旧 `Ys`/Sky addon；同时把 browser-auth commit ledger 抽成轻量模块，
+避免服务装配加载整个 desktop-fetch。WindowContext、about dialog 与 startup icon consumers 均通过兼容别名接回。
+
 接回 cloud environment filesystem owner：既有 `cloud/environment-fs.ts` 现替代主 chunk 旧 `nH/Wze/rH/iH`，并导出共享的
 remote read/executor guard。hosted thread files 与 durable binary fetch 两个真实 consumers 继续通过 `Wze/rH/iH` 兼容别名使用；
 cwd/file URL、metadata sampling、workspace 越界、symlink、hidden/directory filters 和目录优先排序保持完整，旧 97 行簇删除。

@@ -167,6 +167,7 @@ const { ensureComputerUseNotifyConfig: iie } = require("./main-app/computer-use/
 const { isComputerUseOverlaySettingKey: Fie, scheduleComputerUseConfigWrite: ns } = require("./main-app/computer-use/config-writer.js");
 const { ExecutionHostRegistry: fte } = require("./main-app/browser-use/execution-host.js");
 const { CloudEnvironmentFsService: Wze, readRemoteFile: rH, requireExecutor: iH } = require("./main-app/cloud/environment-fs.js");
+const { osNameOf: ut, BrowserAuthServices: aEe, pngIconPath: wT, windowsAppIconPath: TT, DesktopEnvironment: oEe } = require("./main-app/desktop/environment.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -753,13 +754,7 @@ var at = `codex-workspace-settings-`,
     tryPass(e = Date.now()) {
       return this.canPass(e) ? (this.mark(e), !0) : !1;
     }
-  },
-  lt = { darwin: `macOS`, linux: `Linux`, win32: `Windows` };
-function ut(e) {
-  if (e === `darwin`) return lt.darwin;
-  if (e === `linux`) return lt.linux;
-  if (e === `win32`) return lt.win32;
-}
+  };
 function dt(e) {
   let t = e.trim();
   if (!t || /^[a-zA-Z]:[\\/]/.test(t)) return null;
@@ -47207,117 +47202,8 @@ var $Te = n.wf({
       return t;
     }
   };
-function iEe(e) {
-  return new a.dt(async (t) => {
-    let n;
-    if (
-      (await e.updateAndPersist(a.I, (e) => {
-        let r = t(e);
-        return ((n = r), r.value);
-      }),
-      n == null)
-    )
-      throw Error(`Browser sign-in recovery was not committed`);
-    return n.result;
-  });
-}
-var aEe = class extends n.Uf {
-  #e;
-  get services() {
-    return this.#e;
-  }
-  constructor({ globalState: e, ...t }) {
-    (super(), (this.#e = { ...t, browserAuthOperations: iEe(e) }));
-  }
-};
 const iconBaseName = (e) => resolveFlavorIconBaseName(e, { agent: a.in.Agent, nightly: a.in.Nightly, internalAlpha: a.in.InternalAlpha, publicBeta: a.in.PublicBeta, dev: a.in.Dev, prod: a.in.Prod });
 const iconAssetNames = (e) => resolveFlavorIconAssetNames(e, { agent: a.in.Agent, nightly: a.in.Nightly, internalAlpha: a.in.InternalAlpha, publicBeta: a.in.PublicBeta, dev: a.in.Dev, prod: a.in.Prod });
-function wT(e, t = (0, h.join)(l.app.getAppPath(), `src`, `icons`)) {
-  let n = `${iconBaseName(e)}.png`;
-  if (l.app.isPackaged) {
-    let e = (0, h.join)(process.resourcesPath, n);
-    if ((0, v.existsSync)(e)) return e;
-  }
-  let r = (0, h.join)(t, n);
-  return (0, v.existsSync)(r) ? r : null;
-}
-function TT(
-  e,
-  {
-    isDark: t = l.nativeTheme.shouldUseDarkColorsForSystemIntegratedUI,
-    localIconsDirectory: n = (0, h.join)(l.app.getAppPath(), `.generated`, `windows-app-icons`),
-  } = {},
-) {
-  if (e === a.in.Agent) return null;
-  let r = t ? `chatgpt-app-dark.ico` : `chatgpt-app-light.ico`,
-    i = l.app.isPackaged ? (0, h.join)(process.resourcesPath, r) : (0, h.join)(n, r);
-  return (0, v.existsSync)(i) ? i : null;
-}
-var oEe = class extends n.Uf {
-  async get() {
-    let e = a.in.resolve();
-    return {
-      version: n.Bu(l.app.getVersion()).version,
-      buildNumber: a.nn.value,
-      buildFlavor: e,
-      osName: ut(process.platform) ?? null,
-      systemVersion:
-        typeof process.getSystemVersion == `function` ? process.getSystemVersion() : null,
-      appName: l.app.getName(),
-      chatGptDesktopAuthOrigin: void 0,
-      chatGptApiBaseUrl: void 0,
-      appIconMedium: await cEe(e),
-      dockIconPreviews: sEe(e),
-      preloadAttribution: await a.l(),
-    };
-  }
-};
-function sEe(e) {
-  if (process.platform !== `darwin`) return null;
-  let t = iconAssetNames(e),
-    n = ET(`${iconBaseName(e)}.png`),
-    r = ET(t.dark),
-    i = ET(t.light);
-  return n == null || r == null || i == null
-    ? null
-    : { appDefault: n, codexDark: r, codexLight: i };
-}
-function ET(e) {
-  if (e == null) return null;
-  let t = l.app.isPackaged ? (0, h.join)(process.resourcesPath, e) : null;
-  return DT(
-    t != null && (0, v.existsSync)(t) ? t : (0, h.join)(l.app.getAppPath(), `src`, `icons`, e),
-  );
-}
-async function cEe(e) {
-  let t;
-  switch (process.platform) {
-    case `darwin`:
-      return e === a.in.Dev
-        ? DT((0, h.join)(l.app.getAppPath(), `src`, `icons`, `icon-dev-outline.png`))
-        : l.app.isPackaged
-          ? Ys(a.m())
-          : null;
-    case `win32`:
-      t = TT(e);
-      break;
-    case `linux`:
-    case `aix`:
-    case `android`:
-    case `cygwin`:
-    case `freebsd`:
-    case `haiku`:
-    case `netbsd`:
-    case `openbsd`:
-    case `sunos`:
-      t = wT(e);
-  }
-  return t == null ? ET(`${iconBaseName(e)}.png`) : DT(t);
-}
-function DT(e) {
-  let t = l.nativeImage.createFromPath(e);
-  return t.isEmpty() ? null : t.resize({ width: 128, height: 128, quality: `best` }).toDataURL();
-}
 var lEe = `wss://codex-cloud-backend.chatgpt.com/`,
   uEe = new n.td();
 function OT(e) {

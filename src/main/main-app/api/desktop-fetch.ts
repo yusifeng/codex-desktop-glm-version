@@ -60,11 +60,10 @@ import {
   xt as resolveBackendApiUrl,
   gt as applyOriginatorHeaders,
   U as INTEGRITY_STATE_ENVELOPE_KEY,
-  I as BROWSER_AUTH_OPERATIONS_KEY,
   At as MESSAGE_FOR_VIEW,
-  dt as BrowserAuthOperationsStore,
 } from "@chunk/bootstrap";
 import { LOCAL_HOST_ID } from "../host-id";
+import { createBrowserAuthOperations } from "./browser-auth-operations";
 
 // ---------------------------------------------------------------------------
 // zod schema（原 sT/OTe/kTe/ATe，62,046-62,087）
@@ -1582,21 +1581,6 @@ class PrimaryWindowActionsBridge extends EventEmitterBase {
 // 与 bootstrap state/browser-auth-operations 是同一持久化键（a.I）的两端：
 // bootstrap 侧记账（renderer 表单填充遥测），这里提交（browser sign-in recovery）。
 // ---------------------------------------------------------------------------
-
-function createBrowserAuthOperations(
-  globalState: { updateAndPersist(key: unknown, fn: (value: unknown) => unknown): Promise<void> },
-) {
-  return new BrowserAuthOperationsStore(async (update) => {
-    let committed: unknown;
-    await globalState.updateAndPersist(BROWSER_AUTH_OPERATIONS_KEY, (value) => {
-      const result = update(value);
-      committed = result;
-      return result.value;
-    });
-    if (committed == null) throw new Error("Browser sign-in recovery was not committed");
-    return (committed as { result: unknown }).result;
-  });
-}
 
 /** 认证身份匹配（原 main chunk `W`）：chatgpt 比 accountId+userId，其余比 authMode。 */
 export function isSameAuthIdentity(a: { kind: string; accountId?: string; userId?: string; authMode?: string }, b: { kind: string; accountId?: string; userId?: string; authMode?: string }): boolean {
