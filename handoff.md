@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `NQ` command-session backend 整体迁入 `terminal/command-session-backend.ts`；session acquisition、
+UTF-8 streaming decoder、write coalescing/serialization、resize/terminate、exit/error projection 与 dispose
+竞态均由新 owner 持有，cloud terminal 唯一 consumer 已真实接回并删除旧 class。focused test 覆盖 19 项。
+
 随后将 `OZ` remote-localhost browser navigation 转发迁入 `remote-localhost-navigation.ts`；local/durable/
 SSH host 分流、localhost port gate、app-server port-forward、URL host/port 重写与失败日志降级由语义 forwarder
 持有，`r$e.forwardBrowserNavigationUrl` 唯一 consumer 已真实接回并删除旧函数。focused test 覆盖 13 项。

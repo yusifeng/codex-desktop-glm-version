@@ -68,6 +68,7 @@ const { MainThreadJankSampler } = require("./main-app/startup/main-thread-jank-s
 const { createProjectFolderPickerClass } = require("./main-app/workspace/project-folder-picker.js");
 const { WebContentsHostClient } = require("./main-app/app-server/web-contents-host-client.js");
 const { createRemoteLocalhostNavigationForwarder } = require("./main-app/browser-sidebar/remote-localhost-navigation.js");
+const { createCommandSessionBackendClass } = require("./main-app/terminal/command-session-backend.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -119781,91 +119782,10 @@ async function K$e(e, { environmentId: t, cwd: r, signal: i }) {
   let l = s.startsWith(`file:`) ? (0, c.fileURLToPath)(s, { windows: !1 }) : s;
   return h.posix.isAbsolute(l) && (await o(l)) ? l : null;
 }
-var NQ = class {
-    sessionPromise;
-    callbacks;
-    options;
-    decoder = new z.StringDecoder(`utf8`);
-    session = null;
-    settled = !1;
-    disposed = !1;
-    pendingInput = ``;
-    scheduledWrite = null;
-    constructor(e, t, n = {}) {
-      ((this.sessionPromise = e), (this.callbacks = t), (this.options = n), this.run());
-    }
-    async run() {
-      let e;
-      try {
-        ((this.session = await this.sessionPromise),
-          (e = { code: (await this.session.response).exitCode, signal: null }));
-      } catch (t) {
-        e = { code: null, signal: null, error: n.Zo(t) };
-      }
-      this.settled = !0;
-      let t = this.flushDecoder();
-      this.disposed || (t.length > 0 && this.callbacks.onData(t), this.callbacks.onExit(e));
-    }
-    handleOutputDelta(e) {
-      if (this.disposed || this.settled) return;
-      let t = this.decoder.write(e.chunk);
-      t.length > 0 && this.callbacks.onData(t);
-    }
-    write(e) {
-      if (this.disposed || this.settled) return Promise.resolve();
-      if (((this.pendingInput += e), this.scheduledWrite != null)) return this.scheduledWrite;
-      let t = Promise.resolve().then(async () => {
-        try {
-          do {
-            let e = this.pendingInput;
-            ((this.pendingInput = ``),
-              this.options.serializeWrites || (this.scheduledWrite = null),
-              await this.writeInput(e));
-          } while (this.options.serializeWrites && this.pendingInput.length > 0);
-        } finally {
-          this.scheduledWrite === t && (this.scheduledWrite = null);
-        }
-      });
-      return ((this.scheduledWrite = t), t);
-    }
-    async writeInput(e) {
-      let t = await this.getActiveSession();
-      t == null || this.disposed || this.settled || (await t.write(Buffer.from(e, `utf8`)));
-    }
-    async resize(e, t) {
-      if (this.disposed || this.settled) return;
-      let n = await this.getActiveSession();
-      n == null || this.disposed || this.settled || (await n.resize({ cols: e, rows: t }));
-    }
-    async terminate() {
-      if (this.disposed || this.settled) return;
-      let e = await this.getActiveSession();
-      e == null || this.disposed || this.settled || (await e.terminate());
-    }
-    async dispose() {
-      if (
-        this.disposed ||
-        ((this.disposed = !0), (this.pendingInput = ``), this.flushDecoder(), this.settled)
-      )
-        return;
-      let e = await this.getActiveSession();
-      if (!(e == null || this.settled))
-        try {
-          await e.terminate();
-        } catch {}
-    }
-    flushDecoder() {
-      return this.decoder.end();
-    }
-    async getActiveSession() {
-      if (this.session != null) return this.session;
-      try {
-        return ((this.session = await this.sessionPromise), this.session);
-      } catch {
-        return null;
-      }
-    }
-  },
+var NQ = createCommandSessionBackendClass({
+    createUtf8Decoder: () => new z.StringDecoder(`utf8`),
+    formatError: n.Zo,
+  }),
   q$e = n.wf({ deltaBase64: n.Of(), capReached: n.gf() });
 async function J$e(e, { environmentId: t, cwd: r, cols: i, rows: a, callbacks: o, signal: s }) {
   let c = await K$e(e, { environmentId: t, cwd: r, signal: s });

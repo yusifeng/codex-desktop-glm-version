@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 command session backend
+
+原 `NQ` command-session owner 已迁入 `src/main/main-app/terminal/command-session-backend.ts`；异步 session、
+UTF-8 delta decode、write scheduling/serialization、resize/terminate、exit/error 和 dispose lifecycle 均由语义
+class 持有，cloud-terminal 唯一 consumer 直接实例化 factory，旧 class 已物理删除。
+
 ## 2026-10-31 remote localhost navigation
 
 原 `OZ` 已迁入 `src/main/main-app/browser-sidebar/remote-localhost-navigation.ts`；local/durable/SSH host
