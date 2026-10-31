@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 hydration input and turn projection wiring
+
+`threads/hydration.ts` 已完整实现旧 `o_e…iv` 的 attachment/image/read-response/turn projection 链，本轮将 main 的 `X_/Z_/$_/ev/tv/nv/iv`
+真实 consumers 接回并删除旧 schemas、parsers 与 private transforms；focused suite 覆盖附件、image src、cwd、permissions、timestamps、
+collab receiver projection 和 turn defaults。
+
 ## 2026-10-31 automation and thread-error owner unification
 
 main 的 `J_/n_e/Y_` 与 `automation-detector.ts` 重复，ThreadStore 又保留了只识别 Error.code/字面 regex 的 thread-not-found 分支。

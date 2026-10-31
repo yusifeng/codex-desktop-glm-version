@@ -1,0 +1,153 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+import { transform } from "esbuild";
+
+let assertions = 0;
+const equal = (actual, expected) => {
+  assert.deepEqual(actual, expected);
+  assertions += 1;
+};
+const source = fs.readFileSync(
+  new URL("../src/main/main-app/threads/hydration.ts", import.meta.url),
+  "utf8",
+);
+const transpiled = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+const schema = {
+  int: () => schema,
+  nonnegative: () => schema,
+  optional: () => schema,
+  min: () => schema,
+  safeParse: (data) => ({ success: true, data }),
+};
+const shared = {
+  wf: () => schema,
+  Of: () => schema,
+  Cf: () => schema,
+  $u: (id) => id,
+  vl: (value) => path.posix.isAbsolute(value) || /^[A-Za-z]:[\\/]/u.test(value),
+  wl: (value) => value,
+  Tl: (value) => value.replaceAll("\\", "/"),
+  Ol: (value) => value,
+  kd: (roots) => ({ approvalPolicy: "never", sandboxPolicy: { type: "workspaceWrite" }, runtimeWorkspaceRoots: roots }),
+  Od: () => ({ approvalPolicy: "never" }),
+  Nd: (permissions) => ({ sandboxPolicy: permissions.sandboxPolicy }),
+  jd: (permissions) => permissions.runtimeWorkspaceRoots,
+  fd: () => null,
+  lr: () => false,
+  ed: (id) => id,
+  Ji: () => false,
+  pa: new Set(),
+  _s: "durable",
+};
+const module = { exports: {} };
+Function("require", "module", "exports", transpiled.code)(
+  (specifier) => {
+    if (specifier === "@chunk/shared") return shared;
+    if (specifier === "./automation-detector") return { hasCanonicalVoiceHistory: () => false, AUTOMATION_DETECTOR: {} };
+    if (specifier === "../vendor/immer") return { produce: (value, fn) => (fn(value), value), produceWithPatches: () => [], original: (value) => value };
+    if (specifier === "../util/lodash-interop") return { deepEqual: assert.deepEqual, findLast: (items, predicate) => items.findLast(predicate) };
+    if (specifier === "../turns/canonical-history")
+      return {
+        conversationTurns: (conversation) => conversation.turns,
+        mergedConversationTurns: (conversation) => conversation.turns,
+        historyTurnCount: (conversation) => conversation.turns.length,
+        lastTurn: (conversation) => conversation.turns.at(-1) ?? null,
+        hasCompleteHistory: () => true,
+      };
+    if (specifier === "./projection")
+      return {
+        cleanThreadTitle: (value) => value,
+        threadTimestamps: () => ({ createdAt: 0, updatedAt: 0, recencyAt: null }),
+        mergedRecencyAt: () => 0,
+        environmentSelection: () => ({}),
+        subAgentMetadata: () => null,
+        subAgentNickname: () => null,
+      };
+    if (specifier === "./timeline-index")
+      return {
+        isTerminalTransientItem: () => false,
+        isUserMessageItem: () => false,
+        isAgentMessageItem: () => false,
+        isActivityItem: () => false,
+        isCreateThreadCall: () => false,
+        isReasoningItem: () => false,
+        isAutomationItem: () => false,
+      };
+    if (specifier === "../misc/delegation") return { parseCodexDelegation: () => null };
+    if (specifier === "../prompts/section-markers")
+      return {
+        takeLastRequestSection: (value) => value,
+        FILES_MENTIONED_SECTION: "# Files mentioned by the user:",
+        FILES_PASTED_SECTION: "# Files pasted by the user:",
+      };
+    if (specifier === "../markdown/plain-text") return { plainTextFromMarkdown: (value) => value };
+    throw new Error(`unexpected require ${specifier}`);
+  },
+  module,
+  module.exports,
+);
+const owner = module.exports;
+
+const attachments = owner.attachmentsFromInput([{ type: "text", text: [
+  "# Files mentioned by the user:",
+  "## Source: /work/source.ts (lines 1-2)",
+].join("\n") }]);
+equal(attachments, [{ label: "Source", path: "/work/source.ts", fsPath: "/work/source.ts" }]);
+equal(owner.normalizeImageGenerationItem({ result: "YWJj" }), {
+  result: "YWJj",
+  src: "data:image/png;base64,YWJj",
+});
+equal(owner.normalizeImageGenerationItem({ savedPath: "C:\\work\\image.png", result: "ignored" }), {
+  savedPath: "C:\\work\\image.png",
+  result: "ignored",
+  src: "C:/work/image.png",
+});
+equal(owner.turnParamsFromReadResponse(
+  { thread: { id: "thread-1", cwd: "", turns: [] }, sessionMeta: { cwd: "/session" }, model: "gpt", reasoningEffort: "high" },
+  { resolvedPermissions: { approvalPolicy: "never" } },
+), {
+  threadId: "thread-1",
+  turns: [],
+  model: "gpt",
+  reasoningEffort: "high",
+  cwd: "/session",
+  permissions: { approvalPolicy: "never" },
+});
+const projected = owner.projectTurns({
+  threadId: "thread-1",
+  turns: [{
+    id: "turn-1",
+    startedAt: 2,
+    completedAt: 3,
+    status: "completed",
+    items: [
+      { type: "contextCompaction", id: "compact" },
+      { type: "userMessage", id: "user", clientId: "client", content: [{ type: "text", text: "hello" }] },
+      { type: "collabAgentToolCall", id: "call", receiverThreadIds: ["child"] },
+    ],
+  }],
+  model: "gpt",
+  reasoningEffort: "high",
+  cwd: "/work",
+  permissions: { approvalPolicy: "never", sandboxPolicy: { type: "workspaceWrite" }, runtimeWorkspaceRoots: ["/work"] },
+});
+equal(projected[0].turnStartedAtMs, 2000);
+equal(projected[0].finalAssistantStartedAtMs, 3000);
+equal(projected[0].params.clientUserMessageId, "client");
+equal(projected[0].items[2].receiverThreads, [{ threadId: "child", thread: null }]);
+const turn = {};
+equal(owner.ensureTurnFields(turn, "inProgress"), { status: "inProgress", items: [], hookRuns: [] });
+equal(turn, { status: "inProgress", items: [], hookRuns: [] });
+
+const main = fs.readFileSync(
+  new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
+  "utf8",
+);
+equal(main.includes('attachmentsFromInput: X_, normalizeImageGenerationItem: Z_, turnParamsFromReadResponse: $_'), true);
+for (const name of ["c_e", "l_e", "X_", "Z_", "Q_", "$_", "ev", "tv", "nv", "d_e", "rv", "iv"])
+  equal(main.includes(`function ${name}(`), false);
+equal(main.includes("var o_e ="), false);
+equal(main.includes("var u_e ="), false);
+
+console.log(`${assertions} main thread hydration projection owner assertions passed`);
