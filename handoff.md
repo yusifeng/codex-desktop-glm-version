@@ -5413,3 +5413,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 新增并真实接回 `startup/dock-menu-lifecycle.ts`，统一 macOS controller、pre-start completed-thread snapshot、首次 replay、
   后续更新、locale refresh 与 IPC getter；disabled 与重复 start 均保持幂等。
 - `Ust` 旧 `Ce/we` 删除。focused suite 14 项、相邻三组回归 80 项，no-unwired gate 扩至 661 项。
+
+# 2026-11-01 late startup binding convergence
+
+- 新增并真实接回 `startup/application-menu-refresh-lifecycle.ts`，统一 menu builder 前置安全 callback、browser/focus/inspector
+  observers、active-thread sync 顺序与 focus listener cleanup；重复安装保持幂等。
+- Computer Use native-pipe client 前移到 WindowContext 之前创建，analytics、active-turn、close、availability、refresh 与 dispose
+  直接共享同一实例。`Ust` 旧 `Te/Ee/Re/We/qe` 晚绑定别名删除，no-unwired gate 扩至 669 项。

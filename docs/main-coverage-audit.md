@@ -3493,3 +3493,13 @@ state-recovery 相邻 91 项回归通过；progress-window 的直接 `.ts` impor
 `Ust` 原 `Ce/we` buffer/controller 状态和手工 optional chaining 删除，WindowContext completed-thread callback、locale lifecycle 与
 main IPC 均消费同一 owner。14 项 focused 断言及 dock-menu/UI lifecycle/main IPC 相邻 80 项回归通过，no-unwired gate
 扩至 661 项。
+
+### 收敛：application-menu refresh 与 Computer Use native-pipe 晚绑定
+
+新增并接回 `startup/application-menu-refresh-lifecycle.ts`，统一拥有 menu builder 创建前的安全 refresh callback、browser-state、
+browser-window-focus 与 inspector-state 三类观察者，以及 focus listener 的精确清理。browser-state 仍保持“先刷新菜单、再同步
+focused window active thread”的原始顺序，重复安装幂等。
+
+Computer Use native-pipe client 前移到 WindowContext 构造前直接创建，`hasActiveTurn`、analytics、close、feature availability、
+plugin reconcile refresh 与 dispose 均消费同一个语义实例。`Ust` 原 `Te/Ee/Re/We/qe` 晚绑定别名删除；focused 与静态 owner
+回归覆盖前置安全调用、observer 顺序/清理及直接 wiring，no-unwired gate 扩至 669 项。

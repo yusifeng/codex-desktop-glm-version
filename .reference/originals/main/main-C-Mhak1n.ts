@@ -380,6 +380,7 @@ const { createDesktopFeatureAvailabilityReconciler } = require("./main-app/start
 const { createAppUpdateLifecycle } = require("./main-app/startup/app-update-lifecycle.js");
 const { runLocalAppServerStartup } = require("./main-app/startup/local-app-server-startup.js");
 const { createDockMenuLifecycle } = require("./main-app/startup/dock-menu-lifecycle.js");
+const { createApplicationMenuRefreshLifecycle } = require("./main-app/startup/application-menu-refresh-lifecycle.js");
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
 const { createBrowserHostServiceClass } = require("./main-app/browser-sidebar/browser-host-service.js");
@@ -56314,7 +56315,19 @@ async function Ust() {
     }),
   ),
     Se.setGitWorkerTracingSampleRate(ee));
-  let dockMenuLifecycle = createDockMenuLifecycle({
+  let publishComputerUseAnalytics = (event) => {
+      primaryWindowMessages.enqueue({ type: `computer-use-analytics-event`, event });
+    },
+    computerUseNativePipeClient = pie({
+      codexCliPath: fi({ isPackaged: l.app.isPackaged, repoRoot: V.repoRoot }).codexCliPath,
+      codexHome: V.codexHome,
+      onAnalyticsEvent: (event) => publishComputerUseAnalytics(event),
+    }),
+    applicationMenuRefreshLifecycle = createApplicationMenuRefreshLifecycle({
+      app: l.app,
+      registerDispose: (dispose) => I.add(dispose),
+    }),
+    dockMenuLifecycle = createDockMenuLifecycle({
       enabled: N,
       createController: () =>
         new DockMenuManager(
@@ -56322,8 +56335,6 @@ async function Ust() {
           a.hn(),
         ),
     }),
-    Te = null,
-    Ee = (e) => !1,
     De = createSqliteRecoveryConfirmationQueue({
       ensureWindow: windowActivation.ensureWindow,
       logger: r.n,
@@ -56390,7 +56401,7 @@ async function Ust() {
     avatarOverlayManager: W.avatarOverlayManager,
     hotkeyWindowLifecycleManager: W.hotkeyWindowLifecycleManager,
     onAppEntrySource: fe,
-    hasActiveComputerUseTurn: (e) => Ee(e),
+    hasActiveComputerUseTurn: computerUseNativePipeClient.hasActiveTurn,
     globalDictationHotkeyController: W.globalDictationLifecycleManager.getHotkeyController(),
     appshotHotkeysService: W.appshotHotkeysService,
     completeLocalGitTurn: Se.completeLocalGitTurn,
@@ -56399,9 +56410,7 @@ async function Ust() {
     requestGitWorker: Se.requestGitWorker,
     requestOpenInWorker: Se.requestOpenInWorker,
     remoteHostedPIPContentController: N || P ? U : void 0,
-    refreshApplicationMenu: () => {
-      Te?.();
-    },
+    refreshApplicationMenu: applicationMenuRefreshLifecycle.requestRefresh,
     subscribeComputerUseCaptureWorkerEvent: Se.subscribeComputerUseCaptureWorkerEvent,
     subscribeGitWorkerEvent: Se.subscribeGitWorkerEvent,
     gitWorkerInvocationSampler: Se.gitWorkerInvocationSampler,
@@ -56524,32 +56533,25 @@ async function Ust() {
       appVersion: D,
       onDeepLinkReceived: appEntryDelivery.onDeepLinkReceived,
     });
-  ((Te = Le.refreshApplicationMenu),
+  (applicationMenuRefreshLifecycle.bindRefresh(() => Le.refreshApplicationMenu()),
     I.add(
       installLocaleRefreshLifecycle({
         getBrowserSession: () => K.getBrowserHostManager().getBrowserSession(),
         getLocale: () => V.settingsStore.getEffective(n.Fa.localeOverride.key),
         loadLocale: (locale) => a.mn(V.repoRoot, locale ?? void 0),
-        refreshApplicationMenu: () => Le.refreshApplicationMenu(),
+        refreshApplicationMenu: applicationMenuRefreshLifecycle.requestRefresh,
         refreshDockMenu: dockMenuLifecycle.refreshMenu,
         refreshPipLocale: () => U.refreshLocale(),
         refreshTrayMenu: () => X9()?.refreshMenu(),
         setBrowserSessionLocale: Yc,
         subscribe: (listener) => V.settingsStore.onDidChange(n.Fa.localeOverride.key, listener),
       }),
-    ));
-  let Re = () => {
-    Le.refreshApplicationMenu();
-  };
-  (je.setOnBrowserStateChanged(() => {
-    (Le.refreshApplicationMenu(), U.syncActiveThreadForFocusedWindow());
-  }),
-    l.app.on(`browser-window-focus`, Re),
-    I.add(() => {
-      l.app.off(`browser-window-focus`, Re);
-    }),
-    W.windowManager.setOnMainProcessInspectorStateChanged(() => {
-      Le.refreshApplicationMenu();
+    ),
+    applicationMenuRefreshLifecycle.installObservers({
+      setOnBrowserStateChanged: (handler) => je.setOnBrowserStateChanged(handler),
+      setOnInspectorStateChanged: (handler) =>
+        W.windowManager.setOnMainProcessInspectorStateChanged(handler),
+      syncActiveThreadForFocusedWindow: () => U.syncActiveThreadForFocusedWindow(),
     }),
     W.windowManager.setQueueCodexDeepLinkUrl(Le.deepLinks.queueCodexDeepLinkUrl),
     Se.setComputerUseWorkerMainRpcHandler(
@@ -56582,10 +56584,7 @@ async function Ust() {
     windowActivation.openSecondInstance({ channel: `shortcut`, source: `shortcut` });
   });
   dockMenuLifecycle.start();
-  let We = (e) => {
-      primaryWindowMessages.enqueue({ type: `computer-use-analytics-event`, event: e });
-    },
-    Ge = async () => {
+  let Ge = async () => {
       try {
         await Pst({
           buildFlavor: s,
@@ -56606,7 +56605,7 @@ async function Ust() {
             getRecorder: () => be,
             invalidateQuery: (e) => W.broadcastQueryCacheInvalidation(e),
             logComputerHistoryStatusItemAction: (e) =>
-              We({ type: `skysight-status-item-action-clicked`, action: e }),
+              publishComputerUseAnalytics({ type: `skysight-status-item-action-clicked`, action: e }),
             navigate: (e) => windowActivation.navigateWithAttribution(e, { navigateExistingWindow: !0 }),
             quit: () => l.app.quit(),
             requestComputerUseWorker: Se.requestComputerUseWorker,
@@ -56634,13 +56633,7 @@ async function Ust() {
       }
     };
   (P || process.platform === `linux`) && Ge();
-  let qe = pie({
-    codexCliPath: fi({ isPackaged: l.app.isPackaged, repoRoot: V.repoRoot }).codexCliPath,
-    codexHome: V.codexHome,
-    onAnalyticsEvent: We,
-  });
-  ((Ee = qe.hasActiveTurn),
-    I.add(
+  I.add(
       ele({
         appServerConnection: Pe(),
         onActivityChanged: (e, t) => {
@@ -56648,7 +56641,7 @@ async function Ust() {
         },
         onTaskDeleted: U.deleteTaskState,
       }),
-    ));
+    );
   let Je = Pc({
     appServerConnection: Pe(),
     focusPresentation: (e) =>
@@ -56666,7 +56659,12 @@ async function Ust() {
     onFrameUpserted: P ? U.upsertBrowserFrame : void 0,
   });
   (I.add(Je.dispose),
-    I.add(Noe({ appServerConnection: Pe(), closeActiveTurn: qe.closeActiveTurn })));
+    I.add(
+      Noe({
+        appServerConnection: Pe(),
+        closeActiveTurn: computerUseNativePipeClient.closeActiveTurn,
+      }),
+    ));
   let Ye = aoe({
     buildFlavor: s,
     codexHome: V.codexHome,
@@ -56699,7 +56697,7 @@ async function Ust() {
       W.broadcastQueryCacheInvalidation([`skills`]);
     },
     onReconcileComplete: () => {
-      (W.broadcastQueryCacheInvalidation([`plugins`]), qe.refresh());
+      (W.broadcastQueryCacheInvalidation([`plugins`]), computerUseNativePipeClient.refresh());
     },
     repoRoot: V.repoRoot,
     trashItem: (e) => l.shell.trashItem(e),
@@ -56790,7 +56788,7 @@ async function Ust() {
   }
   let Qe = new pne(K.getBrowserSessionRegistry());
   I.add(() => {
-    (Qe.dispose(), qe.dispose());
+    (Qe.dispose(), computerUseNativePipeClient.dispose());
   });
   let $e = createDesktopFeatureAvailabilityReconciler({
     applyDesktopFeatureAvailability: (availability) => Le.setDesktopFeatureAvailability(availability),
@@ -56809,7 +56807,8 @@ async function Ust() {
     resolveDesktopFeatureAvailability: Ar,
     setAppshotHotkeysEnabled: (enabled) => W.appshotHotkeysService.setEnabled(enabled),
     setBrowserSessionFeatureAvailability: (availability) => Qe.setDesktopFeatureAvailability(availability),
-    setComputerUseFeatureAvailability: (availability) => qe.setDesktopFeatureAvailability(availability),
+    setComputerUseFeatureAvailability: (availability) =>
+      computerUseNativePipeClient.setDesktopFeatureAvailability(availability),
     setPluginFeatureAvailability: (availability, reasons) => Xe.setDesktopFeatureAvailability(availability, reasons),
     startConversationExecutor: () => K.startConversationExecutor(),
   });

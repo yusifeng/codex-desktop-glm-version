@@ -16,6 +16,7 @@ const realOwners = [
   ["src/main/main-app/startup/app-update-lifecycle.ts", "createAppUpdateLifecycle"],
   ["src/main/main-app/startup/local-app-server-startup.ts", "runLocalAppServerStartup"],
   ["src/main/main-app/startup/dock-menu-lifecycle.ts", "createDockMenuLifecycle"],
+  ["src/main/main-app/startup/application-menu-refresh-lifecycle.ts", "createApplicationMenuRefreshLifecycle"],
   ["src/main/main-app/startup/window-icon-lifecycle.ts", "createWindowIconLifecycle"],
   ["src/main/main-app/fetch-handler/electron-fetch-handler.ts", "createElectronFetchHandlerClass"],
   ["src/main/main-app/misc/open-in-service.ts", "createOpenInServiceClass"],
@@ -667,5 +668,12 @@ assert.equal(main.includes("dockMenuLifecycle = createDockMenuLifecycle({"), tru
 assert.equal(main.includes("onCompletedThreadsChanged: dockMenuLifecycle.setCompletedThreads"), true, "completed threads use the semantic owner");
 assert.equal(main.includes("getDockMenuController: dockMenuLifecycle.getController"), true, "IPC resolves the semantic dock-menu controller");
 assert.equal(main.includes("let Ce = []"), false, "generated completed-thread buffer must be removed");
+assert.equal(main.includes('require("./main-app/startup/application-menu-refresh-lifecycle.js")'), true, "application-menu refresh lifecycle owner is wired");
+assert.equal(main.includes("applicationMenuRefreshLifecycle = createApplicationMenuRefreshLifecycle({"), true, "startup creates one menu refresh owner");
+assert.equal(main.includes("refreshApplicationMenu: applicationMenuRefreshLifecycle.requestRefresh"), true, "window context consumes the semantic menu refresh callback");
+assert.equal(main.includes("computerUseNativePipeClient = pie({"), true, "startup creates the native-pipe client before window context construction");
+assert.equal(main.includes("hasActiveComputerUseTurn: computerUseNativePipeClient.hasActiveTurn"), true, "window context consumes the native-pipe client directly");
+assert.equal(main.includes("Ee = (e) => !1"), false, "generated computer-use placeholder callback must be removed");
+assert.equal(main.includes("Te = null"), false, "generated menu refresh placeholder must be removed");
 
-console.log("661 main unwired-owner skeleton assertions passed");
+console.log("669 main unwired-owner skeleton assertions passed");

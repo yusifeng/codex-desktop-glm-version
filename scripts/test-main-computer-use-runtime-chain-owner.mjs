@@ -154,6 +154,8 @@ equal(main.includes("BrowserUsePluginConfigSyncer: wie"), true);
 equal(main.includes("buildThreadStartConfigOverrides: $o"), true);
 equal(main.includes("resolveCodexAppMcpOverrides: os"), true);
 equal(main.includes("resolveCodexAppEnabledOverride: Xie"), true);
-equal(main.includes("let qe = pie({"), true);
+equal(main.includes("computerUseNativePipeClient = pie({"), true);
+equal(main.includes("hasActiveComputerUseTurn: computerUseNativePipeClient.hasActiveTurn"), true);
+equal(main.includes("Ee = (e) => !1"), false);
 
 console.log(`${assertions} main computer-use runtime chain owner assertions passed`);
