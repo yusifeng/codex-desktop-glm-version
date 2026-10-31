@@ -146,6 +146,7 @@ const { installApplicationLifecycle } = require("./main-app/startup/application-
 const { registerStartupIpcHandlers } = require("./main-app/startup/startup-ipc.js");
 const { registerRendererContextMenu } = require("./main-app/window/renderer-context-menu.js");
 const { createPlatformShutdownRuntime } = require("./main-app/startup/platform-shutdown.js");
+const { registerMainIpcRouter } = require("./main-app/app-shell/main-ipc-router.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -142573,279 +142574,6 @@ function Lrt(e) {
 function s7(e, t) {
   return waitForCleanupWithTimeout(e, t);
 }
-function Rrt(e) {
-  let t = a.l(),
-    {
-      desktopSentry: i,
-      hotkeyWindowLifecycleManager: o,
-      globalDictationLifecycleManager: s,
-      codexHome: c,
-      globalState: u,
-      productionAppcastStateStore: d,
-      nativeContextMenuIconSearchRoots: f,
-      getContextForWebContents: p,
-      getPrimaryWindow: m,
-      showPrimaryWindow: h,
-      sendMessageToWindow: g,
-      ensureWindow: _,
-      createFreshWindow: v,
-      setDesktopFeatureAvailability: y,
-      setAvatarOverlayFeedbackDiagnosticsEnabled: b,
-      setAutomaticBackgroundDownloadsEnabled: x,
-      restoreAvatarOverlayOpenState: S,
-      prewarmAvatarOverlay: C,
-      reloadBundledPlugins: w,
-      setMacMenuBarEnabled: T,
-      navigateToRoute: E,
-      setRemoteHostedPIPActiveThreadID: D,
-      setRemoteHostedPIPHostLayout: O,
-      getDockMenuController: k,
-      getTrayController: A,
-      onAppEntrySource: j,
-      isTrustedIpcEvent: M,
-      requestDevRelaunch: N,
-    } = e;
-  registerRendererContextMenu({
-    ipcMain: l.ipcMain,
-    channel: a.Vt,
-    BrowserWindow: l.BrowserWindow,
-    screen: l.screen,
-    nativeImage: l.nativeImage,
-    Menu: l.Menu,
-    platform: process.platform,
-    fileURLToPath: c.fileURLToPath,
-    join: h.join,
-    existsSync: v.existsSync,
-    iconSearchRoots: f,
-    isTrustedIpcEvent: M,
-  });
-  let P = !1,
-    F = !1,
-    I = null;
-  (l.ipcMain.handle(a.Pt, async (i, c) => {
-    if (!M(i)) return;
-    if (c.type === `electron-avatar-overlay-restore-ready`) {
-      if ((P || ((P = !0), await S(i.sender)), c.shouldPrewarmAvatarOverlay && !F && C != null)) {
-        F = !0;
-        try {
-          await C(i.sender).catch(() => C(i.sender));
-        } catch (e) {
-          throw ((F = !1), e);
-        }
-      }
-      return;
-    }
-    if (c.type === `remote-hosted-pip-active-thread-changed`) {
-      D?.(i.sender, c.conversationId);
-      return;
-    }
-    if (c.type === `remote-hosted-pip-host-layout-changed`) {
-      O?.(i.sender, c.layout);
-      return;
-    }
-    if (c.type === `electron-avatar-overlay-feedback-diagnostics-changed`) {
-      b(c.enabled);
-      return;
-    }
-    if (c.type === `electron-sparkle-gates-changed`) {
-      let n = {
-        core: c.useWindowsCoreRuntimeFrameworks,
-        primary: c.useWindowsPrimaryRuntimeFrameworks,
-      };
-      (a.i(a.in.resolve()) && a.s((await t) != null || n.primary),
-        e.latchInAppUpdatesEnabledForLaunch(!c.disableInAppUpdates),
-        x(!c.disableSparkleAutodownload),
-        d?.setBackendAppcastEnabled(c.useBackendAppcast),
-        await a.k(u, c.useInternalUpdateCdn),
-        await a.A(u, n));
-      return;
-    }
-    if (c.type === `electron-desktop-features-changed`) {
-      let e = {
-        noPluginListPhase2: c.noPluginListPhase2,
-        noPluginListPhase4: c.noPluginListPhase4,
-        ambientSuggestions: c.ambientSuggestions,
-        ambientSuggestionsFeatureDiscovery: c.ambientSuggestionsFeatureDiscovery,
-        ambientSuggestionsStaleTimeMs: c.ambientSuggestionsStaleTimeMs,
-        appshotsEnabled: c.appshotsEnabled,
-        artifactSession: c.artifactSession,
-        artifactTemplatePicker: c.artifactTemplatePicker,
-        autoAuthForSites: c.autoAuthForSites,
-        cuaPIP: c.cuaPIP,
-        codexLocalAccess: c.codexLocalAccess,
-        inAppBrowserUse: c.inAppBrowserUse,
-        inAppBrowserUseAllowed: c.inAppBrowserUseAllowed,
-        inAppBrowserUseHistory: c.inAppBrowserUseHistory,
-        browserUseTinysky: c.browserUseTinysky,
-        defaultLinkOpenTargetPreference: c.defaultLinkOpenTargetPreference,
-        localBackend: c.localBackend,
-        localProjectTaskMembership: c.localProjectTaskMembership,
-        localAutomationHabitatMigration: c.localAutomationHabitatMigration,
-        browserPane: c.browserPane,
-        browserExtensions: c.browserExtensions,
-        browserSettingsCloudSync: c.browserSettingsCloudSync,
-        externalBrowserUse: c.externalBrowserUse,
-        externalBrowserUseAllowed: c.externalBrowserUseAllowed,
-        computerUse: c.computerUse,
-        computerUseAutoInstall: c.computerUseAutoInstall,
-        nodeReplEnforceModelCheck: c.nodeReplEnforceModelCheck,
-        messages: c.messages,
-        recordAndReplay: c.recordAndReplay,
-        skysight: c.skysight,
-        sites: c.sites,
-        control: c.control,
-        dil: c.dil,
-        multiWindow: c.multiWindow,
-        unifiedTabStrip: c.unifiedTabStrip,
-        quickChat: c.quickChat,
-        remoteControlClientScopedEnvironments: c.remoteControlClientScopedEnvironments,
-        workCloudAccess: c.workCloudAccess,
-        workLocalAccess: c.workLocalAccess,
-        webMcp: c.webMcp,
-        webMcpMaxTools: c.webMcpMaxTools,
-        codeReviewPlugin: c.codeReviewPlugin,
-        deepResearch: c.deepResearch,
-        userWriting: c.userWriting,
-        visualizeLive: c.visualizeLive,
-        visualizeTreatment: !1,
-        workspaceDir: c.workspaceDir,
-      };
-      y(e, c.bundledPluginEligibilityReasons);
-      return;
-    }
-    if (c.type === `mac-menu-bar-enabled-changed`) {
-      (await T(c.enabled),
-        c.enabled &&
-          I != null &&
-          (await A()?.handleMessage({ type: `tray-menu-threads-changed`, trayMenuThreads: I })));
-      return;
-    }
-    if (c.type === `reload-bundled-plugins`) {
-      await w?.();
-      return;
-    }
-    if (c.type === `open-browser-in-main-window`) {
-      if (!Tr().browserPane || !n.bo(c.path)) return;
-      o.hide();
-      let e =
-          p(i.sender)
-            ?.getBrowserHostManager()
-            .getPreferredWindowStateForConversation(c.browserPanel.conversationId)?.window ?? m(),
-        t = e != null;
-      if (((e ??= await v(c.path)), e == null)) return;
-      (e.isMinimized() && e.restore(),
-        e.show(),
-        e.focus(),
-        g(e, c.browserPanel),
-        t && E(e, c.path));
-      return;
-    }
-    if (c.type === `open-current-main-window` || c.type === `open-in-main-window`) {
-      let e = c.type === `open-current-main-window` ? null : c.path;
-      if (e != null && !n.bo(e)) return;
-      o.hide();
-      let t = m(),
-        r = c.appEntryAttribution != null && (t == null || !t.isVisible() || !t.isFocused()),
-        i = t != null || e == null ? await _() : await v(e);
-      i &&
-        (c.type === `open-in-main-window`
-          ? h({ stealFocus: !0 })
-          : c.stealFocus === !0
-            ? h({ focusComposer: c.focusComposer, stealFocus: !0 })
-            : (i.isMinimized() && i.restore(), i.show(), i.focus()),
-        t != null && e != null && E(i, e),
-        r && c.appEntryAttribution != null && j?.(c.appEntryAttribution, i.webContents));
-      return;
-    }
-    if (c.type === `open-in-new-window`) {
-      if (!n.bo(c.path)) return;
-      o.hide();
-      let e = await v(c.path);
-      e && (e.isMinimized() && e.restore(), e.show(), e.focus());
-      return;
-    }
-    if (c.type === `show-settings`) {
-      o.hide();
-      let e = await _();
-      if (!e) return;
-      (e.isMinimized() && e.restore(),
-        e.show(),
-        e.focus(),
-        E(e, `/settings/${c.section}`, c.state));
-      return;
-    }
-    if (c.type === `quit-app`) {
-      c.relaunch === !0 ? (e.quitState?.allowQuitTemporarily(), a7(N)) : l.app.quit();
-      return;
-    }
-    if (isTrayMenuThreadsChangedMessage(c)) {
-      ((I = c.trayMenuThreads),
-        await Promise.all([A()?.handleMessage(c), k?.()?.handleMessage(c)]));
-      return;
-    }
-    if (await s.handleMessage(i, c)) return;
-    let f = p(i.sender);
-    if (!f) {
-      r.n().warning(`Message received for unknown window context`);
-      return;
-    }
-    await f.handleMessage(i.sender, c);
-  }),
-    l.ipcMain.handle(a.Mt, async (e, t) => {
-      let n = oGe.safeParse(t);
-      if (!n.success) {
-        r.n().warning(`Invalid browser sidebar runtime message received`);
-        return;
-      }
-      let i = l.BrowserWindow.fromWebContents(e.sender);
-      if (i == null) {
-        r.n().warning(`Browser sidebar runtime message received without owner window`);
-        return;
-      }
-      let a = p(i.webContents);
-      if (a == null) {
-        r.n().warning(`Browser sidebar runtime message received for unknown window context`);
-        return;
-      }
-      await a.handleMessage(e.sender, n.data);
-    }),
-    l.ipcMain.on(a.jt, (e, t) => {
-      if (!cte(t)) {
-        r.n().warning(`Invalid browser page event received`);
-        return;
-      }
-      if (t.type === bZ.type || t.type === vZ.type) {
-        let t = e.sender.mainFrame;
-        if (e.processId !== t.processId || e.frameId !== t.routingId) return;
-      }
-      let n = l.BrowserWindow.fromWebContents(e.sender),
-        i = n == null ? null : p(n.webContents);
-      if (i == null) {
-        r.n().warning(`Browser page event received for unknown window context`);
-        return;
-      }
-      i.getBrowserHostManager().handlePageEvent(e.sender, t);
-    }),
-    l.ipcMain.handle(a.It, async (e, t) => (M(e) ? n.et({ codexHome: c, params: t }) : null)),
-    l.ipcMain.handle(a.Gt, (e) => {
-      if (!M(e)) return;
-      let t = Error(`Desktop Sentry test error (debug button)`);
-      i.captureException(t, { tags: { trigger: `debug-button` } });
-    }),
-    l.ipcMain.on(a.Ot, (e) => {
-      if (!M(e)) return;
-      let [t] = e.ports,
-        n = p(e.sender),
-        i = n?.createAppHost(e.sender),
-        a = lrt(t, i);
-      n?.registerAppView(e.sender, a).catch((e) => {
-        r.n().warning(`Failed to register AppView RPC services`, {
-          safe: {},
-          sensitive: { error: e },
-        });
-      });
-    }));
-}
 var c7 = `codex.aboutDialog.title`,
   l7 = `About {appName}`;
 var { showAboutDialog: Qrt } = createAboutDialog({
@@ -152057,18 +151785,57 @@ async function Ust() {
         });
       });
   };
-  (Rrt({
+  (registerMainIpcRouter({
+    app: l.app,
+    ipcMain: l.ipcMain,
+    BrowserWindow: l.BrowserWindow,
+    channels: {
+      mainMessage: a.Pt,
+      browserSidebarMessage: a.Mt,
+      browserPageEvent: a.jt,
+      codexHomeRequest: a.It,
+      sentryTest: a.Gt,
+      appViewPort: a.Ot,
+    },
+    logger: r,
+    loadInternalRuntime: a.l,
+    isInternalBuild: () => a.i(a.in.resolve()),
+    assertPrimaryRuntimeAvailable: a.s,
+    setInternalUpdateCdn: a.k,
+    setWindowsRuntimeFrameworks: a.A,
+    registerContextMenu: () =>
+      registerRendererContextMenu({
+        ipcMain: l.ipcMain,
+        channel: a.Vt,
+        BrowserWindow: l.BrowserWindow,
+        screen: l.screen,
+        nativeImage: l.nativeImage,
+        Menu: l.Menu,
+        platform: process.platform,
+        fileURLToPath: c.fileURLToPath,
+        join: h.join,
+        existsSync: v.existsSync,
+        iconSearchRoots: [
+          (0, h.join)(V.repoRoot, `webview`, `public`),
+          (0, h.join)(V.desktopRoot, `webview`),
+        ],
+        isTrustedIpcEvent: _e,
+      }),
+    getDesktopFeatureAvailability: Tr,
+    isSafeRoute: n.bo,
+    parseBrowserSidebarMessage: (payload) => oGe.safeParse(payload),
+    isBrowserPageEvent: cte,
+    guardedBrowserPageEventTypes: new Set([bZ.type, vZ.type]),
+    resolveCodexHomeRequest: (params) => n.et({ codexHome: V.codexHome, params }),
+    createMessagePortRemoteMain: lrt,
+    isTrayMenuThreadsChangedMessage,
+    relaunchApp: (requestDevRelaunch) => a7(requestDevRelaunch),
     desktopSentry: c,
     hotkeyWindowLifecycleManager: W.hotkeyWindowLifecycleManager,
     globalDictationLifecycleManager: W.globalDictationLifecycleManager,
-    codexHome: V.codexHome,
     globalState: V.globalState,
     quitState: ye,
     productionAppcastStateStore: v,
-    nativeContextMenuIconSearchRoots: [
-      (0, h.join)(V.repoRoot, `webview`, `public`),
-      (0, h.join)(V.desktopRoot, `webview`),
-    ],
     getContextForWebContents: W.getContextForWebContents,
     getPrimaryWindow: W.getPrimaryWindow,
     showPrimaryWindow: (e) => me && W.windowManager.showPrimaryWindow(e),
@@ -152085,7 +151852,6 @@ async function Ust() {
     setAutomaticBackgroundDownloadsEnabled: (e) => {
       g.setAutomaticBackgroundDownloadsEnabled(e);
     },
-    setRealtimeSessionRecordingEnabled: je.setRealtimeSessionRecordingEnabled,
     restoreAvatarOverlayOpenState: (e) => W.avatarOverlayManager.restoreOpenState(e),
     prewarmAvatarOverlay: (e) => W.avatarOverlayManager.prewarm(e),
     reloadBundledPlugins: () => Xe.reloadBundledPlugins(),

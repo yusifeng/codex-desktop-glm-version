@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Rrt` primary main IPC router 迁入 `app-shell/main-ipc-router.ts`；avatar/PiP、update gates、desktop feature
+projection、menu/plugin updates、所有 main-window routes、quit/tray/dictation/context fallback、browser sidebar/page validation、
+Codex-home request、Sentry test 与 AppView MessagePort registration 均由新 owner 持有；renderer context-menu registration
+也由该 owner 编排。真实 startup consumer 已接回，旧 function 与一个从未消费的 option 已删除。
+
 随后将 `mrt/t7/hrt/n7/r7/i7/grt/_rt` platform shutdown adapter 迁入
 `startup/platform-shutdown.ts`；Windows descendant kill、addon validation、10 秒 forced-exit single arm/retry logging，以及
 macOS AppKit power-off observer、typed block、allow-quit callback 与 load failure logging 均由新 owner 持有。真实 app

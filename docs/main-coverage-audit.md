@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 primary main IPC router
+
+原 `Rrt` 已迁入 `src/main/main-app/app-shell/main-ipc-router.ts`。新 owner 保留 avatar/PiP、update gates、desktop feature
+projection、menu/plugin updates、main-window/browser routes、quit/tray/dictation/context fallback、browser sidebar/page validation、
+Codex-home request、Sentry test、AppView MessagePort registration 与 renderer context-menu orchestration；真实 startup consumer
+已接回，旧 function 和一个从未被 router 消费的 composition option 已删除。
+
 ## 2026-10-31 platform shutdown adapters
 
 原 `mrt/t7/hrt/n7/r7/i7/grt/_rt` 已迁入 `src/main/main-app/startup/platform-shutdown.ts`。新 owner 保留 Windows
