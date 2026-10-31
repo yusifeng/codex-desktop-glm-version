@@ -4845,3 +4845,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   共 877 行已删除；新生产实现/补全约 500 行。focused coverage 71 项，邻接 desktop-fetch/statsig/avatar/WindowContext
   回归 19/25/45/16 项，no-unwired gate 扩至 329 项。下一批审计 update capability/application-menu snapshot 与相邻
   config/environment owners，优先迁移完整状态和 consumer，不拆 vendor QueryClient。
+
+# 2026-11-01 desktop capability services
+
+- `src/main/main-app/window/desktop-capability-services.ts` 已整组接管更新检查/版本信息/resume-state take-and-clear/macOS
+  remote-control 安装确认、原生 application-menu snapshot/invoke、Appshot hotkey/final-capture forwarding，以及有边界限制的
+  locale/language/timezone/display/session signals；所有四类 consumer 均由 WindowContext 直接使用 semantic outputs。
+- main 旧 `cOe/lOe/YE/yOe/EOe/DOe` 及更新文案/schema/constants 共 173 行已删除，新生产模块 367 行；focused
+  coverage 57 项，application-menu/Appshot/WindowContext 回归 19/59/16 项，no-unwired gate 扩至 339 项。下一批审计
+  相邻 codex-app-config remote declaration/apply owner，保持 global-state 写入与 project-order side-effect 顺序。

@@ -45,6 +45,7 @@ const realOwners = [
   ["src/main/main-app/terminal/cloud-command-session.ts", "createCloudCommandSessionRuntime"],
   ["src/main/main-app/window/rpc-service-adapters.ts", "createWindowRpcServiceAdapters"],
   ["src/main/main-app/account/account-inputs-owner.ts", "createAccountInputsOwnerClass"],
+  ["src/main/main-app/window/desktop-capability-services.ts", "createDesktopCapabilityServices"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -315,6 +316,14 @@ assert.equal(main.includes("ROe = class extends"), false, "generated avatar-over
 assert.equal(main.includes("zOe = class extends"), false, "generated avatar scroll owner must be removed");
 assert.equal(main.includes("BOe = class extends"), false, "generated avatar stop handle must be removed");
 assert.equal(main.includes("PrimaryWindowActionsBridge,"), true, "semantic window action bridge must be wired");
+assert.equal(main.includes("createDesktopCapabilityServices({"), true, "real desktop capability services are wired");
+assert.equal(main.includes("cOe = class extends"), false, "generated app update service must be removed");
+assert.equal(main.includes("lOe = class extends"), false, "generated application-menu snapshot must be removed");
+assert.equal(main.includes("function YE("), false, "generated native menu projector must be removed");
+assert.equal(main.includes("yOe = class extends"), false, "generated appshot capability must be removed");
+assert.equal(main.includes("function EOe("), false, "generated environment signal reader must be removed");
+assert.equal(main.includes("function DOe("), false, "generated environment signal projector must be removed");
+assert.equal(main.includes("ApplicationMenuSnapshotService,"), true, "semantic menu snapshot service must be wired");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("329 main unwired-owner skeleton assertions passed");
+console.log("339 main unwired-owner skeleton assertions passed");

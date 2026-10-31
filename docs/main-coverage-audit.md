@@ -2864,3 +2864,13 @@ thread summary SQLite、integrity state、desktop fetch bridges 和 avatar scrol
 `scripts/test-main-account-inputs-owner.mjs` 覆盖 71 项 cache、force refresh、auth gating、HTTP error projection、profile
 identity、invalidations、subscription disposal、connection epoch、stable ID single-flight、summary revision validation 与真实接线；
 desktop-fetch、PublishedStatsig、avatar overlay、WindowContext 和 no-unwired 邻接回归同步更新并通过。
+
+### 增量抽取：desktop capability services
+
+renderer-facing app update、application-menu snapshot、Appshot hotkey 和 desktop environment signals 已整组迁移至
+`src/main/main-app/window/desktop-capability-services.ts`。更新 owner 保留 Sparkle forwarding、installed metadata merge、
+resume state 先清除再 flush/parse、macOS remote-control session 的 parent-window fallback 和确认顺序；menu owner 保留每次
+snapshot 重建 command map、visible/type projection、focused guest webContents 选择和原 MenuItem `this` click 调用；环境信号保留
+加载期 timezone、语言/字符串长度上限与 display rounding。WindowContext 的四个 consumer 直接使用 semantic classes/functions，
+旧 `cOe/lOe/YE/yOe/EOe/DOe` 已物理删除。focused test 57 项覆盖 update、resume、dialog、menu projection/invoke、
+Appshot forwarding、signal bounds 与真实接线，邻接 application-menu、Appshot 和 WindowContext 回归通过。

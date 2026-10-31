@@ -31,7 +31,7 @@ export function createWindowContextClass(dependencies) {
     Det,
     E,
     E5,
-    EOe,
+    getDesktopEnvironmentSignals,
     Eje,
     Ett,
     F,
@@ -158,7 +158,7 @@ export function createWindowContextClass(dependencies) {
     c,
     c8e,
     cA,
-    cOe,
+    AppUpdateService,
     cee,
     cr,
     crypto,
@@ -196,7 +196,7 @@ export function createWindowContextClass(dependencies) {
     l,
     l1e,
     lA,
-    lOe,
+    ApplicationMenuSnapshotService,
     lne,
     ls,
     m,
@@ -251,7 +251,7 @@ export function createWindowContextClass(dependencies) {
     y,
     OwlRuntimeFeaturesService,
     y8e,
-    yOe,
+    AppshotCapabilityService,
     ytt,
     z,
     resetRuntimeFeatures,
@@ -1236,7 +1236,7 @@ export function createWindowContextClass(dependencies) {
             pluginIncentives: v,
             ambientSuggestions: new ComposerItemsBridge(this.appServerConnectionRegistry),
             automations: this.habitatAutomationsService,
-            applicationMenu: new lOe(e),
+            applicationMenu: new ApplicationMenuSnapshotService(e),
             customRuntime: void 0,
             appActions: this.appActionHostService,
             clientCoordination: this.ipcClientsByWebContentsId.get(e.id)?.hostService,
@@ -1256,7 +1256,7 @@ export function createWindowContextClass(dependencies) {
             avatarOverlay: new AvatarOverlayService(this.options.avatarOverlayManager, e),
             avatarOverlayScroll:
               process.platform === `darwin` ? new AvatarOverlayScrollHostService(e) : void 0,
-            appUpdates: new cOe(
+            appUpdates: new AppUpdateService(
               this.options.windowManager,
               e,
               this.options.sparkleManager,
@@ -1322,13 +1322,16 @@ export function createWindowContextClass(dependencies) {
                     this.messageHandler.setLocalAutomationsCapability(e),
                   )
                 : void 0,
-            appshot: new yOe(this.options.appshotHotkeysService, ({ requestId: e }) =>
-              this.options.requestComputerUseCaptureUpdate == null
-                ? Promise.resolve(!1)
-                : requestFinalCaptureUpdate({
-                    requestComputerUseCaptureUpdate: this.options.requestComputerUseCaptureUpdate,
-                    requestId: e,
-                  }),
+            appshot: new AppshotCapabilityService(
+              this.options.appshotHotkeysService,
+              ({ requestId: e }) =>
+                this.options.requestComputerUseCaptureUpdate == null
+                  ? Promise.resolve(!1)
+                  : requestFinalCaptureUpdate({
+                      requestComputerUseCaptureUpdate:
+                        this.options.requestComputerUseCaptureUpdate,
+                      requestId: e,
+                    }),
             ),
             lsp: this.lsp,
             browserUsePermissions: new XOe(
@@ -2117,7 +2120,7 @@ export function createWindowContextClass(dependencies) {
             methods: [`attestation/generate`],
             handler: or({
               bundleIdentifier: a.rn(this.options.buildFlavor),
-              getSignals: EOe,
+              getSignals: getDesktopEnvironmentSignals,
               resourcesPath: u,
             }),
           }),

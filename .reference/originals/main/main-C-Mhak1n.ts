@@ -267,6 +267,7 @@ const { createHabitatAutomationsServiceClass } = require("./main-app/automations
 const { createPinnedThreadsServiceClass } = require("./main-app/sidebar/pinned-threads-service.js");
 const { createElectronFetchHandlerClass } = require("./main-app/fetch-handler/electron-fetch-handler.js");
 const { createWindowContextClass } = require("./main-app/window/window-context.js");
+const { createDesktopCapabilityServices } = require("./main-app/window/desktop-capability-services.js");
 const { createElectronMessageHandlerClass } = require("./main-app/window/electron-message-handler.js");
 const { createOpenInServiceClass } = require("./main-app/misc/open-in-service.js");
 const { createLinuxApplicationsRuntime } = require("./main-app/platform/linux-applications.js");
@@ -1310,6 +1311,26 @@ function tee(e) {
 }
 var Ht = `update-resume-state-v1`,
   nee = 9e5;
+var {
+  AppUpdateService,
+  ApplicationMenuSnapshotService,
+  AppshotCapabilityService,
+  getDesktopEnvironmentSignals,
+} = createDesktopCapabilityServices({
+  RpcHandlerBase: n.Uf,
+  electron: l,
+  menuSectionIds: ot,
+  persistedStateKey: a.J,
+  updateResumeStateKey: Ht,
+  parseThreadId: n.$u,
+  parseVersion: n.Bu,
+  getBuildNumber: () => a.nn.value,
+  getReleaseChannel: () => a.an(`codexReleaseChannel`),
+  getDefaultReleaseChannel: () => a.in.resolve(),
+  getNativeIntl: a.hn,
+  isRemoteControlSessionActive,
+  appSessionId: a.on,
+});
 function ree(e) {
   return e;
 }
@@ -25497,155 +25518,7 @@ var QDe = class {
     getIoStatsSnapshot() {
       return this.stdioTransport.getIoStatsSnapshot();
     }
-  },
-  $De = `appHeader.installUpdate.confirmTitle`,
-  eOe = `Update {appName} now?`,
-  tOe = `appHeader.installUpdate.confirmSubtitle`,
-  nOe = `{appName} will quit to install the update, which will interrupt active local sessions on this machine`,
-  rOe = `appHeader.installUpdate.confirmCancel`,
-  iOe = `Cancel`,
-  aOe = `appHeader.installUpdate.confirmInstall`,
-  oOe = `Update`,
-  sOe = n.rf.object({
-    accountId: n.rf.string(),
-    userId: n.rf.string(),
-    threadIds: n.rf.array(n.rf.string().transform(n.$u)),
-    expiresAtMs: n.rf.number(),
-  }),
-  cOe = class extends n.Uf {
-    windowManager;
-    origin;
-    sparkleManager;
-    globalState;
-    constructor(e, t, n, r) {
-      (super(),
-        (this.windowManager = e),
-        (this.origin = t),
-        (this.sparkleManager = n),
-        (this.globalState = r));
-    }
-    checkForUpdates() {
-      this.sparkleManager.checkForUpdates();
-    }
-    async checkForUpdateInformation() {
-      return {
-        installedVersion: n.Bu(l.app.getVersion()).version,
-        installedBuildVersion: a.nn.value,
-        installedReleaseChannel: a.an(`codexReleaseChannel`) ?? a.in.resolve(),
-        ...(await this.sparkleManager.checkForUpdateInformation()),
-      };
-    }
-    setSparkleQueryParams(e) {
-      this.sparkleManager.setSparkleQueryParams(e);
-    }
-    async takeResumeState() {
-      let e = this.globalState.get(a.J),
-        t = e?.[Ht];
-      if (t == null) return null;
-      (this.globalState.set(a.J, { ...e, [Ht]: null }), await this.globalState.flushOrThrow());
-      let n = sOe.safeParse(t);
-      return n.success ? n.data : null;
-    }
-    async installUpdate() {
-      if (process.platform === `darwin` && isRemoteControlSessionActive()) {
-        let e =
-            l.BrowserWindow.fromWebContents(this.origin) ?? this.windowManager.getPrimaryWindow(),
-          t = a.hn(),
-          n = t.formatMessage({
-            messageId: $De,
-            defaultMessage: eOe,
-            values: { appName: `ChatGPT` },
-          }),
-          r = {
-            type: `warning`,
-            buttons: [
-              t.formatMessage({ messageId: aOe, defaultMessage: oOe }),
-              t.formatMessage({ messageId: rOe, defaultMessage: iOe }),
-            ],
-            defaultId: 0,
-            cancelId: 1,
-            noLink: !0,
-            title: n,
-            message: n,
-            detail: t.formatMessage({
-              messageId: tOe,
-              defaultMessage: nOe,
-              values: { appName: `ChatGPT` },
-            }),
-          };
-        if (
-          (e == null ? await l.dialog.showMessageBox(r) : await l.dialog.showMessageBox(e, r))
-            .response !== 0
-        )
-          return;
-      }
-      this.sparkleManager.installUpdatesIfAvailable();
-    }
-  },
-  lOe = class extends n.Uf {
-    owner;
-    menuItemsByCommandId = new Map();
-    constructor(e) {
-      (super(), (this.owner = e));
-    }
-    getSnapshot() {
-      this.menuItemsByCommandId.clear();
-      let e = l.Menu.getApplicationMenu();
-      if (e == null) return null;
-      let t = (t) => YE(e.getMenuItemById(t)?.submenu?.items ?? [], this.menuItemsByCommandId);
-      return {
-        [ot.file]: t(ot.file),
-        [ot.edit]: t(ot.edit),
-        [ot.view]: t(ot.view),
-        [ot.help]: t(ot.help),
-      };
-    }
-    invokeItem(e) {
-      if (!n.Cf().int().safeParse(e).success) return;
-      let t = this.menuItemsByCommandId.get(e);
-      if (t == null || !t.enabled || !t.visible) return;
-      let r = l.webContents.getFocusedWebContents(),
-        i =
-          r != null && !r.isDestroyed() && (r === this.owner || r.hostWebContents === this.owner)
-            ? r
-            : this.owner;
-      Reflect.apply(t.click, t, [
-        { triggeredByAccelerator: !1 },
-        l.BrowserWindow.fromWebContents(this.owner) ?? void 0,
-        i,
-      ]);
-    }
   };
-function YE(e, t) {
-  return e.flatMap((e) =>
-    e.visible
-      ? e.type === `separator`
-        ? [{ type: `separator`, nativeCommandId: e.commandId }]
-        : (t.set(e.commandId, e),
-          e.submenu == null
-            ? e.type === `normal`
-              ? [
-                  {
-                    type: `item`,
-                    nativeCommandId: e.commandId,
-                    label: e.label,
-                    accelerator: e.accelerator,
-                    enabled: e.enabled,
-                  },
-                ]
-              : []
-            : [
-                {
-                  type: `submenu`,
-                  nativeCommandId: e.commandId,
-                  label: e.label,
-                  enabled: e.enabled,
-                  items: YE(e.submenu.items, t),
-                },
-              ])
-      : [],
-  );
-}
 var uOe = r.i(`codex-app-config/apply`);
 function dOe({ config: e, globalState: t }) {
   let r = t.get(n.iu.CODEX_MANAGED_REMOTE_CONNECTIONS) ?? [],
@@ -25851,52 +25724,6 @@ function _Oe(e, t) {
 }
 function vOe(e, t) {
   return e.length === t.length && e.every((e, n) => e === t[n]);
-}
-var yOe = class extends n.Uf {
-    hotkeysService;
-    requestFinalUpdateImpl;
-    constructor(e, t) {
-      (super(), (this.hotkeysService = e), (this.requestFinalUpdateImpl = t));
-    }
-    getState() {
-      return this.hotkeysService.getState();
-    }
-    setHotkey(e) {
-      return this.hotkeysService.setHotkey(e);
-    }
-    requestFinalUpdate(e) {
-      return this.requestFinalUpdateImpl(e);
-    }
-  },
-  bOe = 16,
-  xOe = 64,
-  SOe = 64,
-  COe = 64,
-  wOe = 128,
-  TOe = Intl.DateTimeFormat().resolvedOptions().timeZone;
-function EOe() {
-  let e = l.screen.getPrimaryDisplay();
-  return DOe(
-    a.on,
-    e.size.height,
-    e.size.width,
-    e.scaleFactor,
-    l.app.getLocale(),
-    l.app.getPreferredSystemLanguages(),
-    TOe,
-  );
-}
-function DOe(e, t, n, r, i, a, o) {
-  let s = (i || `unknown`).slice(0, SOe);
-  return {
-    schemaVersion: 1,
-    preferredLanguages: (a.length > 0 ? a : [s]).slice(0, bOe).map((e) => e.slice(0, xOe)),
-    locale: s,
-    timezone: (o || `unknown`).slice(0, COe),
-    screenSizeSum: Math.max(0, Math.round(n + t)),
-    screenScale: r,
-    appSessionId: e.slice(0, wOe),
-  };
 }
 var AOe = createHabitatAutomationsServiceClass({
   automationRuntime: n,
@@ -74948,7 +74775,7 @@ var G5 = r.r(`WindowContext`),
     Det,
     E,
     E5,
-    EOe,
+    getDesktopEnvironmentSignals,
     Eje,
     Ett,
     F,
@@ -75075,7 +74902,7 @@ var G5 = r.r(`WindowContext`),
     c,
     c8e,
     cA,
-    cOe,
+    AppUpdateService,
     cee,
     cr,
     crypto,
@@ -75113,7 +74940,7 @@ var G5 = r.r(`WindowContext`),
     l,
     l1e,
     lA,
-    lOe,
+    ApplicationMenuSnapshotService,
     lne,
     ls,
     m,
@@ -75168,7 +74995,7 @@ var G5 = r.r(`WindowContext`),
     y,
     OwlRuntimeFeaturesService,
     y8e,
-    yOe,
+    AppshotCapabilityService,
     ytt,
     z,
     resetRuntimeFeatures,
