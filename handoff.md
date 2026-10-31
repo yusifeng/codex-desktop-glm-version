@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+恢复 core notification reducer 外层 owner：`streams/notifications-apply.ts` 的 `nb` 现按旧顺序执行 reconnect reset、follower ignore、resume/
+thread-start buffering、turn-start observation、trace、realtime/lifecycle/thread/item/fs 分发与最终 emit；thread reducer 同步恢复 environment、start、
+name/settings/status、goal、archive/delete/unarchive、token usage。主 chunk 旧 `nb/rb` 删除，新增 focused suite 覆盖 buffer/ignore 与关键分支。
+
 修复 conversation/subagent interrupt owner：`streams/notifications-apply.ts` 现恢复 expected-turn gate、mismatch retry、no-active fallback、
 canonical/legacy 状态更新、Node REPL 10 秒清理与 background cleanup；descendant interrupt 恢复本地 snapshot 先行、远端 discovery/list-turn
 fallback 和逐 child 错误隔离。主 chunk 旧 `my…jve` 簇删除，新增 focused suite 覆盖正常/错位/idle/远端 descendant 分支。

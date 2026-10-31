@@ -1,5 +1,6 @@
 import { $u as normalizeThreadId, Zo as errorToString } from "@chunk/shared";
 import { conversationTurns, findTurnById, lastTurnWithTurnId } from "../turns/canonical-history";
+import { applyThreadSettingsUpdate } from "../threads/patch-classification";
 
 type R=Record<string,unknown>;const rec=(v:unknown):R=>typeof v===`object`&&v!==null?v as R:{};const fn=(v:unknown,n:string)=>(rec(v)[n] as (((...a:unknown[])=>unknown)|undefined));
 function update(manager:unknown,id:string,callback:(state:R)=>void){fn(manager,`updateConversationState`)?.(id,callback)} function append(state:R,item:unknown){const turns=state.turns;if(Array.isArray(turns)&&turns.length>0){const turn=rec(turns[turns.length-1]);const items=Array.isArray(turn.items)?turn.items:[];turn.items=[...items,item]}}
@@ -8,7 +9,123 @@ export function Iy(manager:unknown,id:string,sourceId:string,title:unknown,histo
 export function Ly(manager:unknown,id:string,taskId:string,history:unknown):void{update(manager,id,state=>append(state,{id:fn(history,`createSearchIslandId`)?.()??`task-${taskId}`,type:`remoteTaskCreated`,taskId}))}
 export function Ry(manager:unknown,id:string,item:unknown,history:unknown,mode:`latest-turn`|`new-turn`=`latest-turn`):void{const value={...rec(item),type:`worktreeInit`};update(manager,id,state=>{if(mode===`new-turn`){const turns=Array.isArray(state.turns)?state.turns:[];state.turns=[...turns,{turnId:fn(history,`createSearchIslandId`)?.()??`worktree-init`,status:`inProgress`,items:[value]}]}else append(state,value)})}
 export function zy(manager:unknown,id:string,turnId:string):void{update(manager,id,state=>{if(Array.isArray(state.requests))state.requests=state.requests.filter(x=>!(rec(x).method===`item/plan/requestImplementation`&&rec(rec(x).params).turnId===turnId))})}
-export function nb(context:unknown,method:string,params:unknown,_capability?:unknown,_ignore?:unknown):void{const notification={method,params};fn(rec(context).events,`emitNotification`)?.(notification);const id=typeof rec(params).threadId===`string`?rec(params).threadId as string:null;if(id==null)return;if(method===`thread/archived`)fn(context,`handleThreadArchived`)?.(id);else if(method===`thread/deleted`)fn(context,`handleThreadDeletion`)?.([id]);else if(method===`thread/unarchived`)fn(context,`handleThreadUnarchived`)?.(id)}
+function goalAllowsConfirmation(status: unknown): boolean {
+  return status === "paused" || status === "blocked" || status === "usageLimited";
+}
+function applyThreadNotification(context: any, notification: { method: string; params: any }): void {
+  const { manager, notificationContext } = context;
+  const { method, params } = notification;
+  switch (method) {
+    case "thread/environment/connected":
+    case "thread/environment/disconnected": {
+      const conversationId = normalizeThreadId(params.threadId);
+      manager.getConversation(conversationId);
+      manager.logger.info("VM lifecycle", {
+        safe: { vmEvent: method === "thread/environment/connected" ? "environment_connected" : "environment_disconnected", vmProduct: "unknown", threadId: params.threadId, environmentId: params.environmentId },
+        sensitive: { hostId: manager.getHostId() },
+      });
+      if (params.environmentId === "managed") return;
+      manager.updateConversationState(conversationId, (state: any) => {
+        if (method === "thread/environment/connected") {
+          if (!state.connectedEnvironmentIds?.includes(params.environmentId))
+            state.connectedEnvironmentIds = [...(state.connectedEnvironmentIds ?? []), params.environmentId];
+        } else state.connectedEnvironmentIds = state.connectedEnvironmentIds?.filter((id: string) => id !== params.environmentId);
+      });
+      return;
+    }
+    case "thread/started": {
+      const conversationId = notificationContext.upsertConversationFromThread(params.thread, "live");
+      notificationContext.threadStore.recordThreadRuntimeStatusEvidence(params.thread.id, params.thread.status);
+      manager.broadcastConversationSnapshot(conversationId);
+      return;
+    }
+    case "thread/name/updated": {
+      const title = params.threadName?.trim() ?? "";
+      if (title.length > 0) notificationContext.threadStore.applyThreadTitleUpdate(params.threadId, title);
+      return;
+    }
+    case "thread/settings/updated": {
+      const conversationId = normalizeThreadId(params.threadId);
+      if (notificationContext.threadStore.conversations.has(conversationId))
+        manager.updateConversationState(conversationId, (state: any) => applyThreadSettingsUpdate(state, params.threadSettings));
+      return;
+    }
+    case "thread/status/changed": {
+      const status = params.status;
+      if (!status) {
+        manager.logger.warning("Invalid thread/status/changed notification payload", { safe: {}, sensitive: { params } });
+        return;
+      }
+      const conversationId = normalizeThreadId(params.threadId);
+      if (!notificationContext.threadStore.conversations.has(conversationId)) {
+        const changed = notificationContext.threadStore.recordThreadRuntimeStatusEvidence(params.threadId, status);
+        if (status.type === "active" && changed) notificationContext.threadStore.hydrateActiveThread(params.threadId);
+        return;
+      }
+      manager.updateConversationState(conversationId, (state: any) => { state.threadRuntimeStatus = status; });
+      notificationContext.threadStore.recordThreadRuntimeStatusEvidence(params.threadId, status);
+      return;
+    }
+    case "thread/goal/updated": {
+      const conversationId = normalizeThreadId(params.threadId);
+      const conversation = manager.getConversation(conversationId);
+      const shouldClear = params.goal.status === "complete" && conversation != null && conversation.completedThreadGoal?.updatedAt !== params.goal.updatedAt;
+      manager.updateConversationState(conversationId, (state: any) => {
+        state.threadGoal = params.goal;
+        state.completedThreadGoal = params.goal.status === "complete" ? params.goal : null;
+        if (!goalAllowsConfirmation(params.goal.status)) state.threadGoalResumeConfirmation = null;
+      });
+      if (shouldClear) manager.sendRequest("thread/goal/clear", { threadId: conversationId }).catch((error: unknown) =>
+        manager.logger.error("Failed to clear completed thread goal", { safe: { conversationId }, sensitive: { error } }));
+      return;
+    }
+    case "thread/goal/cleared": {
+      manager.updateConversationState(normalizeThreadId(params.threadId), (state: any) => {
+        state.threadGoal = null; state.threadGoalResumeConfirmation = null;
+      });
+      return;
+    }
+    case "thread/archived": notificationContext.handleThreadArchived(normalizeThreadId(params.threadId)); return;
+    case "thread/deleted": notificationContext.handleThreadDeletion([params.threadId]); return;
+    case "thread/unarchived": notificationContext.handleThreadUnarchived(normalizeThreadId(params.threadId)); return;
+    case "thread/tokenUsage/updated":
+      manager.updateConversationState(normalizeThreadId(params.threadId), (state: any) => { state.latestTokenUsageInfo = params.tokenUsage; });
+  }
+}
+const THREAD_NOTIFICATION_METHODS = new Set([
+  "thread/started", "thread/environment/connected", "thread/environment/disconnected", "thread/name/updated",
+  "thread/settings/updated", "thread/status/changed", "thread/goal/updated", "thread/goal/cleared",
+  "thread/archived", "thread/deleted", "thread/unarchived", "thread/tokenUsage/updated",
+]);
+const ITEM_STREAM_METHODS = new Set([
+  "item/agentMessage/delta", "item/plan/delta", "item/reasoning/summaryTextDelta", "item/reasoning/summaryPartAdded",
+  "item/reasoning/textDelta", "item/commandExecution/outputDelta", "item/commandExecution/terminalInteraction",
+  "item/fileChange/patchUpdated",
+]);
+export function nb(context: any, method: string, params: any, automationCapability?: unknown, shouldIgnore = false): void {
+  const notification = { method, params };
+  const delivery = { notification, automationCapability };
+  const { manager, notificationContext } = context;
+  if ((method === "account/updated" || method === "account/login/completed")) notificationContext.threadStore.resetAfterReconnect();
+  if (notificationContext.streamState.shouldIgnoreThreadMutationAsFollower(method, params, "notification") ||
+    notificationContext.resumeNotificationBuffer.buffer(delivery, shouldIgnore) ||
+    notificationContext.threadStartedNotificationDeferral.bufferNotification(delivery, shouldIgnore) || shouldIgnore) return;
+  if (method === "turn/started") context.observeTurnStart(normalizeThreadId(params.threadId), params.turn.id);
+  if (method !== "item/commandExecution/outputDelta")
+    manager.logger.trace("Received app server notification", { safe: { method }, sensitive: {} });
+  if (method.startsWith("thread/realtime/")) {
+    if (method === "thread/realtime/itemAdded") notificationContext.handleRealtimeItemAdded(params);
+    notificationContext.events.emitNotification(notification);
+    return;
+  }
+  if (["account/login/completed", "account/updated", "mcpServer/oauthLogin/completed", "windowsSandbox/setupCompleted"].includes(method))
+    notificationContext.lifecycle.handleNotification(notification);
+  else if (THREAD_NOTIFICATION_METHODS.has(method)) applyThreadNotification(context, notification);
+  else if (ITEM_STREAM_METHODS.has(method)) notificationContext.itemStreamState.handleNotification(notification);
+  else if (method === "fs/changed")
+    for (const message of notificationContext.openFileWatches.getFileChangeMessages(params.watchId)) notificationContext.events.emitOpenFileChange(message);
+  notificationContext.events.emitNotification(notification);
+}
 export function ib(manager:unknown,_policy?:unknown):()=>void{const client=rec(manager).requestClient;const add=fn(client,`addNotificationListener`)??fn(client,`addNotificationCallback`);const dispose=add?.((method:string,params:unknown)=>fn(manager,`handleNotification`)?.(method,params));return typeof dispose===`function`?dispose as ()=>void:()=>undefined}
 function mismatchTurnId(error: unknown): string | null {
   const message = errorToString(error);

@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 notification reducer outer owner repair
+
+语义 `nb` 原先绕过 follower mutation gate、resume/start buffer、turn observation、lifecycle 与 item stream，仅 emit 后处理三类 archive 方法。
+本轮恢复旧 outer reducer 顺序及完整 thread notification 子 reducer，接回现有 ItemNotificationHandler/open-file/realtime consumers，删除 main
+旧 `nb/rb`；focused suite 验证 reconnect、buffer/ignore、settings/status、delta、realtime 与 fs fan-out。
+
 ## 2026-10-31 interrupt owner repair
 
 语义 `Ove/Ave` 原先只找 legacy active turn、单发 interrupt，且 descendant 无状态门或远端 fallback；这会漏 canonical turn、mismatch retry、

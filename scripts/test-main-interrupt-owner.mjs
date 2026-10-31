@@ -15,6 +15,7 @@ Function("require", "module", "exports", transpiled.code)((specifier) => {
     lastTurnWithTurnId: (conversation) => [...conversation.turns].reverse().find((turn) => turn.turnId != null) ?? null,
     mergedConversationTurns: (conversation) => conversation.turns,
   };
+  if (specifier === "../threads/patch-classification") return { applyThreadSettingsUpdate() {} };
   throw new Error(`unexpected require ${specifier}`);
 }, module, module.exports);
 const owner = module.exports;
