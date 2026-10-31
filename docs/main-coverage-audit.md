@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread turn-summary service
+
+原 `Nnt/Pnt/z5/B5` 已整簇迁入 `src/main/main-app/threads/thread-turn-summary-service.ts`。新 owner 保留
+principal/host-key authorization recheck、principal identity hashing、summary normalization/limits、compact-summary pairing、
+revision tombstones、delete revision sequencing、renderer subscription cleanup、host/principal invalidation 与 dispose；唯一
+runtime construction 已接回，旧 class/subscription/key helpers 已删除。
+
 ## 2026-10-31 thread read-state RPC services
 
 原 `jnt/Mnt` 已迁入 `src/main/main-app/thread-read-state/rpc-services.ts`。新 adapters 保留 callback dup/using-scope、

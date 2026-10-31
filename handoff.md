@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Nnt/Pnt/z5/B5` thread turn-summary service 迁入 `threads/thread-turn-summary-service.ts`；principal/host-key
+authorization、identity hash、normalized/compact summaries、revision tombstones、delete sequencing、renderer subscriptions、
+host/principal invalidation 与 dispose cleanup 均由新 owner 持有。唯一 runtime construction 已接回，旧 cluster 已删除。
+focused test 覆盖 44 项。
+
 随后将 `jnt/Mnt` thread read-state RPC facade/session 迁入 `thread-read-state/rpc-services.ts`；callback duplication、
 open failure/non-ready cleanup、pre/post-open retired race、RPC-broken unsubscribe、session forwarding 与 cleanup-once
 语义均由新 adapters 持有。唯一 runtime consumer 已接回，旧 classes 已删除。focused test 覆盖 32 项。

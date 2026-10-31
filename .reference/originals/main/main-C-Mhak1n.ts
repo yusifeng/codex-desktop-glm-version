@@ -115,6 +115,7 @@ const { createThreadArchiveServiceClass } = require("./main-app/threads/thread-a
 const { createThreadCatalogPageSlotSchedulerClass } = require("./main-app/thread-catalog/page-slot-scheduler.js");
 const { createThreadMetadataGenerationServiceClass } = require("./main-app/threads/thread-metadata-generation-service.js");
 const { createThreadReadStateRpcServices } = require("./main-app/thread-read-state/rpc-services.js");
+const { createThreadTurnSummaryServiceClass } = require("./main-app/threads/thread-turn-summary-service.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -140553,189 +140554,12 @@ function Ant(e) {
 }
 var { ThreadReadStateService: jnt, ThreadReadStateSession: Mnt } =
     createThreadReadStateRpcServices({ RpcHandlerBase: n.Uf, createUsingScope: a.en }),
-  Nnt = class extends n.Uf {
-    logger = r.r(`ThreadTurnSummaryService`);
-    listeners = new Set();
-    visibleSummaries = new Map();
-    deletedRevisions = new Map();
-    unsubscribeHostRemoved;
-    unsubscribePrincipalChange;
-    authorizationEpoch = 0;
-    disposed = !1;
-    constructor({
-      getPrincipal: e,
-      getStore: t,
-      getHostKey: n,
-      onHostRemoved: r,
-      onPrincipalChange: i,
-    }) {
-      (super(),
-        (this.getPrincipal = e),
-        (this.getStore = t),
-        (this.getHostKey = n),
-        (this.unsubscribeHostRemoved = r((e) => {
-          this.invalidateSummaries((t) => t.hostId === e);
-        })),
-        (this.unsubscribePrincipalChange = i((e) => {
-          e.previous != null &&
-            ((this.authorizationEpoch += 1), this.invalidateSummaries(() => !0));
-        })));
-    }
-    getPrincipal;
-    getStore;
-    getHostKey;
-    async getPrincipalIdentity({ hostId: e }) {
-      return this.runAuthorized(e, null, (e) => e);
-    }
-    async readMany({ hostId: e, threadIds: t }) {
-      return t.length === 0
-        ? []
-        : this.runAuthorized(e, [], (n, r) => {
-            let i = this.getStore();
-            return i == null
-              ? []
-              : i.readMany(n, r, t).map((t) => {
-                  let n = { hostId: e, ...t };
-                  return (this.visibleSummaries.set(z5(e, t.threadId), n), n);
-                });
-          });
-    }
-    async setSummary({
-      hostId: e,
-      threadId: t,
-      summary: n,
-      compactSummary: r,
-      compactSummaryTurnKey: i,
-      revision: a,
-      principalIdentity: o,
-    }) {
-      let s = n.replace(/\s+/g, ` `).trim().slice(0, 280).trimEnd(),
-        c = r?.replace(/\s+/g, ` `).trim().slice(0, 60).trimEnd();
-      return t.length === 0 ||
-        s.length === 0 ||
-        c?.length === 0 ||
-        (c == null) != (i == null) ||
-        i?.length === 0 ||
-        !Number.isSafeInteger(a) ||
-        a < 0
-        ? !1
-        : this.runAuthorized(e, !1, (n, r) => {
-            if (o !== n) return !1;
-            let l = B5(n, r, t);
-            if ((this.deletedRevisions.get(l) ?? -1) >= a) return !1;
-            let u = this.getStore();
-            if (u == null || !u.set(n, r, t, s, a, c, i)) return !1;
-            let d = {
-              hostId: e,
-              threadId: t,
-              summary: s,
-              ...(c == null ? {} : { compactSummary: c, compactSummaryTurnKey: i }),
-              revision: a,
-            };
-            return (
-              this.deletedRevisions.delete(l),
-              this.visibleSummaries.set(z5(e, t), d),
-              this.publish(d),
-              !0
-            );
-          });
-    }
-    async subscribe(e) {
-      if (this.disposed)
-        throw new DOMException(`Task turn summary service is disposed`, `AbortError`);
-      let t = e.dup();
-      this.listeners.add(t);
-      let n = () => {
-        this.listeners.delete(t) && t[Symbol.dispose]();
-      };
-      return (t.onRpcBroken(n), new Pnt(n));
-    }
-    async delete({ hostId: e, threadId: t }) {
-      await this.runAuthorized(e, void 0, (n, r) => {
-        let i = this.getStore(),
-          a = i?.readMany(n, r, [t])[0]?.revision;
-        i?.delete(n, r, t);
-        let o = z5(e, t),
-          s = this.visibleSummaries.get(o),
-          c = B5(n, r, t),
-          l = Math.max(s?.revision ?? -1, a ?? -1, this.deletedRevisions.get(c) ?? -1) + 1;
-        (this.deletedRevisions.set(c, l),
-          this.visibleSummaries.delete(o),
-          this.publish({ hostId: e, threadId: t, summary: null, revision: l }));
-      });
-    }
-    dispose() {
-      if (!this.disposed) {
-        ((this.disposed = !0), this.unsubscribeHostRemoved(), this.unsubscribePrincipalChange());
-        for (let e of this.listeners) e[Symbol.dispose]();
-        (this.listeners.clear(), this.visibleSummaries.clear(), this.deletedRevisions.clear());
-      }
-    }
-    async runAuthorized(e, t, n) {
-      if (this.disposed) return t;
-      let r = this.getHostKey(e);
-      if (r == null) return t;
-      let i = this.authorizationEpoch;
-      try {
-        let a = await this.getPrincipal();
-        return this.disposed ||
-          a == null ||
-          this.authorizationEpoch !== i ||
-          this.getHostKey(e) !== r
-          ? t
-          : n((0, _.createHash)(`sha256`).update(`${a.userId}\0${a.accountId}`).digest(`hex`), r);
-      } catch (n) {
-        return (
-          this.disposed ||
-            this.logger.warning(`Failed to access task turn summaries`, {
-              safe: {},
-              sensitive: { error: n, hostId: e },
-            }),
-          t
-        );
-      }
-    }
-    invalidateSummaries(e) {
-      for (let [t, n] of this.visibleSummaries)
-        e(n) &&
-          (this.visibleSummaries.delete(t),
-          this.publish({
-            hostId: n.hostId,
-            threadId: n.threadId,
-            summary: null,
-            revision: n.revision + 1,
-          }));
-    }
-    publish(e) {
-      for (let n of this.listeners)
-        try {
-          var t = a.en();
-          t.u(n(e));
-        } catch (e) {
-          t.e = e;
-        } finally {
-          t.d();
-        }
-    }
-  },
-  Pnt = class extends n.Uf {
-    unsubscribeOnce;
-    constructor(e) {
-      (super(), (this.unsubscribeOnce = e));
-    }
-    unsubscribe() {
-      (this.unsubscribeOnce?.(), (this.unsubscribeOnce = null));
-    }
-    [Symbol.dispose]() {
-      this.unsubscribe();
-    }
-  };
-function z5(e, t) {
-  return `${e}\0${t}`;
-}
-function B5(e, t, n) {
-  return `${e}\0${t}\0${n}`;
-}
+  Nnt = createThreadTurnSummaryServiceClass({
+    RpcHandlerBase: n.Uf,
+    createLogger: r.r,
+    createHash: _.createHash,
+    createUsingScope: a.en,
+  });
 var Fnt = class extends n.Uf {
     setGitWorkerTracingSampleRate;
     saveDesktopTraceSampleRate;
