@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+继续迁出真实 automations owner：原 `AOe` Habitat Automations service 已连同 hosted/local schema、RRULE normalization、
+cloud/local projection helpers 迁入 `automations/habitat-automations-service.ts`；migration consent/owner identity、serialized
+mutations、cloud save-and-verify、pagination sync、cache adoption 与 principal-change lifecycle 均由新 class 持有。真实 `NOe`
+composition 和 `WindowContext` consumers 已接回，主 chunk 旧 class 与专属 helpers 删除。
+
 saved-section manager 收尾：单用途 `aBe` state-schema predicate 已内聚到 manager factory，主 chunk 转发 helper 与反向注入删除。
 
 完成 saved-section manager owner：原 `iBe` 已迁入 `sidebar/saved-custom-sections-manager.ts`；serialized command queue、

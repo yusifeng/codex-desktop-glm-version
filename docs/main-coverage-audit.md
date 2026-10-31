@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 Habitat Automations owner
+
+原 `AOe` 已迁入 `src/main/main-app/automations/habitat-automations-service.ts`。新 dependency-injected owner 保留 migration
+consent 与 persisted owner identity、mutation serialization、hosted create/update/delete、save 后独立读取校验、分页同步、local
+cache adoption、principal-change invalidation 和 RRULE/local-configuration projection；真实 `NOe` composition 仍构造该 class，
+`WindowContext`、automations façade 与 startup sync consumers 均保持原调用链，主 chunk 旧 class/schema/helpers 已物理删除。
+
 ## 2026-10-31 saved-section manager helper cleanup
 
 单用途 `aBe` saved-state schema predicate 已内聚到 manager factory；主 chunk 转发 helper 与反向 dependency injection 删除。

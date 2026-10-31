@@ -73,8 +73,12 @@ equal(await habitatService.delete({ id: "x" }), { item: { id: "x" }, success: fa
 equal((await habitatService.executeUpdateTool({ hostId: "local" })).response.contentItems[0].text, "Local automation changes must use the Automations app after migration consent.");
 
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
+const electronFetchHandler = fs.readFileSync(
+  new URL("../src/main/main-app/fetch-handler/electron-fetch-handler.ts", import.meta.url),
+  "utf8",
+);
 equal(main.includes("createAutomationsServiceClass({"), true);
 equal(main.includes("var CMe = class"), false);
-equal(main.includes("new CMe("), true);
+equal(electronFetchHandler.includes("new CMe("), true);
 
 console.log(`${assertions} main automations service assertions passed`);

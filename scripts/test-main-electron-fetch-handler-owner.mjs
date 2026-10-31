@@ -61,9 +61,13 @@ handler.handlers.unsupported = () => { throw new UnsupportedElectronHandlerError
 throws(() => handler.handleVSCodeRequest(origin, "unsupported", {}, null, signal), /unsupported not implemented in Electron/);
 
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
+const windowContext = fs.readFileSync(
+  new URL("../src/main/main-app/window/window-context.ts", import.meta.url),
+  "utf8",
+);
 equal(main.includes("PBe = createElectronFetchHandlerClass({"), true);
 equal(main.includes("PBe = class"), false);
-equal(main.includes("new PBe("), true);
+equal(windowContext.includes("new PBe("), true);
 equal(main.includes("computeScreenshotTarget: (...args) => computeScreenshotTarget(...args)"), true);
 const owner = fs.readFileSync(new URL("../src/main/main-app/fetch-handler/electron-fetch-handler.ts", import.meta.url), "utf8");
 equal(owner.includes("return class ElectronFetchHandler"), true);
