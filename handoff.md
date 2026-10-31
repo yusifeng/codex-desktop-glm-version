@@ -4882,3 +4882,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   WindowContext、terminal、remote-host config 和 transport factory；旧 `_E..QDe` 全带同步删除。main 合计物理删除约 1450 行，
   focused coverage 新增 25 项并强化 19 项 transport wiring，邻接 remote-connections/terminal/factory/device-key 回归为
   43/38/45/26 项。下一批从删除后的 automations/browser origin owner 区域继续审计完整状态边界。
+
+# 2026-11-01 Browser Use origin state and habitat automation runtime
+
+- Browser Use config read/update/policy consumer 已直接接到 `browser-use/origin-state.ts`，新增 chrome-history 语义 API；
+  WindowContext 改用 `BrowserSettingsSync`/`IabTabMentions` 真名，旧 `KOe.._ke` 重复带约 275 行删除。
+- `automations/habitat-runtime.ts` 接管 service subscriptions/query invalidation、local host callbacks 和 cron completion ownership
+  cleanup，旧 `NOe/POe/FOe` 删除。focused coverage 22/19/31 项，Electron fetch/WindowContext 邻接 19/16 项。
+  下一批继续审计紧随 vendor utility belt 后的 browser page/host RPC owners，优先整组迁出 class family 而非拆单方法。

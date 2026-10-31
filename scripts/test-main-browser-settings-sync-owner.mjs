@@ -158,19 +158,15 @@ const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
 );
-equal(
-  main.includes('const { BrowserSettingsSync } = require("./main-app/browser-use/origin-state.js");'),
-  true,
-);
-equal(main.includes("var _ke = BrowserSettingsSync;"), true);
-equal(main.includes("_ke = class"), false);
-equal(main.includes("this.browserSettingsSync = new _ke({"), false);
+equal(main.includes('require("./main-app/browser-use/origin-state.js")'), true);
+equal(main.includes("var _ke = BrowserSettingsSync;"), false);
+equal(/\b_ke\b/.test(main), false);
 
 const windowContext = fs.readFileSync(
   new URL("../src/main/main-app/window/window-context.ts", import.meta.url),
   "utf8",
 );
-equal(windowContext.includes("this.browserSettingsSync = new _ke({"), true);
+equal(windowContext.includes("this.browserSettingsSync = new BrowserSettingsSync({"), true);
 equal(windowContext.includes("this.browserSettingsSync.start()"), true);
 
 console.log(`${assertions} main Browser settings sync owner assertions passed`);

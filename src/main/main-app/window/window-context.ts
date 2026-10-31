@@ -38,7 +38,7 @@ export function createWindowContextClass(dependencies) {
     F5e,
     F8e,
     createHostedAppServerManager,
-    FOe,
+    unsubscribeCompletedAutomationIfUnowned,
     Fnt,
     G,
     G5,
@@ -48,7 +48,7 @@ export function createWindowContextClass(dependencies) {
     Gnt,
     H,
     H5,
-    HOe,
+    IabTabMentions,
     Hee,
     Het,
     I,
@@ -83,7 +83,7 @@ export function createWindowContextClass(dependencies) {
     N,
     N0,
     N2e,
-    NOe,
+    createHabitatAutomationsService,
     NativeArtifactFileService,
     Nnt,
     O,
@@ -92,7 +92,7 @@ export function createWindowContextClass(dependencies) {
     P,
     P1e,
     PBe,
-    POe,
+    habitatAutomationHostCallbacks,
     Q,
     Q0e,
     Qj,
@@ -145,7 +145,7 @@ export function createWindowContextClass(dependencies) {
     Znt,
     _,
     _$e,
-    _ke,
+    BrowserSettingsSync,
     a,
     a$e,
     a5,
@@ -468,7 +468,7 @@ export function createWindowContextClass(dependencies) {
               this.broadcastQueryCacheInvalidation([`experimental-features`, `list`, e]),
             ),
           ),
-          (this.habitatAutomationsService = NOe(r, e, this.appState, this.disposables, (...e) =>
+          (this.habitatAutomationsService = createHabitatAutomationsService(r, e, this.appState, this.disposables, (...e) =>
             this.broadcastQueryCacheInvalidation(...e),
           )),
           (this.demoTools = Wje({ buildFlavor: e.buildFlavor, isPackaged: l.app.isPackaged })),
@@ -930,7 +930,7 @@ export function createWindowContextClass(dependencies) {
             this.disposables.add(() => e.dispose()));
         }
         (a.D((e) => this.fetchWrapper.exportTraceBatch(e)),
-          (this.browserSettingsSync = new _ke({
+          (this.browserSettingsSync = new BrowserSettingsSync({
             configFile: new pke(n.Oi()),
             getAuthenticatedPrincipal: () => r.getAuthenticatedPrincipal(),
             createApi: (e) =>
@@ -1281,7 +1281,7 @@ export function createWindowContextClass(dependencies) {
               (e, t, n) => YD(c, e, t, n),
               new nAe(c, e, (e, t, n) => s.getCurrentPageUrl(e, t, n)),
             ),
-            browserTabs: new HOe(s.iabTabMentions, e),
+            browserTabs: new IabTabMentions(s.iabTabMentions, e),
             browserAutocomplete: new Cke(this.messageHandler.getBrowserAutocompleteCoordinator(), e),
             browsingHistory: Xke.create(e, () => s.getBrowserSession()),
             debug: new zje(
@@ -2051,7 +2051,7 @@ export function createWindowContextClass(dependencies) {
             continueWaitingForStdioInitializeTimeout: t.id === J,
             onAutomationCapabilityEvent: (e) => {
               (this.sendAutomationCapabilityEvent(e),
-                FOe(
+                unsubscribeCompletedAutomationIfUnowned(
                   p,
                   e,
                   () =>
@@ -2077,7 +2077,7 @@ export function createWindowContextClass(dependencies) {
               isLocalStdio: () => e === `local` && t.id === `local` && d.kind === `stdio`,
             }),
             onArchiveCleanup: (t, n) => this.managedWorktrees.cleanupForArchivedThread(e, t, n),
-            ...POe(e, () => this.habitatAutomationsService),
+            ...habitatAutomationHostCallbacks(e, () => this.habitatAutomationsService),
             transport: d,
             hostProcess: this.options.hostProcess,
             isOnline: () => l.net.isOnline(),

@@ -283,6 +283,7 @@ const { createWorkspaceDirectoryBrowser } = require("./main-app/workspace/direct
 const { createThirdPartyNoticesReader, createWorkspaceSettingsServiceClass, resolveSystemBackdropSupport } = require("./main-app/settings/workspace-settings-service.js");
 const { createAutomationsServiceClass } = require("./main-app/automations/automations-service.js");
 const { createHabitatAutomationsServiceClass } = require("./main-app/automations/habitat-automations-service.js");
+const { createHabitatAutomationRuntime } = require("./main-app/automations/habitat-runtime.js");
 const { createPinnedThreadsServiceClass } = require("./main-app/sidebar/pinned-threads-service.js");
 const { createElectronFetchHandlerClass } = require("./main-app/fetch-handler/electron-fetch-handler.js");
 const { createWindowContextClass } = require("./main-app/window/window-context.js");
@@ -344,7 +345,18 @@ const { subscribeComputerUsePipTurnLifecycle: Noe } = require("./main-app/comput
 const { AppEntryAttributionTracker: Foe } = require("./main-app/startup/app-entry-attribution.js");
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
-const { BrowserSettingsSync, BrowserUseOriginState: XOe, RemoteBrowserSettings: uke, BrowserConfigFile: pke } = require("./main-app/browser-use/origin-state.js");
+const {
+  BrowserSettingsSync,
+  BrowserUseOriginState: XOe,
+  RemoteBrowserSettings: uke,
+  BrowserConfigFile: pke,
+  readProjectedState: readBrowserUseOriginState,
+  setApprovalMode: setBrowserUseApprovalMode,
+  setChromeHistoryApprovalMode,
+  setTransferApprovalMode: setBrowserUseTransferApprovalMode,
+  setFullCdpAccessEnabled: setBrowserUseFullCdpAccessEnabled,
+  assertIabModeAllowedByPolicy,
+} = require("./main-app/browser-use/origin-state.js");
 const {
   PublishedStatsig,
   StableIdStore,
@@ -23066,354 +23078,24 @@ var AOe = createHabitatAutomationsServiceClass({
   defaultFetch: l.net.fetch.bind(l.net),
   randomUUID: _.randomUUID,
 });
-var rD = r.i(`habitat-automations`),
-  MOe = n.wf({
+var {
+  createHabitatAutomationsService,
+  habitatAutomationHostCallbacks,
+  unsubscribeCompletedAutomationIfUnowned,
+} = createHabitatAutomationRuntime({
+  HabitatAutomationsService: AOe,
+  getDesktopFeatureAvailability: Tr,
+  fetch: l.net.fetch.bind(l.net),
+  completionSchema: n.wf({
     item: n.wf({
       type: n.bf(`mcpToolCall`),
       appContext: n.wf({ connectorId: n.bf(`connector_openai_automations`) }),
     }),
-  });
-function NOe(e, t, n, r, i) {
-  let a = (e = !1) => {
-      (i([`vscode`, `list-automations`], e),
-        i([`vscode`, `inbox-items`], e),
-        i([`cloud-automations`]),
-        i([`local-automation-habitat-migration`]));
-    },
-    o = new AOe(
-      e,
-      t,
-      n,
-      () => Tr().localAutomationHabitatMigration,
-      (e, t) => l.net.fetch(e, t),
-      a,
-    ),
-    s = e.registerInternalAuthenticatedPrincipalChangeHandler(({ current: e }) => {
-      (o.handlePrincipalChanged(e), a(!0));
-    }),
-    c = e.registerInternalNotificationHandler((e) => {
-      e.method === `item/completed` &&
-        MOe.safeParse(e.params).success &&
-        o.sync().catch((e) => {
-          rD().warning(`Failed to refresh automations after hosted tool call`, {
-            safe: {},
-            sensitive: { error: e },
-          });
-        });
-    });
-  return (
-    r.add(() => {
-      (s(), c());
-    }),
-    o
-  );
-}
-function POe(e, t) {
-  return e === `local`
-    ? {
-        onDeleteAutomation: (e) => t().deleteArchivedHeartbeat(e),
-        getHostedAutomationInstallationId: () => t().getHostedInstallationId(),
-        isAutomationMigrationInProgress: () => t().isLocalMigrationActive(),
-      }
-    : {};
-}
-async function FOe(e, t, r, i) {
-  if (t.automationKind === `cron` && t.hostId === `local`)
-    try {
-      let { hostId: a, threadId: o } = t,
-        s = n.$u(o),
-        c = () => {
-          for (let e of r()) if (e.ownsThread(a, s)) return !0;
-          return !1;
-        };
-      if (c()) return;
-      let l = await Promise.allSettled(
-        Array.from(i, async (e) => n.m((await e.services).clientCoordination, a, s)),
-      );
-      if (c() || l.some((e) => e.status === `rejected` || e.value)) return;
-      await e.unsubscribeThread(o);
-    } catch (e) {
-      rD().warning(`Failed to unsubscribe completed automation`, {
-        safe: { threadId: t.threadId },
-        sensitive: { error: e },
-      });
-    }
-}
-var VOe = 5e3,
-  HOe = IabTabMentions;
-function KOe(e) {
-  return e?.allowGlobalPersistentApproval !== !1;
-}
-var qOe = r.r(`BrowserUseOriginState`),
-  JOe = { origin: `origin`, download: `download`, upload: `upload`, fullCdp: `fullCdp` },
-  oD = { origin: `origins`, download: `downloads`, upload: `uploads`, fullCdp: `full_cdp` },
-  YOe = n.hf(
-    n.wf({
-      action: n.df([`add`, `remove`]),
-      kind: n.df([`allowed`, `denied`]),
-      origin: n.Of().min(1),
-      resource: n.df(JOe),
-    }),
-  );
-async function sD(e, t) {
-  if (e !== `neverAsk`) return;
-  let { requirements: n } = await t();
-  if (!KOe(n?.browserUse))
-    throw Error(`Global persistent Browser Use approvals are disabled by enterprise policy`);
-}
-async function cD(e = n.Oi()) {
-  return mD(await dD(e));
-}
-function ZOe(e, t = n.Oi(), r, i) {
-  return lD({ approval_mode: vD(e) }, t, r, i);
-}
-function QOe(e, t = n.Oi(), r, i) {
-  return lD({ history_approval_mode: bD(e) }, t, r, i);
-}
-function $Oe(e, t = n.Oi(), r, i) {
-  return lD({ iab_history_approval_mode: bD(e) }, t, r, i);
-}
-function eke(e, t, r = n.Oi(), i, a) {
-  return lD({ [cke(e)]: vD(t) }, r, i, a);
-}
-function tke(e, t = n.Oi(), r) {
-  return lD({ full_cdp_access_enabled: e }, t, r);
-}
-function nke(e, t = n.Oi(), r) {
-  return lD({ webmcp_enabled: e }, t, r);
-}
-async function lD(e, t, n, r) {
-  if (await n?.({ preferences: e }, r)) return cD(t);
-  n == null && r != null && (await r());
-  let i = await dD(t);
-  return (Object.assign(i, e), await fD(t, i), mD(i));
-}
-function rke(e, t) {
-  let { action: n, kind: r, origin: i, resource: a } = t,
-    o = oD[a];
-  if (n === `add`) {
-    let t = oke(e, o),
-      n = xD(t[r]),
-      a = ske(r),
-      s = xD(t[a]);
-    return (
-      (t[r] = n.includes(i) ? n : [...n, i]),
-      (t[a] = s.filter((e) => e !== i)),
-      !n.includes(i) || s.includes(i)
-    );
-  }
-  let s = e[o];
-  if (!SD(s)) return !1;
-  let c = xD(s[r]);
-  return c.includes(i) ? ((s[r] = c.filter((e) => e !== i)), !0) : !1;
-}
-function uD(e, t) {
-  let n = t.map((t) => ({
-      ...t,
-      origin: t.action === `add` ? ike(e, t.resource, t.origin) : t.origin,
-    })),
-    r = (0, yu.default)(n, ({ resource: e, origin: t }) => `${e}:${t}`).map(
-      ({ resource: t, origin: n }) => ({ resource: t, origin: n, decision: hD(e, t, n) }),
-    ),
-    i = !1;
-  for (let t of n) i = rke(e, t) || i;
-  if (!i) return null;
-  let a = [];
-  for (let { resource: t, origin: n, decision: i } of r) {
-    let r = hD(e, t, n);
-    i !== r && a.push({ resource: t === `fullCdp` ? `full_cdp` : t, pattern: n, decision: r });
-  }
-  return a;
-}
-function ike(e, t, n) {
-  let r = e[oD[t]];
-  if (SD(r) && (xD(r.allowed).includes(n) || xD(r.denied).includes(n))) return n;
-  let i = lke(n);
-  if (i == null) throw Error(`Invalid Browser Use origin`);
-  return i;
-}
-async function dD(e) {
-  let t = pD(e);
-  return (0, v.existsSync)(t) ? ake(t) : {};
-}
-async function ake(e) {
-  try {
-    let t = n.wi(await (0, b.readFile)(e, `utf8`));
-    return SD(t) ? t : {};
-  } catch (t) {
-    return (
-      qOe.warning(`browser_use_origin_state_parse_failed`, {
-        safe: {},
-        sensitive: { error: t, filePath: e },
-      }),
-      {}
-    );
-  }
-}
-async function fD(e, t) {
-  let n = pD(e);
-  await (0, b.mkdir)(h.default.dirname(n), { recursive: !0 });
-  let r = Yt(t);
-  await (0, b.writeFile)(
-    n,
-    r.endsWith(`
-`)
-      ? r
-      : `${r}\n`,
-    `utf8`,
-  );
-}
-function pD(e) {
-  return h.default.join(e, Dn);
-}
-function mD(e) {
-  let t = e.origins;
-  return {
-    fullCdpAccessEnabled: e[Jee] === !0,
-    ...(typeof e.webmcp_enabled == `boolean` ? { webMcpEnabled: e[Yee] } : {}),
-    approvalMode: gD(e.approval_mode),
-    chromeHistoryApprovalMode: yD(e.history_approval_mode),
-    iabHistoryApprovalMode: yD(e.iab_history_approval_mode),
-    downloadApprovalMode: gD(e.download_approval_mode),
-    uploadApprovalMode: gD(e.upload_approval_mode),
-    allowedOrigins: _D(t, `allowed`),
-    deniedOrigins: _D(t, `denied`),
-    allowedDownloadOrigins: _D(e.downloads, `allowed`),
-    deniedDownloadOrigins: _D(e.downloads, `denied`),
-    allowedUploadOrigins: _D(e.uploads, `allowed`),
-    deniedUploadOrigins: _D(e.uploads, `denied`),
-    allowedFullCdpOrigins: _D(e.full_cdp, `allowed`),
-    deniedFullCdpOrigins: _D(e.full_cdp, `denied`),
-  };
-}
-function oke(e, t) {
-  if (SD(e[t])) return e[t];
-  let n = {};
-  return ((e[t] = n), n);
-}
-function ske(e) {
-  return e === `allowed` ? `denied` : `allowed`;
-}
-function hD(e, t, n) {
-  let r = e[oD[t]];
-  return _D(r, `denied`).includes(n) ? `deny` : _D(r, `allowed`).includes(n) ? `allow` : null;
-}
-function gD(e) {
-  return e === `never_ask` ? `neverAsk` : `alwaysAsk`;
-}
-function _D(e, t) {
-  return SD(e) ? xD(e[t]) : [];
-}
-function vD(e) {
-  return e === `neverAsk` ? `never_ask` : `always_ask`;
-}
-function yD(e) {
-  switch (e) {
-    case `disabled`:
-      return `disabled`;
-    case `never_ask`:
-      return `neverAsk`;
-    case `always_ask`:
-      return `alwaysAsk`;
-    default:
-      return `alwaysAsk`;
-  }
-}
-function bD(e) {
-  return e === `disabled` ? `disabled` : vD(e);
-}
-function cke(e) {
-  return e === `download` ? `download_approval_mode` : `upload_approval_mode`;
-}
-function lke(e) {
-  let t = e.trim();
-  if (t.length === 0) return null;
-  let n = /^[a-zA-Z][a-zA-Z\d+.-]*:\/\//.test(t) ? t : `https://${t}`;
-  try {
-    let e = new URL(n);
-    return e.protocol !== `http:` && e.protocol !== `https:` ? null : e.origin;
-  } catch {
-    return null;
-  }
-}
-function xD(e) {
-  if (!Array.isArray(e)) return [];
-  let t = new Set(),
-    n = [];
-  for (let r of e) {
-    if (typeof r != `string`) continue;
-    let e = r.trim();
-    e === `` || t.has(e) || (t.add(e), n.push(e));
-  }
-  return n;
-}
-function SD(e) {
-  return typeof e == `object` && !!e && !Array.isArray(e);
-}
-var CD = n.df([`always_ask`, `never_ask`]),
-  wD = n.df([`always_ask`, `never_ask`, `disabled`]),
-  TD = n
-    ._f((e) => typeof e == `object` && !!e && !Array.isArray(e))
-    .transform((e) => Object.entries(e))
-    .pipe(n.hf(n.Af([n.Of(), n.df([`allow`, `deny`])])))
-    .transform((e) => Object.fromEntries(e)),
-  ED = n.wf({
-    revision: n.Cf().int().nonnegative(),
-    preferences: n.wf({
-      approval_mode: CD,
-      history_approval_mode: wD,
-      iab_history_approval_mode: wD,
-      download_approval_mode: CD,
-      upload_approval_mode: CD,
-      disable_auto_review: n.gf(),
-      full_cdp_access_enabled: n.gf(),
-      webmcp_enabled: n.gf(),
-    }),
-    rules: n.wf({ origin: TD, download: TD, upload: TD, full_cdp: TD }),
   }),
-  DD = `/wham/browser/settings`,
-  OD = 15e3,
-  dke = [
-    [`origin`, `origins`],
-    [`download`, `downloads`],
-    [`upload`, `uploads`],
-    [`full_cdp`, `full_cdp`],
-  ],
-  fke = n
-    .wf({ allowed: n.hf(n.Of()).default([]), denied: n.hf(n.Of()).default([]) })
-    .default({ allowed: [], denied: [] });
-function kD(e) {
-  return {
-    preferences: ED.shape.preferences.parse({
-      approval_mode: `always_ask`,
-      history_approval_mode: `always_ask`,
-      iab_history_approval_mode: `always_ask`,
-      download_approval_mode: `always_ask`,
-      upload_approval_mode: `always_ask`,
-      disable_auto_review: !1,
-      full_cdp_access_enabled: !1,
-      webmcp_enabled: !0,
-      ...e,
-    }),
-    rules: {
-      origin: AD(e.origins),
-      download: AD(e.downloads),
-      upload: AD(e.uploads),
-      full_cdp: AD(e.full_cdp),
-    },
-  };
-}
-function AD(e) {
-  let t = fke.parse(e),
-    n = new Map();
-  for (let e of t.allowed) n.set(e, `allow`);
-  for (let e of t.denied) n.set(e, `deny`);
-  return Object.fromEntries(n);
-}
-function mke(e) {
-  return typeof e == `object` && !!e && !Array.isArray(e) && !(e instanceof Date);
-}
-var _ke = BrowserSettingsSync;
+  threadIdOf: n.$u,
+  requestThreadOwner: n.m,
+  logger: r.i(`habitat-automations`)(),
+});
 var Tke = e.t((e, t) => {
     var r = n.Vd();
     function i(e, t) {
@@ -44084,7 +43766,7 @@ var GH = !!process.env.WSL_DISTRO_NAME,
     NBe,
     Pj,
     Pr,
-    QOe,
+    setChromeHistoryApprovalMode,
     QRe,
     Qie,
     SO,
@@ -44097,18 +43779,18 @@ var GH = !!process.env.WSL_DISTRO_NAME,
     XH,
     YH,
     Ys,
-    ZOe,
+    setBrowserUseApprovalMode,
     _Ie,
     a,
     avatarOverlayAcceleratorFromKeymap,
     b,
     bt,
     bundledSkillsRoot,
-    cD,
+    readBrowserUseOriginState,
     cT: readAccountInfoFromToken,
     computeScreenshotTarget: (...args) => computeScreenshotTarget(...args),
     ds,
-    eke,
+    setBrowserUseTransferApprovalMode,
     fze,
     h,
     iH,
@@ -44133,13 +43815,13 @@ var GH = !!process.env.WSL_DISTRO_NAME,
     qH,
     qs,
     rH,
-    sD,
+    assertIabModeAllowedByPolicy,
     sftpDownload,
     sftpUpload,
     startMacCapture,
     startWindowsCapture,
     tje,
-    tke,
+    setBrowserUseFullCdpAccessEnabled,
     tl,
     uH,
     validateGlobalHotkeySetting,
@@ -72116,7 +71798,7 @@ var G5 = r.r(`WindowContext`),
     F5e,
     F8e,
     createHostedAppServerManager,
-    FOe,
+    unsubscribeCompletedAutomationIfUnowned,
     Fnt,
     G,
     G5,
@@ -72126,7 +71808,7 @@ var G5 = r.r(`WindowContext`),
     Gnt,
     H,
     H5,
-    HOe,
+    IabTabMentions,
     Hee,
     Het,
     I,
@@ -72161,7 +71843,7 @@ var G5 = r.r(`WindowContext`),
     N,
     N0,
     N2e,
-    NOe,
+    createHabitatAutomationsService,
     NativeArtifactFileService,
     Nnt,
     O,
@@ -72170,7 +71852,7 @@ var G5 = r.r(`WindowContext`),
     P,
     P1e,
     PBe,
-    POe,
+    habitatAutomationHostCallbacks,
     Q,
     Q0e,
     Qj,
@@ -72223,7 +71905,7 @@ var G5 = r.r(`WindowContext`),
     Znt,
     _,
     _$e,
-    _ke,
+    BrowserSettingsSync,
     a,
     a$e,
     a5,

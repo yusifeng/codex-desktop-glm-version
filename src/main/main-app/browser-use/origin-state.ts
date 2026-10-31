@@ -260,6 +260,10 @@ async function setApprovalMode(mode: string, home = codexHome(), syncSettings?: 
   return writePreference({ approval_mode: approvalModeToToml(mode) }, home, syncSettings, extra);
 }
 
+async function setChromeHistoryApprovalMode(mode: string, home = codexHome(), syncSettings?: SyncSettingsCallback, extra?: unknown) {
+  return writePreference({ history_approval_mode: historyApprovalModeToToml(mode) }, home, syncSettings, extra);
+}
+
 async function setIabHistoryApprovalMode(mode: string, home = codexHome(), syncSettings?: SyncSettingsCallback, extra?: unknown) {
   return writePreference({ iab_history_approval_mode: historyApprovalModeToToml(mode) }, home, syncSettings, extra);
 }
@@ -867,9 +871,11 @@ export {
   normalizeOrigin,
   readProjectedState,
   setApprovalMode,
+  setChromeHistoryApprovalMode,
   setIabHistoryApprovalMode,
   setTransferApprovalMode,
   setFullCdpAccessEnabled,
   setWebMcpEnabled,
+  assertIabModeAllowedByPolicy,
   type RemoteBrowserSettingsDocument,
 };

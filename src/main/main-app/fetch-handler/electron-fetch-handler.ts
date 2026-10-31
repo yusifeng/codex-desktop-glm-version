@@ -21,7 +21,7 @@ export function createElectronFetchHandlerClass(dependencies) {
     NBe,
     Pj,
     Pr,
-    QOe,
+    setChromeHistoryApprovalMode,
     QRe,
     Qie,
     SO,
@@ -34,18 +34,18 @@ export function createElectronFetchHandlerClass(dependencies) {
     XH,
     YH,
     Ys,
-    ZOe,
+    setBrowserUseApprovalMode,
     _Ie,
     a,
     avatarOverlayAcceleratorFromKeymap,
     b,
     bt,
     bundledSkillsRoot,
-    cD,
+    readBrowserUseOriginState,
     cT,
     computeScreenshotTarget,
     ds,
-    eke,
+    setBrowserUseTransferApprovalMode,
     fze,
     h,
     iH,
@@ -70,13 +70,13 @@ export function createElectronFetchHandlerClass(dependencies) {
     qH,
     qs,
     rH,
-    sD,
+    assertIabModeAllowedByPolicy,
     sftpDownload,
     sftpUpload,
     startMacCapture,
     startWindowsCapture,
     tje,
-    tke,
+    setBrowserUseFullCdpAccessEnabled,
     tl,
     uH,
     validateGlobalHotkeySetting,
@@ -482,21 +482,21 @@ export function createElectronFetchHandlerClass(dependencies) {
         "browser-browsing-data-clear": async ({ dataTypes: e }) => {
           await this.clearBrowserBrowsingData(e);
         },
-        "browser-use-origin-state-read": async () => cD(),
+        "browser-use-origin-state-read": async () => readBrowserUseOriginState(),
         "browser-use-approval-mode-write": async ({ approvalMode: e }) =>
-          ZOe(e, n.Oi(), this.syncBrowserSettings, () =>
+          setBrowserUseApprovalMode(e, n.Oi(), this.syncBrowserSettings, () =>
             this.assertBrowserUseGlobalPersistentApprovalAllowed(e),
           ),
         "browser-use-history-approval-mode-write": async ({ approvalMode: e }) =>
-          QOe(e, n.Oi(), this.syncBrowserSettings, () =>
+          setChromeHistoryApprovalMode(e, n.Oi(), this.syncBrowserSettings, () =>
             this.assertBrowserUseGlobalPersistentApprovalAllowed(e),
           ),
         "browser-use-file-transfer-approval-mode-write": async ({ approvalMode: e, kind: t }) =>
-          eke(t, e, n.Oi(), this.syncBrowserSettings, () =>
+          setBrowserUseTransferApprovalMode(t, e, n.Oi(), this.syncBrowserSettings, () =>
             this.assertBrowserUseGlobalPersistentApprovalAllowed(e),
           ),
         "browser-use-full-cdp-access-enabled-write": async ({ enabled: e }) =>
-          tke(e, n.Oi(), this.syncBrowserSettings),
+          setBrowserUseFullCdpAccessEnabled(e, n.Oi(), this.syncBrowserSettings),
         "node-repl-active-execs-kill": async ({ sessionId: e, turnId: t }) =>
           n.k({ codexHome: n.Oi({ preferWsl: this.shouldUseWslPaths() }), sessionId: e, turnId: t }),
         "is-packaged": async () => ({ isPackaged: l.app.isPackaged }),
@@ -1312,7 +1312,7 @@ export function createElectronFetchHandlerClass(dependencies) {
           t === `medium` ? { iconSmall: null, iconMedium: await Ys(e) } : { iconSmall: await Js(e) },
       };
       async assertBrowserUseGlobalPersistentApprovalAllowed(e) {
-        await sD(e, () => this.appServerConnectionRegistry.getConnection(J).getConfigRequirements());
+        await assertIabModeAllowedByPolicy(e, () => this.appServerConnectionRegistry.getConnection(J).getConfigRequirements());
       }
       async pickFilesFromDialog({
         acceptedFileExtensions: e,

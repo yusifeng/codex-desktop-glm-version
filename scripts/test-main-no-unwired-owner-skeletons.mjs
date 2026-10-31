@@ -51,6 +51,8 @@ const realOwners = [
   ["src/main/main-app/app-server/host-assembly.ts", "createHostedAppServerManagerFactory"],
   ["src/main/main-app/remote-control/client.ts", "authorizeRemoteControlEnvironments"],
   ["src/main/main-app/app-server/transports.ts", "AppServerTransportWslStdio"],
+  ["src/main/main-app/browser-use/origin-state.ts", "BrowserSettingsSync"],
+  ["src/main/main-app/automations/habitat-runtime.ts", "createHabitatAutomationRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");

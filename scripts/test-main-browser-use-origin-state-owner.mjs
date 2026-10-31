@@ -40,10 +40,36 @@ const rules = [{ action: "add", kind: "allowed", origin: "example.com", resource
 equal(await service.updateOriginRules(rules), { projected: config });
 equal(calls.some((entry) => entry[0] === "write"), true);
 
+const chromeHistoryNode = ast.body.find(
+  (node) => node.type === "FunctionDeclaration" && node.id?.name === "setChromeHistoryApprovalMode",
+);
+assert.ok(chromeHistoryNode); assertions += 1;
+const preferenceWrites = [];
+const setChromeHistoryApprovalMode = Function(
+  "writePreference",
+  "historyApprovalModeToToml",
+  "codexHome",
+  `${transpiled.code.slice(chromeHistoryNode.start, chromeHistoryNode.end)}; return setChromeHistoryApprovalMode;`,
+)(
+  async (...args) => { preferenceWrites.push(args); return "written"; },
+  (mode) => mode === "neverAsk" ? "never_ask" : "always_ask",
+  () => "/default-home",
+);
+equal(await setChromeHistoryApprovalMode("neverAsk", "/home", sync, "extra"), "written");
+equal(preferenceWrites, [[{ history_approval_mode: "never_ask" }, "/home", sync, "extra"]]);
+
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
 equal(main.includes("BrowserUseOriginState: XOe"), true);
 equal(main.includes("XOe = class"), false);
+equal(main.includes("function ZOe("), false);
+equal(main.includes("function QOe("), false);
+equal(main.includes("function rke("), false);
+equal(main.includes("var CD ="), false);
 equal(main.includes("browserUsePermissions: new XOe("), false);
 const windowContext = fs.readFileSync(new URL("../src/main/main-app/window/window-context.ts", import.meta.url), "utf8");
 equal(windowContext.includes("browserUsePermissions: new XOe("), true);
+const fetchHandler = fs.readFileSync(new URL("../src/main/main-app/fetch-handler/electron-fetch-handler.ts", import.meta.url), "utf8");
+equal(fetchHandler.includes("setChromeHistoryApprovalMode(e, n.Oi()"), true);
+equal(fetchHandler.includes("readBrowserUseOriginState()"), true);
+equal(fetchHandler.includes("assertIabModeAllowedByPolicy(e,"), true);
 console.log(`${assertions} main BrowserUseOriginState owner assertions passed`);

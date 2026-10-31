@@ -2906,3 +2906,13 @@ SSH websocket/install、WSL stdio、WSL command 和 transport resolution 给所�
 startup hydration、remote host config 和 transport factory 均已真实接回。原始 chunk 中从 `BEe` 到 `fDe` 以及从 `_E`
 到 `QDe` 的约 1450 行重复实现已物理删除。focused coverage 新增 25 项 REST pagination/projection/error/auth/wiring，
 并强化 SSH/WSL wiring 19 项；remote connections 43、terminal 38、transport factory 45、device-key 26 项邻接回归覆盖。
+
+### 增量接线：Browser Use origin state 与 habitat automation runtime
+
+`browser-use/origin-state.ts` 现向 Electron fetch handler 提供可读的 read/update/policy API，并补齐 chrome-history
+approval 写入；WindowContext 直接使用 `BrowserSettingsSync` 与 `IabTabMentions`，不再通过 `_ke/HOe` 别名。
+原始 chunk 中 `KOe.._ke` 的 config TOML、rule matrix、projection、remote schema 重复实现已删除，唯一状态仍在语义模块。
+新增 `automations/habitat-runtime.ts` 接管 Habitat service 创建、四组 query invalidation、principal/item-completed subscriptions、
+local host callbacks，以及 cron 完成后 local/remote ownership 保守检查与 unsubscribe；WindowContext 的三个 consumer 全部接回，
+旧 `NOe/POe/FOe` 已物理删除。focused coverage 为 browser sync 19、origin state 22、habitat runtime 31 项，
+Electron fetch handler 19、WindowContext 16 和 no-unwired 邻接回归通过。
