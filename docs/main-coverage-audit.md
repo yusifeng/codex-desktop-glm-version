@@ -2952,3 +2952,12 @@ acquisition/dup/disposal、record/annotation forwarding、toolbar action present
 comment popup owner resolver 和 DetachedBrowserTabs consumer 均直接使用语义 outputs；唯一 detached context 与 attachment state
 仍由既有 manager/BrowserHost owner 持有。原始 chunk 中 `Qke/$ke/eAe/tAe/rAe/YD/XD` 已物理删除。focused test 50 项覆盖
 resource disposal、active/identity/site gates、timeout、presentation、suspend/resume 顺序、lookup 与真实接线。
+
+### 增量抽取：extension recent-use 与 ChatGPT project file mirror owners
+
+`browser-sidebar/extension-recent-use.ts` 已接管按 global-state/session WeakMap 隔离的最近扩展列表、pin reconciliation、
+持久化、record-use 排序与 change notification；BrowserHost 继续通过 WindowContext 获取唯一 registry。
+`projects/chatgpt-project-files.ts` 已接管 project ID/filename validation、Windows reserved/AGENTS collision、per-root serialization、
+remote callback lease、stream download/SHA-256、cache verify、失败文件降级、只读权限、staging/previous 原子交换、回滚、旧自定义文件
+保留、metadata 和 AGENTS mirror 说明。原始 chunk 中 `ZD/oAe/sAe/QD/fAe/pAe/mAe/hAe/gAe/_Ae/vAe/yAe/bAe/xAe/SAe/CAe/wAe/TAe`
+整段已删除。focused test 53 项覆盖 registry 状态与真实临时文件系统同步、缓存损坏重下、串行化和 wiring。

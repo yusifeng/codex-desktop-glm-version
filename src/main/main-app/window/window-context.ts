@@ -176,7 +176,7 @@ export function createWindowContextClass(dependencies) {
     ett,
     f,
     f8e,
-    fAe,
+    ChatGptProjectFilesService,
     applyRemoteDeclarations,
     fnt,
     g,
@@ -210,7 +210,7 @@ export function createWindowContextClass(dependencies) {
     o,
     o5,
     o8e,
-    oAe,
+    extensionRecentUseRegistryFor,
     oEe,
     or,
     p,
@@ -1276,7 +1276,7 @@ export function createWindowContextClass(dependencies) {
               this.messageHandler,
               s,
               e,
-              oAe(this.options.globalState),
+              extensionRecentUseRegistryFor(this.options.globalState),
               void 0,
               (e, t, n) => findDetachedBrowserPageWebContents(c, e, t, n),
               new DetachedBrowserTabsService(c, e, (e, t, n) => s.getCurrentPageUrl(e, t, n)),
@@ -1368,7 +1368,7 @@ export function createWindowContextClass(dependencies) {
               process.env.NODE_ENV === `development` ? this.options.repoRoot : void 0,
             ),
             chromiumBrowser: new MO(),
-            chatGptProjectFiles: new fAe(n.Oi(), (e) => this.fetchWrapper.getDownloadStream(e)),
+            chatGptProjectFiles: new ChatGptProjectFilesService(n.Oi(), (e) => this.fetchWrapper.getDownloadStream(e)),
             chatGptBrowserSession:
               r == null
                 ? void 0

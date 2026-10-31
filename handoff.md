@@ -4920,3 +4920,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   handshake；WindowContext 的三处 consumer 全部直接使用语义 outputs。
 - main 旧 `Qke/$ke/eAe/tAe/rAe/YD/XD` 已删除；focused coverage 50 项，no-unwired gate 扩至 355 项。下一批越过已迁
   detached bridge，继续审计相邻 extension recent-use owner 或 project-file sync owner，优先选择完整状态边界。
+
+# 2026-11-01 extension recent-use and ChatGPT project file mirror
+
+- `browser-sidebar/extension-recent-use.ts` 已接管 global-state scoped registry、session profile、pin reconciliation、持久化和
+  listener lifecycle；`projects/chatgpt-project-files.ts` 已接管 project mirror 的安全命名、stream/hash、cache、failure projection、
+  per-root queue、目录交换/回滚、metadata/AGENTS 和旧自定义文件保留。两个 owner 状态互不混合，WindowContext 直接消费。
+- main 对应旧 owner/helper belt 约 330 行已删除；focused coverage 53 项，no-unwired gate 扩至 359 项。下一批从 native-host
+  install owner 后方的大型连接/环境 schema belt中继续区分 vendor schema 与可迁第一方 service，不为数量强拆 schema composition。

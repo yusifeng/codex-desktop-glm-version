@@ -349,6 +349,8 @@ const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.
 const { createBrowserHostServiceClass } = require("./main-app/browser-sidebar/browser-host-service.js");
 const { createBrowserHistoryServiceClass } = require("./main-app/browser-sidebar/browser-history-service.js");
 const { createDetachedBrowserRuntime } = require("./main-app/browser-sidebar/detached-browser-runtime.js");
+const { createExtensionRecentUseRegistryFactory } = require("./main-app/browser-sidebar/extension-recent-use.js");
+const { createChatGptProjectFilesServiceClass } = require("./main-app/projects/chatgpt-project-files.js");
 const {
   BrowserSettingsSync,
   BrowserUseOriginState: XOe,
@@ -23648,335 +23650,11 @@ var DownloadsService = createDownloadsServiceClass({
   fromWebContents: (webContents) => l.BrowserWindow.fromWebContents(webContents),
   showOpenDialog: (...args) => l.dialog.showOpenDialog(...args),
 });
-var ZD = new WeakMap();
-function oAe(e) {
-  let t = ZD.get(e);
-  return (t ?? ((t = new sAe(e)), ZD.set(e, t)), t);
-}
-var sAe = class {
-    globalState;
-    profiles = new WeakMap();
-    constructor(e) {
-      this.globalState = e;
-    }
-    getRecentlyUsed(e, t) {
-      let n = this.getProfile(e);
-      return (t.ready && this.updatePins(e, n, t, !1), n.recentlyUsedExtensionIds);
-    }
-    recordUse(e, t) {
-      let n = e.extensions.getExtensionToolbarState();
-      if (!n.ready || !n.pinnedExtensionIds.includes(t)) return;
-      let r = this.getProfile(e);
-      (this.updatePins(e, r, n, !1),
-        this.setRecentlyUsed(e, r, [t, ...r.recentlyUsedExtensionIds.filter((e) => e !== t)], !0));
-    }
-    refreshPins(e) {
-      let t = e.extensions.getExtensionToolbarState();
-      t.ready && this.updatePins(e, this.getProfile(e), t, !0);
-    }
-    subscribe(e, t) {
-      let n = this.getProfile(e);
-      return (n.listeners.add(t), () => n.listeners.delete(t));
-    }
-    getProfile(e) {
-      let t = this.profiles.get(e);
-      if (t == null) {
-        let n = e.storagePath;
-        ((t = {
-          listeners: new Set(),
-          recentlyUsedExtensionIds:
-            n == null
-              ? []
-              : (this.globalState.get(`electron-browser-extension-recently-used`)?.[n] ?? []),
-        }),
-          this.profiles.set(e, t));
-      }
-      return t;
-    }
-    updatePins(e, t, n, r) {
-      let i = new Set([...n.pinnedExtensionIds, ...n.storedPinnedExtensionIds]),
-        a = new Set(t.recentlyUsedExtensionIds),
-        o = n.pinnedExtensionIds.filter((e) => !a.has(e)).reverse();
-      this.setRecentlyUsed(
-        e,
-        t,
-        Array.from(new Set([...o, ...t.recentlyUsedExtensionIds.filter((e) => i.has(e))])),
-        r,
-      );
-    }
-    setRecentlyUsed(e, t, n, r) {
-      if (
-        n.length === t.recentlyUsedExtensionIds.length &&
-        n.every((e, n) => e === t.recentlyUsedExtensionIds[n])
-      )
-        return;
-      t.recentlyUsedExtensionIds = n;
-      let i = e.storagePath;
-      if ((i != null && this.globalState.update(a.L, (e) => ({ ...e, [i]: n })), r))
-        for (let e of t.listeners) e();
-    }
-  },
-  QD = class extends Error {
-    stage;
-    fileOrdinal;
-    status;
-    constructor(e, t, n, r) {
-      (super(`ChatGPT project file sync failed at ${e}`, { cause: r }),
-        (this.stage = e),
-        (this.fileOrdinal = t),
-        (this.status = n));
-    }
-  },
-  cAe = `.chatgpt-projects`,
-  $D = `.metadata`,
-  eO = `sources`,
-  tO = 1,
-  lAe = `<>:"/\\|?*`,
-  nO = new Map(),
-  uAe = n.wf({
-    files: n.hf(n.wf({ fileId: n.Of(), name: n.Of(), sha256: n.Of().regex(/^[a-f0-9]{64}$/) })),
-    version: n.bf(tO),
-  }),
-  dAe = n.wf({ status: n.Cf().int().min(100).max(599) }).loose(),
-  fAe = class extends n.Uf {
-    codexHome;
-    downloadFile;
-    constructor(e, t) {
-      (super(), (this.codexHome = e), (this.downloadFile = t));
-    }
-    async sync(e) {
-      try {
-        var t = a.en();
-        let n = t.u(e.getFileDownloadRequest),
-          { files: r, instructions: i, projectId: o, projectName: s } = e;
-        yAe(o);
-        let c = h.default.join(this.codexHome, cAe, o),
-          l = nO.get(c),
-          u = (async () => (
-            await l?.catch(() => void 0),
-            pAe({
-              downloadFile: this.downloadFile,
-              files: r,
-              getFileDownloadRequest: n,
-              instructions: i,
-              projectName: s,
-              rootPath: c,
-            })
-          ))();
-        nO.set(c, u);
-        try {
-          return await u;
-        } finally {
-          nO.get(c) === u && nO.delete(c);
-        }
-      } catch (e) {
-        t.e = e;
-      } finally {
-        t.d();
-      }
-    }
-  };
-async function pAe({
-  downloadFile: e,
-  files: t,
-  getFileDownloadRequest: n,
-  instructions: r,
-  projectName: i,
-  rootPath: a,
-}) {
-  let o = h.default.dirname(a),
-    s = h.default.basename(a),
-    c = h.default.join(o, `.${s}-staging-${(0, _.randomUUID)()}`),
-    l = h.default.join(o, `.${s}-previous-${(0, _.randomUUID)()}`),
-    u = h.default.join(c, eO),
-    d = h.default.join(o, $D, `${s}.json`),
-    f = await _Ae(d);
-  await (0, b.mkdir)(u, { recursive: !0 });
-  try {
-    let o = [],
-      s = [];
-    for (let [r, i] of bAe(t).entries()) {
-      let t = f?.files.find((e) => e.fileId === i.fileId && SAe(e.name)),
-        c = h.default.join(u, i.name);
-      if (t != null && (await hAe(h.default.join(a, eO, t.name), c, t.sha256))) {
-        s.push({ ...i, sha256: t.sha256 });
-        continue;
-      }
-      try {
-        let t = await mAe(c, i.fileId, r + 1, n, e);
-        s.push({ ...i, sha256: t });
-      } catch (e) {
-        if (!(e instanceof QD) || e.stage === `filesystem`) throw e;
-        (await (0, b.rm)(c, { force: !0 }),
-          o.push({ fileOrdinal: e.fileOrdinal ?? r + 1, stage: e.stage, status: e.status }));
-      }
-    }
-    await (0, b.writeFile)(h.default.join(c, `AGENTS.md`), wAe(i, r, o.length), {
-      encoding: `utf8`,
-      mode: 292,
-    });
-    let p = !1;
-    try {
-      (await (0, b.rename)(a, l), (p = !0));
-    } catch (e) {
-      if (!TAe(e, `ENOENT`)) throw e;
-    }
-    try {
-      await (0, b.rename)(c, a);
-    } catch (e) {
-      throw (p && (await (0, b.rename)(l, a).catch(() => void 0)), e);
-    }
-    return (
-      p &&
-        (await Promise.all(
-          (await (0, b.readdir)(l))
-            .filter((e) => e !== `AGENTS.md` && e !== eO)
-            .map((e) => (0, b.rename)(h.default.join(l, e), h.default.join(a, e))),
-        ),
-        await (0, b.rm)(l, { recursive: !0, force: !0 }).catch(() => void 0)),
-      await vAe(d, { files: s, version: tO }).catch(() => void 0),
-      { failedFiles: o, rootPath: a }
-    );
-  } catch (e) {
-    throw (
-      await (0, b.rm)(c, { recursive: !0, force: !0 }).catch(() => void 0),
-      e instanceof QD ? e : new QD(`filesystem`, void 0, rO(e), e)
-    );
-  }
-}
-async function mAe(e, t, n, r, i) {
-  let a = (0, _.createHash)(`sha256`),
-    o = `filesystem`;
-  try {
-    let n = await (0, b.open)(e, `w`, 292);
-    try {
-      o = `download-link`;
-      let e = await r(t);
-      o = `download`;
-      let s = (await i(e)).getReader();
-      try {
-        for (;;) {
-          let { done: e, value: t } = await s.read();
-          if (e) break;
-          (a.update(t), (o = `filesystem`), await n.writeFile(t), (o = `download`));
-        }
-      } finally {
-        s.releaseLock();
-      }
-      o = `filesystem`;
-    } finally {
-      await n.close();
-    }
-  } catch (e) {
-    throw new QD(o, n, rO(e), e);
-  }
-  return a.digest(`hex`);
-}
-function rO(e) {
-  let t = dAe.safeParse(e);
-  return t.success ? t.data.status : void 0;
-}
-async function hAe(e, t, n) {
-  try {
-    return (
-      await (0, b.copyFile)(e, t),
-      (await gAe(t)) === n
-        ? (await (0, b.chmod)(t, 292), !0)
-        : (await (0, b.rm)(t, { force: !0 }), !1)
-    );
-  } catch {
-    return (await (0, b.rm)(t, { force: !0 }).catch(() => void 0), !1);
-  }
-}
-async function gAe(e) {
-  let t = (0, _.createHash)(`sha256`);
-  return (
-    await new Promise((n, r) => {
-      let i = (0, v.createReadStream)(e);
-      (i.on(`data`, (e) => {
-        t.update(e);
-      }),
-        i.on(`end`, n),
-        i.on(`error`, r));
-    }),
-    t.digest(`hex`)
-  );
-}
-async function _Ae(e) {
-  try {
-    let t = uAe.safeParse(JSON.parse(await (0, b.readFile)(e, `utf8`)));
-    return t.success ? t.data : null;
-  } catch {
-    return null;
-  }
-}
-async function vAe(e, t) {
-  (await (0, b.mkdir)(h.default.dirname(e), { recursive: !0, mode: 448 }),
-    await (0, b.writeFile)(e, `${JSON.stringify(t)}\n`, { encoding: `utf8`, mode: 384 }));
-}
-function yAe(e) {
-  if (
-    e.length === 0 ||
-    e === `.` ||
-    e === `..` ||
-    e.toLowerCase() === $D ||
-    !/^[A-Za-z0-9._-]+$/.test(e)
-  )
-    throw Error(`Invalid ChatGPT project ID`);
-}
-function bAe(e) {
-  let t = new Set();
-  return e.map((e) => {
-    let n = xAe(e.name),
-      r = h.default.parse(n === `` || n === `.` || n === `..` ? `file` : n),
-      i = CAe(n) ? `${r.name} (project file)` : r.name || `file`;
-    /^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(i.split(`.`)[0] ?? ``) && (i = `_${i}`);
-    let a = r.ext,
-      o = `${i}${a}`;
-    for (let e = 2; t.has(o.toLowerCase()); e += 1) o = `${i} (${e})${a}`;
-    return (t.add(o.toLowerCase()), { ...e, name: o });
-  });
-}
-function xAe(e) {
-  return Array.from(h.default.basename(e.trim()), (e) =>
-    e.charCodeAt(0) < 32 || lAe.includes(e) ? `_` : e,
-  )
-    .join(``)
-    .replace(/[ .]+$/g, ``);
-}
-function SAe(e) {
-  return (
-    e !== `` &&
-    e !== `.` &&
-    e !== `..` &&
-    !e.includes(`/`) &&
-    !e.includes(`\\`) &&
-    h.default.basename(e) === e
-  );
-}
-function CAe(e) {
-  let t = e.toLowerCase();
-  return t === `agents.md` || t === `agents.override.md`;
-}
-function wAe(e, t, n) {
-  let r = t.trim();
-  return `# ChatGPT project context
-
-This directory is a local mirror of the ChatGPT project “${e}”.
-
-- Treat every file under \`${eO}/\` as read-only reference material.
-- Do not edit, rename, move, or delete synced project files.
-- These files may be replaced the next time a task is created from this ChatGPT project.
-${n === 0 ? `` : `- ${n} project source${n === 1 ? `` : `s`} could not be synced. Do not assume the local mirror is complete.\n`}
-
-## Project instructions
-
-${r || `This project has no custom instructions.`}
-`;
-}
-function TAe(e, t) {
-  return e instanceof Error && `code` in e && e.code === t;
-}
+var extensionRecentUseRegistryFor = createExtensionRecentUseRegistryFactory();
+var ChatGptProjectFilesService = createChatGptProjectFilesServiceClass({
+  RpcHandlerBase: n.Uf,
+  usingScopeHelper: a.en,
+});
 var EAe = n.wf({
     hostId: n.Of().trim().min(1),
     marketplacePath: n.Of().nullable(),
@@ -71215,7 +70893,7 @@ var G5 = r.r(`WindowContext`),
     ett,
     f,
     f8e,
-    fAe,
+    ChatGptProjectFilesService,
     applyRemoteDeclarations,
     fnt,
     g,
@@ -71249,7 +70927,7 @@ var G5 = r.r(`WindowContext`),
     o,
     o5,
     o8e,
-    oAe,
+    extensionRecentUseRegistryFor,
     oEe,
     or,
     p,

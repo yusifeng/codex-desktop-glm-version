@@ -57,6 +57,8 @@ const realOwners = [
   ["src/main/main-app/window/browser-window-rpc-services.ts", "createBrowserProfileImportServiceClass"],
   ["src/main/main-app/browser-sidebar/browser-history-service.ts", "createBrowserHistoryServiceClass"],
   ["src/main/main-app/browser-sidebar/detached-browser-runtime.ts", "createDetachedBrowserRuntime"],
+  ["src/main/main-app/browser-sidebar/extension-recent-use.ts", "createExtensionRecentUseRegistryFactory"],
+  ["src/main/main-app/projects/chatgpt-project-files.ts", "createChatGptProjectFilesServiceClass"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -347,4 +349,4 @@ assert.equal(main.includes("function _Oe("), false, "generated remote project co
 assert.equal(main.includes("function vOe("), false, "generated project order comparator must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("355 main unwired-owner skeleton assertions passed");
+console.log("359 main unwired-owner skeleton assertions passed");
