@@ -2689,3 +2689,14 @@ Windows PATH/install fallback、VS Code/Insiders Electron app resolution 与各�
 `M4e/X4e/n0/Z4e/G3e/q3e` helpers 和六组内联 declarations 已物理删除，没有复制 target state。
 focused test `scripts/test-main-vscode-family-targets-owner.mjs` 覆盖 45 项 descriptor surface、remote args、
 macOS runtime、Windows resolution、Linux fallback 与 Cursor environment 行为。
+
+### 增量抽取：standalone editor open-target owner
+
+BBEdit、Emacs、Sublime Text、TextMate、Visual Studio、Xcode 与 Zed 七个 descriptors，以及共享的
+file/location args、SSH URI、Sublime/Visual Studio platform detection、TextMate URL、Xcode developer runtime/
+container 上溯/launch fallback、Zed bundle activation/CLI location dispatch 已整体迁移至
+`src/main/main-app/open-target/standalone-editor-targets.ts`。main 通过
+`createStandaloneEditorTargetRuntime` 将七个 descriptors 直接交给既有 registry；旧
+`r0/l0/j3e/u0/N3e/P3e/z3e/U3e/h0/e6e/t6e/r6e/i6e/a6e/o6e` helpers、Xcode logger 和内联
+declarations 已物理删除。focused test `scripts/test-main-standalone-editor-targets-owner.mjs` 覆盖 58 项
+descriptor、macOS/Windows/Linux detection、remote args、container precedence 与 launch 副作用顺序。

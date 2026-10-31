@@ -25,6 +25,7 @@ const realOwners = [
   ["src/main/main-app/open-target/jetbrains-targets.ts", "createJetBrainsTargetRuntime"],
   ["src/main/main-app/open-target/terminal-targets.ts", "createTerminalTargetRuntime"],
   ["src/main/main-app/open-target/vscode-family-targets.ts", "createVscodeFamilyTargetRuntime"],
+  ["src/main/main-app/open-target/standalone-editor-targets.ts", "createStandaloneEditorTargetRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -131,6 +132,22 @@ assert.equal(main.includes("function n0("), false, "generated Cursor macOS runti
 assert.equal(main.includes("function Z4e("), false, "generated Cursor Windows detector must be removed");
 assert.equal(main.includes("function G3e("), false, "generated VS Code Windows detector must be removed");
 assert.equal(main.includes("function q3e("), false, "generated VS Code Insiders Windows detector must be removed");
+assert.equal(main.includes("createStandaloneEditorTargetRuntime({"), true, "real standalone editor target owner is wired");
+assert.equal(main.includes("var r0 ="), false, "generated Emacs argument builder must be removed");
+assert.equal(main.includes("function l0("), false, "generated standalone editor argument builder must be removed");
+assert.equal(main.includes("function j3e("), false, "generated SSH editor URI builder must be removed");
+assert.equal(main.includes("function u0("), false, "generated editor location formatter must be removed");
+assert.equal(main.includes("function N3e("), false, "generated Sublime macOS detector must be removed");
+assert.equal(main.includes("function P3e("), false, "generated Sublime Windows detector must be removed");
+assert.equal(main.includes("function z3e("), false, "generated TextMate argument builder must be removed");
+assert.equal(main.includes("function U3e("), false, "generated Visual Studio detector must be removed");
+assert.equal(main.includes("function h0("), false, "generated Xcode runtime detector must be removed");
+assert.equal(main.includes("function e6e("), false, "generated Xcode container search must be removed");
+assert.equal(main.includes("async function t6e("), false, "generated Xcode launcher must be removed");
+assert.equal(main.includes("function r6e("), false, "generated Zed macOS detector must be removed");
+assert.equal(main.includes("function i6e("), false, "generated Zed Windows detector must be removed");
+assert.equal(main.includes("function a6e("), false, "generated Zed app-path parser must be removed");
+assert.equal(main.includes("async function o6e("), false, "generated Zed launcher must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("129 main unwired-owner skeleton assertions passed");
+console.log("147 main unwired-owner skeleton assertions passed");

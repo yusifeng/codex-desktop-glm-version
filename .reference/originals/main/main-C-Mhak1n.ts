@@ -224,6 +224,7 @@ const { createOpenTargetRegistryRuntime } = require("./main-app/open-target/open
 const { createJetBrainsTargetRuntime } = require("./main-app/open-target/jetbrains-targets.js");
 const { createTerminalTargetRuntime } = require("./main-app/open-target/terminal-targets.js");
 const { createVscodeFamilyTargetRuntime } = require("./main-app/open-target/vscode-family-targets.js");
+const { createStandaloneEditorTargetRuntime } = require("./main-app/open-target/standalone-editor-targets.js");
 const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 const { createElectronPerformanceSnapshotCollectorClass } = require("./main-app/startup/electron-performance-snapshot-collector.js");
 const { MainThreadJankSampler } = require("./main-app/startup/main-thread-jank-sampler.js");
@@ -71110,18 +71111,38 @@ var {
   findWindowsInstall: ta,
   resolveWindowsElectronApp: oa,
 });
-var N4e = {
-  id: `bbedit`,
-  platforms: {
-    darwin: {
-      label: `BBEdit`,
-      icon: `apps/bbedit.png`,
-      kind: `editor`,
-      detect: () => (L1(`BBEdit`) || F1([`/Applications/BBEdit.app`]) ? `/usr/bin/open` : null),
-      args: (e) => [`-a`, `BBEdit`, e],
-    },
-  },
-};
+var {
+  bbedit: N4e,
+  emacs: $4e,
+  sublimeText: M3e,
+  textmate: R3e,
+  visualStudio: H3e,
+  xcode: $3e,
+  zed: n6e,
+} = createStandaloneEditorTargetRuntime({
+  platform: process.platform,
+  path: h,
+  fs: v,
+  env: process.env,
+  createLogger: r.i,
+  createTargetDescriptor: H1,
+  findMacApplicationBundle: L1,
+  findExistingMacApplication: F1,
+  findMacApplicationExecutable: I1,
+  findCommandOrDesktopEntry: W1,
+  findExecutable: Yi,
+  resolveExecutableLink: na,
+  findSiblingExecutable: ra,
+  findWindowsInstall: ta,
+  findWindowsExecutableGlob: Ine,
+  launchLinuxEditor: G1,
+  isRemoteHost: n.Os,
+  remoteHostLabel: y1,
+  pathToFileURL: c.pathToFileURL,
+  sanitizeEnvironment: (env) => n.Bi(env),
+  spawnSync: P.spawnSync,
+  spawn: Zi,
+});
 var {
   terminal: F4e,
   cmder: q4e,
@@ -71151,32 +71172,7 @@ var {
   getWslInfo: () => n.Ni(),
   spawn: Zi,
 });
-var r0 = (e, t) => (t == null ? [e] : [`+${t.line}:${t.column}`, e]),
-  $4e = {
-    id: `emacs`,
-    platforms: {
-      darwin: {
-        label: `Emacs`,
-        icon: `apps/emacs.png`,
-        kind: `editor`,
-        detect: () => (L1(`Emacs`) || F1([`/Applications/Emacs.app`]) ? `/usr/bin/open` : null),
-        args: (e) => [`-a`, `Emacs`, e],
-      },
-      linux: {
-        label: `Emacs`,
-        icon: `apps/emacs.png`,
-        kind: `editor`,
-        detect: () =>
-          W1(
-            [`emacs`, `emacsclient`],
-            [`emacs.desktop`, `emacsclient.desktop`, `org.gnu.emacs.desktop`],
-          ),
-        args: r0,
-        open: (e) => G1(e, r0),
-      },
-    },
-  },
-  e3e = H1({
+var e3e = H1({
     id: `fileManager`,
     label: `Finder`,
     icon: `apps/finder.png`,
@@ -71301,64 +71297,6 @@ var {
   findMacApplicationExecutable: I1,
   launchLinuxEditor: G1,
 });
-function l0(e, t, r, i, a) {
-  if (r != null && n.Os(r)) {
-    let e = y1(r);
-    if (e == null) throw Error(`Zed SSH open is not available for this host.`);
-    let n = j3e(e, a?.trim() || i);
-    if (n != null) return [u0(n, t)];
-    throw Error(`Missing remote path for Zed SSH open.`);
-  }
-  return [u0(e, t)];
-}
-function j3e(e, t) {
-  let n = e.trim(),
-    r = t?.trim();
-  return !n || !r
-    ? null
-    : `ssh://${n}${(r.startsWith(`/`) ? r : `/${r}`).split(`/`).map(encodeURIComponent).join(`/`)}`;
-}
-function u0(e, t) {
-  return t ? `${e}:${t.line}:${t.column}` : e;
-}
-var M3e = H1({
-  id: `sublimeText`,
-  label: `Sublime Text`,
-  icon: `apps/sublime-text.png`,
-  kind: `editor`,
-  darwin: { detect: N3e, args: l0 },
-  win32: { detect: P3e, args: l0 },
-  linux: {
-    detect: () =>
-      W1(
-        [`subl`, `sublime_text`],
-        [`sublime_text.desktop`, `com.sublimetext.three.desktop`, `sublime-text_subl.desktop`],
-      ),
-    args: l0,
-    open: (e) => G1(e, l0),
-  },
-});
-function N3e() {
-  let e = Yi(`subl`);
-  if (e) return e;
-  let t = L1(`Sublime Text`);
-  if (t) {
-    let e = (0, h.join)(t, `Contents`, `SharedSupport`, `bin`, `subl`);
-    if ((0, v.existsSync)(e)) return e;
-  }
-  return F1([`/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl`]);
-}
-function P3e() {
-  let e = Yi(`subl.exe`) ?? Yi(`subl`);
-  if (e) {
-    let t = na(e);
-    if (t) return ra(t, `sublime_text.exe`) ?? t;
-  }
-  return ta([
-    [`Sublime Text`, `sublime_text.exe`],
-    [`Sublime Text`, `subl.exe`],
-  ]);
-}
 var F3e = H1({
   id: `systemDefault`,
   label: `Default app`,
@@ -71402,198 +71340,6 @@ async function d0(e) {
   let { shell: t } = await import(`electron`),
     n = await t.openPath(e);
   if (n) throw Error(n);
-}
-var R3e = {
-  id: `textmate`,
-  platforms: {
-    darwin: {
-      label: `TextMate`,
-      icon: `apps/textmate.png`,
-      kind: `editor`,
-      detect: () => (L1(`TextMate`) || F1([`/Applications/TextMate.app`]) ? `/usr/bin/open` : null),
-      args: z3e,
-    },
-  },
-};
-function z3e(e, t) {
-  if (!t) return [`-a`, `TextMate`, e];
-  let n = new URL(`txmt://open/`);
-  return (
-    n.searchParams.set(`url`, (0, c.pathToFileURL)(e).toString()),
-    n.searchParams.set(`line`, t.line.toString()),
-    n.searchParams.set(`column`, t.column.toString()),
-    [`-a`, `TextMate`, n.toString()]
-  );
-}
-var B3e = [`2022`, `2019`, `2017`],
-  V3e = [`Community`, `Professional`, `Enterprise`, `Preview`, `BuildTools`],
-  H3e = H1({
-    id: `visualStudio`,
-    label: `Visual Studio`,
-    icon: `apps/vscode.png`,
-    kind: `editor`,
-    win32: { detect: U3e, args: (e) => [e] },
-  });
-function U3e() {
-  let e = Yi(`devenv.exe`) ?? Yi(`devenv`);
-  return e
-    ? na(e)
-    : ta(
-        B3e.flatMap((e) =>
-          V3e.map((t) => [`Microsoft Visual Studio`, e, t, `Common7`, `IDE`, `devenv.exe`]),
-        ),
-      ) || Ine(`**\\Common7\\IDE\\devenv.exe`);
-}
-var $3e = {
-    id: `xcode`,
-    platforms: {
-      darwin: {
-        label: `Xcode`,
-        icon: `apps/xcode.png`,
-        kind: `editor`,
-        detect: () => {
-          let e = h0();
-          return e?.xedPath ?? e?.appPath ?? null;
-        },
-        args: (e) => [e],
-        open: async ({ path: e, location: t }) => {
-          await t6e(e, t);
-        },
-      },
-    },
-  },
-  m0 = r.i(`open-in-targets`);
-function h0() {
-  if (process.platform !== `darwin`) return null;
-  let e = L1(`Xcode`) ?? F1([`/Applications/Xcode.app`]),
-    t = null;
-  try {
-    let e = (0, P.spawnSync)(`/usr/bin/xcode-select`, [`-p`], {
-        encoding: `utf8`,
-        env: n.Bi(process.env),
-        timeout: 1e3,
-      }),
-      r = e.stdout?.trim();
-    if (e.status === 0 && r) {
-      let e = (0, h.join)(r, `usr`, `bin`, `xed`);
-      (0, v.existsSync)(e) && (t = e);
-    }
-  } catch (e) {
-    m0().debug(`Failed to resolve Xcode via xcode-select`, { safe: {}, sensitive: { error: e } });
-  }
-  if (t == null && e) {
-    let n = (0, h.join)(e, `Contents`, `Developer`, `usr`, `bin`, `xed`);
-    (0, v.existsSync)(n) && (t = n);
-  }
-  return t == null && e == null ? null : { appPath: e, xedPath: t };
-}
-function e6e(e) {
-  let t = e;
-  (!(0, v.existsSync)(e) || !(0, v.statSync)(e).isDirectory()) && (t = (0, h.dirname)(e));
-  let n = null;
-  for (;;) {
-    let e;
-    try {
-      e = (0, v.readdirSync)(t);
-    } catch {
-      e = [];
-    }
-    let r = e.find((e) => e.endsWith(`.xcworkspace`));
-    if (r) return (0, h.join)(t, r);
-    let i = e.find((e) => e.endsWith(`.xcodeproj`));
-    if (i) return (0, h.join)(t, i);
-    n == null && e.includes(`Package.swift`) && (n = t);
-    let a = (0, h.dirname)(t);
-    if (a === t) return n;
-    t = a;
-  }
-}
-async function t6e(e, t) {
-  let n = h0();
-  if (!n) throw Error(`Open target "xcode" is not available`);
-  if (n.xedPath) {
-    let r = e6e(e),
-      i = [];
-    (r && i.push(`--project`, r),
-      t && i.push(`--line`, t.line.toString()),
-      i.push(e),
-      m0().debug(`Opening path in Xcode via xed`, {
-        safe: {},
-        sensitive: { xedPath: n.xedPath, args: i, xcodeContainerPath: r, path: e },
-      }),
-      await Zi(n.xedPath, i));
-    return;
-  }
-  if (n.appPath == null) throw Error(`Open target "xcode" is not available`);
-  (m0().debug(`Opening path in Xcode via LaunchServices fallback`, {
-    safe: {},
-    sensitive: { appPath: n.appPath, path: e },
-  }),
-    await Zi(`/usr/bin/open`, [`-a`, n.appPath, e]));
-}
-var n6e = {
-  id: `zed`,
-  platforms: {
-    darwin: {
-      label: `Zed`,
-      icon: `apps/zed.png`,
-      kind: `editor`,
-      detect: r6e,
-      args: l0,
-      open: o6e,
-    },
-    win32: { label: `Zed`, icon: `apps/zed.png`, kind: `editor`, detect: i6e, args: l0 },
-    linux: {
-      label: `Zed`,
-      icon: `apps/zed.png`,
-      kind: `editor`,
-      detect: () =>
-        W1([`zed`], [`dev.zed.Zed.desktop`, `dev.zed.Zed-Preview.desktop`, `zed.desktop`]),
-      args: l0,
-      open: (e) => G1(e, l0),
-    },
-  },
-};
-function r6e() {
-  return (
-    Yi(`zed`) ??
-    F1([
-      `/Applications/Zed.app/Contents/MacOS/zed`,
-      `/Applications/Zed Preview.app/Contents/MacOS/zed`,
-      `/Applications/Zed Nightly.app/Contents/MacOS/zed`,
-    ]) ??
-    I1(`Zed`, `zed`)
-  );
-}
-function i6e() {
-  let e = Yi(`zed.exe`) ?? Yi(`zed`);
-  return e ? na(e) : ta([[`Zed`, `Zed.exe`]]);
-}
-function a6e(e) {
-  let t = e.indexOf(`.app/Contents/MacOS/`);
-  return t === -1 ? null : e.slice(0, t + 4);
-}
-async function o6e({
-  command: e,
-  path: t,
-  location: n,
-  hostConfig: r,
-  remoteWorkspaceRoot: i,
-  remotePath: a,
-}) {
-  let o = l0(t, n, r, i, a),
-    s = o[0] ?? t,
-    c = n == null ? s : (l0(t, null, r, i, a)[0] ?? s),
-    l = a6e(e);
-  if (l) {
-    if ((await Zi(`/usr/bin/open`, [`-a`, l, c]), !n)) return;
-    let t = Yi(`zed`) ?? e;
-    try {
-      await Zi(t, o);
-    } catch {}
-    return;
-  }
-  await Zi(e, o);
 }
 var {
   defaultTargets: g0,

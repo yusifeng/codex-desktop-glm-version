@@ -4696,3 +4696,13 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - main 旧 declarations/helpers 删除 158 行，新生产模块 235 行；focused coverage 45 项，no-unwired gate 扩至
   129 项。下一批继续成组审计 Zed/Sublime Text/Visual Studio/Xcode 等剩余 editor/document targets，保持
   专用 platform adapter 与 descriptor 同批迁移。
+
+# 2026-11-01 standalone editor open-target owner
+
+- `src/main/main-app/open-target/standalone-editor-targets.ts` 已接管 BBEdit、Emacs、Sublime Text、TextMate、
+  Visual Studio、Xcode、Zed 七个 descriptors，以及 SSH URI、Sublime/Visual Studio detection、Xcode
+  developer runtime/container search/launch fallback 和 Zed bundle/CLI 双阶段启动；factory 输出直接进入既有
+  registry，没有复制 target state。
+- main 旧 declarations/helpers 删除 288 行，新生产模块 398 行；focused coverage 58 项，no-unwired gate
+  扩至 147 项。下一批继续审计 file manager、system-default、Git Bash、GitHub Desktop 四个剩余专用 target
+  及其 native shell/path controller，随后重新清点静态 target registry 的未迁边界。
