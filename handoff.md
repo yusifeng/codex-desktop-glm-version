@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+审计时修复了 terminal session manager 的运行时接线：`createTerminalSessionManagerClass(...)` 曾被误置于
+`S5()` return 之后的不可达函数体内，现已恢复为模块级初始化；focused test 新增主 chunk 接线形状断言，防止
+transform/typecheck 仍通过但 owner 未实际初始化的回归。
+
 随后将 `Ott/ktt/Att/jtt/h5/g5/_5/v5/y5/Mtt/Ntt` terminal window runtime 迁入
 `terminal/terminal-window-runtime.ts`；shell discovery/command/labels、terminal RPC/trace forwarding、subscription
 replacement/teardown 与 terminal query escape filtering 均由新 runtime 持有。service 与 manager consumers 已接回。

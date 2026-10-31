@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 terminal session manager wiring repair
+
+复核真实 consumer 时发现 `createTerminalSessionManagerClass(...)` 被误留在 `S5()` return 后的不可达函数体内；
+现已恢复为模块级 `Wtt` 初始化，并在既有 terminal-session-manager focused test 中加入主 chunk 结构断言。
+该断言专门覆盖 TypeScript/build 可通过但运行时 factory 未执行的接线回归。
+
 ## 2026-10-31 terminal window runtime
 
 原 `Ott/ktt/Att/jtt/h5/g5/_5/v5/y5/Mtt/Ntt` 已整簇迁入

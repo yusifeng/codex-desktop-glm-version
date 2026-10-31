@@ -138636,6 +138636,7 @@ var Vtt = 16e3,
   };
 function S5(e, t) {
   return `${e}:${t}`;
+}
 var Wtt = createTerminalSessionManagerClass({
   n,
   v,
@@ -138658,7 +138659,6 @@ var Wtt = createTerminalSessionManagerClass({
   Utt,
   S5,
 });
-};
 function C5(e) {
   if (process.platform !== `win32`) return `posix`;
   let t = Ytt(e);

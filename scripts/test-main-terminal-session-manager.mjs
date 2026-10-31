@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
@@ -255,6 +256,29 @@ function createHarness() {
   equal(events.length, 1);
   await manager.dispose();
   equal(await manager.createOrAttach(owner, { type: "create", cwd: "/repo" }), null);
+}
+
+{
+  const mainSource = fs.readFileSync(
+    path.join(root, ".reference/originals/main/main-C-Mhak1n.ts"),
+    "utf8",
+  );
+  const ownerKeyStart = mainSource.indexOf("function S5(e, t) {");
+  const managerFactoryStart = mainSource.indexOf("var Wtt = createTerminalSessionManagerClass({");
+  const nextHelperStart = mainSource.indexOf("function C5(e)", managerFactoryStart);
+  equal(ownerKeyStart >= 0, true);
+  equal(managerFactoryStart > ownerKeyStart, true);
+  equal(nextHelperStart > managerFactoryStart, true);
+  equal(
+    mainSource
+      .slice(ownerKeyStart, managerFactoryStart)
+      .endsWith("return `${e}:${t}`;\n}\n"),
+    true,
+  );
+  equal(
+    mainSource.slice(managerFactoryStart, nextHelperStart).trimEnd().endsWith("});"),
+    true,
+  );
 }
 
 console.log(`${assertions} main terminal session manager assertions passed`);
