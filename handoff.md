@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 main approval synthesis consumers：`requests/item-synthesis.ts` 新增 `Yv/Xv/L_e/Zv/Qv` 兼容导出，覆盖 plan item id、browser-use/
+messages 安全自动 elicitation 与 MCP/permission timeline 合成；主 chunk 的真实通知/plan consumers 已接线，旧 `Uv…W_e` 约 440 行
+审批/动态工具簇整体删除，focused suite 扩至 42 条断言。
+
 修复 requests item-synthesis owner：原单行占位版缺失 follower 转发、method 校验、审批清理、MCP 安全/等价 connector 处理、
 动态 option-picker 转换和中断全类型拒绝；现恢复完整语义，并修正 manager 的 elicitation item 四参数签名。user-verification 改接
 `elicitation-auto-approve.ts` 的真实 lifecycle，主 chunk 无引用 `G_e/K_e` 旧流删除；focused suite 新增 16 条行为/wiring 断言。

@@ -1,5 +1,5 @@
 // Approval, elicitation and dynamic-tool response owner (original M_e…W_e).
-import { cr as sameConnector, ed as requestIdOf, lr as parseElicitation, ur as isElicitationApprovalSafe } from "@chunk/shared";
+import { cr as sameConnector, ed as requestIdOf, lr as parseElicitation, tu as isComputerUseServerName, ur as isElicitationApprovalSafe } from "@chunk/shared";
 import { forEachTurn } from "../turns/canonical-history";
 import { buildOnboardingToolResponse } from "../tools/dynamic-app-tools";
 
@@ -98,6 +98,30 @@ function elicitationItem(requestId: string, params: R, completed: boolean, actio
   };
 }
 export const Xv = elicitationItem;
+export function Yv(turnId: string): string {
+  return `implement-plan:${turnId}`;
+}
+export function L_e(params: R, turn: R | null, parseUrl: (url: string) => unknown): boolean {
+  const parsed = parseElicitation(params, true, parseUrl);
+  const browserOriginApproval =
+    isComputerUseServerName(params.serverName) &&
+    parsed?.kind === "mcpToolCall" &&
+    parsed.approval.connector_id === "browser-use" &&
+    (parsed.approval.tool_name === "access_browser_origin" ||
+      parsed.approval.tool_name === "access_browser_origin_with_raw_cdp") &&
+    turn?.params.approvalPolicy === "never" &&
+    turn.params.sandboxPolicy?.type === "dangerFullAccess";
+  const emptyMessagesForm =
+    params.serverName === "messages" &&
+    parsed?.kind === "generic" &&
+    params.mode === "form" &&
+    Object.keys(params.requestedSchema.properties).length === 0 &&
+    turn?.params.approvalsReviewer === "user" &&
+    turn.items.some((item: R) =>
+      item.type === "mcpToolCall" && item.pluginId === "messages@openai-bundled" &&
+      item.server === "messages" && item.tool === "send_message" && item.status === "inProgress");
+  return browserOriginApproval || emptyMessagesForm;
+}
 export function Gv(context: ApprovalActionContext, id: string, requestId: string, response: R): void {
   const requests = context.getConversationRequests(id);
   const request = requests.find((entry) => entry.id === requestId);
@@ -134,6 +158,16 @@ function upsertTurnItem(state: R, turnId: string | null, item: R): void {
   target.items ??= [];
   const index = target.items.findIndex((entry: R) => entry?.id === item.id);
   if (index < 0) target.items.push(item); else target.items[index] = item;
+}
+export function Zv(state: R, params: R, item: R | null, _logger: R): void {
+  if (params.turnId != null && params.turnId.length !== 0 && item != null)
+    upsertTurnItem(state, params.turnId, item);
+}
+export function Qv(state: R, requestId: string, params: R, completed: boolean, response: unknown, _logger: R): void {
+  upsertTurnItem(state, params.turnId, {
+    id: `permission-request-${requestId}`, type: "permissionRequest", requestId,
+    turnId: params.turnId, reason: params.reason, permissions: params.permissions, completed, response,
+  });
 }
 export function B_e(options: R): ApprovalActionContext {
   function forward(method: string, valueKey: string) {
@@ -250,4 +284,5 @@ export const buildApprovalActionContext=B_e, replyWithCommandExecutionApprovalDe
   replyWithUserInputResponse=F_e, replyWithOptionPickerResponse=U_e, replyWithDynamicToolResponse=W_e,
   getDynamicToolRequest=ey, removePendingDynamicToolRequest=H_e,
   replyWithMcpServerElicitationResponse=Gv, buildMcpServerElicitationItem=Xv,
-  markInterruptedCommandExecutions=V_e;
+  markInterruptedCommandExecutions=V_e, planImplementationItemId=Yv,
+  isSafeAutoElicitation=L_e, applyMcpServerElicitationItem=Zv, applyPermissionRequestItem=Qv;

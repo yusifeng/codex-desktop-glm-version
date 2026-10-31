@@ -16,6 +16,7 @@ Function("require", "module", "exports", transpiled.code)(
       cr: (left, right) => left.id === right.id,
       ed: (id) => id,
       lr: (params) => params.parsed ?? null,
+      tu: (serverName) => serverName === "computer-use",
       ur: (_params, response) => response.safe !== false,
     };
     if (specifier === "../turns/canonical-history")
@@ -100,12 +101,24 @@ const unsafe = {
 assert.throws(() => owner.replyWithMcpServerElicitationResponse(unsafe, "thread-1", "request-5", { action: "accept" }), /Unsafe MCP/);
 assertions += 1;
 equal(owner.buildMcpServerElicitationItem("request-6", { turnId: "turn-1", mode: "openai/userVerification", challenge: "secret" }, false, null).params.challenge, "");
+equal(owner.planImplementationItemId("turn-1"), "implement-plan:turn-1");
+equal(owner.isSafeAutoElicitation({
+  serverName: "computer-use",
+  parsed: { kind: "mcpToolCall", approval: { connector_id: "browser-use", tool_name: "access_browser_origin" } },
+}, { params: { approvalPolicy: "never", sandboxPolicy: { type: "dangerFullAccess" } }, items: [] }, () => null), true);
+const synthesisState = { turns: [{ turnId: "turn-1", items: [] }] };
+owner.applyMcpServerElicitationItem(synthesisState, { turnId: "turn-1" }, { id: "elicitation", type: "mcpServerElicitation" }, logger);
+owner.applyPermissionRequestItem(synthesisState, "permission-1", { turnId: "turn-1", reason: "Need access", permissions: { network: true } }, false, null, logger);
+equal(synthesisState.turns[0].items.map((item) => item.type), ["mcpServerElicitation", "permissionRequest"]);
 
 const managerSource = fs.readFileSync(new URL("../src/main/main-app/conversation/app-server-manager.ts", import.meta.url), "utf8");
 equal(managerSource.includes('createAutoApprovedElicitation as beginUserVerification'), true);
 equal(managerSource.includes("getMcpServerElicitationItem(requestId: string, params: any, completed: boolean, action: unknown)"), true);
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
+equal(main.includes('const { Yv, Xv, L_e, Zv, Qv } = require("./main-app/requests/item-synthesis.js")'), true);
 equal(main.includes("var G_e = class extends n.Uf"), false);
 equal(main.includes("function K_e({"), false);
+for (const name of ["Uv", "Wv", "M_e", "N_e", "P_e", "F_e", "Gv", "Kv", "Jv", "Yv", "Xv", "L_e", "R_e", "Zv", "Qv", "z_e", "B_e", "V_e", "ey", "H_e", "U_e", "W_e"])
+  equal(main.includes(`function ${name}(`), false);
 
 console.log(`${assertions} main item synthesis owner assertions passed`);

@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 main approval synthesis wiring
+
+修复 semantic owner 后，本轮补齐主 chunk 实际仍调用的 `Yv/Xv/L_e/Zv/Qv` 兼容面，将 plan implementation、自动 elicitation、MCP 与
+permission request 合成 consumers 接回；其余旧符号仅在旧簇内部互调。完成接线后删除 `Uv…W_e` 整簇，focused suite 覆盖安全门、
+timeline upsert、兼容 require 与全部旧函数消失。
+
 ## 2026-10-31 request item-synthesis owner repair
 
 `requests/item-synthesis.ts` 原为结构占位，实际 manager consumer 会跳过 follower delegation、MCP safety/equivalent connector auth 与正确
