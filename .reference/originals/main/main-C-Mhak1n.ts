@@ -163,6 +163,7 @@ const { registerInAppBrowserAvailabilityProbe: Jse } = require("./main-app/brows
 const { trackComputerUseActivity: ele } = require("./main-app/computer-use/activity-tracker.js");
 const { ManagedComputerUseService: Eoe } = require("./main-app/computer-use/managed-service.js");
 const { browserUsePartitionNameForHost: Jc, applyPreferredLanguages: Yc, clearSiwcCookies: Xc, clearBrowserData: Zc, setInAppBrowserChromeUrlsAllowed: tl, isInAppBrowserChromeUrlsAllowed: nl } = require("./main-app/browser-use/site-data.js");
+const { ensureComputerUseNotifyConfig: iie } = require("./main-app/computer-use/notify-config.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -7076,88 +7077,6 @@ async function tie(e) {
 }
 function nie(e) {
   (0, p.platform)() !== `win32` && (0, v.existsSync)(e) && (0, v.unlinkSync)(e);
-}
-var zo = `--previous-notify`,
-  Bo = `turn-ended`,
-  rie = /^codex-computer-use(?:-arm64)?\.exe$/i;
-async function iie({ codexHome: e, windowsHelperPath: t }) {
-  let n = h.default.join(e, `config.toml`),
-    r = await oie(n),
-    i = aie(r, t);
-  return i.content === r
-    ? { status: `already-present` }
-    : (await (0, b.mkdir)(h.default.dirname(n), { recursive: !0 }),
-      await (0, b.writeFile)(n, i.content, `utf8`),
-      { status: i.hadNotify ? `repaired` : `installed` });
-}
-function aie(e, t) {
-  let n = sie(e),
-    r = Vo(n),
-    i = [t, Bo];
-  return (
-    r != null && i.push(zo, JSON.stringify(r)),
-    die(n, i)
-      ? { content: e, hadNotify: !0 }
-      : { content: uie(e, Yt({ notify: i }).trimEnd()), hadNotify: n != null }
-  );
-}
-async function oie(e) {
-  try {
-    return await (0, b.readFile)(e, `utf8`);
-  } catch (e) {
-    if (e instanceof Error && `code` in e && e.code === `ENOENT`) return ``;
-    throw e;
-  }
-}
-function sie(e) {
-  if (e.trim() === ``) return null;
-  let t = n.wi(e, { integersAsBigInt: !1 });
-  if (t.notify == null) return null;
-  if (!Ho(t.notify)) throw Error(`Codex notify config must be a string array`);
-  return t.notify;
-}
-function Vo(e) {
-  return e == null ? null : cie(e) ? Vo(lie(e)) : e;
-}
-function cie(e) {
-  let [t, n] = e;
-  return n === Bo && rie.test(t?.replaceAll(`\\`, `/`).split(`/`).at(-1) ?? ``);
-}
-function lie(e) {
-  let t = e[e.indexOf(zo) + 1];
-  if (t == null) return null;
-  try {
-    let e = JSON.parse(t);
-    return Ho(e) ? e : null;
-  } catch {
-    return null;
-  }
-}
-function uie(e, t) {
-  let n = [],
-    r = !0,
-    i = 0;
-  for (let t of e.split(/\r?\n/)) {
-    let e = t.trimStart(),
-      a = t.split(`[`).length - t.split(`]`).length;
-    (r && i === 0 && e.startsWith(`[`) && (r = !1),
-      r ? (i > 0 ? (i += a) : /^notify\s*=/.test(e) ? (i = a) : n.push(t)) : n.push(t));
-  }
-  let a = n.findIndex((e) => e.trimStart().startsWith(`[`)),
-    o = a === -1 ? n : n.slice(0, a),
-    s = a === -1 ? [] : n.slice(a);
-  return `${[...o, t, ...s]
-    .join(
-      `
-`,
-    )
-    .trim()}\n`;
-}
-function Ho(e) {
-  return Array.isArray(e) && e.every((e) => typeof e == `string`);
-}
-function die(e, t) {
-  return e != null && e.length === t.length && e.every((e, n) => e === t[n]);
 }
 var Uo = r.i(`computer-use-native-pipe`),
   Wo = null;

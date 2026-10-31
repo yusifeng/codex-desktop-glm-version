@@ -109,7 +109,9 @@ function parseExistingNotify(content: string): string[] | null {
  */
 function unwrapPreviousNotifyChain(notify: string[] | null): string[] | null {
   if (notify == null) return null;
-  return isComputerUseHelperNotifyEntry(notify) ? parsePreviousNotify(notify) : notify;
+  return isComputerUseHelperNotifyEntry(notify)
+    ? unwrapPreviousNotifyChain(parsePreviousNotify(notify))
+    : notify;
 }
 
 /** 判定 notify 条目是否为本 helper 的 turn-ended 条目（原 `cie`）。 */

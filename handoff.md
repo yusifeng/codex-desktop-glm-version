@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 computer-use notify config：既有 `computer-use/notify-config.ts` 现替代主 chunk 旧 `zo…die`。审计修复了
+`--previous-notify` 只剥一层的偏差，恢复旧 `Vo` 的递归链展开；config.toml 顶层 notify 替换、installed/repaired/already-present、
+helper 识别与 native-pipe 真实 consumer 均通过 `iie` 兼容别名接回。
+
 接回 browser-use site data owner：既有 `browser-use/site-data.ts` 现替代主 chunk 旧 `Wc…Zc/el/tl/nl`。persist partition、
 语言去重、SIWC cookies、siteData time-range 映射与 IAB chrome URL allow ledger 保持完整；旧直接读取 `el` 的 navigation policy
 已改为调用语义 `nl()`，保证 startup setter、session/window consumers 共享同一模块状态。

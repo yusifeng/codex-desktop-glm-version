@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 computer-use notify config wiring
+
+`src/main/main-app/computer-use/notify-config.ts` 已覆盖旧 `zo/Bo/rie/iie/aie/oie/sie/Vo/cie/lie/uie/Ho/die`。本轮把
+`unwrapPreviousNotifyChain` 修为递归后接回 native-pipe consumer，删除主 chunk 96 行旧簇；focused suite 覆盖双层 helper 链、
+custom/null、跨行旧 notify 替换、数组等价、alias 与真实 wiring。
+
 ## 2026-10-31 browser-use site data wiring
 
 `src/main/main-app/browser-use/site-data.ts` 已完整覆盖旧 `Wc/Gc/Kc/qc/Jc/Yc/Xc/Zc/el/tl/nl`。本轮接回 partition/session/
