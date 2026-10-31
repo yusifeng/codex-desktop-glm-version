@@ -1,5 +1,13 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 dictation history owner
+
+原 `W$e` 和独占 `EQ/L$e/DQ/R$e/OQ/kQ/G$e/MQ` helpers 已迁入
+`src/main/main-app/dictation/history.ts`，替换此前未接回的 skeleton。新 owner 保留 schema validation、
+serialized initialization、chunk hard-link 去重、metadata/download 原子落盘与 fsync、interrupted recovery、
+20 条容量清理、legacy global-history 导入/回写以及 query invalidation；main runtime 与 global dictation
+recordHistoryText 均直接消费新实现。
+
 ## 2026-10-31 WorktreeService owner
 
 原 `XQe` 已整体迁入 `src/main/main-app/workspace/worktree-service.ts`。新 owner 保留 pending worktree

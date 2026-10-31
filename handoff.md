@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将原先仅有注释和空方法的 `dictation/history.ts` 补成真实 file-backed owner，并将 `W$e` 及其
+legacy global-history helpers 从 main 物理删除。chunk 去重/排序、metadata 原子写与 fsync、录音恢复、
+20 条清理、audio read/download、transcript/finalize/delete 和 global dictation JSONL bridge 均由单一
+`DictationHistoryService` 持有；runtime 和 global dictation consumer 已真实接回。focused test 覆盖 29 项。
+
 随后将 `XQe` WorktreeService 整体迁入 `workspace/worktree-service.ts`；pending creation 状态机、
 worker path/setup/stream 订阅、新生 worktree 保护、archive owner 转移、managed worktree、自动清理规划、
 失败通知与 restart blockers 继续由同一个语义 owner 持有。main 的 per-host registry 已真实构造新 class，
