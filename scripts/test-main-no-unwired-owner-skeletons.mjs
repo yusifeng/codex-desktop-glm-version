@@ -32,6 +32,7 @@ const realOwners = [
   ["src/main/main-app/remote/remote-control-step-up.ts", "createRemoteControlStepUpRuntime"],
   ["src/main/main-app/thread-read-state/runtime.ts", "createThreadReadStateRuntime"],
   ["src/main/main-app/network/website-preview-fetch.ts", "createWebsitePreviewFetch"],
+  ["src/main/main-app/thread-catalog/sources.ts", "createThreadCatalogSources"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -223,6 +224,10 @@ assert.equal(main.includes("function Ant("), false, "generated thread read-state
 assert.equal(main.includes("g = new Ont({"), false, "generated read-state composition must be removed");
 assert.equal(main.includes("var qnt = createWebsitePreviewFetch({"), true, "real website-preview fetch is wired");
 assert.equal(main.includes("function qnt("), false, "generated website-preview fetch must be removed");
+assert.equal(main.includes("createThreadCatalogSources({"), true, "real thread-catalog sources are wired");
+assert.equal(main.includes("function M5("), false, "generated app-server catalog source must be removed");
+assert.equal(main.includes("function fnt("), false, "generated ChatGPT catalog source must be removed");
+assert.equal(main.includes("function N5("), false, "generated ChatGPT catalog projection must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("228 main unwired-owner skeleton assertions passed");
+console.log("234 main unwired-owner skeleton assertions passed");

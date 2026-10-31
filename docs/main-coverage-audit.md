@@ -2764,3 +2764,13 @@ aborted/end 清理和 invalid response wrapping 已整体迁移至
 `WindowContext` 继续将同一函数交给 website-preview service，未新增第二条网络路径；旧内联 `qnt` 已物理删除。
 focused test `scripts/test-main-website-preview-fetch.mjs` 覆盖 56 项 request policy、redirect、abort、stream、limit、
 no-body response、failure wrapping、cleanup 和真实 consumer wiring 行为。
+
+### 增量抽取：thread-catalog source adapters
+
+app-server catalog 的 state-db-only list/read request policy、source attribution、entry projection、accepted observation、
+notification/archive bridge 与 queued-page promotion，以及 ChatGPT history 的 schema validation、offset pagination、batch
+read、temporary/invalid-date suppression、timestamp/title/project/origin projection 已整组迁移至
+`src/main/main-app/thread-catalog/sources.ts`。main 通过 `createThreadCatalogSources` 生成原 `M5/fnt`，`WindowContext`
+的 local、remote 和 ChatGPT 三类 source consumers 均继续真实调用同一 outputs；旧 `j5/unt` schemas、`M5/fnt/N5`
+实现已物理删除。focused test `scripts/test-main-thread-catalog-sources.mjs` 覆盖 47 项 request、pagination、projection、
+notification、optional adapter、validation、cleanup 和 consumer wiring 行为。

@@ -341,6 +341,7 @@ const { createThreadArchiveServiceClass } = require("./main-app/threads/thread-a
 const { createThreadCatalogPageSlotSchedulerClass } = require("./main-app/thread-catalog/page-slot-scheduler.js");
 const { createThreadCatalogSyncCoordinatorClass } = require("./main-app/thread-catalog/sync-coordinator.js");
 const { createThreadCatalogServiceClass } = require("./main-app/thread-catalog/service.js");
+const { createThreadCatalogSources } = require("./main-app/thread-catalog/sources.js");
 const { LocalThreadCatalogStore } = require("./main-app/thread-catalog/store.js");
 const { createThreadMetadataGenerationServiceClass } = require("./main-app/threads/thread-metadata-generation-service.js");
 const { createThreadReadStateRpcServices } = require("./main-app/thread-read-state/rpc-services.js");
@@ -76355,129 +76356,20 @@ var Xtt = createThreadArchiveServiceClass({
     parseImportedThreadsNotification: NI,
     projectThreadEntry: um,
   });
-var j5 = n
-    .wf({
-      id: n.Of().min(1),
-      title: n.Of().nullish(),
-      create_time: n.Of().nullish(),
-      update_time: n.Of().nullish(),
-      is_temporary_chat: n.gf().nullish(),
-      gizmo_id: n.Of().nullish(),
-      conversation_origin: n.Of().nullish(),
-    })
-    .loose(),
-  unt = n.wf({
-    items: n.hf(j5),
-    total: n.Cf().int().nonnegative(),
-    limit: n.Cf().int().positive(),
-    offset: n.Cf().int().nonnegative(),
-  }),
-  dnt = createThreadCatalogServiceClass({
+var dnt = createThreadCatalogServiceClass({
     ThreadCatalogPageSlotScheduler: E5,
     ThreadCatalogSyncCoordinator: int,
     Buffer: S.Buffer,
     createHash: _.createHash,
   });
-function M5(e, t, r) {
-  return {
-    id: e,
-    hostKind: t,
-    listPage: async ({ cursor: t, limit: i }, a) => {
-      let o = await r.listThreads(
-        {
-          archived: !1,
-          cursor: t,
-          limit: i,
-          modelProviders: [],
-          parentThreadId: null,
-          sortKey: `updated_at`,
-          sortDirection: `desc`,
-          sourceKinds: n.pa,
-          useStateDbOnly: !0,
-        },
-        { ...a, source: `thread_catalog` },
-      );
-      return {
-        items: o.data.map((t) => ({ id: t.id, updatedAt: t.updatedAt, entry: um(t, e) })),
-        nextCursor: o.nextCursor,
-        onAccepted: (e) => e.observeThreads(o.data),
-      };
-    },
-    readItem: async (t, n) => {
-      let i = await r.readThread(t, { includeTurns: !1 }, { ...n, source: `thread_catalog` });
-      return i == null
-        ? null
-        : {
-            id: i.id,
-            updatedAt: i.updatedAt,
-            entry: um(i, e),
-            onAccepted: (e) => e.observeThreads([i]),
-          };
-    },
-    subscribeNotifications: (e) => {
-      let t = r.registerInternalNotificationHandler(e),
-        n = r.registerArchiveSuccessHandler?.((t) => {
-          e({ method: `thread/archived`, params: { threadId: t } });
-        });
-      return () => {
-        (t(), n?.());
-      };
-    },
-    promoteQueuedPage: () => r.promoteQueuedCatalogPage?.(),
-  };
-}
-function fnt(e, t) {
-  return {
-    id: e,
-    hostKind: `chatgpt`,
-    listPage: async ({ cursor: n, limit: r }, { signal: i }) => {
-      let a = n == null ? 0 : Number(n),
-        o = unt.parse(
-          await t(
-            `/conversations?offset=${a}&limit=${r}&order=updated&is_archived=false&hide_snorlax=false`,
-            { signal: i },
-          ),
-        );
-      if (o.offset !== a) throw Error(`ChatGPT history returned an unexpected page offset`);
-      let s = o.offset + o.limit;
-      return { items: o.items.map((t) => N5(e, t)), nextCursor: s < o.total ? String(s) : null };
-    },
-    readItem: async (r, { signal: i }) => {
-      let a = n
-        .hf(j5)
-        .parse(
-          await t(`/conversations/batch`, {
-            method: `POST`,
-            body: { conversation_ids: [r] },
-            signal: i,
-          }),
-        )
-        .find(({ id: e }) => e === r);
-      return a == null ? null : N5(e, a);
-    },
-  };
-}
-function N5(e, t) {
-  let n = t.update_time == null ? NaN : Date.parse(t.update_time) / 1e3;
-  if (t.is_temporary_chat === !0 || !Number.isFinite(n))
-    return { id: t.id, updatedAt: n, entry: null };
-  let r = t.create_time == null ? NaN : Date.parse(t.create_time) / 1e3;
-  return {
-    id: t.id,
-    updatedAt: n,
-    entry: {
-      hostId: e,
-      threadId: t.id,
-      displayTitle: t.title?.trim() || t.id,
-      sourceCreatedAt: Number.isFinite(r) ? r : n,
-      sourceUpdatedAt: n,
-      sourceRecencyAt: n,
-      sourceKind: `chatgpt`,
-      projectId: t.gizmo_id?.startsWith(`g-p-`) ? t.gizmo_id : null,
-      conversationOrigin: t.conversation_origin ?? null,
-    },
-  };
-}
+var {
+  createAppServerThreadCatalogSource: M5,
+  createChatGptThreadCatalogSource: fnt,
+} = createThreadCatalogSources({
+  schema: n,
+  sourceKinds: n.pa,
+  projectAppServerThread: um,
+});
 var I5 = createThreadMetadataGenerationServiceClass({
     RpcHandlerBase: n.Uf,
     createLogger: r.r,

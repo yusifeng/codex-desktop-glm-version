@@ -4761,3 +4761,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   `WindowContext` 的 website-preview service 继续真实消费 factory output。
 - main 旧 `qnt` 删除 70 行，新生产模块 127 行；focused coverage 56 项，no-unwired gate 扩至 228 项。
   下一批审计 thread-catalog local/ChatGPT source adapters，优先按同一 catalog 边界成组迁移，而不是拆成微提交。
+
+# 2026-11-01 thread-catalog source adapters
+
+- `src/main/main-app/thread-catalog/sources.ts` 已整组接管 app-server local/remote list/read、accepted observation、
+  notification/archive bridge、queued-page promotion，以及 ChatGPT history schema、offset pagination、batch read 和
+  catalog entry projection；`WindowContext` 的三类 source attach consumers 全部继续真实消费 factory outputs。
+- main 旧 schemas 与 `M5/fnt/N5` 删除 118 行，新生产模块 180 行；focused coverage 47 项，no-unwired gate 扩至
+  234 项。下一批重新审计 host transport selection/auth recovery 等后续第一方边界，避免强拆大型 app composition root。
