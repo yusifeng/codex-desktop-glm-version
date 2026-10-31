@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 plugin incentives client
+
+原 `w6e`、`x6e/S6e/C6e` schemas、`V0` JWT identity predicate 与 `B0` receipt owner 已整簇迁入
+`src/main/main-app/plugins/incentives-client.ts`。新 owner 保留双端 token identity gate、401 refresh、
+404 unavailable、409 capacity、response 后身份漂移取消、receipt 去重与 AbortController dispose；唯一 runtime
+consumer 直接实例化新 class，旧实现已物理删除。
+
 ## 2026-10-31 authorized thread catalog service
 
 原 `d1e` 已迁入 `src/main/main-app/thread-catalog/authorized-service.ts`。新 owner 保留 ChatGPT host
