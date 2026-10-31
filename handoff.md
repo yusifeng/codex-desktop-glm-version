@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `dat` global-dictation lifecycle state owner 迁入 `dictation/global-dictation-lifecycle-manager.ts`；gate/force-lock、
+hold/toggle hotkey registration/release watching、cross-instance ownership、overlay/pet/in-app sessions、renderer messages、
+clipboard/paste/history、abort/recovery 与 cleanup 状态均由具名 class 持有。真实 window-services consumer 已接回。
+
 随后将 `xst` application worker runtime 迁入 `worker/worker-runtime.ts`；git/open-in 常驻 buses、IPC registration、
 app-event/Sentry fan-out、git sampling/turn completion，以及 computer-use one-shot worker 与 capture-update watcher 的独立
 subscription、abort、terminal update、exit/failure cleanup 均由新 owner 持有。真实 startup consumer 已接回，旧 body 删除。

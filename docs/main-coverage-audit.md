@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 global-dictation lifecycle manager
+
+原 `dat` 已迁入 `src/main/main-app/dictation/global-dictation-lifecycle-manager.ts`。新具名 class 保留 gate/force-lock、
+hold/toggle hotkey registration 与 release watching、cross-instance lock、overlay/pet/in-app session 状态机、renderer protocol、
+clipboard/paste/history、abort/recovery 与 cleanup；真实 window-services consumer 已接回，旧 class body 已删除。
+
 ## 2026-10-31 application worker runtime
 
 原 `xst` 已迁入 `src/main/main-app/worker/worker-runtime.ts`。新 owner 保留 git/open-in 常驻 buses、trusted IPC
