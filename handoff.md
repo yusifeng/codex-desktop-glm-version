@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+恢复并接回 native-pipe 基础链：`browser-use/rpc-client.ts`、`native-pipe/protocol.ts`、`server.ts`、`peer-socket-authorizer.ts` 取代主 chunk
+约 925 行 Browser Use RPC/config、帧协议、多客户端路由、Chrome provider discovery 和 peer 鉴权旧副本；仍在原入口的
+dynamic-app-tools/node-repl consumers 通过语义 owner 兼容导出。
+同时将此前简化的 `browser-use/native-pipe-server.ts` 补成生产实现，恢复监听/鉴权/socket 日志、WebMCP payload 校验、超限 CDP 事件处理、
+启动失败 API 清理和异步 dispose，Browser Session Registry 的真实 consumer 已切换；新增真实 Unix socket 请求/响应回归。
+
 大批收敛 turn control 链：一次删除主 chunk 约 1,300 行 workspace-resolution、turn-dispatch、turn-steer 连续旧副本；真实 start/steer/stop
 consumer 已由 AppServerConversationManager 接到语义 owner。相邻 realtime session-recorder 压缩别名同步消除，桌面启动和依赖注入直接使用命名导出。
 

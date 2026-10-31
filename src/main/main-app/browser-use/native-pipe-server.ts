@@ -17,7 +17,11 @@
 //       ④ [RY] addBrowserUseDownloadChangeListener → sendDownloadChange
 //     → 返回 { pipePath, dispose }（销毁时协议实例 + 管道 + 四路监听清理）
 
+import { memoizedTaggedLogger } from "@chunk/logger";
 import { ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER } from "./iab-api.js";
+import { BrowserUseClient } from "./rpc-client";
+import { PipeFrameLimitError } from "../native-pipe/protocol";
+import { createNativePipeServer } from "../native-pipe/server";
 
 // ---------------------------------------------------------------------------
 // 常量与类型
@@ -32,7 +36,7 @@ export const MAX_OUTGOING_FRAME_BYTES = 67_108_864;
 /** WebMCP 工具调用通知（原 `qYe` schema）。 */
 export interface WebMcpToolInvocation {
   session_id: string;
-  tabId: string;
+  tabId: number;
   toolName: string;
   turn_id: string;
   parentCallId?: string;
@@ -46,22 +50,25 @@ export interface NativePipeCdpEvent {
 }
 
 /** 帧超限错误（R2 的 `Bl`，此处声明消费形态）。 */
-export class NativePipeFrameTooLargeError extends Error {
+export class NativePipeFrameTooLargeError extends PipeFrameLimitError {
   constructor(
     public maxFrameBytes: number,
     public messageBytes: number,
   ) {
-    super(`Frame exceeds ${maxFrameBytes} bytes`);
+    super(messageBytes, maxFrameBytes);
     this.name = "NativePipeFrameTooLargeError";
   }
 }
 
 /** IAB API 面（pipe 后端转发的目标——见 iab-api.ts）。 */
 export interface NativePipeApiImpl {
+  moveMouse(params: unknown): unknown;
   addCdpEventListener(listener: (event: NativePipeCdpEvent) => void): () => void;
   addCdpDetachListener(listener: (event: { tabId: string }) => void): () => void;
   addPageEventListener(listener: (event: { type: string; [key: string]: unknown }) => void): () => void;
   notifyWebMcpToolInvoked(invocation: WebMcpToolInvocation): void;
+  dispose(): void;
+  [key: string]: any;
   [key: symbol]: unknown;
 }
 
@@ -71,7 +78,21 @@ export interface NativePipeProtocol {
   sendCdpDetach(event: { tabId: string }): void;
   sendPageEvent(event: { type: string; [key: string]: unknown }): void;
   sendDownloadChange(change: { path: string; tabId: string }): void;
-  dispose(): void;
+}
+
+const logger = memoizedTaggedLogger(`browser-use-native-pipe-server`);
+
+function parseWebMcpToolInvocation(value: unknown): WebMcpToolInvocation | null {
+  if (typeof value !== `object` || value == null || Array.isArray(value)) return null;
+  const invocation = value as Record<string, unknown>;
+  if (
+    typeof invocation.session_id !== `string` || invocation.session_id.length === 0 ||
+    typeof invocation.turn_id !== `string` || invocation.turn_id.length === 0 ||
+    typeof invocation.tabId !== `number` || !Number.isInteger(invocation.tabId) || invocation.tabId <= 0 ||
+    typeof invocation.toolName !== `string` || invocation.toolName.length === 0 ||
+    (invocation.parentCallId != null && typeof invocation.parentCallId !== `string`)
+  ) return null;
+  return invocation as unknown as WebMcpToolInvocation;
 }
 
 // ---------------------------------------------------------------------------
@@ -87,35 +108,70 @@ export async function createBrowserUseNativePipeServer({
   createPipe,
   createProtocol,
   apiImpl,
+  nativePipeDirectory,
+  maxOutgoingFrameBytes = MAX_OUTGOING_FRAME_BYTES,
   pipePath: requestedPipePath,
+  socketPeerAuthorizer,
 }: {
-  /** 命名管道创建（R2 ql 的注入面）。 */
-  createPipe(options: { maxIncomingFrameBytes: number; maxOutgoingFrameBytes: number; pipePath?: string }): Promise<{ dispose(): void; pipePath: string }>;
-  /** 协议实例创建（R2 ite 的注入面）。 */
-  createProtocol(
-    pipe: { dispose(): void; pipePath: string },
+  /** 测试/嵌入方可替换管道工厂；生产默认使用完整 native-pipe owner。 */
+  createPipe?: (options: Record<string, unknown>) => Promise<any>;
+  /** 测试/嵌入方可替换协议；生产默认使用 BrowserUseClient。 */
+  createProtocol?: (
+    pipe: any,
     api: NativePipeApiImpl,
     callbacks: {
       onMoveMouseError(error: unknown, context: { tabId: string }): void;
-      onWebMcpToolInvoked(invocation: WebMcpToolInvocation): void;
+      onWebMcpToolInvoked(invocation: unknown): void;
     },
-  ): NativePipeProtocol;
+  ) => NativePipeProtocol;
   apiImpl: NativePipeApiImpl;
+  nativePipeDirectory?: string;
+  maxOutgoingFrameBytes?: number;
   pipePath?: string;
-}): Promise<{ dispose(): void; pipePath: string }> {
-  const pipe = await createPipe({
-    maxIncomingFrameBytes: MAX_INCOMING_FRAME_BYTES,
-    maxOutgoingFrameBytes: MAX_OUTGOING_FRAME_BYTES,
-    pipePath: requestedPipePath,
-  });
-  const protocol = createProtocol(pipe, apiImpl, {
+  socketPeerAuthorizer: (socket: unknown) => { authorized: boolean; reason?: string };
+}): Promise<{ dispose(): Promise<void>; pipePath: string }> {
+  let pipe: any;
+  try {
+    pipe = await (createPipe ?? createNativePipeServer)({
+      nativePipeDirectory,
+      maxIncomingFrameBytes: MAX_INCOMING_FRAME_BYTES,
+      maxOutgoingFrameBytes,
+      pipePath: requestedPipePath,
+      socketPeerAuthorizer,
+      events: {
+        onListening(pipePath: string) {
+          logger().info(`browser-use native pipe listening`, { safe: {}, sensitive: { pipePath } });
+        },
+        onAuthorizationError(error: unknown) {
+          logger().warning(`browser-use native pipe peer authorization failed`, { safe: {}, sensitive: { error } });
+        },
+        onRejectedSocket(result: { reason?: string }) {
+          logger().warning(`browser-use native pipe rejected socket peer`, {
+            safe: { reason: result.reason ?? `unauthorized` },
+            sensitive: {},
+          });
+        },
+        onSocketError(error: unknown) {
+          logger().warning(`browser-use native pipe socket error`, { safe: {}, sensitive: { error } });
+        },
+      },
+    });
+  } catch (error) {
+    apiImpl.dispose();
+    throw error;
+  }
+  const protocol = (
+    createProtocol ?? ((transport, handler, options) => new BrowserUseClient(transport, handler, options))
+  )(pipe, apiImpl, {
     onMoveMouseError(error, context) {
-      void error;
-      void context.tabId;
-      // 原文：IAB_LIFECYCLE failed to move browser use cursor（warning）
+      logger().warning(`IAB_LIFECYCLE failed to move browser use cursor`, {
+        safe: { tabId: context.tabId },
+        sensitive: { error },
+      });
     },
     onWebMcpToolInvoked(invocation) {
-      apiImpl.notifyWebMcpToolInvoked(invocation);
+      const parsed = parseWebMcpToolInvocation(invocation);
+      if (parsed != null) apiImpl.notifyWebMcpToolInvoked(parsed);
     },
   });
   const unsubscribes: Array<() => void> = [];
@@ -124,9 +180,15 @@ export async function createBrowserUseNativePipeServer({
       try {
         protocol.sendCdpEvent(event);
       } catch (error) {
-        if (!(error instanceof NativePipeFrameTooLargeError)) throw error;
-        // 原文：browser-use native pipe skipped oversized CDP event（warning，
-        // 含 cdpMethod/maxFrameBytes/messageBytes）
+        if (!(error instanceof PipeFrameLimitError)) throw error;
+        logger().warning(`browser-use native pipe skipped oversized CDP event`, {
+          safe: {
+            cdpMethod: event.method,
+            maxFrameBytes: error.maxFrameBytes,
+            messageBytes: error.messageBytes,
+          },
+          sensitive: {},
+        });
       }
     }),
   );
@@ -141,10 +203,11 @@ export async function createBrowserUseNativePipeServer({
     );
   }
   return {
-    dispose() {
+    async dispose() {
       for (const unsubscribe of unsubscribes) unsubscribe();
-      protocol.dispose();
-      pipe.dispose();
+      apiImpl.dispose();
+      if (typeof pipe.close === `function`) await pipe.close();
+      else await pipe.dispose?.();
     },
     pipePath: pipe.pipePath,
   };

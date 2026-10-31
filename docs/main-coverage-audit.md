@@ -1,5 +1,14 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 native-pipe foundation and browser server restoration
+
+主 chunk 的 Browser Use RPC/config 与 `Bl…zse` 共约 925 行 JSON-RPC admission、command dispatch、framing、stream decoder、pipe client/server、
+Chrome provider discovery、socket routing、路径清理与 macOS peer authorization 已由 `browser-use/rpc-client.ts`、`native-pipe/protocol.ts`、
+`server.ts`、`peer-socket-authorizer.ts` 替代；保留旧 dynamic-app-tools/node-repl consumer
+所需的三个兼容绑定，定义主体物理删除。原 `browser-use/native-pipe-server.ts` 的 dependency-only skeleton 同步恢复为真实生产 owner，补齐日志、
+schema admission、失败清理和 async close，main 的 Browser Session Registry 改接语义工厂并删除 `JYe`。focused suites 覆盖帧拆包、分片、超限、
+真实 socket client-id 路由、事件转发、WebMCP guard、启动失败与 consumer absence。
+
 ## 2026-11-01 turn control large-batch consolidation
 
 本批一次核对并删除约 1,300 行连续旧 owner：runtime/workspace state 推导、turn 权限与 dispatch、unconfirmed submission、turn start、steer/stop。
