@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Met/Het` artifact disposable RPC adapters 迁入 `artifacts/artifact-rpc-services.ts`；external-document
+activate/unbind 与 artifact-session append/dirty/readAsset/unsubscribe forwarding 及 dispose cleanup 均由新 owners
+持有。两个 runtime factories 已接回，旧 classes 已删除。focused test 覆盖 15 项。
+
 随后将 `Det` artifact document store、durable schemas 与全部独占 persistence/hash/compaction/materialization helpers
 迁入 `artifacts/artifact-document-store.ts`；record integrity、atomic temp writes、idempotent append、update collision、
 compaction、clean-session refresh 与 materialization journal/reconciliation 均由新 owner 持有。唯一 runtime consumer

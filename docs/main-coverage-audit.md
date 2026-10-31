@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 artifact RPC services
+
+原 `Met/Het` 已迁入 `src/main/main-app/artifacts/artifact-rpc-services.ts`。新 adapters 保留 external document
+activate/unbind 与 artifact-session append/dirty/readAsset/unsubscribe 转发，并保持 dispose 直接触发资源释放的原始
+语义；两个 runtime factories 已接回，旧 classes 已删除。
+
 ## 2026-10-31 artifact document store
 
 原 `bet/xet/E8/D8/Cet/wet/O8/Tet/Eet/k8/A8/j8/Det/M8/N8/Oet/P8/ket/F8/I8/L8/R8/z8/B8/V8/H8/U8/W8/G8/K8/q8/J8/Y8`

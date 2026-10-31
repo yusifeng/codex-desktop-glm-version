@@ -101,6 +101,7 @@ const { createRemoteRpcServices } = require("./main-app/remote/remote-rpc-servic
 const { createRemoteHostConfigRuntime } = require("./main-app/remote/host-config-runtime.js");
 const { createArtifactDocumentsClass } = require("./main-app/artifacts/artifact-documents.js");
 const { createArtifactDocumentStoreClass } = require("./main-app/artifacts/artifact-document-store.js");
+const { createArtifactRpcServices } = require("./main-app/artifacts/artifact-rpc-services.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -138237,22 +138238,10 @@ var X8 = n.wf({ bindingId: n.Of().min(1) }),
     crdtUpdateBase64: n.Of(),
   }),
   jet = ExternalDocumentBindingRegistry,
-  Met = class extends n.Uf {
-    activateDocument;
-    unbindDocument;
-    constructor(e, t) {
-      (super(), (this.activateDocument = e), (this.unbindDocument = t));
-    }
-    activate(e) {
-      return this.activateDocument(e);
-    }
-    unbind() {
-      return this.unbindDocument();
-    }
-    [Symbol.dispose]() {
-      this.unbind();
-    }
-  },
+  {
+    ExternalDocumentBindingSession: Met,
+    ArtifactSessionOperationsSubscription: Het,
+  } = createArtifactRpcServices({ RpcHandlerBase: n.Uf }),
   Pet = n.vf(`artifactType`, [
     n.wf({
       artifactRef: n.Of().min(1),
@@ -138298,28 +138287,7 @@ function Iet(e, t) {
     path: n.data.value.path,
   };
 }
-var Vet = ArtifactSessionHostService,
-  Het = class extends n.Uf {
-    operations;
-    constructor(e) {
-      (super(), (this.operations = e));
-    }
-    append(e) {
-      return this.operations.append(e);
-    }
-    markDirty() {
-      this.operations.markDirty();
-    }
-    readAsset(e) {
-      return this.operations.readAsset(e);
-    }
-    unsubscribe() {
-      this.operations.unsubscribe();
-    }
-    [Symbol.dispose]() {
-      this.unsubscribe();
-    }
-  };
+var Vet = ArtifactSessionHostService;
 async function Uet(e) {
   let t = await import((0, c.pathToFileURL)(e.hostClientModulePath).href);
   if (typeof t.ArtifactSessionHostRpcClient != `function`)
