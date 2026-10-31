@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+恢复完整 browser comment controller：新增 `browser-sidebar/browser-comment-controller.ts`，迁出真实 `hGe` 的 popup/runtime/overlay 路由、
+comment/design editor、multi-anchor、direct/saved screenshot、CDP provenance、snapshot sync、waiter/abort/WeakMap 状态与清理。59-method/
+68-member owner 复用已迁 overlay manager 和 browser delegate，不复制 page/thread 状态；主 chunk 约 1,597 行旧 class 删除。focused suite
+执行 36 条行为/结构/接线断言，overlay 42 条回归继续通过，防空壳审计扩至 29 条。
+
 恢复完整 browser comment overlay lifecycle owner：新增 `browser-sidebar/browser-comment-overlay-manager.ts`，接管真实 `JWe` 的 session、
 window claim、owner focus/visibility、preview/editor、annotation selection、conversation transfer、placement geometry、dismiss/close 和 timer/listener
 cleanup；原 11-member `prepare()` no-op skeleton 不再是实现基础。`hGe` consumer 已真实接回，主 chunk 约 1,058 行旧 class/helper 删除，

@@ -233,11 +233,15 @@ for (const member of [
 ]) equal(members.includes(member), true);
 
 const main = fs.readFileSync(join(root, ".reference/originals/main/main-C-Mhak1n.ts"), "utf8");
+const commentController = fs.readFileSync(
+  join(root, "src/main/main-app/browser-sidebar/browser-comment-controller.ts"),
+  "utf8",
+);
 equal(main.includes('require("./main-app/browser-sidebar/browser-comment-overlay-manager.js")'), true);
 equal(main.includes("var JWe = createBrowserCommentOverlayManagerClass({"), true);
 equal(main.includes("JWe = class"), false);
 equal(main.includes("function XWe("), false);
 equal(main.includes("function pK("), false);
-equal(main.includes("new JWe(e, t)"), true);
+equal(commentController.includes("new JWe(e, t)"), true);
 
 console.log(`${assertions} main browser comment overlay owner assertions passed`);

@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 browser comment controller owner restoration
+
+新增完整 `browser-sidebar/browser-comment-controller.ts`，替代此前已删除的 8-member partial skeleton，并迁出真实 `hGe` 的 59-method/
+68-member controller：popup claim、runtime/overlay message routing、comment/design editor、multi-anchor、direct/saved screenshot、CDP provenance、
+runtime snapshot sync、waiter/abort/WeakMap 状态与 close cleanup 均保留。依赖边界显式复用 overlay owner、browser delegate 和既有 anchor/design/
+screenshot helpers，不复制 thread/page 状态。主 chunk 原 class 约 1,597 行删除；36 条 focused 行为/结构/接线断言通过，防空壳审计扩至 29 条。
+
 ## 2026-11-01 browser comment overlay lifecycle owner restoration
 
 新增完整 `browser-sidebar/browser-comment-overlay-manager.ts`，替代此前已删除的 11-member/no-op skeleton，并迁出真实 `JWe` 的
