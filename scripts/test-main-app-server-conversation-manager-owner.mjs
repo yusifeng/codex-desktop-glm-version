@@ -91,9 +91,9 @@ const main = fs.readFileSync(
   "utf8",
 );
 equal(main.includes('require("./main-app/conversation/app-server-manager.js")'), true);
-equal(main.includes("rw = AppServerConversationManager"), true);
+equal(main.includes("rw = AppServerConversationManager"), false);
 equal(main.includes("rw = class"), false);
-equal(main.includes("rw.addTurnStartRequestedListener"), true);
-equal(main.includes("rw.dispose(h)"), true);
+equal(main.includes("new AppServerConversationManager({"), true);
+equal(main.includes("AppServerConversationManager.dispose(h)"), true);
 
 console.log(`${assertions} main app-server conversation manager owner assertions passed`);

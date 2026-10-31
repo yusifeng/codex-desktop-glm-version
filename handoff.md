@@ -1,5 +1,8 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+大批收敛 turn control 链：一次删除主 chunk 约 1,300 行 workspace-resolution、turn-dispatch、turn-steer 连续旧副本；真实 start/steer/stop
+consumer 已由 AppServerConversationManager 接到语义 owner。相邻 realtime session-recorder 压缩别名同步消除，桌面启动和依赖注入直接使用命名导出。
+
 大批收敛 conversation/realtime/automation 链：删除主 chunk 2,489 行已被语义模块真实替代的重复实现，包括 realtime handoff parser 与
 RealtimeThreadState、resume buffer、goal resume、thread-start deferral、unread/prewarm、conversation creation helpers、queued follow-up factory、
 完整 turn-context/annotation/queued-input 副本，以及 marked extension/push registration 副本。唯一跨块 annotation fallback consumer 改接

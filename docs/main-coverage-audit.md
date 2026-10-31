@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 turn control large-batch consolidation
+
+本批一次核对并删除约 1,300 行连续旧 owner：runtime/workspace state 推导、turn 权限与 dispatch、unconfirmed submission、turn start、steer/stop。
+AppServerConversationManager 已真实消费 `workspace-resolution.ts`、`turn-dispatch.ts`、`turn-steer.ts`；focused suite 锁定语义导出、consumer wiring
+与压缩定义缺席。相邻 session-recorder 四个别名也被直接命名 consumer 替代。
+
 ## 2026-11-01 conversation/realtime/automation large-batch consolidation
 
 本批不按微小 owner 拆提交，一次核对并移除 2,489 行 dead duplicate：realtime parser/state、stream replay buffer、goal resume、notification

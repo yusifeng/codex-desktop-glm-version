@@ -114,12 +114,16 @@ const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
 );
-equal(main.includes("kwe = readRealtimeSessionLogForFeedback"), true);
-equal(main.includes("Awe = RecordingGate"), true);
-equal(main.includes("mw = RealtimeSessionRecorder"), true);
-equal(main.includes("Lwe = VoiceTimelineLedger"), true);
+equal(main.includes("kwe = readRealtimeSessionLogForFeedback"), false);
+equal(main.includes("Awe = RecordingGate"), false);
+equal(main.includes("mw = RealtimeSessionRecorder"), false);
+equal(main.includes("Lwe = VoiceTimelineLedger"), false);
 equal(main.includes("mw = class"), false);
 equal(main.includes("Lwe = class"), false);
-equal(main.includes("ie = new mw({"), true);
+equal(main.includes("ie = new RealtimeSessionRecorder({"), true);
+equal(main.includes("re = new RecordingGate()"), true);
+equal(main.includes("rootDirectory: RealtimeSessionRecorder.getRootDirectory"), true);
+equal(main.includes("kwe: readRealtimeSessionLogForFeedback"), true);
+equal(main.includes("Lwe: VoiceTimelineLedger"), true);
 
 console.log(`${assertions} main realtime session recorder owner assertions passed`);
