@@ -4981,3 +4981,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   跨 page command/binding controller 的 panel helpers 也改由语义 owner 导出。
 - 修复 dispatcher 混用 wrapper/input 两个 Electron 回调参数的潜在运行时错误；main 旧 `qBe..yU` 约 438 行已删除。
   focused coverage 28 项，no-unwired gate 扩至 401 项。下一批从 browser-sidebar manager 相邻 owner 继续整带审计。
+
+# 2026-11-01 browser error-pages and image attachments wiring
+
+- `browser-sidebar/error-pages.ts` 已接管 image attachment lifecycle、annotation snapshot、context-menu ids 与完整 error/crash
+  interstitial；修复 pending-design snapshot 签名及 crash URL policy 默认注入。
+- main 旧 `pVe..VU` 约 691 行整带删除。focused coverage 32 项，no-unwired gate 扩至 408 项；下一批从紧随其后的 page-store
+  与 browser manager helpers 继续审计。

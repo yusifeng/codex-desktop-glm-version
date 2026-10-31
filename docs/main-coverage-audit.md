@@ -3025,3 +3025,10 @@ focused test 27 项覆盖 URL policy、route identity、IAB/deep-link/external/S
 dispatcher 将 Electron wrapper event 与 input event 混为同一参数的问题，并导出跨 browser controller 共用的 panel resolver。
 原始 chunk 中 `qBe..yU` 约 438 行重复实现已整带删除；focused test 覆盖缓存、过期、URL 归一、快捷键、面板动作和双参数分派，
 no-unwired gate 扩至 401 项。
+
+### 增量接线：browser error-pages 与 image attachments
+
+`browser-sidebar/error-pages.ts` 已成为图片附件 fetch/挂起/拖拽释放、annotation snapshot 切换、错误页内容/HTML、导航错误分类
+和 context-menu message ids 的唯一 owner。接线时修复 `hasPendingDesignChange` 错把 snapshot 当成外层 tab 的签名，并为 crash
+page 恢复默认 secure/local URL policy 注入。原始 chunk 中 `pVe..VU` 约 691 行（含整套 interstitial HTML/CSS/JS 与图标）已
+物理删除。focused test 覆盖附件、清理、snapshot、HTML/error classification 与真实接线；no-unwired gate 扩至 408 项。

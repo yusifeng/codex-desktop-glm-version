@@ -62,6 +62,7 @@ const realOwners = [
   ["src/main/main-app/browser/link-opening.ts", "openLinkInPreferredTarget"],
   ["src/main/main-app/browser-sidebar/comment-site-status.ts", "createCommentModeSiteStatus"],
   ["src/main/main-app/browser-sidebar/app-shell-keyboard.ts", "createAppShellKeyboardDispatcher"],
+  ["src/main/main-app/browser-sidebar/error-pages.ts", "buildCrashErrorPage"],
   ["src/main/main-app/browser-sidebar/browser-host-service.ts", "createBrowserHostServiceClass"],
   ["src/main/main-app/window/browser-window-rpc-services.ts", "createBrowserProfileImportServiceClass"],
   ["src/main/main-app/browser-sidebar/browser-history-service.ts", "createBrowserHistoryServiceClass"],
@@ -119,6 +120,7 @@ assert.equal(main.includes('require("./main-app/util/app-paths.js")'), true, "ap
 assert.equal(main.includes('require("./main-app/browser/link-opening.js")'), true, "link opening runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/comment-site-status.js")'), true, "comment site status runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/app-shell-keyboard.js")'), true, "app-shell keyboard runtime is wired");
+assert.equal(main.includes('require("./main-app/browser-sidebar/error-pages.js")'), true, "browser error-pages runtime is wired");
 assert.equal(main.includes("async function QRe("), false, "generated LaTeX compiler must be removed");
 assert.equal(main.includes("async function lze("), false, "generated internal plugin downloader must be removed");
 assert.equal(main.includes("function qV("), false, "generated global hotkey owner must be removed");
@@ -129,6 +131,10 @@ assert.equal(main.includes("function ZBe("), false, "generated comment site stat
 assert.equal(main.includes("function iU("), false, "generated app-shell zoom policy must be removed");
 assert.equal(main.includes("function uVe("), false, "generated app-shell keyboard dispatcher must be removed");
 assert.equal(main.includes("function yU("), false, "generated close-tab accelerator owner must be removed");
+assert.equal(main.includes("function mVe("), false, "generated image attachment suspension owner must be removed");
+assert.equal(main.includes("async function xU("), false, "generated browser image attachment owner must be removed");
+assert.equal(main.includes("function OHe("), false, "generated browser error-page renderer must be removed");
+assert.equal(main.includes("function VU("), false, "generated embedded JSON serializer must be removed");
 assert.equal(main.includes("function _Ie("), false, "generated external-agent handlers must be removed");
 assert.equal(main.includes("function lIe("), false, "generated Cowork adapter wrapper must be removed");
 assert.equal(main.includes("async function VIe("), false, "generated imported-project finalizer must be removed");
@@ -386,4 +392,4 @@ assert.equal(main.includes("function _Oe("), false, "generated remote project co
 assert.equal(main.includes("function vOe("), false, "generated project order comparator must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("401 main unwired-owner skeleton assertions passed");
+console.log("408 main unwired-owner skeleton assertions passed");

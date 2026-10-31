@@ -24,6 +24,7 @@ import {
   gu as annotationFlows,
 } from "@chunk/shared";
 import { memoizedTaggedLogger } from "@chunk/logger";
+import { isSecureOrLocalHttpUrl } from "../browser/link-opening";
 
 const logger = memoizedTaggedLogger("browser-sidebar-manager");
 
@@ -244,8 +245,8 @@ export interface AnnotationTabState {
 }
 
 /** 最后一条注释是否设计变更（原 `yVe`）。 */
-export function hasPendingDesignChange(tab: { snapshot: AnnotationSnapshot }, inCommentMode: boolean): boolean {
-  return inCommentMode ? tab.snapshot.comments?.at(-1)?.designChange != null : false;
+export function hasPendingDesignChange(snapshot: AnnotationSnapshot, inCommentMode: boolean): boolean {
+  return inCommentMode ? snapshot.comments?.at(-1)?.designChange != null : false;
 }
 
 /** 模式切换后的快照（原 `EU`）：注释字段全部复位。 */
@@ -442,7 +443,7 @@ function loadErrorMessage(errorCode: string): LocalizedMessage {
 }
 
 /** 错误页总装（原 `MU`）：data: URL + encodeURIComponent(HTML)。 */
-function buildLoadErrorPage({ content, errorCode, errorDescription, failedUrl }: { content: InterstitialContent; errorCode: number; errorDescription: string; failedUrl: string }): LoadErrorPage {
+export function buildLoadErrorPage({ content, errorCode, errorDescription, failedUrl }: { content: InterstitialContent; errorCode: number; errorDescription: string; failedUrl: string }): LoadErrorPage {
   const description = normalizedErrorDescription(errorDescription);
   return {
     errorCode,
@@ -482,7 +483,7 @@ export function buildLoadErrorContent({ errorDescription, failedUrl, formatMessa
 }
 
 /** 崩溃错误页（原 `THe`）：外开按钮（https/本地 http 且非默认浏览器时）。 */
-export function buildCrashErrorPage({ failedUrl, formatMessage, isDefaultBrowser, runtimeIntlConfig, isSecureOrLocalHttp }: { failedUrl: string; formatMessage: FormatMessage; isDefaultBrowser: boolean; runtimeIntlConfig: RuntimeIntlConfig; isSecureOrLocalHttp(url: string): boolean }): LoadErrorPage {
+export function buildCrashErrorPage({ failedUrl, formatMessage, isDefaultBrowser, runtimeIntlConfig, isSecureOrLocalHttp = isSecureOrLocalHttpUrl }: { failedUrl: string; formatMessage: FormatMessage; isDefaultBrowser: boolean; runtimeIntlConfig: RuntimeIntlConfig; isSecureOrLocalHttp?(url: string): boolean }): LoadErrorPage {
   const host = hostOf(failedUrl);
   const language = localeOf(runtimeIntlConfig);
   return buildLoadErrorPage({
