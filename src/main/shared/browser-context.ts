@@ -111,6 +111,9 @@ export const ANNOTATION_FLOWS = {
   QUICK: "quick",
 } as const;
 
+/** Maximum selection rectangles accepted by annotation payload schemas (原 `Hy`，导出 `yu`)。 */
+export const MAX_ANNOTATION_SELECTION_RECTS = 1_000;
+
 /** 流配置（原 `Ny`）。 */
 const ANNOTATION_FLOW_CONFIGS: Record<string, { defaultSubmitMode: string; persistent: boolean }> = {
   [ANNOTATION_FLOWS.BATCH]: { defaultSubmitMode: "saved", persistent: true },
@@ -272,4 +275,5 @@ export {
   colorForThreadStatus as tf,
   visualizationDateOf as qi,
   changeTouchesVisualizationArtifact as Ji,
+  MAX_ANNOTATION_SELECTION_RECTS as yu,
 };

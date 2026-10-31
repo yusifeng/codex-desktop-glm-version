@@ -25,6 +25,8 @@
 //
 // 兼容导出：Kc/Vc/Rc/zc/Fc/Lc/Pc/Bc/Ic/Nc/Mc/Wc/Hc/Gc。
 
+import { z } from "zod";
+
 // ---------------------------------------------------------------------------
 // 字符串合法性（原 `cS`）
 // ---------------------------------------------------------------------------
@@ -54,6 +56,9 @@ export const BROWSER_PLUGIN_DESCRIPTORS = {
   chromeDev: "chrome-dev@openai-bundled",
   chromeInternal: "chrome-internal@openai-bundled",
 } as const;
+
+/** Browser page kinds used by IAB snapshots (原 `tb`，导出 `lu`)。 */
+export const BROWSER_TAB_TYPES = { NEW_TAB_PAGE: "new-tab-page", WEB: "web" } as const;
 
 // ---------------------------------------------------------------------------
 // 尺寸常量与校验（原 `rS`..`xS`）
@@ -89,6 +94,12 @@ export function parseFaviconDataUrl(value: string): string | null {
     value.slice(value.indexOf(",") + 1).length % 4 == 0
     ? value
     : null;
+}
+
+/** Case-insensitive all-token query match across tab title and URL (原 `sS`，导出 `qc`)。 */
+export function matchesBrowserTabQuery(snapshot: { title: string; url: string }, query: string): boolean {
+  const haystack = `${snapshot.title}\n${snapshot.url}`.toLowerCase();
+  return query.trim().toLowerCase().split(/\s+/).filter(Boolean).every((token) => haystack.includes(token));
 }
 
 /** 短字符串校验（原 `SS`/`CS`）。 */
@@ -156,6 +167,9 @@ export function parseBrowserTabMention(input: unknown): BrowserTabMention | null
     ? null
     : { browserId, pluginId, source, tabId, snapshot };
 }
+
+/** Browser tab candidate schema (原 `hS`，导出 `Uc`)。 */
+export const browserTabMentionSchema = z.custom<BrowserTabMention>((input) => parseBrowserTabMention(input) != null);
 
 // ---------------------------------------------------------------------------
 // 序列化（原 `TS`/`vS`/`bS`/`yS`/`_S`）
@@ -729,4 +743,8 @@ export {
   tabDedupeKey as Wc,
   mentionsWithinBudget as Hc,
   deserializeBrowserTabMention as Gc,
+  browserTabMentionSchema as Uc,
+  parseFaviconDataUrl as Jc,
+  matchesBrowserTabQuery as qc,
+  BROWSER_TAB_TYPES as lu,
 };

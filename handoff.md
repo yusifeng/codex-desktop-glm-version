@@ -5316,3 +5316,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 
 - `hotkey-window-lifecycle-manager.ts` 直接拥有 `focusComposerNonce` detail state，并通过可注入 `now` 保持测试确定性；主 chunk 旧 `n9`
   删除，57 项 lifecycle 回归通过，no-unwired gate 扩至 590 项。
+
+# 2026-11-01 shared export evidence and consumption convergence
+
+- 完成 shared 692 导出全量证据收敛：12 个旧 `unlocated` 映射全部补全原始行号、zone、signature，生成器现会在
+  任一证据缺失或文档 stale 时失败。原 `unlocated-runtime.ts` 的 permission profile、browser plugin id、direct-transfer
+  上限和 elicitation URL parser 已分别进入 sandbox/app constants/host/elicitation owners，临时聚合层删除。
+- 将 `audit-shared-consumption` 剩余 13 个真实消费契约一次归零，包括 browser tab contracts、dynamic tools、versioned
+  feature overrides、thread-start config、service tier、worktree/project ordering 与 elicitation policy。聚焦测试 115 项，证明
+  `0 unlocated` 且 `0 consumed-unsemantic`；本批次源码/测试/审计总体净新增，删除仅是被拆回真实 owner 的临时文件。

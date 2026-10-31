@@ -208,6 +208,9 @@ export const INBOX_ITEM_CHANGE = { CHANGED: "inbox-items-changed" } as const;
 /** 344×344 弹窗尺寸（原 `Wy`，导出 `bu`）。 */
 export const POPUP_WINDOW_SIZE = { width: 344, height: 344 } as const;
 
+/** Hotkey window home route (原 `tk`/`nk`，导出 `co`)。 */
+export const HOTKEY_WINDOW_ROUTE = "/hotkey-window";
+
 /** claude-cowork marketplace 名（原 `lb`，导出 `uu`）。 */
 export const COWORK_MARKETPLACE_NAME = "claude-cowork";
 
@@ -217,6 +220,9 @@ export const COWORK_MARKETPLACE_NAME = "claude-cowork";
 
 /** browser 插件名（原 `pb`，导出 `ou`）。 */
 export const BROWSER_PLUGIN_NAME = "browser";
+
+/** Persistent Electron session used by browser settings webviews (原 `gx`/`vx`，导出 `rl`)。 */
+export const BROWSER_APP_PARTITION = "persist:codex-browser-app";
 
 /** chrome 插件名（原 `Ab`，导出 `Ml`）。 */
 export const CHROME_PLUGIN_NAME = "chrome";
@@ -466,8 +472,11 @@ export {
   BuildFlavor as cu,
   INBOX_ITEM_CHANGE as fu,
   POPUP_WINDOW_SIZE as bu,
+  HOTKEY_WINDOW_ROUTE as co,
   COWORK_MARKETPLACE_NAME as uu,
   BROWSER_PLUGIN_NAME as ou,
+  BROWSER_PLUGIN_NAME as kl,
+  BROWSER_APP_PARTITION as rl,
   BROWSER_USE_PLUGIN_NAME as su,
   CHROME_PLUGIN_NAME as Ml,
   CHROME_DEV_PLUGIN_NAME as Al,

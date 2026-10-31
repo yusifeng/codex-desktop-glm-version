@@ -396,6 +396,59 @@ const PLUGIN_MCP_CONFIG_OVERRIDE_KEY = "plugins.codex-app-tools@openai-bundled.m
 /** 内建 MCP 配置覆盖键（原 `CC`）。 */
 const BUILTIN_MCP_CONFIG_OVERRIDE_KEY = "mcp_servers.codex_app.enabled_tools";
 
+/** Dynamic-tool namespaces exposed by the desktop native-pipe server (原 `bC`，导出 `wc`)。 */
+export const DYNAMIC_TOOL_NAMESPACES = ["codex_app", "openai_settings", "plugin_management"] as const;
+
+const THREAD_OWNED_DYNAMIC_TOOLS = new Set([
+  "automation_update",
+  "create_thread",
+  "send_message_to_thread",
+  "fork_thread",
+  "handoff_thread",
+]);
+
+/** Remove thread-owned tools before serializing native dynamic tools (原 `TC`，导出 `Oc`)。 */
+export function serializeDynamicTools(tools: any[]): any[] {
+  return tools
+    .filter((tool) => tool.type !== "function" || !THREAD_OWNED_DYNAMIC_TOOLS.has(tool.name))
+    .map((tool) => tool.type === "namespace" && tool.name === "codex_app"
+      ? { ...tool, tools: tool.tools.filter(({ name }: { name: string }) => !THREAD_OWNED_DYNAMIC_TOOLS.has(name)) }
+      : tool);
+}
+
+const VERSIONED_FEATURES: Record<string, string> = {
+  apply_patch_preserve_line_endings: "applyPatchPreserveLineEndings",
+  compaction_image_budget: "compactionImageBudget",
+  deferred_tool_world_state: "deferredToolWorldState",
+  mcp_oauth_refresh_coordination: "mcpOauthRefreshCoordination",
+  recommended_plugins: "recommendedPlugins",
+};
+
+/** Strip feature overrides unsupported by the active app-server (原 `Aw`，导出 `ic`)。 */
+export function versionedFeatureOverrides(overrides: Record<string, unknown> | null | undefined, version: string | null): Record<string, unknown> | null | undefined {
+  if (!overrides) return overrides;
+  const accepted = { ...overrides };
+  for (const [key, feature] of Object.entries(VERSIONED_FEATURES))
+    if (accepted[key] != null && !appServerSupportsFeature(version, feature)) delete accepted[key];
+  const guardian = accepted[GUARDIAN_V2_CONFIG_KEY];
+  if (guardian && typeof guardian === "object" && !Array.isArray(guardian) && !appServerSupportsFeature(version, "guardianV2StructuredConfig"))
+    accepted[GUARDIAN_V2_CONFIG_KEY] = (guardian as { enabled?: unknown }).enabled === true;
+  return accepted;
+}
+
+const RESERVED_FEATURE_OVERRIDES = new Set(["auth_elicitation", "plugins", "apps", "tool_suggest", "tool_call_mcp_elicitation", "writing_blocks"]);
+
+/** Merge feature flags into a thread-start config (原 `jw`/`Mw`，导出 `nc`)。 */
+export function applyFeatureOverrides<T extends Record<string, any>>(config: T, overrides: Record<string, unknown> | null | undefined): T {
+  if (!overrides || Object.keys(overrides).length === 0) return config;
+  const features: Record<string, unknown> = {};
+  for (const [rawKey, value] of Object.entries(overrides)) {
+    const key = rawKey.startsWith(FEATURES_PREFIX) ? rawKey.slice(FEATURES_PREFIX.length) : rawKey;
+    if (!RESERVED_FEATURE_OVERRIDES.has(key)) features[`${FEATURES_PREFIX}${key}`] = value;
+  }
+  return { ...config, config: { ...features, ...config.config } };
+}
+
 /** config 覆盖键（原 `wC`，导出 `Dc`）。 */
 export function configOverrideKeyForVersion(appServerVersion: string | null): string {
   return appServerSupportsFeature(appServerVersion, "pluginMcpConfigOverrides") ? PLUGIN_MCP_CONFIG_OVERRIDE_KEY : BUILTIN_MCP_CONFIG_OVERRIDE_KEY;
@@ -452,4 +505,8 @@ export {
   composeFeatureOverrides as tc,
   configKeyPath as oc,
   configOverrideKeyForVersion as Dc,
+  DYNAMIC_TOOL_NAMESPACES as wc,
+  serializeDynamicTools as Oc,
+  versionedFeatureOverrides as ic,
+  applyFeatureOverrides as nc,
 };

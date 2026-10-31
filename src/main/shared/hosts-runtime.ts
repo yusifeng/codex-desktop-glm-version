@@ -27,6 +27,66 @@ export const GIT_SOURCE_HEADER_KEY = "x-codex-git-source";
 export const LONG_LIVED_HOST_ID = "long-lived", DURABLE_HOST_ID = "durable";
 export const DEFAULT_THREAD_SOURCE_KINDS = ["local", "remote", "wsl", "ssh"] as const;
 export const archiveUndoDurationMs = 60_000;
+/** Resolve a requested/default service tier against config requirements (原 `PA`，导出 `Wa`)。 */
+export function resolveModelServiceTier(requirements: any, requested: string | null | undefined, enabled = true): string | null {
+  if (!enabled) return null;
+  if (requested == null) {
+    const fallback = requirements?.defaultServiceTier ?? null;
+    if (fallback == null) return null;
+    if (fallback === "fast")
+      return requirements?.serviceTiers?.find((tier: any) => [tier.id, tier.name].some((value) => String(value).trim().toLowerCase() === "fast" || String(value).trim().toLowerCase() === "priority"))?.id ?? null;
+    return requirements?.serviceTiers?.find((tier: any) => tier.id === fallback)?.id ?? null;
+  }
+  return requested === "default" ? null : requested;
+}
+
+/** Build the base app-server thread config (原 `$E`，导出 `Yo`)。 */
+export async function buildBaseThreadConfig(
+  model: unknown,
+  serviceTier: unknown,
+  readProxyConfig: (() => Promise<{ baseUrl: string; secret: string } | null>) | null | undefined,
+  cwd: unknown,
+  _permissionsConfig: unknown,
+  readCodexConfig: (() => Promise<Record<string, unknown> | null>) | null | undefined,
+): Promise<Record<string, unknown>> {
+  const config: Record<string, unknown> = {};
+  const proxy = await readProxyConfig?.();
+  let modelProvider: string | null = null;
+  if (proxy != null) {
+    modelProvider = "codex_vscode_copilot";
+    config.model_provider = modelProvider;
+    config[`model_providers.${modelProvider}`] = {
+      name: "Copilot",
+      base_url: proxy.baseUrl,
+      experimental_bearer_token: proxy.secret,
+      wire_api: "responses",
+    };
+  }
+  const additional = await readCodexConfig?.();
+  if (additional) Object.assign(config, additional);
+  return { cwd, model, modelProvider, serviceTier, config };
+}
+
+/** Whether cwd is nested below a managed worktree root (原 `rA`，导出 `Za`)。 */
+export function isPathWithinWorktrees({ cwd, worktreesRoot }: { cwd: string | null; worktreesRoot?: string | null }): boolean {
+  const root = worktreesRoot?.trim();
+  if (cwd == null || !root) return false;
+  const normalizeComparable = (value: string) => value.replaceAll("\\", "/").replace(/\/+$/u, "");
+  const normalizedCwd = normalizeComparable(cwd);
+  const normalizedRoot = normalizeComparable(root);
+  if (normalizedCwd.startsWith(`${normalizedRoot}/`)) return true;
+  const windowsLike = (value: string) => /^[a-z]:[\\/]/i.test(value) || /^[\\/]{2}/u.test(value);
+  return (windowsLike(cwd) || windowsLike(root)) && normalizedCwd.toLowerCase().startsWith(`${normalizedRoot.toLowerCase()}/`);
+}
+
+/** Prepend one thread to a project's manual order without duplicates (原 `Rne`，导出 `wa`)。 */
+export function prependThreadToProject<T extends Record<string, any>>(orders: T, projectId: string, threadId: string): T {
+  const current = orders[projectId];
+  const threadIds = [threadId, ...(current?.threadIds ?? []).filter((id: string) => id !== threadId)];
+  return current != null && current.threadIds.length === threadIds.length && current.threadIds.every((id: string, index: number) => id === threadIds[index])
+    ? orders
+    : { ...orders, [projectId]: { threadIds } };
+}
 export const settingsGroup = (key: string): string => key.split(".")[0] ?? key;
 export const settingsKeys = (keys: readonly string[]): string[] => [...keys];
 export const defaultModeSettings = Object.freeze({}), conversationDetailSettings = Object.freeze({});
@@ -51,6 +111,10 @@ export const parseStoredJson = (value: unknown): unknown => { if (typeof value !
 export const permissionSelectionToRequestFields = ({ permissionSelection }: { permissionSelection: unknown }): Record<string, unknown> => permissionSelection && typeof permissionSelection === "object" ? permissionSelection as Record<string, unknown> : {};
 export const isDeleteChange = changeTouchesVisualizationArtifact;
 export const extractBundleOperationErrorCode = (error: unknown): string | null => errorToMessage(error).match(/(?:code|error_code)[=: ]+([a-z0-9_-]+)/i)?.[1] ?? null;
+/** Maximum byte prefix inspected by shared file-content classification (原 `iT`，导出 `Ls`)。 */
+export const FILE_CONTENT_SNIFF_BYTES = 4_096;
+/** Maximum non-image payload sent through direct transfer (原 `$y`，导出 `pu`)。 */
+export const MAX_DIRECT_TRANSFER_BYTES = 47_185_920;
 export const sniffContentKind = (value: Uint8Array | string): string => { const bytes = typeof value === "string" ? new TextEncoder().encode(value) : value; return bytes[0] === 0x25 && bytes[1] === 0x50 ? "pdf" : bytes[0] === 0x50 && bytes[1] === 0x4b ? "zip" : "unknown"; };
 export const withSpawnTracing = async <T>(operation: () => T | Promise<T>): Promise<T> => await operation();
 export const shouldUseWslPathsForHostConfig = (config: { kind?: string | null } | null | undefined): boolean => isWslPath(config?.kind ?? "");

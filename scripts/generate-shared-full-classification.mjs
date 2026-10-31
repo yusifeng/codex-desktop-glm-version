@@ -5,6 +5,12 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const map = JSON.parse(await fs.readFile(path.join(root, "docs/shared-export-map.json"), "utf8"));
 const dts = await fs.readFile(path.join(root, "src/main/types/chunk-modules.d.ts"), "utf8");
+const weakEvidence = Object.entries(map).filter(([, entry]) =>
+  !Number.isInteger(entry?.line) || entry.line <= 0 || entry.zone === "unlocated" || !entry?.zone || !entry?.signature
+);
+if (weakEvidence.length > 0) {
+  throw new Error(`Shared export evidence is incomplete: ${weakEvidence.map(([name]) => name).join(", ")}`);
+}
 const semantic = new Map();
 for (const statement of dts.matchAll(/export\s*\{([^}]*)\}\s*from\s*["']\.\.\/\.\.\/shared\/([^"']+)["']/g)) {
   for (const item of statement[1].split(",")) {
@@ -30,5 +36,10 @@ for (const name of Object.keys(map).sort()) {
   lines.push(`| \`${name}\` | \`${entry.internal ?? "?"}\` | ${entry.line ?? "?"} | ${entry.zone ?? "unlocated"} | ${classification} | ${evidence} |`);
 }
 const output = lines.join("\n") + "\n";
-if (process.argv.includes("--write")) await fs.writeFile(path.join(root, "docs/shared-full-classification.md"), output);
-else process.stdout.write(output);
+const outputPath = path.join(root, "docs/shared-full-classification.md");
+if (process.argv.includes("--write")) await fs.writeFile(outputPath, output);
+else if (process.argv.includes("--check")) {
+  const existing = await fs.readFile(outputPath, "utf8");
+  if (existing !== output) throw new Error("docs/shared-full-classification.md is stale; run with --write");
+  process.stdout.write(`Shared classification evidence complete: ${Object.keys(map).length} exports, 0 unlocated.\n`);
+} else process.stdout.write(output);

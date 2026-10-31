@@ -266,7 +266,7 @@ async function awaitStructuredTurn({
 // 临时线程生成（原 `L8`）
 // ---------------------------------------------------------------------------
 
-const EPHEMERAL_THREAD_TIMEOUT_MS = 30_000;
+export const EPHEMERAL_THREAD_TIMEOUT_MS = 30_000;
 
 /**
  * 临时线程生成（原 `L8`）：优先 forkThread（ephemeral + excludeTurns），
@@ -660,7 +660,9 @@ function commitPullRequestPrompt(context: string): string {
 // 生成器（原 `Aie`/`Mie`）
 // ---------------------------------------------------------------------------
 
-const EPHEMERAL_GENERATION_TIMEOUT_MS = 45_000;
+export const EPHEMERAL_GENERATION_TIMEOUT_MS = 45_000;
+/** Pull-request message generation timeout (原 `H8`，与通用生成超时同值但保留独立契约)。 */
+export const PULL_REQUEST_GENERATION_TIMEOUT_MS = 45_000;
 const EPHEMERAL_GENERATION_PROMPT_LIMIT = 20_000;
 const PR_PROMPT_LIMIT = 30_000;
 const COMMIT_PR_PROMPT_LIMIT = 40_000;
@@ -722,7 +724,7 @@ export class PullRequestMessageGenerator extends RpcTarget {
         prompt,
         serviceTier: null,
         signal,
-        timeoutMs: EPHEMERAL_GENERATION_TIMEOUT_MS,
+        timeoutMs: PULL_REQUEST_GENERATION_TIMEOUT_MS,
         ...PULL_REQUEST_GENERATION_BUNDLE,
       }),
     );
@@ -799,4 +801,7 @@ export {
   COMMIT_PULL_REQUEST_GENERATION_BUNDLE as ct,
   PULL_REQUEST_GENERATION_BUNDLE as lt,
   COMMIT_MESSAGE_GENERATION_BUNDLE as st,
+  EPHEMERAL_THREAD_TIMEOUT_MS as it,
+  PULL_REQUEST_GENERATION_TIMEOUT_MS as ot,
+  EPHEMERAL_GENERATION_TIMEOUT_MS as at,
 };

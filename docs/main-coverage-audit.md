@@ -3363,3 +3363,14 @@ deep-link listener、application menu manager、窗口导航与 dispose 顺序�
 
 `hotkey-window-lifecycle-manager.ts` 现直接拥有 detail route 的 `focusComposerNonce` 创建，并保留可注入 `now` 以确定性测试；主组合根
 不再注入单行 `n9`。三条 new/detail/collapse 路径继续共享同一 owner，57 项 lifecycle 回归覆盖未配置 hotkey 时的 focus state。
+
+### 整层收敛：shared export evidence 与在用契约
+
+`docs/shared-export-map.json` 的 692 个导出现全部具有原始行号、source zone 和签名，过去 12 个
+`unlocated` 项已根据 `src-DldfpmrL.ts` 实际定义定位，分类生成器新增强制完整性与 stale-output gate。
+文件嗅探上限、tab mention schema，hotkey route、browser partition、annotation rectangle 上限、生成超时以及原
+`unlocated-runtime.ts` 四项已回归各自语义 owner，临时聚合文件删除。
+
+同一批次进一步将消费审计剩余 13 项全部语义化：browser tab query/favicon/type、dynamic tool 过滤与
+namespace、versioned feature overrides、service-tier/base thread config、worktree containment、project thread ordering 和 elicitation
+approval/connector policy。`audit-shared-consumption` 从 13 降为 0；115 项 evidence/runtime 断言通过。

@@ -39,9 +39,21 @@
 // 兼容导出（17 个压缩名）：Md=__、Pd=m_、Nd=y_、jd=b_、kd=T_、
 // Od=E_、Dd=k_、Ad=A_、Fd=S_、Id=x_、Ld=s_。
 
+import { z } from "zod";
+
 // ---------------------------------------------------------------------------
 // 类型
 // ---------------------------------------------------------------------------
+
+/** Permission profiles accepted by the app-server protocol (原 `j_`，导出 `Ed`)。 */
+export const permissionProfileSchema = z.enum([
+  "read-only",
+  "auto",
+  "granular",
+  "guardian-approvals",
+  "full-access",
+  "custom",
+]);
 
 /** 沙箱策略。 */
 export type SandboxPolicy =
@@ -423,4 +435,5 @@ export {
   permissionSetAllowed as Fd,
   availablePermissionProfileKinds as Id,
   deepEquals as Ld,
+  permissionProfileSchema as Ed,
 };

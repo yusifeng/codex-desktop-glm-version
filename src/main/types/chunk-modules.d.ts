@@ -119,7 +119,7 @@ declare module "@chunk/shared" {
   export const Du: any; // 内部符号: Py
   export const E: any; // 内部符号: _se
   export { dynamicAppToolResultSchema as Ec } from "../../shared/app-config";
-  export { permissionProfileSchema as Ed } from "../../shared/unlocated-runtime";
+  export { permissionProfileSchema as Ed } from "../../shared/sandbox-permissions";
   export { Ef } from "../../shared/zod-facade";
   export const Ei: any; // 内部符号: DM
   export { stripDriveLetterSlash as El } from "../../shared/app-constants";
@@ -177,7 +177,7 @@ declare module "@chunk/shared" {
   export { ChunkedMessageSender as It } from "../../shared/chunked-message";
   export { BROWSER_CONTEXT_KINDS as Iu } from "../../shared/app-config";
   export const J: any; // 内部符号: dae
-  export const Jc: any; // 内部符号: oS
+  export { parseFaviconDataUrl as Jc } from "../../shared/browser-tab-mentions";
   export const Jd: any; // 内部符号: kg
   export { changeTouchesVisualizationArtifact as Ji } from "../../shared/browser-context";
   export { NODE_REPL_COMMAND_ENV_KEY as Jl } from "../../shared/app-constants";
@@ -208,7 +208,7 @@ declare module "@chunk/shared" {
   export { resolveNodePath as Ln } from "../../shared/mcp-runtime";
   export const Lo: any; // 内部符号: RD
   export { pruneNonCloudAutomations as Lr } from "../../shared/automation-registry";
-  export const Ls: any; // 内部符号: iT
+  export { FILE_CONTENT_SNIFF_BYTES as Ls } from "../../shared/hosts-runtime";
   export { resolveRealpaths as Lt } from "../../shared/realpath";
   export { parseBrowserContextKind as Lu } from "../../shared/browser-context";
   export { listInstalledApplications as M } from "../../shared/fs-diagnostics";
@@ -238,7 +238,7 @@ declare module "@chunk/shared" {
   export { commandAvailableForAccess as Nt } from "../../shared/command-registry";
   export const Nu: any; // 内部符号: Cy
   export const O: any; // 内部符号: ise
-  export const Oc: any; // 内部符号: TC
+  export { serializeDynamicTools as Oc } from "../../shared/app-config";
   export { readOnlyPermissions as Od } from "../../shared/sandbox-permissions";
   export { Of } from "../../shared/zod-facade";
   export { resolveCodexHome as Oi } from "../../shared/wsl-paths";
@@ -307,7 +307,7 @@ declare module "@chunk/shared" {
   export const Tu: any; // 内部符号: Ry
   export const U: any; // 内部符号: B5
   export const Ua: any; // 内部符号: FA
-  export const Uc: any; // 内部符号: hS
+  export { browserTabMentionSchema as Uc } from "../../shared/browser-tab-mentions";
   export const Ud: any; // 内部符号: Hg
   export { RpcTarget as Uf } from "../../shared/rpc-core";
   export { isWslPath as Ui } from "../../shared/wsl-paths";
@@ -331,7 +331,7 @@ declare module "@chunk/shared" {
   export { collectScheduledTemplates as Vt } from "../../shared/agent-instructions";
   export { buildMsixPackageIdentity as Vu } from "../../shared/app-server-version";
   export const W: any; // 内部符号: z5
-  export const Wa: any; // 内部符号: PA
+  export { resolveModelServiceTier as Wa } from "../../shared/hosts-runtime";
   export { tabDedupeKey as Wc } from "../../shared/browser-tab-mentions";
   export const Wd: any; // 内部符号: Rg
   export { connectRpc as Wf } from "../../shared/rpc-core";
@@ -357,13 +357,13 @@ declare module "@chunk/shared" {
   export const Yi: any; // 内部符号: Aj
   export { NODE_REPL_REQUEST_META_ENV_KEY as Yl } from "../../shared/app-constants";
   export const Yn: any; // 内部符号: Qq
-  export const Yo: any; // 内部符号: $E
+  export { buildBaseThreadConfig as Yo } from "../../shared/hosts-runtime";
   export const Yr: any; // 内部符号: _I
   export { expectedAccountIdOf as Ys } from "../../shared/http-headers";
   export { pointLatestCacheAtVersion as Yt } from "../../shared/streams-runtime";
   export { isSupportedAppServerVersion as Yu } from "../../shared/app-server-version";
   export { downloadPluginsAsset as Z } from "../../shared/lowlevel-runtime";
-  export const Za: any; // 内部符号: rA
+  export { isPathWithinWorktrees as Za } from "../../shared/hosts-runtime";
   export const Zc: any; // 内部符号: tS
   export const Zd: any; // 内部符号: xg
   export const Zl: any; // 内部符号: Cb
@@ -396,7 +396,7 @@ declare module "@chunk/shared" {
   export const ao: any; // 内部符号: sk
   export const ar: any; // 内部符号: uK
   export const as: any; // 内部符号: RE
-  export const at: any; // 内部符号: Sie
+  export { EPHEMERAL_GENERATION_TIMEOUT_MS as at } from "../../shared/structured-generation";
   export { getAtomStateDefault as au } from "../../shared/app-constants";
   export { markAllAutomationRunsRead as b } from "../../shared/lowlevel-runtime";
   export const ba: any; // 内部符号: oj
@@ -418,8 +418,8 @@ declare module "@chunk/shared" {
   export { openSqlite as ci } from "../../shared/sql-git-registry";
   export const cl: any; // 内部符号: Tx
   export { SSH_WEBSOCKET_TRANSPORT_KEY as cn } from "../../shared/streams-runtime";
-  export const co: any; // 内部符号: nk
-  export const cr: any; // 内部符号: EW
+  export { HOTKEY_WINDOW_ROUTE as co } from "../../shared/app-constants";
+  export { sameConnectorAuth as cr } from "../../shared/elicitation-protocol";
   export const cs: any; // 内部符号: PE
   export { COMMIT_PULL_REQUEST_GENERATION_BUNDLE as ct } from "../../shared/structured-generation";
   export { BuildFlavor as cu } from "../../shared/app-constants";
@@ -487,7 +487,7 @@ declare module "@chunk/shared" {
   export { installCustomPet as ht } from "../../shared/pet-spritesheet";
   export { isValidThreadId as hu } from "../../shared/browser-context";
   export const i: any; // 内部符号: Kce
-  export const ic: any; // 内部符号: Aw
+  export { versionedFeatureOverrides as ic } from "../../shared/app-config";
   export { last as id } from "../../shared/app-config";
   declare const if_: any; // 内部符号: ph（保留字导出）
   export { if_ as "if" };
@@ -497,7 +497,7 @@ declare module "@chunk/shared" {
   export { in_ as "in" };
   export const ir: any; // 内部符号: dK
   export const is: any; // 内部符号: IE
-  export const it: any; // 内部符号: bie
+  export { EPHEMERAL_THREAD_TIMEOUT_MS as it } from "../../shared/structured-generation";
   export { STATE_KEYS as iu } from "../../shared/app-constants";
   export { isSystemOnlyApplication as j } from "../../shared/fs-diagnostics";
   export { isCloudRequirementsAuthError as jc } from "../../shared/app-config";
@@ -515,7 +515,7 @@ declare module "@chunk/shared" {
   export { workspaceWritePermissions as kd } from "../../shared/sandbox-permissions";
   export { kf } from "../../shared/zod-facade";
   export { resolveExecutionCodexHome as ki } from "../../shared/wsl-paths";
-  export { BROWSER_PLUGIN_NAME as kl } from "../../shared/unlocated-runtime";
+  export { BROWSER_PLUGIN_NAME as kl } from "../../shared/app-constants";
   export const kn: any; // 内部符号: EX
   export const ko: any; // 内部符号: xO
   export { isSingleRrule as kr } from "../../shared/automation-registry";
@@ -532,7 +532,7 @@ declare module "@chunk/shared" {
   export const lo: any; // 内部符号: Tk
   export { elicitationForTurn as lr } from "../../shared/misc-runtime";
   export { PULL_REQUEST_GENERATION_BUNDLE as lt } from "../../shared/structured-generation";
-  export const lu: any; // 内部符号: tb
+  export { BROWSER_TAB_TYPES as lu } from "../../shared/browser-tab-mentions";
   export { requestThreadUnsubscribe as m } from "../../shared/lowlevel-runtime";
   export const ma: any; // 内部符号: Kne
   export const mc: any; // 内部符号: XC
@@ -546,7 +546,7 @@ declare module "@chunk/shared" {
   export { telemetryIntakeUrl as mt } from "../../shared/telemetry";
   export { broadcastVersionOf as mu } from "../../shared/browser-context";
   export const n: any; // 内部符号: Yce
-  export const nc: any; // 内部符号: jw
+  export { applyFeatureOverrides as nc } from "../../shared/app-config";
   export const nd: any; // 内部符号: Cv
   export const nf: any; // 内部符号: bte
   export { removeRuntimeDirectory as ni } from "../../shared/sql-git-registry";
@@ -567,7 +567,7 @@ declare module "@chunk/shared" {
   export const oo: any; // 内部符号: ik
   export { requestErrorOf as or } from "../../shared/misc-runtime";
   export const os: any; // 内部符号: jE
-  export const ot: any; // 内部符号: H8
+  export { PULL_REQUEST_GENERATION_TIMEOUT_MS as ot } from "../../shared/structured-generation";
   export { BROWSER_PLUGIN_NAME as ou } from "../../shared/app-constants";
   export const p: any; // 内部符号: tce
   export const pc: any; // 内部符号: ZC
@@ -579,9 +579,9 @@ declare module "@chunk/shared" {
   export const po: any; // 内部符号: Ak
   export { WebSocketReadyState as pr } from "../../shared/process-exec";
   export { TelemetryHttpTransport as pt } from "../../shared/telemetry";
-  export { MAX_DIRECT_TRANSFER_BYTES as pu } from "../../shared/unlocated-runtime";
+  export { MAX_DIRECT_TRANSFER_BYTES as pu } from "../../shared/hosts-runtime";
   export const q: any; // 内部符号: x5
-  export const qc: any; // 内部符号: sS
+  export { matchesBrowserTabQuery as qc } from "../../shared/browser-tab-mentions";
   export const qd: any; // 内部符号: jg
   export { visualizationDateOf as qi } from "../../shared/browser-context";
   export { NODE_REPL_MODULE_DIR_ENV_KEY as ql } from "../../shared/app-constants";
@@ -597,7 +597,7 @@ declare module "@chunk/shared" {
   export const rd: any; // 内部符号: bv
   export { rf } from "../../shared/zod-facade";
   export const ri: any; // 内部符号: nI
-  export const rl: any; // 内部符号: vx
+  export { BROWSER_APP_PARTITION as rl } from "../../shared/app-constants";
   export { readProcessTable as rn } from "../../shared/streams-runtime";
   export const ro: any; // 内部符号: Jk
   export { unescapeMarkdownPunctuation as rr } from "../../shared/misc-runtime";
@@ -613,7 +613,7 @@ declare module "@chunk/shared" {
   export const sl: any; // 内部符号: Dx
   export const sn: any; // 内部符号: o1
   export const so: any; // 内部符号: ak
-  export { parseUrl as sr } from "../../shared/unlocated-runtime";
+  export { parseElicitationUrl as sr } from "../../shared/elicitation-protocol";
   export const ss: any; // 内部符号: NE
   export { COMMIT_MESSAGE_GENERATION_BUNDLE as st } from "../../shared/structured-generation";
   export { BROWSER_USE_PLUGIN_NAME as su } from "../../shared/app-constants";
@@ -638,7 +638,7 @@ declare module "@chunk/shared" {
   export const ul: any; // 内部符号: jx
   export const un: any; // 内部符号: r1
   export const uo: any; // 内部符号: Ek
-  export const ur: any; // 内部符号: cW
+  export { isElicitationApprovalSafe as ur } from "../../shared/elicitation-protocol";
   export { runStructuredGeneration as ut } from "../../shared/structured-generation";
   export { COWORK_MARKETPLACE_NAME as uu } from "../../shared/app-constants";
   export const v: any; // 内部符号: Qse
@@ -655,8 +655,8 @@ declare module "@chunk/shared" {
   export { validatePetSpritesheet as vt } from "../../shared/pet-spritesheet";
   export const vu: any; // 内部符号: Vy
   export { persistInboxItems as w } from "../../shared/lowlevel-runtime";
-  export const wa: any; // 内部符号: Rne
-  export const wc: any; // 内部符号: bC
+  export { prependThreadToProject as wa } from "../../shared/hosts-runtime";
+  export { DYNAMIC_TOOL_NAMESPACES as wc } from "../../shared/app-config";
   export { EMPTY_AMBIENT_SUGGESTIONS as wd } from "../../shared/automation-settings";
   export { wf } from "../../shared/zod-facade";
   export { parseToml as wi } from "../../shared/sql-git-registry";
@@ -691,7 +691,7 @@ declare module "@chunk/shared" {
   export { createLocalAutomation as yr } from "../../shared/automation-registry";
   export const ys: any; // 内部符号: DT
   export const yt: any; // 内部符号: C8
-  export const yu: any; // 内部符号: Hy
+  export { MAX_ANNOTATION_SELECTION_RECTS as yu } from "../../shared/browser-context";
   export const z: any; // 内部符号: i7
   export const za: any; // 内部符号: VA
   export { getBrowserFamilyStoreUrls as zc } from "../../shared/browser-tab-mentions";

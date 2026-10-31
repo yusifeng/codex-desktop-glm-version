@@ -73,7 +73,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `E` | `_se` | 63263 | lowlevel-export-shim | preserved | original lowlevel-export-shim implementation retained for compatibility |
 | `Ea` | `ej` | 23094 | hosts-wsl-plugins | semantic | `hosts-runtime` (`findSettingDescriptor`) |
 | `Ec` | `EC` | 19284 | settings-threads | semantic | `app-config` (`dynamicAppToolResultSchema`) |
-| `Ed` | `j_` | ? | unlocated | semantic | `unlocated-runtime` (`permissionProfileSchema`) |
+| `Ed` | `j_` | 16535 | settings-threads | semantic | `sandbox-permissions` (`permissionProfileSchema`) |
 | `Ef` | `im` | 14066 | schema-primitives | semantic | `zod-facade` (`Ef`) |
 | `Ei` | `DM` | 24781 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `El` | `$b` | 17956 | settings-threads | semantic | `app-constants` (`stripDriveLetterSlash`) |
@@ -136,7 +136,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Iu` | `xy` | 17380 | settings-threads | semantic | `app-config` (`BROWSER_CONTEXT_KINDS`) |
 | `J` | `dae` | 60511 | lowlevel-export-shim | preserved | original lowlevel-export-shim implementation retained for compatibility |
 | `Ja` | `uA` | 22297 | hosts-wsl-plugins | semantic | `hosts-runtime` (`chromeTabFocusSchema`) |
-| `Jc` | `oS` | 18467 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
+| `Jc` | `oS` | 18467 | settings-threads | semantic | `browser-tab-mentions` (`parseFaviconDataUrl`) |
 | `Jd` | `kg` | 15910 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `Ji` | `ore` | 24055 | hosts-wsl-plugins | semantic | `browser-context` (`changeTouchesVisualizationArtifact`) |
 | `Jl` | `yb` | 17792 | settings-threads | semantic | `app-constants` (`NODE_REPL_COMMAND_ENV_KEY`) |
@@ -168,7 +168,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Ln` | `vY` | 42321 | mcp-rpc | semantic | `mcp-runtime` (`resolveNodePath`) |
 | `Lo` | `RD` | 21108 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `Lr` | `fB` | 31304 | process-exec | semantic | `automation-registry` (`pruneNonCloudAutomations`) |
-| `Ls` | `iT` | ? | unlocated | preserved | original unlocated implementation retained for compatibility |
+| `Ls` | `iT` | 20047 | hosts-wsl-plugins | semantic | `hosts-runtime` (`FILE_CONTENT_SNIFF_BYTES`) |
 | `Lt` | `u6` | 56262 | keymap-menus | semantic | `realpath` (`resolveRealpaths`) |
 | `Lu` | `Sy` | 17386 | settings-threads | semantic | `browser-context` (`parseBrowserContextKind`) |
 | `M` | `C7` | 62403 | lowlevel-export-shim | semantic | `fs-diagnostics` (`listInstalledApplications`) |
@@ -199,7 +199,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Nu` | `Cy` | 17392 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `O` | `ise` | 62926 | lowlevel-export-shim | preserved | original lowlevel-export-shim implementation retained for compatibility |
 | `Oa` | `Ane` | 23100 | hosts-wsl-plugins | semantic | `hosts-runtime` (`mapSettingValue`) |
-| `Oc` | `TC` | 19275 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
+| `Oc` | `TC` | 19275 | settings-threads | semantic | `app-config` (`serializeDynamicTools`) |
 | `Od` | `E_` | 16472 | settings-threads | semantic | `sandbox-permissions` (`readOnlyPermissions`) |
 | `Of` | `U` | 13603 | schema-primitives | semantic | `zod-facade` (`Of`) |
 | `Oi` | `xM` | 24675 | hosts-wsl-plugins | semantic | `wsl-paths` (`resolveCodexHome`) |
@@ -276,7 +276,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Tu` | `Ry` | 17451 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `U` | `B5` | 61053 | lowlevel-export-shim | preserved | original lowlevel-export-shim implementation retained for compatibility |
 | `Ua` | `FA` | 22416 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
-| `Uc` | `hS` | ? | unlocated | preserved | original unlocated implementation retained for compatibility |
+| `Uc` | `hS` | 18511 | settings-threads | semantic | `browser-tab-mentions` (`browserTabMentionSchema`) |
 | `Ud` | `Hg` | 16071 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `Uf` | `dt` | 2678 | core-path-utils | semantic | `rpc-core` (`RpcTarget`) |
 | `Ui` | `Ij` | 24108 | hosts-wsl-plugins | semantic | `wsl-paths` (`isWslPath`) |
@@ -301,7 +301,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Vt` | `F3` | 55989 | keymap-menus | semantic | `agent-instructions` (`collectScheduledTemplates`) |
 | `Vu` | `hy` | 17341 | settings-threads | semantic | `app-server-version` (`buildMsixPackageIdentity`) |
 | `W` | `z5` | 61050 | lowlevel-export-shim | preserved | original lowlevel-export-shim implementation retained for compatibility |
-| `Wa` | `PA` | 22408 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
+| `Wa` | `PA` | 22408 | hosts-wsl-plugins | semantic | `hosts-runtime` (`resolveModelServiceTier`) |
 | `Wc` | `_S` | 18516 | settings-threads | semantic | `browser-tab-mentions` (`tabDedupeKey`) |
 | `Wd` | `Rg` | 15995 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `Wf` | `ft` | 2679 | core-path-utils | semantic | `rpc-core` (`connectRpc`) |
@@ -332,13 +332,13 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Yi` | `Aj` | 23447 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `Yl` | `bb` | 17793 | settings-threads | semantic | `app-constants` (`NODE_REPL_REQUEST_META_ENV_KEY`) |
 | `Yn` | `Qq` | 41189 | mcp-rpc | preserved | original mcp-rpc implementation retained for compatibility |
-| `Yo` | `$E` | 20860 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
+| `Yo` | `$E` | 20860 | hosts-wsl-plugins | semantic | `hosts-runtime` (`buildBaseThreadConfig`) |
 | `Yr` | `_I` | 27840 | sql-git-registry | preserved | original sql-git-registry implementation retained for compatibility |
 | `Ys` | `Gw` | 19948 | settings-threads | semantic | `http-headers` (`expectedAccountIdOf`) |
 | `Yt` | `W2` | 54379 | streams | semantic | `streams-runtime` (`pointLatestCacheAtVersion`) |
 | `Yu` | `Qv` | 17227 | settings-threads | semantic | `app-server-version` (`isSupportedAppServerVersion`) |
 | `Z` | `eae` | 60092 | lowlevel-export-shim | semantic | `lowlevel-runtime` (`downloadPluginsAsset`) |
-| `Za` | `rA` | 22261 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
+| `Za` | `rA` | 22261 | hosts-wsl-plugins | semantic | `hosts-runtime` (`isPathWithinWorktrees`) |
 | `Zc` | `tS` | 18449 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `Zd` | `xg` | 15718 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `Zi` | `kj` | 23444 | hosts-wsl-plugins | semantic | `hosts-runtime` (`turnRequestStripper`) |
@@ -373,7 +373,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `ao` | `sk` | 21974 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `ar` | `uK` | 38728 | misc | preserved | original misc implementation retained for compatibility |
 | `as` | `RE` | 20713 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
-| `at` | `Sie` | ? | unlocated | preserved | original unlocated implementation retained for compatibility |
+| `at` | `Sie` | 59531 | keymap-menus | semantic | `structured-generation` (`EPHEMERAL_GENERATION_TIMEOUT_MS`) |
 | `au` | `tne` | 17786 | settings-threads | semantic | `app-constants` (`getAtomStateDefault`) |
 | `b` | `Lse` | 63822 | lowlevel-export-shim | semantic | `lowlevel-runtime` (`markAllAutomationRunsRead`) |
 | `ba` | `oj` | 23165 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
@@ -396,8 +396,8 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `ci` | `qF` | 27622 | sql-git-registry | semantic | `sql-git-registry` (`openSqlite`) |
 | `cl` | `Tx` | 18072 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `cn` | `i1` | 53010 | streams | semantic | `streams-runtime` (`SSH_WEBSOCKET_TRANSPORT_KEY`) |
-| `co` | `nk` | ? | unlocated | preserved | original unlocated implementation retained for compatibility |
-| `cr` | `EW` | 35938 | misc | preserved | original misc implementation retained for compatibility |
+| `co` | `nk` | 21969 | hosts-wsl-plugins | semantic | `app-constants` (`HOTKEY_WINDOW_ROUTE`) |
+| `cr` | `EW` | 35938 | misc | semantic | `elicitation-protocol` (`sameConnectorAuth`) |
 | `cs` | `PE` | 20687 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `ct` | `Tie` | 59557 | keymap-menus | semantic | `structured-generation` (`COMMIT_PULL_REQUEST_GENERATION_BUNDLE`) |
 | `cu` | `fb` | 17648 | settings-threads | semantic | `app-constants` (`BuildFlavor`) |
@@ -467,7 +467,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `hu` | `cb` | 17634 | settings-threads | semantic | `browser-context` (`isValidThreadId`) |
 | `i` | `Kce` | 65850 | tail | preserved | original tail implementation retained for compatibility |
 | `ia` | `nre` | 23434 | hosts-wsl-plugins | semantic | `hosts-runtime` (`withSpawnTracing`) |
-| `ic` | `Aw` | 19874 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
+| `ic` | `Aw` | 19874 | settings-threads | semantic | `app-config` (`versionedFeatureOverrides`) |
 | `id` | `yv` | 16882 | settings-threads | semantic | `app-config` (`last`) |
 | `if` | `ph` | 14737 | schema-primitives | preserved | original schema-primitives implementation retained for compatibility |
 | `ii` | `eI` | 27692 | sql-git-registry | semantic | `sql-git-registry` (`deleteRunsForAutomation`) |
@@ -476,7 +476,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `io` | `Xk` | 22218 | hosts-wsl-plugins | semantic | `hosts-runtime` (`queueContextPredicate`) |
 | `ir` | `dK` | 38735 | misc | preserved | original misc implementation retained for compatibility |
 | `is` | `IE` | 20693 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
-| `it` | `bie` | ? | unlocated | preserved | original unlocated implementation retained for compatibility |
+| `it` | `bie` | 59524 | keymap-menus | semantic | `structured-generation` (`EPHEMERAL_THREAD_TIMEOUT_MS`) |
 | `iu` | `gb` | 17673 | settings-threads | semantic | `app-constants` (`STATE_KEYS`) |
 | `j` | `Aoe` | 62478 | lowlevel-export-shim | semantic | `fs-diagnostics` (`isSystemOnlyApplication`) |
 | `ja` | `ZA` | 23055 | hosts-wsl-plugins | semantic | `hosts-runtime` (`sourceSettings`) |
@@ -497,7 +497,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `kd` | `T_` | 16457 | settings-threads | semantic | `sandbox-permissions` (`workspaceWritePermissions`) |
 | `kf` | `Km` | 14325 | schema-primitives | semantic | `zod-facade` (`kf`) |
 | `ki` | `SM` | 24686 | hosts-wsl-plugins | semantic | `wsl-paths` (`resolveExecutionCodexHome`) |
-| `kl` | `Db` | ? | unlocated | semantic | `unlocated-runtime` (`BROWSER_PLUGIN_NAME`) |
+| `kl` | `Db` | 17860 | settings-threads | semantic | `app-constants` (`BROWSER_PLUGIN_NAME`) |
 | `kn` | `EX` | 43135 | mcp-rpc | preserved | original mcp-rpc implementation retained for compatibility |
 | `ko` | `xO` | 21478 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `kr` | `jB` | 31720 | process-exec | semantic | `automation-registry` (`isSingleRrule`) |
@@ -516,7 +516,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `lr` | `TW` | 35833 | misc | semantic | `misc-runtime` (`elicitationForTurn`) |
 | `ls` | `hE` | 20625 | hosts-wsl-plugins | semantic | `hosts-runtime` (`isNotificationMethod`) |
 | `lt` | `X8` | 59549 | keymap-menus | semantic | `structured-generation` (`PULL_REQUEST_GENERATION_BUNDLE`) |
-| `lu` | `tb` | 17588 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
+| `lu` | `tb` | 17588 | settings-threads | semantic | `browser-tab-mentions` (`BROWSER_TAB_TYPES`) |
 | `m` | `y9` | 64974 | lowlevel-export-shim | semantic | `lowlevel-runtime` (`requestThreadUnsubscribe`) |
 | `ma` | `Kne` | 23210 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `mc` | `XC` | 19543 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
@@ -532,7 +532,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `mu` | `ib` | 17615 | settings-threads | semantic | `browser-context` (`broadcastVersionOf`) |
 | `n` | `Yce` | 65993 | tail | preserved | original tail implementation retained for compatibility |
 | `na` | `tre` | 23422 | hosts-wsl-plugins | semantic | `hosts-runtime` (`installSharedTracingBridge`) |
-| `nc` | `jw` | 19906 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
+| `nc` | `jw` | 19906 | settings-threads | semantic | `app-config` (`applyFeatureOverrides`) |
 | `nd` | `Cv` | 16921 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `nf` | `bte` | 15003 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `ni` | `oI` | 27780 | sql-git-registry | semantic | `sql-git-registry` (`removeRuntimeDirectory`) |
@@ -554,7 +554,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `oo` | `ik` | 21971 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `or` | `HW` | 36074 | misc | semantic | `misc-runtime` (`requestErrorOf`) |
 | `os` | `jE` | 20674 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
-| `ot` | `H8` | ? | unlocated | preserved | original unlocated implementation retained for compatibility |
+| `ot` | `H8` | 59528 | keymap-menus | semantic | `structured-generation` (`PULL_REQUEST_GENERATION_TIMEOUT_MS`) |
 | `ou` | `pb` | 17669 | settings-threads | semantic | `app-constants` (`BROWSER_PLUGIN_NAME`) |
 | `p` | `tce` | 64846 | lowlevel-export-shim | preserved | original lowlevel-export-shim implementation retained for compatibility |
 | `pa` | `uj` | 23195 | hosts-wsl-plugins | semantic | `hosts-runtime` (`sourceKinds`) |
@@ -568,10 +568,10 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `pr` | `jV` | 32812 | process-exec | semantic | `process-exec` (`WebSocketReadyState`) |
 | `ps` | `nE` | 20420 | hosts-wsl-plugins | semantic | `hosts-runtime` (`isAddedFileAttachment`) |
 | `pt` | `N8` | 59057 | keymap-menus | semantic | `telemetry` (`TelemetryHttpTransport`) |
-| `pu` | `$y` | ? | unlocated | semantic | `unlocated-runtime` (`MAX_DIRECT_TRANSFER_BYTES`) |
+| `pu` | `$y` | 17584 | settings-threads | semantic | `hosts-runtime` (`MAX_DIRECT_TRANSFER_BYTES`) |
 | `q` | `x5` | 60710 | lowlevel-export-shim | preserved | original lowlevel-export-shim implementation retained for compatibility |
 | `qa` | `lA` | 22296 | hosts-wsl-plugins | semantic | `hosts-runtime` (`tabMentionSearchSchema`) |
-| `qc` | `sS` | 18477 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
+| `qc` | `sS` | 18477 | settings-threads | semantic | `browser-tab-mentions` (`matchesBrowserTabQuery`) |
 | `qd` | `jg` | 15929 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `qi` | `Mj` | 24041 | hosts-wsl-plugins | semantic | `browser-context` (`visualizationDateOf`) |
 | `ql` | `vb` | 17791 | settings-threads | semantic | `app-constants` (`NODE_REPL_MODULE_DIR_ENV_KEY`) |
@@ -587,7 +587,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `rd` | `bv` | 16889 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `rf` | `mh` | 14990 | schema-primitives | semantic | `zod-facade` (`rf`) |
 | `ri` | `nI` | 27717 | sql-git-registry | preserved | original sql-git-registry implementation retained for compatibility |
-| `rl` | `vx` | ? | unlocated | preserved | original unlocated implementation retained for compatibility |
+| `rl` | `vx` | 18065 | settings-threads | semantic | `app-constants` (`BROWSER_APP_PARTITION`) |
 | `rn` | `S1` | 53075 | streams | semantic | `streams-runtime` (`readProcessTable`) |
 | `ro` | `Jk` | 22216 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `rr` | `vK` | 38786 | misc | semantic | `misc-runtime` (`unescapeMarkdownPunctuation`) |
@@ -603,7 +603,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `sl` | `Dx` | 18074 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `sn` | `o1` | 53029 | streams | preserved | original streams implementation retained for compatibility |
 | `so` | `ak` | 21972 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
-| `sr` | `FW` | ? | unlocated | semantic | `unlocated-runtime` (`parseUrl`) |
+| `sr` | `FW` | 35990 | misc | semantic | `elicitation-protocol` (`parseElicitationUrl`) |
 | `ss` | `NE` | 20684 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `st` | `wie` | 59541 | keymap-menus | semantic | `structured-generation` (`COMMIT_MESSAGE_GENERATION_BUNDLE`) |
 | `su` | `$te` | 17670 | settings-threads | semantic | `app-constants` (`BROWSER_USE_PLUGIN_NAME`) |
@@ -629,7 +629,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `ul` | `jx` | 18091 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `un` | `r1` | 50252 | streams | preserved | original streams implementation retained for compatibility |
 | `uo` | `Ek` | 22019 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
-| `ur` | `cW` | 35683 | misc | preserved | original misc implementation retained for compatibility |
+| `ur` | `cW` | 35683 | misc | semantic | `elicitation-protocol` (`isElicitationApprovalSafe`) |
 | `us` | `_E` | 20629 | hosts-wsl-plugins | semantic | `hosts-runtime` (`isMcpMethodNotFoundError`) |
 | `ut` | `R8` | 59447 | keymap-menus | semantic | `structured-generation` (`runStructuredGeneration`) |
 | `uu` | `lb` | 17637 | settings-threads | semantic | `app-constants` (`COWORK_MARKETPLACE_NAME`) |
@@ -647,8 +647,8 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `vt` | `w8` | 58819 | keymap-menus | semantic | `pet-spritesheet` (`validatePetSpritesheet`) |
 | `vu` | `Vy` | 17464 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `w` | `Nse` | 63740 | lowlevel-export-shim | semantic | `lowlevel-runtime` (`persistInboxItems`) |
-| `wa` | `Rne` | 23158 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
-| `wc` | `bC` | 19262 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
+| `wa` | `Rne` | 23158 | hosts-wsl-plugins | semantic | `hosts-runtime` (`prependThreadToProject`) |
+| `wc` | `bC` | 19262 | settings-threads | semantic | `app-config` (`DYNAMIC_TOOL_NAMESPACES`) |
 | `wd` | `M_` | 16555 | settings-threads | semantic | `automation-settings` (`EMPTY_AMBIENT_SUGGESTIONS`) |
 | `wf` | `q` | 14010 | schema-primitives | semantic | `zod-facade` (`wf`) |
 | `wi` | `YM` | 25241 | sql-git-registry | semantic | `sql-git-registry` (`parseToml`) |
@@ -684,7 +684,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `yr` | `VB` | 31868 | process-exec | semantic | `automation-registry` (`createLocalAutomation`) |
 | `ys` | `DT` | 20148 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `yt` | `C8` | 58463 | keymap-menus | preserved | original keymap-menus implementation retained for compatibility |
-| `yu` | `Hy` | ? | unlocated | preserved | original unlocated implementation retained for compatibility |
+| `yu` | `Hy` | 17465 | settings-threads | semantic | `browser-context` (`MAX_ANNOTATION_SELECTION_RECTS`) |
 | `z` | `i7` | 61727 | lowlevel-export-shim | preserved | original lowlevel-export-shim implementation retained for compatibility |
 | `za` | `VA` | 22630 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `zc` | `qS` | 19002 | settings-threads | semantic | `browser-tab-mentions` (`getBrowserFamilyStoreUrls`) |
