@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread-project membership owner
+
+原 `xnt/Snt` 已迁入 `src/main/main-app/projects/thread-project-membership-owner.ts`。新 owner 保留 assignment/projectless
+global-state persistence、membership broadcasts、optional server writer 与 host-id post-commit、initial server project lookup、
+projectless output/workspace metadata updates、removed-thread WeakMap tombstone 和 batched invalidation；唯一 runtime
+construction 已接回，旧 schema/class 已删除。
+
 ## 2026-10-31 thread read-state owner
 
 原 `Ont/L5/R5` 已迁入 `src/main/main-app/thread-read-state/thread-read-state-owner.ts`。新 owner 保留 identity/host

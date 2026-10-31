@@ -126,6 +126,7 @@ const { createVisualizationServiceRuntime } = require("./main-app/visualizations
 const { createHistorySwipeNavigationServiceClass } = require("./main-app/window/history-swipe-navigation-service.js");
 const { createSystemFontsServiceClass } = require("./main-app/window/system-fonts-service.js");
 const { createThreadReadStateOwnerClass } = require("./main-app/thread-read-state/thread-read-state-owner.js");
+const { createThreadProjectMembershipOwnerClass } = require("./main-app/projects/thread-project-membership-owner.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -139960,89 +139961,10 @@ var I5 = createThreadMetadataGenerationServiceClass({
     generateDescription: n.r,
     generateSummary: n.i,
   }),
-  xnt = n.wf({
-    threadId: n.Of().min(1).transform(n.$u),
-    projectless: n.gf().optional(),
-    outputDirectory: n.Of().nullable().optional(),
-    workspaceRoot: n.Of().nullable().optional(),
+  Snt = createThreadProjectMembershipOwnerClass({
+    runtime: n,
+    MembershipStoreBase: n.n,
   }),
-  Snt = class e extends n.n {
-    globalState;
-    windowManager;
-    getInitialServerProjectId;
-    static removedThreadIdsByGlobalState = new WeakMap();
-    constructor(e, t, r, i) {
-      (super(
-        {
-          read: () => ({
-            assignments: n.ca(e.get(n.iu.THREAD_PROJECT_ASSIGNMENTS)),
-            projectlessThreadIds: e.get(n.iu.PROJECTLESS_THREAD_IDS) ?? [],
-          }),
-          write: (t, r) => {
-            (t.assignments !== r.assignments &&
-              e.set(n.iu.THREAD_PROJECT_ASSIGNMENTS, r.assignments),
-              t.projectlessThreadIds !== r.projectlessThreadIds &&
-                e.set(n.iu.PROJECTLESS_THREAD_IDS, r.projectlessThreadIds));
-          },
-        },
-        (e) =>
-          t.sendMessageToAllWindows({ type: `thread-project-memberships-updated`, memberships: e }),
-        r == null
-          ? void 0
-          : (t, i, a) =>
-              r(
-                t.threadId,
-                t.assignment,
-                async () => {
-                  await i();
-                  let r = t.hostId;
-                  r != null &&
-                    e.update(n.iu.THREAD_PROJECT_MEMBERSHIP_HOST_IDS, (e) => ({
-                      ...e,
-                      [t.threadId]: r,
-                    }));
-                },
-                a,
-                t.hostId ?? e.get(n.iu.THREAD_PROJECT_MEMBERSHIP_HOST_IDS)?.[t.threadId],
-              ),
-      ),
-        (this.globalState = e),
-        (this.windowManager = t),
-        (this.getInitialServerProjectId = i));
-    }
-    async getThreadStartProjectId(e) {
-      return this.getInitialServerProjectId?.(n.la.parse(e)) ?? null;
-    }
-    async updateProjectlessThread(t) {
-      let { threadId: r, projectless: i, outputDirectory: a, workspaceRoot: o } = xnt.parse(t),
-        s = [],
-        c = e.removedThreadIdsByGlobalState.get(this.globalState);
-      if (i === !1 && a == null)
-        (c ?? ((c = new Set()), e.removedThreadIdsByGlobalState.set(this.globalState, c)),
-          c.add(r));
-      else if (c?.has(r)) return;
-      (i != null &&
-        (await this.setProjectless({ threadId: r, projectless: i }),
-        s.push(n.iu.PROJECTLESS_THREAD_IDS)),
-        a !== void 0 &&
-          (this.globalState.update(n.iu.THREAD_PROJECTLESS_OUTPUT_DIRECTORIES, (e) => {
-            let t = { ...e };
-            return (a == null ? delete t[r] : (t[r] = a), t);
-          }),
-          s.push(n.iu.THREAD_PROJECTLESS_OUTPUT_DIRECTORIES)),
-        (o !== void 0 ||
-          (i === !1 &&
-            a == null &&
-            this.globalState.get(n.iu.THREAD_WORKSPACE_ROOT_HINTS)?.[r] != null)) &&
-          (this.globalState.update(n.iu.THREAD_WORKSPACE_ROOT_HINTS, (e) => {
-            let t = { ...e };
-            return (o == null ? delete t[r] : (t[r] = o), t);
-          }),
-          s.push(n.iu.THREAD_WORKSPACE_ROOT_HINTS)),
-        s.length !== 0 &&
-          this.windowManager.sendMessageToAllWindows({ type: `global-state-updated`, keys: s }));
-    }
-  },
   Cnt = n.wf({ type: n.bf(`agentMessage`), text: n.Of() }),
   wnt = n.wf({ threadId: n.Of(), turnId: n.Of(), item: Cnt }),
   Tnt = n.wf({
