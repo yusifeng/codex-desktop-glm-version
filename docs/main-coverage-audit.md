@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 artifact document store
+
+原 `bet/xet/E8/D8/Cet/wet/O8/Tet/Eet/k8/A8/j8/Det/M8/N8/Oet/P8/ket/F8/I8/L8/R8/z8/B8/V8/H8/U8/W8/G8/K8/q8/J8/Y8`
+已整簇迁入 `src/main/main-app/artifacts/artifact-document-store.ts`。新 owner 保留 durable schema/hash validation、
+per-record serialization、atomic temp-file writes、adopt/find/read、update idempotency/collision、retention/compaction、
+clean-session refresh 与 materialization prepare/reconcile/finish journal；唯一 runtime consumer 已接回，旧实现已删除。
+
 ## 2026-10-31 artifact documents owner
 
 原 `h4/g4/_4/K5e/q5e/v4/J5e/Y5e/X5e/Z5e/Q5e/y4/$5e/e7e/b4/t7e/n7e` 已整簇迁入

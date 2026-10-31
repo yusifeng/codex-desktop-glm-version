@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Det` artifact document store、durable schemas 与全部独占 persistence/hash/compaction/materialization helpers
+迁入 `artifacts/artifact-document-store.ts`；record integrity、atomic temp writes、idempotent append、update collision、
+compaction、clean-session refresh 与 materialization journal/reconciliation 均由新 owner 持有。唯一 runtime consumer
+已接回，旧 594 行实现已删除。focused test 覆盖 36 项。
+
 随后将 `h4/g4/_4/K5e/q5e/v4/J5e/Y5e/X5e/Z5e/Q5e/y4/$5e/e7e/b4/t7e/n7e` artifact documents
 owner 迁入 `artifacts/artifact-documents.ts`；strict schemas、workspace/exact binding、realpath/hash guards、per-file
 serialization、append/refresh/subscription、staged-file recovery 与 materialization two-phase commit 均由新 owner
