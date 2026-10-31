@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 local node-pty backend
+
+原 `Ptt/Ftt/b5/Itt/Ltt/Rtt/ztt/Btt` 已整簇迁入
+`src/main/main-app/terminal/node-pty-backend.ts`。新 runtime 保留 Windows PowerShell/GetConsoleProcessList 枚举、
+sanitized environment、node-pty lazy require/spawn/callback/I/O，以及 macOS reverse process-tree SIGKILL、ESRCH 忽略、
+首个非 ESRCH error 聚合和 finally root kill；terminal session manager 的真实 backend injection 已接回，旧实现已删除。
+
 ## 2026-10-31 terminal session manager wiring repair
 
 复核真实 consumer 时发现 `createTerminalSessionManagerClass(...)` 被误留在 `S5()` return 后的不可达函数体内；

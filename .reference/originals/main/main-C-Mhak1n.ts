@@ -109,6 +109,7 @@ const { createSystemAudioSpectrumRuntime } = require("./main-app/capture/system-
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
 const { createTerminalWindowRuntime } = require("./main-app/terminal/terminal-window-runtime.js");
+const { createNodePtyBackendRuntime } = require("./main-app/terminal/node-pty-backend.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -138499,132 +138500,17 @@ var ytt = SystemPermissionsService,
     findProgramFilesPath: ta,
     createUsingScope: a.en,
   });
-var Ptt = (0, d.promisify)(P.execFile),
-  Ftt = n.hf(n.if().int().positive()),
-  b5 = `CODEX_CONSOLE_PROCESS_ID`,
-  Itt = `
-$ErrorActionPreference = 'Stop'
-Add-Type -TypeDefinition @'
-using System;
-using System.Runtime.InteropServices;
-
-public static class CodexConsoleProcessListNative {
-    [DllImport("kernel32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool AttachConsole(uint processId);
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool FreeConsole();
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    public static extern uint GetConsoleProcessList([Out] uint[] processIds, uint processCount);
-}
-'@
-
-$processId = [uint32]$env:${b5}
-[void][CodexConsoleProcessListNative]::FreeConsole()
-if (-not [CodexConsoleProcessListNative]::AttachConsole($processId)) {
-    throw 'AttachConsole failed'
-}
-
-try {
-    $capacity = 64
-    do {
-        $processIds = [uint32[]]::new($capacity)
-        $count = [CodexConsoleProcessListNative]::GetConsoleProcessList($processIds, $capacity)
-        $capacity = [int]$count
-    } while ($count -gt $processIds.Length)
-
-    $result = if ($count -eq 0) {
-        ''
-    } else {
-        @(
-            $processIds[0..([int]$count - 1)] |
-                Where-Object { $_ -ne $PID }
-        ) -join ','
-    }
-} finally {
-    [void][CodexConsoleProcessListNative]::FreeConsole()
-}
-
-[Console]::Out.Write($result)
-`;
-async function Ltt(e) {
-  let t = process.env.SystemRoot ?? process.env.windir ?? `C:\\Windows`,
-    { stdout: r } = await Ptt(
-      h.default.win32.join(t, `System32`, `WindowsPowerShell`, `v1.0`, `powershell.exe`),
-      [`-NoLogo`, `-NoProfile`, `-NonInteractive`, `-Command`, Itt],
-      {
-        encoding: `utf8`,
-        env: { ...n.Bi(process.env), [b5]: `${e}` },
-        maxBuffer: 65536,
-        timeout: 5e3,
-        windowsHide: !0,
-      },
-    ),
-    i = r.trim();
-  return i === `` ? [] : Ftt.parse(i.split(`,`));
-}
-var Rtt = (0, ee.createRequire)(__filename),
-  ztt = class e {
-    pty;
-    static create(t) {
-      let { spawn: n } = Rtt(`node-pty`),
-        [r, ...i] = t.command,
-        a = n(r, i, {
-          cols: t.cols,
-          rows: t.rows,
-          cwd: t.cwd,
-          env: t.env,
-          getConsoleProcessList: process.platform === `win32` ? Ltt : void 0,
-        });
-      return (
-        a.onData((e) => {
-          t.callbacks.onData(e);
-        }),
-        a.onExit(({ exitCode: e, signal: n }) => {
-          t.callbacks.onExit({ code: e, signal: Btt(n) });
-        }),
-        new e(a)
-      );
-    }
-    constructor(e) {
-      this.pty = e;
-    }
-    async write(e) {
-      this.pty.write(e);
-    }
-    async resize(e, t) {
-      this.pty.resize(e, t);
-    }
-    async terminate() {
-      await this.pty.kill();
-    }
-    async dispose({ killProcessTree: e }) {
-      if (e && process.platform === `darwin`) {
-        try {
-          let e = await n.nn(this.pty.pid),
-            t;
-          for (let n of e.reverse())
-            try {
-              process.kill(n.pid, `SIGKILL`);
-            } catch (e) {
-              (e instanceof Error && `code` in e && e.code === `ESRCH`) ||
-                (t ??= e instanceof Error ? e : Error(`Failed to stop terminal process`));
-            }
-          if (t instanceof Error) throw Error(`Failed to stop terminal process`, { cause: t });
-        } finally {
-          await this.pty.kill(`SIGKILL`);
-        }
-        return;
-      }
-      await this.pty.kill();
-    }
-  };
-function Btt(e) {
-  return e == null ? null : String(e);
-}
+var { NodePtyBackend: ztt } = createNodePtyBackendRuntime({
+  runtime: n,
+  promisify: d.promisify,
+  execFile: P.execFile,
+  path: h.default,
+  createRequire: ee.createRequire,
+  moduleFilename: __filename,
+  platform: process.platform,
+  environment: process.env,
+  killProcess: process.kill.bind(process),
+});
 var Vtt = 16e3,
   Htt = 100,
   x5 = `xterm-256color`,

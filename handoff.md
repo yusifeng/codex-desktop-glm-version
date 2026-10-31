@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Ptt/Ftt/b5/Itt/Ltt/Rtt/ztt/Btt` local node-pty backend 迁入
+`terminal/node-pty-backend.ts`；Windows console process enumeration、node-pty lazy load、PTY callbacks/I/O 与
+macOS reverse process-tree SIGKILL/error aggregation 均由新 runtime 持有。terminal session manager consumer 已接回，
+旧实现已删除。focused test 覆盖 45 项。
+
 审计时修复了 terminal session manager 的运行时接线：`createTerminalSessionManagerClass(...)` 曾被误置于
 `S5()` return 之后的不可达函数体内，现已恢复为模块级初始化；focused test 新增主 chunk 接线形状断言，防止
 transform/typecheck 仍通过但 owner 未实际初始化的回归。
