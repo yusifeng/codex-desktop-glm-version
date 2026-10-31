@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 browser-use site data wiring
+
+`src/main/main-app/browser-use/site-data.ts` 已完整覆盖旧 `Wc/Gc/Kc/qc/Jc/Yc/Xc/Zc/el/tl/nl`。本轮接回 partition/session/
+startup/navigation consumers，删除两个旧定义簇，并把 navigation policy 的直接 `el` 读取改为 `nl()`；focused suite 覆盖 URL 编码、
+语言去重、cookie URL/flush、siteData 映射、timeRange、共享 ledger 与关键 wiring。
+
 ## 2026-10-31 ManagedComputerUseService wiring
 
 `src/main/main-app/computer-use/managed-service.ts` 与旧 `Eoe` 均为 24 members，并包含旧 `Doe` process/zombie probe。本轮

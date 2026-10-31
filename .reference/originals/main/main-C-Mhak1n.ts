@@ -162,6 +162,7 @@ const { acquireCrossInstanceLock: jN, CROSS_INSTANCE_LOCKS: AN } = require("./ma
 const { registerInAppBrowserAvailabilityProbe: Jse } = require("./main-app/browser-use/availability.js");
 const { trackComputerUseActivity: ele } = require("./main-app/computer-use/activity-tracker.js");
 const { ManagedComputerUseService: Eoe } = require("./main-app/computer-use/managed-service.js");
+const { browserUsePartitionNameForHost: Jc, applyPreferredLanguages: Yc, clearSiwcCookies: Xc, clearBrowserData: Zc, setInAppBrowserChromeUrlsAllowed: tl, isInAppBrowserChromeUrlsAllowed: nl } = require("./main-app/browser-use/site-data.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -10392,47 +10393,6 @@ function Hc(e) {
 function Uc(e) {
   return (0, p.endianness)() === `LE` ? e.readUInt32LE(0) : e.readUInt32BE(0);
 }
-var Wc = `persist:codex-browser-`,
-  Gc = [`fileSystems`, `indexedDB`, `localStorage`, `webSQL`, `serviceWorkers`],
-  Kc = new Set([
-    `__Host-chatgpt_sites_session`,
-    `appgarden_siwc_login`,
-    `appgarden_siwc_session`,
-    `appgen_admin_review_token`,
-    `chatgpt_sites_siwc_login`,
-    `chatgpt_sites_siwc_session`,
-    `sites_preview_token`,
-  ]),
-  qc = `chatgpt_sites_siwc_login_`;
-function Jc(e) {
-  return `${Wc}${encodeURIComponent(e)}`;
-}
-function Yc(e, t) {
-  let n = [...new Set([...(t == null ? [] : [t]), ...l.app.getPreferredSystemLanguages()])];
-  e.setPreferredLanguages(n.length > 0 ? n : [l.app.getLocale()]);
-}
-async function Xc(e) {
-  let t = (await e.cookies.get({})).filter((e) => Kc.has(e.name) || e.name.startsWith(qc));
-  (await Promise.all(
-    t.map(async (t) => {
-      t.domain != null &&
-        (await e.cookies.remove(`https://${t.domain.replace(/^\./, ``)}${t.path ?? `/`}`, t.name));
-    }),
-  ),
-    t.length > 0 && (await e.cookies.flushStore()));
-}
-async function Zc(e, t, n) {
-  let r = [];
-  (t.includes(`cookies`) && r.push(`cookies`),
-    t.includes(`siteData`) && (n == null ? r.push(...Gc) : r.push(`siteData`)),
-    t.includes(`cache`) && r.push(`cache`),
-    t.includes(`downloads`) && r.push(`downloads`),
-    t.includes(`history`) && r.push(`history`),
-    t.includes(`formData`) && r.push(`formData`),
-    t.includes(`siteSettings`) && r.push(`siteSettings`),
-    r.length !== 0 &&
-      (await e.clearData(n == null ? { dataTypes: r } : { dataTypes: r, timeRange: n })));
-}
 function Qc({ currentUrl: e, requestUrl: t, resourceType: n }) {
   return n === `subFrame` && !$c(t) && !Ve(t) && e != null && Ve(e);
 }
@@ -10447,13 +10407,6 @@ function $c(e) {
     t.protocol === `data:` ||
     (t.protocol === `about:` && (t.pathname === `blank` || t.pathname === `srcdoc`))
   );
-}
-var el = !1;
-function tl(e) {
-  el = e;
-}
-function nl() {
-  return el;
 }
 var Vae = class {
   options;
@@ -10486,7 +10439,7 @@ var Vae = class {
   }
 };
 function Hae(e, t) {
-  return e.isBrowserUseNavigationRestrictionActive && !a.b(t) && !(el && Uae(t))
+  return e.isBrowserUseNavigationRestrictionActive && !a.b(t) && !(nl() && Uae(t))
     ? Error(`Blocked browser navigation by Browser Use URL policy: ${t}`)
     : null;
 }
