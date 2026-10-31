@@ -1,7 +1,9 @@
 import { $u as normalizeThreadId, ed as requestIdOf, Zo as errorToString } from "@chunk/shared";
-import { conversationTurns, findTurnById, forEachTurn, lastTurnWithTurnId } from "../turns/canonical-history";
+import { conversationTurns, findTurnById, forEachTurn, lastTurnWithTurnId, mergedConversationTurns } from "../turns/canonical-history";
 import { applyThreadSettingsUpdate } from "../threads/patch-classification";
-import { Qv as applyPermissionsResolution, Zv as applyMcpElicitationResolution } from "../requests/item-synthesis";
+import { Qv as applyPermissionsResolution, Yv as planImplementationId, Zv as applyMcpElicitationResolution } from "../requests/item-synthesis";
+import { parseAutomationUserMessage, parseHeartbeatDecision } from "../threads/automation-detector";
+import { activeAncestryIds } from "../threads/hydration";
 
 type R=Record<string,unknown>;const rec=(v:unknown):R=>typeof v===`object`&&v!==null?v as R:{};const fn=(v:unknown,n:string)=>(rec(v)[n] as (((...a:unknown[])=>unknown)|undefined));
 function update(manager:unknown,id:string,callback:(state:R)=>void){fn(manager,`updateConversationState`)?.(id,callback)} function append(state:R,item:unknown){const turns=state.turns;if(Array.isArray(turns)&&turns.length>0){const turn=rec(turns[turns.length-1]);const items=Array.isArray(turn.items)?turn.items:[];turn.items=[...items,item]}}
@@ -196,6 +198,98 @@ function applyServerRequestResolved(context: any, params: any): void {
     state.requests = state.requests.filter((entry: any) => entry.id !== params.requestId);
   });
 }
+function pendingContinuation(context: any, conversationId: string, status: string, hasRunnableQueuedFollowUp: boolean): boolean {
+  const { manager, notificationContext } = context;
+  const conversation = manager.getConversationOrThrow(conversationId);
+  const turns = mergedConversationTurns(conversation, notificationContext.turnMergePolicy);
+  return (conversation.unconfirmedTurnSubmissions?.length ?? 0) > 0 ||
+    (status !== "interrupted" && hasRunnableQueuedFollowUp) ||
+    (status === "completed" && conversation.threadGoal?.status === "active") ||
+    turns.at(-1)?.status === "inProgress" ||
+    activeAncestryIds(notificationContext.threadStore.getThreadSummaries(), notificationContext.threadStore.getCachedConversations()).has(conversationId);
+}
+function goalCanContinue(context: any, conversationId: string, conversation: any): boolean {
+  const { manager, notificationContext } = context;
+  const hasPendingSteering = mergedConversationTurns(conversation, notificationContext.turnMergePolicy).some((turn: any) =>
+    turn.items.some((item: any) => item.type === "steeringUserMessage" && item.status === "pending"));
+  return conversation.resumeState === "resumed" && conversation.threadGoal?.status === "active" &&
+    conversation.requests.length === 0 && !hasPendingSteering && manager.getStreamRole(conversationId)?.role === "owner" &&
+    manager.isConversationStreaming(conversationId);
+}
+function automationDecision(context: any, conversationId: string, turn: any, capability: any, lastAgentMessage: string | null) {
+  const automationKind = capability?.automationKind ?? null;
+  const parsed = lastAgentMessage == null ? null :
+    (automationKind === "heartbeat" ? parseAutomationUserMessage(lastAgentMessage) : parseHeartbeatDecision(lastAgentMessage));
+  let decision = parsed?.decision ?? null;
+  if (decision == null && automationKind === "heartbeat" && turn.status === "completed" && !lastAgentMessage?.trim()) decision = "DONT_NOTIFY";
+  if (capability?.notificationPolicy === "failed_runs_only") decision = turn.status === "completed" ? "DONT_NOTIFY" : "NOTIFY";
+  const conversation = context.manager.getConversation(conversationId);
+  const shouldMarkUnread = decision === "NOTIFY" || (decision !== "DONT_NOTIFY" &&
+    (!context.supportsGoalContinuation || turn.status !== "completed" || conversation == null || !goalCanContinue(context, conversationId, conversation)));
+  const head = context.readQueuedFollowUpHead(conversationId);
+  return {
+    decision,
+    heartbeatAssistantMessage: parsed,
+    shouldMarkUnread,
+    hasRunnableQueuedFollowUp: head === undefined || (head != null && head.pausedReason == null),
+  };
+}
+function applyTurnCompleted(context: any, notification: { params: any }, capability: any, shouldIgnore: boolean): "deferred" | "handled" {
+  const { manager, notificationContext } = context;
+  if (notificationContext.itemStreamState.drainBefore(() => manager.onNotification("turn/completed", notification.params, capability, shouldIgnore))) return "deferred";
+  const { threadId, turn } = notification.params;
+  const conversationId = normalizeThreadId(threadId);
+  if (!notificationContext.threadStore.conversations.has(conversationId)) {
+    notificationContext.unread.discardTurn(conversationId, turn.id);
+    manager.logger.error("Received turn/completed for unknown conversation", { safe: { conversationId }, sensitive: {} });
+    return "handled";
+  }
+  if (turn.status === "interrupted" || turn.status === "failed") notificationContext.itemStreamState.clearTurnTerminalInputBuffers(conversationId, turn.id);
+  let planContent: string | null = null;
+  let planStepCount: number | null = null;
+  let completedPlanStepCount: number | null = null;
+  notificationContext.updateTurnState(conversationId, turn.id, (state: any) => {
+    state.turnId = turn.id; state.status = turn.status; state.error = turn.error; state.durationMs = turn.durationMs;
+    state.automationKind = capability?.automationKind ?? null;
+    state.items = state.items.filter((item: any) => item.type !== "strictReviewNotice");
+    if (turn.status !== "completed") return;
+    const todo = [...state.items].reverse().find((item: any) => item.type === "todo-list" && "plan" in item);
+    if (todo != null) {
+      completedPlanStepCount = todo.plan.filter((step: any) => step.status === "completed").length;
+      if (completedPlanStepCount < todo.plan.length) planStepCount = todo.plan.length;
+    }
+    const plan = [...state.items].reverse().find((item: any) => item.type === "plan" && "text" in item);
+    const text = plan?.text?.trim(); if (text) planContent = text;
+  });
+  if (planStepCount != null && completedPlanStepCount != null)
+    manager.logger.info("turn_completed_with_incomplete_plan", { safe: { conversationId, turnId: turn.id, planStepCount, completedPlanStepCount }, sensitive: {} });
+  if (planContent != null) manager.updateConversationState(conversationId, (state: any) => {
+    const target = findTurnById(state, turn.id);
+    if (target != null) {
+      target.items = target.items.filter((item: any) => item.type !== "planImplementation");
+      target.items.push({ id: planImplementationId(turn.id), type: "planImplementation", turnId: turn.id, planContent, isCompleted: false });
+    }
+    state.requests = state.requests.filter((request: any) => request.method !== "item/plan/requestImplementation" || request.params.turnId !== turn.id);
+    state.requests.push({ method: "item/plan/requestImplementation", id: planImplementationId(turn.id), params: { threadId: conversationId, turnId: turn.id, planContent } });
+    state.hasUnreadTurn = true;
+  });
+  const lastAgentMessage = notificationContext.getLastAgentMessageForTurn(conversationId, turn.id);
+  const result = automationDecision(context, conversationId, turn, capability, lastAgentMessage);
+  const hasPendingContinuation = pendingContinuation(context, conversationId, turn.status, result.hasRunnableQueuedFollowUp);
+  let fileCount: number | undefined;
+  manager.updateConversationState(conversationId, (state: any) => {
+    notificationContext.unread.completeTurn(conversationId, turn.id, result.decision === "DONT_NOTIFY", state);
+    if (result.shouldMarkUnread) state.hasUnreadTurn = true;
+    fileCount = findTurnById(state, turn.id)?.localMetadata?.fileAttachmentCount;
+  });
+  manager.broadcastConversationSnapshot(conversationId);
+  if (manager.getStreamRole(conversationId)?.role !== "follower") notificationContext.events.emitTurnCompleted({
+    conversationId, hostId: manager.getHostId(), status: turn.status, turnId: turn.id, lastAgentMessage,
+    heartbeatAssistantMessage: result.heartbeatAssistantMessage, automationNotificationDecision: result.decision,
+    hasPendingContinuation, fileCount,
+  });
+  return "handled";
+}
 export function nb(context: any, method: string, params: any, automationCapability?: unknown, shouldIgnore = false): void {
   const notification = { method, params };
   const delivery = { notification, automationCapability };
@@ -212,6 +306,7 @@ export function nb(context: any, method: string, params: any, automationCapabili
     notificationContext.events.emitNotification(notification);
     return;
   }
+  if (method === "turn/completed" && applyTurnCompleted(context, notification, automationCapability, shouldIgnore) === "deferred") return;
   if (["account/login/completed", "account/updated", "mcpServer/oauthLogin/completed", "windowsSandbox/setupCompleted"].includes(method))
     notificationContext.lifecycle.handleNotification(notification);
   else if (THREAD_NOTIFICATION_METHODS.has(method)) applyThreadNotification(context, notification);

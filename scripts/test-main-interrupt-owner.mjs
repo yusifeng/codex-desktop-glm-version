@@ -17,7 +17,9 @@ Function("require", "module", "exports", transpiled.code)((specifier) => {
     forEachTurn: (conversation, callback) => (conversation.turns ?? []).forEach(callback),
   };
   if (specifier === "../threads/patch-classification") return { applyThreadSettingsUpdate() {} };
-  if (specifier === "../requests/item-synthesis") return { Qv() {}, Zv() {} };
+  if (specifier === "../requests/item-synthesis") return { Qv() {}, Yv: String, Zv() {} };
+  if (specifier === "../threads/automation-detector") return { parseAutomationUserMessage: () => null, parseHeartbeatDecision: () => null };
+  if (specifier === "../threads/hydration") return { activeAncestryIds: () => new Set() };
   throw new Error(`unexpected require ${specifier}`);
 }, module, module.exports);
 const owner = module.exports;

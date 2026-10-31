@@ -1,8 +1,12 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成 notification `turn/completed` reducer：恢复 delta drain/defer、unknown/unread cleanup、terminal buffer 清理、turn 状态与 automation 标注、
+incomplete plan metrics、plan implementation request、heartbeat/failed-only notification decision、goal/queued/ancestry continuation、unread、snapshot
+与 owner-only completion event。旧 `tb` 及仅由它消费的 helper、已迁移 synthetic helper 删除；`Ry/Hy/Uy` 因主 chunk 尚有真实 consumer 保留。
+
 继续恢复 notification turn reducer：语义 `nb` 已接回 `turn/started`、diff/plan/safety、hook lifecycle、model reroute 与 turn error；started
 路径恢复 unknown guard、placeholder/synthesized turn 绑定、最新 model/effort/collaboration 投影、旧 plan implementation completion、request 过滤与
-snapshot。focused reducer suite 覆盖 started 和 diff；旧 `tb` 暂保留作为尚待迁移的 completed 分支源码边界。
+snapshot。focused reducer suite 覆盖 started 和 diff。
 
 恢复 core notification reducer 外层 owner：`streams/notifications-apply.ts` 的 `nb` 现按旧顺序执行 reconnect reset、follower ignore、resume/
 thread-start buffering、turn-start observation、trace、realtime/lifecycle/thread/item/fs 分发与最终 emit；thread reducer 同步恢复 environment、start、

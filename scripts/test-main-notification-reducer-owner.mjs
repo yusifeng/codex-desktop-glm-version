@@ -13,6 +13,7 @@ Function("require", "module", "exports", transpiled.code)((specifier) => {
     conversationTurns: (conversation) => conversation.turns ?? [],
     findTurnById: (conversation, id) => (conversation.turns ?? []).find((turn) => turn.turnId === id) ?? null,
     lastTurnWithTurnId: (conversation) => [...(conversation.turns ?? [])].reverse().find((turn) => turn.turnId != null) ?? null,
+    mergedConversationTurns: (conversation) => conversation.turns ?? [],
     forEachTurn: (conversation, callback) => (conversation.turns ?? []).forEach(callback),
   };
   if (specifier === "../threads/patch-classification") return {
@@ -20,8 +21,13 @@ Function("require", "module", "exports", transpiled.code)((specifier) => {
   };
   if (specifier === "../requests/item-synthesis") return {
     Qv: (state, requestId) => { state.permissionResolved = requestId; },
+    Yv: (turnId) => `plan-${turnId}`,
     Zv: (state) => { state.elicitationResolved = true; },
   };
+  if (specifier === "../threads/automation-detector") return {
+    parseAutomationUserMessage: () => null, parseHeartbeatDecision: () => null,
+  };
+  if (specifier === "../threads/hydration") return { activeAncestryIds: () => new Set() };
   throw new Error(`unexpected require ${specifier}`);
 }, module, module.exports);
 const owner = module.exports;
@@ -30,10 +36,15 @@ const calls = [];
 const conversations = new Map([["thread-1", { id: "thread-1", turns: [], requests: [] }]]);
 const context = {
   createId: () => `item-${calls.length}`,
+  supportsGoalContinuation: true,
+  readQueuedFollowUpHead: () => null,
   observeTurnStart: (...args) => calls.push(["observe", ...args]),
   manager: {
     logger: { trace: (...args) => calls.push(["trace", ...args]), info: (...args) => calls.push(["info", ...args]), warning: (...args) => calls.push(["warning", ...args]), error: (...args) => calls.push(["error", ...args]) },
     getHostId: () => "local", getConversation: (id) => conversations.get(id) ?? null,
+    getConversationOrThrow: (id) => conversations.get(id), getStreamRole: () => ({ role: "owner" }),
+    isConversationStreaming: () => false,
+    onNotification: (...args) => calls.push(["replay", ...args]),
     updateConversationState: (id, update) => { const state = conversations.get(id) ?? { id }; update(state); conversations.set(id, state); },
     updateTurnState: (id, turnId, update) => {
       const state = conversations.get(id); const turn = state?.turns?.find((entry) => entry.turnId === turnId);
@@ -48,17 +59,28 @@ const context = {
       conversations, resetAfterReconnect: () => calls.push(["reset"]),
       recordThreadRuntimeStatusEvidence: (...args) => (calls.push(["status", ...args]), true),
       hydrateActiveThread: (id) => calls.push(["hydrate", id]), applyThreadTitleUpdate: (...args) => calls.push(["title", ...args]),
+      getThreadSummaries: () => [], getCachedConversations: () => [],
     },
     streamState: { shouldIgnoreThreadMutationAsFollower: () => false },
     resumeNotificationBuffer: { buffer: () => false }, threadStartedNotificationDeferral: { bufferNotification: () => false },
-    events: { emitNotification: (value) => calls.push(["emit", value]), emitOpenFileChange: (value) => calls.push(["file", value]) },
+    events: {
+      emitNotification: (value) => calls.push(["emit", value]), emitOpenFileChange: (value) => calls.push(["file", value]),
+      emitTurnCompleted: (value) => calls.push(["turn-completed", value]),
+    },
     lifecycle: { handleNotification: (value) => calls.push(["lifecycle", value]) },
-    itemStreamState: { handleNotification: (value) => calls.push(["item", value]) },
+    itemStreamState: {
+      handleNotification: (value) => calls.push(["item", value]), drainBefore: () => false,
+      clearTurnTerminalInputBuffers: (...args) => calls.push(["clear-terminal", ...args]),
+    },
     openFileWatches: { getFileChangeMessages: () => [{ type: "open-file-changed" }] },
     handleRealtimeItemAdded: (params) => calls.push(["realtime", params]),
     upsertConversationFromThread: (thread) => (conversations.set(thread.id, thread), thread.id),
     handleThreadArchived: (id) => calls.push(["archived", id]), handleThreadDeletion: (ids) => calls.push(["deleted", ids]),
     handleThreadUnarchived: (id) => calls.push(["unarchived", id]),
+    unread: { discardTurn: (...args) => calls.push(["discard-unread", ...args]), completeTurn: (...args) => calls.push(["complete-unread", ...args]) },
+    updateTurnState: (id, turnId, update) => context.manager.updateTurnState(id, turnId, update),
+    getLastAgentMessageForTurn: () => "done",
+    turnMergePolicy: {},
   },
 };
 
@@ -80,6 +102,12 @@ equal(conversations.get("thread-1").latestModel, "gpt");
 equal(conversations.get("thread-1").turns[0].durationMs, 3);
 owner.applyNotification(context, "turn/diff/updated", { threadId: "thread-1", turnId: "turn-1", diff: "patch" });
 equal(conversations.get("thread-1").turns[0].diff, "patch");
+owner.applyNotification(context, "turn/completed", {
+  threadId: "thread-1", turn: { id: "turn-1", status: "completed", error: null, durationMs: 8 },
+});
+equal(conversations.get("thread-1").turns[0].status, "completed");
+equal(calls.some(([kind]) => kind === "complete-unread"), true);
+equal(calls.some(([kind]) => kind === "snapshot"), true);
 
 owner.applyNotification(context, "item/agentMessage/delta", { threadId: "thread-1", delta: "hello" });
 equal(calls.some(([kind]) => kind === "item"), true);
@@ -107,5 +135,7 @@ equal(main.includes("function rb("), false);
 equal(main.includes("function My("), false);
 equal(main.includes("function Ny("), false);
 equal(main.includes("function Py("), false);
+for (const name of ["Fy", "Iy", "Ly", "zy", "By", "Vy", "Wy", "Gy", "Ky", "qy", "Jy", "Yy", "Xy", "Zy", "Qy", "eb", "tb"])
+  equal(main.includes(`function ${name}(`), false);
 
 console.log(`${assertions} main notification reducer owner assertions passed`);
