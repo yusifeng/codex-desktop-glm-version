@@ -163,12 +163,12 @@ export function createBrowserSidebarKeyboardHandler({
   owner: ShortcutOwnerLike;
   runCommandInOwner: (commandId: string, keyboardEvent: ReturnType<typeof toDomKeyboardEvent>, options?: { allowAppShellTabShortcut?: boolean }) => void;
   setInteractionMode?: (interactionMode: "comment" | "browse", annotationModeEntrySource?: string) => void;
-}): (event: { preventDefault(): void } & InputEvent, webContents: unknown) => void {
+}): (event: { preventDefault(): void }, input: InputEvent) => void {
   const matchCommand = createCommandMatcher(getOwnerCommandAccelerators);
-  return (event, _webContents) => {
-    if (isFindInPageShortcut(event)) return;
+  return (event, input) => {
+    if (isFindInPageShortcut(input)) return;
     if (
-      actionForEvent(event, {
+      actionForEvent(input, {
         allowDebugMenu: false,
         closeTabAccelerators: getOwnerCommandAccelerators("closeTab"),
         state: {
@@ -194,18 +194,18 @@ export function createBrowserSidebarKeyboardHandler({
       closeBrowserTab();
       return;
     }
-    const matched = matchCommand(event);
+    const matched = matchCommand(input);
     if (matched != null) {
       event.preventDefault();
       if (matched.commandId !== "closeOtherTabs") owner.focus();
       if (matched.allowAppShellTabShortcut && !getThreadNavigationShortcutLocked()) {
-        runCommandInOwner(matched.commandId, toDomKeyboardEvent(event), { allowAppShellTabShortcut: true });
+        runCommandInOwner(matched.commandId, toDomKeyboardEvent(input), { allowAppShellTabShortcut: true });
         return;
       }
-      runCommandInOwner(matched.commandId, toDomKeyboardEvent(event));
+      runCommandInOwner(matched.commandId, toDomKeyboardEvent(input));
       return;
     }
-    const modeToggle = commentModeToggle(event, { interactionMode: getInteractionMode(), isCommentModeAvailable: isCommentModeAvailable() });
+    const modeToggle = commentModeToggle(input, { interactionMode: getInteractionMode(), isCommentModeAvailable: isCommentModeAvailable() });
     if (modeToggle != null) {
       event.preventDefault();
       if (setInteractionMode != null) {

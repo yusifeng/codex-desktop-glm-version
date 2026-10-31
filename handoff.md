@@ -5002,3 +5002,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   cleanup；模块级 authenticated-session registry 供 window manager 跨 owner 识别。
 - main 旧 `$He..MW` 约 352 行整带删除，checkout owner 边界保持不变。focused coverage 24 项，no-unwired gate 扩至
   422 项；下一批继续处理紧随其后的 checkout-webview owner。
+
+# 2026-11-01 browser find and shortcuts wiring
+
+- checkout-webview 当前语义模块仅覆盖 preferences/CDP observer，尚未覆盖完整约 930 行会话状态机，保留旧 owner 等待完整迁移，
+  未做危险的部分删除。
+- 后续完整的 `find-in-page.ts` 与 `browser-shortcuts.ts` 已接回；修复 shortcuts wrapper/input 双参数契约。main 旧 `oq..KGe`
+  约 235 行整带删除。focused coverage 21 项，no-unwired gate 扩至 431 项；下一批从 `qGe` candidate search owner 继续审计。

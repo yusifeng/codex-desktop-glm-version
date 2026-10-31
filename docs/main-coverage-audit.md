@@ -3048,3 +3048,11 @@ focused test 覆盖 URL/navigation、消息/鼠标、store ownership/预算入�
 导出 partition/session predicates，保持 checkout/window-manager 的跨 owner 识别语义。原始 chunk 中 `$He..MW` 约 352 行
 重复实现已物理删除；focused test 覆盖认证、cookies、handoff、partition hardening、共享 session registry 与真实接线，
 no-unwired gate 扩至 422 项。
+
+### 增量接线：browser find 与 shortcuts
+
+`browser-sidebar/find-in-page.ts` 与 `browser-shortcuts.ts` 已整组接回 find state/requestId guard、结果广播、方向查找、关闭清理、
+owner command accelerator、tab/panel 命令冲突和 comment-mode shortcut。接线时修复 shortcuts handler 与 app-shell 相同的
+Electron wrapper/input 双参数契约错误。原始 chunk 中 `oq..KGe` 约 235 行已整带删除，后续候选搜索 owner 边界保持不变。
+focused test 覆盖 find lifecycle、requestId、close cleanup、comment toggle、keymap projection 与真实接线；no-unwired gate 扩至
+431 项。

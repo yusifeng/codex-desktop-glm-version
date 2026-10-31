@@ -45,7 +45,7 @@ export function emptyFindState(): FindInPageState {
 }
 
 /** 状态广播（原 `dq`）。 */
-function broadcastFindState(windowManager: FindWindowManagerLike, owner: { isDestroyed(): boolean }, conversationId: string, tab: FindableTab): void {
+export function broadcastFindState(windowManager: FindWindowManagerLike, owner: { isDestroyed(): boolean }, conversationId: string, tab: FindableTab): void {
   if (owner.isDestroyed()) return;
   windowManager.sendMessageToWebContents(owner, {
     type: "browser-sidebar-find-state",

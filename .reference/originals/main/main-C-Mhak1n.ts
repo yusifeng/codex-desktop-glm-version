@@ -460,6 +460,20 @@ const {
   mountAuthenticatedChatGptWebview: uUe,
 } = require("./main-app/browser-sidebar/first-party-webview.js");
 const {
+  emptyFindState: oq,
+  openFindInPage: sq,
+  updateFindQuery: cq,
+  findNext: lq,
+  findPrevious: uq,
+  applyFindResult: zGe,
+  broadcastFindState: dq,
+  closeFindInPage: fq,
+} = require("./main-app/browser-sidebar/find-in-page.js");
+const {
+  createBrowserSidebarKeyboardHandler: HGe,
+  ownerCommandAcceleratorsFromKeymap: mq,
+} = require("./main-app/browser-sidebar/browser-shortcuts.js");
+const {
   inspect: SVe,
   back: CVe,
   forward: wVe,
@@ -38931,241 +38945,6 @@ var LGe = createDownloadStoreClass({
   path: h,
   sanitizeUrl: a.v,
 });
-function oq() {
-  return { activeMatchOrdinal: 0, matches: 0, query: ``, requestId: null };
-}
-function sq(e, t, n, r) {
-  (e.sendMessageToWebContents(t, {
-    type: `browser-sidebar-command`,
-    conversationId: n,
-    browserTabId: r.browserTabId,
-    command: { type: `open-find` },
-  }),
-    dq(e, t, n, r));
-}
-function cq(e, t, n, r, i) {
-  if (i.length === 0) {
-    fq(e, t, n, r);
-    return;
-  }
-  if (r.findState.query === i) return;
-  ((r.findState = { ...r.findState, activeMatchOrdinal: 0, matches: 0, query: i, requestId: null }),
-    dq(e, t, n, r));
-  let a = r.page?.view.webContents;
-  a == null || a.isDestroyed() || (r.findState.requestId = a.findInPage(i));
-}
-function lq(e) {
-  pq(e, !0);
-}
-function uq(e) {
-  pq(e, !1);
-}
-function zGe(e, t, n, r, i) {
-  i.requestId === r.findState.requestId &&
-    ((r.findState = {
-      ...r.findState,
-      activeMatchOrdinal: i.activeMatchOrdinal,
-      matches: i.matches,
-      requestId: i.finalUpdate ? null : i.requestId,
-    }),
-    dq(e, t, n, r));
-}
-function dq(e, t, n, r) {
-  if (t.isDestroyed()) return;
-  let i = {
-    type: `browser-sidebar-find-state`,
-    conversationId: n,
-    browserTabId: r.browserTabId,
-    state: {
-      activeMatchOrdinal: r.findState.activeMatchOrdinal,
-      matches: r.findState.matches,
-      query: r.findState.query,
-    },
-  };
-  e.sendMessageToWebContents(t, i);
-}
-function fq(e, t, n, r) {
-  if (
-    r.findState.query.length === 0 &&
-    r.findState.matches === 0 &&
-    r.findState.activeMatchOrdinal === 0 &&
-    r.findState.requestId == null
-  )
-    return;
-  let i = r.page?.view.webContents;
-  (i != null && !i.isDestroyed() && i.stopFindInPage(`clearSelection`),
-    (r.findState = oq()),
-    dq(e, t, n, r));
-}
-function pq(e, t) {
-  if (e.findState.query.length === 0) return;
-  let n = e.page?.view.webContents;
-  n == null ||
-    n.isDestroyed() ||
-    (e.findState.requestId = n.findInPage(e.findState.query, { findNext: !1, forward: t }));
-}
-var BGe = [`nextTab`, `previousTab`],
-  VGe = [
-    ...n.Et,
-    `focusBrowserAddressBar`,
-    `nextRecentThread`,
-    `nextThread`,
-    `nextThreadNeedingAttention`,
-    `openBrowserTab`,
-    `previousRecentThread`,
-    `previousThread`,
-    `quickChat`,
-    `reopenClosedTab`,
-    `closeOtherTabs`,
-  ];
-function HGe({
-  captureTextSelection: e,
-  closeBrowserTab: t,
-  getCanCloseBrowserTab: n,
-  getInteractionMode: r,
-  getOwnerCommandAccelerators: i = KGe,
-  getThreadNavigationShortcutLocked: a = () => !1,
-  isCommentModeAvailable: o,
-  owner: s,
-  runCommandInOwner: c,
-  setInteractionMode: l,
-}) {
-  let u = GGe(i);
-  return (d, f) => {
-    if (UGe(f)) return;
-    if (
-      uU(f, {
-        allowDebugMenu: !1,
-        closeTabAccelerators: i(`closeTab`),
-        state: {
-          bottomPanelBrowserCanZoom: !1,
-          bottomPanelBrowserConversationId: null,
-          bottomPanelBrowserTabId: null,
-          canAcceptAppshotShortcut: !1,
-          canRedoAppAction: !1,
-          canUndoAppAction: !1,
-          bottomPanelCanCloseActiveTab: !1,
-          focusArea: `right-panel`,
-          focusedEditable: null,
-          imagePreviewOpen: !1,
-          isNewChatRoute: !1,
-          rightPanelBrowserCanZoom: !1,
-          rightPanelBrowserConversationId: null,
-          rightPanelBrowserTabId: null,
-          rightPanelCanCloseActiveTab: n(),
-        },
-      })?.type === `close-active-app-shell-tab`
-    ) {
-      (d.preventDefault(), t());
-      return;
-    }
-    let p = u(f);
-    if (p != null) {
-      if (
-        (d.preventDefault(),
-        p.commandId !== `closeOtherTabs` && s.focus(),
-        p.allowAppShellTabShortcut && !a())
-      ) {
-        c(p.commandId, gq(f), { allowAppShellTabShortcut: !0 });
-        return;
-      }
-      c(p.commandId, gq(f));
-      return;
-    }
-    let m = WGe(f, { interactionMode: r(), isCommentModeAvailable: o() });
-    m != null &&
-      (d.preventDefault(),
-      l != null &&
-        (m.interactionMode === `comment` &&
-          m.annotationModeEntrySource === `keyboard-shortcut` &&
-          e?.(),
-        l(m.interactionMode, m.annotationModeEntrySource)));
-  };
-}
-function UGe(e) {
-  return (
-    oU(e, `CmdOrCtrl+F`) ||
-    oU(e, `CmdOrCtrl+G`) ||
-    oU(e, process.platform === `darwin` ? `Command+Shift+G` : `Shift+F3`)
-  );
-}
-function WGe(e, { interactionMode: t, isCommentModeAvailable: n }) {
-  return !oU(e, `CmdOrCtrl+.`) || !n
-    ? null
-    : {
-        type: `set-interaction-mode`,
-        interactionMode: t === `comment` ? `browse` : `comment`,
-        ...(t === `comment` ? {} : { annotationModeEntrySource: `keyboard-shortcut` }),
-      };
-}
-function mq(e) {
-  let t = process.platform === `darwin`,
-    r = (r) => n.At({ commandId: r, isMacOS: t, keymapState: e });
-  return {
-    focusTab1: r(`focusTab1`),
-    focusTab2: r(`focusTab2`),
-    focusTab3: r(`focusTab3`),
-    focusTab4: r(`focusTab4`),
-    focusTab5: r(`focusTab5`),
-    focusTab6: r(`focusTab6`),
-    focusTab7: r(`focusTab7`),
-    focusTab8: r(`focusTab8`),
-    focusTab9: r(`focusTab9`),
-    closeOtherTabs: r(`closeOtherTabs`),
-    closeTab: r(`closeTab`),
-    focusBrowserAddressBar: r(`focusBrowserAddressBar`),
-    nextTab: r(`nextTab`),
-    nextRecentThread: r(`nextRecentThread`),
-    nextThread: r(`nextThread`),
-    nextThreadNeedingAttention: r(`nextThreadNeedingAttention`),
-    openBrowserTab: r(`openBrowserTab`),
-    previousTab: r(`previousTab`),
-    previousRecentThread: r(`previousRecentThread`),
-    previousThread: r(`previousThread`),
-    quickChat: r(`quickChat`),
-    reopenClosedTab: r(`reopenClosedTab`),
-  };
-}
-function GGe(e) {
-  return (t) => {
-    if (t.type !== `keyDown`) return null;
-    let n = gq(t),
-      r = hq(t, n, e, BGe),
-      i = hq(t, n, e, VGe);
-    return r != null && i != null
-      ? i === `closeOtherTabs`
-        ? { commandId: r }
-        : { allowAppShellTabShortcut: !0, commandId: i }
-      : r == null
-        ? i == null
-          ? null
-          : { commandId: i }
-        : { commandId: r };
-  };
-}
-function hq(e, t, r, i) {
-  for (let a of i)
-    for (let i of r(a)) {
-      if (i.includes(` `) || !sU(t, i)) continue;
-      let r = n.Ot(a);
-      return e.isAutoRepeat && (r?.kind !== `webview` || r.allowsKeyRepeat !== !0) ? null : a;
-    }
-  return null;
-}
-function gq(e) {
-  return {
-    altKey: e.alt === !0,
-    code: e.code,
-    ctrlKey: e.control === !0,
-    key: e.key,
-    metaKey: e.meta === !0,
-    repeat: e.isAutoRepeat === !0,
-    shiftKey: e.shift === !0,
-  };
-}
-function KGe(e) {
-  return n.jt({ commandId: e, isMacOS: process.platform === `darwin` });
-}
 var qGe = class {
   windows;
   invalidationListeners = new Set();
