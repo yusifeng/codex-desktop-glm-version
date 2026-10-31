@@ -38,4 +38,10 @@ export class WorkerInvocationSampler {
   }
 }
 
-if (typeof module !== `undefined`) module.exports = { WorkerInvocationSampler };
+export function createGitWorkerInvocationSampler(
+  createRollingWindowCounter: RollingWindowCounterFactory,
+): WorkerInvocationSampler {
+  return new WorkerInvocationSampler(createRollingWindowCounter, 30_000);
+}
+
+if (typeof module !== `undefined`) module.exports = { WorkerInvocationSampler, createGitWorkerInvocationSampler };

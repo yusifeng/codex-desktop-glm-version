@@ -227,7 +227,8 @@ const { shouldApplyWindowsOpacityWorkaround } = require("./main-app/startup/wind
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { sendTelemetryRequest } = require("./main-app/worker/telemetry-request.js");
 const { createSentryRpcHandlerClass } = require("./main-app/worker/sentry-envelope-transport.js");
-const { WorkerInvocationSampler } = require("./main-app/worker/invocation-sampler.js");
+const { createGitWorkerInvocationSampler } = require("./main-app/worker/invocation-sampler.js");
+const { createWorkerMainProtocol } = require("./main-app/worker/worker-main-protocol.js");
 const { createWorkerBusClass } = require("./main-app/worker/worker-bus.js");
 const { createWorkerManagerClass } = require("./main-app/worker/worker-manager.js");
 const { AppEventPublisher } = require("./main-app/worker/app-event-publisher.js");
@@ -621,6 +622,7 @@ const { createRealtimeVoiceHotkeyManager } = require("./main-app/realtime/voice-
 const { createDebugWindowRuntime } = require("./main-app/debug/debug-window-manager.js");
 const { createThreadMetadataServiceClass } = require("./main-app/threads/thread-metadata-service.js");
 const { createNativeStatusItemControllerClass } = require("./main-app/tray/native-status-item-controller.js");
+const { createNativeStatusItemEventProtocol } = require("./main-app/tray/native-status-item-event-protocol.js");
 const { createTrayLifecycle } = require("./main-app/tray/tray-lifecycle.js");
 const { createComputerHistoryStatusItemActions } = require("./main-app/computer-use/native-status-item-actions.js");
 const { installDesktopOpenPathHandler } = require("./main-app/files/desktop-open-path-handler.js");
@@ -56116,15 +56118,9 @@ function dst({
     getContextForWebContents: (e) => (B.hasRegisteredWebContents(e) ? z : null),
   };
 }
-var fst = 3e4,
-  pst = class extends WorkerInvocationSampler {
-    constructor() {
-      super((options) => new jt(options), fst);
-    }
-  };
+var workerMainProtocol = createWorkerMainProtocol(n);
 var hst = createSentryRpcHandlerClass({ RpcHandlerBase: n.Uf, getClient: () => a.tn() });
-var yst = n.wf({ payload: n.Of(), requestId: n.Of() }),
-  bst = createWorkerManagerClass({
+var bst = createWorkerManagerClass({
     createLogger: r.r,
     workerFilePath: (0, h.join)(__dirname, `worker.js`),
     resolveMaxLogLevel: () => a.gn(a.in.resolve()),
@@ -56138,7 +56134,7 @@ var yst = n.wf({ payload: n.Of(), requestId: n.Of() }),
     SentryRpcHandler: hst,
     isWorkerMainRpcCancel,
     isWorkerMainRpcRequest,
-    parseCesPayload: (value) => yst.parse(value),
+    parseCesPayload: workerMainProtocol.parseCesPayload,
     sendTelemetryRequest,
     exportOtel: a.S,
   }),
@@ -56150,7 +56146,7 @@ var yst = n.wf({ payload: n.Of(), requestId: n.Of() }),
   });
 var xst = createWorkerRuntimeFactory({
     AppEventPublisher,
-    createGitInvocationSampler: () => new pst(),
+    createGitInvocationSampler: () => createGitWorkerInvocationSampler((options) => new jt(options)),
     WorkerBus: H9,
     createShortcutLinkReader,
     readShortcutLink: (path) => l.shell.readShortcutLink(path),
@@ -56175,45 +56171,12 @@ var Tst = createWorkspacePolicyRuntime({
       sensitive: { error },
     }),
 });
-var jst = n.vf(`type`, [
-    n.wf({ type: n.bf(`menu-update`) }),
-    n.wf({ type: n.bf(`menu-open`) }),
-    n.wf({ type: n.bf(`menu-close`) }),
-    n.wf({ type: n.bf(`quit`) }),
-    n.wf({ type: n.bf(`open-thread`), path: n.Of() }),
-    n.wf({ type: n.bf(`computer-use/stop-application`), applicationId: n.Of() }),
-    n.wf({
-      type: n.bf(`computer-history/pause`),
-      duration: n.df([`thirty_minutes`, `one_hour`, `until_tomorrow`]),
-    }),
-    n.wf({ type: n.bf(`computer-history/resume`) }),
-    n.wf({
-      type: n.bf(`computer-history/update-observation`),
-      scope: n.df([`app`, `url`]),
-      target: n.Of(),
-      observe: n.gf(),
-    }),
-    n.wf({
-      type: n.bf(`computer-history/clear-history`),
-      scope: n.df([`application_session`, `last_ten_minutes`, `last_hour`, `last_day`]),
-      applicationName: n.Of().optional(),
-      startedAt: n.Of().optional(),
-      endedAt: n.Of().nullable().optional(),
-    }),
-    n.wf({ type: n.bf(`computer-history/show-history`) }),
-    n.wf({ type: n.bf(`computer-history/open-settings`) }),
-    n.wf({
-      type: n.bf(`service-state-changed`),
-      processIdentifier: n.Cf().int().positive(),
-      computerUseActive: n.gf(),
-      computerHistoryState: n.df([`stopped`, `running`, `paused`]),
-    }),
-  ]),
+var nativeStatusItemEventProtocol = createNativeStatusItemEventProtocol(n),
   Mst = createNativeStatusItemControllerClass({
     app: l.app,
     resourcesPath: process.resourcesPath,
     createStatusItemAddon: Vs,
-    parseNativeEvent: (event) => jst.safeParse(event),
+    parseNativeEvent: nativeStatusItemEventProtocol.parseNativeEvent,
     indicatorSetting: n.Ia.chronicleMenuBarIndicatorEnabled,
     projectMenuState: projectNativeStatusItemMenuState,
     getQuitLabel: e7,

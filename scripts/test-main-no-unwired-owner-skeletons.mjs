@@ -102,6 +102,9 @@ const realOwners = [
   ["src/main/main-app/projects/project-write-policy.ts", "computeProjectOrderMoves"],
   ["src/main/main-app/remote-artifact/artifact-session-host-protocol.ts", "createArtifactSessionHostProtocol"],
   ["src/main/main-app/window/browser-window-policy-adapters.ts", "createBrowserWindowPolicyAdapters"],
+  ["src/main/main-app/worker/invocation-sampler.ts", "createGitWorkerInvocationSampler"],
+  ["src/main/main-app/worker/worker-main-protocol.ts", "createWorkerMainProtocol"],
+  ["src/main/main-app/tray/native-status-item-event-protocol.ts", "createNativeStatusItemEventProtocol"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -583,5 +586,12 @@ assert.equal(main.includes("function M9("), false, "generated renderer-entry wra
 assert.equal(main.includes("function est("), false, "generated sender-frame wrapper must be removed");
 assert.equal(main.includes("function rst("), false, "generated native-window sizing wrapper must be removed");
 assert.equal(main.includes("function z9("), false, "generated window-options wrapper must be removed");
+assert.equal(main.includes('require("./main-app/worker/worker-main-protocol.js")'), true, "worker main protocol is wired");
+assert.equal(main.includes('require("./main-app/tray/native-status-item-event-protocol.js")'), true, "native status-item protocol is wired");
+assert.equal(main.includes("createWorkerMainProtocol(n)"), true, "worker main protocol runtime is created");
+assert.equal(main.includes("createNativeStatusItemEventProtocol(n)"), true, "native status-item protocol runtime is created");
+assert.equal(main.includes("var yst ="), false, "generated CES request schema must be removed");
+assert.equal(main.includes("var jst ="), false, "generated native status schema must be removed");
+assert.equal(main.includes("class extends WorkerInvocationSampler"), false, "generated sampler subclass must be removed");
 
-console.log("574 main unwired-owner skeleton assertions passed");
+console.log("587 main unwired-owner skeleton assertions passed");

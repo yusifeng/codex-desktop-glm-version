@@ -3345,3 +3345,10 @@ append/asset/open/flush/capabilities/kind 和 native Office snapshot trust bound
 renderer environment URL、error page/app name 等环境依赖一次绑定成语义 API。`browser-window-manager.ts` 的 19 个机械依赖名改为
 `rendererEntryUrl`、`sameTrustedPath`、`windowSurfaceColors` 等可读名称；主 chunk 旧 `E9/wot/Tot/Eot/Dot/D9/Pot/A9/j9/$ot/M9/est/N9/tst/P9/nst/F9/I9/rst/ist/ast/ost/sst/L9/cst/z9`
 wrapper belt 整体删除。42 条 focused 断言覆盖环境绑定、转发参数和旧 wrapper 缺席，manager 33 条生命周期回归继续通过。
+
+### 增量收敛：worker/native status wire schemas
+
+新增并接回 `worker/worker-main-protocol.ts` 与 `tray/native-status-item-event-protocol.ts`，分别拥有 CES request 和 13 类 native
+status/menu/computer-history event 的严格 schema；`worker/invocation-sampler.ts` 增加固定 30 秒 Git worker sampler 工厂。主组合根旧
+`yst/jst` schemas、`fst/pst` 专用 subclass 已删除，worker manager/runtime 与 native controller 直接消费语义 protocol/factory。
+focused suite 27 项覆盖全部 event union、拒绝分支、rolling-window 参数与接线，三组 owner 回归保持通过。

@@ -191,7 +191,7 @@ const main = fs.readFileSync(
   "utf8",
 );
 equal(main.includes("Mst = createNativeStatusItemControllerClass({"), true);
-equal(main.includes("new Mst("), true);
+equal(main.includes("NativeStatusItemController: Mst"), true);
 equal(main.includes("Mst = class"), false);
 equal(main.includes("Failed to handle a native menu-bar action"), false);
 

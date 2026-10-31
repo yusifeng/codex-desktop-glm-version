@@ -5297,3 +5297,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   renderer environment 与 error-page environment；BrowserWindowManager 的 19 项机械注入已改为可读语义名。
 - 主 chunk 旧 `E9/wot/Tot/Eot/Dot/D9/Pot/A9/j9/$ot/M9/est/N9/tst/P9/nst/F9/I9/rst/ist/ast/ost/sst/L9/cst/z9`
   wrapper belt 全部删除。focused suite 42 项、manager 生命周期回归 33 项，no-unwired gate 扩至 574 项。
+
+# 2026-11-01 worker and native-status protocol convergence
+
+- 新增 `worker/worker-main-protocol.ts`、`tray/native-status-item-event-protocol.ts`，迁出 CES request 与 13 类 native status/menu/
+  computer-history events；`worker/invocation-sampler.ts` 新增固定 30 秒 Git sampler 工厂，避免主组合根专用 subclass。
+- 主 chunk 旧 `yst/jst/fst/pst` 已删除；focused suite 27 项，worker manager/runtime 与 native status controller 回归 101 项，
+  no-unwired gate 扩至 587 项。`dst/Ust` 仍作为共享 Electron startup composition roots 保留，不强拆。
