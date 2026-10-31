@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `H9` worker bus owner 迁入 `worker/worker-bus.ts`；renderer/host pending requests、method/result validation、
+AbortSignal cancellation、webContents lifecycle cleanup、worker-exit rejection、host listeners、performance single-recipient、
+host-only 与 broadcast routing，以及 worker-manager delegation 均由新 class 持有。真实 git/open-in buses 已接回。
+
 随后将 `$it/eat/I7/L7/nat/B7/rat/V7/iat/aat` global-dictation paste/clipboard owner 迁入
 `dictation/global-paste-runtime.ts`；clipboard fingerprint/snapshot/conditional restore、pre/post timing、abort/change detection、
 macOS AX menu lookup 与 AppleScript fallback、Windows SendKeys、accessibility/copy failure projection 均由新 runtime 持有。

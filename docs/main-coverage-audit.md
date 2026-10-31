@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 worker bus owner
+
+原 `H9` 已迁入 `src/main/main-app/worker/worker-bus.ts`。新 class 保留 renderer/host pending request maps、response
+method/result validation、AbortSignal cancellation、webContents/worker-exit cleanup、host subscriptions、performance event single
+recipient、host-only/broadcast routing 与 worker-manager delegation；真实 git/open-in bus consumers 已接回，旧 class 已删除。
+
 ## 2026-10-31 global-dictation paste runtime
 
 原 `$it/eat/I7/L7/nat/B7/rat/V7/iat/aat` 已迁入 `src/main/main-app/dictation/global-paste-runtime.ts`。新 runtime
