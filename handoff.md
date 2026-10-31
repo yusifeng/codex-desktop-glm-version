@@ -4912,3 +4912,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   `BrowserHistoryService`，没有复制 browser session 或 favicon owner。
 - main 旧 `Jke/Yke/Xke/Zke/JD` 已删除；focused coverage 36 项，no-unwired gate 扩至 353 项。下一批继续审计紧邻的
   detached browser toolbar action proxy/attachment lifecycle owner，保持 detached context 和 suspended image attachment 的唯一状态。
+
+# 2026-11-01 detached browser toolbar and attachment runtime
+
+- `browser-sidebar/detached-browser-runtime.ts` 已接管 detached kind handler、toolbar lease/dup/disposal、record 与 annotation
+  forwarding、action presentation/reveal、AppGen URL double-check、30 秒 timeout/abort fallback，以及 attachment disable/enable/resume
+  handshake；WindowContext 的三处 consumer 全部直接使用语义 outputs。
+- main 旧 `Qke/$ke/eAe/tAe/rAe/YD/XD` 已删除；focused coverage 50 项，no-unwired gate 扩至 355 项。下一批越过已迁
+  detached bridge，继续审计相邻 extension recent-use owner 或 project-file sync owner，优先选择完整状态边界。

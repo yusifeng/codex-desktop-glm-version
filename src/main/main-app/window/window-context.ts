@@ -6,7 +6,7 @@ export function createWindowContextClass(dependencies) {
     $0e,
     $8,
     $j,
-    $ke,
+    createDetachedBrowserKindHandler,
     $nt,
     A,
     Ae,
@@ -133,7 +133,7 @@ export function createWindowContextClass(dependencies) {
     HotkeyWindowService,
     Y6e,
     Y8e,
-    YD,
+    findDetachedBrowserPageWebContents,
     Yj,
     Z,
     Z5e,
@@ -1096,9 +1096,9 @@ export function createWindowContextClass(dependencies) {
           i = this.appServerConnectionRegistry.getConnection(J),
           s = this.messageHandler.getBrowserHostManager();
         this.detachedWindowManager =
-          this.detachedWindowManager ?? new Jje(this.options.windowManager, { browser: $ke(s) });
+          this.detachedWindowManager ?? new Jje(this.options.windowManager, { browser: createDetachedBrowserKindHandler(s) });
         let c = this.detachedWindowManager;
-        (this.options.windowManager.setBrowserCommentPopupOwnerResolver((e, t, n) => YD(c, e, t, n)),
+        (this.options.windowManager.setBrowserCommentPopupOwnerResolver((e, t, n) => findDetachedBrowserPageWebContents(c, e, t, n)),
           (this.contentTabServiceManager =
             this.contentTabServiceManager ??
             new rje(this.options.windowManager, this.detachedWindowManager)));
@@ -1278,7 +1278,7 @@ export function createWindowContextClass(dependencies) {
               e,
               oAe(this.options.globalState),
               void 0,
-              (e, t, n) => YD(c, e, t, n),
+              (e, t, n) => findDetachedBrowserPageWebContents(c, e, t, n),
               new DetachedBrowserTabsService(c, e, (e, t, n) => s.getCurrentPageUrl(e, t, n)),
             ),
             browserTabs: new IabTabMentions(s.iabTabMentions, e),

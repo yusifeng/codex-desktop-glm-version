@@ -348,6 +348,7 @@ const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtim
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
 const { createBrowserHostServiceClass } = require("./main-app/browser-sidebar/browser-host-service.js");
 const { createBrowserHistoryServiceClass } = require("./main-app/browser-sidebar/browser-history-service.js");
+const { createDetachedBrowserRuntime } = require("./main-app/browser-sidebar/detached-browser-runtime.js");
 const {
   BrowserSettingsSync,
   BrowserUseOriginState: XOe,
@@ -23634,184 +23635,14 @@ var BrowserHistoryService = createBrowserHistoryServiceClass({
   displayScaleFactor: (window) => l.screen.getDisplayMatching(window.getBounds()).scaleFactor,
   loadFaviconData: GD,
 });
-var Qke = {
-  "open-settings": `window`,
-  "open-profile-import": `window`,
-  "browsing-data-cleared": `none`,
-  "clear-browser-data": `none`,
-  "capture-screenshot-selected": `none`,
-  "open-external": `none`,
-  "device-toolbar-shown": `none`,
-  "device-toolbar-action": `none`,
-  "set-extensions-toolbar-visible": `none`,
-  "open-extensions-web-store": `window`,
-  "record-site-tools-action": `none`,
-  "record-error-toast": `none`,
-  "open-site-tools-help": `window`,
-  "open-site-tools-sources": `window`,
-  "open-appgen-site-settings": `window`,
-  "open-appgen-site-share": `window`,
-  "submit-browser-tweaks": `none`,
-  "submit-browser-tweaks-after-focus": `task`,
-  "capture-screenshot-clicked": `none`,
-  "dismiss-active-annotation-editor": `none`,
-  "dismiss-annotation-coachmark": `none`,
-  "set-annotation-markers-visible": `none`,
-};
-function $ke(e) {
-  return {
-    move: (t) => e.moveTabToWindow(t),
-    suspend: (t) => tAe(t, e.suspendImageAttachments.bind(e)),
-    createToolbarService: (t) => eAe(t, e.getCurrentPageUrl.bind(e)),
-    close: ({ content: t, destinationWindow: n }) => {
-      e.closePage(n.webContents, t.conversationId, t.browserTabId);
-    },
-  };
-}
-async function eAe(e, t) {
-  try {
-    try {
-      var n = a.en();
-      let r = n.u(await e.source.toolbar);
-      return r.kind !== `browser` || !e.isActive(!0)
-        ? null
-        : { kind: `browser`, service: new rAe(e, t, r.service.dup()) };
-    } catch (e) {
-      n.e = e;
-    } finally {
-      n.d();
-    }
-  } catch {
-    return null;
-  }
-}
-function tAe(e, t) {
-  let { browserTabId: n, conversationId: r } = e.request.content.data,
-    i = t(e.window.webContents, r, n),
-    o = async (t, i) => {
-      try {
-        try {
-          var o = a.en();
-          let s = o.u(await e.source.toolbar);
-          return s.kind !== `browser` || (t && !e.isActive())
-            ? !1
-            : (await s.service.forwardBrowserAnnotationMessage({
-                type: `browser-sidebar-image-attachment-status`,
-                browserTabId: n,
-                conversationId: r,
-                enabled: t,
-                hadPendingDownloads: i,
-              }),
-              !0);
-        } catch (e) {
-          o.e = e;
-        } finally {
-          o.d();
-        }
-      } catch {
-        return !1;
-      }
-    },
-    s = o(!1, i?.hadPendingDownloads ?? !1);
-  return () => {
-    if (e.phase === `restored`) {
-      i?.resume();
-      return;
-    }
-    s.then(async () => {
-      e.isActive() && (await o(!0, !1)) && e.isActive() && i?.resume();
-    });
-  };
-}
-function YD(e, t, n, r) {
-  return XD(e, t, n, r)?.window.webContents ?? null;
-}
+var { createDetachedBrowserKindHandler, findDetachedBrowserPageWebContents } =
+  createDetachedBrowserRuntime({
+    RpcHandlerBase: n.Uf,
+    usingScopeHelper: a.en,
+    setTimeout,
+    clearTimeout,
+  });
 var DetachedBrowserTabsService = createDetachedBrowserTabsServiceClass(n.Uf);
-var rAe = class extends n.Uf {
-    context;
-    getCurrentPageUrl;
-    source;
-    constructor(e, t, n) {
-      (super(), (this.context = e), (this.getCurrentPageUrl = t), (this.source = n));
-    }
-    [Symbol.dispose]() {
-      this.source[Symbol.dispose]();
-    }
-    recordBrowserAddressCommit(e) {
-      this.context.isActive() && this.source.recordBrowserAddressCommit(e).catch(() => {});
-    }
-    recordBrowserAutocompleteSuggestionsShown(e) {
-      this.context.isActive() &&
-        this.source.recordBrowserAutocompleteSuggestionsShown(e).catch(() => {});
-    }
-    recordBrowserNavigation(e) {
-      this.context.isActive() && this.source.recordBrowserNavigation(e).catch(() => {});
-    }
-    getBrowserSiteToolsContext(e) {
-      return this.#t(
-        () => this.source.getBrowserSiteToolsContext(e),
-        { canOpenSources: !1, recentToolCallCount: 0 },
-        !0,
-      );
-    }
-    async requestBrowserToolbarAction(e) {
-      let t = () =>
-        (e.type !== `open-appgen-site-settings` && e.type !== `open-appgen-site-share`) ||
-        this.#e() === e.siteUrl;
-      if (!this.context.isActive() || !t()) return !1;
-      let n = Qke[e.type];
-      return n !== `none` && !(await this.context.revealSource(n === `task`))
-        ? !1
-        : this.#t(() => this.source.requestBrowserToolbarAction(e), !1, !1, t);
-    }
-    forwardBrowserAnnotationMessage(e) {
-      this.context.isActive() &&
-        this.context.request.content.data.browserTabId === e.browserTabId &&
-        this.context.request.content.data.conversationId === e.conversationId &&
-        this.source.forwardBrowserAnnotationMessage(e).catch(() => {});
-    }
-    #e() {
-      let { conversationId: e, browserTabId: t } = this.context.request.content.data;
-      return (
-        this.getCurrentPageUrl(this.context.window.webContents, e, t) ??
-        (this.context.phase === `opening`
-          ? this.getCurrentPageUrl(this.context.sourceWindow.webContents, e, t)
-          : null)
-      );
-    }
-    async #t(e, t, n, r = () => !0) {
-      if (!this.context.isActive(n) || !r()) return t;
-      let i = Promise.withResolvers(),
-        o = () => i.resolve(t),
-        s = setTimeout(o, 3e4);
-      this.context.signal.addEventListener(`abort`, o, { once: !0 });
-      try {
-        try {
-          var c = a.en();
-          let o = c.u(e()),
-            s = await Promise.race([o, i.promise]);
-          return this.context.isActive(n) && r() ? s : t;
-        } catch (e) {
-          c.e = e;
-        } finally {
-          c.d();
-        }
-      } catch {
-        return t;
-      } finally {
-        (clearTimeout(s), this.context.signal.removeEventListener(`abort`, o));
-      }
-    }
-  };
-function XD(e, t, n, r) {
-  return e.findForSource(
-    t,
-    (e) =>
-      e.content.kind === `browser` &&
-      e.content.data.conversationId === n &&
-      e.content.data.browserTabId === r,
-  );
-}
 var DownloadsService = createDownloadsServiceClass({
   RpcHandlerBase: n.Uf,
   fromWebContents: (webContents) => l.BrowserWindow.fromWebContents(webContents),
@@ -71214,7 +71045,7 @@ var G5 = r.r(`WindowContext`),
     $0e,
     $8,
     $j,
-    $ke,
+    createDetachedBrowserKindHandler,
     $nt,
     A,
     Ae,
@@ -71341,7 +71172,7 @@ var G5 = r.r(`WindowContext`),
     HotkeyWindowService,
     Y6e,
     Y8e,
-    YD,
+    findDetachedBrowserPageWebContents,
     Yj,
     Z,
     Z5e,

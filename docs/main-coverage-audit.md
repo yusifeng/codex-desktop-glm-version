@@ -2943,3 +2943,12 @@ detached lookup/focus/URL、dialog parent selection、destroyed-origin download 
 WindowContext 直接创建 `BrowserHistoryService` 并继续引用唯一 browser session。原始 chunk 中 `Jke/Yke/Xke/Zke/JD`
 已物理删除。focused test 36 项覆盖时间范围、summary、分页补取、favicon、callback result disposal、session absence、
 initial/change race、cleanup 与真实接线。
+
+### 增量抽取：detached browser toolbar 与 attachment lifecycle
+
+`src/main/main-app/browser-sidebar/detached-browser-runtime.ts` 已整组接管 detached browser kind handler、toolbar service
+acquisition/dup/disposal、record/annotation forwarding、toolbar action presentation、source reveal、AppGen site URL 前后校验、
+30 秒 RPC timeout/abort fallback，以及 image attachment suspend/status/resume handshake。WindowContext 的 detached manager handler、
+comment popup owner resolver 和 DetachedBrowserTabs consumer 均直接使用语义 outputs；唯一 detached context 与 attachment state
+仍由既有 manager/BrowserHost owner 持有。原始 chunk 中 `Qke/$ke/eAe/tAe/rAe/YD/XD` 已物理删除。focused test 50 项覆盖
+resource disposal、active/identity/site gates、timeout、presentation、suspend/resume 顺序、lookup 与真实接线。
