@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 Browser Settings Sync owner wiring
+
+既有 `src/main/main-app/browser-use/origin-state.ts` 已完整实现原 `_ke` 的 34-member 双向同步 owner，但 bootstrap 仍导出旧类。
+本轮接回 `WindowContext` 的真实 consumer，删除旧 class 与专属 `MD/ND/vke/hke/gke/jD`；focused suite 覆盖首次远端投影、
+revision patch、本地写入、串行 callback、dispose/generation guard，并锁定真实 startup wiring。
+
 ## 2026-10-31 IAB tab mentions owner wiring
 
 既有 `src/main/main-app/browser-sidebar/iab-tab-mentions.ts` 已完整实现原 `HOe` 的 24-member owner，但 bootstrap 仍导出旧类。

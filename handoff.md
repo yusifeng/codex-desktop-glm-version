@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 Browser Settings Sync owner：既有 `browser-use/origin-state.ts` 的 `BrowserSettingsSync` 现已替代主 chunk 旧 `_ke`
+及其专属 diff/merge/principal helpers。60s refresh、config watcher、串行 update、账号 generation guard、409 重读与本地变更合并
+由完整 34-member owner 持有；`WindowContext` 真实 consumer 继续通过 `_ke` 兼容别名构造。
+
 接回 IAB tab mentions owner：既有 `browser-sidebar/iab-tab-mentions.ts` 现已替代主 chunk 的 `HOe` 及专属 Chrome provider
 key/connector/subscription helpers。IAB+Chrome 双源搜索、liveness/focus、5s discovery cache、profile/generation 去重、close/
 invalidation cleanup 由完整 24-member owner 持有；bootstrap export 与 WindowContext consumer 保持 `HOe` 兼容别名。
