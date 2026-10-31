@@ -79,6 +79,7 @@ const { createPrimaryRuntimeHostClass } = require("./main-app/misc/primary-runti
 const { createProcessMemorySnapshotCacheClass } = require("./main-app/startup/process-memory-snapshot-cache.js");
 const { createProjectlessDirectoryChooserClass } = require("./main-app/workspace/projectless-directory-chooser.js");
 const { createThreadProjectAssignmentWriterClass } = require("./main-app/thread-catalog/thread-project-assignment-writer.js");
+const { createPendingProjectDeletionSchedulerClass } = require("./main-app/projects/pending-project-deletion-scheduler.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -133128,63 +133129,14 @@ var U6e = 100,
     batchSize: f2,
   }),
   G6e = 3e4,
-  K6e = class {
-    globalState;
-    finish;
-    logger = r.r(`pending-app-server-project-deletions`);
-    timers = new Map();
-    activeIdentity = null;
-    constructor(e, t) {
-      ((this.globalState = e), (this.finish = t));
-    }
-    getAll(e) {
-      return this.globalState.get(n.iu.APP_SERVER_PENDING_PROJECT_DELETIONS_BY_HOST)?.[e] ?? {};
-    }
-    get(e, t) {
-      return this.getAll(e)[t];
-    }
-    set(e, t, r) {
-      this.globalState.update(n.iu.APP_SERVER_PENDING_PROJECT_DELETIONS_BY_HOST, (n) => {
-        let i = { ...n?.[e] };
-        r == null ? delete i[t] : (i[t] = r);
-        let a = { ...n, [e]: i };
-        return (
-          Object.keys(i).length === 0 && delete a[e],
-          Object.keys(a).length === 0 ? void 0 : a
-        );
-      });
-    }
-    resume(e) {
-      (this.stop(), (this.activeIdentity = e));
-      for (let t of Object.keys(this.getAll(e))) this.schedule(e, t);
-    }
-    stop() {
-      this.activeIdentity = null;
-      for (let e of this.timers.values()) clearTimeout(e);
-      this.timers.clear();
-    }
-    schedule(e, t, n = !1) {
-      if (this.activeIdentity !== e) return;
-      (clearTimeout(this.timers.get(t)), this.timers.delete(t));
-      let r = this.get(e, t);
-      if (r == null) return;
-      let i = setTimeout(
-        () => {
-          (this.timers.delete(t),
-            this.finish(e, t, r).catch((n) => {
-              this.activeIdentity === e &&
-                (this.logger.warning(`Failed to finish app-server project deletion`, {
-                  safe: {},
-                  sensitive: { error: n },
-                }),
-                this.schedule(e, t, !0));
-            }));
-        },
-        Math.max(n ? G6e : 0, r.deleteAfterMs - Date.now()),
-      );
-      (i.unref(), this.timers.set(t, i));
-    }
-  },
+  K6e = createPendingProjectDeletionSchedulerClass({
+    stateKey: n.iu.APP_SERVER_PENDING_PROJECT_DELETIONS_BY_HOST,
+    createLogger: r.r,
+    retryDelayMs: G6e,
+    now: Date.now,
+    setTimer: setTimeout,
+    clearTimer: clearTimeout,
+  }),
   q6e = 100,
   J6e = Symbol(`project-order`),
   Y6e = class {

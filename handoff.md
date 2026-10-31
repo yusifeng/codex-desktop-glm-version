@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `K6e` pending project deletion scheduler 迁入
+`projects/pending-project-deletion-scheduler.ts`；per-project timer ownership、account identity resume/stop、
+deleteAfter scheduling、失败日志与 30 秒 retry backoff 均由新 owner 持有，`Y6e` 已真实接回并删除旧 class。
+focused test 覆盖 20 项。
+
 随后将 `W6e` thread-project assignment writer 迁入
 `thread-catalog/thread-project-assignment-writer.ts`；observe/refresh/adopt、local↔server project 映射、
 metadata write、projectless membership cache 与 paginated migration 均由新 owner 持有。共享 keyed queue `d2`

@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 pending project deletion scheduler
+
+原 `K6e` 已迁入 `src/main/main-app/projects/pending-project-deletion-scheduler.ts`。新 owner 保留 persisted
+pending deletion map、active identity 切换、timer replace/stop、deleteAfter delay、失败日志与 30 秒 retry；
+`Y6e` 直接构造新 class，旧实现已物理删除。
+
 ## 2026-10-31 thread project assignment writer
 
 原 `W6e` 已迁入 `src/main/main-app/thread-catalog/thread-project-assignment-writer.ts`。新 owner 保留 keyed
