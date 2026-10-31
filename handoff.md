@@ -5377,3 +5377,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   consumers 到最终 `markReady()` 后才放行。
 - `Ust` 旧 `me/he/ge/Be/Ve/He/Ue` 状态与 closures 删除。focused suite 25 项、相邻回归 250 项，no-unwired gate 扩至
   626 项；application menu、native status-item、desktop open-path、startup IPC 四个原本无法加载 `.ts` 的测试入口恢复执行。
+
+# 2026-11-01 startup UI lifecycle residue convergence
+
+- 一次新增并接回 `native-theme-window-sync.ts`、`remote-hosted-pip-availability.ts`、`locale-refresh-lifecycle.ts`：分别拥有
+  nativeTheme broadcast/dispose、PiP availability transition 和记忆状态、locale browser-policy 与四类 UI refresh 顺序。
+- `Ust` 旧 `ve`、`G/pe` 和 inline locale subscription 删除；focused suite 16 项，相邻三组回归 127 项，no-unwired gate
+  扩至 638 项。`dst` 已基本收敛为构造根，后续重点转回 `Ust` 的启动 I/O 与 feature-availability 大段，先区分可迁状态 owner
+  和应保留的严格顺序装配。

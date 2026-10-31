@@ -9,6 +9,9 @@ const realOwners = [
   ["src/main/main-app/startup/app-entry-delivery.ts", "createAppEntryDeliveryRuntime"],
   ["src/main/main-app/startup/primary-window-message-queue.ts", "createPrimaryWindowMessageQueue"],
   ["src/main/main-app/startup/window-activation-runtime.ts", "createWindowActivationRuntime"],
+  ["src/main/main-app/startup/native-theme-window-sync.ts", "installNativeThemeWindowSync"],
+  ["src/main/main-app/startup/remote-hosted-pip-availability.ts", "createRemoteHostedPipAvailabilityReconciler"],
+  ["src/main/main-app/startup/locale-refresh-lifecycle.ts", "installLocaleRefreshLifecycle"],
   ["src/main/main-app/startup/window-icon-lifecycle.ts", "createWindowIconLifecycle"],
   ["src/main/main-app/fetch-handler/electron-fetch-handler.ts", "createElectronFetchHandlerClass"],
   ["src/main/main-app/misc/open-in-service.ts", "createOpenInServiceClass"],
@@ -632,5 +635,14 @@ assert.equal(main.includes("windowActivation.markReady()"), true, "startup relea
 assert.equal(main.includes("me = !1"), false, "generated window readiness flag must be removed");
 assert.equal(main.includes("let He = async"), false, "generated window navigation adapter must be removed");
 assert.equal(main.includes("windowActivation.openSecondInstance"), true, "second-instance paths use the semantic activation runtime");
+assert.equal(main.includes('require("./main-app/startup/native-theme-window-sync.js")'), true, "native-theme sync owner is wired");
+assert.equal(main.includes('require("./main-app/startup/remote-hosted-pip-availability.js")'), true, "PiP availability owner is wired");
+assert.equal(main.includes('require("./main-app/startup/locale-refresh-lifecycle.js")'), true, "locale refresh owner is wired");
+assert.equal(main.includes("installNativeThemeWindowSync({"), true, "startup installs semantic native-theme sync");
+assert.equal(main.includes("createRemoteHostedPipAvailabilityReconciler({"), true, "startup creates semantic PiP reconciler");
+assert.equal(main.includes("installLocaleRefreshLifecycle({"), true, "startup installs semantic locale lifecycle");
+assert.equal(main.includes("let G = re()"), false, "generated PiP availability state must be removed");
+assert.equal(main.includes("l.nativeTheme.on(`updated`, ve)"), false, "generated native-theme listener must be removed");
+assert.equal(main.includes("V.settingsStore.onDidChange(n.Fa.localeOverride.key, () =>"), false, "generated locale listener must be removed");
 
-console.log("626 main unwired-owner skeleton assertions passed");
+console.log("638 main unwired-owner skeleton assertions passed");

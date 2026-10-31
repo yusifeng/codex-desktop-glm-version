@@ -3441,3 +3441,14 @@ second-instance 打开、菜单/托盘导航与 shortcut attribution。active pr
 second-instance consumers 均使用同一 runtime，启动自身仍直接 `W.ensureWindow()` 以绕过尚未释放的外部 gate，最终阶段才
 `markReady()`。25 项 focused 断言与相邻 250 项回归通过；其中 application menu、native status-item、desktop open-path、
 startup IPC 四个直接 import `.ts` 的失效入口已修复为真实执行。no-unwired gate 扩至 626 项。
+
+### 批量收敛：startup UI lifecycle residues
+
+将 `Ust` 中三组独立订阅/transition 状态一次迁出：`native-theme-window-sync.ts` 负责 backdrop 刷新、live-window theme 广播和
+listener dispose；`remote-hosted-pip-availability.ts` 保存上次 feature 状态，每次先 reconcile native host，仅在 availability
+变化时记录日志并 reconcile overlay host；`locale-refresh-lifecycle.ts` 保持 browser-session locale 先更新、异步加载 locale 后再按
+application menu→dock menu→tray menu→PiP 的顺序刷新，并返回原 settings subscription disposer。
+
+主组合根旧 `ve` listener、`G/pe` transition state 和 inline locale subscription 已删除，所有 callbacks 以 wrapper 保持 class method
+receiver。16 项 focused 断言覆盖 light/dark、destroyed window、dispose、PiP unchanged/enable/disable 与 locale async ordering；
+avatar overlay、native status item、application menu 相邻 127 项回归通过，no-unwired gate 扩至 638 项。

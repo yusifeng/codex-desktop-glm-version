@@ -373,6 +373,9 @@ const { AppEntryAttributionTracker: Foe } = require("./main-app/startup/app-entr
 const { createAppEntryDeliveryRuntime } = require("./main-app/startup/app-entry-delivery.js");
 const { createPrimaryWindowMessageQueue } = require("./main-app/startup/primary-window-message-queue.js");
 const { createWindowActivationRuntime } = require("./main-app/startup/window-activation-runtime.js");
+const { installNativeThemeWindowSync } = require("./main-app/startup/native-theme-window-sync.js");
+const { createRemoteHostedPipAvailabilityReconciler } = require("./main-app/startup/remote-hosted-pip-availability.js");
+const { installLocaleRefreshLifecycle } = require("./main-app/startup/locale-refresh-lifecycle.js");
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
 const { createBrowserHostServiceClass } = require("./main-app/browser-sidebar/browser-host-service.js");
@@ -55873,7 +55876,7 @@ function dst({
       subscribeAccessState: Dr,
       getAccessState: Er,
       releaseCommandKeybinding: YV,
-      logger: r.n(),
+      getLogger: r.n,
     }),
     te = new Eat(
       B,
@@ -56239,15 +56242,12 @@ async function Ust() {
       }),
     ),
     U.reconcileContentHostLifecycle());
-  let G = re(),
-    pe = () => {
-      let e = re();
-      (U.reconcileContentHostLifecycle(),
-        G !== e &&
-          (r.n().info(`Remote hosted PiP availability changed`, { safe: { enabled: e } }),
-          W.avatarOverlayManager.reconcileRemoteHostedPIPContentHost()),
-        (G = e));
-    },
+  let reconcileRemoteHostedPipAvailability = createRemoteHostedPipAvailabilityReconciler({
+      getEnabled: re,
+      logger: r.n(),
+      reconcileContentHostLifecycle: () => U.reconcileContentHostLifecycle(),
+      reconcileOverlayContentHost: () => W.avatarOverlayManager.reconcileRemoteHostedPIPContentHost(),
+    }),
     windowActivation = createWindowActivationRuntime({
       createFreshWindow: W.createFreshWindow,
       dismissNotificationByNavigationPath: (path) => je.desktopNotificationManager.dismissByNavigationPath(path),
@@ -56291,15 +56291,14 @@ async function Ust() {
       }
       e.returnValue = l.nativeTheme.shouldUseDarkColors ? `dark` : `light`;
     }));
-  let ve = () => {
-    let e = l.nativeTheme.shouldUseDarkColors ? `dark` : `light`;
-    W.windowManager.refreshWindowBackdrops();
-    for (let t of l.BrowserWindow.getAllWindows()) t.isDestroyed() || t.webContents.send(a.Wt, e);
-  };
-  (l.nativeTheme.on(`updated`, ve),
-    I.add(() => {
-      l.nativeTheme.off(`updated`, ve);
-    }));
+  I.add(
+    installNativeThemeWindowSync({
+      listWindows: () => l.BrowserWindow.getAllWindows(),
+      nativeTheme: l.nativeTheme,
+      refreshWindowBackdrops: () => W.windowManager.refreshWindowBackdrops(),
+      themeChannel: a.Wt,
+    }),
+  );
   let ye = new yit(),
     be = null,
     xe = (e) => {
@@ -56517,16 +56516,16 @@ async function Ust() {
     });
   ((Te = Le.refreshApplicationMenu),
     I.add(
-      V.settingsStore.onDidChange(n.Fa.localeOverride.key, () => {
-        let e = V.settingsStore.getEffective(n.Fa.localeOverride.key),
-          t = K.getBrowserHostManager().getBrowserSession();
-        (t != null && Yc(t, e),
-          a.mn(V.repoRoot, e ?? void 0).then(() => {
-            (Le.refreshApplicationMenu(),
-              we?.refreshMenu(),
-              X9()?.refreshMenu(),
-              U.refreshLocale());
-          }));
+      installLocaleRefreshLifecycle({
+        getBrowserSession: () => K.getBrowserHostManager().getBrowserSession(),
+        getLocale: () => V.settingsStore.getEffective(n.Fa.localeOverride.key),
+        loadLocale: (locale) => a.mn(V.repoRoot, locale ?? void 0),
+        refreshApplicationMenu: () => Le.refreshApplicationMenu(),
+        refreshDockMenu: () => we?.refreshMenu(),
+        refreshPipLocale: () => U.refreshLocale(),
+        refreshTrayMenu: () => X9()?.refreshMenu(),
+        setBrowserSessionLocale: Yc,
+        subscribe: (listener) => V.settingsStore.onDidChange(n.Fa.localeOverride.key, listener),
       }),
     ));
   let Re = () => {
@@ -56808,7 +56807,7 @@ async function Ust() {
       Qe.setDesktopFeatureAvailability(a),
       qe.setDesktopFeatureAvailability(a),
       P && W.appshotHotkeysService.setEnabled(o.appshotsEnabled),
-      pe());
+      reconcileRemoteHostedPipAvailability());
     let c = o.skysight;
     if ((!i && c && W.broadcastQueryCacheInvalidation([`chronicle-history`]), H != null)) {
       let e = o.appshotsEnabled,
