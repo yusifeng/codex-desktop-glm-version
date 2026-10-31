@@ -244,6 +244,8 @@ const targetLaunchArgs = require("./main-app/open-target/target-launch-args.js")
 const targetDescriptorPolicy = require("./main-app/open-target/target-descriptor-policy.js");
 const languageServerProtocolHelpers = require("./main-app/language-server/protocol-helpers.js");
 const { BrowserPermissionPromptRegistry } = require("./main-app/browser-sidebar/browser-permission-prompt-registry.js");
+const { createBrowserSessionServiceClass } = require("./main-app/browser-sidebar/browser-session-service.js");
+const { BrowserUseOpenRequestRegistry } = require("./main-app/browser-sidebar/browser-use-open-request-registry.js");
 const { createBrowserCommentOverlayManagerClass } = require("./main-app/browser-sidebar/browser-comment-overlay-manager.js");
 const { createBrowserCommentControllerClass } = require("./main-app/browser-sidebar/browser-comment-controller.js");
 const { createBrowserSessionRegistryRuntime } = require("./main-app/browser-use/session-registry.js");
@@ -37704,224 +37706,7 @@ function IWe(e, t, n) {
     !0
   );
 }
-var LWe = `/codex/deeplink`,
-  RWe = `https://chatgpt.com/`,
-  zWe = [`originUrl`, `path`, `prompt`],
-  BWe = class {
-    options;
-    configured = !1;
-    constructor(e) {
-      this.options = e;
-    }
-    configure() {
-      let e = l.session.fromPartition(Jc(`app`), { permissionHandling: `browser` });
-      return this.configured
-        ? e
-        : (e.setPermissionPromptHandler(this.options.onPermissionPrompt),
-          e.setPermissionRequestHandler((e, t, n) => {
-            n(!1);
-          }),
-          e.setPermissionCheckHandler(() => !1),
-          e.on(`web-notification-clicked`, (e, t) => this.options.onWebNotificationClicked(t)),
-          this.options.downloadStore.registerSession({
-            browserSession: e,
-            browserSessionRegistry: this.options.browserSessionRegistry,
-            findPageStateForWebContentsId: this.options.findPageStateForWebContentsId,
-          }),
-          this.options.applicationNetwork.addSessionRestriction(e, (e) => {
-            let t =
-                e.webContentsId == null
-                  ? null
-                  : this.options.findPageStateForWebContentsId(e.webContentsId),
-              r = t == null || e.resourceType !== `mainFrame` ? null : VWe(e.url);
-            return r == null
-              ? {
-                  cancel:
-                    (e.resourceType === `mainFrame` &&
-                      ((n.dl(e.url) != null && !nl()) ||
-                        OWe({
-                          webContentsId: e.webContentsId,
-                          windows: this.options.getWindows(),
-                          url: e.url,
-                        }))) ||
-                    (t?.threadState.isAgentControllingBrowser !== !0 &&
-                      Qc({
-                        currentUrl: t == null ? null : t.page.url,
-                        resourceType: e.resourceType,
-                        requestUrl: e.url,
-                      })) ||
-                    (Wae(e.resourceType) &&
-                      this.options.isRestrictedBrowserNavigation(
-                        e.webContentsId,
-                        e.url,
-                        e.resourceType,
-                      )),
-                }
-              : { redirectURL: r };
-          }),
-          (this.configured = !0),
-          e);
-    }
-  };
-function VWe(e) {
-  let t;
-  try {
-    t = new URL(e);
-  } catch {
-    return null;
-  }
-  let n = t.searchParams.get(`url`);
-  return e.slice(0, 20).toLowerCase() !== RWe ||
-    t.protocol !== `https:` ||
-    t.hostname !== `chatgpt.com` ||
-    t.pathname !== LWe ||
-    t.username !== `` ||
-    t.password !== `` ||
-    t.port !== `` ||
-    t.hash !== `` ||
-    e.includes(`#`) ||
-    t.searchParams.getAll(`url`).length !== 1 ||
-    n == null ||
-    zWe.some((e) => t.searchParams.has(e))
-    ? null
-    : a.v(n);
-}
-var JG = r.i(`browser-sidebar-manager`),
-  HWe = 15e3,
-  UWe = class {
-    recordDebugEvent;
-    requests = new Set();
-    constructor(e = () => void 0) {
-      this.recordDebugEvent = e;
-    }
-    getDebugSnapshot() {
-      return Array.from(this.requests).map((e) => ({
-        activeBrowserTabId: null,
-        activeConversationId: null,
-        browserTabId: e.browserTabId,
-        conversationId: e.conversationId,
-        guestWebContentsId: null,
-        hasPage: null,
-        ownerWebContentsId: e.owner.id,
-        ownerRoutePath: null,
-        pendingAttachCount: null,
-        pendingBrowserUsePanelOpen: null,
-        routeActive: null,
-        windowId: null,
-      }));
-    }
-    waitForOpen(e, t, n) {
-      return new Promise((r, i) => {
-        let a = {
-          browserTabId: n,
-          conversationId: t,
-          owner: e,
-          reject: i,
-          resolve: r,
-          timer: setTimeout(() => {
-            let r = Error(
-              `Timed out waiting for the Browser webview to attach for this browser-use page`,
-            );
-            (this.recordDebugEvent({
-              browserTabId: n,
-              conversationId: t,
-              guestWebContentsId: null,
-              kind: `browser-open-wait-timeout`,
-              message: `Timed out waiting for Browser webview attach`,
-              ownerWebContentsId: e.id,
-              pageKey: null,
-              windowId: null,
-            }),
-              JG().warning(`IAB_LIFECYCLE browser use open wait timed out`, {
-                safe: { conversationId: t, ownerWebContentsId: e.id },
-                sensitive: {},
-              }),
-              this.reject(a, r));
-          }, HWe),
-        };
-        (a.timer.unref(),
-          this.requests.add(a),
-          JG().info(`IAB_LIFECYCLE browser use open wait started`, {
-            safe: { browserTabId: n, conversationId: t, ownerWebContentsId: e.id },
-            sensitive: {},
-          }),
-          this.recordDebugEvent({
-            browserTabId: n,
-            conversationId: t,
-            guestWebContentsId: null,
-            kind: `browser-open-wait-started`,
-            message: `Waiting for Browser webview attach`,
-            ownerWebContentsId: e.id,
-            pageKey: null,
-            windowId: null,
-          }));
-      });
-    }
-    resolveForWindow(e, t) {
-      let n = Array.from(this.requests).filter((t) => t.owner.id === e.owner.id);
-      for (let e of n) {
-        let n = t(e);
-        n != null && this.resolve(e, n);
-      }
-    }
-    rejectForOwner(e, t) {
-      for (let n of Array.from(this.requests)) n.owner.id === e.id && this.reject(n, t);
-    }
-    rejectForRoute({ browserTabId: e, conversationId: t, error: n, owner: r }) {
-      for (let i of Array.from(this.requests))
-        i.owner.id === r.id && i.conversationId === t && i.browserTabId === e && this.reject(i, n);
-    }
-    resolve(e, t) {
-      (JG().info(`IAB_LIFECYCLE browser use open wait resolved`, {
-        safe: {
-          browserTabId: t.browserTabId,
-          conversationId: e.conversationId,
-          guestWebContentsId: t.webContents.id,
-          ownerWebContentsId: e.owner.id,
-          pageKey: t.pageKey,
-        },
-        sensitive: {},
-      }),
-        this.recordDebugEvent({
-          browserTabId: t.browserTabId,
-          conversationId: e.conversationId,
-          guestWebContentsId: t.webContents.id,
-          kind: `browser-open-wait-resolved`,
-          message: `Resolved Browser webview attach wait`,
-          ownerWebContentsId: e.owner.id,
-          pageKey: t.pageKey,
-          windowId: null,
-        }),
-        this.requests.delete(e),
-        clearTimeout(e.timer),
-        e.resolve(t));
-    }
-    reject(e, t) {
-      (this.recordDebugEvent({
-        browserTabId: e.browserTabId,
-        conversationId: e.conversationId,
-        details: [{ label: `errorMessage`, value: t.message }],
-        guestWebContentsId: null,
-        kind: `browser-open-wait-rejected`,
-        message: `Rejected Browser webview attach wait`,
-        ownerWebContentsId: e.owner.id,
-        pageKey: null,
-        windowId: null,
-      }),
-        JG().warning(`IAB_LIFECYCLE browser use open wait rejected`, {
-          safe: {
-            conversationId: e.conversationId,
-            errorMessage: t.message,
-            ownerWebContentsId: e.owner.id,
-          },
-          sensitive: {},
-        }),
-        this.requests.delete(e),
-        clearTimeout(e.timer),
-        e.reject(t));
-    }
-  },
-  YG = {
+var YG = {
     requestEvent: `codex:annotation-surface-request`,
     responseEvent: `codex:annotation-surface-response`,
     removeEvent: `codex:annotation-surfaces-remove`,
@@ -43678,6 +43463,14 @@ var {
   securityStateForPage: dZe,
   syncBackgroundThrottling: dZ,
 } = createBrowserPagePresentationPolicy({ isFirstPartyUrl: Ve, pageUrl: QU });
+var BrowserSessionService = createBrowserSessionServiceClass({
+  decodeRedirectTarget: a.v,
+  fromPartition: (partition, options) => l.session.fromPartition(partition, options),
+  getPartitionName: () => Jc(`app`),
+  isBrowserSettingsNavigationBlocked: OWe,
+  isRouteNavigationDisabled: nl,
+  routePathForUrl: n.dl,
+});
 var { dispatchPageEvent: dispatchSitePageEvent } = createSitePageEventRuntime({
   browserWindowFromWebContents: (owner) => l.BrowserWindow.fromWebContents(owner),
   getFeatureFlags: Tr,
@@ -43795,7 +43588,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
         (this.downloadStore = new LGe(s)),
         (this.isDefaultBrowser = s.isDefaultBrowser ?? (() => !1)),
         (this.browserPageSnapshots = s.browserPageSnapshots ?? XHe(s.browserPersistenceDirectory)),
-        (this.browserSessionService = new BWe({
+        (this.browserSessionService = new BrowserSessionService({
           applicationNetwork: this.windowManager.applicationNetwork,
           browserSessionRegistry: this.browserSessionRegistry,
           downloadStore: this.downloadStore,
@@ -43818,8 +43611,9 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
             },
           },
         )),
-        (this.browserUseOpenRequests = new UWe((e) => {
-          this.browserSessionRegistry.recordDebugEvent(e);
+        (this.browserUseOpenRequests = new BrowserUseOpenRequestRegistry({
+          logger: r.i(`browser-sidebar-manager`),
+          recordDebugEvent: (e) => this.browserSessionRegistry.recordDebugEvent(e),
         })),
         (this.tabBudget = new BrowserTabWorkingSetManager({
           browserSessionRegistry: this.browserSessionRegistry,

@@ -5194,3 +5194,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   executable、staging cleanup、atomic replace/rollback/fallback；window context 继续通过 `P1e` 使用唯一真实 owner。
 - `runtime-resources.ts` 从未接线清单升级为 spec owner，并修正 900000ms、gzip 与 Windows `.exe` 偏差。主 chunk 清单和
   `A1e/P1e/F1e/I1e/L1e/UQ/WQ/GQ` 已删除；focused coverage 使用本地 gzip 验证并发、cache、expiry、digest-fallback。
+
+# 2026-11-01 browser session and open-request lifecycle extraction
+
+- 新增并接回 `browser-sidebar/browser-session-service.ts`，完整承接共享 Browser partition 的一次性权限 handler、默认拒绝、web notification、
+  download 注册和 application-network restriction；严格 ChatGPT redirect trust boundary、app-route、settings webview、local subframe 与
+  Browser Use restriction 的短路顺序保持不变。主 chunk 旧 `BWe/VWe` 已删除。
+- 新增并接回 `browser-sidebar/browser-use-open-request-registry.ts`，统一 pending panel-open promise 的 debug snapshot、owner/route resolve/reject、
+  15 秒 unref timeout、日志/debug 事件和 timer cleanup；主 chunk 旧 `UWe` 已删除。两组 focused suite 共 68 项断言，no-unwired gate
+  同步锁定真实接线与旧 owner 缺席。下一批继续审计相邻 browser-settings webview lifecycle belt，避免拆散同一 webContents cleanup owner。

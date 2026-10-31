@@ -77,6 +77,8 @@ const realOwners = [
   ["src/main/main-app/browser-sidebar/browser-context-menu.ts", "createBrowserContextMenuRuntime"],
   ["src/main/main-app/browser-sidebar/browser-webview-navigation-runtime.ts", "createBrowserWebviewNavigationRuntime"],
   ["src/main/main-app/browser-sidebar/browser-host-policy-controller.ts", "createBrowserHostPolicyControllerClass"],
+  ["src/main/main-app/browser-sidebar/browser-session-service.ts", "createBrowserSessionServiceClass"],
+  ["src/main/main-app/browser-sidebar/browser-use-open-request-registry.ts", "BrowserUseOpenRequestRegistry"],
   ["src/main/main-app/browser-sidebar/site-page-event-runtime.ts", "createSitePageEventRuntime"],
   ["src/main/main-app/browser-sidebar/browser-host-service.ts", "createBrowserHostServiceClass"],
   ["src/main/main-app/window/browser-window-rpc-services.ts", "createBrowserProfileImportServiceClass"],
@@ -154,6 +156,8 @@ assert.equal(main.includes('require("./main-app/browser-sidebar/sites-bootstrap-
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-page-presentation-policy.js")'), true, "browser page presentation policy is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-session-notification-bridge.js")'), true, "browser session notification bridge is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/site-page-event-runtime.js")'), true, "site page-event runtime is wired");
+assert.equal(main.includes('require("./main-app/browser-sidebar/browser-session-service.js")'), true, "browser session service is wired");
+assert.equal(main.includes('require("./main-app/browser-sidebar/browser-use-open-request-registry.js")'), true, "browser open-request registry is wired");
 assert.equal(main.includes('require("./main-app/language-server/runtime-installer.js")'), true, "language-server runtime installer is wired");
 for (const oldOwner of ["function lX(", "function uX(", "function $Ye(", "function dX(", "function eXe(", "function fX(", "function tXe(", "function nXe(", "function pX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser tab lifecycle owner must be removed`);
@@ -203,6 +207,7 @@ for (const oldOwner of ["function LZe(", "function RZe(", "function zZe(", "func
 for (const oldOwner of ["function YZe(", "function XZe(", "function ZZe(", "function QZe(", "TZ = class"]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated screenshot/permission helper must be removed`);
 for (const oldOwner of ["function OYe(", "function kYe(", "function VY(", "function HY(", "function AYe(", "function UY(", "function jYe(", "function MYe(", "function WY(", "function GY(", "function KY(", "function NYe(", "function PYe(", "function FYe(", "function IYe(", "function qY(", "function JY(", "function LYe(", "function RYe(", "function YY(", "function XY(", "function zYe(", "function BYe(", "function ZY(", "function VYe(", "function QY(", "function $Y(", "function HYe(", "function UYe(", "function eX(", "async function WYe(", "function tX(", "function nX(", "function rX("]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated IAB policy helper must be removed`);
 for (const oldOwner of ["function A1e(", "P1e = class", "async function F1e(", "async function I1e(", "async function L1e(", "async function UQ(", "async function WQ(", "async function GQ("]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated language-server runtime installer must be removed`);
+for (const oldOwner of ["BWe = class", "function VWe(", "UWe = class"]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser session/open-request owner must be removed`);
 for (const oldOwner of ["function cXe(", "function bX(", "async function lXe(", "function uXe(", "function xX(", "function SX(", "function dXe(", "function fXe(", "function CX(", "function wX(", "function TX(", "function EX(", "function pXe(", "function DX(", "function mXe(", "function hXe(", "function OX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated Browser Use route adapter must be removed`);
 }

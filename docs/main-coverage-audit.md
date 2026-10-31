@@ -3234,3 +3234,11 @@ identity、blank/persistent URL 与 title reconciliation、process-gone extracti
 新增并接回 `language-server/runtime-installer.ts`，完整接管并发安装去重、过期 gate、缓存 manifest/path 验证、pinned size/SHA-256
 流式下载、gzip/zip/tar 解包、executable mode、staging cleanup、原子替换与失败回滚。既有 `runtime-resources.ts` 被纠正并成为真实
 spec owner（15 分钟 Kotlin timeout、`gzip`、Windows rust-analyzer `.exe`）；主 chunk 资源清单与 `A1e/P1e/F1e..GQ` 整带删除。
+
+### 增量抽取：browser session 与 Browser Use open-request 生命周期
+
+新增 `browser-sidebar/browser-session-service.ts`，把原 `BWe/VWe` 的 shared partition configure-once owner、权限默认拒绝、通知/下载注册、
+network restriction 和严格 `https://chatgpt.com/codex/deeplink?url=...` trust boundary 整体迁出；主组合根显式注入 Electron session、
+partition/app-route/settings-webview policy，local-subframe 与 Browser Use restriction 直接复用现有语义模块。新增
+`browser-use-open-request-registry.ts`，迁出原 `UWe` 的 pending promise Set、snapshot、window resolve、owner/route rejection、15 秒
+unref timeout、日志/debug 顺序和清理。两个 owner 均由 `tQe` 真实实例化，旧定义物理删除，68 条 focused 断言覆盖行为与接线。
