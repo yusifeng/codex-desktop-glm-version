@@ -158,6 +158,7 @@ const { BrowserSourceOwnerRegistry: rje } = require("./main-app/window/browser-s
 const { CodexMicroHostService: cA } = require("./main-app/device/codex-micro-host-service.js");
 const { listAmbientSummaries: Yj, newAmbientSuggestions: Xj, activeSummaryIntervals: Zj, listAllApplications: Qj, listApplicationsByBundleIds: $j } = require("./main-app/computer-use/memory-summaries.js");
 const { listApplicationsForFile: Nj, appForBundleId: Pj, listWebUrlHandlers: Fj, notifyDownloadComplete: Ij, setAppIcon: Lj } = require("./main-app/mac/launch-services.js");
+const { acquireCrossInstanceLock: jN, CROSS_INSTANCE_LOCKS: AN } = require("./main-app/util/cross-instance-lock.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -61383,125 +61384,7 @@ $&`,
       (e.visitAsync = h.visitAsync));
   })();
 var nje = ComputerUseSettingsService;
-var kN = ConversationalOnboardingService,
-  AN = {
-    customRuntime: `custom-runtime`,
-    globalDictation: `global-dictation`,
-    hotkeyWindow: `hotkey-window`,
-  },
-  cje = 1e3,
-  lje = `.claim`,
-  uje = `owner.json`,
-  dje = 5e3,
-  fje = `codex-global-dictation-window.lock`,
-  pje = n.wf({ pid: n.Cf().int().positive(), priority: n.Cf().default(0), token: n.Of().min(1) });
-function jN({ force: e = !1, lockPath: t, name: n, onLost: r, priority: i = 0 }) {
-  let a = t ?? mje(n),
-    o = { pid: process.pid, priority: i, token: (0, _.randomUUID)() };
-  if (((0, v.mkdirSync)((0, h.dirname)(a), { mode: 448, recursive: !0 }), !hje(a, o, e)))
-    return null;
-  let s = () => NN(a, o.token),
-    c = setInterval(() => {
-      s() || (clearInterval(c), r());
-    }, cje);
-  return (
-    c.unref?.(),
-    {
-      dispose: () => {
-        (clearInterval(c), vje(a, o.token));
-      },
-      isOwner: s,
-    }
-  );
-}
-function mje(e) {
-  return e === AN.globalDictation
-    ? (0, h.join)((0, p.tmpdir)(), fje)
-    : (0, h.join)((0, p.homedir)(), `.codex`, `cross-instance-locks`, `${e}.lock`);
-}
-function hje(e, t, n) {
-  if (MN(e, t)) return !0;
-  let r = FN(e);
-  if (!n && !PN(e, r) && t.priority <= (r?.priority ?? 0)) return !1;
-  let i = `${e}${lje}`;
-  try {
-    (0, v.mkdirSync)(i, { mode: 448, recursive: !1 });
-  } catch (e) {
-    if (LN(e)) return !1;
-    throw e;
-  }
-  try {
-    let i = FN(e);
-    return !gje(r, i) || (!n && !PN(e, i) && t.priority <= (i?.priority ?? 0))
-      ? !1
-      : ((0, v.rmSync)(e, { force: !0, recursive: !0 }), MN(e, t));
-  } finally {
-    (0, v.rmSync)(i, { force: !0, recursive: !0 });
-  }
-}
-function MN(e, t) {
-  try {
-    (0, v.mkdirSync)(e, { mode: 448, recursive: !1 });
-  } catch (e) {
-    if (LN(e)) return !1;
-    throw e;
-  }
-  try {
-    return (_je(e, t), !0);
-  } catch (t) {
-    throw ((0, v.rmSync)(e, { force: !0, recursive: !0 }), t);
-  }
-}
-function gje(e, t) {
-  return e?.token === t?.token;
-}
-function _je(e, t) {
-  (0, v.writeFileSync)(IN(e), `${JSON.stringify(t, null, 2)}\n`);
-}
-function vje(e, t) {
-  NN(e, t) && (0, v.rmSync)(e, { force: !0, recursive: !0 });
-}
-function NN(e, t) {
-  return FN(e)?.token === t;
-}
-function PN(e, t) {
-  return t == null ? !yje(e) : !bje(t.pid);
-}
-function FN(e) {
-  try {
-    let t = (0, v.readFileSync)(IN(e), `utf8`);
-    return pje.parse(JSON.parse(t));
-  } catch {
-    return null;
-  }
-}
-function IN(e) {
-  return (0, h.join)(e, uje);
-}
-function yje(e) {
-  try {
-    let t = (0, v.statSync)(e);
-    return Date.now() - t.mtimeMs < dje;
-  } catch {
-    return !1;
-  }
-}
-function bje(e) {
-  try {
-    return (process.kill(e, 0), !0);
-  } catch (e) {
-    return !xje(e);
-  }
-}
-function LN(e) {
-  return RN(e) === `EEXIST`;
-}
-function xje(e) {
-  return RN(e) === `ESRCH`;
-}
-function RN(e) {
-  return typeof e == `object` && e && `code` in e ? e.code : null;
-}
+var kN = ConversationalOnboardingService;
 var Eje = AvatarManager;
 var zje = DebugService,
   Wje = createDemoTools;

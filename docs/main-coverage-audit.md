@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 cross-instance lock owner wiring
+
+`src/main/main-app/util/cross-instance-lock.ts` 已覆盖旧 `AN/cje/lje/uje/dje/fje/pje/jN/mje/hje/MN/gje/_je/vje/NN/PN/FN/IN/yje/bje/LN/xje/RN`。
+本轮修正 claim 竞态后接回 global dictation/hotkey window 两个 lifecycle consumer，删除主 chunk 119 行旧簇；focused suite
+覆盖 owner-change 拒绝、force takeover、active higher-priority 拒绝、claim cleanup 与双 consumer wiring。
+
 ## 2026-10-31 macOS launch-services owner wiring
 
 `src/main/main-app/mac/launch-services.ts` 已覆盖旧 `Oj/kj/Aj/jj/Mj/Nj/Pj/Fj/Ij/Lj/Rj/zj/Bj/Vj`。本轮补齐动态

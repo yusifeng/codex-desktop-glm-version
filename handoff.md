@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 cross-instance lock owner：既有 `util/cross-instance-lock.ts` 现替代主 chunk 旧 `AN/cje…RN`。审计修复 claim 后
+owner 变化时仍可能覆盖新 owner 的 OR 竞态，恢复“token 必须未变，再判断 force/stale/priority”的旧语义；global dictation 与
+hotkey window lifecycle 两个真实 consumers 已通过 `jN/AN` 兼容别名接回，旧 119 行簇删除。
+
 接回 macOS launch-services helper：既有 `mac/launch-services.ts` 现替代主 chunk 旧 `Oj…Vj`。审计补齐了 `Nj` 的动态
 单参数 helper 契约，并把 download-complete 成功返回从错误的 `true` 恢复为原始 `undefined`；应用/bundle/browser 查询、下载
 通知、串行 app icon 更新的真实 consumers 均通过 `Nj/Pj/Fj/Ij/Lj` 兼容别名接回。

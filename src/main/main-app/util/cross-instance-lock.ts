@@ -164,9 +164,16 @@ function tryAcquire(lockPath: string, owner: LockOwner, force: boolean): boolean
   try {
     // claim 期间 owner 可能变化：重读复核。
     const ownerAfterClaim = readLockOwner(lockPath);
-    return currentOwner?.token === ownerAfterClaim?.token || force || isLockStale(lockPath, ownerAfterClaim)
-      ? (rmSync(lockPath, { force: true, recursive: true }), createLockDirectory(lockPath, owner))
-      : false;
+    if (currentOwner?.token !== ownerAfterClaim?.token) return false;
+    if (
+      !force &&
+      !isLockStale(lockPath, ownerAfterClaim) &&
+      owner.priority <= (ownerAfterClaim?.priority ?? 0)
+    ) {
+      return false;
+    }
+    rmSync(lockPath, { force: true, recursive: true });
+    return createLockDirectory(lockPath, owner);
   } finally {
     rmSync(claimPath, { force: true, recursive: true });
   }
