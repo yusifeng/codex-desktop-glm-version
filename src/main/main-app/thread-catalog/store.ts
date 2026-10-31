@@ -19,7 +19,8 @@
 //     中断可从 checkpoint 续扫（attempt.mode 相同则复用 attempt 与水位）；
 //   - 事务：runInTransaction 用 BEGIN IMMEDIATE（写写互斥）。
 //
-// 本模块为纯定义区：实例化在 R4/R10 装配区（54,078-54,436 / 161,190+）。
+// 主进程装配区以 `hhe = LocalThreadCatalogStore` 保留旧符号兼容，所有真实
+// cross-host catalog consumers 均通过该可读实现创建 store。
 
 import {
   CATALOG_UPSERT_SQL,

@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 local thread catalog store wiring correction
+
+既有 `src/main/main-app/thread-catalog/store.ts` 是完整的 6-table SQLite DAO，但此前从未被 main require；本轮将真实
+`hhe` consumer 接到 `LocalThreadCatalogStore`。host registration、sync state、cursor/manual pages、scan checkpoint、observation
+sequence、pending title、missing-candidate reconciliation、revision 与 BEGIN IMMEDIATE transaction 均由语义模块持有；主
+chunk 重复 class、store-only schemas/upsert SQL、filter/row helpers 已删除，`_he/um/dm` projection chain 保留。
+
 ## 2026-10-31 cross-host thread catalog service
 
 原 `dnt` 已迁入 `src/main/main-app/thread-catalog/service.ts`。新 owner 保留 source attach/detach 与 owner counts、population

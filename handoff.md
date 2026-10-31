@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修复 thread-catalog store 的长期未接线迁移：完整 `LocalThreadCatalogStore` 现已替代主 chunk 的 `hhe`，真实 catalog
+factory consumer 保持 `new hhe(...)` 兼容。主 chunk 中重复的 6-table SQLite DAO、store-only schemas/upsert SQL、filter/
+row-mapping helpers 已删除；仍由 thread projection 使用的 `_he/um/dm` 保留。
+
 完成 thread-catalog 上层 owner：原 `dnt` 跨 host catalog service 已迁入 `thread-catalog/service.ts`；source attach/detach、
 ownership、population lifecycle、scan-slot concurrency/fairness、host registry、page/filter/cursor validation、status/observation
 publication 与 disposal 均由具名 class 持有。真实 `WindowContext` consumer 已接回，旧 class 和专属 cursor/filter helpers 删除。
