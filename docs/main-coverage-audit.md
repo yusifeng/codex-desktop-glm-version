@@ -2666,3 +2666,15 @@ install-root/fallback 探测、Linux executable/Toolbox script/desktop-entry 探
 直接交给同一 open-target registry，旧 `u3e..S3e` state/declarations 与 `C3e/o0/w3e/s0/T3e/E3e/D3e/
 O3e/k3e/c0` helpers 已物理删除。focused test `scripts/test-main-jetbrains-targets-owner.mjs` 覆盖 45 项
 Toolbox ordering/cache、macOS/Windows/Linux detection、descriptor surface、args 和 launch delegation。
+
+### 增量抽取：terminal open-target owner
+
+Terminal、Ghostty、iTerm2、Kitty、Warp、Cmder、WSL/Windows Terminal 七个 descriptors 及共享的 target
+directory resolution、`$VISUAL/$EDITOR` selection、shell parsing/quoting/location args、macOS open/AppleScript editor
+bridge、Linux terminal argument/exec matrix、Windows Terminal/Cmder shortcut detection、cmd.exe launch environment 和
+WSL distro/path args 已整体迁移至 `src/main/main-app/open-target/terminal-targets.ts`。main 通过
+`createTerminalTargetRuntime` 将 descriptors 直接交给 registry；Git Bash/GitHub Desktop 原本复用的 `Y1`
+也真实接到同一 `directoryForTarget`，未保留重复 helper。旧 `q1/I4e/J1/L4e/R4e/Y1/Z1/Q1/$1/V4e/
+e0/H4e/U4e/W4e/t0/G4e/K4e/J4e/p0/Z3e/Q3e` 实现已物理删除。focused test
+`scripts/test-main-terminal-targets-owner.mjs` 覆盖 61 项 editor、shell、macOS/Linux/Windows/WSL detection、
+args、fallback、environment、descriptor 和 launch 行为。

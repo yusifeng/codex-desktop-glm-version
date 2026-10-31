@@ -23,6 +23,7 @@ const realOwners = [
   ["src/main/main-app/open-target/open-target-foundation.ts", "createOpenTargetFoundation"],
   ["src/main/main-app/open-target/open-target-registry-runtime.ts", "createOpenTargetRegistryRuntime"],
   ["src/main/main-app/open-target/jetbrains-targets.ts", "createJetBrainsTargetRuntime"],
+  ["src/main/main-app/open-target/terminal-targets.ts", "createTerminalTargetRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -116,6 +117,12 @@ assert.equal(main.includes("function C3e("), false, "generated Toolbox scanner m
 assert.equal(main.includes("function o0("), false, "generated JetBrains descriptor builder must be removed");
 assert.equal(main.includes("function w3e("), false, "generated Linux JetBrains detector must be removed");
 assert.equal(main.includes("function O3e("), false, "generated Windows JetBrains detector must be removed");
+assert.equal(main.includes("createTerminalTargetRuntime({"), true, "real terminal target owner is wired");
+assert.equal(main.includes("function q1("), false, "generated terminal descriptor builder must be removed");
+assert.equal(main.includes("async function L4e("), false, "generated Linux terminal launcher must be removed");
+assert.equal(main.includes("async function K4e("), false, "generated macOS editor-terminal bridge must be removed");
+assert.equal(main.includes("async function J4e("), false, "generated Cmder detector must be removed");
+assert.equal(main.includes("function p0("), false, "generated WSL argument builder must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("112 main unwired-owner skeleton assertions passed");
+console.log("120 main unwired-owner skeleton assertions passed");

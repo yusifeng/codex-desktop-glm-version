@@ -4678,3 +4678,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   detection 与统一 location args；factory 输出直接进入 open-target registry。
 - focused coverage 45 项，no-unwired gate 扩至 112 项。下一步继续按共享 adapter 成组迁移 terminal targets、
   VS Code family、Zed/Visual Studio 等剩余静态 descriptors，避免逐个 target 做小提交。
+
+# 2026-11-01 terminal open-target owner
+
+- `src/main/main-app/open-target/terminal-targets.ts` 已接管 Terminal/Ghostty/iTerm2/Kitty/Warp/Cmder/WSL
+  descriptors、`$EDITOR` file launch、shell quoting、macOS AppleScript/open、Linux emulator args、Windows shortcut/
+  cmd environment 与 WSL path/distro；Git Bash/GitHub Desktop 的共享 directory consumer 也接回新 owner。
+- main 旧实现删除 331 行，新生产模块 449 行；focused coverage 61 项，no-unwired gate 扩至 120 项。
+  下一批继续成组迁移 VS Code/Cursor/Windsurf/Antigravity/Devin family 与其 platform detection adapters。

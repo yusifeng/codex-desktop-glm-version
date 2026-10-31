@@ -222,6 +222,7 @@ const { createBrowserSessionProbeRuntime } = require("./main-app/browser-session
 const { createOpenTargetFoundation } = require("./main-app/open-target/open-target-foundation.js");
 const { createOpenTargetRegistryRuntime } = require("./main-app/open-target/open-target-registry-runtime.js");
 const { createJetBrainsTargetRuntime } = require("./main-app/open-target/jetbrains-targets.js");
+const { createTerminalTargetRuntime } = require("./main-app/open-target/terminal-targets.js");
 const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 const { createElectronPerformanceSnapshotCollectorClass } = require("./main-app/startup/electron-performance-snapshot-collector.js");
 const { MainThreadJankSampler } = require("./main-app/startup/main-thread-jank-sampler.js");
@@ -71106,286 +71107,46 @@ function M4e() {
       ]);
 }
 var N4e = {
-    id: `bbedit`,
-    platforms: {
-      darwin: {
-        label: `BBEdit`,
-        icon: `apps/bbedit.png`,
-        kind: `editor`,
-        detect: () => (L1(`BBEdit`) || F1([`/Applications/BBEdit.app`]) ? `/usr/bin/open` : null),
-        args: (e) => [`-a`, `BBEdit`, e],
-      },
+  id: `bbedit`,
+  platforms: {
+    darwin: {
+      label: `BBEdit`,
+      icon: `apps/bbedit.png`,
+      kind: `editor`,
+      detect: () => (L1(`BBEdit`) || F1([`/Applications/BBEdit.app`]) ? `/usr/bin/open` : null),
+      args: (e) => [`-a`, `BBEdit`, e],
     },
   },
-  P4e = r.i(`open-in-targets`),
-  F4e = {
-    id: `terminal`,
-    platforms: {
-      ...q1({
-        id: `terminal`,
-        label: `Terminal`,
-        icon: `apps/terminal.png`,
-        darwin: { appPaths: [`/System/Applications/Utilities/Terminal.app`], appName: `Terminal` },
-        linux: {
-          commandNames: [
-            `kgx`,
-            `gnome-terminal`,
-            `konsole`,
-            `xfce4-terminal`,
-            `mate-terminal`,
-            `tilix`,
-            `alacritty`,
-            `x-terminal-emulator`,
-          ],
-        },
-      }).platforms,
-      win32: {
-        label: `Terminal`,
-        icon: `apps/microsoft-terminal.png`,
-        kind: `terminal`,
-        detect: Z1,
-        iconPath: () => null,
-        args: Q1,
-        open: ({ command: e, path: t }) => $1(e, Q1(t)),
-      },
-    },
-  };
-function q1({ id: e, label: t, icon: n, darwin: r, linux: i }) {
-  return {
-    id: e,
-    platforms: {
-      darwin: {
-        label: t,
-        icon: n,
-        kind: `terminal`,
-        detect: () => (F1(r.appPaths) ? `/usr/bin/open` : null),
-        args: (e) => [`-a`, r.appName, Y1(e)],
-        open: async ({ command: t, path: n, location: i }) => {
-          (await K4e(e, n, i)) || (await Zi(t, [`-a`, r.appName, Y1(n)]));
-        },
-      },
-      linux:
-        i == null
-          ? void 0
-          : {
-              label: t,
-              icon: n,
-              kind: `terminal`,
-              detect: () => I4e(i.commandNames),
-              args: (e) => J1(i.commandNames[0], e),
-              open: ({ command: e, path: t, location: n }) => L4e(e, t, n),
-            },
-    },
-  };
-}
-function I4e(e) {
-  for (let t of e) {
-    let e = Yi(t);
-    if (e != null) return e;
-  }
-  return null;
-}
-function J1(e, t) {
-  let r = Y1(t);
-  switch ((0, h.basename)(e)) {
-    case `kitty`:
-      return [`--directory`, r];
-    case `ghostty`:
-      return [`--working-directory=${r}`];
-    case `konsole`:
-      return [`--workdir`, r];
-    case `alacritty`:
-    case `gnome-terminal`:
-    case `kgx`:
-    case `mate-terminal`:
-    case `tilix`:
-    case `xfce4-terminal`:
-      return [`--working-directory`, r];
-    case `x-terminal-emulator`:
-    case `zutty`: {
-      let e = process.env.SHELL?.trim() || `/bin/sh`;
-      return [`-e`, e, `-lc`, `cd ${n.$n(r)} && exec ${n.$n(e)}`];
-    }
-    default:
-      throw Error(`Unsupported Linux terminal command: ${(0, h.basename)(e)}`);
-  }
-}
-async function L4e(e, t, n) {
-  let r = J1(e, t),
-    i = e0();
-  if (i != null && (0, v.existsSync)(t) && (0, v.statSync)(t).isFile()) {
-    let a = process.env.SHELL?.trim() || `/bin/sh`,
-      o = t0(i, t, n);
-    switch ((0, h.basename)(e)) {
-      case `kitty`:
-        r.push(a, `-lc`, o);
-        break;
-      case `alacritty`:
-      case `ghostty`:
-      case `kgx`:
-      case `konsole`:
-      case `tilix`:
-        r.push(`-e`, a, `-lc`, o);
-        break;
-      case `mate-terminal`:
-      case `xfce4-terminal`:
-        r.push(`--execute`, a, `-lc`, o);
-        break;
-      case `x-terminal-emulator`:
-      case `zutty`:
-        r = [`-e`, a, `-lc`, o];
-        break;
-      case `gnome-terminal`:
-        r.push(`--`, a, `-lc`, o);
-        break;
-      default:
-        throw Error(`Unsupported Linux terminal command: ${(0, h.basename)(e)}`);
-    }
-  }
-  await Zi(e, r);
-}
-function R4e(e) {
-  let t = process.env.VISUAL?.trim();
-  if (t) return t;
-  let n = process.env.EDITOR?.trim();
-  if (n) return n;
-  for (let t of z4e) {
-    let n = e(t);
-    if (n) return n;
-  }
-  return null;
-}
-function Y1(e) {
-  return (0, v.existsSync)(e) && (0, v.statSync)(e).isDirectory() ? e : (0, h.dirname)(e);
-}
-var z4e = [`nvim`, `vim`, `nano`, `less`],
-  X1 = `wt.exe`,
-  B4e = [`Terminal.lnk`, `Windows Terminal.lnk`];
-async function Z1(e) {
-  if (Yi(X1) || ia(X1)) return X1;
-  let t = sa(B4e);
-  return t ? (na((await e(t)).target) ?? X1) : null;
-}
-function Q1(e) {
-  return [`-d`, Y1(e)];
-}
-async function $1(e, t) {
-  await Zi(`cmd.exe`, [`/d`, `/s`, `/c`, `start`, ``, e, ...t], { env: V4e() });
-}
-function V4e() {
-  let e = aa(),
-    t = process.env.Path == null ? `PATH` : `Path`,
-    n = (process.env[t] ?? ``).split(`;`).filter(Boolean);
-  return (
-    n.some((t) => t.toLowerCase() === e.toLowerCase()) || n.unshift(e),
-    { ...process.env, [t]: n.join(`;`) }
-  );
-}
-function e0() {
-  return R4e(Yi);
-}
-function H4e(e) {
-  return e.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`);
-}
-function U4e(e) {
-  try {
-    let t = n.er(e),
-      r = t.at(0)?.trim();
-    return r
-      ? {
-          args: t,
-          executableName: (0, h.basename)(r)
-            .replace(/\.exe$/i, ``)
-            .toLowerCase(),
-        }
-      : null;
-  } catch {
-    return null;
-  }
-}
-function W4e(e, t) {
-  return t
-    ? e === `nvim` || e === `vim`
-      ? [`+call cursor(${t.line},${t.column})`]
-      : e === `nano`
-        ? [`+${t.line},${t.column}`]
-        : e === `less`
-          ? [`+${t.line}g`]
-          : []
-    : [];
-}
-function t0(e, t, r) {
-  let i = (0, h.dirname)(t),
-    a = U4e(e);
-  if (a == null) return `cd ${n.$n(i)} && ${e} ${n.$n(t)}`;
-  let o = W4e(a.executableName, r),
-    s = a.args.indexOf(`--`),
-    c = s < 0 ? [...a.args, ...o, t] : [...a.args.slice(0, s), ...o, ...a.args.slice(s), t];
-  return `cd ${n.$n(i)} && ${n.Qn(c)}`;
-}
-function G4e(e, t) {
-  let n = process.env.SHELL?.trim() || `/bin/zsh`,
-    r = H4e(t);
-  return e === `kitty`
-    ? { command: `/usr/bin/open`, args: [`-na`, `kitty.app`, `--args`, n, `-lc`, t] }
-    : e === `ghostty`
-      ? { command: `/usr/bin/open`, args: [`-na`, `Ghostty.app`, `--args`, `-e`, n, `-lc`, t] }
-      : e === `terminal`
-        ? {
-            command: `/usr/bin/osascript`,
-            args: [`-e`, `tell application "Terminal" to do script "${r}"`],
-          }
-        : e === `iterm2`
-          ? {
-              command: `/usr/bin/osascript`,
-              args: [
-                `-e`,
-                [
-                  `tell application "iTerm"`,
-                  `create window with default profile`,
-                  `tell current session of current window to write text "${r}"`,
-                  `end tell`,
-                ].join(`
-`),
-              ],
-            }
-          : null;
-}
-async function K4e(e, t, n) {
-  let r = e0();
-  if (!r || !(0, v.existsSync)(t) || (0, v.statSync)(t).isDirectory()) return !1;
-  let i = G4e(e, t0(r, t, n));
-  if (i == null) return !1;
-  try {
-    return (await Zi(i.command, i.args), !0);
-  } catch (n) {
-    return (
-      P4e().warning(
-        `Failed to run $EDITOR command for terminal target; falling back to opening directory`,
-        { safe: { targetId: e }, sensitive: { error: n, path: t } },
-      ),
-      !1
-    );
-  }
-}
-var q4e = H1({
-  id: `cmder`,
-  label: `Cmder`,
-  icon: `apps/cmder.png`,
-  kind: `terminal`,
-  win32: { detect: J4e, args: (e) => [`/START`, Y1(e)] },
+};
+var {
+  terminal: F4e,
+  cmder: q4e,
+  ghostty: r3e,
+  iterm2: l3e,
+  kitty: A3e,
+  warp: J3e,
+  wsl: X3e,
+  directoryForTarget: Y1,
+} = createTerminalTargetRuntime({
+  platform: process.platform,
+  path: h,
+  fs: v,
+  env: process.env,
+  createLogger: r.i,
+  findExistingMacApplication: F1,
+  findExecutable: Yi,
+  findWindowsExecutable: ia,
+  findWindowsShortcut: sa,
+  resolveExecutableLink: na,
+  getWindowsSystemPath: aa,
+  parseShellWords: (command) => n.er(command),
+  shellEscape: (value) => n.$n(value),
+  shellJoin: (values) => n.Qn(values),
+  toWslPath: (value) => n.Vi(value),
+  getWslDistro: (value) => n.Hi(value),
+  getWslInfo: () => n.Ni(),
+  spawn: Zi,
 });
-async function J4e(e) {
-  let t = process.env.CMDER_ROOT?.trim();
-  if (t) {
-    let e = (0, h.join)(t, `Cmder.exe`);
-    if ((0, v.existsSync)(e)) return e;
-  }
-  let n = Yi(`cmder.exe`) ?? Yi(`cmder`);
-  if (n) return na(n);
-  let r = sa([`Cmder.lnk`]);
-  return r ? na((await e(r)).target) : null;
-}
 var Y4e = U1({
     id: `cursor`,
     label: `Cursor`,
@@ -71533,14 +71294,7 @@ function n3e(e) {
     t = e;
   }
 }
-var r3e = q1({
-    id: `ghostty`,
-    label: `Ghostty`,
-    icon: `apps/ghostty.png`,
-    darwin: { appPaths: [`/Applications/Ghostty.app`], appName: `Ghostty` },
-    linux: { commandNames: [`ghostty`] },
-  }),
-  i3e = H1({
+var i3e = H1({
     id: `gitBash`,
     label: `Git Bash`,
     icon: `apps/vscode.png`,
@@ -71591,12 +71345,6 @@ function c3e() {
     [`GitHubDesktop`, `GitHubDesktop.exe`],
   ]);
 }
-var l3e = q1({
-    id: `iterm2`,
-    label: `iTerm2`,
-    icon: `apps/iterm2.png`,
-    darwin: { appPaths: [`/Applications/iTerm.app`, `/Applications/iTerm2.app`], appName: `iTerm` },
-  });
 var {
   androidStudio: h3e,
   intellij: g3e,
@@ -71620,13 +71368,6 @@ var {
   findExistingMacApplication: F1,
   findMacApplicationExecutable: I1,
   launchLinuxEditor: G1,
-});
-var A3e = q1({
-  id: `kitty`,
-  label: `Kitty`,
-  icon: `apps/kitty.png`,
-  darwin: { appPaths: [`/Applications/kitty.app`], appName: `kitty` },
-  linux: { commandNames: [`kitty`] },
 });
 function l0(e, t, r, i, a) {
   if (r != null && n.Os(r)) {
@@ -71827,45 +71568,13 @@ function q3e() {
     installDirName: `Microsoft VS Code Insiders`,
   });
 }
-var J3e = q1({
-    id: `warp`,
-    label: `Warp`,
-    icon: `apps/warp.png`,
-    darwin: { appPaths: [`/Applications/Warp.app`], appName: `Warp` },
-  }),
-  Y3e = U1({
+var Y3e = U1({
     id: `windsurf`,
     label: `Windsurf`,
     icon: `apps/windsurf.png`,
     darwinDetect: () => F1([`/Applications/Windsurf.app/Contents/Resources/app/bin/windsurf`]),
     linuxDetect: () => W1([`windsurf`], [`windsurf.desktop`]),
-  }),
-  f0 = `wsl.exe`,
-  X3e = H1({
-    id: `wsl`,
-    label: `WSL`,
-    icon: `apps/terminal.png`,
-    kind: `terminal`,
-    win32: {
-      detect: Q3e,
-      iconPath: Z3e,
-      args: p0,
-      open: ({ command: e, path: t }) => $1(e, p0(t)),
-    },
   });
-function p0(e) {
-  let t = Y1(e),
-    r = n.Vi(t),
-    i = [...Q1(e), f0],
-    a = n.Hi(t);
-  return (a != null && i.push(`-d`, a), r.startsWith(`\\\\`) || i.push(`--cd`, r), i);
-}
-function Z3e() {
-  return sa([`WSL.lnk`]) ?? ia(f0);
-}
-async function Q3e(e) {
-  return (await n.Ni()) == null ? null : Z1(e);
-}
 var $3e = {
     id: `xcode`,
     platforms: {
