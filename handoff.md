@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `d1e` thread-catalog authorization wrapper 迁入 `thread-catalog/authorized-service.ts`；本地/ChatGPT
+host authorization、population/account-source leases、principal generation 竞态、status/observation RPC
+subscription cleanup 与 dispose 顺序均由新 owner 持有，唯一 runtime consumer 已真实接回并删除旧 class。
+focused test 覆盖 25 项。
+
 随后将原先空壳的 `workspace/files.ts` 替换为真实 `p$e` owner；local/remote path resolution、metadata、
 bounded text/blob reads、etag conflict writes、temporary preview lifecycle、save/download copy、macOS thumbnail
 queue/timeout/overload 和 dispose cleanup 均由新 class 持有。共享路径/atomic-write helpers 仍单一保留在 main

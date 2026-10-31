@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 authorized thread catalog service
+
+原 `d1e` 已迁入 `src/main/main-app/thread-catalog/authorized-service.ts`。新 owner 保留 ChatGPT host
+authorization、principal/account source generation gate、population/source lease ownership、status/observation
+callback filtering、RPC-broken cleanup 与完整 dispose lifecycle；runtime 唯一 consumer 直接实例化新 class，
+旧实现已物理删除。
+
 ## 2026-10-31 workspace file service owner
 
 原 `p$e` 已迁入 `src/main/main-app/workspace/files.ts`，替换此前未接回的 skeleton。新 owner 保留
