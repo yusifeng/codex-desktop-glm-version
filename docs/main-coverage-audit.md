@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 conversation creation cluster cleanup
+
+`src/main/main-app/conversation/conversation-creation.ts` 的 `ConversationParamsBuilder` 与 `ConversationCreationExecutor` 已由
+语义 `AppServerConversationManager` 真实消费，主 chunk 旧 `FSe/ISe/LSe/CC/RSe` 因而只剩内部互相引用。本轮物理删除重复
+创建/预热簇；focused suite 验证 initial-daybreak 乐观写与失败回滚、paginated history mode 和 manager wiring。
+
 ## 2026-10-31 account-auth lifecycle cleanup
 
 `src/main/main-app/conversation/app-server-manager.ts` 已直接导入并构造 `auth/account-auth.ts` 的 `AccountAuthService`，主 chunk

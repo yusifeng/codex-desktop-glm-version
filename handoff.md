@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+收敛 conversation creation cluster：语义 `conversation-creation.ts` 已由 `AppServerConversationManager` 真实构造并消费，主
+chunk 旧 `FSe/ISe/LSe/CC/RSe` 只剩内部互相引用。本轮物理删除整个重复创建/预热簇；focused suite 覆盖 initial-daybreak
+写入失败回滚、history mode 选择、完整 6-member executor 和真实 manager wiring。
+
 收敛 account-auth lifecycle：`conversation/app-server-manager.ts` 已真实消费 `auth/account-auth.ts` 的 `AccountAuthService`，
 因此主 chunk 中失去 consumer 的旧 `Khe` 355 行 class 已物理删除。语义 owner 保留 API-key/ChatGPT/device-code login、remote
 port-forward、Windows sandbox setup timeout、auth/MCP notifications 与 disposal，并新增 focused 行为测试。
