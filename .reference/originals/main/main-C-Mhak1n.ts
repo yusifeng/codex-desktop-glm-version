@@ -74,7 +74,25 @@ const { normalizeUserInput: ug } = require("./main-app/conversations/image-place
 const {
   buildSteeringUserMessage: dg,
   findMatchingSteeringMessage: fg,
+  isOpeningUserMessage: yge,
+  upsertItem: mg,
+  isUnboundSteeringMessage: hg,
+  recoverSteeringOrphans: gg,
+  recoverTurnSteeringOrphans: _g,
+  acceptServerUserMessage: vg,
+  isSteeringUserMessage: yg,
 } = require("./main-app/turns/steering-merge.js");
+const {
+  threadToCatalogEntry: um,
+} = require("./main-app/thread-catalog/schema.js");
+const {
+  ConversationEvictionCoordinator: kh,
+} = require("./main-app/conversations/eviction.js");
+const { UpdateHandle: qhe } = require("./main-app/util/update-handle.js");
+const { streamRolesEqual: Jhe } = require("./main-app/threads/stream-roles.js");
+const {
+  threadReferenceCapabilityKey: Oh,
+} = require("./main-app/threads/reference-capability.js");
 const { DesktopFetchService } = require("./main-app/api/desktop-fetch.js");
 const { AppServerTransportSshWebsocket } = require("./main-app/app-server/transports.js");
 const { QueuedFollowUpsCoordinator } = require("./main-app/conversation/queued-follow-ups.js");
@@ -12727,53 +12745,7 @@ function Qme(e) {
     ? null
     : r;
 }
-var she = 80,
-  cm = `local`;
-function um(e, t = cm) {
-  if (
-    e.ephemeral ||
-    e.threadSource === `chatgpt_hidden` ||
-    e.parentThreadId != null ||
-    e.threadSource === `ambient_suggestions` ||
-    e.threadSource === `pull_request_fix_automation`
-  )
-    return null;
-  let n = _he(e.source);
-  if (n == null || n.kind === `exec` || !Number.isFinite(e.updatedAt)) return null;
-  let r = Number.isFinite(e.createdAt) ? e.createdAt : e.updatedAt,
-    i = e.cwd;
-  return {
-    hostId: t,
-    threadId: e.id,
-    displayTitle: dm({ cwd: i, name: e.name, preview: e.preview, threadId: e.id }),
-    sourceCreatedAt: r,
-    sourceUpdatedAt: e.updatedAt,
-    sourceRecencyAt:
-      e.recencyAt != null && Number.isFinite(e.recencyAt) ? e.recencyAt : e.updatedAt,
-    cwd: i,
-    sourceKind: n.kind,
-    sourceDetail: n.detail,
-    threadSource: e.threadSource,
-    modelProvider: e.modelProvider,
-    gitBranch: e.gitInfo?.branch ?? null,
-  };
-}
-function dm({ cwd: e, name: t, preview: n, threadId: r }) {
-  let i = ae(n ?? ``)?.input ?? (n?.trimStart().startsWith(`<codex_delegation>`) ? `` : n);
-  for (let n of [Vp(t ?? ``), Vp(rm(i ?? ``)), e, r]) {
-    let e = n.replace(/\s+/g, ` `).trim();
-    if (e.length > 0) return e.length <= she ? e : `${e.slice(0, 79).trimEnd()}…`;
-  }
-  return r;
-}
 var hhe = LocalThreadCatalogStore;
-function _he(e) {
-  return typeof e == `string`
-    ? { kind: e, detail: null }
-    : `custom` in e && typeof e.custom == `string`
-      ? { kind: `custom`, detail: e.custom }
-      : null;
-}
 var { resolveSoundCommand: _m, resolveMacBuiltinSound: gm, getCustomSoundDirectory: vm } =
     createNotificationSoundHelpers({ electron: l, fs: v, os: p.default, path: h.default, process }),
   bhe = createNativeNotificationManagerClass({
@@ -13461,165 +13433,7 @@ var ph = new Ihe(),
 function hh(e) {
   return e;
 }
-function Oh(e) {
-  return `thread-reference-capability:${e}`;
-}
-var kh = class {
-    params;
-    constructor(e) {
-      this.params = e;
-    }
-    evictConversation(e, t) {
-      switch (t.reason) {
-        case `archive`:
-        case `archive-notification`:
-          (this.params.clearPersistedUnreadState(e),
-            this.params.threadStore.suppressArchivedConversation(e),
-            t.reason === `archive-notification` && this.params.emitThreadArchived(e),
-            this.params.threadStore.removeThreadSummary(e));
-          break;
-        case `delete`:
-          (this.params.clearPersistedUnreadState(e),
-            this.params.threadStore.suppressArchivedConversation(e),
-            this.params.threadStore.removeThreadSummary(e));
-          break;
-        case `discard`:
-          this.params.clearPersistedUnreadState(e);
-      }
-      (this.params.invalidateResumeState(e, t.reason),
-        this.params.inactiveThreadUnsubscriber.removeConversation(e),
-        this.params.itemStreamState.clearConversationTerminalInputBuffers(e),
-        this.params.manualContextCompactions.clearConversation(e),
-        this.params.unread.clearConversation(e),
-        this.params.resumeNotificationBuffer.discard(e),
-        this.params.threadStartedNotificationDeferral.discardConversation(e),
-        this.params.threadStore.removeConversationStoreEntries(e),
-        t.reason === `discard` && this.params.threadStore.removeThreadSummary(e));
-    }
-  },
-  jh = n.Of().brand(),
-  qhe = class extends n.Uf {
-    #e;
-    constructor(e) {
-      (super(), (this.#e = e));
-    }
-    update(e) {
-      this.#e?.(e);
-    }
-    [Symbol.dispose]() {
-      let e = this.#e;
-      ((this.#e = null), e?.(null));
-    }
-  };
-function Jhe(e, t) {
-  return e?.role === t?.role
-    ? e?.role !== `follower` || t?.role !== `follower` || e.ownerClientId === t.ownerClientId
-    : !1;
-}
-function yge(e, t, n) {
-  let r = e.itemsPagination?.openingUserMessageId;
-  if (r !== void 0) return n.id === r;
-  if (n.clientId != null && e.params.clientUserMessageId != null)
-    return n.clientId === e.params.clientUserMessageId;
-  if (e.itemsPagination?.hasLoadedOldest === !1 || !(0, G.default)(n.content, e.params.input))
-    return !1;
-  let i = Am(e.items) ? dh(e.items) : e.items;
-  for (let e = 0; e < t; e += 1) {
-    let t = i[e];
-    if (
-      t != null &&
-      t.type !== `automaticApprovalReview` &&
-      t.type !== `contextCompaction` &&
-      t.type !== `forkedFromConversation` &&
-      t.type !== `modelChanged` &&
-      t.type !== `modelRerouted` &&
-      t.type !== `personalityChanged` &&
-      t.type !== `remoteTaskCreated` &&
-      t.type !== `steeringUserMessage` &&
-      t.type !== `worktreeInit`
-    )
-      return !1;
-  }
-  return !0;
-}
-function pg(e, t) {
-  return e.type === t;
-}
-function mg(e, t) {
-  let n = (Am(e.items) ? dh(e.items) : e.items).findIndex((e) => e.id === t.id);
-  n >= 0 ? (e.items[n] = t) : e.items.push(t);
-}
-function hg(e) {
-  return yg(e) && e.serverUserMessageId == null;
-}
-function gg(e) {
-  let t = new Map(e.map((e) => [e.turnId, e])),
-    n = new Set();
-  for (let r of e) {
-    let e = r.items.filter((e) => {
-      if (!yg(e)) return !0;
-      let i = e.targetTurnId == null ? null : t.get(e.targetTurnId);
-      return i == null || i === r || ((i.items = i.items.slice()), mg(i, e), n.add(i), !1);
-    });
-    e.length !== r.items.length && (r.items = e);
-  }
-  for (let e of n) _g(e);
-}
-function _g(e) {
-  let t = e.items.filter(hg);
-  if (t.length === 0) return;
-  let n = Am(e.items) ? dh(e.items) : e.items;
-  for (let r of n)
-    pg(r, `userMessage`) &&
-      r.clientId != null &&
-      t.some((e) => e.clientUserMessageId === r.clientId) &&
-      vg(e, r, `completed`, null);
-}
-function vg(e, t, n, r, i = e.turnId) {
-  for (let n of e.items) if (yg(n) && n.serverUserMessageId === t.id) return;
-  let a = (Am(e.items) ? dh(e.items) : e.items).findIndex((e) => e.id === t.id);
-  if (i !== e.turnId || !yge(e, a < 0 ? e.items.length : a, t)) {
-    let o = bge({
-      turn: e,
-      targetTurnId: i,
-      input: t.content,
-      clientUserMessageId: t.clientId,
-      modelProvider: r,
-    });
-    if (o != null) {
-      if (n === `started`) return;
-      i === e.turnId &&
-        o.fileAttachmentCount > 0 &&
-        (e.localMetadata = {
-          fileAttachmentCount: (e.localMetadata?.fileAttachmentCount ?? 0) + o.fileAttachmentCount,
-        });
-      let r = { ...o.item, status: `accepted`, serverUserMessageId: t.id },
-        s = e.items.indexOf(o.item);
-      ((e.items = e.items.slice()),
-        (e.items[s] = r),
-        a >= 0 && s > a && e.items.splice(a, 0, ...e.items.splice(s, 1)),
-        i === e.turnId && mg(e, hh({ type: `steered`, id: t.id })));
-      return;
-    }
-  }
-  i === e.turnId && mg(e, hh(t));
-}
-function bge({ turn: e, targetTurnId: t, input: r, clientUserMessageId: i, modelProvider: a }) {
-  let o = fg(e.items.filter(yg), r, t, e.turnStartedAtMs, !1, i);
-  if (o == null) return null;
-  let { context: s } = o.restoreMessage;
-  return {
-    item: o,
-    fileAttachmentCount:
-      (s.fileAttachments?.length ?? 0) +
-      (s.pastedTextAttachments?.length ?? 0) +
-      (s.uploadedFileAttachments?.length ?? 0) +
-      (s.addedFiles?.filter(n.ps).length ?? 0),
-  };
-}
-function yg(e) {
-  return e.type === `steeringUserMessage`;
-}
+var jh = n.Of().brand();
 function bg(e, t, n = `append`, { preferIncomingItems: r = !1 } = {}) {
   let i = typeof n == `object`,
     a = new Map(e.map((e) => [e.id, e])),

@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 catalog, eviction and steering owner consolidation
+
+主 chunk 的 local thread catalog projection 已改接 `thread-catalog/schema.ts`；conversation eviction、一次性 update handle、stream role equality
+以及 steering message opening/upsert/orphan recovery/server acceptance 改由既有完整 owner 服务真实 consumer。新增
+`threads/reference-capability.ts` 并同步接入 archive/AppServer manager，消除三处 storage key 构造分叉。旧 `she…_he`、`Oh…Jhe`、
+`yge…yg` 约 205 行物理删除；conversation subowner suite 新增 23 条 wiring/lifecycle 断言至 96 条，catalog store/sync 回归通过。
+
 ## 2026-11-01 untrusted app input and generated image evidence owners
 
 将此前仅做字符串拼接的 `conversations/untrusted-input.ts` 与只统计表层图片的 `image-placeholders.ts` 恢复为完整 owner：严格解析 app sender/

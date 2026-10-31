@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+继续消除 conversation/catalog 双轨 owner：主入口的 thread→catalog 投影切到 `thread-catalog/schema.ts`，eviction、UpdateHandle、stream-role
+相等判定和 steering opening/upsert/orphan/accept 全链切到既有语义模块；新增 `threads/reference-capability.ts`，让主入口、archive 与
+AppServer manager 共用同一 storage key owner。旧 `she…_he`、`Oh…Jhe` 与 `yge…yg` 合计约 205 行删除；conversation subowner suite
+从 73 强化到 96 条断言，并复跑 catalog store/sync、notification 和 interrupt 行为回归。
+
 修复并接回此前缩水的 untrusted app input / image placeholder owner：`conversations/untrusted-input.ts` 现恢复严格 payload/image data URL
 校验、UTF-8 byte range、function-call/output 投影、placeholder 防篡改解码，以及 browser element/region/text/graphics、PDF 和附加图片证据文案；
 `image-placeholders.ts` 恢复 comment prompt 计数、text/image pair 识别、generated evidence 剥离、app display text 与图片数核算。主入口同时改接

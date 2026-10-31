@@ -224,4 +224,73 @@ equal(threadStore.includes("const invalidation = historyInvalidationOf(next, pat
 equal(threadStore.includes("function byRecencyDesc("), true);
 equal(threadStore.includes(".sort(byRecencyDesc as never)"), true);
 
+for (const ownerPath of [
+  "thread-catalog/schema.js",
+  "conversations/eviction.js",
+  "util/update-handle.js",
+  "threads/stream-roles.js",
+  "threads/reference-capability.js",
+  "turns/steering-merge.js",
+]) equal(main.includes(`require("./main-app/${ownerPath}")`), true);
+for (const oldDefinition of [
+  "function um(",
+  "function dm(",
+  "function _he(",
+  "function Oh(",
+  "var kh = class",
+  "qhe = class",
+  "function Jhe(",
+  "function yge(",
+  "function mg(",
+  "function hg(",
+  "function gg(",
+  "function _g(",
+  "function vg(",
+  "function yg(",
+]) equal(main.includes(oldDefinition), false);
+
+const referenceSource = fs.readFileSync(
+  new URL("../src/main/main-app/threads/reference-capability.ts", import.meta.url),
+  "utf8",
+);
+const referenceTranspiled = await transform(referenceSource, {
+  loader: "ts",
+  format: "cjs",
+  target: "es2022",
+});
+const referenceModule = { exports: {} };
+Function("require", "module", "exports", referenceTranspiled.code)(
+  () => { throw new Error("unexpected import"); },
+  referenceModule,
+  referenceModule.exports,
+);
+equal(referenceModule.exports.threadReferenceCapabilityKey("thread-a"),
+  "thread-reference-capability:thread-a");
+equal(manager.includes('import { threadReferenceCapabilityKey } from "../threads/reference-capability"'), true);
+
+const updateHandleSource = fs.readFileSync(
+  new URL("../src/main/main-app/util/update-handle.ts", import.meta.url),
+  "utf8",
+);
+const updateHandleTranspiled = await transform(updateHandleSource, {
+  loader: "ts",
+  format: "cjs",
+  target: "es2022",
+});
+const updateHandleModule = { exports: {} };
+Function("require", "module", "exports", updateHandleTranspiled.code)(
+  (specifier) => {
+    if (specifier === "@chunk/shared") return { Uf: class {} };
+    throw new Error(`unexpected require ${specifier}`);
+  },
+  updateHandleModule,
+  updateHandleModule.exports,
+);
+const updates = [];
+const handle = new updateHandleModule.exports.UpdateHandle((value) => updates.push(value));
+handle.update("active");
+handle[Symbol.dispose]();
+handle.update("ignored");
+equal(updates, ["active", null]);
+
 console.log(`${assertions} main conversation subowner cleanup assertions passed`);

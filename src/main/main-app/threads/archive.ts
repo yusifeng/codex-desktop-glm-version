@@ -1,5 +1,6 @@
 import { Of as zString, wf as zObject } from "@chunk/shared";
 import { H_ as subAgentMetadata } from "./projection";
+import { threadReferenceCapabilityKey as capabilityKey } from "./reference-capability";
 
 type UnknownRecord = Record<string, unknown>;
 const record = (value: unknown): UnknownRecord => typeof value === `object` && value !== null ? value as UnknownRecord : {};
@@ -7,7 +8,6 @@ const method = (value: unknown, name: string): ((...args: unknown[]) => unknown)
 const mapLike = (value: unknown) => value as { get(key: string): unknown; has(key: string): boolean; delete(key: string): boolean; set(key: string, value: unknown): unknown };
 const setLike = (value: unknown) => value as { add(value: string, metadata?: unknown): unknown; delete(value: string): boolean; remove?(value: string): unknown };
 const call = <T>(target: unknown, name: string, ...args: unknown[]): T => method(target, name)?.apply(target, args) as T;
-const capabilityKey = (conversationId: string) => `thread-reference-capability:${conversationId}`;
 
 /**
  * 取消归档后无法装载会话的错误（原版 sb）。unarchive 流程读到该错误时

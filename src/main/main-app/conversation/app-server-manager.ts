@@ -36,6 +36,7 @@ import {
 import { Sm as ConversationStreamSubscription } from "../app-server/stream-subscription";
 import { Ah as ConversationEventBus } from "../conversations/event-bus";
 import { kh as ConversationEvictionCoordinator } from "../conversations/eviction";
+import { threadReferenceCapabilityKey } from "../threads/reference-capability";
 import { Khe as AccountAuthService } from "../auth/account-auth";
 import { T_e as ThreadStore } from "../threads/thread-store";
 import { ConversationHistoryReader as ConversationHistoryPagination } from "../threads/history-reader";
@@ -167,11 +168,6 @@ const OWNER_WINDOW_ERROR = `Please continue this conversation on the window wher
 function tokenBudgetThreadKey(hostId: string, conversationId: string) {
   return `token-budget-thread:${hostId}:${conversationId}`;
 }
-/** thread-reference 能力键（原 Oh，28,722 R3 带）。 */
-function threadReferenceCapabilityKey(conversationId: string) {
-  return `thread-reference-capability:${conversationId}`;
-}
-
 /** 构造参数（R5 app-server 连接装配的接口契约，原 54,155-54,176）。 */
 export interface AppServerManagerOptions {
   hostId: string;
