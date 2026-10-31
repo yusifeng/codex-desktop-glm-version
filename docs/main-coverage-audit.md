@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 realtime memory summary reader
+
+原 `y8e` 已迁入 `src/main/main-app/realtime/memory-summary.ts`。新 RPC owner 保留 execution-host Codex home 与
+platform path 并发解析、remote filesystem read、空白内容/null 与失败/null projection；唯一 runtime consumer
+已接回，旧 class 已物理删除。现有 `computer-use/memory-summaries.ts` 属于 CUA 多文件 ambient protocol，未重复。
+
 ## 2026-10-31 realtime continuity history
 
 原 `p8e/m8e/h8e/v2/g8e/y2/_8e/b2/v8e` 已整簇迁入

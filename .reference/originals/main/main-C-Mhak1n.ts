@@ -88,6 +88,7 @@ const { createProjectsManagerClass } = require("./main-app/projects/projects-man
 const { createInteractionRpcServices } = require("./main-app/window/interaction-rpc-services.js");
 const { createAirpodsMicrophoneMuteRuntime } = require("./main-app/realtime/airpods-microphone-mute.js");
 const { createRealtimeContinuityHistoryRuntime } = require("./main-app/realtime/continuity-history.js");
+const { createRealtimeMemorySummaryClass } = require("./main-app/realtime/memory-summary.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -133234,24 +133235,10 @@ var o8e = createProjectsManagerClass({
     fs: b,
     path: h.default,
   });
-var y8e = class extends n.Uf {
-    executionHost;
-    constructor(e) {
-      (super(), (this.executionHost = e));
-    }
-    async readSummary() {
-      let [e, t] = await Promise.all([
-        this.executionHost.codexHome(),
-        this.executionHost.platformPath(),
-      ]);
-      try {
-        let r = await n.Di.readFile(t.join(e, `memories`, `memory_summary.md`), this.executionHost);
-        return r.trim() ? r : null;
-      } catch {
-        return null;
-      }
-    }
-  },
+var y8e = createRealtimeMemorySummaryClass({
+    RpcHandlerBase: n.Uf,
+    readRemoteFile: n.Di.readFile,
+  }),
   b8e = class {
     ledger;
     onUpdate;

@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `y8e` realtime memory-summary RPC owner 迁入 `realtime/memory-summary.ts`；Codex home/platform path
+并发解析、execution-host remote file read、whitespace-empty 与 read failure 归一化均由新 class 持有。唯一
+realtime consumer 已接回，旧 class 已删除；它与 CUA 多文件 ambient summaries 协议不同，未错误合并。
+focused test 覆盖 12 项。
+
 随后将 `p8e/m8e/h8e/v2/g8e/y2/_8e/b2/v8e` realtime continuity history cluster 迁入
 `realtime/continuity-history.ts`；schema parse/fallback、Codex home path、trim/truncate、per-thread max-items、
 newline JSON write 与跨实例串行写队列/失败恢复均由新 file-backed owner 持有。唯一 voice runtime consumer
