@@ -43853,14 +43853,11 @@ var { createTokenProvider: rZe } = createSitesBootstrapTokenRuntime({
     expires_in: n.Cf().positive(),
   }),
 });
-var $X = r.i(`browser-sidebar-manager`),
-  eZ = `-owl-native-contents-close`,
+var eZ = `-owl-native-contents-close`,
   tZ = `being-captured-state-changed`,
   nZ = `password-manager-open-settings`,
   rZ = `page-info-open-site-settings`,
   iZ = `owl-favicon-image-updated`,
-  aZ = 50,
-  oZ = 100,
   sZ = new WeakMap(),
   aZe = {
     [n.gu.BATCH]: { action: `annotate`, annotationModeEntrySource: `context-menu-annotate` },
@@ -43873,72 +43870,6 @@ var {
   securityStateForPage: dZe,
   syncBackgroundThrottling: dZ,
 } = createBrowserPagePresentationPolicy({ isFirstPartyUrl: Ve, pageUrl: QU });
-function fZe(e, t, n, r, { failedUrl: i, kind: a, loadError: o }) {
-  let s = e.getThreadStateForWindow(t, n.conversationId, n.browserTabId) ?? null;
-  if (
-    (s != null && fq(e.windowManager, t.owner, n.conversationId, s), n.errorPagesByUrl.size > 0)
-  ) {
-    let e = r.navigationHistory.getAllEntries();
-    for (let [t, r] of n.errorPagesByUrl)
-      e.some((e) => FU(r, e.url)) || n.errorPagesByUrl.delete(t);
-  }
-  (n.errorPagesByUrl.set(o.pageUrl, o),
-    (n.loadError = o),
-    n.pendingNavigationUsage?.expectedUrl === Ze(i) && (n.pendingNavigationUsage = null),
-    (n.pendingUrl = i),
-    (n.faviconUrl = null),
-    (n.isAudible = !1),
-    fZ(n),
-    n.mediaIndicator.reset(),
-    (n.title = o.title),
-    (n.isLoading = !1),
-    (n.isMainFrameLoading = !1),
-    (n.isWaitingForResponse = !1),
-    XX(n),
-    (n.canGoBack = r.canGoBack()),
-    (n.canGoForward = r.canGoForward()),
-    (n.serializedPageState = eW({ faviconUrl: n.faviconUrl, title: n.title, url: QU(n) })),
-    s != null && (e.syncThreadState(t, n.conversationId, s), e.enforceDetachedPageBudget(t)));
-  let c = n.navigationVersion,
-    l = (t = 0) => {
-      if (
-        r.isDestroyed() ||
-        n.view.webContents?.id !== r.id ||
-        n.loadError !== o ||
-        n.navigationVersion !== c
-      )
-        return;
-      if (r.isLoading() && t < oZ) {
-        setTimeout(() => {
-          l(t + 1);
-        }, aZ);
-        return;
-      }
-      let s = (r) => {
-        if (!(n.loadError !== o || NU(r))) {
-          if (PU(r) && t < oZ) {
-            setTimeout(() => {
-              l(t + 1);
-            }, aZ);
-            return;
-          }
-          ($X().warning(`failed to load browser sidebar error page`, {
-            safe: { conversationId: n.conversationId, kind: a },
-            sensitive: { error: r, url: i },
-          }),
-            e.errorReporter.reportNonFatal(r instanceof Error ? r : Error(String(r)), {
-              kind: `browser-sidebar-load-error-page`,
-            }));
-        }
-      };
-      try {
-        r.loadURL(o.pageUrl, { replaceCurrentEntry: !0 }).catch(s);
-      } catch (e) {
-        s(e);
-      }
-    };
-  l();
-}
 function fZ(e) {
   ((e.isCapturingUserMedia = !1),
     (e.isCapturingCamera = void 0),
@@ -44655,7 +44586,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
         (this.annotationInteractionController = new (createBrowserAnnotationInteractionControllerClass({ hX, EU, IZe, LZe, n, SU, mVe, gVe }))(this)),
         (this.pageMaterializationController = new (createBrowserPageMaterializationControllerClass({ eW, KX, oX, n }))(this)),
         (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ hX, fq, kZe, tq, KU, EZ, lifecycleHelpersClass: createBrowserPageLifecycleHelpersControllerClass, WU, dZ, QU, Ze, n, pX, dZe, oX, dq, isEqual: G.default }))(this)),
-        (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW }))(this)),
+        (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW, fq, matchesLoadError: FU, normalizeUrl: Ze, resetCaptureState: fZ, clearSiteTools: XX, serializePageState: eW, shouldIgnoreLoadError: NU, shouldRetryLoadError: PU, logger: r.i, setTimer: setTimeout, retryDelayMs: 50, maxAttempts: 100 }))(this)),
         (this.pageLookupController = new (createBrowserPageLookupControllerClass({}))(this)),
 (this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, mZe, mZ, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, Xe, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, fZ, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, pZe, pZ, Se, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ }))(this)),
         (this.hostPolicyController = new (createBrowserHostPolicyControllerClass({ DXe, OXe, kXe, mq, VG, Yc, Xc, DZ, hX }))(this)),

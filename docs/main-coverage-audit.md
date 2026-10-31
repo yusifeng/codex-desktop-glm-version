@@ -3173,3 +3173,9 @@ focused test 覆盖两个域名族、拒绝条件、请求合约、过期时间�
 `browser-runtime-sync-controller.ts` 已直接接管原 `uZe` 的 capture-state/budget/message、background throttling、restore/blank-page
 snapshot 投影、Browser Use session snapshot、find-state 广播和 state diff message 顺序；所有依赖由组合根显式注入。主 chunk 旧
 `uZe` 已物理删除，避免 controller 继续委托给机械 helper。
+
+### 增量修复：browser load-error recovery
+
+`browser-navigation-context-controller.ts` 已补齐原 `fZe` 的完整 load-error recovery：find cleanup、stale history error pruning、
+pending usage/media/site-tools reset、snapshot serialization、thread sync/budget，以及带 navigation/version guards 的 50ms×100
+loading/retry loop 和最终 non-fatal report。原主 chunk `fZe` 及专用常量/logger 已删除。

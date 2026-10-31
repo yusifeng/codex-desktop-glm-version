@@ -5124,3 +5124,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   message 的完整投影顺序；主组合根显式注入全部策略依赖，旧 `uZe` 已删除。
 - focused test 已从单纯验证委托改为验证真实 snapshot、throttling、find broadcast 和 state message。下一批审计相邻 load-error
   recovery `fZe` 与现有 error-pages owner 的边界。
+
+# 2026-11-01 browser load-error recovery convergence
+
+- `browser-navigation-context-controller.ts` 不再使用简化 placeholder，现完整承接旧 `fZe` 的 state reset、history pruning、sync/budget、
+  guarded error-page load retry 和错误上报；组合根显式注入 policy，旧 `fZe` 与专用 constants/logger 已删除。
+- focused test 覆盖 stale error 清理、pending usage、状态投影、replace-current load 与真实接线。下一批审计 `fZ/pZ` 后续小 helper
+  belt 和 webview navigation observer ownership。

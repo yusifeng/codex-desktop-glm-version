@@ -78,14 +78,59 @@ export function createBrowserNavigationContextControllerClass(dependencies: Reco
       return true;
     }
 
-    loadBrowserErrorPage(_windowState: any, page: any, _webContents: any, details: any) {
-      if (page == null) return false;
-      const failedUrl = details?.failedUrl ?? page.pendingUrl ?? page.url ?? ``;
-      page.loadError = details?.loadError ?? { failedUrl };
-      if (failedUrl.length > 0) page.errorPagesByUrl?.set(failedUrl, page.loadError);
+    loadBrowserErrorPage(windowState: any, page: any, webContents: any, details: any) {
+      if (page == null || webContents == null || details?.loadError == null) return false;
+      const { failedUrl, kind, loadError } = details;
+      const threadState = this.host.getThreadStateForWindow(windowState, page.conversationId, page.browserTabId) ?? null;
+      if (threadState != null) dependencies.fq(this.host.windowManager, windowState.owner, page.conversationId, threadState);
+      if (page.errorPagesByUrl.size > 0) {
+        const entries = webContents.navigationHistory.getAllEntries();
+        for (const [key, error] of page.errorPagesByUrl) {
+          if (!entries.some((entry: any) => dependencies.matchesLoadError(error, entry.url))) page.errorPagesByUrl.delete(key);
+        }
+      }
+      page.errorPagesByUrl.set(loadError.pageUrl, loadError);
+      page.loadError = loadError;
+      if (page.pendingNavigationUsage?.expectedUrl === dependencies.normalizeUrl(failedUrl)) page.pendingNavigationUsage = null;
       page.pendingUrl = failedUrl;
-      page.url = ``;
+      page.faviconUrl = null;
+      page.isAudible = false;
+      dependencies.resetCaptureState(page);
+      page.mediaIndicator.reset();
+      page.title = loadError.title;
       page.isLoading = false;
+      page.isMainFrameLoading = false;
+      page.isWaitingForResponse = false;
+      dependencies.clearSiteTools(page);
+      page.canGoBack = webContents.canGoBack();
+      page.canGoForward = webContents.canGoForward();
+      page.serializedPageState = dependencies.serializePageState({ faviconUrl: page.faviconUrl, title: page.title, url: QU(page) });
+      if (threadState != null) {
+        this.host.syncThreadState(windowState, page.conversationId, threadState);
+        this.host.enforceDetachedPageBudget(windowState);
+      }
+      const navigationVersion = page.navigationVersion;
+      const retry = (attempt = 0) => {
+        if (webContents.isDestroyed() || page.view.webContents?.id !== webContents.id || page.loadError !== loadError || page.navigationVersion !== navigationVersion) return;
+        if (webContents.isLoading() && attempt < dependencies.maxAttempts) {
+          dependencies.setTimer(() => retry(attempt + 1), dependencies.retryDelayMs);
+          return;
+        }
+        const reportFailure = (error: unknown) => {
+          if (page.loadError !== loadError || dependencies.shouldIgnoreLoadError(error)) return;
+          if (dependencies.shouldRetryLoadError(error) && attempt < dependencies.maxAttempts) {
+            dependencies.setTimer(() => retry(attempt + 1), dependencies.retryDelayMs);
+            return;
+          }
+          dependencies.logger().warning(`failed to load browser sidebar error page`, {
+            safe: { conversationId: page.conversationId, kind }, sensitive: { error, url: failedUrl },
+          });
+          this.host.errorReporter.reportNonFatal(error instanceof Error ? error : Error(String(error)), { kind: `browser-sidebar-load-error-page` });
+        };
+        try { webContents.loadURL(loadError.pageUrl, { replaceCurrentEntry: true }).catch(reportFailure); }
+        catch (error) { reportFailure(error); }
+      };
+      retry();
       return true;
     }
 
