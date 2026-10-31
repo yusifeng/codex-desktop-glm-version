@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 app-server operation handle cleanup
+
+`src/main/main-app/app-server/operation-handle.ts` 的 `AppServerOperationHandle/CancellableOperationHandle` 已由语义
+`AppServerConversationManager` 的 login/device-code/sandbox consumers 使用；主 chunk `Lv/Rv` 已无引用。本轮删除旧 27 行重复
+classes；focused suite 覆盖 start result、completion/null、cancel/dispose abort 与真实 manager wiring。
+
 ## 2026-10-31 desktop feature availability owner wiring
 
 `src/main/main-app/misc/availability.ts` 已完整覆盖旧 `_r/kte/vr/yr/br/xr/Sr/Cr/wr/Tr/Er/Ate/Dr/Or/jte/kr/Ar/Mte`。

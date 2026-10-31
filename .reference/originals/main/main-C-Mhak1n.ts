@@ -26770,33 +26770,6 @@ function Iv(e, t) {
 function E_e(e, t) {
   return (t.recencyAt ?? t.updatedAt) - (e.recencyAt ?? e.updatedAt);
 }
-var Lv = class extends n.Uf {
-    #e;
-    constructor(e) {
-      (super(), (this.#e = e));
-    }
-    async getStartResult() {
-      let { completion: e, ...t } = await this.#e;
-      return t;
-    }
-    async waitForCompletion() {
-      let { completion: e } = await this.#e;
-      if (e == null) throw Error(`App-server operation did not start`);
-      return e;
-    }
-  },
-  Rv = class extends Lv {
-    #e;
-    constructor(e, t) {
-      (super(e), (this.#e = t));
-    }
-    cancel() {
-      this.#e.abort();
-    }
-    [Symbol.dispose]() {
-      this.#e.abort();
-    }
-  };
 function D_e(e) {
   let t = 0,
     n = 0,

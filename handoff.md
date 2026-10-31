@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+清理 app-server operation handle 重复 owner：`app-server/operation-handle.ts` 的 `AppServerOperationHandle` 与可取消变体已由
+真实 `AppServerConversationManager` login/sandbox consumers 使用，主 chunk 旧 `Lv/Rv` 无引用。本轮删除旧 27 行 class 簇，并用
+focused suite 锁定 start/completion、null completion error、cancel/dispose abort 与 consumer wiring。
+
 接回 desktop feature availability 单一状态 owner：既有 `misc/availability.ts` 现替代旧 `_r…Mte`，通过 `vr/Tr/Er/Ate/Dr/Or/
 jte/kr/Ar` 兼容别名服务 main 全部读写/订阅/解析 consumers。main 与 autocomplete、host assembly、link opening 等语义模块现共享
 同一 currentAvailability，消除了重复 owner；ready 单向跃迁、deviceAttestation 重算、Dev env strict override 保持完整。
