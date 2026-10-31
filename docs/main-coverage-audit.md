@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 trigger subscription reader
+
+原 `Int/Lnt/Rnt` 已整簇迁入 `src/main/main-app/triggers/trigger-subscription-reader.ts`。新 owner 保留 strict
+subscription schema、thread-id dedupe、100-item POST batching、request 前后 account/user identity recheck、captured-signal
+abort checks、controller rollover 与 per-thread result projection；真实 construction/cancellation 已接回，旧 cluster 已删除。
+
 ## 2026-10-31 tracing RPC service
 
 原 `Fnt` 已迁入 `src/main/main-app/tracing/tracing-rpc-service.ts`。新 adapter 保留 trace batch export、non-finite/

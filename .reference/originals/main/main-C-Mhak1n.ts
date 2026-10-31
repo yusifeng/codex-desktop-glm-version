@@ -117,6 +117,7 @@ const { createThreadMetadataGenerationServiceClass } = require("./main-app/threa
 const { createThreadReadStateRpcServices } = require("./main-app/thread-read-state/rpc-services.js");
 const { createThreadTurnSummaryServiceClass } = require("./main-app/threads/thread-turn-summary-service.js");
 const { createTracingRpcServiceClass } = require("./main-app/tracing/tracing-rpc-service.js");
+const { createTriggerSubscriptionReaderClass } = require("./main-app/triggers/trigger-subscription-reader.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -140570,54 +140571,11 @@ var Fnt = createTracingRpcServiceClass({
     keepTraceRecordingLocal: jQe,
     submitTraceRecording: AQe,
   }),
-  Int = n.wf({
-    subscriptions: n.hf(
-      n.wf({
-        thread_id: n.Of(),
-        subscription_id: n.Of(),
-        connector_id: n.Of(),
-        connector_name: n.Of(),
-        event_name: n.Of(),
-        display_label: n.Of(),
-      }),
-    ),
+  Rnt = createTriggerSubscriptionReaderClass({
+    runtime: n,
+    RpcHandlerBase: n.Uf,
+    chunkArray: dp.default,
   }),
-  Lnt = 100,
-  Rnt = class extends n.Uf {
-    getPrincipal;
-    fetchJson;
-    controller = new AbortController();
-    constructor(e, t) {
-      (super(), (this.getPrincipal = e), (this.fetchJson = t));
-    }
-    async readMany({ accountId: e, threadIds: t }) {
-      let { signal: n } = this.controller,
-        r = await this.getPrincipal();
-      if (r?.accountId !== e) throw Error(`Trigger account is no longer active`);
-      n.throwIfAborted();
-      let i = [...new Set(t)],
-        a = await Promise.all(
-          (0, dp.default)(i, Lnt).map(async (e) =>
-            Int.parse(
-              await this.fetchJson(`/ps/event-subscriptions/batch`, {
-                method: `POST`,
-                body: { thread_ids: e },
-                signal: n,
-              }),
-            ),
-          ),
-        ),
-        o = await this.getPrincipal();
-      if (o?.accountId !== r.accountId || o.userId !== r.userId)
-        throw Error(`Trigger account changed during the request`);
-      n.throwIfAborted();
-      let s = a.flatMap((e) => e.subscriptions);
-      return Object.fromEntries(i.map((e) => [e, s.filter((t) => t.thread_id === e)]));
-    }
-    cancelPendingReads() {
-      (this.controller.abort(), (this.controller = new AbortController()));
-    }
-  },
   znt = class extends n.Uf {
     getConnection;
     constructor(e) {
