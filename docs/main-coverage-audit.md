@@ -1,5 +1,13 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 remote connections handler
+
+原 `D5e/O5e/k5e/A5e/j5e/u4` 已整簇迁入
+`src/main/main-app/remote/remote-connections-handler.ts`。新 owner 保留 SSH/WSL/Remote Control catalog refresh
+generation、shared-state reconciliation、auto-connect sequencing、connection create/connect/disconnect、saved schema
+migration/backfill、analytics IDs、remote-control enrollment/auth 状态、远程目录浏览与 authoritative host reconciliation；
+唯一 runtime consumer 已接回，旧 876 行实现已物理删除。SSH config 通用 parser 保持独立。
+
 ## 2026-10-31 realtime voice thread title coordinator
 
 原 `Y8e/z2` 已迁入 `src/main/main-app/realtime/voice-thread-title-coordinator.ts`。新 owner 保留 session-id
