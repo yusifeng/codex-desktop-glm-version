@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread settings patch owner repair
+
+`src/main/main-app/threads/patch-classification.ts` 原先把 metrics 压成三个非原始字段，并丢失 collaboration mode/effort 合并、permission
+profile 映射与 last-turn model-change ledger。本轮恢复旧 `D_e/O_e/zv/Bv/Vv/k_e/A_e/j_e/Hv` 的完整语义，AppServer manager、
+conversation creation 与主 chunk consumers 统一接到该模块，删除旧 199 行簇；focused suite 覆盖字段投影、模型往返与全量 metrics。
+
 ## 2026-10-31 manual context compaction owner repair
 
 `src/main/main-app/threads/context-compaction.ts` 原先只遍历 legacy `conversation.turns`，会漏掉 canonical history，且不会删除清空后的

@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修复并统一 thread settings patch owner：`threads/patch-classification.ts` 的 metrics、collaboration/effort 合并、permission profile 投影与
+previous-turn model ledger 已恢复原始完整语义；AppServer manager、conversation creation 和主 chunk 其他 consumers 现共享
+`O_e/zv/Bv/Vv/D_e`，旧 `D_e…Hv` 199 行函数簇删除。
+
 修复并收敛 manual context compaction owner：`threads/context-compaction.ts` 现复用 canonical-history 的 `findDraftTurn/removeTurn`，
 恢复 canonical/legacy 双路径、只处理最后一个匹配 draft，以及空的本地 in-progress turn 清理；真实 AppServer manager consumer 保持接回，
 主 chunk 旧 `Sy/Bve` 47 行重复 owner 删除。
