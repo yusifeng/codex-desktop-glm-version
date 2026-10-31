@@ -306,7 +306,7 @@ function terminalCommandForEvent(event: InputEvent, keymapState: unknown): Termi
 }
 
 /** 面板归属（原 `dVe`/`fU`/`hU`/`mU`）。 */
-function panelForConversation(state: AppShellFocusState | null, conversationId: string | null, tabId: string | null): "bottom" | "right" | null {
+export function panelForConversation(state: AppShellFocusState | null, conversationId: string | null, tabId: string | null): "bottom" | "right" | null {
   return state?.bottomPanelBrowserConversationId === conversationId && state.bottomPanelBrowserTabId === tabId
     ? "bottom"
     : state?.rightPanelBrowserConversationId === conversationId && state.rightPanelBrowserTabId === tabId
@@ -314,7 +314,8 @@ function panelForConversation(state: AppShellFocusState | null, conversationId: 
       : null;
 }
 
-function focusAreaPanel(state: AppShellFocusState | null): "bottom" | "right" | null {
+export function focusAreaPanel(state: AppShellFocusState | null): "bottom" | "right" | null | undefined {
+  if (state == null) return null;
   switch (state?.focusArea) {
     case "bottom-panel":
       return "bottom";
@@ -323,19 +324,43 @@ function focusAreaPanel(state: AppShellFocusState | null): "bottom" | "right" | 
       return "right";
     case "hidden-browser-use":
     case null:
-      return null;
+      return undefined;
   }
 }
 
 /** close-active-app-shell-tab 动作（原 `dU`/`pU`/`mU`）。 */
-function closeTabAction(state: AppShellFocusState | null, conversationId?: string | null, tabId?: string | null, forcedPanel?: "bottom" | "right" | null): AppShellAction | null {
-  if (state == null) return null;
-  let panel: "bottom" | "right" | null;
-  if (forcedPanel != null) panel = forcedPanel;
-  else if (conversationId != null && tabId != null) {
+export function panelForAppShellTarget(
+  state: AppShellFocusState | null,
+  conversationId?: string | null,
+  tabId?: string | null,
+  forcedPanel?: "bottom" | "right" | null,
+): "bottom" | "right" | null | undefined {
+  if (forcedPanel != null) return forcedPanel;
+  if (conversationId != null && tabId != null) {
     const matched = panelForConversation(state, conversationId, tabId);
-    panel = matched ?? focusAreaPanel(state);
-  } else panel = focusAreaPanel(state);
+    if (matched != null) return matched;
+  }
+  return focusAreaPanel(state);
+}
+
+/** Browser host kind → app-shell panel（原 `hU`）。 */
+export function panelForHostKind(hostKind: string | null): "bottom" | "right" | null | undefined {
+  switch (hostKind) {
+    case "bottom-panel":
+      return "bottom";
+    case "right-panel":
+      return "right";
+    case "hidden-browser-use":
+    case null:
+      return null;
+    default:
+      return undefined;
+  }
+}
+
+export function closeTabAction(state: AppShellFocusState | null, conversationId?: string | null, tabId?: string | null, forcedPanel?: "bottom" | "right" | null): AppShellAction | null | undefined {
+  if (state == null) return null;
+  const panel = panelForAppShellTarget(state, conversationId, tabId, forcedPanel);
   switch (panel) {
     case "bottom":
       return state.bottomPanelCanCloseActiveTab ? { panelId: "bottom", type: "close-active-app-shell-tab" } : null;
@@ -360,7 +385,7 @@ export function actionForEvent(
     getCommandKeymapState?: () => unknown;
     state: AppShellFocusState | null;
   },
-): AppShellAction | null {
+): AppShellAction | null | undefined {
   const keymapState = getCommandKeymapState();
   if (allowDebugMenu && matchesCommand(event, "toggleDebugModal", keymapState)) return { type: "toggle-debug-modal" };
   if (state == null) return null;
@@ -431,19 +456,19 @@ export function createAppShellKeyboardDispatcher({
   getCommandKeymapState?: () => unknown;
   getState: () => AppShellFocusState | null;
   sendAction: (action: AppShellAction) => void;
-}): (event: { preventDefault(): void } & InputEvent, webContents: unknown) => void {
-  return (event, _webContents) => {
+}): (event: { preventDefault(): void }, input: InputEvent) => void {
+  return (event, input) => {
     const state = getState();
-    if (state?.terminalFocused === true && isPrimaryShortcut(event, "t")) {
-      const command = terminalCommandForEvent(event, getCommandKeymapState());
+    if (state?.terminalFocused === true && isPrimaryShortcut(input, "t")) {
+      const command = terminalCommandForEvent(input, getCommandKeymapState());
       if (command != null && command.kind !== "webview") return;
       event.preventDefault();
-      if (command != null && (event.isAutoRepeat !== true || command.allowsKeyRepeat === true)) {
-        sendAction({ type: "run-command", id: command.id, keyboardEvent: toDomKeyboardEvent(event) });
+      if (command != null && (input.isAutoRepeat !== true || command.allowsKeyRepeat === true)) {
+        sendAction({ type: "run-command", id: command.id, keyboardEvent: toDomKeyboardEvent(input) });
       }
       return;
     }
-    const action = actionForEvent(event, {
+    const action = actionForEvent(input, {
       allowDebugMenu,
       closeTabAccelerators: getCloseTabAccelerators(),
       getCommandKeymapState,
@@ -451,7 +476,7 @@ export function createAppShellKeyboardDispatcher({
     });
     if (action != null) {
       event.preventDefault();
-      if (action.type !== "toggle-debug-modal" || event.isAutoRepeat !== true) sendAction(action);
+      if (action.type !== "toggle-debug-modal" || input.isAutoRepeat !== true) sendAction(action);
     }
   };
 }

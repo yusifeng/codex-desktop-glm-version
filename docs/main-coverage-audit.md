@@ -3017,3 +3017,11 @@ open-in service 继续通过组合根注入同一实现；默认打开偏好 res
 原始 chunk 中 `MH..bBe` 约 278 行重复实现已物理删除，saved-sections 与 workspace settings 组合边界保持不变。
 focused test 27 项覆盖 URL policy、route identity、IAB/deep-link/external/Slack/invalid 分支与真实接线；no-unwired gate 扩至
 391 项。
+
+### 增量接线：comment site status 与 app-shell keyboard
+
+`browser-sidebar/comment-site-status.ts` 与 `app-shell-keyboard.ts` 已整组接回主运行时，分别接管站点 feature-status 的 24 小时
+缓存/in-flight 去重/降级，以及 zoom、accelerator 匹配、焦点面板归属、close-tab 和 before-input 分派。接线时修复了语义
+dispatcher 将 Electron wrapper event 与 input event 混为同一参数的问题，并导出跨 browser controller 共用的 panel resolver。
+原始 chunk 中 `qBe..yU` 约 438 行重复实现已整带删除；focused test 覆盖缓存、过期、URL 归一、快捷键、面板动作和双参数分派，
+no-unwired gate 扩至 401 项。

@@ -4974,3 +4974,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   workspace settings、window manager、message handler 和 open-in consumers 均由主组合根接入同一实现。
 - main 旧 `MH..bBe` 约 278 行已删除，saved-sections/workspace-settings 边界保持不变。focused coverage 27 项，no-unwired gate
   扩至 391 项。下一批从 workspace settings 后的相邻第一方 owner 继续整带审计。
+
+# 2026-11-01 comment site status and app-shell keyboard wiring
+
+- `browser-sidebar/comment-site-status.ts` 与 `app-shell-keyboard.ts` 已接回 comment-mode 状态查询和全套 app-shell 键盘分派；
+  跨 page command/binding controller 的 panel helpers 也改由语义 owner 导出。
+- 修复 dispatcher 混用 wrapper/input 两个 Electron 回调参数的潜在运行时错误；main 旧 `qBe..yU` 约 438 行已删除。
+  focused coverage 28 项，no-unwired gate 扩至 401 项。下一批从 browser-sidebar manager 相邻 owner 继续整带审计。
