@@ -102,6 +102,11 @@ const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n
 assert.match(main, /F5e = createRemoteControlDeviceKeyClientClass\(\{/);
 assert.doesNotMatch(main, /F5e = class/);
 assert.doesNotMatch(main, /function I5e\(/);
-assert.match(main, /this\.remoteControlDeviceKeyClient = new F5e\(/);
+assert.match(main, /\n    F5e,\n/);
+const windowContext = fs.readFileSync(
+  new URL("../src/main/main-app/window/window-context.ts", import.meta.url),
+  "utf8",
+);
+assert.match(windowContext, /this\.remoteControlDeviceKeyClient = new F5e\(/);
 
-console.log("remote control device key client assertions: 25");
+console.log("remote control device key client assertions: 26");

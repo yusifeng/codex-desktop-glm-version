@@ -60,9 +60,14 @@ const main = fs.readFileSync(
   "utf8",
 );
 equal(main.includes('require("./main-app/app-server/transports.js")'), true);
-equal(main.includes("VE = AppServerTransportSshWebsocket"), true);
-equal(main.includes("VE = class"), false);
-equal(main.includes("RemoteCodexInstaller: VE"), true);
-equal(main.includes("new VE({ ...t, getConnectTimeoutSeconds"), true);
+equal(main.includes("AppServerTransportWslStdio,"), true);
+equal(main.includes("var VE = AppServerTransportSshWebsocket"), false);
+equal(main.includes("RemoteCodexInstaller: AppServerTransportSshWebsocket"), true);
+equal(main.includes("SshWebsocketTransport: AppServerTransportSshWebsocket"), true);
+equal(main.includes("RemoteStdioTransport: AppServerTransportWslStdio"), true);
+equal(main.includes("resolveSshWebsocketConfig: createTransport"), true);
+equal(main.includes("buildWslCodexCommand: wslAppServerArgs"), true);
+equal(main.includes("z = loadShellEnvForStartup()"), true);
+equal(main.includes("var QDe = class"), false);
 
 console.log(`${assertions} main SSH app-server transport owner assertions passed`);

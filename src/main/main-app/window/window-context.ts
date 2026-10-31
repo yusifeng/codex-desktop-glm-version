@@ -26,7 +26,7 @@ export function createWindowContextClass(dependencies) {
     D,
     D2e,
     D5e,
-    DE,
+    loadShellEnv,
     ThreadTurnSummariesStore,
     Det,
     E,
@@ -2093,7 +2093,7 @@ export function createWindowContextClass(dependencies) {
                   }
                 : void 0,
             prepareRemoteChatgptLoginPortForward: async () => {
-              await DE({ caller: `ssh_connect` });
+              await loadShellEnv({ caller: `ssh_connect` });
             },
             ensureAuth: r,
             getRemoteConnectionMaxRetryAttempts: () =>

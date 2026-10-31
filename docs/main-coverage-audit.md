@@ -2896,3 +2896,13 @@ thread-stream coordination，并保留成功/失败路径的 abort/router/catalo
 `yEe/bEe/IT/xEe/SEe/CEe/wEe/EEe/DEe/RT/zT/BT/OEe/kEe/AEe/jEe/NEe/PEe/FEe/IEe/LEe` 整段重复实现已物理删除。
 focused test 覆盖 lazy session、protocol gate、local/remote request、abort、stream/queue projection、owner binding、dispose、
 assembly wiring 和旧符号移除；registry、WindowContext 与 no-unwired 邻接回归同步执行。
+
+### 增量接线：remote-control client 与 AppServer transports
+
+此前已经语义恢复但仅部分接线的 `remote-control/client.ts` 现成为环境 list/rename/delete、REST 错误映射、身份解析、
+enrollment/refresh、step-up、设备密钥 challenge 和 remote-control WebSocket 的唯一运行时实现；
+`remote-connections-handler.ts` 的依赖面同步改为可读语义名。`app-server/transports.ts` 现同时提供 shell-env single-flight、
+SSH websocket/install、WSL stdio、WSL command 和 transport resolution 给所有 consumer，WindowContext、terminal session、
+startup hydration、remote host config 和 transport factory 均已真实接回。原始 chunk 中从 `BEe` 到 `fDe` 以及从 `_E`
+到 `QDe` 的约 1450 行重复实现已物理删除。focused coverage 新增 25 项 REST pagination/projection/error/auth/wiring，
+并强化 SSH/WSL wiring 19 项；remote connections 43、terminal 38、transport factory 45、device-key 26 项邻接回归覆盖。

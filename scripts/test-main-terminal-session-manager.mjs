@@ -92,7 +92,7 @@ function createHarness() {
     C5: () => "posix",
     ztt,
     NQ: class {},
-    bE: () => ["remote-shell"],
+    loginShellProbeCommand: () => ["remote-shell"],
     Vtt: 16_000,
     Htt: 100,
     x5: "xterm-256color",
@@ -265,7 +265,10 @@ function createHarness() {
   );
   const ownerKeyStart = mainSource.indexOf("function S5(e, t) {");
   const managerFactoryStart = mainSource.indexOf("var Wtt = createTerminalSessionManagerClass({");
-  const nextHelperStart = mainSource.indexOf("function C5(e)", managerFactoryStart);
+  const nextHelperStart = mainSource.indexOf(
+    "var Xtt = createThreadArchiveServiceClass({",
+    managerFactoryStart,
+  );
   equal(ownerKeyStart >= 0, true);
   equal(managerFactoryStart > ownerKeyStart, true);
   equal(nextHelperStart > managerFactoryStart, true);

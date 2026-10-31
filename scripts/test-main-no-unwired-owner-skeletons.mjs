@@ -49,6 +49,8 @@ const realOwners = [
   ["src/main/main-app/remote/codex-app-config-runtime.ts", "createCodexAppConfigRuntime"],
   ["src/main/main-app/app-server/host-client-coordination.ts", "createHostClientCoordinationClass"],
   ["src/main/main-app/app-server/host-assembly.ts", "createHostedAppServerManagerFactory"],
+  ["src/main/main-app/remote-control/client.ts", "authorizeRemoteControlEnvironments"],
+  ["src/main/main-app/app-server/transports.ts", "AppServerTransportWslStdio"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");

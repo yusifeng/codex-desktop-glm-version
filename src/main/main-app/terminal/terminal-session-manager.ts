@@ -5,7 +5,7 @@
  * The returned class owns all session, pending-create, action, listener, and cleanup state.
  */
 export function createTerminalSessionManagerClass(dependencies: Record<string, any>) {
-  const { n, v, D, _, Pr, Bn, zn, Ntt, Gtt, jtt, h5, C5, ztt, NQ, bE, Vtt, Htt, x5, Utt, S5 } = dependencies;
+  const { n, v, D, _, Pr, Bn, zn, Ntt, Gtt, jtt, h5, C5, ztt, NQ, loginShellProbeCommand, Vtt, Htt, x5, Utt, S5 } = dependencies;
   return class TerminalSessionManager {
   globalState;
   getIntegratedTerminalShellPreference;
@@ -592,7 +592,7 @@ export function createTerminalSessionManagerClass(dependencies: Record<string, a
   }
   createRemoteTerminalBackend(e) {
     let t = this.getProcessConnectionForHostId?.(e.hostId) ?? null,
-      n = bE(),
+      n = loginShellProbeCommand(),
       r = null;
     return (
       (r = new NQ(

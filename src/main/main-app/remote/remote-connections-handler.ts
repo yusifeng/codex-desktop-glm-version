@@ -8,17 +8,17 @@ export function createRemoteConnectionsHandlerClass(dependencies: Record<string,
     deepEqual,
     discoverSshAliases: Q2,
     resolveSshAlias: $2,
-    authorizeRemoteControl: YEe,
-    renameRemoteControlEnvironment: VEe,
-    deleteRemoteControlEnvironment: HEe,
-    listRemoteControlConnections: BEe,
-    getRemoteControlEnrollmentStatus: XEe,
+    authorizeRemoteControlEnvironments,
+    renameRemoteControlEnvironment,
+    deleteRemoteControlEnvironment,
+    listRemoteControlEnvironments,
+    checkRemoteControlAuthorization,
     requestRemoteControlEnrollmentStepUpToken: y5e,
-    RemoteControlUnavailableError: VT,
-    RemoteControlAccessRequiredError: UT,
-    RemoteControlAuthRequiredError: HT,
-    getSshHostConfig: HE,
-    RemoteCodexInstaller: VE,
+    RemoteControlFeatureUnavailableError,
+    RemoteControlPermissionError,
+    RemoteControlAuthError,
+    getSshHostConfig,
+    RemoteCodexInstaller,
     normalizeRemotePath: zn,
     randomUUID,
     homeDirectory,
@@ -275,7 +275,7 @@ var l4 = createLogger(`remote-connections/window-context`),
     }
     async authorizeRemoteControlConnections() {
       return (
-        await YEe({
+        await authorizeRemoteControlEnvironments({
           appServerClient: this.desktopAuthAppServerClient,
           desktopApiOptions: this.desktopApiOptions,
           deviceKeyClient: this.remoteControlDeviceKeyClient,
@@ -292,7 +292,7 @@ var l4 = createLogger(`remote-connections/window-context`),
       let r = this.sharedObjectRepository.get(`remote_control_connections`),
         i = r?.find((t) => t.envId === e);
       if (i == null) throw Error(`Remote control environment not found.`);
-      let a = await VEe({
+      let a = await renameRemoteControlEnvironment({
           appServerClient: this.desktopAuthAppServerClient,
           desktopApiOptions: this.desktopApiOptions,
           envId: e,
@@ -324,7 +324,7 @@ var l4 = createLogger(`remote-connections/window-context`),
         n = t?.find((t) => t.envId === e);
       if (n == null) throw Error(`Remote control environment not found.`);
       if (n.online) throw Error(`Only offline remote control environments can be deleted.`);
-      (await HEe({
+      (await deleteRemoteControlEnvironment({
         appServerClient: this.desktopAuthAppServerClient,
         desktopApiOptions: this.desktopApiOptions,
         envId: e,
@@ -366,9 +366,9 @@ var l4 = createLogger(`remote-connections/window-context`),
         : { remoteConnections: i, ...(await this.disconnectRemoteConnection(e)) };
     }
     async installRemoteCodex(e) {
-      let t = HE(this.getHostConfigForHostId(e));
+      let t = getSshHostConfig(this.getHostConfigForHostId(e));
       if (t == null) throw Error(`Installing the Codex CLI requires an SSH connection.`);
-      await new VE(t).installCodex();
+      await new RemoteCodexInstaller(t).installCodex();
       let n = this.appServerConnectionRegistry.getMaybeConnection(e);
       return n?.getConnectionError()?.code === `update-required`
         ? (await n.restart({ intent: `restart`, killCodexProcess: !0 }),
@@ -728,7 +728,7 @@ var l4 = createLogger(`remote-connections/window-context`),
           r =
             n == null
               ? []
-              : await BEe({
+              : await listRemoteControlEnvironments({
                   appServerClient: this.desktopAuthAppServerClient,
                   clientId: n,
                   desktopApiOptions: this.desktopApiOptions,
@@ -745,7 +745,7 @@ var l4 = createLogger(`remote-connections/window-context`),
           : r;
       } catch (t) {
         if (e !== this.remoteControlRefreshGeneration) return [];
-        if (t instanceof VT)
+        if (t instanceof RemoteControlFeatureUnavailableError)
           return (
             this.sharedObjectRepository.set(`local_remote_control_client_id`, null),
             this.sharedObjectRepository.set(`remote_control_connections_state`, {
@@ -756,7 +756,7 @@ var l4 = createLogger(`remote-connections/window-context`),
             }),
             []
           );
-        if (t instanceof UT)
+        if (t instanceof RemoteControlPermissionError)
           return (
             this.sharedObjectRepository.set(`remote_control_connections_state`, {
               available: !1,
@@ -766,7 +766,7 @@ var l4 = createLogger(`remote-connections/window-context`),
             }),
             []
           );
-        if (t instanceof HT)
+        if (t instanceof RemoteControlAuthError)
           return (
             this.sharedObjectRepository.set(`local_remote_control_client_id`, null),
             this.sharedObjectRepository.set(`remote_control_connections_state`, {
@@ -845,7 +845,7 @@ var l4 = createLogger(`remote-connections/window-context`),
         });
     }
     getRemoteControlClientEnrollmentStatus() {
-      return XEe({
+      return checkRemoteControlAuthorization({
         appServerClient: this.desktopAuthAppServerClient,
         desktopApiOptions: this.desktopApiOptions,
         deviceKeyClient: this.remoteControlDeviceKeyClient,

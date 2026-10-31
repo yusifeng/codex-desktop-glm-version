@@ -4873,3 +4873,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   coordination/router/context/read-state/request/runtime/storage/catalog/final assembly 共约 1050 行已物理删除。focused coverage
   46 项，registry/no-unwired/WindowContext 邻接回归纳入验证。下一批从删除后的 remote-control/browser-config 区域继续审计
   尚未语义化的第一方状态 owner，保留无法无损拆分的组合根和 vendor belts。
+
+# 2026-11-01 remote-control and AppServer transport runtime wiring
+
+- `remote-control/client.ts` 的环境 REST、enrollment/refresh、step-up、device-key proof 与 websocket transport 已替换 main
+  旧 `BEe..fDe` 全带；`remote-connections-handler.ts` 直接消费语义 API/error classes，不再接受混淆别名。
+- `app-server/transports.ts` 的 shell-env cache、SSH websocket/install、WSL command/stdio 与 transport resolver 已接到 startup、
+  WindowContext、terminal、remote-host config 和 transport factory；旧 `_E..QDe` 全带同步删除。main 合计物理删除约 1450 行，
+  focused coverage 新增 25 项并强化 19 项 transport wiring，邻接 remote-connections/terminal/factory/device-key 回归为
+  43/38/45/26 项。下一批从删除后的 automations/browser origin owner 区域继续审计完整状态边界。
