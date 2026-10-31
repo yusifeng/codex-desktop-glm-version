@@ -133,6 +133,7 @@ const { createTrayMenuControllerClass, isTrayMenuThreadsChangedMessage } = requi
 const { createMessagePortRemoteMainFactory } = require("./main-app/app-server/message-port-transport.js");
 const { createQuitStateClass } = require("./main-app/startup/quit-state.js");
 const { createStartupProgressWindowRuntime } = require("./main-app/startup/progress-window.js");
+const { createGlobalDictationWindowControllerClass } = require("./main-app/dictation/global-dictation-window-controller.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -145527,190 +145528,13 @@ async function aat(e) {
       throw Error(`Global dictation paste is not supported on this OS.`);
   }
 }
-var oat = 16,
-  H7 = { width: 720, height: 84 },
-  sat = class {
-    windowManager;
-    recorderWindow = new GN(() => this.createWindow());
-    recoveryVisible = !1;
-    rendererReadyPromise = null;
-    rendererReadyResolve = null;
-    rendererReadyWebContentsId = null;
-    constructor(e) {
-      this.windowManager = e;
-    }
-    prewarm() {
-      this.recorderWindow.prewarm();
-    }
-    async showPasteFailure(e, t) {
-      let n = await this.recorderWindow.get();
-      return n == null || !t() || (await this.waitForRenderer(n), n.isDestroyed() || !t())
-        ? !1
-        : ((this.recoveryVisible = !1),
-          this.positionWindow(n),
-          n.setAlwaysOnTop(!0, `floating`),
-          this.windowManager.sendMessageToWebContents(n.webContents, {
-            type: `global-dictation-paste-failed`,
-            failure: e,
-          }),
-          n.showInactive(),
-          this.applyPointerInteractivity(n, !0),
-          !0);
-    }
-    async showAndStart(e, t, n, r) {
-      let i = await this.recorderWindow.get();
-      return i == null || !n() || (await this.waitForRenderer(i), i.isDestroyed() || !n())
-        ? !1
-        : ((this.recoveryVisible = !1),
-          this.positionWindow(i),
-          i.setAlwaysOnTop(!0, `floating`),
-          this.windowManager.sendMessageToWebContents(i.webContents, {
-            type: `global-dictation-start`,
-            sessionId: e,
-            startGesture: t,
-            activationStartedAtMs: r,
-          }),
-          i.showInactive(),
-          this.applyPointerInteractivity(i, !1),
-          !0);
-    }
-    showRecovery() {
-      let e = this.recorderWindow.peek();
-      e != null &&
-        ((this.recoveryVisible = !0),
-        this.positionWindow(e),
-        this.applyPointerInteractivity(e, !0));
-    }
-    sendStop(e, t) {
-      let n = this.recorderWindow.peek();
-      if (n != null) {
-        if (this.rendererReadyWebContentsId === n.webContents.id) {
-          this.windowManager.sendMessageToWebContents(n.webContents, {
-            type: `global-dictation-stop`,
-            sessionId: e,
-            cancel: t,
-          });
-          return;
-        }
-        this.waitForRenderer(n).then(() => {
-          n.isDestroyed() ||
-            this.windowManager.sendMessageToWebContents(n.webContents, {
-              type: `global-dictation-stop`,
-              sessionId: e,
-              cancel: t,
-            });
-        });
-      }
-    }
-    setPointerInteractive(e, t) {
-      let n = this.recorderWindow.peek();
-      n != null && n.webContents.id === e && this.applyPointerInteractivity(n, t);
-    }
-    setRendererReady(e) {
-      let t = this.recorderWindow.peek();
-      if (t == null) {
-        this.recorderWindow.runWhenAvailable((t) => {
-          t.webContents.id === e && this.markRendererReady(e);
-        });
-        return;
-      }
-      t.webContents.id === e && this.markRendererReady(e);
-    }
-    hide() {
-      let e = this.recorderWindow.peek();
-      if (e != null) {
-        (e.setIgnoreMouseEvents(!0, { forward: !1 }), e.hide());
-        return;
-      }
-      this.recorderWindow.runWhenAvailable((e) => {
-        (e.setIgnoreMouseEvents(!0, { forward: !1 }), e.hide());
-      });
-    }
-    close() {
-      ((this.rendererReadyWebContentsId = null),
-        this.rendererReadyResolve?.(),
-        (this.rendererReadyResolve = null),
-        (this.rendererReadyPromise = null),
-        this.recorderWindow.clear());
-    }
-    getFocusedInAppWindow() {
-      let e = l.BrowserWindow.getFocusedWindow();
-      return e == null || e.isDestroyed() || e === this.recorderWindow.peek() ? null : e;
-    }
-    positionWindow(e) {
-      let t = l.screen.getDisplayNearestPoint(l.screen.getCursorScreenPoint()).workArea,
-        n = { ...H7, height: this.recoveryVisible ? 180 : H7.height };
-      e.setBounds(
-        {
-          ...n,
-          x: Math.round(t.x + (t.width - H7.width) / 2),
-          y: Math.max(t.y, t.y + t.height - n.height - oat),
-        },
-        !1,
-      );
-    }
-    async createWindow() {
-      try {
-        let e = await this.windowManager.createWindow({
-          title: `Dictation`,
-          ...H7,
-          appearance: `globalDictation`,
-          show: !1,
-          initialRoute: n.so,
-          focusable: !1,
-        });
-        ((this.rendererReadyPromise = new Promise((e) => {
-          this.rendererReadyResolve = e;
-        })),
-          e.setAlwaysOnTop(!0, `floating`),
-          this.positionWindow(e),
-          this.applyPointerInteractivity(e, !1));
-        let t = () => {
-          !e.isDestroyed() && e.isVisible() && this.positionWindow(e);
-        };
-        return (
-          l.screen.on(`display-added`, t),
-          l.screen.on(`display-removed`, t),
-          l.screen.on(`display-metrics-changed`, t),
-          e.once(`closed`, () => {
-            (l.screen.off(`display-added`, t),
-              l.screen.off(`display-removed`, t),
-              l.screen.off(`display-metrics-changed`, t));
-          }),
-          e
-        );
-      } catch (e) {
-        return (
-          r
-            .n()
-            .warning(`Failed to create global dictation window`, {
-              safe: {},
-              sensitive: { error: e },
-            }),
-          null
-        );
-      }
-    }
-    async waitForRenderer(e) {
-      this.rendererReadyWebContentsId !== e.webContents.id && (await this.rendererReadyPromise);
-    }
-    markRendererReady(e) {
-      ((this.rendererReadyWebContentsId = e),
-        this.rendererReadyResolve?.(),
-        (this.rendererReadyResolve = null));
-    }
-    applyPointerInteractivity(e, t) {
-      if (!e.isVisible()) {
-        e.setIgnoreMouseEvents(!0, { forward: !1 });
-        return;
-      }
-      if (t) {
-        e.setIgnoreMouseEvents(!1);
-        return;
-      }
-      e.setIgnoreMouseEvents(!0, { forward: !0 });
-    }
-  },
+var sat = createGlobalDictationWindowControllerClass({
+    LazyWindow: GN,
+    BrowserWindow: l.BrowserWindow,
+    screen: l.screen,
+    logger: r,
+    initialRoute: n.so,
+  }),
   cat = {
     "global-dictation-enabled-changed": !0,
     "global-dictation-force-lock-changed": !0,

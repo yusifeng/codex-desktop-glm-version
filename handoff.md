@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `oat/H7/sat` global-dictation overlay window owner 迁入
+`dictation/global-dictation-window-controller.ts`；lazy prewarm/create、renderer-ready handshake、start/stop/paste-failure、
+recovery geometry、pointer interactivity、display listeners、focus filtering、hide/close 与 failure logging 均由新 owner 持有。
+真实 global-dictation lifecycle 已接回，旧 class/constants 已删除。focused test 覆盖 37 项。
+
 随后将 `bit/xit/Sit/Cit/wit/Tit/Eit/Dit/x7/Oit/kit` startup progress-window owner 迁入
 `startup/progress-window.ts`；localized copy、安全 HTML、BrowserWindow hardening、active/inactive presentation、user quit、
 load failure cleanup、programmatic disposal 与 delayed-show adapter 均由新 owner 持有。两个真实 startup consumers 已接回，

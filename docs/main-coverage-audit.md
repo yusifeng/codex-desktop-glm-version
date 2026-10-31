@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 global-dictation window owner
+
+原 `oat/H7/sat` 已迁入 `src/main/main-app/dictation/global-dictation-window-controller.ts`。新 owner 保留 lazy
+prewarm/create、renderer-ready handshake、start/stop/paste-failure、recovery geometry、pointer interactivity、display
+reposition/cleanup、focused in-app filtering、hide/close 与 creation failure logging；真实 lifecycle 已接回，旧 cluster 已删除。
+
 ## 2026-10-31 startup progress-window owner
 
 原 `bit/xit/Sit/Cit/wit/Tit/Eit/Dit/x7/Oit/kit` 已迁入 `src/main/main-app/startup/progress-window.ts`。新 owner
