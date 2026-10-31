@@ -5228,3 +5228,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   整个 owner 与主 host wrapper 均遗漏。该缺口会让真实 will-attach 读取 undefined，并让窗口关闭清理失效。
 - 已恢复原参数和副作用顺序：window map→session register→shutdown hook；关闭时 persist→mark closing→reject waits→逐 thread dispose→
   listener/map/budget/session cleanup。focused suite 强化至 39 项并实际执行 onClosing/onClosed；no-unwired gate 增加五项结构防回归。
+
+# 2026-11-01 browser annotation anchor policy extraction
+
+- 新增并接回 `browser-sidebar/browser-annotation-anchor-policy.ts`，整带迁出 virtual target/role schemas、viewport validation、element/virtual
+  identity、runtime metadata/name/role enrichment、comment/design-change page sanitation 和 hash-insensitive annotation URL equality。comment controller
+  与 page-command controller 继续消费同一 owner。
+- 审计同时发现主 chunk 的 `VC` virtual target id schema 已在更早批次误删但六处仍引用；现从原始 commit 恢复 control/format/surrogate/
+  line-separator 拒绝 regex，并由语义 policy 回接。旧 `ZG/KWe/$G/eK/tK/nK/rK/iK/aK` 和无消费者 surface schema 已删除；focused
+  suite 53 项，覆盖 schema 边界、viewport、enrichment ambiguity、sanitization 和 URL 类型。

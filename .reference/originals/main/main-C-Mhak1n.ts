@@ -247,6 +247,7 @@ const { BrowserPermissionPromptRegistry } = require("./main-app/browser-sidebar/
 const { createBrowserSessionServiceClass } = require("./main-app/browser-sidebar/browser-session-service.js");
 const { BrowserUseOpenRequestRegistry } = require("./main-app/browser-sidebar/browser-use-open-request-registry.js");
 const { createBrowserSettingsWebviewRuntime, parseBrowserSettingsUrl: UG } = require("./main-app/browser-sidebar/browser-settings-webview-runtime.js");
+const { createBrowserAnnotationAnchorPolicy } = require("./main-app/browser-sidebar/browser-annotation-anchor-policy.js");
 const {
   BROWSER_WEBVIEW_ADOPTION_LEASE: IG,
   getWebviewInstanceId: GG,
@@ -37511,191 +37512,15 @@ function SWe({
     }
   );
 }
-var YG = {
-    requestEvent: `codex:annotation-surface-request`,
-    responseEvent: `codex:annotation-surface-response`,
-    removeEvent: `codex:annotation-surfaces-remove`,
-    availableEvent: `codex:annotation-surface-available`,
-    busySlot: `codex:annotation-surface-pending`,
-    deadlineMs: 250,
-    maxPayloadLength: 8192,
-    maxIdLength: 128,
-    maxRoleLength: 64,
-    rolePattern: `^[a-z][a-z0-9-]*(?![\\s\\S])`,
-    metadataLimits: n.Nu,
-  },
-  XG = n.Of().max(YG.maxRoleLength).regex(new RegExp(YG.rolePattern));
-function ZG(e) {
-  let t = XG.safeParse(e);
-  return t.success ? t.data : void 0;
-}
-var WWe = n.wf({
-  id: VC,
-  name: n.Mf().optional(),
-  role: n.Mf().optional(),
-  metadata: n.Mf().optional(),
-  rect: n
-    .wf({ x: n.Cf(), y: n.Cf(), width: n.Cf().positive(), height: n.Cf().positive() })
-    .optional(),
-});
-n.wf({
-  type: n.df([`registered`, `invalidated`, `disposed`, `rendering-failed`, `result`]),
-  registrationId: VC,
-  requestId: n.Of().max(128).optional(),
-  customRendering: n.gf().optional(),
-  hit: WWe.nullable().optional(),
-});
-var QG = n.wf({
-    x: n.Cf().nonnegative(),
-    y: n.Cf().nonnegative(),
-    width: n.Cf().positive(),
-    height: n.Cf().positive(),
-  }),
-  GWe = n.wf({
-    anchor: n.wf({
-      kind: n.bf(`virtual`),
-      surfaceId: VC,
-      targetId: VC,
-      pageUrl: n.Of(),
-      frameUrl: n.pf(),
-      framePath: n.Af([]),
-      selector: n.pf(),
-      role: XG.nullable(),
-      name: n.pf(),
-      nearbyText: n.pf(),
-      isFixed: n.bf(!0),
-      point: n.wf({ xPercent: n.Cf().min(0).max(100), y: n.Cf().nonnegative() }),
-      rect: QG,
-      scrollContainers: n.hf(n.Sf()).max(0).optional(),
-    }),
-    additionalAnchors: n.hf(n.Sf()).max(0).optional(),
-    viewportRect: QG,
-    viewportPoint: n.wf({ x: n.Cf().nonnegative(), y: n.Cf().nonnegative() }),
-    viewportSize: n.wf({ width: n.Cf().positive(), height: n.Cf().positive() }),
-  });
-function KWe(e, t) {
-  let n = GWe.safeParse(e);
-  if (!n.success) return !1;
-  let { anchor: r, viewportRect: i, viewportPoint: a, viewportSize: o } = n.data;
-  return (
-    r.pageUrl === t &&
-    r.point.y <= o.height &&
-    a.x <= o.width &&
-    a.y <= o.height &&
-    [r.rect, i].every(
-      (e) =>
-        e.x < o.width &&
-        e.y < o.height &&
-        e.x + e.width <= o.width + 1 &&
-        e.y + e.height <= o.height + 1,
-    ) &&
-    r.rect.x === i.x &&
-    r.rect.y === i.y &&
-    r.rect.width === i.width &&
-    r.rect.height === i.height
-  );
-}
-function $G(e, t, r, i = !1) {
-  let a = r == null ? r : [r.anchor, ...(r.additionalAnchors ?? [])],
-    o = (e) => {
-      if (a === void 0) return e;
-      let t = a?.filter((t) => rK(e, t)) ?? [],
-        r = t.filter((t) => n.Cu(e, t));
-      return r.length === 1
-        ? (r[0] ?? null)
-        : r.length === 0 && t.length === 1
-          ? (t[0] ?? null)
-          : null;
-    };
-  return {
-    ...e,
-    anchor: nK(e.anchor, t, o(e.anchor), i || r != null),
-    additionalAnchors: e.additionalAnchors?.map((e) => nK(e, t, o(e), i || r != null)),
-  };
-}
-function eK(e, t, n) {
-  if (e == null) return e;
-  let r = nK(e.anchor, t, n ?? e.anchor, n?.kind === `virtual`);
-  return r === e.anchor ? e : { ...e, anchor: r };
-}
-function tK(e, t) {
-  let n = nK(e.anchor, t, e.anchor, !0);
-  return {
-    ...e,
-    anchor: n,
-    additionalAnchors: e.additionalAnchors?.map((e) => nK(e, t, e, !0)),
-    designChange: eK(e.designChange, t, n),
-  };
-}
-function nK(e, t, r = e, i = !1) {
-  if (e.kind !== `element` && e.kind !== `virtual`) return e;
-  let a =
-      ((t != null && e.pageUrl === t) || (e.kind === `virtual` && i)) &&
-      e.frameUrl == null &&
-      e.framePath.length === 0 &&
-      (r?.kind === `element` || r?.kind === `virtual`) &&
-      rK(e, r)
-        ? r
-        : null,
-    o = n.Pu(a?.elementMetadata),
-    s = n.Fu(a?.elementName),
-    c = e.kind === `virtual` ? (ZG(a?.role) ?? null) : e.role;
-  if (
-    o === void 0 &&
-    s === void 0 &&
-    c === e.role &&
-    !Object.hasOwn(e, `elementMetadata`) &&
-    !Object.hasOwn(e, `elementName`)
-  )
-    return e;
-  let l = { ...e, elementMetadata: o, elementName: s, role: c };
-  return (o === void 0 && delete l.elementMetadata, s === void 0 && delete l.elementName, l);
-}
-function rK(e, t) {
-  return e.kind === `virtual` || t.kind === `virtual`
-    ? e.kind === `virtual` && t.kind === `virtual` && n.Cu({ ...e, role: t.role }, t)
-    : e.kind === `element` &&
-        t.kind === `element` &&
-        e.pageUrl === t.pageUrl &&
-        e.frameUrl === t.frameUrl &&
-        e.framePath.length === t.framePath.length &&
-        e.framePath.every((e, n) => e === t.framePath[n]) &&
-        ((e.runtimeElementId != null && e.runtimeElementId === t.runtimeElementId) ||
-          (e.elementPath === t.elementPath &&
-            e.selector === t.selector &&
-            (e.selector != null || n.Cu(e, t))));
-}
-function iK(e, t) {
-  let n = aK(e),
-    r = aK(t);
-  if (n == null || r == null) return e === t;
-  if (n.type !== r.type) return !1;
-  switch (n.type) {
-    case `http`:
-      return (
-        r.type === `http` &&
-        n.origin === r.origin &&
-        n.pathname === r.pathname &&
-        n.search === r.search
-      );
-    case `file`:
-      return r.type === `file` && n.pathname === r.pathname && n.search === r.search;
-    case `other`:
-      return r.type === `other` && n.value === r.value;
-  }
-}
-function aK(e) {
-  try {
-    let t = new URL(e);
-    return t.protocol === `http:` || t.protocol === `https:`
-      ? { type: `http`, origin: t.origin, pathname: t.pathname, search: t.search }
-      : t.protocol === `file:`
-        ? { type: `file`, pathname: t.pathname, search: t.search }
-        : { type: `other`, value: t.toString() };
-  } catch {
-    return null;
-  }
-}
+var {
+  isValidVirtualAnchorState: KWe,
+  normalizeAnchorState: $G,
+  sameAnnotationUrl: iK,
+  sanitizeCommentForPage: tK,
+  updateDesignChangeAnchor: eK,
+  virtualRoleSchema: XG,
+  virtualTargetIdSchema: VC,
+} = createBrowserAnnotationAnchorPolicy({ shared: n });
 var JWe = createBrowserCommentOverlayManagerClass({
   BrowserWindow: l.BrowserWindow,
   screen: l.screen,

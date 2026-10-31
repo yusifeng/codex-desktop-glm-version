@@ -3264,3 +3264,10 @@ route consume 和 accepted-host attach transaction。transaction 保持 history 
 session registry/shutdown persistence 注册、完整 `disposeWindowState` 及主 host wrapper。现已恢复原装配与关闭顺序：persist（仅首次）、
 closing 标记、pending open rejection、thread/page disposal、listener teardown、window map/tab budget/last-synced/session registry cleanup。
 focused test 实际触发 shutdown callbacks 并核对参数/state identity，防空壳审计锁定五项运行接线。
+
+### 增量抽取：browser annotation anchor policy
+
+新增 `browser-sidebar/browser-annotation-anchor-policy.ts`，集中 virtual target/role schema、viewport geometry validation、element/virtual anchor
+identity、runtime metadata/name/role enrichment、comment/design-change page sanitation 与 annotation URL equality。主 chunk 旧
+`ZG/KWe/$G/eK/tK/nK/rK/iK/aK` 删除，comment/page-command consumers 通过命名工厂回接。迁移还修复了更早批次误删 `VC` 后六处 schema
+继续引用未定义变量的问题：恢复 1..128 长度和 Unicode control/format/surrogate/line-separator 拒绝规则。53 条 focused 断言覆盖边界。
