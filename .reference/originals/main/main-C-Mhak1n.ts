@@ -111,6 +111,7 @@ const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag
 const { createTerminalWindowRuntime } = require("./main-app/terminal/terminal-window-runtime.js");
 const { createNodePtyBackendRuntime } = require("./main-app/terminal/node-pty-backend.js");
 const { createTerminalCommandRuntime } = require("./main-app/terminal/terminal-command-runtime.js");
+const { createThreadArchiveServiceClass } = require("./main-app/threads/thread-archive-service.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -138548,88 +138549,11 @@ var Wtt = createTerminalSessionManagerClass({
   Utt,
   S5,
 });
-var Xtt = class extends n.Uf {
-    executionHostRegistry;
-    appServerConnectionRegistry;
-    localThreadCatalogSyncCoordinator;
-    logger = r.r(`ThreadArchiveService`);
-    constructor(e, t, n) {
-      (super(),
-        (this.executionHostRegistry = e),
-        (this.appServerConnectionRegistry = t),
-        (this.localThreadCatalogSyncCoordinator = n));
-    }
-    async archiveInactiveThread({
-      hostId: e,
-      threadId: t,
-      removeCatalogEntryIfMissing: r,
-      discardProvisionalThread: i,
-    }) {
-      let a = this.executionHostRegistry.get(e);
-      if (n.Es(a.hostConfig)) throw Error(`Archiving inactive chats is only supported locally`);
-      let o = await n.Jr({ codexHome: await a.codexHome(), threadId: t });
-      if (o === !1) return { success: !1 };
-      if (o == null) {
-        if (r !== !0 || this.localThreadCatalogSyncCoordinator == null) return { success: !1 };
-        let n = this.appServerConnectionRegistry.getConnection(e);
-        try {
-          if ((await n.readThread(t, { includeTurns: !1 })) != null && i !== !0)
-            return { success: !1 };
-        } catch (e) {
-          if (!(e instanceof Error) || e.message !== `thread not loaded: ${t}`)
-            return (
-              this.logger.warning(`Failed to confirm archived thread state`, {
-                safe: {},
-                sensitive: { error: e, threadId: t },
-              }),
-              { success: !1 }
-            );
-        }
-        try {
-          if (!this.localThreadCatalogSyncCoordinator.removeThreadFromCatalog(t))
-            return { success: !1 };
-        } catch (e) {
-          return (
-            this.logger.warning(`Failed to remove archived thread from catalog`, {
-              safe: {},
-              sensitive: { error: e, threadId: t },
-            }),
-            { success: !1 }
-          );
-        }
-      } else
-        try {
-          this.localThreadCatalogSyncCoordinator?.handleNotification({
-            method: `thread/archived`,
-            params: { threadId: t },
-          });
-        } catch (e) {
-          this.logger.warning(`Failed to remove archived thread from catalog`, {
-            safe: {},
-            sensitive: { error: e, threadId: t },
-          });
-        }
-      try {
-        this.appServerConnectionRegistry.getConnection(e).handleArchivedThreadSideEffects(t);
-      } catch (e) {
-        this.logger.warning(`Failed to apply archived thread side effects`, {
-          safe: {},
-          sensitive: { error: e, threadId: t },
-        });
-      }
-      return o == null ? { success: !0, threadMissing: !0 } : { success: !0 };
-    }
-    async deleteArchivedThread({ hostId: e, threadId: t }) {
-      let r = this.appServerConnectionRegistry.getConnection(e),
-        i = await n.Xr({ appServer: r, threadId: t });
-      return (r.notifyAutomationRunsUpdated(), { deletedThreadIds: i });
-    }
-    async deleteAllArchivedThreads({ hostId: e }) {
-      let t = this.appServerConnectionRegistry.getConnection(e),
-        r = await n.Yr({ appServer: t });
-      return (r.length > 0 && t.notifyAutomationRunsUpdated(), { deletedThreadIds: r });
-    }
-  },
+var Xtt = createThreadArchiveServiceClass({
+    runtime: n,
+    RpcHandlerBase: n.Uf,
+    createLogger: r.r,
+  }),
   Ztt = 1e3,
   E5 = class {
     #e;

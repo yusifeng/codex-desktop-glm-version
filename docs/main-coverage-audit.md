@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread archive service
+
+原 `Xtt` 已迁入 `src/main/main-app/threads/thread-archive-service.ts`。新 owner 保留 local-host gate、inactive rollout
+archive result handling、missing-thread/provisional-thread validation、catalog removal/notification、archive side effects，
+以及 single/all archived deletion 后的 automation-run refresh；唯一 runtime construction 已接回，旧 class 已删除。
+
 ## 2026-10-31 terminal command runtime
 
 原 `C5/Gtt/Ktt/w5/T5/qtt/Jtt/Ytt` 已迁入

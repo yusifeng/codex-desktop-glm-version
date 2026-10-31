@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Xtt` thread archive service 迁入 `threads/thread-archive-service.ts`；local-only inactive archive、missing
+rollout/catalog reconciliation、provisional-thread guard、archive side effects、single/all archived deletion 与 automation
+refresh 均由新 owner 持有。唯一 runtime construction 已接回，旧 class 已删除。focused test 覆盖 36 项。
+
 随后将 `C5/Gtt/Ktt/w5/T5/qtt/Jtt/Ytt` terminal command runtime 迁入
 `terminal/terminal-command-runtime.ts`；跨平台 shell-kind 判定、PowerShell/cmd 路径转义、action command 换行归一化
 与 cwd command wrapping 均由新 runtime 持有。terminal session manager consumer 已接回，旧 helpers 已删除。
