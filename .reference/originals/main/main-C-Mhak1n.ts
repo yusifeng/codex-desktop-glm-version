@@ -104,6 +104,7 @@ const { createArtifactDocumentStoreClass } = require("./main-app/artifacts/artif
 const { createArtifactRpcServices } = require("./main-app/artifacts/artifact-rpc-services.js");
 const { createSshConnectionRegistrationClass } = require("./main-app/remote/ssh-connection-registration.js");
 const { createNotificationsServiceClass } = require("./main-app/notifications/notifications-service.js");
+const { createShortcutCaptureServices } = require("./main-app/window/shortcut-capture-service.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -138427,72 +138428,15 @@ var Xet = createNotificationsServiceClass({
   createLogger: r.i,
   createUsingScope: a.en,
 });
-var Zet = class extends n.Uf {
-    origin;
-    constructor(e) {
-      (super(), (this.origin = e));
-    }
-    beginCapture() {
-      if (this.origin.isDestroyed()) return null;
-      let e = l.BrowserWindow.fromWebContents(this.origin);
-      return e == null || !e.isFocused() ? null : new Qet(this.origin, e);
-    }
-  },
-  Qet = class extends n.Uf {
-    origin;
-    window;
-    #e = Promise.withResolvers();
-    #t = jze();
-    #n = !1;
-    #r = null;
-    #i = Promise.withResolvers();
-    #a = () => this[Symbol.dispose]();
-    #o = (e) => {
-      e.isMainFrame && !e.isSameDocument && this.#a();
-    };
-    constructor(e, t) {
-      (super(),
-        (this.origin = e),
-        (this.window = t),
-        t.once(`blur`, this.#a),
-        e.once(`destroyed`, this.#a),
-        e.once(`render-process-gone`, this.#a),
-        e.on(`did-start-navigation`, this.#o));
-    }
-    waitForEnd() {
-      return this.#e.promise;
-    }
-    async startBareModifierCapture() {
-      return this.#n || process.platform !== `darwin`
-        ? !1
-        : ((this.#r =
-            this.#r ??
-            Vs({
-              electronAppPath: l.app.getAppPath(),
-              resourcesPath: process.resourcesPath,
-            }).startModifierCapture(this.window.getNativeWindowHandle(), (e) =>
-              this.#i.resolve(e),
-            )),
-          this.#r != null);
-    }
-    async nextBareModifier() {
-      if (this.#n || this.#r == null) return null;
-      let e = await this.#i.promise;
-      return ((this.#i = Promise.withResolvers()), e);
-    }
-    [Symbol.dispose]() {
-      this.#n ||
-        ((this.#n = !0),
-        this.#r?.dispose(),
-        this.#i.resolve(null),
-        this.window.removeListener(`blur`, this.#a),
-        this.origin.removeListener(`destroyed`, this.#a),
-        this.origin.removeListener(`render-process-gone`, this.#a),
-        this.origin.removeListener(`did-start-navigation`, this.#o),
-        this.#t(),
-        this.#e.resolve(void 0));
-    }
-  },
+var { ShortcutCaptureService: Zet, ShortcutCaptureSession: Qet } =
+    createShortcutCaptureServices({
+      RpcHandlerBase: n.Uf,
+      electron: l,
+      createNativeCapture: Vs,
+      installKeyboardHook: jze,
+      platform: process.platform,
+      resourcesPath: process.resourcesPath,
+    }),
   ett = createSshConnectionRegistrationClass({
     runtime: n,
     RpcHandlerBase: n.Uf,
