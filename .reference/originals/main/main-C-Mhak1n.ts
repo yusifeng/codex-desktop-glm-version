@@ -237,6 +237,7 @@ const { createHabitatAutomationsServiceClass } = require("./main-app/automations
 const { createPinnedThreadsServiceClass } = require("./main-app/sidebar/pinned-threads-service.js");
 const { createElectronFetchHandlerClass } = require("./main-app/fetch-handler/electron-fetch-handler.js");
 const { createWindowContextClass } = require("./main-app/window/window-context.js");
+const { createOpenInServiceClass } = require("./main-app/misc/open-in-service.js");
 const { createThreadSectionServerClass } = require("./main-app/sidebar/thread-section-server.js");
 const { createSavedSectionUndoRedoStackClass } = require("./main-app/sidebar/saved-section-undo-redo-stack.js");
 const { createSavedSectionTransitionClass } = require("./main-app/sidebar/saved-section-transition.js");
@@ -81688,138 +81689,6 @@ async function d6e(
   }
   await Zi(u, l.args(t, a, i, s, o), { env: l.env?.() });
 }
-function f6e(e) {
-  return e.map(({ id: e, label: t, icon: n, kind: r, hidden: i, supportsSsh: a }) => ({
-    id: e,
-    label: t,
-    icon: O1(n),
-    kind: r,
-    hidden: i,
-    supportsSsh: a,
-  }));
-}
-var _0 = r.i(`open-in-targets`),
-  v0 = new WeakMap();
-function y0(e) {
-  return f6e(k0(e));
-}
-function b0(e, t, n = process.platform) {
-  return n !== `linux` || e.kind !== `editor` || t == null || (0, h.extname)(t) !== `.desktop`
-    ? e
-    : { ...e, supportsSsh: !1 };
-}
-function x0(e, t) {
-  let n = k0(e).find((e) => e.id === t);
-  return n?.configuredCommand == null || n.configuredIcon == null
-    ? { target: t }
-    : { target: t, customTarget: { command: n.configuredCommand, icon: n.configuredIcon } };
-}
-async function S0(e, t) {
-  let n = await Promise.all(
-    y0(e).map(async (n) => {
-      let r = x0(e, n.id),
-        [i, a] = await Promise.all([
-          t({ method: `get-target-command`, params: r })
-            .then((e) => e.command)
-            .catch(
-              (e) => (
-                _0().error(`Failed to detect open target`, {
-                  safe: {},
-                  sensitive: { id: n.id, error: e },
-                }),
-                null
-              ),
-            ),
-          process.platform === `win32`
-            ? t({ method: `load-target-icon`, params: r })
-                .then((e) => e.icon)
-                .catch(
-                  (e) => (
-                    _0().warning(`Failed to resolve open target icon`, {
-                      safe: {},
-                      sensitive: { id: n.id, error: e },
-                    }),
-                    n.icon
-                  ),
-                )
-            : n.icon,
-        ]);
-      return { command: i, metadata: { ...b0(n, i), icon: a } };
-    }),
-  );
-  return {
-    allAvailableTargets: n.flatMap(({ command: e, metadata: t }) => (e == null ? [] : [t.id])),
-    targetMetadata: n.map(({ metadata: e }) => e),
-  };
-}
-async function C0(
-  e,
-  t,
-  n,
-  {
-    appPath: r,
-    detectedCommand: i,
-    hostConfig: a,
-    location: o,
-    remotePath: s,
-    remoteWorkspaceRoot: c,
-  } = {},
-) {
-  await d6e(t, n, {
-    appPath: r,
-    detectedCommand: i,
-    hostConfig: a,
-    location: o,
-    remotePath: s,
-    remoteWorkspaceRoot: c,
-    targets: k0(e),
-  });
-}
-function p6e(e, t) {
-  return u6e(t, k0(e));
-}
-function w0(e) {
-  let t = k0(e),
-    r = e.getEffective(n.Ia.openInTargetPreferences.key) ?? {},
-    i = T0(r.global, t) ?? void 0,
-    a = Object.fromEntries(
-      Object.entries(r.perPath ?? {}).flatMap(([e, n]) => {
-        let r = T0(n, t);
-        return r ? [[e, r]] : [];
-      }),
-    );
-  return { global: i, perPath: Object.keys(a).length > 0 ? a : void 0 };
-}
-function T0(e, t) {
-  return e === `finder`
-    ? `fileManager`
-    : typeof e == `string`
-      ? (t.find((t) => t.id === e)?.id ?? null)
-      : null;
-}
-function E0(e, t, n) {
-  let r = D0(e, t);
-  return r && n.has(r) ? r : (n.values().next().value ?? null);
-}
-function D0(e, t) {
-  let n = w0(e);
-  return (t ? n.perPath?.[t] : void 0) ?? n.global ?? null;
-}
-function O0(e, t, r) {
-  let i = w0(e);
-  ((i.global = r),
-    t && ((i.perPath = i.perPath ?? {}), (i.perPath[t] = r)),
-    e.set(n.Ia.openInTargetPreferences.key, i));
-}
-function k0(e) {
-  let t = e.getEffective(n.Ia.customFileHandlers.key);
-  if (t == null) return g0;
-  let r = v0.get(t);
-  if (r != null) return r;
-  let i = S4e(t, process.platform),
-    a = i.length === 0 ? g0 : [...g0, ...i];
-  return (v0.set(t, a), a);
-}
 var m6e = new Map([
   [
     `.pptx`,
@@ -81847,246 +81716,41 @@ function h6e(e) {
 var A0 = 5,
   j0 = 5,
   M0 = new Set(a.in.values.map((e) => a.rn(e))),
-  N0 = class extends n.Uf {
-    globalState;
-    executionHostRegistry;
-    settingsStore;
-    requestOpenInWorker;
-    origin;
-    chunkedMessageSender;
-    logger = r.i(`open-in-service`);
-    constructor(e, t, n, r, i, a) {
-      (super(),
-        (this.globalState = e),
-        (this.executionHostRegistry = t),
-        (this.settingsStore = n),
-        (this.requestOpenInWorker = r),
-        (this.origin = i),
-        (this.chunkedMessageSender = a));
-    }
-    async detectTarget({ target: e }) {
-      let { command: t } = await this.#n()({
-        method: `get-target-command`,
-        params: x0(this.settingsStore, e),
-      });
-      return { available: t != null };
-    }
-    async getTargets({
-      cwd: e,
-      deferEnrichment: t = !1,
-      hostId: r,
-      nativeBrowserDiscovery: i = `scan`,
-      path: a,
-    }) {
-      let { hostConfig: o } = this.executionHostRegistry.get(r ?? void 0);
-      if (t && a == null) {
-        let t = D0(this.settingsStore, e);
-        return {
-          preferredTarget: t,
-          availableTargets: [],
-          mode: `editor`,
-          targets: E1(y0(this.settingsStore), o).map(
-            ({ id: e, label: n, icon: r, kind: i, hidden: a }) => ({
-              id: e,
-              target: e,
-              label: n,
-              icon: r,
-              kind: i,
-              hidden: a,
-              default: t === e || void 0,
-            }),
-          ),
-        };
-      }
-      let { allAvailableTargets: s, targetMetadata: c } = await S0(this.settingsStore, this.#n()),
-        l = a?.replace(/^([ab])[\\/]/, ``) ?? null,
-        u = l != null && L0(l) && !n.Es(o),
-        d = l == null || u || n.Es(o) ? null : pH(Un(l, o) ?? l, Un(e, o) ?? Ir(this.globalState)),
-        f = T1(o, s, c),
-        p = new Set(f),
-        m = E0(this.settingsStore, e, p),
-        g = u || (d != null && ze(d)),
-        _ = d != null && u4e(d),
-        v =
-          d != null &&
-          _ &&
-          (process.platform === `darwin` || process.platform === `linux`) &&
-          ke.some((e) => e === (0, h.extname)(d).toLowerCase()),
-        y = [];
-      return (
-        g
-          ? (y = await v6e(i))
-          : d != null && v
-            ? (y = await _6e(d))
-            : d != null && (h1(d) || (process.platform === `linux` && _)) && (y = await g6e(d)),
-        {
-          preferredTarget: m,
-          availableTargets: Array.from(p),
-          mode: g || _ ? `native` : `editor`,
-          targets: [
-            ...c
-              .filter(({ id: e }) => !(v && e === `systemDefault`))
-              .map(({ id: e, label: t, icon: n, kind: r, hidden: i }) => ({
-                id: e,
-                target: e,
-                label: t,
-                icon: n,
-                kind: r,
-                hidden: i,
-                available: p.has(e),
-                default: m === e || void 0,
-              })),
-            ...y,
-          ],
-        }
-      );
-    }
-    loadTargetIcon({ target: e }) {
-      return this.#n()({ method: `load-target-icon`, params: x0(this.settingsStore, e) });
-    }
-    async open({
-      path: e,
-      conversationId: t,
-      target: r,
-      appPath: i,
-      line: a,
-      column: o,
-      cwd: s,
-      persistPreferredTargetPath: l,
-      hostId: u,
-      openMode: d,
-    }) {
-      try {
-        let f = this.executionHostRegistry.get(u ?? void 0),
-          p = f.hostConfig;
-        if (r === `systemDefault` && L0(e) && !n.Es(p)) {
-          if (i == null) {
-            if (
-              !(await IH({
-                request: {
-                  url: e,
-                  initiator: `open_in_browser_bridge`,
-                  openTarget: `external-browser`,
-                },
-              }))
-            )
-              throw Error(`Failed to open URL in system browser`);
-          } else
-            await C0(this.settingsStore, `systemDefault`, e, {
-              appPath: i,
-              detectedCommand: await this.#t(`systemDefault`),
-              hostConfig: p,
-            });
-          return { success: !0 };
-        }
-        let m = e.replace(/^([ab])[\\/]/, ``),
-          h = Un(m, p) ?? m,
-          g = Un(s, p) ?? Ir(this.globalState),
-          _ = n.Es(p),
-          v = _ ? s : null,
-          y = r != null,
-          b = await f.platformPath(),
-          x = pH(h, g),
-          S = !_ && (await this.#e(f, x)),
-          C = typeof a == `number` ? { line: a, column: typeof o == `number` ? o : 1 } : null,
-          w = v != null || (_ && n.f(m, b)) ? pH(m, v, b) : null;
-        if (
-          !_ &&
-          !S &&
-          Ue({
-            browserPaneEnabled: Tr().browserPane,
-            link: { type: `file`, location: C, path: x, target: r },
-          })
-        )
-          return (
-            this.chunkedMessageSender.sendInlineMessageForView(this.origin, {
-              open: !0,
-              type: `toggle-browser-panel`,
-              conversationId: t,
-              url: (0, c.pathToFileURL)(x).toString(),
-              source: `manual`,
-              initiator: `open_in_browser_bridge`,
-            }),
-            { success: !0 }
-          );
-        let T = r == null ? void 0 : await this.#t(r),
-          E;
-        if (r == null || T == null) {
-          let { allAvailableTargets: e, targetMetadata: t } = await S0(
-            this.settingsStore,
-            this.#n(),
-          );
-          E = T1(p, e, t);
-        } else
-          E = E1(
-            y0(this.settingsStore).map((e) => (e.id === r ? b0(e, T) : e)),
-            p,
-          ).some((e) => e.id === r)
-            ? [r]
-            : [];
-        let D = new Set(E),
-          O = r ?? null,
-          k = O != null && !D.has(O);
-        if (
-          ((O = d4e({
-            requestedTarget: O,
-            requestedTargetWasFiltered: k,
-            preferredTarget: E0(this.settingsStore, v ?? g, D),
-            shouldUsePlatformDefaultViewer: !_ && !S && g1(x),
-            shouldUseFileManager: S && D.has(`fileManager`),
-            hasExplicitTarget: y,
-            allowPlatformFallback: !_,
-            platform: process.platform,
-          })),
-          O == null)
-        )
-          throw Error(`No available open target`);
-        let A = !_ && h1(x),
-          j = l != null && D0(this.settingsStore, l) != null;
-        l && (y || !j) && O0(this.settingsStore, l, O);
-        let M = d === `workspace` && C == null ? null : w;
-        return (
-          A && C == null && !y && p6e(this.settingsStore, O) && (O = `fileManager`),
-          await C0(this.settingsStore, O, x, {
-            appPath: i,
-            detectedCommand: O === r ? T : void 0,
-            hostConfig: p,
-            location: C,
-            remotePath: M,
-            remoteWorkspaceRoot: v,
-          }),
-          { success: !0 }
-        );
-      } catch (e) {
-        return (
-          this.logger().error(`Failed to open file`, { safe: {}, sensitive: { error: e } }),
-          { success: !1 }
-        );
-      }
-    }
-    async setGlobalPreferredTarget({ target: e }) {
-      return (O0(this.settingsStore, null, e), { success: !0 });
-    }
-    async #e(e, t) {
-      try {
-        return (await n.Di.stat(t, e)).isDirectory();
-      } catch {
-        return !1;
-      }
-    }
-    async #t(e) {
-      let { command: t } = await this.#n()({
-        method: `get-target-command`,
-        params: x0(this.settingsStore, e),
-      });
-      if (t == null) throw Error(`Open target "${e}" is not available`);
-      return t;
-    }
-    #n() {
-      if (this.requestOpenInWorker == null) throw Error(`Open in worker unavailable`);
-      return this.requestOpenInWorker;
-    }
-  };
+  N0 = createOpenInServiceClass({
+    DisposableBase: n.Uf,
+    createLogger: r.i,
+    platform: process.platform,
+    extname: h.extname,
+    customFileHandlersKey: n.Ia.customFileHandlers.key,
+    openInTargetPreferencesKey: n.Ia.openInTargetPreferences.key,
+    defaultTargets: g0,
+    parseCustomTargets: S4e,
+    normalizeTargetIcon: O1,
+    openWithTarget: d6e,
+    isEditorTarget: u6e,
+    filterTargetIds: T1,
+    filterTargets: E1,
+    resolveTarget: d4e,
+    isHostConfig: n.Es,
+    translateHostPath: Un,
+    defaultCwd: Ir,
+    resolvePath: pH,
+    isUrl: L0,
+    isHtml: ze,
+    isNativeDocument: u4e,
+    isDarwinNativeDocument: h1,
+    isPlatformDefaultViewerDocument: g1,
+    nativeDocumentExtensions: ke,
+    discoverNativeBrowsers: v6e,
+    discoverDocumentApplications: _6e,
+    discoverNativeApplications: g6e,
+    openExternalLink: IH,
+    shouldOpenInBrowserPane: Ue,
+    browserPaneEnabled: () => Tr().browserPane,
+    pathToFileUrl: (path) => (0, c.pathToFileURL)(path).toString(),
+    isPathOnPlatform: n.f,
+    statPath: (path, executionHost) => n.Di.stat(path, executionHost),
+  });
 async function P0({ appPath: e, bundleId: t, displayName: n }) {
   return {
     id: `app:${e}`,

@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+恢复完整 OpenInService owner：新增 `misc/open-in-service.ts` 接管目标发现/缓存、worker 调用、icon/enrichment、偏好规范化与持久化、URL/browser
+panel、远端/本地路径、目录、Office/native document、编辑器和文件管理器路由；WindowContext 已消费新 owner。主 chunk 原 helper/class 约 372 行
+重复实现删除，新增 42 条行为/接线断言，防未接线空壳审计同步扩展至 23 条。
+
 恢复完整 thread edit/fork 生命周期：`threads/operations.ts` 不再发送不存在的 edit facade 或返回 dummy fork product，现保留 follower/owner gate、
 revert/rollback、权限与 start 顺序，以及 fork trace/deferral/materialization/resume/project/metadata/side-conversation/projectless 全链；新增
 `threads/fork-placement.ts` 处理 saved section 与 app-server replica 的相对位置和失败回滚。token-budget key 已与 startup consumer 统一，主 chunk

@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 OpenInService owner restoration
+
+新增完整 `misc/open-in-service.ts`，把打开目标的发现/缓存、worker 参数、图标与目标 enrichment、偏好读取和持久化、URL/system-default、
+browser panel、远端路径、本地目录、Office/native document、编辑器与文件管理器路由全部迁入具名 owner。WindowContext 的真实 consumer 已改接
+该 owner，主 chunk 原 `f6e…k0` helpers 与 `N0` class 共约 372 行重复实现删除；42 条 focused 行为/接线断言和 23 条防空壳断言通过。
+
 ## 2026-11-01 thread edit and fork lifecycle restoration
 
 将 `threads/operations.ts` 从 338 行 facade 恢复为真实运行 owner：edit 现执行 follower 委托、owner/settings gate、latest-message/in-progress

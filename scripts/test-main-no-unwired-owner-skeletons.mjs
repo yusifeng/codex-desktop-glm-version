@@ -5,6 +5,7 @@ const root = new URL("../", import.meta.url);
 const realOwners = [
   ["src/main/main-app/window/window-context.ts", "createWindowContextClass"],
   ["src/main/main-app/fetch-handler/electron-fetch-handler.ts", "createElectronFetchHandlerClass"],
+  ["src/main/main-app/misc/open-in-service.ts", "createOpenInServiceClass"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -19,12 +20,10 @@ const removedSkeletons = [
   "src/main/main-app/sidebar/saved-sections-transactions.ts",
   "src/main/main-app/automations/automation-update-tool.ts",
   "src/main/main-app/automations/habitat.ts",
-  "src/main/main-app/automations/inbox-items.ts",
   "src/main/main-app/automations/index.ts",
   "src/main/main-app/browser-sidebar/comment-overlay-manager.ts",
   "src/main/main-app/browser-sidebar/comment-controller.ts",
   "src/main/main-app/browser-use/session-registry.ts",
-  "src/main/main-app/misc/open-in-service.ts",
 ];
 
 for (const path of removedSkeletons) {
@@ -35,8 +34,16 @@ const main = fs.readFileSync(
   new URL(".reference/originals/main/main-C-Mhak1n.ts", root),
   "utf8",
 );
+const inboxOwner = fs.readFileSync(
+  new URL("src/main/main-app/automations/inbox-items.ts", root),
+  "utf8",
+);
+assert.equal(inboxOwner.includes("export class InboxItemsFacade"), true, "InboxItemsFacade must remain a real owner");
+assert.equal(main.includes("new InboxItemsFacade({"), true, "InboxItemsFacade must remain wired");
 assert.equal(main.includes("PBe = createElectronFetchHandlerClass({"), true, "real Electron fetch owner is wired");
 assert.equal(main.includes("ert = createWindowContextClass({"), true, "real WindowContext owner is wired");
+assert.equal(main.includes("N0 = createOpenInServiceClass({"), true, "real OpenInService owner is wired");
+assert.equal(main.includes("N0 = class extends"), false, "generated OpenInService owner must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("19 main unwired-owner skeleton assertions passed");
+console.log("23 main unwired-owner skeleton assertions passed");
