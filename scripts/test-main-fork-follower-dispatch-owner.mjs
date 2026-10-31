@@ -13,7 +13,19 @@ async function load(relativePath, requireStub) {
 }
 
 const { owner: operations } = await load("../src/main/main-app/threads/operations.ts", (specifier) => {
-  if (specifier === "@chunk/shared") return { Zo: (error) => error instanceof Error ? error.message : String(error) };
+  if (specifier === "@chunk/shared") return {
+    Zo: (error) => error instanceof Error ? error.message : String(error),
+  };
+  if (specifier === "../turns/canonical-history") return {};
+  if (specifier === "../prompts/section-markers") return {};
+  if (specifier === "./hydration") return {};
+  if (specifier === "./history-policy") return {};
+  if (specifier === "./patch-classification") return {};
+  if (specifier === "./maybe-resume") return {};
+  if (specifier === "./start-config") return {};
+  if (specifier === "../workspace/config") return {};
+  if (specifier === "./reference-capability") return {};
+  if (specifier === "./fork-placement") return {};
   throw new Error(`unexpected operations require ${specifier}`);
 });
 

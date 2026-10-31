@@ -77,6 +77,7 @@ import {
   Fye as listMcpServers,
   Hye as resumeSubagentForFileApproval,
   dye as buildForkCapabilities,
+  tokenBudgetThreadKey,
 } from "../threads/operations";
 // R3 threads/fork-rollback（37,866-38,268）+ threads/history-policy（38,269-38,677）。
 import {
@@ -164,10 +165,6 @@ import { createQueuedMessagesFacade } from "./turn-context";
 const TURN_START_TIMEOUT_MS = 30_000;
 /** owner 窗口错误文案（原 xm，27,878）。 */
 const OWNER_WINDOW_ERROR = `Please continue this conversation on the window where it was started.`;
-/** token-budget 线程的 storage 键（原 yb，41,459 R3 带）。 */
-function tokenBudgetThreadKey(hostId: string, conversationId: string) {
-  return `token-budget-thread:${hostId}:${conversationId}`;
-}
 /** 构造参数（R5 app-server 连接装配的接口契约，原 54,155-54,176）。 */
 export interface AppServerManagerOptions {
   hostId: string;

@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+恢复完整 thread edit/fork 生命周期：`threads/operations.ts` 不再发送不存在的 edit facade 或返回 dummy fork product，现保留 follower/owner gate、
+revert/rollback、权限与 start 顺序，以及 fork trace/deferral/materialization/resume/project/metadata/side-conversation/projectless 全链；新增
+`threads/fork-placement.ts` 处理 saved section 与 app-server replica 的相对位置和失败回滚。token-budget key 已与 startup consumer 统一，主 chunk
+`tx…Iye` 573 行重复区删除；新增 48 条 focused 断言并将 cleanup 接线审计扩至 165 条。
+
 大批移除 maybe-resume 双轨实现：后续仍使用的 cwd 冲突裁决 `xx` 与权限合成 `Cx` 已直接绑定
 `threads/maybe-resume.ts`，完整 resume 状态机则由 AppServer manager 的真实 consumer 使用同一语义 owner。旧 `xx…Cx` helper 与
 `Rye…zx` 状态机/恢复辅助合计约 1,195 行物理删除；新增 56 条 focused 断言覆盖路径/权限/root/goal/writer/sandbox 分支、inactive/canceled

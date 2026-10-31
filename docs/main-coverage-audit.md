@@ -1,5 +1,13 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 thread edit and fork lifecycle restoration
+
+将 `threads/operations.ts` 从 338 行 facade 恢复为真实运行 owner：edit 现执行 follower 委托、owner/settings gate、latest-message/in-progress
+校验、revert/rollback、profile 权限合成与 turn restart；fork 现恢复版本/history gate、trace、notification deferral、conversation materialization、
+canonical history、metadata/token-budget/thread-reference 继承、side-conversation boundary、resume/project/placement 同步和 projectless 收养。
+新增 `threads/fork-placement.ts` 接管本地 saved-section 相对顺序、app-server section replica/rollback 及手动 project order；同时统一
+token-budget storage key。主 chunk `tx…Iye` 573 行旧副本物理删除，focused suite 执行 48 条行为/接线/旧定义缺席断言，cleanup 扩至 165 条。
+
 ## 2026-11-01 maybe-resume state machine consolidation
 
 主 chunk 后续仍消费的 `xx/Cx` 已分别改接 `resolveResumeCwd` 与 `mergePermissionSettings`；resume 主状态机由

@@ -300,7 +300,26 @@ for (const oldDefinition of [
   "async function Kye(",
   "function Rx(",
   "function zx(",
+  "function tx(",
+  "function dye(",
+  "async function Eye(",
+  "async function Mye(",
+  "async function wx(",
+  "async function Tx(",
+  "function Nye(",
+  "function Fye(",
+  "async function Iye(",
 ]) equal(main.includes(oldDefinition), false);
+
+for (const binding of [
+  "Eye as editLastUserTurn",
+  "Mye as forkConversation",
+  "Tx as adoptForkedConversation",
+  "wx as synchronizeForkedThread",
+  "tx as createForkProduct",
+  "dye as buildForkCapabilities",
+  "tokenBudgetThreadKey",
+]) equal(manager.includes(binding), true);
 
 const referenceSource = fs.readFileSync(
   new URL("../src/main/main-app/threads/reference-capability.ts", import.meta.url),
