@@ -1,5 +1,13 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 realtime presentation coordinator
+
+原 `L2/H8e/U8e/W8e/G8e/K8e/q8e/J8e/R2` 已整簇迁入
+`src/main/main-app/realtime/presentation-coordinator.ts`。新 owner 保留 static factory contract、surface
+registration/anchor/eligibility、preferred and requested surface selection、main-thread/global-overlay/in-window
+handoff、dock/fade/native accessory motion、focus grace/fallback/wait timers、toast/offset/visibility publishing 与
+RPC/surface disposal；唯一 runtime consumer 已接回，旧实现已物理删除。
+
 ## 2026-10-31 multi-agent activity service
 
 原 `z8e/B8e/V8e/I2` 已迁入 `src/main/main-app/realtime/multi-agent-activity-service.ts`。新 owner 保留
