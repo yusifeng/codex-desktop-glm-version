@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+大批移除 maybe-resume 双轨实现：后续仍使用的 cwd 冲突裁决 `xx` 与权限合成 `Cx` 已直接绑定
+`threads/maybe-resume.ts`，完整 resume 状态机则由 AppServer manager 的真实 consumer 使用同一语义 owner。旧 `xx…Cx` helper 与
+`Rye…zx` 状态机/恢复辅助合计约 1,195 行物理删除；新增 56 条 focused 断言覆盖路径/权限/root/goal/writer/sandbox 分支、inactive/canceled
+早退与主 chunk 接线，cleanup suite 扩至 149 条。
+
 修复并收拢 thread archive/history support owner：`threads/archive.ts` 从压缩式通用调用 facade 扩成明确的 archive context/lifecycle，恢复 desktop
 thread-attachments cleanup 快路、managed/configured worktree roots、inactive archive、thread-missing metadata 清理日志、pin undo 与 broadcast/cache 顺序；
 相邻 history-boundaries、state-normalization、SubscriptionRegistry 和 tail invalidation 已由既有语义模块接管。主 chunk `qge…hb` 约 445 行旧区整体

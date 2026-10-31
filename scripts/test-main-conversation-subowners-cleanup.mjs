@@ -288,6 +288,18 @@ for (const oldDefinition of [
   "async function db(",
   "async function fb(",
   "Xge = class",
+  "function xx(",
+  "function Cx(",
+  "function Rye(",
+  "async function zye(",
+  "async function Wye(",
+  "function Fx(",
+  "function Ix(",
+  "function Lx(",
+  "function Gye(",
+  "async function Kye(",
+  "function Rx(",
+  "function zx(",
 ]) equal(main.includes(oldDefinition), false);
 
 const referenceSource = fs.readFileSync(

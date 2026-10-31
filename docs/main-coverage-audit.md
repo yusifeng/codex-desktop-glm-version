@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 maybe-resume state machine consolidation
+
+主 chunk 后续仍消费的 `xx/Cx` 已分别改接 `resolveResumeCwd` 与 `mergePermissionSettings`；resume 主状态机由
+`AppServerConversationManager` 直接消费 `threads/maybe-resume.ts` 的完整实现。原 `xx…Cx` 与 `Rye…zx` 两段约 1,195 行重复实现删除，涵盖
+writer closing retry、timeline/paginated/durable history 装载、ownership 竞态、workspace/permissions 合并、goal hydration 和失败恢复。
+focused suite 执行 56 条 helper/早退/接线断言，conversation cleanup 增至 149 条。
+
 ## 2026-11-01 thread archive and history support owner consolidation
 
 `threads/archive.ts` 已从薄弱的动态调用 facade 恢复为具名、类型化 archive lifecycle：context 装配、local/remote inactive fallback、desktop
