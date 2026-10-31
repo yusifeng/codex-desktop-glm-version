@@ -195,7 +195,7 @@ export function createWindowContextClass(dependencies) {
     kZ,
     l,
     l1e,
-    lA,
+    CodexMicroServiceManager,
     ApplicationMenuSnapshotService,
     lne,
     ls,
@@ -339,7 +339,7 @@ export function createWindowContextClass(dependencies) {
       constructor(e) {
         ((this.options = e),
           (this.computerUseSettings = new nje(e.requestComputerUseWorker)),
-          (this.codexMicroServiceManager = new lA({
+          (this.codexMicroServiceManager = new CodexMicroServiceManager({
             ensureWindow: e.ensureWindow,
             windowManager: e.windowManager,
           })),

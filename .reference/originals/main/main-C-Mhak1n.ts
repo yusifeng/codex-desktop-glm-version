@@ -352,6 +352,7 @@ const { createDetachedBrowserRuntime } = require("./main-app/browser-sidebar/det
 const { createExtensionRecentUseRegistryFactory } = require("./main-app/browser-sidebar/extension-recent-use.js");
 const { createChatGptProjectFilesServiceClass } = require("./main-app/projects/chatgpt-project-files.js");
 const { createEnvironmentConfigServiceClass } = require("./main-app/environment-config/service.js");
+const { createCodexMicroServiceManagerClass } = require("./main-app/device/codex-micro-service-manager.js");
 const {
   BrowserSettingsSync,
   BrowserUseOriginState: XOe,
@@ -24290,256 +24291,18 @@ function Zk(e, t) {
       },
     });
 }
-var aA = 350,
-  oA = 250,
-  sA = { status: `not-detected`, transport: null, model: null, error: null, battery: null },
-  lA = class {
-    options;
-    logger = r.r(`CodexMicroServiceManager`);
-    connectionFailureLogged = !1;
-    deviceState = sA;
-    reconnectPending = !1;
-    service = null;
-    servicePromise = null;
-    ownerWindow = null;
-    agentThreadKeys = [];
-    agentKeyKinds = [];
-    singleTapAgentKeys = !1;
-    lastAgentTap = null;
-    transportHandoffSource = null;
-    unsubscribePrimaryWindowChanges;
-    sessionLockMonitor = null;
-    constructor(e) {
-      ((this.options = e),
-        (this.unsubscribePrimaryWindowChanges = e.windowManager.subscribePrimaryWindowChanges(
-          (e) => {
-            this.setOwnerWindow(this.isSessionLocked() ? null : e);
-          },
-        )));
-    }
-    async getState() {
-      let e = await this.getService();
-      e.start();
-      let t = e.getState();
-      return (this.syncSessionLockMonitor(t), t);
-    }
-    async stop() {
-      (this.resetLifecycleTracking(), await (this.service ?? (await this.servicePromise))?.stop());
-    }
-    updateAgentThreadKeys(e, t, n = !1) {
-      ((this.agentThreadKeys = e),
-        (this.agentKeyKinds = t),
-        this.singleTapAgentKeys !== n && (this.lastAgentTap = null),
-        (this.singleTapAgentKeys = n));
-    }
-    async updateLighting(e) {
-      return (await this.getService()).updateLighting(e);
-    }
-    dispose() {
-      if (
-        (this.sessionLockMonitor != null &&
-          (clearInterval(this.sessionLockMonitor), (this.sessionLockMonitor = null)),
-        this.unsubscribePrimaryWindowChanges(),
-        this.service != null)
-      ) {
-        this.service.dispose();
-        return;
-      }
-      this.servicePromise?.then((e) => e.dispose());
-    }
-    getService() {
-      return this.service == null
-        ? ((this.servicePromise ??= Promise.resolve()
-            .then(() => require("./service-CtZiLFyH.js"))
-            .then(({ CodexMicroService: e }) => {
-              let t = new e({
-                onDeviceStateChanged: (e, t) => {
-                  let n = this.deviceState;
-                  ((this.deviceState = e),
-                    this.syncSessionLockMonitor(e),
-                    this.options.windowManager.sendMessageToAllWindows({
-                      type: `codex-micro-device-state-changed`,
-                      state: e,
-                      cause: t,
-                    }));
-                  let r = this.getLifecycleEvent(n, e, t),
-                    i = r?.transition ?? null,
-                    a =
-                      n.status !== `detected` &&
-                      n.status !== `connected` &&
-                      (e.status === `detected` || e.status === `connected`);
-                  if (t !== `device-lifecycle` || (!a && i == null)) return;
-                  let o = this.options.windowManager.getPrimaryWindow();
-                  o != null &&
-                    this.options.windowManager.sendMessageToWindow(o, {
-                      type: `codex-micro-device-lifecycle`,
-                      state: e,
-                      transition: i,
-                      transport: r?.transport ?? e.transport,
-                    });
-                },
-                onHidEvent: (e) => {
-                  this.handleHidEvent(e);
-                },
-                onJoystickEvent: (e) => {
-                  if (this.isSessionLocked()) return;
-                  let t = this.options.windowManager.getPrimaryWindow();
-                  t != null &&
-                    (this.setOwnerWindow(t),
-                    this.options.windowManager.sendMessageToWindow(t, {
-                      type: `codex-micro-joystick-event`,
-                      event: e,
-                    }));
-                },
-              });
-              return ((this.service = t), t);
-            })
-            .finally(() => {
-              this.servicePromise = null;
-            })),
-          this.servicePromise)
-        : Promise.resolve(this.service);
-    }
-    syncSessionLockMonitor(e) {
-      if (e.status !== `connected`) {
-        this.sessionLockMonitor != null &&
-          (clearInterval(this.sessionLockMonitor), (this.sessionLockMonitor = null));
-        return;
-      }
-      this.sessionLockMonitor ??
-        ((this.sessionLockMonitor = setInterval(() => {
-          this.setOwnerWindow(
-            this.isSessionLocked() ? null : this.options.windowManager.getPrimaryWindow(),
-          );
-        }, oA)),
-        this.sessionLockMonitor.unref());
-    }
-    setOwnerWindow(e) {
-      let t = this.ownerWindow;
-      e !== t &&
-        ((this.ownerWindow = e),
-        (this.lastAgentTap = null),
-        t != null &&
-          !t.isDestroyed() &&
-          this.options.windowManager.sendMessageToWindow(t, {
-            type: `codex-micro-window-ownership-changed`,
-            isOwner: !1,
-          }),
-        e != null &&
-          this.options.windowManager.sendMessageToWindow(e, {
-            type: `codex-micro-window-ownership-changed`,
-            isOwner: !0,
-          }));
-    }
-    isSessionLocked() {
-      return l.powerMonitor.getSystemIdleState(1) === `locked`;
-    }
-    handleHidEvent(e) {
-      if (this.isSessionLocked()) {
-        this.lastAgentTap = null;
-        return;
-      }
-      let t = this.options.windowManager.getPrimaryWindow();
-      if ((this.setOwnerWindow(t), e.act !== 1 || e.slot == null)) {
-        t != null && this.sendHidEvent(t, e);
-        return;
-      }
-      let n = this.agentKeyKinds[e.slot],
-        r = n === `recent-thread` ? e.threadKey : (this.agentThreadKeys[e.slot] ?? null),
-        i = n === `action`,
-        a = Date.now(),
-        o = this.lastAgentTap,
-        s = o == null ? null : a - o.pressedAt,
-        c =
-          (!i &&
-            o?.owner === t &&
-            o.slot === e.slot &&
-            o.threadKey === r &&
-            s != null &&
-            s >= 0 &&
-            s <= aA) ||
-          (this.singleTapAgentKeys && !i);
-      if (
-        ((this.lastAgentTap =
-          c || i ? null : { owner: t, slot: e.slot, threadKey: r, pressedAt: a }),
-        t == null)
-      ) {
-        (c || i) &&
-          this.openWindowForAgentTap(e, i ? e.threadKey : r, i).catch((e) => {
-            this.logger.error(`Open window for Codex Micro agent key failed`, {
-              safe: {},
-              sensitive: { error: e },
-            });
-          });
-        return;
-      }
-      (this.sendHidEvent(t, e), c && this.options.windowManager.showWindow(t, { stealFocus: !0 }));
-    }
-    sendHidEvent(e, t) {
-      this.options.windowManager.sendMessageToWindow(e, {
-        type: `codex-micro-hid-event`,
-        event: t,
-      });
-    }
-    async openWindowForAgentTap(e, t, n = !1) {
-      let r = await this.options.ensureWindow();
-      r == null ||
-        this.isSessionLocked() ||
-        ((t != null || n) && this.sendHidEvent(r, { ...e, threadKey: t }),
-        this.options.windowManager.showWindow(r, { stealFocus: !0 }));
-    }
-    getLifecycleEvent(e, t, n) {
-      if (n === `service-stop`) return (this.resetLifecycleTracking(), null);
-      if (n === `transport-handoff`)
-        return (
-          e.status === `connected` && t.status === `not-detected`
-            ? (this.transportHandoffSource = { transport: e.transport })
-            : t.status === `connected` && (this.transportHandoffSource = null),
-          null
-        );
-      if (n !== `device-lifecycle`) return null;
-      if (
-        this.transportHandoffSource != null &&
-        (t.status === `error` || t.status === `not-detected`)
-      ) {
-        let { transport: e } = this.transportHandoffSource;
-        return (
-          (this.connectionFailureLogged = !1),
-          (this.reconnectPending = !0),
-          (this.transportHandoffSource = null),
-          { transition: `connection-lost`, transport: e }
-        );
-      }
-      if (e.status === `connected` && (t.status === `error` || t.status === `not-detected`))
-        return (
-          (this.connectionFailureLogged = !1),
-          (this.reconnectPending = !0),
-          { transition: `connection-lost`, transport: e.transport }
-        );
-      if (e.status === `detected` && t.status === `error` && !this.connectionFailureLogged)
-        return (
-          (this.connectionFailureLogged = !0),
-          { transition: `connection-failed`, transport: t.transport }
-        );
-      if (e.status === `error` && t.status === `not-detected` && this.connectionFailureLogged)
-        return ((this.connectionFailureLogged = !1), null);
-      if (e.status !== `connected` && t.status === `connected`) {
-        let e = this.reconnectPending ? `reconnected` : `connected`;
-        return (
-          (this.connectionFailureLogged = !1),
-          (this.reconnectPending = !1),
-          { transition: e, transport: t.transport }
-        );
-      }
-      return null;
-    }
-    resetLifecycleTracking() {
-      ((this.connectionFailureLogged = !1),
-        (this.reconnectPending = !1),
-        (this.transportHandoffSource = null));
-    }
-  },
-  uA = e.t((e) => {
+var CodexMicroServiceManager = createCodexMicroServiceManagerClass({
+  logger: r.r(`CodexMicroServiceManager`),
+  loadServiceClass: () =>
+    Promise.resolve()
+      .then(() => require("./service-CtZiLFyH.js"))
+      .then(({ CodexMicroService }) => CodexMicroService),
+  getSystemIdleState: (thresholdSeconds) => l.powerMonitor.getSystemIdleState(thresholdSeconds),
+  setInterval,
+  clearInterval,
+  now: Date.now,
+});
+var uA = e.t((e) => {
     var t = Symbol.for(`yaml.alias`),
       n = Symbol.for(`yaml.document`),
       r = Symbol.for(`yaml.map`),
@@ -70639,7 +70402,7 @@ var G5 = r.r(`WindowContext`),
     kZ,
     l,
     l1e,
-    lA,
+    CodexMicroServiceManager,
     ApplicationMenuSnapshotService,
     lne,
     ls,

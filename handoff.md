@@ -4936,3 +4936,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   原 Zod schemas 保留在 main composition root 并显式注入，避免复制或弱化协议验证；WindowContext 直接消费语义 service。
 - main 旧 `Vk/Kk/Hk/qk/Jk/Uk/Wk/Gk` 约 290 行已删除；focused coverage 61 项，no-unwired gate 扩至 361 项。下一批继续
   审计 `Zk` auto-resolution hook 与 `lA` device lifecycle，优先完整迁移大 lifecycle owner。
+
+# 2026-11-01 Codex Micro device lifecycle manager
+
+- `device/codex-micro-service-manager.ts` 已接管 dynamic service single-flight、device broadcasts、window ownership、session-lock
+  polling、joystick/HID、agent key double/single/action gestures、window wakeup和 lifecycle transition tracking；底层 rewritten
+  `CodexMicroService` 仍是唯一硬件 I/O owner。
+- main 旧 `aA/oA/sA/lA` 约 245 行已删除，紧随的 YAML vendor belt 未拆；focused coverage 47 项，no-unwired gate 扩至
+  363 项。下一批越过 vendor belt，从其后的第一方 owners 继续审计，另将小型 `Zk` hook 与相邻真实 owner 合并处理。

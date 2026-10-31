@@ -2970,3 +2970,12 @@ user/workspace 并行分页、POST config 10 分钟与其他请求 30 秒 timeou
 8 KiB diagnostic body cap、512 字符 credential/URL redaction、route normalization 和安全/敏感日志字段。原请求/响应 schemas
 继续留在 composition root 注入，未复制 schema 状态；WindowContext 直接构造 `EnvironmentConfigService`。旧
 `Vk/Kk/Hk/qk/Jk/Uk/Wk/Gk` 已删除，focused test 61 项覆盖公开端点、路由、认证竞态、诊断限制/清洗与 wiring。
+
+### 增量抽取：Codex Micro device lifecycle manager
+
+`src/main/main-app/device/codex-micro-service-manager.ts` 已接管 device service dynamic-load single-flight、start/stop/dispose、
+device-state broadcast、primary-window ownership、session-lock 250ms monitor、joystick/HID forwarding、agent key 350ms double-tap、
+single-tap/action/no-window wakeup，以及 connected/connection-failed/connection-lost/reconnected/transport-handoff 状态跟踪。
+底层 `CodexMicroService` rewritten chunk 继续是唯一 I/O service；manager 只持有 desktop lifecycle state。WindowContext 直接构造
+`CodexMicroServiceManager`，旧 `aA/oA/sA/lA` 已删除，后续 YAML generated/vendor belt 保持原边界。focused test 47 项覆盖
+lazy load、ownership/lock、input gestures、lifecycle transitions、dispose-before-load 与 wiring。

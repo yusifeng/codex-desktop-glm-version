@@ -60,6 +60,7 @@ const realOwners = [
   ["src/main/main-app/browser-sidebar/extension-recent-use.ts", "createExtensionRecentUseRegistryFactory"],
   ["src/main/main-app/projects/chatgpt-project-files.ts", "createChatGptProjectFilesServiceClass"],
   ["src/main/main-app/environment-config/service.ts", "createEnvironmentConfigServiceClass"],
+  ["src/main/main-app/device/codex-micro-service-manager.ts", "createCodexMicroServiceManagerClass"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -350,4 +351,4 @@ assert.equal(main.includes("function _Oe("), false, "generated remote project co
 assert.equal(main.includes("function vOe("), false, "generated project order comparator must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("361 main unwired-owner skeleton assertions passed");
+console.log("363 main unwired-owner skeleton assertions passed");
