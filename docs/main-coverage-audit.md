@@ -3118,3 +3118,10 @@ restore constants 已物理删除，共享 lifecycle debug emitters 保持独立
 投递与 async scope、60 秒 navigation phase timeout、finished/phase-change 去重、按阈值提取 observation，以及 webContents event listener
 安装/清理。主运行时继续以 `IXe/RX/UXe/WXe` 兼容别名服务 RPC、page lifecycle 与 webview binding；旧实现及模块级 listener stack
 已物理删除。focused test 16 项覆盖投递/断线幂等、observation timing 和 listener cleanup；no-unwired gate 扩至 508 项。
+
+### 增量抽取：browser lifecycle debug events
+
+新增 `browser-sidebar/browser-lifecycle-debug-events.ts`，统一接管 runtime attach missing-page 警告、thread restore/lifecycle event、
+attached guest event 的 session debug projection，保持 browserStorageId details、guest/owner/window ids 与有无 page 时的 page-key 语义。
+page persistence、webview binding 与 host lifecycle 三个 consumer 继续通过 `NX/EXe/TXe` 兼容别名使用同一实现；旧
+`TXe/NX/EXe/PX` 已物理删除。focused test 19 项，no-unwired gate 扩至 514 项。

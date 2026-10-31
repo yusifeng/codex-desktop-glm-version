@@ -478,6 +478,7 @@ const { createBrowserTabLifecycleRuntime } = require("./main-app/browser-sidebar
 const { createBrowserThreadStateRuntime } = require("./main-app/browser-sidebar/browser-thread-state-runtime.js");
 const { createBrowserDiagnosticsRuntime } = require("./main-app/browser-sidebar/browser-diagnostics-runtime.js");
 const { createIncompleteNavigationRuntime } = require("./main-app/browser-sidebar/incomplete-navigation-service.js");
+const { createBrowserLifecycleDebugEvents } = require("./main-app/browser-sidebar/browser-lifecycle-debug-events.js");
 const {
   inspect: SVe,
   back: CVe,
@@ -43780,48 +43781,11 @@ var {
   limitFeedbackDiagnostics: OXe,
   openOwner: kXe,
 } = createBrowserDiagnosticsRuntime({ makePageKey: KU, pageUrl: QU });
-var CXe = r.i(`browser-sidebar-manager`);
-function TXe(e, t, n, r) {
-  (e.recordDebugEvent({
-    browserTabId: n.browserTabId,
-    conversationId: n.conversationId,
-    guestWebContentsId: r,
-    kind: `browser-runtime-attach-missing-page`,
-    message: `Runtime attach had no Browser page`,
-    ownerWebContentsId: t.owner.id,
-    pageKey: null,
-    windowId: t.window.id,
-  }),
-    CXe().warning(`IAB_LIFECYCLE runtime attach had no page`, {
-      safe: {
-        browserTabId: n.browserTabId,
-        conversationId: n.conversationId,
-        guestWebContentsId: r,
-        ownerWebContentsId: t.owner.id,
-        windowId: t.window.id,
-      },
-      sensitive: {},
-    }));
-}
-function NX(e, t, n, r, i, a = []) {
-  PX(e, t, n, n.page?.view.webContents?.id ?? null, n.page != null, r, i, a);
-}
-function EXe(e, t, n, r, i, a, o = []) {
-  PX(e, t, n, r, !0, i, a, o);
-}
-function PX(e, t, n, r, i, a, o, s) {
-  e.recordDebugEvent({
-    browserTabId: n.browserTabId,
-    conversationId: n.conversationId,
-    details: [{ label: `browserStorageId`, value: n.browserStorageId }, ...s],
-    guestWebContentsId: r,
-    kind: a,
-    message: o,
-    ownerWebContentsId: t.owner.id,
-    pageKey: i ? KU(t.owner.id, n.conversationId, n.browserTabId) : null,
-    windowId: t.window.id,
-  });
-}
+var {
+  recordMissingPageAttach: TXe,
+  recordThreadDebugEvent: NX,
+  recordAttachedPageDebugEvent: EXe,
+} = createBrowserLifecycleDebugEvents({ createLogger: r.i, makePageKey: KU });
 var {
   IncompleteNavigationSubscription: IXe,
   reportIncompleteNavigation: RX,

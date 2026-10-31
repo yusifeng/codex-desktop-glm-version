@@ -5068,3 +5068,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   60 秒 phase observer、threshold observation 与 webContents listener cleanup；main 旧 `IXe/RX/UXe/WXe` owner 已删除。
 - focused coverage 16 项，no-unwired gate 扩至 508 项；下一批继续迁移共享 lifecycle debug emitters `TXe/NX/EXe/PX`，随后审计
   context-menu 与 navigation restore 边界，避免把无关 owners 混成一个模块。
+
+# 2026-11-01 browser lifecycle debug event extraction
+
+- 新增并接回 `browser-sidebar/browser-lifecycle-debug-events.ts`，统一 page persistence、webview binding、host lifecycle 的
+  missing-page/thread/attached debug projections；main 旧 `TXe/NX/EXe/PX` 已删除。
+- focused coverage 19 项，no-unwired gate 扩至 514 项；下一批处理 `zX/LXe..VXe` browser context-menu owner，保持其与
+  navigation restore/media tracker 等后续状态边界分离。
