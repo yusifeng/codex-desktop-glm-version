@@ -136,6 +136,7 @@ const { createStartupProgressWindowRuntime } = require("./main-app/startup/progr
 const { createGlobalDictationWindowControllerClass } = require("./main-app/dictation/global-dictation-window-controller.js");
 const { createRealtimeVoiceHotkeyManager } = require("./main-app/realtime/voice-hotkey-manager.js");
 const { createDebugWindowRuntime } = require("./main-app/debug/debug-window-manager.js");
+const { createThreadMetadataServiceClass } = require("./main-app/threads/thread-metadata-service.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -150694,76 +150695,13 @@ function Dot(e, t) {
 function D9(e) {
   return mainUrlTrust.parseUrl(e);
 }
-var Oot = RegExp(`^(?:\\p{RGI_Emoji})$`, `v`),
-  kot = class extends n.Uf {
-    #e = r.r(`ThreadMetadataService`);
-    #t = Promise.resolve();
-    #n;
-    #r;
-    constructor(e, t) {
-      (super(), (this.#n = e), (this.#r = t));
-    }
-    async get(e) {
-      await this.#t;
-      let t = this.#n.getStored(n.iu.SIDEBAR_THREAD_METADATA)?.[e];
-      return t == null ? null : { ...t };
-    }
-    update(e) {
-      let t = this.#t.then(
-        () => this.#i(e),
-        () => this.#i(e),
-      );
-      return ((this.#t = t.catch(() => void 0)), t);
-    }
-    async #i(e) {
-      Aot(e);
-      let t = this.#n.getStored(n.iu.SIDEBAR_THREAD_METADATA),
-        r = t ?? {},
-        i = jot(r, e);
-      if (i !== r) {
-        this.#n.set(n.iu.SIDEBAR_THREAD_METADATA, i);
-        try {
-          (await this.#n.flushOrThrow(), this.#r());
-        } catch (e) {
-          this.#n.set(n.iu.SIDEBAR_THREAD_METADATA, t);
-          try {
-            await this.#n.flushOrThrow();
-          } catch (e) {
-            this.#e.error(`Failed to persist thread metadata rollback`, {
-              safe: {},
-              sensitive: { rollbackError: e },
-            });
-          }
-          throw (this.#r(), e);
-        }
-      }
-    }
-  };
-function Aot(e) {
-  return validateThreadMetadataUpdate(e);
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  if (e.threadId.length === 0) throw Error(`Thread id must not be empty.`);
-  if (e.emoji != null && !Oot.test(e.emoji))
-    throw Error(`Thread emoji must be exactly one emoji sequence.`);
-}
-function jot(e, t) {
-  return updateThreadMetadata(e, t);
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  if (t.emoji === void 0 && t.labelColor === void 0) return e;
-  let n = e[t.threadId] ?? {},
-    r = t.emoji === void 0 ? n.emoji : (t.emoji ?? void 0),
-    i = t.labelColor === void 0 ? n.labelColor : (t.labelColor ?? void 0);
-  if (r === n.emoji && i === n.labelColor) return e;
-  let a = { ...n };
-  (t.emoji !== void 0 && (t.emoji == null ? delete a.emoji : (a.emoji = t.emoji)),
-    t.labelColor !== void 0 &&
-      (t.labelColor == null ? delete a.labelColor : (a.labelColor = t.labelColor)));
-  let o = { ...e };
-  return (
-    Object.keys(a).length === 0 ? delete o[t.threadId] : (o[t.threadId] = a),
-    Object.keys(o).length === 0 ? void 0 : o
-  );
-}
+var kot = createThreadMetadataServiceClass({
+  RpcHandlerBase: n.Uf,
+  createLogger: r.r,
+  metadataKey: n.iu.SIDEBAR_THREAD_METADATA,
+  validateUpdate: validateThreadMetadataUpdate,
+  applyUpdate: updateThreadMetadata,
+});
 var O9 = r.i(`window-manager`),
   Mot = `http://localhost:5175/`,
   Not =

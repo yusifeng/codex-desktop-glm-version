@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread-metadata persistence owner
+
+原 `Oot/kot/Aot/jot` 已迁入 `src/main/main-app/threads/thread-metadata-service.ts`。新 owner 保留 serialized mutation
+queue、read cloning、validation/update delegation、flush、rollback、rollback-error logging 与 change publication；真实
+BrowserWindow manager dependency 已接回，旧 class 和两个 early-return 后的 unreachable generated skeleton 已删除。
+
 ## 2026-10-31 debug-window owner
 
 原 `Sot/T9/Cot` 已迁入 `src/main/main-app/debug/debug-window-manager.ts`。新 owner 保留 conversation source/listener
