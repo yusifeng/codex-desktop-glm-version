@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 browser-session registry partial migration removal
+
+删除无 runtime consumer 的 `src/main/main-app/browser-use/session-registry.ts` 及其 focused test。该文件只有 30 个 members，
+真实 `cX` 有 64 个；缺少 window/session route ownership、native-pipe enablement、browser host/page lifecycle、download/cursor
+events、window/page snapshots 与 route disposal。真实 owner 仍保留在主 chunk，unwired-owner gate 已锁定该部分 façade 不得回归。
+
 ## 2026-10-31 browser comment controller skeleton removal
 
 删除无 runtime consumer 的 `src/main/main-app/browser-sidebar/comment-controller.ts`。该文件只有 8 个 members，真实 `hGe`

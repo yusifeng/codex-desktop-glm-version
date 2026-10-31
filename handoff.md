@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+删除 browser-session registry 的部分假迁移：旧 `browser-use/session-registry.ts` 只有 30 个成员，而真实 `cX` 有 64 个，
+缺少 window/session route、native-pipe、download/cursor/page snapshots 等核心路径且无 runtime consumer。模块及其只验证局部
+facade 的 17-assertion 测试已删除，test index 回到 1638，skeleton gate 已扩展；真实 `cX` 继续留在主 chunk。
+
 继续清理 browser comment 假迁移：`comment-controller.ts` 只有 8 个成员，而真实 `hGe` 有 68 个；文件仅保留截图等待/
 压缩局部逻辑，没有 overlay/runtime/design editor/message routing 等 owner 职责，也无任何 runtime consumer。该 skeleton 已删除
 并加入防回归 gate，真实 `hGe` 仍留在主 chunk。
