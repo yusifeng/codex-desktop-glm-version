@@ -14,6 +14,7 @@ const realOwners = [
   ["src/main/main-app/startup/locale-refresh-lifecycle.ts", "installLocaleRefreshLifecycle"],
   ["src/main/main-app/startup/desktop-feature-availability-reconciler.ts", "createDesktopFeatureAvailabilityReconciler"],
   ["src/main/main-app/startup/app-update-lifecycle.ts", "createAppUpdateLifecycle"],
+  ["src/main/main-app/startup/local-app-server-startup.ts", "runLocalAppServerStartup"],
   ["src/main/main-app/startup/window-icon-lifecycle.ts", "createWindowIconLifecycle"],
   ["src/main/main-app/fetch-handler/electron-fetch-handler.ts", "createElectronFetchHandlerClass"],
   ["src/main/main-app/misc/open-in-service.ts", "createOpenInServiceClass"],
@@ -655,5 +656,10 @@ assert.equal(main.includes("appUpdateLifecycle = createAppUpdateLifecycle({"), t
 assert.equal(main.includes("appUpdateLifecycle.enableHostReadyInstallHandling()"), true, "startup transitions update handling after host readiness");
 assert.equal(main.includes("g.prepareWindowsUpdate = appUpdateLifecycle.prepareWindowsUpdate"), true, "Windows preparation uses the semantic update owner");
 assert.equal(main.includes("xe = (e) =>"), false, "generated mutable install handler must be removed");
+assert.equal(main.includes('require("./main-app/startup/local-app-server-startup.js")'), true, "local app-server startup owner is wired");
+assert.equal(main.includes("localAppServerStartup = await runLocalAppServerStartup({"), true, "startup delegates strict app-server I/O ordering");
+assert.equal(main.includes("localAppServerStartup.closeBackfillProgress()"), true, "startup closes semantic backfill progress after window readiness");
+assert.equal(main.includes("nt = () => {}"), false, "generated backfill progress handle must be removed");
+assert.equal(main.includes("rt = !1"), false, "generated backfill progress flag must be removed");
 
-console.log("649 main unwired-owner skeleton assertions passed");
+console.log("655 main unwired-owner skeleton assertions passed");

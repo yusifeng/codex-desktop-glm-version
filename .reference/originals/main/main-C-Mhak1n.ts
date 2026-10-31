@@ -378,6 +378,7 @@ const { createRemoteHostedPipAvailabilityReconciler } = require("./main-app/star
 const { installLocaleRefreshLifecycle } = require("./main-app/startup/locale-refresh-lifecycle.js");
 const { createDesktopFeatureAvailabilityReconciler } = require("./main-app/startup/desktop-feature-availability-reconciler.js");
 const { createAppUpdateLifecycle } = require("./main-app/startup/app-update-lifecycle.js");
+const { runLocalAppServerStartup } = require("./main-app/startup/local-app-server-startup.js");
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
 const { createBrowserHostServiceClass } = require("./main-app/browser-sidebar/browser-host-service.js");
@@ -56944,56 +56945,21 @@ async function Ust() {
   }
   L = Date.now();
   let tt = K.appServerConnectionRegistry.getConnection(J),
-    nt = () => {},
-    rt = !1,
-    it = () => {
-      (ye.markQuitApproved(), l.app.quit());
-    };
-  if (
-    !(await a.p({
-      databasePath: null,
-      onBackfillWait: async () => {
-        try {
-          ((nt = await x7({
-            activate: !ze,
-            kind: `sqlite-backfill`,
-            onQuit: it,
-            windowIconPath: W.windowIconPath,
-          })),
-            (rt = !0));
-        } catch (e) {
-          r.n().warning(`Failed to show SQLite backfill progress window`, {
-            safe: {},
-            sensitive: { error: e },
-          });
-        }
-      },
-      open: async () => {
-        let e = rt
-          ? () => {}
-          : Oit({
-              activate: !ze,
-              delayMs: Hst,
-              kind: `app-server`,
-              onError: (e) => {
-                r.n().warning(`Failed to show slow app-server startup progress window`, {
-                  safe: {},
-                  sensitive: { error: e },
-                });
-              },
-              onQuit: it,
-              windowIconPath: W.windowIconPath,
-            });
-        try {
-          (await tt.connect(), await i.whenReady(), await De.enable());
-        } finally {
-          e();
-        }
-      },
+    localAppServerStartup = await runLocalAppServerStartup({
+      activateProgressWindows: !ze,
+      appQuit: () => l.app.quit(),
+      connect: () => tt.connect(),
+      enableRecovery: () => De.enable(),
+      getLogger: r.n,
+      markQuitApproved: () => ye.markQuitApproved(),
+      runWithRecovery: a.p,
       shouldHandleError: a.d,
-    }))
-  )
-    return;
+      showBackfillProgress: x7,
+      startDelayedProgress: (options) => Oit({ ...options, delayMs: Hst }),
+      waitForNetwork: () => i.whenReady(),
+      windowIconPath: W.windowIconPath,
+    });
+  if (!localAppServerStartup.shouldContinue) return;
   (await K.getBrowserHostManager().setInAppBrowserFeatureEnabled(
     await Fe(),
     V.settingsStore.getEffective(n.Fa.localeOverride.key),
@@ -57151,7 +57117,7 @@ async function Ust() {
       ),
       ct !== et && windowActivation.presentWindow(ct, !ze)),
     windowActivation.markReady(),
-    nt(),
+    localAppServerStartup.closeBackfillProgress(),
     M(`window ensured`, L, { windowVisible: ct?.isVisible() ?? !1 }),
     (L = Date.now()),
     await Le.deepLinks.flushPendingDeepLinks(),

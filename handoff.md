@@ -5400,3 +5400,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   Windows forced-exit preflight/cleanup、非 Windows quit policy 和 per-project fsmonitor shutdown preparation。
 - `Ust` 旧 `xe` 与两段 inline update handling 删除；focused suite 26 项、相邻四组回归 90 项，no-unwired gate 扩至
   649 项。immediate-exit/startup-adapter 两个原直接 import TypeScript 的测试入口同步恢复真实执行。
+
+# 2026-11-01 local app-server startup progress extraction
+
+- 新增并真实接回 `startup/local-app-server-startup.ts`，统一 SQLite backfill/30 秒 delayed app-server progress、quit approval、
+  warning 与 `connect→network ready→recovery enable→finally close` 顺序；长期 backfill handle 继续在窗口 ready 后关闭。
+- `Ust` 旧 `nt/rt/it` 和 inline callbacks 删除。focused suite 24 项、相邻三组回归 91 项，no-unwired gate 扩至 655 项；
+  progress-window 测试的直接 TypeScript import 同步修复。

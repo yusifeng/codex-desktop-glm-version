@@ -3474,3 +3474,13 @@ keep-alive preparation、四项 preflight `Promise.allSettled`、immediate clean
 `Ust` 原 `xe` 可变 handler、inline bridge object 和 host-ready install/prepare 大段已删除，Sparkle bridge 始终转发到唯一 owner。
 26 项 focused 断言与 quit policy、immediate exit、state recovery、startup adapter 相邻 90 项回归通过；其中 immediate-exit 与
 startup-adapter 两个直接 import `.ts` 的失效入口恢复执行。no-unwired gate 扩至 649 项。
+
+### 整块抽取：local app-server / SQLite startup progress
+
+新增并接回 `startup/local-app-server-startup.ts`，统一拥有 SQLite backfill progress handle、是否已显示状态、shared quit callback、
+slow app-server delayed progress，以及 `connect→application network ready→recovery enable` 的严格异步顺序。backfill window 成功时
+抑制 delayed window，失败时记录独立 warning 并回退 delayed path；open 无论成功或抛错都在 finally 关闭 delayed handle，长期
+backfill handle 则保持到 primary window ready 后由 caller 显式关闭。
+
+`Ust` 原 `nt/rt/it` 与 inline recovery/open callbacks 删除，失败返回仍短路整个启动。24 项 focused 断言与 progress/delayed-progress/
+state-recovery 相邻 91 项回归通过；progress-window 的直接 `.ts` import 测试入口恢复真实执行。no-unwired gate 扩至 655 项。

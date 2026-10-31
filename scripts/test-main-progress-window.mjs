@@ -1,6 +1,15 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { buildProgressWindowHtml, createStartupProgressWindowRuntime } from "../src/main/main-app/startup/progress-window.ts";
+import { transform } from "esbuild";
+
+const source = fs.readFileSync(
+  new URL("../src/main/main-app/startup/progress-window.ts", import.meta.url),
+  "utf8",
+);
+const output = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+const loaded = { exports: {} };
+Function("module", "exports", output.code)(loaded, loaded.exports);
+const { buildProgressWindowHtml, createStartupProgressWindowRuntime } = loaded.exports;
 
 let assertions = 0;
 const equal = (actual, expected) => {
@@ -151,8 +160,10 @@ const main = fs.readFileSync(
 );
 equal(main.includes("createStartupProgressWindow: x7"), true);
 equal(main.includes("createDelayedStartupProgressWindow: Oit"), true);
-equal(main.includes("await x7({"), true);
-equal(main.includes("Oit({"), true);
+equal(main.includes("showBackfillProgress: x7"), true);
+equal(main.includes("startDelayedProgress: (options) => Oit({"), true);
+equal(main.includes("await x7({"), false);
+equal(main.includes("localAppServerStartup = await runLocalAppServerStartup({"), true);
 equal(main.includes("async function x7("), false);
 equal(main.includes("function Oit("), false);
 equal(main.includes("function kit("), false);
