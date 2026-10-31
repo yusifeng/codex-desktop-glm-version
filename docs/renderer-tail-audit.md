@@ -1,5 +1,10 @@
 # Renderer 尾部资产审计
 
+2026-10-31 A5 browser-comment consumer：继续展开 app-primary `Hi` 的跨 hub 依赖，确认其完整
+语义为 annotation origin 规范化、legacy local browser 字段回退与 `browserTabId` 匹配；现已收进
+`is-browser-comment-for-tab` 并由 detached-browser host 直接消费。semantic/hub 交叉集合仅剩依赖
+私有 registry 的 `po/Rs/Us`。
+
 2026-10-31 A5 semantic consumer 交叉审计：在 namespace 批次后继续核对所有
 `semantic-business-logic` 分类与 hub 消费集合，接回 `sort-by-recency` 和
 `project-annotation-items` 两条真实 consumer。对应 app-primary `_n` 与 app-shared `wJ`

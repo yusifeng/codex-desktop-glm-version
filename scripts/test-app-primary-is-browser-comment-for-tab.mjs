@@ -6,4 +6,8 @@ const mod = await import(`data:text/javascript;base64,${Buffer.from(built.output
 const comment = { tabId: "tab-1", browser: true };
 assert.equal(mod.isBrowserCommentForTab(comment, "tab-1", (value) => value.browser, (value) => value.tabId), true);
 assert.equal(mod.isBrowserCommentForTab(comment, "tab-2", (value) => value.browser, (value) => value.tabId), false);
-console.log("app-primary browser comment tab predicate: 2 assertions passed");
+assert.equal(mod.isBrowserCommentForTab({ origin: "browser", localBrowserCommentMetadata: { browserTabId: "tab-1" } }, "tab-1"), true);
+assert.equal(mod.isBrowserCommentForTab({ origin: "pdf", localBrowserCommentMetadata: { browserTabId: "tab-1" } }, "tab-1"), false);
+assert.equal(mod.isBrowserComment({ localBrowserScreenshot: {} }), true);
+assert.equal(mod.isBrowserComment({ localBrowserAttachedImages: [] }), false);
+console.log("app-primary browser comment tab predicate: 6 assertions passed");

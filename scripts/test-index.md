@@ -1415,6 +1415,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-preload-annotation-name-policy.mjs](test-preload-annotation-name-policy.mjs)
 [test-preload-annotation-id-policy.mjs](test-preload-annotation-id-policy.mjs)
 [test-app-primary-is-browser-comment-for-tab.mjs](test-app-primary-is-browser-comment-for-tab.mjs)
+  - Covers 6 origin, legacy-field, tab matching, and detached-browser consumer assertions.
 [test-app-primary-resolve-panel-position.mjs](test-app-primary-resolve-panel-position.mjs)
 [test-preload-annotation-rect-policy.mjs](test-preload-annotation-rect-policy.mjs)
 [test-preload-annotation-metadata-value-policy.mjs](test-preload-annotation-metadata-value-policy.mjs)

@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后解开 app-primary `Hi` 的跨 hub browser-comment 判型链：typed helper 现完整保留 annotation
+origin、五类 legacy local browser 字段和 tab metadata 匹配，detached-browser host 不再读取 `Hi`。
+semantic/hub 交叉集合仅剩依赖私有 registry 的 `po/Rs/Us`。
+
 随后对全部 `semantic-business-logic` 分类与 hub consumer 做交叉审计，接回 subagent
 recency 排序和 detached-browser annotation projection，清除 app-primary `_n` 与 app-shared
 `wJ` 读取。`po/Rs/Us` 仍依赖 hub 私有 registry，保留为显式例外，不做循环依赖式伪迁移。
