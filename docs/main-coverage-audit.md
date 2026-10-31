@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 saved custom sections manager
+
+原 `iBe` manager 已迁入 `src/main/main-app/sidebar/saved-custom-sections-manager.ts`。新 class 保留 serialized command queue、
+principal/connection-bound source capture、creation reservations、legacy import、persisted-atom write/broadcast、migration 与
+reconciliation entrypoints；真实 pinned façade consumer 已接回，主 chunk 旧 class body 已删除。
+
 ## 2026-10-31 saved-section reconciliation owner
 
 原 `rBe` reconciliation query owner 已迁入 `src/main/main-app/sidebar/saved-section-reconciliation.ts`。新 class 保留

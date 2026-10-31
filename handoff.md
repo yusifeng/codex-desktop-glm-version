@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成 saved-section manager owner：原 `iBe` 已迁入 `sidebar/saved-custom-sections-manager.ts`；serialized command queue、
+principal/connection-bound source capture、creation reservation、legacy import、persisted-atom write/broadcast、migration 与
+reconciliation entrypoints 均由新 class 持有。真实 pinned façade consumer 已接回，旧 class body 删除。
+
 继续迁 saved-section cluster：原 `rBe` reconciliation query owner 已迁入
 `sidebar/saved-section-reconciliation.ts`，single-read guard、source/connection lifetime、list/member snapshots、conflict detection
 与 commit merge/writeback 均由新 class 持有；真实 `iBe` consumer 已接回，旧 class body 删除。
