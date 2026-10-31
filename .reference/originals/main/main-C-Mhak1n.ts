@@ -221,6 +221,7 @@ const { createNativeCommandCrashRuntime } = require("./main-app/diagnostics/nati
 const { createBrowserSessionProbeRuntime } = require("./main-app/browser-session/browser-session-probe.js");
 const { createOpenTargetFoundation } = require("./main-app/open-target/open-target-foundation.js");
 const { createOpenTargetRegistryRuntime } = require("./main-app/open-target/open-target-registry-runtime.js");
+const { createJetBrainsTargetRuntime } = require("./main-app/open-target/jetbrains-targets.js");
 const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 const { createElectronPerformanceSnapshotCollectorClass } = require("./main-app/startup/electron-performance-snapshot-collector.js");
 const { MainThreadJankSampler } = require("./main-app/startup/main-thread-jank-sampler.js");
@@ -71595,309 +71596,31 @@ var l3e = q1({
     label: `iTerm2`,
     icon: `apps/iterm2.png`,
     darwin: { appPaths: [`/Applications/iTerm.app`, `/Applications/iTerm2.app`], appName: `iTerm` },
-  }),
-  u3e = r.i(`open-in-targets`),
-  d3e = (0, h.join)(
-    (0, p.homedir)(),
-    `Library`,
-    `Application Support`,
-    `JetBrains`,
-    `Toolbox`,
-    `apps`,
-  ),
-  f3e = [process.env.ProgramFiles, process.env[`ProgramFiles(x86)`]].flatMap((e) =>
-    e ? [(0, h.join)(e, `JetBrains`)] : [],
-  ),
-  p3e = [
-    { target: `androidStudio`, bundlePrefixes: [`android studio`], executable: `studio` },
-    { target: `intellij`, bundlePrefixes: [`intellij idea`], executable: `idea` },
-    { target: `rider`, bundlePrefixes: [`rider`], executable: `rider` },
-    { target: `goland`, bundlePrefixes: [`goland`], executable: `goland` },
-    { target: `rustrover`, bundlePrefixes: [`rustrover`], executable: `rustrover` },
-    { target: `pycharm`, bundlePrefixes: [`pycharm`], executable: `pycharm` },
-    { target: `webstorm`, bundlePrefixes: [`webstorm`], executable: `webstorm` },
-    { target: `phpstorm`, bundlePrefixes: [`phpstorm`], executable: `phpstorm` },
-  ],
-  m3e = {
-    androidStudio: [
-      `jetbrains-studio.desktop`,
-      `android-studio.desktop`,
-      `com.google.AndroidStudio.desktop`,
-      `android-studio_android-studio.desktop`,
-    ],
-    intellij: [
-      `jetbrains-idea.desktop`,
-      `jetbrains-idea-ce.desktop`,
-      `com.jetbrains.IntelliJ-IDEA-Ultimate.desktop`,
-      `com.jetbrains.IntelliJ-IDEA-Community.desktop`,
-      `intellij-idea_intellij-idea.desktop`,
-      `intellij-idea-ultimate_intellij-idea-ultimate.desktop`,
-      `intellij-idea-community_intellij-idea-community.desktop`,
-    ],
-    rider: [`jetbrains-rider.desktop`, `com.jetbrains.Rider.desktop`, `rider_rider.desktop`],
-    goland: [`jetbrains-goland.desktop`, `com.jetbrains.GoLand.desktop`, `goland_goland.desktop`],
-    rustrover: [
-      `jetbrains-rustrover.desktop`,
-      `com.jetbrains.RustRover.desktop`,
-      `rustrover_rustrover.desktop`,
-    ],
-    pycharm: [
-      `jetbrains-pycharm.desktop`,
-      `jetbrains-pycharm-ce.desktop`,
-      `com.jetbrains.PyCharm-Professional.desktop`,
-      `com.jetbrains.PyCharm-Community.desktop`,
-      `pycharm_pycharm.desktop`,
-      `pycharm-professional_pycharm-professional.desktop`,
-      `pycharm-community_pycharm-community.desktop`,
-    ],
-    webstorm: [
-      `jetbrains-webstorm.desktop`,
-      `com.jetbrains.WebStorm.desktop`,
-      `webstorm_webstorm.desktop`,
-    ],
-    phpstorm: [
-      `jetbrains-phpstorm.desktop`,
-      `com.jetbrains.PhpStorm.desktop`,
-      `phpstorm_phpstorm.desktop`,
-    ],
-  },
-  a0 = null,
-  h3e = o0({
-    id: `androidStudio`,
-    label: `Android Studio`,
-    icon: `apps/android-studio.png`,
-    toolboxTarget: `androidStudio`,
-    macExecutable: `studio`,
-    windowsPathCommands: [`studio64.exe`, `studio.exe`, `studio`],
-    windowsInstallDirPrefixes: [`android studio`],
-    windowsInstallExecutables: [`studio64.exe`, `studio.exe`],
-    windowsFallbackPaths: [
-      [`Android`, `Android Studio`, `bin`, `studio64.exe`],
-      [`Android`, `Android Studio`, `bin`, `studio.exe`],
-    ],
-  }),
-  g3e = o0({
-    id: `intellij`,
-    label: `IntelliJ IDEA`,
-    icon: `apps/intellij.png`,
-    toolboxTarget: `intellij`,
-    macExecutable: `idea`,
-    windowsPathCommands: [`idea64.exe`, `idea.exe`, `idea`],
-    windowsInstallDirPrefixes: [`intellij idea`, `idea`],
-    windowsInstallExecutables: [`idea64.exe`, `idea.exe`],
-  }),
-  _3e = o0({
-    id: `rider`,
-    label: `Rider`,
-    icon: `apps/rider.png`,
-    toolboxTarget: `rider`,
-    macExecutable: `rider`,
-    windowsPathCommands: [`rider64.exe`, `rider.exe`, `rider`],
-    windowsInstallDirPrefixes: [`rider`],
-    windowsInstallExecutables: [`rider64.exe`, `rider.exe`],
-  }),
-  v3e = o0({
-    id: `goland`,
-    label: `GoLand`,
-    icon: `apps/goland.png`,
-    toolboxTarget: `goland`,
-    macExecutable: `goland`,
-  }),
-  y3e = o0({
-    id: `rustrover`,
-    label: `RustRover`,
-    icon: `apps/rustrover.png`,
-    toolboxTarget: `rustrover`,
-    macExecutable: `rustrover`,
-  }),
-  b3e = o0({
-    id: `pycharm`,
-    label: `PyCharm`,
-    icon: `apps/pycharm.png`,
-    toolboxTarget: `pycharm`,
-    macExecutable: `pycharm`,
-    windowsPathCommands: [`pycharm64.exe`, `pycharm.exe`, `pycharm`],
-    windowsInstallDirPrefixes: [`pycharm`],
-    windowsInstallExecutables: [`pycharm64.exe`, `pycharm.exe`],
-  }),
-  x3e = o0({
-    id: `webstorm`,
-    label: `WebStorm`,
-    icon: `apps/webstorm.svg`,
-    toolboxTarget: `webstorm`,
-    macExecutable: `webstorm`,
-    windowsPathCommands: [`webstorm64.exe`, `webstorm.exe`, `webstorm`],
-    windowsInstallDirPrefixes: [`webstorm`],
-    windowsInstallExecutables: [`webstorm64.exe`, `webstorm.exe`],
-  }),
-  S3e = o0({
-    id: `phpstorm`,
-    label: `PhpStorm`,
-    icon: `apps/phpstorm.png`,
-    toolboxTarget: `phpstorm`,
-    macExecutable: `phpstorm`,
-    windowsPathCommands: [`phpstorm64.exe`, `phpstorm.exe`, `phpstorm`],
-    windowsInstallDirPrefixes: [`phpstorm`],
-    windowsInstallExecutables: [`phpstorm64.exe`, `phpstorm.exe`],
   });
-function C3e(e) {
-  let t = new Map();
-  if (process.platform !== `darwin`) return t;
-  let n;
-  try {
-    n = (0, v.readdirSync)(e);
-  } catch {
-    return t;
-  }
-  for (let r of s0(n)) {
-    let n = (0, h.join)(e, r),
-      i;
-    try {
-      i = (0, v.readdirSync)(n);
-    } catch {
-      continue;
-    }
-    for (let e of s0(i)) {
-      let r = (0, h.join)(n, e),
-        i;
-      try {
-        i = (0, v.readdirSync)(r);
-      } catch {
-        continue;
-      }
-      for (let e of s0(i)) {
-        let n = (0, h.join)(r, e),
-          i;
-        try {
-          i = (0, v.readdirSync)(n);
-        } catch {
-          continue;
-        }
-        for (let e of s0(i)) {
-          let r = e.toLowerCase();
-          if (r.endsWith(`.app`))
-            for (let i of p3e) {
-              if (t.has(i.target) || !i.bundlePrefixes.some((e) => r.startsWith(e))) continue;
-              let a = (0, h.join)(n, e, `Contents`, `MacOS`, i.executable);
-              (0, v.existsSync)(a) && t.set(i.target, a);
-            }
-        }
-      }
-    }
-  }
-  return t;
-}
-function o0({
-  id: e,
-  label: t,
-  icon: n,
-  toolboxTarget: r,
-  macExecutable: i,
-  windowsPathCommands: a,
-  windowsInstallDirPrefixes: o,
-  windowsInstallExecutables: s,
-  windowsFallbackPaths: c,
-}) {
-  return {
-    id: e,
-    platforms: {
-      darwin: {
-        label: t,
-        icon: n,
-        kind: `editor`,
-        detect: () => D3e(r, [`/Applications/${t}.app/Contents/MacOS/${i}`], t, i),
-        args: c0,
-      },
-      win32:
-        a && o && s
-          ? {
-              label: t,
-              icon: n,
-              kind: `editor`,
-              detect: () =>
-                O3e({
-                  pathCommands: a,
-                  installDirPrefixes: o,
-                  installExecutables: s,
-                  fallbackPaths: c,
-                }),
-              args: c0,
-            }
-          : void 0,
-      linux: {
-        label: t,
-        icon: n,
-        kind: `editor`,
-        detect: () => w3e(r, i),
-        args: c0,
-        open: (e) => G1(e, c0),
-      },
-    },
-  };
-}
-function w3e(e, t) {
-  let n = e === `intellij` ? [t, `${t}.sh`, `intellij-idea`] : [t, `${t}.sh`];
-  for (let e of n) {
-    let t = Yi(e);
-    if (t != null) return t;
-  }
-  let r = (0, h.join)((0, p.homedir)(), `.local`, `share`, `JetBrains`, `Toolbox`, `scripts`, t);
-  return (0, v.existsSync)(r) ? r : lO(m3e[e]);
-}
-function s0(e) {
-  return [...e].sort((e, t) => t.localeCompare(e));
-}
-function T3e() {
-  if (a0) return a0;
-  try {
-    a0 = C3e(d3e);
-  } catch (e) {
-    (u3e().debug(`Failed to discover JetBrains Toolbox installations`, {
-      safe: {},
-      sensitive: { error: e },
-    }),
-      (a0 = new Map()));
-  }
-  return a0;
-}
-function E3e(e, t, n) {
-  return F1(e) ?? I1(t, n);
-}
-function D3e(e, t, n, r) {
-  return E3e(t, n, r) ?? T3e().get(e) ?? null;
-}
-function O3e({ pathCommands: e, installDirPrefixes: t, installExecutables: n, fallbackPaths: r }) {
-  for (let t of e) {
-    let e = Yi(t);
-    if (!e) continue;
-    let n = na(e);
-    if (n) return n;
-  }
-  return k3e({ installDirPrefixes: t, installExecutables: n }) || (r ? ta(r) : null);
-}
-function k3e({ installDirPrefixes: e, installExecutables: t }) {
-  let n = e.map((e) => e.toLowerCase());
-  for (let e of f3e) {
-    let r;
-    try {
-      r = s0((0, v.readdirSync)(e));
-    } catch {
-      continue;
-    }
-    for (let i of r) {
-      let r = i.toLowerCase();
-      if (n.some((e) => r.startsWith(e)))
-        for (let n of t) {
-          let t = (0, h.join)(e, i, `bin`, n);
-          if ((0, v.existsSync)(t)) return t;
-        }
-    }
-  }
-  return null;
-}
-function c0(e, t) {
-  return t ? [`--line`, t.line.toString(), `--column`, t.column.toString(), e] : [e];
-}
+var {
+  androidStudio: h3e,
+  intellij: g3e,
+  rider: _3e,
+  goland: v3e,
+  rustrover: y3e,
+  pycharm: b3e,
+  webstorm: x3e,
+  phpstorm: S3e,
+} = createJetBrainsTargetRuntime({
+  platform: process.platform,
+  path: h,
+  fs: v,
+  os: p,
+  env: process.env,
+  createLogger: r.i,
+  findExecutable: Yi,
+  resolveExecutableLink: na,
+  findWindowsInstall: ta,
+  findLinuxDesktopEntry: lO,
+  findExistingMacApplication: F1,
+  findMacApplicationExecutable: I1,
+  launchLinuxEditor: G1,
+});
 var A3e = q1({
   id: `kitty`,
   label: `Kitty`,

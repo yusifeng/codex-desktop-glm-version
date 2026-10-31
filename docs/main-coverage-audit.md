@@ -2656,3 +2656,13 @@ descriptors 与平台 I/O adapters，输出直接接入 `OpenInService`，没有
 实现已物理删除；focused test `scripts/test-main-open-target-registry-runtime-owner.mjs` 覆盖 42 项 projection、
 detect、launch、admission、application query、fallback、browser canonicalization/dedupe 与 Linux 行为。
 剩余约 1,200 行主要是 32 个 target 的静态 platform descriptors 和各应用专用探测 adapter，继续列为待审计。
+
+### 增量抽取：JetBrains open-target owner
+
+Android Studio、IntelliJ IDEA、Rider、GoLand、RustRover、PyCharm、WebStorm、PhpStorm 八个 descriptors，
+以及共用的 macOS JetBrains Toolbox 四层 newest-first 扫描/cache、bundle/direct fallback、Windows PATH link/
+install-root/fallback 探测、Linux executable/Toolbox script/desktop-entry 探测和 line/column args 已整体迁移至
+`src/main/main-app/open-target/jetbrains-targets.ts`。main 通过 `createJetBrainsTargetRuntime` 将八个 descriptors
+直接交给同一 open-target registry，旧 `u3e..S3e` state/declarations 与 `C3e/o0/w3e/s0/T3e/E3e/D3e/
+O3e/k3e/c0` helpers 已物理删除。focused test `scripts/test-main-jetbrains-targets-owner.mjs` 覆盖 45 项
+Toolbox ordering/cache、macOS/Windows/Linux detection、descriptor surface、args 和 launch delegation。

@@ -22,6 +22,7 @@ const realOwners = [
   ["src/main/main-app/browser-session/browser-session-probe.ts", "createBrowserSessionProbeRuntime"],
   ["src/main/main-app/open-target/open-target-foundation.ts", "createOpenTargetFoundation"],
   ["src/main/main-app/open-target/open-target-registry-runtime.ts", "createOpenTargetRegistryRuntime"],
+  ["src/main/main-app/open-target/jetbrains-targets.ts", "createJetBrainsTargetRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -110,6 +111,11 @@ assert.equal(main.includes("function c6e("), false, "generated platform target p
 assert.equal(main.includes("async function d6e("), false, "generated target launch dispatch must be removed");
 assert.equal(main.includes("async function P0("), false, "generated native target projection must be removed");
 assert.equal(main.includes("async function v6e("), false, "generated browser application discovery must be removed");
+assert.equal(main.includes("createJetBrainsTargetRuntime({"), true, "real JetBrains target owner is wired");
+assert.equal(main.includes("function C3e("), false, "generated Toolbox scanner must be removed");
+assert.equal(main.includes("function o0("), false, "generated JetBrains descriptor builder must be removed");
+assert.equal(main.includes("function w3e("), false, "generated Linux JetBrains detector must be removed");
+assert.equal(main.includes("function O3e("), false, "generated Windows JetBrains detector must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("105 main unwired-owner skeleton assertions passed");
+console.log("112 main unwired-owner skeleton assertions passed");

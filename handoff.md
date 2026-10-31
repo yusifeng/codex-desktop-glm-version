@@ -4670,3 +4670,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   default-browser canonicalization、排序与去重；`OpenInService` 真实消费其 `defaultTargets/openWithTarget/discover*`。
 - focused coverage 42 项，no-unwired gate 扩至 105 项。下一步继续迁移仍在 main 的 32-target 静态 descriptors
   及其应用专用 detect/args/open adapters；共享 registry state 与 discovery 不再保留第二份实现。
+
+# 2026-11-01 JetBrains open-target owner
+
+- `src/main/main-app/open-target/jetbrains-targets.ts` 已接管八个 JetBrains IDE descriptors、Toolbox discovery
+  cache、macOS direct/bundle/Toolbox fallback、Windows PATH/install/fallback、Linux executable/script/desktop
+  detection 与统一 location args；factory 输出直接进入 open-target registry。
+- focused coverage 45 项，no-unwired gate 扩至 112 项。下一步继续按共享 adapter 成组迁移 terminal targets、
+  VS Code family、Zed/Visual Studio 等剩余静态 descriptors，避免逐个 target 做小提交。
