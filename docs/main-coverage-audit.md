@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 hosted AppServerManager registry owner
+
+原 `LEe` 已迁入 `src/main/main-app/app-server/hosted-manager-registry.ts`，bootstrap 继续以 `LEe` 导出该语义 factory class。
+模块保留 connection registry subscription、identity generation/readiness、异步 manager creation race、principal/account 更新、
+listener fan-out 和 resource retirement；focused suite 覆盖 add/refresh/context replacement/remove/dispose 全生命周期。
+
 ## 2026-10-31 saved-section transition owner
 
 原 `tBe` 已迁入 `src/main/main-app/sidebar/saved-section-transition.ts`，真实 `SavedSectionUndoRedoStack` 仍通过生成别名注入并
