@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 DebugService owner wiring
+
+`src/main/main-app/debug/export-logs.ts` 的 `DebugService` 与旧 `zje` 均为 19 members。本轮接回 `WindowContext` 的真实 debug
+RPC consumer 并删除旧 class；focused suite 覆盖日志导出参数、browser snapshot/tab owner、debug window、ChatGPT conversation
+source/action/subscription、memory diagnostics unavailable stub 与 bootstrap wiring。
+
 ## 2026-10-31 demo tools owner wiring
 
 `src/main/main-app/debug/export-logs.ts` 已完整实现原 `Bje/Hje/Uje/Wje` 的 demo backend、lifecycle、per-origin service 与工厂。

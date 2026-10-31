@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 DebugService owner：`debug/export-logs.ts` 的 19-member `DebugService` 现已替代主 chunk 旧 `zje`。日志导出、browser
+snapshot/tab owner、debug window、ChatGPT conversation source/action/subscription 与 memory diagnostics stub 保持完整；
+`WindowContext` 的真实 RPC consumer 继续通过 `zje` 兼容别名构造。
+
 接回 demo tools owner：既有 `debug/export-logs.ts` 的 `ChatGPTAppDemoBackend`、`DemoTools`、`DemoToolsService` 与
 `createDemoTools` 现已替代主 chunk 旧 `Bje/Hje/Uje/Wje`。5/9/8-member 生命周期、abort/origin cleanup 与仅 packaged non-Dev
 darwin 启用的工厂 gate 保持完整；`WindowContext` 真实 consumer 继续通过 `Wje` 兼容别名构造。

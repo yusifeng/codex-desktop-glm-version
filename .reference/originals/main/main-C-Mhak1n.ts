@@ -145,7 +145,7 @@ const { BrowserSettingsSync } = require("./main-app/browser-use/origin-state.js"
 const { PublishedStatsig } = require("./main-app/account/statsig-adapter.js");
 const { ConversationalOnboardingService } = require("./main-app/onboarding/conversational-onboarding.js");
 const { ArtifactSessionHostLifecycle } = require("./main-app/artifact-session/host-lifecycle.js");
-const { createDemoTools } = require("./main-app/debug/export-logs.js");
+const { DebugService, createDemoTools } = require("./main-app/debug/export-logs.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -63043,76 +63043,7 @@ async function Rje(e) {
   let i = await Lje(n);
   await (0, b.writeFile)(r, i, `utf8`);
 }
-var zje = class extends n.Uf {
-    debugWindowManager;
-    browserHostManager;
-    origin;
-    windowManager;
-    constructor(e, t, n, r) {
-      (super(),
-        (this.debugWindowManager = e),
-        (this.browserHostManager = t),
-        (this.origin = n),
-        (this.windowManager = r));
-    }
-    async captureMemoryAllocationProfiles() {
-      throw Error(`Memory diagnostics are unavailable`);
-    }
-    async executeCaptureHeapSnapshotsTool(e) {
-      throw Error(`Memory diagnostics are unavailable`);
-    }
-    async captureMemoryHeapSnapshots() {
-      throw Error(`Memory diagnostics are unavailable`);
-    }
-    async exportLogs({ scope: e }) {
-      await Rje({
-        appSessionId: a.on,
-        parentWindow: l.BrowserWindow.fromWebContents(this.origin),
-        scope: e,
-      });
-    }
-    async getBrowserSnapshot() {
-      return this.browserHostManager.getDebugSnapshot();
-    }
-    async getMemoryDiagnosticsStatus() {
-      throw Error(`Memory diagnostics are unavailable`);
-    }
-    async openBrowserTabOwner(e) {
-      return this.browserHostManager.openDebugTabOwner(e);
-    }
-    async openWindow() {
-      await this.debugWindowManager?.show(this.origin);
-    }
-    registerChatGptConversationSource(e) {
-      return (
-        this.debugWindowManager?.chatGptConversations.registerSource(this.origin.id, e) ?? null
-      );
-    }
-    async revealMemoryDiagnosticsDirectory() {
-      throw Error(`Memory diagnostics are unavailable`);
-    }
-    async resetUpdateSsoState() {}
-    async runChatGptConversationAction(e) {
-      return (
-        this.debugWindowManager?.chatGptConversations.runAction(
-          this.debugWindowManager.getOwnerWebContentsId(this.origin.id) ?? this.origin.id,
-          e,
-        ) ?? !1
-      );
-    }
-    async setMemoryDiagnosticsConfig(e) {
-      throw Error(`Memory diagnostics are unavailable`);
-    }
-    subscribeChatGptConversation(e) {
-      return (
-        this.debugWindowManager?.chatGptConversations.subscribe(
-          this.debugWindowManager.getOwnerWebContentsId(this.origin.id) ?? this.origin.id,
-          this.origin.id,
-          e,
-        ) ?? null
-      );
-    }
-  },
+var zje = DebugService,
   Wje = createDemoTools;
 var GN = PrewarmSlot;
 function KN(e) {
