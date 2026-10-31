@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `dit/fit/pit/mit/hit` deep-link workspace resolver 迁入 `deep-links/workspace-resolver.ts`；显式目录优先、
+无效路径到 origin fallback、local project/fallback roots、Git origin discovery、dir/root 映射首值语义，以及规范化
+host/owner/repo 匹配均由新 owner 持有。真实 new-thread deep-link consumer 已接回，旧五个 functions 已删除。
+
 随后将 `vit` deep-link thread-host resolver 迁入 `deep-links/thread-host-resolver.ts`；origin/indexed/catalog host
 优先级、catalog membership、connection availability、thread ownership lookup 与 origin/local fallback 均由新策略持有。
 真实 local-conversation deep-link consumer 已接回，旧 function 已删除。

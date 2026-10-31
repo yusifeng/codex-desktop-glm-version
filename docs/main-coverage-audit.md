@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 deep-link workspace resolver
+
+原 `dit/fit/pit/mit/hit` 已迁入 `src/main/main-app/deep-links/workspace-resolver.ts`。新 resolver 保留显式目录优先、
+无效 path 到 origin fallback、local project roots/fallback roots、Git `origin-and-roots` 请求、dir/root 首映射语义，
+以及 exact URL 或规范化 host/owner/repo 匹配；真实 new-thread deep-link consumer 已接回，旧 functions 已删除。
+
 ## 2026-10-31 deep-link thread-host resolver
 
 原 `vit` 已迁入 `src/main/main-app/deep-links/thread-host-resolver.ts`。新策略保留 origin/indexed/catalog host 优先级、

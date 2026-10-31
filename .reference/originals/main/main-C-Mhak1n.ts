@@ -150,6 +150,7 @@ const { registerMainIpcRouter } = require("./main-app/app-shell/main-ipc-router.
 const { createQuitRuntime } = require("./main-app/startup/quit-runtime.js");
 const { ApplicationMenuManager, normalizeMenuAccelerator } = require("./main-app/app-shell/application-menu-runtime.js");
 const { resolveDeepLinkThreadHost } = require("./main-app/deep-links/thread-host-resolver.js");
+const { resolveDeepLinkWorkspace } = require("./main-app/deep-links/workspace-resolver.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -143975,12 +143976,16 @@ async function lit({
         s = null;
       s =
         o == null
-          ? await dit({
+          ? await resolveDeepLinkWorkspace({
               route: t,
               globalState: r,
               requestGitWorker: i,
               appServerClient: a,
               projectsManager: c,
+              resolvePath: h.resolve,
+              stat: b.stat,
+              getFallbackRoots: (globalState) => Fr(globalState).roots,
+              parseRepoOrigin: dt,
             })
           : n.Wo(o.rootPaths);
       let d =
@@ -144057,68 +144062,6 @@ async function uit({ listPlugins: e, route: t }) {
         : e.plugins.some((e) => e.name === t.pluginName),
     )?.path ?? null
   );
-}
-async function dit({
-  route: e,
-  globalState: t,
-  requestGitWorker: n,
-  appServerClient: r,
-  projectsManager: i,
-}) {
-  if (e.path != null) {
-    let t = await fit(e.path);
-    if (t != null) return t;
-  }
-  return e.originUrl == null
-    ? null
-    : pit({
-        targetOriginUrl: e.originUrl,
-        globalState: t,
-        requestGitWorker: n,
-        appServerClient: r,
-        projectsManager: i,
-      });
-}
-async function fit(e) {
-  let t = (0, h.resolve)(e);
-  try {
-    return (await (0, b.stat)(t)).isDirectory() ? t : null;
-  } catch {
-    return null;
-  }
-}
-async function pit({
-  targetOriginUrl: e,
-  globalState: t,
-  requestGitWorker: n,
-  appServerClient: r,
-  projectsManager: i,
-}) {
-  let a = i?.getProjectRootPathsForHost(`local`) ?? Fr(t).roots;
-  if (a.length === 0) return null;
-  let { origins: o } = await n({
-    method: `origin-and-roots`,
-    params: { discoveryDirs: a, operationSource: `git_direct_call`, hostConfig: r.hostConfig },
-  });
-  return mit({ targetOriginUrl: e, workspaceRoots: a, origins: o });
-}
-function mit({ targetOriginUrl: e, workspaceRoots: t, origins: n }) {
-  let r = dt(e),
-    i = new Map();
-  for (let e of n)
-    e.originUrl != null &&
-      (i.has(e.dir) || i.set(e.dir, e.originUrl), i.has(e.root) || i.set(e.root, e.originUrl));
-  for (let n of t) {
-    let t = i.get(n);
-    if (t != null && hit({ targetOriginUrl: e, candidateOriginUrl: t, targetRepo: r })) return n;
-  }
-  return null;
-}
-function hit({ targetOriginUrl: e, candidateOriginUrl: t, targetRepo: n }) {
-  if (t === e) return !0;
-  if (n == null) return !1;
-  let r = dt(t);
-  return r != null && r.host === n.host && r.owner === n.owner && r.repo === n.repo;
 }
 async function git({
   globalState: e,
