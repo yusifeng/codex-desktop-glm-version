@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 macOS launch-services owner wiring
+
+`src/main/main-app/mac/launch-services.ts` 已覆盖旧 `Oj/kj/Aj/jj/Mj/Nj/Pj/Fj/Ij/Lj/Rj/zj/Bj/Vj`。本轮补齐动态
+`listApplicationsForFile(argument)` 并修正 download notification 的 void 返回后，接回 open-target、browser scan、workspace file、
+dock icon 等真实 consumers，删除主 chunk 旧 67 行簇；focused suite 锁定 helper argv/schema、void 返回、五个 alias 与关键 wiring。
+
 ## 2026-10-31 computer-use memory summaries wiring
 
 `src/main/main-app/computer-use/memory-summaries.ts` 已完整覆盖旧 `Hj…lM`。本轮将五个查询导出接回 `WindowContext` 的

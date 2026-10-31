@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 macOS launch-services helper：既有 `mac/launch-services.ts` 现替代主 chunk 旧 `Oj…Vj`。审计补齐了 `Nj` 的动态
+单参数 helper 契约，并把 download-complete 成功返回从错误的 `true` 恢复为原始 `undefined`；应用/bundle/browser 查询、下载
+通知、串行 app icon 更新的真实 consumers 均通过 `Nj/Pj/Fj/Ij/Lj` 兼容别名接回。
+
 接回 computer-use memory summaries：既有 `computer-use/memory-summaries.ts` 现以 `Yj/Xj/Zj/Qj/$j` 兼容别名替代主
 chunk 旧 `Hj…lM` 240 行重复簇。文件名/区间解析、6h 覆盖、frontmatter promise cache、48h suggestion、应用解析与后台
 agent 过滤保持完整；ChronicleService 的 history/app resolver 五条真实 consumer 已全部接到语义模块。

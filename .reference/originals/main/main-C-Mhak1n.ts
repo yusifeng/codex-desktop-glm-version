@@ -157,6 +157,7 @@ const { createQueryCacheHostServiceClass } = require("./main-app/window/query-ca
 const { BrowserSourceOwnerRegistry: rje } = require("./main-app/window/browser-source-owner-registry.js");
 const { CodexMicroHostService: cA } = require("./main-app/device/codex-micro-host-service.js");
 const { listAmbientSummaries: Yj, newAmbientSuggestions: Xj, activeSummaryIntervals: Zj, listAllApplications: Qj, listApplicationsByBundleIds: $j } = require("./main-app/computer-use/memory-summaries.js");
+const { listApplicationsForFile: Nj, appForBundleId: Pj, listWebUrlHandlers: Fj, notifyDownloadComplete: Ij, setAppIcon: Lj } = require("./main-app/mac/launch-services.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -61380,76 +61381,7 @@ $&`,
       (e.stringify = m.stringify),
       (e.visit = h.visit),
       (e.visitAsync = h.visitAsync));
-  })(),
-  Oj = (0, d.promisify)(P.execFile),
-  kj = Promise.resolve(),
-  Aj = n.wf({
-    appPath: n.Of(),
-    bundleId: n.Of(),
-    displayName: n.Of(),
-    isDefault: n.gf().optional(),
-  }),
-  jj = n.hf(Aj),
-  Mj = n.wf({ applications: jj, defaultApplicationPath: n.Of().nullish() });
-async function Nj(e) {
-  return zj([e], jj);
-}
-async function Pj(e) {
-  return zj([`app-for-bundle-id`, e], Aj.nullable());
-}
-async function Fj() {
-  return zj([`list-web-url-handlers`], Mj);
-}
-async function Ij(e) {
-  await zj([`notify-download-complete`, e], n.bf(!0));
-}
-function Lj({ preference: e, resourceName: t }) {
-  if (process.platform !== `darwin` || !l.app.isPackaged) return Promise.resolve(!1);
-  let n = Rj(),
-    r = Vj();
-  if (n == null || r == null) return Promise.resolve(!1);
-  let i = kj.then(async () => {
-    try {
-      return (await Oj(n, [`set-app-icon`, r, e, t ?? ``], { timeout: 5e3 }), !0);
-    } catch {
-      return !1;
-    }
-  });
-  return ((kj = i.then(() => void 0)), i);
-}
-function Rj() {
-  for (let e of Bj()) if ((0, v.existsSync)(e)) return e;
-  return null;
-}
-async function zj(e, t) {
-  if (process.platform !== `darwin`) return null;
-  let n = Rj();
-  if (n == null) return null;
-  try {
-    let { stdout: r } = await Oj(n, e, { timeout: 2e3 });
-    return t.parse(JSON.parse(r));
-  } catch {
-    return null;
-  }
-}
-function Bj() {
-  return [
-    h.default.join(process.resourcesPath, `native`, `launch-services-helper`),
-    h.default.join(
-      l.app.getAppPath(),
-      `native`,
-      `launch-services-helper`,
-      `build`,
-      `Release-${process.arch}`,
-      `launch-services-helper`,
-    ),
-  ];
-}
-function Vj() {
-  let e = h.default.dirname(h.default.dirname(process.execPath)),
-    t = h.default.dirname(e);
-  return t.endsWith(`.app`) ? t : null;
-}
+  })();
 var nje = ComputerUseSettingsService;
 var kN = ConversationalOnboardingService,
   AN = {

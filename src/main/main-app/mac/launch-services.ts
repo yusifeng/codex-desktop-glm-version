@@ -63,6 +63,11 @@ async function invokeHelper<T>(args: string[], outputSchema: { parse(input: unkn
 }
 
 /** 应用列表（原 `Nj`）。 */
+async function listApplicationsForFile(argument: string): Promise<Array<{ appPath: string; bundleId: string; displayName: string; isDefault?: boolean }> | null> {
+  return invokeHelper([argument], applicationListSchema as never);
+}
+
+/** 全量应用列表。 */
 async function listApplications(): Promise<Array<{ appPath: string; bundleId: string; displayName: string; isDefault?: boolean }> | null> {
   return invokeHelper(["list-applications"], applicationListSchema as never);
 }
@@ -78,9 +83,8 @@ async function listWebUrlHandlers(): Promise<{ applications: Array<{ appPath: st
 }
 
 /** 通知下载完成（原 `Ij`）。 */
-async function notifyDownloadComplete(path: string): Promise<boolean> {
+async function notifyDownloadComplete(path: string): Promise<void> {
   await invokeHelper(["notify-download-complete", path], literalSchema(true) as never);
-  return true;
 }
 
 /** 当前 .app bundle 路径（原 `Vj`）。 */
@@ -110,6 +114,7 @@ function setAppIcon({ preference, resourceName }: { preference: string; resource
 
 export {
   listApplications,
+  listApplicationsForFile,
   appForBundleId,
   listWebUrlHandlers,
   notifyDownloadComplete,
