@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 Electron fetch handler owner
+
+原 `PBe` 完整 1,600+ 行 owner 已迁入 `src/main/main-app/fetch-handler/electron-fetch-handler.ts`。新 dependency-injected
+factory 持有 129 个 handlers、constructor-owned settings/automations/pinned services、global-state/config helpers 与 VS Code
+dispatch/tracing/error projection；真实 `ert` consumer 仍通过 `new PBe(...)` 接回，主 chunk 旧 class body 已删除。对定义在
+composition 之后的 screenshot resolver 使用 lazy closure 注入，避免 factory 初始化期 TDZ/undefined capture。
+
 ## 2026-10-31 pinned threads service façade
 
 `PBe` 构造器持有的原 `jH` 已迁入 `src/main/main-app/sidebar/pinned-threads-service.ts`。新 class 保留 legacy/server

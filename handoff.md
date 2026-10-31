@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成主 `PBe` owner 迁移：完整 1,600+ 行 Electron fetch handler（129 handlers、constructor-owned services、settings/global
+state/config helpers、VS Code dispatch/tracing/error projection）已迁入真实
+`fetch-handler/electron-fetch-handler.ts` dependency-injected factory，真实 `ert` consumer 仍以 `new PBe(...)` 接回；主 chunk
+旧 class body 已删除。focused gate 同时覆盖构造 ownership、direct/traced dispatch、git-source guard 与 unsupported projection。
+
 继续拆 `PBe` 持有的真实 owner：`jH` pinned-threads façade 已迁入 `sidebar/pinned-threads-service.ts`；legacy/server
 listing、pin/reorder fallback、section CRUD delegation、deduped update、saved-section callback synchronization、broadcast 与
 worktree-cleanup protection 均由新 class 持有。真实 consumer 已接回，复杂 server/reconciliation 作为明确注入边界保留。
