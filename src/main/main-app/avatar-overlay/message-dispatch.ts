@@ -15,13 +15,38 @@ export interface AvatarOverlayManagerLike {
   hide(): void;
   toggle(origin: unknown): Promise<void>;
   isOpen(): boolean;
-  startDrag(viewId: number, pointer: { pointerWindowX: number; pointerWindowY: number; pointerScreenX?: number; pointerScreenY?: number }, usesOrbPhysics?: boolean): void;
-  moveDrag(viewId: number, pointer?: { pointerScreenX: number; pointerScreenY: number }): void;
-  endDrag(viewId: number, pointer?: { pointerScreenX: number; pointerScreenY: number }, altKey?: boolean): void;
-  throwWithVelocity(viewId: number, velocityX: number, velocityY: number, shouldBounce: boolean): void;
+  startDrag(
+    viewId: number,
+    pointer: {
+      pointerWindowX: number;
+      pointerWindowY: number;
+      pointerScreenX?: number;
+      pointerScreenY?: number;
+    },
+    usesOrbPhysics?: boolean,
+  ): void;
+  moveDrag(
+    viewId: number,
+    pointer?: { pointerScreenX: number; pointerScreenY: number },
+  ): void;
+  endDrag(
+    viewId: number,
+    pointer?: { pointerScreenX: number; pointerScreenY: number },
+    altKey?: boolean,
+  ): void;
+  throwWithVelocity(
+    viewId: number,
+    velocityX: number,
+    velocityY: number,
+    shouldBounce: boolean,
+  ): void;
   setElementSize(viewId: number, state: Record<string, unknown>): void;
   setPointerInteraction(viewId: number, isInteractive: boolean): void;
-  setKeyboardInteraction(viewId: number, isInteractive: boolean, restorePreviousFocus: boolean): void;
+  setKeyboardInteraction(
+    viewId: number,
+    isInteractive: boolean,
+    restorePreviousFocus: boolean,
+  ): void;
 }
 
 /** overlay 消息（结构化子集）。 */
@@ -57,10 +82,16 @@ export function isAvatarOverlayMessage(message: { type: string }): boolean {
 }
 
 /** 指针屏幕坐标提取（原 `tU`）：非数值时返回 null（回退窗口坐标）。 */
-function pointerScreenPosition(message: AvatarOverlayMessage): { pointerScreenX: number; pointerScreenY: number } | null {
-  const screenX = "pointerScreenX" in message ? message.pointerScreenX : undefined;
-  const screenY = "pointerScreenY" in message ? message.pointerScreenY : undefined;
-  return typeof screenX !== "number" || typeof screenY !== "number" ? null : { pointerScreenX: screenX, pointerScreenY: screenY };
+function pointerScreenPosition(
+  message: AvatarOverlayMessage,
+): { pointerScreenX: number; pointerScreenY: number } | null {
+  const screenX =
+    "pointerScreenX" in message ? message.pointerScreenX : undefined;
+  const screenY =
+    "pointerScreenY" in message ? message.pointerScreenY : undefined;
+  return typeof screenX !== "number" || typeof screenY !== "number"
+    ? null
+    : { pointerScreenX: screenX, pointerScreenY: screenY };
 }
 
 /**
@@ -85,14 +116,24 @@ export async function dispatchAvatarOverlayMessage(
       await manager.toggle(view);
       return;
     case "avatar-overlay-open-state-request":
-      reply({ type: "avatar-overlay-open-state-changed", isOpen: manager.isOpen() });
+      reply({
+        type: "avatar-overlay-open-state-changed",
+        isOpen: manager.isOpen(),
+      });
       return;
     case "avatar-overlay-drag-start": {
       const pointer = pointerScreenPosition(message);
       const dragPointer =
         pointer == null
-          ? { pointerWindowX: message.pointerWindowX ?? 0, pointerWindowY: message.pointerWindowY ?? 0 }
-          : { ...pointer, pointerWindowX: message.pointerWindowX ?? 0, pointerWindowY: message.pointerWindowY ?? 0 };
+          ? {
+              pointerWindowX: message.pointerWindowX,
+              pointerWindowY: message.pointerWindowY,
+            }
+          : {
+              ...pointer,
+              pointerWindowX: message.pointerWindowX,
+              pointerWindowY: message.pointerWindowY,
+            };
       manager.startDrag(view.id, dragPointer, message.usesOrbPhysics);
       return;
     }
@@ -108,12 +149,18 @@ export async function dispatchAvatarOverlayMessage(
       return;
     }
     case "avatar-overlay-drag-release":
-      manager.throwWithVelocity(view.id, message.velocityX ?? 0, message.velocityY ?? 0, !!message.shouldBounce);
+      manager.throwWithVelocity(
+        view.id,
+        message.velocityX,
+        message.velocityY,
+        message.shouldBounce,
+      );
       return;
     case "avatar-overlay-element-size-changed":
       manager.setElementSize(view.id, {
         quickChatFocusRequestId: message.quickChatFocusRequestId,
-        isGlobalRealtimeVoiceTransitioning: message.isGlobalRealtimeVoiceTransitioning,
+        isGlobalRealtimeVoiceTransitioning:
+          message.isGlobalRealtimeVoiceTransitioning,
         isQuickChatLoading: message.isQuickChatLoading,
         isTrayVisible: message.isTrayVisible,
         mascot: message.mascot,
@@ -126,10 +173,14 @@ export async function dispatchAvatarOverlayMessage(
       });
       return;
     case "avatar-overlay-pointer-interaction-changed":
-      manager.setPointerInteraction(view.id, !!message.isInteractive);
+      manager.setPointerInteraction(view.id, message.isInteractive);
       return;
     case "avatar-overlay-keyboard-interaction-changed":
-      manager.setKeyboardInteraction(view.id, !!message.isInteractive, !!message.restorePreviousFocus);
+      manager.setKeyboardInteraction(
+        view.id,
+        message.isInteractive,
+        message.restorePreviousFocus,
+      );
       return;
   }
 }

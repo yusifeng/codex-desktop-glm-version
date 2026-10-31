@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 Avatar Overlay renderer message dispatch：既有 `avatar-overlay/message-dispatch.ts` 原先仅是未消费的语义副本，且把缺失 drag/interaction
+字段错误地归一为 `0/false`。本批恢复原始 `undefined` 透传语义，由 ElectronMessageHandler 真实消费 message predicate/dispatcher，并从主 chunk
+物理删除 `GBe/tU/KBe`。focused suite 执行 11 条消息、pointer fallback、回执、undefined fidelity 与接线断言。
+
 完成 Saved Sections 纯状态策略整带迁移：新增 `sidebar/saved-section-policy.ts`，统一接管 section create/rename/delete/move/reorder/replace、
 pending deletion 清理、operation reducer、thread-host 投影、undo/redo affected-state diff 与 identity guard、reconciliation commit 及 host/member 辅助。
 ThreadSectionServer、undo stack、reconciliation、custom-section manager 和 pinned service 均已真实改接同一 policy factory；主 chunk 物理删除约 405 行

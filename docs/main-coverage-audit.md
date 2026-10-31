@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 avatar overlay message dispatch wiring
+
+`avatar-overlay/message-dispatch.ts` 已从无 consumer 的语义副本改为 ElectronMessageHandler 的真实消息边界；修复旧模块对缺失 drag velocity、pointer
+window coordinate、bounce 与 interaction flags 强制补 `0/false` 的行为漂移，保持原始 `undefined` 透传。主 chunk 的 predicate/pointer projection/
+13-way dispatcher 共约 69 行已删除；11 条 focused 行为与接线断言通过，防空壳审计锁定旧定义不会回流。
+
 ## 2026-11-01 saved-section state policy extraction
 
 新增 `sidebar/saved-section-policy.ts`，将 saved custom sections 的基础 state mutations、operation reducer、thread-host retention、undo/redo affected

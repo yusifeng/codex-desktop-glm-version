@@ -13,6 +13,7 @@ const { AppshotHotkeyManager } = require("./main-app/hotkey/appshot-hotkey-manag
 const { createHotkeyWindowLifecycleManagerClass } = require("./main-app/hotkey/hotkey-window-lifecycle-manager.js");
 const { createPetHotkeyManager } = require("./main-app/hotkey/pet-hotkey-manager.js");
 const { AvatarOverlayWindowManager } = require("./main-app/avatar-overlay/composition-surface.js");
+const { isAvatarOverlayMessage: GBe, dispatchAvatarOverlayMessage: KBe } = require("./main-app/avatar-overlay/message-dispatch.js");
 const { getVoiceController } = require("./main-app/avatar-overlay/realtime.js");
 const { createRemoteHostedPipManager } = require("./main-app/avatar-overlay/pip.js");
 const { createProjectLocalDataMigrationRuntime } = require("./main-app/projects/local-data-migrations.js");
@@ -35256,75 +35257,6 @@ var computeScreenshotTarget = createScreenshotTargetResolver({
   fromWebContents: (webContents) => l.BrowserWindow.fromWebContents(webContents),
   getDisplayMatching: (frame) => l.screen.getDisplayMatching(frame),
 });
-function GBe(e) {
-  return e.type.startsWith(`avatar-overlay-`);
-}
-function tU(e) {
-  let t = `pointerScreenX` in e ? e.pointerScreenX : void 0,
-    n = `pointerScreenY` in e ? e.pointerScreenY : void 0;
-  return typeof t != `number` || typeof n != `number`
-    ? null
-    : { pointerScreenX: t, pointerScreenY: n };
-}
-async function KBe(e, t, n, r = () => {}) {
-  switch (n.type) {
-    case `avatar-overlay-close`:
-      e.dismiss();
-      return;
-    case `avatar-overlay-hide`:
-      e.hide();
-      return;
-    case `avatar-overlay-open`:
-      await e.toggle(t);
-      return;
-    case `avatar-overlay-open-state-request`:
-      r({ type: `avatar-overlay-open-state-changed`, isOpen: e.isOpen() });
-      return;
-    case `avatar-overlay-drag-start`: {
-      let r = tU(n),
-        i =
-          r == null
-            ? { pointerWindowX: n.pointerWindowX, pointerWindowY: n.pointerWindowY }
-            : { ...r, pointerWindowX: n.pointerWindowX, pointerWindowY: n.pointerWindowY };
-      e.startDrag(t.id, i, n.usesOrbPhysics);
-      return;
-    }
-    case `avatar-overlay-drag-move`: {
-      let r = tU(n);
-      r ? e.moveDrag(t.id, r) : e.moveDrag(t.id);
-      return;
-    }
-    case `avatar-overlay-drag-end`: {
-      let r = tU(n);
-      e.endDrag(t.id, r ?? void 0, n.altKey);
-      return;
-    }
-    case `avatar-overlay-drag-release`:
-      e.throwWithVelocity(t.id, n.velocityX, n.velocityY, n.shouldBounce);
-      return;
-    case `avatar-overlay-element-size-changed`:
-      e.setElementSize(t.id, {
-        quickChatFocusRequestId: n.quickChatFocusRequestId,
-        isGlobalRealtimeVoiceTransitioning: n.isGlobalRealtimeVoiceTransitioning,
-        isQuickChatLoading: n.isQuickChatLoading,
-        isTrayVisible: n.isTrayVisible,
-        mascot: n.mascot,
-        petControlsAppearance: n.petControlsAppearance,
-        presentation: n.presentation,
-        quickChat: n.quickChat,
-        realtimeCaptionAboveMascotPx: n.realtimeCaptionAboveMascotPx,
-        showsPetControls: n.showsPetControls,
-        tray: n.tray,
-      });
-      return;
-    case `avatar-overlay-pointer-interaction-changed`:
-      e.setPointerInteraction(t.id, n.isInteractive);
-      return;
-    case `avatar-overlay-keyboard-interaction-changed`:
-      e.setKeyboardInteraction(t.id, n.isInteractive, n.restorePreviousFocus);
-      return;
-  }
-}
 var NW = r.i(`checkout-webview`),
   PW = new Map(),
   FW = new WeakMap(),
