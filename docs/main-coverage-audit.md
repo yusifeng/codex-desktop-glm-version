@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 downloads view publisher
+
+原 `Jnt` 已迁入 `src/main/main-app/downloads/downloads-view-publisher.ts`。新 owner 保留 per-app-view lifecycle queue、
+detached view serial queue/initial snapshot、state broadcast coalescing、30 秒 publish watchdog、RPC-broken/destroyed/
+render-process-gone cleanup、failure isolation 与 dispose；唯一 runtime construction 已接回，旧 class 已删除。
+
 ## 2026-10-31 user-verification RPC services
 
 原 `znt/Bnt` 已迁入 `src/main/main-app/user-verification/rpc-services.ts`。新 adapters 保留 per-host connection lookup、

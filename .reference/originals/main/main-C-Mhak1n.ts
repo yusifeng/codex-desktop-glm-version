@@ -119,6 +119,7 @@ const { createThreadTurnSummaryServiceClass } = require("./main-app/threads/thre
 const { createTracingRpcServiceClass } = require("./main-app/tracing/tracing-rpc-service.js");
 const { createTriggerSubscriptionReaderClass } = require("./main-app/triggers/trigger-subscription-reader.js");
 const { createUserVerificationRpcServices } = require("./main-app/user-verification/rpc-services.js");
+const { createDownloadsViewPublisherClass } = require("./main-app/downloads/downloads-view-publisher.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -140816,137 +140817,12 @@ function qnt(e, { signal: t }) {
     })
   );
 }
-var Jnt = class {
-    appViewsByWebContentsId;
-    getDownloadsSnapshot;
-    logger = r.r(`WindowContext`);
-    downloadsLifecycleEventBroadcastQueues = new WeakMap();
-    detachedDownloadsViews = new Set();
-    downloadsStateBroadcastPending = !1;
-    downloadsStateBroadcastRunning = !1;
-    constructor(e, t) {
-      ((this.appViewsByWebContentsId = e), (this.getDownloadsSnapshot = t));
-    }
-    registerDetachedView = (e, t) => {
-      let n = { view: t, queue: Promise.resolve(), unsubscribe: () => {} },
-        r = () => {
-          this.detachedDownloadsViews.delete(n) &&
-            (e.removeListener(`destroyed`, r),
-            e.removeListener(`render-process-gone`, r),
-            t[Symbol.dispose]());
-        };
-      return (
-        (n.unsubscribe = r),
-        this.detachedDownloadsViews.add(n),
-        e.once(`destroyed`, r),
-        e.once(`render-process-gone`, r),
-        t.onRpcBroken(r),
-        this.enqueueDetachedDownloadsUpdate(n, async () => {
-          await t.stateChanged(await this.getDownloadsSnapshot());
-        }),
-        r
-      );
-    };
-    enqueueDetachedDownloadsUpdate(e, t) {
-      return (
-        (e.queue = e.queue
-          .then(async () => {
-            if (!this.detachedDownloadsViews.has(e)) return;
-            let n = setTimeout(() => e.unsubscribe(), 3e4);
-            try {
-              await t();
-            } finally {
-              clearTimeout(n);
-            }
-          })
-          .catch((t) => {
-            this.detachedDownloadsViews.has(e) &&
-              this.logger.warning(`Failed to publish downloads to detached renderer`, {
-                safe: {},
-                sensitive: { error: t },
-              });
-          })),
-        e.queue
-      );
-    }
-    broadcastDownloadsState() {
-      ((this.downloadsStateBroadcastPending = !0),
-        !this.downloadsStateBroadcastRunning &&
-          ((this.downloadsStateBroadcastRunning = !0), this.flushDownloadsStateBroadcasts()));
-    }
-    broadcastDownloadLifecycleEvent(e) {
-      for (let t of this.appViewsByWebContentsId.values()) {
-        let n = this.downloadsLifecycleEventBroadcastQueues.get(t) ?? Promise.resolve();
-        this.downloadsLifecycleEventBroadcastQueues.set(
-          t,
-          n.then(() => this.publishDownloadLifecycleEvent(e, t)),
-        );
-      }
-      for (let t of this.detachedDownloadsViews)
-        this.enqueueDetachedDownloadsUpdate(t, () => t.view.lifecycleChanged(e));
-    }
-    async publishDownloadLifecycleEvent(e, t) {
-      try {
-        try {
-          var n = a.en();
-          await n.u(await t.services).downloads.lifecycleChanged(e);
-        } catch (e) {
-          n.e = e;
-        } finally {
-          n.d();
-        }
-      } catch (e) {
-        this.logger.warning(`Failed to publish download lifecycle event to renderer`, {
-          safe: {},
-          sensitive: { error: e },
-        });
-      }
-    }
-    async flushDownloadsStateBroadcasts() {
-      try {
-        for (; this.downloadsStateBroadcastPending;) {
-          this.downloadsStateBroadcastPending = !1;
-          let e;
-          try {
-            e = await this.getDownloadsSnapshot();
-          } catch (e) {
-            this.logger.warning(`Failed to read native download history`, {
-              safe: {},
-              sensitive: { error: e },
-            });
-            continue;
-          }
-          for (let t of this.detachedDownloadsViews)
-            this.enqueueDetachedDownloadsUpdate(t, () => t.view.stateChanged(e));
-          await Promise.all(
-            Array.from(this.appViewsByWebContentsId.values(), async (t) => {
-              try {
-                try {
-                  var n = a.en();
-                  await n.u(await t.services).downloads.stateChanged(e);
-                } catch (e) {
-                  n.e = e;
-                } finally {
-                  n.d();
-                }
-              } catch (e) {
-                this.logger.warning(`Failed to publish downloads state to renderer`, {
-                  safe: {},
-                  sensitive: { error: e },
-                });
-              }
-            }),
-          );
-        }
-      } finally {
-        ((this.downloadsStateBroadcastRunning = !1),
-          this.downloadsStateBroadcastPending && this.broadcastDownloadsState());
-      }
-    }
-    dispose() {
-      for (let e of this.detachedDownloadsViews) e.unsubscribe();
-    }
-  },
+var Jnt = createDownloadsViewPublisherClass({
+    createLogger: r.r,
+    createUsingScope: a.en,
+    setTimer: setTimeout,
+    clearTimer: clearTimeout,
+  }),
   H5 = [
     n.iu.DESKTOP_FIRST_SEEN_AT_MS,
     n.iu.LOCAL_PROJECTS,

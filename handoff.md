@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Jnt` downloads view publisher 迁入 `downloads/downloads-view-publisher.ts`；app/detached renderer queues、
+initial snapshot、lifecycle ordering、state broadcast coalescing、30 秒 detached watchdog、RPC/renderer teardown 与
+dispose cleanup 均由新 owner 持有。唯一 runtime construction 已接回，旧 class 已删除。focused test 覆盖 29 项。
+
 随后将 `znt/Bnt` user-verification RPC facade/attempt 迁入 `user-verification/rpc-services.ts`；host connection lookup、
 verification begin、wait/accept/cancel forwarding 与 dispose-cancel 均由新 adapters 持有。条件式 runtime consumer 已
 接回，旧 classes 已删除。focused test 覆盖 15 项。
