@@ -865,7 +865,7 @@ function resolveLiveVisualizationSkillVariant({
 }
 
 /** 读取观察名单内插件的已装状态（原 `ul`）。 */
-async function listObservedPluginStates({
+export async function listObservedPluginStates({
   appServerConnection,
   marketplaceName,
 }: {

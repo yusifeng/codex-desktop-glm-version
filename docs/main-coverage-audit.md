@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 bundled plugin orchestrator and archive owner consolidation
+
+`plugins/orchestrator.ts` 现作为启动区唯一 bundled plugin 编排 owner，`chrome-native-host-sync.ts` 的 cache watcher 和 marketplace descriptor
+清单也直接接回。主 chunk `al…hl` 约 793 行旧 descriptor/orchestrator/watcher/Chronicle archive 副本删除；`listObservedPluginStates`
+转为正式导出以保持仍存在的注入 consumer。focused suite 验证 dev reconcile 状态键去重、pending 链、两类 thread config 同步、观察状态，
+并在临时目录中执行 Chronicle skill/marker 归档及 SHA-256 metadata 写回。
+
 ## 2026-11-01 plugin marketplace runtime owner consolidation
 
 本批把 `plugins/marketplace.ts`、`chrome-native-host-sync.ts`、`cua-repl-config.ts` 与 `computer-use/app-resolution.ts` 作为一条运行链接回，

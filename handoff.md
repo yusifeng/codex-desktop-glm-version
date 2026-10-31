@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+继续收拢 bundled plugin 编排层：descriptor 清单、安装状态观察、dev/full reconcile 串行器、远端 SSH 同步入口、Chrome native-host cache
+watcher 与 legacy Chronicle skill 归档，全部改接 `marketplace.ts`、`orchestrator.ts` 和 `chrome-native-host-sync.ts`。旧 `al…hl` 约 793 行
+整体删除；focused suite 实际运行 dev reconcile 去重/pending 注册、插件状态读取，以及带目录哈希、marker 和 metadata 的 Chronicle 文件迁移。
+
 大批接回 bundled plugin 核心链：marketplace 物化/reconcile/远端同步、Chrome native-host 缓存和 CUA skills 同步、CUA REPL `.mcp.json`
 原子写入，以及 computer-use app/env/marketplace 路径解析，已由四个完整语义模块共同接管。主入口约 30 个跨区 consumer 改接命名导出，
 `Di…Sne` 与 `wa…wo` 两段合计约 1,859 行旧副本整体删除；focused suite 覆盖 marketplace 选择、插件查找、日志脱敏、安装决策及真实
