@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 browser runtime resolution owner consolidation
+
+`plugins/browser-runtime-resolution.ts` 现独立拥有 bundled plugin 根目录/强制重载、Chrome 渠道、PATH 与 Windows 应用发现、商店链接、
+Chromium profile/扩展检测，以及 computer-use/visualize bundled 内容变体。main 仍在应用 opener、marketplace 与 materialization 真实路径上
+消费这些导出；原连续 `Cne…Qne` 和 `$ne…tre` 定义物理删除。focused suite 不只做静态 wiring 检查，还在临时文件系统中执行 executable
+解析、sibling fallback、live skill 删除、manifest variant 写回和 audio skill 注入。
+
 ## 2026-11-01 dynamic app tools and host services native-pipe owners
 
 新增 `native-pipe/dynamic-app-tools-server.ts` 与 `host-services-server.ts`，分别接管原 `Hse/Use/Wse/tu/Gse` 和 `Hce/Uce/Wce`。两者保留 8MiB

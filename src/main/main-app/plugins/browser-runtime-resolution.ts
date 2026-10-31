@@ -272,7 +272,7 @@ const VSWHERE_PATHS = [vswherePathFor(`ProgramFiles(x86)`), vswherePathFor(`Prog
 );
 
 /** 在常规程序目录里找第一个存在的组合路径（原 `ta`）。 */
-function findFirstExistingProgramPath(segmentsList: string[][]): string | null {
+export function findFirstExistingProgramPath(segmentsList: string[][]): string | null {
   return joinProgramDirs(segmentsList).find(fs.existsSync) ?? null;
 }
 
@@ -293,7 +293,7 @@ async function findFirstExistingProgramPathAsync(segmentsList: string[][]): Prom
 }
 
 /** 解析 Windows 可执行路径（无扩展名时补 .cmd/.bat/.exe；原 `na`）。 */
-function resolveWindowsExecutable(target: string): string | null {
+export function resolveWindowsExecutable(target: string): string | null {
   if (!fs.existsSync(target)) return null;
   if (path.extname(target)) return target;
   for (let extension of [`.cmd`, `.bat`, `.exe`]) {
@@ -304,7 +304,7 @@ function resolveWindowsExecutable(target: string): string | null {
 }
 
 /** 在可执行文件旁找同名数据文件（bin 目录上提一级；原 `ra`）。 */
-function findSiblingFile(executablePath: string, siblingName: string): string | null {
+export function findSiblingFile(executablePath: string, siblingName: string): string | null {
   let directory = path.dirname(executablePath);
   if (path.basename(directory).toLowerCase() === `bin`) {
     let sibling = path.join(path.dirname(directory), siblingName);

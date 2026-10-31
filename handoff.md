@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+收拢浏览器运行时解析与 bundled content owner：主入口的 bundled marketplace 路径、插件渠道、通用命令、Windows 程序发现、Chromium
+安装/扩展探测、computer-use 音频注入和 visualize 变体物化，现统一接到完整的 `plugins/browser-runtime-resolution.ts`。三个仍被应用
+opener 直接消费的路径 helper 改为正式导出，旧 `Cne…Qne` 与 `$ne…tre` 约 619 行压缩副本整体删除；focused suite 使用真实临时目录验证
+可执行文件/同级文件解析、visualize live 删除、plugin manifest 写回及 computer-use SKILL.md 音频注入。
+
 继续向上收敛 native-pipe 服务：新增完整 `dynamic-app-tools-server.ts` 与 `host-services-server.ts`，恢复 JSON-RPC admission、namespace/tool
 projection、call cancellation、hostId envelope、unsupported/error response、service ensure、0600 pipe、peer/socket 日志和 pending abort/close；桌面启动
 两个真实 consumer 改接语义 owner，旧 `Hse…Gse`、`Hce…Wce` 与随机 pipe helper 删除，基础层压缩兼容别名全部消除。
