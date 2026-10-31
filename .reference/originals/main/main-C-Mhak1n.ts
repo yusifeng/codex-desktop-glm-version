@@ -80,6 +80,8 @@ const { createDictationHistoryRuntime } = require("./main-app/dictation/history.
 const { createGlobalPasteRuntime } = require("./main-app/dictation/global-paste-runtime.js");
 const { createGlobalDictationLifecycleManagerClass, isGlobalDictationMessage, isGlobalDictationPlatformSupported } = require("./main-app/dictation/global-dictation-lifecycle-manager.js");
 const { createScreenshotTargetResolver } = require("./main-app/fetch-handler/screenshot-target.js");
+const { createSftpTransfers } = require("./main-app/fetch-handler/sftp.js");
+const { applySparseStateWrite, createFetchHandlerStateRuntime } = require("./main-app/fetch-handler/state-writes.js");
 const { createWorkspaceFileServiceClass } = require("./main-app/workspace/files.js");
 const { createAuthorizedThreadCatalogServiceClass } = require("./main-app/thread-catalog/authorized-service.js");
 const { createPluginIncentivesClientRuntime } = require("./main-app/plugins/incentives-client.js");
@@ -95754,6 +95756,26 @@ function WH({ path: e, targetPath: t, workspaceRoot: n }) {
   let r = e.relative(n, t);
   return !(r === `..` || r.startsWith(`..${e.sep}`) || e.isAbsolute(r));
 }
+var { sftpUpload, sftpDownload } = createSftpTransfers({
+    isSshHostConfig: n.Os,
+    resolveExecutable: (name) => n.qn.resolve(name),
+    spawn: P.spawn,
+  }),
+  {
+    avatarOverlayAcceleratorFromKeymap,
+    bundledSkillsRoot,
+    validateGlobalHotkeySetting,
+  } = createFetchHandlerStateRuntime({
+    existsSync: v.existsSync,
+    getAppPath: () => l.app.getAppPath(),
+    isPackaged: () => l.app.isPackaged,
+    join: h.join,
+    keymapAcceleratorForCommand: n.kt,
+    platform: process.platform,
+    resourcesPath: process.resourcesPath,
+    validateGlobalDictationHotkey: QV,
+    validateHotkey: JV,
+  });
 var GH = !!process.env.WSL_DISTRO_NAME,
   KH = r.i(`electron-fetch-handler`),
   qH = new Set([n.iu.PROJECT_ORDER]),
@@ -95923,7 +95945,7 @@ var GH = !!process.env.WSL_DISTRO_NAME,
         (this.pinnedThreadsService = new jH(e, i, l, B)),
         (this.realtimeSessionRecorder = T),
         (this.realtimeVoiceHotkeyController = D),
-        (this.bundledSkillsRoot = HBe()),
+        (this.bundledSkillsRoot = bundledSkillsRoot()),
         n
           .l({
             refresh: !1,
@@ -96221,7 +96243,7 @@ var GH = !!process.env.WSL_DISTRO_NAME,
         );
       },
       "set-codex-command-keybinding": async ({ commandId: e, update: t }) => {
-        VBe(e, t);
+        validateGlobalHotkeySetting(e, t);
         let r = await n.St(),
           i = await n.Tt({
             commandId: e,
@@ -96230,8 +96252,8 @@ var GH = !!process.env.WSL_DISTRO_NAME,
               ? this.settingsStore?.getEffective(n.Ia.primaryNumberShortcutTarget.key)
               : void 0,
           }),
-          a = eU(r),
-          o = eU(i),
+          a = avatarOverlayAcceleratorFromKeymap(r),
+          o = avatarOverlayAcceleratorFromKeymap(i),
           s = e !== `openAvatarOverlay` && a !== o;
         return (
           s && o == null && this.syncAvatarOverlayHotkey(null),
@@ -96260,7 +96282,7 @@ var GH = !!process.env.WSL_DISTRO_NAME,
         };
         return (
           this.hotkeyWindowLifecycleManager.syncCommandKeybinding(lH(`hotkeyWindow`, e).hotkey),
-          this.syncAvatarOverlayHotkey(eU(e)),
+          this.syncAvatarOverlayHotkey(avatarOverlayAcceleratorFromKeymap(e)),
           this.globalDictationHotkeyController.syncCommandKeybindings({
             holdHotkey: lH(`globalDictationHold`, e).hotkey,
             toggleHotkey: lH(`globalDictationToggle`, e).hotkey,
@@ -96829,7 +96851,7 @@ var GH = !!process.env.WSL_DISTRO_NAME,
           );
         let n = this.getRequestAppServerClient(e.hostId);
         return (
-          await zBe({
+          await sftpDownload({
             sourcePath: await this.getFileRequestPath(e.sourcePath, n),
             targetPath: t.filePath,
             hostConfig: n.hostConfig,
@@ -97296,7 +97318,7 @@ var GH = !!process.env.WSL_DISTRO_NAME,
     }
     async uploadLocalFile({ sourcePath: e, targetPath: t, hostId: n }) {
       let r = this.getRequestAppServerClient(n);
-      await RBe({ sourcePath: Un(e, ls) ?? e, targetPath: t, hostConfig: r.hostConfig });
+      await sftpUpload({ sourcePath: Un(e, ls) ?? e, targetPath: t, hostConfig: r.hostConfig });
     }
     async readGitOrigins({ dirs: e, hostId: t }) {
       let r = this.getRequestAppServerClient(t).hostConfig,
@@ -97444,104 +97466,6 @@ var computeScreenshotTarget = createScreenshotTargetResolver({
   fromWebContents: (webContents) => l.BrowserWindow.fromWebContents(webContents),
   getDisplayMatching: (frame) => l.screen.getDisplayMatching(frame),
 });
-async function RBe({ sourcePath: e, targetPath: t, hostConfig: n }) {
-  await QH({ command: `put`, operation: `upload`, sourcePath: e, targetPath: t, hostConfig: n });
-}
-async function zBe({ sourcePath: e, targetPath: t, hostConfig: n }) {
-  await QH({ command: `get`, operation: `download`, sourcePath: e, targetPath: t, hostConfig: n });
-}
-async function QH({ command: e, operation: t, sourcePath: r, targetPath: i, hostConfig: a }) {
-  if (!n.Os(a)) throw Error(`SFTP ${t}s require an SSH host`);
-  let [o, ...s] = a.terminal_command;
-  if (o !== `ssh`) throw Error(`SSH host is missing an ssh terminal command`);
-  let c = $H(r),
-    l = $H(i),
-    u = (0, P.spawn)(n.qn.resolve(`sftp`) ?? `sftp`, [`-b`, `-`, ...BBe(s)], {
-      stdio: [`pipe`, `pipe`, `pipe`],
-    });
-  u.stdin?.end(`${e} ${c} ${l}\n`);
-  let d = [];
-  if (
-    (u.stderr?.on(`data`, (e) => d.push(e)),
-    (await new Promise((e) => {
-      (u.on(`close`, (t) => e(t)), u.on(`error`, () => e(null)));
-    })) !== 0)
-  ) {
-    let e = Buffer.concat(d).toString(`utf8`).trim();
-    throw Error(`SFTP ${t} failed${e.length > 0 ? `: ${e}` : ``}`);
-  }
-}
-function BBe(e) {
-  let t = [`-o`, `BatchMode=yes`];
-  for (let n = 0; n < e.length; n += 1) {
-    let r = e[n];
-    if (r === `-p`) {
-      let r = e[n + 1];
-      if (r == null) throw Error(`SSH terminal command is missing a port value`);
-      (t.push(`-P`, r), (n += 1));
-      continue;
-    }
-    t.push(r);
-  }
-  return t;
-}
-function $H(e) {
-  if (/[\r\n]/.test(e)) throw Error(`SFTP batch paths cannot contain newlines`);
-  return `"${e.replace(/[\\"]/g, `\\$&`)}"`;
-}
-function VBe(e, t) {
-  let n = e === `hotkeyWindow` || e === `openAvatarOverlay` || e === `realtimeVoice`;
-  if (!n && e !== `globalDictationHold` && e !== `globalDictationToggle`) return;
-  if (t.type === `append`) throw Error(`OS-global shortcuts support one keybinding.`);
-  if (t.type !== `set` && t.type !== `replace`) return;
-  let r = n ? JV(t.accelerator) : QV(t.accelerator);
-  if (r != null) throw Error(r);
-}
-function eU(e) {
-  return n.kt({
-    commandId: `openAvatarOverlay`,
-    keymapState: e,
-    isMacOS: process.platform === `darwin`,
-  });
-}
-function HBe() {
-  let e = l.app.getAppPath();
-  if (l.app.isPackaged) return h.join(process.resourcesPath, `skills`);
-  let t = h.join(e, `assets`, `skills`);
-  if ((0, v.existsSync)(t)) return t;
-  let n = h.join(e, `..`, `assets`, `skills`);
-  return (0, v.existsSync)(n) ? n : null;
-}
-var UBe = n.Ef(n.Of(), n.Mf());
-function WBe(e, t) {
-  let n = UBe.safeParse(e),
-    r = n.success ? n.data : {};
-  for (let [e, n] of Object.entries(t.entries)) {
-    if (n?.updateOnly) {
-      if (!Object.hasOwn(r, e)) continue;
-    } else delete r[e];
-    n != null &&
-      Object.defineProperty(r, e, {
-        configurable: !0,
-        enumerable: !0,
-        value: n.value,
-        writable: !0,
-      });
-  }
-  if (t.maxEntries != null) {
-    let e = Object.keys(r);
-    for (let n of e.slice(0, Math.max(0, e.length - t.maxEntries))) delete r[n];
-  }
-  if (t.maxBytes != null) {
-    let e = 2;
-    for (let [n, i] of Object.entries(r).reverse()) {
-      let a = new TextEncoder().encode(JSON.stringify({ [n]: i })).byteLength - 2,
-        o = e + a + +(e > 2 && a > 0);
-      o > t.maxBytes ? delete r[n] : (e = o);
-    }
-  }
-  return r;
-}
 function GBe(e) {
   return e.type.startsWith(`avatar-overlay-`);
 }
@@ -117696,7 +117620,10 @@ var r$e = class {
       a =
         r == null
           ? n
-          : WBe(i[t] ?? (r.legacyStorageKey == null ? void 0 : i[r.legacyStorageKey]), r);
+          : applySparseStateWrite(
+              i[t] ?? (r.legacyStorageKey == null ? void 0 : i[r.legacyStorageKey]),
+              r,
+            );
     (a === void 0
       ? delete i[t]
       : Object.defineProperty(i, t, { configurable: !0, enumerable: !0, value: a, writable: !0 }),

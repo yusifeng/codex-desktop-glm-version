@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 fetch-handler support runtime wiring correction
+
+既有 `sftp.ts`/`state-writes.ts` 同样未接回真实 consumers；本轮将两者改为 dependency-injected runtime，接回 SFTP
+upload/download、global-hotkey validation、avatar accelerator、bundled-skills root 与 persisted-atom sparse writes。旧
+`RBe/zBe/QH/BBe/$H/VBe/eU/HBe/UBe/WBe` 已删除；focused suite 同时覆盖行为与主 chunk source wiring。
+
 ## 2026-10-31 screenshot-target wiring correction
 
 既有 `screenshot-target.ts` 未接回且直接导入 Electron；本轮改为 dependency-injected resolver，并将真实 `PBe`
