@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 computer-use memory summaries wiring
+
+`src/main/main-app/computer-use/memory-summaries.ts` 已完整覆盖旧 `Hj…lM`。本轮将五个查询导出接回 `WindowContext` 的
+ChronicleService history/app resolver，并删除主 chunk 240 行重复簇；focused suite 覆盖 10min/6h 文件协议、活跃区间排序、
+bundle-id 去重/后台过滤/异常 fallback、五个 alias 与三条 history wiring。
+
 ## 2026-10-31 CodexMicroHostService owner wiring
 
 新增 `src/main/main-app/device/codex-micro-host-service.ts`，迁出旧 `Qk/$k/eA/tA/nA/rA/iA/cA` addon probe 与 host service，

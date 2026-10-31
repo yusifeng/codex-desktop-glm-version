@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 computer-use memory summaries：既有 `computer-use/memory-summaries.ts` 现以 `Yj/Xj/Zj/Qj/$j` 兼容别名替代主
+chunk 旧 `Hj…lM` 240 行重复簇。文件名/区间解析、6h 覆盖、frontmatter promise cache、48h suggestion、应用解析与后台
+agent 过滤保持完整；ChronicleService 的 history/app resolver 五条真实 consumer 已全部接到语义模块。
+
 接回 CodexMicroHostService：新增 `device/codex-micro-host-service.ts`，整体替代主 chunk 旧 `Qk…rA/iA/cA` 的 macOS
 Input Monitoring addon 探测与 11-member per-window RPC 门面。primary-window/锁屏 ownership gate、thread-key/lighting forwarding、
 System Settings 打开与错误降级保持完整；大型 `lA` device lifecycle manager 原样保留并继续作为真实 consumer 的依赖。
