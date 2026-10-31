@@ -59,7 +59,7 @@ export function createWindowContextClass(dependencies) {
     IXe,
     Iet,
     J,
-    J$e,
+    createCloudCommandSession,
     Jje,
     Jnt,
     K5,
@@ -712,7 +712,7 @@ export function createWindowContextClass(dependencies) {
               ).shellEnvironment,
             (e) => this.getHostConfigForHostId(e),
             (e) => this.appServerConnectionRegistry.getMaybeConnection(e),
-            (e) => J$e(this.appServerConnectionRegistry.getConnection(n._s), e),
+            (e) => createCloudCommandSession(this.appServerConnectionRegistry.getConnection(n._s), e),
           )),
           (this.remoteConnectionsHandler = new D5e(
             this.appState,

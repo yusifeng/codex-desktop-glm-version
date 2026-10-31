@@ -235,6 +235,7 @@ const { createProjectFolderPickerClass } = require("./main-app/workspace/project
 const { WebContentsHostClient } = require("./main-app/app-server/web-contents-host-client.js");
 const { createRemoteLocalhostNavigationForwarder } = require("./main-app/browser-sidebar/remote-localhost-navigation.js");
 const { createCommandSessionBackendClass } = require("./main-app/terminal/command-session-backend.js");
+const { createCloudCommandSessionRuntime } = require("./main-app/terminal/cloud-command-session.js");
 const { createWorktreeServiceClass } = require("./main-app/workspace/worktree-service.js");
 const { createWorktreeCleanupRuntime } = require("./main-app/workspace/worktree-cleanup-runtime.js");
 const { createWorktreeAttachmentHandlerClass } = require("./main-app/workspace/worktree-attachment-handler.js");
@@ -260,6 +261,7 @@ const { createSavedSectionTransitionClass } = require("./main-app/sidebar/saved-
 const { createSavedSectionReconciliationClass } = require("./main-app/sidebar/saved-section-reconciliation.js");
 const { createSavedCustomSectionsManagerClass } = require("./main-app/sidebar/saved-custom-sections-manager.js");
 const { createWorkspaceFileServiceClass } = require("./main-app/workspace/files.js");
+const { createWorkspaceFileRuntimeSupport } = require("./main-app/workspace/file-runtime-support.js");
 const { createDesktopFileServicesRuntime } = require("./main-app/files/desktop-file-services.js");
 const { createLibraryFilesBackendRuntime } = require("./main-app/files/library-files-backend.js");
 const { createDictationAudioServiceClass } = require("./main-app/dictation/audio.js");
@@ -61609,6 +61611,30 @@ var r$e = createElectronMessageHandlerClass({
     performanceHeartbeatIntervalMs,
   },
 });
+var {
+  atomicDownloadWrite,
+  classifyBuffer: classifyWorkspaceBuffer,
+  createEtag: createWorkspaceEtag,
+  decodeBase64: decodeWorkspaceBase64,
+  normalizeBase64: normalizeWorkspaceBase64,
+  resolveLocalWorkspacePath,
+  resolveWorkspacePath,
+  statIfExists: statWorkspacePathIfExists,
+} = createWorkspaceFileRuntimeSupport({
+  fsPromises: b,
+  path: h,
+  randomUUID: _.randomUUID,
+  createHash: _.createHash,
+  classifySample: n.Rs,
+  statPath: n.Di.stat,
+  isRemoteHostConfig: n.Es,
+  convertPathForDesktopHost: Vn,
+  getUseWslPaths: n.zi,
+  getPrimaryWorkspaceRoot: n.Wo,
+  getSelectedProject: Pr,
+  getLocalProjects: Fr,
+  existsSync: v.existsSync,
+});
 var { AppServerClientRegistry: a$e, FileAttachmentsService: s$e, FileDragService: _$e, LibraryFilesService: l1e } =
   createDesktopFileServicesRuntime({
     RpcHandlerBase: n.Uf,
@@ -61625,7 +61651,7 @@ var { AppServerClientRegistry: a$e, FileAttachmentsService: s$e, FileDragService
     childProcess: P,
     countFolderFiles: n.$,
     isRemoteHostConfig: n.Es,
-    resolveLocalWorkspacePath: pQ,
+    resolveLocalWorkspacePath,
     resolveElectronResourcesPath: o.t,
     loadNativeFileDragAddon: Vs,
     normalizeEnvironment: n.Bi,
@@ -61653,83 +61679,19 @@ var u$e = 41943040,
     isFileTooLarge: K,
     maxFileBytes: Ae,
     showItemInFolder: Ij,
-    resolveWorkspacePath: fQ,
-    resolveLocalWorkspacePath: pQ,
-    atomicDownloadWrite: sQ,
-    classifyBuffer: cQ,
-    normalizeBase64: m$e,
-    decodeBase64: h$e,
-    statIfExists: lQ,
-    createEtag: uQ,
+    resolveWorkspacePath,
+    resolveLocalWorkspacePath,
+    atomicDownloadWrite,
+    classifyBuffer: classifyWorkspaceBuffer,
+    normalizeBase64: normalizeWorkspaceBase64,
+    decodeBase64: decodeWorkspaceBase64,
+    statIfExists: statWorkspacePathIfExists,
+    createEtag: createWorkspaceEtag,
     thumbnailMaxBytes: u$e,
     thumbnailMaxDimension: d$e,
     thumbnailConcurrency: f$e,
     operationTimeoutMs: oQ,
   });
-async function sQ(e, t) {
-  let n;
-  try {
-    n = (await (0, b.stat)(e)).mode & 511;
-  } catch (e) {
-    if (!dQ(e, `ENOENT`)) throw e;
-  }
-  let r = h.join(
-      h.dirname(e),
-      `${h.basename(e).slice(0, 64)}.${(0, _.randomUUID)()}.chatgptdownload`,
-    ),
-    i = await (0, b.open)(r, `wx`, n == null ? 438 : 384);
-  try {
-    (await i.writeFile(await t()),
-      n != null && (await i.chmod(n)),
-      await i.close(),
-      await (0, b.rename)(r, e));
-  } finally {
-    (await i.close(), await (0, b.rm)(r, { force: !0 }));
-  }
-}
-async function cQ(e) {
-  return (await n.Rs(e.subarray(0, 4096))) === `text`
-    ? { text: e.toString(`utf8`) }
-    : { blob: e.toString(`base64`) };
-}
-function m$e(e) {
-  return typeof e == `string` ? e : e.toString(`base64`);
-}
-function h$e(e) {
-  return typeof e == `string` ? Buffer.from(e, `base64`) : e;
-}
-async function lQ(e, t) {
-  try {
-    return await n.Di.stat(e, t, { bypassCache: !0 });
-  } catch (e) {
-    if (dQ(e, `ENOENT`)) return null;
-    throw e;
-  }
-}
-function uQ(e) {
-  return e == null
-    ? `missing`
-    : `stat:${(0, _.createHash)(`sha256`).update(`${e.mtimeMs}:${e.ctimeMs}:${e.size}`).digest(`base64url`)}`;
-}
-function dQ(e, t) {
-  return e instanceof Error && `code` in e && e.code === t;
-}
-async function fQ(e, t, r) {
-  return n.Es(t.hostConfig) ? mQ(e, null, await t.platformPath()) : pQ(e, t, r);
-}
-function pQ(e, t, r) {
-  return mQ(Vn(e, n.zi(t.hostConfig)), n.Wo(Pr(r)?.rootPaths) ?? Fr(r).roots[0] ?? null);
-}
-function mQ(e, t, r = h) {
-  let i = r.normalize(r.sep === `\\` ? n.El(e) : e);
-  if (n.f(i, r) || t == null) return i;
-  let a = i.split(r.sep).filter(Boolean);
-  if (a.length === 0) return t;
-  let o = r.join(t, ...a);
-  if ((0, v.existsSync)(o)) return o;
-  let s = a.indexOf(r.basename(t));
-  return s === -1 ? o : r.join(t, ...a.slice(s + 1));
-}
 var { DictationHistoryService: W$e, appendGlobalDictationHistory: L$e } =
   createDictationHistoryRuntime({
     schema: n,
@@ -61739,143 +61701,20 @@ var { DictationHistoryService: W$e, appendGlobalDictationHistory: L$e } =
     getLogger: () => r.n(),
     createLogger: (tag) => r.r(tag),
   });
-async function K$e(e, { environmentId: t, cwd: r, signal: i }) {
-  let a = (t, r) => {
-      i?.throwIfAborted();
-      let a = e.sendAppServerExtensionRequest(t, r);
-      return i == null ? a : n.kc(a, i);
-    },
-    o = async (e) => {
-      try {
-        return n
-          .wf({ isDirectory: n.gf() })
-          .parse(await a(`fs/getMetadata`, { environmentId: t, path: e })).isDirectory;
-      } catch (e) {
-        if (
-          e instanceof Error &&
-          [`No such file or directory (os error 2)`, `Not a directory (os error 20)`].includes(
-            e.message,
-          )
-        )
-          return !1;
-        throw e;
-      }
-    };
-  if (r != null && h.posix.isAbsolute(r) && (await o(r))) return r;
-  let { cwd: s } = n
-    .wf({ cwd: n.Of().nullish() })
-    .parse(await a(`environment/info`, { environmentId: t }));
-  if (s == null) return null;
-  let l = s.startsWith(`file:`) ? (0, c.fileURLToPath)(s, { windows: !1 }) : s;
-  return h.posix.isAbsolute(l) && (await o(l)) ? l : null;
-}
 var NQ = createCommandSessionBackendClass({
-    createUtf8Decoder: () => new z.StringDecoder(`utf8`),
-    formatError: n.Zo,
-  }),
-  q$e = n.wf({ deltaBase64: n.Of(), capReached: n.gf() });
-async function J$e(e, { environmentId: t, cwd: r, cols: i, rows: a, callbacks: o, signal: s }) {
-  let c = await K$e(e, { environmentId: t, cwd: r, signal: s });
-  if (c == null) throw Error(`The terminal environment did not report a valid working directory`);
-  s?.throwIfAborted();
-  let l = (0, _.randomUUID)(),
-    u = Promise.withResolvers(),
-    d = !1,
-    f = !1,
-    p = !1,
-    m,
-    h,
-    g,
-    v = async () => (
-      (p = !0),
-      u.resolve(void 0),
-      f &&
-        !d &&
-        ((g ??= e.sendAppServerExtensionRequest(`command/exec/terminate`, { processId: l })),
-        await g),
-      {}
-    ),
-    y = e.registerInternalNotificationHandler((e) => {
-      if (e.method !== `command/exec/outputDelta` || e.params?.processId !== l) return;
-      if (((f = !0), u.resolve(void 0), p)) {
-        v().catch(() => void 0);
-        return;
-      }
-      let t = q$e.safeParse(e.params);
-      if (!t.success) {
-        ((m = `Cloud terminal received invalid output`),
-          o.onData(`\r
-[Cloud terminal received invalid output; closing this shell.]\r
-`),
-          v().catch(() => void 0));
-        return;
-      }
-      (h.handleOutputDelta({
-        chunk: Buffer.from(t.data.deltaBase64, `base64`),
-        capReached: t.data.capReached,
-      }),
-        t.data.capReached &&
-          ((m = `Cloud terminal reached the server's 1 MiB output limit`),
-          o.onData(`\r
-[Cloud terminal reached the server's 1 MiB output limit; closing this shell. Open a new terminal tab to continue.]\r
-`),
-          v().catch(() => void 0)));
-    }),
-    b = {
-      processHandle: l,
-      response: e
-        .sendAppServerExtensionRequest(
-          `command/exec`,
-          {
-            environmentId: t,
-            processId: l,
-            command: [
-              `sh`,
-              `-c`,
-              `stty cols "$1" rows "$2"; printf "\\033[0m"; shift 2; exec "$@"`,
-              `sh`,
-              String(i),
-              String(a),
-              ...bE(),
-            ],
-            cwd: c,
-            env: { TERM: `xterm-256color`, TERMINFO: null, TERMINFO_DIRS: null },
-            tty: !0,
-            streamStdin: !0,
-            streamStdoutStderr: !0,
-            disableTimeout: !0,
-            outputBytesCap: 1048576,
-          },
-          void 0,
-          { timeoutMs: null },
-        )
-        .then((e) => n.wf({ exitCode: n.Cf(), stdout: n.Of(), stderr: n.Of() }).parse(e))
-        .finally(() => {
-          ((d = !0), u.resolve(void 0), y());
-        }),
-      write: async (t) => (
-        await u.promise,
-        !d &&
-          !p &&
-          (await e.sendAppServerExtensionRequest(`command/exec/write`, {
-            processId: l,
-            deltaBase64: Buffer.from(t).toString(`base64`),
-          })),
-        {}
-      ),
-      resize: async () => ({}),
-      terminate: v,
-    };
-  return (
-    (h = new NQ(
-      Promise.resolve(b),
-      { onData: o.onData, onExit: (e) => o.onExit({ ...e, error: m ?? e.error }) },
-      { serializeWrites: !0 },
-    )),
-    o.onData(`[Temporary Cloud terminal: fixed ${i}x${a} PTY; closes at 1 MiB of output.]\r\n`),
-    { backend: h, cwd: c, shell: `sh` }
-  );
-}
+  createUtf8Decoder: () => new z.StringDecoder(`utf8`),
+  formatError: n.Zo,
+});
+var { createCloudCommandSession } =
+  createCloudCommandSessionRuntime({
+    schema: n,
+    posixPath: h.posix,
+    fileUrlToPath: c.fileURLToPath,
+    randomUUID: _.randomUUID,
+    raceWithAbort: n.kc,
+    getShellCommand: bE,
+    CommandSessionBackend: NQ,
+  });
 var Y$e = class extends n.Uf {
     lifecycleManager;
     origin;
@@ -76081,7 +75920,7 @@ var G5 = r.r(`WindowContext`),
     IXe,
     Iet,
     J,
-    J$e,
+    createCloudCommandSession,
     Jje,
     Jnt,
     K5,

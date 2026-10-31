@@ -16,14 +16,14 @@ export function createWorkspaceFileServiceClass(
     isFileTooLarge: K,
     maxFileBytes: Ae,
     showItemInFolder: Ij,
-    resolveWorkspacePath: fQ,
-    resolveLocalWorkspacePath: pQ,
-    atomicDownloadWrite: sQ,
-    classifyBuffer: cQ,
-    normalizeBase64: m$e,
-    decodeBase64: h$e,
-    statIfExists: lQ,
-    createEtag: uQ,
+    resolveWorkspacePath,
+    resolveLocalWorkspacePath,
+    atomicDownloadWrite,
+    classifyBuffer,
+    normalizeBase64,
+    decodeBase64,
+    statIfExists,
+    createEtag,
     thumbnailMaxBytes: u$e,
     thumbnailMaxDimension: d$e,
     thumbnailConcurrency: f$e,
@@ -43,7 +43,7 @@ export function createWorkspaceFileServiceClass(
     }
     async createDirectory({ hostId: e, path: t }) {
       let r = this.executionHostRegistry.get(e);
-      await n.Di.mkdir(await fQ(t, r, this.globalState), { recursive: !0 }, r);
+      await n.Di.mkdir(await resolveWorkspacePath(t, r, this.globalState), { recursive: !0 }, r);
     }
     dispose() {
       this.isDisposed = !0;
@@ -75,7 +75,7 @@ export function createWorkspaceFileServiceClass(
       let i = this.executionHostRegistry.get(t);
       if (n.Es(i.hostConfig))
         throw Error(`Downloading a copy is only supported for local files`);
-      let a = await fQ(r, i, this.globalState),
+      let a = await resolveWorkspacePath(r, i, this.globalState),
         o = l.app.getPath(`downloads`),
         s = h.parse(e == null ? a : je(e));
       for (let e = 0; ; e += 1) {
@@ -104,7 +104,7 @@ export function createWorkspaceFileServiceClass(
     }
     async getMetadata({ hostId: e, path: t }) {
       let r = this.executionHostRegistry.get(e),
-        i = await fQ(t, r, this.globalState),
+        i = await resolveWorkspacePath(t, r, this.globalState),
         a = await n.Di.stat(i, r, { bypassCache: !0 });
       return a.isDirectory()
         ? { kind: `directory` }
@@ -141,8 +141,8 @@ export function createWorkspaceFileServiceClass(
           if (c && (await a.platformFamily()) !== `unix`)
             return { dataUrl: null, reason: `unsupported` };
           let u = c
-              ? await fQ(r, a, this.globalState)
-              : pQ(r, a, this.globalState),
+              ? await resolveWorkspacePath(r, a, this.globalState)
+              : resolveLocalWorkspacePath(r, a, this.globalState),
             d = h.extname(u).toLowerCase(),
             f = await n.Di.stat(u, a, { bypassCache: !0, followSymlinks: !1 });
           if (!f.isFile() || f.isSymbolicLink() || (!c && f.size == null))
@@ -241,7 +241,7 @@ export function createWorkspaceFileServiceClass(
     }
     async read({ hostId: e, maxBytes: t, path: r, representation: i }) {
       let a = this.executionHostRegistry.get(e),
-        o = await fQ(r, a, this.globalState);
+        o = await resolveWorkspacePath(r, a, this.globalState);
       if (t != null) {
         let e = await n.Di.stat(o, a, { bypassCache: !0 });
         if (e.size != null && e.size > t)
@@ -249,10 +249,10 @@ export function createWorkspaceFileServiceClass(
         let r = await n.Di.readFileSampleBytes(o, a, t + 1);
         if (r.byteLength > t)
           throw Error(`Workspace file exceeds the requested size limit`);
-        let s = uQ(e);
+        let s = createEtag(e);
         switch (i) {
           case `auto`:
-            return { ...(await cQ(r)), etag: s };
+            return { ...(await classifyBuffer(r)), etag: s };
           case `blob`:
             return { blob: r.toString(`base64`), etag: s };
           case `text`:
@@ -264,19 +264,19 @@ export function createWorkspaceFileServiceClass(
           n.Di.readFile(o, a),
           n.Di.stat(o, a, { bypassCache: !0 }),
         ]);
-        return { etag: uQ(t), text: e };
+        return { etag: createEtag(t), text: e };
       }
       let [s, c] = await Promise.all([
           n.Di.readFileBase64(o, a),
           n.Di.stat(o, a, { bypassCache: !0 }),
         ]),
-        l = h$e(s),
-        u = uQ(c);
+        l = decodeBase64(s),
+        u = createEtag(c);
       switch (i) {
         case `auto`:
-          return { ...(await cQ(l)), etag: u };
+          return { ...(await classifyBuffer(l)), etag: u };
         case `blob`:
-          return { blob: m$e(s), etag: u };
+          return { blob: normalizeBase64(s), etag: u };
       }
     }
     async releaseTemporaryFile({ path: e }) {
@@ -292,27 +292,27 @@ export function createWorkspaceFileServiceClass(
       if (`bytes` in e) {
         if (K(e.bytes.byteLength))
           throw Error(`File is too large to save directly`);
-        await sQ(t.filePath, () => e.bytes);
+        await atomicDownloadWrite(t.filePath, () => e.bytes);
       } else {
         let r = this.executionHostRegistry.get(e.hostId),
-          i = await fQ(e.path, r, this.globalState);
+          i = await resolveWorkspacePath(e.path, r, this.globalState);
         if (!n.Es(r.hostConfig) && h.resolve(i) === h.resolve(t.filePath))
           return { path: t.filePath };
-        await sQ(t.filePath, async () => C.Readable.from(await r.readFile(i)));
+        await atomicDownloadWrite(t.filePath, async () => C.Readable.from(await r.readFile(i)));
       }
       return (Ij(t.filePath), { path: t.filePath });
     }
     async write({ bytes: e, hostId: t, ifMatch: r, path: i }) {
       if (K(e.byteLength)) return { maxBytes: Ae, outcome: `too-large` };
       let a = this.executionHostRegistry.get(t),
-        o = await fQ(i, a, this.globalState);
+        o = await resolveWorkspacePath(i, a, this.globalState);
       if (r != null) {
-        let e = uQ(await lQ(o, a));
+        let e = createEtag(await statIfExists(o, a));
         if (r !== e) return { etag: e, outcome: `conflict` };
       }
       return (
         await n.Di.writeFileBuffer(o, Buffer.from(e), a),
-        { etag: uQ(await lQ(o, a)), outcome: `saved` }
+        { etag: createEtag(await statIfExists(o, a)), outcome: `saved` }
       );
     }
   };

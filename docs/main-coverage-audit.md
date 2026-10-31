@@ -2830,3 +2830,14 @@ keep-count 裁剪，连同去重 thread metadata 读取、worktree path mtime �
 `Iee/Lee/Ree/qZ/JZ/HQe/UQe/WQe/GQe/KQe/YZ/qQe` helpers 与 cleanup logger/constants 已物理删除。
 focused test `scripts/test-main-worktree-cleanup-runtime.mjs` 覆盖 44 项 planner、cutoff/boundary、I/O failure、dedupe、
 settings、state initialization/expiry、path containment 与 wiring；worktree service 34 项和 handler 48 项回归通过。
+
+### 增量抽取：workspace file support 与 cloud terminal lifecycle
+
+`src/main/main-app/workspace/file-runtime-support.ts` 已接管 atomic temp-write/rename/mode restore/final cleanup、4 KiB
+content classification、base64 projection、remote stat/ENOENT、SHA-256 ETag，以及 local/remote/WSL/project-root path fallback；
+`WorkspaceFileService` 和 desktop file services 直接消费同一 factory outputs。`src/main/main-app/terminal/cloud-command-session.ts`
+已接管 cloud environment cwd metadata/file-URL validation、AbortSignal request、command exec payload、首个 output/exit 前 write gate、
+output notification validation、1 MiB cap、single terminate、unregister 和 error override；WindowContext 真实消费
+`createCloudCommandSession`，并复用唯一 `CommandSessionBackend`。旧 `sQ/cQ/m$e/h$e/lQ/uQ/dQ/fQ/pQ/mQ` 与
+`K$e/J$e/q$e` 共约 210 行已物理删除。focused coverage 分别 37/40 项，邻接 workspace service 26、command backend 19、
+WindowContext 16 项回归通过。

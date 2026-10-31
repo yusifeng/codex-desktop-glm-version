@@ -4815,3 +4815,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - main 跨两个区域的旧 planner/adapters 共 143 行已物理删除，新生产模块 307 行；focused coverage 44 项，邻接
   worktree service/handler 回归 34/48 项，no-unwired gate 扩至 289 项。下一批继续审计其后的 workspace file/terminal
   RPC cluster，优先迁移完整 I/O lifecycle，避免只移动常量或 schema。
+
+# 2026-11-01 workspace file support and cloud terminal lifecycle
+
+- `workspace/file-runtime-support.ts` 已接管 atomic save、mode/cleanup、classification/base64/ETag、remote stat 与
+  local/remote/WSL/project-root path mapping；`workspace/files.ts` 和 desktop file services 使用语义 outputs。
+- `terminal/cloud-command-session.ts` 已接管 cloud cwd validation、abort、exec/output/write/terminate/cap/unregister lifecycle；
+  WindowContext 直接消费 `createCloudCommandSession` 并复用唯一 command backend。main 旧两组实现 210 行已删除，
+  新生产模块合计 385 行；focused coverage 37/40 项，邻接回归 26/19/16 项，no-unwired gate 扩至 305 项。
+  下一批审计紧随其后的 hotkey/local-environment RPC owners 与 vendor stream belt，前者只在能成组迁移时处理，后者保留。

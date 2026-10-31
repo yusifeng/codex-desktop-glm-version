@@ -41,6 +41,8 @@ const realOwners = [
   ["src/main/main-app/startup/workspace-policy-runtime.ts", "createWorkspacePolicyRuntime"],
   ["src/main/main-app/diagnostics/content-tracing-runtime.ts", "createContentTracingRuntime"],
   ["src/main/main-app/workspace/worktree-cleanup-runtime.ts", "createWorktreeCleanupRuntime"],
+  ["src/main/main-app/workspace/file-runtime-support.ts", "createWorkspaceFileRuntimeSupport"],
+  ["src/main/main-app/terminal/cloud-command-session.ts", "createCloudCommandSessionRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -279,6 +281,18 @@ assert.equal(main.includes("function HQe("), false, "generated pinned-root prote
 assert.equal(main.includes("async function WQe("), false, "generated worktree settings reader must be removed");
 assert.equal(main.includes("function GQe("), false, "generated migration protection owner must be removed");
 assert.equal(main.includes("function YZ("), false, "generated workspace-root protection must be removed");
+assert.equal(main.includes("createWorkspaceFileRuntimeSupport({"), true, "real workspace-file support is wired");
+assert.equal(main.includes("async function sQ("), false, "generated atomic workspace writer must be removed");
+assert.equal(main.includes("async function cQ("), false, "generated workspace buffer classifier must be removed");
+assert.equal(main.includes("async function lQ("), false, "generated workspace stat adapter must be removed");
+assert.equal(main.includes("function pQ("), false, "generated local workspace path resolver must be removed");
+assert.equal(main.includes("function mQ("), false, "generated workspace path normalizer must be removed");
+assert.equal(main.includes("createCloudCommandSessionRuntime({"), true, "real cloud-command session is wired");
+assert.equal(main.includes("async function K$e("), false, "generated cloud cwd resolver must be removed");
+assert.equal(main.includes("async function J$e("), false, "generated cloud terminal owner must be removed");
+assert.equal(main.includes("q$e = n.wf"), false, "generated cloud output schema owner must be removed");
+assert.equal(main.includes("createCloudCommandSession,"), true, "cloud command consumer must use semantic output");
+assert.equal(main.includes("    J$e,"), false, "generated cloud command alias must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("289 main unwired-owner skeleton assertions passed");
+console.log("305 main unwired-owner skeleton assertions passed");
