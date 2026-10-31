@@ -2,7 +2,8 @@
 
 /** Owns Browser sidebar window and thread-state lookup/materialization. */
 export function createBrowserWindowThreadStateControllerClass(dependencies: Record<string, any>) {
-  const { hX, fq, gXe, oX, SWe, AX, vXe, yXe, bXe, xXe, SXe, aXe, gX, qU, oXe, vX, tq, KU, l } = dependencies;
+  const { hX, fq, gXe, oX, SWe, aXe, gX, qU, oXe, vX, tq, KU, l } = dependencies;
+  const logger = dependencies.logger ?? (() => ({ warning() {} }));
 
   return class BrowserWindowThreadStateController {
     host: any;
@@ -180,13 +181,80 @@ export function createBrowserWindowThreadStateControllerClass(dependencies: Reco
       return hX(windowState, conversationId, browserTabId);
     }
 
-    getDetachedWindowStates(windowId: any) { return AX(this.host.windows.values(), windowId); }
-    getPageWindowState(route: any, browserTabId: any) { return vXe(route, browserTabId, this.host.windows.values(), this.host.getLiveWindowState.bind(this.host)); }
-    getLiveWindowState(windowId: any) { return yXe({ ensureWindowState: this.host.ensureWindowState.bind(this.host), windowId, windows: this.host.windows }); }
-    getFocusedOwnerWebContents() { return bXe({ getLiveWindowState: this.host.getLiveWindowState.bind(this.host), lastSyncedWindowId: this.host.lastSyncedWindowId, windows: this.host.windows.values() }); }
-    getFocusedWindowState() { return xXe({ getLiveWindowState: this.host.getLiveWindowState.bind(this.host), windows: this.host.windows }); }
+    getDetachedWindowStates(windowId: any) {
+      return [...this.host.windows.values()].filter((windowState: any) =>
+        windowState.tabSourceWindow?.window.id === windowId &&
+        !windowState.window.isDestroyed() &&
+        !windowState.owner.isDestroyed(),
+      );
+    }
+
+    getPageWindowState(route: any, browserTabId: any) {
+      return (browserTabId == null
+        ? undefined
+        : this.getDetachedWindowStates(route.windowId).find(
+            (windowState: any) => hX(windowState, route.conversationId, browserTabId) != null,
+          )) ?? this.host.getLiveWindowState(route.windowId);
+    }
+
+    getLiveWindowState(windowId: any) {
+      let windowState = this.host.windows.get(windowId) ?? null;
+      if (windowState == null) {
+        const window = l.BrowserWindow.fromId(windowId);
+        if (window != null && !window.isDestroyed() && !window.webContents.isDestroyed()) {
+          windowState = this.host.ensureWindowState(window, window.webContents);
+        }
+      }
+      if (windowState == null || windowState.window.isDestroyed() || windowState.owner.isDestroyed()) {
+        logger().warning(`IAB_LIFECYCLE route window is not live`, {
+          safe: {
+            hasWindowState: windowState != null,
+            ownerDestroyed: windowState?.owner.isDestroyed() ?? null,
+            windowDestroyed: windowState?.window.isDestroyed() ?? null,
+            windowId,
+          },
+          sensitive: {},
+        });
+        return null;
+      }
+      return windowState;
+    }
+
+    getFocusedOwnerWebContents() {
+      const focusedWindow = l.BrowserWindow.getFocusedWindow();
+      if (focusedWindow != null && !focusedWindow.isDestroyed()) return focusedWindow.webContents;
+      const liveWindows = l.BrowserWindow.getAllWindows().filter((window: any) => !window.isDestroyed());
+      if (liveWindows.length === 1) return liveWindows[0]?.webContents ?? null;
+      if (this.host.lastSyncedWindowId != null) {
+        const lastSynced = this.host.getLiveWindowState(this.host.lastSyncedWindowId);
+        if (lastSynced != null) return lastSynced.owner;
+      }
+      for (const windowState of this.host.windows.values()) {
+        const live = this.host.getLiveWindowState(windowState.window.id);
+        if (live != null) return live.owner;
+      }
+      return null;
+    }
+
+    getFocusedWindowState() {
+      const focusedWindow = l.BrowserWindow.getFocusedWindow();
+      return focusedWindow == null || focusedWindow.isDestroyed() || !this.host.windows.has(focusedWindow.id)
+        ? null
+        : this.host.getLiveWindowState(focusedWindow.id);
+    }
+
     getPreferredWindowStateForConversation(conversationId: any) {
-      const state = SXe({ conversationId, getFocusedWindowState: this.host.getFocusedWindowState.bind(this.host), hasThreadForConversation: aXe, lastSyncedWindowId: this.host.lastSyncedWindowId, windows: this.host.windows });
+      let state = this.host.getFocusedWindowState();
+      if (state == null || state.owner.isDestroyed() || !aXe(state, conversationId)) state = null;
+      if (state == null && this.host.lastSyncedWindowId != null) {
+        const lastSynced = this.host.windows.get(this.host.lastSyncedWindowId) ?? null;
+        if (lastSynced != null && !lastSynced.owner.isDestroyed() && aXe(lastSynced, conversationId)) state = lastSynced;
+      }
+      if (state == null) {
+        for (const candidate of this.host.windows.values()) {
+          if (!candidate.owner.isDestroyed() && aXe(candidate, conversationId)) { state = candidate; break; }
+        }
+      }
       return state?.tabSourceWindow ?? state;
     }
     resolveBrowserUseOpenRequests(windowState: any) { this.host.browserUseOpenRequests.resolveForWindow(windowState, (request: any) => gX(windowState, request.conversationId, request.browserTabId)); }

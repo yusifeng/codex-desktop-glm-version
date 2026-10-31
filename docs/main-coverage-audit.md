@@ -3096,3 +3096,11 @@ adopted/webview route 与 registered partition 重写、managed Browser Use sess
 page identity、ignored/transfer keys、debug event 和最终 thread/runtime sync。主组合根直接将语义 transaction 作为 `gXe` 注入
 window/thread controller；旧 `gXe/kX` 已物理删除。focused test 扩至 75 项，覆盖正常 transfer 的副作用顺序和所有 route 容器；
 no-unwired gate 扩至 483 项。
+
+### 增量接线：browser window selection controller
+
+`browser-window-thread-state-controller.ts` 已直接接管 detached-window 过滤、route/tab 精确窗口选择、惰性 live-window 恢复、focused
+owner/window 求解，以及 focused/last-synced/fallback conversation window 优先级。主组合根不再注入机械 helper；旧
+`_Xe/AX/vXe/yXe/bXe/xXe/SXe` 已删除，跨 owner 的 debug-route opener `jX` 保持在相邻 host-policy 边界等待整组迁移。
+focused test 从 6 项扩至 19 项，覆盖 detached/source 解析、focused owner、last-synced fallback 和旧 owner 删除；no-unwired gate
+扩至 489 项。

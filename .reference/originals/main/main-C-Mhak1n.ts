@@ -43773,15 +43773,6 @@ var {
   registerThreadAndRecordOpened: fX,
   runtimeIntlConfig: n.xu,
 });
-var _Xe = r.i(`browser-sidebar-manager`);
-function AX(e, t) {
-  return [...e].filter(
-    (e) => e.tabSourceWindow?.window.id === t && !e.window.isDestroyed() && !e.owner.isDestroyed(),
-  );
-}
-function vXe({ windowId: e, conversationId: t }, n, r, i) {
-  return (n == null ? void 0 : AX(r, e).find((e) => hX(e, t, n) != null)) ?? i(e);
-}
 function jX({ stealFocus: e = !1, threadState: t, windowManager: n, windowState: r }) {
   return t.ownerRoutePath == null || r.owner.isDestroyed() || r.window.isDestroyed()
     ? !1
@@ -43794,60 +43785,6 @@ function jX({ stealFocus: e = !1, threadState: t, windowManager: n, windowState:
         n.sendMessageToWebContents(r.owner, { type: `navigate-to-route`, path: t.ownerRoutePath }),
         n.showWindow(r.window, { stealFocus: e }))
       : n.showWindow(r.window, { stealFocus: e });
-}
-function yXe({ ensureWindowState: e, windowId: t, windows: n }) {
-  let r = n.get(t) ?? null;
-  if (r == null) {
-    let n = l.BrowserWindow.fromId(t);
-    n != null && !n.isDestroyed() && !n.webContents.isDestroyed() && (r = e(n, n.webContents));
-  }
-  return r == null || r.window.isDestroyed() || r.owner.isDestroyed()
-    ? (_Xe().warning(`IAB_LIFECYCLE route window is not live`, {
-        safe: {
-          hasWindowState: r != null,
-          ownerDestroyed: r?.owner.isDestroyed() ?? null,
-          windowDestroyed: r?.window.isDestroyed() ?? null,
-          windowId: t,
-        },
-        sensitive: {},
-      }),
-      null)
-    : r;
-}
-function bXe({ getLiveWindowState: e, lastSyncedWindowId: t, windows: n }) {
-  let r = l.BrowserWindow.getFocusedWindow();
-  if (r != null && !r.isDestroyed()) return r.webContents;
-  let i = l.BrowserWindow.getAllWindows().filter((e) => !e.isDestroyed());
-  if (i.length === 1) return i[0]?.webContents ?? null;
-  if (t != null) {
-    let n = e(t);
-    if (n != null) return n.owner;
-  }
-  for (let t of n) {
-    let n = e(t.window.id);
-    if (n != null) return n.owner;
-  }
-  return null;
-}
-function xXe({ getLiveWindowState: e, windows: t }) {
-  let n = l.BrowserWindow.getFocusedWindow();
-  return n == null || n.isDestroyed() || !t.has(n.id) ? null : e(n.id);
-}
-function SXe({
-  conversationId: e,
-  getFocusedWindowState: t,
-  hasThreadForConversation: n,
-  lastSyncedWindowId: r,
-  windows: i,
-}) {
-  let a = t();
-  if (a != null && !a.owner.isDestroyed() && n(a, e)) return a;
-  if (r != null) {
-    let t = i.get(r) ?? null;
-    if (t != null && !t.owner.isDestroyed() && n(t, e)) return t;
-  }
-  for (let t of i.values()) if (!t.owner.isDestroyed() && n(t, e)) return t;
-  return null;
 }
 var CXe = r.i(`browser-sidebar-manager`),
   MX = 524288,
@@ -45694,7 +45631,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
 (this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, mZe, mZ, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, Xe, L, fq, XX, EHe, wHe, JU, MU, sW, re, ie, fZ, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, pZe, pZ, Se, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ }))(this)),
         (this.hostPolicyController = new (createBrowserHostPolicyControllerClass({ DXe, OXe, kXe, mq, VG, Yc, Xc, DZ, hX }))(this)),
         (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
-        (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, SWe, AX, vXe, yXe, bXe, xXe, SXe, aXe, gX, qU, oXe, vX, tq, KU, l }))(this)),
+        (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, SWe, aXe, gX, qU, oXe, vX, tq, KU, l, logger: r.i(`browser-sidebar-manager`) }))(this)),
         (this.getSiteBootstrapToken = s.getSiteBootstrapToken),
         (this.getCommandKeymapState = s.getCommandKeymapState ?? n.Ct),
         (this.ownerCommandAccelerators = mq(this.getCommandKeymapState())),

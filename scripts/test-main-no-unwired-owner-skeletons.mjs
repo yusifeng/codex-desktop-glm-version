@@ -145,6 +145,9 @@ for (const oldOwner of ["function mX(", "function hX(", "function gX(", "functio
 for (const oldOwner of ["function gXe(", "function kX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated conversation transfer owner must be removed`);
 }
+for (const oldOwner of ["function AX(", "function vXe(", "function yXe(", "function bXe(", "function xXe(", "function SXe("]) {
+  assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser window lookup owner must be removed`);
+}
 for (const oldOwner of ["function cXe(", "function bX(", "async function lXe(", "function uXe(", "function xX(", "function SX(", "function dXe(", "function fXe(", "function CX(", "function wX(", "function TX(", "function EX(", "function pXe(", "function DX(", "function mXe(", "function hXe(", "function OX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated Browser Use route adapter must be removed`);
 }
@@ -435,4 +438,4 @@ assert.equal(main.includes("function _Oe("), false, "generated remote project co
 assert.equal(main.includes("function vOe("), false, "generated project order comparator must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("483 main unwired-owner skeleton assertions passed");
+console.log("489 main unwired-owner skeleton assertions passed");

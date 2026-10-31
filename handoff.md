@@ -5047,3 +5047,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   download/comments、page identity、transfer keys、debug event 与 sync 的完整 conversation-transfer 事务；旧 main `gXe/kX` 已删除。
 - focused coverage 75 项，no-unwired gate 扩至 483 项。下一批继续把仅由 window/thread controller 消费的
   `AX/vXe/yXe/bXe/xXe/SXe` window selection helpers 内聚，`jX` 暂留给 host-policy debug-owner 边界一起处理。
+
+# 2026-11-01 browser window selection controller convergence
+
+- `browser-window-thread-state-controller.ts` 现直接拥有 detached/live/focused/preferred window selection；主组合根旧
+  `_Xe/AX/vXe/yXe/bXe/xXe/SXe` 已删除，controller 不再接收这些机械 helper。
+- focused coverage 19 项，no-unwired gate 扩至 489 项。`jX` 仍只服务 host-policy 的 exact owner debug open，下一批与
+  diagnostics snapshot/feedback/open-owner helper belt 一起迁移，不把它错误塞进 window-state owner。
