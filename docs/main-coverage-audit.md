@@ -4,7 +4,8 @@
 
 `src/main/main-app/computer-use/approvals.ts` 与旧 `nje` 都有 17 members，但原语义类错误地以 `setCuaAppshotSoundEnabled`
 替代了真实 `openChromeExtensionInstallPage`。本轮修正方法面，公开复用 `plugins/browser-runtime-resolution.ts` 的语义
-`openChromeExtensionSettings`，接回 `WindowContext` consumer 并删除旧 class；focused suite 覆盖方法面与关键 forwarding。
+`openChromeExtensionSettings`，接回 `WindowContext` consumer；同时把 `electron-fetch-handler` 的 `tje` 注入接到语义
+`setCuaAppshotSoundEnabled` 导出，删除旧 `bM…tje` 453 行重复 I/O 簇。focused suite 覆盖方法面、关键 forwarding 与双 consumer wiring。
 
 ## 2026-10-31 avatar pet install owner wiring
 

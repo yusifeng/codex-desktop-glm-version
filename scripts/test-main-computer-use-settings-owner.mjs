@@ -38,9 +38,13 @@ equal(await service.openChromeExtensionInstallPage(), "openChromeExtensionSettin
 equal(calls.at(-1), ["openChromeExtensionSettings", {}]);
 
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
-equal(main.includes('const { ComputerUseSettingsService } = require("./main-app/computer-use/approvals.js");'), true);
+equal(main.includes('const { ComputerUseSettingsService, setCuaAppshotSoundEnabled: tje } = require("./main-app/computer-use/approvals.js");'), true);
 equal(main.includes("var nje = ComputerUseSettingsService,"), true);
 equal(main.includes("nje = class"), false);
+equal(main.includes("var bM ="), false);
+equal(main.includes("async function tje("), false);
 const windowContext = fs.readFileSync(new URL("../src/main/main-app/window/window-context.ts", import.meta.url), "utf8");
 equal(windowContext.includes("this.computerUseSettings = new nje(e.requestComputerUseWorker)"), true);
+const fetchHandler = fs.readFileSync(new URL("../src/main/main-app/fetch-handler/electron-fetch-handler.ts", import.meta.url), "utf8");
+equal(fetchHandler.includes("tje(t === !0).catch((t) => {"), true);
 console.log(`${assertions} main Computer Use settings owner assertions passed`);
