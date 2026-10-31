@@ -2,7 +2,7 @@
 
 /** Owns Browser sidebar thread snapshots and runtime-page state projection. */
 export function createBrowserRuntimeSyncControllerClass(dependencies: Record<string, any>) {
-  const { hX, fq, kZe, tq, KU, EZ, lifecycleHelpersClass } = dependencies;
+  const { hX, fq, tq, KU, EZ, lifecycleHelpersClass } = dependencies;
 
   return class BrowserRuntimeSyncController {
     host: any;
@@ -56,11 +56,16 @@ export function createBrowserRuntimeSyncControllerClass(dependencies: Record<str
         isRestrictedBrowserNavigation: bind(`isRestrictedBrowserNavigation`),
         loadBrowserErrorPage: bind(`loadBrowserErrorPage`),
         navigatePageToUrl: bind(`navigatePageToUrl`),
-        notifyBrowserNavigationUsage: kZe(
-          host.windowManager,
-          bind(`getPreferredWindowStateForConversation`),
-          bind(`getPageWindowState`),
-        ),
+        notifyBrowserNavigationUsage: (conversationId: string, browserTabId: string, source: unknown, initiator: unknown, urlKind: unknown) => {
+          const preferred = bind(`getPreferredWindowStateForConversation`)(conversationId);
+          const pageWindow = preferred == null ? null : bind(`getPageWindowState`)({
+            windowId: dependencies.oX(preferred.window.id), conversationId,
+          }, browserTabId);
+          if (pageWindow == null || pageWindow.owner.isDestroyed()) return;
+          host.windowManager.sendMessageToWebContents(pageWindow.owner, {
+            type: `browser-sidebar-usage`, conversationId, browserTabId, kind: `navigated`, source, initiator, urlKind,
+          });
+        },
         onBrowserStateChanged: () => {
           host.onBrowserStateChanged();
           host.iabTabMentions.notifyInvalidated();

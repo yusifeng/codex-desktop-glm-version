@@ -5151,3 +5151,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 新增并接回 `browser-sidebar/browser-session-notification-bridge.ts`，承接 MCP completion、thread archive、thread idle 三类 app-server
   notification 到 Browser session registry 的路由；旧 `wZe/TZe/EZe/DZe/CZe` 已删除。
 - focused test 覆盖有效、畸形、无关通知和缺失 source。下一批审计 `OZe/kZe` active new-tab matching 与 navigation usage emitter。
+
+# 2026-11-01 active new-tab and navigation usage policy convergence
+
+- page-command controller 内聚 hidden blank new-tab 的 attached-host/active/presentation 校验；runtime-sync controller 内聚 navigation
+  usage 的 preferred/page-window message 路由。主 chunk 旧 `OZe/kZe` 已删除。
+- focused coverage 增加 allowHiddenBlankTab 完整 true contract。下一批审计 site-annotation/WebMCP event validation belt
+  `vZ/AZe/yZ/bZ/jZe/MZe/NZe/PZe/FZe/IZe`，优先与现有 annotation controller 合并。

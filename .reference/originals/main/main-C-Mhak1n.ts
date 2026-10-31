@@ -43870,40 +43870,6 @@ var {
   securityStateForPage: dZe,
   syncBackgroundThrottling: dZ,
 } = createBrowserPagePresentationPolicy({ isFirstPartyUrl: Ve, pageUrl: QU });
-function OZe(e, t, r) {
-  if (t == null) return !1;
-  let { page: i, threadState: a, windowState: o } = t,
-    s = i.view.webContents;
-  return (
-    s != null &&
-    !s.isDestroyed() &&
-    r?.route.conversationId === a.conversationId &&
-    r.route.browserTabId === a.browserTabId &&
-    r.hostGeneration === a.hostGeneration &&
-    r.rendererInstanceId === o.rendererInstanceId &&
-    e?.activeConversationId === a.conversationId &&
-    e.activeBrowserTabId === a.browserTabId &&
-    a.presented &&
-    a.visible &&
-    a.snapshot.tabType === n.lu.NEW_TAB_PAGE &&
-    a.snapshot.url === ``
-  );
-}
-function kZe(e, t, n, r, i, a, o, s) {
-  let c = t(r),
-    l = c == null ? null : n({ windowId: oX(c.window.id), conversationId: r }, i);
-  l == null ||
-    l.owner.isDestroyed() ||
-    e.sendMessageToWebContents(l.owner, {
-      type: `browser-sidebar-usage`,
-      conversationId: r,
-      browserTabId: i,
-      kind: `navigated`,
-      source: a,
-      initiator: o,
-      urlKind: s,
-    });
-}
 var vZ = { type: `site_annotation_features_changed`, version: 1 },
   AZe = n.wf({
     type: n.bf(vZ.type),
@@ -44410,12 +44376,12 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
         (this.commentModeBlocklistLookup = i),
         (this.browserSessionRegistry = a),
         (this.defaultBrowserUseViewportSize = o),
-        (this.pageCommandController = new (createBrowserPageCommandControllerClass({ a, l, n, crypto, hX, mU, pU, hU, QU, RZe, ZZe, zZe, sq, cq, lq, uq, fq, sW, HZe, OZe, XZe, GXe, iK, pX, DU, oX, PHe, GU, rW, WX, GX }))(this)),
+        (this.pageCommandController = new (createBrowserPageCommandControllerClass({ a, l, n, crypto, hX, mU, pU, hU, QU, RZe, ZZe, zZe, sq, cq, lq, uq, fq, sW, HZe, XZe, GXe, iK, pX, DU, oX, PHe, GU, rW, WX, GX }))(this)),
         (this.browserUseRouteController = new (createBrowserUseRouteControllerClass({ hX, n, qU, oX, QU, iW, wU, aW, mX, lW, OX, dZ, WU, fq, gX, logger: r.i(`browser-sidebar-manager`) }))(this)),
         (this.commentModeController = new (createBrowserCommentModeControllerClass({ EU, cW, yVe, tq, n }))(this)),
         (this.annotationInteractionController = new (createBrowserAnnotationInteractionControllerClass({ hX, EU, IZe, LZe, n, SU, mVe, gVe }))(this)),
         (this.pageMaterializationController = new (createBrowserPageMaterializationControllerClass({ eW, KX, oX, n }))(this)),
-        (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ hX, fq, kZe, tq, KU, EZ, lifecycleHelpersClass: createBrowserPageLifecycleHelpersControllerClass, WU, dZ, QU, Ze, n, pX, dZe, oX, dq, isEqual: G.default }))(this)),
+        (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ hX, fq, tq, KU, EZ, lifecycleHelpersClass: createBrowserPageLifecycleHelpersControllerClass, WU, dZ, QU, Ze, n, pX, dZe, oX, dq, isEqual: G.default }))(this)),
         (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW, fq, matchesLoadError: FU, normalizeUrl: Ze, resetCaptureState: (page) => { page.isCapturingUserMedia = !1; page.isCapturingCamera = void 0; page.isCapturingMicrophone = void 0; }, clearSiteTools: XX, serializePageState: eW, shouldIgnoreLoadError: NU, shouldRetryLoadError: PU, logger: r.i, setTimer: setTimeout, retryDelayMs: 50, maxAttempts: 100 }))(this)),
         (this.pageLookupController = new (createBrowserPageLookupControllerClass({}))(this)),
 (this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, Xe, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, Se, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ, WXe, RX }))(this)),

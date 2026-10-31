@@ -2,7 +2,7 @@
 
 /** Owns browser page command routing and host/page lifecycle orchestration. */
 export function createBrowserPageCommandControllerClass(dependencies: Record<string, any>) {
-  const { a, l, n, crypto, hX, mU, pU, hU, QU, RZe, ZZe, zZe, sq, cq, lq, uq, fq, sW, HZe, OZe, XZe, GXe, iK, pX, DU, oX, PHe, GU, rW, WX, GX } = dependencies;
+  const { a, l, n, crypto, hX, mU, pU, hU, QU, RZe, ZZe, zZe, sq, cq, lq, uq, fq, sW, HZe, XZe, GXe, iK, pX, DU, oX, PHe, GU, rW, WX, GX } = dependencies;
   return class BrowserPageCommandController {
     constructor(host: any) { this.host = host; }
     host: any;
@@ -315,11 +315,19 @@ export function createBrowserPageCommandControllerClass(dependencies: Record<str
         i = r?.page.view.webContents;
       return {
         webContents: i,
-        allowHiddenBlankTab: OZe(
-          this.host.getCurrentWindowState(e),
-          r,
-          i == null ? void 0 : this.host.browserPageHostLifecycle.attachedWebviewHosts.get(i),
-        ),
+        allowHiddenBlankTab: (() => {
+          if (r == null || i == null || i.isDestroyed()) return false;
+          const activeWindow = this.host.getCurrentWindowState(e);
+          const attachedHost = this.host.browserPageHostLifecycle.attachedWebviewHosts.get(i);
+          return attachedHost?.route.conversationId === r.threadState.conversationId &&
+            attachedHost.route.browserTabId === r.threadState.browserTabId &&
+            attachedHost.hostGeneration === r.threadState.hostGeneration &&
+            attachedHost.rendererInstanceId === r.windowState.rendererInstanceId &&
+            activeWindow?.activeConversationId === r.threadState.conversationId &&
+            activeWindow.activeBrowserTabId === r.threadState.browserTabId &&
+            r.threadState.presented && r.threadState.visible &&
+            r.threadState.snapshot.tabType === dependencies.n.lu.NEW_TAB_PAGE && r.threadState.snapshot.url === ``;
+        })(),
       };
     }
     async captureTabThumbnail(e, t, n) {

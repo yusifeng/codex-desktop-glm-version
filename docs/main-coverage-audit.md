@@ -3197,3 +3197,9 @@ annotation/message/logger policies；旧 `gZe/hZe` 已删除。focused test 覆�
 新增 `browser-sidebar/browser-session-notification-bridge.ts`，将 app-server 的 completed MCP tool call、archived thread 和 idle thread
 通知分别路由到 parent-call completion、conversation disposal 与 session-activity end。唯一安装点直接使用语义 bridge；旧
 `wZe/TZe/EZe/DZe/CZe` 已删除，focused test 覆盖合法/畸形/无关通知与无 source 情况。
+
+### 增量内聚：active new-tab 与 navigation usage policies
+
+`browser-page-command-controller.ts` 已直接拥有 extension action 对 hidden blank new-tab 的 route/host/renderer/active/presentation 校验；
+`browser-runtime-sync-controller.ts` 已直接拥有 preferred window→page window 的 navigation usage message 路由。旧 `OZe/kZe` 已删除，
+focused test 新增完整 allowHiddenBlankTab true contract。

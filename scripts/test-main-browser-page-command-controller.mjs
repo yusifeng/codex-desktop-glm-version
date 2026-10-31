@@ -40,7 +40,7 @@ const host = {
 const deps = {
   a: { bn: (value) => value },
   l: { clipboard: { writeText: (value) => calls.push(["copy", value]) }, BrowserWindow: { fromWebContents: () => null } },
-  n: { Yc: (value) => value, Zc: (value, delta) => value + delta, Xc: (value) => value / 100 },
+  n: { Yc: (value) => value, Zc: (value, delta) => value + delta, Xc: (value) => value / 100, lu: { NEW_TAB_PAGE: "new-tab" } },
   crypto: { randomUUID: () => "uuid" },
   hX: () => null, mU: () => "panel", pU: () => null, hU: () => "right", QU: () => "url",
   RZe: () => "command", ZZe: async () => undefined, zZe: () => null, sq: () => undefined,
@@ -65,6 +65,15 @@ equal(controller.canReloadActiveVisiblePage({}, null), false);
 equal(controller.getCurrentPageWebContents("owner", "conversation", "tab"), undefined);
 equal(controller.getWebMcpInspectorData("owner", "conversation", "tab"), null);
 equal(controller.getExtensionActionMenuTarget("owner", "conversation", "tab"), { webContents: undefined, allowHiddenBlankTab: false });
+const hiddenWebContents = { isDestroyed: () => false };
+const hiddenThread = { conversationId: "conversation", browserTabId: "tab", hostGeneration: 3, presented: true, visible: true, snapshot: { tabType: "new-tab", url: "" } };
+const hiddenWindow = { rendererInstanceId: "renderer", activeConversationId: "conversation", activeBrowserTabId: "tab" };
+host.getCurrentPageCommandContext = () => ({ page: { view: { webContents: hiddenWebContents } }, threadState: hiddenThread, windowState: hiddenWindow });
+host.getCurrentWindowState = () => hiddenWindow;
+host.browserPageHostLifecycle.attachedWebviewHosts.set(hiddenWebContents, { route: { conversationId: "conversation", browserTabId: "tab" }, hostGeneration: 3, rendererInstanceId: "renderer" });
+equal(controller.getExtensionActionMenuTarget("owner", "conversation", "tab"), { webContents: hiddenWebContents, allowHiddenBlankTab: true });
+host.getCurrentPageCommandContext = () => null;
+host.getCurrentWindowState = () => null;
 equal(await controller.captureScreenshotToClipboard("owner", "conversation", "tab"), undefined);
 equal(controller.resetZoom("owner", "conversation", "tab"), undefined);
 equal(controller.stepZoom("owner", "conversation", 1, "tab"), undefined);
