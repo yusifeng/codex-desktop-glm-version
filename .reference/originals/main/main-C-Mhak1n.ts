@@ -345,6 +345,7 @@ const { subscribeComputerUsePipTurnLifecycle: Noe } = require("./main-app/comput
 const { AppEntryAttributionTracker: Foe } = require("./main-app/startup/app-entry-attribution.js");
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
+const { createBrowserHostServiceClass } = require("./main-app/browser-sidebar/browser-host-service.js");
 const {
   BrowserSettingsSync,
   BrowserUseOriginState: XOe,
@@ -23601,234 +23602,21 @@ async function Gke(e, t, n) {
     return !1;
   }
 }
-var Kke = class extends n.Uf {
-    messageHandler;
-    browserHostManager;
-    origin;
-    extensionUsage;
-    onConversationDeleted;
-    getPairedCommentOverlayOwner;
-    detachedTabsService;
-    viewportWaits = new Map();
-    annotationFeaturePreview;
-    extensionActionMenus;
-    constructor(e, t, n, r, i, a, o) {
-      (super(),
-        (this.messageHandler = e),
-        (this.browserHostManager = t),
-        (this.origin = n),
-        (this.extensionUsage = r),
-        (this.onConversationDeleted = i),
-        (this.getPairedCommentOverlayOwner = a),
-        (this.detachedTabsService = o),
-        (this.annotationFeaturePreview = new Wke(n)),
-        (this.extensionActionMenus = new wke(n)));
-    }
-    get detachedTabs() {
-      return this.detachedTabsService;
-    }
-    async runPageCommand(e) {
-      return this.browserHostManager.runPageCommand(this.origin, e, (e, t) =>
-        this.messageHandler.forwardBrowserNavigationUrl(e, t),
-      );
-    }
-    subscribePermissionPrompts(e, t) {
-      return this.browserHostManager.permissionPrompts.subscribe(this.origin, e, t);
-    }
-    async respondToPermissionPrompt(e, t) {
-      return this.browserHostManager.permissionPrompts.respond(this.origin, e, t);
-    }
-    async openPermissionSystemSettings(e) {
-      return this.browserHostManager.permissionPrompts.openSystemSettings(this.origin, e);
-    }
-    async cancelPendingLocalWorkSessionRoute({ browserConversationId: e }) {
-      let t = this.messageHandler.getBrowserOwnerWebContentsForOrigin(this.origin);
-      t != null &&
-        this.messageHandler
-          .getBrowserSessionRegistry()
-          .cancelPendingLocalWorkSessionRoute({ browserConversationId: e, owner: t });
-    }
-    async setAnnotationPresentation(e) {
-      let t = this.messageHandler.getBrowserOwnerWebContentsForOrigin(this.origin);
-      t != null && this.browserHostManager.setAnnotationPresentation(t, e);
-    }
-    async deleteConversation(e) {
-      (this.messageHandler.deletePersistedBrowserConversation(this.origin, e),
-        await this.onConversationDeleted?.(e.conversationId));
-    }
-    async editComment({ browserTabId: e, conversationId: t, commentId: n }) {
-      return this.browserHostManager.selectComment(this.origin, t, n, e);
-    }
-    async deleteComment({ browserTabId: e, conversationId: t, commentId: n }) {
-      return this.browserHostManager.deleteComment(this.origin, t, n, e);
-    }
-    async captureTabThumbnail({ browserTabId: e, conversationId: t }) {
-      return this.browserHostManager.captureTabThumbnail(this.origin, t, e);
-    }
-    async getPageRestoreResults({ pages: e }) {
-      return this.browserHostManager.getBrowserPageRestoreResults(
-        this.origin,
-        e.map(({ browserStorageId: e, browserTabId: t, conversationId: n }) => ({
-          browserStorageId: nt(e),
-          browserTabId: a.bn(t),
-          conversationId: n,
-        })),
-      );
-    }
-    async getExtensionActions(e) {
-      return Ike(() => this.getExtensionWebContents(e));
-    }
-    async subscribeExtensionProfile(e) {
-      let t = this.browserHostManager.getBrowserSession();
-      return t == null ? null : Lke(t, this.origin, e, this.extensionUsage);
-    }
-    async getExtensionCounts() {
-      return this.browserHostManager.getBrowserSession()?.extensions.getExtensionCounts() ?? null;
-    }
-    async getWebMcpInspectorData({ browserTabId: e, conversationId: t }) {
-      return this.browserHostManager.getWebMcpInspectorData(this.origin, t, e);
-    }
-    async focusCommentOverlay({ browserTabId: e, conversationId: t, sessionId: n }) {
-      this.browserHostManager.handleCommentOverlayFocus(
-        this.getPairedCommentOverlayOwner?.(this.origin, t, e) ?? this.origin,
-        t,
-        e,
-        n,
-      );
-    }
-    async openSiteInfo({ anchorBounds: e, browserTabId: t, conversationId: n, siteUrl: r }) {
-      return this.browserHostManager.openSiteInfo(this.origin, n, t, e, r);
-    }
-    async cloneTab(e) {
-      this.browserHostManager.cloneTab(this.origin, e);
-    }
-    async prepareLocalWorkSessionRoute({ browserConversationId: e }) {
-      let t = this.messageHandler.getBrowserOwnerWebContentsForOrigin(this.origin);
-      t != null &&
-        this.messageHandler
-          .getBrowserSessionRegistry()
-          .prepareLocalWorkSessionRoute({ browserConversationId: e, owner: t });
-    }
-    async registerWebviewHost({
-      browserTabId: e,
-      conversationId: t,
-      hostGeneration: n,
-      pagePersistence: r,
-      rendererInstanceId: i,
-    }) {
-      return this.browserHostManager.registerWebviewHost(this.origin, e, t, n, r, i);
-    }
-    async syncView(e) {
-      this.browserHostManager.syncView(this.origin, e);
-    }
-    async registerWebviewHostSession({ rendererInstanceId: e }) {
-      return this.browserHostManager.registerWebviewHostSession(this.origin, e);
-    }
-    async setAudioMuted({ browserTabId: e, conversationId: t, muted: n }) {
-      this.browserHostManager.setAudioMuted(this.origin, t, e, n);
-    }
-    async setExtensionPinned(e) {
-      return zke(() => this.getExtensionWebContents(e), e, this.extensionUsage);
-    }
-    async setSiteAnnotationFeaturesEnabled(e) {
-      return this.browserHostManager.setSiteAnnotationFeaturesEnabled(this.origin, e);
-    }
-    async respondToSiteAnnotationPermission(e) {
-      return this.browserHostManager.respondToSiteAnnotationPermission(this.origin, e);
-    }
-    async setSiteAnnotationFeaturePreview(e) {
-      this.annotationFeaturePreview.set(
-        this.browserHostManager.getCurrentPageWebContents(
-          this.origin,
-          e.conversationId,
-          e.browserTabId,
-        ),
-        e,
-      );
-    }
-    async setFloatingComposerRevealTracking({
-      activationHeightPx: e,
-      browserTabId: t,
-      conversationId: n,
-      enabled: r,
-    }) {
-      this.browserHostManager.setFloatingComposerRevealTracking(this.origin, n, t, r, e);
-    }
-    async showExtensionActionContextMenu(e) {
-      let t = this.browserHostManager.getExtensionActionMenuTarget(
-        this.origin,
-        e.conversationId,
-        e.browserTabId,
-      );
-      return Bke(() => t.webContents, this.origin, e, this.extensionUsage, t.allowHiddenBlankTab);
-    }
-    async beginExtensionActionMenu(e, t) {
-      let n = this.browserHostManager.getExtensionActionMenuTarget(
-        this.origin,
-        e.conversationId,
-        e.browserTabId,
-      );
-      return this.extensionActionMenus.begin(n.webContents, e, t, n.allowHiddenBlankTab);
-    }
-    async executeExtensionActionMenuCommand(e) {
-      return this.extensionActionMenus.execute(() => this.getExtensionWebContents(e), e);
-    }
-    async closeExtensionActionMenu(e) {
-      this.extensionActionMenus.close(e);
-    }
-    subscribeExtensionActionEvents(e, t) {
-      return Vke(() => this.getExtensionWebContents(e), this.origin, t);
-    }
-    subscribeFavicon(e, t) {
-      return Hke(
-        this.browserHostManager.getCurrentPageWebContents(
-          this.origin,
-          e.conversationId,
-          e.browserTabId,
-        ),
-        this.origin,
-        e.size,
-        t,
-      );
-    }
-    async triggerExtensionAction(e) {
-      return Rke(() => this.getExtensionWebContents(e), this.origin, e, this.extensionUsage);
-    }
-    getExtensionWebContents(e) {
-      return this.browserHostManager.getCurrentPageWebContents(
-        this.origin,
-        e.conversationId,
-        e.browserTabId,
-      );
-    }
-    async waitForViewportSize({
-      browserTabId: e,
-      conversationId: t,
-      requestId: n,
-      viewportSize: r,
-    }) {
-      let i = this.browserHostManager.getCurrentPageWebContents(this.origin, t, e);
-      if (i == null || i.isDestroyed()) return !1;
-      this.viewportWaits.get(n)?.abort();
-      let a = new AbortController();
-      this.viewportWaits.set(n, a);
-      let o = setTimeout(() => a.abort(), 1e3);
-      try {
-        return await Gke(i, r, a.signal);
-      } finally {
-        (clearTimeout(o), this.viewportWaits.get(n) === a && this.viewportWaits.delete(n));
-      }
-    }
-    async cancelViewportWait(e) {
-      this.viewportWaits.get(e)?.abort();
-    }
-    [Symbol.dispose]() {
-      (this.annotationFeaturePreview.clear(), this.extensionActionMenus[Symbol.dispose]());
-      for (let e of this.viewportWaits.values()) e.abort();
-      this.viewportWaits.clear();
-    }
-  },
-  qke = class e extends n.Uf {
+var BrowserHostService = createBrowserHostServiceClass({
+  RpcHandlerBase: n.Uf,
+  ExtensionActionMenus: wke,
+  browserMessageChannel: a.At,
+  browserStorageIdOf: nt,
+  browserTabIdOf: a.bn,
+  getExtensionActions: Ike,
+  subscribeExtensionProfile: Lke,
+  setExtensionPinned: zke,
+  showExtensionActionContextMenu: Bke,
+  subscribeExtensionActionEvents: Vke,
+  subscribeFavicon: Hke,
+  triggerExtensionAction: Rke,
+});
+var qke = class e extends n.Uf {
     getConfigRequirements;
     getBrowserSession;
     logger = r.r(`browser-profile-import`);
@@ -71826,7 +71614,7 @@ var G5 = r.r(`WindowContext`),
     Kee,
     Ket,
     Kk,
-    Kke,
+    BrowserHostService,
     L,
     L6e,
     L8e,

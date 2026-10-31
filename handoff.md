@@ -4890,3 +4890,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - `automations/habitat-runtime.ts` 接管 service subscriptions/query invalidation、local host callbacks 和 cron completion ownership
   cleanup，旧 `NOe/POe/FOe` 删除。focused coverage 22/19/31 项，Electron fetch/WindowContext 邻接 19/16 项。
   下一批继续审计紧随 vendor utility belt 后的 browser page/host RPC owners，优先整组迁出 class family 而非拆单方法。
+
+# 2026-11-01 BrowserHost renderer RPC owner
+
+- `browser-sidebar/browser-host-service.ts` 已接管 renderer-facing BrowserHost facade、extension/menu/favicon/profile bridges、
+  permission/page restore/local-work route、annotation preview cleanup 与 viewport wait 竞态；WindowContext 直接使用语义 class。
+- main 旧 `Kke` 227 行已删除，focused coverage 25 项，WindowContext/no-unwired 回归通过。下一批继续处理相邻 browser
+  profile/history/top-sites 与 detached-source/downloads RPC owners，保持 browser session 和 detached manager 的唯一状态。

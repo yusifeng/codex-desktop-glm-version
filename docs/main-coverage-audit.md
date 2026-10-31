@@ -2916,3 +2916,12 @@ approval 写入；WindowContext 直接使用 `BrowserSettingsSync` 与 `IabTabMe
 local host callbacks，以及 cron 完成后 local/remote ownership 保守检查与 unsubscribe；WindowContext 的三个 consumer 全部接回，
 旧 `NOe/POe/FOe` 已物理删除。focused coverage 为 browser sync 19、origin state 22、habitat runtime 31 项，
 Electron fetch handler 19、WindowContext 16 和 no-unwired 邻接回归通过。
+
+### 增量抽取：BrowserHost renderer RPC owner
+
+`src/main/main-app/browser-sidebar/browser-host-service.ts` 已接管每 renderer window 的 BrowserHost RPC facade、extension
+actions/menu/profile/favicon 桥、permission prompts、page restore ID validation、local-work route、annotation preview lifecycle，
+以及带 1 秒 timeout、同 request replacement 和 abort cleanup 的 viewport wait owner。WindowContext 直接构造
+`BrowserHostService`，仍复用唯一 `browserHostManager`、extension usage 和 detached tabs owner；原始 chunk 中 `Kke` 227 行
+已物理删除。focused test 25 项覆盖 forwarding、ID projection、extension bridges、route owner、conversation cleanup、preview
+navigation cleanup、viewport success/cancel 和 service dispose，WindowContext/no-unwired 回归同步通过。

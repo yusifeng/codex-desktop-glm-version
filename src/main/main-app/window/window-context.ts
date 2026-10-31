@@ -66,7 +66,7 @@ export function createWindowContextClass(dependencies) {
     Kee,
     Ket,
     Kk,
-    Kke,
+    BrowserHostService,
     L,
     L6e,
     L8e,
@@ -1272,7 +1272,7 @@ export function createWindowContextClass(dependencies) {
               () => i.getConfigRequirements(),
               () => s.getBrowserSession(),
             ),
-            browserHost: new Kke(
+            browserHost: new BrowserHostService(
               this.messageHandler,
               s,
               e,
