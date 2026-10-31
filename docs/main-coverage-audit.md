@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 browser comment overlay skeleton removal
+
+删除从未被 main 或其他 runtime 模块消费的 `src/main/main-app/browser-sidebar/comment-overlay-manager.ts`。该文件只有 11 个
+members，而真实 `JWe` 有 42 个；核心 `prepare()` 是显式 no-op，缺少 preview/anchor/selection/dismiss/session/geometry/window
+lifecycle。真实 owner 仍保留在主 chunk，unwired-owner gate 已锁定该 skeleton 不得回归。
+
 ## 2026-10-31 AppServerConversationManager owner
 
 既有 `src/main/main-app/conversation/app-server-manager.ts` 已接回真实 host assembly、inbox listener 与 disposal consumers，

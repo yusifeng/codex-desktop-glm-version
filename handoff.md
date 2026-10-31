@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+删除 browser comment overlay 的未接线 skeleton：旧 `comment-overlay-manager.ts` 只有 11 个成员，而真实 `JWe` 有 42 个，
+其中 `prepare()` 明确为空实现且没有任何 runtime consumer。文件已删除并加入 unwired-owner 防回归 gate；真实 overlay
+owner 继续留在主 chunk，避免把占位壳误记为完成迁移。
+
 接回 AppServerConversationManager 顶层 owner：`conversation/app-server-manager.ts` 现已替代主 chunk 的 `rw`。thread store、
 stream roles、queued follow-ups、turn start/resume/archive/auth/settings/read-state 与 20+ 子 owner 的 composition/disposal 均由
 299-member 语义类持有；真实 host assembly、inbox listener 和 disposal consumers 已接回，旧 2,004 行 class 已删除。
