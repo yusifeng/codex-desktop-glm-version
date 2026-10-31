@@ -4624,3 +4624,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - focused coverage 59 项，no-unwired gate 扩至 70 项。后续优先审计同区仍留在 main 的 sandbox prewarm/
   request-header/session restriction policy 与 clear-data RPC；Electron protocol/session 组合根仅在能够完整
   保持 global installation identity 时迁移。
+
+# 2026-11-01 MCP sandbox network/session owner
+
+- `src/main/main-app/mcp-sandbox/network-runtime.ts` 已接管 shell/asset prewarm cache、cache fallback 与 refresh、
+  request normalization、UA/client-hint/language rewrite、default/session hook 单次安装、protocol response header
+  allowlist、permission/download/request restriction和 persistent session clear-data RPC。
+- lifecycle 与 network owners 已互相通过显式 callback 接线，共享 guest state 和 gesture token 而不复制 Map；
+  focused coverage 60 项，no-unwired gate 77 项。下一步从 MCP 后续区域继续审计 native crash attribution 与
+  其他仍在 main chunk 的第一方 RPC/controller，保留纯 Electron session I/O adapter 证据。

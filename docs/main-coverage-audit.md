@@ -2600,3 +2600,13 @@ destroy cleanup 已整体迁移至 `src/main/main-app/mcp-sandbox/lifecycle.ts`�
 `T$/E$/a2e/b2e/x2e/Z$/S2e/C2e/w2e/Q$/$$/T2e` 状态和 listener 实现已物理删除。
 `scripts/test-main-mcp-sandbox-lifecycle-owner.mjs` 覆盖 59 项 admission、IPC validation、navigation、
 gesture、MessagePort transfer、pending/guest cleanup 与 telemetry 顺序。
+
+### 增量抽取：MCP sandbox network/session owner
+
+MCP sandbox shell single-flight prewarm/cache-refresh、asset allowlist、force-cache→reload fallback、
+default/session request-header rewrite、protocol bridge、permission/download/network restriction、session
+installation identity 与 persistent partition clear-data RPC 已迁移至
+`src/main/main-app/mcp-sandbox/network-runtime.ts`。它与 lifecycle owner 共享 guest state/gesture consumer，
+BrowserWindow startup 真实调用 default header installer，sandbox attach 真实调用 session configurator，`D2e`
+真实复用新 data handler；旧 `c2e..V$` cache、`H$/h2e/g2e` session owner 和旧 `D2e` class 已删除。
+focused test 覆盖 60 项 cache、header、protocol、permission、restriction 和 storage cleanup 行为。

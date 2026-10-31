@@ -17,6 +17,7 @@ const realOwners = [
   ["src/main/main-app/language-server/session-runtime.ts", "createLanguageServerSessionRuntime"],
   ["src/main/main-app/workspace/worktree-attachment-handler.ts", "createWorktreeAttachmentHandlerClass"],
   ["src/main/main-app/mcp-sandbox/lifecycle.ts", "createMcpSandboxLifecycleRuntime"],
+  ["src/main/main-app/mcp-sandbox/network-runtime.ts", "createMcpSandboxNetworkRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -80,6 +81,11 @@ assert.equal(main.includes("createMcpSandboxLifecycleRuntime({"), true, "real MC
 assert.equal(main.includes("function a2e("), false, "generated MCP guest listener owner must be removed");
 assert.equal(main.includes("function S2e("), false, "generated MCP webview attachment owner must be removed");
 assert.equal(main.includes("function b2e("), false, "generated MCP init bridge must be removed");
+assert.equal(main.includes("createMcpSandboxNetworkRuntime({"), true, "real MCP sandbox network owner is wired");
+assert.equal(main.includes("function c2e("), false, "generated MCP prewarm cache must be removed");
+assert.equal(main.includes("function h2e("), false, "generated MCP default header installer must be removed");
+assert.equal(main.includes("function g2e("), false, "generated MCP session restriction owner must be removed");
+assert.equal(main.includes("D2e = class extends"), false, "generated MCP sandbox data handler must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("70 main unwired-owner skeleton assertions passed");
+console.log("77 main unwired-owner skeleton assertions passed");

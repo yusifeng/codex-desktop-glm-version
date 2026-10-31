@@ -216,6 +216,7 @@ const { LanguageServerManager } = require("./main-app/language-server/language-s
 const { createLanguageServerProvidersRuntime } = require("./main-app/language-server/providers.js");
 const { createLanguageServerSessionRuntime } = require("./main-app/language-server/session-runtime.js");
 const { createMcpSandboxLifecycleRuntime } = require("./main-app/mcp-sandbox/lifecycle.js");
+const { createMcpSandboxNetworkRuntime } = require("./main-app/mcp-sandbox/network-runtime.js");
 const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 const { createElectronPerformanceSnapshotCollectorClass } = require("./main-app/startup/electron-performance-snapshot-collector.js");
 const { MainThreadJankSampler } = require("./main-app/startup/main-thread-jank-sampler.js");
@@ -11014,7 +11015,6 @@ var Zfe = e.a(n.jo()),
   dp = e.a(n.xi()),
   fp = e.a(n.Gr()),
   pp = e.a(n.dr()),
-  mp = e.a(n.z()),
   $fe = a.pn();
 function epe(e) {
   if (typeof e != `string`) throw TypeError(`Expected a string`);
@@ -70921,279 +70921,41 @@ function k$(e, t, n = {}) {
     },
   });
 }
-function n2e(e, { allowLocalDevelopment: t }) {
-  let r = M$(e),
-    i = t && r?.hostname === `localhost` && [`http:`, `ws:`].includes(r.protocol),
-    a = r?.protocol === `codex-sandbox:` && n.ss(r.hostname);
-  return (
-    r != null &&
-    ([`about:`, `blob:`, `data:`, `https:`, `wss:`].includes(r.protocol) ||
-      r.protocol === `devtools:` ||
-      i ||
-      a)
-  );
-}
-function r2e(e) {
-  return (
-    i2e(e.frame) ||
-    j$(e.url) ||
-    j$(A$(e.requestHeaders, `Origin`)) ||
-    j$(A$(e.requestHeaders, `Referer`))
-  );
-}
-function i2e(e) {
-  return e != null && (j$(e.origin) || j$(e.url));
-}
-function A$(e, t) {
-  let n = Object.keys(e).find((e) => e.toLowerCase() === t.toLowerCase());
-  return n == null ? void 0 : e[n];
-}
-function j$(e) {
-  let t = M$(e);
-  return t != null && n.ss(t.hostname);
-}
-function M$(e) {
-  if (e == null || e.length === 0) return null;
-  try {
-    return new URL(e);
-  } catch {
-    return null;
-  }
-}
-function N$(e) {
-  return M$(e)?.protocol ?? `invalid`;
-}
-var P$ = `web-sandbox.oaiusercontent.com`,
-  F$ = process.env.NODE_ENV === `development` ? process.env.CODEX_MCP_APP_SANDBOX_URL : void 0,
-  I$ = `/mcp-app.html`,
-  o2e = 8,
-  s2e = /^\/assets\/[A-Za-z0-9_-]+-[A-Za-z0-9_-]{8,}\.(?:css|js)$/,
-  L$ = new Map();
-function c2e(e) {
-  let t = B$(new Request(e));
-  return t == null ? `cold` : (L$.get(t)?.state ?? `cold`);
-}
-async function l2e(e) {
-  let t = B$(e);
-  return t == null ? null : V$(t, `force-cache`);
-}
-function u2e(e) {
-  let t = new URL(n.es({ locale: e, subdomain: `shared` }));
-  ((t.hostname = P$), (t.pathname = I$));
-  let r = t.toString(),
-    i = L$.get(r);
-  if (i != null) return (i.state === `warm` && R$(r, i), i.promise);
-  let a = (async () => {
-      let e = await V$(r, `force-cache`);
-      if (!e.ok) throw Error(`MCP app sandbox shell failed to prewarm.`);
-      await z$(e);
-    })(),
-    o = { promise: a, state: `warming` };
-  return (
-    L$.set(r, o),
-    a.then(
-      () => {
-        ((o.state = `warm`), R$(r, o));
-      },
-      () => {
-        L$.delete(r);
-      },
-    ),
-    a
-  );
-}
-function R$(e, t) {
-  t.refreshing ||
-    ((t.refreshing = !0),
-    V$(e, `default`)
-      .then((e) => (e.ok ? z$(e) : void 0))
-      .catch(() => {})
-      .finally(() => {
-        t.refreshing = !1;
-      }));
-}
-async function z$(e) {
-  let t = [
-    ...new Set(
-      (await e.text()).match(/\/assets\/[A-Za-z0-9_-]+-[A-Za-z0-9_-]{8,}\.(?:css|js)/g) ?? [],
-    ),
-  ].slice(0, o2e);
-  if ((await Promise.all(t.map((e) => V$(`https://${P$}${e}`, `force-cache`)))).some((e) => !e.ok))
-    throw Error(`MCP app sandbox startup asset failed to prewarm.`);
-}
-function B$(e) {
-  if (e.method !== `GET`) return null;
-  let t = new URL(e.url);
-  if (
-    (t.protocol !== `https:` && t.protocol !== `codex-sandbox:`) ||
-    t.port !== `` ||
-    t.username !== `` ||
-    t.password !== `` ||
-    !n.ss(t.hostname)
-  )
-    return null;
-  let r = n.as(e.url, { requireSkybridge: !0 }) != null,
-    i = t.search === `` && s2e.test(t.pathname);
-  return !r && !i && F$ == null ? null : `https://${P$}${r ? I$ : t.pathname}${t.search}`;
-}
-async function V$(e, t) {
-  let n = new URL(e),
-    r = F$ == null ? e : new URL(`${n.pathname}${n.search}`, F$).toString(),
-    i = await l.net.fetch(r, {
-      cache: t,
-      credentials: `omit`,
-      headers:
-        F$ != null && n.pathname === `/index.css` && n.search === ``
-          ? { Accept: `text/css,*/*;q=0.1` }
-          : void 0,
-      redirect: `error`,
-    });
-  return t === `force-cache` && !i.ok ? V$(e, `reload`) : i;
-}
-var d2e = /\b(?:Chrome|Chromium)\/(\d+)\./;
-function f2e(e, t) {
-  return t
-    .filter(Boolean)
-    .reduce((e, t) => e.replace(RegExp(`\\s${(0, mp.default)(t)}/[^\\s]+`, `g`), ``), e);
-}
-function p2e(e) {
-  let t = d2e.exec(e)?.[1];
-  return t == null ? null : `"Chromium";v="${t}", "Google Chrome";v="${t}", "Not=A?Brand";v="24"`;
-}
-function m2e() {
-  return process.platform === `darwin`
-    ? `"macOS"`
-    : process.platform === `win32`
-      ? `"Windows"`
-      : `"Linux"`;
-}
-function H$(e, t) {
-  let n = { ...e },
-    r = f2e(t.userAgent, t.excludedUserAgentProducts),
-    i = p2e(r);
-  return (
-    U$(n, `User-Agent`, r),
-    U$(n, `Accept-Language`, t.acceptLanguage),
-    i != null && U$(n, `sec-ch-ua`, i),
-    U$(n, `sec-ch-ua-mobile`, `?0`),
-    U$(n, `sec-ch-ua-platform`, m2e()),
-    n
-  );
-}
-function U$(e, t, n) {
-  let r = Object.keys(e).find((e) => e.toLowerCase() === t.toLowerCase());
-  (r != null && r !== t && delete e[r], (e[t] = n));
-}
-var W$ = !1,
-  G$ = new WeakSet();
-function h2e() {
-  if (W$) return;
-  let e = `session` in l ? l.session?.defaultSession : void 0;
-  e?.webRequest != null &&
-    ((W$ = !0),
-    e.webRequest.onBeforeSendHeaders((t, n) => {
-      let r = t.requestHeaders;
-      n({
-        requestHeaders: r2e({ frame: t.frame, requestHeaders: r, url: t.url })
-          ? H$(r, {
-              acceptLanguage: q$(),
-              excludedUserAgentProducts: [`Electron`, l.app.getName()],
-              userAgent: e.getUserAgent(),
-            })
-          : r,
-      });
-    }));
-}
-function g2e(e, { applicationNetwork: t, getSandboxState: r }) {
-  (pWe(e),
-    !G$.has(e) &&
-      (G$.add(e),
-      e.protocol.handle(n.$o, async (e) => {
-        let t = await l2e(e);
-        return t == null
-          ? new Response(null, { status: 404 })
-          : new Response(await t.arrayBuffer(), {
-              headers: {
-                "Content-Security-Policy": t.headers.get(`Content-Security-Policy`) ?? ``,
-                "Content-Type": t.headers.get(`Content-Type`) ?? `application/octet-stream`,
-                "Permissions-Policy": t.headers.get(`Permissions-Policy`) ?? ``,
-                "X-Content-Type-Options": `nosniff`,
-              },
-              status: t.status,
-            });
-      }),
-      e.setPermissionRequestHandler((e, t, i, a) => {
-        let o = r(e.id);
-        if (
-          (o != null && K$(t, a.requestingUrl, o)) ||
-          (t === `clipboard-sanitized-write` &&
-            o != null &&
-            n.as(e.getURL()) === o.origin &&
-            mcpSandboxLifecycle.consumeUserGestureForGuest(e))
-        ) {
-          i(!0);
-          return;
-        }
-        (O$().info(`${D$}.permission_blocked`, {
-          safe: { permission: t },
-          sensitive: { guestWebContentsId: e.id, sandboxId: o?.sandboxId },
-        }),
-          i(!1));
-      }),
-      e.setPermissionCheckHandler((e, t, n) => {
-        let i = e == null ? null : r(e.id);
-        return i != null && K$(t, n, i);
-      }),
-      e.on(`will-download`, (e, t) => {
-        (O$().info(`${D$}.download_blocked`, {
-          safe: { urlProtocol: N$(t.getURL()) },
-          sensitive: { url: fT(t.getURL()) },
-        }),
-          e.preventDefault(),
-          t.cancel());
-      }),
-      t.addSessionRestriction(e, (e) => {
-        let t = e.webContentsId == null ? null : r(e.webContentsId),
-          n = n2e(e.url, { allowLocalDevelopment: t?.allowLocalDevelopment === !0 });
-        return (
-          n ||
-            O$().info(`${D$}.request_blocked`, {
-              safe: { resourceType: e.resourceType, urlProtocol: N$(e.url) },
-              sensitive: {
-                guestWebContentsId: e.webContentsId,
-                sandboxId: t?.sandboxId,
-                url: fT(e.url),
-              },
-            }),
-          { cancel: !n }
-        );
-      }),
-      e.webRequest.onBeforeSendHeaders((t, n) => {
-        n({
-          requestHeaders: H$(t.requestHeaders, {
-            acceptLanguage: q$(),
-            excludedUserAgentProducts: [`Electron`, l.app.getName()],
-            userAgent: e.getUserAgent(),
-          }),
-        });
-      })));
-}
-function K$(e, t, r) {
-  return e === `local-network` && r.sandboxId.startsWith(`local-network-`) && n.as(t) === r.origin;
-}
-function q$() {
-  let e = l.app.getPreferredSystemLanguages();
-  return (e.length > 0 ? e : [l.app.getLocale()])
-    .map((e, t) => (t === 0 ? e : `${e};q=${Math.max(1 - t * 0.1, 0.1).toFixed(1)}`))
-    .join(`,`);
-}
+var mcpSandboxNetwork = createMcpSandboxNetworkRuntime({
+  RpcHandlerBase: n.Uf,
+  app: l.app,
+  buildSharedUrl: (e) => n.es(e),
+  consumeUserGesture: (e, t, n) => mcpSandboxLifecycle.consumeUserGesture(e, t, n),
+  defaultSession: `session` in l ? l.session?.defaultSession : null,
+  developmentBaseUrl:
+    process.env.NODE_ENV === `development` ? process.env.CODEX_MCP_APP_SANDBOX_URL : void 0,
+  fsPromises: b.default,
+  isSandboxHostname: (e) => n.ss(e),
+  logger: O$,
+  markTrustedSession: (e) => pWe(e),
+  netFetch: (e, t) => l.net.fetch(e, t),
+  parseOrigin: (e, t) => n.as(e, t),
+  path: h,
+  persistentPartition: n.Qo,
+  protocolScheme: n.$o,
+  sanitizeUrl: (e) => fT(e),
+  sessionFromPartition: (e) => l.session.fromPartition(e),
+  toPersistentPartition: (e) => n.rs(e, { persist: !0 }),
+  userGestureSchema: { safeParse: (e) => E2e.safeParse(e) },
+});
 var _2e = (0, h.join)(__dirname, `sandbox-preload.js`),
   mcpSandboxLifecycle = createMcpSandboxLifecycleRuntime({
     canUseSandboxProtocol: `net` in l && l.net?.fetch != null,
-    configureSession: (e, t, n) => g2e(e, { applicationNetwork: n, getSandboxState: t }),
+    configureSession: (e, t, n) =>
+      mcpSandboxNetwork.configureSession(e, {
+        applicationNetwork: n,
+        consumeUserGestureForGuest: (e) =>
+          mcpSandboxLifecycle.consumeUserGestureForGuest(e),
+        getSandboxState: t,
+      }),
     forwardInitChannel: a.kt,
     getLocale: () => l.app.getLocale(),
-    getSkybridgeCacheState: c2e,
+    getSkybridgeCacheState: (e) => mcpSandboxNetwork.getCacheState(e),
     initChannel: a.Nt,
     ipcMain: `ipcMain` in l ? l.ipcMain : null,
     isPortNameList: (e) => n.os(e),
@@ -71206,7 +70968,7 @@ var _2e = (0, h.join)(__dirname, `sandbox-preload.js`),
     parsePartitionSandbox: (e) => n.is(e),
     parsePersistentSandbox: (e) => n.ts(e),
     persistentPartition: n.Qo,
-    prewarmSandbox: u2e,
+    prewarmSandbox: (e) => mcpSandboxNetwork.prewarmSandbox(e),
     sanitizeUrl: (e) => fT(e),
     sandboxPreloadPath: _2e,
     sessionFromPartition: (e) => l.session.fromPartition(e),
@@ -71226,43 +70988,11 @@ var _2e = (0, h.join)(__dirname, `sandbox-preload.js`),
     webContentsFromId: (e) => l.webContents.fromId(e),
   });
 function y2e() {
-  (h2e(), mcpSandboxLifecycle.initialize());
+  (mcpSandboxNetwork.initializeDefaultSessionHeaders(), mcpSandboxLifecycle.initialize());
 }
 var e1 = n.Of().refine(n.cs),
   E2e = n.wf({ initId: e1, sandboxId: e1 }),
-  D2e = class extends n.Uf {
-    origin;
-    constructor(e) {
-      (super(), (this.origin = e));
-    }
-    async clearData() {
-      let e = l.session.fromPartition(n.Qo),
-        t = e.storagePath;
-      if (t == null) throw Error(`The persistent MCP app session has no storage path.`);
-      let r = (0, h.basename)(t).slice(0, -6),
-        i = await (0, b.readdir)((0, h.dirname)(t), { withFileTypes: !0 }).catch((e) => {
-          if (e instanceof Error && `code` in e && e.code === `ENOENT`) return [];
-          throw e;
-        }),
-        a = [e];
-      for (let e of i) {
-        if (!e.isDirectory() || !e.name.startsWith(r)) continue;
-        let t = e.name.slice(r.length);
-        /^connection-[a-f0-9]{48}$/.test(t) &&
-          a.push(l.session.fromPartition(n.rs(t, { persist: !0 })));
-      }
-      await Promise.all(a.map((e) => e.clearData()));
-    }
-    async consumeUserGesture(e) {
-      let t = E2e.safeParse(e);
-      if (!t.success) return !1;
-      return mcpSandboxLifecycle.consumeUserGesture(
-        this.origin,
-        t.data.sandboxId,
-        t.data.initId,
-      );
-    }
-  },
+  D2e = mcpSandboxNetwork.McpSandboxDataHandler,
   O2e = n.wf({
     item: n.wf({
       aggregatedOutput: n.Of().nullish(),
