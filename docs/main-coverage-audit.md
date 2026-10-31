@@ -1,5 +1,13 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 thread archive and history support owner consolidation
+
+`threads/archive.ts` 已从薄弱的动态调用 facade 恢复为具名、类型化 archive lifecycle：context 装配、local/remote inactive fallback、desktop
+thread-attachments admission、managed/configured worktree root 判定、canonical cwd 回退、no-rollout fallback、thread-missing metadata 清理、pin placement
+撤销和 unarchive ownership 顺序均与原实现对齐。相邻 `turns/history-boundaries.ts`、`threads/state-normalization.ts`、
+`threads/stream-roles.ts::SubscriptionRegistry` 与 item-notification tail invalidation 已有真实 consumer；主 chunk `qge…hb` 约 445 行重复区物理删除。
+focused coverage 为 archive 46、history support 34、conversation cleanup 137 条断言。
+
 ## 2026-11-01 canonical history and history request runtime consolidation
 
 主 chunk 的 canonical island/entity 访问、tail history 构建、boundary topology/gap、conversation turn 应用与定位，以及 items/turns/timeline

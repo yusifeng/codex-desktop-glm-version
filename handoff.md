@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修复并收拢 thread archive/history support owner：`threads/archive.ts` 从压缩式通用调用 facade 扩成明确的 archive context/lifecycle，恢复 desktop
+thread-attachments cleanup 快路、managed/configured worktree roots、inactive archive、thread-missing metadata 清理日志、pin undo 与 broadcast/cache 顺序；
+相邻 history-boundaries、state-normalization、SubscriptionRegistry 和 tail invalidation 已由既有语义模块接管。主 chunk `qge…hb` 约 445 行旧区整体
+删除，新增 archive 46 项、history support 34 项行为断言，cleanup suite 扩至 137 项。
+
 大批接回 canonical history 与 history request 运行链：history islands/entities、tail 构建、gap/boundary、turn 定位与应用，以及 items/turns/timeline
 分页、resume merge/reconcile、durable host 装载，现统一由 `turns/canonical-history.ts` 和 `turns/history-requests.ts` 服务主 chunk consumer。
 旧 `Eg…Gge` 连续区约 1,312 行整体删除；新增 71 条行为/接线断言，conversation subowner cleanup 扩至 124 条，并复跑 canonical append、

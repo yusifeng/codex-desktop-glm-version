@@ -275,6 +275,19 @@ for (const oldDefinition of [
   "async function N_(",
   "async function P_(",
   "function Gge(",
+  "function qge(",
+  "function F_(",
+  "function I_(",
+  "function L_(",
+  "function R_(",
+  "function Jge(",
+  "function zve(",
+  "function ab(",
+  "async function ob(",
+  "async function ub(",
+  "async function db(",
+  "async function fb(",
+  "Xge = class",
 ]) equal(main.includes(oldDefinition), false);
 
 const referenceSource = fs.readFileSync(
