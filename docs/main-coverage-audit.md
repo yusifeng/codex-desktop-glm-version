@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 computer-use runtime chain consolidation
+
+`computer-use/native-pipe-service.ts`、`browser-use/thread-config.ts`、`misc/automation-thread-config.ts` 及两层 codex-app-tools config 已接管
+原 `To…cs` 连续运行链，启动区只保留命名导出绑定。约 1,185 行 selection/schema/server/client/config 重复实现物理删除；focused suite
+实际验证非 Windows client 不误启 helper、plugin 变化触发无 reload 同步、自动化线程优先复用 pending reconcile selection，以及 local/remote
+codex_app enabled 覆盖分支。
+
 ## 2026-11-01 bundled plugin orchestrator and archive owner consolidation
 
 `plugins/orchestrator.ts` 现作为启动区唯一 bundled plugin 编排 owner，`chrome-native-host-sync.ts` 的 cache watcher 和 marketplace descriptor

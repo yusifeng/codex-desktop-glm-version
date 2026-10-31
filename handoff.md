@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+大批接回 computer-use 启动运行链：selection/cache、native-pipe server/client、Browser Use thread config/reconcile、自动化线程 overrides、
+codex-app-tools MCP 定义/启用覆盖，统一切到五个语义模块；旧 `To…cs` 约 1,185 行连续实现删除。focused suite 执行非 Windows client
+生命周期、plugin-change config sync、reconcile selection 复用与 codex_app enabled override，并锁定桌面启动 consumer 的真实接线。
+
 继续收拢 bundled plugin 编排层：descriptor 清单、安装状态观察、dev/full reconcile 串行器、远端 SSH 同步入口、Chrome native-host cache
 watcher 与 legacy Chronicle skill 归档，全部改接 `marketplace.ts`、`orchestrator.ts` 和 `chrome-native-host-sync.ts`。旧 `al…hl` 约 793 行
 整体删除；focused suite 实际运行 dev reconcile 去重/pending 注册、插件状态读取，以及带目录哈希、marker 和 metadata 的 Chronicle 文件迁移。
