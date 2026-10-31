@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 saved-sections unwired island removal
+
+删除从未有 consumer 的 `saved-sections-service.ts`、`saved-sections-state.ts`、`saved-sections-transactions.ts` 三文件孤岛；
+其中 façade 以 `{}` 强转注入 server engine，属于不可运行的假迁移。真实 `$ze/iBe` engine/reconciliation 仍在主 chunk，
+并由已接线的 `pinned-threads-service.ts` 显式注入。unwired-owner gate 同步改为验证 PBe/ert 真实 factories 与主 wiring。
+
 ## 2026-10-31 WindowContext owner
 
 原 `ert` 完整约 2,000 行 owner 已迁入 `src/main/main-app/window/window-context.ts`。新 dependency-injected factory 持有

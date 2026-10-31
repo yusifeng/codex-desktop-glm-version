@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+清理 saved-sections 的无 consumer 三文件孤岛：旧 `saved-sections-service/state/transactions.ts` 从未接入 main，且 façade
+以 `{}` 强转注入 server engine，不能代表真实 `$ze/iBe`。三文件已删除；真实 generated engine/reconciliation 仍留在主
+chunk并作为 `pinned-threads-service.ts` 的显式依赖。原 unwired-skeleton gate 同步升级，锁定新 PBe/ert owner 不回退为壳。
+
 完成最大剩余 `ert` WindowContext owner 迁移：完整约 2,000 行 composition/state owner 已迁入真实
 `window/window-context.ts` dependency-injected factory；app-server/host registries、projects/workspaces、fetch/message handler、
 browser/realtime/artifact/automation/runtime services 与 lifecycle disposables 均由新 class 持有。真实 startup consumer 仍以
