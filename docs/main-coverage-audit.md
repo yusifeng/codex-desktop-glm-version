@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 fork and follower dispatch owner repair
+
+`threads/operations.ts` 的 `uve` 原先无条件直接 `thread/fork`，漏掉旧 AppServer 兼容所需的 complete history、target 定位、rollback 应用、
+fork synthetic item 与 synchronization failure 合并；follower dispatcher 也仅覆盖少数请求。本轮恢复两条完整控制流，修正 complete-history
+判断对不存在 manager 方法的调用，删除 main 旧 `uve/dve`，并以 focused suite 锁定现代/旧版 fork 及 follower start/settings/interrupt/history。
+
 ## 2026-10-31 open-file watch registry repair
 
 语义 `OpenFileWatchRegistry` 原先在 MCP watch start 失败后保留错误资源状态，pending ignore 永不清理，且异步失败可能删除已替换 watch。

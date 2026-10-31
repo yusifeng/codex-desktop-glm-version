@@ -1,5 +1,5 @@
 import { Wn as ResumeNotReadyError, Zo as errorToString } from "@chunk/shared";
-import { lastIncompleteTurn, lastTurn, mergedConversationTurns } from "../turns/canonical-history";
+import { hasCompleteHistory, lastIncompleteTurn, lastTurn, mergedConversationTurns } from "../turns/canonical-history";
 
 type UnknownRecord = Record<string, unknown>;
 type StreamRole = { role: string; ownerClientId?: string } | null | undefined;
@@ -146,7 +146,68 @@ export async function ave(manager: unknown, conversationId: string, helpers: Unk
     throw error;
   }
 }
-export async function dve(manager: unknown, request: { method: string; params: UnknownRecord }): Promise<UnknownRecord | undefined> { const target = manager as UnknownRecord; const fn = (name: string) => target[name] as ((...args: unknown[]) => unknown); const id = String(request.params.conversationId ?? ``); fn(`assertThreadFollowerOwner`)?.call(manager, id); const methodMap: Record<string, string> = { [`thread-follower-command-approval-decision`]: `replyWithCommandExecutionApprovalDecision`, [`thread-follower-file-approval-decision`]: `replyWithFileChangeApprovalDecision`, [`thread-follower-permissions-request-approval-response`]: `replyWithPermissionsRequestApprovalResponse`, [`thread-follower-submit-mcp-server-elicitation-response`]: `replyWithMcpServerElicitationResponse`, [`thread-follower-submit-user-input`]: `replyWithUserInputResponse`, [`thread-follower-compact-thread`]: `compactThread` }; const method = methodMap[request.method]; if (method == null) return undefined; const args = request.method === `thread-follower-compact-thread` ? [id] : [id, request.params.requestId, request.params.decision ?? request.params.response]; await fn(method)?.apply(manager, args); return { method: request.method, result: { ok: true } }; }
+export async function dve(manager: unknown, request: { method: string; params: UnknownRecord }): Promise<UnknownRecord | undefined> {
+  const target = manager as UnknownRecord;
+  const fn = (name: string) => target[name] as ((...args: unknown[]) => unknown);
+  const params = request.params;
+  const id = String(params.conversationId ?? ``);
+  fn(`assertThreadFollowerOwner`).call(manager, id);
+  switch (request.method) {
+    case `thread-follower-set-queued-follow-ups-state`:
+      await ((target.turnCoordinator as UnknownRecord).acceptFromFollower as (...args: unknown[]) => unknown)(id, (params.state as UnknownRecord)[id] ?? []);
+      return { method: request.method, result: { ok: true } };
+    case `thread-follower-command-approval-decision`:
+      fn(`replyWithCommandExecutionApprovalDecision`).call(manager, id, params.requestId, params.decision); break;
+    case `thread-follower-file-approval-decision`:
+      fn(`replyWithFileChangeApprovalDecision`).call(manager, id, params.requestId, params.decision); break;
+    case `thread-follower-permissions-request-approval-response`:
+      fn(`replyWithPermissionsRequestApprovalResponse`).call(manager, id, params.requestId, params.response); break;
+    case `thread-follower-submit-mcp-server-elicitation-response`:
+      fn(`replyWithMcpServerElicitationResponse`).call(manager, id, params.requestId, params.response); break;
+    case `thread-follower-submit-user-input`:
+      fn(`replyWithUserInputResponse`).call(manager, id, params.requestId, params.response); break;
+    case `thread-follower-compact-thread`:
+      await fn(`compactThread`).call(manager, id); break;
+    case `thread-follower-edit-last-user-turn`:
+      await fn(`editLastUserTurn`).call(manager, id, params); break;
+    case `thread-follower-interrupt-turn`:
+      try {
+        const interruptedTurnId = await fn(`interruptConversation`).call(manager, id, params.mode, params.expectedTurnId);
+        return { method: request.method, result: { interruptedTurnId, ok: true } };
+      } catch (error) {
+        if (params.mode !== `user-stop` || !(error instanceof Error) || !(`interruptedTurnId` in error) || typeof error.interruptedTurnId !== `string`) throw error;
+        return { method: request.method, result: { interruptedTurnId: error.interruptedTurnId, goalPauseError: error.message, ok: true } };
+      }
+    case `thread-follower-load-complete-history`: {
+      const conversation = fn(`getConversation`).call(manager, id);
+      const wasComplete = conversation != null && hasCompleteHistory(conversation as never);
+      const before = fn(`getConversationStreamRevision`).call(manager, id);
+      await fn(`getCompleteConversationTurns`).call(manager, id);
+      const after = fn(`getConversationStreamRevision`).call(manager, id) as number | null;
+      const revision = (!wasComplete && after != null && after > ((before as number | null) ?? 0) ? after : null) ?? fn(`broadcastConversationSnapshot`).call(manager, id);
+      if (revision == null) throw Error(`no-client-found: thread stream owner became unavailable`);
+      return { method: request.method, result: { revision } };
+    }
+    case `thread-follower-start-turn`: {
+      const result = await fn(`startTurn`).call(manager, id, params.turnStart);
+      return { method: request.method, result: { result } };
+    }
+    case `thread-follower-steer-turn`: {
+      const result = await fn(`steerTurn`).call(manager, id, params.input, params.restoreMessage, params.serviceTier, params.attachments, params.clientUserMessageId, params.additionalContext, params.toolOutput);
+      return { method: request.method, result: { result } };
+    }
+    case `thread-follower-update-daybreak`:
+      await fn(`updateThreadDaybreakEnabled`).call(manager, id, params.daybreakEnabled); break;
+    case `thread-follower-update-thread-settings`:
+      if (params.activeTurnId == null)
+        return { method: request.method, result: { applied: await fn(`updateThreadSettingsForNextTurn`).call(manager, id, params.threadSettings, params.condition) } };
+      await fn(`updateThreadPermissions`).call(manager, id, params.threadSettings, params.activeTurnId);
+      return { method: request.method, result: { applied: true } };
+    default:
+      return undefined;
+  }
+  return { method: request.method, result: { ok: true } };
+}
 export const handleThreadFollowerRequest = dve;
 export const activeTurnId = ry;
 export const hasInProgressLocalTurn = iy;

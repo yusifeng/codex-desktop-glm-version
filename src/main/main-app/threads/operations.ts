@@ -1,3 +1,5 @@
+import { Zo as errorToString } from "@chunk/shared";
+
 type Sandbox = {
   type?: string;
   writableRoots?: string[];
@@ -198,16 +200,54 @@ export async function forkConversation(input: {
 }
 export const Mye = forkConversation;
 export async function uve(
-  manager: {
-    sendRequest(
-      method: string,
-      params: unknown,
-    ): Promise<Record<string, unknown>>;
-  },
+  manager: Record<string, any>,
   params: Record<string, unknown>,
-  _compareSemanticVersions?: unknown,
+  compareSemanticVersions: (left: string, right: string) => number,
 ): Promise<Record<string, unknown>> {
-  return manager.sendRequest("thread/fork", params);
+  const { targetTurnId, ...forkParams } = params;
+  const sourceConversationId = String(params.sourceConversationId);
+  const source = manager.getConversation(sourceConversationId);
+  if (source == null) throw Error("Source conversation not found.");
+  const appServerVersion = manager.requestClient.getAppServerVersion();
+  if (
+    source.historyMode === "paginated" ||
+    (appServerVersion != null && appServerVersion !== "0.0.0" &&
+      compareSemanticVersions(appServerVersion, "0.143.0-alpha.32") >= 0)
+  ) return manager.forkConversationFromLatest({ ...forkParams, lastTurnId: targetTurnId });
+  const turns = await manager.getCompleteConversationTurns(sourceConversationId);
+  const targetIndex = turns.findIndex((turn: Record<string, unknown>) => turn.turnId === targetTurnId);
+  if (targetIndex === -1) throw Error("Target turn not found.");
+  const result = await manager.forkConversationFromLatest({ ...forkParams, addForkedSyntheticItem: false });
+  if (result.status === "not-ready") return result;
+  const conversationId = result.conversationId;
+  try {
+    const numTurns = turns.length - targetIndex - 1;
+    const rollbackResponse = numTurns > 0
+      ? await manager.sendRequest("thread/rollback", { threadId: conversationId, numTurns })
+      : null;
+    const conversation = manager.getConversation(conversationId);
+    if (conversation == null) throw Error("Forked conversation state not found.");
+    if (rollbackResponse != null)
+      manager.applyRollbackResponseToConversation({ conversationId, conversationState: conversation, rollbackResponse });
+    manager.addForkedFromConversationSyntheticItem(
+      conversationId,
+      sourceConversationId,
+      params.sourceTitle === undefined ? source.title : params.sourceTitle,
+    );
+    return result;
+  } catch (error) {
+    const message = errorToString(error);
+    return {
+      status: "created",
+      conversationId,
+      synchronization: {
+        status: "failed",
+        message: result.synchronization.status === "failed"
+          ? `${result.synchronization.message}; ${message}`
+          : message,
+      },
+    };
+  }
 }
 export async function Tx(input: {
   manager?: { getConversation?(id: string): unknown };

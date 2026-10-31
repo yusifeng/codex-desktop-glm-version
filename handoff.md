@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修复 fork-from-turn 与 follower request dispatcher：`threads/operations.ts` 现按 AppServer 版本选择原生 last-turn fork 或旧版
+fork-latest + rollback 兼容流，恢复 target 校验、synthetic item 与同步失败合并；`files/open-file-watches.ts` 的 dispatcher 恢复 queued
+follow-up、审批、compact/edit/interrupt、完整历史、start/steer、daybreak/settings 全方法覆盖，并改用 canonical complete-history 判定。
+主 chunk 旧 `uve/dve` 删除，新增 focused suite 覆盖现代/旧版 fork、回滚失败与关键 follower 分支。
+
 修复并收敛 open-file watch registry：`files/open-file-watches.ts` 现恢复 MCP resource watch 启动失败回滚、pending ignore 5 秒清理、
 过期 ignore 归零与异步 watch 失败的 identity-safe map cleanup；watch/unwatch、review/open-file/MCP message consumers 仍由 AppServer
 manager 使用。主 chunk 旧 `sve/cve/oy/sy` 簇删除，focused suite 扩至 28 条断言。
