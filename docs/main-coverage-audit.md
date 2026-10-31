@@ -1,5 +1,13 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 desktop host/file services and dictation audio restoration
+
+新增 `files/desktop-file-services.ts`，整体迁出 app-server client registry、file attachment temp persistence、validated renderer/native file drag、
+Library allowlisted realpath/file-identity access、private preview lifecycle、serialized Quick Look/Electron thumbnail generation 及 RPC facade。同步将
+`dictation/audio.ts` 从未接线且固定返回 `null` 的 partial skeleton 恢复为真实 CoreAudio route/device/property-buffer owner，并由 WindowContext 的
+现有 consumers 真实消费两组 factory。主 chunk 约 425 行旧实现物理删除；54 条 focused 文件系统/拖拽/CoreAudio/接线断言通过，防空壳审计扩至
+44 条。
+
 ## 2026-11-01 Electron message handler restoration
 
 新增完整 `window/electron-message-handler.ts`，迁出真实 `r$e` 的 56-method message owner：app-server request/response routing、shared-object

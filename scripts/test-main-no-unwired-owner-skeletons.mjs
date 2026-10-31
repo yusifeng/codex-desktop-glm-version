@@ -10,6 +10,8 @@ const realOwners = [
   ["src/main/main-app/browser-sidebar/browser-comment-controller.ts", "createBrowserCommentControllerClass"],
   ["src/main/main-app/browser-use/session-registry.ts", "createBrowserSessionRegistryRuntime"],
   ["src/main/main-app/window/electron-message-handler.ts", "createElectronMessageHandlerClass"],
+  ["src/main/main-app/files/desktop-file-services.ts", "createDesktopFileServicesRuntime"],
+  ["src/main/main-app/dictation/audio.ts", "createDictationAudioServiceClass"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -53,6 +55,10 @@ assert.equal(main.includes("BrowserSessionRegistry: cX, BrowserUseHost: ZYe"), t
 assert.equal(main.includes("cX = class"), false, "generated browser session registry must be removed");
 assert.equal(main.includes("r$e = createElectronMessageHandlerClass({"), true, "real Electron message handler owner is wired");
 assert.equal(main.includes("r$e = class"), false, "generated Electron message handler owner must be removed");
+assert.equal(main.includes("createDesktopFileServicesRuntime({"), true, "real desktop file service owners are wired");
+assert.equal(main.includes("a$e = class"), false, "generated app-server client registry must be removed");
+assert.equal(main.includes("k$e = createDictationAudioServiceClass({"), true, "real dictation audio owner is wired");
+assert.equal(main.includes("k$e = class"), false, "generated dictation audio owner must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("36 main unwired-owner skeleton assertions passed");
+console.log("44 main unwired-owner skeleton assertions passed");

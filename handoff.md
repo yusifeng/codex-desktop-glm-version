@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+恢复 desktop host/file services 与 dictation audio：新增 `files/desktop-file-services.ts`，接管 client registry、附件临时落盘、renderer/native
+file drag、Library realpath/file-identity allowlist、preview cleanup 和串行 Quick Look/Electron thumbnail；`dictation/audio.ts` 不再是固定返回
+`null` 的未接线 skeleton，现恢复完整 CoreAudio route/device/property-buffer/name decode 并真实接回 WindowContext。主 chunk 约 425 行旧副本删除；
+focused suite 执行 54 条文件系统/拖拽/CoreAudio/接线断言，防空壳审计扩至 44 条。
+
 恢复完整 ElectronMessageHandler：新增 `window/electron-message-handler.ts`，迁出真实 `r$e` 的 app-server/shared-object/dynamic-tools、project/worktree、
 browser host/session、sampling、power/focus、window restore、默认 workspace 与 disposal 全链。主 chunk 约 1,830 行旧 class/helper 删除并改为显式工厂接线；
 focused suite 执行 48 条行为/结构断言，防空壳审计扩至 36 条，并修正 sampler logger 的反编译参数遮蔽。

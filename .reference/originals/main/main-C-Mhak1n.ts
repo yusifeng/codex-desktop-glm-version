@@ -249,6 +249,8 @@ const { createSavedSectionTransitionClass } = require("./main-app/sidebar/saved-
 const { createSavedSectionReconciliationClass } = require("./main-app/sidebar/saved-section-reconciliation.js");
 const { createSavedCustomSectionsManagerClass } = require("./main-app/sidebar/saved-custom-sections-manager.js");
 const { createWorkspaceFileServiceClass } = require("./main-app/workspace/files.js");
+const { createDesktopFileServicesRuntime } = require("./main-app/files/desktop-file-services.js");
+const { createDictationAudioServiceClass } = require("./main-app/dictation/audio.js");
 const { createAuthorizedThreadCatalogServiceClass } = require("./main-app/thread-catalog/authorized-service.js");
 const { createPluginIncentivesClientRuntime } = require("./main-app/plugins/incentives-client.js");
 const { createPrimaryRuntimeUpdatePollerClass } = require("./main-app/misc/primary-runtime-update-poller.js");
@@ -62050,67 +62052,34 @@ var r$e = createElectronMessageHandlerClass({
     yQe,
   },
 });
-var a$e = class {
-    defaultHostId;
-    hosts = new Map();
-    constructor(e = J) {
-      this.defaultHostId = e;
-    }
-    add(e, t) {
-      this.hosts.set(e, t);
-    }
-    get(e = this.defaultHostId) {
-      let t = this.getMaybe(e);
-      if (t == null) throw Error(`App server client for host ID ${e} not found`);
-      return t;
-    }
-    getMaybe(e = this.defaultHostId) {
-      return this.hosts.get(e);
-    }
-    remove(e) {
-      this.hosts.delete(e);
-    }
-  },
-  o$e = new Map([
-    [`image/gif`, `gif`],
-    [`image/jpeg`, `jpg`],
-    [`image/png`, `png`],
-    [`image/webp`, `webp`],
-  ]),
-  s$e = class extends n.Uf {
-    executionHostRegistry;
-    constructor(e) {
-      (super(), (this.executionHostRegistry = e));
-    }
-    countFolderFiles({ folderPath: e, hostId: t }) {
-      return n.$(e, this.executionHostRegistry.get(t));
-    }
-    async persistImageFileToTemp({ bytes: e, mimeType: t }) {
-      let n = o$e.get(t);
-      if (n == null) return null;
-      let r = (0, h.join)((0, p.tmpdir)(), `codex-clipboard-${(0, _.randomUUID)()}.${n}`);
-      return (await (0, b.writeFile)(r, e, { flag: `wx`, mode: 384 }), r);
-    }
-  },
-  aQ;
-function c$e(e) {
-  if (process.platform !== `darwin`) return !1;
-  try {
-    return l$e()?.startFileDrag(e) === !0;
-  } catch {
-    return !1;
-  }
-}
-function l$e() {
-  if (aQ !== void 0) return aQ;
-  let e = o.t({ env: process.env, resourcesPath: process.resourcesPath });
-  try {
-    aQ = Vs({ electronAppPath: l.app.getAppPath(), resourcesPath: e });
-  } catch {
-    aQ = null;
-  }
-  return aQ;
-}
+var { AppServerClientRegistry: a$e, FileAttachmentsService: s$e, FileDragService: _$e, LibraryFilesService: l1e } =
+  createDesktopFileServicesRuntime({
+    RpcHandlerBase: n.Uf,
+    defaultHostId: J,
+    schema: n,
+    electron: l,
+    crypto: _,
+    path: h,
+    os: p,
+    fs: v,
+    fsPromises: b,
+    streamPromises: F,
+    util: d,
+    childProcess: P,
+    countFolderFiles: n.$,
+    isRemoteHostConfig: n.Es,
+    resolveLocalWorkspacePath: pQ,
+    resolveElectronResourcesPath: o.t,
+    loadNativeFileDragAddon: Vs,
+    normalizeEnvironment: n.Bi,
+    pathContains: fH,
+  });
+var k$e = createDictationAudioServiceClass({
+  RpcHandlerBase: n.Uf,
+  electron: l,
+  createLogger: r.r,
+  loadObjcJs: () => import(`objc-js`),
+});
 var u$e = 41943040,
   d$e = 512,
   f$e = 16,
@@ -62203,195 +62172,6 @@ function mQ(e, t, r = h) {
   if ((0, v.existsSync)(o)) return o;
   let s = a.indexOf(r.basename(t));
   return s === -1 ? o : r.join(t, ...a.slice(s + 1));
-}
-var g$e = n.wf({ hostId: n.Of().trim().min(1), path: n.Of().min(1) }),
-  _$e = class extends n.Uf {
-    executionHostRegistry;
-    globalState;
-    origin;
-    pendingFilePath = null;
-    preparedFileDrag = null;
-    constructor(e, t, n) {
-      (super(), (this.executionHostRegistry = e), (this.globalState = t), (this.origin = n));
-    }
-    async prepareDrag(e) {
-      let t = null;
-      try {
-        if (
-          ((t = this.#e(e)),
-          t == null ||
-            this.preparedFileDrag?.filePath === t ||
-            this.pendingFilePath === t ||
-            (0, v.statSync)(t, { throwIfNoEntry: !1 })?.isFile() !== !0)
-        )
-          return;
-        ((this.preparedFileDrag = null), (this.pendingFilePath = t));
-        let n = await l.app.getFileIcon(t, { size: `normal` });
-        this.pendingFilePath === t && (this.preparedFileDrag = { filePath: t, icon: n });
-      } catch {
-        this.pendingFilePath === t && (this.preparedFileDrag = null);
-      } finally {
-        this.pendingFilePath === t && (this.pendingFilePath = null);
-      }
-    }
-    startDrag = (e) => {
-      try {
-        let t = this.#e(e);
-        return t == null || (0, v.statSync)(t, { throwIfNoEntry: !1 })?.isFile() !== !0
-          ? !1
-          : this.origin.startDrag == null
-            ? c$e(t)
-            : this.preparedFileDrag?.filePath === t &&
-              (this.origin.startDrag({ file: t, icon: this.preparedFileDrag.icon }), !0);
-      } catch {
-        return !1;
-      }
-    };
-    #e(e) {
-      let t = g$e.safeParse(e);
-      if (!t.success) return null;
-      let { hostId: r, path: i } = t.data,
-        a = this.executionHostRegistry.get(r);
-      return n.Es(a.hostConfig) ? null : pQ(i, a, this.globalState);
-    }
-  },
-  v$e = `/System/Library/Frameworks/CoreAudio.framework/CoreAudio`,
-  hQ = 1,
-  gQ = TQ(`glob`),
-  _Q = 0,
-  y$e = TQ(`lnam`),
-  b$e = TQ(`dev#`),
-  x$e = TQ(`dIn `),
-  S$e = TQ(`dOut`),
-  C$e = TQ(`inpt`),
-  w$e = TQ(`stm#`),
-  vQ = TQ(`tran`),
-  T$e = TQ(`gone`),
-  E$e = TQ(`blue`),
-  D$e = TQ(`blea`),
-  O$e = TQ(`bltn`),
-  yQ = null,
-  k$e = class extends n.Uf {
-    logger = r.r(`dictation-audio`);
-    async getBuiltInMicrophoneName() {
-      if (process.platform !== `darwin`) return null;
-      try {
-        if (!l.screen.getAllDisplays().some((e) => e.internal)) return null;
-        let e = await M$e();
-        return A$e(e) ? j$e(e) : null;
-      } catch (e) {
-        return (
-          this.logger.warning(`Unable to inspect the active macOS audio route`, {
-            safe: {},
-            sensitive: { error: e },
-          }),
-          null
-        );
-      }
-    }
-  };
-function A$e(e) {
-  let t = SQ(e, { address: { element: _Q, scope: gQ, selector: x$e }, objectId: hQ }),
-    n = SQ(e, { address: { element: _Q, scope: gQ, selector: S$e }, objectId: hQ });
-  if (t == null || n == null) return !1;
-  let r = bQ(e, t, vQ),
-    i = bQ(e, n, vQ);
-  return wQ(r) && wQ(i) && bQ(e, n, T$e) === 1;
-}
-function j$e(e) {
-  let t = xQ(e, { address: { element: _Q, scope: gQ, selector: b$e }, objectId: hQ })?.find(
-    (t) =>
-      bQ(e, t, vQ) === O$e &&
-      (xQ(e, { address: { element: _Q, scope: C$e, selector: w$e }, objectId: t })?.length ?? 0) >
-        0,
-  );
-  if (t == null) return null;
-  let n = CQ({ element: _Q, scope: gQ, selector: y$e }),
-    r = Buffer.alloc(4);
-  r.writeUInt32LE(8, 0);
-  let i = Buffer.alloc(8);
-  return e.getPropertyData(t, n, 0, null, r, i) === 0 && r.readUInt32LE(0) === 8
-    ? e.getStringFromPointer(i)
-    : null;
-}
-function bQ(e, t, n) {
-  return SQ(e, { address: { element: _Q, scope: gQ, selector: n }, objectId: t });
-}
-function xQ(e, { address: t, objectId: n }) {
-  let r = CQ(t),
-    i = Buffer.alloc(4),
-    a = e.getPropertyDataSize(n, r, 0, null, i),
-    o = i.readUInt32LE(0);
-  if (a !== 0 || o === 0 || o % 4 != 0) return null;
-  let s = Buffer.alloc(o);
-  return e.getPropertyData(n, r, 0, null, i, s) !== 0 || i.readUInt32LE(0) !== o
-    ? null
-    : Array.from({ length: o / 4 }, (e, t) => s.readUInt32LE(t * 4));
-}
-function SQ(e, { address: t, objectId: n }) {
-  let r = CQ(t),
-    i = Buffer.alloc(4);
-  i.writeUInt32LE(4, 0);
-  let a = Buffer.alloc(4);
-  return e.getPropertyData(n, r, 0, null, i, a) !== 0 || i.readUInt32LE(0) !== 4
-    ? null
-    : a.readUInt32LE(0);
-}
-function CQ(e) {
-  let t = Buffer.alloc(12);
-  return (
-    t.writeUInt32LE(e.selector, 0),
-    t.writeUInt32LE(e.scope, 4),
-    t.writeUInt32LE(e.element, 8),
-    t
-  );
-}
-function wQ(e) {
-  return e === E$e || e === D$e;
-}
-function TQ(e) {
-  return (
-    e.charCodeAt(0) * 16777216 + e.charCodeAt(1) * 65536 + e.charCodeAt(2) * 256 + e.charCodeAt(3)
-  );
-}
-async function M$e() {
-  return ((yQ ??= N$e()), yQ);
-}
-async function N$e() {
-  let { callFunction: e, fromPointer: t, NobjcLibrary: n } = await import(`objc-js`);
-  return (
-    new n(v$e),
-    {
-      getStringFromPointer: (n) => {
-        let r = t(n);
-        try {
-          let e = r.UTF8String();
-          if (typeof e != `string`) throw TypeError(`CoreAudio returned an invalid device name`);
-          return e;
-        } finally {
-          e(`CFRelease`, { returns: `v`, args: [`@`] }, r);
-        }
-      },
-      getPropertyData: (...t) => {
-        let n = e(
-          `AudioObjectGetPropertyData`,
-          { returns: `i`, args: [`I`, `^v`, `I`, `^v`, `^I`, `^v`] },
-          ...t,
-        );
-        if (typeof n != `number`) throw TypeError(`CoreAudio returned an invalid status`);
-        return n;
-      },
-      getPropertyDataSize: (...t) => {
-        let n = e(
-          `AudioObjectGetPropertyDataSize`,
-          { returns: `i`, args: [`I`, `^v`, `I`, `^v`, `^I`] },
-          ...t,
-        );
-        if (typeof n != `number`) throw TypeError(`CoreAudio returned an invalid status`);
-        return n;
-      },
-    }
-  );
 }
 var { DictationHistoryService: W$e, appendGlobalDictationHistory: L$e } =
   createDictationHistoryRuntime({
@@ -62856,181 +62636,7 @@ function n1e(e, t) {
     });
   return (n.set(t, { expiresAt: 1 / 0, promise: i }), i);
 }
-var r1e = class {
-    backend;
-    allowedLibraryRealPathsPromise = null;
-    previewPaths = new Set();
-    constructor(e) {
-      this.backend = e;
-    }
-    async prepareFilePreview(e) {
-      let t = await this.openAllowedFile(e),
-        n = null;
-      try {
-        n = await (0, b.mkdtemp)(h.default.join((0, p.tmpdir)(), `codex-library-preview-`));
-        let r = h.default.join(n, h.default.basename(e.replaceAll(`\\`, `/`)));
-        return (
-          await (0, F.pipeline)(
-            t.createReadStream({ autoClose: !1 }),
-            (0, v.createWriteStream)(r, { flags: `wx`, mode: 384 }),
-          ),
-          this.previewPaths.add(r),
-          r
-        );
-      } catch {
-        throw (
-          n != null && (await (0, b.rm)(n, { force: !0, recursive: !0 })),
-          Error(`Library file is unavailable`)
-        );
-      } finally {
-        await t.close();
-      }
-    }
-    async releaseFilePreview(e) {
-      this.previewPaths.delete(e) &&
-        (await (0, b.rm)(h.default.dirname(e), { force: !0, recursive: !0 }));
-    }
-    async openAllowedFile(e) {
-      let t = this.backend.convertPathForDesktopHost(e),
-        n,
-        r;
-      try {
-        let [e, i] = await Promise.all([(0, b.lstat)(t), (0, b.realpath)(t)]);
-        if (!e.isFile() || e.isSymbolicLink()) throw Error(`Invalid Library file`);
-        ((r = e), (n = i));
-      } catch {
-        throw Error(`Library file is unavailable`);
-      }
-      if (!(await this.getAllowedLibraryRealPaths()).some((e) => e != null && fH(n, e)))
-        throw Error(`Library file is unavailable`);
-      try {
-        let e = await (0, b.open)(n, v.constants.O_RDONLY | v.constants.O_NOFOLLOW);
-        try {
-          let [t, i, a] = await Promise.all([e.stat(), (0, b.lstat)(n), (0, b.realpath)(n)]);
-          if (
-            !t.isFile() ||
-            t.dev !== r.dev ||
-            t.ino !== r.ino ||
-            i.isSymbolicLink() ||
-            t.dev !== i.dev ||
-            t.ino !== i.ino ||
-            a !== n
-          )
-            throw Error(`Invalid Library file`);
-          return e;
-        } catch {
-          throw (await e.close(), Error(`Library file is unavailable`));
-        }
-      } catch {
-        throw Error(`Library file is unavailable`);
-      }
-    }
-    getAllowedLibraryRealPaths() {
-      return (
-        (this.allowedLibraryRealPathsPromise ??= this.loadAllowedLibraryRealPaths()),
-        this.allowedLibraryRealPathsPromise
-      );
-    }
-    async loadAllowedLibraryRealPaths() {
-      try {
-        return await Promise.all(
-          (await this.backend.getAllowedLibraryDirectories()).map(async (e) => {
-            try {
-              let [t, n] = await Promise.all([(0, b.lstat)(e), (0, b.realpath)(e)]);
-              return t.isDirectory() && !t.isSymbolicLink() ? n : null;
-            } catch {
-              return null;
-            }
-          }),
-        );
-      } finally {
-        this.allowedLibraryRealPathsPromise = null;
-      }
-    }
-  },
-  i1e = { compact: 96, large: 320 },
-  a1e = 5e3,
-  o1e = (0, d.promisify)(P.execFile),
-  s1e = class {
-    fileAccess;
-    queue = Promise.resolve();
-    constructor(e) {
-      this.fileAccess = e;
-    }
-    getDataUrl(e, t) {
-      let n = this.queue.then(async () => {
-        let n = await this.fileAccess.openAllowedFile(e);
-        try {
-          let r = await (0, b.mkdtemp)(h.default.join((0, p.tmpdir)(), `codex-library-source-`)),
-            i = h.default.join(r, h.default.basename(e.replaceAll(`\\`, `/`)));
-          try {
-            await (0, F.pipeline)(
-              n.createReadStream({ autoClose: !1 }),
-              (0, v.createWriteStream)(i, { flags: `wx` }),
-            );
-            let e = i1e[t],
-              r = await c1e(i, e);
-            if (r != null) return { dataUrl: r };
-            let a = await l.nativeImage.createThumbnailFromPath(i, { height: e, width: e });
-            return { dataUrl: a.isEmpty() ? null : a.toDataURL() };
-          } finally {
-            await (0, b.rm)(r, { force: !0, recursive: !0 });
-          }
-        } finally {
-          await n.close();
-        }
-      });
-      return (
-        (this.queue = n.then(
-          () => void 0,
-          () => void 0,
-        )),
-        n
-      );
-    }
-  };
-async function c1e(e, t) {
-  if (process.platform !== `darwin`) return null;
-  let r = await (0, b.mkdtemp)(h.default.join((0, p.tmpdir)(), `codex-library-thumbnail-`)),
-    i = h.default.join(r, `${h.default.basename(e)}.png`);
-  try {
-    return (
-      await o1e(`/usr/bin/qlmanage`, [`-t`, `-s`, String(t), `-o`, r, e], {
-        env: n.Bi(process.env),
-        timeout: a1e,
-      }),
-      `data:image/png;base64,${(await (0, b.readFile)(i)).toString(`base64`)}`
-    );
-  } catch {
-    return null;
-  } finally {
-    await (0, b.rm)(r, { recursive: !0, force: !0 });
-  }
-}
-var l1e = class extends n.Uf {
-    backend;
-    fileAccess;
-    thumbnailGenerator;
-    constructor(e) {
-      (super(),
-        (this.backend = e),
-        (this.fileAccess = new r1e(e)),
-        (this.thumbnailGenerator = new s1e(this.fileAccess)));
-    }
-    getThumbnailDataUrl({ size: e, sourcePath: t }) {
-      return this.thumbnailGenerator.getDataUrl(t, e);
-    }
-    listOutputFiles() {
-      return this.backend.listOutputFiles();
-    }
-    async prepareFilePreview({ sourcePath: e }) {
-      return { previewPath: await this.fileAccess.prepareFilePreview(e) };
-    }
-    releaseFilePreview({ previewPath: e }) {
-      return this.fileAccess.releaseFilePreview(e);
-    }
-  },
-  u1e = class extends n.Uf {
+var u1e = class extends n.Uf {
     executionHostRegistry;
     constructor(e) {
       (super(), (this.executionHostRegistry = e));
