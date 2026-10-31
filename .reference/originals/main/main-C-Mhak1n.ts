@@ -150713,37 +150713,14 @@ var O9 = r.i(`window-manager`),
 function Pot() {
   return buildWindowErrorPage(l.app.getName());
 }
-var k9 = `#00000000`,
-  Fot = `#000000`,
-  Iot = `#f9f9f9`,
-  Lot = 3840,
-  Rot = 2160,
-  zot = 320,
-  Bot = 140,
-  Vot = 400,
-  Hot = 400,
-  Uot = 46,
-  Wot = 14,
-  Got = 16,
-  Kot = 36,
-  qot = `#1f1f1f`,
-  Jot = `#ffffff`,
-  Yot = 5e3,
+var Yot = 5e3,
   Xot = 1e3,
   Zot = 5e3;
 function A9(e) {
   return windowAppearance.trafficLightPosition(e);
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  return { x: Got, y: Math.round((Uot * e - Wot) / 2) };
 }
 function j9(e = 1) {
   return windowAppearance.titleBarOverlay(e, l.nativeTheme.shouldUseDarkColors);
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  return {
-    color: k9,
-    symbolColor: l.nativeTheme.shouldUseDarkColors ? Jot : qot,
-    height: Math.round(Kot * e),
-  };
 }
 var Qot = createBrowserWindowManagerClass({
   n,
@@ -150829,186 +150806,30 @@ function F9(e) {
 }
 function I9(e) {
   return windowAppearance.isOverlayAppearance(e);
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  return (
-    e === `avatarOverlay` ||
-    e === `browserCommentPopup` ||
-    e === `globalDictation` ||
-    e === `screenOverlay` ||
-    e === `hotkeyWindowHome` ||
-    e === `hotkeyWindowThread`
-  );
 }
 function rst({ appearance: e, platform: t, scaleFactor: n, windowBounds: r }) {
   return windowAppearance.isLargeEnoughForNativeWindow({ appearance: e, platform: t, scaleFactor: n, windowBounds: r });
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  if (t !== `darwin` || I9(e)) return !1;
-  let i = r.width * n,
-    a = r.height * n;
-  return Math.max(i, a) >= Lot && Math.min(i, a) >= Rot;
 }
 function ist({ appearance: e, opaqueWindowsEnabled: t, platform: n }) {
   return windowAppearance.shouldUseOpaqueWindows({ appearance: e, opaqueWindowsEnabled: t, platform: n });
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  return t && !I9(e) && (n === `darwin` || n === `win32`);
 }
 function ast({ appearance: e, isFocused: t, platform: n }) {
   return windowAppearance.shouldHideInactiveWindow({ appearance: e, isFocused: t, platform: n });
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  return !t && !I9(e) && n === `darwin`;
 }
 function ost(e) {
   return windowAppearance.supportsEmbeddedWebview(e);
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  return e === `primary` || e === `detached` || e === `hotkeyWindowThread` || e === `hud`;
 }
 function sst(e, t) {
   return windowAppearance.minimumWindowSize(e, t);
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  switch (e) {
-    case `avatarOverlay`:
-    case `browserCommentPopup`:
-    case `globalDictation`:
-    case `screenOverlay`:
-      return null;
-    case `primary`:
-      return t;
-    case `hotkeyWindowHome`:
-      return { width: zot, height: Bot };
-    case `hotkeyWindowThread`:
-      return { width: Vot, height: Hot };
-    case `hud`:
-    case `quickChat`:
-    case `secondary`:
-    case `detached`:
-      return { width: 400, height: 400 };
-  }
 }
 function L9({ platform: e, appearance: t, opaqueWindowSurfaceEnabled: n, prefersDarkColors: r }) {
   return windowAppearance.windowSurfaceColors({ platform: e, appearance: t, opaqueWindowSurfaceEnabled: n, prefersDarkColors: r });
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  return n
-    ? { backgroundColor: r ? Fot : Iot, backgroundMaterial: e === `win32` ? `none` : null }
-    : e !== `win32` || I9(t)
-      ? { backgroundColor: k9, backgroundMaterial: null }
-      : { backgroundColor: k9, backgroundMaterial: `mica` };
 }
 function cst(e, t) {
   return windowAppearance.vibrancyForAppearance(e, t);
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  return t || I9(e) ? null : `menu`;
-}
-function R9({
-  alwaysOnTop: e,
-  hasShadow: t = !0,
-  platform: n,
-  resizable: r,
-  thickFrame: i,
-  transparent: a = !0,
-}) {
-  return windowAppearance.framelessWindowOptions({ alwaysOnTop: e, hasShadow: t, platform: n, resizable: r, thickFrame: i, transparent: a });
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  return {
-    frame: !1,
-    transparent: a,
-    hasShadow: t,
-    resizable: r,
-    minimizable: !1,
-    maximizable: !1,
-    fullscreenable: !1,
-    skipTaskbar: !0,
-    ...(e ? { alwaysOnTop: !0 } : {}),
-    ...(n === `win32` ? { accentColor: !1, roundedCorners: !1, thickFrame: i } : {}),
-    ...(n === `darwin` ? { type: `panel` } : {}),
-  };
 }
 function z9({ appearance: e, opaqueWindowSurfaceEnabled: t, platform: n, windowZoom: r = 1 }) {
   return windowAppearance.windowOptions({ appearance: e, opaqueWindowSurfaceEnabled: t, platform: n, windowZoom: r });
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  switch (e) {
-    case `browserCommentPopup`:
-      return R9({ hasShadow: !1, platform: n, resizable: !1, thickFrame: !1, transparent: !0 });
-    case `globalDictation`:
-    case `screenOverlay`:
-      return {
-        ...R9({
-          alwaysOnTop: !0,
-          hasShadow: !1,
-          platform: n,
-          resizable: !1,
-          thickFrame: !1,
-          transparent: !0,
-        }),
-        ...(n === `darwin`
-          ? { acceptFirstMouse: !0, enableLargerThanScreen: e === `screenOverlay` }
-          : {}),
-      };
-    case `avatarOverlay`:
-      return {
-        ...R9({ alwaysOnTop: !0, platform: n, resizable: !1, thickFrame: !1 }),
-        ...(n === `darwin` ? { enableLargerThanScreen: !0 } : {}),
-        hasShadow: !1,
-      };
-    case `hotkeyWindowHome`:
-      return {
-        ...R9({ platform: n, resizable: !1, thickFrame: !1 }),
-        ...(n === `darwin` ? { acceptFirstMouse: !0 } : {}),
-      };
-    case `hotkeyWindowThread`:
-      return R9({ platform: n, resizable: !0 });
-    case `quickChat`:
-    case `primary`:
-      return n === `darwin`
-        ? {
-            titleBarStyle: `hiddenInset`,
-            trafficLightPosition: A9(r),
-            ...(e === `primary` ? { acceptFirstMouse: !0 } : {}),
-            ...(e === `quickChat` ? { hasShadow: !0, resizable: !0, transparent: !0 } : {}),
-            ...(t ? {} : { vibrancy: `menu` }),
-          }
-        : n === `win32` || n === `linux`
-          ? {
-              titleBarStyle: `hidden`,
-              titleBarOverlay: j9(r),
-              ...(e === `quickChat` ? { resizable: !0 } : {}),
-            }
-          : { titleBarStyle: `default`, ...(e === `quickChat` ? { resizable: !0 } : {}) };
-    case `detached`:
-      return { titleBarStyle: `hidden`, titleBarOverlay: n === `darwin` || j9(r) };
-    case `secondary`:
-      return n === `darwin`
-        ? t
-          ? { titleBarStyle: `default` }
-          : { vibrancy: `menu`, titleBarStyle: `default` }
-        : { titleBarStyle: `default` };
-    case `hud`:
-      return n === `darwin`
-        ? t
-          ? {
-              titleBarStyle: `hiddenInset`,
-              minimizable: !1,
-              maximizable: !1,
-              fullscreenable: !1,
-              alwaysOnTop: !0,
-              trafficLightPosition: { x: 10, y: 10 },
-            }
-          : {
-              vibrancy: `menu`,
-              titleBarStyle: `hiddenInset`,
-              minimizable: !1,
-              maximizable: !1,
-              fullscreenable: !1,
-              alwaysOnTop: !0,
-              trafficLightPosition: { x: 10, y: 10 },
-            }
-        : {
-            titleBarStyle: `default`,
-            minimizable: !1,
-            maximizable: !1,
-            fullscreenable: !1,
-            alwaysOnTop: !0,
-          };
-  }
 }
 var lst = 2e3,
   ust = 10;

@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 window-appearance wiring skeleton cleanup
+
+`A9/j9/I9/rst/ist/ast/ost/sst/L9/cst/z9` 现仅保留对 `main-app/window-appearance.ts` 的真实 delegation；已删除
+所有 early-return 后的 generated duplicate bodies、仅由死代码引用的 15 个常量，以及无剩余 consumer 的 `R9`。
+BrowserWindow manager 依赖签名和调用边界不变。
+
 ## 2026-10-31 thread-metadata persistence owner
 
 原 `Oot/kot/Aot/jot` 已迁入 `src/main/main-app/threads/thread-metadata-service.ts`。新 owner 保留 serialized mutation

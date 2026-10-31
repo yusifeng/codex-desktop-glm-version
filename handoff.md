@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+继续清理 `windowAppearance` wiring：`A9/j9/I9/rst/ist/ast/ost/sst/L9/cst/z9` 已只保留真实模块 delegation，
+删除全部 early-return 后的 generated duplicate bodies、仅由这些死代码引用的 15 个常量，以及已无 consumer 的 `R9`。
+BrowserWindow manager 的现有调用边界保持不变。新 focused test 覆盖 21 项，既有 appearance 回归 18 项。
+
 随后将 `Oot/kot/Aot/jot` thread-metadata persistence owner 迁入 `threads/thread-metadata-service.ts`；serialized
 mutation queue、read cloning、validation/update delegation、flush、rollback、rollback-error logging 与 change publication 均由
 新 owner 持有。BrowserWindow manager dependency 已接回，旧 class 及两个 unreachable generated skeleton 已删除。
