@@ -5032,3 +5032,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   cold thread materialization 与 presentation projection；main 旧 `mX..sXe` helper belt 已删除。
 - 无调用点的 `rXe/iXe` 作为死恢复残留一并移除。focused coverage 57 项，no-unwired gate 扩至 464 项；下一批从紧随其后的
   Browser Use route adapter helpers继续审计，优先与现有 `browser-use-route-controller.ts` 合并而不是复制 controller 状态。
+
+# 2026-11-01 Browser Use route controller convergence
+
+- `browser-use-route-controller.ts` 现独占 route page/tab/open/close/release、visibility、viewport/capture、active/WebMCP/cursor 状态；
+  原 main `cXe..OX` 约 480 行重复 adapter 已删除，panel/cursor helpers 内聚进 controller。
+- thread runtime 补充 `_X/OX` 对应语义 exports，并修复 conversation transfer 仍引用 `_X` 却未接线的潜在运行时错误。
+  focused coverage 29 + 60 项，no-unwired gate 扩至 481 项；下一批继续审计 `gXe` conversation transfer 及相邻 page-state helpers，
+  优先复用现有 window/thread controller，不拆共享 transfer 副作用链。

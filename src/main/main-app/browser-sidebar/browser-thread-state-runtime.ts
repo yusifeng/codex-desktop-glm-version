@@ -80,6 +80,19 @@ export function createBrowserThreadStateRuntime(
     return null;
   }
 
+  function getBrowserUseTabIds(windowState: AnyRecord, conversationId: string): string[] {
+    const browserTabIds: string[] = [];
+    for (const threadState of windowState.threads.values()) {
+      if (
+        threadState.conversationId === conversationId &&
+        (threadState.isBrowserUsePage || threadState.isBrowserUseActive)
+      ) {
+        browserTabIds.push(threadState.browserTabId);
+      }
+    }
+    return browserTabIds;
+  }
+
   function ensureThreadStateForWindow({
     browserSessionRegistry,
     browserTabId,
@@ -199,6 +212,7 @@ export function createBrowserThreadStateRuntime(
     getPageHandleForConversation,
     hasThreadForConversation,
     findOwnerRoutePath,
+    getBrowserUseTabIds,
     ensureThreadStateForWindow,
     createThreadState,
     applyThreadPresentation,

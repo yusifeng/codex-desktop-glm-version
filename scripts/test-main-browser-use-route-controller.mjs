@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
@@ -63,9 +64,9 @@ const host = {
 };
 const Controller = createBrowserUseRouteControllerClass({
   hX: (window, conversationId, browserTabId) => host.getThreadStateForWindow(window, conversationId, browserTabId),
-  n: { lu: { NEW_TAB_PAGE: "new-tab" } }, qU: () => "page-key", oX: (value) => value,
+  n: { lu: { NEW_TAB_PAGE: "new-tab", WEB: "web" } }, qU: () => "page-key", oX: (value) => value,
   QU: (page) => page.snapshot?.url ?? "", iW: (value) => value, wU: { minWidth: 1, maxWidth: 2000, minHeight: 1, maxHeight: 2000 },
-  aW: (value) => value, mX: () => "tab", mXe: () => undefined, lW: () => null, OX: () => ["tab"], hXe: () => false,
+  aW: (value) => value, mX: () => "tab", lW: () => null, OX: () => ["tab"],
   dZ: () => undefined, WU: (manager, target, message) => manager.sendMessageToWebContents(target, message), fq: () => undefined,
   gX: (window, conversationId, browserTabId) => host.getThreadStateForWindow(window, conversationId, browserTabId)?.page ?? null,
   logger: () => ({ warning: () => undefined, info: () => undefined }),
@@ -81,5 +82,25 @@ assert.equal(calls.some(([kind, , message]) => kind === "message" && message.typ
 assert.equal(typeof controller.getBrowserUseRouteActionHelpers().getPageWindowState, "function");
 assert.equal(typeof controller.setBrowserUseActiveForConversation, "function");
 assertions += 3;
+
+controller.setBrowserVisibleForBrowserUseForRoute({ conversationId: "conversation", windowId: 10 }, true, "tab");
+equal(calls.some(([kind, , message]) => kind === "message" && message.type === "toggle-browser-panel" && message.open === true), true);
+thread.visible = true;
+thread.bounds = { x: 0, y: 0, width: 100, height: 100 };
+thread.snapshot.tabType = "web";
+equal(controller.setBrowserUseCursorForRoute(
+  { conversationId: "conversation", windowId: 10 },
+  { moveSequence: 1, sessionConversationId: "session", x: 4, y: 5 },
+  "tab",
+), true);
+const cursorMessage = calls.findLast(([kind, , message]) => kind === "message" && message.type === "browser-sidebar-browser-use-cursor-state")[2];
+equal(cursorMessage.animateMovement, undefined);
+equal(cursorMessage.visible, true);
+
+const main = fs.readFileSync(path.join(root, ".reference/originals/main/main-C-Mhak1n.ts"), "utf8");
+for (const oldOwner of ["function cXe(", "function bX(", "async function lXe(", "function uXe(", "function xX(", "function SX(", "function dXe(", "function fXe(", "function CX(", "function wX(", "function TX(", "function EX(", "function pXe(", "function DX(", "function mXe(", "function hXe(", "function OX("]) {
+  equal(main.includes(oldOwner), false);
+}
+equal(main.includes("createBrowserUseRouteControllerClass({"), true);
 
 console.log(`main browser use route controller tests passed (${assertions} assertions)`);

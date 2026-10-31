@@ -3,7 +3,7 @@
 /** Owns Browser Use route actions and the route-scoped page state transitions. */
 export function createBrowserUseRouteControllerClass(dependencies: Record<string, any>) {
   const {
-    hX, n, qU, oX, QU, iW, wU, aW, mX, mXe, lW, OX, hXe, dZ, WU, fq, gX,
+    hX, n, qU, oX, QU, iW, wU, aW, mX, lW, OX, dZ, WU, fq, gX,
     logger,
   } = dependencies;
   const yX = logger ?? (() => ({ warning() {}, info() {} }));
@@ -143,7 +143,7 @@ export function createBrowserUseRouteControllerClass(dependencies: Record<string
     const c = e.getThreadStateForWindow(o, i, s);
     if (!n) { const e = c?.page?.view.webContents; if (e != null && !e.isDestroyed()) e.closeExtensionActionContextMenu(); }
     if (o.tabSourceWindow != null) { n ? o.window.show() : o.window.hide(); return; }
-    if (n) { e.ensureThreadStateForWindow(o, i, s, { isBrowserUseTab: !0 }); mXe(e, o, i, s); return; }
+    if (n) { e.ensureThreadStateForWindow(o, i, s, { isBrowserUseTab: !0 }); showBrowserPanel(e, o, i, s); return; }
     if (c != null) { c.pendingBrowserUsePanelOpen = !1; c.hasPendingBrowserUseVisibilityRequest = !1; c.presented = !1; c.visible = !1; c.bounds = null; e.updateThreadSessionState(c); }
     e.windowManager.sendMessageToWebContents(o.owner, { type: `browser-sidebar-clear-pending-panel-open`, browserTabId: s, conversationId: i, reason: `hide` });
     if (o.activeConversationId === i && o.activeBrowserTabId === s) e.windowManager.sendMessageToWebContents(o.owner, { type: `toggle-browser-panel`, browserTabId: s, open: !1, source: `browser_use` });
@@ -179,6 +179,37 @@ export function createBrowserUseRouteControllerClass(dependencies: Record<string
     if (i?.visible !== !0 || i.bounds == null) { if (i != null) { i.pendingBrowserUsePanelOpen = !1; i.hasPendingBrowserUseVisibilityRequest = t.activeConversationId === n; } e.windowManager.sendMessageToWebContents(t.owner, { type: `browser-sidebar-open-panel-without-animation`, conversationId: n, browserTabId: r, source: `browser_use`, initiator: `browser_use` }); }
   }
 
+  function showBrowserPanel(e, t, n, r) {
+    if (t.activeConversationId !== n) {
+      openPanel(e, t, n, r);
+      return;
+    }
+    const threadState = e.getThreadStateForWindow(t, n, r) ?? null;
+    if (threadState?.visible === true && threadState.bounds != null) return;
+    if (threadState != null) {
+      threadState.pendingBrowserUsePanelOpen = false;
+      threadState.hasPendingBrowserUseVisibilityRequest = true;
+    }
+    e.windowManager.sendMessageToWebContents(t.owner, {
+      type: `toggle-browser-panel`,
+      open: true,
+      browserTabId: r,
+      conversationId: n,
+      source: `browser_use`,
+      initiator: `browser_use`,
+    });
+  }
+
+  function isBrowserUseCursorVisible(e, windowState, conversationId, browserTabId) {
+    const threadState = e.getThreadStateForWindow(windowState, conversationId, browserTabId) ?? null;
+    return windowState.window.isFocused() &&
+      windowState.activeConversationId === conversationId &&
+      windowState.activeBrowserTabId === browserTabId &&
+      threadState?.visible === true &&
+      threadState.bounds != null &&
+      threadState.snapshot.tabType === n.lu.WEB;
+  }
+
   function setActive(e, t, n, r) {
     const i = e.getPageWindowState(t, r); if (i == null) { yX().warning(`IAB_LIFECYCLE browser use route window missing for active state`, { safe: t, sensitive: {} }); return; }
     if (r == null) for (const r of e.getDetachedWindowStates(t.windowId)) setActive(e, { ...t, windowId: oX(r.window.id) }, n);
@@ -204,7 +235,7 @@ export function createBrowserUseRouteControllerClass(dependencies: Record<string
     if (n != null && r == null) throw Error(`A browser tab id is required to show the Browser Use cursor`);
     const a = r == null ? OX(i, t.conversationId) : [r]; let o = !1;
     if (r == null) for (const r of e.getDetachedWindowStates(t.windowId)) o = setCursor(e, { ...t, windowId: oX(r.window.id) }, n) || o;
-    for (const r of a) { const a = (n == null ? (e.getThreadStateForWindow(i, t.conversationId, r) ?? null) : e.ensureThreadStateForWindow(i, t.conversationId, r, { isBrowserUseTab: !0 }))?.browserTabId ?? r, s = n != null && hXe(e, i, t.conversationId, a), c = n == null ? { visible: !1, x: 0, y: 0 } : { ...(s ? {} : { animateMovement: !1 }), moveSequence: n.moveSequence, sessionConversationId: n.sessionConversationId, visible: !0, x: n.x, y: n.y };
+    for (const r of a) { const a = (n == null ? (e.getThreadStateForWindow(i, t.conversationId, r) ?? null) : e.ensureThreadStateForWindow(i, t.conversationId, r, { isBrowserUseTab: !0 }))?.browserTabId ?? r, s = n != null && isBrowserUseCursorVisible(e, i, t.conversationId, a), c = n == null ? { visible: !1, x: 0, y: 0 } : { ...(s ? {} : { animateMovement: !1 }), moveSequence: n.moveSequence, sessionConversationId: n.sessionConversationId, visible: !0, x: n.x, y: n.y };
       WU(e.windowManager, i, { type: `browser-sidebar-browser-use-cursor-state`, conversationId: t.conversationId, browserTabId: a, ...c }); o = s || o; }
     return o;
   }

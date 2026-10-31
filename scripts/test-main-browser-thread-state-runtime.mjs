@@ -63,6 +63,11 @@ equal(runtime.hasThreadForConversation(windowState, "conversation-a"), true);
 equal(runtime.hasThreadForConversation(windowState, "missing"), false);
 equal(runtime.findOwnerRoutePath(windowState, "conversation-b"), "/route");
 equal(runtime.findOwnerRoutePath(windowState, "conversation-a"), null);
+activeThread.isBrowserUseActive = true;
+inheritedRouteThread.isBrowserUsePage = true;
+equal(runtime.getBrowserUseTabIds(windowState, "conversation-a"), ["tab-a"]);
+equal(runtime.getBrowserUseTabIds(windowState, "conversation-b"), ["tab-old"]);
+equal(runtime.getBrowserUseTabIds(windowState, "missing"), []);
 
 const cold = runtime.createThreadState({
   annotationModeEnabled: true,

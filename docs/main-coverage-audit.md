@@ -3080,3 +3080,11 @@ opened、删除先于 closed 计数、active/ignored 清理、默认 snapshot �
 向现有 controllers 注入同一语义实现；无 consumer 的 `rXe/iXe` 死恢复 helper 同步删除，未制造 facade。原始 chunk 中
 `mX..sXe` 约 140 行已物理删除。focused test 57 项覆盖 lookup 拒绝条件、owner route、existing/new materialization、cold state、
 viewport 变更检测、bounds rounding 与真实接线；no-unwired gate 扩至 464 项。
+
+### 增量接线：Browser Use route controller 收敛
+
+`browser-sidebar/browser-use-route-controller.ts` 已成为 route page lookup/list/open/close/release、route disposal、panel visibility、
+viewport/capture、active/WebMCP/cursor state 的唯一 owner。panel-open 与 cursor-visible helper 已内聚进 controller；thread runtime
+新增 owner-route 与 Browser Use tab-id 查询 exports，主组合根补齐 conversation transfer 的 `_X/OX` 真实接线，修复迁移后可能触发的
+`_X is not defined`。原始 chunk 中 `cXe..OX` 约 480 行重复 adapter 已整带删除。focused tests 29 + 60 项覆盖 panel/cursor、
+route old-owner removal、thread queries 与 wiring；no-unwired gate 扩至 481 项。

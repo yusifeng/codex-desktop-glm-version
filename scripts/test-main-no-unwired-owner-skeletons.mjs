@@ -142,6 +142,9 @@ for (const oldOwner of ["function lX(", "function uX(", "function $Ye(", "functi
 for (const oldOwner of ["function mX(", "function hX(", "function gX(", "function rXe(", "function iXe(", "function aXe(", "function _X(", "function oXe(", "function vX(", "function sXe("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser thread state owner must be removed`);
 }
+for (const oldOwner of ["function cXe(", "function bX(", "async function lXe(", "function uXe(", "function xX(", "function SX(", "function dXe(", "function fXe(", "function CX(", "function wX(", "function TX(", "function EX(", "function pXe(", "function DX(", "function mXe(", "function hXe(", "function OX("]) {
+  assert.equal(main.includes(oldOwner), false, `${oldOwner} generated Browser Use route adapter must be removed`);
+}
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-host-policy-controller.js")'), true, "browser host policy controller is wired");
 assert.equal(main.includes("async function QRe("), false, "generated LaTeX compiler must be removed");
 assert.equal(main.includes("async function lze("), false, "generated internal plugin downloader must be removed");
@@ -429,4 +432,4 @@ assert.equal(main.includes("function _Oe("), false, "generated remote project co
 assert.equal(main.includes("function vOe("), false, "generated project order comparator must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("464 main unwired-owner skeleton assertions passed");
+console.log("481 main unwired-owner skeleton assertions passed");
