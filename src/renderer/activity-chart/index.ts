@@ -4,8 +4,8 @@
 // small chart vocabulary directly, avoiding a second charting runtime.
 
 import "@rchunk/rolldown-runtime";
-// Preserve release dependency edges used by the chunk loader/cache.  The
-// semantic renderer below no longer embeds their implementation.
+// Preserve release dependency edges used by the chunk loader/cache. The
+// implementations are compiled from reviewed TypeScript preserved sources.
 import "@exact-chunk/linear-51abf1a86c3b.js";
 import "@exact-chunk/line-5171f1d885cc.js";
 import "@exact-chunk/area-76377dfd01aa.js";

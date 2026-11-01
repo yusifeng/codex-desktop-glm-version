@@ -41,28 +41,21 @@ exports were previously classified. Current completion requires source-backed bu
 
 ## Current runtime-source recovery status
 
-The renderer build now emits and verifies all 1,888 registered rewritten chunks. There are 43 remaining release-faithful source owners
-under their semantic `src/renderer/<name>/` directories, including the settings/composer surfaces and the complete local
-conversation dependency closure. Their checked-in `exact.js` files are generated from the published ESM with only cross-chunk
-import specifiers rewritten; the source-build gate regenerates all 48 owners and requires exact source equality. The remaining
-inventory contains 183,586 formatted release-derived lines. The build therefore no longer substitutes the earlier partial
-view-model approximations for these production components.
+The renderer build now emits and verifies all 1,888 registered rewritten chunks. As of the 2026-11-02 voice batch,
+`EXACT_ROUTE_SOURCE_OWNERS` is empty: the final `mark-session-create` and realtime-controls owners compile directly from
+checked-in TypeScript and preserve their 69/41-symbol release ABIs. This is an exact-owner milestone, not by itself proof that
+the entire project is completely decompiled.
 
-The remaining route compatibility closure contains 35 checked-in ESM modules, down from 77 before the exact-owner promotion.
-The generated Google logo geometry and generic Unicode bidirectional-layout engine intentionally supersede thin semantic
-drafts and are guarded as reviewed boundaries. Dependency-owner checks ensure every exact owner import is supplied by a
-semantic owner, transform-only owner, reconstructed core, or the checked-in compatibility graph. All 35 remaining modules are
-explicitly audited as vendor or generated boundaries (Recharts/D3,
-Three.js, date/phone/form runtimes, generated icons and entry shims); a gate requires that inventory to match the closure
-exactly. Six former incremental hubs now also have exact source owners; only the three shared renderer hubs remain incremental.
-Renderer verification passes 1,888/1,888 outputs, TypeScript typechecking passes, and the recovery gate covers 11 source-build
-assertions, 35 compatibility modules, 43 exact owners, and six reviewed structural drafts. The packaged app now starts from
-the reconstructed build, renders the home composer, resumes a real signed-in local conversation, hydrates its turns, and renders
-the virtualized user/assistant transcript without loading original JavaScript as a runtime fallback. The build also rejects
-build-only `@exact-chunk` aliases if any leak into packaged assets.
+The former route compatibility closure is also empty. Its final 35 modules (157,630 formatted lines) were split by ownership:
+the locally implemented Activity/Billing/Imported-setup surfaces retain their published dependency order while those Recharts/D3
+and visualization-shim edges are supplied by preserved TypeScript source; Google Logo and Unicode layout use semantic TypeScript owners; the remaining 33 reviewed vendor/generated boundaries
+(Recharts/D3, Three.js, date/phone/form, QR, icons/images and entry shims) now live under
+`src/renderer-preserved/route-runtime/*.ts` and are compiled explicitly. The source-build gate requires zero compatibility
+modules, zero exact owners, a matching preserved manifest/disk inventory, and successful TypeScript compilation for all 33
+boundaries. Renderer verification remains 1,888/1,888 and build-only `@exact-chunk` aliases are rejected if they leak into
+packaged assets.
 
-Exact owners still retain release-local identifiers that can be renamed for readability, but those identifiers no longer imply
-a runtime fallback: the checked-in source owners are the build inputs. The signed-in E2E matrix now passes General settings,
+The signed-in E2E matrix has passed General settings,
 Git, Worktrees, Browser Use, historical user/assistant turn rendering, and the conversation add-context menu. On 2026-11-02 a
 fresh signed-in turn also completed through `fill` + `send` + `wait`. A separate turn invoked the reconstructed in-app-browser
 stack, attached the Browser webview, loaded `https://example.com/`, and returned the requested marker. The same packaged app
@@ -81,10 +74,9 @@ tab-activity, and session-registration behavior. Browser-page preload initializa
 annotation owners initialize lazily after their runtime bindings, WebMCP retains a real ESM named export, and every extracted
 annotation controller is bound before registry construction. Focused regressions cover these ordering and ownership contracts.
 
-The 43 exact owners are still outstanding readability and semantic-recovery work and must not be described as a completely
-decompiled renderer. The current build is source-backed and runnable, but final completion additionally requires replacing
-those owners with maintainable semantic TypeScript (or explicitly justified generated/vendor boundaries), keeping the
-critical E2E matrix green, and eliminating the remaining stable runtime contract errors.
+Zero exact owners and zero route-compatibility modules must still not be described as proof that the entire project is complete.
+Final completion additionally requires resolving the remaining preserved main/renderer inventory, keeping the full critical
+E2E matrix green, and eliminating every known stable runtime contract error.
 
 The latest semantic batch replaces the standalone visualization-document owner and parental-controls presentation owner.
 The visualization owner retains the nested sandbox, inner/outer CSP split, widget-state persistence, user-activation checks,

@@ -20,6 +20,7 @@ import { fileURLToPath } from "node:url";
 import { CHUNKS, IMPORT_ALIASES, REWRITTEN } from "./renderer-chunk-manifest.mjs";
 import {
   EXACT_ROUTE_SOURCE_OWNERS,
+  PRESERVED_ROUTE_SOURCE_OUTPUTS,
   collectConversationRouteClosure,
 } from "./renderer-route-recovery.mjs";
 
@@ -76,6 +77,11 @@ async function listSourceFiles(dir) {
 // draft rewrites are not needlessly bundled and then replaced.
 const recoveredRouteSourceDir = path.join(ROOT, "src/renderer-recovered/conversation-route");
 const recoveredRouteChunks = await collectConversationRouteClosure(recoveredRouteSourceDir);
+const preservedRouteSourceDir = path.join(ROOT, "src/renderer-preserved/route-runtime");
+const preservedRouteManifest = JSON.parse(
+  await fs.readFile(path.join(preservedRouteSourceDir, "manifest.json"), "utf8"),
+);
+const preservedRouteOutputs = new Set(preservedRouteManifest.outputs);
 const exactRouteOutputs = new Set(EXACT_ROUTE_SOURCE_OWNERS.values());
 
 // ---- bundle：已重写的 renderer chunk ----
@@ -166,6 +172,36 @@ await Promise.all(
 );
 if (routeCompileErrors.length > 0) errors.push(...routeCompileErrors);
 console.log(`compiled ${recoveredRouteChunks.size - routeCompileErrors.length}/${recoveredRouteChunks.size} recovered runtime-route source modules`);
+const preservedRouteCompileErrors = [];
+if (
+  preservedRouteManifest.moduleCount !== preservedRouteOutputs.size ||
+  preservedRouteOutputs.size !== PRESERVED_ROUTE_SOURCE_OUTPUTS.size ||
+  [...preservedRouteOutputs].some((output) => !PRESERVED_ROUTE_SOURCE_OUTPUTS.has(output))
+) {
+  errors.push("preserved route source manifest does not match the reviewed source-owner inventory");
+} else {
+  await Promise.all(
+    [...preservedRouteOutputs].map(async (output) => {
+      try {
+        const sourceName = output.replace(/\.js$/, ".ts");
+        const source = await fs.readFile(path.join(preservedRouteSourceDir, sourceName), "utf8");
+        const result = await esbuild.transform(source, {
+          ...common,
+          format: "esm",
+          loader: "ts",
+          sourcefile: sourceName,
+        });
+        await fs.writeFile(path.join(assetsDir, output), result.code);
+      } catch (error) {
+        preservedRouteCompileErrors.push(`${output}: ${error.message.split("\n")[0]}`);
+      }
+    }),
+  );
+}
+if (preservedRouteCompileErrors.length > 0) errors.push(...preservedRouteCompileErrors);
+console.log(
+  `compiled ${preservedRouteOutputs.size - preservedRouteCompileErrors.length}/${preservedRouteOutputs.size} preserved vendor/generated route sources`,
+);
 const assetNames = (await fs.readdir(assetsDir)).filter((name) => name.endsWith(".js"));
 const assetSources = new Map(
   await Promise.all(assetNames.map(async (name) => [name, await fs.readFile(path.join(assetsDir, name), "utf8")])),

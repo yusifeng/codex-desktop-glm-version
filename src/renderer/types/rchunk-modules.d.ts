@@ -8367,14 +8367,6 @@ declare module "@rchunk/line";
 declare module "@rchunk/area";
 declare module "@rchunk/step";
 declare module "@rchunk/monotone";
-declare module "@exact-chunk/linear-51abf1a86c3b.js";
-declare module "@exact-chunk/line-5171f1d885cc.js";
-declare module "@exact-chunk/area-76377dfd01aa.js";
-declare module "@exact-chunk/step-cc59eba019a7.js";
-declare module "@exact-chunk/monotone-68fb4f84bd88.js";
-declare module "@exact-chunk/BarChart-2010e7d67e4a.js";
-declare module "@exact-chunk/queries-a53713419c4d.js";
-declare module "@exact-chunk/visualization-directive-renderer-59d128f8ff01.js";
 declare module "@rchunk/visualization-standalone-document";
 declare module "@rchunk/external-agent-import-setup";
 declare module "@rchunk/symbol-browser" {
@@ -16165,3 +16157,11 @@ declare module "@rchunk/app-initial" {
   /** Initializes visualization security and bootstrap constants. */
   export const knt: () => void;
 }
+declare module "@exact-chunk/linear-51abf1a86c3b.js";
+declare module "@exact-chunk/line-5171f1d885cc.js";
+declare module "@exact-chunk/area-76377dfd01aa.js";
+declare module "@exact-chunk/step-cc59eba019a7.js";
+declare module "@exact-chunk/monotone-68fb4f84bd88.js";
+declare module "@exact-chunk/BarChart-2010e7d67e4a.js";
+declare module "@exact-chunk/queries-a53713419c4d.js";
+declare module "@exact-chunk/visualization-directive-renderer-59d128f8ff01.js";

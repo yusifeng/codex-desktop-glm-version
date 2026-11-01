@@ -8,6 +8,7 @@ import {
   EXACT_ROUTE_SOURCE_OWNERS,
   RECONSTRUCTED_ROUTE_CORE,
   PROMOTED_ROUTE_DEPENDENCIES,
+  PRESERVED_ROUTE_SOURCE_OUTPUTS,
   ROUTE_COMPATIBILITY_BOUNDARIES,
   SEMANTIC_ROUTE_OVERRIDES,
   collectConversationRouteClosure,
@@ -17,6 +18,13 @@ import { formatExactRouteSource } from "./renderer-exact-route-source.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sourceDirectory = path.join(root, "src/renderer-recovered/conversation-route");
 const releaseDirectory = path.join(root, ".reference/app-original/webview/assets");
+function exportNames(source) {
+  return [...source.matchAll(/export\s*\{([\s\S]*?)\};/g)]
+    .flatMap((match) => match[1].split(","))
+    .map((entry) => entry.trim().match(/(?:\bas\s+)?([\w$]+)$/)?.[1])
+    .filter(Boolean)
+    .sort();
+}
 const manifest = JSON.parse(await fs.readFile(path.join(sourceDirectory, "manifest.json"), "utf8"));
 const recovered = await collectConversationRouteClosure(sourceDirectory);
 const recoveredModules = [...recovered].sort();
@@ -39,7 +47,7 @@ assert.ok(
 const compiledModules = await Promise.all(
   recoveredModules.map(async (name) => {
     const source = await fs.readFile(path.join(sourceDirectory, name), "utf8");
-    return esbuild.transform(source, {
+    const transformed = await esbuild.transform(source, {
       target: "esnext",
       charset: "utf8",
       legalComments: "inline",
@@ -47,9 +55,60 @@ const compiledModules = await Promise.all(
       loader: "js",
       sourcefile: name,
     });
+    const output = name.replace(/\.ts$/, ".js");
+    const releaseSource = await fs.readFile(path.join(releaseDirectory, output), "utf8");
+    assert.deepEqual(
+      exportNames(transformed.code),
+      exportNames(releaseSource),
+      `${output} preserves its published export ABI`,
+    );
+    return transformed;
   }),
 );
 assert.equal(compiledModules.length, recovered.size, "every recovered route source module compiles as ESM");
+
+const preservedDirectory = path.join(root, "src/renderer-preserved/route-runtime");
+const preservedManifest = JSON.parse(
+  await fs.readFile(path.join(preservedDirectory, "manifest.json"), "utf8"),
+);
+const preservedOutputs = [...preservedManifest.outputs].sort();
+assert.equal(
+  preservedManifest.moduleCount,
+  preservedOutputs.length,
+  "preserved route manifest count matches its outputs",
+);
+assert.deepEqual(
+  preservedOutputs,
+  [...PRESERVED_ROUTE_SOURCE_OUTPUTS].sort(),
+  "preserved route manifest matches the reviewed source-owner inventory",
+);
+const preservedSourceFiles = (await fs.readdir(preservedDirectory))
+  .filter((name) => name.endsWith(".ts"))
+  .sort();
+assert.deepEqual(
+  preservedSourceFiles,
+  preservedOutputs.map((output) => output.replace(/\.js$/, ".ts")).sort(),
+  "every preserved route output has exactly one TypeScript source",
+);
+const preservedCompiled = await Promise.all(
+  preservedSourceFiles.map(async (name) => {
+    const source = await fs.readFile(path.join(preservedDirectory, name), "utf8");
+    assert.match(source, /^\/\/ @ts-nocheck -- preserved third-party or generated route boundary\./);
+    return esbuild.transform(source, {
+      target: "esnext",
+      charset: "utf8",
+      legalComments: "inline",
+      format: "esm",
+      loader: "ts",
+      sourcefile: name,
+    });
+  }),
+);
+assert.equal(
+  preservedCompiled.length,
+  PRESERVED_ROUTE_SOURCE_OUTPUTS.size,
+  "every preserved vendor/generated boundary compiles from TypeScript",
+);
 
 const semanticNamesByOutput = new Map();
 for (const semanticName of REWRITTEN) {
@@ -82,6 +141,11 @@ assert.deepEqual(
 
 const buildSource = await fs.readFile(path.join(root, "scripts/build-renderer.mjs"), "utf8");
 assert.match(buildSource, /esbuild\.transform\(source,\s*\{/, "renderer build compiles recovered route modules as source");
+assert.match(
+  buildSource,
+  /preserved vendor\/generated route sources/,
+  "renderer build compiles preserved route boundaries from checked-in TypeScript",
+);
 assert.doesNotMatch(buildSource, /fs\.copyFile\(/, "renderer build never copies published JavaScript into runtime output");
 assert.doesNotMatch(buildSource, /\.reference\/app-original/, "renderer build has no release-tree runtime dependency");
 
@@ -140,4 +204,6 @@ const uncoveredDrafts = structuralDrafts.filter(
 );
 assert.deepEqual(uncoveredDrafts, [], "every structural component draft is covered by a complete exact source owner");
 
-console.log(`11 recovered route source-build assertions passed (${recovered.size} compatibility modules, ${EXACT_ROUTE_SOURCE_OWNERS.size} exact owners, ${structuralDrafts.length} structural drafts covered)`);
+console.log(
+  `recovered route source-build assertions passed (${recovered.size} compatibility modules, ${PRESERVED_ROUTE_SOURCE_OUTPUTS.size} preserved TypeScript boundaries, ${EXACT_ROUTE_SOURCE_OWNERS.size} exact owners, ${structuralDrafts.length} structural drafts covered)`,
+);

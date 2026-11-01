@@ -1,5 +1,15 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Conversation route source closure 收官批次：最后 35 个 compatibility
+模块（157,630 格式化行、约 5.8 MB）不再作为 `src/renderer-recovered/conversation-route`
+发布 JS 图参与运行。Activity/Billing/Imported setup 保留发布依赖顺序，但 Recharts/D3 与
+visualization shim 副作用边已由 preserved TypeScript source 提供；Google Logo 和 Unicode layout 改由已有语义 TypeScript owner
+输出；其余 33 个经过审计的 Recharts/D3、Three、date/phone/form、QR、generated icon/image
+边界迁到 `src/renderer-preserved/route-runtime/*.ts`，由 renderer build 明确编译。source-build gate
+同时要求 compatibility=0、preserved manifest/磁盘/TypeScript 编译三者一致。当前构建报告
+`0/0 recovered compatibility`、`33/33 preserved vendor/generated`、`1888/1888 rewritten`；这清除了
+conversation-route 的原始 JS 运行回退，但 preserved main/renderer 的其余清单与完整 E2E 矩阵仍需继续。
+
 2026-11-02 Realtime voice 收官批次：`mark-session-create` 与
 `realtime-voice-controls-surface` 的合计 8,209 行发布 owner 已进入直接 TypeScript 源构建，
 不再由 `exact.js` 或构建时回拷拥有输出。为避免在 69/41 项短导出均有真实消费者时引入行为
@@ -7,8 +17,7 @@
 以及浮动 voice/pet/quick-chat 控件、几何布局、activity 与无障碍文案契约；新增专项 ABI/source
 contract，并通过 typecheck、604 个 semantic overrides 和 renderer source build。严格 exact owner
 清单由 2 个 / 8,209 行降至 0。这里的“严格清零”只表示 renderer exact owner 清零，**不等于
-完整项目已经反编译完成**；conversation-route compatibility、preserved main/renderer 边界和完整
-E2E 矩阵仍按总目标继续处理。
+完整项目已经反编译完成**；preserved main/renderer 的其余边界和完整 E2E 矩阵仍按总目标继续处理。
 
 2026-11-02 Artifact source bootstrap 大批次：`artifact-source-bootstrap` 不再保留
 15,318 行发布版 owner。可维护 TypeScript 恢复 artifact header/layout/zoom、worker transport、

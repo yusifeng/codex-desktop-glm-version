@@ -208,66 +208,50 @@ export const STRUCTURAL_COMPONENT_ROOTS = [
 // Static and lazy dependencies referenced by exact semantic owners that do not
 // yet have their own renderer or transform-only source owner. Keeping them as
 // explicit roots makes clean builds independent of stale app/webview output.
-export const EXACT_ROUTE_DEPENDENCY_ROOTS = [
-  "BarChart-2010e7d67e4a.js",
-  "invitations-44091c7ba43a.js",
-  "three.core-cb39b1271a0d.js",
-  "three.module-b65ff644899d.js",
-  "Icon-994cd6bb9e69.js",
-  "NewsPaper-4739abdcdbac.js",
-  "use-imported-setup-opportunity-fe980a908289.js",
-  "useForm-f8b6846e7263.js",
-  "browser-5e2e016ba055.js",
-  "google-logo-fc56f9e3f0e8.js",
-  "layout-a912dff4540d.js",
-  "visualization-directive-renderer-59d128f8ff01.js",
-];
+export const EXACT_ROUTE_DEPENDENCY_ROOTS = [];
 
 // Reviewed non-business boundaries that remain in the compatibility source
 // graph. The source-build gate requires this inventory to match the closure
 // exactly, so a newly introduced first-party module cannot hide here.
-export const ROUTE_COMPATIBILITY_BOUNDARIES = new Map([
-  ["BarChart-2010e7d67e4a.js", "vendor:recharts-bar-chart"],
-  ["ComposedChart-12232a23b4b3.js", "vendor:recharts-composed-chart-runtime"],
-  ["DatePicker-14d6de970c7c.js", "vendor:date-picker-runtime"],
-  ["google-logo-fc56f9e3f0e8.js", "generated:google-logo-svg-geometry"],
-  ["Icon-994cd6bb9e69.js", "generated:icon-geometry"],
-  ["NewsPaper-4739abdcdbac.js", "generated:icon-entry"],
-  ["area-76377dfd01aa.js", "vendor:d3-area"],
-  ["band-7f9eb19564f9.js", "vendor:d3-band-scale"],
-  ["browser-5e2e016ba055.js", "vendor:qrcode-browser-bundle"],
-  ["constant-363a14bf6d8f.js", "vendor:d3-constant"],
-  ["defaultLocale-99084237f459.js", "vendor:date-locale"],
-  ["eventemitter3-855cba3f482a.js", "vendor:eventemitter3"],
-  ["init-cd6c1f803e47.js", "vendor:chart-initializer"],
-  ["invitations-44091c7ba43a.js", "generated:invitation-illustration-geometry"],
-  ["lib-94a0a161a542.js", "vendor:recharts-component-runtime"],
-  ["layout-a912dff4540d.js", "vendor:unicode-bidirectional-text-layout"],
-  ["line-5171f1d885cc.js", "vendor:d3-line"],
-  ["linear-32e1d819583b.js", "vendor:d3-linear-scale"],
-  ["linear-51abf1a86c3b.js", "vendor:d3-linear-curve"],
-  ["monotone-68fb4f84bd88.js", "vendor:d3-monotone-curve"],
-  ["nice-2b3cc20611af.js", "vendor:d3-nice-domain"],
-  ["ordinal-654830f58ee1.js", "vendor:d3-ordinal-scale"],
-  [
-    "parental-controls-invitation-background-c88ddd8be059.js",
-    "generated:image-data-url",
-  ],
-  ["path-3b8129ebc7ff.js", "vendor:d3-path"],
-  ["phone-number-input-6ac1e964b07b.js", "vendor:phone-number-input"],
-  ["react-redux-14f5167095ae.js", "vendor:react-redux"],
-  ["step-cc59eba019a7.js", "vendor:d3-step-curve"],
-  ["string-963febbec52f.js", "vendor:d3-format"],
-  ["three.core-cb39b1271a0d.js", "vendor:three-core"],
-  ["three.module-b65ff644899d.js", "vendor:three-module"],
-  ["time-510b3d922182.js", "vendor:d3-time-scale"],
-  ["useForm-f8b6846e7263.js", "vendor:react-hook-form"],
-  [
-    "visualization-directive-renderer-59d128f8ff01.js",
-    "generated:visualization-entry-shim",
-  ],
-  ["with-selector-ee24d273d86e.js", "vendor:use-sync-external-store-selector"],
-  ["withMetadataArgument-d4cb51a53bdb.js", "vendor:libphonenumber-wrapper"],
+export const ROUTE_COMPATIBILITY_BOUNDARIES = new Map([]);
+
+// Reviewed third-party/generated boundaries are compiled from checked-in
+// TypeScript under src/renderer-preserved/route-runtime. They are not part of
+// the conversation compatibility graph and never fall back to published JS.
+export const PRESERVED_ROUTE_SOURCE_OUTPUTS = new Set([
+  "BarChart-2010e7d67e4a.js",
+  "ComposedChart-12232a23b4b3.js",
+  "DatePicker-14d6de970c7c.js",
+  "Icon-994cd6bb9e69.js",
+  "NewsPaper-4739abdcdbac.js",
+  "area-76377dfd01aa.js",
+  "band-7f9eb19564f9.js",
+  "browser-5e2e016ba055.js",
+  "constant-363a14bf6d8f.js",
+  "defaultLocale-99084237f459.js",
+  "eventemitter3-855cba3f482a.js",
+  "init-cd6c1f803e47.js",
+  "invitations-44091c7ba43a.js",
+  "lib-94a0a161a542.js",
+  "line-5171f1d885cc.js",
+  "linear-32e1d819583b.js",
+  "linear-51abf1a86c3b.js",
+  "monotone-68fb4f84bd88.js",
+  "nice-2b3cc20611af.js",
+  "ordinal-654830f58ee1.js",
+  "parental-controls-invitation-background-c88ddd8be059.js",
+  "path-3b8129ebc7ff.js",
+  "phone-number-input-6ac1e964b07b.js",
+  "react-redux-14f5167095ae.js",
+  "step-cc59eba019a7.js",
+  "string-963febbec52f.js",
+  "three.core-cb39b1271a0d.js",
+  "three.module-b65ff644899d.js",
+  "time-510b3d922182.js",
+  "useForm-f8b6846e7263.js",
+  "visualization-directive-renderer-59d128f8ff01.js",
+  "with-selector-ee24d273d86e.js",
+  "withMetadataArgument-d4cb51a53bdb.js",
 ]);
 
 export const CONVERSATION_ROUTE_ROOTS = [
@@ -975,6 +959,7 @@ export async function collectConversationRouteClosure(assetDirectory) {
     if (
       recovered.has(name) ||
       RECONSTRUCTED_ROUTE_CORE.has(name) ||
+      PRESERVED_ROUTE_SOURCE_OUTPUTS.has(name) ||
       SEMANTIC_ROUTE_OVERRIDES.has(name)
     )
       continue;
