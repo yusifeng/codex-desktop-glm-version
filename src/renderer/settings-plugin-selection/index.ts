@@ -16,7 +16,7 @@
 //
 // 依赖：7 文件（1 个新登记 browser-use-origin-state-queries）。
 
-import { $3 as runtimeLazy, FX as originStateApi, G4 as settingsHelpers, I3 as getJsxRuntime } from "@rchunk/app-shared";
+import { $3 as runtimeLazy, FX as originStateApi, G4 as settingsHelpers } from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
 import { d as appPrimaryInit } from "@rchunk/app-primary";
 import * as assertNever from "@rchunk/assert-never";
@@ -54,24 +54,29 @@ function BrowserUseSettingsSection(props: {
   showHistory?: boolean;
   showWebMcp?: boolean;
   siteSettingsRow?: unknown;
-}): unknown {
+}): PluginSelectionViewNode {
   const browserUseEnabled = props.browserUseEnabled !== false;
   const showHistory = props.showHistory !== false;
   const showWebMcp = props.showWebMcp === true;
   const status: BrowserConfigStatus = "supported" as BrowserConfigStatus;
-  const jsx = getJsxRuntime();
-  if (status === "loading") return jsx.jsx("div", { role: "status", children: "Loading browser settings…" });
-  if (status === "error") return jsx.jsx("div", { role: "alert", children: "Unable to load browser settings" });
+  if (status === "loading") return { kind: "browser-settings-loading" };
+  if (status === "error") return { kind: "browser-settings-error" };
   if (status === "supported") {
-    return jsx.jsxs("section", { "data-browser-settings-section": true, children: [
-      jsx.jsx("h3", { children: "Browser" }),
-      jsx.jsx("div", { "data-browser-use-enabled": browserUseEnabled }),
-      showHistory ? jsx.jsx("div", { "data-browser-history-settings": true }) : null,
-      showWebMcp ? jsx.jsx("div", { "data-web-mcp-settings": true }) : null,
-      props.siteSettingsRow,
-    ] });
+    return {
+      kind: "browser-settings-section",
+      props: {
+        backend: props.backend,
+        browserUseEnabled,
+        showHistory,
+        showWebMcp,
+        siteSettingsRow: props.siteSettingsRow,
+      },
+    };
   }
-  return jsx.jsx("section", { "data-browser-settings-unsupported": true, children: props.siteSettingsRow });
+  return {
+    kind: "browser-settings-unsupported",
+    props: { collapsed: props.siteSettingsRow != null || (browserUseEnabled && showWebMcp) },
+  };
 }
 
 /** 初始化器（原 `Lr`，导出 i）。 */
@@ -87,9 +92,8 @@ function handleOriginPermission(origin: string, permission: string): void {
 function initializeOriginSettings(): void {}
 
 /** origin 设置行（原 `Ar`，导出 t）。 */
-function OriginSettingsRow(props: { origin: string }): unknown {
-  const jsx = getJsxRuntime();
-  return jsx.jsxs("div", { "data-origin-settings-row": props.origin, children: [jsx.jsx("span", { children: props.origin }), jsx.jsx("button", { type: "button", onClick: () => handleOriginPermission(props.origin, "reset"), children: "Reset" })] });
+function OriginSettingsRow(props: { origin: string }): PluginSelectionViewNode {
+  return { kind: "origin-settings-row", props: props as Record<string, unknown> };
 }
 
 /** 初始化器（原 `zr`，导出 a）。 */

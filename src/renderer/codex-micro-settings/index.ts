@@ -26,7 +26,7 @@
 // 依赖：11 文件（7 个新登记：analog-action-title/commands/keyboard-surface/
 // layout/slot-signals + command-messages/keyboard-shortcuts-search-input）。
 
-import { $3 as runtimeLazy, I3 as getJsxRuntime } from "@rchunk/app-shared";
+import { $3 as runtimeLazy } from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
 import { d as appPrimaryInit } from "@rchunk/app-primary";
 import { default as analogActionTitle } from "@rchunk/codex-micro-analog-action-title";
@@ -76,12 +76,33 @@ export interface CodexMicroSettingsState {
  * 十五个设置区块全量挂载（keycaps/analog/editor/custom/knob/connection/
  * keyboard/agent/lighting/microphone/encoder/input/battery/options）。
  */
-export function CodexMicroSettings(props: { codexMicro?: CodexMicroService | null }): unknown {
+export function CodexMicroSettings(props: { codexMicro?: CodexMicroService | null }): CodexMicroViewNode | null {
   if (props.codexMicro == null) return null;
-  const jsx = getJsxRuntime();
-  const sections = ["Connection", "Keyboard layout", "Keycaps", "Analog controls", "Custom keys", "Knob", "Lighting", "Microphone", "Encoder", "Input", "Battery", "Options"];
-  return jsx.jsxs("section", { "data-codex-micro-settings": true, children: [
-    jsx.jsx("h2", { children: "Codex Micro" }),
-    sections.map((label) => jsx.jsxs("fieldset", { children: [jsx.jsx("legend", { children: label }), jsx.jsx("div", { "data-codex-micro-section": label.toLowerCase().replaceAll(" ", "-") })] }, label)),
-  ] });
+  return {
+    kind: "codex-micro-settings",
+    props: {
+      sections: {
+        analog: true,
+        battery: true,
+        connection: true,
+        custom: true,
+        editor: true,
+        encoder: true,
+        input: true,
+        keycaps: true,
+        keyboard: true,
+        knob: true,
+        lighting: true,
+        microphone: true,
+        options: true,
+      },
+      settingsKeys: {
+        agentSource: "codex-micro-agent-source",
+        layout: "codex-micro-layout",
+        lightingAutoOff: "codex-micro-lighting-auto-off",
+        lightingBrightness: "codex-micro-lighting-brightness",
+        singleTapAgentKeys: "codex-micro-single-tap-agent-keys",
+      } satisfies Record<keyof CodexMicroSettingsState, string>,
+    },
+  };
 }

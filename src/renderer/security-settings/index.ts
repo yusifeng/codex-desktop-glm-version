@@ -17,7 +17,7 @@
 // shared 等——注意 browser-5e2e016ba055 与 shared-7f893c663492 是设置页
 // 专属变体文件，与 app-shared 主体不同）。
 
-import { $3 as runtimeLazy, I3 as getJsxRuntime } from "@rchunk/app-shared";
+import { $3 as runtimeLazy } from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
 import { t as QrCode } from "@rchunk/security-browser";
 import { n as createSecurityQueries, t as initializeSecurityClient } from "@rchunk/security-client";
@@ -84,9 +84,32 @@ export interface SecuritySettingsView {
  * ChatGptSecuritySettings（原 `Da`，唯一导出）：
  * accountId 缺失 → 空态；否则安全设置主装配。
  */
-export function ChatGptSecuritySettings(props: { accountId?: string | null }): unknown {
-  const jsx = getJsxRuntime();
-  if (props.accountId == null) return jsx.jsx("div", { "data-security-settings-empty": true });
-  const sections = ["Multi-factor authentication", "Active sessions", "Connected apps", "Advanced protection", "Login connections", "Developer mode", "Lockdown mode"];
-  return jsx.jsxs("section", { "data-chatgpt-security-settings": props.accountId, children: [jsx.jsx("h2", { children: "Security" }), sections.map((label) => jsx.jsxs("section", { children: [jsx.jsx("h3", { children: label }), jsx.jsx("div", { "data-security-section": label })] }, label))] });
+export function ChatGptSecuritySettings(props: { accountId?: string | null }): SecuritySettingsViewNode {
+  if (props.accountId == null) return { kind: "security-settings-empty" };
+  return {
+    kind: "chatgpt-security-settings",
+    props: {
+      accountId: props.accountId,
+      sections: {
+        activeSessions: true,
+        advancedProtection: true,
+        developerMode: true,
+        linkedApps: true,
+        loginConnections: true,
+        lockdownMode: true,
+        mfa: true,
+      },
+      queries: {
+        linkedApps: { staleTime: 60_000 },
+        mfa: { refetchOnMount: true },
+      },
+      advancedProtectionGuard: {
+        // view=advanced-protection + apm_disable_confirm=true 且尚无
+        // apm_account_id 时，经 token 校验后追加查询参数（replace 导航）
+        requiredView: "advanced-protection",
+        confirmParam: "apm_disable_confirm",
+        accountIdParam: "apm_account_id",
+      },
+    },
+  };
 }

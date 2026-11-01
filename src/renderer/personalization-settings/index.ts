@@ -15,7 +15,7 @@
 //
 // 依赖：13 文件（9 个新登记）。
 
-import { $3 as runtimeLazy, I3 as getJsxRuntime } from "@rchunk/app-shared";
+import { $3 as runtimeLazy } from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
 import { d as appPrimaryInit } from "@rchunk/app-primary";
 import { default as aboutYouSummary } from "@rchunk/about-you-summary";
@@ -53,11 +53,20 @@ export interface PersonalizationViewNode {
  * accountId + 个性化 flag 双门控；记忆管理（gate + saved-memories）、
  * chronicle、参考照片、基础风格、agents 保存。
  */
-export function ChatGptPersonalizationSettings(props: { accountId?: string | null; personalizationEnabled?: boolean }): unknown {
+export function ChatGptPersonalizationSettings(props: { accountId?: string | null; personalizationEnabled?: boolean }): PersonalizationViewNode | null {
   if (!(props.accountId != null && props.personalizationEnabled === true)) return null;
-  const jsx = getJsxRuntime();
-  return jsx.jsxs("section", { "data-chatgpt-personalization-settings": props.accountId, children: [
-    jsx.jsx("h2", { children: "Personalization" }),
-    ["About you", "Memory", "Computer history", "Reference photos", "Base style", "Agents"].map((label) => jsx.jsxs("section", { children: [jsx.jsx("h3", { children: label }), jsx.jsx("div", { "data-personalization-section": label })] }, label)),
-  ] });
+  return {
+    kind: "chatgpt-personalization-settings",
+    props: {
+      accountId: props.accountId,
+      sections: {
+        aboutYouSummary: true,
+        agents: true,
+        baseStyle: true,
+        chronicle: true,
+        memory: true,
+        referencePhotos: true,
+      },
+    },
+  };
 }

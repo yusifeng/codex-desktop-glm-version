@@ -28,7 +28,6 @@ export const CHUNKS = {
   "profile-settings-entry": "profile-settings-3687227a4513.js",
   "plugins-settings-core": "plugins-settings-a104e9fe3d0b.js",
   "billing-analytics": "billing-analytics-9a493b3c8aaf.js",
-  "recharts-bar-chart": "BarChart-2010e7d67e4a.js",
   "terminal-panel-bootstrap": "terminal-panel-636086210b6f.js",
   "terminal-panel": "terminal-panel-b26695cb7733.js",
   "terminal-tab": "terminal-tab-c813278916e5.js",
@@ -2788,7 +2787,6 @@ export const CHUNKS = {
   "file-preview-loading": "loading-cba17c98d28e.js",
   "lowlight-runtime": "lowlight-62906d2993ab.js",
   "voice-reasoning-notice": "notice-2197fe51f059.js",
-  "math-block-utils": "math-block-utils-ca3c4f5321e8.js",
   "ads-placement-policy": "placement-policy-c8f98920d800.js",
   "realtime-buffered-audio-worklet":
     "realtime-buffered-audio-worklet-773c5f6cc0c3.js",
@@ -2980,7 +2978,6 @@ export const REWRITTEN = new Set([
   "usage-analytics-settings",
   "profile-settings-entry",
   "plugins-settings-core",
-  "billing-analytics",
   "terminal-panel-bootstrap",
   "terminal-panel",
   "terminal-tab",
@@ -4843,7 +4840,6 @@ export const REWRITTEN = new Set([
   "color-channel-parser-modern",
   "color-channel-parser-legacy",
   "media-device-contracts",
-  "math-block-utils",
 ]);
 
 // 已审计并明确保留发布版资产的尾部 chunk。这些模块属于第三方运行时、
@@ -4851,7 +4847,6 @@ export const REWRITTEN = new Set([
 // 轨道，不能计入 REWRITTEN。单独登记可防止尾部清扫时反复把 vendor 复制成
 // 难以维护的“语义源码”。
 export const PRESERVED_ASSETS = new Map([
-  ["recharts-bar-chart", "vendor:recharts-entry"],
   ["hammer-vendor-runtime-variant-2", "vendor:hammer-entry"],
   ["go-syntax-definition", "vendor:syntax-definition-entry"],
   ["cpp-syntax-definition", "vendor:syntax-definition-entry"],
@@ -5292,6 +5287,7 @@ export const INCREMENTAL_HUBS = new Map([
   ["popcorn-electron-surface-style", "typed-consumer-surface"],
   ["use-imported-setup-opportunity", "typed-consumer-surface"],
   ["checkout-session", "typed-consumer-surface"],
+  ["billing-analytics", "typed-consumer-surface"],
   ["mark-session-create", "typed-consumer-surface"],
   ["xterm-window-zoom", "typed-consumer-surface"],
   ["activity-chart", "typed-consumer-surface"],

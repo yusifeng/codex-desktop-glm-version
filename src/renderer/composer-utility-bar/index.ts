@@ -17,7 +17,7 @@
 // 图边界；具体压缩导出仍由 transform-only 轨道提供。
 
 import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
+import "@rchunk/app-shared";
 import "@rchunk/app-initial";
 import "@rchunk/app-primary";
 import "@rchunk/use-git-submodule-paths";
@@ -131,7 +131,7 @@ function createRemoteHostControl(
   projectPath: string | null | undefined,
 ): ComposerUtilityControl | null {
   if (hostId == null) return null;
-  const control: ComposerUtilityControl = {
+  return {
     kind: "remote-host",
     disabled: projectPath == null,
     props: {
@@ -140,7 +140,6 @@ function createRemoteHostControl(
       projectPath: projectPath ?? null,
     },
   };
-  return control;
 }
 
 const WORKTREE_NAME_PATTERN =
@@ -212,7 +211,7 @@ function formatExistingWorktreePath(codexHome: string | null | undefined, worktr
  * footer；compact/home 场景把项目和辅助控制放在 leading 区；运行模式、
  * Git、环境和远程 host 状态按当前任务类型装配到对应区域。
  */
-function ComposerUtilityBar(props: ComposerUtilityBarProps): unknown {
+function ComposerUtilityBar(props: ComposerUtilityBarProps): ComposerUtilityBarView {
   const isHome = props.variant === "home";
   const hasExistingWorkspace = props.existingWorkspace != null;
   const isWorktreeMode = props.composerMode === "worktree";
@@ -300,44 +299,13 @@ function ComposerUtilityBar(props: ComposerUtilityBarProps): unknown {
     if (remoteHost != null) trailingControls.push(remoteHost);
   }
 
-  const view: ComposerUtilityBarView = {
+  return {
     kind: "composer-utility-bar",
     layout: isHome ? "floating-home" : "inline-footer",
     hidden: props.isHidden === true,
     leadingControls,
     trailingControls,
   };
-  const jsx = (appSharedChunk as any).I3?.();
-  if (jsx == null) return null;
-  const renderControl = (control: ComposerUtilityControl, index: number): unknown => {
-    const details = control.props ?? {};
-    if (control.kind === "home-auxiliary" || control.kind === "free-upsell") return details.content ?? null;
-    if (control.kind === "mode-selector") return jsx.jsxs("label", { children: [
-      jsx.jsx("span", { className: "sr-only", children: "Run location" }),
-      jsx.jsxs("select", { disabled: control.disabled, value: props.composerMode, onChange: (event: { target: { value: ComposerMode } }) => props.setComposerMode(event.target.value), children: [
-        jsx.jsx("option", { value: "local", children: "Local" }),
-        details.allowWorktree ? jsx.jsx("option", { value: "worktree", children: "Worktree" }) : null,
-        jsx.jsx("option", { value: "cloud", children: "Cloud" }),
-      ] }),
-    ] }, `${control.kind}:${index}`);
-    const label = details.label ?? details.projectPath ?? ({
-      "branch-switcher": "Branch",
-      "cloud-follow-up-starting-state": "Starting state",
-      "cloud-run-location": "Cloud",
-      "existing-workspace": "Existing workspace",
-      "project-picker": "Project",
-      "remote-host": "Remote host",
-      "runtime-controls": "Runtime",
-      "worktree-environment": "Environment",
-    } as Record<string, string>)[control.kind] ?? control.kind;
-    return jsx.jsx("button", { disabled: control.disabled, type: "button", "data-composer-utility-control": control.kind, title: typeof details.projectPath === "string" ? details.projectPath : undefined, children: String(label) }, `${control.kind}:${index}`);
-  };
-  return jsx.jsxs("div", {
-    className: view.layout === "floating-home" ? "flex items-center justify-between" : "flex items-center gap-2",
-    hidden: view.hidden,
-    "data-composer-utility-bar": view.layout,
-    children: [jsx.jsx("div", { className: "flex min-w-0 items-center gap-2", children: view.leadingControls.map(renderControl) }), jsx.jsx("div", { className: "ml-auto flex items-center gap-2", children: view.trailingControls.map(renderControl) })],
-  });
 }
 
 export { ComposerUtilityBar };
