@@ -437,7 +437,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
     "local-conversation-git-actions",
     "local-conversation-git-actions-f71520dad4b4.js",
   ],
-  ["mcp-tool-activity-label", "mcp-tool-activity-label-87ba9ef42b0b.js"],
   ["thread-handoff-modal", "thread-handoff-modal-ccac59d04293.js"],
   ["thread-panel-toggle-button", "thread-panel-toggle-button-d0ce9733e408.js"],
 ]);

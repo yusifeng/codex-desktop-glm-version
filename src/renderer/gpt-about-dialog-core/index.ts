@@ -79,6 +79,9 @@ function toolDetails(tool: GptTool): { description?: string; title: string } | n
 function displayName(resource: GptResource): string {
   return resource.gizmo.display?.name?.trim() || resource.gizmo.id;
 }
+function isGptResource(value: GptData | GptResource): value is GptResource {
+  return typeof value.gizmo === "object" && value.gizmo != null && typeof (value.gizmo as GptData).id === "string";
+}
 function GptCard({ resource, onStartChat }: { resource: GptResource; onStartChat?(resource: GptResource): void }): unknown {
   const name = displayName(resource);
   return jsx.jsxs("button", {
@@ -102,7 +105,7 @@ function GptAboutDialog({ accountId, gizmo, isError = false, isOwnerAndWorkspace
         : [jsx.jsx("h2", { className: "sr-only", children: "Loading GPT details" }), jsx.jsx("p", { role: "status", children: "Loading information about this GPT" })],
     });
   }
-  const resource: GptResource = "gizmo" in gizmo ? gizmo : { gizmo };
+  const resource: GptResource = isGptResource(gizmo) ? gizmo : { gizmo };
   const name = displayName(resource);
   const author = resource.gizmo.author?.display_name?.trim() || null;
   const capabilities = [...new Map((resource.tools ?? []).map(toolDetails).filter((value): value is { description?: string; title: string } => value != null).map(value => [value.title, value])).values()];

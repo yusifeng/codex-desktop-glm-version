@@ -1,5 +1,14 @@
 # Renderer 尾部资产审计
 
+2026-11-02 MCP tool activity/approval 大批次：`mcp-tool-activity-label` 已从
+10,030 行发布版 owner 迁出。语义源码保留发布版 928 个 activity descriptor 与 167 个
+approval descriptor（ID 和 ICU default message 全覆盖），恢复 Figma、Gmail、Google Calendar、
+Google Drive、GitHub、Linear、Notion、Slack 的参数校验、上下文模板选择、URL/日期/计数和值投影；
+Browser Use fallback 也重新经过 `intl.formatMessage`，不再绕过本地化。专项 cluster 增加跨应用
+上下文审批、发布 descriptor 数量及禁止 `exact.js` 回退门禁；同时修正上一批暴露的 connector
+definition 与 GPT resource 类型收窄。严格剩余由 24 个 / 123,299 行降至
+23 个 / 113,269 行。
+
 2026-11-02 Connector/GPT contract reconstruction（owner 尚未迁出）：继续逐函数对照
 `app-connect-modal` 与 `gpt-about-dialog-core` 发布源码后，确认现有 TypeScript 并非可删除
 owner 的完成态。App Connect 原先 15 个导出中多项映射错位，Google/Microsoft companion

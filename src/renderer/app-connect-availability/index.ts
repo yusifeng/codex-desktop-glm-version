@@ -34,6 +34,10 @@ import {
 interface Connector extends Record<string, unknown> {
   id: string;
 }
+interface ConnectorDefinition extends Record<string, unknown> {
+  connectorId: string;
+}
+type ConnectorLink = Record<string, unknown>;
 interface QueryOptions extends Record<string, unknown> {
   queryKey: readonly unknown[];
   staleTime?: number;
@@ -55,13 +59,13 @@ interface AvailabilityInput extends Record<string, unknown> {
   scope: AvailabilityScope;
 }
 interface ConnectorAvailabilityInput extends AvailabilityInput {
-  connectors: Connector[];
+  connectors: ConnectorDefinition[];
 }
 interface CompanionQueryInput {
   availableAppIds: Set<string>;
   companionConnectorIds: string[];
   companionConnectors: Array<Connector | null>;
-  companionLinks: unknown[];
+  companionLinks: Array<ConnectorLink | null | undefined>;
 }
 
 async function resolveAvailableCompanions(
@@ -119,7 +123,7 @@ async function resolveAvailableCompanions(
   const availableCompanionIds = companionIds.filter((id) => availableAppIds.has(id));
   if (availableCompanionIds.length === 0) return [];
 
-  const fetchLink = (id: string) => queryClient.fetchQuery<unknown>({
+  const fetchLink = (id: string) => queryClient.fetchQuery<ConnectorLink | null>({
     ...(connectorLinkQueryOptions(id) as QueryOptions),
     staleTime: freshLinkChecks ? 0 : queryDurations.FIVE_MINUTES,
   });
@@ -155,10 +159,8 @@ function getAvailableConnectorCompanions(
 ): Promise<Connector[]> {
   return resolveAvailableCompanions(
     input,
-    (context) => getConnectorAvailableCompanions({
-      ...context,
-      connectors: input.connectors,
-    }) as unknown as Connector[],
+    (context) => getConnectorAvailableCompanions({ ...context, connectors: input.connectors })
+      .map(({ connector }) => connector as Connector),
     (appId) => getConnectorCompanionConnectorIds(appId, input.connectors),
   );
 }
