@@ -5551,3 +5551,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 修正并真实接回既有 `misc/model-routing.ts`，返回完整远端模型表；主 chunk 旧 `Ln/Br/Vr/Fte/Hr/Ite/Wr` 实现删除。
 - focused 40 项及 fetch/Habitat/startup/WindowContext 邻接回归通过；Habitat 直接 `.ts` 失效入口已恢复真实执行。测试索引
   1840，no-unwired gate 938 项。automation scheduler 其余 execution/worktree/thread 组合根继续保留，等待独立边界审计。
+
+# 2026-11-01 Artifact Session runtime and thread-config convergence
+
+- 真实接回既有 `artifact-session/runtime-paths.ts`，统一 packaged/dev、env override、WindowsApps relocation、primary Node fallback、
+  WSL exclusion 与 telemetry；新增并接回 `artifact-session/thread-config.ts`，持有 MCP config、banner/tool overrides、source/local-stdio
+  gate、trusted env merge 和 nested/dotted config cleanup。
+- `browser-use/desktop-feature-availability.ts` 接管唯一 feature adapter；主 chunk 旧路径 helper、thread-config belt、配套常量与
+  `pne` class 整带删除，没有保留重复 owner。
+- focused 52 项及 Artifact host/fetch/WindowContext/Windows capture/webview 六组回归通过；测试索引 1841，no-unwired gate 966 项。

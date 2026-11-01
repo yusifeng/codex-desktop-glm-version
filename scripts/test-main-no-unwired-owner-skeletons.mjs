@@ -141,6 +141,9 @@ const realOwners = [
   ["src/main/main-app/misc/model-routing.ts", "resolveAutomationModelRouting"],
   ["src/main/main-app/startup/deferred-startup-work.ts", "scheduleDeferredStartupWork"],
   ["src/main/main-app/ambient-suggestions/runtime.ts", "createAmbientSuggestionsRuntime"],
+  ["src/main/main-app/artifact-session/runtime-paths.ts", "resolveRuntimePaths"],
+  ["src/main/main-app/artifact-session/thread-config.ts", "createArtifactSessionThreadConfigRuntime"],
+  ["src/main/main-app/browser-use/desktop-feature-availability.ts", "BrowserUseDesktopFeatureAvailability"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -908,5 +911,19 @@ for (const generatedName of ["Ln", "Br", "Vr", "Fte", "Hr", "Ite", "Wr"]) {
   );
 }
 assert.equal(/^var Ur = /m.test(main), false, "generated ambient logger alias must be removed");
+assert.equal(main.includes('require("./main-app/artifact-session/runtime-paths.js")'), true, "artifact runtime paths are wired");
+assert.equal(main.includes('require("./main-app/artifact-session/thread-config.js")'), true, "artifact thread config is wired");
+assert.equal(main.includes('require("./main-app/browser-use/desktop-feature-availability.js")'), true, "browser availability adapter is wired");
+assert.equal(main.includes("createArtifactSessionThreadConfigRuntime({"), true, "artifact thread config runtime is composed");
+for (const generatedName of [
+  "fi", "pi", "mi", "tne", "hi", "nne", "vi", "lne", "une", "xi", "Si", "Ci", "dne", "wi", "fne", "Ti", "Ei",
+]) {
+  assert.equal(
+    new RegExp(`^function ${generatedName}\\(`, "m").test(main),
+    false,
+    `generated Artifact Session helper ${generatedName} must be removed`,
+  );
+}
+assert.equal(/^var pne = class/m.test(main), false, "generated browser availability adapter must be removed");
 
-console.log("938 main unwired-owner skeleton assertions passed");
+console.log("966 main unwired-owner skeleton assertions passed");

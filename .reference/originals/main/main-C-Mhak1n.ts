@@ -635,6 +635,34 @@ const {
 } = require("./main-app/avatar-overlay/scroll-host.js");
 const { ConversationalOnboardingService } = require("./main-app/onboarding/conversational-onboarding.js");
 const { ArtifactSessionHostLifecycle } = require("./main-app/artifact-session/host-lifecycle.js");
+const { resolveRuntimePaths: fi } = require("./main-app/artifact-session/runtime-paths.js");
+const {
+  createArtifactSessionThreadConfigRuntime,
+} = require("./main-app/artifact-session/thread-config.js");
+const {
+  BrowserUseDesktopFeatureAvailability: pne,
+} = require("./main-app/browser-use/desktop-feature-availability.js");
+const {
+  createExpectedArtifactSessionThreadConfig: vi,
+  installArtifactSessionThreadConfigInterceptor: lne,
+} = createArtifactSessionThreadConfigRuntime({
+  logger: r.r(`ArtifactSessionThreadConfig`),
+  resolveRuntimePaths: fi,
+  buildNodeReplMcpConfig: n.eu,
+  resolveCodexHome: n.Oi,
+  resolveRequestMetadata: a.in.resolve,
+  developmentBuildFlavor: a.in.Dev,
+  isInternalBuild: a.in.isInternal,
+  isNodeReplSandboxPlatform: n.nu,
+  isEligibleThreadSource: n.ha,
+  nodeModulesPathEnvKey: n.Ql,
+  mcpServicesEnvKey: n.$l,
+  requestMetaEnvKey: n.Yl,
+  nodeReplBannerEnvKey: `NODE_REPL_JS_BANNER`,
+  nodeReplToolOverridesEnvKey: `NODE_REPL_TOOL_OVERRIDES`,
+  cwd: process.cwd,
+  env: process.env,
+});
 const { DebugService, createDemoTools } = require("./main-app/debug/export-logs.js");
 const { AvatarManager } = require("./main-app/avatar/pet-install.js");
 const { ComputerUseSettingsService, setCuaAppshotSoundEnabled: tje } = require("./main-app/computer-use/approvals.js");
@@ -2473,280 +2501,6 @@ var Mee = class extends Zt {
     }
   };
 var Hte = ArtifactSessionHostLifecycle;
-var Zte = `CODEX_CHROME_USER_DATA_DIR`,
-  Qte = `BROWSER_AUTH_BROKER_SOCKET_PATH`,
-  $te = `NODE_REPL_DISABLE_ANALYTICS`,
-  ene = `NODE_REPL_FORCE_STRICT_AUTO_REVIEW`,
-  si = `NODE_REPL_JS_BANNER`,
-  ci = `NODE_REPL_TOOL_OVERRIDES`,
-  li = `NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER`,
-  ui = `NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME`,
-  di = `NODE_REPL_UNTRUSTED_ENV_ALLOWLIST`;
-function fi({
-  env: e = process.env,
-  isPackaged: t = !0,
-  platform: r = process.platform,
-  repoRoot: i = process.cwd(),
-  resolveCodexPath: a = n.In,
-  resolveNodePath: s = n.Ln,
-  resolveNodeReplPath: c = n.Rn,
-  resolvePrimaryRuntimeNodePath: l = tne,
-  resourcesPath: u,
-}) {
-  let d = u ?? o.t({ env: e, resourcesPath: process.resourcesPath }),
-    f = r === `win32` && n.Bn() != null,
-    p = r === `win32` && !f,
-    m =
-      mi({ relocateWindowsApps: p, rawValue: e.CODEX_CLI_PATH, resolveWindowsAppsPath: a }) ??
-      pi({
-        devRelativePathSegments: [`extension`, `bin`, `codex`],
-        isPackaged: t,
-        platform: r,
-        repoRoot: i,
-        resolveBundledPath: a,
-        resourcesPath: d,
-      }),
-    h =
-      mi({
-        relocateWindowsApps: p,
-        rawValue: e.CODEX_BROWSER_USE_NODE_PATH,
-        resolveWindowsAppsPath: s,
-      }) ??
-      pi({
-        devRelativePathSegments: null,
-        isPackaged: t,
-        platform: r,
-        repoRoot: i,
-        resolveBundledPath: s,
-        resourcesPath: d,
-      });
-  if (h.path == null && !f) {
-    let e = l(r);
-    e != null && (h = { path: e, source: `primary-runtime` });
-  }
-  let g =
-    mi({ relocateWindowsApps: p, rawValue: e.CODEX_NODE_REPL_PATH, resolveWindowsAppsPath: c }) ??
-    pi({
-      devRelativePathSegments: null,
-      isPackaged: t,
-      platform: r,
-      repoRoot: i,
-      resolveBundledPath: c,
-      resourcesPath: d,
-    });
-  if (r === `win32`)
-    for (let [e, t] of [
-      [`codex`, m],
-      [`node`, h],
-      [`node-repl`, g],
-    ]) {
-      let r;
-      (t.source === `env-override` || t.source === `env-override-relocated`
-        ? (r = `override`)
-        : t.source === `primary-runtime` && (r = `primary-runtime`),
-        n.Vn({ component: e, consumer: `browser-use`, executablePath: t.path, source: r }));
-    }
-  return {
-    codexCliPath: m.path,
-    codexCliPathSource: m.source,
-    nodeModuleDirs: n.Mn(d),
-    nodePath: h.path,
-    nodePathSource: h.source,
-    nodeReplPath: g.path,
-    nodeReplPathSource: g.source,
-    platform: r,
-  };
-}
-function pi({
-  devRelativePathSegments: e,
-  isPackaged: t,
-  platform: n,
-  repoRoot: r,
-  resolveBundledPath: i,
-  resourcesPath: a,
-}) {
-  let o = i(a);
-  if (!t && n !== `win32` && o == null && e != null) {
-    let t = h.default.join(r, ...e);
-    o = hi(t) ? t : null;
-  }
-  return { path: o, source: o == null ? `missing` : `bundled-or-dev` };
-}
-function mi({ relocateWindowsApps: e, rawValue: t, resolveWindowsAppsPath: n }) {
-  if (t == null) return null;
-  let r = t.trim();
-  if (r.length === 0) return null;
-  if (e && nne(r)) {
-    let e = n(h.default.dirname(r));
-    return e == null ? null : { path: e, source: `env-override-relocated` };
-  }
-  return { path: r, source: `env-override` };
-}
-function tne(e) {
-  if (e !== `win32`) return null;
-  let t = h.default.join(h.default.dirname(n.On()), `node`, `bin`, `node.exe`);
-  return hi(t) ? t : null;
-}
-function hi(e) {
-  if (!(0, v.existsSync)(e)) return !1;
-  try {
-    return (0, v.statSync)(e).isFile()
-      ? (process.platform === `win32` || (0, v.accessSync)(e, v.constants.X_OK), !0)
-      : !1;
-  } catch {
-    return !1;
-  }
-}
-function nne(e) {
-  return e.replaceAll(`/`, `\\`).toLowerCase().includes(`\\program files\\windowsapps\\`);
-}
-var gi = `artifact_session`,
-  rne = `artifact_session`,
-  ine = `@oai/artifact-tool/artifact-session/service`,
-  _i = r.r(`ArtifactSessionThreadConfig`),
-  ane = `NODE_REPL_INSTRUCTIONS_USE_CASE_ARTIFACT_SESSION`,
-  one = `Create and edit viewer-bound spreadsheets and presentations, and edit existing bound canvases, with persistent JavaScript authoring sessions.`,
-  sne = `const { artifactSession: __artifactSessionClient } = await import("@oai/artifact-tool/artifact-session");
-const __artifactSession = Object.freeze({
-  run(callback, options) {
-    return __artifactSessionClient.run(callback, options);
-  },
-  status(transaction) {
-    return __artifactSessionClient.status(transaction);
-  },
-  abort(transaction) {
-    return __artifactSessionClient.abort(transaction);
-  },
-});
-Object.defineProperty(globalThis, "artifactSession", { configurable: false, enumerable: true, value: __artifactSession, writable: false });`,
-  cne = JSON.stringify({
-    server_instructions: `Use this first-party JavaScript tool for persistent spreadsheet and presentation authoring and editing an existing bound canvas. The global artifactSession client edits the same CRDT state shown in the live viewer. For spreadsheets, call artifactSession.run(async ({ workbook, session }) => { ... }, { artifactType: "spreadsheet" }); for presentations, use ({ presentation, session }) and artifactType: "presentation". When the application supplies a bound canvas artifactRef, use ({ whiteboard, session }) with that artifactRef and artifactType: "whiteboard". Canvas creation belongs to Spaces. Use nodeRepl.write(...) for compact results. All model and session handles are callback-scoped snapshots: use and mutate them only inside that callback. Mutations after the callback returns do not sync; start a new artifactSession.run for every durable edit.`,
-    tools: {
-      js: {
-        description: `Run sandboxed JavaScript to create or edit a viewer-bound spreadsheet or presentation, or edit an existing bound canvas, through the global artifactSession client.`,
-        field_descriptions: {
-          code: `JavaScript to run. Use a new artifactSession.run(...) callback for every durable edit. Canvas edits require the artifactRef supplied by the application.`,
-        },
-      },
-    },
-  });
-function vi({
-  enabled: e,
-  hostLifecycle: t,
-  isPackaged: r = !0,
-  repoRoot: i = k.default.cwd(),
-  runtimePaths: o,
-  shouldUseWslPaths: s,
-}) {
-  if (!e || t == null || !t.isViewerAvailable()) return null;
-  if (s)
-    return (
-      _i.info(`artifact_session_thread_config_skipped`, {
-        safe: { reason: `wsl-host-bridge-unavailable` },
-        sensitive: {},
-      }),
-      null
-    );
-  let c = o ?? fi({ isPackaged: r, repoRoot: i });
-  if (c.nodeReplPath == null || c.codexCliPath == null || !n.nu(c.platform))
-    return (
-      _i.warning(`artifact_session_thread_config_skipped`, {
-        safe: { platform: c.platform, reason: `sandbox-runtime-unavailable` },
-        sensitive: {},
-      }),
-      null
-    );
-  let l = t.getPrimaryRuntimePaths(),
-    u = a.in.resolve(),
-    d = n.eu({
-      codexCliPath: c.codexCliPath,
-      codexHome: n.Oi(),
-      extraEnv: {
-        [ane]: one,
-        [si]: sne,
-        [ci]: cne,
-        [n.Ql]: l.nodeModulesPath,
-        [n.$l]: JSON.stringify({ [rne]: ine }),
-      },
-      nodeModuleDirs: l.nodeModulesPath,
-      nodePath: l.nodePath,
-      nodeReplPath: c.nodeReplPath,
-      platform: c.platform,
-      requestMeta: u === a.in.Dev ? k.default.env[n.Yl] : void 0,
-      shouldUseWslPaths: !1,
-      traceMeta: a.in.isInternal(u) || k.default.env.NODE_REPL_TRACE_META === `1`,
-    });
-  return d == null ? null : { [`mcp_servers.${gi}`]: d[`mcp_servers.node_repl`] };
-}
-var yi = `mcp_servers.${gi}`,
-  bi = { command: ``, enabled: !1 };
-function lne({ getHostLifecycle: e, getExpectedThreadConfig: t, isLocalStdio: n }) {
-  if (n()) return (r) => (n() ? une(r, Ti(r) && xi(r) ? e() : null, t) : r);
-}
-function une(e, t, n) {
-  if (!Ti(e) || !Si(e)) return e;
-  if (!xi(e) || t == null || !t.isViewerAvailable()) return Ci(e, bi);
-  let r = n()?.[yi];
-  if (!Ei(r)) return Ci(e, bi);
-  let i = Ei(r.env) ? r.env : {};
-  return Ci(e, { ...r, env: { ...i, ...t.getTrustedServiceEnv() } });
-}
-function xi(e) {
-  return `threadSource` in e.params && !n.ha(e.params.threadSource) ? !1 : Si(e);
-}
-function Si(e) {
-  return Ei(e.params.config) && Object.hasOwn(e.params.config, yi);
-}
-function Ci(e, t) {
-  if (!Ti(e)) return e;
-  let n = Ei(e.params.config) ? e.params.config : {};
-  return { ...e, params: { ...e.params, config: { ...dne(n), [yi]: t } } };
-}
-function dne(e) {
-  return wi(e, ``);
-}
-function wi(e, t) {
-  return Object.fromEntries(
-    Object.entries(e).flatMap(([e, n]) => {
-      let r = fne(t, e);
-      if (r === yi || r.startsWith(`${yi}.`)) return [];
-      if (Ei(n) && yi.startsWith(`${r}.`)) {
-        let t = wi(n, r);
-        return Object.keys(t).length === 0 ? [] : [[e, t]];
-      }
-      return [[e, n]];
-    }),
-  );
-}
-function fne(e, t) {
-  return `${e}.${t}`
-    .replaceAll(`[`, `.`)
-    .replaceAll(`]`, ``)
-    .replace(/["'\s]/gu, ``)
-    .replace(/\.{2,}/gu, `.`)
-    .replace(/^\.|\.$/gu, ``);
-}
-function Ti(e) {
-  return !(`id` in e) || !(`method` in e)
-    ? !1
-    : e.method === `thread/start` || e.method === `thread/resume` || e.method === `thread/fork`;
-}
-function Ei(e) {
-  return typeof e == `object` && !!e && !Array.isArray(e);
-}
-var pne = class {
-    browserSessionRegistry;
-    constructor(e) {
-      this.browserSessionRegistry = e;
-    }
-    setDesktopFeatureAvailability(e) {
-      e.inAppBrowserUse != null &&
-        this.browserSessionRegistry.setBrowserUseNativePipeEnabled(e.inAppBrowserUse);
-    }
-    dispose() {
-      this.browserSessionRegistry.setBrowserUseNativePipeEnabled(!1);
-    }
-  };
 var J = `local`,
   ls = { id: J, display_name: `Local`, kind: `local` };
 var AccountInputsOwner = createAccountInputsOwnerClass({

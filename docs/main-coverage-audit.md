@@ -3697,3 +3697,16 @@ refresh 与主启动后台 refresh 复用同一 eligibility/surface policy，没
 新 focused suite 40 项覆盖 routing fallback、phase race/abort、eligibility、surface、single-flight、fresh skip、project/home root、
 foreground cancellation 和真实 wiring；修复 Habitat suite 的直接 `.ts` 失效入口及过时 consumer 断言后，五组相邻回归通过。
 测试索引 1840，no-unwired gate 扩至 938 项。automation scheduler 的 execution/worktree/thread lifecycle 仍是同一组合根，本轮未强拆。
+
+### 整域收敛：Artifact Session runtime paths 与 thread config
+
+既有但未接线的 `artifact-session/runtime-paths.ts` 已成为所有真实 runtime-path consumer：统一 packaged/dev executable discovery、
+env override、WindowsApps relocation、primary runtime Node fallback、WSL exclusion 与 Windows resolution telemetry。新增并接回
+`artifact-session/thread-config.ts`，完整持有 viewer/runtime eligibility、Node REPL MCP config、Artifact Session banner/tool overrides、
+local-stdio interceptor、thread source gate、trusted service env 合并，以及 dotted/nested config 的不可变剥离与替换。
+
+同时将唯一的 `pne` Browser Use feature adapter 迁为 `browser-use/desktop-feature-availability.ts`。主 chunk 原
+`fi/pi/mi/tne/hi/nne` 路径函数、`vi/lne/une/xi/Si/Ci/dne/wi/fne/Ti/Ei` thread-config belt、`pne` class 与只服务旧实现的
+常量全部删除。新 focused suite 52 项覆盖 override/relocation/WSL/dev discovery、config build、source/transport gates、nested key
+cleanup、trusted env 和 adapter cleanup；Artifact host lifecycle/environment、Electron fetch、WindowContext、Windows capture 与
+first-party webview 六组相邻回归通过。测试索引 1841，no-unwired gate 扩至 966 项。
