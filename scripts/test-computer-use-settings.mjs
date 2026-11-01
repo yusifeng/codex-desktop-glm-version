@@ -104,7 +104,7 @@ const mocks = {
   "browser-extension-connection-status-description": "const r=globalThis.__computerUseSettings;export const n=()=>{r.state.initialized+=1};export const t=({status})=>({type:'browser-status',props:{children:status.isLoading?'Use the browser extension for additional control':status.isInstalled?'Browser extension installed':'Browser extension not installed'}});",
   "settings-plugin-selection": [
     "const runtime=globalThis.__computerUseSettings;export const i=()=>{runtime.state.initialized+=1};export const o=()=>{runtime.state.initialized+=1};export const t=()=>{runtime.state.initialized+=1};",
-    "export const n=(origin,permission)=>{runtime.state.originPermissions.push({origin,permission})};export const a=props=>({type:'origin-row',props});export const r=props=>({type:'browser-settings-section',props});",
+    "export const n=()=>null;export const a=props=>({type:'browser-settings-section',props});export const r=props=>({type:'plugin-controls',props});",
   ].join("\n"),
 };
 
@@ -146,7 +146,7 @@ view = render();
 assert.equal(textContent(view).includes("Manage how ChatGPT uses other applications on your computer"), true);
 assert.equal(textContent(view).includes("Browser extension installed"), true);
 assert.equal(walk(view).some((node) => node.type === "browser-settings-section"), true);
-assert.deepEqual(state.originPermissions.at(-1), { origin: "https://chatgpt.com", permission: "allow" });
+assert.equal(state.originPermissions.length, 0);
 assert.equal(walk(view).find((node) => node.props?.["data-home-directory"] === "/Users/test") != null, true);
 
 await input(view, "Toggle Google Chrome").props.onChange({ currentTarget: { checked: false } });

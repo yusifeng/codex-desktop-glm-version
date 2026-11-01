@@ -4882,13 +4882,22 @@ declare module "@rchunk/duplicate-agent" { export interface AgentManagementServi
 declare module "@rchunk/use-visible-settings-sections" {
   export type SettingsSurface = "chatGpt" | "codex" | "codexLocal" | "codexOrWorkLocal" | "chatGptOrCodex";
   export interface SettingsSection { disabled?: boolean; externalUrl?: string; label: string; slug: string; surface?: SettingsSurface }
-  export interface VisibleSettingsOptions { buildFlavor?: "chatgpt" | "codex" | "work"; isLocalHost?: boolean; labels?: Partial<Record<string, string>>; sections?: readonly SettingsSection[] }
+  export interface VisibleSettingsResult { activeSettingsSection: string; settingsNavigationSections: SettingsSection[]; shouldRedirectToVisibleSettingsSection: boolean; shouldRenderRouteContent: boolean; showEnterpriseUsageLabel: boolean; visibleSettingsSections: SettingsSection[] }
   export const a: string;
   export const i: () => void;
-  export const n: (options?: VisibleSettingsOptions) => SettingsSection[];
-  export const o: Readonly<Record<"account" | "securitySettings", { href: string; label: string }>>;
-  export const r: (slug: string, platform?: string) => { commandAsset: string; component: string; navigation: { ariaHidden: boolean } };
+  export const n: (requestedSlug?: string | null, isLocalHost?: boolean, hostId?: string) => VisibleSettingsResult;
+  export const o: Readonly<Record<"account" | "securitySettings", { href: string; icon: string; message: string }>>;
+  export const r: (slug: string, platform?: string) => { commandAsset: string; component: string; navigation: { ariaHidden: boolean; assets: { 16: string; 20: string } } };
   export const s: () => void;
+  export const t: () => void;
+}
+
+declare module "@rchunk/settings-plugin-selection" {
+  export const a: (props: Record<string, unknown>) => unknown;
+  export const i: () => void;
+  export const n: (records: readonly unknown[], pluginName: string, marketplacePath?: string) => unknown;
+  export const o: () => void;
+  export const r: (props: Record<string, unknown>) => unknown;
   export const t: () => void;
 }
 

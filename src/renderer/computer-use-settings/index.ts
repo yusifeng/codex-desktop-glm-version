@@ -82,7 +82,6 @@ const {
 const {
   E6t: usePlatform,
   Gv: useSelectedHost,
-  Kcn: readSetting,
   Ucn: writeSetting,
   Xl: initializeSettingsRuntime,
   e8t: useNavigate,
@@ -91,7 +90,6 @@ const {
 } = appInitialChunk as unknown as {
   E6t(): { platform: string };
   Gv(): { selectedHostId: string };
-  Kcn(settingId: string): unknown;
   Ucn(scope: unknown, setting: { key: string }, value: unknown): Promise<void>;
   Xl(): void;
   e8t(): (path: string) => void;
@@ -142,18 +140,14 @@ const { n: useHomeDirectory, t: initializeUseHomeDirectory } = useHomeDirectoryC
 const { n: initializeSettingsLoadingRow, t: SettingsLoadingRow } = settingsLoadingRowChunk;
 const { n: initializeBrowserStatus, t: BrowserStatusDescription } = browserStatusChunk as { n(): void; t(props: { status: BrowserStatus }): unknown };
 const {
-  a: OriginSettingsRow,
+  a: BrowserUseSettingsSection,
   i: initializePluginSelection,
-  n: handleOriginPermission,
-  o: initializeOriginSettings,
-  r: BrowserUseSettingsSection,
-  t: initializeOriginSettingsRow,
+  o: initializeBrowserUseSettingsSection,
+  t: initializePluginControls,
 } = settingsPluginSelectionChunk as unknown as {
-  a(props: { origin: string }): unknown;
+  a(props: Record<string, unknown>): unknown;
   i(): void;
-  n(origin: string, permission: string): void;
   o(): void;
-  r(props: Record<string, unknown>): unknown;
   t(): void;
 };
 
@@ -169,8 +163,8 @@ initializeUseHomeDirectory();
 initializeSettingsLoadingRow();
 initializeBrowserStatus();
 initializePluginSelection();
-initializeOriginSettings();
-initializeOriginSettingsRow();
+initializeBrowserUseSettingsSection();
+initializePluginControls();
 
 const React = getReactRuntime();
 const { Fragment, jsx, jsxs } = getJsxRuntime();
@@ -206,7 +200,7 @@ function AppControls(props: { availability: AvailabilityState; hostId: string; p
     notify: (tone, text) => tone === "success" ? props.toast.success(text) : props.toast.danger(text),
   }) as AppsAvailabilityController;
   const browserStatus = props.availability.browserStatus ?? { isInstalled: false, isLoading: true };
-  const browserSection = jsx(BrowserUseSettingsSection, { backend: "extension", browserUseEnabled: true, showHistory: false, showWebMcp: false, siteSettingsRow: jsx(OriginSettingsRow, { origin: "https://chatgpt.com" }) });
+  const browserSection = jsx(BrowserUseSettingsSection, { backend: "extension", browserUseEnabled: true, showHistory: false, showWebMcp: false });
   return jsxs(Fragment, { children: [jsx("div", { "data-home-directory": homeDirectory ?? "", children: apps.map((app) => jsx(SettingsRow, { label: app.name, description: app.id === "computer-use" ? "Let ChatGPT control apps on your computer" : app.id === "messages" ? "Let ChatGPT read and send messages" : app.id === "chrome" ? jsx(BrowserStatusDescription, { status: browserStatus }) : "Let ChatGPT use Microsoft Excel add-in for additional control", control: jsxs("div", { children: [app.id === "messages" ? jsx("button", { type: "button", onClick: () => props.navigate("/settings/computer-use/messages"), children: "Manage" }) : null, jsx("input", { type: "checkbox", "aria-label": `Toggle ${app.name}`, checked: app.isEnabled, disabled: controller.isUpdating && controller.updatingAppId === app.id, onChange: async (event: { currentTarget: { checked: boolean } }) => { try { await controller.setAppEnabled({ appId: app.id, appName: app.name, enabled: event.currentTarget.checked }); } catch { return; } } })] }) }, app.id)) }), browserSection] });
 }
 
@@ -263,8 +257,6 @@ function ComputerUseSettings(): unknown {
   else control = jsx(AppControls, { availability, hostId: selectedHostId, platform, scope, toast, navigate });
   const approvalQuery = useSignalValue<QueryResult<AppApprovals>>(appApprovalsQuery);
   void approvalQuery;
-  const configuredOrigin = readSetting("computer-use-origin-permission");
-  if (typeof configuredOrigin === "string") handleOriginPermission("https://chatgpt.com", configuredOrigin);
   return jsxs("main", { "data-settings-page": "computer-use", children: [jsx("h1", { children: "Computer use" }), jsx("p", { children: "Manage how ChatGPT uses other applications on your computer" }), jsx("section", { "aria-label": "Control", children: jsxs(Fragment, { children: [jsx("h2", { children: "Control" }), control] }) }), availability.available ? jsx(AllowedApps, { toast }) : null, availability.available ? jsx(SoundAndLockedUse, { platform, toast }) : null] });
 }
 

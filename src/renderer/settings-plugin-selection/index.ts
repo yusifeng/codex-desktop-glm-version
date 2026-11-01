@@ -1,113 +1,54 @@
-// settings-plugin-selection —— 浏览器/插件设置选择区（106KB / 2,405 行）。
-//
-// 原版：app/webview/assets/settings-plugin-selection-e42895d573ba.js。
-//
-// 六个导出（压缩名 → 语义，全部经原文核实）：
-//   - r（Er，L1981，18 号 memo-cache）：BrowserUseSettingsSection —— 浏览器
-//     Use 设置区（backend/browserUseEnabled/showHistory/showWebMcp/
-//     siteSettingsRow 四 props；配置查询三态：loading → Loading browser
-//     settings…；error → Unable to load browser settings；supported → br
-//     完整设置；否则折叠组装）
-//   - i（Lr，L2391）：初始化器
-//   - n（Rr，L2396）：origin 权限处理
-//   - o（kr，L2041）：初始化器
-//   - t（Ar，L2046）：origin 设置行
-//   - a（zr，L2400）：初始化器
-//
-// 依赖：7 文件（1 个新登记 browser-use-origin-state-queries）。
+// Browser permissions and plugin selection controls used by settings pages.
+import "@rchunk/rolldown-runtime";
+import * as appInitialChunk from "@rchunk/app-initial";
+import * as appSharedChunk from "@rchunk/app-shared";
+import "@rchunk/browser-use-origin-state-queries";
+import "@rchunk/settings-loading-row";
 
-import { $3 as runtimeLazy, FX as originStateApi, G4 as settingsHelpers } from "@rchunk/app-shared";
-import { C as appInitialInit } from "@rchunk/app-initial";
-import { d as appPrimaryInit } from "@rchunk/app-primary";
-import * as assertNever from "@rchunk/assert-never";
-import { default as browserUseOriginStateQueries } from "@rchunk/browser-use-origin-state-queries";
-import { default as settingsLoadingRow } from "@rchunk/settings-loading-row";
+interface PluginRecord { displayName?: string; marketplaceName?: string; marketplacePath?: string; plugin: { enabled?: boolean; id: string; installed?: boolean; name: string } }
+interface PluginItem { action?: unknown; description?: unknown; enabled?: boolean; expanded?: boolean; icon?: unknown; id: string; kind?: "app" | "disclosure" | "plugin" | "unavailable"; onToggleEnabled?(enabled: boolean): void; onToggleExpanded?(): void; plugin?: PluginRecord; showEnableToggle?: boolean; title: unknown; toggleAriaLabel?: string }
+interface PluginsQuery { errorMessage?: string | null; isLoading?: boolean; reload?(): void; retry?(): void }
+const shared = appSharedChunk as unknown as { I3(): import("@rchunk/app-shared").JsxRuntime; an?(): unknown; Hi?(value: unknown): string | null | undefined; A_?(marketplaceName: string | undefined): boolean; mr?(path: string | undefined, candidate: string | undefined): boolean };
+const initial = appInitialChunk as unknown as { Gv?(): { selectedHostId: string }; browserConfigStatus?: unknown };
+let jsx: import("@rchunk/app-shared").JsxRuntime;
 
-void runtimeLazy; void originStateApi; void settingsHelpers;
-void appInitialInit; void appPrimaryInit; void assertNever;
-void browserUseOriginStateQueries; void settingsLoadingRow;
-
-// ---------------------------------------------------------------------------
-// 类型
-// ---------------------------------------------------------------------------
-
-/** 视图描述。 */
-export interface PluginSelectionViewNode {
-  kind: string;
-  props?: Record<string, unknown>;
+function SettingRow(props: { control?: unknown; description?: unknown; icon?: unknown; label: unknown; muted?: boolean }): unknown {
+  return jsx.jsxs("div", { className: `flex min-h-[60px] items-center gap-3 px-4 py-3${props.muted ? " opacity-60" : ""}`, children: [props.icon == null ? null : jsx.jsx("span", { className: "flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border", children: props.icon }), jsx.jsxs("div", { className: "min-w-0 flex-1", children: [jsx.jsx("div", { className: "font-medium", children: props.label }), props.description == null ? null : jsx.jsx("div", { className: "text-xs text-secondary", children: props.description })] }), props.control ?? null] });
 }
-
-/** 配置查询状态。 */
-export type BrowserConfigStatus = "loading" | "error" | "supported" | "unsupported";
-
-// ---------------------------------------------------------------------------
-// 主组件（原 `Er`，导出 r）
-// ---------------------------------------------------------------------------
-
-/**
- * BrowserUseSettingsSection（原 `Er`，导出 r；18 号 memo-cache）：
- * 配置查询三态（loading/error/supported）+ 不支持时按 props 折叠组装。
- */
-function BrowserUseSettingsSection(props: {
-  backend?: unknown;
-  browserUseEnabled?: boolean;
-  showHistory?: boolean;
-  showWebMcp?: boolean;
-  siteSettingsRow?: unknown;
-}): PluginSelectionViewNode {
-  const browserUseEnabled = props.browserUseEnabled !== false;
-  const showHistory = props.showHistory !== false;
-  const showWebMcp = props.showWebMcp === true;
-  const status: BrowserConfigStatus = "supported" as BrowserConfigStatus;
-  if (status === "loading") return { kind: "browser-settings-loading" };
-  if (status === "error") return { kind: "browser-settings-error" };
-  if (status === "supported") {
-    return {
-      kind: "browser-settings-section",
-      props: {
-        backend: props.backend,
-        browserUseEnabled,
-        showHistory,
-        showWebMcp,
-        siteSettingsRow: props.siteSettingsRow,
-      },
-    };
-  }
-  return {
-    kind: "browser-settings-unsupported",
-    props: { collapsed: props.siteSettingsRow != null || (browserUseEnabled && showWebMcp) },
-  };
+function Toggle(props: { ariaLabel?: string; checked: boolean; disabled?: boolean; onChange(value: boolean): void }): unknown {
+  return jsx.jsx("button", { type: "button", role: "switch", "aria-label": props.ariaLabel, "aria-checked": props.checked, disabled: props.disabled, onClick: () => props.onChange(!props.checked), children: props.checked ? "On" : "Off" });
 }
-
-/** 初始化器（原 `Lr`，导出 i）。 */
-function initializePluginSelection(): void {}
-
-/** origin 权限处理（原 `Rr`，导出 n）。 */
-function handleOriginPermission(origin: string, permission: string): void {
-  void origin;
-  void permission;
+function BrowserUseSettingsSection(props: { backend?: unknown; browserUseEnabled?: boolean; configStatus?: "error" | "loading" | "supported" | "unsupported"; showHistory?: boolean; showWebMcp?: boolean; siteSettingsRow?: unknown }): unknown {
+  const host = initial.Gv?.().selectedHostId;
+  const status = props.configStatus ?? (initial.browserConfigStatus as typeof props.configStatus | undefined) ?? "unsupported";
+  if (status === "loading") return jsx.jsx("div", { role: "status", children: "Loading browser settings…" });
+  if (status === "error") return jsx.jsx("div", { role: "alert", children: "Unable to load browser settings" });
+  const enabled = props.browserUseEnabled !== false;
+  const permissions = props.siteSettingsRow != null || (enabled && props.showWebMcp === true) ? jsx.jsxs("section", { "data-browser-backend": props.backend, "data-host-id": host, children: [jsx.jsx("h3", { children: props.backend === "chrome" ? "Permissions" : "Browser permissions" }), props.siteSettingsRow, enabled && props.showWebMcp === true ? jsx.jsx(SettingRow, { label: "Website tools", description: "Allow websites to expose tools to ChatGPT." }) : null] }) : null;
+  if (status === "supported") return jsx.jsxs("section", { "data-browser-settings": true, children: [permissions, enabled && props.showHistory !== false ? jsx.jsx(SettingRow, { label: "Browsing history" }) : null] });
+  return jsx.jsxs(jsx.Fragment, { children: [permissions, enabled ? jsx.jsx(SettingRow, { label: "Browser Use" }) : null] });
 }
-
-/** 初始化器（原 `kr`，导出 o）。 */
-function initializeOriginSettings(): void {}
-
-/** origin 设置行（原 `Ar`，导出 t）。 */
-function OriginSettingsRow(props: { origin: string }): PluginSelectionViewNode {
-  return { kind: "origin-settings-row", props: props as Record<string, unknown> };
+function PluginControls(props: { emptyStateTitle: unknown; installButtonLabel: unknown; items: readonly PluginItem[]; onInstallPlugin?(plugin: PluginRecord): void; onOpenPluginDetails?(plugin: PluginRecord): void; onTogglePlugin?(plugin: PluginRecord, enabled: boolean): void; onUninstallPlugin?(plugin: PluginRecord): void; pendingPluginId?: string | null; pluginsQuery: PluginsQuery; selectedHostId: string; unavailableItems?: readonly PluginItem[] }): unknown {
+  const items = [...props.items, ...(props.unavailableItems ?? [])];
+  if (props.pluginsQuery.isLoading === true && items.length === 0) return jsx.jsx("div", { role: "status", children: "Loading plugins…" });
+  if (props.pluginsQuery.errorMessage != null) return jsx.jsxs("div", { role: "alert", children: [props.pluginsQuery.errorMessage, props.pluginsQuery.retry == null ? null : jsx.jsx("button", { type: "button", onClick: props.pluginsQuery.retry, children: "Retry" })] });
+  if (items.length === 0) return jsx.jsx(SettingRow, { label: props.emptyStateTitle });
+  return jsx.jsx("div", { "data-plugin-host-id": props.selectedHostId, children: items.map((item) => {
+    if (item.kind === "disclosure") return jsx.jsx("button", { type: "button", "aria-expanded": item.expanded, onClick: item.onToggleExpanded, children: jsx.jsx(SettingRow, { icon: item.icon, label: item.title, description: item.description, control: item.expanded ? "⌃" : "⌄" }) }, item.id);
+    if (item.kind === "unavailable") return jsx.jsx(SettingRow, { icon: item.icon, label: item.title, description: item.description, muted: true, control: jsx.jsx(Toggle, { checked: false, disabled: true, onChange() {} }) }, item.id);
+    if (item.kind === "app" || item.plugin == null) return jsx.jsx(SettingRow, { icon: item.icon, label: item.title, description: item.description, control: item.action ?? (item.showEnableToggle === false ? null : jsx.jsx(Toggle, { ariaLabel: item.toggleAriaLabel, checked: item.enabled === true, onChange: (enabled) => item.onToggleEnabled?.(enabled) })) }, item.id);
+    const record = item.plugin; const installed = record.plugin.installed === true; const pending = props.pendingPluginId === record.plugin.id;
+    const control = installed ? jsx.jsxs("div", { children: [jsx.jsx(Toggle, { checked: record.plugin.enabled !== false, disabled: pending, onChange: (value) => props.onTogglePlugin?.(record, value) }), props.onUninstallPlugin == null ? null : jsx.jsx("button", { type: "button", disabled: pending, onClick: () => props.onUninstallPlugin?.(record), children: "Delete" })] }) : jsx.jsx("button", { type: "button", disabled: pending, onClick: () => props.onInstallPlugin?.(record), children: props.installButtonLabel });
+    return jsx.jsx("div", { className: "group", children: jsx.jsx("button", { type: "button", onClick: () => props.onOpenPluginDetails?.(record), children: jsx.jsx(SettingRow, { icon: item.icon, label: item.title, description: item.description, control }) }) }, item.id);
+  }) });
 }
-
-/** 初始化器（原 `zr`，导出 a）。 */
-function initializeOriginSettingsRow(): void {}
-
-// ---------------------------------------------------------------------------
-// 原版压缩导出名（chunk 间契约）
-// ---------------------------------------------------------------------------
-
-export {
-  OriginSettingsRow as a,
-  initializePluginSelection as i,
-  handleOriginPermission as n,
-  initializeOriginSettings as o,
-  BrowserUseSettingsSection as r,
-  initializeOriginSettingsRow as t,
-};
+function resolvePreferredPlugin(records: readonly PluginRecord[], pluginName: string, marketplacePath?: string): PluginRecord | null {
+  const candidates = records.filter((record) => record.plugin.name === pluginName || record.plugin.id.split("@")[0] === pluginName);
+  const currentMarketplace = shared.Hi?.(shared.an?.());
+  return candidates.find((record) => record.marketplaceName === currentMarketplace) ?? candidates.find((record) => shared.A_?.(record.marketplaceName) === true) ?? candidates.find((record) => record.marketplaceName === "openai-curated") ?? candidates.find((record) => shared.mr?.(marketplacePath, record.marketplacePath) === true) ?? null;
+}
+let initialized = false;
+function initializePluginSelection(): void { if (!initialized) { jsx = shared.I3(); initialized = true; } }
+function initializeBrowserUseSettingsSection(): void { initializePluginSelection(); }
+function initializePluginControls(): void { initializePluginSelection(); }
+export { BrowserUseSettingsSection as a, initializePluginSelection as i, resolvePreferredPlugin as n, initializeBrowserUseSettingsSection as o, PluginControls as r, initializePluginControls as t };

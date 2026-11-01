@@ -1,5 +1,17 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Settings runtime contract 批次：`use-visible-settings-sections` 与
+`settings-plugin-selection` 已从 release-faithful owner 迁到 TypeScript，一次删除 5,092 行
+原始 owner。前者修正原占位实现最关键的跨 chunk 契约：`n` 现在接收 requested slug、local
+host 状态和 host id，并返回 visible/navigation section、active fallback、redirect、pending
+render 和 enterprise usage label 的完整路由结果；同时恢复 external-settings 和 section asset
+契约。后者修正此前完全错位的六个压缩导出：`a` 为 Browser Use 设置区、`r` 为插件控制区、
+`n` 为 marketplace 候选选择，保留 loading/error/unsupported、插件 disclosure/app/install/
+toggle/uninstall 与 unavailable 分支。`computer-use-settings` 同步删除把 marketplace resolver
+误当 origin permission mutation 的调用。focused suites 覆盖 settings route 44 项、plugin selection
+25 项、computer use 52 项及 settings page 26 项；严格剩余清单由 36 个 / 172,588 行降至
+34 个 / 167,496 行。
+
 2026-11-02 Home suggestions 大批次：`home-task-suggestions-core`、
 `image-suggestions-core`、`home-ambient-suggestions-content` 与
 `work-onboarding-suggestions` 已从 release-faithful `exact.js` 迁至可维护 TypeScript，

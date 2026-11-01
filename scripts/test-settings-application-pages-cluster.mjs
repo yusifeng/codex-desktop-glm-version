@@ -4,8 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-globalThis.__settingsPagesTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "settings-pages-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__settingsPagesTest.jsx;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+globalThis.__settingsPagesTest = { settingsState: {}, jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
+async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "settings-pages-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__settingsPagesTest.jsx;export const HX=()=>globalThis.__settingsPagesTest.settingsState;" : importPath === "app-initial" ? "export const NT=[];export const settingsNavigationState={};export const ugn='local';" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
 function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(child => walk(child, visit)); else walk(children, visit); }
 function findAll(node, predicate) { const results = []; walk(node, value => { if (predicate(value)) results.push(value); }); return results; }
 function find(node, predicate) { return findAll(node, predicate)[0]; }
@@ -19,22 +19,27 @@ assert.equal(visible.o.account.href, "https://chatgpt.com/#settings");
 assert.equal(visible.o.securitySettings.href, "https://chatgpt.com/open-security-settings");
 assert.equal(visible.r("appshots", "windows").component, "appshots-windows-settings");
 assert.equal(visible.r("voice", "macos").commandAsset, "voice-16");
-const codexLocal = visible.n({ buildFlavor: "codex", isLocalHost: true });
-assert.equal(codexLocal.some(section => section.slug === "cloud-environments"), true);
-assert.equal(codexLocal.some(section => section.slug === "security"), false);
-const codexRemote = visible.n({ buildFlavor: "codex", isLocalHost: false });
-assert.equal(codexRemote.some(section => section.slug === "cloud-environments"), false);
-assert.equal(codexRemote.some(section => section.slug === "profile"), true);
-const chatgpt = visible.n({ buildFlavor: "chatgpt" });
-assert.equal(chatgpt.some(section => section.slug === "security"), true);
-assert.equal(chatgpt.some(section => section.slug === "profile"), false);
-const custom = visible.n({ buildFlavor: "codex", labels: { profile: "Your profile" }, sections: [{ label: "Profile", slug: "profile" }, { disabled: true, label: "Hidden", slug: "usage" }] });
-assert.deepEqual(custom, [{ label: "Your profile", slug: "profile" }]);
+globalThis.__settingsPagesTest.settingsState = { buildFlavor: "codex", enterprisePlan: true, pluginsSettingsVisible: true, sections: [{ label: "Agent", slug: "agent" }, { label: "Profile", slug: "profile" }, { label: "Cloud", slug: "cloud-environments" }, { label: "Analytics", slug: "analytics" }, { label: "MCP", slug: "mcp-settings" }, { label: "Plugins", slug: "plugins-settings" }, { label: "Pending", slug: "voice" }, { label: "Hidden", slug: "security" }], visibility: { voice: { pending: true, visible: false } } };
+const codexLocal = visible.n("cloud-environments", true, "local");
+assert.equal(codexLocal.visibleSettingsSections.some(section => section.slug === "cloud-environments"), true);
+assert.equal(codexLocal.activeSettingsSection, "cloud-environments");
+assert.equal(codexLocal.showEnterpriseUsageLabel, true);
+assert.equal(codexLocal.settingsNavigationSections.some(section => section.slug === "mcp-settings"), false);
+const codexRemote = visible.n("cloud-environments", false, "remote");
+assert.equal(codexRemote.visibleSettingsSections.some(section => section.slug === "cloud-environments"), false);
+assert.equal(codexRemote.activeSettingsSection, "profile");
+assert.equal(codexRemote.shouldRedirectToVisibleSettingsSection, true);
+const pending = visible.n("voice", false, "remote");
+assert.equal(pending.shouldRenderRouteContent, false);
+assert.equal(pending.shouldRedirectToVisibleSettingsSection, false);
+globalThis.__settingsPagesTest.settingsState = { buildFlavor: "chatgpt", sections: [{ label: "General", slug: "general-settings" }, { label: "Security", slug: "security" }, { label: "Profile", slug: "profile" }], visibility: {} };
+const chatgpt = visible.n("security");
+assert.deepEqual(chatgpt.visibleSettingsSections.map(section => section.slug), ["general-settings", "security"]);
+assert.equal(chatgpt.activeSettingsSection, "security");
 assert.equal(visible.i(), undefined);
 assert.equal(visible.s(), undefined);
 assert.equal(visible.t(), undefined);
-assert.equal(visible.n({ buildFlavor: "work", isLocalHost: true }).some(section => section.slug === "agent"), true);
-assert.equal(visible.n({ buildFlavor: "work", isLocalHost: false }).some(section => section.slug === "agent"), false);
+assert.equal(visible.r("appshots", "windows").navigation.assets[20], "appshots-windows-20");
 
 // personal-vault-settings: 12
 const vault = await bundle("personal-vault-settings");
