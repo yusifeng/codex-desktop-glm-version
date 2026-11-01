@@ -64,7 +64,7 @@ export function isWslUncPath(path: string): boolean {
 }
 
 /** UNC 里的 distro 名（原 `lre`）。 */
-function wslDistroFromUnc(path: string): string | null {
+export function wslDistroFromUnc(path: string): string | null {
   return path.match(/^(?:\\\\|\/\/)(?:\?[\\/]UNC[\\/])?(?:wsl\$|wsl\.localhost)[\\/]([^\\/]+)/i)?.[1] ?? null;
 }
 
@@ -676,7 +676,7 @@ export const appServerFileSystem = {
 
 export {
   isWslPath as Ui,
-  isWslUncPath as Hi,
+  wslDistroFromUnc as Hi,
   windowsToWslPath as Vi,
   sanitizedProcessEnv as Bi,
   setShouldSpawnInsideWsl as Li,

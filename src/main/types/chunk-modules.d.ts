@@ -157,7 +157,7 @@ declare module "@chunk/shared" {
   export { mentionsWithinBudget as Hc } from "../../shared/browser-tab-mentions";
   export const Hd: any; // 内部符号: Ug
   export { RpcStubLike as Hf } from "../../shared/rpc-core";
-  export { isWslUncPath as Hi } from "../../shared/wsl-paths";
+  export { wslDistroFromUnc as Hi } from "../../shared/wsl-paths";
   export { buildAutoInstallOptOutKey as Hl } from "../../shared/app-constants";
   export { setWindowsCoreRoot as Hn } from "../../shared/mcp-runtime";
   export { pathApiForPlatform as Hr } from "../../shared/sql-git-registry";

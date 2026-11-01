@@ -3,7 +3,16 @@ import fs from "node:fs";
 import { mkdir, mkdtemp, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { createProjectlessDirectoryChooserClass } from "../src/main/main-app/workspace/projectless-directory-chooser.ts";
+import { transform } from "esbuild";
+
+const source = fs.readFileSync(
+  new URL("../src/main/main-app/workspace/projectless-directory-chooser.ts", import.meta.url),
+  "utf8",
+);
+const transpiled = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+const loaded = { exports: {} };
+Function("module", "exports", transpiled.code)(loaded, loaded.exports);
+const { createProjectlessDirectoryChooserClass } = loaded.exports;
 
 const root = await mkdtemp(path.join(os.tmpdir(), "projectless-picker-test-"));
 const validDirectory = path.join(root, "valid");

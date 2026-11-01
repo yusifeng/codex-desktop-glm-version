@@ -335,6 +335,13 @@ const { createPrimaryRuntimeHostClass } = require("./main-app/misc/primary-runti
 const { createPrimaryRuntimeInstaller } = require("./main-app/misc/primary-runtime-installer.js");
 const { createProcessMemorySnapshotCacheClass } = require("./main-app/startup/process-memory-snapshot-cache.js");
 const { createProjectlessDirectoryChooserClass } = require("./main-app/workspace/projectless-directory-chooser.js");
+const {
+  createProjectlessThreadPathsViaAppServer,
+  defaultWorkspaceRoot,
+  projectlessWorkspaceInstructions,
+  resolveProjectlessWorkspaceRootViaAppServer,
+  validateProjectlessDirectory,
+} = require("./main-app/misc/projectless-workspace.js");
 const { createThreadProjectAssignmentWriterClass } = require("./main-app/thread-catalog/thread-project-assignment-writer.js");
 const { createPendingProjectDeletionSchedulerClass } = require("./main-app/projects/pending-project-deletion-scheduler.js");
 const { createHostAppServerProjectsClass } = require("./main-app/projects/host-app-server-projects.js");
@@ -1364,134 +1371,9 @@ function _t({ threadIds: e, threadId: t, beforeThreadId: n }) {
   let i = r.indexOf(n);
   return i === -1 ? [...r, t] : [...r.slice(0, i), t, ...r.slice(i)];
 }
-function vt({ cwd: e, projectlessOutputDirectory: t, projectlessWorkspaceBrowserRoot: n }) {
-  let r = t ?? n ?? e;
-  return [
-    `### Projectless Chat`,
-    `This projectless thread starts in a generated directory under the user's Documents/Codex folder.`,
-    `The generated directory name is only a filesystem identifier. Do not infer the user's language, locale, or preferences from its name or path, even if it resembles a language code such as 'ru'.`,
-    `Prefer answering inline in chat unless using local files would make the result more useful.`,
-    ...(t != null && t !== e
-      ? [
-          `Use work/ for intermediate files, scratch analysis, scripts, drafts, and temporary assets. Use ${r} only for user-facing deliverables that should appear as outputs.`,
-          `When referring to saved deliverables in the final response, link only files from ${r}.`,
-        ]
-      : [
-          `When using local files for this projectless thread, write scratch files, drafts, generated assets, and other outputs under ${r}.`,
-        ]),
-    `Do not write directly in the home directory unless the user explicitly asks.`,
-  ].join(`
-`);
-}
-var yt = 5;
 function bt({ codexHome: e, path: t }) {
   let n = e.replace(/[\\/]+$/, ``);
   return t.basename(n) === `.codex` ? t.dirname(n) : n;
-}
-function xt({ configuredWorkspaceRoot: e, homeDirectory: t, path: n }) {
-  return e ?? n.join(t, `Documents`, `Codex`);
-}
-function St({ date: e = new Date(), path: t, workspaceRoot: n }) {
-  return t.join(n, wt(e));
-}
-function Ct(e) {
-  let t = typeof e == `object` && e ? e.directoryName : null,
-    n = typeof e == `object` && e ? e.prompt : e,
-    r = (t ?? n)?.toLowerCase().match(/[a-z0-9]+/g);
-  return r == null || r.length === 0
-    ? `new-chat`
-    : (t == null ? r.slice(0, 6) : r).join(`-`).slice(0, 80);
-}
-function wt(e) {
-  let t = String(e.getMonth() + 1).padStart(2, `0`),
-    n = String(e.getDate()).padStart(2, `0`);
-  return `${e.getFullYear()}-${t}-${n}`;
-}
-async function Tt({
-  configuredWorkspaceRoot: e,
-  createSplitDirectories: t,
-  directoryName: n,
-  fileSystem: r,
-  homeDirectory: i,
-  path: a,
-  prompt: o,
-  uniqueDirectoryNameSuffix: s = At,
-}) {
-  let c = await Et({ configuredWorkspaceRoot: e, fileSystem: r, homeDirectory: i, path: a }),
-    l = St({ path: a, workspaceRoot: c }),
-    u = Ct({ directoryName: n, prompt: o });
-  (await r.createDirectory({ path: l, recursive: !0 }), await Dt(r, l));
-  for (let e = 0; e < 100; e += 1) {
-    let n = await Ot({
-      createSplitDirectories: t,
-      dateDirectory: l,
-      fileSystem: r,
-      path: a,
-      threadDirectoryName: e === 0 ? u : `${u}-${e + 1}`,
-      workspaceRoot: c,
-    });
-    if (n != null) return n;
-  }
-  for (let e = 0; e < yt; e += 1) {
-    let e = await Ot({
-      createSplitDirectories: t,
-      dateDirectory: l,
-      fileSystem: r,
-      path: a,
-      threadDirectoryName: `${u}-${s()}`,
-      workspaceRoot: c,
-    });
-    if (e != null) return e;
-  }
-  throw Error(`Unable to create a unique projectless thread directory`);
-}
-async function Et({ configuredWorkspaceRoot: e, fileSystem: t, homeDirectory: n, path: r }) {
-  let i = xt({ configuredWorkspaceRoot: e, homeDirectory: n, path: r });
-  return (await t.createDirectory({ path: i, recursive: !0 }), await Dt(t, i), i);
-}
-async function Dt(e, t) {
-  let n = await e.getMetadata(t);
-  if (n.isDirectory !== !0 || n.isSymlink === !0)
-    throw Error(`Projectless thread directory must be a real directory`);
-}
-async function Ot({
-  createSplitDirectories: e,
-  dateDirectory: t,
-  fileSystem: n,
-  path: r,
-  threadDirectoryName: i,
-  workspaceRoot: a,
-}) {
-  let o = r.join(t, i),
-    s = e ? r.join(o, `outputs`) : o;
-  try {
-    await n.createDirectory({ path: o, recursive: !1 });
-  } catch (e) {
-    if (!(await kt(n, o))) throw e;
-    return null;
-  }
-  if (e)
-    try {
-      await Promise.all([
-        n.createDirectory({ path: s, recursive: !1 }),
-        n.createDirectory({ path: r.join(o, `work`), recursive: !1 }),
-      ]);
-    } catch {
-      return { cwd: o, outputDirectory: o, workspaceRoot: a };
-    }
-  return { cwd: o, outputDirectory: s, workspaceRoot: a };
-}
-async function kt(e, t) {
-  try {
-    return (await Dt(e, t), !0);
-  } catch {
-    return !1;
-  }
-}
-function At() {
-  return typeof crypto < `u` && typeof crypto.randomUUID == `function`
-    ? crypto.randomUUID()
-    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 var jt = class {
     windowMs;
@@ -3939,66 +3821,6 @@ var AccountInputsOwner = createAccountInputsOwnerClass({
   identitiesEqual: isSameAuthIdentity,
   AuthenticatedDesktopFetchError,
 });
-function us(e, t) {
-  let r = zn(e, t);
-  if (t) {
-    let t = n.Hi(e);
-    if (t != null && t.toLowerCase() !== n.Mi()?.toLowerCase())
-      throw Error(`Projectless chat folder must belong to the active WSL distribution`);
-    if (n.xl(r)) throw Error(`Projectless chat folder must be accessible from WSL`);
-  }
-  return r;
-}
-async function ds({
-  appServerClient: e,
-  configuredWorkspaceRoot: t,
-  createSplitDirectories: r,
-  directoryName: i,
-  homeDirectory: a,
-  prompt: o,
-}) {
-  let s = await e.platformPath(),
-    c = t == null ? null : us(t, n.zi(e.hostConfig));
-  if (c != null && !s.isAbsolute(c))
-    throw Error(`Projectless chat folder must be absolute on the execution host`);
-  return Tt({
-    configuredWorkspaceRoot: c,
-    createSplitDirectories: r,
-    directoryName: i,
-    fileSystem: $ie(e),
-    homeDirectory: a,
-    path: s,
-    prompt: o,
-  });
-}
-async function Qie({ appServerClient: e, configuredWorkspaceRoot: t, homeDirectory: r }) {
-  let i = await e.platformPath(),
-    a = xt({
-      configuredWorkspaceRoot: t == null ? null : us(t, n.zi(e.hostConfig)),
-      homeDirectory: r,
-      path: i,
-    });
-  if (!i.isAbsolute(a))
-    throw Error(`Projectless chat folder must be absolute on the execution host`);
-  let o = await n.Di.stat(a, e, { bypassCache: !0, followSymlinks: !1 }).catch((e) => {
-    if (e instanceof Error && `code` in e && e.code === `ENOENT`) return null;
-    throw e;
-  });
-  if (o != null && (!o.isDirectory() || o.isSymbolicLink()))
-    throw Error(`Projectless thread directory must be a real directory`);
-  return a;
-}
-function $ie(e) {
-  return {
-    createDirectory: async ({ path: t, recursive: r }) => {
-      await n.Di.mkdir(t, { recursive: r }, e);
-    },
-    getMetadata: async (t) => {
-      let r = await n.Di.stat(t, e, { followSymlinks: !1 });
-      return { isDirectory: r.isDirectory(), isSymlink: r.isSymbolicLink() };
-    },
-  };
-}
 var eae = `Response MUST end with a remark-directive block.
 
 ## Responding
@@ -4694,7 +4516,7 @@ async function gae({
     A = null,
     j = null;
   if (w || D == null) {
-    let e = await ds({
+    let e = await createProjectlessThreadPathsViaAppServer({
         appServerClient: u,
         configuredWorkspaceRoot:
           u.hostConfig.id === `local` ? l.getEffective(n.Fa.projectlessWorkspaceRoot.key) : null,
@@ -4714,7 +4536,11 @@ async function gae({
     P =
       A == null
         ? null
-        : vt({ cwd: O, projectlessOutputDirectory: A, projectlessWorkspaceBrowserRoot: j }),
+        : projectlessWorkspaceInstructions({
+            cwd: O,
+            projectlessOutputDirectory: A,
+            projectlessWorkspaceBrowserRoot: j,
+          }),
     F = [
       n.Rt({
         baseInstructions: C,
@@ -35154,7 +34980,7 @@ var GH = !!process.env.WSL_DISTRO_NAME,
     Pr,
     setChromeHistoryApprovalMode,
     QRe,
-    Qie,
+    Qie: resolveProjectlessWorkspaceRootViaAppServer,
     SO,
     TV,
     Tr,
@@ -35175,7 +35001,7 @@ var GH = !!process.env.WSL_DISTRO_NAME,
     readBrowserUseOriginState,
     cT: readAccountInfoFromToken,
     computeScreenshotTarget: (...args) => computeScreenshotTarget(...args),
-    ds,
+    ds: createProjectlessThreadPathsViaAppServer,
     setBrowserUseTransferApprovalMode,
     fze,
     h,
@@ -35214,7 +35040,7 @@ var GH = !!process.env.WSL_DISTRO_NAME,
     validateGlobalHotkeySetting,
     vi,
     wV,
-    xt,
+    xt: defaultWorkspaceRoot,
     readConnectorCandidates,
     zn,
   });
@@ -37119,7 +36945,7 @@ var { LibraryFilesBackend: t1e, loadProjectlessWorkspaceScope: BQ } =
     convertPathForAgentEnvironment: zn,
     getShouldUseWslPaths: () => n.zi(ls),
     getCodexHome: n.Oi,
-    getDefaultProjectlessWorkspaceRoot: xt,
+    getDefaultProjectlessWorkspaceRoot: defaultWorkspaceRoot,
     normalizeProjectAssignments: n.ca,
     stateKeys: n.iu,
     projectlessWorkspaceRootSettingKey: n.Fa.projectlessWorkspaceRoot.key,
@@ -45667,8 +45493,8 @@ var V6e = createProjectlessDirectoryChooserClass({
   settings: n.Fa,
   getHomeDirectory: p.homedir,
   path: h.default,
-  getDefaultWorkspaceRoot: xt,
-  validateProjectlessDirectory: us,
+  getDefaultWorkspaceRoot: defaultWorkspaceRoot,
+  validateProjectlessDirectory,
   getUseWslPaths: n.zi,
   hostConfig: ls,
   lstat: b.lstat,

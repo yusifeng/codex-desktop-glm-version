@@ -736,5 +736,19 @@ assert.equal(main.includes("l.ipcMain.on(a.Bt"), false, "generated inline theme 
 assert.equal(main.includes("appEntryDelivery.subscribeAppEvents({"), true, "app-entry owner subscribes to worker app events");
 assert.equal(main.includes("Se.appEvent.subscribe((e) =>"), false, "startup no longer owns the app-entry event listener inline");
 assert.equal(main.includes("U.setPetWakeRequestHandler"), false, "startup no longer wires PiP wake errors inline");
+assert.equal(main.includes('require("./main-app/misc/projectless-workspace.js")'), true, "projectless workspace runtime is wired");
+assert.equal(main.includes("await createProjectlessThreadPathsViaAppServer({"), true, "automation projectless paths use the semantic runtime");
+assert.equal(main.includes("ds: createProjectlessThreadPathsViaAppServer"), true, "fetch handler uses the semantic projectless creator");
+assert.equal(main.includes("Qie: resolveProjectlessWorkspaceRootViaAppServer"), true, "fetch handler uses the semantic workspace-root resolver");
+assert.equal(main.includes("xt: defaultWorkspaceRoot"), true, "fetch handler uses the semantic default-root policy");
+assert.equal(main.includes("getDefaultWorkspaceRoot: defaultWorkspaceRoot"), true, "directory chooser uses the semantic default-root policy");
+assert.equal(main.includes("validateProjectlessDirectory,"), true, "directory chooser uses the semantic WSL validator");
+assert.equal(main.includes("function vt("), false, "generated projectless instruction formatter must be removed");
+assert.equal(main.includes("function xt("), false, "generated projectless default-root policy must be removed");
+assert.equal(main.includes("async function Tt({"), false, "generated projectless directory creator must be removed");
+assert.equal(main.includes("async function ds({"), false, "generated app-server projectless creator must be removed");
+assert.equal(main.includes("async function Qie({"), false, "generated projectless root resolver must be removed");
+assert.equal(main.includes("function us("), false, "generated projectless WSL validator must be removed");
+assert.equal(main.includes("function $ie("), false, "generated projectless filesystem adapter must be removed");
 
-console.log("730 main unwired-owner skeleton assertions passed");
+console.log("744 main unwired-owner skeleton assertions passed");

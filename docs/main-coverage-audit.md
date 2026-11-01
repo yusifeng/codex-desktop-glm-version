@@ -3564,3 +3564,14 @@ always-hide settings subscription、pet wake failure warning、content-host-star
 
 PiP manager、attribution tracker 与 startup IPC runtime 仍是各自唯一状态 owner，新 installer 不复制状态。6 项 PiP focused、startup IPC
 30 项、app-entry 18 项、avatar-overlay 45 项回归通过；`Ust` 对应 inline handlers/subscriptions 删除，no-unwired gate 扩至 730 项。
+
+### 整域收敛：projectless workspace 路径与目录生命周期
+
+既有 `misc/projectless-workspace.ts` 现补齐 app-server workspace-root resolve/stat 边界，并真实接回 automation、Electron fetch
+handler、Library files backend 与 directory chooser。语义 owner 统一拥有提示文案、默认根目录、日期/标题目录命名、100 次顺序重试、
+5 次随机后缀、split outputs/work 降级、远端文件系统代理、绝对路径及 WSL distro/UNC 校验；主 chunk 原 `vt/xt/St/Ct/wt/Tt/Et/Dt/Ot/kt/At/us/ds/Qie/$ie`
+实现已物理删除。
+
+审计同时依据原始 `src-DldfpmrL.ts` 导出表修正 shared `Hi`：它是 UNC distro 提取器 `lre`，不是布尔型
+`isWslUncPath`。新 focused suite 30 项覆盖目录冲突、split 降级、WSL/remote 路径、missing/existing root 与真实 wiring；修复
+projectless chooser 测试的直接 `.ts` 失效入口后原 18 项也重新真实执行。no-unwired gate 扩至 744 项。

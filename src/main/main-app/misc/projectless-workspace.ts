@@ -15,7 +15,8 @@
 import {
   Di as appServerFileSystem,
   zi as shouldUseWslPaths,
-  Hi as wslHostPath,
+  Vi as convertPathForExecutionHost,
+  Hi as wslDistroFromUnc,
   Mi as wslDistroName,
   xl as isAccessibleFromWsl,
   Es as isRemoteHostConfig,
@@ -52,7 +53,7 @@ export function projectlessWorkspaceInstructions({
     `Prefer answering inline in chat unless using local files would make the result more useful.`,
     ...(projectlessOutputDirectory != null && projectlessOutputDirectory !== cwd
       ? [
-          `Use work/ for intermediate files, scratch analysis, scripts, drafts, and temporary assets. Use ${deliverablesRoot} only for user-facing deliverables that should appear in outputs.`,
+          `Use work/ for intermediate files, scratch analysis, scripts, drafts, and temporary assets. Use ${deliverablesRoot} only for user-facing deliverables that should appear as outputs.`,
           `When referring to saved deliverables in the final response, link only files from ${deliverablesRoot}.`,
         ]
       : [
@@ -134,11 +135,11 @@ export async function createProjectlessThreadDirectory({
 }: {
   configuredWorkspaceRoot: string | null;
   createSplitDirectories: boolean;
-  directoryName?: string;
+  directoryName?: string | null;
   fileSystem: ProjectlessFileSystem;
   homeDirectory: string;
   path: { join(...parts: string[]): string; basename(p: string): string; dirname(p: string): string };
-  prompt: string;
+  prompt: string | null;
   uniqueDirectoryNameSuffix?: () => string;
 }): Promise<ProjectlessThreadPaths> {
   let workspaceRoot = await ensureWorkspaceRoot({
@@ -298,9 +299,9 @@ export async function createProjectlessThreadPathsViaAppServer({
   };
   configuredWorkspaceRoot: string | null;
   createSplitDirectories: boolean;
-  directoryName?: string;
+  directoryName?: string | null;
   homeDirectory: string;
-  prompt: string;
+  prompt: string | null;
 }): Promise<ProjectlessThreadPaths> {
   let path = await appServerClient.platformPath();
   let validatedRoot =
@@ -328,9 +329,9 @@ export async function createProjectlessThreadPathsViaAppServer({
  * 发行版、可从 WSL 访问。
  */
 export function validateProjectlessDirectory(directory: string, useWslPaths: boolean): string {
-  let converted = useWslPaths ? wslHostPath(directory) : directory;
+  let converted = useWslPaths ? convertPathForExecutionHost(directory) : directory;
   if (useWslPaths) {
-    let distroPrefix = wslHostPath(directory);
+    let distroPrefix = wslDistroFromUnc(directory);
     if (
       distroPrefix != null &&
       distroPrefix.toLowerCase() !== (wslDistroName()?.toLowerCase() ?? ``)
@@ -339,6 +340,52 @@ export function validateProjectlessDirectory(directory: string, useWslPaths: boo
     if (isAccessibleFromWsl(converted)) throw Error(`Projectless chat folder must be accessible from WSL`);
   }
   return converted;
+}
+
+/**
+ * Resolve and validate the effective projectless workspace root through app-server
+ * path and stat APIs (原 Qie). A missing directory is valid because creation is
+ * deferred until the first projectless thread; an existing symlink/non-directory
+ * is rejected.
+ */
+export async function resolveProjectlessWorkspaceRootViaAppServer({
+  appServerClient,
+  configuredWorkspaceRoot,
+  homeDirectory,
+}: {
+  appServerClient: {
+    hostConfig: unknown;
+    platformPath(): Promise<{
+      join(...parts: string[]): string;
+      isAbsolute(path: string): boolean;
+    }>;
+  };
+  configuredWorkspaceRoot: string | null;
+  homeDirectory: string;
+}): Promise<string> {
+  let path = await appServerClient.platformPath();
+  let workspaceRoot = defaultWorkspaceRoot({
+    configuredWorkspaceRoot:
+      configuredWorkspaceRoot == null
+        ? null
+        : validateProjectlessDirectory(
+            configuredWorkspaceRoot,
+            shouldUseWslPaths(appServerClient.hostConfig),
+          ),
+    homeDirectory,
+    path,
+  });
+  if (!path.isAbsolute(workspaceRoot))
+    throw Error(`Projectless chat folder must be absolute on the execution host`);
+  let stat = await appServerFileSystem
+    .stat(workspaceRoot, appServerClient, { bypassCache: true, followSymlinks: false })
+    .catch((error: unknown) => {
+      if (error instanceof Error && `code` in error && error.code === `ENOENT`) return null;
+      throw error;
+    });
+  if (stat != null && (!stat.isDirectory() || stat.isSymbolicLink()))
+    throw Error(`Projectless thread directory must be a real directory`);
+  return workspaceRoot;
 }
 
 /** app-server 文件系统代理（原 $ie，8625-8634）。 */

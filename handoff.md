@@ -5461,3 +5461,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - `startup-ipc.ts` 接管 native-theme sync IPC；`app-entry-delivery.ts` 接管 worker app-event subscription/disposer；新增并接回
   `startup/remote-hosted-pip-bindings.ts`，统一 sender/settings/wake/content-host bindings 与首次 reconcile。
 - 三个既有状态 owner 未复制；focused PiP 6 项及 startup IPC/app-entry/avatar-overlay 93 项回归通过，no-unwired gate 扩至 730 项。
+
+# 2026-11-01 projectless workspace domain convergence
+
+- 扩展并真实接回 `misc/projectless-workspace.ts`，统一提示文案、默认根、日期/标题目录、顺序/随机重试、split directory 降级、
+  app-server fs adapter、workspace-root stat 与 WSL/绝对路径校验；automation/fetch handler/Library/chooser 均消费该语义边界。
+- 主 chunk 旧 `vt/xt/St/Ct/wt/Tt/Et/Dt/Ot/kt/At/us/ds/Qie/$ie` 已删除。依据原始 shared bundle 导出表修复
+  `Hi` 映射为 UNC distro extractor，避免 WSL 校验把 boolean 当 distro string。
+- 新 focused suite 30 项；projectless chooser 失效的直接 `.ts` import 已修复并恢复 18 项真实执行；no-unwired gate 扩至 744 项。
