@@ -11,6 +11,8 @@ const state = globalThis.__localThreadTest = {
   initialized: [],
   markedRead: [],
   queries: new Map(),
+  scopeValues: new Map(),
+  scopeWatchers: [],
   resume: { hasResumeFailed: false, isResuming: false, isUnavailable: false, isWriterConflict: false, retryResume() {} },
 };
 state.jsx = {
@@ -34,12 +36,13 @@ const result = await esbuild.build({
         export const I3=()=>globalThis.__localThreadTest.jsx;export const K2=()=>{};export const FX=()=>{};export const wL=()=>{};export const QI=()=>{};
         export const Yh='button';export const BX=(signal,key)=>globalThis.__localThreadTest.queries.get(String(signal?.kind)+':'+String(key));
         export const e6=()=>({useEffect(effect){effect();}});
-        export const LX=signal=>signal?.kind==='client-context'?globalThis.__localThreadTest.clientContext:{get(){},set(){}};
+        const scopeGet=(signal,parameter)=>globalThis.__localThreadTest.scopeValues.get(String(signal?.kind)+':'+(parameter==null?'':JSON.stringify(parameter)));
+        export const LX=signal=>signal?.kind==='client-context'?globalThis.__localThreadTest.clientContext:{get:scopeGet,set(){},watch(listener){globalThis.__localThreadTest.scopeWatchers.push(listener);listener({get:scopeGet});return()=>{}}};
         export const rZ=(scope,resolver)=>{globalThis.__localThreadTest.derivedResolvers.push(resolver);return {kind:'derived-family',resolve:(key,get)=>resolver(key,{get})}};
       ` };
       if (importPath === "app-initial") return { loader: "js", contents: `
         export const C=()=>globalThis.__localThreadTest.initialized.push('initial');
-        export const $en={kind:'app-scope'},Ltn={kind:'submitted'},y_t={kind:'source'},zZt={kind:'available'},um={kind:'legacy-available'},wQt={kind:'host'},wtn={kind:'client-context'},XZt={kind:'active'};
+        export const $en={kind:'app-scope'},Ltn={kind:'submitted'},y_t={kind:'source'},zZt={kind:'available'},um={kind:'legacy-available'},wQt={kind:'host'},wtn={kind:'client-context'},XZt={kind:'active'},o0t={kind:'persisted'},UQt={kind:'thread-state'},ewt={kind:'persisted-unread'},WQt={kind:'turn-summary'},GPt={kind:'read-enabled'},eQt={kind:'receipt'};
         export const Ugn=(scope,hostId)=>({markConversationAsRead:id=>globalThis.__localThreadTest.markedRead.push({hostId,id})});
         export default {};
       ` };
@@ -98,6 +101,14 @@ view = thread.n({ conversationId: "main", hostId: "host-1", trackReadState: true
 view.props.onKeyDownCapture({ type: "keydown", key: "Shift" });
 view.props.onPointerDownCapture({ type: "pointerdown" });
 assert.deepEqual(reads, ["main", "main"], "mount and pointer interaction mark the thread read; modifier-only keydown does not");
+
+state.scopeValues.set("available:\"watch\"", true);
+state.scopeValues.set("host:\"watch\"", "host-watch");
+state.scopeValues.set("read-enabled:", true);
+state.scopeValues.set('thread-state:{"hostId":"host-watch","threadId":"watch"}', { summary: { hasUnreadTurn: true }, requests: [{ id: "request-1" }] });
+state.scopeValues.set('turn-summary:{"hostId":"host-watch","threadId":"watch"}', { lastTurnId: "turn-1", lastTurnStatus: "completed" });
+thread.n({ conversationId: "watch", hostId: "host-watch", trackReadState: true });
+assert.deepEqual(state.markedRead.at(-1), { hostId: "host-watch", id: "watch" });
 
 state.queries.set("available:expired", false);
 assert.match(text(thread.r({ conversationId: "expired" })), /Side chat expired/);

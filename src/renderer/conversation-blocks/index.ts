@@ -182,16 +182,106 @@ function ActivityRowGroup(props: { historyEntityKey?: unknown; hostId?: string; 
   return jsx().jsx("section", { "data-activity-row-group": true, children: items.map((item, index) => jsx().jsx(ActivityRow, { hostId: props.hostId, item: item as Record<string, unknown> }, index)) });
 }
 
-/** TurnBodyAssembly（原 `_w`，导出 a；45 号 memo-cache 的 turn 渲染编排）。 */
-function TurnBodyAssembly(props: { activeCommentaryItem?: unknown; conversationId?: string; cwd?: string; hostId?: string; keepMcpAppEntriesPersistent?: boolean; mcpServerStatuses?: unknown; renderMcpApps?: boolean; turnId?: string; units: any[] }): unknown {
+/** TurnBodyAssembly（原 `_w`，导出 a；turn 渲染编排）。 */
+function TurnBodyAssembly(props: {
+  activeCommentaryItem?: unknown;
+  clientUserMessageId?: string | null;
+  completedThreadGoal?: unknown;
+  conversationId?: string;
+  cwd?: string;
+  emptyUserMessageOverride?: unknown;
+  generatedImages?: unknown;
+  hideUserMessageActions?: boolean;
+  hostId?: string;
+  interruptedByThisClient?: boolean;
+  isCollapsed?: boolean;
+  isMostRecentTurn?: boolean;
+  isReadOnly?: boolean;
+  keepMcpAppEntriesPersistent?: boolean;
+  latestTurnFollowContentRef?: unknown;
+  mcpServerStatuses?: unknown;
+  messageActions?: unknown;
+  messageHeader?: unknown;
+  onEditUserMessage?: (message: unknown) => void;
+  onForkTurn?: () => void;
+  onSetCollapsed?: (collapsed: boolean) => void;
+  parentThreadAttachment?: unknown;
+  renderMcpApps?: boolean;
+  resolvedApps?: unknown[];
+  showInProgressFixedContent?: boolean;
+  threadHandoffOperation?: unknown;
+  transcriptBlock?: unknown;
+  turn?: { items?: Array<Record<string, any>>; status?: string };
+  turnId?: string;
+  units: any[];
+  workedDurationMs?: number | null;
+}): unknown {
   const parts = partitionCollapsibleUnits(props.units as any, props);
+  const react = getReact?.();
+  const initiallyExpanded = props.turn?.status === "in_progress" || props.turn?.status === "inProgress";
+  const [activityExpanded, setActivityExpanded] = react?.useState?.(initiallyExpanded) ?? [initiallyExpanded, () => undefined];
   const turnBlockProps = { conversationId: props.conversationId, cwd: props.cwd, hostId: props.hostId, renderMcpApps: props.renderMcpApps, turnId: props.turnId };
-  return jsx().jsxs(jsx().Fragment, { children: [
+  const status = props.turn?.status;
+  const isInProgress = status === "in_progress" || status === "inProgress";
+  const statusNotice = props.interruptedByThisClient
+    ? jsx().jsx("div", { role: "status", "data-turn-interrupted": true, children: "Stopped" })
+    : status === "cancelled" || status === "interrupted"
+      ? jsx().jsx("div", { role: "status", "data-turn-status": status, children: status === "cancelled" ? "Cancelled" : "Interrupted" })
+      : null;
+  const activity = parts.collapsibleUnits.length === 0 ? null : jsx().jsxs("section", {
+    "data-turn-activity": true,
+    children: [
+      jsx().jsx("button", {
+        "aria-expanded": activityExpanded,
+        onClick: () => setActivityExpanded(!activityExpanded),
+        type: "button",
+        children: isInProgress ? "Working…" : props.workedDurationMs == null ? "Activity" : `Worked for ${Math.max(0, Math.round(props.workedDurationMs / 1000))}s`,
+      }),
+      activityExpanded ? jsx().jsx(TurnBlocks as any, { ...turnBlockProps, units: parts.collapsibleUnits }) : null,
+    ],
+  });
+  const widgets = props.renderMcpApps !== true || props.turn?.items == null ? null : jsx().jsx(McpAppWidgets as any, {
+    conversationId: props.conversationId ?? "",
+    hostId: props.hostId ?? "",
+    items: props.turn.items,
+    resolvedApps: props.resolvedApps,
+    shouldInitialize: true,
+  });
+  const turnContent = jsx().jsxs(jsx().Fragment, { children: [
+    props.messageHeader,
+    props.parentThreadAttachment == null ? null : jsx().jsx("aside", { "data-parent-thread-attachment": true, children: props.parentThreadAttachment }),
     parts.preToggleUnits.length ? jsx().jsx(TurnBlocks as any, { ...turnBlockProps, units: parts.preToggleUnits }) : null,
+    activity,
     parts.expandedUnits.length ? jsx().jsx(TurnBlocks as any, { ...turnBlockProps, units: parts.expandedUnits }) : null,
     parts.persistentUnits.length ? jsx().jsx(TurnBlocks as any, { ...turnBlockProps, units: parts.persistentUnits }) : null,
+    widgets,
     props.activeCommentaryItem == null ? null : jsx().jsx(ActivityRow, { item: props.activeCommentaryItem as Record<string, unknown> }),
+    props.completedThreadGoal == null ? null : jsx().jsx("div", { "data-completed-thread-goal": true, children: props.completedThreadGoal }),
+    props.generatedImages == null ? null : jsx().jsx("div", { "data-generated-images": true, children: props.generatedImages }),
+    statusNotice,
+    props.threadHandoffOperation == null ? null : jsx().jsx("div", { "data-thread-handoff": true, children: props.threadHandoffOperation }),
   ] });
+  if (props.isCollapsed === true) {
+    return jsx().jsx("button", {
+      "aria-expanded": false,
+      "data-collapsed-turn": props.turnId ?? true,
+      onClick: props.onSetCollapsed == null ? undefined : () => props.onSetCollapsed?.(false),
+      type: "button",
+      children: "Show turn",
+    });
+  }
+  return jsx().jsxs("article", {
+    "data-local-conversation-turn-body": props.turnId ?? true,
+    "data-turn-in-progress": isInProgress || undefined,
+    children: [
+      turnContent,
+      props.onSetCollapsed == null ? null : jsx().jsx("button", { type: "button", onClick: () => props.onSetCollapsed?.(true), children: "Collapse turn" }),
+      props.isReadOnly === true || props.hideUserMessageActions === true ? null : jsx().jsxs("div", { "data-user-message-actions": true, children: [
+        props.onEditUserMessage == null ? null : jsx().jsx("button", { type: "button", onClick: () => props.onEditUserMessage?.(props.emptyUserMessageOverride), children: "Edit" }),
+        props.onForkTurn == null ? null : jsx().jsx("button", { type: "button", onClick: props.onForkTurn, children: "Fork" }),
+      ] }),
+    ],
+  });
 }
 
 /** 可折叠性分拣（原 `Iw`，L10900 区）。 */
@@ -214,14 +304,15 @@ function partitionCollapsibleUnits(
       else { expandedUnits.push(unit); persistentUnits.push(unit); }
       continue;
     }
-    expandedUnits.push(unit);
     const item = unit.item.item as Record<string, any>;
     const isPersistent = unit.kind === "standalone" && (
       (item.type === "dynamic-tool-call" && item.isDynamic === true) ||
       (options.keepMcpAppEntriesPersistent === true && options.renderMcpApps === true && item.type === "mcp-tool-call" && (item.mcpAppResourceUri != null || item.result?.type === "success")) ||
       (item.type === "user-message" && (item.steeringStatus != null || item.hookFeedback === true))
     );
+    const isAlwaysExpanded = ["assistant-message", "user-message", "assistantMessage", "userMessage", "generated-image", "image", "attachment"].includes(String(item.type));
     if (isPersistent) persistentUnits.push(unit);
+    else if (isAlwaysExpanded) expandedUnits.push(unit);
     else collapsibleUnits.push(unit);
   }
   return { collapsibleUnits, expandedUnits, persistentUnits, preToggleUnits, workedForItem };

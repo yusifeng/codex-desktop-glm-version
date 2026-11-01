@@ -46,6 +46,7 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
 import * as appInitialChunk from "@rchunk/app-initial";
 import { d as appPrimaryInit } from "@rchunk/app-primary";
+import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as virtualizedTurnList from "@rchunk/virtualized-turn-list";
 import * as localConversationTurn from "@rchunk/local-conversation-turn";
 import * as conversationBlocks from "@rchunk/conversation-blocks";
@@ -67,7 +68,7 @@ import { default as useGitConfigValue } from "@rchunk/use-git-config-value";
 import { default as threadTurnEntries } from "@rchunk/local-conversation-thread-turn-entries";
 import { default as planModel } from "@rchunk/local-conversation-plan-model";
 import { default as webmcpToolsModel } from "@rchunk/local-conversation-webmcp-tools-model";
-import { default as sideChat } from "@rchunk/local-conversation-side-chat";
+import * as sideChatRuntime from "@rchunk/local-conversation-side-chat";
 import { default as summaryPanelImagePreview } from "@rchunk/local-conversation-summary-panel-image-preview";
 import { default as artifactsSignals } from "@rchunk/local-conversation-artifacts-signals";
 import { default as externalResourceIcon } from "@rchunk/local-conversation-external-resource-icon";
@@ -108,6 +109,7 @@ import * as openTargetChunk from "@rchunk/open-target";
 import { default as triangleWarning } from "@rchunk/triangle-warning";
 
 void appSharedLazy; void appInitialInit; void appPrimaryInit;
+void appPrimaryChunk;
  void virtualizedTurnList; void localConversationTurn;
 void conversationBlocks;  void splitItems;
  void userMessage; void scrollLayout;
@@ -116,7 +118,7 @@ void planSidePanel; void pullRequest; void pullRequestDetailModel;
 void pullRequestFixWorkflow; void pullRequestStatusLabel;
 void openThreadPullRequestCodeTab; void gitActions; void gitActionNewBranchField;
 void useGitConfigValue; void threadTurnEntries; void planModel;
-void webmcpToolsModel; void sideChat; void summaryPanelImagePreview;
+void webmcpToolsModel; void sideChatRuntime; void summaryPanelImagePreview;
 void artifactsSignals; void externalResourceIcon; void useLocalConversationSources;
 void conversationSource; void creationTargetQuery; void environmentLabels;
 void localEnvironmentEditor; void localEnvironmentWorkflowMessages;
@@ -161,11 +163,14 @@ interface JsxRuntime {
 
 interface ReactRuntime {
   useEffect(effect: () => void | (() => void), dependencies: unknown[]): void;
+  useState?<Value>(initialValue: Value): [Value, (value: Value | ((previous: Value) => Value)) => void];
 }
 
 type ScopeLike = {
   get(signal: unknown, parameter?: unknown): any;
   set?(signal: unknown, value: unknown, parameter?: unknown): void;
+  watch?(listener: (scope: { get(signal: unknown, parameter?: unknown): any }) => void): (() => void) | void;
+  value?: Record<string, any>;
 };
 
 const shared = appSharedChunk as unknown as Record<string, any>;
@@ -191,8 +196,77 @@ function appScope(): ScopeLike | null {
   if (typeof shared.LX !== "function") return null;
   try { return shared.LX(initial.$en ?? shared.ZI) as ScopeLike; } catch { return null; }
 }
+function currentRouteConversationId(scope: ScopeLike | null): string | null {
+  if (scope == null) return null;
+  try {
+    const route = typeof shared.ttn === "function" ? shared.ttn(scope.value) : scope.value?.conversationId;
+    return typeof route === "string" && route.length > 0 ? route : null;
+  } catch { return null; }
+}
+function voiceTimelineEnabled(conversationId: string | null): boolean {
+  if (conversationId == null) return false;
+  const voiceState = query<unknown>(initial.YQt, conversationId);
+  const configured = query<{ existingThreadVoiceEnabled?: boolean }>(initial.b1t);
+  try { return initial.ACt?.(voiceState) === true || configured?.existingThreadVoiceEnabled === true; }
+  catch { return configured?.existingThreadVoiceEnabled === true; }
+}
 function interactionMarksRead(event: { defaultPrevented?: boolean; key?: string; type?: string }): boolean {
   return event.defaultPrevented !== true && (event.type !== "keydown" || !["Meta", "Control", "Alt", "AltGraph", "Shift"].includes(event.key ?? ""));
+}
+type UnreadConversationState = { hasConversation: boolean; hasPersistedUnreadTurn: boolean; hasUnreadTurn: boolean; persistedUnreadHostId: string | undefined };
+function unreadConversationState(get: ScopeLike["get"], conversationId: string): UnreadConversationState {
+  const hasConversation = Boolean(get(initial.zZt, conversationId));
+  const registeredHostId = get(initial.wQt, conversationId) as string | undefined;
+  const persistedUnreadHostId = hasConversation ? registeredHostId : (get(initial.o0t, conversationId)?.hostId ?? registeredHostId);
+  const summary = get(initial.UQt, { hostId: persistedUnreadHostId, threadId: conversationId });
+  const persistedUnread = get(initial.ewt);
+  return {
+    hasConversation,
+    hasPersistedUnreadTurn: Array.isArray(persistedUnread?.[persistedUnreadHostId ?? ""]) && persistedUnread[persistedUnreadHostId!].includes(conversationId),
+    hasUnreadTurn: summary?.summary?.hasUnreadTurn === true,
+    persistedUnreadHostId,
+  };
+}
+function markConversationRead(scope: ScopeLike | null, conversationId: string): void {
+  if (scope == null) return;
+  const state = unreadConversationState(scope.get.bind(scope), conversationId);
+  if (!state.hasUnreadTurn && !state.hasPersistedUnreadTurn) return;
+  try { initial.Ugn?.(scope, state.persistedUnreadHostId)?.markConversationAsRead?.(conversationId); } catch { /* read tracking is best effort */ }
+}
+function watchConversationRead(scope: ScopeLike | null, conversationId: string): (() => void) | void {
+  if (scope?.watch == null) return;
+  let initialized = false;
+  let previousRequestId: string | null = null;
+  let previousTurnId: string | null = null;
+  let previousTurnStatus: string | null = null;
+  let previousReceipt: any = scope.get(initial.eQt);
+  return scope.watch(({ get }) => {
+    if (initial.GPt != null && get(initial.GPt) !== true) return;
+    const unread = unreadConversationState(get, conversationId);
+    const requests = get(initial.UQt, { hostId: unread.persistedUnreadHostId, threadId: conversationId })?.requests;
+    const requestId = Array.isArray(requests) ? requests.at(-1)?.id ?? null : null;
+    const turnSummary = get(initial.WQt, { hostId: unread.persistedUnreadHostId, threadId: conversationId });
+    const turnId = turnSummary?.lastTurnId ?? null;
+    const turnStatus = turnSummary?.lastTurnStatus ?? null;
+    const receipt = get(initial.eQt);
+    if (!unread.hasUnreadTurn && !unread.hasPersistedUnreadTurn) {
+      initialized = true;
+      previousRequestId = requestId;
+      previousTurnId = turnId;
+      previousTurnStatus = turnStatus;
+      previousReceipt = receipt;
+      return;
+    }
+    const routeReceiptMatches = receipt !== previousReceipt && receipt?.conversationId === conversationId && receipt?.hostId === unread.persistedUnreadHostId && receipt?.turnId === turnId;
+    if (!initialized || routeReceiptMatches || (unread.hasPersistedUnreadTurn && !unread.hasUnreadTurn) || previousRequestId !== requestId || previousTurnId !== turnId || previousTurnStatus !== turnStatus) {
+      initialized = true;
+      previousRequestId = requestId;
+      previousTurnId = turnId;
+      previousTurnStatus = turnStatus;
+      previousReceipt = receipt;
+      markConversationRead(scope, conversationId);
+    }
+  });
 }
 function unavailableResumeState(): ResumeState {
   return { hasResumeFailed: false, isResuming: false, isUnavailable: false, isWriterConflict: false, retryResume: () => undefined };
@@ -355,15 +429,52 @@ function ThreadContainer(props: {
   const markRead = (event?: { defaultPrevented?: boolean; key?: string; type?: string }) => {
     if (!trackReadState || (event != null && !interactionMarksRead(event))) return;
     if (props.onMarkRead != null) { props.onMarkRead(props.conversationId); return; }
-    try {
-      const hostId = props.hostId ?? scope?.get(initial.wQt, props.conversationId);
-      initial.Ugn?.(scope, hostId)?.markConversationAsRead?.(props.conversationId);
-    } catch { /* read tracking must never break the thread */ }
+    markConversationRead(scope, props.conversationId);
   };
   const react = shared.e6?.() as ReactRuntime | undefined;
-  react?.useEffect?.(() => { markRead(); }, [props.conversationId, trackReadState]);
+  react?.useEffect?.(() => {
+    if (!trackReadState) return;
+    if (props.onMarkRead != null) { props.onMarkRead(props.conversationId); return; }
+    return watchConversationRead(scope, props.conversationId);
+  }, [props.conversationId, props.onMarkRead, scope, trackReadState]);
   const entries = projected?.visibleTurnEntries ?? projected?.renderEntries ?? [];
   const Turn = (localConversationTurn as any).t;
+  const RowComponent = ({ entry, latestTurnFooter, latestTurnFollowContentRef }: { entry: Record<string, any>; latestTurnFooter?: unknown; latestTurnFollowContentRef?: unknown }) => {
+    if (entry.type === "gap") return jsx().jsx("div", { "aria-hidden": true, style: { height: entry.estimatedHeightPx ?? 0 } });
+    if (entry.type === "child-elicitation") return null;
+    if (entry.type === "voice-transcript" || entry.type === "voice-presentation") {
+      return jsx().jsx("div", { "data-voice-turn": entry.type, children: entry.block?.text ?? entry.presentation ?? null });
+    }
+    return entry.turn == null || typeof Turn !== "function" ? null : jsx().jsx(Turn, {
+      ...entry,
+      conversationId: props.conversationId,
+      hostId: props.hostId,
+      isBackgroundSubagentsEnabled: entry.isBackgroundSubagentsEnabled !== false,
+      isLatestTurn: entry.isLatestTurn === true,
+      isMostRecentTurn: entry.isMostRecentTurn === true,
+      isReadOnly,
+      latestTurnFollowContentRef,
+      renderMcpApps: entry.renderMcpApps !== false,
+      turnRequests: entry.requests ?? entry.turnRequests,
+      latestTurnFooter,
+    });
+  };
+  const VirtualizedList = (virtualizedTurnList as any).t;
+  const renderableEntries = entries.map((entry, index) => ({
+    ...entry,
+    type: entry.type ?? "turn",
+    turnKey: String(entry.turnKey ?? entry.turnId ?? entry.turn?.turnId ?? index),
+    isLatestTurn: entry.isLatestTurn === true || index === entries.length - 1,
+    isMostRecentTurn: index === entries.length - 1,
+  }));
+  const turns = typeof VirtualizedList === "function" && renderableEntries.length > 0
+    ? jsx().jsx(VirtualizedList, {
+        collapseEmptyRows: false,
+        entries: renderableEntries,
+        preserveMeasuredTurnViewport: true,
+        RowComponent,
+      })
+    : renderableEntries.map((entry) => jsx().jsx(RowComponent, { entry }, entry.turnKey));
   const body = props.children ?? jsx().jsx("div", {
     className: "flex min-h-0 flex-1 flex-col overflow-y-auto",
     "data-local-conversation-body": true,
@@ -372,26 +483,9 @@ function ThreadContainer(props: {
     "data-read-only": isReadOnly || undefined,
     "data-retain-active-interest": retainActiveInterest,
     "data-show-side-chat-empty-state": props.showSideChatEmptyState === true || undefined,
-    children: entries.length === 0
+    children: renderableEntries.length === 0
       ? (props.showSideChatEmptyState === true ? jsx().jsx("div", { "data-side-chat-empty-state": true, children: "No messages yet" }) : null)
-      : entries.map((entry, index) => entry.turn == null || typeof Turn !== "function"
-        ? null
-        : jsx().jsx(Turn, {
-            conversationId: props.conversationId,
-            historyEntityKey: entry.historyEntityKey,
-            hostId: props.hostId,
-            isBackgroundSubagentsEnabled: true,
-            isLatestTurn: entry.isLatestTurn === true || index === entries.length - 1,
-            isMostRecentTurn: index === entries.length - 1,
-            isReadOnly,
-            preserveServerUserMessages: entry.preserveServerUserMessages === true,
-            renderMcpApps: true,
-            totalTurnCount: entries.length,
-            turn: entry.turn,
-            turnNumber: index + 1,
-            turnRequests: entry.requests,
-            turnSearchKey: entry.turnSearchKey,
-          }, String(entry.turnKey ?? entry.turnId ?? index))),
+      : turns,
   });
   return jsx().jsx("div", {
     className: "min-h-0 flex-1",
@@ -409,6 +503,45 @@ function ThreadContainer(props: {
 // ---------------------------------------------------------------------------
 // 线程主组件（原 `fM`，导出 t）
 // ---------------------------------------------------------------------------
+
+function ThreadComposer(props: {
+  className?: string;
+  composerPresentation?: Record<string, any> | null;
+  conversationId: string | null;
+  disabled?: boolean;
+  hostId?: string;
+  lockedCollaborationMode?: unknown;
+  showUtilityBar?: boolean;
+}): unknown {
+  const Composer = (appPrimaryChunk as any).ut;
+  if (typeof Composer !== "function") {
+    return jsx().jsx("div", { className: props.className, "aria-disabled": props.disabled === true, "data-thread-composer": true });
+  }
+  const presentation = props.composerPresentation ?? undefined;
+  return jsx().jsx("div", {
+    className: ["flex flex-col gap-2", props.className].filter(Boolean).join(" "),
+    "data-thread-composer": true,
+    "data-thread-find-composer": "true",
+    children: jsx().jsx(Composer, {
+      animateRadius: presentation?.animateRadius,
+      composerLayoutMode: presentation?.composerLayoutMode,
+      hideRunLocationDropdownOverride: presentation?.hideRunLocationDropdownOverride,
+      hideSecondaryControls: presentation?.hideSecondaryControls,
+      isThreadHistoryLoading: props.disabled === true,
+      lockedCollaborationMode: props.lockedCollaborationMode,
+      lockedLayout: presentation?.lockedLayout,
+      onLocalConversationCreated: () => undefined,
+      placeholderText: props.conversationId == null ? "Starting your task…" : undefined,
+      radiusVariant: presentation?.radiusVariant,
+      selectedProject: query(initial.mo),
+      showUtilityBar: props.showUtilityBar !== false,
+      showWorkspaceDropdownInUtilityBar: presentation?.showWorkspaceDropdownInUtilityBar === true,
+      submitDisabled: props.disabled === true,
+      surfaceClassName: props.className,
+      surfaceVariant: presentation?.surfaceVariant,
+    }),
+  });
+}
 
 /**
  * LocalConversationThread（原 `fM`，导出 t）：
@@ -475,11 +608,12 @@ function LocalConversationThread(props: {
       jsx().jsx("div", { className: "relative flex min-h-0 flex-1 flex-col", children: thread }),
       writerConflictCard,
       props.hostMcpApps === true ? jsx().jsx("div", { "data-host-mcp-apps": true }) : null,
-      showComposer ? jsx().jsx("div", {
+      showComposer ? jsx().jsx(ThreadComposer, {
         className: "shrink-0",
-        "data-thread-composer": true,
-        "data-composer-presentation": typeof props.composerPresentation === "string" ? props.composerPresentation : undefined,
-        "aria-disabled": composerDisabled,
+        composerPresentation: typeof props.composerPresentation === "object" ? props.composerPresentation as Record<string, any> : null,
+        conversationId: props.conversationId,
+        disabled: composerDisabled,
+        hostId: resolvedHostId,
       }) : null,
     ],
   });
@@ -533,26 +667,54 @@ function SideChatThread(props: {
 }): unknown {
   const clientThreadContext = typeof shared.LX === "function" && initial.wtn != null ? shared.LX(initial.wtn) : null;
   const clientThreadId = clientThreadContext?.value?.clientThreadId ?? clientThreadContext?.value ?? null;
-  return jsx().jsx("section", {
-    className: props.composerSurfaceClassName,
-    "data-side-chat-thread": clientThreadId ?? true,
-    "data-hide-when-covered": props.hideWhenCoveredByRightPanel !== false || undefined,
-    "data-transcript-visible": props.isTranscriptVisible !== false || undefined,
-    children: jsx().jsxs(jsx().Fragment, { children: [
-      props.showUtilityBar === false ? null : jsx().jsx(ThreadPanelsBar, {
-        onOpenBackgroundAgent: props.onOpenBackgroundAgent,
-        onOpenPullRequestSidePanel: props.onOpenPullRequestSidePanel,
-        onOpenSubagentsPanel: props.onOpenSubagentsPanel,
-      }),
-      clientThreadId == null ? props.footerContent ?? null : jsx().jsx(LocalConversationThread, {
-        canInteract: props.isReadOnly !== true,
+  const scope = appScope();
+  const mappedConversationId = clientThreadId == null ? null : query<string | null>(clientThreadIdForFamily, clientThreadId);
+  const conversationId = mappedConversationId ?? currentRouteConversationId(scope);
+  const hostId = query<string>(initial.wQt, conversationId);
+  const exists = conversationId == null ? false : query<boolean>(initial.zZt, conversationId);
+  const waitingForCreation = clientThreadId != null && conversationId == null;
+  const missing = conversationId != null && exists === false;
+  let content: unknown;
+  if (waitingForCreation) {
+    content = jsx().jsx(ThreadSetup, { clientThreadId, submittedThreadStart: query(initial.Ltn, clientThreadId) });
+  } else if (missing && props.allowMissingConversation !== true) {
+    content = jsx().jsx(ExpiredSideChat, { conversationId: conversationId!, sourceConversationId: currentRouteConversationId(scope), target: "right" });
+  } else if (conversationId == null) {
+    content = props.footerContent ?? null;
+  } else {
+    const isReadOnly = props.isReadOnly === true || missing;
+    content = jsx().jsxs(jsx().Fragment, { children: [
+      jsx().jsx(LocalConversationThread, {
+        canInteract: !isReadOnly && props.showComposer !== false,
         composerPresentation: props.composerPresentation,
-        conversationId: clientThreadId,
+        conversationId,
+        header: props.showUtilityBar === false ? undefined : jsx().jsx(ThreadPanelsBar, {
+          onOpenBackgroundAgent: props.onOpenBackgroundAgent,
+          onOpenPullRequestSidePanel: props.onOpenPullRequestSidePanel,
+          onOpenSubagentsPanel: props.onOpenSubagentsPanel,
+        }),
+        hostId,
         onOpenBackgroundAgent: props.onOpenBackgroundAgent,
         shouldResume: props.shouldResume !== false,
       }),
-    ] }),
+      props.showSummaryPanel === false ? null : jsx().jsx("aside", { "data-thread-summary-panel": true }),
+      props.footerContent == null ? null : jsx().jsx("footer", { "data-thread-footer": true, children: props.footerContent }),
+    ] });
+  }
+  const surface = jsx().jsx("section", {
+    className: props.composerSurfaceClassName,
+    "data-side-chat-thread": clientThreadId ?? true,
+    "data-conversation-id": conversationId ?? undefined,
+    "data-hide-when-covered": props.hideWhenCoveredByRightPanel !== false || undefined,
+    "data-transcript-visible": props.isTranscriptVisible !== false || undefined,
+    "data-render-layout": props.renderLayout == null ? undefined : true,
+    "data-restore-scroll-position": props.restoreScrollPosition == null ? undefined : true,
+    "data-show-messaging-toggle": props.showMessagingToggle === true || undefined,
+    "data-locked-collaboration-mode": props.lockedCollaborationMode == null ? undefined : true,
+    children: content,
   });
+  const Context = (sideChatRuntime as any).t;
+  return Context?.Provider == null ? surface : jsx().jsx(Context.Provider, { value: SideChat, children: surface });
 }
 
 /**
@@ -566,27 +728,97 @@ function SideChat(props: {
   lockedCollaborationMode?: unknown;
   target?: unknown;
 }): unknown {
+  const scope = appScope();
+  const sourceConversationId = currentRouteConversationId(scope);
   const available = query<boolean>(initial.zZt, props.conversationId ?? null);
-  const isActive = query<boolean>(initial.XZt, props.conversationId ?? null);
-  const hostId = query<string>(initial.wQt, props.conversationId ?? null);
+  const isRunningElsewhere = query<boolean>(initial.XZt, props.conversationId ?? null);
+  const hostId = query<string>(initial.wQt, props.conversationId ?? sourceConversationId);
   if (props.conversationId != null && available === false) {
-    return jsx().jsxs("section", { className: "flex h-full flex-col items-center justify-center gap-2", "data-side-chat-expired": true, children: [
-      jsx().jsx("h2", { children: "Side chat expired" }),
-      jsx().jsx("p", { children: "This temporary side chat is no longer available; start a new side chat to continue" }),
+    return jsx().jsx(ExpiredSideChat, { conversationId: props.conversationId, sourceConversationId, target: props.target });
+  }
+  const conversationId = props.conversationId ?? props.clientThreadId ?? null;
+  const readOnly = isRunningElsewhere === true;
+  const banner = props.conversationId != null && isRunningElsewhere === true
+    ? jsx().jsx(ExpiredSideChat, { conversationId: props.conversationId, presentation: "banner", sourceConversationId, target: props.target })
+    : null;
+  const body = conversationId == null
+    ? jsx().jsx(ThreadSetup, { clientThreadId: props.clientThreadId })
+    : jsx().jsxs("section", {
+        className: "flex h-full min-h-0 flex-col",
+        "data-side-chat": conversationId,
+        "data-unified-timeline": voiceTimelineEnabled(props.conversationId ?? null) || undefined,
+        children: [
+          banner,
+          jsx().jsx(ThreadContainer, {
+            conversationId,
+            hostId,
+            isReadOnly: readOnly,
+            retainActiveInterest: !readOnly,
+            showSideChatEmptyState: isRunningElsewhere === false,
+          }),
+          readOnly ? null : jsx().jsx(ThreadComposer, {
+            className: "shrink-0",
+            conversationId,
+            disabled: false,
+            hostId,
+            lockedCollaborationMode: props.lockedCollaborationMode,
+            showUtilityBar: false,
+          }),
+        ],
+      });
+  const Context = (sideChatRuntime as any).t;
+  const contextual = Context?.Provider == null ? body : jsx().jsx(Context.Provider, { value: SideChat, children: body });
+  return voiceTimelineEnabled(props.conversationId ?? null)
+    ? jsx().jsx("div", { className: "group/realtime-voice-thread relative flex h-full min-h-0 flex-1 flex-col overflow-clip", "data-realtime-voice-perspective": true, children: contextual })
+    : contextual;
+}
+
+function ExpiredSideChat(props: {
+  conversationId: string;
+  presentation?: "banner" | "page";
+  sourceConversationId: string | null;
+  target?: unknown;
+}): unknown {
+  const scope = appScope();
+  const react = shared.e6?.() as ReactRuntime | undefined;
+  const state = react?.useState?.(false);
+  const recreating = state?.[0] ?? false;
+  const setRecreating = state?.[1] ?? (() => undefined);
+  const sourceConversationId = props.sourceConversationId;
+  const recreate = () => {
+    if (scope == null || sourceConversationId == null || recreating || typeof (sideChatRuntime as any).r !== "function") return;
+    setRecreating(true);
+    const sourceHostId = scope.get(initial.wQt, sourceConversationId);
+    const cwd = scope.get(initial.MZt, sourceConversationId);
+    const collaborationMode = scope.get(initial.rQt, sourceConversationId);
+    Promise.resolve((sideChatRuntime as any).r(scope, SideChat, {
+      collaborationMode,
+      cwd,
+      displayTitle: undefined,
+      hostId: sourceHostId,
+      replaceTabId: `sidechat:${props.conversationId}`,
+      sourceConversationId,
+      target: props.target,
+    })).catch(() => setRecreating(false));
+  };
+  const action = sourceConversationId == null ? null : jsx().jsx("button", {
+    disabled: recreating,
+    onClick: recreate,
+    type: "button",
+    children: recreating ? "Starting new side chat…" : "Start new side chat",
+  });
+  if (props.presentation === "banner") {
+    return jsx().jsxs("div", { role: "alert", "data-side-chat-expired-banner": true, children: [
+      jsx().jsx("strong", { children: "Side chat expired" }),
+      jsx().jsx("span", { children: "This temporary side chat is no longer available; start a new side chat to continue" }),
+      action,
     ] });
   }
-  const readOnly = isActive === true;
-  return jsx().jsx("section", {
-    className: "flex h-full min-h-0 flex-col",
-    "data-side-chat": props.conversationId ?? props.clientThreadId ?? true,
-    children: jsx().jsx(ThreadContainer, {
-      conversationId: props.conversationId ?? props.clientThreadId ?? "",
-      hostId,
-      isReadOnly: readOnly,
-      retainActiveInterest: !readOnly,
-      showSideChatEmptyState: isActive === false,
-    }),
-  });
+  return jsx().jsxs("section", { className: "flex h-full flex-col items-center justify-center gap-2", "data-side-chat-expired": true, children: [
+    jsx().jsx("h2", { children: "Side chat expired" }),
+    jsx().jsx("p", { children: "This temporary side chat is no longer available; start a new side chat to continue" }),
+    action,
+  ] });
 }
 
 // ---------------------------------------------------------------------------

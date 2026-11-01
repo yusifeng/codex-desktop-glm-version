@@ -440,6 +440,7 @@ function LocalConversationTurnComponent(props: LocalConversationTurnProps): unkn
     emptyUserMessageOverride: props.emptyUserMessageOverride,
     excludedSubagentThreadIds: props.excludedSubagentThreadIds,
     generatedImages: props.generatedImages,
+    hideUserMessageActions: props.hideUserMessageActions,
     hostId: props.hostId,
     historyEntityKey: props.historyEntityKey,
     includeEndResources: props.includeEndResources,
