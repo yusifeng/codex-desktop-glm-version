@@ -689,6 +689,250 @@ export function createSavedSectionPolicy({
     };
   }
 
+  function reconcileHostSectionList(
+    state: any,
+    hostId: string,
+    snapshot: any,
+    threadHostIds: any,
+    bindings: any,
+    createId: () => string,
+    discoveredMembers?: Map<string, string[]>,
+  ) {
+    if (!snapshot.hostIds.includes(hostId)) return state;
+    const hostSections = snapshot.sections.filter(
+      (section: any) => section.hostId === hostId,
+    );
+    const matchedSectionIds = new Map<string, string>();
+    let next =
+      state.appServerLegacySectionIds == null
+        ? {
+            ...state,
+            appServerLegacySectionIds: state.sections.map(
+              ({ id }: any) => id,
+            ),
+          }
+        : state;
+
+    for (const section of state.sections) {
+      const hostSectionId = section.hostSectionIds?.[hostId];
+      const replicaMissing =
+        hostSectionId != null &&
+        !hostSections.some(({ id }: any) => id === hostSectionId);
+      if (
+        !replicaMissing &&
+        section.pendingDeletionHostIdsByItemKey == null
+      )
+        continue;
+
+      const nameMatch = replicaMissing
+        ? hostSections.find(
+            (candidate: any) =>
+              candidate.name === section.name &&
+              !matchedSectionIds.has(candidate.id) &&
+              !state.sections.some(
+                (saved: any) =>
+                  saved.hostSectionIds?.[hostId] === candidate.id,
+              ),
+          )
+        : undefined;
+      if (
+        nameMatch != null &&
+        (matchedSectionIds.set(nameMatch.id, section.id),
+        !discoveredMembers?.has(nameMatch.id))
+      )
+        continue;
+
+      const hostSectionIds = { ...section.hostSectionIds };
+      if (replicaMissing) delete hostSectionIds[hostId];
+      const pendingDeletionHostIdsByItemKey: Record<string, string[]> = {};
+      const itemKeys = section.itemKeys.filter((itemKey: string) => {
+        const threadId = bindings[itemKey] ?? threadIdFromItemKey(itemKey);
+        if (
+          threadId == null &&
+          !itemKey.startsWith(`codex:thread:local:`)
+        )
+          return true;
+        const pendingHosts = new Set([
+          ...(section.pendingDeletionHostIdsByItemKey?.[itemKey] ?? []),
+          ...(replicaMissing ? [hostId] : []),
+        ]);
+        if (pendingHosts.size === 0) return true;
+        const currentHostId =
+          threadId == null
+            ? undefined
+            : (threadHostIds[threadId] ?? state.threadHostIds?.[threadId]);
+        if (currentHostId == null)
+          pendingDeletionHostIdsByItemKey[itemKey] = [...pendingHosts];
+        return currentHostId == null || !pendingHosts.has(currentHostId);
+      });
+
+      next =
+        nameMatch == null &&
+        Object.keys(hostSectionIds).length === 0 &&
+        itemKeys.length === 0
+          ? deleteSection(next, section.id)
+          : {
+              ...next,
+              sections: next.sections.map((candidate: any) =>
+                candidate.id === section.id
+                  ? {
+                      ...candidate,
+                      hostSectionIds,
+                      itemKeys,
+                      pendingDeletionHostIdsByItemKey:
+                        Object.keys(pendingDeletionHostIdsByItemKey).length ===
+                        0
+                          ? undefined
+                          : pendingDeletionHostIdsByItemKey,
+                    }
+                  : candidate,
+              ),
+            };
+    }
+
+    for (const hostSection of hostSections) {
+      const matchedLogicalId = matchedSectionIds.get(hostSection.id);
+      const savedSection =
+        next.sections.find(
+          (section: any) =>
+            section.hostSectionIds?.[hostId] === hostSection.id,
+        ) ??
+        next.sections.find(
+          (section: any) =>
+            (matchedLogicalId == null
+              ? section.name === hostSection.name
+              : section.id === matchedLogicalId) &&
+            section.hostSectionIds?.[hostId] == null &&
+            discoveredMembers?.has(hostSection.id),
+        );
+      if (savedSection == null) {
+        const memberThreadIds = discoveredMembers?.get(hostSection.id);
+        if (memberThreadIds != null) {
+          next = createSection(next, {
+            id: createId(),
+            name: hostSection.name,
+            itemKeys: memberThreadIds
+              .filter((threadId: string) => {
+                const currentHostId =
+                  threadHostIds[threadId] ??
+                  state.threadHostIds?.[threadId];
+                return currentHostId == null || currentHostId === hostId;
+              })
+              .map(itemKeyFromThreadId),
+            hostSectionIds: { [hostId]: hostSection.id },
+          });
+        }
+        continue;
+      }
+      next = {
+        ...next,
+        sections: next.sections.map((section: any) =>
+          section === savedSection
+            ? {
+                ...section,
+                name: hostSection.name,
+                hostSectionIds: {
+                  ...section.hostSectionIds,
+                  [hostId]: hostSection.id,
+                },
+              }
+            : section,
+        ),
+      };
+    }
+    return pruneThreadHostIds(next, threadHostIds, bindings);
+  }
+
+  function reconcileHostSectionMembers(
+    state: any,
+    hostId: string,
+    hostSectionId: string,
+    memberThreadIds: string[],
+    threadHostIds: any,
+    bindings: any,
+  ) {
+    const targetSection = state.sections.find(
+      (section: any) =>
+        section.hostSectionIds?.[hostId] === hostSectionId,
+    );
+    if (targetSection == null) return state;
+
+    const hostThreadIds = new Set(
+      memberThreadIds.filter((threadId) => {
+        const currentHostId =
+          threadHostIds[threadId] ?? state.threadHostIds?.[threadId];
+        return currentHostId == null || currentHostId === hostId;
+      }),
+    );
+    const boundThreadIds = new Set(Object.values(bindings));
+    const hostItemKeys = [...hostThreadIds].map(itemKeyFromThreadId);
+    const hostMigrated =
+      state.appServerMigratedHostIds?.includes(hostId) === true;
+    let nextHostItemIndex = 0;
+    const targetItemKeys = targetSection.itemKeys.flatMap(
+      (itemKey: string) => {
+        const threadId = bindings[itemKey] ?? threadIdFromItemKey(itemKey);
+        if (threadId == null) return [itemKey];
+        const currentHostId =
+          threadHostIds[threadId] ?? state.threadHostIds?.[threadId];
+        const belongsToHost =
+          currentHostId === hostId ||
+          (currentHostId == null && hostThreadIds.has(threadId));
+        if (!hostMigrated)
+          return [hostThreadIds.has(threadId) ? itemKeyFromThreadId(threadId) : itemKey];
+        if (
+          !belongsToHost ||
+          (boundThreadIds.has(threadId) && !hostThreadIds.has(threadId))
+        )
+          return [itemKey];
+        const replacement = hostItemKeys[nextHostItemIndex++];
+        return replacement == null ? [] : [replacement];
+      },
+    );
+    const mergedItemKeys = hostMigrated
+      ? [
+          ...targetItemKeys,
+          ...hostItemKeys.slice(nextHostItemIndex),
+        ]
+      : [...new Set([...targetItemKeys, ...hostItemKeys])];
+
+    return pruneThreadHostIds(
+      {
+        ...state,
+        sections: state.sections.map((section: any) => {
+          if (section === targetSection)
+            return updateSectionItems(
+              section,
+              mergedItemKeys,
+              hostThreadIds,
+              bindings,
+            );
+          if (!hostMigrated) return section;
+          const itemKeys = section.itemKeys.filter((itemKey: string) => {
+            const threadId =
+              bindings[itemKey] ?? threadIdFromItemKey(itemKey);
+            return threadId == null || !hostThreadIds.has(threadId);
+          });
+          return itemKeys.length === section.itemKeys.length
+            ? section
+            : updateSectionItems(
+                section,
+                itemKeys,
+                hostThreadIds,
+                bindings,
+              );
+        }),
+      },
+      {
+        ...Object.fromEntries(
+          [...hostThreadIds].map((threadId) => [threadId, hostId]),
+        ),
+        ...threadHostIds,
+      },
+      bindings,
+    );
+  }
+
   return {
     affectedStateGuardsMatch,
     applyAffectedState,
@@ -705,6 +949,8 @@ export function createSavedSectionPolicy({
     moveItem,
     projectAffectedState,
     pruneThreadHostIds,
+    reconcileHostSectionList,
+    reconcileHostSectionMembers,
     readPinnedThreadIds,
     removeItem,
     renameSection,

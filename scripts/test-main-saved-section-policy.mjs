@@ -236,6 +236,116 @@ equal(
   undefined,
 );
 
+const reconciliationState = {
+  sections: [
+    {
+      id: "logical",
+      name: "One",
+      hostSectionIds: { remote: "missing" },
+      itemKeys: [
+        "codex:thread:local:a",
+        "codex:thread:local:b",
+        "chatgpt:conversation:external",
+      ],
+      pendingDeletionHostIdsByItemKey: {
+        "codex:thread:local:a": ["remote"],
+      },
+    },
+  ],
+  collapsedSectionIds: [],
+  sectionOrder: ["custom:logical", "threads"],
+  threadHostIds: { a: "remote", b: "other", c: "remote" },
+};
+equal(
+  policy.reconcileHostSectionList(
+    reconciliationState,
+    "absent",
+    { hostIds: ["remote"], sections: [] },
+    {},
+    {},
+    () => "unused",
+  ),
+  reconciliationState,
+);
+const reconciledList = policy.reconcileHostSectionList(
+  reconciliationState,
+  "remote",
+  {
+    hostIds: ["remote"],
+    sections: [
+      { id: "replacement", name: "One", hostId: "remote" },
+      { id: "fresh", name: "Fresh", hostId: "remote" },
+    ],
+  },
+  { a: "remote", b: "other", c: "remote" },
+  {},
+  () => "created",
+  new Map([
+    ["replacement", ["a"]],
+    ["fresh", ["c"]],
+  ]),
+);
+equal(reconciledList.appServerLegacySectionIds, ["logical"]);
+equal(reconciledList.sections[0], {
+  id: "logical",
+  name: "One",
+  hostSectionIds: { remote: "replacement" },
+  itemKeys: ["codex:thread:local:b", "chatgpt:conversation:external"],
+  pendingDeletionHostIdsByItemKey: undefined,
+});
+equal(reconciledList.sections[1], {
+  id: "created",
+  name: "Fresh",
+  itemKeys: ["codex:thread:local:c"],
+  hostSectionIds: { remote: "fresh" },
+});
+equal(reconciledList.threadHostIds, { b: "other", c: "remote" });
+
+const migratedMembersState = {
+  sections: [
+    {
+      id: "target",
+      name: "Target",
+      hostSectionIds: { remote: "section" },
+      itemKeys: ["codex:thread:local:a", "codex:thread:local:c"],
+    },
+    {
+      id: "other",
+      name: "Other",
+      itemKeys: ["codex:thread:local:b"],
+    },
+  ],
+  collapsedSectionIds: [],
+  sectionOrder: ["custom:target", "custom:other", "threads"],
+  appServerMigratedHostIds: ["remote"],
+  threadHostIds: { a: "remote", b: "remote", c: "remote" },
+};
+const reconciledMembers = policy.reconcileHostSectionMembers(
+  migratedMembersState,
+  "remote",
+  "section",
+  ["b", "a"],
+  migratedMembersState.threadHostIds,
+  {},
+);
+equal(reconciledMembers.sections[0].itemKeys, [
+  "codex:thread:local:b",
+  "codex:thread:local:a",
+]);
+equal(reconciledMembers.sections[1].itemKeys, []);
+equal(reconciledMembers.threadHostIds, { a: "remote", b: "remote" });
+equal(
+  policy.reconcileHostSectionMembers(
+    migratedMembersState,
+    "remote",
+    "missing",
+    [],
+    {},
+    {},
+  ),
+  migratedMembersState,
+);
+
 const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
@@ -258,6 +368,8 @@ for (const oldFunction of [
   "function DH(",
   "function OH(",
   "function AH(",
+  "function TH(",
+  "function EH(",
 ]) {
   equal(main.includes(oldFunction), false, `${oldFunction} must be removed`);
 }

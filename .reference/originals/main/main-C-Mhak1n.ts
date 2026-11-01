@@ -11170,6 +11170,8 @@ var {
   moveItem: Gb,
   projectAffectedState: CH,
   pruneThreadHostIds: DH,
+  reconcileHostSectionList,
+  reconcileHostSectionMembers,
   readPinnedThreadIds: hH,
   removeItem: Xb,
   renameSection: Jb,
@@ -30803,136 +30805,11 @@ var yH = createSavedSectionUndoRedoStackClass({
   wH,
   xH,
 });
-function TH(e, t, n, r, i, a, o) {
-  if (!n.hostIds.includes(t)) return e;
-  let s = n.sections.filter((e) => e.hostId === t),
-    c = new Map(),
-    l =
-      e.appServerLegacySectionIds == null
-        ? { ...e, appServerLegacySectionIds: e.sections.map(({ id: e }) => e) }
-        : e;
-  for (let n of e.sections) {
-    let a = n.hostSectionIds?.[t],
-      u = a != null && !s.some(({ id: e }) => e === a);
-    if (!u && n.pendingDeletionHostIdsByItemKey == null) continue;
-    let d = u
-      ? s.find(
-          (r) =>
-            r.name === n.name &&
-            !c.has(r.id) &&
-            !e.sections.some((e) => e.hostSectionIds?.[t] === r.id),
-        )
-      : void 0;
-    if (d != null && (c.set(d.id, n.id), !o?.has(d.id))) continue;
-    let f = { ...n.hostSectionIds };
-    u && delete f[t];
-    let p = {},
-      m = n.itemKeys.filter((a) => {
-        let o = i[a] ?? OH(a);
-        if (o == null && !a.startsWith(`codex:thread:local:`)) return !0;
-        let s = new Set([...(n.pendingDeletionHostIdsByItemKey?.[a] ?? []), ...(u ? [t] : [])]);
-        if (s.size === 0) return !0;
-        let c = o == null ? void 0 : (r[o] ?? e.threadHostIds?.[o]);
-        return (c ?? (p[a] = [...s]), c == null || !s.has(c));
-      });
-    l =
-      d == null && Object.keys(f).length === 0 && m.length === 0
-        ? Yb(l, n.id)
-        : {
-            ...l,
-            sections: l.sections.map((e) =>
-              e.id === n.id
-                ? {
-                    ...e,
-                    hostSectionIds: f,
-                    itemKeys: m,
-                    pendingDeletionHostIdsByItemKey: Object.keys(p).length === 0 ? void 0 : p,
-                  }
-                : e,
-            ),
-          };
-  }
-  for (let n of s) {
-    let i = c.get(n.id),
-      s =
-        l.sections.find((e) => e.hostSectionIds?.[t] === n.id) ??
-        l.sections.find(
-          (e) =>
-            (i == null ? e.name === n.name : e.id === i) &&
-            e.hostSectionIds?.[t] == null &&
-            o?.has(n.id),
-        );
-    if (s == null) {
-      let i = o?.get(n.id);
-      i != null &&
-        (l = qb(l, {
-          id: a(),
-          name: n.name,
-          itemKeys: i
-            .filter((n) => {
-              let i = r[n] ?? e.threadHostIds?.[n];
-              return i == null || i === t;
-            })
-            .map(kH),
-          hostSectionIds: { [t]: n.id },
-        }));
-      continue;
-    }
-    l = {
-      ...l,
-      sections: l.sections.map((e) =>
-        e === s ? { ...e, name: n.name, hostSectionIds: { ...e.hostSectionIds, [t]: n.id } } : e,
-      ),
-    };
-  }
-  return DH(l, r, i);
-}
-function EH(e, t, n, r, i, a) {
-  let o = e.sections.find((e) => e.hostSectionIds?.[t] === n);
-  if (o == null) return e;
-  let s = new Set(
-      r.filter((n) => {
-        let r = i[n] ?? e.threadHostIds?.[n];
-        return r == null || r === t;
-      }),
-    ),
-    c = new Set(Object.values(a)),
-    l = [...s].map(kH),
-    u = e.appServerMigratedHostIds?.includes(t) === !0,
-    d = 0,
-    f = o.itemKeys.flatMap((n) => {
-      let r = a[n] ?? OH(n);
-      if (r == null) return [n];
-      let o = i[r] ?? e.threadHostIds?.[r],
-        f = o === t || (o == null && s.has(r));
-      if (!u) return [s.has(r) ? kH(r) : n];
-      if (!f || (c.has(r) && !s.has(r))) return [n];
-      let p = l[d++];
-      return p == null ? [] : [p];
-    }),
-    p = u ? [...f, ...l.slice(d)] : [...new Set([...f, ...l])];
-  return DH(
-    {
-      ...e,
-      sections: e.sections.map((e) => {
-        if (e === o) return AH(e, p, s, a);
-        if (!u) return e;
-        let t = e.itemKeys.filter((e) => {
-          let t = a[e] ?? OH(e);
-          return t == null || !s.has(t);
-        });
-        return t.length === e.itemKeys.length ? e : AH(e, t, s, a);
-      }),
-    },
-    { ...Object.fromEntries([...s].map((e) => [e, t])), ...i },
-    a,
-  );
-}
 var rBe = createSavedSectionReconciliationClass({
-  EH,
-  TH,
   _,
   n,
+  reconcileHostSectionList,
+  reconcileHostSectionMembers,
   vH,
 });
 var iBe = createSavedCustomSectionsManagerClass({

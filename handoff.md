@@ -5636,3 +5636,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   existing-timeout gate、scoped config reference 校验和 thread/request id normalization 后的 snooze 顺序；WindowContext 直接消费语义 installer。
 - 主 chunk 旧 `aMe.._Me` schema belt 与 `Yk/Xk/Zk` 共约 137 行物理删除，中间约 6,100 行 YAML vendor 保持原样未拆。
   focused 60 项、automation tool/service 与 WindowContext 相邻回归 67 项通过；测试索引 1850，no-unwired gate 1151 项。
+
+# 2026-11-01 saved-section host reconciliation convergence
+
+- 扩展既有 `sidebar/saved-section-policy.ts`，由同一纯状态 owner 接管 host section snapshot 合并、缺失 replica 按名称重连、
+  新 section 导入、pending-deletion 清理、migrated host 成员顺序替换、跨 section 去重和 thread-host pruning。
+- `SavedSectionReconciliation` 保留 single-read/source-current/conflict/commit 生命周期，但改为消费语义化
+  `reconcileHostSectionList` / `reconcileHostSectionMembers`；主 chunk 旧 `TH/EH` 约 123 行物理删除，没有第二份 state owner。
+- policy/reconciliation focused 79 项及 transition、undo/redo、manager、server、engine、pinned 六组相邻回归 107 项通过；测试索引仍为
+  1850 个唯一脚本，no-unwired gate 扩至 1155 项。紧邻约 15,000 行 tar/minipass 实现有完整第三方边界，继续按 vendor 保留。

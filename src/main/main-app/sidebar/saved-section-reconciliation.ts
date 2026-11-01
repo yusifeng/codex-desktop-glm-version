@@ -2,8 +2,8 @@
 
 export function createSavedSectionReconciliationClass(dependencies) {
   const {
-    EH,
-    TH,
+    reconcileHostSectionList,
+    reconcileHostSectionMembers,
     _,
     n,
     vH,
@@ -65,8 +65,24 @@ export function createSavedSectionReconciliationClass(dependencies) {
         )
           return `unavailable`;
         if (!this.#r()) return `conflict`;
-        let i = TH(t, this.#t, n, e.threadHostIds, e.boundThreadIds, _.randomUUID, r);
-        for (let [t, n] of r) i = EH(i, this.#t, t, n, e.threadHostIds, e.boundThreadIds);
+        let i = reconcileHostSectionList(
+          t,
+          this.#t,
+          n,
+          e.threadHostIds,
+          e.boundThreadIds,
+          _.randomUUID,
+          r,
+        );
+        for (let [t, n] of r)
+          i = reconcileHostSectionMembers(
+            i,
+            this.#t,
+            t,
+            n,
+            e.threadHostIds,
+            e.boundThreadIds,
+          );
         return vH(this.#e, t, i, e.operationId, this.#t);
       }
       async commitMembers(e) {
@@ -82,7 +98,7 @@ export function createSavedSectionReconciliationClass(dependencies) {
           r =
             this.#a == null
               ? n
-              : TH(
+              : reconcileHostSectionList(
                   n,
                   this.#t,
                   this.#a,
@@ -94,7 +110,14 @@ export function createSavedSectionReconciliationClass(dependencies) {
         return vH(
           this.#e,
           n,
-          EH(r, this.#t, this.#n, this.#o, e.threadHostIds, e.boundThreadIds),
+          reconcileHostSectionMembers(
+            r,
+            this.#t,
+            this.#n,
+            this.#o,
+            e.threadHostIds,
+            e.boundThreadIds,
+          ),
           e.operationId,
           this.#t,
         );

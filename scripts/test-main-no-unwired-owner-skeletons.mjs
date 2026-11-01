@@ -262,6 +262,8 @@ assert.equal(main.includes('require("./main-app/browser-use/iab-capabilities.js"
 assert.equal(main.includes("capabilities: iabCapabilityRuntime"), true, "IAB API consumes the semantic capability runtime");
 assert.equal(main.includes("var _q = class"), false, "embedded browser SDK/Zod belt must remain removed");
 assert.equal(main.includes('require("./main-app/sidebar/saved-section-policy.js")'), true, "saved-section policy is wired");
+assert.equal(main.includes("reconcileHostSectionList,"), true, "saved-section host-list reconciliation is wired");
+assert.equal(main.includes("reconcileHostSectionMembers,"), true, "saved-section host-member reconciliation is wired");
 assert.equal(main.includes('require("./main-app/avatar-overlay/message-dispatch.js")'), true, "avatar overlay message dispatch is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/checkout-webview.js")'), true, "checkout webview runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/workspace-settings-webview-runtime.js")'), true, "workspace settings webview runtime is wired");
@@ -278,7 +280,7 @@ for (const oldOwner of ["var NW = r.i(`checkout-webview`)", "function IUe(", "fu
 for (const oldOwner of ["function GBe(", "function tU(", "async function KBe("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated avatar overlay dispatch must be removed`);
 }
-for (const oldOwner of ["function Wb(", "function Gb(", "function Kb(", "function qb(", "function _H(", "function eBe(", "function vH(", "function bH(", "function wH(", "function DH(", "function OH(", "function AH("]) {
+for (const oldOwner of ["function Wb(", "function Gb(", "function Kb(", "function qb(", "function _H(", "function eBe(", "function vH(", "function bH(", "function wH(", "function DH(", "function OH(", "function AH(", "function TH(", "function EH("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated saved-section policy must be removed`);
 }
 for (const oldOwner of ["function gGe(", "function HK(", "function UK(", "function WK(", "function GK(", "function KK(", "function JK(", "function kGe(", "function tq(", "function PGe("]) {
@@ -1101,4 +1103,4 @@ assert.equal(/^function Zk\(/m.test(main), false, "generated request auto-resolu
 assert.equal(/^[ ]{0,2}Yk = /m.test(main), false, "generated environment setup record schema must be removed");
 assert.equal(/^[ ]{0,2}Xk = /m.test(main), false, "generated environment config reference schema must be removed");
 
-console.log("1151 main unwired-owner skeleton assertions passed");
+console.log("1155 main unwired-owner skeleton assertions passed");

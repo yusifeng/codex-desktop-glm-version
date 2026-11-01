@@ -11,6 +11,8 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 
 ## Recent semantic extraction suites
 
+- [`test-main-saved-section-policy.mjs`](./test-main-saved-section-policy.mjs)
+- [`test-main-saved-section-reconciliation.mjs`](./test-main-saved-section-reconciliation.mjs)
 - [`test-main-automation-update-schemas.mjs`](./test-main-automation-update-schemas.mjs)
 - [`test-main-environment-config-auto-resolution.mjs`](./test-main-environment-config-auto-resolution.mjs)
 - [`test-main-environment-config-schemas.mjs`](./test-main-environment-config-schemas.mjs)
@@ -58,7 +60,6 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-main-workspace-settings-webview-runtime.mjs`](./test-main-workspace-settings-webview-runtime.mjs)
 - [`test-main-checkout-webview-runtime.mjs`](./test-main-checkout-webview-runtime.mjs)
 - [`test-main-avatar-overlay-message-dispatch.mjs`](./test-main-avatar-overlay-message-dispatch.mjs)
-- [`test-main-saved-section-policy.mjs`](./test-main-saved-section-policy.mjs)
 - [`test-main-browser-comment-policy.mjs`](./test-main-browser-comment-policy.mjs)
 - [`test-main-browser-annotation-anchor-policy.mjs`](./test-main-browser-annotation-anchor-policy.mjs)
 - [`test-main-browser-webview-adoption-runtime.mjs`](./test-main-browser-webview-adoption-runtime.mjs)
@@ -235,7 +236,6 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-main-thread-catalog-sync-coordinator.mjs`](./test-main-thread-catalog-sync-coordinator.mjs)
 - [`test-main-habitat-automations-service.mjs`](./test-main-habitat-automations-service.mjs)
 - [`test-main-saved-custom-sections-manager.mjs`](./test-main-saved-custom-sections-manager.mjs)
-- [`test-main-saved-section-reconciliation.mjs`](./test-main-saved-section-reconciliation.mjs)
 - [`test-main-saved-section-undo-redo-stack.mjs`](./test-main-saved-section-undo-redo-stack.mjs)
 - [`test-main-thread-section-server-owner.mjs`](./test-main-thread-section-server-owner.mjs)
 - [`test-main-window-context-owner.mjs`](./test-main-window-context-owner.mjs)

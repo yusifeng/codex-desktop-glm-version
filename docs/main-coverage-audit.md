@@ -3818,3 +3818,14 @@ blocking/already-timed request 排除、scoped environment config reference 校�
 直接消费 semantic installer，旧 `Yk/Xk/Zk` 已删除。两块合计从主 chunk 物理删除约 137 行；中间 bundled YAML vendor 约 6,100 行
 有明确第三方边界，保持不拆。focused 42 + 18 项，automation tool/service 与 WindowContext 67 项相邻回归通过；测试索引增至
 1850，no-unwired gate 扩至 1151 项。
+
+### 既有 owner 收敛：saved-section host reconciliation
+
+`sidebar/saved-section-policy.ts` 现除基础 mutation、undo guards 与 commit projection 外，也统一持有 host section list/member 的纯状态
+reconciliation：host snapshot gate、丢失 replica 的名称匹配和重连、未知远端 section 导入、pending deletion 与实际 thread host 过滤、
+migrated host 顺序投影、bound thread 保留、跨 section 去重和最终 thread-host pruning 均在同一 policy 内完成。
+
+`saved-section-reconciliation.ts` 继续唯一持有 query snapshot、single-read、source/connection lifetime、conflict gate 和 commit I/O，只消费
+`reconcileHostSectionList` / `reconcileHostSectionMembers`，没有复制 state。主 chunk 原 `TH/EH` 约 123 行物理删除；focused 64 + 15 项，
+transition/undo-redo/manager/server/engine/pinned 相邻回归 107 项通过。测试索引仍为 1850，no-unwired gate 扩至 1155 项；相邻
+tar/minipass 约 15,000 行具备完整第三方实现边界，记录为 vendor/generated 保留而不拆成伪业务模块。

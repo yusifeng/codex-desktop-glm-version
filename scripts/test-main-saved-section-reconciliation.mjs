@@ -13,8 +13,8 @@ const equal = (actual, expected) => { assert.deepEqual(actual, expected); assert
 const rejects = async (promise, pattern) => { await assert.rejects(promise, pattern); assertions += 1; };
 class DisposableBase {}
 const Reconciliation = createSavedSectionReconciliationClass({
-  EH: (state) => state,
-  TH: (state) => state,
+  reconcileHostSectionList: (state) => state,
+  reconcileHostSectionMembers: (state) => state,
   _: { randomUUID: () => "uuid" },
   n: { Uf: DisposableBase },
   vH: async () => "applied",
@@ -48,6 +48,10 @@ await rejects(memberQuery.readMembers(), /Saved section query retired/);
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
 const manager = fs.readFileSync(new URL("../src/main/main-app/sidebar/saved-custom-sections-manager.ts", import.meta.url), "utf8");
 equal(main.includes("rBe = createSavedSectionReconciliationClass({"), true);
+equal(main.includes("reconcileHostSectionList,"), true);
+equal(main.includes("reconcileHostSectionMembers,"), true);
+equal(main.includes("function TH("), false);
+equal(main.includes("function EH("), false);
 equal(main.includes("rBe = class"), false);
 equal(manager.includes("new rBe("), true);
 console.log(`${assertions} main saved-section reconciliation assertions passed`);
