@@ -6,8 +6,8 @@
 // 两个导出：n = initializeBrowserComposerDisclaimer（原 `K`），
 // t = BrowserComposerDisclaimer（原 `P`）。
 
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
+import * as sharedChunk from "@rchunk/app-shared";
+import * as initialChunk from "@rchunk/app-initial";
 
 export type DisclaimerPlacement = "home" | "thread" | string;
 export type RegulatedConnectorKind = "finance" | "health" | string | null;
@@ -96,6 +96,27 @@ const MESSAGE = {
       : `ChatGPT for Teachers can make mistakes. OpenAI doesn't use ${name} workspace data to train its models. The content of this workspace is encrypted with your organization managed keys.`,
 } as const;
 
+const shared = sharedChunk as unknown as Record<string, any>;
+const initial = initialChunk as unknown as Record<string, any>;
+let jsx: any;
+let initialized = false;
+
+function call(value: unknown): void { if (typeof value === "function") value(); }
+function normalizeAccount(value: any): BrowserDisclaimerAccountState | null {
+  if (value == null) return null;
+  if (value.structure === "personal") return {
+    structure: "personal", id: value.id, showAiServiceDisclaimer: value.showAiServiceDisclaimer,
+    browserSideChat: value.browserSideChat, regulatedConnectorKind: value.regulatedConnectorKind,
+  };
+  if (value.structure === "workspace") return {
+    structure: "workspace", id: value.id, name: value.name, planType: value.planType ?? value.plan_type,
+    workspaceType: value.workspaceType ?? value.workspace_type, trainingAllowed: value.trainingAllowed,
+    encrypted: value.encrypted ?? value.ekm_config != null, hideStandardDisclaimer: value.hideStandardDisclaimer,
+    dataLoaded: value.dataLoaded,
+  };
+  return null;
+}
+
 function regulatedMessage(kind: RegulatedConnectorKind): Pick<BrowserComposerDisclaimerView, "message" | "messageKind"> {
   if (kind === "finance") return { message: MESSAGE.finance, messageKind: "finance" };
   if (kind === "health") return { message: MESSAGE.health, messageKind: "health" };
@@ -137,7 +158,25 @@ function workspaceDisclaimer(
   return { ...base, message: MESSAGE.workspace, messageKind: "workspace" };
 }
 
-function initializeBrowserComposerDisclaimer(): void {}
+function initializeBrowserComposerDisclaimer(): void {
+  if (initialized) return;
+  initialized = true;
+  for (const candidate of [shared.$3, shared.h4, shared.FX, shared.K2, initial.Qgn, initial.Oln, initial.M6t, initial.$un, initial.dqt, initial.uHt, initial.Sqt, initial.vln, initial.rht, initial.Xot, initial.ifn]) call(candidate);
+  jsx = shared.I3();
+}
+
+function DisclaimerSurface({ view }: { view: BrowserComposerDisclaimerView }): unknown {
+  const body = view.messageKind === "workspace-research-partner"
+    ? jsx.jsxs(jsx.Fragment, { children: [view.message.replace(/ Learn more$/, " "), jsx.jsx("a", {
+      className: "cursor-interaction underline underline-offset-2 hover:text-default",
+      href: view.learnMoreUrl, target: "_blank", rel: "noreferrer", children: "Learn more",
+    })] })
+    : view.message;
+  return jsx.jsx("div", {
+    className: ["text-center text-xs text-pretty text-codex-description select-none", view.placement === "thread" ? "px-toolbar pb-2" : null].filter(Boolean).join(" "),
+    "data-markdown-copy": "exclude", "data-disclaimer-kind": view.messageKind, children: body,
+  });
+}
 
 /**
  * BrowserComposerDisclaimer（原 `P`）。临时聊天优先于其他个人提示；显式
@@ -147,26 +186,54 @@ function initializeBrowserComposerDisclaimer(): void {}
  */
 function BrowserComposerDisclaimer(
   props: BrowserComposerDisclaimerProps,
-): BrowserComposerDisclaimerView | null {
+): unknown {
+  initializeBrowserComposerDisclaimer();
   const placement = props.placement ?? "thread";
-  const account = props.account;
+  const route = typeof initial.i_n === "function" ? initial.i_n() : { search: "" };
+  const accountQuery = typeof initial.uht === "function" ? initial.uht() : { data: null };
+  const account = normalizeAccount(props.account ?? accountQuery?.data);
   if (account == null) return null;
-  const temporary = props.isTemporaryChat === true && !(props.hasUserMessage ?? placement === "thread");
+  const routeTemporary = typeof initial.yln === "function" ? initial.yln(route?.search ?? "") : false;
+  const temporary = (props.isTemporaryChat ?? routeTemporary) === true && !(props.hasUserMessage ?? placement === "thread");
 
-  if (account.structure === "workspace") return workspaceDisclaimer(account, temporary, placement);
-  const base = { kind: "browser-composer-disclaimer" as const, placement };
-  if (temporary) return { ...base, message: MESSAGE.temporaryChat, messageKind: "temporary-chat" };
-  if (account.showAiServiceDisclaimer === true) {
-    return { ...base, message: MESSAGE.aiService, messageKind: "ai-service" };
+  if (account.structure === "workspace") {
+    let workspace = account;
+    if (typeof shared.BX === "function") {
+      const details = shared.BX(initial.Zun, account.id)?.data;
+      const settings = shared.BX(initial.Dln, account.id)?.data;
+      if (details == null && account.dataLoaded == null) return null;
+      workspace = {
+        ...account,
+        dataLoaded: details != null || account.dataLoaded,
+        name: details?.account?.name ?? account.name,
+        workspaceType: details?.account?.workspace_type ?? account.workspaceType,
+        encrypted: details?.account?.ekm_config != null || account.encrypted,
+        trainingAllowed: settings?.beta_settings?.training_allowed ?? account.trainingAllowed,
+      };
+      if (workspace.workspaceType !== "early-access" && settings == null && account.dataLoaded == null) return null;
+    }
+    const view = workspaceDisclaimer(workspace, temporary, placement);
+    return view == null ? null : jsx.jsx(DisclaimerSurface, { view });
   }
+  const aiService = props.account == null && typeof initial.ofn === "function" ? initial.ofn("1831960162") : account.showAiServiceDisclaimer;
+  const regulatedFromStore = props.regulatedConnectorKindOverride === undefined && typeof shared.BX === "function"
+    ? shared.BX(initial.HVt, props.conversationId ?? null) : undefined;
+  const personal = { ...account, showAiServiceDisclaimer: aiService, regulatedConnectorKind: regulatedFromStore ?? account.regulatedConnectorKind };
+  const base = { kind: "browser-composer-disclaimer" as const, placement };
+  let view: BrowserComposerDisclaimerView | null;
+  if (temporary) view = { ...base, message: MESSAGE.temporaryChat, messageKind: "temporary-chat" };
+  else if (personal.showAiServiceDisclaimer === true) view = { ...base, message: MESSAGE.aiService, messageKind: "ai-service" };
   if (props.regulatedConnectorKindOverride !== undefined) {
     const regulatedKind = props.regulatedConnectorKindOverride;
-    if (regulatedKind == null && (account.browserSideChat === true || placement === "home")) return null;
-    return { ...base, ...regulatedMessage(regulatedKind) };
-  }
-  if (placement === "home") return null;
-  if (account.browserSideChat === true && account.regulatedConnectorKind == null) return null;
-  return { ...base, ...regulatedMessage(account.regulatedConnectorKind ?? null) };
+    if (regulatedKind == null && (personal.browserSideChat === true || placement === "home")) view = null;
+    else view = { ...base, ...regulatedMessage(regulatedKind) };
+  } else if (temporary || personal.showAiServiceDisclaimer === true) {
+    // Earlier priority branches already selected the view.
+  } else if (placement === "home" || (personal.browserSideChat === true && personal.regulatedConnectorKind == null)) view = null;
+  else view = { ...base, ...regulatedMessage(personal.regulatedConnectorKind ?? null) };
+  return view == null ? null : jsx.jsx(DisclaimerSurface, { view });
 }
+
+initializeBrowserComposerDisclaimer();
 
 export { initializeBrowserComposerDisclaimer as n, BrowserComposerDisclaimer as t };

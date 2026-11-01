@@ -381,15 +381,7 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ],
   ["image-suggestions-core", "suggestions-1907f4f59b11.js"],
   ["home-task-suggestions-core", "home-task-suggestions-e29a02e9b466.js"],
-  [
-    "browser-composer-disclaimer-core",
-    "browser-composer-disclaimer-6a73b502bd51.js",
-  ],
   ["sketch-composer-host-core", "composer-host-ac9410930773.js"],
-  [
-    "browser-address-suggestion-overlay",
-    "browser-address-suggestion-overlay-59b25209907d.js",
-  ],
   [
     "codex-micro-mini-game-composer",
     "codex-micro-mini-game-composer-c7d8a016e5c4.js",
@@ -481,7 +473,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ],
   ["git-branch-switcher", "git-branch-switcher-96861524e333.js"],
   ["google-logo", "google-logo-fc56f9e3f0e8.js"],
-  ["tab-address-input", "input-f296e047d4b5.js"],
   ["layout", "layout-a912dff4540d.js"],
   [
     "local-conversation-git-actions",
@@ -547,6 +538,8 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   "artifact-tab-content.electron-cf33641b2f73.js",
   "avatar-mascot-button-ae197b2778b9.js",
   "bookmarked-thread-user-message-navigation-f166b870b632.js",
+  "browser-address-suggestion-overlay-59b25209907d.js",
+  "browser-composer-disclaimer-6a73b502bd51.js",
   "browser-clear-browsing-data-dialog-view-32f0f308148f.js",
   "build-graph-data-ee6e0d8e135a.js",
   "card-tile-58cfccd9fb3f.js",

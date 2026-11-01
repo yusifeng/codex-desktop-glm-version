@@ -6,7 +6,8 @@ import * as esbuild from "esbuild";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__threadTabTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "thread-tab-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\/(popup|conversation-thumbnail-ui)$/ }, ({ path: importPath }) => ({ path: path.join(ROOT, "src/renderer", importPath.slice(8), "index.ts") })); build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__threadTabTest.jsx;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+globalThis.__threadTabTest.React={useRef:value=>({current:value}),useState:value=>[typeof value==="function"?value():value,()=>{}],useCallback:value=>value,useSyncExternalStore:(_subscribe,getSnapshot)=>getSnapshot(),useEffect:()=>{},useLayoutEffect:()=>{},useImperativeHandle:()=>{}};
+async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "thread-tab-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\/(popup|conversation-thumbnail-ui)$/ }, ({ path: importPath }) => ({ path: path.join(ROOT, "src/renderer", importPath.slice(8), "index.ts") })); build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__threadTabTest.jsx;export const e6=()=>globalThis.__threadTabTest.React;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
 function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(child => walk(child, visit)); else walk(children, visit); }
 function find(node, predicate) { let result; walk(node, value => { if (result == null && predicate(value)) result = value; }); return result; }
 function all(node, predicate) { const result = []; walk(node, value => { if (predicate(value)) result.push(value); }); return result; }
@@ -63,7 +64,9 @@ assert.deepEqual(Object.keys(addressInput), ["n", "t"]);
 const addressEvents = [];
 const addressUi = addressInput.t({ addressValue: "exa", id: "address", isAddressEditing: true, isVisible: true, sources: [source], onAddressValueChange(value) { addressEvents.push(["change", value]); }, onCancelAddressEditing() { addressEvents.push("cancel"); }, onCommitAddress(value) { addressEvents.push(["commit", value]); } });
 const input = find(addressUi, node => node.type === "input");
-assert.equal(input.props.value, "exa");
+assert.equal(input.props.value, "exact");
+assert.equal(input.props["aria-autocomplete"], "both");
+assert.equal(input.props["aria-expanded"], true);
 assert.equal(find(addressUi, node => node.props?.role === "listbox").props.id, "address-suggestions-address");
 input.props.onChange({ currentTarget: { value: "next" } });
 assert.deepEqual(addressEvents[0], ["change", "next"]);
