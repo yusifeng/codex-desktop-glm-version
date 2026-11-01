@@ -6,10 +6,10 @@
 //   - 跨 chunk 引用：import ... from "@chunk/<语义名>"
 //     （构建时映射为对输出 chunk 的运行时 require）
 //
-// REWRITTEN 中列出的 chunk 已经逆向重写为真实源码（由 esbuild 打包输出）；
-// 其余 chunk 仍是「格式化后的原版代码」（src/main/<chunk 文件名>.ts，
-// 仅做 TS→JS 转换，保证与发布版逐字节一致）。两者可以任意比例混合，
-// 重写一个 chunk 不需要同时重写它的依赖方或被依赖方。
+// REWRITTEN 中列出的 chunk 已经逆向重写为模块化源码（由 esbuild 打包输出）。
+// EXACT_PROCESS_ROOTS 是已检查入库、由构建直接编译的精确保真进程组合根；
+// 它们不是发布资产回退，也不能再由 restore-ts 覆盖。PRESERVED 只允许登记
+// vendor/generated 边界。三条轨道可以混合，输出文件名始终保持发布契约。
 
 export const CHUNKS = {
   "early-bootstrap": "early-bootstrap.js",
@@ -50,24 +50,38 @@ export const REWRITTEN = new Set([
   "bootstrap",
 ]);
 
+// 已恢复的完整进程组合根。业务 owner 已逐批迁到 src/main 的语义模块，
+// 这些根继续持有启动/transport/I/O 的精确装配顺序，并从仓库源码直接构建。
+export const EXACT_PROCESS_ROOTS = new Map([
+  [
+    "main",
+    {
+      source: "main-C-Mhak1n.ts",
+      reason: "main process startup/composition root；语义 owner 迁移记录见 docs/main-coverage-audit.md",
+    },
+  ],
+  [
+    "git-worker",
+    {
+      source: "worker.ts",
+      reason: "worker transport、host/I/O 与 Git lifecycle composition root；A1 closure 见 docs/git-worker-audit.md",
+    },
+  ],
+  [
+    "browser-page-preload",
+    {
+      source: "browser-page-preload.ts",
+      reason: "isolated-world preload startup root；协议 owner 与审计见 docs/preload-audit.md",
+    },
+  ],
+]);
+
 // 经逐段审计确认无 Codex 业务逻辑、应继续走 transform-only 保真的第三方或
 // bundler 生成 chunk。Map 的值是保留理由，禁止为这些内容伪造业务源码。
 export const PRESERVED = new Map([
   [
     "bundler-runtime",
     "Rolldown runtime bootstrap；仅提供 chunk/module loader，不含 app 业务代码",
-  ],
-  [
-    "main",
-    "逐段审计见 docs/main-coverage-audit.md；delegation/account 与 URL trust 等低耦合业务边界已抽取，主入口仍保留启动顺序与尚未迁出的业务/vendor 区段",
-  ],
-  [
-    "git-worker",
-    "逐段审计见 docs/git-worker-audit.md；vendor/generated 区段与 worker-entry 保持原布局，业务边界已分批抽取（RPC、入口分发、Git 错误分类），剩余 business 区段继续由原入口承载",
-  ],
-  [
-    "browser-page-preload",
-    "逐段审计见 docs/preload-audit.md；WebMCP 协议已抽取为 CommonJS helper，其余 vendor/runtime 与隔离世界启动顺序保持 transform-only",
   ],
   [
     "shared",

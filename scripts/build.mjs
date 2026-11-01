@@ -18,7 +18,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { CHUNKS, REWRITTEN } from "./chunk-manifest.mjs";
+import { CHUNKS, EXACT_PROCESS_ROOTS, PRESERVED, REWRITTEN } from "./chunk-manifest.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const check = process.argv.includes("--check");
@@ -108,9 +108,25 @@ for (const src of await listTs(path.join(ROOT, "src/main"))) {
 // Exact-recovery process roots are checked-in application source. Reference
 // release files remain audit inputs only and are never consumed by the build.
 const recoveredMain = path.join(ROOT, "src/main-recovered");
+const recoveredOwnershipBySource = new Map([
+  ...[...EXACT_PROCESS_ROOTS].map(([name, owner]) => [owner.source, `exact process root ${name}`]),
+  ...[...PRESERVED].map(([name]) => [CHUNKS[name].replace(/\.js$/, ".ts"), `preserved boundary ${name}`]),
+]);
+const seenRecoveredSources = new Set();
 for (const src of await listTs(recoveredMain)) {
   const rel = path.relative(recoveredMain, src);
+  if (!recoveredOwnershipBySource.has(rel)) {
+    console.error(`error: ${rel} has no exact-process or preserved source owner`);
+    process.exit(1);
+  }
+  seenRecoveredSources.add(rel);
   jobs.push([src, path.join(ROOT, "app/.vite/build", rel.replace(/\.ts$/, ".js"))]);
+}
+for (const [source, owner] of recoveredOwnershipBySource) {
+  if (!seenRecoveredSources.has(source)) {
+    console.error(`error: ${owner} source is missing: src/main-recovered/${source}`);
+    process.exit(1);
+  }
 }
 for (const src of await listTs(path.join(ROOT, "src/webview"))) {
   const rel = path.relative(path.join(ROOT, "src/webview"), src);

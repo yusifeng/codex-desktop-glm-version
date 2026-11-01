@@ -56,3 +56,8 @@ exactly. Six former incremental hubs now also have exact source owners; only the
 Renderer verification passes 1,888/1,888 outputs. This is substantial runtime-source recovery, not proof that the entire project is complete. Exact owners still retain
 release-local identifiers that can be renamed for readability, preserved main/renderer boundaries remain, and the consolidated
 E2E workflow matrix has not yet passed.
+
+The main process, Git worker, and browser-page preload are now separately registered as checked-in exact process roots rather
+than being counted as preserved vendor chunks. The build rejects unowned files in `src/main-recovered`, verifies that each
+exact root owns the published output filename, and `restore-ts` cannot overwrite these sources. The remaining preserved
+main-process inventory is therefore seven audited vendor/generated chunks, not an application-code fallback.

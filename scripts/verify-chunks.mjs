@@ -12,7 +12,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { CHUNKS, PRESERVED, REWRITTEN } from "./chunk-manifest.mjs";
+import { CHUNKS, EXACT_PROCESS_ROOTS, PRESERVED, REWRITTEN } from "./chunk-manifest.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -62,8 +62,33 @@ function diffSets(a, b) {
 
 let failures = 0;
 for (const name of REWRITTEN) {
+  if (PRESERVED.has(name) || EXACT_PROCESS_ROOTS.has(name)) {
+    console.error(`${name}: 同时登记到多个 source ownership 轨道`);
+    failures++;
+  }
+}
+for (const [name, owner] of EXACT_PROCESS_ROOTS) {
+  if (!(name in CHUNKS)) {
+    console.error(`${name}: EXACT_PROCESS_ROOTS 条目未登记到 CHUNKS`);
+    failures++;
+  }
   if (PRESERVED.has(name)) {
-    console.error(`${name}: 同时登记为 REWRITTEN 与 PRESERVED`);
+    console.error(`${name}: 同时登记为 exact process root 与 PRESERVED`);
+    failures++;
+  }
+  if (typeof owner.source !== "string" || typeof owner.reason !== "string" || owner.reason.trim() === "") {
+    console.error(`${name}: exact process root 缺少 source/reason`);
+    failures++;
+    continue;
+  }
+  const expectedSource = CHUNKS[name].replace(/\.js$/, ".ts");
+  if (owner.source !== expectedSource) {
+    console.error(`${name}: exact source ${owner.source} 与输出 ${CHUNKS[name]} 不匹配`);
+    failures++;
+  }
+  const sourcePath = path.join(ROOT, "src/main-recovered", owner.source);
+  if (!(await fs.stat(sourcePath).catch(() => null))?.isFile()) {
+    console.error(`${name}: exact process source 缺失 ${path.relative(ROOT, sourcePath)}`);
     failures++;
   }
 }
@@ -114,8 +139,11 @@ for (const name of REWRITTEN) {
   }
 }
 
-const pending = Object.keys(CHUNKS).filter((name) => !REWRITTEN.has(name) && !PRESERVED.has(name));
+const pending = Object.keys(CHUNKS).filter(
+  (name) => !REWRITTEN.has(name) && !EXACT_PROCESS_ROOTS.has(name) && !PRESERVED.has(name),
+);
 if (pending.length) console.log(`\n尚未分类 ${pending.length} 个 chunk: ${pending.join(", ")}`);
+console.log(`已登记 ${EXACT_PROCESS_ROOTS.size} 个精确保真进程组合根`);
 console.log(`已登记保留 ${PRESERVED.size} 个 vendor/generated chunk`);
 
 if (failures) {

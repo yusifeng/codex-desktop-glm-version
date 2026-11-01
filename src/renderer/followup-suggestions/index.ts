@@ -1,4 +1,8 @@
 import "@rchunk/rolldown-runtime";
+// Preserve the published sampling-helper dependency edge. The readable owner
+// below implements the same selection policy locally, while this side-effect
+// import keeps chunk initialization and the cross-chunk contract identical.
+import "@rchunk/values";
 import * as sharedChunk from "@rchunk/app-shared";
 import * as initialChunk from "@rchunk/app-initial";
 import {

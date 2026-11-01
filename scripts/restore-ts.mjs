@@ -47,21 +47,24 @@ async function formatOne(prettier, src, dst) {
 if (isMainThread) {
   // 已重写 chunk 的输出不做机械恢复，避免在 src/main/<语义名>/ 旁边生成
   // 会被 build 拒绝的旧格式 .ts（真实源码以 src/main/<语义名>/ 为准）。
-  const { CHUNKS, REWRITTEN } = await import("./chunk-manifest.mjs");
-  const rewrittenOutputs = new Set([...REWRITTEN].map((name) => CHUNKS[name]));
+  const { CHUNKS, EXACT_PROCESS_ROOTS, REWRITTEN } = await import("./chunk-manifest.mjs");
+  const ownedOutputs = new Set([
+    ...[...REWRITTEN].map((name) => CHUNKS[name]),
+    ...[...EXACT_PROCESS_ROOTS].map(([name]) => CHUNKS[name]),
+  ]);
   const jobs = [];
   let skipped = 0;
   for (const { from, to } of MAPPINGS) {
     for (const src of await listJs(path.join(ROOT, from))) {
       const rel = path.relative(path.join(ROOT, from), src);
-      if (rewrittenOutputs.has(rel)) {
+      if (ownedOutputs.has(rel)) {
         skipped++;
         continue;
       }
       jobs.push([src, path.join(ROOT, to, rel.replace(/\.js$/, ".ts"))]);
     }
   }
-  if (skipped) console.log(`skipped ${skipped} rewritten chunk(s) (source of truth: src/main/<name>/)`);
+  if (skipped) console.log(`skipped ${skipped} source-owned chunk(s) (semantic or exact process source)`);
   // Big files first so they don't all land at the end.
   const sizes = new Map(await Promise.all(jobs.map(async ([s]) => [s, (await fs.stat(s)).size])));
   jobs.sort((a, b) => sizes.get(b[0]) - sizes.get(a[0]));
