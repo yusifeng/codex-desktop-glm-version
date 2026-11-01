@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 1869.
+Total scripts: 1871.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -20,6 +20,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-user-message-restored-components.mjs`](./test-user-message-restored-components.mjs)
 - [`test-virtualized-turn-list.mjs`](./test-virtualized-turn-list.mjs)
 - [`test-resource-updates-bridge-runtime.mjs`](./test-resource-updates-bridge-runtime.mjs)
+- [`test-renderer-promoted-route-export-contracts.mjs`](./test-renderer-promoted-route-export-contracts.mjs)
 - [`test-renderer-recovered-route-source-build.mjs`](./test-renderer-recovered-route-source-build.mjs)
 - [`test-renderer-route-semantic-overrides.mjs`](./test-renderer-route-semantic-overrides.mjs)
 - [`test-worker-source-parse-integrity.mjs`](./test-worker-source-parse-integrity.mjs)
@@ -376,6 +377,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-main-browser-page-materialization-controller.mjs`](./test-main-browser-page-materialization-controller.mjs)
 - [`test-main-browser-runtime-sync-controller.mjs`](./test-main-browser-runtime-sync-controller.mjs)
 - [`test-main-browser-host-policy-controller.mjs`](./test-main-browser-host-policy-controller.mjs)
+- [`test-main-browser-host-manager-runtime-wiring.mjs`](./test-main-browser-host-manager-runtime-wiring.mjs)
 - [`test-main-browser-navigation-context-controller.mjs`](./test-main-browser-navigation-context-controller.mjs)
 - [`test-main-browser-page-webview-binding-controller.mjs`](./test-main-browser-page-webview-binding-controller.mjs)
 - [`test-main-browser-page-lifecycle-helpers-controller.mjs`](./test-main-browser-page-lifecycle-helpers-controller.mjs)

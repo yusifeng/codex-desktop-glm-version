@@ -26254,7 +26254,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
         this.windowManager.showPrimaryWindow(primaryWindow);
       }
     }
-    constructor(e, t, browserPageLifecycleClass = J, i = QBe(), a = new cX(), o = NHe(), s = {}) {
+    constructor(e, t, hostId = J, i = QBe(), a = new cX(), o = NHe(), s = {}) {
       ((this.windowManager = e),
         (this.errorReporter = t),
         (this.commentModeBlocklistLookup = i),
@@ -26412,7 +26412,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
               r != null && this.syncCommentSnapshot(e, t, r);
             },
           },
-          r,
+          hostId,
         )),
         (this.siteAnnotationFeatures = new $Ze({
           settingsStore: s.settingsStore,

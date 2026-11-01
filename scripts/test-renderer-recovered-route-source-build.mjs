@@ -3,8 +3,13 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
-import { CHUNKS, REWRITTEN } from "./renderer-chunk-manifest.mjs";
-import { collectConversationRouteClosure } from "./renderer-route-recovery.mjs";
+import { CHUNKS, IMPORT_ALIASES, REWRITTEN } from "./renderer-chunk-manifest.mjs";
+import {
+  RECONSTRUCTED_ROUTE_CORE,
+  PROMOTED_ROUTE_DEPENDENCIES,
+  SEMANTIC_ROUTE_OVERRIDES,
+  collectConversationRouteClosure,
+} from "./renderer-route-recovery.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sourceDirectory = path.join(root, "src/renderer-recovered/conversation-route");
@@ -33,6 +38,33 @@ const compiledModules = await Promise.all(
 );
 assert.equal(compiledModules.length, recovered.size, "every recovered route source module compiles as ESM");
 
+const semanticNamesByOutput = new Map();
+for (const semanticName of REWRITTEN) {
+  const output = CHUNKS[semanticName];
+  if (output != null && !semanticNamesByOutput.has(output)) semanticNamesByOutput.set(output, semanticName);
+}
+const missingPromotedDependencies = [];
+for (const output of PROMOTED_ROUTE_DEPENDENCIES) {
+  const semanticName = semanticNamesByOutput.get(output);
+  if (semanticName == null) continue;
+  const source = await fs.readFile(path.join(root, "src/renderer", semanticName, "index.ts"), "utf8");
+  for (const match of source.matchAll(/@rchunk\/([A-Za-z0-9_$-]+)/g)) {
+    const dependency = CHUNKS[match[1]] ?? IMPORT_ALIASES[match[1]];
+    if (dependency == null) continue;
+    const dependencySemanticName = semanticNamesByOutput.get(dependency);
+    const hasSemanticOwner = dependencySemanticName != null && !recovered.has(dependency);
+    const hasTransformOwner = await fs.access(path.join(root, "src/webview/assets", `${dependency}.ts`)).then(() => true, () => false);
+    if (!hasSemanticOwner && !hasTransformOwner && !recovered.has(dependency) && !RECONSTRUCTED_ROUTE_CORE.has(dependency)) {
+      missingPromotedDependencies.push(`${output} -> ${dependency}`);
+    }
+  }
+}
+assert.deepEqual(
+  missingPromotedDependencies,
+  [],
+  "semantic route overrides have a checked-in owner for every static chunk dependency",
+);
+
 const buildSource = await fs.readFile(path.join(root, "scripts/build-renderer.mjs"), "utf8");
 assert.match(buildSource, /esbuild\.transform\(source,\s*\{/, "renderer build compiles recovered route modules as source");
 assert.doesNotMatch(buildSource, /fs\.copyFile\(/, "renderer build never copies published JavaScript into runtime output");
@@ -55,4 +87,4 @@ for (const entry of await fs.readdir(rendererDirectory, { recursive: true, withF
 const uncoveredDrafts = structuralDrafts.filter(({ output }) => output == null || !recovered.has(output));
 assert.deepEqual(uncoveredDrafts, [], "every structural component draft is superseded by a complete recovered source module");
 
-console.log(`10 recovered route source-build assertions passed (${recovered.size} modules compiled, ${supersededDrafts.length} drafts skipped, ${structuralDrafts.length} structural drafts covered)`);
+console.log(`11 recovered route source-build assertions passed (${recovered.size} modules compiled, ${supersededDrafts.length} drafts skipped, ${structuralDrafts.length} structural drafts covered)`);

@@ -212,6 +212,10 @@ export const CONVERSATION_ROUTE_ROOTS = [
   "conversation-blocks-3f59e850f9fb.js",
   "agent-activity-item-792873f87aad.js",
   "agent-activity-units-9397783428a4.js",
+  // equation-analysis is now semantic source, but its tokenizer dependency is
+  // still release-derived. Keep that dependency explicit so a clean output
+  // build cannot accidentally rely on a stale app/webview asset.
+  "tokenize-math-block-92dba400da42.js",
   // Still owned by the incremental/transform-only path; keep it explicit when
   // a promoted route stops pulling it into the eager compatibility closure.
   "math-block-utils-ca3c4f5321e8.js",
@@ -239,7 +243,24 @@ export const RECONSTRUCTED_ROUTE_CORE = new Set([
 // against the release import/export contract.  They deliberately break out of
 // the compatibility closure: importers keep the same hashed filename, while
 // build-renderer emits that filename from src/renderer/<semantic-name>.
+// Route dependencies promoted as a verified batch. Keeping this set named lets
+// the source-build gate validate the full dependency graph of each new owner.
+export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
+  "content-bd6ed75ea274.js",
+  "equation-44cf0b1d4b75.js",
+  "library-cloud-file-preview-b3ddfaa823c0.js",
+  "math-block-utils-ca3c4f5321e8.js",
+  "open-a618d40921b2.js",
+  "page-268e2fb6d880.js",
+  "registered-259e95b201a1.js",
+  "workbook-review-utils-3e78f7501b68.js",
+  "workspace-agent-detail-query-3cb2bb771d2e.js",
+]);
+
 export const SEMANTIC_ROUTE_OVERRIDES = new Set([
+  // These keep their published filenames, but are now built from readable
+  // TypeScript instead of the formatted release compatibility graph.
+  ...PROMOTED_ROUTE_DEPENDENCIES,
   // Large route-dependency promotion: these modules have readable TypeScript
   // implementations and preserve the published ESM export contract. Keeping
   // them outside the compatibility closure makes the remaining recovered graph

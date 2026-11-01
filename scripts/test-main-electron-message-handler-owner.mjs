@@ -68,16 +68,18 @@ powerMonitor.isOnBatteryPower = () => false;
 const powerSaveEvents = [];
 let blockerId = 0;
 const focusedWindow = { id: 1, isFocused: () => true };
+let primaryWindowRef;
 const electron = {
   app: {
     isPackaged: false,
     getPath: (name) => `/tmp/${name}`,
   },
   BrowserWindow: {
-    fromWebContents: () => focusedWindow,
+    fromWebContents: () => primaryWindowRef ?? focusedWindow,
     getAllWindows: () => [focusedWindow],
     getFocusedWindow: () => focusedWindow,
   },
+  screen: { getDisplayMatching: () => ({ workAreaSize: { width: 1440, height: 900 } }) },
   powerMonitor,
   powerSaveBlocker: {
     start: (type) => { powerSaveEvents.push(["start", type]); return ++blockerId; },
@@ -148,7 +150,7 @@ const ElectronMessageHandler = createElectronMessageHandlerClass({
   path,
   fsPromises: fs.promises,
   perfHooks: { performance },
-  deepEqual: { default: (left, right) => JSON.stringify(left) === JSON.stringify(right) },
+  deepEqual: (left, right) => JSON.stringify(left) === JSON.stringify(right),
   createLogger,
   DynamicAppToolResponses: DynamicResponses,
   ProjectFolderPicker,
@@ -165,12 +167,42 @@ const ElectronMessageHandler = createElectronMessageHandlerClass({
 const webContents = new EventEmitter();
 webContents.id = 11;
 webContents.isDestroyed = () => false;
-const primaryWindow = { id: 1, webContents, isDestroyed: () => false };
+const windowModeEvents = [];
+let windowBounds = { x: 80, y: 90, width: 1200, height: 780 };
+let maximized = true;
+let fullScreen = true;
+let visible = false;
+const primaryWindow = {
+  id: 1,
+  webContents,
+  isDestroyed: () => false,
+  isVisible: () => visible,
+  show: () => { visible = true; windowModeEvents.push(["show"]); },
+  focus: () => windowModeEvents.push(["focus"]),
+  getNormalBounds: () => ({ ...windowBounds }),
+  getBounds: () => ({ ...windowBounds }),
+  getContentBounds: () => ({ ...windowBounds }),
+  isMaximized: () => maximized,
+  maximize: () => { maximized = true; windowModeEvents.push(["maximize"]); },
+  unmaximize: () => { maximized = false; windowModeEvents.push(["unmaximize"]); },
+  isFullScreen: () => fullScreen,
+  setFullScreen: (value) => { fullScreen = value; windowModeEvents.push(["full-screen", value]); },
+  setResizable: (value) => windowModeEvents.push(["resizable", value]),
+  setMaximizable: (value) => windowModeEvents.push(["maximizable", value]),
+  setFullScreenable: (value) => windowModeEvents.push(["full-screenable", value]),
+  setMinimumSize: (...args) => windowModeEvents.push(["minimum-size", ...args]),
+  setSize: (width, height) => { windowBounds = { ...windowBounds, width, height }; windowModeEvents.push(["size", width, height]); },
+  setBounds: (bounds) => { windowBounds = { ...bounds }; windowModeEvents.push(["bounds", bounds]); },
+  center: () => windowModeEvents.push(["center"]),
+};
+primaryWindowRef = primaryWindow;
 const sent = [];
 const windowMessages = [];
 const windowManager = {
   getPrimaryWindow: () => primaryWindow,
   getPrimaryWindows: () => [primaryWindow],
+  getPrimaryMinimumSize: () => ({ width: 420, height: 360 }),
+  syncPrimaryMinimumSize: () => windowModeEvents.push(["sync-minimum-size"]),
   sendMessageToWebContents: (...args) => windowMessages.push(args),
   sendMessageToAllWindows: (message) => windowMessages.push(["all", message]),
   sendMessageToWindow: (...args) => windowMessages.push(args),
@@ -255,6 +287,22 @@ equal(handler.createOrSelectProject("/workspace"), { selected: "/workspace" });
 handler.startPerformanceSpanCpuSampling("span", 1);
 equal(handler.samplerManager.started, ["span", 1]);
 equal(handler.finishPerformanceSpanCpuSampling("span"), ["span"]);
+
+handler.setPrimaryWindowMode(webContents, { mode: "onboarding", onboardingVariant: "v2" });
+equal(windowBounds.width, 1090);
+equal(windowBounds.height, 760);
+equal(fullScreen, false);
+equal(maximized, false);
+equal(windowModeEvents.some(([kind, value]) => kind === "minimum-size" && value === 420), true);
+equal(windowModeEvents.some(([kind]) => kind === "center"), true);
+const modeEventCount = windowModeEvents.length;
+handler.setPrimaryWindowMode(webContents, { mode: "onboarding", onboardingVariant: "v2" });
+equal(windowModeEvents.length, modeEventCount);
+handler.setPrimaryWindowMode(webContents, { mode: "default" });
+equal(windowBounds, { x: 80, y: 90, width: 1200, height: 780 });
+equal(maximized, true);
+equal(fullScreen, true);
+equal(windowModeEvents.some(([kind]) => kind === "sync-minimum-size"), true);
 
 equal(handler.sanitizeDefaultProjectName("  Demo Project. "), "Demo Project");
 equal(handler.sanitizeDefaultProjectName("CON"), "_CON");

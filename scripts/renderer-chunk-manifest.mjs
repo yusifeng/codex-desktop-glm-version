@@ -2787,6 +2787,7 @@ export const CHUNKS = {
   "file-preview-loading": "loading-cba17c98d28e.js",
   "lowlight-runtime": "lowlight-62906d2993ab.js",
   "voice-reasoning-notice": "notice-2197fe51f059.js",
+  "math-block-utils": "math-block-utils-ca3c4f5321e8.js",
   "ads-placement-policy": "placement-policy-c8f98920d800.js",
   "realtime-buffered-audio-worklet":
     "realtime-buffered-audio-worklet-773c5f6cc0c3.js",
@@ -4840,6 +4841,7 @@ export const REWRITTEN = new Set([
   "color-channel-parser-modern",
   "color-channel-parser-legacy",
   "media-device-contracts",
+  "math-block-utils",
 ]);
 
 // 已审计并明确保留发布版资产的尾部 chunk。这些模块属于第三方运行时、
