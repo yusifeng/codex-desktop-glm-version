@@ -210,6 +210,7 @@ export const STRUCTURAL_COMPONENT_ROOTS = [
 // yet have their own renderer or transform-only source owner. Keeping them as
 // explicit roots makes clean builds independent of stale app/webview output.
 export const EXACT_ROUTE_DEPENDENCY_ROOTS = [
+  "BarChart-2010e7d67e4a.js",
   "presentation-eeb7ac6fced2.js",
   "invitations-44091c7ba43a.js",
   "three.core-cb39b1271a0d.js",
@@ -219,7 +220,47 @@ export const EXACT_ROUTE_DEPENDENCY_ROOTS = [
   "use-imported-setup-opportunity-fe980a908289.js",
   "useForm-f8b6846e7263.js",
   "browser-5e2e016ba055.js",
+  "visualization-directive-renderer-59d128f8ff01.js",
 ];
+
+// Reviewed non-business boundaries that remain in the compatibility source
+// graph. The source-build gate requires this inventory to match the closure
+// exactly, so a newly introduced first-party module cannot hide here.
+export const ROUTE_COMPATIBILITY_BOUNDARIES = new Map([
+  ["BarChart-2010e7d67e4a.js", "vendor:recharts-bar-chart"],
+  ["ComposedChart-12232a23b4b3.js", "vendor:recharts-composed-chart-runtime"],
+  ["DatePicker-14d6de970c7c.js", "vendor:date-picker-runtime"],
+  ["Icon-994cd6bb9e69.js", "generated:icon-geometry"],
+  ["NewsPaper-4739abdcdbac.js", "generated:icon-entry"],
+  ["area-76377dfd01aa.js", "vendor:d3-area"],
+  ["band-7f9eb19564f9.js", "vendor:d3-band-scale"],
+  ["browser-5e2e016ba055.js", "vendor:qrcode-browser-bundle"],
+  ["constant-363a14bf6d8f.js", "vendor:d3-constant"],
+  ["defaultLocale-99084237f459.js", "vendor:date-locale"],
+  ["eventemitter3-855cba3f482a.js", "vendor:eventemitter3"],
+  ["init-cd6c1f803e47.js", "vendor:chart-initializer"],
+  ["invitations-44091c7ba43a.js", "generated:invitation-illustration-geometry"],
+  ["lib-94a0a161a542.js", "vendor:recharts-component-runtime"],
+  ["line-5171f1d885cc.js", "vendor:d3-line"],
+  ["linear-32e1d819583b.js", "vendor:d3-linear-scale"],
+  ["linear-51abf1a86c3b.js", "vendor:d3-linear-curve"],
+  ["monotone-68fb4f84bd88.js", "vendor:d3-monotone-curve"],
+  ["nice-2b3cc20611af.js", "vendor:d3-nice-domain"],
+  ["ordinal-654830f58ee1.js", "vendor:d3-ordinal-scale"],
+  ["parental-controls-invitation-background-c88ddd8be059.js", "generated:image-data-url"],
+  ["path-3b8129ebc7ff.js", "vendor:d3-path"],
+  ["phone-number-input-6ac1e964b07b.js", "vendor:phone-number-input"],
+  ["react-redux-14f5167095ae.js", "vendor:react-redux"],
+  ["step-cc59eba019a7.js", "vendor:d3-step-curve"],
+  ["string-963febbec52f.js", "vendor:d3-format"],
+  ["three.core-cb39b1271a0d.js", "vendor:three-core"],
+  ["three.module-b65ff644899d.js", "vendor:three-module"],
+  ["time-510b3d922182.js", "vendor:d3-time-scale"],
+  ["useForm-f8b6846e7263.js", "vendor:react-hook-form"],
+  ["visualization-directive-renderer-59d128f8ff01.js", "generated:visualization-entry-shim"],
+  ["with-selector-ee24d273d86e.js", "vendor:use-sync-external-store-selector"],
+  ["withMetadataArgument-d4cb51a53bdb.js", "vendor:libphonenumber-wrapper"],
+]);
 
 export const CONVERSATION_ROUTE_ROOTS = [
   "local-conversation-page-bcc7eca0b3ab.js",
@@ -342,6 +383,13 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["usage", "usage-5ab4582aac77.js"],
   ["use-visible-settings-sections", "use-visible-settings-sections-5efd0081496f.js"],
   ["appgen-settings-page", "appgen-settings-page-95e95458752b.js"],
+  ["activity-chart", "activity-chart-816f6e49aa7a.js"],
+  ["billing-analytics", "billing-analytics-9a493b3c8aaf.js"],
+  ["realtime-voice-controls-surface", "controls-fedbfda05b6b.js"],
+  ["settings-parental-presentation", "presentation-eeb7ac6fced2.js"],
+  ["tokenize-math-block", "tokenize-math-block-92dba400da42.js"],
+  ["use-imported-setup-opportunity", "use-imported-setup-opportunity-fe980a908289.js"],
+  ["visualization-standalone-document", "visualization-standalone-document-45332507e418.js"],
 ]);
 
 export const SEMANTIC_ROUTE_OVERRIDES = new Set([

@@ -2805,6 +2805,9 @@ export const CHUNKS = {
   "shared-snapshot-continuation":
     "shared-snapshot-continuation-c3634fe7a1b8.js",
   "spoken-language-options": "spoken-language-options-a8b38a93da0c.js",
+  "settings-parental-presentation": "presentation-eeb7ac6fced2.js",
+  "tokenize-math-block": "tokenize-math-block-92dba400da42.js",
+  "visualization-standalone-document": "visualization-standalone-document-45332507e418.js",
 };
 
 // 已重写模块可依赖尚未进入 CHUNKS 跟踪集的发布资产。这里仅提供
@@ -2840,7 +2843,6 @@ export const IMPORT_ALIASES = {
   "chunk-Y2CYZVJY": "chunk-Y2CYZVJY-ec17b93e265e.js",
   "chunk-Y2CYZVJY-24cce454fd91": "chunk-Y2CYZVJY-24cce454fd91.js",
   "adaptive-slider-field": "adaptive-slider-field-6d316e0b7a10.js",
-  "tokenize-math-block": "tokenize-math-block-92dba400da42.js",
   "null-throws": "null-throws-c7a886463bcb.js",
   "chunk-KEIR6QF5": "chunk-KEIR6QF5-95b0e7b7ebae.js",
   "chunk-BIQX33UG": "chunk-BIQX33UG-4ee00f04a87a.js",
@@ -2932,7 +2934,6 @@ export const IMPORT_ALIASES = {
   "session": "session-3ec40b7dd28e.js",
   "source-annotation-host-registry": "source-annotation-host-registry-60c474ef605e.js",
   "setup": "setup-2f040eea0a81.js",
-  "settings-parental-presentation": "presentation-eeb7ac6fced2.js",
   "spoken-language-options": "spoken-language-options-a8b38a93da0c.js",
   "tabs": "tabs-285592374a40.js",
   "three.core": "three.core-cb39b1271a0d.js",
@@ -4842,6 +4843,13 @@ export const REWRITTEN = new Set([
   "color-channel-parser-legacy",
   "media-device-contracts",
   "math-block-utils",
+  "activity-chart",
+  "billing-analytics",
+  "realtime-voice-controls-surface",
+  "settings-parental-presentation",
+  "tokenize-math-block",
+  "use-imported-setup-opportunity",
+  "visualization-standalone-document",
 ]);
 
 // 已审计并明确保留发布版资产的尾部 chunk。这些模块属于第三方运行时、
@@ -5044,7 +5052,6 @@ export const PRESERVED_ASSETS = new Map([
   ["create-text-file-thumbnail-entry", "generated:initializer-reexport-facade"],
   ["trusted-contact-beacon-action-entry", "generated:initializer-reexport-facade"],
   ["valdi-localized-strings-registry", "generated:locale-loader-registry"],
-  ["realtime-voice-controls-surface", "generated:compiled-voice-controls-surface"],
   ["learning-block-registry", "generated:learning-block-runtime-registry"],
   ["browser-thread-panel-tab-content", "generated:compiled-browser-tab-surface"],
   ["view-state-persistence-runtime", "generated:compiled-persistence-runtime"],
@@ -5287,10 +5294,7 @@ export const INCREMENTAL_HUBS = new Map([
   ["artifact-source-bootstrap", "typed-consumer-surface"],
   ["text-underline-icon", "typed-consumer-surface"],
   ["popcorn-electron-surface-style", "typed-consumer-surface"],
-  ["use-imported-setup-opportunity", "typed-consumer-surface"],
   ["checkout-session", "typed-consumer-surface"],
-  ["billing-analytics", "typed-consumer-surface"],
   ["mark-session-create", "typed-consumer-surface"],
   ["xterm-window-zoom", "typed-consumer-surface"],
-  ["activity-chart", "typed-consumer-surface"],
 ]);

@@ -17,6 +17,7 @@ const rendererDirectory = path.join(ROOT, "src/renderer");
 for (const [semanticName, output] of EXACT_ROUTE_SOURCE_OWNERS) {
   const releaseCode = await fs.readFile(path.join(releaseDirectory, output), "utf8");
   const source = await formatExactRouteSource(releaseCode, output);
+  await fs.mkdir(path.join(rendererDirectory, semanticName), { recursive: true });
   await fs.writeFile(path.join(rendererDirectory, semanticName, "exact.js"), source);
 }
 

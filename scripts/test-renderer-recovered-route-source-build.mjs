@@ -8,6 +8,7 @@ import {
   EXACT_ROUTE_SOURCE_OWNERS,
   RECONSTRUCTED_ROUTE_CORE,
   PROMOTED_ROUTE_DEPENDENCIES,
+  ROUTE_COMPATIBILITY_BOUNDARIES,
   SEMANTIC_ROUTE_OVERRIDES,
   collectConversationRouteClosure,
 } from "./renderer-route-recovery.mjs";
@@ -25,6 +26,15 @@ assert.deepEqual(recoveredModules, manifest.modules, "route source manifest cont
 
 const diskModules = (await fs.readdir(sourceDirectory)).filter((name) => name.endsWith(".js")).sort();
 assert.deepEqual(diskModules, recoveredModules, "route source directory has neither missing nor orphaned JavaScript modules");
+assert.deepEqual(
+  recoveredModules,
+  [...ROUTE_COMPATIBILITY_BOUNDARIES.keys()].sort(),
+  "route compatibility closure contains only reviewed vendor or generated boundaries",
+);
+assert.ok(
+  [...ROUTE_COMPATIBILITY_BOUNDARIES.values()].every((reason) => /^(vendor|generated):/.test(reason)),
+  "every route compatibility boundary has a vendor or generated reason",
+);
 
 const compiledModules = await Promise.all(
   recoveredModules.map(async (name) => {
