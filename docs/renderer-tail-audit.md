@@ -1,5 +1,14 @@
 # Renderer 尾部资产审计
 
+2026-11-02 General/remote settings 大批次：`general-settings` 与
+`remote-connections-settings` 已从 release-faithful owner 迁到可维护 React/TypeScript，
+一次删除 14,930 行原始 owner。General 恢复主设置、外观、发送键行为、
+follow-up queue、防休眠、快捷键与 Windows/WSL agent environment，并校正
+六个发布导出的真实映射；Remote 恢复 SSH、WSL、remote-control 列表、
+loading/error、refresh/add/edit 与 mobile pairing 交互。Focused suite 31 项、
+settings leaf 78 项、test-index 与 typecheck 通过；严格剩余清单由
+33 个 / 161,532 行降至 31 个 / 146,602 行。
+
 2026-11-02 Security settings owner：`security-settings` 已从 release-faithful owner
 迁至真实 React 页面，删除 5,964 行原始 owner。恢复 account signal fallback、按账户隔离的
 MFA/sessions/linked-apps/advanced-protection 查询、并行 loading/error/retry、MFA 状态、活动会话
