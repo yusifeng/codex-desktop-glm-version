@@ -2597,7 +2597,7 @@ declare module "@rchunk/app-shared" {
     scope: MaitaiScope<T>,
     key: unknown,
   ) => MaitaiScopeApi<T> | null;
-  export const n$: unknown;
+  export const n$: (value: number) => { get(): number; set(value: number): void };
   /** createSignalFamily（app-shared/runtime/atom-signal.ts，内部 bje）。 */
   export const oZ: <TScope, Param, TValue>(
     scope: MaitaiScope<TScope>,
@@ -2631,7 +2631,7 @@ declare module "@rchunk/app-shared" {
   /** initializeQueryRuntime（查询客户端与 React bridge 的基础装配）。 */
   export const qm: () => void;
   export const r$: unknown;
-  export const t$: unknown;
+  export const t$: () => void;
   export const x_: () => unknown; // useIconScaleContext（_3）
   export const y_: () => void;
   export const G4: <Key extends string, Value>(
@@ -15929,5 +15929,34 @@ declare module "@rchunk/mermaid-core" { export const a: unknown; export const c:
 declare module "@rchunk/phone-metadata-argument-wrapper" { export const w: <Arguments extends unknown[], Result>(callback: (...arguments_: Arguments) => Result) => (...arguments_: Arguments) => Result; }
 declare module "@rchunk/parental-control-notifications-runtime" { export const listenForParentalControlNotifications: (scope: unknown, userId: string, accountId: string) => () => void; }
 declare module "@rchunk/precise-location-banner-constants" { export const n: () => void; }
+declare module "@rchunk/app-shared" {
+  export const $Q: () => void;
+  export const e$: (...arguments_: unknown[]) => unknown;
+  export const CS: (props: Record<string, unknown>) => unknown;
+}
+declare module "@rchunk/app-initial" {
+  export const fdn: () => Record<string, string>;
+  export const X8t: (pullRequest: Record<string, unknown>) => string;
+  export const Z8t: (hostname: string) => string;
+  export const e5t: <Account extends Record<string, unknown>>(account: Account) => Account;
+  export const Bw: import("@rchunk/app-shared").ReadableSignal<boolean>;
+  export const XGt: (url: string) => string | null;
+  export const YGt: () => void;
+  export const aJt: (url: string) => string | null;
+  export const zw: () => void;
+}
+declare module "@rchunk/app-primary" {
+  export const Al: () => void;
+  export const Gl: (source: unknown) => boolean;
+  export const Hl: (...arguments_: unknown[]) => Array<{ items: Array<{ key: string; searchTerms?: string[] | null; [key: string]: unknown }>; [key: string]: unknown }>;
+  export const Sl: (input: Record<string, unknown>) => unknown;
+  export const Ul: () => void;
+  export const Wl: () => void;
+  export const bl: () => void;
+  export const jl: (input: Record<string, unknown>) => { sections: Array<{ items: Array<{ key: string; searchTerms?: string[] | null; [key: string]: unknown }>; [key: string]: unknown }> };
+  export const vl: (props: Record<string, unknown>) => unknown;
+  export const xl: () => void;
+  export const yl: (props: Record<string, unknown>) => unknown;
+}
 declare module "@rchunk/color-channel-runtime-modern" { export const at: (source: string) => unknown; export const ot: { lang: { round(value: number): number } }; }
 declare module "@rchunk/color-channel-runtime-legacy" { export const ft: (source: string) => unknown; export const ht: () => void; export const mt: { lang: { round(value: number): number } }; export const pt: () => void; }

@@ -46,11 +46,13 @@ function observePluginImpressions(
   const observer = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
-        const id = entry.target instanceof HTMLElement
-          ? entry.target.dataset.pluginImpressionId
-          : undefined;
+        const id =
+          entry.target instanceof HTMLElement
+            ? entry.target.dataset.pluginImpressionId
+            : undefined;
         if (id == null) continue;
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) visible.add(id);
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5)
+          visible.add(id);
         else visible.delete(id);
       }
       const visibleIds = ids.filter((id) => visible.has(id));
@@ -61,36 +63,49 @@ function observePluginImpressions(
     },
     { root: container.parentElement, threshold: 0.5 },
   );
-  for (const item of container.querySelectorAll<HTMLElement>("[data-plugin-impression-id]")) {
+  for (const item of container.querySelectorAll<HTMLElement>(
+    "[data-plugin-impression-id]",
+  )) {
     observer.observe(item);
   }
   return () => observer.disconnect();
 }
 
 function initializeRecommendationQuery(): void {
-  for (const name of ["jZ", "I1t", "z2t", "FX", "g4", "G6t", "i4t", "E4t", "QI", "pfn", "ek", "pdn"]) {
-    shared[name]?.();
-    initial[name]?.();
-  }
+  shared.jZ();
+  initial.I1t();
+  initial.z2t();
+  shared.FX();
+  shared.g4();
+  initial.G6t();
+  initial.i4t();
+  initial.E4t();
+  shared.QI();
+  initial.pfn();
+  shared.ek();
+  initial.pdn();
   const stringSchema = shared.q4?.();
   if (stringSchema != null) {
     const itemSchema = stringSchema.trim().catch("");
     shared.E4?.(itemSchema)?.catch([]);
   }
-  featuredPluginsQuery = shared.QX(shared.ZI, (hostId: string, { get }: { get(signal: unknown): unknown }) => ({
-    enabled: false,
-    queryKey: [
-      ...initial.m4t,
-      "work-composer-featured",
-      get(initial.H6t),
-      hostId,
-      false,
-      undefined,
-    ],
-    queryFn: shared.FZ,
-    retry: false,
-    staleTime: shared.$O.ONE_MINUTE,
-  }));
+  featuredPluginsQuery = shared.QX(
+    shared.ZI,
+    (hostId: string, { get }: { get(signal: unknown): unknown }) => ({
+      enabled: false,
+      queryKey: [
+        ...initial.m4t,
+        "work-composer-featured",
+        get(initial.H6t),
+        hostId,
+        false,
+        undefined,
+      ],
+      queryFn: shared.FZ,
+      retry: false,
+      staleTime: shared.$O.ONE_MINUTE,
+    }),
+  );
 }
 
 function ConnectPluginsSubmenuItem({
@@ -107,7 +122,8 @@ function ConnectPluginsSubmenuItem({
     isLoading: boolean;
   };
   const reported = React.useRef(new Set<string>());
-  const recommendations: PluginRecommendation[] = query.data?.map(initial.dv) ?? featuredPlugins;
+  const recommendations: PluginRecommendation[] =
+    query.data?.map(initial.dv) ?? featuredPlugins;
   const Menu = shared.jf;
   const FormattedMessage = shared.Y2;
   const PluginLogo = initial.Dlt;
@@ -121,51 +137,61 @@ function ConnectPluginsSubmenuItem({
           children: jsx.jsx(FormattedMessage, {
             id: "composer.workMode.plugins.loadingRecommendations",
             defaultMessage: "Loading plugins…",
-            description: "Status in the Connect plugins submenu while recommended plugins load. Installed plugins and the Browse all plugins action remain available.",
+            description:
+              "Status in the Connect plugins submenu while recommended plugins load. Installed plugins and the Browse all plugins action remain available.",
           }),
         }),
       })
     : null;
 
-  const recommendationItems = recommendations.length === 0
-    ? null
-    : jsx.jsxs(jsx.Fragment, {
-        children: [
-          jsx.jsx("div", {
-            ref: (element: HTMLElement | null) => {
-              if (element != null && onPluginImpressions != null) {
-                return observePluginImpressions(
-                  element,
-                  recommendations.map(pluginImpressionId),
-                  reported.current,
-                  onPluginImpressions,
-                );
-              }
-            },
-            className: "flex flex-col",
-            children: recommendations.map((plugin) => jsx.jsxs(Menu.Item, {
-              "data-plugin-impression-id": pluginImpressionId(plugin),
-              rightIconAsset: shared.kc,
-              onSelect: () => onConnectPlugin(plugin),
-              children: [
-                jsx.jsx(Menu.ItemIcon, {
-                  size: "xs",
-                  children: jsx.jsx(PluginLogo, {
-                    alt: "",
-                    className: "size-full object-contain",
-                    knownAppId: plugin.name ?? undefined,
-                    logoDarkUrl: plugin.logoDarkPath,
-                    logoUrl: plugin.logoPath,
-                    fallback: jsx.jsx(shared.Gm, { className: "size-full text-secondary" }),
-                  }),
-                }),
-                jsx.jsx("span", { children: plugin.displayName }),
-              ],
-            }, plugin.id)),
-          }),
-          jsx.jsx(Menu.Separator, {}),
-        ],
-      });
+  const recommendationItems =
+    recommendations.length === 0
+      ? null
+      : jsx.jsxs(jsx.Fragment, {
+          children: [
+            jsx.jsx("div", {
+              ref: (element: HTMLElement | null) => {
+                if (element != null && onPluginImpressions != null) {
+                  return observePluginImpressions(
+                    element,
+                    recommendations.map(pluginImpressionId),
+                    reported.current,
+                    onPluginImpressions,
+                  );
+                }
+              },
+              className: "flex flex-col",
+              children: recommendations.map((plugin) =>
+                jsx.jsxs(
+                  Menu.Item,
+                  {
+                    "data-plugin-impression-id": pluginImpressionId(plugin),
+                    rightIconAsset: shared.kc,
+                    onSelect: () => onConnectPlugin(plugin),
+                    children: [
+                      jsx.jsx(Menu.ItemIcon, {
+                        size: "xs",
+                        children: jsx.jsx(PluginLogo, {
+                          alt: "",
+                          className: "size-full object-contain",
+                          knownAppId: plugin.name ?? undefined,
+                          logoDarkUrl: plugin.logoDarkPath,
+                          logoUrl: plugin.logoPath,
+                          fallback: jsx.jsx(shared.Gm, {
+                            className: "size-full text-secondary",
+                          }),
+                        }),
+                      }),
+                      jsx.jsx("span", { children: plugin.displayName }),
+                    ],
+                  },
+                  plugin.id,
+                ),
+              ),
+            }),
+            jsx.jsx(Menu.Separator, {}),
+          ],
+        });
 
   return jsx.jsxs(Menu.FlyoutSubmenuItem, {
     leftIconAsset: shared.lT,
@@ -186,7 +212,8 @@ function ConnectPluginsSubmenuItem({
           children: jsx.jsx(FormattedMessage, {
             id: "composer.workMode.plugins.browseAll",
             defaultMessage: "Browse all plugins",
-            description: "Action that opens the full plugin directory from a plugin picker",
+            description:
+              "Action that opens the full plugin directory from a plugin picker",
           }),
         }),
       }),
@@ -197,20 +224,20 @@ function ConnectPluginsSubmenuItem({
 function initializeConnectPluginsSubmenuItem(): void {
   if (initialized) return;
   initialized = true;
-  shared.$3?.();
-  for (const name of ["dO", "cT", "Oc", "FX"]) shared[name]?.();
+  shared.$3();
+  shared.dO();
+  shared.cT();
+  shared.Oc();
+  shared.FX();
   React = shared.e6();
-  shared.K2?.();
-  for (const name of ["Olt", "If", "Km"]) {
-    initial[name]?.();
-    shared[name]?.();
-  }
+  shared.K2();
+  initial.Olt();
+  shared.If();
+  shared.Km();
   initializeRecommendationQuery();
-  initial._v?.();
+  initial._v();
   jsx = shared.I3();
 }
-
-initializeConnectPluginsSubmenuItem();
 
 export {
   initializeConnectPluginsSubmenuItem as n,

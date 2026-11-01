@@ -106,8 +106,8 @@ export const COMPOSER_ROUTE_ROOTS = [
   "composer-tip-fda4ea1a2c09.js",
   "composer-utility-bar-a9b94a95b731.js",
   "composer-work-home-plugins-control-8beac401e5e1.js",
-  // These plugin menu helpers still have thin semantic drafts. Keep their
-  // release implementations when the promoted picker no longer imports them.
+  // Plugin menu helpers are now semantic owners, but remain explicit route
+  // roots because the composer reaches them through runtime registries.
   "connect-plugins-submenu-item-4ea7d2e57cab.js",
   "use-search-plugins-12df8f20afed.js",
   "computer-history-suggestion-prompt-7850c0ed2372.js",
@@ -203,7 +203,6 @@ export const STRUCTURAL_COMPONENT_ROOTS = [
   "page-268e2fb6d880.js",
   "registered-259e95b201a1.js",
   "workbook-review-utils-3e78f7501b68.js",
-  "workspace-agent-detail-query-3cb2bb771d2e.js",
 ];
 
 // Static and lazy dependencies referenced by exact semantic owners that do not
@@ -247,7 +246,10 @@ export const ROUTE_COMPATIBILITY_BOUNDARIES = new Map([
   ["monotone-68fb4f84bd88.js", "vendor:d3-monotone-curve"],
   ["nice-2b3cc20611af.js", "vendor:d3-nice-domain"],
   ["ordinal-654830f58ee1.js", "vendor:d3-ordinal-scale"],
-  ["parental-controls-invitation-background-c88ddd8be059.js", "generated:image-data-url"],
+  [
+    "parental-controls-invitation-background-c88ddd8be059.js",
+    "generated:image-data-url",
+  ],
   ["path-3b8129ebc7ff.js", "vendor:d3-path"],
   ["phone-number-input-6ac1e964b07b.js", "vendor:phone-number-input"],
   ["react-redux-14f5167095ae.js", "vendor:react-redux"],
@@ -257,7 +259,10 @@ export const ROUTE_COMPATIBILITY_BOUNDARIES = new Map([
   ["three.module-b65ff644899d.js", "vendor:three-module"],
   ["time-510b3d922182.js", "vendor:d3-time-scale"],
   ["useForm-f8b6846e7263.js", "vendor:react-hook-form"],
-  ["visualization-directive-renderer-59d128f8ff01.js", "generated:visualization-entry-shim"],
+  [
+    "visualization-directive-renderer-59d128f8ff01.js",
+    "generated:visualization-entry-shim",
+  ],
   ["with-selector-ee24d273d86e.js", "vendor:use-sync-external-store-selector"],
   ["withMetadataArgument-d4cb51a53bdb.js", "vendor:libphonenumber-wrapper"],
 ]);
@@ -337,13 +342,12 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
 ]);
 
 // Full release-faithful React/runtime modules promoted into their semantic
-// source directories as exact.ts. These are not approximations: the promotion
-// tool formats the published ESM, rewrites only its import specifiers, and the
-// renderer build compiles that checked-in source directly. This lets large UI
+// source directories. Some remain generated exact.js owners while reviewed
+// modules move to maintainable index.ts implementations. The renderer build
+// compiles the selected checked-in owner directly. This lets large UI
 // modules leave the compatibility graph before their local names are manually
 // clarified, without changing their behavior or export surface.
 export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
-  ["primary-composer-at-mention-list", "primary-composer-at-mention-list-9532ce06fc83.js"],
   ["safety-settings", "safety-settings-aa3588e3b94c.js"],
   ["agent-settings", "agent-settings-27cdda401037.js"],
   ["billing-settings", "billing-settings-d5b5419393a0.js"],
@@ -354,61 +358,111 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["onboarding-page", "onboarding-page-905dd8894724.js"],
   ["onboarding", "onboarding-d0bfce15e4cc.js"],
   ["worktrees-settings-page", "worktrees-settings-page-f7e1c38f9bb4.js"],
-  ["cloud-environments-settings-page", "cloud-environments-settings-page-b47c295bea65.js"],
-  ["local-environments-settings-page", "local-environments-settings-page-6e0104d39e76.js"],
+  [
+    "cloud-environments-settings-page",
+    "cloud-environments-settings-page-b47c295bea65.js",
+  ],
+  [
+    "local-environments-settings-page",
+    "local-environments-settings-page-6e0104d39e76.js",
+  ],
   ["app-connect-modal", "app-connect-modal-7b842fd077d6.js"],
   ["gpt-about-dialog-core", "gpt-about-dialog-7509f0d1e79e.js"],
   ["about-you-summary", "about-you-summary-ee1fdcc83db8.js"],
   ["notifications-settings", "notifications-settings-42b7c5801f48.js"],
-  ["realtime-voice-launch-surface", "realtime-voice-launch-surface-20e3f20aea6c.js"],
+  [
+    "realtime-voice-launch-surface",
+    "realtime-voice-launch-surface-20e3f20aea6c.js",
+  ],
   ["announcement-entry-points", "entry-points-24b83c9c7664.js"],
   ["composer-utility-bar", "composer-utility-bar-a9b94a95b731.js"],
   ["work-onboarding-suggestions", "suggestions-92e2efd3926f.js"],
-  ["home-ambient-suggestions-content", "home-ambient-suggestions-content-a1c4fe488b63.js"],
+  [
+    "home-ambient-suggestions-content",
+    "home-ambient-suggestions-content-a1c4fe488b63.js",
+  ],
   ["image-suggestions-core", "suggestions-1907f4f59b11.js"],
   ["home-task-suggestions-core", "home-task-suggestions-e29a02e9b466.js"],
-  ["browser-composer-disclaimer-core", "browser-composer-disclaimer-6a73b502bd51.js"],
+  [
+    "browser-composer-disclaimer-core",
+    "browser-composer-disclaimer-6a73b502bd51.js",
+  ],
   ["sketch-composer-host-core", "composer-host-ac9410930773.js"],
-  ["browser-address-suggestion-overlay", "browser-address-suggestion-overlay-59b25209907d.js"],
-  ["codex-micro-mini-game-composer", "codex-micro-mini-game-composer-c7d8a016e5c4.js"],
-  ["right-panel-composer-overlay", "right-panel-composer-overlay-fdca4b46e82c.js"],
+  [
+    "browser-address-suggestion-overlay",
+    "browser-address-suggestion-overlay-59b25209907d.js",
+  ],
+  [
+    "codex-micro-mini-game-composer",
+    "codex-micro-mini-game-composer-c7d8a016e5c4.js",
+  ],
+  [
+    "right-panel-composer-overlay",
+    "right-panel-composer-overlay-fdca4b46e82c.js",
+  ],
   ["agent-activity-units", "agent-activity-units-9397783428a4.js"],
   ["agent-activity-item", "agent-activity-item-792873f87aad.js"],
   ["general-settings", "general-settings-3d550f75d0eb.js"],
   ["security-settings", "security-settings-2da2a3b205ab.js"],
-  ["remote-connections-settings", "remote-connections-settings-12e860fd2983.js"],
+  [
+    "remote-connections-settings",
+    "remote-connections-settings-12e860fd2983.js",
+  ],
   ["codex-micro-settings", "codex-micro-settings-cbf47e1d3359.js"],
   ["personalization-settings", "personalization-settings-c52a4963cfd3.js"],
   ["settings-plugin-selection", "settings-plugin-selection-e42895d573ba.js"],
   ["review-preferences-model", "review-preferences-model-677402e96a42.js"],
   ["usage", "usage-5ab4582aac77.js"],
-  ["use-visible-settings-sections", "use-visible-settings-sections-5efd0081496f.js"],
+  [
+    "use-visible-settings-sections",
+    "use-visible-settings-sections-5efd0081496f.js",
+  ],
   ["appgen-settings-page", "appgen-settings-page-95e95458752b.js"],
   ["activity-chart", "activity-chart-816f6e49aa7a.js"],
   ["billing-analytics", "billing-analytics-9a493b3c8aaf.js"],
   ["realtime-voice-controls-surface", "controls-fedbfda05b6b.js"],
   ["settings-parental-presentation", "presentation-eeb7ac6fced2.js"],
   ["tokenize-math-block", "tokenize-math-block-92dba400da42.js"],
-  ["use-imported-setup-opportunity", "use-imported-setup-opportunity-fe980a908289.js"],
-  ["visualization-standalone-document", "visualization-standalone-document-45332507e418.js"],
+  [
+    "use-imported-setup-opportunity",
+    "use-imported-setup-opportunity-fe980a908289.js",
+  ],
+  [
+    "visualization-standalone-document",
+    "visualization-standalone-document-45332507e418.js",
+  ],
   ["artifact-source-bootstrap", "artifact-source-bootstrap-583ed8de587e.js"],
   ["text-underline-icon", "TextUnderlineIcon-6110dcc4e55d.js"],
-  ["popcorn-electron-surface-style", "popcorn-electron-surface-style-734d538e9445.js"],
+  [
+    "popcorn-electron-surface-style",
+    "popcorn-electron-surface-style-734d538e9445.js",
+  ],
   ["checkout-session", "session-3ec40b7dd28e.js"],
   ["mark-session-create", "mark-session-create-6f7d531b2a15.js"],
   ["xterm-window-zoom", "xterm-window-zoom-15fe24cf01f9.js"],
-  ["connect-plugins-submenu-item", "connect-plugins-submenu-item-4ea7d2e57cab.js"],
   ["plaid-link", "plaid-link-a9255a11a708.js"],
   ["codex-home-announcements", "codex-home-announcements-327826cf904d.js"],
-  ["codex-home-announcements-current", "codex-home-announcements-cc03f986780c.js"],
-  ["codex-app-home-beacon-announcement-core", "codex-app-home-beacon-announcement-8c94f69eb080.js"],
-  ["codex-micro-onboarding-host", "codex-micro-onboarding-host-85407a96e02a.js"],
+  [
+    "codex-home-announcements-current",
+    "codex-home-announcements-cc03f986780c.js",
+  ],
+  [
+    "codex-app-home-beacon-announcement-core",
+    "codex-app-home-beacon-announcement-8c94f69eb080.js",
+  ],
+  [
+    "codex-micro-onboarding-host",
+    "codex-micro-onboarding-host-85407a96e02a.js",
+  ],
   ["content", "content-bd6ed75ea274.js"],
   ["equation-analysis", "equation-44cf0b1d4b75.js"],
   ["git-settings", "git-settings-537e4135cecb.js"],
   ["hooks-settings", "hooks-settings-fde35406d6f4.js"],
   ["import-settings", "import-settings-ec2688b74a01.js"],
-  ["keyboard-shortcuts-settings", "keyboard-shortcuts-settings-5511d1126168.js"],
+  [
+    "keyboard-shortcuts-settings",
+    "keyboard-shortcuts-settings-5511d1126168.js",
+  ],
   ["library-cloud-file-preview", "library-cloud-file-preview-b3ddfaa823c0.js"],
   ["open-conversation-files", "open-a618d40921b2.js"],
   ["detached-browser-page", "page-268e2fb6d880.js"],
@@ -416,48 +470,86 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["registered-automation-thumbnail", "registered-259e95b201a1.js"],
   ["trusted-contact-settings", "trusted-contact-settings-b71f926a1121.js"],
   ["voice-settings", "voice-settings-3a0651cd977e.js"],
-  ["settings-search-documents", "_virtual_settings-search-documents-d81257e4909b.js"],
+  [
+    "settings-search-documents",
+    "_virtual_settings-search-documents-d81257e4909b.js",
+  ],
   ["subscription-onboarding", "subscription-onboarding-bdae6e918350.js"],
-  ["subscription-onboarding-content", "subscription-onboarding-dcd9d9af0fe0.js"],
+  [
+    "subscription-onboarding-content",
+    "subscription-onboarding-dcd9d9af0fe0.js",
+  ],
   ["home-artifact-templates", "home-artifact-templates-1e0738b7ddeb.js"],
-  ["wallet-onboarding-announcement-content", "wallet-onboarding-announcement-content-28d619ce7d4e.js"],
+  [
+    "wallet-onboarding-announcement-content",
+    "wallet-onboarding-announcement-content-28d619ce7d4e.js",
+  ],
   ["workbook-review-utils", "workbook-review-utils-3e78f7501b68.js"],
-  ["workspace-agent-detail-query", "workspace-agent-detail-query-3cb2bb771d2e.js"],
   // Complete eager first-party dependency closure of the four conversation
   // React roots. These owners remove structurally approximate implementations
   // from the live conversation path while retaining vendor/generated boundaries.
   ["active-tool-activity-label", "active-tool-activity-label-f837b1d602a5.js"],
   ["ansi-block", "ansi-block-5043e88b0254.js"],
-  ["appgen-access-state-messages", "appgen-access-state-messages-ba11f4e596b6.js"],
+  [
+    "appgen-access-state-messages",
+    "appgen-access-state-messages-ba11f4e596b6.js",
+  ],
   ["artifact-feedback-button", "artifact-feedback-button-253b2bfc6015.js"],
-  ["bookmarked-thread-user-message-navigation", "bookmarked-thread-user-message-navigation-f166b870b632.js"],
-  ["chatgpt-tasks-runtime", "chatgpt_tasks-5e437f7d5423.js"],
-  ["codex-thread-report-dialog", "codex-thread-report-dialog-77d856cf550b.js"],
+  [
+    "bookmarked-thread-user-message-navigation",
+    "bookmarked-thread-user-message-navigation-f166b870b632.js",
+  ],
   ["content-quick-chat-overlay", "content-quick-chat-overlay-ed4d1aa8ed4b.js"],
   ["conversation-source", "conversation-source-a25a6a9a1e11.js"],
-  ["create-pull-request-modal-content", "create-pull-request-modal-content-a56e677534f4.js"],
+  [
+    "create-pull-request-modal-content",
+    "create-pull-request-modal-content-a56e677534f4.js",
+  ],
   ["quick-chat-drop-zones", "drop-zones-5d14ded04e79.js"],
   ["exec-shell-container", "exec-shell-container-acf07586aee6.js"],
   ["feedback-form-dialog", "feedback-form-dialog-463404df986b.js"],
-  ["git-action-new-branch-field", "git-action-new-branch-field-a2e24da5e504.js"],
+  [
+    "git-action-new-branch-field",
+    "git-action-new-branch-field-a2e24da5e504.js",
+  ],
   ["git-branch-switcher", "git-branch-switcher-96861524e333.js"],
   ["google-logo", "google-logo-fc56f9e3f0e8.js"],
   ["tab-address-input", "input-f296e047d4b5.js"],
   ["latest-turn-preview", "latest-turn-preview-3395407f9d40.js"],
   ["layout", "layout-a912dff4540d.js"],
-  ["local-conversation-artifacts-signals", "local-conversation-artifacts-signals-adff984a1c7d.js"],
-  ["local-conversation-external-resources", "local-conversation-external-resources-c392ed595266.js"],
-  ["local-conversation-git-actions", "local-conversation-git-actions-f71520dad4b4.js"],
-  ["local-conversation-side-chat", "local-conversation-side-chat-48c6730ec06a.js"],
-  ["local-conversation-thread-turn-entries", "local-conversation-thread-turn-entries-5bba2186bc7d.js"],
+  [
+    "local-conversation-artifacts-signals",
+    "local-conversation-artifacts-signals-adff984a1c7d.js",
+  ],
+  [
+    "local-conversation-external-resources",
+    "local-conversation-external-resources-c392ed595266.js",
+  ],
+  [
+    "local-conversation-git-actions",
+    "local-conversation-git-actions-f71520dad4b4.js",
+  ],
+  [
+    "local-conversation-side-chat",
+    "local-conversation-side-chat-48c6730ec06a.js",
+  ],
+  [
+    "local-conversation-thread-turn-entries",
+    "local-conversation-thread-turn-entries-5bba2186bc7d.js",
+  ],
   ["local-environment-editor", "local-environment-editor-c4a981e88476.js"],
   ["mcp-tool-activity-label", "mcp-tool-activity-label-87ba9ef42b0b.js"],
   ["mcp-tool-approval-message", "mcp-tool-approval-message-cfc9b358efc1.js"],
   ["mcp-tool-item-content", "mcp-tool-item-content-d63cc703d211.js"],
   ["open-in-button", "open-in-button-c51945f2c9d6.js"],
-  ["open-in-google-drive-menu-item", "open-in-google-drive-menu-item-b5e143939095.js"],
-  ["open-thread-pull-request-code-tab", "open-thread-pull-request-code-tab-a2de8074d196.js"],
-  ["open-thread-pull-request-side-panel-tab", "open-thread-pull-request-side-panel-tab-4cc87983599f.js"],
+  [
+    "open-in-google-drive-menu-item",
+    "open-in-google-drive-menu-item-b5e143939095.js",
+  ],
+  [
+    "open-thread-pull-request-side-panel-tab",
+    "open-thread-pull-request-side-panel-tab-4cc87983599f.js",
+  ],
   ["plan-summary-item-content", "plan-summary-item-content-748d84eee508.js"],
   ["plugin-picker-menu-content", "plugin-picker-menu-content-a51d37a29207.js"],
   ["popup", "popup-dbb4bbacd7ea.js"],
@@ -466,12 +558,14 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["pull-request-actions", "pull-request-actions-5ac6dcc71dec.js"],
   ["pull-request-fix-workflow", "pull-request-fix-workflow-1561e22a0cbc.js"],
   ["quick-chat-obstacles", "quick-chat-obstacles-c569ea17ffc9.js"],
-  ["realtime-voice-stage-layout", "realtime-voice-stage-layout-855d5d26c78e.js"],
   ["report-dialog-core", "report-dialog-75a130d615ed.js"],
   ["result-card", "result-card-17125719c243.js"],
   ["result-values", "result-values-d618934c5c1e.js"],
   ["thread-shell-runtime", "runtime-4b6d284756d8.js"],
-  ["split-items-into-render-groups", "split-items-into-render-groups-19560a11b33a.js"],
+  [
+    "split-items-into-render-groups",
+    "split-items-into-render-groups-19560a11b33a.js",
+  ],
   ["thread-app-shell-chrome", "thread-app-shell-chrome-e245ed2613ae.js"],
   ["thread-handoff-modal", "thread-handoff-modal-ccac59d04293.js"],
   ["thread-overflow-menu", "thread-overflow-menu-51894ca4476d.js"],
@@ -479,7 +573,10 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["thread-scroll-layout", "thread-scroll-layout-27da424d79e0.js"],
   ["thread-usage-breakdown", "thread-usage-breakdown-2a2ef1ac41f7.js"],
   ["use-app-connect-flow", "use-app-connect-flow-e16aee878521.js"],
-  ["use-resume-conversation-if-needed", "use-resume-conversation-if-needed-5447ec5aebcd.js"],
+  [
+    "use-resume-conversation-if-needed",
+    "use-resume-conversation-if-needed-5447ec5aebcd.js",
+  ],
   ["use-target-apps", "use-target-apps-976e88a40210.js"],
   ["user-message", "user-message-e36f9e2dfe24.js"],
   ["worktree-setup-auto-fix", "worktree-setup-auto-fix-4dc0f12b7219.js"],
@@ -1027,7 +1124,8 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
 // product-wide route registries; recursively activating those exact chunks can
 // overwrite unrelated semantic routes and mix incompatible graph segments.
 // Lazy route entries are covered explicitly by the classified roots above.
-const STATIC_IMPORT_RE = /(?:from\s*|import\s*)(?:\(\s*)?["']\.\/([^"']+\.js)["']/g;
+const STATIC_IMPORT_RE =
+  /(?:from\s*|import\s*)(?:\(\s*)?["']\.\/([^"']+\.js)["']/g;
 
 export async function collectConversationRouteClosure(assetDirectory) {
   const recovered = new Set();
@@ -1038,7 +1136,8 @@ export async function collectConversationRouteClosure(assetDirectory) {
       recovered.has(name) ||
       RECONSTRUCTED_ROUTE_CORE.has(name) ||
       SEMANTIC_ROUTE_OVERRIDES.has(name)
-    ) continue;
+    )
+      continue;
     const code = await fs.readFile(path.join(assetDirectory, name), "utf8");
     recovered.add(name);
     for (const match of code.matchAll(STATIC_IMPORT_RE)) pending.push(match[1]);
