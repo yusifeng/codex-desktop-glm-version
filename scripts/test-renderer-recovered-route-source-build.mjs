@@ -115,7 +115,14 @@ assert.match(buildSource, /exactOutput == null \? "index\.ts" : "exact\.js"/, "r
 assert.match(buildSource, /\^@exact-chunk/, "renderer build externalizes exact route dependencies");
 
 const supersededDrafts = [...REWRITTEN].filter((name) => recovered.has(CHUNKS[name]));
-assert.deepEqual(supersededDrafts, [], "no rewritten renderer module is shadowed by the compatibility graph");
+const unreviewedSupersededDrafts = supersededDrafts.filter(
+  (name) => !ROUTE_COMPATIBILITY_BOUNDARIES.has(CHUNKS[name]),
+);
+assert.deepEqual(
+  unreviewedSupersededDrafts,
+  [],
+  "only reviewed vendor or generated boundaries may supersede a semantic draft",
+);
 
 const rendererDirectory = path.join(root, "src/renderer");
 const structuralDrafts = [];

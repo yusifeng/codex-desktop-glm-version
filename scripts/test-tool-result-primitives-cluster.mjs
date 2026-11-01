@@ -31,6 +31,12 @@ state.outboundData = {
   data: { items: [{ connection_id: "github", display_name: "GitHub" }] },
 };
 state.react = {
+  useEffect(effect) {
+    effect();
+  },
+  useRef(initial) {
+    return { current: initial };
+  },
   useState(initial) {
     let value = typeof initial === "function" ? initial() : initial;
     return [
@@ -115,11 +121,17 @@ const overrides = {
     g9t: "path => path.endsWith('SKILL.md') ? { isSkillDefinitionFile: true, skillId: 'visualize' } : null",
     qpn: "path => path",
   },
+  "ansi-block": {
+    n: "() => undefined",
+    t: "props => ({ type: 'AnsiBlock', props })",
+  },
+  "shell-label": {
+    n: "() => undefined",
+    t: "command => command.includes('zsh') ? 'Z shell' : command.includes('bash') ? 'Bash' : null",
+  },
 };
 const sideEffects = new Set([
   "diff-preview-content",
-  "ansi-block",
-  "shell-label",
   "use-app-connect-flow",
   "open-in-google-drive-menu-item",
 ]);
@@ -257,34 +269,79 @@ assert.equal(diffTooltip.props.children, "main.ts");
 assert.equal(diffTooltip.props.delayDuration, 800);
 assert.equal(typeof diffTooltip.props.onPointerEnter, "function");
 
-// exec-shell-container: 10
+// exec-shell-container: 17
 const shell = await bundle("exec-shell-container");
 shell.n();
 const shellTree = shell.t({
-  command: "npm test",
+  command: "/bin/zsh -lc 'npm test'",
   cwd: "/repo",
   output: "passed",
   surface: "plain",
 });
-assert.equal(shellTree.type, "section");
+assert.equal(shellTree.type, "div");
 assert.equal(shellTree.props["data-surface"], "plain");
-assert.equal(textNode(shellTree, "npm test").type, "code");
-assert.equal(textNode(shellTree, "/repo").type, "span");
-assert.equal(nodeOfType(shellTree, "pre").props.children, "passed");
+const shellOutputNode = nodes(shellTree).find(
+  (node) => typeof node.type === "function",
+);
+assert.equal(shellOutputNode.props.cwd, "/repo");
+assert.equal(shellOutputNode.props.embeddedAppearance, "plain");
+const shellOutput = shellOutputNode.type(shellOutputNode.props);
 assert.equal(
-  nodeOfType(shell.t({ command: "true", output: "" }), "pre").props.children,
+  nodes(shellOutput).find((node) => node.props?.["aria-label"] === "$ npm test")
+    ?.props.role,
+  "button",
+);
+assert.equal(
+  nodes(shellOutput).find(
+    (node) =>
+      typeof node.type === "function" && node.props?.children === "passed",
+  )?.props.children,
+  "passed",
+);
+assert.equal(textNode(shellOutput, "Z shell"), undefined);
+assert.equal(
+  nodes(
+    nodes(shell.t({ command: "true", output: "" }))
+      .find((node) => typeof node.type === "function")
+      .type({ command: "true", output: "", variant: "embedded" }),
+  ).find(
+    (node) =>
+      typeof node.type === "function" && node.props?.children === "No output",
+  ).props.children,
   "No output",
 );
+assert.equal(
+  nodes(
+    nodes(shell.t({ command: "true", output: "", isInProgress: true }))
+      .find((node) => typeof node.type === "function")
+      .type({
+        command: "true",
+        output: "",
+        isInProgress: true,
+        variant: "embedded",
+      }),
+  ).find(
+    (node) => typeof node.type === "function" && node.props?.children === "",
+  ).props.children,
+  "",
+);
+assert.equal(shell.r({ className: "expand" }).props.className, "expand");
 assert.equal(
   shell.t.Footer({ isInProgress: true }).props["aria-label"],
   "Command running",
 );
 assert.equal(
-  shell.t.Footer({ wasInterrupted: true }).props.children,
+  shell.t.Footer({ wasInterrupted: true }).props.children.props.children,
   "Stopped",
 );
-assert.equal(shell.t.Footer({ isSuccess: true }).props.children, "Success");
-assert.equal(shell.t.Footer({ exitCode: 2 }).props.children, "Exit code 2");
+assert.equal(
+  shell.t.Footer({ isSuccess: true }).props.children.props.children,
+  "Success",
+);
+assert.equal(
+  shell.t.Footer({ exitCode: 2 }).props.children.props.children,
+  "Exit code 2",
+);
 
 // open-in-button: 7
 const openIn = await bundle("open-in-button");

@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "moduleCount": 33,
+  "moduleCount": 35,
   "modules": [
     "BarChart-2010e7d67e4a.js",
     "ComposedChart-12232a23b4b3.js",
@@ -13,8 +13,10 @@
     "constant-363a14bf6d8f.js",
     "defaultLocale-99084237f459.js",
     "eventemitter3-855cba3f482a.js",
+    "google-logo-fc56f9e3f0e8.js",
     "init-cd6c1f803e47.js",
     "invitations-44091c7ba43a.js",
+    "layout-a912dff4540d.js",
     "lib-94a0a161a542.js",
     "line-5171f1d885cc.js",
     "linear-32e1d819583b.js",

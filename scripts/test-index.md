@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 1874.
+Total scripts: 1883.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -12,6 +12,10 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 ## Recent semantic extraction suites
 
 - [`test-ambient-suggestion-recovery.mjs`](./test-ambient-suggestion-recovery.mjs)
+- [`test-activity-report-semantic-owners.mjs`](./test-activity-report-semantic-owners.mjs)
+- [`test-browser-address-suggestion-overlay.mjs`](./test-browser-address-suggestion-overlay.mjs)
+- [`test-browser-composer-disclaimer.mjs`](./test-browser-composer-disclaimer.mjs)
+- [`test-composer-utility-bar-semantic-owner.mjs`](./test-composer-utility-bar-semantic-owner.mjs)
 - [`test-new-chat-suggestion-source-debug-state.mjs`](./test-new-chat-suggestion-source-debug-state.mjs)
 - [`test-scroll-to-match.mjs`](./test-scroll-to-match.mjs)
 - [`test-conversation-blocks-restored-cluster.mjs`](./test-conversation-blocks-restored-cluster.mjs)
@@ -20,12 +24,17 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-local-conversation-side-chat-cluster.mjs`](./test-local-conversation-side-chat-cluster.mjs)
 - [`test-home-composer-restored-components.mjs`](./test-home-composer-restored-components.mjs)
 - [`test-pull-request-hover-card-data.mjs`](./test-pull-request-hover-card-data.mjs)
+- [`test-popup-address-suggestions.mjs`](./test-popup-address-suggestions.mjs)
+- [`test-presentation-activity-result-semantic-owners.mjs`](./test-presentation-activity-result-semantic-owners.mjs)
 - [`test-user-message-restored-components.mjs`](./test-user-message-restored-components.mjs)
 - [`test-virtualized-turn-list.mjs`](./test-virtualized-turn-list.mjs)
 - [`test-resource-updates-bridge-runtime.mjs`](./test-resource-updates-bridge-runtime.mjs)
 - [`test-renderer-promoted-route-export-contracts.mjs`](./test-renderer-promoted-route-export-contracts.mjs)
 - [`test-renderer-recovered-route-source-build.mjs`](./test-renderer-recovered-route-source-build.mjs)
 - [`test-renderer-route-semantic-overrides.mjs`](./test-renderer-route-semantic-overrides.mjs)
+- [`test-tokenize-math-block.mjs`](./test-tokenize-math-block.mjs)
+- [`test-thread-shell-chrome-overflow-semantic-owners.mjs`](./test-thread-shell-chrome-overflow-semantic-owners.mjs)
+- [`test-thread-shell-runtime-semantic-owner.mjs`](./test-thread-shell-runtime-semantic-owner.mjs)
 - [`test-worker-source-parse-integrity.mjs`](./test-worker-source-parse-integrity.mjs)
 - [`test-shared-project-state-runtime.mjs`](./test-shared-project-state-runtime.mjs)
 - [`test-main-turn-submission-runtime.mjs`](./test-main-turn-submission-runtime.mjs)
