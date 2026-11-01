@@ -175,7 +175,7 @@ const { mx, yx } = require("./main-app/threads/start-config.js");
 const { hasCanonicalVoiceHistory: q_, parseHeartbeatDecision: J_, parseAutomationUserMessage: n_e, AUTOMATION_DETECTOR: Y_ } = require("./main-app/threads/automation-detector.js");
 const { conversationFromThreadSummary: V_, cleanThreadTitle: Cv, truncateText: wv, threadPreviewTitle: v_e, threadTimestamps: Tv, mergedRecencyAt: Ev, environmentSelection: Dv, subAgentMetadata: H_, subAgentNickname: $ge } = require("./main-app/threads/projection.js");
 const { me, Xt } = require("./main-app/misc/thread-errors.js");
-const { attachmentsFromInput: X_, normalizeImageGenerationItem: Z_, turnParamsFromReadResponse: $_, projectReadResponseTurns: ev, projectTurns: tv, projectItems: nv, ensureTurnFields: iv, registerThreadMetadata: av, activeAncestryIds: ov, isSubagentThread: sv, effectiveRuntimeStatus: cv, isDescendantOf: lv, parentThreadIdOf: uv, isSurfaceableThread: dv, environmentInputResult: fv, pendingInteractionKind: pv, pendingInteraction: mv, withThreadMode: Av, newConversationFromThread: Ov } = require("./main-app/threads/hydration.js");
+const { attachmentsFromInput: X_, normalizeImageGenerationItem: Z_, turnParamsFromReadResponse: $_, projectReadResponseTurns: ev, projectTurns: tv, projectItems: nv, ensureTurnFields: iv, registerThreadMetadata: av, activeAncestryIds: ov, isSubagentThread: sv, effectiveRuntimeStatus: cv, isDescendantOf: lv, parentThreadIdOf: uv, isSurfaceableThread: dv, environmentInputResult: fv, pendingInteractionKind: pv, pendingInteraction: mv, RetryLookupCache } = require("./main-app/threads/hydration.js");
 const { Yv, Xv, L_e, Zv, Qv } = require("./main-app/requests/item-synthesis.js");
 const { ny, ove, ry, iy } = require("./main-app/files/open-file-watches.js");
 const { AppServerManagerStreamState } = require("./main-app/threads/stream-roles.js");
@@ -314,6 +314,7 @@ const { createWindowContextClass } = require("./main-app/window/window-context.j
 const { createDesktopCapabilityServices } = require("./main-app/window/desktop-capability-services.js");
 const { createElectronMessageHandlerClass } = require("./main-app/window/electron-message-handler.js");
 const { createOpenInServiceClass, isOpenableUrl } = require("./main-app/misc/open-in-service.js");
+const { parseRepositoryOrigin } = require("./main-app/misc/git-repository-origin.js");
 const { createLinuxApplicationsRuntime } = require("./main-app/platform/linux-applications.js");
 const { createThreadSectionServerClass } = require("./main-app/sidebar/thread-section-server.js");
 const { PINNED_THREAD_SECTION_ID, ThreadSectionEngine } = require("./main-app/sidebar/thread-section-engine.js");
@@ -426,6 +427,7 @@ const {
 } = require("./main-app/util/app-paths.js");
 const {
   BROWSER_ROUTE_PARTITION_PREFIX,
+  HOST_GENERATION_SUFFIX,
   PAGE_RESTORE_ATTRIBUTE,
   browserRoutePartition,
   isHtmlFileName,
@@ -923,49 +925,7 @@ function W(e, t) {
     ? t.kind === `chatgpt` && e.accountId === t.accountId && e.userId === t.userId
     : t.kind === `execution-storage` && e.authMode === t.authMode;
 }
-var G = e.a(n.Ld()),
-  pe = 6e4;
-var he = class {
-  lookups = new Map();
-  nextPruneAtMs = 0;
-  read(e, t) {
-    let n = Date.now();
-    if (n >= this.nextPruneAtMs) {
-      this.nextPruneAtMs = n + pe;
-      for (let [e, t] of this.lookups) t.retryAtMs <= n && this.lookups.delete(e);
-    }
-    let r = this.lookups.get(e);
-    if (r != null && r.retryAtMs > n) return r.promise;
-    let i = {
-      retryAtMs: 1 / 0,
-      promise: Promise.resolve()
-        .then(t)
-        .then(
-          (t) => (
-            t == null
-              ? (i.retryAtMs = Date.now() + pe)
-              : this.lookups.get(e) === i && this.lookups.delete(e),
-            t
-          ),
-          (t) => {
-            throw (
-              t instanceof Error && me(t)
-                ? (i.retryAtMs = Date.now() + pe)
-                : this.lookups.get(e) === i && this.lookups.delete(e),
-              t
-            );
-          },
-        ),
-    };
-    return (this.lookups.set(e, i), i.promise);
-  }
-  delete(e) {
-    this.lookups.delete(e);
-  }
-  clear() {
-    (this.lookups.clear(), (this.nextPruneAtMs = 0));
-  }
-};
+var G = e.a(n.Ld());
 function ge(e) {
   return (
     /^(?:thread not (?:found|loaded)|unknown thread):/i.test(e) ||
@@ -1075,48 +1035,6 @@ var at = `codex-workspace-settings-`,
       return this.canPass(e) ? (this.mark(e), !0) : !1;
     }
   };
-function dt(e) {
-  let t = e.trim();
-  if (!t || /^[a-zA-Z]:[\\/]/.test(t)) return null;
-  if (t.includes(`://`)) {
-    let e = ft(t);
-    return e.success ? e.value : null;
-  }
-  let n = pt(t);
-  return n.success ? n.value : null;
-}
-function ft(e) {
-  try {
-    let t = new URL(e),
-      n = t.hostname;
-    if (!n) return { success: !1 };
-    let r = mt(t.pathname.replace(/^\/+/, ``).replace(/\.git$/i, ``));
-    return r.success ? { success: !0, value: { host: n, ...r.value } } : { success: !1 };
-  } catch {
-    return { success: !1 };
-  }
-}
-function pt(e) {
-  if (e.includes(`://`)) return { success: !1 };
-  let t = /^(?:[^@]+@)?([^:]+):(.+)$/.exec(e);
-  if (!t) return { success: !1 };
-  let n = t[1]?.trim(),
-    r = t[2]
-      ?.trim()
-      .replace(/^\/+/, ``)
-      .replace(/\.git$/i, ``);
-  if (!n || !r) return { success: !1 };
-  let i = mt(r);
-  return i.success ? { success: !0, value: { host: n, ...i.value } } : { success: !1 };
-}
-function mt(e) {
-  let t = e.split(`/`).filter((e) => e.length > 0);
-  if (t.length < 2) return { success: !1 };
-  let n = t[t.length - 1];
-  if (!n) return { success: !1 };
-  let r = t.slice(0, -1).join(`/`);
-  return r ? { success: !0, value: { owner: r, repo: n } } : { success: !1 };
-}
 function ht(e) {
   return e === `friendly` || e === `pragmatic`;
 }
@@ -34457,7 +34375,7 @@ var Qze = n.wf({ thread: n.wf({ id: n.Of() }) }),
     be,
     gH,
     hH,
-    he,
+    RetryLookupCache,
     me,
     n,
     pinnedThreadSectionId: PINNED_THREAD_SECTION_ID,
@@ -34847,7 +34765,7 @@ var {
     hashBrowserStorageId: threadBrowserTabKey,
   isInternalEnvironment: n.cu.isInternal,
   parseBrowserTabId: a.bn,
-  webviewPartitionSuffix: $e,
+  webviewPartitionSuffix: HOST_GENERATION_SUFFIX,
 });
 var FG = r.i(`browser-sidebar-manager`),
   LG = new WeakSet(),
@@ -36060,7 +35978,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
         (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ hX, fq, tq, KU, EZ, lifecycleHelpersClass: createBrowserPageLifecycleHelpersControllerClass, WU, dZ, QU, Ze: normalizeUrlOrBlank, n, pX, dZe, oX, dq, isEqual: G.default }))(this)),
         (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW, fq, matchesLoadError: FU, normalizeUrl: normalizeUrlOrBlank, resetCaptureState: (page) => { page.isCapturingUserMedia = !1; page.isCapturingCamera = void 0; page.isCapturingMicrophone = void 0; }, clearSiteTools: XX, serializePageState: eW, shouldIgnoreLoadError: NU, shouldRetryLoadError: PU, logger: r.i, setTimer: setTimeout, retryDelayMs: 50, maxAttempts: 100 }))(this)),
         (this.pageLookupController = new (createBrowserPageLookupControllerClass({}))(this)),
-(this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze: normalizeUrlOrBlank, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ, WXe, RX }))(this)),
+(this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze: normalizeUrlOrBlank, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ, WXe, RX }))(this)),
         (this.hostPolicyController = new (createBrowserHostPolicyControllerClass({ DXe, OXe, kXe, mq, VG, Yc, Xc, DZ, hX }))(this)),
         (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
         (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, SWe, aXe, gX, qU, oXe, vX, tq, KU, l, EZ, logger: r.i(`browser-sidebar-manager`) }))(this)),
@@ -50656,7 +50574,7 @@ var y7 = r.r(`codex-deep-link-navigation`),
         resolvePath: h.resolve,
         stat: b.stat,
         getFallbackRoots: (globalState) => Fr(globalState).roots,
-        parseRepoOrigin: dt,
+        parseRepoOrigin: parseRepositoryOrigin,
       }),
     selectWorkspaceProject: (options) =>
       selectLocalProjectForWorkspace({

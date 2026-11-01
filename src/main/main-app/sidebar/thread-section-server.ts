@@ -7,7 +7,7 @@ export function createThreadSectionServerClass(dependencies) {
     be,
     gH,
     hH,
-    he,
+    RetryLookupCache,
     me,
     n,
     pinnedThreadSectionId,
@@ -436,7 +436,7 @@ export function createThreadSectionServerClass(dependencies) {
         let i = this.threadLookupsByConnection.get(e);
         return !n || r != null
           ? (i?.delete(t), e.readThread(t, { includeTurns: !1 }, void 0, r))
-          : (i ?? ((i = new he()), this.threadLookupsByConnection.set(e, i)),
+          : (i ?? ((i = new RetryLookupCache((error) => error instanceof Error && me(error))), this.threadLookupsByConnection.set(e, i)),
             i.read(t, () => e.readThread(t, { includeTurns: !1 })));
       }
       getMigratedThreadIds(e) {

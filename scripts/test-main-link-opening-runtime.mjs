@@ -75,6 +75,7 @@ equal(runtime.threadBrowserTabStorageKey("a/b"), "thread-browser-tabs-v1:a%2Fb")
 equal(runtime.browserRoutePartition("owner", "thread"), "persist:codex-browser-app-route:owner%00thread");
 equal(runtime.threadBrowserTabKey("thread"), "thread");
 equal(runtime.BROWSER_ROUTE_PARTITION_PREFIX, "persist:codex-browser-app-route:");
+equal(runtime.HOST_GENERATION_SUFFIX, ":host:");
 equal(runtime.PAGE_RESTORE_ATTRIBUTE, "data-browser-sidebar-page-restore");
 equal(runtime.shouldOpenLinkInAppBrowser({
   browserPaneEnabled: true,
@@ -129,6 +130,7 @@ equal(main.includes("async function IH("), false);
 equal(main.includes("function mBe("), false);
 equal(main.includes("function bBe("), false);
 equal(main.includes("browserRoutePartitionPrefix: BROWSER_ROUTE_PARTITION_PREFIX"), true);
+equal(main.includes("webviewPartitionSuffix: HOST_GENERATION_SUFFIX"), true);
 equal(main.includes("makePartitionKey: browserRoutePartition"), true);
 equal(main.includes("canOpenExternalUrl: isSupportedExternalUrl"), true);
 equal(main.includes("normalizeUrl: normalizeUrlOrBlank"), true);

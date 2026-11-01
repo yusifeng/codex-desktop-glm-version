@@ -2,7 +2,7 @@
 
 /** Owns the complete page-to-WebContents binding lifecycle for Browser sidebar pages. */
 export function createBrowserPageWebviewBindingControllerClass(dependencies: Record<string, any>) {
-  const { e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ } = dependencies;
+  const { e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ } = dependencies;
   const pendingObservers = new WeakMap<object, any>();
   const resetCaptureState = (page: any) => {
     page.isCapturingUserMedia = false;

@@ -760,6 +760,7 @@ assert.equal(main.includes("ye = new Map()"), false, "generated section-create r
 assert.equal(main.includes("01984de2-8f74-7c91-a3b2-5c5e937cf318"), false, "pinned section ID must not be duplicated in main");
 assert.equal(main.includes("GX, Se, JXe"), false, "unused generated engine injection must be removed from browser webview wiring");
 assert.equal(main.includes("browserRoutePartitionPrefix: BROWSER_ROUTE_PARTITION_PREFIX"), true, "browser sessions use the semantic route prefix");
+assert.equal(main.includes("webviewPartitionSuffix: HOST_GENERATION_SUFFIX"), true, "browser webviews use the semantic host-generation suffix");
 assert.equal(main.includes("s[PAGE_RESTORE_ATTRIBUTE]"), true, "browser restore reads the semantic attribute constant");
 assert.equal(main.includes("isFirstPartyUrl: isLocalUrl"), true, "browser presentation uses semantic local-URL policy");
 assert.equal(main.includes("canOpenExternalUrl: isSupportedExternalUrl"), true, "browser runtime uses semantic external-URL policy");
@@ -771,5 +772,16 @@ assert.equal(main.includes("function ze("), false, "generated HTML-file policy m
 assert.equal(main.includes("function Ve("), false, "generated local-URL policy must be removed");
 assert.equal(main.includes("function Ze("), false, "generated URL normalization must be removed");
 assert.equal(main.includes("var Qe = `persist:codex-browser-app-route:`"), false, "generated browser route constants must be removed");
+assert.equal(main.includes("pendingInteraction: mv, RetryLookupCache"), true, "semantic retry lookup cache is imported");
+assert.equal(main.includes("RetryLookupCache,"), true, "thread-section server receives the semantic retry cache");
+assert.equal(main.includes("var he = class"), false, "generated retry lookup cache must be removed");
+assert.equal(main.includes("pe = 6e4"), false, "generated retry backoff constant must be removed");
+assert.equal(main.includes("hU, he, At"), false, "unused retry cache injection must be removed from browser webview wiring");
+assert.equal(main.includes('require("./main-app/misc/git-repository-origin.js")'), true, "git repository origin parser is wired");
+assert.equal(main.includes("parseRepoOrigin: parseRepositoryOrigin"), true, "runtime consumer uses the semantic repository parser");
+assert.equal(main.includes("function dt("), false, "generated repository origin parser must be removed");
+assert.equal(main.includes("function ft("), false, "generated repository URL parser must be removed");
+assert.equal(main.includes("function pt("), false, "generated SCP-like repository parser must be removed");
+assert.equal(main.includes("function mt("), false, "generated repository path parser must be removed");
 
-console.log("766 main unwired-owner skeleton assertions passed");
+console.log("778 main unwired-owner skeleton assertions passed");

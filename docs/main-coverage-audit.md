@@ -3596,6 +3596,23 @@ persistence、open-in service、Electron message handler 与 localhost navigatio
 protocol whitelist、file normalization、route constants/key builders 已物理删除。
 
 Browser Page WebView factory 中从未读取的 `Xe` normalize-path dependency 同步删除；`normalizeUrlOrBlank` 仍以明确 adapter key
-注入需要压缩兼容名 `Ze` 的已迁模块。link-opening focused suite 扩至 61 项并覆盖新增导出与全部旧定义消失；相关
+注入需要压缩兼容名 `Ze` 的已迁模块。link-opening focused suite 扩至 63 项并覆盖新增导出与全部旧定义消失；相关
 navigation/persistence/presentation/webview/runtime-sync/message-handler/open-in/localhost 九组回归通过，并修复其中 4 个直接
-`.ts` import 的失效入口。no-unwired gate 扩至 766 项。
+`.ts` import 的失效入口。no-unwired gate 扩至 767 项。
+
+### 收敛既有 owner：retry lookup cache
+
+`threads/hydration.ts` 既有 typed `RetryLookupCache<T>` 现真实接入 `ThreadSectionServer`，以 `Error` + thread-not-found classifier
+保持旧 `he` 的 retryable-error 边界；null/backoff、成功/非重试错误即时 eviction、delete/clear 与周期 prune 仍保持原语义。
+同时补回旧实现 `clear()` 重置 `nextPruneAtMs` 的细节，避免语义模块与原 owner 偏差。
+
+主 chunk 原 `he` class 与 `pe` backoff 常量删除，Browser Page WebView 中被局部 selection callback 遮蔽且未读取的 `he`
+dependency 同步清理。hydration focused suite 补齐 cache 行为/接线断言并清除两个已无 consumer 的 hydration alias，
+no-unwired gate 扩至 772 项。
+
+### 小型完整边界：Git repository origin parser
+
+新增并真实接回 typed `misc/git-repository-origin.ts`，统一 URL 与 SCP-like remote 解析、Windows drive 排除、`.git`
+归一、nested owner path 和 invalid input 降级。唯一 runtime `parseRepoOrigin` consumer 已切换，主 chunk 原 `dt/ft/pt/mt`
+机械函数删除。focused suite 19 项覆盖 HTTPS/SSH/SCP/nested owner/drive/invalid 与真实 wiring；测试索引增至 1833，
+no-unwired gate 扩至 778 项。

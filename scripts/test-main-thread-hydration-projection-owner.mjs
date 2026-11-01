@@ -292,6 +292,37 @@ equal(owner.transcriptChanges(
   transcriptAccess,
 ), { type: "reset", value: transcriptSnapshot });
 
+let lookupCalls = 0;
+const retryable = new Error("missing");
+const lookupCache = new owner.RetryLookupCache((error) => error === retryable);
+const firstMissing = lookupCache.read("missing", async () => { lookupCalls += 1; return null; });
+equal(await firstMissing, null);
+equal(lookupCache.read("missing", async () => { lookupCalls += 1; return "unexpected"; }), firstMissing);
+equal(lookupCalls, 1);
+lookupCache.delete("missing");
+equal(await lookupCache.read("missing", async () => { lookupCalls += 1; return "found"; }), "found");
+equal(lookupCalls, 2);
+equal(lookupCache.lookups.has("missing"), false);
+
+const retryPromise = lookupCache.read("retry", async () => { lookupCalls += 1; throw retryable; });
+await assert.rejects(retryPromise, /missing/);
+assertions += 1;
+equal(lookupCache.read("retry", async () => { lookupCalls += 1; return "unexpected"; }), retryPromise);
+await assert.rejects(retryPromise, /missing/);
+assertions += 1;
+equal(lookupCalls, 3);
+
+await assert.rejects(
+  lookupCache.read("fatal", async () => { lookupCalls += 1; throw new Error("fatal"); }),
+  /fatal/,
+);
+assertions += 1;
+equal(lookupCache.lookups.has("fatal"), false);
+lookupCache.nextPruneAtMs = 123;
+lookupCache.clear();
+equal(lookupCache.lookups.size, 0);
+equal(lookupCache.nextPruneAtMs, 0);
+
 const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
@@ -303,8 +334,10 @@ equal(main.includes("var o_e ="), false);
 equal(main.includes("var u_e ="), false);
 equal(main.includes("registerThreadMetadata: av, activeAncestryIds: ov"), true);
 equal(main.includes("environmentInputResult: fv, pendingInteractionKind: pv, pendingInteraction: mv"), true);
-equal(main.includes("withThreadMode: Av, newConversationFromThread: Ov"), true);
-equal(main.includes("thread: Av(n.thread, e.getConversation(t)?.threadStartKind, r, i)"), true);
+equal(main.includes("pendingInteractionKind: pv, pendingInteraction: mv, RetryLookupCache"), true);
+equal(main.includes("withThreadMode: Av"), false);
+equal(main.includes("newConversationFromThread: Ov"), false);
+equal(main.includes("var he = class"), false);
 for (const name of ["f_e", "av", "p_e", "m_e", "ov", "sv", "cv", "lv", "uv", "dv"])
   equal(main.includes(`function ${name}(`), false);
 for (const name of ["fv", "pv", "mv", "hv", "gv", "h_e"])

@@ -5486,5 +5486,18 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   `browser/link-opening.ts`，补充导出 HTML-file/localhost-port 两个缺失语义入口；旧重复实现整体删除。
 - browser session/presentation/runtime sync/navigation context/persistence、open-in、Electron message handler 与 localhost
   navigation 均已真实接回；Browser Page WebView 未读取的 `Xe` dependency 同步清理。
-- link-opening focused suite 扩至 61 项；相关 browser/open-in/message-handler 九组回归通过，修复其中 4 个直接 `.ts`
-  import 失效入口。no-unwired gate 扩至 766 项。
+- link-opening focused suite 扩至 63 项；相关 browser/open-in/message-handler 九组回归通过，修复其中 4 个直接 `.ts`
+  import 失效入口。no-unwired gate 扩至 767 项。
+
+# 2026-11-01 retry lookup cache convergence
+
+- 将 `threads/hydration.ts` 的 typed `RetryLookupCache<T>` 真实接入 `ThreadSectionServer`，保留 null/retryable backoff、
+  success/fatal eviction、prune/delete/clear；修正语义实现此前漏掉的 `clear → nextPruneAtMs=0`。
+- 主 chunk 旧 `he/pe` 删除，Browser Page WebView 被局部 callback 遮蔽的未使用 `he` dependency 同步清理；hydration suite
+  补齐 cache/wiring 行为覆盖并清除两个已无 consumer 的 hydration alias，no-unwired gate 扩至 772 项。
+
+# 2026-11-01 Git repository origin parser extraction
+
+- 新增并真实接回 typed `misc/git-repository-origin.ts`，覆盖 URL/SCP-like、Windows drive 排除、`.git` 归一与 nested owner；
+  runtime `parseRepoOrigin` consumer 已切换，主 chunk 旧 `dt/ft/pt/mt` 删除。
+- focused suite 19 项；测试索引 1833，no-unwired gate 扩至 778 项。

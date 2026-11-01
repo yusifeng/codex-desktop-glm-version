@@ -1522,5 +1522,6 @@ export class RetryLookupCache<T> {
 
   clear() {
     this.lookups.clear();
+    this.nextPruneAtMs = 0;
   }
 }
