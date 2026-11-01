@@ -2,6 +2,7 @@ import "@rchunk/rolldown-runtime";
 import * as appShared from "@rchunk/app-shared";
 import * as appInitial from "@rchunk/app-initial";
 import * as appPrimary from "@rchunk/app-primary";
+import { accountSpendKey } from "../app-primary/runtime/account-spend-key";
 
 type HostId = string;
 type ModelSlug = string;
@@ -83,11 +84,11 @@ interface UsageRuntime {
   dismissConversationNotice(scope: ScopeApi, conversationId: string | null, state: ConversationUsageState): void;
   getConversationId(scope: ScopeApi): string | null;
   getLatestTurn(conversation: ConversationRecord): TurnRecord | null;
-  getPrimaryUsagePercent(status: RateLimitStatus): number | null;
+  getRateLimitWarningKey(status: RateLimitStatus): string | null;
   isIdentityCurrent(input: Record<string, unknown>): boolean;
   isLunaReserveAvailable: unknown;
   markBannerShown(scope: ScopeApi, key: string | null): void;
-  markWarningDismissed(scope: ScopeApi, percent: number, threshold: number): void;
+  markWarningDismissed(scope: ScopeApi, warningKey: string, threshold: number): void;
 }
 
 const shared = appShared as unknown as {
@@ -117,8 +118,7 @@ const initial = appInitial as unknown as {
 };
 const primary = appPrimary as unknown as {
   Dm: unknown; Em: unknown; wm: unknown;
-  Im(scope: ScopeApi, percent: number, threshold: number): void;
-  Pm(status: RateLimitStatus): number | null;
+  Im(scope: ScopeApi, warningKey: string, threshold: number): void;
   [key: string]: unknown;
 };
 
@@ -146,7 +146,7 @@ const runtime: UsageRuntime = {
   dismissConversationNotice: initial.F8,
   getConversationId: initial.Fht,
   getLatestTurn: initial.Min,
-  getPrimaryUsagePercent: primary.Pm,
+  getRateLimitWarningKey: accountSpendKey,
   isIdentityCurrent: initial.k5,
   isLunaReserveAvailable: initial.Z8,
   markBannerShown: initial.y0t,
@@ -242,8 +242,8 @@ function UsageBanner(props: UsageBannerProps): unknown {
   else if (kind === "image-generation-limit" && props.imageGenerationLimit != null) fallbackContent = jsx.jsx(runtime.RateLimitBanner, { imageGenerationLimit: props.imageGenerationLimit, imageGenerationPresentationKey, lastImageGenerationImpressionKeyRef, rateLimitStatus: props.rateLimit, onDismissImageGenerationLimit: props.onDismissImageGenerationLimit });
   else if (kind === "model-limit") fallbackContent = jsx.jsx(runtime.ModelLimitBanner, { modelName: props.modelName, resetAt: props.resetAt });
   else if (kind === "warning" && props.rateLimit != null) {
-    const percent = runtime.getPrimaryUsagePercent(props.rateLimit);
-    if (props.rateLimitWarningThreshold != null && percent != null) fallbackContent = jsx.jsx(runtime.RateLimitBanner, { rateLimitStatus: props.rateLimit, rateLimitWarningThreshold: props.rateLimitWarningThreshold, showWorkspaceUsageLimit: props.showWorkspaceUsageLimit, onDismissWarning: () => runtime.markWarningDismissed(scope, percent, props.rateLimitWarningThreshold as number) }, `${percent}:${props.rateLimitWarningThreshold}`);
+    const warningKey = runtime.getRateLimitWarningKey(props.rateLimit);
+    if (props.rateLimitWarningThreshold != null && warningKey != null) fallbackContent = jsx.jsx(runtime.RateLimitBanner, { rateLimitStatus: props.rateLimit, rateLimitWarningThreshold: props.rateLimitWarningThreshold, showWorkspaceUsageLimit: props.showWorkspaceUsageLimit, onDismissWarning: () => runtime.markWarningDismissed(scope, warningKey, props.rateLimitWarningThreshold as number) }, `${warningKey}:${props.rateLimitWarningThreshold}`);
   }
   const backendUpsell = BackendRateLimitUpsell({ banner: rateLimitStatus?.rate_limit_upsell, fallbackContent, hostId, rateLimitStatus, selectedModel: props.selectedModel });
   if (!props.canShowUsageBanners) return null;

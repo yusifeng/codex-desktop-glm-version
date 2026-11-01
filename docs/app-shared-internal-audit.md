@@ -15,10 +15,14 @@ assets; the source is intentionally excluded from TypeScript semantic rewriting
 
 The existing `docs/renderer-app-shared-analysis.md` and
 `docs/renderer-app-shared-export-map.json` provide the symbol-level inventory.
-The executable contract is `scripts/audit-app-shared-consumption.mjs`: every
-consumed export must have a declaration, no declaration may contain `any`, and
-namespace consumption is rejected. The current result is 340 consumed exports,
-0 missing, 0 `any`, and 0 direct namespace uses.
+The authoritative executable contract is
+`scripts/audit-renderer-hub-classification.mjs --strict`. It counts named
+imports, namespace member access, namespace destructuring, and typed namespace
+casts with the same parser used by the exhaustive manifest. The current result
+is 432/3,185 consumed exports and 0 unreviewed. The older
+`audit-app-shared-consumption.mjs` report remains useful for locating direct
+namespace access, but it is not the exhaustive completion gate and must not be
+cited as proof of zero namespace use.
 
 The remaining internal ranges are classified as either shared runtime/UI
 primitives (the semanticization boundary for future work) or vendor/interop
@@ -40,13 +44,15 @@ into misleading handwritten source.
 The primary hub is treated the same way: route registration, RPC bridge wiring,
 and application-owned state are semantic boundaries; bundled library facades,
 asset registration, and lazy chunk tables are preserved. `verify-renderer.mjs`
-checks the full 1,874-chunk graph, and the renderer classification report keeps
+checks the full 1,888-chunk graph, and the renderer classification report keeps
 the preserved asset families explicit.
 
 ## Re-audit procedure
 
 ```sh
 node scripts/audit-app-shared-consumption.mjs
+node scripts/audit-renderer-hub-classification.mjs --strict
+node scripts/audit-renderer-hub-manifest.mjs --strict
 node scripts/verify-renderer.mjs
 ```
 
@@ -61,8 +67,11 @@ identity stubs or fabricated exports are not accepted.
 
 ## 2026-10-12 Consumer Recheck
 
-The classification manifest reports `UNREVIEWED: 0`; all 113 semantic entries
-map to existing runtime modules (112 unique files). Representative modules such
+The classification manifest reports `UNREVIEWED: 0`. Historical duplicate
+records have been removed: 12,134 evidence records now correspond to 12,134
+unique hub/alias keys, and the gate rejects future duplicates. Semantic entries
+must also map the public alias to the exact internal source symbol and contain
+that symbol inside their recorded source range. Representative modules such
 as `normalize-suggested-followups`, `is-site-url-match`, and
 `create-prefilled-plugin-prompt` have confirmed consumers in the split renderer
 surface. A small remainder, including `format-annotation-summary`,

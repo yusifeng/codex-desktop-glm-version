@@ -1,5 +1,18 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Hub evidence/usage contract batch：修正聚合 hub 消费审计器把正则字面量中的
+`\w` 二次转义的问题；真实命名、namespace destructuring 与 typed-cast 消费数现在分别为
+app-shared 432/3,185、app-initial 1,621/8,204、app-primary 214/917，三者仍为 0 unreviewed。
+exhaustive manifest 与 classification gate 复用同一消费解析器，避免两套统计互相矛盾。
+`renderer-hub-line-classification.json` 同时移除 838 条历史重复记录（494 个重复 key），严格
+gate 以后拒绝重复 key，并要求每个 `semantic-business-logic` 的公开 alias、内部 source symbol
+与记录源码区间精确对应；29 个因格式化行号漂移的 semantic 区间已按真实定义修复，skill
+label 的 `go/ho` 错位也已纠正。核对过程中发现 `usage` 把 `app-primary.Pm` 误声明成百分比
+getter；发布实现实际是 rate-limit warning 的 account/spend/reset cache key。当前 owner 改为直接
+消费 `accountSpendKey`，dismissal key 和阈值类型恢复发布契约，focused usage/checkout 50 项通过。
+全量 typecheck、main build-check、renderer source/semantic gates、1,888/1,888 renderer verify 与
+11/11 main verify 均通过。这一批提高 hub 剩余证据可信度，但 3 个大型 hub 仍是后续迁移边界。
+
 2026-11-02 Conversation route source closure 收官批次：最后 35 个 compatibility
 模块（157,630 格式化行、约 5.8 MB）不再作为 `src/renderer-recovered/conversation-route`
 发布 JS 图参与运行。Activity/Billing/Imported setup 保留发布依赖顺序，但 Recharts/D3 与

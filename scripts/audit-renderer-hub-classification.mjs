@@ -18,6 +18,7 @@ const HUBS = {
 const LINE_CLASSIFICATIONS_PATH = path.join(ROOT, "docs/renderer-hub-line-classification.json");
 const hubSymbolSets = new Map();
 const hubLineCache = new Map();
+const hubExportMapCache = new Map();
 
 function getHubLines(hub) {
   if (!hubLineCache.has(hub)) {
@@ -35,9 +36,25 @@ function getHubSymbols(hub, lines) {
   return hubSymbolSets.get(hub);
 }
 
+function getHubExportMap(hub) {
+  if (!hubExportMapCache.has(hub)) {
+    const source = getHubLines(hub).join("\n");
+    const start = Math.max(source.lastIndexOf("export{"), source.lastIndexOf("export {"));
+    hubExportMapCache.set(
+      hub,
+      new Map(
+        [...source.slice(start).matchAll(/(?<![A-Za-z0-9_$])([A-Za-z_$][\w$]*)\s+as\s+([A-Za-z_$][\w$]*)(?![A-Za-z0-9_$])/g)]
+          .map((match) => [match[2], match[1]]),
+      ),
+    );
+  }
+  return hubExportMapCache.get(hub);
+}
+
 function readLineClassifications() {
   const entries = JSON.parse(fs.readFileSync(LINE_CLASSIFICATIONS_PATH, "utf8"));
   if (!Array.isArray(entries)) throw new Error("renderer hub line classifications must be an array");
+  const keys = new Set();
   for (const entry of entries) {
     if (!entry || typeof entry !== "object") throw new Error("invalid hub line classification entry");
     if (!(entry.hub in HUBS) || typeof entry.alias !== "string") throw new Error("classification must identify hub and alias");
@@ -47,6 +64,9 @@ function readLineClassifications() {
     if (typeof entry.classification !== "string" || typeof entry.module !== "string") {
       throw new Error(`classification ${entry.hub}:${entry.alias} needs category and module`);
     }
+    const key = `${entry.hub}:${entry.alias}`;
+    if (keys.has(key)) throw new Error(`duplicate hub classification ${key}`);
+    keys.add(key);
     const modulePath = path.join(ROOT, entry.module);
     if (!fs.existsSync(modulePath)) throw new Error(`missing semantic module for ${entry.hub}:${entry.alias}: ${entry.module}`);
     const hubLines = getHubLines(entry.hub);
@@ -56,6 +76,15 @@ function readLineClassifications() {
     const sourceSymbolPattern = escapedSourceSymbol && new RegExp(`(?<![A-Za-z0-9_$])${escapedSourceSymbol}(?![A-Za-z0-9_$])`);
     if (sourceSymbolPattern && !sourceSymbolPattern.test(sourceWindow) && !hubSymbols.has(entry.sourceSymbol)) {
       throw new Error(`source symbol ${entry.sourceSymbol} is outside ${entry.hub}:${entry.startLine}-${entry.endLine}`);
+    }
+    if (entry.classification === "semantic-business-logic") {
+      const actualSourceSymbol = getHubExportMap(entry.hub).get(entry.alias);
+      if (typeof entry.sourceSymbol !== "string" || actualSourceSymbol !== entry.sourceSymbol) {
+        throw new Error(`semantic ABI mismatch ${key}: recorded ${entry.sourceSymbol ?? "<missing>"}, actual ${actualSourceSymbol ?? "<missing>"}`);
+      }
+      if (!sourceSymbolPattern?.test(sourceWindow)) {
+        throw new Error(`semantic source symbol ${entry.sourceSymbol} is outside the recorded range for ${key}`);
+      }
     }
   }
   return entries;
@@ -104,7 +133,7 @@ function readConsumption(hub) {
         for (const binding of source.matchAll(destructuring)) {
           for (const item of binding[1].split(",")) {
             const exportName = item.trim().split(/\s*:\s*/)[0].replace(/^type\s+/, "");
-            if (/^[A-Za-z_$][\\w$]*$/.test(exportName)) namespaceMembers.add(exportName);
+            if (/^[A-Za-z_$][\w$]*$/.test(exportName)) namespaceMembers.add(exportName);
           }
         }
 
@@ -168,7 +197,7 @@ function readConsumption(hub) {
       if (braces) {
         for (const binding of braces[1].split(",")) {
           const alias = binding.trim().split(/\s+as\s+/)[0].replace(/^type\s+/, "");
-          if (/^[A-Za-z_$][\\w$]*$/.test(alias)) named.add(alias);
+          if (/^[A-Za-z_$][\w$]*$/.test(alias)) named.add(alias);
         }
       }
     }
@@ -188,13 +217,24 @@ export function classifyHub(hub) {
   for (const entry of reviewed) {
     if (!exports.has(entry.alias)) throw new Error(`line classification references missing export ${hub}:${entry.alias}`);
   }
-  return { hub, exportCount: exports.size, consumedCount: consumed.size, sideEffectImports: consumption.sideEffectImports, unconsumed, unreviewed, reviewedCount: reviewed.length };
+  return {
+    hub,
+    exportCount: exports.size,
+    consumedCount: consumed.size,
+    consumedAliases: [...consumed].sort(),
+    sideEffectImports: consumption.sideEffectImports,
+    unconsumed,
+    unreviewed,
+    reviewedCount: reviewed.length,
+  };
 }
 
-const strict = process.argv.includes("--strict");
-const hubs = Object.keys(HUBS).map(classifyHub);
-for (const result of hubs) {
-  console.log(`${result.hub}: ${result.consumedCount}/${result.exportCount} consumed; ${result.sideEffectImports} side-effect imports; ${result.unconsumed.length} unconsumed; ${result.unreviewed.length} unreviewed`);
-  if (result.unreviewed.length > 0 && process.argv.includes("--list")) console.log(`  ${result.unreviewed.join(", ")}`);
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const strict = process.argv.includes("--strict");
+  const hubs = Object.keys(HUBS).map(classifyHub);
+  for (const result of hubs) {
+    console.log(`${result.hub}: ${result.consumedCount}/${result.exportCount} consumed; ${result.sideEffectImports} side-effect imports; ${result.unconsumed.length} unconsumed; ${result.unreviewed.length} unreviewed`);
+    if (result.unreviewed.length > 0 && process.argv.includes("--list")) console.log(`  ${result.unreviewed.join(", ")}`);
+  }
+  if (strict && hubs.some((result) => result.unreviewed.length > 0)) process.exit(1);
 }
-if (strict && hubs.some((result) => result.unreviewed.length > 0)) process.exit(1);

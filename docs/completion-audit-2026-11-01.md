@@ -78,6 +78,14 @@ Zero exact owners and zero route-compatibility modules must still not be describ
 Final completion additionally requires resolving the remaining preserved main/renderer inventory, keeping the full critical
 E2E matrix green, and eliminating every known stable runtime contract error.
 
+The 2026-11-02 hub evidence re-audit corrected a consumer-parser escaping bug and removed 838 duplicate classification
+records. The current strict counts are app-shared 432/3,185, app-initial 1,621/8,204, and app-primary 214/917 consumed,
+with 0 unreviewed across all 12,306 public exports. Semantic evidence is now additionally required to match the exact
+public-alias/internal-symbol ABI and its recorded source range. This audit also exposed and fixed a real UsageBanner wiring
+error: `app-primary.Pm` is the account/spend/reset warning key, not a numeric percent getter. These stronger gates supersede
+the older consumed-export counts above; they improve evidence quality but do not reclassify the three remaining hubs as
+fully migrated.
+
 The latest semantic batch replaces the standalone visualization-document owner and parental-controls presentation owner.
 The visualization owner retains the nested sandbox, inner/outer CSP split, widget-state persistence, user-activation checks,
 follow-up/open-external bridge, theme synchronization, and height/scroll protocol. The parental presentation owner retains
