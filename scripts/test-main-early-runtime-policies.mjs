@@ -88,12 +88,16 @@ for (const wiring of [
   'require("./main-app/util/minimum-interval-gate.js")',
   "identitiesEqual: isSameAuthIdentity",
   "identityEquals: isSameAuthIdentity",
-  "supportsAppServerSections(e.appServerVersion)",
   "protocolsForToken: appServerProtocolsForToken",
   "parseBrowserCommentPopupFrameName,",
   "sanitizeFileName: sanitizeWorkspaceDownloadFileName",
   "PerformanceTriggerGate: MinimumIntervalGate",
 ]) equal(main.includes(wiring), true);
+const forkPlacement = fs.readFileSync(
+  new URL("../src/main/main-app/threads/fork-placement.ts", import.meta.url),
+  "utf8",
+);
+equal(forkPlacement.includes("supportsAppServerSections(context.appServerVersion)"), true);
 
 for (const oldDefinition of [
   /^function (?:ae|oe|se|ce|ue|de|W|ge|be|xe|Te|Oe|je|K|Pe)\(/m,

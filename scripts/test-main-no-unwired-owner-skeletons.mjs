@@ -149,6 +149,7 @@ const realOwners = [
   ["src/main/main-app/automations/cron-run.ts", "createCronAutomationRunRuntime"],
   ["src/main/main-app/automations/scheduler-runtime.ts", "createAutomationSchedulerRuntime"],
   ["src/main/main-app/markdown/plain-text.ts", "configureMarkdownPlainTextRuntime"],
+  ["src/main/main-app/threads/fork-placement.ts", "readForkPlacement"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -177,6 +178,10 @@ const main = fs.readFileSync(
 );
 const markdownPlainText = fs.readFileSync(
   new URL("src/main/main-app/markdown/plain-text.ts", root),
+  "utf8",
+);
+const forkPlacement = fs.readFileSync(
+  new URL("src/main/main-app/threads/fork-placement.ts", root),
   "utf8",
 );
 const codexAppConfigRuntime = fs.readFileSync(
@@ -872,7 +877,7 @@ assert.equal(main.includes('require("./main-app/app-server/auth-protocols.js")')
 assert.equal(main.includes('require("./main-app/window/renderer-window-identity.js")'), true, "renderer-window identity is wired");
 assert.equal(main.includes('require("./main-app/files/workspace-file-policy.js")'), true, "workspace-file policy is wired");
 assert.equal(main.includes('require("./main-app/util/minimum-interval-gate.js")'), true, "minimum-interval gate is wired");
-assert.equal(main.includes("supportsAppServerSections(e.appServerVersion)"), true, "fork placement uses semantic version policy");
+assert.equal(forkPlacement.includes("supportsAppServerSections(context.appServerVersion)"), true, "fork placement uses semantic version policy");
 assert.equal(main.includes("isValidAppServerVersion,"), true, "thread-section server receives semantic version validation");
 assert.equal(main.includes("supportsAppServerSections,"), true, "thread-section server receives semantic section support policy");
 assert.equal(main.includes("identitiesEqual: isSameAuthIdentity"), true, "hosted manager reuses the existing identity policy");
@@ -1008,5 +1013,23 @@ assert.equal(/^var Bme = /m.test(main), false, "generated HTML parser alias must
 assert.equal(/^[ ]*Vme = /m.test(main), false, "generated prose-pattern alias must be removed");
 assert.equal(markdownPlainText.includes('../vendor/mdast'), false, "markdown owner must not depend on unshipped npm adapter");
 assert.equal(fs.existsSync(new URL("src/main/main-app/vendor/mdast.ts", root)), false, "unshippable mdast adapter must stay removed");
+for (const generatedName of ["ex", "cye", "lye", "uye"]) {
+  assert.equal(
+    new RegExp(`^(?:async )?function ${generatedName}\\(`, "m").test(main),
+    false,
+    `generated fork-placement helper ${generatedName} must be removed`,
+  );
+}
+for (const deadAlias of [
+  "ym = 3e4", "She = `codex_cloud`", "bm = 12e4",
+  "Che = `Timed out waiting for Windows sandbox setup completion`", "whe = 12e5",
+  "The = 3e5", "xm = `Please continue this conversation on the window where it was started.`",
+  "Ehe = 5e3",
+]) assert.equal(main.includes(deadAlias), false, `dead generated alias ${deadAlias} must be removed`);
+assert.equal(main.includes("var Qb = n.Ef"), false, "fork-only saved-section record schema must be removed");
+assert.equal(main.includes("$b = n.df([`manual`"), false, "fork-only sort schema must be removed");
+assert.equal(main.includes("var Wke = class"), false, "generated annotation preview owner must be removed");
+assert.equal(main.includes("async function Gke("), false, "generated viewport wait owner must be removed");
+assert.equal(main.includes("qD = new WeakMap()"), false, "generated viewport wait map must be removed");
 
-console.log("1047 main unwired-owner skeleton assertions passed");
+console.log("1066 main unwired-owner skeleton assertions passed");

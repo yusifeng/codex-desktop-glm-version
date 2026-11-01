@@ -3770,3 +3770,14 @@ directive fence、私有占位符、HTML script/style/comment 过滤和容器空
 app 中未安装的六个裸 npm packages，已删除该失效 adapter，改由组合根传入同一发布 vendor 实例。新 focused suite 37 项，
 notification/thread-catalog/hydration/projection 九组共 318 项相邻回归真实执行并通过；修复五个直接 import `.ts` 的失效测试入口。
 测试索引增至 1845，no-unwired gate 扩至 1047 项。
+
+### 既有 owner 去重：fork placement 与 BrowserHost preview/viewport
+
+`threads/fork-placement.ts` 已是 `threads/operations.ts` 的真实 placement owner，覆盖 source-relative local move、project order
+prepend、app-server section create/move、account race gate 和失败回滚；主 chunk 遗留 `ex/cye/lye/uye` 已无任何 consumer，现连同
+两个 fork-only schema 物理删除。`browser-host-service.ts` 已持有 annotation preview 生命周期与 viewport promise/abort 协调，旧
+`Wke/Gke/qD` 重复 owner 同步删除。
+
+另清除 `ym/She/bm/Che/whe/The/xm/Ehe` 八个零引用旧常量；它们对应的有效语义早已位于 auth/start-config 等 owner，未保留死别名。
+thread operations、BrowserHost、early policy 三组共 128 项 focused 回归通过；测试索引仍为 1845 个唯一脚本，no-unwired gate
+扩至 1066 项。

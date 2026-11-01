@@ -5599,3 +5599,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   `vendor/mdast.ts` 失效 adapter，消除实际启动风险。
 - 新 focused 37 项，notification/thread-catalog/hydration/projection 相邻回归共 318 项通过；五个直接 `.ts` 测试入口已恢复
   真实执行。测试索引 1845，no-unwired gate 1047 项。
+
+# 2026-11-01 fork placement and BrowserHost residue convergence
+
+- 删除主 chunk 已无 consumer 的 `ex/cye/lye/uye` fork-placement 副本与两个专用 schemas；真实路径继续由
+  `threads/fork-placement.ts` → `threads/operations.ts` 持有 account race、remote section 和 rollback 语义。
+- 删除已由 `browser-host-service.ts` 持有的 `Wke/Gke/qD` annotation-preview/viewport 重复 owner，并清除 8 个零引用旧常量。
+- thread operations、BrowserHost、early policy 共 128 项 focused 回归通过；测试索引 1845，no-unwired gate 1066 项。

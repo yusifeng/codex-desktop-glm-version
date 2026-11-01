@@ -126,6 +126,9 @@ const windowContext = fs.readFileSync(new URL("../src/main/main-app/window/windo
 equal(main.includes("BrowserHostService = createBrowserHostServiceClass({"), true);
 equal(main.includes("var Kke = class"), false);
 equal(/\bKke\b/.test(main), false);
+equal(main.includes("var Wke = class"), false);
+equal(main.includes("async function Gke("), false);
+equal(main.includes("qD = new WeakMap()"), false);
 equal(windowContext.includes("browserHost: new BrowserHostService("), true);
 
 console.log(`${assertions} main browser host service assertions passed`);

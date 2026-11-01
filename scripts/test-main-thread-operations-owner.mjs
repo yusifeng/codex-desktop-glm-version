@@ -417,7 +417,8 @@ const originalMain = fs.readFileSync(
 for (const oldDefinition of [
   "function tx(", "function dye(", "async function Eye(", "async function Mye(",
   "async function wx(", "async function Tx(", "function Nye(", "function Fye(",
-  "async function Iye(",
+  "async function Iye(", "function ex(", "function cye(", "async function lye(",
+  "async function uye(",
 ]) equal(originalMain.includes(oldDefinition), false);
 
 const managerSource = fs.readFileSync(
