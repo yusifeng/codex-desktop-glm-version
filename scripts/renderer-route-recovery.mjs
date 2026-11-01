@@ -669,7 +669,9 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   "home-suggestion-surface-6b043b722abb.js",
   "composer-action-bar-run-location-dropdown-4c846a804c36.js",
   "composer-banners-92519a56d6b2.js",
+  "composer-provider-15ef4a061c57.js",
   "home-composer-announcement-candidates-da8179151998.js",
+  "thread-scroll-controller-context-value-144c8345e935.js",
   "usd-5d2c7710cf01.js",
 ]);
 

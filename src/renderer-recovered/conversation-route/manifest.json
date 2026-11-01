@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "moduleCount": 205,
+  "moduleCount": 203,
   "modules": [
     "BarChart-2010e7d67e4a.js",
     "ComposedChart-12232a23b4b3.js",
@@ -54,7 +54,6 @@
     "color-icon-d65c230673c8.js",
     "command-messages-294d3e3133e1.js",
     "composer-host-ac9410930773.js",
-    "composer-provider-15ef4a061c57.js",
     "composer-utility-bar-a9b94a95b731.js",
     "computer-use-settings-6786672692bb.js",
     "configuration-fields-56633f88c571.js",
@@ -182,7 +181,6 @@
     "thread-handoff-modal-ccac59d04293.js",
     "thread-overflow-menu-51894ca4476d.js",
     "thread-panel-toggle-button-d0ce9733e408.js",
-    "thread-scroll-controller-context-value-144c8345e935.js",
     "thread-scroll-layout-27da424d79e0.js",
     "time-510b3d922182.js",
     "tokenize-math-block-92dba400da42.js",
