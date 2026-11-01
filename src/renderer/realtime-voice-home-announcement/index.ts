@@ -3,7 +3,7 @@
 
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
-import * as appPrimaryChunk from "@rchunk/app-primary";
+import * as announcementStateChunk from "@rchunk/home-announcement-state";
 
 void runtimeChunk;
 
@@ -16,7 +16,18 @@ const {
   ig: dismissIcon,
   n4: useIntl,
 } = appSharedChunk;
-const { Cm: initializeAnnouncement, Sm: Announcement } = appPrimaryChunk;
+const { Announcement, initializeAnnouncement } = (() => {
+  const state = announcementStateChunk.t as typeof announcementStateChunk.t & {
+    presentation: {
+      Banner: (props: Record<string, unknown>) => unknown;
+      initializeBanner(): void;
+    };
+  };
+  return {
+    Announcement: state.presentation.Banner,
+    initializeAnnouncement: state.presentation.initializeBanner,
+  };
+})();
 
 const DEFAULT_ORB_SRC =
   "https://persistent.oaistatic.com/voice/bidi-homepage-banner-orb.21107572.webp";

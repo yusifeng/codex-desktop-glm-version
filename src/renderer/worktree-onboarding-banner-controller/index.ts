@@ -1,9 +1,9 @@
 // worktree-onboarding-banner-controller —— Worktree 建议横幅及动作控制。
 
 import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
+import * as announcementStateChunk from "@rchunk/home-announcement-state";
 import * as stateChunk from "@rchunk/worktree-onboarding-state";
 import type {
   JsxRuntime,
@@ -51,11 +51,6 @@ interface AppInitialBindings {
   ypn(): void;
 }
 
-interface AppPrimaryBindings {
-  Cm(): void;
-  Sm: ((props: WorktreeOnboardingBannerViewProps) => unknown) | null;
-}
-
 interface WorktreeOnboardingBannerViewProps {
   description: string;
   dismissAction: { ariaLabel: string; icon: unknown; onClick(): void };
@@ -98,10 +93,16 @@ const {
   xvt: closeWorktreePicker,
   ypn: initializeWorktreeAnalytics,
 } = appInitialChunk as unknown as AppInitialBindings;
+const announcementState = announcementStateChunk.t as typeof announcementStateChunk.t & {
+  presentation: {
+    Banner: ((props: WorktreeOnboardingBannerViewProps) => unknown) | null;
+    initializeBanner(): void;
+  };
+};
 const {
-  Cm: initializeBanner,
-  Sm: Banner,
-} = appPrimaryChunk as unknown as AppPrimaryBindings;
+  Banner,
+  initializeBanner,
+} = announcementState.presentation;
 const {
   r: worktreeOnboardingStateSignal,
   t: initializeWorktreeOnboardingState,

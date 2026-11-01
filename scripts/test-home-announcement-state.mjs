@@ -67,6 +67,9 @@ const result = await esbuild.build({
                   export const ZI = "application-scope";
                   export const e6 = globalThis.__homeAnnouncementStateTest.react;
                   export const I3 = globalThis.__homeAnnouncementStateTest.jsx;
+                  export const Yh = "Button";
+                  export const Zh = () => {};
+                  export const m4 = (...values) => values.filter(Boolean).join(" ");
                   export const n4 = () => ({ formatMessage: descriptor => descriptor.defaultMessage });
                   export const LX = () => ({
                     set(signal, value) {
@@ -116,8 +119,10 @@ const result = await esbuild.build({
                   };
                   export const Kot = "MultiAgentIcon";
                   export const n6 = "ResetIcon";
+                  export const fit = "Badge";
+                  export const n7 = "AnnouncementSurface";
+                  export const r7 = () => {};
                 `,
-                "app-primary": `export const Sm = "Banner";`,
               }[importPath] ?? "export {};",
             loader: "js",
           }),
@@ -145,7 +150,7 @@ check(
 
 let banner = announcements.s({});
 check(
-  banner.type === "Banner" &&
+  typeof banner.type === "function" &&
     state.analytics.some(({ event }) => event === "banner-exposed"),
   "renders and records the multi-agent banner exposure",
 );

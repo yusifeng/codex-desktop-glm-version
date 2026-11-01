@@ -48,9 +48,10 @@ const result = await esbuild.build({
                   export const K2 = () => {};
                   export const ag = () => {};
                 `,
-                "app-primary": `
-                  export const Cm = () => {};
-                  export const Sm = "AnnouncementShell";
+                "home-announcement-state": `
+                  const initialize = () => {};
+                  initialize.presentation = { Banner: "AnnouncementShell", initializeBanner() {} };
+                  export { initialize as t };
                 `,
               }[importPath] ?? "export {};",
             loader: "js",

@@ -4,13 +4,17 @@
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as chatChoiceChunk from "@rchunk/chat-choice-view";
 import * as migratedAccessChunk from "@rchunk/migrated-plugin-access";
 import * as noticesChunk from "@rchunk/gpt-plugin-migration-notices";
 import * as migratedPluginChunk from "@rchunk/migrated-plugin-notice";
 import * as migrationDialogChunk from "@rchunk/gpt-plugin-migration-dialog";
-import type { LazyComponent } from "@rchunk/app-shared";
+import type {
+  LazyComponent,
+  MaitaiScopeApi,
+  ScopedDerivedFamily,
+  ScopedSignalFamily,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
 
@@ -36,6 +40,39 @@ interface MigrationChoiceProps {
   gptName: string;
 }
 
+interface MigrationVisitKey {
+  gizmoId: string | null;
+  visitKey: string;
+}
+
+interface MigrationVisitIdentity extends MigrationVisitKey {
+  accountId: string | null;
+  userId: string | null;
+}
+
+interface MigrationVisitState {
+  continued: boolean;
+  migrationNoticeDismissed: boolean;
+}
+
+type MigrationScope = MaitaiScopeApi<Record<string, unknown>>;
+
+let migrationVisitState: ScopedSignalFamily<
+  Record<string, unknown>,
+  MigrationVisitIdentity,
+  MigrationVisitState
+>;
+let migrationVisitedSignal: ScopedDerivedFamily<
+  Record<string, unknown>,
+  MigrationVisitKey,
+  boolean
+>;
+let migrationDismissedSignal: ScopedDerivedFamily<
+  Record<string, unknown>,
+  MigrationVisitKey,
+  boolean
+>;
+
 const {
   $3: initializeRuntimeLazy,
   BX: useSignalFamilyValue,
@@ -43,7 +80,9 @@ const {
   I3: getJsxRuntime,
   Jm: createLazyComponent,
   LX: useSignalScope,
+  oZ: createSignalFamily,
   QI: initializeSharedRuntime,
+  rZ: createDerivedFamily,
   ZI: applicationScope,
   qm: initializeQueryRuntime,
 } = appSharedChunk;
@@ -61,19 +100,15 @@ const {
   ifn: initializeExperiments,
   l1: initializePluginNavigation,
   mN: initializeAccounts,
+  mfn: migrationExperimentSignal,
+  mun: accountIdSignal,
   o_n: useNavigate,
   ofn: useFeatureGate,
   rht: initializeAccountQuery,
   u1: openPlugin,
   uht: useAccountQuery,
+  _un: userIdSignal,
 } = appInitialChunk;
-const {
-  Ip: migrationDismissedSignal,
-  Lp: initializeMigrationVisitState,
-  Mp: keepUsingGptForVisit,
-  Np: dismissMigrationForVisit,
-  Pp: migrationVisitedSignal,
-} = appPrimaryChunk;
 const { n: initializeChatChoiceView, t: ChatChoiceView } = chatChoiceChunk;
 const {
   i: accountCanUseWorkspacePlugins,
@@ -94,6 +129,100 @@ const {
 } = migratedPluginChunk;
 const MigrationDialogComponent =
   migrationDialogChunk.GptPluginMigrationDialog as LazyComponent<MigrationDialogProps>;
+
+function normalizedConversationVisitKey(visitKey: string): string {
+  const pathname = visitKey.split(/[?#]/, 1)[0];
+  const match = pathname.match(/(?:^|\/)c\/([^/]+)/);
+  if (match == null) return visitKey;
+  try {
+    return decodeURIComponent(match[1]);
+  } catch {
+    return match[1];
+  }
+}
+
+function migrationIdentity(
+  get: <Value = unknown>(signal: unknown, ...parameters: unknown[]) => Value,
+  visit: MigrationVisitKey,
+): MigrationVisitIdentity {
+  return {
+    ...visit,
+    accountId: get<string | null>(accountIdSignal),
+    userId: get<string | null>(userIdSignal),
+  };
+}
+
+function initializeMigrationVisitState(): void {
+  if (migrationVisitState != null) return;
+  migrationVisitState = createSignalFamily(
+    applicationScope,
+    () => ({ continued: false, migrationNoticeDismissed: false }),
+    undefined,
+    {
+      autoDispose: true,
+      key: ({ gizmoId, visitKey, accountId, userId }) =>
+        JSON.stringify([
+          gizmoId,
+          normalizedConversationVisitKey(visitKey),
+          accountId,
+          userId,
+        ]),
+    },
+  );
+  migrationVisitedSignal = createDerivedFamily(
+    applicationScope,
+    (visit, { get }) => {
+      if (
+        visit.gizmoId == null ||
+        get(migrationExperimentSignal, "2160578039") !== true
+      ) return false;
+      const resource = get(gptResourceQuery, visit.gizmoId);
+      const state = get(migrationVisitState, migrationIdentity(get, visit));
+      if (state.continued) return false;
+      if (resource.data == null) return resource.isError !== true;
+      return (
+        resource.data.gizmo.gizmo_type === "gpt" &&
+        Boolean(resource.data.gizmo.migrated_plugin_id)
+      );
+    },
+    { autoDispose: true },
+  );
+  migrationDismissedSignal = createDerivedFamily(
+    applicationScope,
+    (visit, { get }) =>
+      get(
+        migrationVisitState,
+        migrationIdentity(get, visit),
+      ).migrationNoticeDismissed,
+    { autoDispose: true },
+  );
+}
+
+function keepUsingGptForVisit(
+  scope: MigrationScope,
+  visit: MigrationVisitKey,
+): void {
+  initializeMigrationVisitState();
+  scope.set(
+    migrationVisitState,
+    migrationIdentity(scope.get.bind(scope), visit),
+    (state) => state.continued ? state : { ...state, continued: true },
+  );
+}
+
+function dismissMigrationForVisit(
+  scope: MigrationScope,
+  visit: MigrationVisitKey,
+): void {
+  initializeMigrationVisitState();
+  scope.set(
+    migrationVisitState,
+    migrationIdentity(scope.get.bind(scope), visit),
+    (state) => state.migrationNoticeDismissed
+      ? state
+      : { ...state, migrationNoticeDismissed: true },
+  );
+}
 
 let jsx: ReturnType<typeof getJsxRuntime>;
 let MigrationDialog: LazyComponent<MigrationDialogProps>;
@@ -265,6 +394,20 @@ function GptPluginMigrationBannerContent({
         }),
   });
 }
+
+GptPluginMigrationBannerContent.visitState = {
+  dismissMigrationForVisit,
+  initializeMigrationVisitState,
+  keepUsingGptForVisit,
+  get migrationDismissedSignal() {
+    initializeMigrationVisitState();
+    return migrationDismissedSignal;
+  },
+  get migrationVisitedSignal() {
+    initializeMigrationVisitState();
+    return migrationVisitedSignal;
+  },
+};
 
 initializeGptPluginMigrationBannerContent();
 export { GptPluginMigrationBannerContent };

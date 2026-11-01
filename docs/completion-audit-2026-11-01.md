@@ -139,3 +139,11 @@ the account-scoped conversations API with cursor-cycle protection and de-duplica
 visible message attachments, preserves project/gizmo origination filtering, registers the account-isolated panel, and renders
 loading, retry, empty, and file-open states. Focused coverage exercises registration, production opening, two-page query,
 duplicate suppression, API/message merging, account propagation, and the compatibility adapter.
+
+The subsequent announcement/migration batch replaces seven additional app-primary contracts. The responsive Home Banner
+presentation is now source-owned alongside announcement state, while GPT-to-plugin visit/dismiss state is account/user scoped
+and shared by the content and banner owners instead of being duplicated across rebuilt chunks. Current strict hub counts are
+app-shared 375/3,185, app-initial 1,484/8,204, and app-primary 170/917 consumed; all 12,306 exports remain classified and none
+are unreviewed. Renderer verification passes 1,888/1,888 with intentional dependency migrations enumerated per chunk. These
+figures measure aggregate-hub consumption, not a linear percentage of implementation effort, and must not be presented as
+proof of full decompilation.

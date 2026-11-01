@@ -4,7 +4,6 @@
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as chatChoiceChunk from "@rchunk/chat-choice-view";
 import * as bannerContentChunk from "@rchunk/gpt-plugin-migration-banner-content";
 
@@ -27,13 +26,22 @@ const {
   o_n: useNavigate,
   pfn: initializeMigrationExperiment,
 } = appInitialChunk;
-const {
-  Lp: initializeMigrationVisitState,
-  Mp: keepUsingGptForVisit,
-  Pp: migrationVisitedSignal,
-} = appPrimaryChunk;
 const { n: initializeChatChoiceView, t: ChatChoiceView } = chatChoiceChunk;
 const { GptPluginMigrationBannerContent } = bannerContentChunk;
+const migrationVisitState = (
+  GptPluginMigrationBannerContent as typeof GptPluginMigrationBannerContent & {
+    visitState: {
+      initializeMigrationVisitState(): void;
+      keepUsingGptForVisit(scope: unknown, visit: { gizmoId: string; visitKey: string }): void;
+      readonly migrationVisitedSignal: unknown;
+    };
+  }
+).visitState;
+const {
+  initializeMigrationVisitState,
+  keepUsingGptForVisit,
+  migrationVisitedSignal,
+} = migrationVisitState;
 
 let jsx: ReturnType<typeof getJsxRuntime>;
 let initialized = false;
@@ -61,7 +69,12 @@ function MigrationBannerErrorFallback({
   const navigate = useNavigate();
   const query = useSignalFamilyValue(gptResourceQuery, gizmoId);
   const visitKey = { gizmoId, visitKey: location.pathname };
-  const shouldShow = useSignalFamilyValue(migrationVisitedSignal, visitKey);
+  const shouldShow = (
+    useSignalFamilyValue as unknown as (
+      signal: unknown,
+      key: { gizmoId: string; visitKey: string },
+    ) => boolean
+  )(migrationVisitedSignal, visitKey);
   return shouldShow && query.data?.gizmo?.migrated_plugin_id
     ? jsx.jsx(ChatChoiceView, {
         gptName: query.data.gizmo.display.name,

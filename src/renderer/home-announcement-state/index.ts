@@ -1,7 +1,6 @@
 // home-announcement-state —— Home 页多代理与限流重置公告的状态和内容。
 
 import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import type {
@@ -20,12 +19,15 @@ const {
   I3: jsxRuntime,
   LX: useSignalScope,
   OM: multiAgentBannerActionEvent,
+  Yh: Button,
   Y2: FormattedMessage,
   ZI: applicationScope,
   e6: reactRuntime,
   ig: DismissIcon,
   kM: multiAgentBannerDismissedEvent,
+  m4: classNames,
   n4: useIntl,
+  Zh: initializeButton,
 } = appSharedChunk;
 const {
   $M: getRateLimitAnnouncementConfig,
@@ -41,15 +43,19 @@ const {
   kI: useCurrentHost,
   lfn: getRateLimitExperiment,
   n6: RateLimitResetIcon,
+  n7: AnnouncementSurface,
   nN: useMultiAgentFeatureEnabled,
   ngn: getPersistedFallback,
   ont: hostFeaturesQueryFamily,
+  r7: initializeAnnouncementSurface,
   ugn: localHostId,
   uht: useAccountQuery,
   vP: RateLimitResetDialog,
   xpn: logProductEvent,
 } = appInitialChunk;
-const { Sm: Banner } = appPrimaryChunk;
+const { fit: Badge } = appInitialChunk as unknown as {
+  fit?: (props: { children?: unknown; variant?: string }) => unknown;
+};
 
 const MULTI_AGENT_FEATURE = "multi_agent";
 const MULTI_AGENT_DISMISSED_KEY = "has-seen-multi-agent-composer-banner";
@@ -93,6 +99,31 @@ interface RateLimitResetBannerProps {
   onSeeResets(): void;
 }
 
+interface BannerAction {
+  ariaLabel?: string;
+  disabled?: boolean;
+  icon?: (props: { className?: string }) => unknown;
+  label?: unknown;
+  loading?: boolean;
+  onClick?: (event?: unknown) => void;
+}
+
+interface HomeAnnouncementBannerProps {
+  actionsPlacement?: "aside" | "body" | "bodyOnNarrow";
+  additionalActions?: unknown;
+  attachedToComposer?: boolean;
+  badge?: unknown;
+  density?: unknown;
+  description?: unknown;
+  dismissAction?: BannerAction;
+  leadingVisual?: unknown;
+  primaryAction?: BannerAction;
+  primaryActionRef?: unknown;
+  secondaryAction?: BannerAction;
+  title?: unknown;
+  variant?: "beacon" | "default";
+}
+
 function initializeRuntime(): void {
   if (initialized) return;
   initialized = true;
@@ -100,6 +131,8 @@ function initializeRuntime(): void {
     ? reactRuntime()
     : reactRuntime);
   jsx = typeof jsxRuntime === "function" ? jsxRuntime() : jsxRuntime;
+  initializeAnnouncementSurface?.();
+  initializeButton?.();
   multiAgentDismissedState = createPersistedSignal(
     MULTI_AGENT_DISMISSED_KEY,
     false,
@@ -109,6 +142,190 @@ function initializeRuntime(): void {
     {},
   );
 }
+
+function BannerActionButton({
+  action,
+  buttonRef,
+  kind,
+  variant = "default",
+}: {
+  action: BannerAction;
+  buttonRef?: unknown;
+  kind: "dismiss" | "primary" | "secondary";
+  variant?: "beacon" | "default";
+}): unknown {
+  const runtime = getAnnouncementRuntime();
+  const iconOnly = action.icon != null && action.label == null;
+  const beacon = variant === "beacon";
+  const color = kind === "primary"
+    ? "primary"
+    : beacon
+      ? iconOnly
+        ? "ghostActive"
+        : "outlineGhost"
+      : "ghost";
+  const size = beacon ? (iconOnly ? "inputIcon" : "dialog") : "composerSm";
+  const Icon = action.icon;
+  return runtime.jsx.jsx(Button, {
+    ref: buttonRef,
+    "aria-label": action.ariaLabel,
+    className: classNames(
+      !beacon &&
+        (iconOnly
+          ? "border-transparent text-codex-description hover:text-default"
+          : "px-3 [@container_(max-width:400px)]:flex-1 [@container_(max-width:400px)]:justify-center"),
+    ),
+    color,
+    disabled: action.disabled,
+    loading: action.loading,
+    onClick: action.onClick,
+    radius: "full",
+    size,
+    uniform: iconOnly,
+    children: [
+      Icon == null
+        ? null
+        : runtime.jsx.jsx(Icon, { className: beacon ? undefined : "icon-xs" }),
+      action.label,
+    ],
+  });
+}
+
+function HomeAnnouncementBanner({
+  actionsPlacement = "aside",
+  additionalActions,
+  attachedToComposer = false,
+  badge,
+  density,
+  description,
+  dismissAction,
+  leadingVisual,
+  primaryAction,
+  primaryActionRef,
+  secondaryAction,
+  title,
+  variant = "default",
+}: HomeAnnouncementBannerProps): unknown {
+  const runtime = getAnnouncementRuntime();
+  const hasActions =
+    additionalActions != null ||
+    primaryAction != null ||
+    secondaryAction != null ||
+    dismissAction != null;
+  const renderActions = (extraClassName?: string) =>
+    runtime.jsx.jsx("div", {
+      className: classNames(
+        "flex items-center gap-2",
+        variant === "beacon" && "min-w-0 flex-wrap",
+        actionsPlacement === "aside" &&
+          "self-center [@container_(max-width:400px)]:w-full [@container_(max-width:400px)]:justify-center [@container_(max-width:400px)]:self-stretch",
+        actionsPlacement === "body" && "mt-3 w-full justify-end",
+        actionsPlacement === "bodyOnNarrow" &&
+          "justify-start [@container_(max-width:400px)]:mt-3",
+        extraClassName,
+      ),
+      children: [
+        secondaryAction == null
+          ? null
+          : runtime.jsx.jsx(BannerActionButton, {
+              action: secondaryAction,
+              kind: "secondary",
+              variant,
+            }),
+        primaryAction == null
+          ? null
+          : runtime.jsx.jsx(BannerActionButton, {
+              action: primaryAction,
+              buttonRef: primaryActionRef,
+              kind: "primary",
+              variant,
+            }),
+        dismissAction == null || variant === "beacon"
+          ? null
+          : runtime.jsx.jsx(BannerActionButton, {
+              action: dismissAction,
+              kind: "dismiss",
+            }),
+        additionalActions,
+      ],
+    });
+  const bodyActions =
+    hasActions && actionsPlacement === "body" ? renderActions() : null;
+  const narrowActions =
+    hasActions && actionsPlacement === "bodyOnNarrow"
+      ? renderActions("hidden [@container_(max-width:400px)]:flex")
+      : null;
+  const wideActions =
+    hasActions && actionsPlacement === "bodyOnNarrow"
+      ? renderActions("[@container_(max-width:400px)]:hidden")
+      : null;
+  const asideActions =
+    hasActions && actionsPlacement === "aside" ? renderActions() : null;
+  const trailingAction =
+    variant === "beacon" && dismissAction != null
+      ? runtime.jsx.jsx(BannerActionButton, {
+          action: dismissAction,
+          kind: "dismiss",
+          variant: "beacon",
+        })
+      : undefined;
+  const visual =
+    leadingVisual == null
+      ? null
+      : runtime.jsx.jsx("div", {
+          className: classNames(
+            "flex size-12 shrink-0 items-center justify-center self-center text-secondary",
+            actionsPlacement === "bodyOnNarrow" &&
+              "[@container_(max-width:400px)]:self-start",
+          ),
+          children: leadingVisual,
+        });
+  const heading = runtime.jsx.jsx("div", {
+    className: classNames(
+      "min-w-0 text-default",
+      variant === "beacon" ? "text-sm font-bold" : "text-base font-medium",
+    ),
+    children: title,
+  });
+  const badgeNode =
+    badge == null
+      ? null
+      : runtime.jsx.jsx(Badge ?? "span", { variant: "outline", children: badge });
+  const copy = runtime.jsx.jsx("div", {
+    className: "min-w-0 flex-1",
+    children: [
+      runtime.jsx.jsx("div", {
+        className: "flex flex-wrap items-center gap-2",
+        children: [heading, badgeNode],
+      }),
+      runtime.jsx.jsx("div", {
+        className: classNames(
+          "text-sm text-pretty text-secondary",
+          variant === "beacon" ? "leading-5" : "leading-tight",
+        ),
+        children: description,
+      }),
+      bodyActions,
+      narrowActions,
+    ],
+  });
+  return runtime.jsx.jsx(AnnouncementSurface, {
+    attachedToComposer,
+    content: runtime.jsx.jsx("div", {
+      className:
+        "flex min-w-0 items-center gap-2 [@container_(max-width:400px)]:items-start",
+      children: [visual, copy],
+    }),
+    customCtas: asideActions ?? wideActions ?? undefined,
+    density,
+    stackOnNarrow: true,
+    trailingAction,
+    variant: "announcement",
+    wrapCtas: variant === "beacon",
+  });
+}
+
+const Banner = HomeAnnouncementBanner;
 
 function initializeAnnouncementClassification(): void {
   initializeRuntime();
@@ -406,6 +623,11 @@ function useRateLimitResetAnnouncement(): RateLimitResetEligibility {
       (usageQuery.data == null && usageQuery.isLoading === true),
   };
 }
+
+initializeRateLimitResetAnnouncementState.presentation = {
+  Banner: HomeAnnouncementBanner,
+  initializeBanner: initializeRuntime,
+};
 
 export {
   initializeAppUpsellAnnouncementState as a,

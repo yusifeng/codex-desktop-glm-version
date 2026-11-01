@@ -4,7 +4,6 @@
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as homeBeaconChunk from "@rchunk/home-beacon";
 import * as composerSlotChunk from "@rchunk/composer-announcement-slot";
 import * as modalSourceChunk from "@rchunk/announcement-modal-source-bridge";
@@ -46,7 +45,6 @@ const {
   vN: FastModeIcon,
   xpn: logAnalyticsEvent,
 } = appInitialChunk;
-const { Sm: AnnouncementShell } = appPrimaryChunk;
 const {
   r: useHomeBeacon,
   t: initializeHomeBeacon,
@@ -64,6 +62,11 @@ const {
   t: initializeHomeAnnouncementState,
   u: useMultiAgentAnnouncementEligibility,
 } = announcementStateChunk;
+const { Banner: AnnouncementShell } = (
+  initializeHomeAnnouncementState as typeof initializeHomeAnnouncementState & {
+    presentation: { Banner: (props: Record<string, unknown>) => unknown };
+  }
+).presentation;
 const { t: CustomGptBanner } = bannerChunk;
 const { HomeComposerAnnouncementCandidates } = composerCandidatesChunk;
 

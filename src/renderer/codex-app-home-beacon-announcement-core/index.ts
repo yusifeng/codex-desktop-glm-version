@@ -5,6 +5,7 @@ import * as appPrimaryChunk from "@rchunk/app-primary";
 import { formatBeaconActionKey as createBeaconActionKey } from "../app-primary/runtime/format-beacon-action-key";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as homeBeaconFinanceChunk from "@rchunk/home-beacon-finance";
+import * as homeAnnouncementStateChunk from "@rchunk/home-announcement-state";
 import * as pcaConnectorActionChunk from "@rchunk/pca-connector-action";
 import * as pcaEligibilityChunk from "@rchunk/pca-connector-eligibility";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
@@ -41,12 +42,10 @@ const {
 } = appInitialChunk;
 const {
   $m: isAllowedRemoteImage,
-  Cm: initializeBanner,
   Dh: initializePageContextAvailability,
   Hm: unavailableActionOverride,
   Hp: nonChatBeaconClassName,
   Km: initializeBeaconActions,
-  Sm: Banner,
   Up: initializeBeaconDialog,
   Vp: initializeBeaconPresentation,
   _h: resolveBeacon,
@@ -55,6 +54,18 @@ const {
   vh: dismissBeacon,
   xh: recordBeaconView,
 } = appPrimaryChunk;
+const announcementPresentation = (
+  homeAnnouncementStateChunk.t as typeof homeAnnouncementStateChunk.t & {
+    presentation: {
+      Banner: (props: Record<string, unknown>) => unknown;
+      initializeBanner(): void;
+    };
+  }
+).presentation;
+const {
+  Banner,
+  initializeBanner,
+} = announcementPresentation;
 const {
   FX: initializeSignalRuntime,
   H3: initializeDialogUi,

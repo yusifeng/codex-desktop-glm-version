@@ -75,11 +75,13 @@ const result = await esbuild.build({
                   export const vN = "FastIcon";
                 `,
                 "app-primary": `
-                  export const Ne = "AnnouncementEntries"; export const Sm = "AnnouncementShell";
+                  export const Ne = "AnnouncementEntries";
                   export const $p = input => input.isLoading ? "loading" : input.isEligible ? "eligible" : "ineligible";
                 `,
                 "home-announcement-state": `
-                  export const t = () => {};
+                  const initialize = () => {};
+                  initialize.presentation = { Banner: "AnnouncementShell" };
+                  export { initialize as t };
                   export const u = () => ({ isEligible: false, isLoading: false, content: null });
                 `,
                 "announcement-entry-points": `export const t = () => {};`,

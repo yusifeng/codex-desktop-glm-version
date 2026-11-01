@@ -56,7 +56,6 @@ const {
   $p: getAnnouncementStatus,
   Ch: useHomeBeaconCandidate,
   Ne: AnnouncementEntriesHost,
-  Sm: AnnouncementShell,
 } = appPrimaryChunk;
 const {
   r: initializeBeaconAnnouncement,
@@ -85,6 +84,11 @@ const {
   t: initializeRateLimitResetAnnouncementState,
   u: useMultiAgentAnnouncementEligibility,
 } = announcementStateChunk;
+const { Banner: AnnouncementShell } = (
+  initializeRateLimitResetAnnouncementState as typeof initializeRateLimitResetAnnouncementState & {
+    presentation: { Banner: (props: Record<string, unknown>) => unknown };
+  }
+).presentation;
 
 interface ReactRuntime {
   useState<Value>(initialValue: Value): [

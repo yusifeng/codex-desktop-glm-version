@@ -21,6 +21,46 @@ const ORIGINAL_DIR = path.resolve(
   originalArgIndex !== -1 ? args[originalArgIndex + 1] : "../chatgpt-desktop-src",
 );
 
+// Semantic owner extraction deliberately moves selected hub dependencies into
+// smaller rewritten chunks. Keep these dependency-graph changes explicit and
+// per chunk so an unrelated missing/extra import still fails verification.
+const EXPECTED_IMPORT_CHANGES = new Map([
+  [
+    CHUNKS["worktree-onboarding-banner-controller"],
+    {
+      missing: new Set([`./${CHUNKS["app-primary"]}`]),
+      extra: new Set([`./${CHUNKS["home-announcement-state"]}`]),
+    },
+  ],
+  [
+    CHUNKS["home-announcement-state"],
+    { missing: new Set([`./${CHUNKS["app-primary"]}`]), extra: new Set() },
+  ],
+  [
+    CHUNKS["codex-app-home-beacon-announcement-core"],
+    { missing: new Set(), extra: new Set([`./${CHUNKS["home-announcement-state"]}`]) },
+  ],
+  [
+    CHUNKS["realtime-voice-home-announcement"],
+    {
+      missing: new Set([`./${CHUNKS["app-primary"]}`]),
+      extra: new Set([`./${CHUNKS["home-announcement-state"]}`]),
+    },
+  ],
+  [
+    CHUNKS["codex-home-announcements"],
+    { missing: new Set([`./${CHUNKS["app-primary"]}`]), extra: new Set() },
+  ],
+  [
+    CHUNKS.banner,
+    { missing: new Set([`./${CHUNKS["app-primary"]}`]), extra: new Set() },
+  ],
+  [
+    CHUNKS["gpt-plugin-migration-banner-content"],
+    { missing: new Set([`./${CHUNKS["app-primary"]}`]), extra: new Set() },
+  ],
+]);
+
 function importsOf(code) {
   const set = new Set();
   // 静态 import ... from "./x.js" / 动态 import("./x.js") / import.meta 之外的形式
@@ -80,10 +120,28 @@ for (const name of REWRITTEN) {
   const problems = [];
   const importsA = importsOf(originalCode);
   const importsB = importsOf(rebuiltCode);
-  const importsMissing = diffSets(importsA, importsB);
-  const importsExtra = diffSets(importsB, importsA);
+  const expectedImportChanges = EXPECTED_IMPORT_CHANGES.get(file) ?? {
+    missing: new Set(),
+    extra: new Set(),
+  };
+  const observedImportsMissing = new Set(diffSets(importsA, importsB));
+  const observedImportsExtra = new Set(diffSets(importsB, importsA));
+  const importsMissing = [...observedImportsMissing].filter(
+    (dependency) => !expectedImportChanges.missing.has(dependency),
+  );
+  const importsExtra = [...observedImportsExtra].filter(
+    (dependency) => !expectedImportChanges.extra.has(dependency),
+  );
+  const expectedMissingNotObserved = diffSets(expectedImportChanges.missing, observedImportsMissing);
+  const expectedExtraNotObserved = diffSets(expectedImportChanges.extra, observedImportsExtra);
   if (importsMissing.length) problems.push(`缺少 import: ${importsMissing.join(", ")}`);
   if (importsExtra.length) problems.push(`多余 import: ${importsExtra.join(", ")}`);
+  if (expectedMissingNotObserved.length) {
+    problems.push(`预期移除的 import 未发生: ${expectedMissingNotObserved.join(", ")}`);
+  }
+  if (expectedExtraNotObserved.length) {
+    problems.push(`预期新增的 import 未发生: ${expectedExtraNotObserved.join(", ")}`);
+  }
   const exportsA = exportsOfOriginal(originalCode);
   const exportsB = exportsOfRebuilt(rebuiltCode);
   const exportsMissing = diffSets(exportsA, exportsB);

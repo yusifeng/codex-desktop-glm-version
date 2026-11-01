@@ -16,8 +16,6 @@ const state = (globalThis.__migrationContentTest = {
   },
   account: { id: "account-1", structure: "personal" },
   access: { data: true },
-  visited: false,
-  dismissed: false,
   workspaceExperiment: false,
   workspaceGate: false,
   retirement: false,
@@ -25,8 +23,6 @@ const state = (globalThis.__migrationContentTest = {
   canMigrateResource: false,
   navigated: null,
   openedPlugin: null,
-  kept: null,
-  dismissedVisit: null,
   dialog: null,
   jsx: { jsx: (type, props, key) => ({ type, props, key }) },
 });
@@ -58,17 +54,40 @@ const result = await esbuild.build({
             contents:
               {
                 "app-shared": `
-                  export const I3 = () => globalThis.__migrationContentTest.jsx;
-                  export const ZI = Symbol("scope"); export const LX = () => "scope";
-                  export const BX = (source) => {
+                  const keyOf = value => JSON.stringify(value);
+                  const read = (source, parameter) => {
                     const s = globalThis.__migrationContentTest;
-                    if (source === "resource") return { data: s.resource };
+                    if (source === "resource") return { data: s.resource, isError: false };
                     if (source === "access") return s.access;
-                    if (source === "dismissed") return s.dismissed;
-                    if (source === "visited") return s.visited;
                     if (source === "permissions") return { data: { permissions: ["manage"] }, isPending: false, isError: false };
+                    if (source === "experiment-signal") return true;
+                    if (source === "account-id") return "account-1";
+                    if (source === "user-id") return "user-1";
+                    if (source?.kind === "state-family") {
+                      const key = source.key(parameter);
+                      if (!source.values.has(key)) source.values.set(key, source.initial(parameter));
+                      return source.values.get(key);
+                    }
+                    if (source?.kind === "derived-family") return source.derive(parameter, { get: read });
                     return undefined;
                   };
+                  export const I3 = () => globalThis.__migrationContentTest.jsx;
+                  export const ZI = Symbol("scope");
+                  export const LX = () => ({
+                    get: read,
+                    set(source, parameter, update) {
+                      const key = source.key(parameter);
+                      const current = read(source, parameter);
+                      source.values.set(key, typeof update === "function" ? update(current) : update);
+                    },
+                  });
+                  export const BX = read;
+                  export const oZ = (_scope, initial, _valueOptions, options) => {
+                    const family = { kind: "state-family", initial, key: value => keyOf(options?.key?.(value) ?? value), values: new Map() };
+                    globalThis.__migrationContentTest.visitFamily = family;
+                    return family;
+                  };
+                  export const rZ = (_scope, derive) => ({ kind: "derived-family", derive });
                   export const Jm = loader => {
                     globalThis.__migrationContentTest.lazyLoader = loader;
                     return "LazyMigrationDialog";
@@ -78,6 +97,7 @@ const result = await esbuild.build({
                 `,
                 "app-initial": `
                   export const fN = "resource"; export const Dln = "permissions";
+                  export const mfn = "experiment-signal"; export const mun = "account-id"; export const _un = "user-id";
                   export const N6t = () => ({ accountId: "account-1", userId: "user-1" });
                   export const uht = () => ({ data: globalThis.__migrationContentTest.account });
                   export const afn = () => ({ get: () => globalThis.__migrationContentTest.workspaceExperiment });
@@ -89,12 +109,6 @@ const result = await esbuild.build({
                   export const Qgn = () => {}; export const Oln = () => {}; export const M6t = () => {};
                   export const rht = () => {}; export const Vzt = () => {}; export const ifn = () => {};
                   export const mN = () => {}; export const l1 = () => {};
-                `,
-                "app-primary": `
-                  export const Ip = "dismissed"; export const Pp = "visited";
-                  export const Mp = (_scope, visit) => { globalThis.__migrationContentTest.kept = visit; };
-                  export const Np = (_scope, visit) => { globalThis.__migrationContentTest.dismissedVisit = visit; };
-                  export const Lp = () => {};
                 `,
                 "chat-choice-view": `export const n = () => {}; export const t = "ChoiceView";`,
                 "migrated-plugin-access": `
@@ -135,15 +149,8 @@ check(
 
 let node = migration.GptPluginMigrationBannerContent({ gizmoId: "gizmo-1" });
 check(
-  node.type === "MigratedPluginNotice",
-  "shows the initial migrated-plugin notice",
-);
-
-state.visited = true;
-node = migration.GptPluginMigrationBannerContent({ gizmoId: "gizmo-1" });
-check(
   typeof node.type === "function",
-  "switches to the migrated-plugin choice after a visit",
+  "projects an eligible migrated GPT through the visit-state owner",
 );
 let choice = node.type(node.props);
 check(
@@ -152,12 +159,6 @@ check(
 );
 choice.props.onUsePlugin();
 check(state.openedPlugin === "plugin-1", "opens an allowed migrated plugin");
-choice.props.onKeepUsingGpt();
-check(
-  state.kept.visitKey === "/g/gizmo-1",
-  "keeps the GPT for the current visit",
-);
-
 state.access = { isError: true, refetch: () => (state.retried = true) };
 choice = node.type(node.props);
 check(choice.props.accessState === "error", "reports plugin access failures");
@@ -168,6 +169,14 @@ check(
   state.navigated === "/plugins",
   "falls back to plugin discovery when access fails",
 );
+
+choice.props.onKeepUsingGpt();
+node = migration.GptPluginMigrationBannerContent({ gizmoId: "gizmo-1" });
+check(
+  node.type === "MigratedPluginNotice",
+  "keeps the GPT by atomically marking the account-scoped visit continued",
+);
+state.visitFamily.values.clear();
 
 state.workspaceExperiment = true;
 state.workspaceGate = true;
@@ -192,9 +201,10 @@ check(
 node.props.children.props.onDismiss();
 node.props.children.props.onMigrate();
 check(
-  state.dismissedVisit.gizmoId === "gizmo-1",
-  "dismisses the migration notice per GPT visit",
+  migration.GptPluginMigrationBannerContent({ gizmoId: "gizmo-1" }) === null,
+  "dismisses the migration notice in the account-scoped visit state",
 );
+state.visitFamily.values.clear();
 check(
   state.dialog.dialog === "LazyMigrationDialog" &&
     state.dialog.input.resource === state.resource,
@@ -219,7 +229,7 @@ check(
   "ignores non-GPT resources",
 );
 
-assert.equal(assertions, 16);
+assert.equal(assertions, 15);
 console.log(
   `${assertions} GPT plugin migration banner-content assertions passed`,
 );

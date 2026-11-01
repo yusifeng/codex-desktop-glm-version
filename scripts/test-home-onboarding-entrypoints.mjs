@@ -682,9 +682,10 @@ const worktreeBanner = await loadModule(
       export const eEt = () => {}; export const jst = () => {}; export const pdt = () => {};
       export const x3 = () => {}; export const ypn = () => {};
     `,
-    "app-primary": `
-      export const Sm = "Banner";
-      export const Cm = () => {};
+    "home-announcement-state": `
+      const initialize = () => {};
+      initialize.presentation = { Banner: "Banner", initializeBanner() {} };
+      export { initialize as t };
     `,
     "app-shared": `
       export const I3 = globalThis.__homeOnboardingTest.jsx;
@@ -868,6 +869,9 @@ const homeAnnouncementState = await loadModule("home-announcement-state", {
     export const vP = "RateLimitResetModal";
     export const Kot = "MultiAgentIcon";
     export const n6 = "ResetIcon";
+    export const fit = "Badge";
+    export const n7 = "AnnouncementSurface";
+    export const r7 = () => {};
     export const dun = (key, _fallback) => Symbol(key);
     export const kI = () => ({ id: "host" });
     export const jyt = () => ({ hostId: "local-host" });
@@ -890,6 +894,9 @@ const homeAnnouncementState = await loadModule("home-announcement-state", {
     export const kM = "dismissed";
     export const ig = "DismissIcon";
     export const Y2 = "FormattedMessage";
+    export const Yh = "Button";
+    export const Zh = () => {};
+    export const m4 = (...values) => values.filter(Boolean).join(" ");
     export const e6 = {
       useState: value => [value, () => {}],
       useRef: value => ({ current: value }),
@@ -907,7 +914,6 @@ const homeAnnouncementState = await loadModule("home-announcement-state", {
     export const BX = () => ({ data: [], isLoading: false });
     export const n4 = () => ({ formatMessage: descriptor => descriptor.defaultMessage });
   `,
-  "app-primary": "export const Sm = 'Banner';",
 });
 const multiAgentEligibility = homeAnnouncementState.u();
 check(
@@ -916,7 +922,7 @@ check(
 );
 const multiAgentBanner = homeAnnouncementState.s({});
 check(
-  multiAgentBanner.type === "Banner" &&
+  typeof multiAgentBanner.type === "function" &&
     multiAgentBanner.props.primaryAction.label.props.defaultMessage ===
       "Try now",
   "renders the multi-agent banner actions",

@@ -44,13 +44,17 @@ const result = await esbuild.build({
                   export const o_n = () => path => { globalThis.__bannerTest.navigated = path; };
                   export const Qgn = () => {}; export const pfn = () => {}; export const mN = () => {};
                 `,
-                "app-primary": `
-                  export const Pp = "visit";
-                  export const Mp = (_scope, value) => { globalThis.__bannerTest.kept = value; };
-                  export const Lp = () => {};
-                `,
                 "chat-choice-view": `export const n = () => {}; export const t = "ChoiceView";`,
-                "gpt-plugin-migration-banner-content": `export const GptPluginMigrationBannerContent = "MigrationContent";`,
+                "gpt-plugin-migration-banner-content": `
+                  function MigrationContent() {}
+                  const content = MigrationContent;
+                  content.visitState = {
+                    initializeMigrationVisitState() {},
+                    keepUsingGptForVisit(_scope, value) { globalThis.__bannerTest.kept = value; },
+                    migrationVisitedSignal: "visit",
+                  };
+                  export const GptPluginMigrationBannerContent = content;
+                `,
               }[importPath] ?? "export {};",
             loader: "js",
           }),
@@ -63,7 +67,7 @@ const banner = await import(
   `data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}`
 );
 const visible = banner.t({ gizmoId: "gizmo-1" });
-assert.equal(visible.type, "MigrationContent");
+assert.equal(visible.type.name, "MigrationContent");
 assert.equal(visible.props.gizmoId, "gizmo-1");
 assert.equal(visible.key, "gizmo-1");
 globalThis.__bannerTest.enabled = false;

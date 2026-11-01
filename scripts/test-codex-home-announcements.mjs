@@ -51,7 +51,6 @@ const result = await esbuild.build({
                   export const i_n = () => ({ pathname: "/" }); export const sbt = () => false;
                   export const CNt = () => ({ id: "rate", isEligible: true, isLoading: false, content: "rate" });
                 `,
-                "app-primary": `export const Sm = "AnnouncementShell";`,
                 "home-beacon": `
                   export const r = () => ({ accountId: null, beacon: null, containerBeacon: null, isEligible: false, isLoading: false, shouldSuppressVanillaPromos: false });
                   export const t = () => {};
@@ -59,7 +58,12 @@ const result = await esbuild.build({
                 "composer-announcement-slot": `export const n = () => {}; export const t = "CandidateHost";`,
                 "workspace-renewal-payment": `export const n = () => ({ isEligible: false, isLoading: false, content: null });`,
                 "codex-app-home-beacon-announcement-core": `export const r = () => {}; export const t = "Beacon";`,
-                "home-announcement-state": `export const t = () => {}; export const u = () => ({ id: "multi", isEligible: false, isLoading: false, content: null });`,
+                "home-announcement-state": `
+                  const initialize = () => {};
+                  initialize.presentation = { Banner: "AnnouncementShell" };
+                  export { initialize as t };
+                  export const u = () => ({ id: "multi", isEligible: false, isLoading: false, content: null });
+                `,
                 banner: `export const t = "CustomGptBanner";`,
                 "home-composer-announcement-candidates": `export const HomeComposerAnnouncementCandidates = "CandidateSource";`,
               }[importPath] ?? "export {};",

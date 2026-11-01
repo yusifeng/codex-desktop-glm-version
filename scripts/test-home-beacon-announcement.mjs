@@ -113,13 +113,17 @@ const beaconModule = await loadModule({
   `,
   "app-primary": `
     export const $m = url => /^https:\/\//.test(url);
-    export const Sm = "Banner";
     export const Hp = "beacon-shell";
     export const yh = ({ actionId, beaconId }) => beaconId + ":" + actionId;
     export const xh = (...args) => globalThis.__beaconAnnouncementTest.lifecycle.push(args);
     export const vh = () => {};
     export const _h = () => {};
     export const Hm = "UnavailableAction";
+  `,
+  "home-announcement-state": `
+    const initialize = () => {};
+    initialize.presentation = { Banner: "Banner", initializeBanner() {} };
+    export { initialize as t };
   `,
   "pca-connector-eligibility": `
     export const c = "BeaconActions";
