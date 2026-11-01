@@ -5606,3 +5606,13 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   `threads/fork-placement.ts` → `threads/operations.ts` 持有 account race、remote section 和 rollback 语义。
 - 删除已由 `browser-host-service.ts` 持有的 `Wke/Gke/qD` annotation-preview/viewport 重复 owner，并清除 8 个零引用旧常量。
 - thread operations、BrowserHost、early policy 共 128 项 focused 回归通过；测试索引 1845，no-unwired gate 1066 项。
+
+# 2026-11-01 browser extension action and favicon runtime extraction
+
+- 新增并真实接回 `browser-sidebar/browser-extension-runtime.ts`，统一持有 extension action 投影、ARGB 颜色转换、manifest icon
+  安全 fallback、feature/target gate、zoom anchor、toolbar/profile/event 订阅、recent-use/pin/context-menu 交互，以及 favicon URL/page
+  fallback、per-webContents/per-size 引用计数、去重和 cleanup。
+- `BrowserHostService`、`BrowserHistoryService` 与 `electron-message-handler.ts` 直接消费语义入口；主 chunk 旧
+  `Fke/RD/zD/Ike/Lke/Rke/zke/Bke/Vke/BD/VD/HD/UD/WD/GD/Hke/Uke/KD` 约 294 行实现已物理删除，没有留下第二份
+  subscription 或 favicon state owner。
+- focused 62 项及 BrowserHost/BrowserHistory/Electron handler 112 项相邻回归通过；测试索引 1846，no-unwired gate 1092 项。

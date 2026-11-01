@@ -3781,3 +3781,14 @@ prepend、app-server section create/move、account race gate 和失败回滚；�
 另清除 `ym/She/bm/Che/whe/The/xm/Ehe` 八个零引用旧常量；它们对应的有效语义早已位于 auth/start-config 等 owner，未保留死别名。
 thread operations、BrowserHost、early policy 三组共 128 项 focused 回归通过；测试索引仍为 1845 个唯一脚本，no-unwired gate
 扩至 1066 项。
+
+### 大型 owner 抽取：browser extension action 与 favicon runtime
+
+新增并真实接回 `browser-sidebar/browser-extension-runtime.ts`。同一 typed runtime 完整持有 extension action projection、signed ARGB
+颜色转换、manifest icon 候选排序与目录穿越防护、feature/target gate、zoom-scaled anchor、toolbar/profile/action-popup 订阅、recent-use、
+pin/context-menu，以及 favicon iconURL/page fallback、per-webContents/per-size WeakMap 引用计数、重复值抑制和销毁/RPC cleanup。
+
+`BrowserHostService`、`BrowserHistoryService` 和 Electron message handler 均已切换到语义入口。主 chunk 旧
+`Fke/RD/zD/Ike/Lke/Rke/zke/Bke/Vke/BD/VD/HD/UD/WD/GD/Hke/Uke/KD` 约 294 行已物理删除，因此不存在重复的 listener、
+subscription 或 favicon size state。focused suite 62 项覆盖行为、竞态清理与旧 owner 缺席，BrowserHost/BrowserHistory/Electron
+handler 三组 112 项相邻回归通过；测试索引增至 1846，no-unwired gate 扩至 1092 项。

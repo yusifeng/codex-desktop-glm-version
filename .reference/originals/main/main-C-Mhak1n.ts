@@ -455,6 +455,7 @@ const { createApplicationMenuRefreshLifecycle } = require("./main-app/startup/ap
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
 const { createBrowserHostServiceClass } = require("./main-app/browser-sidebar/browser-host-service.js");
+const { createBrowserExtensionRuntime } = require("./main-app/browser-sidebar/browser-extension-runtime.js");
 const { createBrowserHistoryServiceClass } = require("./main-app/browser-sidebar/browser-history-service.js");
 const { createDetachedBrowserRuntime } = require("./main-app/browser-sidebar/detached-browser-runtime.js");
 const { createExtensionRecentUseRegistryFactory } = require("./main-app/browser-sidebar/extension-recent-use.js");
@@ -20228,304 +20229,37 @@ var Tke = e.t((e, t) => {
   }),
   Nke = e.a(Mke()),
   Pke = n.wf({ icons: n.Ef(n.Of(), n.Of()).optional() });
-function Fke(e, t) {
-  return {
-    badgeBackgroundColor: zD(e.effectiveBadgeColors.backgroundColor),
-    badgeText: e.badgeText,
-    badgeTextColor: zD(e.effectiveBadgeColors.textColor),
-    enabled: e.visible,
-    forcePinned: t.forcePinnedExtensionIds.includes(e.id),
-    hasPopup: e.hasPopup,
-    iconDataUrl: e.icon.isEmpty() ? RD(e) : e.icon.toDataURL({ scaleFactor: 2 }),
-    id: e.id,
-    name: e.name,
-    pinned: t.pinnedExtensionIds.includes(e.id),
-    title: e.title,
-  };
-}
-function RD(e) {
-  let t = Pke.safeParse(e.manifest);
-  if (!t.success || t.data.icons == null) return null;
-  let n = (0, Nke.default)(
-    Object.entries(t.data.icons).filter(([e]) => Number.isFinite(Number(e))),
-    ([e]) => Number(e) < 32,
-    ([e]) => Math.abs(Number(e) - 32),
-  );
-  for (let [, t] of n) {
-    let n = (0, h.resolve)(e.path, t),
-      r = (0, h.relative)(e.path, n);
-    if (r === `..` || r.startsWith(`..${h.sep}`) || (0, h.isAbsolute)(r)) continue;
-    let i = l.nativeImage.createFromPath(n);
-    if (!i.isEmpty()) return i.toDataURL();
-  }
-  return null;
-}
-function zD(e) {
-  let t = (e < 0 ? e + 4294967296 : e).toString(16).padStart(8, `0`);
-  return `#${t.slice(2)}${t.slice(0, 2)}`;
-}
-async function Ike(e) {
-  let t = HD(e);
-  if (t.status !== `available`) return { status: `unsupported` };
-  let n = t.webContents.session.extensions.getExtensionToolbarState();
-  return {
-    actions: t.webContents.getExtensionActions().map((e) => Fke(e, n)),
-    status: `available`,
-    supportsContextMenu: !0,
-  };
-}
-async function Lke(e, t, n, r) {
-  if (t.isDestroyed()) return null;
-  let i = () => {
-      let t = e.extensions.getExtensionToolbarState();
-      return {
-        extensions: e.extensions
-          .getAllExtensions()
-          .map((e) => ({ iconDataUrl: RD(e), id: e.id, name: e.name })),
-        recentlyUsedExtensionIds: r.getRecentlyUsed(e, t),
-        toolbar: t,
-      };
-    },
-    o = i(),
-    s = n.dup(),
-    c = () => {
-      try {
-        var e = a.en();
-        e.u(s(i()));
-      } catch (t) {
-        e.e = t;
-      } finally {
-        e.d();
-      }
-    },
-    l = VD(e, c),
-    u = r.subscribe(e, c),
-    d = new BD(() => {
-      (l(), u(), t.removeListener(`destroyed`, f), s[Symbol.dispose]());
-    }),
-    f = () => d.unsubscribe();
-  (t.once(`destroyed`, f), s.onRpcBroken(f));
-  try {
-    return (await s(o), d);
-  } catch (e) {
-    throw (f(), e);
-  }
-}
-async function Rke(e, t, { actionId: n, anchorBounds: r }, i) {
-  let a = HD(e);
-  if (a.status !== `available`) return a.status;
-  if (t.isDestroyed()) return `invalid-target`;
-  let o = a.webContents.session,
-    s = a.webContents.triggerExtensionAction(n, { anchorRect: UD(t, r) });
-  return (s === `triggered` && i.recordUse(o, n), s);
-}
-async function zke(e, { actionId: t, pinned: n }, r) {
-  let i = HD(e);
-  if (i.status !== `available`) return i.status;
-  let a = i.webContents.session,
-    o = a.extensions.setExtensionPinned(t, n);
-  return ((o === `updated` || o === `unchanged`) && r.refreshPins(a), o);
-}
-async function Bke(e, t, { actionId: n, anchorBounds: r, source: i, sourceType: a }, o, s = !1) {
-  let c = HD(e);
-  if (c.status !== `available`) return c.status;
-  if (t.isDestroyed()) return `invalid-target`;
-  let l = c.webContents.session,
-    u = await c.webContents.showExtensionActionContextMenu(n, {
-      allowHiddenBlankTab: s,
-      anchorRect: UD(t, r),
-      source: i,
-      sourceType: a,
-    });
-  return (u === `closed` && o.refreshPins(l), u);
-}
-function Vke(e, t, n) {
-  let r = HD(e);
-  if (r.status !== `available` || t.isDestroyed()) return null;
-  let i = n.dup(),
-    o = !0,
-    s = (e) => {
-      if (o)
-        try {
-          var t = a.en();
-          t.u(i(e));
-        } catch (e) {
-          t.e = e;
-        } finally {
-          t.d();
-        }
-    },
-    c = r.webContents.session,
-    l = () => s({ type: `changed` }),
-    u = (e, t) => {
-      (t.webContentsId == null || t.webContentsId === r.webContents.id) && l();
-    },
-    d = (e, t) => s({ actionId: t.extensionId, type: `popup-opening` }),
-    f = (e, t) => s({ actionId: t.extensionId, type: `popup-opened` }),
-    p = (e, t) => s({ actionId: t.extensionId, type: `popup-closed` }),
-    m = VD(c, l);
-  (c.extensions.on(`extension-action-updated`, u),
-    r.webContents.on(`did-navigate`, l),
-    r.webContents.on(`did-navigate-in-page`, l),
-    r.webContents.on(`extension-action-popup-opening`, d),
-    r.webContents.on(`extension-action-popup-opened`, f),
-    r.webContents.on(`extension-action-popup-closed`, p));
-  let h = () => {
-    o &&
-      ((o = !1),
-      m(),
-      c.extensions.removeListener(`extension-action-updated`, u),
-      r.webContents.removeListener(`did-navigate`, l),
-      r.webContents.removeListener(`did-navigate-in-page`, l),
-      r.webContents.removeListener(`extension-action-popup-opening`, d),
-      r.webContents.removeListener(`extension-action-popup-opened`, f),
-      r.webContents.removeListener(`extension-action-popup-closed`, p),
-      r.webContents.removeListener(`destroyed`, h),
-      t.removeListener(`destroyed`, h),
-      i[Symbol.dispose]());
-  };
-  return (r.webContents.once(`destroyed`, h), t.once(`destroyed`, h), i.onRpcBroken(h), new BD(h));
-}
-var BD = class extends n.Uf {
-  unsubscribeOnce;
-  constructor(e) {
-    (super(), (this.unsubscribeOnce = e));
-  }
-  unsubscribe() {
-    let e = this.unsubscribeOnce;
-    ((this.unsubscribeOnce = null), e?.());
-  }
-  [Symbol.dispose]() {
-    this.unsubscribe();
-  }
-};
-function VD(e, t) {
-  return (
-    e.extensions.on(`extension-loaded`, t),
-    e.extensions.on(`extension-ready`, t),
-    e.extensions.on(`extension-unloaded`, t),
-    e.extensions.on(`pinned-extensions-changed`, t),
-    () => {
-      (e.extensions.removeListener(`extension-loaded`, t),
-        e.extensions.removeListener(`extension-ready`, t),
-        e.extensions.removeListener(`extension-unloaded`, t),
-        e.extensions.removeListener(`pinned-extensions-changed`, t));
-    }
-  );
-}
-function HD(e) {
-  if (!Tr().browserExtensions) return { status: `unsupported` };
-  let t = e();
-  return t == null || t.isDestroyed()
-    ? { status: `invalid-target` }
-    : { status: `available`, webContents: t };
-}
-function UD(e, t) {
-  if (
-    t == null ||
-    !Number.isFinite(t.x) ||
-    !Number.isFinite(t.y) ||
-    !Number.isFinite(t.width) ||
-    !Number.isFinite(t.height) ||
-    t.width <= 0 ||
-    t.height <= 0
-  )
-    return;
-  let n = e.getZoomFactor();
-  return {
-    height: Math.round(t.height * n),
-    width: Math.round(t.width * n),
-    x: Math.round(t.x * n),
-    y: Math.round(t.y * n),
-  };
-}
-var WD = new WeakMap();
-async function GD(e, { destinationURL: t, iconURL: n, scaleFactor: r }) {
-  if (n != null) {
-    let t = KD(await e.getFaviconForIconURL(n).catch(() => null), r);
-    if (t != null) return t;
-  }
-  return KD(await e.getFavicon(t), r);
-}
-function Hke(e, t, n, r) {
-  if (e == null || e.isDestroyed() || t.isDestroyed()) return;
-  let i = WD.get(e) ?? new Map(),
-    o = r.dup(),
-    s = !0,
-    c,
-    l = (e) => {
-      if (s && e !== c)
-        try {
-          var t = a.en();
-          ((c = e), t.u(o(e)));
-        } catch (e) {
-          t.e = e;
-        } finally {
-          t.d();
-        }
-    },
-    u = () => {
-      l(KD(e.getFaviconImage({ size: n }), 2));
-    },
-    d = (e, t, r) => {
-      r.sizes.includes(n) ? u() : l(null);
-    },
-    f = () => {
-      if (!s) return;
-      ((s = !1),
-        e.removeListener(`owl-favicon-image-updated`, d),
-        e.removeListener(`destroyed`, p),
-        t.removeListener(`destroyed`, f),
-        o[Symbol.dispose]());
-      let r = (i.get(n) ?? 1) - 1;
-      (r === 0 ? i.delete(n) : i.set(n, r),
-        i.size === 0 && WD.delete(e),
-        e.isDestroyed() || e.setFaviconImageSizes([16, ...i.keys()]));
-    },
-    p = () => {
-      (l(null), f());
-    };
-  return (
-    e.on(`owl-favicon-image-updated`, d),
-    e.once(`destroyed`, p),
-    t.once(`destroyed`, f),
-    o.onRpcBroken(f),
-    i.set(n, (i.get(n) ?? 0) + 1),
-    WD.set(e, i),
-    e.setFaviconImageSizes([16, ...i.keys()]),
-    u(),
-    new Uke(f)
-  );
-}
-var Uke = class extends n.Uf {
-  disposeSubscription;
-  constructor(e) {
-    (super(), (this.disposeSubscription = e));
-  }
-  [Symbol.dispose]() {
-    this.disposeSubscription();
-  }
-};
-function KD(e, t) {
-  return e == null || e.isEmpty()
-    ? null
-    : t == null
-      ? e.toDataURL()
-      : e.toDataURL({ scaleFactor: t });
-}
+var {
+  getExtensionActions,
+  loadFaviconData,
+  setExtensionPinned,
+  showExtensionActionContextMenu,
+  subscribeExtensionActionEvents,
+  subscribeExtensionProfile,
+  subscribeFavicon,
+  triggerExtensionAction,
+} = createBrowserExtensionRuntime({
+  RpcHandlerBase: n.Uf,
+  createUsingScope: a.en,
+  featureAvailability: Tr,
+  iconManifestSchema: Pke,
+  nativeImage: l.nativeImage,
+  orderBy: Nke.default,
+  path: h,
+});
 var BrowserHostService = createBrowserHostServiceClass({
   RpcHandlerBase: n.Uf,
   ExtensionActionMenus: wke,
   browserMessageChannel: a.At,
   browserStorageIdOf: threadBrowserTabKey,
   browserTabIdOf: a.bn,
-  getExtensionActions: Ike,
-  subscribeExtensionProfile: Lke,
-  setExtensionPinned: zke,
-  showExtensionActionContextMenu: Bke,
-  subscribeExtensionActionEvents: Vke,
-  subscribeFavicon: Hke,
-  triggerExtensionAction: Rke,
+  getExtensionActions,
+  subscribeExtensionProfile,
+  setExtensionPinned,
+  showExtensionActionContextMenu,
+  subscribeExtensionActionEvents,
+  subscribeFavicon,
+  triggerExtensionAction,
 });
 var BrowserProfileImportService = createBrowserProfileImportServiceClass({
   RpcHandlerBase: n.Uf,
@@ -20541,7 +20275,7 @@ var BrowserHistoryService = createBrowserHistoryServiceClass({
   clearBrowserData: Zc,
   fromWebContents: (webContents) => l.BrowserWindow.fromWebContents(webContents),
   displayScaleFactor: (window) => l.screen.getDisplayMatching(window.getBounds()).scaleFactor,
-  loadFaviconData: GD,
+  loadFaviconData,
 });
 var { createDetachedBrowserKindHandler, findDetachedBrowserPageWebContents } =
   createDetachedBrowserRuntime({
@@ -33817,7 +33551,7 @@ var r$e = createElectronMessageHandlerClass({
   featureFlags: Tr,
   dependencies: {
     GBe,
-    GD,
+    loadFaviconData,
     IH,
     KBe,
     toggleTraceRecording,

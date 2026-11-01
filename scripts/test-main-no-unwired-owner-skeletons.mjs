@@ -109,6 +109,7 @@ const realOwners = [
   ["src/main/main-app/browser-sidebar/browser-webview-identity-policy.ts", "createBrowserWebviewIdentityPolicy"],
   ["src/main/main-app/browser-sidebar/site-page-event-runtime.ts", "createSitePageEventRuntime"],
   ["src/main/main-app/browser-sidebar/browser-host-service.ts", "createBrowserHostServiceClass"],
+  ["src/main/main-app/browser-sidebar/browser-extension-runtime.ts", "createBrowserExtensionRuntime"],
   ["src/main/main-app/window/browser-window-rpc-services.ts", "createBrowserProfileImportServiceClass"],
   ["src/main/main-app/browser-sidebar/browser-history-service.ts", "createBrowserHistoryServiceClass"],
   ["src/main/main-app/browser-sidebar/detached-browser-runtime.ts", "createDetachedBrowserRuntime"],
@@ -174,6 +175,10 @@ for (const path of removedSkeletons) {
 
 const main = fs.readFileSync(
   new URL(".reference/originals/main/main-C-Mhak1n.ts", root),
+  "utf8",
+);
+const electronMessageHandler = fs.readFileSync(
+  new URL("src/main/main-app/window/electron-message-handler.ts", root),
   "utf8",
 );
 const markdownPlainText = fs.readFileSync(
@@ -1031,5 +1036,23 @@ assert.equal(main.includes("$b = n.df([`manual`"), false, "fork-only sort schema
 assert.equal(main.includes("var Wke = class"), false, "generated annotation preview owner must be removed");
 assert.equal(main.includes("async function Gke("), false, "generated viewport wait owner must be removed");
 assert.equal(main.includes("qD = new WeakMap()"), false, "generated viewport wait map must be removed");
+assert.equal(main.includes('require("./main-app/browser-sidebar/browser-extension-runtime.js")'), true, "browser extension runtime is wired");
+assert.equal(main.includes("createBrowserExtensionRuntime({"), true, "browser extension runtime is composed");
+assert.equal(main.includes("getExtensionActions,\n  subscribeExtensionProfile,"), true, "BrowserHost consumes semantic extension actions/profile");
+assert.equal(main.includes("subscribeExtensionActionEvents,\n  subscribeFavicon,"), true, "BrowserHost consumes semantic extension event owners");
+assert.equal(main.includes("displayScaleFactor: (window) => l.screen.getDisplayMatching(window.getBounds()).scaleFactor,\n  loadFaviconData,"), true, "BrowserHistory consumes semantic favicon loader");
+assert.equal(electronMessageHandler.includes("loadFaviconData(t.faviconService, e)"), true, "Electron message handler consumes semantic favicon loader");
+for (const generatedName of [
+  "Fke", "RD", "zD", "Ike", "Lke", "Rke", "zke", "Bke", "Vke", "VD", "HD", "UD", "GD", "Hke", "KD",
+]) {
+  assert.equal(
+    new RegExp(`^(?:async )?function ${generatedName}\\(`, "m").test(main),
+    false,
+    `generated browser extension helper ${generatedName} must be removed`,
+  );
+}
+assert.equal(/^var BD = class/m.test(main), false, "generated extension subscription owner must be removed");
+assert.equal(/^var Uke = class/m.test(main), false, "generated favicon subscription owner must be removed");
+assert.equal(/^var WD = new WeakMap\(\)/m.test(main), false, "generated favicon state owner must be removed");
 
-console.log("1066 main unwired-owner skeleton assertions passed");
+console.log("1092 main unwired-owner skeleton assertions passed");

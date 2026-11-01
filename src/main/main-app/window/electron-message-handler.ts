@@ -42,10 +42,10 @@ function createElectronMessageHandlerClass({
   dependencies,
 }: ElectronMessageHandlerDependencies) {
   const {
-    GBe, GD, IH, KBe, LUe, Lr, MainThreadJankSampler, Mze, OZ, Vt, XQe, ZBe,
+    GBe, IH, KBe, LUe, Lr, MainThreadJankSampler, Mze, OZ, Vt, XQe, ZBe,
     applySparseStateWrite, broadcastPersistedAtomUpdate, combinePerformanceSpanSnapshots,
     deletePersistedBrowserConversation, forwardBrowserNavigationUrl, lWe,
-    performanceHeartbeatIntervalMs, performanceRequestTtlMs, performanceTriggerMinIntervalMs,
+    loadFaviconData, performanceHeartbeatIntervalMs, performanceRequestTtlMs, performanceTriggerMinIntervalMs,
     rZe, readHostWorktreeSettings, rt, setRemoteControlEnabled, setRemoteControlSessionActive,
     summarizeWindowAttention, tee, toggleTraceRecording, uEe,
   } = dependencies;
@@ -214,7 +214,7 @@ class ElectronMessageHandler {
           (t.surface === `composer` ? e : null),
         async (e) => {
           let t = this.browserHostManager.getBrowserSession();
-          return t == null ? null : GD(t.faviconService, e);
+          return t == null ? null : loadFaviconData(t.faviconService, e);
         },
       )),
       (this.browserHostManager = new tQe(
