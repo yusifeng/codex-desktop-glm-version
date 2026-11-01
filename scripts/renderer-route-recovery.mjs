@@ -318,6 +318,7 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "connect-plugins-submenu-item-4ea7d2e57cab.js",
   "content-bd6ed75ea274.js",
   "equation-44cf0b1d4b75.js",
+  "feedback-form-dialog-463404df986b.js",
   "git-settings-537e4135cecb.js",
   "hooks-settings-fde35406d6f4.js",
   "import-settings-ec2688b74a01.js",
@@ -345,11 +346,13 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "workbook-review-utils-3e78f7501b68.js",
   "workspace-agent-detail-query-3cb2bb771d2e.js",
   "presentation-f4eb8ac38003.js",
+  "publish-actions-271f912485e5.js",
   "result-card-17125719c243.js",
   "runtime-4b6d284756d8.js",
   "quick-chat-obstacles-c569ea17ffc9.js",
   "thread-app-shell-chrome-e245ed2613ae.js",
   "thread-overflow-menu-51894ca4476d.js",
+  "worktree-setup-auto-fix-4dc0f12b7219.js",
 ]);
 
 // Full release-faithful React/runtime modules promoted into their semantic
@@ -475,7 +478,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ],
   ["quick-chat-drop-zones", "drop-zones-5d14ded04e79.js"],
   ["exec-shell-container", "exec-shell-container-acf07586aee6.js"],
-  ["feedback-form-dialog", "feedback-form-dialog-463404df986b.js"],
   [
     "git-action-new-branch-field",
     "git-action-new-branch-field-a2e24da5e504.js",
@@ -503,13 +505,11 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
     "open-thread-pull-request-side-panel-tab-4cc87983599f.js",
   ],
   ["plugin-picker-menu-content", "plugin-picker-menu-content-a51d37a29207.js"],
-  ["publish-actions", "publish-actions-271f912485e5.js"],
   ["pull-request-actions", "pull-request-actions-5ac6dcc71dec.js"],
   ["pull-request-fix-workflow", "pull-request-fix-workflow-1561e22a0cbc.js"],
   ["thread-handoff-modal", "thread-handoff-modal-ccac59d04293.js"],
   ["thread-panel-toggle-button", "thread-panel-toggle-button-d0ce9733e408.js"],
   ["use-app-connect-flow", "use-app-connect-flow-e16aee878521.js"],
-  ["worktree-setup-auto-fix", "worktree-setup-auto-fix-4dc0f12b7219.js"],
 ]);
 
 export const SEMANTIC_ROUTE_OVERRIDES = new Set([
