@@ -11,6 +11,7 @@
 import "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
+import "@rchunk/app-primary";
 import "@rchunk/color-icon";
 import "@rchunk/connector-logo-stack";
 import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";

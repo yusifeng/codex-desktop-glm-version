@@ -1,6 +1,12 @@
 import "@rchunk/rolldown-runtime";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as appSharedChunk from "@rchunk/app-shared";
+import "@rchunk/security-browser";
+import "@rchunk/settings-route-state";
+import "@rchunk/security-messages";
+import "@rchunk/confirmation";
+import "@rchunk/history";
+import "@rchunk/order-yubikey-dialog";
 import { n as createSecurityQueries, t as initializeSecurityClient } from "@rchunk/security-client";
 import { i as initializeSecurityShared, n as SecurityLoadingState } from "@rchunk/security-shared";
 import { r as initializeLinkedAppLogo, n as LinkedAppLogo } from "@rchunk/linked-app-logo";

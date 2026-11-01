@@ -1,5 +1,17 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Composer runtime 大批次：`codex-micro-mini-game-composer`、
+`right-panel-composer-overlay` 与 `sketch-composer-host-core` 已从 release-faithful owner
+迁到可维护 React/TypeScript，一次删除 4,823 行原始 owner。Codex Micro 不再是通用 canvas
+占位动画，现恢复 Markdown/字形关卡、Asteroids/Brick Breaker/Snake 三套独立物理状态机、
+摇杆/HID 输入、得分/碰撞与 ResizeObserver/RAF 生命周期；Right Panel 恢复 browser-tab/runtime
+signal 投影、default/compact/expanded 模式、reveal/hide handle、wheel gesture、portal、焦点与几何观察；
+Sketch 修正原实现把 `sketch.t` 错接为画布的问题，接回真实 `sketch.o` canvas 与 `sketch.l`
+snapshot hook，并恢复工具/形状/颜色/尺寸、移动端切换、undo/redo、保存门禁、discard 和 attachment
+transition。三套 focused suites 共 87 项断言、test-index、typecheck 及删除 owner 后的 renderer source-build
+通过；同时补齐受影响语义 owner 的发布依赖边，完整结构校验达到 1,888/1,888、0 failures。
+严格剩余由 23 个 / 113,269 行降至 20 个 / 108,446 行。
+
 2026-11-02 MCP tool activity/approval 大批次：`mcp-tool-activity-label` 已从
 10,030 行发布版 owner 迁出。语义源码保留发布版 928 个 activity descriptor 与 167 个
 approval descriptor（ID 和 ICU default message 全覆盖），恢复 Figma、Gmail、Google Calendar、

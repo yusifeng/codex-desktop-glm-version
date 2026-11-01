@@ -1,6 +1,16 @@
 import "@rchunk/rolldown-runtime";
+import "@rchunk/app-primary";
 import * as appSharedChunk from "@rchunk/app-shared";
 import "@rchunk/app-initial";
+import "@rchunk/theme-font-family";
+import "@rchunk/theme-font-face-loader";
+import "@rchunk/file-diff-alt";
+import "@rchunk/triangle-warning";
+import "@rchunk/permissions-mode-visibility";
+import "@rchunk/chatgpt-accent-messages";
+import "@rchunk/middle-truncated-text";
+import "@rchunk/settings-route-state";
+import "@rchunk/dock-icon-setting-visibility";
 import "@rchunk/notifications-settings";
 import "@rchunk/import-settings-gate";
 import "@rchunk/plugins-settings-row";

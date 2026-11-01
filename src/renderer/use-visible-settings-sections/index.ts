@@ -3,6 +3,15 @@
 import "@rchunk/rolldown-runtime";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as appSharedChunk from "@rchunk/app-shared";
+import "@rchunk/app-primary";
+import "@rchunk/command-menu-availability";
+import "@rchunk/command-menu-client";
+import "@rchunk/command-menu-queries";
+import "@rchunk/dock";
+import "@rchunk/hooks";
+import "@rchunk/import-settings-gate";
+import "@rchunk/queries";
+import "@rchunk/security-keys";
 
 export type SettingsSurface = "chatGpt" | "codex" | "codexLocal" | "codexOrWorkLocal" | "chatGptOrCodex";
 export interface SettingsSection { disabled?: boolean; externalUrl?: string; label: string; slug: string; surface?: SettingsSurface }

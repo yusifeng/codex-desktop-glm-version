@@ -3,6 +3,7 @@
 
 import { I3 as getJsxRuntime } from "@rchunk/app-shared";
 import * as appInitial from "@rchunk/app-initial";
+import "@rchunk/result-values";
 
 type OpenSection = "repositories" | "secrets" | "connections" | "network" | "scripts" | "privacy";
 interface NetworkPolicy { type?: "restricted" | "unrestricted" | "disabled" | string; egress_rules?: Array<{ host?: string }>; [key: string]: unknown }

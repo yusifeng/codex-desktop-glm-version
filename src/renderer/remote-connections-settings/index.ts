@@ -4,7 +4,9 @@ import "@rchunk/app-initial";
 import "@rchunk/chatgpt-desktop-auth-url";
 import "@rchunk/codex-mobile-setup-dialog";
 import "@rchunk/codex-mobile-setup-flow";
+import "@rchunk/onboarding-login-content";
 import "@rchunk/remote-connection-editor-dialog";
+import "@rchunk/remote-connection-editor-draft";
 interface Connection { displayName?: string; hostId: string; hostname?: string; status?: string; username?: string }
 interface RemoteProps { error?: string | null; isLoading?: boolean; onAdd?(): void; onEdit?(connection: Connection): void; onPairMobile?(): void; onRefresh?(): void; remoteControlConnections?: readonly Connection[]; routeDraft?: { draft?: unknown; hostId?: string | null } | null; sshConnections?: readonly Connection[]; wslConnections?: readonly Connection[] }
 const shared = appSharedChunk as unknown as { I3(): import("@rchunk/app-shared").JsxRuntime };

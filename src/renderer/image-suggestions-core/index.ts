@@ -6,6 +6,8 @@ import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as imageHomeChunk from "@rchunk/chatgpt-image-home";
 import * as recentUploadsChunk from "@rchunk/recent-uploads";
+import "@rchunk/option-carousel";
+import "@rchunk/tabs";
 import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
 
 type Surface = "home" | "images";

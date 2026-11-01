@@ -7,6 +7,7 @@ import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as computerHistoryIconChunk from "@rchunk/computer-history-plugin-icon";
 import * as computerHistoryQueryChunk from "@rchunk/computer-history-query";
+import "@rchunk/computer-history-suggestion-prompt";
 import * as computerHistorySuggestionsChunk from "@rchunk/computer-history-suggestions";
 import * as entryPointAvailabilityChunk from "@rchunk/entry-point-availability";
 import * as externalAgentImportChunk from "@rchunk/run-external-agent-import-command";

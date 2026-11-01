@@ -1,9 +1,11 @@
 // Browser permissions and plugin selection controls used by settings pages.
 import "@rchunk/rolldown-runtime";
+import "@rchunk/app-primary";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as appSharedChunk from "@rchunk/app-shared";
 import "@rchunk/browser-use-origin-state-queries";
 import "@rchunk/settings-loading-row";
+import "@rchunk/assert-never";
 
 interface PluginRecord { displayName?: string; marketplaceName?: string; marketplacePath?: string; plugin: { enabled?: boolean; id: string; installed?: boolean; name: string } }
 interface PluginItem { action?: unknown; description?: unknown; enabled?: boolean; expanded?: boolean; icon?: unknown; id: string; kind?: "app" | "disclosure" | "plugin" | "unavailable"; onToggleEnabled?(enabled: boolean): void; onToggleExpanded?(): void; plugin?: PluginRecord; showEnableToggle?: boolean; title: unknown; toggleAriaLabel?: string }
