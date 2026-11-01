@@ -5517,3 +5517,13 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   `misc/env-toml-stringifier.ts` 已由五个真实 consumer 使用，并补齐 inline unsupported value 的原始 fallthrough 语义。
 - 新 focused suites 37 项，相关 owner/storage 回归通过；修复 Computer Use notify suite 已过时的 main 直连断言，使其验证当前
   `native-pipe-service` 真实 consumer。测试索引 1836，no-unwired gate 扩至 811 项。
+
+# 2026-11-01 early runtime policy convergence
+
+- 新增并接回 app-server version/auth protocols、renderer popup identity、workspace-file policy、minimum-interval gate 五个 typed
+  模块；fork placement、section server、transport、BrowserWindowManager、Open In、workspace/artifact files、WindowContext 与
+  Electron message handler 均消费语义入口。
+- hosted manager/thread read-state 复用既有 `isSameAuthIdentity`；主 chunk 旧 `be/xe/Te/Oe/je/K/ct`、业务 wrapper、无 consumer
+  UI constants 及 WebView 虚假注入已删除，没有创建重复 owner。
+- 新 focused suite 48 项，八组相邻 owner 共 288 项及 main-business 5 项回归通过；修复 workspace files、Artifact Documents、app-server transport
+  三个直接 `.ts` 失效测试。测试索引 1837，no-unwired gate 扩至 861 项。

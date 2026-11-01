@@ -348,12 +348,13 @@ const { owner: placementOwner } = await load(
   (specifier) => {
     if (specifier === "@chunk/shared") return {
       Ca: (value) => value ?? {},
-      Qu: () => true,
-      Zu: () => 1,
       wa: (value, projectId, conversationId) => ({
         ...value,
         [projectId]: [conversationId, ...(value?.[projectId] ?? [])],
       }),
+    };
+    if (specifier === "../app-server/version-capabilities") return {
+      supportsAppServerSections: () => true,
     };
     throw new Error(`unexpected placement require ${specifier}`);
   },

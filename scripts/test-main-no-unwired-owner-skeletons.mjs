@@ -127,6 +127,11 @@ const realOwners = [
   ["src/main/main-app/sidebar/thread-section-engine.ts", "ThreadSectionEngine"],
   ["src/main/main-app/misc/env-toml-stringifier.ts", "stringifyToml"],
   ["src/main/main-app/window/thread-storage-keys.ts", "threadClientIdStorageKey"],
+  ["src/main/main-app/app-server/version-capabilities.ts", "supportsAppServerSections"],
+  ["src/main/main-app/app-server/auth-protocols.ts", "appServerProtocolsForToken"],
+  ["src/main/main-app/window/renderer-window-identity.ts", "parseBrowserCommentPopupFrameName"],
+  ["src/main/main-app/files/workspace-file-policy.ts", "sanitizeWorkspaceDownloadFileName"],
+  ["src/main/main-app/util/minimum-interval-gate.ts", "MinimumIntervalGate"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -814,5 +819,45 @@ assert.equal(main.includes("function see("), false, "generated TOML array serial
 assert.equal(main.includes("function qt("), false, "generated TOML table-array serializer must be removed");
 assert.equal(main.includes("function Jt("), false, "generated TOML table serializer must be removed");
 assert.equal(main.includes("function Yt("), false, "generated TOML entry point must be removed");
+assert.equal(main.includes('require("./main-app/app-server/version-capabilities.js")'), true, "app-server version policy is wired");
+assert.equal(main.includes('require("./main-app/app-server/auth-protocols.js")'), true, "app-server auth protocols are wired");
+assert.equal(main.includes('require("./main-app/window/renderer-window-identity.js")'), true, "renderer-window identity is wired");
+assert.equal(main.includes('require("./main-app/files/workspace-file-policy.js")'), true, "workspace-file policy is wired");
+assert.equal(main.includes('require("./main-app/util/minimum-interval-gate.js")'), true, "minimum-interval gate is wired");
+assert.equal(main.includes("supportsAppServerSections(e.appServerVersion)"), true, "fork placement uses semantic version policy");
+assert.equal(main.includes("isValidAppServerVersion,"), true, "thread-section server receives semantic version validation");
+assert.equal(main.includes("supportsAppServerSections,"), true, "thread-section server receives semantic section support policy");
+assert.equal(main.includes("identitiesEqual: isSameAuthIdentity"), true, "hosted manager reuses the existing identity policy");
+assert.equal(main.includes("identityEquals: isSameAuthIdentity"), true, "thread read-state reuses the existing identity policy");
+assert.equal(main.includes("protocolsForToken: appServerProtocolsForToken"), true, "transport uses semantic auth protocols");
+assert.equal(main.includes("parseBrowserCommentPopupFrameName,"), true, "window manager uses semantic popup identity parsing");
+assert.equal(main.includes("browserCommentPopupWindowId: BROWSER_COMMENT_POPUP_WINDOW_ID"), true, "window manager uses semantic popup ID");
+assert.equal(main.includes("sanitizeFileName: sanitizeWorkspaceDownloadFileName"), true, "workspace files use semantic filename policy");
+assert.equal(main.includes("isFileTooLarge: isWorkspaceFileTooLarge"), true, "file owners use semantic size policy");
+assert.equal(main.includes("maxFileBytes: MAX_WORKSPACE_FILE_BYTES"), true, "file owners use semantic byte limit");
+assert.equal(main.includes("nativeDocumentExtensions: NATIVE_DOCUMENT_EXTENSIONS"), true, "open-in uses semantic native extensions");
+assert.equal(main.includes("PerformanceTriggerGate: MinimumIntervalGate"), true, "message handler uses semantic interval gate");
+assert.equal(/^function ae\(/m.test(main), false, "generated delegation parser wrapper must be removed");
+assert.equal(/^function oe\(/m.test(main), false, "generated delegation tag wrapper must be removed");
+assert.equal(/^function se\(/m.test(main), false, "generated XML decoder wrapper must be removed");
+assert.equal(/^function ce\(/m.test(main), false, "generated employee predicate wrapper must be removed");
+assert.equal(/^function ue\(/m.test(main), false, "generated account eligibility wrapper must be removed");
+assert.equal(/^function de\(/m.test(main), false, "dead generated profile eligibility wrapper must be removed");
+assert.equal(/^function W\(/m.test(main), false, "duplicate generated identity comparison must be removed");
+assert.equal(/^function ge\(/m.test(main), false, "dead generated thread-error predicate must be removed");
+assert.equal(/^function be\(/m.test(main), false, "generated app-server version gate must be removed");
+assert.equal(/^function xe\(/m.test(main), false, "generated section capability alias must be removed");
+assert.equal(/^function Te\(/m.test(main), false, "generated auth protocol builder must be removed");
+assert.equal(/^function Oe\(/m.test(main), false, "generated renderer-window parser must be removed");
+assert.equal(/^function je\(/m.test(main), false, "generated filename sanitizer must be removed");
+assert.equal(/^function K\(/m.test(main), false, "generated file-size predicate must be removed");
+assert.equal(/^function Pe\(/m.test(main), false, "dead generated layout helper must be removed");
+assert.equal(/^var ke = /m.test(main), false, "generated native-document extensions must be removed");
+assert.equal(/^var Me = /m.test(main), false, "dead generated overlay motion constants must be removed");
+assert.equal(/^var at = /m.test(main), false, "dead generated workspace-settings prefix must be removed");
+assert.equal(main.includes("ct = class {"), false, "generated interval gate must be removed");
+assert.equal(main.includes("ae, oe, se, ce, THe"), false, "dead policy injection cluster must be removed");
+assert.equal(main.includes("maxFileBytes: Ae"), false, "generated max-file alias must be removed");
+assert.equal(main.includes("protocolsForToken: Te"), false, "generated auth-protocol alias must be removed");
 
-console.log("811 main unwired-owner skeleton assertions passed");
+console.log("861 main unwired-owner skeleton assertions passed");

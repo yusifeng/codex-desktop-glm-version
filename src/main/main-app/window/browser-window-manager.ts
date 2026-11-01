@@ -5,7 +5,7 @@
  * The returned class owns window registries, message queues, primary selection, creation, and cleanup.
  */
 export function createBrowserWindowManagerClass(dependencies: Record<string, any>) {
-  const { n, l, a, xot, IH, trafficLightPosition, titleBarOverlay, Yot, Xot, Zot, installDisplayChangeGeometryRefresh, isTrustedRendererSenderFrame, U, J, O9, initializeMcpSandbox, kot, Cot, r9, minimumWindowSize, windowOptions, supportsEmbeddedWebview, windowSurfaceColors, buildBrowserWindowOptions, S2e, RUe, uWe, lUe, uVe, installWindowTitlebarOverlaySync, rendererEntryUrl, rendererOrigin, Oe, De, isTrustedRendererFrameUrl, sameOrigin, MH, sameTrustedPath, isAppProtocolUrl, h, v, buildWindowErrorPage, installPrimaryWindowTracking, resolveAppearanceTheme, shouldHideInactiveWindow, isLargeEnoughForNativeWindow, shouldUseOpaqueWindows, BH, isOverlayAppearance, vibrancyForAppearance, bot, Not, installNativeContextMenu, installWebContentsDiagnostics, shouldRecoverRendererCrash, fT } = dependencies;
+  const { n, l, a, xot, IH, trafficLightPosition, titleBarOverlay, Yot, Xot, Zot, installDisplayChangeGeometryRefresh, isTrustedRendererSenderFrame, U, J, O9, initializeMcpSandbox, kot, Cot, r9, minimumWindowSize, windowOptions, supportsEmbeddedWebview, windowSurfaceColors, buildBrowserWindowOptions, S2e, RUe, uWe, lUe, uVe, installWindowTitlebarOverlaySync, rendererEntryUrl, rendererOrigin, parseBrowserCommentPopupFrameName, browserCommentPopupWindowId, isTrustedRendererFrameUrl, sameOrigin, MH, sameTrustedPath, isAppProtocolUrl, h, v, buildWindowErrorPage, installPrimaryWindowTracking, resolveAppearanceTheme, shouldHideInactiveWindow, isLargeEnoughForNativeWindow, shouldUseOpaqueWindows, BH, isOverlayAppearance, vibrancyForAppearance, bot, Not, installNativeContextMenu, installWebContentsDiagnostics, shouldRecoverRendererCrash, fT } = dependencies;
   return class BrowserWindowManager {
   applicationNetwork;
   options;
@@ -639,9 +639,9 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
         }));
     let re = rendererOrigin();
     (I.webContents.setWindowOpenHandler(({ disposition: e, url: t, frameName: n }) => {
-      let r = Oe(n);
+      let r = parseBrowserCommentPopupFrameName(n, a.bn);
       if (
-        r?.windowId === De.BROWSER_COMMENT_POPUP &&
+        r?.windowId === browserCommentPopupWindowId &&
         this.browserCommentPopupWindowCreatedHandlers.size > 0 &&
         t === `about:blank` &&
         s === `primary` &&
@@ -675,8 +675,8 @@ export function createBrowserWindowManagerClass(dependencies: Record<string, any
           { action: `deny` });
     }),
       I.webContents.on(`did-create-window`, (e, t) => {
-        let n = Oe(t.frameName);
-        if (n?.windowId !== De.BROWSER_COMMENT_POPUP || t.url !== `about:blank` || s !== `primary`)
+        let n = parseBrowserCommentPopupFrameName(t.frameName, a.bn);
+        if (n?.windowId !== browserCommentPopupWindowId || t.url !== `about:blank` || s !== `primary`)
           return;
         let r = this.getBrowserCommentPopupOwner(I.webContents, n.conversationId, n.browserTabId),
           i = r == null ? null : l.BrowserWindow.fromWebContents(r);

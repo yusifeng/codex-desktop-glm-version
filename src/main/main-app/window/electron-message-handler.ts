@@ -37,7 +37,7 @@ function createElectronMessageHandlerClass({
   BrowserHostManager: tQe,
   MessageReply: kZ,
   SamplerController: SQe,
-  PerformanceTriggerGate: ct,
+  PerformanceTriggerGate: MinimumIntervalGate,
   featureFlags: Tr,
   dependencies,
 }: ElectronMessageHandlerDependencies) {
@@ -274,7 +274,7 @@ class ElectronMessageHandler {
         requestRegistry: new n.Sc({ ttlMs: performanceRequestTtlMs }),
         setInterval: (e, t) => setInterval(e, t),
         summarizeWindowAttention,
-        triggerGate: new ct({ minIntervalMs: performanceTriggerMinIntervalMs }),
+        triggerGate: new MinimumIntervalGate({ minIntervalMs: performanceTriggerMinIntervalMs }),
         windowManager: this.windowManager,
       })),
       this.ensureWorktreeService(this.hostId));

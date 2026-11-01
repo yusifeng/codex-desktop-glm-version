@@ -1,13 +1,11 @@
 import {
   Ca as normalizeThreadOrders,
-  Qu as isValidSemver,
-  Zu as compareSemver,
   wa as prependThreadToProject,
 } from "@chunk/shared";
+import { supportsAppServerSections } from "../app-server/version-capabilities";
 
 const SAVED_SECTIONS_KEY = "sidebar-custom-sections-v3";
 const LOCAL_THREAD_PREFIX = "codex:thread:local:";
-const APP_SERVER_SECTIONS_VERSION = "0.148.0-alpha.7";
 
 type SavedSection = {
   id: string;
@@ -148,10 +146,6 @@ function moveItemToSection(
     return { ...section, itemKeys, pendingDeletionHostIdsByItemKey };
   });
   return changed ? { ...state, sections } : state;
-}
-
-function supportsAppServerSections(version: string | null): boolean {
-  return version != null && isValidSemver(version) && compareSemver(version, APP_SERVER_SECTIONS_VERSION) >= 0;
 }
 
 export function readForkPlacement(

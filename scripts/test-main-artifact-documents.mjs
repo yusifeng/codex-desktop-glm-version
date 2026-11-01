@@ -1,8 +1,22 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { createHash } from "node:crypto";
+import path from "node:path";
+import * as esbuild from "esbuild";
 import { z } from "zod";
-import { createArtifactDocumentsClass } from "../src/main/main-app/artifacts/artifact-documents.ts";
+
+const built = await esbuild.build({
+  bundle: true,
+  entryPoints: [path.resolve(import.meta.dirname, "../src/main/main-app/artifacts/artifact-documents.ts")],
+  format: "esm",
+  logLevel: "silent",
+  platform: "node",
+  target: "node22",
+  write: false,
+});
+const { createArtifactDocumentsClass } = await import(
+  `data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`
+);
 
 const fileBytes = new Map([["/workspace/file.pptx", Buffer.from("public-file")]]);
 const fsCalls = [];
@@ -149,6 +163,10 @@ assert.match(main, /Z5e = createArtifactDocumentsClass\(\{/);
 assert.doesNotMatch(main, /Z5e = class/);
 assert.doesNotMatch(main, /function \$5e\(/);
 assert.doesNotMatch(main, /function b4\(/);
-assert.match(main, /this\.artifactDocuments = new Z5e\(\{/);
+const windowContext = fs.readFileSync(
+  new URL("../src/main/main-app/window/window-context.ts", import.meta.url),
+  "utf8",
+);
+assert.match(windowContext, /this\.artifactDocuments = new Z5e\(\{/);
 
 console.log("artifact documents assertions: 31");

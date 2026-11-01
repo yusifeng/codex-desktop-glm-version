@@ -4,14 +4,14 @@ export function createThreadSectionServerClass(dependencies) {
   const {
     Qze,
     ThreadSectionEngine,
-    be,
+    isValidAppServerVersion,
     gH,
     hH,
     RetryLookupCache,
     me,
     n,
     pinnedThreadSectionId,
-    xe,
+    supportsAppServerSections,
   } = dependencies;
   return class ThreadSectionServer {
       globalState;
@@ -89,7 +89,7 @@ export function createThreadSectionServerClass(dependencies) {
       async listSections({ hostId: e } = {}, t) {
         t?.assertCurrent();
         let r = (await this.getSupportedHosts(e, t)).filter(
-          (t) => (e != null || !n.Cs(t.hostId)) && xe(t.connection.appServerVersion),
+          (t) => (e != null || !n.Cs(t.hostId)) && supportsAppServerSections(t.connection.appServerVersion),
         );
         return this.threadSectionEngine.listSections(r.map((e) => this.bindSectionOperation(e, t)));
       }
@@ -263,7 +263,7 @@ export function createThreadSectionServerClass(dependencies) {
       async getCustomSectionHost(e, t) {
         (t?.getConnection(e), t?.assertCurrent());
         let n = (await this.getSupportedHosts(e, t))[0];
-        if (n == null || !xe(n.connection.appServerVersion))
+        if (n == null || !supportsAppServerSections(n.connection.appServerVersion))
           throw Error(`App server does not support custom thread sections`);
         return this.bindSectionOperation(n, t);
       }
@@ -316,7 +316,7 @@ export function createThreadSectionServerClass(dependencies) {
                 }));
               let a = r.appServerVersion,
                 o = a != null && a !== `0.0.0` && n.Qu(a) ? a : null;
-              if ((a == null && !r.isLocal) || (o != null && !be(o)))
+              if ((a == null && !r.isLocal) || (o != null && !isValidAppServerVersion(o)))
                 return { hostId: e, connection: r, pinnedSectionId: null };
               let s = this.pinnedSectionIdsByConnection.get(r);
               if (!this.pinnedSectionIdsByConnection.has(r)) {

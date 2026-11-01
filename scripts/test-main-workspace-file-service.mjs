@@ -5,7 +5,20 @@ import { copyFile, mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs
 import os from "node:os";
 import path from "node:path";
 import { Readable } from "node:stream";
-import { createWorkspaceFileServiceClass } from "../src/main/main-app/workspace/files.ts";
+import * as esbuild from "esbuild";
+
+const built = await esbuild.build({
+  bundle: true,
+  entryPoints: [path.resolve(import.meta.dirname, "../src/main/main-app/workspace/files.ts")],
+  format: "esm",
+  logLevel: "silent",
+  platform: "node",
+  target: "node22",
+  write: false,
+});
+const { createWorkspaceFileServiceClass } = await import(
+  `data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`
+);
 
 const root = await mkdtemp(path.join(os.tmpdir(), "workspace-files-test-"));
 const downloads = path.join(root, "downloads");

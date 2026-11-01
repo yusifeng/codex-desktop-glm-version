@@ -7,7 +7,7 @@ const e = require("./rolldown-runtime-CPUxUITh.js"),
   a = require("./bootstrap-C4dRql4x.js"),
   o = require("./electron-resources-path-BDLw2lp0.js"),
   s = require("./dist-wQAv1pJP.js");
-const mainBusiness = require("./main-app/util/main-business.js");
+const { isEligibleAccount } = require("./main-app/util/main-business.js");
 const mainUrlTrust = require("./main-app/util/url-trust.js");
 const { AppshotHotkeyManager } = require("./main-app/hotkey/appshot-hotkey-manager.js");
 const { createHotkeyWindowLifecycleManagerClass } = require("./main-app/hotkey/hotkey-window-lifecycle-manager.js");
@@ -28,6 +28,8 @@ const { loadReactDevToolsExtension } = require("./main-app/startup/react-devtool
 const { removeLegacyRemoteControlConfig } = require("./main-app/startup/legacy-remote-control-config.js");
 const { createSqliteRecoveryConfirmationQueue } = require("./main-app/app-server/sqlite-recovery.js");
 const { reconcileAppServerSqliteState } = require("./main-app/app-server/sqlite-state-reconciliation.js");
+const { isValidAppServerVersion, supportsAppServerSections } = require("./main-app/app-server/version-capabilities.js");
+const { appServerProtocolsForToken } = require("./main-app/app-server/auth-protocols.js");
 const { ChildProcessGoneDiagnostics } = require("./main-app/startup/child-process-gone-diagnostics.js");
 const { configureBundledGitEnvironment } = require("./main-app/startup/bundled-git-environment.js");
 const {
@@ -314,6 +316,9 @@ const { createWindowContextClass } = require("./main-app/window/window-context.j
 const { createDesktopCapabilityServices } = require("./main-app/window/desktop-capability-services.js");
 const { createElectronMessageHandlerClass } = require("./main-app/window/electron-message-handler.js");
 const { localThreadClientIdStorageKey, threadTabRoutesStorageKey } = require("./main-app/window/thread-storage-keys.js");
+const { BROWSER_COMMENT_POPUP_WINDOW_ID, parseBrowserCommentPopupFrameName } = require("./main-app/window/renderer-window-identity.js");
+const { MinimumIntervalGate } = require("./main-app/util/minimum-interval-gate.js");
+const { NATIVE_DOCUMENT_EXTENSIONS, MAX_WORKSPACE_FILE_BYTES, sanitizeWorkspaceDownloadFileName, isWorkspaceFileTooLarge } = require("./main-app/files/workspace-file-policy.js");
 const { createOpenInServiceClass, isOpenableUrl } = require("./main-app/misc/open-in-service.js");
 const { parseRepositoryOrigin } = require("./main-app/misc/git-repository-origin.js");
 const { createLinuxApplicationsRuntime } = require("./main-app/platform/linux-applications.js");
@@ -904,139 +909,14 @@ let re = require("node:path/posix"),
   U = require("node:inspector");
 U = e.a(U);
 var ie = `https://chatgpt.com/codex`;
-function ae(e) {
-  return mainBusiness.parseDelegationEnvelope(e);
-}
-function oe(e, t) {
-  return mainBusiness.readDelegationTag(e, t);
-}
-function se(e) {
-  return mainBusiness.decodeXmlText(e);
-}
-function ce(e) {
-  return mainBusiness.isOpenAiEmployee(e);
-}
-var le = mainBusiness.eligibleAccountPlans;
-function ue(e) {
-  return mainBusiness.isEligibleAccount(e);
-}
-function de({ email: e, plan: t }) {
-  return mainBusiness.isEligibleAccount({ type: `chatgpt`, email: e, planType: t });
-}
-function W(e, t) {
-  return e.kind === `chatgpt`
-    ? t.kind === `chatgpt` && e.accountId === t.accountId && e.userId === t.userId
-    : t.kind === `execution-storage` && e.authMode === t.authMode;
-}
 var G = e.a(n.Ld());
-function ge(e) {
-  return (
-    /^(?:thread not (?:found|loaded)|unknown thread):/i.test(e) ||
-    /^no rollout found for thread id /i.test(e) ||
-    /^invalid thread id:/i.test(e)
-  );
-}
 var _e = e.a(n.id());
-function be(e) {
-  return e != null && n.Qu(e) && n.Zu(e, `0.148.0-alpha.7`) >= 0;
-}
-function xe(e) {
-  return be(e);
-}
-var Ce = `codex-app-server`,
-  we = `openai-bearer.`;
-function Te(e) {
-  return [Ce, `${we}${e}`];
-}
-var Ee = `codex-renderer-window:`,
-  De = { BROWSER_COMMENT_POPUP: `browserCommentPopup` };
-function Oe(e) {
-  if (!e.startsWith(Ee)) return null;
-  let t = e.slice(22),
-    n = t.indexOf(`:`);
-  if (n < 0) return null;
-  let r = t.slice(0, n),
-    i = t.slice(n + 1);
-  if (r !== De.BROWSER_COMMENT_POPUP) return null;
-  let o = i.indexOf(`:`);
-  if (o < 0) return null;
-  try {
-    let [e, t] = decodeURIComponent(i.slice(0, o)).split(`\0`),
-      n = decodeURIComponent(i.slice(o + 1));
-    return e?.length > 0 && t?.length > 0 && n.length > 0
-      ? { windowId: r, browserTabId: a.bn(t), conversationId: e, sessionId: n }
-      : null;
-  } catch {
-    return null;
-  }
-}
-var ke = [`.doc`, `.docx`, `.ppt`, `.pptx`, `.xls`, `.xlsm`, `.xlsx`],
-  Ae = 268435456;
-function je(e) {
-  let t = (e.replaceAll(`\\`, `/`).replace(/\/+$/u, ``).split(`/`).at(-1) ?? ``)
-    .replace(/[<>:"|?*]/gu, `_`)
-    .replaceAll(`\0`, `_`);
-  return t === `.` || t === `..` || t === `` ? `download` : t;
-}
-function K(e) {
-  return e > Ae;
-}
-var Me = { damping: 18.85, initialVelocity: 0, mass: 1, stiffness: 180 },
-  Ne = 330;
-function Pe(e) {
-  let t = 2 + +!!e;
-  return 20 + 20 * t + 20 * (t - 1);
-}
-var Fe = {
-    collapseMovementSpringBounce: 0.1,
-    collapseTransitionDurationMs: 0,
-    compactControlCornerRadius: 6.5,
-    compactControlGap: -10.5,
-    compactControlHeight: 6,
-    compactControlWidth: 17,
-    compactDismissDelayMs: 300,
-    compactGlassSpacing: 14,
-    compactOffsetX: 0,
-    compactOffsetY: 0,
-    contentHiddenBlurRadiusPx: 14,
-    contentHiddenScale: 0.75,
-    expandingGlassSpacing: 20,
-    glassMergeDurationMs: 300,
-    hoverControlGap: 8,
-    hoverControlSize: 24,
-    hoverGlassSpacing: 0,
-    hoverOffsetX: 0,
-    hoverOffsetY: 10,
-    movementSpringBounce: 0.1,
-    movementSpringLaunchOffsetY: 16,
-    proximityEnterDistance: 40,
-    proximityExitDistance: 56,
-    transitionDurationMs: 200,
-  };
-var at = `codex-workspace-settings-`,
-  ot = {
+var ot = {
     file: `file-menu`,
     edit: `edit-menu`,
     view: `view-menu`,
     window: `window-menu`,
     help: `help-menu`,
-  },
-  st = `codex-first-party-plugin-authenticated-chatgpt-`,
-  ct = class {
-    minIntervalMs;
-    lastMarkedAtMs = -1 / 0;
-    constructor(e) {
-      this.minIntervalMs = e.minIntervalMs;
-    }
-    canPass(e = Date.now()) {
-      return e - this.lastMarkedAtMs >= this.minIntervalMs;
-    }
-    mark(e = Date.now()) {
-      this.lastMarkedAtMs = e;
-    }
-    tryPass(e = Date.now()) {
-      return this.canPass(e) ? (this.mark(e), !0) : !1;
-    }
   };
 var Mt = [`OwlOpenAIGoLinks`, `OwlRemoteSearchSuggestions`],
   Nt = 6e4,
@@ -1048,8 +928,7 @@ var Mt = [`OwlOpenAIGoLinks`, `OwlRemoteSearchSuggestions`],
   },
   Ft = e.a(n.Oo()),
   It = e.a(n.Do());
-var Ht = `update-resume-state-v1`,
-  nee = 9e5;
+var Ht = `update-resume-state-v1`;
 var {
   AppUpdateService,
   ApplicationMenuSnapshotService,
@@ -2917,7 +2796,7 @@ async function Hr({ appServerConnection: e, settingsStore: t }) {
   } = Tr();
   if (!Vr(t) || r == null) return { enabled: !1 };
   let { account: a } = await e.getAccount();
-  return ue(a)
+  return isEligibleAccount(a)
     ? { enabled: !0, computerUseAvailable: i, featureDiscoveryEnabled: n, staleTimeMs: r }
     : { enabled: !1 };
 }
@@ -13506,7 +13385,7 @@ async function uye(e, t, n) {
   let a = Gb(i, n.sectionId, `codex:thread:local:${t}`, `codex:thread:local:${n.beforeThreadId}`);
   if (
     (a !== i && e.storage.writeValue(Hb, { ...r, [n.accountId]: Wb(a) }),
-    !n.useAppServerSections || !xe(e.appServerVersion))
+    !n.useAppServerSections || !supportsAppServerSections(e.appServerVersion))
   )
     return;
   let o = a.sections.find(({ id: e }) => e === n.sectionId);
@@ -22424,7 +22303,7 @@ var createHostedAppServerManager = createHostedAppServerManagerFactory({
 });
 var CodexHomeService = createCodexHomeServiceClass(n.Uf);
 var HostedManagerRegistry = createHostedManagerRegistryClass({
-  identitiesEqual: W,
+  identitiesEqual: isSameAuthIdentity,
   scheduleMicrotask: queueMicrotask,
 });
 var { stageRemoteConnectionDeclarations, applyRemoteDeclarations } =
@@ -34200,14 +34079,14 @@ var Qze = n.wf({ thread: n.wf({ id: n.Of() }) }),
   $ze = createThreadSectionServerClass({
     Qze,
     ThreadSectionEngine,
-    be,
+    isValidAppServerVersion,
     gH,
     hH,
     RetryLookupCache,
     me,
     n,
     pinnedThreadSectionId: PINNED_THREAD_SECTION_ID,
-    xe,
+    supportsAppServerSections,
   });
 var tBe = createSavedSectionTransitionClass({
     RpcHandlerBase: n.Uf,
@@ -35806,7 +35685,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
         (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ hX, fq, tq, KU, EZ, lifecycleHelpersClass: createBrowserPageLifecycleHelpersControllerClass, WU, dZ, QU, Ze: normalizeUrlOrBlank, n, pX, dZe, oX, dq, isEqual: G.default }))(this)),
         (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW, fq, matchesLoadError: FU, normalizeUrl: normalizeUrlOrBlank, resetCaptureState: (page) => { page.isCapturingUserMedia = !1; page.isCapturingCamera = void 0; page.isCapturingMicrophone = void 0; }, clearSiteTools: XX, serializePageState: eW, shouldIgnoreLoadError: NU, shouldRetryLoadError: PU, logger: r.i, setTimer: setTimeout, retryDelayMs: 50, maxAttempts: 100 }))(this)),
         (this.pageLookupController = new (createBrowserPageLookupControllerClass({}))(this)),
-(this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze: normalizeUrlOrBlank, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ, WXe, RX }))(this)),
+(this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze: normalizeUrlOrBlank, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, THe, X, fe, zGe, G, me, pU, hU, At, HGe, zX, mU, run, _e, on, Xc, LXe, xU, to, al, ul, audio, WX, bn, GX, JXe, YXe, EXe, n, a, iZ, tZ, eZ, nZ, rZ, WXe, RX }))(this)),
         (this.hostPolicyController = new (createBrowserHostPolicyControllerClass({ DXe, OXe, kXe, mq, VG, Yc, Xc, DZ, hX }))(this)),
         (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
         (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, SWe, aXe, gX, qU, oXe, vX, tq, KU, l, EZ, logger: r.i(`browser-sidebar-manager`) }))(this)),
@@ -36274,7 +36153,7 @@ var r$e = createElectronMessageHandlerClass({
   BrowserHostManager: tQe,
   MessageReply: kZ,
   SamplerController: SamplerManager,
-  PerformanceTriggerGate: ct,
+  PerformanceTriggerGate: MinimumIntervalGate,
   featureFlags: Tr,
   dependencies: {
     GBe,
@@ -36373,9 +36252,9 @@ var u$e = 41943040,
     fsPromises: b,
     electron: l,
     stream: C,
-    sanitizeFileName: je,
-    isFileTooLarge: K,
-    maxFileBytes: Ae,
+    sanitizeFileName: sanitizeWorkspaceDownloadFileName,
+    isFileTooLarge: isWorkspaceFileTooLarge,
+    maxFileBytes: MAX_WORKSPACE_FILE_BYTES,
     showItemInFolder: Ij,
     resolveWorkspacePath,
     resolveLocalWorkspacePath,
@@ -44912,7 +44791,7 @@ var N0 = createOpenInServiceClass({
     isNativeDocument: u4e,
     isDarwinNativeDocument: h1,
     isPlatformDefaultViewerDocument: g1,
-    nativeDocumentExtensions: ke,
+    nativeDocumentExtensions: NATIVE_DOCUMENT_EXTENSIONS,
     discoverNativeBrowsers: v6e,
     discoverDocumentApplications: _6e,
     discoverNativeApplications: g6e,
@@ -45653,8 +45532,8 @@ var { RemoteControlEnvironmentService: R5e, RemoteHostedPipContentService: z5e }
     path: h.default,
     fs: b,
     isPathInside: fH,
-    isFileTooLarge: K,
-    maxFileBytes: Ae,
+    isFileTooLarge: isWorkspaceFileTooLarge,
+    maxFileBytes: MAX_WORKSPACE_FILE_BYTES,
     pipeline: F.pipeline,
     createReadStream: v.createReadStream,
     createHash: _.createHash,
@@ -49561,7 +49440,7 @@ var Det = createArtifactDocumentStoreClass({
   mergeYjsUpdates: T9e,
 });
 var artifactSessionHostProtocol = createArtifactSessionHostProtocol({
-    maxFileBytes: Ae,
+    maxFileBytes: MAX_WORKSPACE_FILE_BYTES,
     path: h,
     pathToFileUrl: c.pathToFileURL,
     schema: n,
@@ -49746,7 +49625,7 @@ var I5 = createThreadMetadataGenerationServiceClass({
   });
 var { ThreadReadStateOwner: Ont } = createThreadReadStateOwnerClass({
   createHash: _.createHash,
-  identityEquals: W,
+  identityEquals: isSameAuthIdentity,
   normalizeThreadId: n.$u,
   readStateKey: a.tt,
   legacyStateKey: a.J,
@@ -49843,7 +49722,7 @@ var G5 = r.r(`WindowContext`),
     createDetachedBrowserKindHandler,
     $nt,
     A,
-    Ae,
+    maxWorkspaceFileBytes: MAX_WORKSPACE_FILE_BYTES,
     artifactSessionHostProtocol,
     Ant,
     ArtifactSubscriptionManager,
@@ -50093,7 +49972,7 @@ var { hostKindForConfig: trt, createAppServerTransport: K5 } =
     isCloudHostId: n.Cs,
     accountIdFromToken: a.yt,
     authenticatedPrincipalFromToken: n._i,
-    protocolsForToken: Te,
+    protocolsForToken: appServerProtocolsForToken,
     resolveSocksProxyUrl: Ynt,
     getCACertificates: ne.getCACertificates,
     WebsocketTransport: n.pn,
@@ -55082,8 +54961,8 @@ var Qot = createBrowserWindowManagerClass({
   installWindowTitlebarOverlaySync,
   rendererEntryUrl: browserWindowPolicies.rendererEntryUrl,
   rendererOrigin: browserWindowPolicies.rendererOrigin,
-  Oe,
-  De,
+  parseBrowserCommentPopupFrameName,
+  browserCommentPopupWindowId: BROWSER_COMMENT_POPUP_WINDOW_ID,
   isTrustedRendererFrameUrl: browserWindowPolicies.isTrustedRendererFrameUrl,
   sameOrigin: browserWindowPolicies.sameOrigin,
   MH,

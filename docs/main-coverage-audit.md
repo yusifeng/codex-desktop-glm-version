@@ -3638,3 +3638,19 @@ no-unwired gate 扩至 778 项。
 真实 consumer 使用，因此物理删除旧实现；同时补齐原 `Kt` 对 inline unsupported value fallthrough 为 `undefined` 的兼容细节。
 新 focused suites 共 37 项，TOML 五个 consumer、Electron message handler、browser settings storage 与 Computer Use notify
 相邻回归通过；测试索引 1836，no-unwired gate 扩至 811 项。
+
+### 整域收敛：early runtime identity / version / file / window policies
+
+一次迁出并真实接回五个早期第一方策略边界：`app-server/version-capabilities.ts` 统一 semver validation 与 custom-section
+版本 gate，`app-server/auth-protocols.ts` 拥有 websocket subprotocol projection，`window/renderer-window-identity.ts` 解析
+Browser Comment popup frame identity，`files/workspace-file-policy.ts` 统一 Office 扩展名、256 MiB 限制与安全下载文件名，
+`util/minimum-interval-gate.ts` 拥有 sampler trigger 节流状态。
+
+fork placement、ThreadSectionServer、transport factory、BrowserWindowManager、Open In、workspace/artifact files、WindowContext 与
+Electron message handler 均已切换到具名语义入口。Hosted manager 与 thread read-state 不再复制身份比较，直接复用既有
+`isSameAuthIdentity`。主 chunk 原 `be/xe/Te/Oe/je/K/ct` 及相关常量被物理删除；`ae/oe/se/ce/le/ue/de/W/ge` wrapper、
+未被 WebView controller 读取的 dependency cluster 和无 consumer 的 overlay/layout/prefix 常量同步清理。
+
+新 focused suite 48 项，八组相邻 owner 共 288 项及 main-business 5 项回归通过；修复 workspace files、Artifact Documents 与 app-server transport
+三组直接 `.ts` import 的失效入口，其中 Artifact Documents 也改为验证当前 WindowContext 真实 consumer。测试索引 1837，
+no-unwired gate 扩至 861 项。
