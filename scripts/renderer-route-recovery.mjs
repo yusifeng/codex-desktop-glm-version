@@ -312,6 +312,10 @@ export const RECONSTRUCTED_ROUTE_CORE = new Set([
 export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "agent-activity-item-792873f87aad.js",
   "agent-activity-units-9397783428a4.js",
+  "agent-settings-27cdda401037.js",
+  "billing-settings-d5b5419393a0.js",
+  "chronicle-settings-page-e92cf619a884.js",
+  "computer-use-settings-6786672692bb.js",
   "local-conversation-side-chat-48c6730ec06a.js",
   "codex-app-home-beacon-announcement-8c94f69eb080.js",
   "codex-micro-onboarding-host-85407a96e02a.js",
@@ -337,6 +341,8 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "registered-259e95b201a1.js",
   "report-dialog-75a130d615ed.js",
   "safety-settings-aa3588e3b94c.js",
+  "settings-e03d8d0b0de2.js",
+  "settings-page-9811299ef92c.js",
   "trusted-contact-settings-b71f926a1121.js",
   "use-search-plugins-12df8f20afed.js",
   "voice-settings-3a0651cd977e.js",
@@ -355,6 +361,7 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "thread-app-shell-chrome-e245ed2613ae.js",
   "thread-overflow-menu-51894ca4476d.js",
   "worktree-setup-auto-fix-4dc0f12b7219.js",
+  "worktrees-settings-page-f7e1c38f9bb4.js",
 ]);
 
 // Full release-faithful React/runtime modules promoted into their semantic
@@ -364,15 +371,8 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
 // modules leave the compatibility graph before their local names are manually
 // clarified, without changing their behavior or export surface.
 export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
-  ["agent-settings", "agent-settings-27cdda401037.js"],
-  ["billing-settings", "billing-settings-d5b5419393a0.js"],
-  ["chronicle-settings-page", "chronicle-settings-page-e92cf619a884.js"],
-  ["computer-use-settings", "computer-use-settings-6786672692bb.js"],
-  ["settings", "settings-e03d8d0b0de2.js"],
-  ["settings-page", "settings-page-9811299ef92c.js"],
   ["onboarding-page", "onboarding-page-905dd8894724.js"],
   ["onboarding", "onboarding-d0bfce15e4cc.js"],
-  ["worktrees-settings-page", "worktrees-settings-page-f7e1c38f9bb4.js"],
   [
     "cloud-environments-settings-page",
     "cloud-environments-settings-page-b47c295bea65.js",
