@@ -1,247 +1,314 @@
-// home-task-suggestions-core —— 首页 Work 任务建议核心。
-//
-// 原版：app/webview/assets/home-task-suggestions-e29a02e9b466.js
-//（26.8KB / 1,004 行）。
-//
-// 四个导出（压缩名 → 语义）：
-//   i = taskSuggestionAccountIdSignal（原 `X`）
-//   n = initializeHomeTaskSuggestions（原 `Pn`）
-//   r = initializeTaskSuggestionQueries（原 `fn`）
-//   t = HomeTaskSuggestions（原 `hn`）
+// ChatGPT Work task suggestions below the Home composer. The release owner
+// combines the account-scoped native query, composer activation, background
+// task submission, interaction recording, and the Home suggestion surface.
 
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/app-primary";
-import "@rchunk/home-suggestion-surface";
-import "@rchunk/home-starter-prompts";
+import "@rchunk/rolldown-runtime";
+import * as appInitialChunk from "@rchunk/app-initial";
+import * as appPrimaryChunk from "@rchunk/app-primary";
+import * as appSharedChunk from "@rchunk/app-shared";
+import * as homeStarterPromptsChunk from "@rchunk/home-starter-prompts";
+import * as homeSuggestionSurfaceChunk from "@rchunk/home-suggestion-surface";
+import type { JsxRuntime, MaitaiScopeApi, ReactRuntime } from "@rchunk/app-shared";
 
-export type HomeTaskSuggestionMode = "chat" | "local" | string;
-export type WorkRunLocation = "cloud" | "local" | null;
+type HomeTaskSuggestionMode = "chat" | "local" | string;
+type WorkRunLocation = "cloud" | "local" | null;
+type Scope = MaitaiScopeApi<Record<string, unknown>>;
 
-export interface PromptDestinationMetadata {
-  type: "prompt";
-  prompt: string;
-  entrypoint?: string;
+interface PromptDestinationMetadata {
   auto_send?: boolean;
   auto_send_in_background?: boolean;
+  entrypoint?: string;
+  prompt: string;
   show_prompt_on_hover?: boolean;
+  type: "prompt";
 }
-
-export interface ConnectorDestinationMetadata {
-  type: "connector";
-}
-
-export interface RawHomeTaskSuggestion {
-  id: string;
-  title: string;
-  item_type: string;
-  emoji?: string | null;
+interface ConnectorDestinationMetadata { type: "connector" }
+interface RawHomeTaskSuggestion {
+  action_metadata?: { prompt?: string; system_hints?: unknown[] } | null;
   destination_metadata?: PromptDestinationMetadata | ConnectorDestinationMetadata | null;
-  action_metadata?: {
-    prompt?: string;
-    system_hints?: unknown[];
-  } | null;
+  emoji?: string | null;
   icon_paths?: Record<string, string | undefined>;
-  logging_metadata?: {
-    app_id?: string;
-    suggestion_id?: string;
-  } | null;
+  id: string;
+  item_type: string;
+  logging_metadata?: { app_id?: string; suggestion_id?: string } | null;
+  title: string;
 }
-
-export interface HomeTaskSuggestion {
-  item: RawHomeTaskSuggestion;
+interface HomeTaskSuggestion {
   emoji?: string | null;
   iconDarkUrl?: string;
   iconUrl?: string;
   id: string;
   isScheduledAutomation: boolean;
+  item: RawHomeTaskSuggestion;
   prompt: string;
   title: string;
 }
-
-export interface HomeTaskSuggestionsRuntimeState {
-  accountId?: string | null;
-  composerEmpty?: boolean;
-  headline?: string | null;
-  navigationIdle?: boolean;
-  pendingSuggestionIds?: string[];
-  rawSuggestions?: RawHomeTaskSuggestion[];
-  showFollowUpSketchSuggestion?: boolean;
-  clinicalExperimentEnabled?: boolean;
-  clinicalPluginLoading?: boolean;
-  clinicalPluginError?: boolean;
+interface QueryResult<Value> { data?: Value; isLoading?: boolean }
+interface ComposerController {
+  cancelPendingSubmit?(): void;
+  focus(): void;
+  hasText(): boolean;
+  requestSubmitWhenReady?(ready: () => boolean): void;
+  setPromptText(text: string): void;
+  view?: { isDestroyed?: boolean };
 }
-
-export interface HomeTaskSuggestionsProps {
+interface HomeTaskSuggestionsProps {
   generatedSuggestionsEnabled?: boolean;
   hostId: string;
   mode: HomeTaskSuggestionMode;
   onSelect?(suggestion: HomeTaskSuggestion): void;
-  projectId?: string | null;
   prepareDestination?(destination: string): void | Promise<void>;
-  workRunLocation?: WorkRunLocation;
-  showGenericSuggestions?: boolean;
+  projectId?: string | null;
   showClinicalHomeSuggestions?: boolean;
-  /** 语义重写层显式输入；真实组件从 stores/query/portal contexts 读取。 */
-  runtimeState?: HomeTaskSuggestionsRuntimeState;
+  showGenericSuggestions?: boolean;
+  workRunLocation?: WorkRunLocation;
+}
+interface ScopeWithQuery extends Scope {
+  queryClient: {
+    cancelQueries(input: { queryKey: unknown[] }): Promise<unknown> | void;
+    invalidateQueries(input: { queryKey: unknown[] }): Promise<unknown> | void;
+    setQueriesData(input: { queryKey: unknown[] }, update: (value: RawHomeTaskSuggestion[] | undefined) => RawHomeTaskSuggestion[] | undefined): void;
+  };
+}
+interface SharedBindings {
+  BX<Value>(family: unknown, parameter: unknown, options?: { enabled?: boolean }): QueryResult<Value>;
+  HX<Value>(signal: unknown): Value;
+  I3: JsxRuntime | (() => JsxRuntime);
+  LX(scope: unknown): ScopeWithQuery;
+  QX?(scope: unknown, factory: (parameter: { hostId: string; mode: string }, context: { get<Value>(signal: unknown): Value }) => Record<string, unknown>): unknown;
+  ZI: unknown;
+  e6: ReactRuntime | (() => ReactRuntime);
+  n4?(): { formatMessage(descriptor: { defaultMessage: string; id?: string }): string };
+  pZ?<Value>(scope: unknown, initialValue: Value): unknown;
+  pk?: unknown;
+  sZ?<Value>(scope: unknown, derive: (context: { get<T>(signal: unknown): T }) => Value): unknown;
+}
+interface InitialBindings {
+  HZ?(): ComposerController;
+  Sln?: unknown;
+  b2?(scope: Scope, conversationId: string, hints: string[]): void;
+  gln?(conversation: unknown): string;
+  gln?(conversation: unknown): string;
+  kht?: unknown;
+  o_n?(): (destination: string) => void;
+  pnt?: {
+    ambientSuggestions?: {
+      getChatGptComposerItems(input: { entrypoint: string; hostId: string }): Promise<RawHomeTaskSuggestion[]>;
+      recordChatGptComposerItemInteraction(input: { entrypoint: string; hostId: string; interactionType: string; item: RawHomeTaskSuggestion }): Promise<unknown>;
+    };
+  };
+  xpn?(scope: Scope, event: unknown, payload: Record<string, unknown>): void;
+  v2?: unknown;
+}
+interface PrimaryBindings {
+  Sg?(): { headline?: { message_body?: string } | null };
+  eu?(scope: Scope, input: Record<string, unknown>): Promise<unknown>;
 }
 
-export interface HomeTaskSuggestionActionPlan {
-  type: "fill-composer" | "start-background-thread";
-  autoSend: boolean;
-  destination: string;
-  prompt: string;
-  requiresCloud: boolean;
-}
+const shared = appSharedChunk as unknown as SharedBindings;
+const initial = appInitialChunk as unknown as InitialBindings;
+const primary = appPrimaryChunk as unknown as PrimaryBindings;
+const HomeSuggestionSurface = (homeSuggestionSurfaceChunk as unknown as { t?: unknown }).t;
+const ClinicalStarterPrompts = (homeStarterPromptsChunk as unknown as { ClinicalStarterPrompts?: unknown }).ClinicalStarterPrompts;
 
-export interface HomeTaskSuggestionViewItem {
-  id: string;
-  label: string;
-  disabled: boolean;
-  emoji: string | null;
-  iconUrl: string | null;
-  iconDarkUrl: string | null;
-  tooltipPrompt: string | null;
-  action: HomeTaskSuggestionActionPlan;
-}
+let React: ReactRuntime;
+let jsx: JsxRuntime;
+let taskSuggestionAccountIdSignal: unknown;
+let pendingSuggestionKeysSignal: unknown;
+let taskSuggestionQueryFamily: unknown;
+let initialized = false;
 
-export interface HomeTaskSuggestionsView {
-  kind: "home-task-suggestions";
-  composerMode: HomeTaskSuggestionMode;
-  headline: string | null;
-  layout: "list";
-  showCloseAction: false;
-  items: HomeTaskSuggestionViewItem[];
-  clinicalPortal: {
-    enabled: boolean;
-    showStarterPrompts: boolean;
-  } | null;
-}
-
-/** 原 `X`：当前 ChatGPT task suggestions 查询所使用的账号。 */
-const taskSuggestionAccountIdSignal = {
-  key: "chatgpt-task-suggestions-account-id",
-};
-
-/** 原 `ln`：丢弃 curated、空标题和无 prompt 条目，并统一 API 形态。 */
 function normalizeTaskSuggestions(items: readonly RawHomeTaskSuggestion[]): HomeTaskSuggestion[] {
   return items.flatMap((item) => {
     const destination = item.destination_metadata;
     let prompt = destination?.type === "prompt" ? destination.prompt : undefined;
     if (destination?.type === "connector") prompt = item.action_metadata?.prompt;
     if (item.item_type === "chat_home_curated" || item.title.trim() === "" || !prompt?.trim()) return [];
-    return [
-      {
-        item,
-        emoji: item.emoji,
-        iconDarkUrl: item.icon_paths?.["64_1x_dark"],
-        iconUrl: item.icon_paths?.["64_1x"],
-        id: item.logging_metadata?.suggestion_id ?? item.id,
-        isScheduledAutomation: item.item_type === "automation_suggestion",
-        prompt,
-        title: item.title,
-      },
-    ];
+    return [{
+      item,
+      emoji: item.emoji,
+      iconDarkUrl: item.icon_paths?.["64_1x_dark"],
+      iconUrl: item.icon_paths?.["64_1x"],
+      id: item.logging_metadata?.suggestion_id ?? item.id,
+      isScheduledAutomation: item.item_type === "automation_suggestion",
+      prompt,
+      title: item.title,
+    }];
   });
 }
 
-/** 原 `Tn`：只有 task/automation prompt destination 可请求后台自动发送。 */
 function startsInBackground(suggestion: HomeTaskSuggestion): boolean {
-  const { item_type: itemType, destination_metadata: destination } = suggestion.item;
-  return (
-    (itemType === "task_suggestion" || itemType === "automation_suggestion") &&
-    destination?.type === "prompt" &&
-    destination.auto_send_in_background === true
-  );
-}
-
-/** 原 `En`：主机返回的站内相对图标统一解析到 chatgpt.com。 */
-function normalizeIconUrl(url: string | undefined): string | null {
-  if (url == null) return null;
-  return url.startsWith("/") ? new URL(url, "https://chatgpt.com").href : url;
-}
-
-function actionPlanFor(
-  suggestion: HomeTaskSuggestion,
-  fallbackDestination: string,
-): HomeTaskSuggestionActionPlan {
   const destination = suggestion.item.destination_metadata;
-  const background = startsInBackground(suggestion);
-  return {
-    type: background ? "start-background-thread" : "fill-composer",
-    autoSend: destination?.type === "prompt" && destination.auto_send === true,
-    destination: destination?.type === "prompt" ? (destination.entrypoint ?? fallbackDestination) : fallbackDestination,
-    prompt: suggestion.prompt,
-    requiresCloud: background,
-  };
+  return (suggestion.item.item_type === "task_suggestion" || suggestion.item.item_type === "automation_suggestion") &&
+    destination?.type === "prompt" && destination.auto_send_in_background === true;
 }
 
-function initializeTaskSuggestionQueries(): void {}
+function normalizeIconUrl(url: string | undefined): string | undefined {
+  return url?.startsWith("/") ? new URL(url, "https://chatgpt.com").href : url;
+}
+
+function initializeTaskSuggestionQueries(): void {
+  if (taskSuggestionAccountIdSignal != null) return;
+  taskSuggestionAccountIdSignal = shared.sZ?.(shared.ZI, ({ get }) => get<{ accountId?: string | null }>(initial.Sln).accountId) ?? { key: "chatgpt-task-suggestions-account-id" };
+  pendingSuggestionKeysSignal = shared.pZ?.(shared.ZI, new Set<string>()) ?? { key: "chatgpt-task-suggestions-pending" };
+  taskSuggestionQueryFamily = shared.QX?.(shared.ZI, ({ hostId, mode }, { get }) => {
+    const accountId = get<string | null>(taskSuggestionAccountIdSignal);
+    return {
+      enabled: accountId != null,
+      queryKey: ["chatgpt-task-suggestions", accountId, hostId, mode],
+      queryFn: async () => normalizeTaskSuggestions(await initial.pnt?.ambientSuggestions?.getChatGptComposerItems({ entrypoint: mode, hostId }) ?? []),
+      retry: false,
+      staleTime: 60_000,
+    };
+  }) ?? { key: "chatgpt-task-suggestions-query" };
+}
+
 function initializeHomeTaskSuggestions(): void {
+  if (initialized) return;
   initializeTaskSuggestionQueries();
+  React = typeof shared.e6 === "function" ? shared.e6() : shared.e6;
+  jsx = typeof shared.I3 === "function" ? shared.I3() : shared.I3;
+  (homeSuggestionSurfaceChunk as unknown as { n?(): void }).n?.();
+  initialized = true;
 }
 
-/**
- * HomeTaskSuggestions（原 `hn`/`_n`）。Generic 区最多取三条，composer 非空、
- * 导航/附件处理中或查询不可用时隐藏；后台条目保留 Cloud 限制。Clinical
- * starter prompts 通过 follow-up portal 独立呈现。
- */
-function HomeTaskSuggestions(props: HomeTaskSuggestionsProps): HomeTaskSuggestionsView | null {
-  const state = props.runtimeState;
-  const showGeneric = props.showGenericSuggestions !== false;
-  const showClinical = props.showClinicalHomeSuggestions === true;
-  if (state == null) return null;
-
-  const clinicalEligible =
-    showClinical &&
-    props.mode !== "chat" &&
-    state.clinicalExperimentEnabled === true &&
-    state.clinicalPluginError !== true;
-  const clinicalPortal = showClinical
-    ? {
-        enabled: true,
-        showStarterPrompts:
-          clinicalEligible &&
-          state.clinicalPluginLoading !== true &&
-          state.navigationIdle !== false,
-      }
-    : null;
-
-  const suggestionsDisabled =
-    state.composerEmpty === false || state.navigationIdle === false || props.generatedSuggestionsEnabled === false;
-  const suggestions =
-    showGeneric && !suggestionsDisabled && state.accountId != null
-      ? normalizeTaskSuggestions(state.rawSuggestions ?? []).slice(0, 3)
-      : [];
-  if (suggestions.length === 0 && state.headline == null && clinicalPortal == null) return null;
-
-  const pendingIds = new Set(state.pendingSuggestionIds ?? []);
-  const fallbackDestination = props.mode;
-  return {
-    kind: "home-task-suggestions",
-    composerMode: props.mode,
-    headline: state.headline ?? null,
-    layout: "list",
-    showCloseAction: false,
-    items: suggestions.map((suggestion) => {
-      const destination = suggestion.item.destination_metadata;
-      return {
-        id: suggestion.id,
-        label: suggestion.title,
-        disabled: pendingIds.has(suggestion.id),
-        emoji: suggestion.emoji?.trim() || null,
-        iconUrl: normalizeIconUrl(suggestion.iconUrl),
-        iconDarkUrl: normalizeIconUrl(suggestion.iconDarkUrl),
-        tooltipPrompt:
-          destination?.type === "prompt" && destination.show_prompt_on_hover === true
-            ? suggestion.prompt
-            : null,
-        action: actionPlanFor(suggestion, fallbackDestination),
-      };
-    }),
-    clinicalPortal,
+async function recordInteraction(scope: ScopeWithQuery, hostId: string, mode: string, suggestion: HomeTaskSuggestion, interaction: "dismiss" | "select" | "view"): Promise<void> {
+  const accountId = scope.get<string | null>(taskSuggestionAccountIdSignal);
+  const queryKey = ["chatgpt-task-suggestions", accountId, hostId, mode];
+  const remove = () => {
+    void scope.queryClient.cancelQueries({ queryKey });
+    scope.queryClient.setQueriesData({ queryKey }, (items) => items?.filter((item) => item.id !== suggestion.item.id));
   };
+  if (interaction === "select") remove();
+  const bridge = initial.pnt?.ambientSuggestions;
+  if (bridge == null) throw new Error("ChatGPT task suggestions are unavailable on this host");
+  await bridge.recordChatGptComposerItemInteraction({
+    entrypoint: mode,
+    hostId,
+    interactionType: { dismiss: "dismissed", select: "clicked", view: "viewed" }[interaction],
+    item: suggestion.item,
+  });
+  if (interaction === "dismiss") remove();
+  if (interaction !== "view") void scope.queryClient.invalidateQueries({ queryKey });
 }
+
+function HomeTaskSuggestions(props: HomeTaskSuggestionsProps): unknown {
+  initializeHomeTaskSuggestions();
+  const scope = shared.LX(initial.kht ?? shared.ZI);
+  const composer = initial.HZ?.();
+  const accountId = shared.HX<string | null>(taskSuggestionAccountIdSignal);
+  const pending = shared.HX<Set<string>>(pendingSuggestionKeysSignal) ?? new Set<string>();
+  const generatedEnabled = props.generatedSuggestionsEnabled !== false && props.showGenericSuggestions !== false;
+  const query = shared.BX<HomeTaskSuggestion[]>(taskSuggestionQueryFamily, { hostId: props.hostId, mode: props.mode }, {
+    enabled: generatedEnabled && accountId != null && composer?.hasText() === false,
+  });
+  const suggestions = query.data?.slice(0, 3);
+  const viewed = React.useRef(new Set<string>());
+  React.useEffect(() => {
+    for (const suggestion of suggestions ?? []) {
+      const key = `${accountId}:${props.hostId}:${props.mode}:${suggestion.item.id}`;
+      if (viewed.current.has(key)) continue;
+      viewed.current.add(key);
+      void recordInteraction(scope, props.hostId, props.mode, suggestion, "view").catch(() => undefined);
+    }
+  }, [accountId, props.hostId, props.mode, scope, suggestions]);
+
+  const headline = primary.Sg?.().headline?.message_body;
+  const showClinical = props.showClinicalHomeSuggestions === true && ClinicalStarterPrompts != null;
+  if (composer == null || composer.hasText() || (suggestions?.length ?? 0) === 0 && headline == null && !showClinical) return null;
+
+  const activate = async (suggestion: HomeTaskSuggestion, index: number) => {
+    const pendingKey = `${accountId}:${props.hostId}:${suggestion.item.id}`;
+    if (pending.has(pendingKey) || composer.hasText()) return;
+    const background = startsInBackground(suggestion);
+    const toast = scope.get<{ success?(message: string, options?: unknown): void; warning?(message: string): void } | undefined>(shared.pk);
+    if (background && props.workRunLocation !== "cloud") {
+      toast?.warning?.("Background suggestions are only available in Cloud");
+      return;
+    }
+    scope.set(pendingSuggestionKeysSignal, new Set([...pending, pendingKey]));
+    try {
+      if (background && primary.eu != null) {
+        const created = await primary.eu(scope, {
+          hostId: props.hostId,
+          projectId: props.projectId,
+          prompt: suggestion.prompt,
+          suggestedAutomationType: suggestion.isScheduledAutomation ? suggestion.id : undefined,
+          threadSource: "ambient_suggestion_task",
+          turnTrigger: "ambient_suggestion_task",
+        });
+        if (created == null) throw new Error("Background suggestion did not start");
+        const conversationId = (created as { conversationId?: string }).conversationId;
+        toast?.success?.("Task started", conversationId == null ? undefined : {
+          primaryAction: {
+            label: "Open chat",
+            onClick: () => initial.o_n?.()(initial.gln?.({ id: conversationId }) ?? `/c/${conversationId}`),
+          },
+        });
+      } else {
+        const destination = suggestion.item.destination_metadata?.type === "prompt"
+          ? suggestion.item.destination_metadata.entrypoint ?? props.mode
+          : props.mode;
+        await props.prepareDestination?.(destination);
+        composer.cancelPendingSubmit?.();
+        composer.setPromptText(suggestion.prompt);
+        const systemHint = suggestion.item.action_metadata?.system_hints?.find((value): value is string => typeof value === "string" && value.length > 0);
+        const conversationId = initial.v2 == null ? null : scope.get<string | null>(initial.v2);
+        if (systemHint != null && conversationId != null) initial.b2?.(scope, conversationId, [systemHint]);
+        composer.focus();
+        if (suggestion.item.destination_metadata?.type === "prompt" && suggestion.item.destination_metadata.auto_send === true) {
+          composer.requestSubmitWhenReady?.(() => accountId === scope.get(taskSuggestionAccountIdSignal));
+        }
+      }
+      await recordInteraction(scope, props.hostId, props.mode, suggestion, "select");
+      initial.xpn?.(scope, "chatgpt_task_suggestion_selected", {
+        action: background ? "start-thread" : "fill-composer",
+        promptId: suggestion.id,
+        promptIndex: index,
+        surface: "chatgpt_work",
+      });
+      props.onSelect?.(suggestion);
+    } catch {
+      toast?.warning?.("Couldn't start suggestion. Please try again");
+    } finally {
+      scope.set(pendingSuggestionKeysSignal, (current: Set<string>) => {
+        const next = new Set(current);
+        next.delete(pendingKey);
+        return next;
+      });
+    }
+  };
+
+  const items = suggestions?.map((suggestion, index) => {
+    const destination = suggestion.item.destination_metadata;
+    const emoji = suggestion.emoji?.trim();
+    return {
+      id: suggestion.id,
+      label: suggestion.title,
+      disabled: pending.has(`${accountId}:${props.hostId}:${suggestion.item.id}`),
+      icon: emoji || normalizeIconUrl(suggestion.iconUrl) || null,
+      logoUrl: normalizeIconUrl(suggestion.iconUrl),
+      logoDarkUrl: normalizeIconUrl(suggestion.iconDarkUrl),
+      tooltipContent: destination?.type === "prompt" && destination.show_prompt_on_hover === true ? suggestion.prompt : undefined,
+      onClick: () => void activate(suggestion, index),
+      onDismiss: () => void recordInteraction(scope, props.hostId, props.mode, suggestion, "dismiss").catch(() => undefined),
+    };
+  }) ?? [];
+  const surface = HomeSuggestionSurface == null
+    ? jsx.jsx("div", { "data-home-task-suggestions": true, children: items.map((item) => jsx.jsx("button", { disabled: item.disabled, onClick: item.onClick, children: item.label }, item.id)) })
+    : jsx.jsx(HomeSuggestionSurface, {
+        composerMode: props.mode,
+        headline,
+        items,
+        layout: "list",
+        showCloseAction: false,
+      });
+  return showClinical
+    ? jsx.jsxs(jsx.Fragment, { children: [surface, jsx.jsx(ClinicalStarterPrompts, {})] })
+    : surface;
+}
+
+initializeHomeTaskSuggestions();
 
 export {
   taskSuggestionAccountIdSignal as i,

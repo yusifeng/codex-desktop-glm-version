@@ -11,6 +11,9 @@ const MODULES = [
   "use-home-directory",
   "task-announcement-candidates",
   "announcement-entry-points",
+  "home-task-suggestions-core",
+  "home-ambient-suggestions-content",
+  "work-onboarding-suggestions",
 ];
 const state = (globalThis.__homeAnnouncementEntryPointTest = {
   accountId: "account-1",
@@ -24,9 +27,20 @@ const state = (globalThis.__homeAnnouncementEntryPointTest = {
   },
   homeDirectory: "/Users/tester",
   imported: [],
+  interactions: [],
   launched: [],
+  started: [],
   signals: new Map(),
+  taskQuery: { data: [] },
 });
+state.composer = {
+  text: "",
+  cancelPendingSubmit() { state.cancelledSubmit = true; },
+  focus() { state.focused = true; },
+  hasText() { return this.text.length > 0; },
+  requestSubmitWhenReady(ready) { state.submitReady = ready(); },
+  setPromptText(text) { this.text = text; },
+};
 state.jsx = {
   Fragment: Symbol("Fragment"),
   jsx: (type, props, key) => ({ type, props: props ?? {}, key }),
@@ -48,24 +62,35 @@ const mocks = {
     export const e6 = () => react;
     export const n4 = () => ({ formatMessage: (descriptor) => descriptor.defaultMessage });
     export const LX = () => ({
-      get: (signal) => globalThis.__homeAnnouncementEntryPointTest.signals.get(signal.key),
+      queryClient: {
+        cancelQueries: async () => {},
+        invalidateQueries: async () => {},
+        setQueriesData: () => {},
+      },
+      get: (signal) => read(signal),
       set: (signal, value) => {
         const current = globalThis.__homeAnnouncementEntryPointTest.signals.get(signal.key);
         globalThis.__homeAnnouncementEntryPointTest.signals.set(signal.key, typeof value === 'function' ? value(current) : value);
       },
     });
-    export const HX = (signal) => globalThis.__homeAnnouncementEntryPointTest.signals.get(signal.key);
+    const read = signal => signal?.kind === 'derived' ? signal.derive({get:read}) : globalThis.__homeAnnouncementEntryPointTest.signals.get(signal?.key);
+    export const HX = read;
     export const sZ = (_scope, derive) => ({ kind: 'derived', derive });
+    export const pZ = (_scope, value) => { const signal={key:'signal-'+globalThis.__homeAnnouncementEntryPointTest.signals.size};globalThis.__homeAnnouncementEntryPointTest.signals.set(signal.key,value);return signal; };
+    export const QX = (_scope, factory) => ({ kind: 'task-query', factory });
     export const BX = (query, variables) => {
       const test = globalThis.__homeAnnouncementEntryPointTest;
       if (query?.kind === 'home-directory') return { data: variables == null ? undefined : { homeDirectory: test.homeDirectory } };
       if (query?.kind === 'histories') return { data: [{ completedAtMs: Date.now() - 70 * 86400000, successes: [1] }], isLoading: false };
       if (query?.kind === 'status') return { data: {}, isLoading: false };
+      if (query?.kind === 'task-query') return test.taskQuery;
       return { data: undefined, isLoading: false };
     };
   `,
   "app-initial": `
     export const gcn = { kind: 'home-directory' };
+    export const Sln = { key: 'auth-state' };
+    export const kht = Symbol('composer-scope');
     export const ZA = { kind: 'histories' };
     export const _A = { kind: 'status' };
     export const ugn = 'local';
@@ -75,7 +100,7 @@ const mocks = {
       if (!test.signals.has(key)) test.signals.set(key, value);
       return { key };
     };
-    export const N6t = () => ({ accountId: globalThis.__homeAnnouncementEntryPointTest.accountId, isLoading: false });
+    export const N6t = () => ({ accountId: globalThis.__homeAnnouncementEntryPointTest.accountId, userId: 'user-1', isLoading: false });
     export const mht = () => ({ data: { desktop_onboarding_completed_at: new Date(Date.now() - 86400000).toISOString() }, isLoading: false });
     const experiment = (id) => ({
       __evaluation: { is_experiment_active: id === '1602805785', is_user_in_experiment: id === '1602805785' },
@@ -91,7 +116,6 @@ const mocks = {
     export const IA = () => ({});
     export const CA = () => globalThis.__homeAnnouncementEntryPointTest.discovery;
     export const ngn = (_key, fallback) => fallback;
-    export const xpn = (_scope, event, payload) => globalThis.__homeAnnouncementEntryPointTest.analytics.push({ event, payload });
     export const e4t = Symbol('plugin-query');
     export const h4t = plugin => plugin;
     export const Gwt = async input => { globalThis.__homeAnnouncementEntryPointTest.launched.push({ reload: input.hostId }); };
@@ -100,9 +124,20 @@ const mocks = {
     export const VDt = async () => ({ cwd: '/tmp/replay', projectlessOutputDirectory: 'output', workspaceRoots: ['/tmp/replay'] });
     export const Zgt = async () => 'default';
     export const gpt = async () => ({ conversationId: 'conversation-replay', firstTurn: { status: 'accepted', turnId: 'turn-1' }, status: 'accepted' });
+    export const rqt = () => 'onboarding-conversation';
+    export const ROt = async (_scope, input) => { globalThis.__homeAnnouncementEntryPointTest.started.push(input); return { serverConversationId: 'server-onboarding' }; };
+    export const gln = conversation => '/c/' + conversation.id;
+    export const o_n = () => destination => globalThis.__homeAnnouncementEntryPointTest.launched.push({ destination });
+    export const rJt = { safeGet: async () => ({}), safePost: async (_path, options) => ({ status: 'ready', options }) };
     export const mpt = () => null;
+    export const HZ = () => globalThis.__homeAnnouncementEntryPointTest.composer;
+    export const pnt = { ambientSuggestions: {
+      getChatGptComposerItems: async () => [],
+      recordChatGptComposerItemInteraction: async input => globalThis.__homeAnnouncementEntryPointTest.interactions.push(input),
+    }};
+    export const xpn = (_scope, event, payload) => globalThis.__homeAnnouncementEntryPointTest.analytics.push({ event, payload });
   `,
-  "app-primary": "export const Sm = null;",
+  "app-primary": "export const Sm = null; export const Sg=()=>({headline:{message_body:'Suggested for you'}}); export const eu=async()=>({conversationId:'background-1'});",
   "composer-announcement-slot": "export const t = null;",
   "computer-history-plugin-icon": "export const t = 'computer-history.png';",
   "run-external-agent-import-command": `
@@ -116,6 +151,9 @@ const mocks = {
     export const n = ({ enabled }) => enabled;
     export const a = (_input, entryPoint) => globalThis.__homeAnnouncementEntryPointTest.launched.push({ entryPoint });
   `,
+  "home-suggestion-surface": "export const n=()=>{};export const t=props=>({type:'suggestion-surface',props});",
+  "home-starter-prompts": "export const ClinicalStarterPrompts=props=>({type:'clinical-prompts',props});",
+  "new-chat-suggestion-source-debug-state": "export const c=()=>{};export const t=()=>{};",
 };
 
 function mock(name) {
@@ -281,6 +319,85 @@ assert.equal(replayConversation, "conversation-replay");
 assert.equal(replayCompleted, true);
 await new Promise((resolve) => setTimeout(resolve, 0));
 assert.equal(state.imported.length, 1);
+
+// home-task-suggestions-core: real derived account signal, rendered surface and native interactions
+state.signals.set("auth-state", { accountId: "account-1" });
+state.taskQuery = {
+  data: [{
+    id: "suggestion-1",
+    title: "Draft a launch plan",
+    prompt: "Draft a launch plan",
+    isScheduledAutomation: false,
+    item: {
+      id: "raw-1",
+      item_type: "task_suggestion",
+      title: "Draft a launch plan",
+      destination_metadata: { type: "prompt", prompt: "Draft a launch plan", auto_send: true, show_prompt_on_hover: true },
+      logging_metadata: { suggestion_id: "suggestion-1" },
+    },
+  }],
+};
+const taskSuggestions = await bundle("home-task-suggestions-core");
+assert.equal(taskSuggestions.i.kind, "derived");
+const homeTaskTree = taskSuggestions.t({ hostId: "local", mode: "chat", workRunLocation: "cloud" });
+const homeTaskSurface = homeTaskTree.type(homeTaskTree.props);
+assert.equal(homeTaskSurface.type, "suggestion-surface");
+assert.equal(homeTaskSurface.props.headline, "Suggested for you");
+assert.equal(homeTaskSurface.props.items.length, 1);
+assert.equal(homeTaskSurface.props.items[0].tooltipContent, "Draft a launch plan");
+await homeTaskSurface.props.items[0].onClick();
+await new Promise((resolve) => setTimeout(resolve, 0));
+assert.equal(state.composer.text, "Draft a launch plan");
+assert.equal(state.focused, true);
+assert.equal(state.submitReady, true);
+assert.equal(state.interactions.some((entry) => entry.interactionType === "viewed"), true);
+assert.equal(state.interactions.some((entry) => entry.interactionType === "clicked"), true);
+homeTaskSurface.props.items[0].onDismiss();
+await new Promise((resolve) => setTimeout(resolve, 0));
+assert.equal(state.interactions.some((entry) => entry.interactionType === "dismissed"), true);
+
+// home-ambient-suggestions-content: rendered production surface and composer action
+state.composer.text = "";
+const ambient = await bundle("home-ambient-suggestions-content");
+const ambientTree = ambient.HomeAmbientSuggestionsContent({
+  generatedSuggestionsEnabled: true,
+  hostId: "local",
+  onLocalConversationCreated() {},
+  projectRoot: "/workspace",
+  runtimeState: {
+    source: "generated",
+    headline: "Try one of these",
+    generatedSuggestions: [{ id: "ambient-1", title: "Summarize notes", prompt: "Summarize my notes", source: "generated", homeAction: { type: "fill-composer" } }],
+  },
+});
+const ambientSurfaceNode = nodes(ambientTree).find((node) => node.type === mocks["home-suggestion-surface"]?.t || node.type === "suggestion-surface") ?? nodes(ambientTree).find((node) => typeof node.type === "function");
+const ambientSurface = typeof ambientSurfaceNode.type === "function" ? ambientSurfaceNode.type(ambientSurfaceNode.props) : ambientSurfaceNode;
+assert.equal(ambientSurface.type, "suggestion-surface");
+assert.equal(ambientSurface.props.headline, "Try one of these");
+assert.equal(ambientSurface.props.items[0].label, "Summarize notes");
+await ambientSurface.props.items[0].onClick();
+assert.equal(state.composer.text, "Summarize my notes");
+assert.equal(state.analytics.some((entry) => entry.event === "ambient_suggestion_selected"), true);
+
+// work-onboarding-suggestions: real carousel, task creation and conversation link
+state.taskQuery = { data: { status: "ready", cards: [] }, isPending: false };
+state.started = [];
+const workOnboarding = await bundle("work-onboarding-suggestions");
+const eligible = { hasIdentity: true, announcementEligible: true, announcementCompleted: false, composerEmpty: true, featureEnabled: true, isWorkPlan: true, hasExistingConversations: false };
+const workTree = workOnboarding.WorkOnboardingSuggestions({
+  eligibility: eligible,
+  serverCards: [{ category: "website", short_prompt: "Build a launch site", long_prompt: "Build a launch website" }],
+});
+assert.equal(workTree.type, "section");
+assert.equal(workTree.props["data-work-onboarding-carousel"], true);
+assert.equal(nodes(workTree).find((node) => node.type === "h2").props.children, "See what Work can do");
+const tryButton = nodes(workTree).find((node) => node.type === "button" && node.props.children === "Try");
+await tryButton.props.onClick();
+await new Promise((resolve) => setTimeout(resolve, 0));
+assert.equal(state.started.length, 1);
+assert.equal(state.started[0].conversationOrigin, "tpp");
+assert.equal(state.started[0].prompt, "Build a launch website");
+assert.equal(state.launched.some((entry) => entry.destination === "/c/server-onboarding"), true);
 
 const assertionCount = [...fs.readFileSync(fileURLToPath(import.meta.url), "utf8").matchAll(/\bassert\.(?:equal|deepEqual|match|ok)\s*\(/g)].length;
 console.log(`${assertionCount} home announcement entry-point cluster assertions passed`);

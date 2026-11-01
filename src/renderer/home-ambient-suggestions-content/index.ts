@@ -11,16 +11,17 @@
 //   - suggestion impression、accept、refresh、dismiss 与错误 toast。
 
 import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/app-primary";
+import * as appSharedChunk from "@rchunk/app-shared";
+import * as appInitialChunk from "@rchunk/app-initial";
+import * as appPrimaryChunk from "@rchunk/app-primary";
 import "@rchunk/onboarding-mail-provider";
 import "@rchunk/ambient-suggestion-apps";
-import "@rchunk/new-chat-suggestion-source-debug-state";
+import * as suggestionStateChunk from "@rchunk/new-chat-suggestion-source-debug-state";
 import "@rchunk/color-icon";
-import "@rchunk/home-suggestion-surface";
+import * as homeSuggestionSurfaceChunk from "@rchunk/home-suggestion-surface";
 import "@rchunk/book-open";
 import "@rchunk/new-chat-page-suggestions-eligibility";
+import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
 
 export type AmbientSuggestionSurface = "chatgpt_work" | "codex";
 export type AmbientSuggestionSource = "curated" | "default" | "generated";
@@ -118,6 +119,52 @@ export interface HomeAmbientSuggestionsView {
   suggestions: AmbientSuggestionViewItem[];
   prioritizedSupplementalItemIds: string[];
 }
+
+interface Scope {
+  get<Value>(signal: unknown, parameter?: unknown): Value;
+  set(signal: unknown, parameter: unknown, value?: unknown): void;
+}
+interface SharedBindings {
+  BX<Value>(signal: unknown, parameter: unknown, options?: { enabled?: boolean }): Value;
+  HX<Value>(signal: unknown): Value;
+  I3: JsxRuntime | (() => JsxRuntime);
+  LX(scope: unknown): Scope;
+  ZI: unknown;
+  e6: ReactRuntime | (() => ReactRuntime);
+  pk?: unknown;
+}
+interface ComposerController {
+  focus(): void;
+  hasText(): boolean;
+  setPromptText(text: string): void;
+}
+interface InitialBindings {
+  HZ?(): ComposerController;
+  Sln?: unknown;
+  kht?: unknown;
+  xpn?(scope: Scope, event: unknown, payload: Record<string, unknown>): void;
+}
+interface PrimaryBindings {
+  Sg?(): { headline?: { message_body?: string } | null };
+  eu?(scope: Scope, input: Record<string, unknown>): Promise<{ conversationId?: string } | null>;
+}
+interface SuggestionStateBindings {
+  a?: unknown;
+  c?(): void;
+  d?(scope: Scope, params: Record<string, unknown>, suggestionId: string, status: string): void;
+  f?(scope: Scope, params: Record<string, unknown>, suggestionId: string, status: string): void;
+  p?: unknown;
+  t?(): void;
+}
+
+const shared = appSharedChunk as unknown as SharedBindings;
+const initial = appInitialChunk as unknown as InitialBindings;
+const primary = appPrimaryChunk as unknown as PrimaryBindings;
+const suggestionState = suggestionStateChunk as unknown as SuggestionStateBindings;
+const HomeSuggestionSurface = (homeSuggestionSurfaceChunk as unknown as { t?: unknown }).t;
+let React: ReactRuntime;
+let jsx: JsxRuntime;
+let initialized = false;
 
 const DEFAULT_CATEGORIES: readonly AmbientSuggestionCategory[] = [
   {
@@ -250,47 +297,135 @@ function createExecutionPlan(
   }
 }
 
-/**
- * HomeAmbientSuggestionsContent（原 `Zi` → `xi`）。生成建议未启用、项目根
- * 缺失或资格查询尚未选出来源时不显示；curated 模式呈现 taxonomy，generated
- * 模式默认为 list。每个条目都保留原三类启动动作的执行语义。
- */
-function HomeAmbientSuggestionsContent(
-  props: HomeAmbientSuggestionsContentProps,
-): HomeAmbientSuggestionsView | null {
-  const state = props.runtimeState;
-  if (!props.generatedSuggestionsEnabled || props.projectRoot == null || state == null || state.hidden === true) {
-    return null;
-  }
+function initializeAmbientSuggestions(): void {
+  if (initialized) return;
+  React = typeof shared.e6 === "function" ? shared.e6() : shared.e6;
+  jsx = typeof shared.I3 === "function" ? shared.I3() : shared.I3;
+  suggestionState.c?.();
+  suggestionState.t?.();
+  (homeSuggestionSurfaceChunk as unknown as { n?(): void }).n?.();
+  initialized = true;
+}
 
-  const source = state.source;
-  if (source == null && state.starterPrompt == null) return null;
-  const categories = source === "curated" ? (state.curatedCategories ?? [...DEFAULT_CATEGORIES]) : [];
-  const supplemental = state.generatedSuggestions ?? [];
-  const rawSuggestions = state.starterPrompt == null ? supplemental : [state.starterPrompt, ...supplemental];
-  const projectRoot = props.projectRoot ?? null;
-  const disabled = state.isAgentModePending === true || state.isLoading === true;
-  const suggestions = rawSuggestions.map((suggestion) => ({
-    ...suggestion,
-    disabled,
-    execution: createExecutionPlan(suggestion, props.hostId, projectRoot),
-  }));
+function normalizeGeneratedSuggestion(value: Record<string, unknown>): AmbientSuggestionItem | null {
+  const id = typeof value.id === "string" ? value.id : null;
+  const prompt = typeof value.prompt === "string" ? value.prompt : null;
+  const title = typeof value.title === "string" ? value.title : prompt;
+  if (id == null || prompt == null || title == null) return null;
+  const rawAction = value.homeAction as Record<string, unknown> | undefined;
+  let homeAction: AmbientSuggestionAction = { type: "fill-composer" };
+  if (rawAction?.type === "start-thread") {
+    homeAction = {
+      type: "start-thread",
+      initialTitle: typeof rawAction.initialTitle === "string" ? rawAction.initialTitle : undefined,
+      skillNameToMention: typeof rawAction.skillNameToMention === "string" ? rawAction.skillNameToMention : undefined,
+      elicitationPluginIds: Array.isArray(rawAction.elicitationPluginIds) ? rawAction.elicitationPluginIds.filter((item): item is string => typeof item === "string") : undefined,
+    };
+  } else if (rawAction?.type === "connect-plugin-onboarding") {
+    const plugin = rawAction.plugin as { id?: string } | undefined;
+    homeAction = { type: "connect-plugin-onboarding", pluginId: plugin?.id ?? "" };
+  }
+  return {
+    analyticsType: typeof value.analyticsType === "string" ? value.analyticsType : undefined,
+    appIds: Array.isArray(value.appIds) ? value.appIds.filter((item): item is string => typeof item === "string") : undefined,
+    homeAction,
+    id,
+    prompt,
+    showArtifactTemplates: value.showArtifactTemplates === true,
+    source: value.source === "default" || value.source === "curated" ? value.source : "generated",
+    title,
+  };
+}
+
+function HomeAmbientSuggestionsContent(props: HomeAmbientSuggestionsContentProps): unknown {
+  initializeAmbientSuggestions();
+  const scope = shared.LX(initial.kht ?? shared.ZI);
+  const composer = initial.HZ?.();
+  const params = { domain: "default", hostId: props.hostId, projectRoot: props.projectRoot };
+  const query = suggestionState.a == null ? undefined : shared.BX<{ data?: { file?: { currentSuggestionIds?: string[]; suggestions?: Record<string, unknown>[] } }; isError?: boolean; isLoading?: boolean; isPending?: boolean }>(suggestionState.a, params, { enabled: props.generatedSuggestionsEnabled && props.projectRoot != null });
+  const pending = suggestionState.p == null ? undefined : shared.BX<Record<string, unknown>[] | undefined>(suggestionState.p, params);
+  const state = props.runtimeState;
+  const queryItems = pending ?? query?.data?.file?.suggestions?.filter((item) => item.status === "pending") ?? [];
+  const generated = state?.generatedSuggestions ?? queryItems.flatMap((item) => {
+    const normalized = normalizeGeneratedSuggestion(item);
+    return normalized == null ? [] : [normalized];
+  });
+  const source = state?.source ?? (props.generatedSuggestionsEnabled && generated.length > 0 ? "generated" : "curated");
+  const categories = source === "curated" ? state?.curatedCategories ?? [...DEFAULT_CATEGORIES] : [];
+  const supplemental = state?.starterPrompt == null ? generated : [state.starterPrompt, ...generated];
+  const [activeCategoryId, setActiveCategoryId] = React.useState<string | null>(null);
+  const activeCategory = categories.find((category) => category.id === activeCategoryId);
+  const suggestions = activeCategory?.tasks ?? supplemental;
+  const disabled = state?.isAgentModePending === true || state?.isLoading === true || query?.isLoading === true || query?.isPending === true;
   const surface: AmbientSuggestionSurface = props.plan === "chatgpt_work" ? "chatgpt_work" : "codex";
   const layout = props.topLevelLayout ?? (source === "generated" ? "list" : "cards");
+  const visibleIds = suggestions.map((item) => item.id).join(",");
+  const previousVisibleIds = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    if (visibleIds === "" || previousVisibleIds.current === visibleIds) return;
+    previousVisibleIds.current = visibleIds;
+    initial.xpn?.(scope, "ambient_suggestions_impression", { promptCount: suggestions.length, promptIds: visibleIds, surface });
+  }, [scope, suggestions.length, surface, visibleIds]);
+  if (state?.hidden === true || composer?.hasText() === true) return null;
+  if (source === "generated" && props.projectRoot == null) return null;
 
-  return {
-    kind: "home-ambient-suggestions",
-    surface,
-    domain: deriveDomain(state.selectedModel, state.selectedModelDisplayName),
-    headline: state.headline ?? null,
-    layout,
-    loading: state.isLoading === true,
-    refreshable: source === "generated",
-    activeSuggestionId: state.activeSuggestionId ?? null,
-    categories,
-    suggestions,
-    prioritizedSupplementalItemIds: surface === "chatgpt_work" ? ["learn-writing-style"] : [],
+  const markAccepted = (suggestion: AmbientSuggestionItem) => {
+    if (suggestion.source === "default") suggestionState.f?.(scope, params, suggestion.id, "accepted");
+    else suggestionState.d?.(scope, params, suggestion.id, "accepted");
   };
+  const activate = async (suggestion: AmbientSuggestionItem, index: number) => {
+    if (disabled) return;
+    try {
+      switch (suggestion.homeAction.type) {
+        case "fill-composer":
+        case "connect-plugin-onboarding":
+          composer?.setPromptText(suggestion.prompt);
+          composer?.focus();
+          markAccepted(suggestion);
+          break;
+        case "start-thread": {
+          if (props.projectRoot == null || primary.eu == null) return;
+          const created = await primary.eu(scope, {
+            elicitationPluginIds: suggestion.homeAction.elicitationPluginIds,
+            hostId: props.hostId,
+            initialTitle: suggestion.homeAction.initialTitle,
+            projectRoot: props.projectRoot,
+            prompt: suggestion.prompt,
+            skillName: suggestion.homeAction.skillNameToMention,
+            threadSource: "ambient_suggestion_task",
+            turnTrigger: "ambient_suggestion_task",
+          });
+          if (created?.conversationId != null) await props.onLocalConversationCreated(created.conversationId);
+          markAccepted(suggestion);
+          break;
+        }
+      }
+      initial.xpn?.(scope, "ambient_suggestion_selected", { action: suggestion.homeAction.type, promptId: suggestion.id, promptIndex: index, promptType: suggestion.analyticsType ?? suggestion.source, surface });
+    } catch {
+      scope.get<{ danger?(message: string, options?: unknown): void } | undefined>(shared.pk)?.danger?.("Unable to start this suggestion", { errorAnalytics: { toastId: "home.ambientSuggestions.startError" }, id: "ambient-suggestion-start-error" });
+    }
+  };
+  const items = suggestions.map((suggestion, index) => ({
+    disabled,
+    id: suggestion.id,
+    label: suggestion.title,
+    onClick: () => void activate(suggestion, index),
+    tooltipContent: suggestion.prompt,
+  }));
+  const categoryItems = categories.map((category) => ({ disabled, id: category.id, label: category.title, onClick: () => { composer?.setPromptText(category.starterPrompt); setActiveCategoryId(category.id); }, tooltipContent: category.starterPrompt }));
+  if (HomeSuggestionSurface == null || (items.length === 0 && categoryItems.length === 0 && state?.headline == null && primary.Sg?.().headline?.message_body == null)) return null;
+  return jsx.jsxs("div", { className: "flex min-w-0 flex-col gap-3", children: [
+    activeCategory == null ? null : jsx.jsx("button", { onClick: () => setActiveCategoryId(null), type: "button", children: "Back" }),
+    jsx.jsx(HomeSuggestionSurface, {
+      headline: state?.headline ?? primary.Sg?.().headline?.message_body,
+      hideSuggestions: false,
+      isRefreshing: false,
+      items: activeCategory == null && source === "curated" ? categoryItems : items,
+      layout,
+      showCloseAction: source === "curated",
+    }),
+    query?.isError ? jsx.jsx("div", { role: "alert", children: "Suggestions could not be loaded" }) : null,
+  ] });
 }
 
 export { HomeAmbientSuggestionsContent };

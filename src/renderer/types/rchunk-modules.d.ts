@@ -8492,15 +8492,28 @@ declare module "@rchunk/option-carousel" {
 }
 
 declare module "@rchunk/recent-uploads" {
-  export const _any: any;
+  export const n: () => void;
+  export const r: unknown;
+  export const t: (record: { file_id: string }) => Promise<Record<string, unknown>>;
 }
 
 declare module "@rchunk/chatgpt-image-home" {
-  export const _any: any;
+  export const a: Record<string, string>;
+  export const i: unknown;
+  export const n: unknown;
+  export const o: () => void;
+  export const r: unknown;
+  export const t: Record<string, string>;
 }
 
 declare module "@rchunk/image-suggestions-core" {
+  export const a: (scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>) => { conversationId: string };
+  export const c: () => void;
+  export const i: (scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>, item: unknown, group: unknown, imageSendUuid: string) => void;
   export const n: () => void;
+  export const o: unknown;
+  export const r: () => void;
+  export const s: unknown;
   export const t: unknown;
 }
 
@@ -8698,8 +8711,18 @@ declare module "@rchunk/composer-browser-skills-state" {
 }
 
 declare module "@rchunk/home-task-suggestions-core" {
+  export const i: unknown;
   export const n: () => void;
+  export const r: () => void;
   export const t: unknown;
+}
+
+declare module "@rchunk/home-ambient-suggestions-content" {
+  export const HomeAmbientSuggestionsContent: unknown;
+}
+
+declare module "@rchunk/work-onboarding-suggestions" {
+  export const WorkOnboardingSuggestions: unknown;
 }
 
 declare module "@rchunk/home-starter-prompts" {

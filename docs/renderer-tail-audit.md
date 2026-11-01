@@ -1,5 +1,19 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Home suggestions 大批次：`home-task-suggestions-core`、
+`image-suggestions-core`、`home-ambient-suggestions-content` 与
+`work-onboarding-suggestions` 已从 release-faithful `exact.js` 迁至可维护 TypeScript，
+一次删除 8,090 行原始 owner。Task suggestions 恢复账户/host 隔离查询、native
+view/click/dismiss interaction、Cloud background task、destination preparation、system hint、
+auto-submit 与成功/失败 toast；Images 恢复 scoped draft family、账户/用户隔离 catalog/styles
+查询、style suggestion 合并、四种 card presentation、Home prompt 原位替换、impression/selection/send
+analytics、sketch request guard、upload/recent-photo 分支；Ambient suggestions 恢复 generated/curated
+来源、taxonomy drill-in、composer/start-thread 动作、接受状态与曝光/选择 analytics；Work onboarding
+恢复资格门控、temporal/legacy API、静态 fallback、三卡 carousel、Try/Tried conversation linkage、
+dismiss/retry 与完成 analytics。focused suites 分别达到 Home/announcement 59 项、Images 66 项，
+source-build 在删除 owner 后覆盖 36 个剩余 exact owners。严格剩余清单由 40 个 / 180,678 行
+降至 36 个 / 172,588 行。
+
 2026-11-02 route owner 大批次：`usage`、`notifications-settings` 与
 `announcement-entry-points` 已从 release-faithful `exact.js` 迁至可维护 TypeScript。
 Usage 恢复账户/用户隔离、warning/blocking/image/model 分支、backend upsell、fallback model
