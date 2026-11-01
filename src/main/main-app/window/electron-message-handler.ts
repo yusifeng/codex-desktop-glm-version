@@ -47,7 +47,7 @@ function createElectronMessageHandlerClass({
     deletePersistedBrowserConversation, forwardBrowserNavigationUrl, lWe,
     loadFaviconData, performanceHeartbeatIntervalMs, performanceRequestTtlMs, performanceTriggerMinIntervalMs,
     rZe, readHostWorktreeSettings, rt, setRemoteControlEnabled, setRemoteControlSessionActive,
-    summarizeWindowAttention, tee, toggleTraceRecording, uEe,
+    requestInterceptor, summarizeWindowAttention, tee, toggleTraceRecording,
   } = dependencies;
 
   var eQ = createLogger(`electron-message-handler`),
@@ -1079,7 +1079,7 @@ class ElectronMessageHandler {
         });
         let r = t.request;
         if (n.Cs(t.hostId)) {
-          let n = uEe.send(t.request);
+          let n = requestInterceptor.send(t.request);
           if (n.type === `response`) {
             this.sendAppServerResponseToView(
               e,

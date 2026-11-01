@@ -83,7 +83,7 @@ export function createWindowContextClass(dependencies) {
     Nnt,
     O,
     OAe,
-    OT,
+    longLivedHostDescriptor,
     P,
     P1e,
     PBe,
@@ -223,7 +223,7 @@ export function createWindowContextClass(dependencies) {
     uQe,
     uke,
     v,
-    vEe,
+    AppServerFeatureEnablement,
     vi,
     w,
     w6e,
@@ -359,7 +359,7 @@ export function createWindowContextClass(dependencies) {
               ).originUrl,
             (e, t) => this.messageHandler.createDefaultWorkspaceRoot(e, t),
           )),
-          (this.durableThreadHostConfig = OT({
+          (this.durableThreadHostConfig = longLivedHostDescriptor({
             desktopOriginator: e.desktopOriginator,
             devApiBaseUrl: e.devApiBaseUrl,
             prodApiBaseUrl: e.prodApiBaseUrl,
@@ -447,7 +447,7 @@ export function createWindowContextClass(dependencies) {
           (this.appServerConnectionRegistry = new AppServerConnectionRegistry()),
           this.appServerConnectionRegistry.addConnection(J, r),
           this.disposables.add(
-            new vEe(this.appServerConnectionRegistry, this.publishedStatsig, (e) =>
+            new AppServerFeatureEnablement(this.appServerConnectionRegistry, this.publishedStatsig, (e) =>
               this.broadcastQueryCacheInvalidation([`experimental-features`, `list`, e]),
             ),
           ),

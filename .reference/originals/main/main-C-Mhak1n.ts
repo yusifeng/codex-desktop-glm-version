@@ -654,11 +654,19 @@ const {
   assertIabModeAllowedByPolicy,
 } = require("./main-app/browser-use/origin-state.js");
 const {
+  configureStatsigAdapterRuntime,
   PublishedStatsig,
   StableIdStore,
   getThreadSummariesDb,
   ThreadTurnSummariesStore,
 } = require("./main-app/account/statsig-adapter.js");
+const {
+  AppServerFeatureEnablement,
+  AppServerHttpClient,
+  HybridWebsocketHttpTransport,
+  longLivedHostDescriptor,
+  requestInterceptor,
+} = require("./main-app/app-server/cloud-backend.js");
 const {
   UpdateCapabilityService,
   AvatarOverlayService,
@@ -19590,450 +19598,14 @@ var bw = e.t((e) => {
     ((e.StatsigClient = i.default),
       n(qw(), e),
       (e.default = Object.assign((0, r._getStatsigGlobal)(), { StatsigClient: i.default })));
-  })(),
-  Xw = {
-    gates: {
-      crossHostHandoff: `codex-app-cross-host-handoff`,
-      projectTools: `codex-app-project-tools`,
-      threadPullRequestAssociations: `codex-app-thread-pull-request-associations`,
-      shareThread: `codex-share-thread`,
-      multiAgentMode: `codex_rollout_multi_agent_mode`,
-      sidebarCustomSections: `codex-app-sidebar-custom-sections`,
-      appLifecycle: `codex_app_enable_new_app_lifecycle`,
-    },
-    configs: {
-      modelAvailability: `codex-app-vscode-model-availability`,
-      realtimeConversationPrompt: `codex-app-realtime-conversation-prompt`,
-    },
-  },
-  Zw = n.wf({
-    gates: n.Df((0, up.default)(Xw.gates, () => n.gf())),
-    restrictedGates: n.Ef(n.Of(), n.gf()),
-    configs: n.Df((0, up.default)(Xw.configs, () => n.Ef(n.Of(), n.Mf()))),
-  });
-function hTe() {
-  return Zw.parse({
-    restrictedGates: {},
-    gates: (0, up.default)(Xw.gates, () => !1),
-    configs: (0, up.default)(Xw.configs, () => ({})),
-  });
-}
-var $w = {
-    apiKeyModelDiscovery: `codex_rollout_api_key_model_discovery`,
-    localThreadStoreCompression: `codex-app-local-thread-store-compression`,
-    mcp20260728: `codex_rollout_mcp_2026_07_28`,
-    codexAppsMcp20260728: `codex_rollout_codex_apps_mcp_2026_07_28`,
-    curatedRemoteMarketplace: `codex-app-openai-curated-remote-marketplace`,
-    backgroundPaginatedRolloutMigration: `codex-app-background-paginated-rollout-migration`,
-    permissionRefresh: `codex-app-permission-refresh`,
-    personality: `codex_vscode_default_personality_assignment_2`,
-    instructions: `codex_apps_instruction_overrides`,
-  },
-  eT = n.Ef(n.Of(), n.Mf()),
-  vTe = n.wf({
-    guardianV2Experiment: n.ac.optional(),
-    experimentalFeatureGates: n.wf({
-      mcp20260728: n.gf(),
-      codexAppsMcp20260728: n.gf(),
-      curatedRemoteMarketplace: n.gf(),
-      backgroundPaginatedRolloutMigration: n.gf(),
-      localThreadStoreCompression: n.gf(),
-      apiKeyModelDiscovery: n.gf(),
-    }),
-    toolCatalog: Zw,
-    permissionRefresh: n.gf(),
-    personality: eT,
-    instructions: eT,
-  }),
-  yTe = Zw.shape.gates.keyof().options,
-  bTe = Zw.shape.configs.keyof().options;
-function xTe(e) {
-  let t = vTe.parse(e);
-  return {
-    getGateOverride(e) {
-      if (tT(e.name, $w.apiKeyModelDiscovery))
-        return { ...e, value: t.experimentalFeatureGates.apiKeyModelDiscovery };
-      if (tT(e.name, $w.localThreadStoreCompression))
-        return { ...e, value: t.experimentalFeatureGates.localThreadStoreCompression };
-      if (tT(e.name, $w.mcp20260728))
-        return { ...e, value: t.experimentalFeatureGates.mcp20260728 };
-      if (tT(e.name, $w.codexAppsMcp20260728))
-        return { ...e, value: t.experimentalFeatureGates.codexAppsMcp20260728 };
-      if (tT(e.name, $w.curatedRemoteMarketplace))
-        return { ...e, value: t.experimentalFeatureGates.curatedRemoteMarketplace };
-      if (tT(e.name, $w.backgroundPaginatedRolloutMigration))
-        return { ...e, value: t.experimentalFeatureGates.backgroundPaginatedRolloutMigration };
-      let n = yTe.find((t) => tT(e.name, Xw.gates[t]));
-      if (n != null) return { ...e, value: t.toolCatalog.gates[n] };
-      let r = Object.entries(t.toolCatalog.restrictedGates).find(([t]) => tT(e.name, t));
-      return r == null
-        ? tT(e.name, $w.permissionRefresh)
-          ? { ...e, value: t.permissionRefresh }
-          : null
-        : { ...e, value: r[1] };
-    },
-    getDynamicConfigOverride(e) {
-      let n = bTe.find((t) => tT(e.name, Xw.configs[t]));
-      return n == null
-        ? null
-        : {
-            ...e,
-            value: t.toolCatalog.configs[n],
-            get: (0, Yw._makeTypedGet)(e.name, t.toolCatalog.configs[n]),
-          };
-    },
-    getExperimentOverride(e) {
-      let n = null;
-      return (
-        tT(e.name, $w.personality) && (n = t.personality),
-        n == null ? null : { ...e, value: n, get: (0, Yw._makeTypedGet)(e.name, n) }
-      );
-    },
-    getLayerOverride(e) {
-      let n = null;
-      return (
-        tT(e.name, $w.instructions) && (n = t.instructions),
-        n == null ? null : { ...e, __value: n, get: (0, Yw._makeTypedGet)(e.name, n) }
-      );
-    },
-  };
-}
-function tT(e, t) {
-  return e === t || (0, Yw._DJB2)(t) === e || (0, Yw._DJB2)(e) === t;
-}
+  })();
+configureStatsigAdapterRuntime({
+  StatsigClient: Yw.StatsigClient,
+  djb2Hash: Yw._DJB2,
+  makeTypedGet: Yw._makeTypedGet,
+});
 const iconBaseName = (e) => resolveFlavorIconBaseName(e, { agent: a.in.Agent, nightly: a.in.Nightly, internalAlpha: a.in.InternalAlpha, publicBeta: a.in.PublicBeta, dev: a.in.Dev, prod: a.in.Prod });
 const iconAssetNames = (e) => resolveFlavorIconAssetNames(e, { agent: a.in.Agent, nightly: a.in.Nightly, internalAlpha: a.in.InternalAlpha, publicBeta: a.in.PublicBeta, dev: a.in.Dev, prod: a.in.Prod });
-var lEe = `wss://codex-cloud-backend.chatgpt.com/`,
-  uEe = new n.td();
-function OT(e) {
-  return { id: n._s, display_name: `Long-lived`, kind: `local`, websocket_url: lEe };
-}
-var kT = class {
-    getDesktopAuthToken;
-    options;
-    constructor(e, t) {
-      ((this.getDesktopAuthToken = e), (this.options = t));
-    }
-    async getAuthToken() {
-      return await this.getDesktopAuthToken();
-    }
-    async fetch(e, t) {
-      let n = t.token ?? (await this.getAuthToken());
-      if (!n) throw Error(`ChatGPT authentication is required`);
-      let r = { "Content-Type": `application/json` };
-      (a.mt(r, n, this.options),
-        t.trace != null &&
-          ((r.traceparent = t.trace.traceparent),
-          t.trace.tracestate != null && (r.tracestate = t.trace.tracestate)));
-      let i = this.#e(),
-        o = new URL(e, i);
-      if (!e.startsWith(`/`) || e.startsWith(`//`) || o.origin !== i.origin)
-        throw Error(`App-server HTTP path is unavailable`);
-      return {
-        response: await l.net.fetch(o.href, {
-          method: t.method,
-          headers: r,
-          redirect: `error`,
-          cache: `no-store`,
-          signal: t.signal ?? AbortSignal.timeout(3e4),
-          body: t.body,
-        }),
-        token: n,
-      };
-    }
-    #e() {
-      let e = OT(this.options);
-      if (!e.websocket_url) throw Error(`App-server is unavailable`);
-      let t = new URL(e.websocket_url);
-      if (
-        ((t.protocol = t.protocol === `wss:` ? `https:` : `http:`),
-        t.username ||
-          t.password ||
-          (t.protocol !== `https:` &&
-            !(t.protocol === `http:` && [`localhost`, `127.0.0.1`, `[::1]`].includes(t.hostname))))
-      )
-        throw Error(`App-server HTTP URL is unavailable`);
-      return ((t.pathname = `/`), (t.search = ``), (t.hash = ``), t);
-    }
-  },
-  AT = n.Df({ cursor: n.Of().nullish(), limit: n.Cf().nullish() }),
-  jT = AT.extend({
-    threadId: n.Of(),
-    sortDirection: n.df([`asc`, `desc`]).nullish(),
-    threadAccess: n.bf(`shared`).nullish(),
-  }),
-  MT = n.wf({
-    id: n.jf([n.Of(), n.Cf()]),
-    trace: n.wf({ traceparent: n.Of(), tracestate: n.Of().optional() }).optional(),
-  }),
-  dEe = n.vf(`method`, [
-    MT.extend({
-      method: n.bf(`thread/read`),
-      params: n.Df({ threadId: n.Of(), includeTurns: n.bf(!1).nullish() }),
-    }),
-    MT.extend({
-      method: n.bf(`model/list`),
-      params: AT.extend({ includeHidden: n.gf().nullish() }).nullish(),
-    }),
-    MT.extend({
-      method: n.df([
-        `collaborationMode/list`,
-        `account/rateLimits/read`,
-        `thread/realtime/listVoices`,
-      ]),
-      params: n.Df({}).nullish(),
-    }),
-    MT.extend({
-      method: n.bf(`thread/turns/list`),
-      params: jT.extend({ itemsView: n.df([`notLoaded`, `full`]).nullish() }),
-    }),
-    MT.extend({
-      method: n.bf(`thread/items/list`),
-      params: jT.extend({ turnId: n.Of().nullish() }),
-    }),
-  ]),
-  fEe = n.wf({ error: n.wf({ code: n.Cf(), message: n.Of(), data: n.Mf().optional() }) }),
-  pEe = n.xf({ thread: n.xf({ id: n.Of() }) }),
-  NT = n.xf({ data: n.hf(n.xf({})) }),
-  PT = NT.extend({ nextCursor: n.Of().nullable() }),
-  FT = PT.extend({ backwardsCursor: n.Of().nullable() }),
-  mEe = {
-    "model/list": PT,
-    "collaborationMode/list": NT,
-    "account/rateLimits/read": n.xf({ rateLimits: n.xf({}) }),
-    "thread/realtime/listVoices": n.xf({ voices: n.xf({}) }),
-    "thread/turns/list": FT,
-    "thread/items/list": FT,
-  },
-  hEe = class {
-    websocket;
-    http;
-    kind = `websocket`;
-    constructor(e, t) {
-      ((this.websocket = e), (this.http = t));
-    }
-    supportsReconnect() {
-      return this.websocket.supportsReconnect();
-    }
-    async connect() {
-      let e = await this.websocket.connect(),
-        t = new AbortController(),
-        r = {
-          authenticatedPrincipal: e.authenticatedPrincipal,
-          get readyState() {
-            return e.readyState;
-          },
-          onopen: null,
-          onmessage: null,
-          onerror: null,
-          onclose: null,
-          send: (i) => {
-            let a = dEe.safeParse(JSON.parse(i));
-            if (!a.success || t.signal.aborted || e.readyState !== n.pr.Open) {
-              e.send(i);
-              return;
-            }
-            let o = a.data,
-              s = AbortSignal.any([t.signal, AbortSignal.timeout(3e4)]);
-            this.read(o, e, s)
-              .catch((e) => ({
-                id: o.id,
-                error: {
-                  code: -32603,
-                  message: e instanceof Error ? e.message : `ASB HTTP read failed`,
-                },
-              }))
-              .then((e) => {
-                t.signal.aborted ||
-                  r.onmessage?.({ data: JSON.stringify(e), receivedAtMs: Date.now() });
-              });
-          },
-          close: (n, r) => {
-            (t.abort(), e.close(n, r));
-          },
-        };
-      return (
-        (e.onopen = (e) => r.onopen?.(e)),
-        (e.onmessage = (e) => r.onmessage?.(e)),
-        (e.onerror = (e) => r.onerror?.(e)),
-        (e.onclose = (e) => {
-          (t.abort(), r.onclose?.(e));
-        }),
-        r
-      );
-    }
-    async read(e, t, r) {
-      let i = await this.http.getAuthToken(),
-        a = n._i(i);
-      if (
-        i == null ||
-        a == null ||
-        a.accountId !== t.authenticatedPrincipal?.accountId ||
-        a.userId !== t.authenticatedPrincipal?.userId
-      )
-        throw Error(`App server account changed`);
-      let o;
-      switch (e.method) {
-        case `thread/read`:
-          o = `/v1/threads/${encodeURIComponent(e.params.threadId)}`;
-          break;
-        case `model/list`:
-          o = `/v2/models`;
-          break;
-        case `collaborationMode/list`:
-          o = `/v2/collaboration-modes`;
-          break;
-        case `account/rateLimits/read`:
-          o = `/v2/account/rate-limits`;
-          break;
-        case `thread/realtime/listVoices`:
-          o = `/v2/realtime/voices`;
-          break;
-        case `thread/turns/list`:
-          o = `/v2/threads/${encodeURIComponent(e.params.threadId)}/turns`;
-          break;
-        case `thread/items/list`:
-          o = `/v2/threads/${encodeURIComponent(e.params.threadId)}/items`;
-      }
-      let s = new URLSearchParams();
-      for (let [t, n] of Object.entries(e.params ?? {}))
-        t !== `threadId` && t !== `includeTurns` && n != null && s.set(t, String(n));
-      let { response: c } = await this.http.fetch(s.size === 0 ? o : `${o}?${s}`, {
-          method: `GET`,
-          token: i,
-          signal: r,
-          trace: e.trace,
-        }),
-        l = await c.json().catch(() => null),
-        u = n._i(await this.http.getAuthToken());
-      if ((r.throwIfAborted(), u?.accountId !== a.accountId || u.userId !== a.userId))
-        throw Error(`App server account changed`);
-      if (!c.ok) {
-        let t = fEe.safeParse(l);
-        if (t.success) return { id: e.id, error: t.data.error };
-        throw Error(`ASB HTTP read failed (${c.status})`);
-      }
-      if (e.method !== `thread/read`) {
-        let t = mEe[e.method].safeParse(l);
-        if (!t.success) throw Error(`App server returned an invalid read response`);
-        return { id: e.id, result: t.data };
-      }
-      let d = pEe.safeParse(l);
-      if (!d.success || d.data.thread.id !== e.params.threadId)
-        throw Error(`App server returned an invalid metadata response`);
-      return { id: e.id, result: { ...d.data, thread: { ...d.data.thread, turns: [] } } };
-    }
-  },
-  gEe = [`apps_mcp_path_override`, `auth_elicitation`, `tool_suggest`];
-function _Ee(e, t, n, r, i) {
-  let a = { memories: !1 };
-  for (let t of gEe) {
-    let n = e[t];
-    typeof n == `boolean` && (a[t] = n);
-  }
-  return (
-    (a.mcp_2026_07_28 = n),
-    (a.remote_plugin = t),
-    r && (a.background_paginated_rollout_migration = !0),
-    (a.api_key_model_discovery = i),
-    a
-  );
-}
-var vEe = class {
-  evaluations;
-  onChanged;
-  logger = r.r(`app-server-feature-enablement`);
-  connections = new Map();
-  stopWatchingPolicy;
-  stopWatchingConnections;
-  disposed = !1;
-  constructor(e, t, n) {
-    ((this.evaluations = t),
-      (this.onChanged = n),
-      (this.stopWatchingPolicy = t.onDidChange(() => {
-        for (let e of this.connections.values()) this.sync(e);
-      })),
-      (this.stopWatchingConnections = e.subscribe((e) => {
-        if (e.hostId === `durable`) return;
-        if (e.type === `removed`) {
-          let t = this.connections.get(e.hostId);
-          t != null && (t.generation++, t.stopWatching(), this.connections.delete(e.hostId));
-          return;
-        }
-        let t = {
-          connection: e.connection,
-          generation: 0,
-          rolloutCompressionRequested: !1,
-          stopWatching: e.connection.registerInternalConnectionStateHandler(() => this.sync(t)),
-        };
-        (this.connections.set(e.hostId, t), this.sync(t));
-      })));
-  }
-  dispose() {
-    ((this.disposed = !0), this.stopWatchingPolicy(), this.stopWatchingConnections());
-    for (let e of this.connections.values()) (e.generation++, e.stopWatching());
-    this.connections.clear();
-  }
-  sync(e) {
-    let t = ++e.generation;
-    if (e.connection.getConnectionState() !== `connected`) {
-      e.rolloutCompressionRequested = !1;
-      return;
-    }
-    this.sendEnablement(e, t).catch((r) => {
-      this.disposed ||
-        e.generation !== t ||
-        r instanceof n.Wn ||
-        this.logger.warning(`Failed to sync experimental feature enablement`, {
-          safe: {},
-          sensitive: { error: r },
-        });
-    });
-  }
-  async sendEnablement(e, t) {
-    let r = await this.evaluations.readExecutionAssignments();
-    if (this.disposed || e.generation !== t || r?.defaultEnableFeatures == null) return;
-    let i = r.values.experimentalFeatureGates,
-      a = _Ee(
-        r.defaultEnableFeatures,
-        i.curatedRemoteMarketplace,
-        i.mcp20260728,
-        i.backgroundPaginatedRolloutMigration,
-        i.apiKeyModelDiscovery,
-      );
-    ((a.codex_apps_mcp_2026_07_28 = i.codexAppsMcp20260728), (a.windows_sandbox_service = !0));
-    let o = () => {
-      if (
-        this.disposed ||
-        e.generation !== t ||
-        !(0, G.default)(this.evaluations.readReadyExecutionAssignments(), r)
-      )
-        throw new n.Wn({ status: `not-ready`, reason: `execution-config-loading` });
-    };
-    (i.localThreadStoreCompression &&
-      !e.rolloutCompressionRequested &&
-      n.Wu(e.connection.appServerVersion, `rolloutCompression`) &&
-      e.connection
-        .sendAppServerRequest(`rollout/compress`, void 0, () => {
-          (o(), (e.rolloutCompressionRequested = !0));
-        })
-        .catch((r) => {
-          !this.disposed &&
-            e.generation === t &&
-            !(r instanceof n.Wn) &&
-            this.logger.warning(`Failed to trigger rollout compression`, {
-              safe: {},
-              sensitive: { error: r },
-            });
-        }),
-      await e.connection.sendAppServerRequest(
-        `experimentalFeature/enablement/set`,
-        { enablement: a },
-        o,
-      ),
-      !this.disposed && e.generation === t && this.onChanged(e.connection.hostId));
-  }
-};
 var HostClientCoordination = createHostClientCoordinationClass({
   ClientCoordination: n.v,
   ClientCoordinationService: n.p,
@@ -20334,7 +19906,7 @@ var BO = createQueryCacheHostServiceClass({ HostServiceBase: n.p, invalidatePlug
 var environmentConfigSchemas = createEnvironmentConfigSchemas(n);
 var EnvironmentConfigService = createEnvironmentConfigServiceClass({
   RpcHandlerBase: n.Uf,
-  createHttpClient: (getAuthToken, options) => new kT(getAuthToken, options),
+  createHttpClient: (getAuthToken, options) => new AppServerHttpClient(getAuthToken, options),
   accountIdFromToken: a.yt,
   identityFromToken: n._i,
   loggerFactory: r.i,
@@ -32001,7 +31573,7 @@ var r$e = createElectronMessageHandlerClass({
     setRemoteControlEnabled,
     setRemoteControlSessionActive,
     tee: threadTabRoutesStorageKey,
-    uEe,
+    requestInterceptor,
     performanceRequestTtlMs,
     performanceHeartbeatIntervalMs,
   },
@@ -45616,7 +45188,7 @@ var G5 = r.r(`WindowContext`),
     Nnt,
     O,
     OAe,
-    OT,
+    longLivedHostDescriptor,
     P,
     P1e,
     PBe,
@@ -45756,7 +45328,7 @@ var G5 = r.r(`WindowContext`),
     uQe,
     uke,
     v,
-    vEe,
+    AppServerFeatureEnablement,
     vi,
     w,
     w6e,
@@ -45794,8 +45366,8 @@ var { hostKindForConfig: trt, createAppServerTransport: K5 } =
     resolveSocksProxyUrl: Ynt,
     getCACertificates: ne.getCACertificates,
     WebsocketTransport: n.pn,
-    AuthenticatedTransport: hEe,
-    DesktopApiTokenClient: kT,
+    AuthenticatedTransport: HybridWebsocketHttpTransport,
+    DesktopApiTokenClient: AppServerHttpClient,
     LocalStdioTransport: n.dn,
     getConfigOverrides: Xie,
     logger: G5,

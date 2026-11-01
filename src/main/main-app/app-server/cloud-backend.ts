@@ -22,14 +22,12 @@ import {
   vf as discriminatedUnionSchema,
   xf as looseObjectSchema,
   jf as unionSchema,
-  Mf as nullSchema,
+  Mf as unknownSchema,
   _s as LONG_LIVED_HOST_ID,
   _i as principalOfToken,
   pr as websocketReadyState,
   Wn as NotReadyError,
   Wu as appServerVersionSupports,
-  mu as broadcastVersionOf,
-  Ac as createDeferred,
   td as InMemoryInterceptor,
   Ld as lodashIsEqualModule,
 } from "@chunk/shared";
@@ -153,7 +151,7 @@ const readOnlyRequestSchema = discriminatedUnionSchema("method", [
     params: threadPaginationSchema.extend({ turnId: stringSchema().nullish() }),
   }),
 ]);
-const httpErrorSchema = objectSchema({ error: objectSchema({ code: numberSchema(), message: stringSchema(), data: nullSchema().optional() }) });
+const httpErrorSchema = objectSchema({ error: objectSchema({ code: numberSchema(), message: stringSchema(), data: unknownSchema().optional() }) });
 const threadMetadataSchema = looseObjectSchema({ thread: looseObjectSchema({ id: stringSchema() }) });
 const listResultSchema = looseObjectSchema({ data: arraySchema(looseObjectSchema({})) });
 const cursorResultSchema = listResultSchema.extend({ nextCursor: stringSchema().nullable() });
@@ -306,9 +304,11 @@ class HybridWebsocketHttpTransport {
       throw new Error(`ASB HTTP read failed (${response.status})`);
     }
     if (request.method !== "thread/read") {
-      const parsed = (readOnlyResponseSchemas[request.method] as { safeParse(input: unknown): { success: boolean } }).safeParse(body);
+      const parsed = (readOnlyResponseSchemas[request.method] as {
+        safeParse(input: unknown): { success: boolean; data?: unknown };
+      }).safeParse(body);
       if (!parsed.success) throw new Error("App server returned an invalid read response");
-      return { id: request.id, result: body };
+      return { id: request.id, result: parsed.data };
     }
     const metadata = threadMetadataSchema.safeParse(body);
     if (!metadata.success || (metadata.data as { thread: { id: string } }).thread.id !== (request.params as { threadId: string }).threadId)

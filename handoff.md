@@ -1,5 +1,15 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成 Cloud Backend 与 Statsig 运行时收敛：既有 `app-server/cloud-backend.ts` 不再是未接线语义副本，主组合根、Environment Config、
+transport factory、WindowContext 和 ElectronMessageHandler 现真实消费 `AppServerHttpClient`、`HybridWebsocketHttpTransport`、
+`AppServerFeatureEnablement`、host descriptor 与 request interceptor。保留在主 chunk 的唯一 Statsig vendor 实例通过显式 runtime injection
+交给 `statsig-adapter.ts`，移除无法解析的 `@main-vendor/statsig` 伪 import；旧 Cloud Backend 与 Statsig override 副本共约 448 行已删除。
+
+本批同时逐项核对原 shared chunk 的 Zod exports getter，修正 `gf/Ef/Df/hf/vf/Af/mf/pf/Sf/Rf/yf/rf` 等系统性错位；其中
+`mf` 证实为 `undefined` 而非 `null`，Statsig custom/config schema 已按原语义恢复。审计曾误判 thread-stream helper 无 consumer，
+`typecheck` 立即定位 `host-assembly.ts` 的真实调用后已完整恢复，并新增注册、广播、snapshot/patch、ownership 与 disposer 顺序测试。
+focused suite 92 项、十二组相邻 owner 回归 411 项、no-unwired gate 1208 项通过；测试索引增至 1853。
+
 完成 browser webview identity/admission policy：新增 `browser-sidebar/browser-webview-identity-policy.ts`，统一接管 trusted-session registry、
 webMCP environment gate、route/host identity 从 params/partition 的解析、browser storage id，以及同步 annotation policy 的 deferred wait 和
 navigation/destroy cleanup。审计同时发现 checkout/workspace factory 初版漏导出 `KW/EG` session predicates（主 chunk `ts-nocheck` 未报错），现已补回

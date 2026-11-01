@@ -68,6 +68,7 @@ const realOwners = [
   ["src/main/main-app/remote/codex-app-config-runtime.ts", "createCodexAppConfigRuntime"],
   ["src/main/main-app/app-server/host-client-coordination.ts", "createHostClientCoordinationClass"],
   ["src/main/main-app/app-server/host-assembly.ts", "createHostedAppServerManagerFactory"],
+  ["src/main/main-app/app-server/cloud-backend.ts", "AppServerFeatureEnablement"],
   ["src/main/main-app/remote-control/client.ts", "authorizeRemoteControlEnvironments"],
   ["src/main/main-app/app-server/transports.ts", "AppServerTransportWslStdio"],
   ["src/main/main-app/browser-use/origin-state.ts", "BrowserSettingsSync"],
@@ -185,6 +186,18 @@ const main = fs.readFileSync(
 );
 const electronMessageHandler = fs.readFileSync(
   new URL("src/main/main-app/window/electron-message-handler.ts", root),
+  "utf8",
+);
+const cloudBackend = fs.readFileSync(
+  new URL("src/main/main-app/app-server/cloud-backend.ts", root),
+  "utf8",
+);
+const hostAssembly = fs.readFileSync(
+  new URL("src/main/main-app/app-server/host-assembly.ts", root),
+  "utf8",
+);
+const statsigAdapter = fs.readFileSync(
+  new URL("src/main/main-app/account/statsig-adapter.ts", root),
   "utf8",
 );
 const markdownPlainText = fs.readFileSync(
@@ -1135,4 +1148,21 @@ assert.equal(/^function Zk\(/m.test(main), false, "generated request auto-resolu
 assert.equal(/^[ ]{0,2}Yk = /m.test(main), false, "generated environment setup record schema must be removed");
 assert.equal(/^[ ]{0,2}Xk = /m.test(main), false, "generated environment config reference schema must be removed");
 
-console.log("1185 main unwired-owner skeleton assertions passed");
+assert.equal(main.includes('require("./main-app/app-server/cloud-backend.js")'), true, "cloud backend runtime is wired");
+assert.equal(main.includes("configureStatsigAdapterRuntime({"), true, "Statsig adapter receives the retained vendor runtime");
+assert.equal(statsigAdapter.includes("@main-vendor/statsig"), false, "Statsig adapter must not retain an unresolved pseudo-vendor import");
+assert.equal(statsigAdapter.includes("mf as undefinedSchema"), true, "Statsig value schema preserves the original undefined branch");
+assert.equal(main.includes("new AppServerHttpClient(getAuthToken, options)"), true, "environment config consumes the semantic HTTP client");
+assert.equal(main.includes("AuthenticatedTransport: HybridWebsocketHttpTransport"), true, "transport factory consumes the hybrid transport");
+assert.equal(windowContext.includes("new AppServerFeatureEnablement("), true, "WindowContext consumes semantic feature enablement");
+assert.equal(windowContext.includes("longLivedHostDescriptor({"), true, "WindowContext consumes the semantic host descriptor");
+assert.equal(electronMessageHandler.includes("requestInterceptor.send(t.request)"), true, "message handler consumes the semantic request interceptor");
+assert.equal(hostAssembly.includes("createThreadStreamBroadcastHandlers("), true, "host assembly retains the thread-stream broadcast consumer");
+for (const oldOwner of ["var lEe =", "function OT(", "var kT = class", "hEe = class", "function _Ee(", "var vEe = class"]) {
+  assert.equal(main.includes(oldOwner), false, `${oldOwner} generated cloud backend owner must be removed`);
+}
+for (const oldOwner of ["Xw = {", "Zw =", "function hTe(", "function xTe(", "function tT("]) {
+  assert.equal(main.includes(oldOwner), false, `${oldOwner} generated Statsig override owner must be removed`);
+}
+
+console.log("1208 main unwired-owner skeleton assertions passed");

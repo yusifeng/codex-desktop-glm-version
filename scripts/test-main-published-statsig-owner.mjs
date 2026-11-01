@@ -49,6 +49,26 @@ const publicationMatchesUser = (publication, user, identity) =>
   (user.customIDs?.stableID ?? null) === publication.stableId &&
   publicationMatchesIdentity(publication, identity);
 const defaultToolCatalog = () => ({ restrictedGates: {}, gates: {}, configs: {} });
+const statsigClients = [];
+class FakeStatsigClient {
+  constructor(sdkKey, user, options) {
+    this.sdkKey = sdkKey;
+    this.options = options;
+    this.context = { user, values: { ready: true } };
+    this.dataAdapter = { setData: (data) => { this.data = data; } };
+    statsigClients.push(this);
+  }
+  initializeSync() { return { success: true }; }
+  getContext() { return this.context; }
+  shutdown() { this.shutdownCalled = true; }
+}
+const statsigRuntime = {
+  StatsigClient: FakeStatsigClient,
+  djb2Hash: (value) => value,
+  makeTypedGet: () => () => undefined,
+};
+let parsedClientOptions = 0;
+let createdOverrideAdapters = 0;
 
 const classSource = transpiled.code.slice(classNode.start, classNode.end);
 const PublishedStatsig = Function(
@@ -60,7 +80,7 @@ const PublishedStatsig = Function(
   "composeDefaultEnableFeatures",
   "statsigClientOptionsSchema",
   "createOverrideAdapter",
-  "StatsigClient",
+  "getStatsigRuntime",
   `${classSource}; return PublishedStatsig;`,
 )(
   EventEmitterBase,
@@ -69,9 +89,9 @@ const PublishedStatsig = Function(
   publicationMatchesUser,
   defaultToolCatalog,
   (defaults) => defaults,
-  { parse: JSON.parse },
-  () => ({}),
-  class {},
+  { parse(value) { parsedClientOptions += 1; return value; } },
+  () => { createdOverrideAdapters += 1; return {}; },
+  () => statsigRuntime,
 );
 
 const publication = {
@@ -126,6 +146,33 @@ equal(assignments.values.experimentalFeatureGates, {
 });
 equal(await owner.hasReadyExecutionAssignments(), true);
 
+const readyPayload = JSON.stringify({
+  user: {
+    userID: "user-1",
+    customIDs: { account_id: "account-1" },
+    custom: { auth_method: "chatgpt" },
+  },
+});
+const readyPublication = { ...publication, payload: readyPayload };
+const readyOwner = new PublishedStatsig(
+  { get: () => readyPublication, addSubscriber: () => () => {} },
+  async () => ({
+    principal: { userId: "user-1", accountId: "account-1" },
+    authMethod: "chatgpt",
+    unauthenticatedStableId: null,
+  }),
+  () => () => {},
+);
+const readyClient = await readyOwner.getClient();
+equal(parsedClientOptions, 1);
+equal(createdOverrideAdapters, 1);
+equal(readyClient, statsigClients.at(-1));
+equal(readyClient.sdkKey, "client-key");
+equal(readyClient.data, readyPayload);
+equal(readyClient.options.networkConfig.preventAllNetworkTraffic, true);
+equal(readyOwner.getReadyClient(), readyClient);
+readyOwner.dispose();
+
 let changes = 0;
 const unsubscribe = owner.onDidChange(() => { changes += 1; });
 latest = { ...publication, payload: undefined };
@@ -163,8 +210,10 @@ equal(
   true,
 );
 equal(main.includes("PublishedStatsig,"), true);
+equal(main.includes("configureStatsigAdapterRuntime({"), true);
 equal(main.includes("STe = class"), false);
 equal(main.includes("this.publishedStatsig = new STe("), false);
+equal(source.includes("@main-vendor/statsig"), false);
 
 const windowContext = fs.readFileSync(
   new URL("../src/main/main-app/window/window-context.ts", import.meta.url),

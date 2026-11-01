@@ -1,5 +1,19 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 Cloud Backend runtime and Zod facade convergence
+
+既有 `app-server/cloud-backend.ts` 已从未接线模块变为真实运行时 owner：主组合根解构语义入口，Environment Config 创建
+`AppServerHttpClient`，transport factory 使用 `HybridWebsocketHttpTransport`，WindowContext 持有 `AppServerFeatureEnablement` 与 long-lived
+host descriptor，Electron message handler 使用同一个 request interceptor。`statsig-adapter.ts` 改为接收主 chunk 保留的唯一 vendored
+Statsig client/hash/typed-get runtime，不再依赖构建后仍无法解析的 `@main-vendor/statsig`。旧 `lEe/uEe/OT/kT/hEe/_Ee/vEe` Cloud Backend
+实现和 `Xw/Zw/hTe/xTe/tT` Statsig override 副本共约 448 行物理删除。
+
+原 `src-DldfpmrL.ts` 最终 exports getter 已逐项核实，`shared/zod-facade.ts` 的基础、组合、class、JSON schema 与 namespace aliases
+按真实映射重建；修复了 boolean/record/strict-object/array/discriminated-union/tuple/undefined/null/never 等长期错位。`Rf` 现在是实际
+JSON Schema converter，`yf` 是递归 JSON value schema，`rf` 是完整 Zod namespace。迁移审计还通过 `typecheck` 发现
+`createThreadStreamBroadcastHandlers` 有 `host-assembly.ts` 真实 consumer，已保留并增加完整 lifecycle 测试，避免把有效 owner 当死代码删除。
+focused 92 项、相邻 owner 411 项、no-unwired 1208 项通过；唯一测试脚本数为 1853。
+
 ## 2026-11-01 browser webview identity and admission policy
 
 新增 `browser-sidebar/browser-webview-identity-policy.ts`，迁出 trusted session WeakSet、internal/webMCP gate、route/host identity parsing、partition suffix

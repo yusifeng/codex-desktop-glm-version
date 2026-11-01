@@ -1,135 +1,242 @@
-// shared chunk：zod v4 门面（schema 快捷构造的导出面）。
+// shared chunk 的 Zod 导出兼容面。
 //
-// 对应 src-DldfpmrL.ts 的 L10,001-15,000 区段（36 导出）：
-// vendored zod v4（`q`/`F` 工厂 + ZodString/ZodNumber/… 类族）之上的
-// 快捷构造函数与 ZodError——这是全 app 的 schema 基础设施。
-//
-// 导出别名 → zod 语义（36 个，全部经原文核实）：
-//   Of=U / gf=G / Cf=W / Pf=Cf / Nf=Of（z.string 的 trim/min/… 变体）
-//   Ff=Zd（ZodError） / Mf=Fp（z.never） / If=Gd / Lf=Ud（z.unknown/any）
-//   Af=nm / Ef=im / vf=Qp（z.object 三变体 q/wf） / xf=Kp（z.extend）
-//   Df=Gp / Rf=Id（z.array） / hf=K（z.record） / uf=rm（z.enum）
-//   jf=Jp / kf=Km / Tf=lh / _f=th / ff=oh（z.optional/default/…）
-//   lf=vm / sf=Sm / of=Tm / bf=Yp...（ZodOptional/Nullable/Default 类）
-//   af=Hp（ZodArray 类） / cf=Wp（ZodObject 类） / Sf=Lp / df=J / bf=Y
-//   if=ph / yf=ch / rf=mh / mf=kp / pf=jp / nf=…（string format 族）
-//
-// 重写策略：zod v4 本体按 npm `zod@4` 对齐（vendor 不逐行还原）；
-// 本模块承载「快捷构造的导出别名面」——保持 main-app 模块的
-// `import { Of as stringSchema } from "@chunk/shared"` 契约。
-// 真正接入 npm zod 后，此文件改为 re-export + 别名。
-
-// ---------------------------------------------------------------------------
-// 门面导出（zod v4 的快捷构造——36 别名与原版对齐）
-// ---------------------------------------------------------------------------
+// 原始 chunk 内嵌 Zod v4；仓库当前依赖 Zod v3，因此这里按原始导出表提供
+// 等价构造器/类，而不是继续传播压缩名。映射已经逐项从
+// `.reference/originals/main/src-DldfpmrL.ts` 的最终 exports getter 核实。
 
 import {
   z,
-  ZodError,
   ZodArray,
+  ZodDefault,
+  ZodError,
+  ZodNullable,
   ZodObject,
   ZodOptional,
-  ZodNullable,
-  ZodDefault,
-  ZodEnum,
+  ZodRecord,
 } from "zod";
 
-/** 基础 string 构造（原 `Of` = U：z.string）。 */
-export const stringSchema = z.string as never;
-/** trim/min(1) string（原 `gf` = G）。 */
-export const trimmedStringSchema = z.string().trim() as never;
-/** string 格式族（原 `Pf`/`Nf`/`yf`/`nf` 等 = 各 format 变体）。 */
-export const stringFormatSchema = z.string as never;
-/** number 构造（原 `Cf` = W：z.number）。 */
-export const numberSchema = z.number as never;
-/** int/positive 等 number 变体（原 `mf`/`pf` 等）。 */
-export const intSchema = z.number().int() as never;
-/** boolean 构造（原 `Ef` = im）。 */
-export const booleanSchema = z.boolean as never;
-/** z.unknown（原 `If` = Gd）。 */
-export const unknownSchema = z.unknown;
-/** z.any（原 `Lf` = Ud）。 */
-export const jsonSchemaPlaceholder = z.any;
-/** z.never（原 `Mf` = Fp）。 */
-export const neverSchema = z.never;
+type JsonSchema = boolean | { [key: string]: unknown };
+type ZodLike = {
+  _def?: Record<string, any>;
+  description?: string;
+};
 
-/** z.object 工厂（原 `vf` = Qp / `wf` = q）。 */
-export const objectSchema = z.object as never;
-/** z.array（原 `Df` = Gp / `Rf` = Id）。 */
-export const arraySchema = z.array as never;
-/** z.record（原 `hf` = K）。 */
-export const recordSchema = z.record as never;
-/** z.enum（原 `uf` = rm）。 */
-export const enumSchema = z.enum as never;
-/** Additional primitive builders used by main-app schema consumers. */
-export const literalSchema = z.literal as never;
-export const unionSchema = z.union as never;
-export const discriminatedUnionSchema = z.discriminatedUnion as never;
-export const tupleSchema = z.tuple as never;
-export const nullableSchema = z.nullable as never;
-export const optionalSchema = z.optional as never;
-export const defaultSchema = ((schema: { default(value: unknown): unknown }, value: unknown) =>
-  schema.default(value)) as never;
-export const dateSchema = z.date as never;
-export const bigintSchema = z.bigint as never;
-export const nullSchema = z.null as never;
-export const undefinedSchema = z.undefined as never;
-export const voidSchema = z.void as never;
-export const symbolSchema = z.symbol as never;
-export const arraySchemaFactory = z.array as never;
-export const literalSchemaAlt = z.literal as never;
-export const extendSchema = ((shape: unknown) => z.object(shape as never)) as never;
-export const catchSchema = z.any as never;
-export const preprocessSchema = z.preprocess as never;
-export const refineSchema = z.any as never;
-const zodError = ZodError;
+const uuidSchema = (options?: any) => z.string().uuid(options);
+const urlSchema = (options?: any) => z.string().url(options);
+const isoDateSchema = (options?: any) => z.string().date(options);
+const isoDateTimeSchema = (options?: any) => z.string().datetime(options);
+const stringSchema = z.string;
+const booleanSchema = z.boolean;
+const numberSchema = z.number;
+const unknownSchema = z.unknown;
+const tupleSchema = z.tuple;
+const recordSchema = z.record;
+const discriminatedUnionSchema = z.discriminatedUnion;
+const arraySchema = z.array;
+const unionSchema = z.union;
+const preprocessSchema = z.preprocess;
+const customSchema = z.custom;
+const instanceOfSchema = z.instanceof;
+const literalSchema = z.literal;
+const neverSchema = z.never;
+const enumSchema = z.enum;
+const undefinedSchema = z.undefined;
+const nullSchema = z.null;
+const objectSchema = z.object;
+const coercedNumberSchema = z.coerce.number;
+const strictObjectSchema = (shape: z.ZodRawShape, options?: any) =>
+  z.object(shape, options).strict();
+const looseObjectSchema = (shape: z.ZodRawShape, options?: any) =>
+  z.object(shape, options).passthrough();
+
+/** 原 `yf = ch`：递归 JSON value schema，而不是 `z.any()`。 */
+const jsonSchema = () => {
+  let schema: z.ZodType<unknown>;
+  schema = z.lazy(() =>
+    z.union([
+      z.string(),
+      z.number(),
+      z.boolean(),
+      z.null(),
+      z.array(schema),
+      z.record(z.string(), schema),
+    ]),
+  );
+  return schema;
+};
+
+function jsonTypeForLiteral(value: unknown): string | undefined {
+  if (value === null) return "null";
+  if (["string", "number", "boolean"].includes(typeof value)) return typeof value;
+  return undefined;
+}
+
+/**
+ * Zod v3 lacks Zod v4's built-in `toJSONSchema`; cover the schema kinds used by
+ * first-party main modules so the original module-load validation remains real.
+ */
+function toJSONSchema(schema: ZodLike): JsonSchema {
+  const memo = new WeakMap<object, JsonSchema>();
+  const convertFresh = (current: ZodLike): JsonSchema => {
+    if (current == null || typeof current !== "object") return {};
+    const definition = current._def ?? {};
+    const description = current.description == null ? {} : { description: current.description };
+    switch (definition.typeName) {
+      case z.ZodFirstPartyTypeKind.ZodString: {
+        const result: Record<string, unknown> = { type: "string", ...description };
+        for (const check of definition.checks ?? []) {
+          if (check.kind === "min") result.minLength = check.value;
+          else if (check.kind === "max") result.maxLength = check.value;
+          else if (check.kind === "email") result.format = "email";
+          else if (check.kind === "url") result.format = "uri";
+          else if (check.kind === "uuid") result.format = "uuid";
+          else if (check.kind === "datetime") result.format = "date-time";
+          else if (check.kind === "date") result.format = "date";
+          else if (check.kind === "regex") result.pattern = check.regex.source;
+        }
+        return result;
+      }
+      case z.ZodFirstPartyTypeKind.ZodNumber: {
+        const result: Record<string, unknown> = { type: "number", ...description };
+        for (const check of definition.checks ?? []) {
+          if (check.kind === "int") result.type = "integer";
+          else if (check.kind === "min") result[check.inclusive ? "minimum" : "exclusiveMinimum"] = check.value;
+          else if (check.kind === "max") result[check.inclusive ? "maximum" : "exclusiveMaximum"] = check.value;
+        }
+        return result;
+      }
+      case z.ZodFirstPartyTypeKind.ZodBoolean:
+        return { type: "boolean", ...description };
+      case z.ZodFirstPartyTypeKind.ZodNull:
+        return { type: "null", ...description };
+      case z.ZodFirstPartyTypeKind.ZodLiteral:
+        return { const: definition.value, type: jsonTypeForLiteral(definition.value), ...description };
+      case z.ZodFirstPartyTypeKind.ZodEnum:
+        return { type: "string", enum: definition.values, ...description };
+      case z.ZodFirstPartyTypeKind.ZodArray:
+        return { type: "array", items: convert(definition.type), ...description };
+      case z.ZodFirstPartyTypeKind.ZodTuple:
+        return {
+          type: "array",
+          prefixItems: definition.items.map(convert),
+          minItems: definition.items.length,
+          ...(definition.rest == null
+            ? { maxItems: definition.items.length }
+            : { items: convert(definition.rest) }),
+          ...description,
+        };
+      case z.ZodFirstPartyTypeKind.ZodRecord:
+        return { type: "object", additionalProperties: convert(definition.valueType), ...description };
+      case z.ZodFirstPartyTypeKind.ZodObject: {
+        const shape = definition.shape();
+        const properties = Object.fromEntries(
+          Object.entries(shape).map(([key, value]) => [key, convert(value as ZodLike)]),
+        );
+        const required = Object.entries(shape)
+          .filter(([, value]) => !(value as any).isOptional?.())
+          .map(([key]) => key);
+        return {
+          type: "object",
+          properties,
+          ...(required.length === 0 ? {} : { required }),
+          additionalProperties:
+            definition.catchall?._def?.typeName !== z.ZodFirstPartyTypeKind.ZodNever
+              ? convert(definition.catchall)
+              : definition.unknownKeys === "passthrough",
+          ...description,
+        };
+      }
+      case z.ZodFirstPartyTypeKind.ZodUnion:
+        return { anyOf: definition.options.map(convert), ...description };
+      case z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion:
+        return { oneOf: [...definition.options.values()].map(convert), ...description };
+      case z.ZodFirstPartyTypeKind.ZodOptional:
+      case z.ZodFirstPartyTypeKind.ZodDefault:
+      case z.ZodFirstPartyTypeKind.ZodReadonly:
+      case z.ZodFirstPartyTypeKind.ZodBranded:
+        return convert(definition.innerType ?? definition.type);
+      case z.ZodFirstPartyTypeKind.ZodNullable:
+        return { anyOf: [convert(definition.innerType), { type: "null" }], ...description };
+      case z.ZodFirstPartyTypeKind.ZodEffects:
+        return convert(definition.schema);
+      case z.ZodFirstPartyTypeKind.ZodLazy:
+        return convert(definition.getter());
+      case z.ZodFirstPartyTypeKind.ZodDate:
+        return { type: "string", format: "date-time", ...description };
+      case z.ZodFirstPartyTypeKind.ZodNever:
+        return false;
+      default:
+        return description;
+    }
+  };
+  function convert(current: ZodLike): JsonSchema {
+    if (current == null || typeof current !== "object") return {};
+    const cached = memo.get(current as object);
+    if (cached != null) return cached;
+    // Break recursive schema cycles; non-recursive repeated schemas are replaced
+    // with the completed cached value after their first conversion.
+    memo.set(current as object, {});
+    const converted = convertFresh(current);
+    memo.set(current as object, converted);
+    return converted;
+  }
+  return convert(schema);
+}
+
+// Zod v3 没有 ZodTemplateLiteral。当前源码没有该别名 consumer；保留一个
+// 接受同签名、至少强制 string 的兼容构造器，避免把它错误映射成 void。
+const templateLiteralSchema = (_parts: readonly unknown[], options?: any) =>
+  z.string(options);
+
+// 原始 Zod v4 类导出；settings TOML codec 用它们做 instanceof/unwrap。
 const zodArrayClass = ZodArray;
 const zodObjectClass = ZodObject;
 const zodOptionalClass = ZodOptional;
 const zodNullableClass = ZodNullable;
 const zodDefaultClass = ZodDefault;
-const zodEnumClass = ZodEnum;
-
-// ---------------------------------------------------------------------------
-// 压缩名兼容导出（36 个原版别名）
-// ---------------------------------------------------------------------------
+const zodRecordClass = ZodRecord;
 
 export {
+  // 基础构造器
+  z as rf,
   stringSchema as Of,
-  trimmedStringSchema as gf,
-  stringFormatSchema as Pf,
-  stringFormatSchema as Nf,
+  booleanSchema as gf,
   numberSchema as Cf,
-  intSchema as mf,
-  booleanSchema as Ef,
-  unknownSchema as If,
-  jsonSchemaPlaceholder as Lf,
-  neverSchema as Mf,
-  objectSchema as vf,
-  objectSchema as wf,
-  arraySchema as Df,
-  arraySchema as Rf,
-  recordSchema as hf,
-  enumSchema as uf,
+  uuidSchema as Pf,
+  urlSchema as Nf,
+  ZodError as Ff,
+  unknownSchema as Mf,
+  isoDateSchema as If,
+  isoDateTimeSchema as Lf,
+  // 组合 schema
+  tupleSchema as Af,
+  recordSchema as Ef,
+  discriminatedUnionSchema as vf,
+  looseObjectSchema as xf,
+  strictObjectSchema as Df,
+  toJSONSchema as Rf,
+  arraySchema as hf,
+  zodRecordClass as uf,
+  unionSchema as jf,
+  templateLiteralSchema as kf,
+  preprocessSchema as Tf,
+  customSchema as _f,
+  instanceOfSchema as ff,
+  // schema 类
+  zodOptionalClass as lf,
+  zodNullableClass as sf,
+  zodDefaultClass as of,
   zodArrayClass as af,
   zodObjectClass as cf,
-  zodError as Ff,
+  // 其余构造器
   literalSchema as bf,
-  unionSchema as jf,
-  discriminatedUnionSchema as Sf,
-  tupleSchema as Tf,
-  nullableSchema as sf,
-  optionalSchema as lf,
-  defaultSchema as of,
-  dateSchema as rf,
-  bigintSchema as yf,
+  neverSchema as Sf,
+  enumSchema as df,
+  undefinedSchema as mf,
   nullSchema as pf,
-  undefinedSchema as if,
-  voidSchema as kf,
-  symbolSchema as Af,
-  literalSchemaAlt as df,
-  extendSchema as xf,
-  catchSchema as ff,
-  preprocessSchema as _f,
-  refineSchema as Gd,
+  objectSchema as wf,
+  jsonSchema as yf,
+  coercedNumberSchema as if,
+  // 仍有旧声明引用该内部 ISO date 符号；没有独立运行时 consumer。
+  isoDateSchema as Gd,
 };

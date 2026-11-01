@@ -93,7 +93,11 @@ const main = fs.readFileSync(
 equal(main.includes('require("./main-app/conversation/app-server-manager.js")'), true);
 equal(main.includes("rw = AppServerConversationManager"), false);
 equal(main.includes("rw = class"), false);
-equal(main.includes("new AppServerConversationManager({"), true);
-equal(main.includes("AppServerConversationManager.dispose(h)"), true);
+const hostAssembly = fs.readFileSync(
+  new URL("../src/main/main-app/app-server/host-assembly.ts", import.meta.url),
+  "utf8",
+);
+equal(hostAssembly.includes("new AppServerConversationManager({"), true);
+equal(hostAssembly.includes("AppServerConversationManager.dispose(hostedManager)"), true);
 
 console.log(`${assertions} main app-server conversation manager owner assertions passed`);

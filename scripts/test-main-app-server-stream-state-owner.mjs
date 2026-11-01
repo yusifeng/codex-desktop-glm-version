@@ -77,8 +77,12 @@ const main = fs.readFileSync(
   "utf8",
 );
 equal(main.includes('require("./main-app/threads/stream-roles.js")'), true);
-equal(main.includes("Yge = AppServerManagerStreamState"), true);
 equal(main.includes("Yge = class"), false);
-equal(main.includes("this.streamState = new Yge({"), true);
+const manager = fs.readFileSync(
+  new URL("../src/main/main-app/conversation/app-server-manager.ts", import.meta.url),
+  "utf8",
+);
+equal(manager.includes('import { AppServerManagerStreamState } from "../threads/stream-roles"'), true);
+equal(manager.includes("this.streamState = new AppServerManagerStreamState({"), true);
 
 console.log(`${assertions} main app-server stream state owner assertions passed`);

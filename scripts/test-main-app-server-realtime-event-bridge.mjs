@@ -229,6 +229,10 @@ const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n
 assert.match(main, /F8e = createAppServerRealtimeEventBridgeClass\(\{/);
 assert.doesNotMatch(main, /F8e = class/);
 assert.doesNotMatch(main, /function k8e\(/);
-assert.match(main, /v = new F8e\(this\.appServerConnectionRegistry\)/);
+const windowContext = fs.readFileSync(
+  new URL("../src/main/main-app/window/window-context.ts", import.meta.url),
+  "utf8",
+);
+assert.match(windowContext, /v = new F8e\(this\.appServerConnectionRegistry\)/);
 
 console.log("app-server realtime event bridge assertions: 38");

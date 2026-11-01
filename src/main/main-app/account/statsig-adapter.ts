@@ -18,7 +18,7 @@ import {
   Cf as numberSchema,
   gf as booleanSchema,
   hf as arraySchema,
-  mf as nullSchema,
+  mf as undefinedSchema,
   jf as unionSchema,
   xf as looseObjectSchema,
   bf as literalSchema,
@@ -31,8 +31,31 @@ import {
   ci as openStateSqlite,
   oi as stateDatabasePath,
 } from "@chunk/shared";
-import type { StatsigClientLike } from "@main-vendor/statsig";
-import { StatsigClient, djb2Hash, makeTypedGet } from "@main-vendor/statsig";
+type StatsigClientLike = {
+  dataAdapter: { setData(data: string): void };
+  initializeSync(options?: unknown): { success: boolean };
+  getContext(): { user: unknown; values: unknown };
+  shutdown(): void;
+};
+
+type StatsigAdapterRuntime = {
+  StatsigClient: new (sdkKey: string, user: unknown, options?: unknown) => StatsigClientLike;
+  djb2Hash(value: string): string;
+  makeTypedGet(name: string, value: unknown): (key: string) => unknown;
+};
+
+let statsigRuntime: StatsigAdapterRuntime | null = null;
+
+/** Binds the one vendored Statsig instance owned by the main composition root. */
+function configureStatsigAdapterRuntime(runtime: StatsigAdapterRuntime) {
+  statsigRuntime = runtime;
+}
+
+function getStatsigRuntime(): StatsigAdapterRuntime {
+  if (statsigRuntime == null)
+    throw new Error("Statsig adapter runtime has not been configured");
+  return statsigRuntime;
+}
 
 // lodash mapValues interop（原 `up = e.a(n.Ra())`）。
 const mapValues = (mapValuesModule() as { default: <T, R>(obj: Record<string, T>, fn: (value: T) => R) => Record<string, R> }).default;
@@ -62,7 +85,7 @@ const STATSIG_NAMES = {
 const toolCatalogSchema = objectSchema({
   gates: strictObjectSchema(mapValues(STATSIG_NAMES.gates, () => booleanSchema())),
   restrictedGates: recordSchema(stringSchema(), booleanSchema()),
-  configs: strictObjectSchema(mapValues(STATSIG_NAMES.configs, () => recordSchema(stringSchema(), nullSchema()))),
+  configs: strictObjectSchema(mapValues(STATSIG_NAMES.configs, () => recordSchema(stringSchema(), undefinedSchema()))),
 });
 
 /** toolCatalog 默认值（原 `hTe`）。 */
@@ -91,7 +114,7 @@ const EXPERIMENT_OVERRIDE_NAMES = {
   instructions: "codex_apps_instruction_overrides",
 } as const;
 
-const dynamicConfigSchema = recordSchema(stringSchema(), nullSchema());
+const dynamicConfigSchema = recordSchema(stringSchema(), undefinedSchema());
 
 /** 执行侧的 statsig 值 schema（原 `vTe`）。 */
 const executionValuesSchema = objectSchema({
@@ -115,11 +138,13 @@ const CONFIG_NAME_OPTIONS = (toolCatalogSchema.shape.configs.keyof().options as 
 
 /** statsig 名比较：字面或 DJB2 哈希互比（原 `tT`）。 */
 function nameMatches(name: string, expected: string): boolean {
+  const { djb2Hash } = getStatsigRuntime();
   return name === expected || djb2Hash(expected) === name || djb2Hash(name) === expected;
 }
 
 /** override 适配器（原 `xTe`）：实验值 → StatsigClient 的四类覆盖。 */
 function createOverrideAdapter(rawValues: unknown) {
+  const { makeTypedGet } = getStatsigRuntime();
   const values = executionValuesSchema.parse(rawValues) as {
     guardianV2Experiment?: unknown;
     experimentalFeatureGates: Record<keyof typeof EXPERIMENT_OVERRIDE_NAMES, boolean>;
@@ -235,8 +260,8 @@ const statsigUserSchema = objectSchema({
   country: stringSchema().optional(),
   locale: stringSchema().optional(),
   appVersion: stringSchema().optional(),
-  custom: recordSchema(stringSchema(), unionSchema([stringSchema(), numberSchema(), booleanSchema(), arraySchema(stringSchema()), nullSchema()])).optional(),
-  privateAttributes: recordSchema(stringSchema(), unionSchema([stringSchema(), numberSchema(), booleanSchema(), arraySchema(stringSchema()), nullSchema()])).nullable().optional(),
+  custom: recordSchema(stringSchema(), unionSchema([stringSchema(), numberSchema(), booleanSchema(), arraySchema(stringSchema()), undefinedSchema()])).optional(),
+  privateAttributes: recordSchema(stringSchema(), unionSchema([stringSchema(), numberSchema(), booleanSchema(), arraySchema(stringSchema()), undefinedSchema()])).nullable().optional(),
   analyticsOnlyMetadata: recordSchema(stringSchema(), unionSchema([stringSchema(), numberSchema(), booleanSchema()])).optional(),
 }).loose();
 const statsigClientOptionsSchema = objectSchema({ user: statsigUserSchema }).loose();
@@ -394,6 +419,7 @@ class PublishedStatsig extends EventEmitterBase {
       return null;
     }
     if (!publicationMatchesUser(matched, user as never, identity)) return null;
+    const { StatsigClient } = getStatsigRuntime();
     const client = new StatsigClient(matched.sdkKey, user, {
       overrideAdapter,
       disableStorage: true,
@@ -656,6 +682,7 @@ class ThreadTurnSummariesStore {
 }
 
 export {
+  configureStatsigAdapterRuntime,
   STATSIG_NAMES,
   EXPERIMENT_OVERRIDE_NAMES,
   toolCatalogSchema,
