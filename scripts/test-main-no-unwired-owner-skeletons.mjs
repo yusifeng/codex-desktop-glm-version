@@ -104,6 +104,7 @@ const realOwners = [
   ["src/main/main-app/browser-sidebar/browser-webview-listener-runtime.ts", "createBrowserWebviewListenerRuntime"],
   ["src/main/main-app/browser-sidebar/browser-annotation-anchor-policy.ts", "createBrowserAnnotationAnchorPolicy"],
   ["src/main/main-app/browser-sidebar/browser-comment-policy.ts", "createBrowserCommentPolicy"],
+  ["src/main/main-app/browser-sidebar/browser-comment-schemas.ts", "createBrowserCommentSchemas"],
   ["src/main/main-app/sidebar/saved-section-policy.ts", "createSavedSectionPolicy"],
   ["src/main/main-app/avatar-overlay/message-dispatch.ts", "dispatchAvatarOverlayMessage"],
   ["src/main/main-app/browser-sidebar/checkout-webview.ts", "createCheckoutWebviewRuntime"],
@@ -272,6 +273,22 @@ assert.equal(/^\s*LG = new WeakSet/m.test(main), false, "generated webview liste
 assert.equal(/\bpW\.maxTotalDescriptorBytes\b/.test(main), false, "deleted WebMCP limit alias must not remain referenced");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-annotation-anchor-policy.js")'), true, "browser annotation anchor policy is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-comment-policy.js")'), true, "browser comment policy is wired");
+assert.equal(main.includes('require("./main-app/browser-sidebar/browser-comment-schemas.js")'), true, "browser comment schemas are wired");
+assert.equal(main.includes("browserCommentSchemas = createBrowserCommentSchemas({"), true, "browser comment schemas are composed once");
+assert.equal(main.includes("  annotationControlChangeSchema,\n  annotationControlsSchema,"), true, "browser comment schemas consume the conversation control schemas");
+assert.equal(main.includes("isDesignChange: (value) => browserCommentSchemas.designChangeSchema.safeParse(value).success"), true, "browser comment policy consumes the semantic design-change schema");
+assert.equal(main.includes("parseDocumentRoot: browserCommentSchemas.documentRootSchema"), true, "browser comment controller consumes the semantic document schema");
+assert.equal(main.includes("parseNodeId: browserCommentSchemas.nodeIdSchema"), true, "browser comment controller consumes the semantic node-id schema");
+assert.equal(main.includes("parseMatchedStyles: browserCommentSchemas.matchedStylesSchema"), true, "browser comment controller consumes the semantic matched-styles schema");
+assert.equal(main.includes("browserCommentSchemas.runtimeMessageSchema.safeParse(payload)"), true, "Electron message handler consumes the semantic runtime message schema");
+assert.equal(main.includes("projectCaptureRect: projectBrowserCaptureRect"), true, "visualization and comment policy consume the semantic capture projection");
+assert.equal(main.includes("var CK ="), false, "generated editor-target schema belt must be removed");
+assert.equal(main.includes("function NK("), false, "generated capture projection must be removed");
+assert.equal(main.includes("sGe = 1e3"), false, "generated screenshot timeout alias must be removed");
+assert.equal(main.includes("uGe = n.wf("), false, "generated CDP document schema must be removed");
+assert.equal(main.includes("mGe = n"), false, "generated CDP matched-styles schema must be removed");
+assert.equal(main.includes("$Se.optional()"), false, "dangling generated annotation-controls alias must be removed");
+assert.equal(main.includes("n.hf(QSe)"), false, "dangling generated annotation-control-change alias must be removed");
 assert.equal(main.includes('require("./main-app/browser-use/iab-capabilities.js")'), true, "IAB capability runtime is wired");
 assert.equal(main.includes("capabilities: iabCapabilityRuntime"), true, "IAB API consumes the semantic capability runtime");
 assert.equal(main.includes("var _q = class"), false, "embedded browser SDK/Zod belt must remain removed");
@@ -1118,4 +1135,4 @@ assert.equal(/^function Zk\(/m.test(main), false, "generated request auto-resolu
 assert.equal(/^[ ]{0,2}Yk = /m.test(main), false, "generated environment setup record schema must be removed");
 assert.equal(/^[ ]{0,2}Xk = /m.test(main), false, "generated environment config reference schema must be removed");
 
-console.log("1167 main unwired-owner skeleton assertions passed");
+console.log("1185 main unwired-owner skeleton assertions passed");

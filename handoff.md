@@ -5656,3 +5656,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   `pW` 已被删除却仍有两个 consumer。现恢复两个 predicate，并以 `WEB_MCP_LIMITS` 同时服务同步 IPC 与 site-page event。
 - focused 51 项及 controller/adoption/identity/settings/checkout/site-event/page-host/BrowserHost 八组相邻回归 399 项通过；测试索引
   1851，no-unwired gate 扩至 1167 项。
+
+# 2026-11-01 Browser comment schema and validation convergence
+
+- 新增并真实接回 `browser-sidebar/browser-comment-schemas.ts`，统一持有 editor target、element/region/text/virtual anchor、anchor state、
+  design/saved-design change、18 路 sidebar runtime message 与 CDP document/node/matched-style schemas，以及截图裁剪坐标投影。
+- `turn-context.ts` 导出既有 annotation control schemas 供该模块复用，修复旧主 chunk 中 `$Se/QSe` 已删除却仍被 schema belt 引用的
+  悬空边界；comment policy/controller、Electron message handler 与 visualization service 均消费同一次构造的语义 schema owner。
+- 主 chunk 旧 `CK..oGe` 与 `NK/uGe..mGe` 约 326 行定义已物理删除；同时移除 visualization ESM 模块末尾无 consumer 的
+  `module.exports` 兼容分支和对应构建告警。focused 35 项、七组相邻回归 274 项通过；测试索引 1852，no-unwired gate 扩至 1185 项。

@@ -178,7 +178,11 @@ const { QueuedFollowUpsCoordinator } = require("./main-app/conversation/queued-f
 const { QueuedMessageLocks } = require("./main-app/conversation/queued-message-locks.js");
 const { AppServerConversationManager } = require("./main-app/conversation/app-server-manager.js");
 const { addWorktreeInitSyntheticTurn } = require("./main-app/streams/notifications-apply.js");
-const { controlFallbackValue } = require("./main-app/conversation/turn-context.js");
+const {
+  annotationControlChangeSchema,
+  annotationControlsSchema,
+  controlFallbackValue,
+} = require("./main-app/conversation/turn-context.js");
 const { InboxItemsFacade } = require("./main-app/automations/inbox-items.js");
 const { registerPushNotifications, deregisterPushNotifications } = require("./main-app/notifications/push-registration.js");
 const { O_e, zv, Bv, Vv, D_e } = require("./main-app/threads/patch-classification.js");
@@ -267,6 +271,12 @@ const { BrowserUseOpenRequestRegistry } = require("./main-app/browser-sidebar/br
 const { createBrowserSettingsWebviewRuntime, parseBrowserSettingsUrl: UG } = require("./main-app/browser-sidebar/browser-settings-webview-runtime.js");
 const { createBrowserAnnotationAnchorPolicy } = require("./main-app/browser-sidebar/browser-annotation-anchor-policy.js");
 const { createBrowserCommentPolicy } = require("./main-app/browser-sidebar/browser-comment-policy.js");
+const {
+  BROWSER_COMMENT_SCREENSHOT_READY_TIMEOUT_MS,
+  BROWSER_DESIGN_GROUP_ATTRIBUTE,
+  createBrowserCommentSchemas,
+  projectBrowserCaptureRect,
+} = require("./main-app/browser-sidebar/browser-comment-schemas.js");
 const { createCheckoutWebviewRuntime } = require("./main-app/browser-sidebar/checkout-webview.js");
 const { createWorkspaceSettingsWebviewRuntime } = require("./main-app/browser-sidebar/workspace-settings-webview-runtime.js");
 const { createBrowserWebviewIdentityPolicy } = require("./main-app/browser-sidebar/browser-webview-identity-policy.js");
@@ -31134,332 +31144,14 @@ var JWe = createBrowserCommentOverlayManagerClass({
   shared: n,
   isEqual: G.default,
 });
-var CK = n.vf(`mode`, [
-    n.wf({ mode: n.bf(`create`) }),
-    n.wf({ mode: n.bf(`edit`), commentId: n.Of() }),
-    n.wf({ mode: n.bf(`design`), groupId: n.Of() }),
-  ]),
-  wK = n.wf({ x: n.Cf(), y: n.Cf(), width: n.Cf(), height: n.Cf() }),
-  TK = n.wf({ x: n.Cf(), y: n.Cf() }),
-  $We = n.wf({
-    provider: n.bf(`google-docs`),
-    kind: n.bf(`google-docs`),
-    documentId: n.Of(),
-    tabId: n.Of().optional(),
-    documentTitle: n.Of().optional(),
-    selectedText: n.Of().optional(),
-    visibleText: n.Of().optional(),
-  }),
-  EK = n.wf({
-    pageUrl: n.Of(),
-    frameUrl: n.Of().nullable(),
-    title: n.Of(),
-    elementPath: n.Of(),
-    point: n.wf({ xPercent: n.Cf(), y: n.Cf() }),
-    rect: wK,
-    isFixed: n.gf(),
-    framePath: n.hf(n.Of()),
-    immediateText: n.Of().nullable().optional(),
-    documentContext: $We.optional(),
-    scrollContainers: n
-      .hf(n.wf({ selector: n.Of(), scrollLeft: n.Cf(), scrollTop: n.Cf() }))
-      .optional(),
-  }),
-  DK = EK.extend({
-    kind: n.bf(`element`),
-    runtimeElementId: n.Of().min(1).max(128).optional(),
-    elementMetadata: n.Mf().transform(n.Pu).optional(),
-    elementName: n.Mf().transform(n.Fu).optional(),
-    role: n.Of().nullable(),
-    name: n.Of().nullable(),
-    selector: n.Of().nullable(),
-    nearbyText: n.Of().nullable(),
-  }),
-  OK = EK.extend({
-    kind: n.bf(`region`),
-    role: n.pf(),
-    name: n.pf(),
-    selector: n.pf(),
-    nearbyText: n.pf(),
-  }),
-  eGe = n.vf(`kind`, [DK, OK]),
-  tGe = n.vf(`kind`, [
-    DK,
-    OK,
-    EK.extend({
-      kind: n.bf(`text`),
-      role: n.pf(),
-      name: n.pf(),
-      selector: n.pf(),
-      nearbyText: n.pf(),
-      selectedText: n.Of().max(n.vu),
-      selectionRects: n.hf(wK).max(n.yu),
-      textLocator: n.vf(`kind`, [
-        n.wf({
-          kind: n.bf(`dom`),
-          direction: n.df([`backward`, `forward`]),
-          rangeText: n.Of().max(n.vu),
-          selector: n.Of().nullable(),
-          shadowHosts: n.hf(n.Of()),
-          startOffset: n.Cf(),
-          endOffset: n.Cf(),
-        }),
-        n.wf({
-          kind: n.bf(`form-control`),
-          direction: n.df([`backward`, `forward`]),
-          selector: n.Of(),
-          shadowHosts: n.hf(n.Of()),
-          startOffset: n.Cf(),
-          endOffset: n.Cf(),
-        }),
-      ]),
-    }),
-  ]),
-  nGe = DK.omit({
-    documentContext: !0,
-    immediateText: !0,
-    runtimeElementId: !0,
-    scrollContainers: !0,
-  })
-    .extend({
-      kind: n.bf(`virtual`),
-      surfaceId: VC,
-      targetId: VC,
-      frameUrl: n.pf(),
-      framePath: n.Af([]),
-      isFixed: n.bf(!0),
-      point: n.wf({ xPercent: n.Cf().min(0).max(100), y: n.Cf().nonnegative() }),
-      rect: n.wf({
-        x: n.Cf().nonnegative(),
-        y: n.Cf().nonnegative(),
-        width: n.Cf().positive(),
-        height: n.Cf().positive(),
-      }),
-      role: XG.nullable(),
-      name: n.pf(),
-      selector: n.pf(),
-      nearbyText: n.pf(),
-    })
-    .strict(),
-  kK = n.vf(`kind`, [...tGe.options, nGe]),
-  AK = n.wf({
-    anchor: kK,
-    additionalAnchors: n.hf(eGe).optional(),
-    cardViewportRect: wK.optional(),
-    placement: n.bf(`top-left`).optional(),
-    viewportRect: wK.nullable(),
-    viewportPoint: TK,
-    viewportSize: n.wf({ width: n.Cf(), height: n.Cf() }).optional(),
-    visualViewport: n
-      .wf({ offsetLeft: n.Cf(), offsetTop: n.Cf(), scale: n.Cf().positive() })
-      .optional(),
-  }),
-  rGe = n.wf({
-    property: n.Of(),
-    value: n.Of(),
-    previousValue: n.Of(),
-    placeholderValue: n.Of().optional(),
-  }),
-  iGe = n.wf({ value: n.Of(), previousValue: n.Of() }),
-  jK = n
-    .wf({
-      id: n.Of(),
-      anchor: kK,
-      annotationControls: $Se.optional(),
-      annotationControlChanges: n.hf(QSe).max(12).optional(),
-      declarations: n.hf(rGe),
-      draftAttribute: n.Of(),
-      markerViewportPoint: TK.optional(),
-      provenance: n.hf(
-        n.wf({
-          property: n.Of(),
-          selectorText: n.Of().optional(),
-          sourceUrl: n.Of().optional(),
-          sourceLine: n.Cf().optional(),
-          sourceColumn: n.Cf().optional(),
-        }),
-      ),
-      selector: n.Of().nullable(),
-      targetLabel: n.Of(),
-      elementTagName: n.Of().optional(),
-      text: iGe.optional(),
-      viewportSize: n.wf({ width: n.Cf(), height: n.Cf() }).optional(),
-    })
-    .superRefine((e, t) => {
-      e.anchor.kind === `virtual` &&
-        (e.annotationControls == null ||
-          e.annotationControls.controls.length === 0 ||
-          e.declarations.length > 0 ||
-          e.provenance.length > 0 ||
-          e.text != null ||
-          e.selector != null) &&
-        t.addIssue({
-          code: `custom`,
-          message: `Graphics targets support only registered annotation controls`,
-        });
-      let n = new Map(e.annotationControls?.controls.map((e) => [e.callback, e])),
-        r = new Set();
-      for (let [i, a] of (e.annotationControlChanges ?? []).entries()) {
-        let e = n.get(a.callback);
-        ((e == null ||
-          r.has(a.callback) ||
-          [a.value, a.previousValue].some((t) => {
-            if (t == null) return !1;
-            switch (e.type) {
-              case `color`:
-                return (
-                  typeof t != `string` || !/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(t)
-                );
-              case `select`:
-                return !e.options.some((e) => e.value === t);
-              case `range`:
-                return typeof t != `number` || t < e.min || t > e.max;
-              case `toggle`:
-                return typeof t != `boolean`;
-            }
-          })) &&
-          t.addIssue({
-            code: `custom`,
-            message: `Control changes must match their registered callback and type`,
-            path: [`annotationControlChanges`, i],
-          }),
-          r.add(a.callback));
-      }
-    }),
-  aGe = jK.safeExtend({
-    createdAt: n.Of(),
-    updatedAt: n.Of(),
-    status: n.jf([n.bf(`current`), n.bf(`queued`)]),
-  }),
-  oGe = n
-    .vf(`type`, [
-      n.wf({ type: n.bf(`browser-sidebar-runtime-close-comment-preview`), commentId: n.Of() }),
-      n.wf({
-        type: n.bf(`browser-sidebar-runtime-comment-screenshot-ready`),
-        commentId: n.Of(),
-        annotationViewportRect: wK.nullable().optional(),
-        markerViewportPoint: TK.optional(),
-        skipScreenshotCapture: n.gf().optional(),
-      }),
-      n.wf({ type: n.bf(`browser-sidebar-runtime-exit-comment-mode`) }),
-      n.wf({
-        type: n.bf(`browser-sidebar-runtime-toggle-annotation-mode`),
-        force: n.gf().optional(),
-      }),
-      n.wf({
-        type: n.bf(`browser-sidebar-runtime-request-annotation-permission`),
-        requestId: n.Pf(),
-      }),
-      n.wf({ type: n.bf(`browser-sidebar-runtime-annotation-suspension`), suspended: n.gf() }),
-      n.wf({ type: n.bf(`browser-sidebar-runtime-design-modifier-state`), pressed: n.gf() }),
-      n.wf({
-        type: n.bf(`browser-sidebar-runtime-annotation-selection-modifier-state`),
-        pressed: n.gf(),
-      }),
-      n.wf({ type: n.bf(`browser-sidebar-runtime-focus-editor`) }),
-      n.wf({ type: n.bf(`browser-sidebar-runtime-cancel-editor`), target: CK }),
-      n.wf({ type: n.bf(`browser-sidebar-runtime-image-drag-ended`) }),
-      n.wf({ type: n.bf(`browser-sidebar-runtime-image-drag-started`), sourceUrl: n.Of() }),
-      n.wf({
-        type: n.bf(`browser-sidebar-runtime-mouse-navigation`),
-        direction: n.jf([n.bf(`back`), n.bf(`forward`)]),
-      }),
-      n.wf({
-        type: n.bf(`browser-sidebar-runtime-open-comment-preview`),
-        commentId: n.Of(),
-        anchorState: AK,
-      }),
-      n.wf({
-        type: n.bf(`browser-sidebar-runtime-open-editor`),
-        target: CK,
-        anchorState: AK,
-        annotationEditorDefault: n.bf(`advanced`).optional(),
-        designEditorState: jK.optional(),
-        enterAnnotationMode: n.bf(!0).optional(),
-        initialComment: n.wu.optional().catch(void 0),
-        openTweaks: n.bf(!0).optional(),
-        siteInitiated: n.bf(!0).optional(),
-        wantsScreenshot: n.gf().optional(),
-      }),
-      n.wf({
-        type: n.bf(`browser-sidebar-runtime-open-design-editor`),
-        anchorState: AK,
-        designEditorState: jK,
-        designChange: aGe.optional(),
-      }),
-      n.wf({
-        type: n.bf(`browser-sidebar-runtime-update-anchor`),
-        target: CK,
-        anchorState: AK.nullable(),
-      }),
-    ])
-    .refine((e) =>
-      (e.type === `browser-sidebar-runtime-open-design-editor` &&
-        (e.designEditorState.anchor.kind === `virtual` ||
-          e.designChange?.anchor.kind === `virtual`)) ||
-      (e.type === `browser-sidebar-runtime-open-editor` &&
-        e.designEditorState?.anchor.kind === `virtual` &&
-        (e.anchorState.anchor.kind !== `virtual` ||
-          !n.Cu(e.designEditorState.anchor, e.anchorState.anchor)))
-        ? !1
-        : !(`anchorState` in e) || e.anchorState?.anchor.kind !== `virtual`
-          ? !0
-          : (e.anchorState.additionalAnchors?.length ?? 0) > 0 ||
-              e.type === `browser-sidebar-runtime-open-design-editor`
-            ? !1
-            : e.type !== `browser-sidebar-runtime-open-editor` ||
-              (e.target.mode !== `design` &&
-                (e.designEditorState == null || e.designEditorState.anchor.kind === `virtual`) &&
-                e.openTweaks !== !0 &&
-                e.siteInitiated !== !0),
-    );
-function NK(e, t, n, r) {
-  if (e.width <= 0 || e.height <= 0 || n.width <= 0 || n.height <= 0) return null;
-  let i = e.width / n.width,
-    a = e.height / n.height,
-    o = Math.max(0, Math.floor((t.x - r) * i)),
-    s = Math.max(0, Math.floor((t.y - r) * a)),
-    c = Math.min(e.width, Math.ceil((t.x + t.width + r) * i)),
-    l = Math.min(e.height, Math.ceil((t.y + t.height + r) * a)),
-    u = c - o,
-    d = l - s;
-  return u <= 0 || d <= 0 ? null : { x: o, y: s, width: u, height: d };
-}
-var PK = r.i(`browser-sidebar-comment-controller`),
-  sGe = 1e3,
-  lGe = `data-codex-browser-design-group`,
-  uGe = n.wf({ root: n.wf({ nodeId: n.Cf() }) }),
-  dGe = n.wf({ nodeId: n.Cf() }),
-  fGe = n.wf({ startLine: n.Cf(), startColumn: n.Cf() }),
-  zK = n
-    .wf({
-      name: n.Of(),
-      value: n.Of().optional(),
-      disabled: n.gf().optional(),
-      implicit: n.gf().optional(),
-      range: fGe.optional(),
-    })
-    .loose(),
-  BK = n.wf({ text: n.Of().optional(), sourceURL: n.Of().optional() }).loose(),
-  pGe = n
-    .wf({
-      rule: n
-        .wf({
-          selectorList: n.wf({ text: n.Of().optional() }).optional(),
-          media: n.hf(BK).optional(),
-          containerQueries: n.hf(BK).optional(),
-          supports: n.hf(BK).optional(),
-          style: n.wf({ cssProperties: n.hf(zK).optional() }).optional(),
-        })
-        .loose(),
-    })
-    .loose(),
-  mGe = n
-    .wf({
-      inlineStyle: n.wf({ cssProperties: n.hf(zK).optional() }).optional(),
-      matchedCSSRules: n.hf(pGe).optional(),
-    })
-    .loose();
+var browserCommentSchemas = createBrowserCommentSchemas({
+  annotationControlChangeSchema,
+  annotationControlsSchema,
+  schema: n,
+  virtualRoleSchema: XG,
+  virtualTargetIdSchema: VC,
+});
+var browserCommentLogger = r.i(`browser-sidebar-comment-controller`);
 var {
   anchorStateFromComment: KK,
   compactCommentScreenshots: gGe,
@@ -31488,10 +31180,10 @@ var {
 } = createBrowserCommentPolicy({
   anchorsEqual: n.Cu,
   browserRuntimeMessageChannel: a.At,
-  isDesignChange: (value) => jK.safeParse(value).success,
+  isDesignChange: (value) => browserCommentSchemas.designChangeSchema.safeParse(value).success,
   markerSize: n._u,
   nativeImage: l.nativeImage,
-  projectCaptureRect: NK,
+  projectCaptureRect: projectBrowserCaptureRect,
 });
 var hGe = createBrowserCommentControllerClass({
     shared: n,
@@ -31500,14 +31192,14 @@ var hGe = createBrowserCommentControllerClass({
     crypto: _,
     defaultHostId: J,
     OverlayManager: JWe,
-    logger: PK,
-    screenshotReadyTimeoutMs: sGe,
+    logger: browserCommentLogger,
+    screenshotReadyTimeoutMs: BROWSER_COMMENT_SCREENSHOT_READY_TIMEOUT_MS,
     screenshotMaxDimension: LK,
     controlFallbackValue,
-    parseDocumentRoot: uGe,
-    parseNodeId: dGe,
-    parseMatchedStyles: mGe,
-    designGroupAttribute: lGe,
+    parseDocumentRoot: browserCommentSchemas.documentRootSchema,
+    parseNodeId: browserCommentSchemas.nodeIdSchema,
+    parseMatchedStyles: browserCommentSchemas.matchedStylesSchema,
+    designGroupAttribute: BROWSER_DESIGN_GROUP_ATTRIBUTE,
     normalizeAnchorState: $G,
     sameDesignChangeIdentity: EGe,
     resetCommentModeSnapshot: EU,
@@ -45799,7 +45491,7 @@ var Fnt = createTracingRpcServiceClass({
     electron: l,
     platform: process.platform,
     getSandboxWebContents: Z$,
-    projectCaptureRect: NK,
+    projectCaptureRect: projectBrowserCaptureRect,
     getFeatureFlags: Tr,
     temporaryDirectory: p.tmpdir,
     realpathSync: v.realpathSync,
@@ -52059,7 +51751,7 @@ async function Ust() {
       }),
     getDesktopFeatureAvailability: Tr,
     isSafeRoute: n.bo,
-    parseBrowserSidebarMessage: (payload) => oGe.safeParse(payload),
+    parseBrowserSidebarMessage: (payload) => browserCommentSchemas.runtimeMessageSchema.safeParse(payload),
     isBrowserPageEvent: cte,
     guardedBrowserPageEventTypes: new Set([
       WEBMCP_UI_TOOLS_CHANGED_EVENT.type,

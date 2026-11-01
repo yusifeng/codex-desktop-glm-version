@@ -320,7 +320,7 @@ const annotationControlSchema = zUnionByType(`type`, [
   }
 });
 /** 单条控件变更 schema（值类型不变，原 QSe）。 */
-const controlChangeSchema = zDiscriminatedUnion({
+export const annotationControlChangeSchema = zDiscriminatedUnion({
   callback: controlCallbackSchema,
   previousValue: controlValueSchema.optional(),
   value: controlValueSchema,
@@ -334,7 +334,7 @@ const controlChangeSchema = zDiscriminatedUnion({
     });
 });
 /** 控件组 schema（≤12 控件、callback 唯一，原 $Se）。 */
-const annotationControlsSchema = zDiscriminatedUnion({
+export const annotationControlsSchema = zDiscriminatedUnion({
   controls: zArray(annotationControlSchema).max(12),
   controlsHeading: controlLabelSchema.optional(),
   controlsMode: zEnum([`extend`, `replace`]).optional(),

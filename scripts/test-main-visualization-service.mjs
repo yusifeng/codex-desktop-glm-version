@@ -1,7 +1,26 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import { createVisualizationServiceRuntime } from "../src/main/main-app/visualizations/visualization-service.ts";
+import { fileURLToPath } from "node:url";
+import { build } from "esbuild";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const output = await build({
+  entryPoints: [
+    path.join(
+      root,
+      "src/main/main-app/visualizations/visualization-service.ts",
+    ),
+  ],
+  bundle: true,
+  format: "esm",
+  platform: "node",
+  target: "node22",
+  write: false,
+});
+const { createVisualizationServiceRuntime } = await import(
+  `data:text/javascript;base64,${Buffer.from(output.outputFiles[0].text).toString("base64")}`
+);
 
 let assertions = 0;
 const equal = (actual, expected) => {
@@ -265,12 +284,23 @@ function createHarness({
 }
 
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
+const windowContext = fs.readFileSync(
+  new URL("../src/main/main-app/window/window-context.ts", import.meta.url),
+  "utf8",
+);
 equal(main.includes("VisualizationService: Gnt"), true);
-equal(main.includes("visualizations: new Gnt("), true);
+equal(windowContext.includes("visualizations: new Gnt("), true);
 equal(main.includes("Gnt = class"), false);
 equal(main.includes("async function Knt("), false);
 equal(main.includes("function V5("), false);
 equal(main.includes("Vnt = 5e6"), false);
 equal(main.includes("Hnt = n.Of"), false);
+equal(
+  fs.readFileSync(
+    new URL("../src/main/main-app/visualizations/visualization-service.ts", import.meta.url),
+    "utf8",
+  ).includes("module.exports"),
+  false,
+);
 
 console.log(`${assertions} main visualization service assertions passed`);

@@ -3842,3 +3842,15 @@ settings mount/session/instance、route 与 persistence reconciliation、storage
 workspace-settings 迁移漏接 `isCheckoutAttachParams` / `isWorkspaceSettingsAttachParams`，原 WebMCP `pW` 常量删除后两个 consumer 未更新；本批
 恢复两个语义 predicate，并导出 `WEB_MCP_LIMITS` 供 listener IPC 和 site-page event 共用。focused 51 项、八组相邻回归 399 项通过；测试索引
 1851，no-unwired gate 扩至 1167 项。
+
+### Schema owner 收敛：Browser comment runtime validation
+
+新增 `browser-sidebar/browser-comment-schemas.ts`，将 editor target、页面/文档上下文、element/region/text/virtual anchor、anchor state、
+design change、saved design change、sidebar runtime message 及 CDP document/node/matched-style 校验集中到单一 typed factory。virtual target
+只能携带已注册 annotation controls、control callback 唯一性、color/select/range/toggle value 约束、UUID 与 open-editor virtual-anchor 限制均
+按原顺序保留；`projectBrowserCaptureRect` 保留 scale、floor/ceil 与 viewport clamp 语义。
+
+主组合根从 `conversation/turn-context.ts` 复用并注入 annotation control schemas，消除旧 `$Se/QSe` 悬空引用；comment policy、controller、
+Electron message handler 和 visualization service 现消费同一 schema owner。旧 `CK..oGe`、`NK`、`uGe..mGe` 约 326 行已删除，没有复制
+validation 状态。另移除 `visualization-service.ts` 的死 CommonJS footer，ESM bundle 告警随之消失。focused 35 项及 anchor-policy、controller、
+mode、overlay、policy、Electron handler、visualization 七组 274 项相邻回归通过；测试索引增至 1852，no-unwired gate 扩至 1185 项。

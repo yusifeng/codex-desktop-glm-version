@@ -251,7 +251,3 @@ export function createVisualizationServiceRuntime(dependencies: Record<string, a
 
   return { VisualizationService, isPathWithin, resolveAuthorizedAbsolutePath };
 }
-
-if (typeof module !== "undefined") {
-  module.exports = { createVisualizationServiceRuntime };
-}
