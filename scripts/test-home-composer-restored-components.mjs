@@ -253,4 +253,102 @@ assert.equal(selectedLocation, "cloud");
 locationTree.props.children[1].props.onClick();
 assert.equal(selectedLocation, "local");
 
+const announcements = await bundle("home-composer-announcement-candidates", {
+  "app-shared": `
+    export const I3=()=>globalThis.__homeComposerRestored.jsx;
+    export const Jm=()=>"LazyAnnouncement"; export const P3=()=>({flushSync:callback=>callback()});
+    export const ZI="app-scope"; export const LX=()=>({set:(signal,value)=>globalThis.__homeComposerRestored.events.push({signal,value})});
+    export const HX=signal=>signal==="history-state"?"eligible":null;
+  `,
+  "app-initial": `
+    export const F$=()=>"navigate"; export const Fk=()=>()=>globalThis.__homeComposerRestored.events.push({voice:true});
+    export const Gk=scope=>globalThis.__homeComposerRestored.events.push({dismissVoice:scope});
+    export const HZ=()=>globalThis.__homeComposerRestored.announcementEditor;
+    export const U2=()=>({showPluginInstallDetails:true}); export const qk=()=>true;
+  `,
+  "app-primary": `export const om="FallbackAnnouncement";`,
+  "codex-home-announcements": `export const i="ProductAnnouncements"; export const t="CodexAnnouncements";`,
+  "worktree-onboarding-state": `export const n=()=>({isEligible:false});`,
+  "announcement-entry-points": `
+    const state={isEligible:false,isLoading:false,dismiss(){},markShown(){},openGiftCredits(){},openImport(){},replay(){}};
+    export const f=()=>state; export const g="history-state"; export const h="history-dismissed"; export const i=()=>state; export const o=()=>state;
+    export const p="ReplayAnnouncement"; export const s="ImportAnnouncement"; export const t="GiftAnnouncement"; export const v="HistoryAnnouncement";
+    export const u=options=>globalThis.__homeComposerRestored.events.push({replay:options});
+  `,
+  "realtime-voice-home-announcement": `export const RealtimeVoiceHomeAnnouncementContent="VoiceAnnouncement";`,
+  "worktree-onboarding-banner-controller": `export const WorktreeOnboardingBannerController="WorktreeAnnouncement";`,
+});
+state.announcementPrompt = [];
+globalThis.__homeComposerRestored.announcementEditor = {
+  eventEmitter: { emit: event => state.events.push({ submitted: event }) },
+  setPromptText: prompt => state.announcementPrompt.push(prompt),
+};
+const announcementTree = announcements.HomeComposerAnnouncementCandidates({
+  entryPoint: "codex",
+  renderCandidates: candidates => candidates,
+});
+assert.equal(announcementTree.type, "CodexAnnouncements");
+assert.deepEqual(announcementTree.props.composerEntries.map(candidate => candidate.id), [
+  "gift-credits", "realtime-voice", "external-agent-import", "worktree-onboarding", "computer-history", "codex-replay",
+]);
+const historyCandidate = announcementTree.props.composerEntries[4];
+assert.equal(historyCandidate.isEligible, true);
+historyCandidate.content.props.onViewRecap("recap prompt");
+assert.deepEqual(state.announcementPrompt, ["recap prompt"]);
+assert.equal(state.events.some(event => event.submitted === "submit"), true);
+const productAnnouncementTree = announcements.HomeComposerAnnouncementCandidates({
+  beaconProduct: "work_tab",
+  entryPoint: "codex",
+  renderCandidates: candidates => candidates,
+});
+assert.equal(productAnnouncementTree.type, "ProductAnnouncements");
+assert.equal(productAnnouncementTree.key, "work_tab");
+
+const banners = await bundle("composer-banners", {
+  "app-shared": `
+    export const I3=()=>globalThis.__homeComposerRestored.jsx;
+    export const e6=()=>({Suspense:"Suspense"}); export const Jm=()=>"TaskAnnouncementCandidates";
+    export const ZI="scope"; export const LX=()=>({set(){}}); export const HX=()=>false;
+    export const BX=()=>({data:{maxAgents:8}}); export const Y2="FormattedMessage";
+  `,
+  "app-initial": `
+    export const dun=(key,fallback)=>({key,fallback}); export const jyt=()=>({cwd:"/repo",hostId:"local"});
+    export const P6t=()=>({authMethod:"chatgpt"}); export const w8=()=>({data:{models:[{reasoningEffort:"ultra"}]}});
+    export const wst="config"; export const n7="Banner";
+  `,
+  "app-primary": `
+    export const Op="FullAccess"; export const Vf="CyberSafety"; export const om="DictationFirstUse"; export const Jp="WarningIcon";
+    export const Tp=models=>models; export const Cp=input=>{globalThis.__homeComposerRestored.ultraConfig=input.config;return 8};
+  `,
+  "usage": `export const n=props=>({type:"UsageBanner",props}); export const t=()=>{};`,
+  "composer-announcement-slot": `
+    export const r=(id,content)=>({id,isEligible:content!=null,isLoading:false,content});
+    export const t="ComposerAnnouncementSlot";
+  `,
+  "task-announcement-candidates": `export const TaskAnnouncementCandidates="TaskAnnouncementCandidates";`,
+});
+const homeBanners = banners.ComposerBanners({
+  hostId: "local",
+  environmentBanners: { showFullAccessWarning: true, windowsSandboxWarnings: "SandboxWarning" },
+  safetyEvent: { id: "safety" },
+  usageBannerProps: { model: "gpt" },
+});
+assert.equal(homeBanners.type, "ComposerAnnouncementSlot");
+assert.equal(homeBanners.props.area, "home");
+assert.deepEqual(homeBanners.props.candidates.map(candidate => candidate.id), [
+  "windows-sandbox", "wsl-migration", "full-access", "cyber-safety", "codex-usage", "ultra-usage", "misalignment-policy", "safety-buffering", "dictation-first-use",
+]);
+assert.equal(homeBanners.props.candidates[2].isEligible, true);
+const taskBanners = banners.ComposerBanners({ conversationId: "conversation-1", hostId: "local" });
+assert.equal(taskBanners.type, "Suspense");
+assert.equal(taskBanners.props.children.type, "TaskAnnouncementCandidates");
+assert.equal(taskBanners.props.fallback.props.candidates.at(-1).id, "workspace-renewal-payment");
+const ultraBanners = banners.ComposerBanners({
+  conversationId: "conversation-1", hostId: "local", showUltraWarning: true, ultraWarningModel: "gpt-ultra",
+});
+const ultraCandidate = ultraBanners.props.children.props.candidates[5];
+const ultraWarning = ultraCandidate.content.type(ultraCandidate.content.props);
+assert.equal(ultraWarning.type, "Banner");
+assert.deepEqual(globalThis.__homeComposerRestored.ultraConfig, { maxAgents: 8 });
+
 console.log("home composer restored component tests passed");

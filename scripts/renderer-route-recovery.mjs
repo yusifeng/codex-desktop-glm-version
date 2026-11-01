@@ -113,6 +113,12 @@ export const COMPOSER_ROUTE_ROOTS = [
   "computer-history-suggestions-55e8abf166e7.js",
   "first-app-connect-ambient-suggestions-ef1637627fe1.js",
   "followup-suggestions-822629129cd6.js",
+  // The announcement entry-point draft does not yet preserve the release
+  // signal/hook aliases consumed by the restored candidate aggregator.
+  "entry-points-24b83c9c7664.js",
+  // ComposerBanners now imports Usage directly; retain the release component
+  // until its current visual approximation is rebuilt against the full hook contract.
+  "usage-5ab4582aac77.js",
   "home-ambient-suggestions-content-a1c4fe488b63.js",
   "home-composer-announcement-candidates-da8179151998.js",
   "home-composer-mode-toggle-ceb4980e314e.js",
@@ -662,6 +668,8 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   "home-composer-mode-toggle-ceb4980e314e.js",
   "home-suggestion-surface-6b043b722abb.js",
   "composer-action-bar-run-location-dropdown-4c846a804c36.js",
+  "composer-banners-92519a56d6b2.js",
+  "home-composer-announcement-candidates-da8179151998.js",
   "usd-5d2c7710cf01.js",
 ]);
 

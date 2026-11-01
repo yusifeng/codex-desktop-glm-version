@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "moduleCount": 207,
+  "moduleCount": 205,
   "modules": [
     "BarChart-2010e7d67e4a.js",
     "ComposedChart-12232a23b4b3.js",
@@ -53,7 +53,6 @@
     "codex-thread-report-dialog-77d856cf550b.js",
     "color-icon-d65c230673c8.js",
     "command-messages-294d3e3133e1.js",
-    "composer-banners-92519a56d6b2.js",
     "composer-host-ac9410930773.js",
     "composer-provider-15ef4a061c57.js",
     "composer-utility-bar-a9b94a95b731.js",
@@ -84,7 +83,6 @@
     "gpt-about-dialog-7509f0d1e79e.js",
     "home-ambient-suggestions-content-a1c4fe488b63.js",
     "home-artifact-templates-1e0738b7ddeb.js",
-    "home-composer-announcement-candidates-da8179151998.js",
     "home-task-suggestions-e29a02e9b466.js",
     "hooks-settings-fde35406d6f4.js",
     "hover-card-data-95a14e835743.js",
