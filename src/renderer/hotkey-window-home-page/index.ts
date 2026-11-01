@@ -114,7 +114,7 @@ interface AppPrimaryApi {
   Cf?: () => void; Dn?: () => void; Ns?: () => void; dg?: () => void; dt?: () => void; eg?: () => void; fg?: () => void; ko?: () => void; l?: () => void; rg?: () => void; sg?: () => void; ug?: unknown; ut: unknown; zo?: () => void;
   Nt(input: { composerMode: ComposerMode; setComposerMode(mode: ComposerMode): void }): void; Oo: unknown; Ps(command: string, callback: () => void, options: { enabled: boolean }): void; Qh: unknown; Ro: unknown; c: unknown; ig(input: { cloudAccess: unknown; isPrimaryReviewComposer: unknown; isRemoteProject: boolean; supportsCloud: boolean }): string | null; kn(root: string | null, options: { enabled: boolean; hostId: string; source: string }): { gitRoot?: string | null }; lg: unknown; ng(input: ModeAvailability & { composerMode: ComposerMode; isEverydayWorkMode: false }): ComposerMode; wf(root: string | null, config: HostConfig, source: string, options: { enabled: boolean }): { data?: unknown };
 }
-interface FloatingPointerApi { n?: () => void; t(options: { activationNonce: unknown; floatingElementSelectors: readonly string[]; includeInteractiveRegion: true; interactiveRegionRef: Ref<ElementLike | null>; onInteractiveChange(value: boolean): void }): boolean }
+interface FloatingPointerApi { n(options: { activationNonce: unknown; floatingElementSelectors: readonly string[]; includeInteractiveRegion: true; interactiveRegionRef: Ref<ElementLike | null>; onInteractiveChange(value: boolean): void }): boolean; t?: () => void }
 interface DismissApi { n?: () => void; t(): void }
 interface EnvironmentDropdownApi { c?: () => void; i?: () => void; n?: () => void; o?: () => void; r: unknown; s: unknown; t: unknown }
 
@@ -211,7 +211,7 @@ function ModeCommands(props: { composerMode: ComposerMode; enabled: boolean; set
 }
 
 function usePointerInteractivity(activationNonce: unknown, interactiveRegionRef: Ref<ElementLike | null>): boolean {
-  return floating.t({ activationNonce, floatingElementSelectors: FLOATING_SELECTORS, includeInteractiveRegion: true, interactiveRegionRef, onInteractiveChange: onInteractiveChange });
+  return floating.n({ activationNonce, floatingElementSelectors: FLOATING_SELECTORS, includeInteractiveRegion: true, interactiveRegionRef, onInteractiveChange: onInteractiveChange });
 }
 function onInteractiveChange(isInteractive: boolean): void { initial.pnt.hotkeyWindowHotkeys?.homePointerInteractionChanged({ isInteractive }); }
 function openConversation(conversationId: string): void { initial.pnt.hotkeyWindowHotkeys?.open({ path: shared.UB(conversationId) }); }
@@ -343,7 +343,7 @@ function HotkeyWindowHomePage(): unknown {
 }
 
 function initializeHotkeyWindowHomePage(): void {
-  for (const initializer of [shared.$3, shared.FX, shared.wL, shared.K2, shared.jO, shared.xD, shared.lD, shared.QT, shared.Zh, shared.If, shared.c_, shared.Ef, shared._u, shared.W3, initial.mnt, initial.xvt, initial.jst, initial.x3, initial.pfn, initial.rW, initial.Dht, initial.Bfn, initial.Qgn, initial.Rht, initial.Vcn, initial.Yln, initial._cn, initial.aW, initial.xlt, initial.yb, primary.Cf, primary.Dn, primary.Ns, primary.dt, primary.ko, primary.l, primary.rg, primary.sg, primary.zo, primary.eg, primary.fg, floating.n, dismiss.n, environmentUi.n, environmentUi.c, environmentUi.i, environmentUi.o]) callInitializer(initializer);
+  for (const initializer of [shared.$3, shared.FX, shared.wL, shared.K2, shared.jO, shared.xD, shared.lD, shared.QT, shared.Zh, shared.If, shared.c_, shared.Ef, shared._u, shared.W3, initial.mnt, initial.xvt, initial.jst, initial.x3, initial.pfn, initial.rW, initial.Dht, initial.Bfn, initial.Qgn, initial.Rht, initial.Vcn, initial.Yln, initial._cn, initial.aW, initial.xlt, initial.yb, primary.Cf, primary.Dn, primary.Ns, primary.dt, primary.ko, primary.l, primary.rg, primary.sg, primary.zo, primary.eg, primary.fg, floating.t, dismiss.n, environmentUi.n, environmentUi.c, environmentUi.i, environmentUi.o]) callInitializer(initializer);
   jsx = shared.I3();
   React = shared.e6();
   workspaceContextFamily = shared.rZ(initial.kht, deriveWorkspaceContext, { isEqual: shared.l3 });

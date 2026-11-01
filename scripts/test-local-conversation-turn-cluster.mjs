@@ -86,6 +86,8 @@ assert.equal(rendered.props.turn.items[0].isMcpAppWidgetSuperseded, true);
 assert.equal(rendered.props.turn.projectedRequestCount, 0);
 assert.equal(rendered.props.turn.projectionOptions.isBackgroundSubagentsEnabled, false);
 assert.equal(rendered.props.turn.projectionOptions.showStrictReviewNotices, true);
+assert.equal("projectionBudget" in rendered.props.turn.projectionOptions, false, "the UI projection must not use the context-renderer budget path");
+assert.equal("includeTurnDiff" in rendered.props.turn.projectionOptions, false, "the UI projection must preserve the original call contract");
 await rendered.props.onEditUserMessage("updated");
 rendered.props.onForkTurn();
 assert.equal(edits[0].message, "updated");

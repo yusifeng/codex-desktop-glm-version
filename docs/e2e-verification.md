@@ -34,3 +34,54 @@ node scripts/generate-shared-full-classification.mjs --write
 The smoke script is intentionally not treated as a substitute for these gates:
 it validates process startup and the packaged module graph, while the static
 checks validate source coverage and renderer/chunk contracts.
+
+## Signed-in renderer matrix
+
+The packaged app can also be driven through its Electron DevTools endpoint. Start
+the reconstructed package with a dedicated debug port:
+
+```sh
+CODEX_DESKTOP_STARTUP_DEBUG=1 ./scripts/run.sh --remote-debugging-port=9223
+```
+
+Then run the non-mutating matrix:
+
+```sh
+npm run e2e:readonly
+```
+
+The driver is state-independent: it can start on the home page, a conversation,
+or an already-open settings page. It currently checks all of the following in one
+run and rejects the renderer recovery boundary at every checkpoint:
+
+- General settings and the default-permissions surface
+- Git settings
+- Worktrees settings
+- Browser Use settings
+- A hydrated historical conversation containing both a user turn and an assistant reply
+- The conversation add-context menu, including the in-app browser action
+
+`npm run e2e:inspect` records the current renderer title, body, editable controls,
+conversation virtualizer nodes, and new console exceptions without changing app
+state. The lower-level driver also has explicit `fill`, `send`, and `wait` modes.
+Only `send` submits through the signed-in account; keep it a separate, intentional
+mutation step rather than hiding it inside inspection or navigation checks.
+
+The 2026-11-01 signed-in package run passed all six read-only checkpoints. On
+2026-11-02 the mutation matrix also passed:
+
+- `fill` + `send` + `wait` submitted a fresh turn through the signed-in account and
+  observed the assistant response marker.
+- A fresh turn invoked Browser Use, attached the reconstructed Browser webview,
+  loaded `https://example.com/`, and returned `IAB_E2E_20261102_0520`.
+- A direct packaged-app Git worker request traversed renderer preload, IPC,
+  `WorkerBus`, and the Git worker, committed an unstaged file in an isolated
+  repository, and returned a real commit SHA.
+- A second packaged-app Git worker request created a real detached worktree under
+  an isolated temporary root; `git worktree list` and the checked-out file verified
+  the result.
+
+The Git fixtures lived under `/private/tmp` and did not modify the recovery
+repository. Together these checks cover fresh conversation mutation, IAB
+attachment/navigation, Git mutation, and worktree creation rather than only
+read-only rendering.

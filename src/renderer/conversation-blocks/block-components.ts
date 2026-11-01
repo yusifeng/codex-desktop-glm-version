@@ -46,6 +46,12 @@ function renderableText(value: unknown, fallback = ""): string | number {
   }
   return fallback;
 }
+function messageText(item: Record<string, unknown>): string | number {
+  return renderableText(
+    item.content ?? item.text ?? item.message ?? item.prompt ?? item.input ?? item.inputText ??
+    item.output ?? item.outputText ?? item.response ?? item.body,
+  );
+}
 
 /** 兼容恢复期间仍被少量纯算法调用使用的视图描述。 */
 export interface ConversationBlockNode {
@@ -82,7 +88,7 @@ export function collectSubagentThreadNames(
 
 /** AssistantMessageBlock（原 `rg`，导出 W）。 */
 export function AssistantMessageBlock(props: { assistantCopyText?: string; item: Record<string, unknown> }): unknown {
-  const content = renderableText(props.item.content ?? props.item.text);
+  const content = messageText(props.item);
   return jsx().jsxs("article", { "data-conversation-block": "assistant-message", children: [jsx().jsx("div", { children: content }), props.assistantCopyText == null ? null : jsx().jsx("button", { type: "button", "aria-label": "Copy response", "data-copy-text": props.assistantCopyText, children: "Copy" })] });
 }
 
@@ -185,7 +191,7 @@ export function WebSearchBlock(props: { icon?: unknown; item: { action?: string;
 
 /** UserMessageBlock（原 `zC`，导出 u；400 号 memo-cache 主块）。 */
 export function UserMessageBlock(props: { alwaysShowUserMessageActions?: boolean; item: Record<string, unknown> }): unknown {
-  return jsx().jsx("article", { "data-conversation-block": "user-message", children: renderableText(props.item.content ?? props.item.text) });
+  return jsx().jsx("article", { "data-conversation-block": "user-message", children: messageText(props.item) });
 }
 
 /** TurnBlocks（原 `Gw`，导出 r；60 号 memo-cache）。 */
@@ -196,7 +202,7 @@ export function TurnBlocks(props: { conversationId?: string; cwd?: string; denie
     if (wrapper.node != null) return wrapper.node;
     const item = wrapper.item?.item ?? unit as Record<string, unknown>;
     const type = typeof item.type === "string" ? item.type : "activity";
-    if (type === "assistant-message" || type === "assistantMessage") return jsx().jsx(AssistantMessageBlock, { item }, index);
+    if (type === "assistant-message" || type === "assistantMessage" || type === "agentMessage") return jsx().jsx(AssistantMessageBlock, { item }, index);
     if (type === "user-message" || type === "userMessage") return jsx().jsx(UserMessageBlock, { item }, index);
     if (type === "web-search" || type === "webSearch") return jsx().jsx(WebSearchBlock, { item: item as { action?: string; query?: string } }, index);
     if (type === "mcp-tool-call" || type === "mcpToolCall") {
@@ -229,7 +235,7 @@ export function TurnBlocks(props: { conversationId?: string; cwd?: string; denie
     if (type === "attachment" || type === "file") return jsx().jsx(AttachmentBlock, { attachment: item, cwd: props.cwd, hostId: props.hostId }, index);
     if (type === "appshot") return jsx().jsx(AppshotBlock, { appshotContext: item, conversationId: props.conversationId ?? "" }, index);
     if (type === "diff-summary" || type === "diffSummary") return jsx().jsx(InProgressDiffSummaryBlock, { inProgressDiffSummary: item, isInProgress: item.completed !== true }, index);
-    const content = item.content ?? item.summary ?? item.title;
+    const content = item.content ?? item.message ?? item.text ?? item.output ?? item.summary ?? item.title;
     return jsx().jsx("div", { "data-turn-unit-type": type, children: typeof content === "string" || typeof content === "number" ? content : null }, (item.callId as string | undefined) ?? index);
   };
   return jsx().jsxs("section", { "data-turn-blocks": true, children: [(props.deniedActionCount ?? 0) > 0 ? jsx().jsx("span", { "data-denied-action-count": props.deniedActionCount, children: `${props.deniedActionCount} denied` }) : null, props.units.map(renderUnit)] });
@@ -308,11 +314,17 @@ function McpAppWidgetItem(props: { conversationId: string; hostId: string; item:
   const react = getReact?.();
   const [openOnRegistration] = react?.useState?.(() => props.item.completed !== true) ?? [props.item.completed !== true];
   if (!registered && !props.shouldInitialize) return null;
+  // The release resolver memoizes by the apps collection in a WeakMap and
+  // therefore requires an object key.  During startup/plugin reconciliation
+  // the route can legitimately render a persisted tool call before the apps
+  // query has produced its first array.  Keep the release resolver contract
+  // by supplying a stable collection instead of forwarding `undefined`.
+  const resolvedApps = Array.isArray(props.resolvedApps) ? props.resolvedApps : EMPTY_RESOLVED_APPS;
   const matchingApp = typeof (appInitialChunk as any).Ern === "function"
     ? (appInitialChunk as any).Ern({
         appContext: props.item.appContext,
-        apps: props.resolvedApps,
-        functionName: props.item.functionName,
+        apps: resolvedApps,
+        functionName: typeof props.item.functionName === "string" ? props.item.functionName : props.item.invocation?.tool ?? "",
         serverName: props.item.invocation?.server,
         toolName: props.item.invocation?.tool,
       })
@@ -328,6 +340,8 @@ function McpAppWidgetItem(props: { conversationId: string; hostId: string; item:
     widgetOnly: true,
   }) : null;
 }
+
+const EMPTY_RESOLVED_APPS: unknown[] = [];
 
 /** WidgetCleanupEffect（原 `tm`，导出 J）。 */
 export function widgetCleanupEffect({ callIds, onCleanup }: { callIds: string[]; onCleanup?(callId: string): void }): null {

@@ -25,5 +25,4 @@ function initializeModelPickerChevron(): void {
   jsx = getJsxRuntime();
   initialized = true;
 }
-initializeModelPickerChevron();
 export { initializeModelPickerChevron as n, ModelPickerChevronDownSmall as t };

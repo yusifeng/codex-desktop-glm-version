@@ -28,7 +28,6 @@ import {
   wf as objectSchema,
   Of as stringSchema,
   df as enumSchema,
-  Ec as dynamicAppToolResultSchema,
   Ef as recordSchema,
   $u as threadIdOf,
   ed as requestIdOf,
@@ -58,6 +57,7 @@ import {
   Pa as defaultModeSettings,
   ja as conversationDetailSettings,
 } from "@chunk/shared";
+import { dynamicAppToolResultSchema } from "../../shared/app-config";
 import { createTaggedLogger, memoizedTaggedLogger } from "@chunk/logger";
 import { getDesktopFeatureAvailability } from "../misc/availability";
 import { J as PERSISTED_ATOM_STATE_KEY } from "@chunk/bootstrap";
@@ -107,7 +107,10 @@ class HostRequestRouter {
   assertCurrent: () => void;
   assertLifetimeCurrent: () => void;
   requests = new Map<string, { method: string; origin: "server" | "native"; threadId: string | null }>();
-  nativeResponses = new DynamicAppToolPendingResponses(dynamicAppToolResultSchema);
+  // The recovered shared chunk is CommonJS-backed and participates in a
+  // circular main-process graph. Resolve its schema lazily so the router does
+  // not capture the transient undefined export during module initialization.
+  nativeResponses = new DynamicAppToolPendingResponses(() => dynamicAppToolResultSchema);
   cleanup: Array<() => void> = [];
   disposed = false;
   manager: RouterManagerTarget | null = null;

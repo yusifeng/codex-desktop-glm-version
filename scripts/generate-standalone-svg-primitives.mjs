@@ -11,6 +11,7 @@ const SPECS = [
   ["arrow-curved-right", "arrow-curved-right-f88ac704e2f7.ts", "ArrowCurvedRightIcon"],
   ["arrow-rotate-ccw", "arrow-rotate-ccw-b6615005fd79.ts", "ArrowRotateCounterclockwiseIcon"],
   ["bar-chart-icon", "bar-chart-df721a832f82.ts", "BarChartIcon"],
+  ["book-open", "book-open-49e6c579d8f3.ts", "BookOpenIcon"],
   ["document-search-icon", "document-search-d1a8a918aa84.ts", "DocumentSearchIcon"],
   ["file-blank-icon", "file-blank-b55ab355e982.ts", "FileBlankIcon"],
   ["filter", "filter-b13f62bf3469.ts", "FilterIcon"],
@@ -20,10 +21,12 @@ const SPECS = [
   ["hand-icon", "hand-ab2b3e50d560.ts", "HandIcon"],
   ["plus-sm-icon", "plus-sm-7f7ff2c8a312.ts", "PlusSmallIcon"],
   ["reddit-logo", "reddit-7cd517f2e808.ts", "RedditLogo"],
+  ["security-keys", "security-keys-a34b7fb8f7ef.ts", "SecurityKeysIcon"],
   ["shield-check", "shield-check-cd8c69f429ca.ts", "ShieldCheckIcon"],
   ["text-shorter", "text-shorter-a76bbb7184d8.ts", "TextShorterIcon"],
   ["thumb-mixed", "thumb-mixed-e90a960095aa.ts", "ThumbMixedIcon"],
   ["twitter-logo", "twitter-4ec2d9a72253.ts", "TwitterLogo"],
+  ["undo", "undo-56dd6481731f.ts", "UndoIcon"],
 ];
 
 function extractCallExpression(source, start) {

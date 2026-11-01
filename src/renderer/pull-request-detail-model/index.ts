@@ -7,6 +7,7 @@ import {
 import {
   mnt as initializeAppRuntime,
   pnt as appServices,
+  z2t as loadUniqueValues,
 } from "@rchunk/app-initial";
 
 export interface PullRequestReference {
@@ -73,6 +74,7 @@ export interface PullRequestReviewerSummary {
 }
 
 let githubIntegrationAvailable: ReturnType<typeof createScopedSignal>;
+let uniqueValues: <Value>(values: readonly Value[]) => Value[];
 
 function initializePullRequestDetailAvailability(): void {
   initializeSignalRuntime();
@@ -167,7 +169,7 @@ function reviewerStatus(
 }
 
 function uniqueInOrder(values: readonly string[]): string[] {
-  return [...new Set(values)];
+  return uniqueValues(values);
 }
 
 function summarizeReviewers(
@@ -187,7 +189,10 @@ function summarizeReviewers(
   }));
 }
 
-function initializePullRequestReviewerModel(): void {}
+function initializePullRequestReviewerModel(): void {
+  const loaded = loadUniqueValues();
+  uniqueValues = typeof loaded === "function" ? loaded : loaded.default;
+}
 
 export {
   summarizeReviewers as a,

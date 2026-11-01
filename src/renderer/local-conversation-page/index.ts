@@ -238,7 +238,7 @@ function initializeLocalConversationPage(): void {
   if (pageInitialized) return;
   pageInitialized = true;
   initializeArchivedConversationPage();
-  for (const dependency of [appPrimaryInit, (localConversationThread as any).p, (localConversationThread as any)._, (localConversationTurn as any).n, (agentActivityUnits as any).n, (splitItems as any).t, (virtualizedTurnList as any).n]) call(dependency);
+  for (const dependency of [appPrimaryInit, (localConversationThread as any).p, (localConversationThread as any)._, (localConversationTurn as any).n, (agentActivityUnits as any).c, (splitItems as any).t, (virtualizedTurnList as any).n]) call(dependency);
   void jsx();
 }
 

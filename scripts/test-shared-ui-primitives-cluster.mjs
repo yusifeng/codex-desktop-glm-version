@@ -22,6 +22,8 @@ const appSharedMock = `
   function ReactRuntime(){return ReactRuntime}
   ReactRuntime.useState=(value)=>[typeof value==="function"?value():value,()=>{}];
   ReactRuntime.useSyncExternalStore=(subscribe,getSnapshot)=>getSnapshot();
+  const compiler={c:(size)=>Array(size).fill(Symbol.for("react.memo_cache_sentinel"))};
+  export const $3=()=>compiler;
   export const e6=ReactRuntime;
   export const I3=()=>s.jsx;
   export const G2=(messages)=>messages;

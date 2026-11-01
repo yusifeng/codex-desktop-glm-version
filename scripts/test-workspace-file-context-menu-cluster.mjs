@@ -40,7 +40,7 @@ async function bundle(entryDirectory) {
               contents:
                 importPath === "app-shared"
                   ? `
-                    export const $3 = () => globalThis.__workspaceFileMenuTest.initializers.push("runtime");
+                    export const $3 = () => { globalThis.__workspaceFileMenuTest.initializers.push("runtime"); const cache = []; return { c: size => { while (cache.length < size) cache.push(Symbol.for("react.memo_cache_sentinel")); return cache; } }; };
                     export const FX = () => globalThis.__workspaceFileMenuTest.initializers.push("signals");
                     export const Of = () => globalThis.__workspaceFileMenuTest.initializers.push("menu");
                     export const I3 = () => globalThis.__workspaceFileMenuTest.jsx;

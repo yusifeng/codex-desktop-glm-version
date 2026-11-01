@@ -15,12 +15,41 @@ for (const directory of MODULES) {
   const source = fs.readFileSync(path.join(ROOT, "src/renderer", directory, "index.ts"), "utf8");
   for (const match of source.matchAll(/import\s*{([\s\S]*?)}\s*from\s*"@rchunk\/([^"]+)";/g)) {
     const names = imports.get(match[2]) ?? new Set();
-    for (const item of match[1].split(",")) names.add(item.trim().split(/\s+as\s+/)[0]);
+    for (const item of match[1].split(",")) {
+      const name = item.trim().split(/\s+as\s+/)[0];
+      if (name && !name.startsWith("type ")) names.add(name);
+    }
     imports.set(match[2], names);
   }
 }
-const overrides = { "app-shared": { I3: "() => globalThis.__toolResultPrimitivesTest.jsx", e6: "() => globalThis.__toolResultPrimitivesTest.react" } };
-const sideEffects = new Set(["rolldown-runtime", "app-initial", "diff-preview-content", "ansi-block", "shell-label", "use-app-connect-flow", "open-in-google-drive-menu-item"]);
+const overrides = {
+  "app-shared": {
+    $O: "{ FIVE_MINUTES: 300000 }",
+    BX: "(family, parameter) => ({ data: family?.read?.(parameter) ?? null })",
+    FX: "() => undefined",
+    I3: "() => globalThis.__toolResultPrimitivesTest.jsx",
+    QI: "() => undefined",
+    ZI: "{ id: 'app-scope' }",
+    e6: "() => globalThis.__toolResultPrimitivesTest.react",
+    ek: "() => undefined",
+  },
+  "app-initial": {
+    eun: `(scope, method, options) => ({
+      method,
+      options,
+      read(parameter) {
+        const config = options(parameter);
+        if (!config.enabled) return null;
+        if (method === "native-desktop-app-by-bundle-id") {
+          return config.select({ app: { appId: parameter, displayName: "Editor" } });
+        }
+        return config.select({ apps: [{ appId: "com.example.Editor", displayName: "Editor" }] });
+      },
+    })`,
+    nun: "() => undefined",
+  },
+};
+const sideEffects = new Set(["rolldown-runtime", "diff-preview-content", "ansi-block", "shell-label", "use-app-connect-flow", "open-in-google-drive-menu-item"]);
 function mock(name) { if (sideEffects.has(name)) return "export {};"; return [...(imports.get(name) ?? [])].map(exportName => `export const ${exportName} = ${overrides[name]?.[exportName] ?? "() => undefined"};`).join("\n"); }
 async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "tool-result-primitives-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: mock(importPath), loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
 function nodes(root) { const output = []; const visit = value => { if (value == null || typeof value !== "object") return; if (Array.isArray(value)) return value.forEach(visit); if ("type" in value && "props" in value) output.push(value); visit(value.props?.children); }; visit(root); return output; }
@@ -58,9 +87,8 @@ assert.equal(bookTree.props.className, "book");
 // computer-use-native-app-metadata: 4
 const nativeApp = await bundle("computer-use-native-app-metadata");
 nativeApp.t();
-const metadata = { appId: "com.example.Editor", displayName: "Editor" };
-assert.equal(nativeApp.n({ kind: "appId", appId: "com.example.Editor", metadata }), metadata);
-assert.equal(nativeApp.n({ kind: "displayName", displayName: "Editor" }), null);
+assert.deepEqual(nativeApp.n({ kind: "appId", appId: "com.example.Editor" }), { appId: "com.example.Editor", displayName: "Editor" });
+assert.deepEqual(nativeApp.n({ kind: "displayName", displayName: "Editor" }), { appId: "com.example.Editor", displayName: "Editor" });
 assert.equal(nativeApp.n(null), null);
 assert.equal(typeof nativeApp.t, "function");
 

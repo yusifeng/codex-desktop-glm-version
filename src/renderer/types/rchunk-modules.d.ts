@@ -906,6 +906,8 @@ declare module "@rchunk/app-shared" {
   export const kM: unknown;
   /** initializeIntlRuntime（localized banner/message 基础设施）。 */
   export const fI: () => void;
+  /** Elicitation lifecycle analytics event descriptor. */
+  export const oj: unknown;
   /** initializeMountedState（mounted callback hook 依赖）。 */
   export const AT: () => void;
   export const $h: () => void; // i8：资源按钮依赖初始化器
@@ -2884,6 +2886,7 @@ declare module "@rchunk/thumbnail-worker-pdf-runtime" {
 }
 
 declare module "@rchunk/app-initial" {
+  export const E_t: unknown;
   export const aa: (props: Record<string, unknown>) => unknown;
   export const oa: (props: Record<string, unknown>) => unknown;
   export const Yg: (props: Record<string, unknown>) => unknown;
@@ -3036,6 +3039,8 @@ declare module "@rchunk/app-initial" {
     Record<string, unknown>,
     Value
   >;
+  /** clear persisted preference values whose keys begin with the prefix. */
+  export const ign: (prefix: string) => void;
   export const Dt: () => Promise<unknown>;
   export const Et: () => void;
   export const FG: unknown;
@@ -3447,6 +3452,9 @@ declare module "@rchunk/app-initial" {
     customAvatars: {
       installPet?: (request: Record<string, unknown>) => Promise<{ id: string }>;
       previewPetInstall?: (request: Record<string, unknown>) => Promise<Record<string, unknown> & { spriteVersionNumber: number }>;
+    };
+    ambientSuggestions?: {
+      hasAccessibleAndEnabledApp(input: { hostId: string }): Promise<boolean | null | undefined>;
     };
     hotkeyWindowHotkeys?: {
       open(options: { path: string }): void;
@@ -4235,6 +4243,11 @@ declare module "@rchunk/app-initial" {
   ) => void;
   export const Ks: () => void;
   export const ypn: () => void;
+  /** Window-focus state used to gate visibility analytics. */
+  export const GPt: import("@rchunk/app-shared").ReadableSignal<boolean>;
+  export const KPt: () => void;
+  /** Elicitation UI state for which shown events are suppressed. */
+  export const Spn: unknown;
   export const Ux: (result: { status?: string } | null | undefined) => boolean;
   export const Wx: (
     result:
@@ -4562,6 +4575,7 @@ declare module "@rchunk/app-initial" {
   export const mg: () => void;
   export const msn: () => void;
   export const pg: unknown;
+  /** Local conversation presence and resolved-host signal families (original fM contract). */
   export const wQt: unknown;
   export const zZt: unknown;
   export const GYt: () => void;
@@ -9588,6 +9602,7 @@ declare module "@rchunk/agent-activity-units" {
   export const l: unknown;
   export const n: () => void;
   export const r: unknown;
+  export const y: unknown;
 }
 
 declare module "@rchunk/thread-virtualizer" {
@@ -11161,12 +11176,15 @@ declare module "@rchunk/app-initial" {
   export const kZt: unknown;
   export const og: string;
   export const qvt: {
+    tabIds$: unknown;
     tabById$: unknown;
     tabStateById$: unknown;
     activeTab$?: unknown;
     closeTab?(tabId: string): void;
     updateTab?(tabId: string, update: Record<string, unknown>): void;
   };
+  export const avt: unknown;
+  export const rvt: () => void;
   export const sg: (parentConversationId: string) => string;
   export const wZt: unknown;
   /** Side-panel definition registry and environment setup state。 */
@@ -14802,7 +14820,7 @@ declare module "@rchunk/browser-session-queries";
 declare module "@rchunk/tab-address-input" { import type { AddressSuggestionSource } from "@rchunk/popup"; export interface TabAddressInputProps { addressValue: string; allowEmptySuggestions?: boolean; className?: string; currentAddress?: string; id: string; isAddressEditing?: boolean; isVisible?: boolean; placeholder?: string; sources: AddressSuggestionSource[]; submittedAddressStillPending?: boolean; onAddressValueChange(value: string): void; onCancelAddressEditing?(): void; onCommitAddress(address: string): void; onEnsureAddressEditing?(): void; onFind?(): void; onFinishAddressEditing?(): void; onStartAddressEditing?(): void; onStopAddressEditing?(): void } export const n: () => void; export const t: (props: TabAddressInputProps) => unknown }
 declare module "@rchunk/tab-input" {
   export interface TabInputContext { conversationId?: string | null; id: string; navigate(address: string, preserveEditing?: boolean): void; panelTarget?: string; stopEditing?(): void; value?: string }
-  export interface TabInputProps extends Record<string, unknown> { addressValue?: string; conversationId?: string | null; id: string; onNavigate(address: string, preserveEditing?: boolean): void; onStopAddressEditing?(): void; panelTarget?: string; providers?: Array<(scope: unknown, context: TabInputContext) => Record<string, unknown>>; scope?: unknown; sources?: Array<Record<string, unknown>> }
+  export interface TabInputProps extends Record<string, unknown> { addressValue?: string; conversationId?: string | null; id: string; onNavigate(address: string, preserveEditing?: boolean): void; onStopAddressEditing?(): void; panelTarget?: string; providers?: Array<(scope: unknown, getContext: () => TabInputContext) => Record<string, unknown>>; sources?: Array<Record<string, unknown>> }
   export const n: () => void; export const t: (props: TabInputProps) => unknown;
 }
 declare module "@rchunk/view-control-labels" {
@@ -15790,6 +15808,13 @@ declare module "@rchunk/app-shared" {
   export const p4: () => void;
   export const p0: () => void;
   export const u0: () => void;
+  export const l1: () => void;
+  export const m1: (
+    element: unknown,
+    options: unknown,
+    callback: () => void,
+  ) => () => void;
+  export const gg: () => void;
 }
 
 declare module "@rchunk/callback-utility" { export const r: (...arguments_: unknown[]) => Promise<unknown>; }

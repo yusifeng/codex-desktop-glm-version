@@ -288,5 +288,16 @@ assert.deepEqual(model.u({ source: "project", projectRoot: "/repo", projectRoots
 assert.deepEqual(model.u({ source: "plugin", pluginId: "__unknown__" }), { source: "plugin", pluginId: null });
 assert.equal(model.t, "__unknown__");
 assert.equal(model.p(), undefined);
+const grouped = model.i([
+  { cwd: "/repo", hooks: [hookList[0]], warnings: ["user-warning"], errors: [] },
+  { cwd: "/repo", hooks: [hookList[1]], warnings: ["plugin-warning"], errors: [{ path: "hooks.json", message: "bad" }] },
+  { cwd: "/repo", hooks: [hookList[2]], warnings: [], errors: [] },
+  { cwd: "/project", hooks: [{ ...hookList[0], key: "project", source: "project" }], warnings: ["project-warning"], errors: [] },
+]);
+assert.deepEqual(grouped.map(group => group.id), ["plugin", "user", "admin", "project"]);
+assert.equal(grouped[0].pluginEntries[0].pluginId, "p1");
+assert.equal(grouped[0].entry.warnings[0], "plugin-warning");
+assert.equal(model.d(grouped, { source: "plugin", pluginId: "p1" }).hooks[0].key, "b");
+assert.equal(model.d(grouped, { source: "project", projectRoot: "/project" }).hooks[0].key, "project");
 
 console.log("62 settings foundations cluster assertions passed");

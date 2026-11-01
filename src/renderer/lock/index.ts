@@ -49,5 +49,4 @@ function initializeLockIcon(): void {
   initialized = true;
 }
 
-initializeLockIcon();
 export { initializeLockIcon as n, LockIcon as t };

@@ -1,6 +1,6 @@
 import "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeCompilerCache,
+  $3 as getCompilerRuntime,
   BX as useSignalFamilyValue,
   FX as initializeSignalRuntime,
   I3 as getJsxRuntime,
@@ -18,7 +18,16 @@ export interface DocumentTitleProps {
   title?: string | null;
 }
 
+interface CompilerRuntime {
+  c(size: number): unknown[];
+}
+
+let compilerRuntime: CompilerRuntime;
+let React: ReturnType<typeof getReactRuntime>;
+let jsxRuntime: ReturnType<typeof getJsxRuntime>;
+
 function RouteDocumentTitle({ title }: DocumentTitleProps): unknown {
+  const cache = compilerRuntime.c(2);
   const scope = useScope(conversationScope) as unknown as {
     value: { pathname: string; search?: string };
   };
@@ -30,30 +39,47 @@ function RouteDocumentTitle({ title }: DocumentTitleProps): unknown {
     routeDocumentTitle,
     `${scope.value.pathname}${scope.value.search ?? ""}`,
   ) as string | null;
-  return getJsxRuntime().jsx(DocumentTitle, { title: title ?? routeTitle });
+  const resolvedTitle = title ?? routeTitle;
+  if (cache[0] !== resolvedTitle) {
+    cache[0] = resolvedTitle;
+    cache[1] = jsxRuntime.jsx(DocumentTitle, { title: resolvedTitle });
+  }
+  return cache[1];
 }
 
 function DocumentTitle({ title }: DocumentTitleProps): null {
-  const React = getReactRuntime();
-  React.useEffect(() => {
-    if (title == null) return undefined;
-    const previousTitle = document.title;
-    document.title = title;
-    const appliedTitle = document.title;
-    return () => {
-      if (document.title === appliedTitle) document.title = previousTitle;
+  const cache = compilerRuntime.c(3);
+  let effect: () => (() => void) | undefined;
+  let dependencies: Array<string | null | undefined>;
+  if (cache[0] !== title) {
+    effect = () => {
+      if (title == null) return undefined;
+      const previousTitle = document.title;
+      document.title = title;
+      const appliedTitle = document.title;
+      return () => {
+        if (document.title === appliedTitle) document.title = previousTitle;
+      };
     };
-  }, [title]);
+    dependencies = [title];
+    cache[0] = title;
+    cache[1] = effect;
+    cache[2] = dependencies;
+  } else {
+    effect = cache[1] as typeof effect;
+    dependencies = cache[2] as typeof dependencies;
+  }
+  React.useEffect(effect, dependencies);
   return null;
 }
 
 function initializeDocumentTitle(): void {
-  initializeCompilerCache();
+  compilerRuntime = getCompilerRuntime() as unknown as CompilerRuntime;
   initializeSignalRuntime();
-  getReactRuntime();
+  React = getReactRuntime();
   initializeConversationScope();
   initializeDocumentTitles();
-  getJsxRuntime();
+  jsxRuntime = getJsxRuntime();
 }
 
 export { RouteDocumentTitle as n, initializeDocumentTitle as r, DocumentTitle as t };

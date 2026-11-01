@@ -82,6 +82,25 @@ const chunkImportPlugin = {
   },
 };
 
+// The browser page preload runs in Electron's sandboxed preload context, whose
+// require implementation only exposes approved bare modules such as
+// "electron".  Recovered semantic owners therefore cannot remain as runtime
+// relative requires.  Resolve the published output-relative specifiers back to
+// their TypeScript owners so esbuild can inline the complete graph into the
+// single preload entry.
+const browserPagePreloadOwnersPlugin = {
+  name: "browser-page-preload-owners",
+  setup(build) {
+    build.onResolve({ filter: /^\.\/browser-page-preload\// }, (args) => ({
+      path: path.join(
+        ROOT,
+        "src/main",
+        `${args.path.slice("./".length)}.ts`,
+      ),
+    }));
+  },
+};
+
 async function listTs(dir) {
   const out = [];
   for (const e of await fs.readdir(dir, { withFileTypes: true, recursive: true })) {
@@ -181,6 +200,29 @@ async function worker() {
 const transformWorkers = Math.min(os.cpus().length, 2);
 await Promise.all(Array.from({ length: transformWorkers }, worker));
 
+// Overwrite the transform-only process-root emission with a sandbox-safe
+// single-file bundle.  The individual owner outputs remain available for
+// focused tests and audits, but the packaged preload has no relative runtime
+// require fallback.
+let browserPagePreloadBundled = false;
+try {
+  await esbuild.build({
+    entryPoints: [path.join(ROOT, "src/main-recovered/browser-page-preload.ts")],
+    outfile: path.join(ROOT, "app/.vite/build/browser-page-preload.js"),
+    bundle: true,
+    format: "cjs",
+    platform: "node",
+    target: "esnext",
+    charset: "utf8",
+    packages: "external",
+    plugins: [browserPagePreloadOwnersPlugin],
+    logLevel: "warning",
+  });
+  browserPagePreloadBundled = true;
+} catch (err) {
+  errors.push(`browser-page-preload bundle: ${err.message.split("\n")[0]}`);
+}
+
 // ---- 2. bundle：已重写的 chunk ----
 const bundleSummaries = [];
 for (const name of REWRITTEN) {
@@ -217,7 +259,8 @@ for (const m of mismatches) console.error(`TS/JS semantics differ: ${path.relati
 const transformed = jobs.length - errors.length;
 console.log(
   `built ${transformed}/${jobs.length} transform-only files, ` +
-    `${bundleSummaries.length}/${REWRITTEN.size} rewritten chunks bundled`,
+    `${bundleSummaries.length}/${REWRITTEN.size} rewritten chunks bundled, ` +
+    `${browserPagePreloadBundled ? 1 : 0}/1 sandbox preload roots bundled`,
 );
 for (const b of bundleSummaries)
   console.log(`  ${b.file} <- src/main/${b.name}/ (exports: ${b.exports.join(", ") || "none"})`);

@@ -31,7 +31,7 @@ const result = await esbuild.build({
             contents: `
             const state = globalThis.__appgenCardLayoutTest; const init = (name) => state.initialized.push(name);
             export const I3 = () => { init("I3"); return state.jsx; }; export const m4 = (...values) => values.filter(Boolean).join(" ");
-            export const $3 = () => init("$3"); export const h4 = () => init("h4"); export const Zh = () => init("Zh"); export const C_ = () => init("C_"); export const c_ = () => init("c_");
+            export const $3 = () => { init("$3"); const cache=[]; return { c(size) { while(cache.length<size) cache.push(Symbol.for("react.memo_cache_sentinel")); return cache; } }; }; export const h4 = () => init("h4"); export const Zh = () => init("Zh"); export const C_ = () => init("C_"); export const c_ = () => init("c_");
           `,
             loader: "js",
           }),

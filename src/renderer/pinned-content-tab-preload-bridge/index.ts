@@ -116,7 +116,7 @@ interface InitialRuntime {
   fpn(): void;
   ggt: PageRegistry;
   itn(): void;
-  iyt: unknown;
+  iyt(): void;
   jDt(kind: string): {
     durableRoute?: { version?: number };
     isAvailable(scope: Scope): boolean;
@@ -307,7 +307,12 @@ class PreloadScheduler {
   schedule(snapshot: Scope = this.scope) {
     this.cancelScheduled();
     if (this.listeners.size === 0) return;
-    const pins = snapshot.get(initial.dyt) as Pin[];
+    // I0t is the pinned-content-tab collection. dyt is the active
+    // conversation id used while materialising a saved tab route. Keeping
+    // these two obfuscated exports distinct is important: subscribing to dyt
+    // as though it were the pin collection makes the scope watcher throw an
+    // AggregateError as soon as the bridge mounts.
+    const pins = snapshot.get(initial.I0t) as Pin[];
     const pinnedIds = new Set(snapshot.get(initial.Q_t) as string[]);
     const accountId = snapshot.get(initial.mun);
     if (this.accountId !== accountId) {
@@ -510,7 +515,7 @@ class PinPreloader {
       return "ineligible";
     if (definition.isAvailable(this.scope) !== true) return "deferred";
     const manager = target === "right" ? initial.qvt : initial.Vvt;
-    const routeActive = this.scope.get(initial.iyt) === conversationId;
+    const routeActive = this.scope.get(initial.dyt) === conversationId;
     const tab = this.scope.get(manager.tabById$, this.pin.tabId);
     if (
       !routeActive &&
@@ -660,6 +665,7 @@ function initialize(): void {
   initial.Yst();
   initial.nct();
   initial.ng();
+  initial.iyt();
   shared.Z3();
   initial.xl();
   shared.g_();

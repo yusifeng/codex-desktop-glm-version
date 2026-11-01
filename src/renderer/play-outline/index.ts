@@ -1,4 +1,8 @@
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import {
+  I3 as getJsxRuntime,
+  e6 as initializeReactRuntime,
+  type JsxRuntime,
+} from "@rchunk/app-shared";
 import "@rchunk/rolldown-runtime";
 
 export interface IconProps {
@@ -41,9 +45,11 @@ function PlayOutlineIcon(props: IconProps): unknown {
 }
 
 function initializeFlaskOutlineIcon(): void {
+  initializeReactRuntime();
   jsx = getJsxRuntime();
 }
 function initializePlayOutlineIcon(): void {
+  initializeReactRuntime();
   jsx = getJsxRuntime();
 }
 function ensureJsx(): JsxRuntime {

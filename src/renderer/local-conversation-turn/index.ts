@@ -228,8 +228,6 @@ function projectTurnState(turn: unknown, requests: unknown[], options: TurnProje
       requestUserInputAsyncUiEnabled: options.requestUserInputAsyncUiEnabled,
       showStrictReviewNotices: options.showStrictReviewNotices,
       ...(options.shouldHideUserMessage == null ? {} : { shouldHideUserMessage: options.shouldHideUserMessage }),
-      includeTurnDiff: true,
-      projectionBudget: { fits: () => true, select: <Value>(values: readonly Value[], predicate?: (value: Value) => boolean, limit?: number) => { const selected = predicate == null ? [...values] : values.filter(predicate); return limit == null ? selected : selected.slice(0, limit); } },
     });
     if (projected != null && typeof projected === "object" && Array.isArray((projected as ProjectedTurn).items)) return projected as ProjectedTurn;
   }

@@ -1,8 +1,14 @@
-// right-panel-composer-overlay-alignment —— 右侧面板 composer overlay 的水平对齐测量。
-// 原版：app/webview/assets/right-panel-composer-overlay-alignment-95f87dd3a2a9.js。
-
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
+import "@rchunk/rolldown-runtime";
+import {
+  FX as initializeSignalRuntime,
+  l1 as initializeElementObserver,
+  m1 as observeElement,
+  pZ as createScopedSignal,
+} from "@rchunk/app-shared";
+import {
+  $en as conversationScope,
+  itn as initializeConversationScope,
+} from "@rchunk/app-initial";
 
 export interface OverlayAlignment {
   left: number;
@@ -10,34 +16,27 @@ export interface OverlayAlignment {
 }
 
 export interface OverlayAlignmentStore {
-  get(key: typeof rightPanelComposerOverlayAlignment): OverlayAlignment | null;
-  set(key: typeof rightPanelComposerOverlayAlignment, value: OverlayAlignment | null): void;
+  get(signal: unknown): OverlayAlignment | null;
+  set(signal: unknown, value: OverlayAlignment | null): void;
 }
 
 export interface MeasurableElement {
   getBoundingClientRect(): Pick<DOMRect, "left" | "width">;
 }
 
-export type ElementObserver = (
-  element: MeasurableElement,
-  options: unknown,
-  callback: () => void,
-) => () => void;
+let rightPanelComposerOverlayAlignment: unknown;
 
-/** 原 atom 的语义标识；初始值为 null。 */
-const rightPanelComposerOverlayAlignment = Symbol("right-panel-composer-overlay-alignment");
-
-/**
- * 订阅 composer 容器尺寸，只在 left/width 变化时写 store；清理时仅移除
- * 自己最后写入的值，避免覆盖另一个仍在工作的测量实例。
- */
 function observeRightPanelComposerOverlayAlignment(
   store: OverlayAlignmentStore,
   element: MeasurableElement,
-  observe: ElementObserver = defaultElementObserver,
 ): () => void {
   let active = true;
   let lastValue: OverlayAlignment | null = null;
+  const observe = observeElement as unknown as (
+    element: MeasurableElement,
+    options: null,
+    callback: () => void,
+  ) => () => void;
   const stop = observe(element, null, () => {
     if (!active) return;
     const { left, width } = element.getBoundingClientRect();
@@ -54,19 +53,19 @@ function observeRightPanelComposerOverlayAlignment(
   };
 }
 
-function defaultElementObserver(
-  element: MeasurableElement,
-  _options: unknown,
-  callback: () => void,
-): () => void {
-  callback();
-  if (typeof ResizeObserver === "undefined" || !(element instanceof Element)) return () => {};
-  const observer = new ResizeObserver(callback);
-  observer.observe(element);
-  return () => observer.disconnect();
+function initializeRightPanelComposerOverlayAlignment(): void {
+  initializeElementObserver();
+  initializeSignalRuntime();
+  initializeConversationScope();
+  const createSignal = createScopedSignal as unknown as (
+    scope: unknown,
+    initialValue: () => null,
+  ) => unknown;
+  rightPanelComposerOverlayAlignment = createSignal(
+    conversationScope,
+    () => null,
+  );
 }
-
-function initializeRightPanelComposerOverlayAlignment(): void {}
 
 export {
   observeRightPanelComposerOverlayAlignment as n,

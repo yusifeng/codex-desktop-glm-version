@@ -16,7 +16,7 @@ state.jsxRuntime = jsxRuntime;
 function mockChunk(name) {
   if (name === "app-shared")
     return `
-      export const $3 = () => {};
+      export const $3 = () => { const cache = []; return { c(size) { while (cache.length < size) cache.push(Symbol.for("react.memo_cache_sentinel")); return cache; } }; };
       export const I3 = () => globalThis.__gitReviewPresentationTest.jsxRuntime;
       export const e6 = () => globalThis.__gitReviewPresentationTest.initialized.push("react");
       export const h4 = () => globalThis.__gitReviewPresentationTest.initialized.push("styles");

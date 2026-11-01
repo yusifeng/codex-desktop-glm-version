@@ -53,7 +53,7 @@ const installBrowserWebviewListeners = createBrowserWebviewListenerRuntime({
     calls.push(["configure-page", options]),
   configureBrowserSettingsWebviewPreferences: (options) =>
     calls.push(["configure-settings", options]),
-  createLogger: (name) => ({
+  createLogger: (name) => () => ({
     info: (message, fields) => calls.push(["info", name, message, fields]),
     warning: (message, fields) =>
       calls.push(["warning", name, message, fields]),

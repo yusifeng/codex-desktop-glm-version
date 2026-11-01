@@ -48,5 +48,4 @@ function initializeHooksIcon(): void {
   initialized = true;
 }
 
-initializeHooksIcon();
 export { initializeHooksIcon as n, HooksIcon as t };

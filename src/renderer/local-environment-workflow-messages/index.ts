@@ -4,7 +4,7 @@ import {
   K2 as initializeInternationalization,
 } from "@rchunk/app-shared";
 
-const localEnvironmentWorkflowMessages = defineMessages({
+const messageDescriptors = {
   needsAttention: {
     id: "localEnvironment.needsAttention",
     defaultMessage: "Environment needs attention",
@@ -30,10 +30,13 @@ const localEnvironmentWorkflowMessages = defineMessages({
     defaultMessage: "Set up local environment",
     description: "Accessible label for setting up a local environment from a thread",
   },
-});
+};
+
+let localEnvironmentWorkflowMessages: ReturnType<typeof defineMessages>;
 
 function initializeLocalEnvironmentWorkflowMessages(): void {
   initializeInternationalization();
+  localEnvironmentWorkflowMessages = defineMessages(messageDescriptors);
 }
 
 export {

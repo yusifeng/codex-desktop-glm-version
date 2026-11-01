@@ -69,19 +69,19 @@ const permissionDescriptions: Record<string, SecurityPermissionMessage | undefin
   "chatgpt.plugins.invoke": {
     id: "signInWithChatGPTConsent.resourcePermission.chatgptPlugins.description",
     defaultMessage: "{appName} will be able to use apps you’ve connected to ChatGPT to work on your requests.",
-    description: "Description beneath the connected-app permission title in SIWC consent and linked-app settings.",
+    description: "Description beneath the connected-app permission title in SIWC consent and linked-app settings. {appName} is the requesting third-party app display name, such as Acme; ChatGPT is a product name.",
   },
   "chatpass.enable.request": {
     id: "oauthConsentChoices.tokensAndCredits",
     defaultMessage: "Complete your AI requests in {appName} with usage included in your ChatGPT plan or credits balance.",
-    description: "Description beneath the ChatPass permission title in SIWC consent and linked-app settings.",
+    description: "Description beneath the ChatPass permission title in SIWC consent and linked-app settings. {appName} is the requesting third-party app display name, such as Acme. Tokens and credits refer to ChatGPT usage; this copy does not authorize purchasing credits.",
   },
   "ads.admin.all.read": undefined,
   "ads.admin.all.write": undefined,
   offline_access: {
     id: "signInWithChatGPTConsent.adsOfflineDescription",
     defaultMessage: "Keep this connection active when you’re not using the app.",
-    description: "Description beneath the offline-access permission title in SIWC consent and linked-app settings.",
+    description: "Description beneath the offline-access permission title in SIWC consent and linked-app settings. Explains that the app can keep the connection active without requiring repeated sign-in.",
   },
 };
 for (const alias of [

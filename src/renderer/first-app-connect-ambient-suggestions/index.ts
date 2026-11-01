@@ -1,6 +1,7 @@
 // first-app-connect-ambient-suggestions —— 首次启用可访问 app 后刷新 ambient suggestions。
 // 原版：app/webview/assets/first-app-connect-ambient-suggestions-ef1637627fe1.js。
 
+import "@rchunk/rolldown-runtime";
 import { iW as resolveProjectRoot, wL as initializeSharedApps } from "@rchunk/app-shared";
 import {
   $ln as ambientQueryKey,
@@ -26,6 +27,8 @@ export interface AmbientSuggestionQueryClient {
   getQueriesData(options: { queryKey: readonly unknown[] }): Array<[unknown, ConnectedApp[] | null | undefined]>;
   invalidateQueries(options: { queryKey: readonly unknown[] }): Promise<unknown>;
 }
+
+let ambientSuggestionDomains: Array<string | null>;
 
 function hasAccessibleEnabledApp(app: ConnectedApp): boolean {
   return app.isAccessible && app.isEnabled;
@@ -58,7 +61,7 @@ async function refreshAppsAndAmbientSuggestions(input: {
 
   await refreshQueryState(input.queryClient, ambientSuggestionAppQueryKey(input.hostId));
   await Promise.all(
-    [null, "science"].map((domain) =>
+    ambientSuggestionDomains.map((domain) =>
       requestAmbientSuggestionRefresh("ambient-suggestions-refresh", {
         params: {
           domain,
@@ -82,6 +85,7 @@ function initializeFirstAppConnectAmbientSuggestions(): void {
   initializeAmbientRefresh();
   initializeAppsQueries();
   initializeSuggestionQueries();
+  ambientSuggestionDomains = [null, "science"];
 }
 
 export {

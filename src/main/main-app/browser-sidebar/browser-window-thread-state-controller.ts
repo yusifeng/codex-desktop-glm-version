@@ -15,6 +15,9 @@ export function createBrowserWindowThreadStateControllerClass(
     qU,
     oXe,
     vX,
+    PG,
+    _X,
+    fX,
     tq,
     KU,
     l,
@@ -333,6 +336,38 @@ export function createBrowserWindowThreadStateControllerClass(
       return windowState == null
         ? null
         : hX(windowState, conversationId, browserTabId);
+    }
+
+    ensureThreadState(windowState: any, input: any, browserTabId: any) {
+      const route = {
+        browserTabId,
+        conversationId: input.conversationId,
+      };
+      const key = qU(route);
+      const existing = windowState.threads.get(key);
+      if (existing != null) return existing;
+      const threadState = vX({
+        annotationModeEnabled: input.annotationModeEnabled ?? true,
+        browserStorageId: PG(route),
+        browserTabId,
+        conversationId: input.conversationId,
+        hostKind: input.hostKind ?? null,
+        emulatedViewportSize: input.emulatedViewportSize ?? null,
+        cwd: input.cwd ?? null,
+        isBrowserUsePage: false,
+        ownerRoutePath: _X(windowState, input.conversationId),
+        runtimeIntlConfig: input.runtimeIntlConfig,
+      });
+      this.host.tabBudget.markTabActivity(threadState);
+      windowState.threads.set(key, threadState);
+      fX(
+        this.host.browserSessionRegistry,
+        this.host.windowManager,
+        this.host.windows,
+        windowState,
+        threadState,
+      );
+      return threadState;
     }
 
     ensureThreadStateForWindow(

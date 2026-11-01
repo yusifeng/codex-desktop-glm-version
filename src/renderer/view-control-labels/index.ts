@@ -1,54 +1,102 @@
 import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
+import {
+  FX as initializeSignalRuntime,
+  sZ as createDerivedSignal,
+} from "@rchunk/app-shared";
+import {
+  $en as conversationScope,
+  Wvt as initializeSidePanelRuntime,
+  avt as workspaceView,
+  itn as initializeConversationScope,
+  mpn as internationalization,
+  ppn as initializeWorkspaceView,
+  qvt as workspaceTabs,
+  rvt as initializeWorkspaceTabs,
+} from "@rchunk/app-initial";
 
 interface MessageFormatter {
-  formatMessage(descriptor: { defaultMessage: string; description: string; id: string }): string;
+  formatMessage(descriptor: {
+    defaultMessage: string;
+    description: string;
+    id: string;
+  }): string;
 }
 
-interface ViewLabelContext {
-  intl: MessageFormatter;
-  tabIds: readonly string[];
-  view: "chat" | "full" | "split" | string;
+interface SignalReader {
+  get(signal: unknown): unknown;
 }
 
-interface ViewLabelState {
-  evaluate(context: ViewLabelContext): string;
+let chatViewControlLabel: unknown;
+let fullViewControlLabel: unknown;
+
+function initializeViewControlLabels(): void {
+  initializeSignalRuntime();
+  initializeSidePanelRuntime();
+  initializeWorkspaceView();
+  initializeConversationScope();
+  initializeWorkspaceTabs();
+  const derive = createDerivedSignal as unknown as (
+    scope: unknown,
+    compute: (reader: SignalReader) => string,
+  ) => unknown;
+
+  chatViewControlLabel = derive(conversationScope, ({ get }) => {
+    const intl = get(internationalization) as MessageFormatter;
+    if (get(workspaceView) === "chat") {
+      const tabs = get(
+        (workspaceTabs as { tabIds$: unknown }).tabIds$,
+      ) as unknown[];
+      return tabs.length === 0
+        ? intl.formatMessage({
+            id: "threadWorkspace.layout.newTab",
+            defaultMessage: "New tab",
+            description:
+              "Creates a content tab in the selected layout when there are no tabs",
+          })
+        : intl.formatMessage({
+            id: "threadWorkspace.layout.showTabs",
+            defaultMessage: "Show tabs",
+            description:
+              "Restores the content tabs in the selected full or split layout",
+          });
+    }
+    return intl.formatMessage({
+      id: "threadWorkspace.layout.hideTabs",
+      defaultMessage: "Hide tabs",
+      description: "Hides the content tabs and leaves Chat visible",
+    });
+  });
+
+  fullViewControlLabel = derive(conversationScope, ({ get }) => {
+    const intl = get(internationalization) as MessageFormatter;
+    if (get(workspaceView) === "full") {
+      return intl.formatMessage({
+        id: "threadWorkspace.layout.exitFullView",
+        defaultMessage: "Exit full view",
+        description:
+          "Restores the content tabs beside Chat in split view",
+      });
+    }
+    const tabs = get(
+      (workspaceTabs as { tabIds$: unknown }).tabIds$,
+    ) as unknown[];
+    return tabs.length === 0
+      ? intl.formatMessage({
+          id: "threadWorkspace.layout.newTabInFullView",
+          defaultMessage: "New tab in full view",
+          description: "Creates a content tab that fills the workspace",
+        })
+      : intl.formatMessage({
+          id: "threadWorkspace.layout.enterFullView",
+          defaultMessage: "Enter full view",
+          description:
+            "Expands the active content tab to fill the workspace",
+        });
+  });
 }
 
-function format(
-  intl: MessageFormatter,
-  id: string,
-  defaultMessage: string,
-  description: string,
-): string {
-  return intl.formatMessage({ id, defaultMessage, description });
-}
-
-let r: ViewLabelState;
-let n: ViewLabelState;
-
-function t(): void {
-  r ??= {
-    evaluate({ intl, tabIds, view }) {
-      if (view === "chat") {
-        return tabIds.length === 0
-          ? format(intl, "threadWorkspace.layout.newTab", "New tab", "Creates a content tab in the selected layout when there are no tabs")
-          : format(intl, "threadWorkspace.layout.showTabs", "Show tabs", "Restores the content tabs in the selected full or split layout");
-      }
-      return format(intl, "threadWorkspace.layout.hideTabs", "Hide tabs", "Hides the content tabs and leaves Chat visible");
-    },
-  };
-  n ??= {
-    evaluate({ intl, tabIds, view }) {
-      if (view === "full") {
-        return format(intl, "threadWorkspace.layout.exitFullView", "Exit full view", "Restores the content tabs beside Chat in split view");
-      }
-      return tabIds.length === 0
-        ? format(intl, "threadWorkspace.layout.newTabInFullView", "New tab in full view", "Creates a content tab that fills the workspace")
-        : format(intl, "threadWorkspace.layout.enterFullView", "Enter full view", "Expands the active content tab to fill the workspace");
-    },
-  };
-}
-
-export { n, r, t };
+export {
+  fullViewControlLabel as n,
+  chatViewControlLabel as r,
+  initializeViewControlLabels as t,
+};

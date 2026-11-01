@@ -8,7 +8,7 @@ import type { JsxRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
 const {
-  $3: initializeJsxRuntime,
+  $3: getCompilerRuntime,
   Ah: DialogHeader,
   I3: getJsxRuntime,
   Ih: Dialog,
@@ -25,11 +25,13 @@ const {
 } = appSharedChunk;
 const { Lb: commonMessages, Rb: initializeCommonMessages } = appInitialChunk;
 let jsxRuntime: JsxRuntime | null = null;
+interface CompilerRuntime { c(size: number): unknown[] }
+let compilerRuntime: CompilerRuntime;
 let initialized = false;
 
 function initializeDeleteArchivedChatsDialog(): void {
   if (initialized) return;
-  initializeJsxRuntime();
+  compilerRuntime = getCompilerRuntime() as unknown as CompilerRuntime;
   initializeIntlRuntime();
   initializeButton();
   initializeDialog();
@@ -62,99 +64,71 @@ function DeleteArchivedChatsDialog({
   isDeleting = false,
 }: DeleteArchivedChatsDialogProps): unknown {
   initializeDeleteArchivedChatsDialog();
+  const cache = compilerRuntime.c(31);
   if (state == null) return null;
   const jsx = getInitializedJsxRuntime();
-  const titleCopy =
-    state.kind === "all"
-      ? {
-          id: "settings.dataControls.archivedChats.deleteAllConfirm.title",
-          defaultMessage: "Delete all archived local chats?",
-          description:
-            "Title for confirming deletion of all archived local chats",
-        }
+  let handleOpenChange: (open: boolean) => void;
+  if (cache[0] === isDeleting && cache[1] === onOpenChange) handleOpenChange = cache[2] as typeof handleOpenChange;
+  else {
+    handleOpenChange = (open) => { if (!isDeleting) onOpenChange(open); };
+    cache[0] = isDeleting; cache[1] = onOpenChange; cache[2] = handleOpenChange;
+  }
+  let handleSubmit: (event: FormSubmitEvent) => void;
+  if (cache[3] === isDeleting && cache[4] === onConfirm) handleSubmit = cache[5] as typeof handleSubmit;
+  else {
+    handleSubmit = (event) => { event.preventDefault(); if (!isDeleting) onConfirm(); };
+    cache[3] = isDeleting; cache[4] = onConfirm; cache[5] = handleSubmit;
+  }
+  let header: unknown;
+  if (cache[6] === state.kind) header = cache[7];
+  else {
+    const title = state.kind === "all"
+      ? jsx.jsx(FormattedMessage, { id: "settings.dataControls.archivedChats.deleteAllConfirm.title", defaultMessage: "Delete all archived local chats?", description: "Title for confirming deletion of all archived local chats" })
       : state.kind === "project"
-        ? {
-            id: "settings.dataControls.archivedChats.deleteProjectConfirm.title",
-            defaultMessage: "Delete all in project?",
-            description:
-              "Title for confirming deletion of archived local chats in one project",
-          }
-        : {
-            id: "settings.dataControls.archivedChats.deleteConfirm.title",
-            defaultMessage: "Delete archived chat?",
-            description: "Title for confirming deletion of an archived chat",
-          };
-  const bodyCopy =
-    state.kind === "all"
-      ? {
-          id: "settings.dataControls.archivedChats.deleteAllConfirm.body",
-          defaultMessage: "This permanently deletes all local archived chats",
-          description:
-            "Body copy in the delete all archived local chats confirmation dialog",
-        }
+        ? jsx.jsx(FormattedMessage, { id: "settings.dataControls.archivedChats.deleteProjectConfirm.title", defaultMessage: "Delete all in project?", description: "Title for confirming deletion of archived local chats in one project" })
+        : jsx.jsx(FormattedMessage, { id: "settings.dataControls.archivedChats.deleteConfirm.title", defaultMessage: "Delete archived chat?", description: "Title for confirming deletion of an archived chat" });
+    header = jsx.jsx(DialogSection, { children: jsx.jsx(DialogHeader, { title: jsx.jsx(DialogTitle, { children: title }) }) });
+    cache[6] = state.kind; cache[7] = header;
+  }
+  let body: unknown;
+  if (cache[8] === state.kind && cache[9] === state.threads) body = cache[10];
+  else {
+    const message = state.kind === "all"
+      ? jsx.jsx(FormattedMessage, { id: "settings.dataControls.archivedChats.deleteAllConfirm.body", defaultMessage: "This permanently deletes all local archived chats", description: "Body copy in the delete all archived local chats confirmation dialog" })
       : state.kind === "project"
-        ? {
-            id: "settings.dataControls.archivedChats.deleteProjectConfirm.body",
-            defaultMessage:
-              "This permanently deletes {count, plural, one {# local archived chat} other {# local archived chats}} in this project",
-            description:
-              "Body copy in the delete archived local chats in project confirmation dialog",
-            values: { count: state.threads.length },
-          }
-        : {
-            id: "settings.dataControls.archivedChats.deleteConfirm.body",
-            defaultMessage: "This permanently deletes the archived chat",
-            description:
-              "Body copy in the delete archived chat confirmation dialog",
-          };
-  const header = jsx.jsx(DialogSection, {
-    children: jsx.jsx(DialogHeader, {
-      title: jsx.jsx(DialogTitle, {
-        children: jsx.jsx(FormattedMessage, titleCopy),
-      }),
-    }),
-  });
-  const body = jsx.jsx(DialogSection, {
-    className: "text-codex-description",
-    children: jsx.jsx("p", {
-      children: jsx.jsx(FormattedMessage, bodyCopy),
-    }),
-  });
-  const cancel = jsx.jsx(Button, {
-    color: "ghost",
-    disabled: isDeleting,
-    onClick: () => onOpenChange(false),
-    children: jsx.jsx(FormattedMessage, {
+        ? jsx.jsx(FormattedMessage, { id: "settings.dataControls.archivedChats.deleteProjectConfirm.body", defaultMessage: "This permanently deletes {count, plural, one {# local archived chat} other {# local archived chats}} in this project", description: "Body copy in the delete archived local chats in project confirmation dialog", values: { count: state.threads.length } })
+        : jsx.jsx(FormattedMessage, { id: "settings.dataControls.archivedChats.deleteConfirm.body", defaultMessage: "This permanently deletes the archived chat", description: "Body copy in the delete archived chat confirmation dialog" });
+    body = jsx.jsx(DialogSection, { className: "text-codex-description", children: jsx.jsx("p", { children: message }) });
+    cache[8] = state.kind; cache[9] = state.threads; cache[10] = body;
+  }
+  let close: () => void;
+  if (cache[11] === onOpenChange) close = cache[12] as typeof close;
+  else { close = () => onOpenChange(false); cache[11] = onOpenChange; cache[12] = close; }
+  let cancelLabel: unknown;
+  if (cache[13] === Symbol.for("react.memo_cache_sentinel")) {
+    cancelLabel = jsx.jsx(FormattedMessage, {
       id: "settings.dataControls.archivedChats.deleteConfirm.cancel",
       defaultMessage: "Cancel",
       description: "Cancel button label for deleting archived chats",
-    }),
-  });
-  const confirm = jsx.jsx(Button, {
-    color: "danger",
-    loading: isDeleting,
-    type: "submit",
-    children: jsx.jsx(FormattedMessage, { ...commonMessages.delete }),
-  });
-  const footer = jsx.jsx(DialogSection, {
-    children: jsx.jsxs(DialogFooter, { children: [cancel, confirm] }),
-  });
-  const form = jsx.jsxs(DialogBody, {
-    as: "form",
-    onSubmit: (event: FormSubmitEvent) => {
-      event.preventDefault();
-      if (!isDeleting) onConfirm();
-    },
-    children: [header, body, footer],
-  });
-  return jsx.jsx(Dialog, {
-    open: true,
-    showDialogClose: false,
-    onOpenChange: (open: boolean) => {
-      if (!isDeleting) onOpenChange(open);
-    },
-    children: form,
-  });
+    }); cache[13] = cancelLabel;
+  } else cancelLabel = cache[13];
+  let cancel: unknown;
+  if (cache[14] === isDeleting && cache[15] === close) cancel = cache[16];
+  else { cancel = jsx.jsx(Button, { color: "ghost", disabled: isDeleting, onClick: close, children: cancelLabel }); cache[14] = isDeleting; cache[15] = close; cache[16] = cancel; }
+  let deleteLabel: unknown;
+  if (cache[17] === Symbol.for("react.memo_cache_sentinel")) { deleteLabel = jsx.jsx(FormattedMessage, { ...commonMessages.delete }); cache[17] = deleteLabel; }
+  else deleteLabel = cache[17];
+  let confirm: unknown;
+  if (cache[18] === isDeleting) confirm = cache[19];
+  else { confirm = jsx.jsx(Button, { color: "danger", loading: isDeleting, type: "submit", children: deleteLabel }); cache[18] = isDeleting; cache[19] = confirm; }
+  let footer: unknown;
+  if (cache[20] === confirm && cache[21] === cancel) footer = cache[22];
+  else { footer = jsx.jsx(DialogSection, { children: jsx.jsxs(DialogFooter, { children: [cancel, confirm] }) }); cache[20] = confirm; cache[21] = cancel; cache[22] = footer; }
+  let form: unknown;
+  if (cache[23] === footer && cache[24] === handleSubmit && cache[25] === header && cache[26] === body) form = cache[27];
+  else { form = jsx.jsxs(DialogBody, { as: "form", onSubmit: handleSubmit, children: [header, body, footer] }); cache[23] = footer; cache[24] = handleSubmit; cache[25] = header; cache[26] = body; cache[27] = form; }
+  if (cache[28] !== form || cache[29] !== handleOpenChange) { cache[28] = form; cache[29] = handleOpenChange; cache[30] = jsx.jsx(Dialog, { open: true, showDialogClose: false, onOpenChange: handleOpenChange, children: form }); }
+  return cache[30];
 }
 
 function getInitializedJsxRuntime(): JsxRuntime {
@@ -165,7 +139,6 @@ function getInitializedJsxRuntime(): JsxRuntime {
   return jsxRuntime;
 }
 
-initializeDeleteArchivedChatsDialog();
 export {
   initializeDeleteArchivedChatsDialog as n,
   DeleteArchivedChatsDialog as t,

@@ -175,6 +175,7 @@ let threadMountInitialized = false;
 let setupInitialized = false;
 let localThreadInitialized = false;
 let moduleInitialized = false;
+const activeInterestParameters = new Map<string, { hostId: string | undefined; threadId: string }>();
 
 function jsx(): JsxRuntime {
   jsxRuntime ??= shared.I3?.() as JsxRuntime;
@@ -183,6 +184,15 @@ function jsx(): JsxRuntime {
 }
 
 function call(value: unknown): void { if (typeof value === "function") value(); }
+function activeInterestParameter(hostId: string | undefined, threadId: string): { hostId: string | undefined; threadId: string } {
+  const key = `${hostId ?? ""}\0${threadId}`;
+  let parameter = activeInterestParameters.get(key);
+  if (parameter == null) {
+    parameter = { hostId, threadId };
+    activeInterestParameters.set(key, parameter);
+  }
+  return parameter;
+}
 function query<Value>(signal: unknown, parameter?: unknown): Value | undefined {
   return typeof shared.BX === "function" && signal != null ? shared.BX(signal, parameter) as Value : undefined;
 }
@@ -207,7 +217,11 @@ function voiceTimelineEnabled(conversationId: string | null): boolean {
 function withThreadPlacementScope(child: unknown, conversationId: string | null, placement: "main" | "side", sourceConversationId: string | null, clientThreadId?: string | null): unknown {
   const Provider = shared.UX;
   if (typeof Provider !== "function" || initial.kht == null || typeof initial.jht !== "function") return child;
-  const value = initial.jht(conversationId, placement, sourceConversationId, clientThreadId);
+  // jht distinguishes established and pending composers by arity. Supplying a
+  // fourth `null` still selects the pending-client branch and throws.
+  const value = clientThreadId == null
+    ? initial.jht(conversationId, placement, sourceConversationId)
+    : initial.jht(conversationId, placement, sourceConversationId, clientThreadId);
   return jsx().jsx(Provider, { scope: initial.kht, value, children: child });
 }
 function interactionMarksRead(event: { defaultPrevented?: boolean; key?: string; type?: string }): boolean {
@@ -422,6 +436,10 @@ function ThreadContainer(props: {
   const isReadOnly = props.isReadOnly === true;
   const retainActiveInterest = props.retainActiveInterest !== false;
   const scope = appScope();
+  // Original Lj subscribes to E_t before reading turn projections. This is a
+  // runtime contract, not a DOM annotation: without it completed stream events
+  // are persisted but the open transcript does not update until it is reopened.
+  query(initial.E_t, retainActiveInterest ? activeInterestParameter(props.hostId, props.conversationId) : null);
   const projected = query<{ renderEntries?: Array<Record<string, any>>; visibleTurnEntries?: Array<Record<string, any>> }>(initial.M_, {
     conversationId: props.conversationId,
     isBackgroundSubagentsEnabled: true,
@@ -437,7 +455,10 @@ function ThreadContainer(props: {
     if (props.onMarkRead != null) { props.onMarkRead(props.conversationId); return; }
     return watchConversationRead(scope, props.conversationId);
   }, [props.conversationId, props.onMarkRead, scope, trackReadState]);
-  const entries = projected?.visibleTurnEntries ?? projected?.renderEntries ?? [];
+  // `visibleTurnEntries` is the lightweight conversation/context projection.
+  // The original thread renderer consumes `renderEntries`, which also carries
+  // assistant/tool transcript blocks assembled from thread/items/list.
+  const entries = projected?.renderEntries ?? projected?.visibleTurnEntries ?? [];
   const Turn = (localConversationTurn as any).t;
   const RowComponent = ({ entry, latestTurnFooter, latestTurnFollowContentRef }: { entry: Record<string, any>; latestTurnFooter?: unknown; latestTurnFollowContentRef?: unknown }) => {
     if (entry.type === "gap") return jsx().jsx("div", { "aria-hidden": true, style: { height: entry.estimatedHeightPx ?? 0 } });
@@ -445,8 +466,10 @@ function ThreadContainer(props: {
     if (entry.type === "voice-transcript" || entry.type === "voice-presentation") {
       return jsx().jsx("div", { "data-voice-turn": entry.type, children: entry.block?.text ?? entry.presentation ?? null });
     }
-    return entry.turn == null || typeof Turn !== "function" ? null : jsx().jsx(Turn, {
+    const turn = entry.turn ?? entry;
+    return Turn == null ? null : jsx().jsx(Turn, {
       ...entry,
+      turn,
       conversationId: props.conversationId,
       hostId: props.hostId,
       isBackgroundSubagentsEnabled: entry.isBackgroundSubagentsEnabled !== false,
@@ -455,7 +478,7 @@ function ThreadContainer(props: {
       isReadOnly,
       latestTurnFollowContentRef,
       renderMcpApps: entry.renderMcpApps !== false,
-      turnRequests: entry.requests ?? entry.turnRequests,
+      turnRequests: entry.requests ?? entry.turnRequests ?? turn.requests,
       latestTurnFooter,
     });
   };
@@ -487,6 +510,16 @@ function ThreadContainer(props: {
       ? (props.showSideChatEmptyState === true ? jsx().jsx("div", { "data-side-chat-empty-state": true, children: "No messages yet" }) : null)
       : turns,
   });
+  const ThreadScrollLayout = (scrollLayout as any).t;
+  const scrollBody = typeof ThreadScrollLayout === "function"
+    ? jsx().jsx(ThreadScrollLayout, {
+        active: true,
+        autoLoadHistory: true,
+        children: body,
+        preserveViewportOnContentGrowth: true,
+        scrollOrigin: "bottom",
+      })
+    : body;
   return jsx().jsx("div", {
     className: "min-h-0 flex-1",
     "data-local-conversation-thread-container": true,
@@ -496,7 +529,7 @@ function ThreadContainer(props: {
       const conversationId = event.target?.closest?.("[data-background-agent-id]")?.getAttribute("data-background-agent-id");
       if (conversationId != null && props.backgroundAgentCallbacks?.canOpen(conversationId)) props.backgroundAgentCallbacks.open(conversationId);
     },
-    children: body,
+    children: scrollBody,
   });
 }
 
@@ -631,7 +664,10 @@ function initializeLocalConversationThread(): void {
   call((localConversationTurn as any).n);
   call((conversationBlocks as any).p);
   call((splitItems as any).t);
-  call((userMessage as any).r);
+  call((userMessage as any).n);
+  call((gitActions as any).i);
+  call((gitActions as any).n);
+  call((scrollLayout as any).n);
 }
 
 // ---------------------------------------------------------------------------
@@ -715,7 +751,11 @@ function SideChatThread(props: {
   });
   const Context = (sideChatRuntime as any).t;
   const contextual = Context?.Provider == null ? surface : jsx().jsx(Context.Provider, { value: SideChat, children: surface });
-  return withThreadPlacementScope(contextual, conversationId, "main", currentRouteConversationId(scope), clientThreadId);
+  const routeConversationId = currentRouteConversationId(scope) ?? conversationId;
+  // The original established-thread path scopes the main placement by the
+  // server conversation id. Carrying a stale client-new-thread id here causes
+  // BrowserHostManager to create IAB pages under the wrong session route.
+  return withThreadPlacementScope(contextual, conversationId, "main", routeConversationId, conversationId == null ? clientThreadId : null);
 }
 
 /**
@@ -880,7 +920,10 @@ function initializeThreadMountDependencies(): void {
   call((localConversationTurn as any).n);
   call((conversationBlocks as any).p);
   call((splitItems as any).t);
-  call((userMessage as any).r);
+  call((userMessage as any).n);
+  call((gitActions as any).i);
+  call((gitActions as any).n);
+  call((scrollLayout as any).n);
   call((resumeConversationChunk as any).t);
 }
 
@@ -900,10 +943,12 @@ function initializeLocalConversationThreadModule(): void {
   if (!setupInitialized) {
     setupInitialized = true;
     call((pendingOnboarding as any)?.t);
-    call((worktreeSetupAutoFix as any)?.t);
-    call((threadTurnEntries as any)?.t);
-    call((threadBridge as any)?.t);
-    call((threadPinShortcutBridge as any)?.t);
+    call((worktreeSetupAutoFix as any)?.i);
+    call((worktreeSetupAutoFix as any)?.n);
+    call((threadTurnEntries as any)?.i);
+    call((threadTurnEntries as any)?.r);
+    call((threadBridge as any)?.n);
+    call((threadPinShortcutBridge as any)?.n);
     call((useLocalConversationSources as any)?.t);
   }
 }

@@ -42,5 +42,4 @@ function initializeTriangleWarningIcon(): void {
   jsx = getJsxRuntime();
   initialized = true;
 }
-initializeTriangleWarningIcon();
 export { initializeTriangleWarningIcon as n, TriangleWarningIcon as t };

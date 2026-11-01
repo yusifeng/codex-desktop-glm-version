@@ -16,6 +16,7 @@ const state = {
   sessions: [{ id: "session-1", title: "Fix authentication", body: "Editing files", path: "/tasks/session-1", status: "running" }],
 };
 const React = {
+  useRef(initial) { hookIndex += 1; return { current: initial }; },
   useState(initial) {
     const index = hookIndex++;
     if (!(index in hookState)) hookState[index] = typeof initial === "function" ? initial() : initial;
@@ -47,11 +48,11 @@ mocks["app-shared"] = [
 mocks["app-initial"] = [
   "const runtime=globalThis.__avatarOverlayNativePage;",
   "export const Kcn=()=>runtime.state.petVisible;export const bc=()=>({selectedAvatar:runtime.state.avatar,selectedAvatarId:runtime.state.avatarId});",
-  "export const ofn=gate=>Boolean(runtime.state.gates[gate]);export const p4=()=>({activeMode:runtime.state.collaborationMode});export const q2=()=>runtime.state.sessions;",
+  "export const ofn=gate=>Boolean(runtime.state.gates[gate]);export const p4=()=>({activeMode:runtime.state.collaborationMode});export const q2=()=>runtime.state.initialized.push('overlay-activity');",
 ].join("\n");
 mocks["use-floating-window-pointer-interactivity"] = [
-  "const runtime=globalThis.__avatarOverlayNativePage;export const n=()=>runtime.state.initialized.push('pointer');",
-  "export const t=options=>runtime.state.pointerStates.push(options.isInteractive);",
+  "const runtime=globalThis.__avatarOverlayNativePage;export const t=()=>runtime.state.initialized.push('pointer');",
+  "export const n=options=>{const interactive=!options.isPaused?.();runtime.state.pointerStates.push(interactive);options.onInteractiveChange(interactive);return !interactive};",
 ].join("\n");
 mocks["use-realtime-voice-native-overlay-transition-enabled"] = "const runtime=globalThis.__avatarOverlayNativePage;export const t=()=>runtime.state.initialized.push('voice-transition');export const n=()=>runtime.state.nativeVoiceTransition;";
 mocks["avatar-overlay-debug-state"] = "const runtime=globalThis.__avatarOverlayNativePage;export const n=()=>runtime.state.initialized.push('debug');export const t={get value(){return runtime.state.debugBorder}};";
@@ -68,7 +69,7 @@ const result = await esbuild.build({
 });
 const module = await import("data:text/javascript;base64," + Buffer.from(result.outputFiles[0].text).toString("base64"));
 assert.deepEqual(Object.keys(module), ["AvatarOverlayNativePage"]);
-assert.deepEqual(state.initialized, ["runtime", "pointer", "voice-transition", "debug", "mascot", "handoff"]);
+assert.deepEqual(state.initialized, ["runtime", "pointer", "overlay-activity", "voice-transition", "debug", "mascot", "handoff"]);
 assert.deepEqual(Object.keys(result.metafile.inputs).filter((input) => input.startsWith("mock:")).map((input) => input.slice(5)).sort(), [...dependencyNames].sort());
 
 function render(clear = false) { hookIndex = 0; if (clear) hookState.length = 0; return module.AvatarOverlayNativePage(); }
@@ -90,18 +91,15 @@ let view = render(true);
 assert.equal(view.props["data-avatar-overlay-state"], "ready");
 assert.equal(view.props["data-native-voice-transition"], true);
 assert.equal(state.pointerStates.at(-1), true);
-assert.equal(find(view, (node) => node.type === "avatar-mascot").props.state, "running");
+assert.equal(find(view, (node) => node.type === "avatar-mascot").props.state, "idle");
 assert.equal(find(view, (node) => node.type === "avatar-mascot").props.source, "codex-asset");
-assert.equal(textContent(view).includes("Fix authentication Editing files"), true);
+assert.equal(textContent(view).includes("Fix authentication Editing files"), false);
 assert.equal(find(view, (node) => node.type === "voice-handoff").props.surface, "global-overlay");
 
 button(view, "Open Codex in Codex").props.onClick();
 assert.deepEqual(state.bridgeMessages.at(-1), { type: "open-current-main-window", payload: { focusComposer: true, stealFocus: true, appEntryAttribution: { channel: "shortcut", source: "shortcut" } } });
 button(view, "Close pet").props.onClick();
 assert.deepEqual(state.bridgeMessages.at(-1), { type: "avatar-overlay-close", payload: {} });
-find(view, (node) => node.props?.["data-session-status"] === "running").props.children.props.onClick();
-assert.deepEqual(state.bridgeMessages.at(-1), { type: "open-in-main-window", payload: { path: "/tasks/session-1", appEntryAttribution: { channel: "push_notification", source: "pet_notification" } } });
-
 find(view, (node) => node.props?.["aria-label"] === "Quick chat prompt").props.onChange({ target: { value: "  review this patch  " } });
 view = render();
 assert.equal(button(view, "Send").props.disabled, false);

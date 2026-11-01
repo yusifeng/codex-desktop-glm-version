@@ -31,15 +31,25 @@ interface InitialRuntime {
   bc(): AvatarSelection;
   ofn(gate: string): boolean;
   p4(): { activeMode?: string };
-  q2(): OverlaySession[];
+  q2(): void;
 }
-interface PointerRuntime { n(): void; t(options: { isInteractive: boolean }): void }
+interface PointerRuntime {
+  n(options: {
+    activationNonce?: unknown;
+    floatingElementSelectors?: readonly string[];
+    includeInteractiveRegion?: boolean;
+    interactiveRegionRef: { current: HTMLElement | null };
+    isPaused?(): boolean;
+    onInteractiveChange(interactive: boolean): void;
+  }): boolean;
+  t(): void;
+}
 
 const { $3: initializeRuntimeLazy, $R: petSettings, G3: hostBridge, I3: getJsxRuntime, e6: getReactRuntime } = appSharedChunk as unknown as SharedRuntime;
-const { Kcn: readSetting, bc: useSelectedAvatar, ofn: isGateEnabled, p4: useCollaborationMode, q2: useOverlaySessions } = appInitialChunk as unknown as InitialRuntime;
-const { n: initializePointerInteractivity, t: usePointerInteractivity } = pointerInteractivityChunk as unknown as PointerRuntime;
+const { Kcn: readSetting, bc: useSelectedAvatar, ofn: isGateEnabled, p4: useCollaborationMode, q2: initializeOverlayActivity } = appInitialChunk as unknown as InitialRuntime;
+const { n: usePointerInteractivity, t: initializePointerInteractivity } = pointerInteractivityChunk as unknown as PointerRuntime;
 const { n: useNativeVoiceTransition, t: initializeNativeVoiceTransition } = nativeVoiceTransitionChunk;
-const { n: initializeOverlayDebugState, t: overlayDebugState } = overlayDebugChunk;
+const { n: initializeOverlayDebugState } = overlayDebugChunk;
 const { r: initializeAvatarMascotButton, t: AvatarMascotButton } = avatarMascotChunk;
 const { n: initializeRealtimeHandoff, t: RealtimeVoiceHandoffTarget } = realtimeHandoffChunk;
 
@@ -54,6 +64,7 @@ function initializeAvatarOverlayNativePage(): void {
   if (initialized) return;
   initializeRuntimeLazy();
   initializePointerInteractivity();
+  initializeOverlayActivity();
   initializeNativeVoiceTransition();
   initializeOverlayDebugState();
   initializeAvatarMascotButton();
@@ -127,14 +138,25 @@ function QuickChat({ avatar, enabled }: { avatar: Avatar; enabled: boolean }): u
 }
 
 function AvatarOverlayNativePage(): unknown {
+  const overlayRef = React.useRef<HTMLElement | null>(null);
   const { selectedAvatar, selectedAvatarId } = useSelectedAvatar();
   const petVisible = readSetting<boolean>(petSettings.petVisible) ?? petSettings.petVisible.default;
   const quickChatEnabled = (isGateEnabled(QUICK_CHAT_GATE) || isGateEnabled(QUICK_CHAT_STYLE_GATE)) && petVisible;
   const voiceEnabled = isGateEnabled(REALTIME_VOICE_GATE);
   const nativeVoiceTransition = useNativeVoiceTransition();
-  const sessions = useOverlaySessions();
+  // q2 is the release chunk's overlay-activity initializer, not a hook.
+  // The compact native fallback does not project the release notification
+  // graph yet, so it must start from an empty activity stack.
+  const sessions: OverlaySession[] = [];
   const interactive = selectedAvatar != null && (quickChatEnabled || voiceEnabled || sessions.length > 0);
-  usePointerInteractivity({ isInteractive: interactive });
+  usePointerInteractivity({
+    activationNonce: selectedAvatarId,
+    includeInteractiveRegion: true,
+    interactiveRegionRef: overlayRef,
+    isPaused: () => !interactive,
+    onInteractiveChange: (isInteractive) =>
+      hostBridge.dispatchMessage("avatar-overlay-pointer-interaction-changed", { isInteractive }),
+  });
   React.useEffect(() => {
     if (selectedAvatar == null) hostBridge.dispatchMessage("avatar-overlay-pointer-interaction-changed", { isInteractive: false });
   }, [selectedAvatar]);
@@ -143,9 +165,12 @@ function AvatarOverlayNativePage(): unknown {
   if (customAvatarPending) return jsx.jsx("div", { role: "status", "data-avatar-overlay-state": "pending-custom-avatar", children: "Loading custom pet…" });
 
   return jsx.jsxs("main", {
+    ref: overlayRef,
     className: "avatar-overlay-native-page",
     "data-avatar-overlay-state": "ready",
-    "data-debug-border": overlayDebugState.value || undefined,
+    // `t` is assigned by the debug-state initializer. Read it through the
+    // module namespace so the ESM live binding is preserved.
+    "data-debug-border": overlayDebugChunk.t?.value || undefined,
     "data-native-voice-transition": nativeVoiceTransition || undefined,
     children: [
       jsx.jsx("button", {

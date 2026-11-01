@@ -34,11 +34,30 @@ async function bundle(directory) {
         build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => {
           const name = path.basename(importPath);
           const contents = name === "app-shared"
-            ? "export const I3=()=>globalThis.__sharedControlsTest.jsx;export const m4=(...v)=>globalThis.__sharedControlsTest.joinClasses(...v);"
+            ? `export const $3=()=>{const cache=[];return{c:size=>{while(cache.length<size)cache.push(Symbol.for("react.memo_cache_sentinel"));return cache}}};
+export const FX=()=>{};
+export const I3=()=>globalThis.__sharedControlsTest.jsx;
+export const LX=(scope)=>({scope});
+export const __=(callback)=>(...args)=>callback(...args);
+export const e6=()=>({useState:(initializer)=>[initializer(),()=>{}]});
+export const g_=()=>{};
+export const a$=()=>{};
+export const m4=(...v)=>globalThis.__sharedControlsTest.joinClasses(...v);
+export const o$={div:"motion.div"};
+export const sZ=(scope,compute)=>({scope,evaluate:({intl,tabIds,view})=>compute({get:signal=>signal==="intl"?intl:signal==="view"?view:signal==="tabs"?tabIds:null})});`
             : name === "app-initial"
-              ? "export const dun=(k,v)=>globalThis.__sharedControlsTest.persisted(k,v);export const pnt=globalThis.__sharedControlsTest.desktopBridge;"
+              ? `export const $en="conversation-scope";
+export const Wvt=()=>{};
+export const avt="view";
+export const dun=(k,v)=>globalThis.__sharedControlsTest.persisted(k,v);
+export const itn=()=>{};
+export const mpn="intl";
+export const pnt=globalThis.__sharedControlsTest.desktopBridge;
+export const ppn=()=>{};
+export const qvt={tabIds$:"tabs"};
+export const rvt=()=>{};`
               : name === "tab-address-input"
-                ? "export const t=globalThis.__sharedControlsTest.addressInput;"
+                ? "export const n=()=>{}; export const t=globalThis.__sharedControlsTest.addressInput;"
                 : "export {};";
           return { contents, loader: "js" };
         });
@@ -89,14 +108,25 @@ assert.equal(labels.n.evaluate({ intl, tabIds: [], view: "split" }), "New tab in
 assert.equal(labels.n.evaluate({ intl, tabIds: ["a"], view: "split" }), "Enter full view");
 assert.doesNotThrow(() => labels.t());
 
+// above-composer-fixed-content-surface: 6
+const fixedSurface = await bundle("above-composer-fixed-content-surface");
+fixedSurface.n();
+const fixed = fixedSurface.t({ children: "Notice", transition: { duration: 0.2 } });
+assert.equal(fixed.type, "div");
+assert.match(fixed.props.className, /thread-content-max-width/);
+assert.equal(fixed.props.children.type, "motion.div");
+assert.equal(fixed.props.children.props.layout, "size");
+assert.equal(fixed.props.children.props.children.props.children, "Notice");
+assert.deepEqual(Object.keys(fixedSurface), ["n", "t"]);
+
 // tab-input: 7
 const tabInput = await bundle("tab-input");
 assert.deepEqual(Object.keys(tabInput), ["n", "t"]);
 const navigations = [];
-const tab = tabInput.t({ id: "address", addressValue: "https://example.com", scope: "scope", sources: [{ id: "base" }], providers: [(scope, context) => ({ id: "generated", scope, context })], onNavigate(...args) { navigations.push(args); } });
+const tab = tabInput.t({ id: "address", addressValue: "https://example.com", sources: [{ id: "base" }], providers: [(scope, getContext) => ({ id: "generated", scope, context: getContext() })], onNavigate(...args) { navigations.push(args); } });
 assert.equal(tab.type, globalThis.__sharedControlsTest.addressInput);
 assert.equal(tab.props.sources.length, 2);
-assert.equal(tab.props.sources[1].scope, "scope");
+assert.equal(tab.props.sources[1].scope.scope, "conversation-scope");
 assert.equal(tab.props.sources[1].context.value, "https://example.com");
 tab.props.onCommitAddress("https://openai.com");
 assert.deepEqual(navigations, [["https://openai.com", false]]);
@@ -212,4 +242,4 @@ const permissions = share.r(project, { account_user_id: "u1__b", account_user_ro
 assert.equal(permissions.canManage, true);
 assert.equal(permissions.canShareWorkspaceLink, true);
 
-console.log("92 shared controls and state models cluster assertions passed");
+console.log("98 shared controls and state models cluster assertions passed");

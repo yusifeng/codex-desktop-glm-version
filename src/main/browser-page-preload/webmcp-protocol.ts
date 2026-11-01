@@ -1,4 +1,3 @@
-export {};
 const { createWebMcpDescriptorSerializer } = require(`./webmcp-descriptor`);
 
 /**
@@ -174,4 +173,5 @@ function installWebMcpProtocol(deps: WebMcpProtocolDependencies): void {
 }
 
 declare const module: { exports: unknown };
+export { installWebMcpProtocol };
 module.exports = { installWebMcpProtocol };

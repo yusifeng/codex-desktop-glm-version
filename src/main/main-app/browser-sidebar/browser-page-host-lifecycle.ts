@@ -18,7 +18,7 @@ export type BrowserPageHostLifecycleOptions = {
     themeVariant: unknown,
     initialNavigationOwner: unknown,
   ): void;
-  logger: { info(event: string, fields: AnyRecord): void; warning(event: string, fields: AnyRecord): void };
+  logger(): { info(event: string, fields: AnyRecord): void; warning(event: string, fields: AnyRecord): void };
   normalizeWindowId(windowId: number): unknown;
   pageKey(ownerId: number, conversationId: string, browserTabId: string): unknown;
   recordMissingPageAttach(registry: AnyRecord, windowState: AnyRecord, route: AnyRecord, guestId: number): void;
@@ -29,7 +29,7 @@ export type BrowserPageHostLifecycleOptions = {
   sendWindowMessage(windowManager: AnyRecord, windowState: AnyRecord, message: AnyRecord): void;
   syncThreadState(windowState: AnyRecord, conversationId: string, threadState: AnyRecord): void;
   tabBudget: AnyRecord;
-  transferLogger: { error(event: string, fields: AnyRecord): void };
+  transferLogger(): { error(event: string, fields: AnyRecord): void };
   windowManager: AnyRecord;
   windows: Map<unknown, AnyRecord>;
 };
@@ -116,7 +116,7 @@ export class BrowserPageHostLifecycle {
       return `moved`;
     } catch (error) {
       if (!moved) throw error;
-      this.options.transferLogger.error(`Failed to bind transferred Browser page`, { safe: {}, sensitive: { error } });
+      this.options.transferLogger().error(`Failed to bind transferred Browser page`, { safe: {}, sensitive: { error } });
       page.view.webContents = webContents;
       const owner = target.threads.get(key) === threadState ? target : source;
       this.requestThreadTeardown(owner, threadState.conversationId, threadState, `closed`);
@@ -139,8 +139,8 @@ export class BrowserPageHostLifecycle {
 
   registerHost(
     windowState: AnyRecord,
-    conversationId: string,
     browserTabId: string,
+    conversationId: string,
     hostGeneration: number,
     persistenceKey: unknown,
     rendererInstanceId: string,
@@ -201,7 +201,7 @@ export class BrowserPageHostLifecycle {
         pageKey: null,
         windowId: windowState.window.id,
       });
-      this.options.logger.warning("IAB_LIFECYCLE rejected stale browser sidebar attach", {
+      this.options.logger().warning("IAB_LIFECYCLE rejected stale browser sidebar attach", {
         safe: {
           browserTabId: route.browserTabId,
           conversationId: route.conversationId,
@@ -236,7 +236,7 @@ export class BrowserPageHostLifecycle {
         pageKey: null,
         windowId: windowState.window.id,
       });
-      this.options.logger.warning("IAB_LIFECYCLE rejected browser sidebar route rebind", {
+      this.options.logger().warning("IAB_LIFECYCLE rejected browser sidebar route rebind", {
         safe: {
           browserTabId: route.browserTabId,
           conversationId: route.conversationId,
@@ -265,7 +265,7 @@ export class BrowserPageHostLifecycle {
       ),
       windowId: windowState.window.id,
     });
-    this.options.logger.info("IAB_LIFECYCLE runtime attached browser sidebar webview", {
+    this.options.logger().info("IAB_LIFECYCLE runtime attached browser sidebar webview", {
       safe: {
         browserTabId: route.browserTabId,
         conversationId: route.conversationId,

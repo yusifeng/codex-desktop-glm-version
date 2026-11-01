@@ -24,14 +24,14 @@ import { C as appInitialInit } from "@rchunk/app-initial";
 import { d as appPrimaryInit } from "@rchunk/app-primary";
 import * as activeToolActivityLabel from "@rchunk/active-tool-activity-label";
 import { n as aaiInit, t as aaiFor } from "@rchunk/agent-activity-item";
-import { n as aauInit } from "@rchunk/agent-activity-units";
+import { y as aauInit } from "@rchunk/agent-activity-units";
 import * as appgenAccess from "@rchunk/appgen-access";
 import * as appgenAccessStateMessages from "@rchunk/appgen-access-state-messages";
 import * as bookOpen from "@rchunk/book-open";
 import * as computerUseNativeAppMetadata from "@rchunk/computer-use-native-app-metadata";
 import * as diffPreviewTooltip from "@rchunk/diff-preview-tooltip";
 import * as diffSummary from "@rchunk/diff-summary";
-import * as elicitationEvents from "@rchunk/elicitation-events";
+import { t as initializeElicitationEvents } from "@rchunk/elicitation-events";
 import * as execShellContainer from "@rchunk/exec-shell-container";
 import * as hooksChunk from "@rchunk/hooks";
 import * as hooksSettingsModel from "@rchunk/hooks-settings-model";
@@ -53,7 +53,7 @@ import * as roleHeadingInit2 from "@rchunk/user-message";
 import * as workspaceFileContextMenuTrigger from "@rchunk/workspace-file-context-menu-trigger";
 import * as writingBlockDirectiveRenderer from "@rchunk/codex-writing-block-directive-renderer";
 import * as fileDiff from "@rchunk/file-diff";
-void appSharedLazy, appInitialInit, appPrimaryInit, activeToolActivityLabel, aaiInit, aauInit, appgenAccess, appgenAccessStateMessages, bookOpen, computerUseNativeAppMetadata, diffPreviewTooltip, diffSummary, elicitationEvents, execShellContainer, hooksChunk, hooksSettingsModel, hooksSettingsRoute, mcpAppAnalytics, mcpToolActivityLabel, mcpToolApprovalMessage, mcpToolItemContent, openAutomationSidePanelTab, partition, patchDiffStats, planSummaryItemContent, presentation, scrollToMatchInit, skillExplorationLabels, toolActivityDisclosure, undo, roleHeadingInit2, workspaceFileContextMenuTrigger, writingBlockDirectiveRenderer, fileDiff;
+void appSharedLazy, appInitialInit, appPrimaryInit, activeToolActivityLabel, aaiInit, aauInit, appgenAccess, appgenAccessStateMessages, bookOpen, computerUseNativeAppMetadata, diffPreviewTooltip, diffSummary, initializeElicitationEvents, execShellContainer, hooksChunk, hooksSettingsModel, hooksSettingsRoute, mcpAppAnalytics, mcpToolActivityLabel, mcpToolApprovalMessage, mcpToolItemContent, openAutomationSidePanelTab, partition, patchDiffStats, planSummaryItemContent, presentation, scrollToMatchInit, skillExplorationLabels, toolActivityDisclosure, undo, roleHeadingInit2, workspaceFileContextMenuTrigger, writingBlockDirectiveRenderer, fileDiff;
 
 import {
   connectorAssetTitleQuery,
@@ -99,9 +99,9 @@ const initializeImageAndAttachmentBlocks = once(() => { call(appSharedLazy); cal
 const initializeDiffDonut = once(() => { call(appSharedLazy); call((patchDiffStats as any).n); call((diffPreviewTooltip as any).n); void jsx(); });
 const initializeInProgressDiffSummary = once(() => { initializeDiffDonut(); call((diffSummary as any).n); void jsx(); });
 const initializeSummaryBlock = once(() => { call(appSharedLazy); call((toolActivityDisclosure as any).n); void jsx(); });
-const initializeWebSearchBlock = once(() => { call(appSharedLazy); call((presentation as any).a); void jsx(); });
+const initializeWebSearchBlock = once(() => { call(appSharedLazy); void jsx(); });
 const initializeTurnBlockAssembly = once(() => { initializeActivitySummaryGroup(); initializeMcpAppWidgets(); initializeImageAndAttachmentBlocks(); initializeInProgressDiffSummary(); initializeSummaryBlock(); initializeWebSearchBlock(); call((mcpToolApprovalMessage as any).u); call((planSummaryItemContent as any).n); call((writingBlockDirectiveRenderer as any).n); void jsx(); });
-const initializeActivityRow = once(() => { initializeTurnBlockAssembly(); call((execShellContainer as any).n); call((elicitationEvents as any).n); void jsx(); });
+const initializeActivityRow = once(() => { initializeTurnBlockAssembly(); call((execShellContainer as any).n); call(initializeElicitationEvents); void jsx(); });
 const initializeTurnBlocks = once(() => { initializeActivityRow(); call((partition as any).n); void jsx(); });
 const initializeBlockList = once(() => { call(appSharedLazy); void jsx(); });
 
@@ -310,7 +310,7 @@ function partitionCollapsibleUnits(
       (options.keepMcpAppEntriesPersistent === true && options.renderMcpApps === true && item.type === "mcp-tool-call" && (item.mcpAppResourceUri != null || item.result?.type === "success")) ||
       (item.type === "user-message" && (item.steeringStatus != null || item.hookFeedback === true))
     );
-    const isAlwaysExpanded = ["assistant-message", "user-message", "assistantMessage", "userMessage", "generated-image", "image", "attachment"].includes(String(item.type));
+    const isAlwaysExpanded = ["assistant-message", "user-message", "assistantMessage", "agentMessage", "userMessage", "generated-image", "image", "attachment"].includes(String(item.type));
     if (isPersistent) persistentUnits.push(unit);
     else if (isAlwaysExpanded) expandedUnits.push(unit);
     else collapsibleUnits.push(unit);

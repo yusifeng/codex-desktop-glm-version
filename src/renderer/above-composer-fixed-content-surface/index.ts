@@ -1,44 +1,63 @@
-// above-composer-fixed-content-surface —— Composer 上方固定内容的胶囊容器。
-// 原版：app/webview/assets/above-composer-fixed-content-surface-59cfe2f3858a.js。
+import "@rchunk/rolldown-runtime";
+import {
+  $3 as getCompilerRuntime,
+  I3 as getJsxRuntime,
+  a$ as initializeMotionRuntime,
+  o$ as motion,
+} from "@rchunk/app-shared";
 
-import "@rchunk/app-shared";
+interface CompilerRuntime {
+  c(size: number): unknown[];
+}
 
-export interface AboveComposerFixedContentSurfaceProps<T = unknown> {
-  children: T;
+export interface AboveComposerFixedContentSurfaceProps {
+  children: unknown;
   transition?: unknown;
 }
 
-export interface AboveComposerFixedContentSurfaceView<T = unknown> {
-  kind: "above-composer-fixed-content-surface";
-  outerClassName: string;
-  motion: {
-    layout: "size";
-    transition?: unknown;
-    className: string;
-  };
-  surface: {
-    className: string;
-    children: T;
-  };
+let compilerRuntime: CompilerRuntime;
+let jsxRuntime: ReturnType<typeof getJsxRuntime>;
+
+function AboveComposerFixedContentSurface({
+  children,
+  transition,
+}: AboveComposerFixedContentSurfaceProps): unknown {
+  const cache = compilerRuntime.c(5);
+  let surface: unknown;
+  if (cache[0] !== children) {
+    surface = jsxRuntime.jsx("div", {
+      className:
+        "flex w-max max-w-full min-w-0 items-center gap-2 rounded-3xl border border-border/80 bg-background-primary-soft/70 px-3 py-1.5 text-default backdrop-blur-sm",
+      children,
+    });
+    cache[0] = children;
+    cache[1] = surface;
+  } else {
+    surface = cache[1];
+  }
+  if (cache[2] !== surface || cache[3] !== transition) {
+    cache[2] = surface;
+    cache[3] = transition;
+    cache[4] = jsxRuntime.jsx("div", {
+      className:
+        "flex w-full max-w-(--thread-content-max-width) min-w-0 justify-center",
+      children: jsxRuntime.jsx(motion.div, {
+        layout: "size",
+        transition,
+        className:
+          "relative z-10 w-fit max-w-full min-w-0 overflow-hidden rounded-3xl",
+        children: surface,
+      }),
+    });
+  }
+  return cache[4];
 }
 
-const OUTER_CLASS = "flex w-full max-w-(--thread-content-max-width) min-w-0 justify-center";
-const MOTION_CLASS = "relative z-10 w-fit max-w-full min-w-0 overflow-hidden rounded-3xl";
-const SURFACE_CLASS =
-  "flex w-max max-w-full min-w-0 items-center gap-2 rounded-3xl border border-border/80 bg-background-primary-soft/70 px-3 py-1.5 text-default backdrop-blur-sm";
-
-function AboveComposerFixedContentSurface<T>(
-  props: AboveComposerFixedContentSurfaceProps<T>,
-): AboveComposerFixedContentSurfaceView<T> {
-  return {
-    kind: "above-composer-fixed-content-surface",
-    outerClassName: OUTER_CLASS,
-    motion: { layout: "size", transition: props.transition, className: MOTION_CLASS },
-    surface: { className: SURFACE_CLASS, children: props.children },
-  };
+function initializeAboveComposerFixedContentSurface(): void {
+  compilerRuntime = getCompilerRuntime() as unknown as CompilerRuntime;
+  initializeMotionRuntime();
+  jsxRuntime = getJsxRuntime();
 }
-
-function initializeAboveComposerFixedContentSurface(): void {}
 
 export {
   initializeAboveComposerFixedContentSurface as n,

@@ -3,6 +3,7 @@ import {
   FX as initializeSignalRuntime,
   QI as initializeScopedSignals,
   ZI as conversationIdScope,
+  l3 as initializeDeepEqual,
   lZ as createScopedState,
   rZ as createScopedDerived,
 } from "@rchunk/app-shared";
@@ -17,8 +18,8 @@ import {
   n$t as priorConversationTurns,
   t$t as sourceHistorySignal,
   wQt as hostIdByConversation,
+  w$t as flattenConversationItems,
 } from "@rchunk/app-initial";
-import { flattenConversationItems } from "../app-initial/runtime/flatten-conversation-items";
 
 export interface SourceTurn {
   attachments?: unknown;
@@ -32,27 +33,7 @@ export interface SourceTurn {
   turnId?: string;
 }
 
-function deepEqual(left: unknown, right: unknown): boolean {
-  if (Object.is(left, right)) return true;
-  if (typeof left !== "object" || left == null || typeof right !== "object" || right == null) {
-    return false;
-  }
-  if (Array.isArray(left) || Array.isArray(right)) {
-    return (
-      Array.isArray(left) &&
-      Array.isArray(right) &&
-      left.length === right.length &&
-      left.every((value, index) => deepEqual(value, right[index]))
-    );
-  }
-  const leftRecord = left as Record<string, unknown>;
-  const rightRecord = right as Record<string, unknown>;
-  const keys = Object.keys(leftRecord);
-  return (
-    keys.length === Object.keys(rightRecord).length &&
-    keys.every((key) => Object.hasOwn(rightRecord, key) && deepEqual(leftRecord[key], rightRecord[key]))
-  );
-}
+let deepEqual: (left: unknown, right: unknown) => boolean;
 
 function getRelevantSourceItems(turn: SourceTurn): unknown[] {
   return (flattenConversationItems(turn.items) as Array<{ type?: string }>).filter(
@@ -85,6 +66,10 @@ let activeTurnForSources: unknown;
 let allConversationTurnsForSources: unknown;
 
 function initializeLocalConversationSourcesSignals(): void {
+  const equalityRuntime = (initializeDeepEqual as unknown as () => unknown)();
+  deepEqual = (typeof equalityRuntime === "function"
+    ? equalityRuntime as (left: unknown, right: unknown) => boolean
+    : (equalityRuntime as { default: (left: unknown, right: unknown) => boolean }).default);
   initializeSignalRuntime();
   initializeConversationSources();
   initializeSourceEntities();
@@ -93,7 +78,6 @@ function initializeLocalConversationSourcesSignals(): void {
   sourceLinksByThread = createScopedState(
     conversationIdScope,
     () => new WeakMap<object, unknown>(),
-    undefined,
     { owner: (value: { threadId?: string } | null | undefined) => value?.threadId },
   );
 

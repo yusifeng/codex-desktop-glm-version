@@ -7,8 +7,10 @@ export interface PullRequestIconProps extends Record<string, unknown> {
   className?: string;
 }
 
+let jsxRuntime: ReturnType<typeof getJsxRuntime>;
+
 function PullRequestIcon(props: PullRequestIconProps): unknown {
-  const { jsx, jsxs } = getJsxRuntime();
+  const { jsx, jsxs } = jsxRuntime;
   return jsx("svg", {
     xmlns: "http://www.w3.org/2000/svg",
     width: 20,
@@ -38,7 +40,7 @@ function PullRequestIcon(props: PullRequestIconProps): unknown {
 
 function initializePullRequestIcon(): void {
   initializeReactRuntime();
-  getJsxRuntime();
+  jsxRuntime = getJsxRuntime();
 }
 
 export { initializePullRequestIcon as n, PullRequestIcon as t };

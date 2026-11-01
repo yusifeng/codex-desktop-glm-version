@@ -133,6 +133,71 @@ function dedupeHooks(hooks: HookDefinition[]): HookDefinition[] {
   return [...byKey.values()];
 }
 
+function dedupeIssues(issues: HookIssue[]): HookIssue[] {
+  const byLocation = new Map<string, HookIssue>();
+  for (const issue of issues) byLocation.set(`${issue.path}:${issue.message}`, issue);
+  return [...byLocation.values()];
+}
+
+function isIssueOnlyEntry(entry: HookSettingsEntry): boolean {
+  return entry.hooks.length === 0 && (entry.warnings.length > 0 || entry.errors.length > 0);
+}
+
+function combineEntries(
+  entries: HookSettingsEntry[],
+  hooks: HookDefinition[],
+  additionalEntries: HookSettingsEntry[] = [],
+): HookSettingsEntry {
+  const uniqueHooks = dedupeHooks(hooks);
+  const hookKeys = new Set(uniqueHooks.map((hook) => hook.key));
+  const relevantEntries = [
+    ...entries.filter((entry) => entry.hooks.some((hook) => hookKeys.has(hook.key))),
+    ...additionalEntries,
+  ];
+  return {
+    cwd: "",
+    hooks: uniqueHooks,
+    warnings: [...new Set(relevantEntries.flatMap((entry) => entry.warnings))],
+    errors: dedupeIssues(relevantEntries.flatMap((entry) => entry.errors)),
+  };
+}
+
+function entryForSource(
+  entries: HookSettingsEntry[],
+  source: Exclude<HookSourceGroup, "plugin" | "project">,
+): HookSettingsEntry | null {
+  const hooks = entries.flatMap((entry) =>
+    entry.hooks.filter((hook) => normalizeSource(hook.source) === source));
+  const issueOnlyEntries = source === "unknown" ? entries.filter(isIssueOnlyEntry) : [];
+  return hooks.length === 0 && issueOnlyEntries.length === 0
+    ? null
+    : combineEntries(entries, hooks, issueOnlyEntries);
+}
+
+function projectEntry(entry: HookSettingsEntry): HookSettingsEntry | null {
+  const hooks = entry.hooks.filter((hook) => normalizeSource(hook.source) === "project");
+  return hooks.length === 0 ? null : { ...entry, hooks };
+}
+
+function pluginEntries(entries: HookSettingsEntry[]): Array<{
+  entry: HookSettingsEntry;
+  pluginId?: string | null;
+}> {
+  const hooksByPlugin = new Map<string | null | undefined, HookDefinition[]>();
+  for (const entry of entries) {
+    for (const hook of entry.hooks) {
+      if (normalizeSource(hook.source) !== "plugin") continue;
+      const hooks = hooksByPlugin.get(hook.pluginId);
+      if (hooks == null) hooksByPlugin.set(hook.pluginId, [hook]);
+      else hooks.push(hook);
+    }
+  }
+  return [...hooksByPlugin.entries()]
+    .sort(([left], [right]) =>
+      left == null ? 1 : right == null ? -1 : left.localeCompare(right))
+    .map(([pluginId, hooks]) => ({ pluginId, entry: combineEntries(entries, hooks) }));
+}
+
 function resolveSourceSelection({
   pluginId,
   source,
@@ -205,12 +270,30 @@ export {
 };
 
 function groupEntriesBySource(entries: HookSettingsEntry[]): Array<Record<string, unknown>> {
-  return sourceOrder.flatMap((source) => {
-    const hooks = entries.flatMap((entry) =>
-      entry.hooks.filter((hook) => normalizeSource(hook.source) === source),
-    );
-    return hooks.length === 0 ? [] : [{ id: source, entry: { cwd: "", hooks: dedupeHooks(hooks), warnings: [], errors: [] } }];
-  });
+  const groups: Array<Record<string, unknown>> = [];
+  for (const source of sourceOrder) {
+    if (source === "project") {
+      const projectEntries = entries.map(projectEntry).filter((entry) => entry != null);
+      if (projectEntries.length > 0) groups.push({ id: source, projectEntries });
+      continue;
+    }
+    if (source === "plugin") {
+      const hooks = entries.flatMap((item) =>
+        item.hooks.filter((hook) => normalizeSource(hook.source) === "plugin"));
+      const plugins = pluginEntries(entries);
+      if (hooks.length > 0 && plugins.length > 0) {
+        groups.push({
+          id: source,
+          entry: combineEntries(entries, hooks),
+          pluginEntries: plugins,
+        });
+      }
+      continue;
+    }
+    const entry = entryForSource(entries, source);
+    if (entry != null) groups.push({ id: source, entry });
+  }
+  return groups;
 }
 
 function resolveEntryForSource(
@@ -218,5 +301,25 @@ function resolveEntryForSource(
   selection: SourceSelection | null,
 ): unknown {
   if (selection == null) return null;
-  return groups.find((group) => group.id === selection.source) ?? null;
+  const group = groups.find((candidate) => candidate.id === selection.source) as
+    | {
+        entry?: unknown;
+        id: string;
+        pluginEntries?: Array<{ entry: unknown; pluginId?: string | null }>;
+        projectEntries?: Array<HookSettingsEntry>;
+      }
+    | undefined;
+  if (group == null) return null;
+  if (selection.source === "project") {
+    return group.id === "project"
+      ? group.projectEntries?.find((entry) => entry.cwd === selection.projectRoot) ?? null
+      : null;
+  }
+  if (selection.source === "plugin") {
+    if (group.id !== "plugin") return null;
+    return selection.pluginId === undefined
+      ? group.entry ?? null
+      : group.pluginEntries?.find((entry) => entry.pluginId === selection.pluginId)?.entry ?? null;
+  }
+  return group.id === selection.source ? group.entry ?? null : null;
 }

@@ -38,6 +38,20 @@ assert.match(source, /removeListener\(`destroyed`/);
 assert.doesNotMatch(source, /generatedBindPageToWebview/);
 assert.match(source, /annotationContextMenuActions\[a\]/);
 assert.doesNotMatch(source, /\baZe\b/);
+assert.doesNotMatch(source, /\$U\(/);
+assert.doesNotMatch(source, /\$X\(\)/);
+assert.match(source, /matchesLoadError\(page\.loadError, url\)/);
+assert.match(source, /logger\(\)\.info/);
+assert.match(source, /resolveBrowserUseOpenRequests\?\.\(t\)/);
+
+const runtimeSyncSource = readFileSync(
+  new URL("../src/main/main-app/browser-sidebar/browser-runtime-sync-controller.ts", import.meta.url),
+  `utf8`,
+);
+assert.match(
+  runtimeSyncSource,
+  /resolveBrowserUseOpenRequests:\s*bind\(`resolveBrowserUseOpenRequests`\)/,
+);
 
 const mainSource = readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
 assert.doesNotMatch(mainSource, /\baZe\s*=\s*\{/);

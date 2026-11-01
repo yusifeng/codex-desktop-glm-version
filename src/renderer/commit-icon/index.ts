@@ -7,8 +7,10 @@ export interface CommitIconProps extends Record<string, unknown> {
   className?: string;
 }
 
+let jsxRuntime: ReturnType<typeof getJsxRuntime>;
+
 function CommitIcon(props: CommitIconProps): unknown {
-  const { jsxs, jsx } = getJsxRuntime();
+  const { jsxs, jsx } = jsxRuntime;
   return jsxs("svg", {
     width: 20,
     height: 20,
@@ -35,7 +37,7 @@ function CommitIcon(props: CommitIconProps): unknown {
 
 function initializeCommitIcon(): void {
   initializeReactRuntime();
-  getJsxRuntime();
+  jsxRuntime = getJsxRuntime();
 }
 
 export { initializeCommitIcon as n, CommitIcon as t };

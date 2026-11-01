@@ -105,7 +105,7 @@ assert.equal(descendants.n(happyScope, { hostId: "host", parentConversationId: "
 
 state = resetState();
 const plans = await bundle("editable-plan-tab");
-plans.o();
+plans.t();
 const planScope = { set(signal, parameter, value) { state.sets.push({ signal, parameter, value }); } };
 let openOptions;
 const opened = plans.n(planScope, {

@@ -41,23 +41,46 @@ exports were previously classified. Current completion requires source-backed bu
 
 ## Current runtime-source recovery status
 
-The renderer build now builds all 1,888 registered rewritten chunks. Fifty-three settings, composer, onboarding, activity, and
-supporting React modules have release-faithful source owners under their semantic `src/renderer/<name>/` directories. Their
-checked-in `exact.js` files are generated from the published ESM with only cross-chunk import specifiers rewritten; a parity
-gate regenerates all fifty-three from the release input and requires exact source equality. The build therefore no longer substitutes
-the earlier partial view-model approximations for these production components.
+The renderer build now emits and verifies all 1,888 registered rewritten chunks. There are 159 remaining release-faithful source owners
+under their semantic `src/renderer/<name>/` directories, including the settings/composer surfaces and the complete local
+conversation dependency closure. Their checked-in `exact.js` files are generated from the published ESM with only cross-chunk
+import specifiers rewritten; the source-build gate regenerates all 159 owners and requires exact source equality. The build
+therefore no longer substitutes the earlier partial view-model approximations for these production components.
 
 The remaining route compatibility closure contains 33 checked-in ESM modules, down from 77 before the exact-owner promotion,
-and the build has zero skipped semantic drafts. Dependency-owner checks ensure every exact owner import is supplied by a
+and two earlier semantic drafts are intentionally superseded because their published output is now owned by an exact source
+owner. Dependency-owner checks ensure every exact owner import is supplied by a
 semantic owner, transform-only owner, reconstructed core, or the checked-in compatibility graph. All 33 remaining modules are
 explicitly audited as vendor or generated boundaries (Recharts/D3,
 Three.js, date/phone/form runtimes, generated icons and entry shims); a gate requires that inventory to match the closure
 exactly. Six former incremental hubs now also have exact source owners; only the three shared renderer hubs remain incremental.
-Renderer verification passes 1,888/1,888 outputs. This is substantial runtime-source recovery, not proof that the entire project is complete. Exact owners still retain
-release-local identifiers that can be renamed for readability, preserved main/renderer boundaries remain, and the consolidated
-E2E workflow matrix has not yet passed.
+Renderer verification passes 1,888/1,888 outputs, TypeScript typechecking passes, and the recovery gate covers 11 source-build
+assertions, 33 compatibility modules, 159 exact owners, and seven reviewed structural drafts. The packaged app now starts from
+the reconstructed build, renders the home composer, resumes a real signed-in local conversation, hydrates its turns, and renders
+the virtualized user/assistant transcript without loading original JavaScript as a runtime fallback. The build also rejects
+build-only `@exact-chunk` aliases if any leak into packaged assets.
+
+Exact owners still retain release-local identifiers that can be renamed for readability, but those identifiers no longer imply
+a runtime fallback: the checked-in source owners are the build inputs. The signed-in E2E matrix now passes General settings,
+Git, Worktrees, Browser Use, historical user/assistant turn rendering, and the conversation add-context menu. On 2026-11-02 a
+fresh signed-in turn also completed through `fill` + `send` + `wait`. A separate turn invoked the reconstructed in-app-browser
+stack, attached the Browser webview, loaded `https://example.com/`, and returned the requested marker. The same packaged app
+then exercised the renderer preload, IPC router, main-process `WorkerBus`, and Git worker against an isolated repository: it
+created a real commit and a real detached worktree, both verified from disk. These mutation checks supersede the earlier note
+that the E2E matrix was read-only or incomplete.
 
 The main process, Git worker, and browser-page preload are now separately registered as checked-in exact process roots rather
 than being counted as preserved vendor chunks. The build rejects unowned files in `src/main-recovered`, verifies that each
 exact root owns the published output filename, and `restore-ts` cannot overwrite these sources. The remaining preserved
 main-process inventory is therefore seven audited vendor/generated chunks, not an application-code fallback.
+
+The final runtime repair restored the published Browser sidebar `ensureThreadState(windowState, input, browserTabId)` contract
+that had been omitted when the manager was split into semantic controllers. It preserves the original storage-id, owner-route,
+tab-activity, and session-registration behavior. Browser-page preload initialization was also corrected so React-backed
+annotation owners initialize lazily after their runtime bindings, WebMCP retains a real ESM named export, and every extracted
+annotation controller is bound before registry construction. Focused regressions cover these ordering and ownership contracts.
+
+The 159 exact owners are still outstanding readability and semantic-recovery work and must not be described as a completely
+decompiled renderer. The current build is source-backed and runnable, but final completion additionally requires replacing
+those owners with maintainable semantic TypeScript (or explicitly justified generated/vendor boundaries), keeping the
+critical E2E matrix green, and eliminating the remaining stable runtime contract errors.

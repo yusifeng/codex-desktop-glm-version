@@ -21,7 +21,7 @@ type BrowserWebviewListenerDependencies = {
   bindBrowserSettingsWebview(options: Record<string, unknown>): void;
   configureBrowserPageWebviewPreferences(options: Record<string, unknown>): void;
   configureBrowserSettingsWebviewPreferences(options: Record<string, unknown>): void;
-  createLogger(name: string): Logger;
+  createLogger(name: string): () => Logger;
   effectivePageUrl(page: unknown): string;
   findBrowserSettingsWebviewDefinition(params: Record<string, unknown>): unknown;
   getAdoptedWebContentsId(params: Record<string, unknown>): number | null;
@@ -197,7 +197,7 @@ export function createBrowserWebviewListenerRuntime(
         findBrowserSettingsWebviewDefinition(params);
       if (browserSettingsWebview != null) {
         if (state.browserSettingsWebviewMountIds.size === 0) {
-          logger.warning(
+          logger().warning(
             `IAB_LIFECYCLE rejected browser settings webview outside settings route`,
             {
               safe: { ownerWebContentsId: owner.id, windowId },
@@ -219,7 +219,7 @@ export function createBrowserWebviewListenerRuntime(
         });
         const instanceId = getWebviewInstanceId(params);
         if (instanceId == null) {
-          logger.warning(
+          logger().warning(
             `IAB_LIFECYCLE rejected browser settings webview attachment without instance id`,
             {
               safe: { ownerWebContentsId: owner.id, windowId },
@@ -358,7 +358,7 @@ export function createBrowserWebviewListenerRuntime(
           pageKey: null,
           windowId,
         });
-        logger.warning(
+        logger().warning(
           `IAB_LIFECYCLE rejected browser sidebar webview attachment`,
           {
             safe: {
@@ -396,7 +396,7 @@ export function createBrowserWebviewListenerRuntime(
         state.rendererInstanceId !== hostIdentity.rendererInstanceId ||
         ensuredThread.hostGeneration !== hostIdentity.hostGeneration
       ) {
-        logger.warning(
+        logger().warning(
           `IAB_LIFECYCLE rejected stale browser sidebar host attachment`,
           {
             safe: {
@@ -432,7 +432,7 @@ export function createBrowserWebviewListenerRuntime(
         return;
       }
 
-      logger.info(`IAB_LIFECYCLE browser sidebar will attach webview`, {
+      logger().info(`IAB_LIFECYCLE browser sidebar will attach webview`, {
         safe: {
           browserTabId: route.browserTabId,
           conversationId: route.conversationId,
@@ -477,7 +477,7 @@ export function createBrowserWebviewListenerRuntime(
           pageKey: null,
           windowId,
         });
-        logger.info(
+        logger().info(
           `IAB_LIFECYCLE reattaching existing browser sidebar webview`,
           {
             safe: {
@@ -510,7 +510,7 @@ export function createBrowserWebviewListenerRuntime(
         pageKey: null,
         windowId,
       });
-      logger.info(`IAB_LIFECYCLE requested browser sidebar webview attachment`, {
+      logger().info(`IAB_LIFECYCLE requested browser sidebar webview attachment`, {
         safe: {
           browserTabId: route.browserTabId,
           conversationId: route.conversationId,
@@ -535,7 +535,7 @@ export function createBrowserWebviewListenerRuntime(
       });
       if (pendingAdoption != null) {
         pendingAdoption.acceptedHostIdentity = hostIdentity;
-        logger.info(`IAB_ADOPTION queued adopted webview attach`, {
+        logger().info(`IAB_ADOPTION queued adopted webview attach`, {
           safe: {
             adoptedWebContentsId,
             browserTabId: route.browserTabId,
@@ -550,7 +550,7 @@ export function createBrowserWebviewListenerRuntime(
       params.src = ``;
       const instanceId = getWebviewInstanceId(params);
       if (instanceId == null) {
-        logger.warning(
+        logger().warning(
           `IAB_LIFECYCLE rejected browser sidebar webview attachment without instance id`,
           {
             safe: {
@@ -573,7 +573,7 @@ export function createBrowserWebviewListenerRuntime(
         rendererInstanceId,
         route,
       });
-      logger.info(`IAB_LIFECYCLE queued browser sidebar webview route`, {
+      logger().info(`IAB_LIFECYCLE queued browser sidebar webview route`, {
         safe: {
           browserTabId: route.browserTabId,
           conversationId: route.conversationId,
@@ -675,7 +675,7 @@ export function createBrowserWebviewListenerRuntime(
         pageKey: null,
         windowId,
       });
-      logger.info(`IAB_LIFECYCLE did attach browser sidebar webview`, {
+      logger().info(`IAB_LIFECYCLE did attach browser sidebar webview`, {
         safe: {
           guestWebContentsId: webContents.id,
           ownerWebContentsId: owner.id,

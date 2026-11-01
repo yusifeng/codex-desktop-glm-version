@@ -180,6 +180,7 @@ pendingConfirmation.props.children.props.onSubmit({ preventDefault() {} });
 assert.equal(confirmed, 1);
 
 const securitySource = await bundle("security-src");
+securitySource.t();
 assert.equal(securitySource.a("openid"), securitySource.a("email"));
 assert.equal(securitySource.a("openid").defaultMessage, "Access your basic profile information");
 assert.equal(securitySource.a("resource.invoke").defaultMessage, "Resource actions");
@@ -190,6 +191,7 @@ assert.match(securitySource.i("offline_access").defaultMessage, /connection acti
 assert.equal(securitySource.a("unknown.scope"), undefined);
 
 const securityKeys = await bundle("security-keys");
+securityKeys.n();
 const icon = securityKeys.t({ className: "security-icon", "aria-hidden": true });
 assert.equal(icon.type, "svg");
 assert.equal(icon.props.width, 20);

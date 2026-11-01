@@ -8,6 +8,7 @@ import * as esbuild from "esbuild";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MODULES = ["mcp-view-surface", "view-frame", "active-tool-activity-label", "tool-activity-disclosure", "elicitation-events", "mcp-app-analytics", "result-card"];
 const state = globalThis.__mcpToolPrimitivesTest = {};
+state.emitted = [];
 state.jsx = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
 state.react = { useRef: value => ({ current: value }), useState(initial) { let value = typeof initial === "function" ? initial() : initial; return [value, next => { value = typeof next === "function" ? next(value) : next; }]; } };
 const imports = new Map();
@@ -15,12 +16,30 @@ for (const directory of MODULES) {
   const source = fs.readFileSync(path.join(ROOT, "src/renderer", directory, "index.ts"), "utf8");
   for (const match of source.matchAll(/import\s*{([\s\S]*?)}\s*from\s*"@rchunk\/([^"]+)";/g)) {
     const names = imports.get(match[2]) ?? new Set();
-    for (const item of match[1].split(",")) names.add(item.trim().split(/\s+as\s+/)[0]);
+    for (const item of match[1].split(",")) {
+      const name = item.trim().replace(/^type\s+/, "").split(/\s+as\s+/)[0];
+      if (name) names.add(name);
+    }
     imports.set(match[2], names);
   }
 }
-const overrides = { "app-shared": { I3: "() => globalThis.__mcpToolPrimitivesTest.jsx", e6: "() => globalThis.__mcpToolPrimitivesTest.react" } };
-const sideEffects = new Set(["rolldown-runtime", "app-initial", "skill-exploration-labels", "result-values"]);
+const overrides = {
+  "app-shared": {
+    I3: "() => globalThis.__mcpToolPrimitivesTest.jsx",
+    e6: "() => globalThis.__mcpToolPrimitivesTest.react",
+    fI: "() => undefined",
+    oj: "({ name: 'elicitation-event' })",
+  },
+  "app-initial": {
+    Cpn: "({ name: 'elicitation-state' })",
+    GPt: "({ name: 'window-focused' })",
+    KPt: "() => undefined",
+    Spn: "({ name: 'blocked' })",
+    xpn: "(_scope, descriptor, event) => globalThis.__mcpToolPrimitivesTest.emitted.push({ descriptor, event })",
+    ypn: "() => undefined",
+  },
+};
+const sideEffects = new Set(["rolldown-runtime", "skill-exploration-labels", "result-values"]);
 function mock(name) { if (sideEffects.has(name)) return "export {};"; return [...(imports.get(name) ?? [])].map(exportName => `export const ${exportName} = ${overrides[name]?.[exportName] ?? "() => undefined"};`).join("\n"); }
 async function bundle(directory) {
   const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "mcp-tool-primitives-mocks", setup(build) {
@@ -94,11 +113,13 @@ assert.equal(disclosure.t({ summary: "No details" }).props.children[0].props.dis
 // elicitation-events: 5
 const elicitation = await bundle("elicitation-events");
 elicitation.t();
-const emitted = [];
-const store = { emit: event => emitted.push(event), watch: () => () => { emitted.push({ cleanup: true }); } };
+const store = {
+  get: signal => signal?.name === "window-focused" ? true : null,
+  watch: () => () => { state.emitted.push({ cleanup: true }); },
+};
 elicitation.n(store, { itemId: "item", threadId: "thread", turnId: "turn" }, "accept");
-assert.equal(emitted[0].stage, "interacted");
-assert.equal(emitted[0].action, "accept");
+assert.equal(state.emitted[0].event.stage, "interacted");
+assert.equal(state.emitted[0].event.action, "accept");
 assert.equal(elicitation.r(store, null, null, {}), undefined);
 assert.equal(typeof elicitation.n, "function");
 assert.equal(typeof elicitation.t, "function");

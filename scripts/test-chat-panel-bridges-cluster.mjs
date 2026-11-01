@@ -48,7 +48,9 @@ async function bundle(directory) {
             const noop=()=>{};
             export const $3=noop,FX=noop,K2=noop,lw=noop,Z3=noop,H3=noop,qm=noop,wL=noop;
             export const I3=()=>state.jsx; export const Y2=Symbol("FormattedMessage"); export const V_=Symbol("UnarchiveIcon");
-            export const e6={useLayoutEffect(effect){state.effects.push(effect);const cleanup=effect();if(cleanup)state.cleanup=cleanup},createElement:(type,props)=>({type,props})};
+            export const V3=async(loader)=>loader();
+            const react={useLayoutEffect(effect){state.effects.push(effect);const cleanup=effect();if(cleanup)state.cleanup=cleanup},createElement:(type,props)=>({type,props})};
+            export const e6=Object.assign(()=>react,react);
             export const LX=()=>({set(signal,value){state.sets.push({signal,value})}});
             export const Q3={warning(message,details){state.warnings.push({message,details})}};
             export const Jm=(loader,options)=>{const component=(props)=>({lazy:true,props});component.loader=loader;component.options=options;state.lazy.push(component);return component};

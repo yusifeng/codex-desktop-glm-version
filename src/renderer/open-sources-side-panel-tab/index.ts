@@ -15,7 +15,7 @@ import {
   gvt as getTabTarget,
 } from "@rchunk/app-initial";
 
-const jsx = getJsxRuntime();
+let jsx: ReturnType<typeof getJsxRuntime>;
 
 function openSourcesSidePanelTab(
   scope: unknown,
@@ -51,6 +51,7 @@ function initializeOpenSourcesSidePanelTab(): void {
   initializeIconAssets();
   initializeRightPanelState();
   initializeSourcesPanelModel();
+  jsx = getJsxRuntime();
 }
 
 export {

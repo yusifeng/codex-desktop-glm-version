@@ -4,7 +4,8 @@ import {
   H3 as initializeLazyComponents,
   Hy as EnvironmentIcon,
   Jm as createLazyComponent,
-  e6 as reactRuntime,
+  V3 as preloadModule,
+  e6 as getReactRuntime,
   lw as initializeReactRuntime,
   oZ as createSignalFamily,
   pZ as createSignal,
@@ -48,6 +49,32 @@ let environmentSetupDefinition: { kind?: string };
 let pendingEnvironmentIdFamily: unknown;
 let isEnvironmentSetupActive: unknown;
 let environmentSetupOpenedAutomatically: unknown;
+let React: ReturnType<typeof getReactRuntime>;
+
+const environmentSetupDependencies = [
+  "./tab-panel-f36ccc73e17f.js",
+  "./rolldown-runtime-2d059c5e81f4.js",
+  "./app-shared-7b9edc1bfb7f.js",
+  "./app-shared-fa570b9eb9dd.css",
+  "./app-initial-51da50e6c6e3.js",
+  "./app-initial-e8ceb32eb626.css",
+  "./publish-actions-271f912485e5.js",
+  "./pending-onboarding-9e794fa64b02.js",
+  "./allowed-domains-input-2ddf45ddb4ff.js",
+  "./validation-message-f0452d72af5e.js",
+  "./change-messages-b91c906d971c.js",
+  "./configuration-fields-56633f88c571.js",
+  "./codex-diff-css-4cc1d2356a79.js",
+  "./register-pierre-themes-58d8ca57f84b.js",
+  "./File-4270090fca79.js",
+  "./renderFileChildren-897963e963e5.js",
+  "./file-diff-d04472cf49af.js",
+  "./file-diff-presentation-b78d448e2f9c.js",
+  "./virtualized-file-diff-line-position-c13dbee45987.js",
+  "./result-values-d618934c5c1e.js",
+  "./editor-370fecef1630.js",
+  "./error-1e0b38c6edf3.js",
+] as const;
 
 function createEnvironmentSetupDefinition({
   open,
@@ -76,7 +103,14 @@ function initializeEnvironmentSetupPanel(): void {
   initializeThreadState();
   initializeLazyComponents();
   EnvironmentSetupPanel = createLazyComponent(
-    async () => (await import("@rchunk/environment-setup-tab-panel")).EnvironmentSetupTabPanel,
+    async () => {
+      const { EnvironmentSetupTabPanel } = await preloadModule(
+        async () => import("@rchunk/environment-setup-tab-panel"),
+        environmentSetupDependencies,
+        import.meta.url,
+      );
+      return EnvironmentSetupTabPanel;
+    },
     { propagateLoadError: true },
   );
 }
@@ -100,7 +134,7 @@ function openEnvironmentSetupPanel(
   openSidePanelTab(scope, environmentSetupDefinition, {
     revealAndFocus: true,
     allowDuringThreadCreation: true,
-    icon: reactRuntime.createElement(EnvironmentIcon, null),
+    icon: React.createElement(EnvironmentIcon, null),
     id: `environment-setup:${isClientConversationId(conversationId)
       ? conversationId
       : (scope.get(canonicalConversationIdFamily, conversationId) ?? conversationId)}`,
@@ -130,6 +164,7 @@ function openEnvironmentSetupPanelOnce(scope: EnvironmentPanelScope, conversatio
 function initializeEnvironmentSetupSidePanel(): void {
   initializeSignalRuntime();
   initializeWindowRuntime();
+  React = getReactRuntime();
   initializeReactRuntime();
   initializeSidePanelRuntime();
   initializeEnvironmentAvailability();

@@ -45,5 +45,4 @@ function initializeGoogleChromeIcon(): void {
   jsx = getJsxRuntime();
   initialized = true;
 }
-initializeGoogleChromeIcon();
 export { initializeGoogleChromeIcon as n, GoogleChromeIcon as t };

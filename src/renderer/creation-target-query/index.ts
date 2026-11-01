@@ -5,10 +5,10 @@ import {
   QI as initializeScopedSignals,
   QX as createScopedQuery,
   ZI as conversationIdScope,
+  _H as parseGitRemoteUrl,
   ek as initializeQueryRuntime,
   wL as initializeUtilities,
 } from "@rchunk/app-shared";
-import { parseGitRemoteUrl } from "../app-shared/runtime/parse-git-remote-url";
 import {
   $sn as initializeExternalResources,
   AXt as initializeGitQueries,
@@ -93,10 +93,12 @@ function initializeCreationTargetQuery(): void {
       }
       const accountQuery =
         enabled && upstream?.host.toLowerCase() === "gitlab.com"
-          ? (get(gitLabAccountQuery, input.hostId) as { data?: unknown })
+          ? (get(gitLabAccountQuery, input.hostId) as { data?: { data?: unknown } })
           : null;
       const capability =
-        accountQuery?.data == null ? null : getGitLabCapability(accountQuery.data, "create");
+        accountQuery?.data == null
+          ? null
+          : getGitLabCapability(accountQuery.data.data, "create");
       return {
         enabled:
           enabled &&

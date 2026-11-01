@@ -1,5 +1,4 @@
 import "@rchunk/rolldown-runtime";
-import { getCanonicalHistoryEntries } from "../app-initial/runtime/canonical-history";
 import {
   HI as normalizePath,
   IK as pathsEqual,
@@ -7,6 +6,7 @@ import {
 } from "@rchunk/app-shared";
 import {
   Dpn as initializeConversationHistory,
+  Dhn as getCanonicalHistoryEntries,
   Fin as getConversationTurns,
   HZt as initializeSidePanelRoutes,
   Iin as initializeArtifactOrigins,
@@ -137,9 +137,7 @@ function findArtifactOriginatingTurn(
       editedFilePaths: string[];
       outputFilePaths: string[];
     };
-    const cwd = typeof turn.params === "object" && turn.params != null
-      ? String((turn.params as { cwd?: string }).cwd ?? "")
-      : "";
+    const cwd = String((turn.params as { cwd?: string }).cwd ?? "");
     const containsPath = [...changes.outputFilePaths, ...changes.editedFilePaths].some(
       (filePath) => pathsEqual(normalizePath(joinPath(cwd, filePath)), path),
     );
@@ -167,6 +165,7 @@ function initializeArtifactOriginatingTurn(): void {
   initializeArtifactOrigins();
   initializeTurnMessages();
   initializeTurnItems();
+  joinPath();
 }
 
 export {

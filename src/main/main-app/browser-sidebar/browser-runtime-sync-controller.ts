@@ -76,6 +76,12 @@ export function createBrowserRuntimeSyncControllerClass(dependencies: Record<str
         openBrowserUrlExternally: bind(`openBrowserUrlExternally`),
         getOwnerCommandAccelerators: (ownerId: number) => host.ownerCommandAccelerators[ownerId] ?? [],
         queuePageDeviceMetricsSync: bind(`queuePageDeviceMetricsSync`),
+        // The page binding runtime receives this helper object rather than the
+        // BrowserSidebarManager instance itself. Keep the Browser Use open
+        // request resolver available here so an authoritative guest attach can
+        // complete a pending IAB open without waiting for another renderer
+        // presentation update.
+        resolveBrowserUseOpenRequests: bind(`resolveBrowserUseOpenRequests`),
         reload: (page: any, options: any, ignoreCache: any, windowState: any) =>
           bind(`reload`)(page, options, ignoreCache == null ? undefined : { ignoreCache }, windowState),
         setDesignModifierPressed: bind(`setDesignModifierPressed`),

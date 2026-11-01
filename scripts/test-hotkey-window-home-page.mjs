@@ -70,7 +70,7 @@ const mocks = {
     "export const ig=input=>input.supportsCloud?state.cloudReason:(state.cloudReason??'unsupported'); export const ng=input=>input.composerMode==='cloud'&&input.cloudUnavailableReason?'local':input.composerMode==='worktree'&&!input.isWorktreeAvailable?'local':input.composerMode;",
     "export const kn=(root,options)=>{state.gitCalls.push({root,options}); return {gitRoot:root?root+'/.worktree':null};}; export const wf=(root,config,source,options)=>{state.taskCalls.push({root,config,source,options}); return {data:{task:true}};}; export const Nt=input=>state.modeChanges.push(input.composerMode==='local'?'worktree':'local'); export const Ps=(command,callback,options)=>state.hotkeys.push({command,callback,options});",
   ].join('\n'),
-  "use-floating-window-pointer-interactivity": [marker,"export const n=marker('pointer-init'); export const t=options=>{state.pointerOptions=options; return state.pointerInteractive;};"].join('\n'),
+  "use-floating-window-pointer-interactivity": [marker,"export const t=marker('pointer-init'); export const n=options=>{state.pointerOptions=options; return state.pointerInteractive;};"].join('\n'),
   "use-hotkey-window-dismiss-on-escape": [marker,"export const n=marker('dismiss-init'); export const t=()=>{state.dismissCalls++;};"].join('\n'),
   "worktree-environment-dropdown": [marker,"export const n=marker('environment-all'); export const c=marker('starting-init'); export const i=marker('branch-init'); export const o=marker('label-init'); export const r='BranchSwitcher'; export const s='StartingStateDropdown'; export const t='EnvironmentDropdown';"].join('\n'),
 };
@@ -119,8 +119,8 @@ check(projectlessModeRow.props.children[1].props.children.props.disabledTooltipT
 reset(); state.location.state={project:{type:"remote",projectId:"remote-1"}}; state.remoteProjects["remote-1"]={projectId:"remote-1",hostId:"host-1",remotePath:"/remote/repo",label:"Remote Repo"}; state.hostConfigs["host-1"]={id:"host-1"}; state.gitRoot="/remote/repo"; state.mode="cloud";
 root=render();
 check(composer(root).props.defaultCwd === "~" && composer(root).props.selectedProject.projectId === "remote-1", "routes remote projects through selectedProject instead of a local cwd");
-check(composer(root).props.placeholderText === "Ask ChatGPT anything in the cloud", "uses cloud placeholder for remote execution");
-check(menuRows(root)[4] === null, "hides permissions mode in cloud execution");
+check(composer(root).props.placeholderText === "Ask ChatGPT anything locally in Remote Repo", "falls remote projects back to local execution when cloud is unavailable");
+check(menuRows(root)[4] !== null, "keeps permissions mode visible after the local fallback");
 const projectRow=renderRow(menuRows(root)[0]);
 projectRow.props.children[1].props.children.props.onProjectSelected({type:"local",projectId:"next"});
 check(state.navigations[0].options.replace === true && state.navigations[0].options.state.project.projectId === "next", "persists project selection in route state");

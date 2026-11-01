@@ -60,6 +60,9 @@ async function openLocalConversationSubagentsPanel(
   }: OpenSubagentsOptions,
 ): Promise<unknown> {
   const id = tabId ?? getSubagentsTabId(parentConversationId);
+  const conversationMissing = selectedConversationId != null
+    && (!scope.get(conversationExistsFamily, selectedConversationId)
+      || scope.get(conversationRecordFamily, selectedConversationId) == null);
   let selectionAvailable: boolean | Promise<boolean> = true;
   if (selectedConversationId != null && !deferHydrationUntilActivation) {
     selectionAvailable = verifyDescendant(scope, {
@@ -86,11 +89,12 @@ async function openLocalConversationSubagentsPanel(
     id,
     insertPosition,
     onActivate: deferHydrationUntilActivation ? () => {
-      const current = scope.get<{ renderPanel?: unknown } | null>(rightPanelState.tabById$, id);
-      openLocalConversationSubagentsPanel(scope, {
+      const loading = openLocalConversationSubagentsPanel(scope, {
         revealAndFocus: false, hostId, openOverviewWhenSelectionUnavailable,
         parentConversationId, selectedConversationId, selectedDisplayName, tabId: id,
-      }).catch((error: unknown) => {
+      });
+      const current = scope.get<{ renderPanel?: unknown } | null>(rightPanelState.tabById$, id);
+      loading.catch((error: unknown) => {
         logger.warning("Failed to load restored subagent", { safe: {}, sensitive: { error } });
         const next = scope.get<{ renderPanel?: unknown } | null>(rightPanelState.tabById$, id);
         if (next != null && next.renderPanel === current?.renderPanel) {
@@ -135,8 +139,6 @@ async function openLocalConversationSubagentsPanel(
     return openedId;
   }
   const hydration: Promise<unknown>[] = [];
-  const conversationMissing = !scope.get(conversationExistsFamily, selectedConversationId)
-    || scope.get(conversationRecordFamily, selectedConversationId) == null;
   const store = scope.get<{ getConversation(id: string): { forkedFromId?: string | null } | undefined } | null>(
     conversationStoreFamily, hostId,
   );
@@ -149,8 +151,17 @@ async function openLocalConversationSubagentsPanel(
     activeTurnFamily, selectedConversationId,
   );
   const hydratedAt = scope.get<number | null>(lastHydratedTurnStartedAtFamily, selectedConversationId);
-  const hasVisibleActiveMessage = activeTurn?.items.some((item) =>
-    item.type === "agentMessage" && (item.text?.trim().length ?? 0) > 0) === true;
+  const activeTurnIsNewer = activeTurn?.turnStartedAtMs != null
+    && hydratedAt != null
+    && activeTurn.turnStartedAtMs > hydratedAt;
+  const activeTurnMissingFromParent = activeTurn?.turnStartedAtMs === hydratedAt
+    && activeTurn?.turnId != null
+    && scope.get(conversationHydratedFamily, parentConversationId) === true
+    && (scope.get<Array<{ turnId?: string }> | null>(conversationTurnsFamily, parentConversationId)
+      ?.some((turn) => turn.turnId === activeTurn.turnId) === false);
+  const hasVisibleActiveMessage = (activeTurnIsNewer || activeTurnMissingFromParent)
+    && activeTurn?.items.some((item) =>
+      item.type === "agentMessage" && (item.text?.trim().length ?? 0) > 0) === true;
   if (!conversationMissing
     && !scope.get(conversationHydratedFamily, selectedConversationId)
     && !hasVisibleActiveMessage) {

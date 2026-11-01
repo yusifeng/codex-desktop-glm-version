@@ -37,6 +37,20 @@ export interface EnvironmentDropdownProps {
 let jsx: JsxRuntime;
 
 function stripRemoteRef(branch: string): string { return branch.startsWith("refs/remotes/") ? branch.slice(13) : branch; }
+function defaultBranchControl({ currentBranch, disabled, isPending, switchTooltipText }: {
+  currentBranch?: string | null;
+  disabled?: boolean;
+  isPending?: boolean;
+  switchTooltipText?: string;
+}): unknown {
+  return ensureJsx().jsx("button", {
+    type: "button",
+    disabled,
+    title: switchTooltipText,
+    "aria-label": switchTooltipText ?? "Switch branch",
+    children: isPending ? "Loading branch…" : (currentBranch ?? "Choose branch"),
+  });
+}
 function chooseRemoteDefault(input: { currentBranch?: string | null; gitDefaultBranch?: string | null; recentBranches?: string[] | null; remoteDefaultBranch?: string | null }): string | null {
   const remote = input.remoteDefaultBranch;
   return remote && (remote === input.currentBranch || remote === input.gitDefaultBranch || input.recentBranches?.includes(remote)) ? remote : null;
@@ -55,6 +69,7 @@ function StartingStateDropdown(props: StartingStateDropdownProps): unknown {
   return runtime.jsx(BranchSwitcher, {
     cwd: props.gitRootOverride ?? "", gitRoot: props.gitRootOverride, hostConfig: props.hostConfig,
     side: props.side ?? "top", shouldShow: true,
+    renderControl: defaultBranchControl,
     onSelectBranch: (branch: string) => props.setStartingState({ type: "branch", branchName: stripRemoteRef(branch), remoteRef: branch }),
     currentBranch,
   });
@@ -65,7 +80,7 @@ function StaticUtilityLabel(props: { categoryLabel?: unknown; className?: string
 }
 
 function ComposerBranchSwitcher(props: Record<string, unknown>): unknown {
-  return ensureJsx().jsx(BranchSwitcher, { ...props, renderWhileLoading: true });
+  return ensureJsx().jsx(BranchSwitcher, { ...props, renderControl: props.renderControl ?? defaultBranchControl, renderWhileLoading: true });
 }
 
 function EnvironmentDropdown(props: EnvironmentDropdownProps): unknown {

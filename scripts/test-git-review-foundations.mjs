@@ -50,6 +50,7 @@ function appInitialMock() {
     export const lut = value => ({ synced: value }); export const sut = value => value.cwd;
     export const mnt = () => globalThis.__gitReviewFoundationsTest.initialized.push("app-runtime");
     export const pnt = { github: { available: true } };
+    export const z2t = () => ({ default: values => [...new Set(values)] });
   `;
 }
 
@@ -167,6 +168,7 @@ linePosition.i(root, { start: 1, end: 2 });
 assert.deepEqual(state.selection, { selection: { start: 1, end: 2 }, options: { notify: true } });
 
 const detail = await bundle("pull-request-detail-model");
+detail.s();
 const items = [
   { id: 1, reviewThreadId: "thread-1", url: "https://one" },
   { id: 2, reviewThreadId: "thread-1", url: "https://two" },

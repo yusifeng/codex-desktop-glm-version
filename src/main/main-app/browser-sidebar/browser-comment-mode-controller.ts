@@ -106,5 +106,113 @@ export function createBrowserCommentModeControllerClass(dependencies: Record<str
       };
       this.host.refreshCommentModeBlockStatus(e, r);
     }
+
+    refreshCommentModeBlockStatus(windowState: any, threadState: any) {
+      const applyResult = (result: any) => {
+        if (!result.changed && result.request == null) return;
+        if (result.changed) {
+          this.host.syncThreadState(windowState, threadState.conversationId, threadState);
+          if (result.shouldSyncRuntime && threadState.page != null) {
+            this.host.syncRuntimeStateToPage(threadState.page, threadState);
+          }
+        }
+        if (result.shouldPrepareComments) {
+          this.host.comments.prepare(
+            windowState.owner,
+            threadState.conversationId,
+            threadState.browserTabId,
+            threadState,
+          );
+        }
+        if (result.request != null && threadState.page != null) tq(threadState.page, result.request);
+      };
+      const reconcile = (blocked: boolean) => {
+        let changed = false;
+        let request = null;
+        let shouldPrepareComments = false;
+        let shouldSyncRuntime = false;
+        const disabledReason = blocked ? `site-blocked` : null;
+        if (threadState.snapshot.commentModeDisabledReason !== disabledReason) {
+          threadState.snapshot = {
+            ...threadState.snapshot,
+            commentModeDisabledReason: disabledReason,
+          };
+          changed = true;
+        }
+        if (blocked) {
+          if (threadState.pendingCommentModeActivation != null) {
+            threadState.pendingCommentModeActivation = null;
+          }
+          if (threadState.snapshot.interactionMode === `comment`) {
+            threadState.snapshot = EU(threadState.snapshot, `browse`);
+            this.host.comments.dismiss(
+              windowState.owner,
+              threadState.conversationId,
+              threadState.browserTabId,
+              threadState,
+            );
+            changed = true;
+            shouldSyncRuntime = true;
+          }
+          return { changed, request, shouldPrepareComments, shouldSyncRuntime };
+        }
+        if (threadState.pendingCommentModeActivation != null) {
+          const pending = threadState.pendingCommentModeActivation;
+          request = pending.request;
+          threadState.pendingCommentModeActivation = null;
+          if (
+            threadState.snapshot.interactionMode !== `comment` ||
+            threadState.snapshot.annotationFlow !== pending.annotationFlow
+          ) {
+            threadState.snapshot = {
+              ...EU(threadState.snapshot, `comment`),
+              annotationFlow: pending.annotationFlow,
+              annotationModeEntrySource: pending.annotationModeEntrySource,
+            };
+            changed = true;
+            shouldPrepareComments = true;
+            shouldSyncRuntime = true;
+          }
+        }
+        return { changed, request, shouldPrepareComments, shouldSyncRuntime };
+      };
+      const finishRequest = (requestId: number, url: string, blocked: boolean) => {
+        if (threadState.commentModeBlockCheckRequestId !== requestId) return;
+        threadState.commentModeBlockCheckUrl = null;
+        if (cW(threadState) === url) applyResult(reconcile(blocked));
+      };
+
+      const url = cW(threadState);
+      if (
+        threadState.pendingCommentModeActivation != null &&
+        (threadState.pendingCommentModeActivation.url !== url ||
+          threadState.pendingCommentModeActivation.navigationVersion !==
+            (threadState.page?.navigationVersion ?? null))
+      ) {
+        threadState.pendingCommentModeActivation = {
+          ...threadState.pendingCommentModeActivation,
+          request: null,
+          url,
+          navigationVersion: threadState.page?.navigationVersion ?? null,
+        };
+      }
+      const cached = this.host.commentModeBlocklistLookup.cachedCommentModeBlocked(url);
+      if (cached != null) {
+        applyResult(reconcile(cached));
+        return;
+      }
+      if (threadState.commentModeBlockCheckUrl === url) return;
+      if (
+        threadState.snapshot.commentModeDisabledReason != null &&
+        threadState.snapshot.url !== url
+      ) {
+        threadState.snapshot = { ...threadState.snapshot, commentModeDisabledReason: null };
+      }
+      threadState.commentModeBlockCheckUrl = url;
+      const requestId = ++threadState.commentModeBlockCheckRequestId;
+      this.host.commentModeBlocklistLookup
+        .isCommentModeBlocked(url)
+        .then((blocked: boolean) => finishRequest(requestId, url, blocked));
+    }
   };
 }

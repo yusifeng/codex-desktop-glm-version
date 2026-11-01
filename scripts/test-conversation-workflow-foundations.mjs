@@ -104,6 +104,7 @@ const reactRuntime = `() => ({
 
 const overrides = {
   "app-shared": {
+    "$3": `() => { const cache = []; return { c: size => { while (cache.length < size) cache.push(Symbol.for("react.memo_cache_sentinel")); return cache; } }; }`,
     "$O": `{ ONE_MINUTE: 60000 }`,
     BX: `(signal, parameter, options) => {
       const state = globalThis.__conversationWorkflowTest;
@@ -259,6 +260,7 @@ async function bundle(directory) {
 }
 
 const pinBridge = await bundle("thread-pin-shortcut-bridge");
+pinBridge.n();
 let toggles = 0;
 assert.equal(pinBridge.t({ enabled: false, onToggle: () => toggles++ }), null);
 state.shortcutHandler();
@@ -268,10 +270,12 @@ state.shortcutHandler();
 assert.equal(toggles, 1);
 
 const emoji = await bundle("thread-emoji");
+emoji.n();
 assert.equal(emoji.t({ threadId: "thread-1" }).type, "span");
 assert.deepEqual(emoji.t({ threadId: "thread-1" }).props.children, ["🚀", " "]);
 
 const planModel = await bundle("local-conversation-plan-model");
+planModel.n();
 const plan = planModel.t([
   { status: "completed", turnId: "turn-1", items: [{ id: "item", type: "plan", text: "# Build it\nBody" }] },
 ]);
@@ -281,6 +285,7 @@ assert.equal(plan.content.includes("Body"), true);
 assert.equal(planModel.t([{ status: "inProgress", items: [] }]), null);
 
 const terminal = await bundle("open-local-conversation-background-terminal-tab");
+terminal.t();
 const terminalTab = terminal.n({
   scope: state.scope,
   backgroundTerminal: { command: "npm test", id: "term-1" },
@@ -300,10 +305,12 @@ assert.equal(webMcp.t("https://example.com/path"), "example.com");
 assert.equal(webMcp.t("not a url"), undefined);
 
 const environmentMessages = await bundle("local-environment-workflow-messages");
+environmentMessages.t();
 assert.equal(environmentMessages.n.retry.defaultMessage, "Retry");
 assert.equal(environmentMessages.n.setup.id, "threadPage.runAction.environment.setup");
 
 const threadBridge = await bundle("thread-bridge");
+threadBridge.n();
 state.scope.get = () => [];
 assert.equal(threadBridge.t(), null);
 assert.equal(typeof threadBridge.n, "function");
@@ -349,6 +356,7 @@ assert.equal(readonlyPlan.options.id, "plan");
 assert.equal(readonlyPlan.options.props.content, "Plan");
 
 const resourceIcon = await bundle("local-conversation-external-resource-icon");
+resourceIcon.n();
 assert.equal(resourceIcon.r({ id: "drive", name: "Drive", pluginDisplayNames: [] }), "drive");
 assert.equal(resourceIcon.r({ id: "other", name: "Other", pluginDisplayNames: [] }), null);
 assert.equal(resourceIcon.t({ resource: { activities: ["provided"], url: "https://example.com" } }).props.className, "icon-sm");
@@ -363,10 +371,12 @@ assert.equal(environmentLabels.t({ configPath: "/tmp/dev.json", type: "success",
 assert.equal(environmentLabels.t({ configPath: "C:\\env\\prod.json", type: "success", environment: { name: "" } }), "prod.json");
 
 const documentTitle = await bundle("document-title");
+documentTitle.r();
 assert.equal(documentTitle.t({ title: "Task" }), null);
 assert.equal(globalThis.document.title, "Task");
 
 const gitConfig = await bundle("use-git-config-value");
+gitConfig.t();
 const gitValue = gitConfig.n("/repo", { id: "host" }, "user.email", "local", "test", { enabled: true });
 assert.equal(gitValue.parameter.key, "user.email");
 assert.equal(gitValue.parameter.lookup.cwd, "/repo");

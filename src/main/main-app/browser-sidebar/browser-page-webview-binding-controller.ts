@@ -34,7 +34,7 @@ export function createAnnotationContextMenuActions(
 
 /** Owns the complete page-to-WebContents binding lifecycle for Browser sidebar pages. */
 export function createBrowserPageWebviewBindingControllerClass(dependencies: Record<string, any>) {
-  const { e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, THe, zGe, G, me, pU, hU, HGe, zX, mU, _e, on, Xc, LXe, xU, al, ul, WX, bn, GX, JXe, YXe, EXe, n, a, iZ, tZ, eZ, nZ, rZ } = dependencies;
+  const { e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, THe, zGe, G, me, pU, hU, HGe, zX, mU, _e, on, Xc, LXe, xU, al, ul, WX, bn, GX, JXe, YXe, EXe, n, a, iZ, tZ, eZ, nZ, rZ, matchesLoadError, logger } = dependencies;
   const annotationContextMenuActions = createAnnotationContextMenuActions(n.gu);
   const pendingObservers = new WeakMap<object, any>();
   const resetCaptureState = (page: any) => {
@@ -66,6 +66,15 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
     pendingObservers.delete(webContents);
     webContents.removeListener(`destroyed`, pending.handleDestroyed);
     return pending.observer;
+  };
+  const findLoadError = (page: any, url: string) => {
+    if (matchesLoadError(page.loadError, url)) return page.loadError;
+    const exact = page.errorPagesByUrl.get(url);
+    if (exact != null || !url.startsWith(`data:`)) return exact ?? null;
+    for (const candidate of page.errorPagesByUrl.values()) {
+      if (matchesLoadError(candidate, url)) return candidate;
+    }
+    return null;
   };
 
   function bindPageToWebview(helpers: any, windowState: any, page: any, webContents: any, themeVariant: unknown, initialNavigationOwner: unknown): void {
@@ -155,6 +164,11 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
           conversationId: r.conversationId,
           mountGeneration: x.mountGeneration,
         }));
+      // A hidden Browser Use host can attach without another renderer
+      // presentation update. Resolve the open request at the authoritative
+      // point where the guest WebContents has been bound; otherwise the IAB
+      // caller waits until timeout even though the webview is already live.
+      e.resolveBrowserUseOpenRequests?.(t);
       let S = !1,
         C = r.navigationVersion,
         w = ({ enforceBudget: n = !0 } = {}) => {
@@ -165,7 +179,7 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
         },
         T = (n, a = !1) => {
           let o = TU(n ?? i.getURL()),
-            s = $U(r, o);
+          s = findLoadError(r, o);
           s == null
             ? (n != null || o.length > 0 || r.url.length === 0) &&
               (n != null || o !== r.url) &&
@@ -256,7 +270,7 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
           ((r.isMainFrameLoading = !1), (r.isWaitingForResponse = !1), T());
           let t = TU(i.mainFrame.url);
           t.length !== 0 &&
-            $U(r, t) == null &&
+            findLoadError(r, t) == null &&
             e.windowManager.sendMessageToWebContents(c.owner, {
               type: `browser-sidebar-page-loaded`,
               agentInitiated: r.isAgentInitiatedLoad,
@@ -315,7 +329,7 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
           let u = TU(c);
           if (
             (l && c === `about:blank`) ||
-            $U(r, u) != null ||
+            findLoadError(r, u) != null ||
             EHe({ errorCode: o, errorDescription: s, isMainFrame: l })
           )
             return;
@@ -466,7 +480,7 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
           (e.windowManager.sendMessageToWebContents(t.owner, {
             type: `browser-sidebar-tab-render-process-gone`,
           }),
-            $X().warning(`browser sidebar render process gone`, {
+            logger().warning(`browser sidebar render process gone`, {
               safe: { conversationId: r.conversationId, exitCode: a.exitCode, reason: a.reason },
               sensitive: { url: i.getURL() },
             }));
@@ -475,7 +489,7 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
         },
         ue = () => {
           if (se()) return;
-          $X().warning(`IAB browser page unresponsive`, {
+          logger().warning(`IAB browser page unresponsive`, {
             safe: { conversationId: r.conversationId },
             sensitive: { url: i.getURL() },
           });
@@ -485,7 +499,7 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
         de = () => {
           let n = e.getThreadStateForWindow(t, r.conversationId, r.browserTabId);
           n &&
-            ($X().info(`browser sidebar dom-ready`, {
+            (logger().info(`browser sidebar dom-ready`, {
               safe: { conversationId: r.conversationId, interactionMode: n.snapshot.interactionMode },
               sensitive: { url: i.getURL() },
             }),
@@ -498,7 +512,7 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
             ));
         },
         fe = (t, n, i) => {
-          ($X().error(`browser sidebar preload failed`, {
+          (logger().error(`browser sidebar preload failed`, {
             safe: { conversationId: r.conversationId, preloadPath: n },
             sensitive: { error: i },
           }),

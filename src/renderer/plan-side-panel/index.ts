@@ -207,9 +207,9 @@ function initializePlanSidePanel(): void {
   initializeErrors();
   initializeEditablePlanTab();
   initializeEditablePlanStorage();
+  joinPath();
+  (planRouteKind as unknown as () => void)();
   planPanelDefinition = createPlanPanelDefinition({ open: openReadonlyPlan });
-  void joinPath;
-  void planRouteKind;
 }
 
 export {

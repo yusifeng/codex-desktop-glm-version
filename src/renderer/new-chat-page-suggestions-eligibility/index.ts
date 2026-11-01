@@ -1,8 +1,18 @@
 // new-chat-page-suggestions-eligibility —— 新对话页 suggestions 的来源、就绪与展示资格。
 // 原版：app/webview/assets/new-chat-page-suggestions-eligibility-3faf4b7da2a4.js。
 
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
+import "@rchunk/rolldown-runtime";
+import {
+  $3 as getCompilerRuntime,
+  $O as timeConstants,
+  _L as useQuery,
+  ek as initializeQueryRuntime,
+  gL as initializeAppServices,
+} from "@rchunk/app-shared";
+import {
+  mnt as initializeAmbientSuggestionsService,
+  pnt as appServices,
+} from "@rchunk/app-initial";
 
 export type NewChatSuggestionSource = "generated" | "curated";
 
@@ -18,18 +28,57 @@ export interface AmbientSuggestionAppQueryOptions {
   accountId: string;
   enabled: boolean;
   hostId: string;
-  hasAccessibleAndEnabledApp?(input: { hostId: string }): Promise<boolean | null | undefined>;
 }
 
-function createAmbientSuggestionAppQuery(options: AmbientSuggestionAppQueryOptions) {
-  return {
-    queryKey: ambientSuggestionAppAccountQueryKey(options.hostId, options.accountId),
-    queryFn: async () =>
-      (await options.hasAccessibleAndEnabledApp?.({ hostId: options.hostId })) ?? false,
-    enabled: options.enabled,
-    retry: false as const,
-    staleTime: 5 * 60 * 1000,
-  };
+interface CompilerRuntime {
+  c(size: number): unknown[];
+}
+
+let compilerRuntime: CompilerRuntime;
+
+function createAmbientSuggestionAppQuery({
+  accountId,
+  enabled,
+  hostId,
+}: AmbientSuggestionAppQueryOptions): unknown {
+  const cache = compilerRuntime.c(9);
+  let queryKey: readonly string[];
+  if (cache[0] !== accountId || cache[1] !== hostId) {
+    queryKey = ambientSuggestionAppAccountQueryKey(hostId, accountId);
+    cache[0] = accountId;
+    cache[1] = hostId;
+    cache[2] = queryKey;
+  } else {
+    queryKey = cache[2] as readonly string[];
+  }
+
+  let queryFn: () => Promise<boolean>;
+  if (cache[3] !== hostId) {
+    queryFn = async () =>
+      (await appServices.ambientSuggestions?.hasAccessibleAndEnabledApp({ hostId })) ?? false;
+    cache[3] = hostId;
+    cache[4] = queryFn;
+  } else {
+    queryFn = cache[4] as () => Promise<boolean>;
+  }
+
+  let options: Record<string, unknown>;
+  if (cache[5] !== enabled || cache[6] !== queryKey || cache[7] !== queryFn) {
+    options = {
+      queryKey,
+      queryFn,
+      enabled,
+      retry: false,
+      staleTime: timeConstants.FIVE_MINUTES,
+    };
+    cache[5] = enabled;
+    cache[6] = queryKey;
+    cache[7] = queryFn;
+    cache[8] = options;
+  } else {
+    options = cache[8] as Record<string, unknown>;
+  }
+  return useQuery(options as never);
 }
 
 function selectNewChatSuggestionSource(input: {
@@ -64,7 +113,12 @@ function shouldShowNewChatPageSuggestions(input: {
   return input.hasProjectRoot && input.shouldShowHomeSuggestions;
 }
 
-function initializeNewChatPageSuggestionsEligibility(): void {}
+function initializeNewChatPageSuggestionsEligibility(): void {
+  compilerRuntime = getCompilerRuntime() as unknown as CompilerRuntime;
+  initializeAppServices();
+  initializeAmbientSuggestionsService();
+  initializeQueryRuntime();
+}
 
 export {
   initializeNewChatPageSuggestionsEligibility as a,

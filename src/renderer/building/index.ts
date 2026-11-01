@@ -29,5 +29,4 @@ function initializeBuildingIcon(): void {
   initialized = true;
 }
 
-initializeBuildingIcon();
 export { initializeBuildingIcon as n, BuildingIcon as t };

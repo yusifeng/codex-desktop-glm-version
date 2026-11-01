@@ -76,6 +76,7 @@ async function listSourceFiles(dir) {
 // draft rewrites are not needlessly bundled and then replaced.
 const recoveredRouteSourceDir = path.join(ROOT, "src/renderer-recovered/conversation-route");
 const recoveredRouteChunks = await collectConversationRouteClosure(recoveredRouteSourceDir);
+const exactRouteOutputs = new Set(EXACT_ROUTE_SOURCE_OWNERS.values());
 
 // ---- bundle：已重写的 renderer chunk ----
 const errors = [];
@@ -84,6 +85,16 @@ let skippedSemanticRouteDrafts = 0;
 let exactRouteSourcesBuilt = 0;
 for (const name of REWRITTEN) {
   const exactOutput = EXACT_ROUTE_SOURCE_OWNERS.get(name);
+  // Several historical semantic names intentionally point at the same release
+  // chunk. Once one of those names has a release-faithful exact owner, do not
+  // let a later compatibility implementation silently overwrite that output.
+  // This matters for runtime-4b6d... (thread-shell-runtime vs runtime) and for
+  // pending-onboarding, and keeps output ownership deterministic as additional
+  // route dependencies are promoted.
+  if (exactOutput == null && exactRouteOutputs.has(CHUNKS[name])) {
+    skippedSemanticRouteDrafts += 1;
+    continue;
+  }
   if (exactOutput != null && exactOutput !== CHUNKS[name]) {
     errors.push(`${name}: exact route owner output ${exactOutput} does not match ${CHUNKS[name]}`);
     continue;
@@ -162,7 +173,12 @@ const assetSources = new Map(
 const hasDefaultExport = (code) =>
   /export\s+default\b|export\s*\{[^}]*\bas\s+default\b/.test(code);
 for (const [name, originalCode] of assetSources) {
-  let code = originalCode.replace(
+  // @exact-chunk is a build-only namespace. esbuild rewrites static imports via
+  // the plugin above, but release chunks also embed dependency URLs in Vite
+  // preload tables and occasionally use template-literal dynamic imports. Turn
+  // every surviving build alias back into a sibling runtime URL so lazy route
+  // dependencies cannot request app://-/assets/@exact-chunk/... at runtime.
+  let code = originalCode.replace(/(["'`])@exact-chunk\//g, "$1./").replace(
     /import\s+\{\s*default\s+as\s+([A-Za-z_$][\w$]*)\s*\}\s+from\s+(["'])\.\/([^"']+\.js)\2;/g,
     (statement, binding, quote, target) => {
       const targetCode = assetSources.get(target);
@@ -173,6 +189,14 @@ for (const [name, originalCode] of assetSources) {
   );
   if (code !== originalCode) await fs.writeFile(path.join(assetsDir, name), code);
 }
+
+const leakedExactAliases = [];
+for (const name of assetNames) {
+  const code = await fs.readFile(path.join(assetsDir, name), "utf8");
+  if (code.includes("@exact-chunk/")) leakedExactAliases.push(name);
+}
+if (leakedExactAliases.length > 0)
+  errors.push(`build-only @exact-chunk aliases leaked into ${leakedExactAliases.length} runtime assets`);
 
 // ---- CSS：src/renderer/<语义名>/index.css → assets/<chunk 基名>.css ----
 for (const name of REWRITTEN) {

@@ -1,6 +1,6 @@
 import "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeCompilerCache,
+  $3 as getCompilerRuntime,
   FX as initializeSignalRuntime,
   HX as useSignalValue,
   LX as useScope,
@@ -26,11 +26,24 @@ export interface ThreadBridgeProps {
   transcriptMcpAppIds?: Set<string>;
 }
 
-function ThreadBridge({
-  transcriptMcpAppIds,
-  shouldBlockExternalEgress = false,
-}: ThreadBridgeProps = {}): null {
-  const React = getReactRuntime();
+interface CompilerRuntime {
+  c(size: number): unknown[];
+}
+
+let compilerRuntime: CompilerRuntime;
+let React: ReturnType<typeof getReactRuntime>;
+
+function ThreadBridge(props?: ThreadBridgeProps): null {
+  const cache = compilerRuntime.c(12);
+  let resolvedProps: ThreadBridgeProps;
+  if (cache[0] === props) {
+    resolvedProps = cache[1] as ThreadBridgeProps;
+  } else {
+    resolvedProps = props === undefined ? {} : props;
+    cache[0] = props;
+    cache[1] = resolvedProps;
+  }
+  const { transcriptMcpAppIds, shouldBlockExternalEgress = false } = resolvedProps;
   const scope = useScope(conversationScope);
   const composer = useScope(composerScope);
   const apps = useSignalValue(activeMcpApps) as Map<
@@ -38,34 +51,72 @@ function ThreadBridge({
     { hostedInThreadScrollLayout?: boolean }
   >;
 
-  React.useLayoutEffect(() => {
-    if (
-      shouldBlockExternalEgress &&
-      (scope as { value?: { routeKind?: string } }).value?.routeKind === "chatgpt-thread" &&
-      (composer as { get(signal: unknown): unknown[] }).get(queuedComposerItems).length > 0
-    ) {
-      clearQueuedComposerItems(composer);
-    }
-    for (const [appId, app] of apps) {
+  let synchronizeThread: () => void;
+  let synchronizeDependencies: unknown[];
+  if (
+    cache[2] !== composer ||
+    cache[3] !== apps ||
+    cache[4] !== scope ||
+    cache[5] !== shouldBlockExternalEgress ||
+    cache[6] !== transcriptMcpAppIds
+  ) {
+    synchronizeThread = () => {
       if (
-        shouldBlockExternalEgress ||
-        (app.hostedInThreadScrollLayout && transcriptMcpAppIds?.has(appId) === false)
+        shouldBlockExternalEgress &&
+        (scope as unknown as { value: { routeKind: string } }).value.routeKind === "chatgpt-thread" &&
+        (composer as { get(signal: unknown): unknown[] }).get(queuedComposerItems).length > 0
       ) {
-        closeMcpApp(scope, appId);
+        clearQueuedComposerItems(composer);
       }
-    }
-  }, [transcriptMcpAppIds, composer, apps, scope, shouldBlockExternalEgress]);
+      for (const [appId, app] of apps) {
+        if (
+          shouldBlockExternalEgress ||
+          (app.hostedInThreadScrollLayout && transcriptMcpAppIds?.has(appId) === false)
+        ) {
+          closeMcpApp(scope, appId);
+        }
+      }
+    };
+    synchronizeDependencies = [
+      transcriptMcpAppIds,
+      composer,
+      apps,
+      scope,
+      shouldBlockExternalEgress,
+    ];
+    cache[2] = composer;
+    cache[3] = apps;
+    cache[4] = scope;
+    cache[5] = shouldBlockExternalEgress;
+    cache[6] = transcriptMcpAppIds;
+    cache[7] = synchronizeThread;
+    cache[8] = synchronizeDependencies;
+  } else {
+    synchronizeThread = cache[7] as () => void;
+    synchronizeDependencies = cache[8] as unknown[];
+  }
+  React.useLayoutEffect(synchronizeThread, synchronizeDependencies);
 
-  React.useLayoutEffect(() => {
-    connectThreadScope(scope);
-  }, [scope]);
+  let connectScope: () => void;
+  let connectDependencies: unknown[];
+  if (cache[9] !== scope) {
+    connectScope = () => connectThreadScope(scope);
+    connectDependencies = [scope];
+    cache[9] = scope;
+    cache[10] = connectScope;
+    cache[11] = connectDependencies;
+  } else {
+    connectScope = cache[10] as () => void;
+    connectDependencies = cache[11] as unknown[];
+  }
+  React.useLayoutEffect(connectScope, connectDependencies);
   return null;
 }
 
 function initializeThreadBridge(): void {
-  initializeCompilerCache();
+  compilerRuntime = getCompilerRuntime() as unknown as CompilerRuntime;
   initializeSignalRuntime();
-  getReactRuntime();
+  React = getReactRuntime();
   initializeComposerState();
   initializeThreadBridgeState();
   initializeConversationScope();

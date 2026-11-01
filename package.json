@@ -13,6 +13,8 @@
     "recover-renderer-route-source": "node scripts/recover-renderer-route-source.mjs",
     "verify-renderer": "node scripts/verify-renderer.mjs",
     "verify-renderer-cluster": "node scripts/verify-renderer-cluster.mjs",
+    "e2e:inspect": "node scripts/inspect-electron-renderer.mjs",
+    "e2e:readonly": "node scripts/e2e-electron-renderer.mjs smoke-readonly",
     "verify": "node scripts/verify-chunks.mjs",
     "audit-test-index": "node scripts/audit-test-index.mjs",
     "pack": "./scripts/pack.sh",

@@ -13,8 +13,12 @@ const check = (value, message) => { assert.equal(value, true, message); assertio
 
 const calls = [];
 const thread = {
+  conversationId: "c1",
   isAnnotationModeEnabled: true,
   pendingWindowTransfer: false,
+  pendingCommentModeActivation: null,
+  commentModeBlockCheckRequestId: 0,
+  commentModeBlockCheckUrl: null,
   browserTabId: 3,
   snapshot: { interactionMode: "comment", annotationFlow: null, comments: [], annotationEditorMode: "comment" },
   page: { navigationVersion: 2 },
@@ -63,12 +67,36 @@ controller.requestCommentMode(windowState, "c1", thread, "batch", null);
 check(thread.pendingCommentModeActivation?.url === "https://example.test/page", "unknown block status is queued");
 check(calls.some((call) => call[0] === "refresh"), "unknown block status refreshes the gate");
 
+host.commentModeBlocklistLookup.cachedCommentModeBlocked = () => true;
+thread.snapshot = { ...thread.snapshot, interactionMode: "comment", commentModeDisabledReason: null };
+controller.refreshCommentModeBlockStatus(windowState, thread);
+check(thread.snapshot.commentModeDisabledReason === "site-blocked", "blocked sites record the disabled reason");
+check(thread.snapshot.interactionMode === "browse", "blocked sites leave comment mode");
+
+host.commentModeBlocklistLookup.cachedCommentModeBlocked = () => null;
+host.commentModeBlocklistLookup.isCommentModeBlocked = async () => false;
+thread.snapshot = { ...thread.snapshot, interactionMode: "browse", commentModeDisabledReason: null };
+thread.pendingCommentModeActivation = {
+  annotationFlow: "batch",
+  annotationModeEntrySource: "toolbar",
+  navigationVersion: 2,
+  request: { kind: "comment" },
+  url: "https://example.test/page",
+};
+controller.refreshCommentModeBlockStatus(windowState, thread);
+await Promise.resolve();
+check(thread.pendingCommentModeActivation == null, "async allowed status consumes the pending activation");
+check(thread.snapshot.interactionMode === "comment", "async allowed status enters comment mode");
+check(calls.filter((call) => call[0] === "point").length >= 2, "async allowed status forwards its pending request");
+
 const source = fs.readFileSync(modulePath, "utf8");
-for (const method of ["setInteractionMode", "startCommentAtPoint", "startDesignEditAtPoint", "requestCommentMode"]) {
+for (const method of ["setInteractionMode", "startCommentAtPoint", "startDesignEditAtPoint", "requestCommentMode", "refreshCommentModeBlockStatus"]) {
   check(source.includes(`    ${method}(`), `${method} is owned by the controller`);
 }
 const main = fs.readFileSync(path.join(root, ".reference/originals/main/main-C-Mhak1n.ts"), "utf8");
 check((main.match(/createBrowserCommentModeControllerClass/g) ?? []).length >= 2, "main wires the controller at construction and import");
 check((main.match(/setInteractionMode\(\.\.\.args\)/g) ?? []).length >= 1, "main delegates interaction mode");
+const recoveredMain = fs.readFileSync(path.join(root, "src/main-recovered/main-C-Mhak1n.ts"), "utf8");
+check(recoveredMain.includes("refreshCommentModeBlockStatus(...args)"), "main delegates comment-mode block status refresh");
 
 console.log(`${assertions} browser comment mode assertions passed`);

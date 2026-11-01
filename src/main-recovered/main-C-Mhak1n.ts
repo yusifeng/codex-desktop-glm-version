@@ -26268,10 +26268,10 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
         (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ hX, fq, tq, KU, EZ, lifecycleHelpersClass: createBrowserPageLifecycleHelpersControllerClass, WU, dZ, QU, Ze: normalizeUrlOrBlank, n, pX, dZe, oX, dq, isEqual: G.default }))(this)),
         (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW, fq, matchesLoadError: FU, normalizeUrl: normalizeUrlOrBlank, resetCaptureState: (page) => { page.isCapturingUserMedia = !1; page.isCapturingCamera = void 0; page.isCapturingMicrophone = void 0; }, clearSiteTools: XX, serializePageState: eW, shouldIgnoreLoadError: NU, shouldRetryLoadError: PU, logger: r.i, setTimer: setTimeout, retryDelayMs: 50, maxAttempts: 100 }))(this)),
         (this.pageLookupController = new (createBrowserPageLookupControllerClass({}))(this)),
-(this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze: normalizeUrlOrBlank, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, THe, zGe, G, me, pU, hU, HGe, zX, mU, _e, on, Xc, LXe, xU, al, ul, WX, bn, GX, JXe, YXe, EXe, n, a, iZ, tZ, eZ, nZ, rZ, WXe, RX }))(this)),
+(this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze: normalizeUrlOrBlank, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, THe, zGe, G, me, pU, hU, HGe, zX, mU, _e, on, Xc, LXe, xU, al, ul, WX, bn, GX, JXe, YXe, EXe, n, a, iZ, tZ, eZ, nZ, rZ, WXe, RX, matchesLoadError: FU, logger: r.i(`browser-sidebar-manager`) }))(this)),
         (this.hostPolicyController = new (createBrowserHostPolicyControllerClass({ DXe, OXe, kXe, mq, VG, Yc, Xc, DZ, hX }))(this)),
         (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
-        (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, installBrowserWebviewListeners, aXe, gX, qU, oXe, vX, tq, KU, l, EZ, logger: r.i(`browser-sidebar-manager`) }))(this)),
+        (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, installBrowserWebviewListeners, aXe, gX, qU, oXe, vX, PG, _X, fX, tq, KU, l, EZ, logger: r.i(`browser-sidebar-manager`) }))(this)),
         (this.getSiteBootstrapToken = s.getSiteBootstrapToken),
         (this.getCommandKeymapState = s.getCommandKeymapState ?? n.Ct),
         (this.ownerCommandAccelerators = mq(this.getCommandKeymapState())),
@@ -26604,6 +26604,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
     startCommentAtPoint(...args) { return this.commentModeController.startCommentAtPoint(...args); }
     startDesignEditAtPoint(...args) { return this.commentModeController.startDesignEditAtPoint(...args); }
     requestCommentMode(...args) { return this.commentModeController.requestCommentMode(...args); }
+    refreshCommentModeBlockStatus(...args) { return this.commentModeController.refreshCommentModeBlockStatus(...args); }
     clearComments(...args) { return this.annotationInteractionController.clearComments(...args); }
     discardPendingAnnotations(...args) { return this.annotationInteractionController.discardPendingAnnotations(...args); }
     clearAnnotations(...args) { return this.annotationInteractionController.clearAnnotations(...args); }
@@ -26655,6 +26656,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
     getCurrentWindowState(...args) { return this.windowThreadStateController.getCurrentWindowState(...args); }
     getCurrentWindow(...args) { return this.windowThreadStateController.getCurrentWindow(...args); }
     getThreadState(...args) { return this.windowThreadStateController.getThreadState(...args); }
+    ensureThreadState(...args) { return this.windowThreadStateController.ensureThreadState(...args); }
     ensureThreadStateForWindow(...args) { return this.windowThreadStateController.ensureThreadStateForWindow(...args); }
     disposeThreadState(...args) { return this.windowThreadStateController.disposeThreadState(...args); }
     disposeWindowState(...args) { return this.windowThreadStateController.disposeWindowState(...args); }

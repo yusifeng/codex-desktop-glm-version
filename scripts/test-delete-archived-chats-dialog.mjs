@@ -37,7 +37,8 @@ const result = await esbuild.build({
                 export const Rh = "DialogTitle"; export const Y2 = "FormattedMessage"; export const Yh = "Button";
                 export const jh = "DialogSection"; export const Ah = "DialogHeading"; export const kh = "DialogActions";
                 export const Oh = "DialogContent"; export const Ih = "Dialog";
-                export const $3 = () => {}; export const K2 = () => {}; export const Zh = () => {};
+                const compiler = { c: (size) => Array(size).fill(Symbol.for("react.memo_cache_sentinel")) };
+                export const $3 = () => compiler; export const K2 = () => {}; export const Zh = () => {};
                 export const zh = () => {}; export const Ph = () => {};
               `,
           loader: "js",

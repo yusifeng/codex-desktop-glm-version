@@ -190,10 +190,10 @@ const initial = new Proxy(
     lpn: signal("route"),
     Q_t: signal("pinnedIds"),
     tvt: signal("blocked"),
-    dyt: signal("pins"),
+    dyt: signal("conversation"),
+    I0t: signal("pins"),
     mun: signal("account"),
     cyt: signal("layout"),
-    iyt: signal("conversation"),
     wVt: signal("serverId"),
     _Qt: signal("turns"),
     mpn: signal("intl"),
@@ -321,6 +321,7 @@ for (const name of [
   "ng",
   "nvt",
   "out",
+  "iyt",
   "pdn",
   "ppn",
   "pst",
@@ -464,6 +465,20 @@ assert.equal(
   null,
 );
 runtimeAssertions += 1;
+const preloadBridgeSource = fs.readFileSync(
+  path.join(
+    root,
+    "src/renderer/pinned-content-tab-preload-bridge/index.ts",
+  ),
+  "utf8",
+);
+assert.match(preloadBridgeSource, /snapshot\.get\(initial\.I0t\)/u);
+assert.match(
+  preloadBridgeSource,
+  /this\.scope\.get\(initial\.dyt\) === conversationId/u,
+);
+assert.match(preloadBridgeSource, /initial\.iyt\(\)/u);
+runtimeAssertions += 3;
 globalThis.__mzKatex = (content, options) => [
   {
     type: "element",

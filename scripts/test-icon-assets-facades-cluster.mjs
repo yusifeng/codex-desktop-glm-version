@@ -26,6 +26,7 @@ const appSharedMock = `
   const s=globalThis.__assetFacadeTest;
   function ReactRuntime(){return ReactRuntime}
   ReactRuntime.Children={toArray:(children)=>children==null?[]:(Array.isArray(children)?children:[children]),map:(children,mapper)=>(Array.isArray(children)?children:[children]).map(mapper)};
+  export const $3=()=>{const cache=[];return {c:size=>{while(cache.length<size)cache.push(Symbol.for("react.memo_cache_sentinel"));return cache}}};
   export const e6=ReactRuntime;
   export const I3=()=>s.jsx;
   export const h4=()=>{};

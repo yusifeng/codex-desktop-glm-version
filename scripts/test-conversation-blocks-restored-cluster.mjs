@@ -29,7 +29,8 @@ const result = await esbuild.build({
       : name === "app-initial" ? "export const $en={};export const cct={};export const gct={};export const Ern=({apps})=>apps?.[0]??null;export const C=()=>globalThis.__conversationBlocksTest.calls.push('initial');"
       : name === "app-primary" ? "export const d=()=>globalThis.__conversationBlocksTest.calls.push('primary');"
       : name === "agent-activity-item" ? "export const n=()=>globalThis.__conversationBlocksTest.calls.push('activity-item');export const t=x=>x;"
-      : name === "agent-activity-units" ? "export const n=()=>globalThis.__conversationBlocksTest.calls.push('activity-units');"
+      : name === "agent-activity-units" ? "export const n=()=>{throw new Error('activityUnitKey is not an initializer')};export const y=()=>globalThis.__conversationBlocksTest.calls.push('activity-units');"
+      : name === "elicitation-events" ? "export const n=()=>{throw new Error('recordElicitationInteraction is not an initializer')};export const r=()=>{};export const t=()=>globalThis.__conversationBlocksTest.calls.push('elicitation-events');"
       : name === "mcp-tool-item-content" ? "export const n=()=>{};export const t=props=>({type:'mcp-tool-content',props});"
       : name === "plan-summary-item-content" ? "export const n=()=>{};export const t=props=>({type:'plan-summary',props});"
       : name === "scroll-to-match" ? "export const n=()=>globalThis.__conversationBlocksTest.calls.push('scroll');"
@@ -52,6 +53,9 @@ assert.deepEqual(blocks.I([{ id: "2", parentTurnKey: "t", displayName: "Beta" },
 assert.equal(blocks.x({ conversationId: "c", src: "image.png" }).type, "img");
 assert.equal(blocks.S({ conversationId: "c", hostId: "h", srcs: ["a.png", "b.png"] }).props["data-image-stack"], true);
 assert.equal(blocks.C({ attachment: { name: "report.txt", path: "/tmp/report.txt" } }).props["data-attachment"], true);
+assert.equal(blocks.u({ item: { type: "user-message", message: "Recovered user message" } }).props.children, "Recovered user message");
+assert.equal(blocks.W({ item: { type: "assistant-message", outputText: "Recovered assistant reply" } }).props.children[0].props.children, "Recovered assistant reply");
+assert.equal(blocks.W({ item: { type: "agentMessage", text: "Raw agent reply" } }).props.children[0].props.children, "Raw agent reply");
 assert.equal(blocks.f({ item: { action: "search", query: "release notes" } }).props["data-web-search"], "search");
 assert.equal(blocks.K({ results: [] }), null);
 assert.equal(find(blocks.K({ results: ["one"] }), node => node.props?.["data-search-result"] === true).props["data-search-result"], true);
@@ -68,6 +72,7 @@ const unit = (type, extra = {}) => ({ kind: "standalone", item: { item: { type, 
 const assembled = blocks.a({ conversationId: "conversation", hostId: "local", renderMcpApps: true, keepMcpAppEntriesPersistent: true, units: [
   unit("realtime-transcript"),
   unit("assistant-message"),
+  unit("agentMessage", { text: "Raw projected reply" }),
   unit("realtime-transcript"),
   unit("user-message", { steeringStatus: "pending" }),
   unit("mcp-tool-call", { mcpAppResourceUri: "ui://widget", result: { type: "success" } }),
@@ -75,6 +80,7 @@ const assembled = blocks.a({ conversationId: "conversation", hostId: "local", re
 ] });
 assert.ok(find(assembled, node => node.props?.["data-turn-blocks"] === true));
 assert.ok(find(assembled, node => node.props?.["data-turn-unit-type"] === "assistant-message") ?? find(assembled, node => node.props?.["data-conversation-block"] === "assistant-message"));
+assert.equal(find(assembled, node => node.props?.["data-conversation-block"] === "assistant-message" && node.props.children?.[0]?.props?.children === "Raw projected reply") != null, true);
 assert.equal(find(assembled, node => node.type === "mcp-tool-content").props.conversationId, "conversation");
 assert.equal(find(assembled, node => node.type === "mcp-tool-content").props.hostId, "local");
 assert.equal(find(assembled, node => node.type === "mcp-tool-content").props.renderMcpApps, true);
@@ -96,4 +102,6 @@ assert.match(JSON.stringify(blocks.W({ item: { content: [{ text: "structured" }]
 
 blocks.i(); blocks.i(); blocks.n(); blocks.t();
 assert.equal(calls.filter(value => value === "activity-item").length, 1);
+assert.equal(calls.filter(value => value === "activity-units").length, 1);
+assert.equal(calls.filter(value => value === "elicitation-events").length, 1);
 console.log("conversation blocks restored cluster assertions passed");

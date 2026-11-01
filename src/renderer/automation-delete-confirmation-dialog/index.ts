@@ -7,7 +7,7 @@ import type { JsxRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
 const {
-  $3: initializeJsxRuntime,
+  $3: getCompilerRuntime,
   Ah: DialogHeader,
   I3: getJsxRuntime,
   Ih: Dialog,
@@ -24,11 +24,13 @@ const {
   zh: initializeDialog,
 } = appSharedChunk;
 let jsxRuntime: JsxRuntime | null = null;
+interface CompilerRuntime { c(size: number): unknown[] }
+let compilerRuntime: CompilerRuntime;
 let initialized = false;
 
 function initializeAutomationDeleteConfirmationDialog(): void {
   if (initialized) return;
-  initializeJsxRuntime();
+  compilerRuntime = getCompilerRuntime() as unknown as CompilerRuntime;
   initializeIntlRuntime();
   initializeButton();
   initializeDialog();
@@ -57,9 +59,24 @@ function AutomationDeleteConfirmationDialog({
   open,
 }: AutomationDeleteConfirmationDialogProps): unknown {
   initializeAutomationDeleteConfirmationDialog();
+  const cache = compilerRuntime.c(26);
   const jsx = getInitializedJsxRuntime();
-  const title = jsx.jsx(DialogTitle, {
-    children: jsx.jsx(FormattedMessage, {
+  let handleOpenChange: (nextOpen: boolean) => void;
+  if (cache[0] === onCancel) handleOpenChange = cache[1] as typeof handleOpenChange;
+  else {
+    handleOpenChange = (nextOpen) => { if (!nextOpen) onCancel(); };
+    cache[0] = onCancel; cache[1] = handleOpenChange;
+  }
+  let handleSubmit: (event: FormSubmitEvent) => void;
+  if (cache[2] === onConfirm) handleSubmit = cache[3] as typeof handleSubmit;
+  else {
+    handleSubmit = (event) => { event.preventDefault(); onConfirm(); };
+    cache[2] = onConfirm; cache[3] = handleSubmit;
+  }
+  let title: unknown;
+  if (cache[4] === name) title = cache[5];
+  else {
+    title = jsx.jsx(DialogTitle, { children: jsx.jsx(FormattedMessage, {
       id: "inbox.automations.deleteConfirm.title",
       defaultMessage: "Delete {name}?",
       description: "Title for the delete automation confirmation dialog",
@@ -69,59 +86,75 @@ function AutomationDeleteConfirmationDialog({
           children: name,
         }),
       },
-    }),
-  });
-  const subtitle = jsx.jsx(DialogDescription, {
-    children: jsx.jsx(FormattedMessage, {
+    }) });
+    cache[4] = name; cache[5] = title;
+  }
+  let subtitle: unknown;
+  if (cache[6] === Symbol.for("react.memo_cache_sentinel")) {
+    subtitle = jsx.jsx(DialogDescription, { children: jsx.jsx(FormattedMessage, {
       id: "inbox.automations.deleteConfirm.descriptionNoPeriod",
       defaultMessage:
         "This will permanently delete the scheduled task and stop future runs",
       description:
         "Description for the delete scheduled task confirmation dialog",
-    }),
-  });
-  const header = jsx.jsx(DialogSection, {
-    children: jsx.jsx(DialogHeader, { title, subtitle }),
-  });
-  const cancel = jsx.jsx(Button, {
-    color: "outline",
-    onClick: onCancel,
-    children: jsx.jsx(FormattedMessage, {
+    }) });
+    cache[6] = subtitle;
+  } else subtitle = cache[6];
+  let header: unknown;
+  if (cache[7] === title) header = cache[8];
+  else {
+    header = jsx.jsx(DialogSection, { children: jsx.jsx(DialogHeader, { title, subtitle }) });
+    cache[7] = title; cache[8] = header;
+  }
+  let cancelLabel: unknown;
+  if (cache[9] === Symbol.for("react.memo_cache_sentinel")) {
+    cancelLabel = jsx.jsx(FormattedMessage, {
       id: "inbox.automations.deleteConfirm.cancel",
       defaultMessage: "Cancel",
       description:
         "Cancel button label for delete automation confirmation dialog",
-    }),
-  });
-  const confirm = jsx.jsx(Button, {
-    color: "danger",
-    loading: isPending,
-    type: "submit",
-    children: jsx.jsx(FormattedMessage, {
+    });
+    cache[9] = cancelLabel;
+  } else cancelLabel = cache[9];
+  let cancel: unknown;
+  if (cache[10] === onCancel) cancel = cache[11];
+  else {
+    cancel = jsx.jsx(Button, { color: "outline", onClick: onCancel, children: cancelLabel });
+    cache[10] = onCancel; cache[11] = cancel;
+  }
+  let confirmLabel: unknown;
+  if (cache[12] === Symbol.for("react.memo_cache_sentinel")) {
+    confirmLabel = jsx.jsx(FormattedMessage, {
       id: "inbox.automations.deleteConfirm.confirm",
       defaultMessage: "Delete scheduled task",
       description:
         "Confirm button label for delete scheduled task confirmation dialog",
-    }),
-  });
-  const footer = jsx.jsx(DialogSection, {
-    children: jsx.jsxs(DialogFooter, { children: [cancel, confirm] }),
-  });
-  const content = jsx.jsxs(DialogBody, {
-    as: "form",
-    onSubmit: (event: FormSubmitEvent) => {
-      event.preventDefault();
-      onConfirm();
-    },
-    children: [header, footer],
-  });
-  return jsx.jsx(Dialog, {
-    open,
-    onOpenChange: (nextOpen: boolean) => {
-      if (!nextOpen) onCancel();
-    },
-    children: content,
-  });
+    });
+    cache[12] = confirmLabel;
+  } else confirmLabel = cache[12];
+  let confirm: unknown;
+  if (cache[13] === isPending) confirm = cache[14];
+  else {
+    confirm = jsx.jsx(Button, { color: "danger", loading: isPending, type: "submit", children: confirmLabel });
+    cache[13] = isPending; cache[14] = confirm;
+  }
+  let footer: unknown;
+  if (cache[15] === cancel && cache[16] === confirm) footer = cache[17];
+  else {
+    footer = jsx.jsx(DialogSection, { children: jsx.jsxs(DialogFooter, { children: [cancel, confirm] }) });
+    cache[15] = cancel; cache[16] = confirm; cache[17] = footer;
+  }
+  let content: unknown;
+  if (cache[18] === footer && cache[19] === handleSubmit && cache[20] === header) content = cache[21];
+  else {
+    content = jsx.jsxs(DialogBody, { as: "form", onSubmit: handleSubmit, children: [header, footer] });
+    cache[18] = footer; cache[19] = handleSubmit; cache[20] = header; cache[21] = content;
+  }
+  if (cache[22] !== open || cache[23] !== handleOpenChange || cache[24] !== content) {
+    cache[22] = open; cache[23] = handleOpenChange; cache[24] = content;
+    cache[25] = jsx.jsx(Dialog, { open, onOpenChange: handleOpenChange, children: content });
+  }
+  return cache[25];
 }
 
 function getInitializedJsxRuntime(): JsxRuntime {
@@ -132,7 +165,6 @@ function getInitializedJsxRuntime(): JsxRuntime {
   return jsxRuntime;
 }
 
-initializeAutomationDeleteConfirmationDialog();
 export {
   initializeAutomationDeleteConfirmationDialog as n,
   AutomationDeleteConfirmationDialog as t,

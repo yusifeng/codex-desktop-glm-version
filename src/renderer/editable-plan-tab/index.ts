@@ -51,7 +51,7 @@ type OpenTextFileTab = (
   options: Record<string, unknown>,
 ) => boolean;
 
-const jsx = getJsxRuntime();
+let jsx: ReturnType<typeof getJsxRuntime>;
 let activeEditablePlanTab: unknown;
 let editablePlanState: unknown;
 let editablePlanContent: unknown;
@@ -132,6 +132,7 @@ function initializeEditablePlanTab(): void {
   initializeRightPanelState();
   initializeSourcesPanelModel();
   initializeEditablePlanState();
+  jsx = getJsxRuntime();
 }
 
 export {

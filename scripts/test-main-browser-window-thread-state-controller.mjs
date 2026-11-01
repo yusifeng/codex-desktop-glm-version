@@ -32,6 +32,7 @@ const calls = [];
 const windows = new Map();
 let focusedWindow = null;
 let webviewOptions = null;
+let createdThreadInput = null;
 const shutdownRegistrations = new Map();
 const host = {
   windows,
@@ -80,6 +81,7 @@ const host = {
   syncRuntimeStateToPage: () => undefined,
   syncThreadState: () => undefined,
   tabBudget: {
+    markTabActivity: (...args) => calls.push(["budget-activity", ...args]),
     markTabSelected: () => undefined,
     handleWindowClosed: (...args) =>
       calls.push(["budget-window-closed", ...args]),
@@ -115,7 +117,13 @@ const controller = new (createBrowserWindowThreadStateControllerClass({
   qU: (route) => `${route.conversationId}:${route.browserTabId}`,
   oXe: ({ windowState, conversationId, browserTabId }) =>
     windowState.threads.get(`${conversationId}:${browserTabId}`) ?? null,
-  vX: () => ({}),
+  vX: (input) => {
+    createdThreadInput = input;
+    return { ...input, createdByTest: true };
+  },
+  PG: ({ conversationId, browserTabId }) => `storage:${conversationId}:${browserTabId}`,
+  _X: () => "/owner/route",
+  fX: (...args) => calls.push(["thread-opened", ...args]),
   tq: () => undefined,
   KU: (...values) => values.join(":"),
   EZ: "/browser-page-preload.js",
@@ -170,6 +178,55 @@ equal(controller.getLiveWindowState(1), state);
 equal(controller.getCurrentWindowState(owner), state);
 equal(controller.getThreadStateForWindow(state, "conversation", "tab"), null);
 equal(controller.getDetachedWindowStates(1), []);
+const createdThread = controller.ensureThreadState(
+  state,
+  {
+    annotationModeEnabled: false,
+    conversationId: "new-conversation",
+    cwd: "/project",
+    emulatedViewportSize: { width: 800, height: 600 },
+    hostKind: "right-panel",
+    runtimeIntlConfig: { locale: "zh-CN" },
+  },
+  "new-tab",
+);
+equal(createdThreadInput, {
+  annotationModeEnabled: false,
+  browserStorageId: "storage:new-conversation:new-tab",
+  browserTabId: "new-tab",
+  conversationId: "new-conversation",
+  hostKind: "right-panel",
+  emulatedViewportSize: { width: 800, height: 600 },
+  cwd: "/project",
+  isBrowserUsePage: false,
+  ownerRoutePath: "/owner/route",
+  runtimeIntlConfig: { locale: "zh-CN" },
+});
+equal(state.threads.get("new-conversation:new-tab"), createdThread);
+equal(
+  calls.some(([kind, value]) => kind === "budget-activity" && value === createdThread),
+  true,
+);
+equal(
+  calls.some(
+    ([kind, registry, manager, allWindows, targetState, value]) =>
+      kind === "thread-opened" &&
+      registry === host.browserSessionRegistry &&
+      manager === host.windowManager &&
+      allWindows === windows &&
+      targetState === state &&
+      value === createdThread,
+  ),
+  true,
+);
+equal(
+  controller.ensureThreadState(
+    state,
+    { conversationId: "new-conversation" },
+    "new-tab",
+  ),
+  createdThread,
+);
 state.threads.set("conversation:tab", {
   conversationId: "conversation",
   browserTabId: "tab",
@@ -269,6 +326,11 @@ for (const oldOwner of [
   equal(main.includes(oldOwner), false);
 }
 equal(main.includes("disposeWindowState(...args)"), true);
+const recoveredMain = fs.readFileSync(
+  path.join(root, "src/main-recovered/main-C-Mhak1n.ts"),
+  "utf8",
+);
+equal(recoveredMain.includes("ensureThreadState(...args)"), true);
 console.log(
   `main browser window thread state controller tests passed (${assertions} assertions)`,
 );

@@ -1,7 +1,43 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const { createAnnotationDocumentContext } = require("../app/.vite/build/browser-page-preload/annotation-document-context.js");
+
+const preloadSource = readFileSync(new URL("../src/main-recovered/browser-page-preload.ts", import.meta.url), "utf8");
+const bundledPreload = readFileSync(new URL("../app/.vite/build/browser-page-preload.js", import.meta.url), "utf8");
+assert.ok(
+  preloadSource.indexOf(`require("./browser-page-preload/annotation-document-context")`) <
+    preloadSource.indexOf("createAnnotationDocumentContext({"),
+  "annotation runtime owners must be loaded before eager preload initializers invoke them",
+);
+assert.doesNotMatch(
+  bundledPreload,
+  /require\(["']\.\/browser-page-preload\//,
+  "sandbox preload must inline semantic owners instead of requiring relative modules at runtime",
+);
+assert.match(
+  bundledPreload,
+  /installWebMcpProtocol:\s*\(\)\s*=>\s*installWebMcpProtocol/,
+  "sandbox preload bundle must retain the WebMCP protocol owner's named export",
+);
+const interactionLayerFactory = preloadSource.indexOf("Ky = createAnnotationInteractionLayerComponent({");
+const annotationRuntimeInitializer = preloadSource.indexOf("Sb = o(() => {");
+const reactBinding = preloadSource.indexOf("(G = u(Bf(), 1))", annotationRuntimeInitializer);
+assert.ok(
+  annotationRuntimeInitializer >= 0 && reactBinding > annotationRuntimeInitializer && interactionLayerFactory > reactBinding,
+  "annotation interaction components must be created after the lazy runtime initializes React bindings",
+);
+const controllerRegistryCall = preloadSource.indexOf("controllerRegistry = useAnnotationControllerRegistry({");
+const controllerRegistryEnd = preloadSource.indexOf("}),\n    {", controllerRegistryCall);
+const controllerRegistrySource = preloadSource.slice(controllerRegistryCall, controllerRegistryEnd);
+const injectedControllerNames = [...new Set(controllerRegistrySource.match(/\bcreateAnnotation[A-Za-z0-9_]+/g) ?? [])];
+for (const controllerName of injectedControllerNames) {
+  assert.ok(
+    preloadSource.slice(0, controllerRegistryCall).includes(controllerName),
+    `controller registry dependency must be declared before use: ${controllerName}`,
+  );
+}
 
 const normalizeText = (value) => typeof value === "string" && value.trim() ? value.replace(/\s+/g, " ").trim().slice(0, 2000) : undefined;
 const google = (value) => String(value).includes("docs.google.com/document/") ? {} : null;
@@ -32,4 +68,4 @@ const document = { body: {}, createTreeWalker: () => ({ nextNode: () => (calls.l
 const visible = context.getVisibleTextInViewportRect({ document }, { x: 0, y: 0 });
 assert.equal(visible, "visible text");
 assert.equal(calls.length, 1);
-console.log("14 preload annotation document context assertions passed");
+console.log(`${15 + injectedControllerNames.length} preload annotation document context assertions passed`);

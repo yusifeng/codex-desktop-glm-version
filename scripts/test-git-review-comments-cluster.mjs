@@ -9,10 +9,10 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MODULES = ["pull-request-actions", "pull-request-revision-tab", "registered-pull-request-thumbnail", "pull-request-readonly-comment", "bookmarked-thread-user-message-navigation", "artifact-file-preview-icon"];
 const state = globalThis.__gitReviewCommentsTest = {};
 state.jsx = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
-state.react = {};
+state.react = { useState: initial => [initial, value => { state.failedImageSource = value; }] };
 const imports = new Map();
-for (const directory of MODULES) { const source = fs.readFileSync(path.join(ROOT, "src/renderer", directory, "index.ts"), "utf8"); for (const match of source.matchAll(/import\s*{([\s\S]*?)}\s*from\s*"@rchunk\/([^"]+)";/g)) { const names = imports.get(match[2]) ?? new Set(); for (const item of match[1].split(",")) names.add(item.trim().split(/\s+as\s+/)[0]); imports.set(match[2], names); } }
-const overrides = { "app-shared": { I3: "() => globalThis.__gitReviewCommentsTest.jsx", e6: "() => globalThis.__gitReviewCommentsTest.react" } };
+for (const directory of MODULES) { const source = fs.readFileSync(path.join(ROOT, "src/renderer", directory, "index.ts"), "utf8"); for (const match of source.matchAll(/import\s*{([\s\S]*?)}\s*from\s*"@rchunk\/([^"]+)";/g)) { const names = imports.get(match[2]) ?? new Set(); for (const item of match[1].split(",")) { const name = item.trim().split(/\s+as\s+/)[0]; if (name && !name.startsWith("type ")) names.add(name); } imports.set(match[2], names); } }
+const overrides = { "app-shared": { $3: `() => { const cache=[]; return { c:size => { while(cache.length<size) cache.push(Symbol.for("react.memo_cache_sentinel")); return cache; } }; }`, I3: "() => globalThis.__gitReviewCommentsTest.jsx", e6: "() => globalThis.__gitReviewCommentsTest.react", gg: "() => undefined", h4: "() => undefined", m4: "(...values) => values.filter(Boolean).join(' ')", mg: "path => 'FileIcon'" } };
 const sideEffects = new Set(["rolldown-runtime", "app-initial", "pull-request-revision-queries-core", "pull-request-code-review-navigation-core", "pull-request-code-review-core", "revision-review-unavailable-message", "pull-request-status-label", "pull-request-checks-summary", "app-primary", "file-diff-alt", "diff-comment-card", "thread-user-message-navigation-rail-app"]);
 function mock(name) { if (sideEffects.has(name)) return "export {};"; return [...(imports.get(name) ?? [])].map(exportName => `export const ${exportName} = ${overrides[name]?.[exportName] ?? "() => undefined"};`).join("\n"); }
 async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "git-review-comments-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: mock(importPath), loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
@@ -104,10 +104,9 @@ const artifactIcon = await bundle("artifact-file-preview-icon"); artifactIcon.n(
 const imageIcon = artifactIcon.t({ getImagePreviewSrc: () => "data:image/png;base64,abc", imageClassName: "preview", path: "image.png" });
 assert.equal(imageIcon.type, "img");
 assert.equal(imageIcon.props.src, "data:image/png;base64,abc");
-assert.equal(imageIcon.props.className, "preview");
+assert.equal(imageIcon.props.className, "shrink-0 object-cover preview");
 const fallbackIcon = artifactIcon.t({ iconClassName: "file", path: "report.pdf" });
-assert.equal(fallbackIcon.type, "span");
-assert.equal(fallbackIcon.props["aria-label"], "PDF file");
-assert.equal(fallbackIcon.props.children, "PDF");
+assert.equal(fallbackIcon.type, "FileIcon");
+assert.equal(fallbackIcon.props.className, "shrink-0 file");
 
 console.log("54 git review comments cluster assertions passed");
