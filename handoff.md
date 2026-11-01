@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+终局完成审计见 [`docs/completion-audit-2026-11-01.md`](docs/completion-audit-2026-11-01.md)。全 10 个原始 chunk、
+main/shared/worker owner、renderer hub/tail/app coverage 与所有保留边界已按当前 Goal 条件复核；未审计、未分类、
+raw shared consumer、semantic tail 和 app chunk pending 均为 0。最终 typecheck、1857 脚本索引、11/11 main chunk、
+1874/1874 renderer chunk 与 12448/12448 全量 build check 通过；当前项目的语义反编译 Goal 可以关闭。
+
 完成全部 10 个原始 chunk 的 AST parse/single-reference 总审计：browser preload 最后 4 个零消费者 wrapper
 （shadow-root observer、virtual target、scroll container/axis）已由对应语义模块直接取代并物理删除；main 的
 6 个剩余 single-reference 项逐个确认为 vendor 初始化表达式，其余 9 个 chunk 顶层零消费者定义全部清零。
