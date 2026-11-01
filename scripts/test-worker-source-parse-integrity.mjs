@@ -4,10 +4,9 @@ import path from "node:path";
 import * as acorn from "acorn";
 
 const root = path.resolve(import.meta.dirname, "..");
-const workerPath = path.join(root, ".reference/originals/main/worker.ts");
-const preloadPath = path.join(root, ".reference/originals/main/browser-page-preload.ts");
-const workerSource = await fs.readFile(workerPath, "utf8");
-const preloadSource = await fs.readFile(preloadPath, "utf8");
+const originalsDirectory = path.join(root, ".reference/originals/main");
+const originalFiles = (await fs.readdir(originalsDirectory)).filter((file) => file.endsWith(".ts")).sort();
+const parsedOriginals = new Map();
 let assertions = 0;
 
 function check(value, message) {
@@ -15,10 +14,14 @@ function check(value, message) {
   assertions += 1;
 }
 
-const workerAst = acorn.parse(workerSource, { ecmaVersion: "latest", sourceType: "script" });
-check(true, "worker source remains parseable");
-acorn.parse(preloadSource, { ecmaVersion: "latest", sourceType: "script" });
-check(true, "preload source remains parseable");
+for (const file of originalFiles) {
+  const source = await fs.readFile(path.join(originalsDirectory, file), "utf8");
+  const ast = acorn.parse(source, { ecmaVersion: "latest", sourceType: "script" });
+  parsedOriginals.set(file, { ast, source });
+  check(true, `${file} remains parseable`);
+}
+
+const { source: workerSource } = parsedOriginals.get("worker.ts");
 
 check(
   workerSource.match(/\.regex\(\/\^\[a-fA-F0-9\]\{64\}\$\/\)/g)?.length === 2,
@@ -47,36 +50,45 @@ for (const deadDefinition of ["kpe = 67108864", "mxe = 6e4", "L8 = new Map()", "
   check(!workerSource.includes(deadDefinition), `${deadDefinition} zero-consumer residue stays removed`);
 }
 
-const topLevelDefinitions = new Set();
-for (const node of workerAst.body) {
-  if ((node.type === "FunctionDeclaration" || node.type === "ClassDeclaration") && node.id) {
-    topLevelDefinitions.add(node.id.name);
-  }
-  if (node.type === "VariableDeclaration") {
-    for (const declaration of node.declarations) {
-      if (declaration.id.type === "Identifier") topLevelDefinitions.add(declaration.id.name);
+function findTopLevelZeroConsumerDefinitions(ast) {
+  const topLevelDefinitions = new Set();
+  for (const node of ast.body) {
+    if ((node.type === "FunctionDeclaration" || node.type === "ClassDeclaration") && node.id) {
+      topLevelDefinitions.add(node.id.name);
+    }
+    if (node.type === "VariableDeclaration") {
+      for (const declaration of node.declarations) {
+        if (declaration.id.type === "Identifier") topLevelDefinitions.add(declaration.id.name);
+      }
     }
   }
-}
-const referenceCounts = new Map([...topLevelDefinitions].map((name) => [name, 0]));
-function countDefinitionReferences(node) {
-  if (node == null || typeof node !== "object") return;
-  if (node.type === "Identifier" && referenceCounts.has(node.name)) {
-    referenceCounts.set(node.name, referenceCounts.get(node.name) + 1);
+  const referenceCounts = new Map([...topLevelDefinitions].map((name) => [name, 0]));
+  function countDefinitionReferences(node) {
+    if (node == null || typeof node !== "object") return;
+    if (node.type === "Identifier" && referenceCounts.has(node.name)) {
+      referenceCounts.set(node.name, referenceCounts.get(node.name) + 1);
+    }
+    for (const [key, value] of Object.entries(node)) {
+      if (key === "start" || key === "end") continue;
+      if (Array.isArray(value)) value.forEach(countDefinitionReferences);
+      else countDefinitionReferences(value);
+    }
   }
-  for (const [key, value] of Object.entries(node)) {
-    if (key === "start" || key === "end") continue;
-    if (Array.isArray(value)) value.forEach(countDefinitionReferences);
-    else countDefinitionReferences(value);
-  }
+  countDefinitionReferences(ast);
+  return [...referenceCounts]
+    .filter(([, references]) => references === 1)
+    .map(([name]) => name)
+    .sort();
 }
-countDefinitionReferences(workerAst);
-const zeroConsumerDefinitions = [...referenceCounts]
-  .filter(([, references]) => references === 1)
-  .map(([name]) => name);
-check(
-  zeroConsumerDefinitions.length === 0,
-  `worker has no top-level zero-consumer definitions: ${zeroConsumerDefinitions.join(", ")}`,
-);
+
+const expectedVendorInitializers = ["Dj", "Qfe", "Zfe", "fp", "pp", "up"];
+for (const [file, { ast }] of parsedOriginals) {
+  const actual = findTopLevelZeroConsumerDefinitions(ast);
+  const expected = file === "main-C-Mhak1n.ts" ? expectedVendorInitializers : [];
+  check(
+    JSON.stringify(actual) === JSON.stringify(expected),
+    `${file} zero-consumer definitions match reviewed vendor initializers: ${actual.join(", ")}`,
+  );
+}
 
 console.log(`test-worker-source-parse-integrity: ${assertions} assertions passed`);

@@ -21669,16 +21669,6 @@ var Dg,
   Mg = o(() => {
     jg = 2147483647;
   });
-function Ng(e, t) {
-  return observeAnnotationShadowRoots(e, t, {
-    mutationObserverConstructor: MutationObserver,
-    observerOptions: Fg,
-    selector: Pg,
-    isElement: F,
-    isIgnored: gl,
-    shadowEvent: Ig,
-  });
-}
 var Pg,
   Fg,
   Ig,
@@ -22141,27 +22131,6 @@ function t_({ rootHost: e, onClearDomHover: t, onFeedback: n, onSelected: r, onF
       (m = null),
       (h = null));
   }
-}
-function n_({ hit: e, point: t }) {
-  return {
-    kind: `virtual`,
-    surfaceId: e.registrationId,
-    targetId: e.id,
-    elementName: e.name,
-    elementMetadata: e.metadata,
-    pageUrl: fd(),
-    frameUrl: null,
-    framePath: [],
-    title: e.name ?? document.title,
-    elementPath: `virtual object`,
-    selector: null,
-    role: e.role ?? null,
-    name: null,
-    nearbyText: null,
-    isFixed: !0,
-    point: { xPercent: (t.x / window.innerWidth) * 100, y: t.y },
-    rect: e.rect ?? { x: t.x, y: t.y, width: 1, height: 1 },
-  };
 }
 var r_ = o(() => {
   (Dl(), wd(), e_());
@@ -23086,16 +23055,6 @@ function Rv(e, t) {
 }
 function zv(e, t, n) {
   return findScrollableAnnotationAncestor(e, t, n.document, ic, (element) => n.getComputedStyle(element), isScrollableAnnotationOverflow, canScrollAnnotationAxis);
-}
-function Bv(e, t, n) {
-  let r = n.getComputedStyle(e);
-  return (
-    (isScrollableAnnotationOverflow(r.overflowY) && Vv(t.y, e.scrollTop, e.clientHeight, e.scrollHeight)) ||
-    (isScrollableAnnotationOverflow(r.overflowX) && Vv(t.x, e.scrollLeft, e.clientWidth, e.scrollWidth))
-  );
-}
-function Vv(e, t, n, r) {
-  return canScrollAnnotationAxis(e, t, n, r);
 }
 var Hv,
   Uv,

@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成全部 10 个原始 chunk 的 AST parse/single-reference 总审计：browser preload 最后 4 个零消费者 wrapper
+（shadow-root observer、virtual target、scroll container/axis）已由对应语义模块直接取代并物理删除；main 的
+6 个剩余 single-reference 项逐个确认为 vendor 初始化表达式，其余 9 个 chunk 顶层零消费者定义全部清零。
+源码完整性门禁已从 worker/preload 两文件扩展到全原始 chunk，并锁定 vendor allowlist；相邻 preload 回归 18 项、
+源码完整性 37 项、typecheck、测试索引 1857、chunk verify 11/11 与全量 check 12448/12448 均通过。
+
 完成 worker 源码完整性与 Parcel watcher 重复 owner 收敛：修复历史 `formatLocalBranchRef` 机械替换误伤两处
 SHA-256 schema、把 `[a-fA-F0-9]` 破坏成非法正则导致完整 worker 无法解析的问题。metadata/working-tree watcher
 已由 `worker/parcel-watcher-runtime.ts` 唯一真实消费，因此物理删除零消费者的旧 `fDe` 类、目录探测 helper 和四条

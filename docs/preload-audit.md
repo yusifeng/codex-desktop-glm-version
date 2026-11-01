@@ -1,5 +1,12 @@
 # `browser-page-preload.ts` 逐段审计
 
+全原始 chunk AST 复核确认 browser preload 仅余 `Ng`、`n_`、`Bv/Vv` 三组零消费者兼容 wrapper；真实消费链已分别
+直接使用 `observeAnnotationShadowRoots`、`createVirtualAnnotationTarget`、`findScrollableAnnotationAncestor` 与
+`canScrollAnnotationAxis`，因此旧 wrapper 已物理删除。`test-worker-source-parse-integrity.mjs` 现解析全部 10 个原始
+chunk，并动态核对顶层 single-reference definitions；除主 chunk 已审计的 6 个 vendor 初始化表达式外，其余原始
+chunk 均清零。shadow-root、virtual-target、scroll-boundary/container 相邻回归共 18 项、源码完整性 37 项、
+typecheck、测试索引 1857、chunk verify 11/11 与全量 check 12448/12448 均通过。
+
 本轮新增 `annotation-controller-lifecycle.ts`、`annotation-runtime-effect-lifecycle.ts` 与 `annotation-interaction-layer-component.ts`，整体迁出 Wy 剩余的 controller disposal fan-out、reconciliation、global input、hover refresh、editor/anchor observation、interaction visibility、highlight/screenshot-ready 生命周期，并迁出 Ky popover/RAF component owner；保留原 hook 顺序、重复 screenshot disposal、RAF retry/cancel 与 popover cleanup，从原文件删除约 194 行内联主体。focused test：`scripts/test-preload-annotation-runtime-lifecycle.mjs`（20 项）。
 
 本轮新增 `annotation-interaction-command-facade.ts`，以单一自定义 hook 真实接回 Wy 的 DOM interaction setup 与 command facade；保留 30 个 React callback/effect-event/effect 的原 hook 顺序、site request subscription、DOM interaction enable/clear/dispose 与 23 个 command 出口，从 Wy 删除约 148 行内联主体。focused test：`scripts/test-preload-annotation-interaction-command-facade.mjs`（15 项）。
