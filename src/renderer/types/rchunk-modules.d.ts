@@ -11967,10 +11967,10 @@ declare module "@rchunk/mcp-tool-activity-label" {
 
 declare module "@rchunk/mcp-tool-approval-message" {
   export interface McpApprovalReplyProps { conversationId: string; hostId: string; requestId: string; onReply?(reply: "accept" | "decline"): Promise<void> | void }
-  export const a: (props: McpApprovalReplyProps & { suggestion: { install_url?: string; tool_id?: string; tool_name?: string; tool_title?: string; tool_type?: string } }) => unknown;
+  export const a: (props: McpApprovalReplyProps & { suggestion: { install_url?: string; remote_plugin_id?: string; suggest_type?: "enable" | "install"; suggestion_id?: string; tool_id: string; tool_name?: string; tool_title?: string; tool_type?: "connector" | "plugin" } }) => unknown;
   export const c: () => void; export const d: (props: { authorization: { origin: string; scopes: Array<{ label: string; scope: string }> } }) => unknown; export const f: () => void; export const i: () => void;
   export const l: (props: { description?: unknown; icon?: unknown; isPrimaryActionLoading?: boolean; primaryActionLabel: string; secondaryActionLabel?: string; showDeclineShortcut?: boolean; title: unknown; onDecline(): void; onPrimaryActionClick?(): void; onSubmit(): void }) => unknown;
-  export const n: () => void; export const o: (props: McpApprovalReplyProps & { title?: string; message?: string }) => unknown; export const r: (props: McpApprovalReplyProps & { action: { message?: string; url: string } }) => unknown; export const s: (props: McpApprovalReplyProps & { auth: { connector?: { connector_id?: string; connector_name?: string; install_url?: string }; reason?: string } }) => unknown; export const t: (props: { message: { descriptor?: { defaultMessage?: string }; values?: Record<string, unknown>; url?: string } }) => unknown; export const u: () => void;
+  export const n: () => void; export const o: () => void; export const r: (props: McpApprovalReplyProps & { action: { message?: string; url: string } }) => unknown; export const s: (props: McpApprovalReplyProps & { auth: { connector: { auth_reason?: string; connection_consent?: { origin: string; scopes: Array<{ label: string; scope: string }> }; connector_id: string; connector_name?: string; install_url?: string; link_id?: string; requested_scopes?: string[] }; reason?: string; url?: string } }) => unknown; export const t: (props: { message: { descriptor?: { defaultMessage?: string }; values?: Record<string, unknown>; url?: string } }) => unknown; export const u: () => void;
   const _default: unknown;
   export default _default;
 }

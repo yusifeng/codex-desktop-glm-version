@@ -31,6 +31,8 @@ import {
   BK as agentActivityApi,
   BX as appSharedInit,
   Bk as appgenAccessApi,
+  I3 as getJsxRuntime,
+  e6 as getReact,
 } from "@rchunk/app-shared";
 import { C as environmentSetupInit } from "@rchunk/app-initial";
 import { d as appPrimaryInit } from "@rchunk/app-primary";
@@ -200,6 +202,11 @@ export interface LocalConversationTurnProps {
   voiceWorkActivity?: unknown;
 }
 
+type JsxRuntime = ReturnType<typeof getJsxRuntime>;
+let jsxRuntime: JsxRuntime | undefined;
+function jsx(): JsxRuntime { jsxRuntime ??= getJsxRuntime(); return jsxRuntime; }
+function initialize(value: unknown): void { if (typeof value === "function") value(); }
+
 // ---------------------------------------------------------------------------
 // turn 状态投影（原 `Ar` 的语义骨架）
 // ---------------------------------------------------------------------------
@@ -249,14 +256,28 @@ function TurnResources(props: {
   turnId?: string | null;
 }): unknown {
   const resources = props.resources ?? EMPTY_RESOURCES;
+  const react = getReact?.();
+  const [expanded, setExpanded] = react?.useState?.(false) ?? [false, () => undefined];
   if (resources.length === 0) return null;
+  const visibleResources = expanded ? resources : resources.slice(0, RESOURCE_COLLAPSE_COUNT);
+  const hiddenCount = resources.length - visibleResources.length;
   const isEndCard = props.isAppgenEndCardEnabled === true && resources.every(isAppgenEndCardResource);
   const containerClass = ["flex flex-col gap-1", isEndCard && "mt-2"].filter(Boolean).join(" ");
-  void containerClass;
-  void props;
-  // 资源分发（六类）——渲染体在依赖 chunk（artifact-originating-turn 等）
-  // 接入后逐类装配；此处承载 props/折叠/端卡片判定管线。
-  return { isEndCard, resources };
+  const resourceNode = (resource: TurnResource, index: number): unknown => {
+    const key = resource.artifactRef ?? resource.path ?? resource.url ?? resource.target ?? `${resource.type}:${index}`;
+    if (resource.type === "page-reference") return null;
+    if (resource.type === "file") {
+      const path = resource.path ?? "File";
+      return jsx().jsx("li", { "data-resource-type": resource.type, children: jsx().jsx("button", { type: "button", onClick: () => props.onFileOpen?.(path, { conversationId: props.conversationId, hostId: props.hostId, turnId: props.turnId }), children: path }) }, key);
+    }
+    const href = resource.url ?? (resource.type === "website" ? resource.target : undefined);
+    const label = typeof resource.title === "string" ? resource.title : typeof resource.name === "string" ? resource.name : resource.type === "artifact-session" ? "Artifact" : resource.type === "google-drive" ? "Google Drive" : resource.type === "appgen-app" ? "App" : resource.target ?? resource.url ?? resource.type;
+    return jsx().jsx("li", { "data-resource-type": resource.type, children: href == null ? jsx().jsx("span", { children: label }) : jsx().jsx("a", { href, children: label }) }, key);
+  };
+  return jsx().jsxs("section", { className: containerClass, "data-end-resource-card": isEndCard || undefined, "aria-label": "Turn resources", children: [
+    jsx().jsx("ul", { "data-resource-variant": isEndCard ? "attachment" : "default", children: visibleResources.map(resourceNode) }),
+    hiddenCount > 0 ? jsx().jsx("button", { type: "button", "aria-expanded": false, onClick: () => setExpanded(true), children: `Show ${hiddenCount} more` }) : null,
+  ] });
 }
 
 // ---------------------------------------------------------------------------
@@ -276,13 +297,21 @@ export interface SubagentActivityRow {
  * seed=conversationId / onClick 受 canOpen 守卫）。
  */
 function SubagentActivityInlineGroup(props: {
+  onOpen?: (conversationId: string, displayName: string) => void;
   onEntranceAnimationEnd?: (conversationId: string) => void;
   rows: SubagentActivityRow[];
   shouldAnimateEntrance?: (conversationId: string) => boolean;
   status: unknown;
 }): unknown {
-  void props;
-  return null;
+  const items = props.rows.map(row => ({
+    animateEntrance: props.shouldAnimateEntrance?.(row.conversationId) ?? true,
+    id: row.conversationId,
+    label: row.displayName,
+    seed: row.conversationId,
+    onAnimationEnd: props.onEntranceAnimationEnd == null ? undefined : () => props.onEntranceAnimationEnd?.(row.conversationId),
+    onClick: !row.canOpen || props.onOpen == null ? undefined : () => props.onOpen?.(row.conversationId, row.displayName),
+  }));
+  return jsx().jsx("ul", { className: "text-secondary", "data-testid": "subagent-activity-inline-group", "data-status": String(props.status ?? ""), children: items.map(item => jsx().jsx("li", { "data-animate-entrance": item.animateEntrance || undefined, "data-seed": item.seed, onAnimationEnd: item.onAnimationEnd, children: item.onClick == null ? jsx().jsx("span", { children: item.label }) : jsx().jsx("button", { type: "button", onClick: item.onClick, children: item.label }) }, item.id)) });
 }
 
 // ---------------------------------------------------------------------------
@@ -373,8 +402,10 @@ function LocalConversationTurnComponent(props: LocalConversationTurnProps): unkn
           props.onForkTurnMessage!(props.turn);
         };
 
-  // ⑤ 渲染体透传（conversation-blocks 的 rl；依赖接入后替换）
-  return {
+  // ⑤ 渲染体透传。conversation-blocks 在源码恢复路由中提供 turn body 组装器。
+  const TurnBody = (conversationBlocksTurnBody as any).a ?? (conversationBlocksTurnBody as any).R;
+  const bodyProps = {
+    activitySummaryWithoutAssistant: props.activitySummaryWithoutAssistant,
     commentaryDisplay: props.commentaryDisplay,
     conversationId: props.conversationId,
     cwd: effectiveTurn.cwd ?? props.cwd,
@@ -396,27 +427,42 @@ function LocalConversationTurnComponent(props: LocalConversationTurnProps): unkn
     deferOffscreenDiffRendering,
     turn: effectiveTurn,
     turnId: props.turn.turnId,
+    units: effectiveTurn.items.map(item => ({ kind: "standalone", item: { item } })),
   };
+  return typeof TurnBody === "function"
+    ? jsx().jsx(TurnBody, bodyProps)
+    : jsx().jsx("section", { "data-local-conversation-turn": props.turn.turnId ?? "pending", children: effectiveTurn.items.map((item, index) => jsx().jsx("div", { "data-turn-item-type": item.type }, item.callId ?? `${item.type}:${index}`)) });
 }
 
 /** memo 包裹（原 `Il = memo(component)`）。 */
-const LocalConversationTurn = { type: "memo", render: LocalConversationTurnComponent };
+let LocalConversationTurn = LocalConversationTurnComponent;
 
 // ---------------------------------------------------------------------------
 // 懒初始化器（原 `Rs`/`Us`/`tc`/`Ll`）
 // ---------------------------------------------------------------------------
 
 /** SubagentActivityInlineGroup 初始化器（原 `Rs`，导出 c）。 */
-function initializeSubagentActivityInlineGroup(): void {}
+function initializeSubagentActivityInlineGroup(): void { initialize(runtimeLazy); initialize(appSharedInit); void jsx(); }
 
 /** 资源上下文初始化器（原 `Us`，导出 o）。 */
-function initializeTurnResourceContext(): void {}
+function initializeTurnResourceContext(): void { initialize(runtimeLazy); initialize(resourceIconHelpers); void jsx(); }
 
 /** 环境准备文案初始化器（原 `tc`，导出 i）。 */
-function initializeEnvironmentSetupStageMessage(): void {}
+function initializeEnvironmentSetupStageMessage(): void { initialize(runtimeLazy); void jsx(); }
 
 /** 主组件初始化器（原 `Ll`，导出 n）：60+ 依赖装配 + 消息常量。 */
-function initializeLocalConversationTurn(): void {}
+let initialized = false;
+function initializeLocalConversationTurn(): void {
+  if (initialized) return;
+  initialized = true;
+  for (const dependency of [runtimeInit, runtimeLazy, appSharedInit, environmentSetupInit, appPrimaryInit,
+    (conversationBlocksTurnBody as any).i, (conversationBlocksTurnBody as any).n,
+    (conversationBlocksTurnBody as any).t, initializeSubagentActivityInlineGroup,
+    initializeTurnResourceContext, initializeEnvironmentSetupStageMessage]) initialize(dependency);
+  const react = getReact?.();
+  if (typeof react?.memo === "function") LocalConversationTurn = react.memo(LocalConversationTurnComponent);
+  void jsx();
+}
 
 // ---------------------------------------------------------------------------
 // 原版压缩导出名（chunk 间契约）

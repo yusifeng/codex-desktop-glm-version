@@ -29,7 +29,12 @@
 //   - Zw（n，L11086）：BlockList —— 块列表（content-visibility + final-
 //     assistant 标记 + canOwnLatestTurnFollowContent ref 分发）
 
-/** 视图描述（语义骨架）。 */
+import { I3 as getJsxRuntime } from "@rchunk/app-shared";
+
+let runtime: ReturnType<typeof getJsxRuntime> | undefined;
+function jsx(): ReturnType<typeof getJsxRuntime> { runtime ??= getJsxRuntime(); return runtime; }
+
+/** 兼容恢复期间仍被少量纯算法调用使用的视图描述。 */
 export interface ViewNode {
   className?: string;
   data?: Record<string, unknown>;
@@ -38,14 +43,14 @@ export interface ViewNode {
 }
 
 /** 活动状态归约（原 `Wg`，导出 L）。 */
-export function mergeActivityStatuses(statuses: string[]): "interrupted" | "updated" | "completed" | null {
+export function mergeActivityStatuses(statuses: string[]): "active" | "interrupted" | "updated" | "completed" {
   return statuses.some((status) => status === "interrupted")
     ? "interrupted"
     : statuses.some((status) => status === "updated")
       ? "updated"
-      : statuses.length > 0 && statuses.every((status) => status === "completed")
+      : statuses.length > 0 && statuses.every((status) => status === "completed" || status === "done")
         ? "completed"
-        : null;
+        : "active";
 }
 
 /** 子代理线程名收集（原 `Kg`，导出 I）。 */
@@ -62,8 +67,9 @@ export function collectSubagentThreadNames(
 }
 
 /** AssistantMessageBlock（原 `rg`，导出 W）。 */
-export function AssistantMessageBlock(props: { assistantCopyText?: string; item: Record<string, unknown> }): ViewNode {
-  return { kind: "assistant-message", props: { item: props.item, copyText: props.assistantCopyText } };
+export function AssistantMessageBlock(props: { assistantCopyText?: string; item: Record<string, unknown> }): unknown {
+  const content = props.item.content ?? props.item.text ?? "";
+  return jsx().jsxs("article", { "data-conversation-block": "assistant-message", children: [jsx().jsx("div", { children: content as any }), props.assistantCopyText == null ? null : jsx().jsx("button", { type: "button", "aria-label": "Copy response", "data-copy-text": props.assistantCopyText, children: "Copy" })] });
 }
 
 /** BrowserRatingControlsBlock（原 `pg`，导出 U）。 */
@@ -72,14 +78,15 @@ export function BrowserRatingControlsBlock(props: { alwaysShowActions?: boolean;
 }
 
 /** AccessPolicyBadge（原 `Ag`，导出 V）。 */
-export function AccessPolicyBadge(props: { accessPolicy?: unknown; isLoading?: boolean }): ViewNode | null {
-  if (props.isLoading) return { kind: "access-policy-loading" };
-  return { kind: "access-policy-badge", props: { policy: props.accessPolicy } };
+export function AccessPolicyBadge(props: { accessPolicy?: unknown; isLoading?: boolean }): unknown {
+  if (props.isLoading) return jsx().jsx("span", { "aria-label": "Loading access policy", children: "…" });
+  return props.accessPolicy == null ? null : jsx().jsx("span", { "data-access-policy": true, children: String(props.accessPolicy) });
 }
 
 /** IconButton（原 `Lg`，导出 z）。 */
-export function IconButton(props: { ariaLabel?: string; className?: string; [key: string]: unknown }): ViewNode {
-  return { kind: "icon-button", props: props as Record<string, unknown> };
+export function IconButton(props: { ariaLabel?: string; className?: string; children?: unknown; onClick?(): void; [key: string]: unknown }): unknown {
+  const { ariaLabel, children, ...rest } = props;
+  return jsx().jsx("button", { ...rest, type: "button", "aria-label": ariaLabel, children });
 }
 
 /** SummaryBlock（原 `C_`，导出 A）。 */
@@ -98,13 +105,13 @@ export function TimelineTargetsBlock(props: { conversationId: string; enableTime
 }
 
 /** ImageBlock（原 `Xy`，导出 x）。 */
-export function ImageBlock(props: { conversationId: string; src: string }): ViewNode {
-  return { kind: "image", props: props as Record<string, unknown> };
+export function ImageBlock(props: { alt?: string; conversationId: string; src: string }): unknown {
+  return jsx().jsx("img", { alt: props.alt ?? "", loading: "lazy", src: props.src, "data-conversation-id": props.conversationId });
 }
 
 /** ImageStackBlock（原 `Zy`，导出 S）。 */
-export function ImageStackBlock(props: { alt?: string; conversationId: string; hostId: string; imageSource?: unknown; srcs: string[]; useImageDialog?: boolean }): ViewNode {
-  return { kind: "image-stack", props: props as Record<string, unknown> };
+export function ImageStackBlock(props: { alt?: string; conversationId: string; hostId: string; imageSource?: unknown; srcs: string[]; useImageDialog?: boolean }): unknown {
+  return props.srcs.length === 0 ? null : jsx().jsx("div", { className: "grid grid-cols-2 gap-2", "data-image-stack": true, children: props.srcs.map((src, index) => jsx().jsx(ImageBlock, { alt: props.alt, conversationId: props.conversationId, src }, `${src}:${index}`)) });
 }
 
 /** AppshotBlock（原 `Qy`，导出 b）。 */
@@ -113,8 +120,10 @@ export function AppshotBlock(props: { appshotContext: Record<string, unknown>; c
 }
 
 /** AttachmentBlock（原 `eb`，导出 C）。 */
-export function AttachmentBlock(props: { attachment: Record<string, unknown>; cwd?: string; hostId?: string; isUploadedFileViewerEnabled?: boolean }): ViewNode {
-  return { kind: "attachment", props: props as Record<string, unknown> };
+export function AttachmentBlock(props: { attachment: Record<string, unknown>; cwd?: string; hostId?: string; isUploadedFileViewerEnabled?: boolean }): unknown {
+  const name = props.attachment.name ?? props.attachment.filename ?? props.attachment.path ?? "Attachment";
+  const href = props.attachment.url ?? props.attachment.path;
+  return jsx().jsxs("div", { "data-attachment": true, children: [jsx().jsx("strong", { children: String(name) }), typeof href === "string" ? jsx().jsx("span", { children: href }) : null] });
 }
 
 /** PullRequestLink（原 `tb`，导出 w）。 */
@@ -123,8 +132,8 @@ export function PullRequestLink(props: { pullRequestNumber: number }): ViewNode 
 }
 
 /** ItemList（原 `kx`，导出 v）。 */
-export function ItemList(props: { className?: string; items: unknown[] }): ViewNode {
-  return { kind: "item-list", className: props.className, props: { items: props.items } };
+export function ItemList(props: { className?: string; items: unknown[] }): unknown {
+  return jsx().jsx("ul", { className: props.className, children: props.items.map((item, index) => jsx().jsx("li", { children: item as any }, index)) });
 }
 
 /** DiffDonut（原 `dS`，导出 g）。 */
@@ -138,19 +147,31 @@ export function InProgressDiffSummaryBlock(props: { inProgressDiffSummary?: unkn
 }
 
 /** WebSearchBlock（原 `EC`，导出 f）。 */
-export function WebSearchBlock(props: { icon?: unknown; item: { action?: string; query?: string } }): ViewNode {
+export function WebSearchBlock(props: { icon?: unknown; item: { action?: string; query?: string } }): unknown {
   const query = props.item.query ?? "";
-  return { kind: "web-search", props: { action: props.item.action, query } };
+  return jsx().jsxs("div", { "data-web-search": props.item.action ?? "search", children: [props.icon, jsx().jsx("span", { children: query })] });
 }
 
 /** UserMessageBlock（原 `zC`，导出 u；400 号 memo-cache 主块）。 */
-export function UserMessageBlock(props: { alwaysShowUserMessageActions?: boolean; item: Record<string, unknown> }): ViewNode {
-  return { kind: "user-message-block", props: props as Record<string, unknown> };
+export function UserMessageBlock(props: { alwaysShowUserMessageActions?: boolean; item: Record<string, unknown> }): unknown {
+  return jsx().jsx("article", { "data-conversation-block": "user-message", children: (props.item.content ?? props.item.text ?? "") as any });
 }
 
 /** TurnBlocks（原 `Gw`，导出 r；60 号 memo-cache）。 */
-export function TurnBlocks(props: { deniedActionCount?: number; units: unknown[] }): ViewNode {
-  return { kind: "turn-blocks", props: { units: props.units, deniedActionCount: props.deniedActionCount ?? 0 } };
+export function TurnBlocks(props: { deniedActionCount?: number; units: unknown[] }): unknown {
+  const renderUnit = (unit: unknown, index: number): unknown => {
+    if (unit == null || typeof unit === "string" || typeof unit === "number") return unit as any;
+    const wrapper = unit as { item?: { item?: Record<string, unknown> }; node?: unknown };
+    if (wrapper.node != null) return wrapper.node;
+    const item = wrapper.item?.item ?? unit as Record<string, unknown>;
+    const type = typeof item.type === "string" ? item.type : "activity";
+    if (type === "assistant-message" || type === "assistantMessage") return jsx().jsx(AssistantMessageBlock, { item }, index);
+    if (type === "user-message" || type === "userMessage") return jsx().jsx(UserMessageBlock, { item }, index);
+    if (type === "web-search" || type === "webSearch") return jsx().jsx(WebSearchBlock, { item: item as { action?: string; query?: string } }, index);
+    const content = item.content ?? item.summary ?? item.title;
+    return jsx().jsx("div", { "data-turn-unit-type": type, children: typeof content === "string" || typeof content === "number" ? content : null }, (item.callId as string | undefined) ?? index);
+  };
+  return jsx().jsxs("section", { "data-turn-blocks": true, children: [(props.deniedActionCount ?? 0) > 0 ? jsx().jsx("span", { "data-denied-action-count": props.deniedActionCount, children: `${props.deniedActionCount} denied` }) : null, props.units.map(renderUnit)] });
 }
 
 /** 渲染块描述（BlockList 的输入）。 */

@@ -19,7 +19,7 @@
 //   - p（jC）：web-search 初始化器
 //   - d（iw）/l（fw）/o（Fw）/i（Xw）/t（$w）：turn 块装配初始化器
 
-import { $3 as appSharedLazy } from "@rchunk/app-shared";
+import { $3 as appSharedLazy, I3 as getJsxRuntime, e6 as getReact, lY as normalizeConversationId } from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
 import { d as appPrimaryInit } from "@rchunk/app-primary";
 import * as activeToolActivityLabel from "@rchunk/active-tool-activity-label";
@@ -72,107 +72,152 @@ const {
   TimelineTargetsBlock,
 } = blocks;
 export type { McpToolCallProjection, ViewNode };
+let runtime: ReturnType<typeof getJsxRuntime> | undefined;
+function jsx(): ReturnType<typeof getJsxRuntime> { runtime ??= getJsxRuntime(); return runtime; }
+function call(value: unknown): void { if (typeof value === "function") value(); }
+function once(run: () => void): () => void { let done = false; return () => { if (done) return; done = true; run(); }; }
 
 // ---------------------------------------------------------------------------
 // 懒初始化器群（原版各组件的装配函数；依赖为模块级，保持幂等契约）
 // ---------------------------------------------------------------------------
 
-function initializeIconButton(): void {}
-function initializeTimelineBlock(): void {}
-function initializeActivitySummary(): void {}
-function initializeActivitySummaryGroup(): void {}
-function initializeSvgIcon(): void {}
-function initializeDefaultNames(): void {}
-function initializeQueryAtoms(): void {}
-function initializeConnectorAssetTitleQuery(): void {}
-function initializeConversationMcpToolCallItems(): void {}
-function initializeMcpAppWidgets(): void {}
-function initializeSearchResultsBlock(): void {}
-function initializeImageAndAttachmentBlocks(): void {}
-function initializeDiffDonut(): void {}
-function initializeInProgressDiffSummary(): void {}
-function initializeSummaryBlock(): void {}
-function initializeWebSearchBlock(): void {}
-function initializeTurnBlockAssembly(): void {}
-function initializeActivityRow(): void {}
-function initializeTurnBlocks(): void {}
-function initializeBlockList(): void {}
+const initializeIconButton = once(() => { call(appSharedLazy); void jsx(); });
+const initializeTimelineBlock = once(() => { call(appSharedLazy); call(scrollToMatchInit); void jsx(); });
+const initializeActivitySummary = once(() => { call(aaiInit); call(aauInit); call((activeToolActivityLabel as any).n); void jsx(); });
+const initializeActivitySummaryGroup = once(() => { initializeActivitySummary(); void jsx(); });
+const initializeSvgIcon = once(() => { call(appSharedLazy); void jsx(); });
+const initializeDefaultNames = once(() => { call(appSharedLazy); });
+const initializeQueryAtoms = once(() => { call(appSharedLazy); call(appInitialInit); });
+const initializeConnectorAssetTitleQuery = once(() => { initializeQueryAtoms(); call((mcpToolActivityLabel as any).i); });
+const initializeConversationMcpToolCallItems = once(() => { initializeQueryAtoms(); });
+const initializeMcpAppWidgets = once(() => { initializeConversationMcpToolCallItems(); call((mcpToolItemContent as any).n); call((mcpAppAnalytics as any).n); void jsx(); });
+const initializeSearchResultsBlock = once(() => { call(appSharedLazy); void jsx(); });
+const initializeImageAndAttachmentBlocks = once(() => { call(appSharedLazy); call(appInitialInit); call((workspaceFileContextMenuTrigger as any).n); void jsx(); });
+const initializeDiffDonut = once(() => { call(appSharedLazy); call((patchDiffStats as any).n); call((diffPreviewTooltip as any).n); void jsx(); });
+const initializeInProgressDiffSummary = once(() => { initializeDiffDonut(); call((diffSummary as any).n); void jsx(); });
+const initializeSummaryBlock = once(() => { call(appSharedLazy); call((toolActivityDisclosure as any).n); void jsx(); });
+const initializeWebSearchBlock = once(() => { call(appSharedLazy); call((presentation as any).a); void jsx(); });
+const initializeTurnBlockAssembly = once(() => { initializeActivitySummaryGroup(); initializeMcpAppWidgets(); initializeImageAndAttachmentBlocks(); initializeInProgressDiffSummary(); initializeSummaryBlock(); initializeWebSearchBlock(); call((mcpToolApprovalMessage as any).u); call((planSummaryItemContent as any).n); call((writingBlockDirectiveRenderer as any).n); void jsx(); });
+const initializeActivityRow = once(() => { initializeTurnBlockAssembly(); call((execShellContainer as any).n); call((elicitationEvents as any).n); void jsx(); });
+const initializeTurnBlocks = once(() => { initializeActivityRow(); call((partition as any).n); void jsx(); });
+const initializeBlockList = once(() => { call(appSharedLazy); void jsx(); });
 
 // ---------------------------------------------------------------------------
 // 搜索结果块（原 `Lh`/`Wh`，导出 K/q：3 条折叠 + 展开按钮）
 // ---------------------------------------------------------------------------
 
 /** 搜索结果块（原 `Lh`，导出 K）。 */
-function SearchResultsBlock(props: { results: unknown[] }): ViewNode | null {
+function SearchResultsBlock(props: { results: unknown[] }): unknown {
   const { results } = props;
+  const react = getReact?.();
+  const [expanded, setExpanded] = react?.useState?.(false) ?? [false, () => undefined];
   if (results.length === 0) return null;
-  if (results.length === 1) return { kind: "search-results-single", props: { result: results[0] } };
-  return { kind: "search-results-collapsible", props: { count: results.length, results } };
+  const visible = expanded ? results : results.slice(0, 3);
+  const renderResult = (result: unknown, index: number): unknown => {
+    if (result == null || typeof result === "string" || typeof result === "number") return jsx().jsx("div", { "data-search-result": true, children: result as any }, index);
+    const value = result as Record<string, unknown>;
+    const label = value.title ?? value.name ?? value.label ?? value.threadId ?? value.clientThreadId ?? `Result ${index + 1}`;
+    return jsx().jsx("div", { "data-search-result": true, children: String(label) }, String(value.threadId ?? value.clientThreadId ?? index));
+  };
+  return jsx().jsxs("section", { "data-search-results": results.length, children: [visible.map(renderResult), results.length > 3 ? jsx().jsx("button", { type: "button", "aria-expanded": expanded, onClick: () => setExpanded(!expanded), children: expanded ? "Show fewer chats" : `Show ${results.length - 3} more ${results.length - 3 === 1 ? "chat" : "chats"}` }) : null] });
 }
 
 /** 活动摘要行（原 `qg`，导出 F）。 */
 function LocalActivitySummaryRow(props: {
-  activityItems: unknown[];
-  backgroundAgentById?: Map<string, { displayName?: string }>;
+  activityItems: Array<Record<string, any>>;
+  backgroundAgentById?: Map<string, Record<string, any>>;
   laterActivityConversationIds?: Set<string>;
-}): ViewNode {
-  return { kind: "activity-summary-row", props: props as Record<string, unknown> };
+  turnKey?: string;
+}): Array<Record<string, unknown>> {
+  const latestByConversation = new Map<string, Record<string, any>>();
+  for (const item of props.activityItems) latestByConversation.set(normalizeConversationId(String(item.agentThreadId)), item);
+  return Array.from(latestByConversation, ([conversationId, item]) => {
+    const agent = props.backgroundAgentById?.get(conversationId);
+    const belongsToTurn = agent?.parentTurnKey === props.turnKey;
+    const displayName = belongsToTurn && agent?.showInlineActivity === false ? agent.displayName : item.displayName?.trim() || agent?.displayName;
+    if (typeof displayName !== "string" || displayName.trim().length === 0 || displayName.trim() === String(item.agentThreadId)) return null;
+    const status = agent == null ? item.displayStatus === "completed" || item.displayStatus === "interrupted" ? "done" : "active" : belongsToTurn ? agent.status : "done";
+    return { activityStatus: status === "done" && belongsToTurn && !props.laterActivityConversationIds?.has(conversationId) ? "done" : item.displayStatus, canOpen: agent != null || item.displayStatus === "active", conversationId, displayName, status };
+  }).filter(value => value != null) as Array<Record<string, unknown>>;
 }
 
 /** 活动摘要分组（原 `Jg`，导出 P）。 */
 function ActivitySummaryGroup(props: {
-  activityItemGroups: unknown[];
-  backgroundAgents?: Array<{ displayName?: string; id: string; parentTurnKey?: string }>;
+  activityItemGroups: Array<Array<Record<string, any>>>;
+  backgroundAgents?: Array<Record<string, any>>;
+  excludedSubagentThreadIds?: Set<string>;
   turnKey?: string;
-}): ViewNode {
-  return { kind: "activity-summary-group", props: props as Record<string, unknown> };
+}): Array<{ anchorItemId: string | null; rows: Array<Record<string, unknown>>; status: ReturnType<typeof mergeActivityStatuses> }> {
+  const agents = (props.backgroundAgents ?? []).filter(agent => !props.excludedSubagentThreadIds?.has(String(agent.conversationId)) && agent.parentTurnKey === props.turnKey && typeof agent.displayName === "string" && agent.displayName.trim().length > 0 && agent.displayName.trim() !== String(agent.conversationId));
+  const standaloneRows = agents.map(agent => ({ activityStatus: agent.status === "done" ? "done" : "active", canOpen: true, conversationId: agent.conversationId, displayName: agent.displayName, status: agent.status }));
+  const group = (anchorItemId: string | null, rows: Array<Record<string, any>>) => ({ anchorItemId, rows, status: mergeActivityStatuses(rows.map(row => String(row.activityStatus))) });
+  if (props.activityItemGroups.length === 0) return standaloneRows.length === 0 ? [] : [group(null, standaloneRows)];
+  const byId = new Map(agents.map(agent => [String(agent.conversationId), agent]));
+  const later = new Set<string>();
+  const groups = [];
+  for (let index = props.activityItemGroups.length - 1; index >= 0; index -= 1) {
+    const items = props.activityItemGroups[index].filter(item => !props.excludedSubagentThreadIds?.has(String(item.agentThreadId)));
+    groups.push(group(items[0]?.id ?? null, LocalActivitySummaryRow({ activityItems: items, backgroundAgentById: byId, laterActivityConversationIds: later, turnKey: props.turnKey })));
+    for (const item of items) later.add(normalizeConversationId(String(item.agentThreadId)));
+  }
+  const visible = groups.reverse().filter(value => value.rows.length > 0);
+  const remaining = standaloneRows.filter(row => !later.has(String(row.conversationId)));
+  return remaining.length === 0 ? visible : [...visible, group(null, remaining)];
 }
 
 /** 活动行（原 `aw`，导出 s）。 */
-function ActivityRow(props: { historyEntityKey?: unknown; hostId?: string; item: Record<string, unknown> }): ViewNode {
-  return { kind: "activity-row", props: props as Record<string, unknown> };
+function ActivityRow(props: { historyEntityKey?: unknown; hostId?: string; item: Record<string, unknown> }): unknown {
+  const type = String(props.item.type ?? "activity");
+  return jsx().jsx("div", { "data-activity-row": type, children: (props.item.title ?? props.item.summary ?? type) as any });
 }
 
 /** 活动行组（原 `sw`，导出 c）。 */
-function ActivityRowGroup(props: { historyEntityKey?: unknown; hostId?: string; item: Record<string, unknown> }): ViewNode {
-  return { kind: "activity-row-group", props: props as Record<string, unknown> };
+function ActivityRowGroup(props: { historyEntityKey?: unknown; hostId?: string; item: Record<string, unknown> }): unknown {
+  const items = Array.isArray(props.item.items) ? props.item.items : [props.item];
+  return jsx().jsx("section", { "data-activity-row-group": true, children: items.map((item, index) => jsx().jsx(ActivityRow, { hostId: props.hostId, item: item as Record<string, unknown> }, index)) });
 }
 
 /** TurnBodyAssembly（原 `_w`，导出 a；45 号 memo-cache 的 turn 渲染编排）。 */
-function TurnBodyAssembly(props: { activeCommentaryItem?: unknown; units: unknown[] }): ViewNode {
-  return { kind: "turn-body-assembly", props: props as Record<string, unknown> };
+function TurnBodyAssembly(props: { activeCommentaryItem?: unknown; keepMcpAppEntriesPersistent?: boolean; mcpServerStatuses?: unknown; renderMcpApps?: boolean; units: any[] }): unknown {
+  const parts = partitionCollapsibleUnits(props.units as any, props);
+  return jsx().jsxs(jsx().Fragment, { children: [
+    parts.preToggleUnits.length ? jsx().jsx(TurnBlocks as any, { units: parts.preToggleUnits }) : null,
+    parts.expandedUnits.length ? jsx().jsx(TurnBlocks as any, { units: parts.expandedUnits }) : null,
+    props.activeCommentaryItem == null ? null : jsx().jsx(ActivityRow, { item: props.activeCommentaryItem as Record<string, unknown> }),
+  ] });
 }
 
 /** 可折叠性分拣（原 `Iw`，L10900 区）。 */
 function partitionCollapsibleUnits(
   units: Array<{ item: { item: { type?: string } }; kind: string }>,
   options: { keepMcpAppEntriesPersistent?: boolean; mcpServerStatuses?: unknown; renderMcpApps?: boolean } = {},
-): { collapsibleUnits: unknown[]; persistentUnits: unknown[]; realtimeUnits: unknown[]; workedForItem: unknown | null } {
+): { collapsibleUnits: unknown[]; expandedUnits: unknown[]; persistentUnits: unknown[]; preToggleUnits: unknown[]; workedForItem: unknown | null } {
   const collapsibleUnits: unknown[] = [];
+  const expandedUnits: unknown[] = [];
   const persistentUnits: unknown[] = [];
-  const realtimeUnits: unknown[] = [];
+  const preToggleUnits: unknown[] = [];
   let workedForItem: unknown | null = null;
-  let seenRealtime = false;
   for (const unit of units) {
     if (unit.kind === "standalone" && unit.item.item.type === "worked-for") {
       workedForItem = unit.item.item;
       continue;
     }
     if (unit.kind === "standalone" && unit.item.item.type === "realtime-transcript") {
-      if (!seenRealtime) realtimeUnits.push(unit);
-      else {
-        seenRealtime = true;
-        persistentUnits.push(unit);
-      }
+      if (expandedUnits.length === 0) preToggleUnits.push(unit);
+      else { expandedUnits.push(unit); persistentUnits.push(unit); }
       continue;
     }
-    seenRealtime = true;
-    // 可折叠判定（原 Lw：mcp-app widget 保持 + 其余可折叠）
-    const isPersistent = options.renderMcpApps === true || options.keepMcpAppEntriesPersistent === true;
+    expandedUnits.push(unit);
+    const item = unit.item.item as Record<string, any>;
+    const isPersistent = unit.kind === "standalone" && (
+      (item.type === "dynamic-tool-call" && item.isDynamic === true) ||
+      (options.keepMcpAppEntriesPersistent === true && options.renderMcpApps === true && item.type === "mcp-tool-call" && (item.mcpAppResourceUri != null || item.result?.type === "success")) ||
+      (item.type === "user-message" && (item.steeringStatus != null || item.hookFeedback === true))
+    );
     if (isPersistent) persistentUnits.push(unit);
     else collapsibleUnits.push(unit);
   }
-  return { collapsibleUnits, persistentUnits, realtimeUnits, workedForItem };
+  return { collapsibleUnits, expandedUnits, persistentUnits, preToggleUnits, workedForItem };
 }
 
 // ---------------------------------------------------------------------------

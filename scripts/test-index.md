@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 1860.
+Total scripts: 1866.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -11,6 +11,11 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 
 ## Recent semantic extraction suites
 
+- [`test-conversation-blocks-restored-cluster.mjs`](./test-conversation-blocks-restored-cluster.mjs)
+- [`test-home-composer-restored-components.mjs`](./test-home-composer-restored-components.mjs)
+- [`test-pull-request-hover-card-data.mjs`](./test-pull-request-hover-card-data.mjs)
+- [`test-user-message-restored-components.mjs`](./test-user-message-restored-components.mjs)
+- [`test-virtualized-turn-list.mjs`](./test-virtualized-turn-list.mjs)
 - [`test-resource-updates-bridge-runtime.mjs`](./test-resource-updates-bridge-runtime.mjs)
 - [`test-renderer-recovered-route-source-build.mjs`](./test-renderer-recovered-route-source-build.mjs)
 - [`test-renderer-route-semantic-overrides.mjs`](./test-renderer-route-semantic-overrides.mjs)
@@ -1303,6 +1308,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-lightweight-route-pages-cluster.mjs`](./test-lightweight-route-pages-cluster.mjs)
 - [`test-local-conversation-background-terminal-tab.mjs`](./test-local-conversation-background-terminal-tab.mjs)
 - [`test-local-conversation-subagents-panel-tab.mjs`](./test-local-conversation-subagents-panel-tab.mjs)
+- [`test-local-conversation-turn-cluster.mjs`](./test-local-conversation-turn-cluster.mjs)
 - [`test-local-environment-settings-cluster.mjs`](./test-local-environment-settings-cluster.mjs)
 - [`test-location-permission-denied-dialog.mjs`](./test-location-permission-denied-dialog.mjs)
 - [`test-logic-query-models-cluster.mjs`](./test-logic-query-models-cluster.mjs)

@@ -13,6 +13,31 @@ import * as appConnectFlowChunk from "@rchunk/use-app-connect-flow";
 
 interface ApprovalCardProps { description?: unknown; icon?: unknown; isPrimaryActionLoading?: boolean; primaryActionLabel: string; secondaryActionLabel?: string; showDeclineShortcut?: boolean; title: unknown; onDecline(): void; onPrimaryActionClick?(): void; onSubmit(): void }
 interface ApprovalReplyProps { conversationId: string; hostId: string; requestId: string; onReply?(reply: "accept" | "decline"): Promise<void> | void }
+interface ConnectorRecord { id: string; installUrl?: string; isAccessible?: boolean; isEnabled?: boolean; name?: string }
+interface PluginRecord { description?: string; displayName?: string; plugin: { enabled?: boolean; id: string; installed?: boolean; name?: string; remotePluginId?: string } }
+interface ConnectorAuthorization {
+  connector: {
+    auth_reason?: "missing_link" | "oauth_upgrade_required" | string;
+    connection_consent?: { origin: string; scopes: Array<{ label: string; scope: string }> };
+    connector_id: string;
+    connector_name?: string;
+    install_url?: string;
+    link_id?: string;
+    requested_scopes?: string[];
+  };
+  reason?: string;
+  url?: string;
+}
+interface ToolSuggestion {
+  install_url?: string;
+  remote_plugin_id?: string;
+  suggest_type?: "enable" | "install";
+  suggestion_id?: string;
+  tool_id: string;
+  tool_name?: string;
+  tool_title?: string;
+  tool_type?: "connector" | "plugin";
+}
 let runtime: JsxRuntime | undefined;
 function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
 function callInitializer(value: unknown): void { if (typeof value === "function") value(); }
@@ -71,58 +96,199 @@ function createReplyHandler(props: ApprovalReplyProps): (value: "accept" | "decl
     }
   };
 }
-function stagedConnectionCard(props: ApprovalReplyProps & { begin(): Promise<void> | void; description: unknown; primaryActionLabel: string; title: string }): unknown {
+function list<Value>(value: unknown): Value[] { return Array.isArray(value) ? value as Value[] : []; }
+function connectorReady(app: ConnectorRecord | null, requireEnabled: boolean): boolean {
+  return app?.isAccessible === true && (!requireEnabled || app.isEnabled === true);
+}
+function pluginReady(plugin: PluginRecord | null, requireEnabled: boolean): boolean {
+  return plugin?.plugin.installed === true && (!requireEnabled || plugin.plugin.enabled === true);
+}
+function showToast(notifications: any, kind: "danger" | "warning", message: string, toastId: string): void {
+  notifications?.[kind]?.(message, { errorAnalytics: { toastId } });
+}
+function formatMessage(intl: any, defaultMessage: string, values?: Record<string, unknown>): string {
+  return intl?.formatMessage?.({ defaultMessage }, values) ?? defaultMessage.replace(/\{(\w+)\}/g, (_match, key) => String(values?.[key] ?? `{${key}}`));
+}
+function connectModal(flow: any, props: ApprovalReplyProps, resumeTarget: Record<string, unknown>, onConnected: () => Promise<void>): unknown {
+  const Modal = (connectModalChunk as any).t;
+  if (typeof Modal !== "function" || flow?.connectingApp == null) return null;
+  return jsx().jsx(Modal, {
+    app: flow.connectingApp,
+    hostId: props.hostId,
+    onConnected,
+    onExternalConnectStarted: flow.onExternalConnectStarted,
+    onOAuthStarted: (event: Record<string, unknown>) => flow.handleAppConnectOAuthStarted?.({ ...event, resumeTarget }),
+    onOpenChange: (open: boolean) => { if (!open) flow.clearConnectingApp?.(); },
+  });
+}
+function ToolSuggestionApproval(props: ApprovalReplyProps & { suggestion: ToolSuggestion }): unknown {
   const react = (sharedChunk as any).e6?.();
-  const [started, setStarted] = react?.useState?.(false) ?? [false, () => undefined];
-  const startedRef = react?.useRef?.(false) ?? { current: false };
+  const notifications = (sharedChunk as any).HX?.((sharedChunk as any).pk);
+  const intl = (sharedChunk as any).n4?.();
+  const notify = (kind: "danger" | "warning", text: string, id: string): void => showToast(notifications, kind, text, id);
+  const format = (text: string, values?: Record<string, unknown>): string => formatMessage(intl, text, values);
+  const [loading, setLoading] = react?.useState?.(false) ?? [false, () => undefined];
+  const stageRef = (react?.useRef?.("idle") ?? { current: "idle" }) as { current: "idle" | "started" };
   const reply = createReplyHandler(props);
-  const submit = async (): Promise<void> => {
-    if (started || (react?.useState == null && startedRef.current)) {
+  const suggestion = props.suggestion;
+  const type = suggestion.tool_type ?? "connector";
+  const action = suggestion.suggest_type ?? "enable";
+  const title = suggestion.tool_title ?? suggestion.tool_name ?? "Tool required";
+  const resumeTarget = { kind: "tool-suggestion-elicitation", conversationId: props.conversationId, requestId: props.requestId, response: (initialChunk as any).Wgn?.("accept") ?? "accept" };
+  const appsQuery = (initialChunk as any).GEt?.({ enabled: type === "connector", hostId: props.hostId }) ?? {};
+  const apps = list<ConnectorRecord>(appsQuery.data);
+  const app = apps.find(candidate => candidate.id === suggestion.tool_id) ?? null;
+  const pluginQuery = (initialChunk as any).N4t?.(props.hostId, undefined, { enabled: type === "plugin" }) ?? {};
+  const plugins = list<PluginRecord>(pluginQuery.availablePlugins ?? pluginQuery.data);
+  const plugin = plugins.find(candidate => candidate.plugin.id === suggestion.tool_id || candidate.plugin.remotePluginId === suggestion.remote_plugin_id) ?? null;
+  const flow = (appConnectFlowChunk as any).n?.({ hostId: props.hostId, onExternalConnectStarted: () => { stageRef.current = "started"; } }) ?? {};
+  const appToggle = (appsAvailabilityChunk as any).n?.({ hostId: props.hostId }) ?? {};
+  const pluginToggle = (initialChunk as any).Vwt?.({ hostId: props.hostId }) ?? {};
+  const pluginInstall = (initialChunk as any).U2?.() ?? {};
+  const isReady = (nextApp = app, nextPlugin = plugin): boolean => type === "connector"
+    ? connectorReady(nextApp, action === "enable")
+    : pluginReady(nextPlugin, action === "enable");
+  const refreshAndAccept = async (): Promise<void> => {
+    setLoading(true);
+    try {
+      if (type === "connector") {
+        const refreshed = list<ConnectorRecord>(await appsQuery.hardRefetchAppsList?.());
+        const next = refreshed.find(candidate => candidate.id === suggestion.tool_id) ?? null;
+        if (!connectorReady(next, action === "enable")) {
+          notify("danger", format("{toolName} is not ready yet. Finish setting it up, then continue", { toolName: title }), "inlineToolSuggestionRequestCard.handleContinue.connectorNotReady");
+          return;
+        }
+      } else {
+        const refreshed = await (pluginQuery.refetch?.() ?? pluginQuery.reload?.());
+        const available = list<PluginRecord>(refreshed?.availablePlugins ?? refreshed?.data ?? pluginQuery.availablePlugins);
+        const next = available.find(candidate => candidate.plugin.id === suggestion.tool_id || candidate.plugin.remotePluginId === suggestion.remote_plugin_id) ?? null;
+        if (!pluginReady(next, action === "enable")) {
+          notify("danger", format("{toolName} is not ready yet. Finish setting it up, then continue", { toolName: title }), "inlineToolSuggestionRequestCard.handleContinue.pluginNotReady");
+          return;
+        }
+      }
       await reply("accept");
-      return;
-    }
-    startedRef.current = true;
-    setStarted(true);
-    try { await props.begin(); }
-    catch { startedRef.current = false; setStarted(false); }
+    } catch {
+      notify("danger", "Could not refresh this tool suggestion", "inlineToolSuggestionRequestCard.handleContinue.genericLoadError");
+    } finally { setLoading(false); }
   };
-  return ApprovalCard({
-    title: props.title,
-    description: props.description,
-    primaryActionLabel: started ? "Continue" : props.primaryActionLabel,
-    secondaryActionLabel: "Decline",
+  const start = async (): Promise<void> => {
+    if (stageRef.current === "started" || isReady()) { await refreshAndAccept(); return; }
+    setLoading(true);
+    try {
+      if (type === "connector") {
+        stageRef.current = "started";
+        if (action === "enable" && app != null) await appToggle.setAppEnabled?.({ appId: app.id, enabled: true });
+        else if (app != null) await flow.handleConnectApp?.(app);
+        else flow.handleOpenAppUrl?.(suggestion.install_url);
+      } else if (action === "enable") {
+        if (plugin == null) { notify("danger", "Could not load this plugin right now", "inlineToolSuggestionRequestCard.handlePrimaryAction.missingPlugin"); return; }
+        stageRef.current = "started";
+        await pluginToggle.setPluginEnabled?.({ pluginDisplayName: plugin.displayName ?? plugin.plugin.name ?? title, pluginId: plugin.plugin.id, plugin: plugin.plugin, enabled: true });
+      } else {
+        if (plugin == null) { notify("danger", "Could not load this plugin right now", "inlineToolSuggestionRequestCard.handleInstallPlugin.missingPlugin"); return; }
+        stageRef.current = "started";
+        await pluginInstall.installPlugin?.(plugin, { elicitationOwnsConnectorRefresh: true, hostId: props.hostId, origin: "in_conversation_elicitation" });
+      }
+    } catch {
+      stageRef.current = "idle";
+      notify("danger", `Could not ${action === "install" ? "install" : "enable"} ${title}`, "inlineToolSuggestionRequestCard.handlePrimaryAction.actionError");
+    } finally { setLoading(false); }
+  };
+  const card = ApprovalCard({
+    title: stageRef.current === "started" && action === "install" ? `Click Continue when you're done setting up ${title}` : title,
+    description: type === "connector" ? app?.name == null ? "Connect this app to continue" : app.name : plugin?.description ?? "Enable this tool to continue",
+    primaryActionLabel: stageRef.current === "started" || isReady() ? "Continue" : action === "install" ? "Install" : "Enable",
+    isPrimaryActionLoading: loading,
     onDecline: () => { void reply("decline"); },
-    onSubmit: () => { void submit(); },
+    onSubmit: () => { void start(); },
   });
+  return jsx().jsxs(jsx().Fragment, { children: [card, connectModal(flow, props, resumeTarget, refreshAndAccept)] });
 }
-function ToolSuggestionApproval(props: ApprovalReplyProps & { suggestion: { install_url?: string; tool_id?: string; tool_name?: string; tool_title?: string; tool_type?: string } }): unknown {
-  const flow = (appConnectFlowChunk as any).n?.({ hostId: props.hostId });
-  const title = props.suggestion.tool_title ?? props.suggestion.tool_name ?? "Tool required";
-  return stagedConnectionCard({
-    ...props,
-    title,
-    description: "Enable this tool to continue",
-    primaryActionLabel: "Enable",
-    begin: async () => {
-      if (props.suggestion.install_url != null && typeof flow?.handleOpenAppUrl === "function") flow.handleOpenAppUrl(props.suggestion.install_url);
-      else if (props.suggestion.tool_type === "connector" && typeof flow?.handleConnectApp === "function") await flow.handleConnectApp({ id: props.suggestion.tool_id, name: title });
-    },
-  });
-}
-function ConnectorAuthorizationApproval(props: ApprovalReplyProps & { auth: { connector?: { connector_id?: string; connector_name?: string; install_url?: string }; reason?: string } }): unknown {
-  const flow = (appConnectFlowChunk as any).n?.({ hostId: props.hostId });
+function ConnectorAuthorizationApproval(props: ApprovalReplyProps & { auth: ConnectorAuthorization }): unknown {
+  const react = (sharedChunk as any).e6?.();
+  const notifications = (sharedChunk as any).HX?.((sharedChunk as any).pk);
+  const intl = (sharedChunk as any).n4?.();
+  const notify = (kind: "danger" | "warning", text: string, id: string): void => showToast(notifications, kind, text, id);
+  const format = (text: string, values?: Record<string, unknown>): string => formatMessage(intl, text, values);
+  const [loading, setLoading] = react?.useState?.(false) ?? [false, () => undefined];
+  const externalStarted = react?.useRef?.(false) ?? { current: false };
+  const reply = createReplyHandler(props);
   const connector = props.auth.connector;
-  const name = connector?.connector_name ?? "this app";
-  return stagedConnectionCard({
-    ...props,
-    title: `Connect ${name}`,
-    description: props.auth.reason ?? `ChatGPT needs access to ${name}`,
-    primaryActionLabel: "Connect",
-    begin: async () => {
-      if (connector?.install_url != null && typeof flow?.handleOpenAppUrl === "function") flow.handleOpenAppUrl(connector.install_url);
-      else if (connector != null && typeof flow?.handleConnectApp === "function") await flow.handleConnectApp({ id: connector.connector_id, name });
-    },
+  const name = connector.connector_name ?? "this app";
+  const queryHost = props.hostId === "durable" ? ((initialChunk as any).ugn ?? props.hostId) : props.hostId;
+  const appsQuery = (initialChunk as any).GEt?.({ hostId: queryHost }) ?? {};
+  const apps = list<ConnectorRecord>(appsQuery.data);
+  const app = apps.find(candidate => candidate.id === connector.connector_id) ?? null;
+  const resumeTarget = { kind: "connector-auth-elicitation", conversationId: props.conversationId, requestId: props.requestId };
+  const flow = (appConnectFlowChunk as any).n?.({ hostId: props.hostId, onExternalConnectStarted: () => { externalStarted.current = true; } }) ?? {};
+  const claimed = (initialChunk as any).Lr?.().isAppConnectCallbackClaimed?.(connector.connector_id, resumeTarget) === true;
+  const pending = flow.isAppConnectPending?.(connector.connector_id, resumeTarget) === true;
+  const continueMode = connector.connection_consent == null && (externalStarted.current || pending || claimed);
+  const send = async (value: "accept" | "decline"): Promise<void> => {
+    flow.clearPendingAppConnect?.({ appId: connector.connector_id, resumeTarget });
+    await reply(value);
+  };
+  const refreshAndAccept = async (): Promise<void> => {
+    setLoading(true);
+    try {
+      const refreshed = list<ConnectorRecord>(await appsQuery.hardRefetchAppsList?.());
+      if (!connectorReady(refreshed.find(candidate => candidate.id === connector.connector_id) ?? null, false)) {
+        notify("warning", format("{connectorName} is not ready yet. Finish signing in, then continue", { connectorName: name }), "inlineConnectorAuthRequestCard.handleContinue.connectorNotReady");
+        return;
+      }
+      await send("accept");
+    } catch {
+      notify("danger", "Could not refresh this connector", "inlineConnectorAuthRequestCard.handleContinue.genericLoadError");
+    } finally { setLoading(false); }
+  };
+  const start = async (): Promise<void> => {
+    if (continueMode || externalStarted.current) { await refreshAndAccept(); return; }
+    setLoading(true);
+    try {
+      if (connector.connection_consent != null) {
+        await (initialChunk as any).Y3t?.({ connectorId: connector.connector_id, authorization: connector.connection_consent });
+        await send("accept");
+        void appsQuery.hardRefetchAppsList?.();
+        return;
+      }
+      const startConnection = (initialChunk as any).l6t;
+      if (typeof startConnection === "function") {
+        const outcome = await startConnection({
+          app: { id: connector.connector_id, installUrl: app?.installUrl ?? connector.install_url, name },
+          authReason: connector.auth_reason,
+          fallbackUrl: props.auth.url,
+          linkId: connector.link_id,
+          openInBrowser: (url: string) => flow.handleOpenAppUrl?.(url),
+          queryClient: (sharedChunk as any).CL?.(),
+          requestedScopes: connector.requested_scopes,
+        });
+        if (outcome?.kind === "connected-directly") { await send("accept"); return; }
+        if (outcome?.kind === "oauth-started") flow.handleAppConnectOAuthStarted?.({ app: { id: connector.connector_id, name }, redirectUrl: outcome.redirectUrl, resumeTarget });
+        if (outcome?.kind === "failed") notify("danger", "Could not start connector authentication", "composer.connectorAuth.startError");
+        externalStarted.current = outcome?.kind === "oauth-started" || outcome?.kind === "browser-fallback";
+        return;
+      }
+      externalStarted.current = true;
+      if (app != null) await flow.handleConnectApp?.(app);
+      else flow.handleOpenAppUrl?.(connector.install_url);
+    } catch {
+      externalStarted.current = false;
+      notify("danger", `Could not connect ${name}`, "inlineConnectorAuthRequestCard.handlePrimaryAction.actionError");
+    } finally { setLoading(false); }
+  };
+  const reason = connector.connection_consent != null
+    ? AuthorizationScopes({ authorization: connector.connection_consent })
+    : props.auth.reason ?? (connector.auth_reason === "oauth_upgrade_required" ? "Your current connection doesn't include the permissions needed for this request." : `ChatGPT needs access to ${name}`);
+  const card = ApprovalCard({
+    title: name,
+    description: reason,
+    primaryActionLabel: continueMode ? "Continue" : connector.auth_reason === "oauth_upgrade_required" ? "Update access" : connector.auth_reason === "missing_link" ? "Connect" : "Reconnect",
+    isPrimaryActionLoading: loading || claimed,
+    onDecline: () => { void send("decline"); },
+    onSubmit: () => { void start(); },
   });
+  return jsx().jsxs(jsx().Fragment, { children: [card, connectModal(flow, props, resumeTarget, refreshAndAccept)] });
 }
 function UrlActionApproval(props: ApprovalReplyProps & { action: { message?: string; url: string } }): unknown {
   const react = (sharedChunk as any).e6?.();
@@ -136,14 +302,14 @@ function UrlActionApproval(props: ApprovalReplyProps & { action: { message?: str
     (initialChunk as any).kft?.({ href: props.action.url, initiator: "mcp_app_resource" });
   };
   const submit = (): void => {
-    if (opened || (react?.useState == null && openedRef.current)) {
+    if (opened || openedRef.current) {
       void reply("accept");
       return;
     }
     openLink();
   };
   const primaryClick = (event?: { preventDefault?(): void }): void => {
-    if (opened) return;
+    if (opened || openedRef.current) return;
     event?.preventDefault?.();
     openLink();
   };

@@ -53,6 +53,60 @@ function compactString(value: unknown, maxLength = 96): string | null {
 function objectArguments(value: unknown): Record<string, unknown> | null {
   return value != null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
 }
+const RESULT_COUNT_KEYS = ["count", "total", "total_count", "totalCount"] as const;
+const RESULT_ARRAY_KEYS: Record<string, string[]> = {
+  figma: ["files", "nodes", "results", "suggestions", "variables"],
+  github: ["items", "issues", "pull_requests", "repositories", "results", "reviews", "threads", "users", "workflow_runs"],
+  gmail: ["emails", "messages", "results", "threads"],
+  google_calendar: ["events", "items", "results"],
+  google_drive: ["comments", "documents", "drives", "files", "items", "presentations", "results", "revisions", "rows", "spreadsheets"],
+  linear: ["attachments", "comments", "customers", "cycles", "documents", "initiatives", "issues", "labels", "milestones", "projects", "results", "teams", "users"],
+  notion: ["comments", "databases", "pages", "results", "teams", "users", "views"],
+  sites: ["access_groups", "deployments", "projects", "results", "sites", "versions"],
+  slack: ["channels", "items", "messages", "reactions", "results", "users", "workspaces"],
+  vercel: ["deployments", "projects", "results", "teams"],
+};
+const ACTIVITY_ARGUMENT_KEYS: Record<string, Record<string, string[]>> = {
+  figma: { create_new_file: ["fileName", "name"], generate_deck: ["title", "name"], generate_diagram: ["name", "description"], use_figma: ["description"] },
+  github: { create_issue: ["title"], create_pull_request: ["title"], search: ["query", "q"], search_commits: ["query"], search_issues: ["query"], search_prs: ["query"], search_repositories: ["query"], update_issue: ["title"], update_pull_request: ["title"] },
+  gmail: { create_draft: ["subject"], forward_emails: ["subject"], search_emails: ["query"], send_draft: ["subject"], send_email: ["subject"], update_draft: ["subject"] },
+  google_calendar: { create_event: ["summary", "title"], search: ["query"], search_events: ["query"], update_event: ["summary", "title"] },
+  google_drive: { create_file: ["name", "file_name"], create_folder: ["name"], search: ["query"], search_spreadsheet_rows: ["query"], upload_file: ["name", "file_name", "filename"] },
+  linear: { create_document: ["title", "name"], research: ["query"], save_issue: ["title"], save_project: ["name"], search: ["query"], search_documentation: ["query"] },
+  notion: { create_database: ["title", "name"], create_pages: ["title", "name"], duplicate_page: ["title", "name"], search: ["query"], update_page: ["title", "name"] },
+  sites: { create_project: ["name"], create_site: ["name"], list_projects: ["query"], list_sites: ["query"], update_site_metadata: ["name", "title"] },
+  slack: { create_canvas: ["title"], create_conversation: ["name"], schedule_message: ["channel_name", "channel"], search_channels: ["query"], search_public: ["query"], search_users: ["query"], send_message: ["channel_name", "channel"] },
+  vercel: { check_domain_availability_and_price: ["domain"], deploy_to_vercel: ["project_name", "name"], search_vercel_documentation: ["query"] },
+};
+function successfulStructuredContent(result: unknown): unknown {
+  const outer = objectArguments(result);
+  if (outer == null || outer.type !== "success") return null;
+  if (outer.structuredContent != null) return outer.structuredContent;
+  const raw = objectArguments(outer.raw);
+  return raw?.structuredContent ?? outer.raw ?? null;
+}
+function resultCount(result: unknown, appKey: string): number | null {
+  const structured = successfulStructuredContent(result);
+  if (Array.isArray(structured)) return structured.length;
+  const object = objectArguments(structured);
+  if (object == null) return null;
+  for (const key of RESULT_ARRAY_KEYS[appKey] ?? ["items", "results"]) if (Array.isArray(object[key])) return object[key].length;
+  for (const key of RESULT_COUNT_KEYS) {
+    const count = object[key];
+    if (typeof count === "number" && Number.isInteger(count) && count >= 0) return count;
+  }
+  const arrays = Object.values(object).filter(Array.isArray);
+  return arrays.length === 1 ? arrays[0].length : null;
+}
+function activityArgumentContext(appKey: string, toolKey: string, value: unknown): string | null {
+  const object = objectArguments(value);
+  if (object == null) return null;
+  for (const key of ACTIVITY_ARGUMENT_KEYS[appKey]?.[toolKey] ?? []) {
+    const preview = compactString(object[key], 80);
+    if (preview != null) return preview;
+  }
+  return null;
+}
 const APPROVAL_CONTEXT_KEYS: Record<string, string[]> = {
   figma: ["name", "title", "query", "node_id", "file_key"],
   github: ["title", "comment", "body", "message", "repo_full_name", "repository_full_name", "branch", "path"],
@@ -117,7 +171,7 @@ function registeredAppKey(app?: MatchingApp | null): string | null {
   const identities = normalizedAppKeys(app);
   return Object.keys(APP_TOOL_KEYS).find(key => identities.some(identity => identity.includes(key))) ?? null;
 }
-function registryLabel(app: MatchingApp | null | undefined, toolName: string, completed: boolean | undefined, args: unknown, intl: IntlShape): string | null {
+function registryLabel(app: MatchingApp | null | undefined, toolName: string, completed: boolean | undefined, args: unknown, result: unknown, intl: IntlShape): string | null {
   const appKey = registeredAppKey(app);
   if (appKey == null) return null;
   const toolKey = words(stripAppPrefix(toolName, app)).join("_");
@@ -127,8 +181,11 @@ function registryLabel(app: MatchingApp | null | undefined, toolName: string, co
   const exactDefault = EXACT_ACTIVITY_MESSAGES[appKey]?.[descriptorToolKey]?.[status];
   const idAppKey = appKey === "google_calendar" ? "googleCalendar" : appKey === "google_drive" ? "googleDrive" : appKey;
   if (exactDefault != null) {
-    const context = approvalContext(app!, args);
-    return intl.formatMessage({ id: `localConversation.mcpToolActivity.${idAppKey}.${descriptorToolKey}.${status}`, defaultMessage: context == null ? exactDefault : `${exactDefault} “${context}”` });
+    const context = activityArgumentContext(appKey, descriptorToolKey, args);
+    const count = completed ? resultCount(result, appKey) : null;
+    if (context != null) return intl.formatMessage({ id: `localConversation.mcpToolActivity.${idAppKey}.${descriptorToolKey}.${status}.withContext`, defaultMessage: `${exactDefault} “{context}”` }, { context });
+    if (count != null && /^(list|search|read|batch|get_|query_)/.test(descriptorToolKey)) return intl.formatMessage({ id: `localConversation.mcpToolActivity.${idAppKey}.${descriptorToolKey}.${status}.count`, defaultMessage: `${exactDefault} ({count})` }, { count });
+    return intl.formatMessage({ id: `localConversation.mcpToolActivity.${idAppKey}.${descriptorToolKey}.${status}`, defaultMessage: exactDefault });
   }
   const parts = words(toolKey);
   const verb = (completed ? COMPLETED_VERBS : ACTIVE_VERBS)[parts[0]];
@@ -306,7 +363,7 @@ function formatToolActivityLabel(input: ToolActivityInput): string {
     });
     return computerUseLabel ?? fallback;
   }
-  return registryLabel(matchingApp, input.appContext?.actionName ?? input.toolName, input.completed, input.toolArguments, input.intl) ?? fallback;
+  return registryLabel(matchingApp, input.appContext?.actionName ?? input.toolName, input.completed, input.toolArguments, input.toolResult, input.intl) ?? fallback;
 }
 let initialized = false;
 function initializeMcpToolActivityLabels(): void {
