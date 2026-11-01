@@ -394,10 +394,7 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
 // compiles the selected checked-in owner directly. This lets large UI
 // modules leave the compatibility graph before their local names are manually
 // clarified, without changing their behavior or export surface.
-export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
-  ["realtime-voice-controls-surface", "controls-fedbfda05b6b.js"],
-  ["mark-session-create", "mark-session-create-6f7d531b2a15.js"],
-]);
+export const EXACT_ROUTE_SOURCE_OWNERS = new Map([]);
 
 export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   // These keep their published filenames, but are now built from readable
@@ -409,6 +406,8 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   // accurately represent unfinished route work instead of already-restored
   // dependencies pulled in transitively by the conversation roots.
   ...EXACT_ROUTE_SOURCE_OWNERS.values(),
+  "controls-fedbfda05b6b.js",
+  "mark-session-create-6f7d531b2a15.js",
   "app-connect-modal-7b842fd077d6.js",
   "gpt-about-dialog-7509f0d1e79e.js",
   "review-preferences-model-677402e96a42.js",

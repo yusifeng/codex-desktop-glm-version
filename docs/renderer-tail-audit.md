@@ -1,5 +1,15 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Realtime voice 收官批次：`mark-session-create` 与
+`realtime-voice-controls-surface` 的合计 8,209 行发布 owner 已进入直接 TypeScript 源构建，
+不再由 `exact.js` 或构建时回拷拥有输出。为避免在 69/41 项短导出均有真实消费者时引入行为
+漂移，本批保持发布行为，恢复 voice availability、session create/reset/timing、command dispatch，
+以及浮动 voice/pet/quick-chat 控件、几何布局、activity 与无障碍文案契约；新增专项 ABI/source
+contract，并通过 typecheck、604 个 semantic overrides 和 renderer source build。严格 exact owner
+清单由 2 个 / 8,209 行降至 0。这里的“严格清零”只表示 renderer exact owner 清零，**不等于
+完整项目已经反编译完成**；conversation-route compatibility、preserved main/renderer 边界和完整
+E2E 矩阵仍按总目标继续处理。
+
 2026-11-02 Artifact source bootstrap 大批次：`artifact-source-bootstrap` 不再保留
 15,318 行发布版 owner。可维护 TypeScript 恢复 artifact header/layout/zoom、worker transport、
 external store、viewport camera、hidden textarea、文本 layout/hit-test/selection、pointer click、
