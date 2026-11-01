@@ -332,6 +332,7 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "math-block-utils-ca3c4f5321e8.js",
   "mcp-tool-approval-message-cfc9b358efc1.js",
   "mcp-tool-item-content-d63cc703d211.js",
+  "onboarding-d0bfce15e4cc.js",
   "open-a618d40921b2.js",
   "page-268e2fb6d880.js",
   "pending-onboarding-9e794fa64b02.js",
@@ -354,6 +355,7 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "workbook-review-utils-3e78f7501b68.js",
   "workspace-agent-detail-query-3cb2bb771d2e.js",
   "presentation-f4eb8ac38003.js",
+  "pull-request-fix-workflow-1561e22a0cbc.js",
   "publish-actions-271f912485e5.js",
   "result-card-17125719c243.js",
   "runtime-4b6d284756d8.js",
@@ -372,7 +374,6 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
 // clarified, without changing their behavior or export surface.
 export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["onboarding-page", "onboarding-page-905dd8894724.js"],
-  ["onboarding", "onboarding-d0bfce15e4cc.js"],
   [
     "cloud-environments-settings-page",
     "cloud-environments-settings-page-b47c295bea65.js",
@@ -448,14 +449,9 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
     "codex-app-home-beacon-announcement-core",
     "codex-app-home-beacon-announcement-8c94f69eb080.js",
   ],
-  [
-    "codex-micro-onboarding-host",
-    "codex-micro-onboarding-host-85407a96e02a.js",
-  ],
   ["content", "content-bd6ed75ea274.js"],
   ["library-cloud-file-preview", "library-cloud-file-preview-b3ddfaa823c0.js"],
   ["open-conversation-files", "open-a618d40921b2.js"],
-  ["detached-browser-page", "page-268e2fb6d880.js"],
   ["workbook-review-utils", "workbook-review-utils-3e78f7501b68.js"],
   // Complete eager first-party dependency closure of the four conversation
   // React roots. These owners remove structurally approximate implementations
@@ -492,7 +488,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ],
   ["plugin-picker-menu-content", "plugin-picker-menu-content-a51d37a29207.js"],
   ["pull-request-actions", "pull-request-actions-5ac6dcc71dec.js"],
-  ["pull-request-fix-workflow", "pull-request-fix-workflow-1561e22a0cbc.js"],
   ["thread-handoff-modal", "thread-handoff-modal-ccac59d04293.js"],
   ["thread-panel-toggle-button", "thread-panel-toggle-button-d0ce9733e408.js"],
   ["use-app-connect-flow", "use-app-connect-flow-e16aee878521.js"],
