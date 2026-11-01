@@ -66,7 +66,9 @@ for (const output of PROMOTED_ROUTE_DEPENDENCIES) {
     if (dependency == null) continue;
     const dependencySemanticName = semanticNamesByOutput.get(dependency);
     const hasSemanticOwner = dependencySemanticName != null && !recovered.has(dependency);
-    const hasTransformOwner = await fs.access(path.join(root, "src/webview/assets", `${dependency}.ts`)).then(() => true, () => false);
+    const hasTransformOwner = await fs
+      .access(path.join(root, "src/webview/assets", dependency.replace(/\.js$/, ".ts")))
+      .then(() => true, () => false);
     if (!hasSemanticOwner && !hasTransformOwner && !recovered.has(dependency) && !RECONSTRUCTED_ROUTE_CORE.has(dependency)) {
       missingPromotedDependencies.push(`${output} -> ${dependency}`);
     }
@@ -98,7 +100,7 @@ const exactOwnerFiles = await Promise.all(
       const dependencySemanticName = semanticNamesByOutput.get(dependency);
       const hasSemanticOwner = dependencySemanticName != null && !recovered.has(dependency);
       const hasTransformOwner = await fs
-        .access(path.join(root, "src/webview/assets", `${dependency}.ts`))
+        .access(path.join(root, "src/webview/assets", dependency.replace(/\.js$/, ".ts")))
         .then(() => true, () => false);
       if (!hasSemanticOwner && !hasTransformOwner && !recovered.has(dependency) && !RECONSTRUCTED_ROUTE_CORE.has(dependency)) {
         missingExactDependencies.push(`${output} -> ${dependency}`);

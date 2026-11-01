@@ -4850,6 +4850,12 @@ export const REWRITTEN = new Set([
   "tokenize-math-block",
   "use-imported-setup-opportunity",
   "visualization-standalone-document",
+  "artifact-source-bootstrap",
+  "text-underline-icon",
+  "popcorn-electron-surface-style",
+  "checkout-session",
+  "mark-session-create",
+  "xterm-window-zoom",
 ]);
 
 // 已审计并明确保留发布版资产的尾部 chunk。这些模块属于第三方运行时、
@@ -5291,10 +5297,4 @@ export const INCREMENTAL_HUBS = new Map([
   ["app-shared", "typed-consumer-surface"],
   ["app-initial", "typed-consumer-surface"],
   ["app-primary", "typed-consumer-surface"],
-  ["artifact-source-bootstrap", "typed-consumer-surface"],
-  ["text-underline-icon", "typed-consumer-surface"],
-  ["popcorn-electron-surface-style", "typed-consumer-surface"],
-  ["checkout-session", "typed-consumer-surface"],
-  ["mark-session-create", "typed-consumer-surface"],
-  ["xterm-window-zoom", "typed-consumer-surface"],
 ]);

@@ -41,10 +41,10 @@ exports were previously classified. Current completion requires source-backed bu
 
 ## Current runtime-source recovery status
 
-The renderer build now builds all 1,882 registered rewritten chunks. Forty-seven large settings, composer, onboarding, activity, and
+The renderer build now builds all 1,888 registered rewritten chunks. Fifty-three settings, composer, onboarding, activity, and
 supporting React modules have release-faithful source owners under their semantic `src/renderer/<name>/` directories. Their
 checked-in `exact.js` files are generated from the published ESM with only cross-chunk import specifiers rewritten; a parity
-gate regenerates all forty-seven from the release input and requires exact source equality. The build therefore no longer substitutes
+gate regenerates all fifty-three from the release input and requires exact source equality. The build therefore no longer substitutes
 the earlier partial view-model approximations for these production components.
 
 The remaining route compatibility closure contains 33 checked-in ESM modules, down from 77 before the exact-owner promotion,
@@ -52,6 +52,7 @@ and the build has zero skipped semantic drafts. Dependency-owner checks ensure e
 semantic owner, transform-only owner, reconstructed core, or the checked-in compatibility graph. All 33 remaining modules are
 explicitly audited as vendor or generated boundaries (Recharts/D3,
 Three.js, date/phone/form runtimes, generated icons and entry shims); a gate requires that inventory to match the closure
-exactly, and renderer verification passes 1,882/1,882 outputs. This is substantial runtime-source recovery, not proof that the entire project is complete. Exact owners still retain
+exactly. Six former incremental hubs now also have exact source owners; only the three shared renderer hubs remain incremental.
+Renderer verification passes 1,888/1,888 outputs. This is substantial runtime-source recovery, not proof that the entire project is complete. Exact owners still retain
 release-local identifiers that can be renamed for readability, preserved main/renderer boundaries remain, and the consolidated
 E2E workflow matrix has not yet passed.

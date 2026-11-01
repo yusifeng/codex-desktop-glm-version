@@ -390,6 +390,12 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["tokenize-math-block", "tokenize-math-block-92dba400da42.js"],
   ["use-imported-setup-opportunity", "use-imported-setup-opportunity-fe980a908289.js"],
   ["visualization-standalone-document", "visualization-standalone-document-45332507e418.js"],
+  ["artifact-source-bootstrap", "artifact-source-bootstrap-583ed8de587e.js"],
+  ["text-underline-icon", "TextUnderlineIcon-6110dcc4e55d.js"],
+  ["popcorn-electron-surface-style", "popcorn-electron-surface-style-734d538e9445.js"],
+  ["checkout-session", "session-3ec40b7dd28e.js"],
+  ["mark-session-create", "mark-session-create-6f7d531b2a15.js"],
+  ["xterm-window-zoom", "xterm-window-zoom-15fe24cf01f9.js"],
 ]);
 
 export const SEMANTIC_ROUTE_OVERRIDES = new Set([
