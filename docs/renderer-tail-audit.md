@@ -1,5 +1,16 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Account dialogs/review model 大批次：`app-connect-modal`、
+`gpt-about-dialog-core` 与 `review-preferences-model` 已从 release-faithful owner
+迁到可维护 TypeScript，一次删除 8,032 行原始 owner。前两者在上一轮已恢复
+Google/Microsoft bundle、OAuth/直连/失败回调、OverflowFade，以及 GPT loading/error、
+capability、related GPT/start-chat 契约；本轮补齐 Review chunk 的真实三类 owner：diff comment
+annotation/draft model、file-tree icon config/resolver/sprite runtime，以及三个持久化 review preferences。
+同时纠正旧实现 19 个短导出中把 icon resolver 当 mutation、DOM line extractor 当 line key、
+preferences signals 当 initializer 的错位。三套 focused suites 共 97 项断言，typecheck、`npm run check`、
+renderer source-build 与 1,888/1,888、0 failures 结构校验通过。严格剩余由
+15 个 / 95,020 行降至 12 个 / 87,000 行。
+
 2026-11-02 Thread panel/Quick Chat 大批次：`thread-panel-toggle-button` 与
 `content-quick-chat-overlay` 已从 release-faithful owner 迁到可维护 React/TypeScript，
 一次删除 7,084 行原始 owner。Thread panel 纠正发布短导出 `b`（layout bridge initializer）

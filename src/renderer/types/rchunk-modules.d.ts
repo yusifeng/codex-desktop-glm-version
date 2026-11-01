@@ -14744,12 +14744,32 @@ declare module "@rchunk/code-diff" {
   export const u: () => void;
 }
 declare module "@rchunk/review-preferences-model" {
-  export const a: () => void;
-  export const c: unknown;
-  export const d: unknown;
-  export const l: unknown;
-  export const o: unknown;
-  export const u: unknown;
+  export const _: () => void;
+  export const a: (options?: string | Record<string, unknown> | null) => {
+    resolveIcon(name: string, path?: string | null): { name: string; remappedFrom?: string; token?: string };
+  };
+  export const c: (options?: string | Record<string, unknown> | null) => Record<string, unknown> & { colored: boolean; set: string };
+  export const d: (set: string) => boolean;
+  export const f: () => void;
+  export const g: (annotations: unknown[]) => unknown[];
+  export const h: (annotation: unknown) => unknown;
+  export const i: import("@rchunk/app-shared").ScopedSignal<Record<string, unknown>, boolean>;
+  export const l: (set: string) => string;
+  export const m: (side: "additions" | "deletions", lineNumber: number) => string;
+  export const n: import("@rchunk/app-shared").ScopedSignal<Record<string, unknown>, boolean>;
+  export const o: () => void;
+  export const p: (options: Record<string, unknown> & { diffPath: string }) => {
+    addDraftComment(input: Record<string, unknown>): void;
+    annotationKeys: Set<string>;
+    annotations: unknown[];
+    renderCommentAnnotation(annotation: unknown): unknown;
+  };
+  export const r: import("@rchunk/app-shared").ScopedSignal<Record<string, unknown>, boolean>;
+  export const s: () => void;
+  export const t: () => void;
+  export const u: () => void;
+  export const v: (path: EventTarget[]) => number | null;
+  export const y: () => void;
 }
 declare module "@rchunk/review-diff-virtualizer-metrics" { const _default: unknown; export default _default; }
 declare module "@rchunk/pull-request-error-description" { const _default: unknown; export default _default; }

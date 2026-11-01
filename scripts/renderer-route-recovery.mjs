@@ -396,9 +396,6 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
 // clarified, without changing their behavior or export surface.
 export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["onboarding-page", "onboarding-page-905dd8894724.js"],
-  ["app-connect-modal", "app-connect-modal-7b842fd077d6.js"],
-  ["gpt-about-dialog-core", "gpt-about-dialog-7509f0d1e79e.js"],
-  ["review-preferences-model", "review-preferences-model-677402e96a42.js"],
   ["activity-chart", "activity-chart-816f6e49aa7a.js"],
   ["billing-analytics", "billing-analytics-9a493b3c8aaf.js"],
   ["realtime-voice-controls-surface", "controls-fedbfda05b6b.js"],
@@ -434,6 +431,9 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   // accurately represent unfinished route work instead of already-restored
   // dependencies pulled in transitively by the conversation roots.
   ...EXACT_ROUTE_SOURCE_OWNERS.values(),
+  "app-connect-modal-7b842fd077d6.js",
+  "gpt-about-dialog-7509f0d1e79e.js",
+  "review-preferences-model-677402e96a42.js",
   "codex-micro-mini-game-composer-c7d8a016e5c4.js",
   "composer-host-ac9410930773.js",
   "right-panel-composer-overlay-fdca4b46e82c.js",
