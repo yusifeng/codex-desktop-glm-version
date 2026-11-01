@@ -121,4 +121,24 @@ equal(tracker.calls.slice(-6), [
   ["can-attribute"],
 ]);
 
+let appEventListener;
+const appEventDispose = () => {};
+const registeredDisposers = [];
+runtime.subscribeAppEvents({
+  subscribe: (listener) => { appEventListener = listener; return appEventDispose; },
+  registerDispose: (dispose) => registeredDisposers.push(dispose),
+});
+equal(registeredDisposers, [appEventDispose]);
+appEventListener({ type: "background" });
+appEventListener({ type: "foreground" });
+appEventListener({ type: "ignored" });
+equal(tracker.calls.slice(-2), [["background"], ["foreground"]]);
+
+const main = fs.readFileSync(
+  new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
+  "utf8",
+);
+equal(main.includes("appEntryDelivery.subscribeAppEvents({"), true);
+equal(main.includes("Se.appEvent.subscribe((e) =>"), false);
+
 console.log(`${assertions} app-entry delivery and primary-window queue assertions passed`);

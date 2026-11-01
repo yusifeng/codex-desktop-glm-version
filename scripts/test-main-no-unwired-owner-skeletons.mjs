@@ -11,6 +11,7 @@ const realOwners = [
   ["src/main/main-app/startup/window-activation-runtime.ts", "createWindowActivationRuntime"],
   ["src/main/main-app/startup/native-theme-window-sync.ts", "installNativeThemeWindowSync"],
   ["src/main/main-app/startup/remote-hosted-pip-availability.ts", "createRemoteHostedPipAvailabilityReconciler"],
+  ["src/main/main-app/startup/remote-hosted-pip-bindings.ts", "installRemoteHostedPipBindings"],
   ["src/main/main-app/startup/locale-refresh-lifecycle.ts", "installLocaleRefreshLifecycle"],
   ["src/main/main-app/startup/desktop-feature-availability-reconciler.ts", "createDesktopFeatureAvailabilityReconciler"],
   ["src/main/main-app/startup/app-update-lifecycle.ts", "createAppUpdateLifecycle"],
@@ -725,5 +726,15 @@ assert.equal(main.includes("workspacePolicyLifecycle.checkForChanges()"), true, 
 assert.equal(main.includes("let Ie = Tst({"), false, "generated workspace-policy checker alias must be removed");
 assert.equal(main.includes("Pe().registerInternalNotificationHandler"), false, "startup no longer wires policy notifications inline");
 assert.equal(main.includes("Failed to initialize desktop settings"), false, "startup no longer owns settings bootstrap failure handling");
+assert.equal(main.includes('require("./main-app/startup/remote-hosted-pip-bindings.js")'), true, "remote-hosted PiP bindings are wired");
+assert.equal(main.includes("installRemoteHostedPipBindings({"), true, "startup installs the semantic PiP bindings");
+assert.equal(main.includes("U.setWindowMessageSender"), false, "startup no longer wires the PiP window sender inline");
+assert.equal(main.includes("V.settingsStore.onDidChange(n.La.alwaysHidePictureInPicture.key"), false, "startup no longer owns the PiP settings subscription");
+assert.equal(main.includes("theme: a.Bt"), true, "startup theme IPC is registered by the semantic IPC owner");
+assert.equal(main.includes("getShouldUseDarkColors: () => l.nativeTheme.shouldUseDarkColors"), true, "theme IPC reads native theme through the owner adapter");
+assert.equal(main.includes("l.ipcMain.on(a.Bt"), false, "generated inline theme IPC handler must be removed");
+assert.equal(main.includes("appEntryDelivery.subscribeAppEvents({"), true, "app-entry owner subscribes to worker app events");
+assert.equal(main.includes("Se.appEvent.subscribe((e) =>"), false, "startup no longer owns the app-entry event listener inline");
+assert.equal(main.includes("U.setPetWakeRequestHandler"), false, "startup no longer wires PiP wake errors inline");
 
-console.log("719 main unwired-owner skeleton assertions passed");
+console.log("730 main unwired-owner skeleton assertions passed");

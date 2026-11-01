@@ -5455,3 +5455,9 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - `Ust` 旧 `Ie`、inline subscriptions/settings promise chain 删除；focused 11 项、startup-adapter 33 项回归通过，no-unwired
   gate 扩至 719 项。
 - Artifact-session 审计确认主启动仅剩 runtime-path 选择、既有 typed owner `start` 与 warning fallback，不再强抽无状态 facade。
+
+# 2026-11-01 startup binding residue convergence
+
+- `startup-ipc.ts` 接管 native-theme sync IPC；`app-entry-delivery.ts` 接管 worker app-event subscription/disposer；新增并接回
+  `startup/remote-hosted-pip-bindings.ts`，统一 sender/settings/wake/content-host bindings 与首次 reconcile。
+- 三个既有状态 owner 未复制；focused PiP 6 项及 startup IPC/app-entry/avatar-overlay 93 项回归通过，no-unwired gate 扩至 730 项。

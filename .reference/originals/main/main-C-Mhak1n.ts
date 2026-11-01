@@ -376,6 +376,7 @@ const { createWindowActivationRuntime } = require("./main-app/startup/window-act
 const { installNativeThemeWindowSync } = require("./main-app/startup/native-theme-window-sync.js");
 const { createRemoteHostedPipAvailabilityReconciler } = require("./main-app/startup/remote-hosted-pip-availability.js");
 const { installLocaleRefreshLifecycle } = require("./main-app/startup/locale-refresh-lifecycle.js");
+const { installRemoteHostedPipBindings } = require("./main-app/startup/remote-hosted-pip-bindings.js");
 const { createDesktopFeatureAvailabilityReconciler } = require("./main-app/startup/desktop-feature-availability-reconciler.js");
 const { createAppUpdateLifecycle } = require("./main-app/startup/app-update-lifecycle.js");
 const { runLocalAppServerStartup } = require("./main-app/startup/local-app-server-startup.js");
@@ -56220,26 +56221,17 @@ async function Ust() {
       disposables: I,
     });
   (primaryWindowMessages.setWindowServices(W),
-    U.setWindowMessageSender((e) => {
-      W.windowManager.sendMessageToAllWindows(e);
-    }),
-    I.add(
-      V.settingsStore.onDidChange(n.La.alwaysHidePictureInPicture.key, U.handleGlobalHiddenChanged),
-    ),
-    U.setPetWakeRequestHandler(() => {
-      W.avatarOverlayManager.wake().catch((e) => {
-        r.n().warning(`Failed to wake pet for PiP placement request`, {
-          safe: {},
-          sensitive: { error: e },
-        });
-      });
-    }),
-    I.add(
-      U.onContentHostStarted(() => {
-        W.avatarOverlayManager.reconcileRemoteHostedPIPContentHost();
-      }),
-    ),
-    U.reconcileContentHostLifecycle());
+    installRemoteHostedPipBindings({
+      hiddenSettingKey: n.La.alwaysHidePictureInPicture.key,
+      logger: r.n(),
+      manager: U,
+      reconcileOverlayContentHost: () =>
+        W.avatarOverlayManager.reconcileRemoteHostedPIPContentHost(),
+      registerDispose: (dispose) => I.add(dispose),
+      sendWindowMessage: (message) => W.windowManager.sendMessageToAllWindows(message),
+      settingsStore: V.settingsStore,
+      wakeOverlay: () => W.avatarOverlayManager.wake(),
+    }));
   let reconcileRemoteHostedPipAvailability = createRemoteHostedPipAvailabilityReconciler({
       getEnabled: re,
       logger: r.n(),
@@ -56270,6 +56262,7 @@ async function Ust() {
         sidebarBootstrap: a.Lt,
         fileDrag: a.Ht,
         linkDrag: a.Ut,
+        theme: a.Bt,
       },
       runtime: n,
       buildFlavor: s,
@@ -56280,14 +56273,8 @@ async function Ust() {
         appVersion: a.St(),
         initialDesktopTraceSampleRate: a.w(),
       }),
+      getShouldUseDarkColors: () => l.nativeTheme.shouldUseDarkColors,
       logger: r,
-    }),
-    l.ipcMain.on(a.Bt, (e) => {
-      if (!_e(e)) {
-        e.returnValue = `light`;
-        return;
-      }
-      e.returnValue = l.nativeTheme.shouldUseDarkColors ? `dark` : `light`;
     }));
   I.add(
     installNativeThemeWindowSync({
@@ -56777,11 +56764,10 @@ async function Ust() {
     isTrustedIpcEvent: _e,
   }),
     new ChildProcessGoneDiagnostics(l.app, u, r.n()).register(),
-    I.add(
-      Se.appEvent.subscribe((e) => {
-        appEntryDelivery.handleAppEvent(e);
-      }),
-    ),
+    appEntryDelivery.subscribeAppEvents({
+      subscribe: (listener) => Se.appEvent.subscribe(listener),
+      registerDispose: (dispose) => I.add(dispose),
+    }),
     installApplicationLifecycle({
       app: l.app,
       BrowserWindow: l.BrowserWindow,

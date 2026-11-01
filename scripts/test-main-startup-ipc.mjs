@@ -20,6 +20,7 @@ const equal = (actual, expected) => {
 const handlers = new Map();
 const warnings = [];
 const dragCalls = [];
+let dark = true;
 const context = {
   getSharedObjectSnapshot: () => ({ shared: true }),
   getInitialSidebarBootstrap: () => ({ sidebar: true }),
@@ -53,16 +54,18 @@ registerStartupIpcHandlers({
     sidebarBootstrap: "sidebar",
     fileDrag: "file-drag",
     linkDrag: "link-drag",
+    theme: "theme",
   },
   runtime,
   buildFlavor: "internal",
   getContextForWebContents: (sender) => sender.hasContext ? context : null,
   isTrustedIpcEvent: (event) => event.trusted,
   getSentryBootstrap: () => ({ dsn: "dsn", appVersion: "1.0" }),
+  getShouldUseDarkColors: () => dark,
   logger: { n: () => ({ warning: (...args) => warnings.push(args) }) },
 });
 
-equal([...handlers.keys()], ["sentry", "flavor", "shared", "sidebar", "file-drag", "link-drag"]);
+equal([...handlers.keys()], ["sentry", "flavor", "shared", "sidebar", "file-drag", "link-drag", "theme"]);
 
 function event(trusted = true, hasContext = true) {
   return {
@@ -84,6 +87,19 @@ function event(trusted = true, hasContext = true) {
   const rejected = event(false);
   handlers.get("sentry")(rejected);
   equal(rejected.returnValue, null);
+}
+
+{
+  const trusted = event();
+  handlers.get("theme")(trusted);
+  equal(trusted.returnValue, "dark");
+  dark = false;
+  handlers.get("theme")(trusted);
+  equal(trusted.returnValue, "light");
+  const rejected = event(false);
+  dark = true;
+  handlers.get("theme")(rejected);
+  equal(rejected.returnValue, "light");
 }
 
 {
@@ -163,6 +179,8 @@ const main = fs.readFileSync(
 equal(main.includes("registerStartupIpcHandlers"), true);
 equal(main.includes("registerStartupIpcHandlers({"), true);
 equal(main.includes("sentryBootstrap: a.Rt"), true);
+equal(main.includes("theme: a.Bt"), true);
+equal(main.includes("l.ipcMain.on(a.Bt"), false);
 equal(main.includes("function zrt("), false);
 equal(main.includes("Frt = n.wf"), false);
 

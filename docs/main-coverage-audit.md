@@ -3555,3 +3555,12 @@ settingsStore.initialize` 顺序，batch-write 仍调用 `config/batchWrite`；�
 `Ust` 原 `Ie` alias、inline subscriptions 与 settings promise chain 删除，update-policy IPC consumer 也直接复用 lifecycle。
 11 项 focused 与 startup adapter 33 项回归通过，no-unwired gate 扩至 719 项。Artifact-session 启动经复核已仅剩 dev runtime-path
 选择、typed `ArtifactSessionHostLifecycle.start` 调用和 warning fallback；其私有状态、retry/process/cleanup 均已在 owner 内，保留为组合装配。
+
+### 批量收敛：startup IPC / app-entry / Remote Hosted PiP bindings
+
+一次收敛三组仍散落在 `Ust` 的生命周期绑定：`startup-ipc.ts` 现拥有 native-theme synchronous IPC trust/default policy；
+`app-entry-delivery.ts` 现直接订阅 worker app-event 并登记 disposer；新增 `remote-hosted-pip-bindings.ts` 统一 WindowManager sender、
+always-hide settings subscription、pet wake failure warning、content-host-started overlay reconcile 与首次 content-host reconcile。
+
+PiP manager、attribution tracker 与 startup IPC runtime 仍是各自唯一状态 owner，新 installer 不复制状态。6 项 PiP focused、startup IPC
+30 项、app-entry 18 项、avatar-overlay 45 项回归通过；`Ust` 对应 inline handlers/subscriptions 删除，no-unwired gate 扩至 730 项。

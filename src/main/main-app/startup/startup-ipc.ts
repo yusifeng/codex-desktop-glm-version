@@ -52,6 +52,11 @@ export function registerStartupIpcHandlers(options: Record<string, any>) {
       });
     }
   });
+  ipcMain.on(channels.theme, (event: Record<string, any>) => {
+    event.returnValue = isTrustedIpcEvent(event) && options.getShouldUseDarkColors()
+      ? `dark`
+      : `light`;
+  });
 }
 
 if (typeof module !== "undefined") {

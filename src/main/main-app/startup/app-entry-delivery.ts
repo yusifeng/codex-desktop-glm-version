@@ -24,6 +24,10 @@ export function createAppEntryDeliveryRuntime({
     undefined,
     initialInstallerId,
   );
+  const handleAppEvent = (event: Record<string, any>) => {
+    if (event.type === `background`) attribution.handleBackground();
+    else if (event.type === `foreground`) attribution.handleForeground();
+  };
 
   return {
     onAppEntrySource(source: Record<string, any>, webContents?: any) {
@@ -35,12 +39,12 @@ export function createAppEntryDeliveryRuntime({
       if (url == null) attribution.handleUnloggableDeepLinkActivation();
       else attribution.handleDeepLink(url);
     },
-    handleAppEvent(event: Record<string, any>) {
-      if (event.type === `background`) attribution.handleBackground();
-      else if (event.type === `foreground`) attribution.handleForeground();
-    },
+    handleAppEvent,
     handleInitialWindowVisible() {
       attribution.handleInitialWindowVisible();
+    },
+    subscribeAppEvents({ subscribe, registerDispose }: Record<string, any>) {
+      registerDispose(subscribe(handleAppEvent));
     },
     canAttributeRuntimeActivation() {
       return attribution.canAttributeRuntimeActivation();
