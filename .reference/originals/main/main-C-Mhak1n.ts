@@ -8,6 +8,12 @@ const e = require("./rolldown-runtime-CPUxUITh.js"),
   o = require("./electron-resources-path-BDLw2lp0.js"),
   s = require("./dist-wQAv1pJP.js");
 const { isEligibleAccount } = require("./main-app/util/main-business.js");
+const { resolveAutomationModelRouting: Ln } = require("./main-app/misc/model-routing.js");
+const {
+  DEFAULT_DEFERRED_STARTUP_FALLBACK_MS: zr,
+  scheduleDeferredStartupWork: Br,
+} = require("./main-app/startup/deferred-startup-work.js");
+const { createAmbientSuggestionsRuntime } = require("./main-app/ambient-suggestions/runtime.js");
 const mainUrlTrust = require("./main-app/util/url-trust.js");
 const { AppshotHotkeyManager } = require("./main-app/hotkey/appshot-hotkey-manager.js");
 const { createHotkeyWindowLifecycleManagerClass } = require("./main-app/hotkey/hotkey-window-lifecycle-manager.js");
@@ -654,6 +660,31 @@ const { CloudEnvironmentFsService: Wze, readRemoteFile: rH, requireExecutor: iH 
 const { osNameOf: ut, BrowserAuthServices: aEe, pngIconPath: wT, windowsAppIconPath: TT, DesktopEnvironment: oEe } = require("./main-app/desktop/environment.js");
 const { AutocompleteManager: bke, AutocompleteService: Cke, ExtensionActionMenus: wke } = require("./main-app/browser-use/autocomplete.js");
 const { DEFAULT_DESKTOP_FEATURE_AVAILABILITY: vr, getDesktopFeatureAvailability: Tr, getDesktopAccessState: Er, subscribeDesktopFeatureAvailabilityChanged: Ate, subscribeDesktopAccessStateChanged: Dr, isValidDesktopFeatureAvailability: Or, hasDesktopFeatureAvailabilityDiff: jte, updateDesktopFeatureAvailability: kr, resolveDesktopFeatureAvailability: Ar } = require("./main-app/misc/availability.js");
+const {
+  createAmbientSuggestionsBackgroundRefresh: Ite,
+  getAmbientSuggestionsEligibility: Hr,
+  isAmbientSuggestionsEnabled: Vr,
+  resolveAmbientSuggestionsSurface: Fte,
+} = createAmbientSuggestionsRuntime({
+  getDesktopFeatureAvailability: Tr,
+  getDesktopAccessState: Er,
+  isEligibleAccount,
+  enabledSettingKey: n.Ua.enabled.key,
+  conversationDetailModeSettingKey: n.ja.conversationDetailMode.key,
+  shouldNormalizeDesktopPaths: n.zi,
+  normalizeDesktopPath: zn,
+  normalizePath: n.Ns,
+  firstWorkspaceRoot: n.Wo,
+  getSelectedLocalProject: Pr,
+  homeDirectory: p.homedir,
+  readAmbientSuggestions: n.pi,
+  generateAmbientSuggestions: n.hi,
+  resolveModelRouting: Ln,
+  scheduleDeferredStartupWork: Br,
+  deferredStartupFallbackMs: zr,
+  createLogger: r.i,
+  now: Date.now,
+});
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -2441,192 +2472,6 @@ var Mee = class extends Zt {
       (this.#e.clear(), this.#t.clear());
     }
   };
-async function Ln(e) {
-  try {
-    let t = await e?.getClient();
-    return n.Cd(t?.getDynamicConfig(`codex-app-model-routing`).value);
-  } catch {
-    return n.Sd;
-  }
-}
-var zr = 1e4;
-function Br({ startupPhases: e, phase: t, fallback: n, start: r, onError: i }) {
-  let a = new AbortController(),
-    o,
-    s = !1,
-    c = () => {
-      a.signal.aborted ||
-        s ||
-        ((s = !0), o != null && (globalThis.clearTimeout(o), (o = void 0)), r());
-    },
-    l = (e) => {
-      (e instanceof Error && e.name === `AbortError`) || i(e);
-    };
-  return (
-    e.whenReached(t, a.signal).then(c).catch(l),
-    n != null &&
-      e
-        .whenReached(n.phase, a.signal)
-        .then(() => {
-          a.signal.aborted ||
-            s ||
-            ((o = globalThis.setTimeout(() => {
-              o = void 0;
-              try {
-                c();
-              } catch (e) {
-                l(e);
-              }
-            }, n.timeoutMs)),
-            o.unref());
-        })
-        .catch(l),
-    {
-      dispose: () => {
-        (o != null && (globalThis.clearTimeout(o), (o = void 0)),
-          a.signal.aborted ||
-            a.abort(new DOMException(`Deferred startup work was canceled`, `AbortError`)));
-      },
-    }
-  );
-}
-function Vr(e) {
-  return Tr().ambientSuggestions && e.getEffective(n.Ua.enabled.key) === !0;
-}
-function Fte(e) {
-  let t =
-      e.getEffective(n.ja.conversationDetailMode.key) === `STEPS_PROSE` ? `chatgpt_work` : `codex`,
-    r = Er();
-  return r.status === `loading`
-    ? t
-    : r.codexLocalAccess
-      ? !r.workCloudAccess && !r.workLocalAccess
-        ? `codex`
-        : t
-      : `chatgpt_work`;
-}
-async function Hr({ appServerConnection: e, settingsStore: t }) {
-  let {
-    ambientSuggestionsFeatureDiscovery: n,
-    ambientSuggestionsStaleTimeMs: r,
-    computerUse: i,
-  } = Tr();
-  if (!Vr(t) || r == null) return { enabled: !1 };
-  let { account: a } = await e.getAccount();
-  return isEligibleAccount(a)
-    ? { enabled: !0, computerUseAvailable: i, featureDiscoveryEnabled: n, staleTimeMs: r }
-    : { enabled: !1 };
-}
-var Ur = r.i(`ambient-suggestions-background-refresh`);
-function Ite({
-  appEvent: e,
-  appServerClient: t,
-  appServerConnectionRegistry: r,
-  globalState: i,
-  settingsStore: a,
-  startupPhases: o,
-  statsig: s,
-}) {
-  let c = new Map(),
-    l,
-    u = n.zi(t.hostConfig),
-    d = async (e, r, i, a, o, l) => {
-      let u = e.projectRoot,
-        d = c.get(u);
-      if (d != null) return d;
-      let f = n.pi(t.hostConfig.id, e.projectRoot, e.domain);
-      if (f.generatedAtMs != null && Date.now() - f.generatedAtMs < l) return;
-      let p = Ln(s)
-        .then((r) =>
-          n.hi({
-            modelRouting: r,
-            usePluginDetailReads: Tr().noPluginListPhase2,
-            domain: e.domain,
-            hostId: t.hostConfig.id,
-            projectRoot: e.projectRoot,
-            isProjectlessChat: e.isProjectlessChat,
-            enabled: !0,
-            computerUseAvailable: a,
-            featureDiscoveryEnabled: o,
-            appServerConnection: i,
-            serviceTier: null,
-            staleTimeMs: l,
-            surface: `codex`,
-          }),
-        )
-        .then(() => void 0)
-        .catch((t) => {
-          Ur().warning(`Failed to refresh ambient suggestions`, {
-            safe: { trigger: r },
-            sensitive: { error: t, projectRoot: e.projectRoot },
-          });
-        })
-        .finally(() => {
-          c.delete(u);
-        });
-      return (c.set(u, p), p);
-    },
-    f = n.Ns(zn((0, p.homedir)(), u)),
-    m = Wr({ projectRoot: f, isProjectlessChat: !0 }),
-    h = () => {
-      let e = n.Wo(Pr(i)?.rootPaths);
-      if (e == null || e === `~`) return m;
-      let t = n.Ns(zn(e, u));
-      return f === t ? m : Wr({ projectRoot: t, isProjectlessChat: !1 });
-    },
-    g = async (e) => {
-      try {
-        if (!Vr(a)) return;
-        let n = r.getConnection(t.hostConfig.id),
-          i = await Hr({ appServerConnection: n, settingsStore: a });
-        if (!i.enabled) return;
-        await d(h(), e, n, i.computerUseAvailable, i.featureDiscoveryEnabled, i.staleTimeMs);
-      } catch (t) {
-        Ur().warning(`Failed to refresh ambient suggestions`, {
-          safe: { trigger: e },
-          sensitive: { error: t },
-        });
-      }
-    },
-    _ = e.subscribe((e) => {
-      switch (e.type) {
-        case `background`:
-          if (!o.hasReached(`background_ready`)) {
-            (l?.dispose(),
-              (l = Br({
-                startupPhases: o,
-                phase: `background_ready`,
-                fallback: { phase: `renderer_ready`, timeoutMs: zr },
-                start: () => {
-                  ((l = void 0), g(`background`));
-                },
-                onError: (e) => {
-                  Ur().warning(`Failed to schedule ambient suggestions`, {
-                    safe: { trigger: `background` },
-                    sensitive: { error: e },
-                  });
-                },
-              })));
-            return;
-          }
-          g(e.type);
-          return;
-        case `foreground`:
-          (l?.dispose(), (l = void 0));
-          return;
-        case `turnComplete`:
-          return;
-      }
-    });
-  return {
-    dispose: () => {
-      (l?.dispose(), _.dispose(), c.clear());
-    },
-  };
-}
-function Wr({ projectRoot: e, isProjectlessChat: t }) {
-  return { domain: null, projectRoot: e, isProjectlessChat: t };
-}
 var Hte = ArtifactSessionHostLifecycle;
 var Zte = `CODEX_CHROME_USER_DATA_DIR`,
   Qte = `BROWSER_AUTH_BROKER_SOCKET_PATH`,

@@ -5543,3 +5543,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 主 chunk 29 个 `Rn..Un` / `jr..Pte` 机械函数已删除，没有保留重复实现或未接线 facade。focused suite 62 项；相关
   ProjectsManager、remote、fetch、onboarding、terminal 回归恢复为源码级真实执行并通过。
 - 测试索引 1839，no-unwired gate 扩至 920 项。
+
+# 2026-11-01 deferred startup and ambient suggestions lifecycle convergence
+
+- 新增并接回 `startup/deferred-startup-work.ts` 与 `ambient-suggestions/runtime.ts`，统一 phase/fallback/abort 调度以及 ambient
+  eligibility、surface、project-root single-flight、stale skip、background/foreground cleanup；Electron fetch 与主启动共用策略。
+- 修正并真实接回既有 `misc/model-routing.ts`，返回完整远端模型表；主 chunk 旧 `Ln/Br/Vr/Fte/Hr/Ite/Wr` 实现删除。
+- focused 40 项及 fetch/Habitat/startup/WindowContext 邻接回归通过；Habitat 直接 `.ts` 失效入口已恢复真实执行。测试索引
+  1840，no-unwired gate 938 项。automation scheduler 其余 execution/worktree/thread 组合根继续保留，等待独立边界审计。

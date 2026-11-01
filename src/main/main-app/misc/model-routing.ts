@@ -6,7 +6,7 @@
 //
 // 依赖约束：@chunk/shared 的动态配置读取器；无副作用。
 
-import { Cd as readDynamicConfig, Sd as DEFAULT_AUTOMATION_MODEL } from "@chunk/shared";
+import { Cd as readDynamicConfig, Sd as DEFAULT_MODELS } from "@chunk/shared";
 
 /** statsig 客户端的最小面（getClient → getDynamicConfig）。 */
 export interface StatsigLike {
@@ -19,15 +19,11 @@ export interface StatsigLike {
  * 解析默认自动化模型（原 Ln，2,970-2,977）：statsig 不可用或配置缺失时
  * 返回 shared 的默认模型。
  */
-export async function resolveAutomationModelRouting(
-  statsig: StatsigLike | null | undefined,
-): Promise<{ automationModel: string }> {
+export async function resolveAutomationModelRouting(statsig: StatsigLike | null | undefined) {
   try {
     let client = await statsig?.getClient();
-    return {
-      automationModel: readDynamicConfig(client?.getDynamicConfig(`codex-app-model-routing`).value),
-    };
+    return readDynamicConfig(client?.getDynamicConfig(`codex-app-model-routing`).value);
   } catch {
-    return { automationModel: DEFAULT_AUTOMATION_MODEL };
+    return DEFAULT_MODELS;
   }
 }

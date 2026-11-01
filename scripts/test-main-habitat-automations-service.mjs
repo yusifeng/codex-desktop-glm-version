@@ -1,6 +1,15 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { createHabitatAutomationsServiceClass } from "../src/main/main-app/automations/habitat-automations-service.ts";
+import { transform } from "esbuild";
+
+const source = fs.readFileSync(
+  new URL("../src/main/main-app/automations/habitat-automations-service.ts", import.meta.url),
+  "utf8",
+);
+const transpiled = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+const loaded = { exports: {} };
+Function("module", "exports", transpiled.code)(loaded, loaded.exports);
+const { createHabitatAutomationsServiceClass } = loaded.exports;
 
 let assertions = 0;
 const equal = (actual, expected) => {
@@ -114,7 +123,7 @@ const main = fs.readFileSync(
 );
 equal(main.includes("AOe = createHabitatAutomationsServiceClass({"), true);
 equal(main.includes("AOe = class"), false);
-equal(main.includes("o = new AOe("), true);
+equal(main.includes("HabitatAutomationsService: AOe"), true);
 equal(main.includes("getHabitatAutomationsService().sync()"), true);
 
 console.log(`${assertions} main habitat automations service assertions passed`);

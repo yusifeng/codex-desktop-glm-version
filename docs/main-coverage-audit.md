@@ -3684,3 +3684,16 @@ conversational onboarding、terminal/session 与 WindowContext 保持既有调�
 dedupe、collision first-wins、realpath failure/fallback、home remap 和 project CRUD/selection；ProjectsManager 与 remote handler 的
 直接 `.ts` 测试入口恢复为源码级执行，并修正已迁入 WindowContext 的静态 consumer 定位。测试索引 1839，no-unwired gate
 扩至 920 项。
+
+### 生命周期收敛：deferred startup 与 ambient suggestions refresh
+
+新增并真实接回 `startup/deferred-startup-work.ts` 与 `ambient-suggestions/runtime.ts`。前者统一目标 phase、renderer fallback timer、
+once gate、AbortError suppression 与 dispose；后者完整持有 feature/settings/account eligibility、surface projection、按 project-root
+single-flight、stale-time skip、projectless/home root、background/foreground deferred lifecycle 和 warning 降级。Electron fetch 的手动
+refresh 与主启动后台 refresh 复用同一 eligibility/surface policy，没有复制状态 owner。
+
+既有 `misc/model-routing.ts` 从未接线的草稿已修正为返回完整 remote model table，并成为 Statsig routing 的真实 consumer；主 chunk
+原 `Ln/Br/Vr/Fte/Hr/Ite/Wr`、ambient logger 与 fallback 常量实现删除，启动 automation scheduler 也改用同一 deferred runtime。
+新 focused suite 40 项覆盖 routing fallback、phase race/abort、eligibility、surface、single-flight、fresh skip、project/home root、
+foreground cancellation 和真实 wiring；修复 Habitat suite 的直接 `.ts` 失效入口及过时 consumer 断言后，五组相邻回归通过。
+测试索引 1840，no-unwired gate 扩至 938 项。automation scheduler 的 execution/worktree/thread lifecycle 仍是同一组合根，本轮未强拆。

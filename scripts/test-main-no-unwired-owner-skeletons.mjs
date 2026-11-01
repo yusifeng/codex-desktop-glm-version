@@ -138,6 +138,9 @@ const realOwners = [
   ["src/main/main-app/app-server/sqlite-recovery-warning.ts", "parseSqliteRecoveryNotification"],
   ["src/main/main-app/projects/path-policy.ts", "createProjectPathPolicy"],
   ["src/main/main-app/projects/project-state.ts", "getLocalProjects"],
+  ["src/main/main-app/misc/model-routing.ts", "resolveAutomationModelRouting"],
+  ["src/main/main-app/startup/deferred-startup-work.ts", "scheduleDeferredStartupWork"],
+  ["src/main/main-app/ambient-suggestions/runtime.ts", "createAmbientSuggestionsRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -893,5 +896,17 @@ for (const generatedName of [
     `generated project helper ${generatedName} must be removed`,
   );
 }
+assert.equal(main.includes('require("./main-app/misc/model-routing.js")'), true, "model routing is wired");
+assert.equal(main.includes('require("./main-app/startup/deferred-startup-work.js")'), true, "deferred startup runtime is wired");
+assert.equal(main.includes('require("./main-app/ambient-suggestions/runtime.js")'), true, "ambient suggestions runtime is wired");
+assert.equal(main.includes("createAmbientSuggestionsRuntime({"), true, "ambient suggestions runtime is composed");
+for (const generatedName of ["Ln", "Br", "Vr", "Fte", "Hr", "Ite", "Wr"]) {
+  assert.equal(
+    new RegExp(`^(?:async )?function ${generatedName}\\(`, "m").test(main),
+    false,
+    `generated ambient helper ${generatedName} must be removed`,
+  );
+}
+assert.equal(/^var Ur = /m.test(main), false, "generated ambient logger alias must be removed");
 
-console.log("920 main unwired-owner skeleton assertions passed");
+console.log("938 main unwired-owner skeleton assertions passed");
