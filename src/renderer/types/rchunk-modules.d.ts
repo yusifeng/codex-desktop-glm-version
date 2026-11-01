@@ -8268,7 +8268,11 @@ declare module "@rchunk/conversation-start" {
 }
 
 declare module "@rchunk/plaid-link" {
-  export interface PlaidScope { queryClient?: unknown; startPlaid?(input: { accountId: string; linkId?: string; receivedRedirectUri?: string; returnTo: string; signal?: AbortSignal }): Promise<{ connected: boolean; publicToken?: string }> }
+  export interface PlaidScope {
+    get(signal: unknown): unknown;
+    query: any;
+    queryClient: any;
+  }
   export const i: (scope: PlaidScope, options: { accountId: string; linkToken: string; oauthStateId: string; signal?: AbortSignal }) => Promise<{ plaidErrorCode?: string; publicToken?: string; type: "completed" | "exited" }>;
   export const n: () => void;
   export const r: (
@@ -9333,15 +9337,30 @@ declare module "@rchunk/ecosystem-widget-queries" {
 declare module "@rchunk/connect-plugins-submenu-item" {
   export const n: () => void;
   export const t: (props: {
-    connectedCount?: number;
-    disabled?: boolean;
-    onConnect(): void;
+    featuredPlugins: Array<Record<string, unknown> & { displayName: string; id: string }>;
+    label: unknown;
+    onConnectPlugin(plugin: Record<string, unknown>): void;
+    onOpenPluginDirectory(): void;
+    onPluginImpressions?(visibleIds: string[], newlyVisibleIds: string[]): void;
+    workRecommendationsHostId: string;
   }) => unknown;
 }
 declare module "@rchunk/use-search-plugins" {
-  export interface SearchablePlugin { id: string; name: string; description?: string; }
-  export const n: () => void;
-  export const t: (plugins: readonly SearchablePlugin[], query: string) => SearchablePlugin[];
+  export const n: (options: {
+    directoryTab?: "openai" | "workspace" | "personal";
+    hostId?: string;
+    limit?: number;
+    searchTerm: string;
+  }) => {
+    data: Array<Record<string, unknown>> | undefined;
+    error: unknown;
+    fetchNextPage(): Promise<void>;
+    hasNextPage: boolean;
+    isFetchNextPageError: boolean;
+    isFetchingNextPage: boolean;
+    isLoading: boolean;
+  };
+  export const t: () => void;
 }
 declare module "@rchunk/plugin-skill-queries" {
   export const a: (pluginId: string, skillName: string) => Record<string, unknown>;

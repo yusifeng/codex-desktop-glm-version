@@ -251,6 +251,7 @@ export const RECONSTRUCTED_ROUTE_CORE = new Set([
 export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "codex-app-home-beacon-announcement-8c94f69eb080.js",
   "codex-micro-onboarding-host-85407a96e02a.js",
+  "connect-plugins-submenu-item-4ea7d2e57cab.js",
   "content-bd6ed75ea274.js",
   "equation-44cf0b1d4b75.js",
   "git-settings-537e4135cecb.js",
@@ -263,8 +264,10 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "page-268e2fb6d880.js",
   "pending-onboarding-9e794fa64b02.js",
   "pets-settings-route-965aa70e25ab.js",
+  "plaid-link-a9255a11a708.js",
   "registered-259e95b201a1.js",
   "trusted-contact-settings-b71f926a1121.js",
+  "use-search-plugins-12df8f20afed.js",
   "voice-settings-3a0651cd977e.js",
   "_virtual_settings-search-documents-d81257e4909b.js",
   "subscription-onboarding-bdae6e918350.js",

@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "moduleCount": 80,
+  "moduleCount": 77,
   "modules": [
     "BarChart-2010e7d67e4a.js",
     "ComposedChart-12232a23b4b3.js",
@@ -28,7 +28,6 @@
     "composer-host-ac9410930773.js",
     "composer-utility-bar-a9b94a95b731.js",
     "computer-use-settings-6786672692bb.js",
-    "connect-plugins-submenu-item-4ea7d2e57cab.js",
     "constant-363a14bf6d8f.js",
     "controls-fedbfda05b6b.js",
     "defaultLocale-99084237f459.js",
@@ -55,7 +54,6 @@
     "path-3b8129ebc7ff.js",
     "personalization-settings-c52a4963cfd3.js",
     "phone-number-input-6ac1e964b07b.js",
-    "plaid-link-a9255a11a708.js",
     "presentation-eeb7ac6fced2.js",
     "react-redux-14f5167095ae.js",
     "realtime-voice-launch-surface-20e3f20aea6c.js",
@@ -75,7 +73,6 @@
     "tokenize-math-block-92dba400da42.js",
     "usage-5ab4582aac77.js",
     "use-imported-setup-opportunity-fe980a908289.js",
-    "use-search-plugins-12df8f20afed.js",
     "use-visible-settings-sections-5efd0081496f.js",
     "useForm-f8b6846e7263.js",
     "visualization-standalone-document-45332507e418.js",

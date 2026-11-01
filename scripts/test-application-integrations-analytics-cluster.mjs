@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "integration-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, () => ({ contents: "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "integration-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({path:name}) => ({ contents: name === "app-initial" ? "export const Pzt='/finances'; export const WW={}; export const ly={}; export const kft=()=>false;" : name === "app-shared" ? "export const q3=()=>null;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
 
 // builder-analytics: 13
 const builder = await bundle("builder-analytics");
@@ -54,22 +54,26 @@ assert.equal(api.a({ name: "PLUGIN.TAR.GZ", size: 12 }), null);
 // plaid-link: 12
 const plaid = await bundle("plaid-link");
 assert.deepEqual(Object.keys(plaid), ["i", "n", "r", "t"]);
-const storage = new Map(); globalThis.sessionStorage = { getItem(key) { return storage.get(key) ?? null; }, setItem(key, value) { storage.set(key, value); }, removeItem(key) { storage.delete(key); }, clear() { storage.clear(); }, key() { return null; }, get length() { return storage.size; } };
+const storage = new Map(); globalThis.window=globalThis; globalThis.sessionStorage = { getItem(key) { return storage.get(key) ?? null; }, setItem(key, value) { storage.set(key, value); }, removeItem(key) { storage.delete(key); }, clear() { storage.clear(); }, key() { return null; }, get length() { return storage.size; } };
+globalThis.addEventListener = () => {}; globalThis.removeEventListener = () => {};
+globalThis.Plaid={create(options){const handler={open(){options.onSuccess("public-token")},destroy(){}};queueMicrotask(()=>options.onLoad());return handler;}};
 assert.equal(plaid.t("account-1"), "/finances");
-storage.set("codex:finance:pending-plaid-link", JSON.stringify({ accountId: "account-1", createdAt: Date.now(), returnTo: "/custom" }));
+storage.set("codex:finance:pending-plaid-link", JSON.stringify({ accountId: "account-1", createdAt: Date.now(), linkToken:"token", oauthStateId:"state", returnTo: "/custom" }));
 assert.equal(plaid.t("account-1"), "/custom");
 assert.equal(plaid.t("other"), "/finances");
-let invalidated = 0, received;
-const plaidScope = { async startPlaid(input) { received = input; return { connected: true }; }, queryClient: { async invalidateQueries() { invalidated++; } } };
+let invalidated = 0, received, submitted;
+const plaidService={async startOAuthFlow(input){received=input;return{token:"link-token",oauth_state_id:"oauth-state"}},async markOAuthFlowInitializing(){},async submitPlaidPublicToken(input){submitted=input},async getOAuthState(){return{finished:true,connected_accounts:1}}};
+const plaidScope = { get(){return plaidService}, query:{invalidate(){invalidated++}}, queryClient: { async invalidateQueries() { invalidated++; } } };
 assert.equal(await plaid.r(plaidScope, { accountId: "account-1", returnTo: "/after" }), true);
-assert.equal(received.returnTo, "/after");
-assert.equal(invalidated, 1);
+assert.deepEqual(received,{link_id:undefined,native_android:false,native_ios:false});
+assert.deepEqual(submitted,{link_token:"link-token",public_token:"public-token"});
+assert.equal(invalidated, 2);
 const aborted = new AbortController(); aborted.abort();
 assert.equal(await plaid.r(plaidScope, { accountId: "account-1", signal: aborted.signal }), false);
 assert.equal((await plaid.i(plaidScope, { accountId: "account-1", linkToken: "token", oauthStateId: "state" })).type, "completed");
 assert.equal((await plaid.i(plaidScope, { accountId: "account-1", linkToken: "token", oauthStateId: "state", signal: aborted.signal })).plaidErrorCode, "launch_cancelled");
 assert.equal(plaid.n(), undefined);
-assert.match(storage.get("codex:finance:pending-plaid-link"), /account-1/);
+assert.equal(storage.get("codex:finance:pending-plaid-link"), undefined);
 
 // chatgpt-sites: 8
 const sites = await bundle("chatgpt-sites");
