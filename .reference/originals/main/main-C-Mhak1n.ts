@@ -326,6 +326,12 @@ const {
 const {
   createHeartbeatAutomationRuntime,
 } = require("./main-app/automations/heartbeat-runtime.js");
+const {
+  createCronAutomationRunRuntime,
+} = require("./main-app/automations/cron-run.js");
+const {
+  createAutomationSchedulerRuntime,
+} = require("./main-app/automations/scheduler-runtime.js");
 const { createPinnedThreadsServiceClass } = require("./main-app/sidebar/pinned-threads-service.js");
 const { createElectronFetchHandlerClass } = require("./main-app/fetch-handler/electron-fetch-handler.js");
 const { createWindowContextClass } = require("./main-app/window/window-context.js");
@@ -2576,15 +2582,7 @@ var eae = `Response MUST end with a remark-directive block.
 - Status update with next step:
   - \`::inbox-item{title="PR comments addressed" summary="Ready for re-review; focus on auth edge case"}\`
 `;
-var nae = 3e4,
-  gs = 6e4,
-  _s = 3e5,
-  rae = 3,
-  bs = `set_thread_archived`,
-  oae = `write_settings`,
-  xs = r.i(`automations`),
-  Ss = async () => [],
-  Cs = async () => !1;
+var xs = r.i(`automations`);
 var {
   findCompatibleAutomationPermissions: fs,
   resolveAutomationProjectTarget: ps,
@@ -2600,6 +2598,7 @@ var {
   readStoredAgentMode: uae,
   resolveAutomationPermissionSelection: dae,
   forEachSequentially: fae,
+  checkHostedAutomationAppAvailable: js,
 } = createAutomationExecutionPolicy({
   localProjectsKey: n.iu.LOCAL_PROJECTS,
   appConfigStateKey: a.J,
@@ -2621,6 +2620,7 @@ var {
   requestedPermissionMode: n.Ad,
   isGuardianApprovalsMode: n.Pd,
   permissionConfig: n.Dd,
+  appServerProtocolVersion: n.Cr,
   logger: xs(),
 });
 var {
@@ -2646,643 +2646,65 @@ var {
   logger: xs(),
   now: Date.now,
 });
-function pae({
-  appVersion: e,
-  statsig: t,
-  appServerConnectionRegistry: r,
-  getDesktopFeatureAvailability: i = () => vr,
-  requestGitWorker: a,
-  globalState: o,
-  threadProjectAssignments: s,
-  settingsStore: c,
-  appServerClient: u,
-  worktreeLifecycle: d,
-  requestDynamicToolsForThreadStart: f = Ss,
-  isHostedAutomationAppAvailable: p = Cs,
-  syncAutomations: m,
-  updateCanonicalAutomation: h,
-  deleteArchivedHeartbeat: g,
-  isOnline: _ = () => l.net.isOnline(),
-  prepareCronTurnReadState: v,
-  isPackaged: y = !0,
-  repoRoot: b = process.cwd(),
-  tickMs: x = nae,
-  maxPerTick: S = rae,
-}) {
-  let C = !1,
-    w = !1,
-    T = !1,
-    E = 0,
-    D = !1,
-    O,
-    k = new AbortController(),
-    A = new Set(),
-    j = new Set(),
-    M = new Map(),
-    N = new Map(),
-    P = new Map(),
-    F = async () => {
-      if (!T && D) {
-        T = !0;
-        try {
-          let l = r.getConnection(u.hostConfig.id),
-            x = (e) =>
-              n
-                .jr(e, S + A.size)
-                .filter((e) => !A.has(e.id))
-                .slice(0, S),
-            C = Date.now(),
-            w = x(C);
-          if (m != null && _()) {
-            if (w.length > 0) {
-              try {
-                (await m(), (E = Date.now() + _s));
-              } catch (e) {
-                ((E = 0),
-                  xs().warning(`Failed to synchronize local automations before run`, {
-                    safe: {},
-                    sensitive: { error: e },
-                  }));
-              }
-              ((C = Date.now()), (w = x(C)));
-            } else
-              C >= E &&
-                ((E = C + _s),
-                m().catch((e) => {
-                  ((E = 0),
-                    xs().warning(`Failed to synchronize local automations`, {
-                      safe: {},
-                      sensitive: { error: e },
-                    }));
-                }));
-          }
-          await Promise.all(
-            w.map(async (m) => {
-              try {
-                if (m.lastRunAt != null && m.lastRunAt + gs > C) {
-                  n.zr(m.id, m.lastRunAt + gs);
-                  return;
-                }
-                if (n.xd(m)) {
-                  if (j.has(m.targetThreadId)) {
-                    n.zr(m.id, C + vs);
-                    return;
-                  }
-                  (j.add(m.targetThreadId),
-                    A.add(m.id),
-                    vae({
-                      automation: m,
-                      now: C,
-                      appServerConnection: l,
-                      signal: k.signal,
-                      assertCurrent: () => {
-                        if ((k.signal.throwIfAborted(), r.getConnection(u.hostConfig.id) !== l))
-                          throw new DOMException(`Heartbeat connection was replaced`, `AbortError`);
-                      },
-                      heartbeatThreadRendererStates: M,
-                      heartbeatThreadCollaborationModes: N,
-                      heartbeatThreadPermissions: P,
-                      updateCanonicalAutomation: h,
-                      deleteArchivedHeartbeat: g,
-                      isHostedAutomationAppAvailable: p,
-                    })
-                      .catch((e) => {
-                        (e instanceof Error && e.name === `AbortError`) ||
-                          xs().warning(`Scheduled run failed`, {
-                            safe: { automationId: m.id, error: e },
-                            sensitive: {},
-                          });
-                      })
-                      .finally(() => {
-                        (A.delete(m.id), j.delete(m.targetThreadId));
-                      }));
-                  return;
-                }
-                let _ = Os({ automation: m, now: C });
-                (n.Pr(m.id, _),
-                  await ks({
-                    statsig: t,
-                    appVersion: e,
-                    automation: m,
-                    appServerConnection: l,
-                    desktopFeatureAvailability: i(),
-                    requestGitWorker: a,
-                    globalState: o,
-                    threadProjectAssignments: s,
-                    settingsStore: c,
-                    appServerClient: u,
-                    worktreeLifecycle: d,
-                    requestDynamicToolsForThreadStart: f,
-                    isHostedAutomationAppAvailable: p,
-                    prepareCronTurnReadState: v,
-                    isPackaged: y,
-                    repoRoot: b,
-                    runTrigger: `scheduled`,
-                  }));
-              } catch (e) {
-                if (e instanceof n.Wn && e.result.reason === `execution-config-loading`) {
-                  n.xr(m.id)?.updatedAt === m.updatedAt && n.zr(m.id, Date.now() + gs);
-                  return;
-                }
-                xs().warning(`Scheduled run failed`, {
-                  safe: { automationId: m.id, error: e },
-                  sensitive: {},
-                });
-              }
-            }),
-          );
-        } finally {
-          T = !1;
-        }
-      }
-    },
-    I = () => {
-      F().catch((e) => {
-        xs().debug(`Automation scheduler tick threw`, { safe: { error: e }, sensitive: {} });
-      });
-    };
-  return {
-    getRestartBlockers: () => [
-      ...(T ? [`automation.tick`] : []),
-      ...(A.size > 0 ? [`automation.heartbeat`] : []),
-    ],
-    start: () => {
-      if (!(w || C)) {
-        w = !0;
-        try {
-          n.ii() && r.getConnection(u.hostConfig.id).notifyAutomationRunsUpdated();
-        } catch (e) {
-          xs().warning(`Failed to settle interrupted automation runs`, {
-            safe: {},
-            sensitive: { error: e },
-          });
-        }
-        (n._r(Date.now()), I(), (O = setInterval(I, x)), O.unref());
-      }
-    },
-    dispose: () => {
-      C ||
-        ((C = !0),
-        k.abort(),
-        O != null && clearInterval(O),
-        A.clear(),
-        j.clear(),
-        M.clear(),
-        N.clear(),
-        P.clear());
-    },
-    setLocalAutomationsCapability: (e) => {
-      C || D === e || ((D = e), w && e && I());
-    },
-    setHeartbeatThreadRendererState: (e) => {
-      if (C) return;
-      let t = e.threadId?.trim() ?? ``;
-      t.length !== 0 &&
-        (M.set(t, { isEligible: e.isEligible, reason: e.reason, updatedAtMs: Date.now() }),
-        e.collaborationMode != null && N.set(t, e.collaborationMode),
-        e.permissions == null ? P.delete(t) : P.set(t, e.permissions));
-    },
-  };
-}
-async function mae({
-  appVersion: e,
-  statsig: t,
-  automationId: r,
-  appServerConnection: i,
-  desktopFeatureAvailability: a = vr,
-  requestGitWorker: o,
-  globalState: s,
-  threadProjectAssignments: c,
-  settingsStore: l,
-  appServerClient: u,
-  worktreeLifecycle: d,
-  requestDynamicToolsForThreadStart: f = Ss,
-  isHostedAutomationAppAvailable: p = Cs,
-  prepareCronTurnReadState: m,
-  isPackaged: h = !0,
-  repoRoot: g = process.cwd(),
-  collaborationMode: _ = null,
-  permissions: v = null,
-}) {
-  let y = n.xr(r);
-  if (!y) throw Error(`Automation not found.`);
-  if (n.xd(y)) {
-    await yae({
-      automation: y,
-      appServerConnection: i,
-      collaborationMode: _,
-      permissions: v,
-      isHostedAutomationAppAvailable: p,
-    });
-    return;
-  }
-  let b = Os({ automation: y, now: Date.now() });
-  (n.Pr(y.id, b),
-    await ks({
-      statsig: t,
-      appVersion: e,
-      automation: y,
-      appServerConnection: i,
-      desktopFeatureAvailability: a,
-      requestGitWorker: o,
-      globalState: s,
-      threadProjectAssignments: c,
-      settingsStore: l,
-      appServerClient: u,
-      worktreeLifecycle: d,
-      requestDynamicToolsForThreadStart: f,
-      isHostedAutomationAppAvailable: p,
-      prepareCronTurnReadState: m,
-      isPackaged: h,
-      repoRoot: g,
-      runTrigger: `run_now`,
-    }));
-}
-function Os({ automation: e, now: t }) {
-  return e.nextRunAt != null && e.nextRunAt <= t && n.kr(e.rrule)
-    ? null
-    : n.Tr({ automation: e, now: t });
-}
-async function ks({
-  appVersion: e,
-  statsig: t,
-  automation: r,
-  appServerConnection: i,
-  desktopFeatureAvailability: a,
-  requestGitWorker: o,
-  globalState: s,
-  threadProjectAssignments: c,
-  settingsStore: l,
-  appServerClient: u,
-  worktreeLifecycle: d,
-  requestDynamicToolsForThreadStart: f,
-  isHostedAutomationAppAvailable: p,
-  prepareCronTurnReadState: m,
-  isPackaged: h,
-  repoRoot: g,
-  runTrigger: _,
-}) {
-  let v;
-  if (r.target == null) v = r.cwds.map((e) => ({ type: `legacy`, cwd: e }));
-  else if (r.target.type === `projectless`) v = [{ type: `projectless` }];
-  else {
-    let e = ps(s, r.target);
-    v = e == null ? [] : [{ type: `project`, project: e }];
-  }
-  if (v.length === 0) {
-    xs().warning(`Scheduled run skipped: no folders configured`, {
-      safe: { automationId: r.id },
-      sensitive: {},
-    });
-    return;
-  }
-  let { automationModel: y } = await Ln(t),
-    b = { model: r.model ?? y, reasoningEffort: r.reasoningEffort ?? `medium` };
-  try {
-    let e = await i.listModels({ includeHidden: !0, cursor: null, limit: 100 });
-    ((b = n.yd({ automation: r, models: e.data, defaultModel: y })),
-      r.model != null &&
-        r.model !== b.model &&
-        xs().warning(`Automation model unavailable; falling back`, {
-          safe: { automationId: r.id, requestedModel: r.model, fallbackModel: b.model },
-          sensitive: {},
-        }));
-  } catch (e) {
-    xs().warning(`Failed to load models for automation run`, {
-      safe: { automationId: r.id, error: e },
-      sensitive: {},
-    });
-  }
-  for (let e of v)
-    i.notifyAutomationRunTriggered({
-      automationKind: r.kind,
-      cwd: As(e),
-      executionEnvironment: r.executionEnvironment,
-      model: b.model,
-      pluginTemplateId: r.pluginTemplateId,
-      reasoningEffort: b.reasoningEffort,
-      rrule: r.rrule,
-      runTrigger: _,
-    });
-  let x = (await i.getConfigRequirements()).requirements,
-    S = await hae(f),
-    C = await js(p),
-    w = [];
-  if (
-    (await fae(v, (t) =>
-      gae({
-        runTrigger: _,
-        appVersion: e,
-        automation: r,
-        appServerConnection: i,
-        desktopFeatureAvailability: a,
-        requestGitWorker: o,
-        globalState: s,
-        threadProjectAssignments: c,
-        settingsStore: l,
-        appServerClient: u,
-        worktreeLifecycle: d,
-        configRequirements: x,
-        target: t,
-        automationModelSettings: b,
-        appToolNames: S,
-        hostedAutomationsAvailable: C,
-        prepareCronTurnReadState: m,
-        isPackaged: h,
-        repoRoot: g,
-      }).catch((e) => {
-        (w.push(e),
-          xs().warning(`Scheduled run failed`, {
-            safe: { automationId: r.id, error: e },
-            sensitive: {},
-          }));
-      }),
-    ),
-    w.length > 0)
-  )
-    throw w[0] instanceof n.Wn && (w.length !== v.length || w.some((e) => !(e instanceof n.Wn)))
-      ? AggregateError(w, `Automation run partially failed`)
-      : w[0];
-}
-function As(e) {
-  return e.type === `legacy` ? e.cwd : e.type === `project` ? n.Wo(e.project.roots) : null;
-}
-async function hae(e) {
-  try {
-    let t = (await e()).flatMap((e) =>
-      e.type === `namespace` ? e.tools.map(({ name: e }) => e) : [e.name],
-    );
-    return [...new Set([...t, bs])].filter((e) => e !== oae);
-  } catch (e) {
-    return (
-      xs().warning(`Failed to load dynamic tools for automation run`, {
-        safe: { error: e },
-        sensitive: {},
-      }),
-      [bs]
-    );
-  }
-}
-async function js(e) {
-  if (n.Cr()[0] !== 0) return !1;
-  try {
-    return await e();
-  } catch (e) {
-    return (
-      xs().warning(`Failed to check hosted Automations availability`, {
-        safe: {},
-        sensitive: { error: e },
-      }),
-      !1
-    );
-  }
-}
-async function gae({
-  runTrigger: e,
-  appVersion: t,
-  automation: r,
-  appServerConnection: i,
-  desktopFeatureAvailability: a,
-  requestGitWorker: o,
-  globalState: s,
-  threadProjectAssignments: c,
-  settingsStore: l,
-  appServerClient: u,
-  worktreeLifecycle: d,
-  configRequirements: f,
-  target: m,
-  automationModelSettings: h,
-  appToolNames: g,
-  hostedAutomationsAvailable: v,
-  prepareCronTurnReadState: y,
-  isPackaged: b,
-  repoRoot: x,
-}) {
-  let S = `Automation: ${r.name}`,
-    C = eae.trim(),
-    w = m.type === `projectless`,
-    T = m.type === `project` ? m.project : null,
-    E = T?.roots ?? [],
-    D = As(m),
-    O = D ?? n.Ns(`~`),
-    k = m.type === `legacy` ? [m.cwd] : E,
-    A = null,
-    j = null;
-  if (w || D == null) {
-    let e = await createProjectlessThreadPathsViaAppServer({
-        appServerClient: u,
-        configuredWorkspaceRoot:
-          u.hostConfig.id === `local` ? l.getEffective(n.Fa.projectlessWorkspaceRoot.key) : null,
-        createSplitDirectories: !0,
-        homeDirectory: (0, p.homedir)(),
-        prompt: r.prompt,
-      }),
-      t = n.zi(u.hostConfig);
-    ((O = n.Ns(zn(e.cwd, t))),
-      (A = zn(e.outputDirectory, t)),
-      (j = zn(e.workspaceRoot, t)),
-      (k = [n.Ns(j), ...E]),
-      w || (A = null));
-  }
-  let M = await i.getUserSavedConfiguration(O),
-    N = uae(s, u.hostConfig.id),
-    P =
-      A == null
-        ? null
-        : projectlessWorkspaceInstructions({
-            cwd: O,
-            projectlessOutputDirectory: A,
-            projectlessWorkspaceBrowserRoot: j,
-          }),
-    F = [
-      n.Rt({
-        baseInstructions: C,
-        isNonGitWorkspace: !0,
-        threadToolsEnabled: !0,
-        hostedAutomationsEnabled: v,
-      }),
-      P,
-    ].filter((e) => !!e).join(`
-
-`),
-    I = Ds(k, M, f, N, w),
-    L = r.executionEnvironment === `worktree` && !w;
-  if (L && D == null) throw Error(`Worktree automations require a project with a folder`);
-  let R =
-      L &&
-      (await o({
-        method: `stable-metadata`,
-        params: { cwd: O, hostConfig: u.hostConfig, operationSource: `git_direct_call` },
-      })) != null,
-    z = async (e) => {
-      let r = u.hostConfig;
-      ns({ settingsStore: l, isPackaged: b, repoRoot: x });
-      let o = await $o({
-          appServerConnection: i,
-          appVersion: t,
-          desktopFeatureAvailability: a,
-          cwd: e,
-          isPackaged: b,
-          repoRoot: x,
-          shouldUseWslPaths: n.zi(r),
-        }),
-        s = {
-          model: h.model,
-          modelProvider: null,
-          cwd: e,
-          approvalPolicy: I.approvalPolicy,
-          approvalsReviewer: I.approvalsReviewer,
-          sandbox:
-            I.sandboxPolicy.type === `dangerFullAccess`
-              ? `danger-full-access`
-              : I.sandboxPolicy.type === `readOnly`
-                ? `read-only`
-                : `workspace-write`,
-          config: {
-            ...o,
-            ...(await os({ hostConfig: r, appServerVersion: i.appServerVersion })),
-            [n.Dc(i.appServerVersion)]: g,
-          },
-          developerInstructions: F,
-          personality: null,
-          ephemeral: null,
-          threadSource: `automation`,
-          dynamicTools: [],
-          mockExperimentalField: null,
-          experimentalRawEvents: !1,
-          serviceTier: null,
-        };
-      return i.startThread(s);
-    },
-    B = null,
-    V = null,
-    ee = null,
-    te = `pending:${(0, _.randomUUID)()}`;
-  (n.Qr(r.id, te, r.name, D), i.notifyAutomationRunsUpdated());
-  try {
-    if (R) {
-      let e = await cae(O, o, u),
-        t = await o({
-          method: `create-worktree`,
-          params: {
-            cwd: O,
-            startingState: e,
-            upstreamRefreshMode: `never`,
-            localEnvironmentConfigPath: r.localEnvironmentConfigPath,
-            hostConfig: u.hostConfig,
-            operationSource: `git_direct_call`,
-            worktreesRoot: n.ms(M.desktop).worktreesRoot,
-            useWorkspaceDir: a.workspaceDir,
-            streamId: (0, _.randomUUID)(),
-          },
-        });
-      ((ee = t.worktreeGitRoot), (B = await z(t.worktreeWorkspaceRoot)));
-    } else B = await z(O);
-    let e = B.thread.id;
-    if (((V = e), ee != null))
-      try {
-        (await d.setOwnerThread({ conversationId: n.$u(e), worktree: ee }), d.requestCleanup());
-      } catch (e) {
-        xs().warning(
-          `Automation worktree thread started, but owner metadata could not be updated`,
-          { safe: { automationId: r.id }, sensitive: { error: e } },
-        );
-      }
-    (w
-      ? (await c.setProjectless({ threadId: n.$u(e), projectless: !0 }),
-        j != null && s.update(n.iu.THREAD_WORKSPACE_ROOT_HINTS, (t) => ({ ...t, [e]: j })),
-        A != null &&
-          s.update(n.iu.THREAD_PROJECTLESS_OUTPUT_DIRECTORIES, (t) => ({ ...t, [e]: A })))
-      : T != null &&
-        (await c.setAssignment({
-          threadId: n.$u(e),
-          assignment: { projectKind: `local`, projectId: T.projectId },
-        })),
-      n.ni(te, V) || n.Qr(r.id, V, r.name, D),
-      i.notifyAutomationRunsUpdated(),
-      _ae({ automation: r, threadId: V, appServerConnection: i }));
-  } catch (e) {
-    throw (n.ti(te, `auto`), i.notifyAutomationRunsUpdated(), e);
-  }
-  if (B == null || V == null) throw Error(`Automation thread start failed`);
-  let ne;
-  try {
-    ne = await lae({
-      sourceCwds: k,
-      worktreeCwd: B.cwd,
-      requestGitWorker: o,
-      appServerClient: u,
-      automationId: r.id,
-      includeGitRoots: !w,
-    });
-  } catch (e) {
-    throw (n.ti(V, `auto`), i.notifyAutomationRunsUpdated(), e);
-  }
-  let H = Ds(ne, M, f, N, w),
-    re = n.qi(V),
-    U = H.sandboxPolicy,
-    ie = null;
-  if (re != null && (U.type === `workspaceWrite` || U.type === `dangerFullAccess`))
-    try {
-      let [e, t] = await Promise.all([
-          a.workspaceDir ? u.workspacesRoot() : u.codexHome(),
-          u.platformPath(),
-        ]),
-        r = t.join(zn(e, n.zi(u.hostConfig)), `visualizations`, ...re.split(`/`), V);
-      (await u.createDirectory(r, { recursive: !0 }),
-        U.type === `workspaceWrite`
-          ? (U = { ...U, writableRoots: [...U.writableRoots, r] })
-          : U.type === `dangerFullAccess` && (ie = [...ne, r]));
-    } catch (e) {
-      (U.type === `dangerFullAccess` && (ie = ne),
-        xs().warning(`Failed to prepare visualization directory for automation run`, {
-          safe: { automationId: r.id },
-          sensitive: { error: e },
-        }));
-    }
-  let ae =
-      r.lastRunAt == null ? `never` : `${new Date(r.lastRunAt).toISOString()} (${r.lastRunAt})`,
-    oe = `${S}\nAutomation ID: ${r.id}\nAutomation memory: $CODEX_HOME/automations/${r.id}/memory.md\nLast run: ${ae}\n\n${r.prompt}`,
-    se = {
-      threadId: V,
-      turnTrigger: `automation_cron_${e}`,
-      input: [{ type: `text`, text: oe, text_elements: [] }],
-      cwd: B.cwd,
-      approvalPolicy: H.approvalPolicy,
-      approvalsReviewer: H.approvalsReviewer,
-      sandboxPolicy: U,
-      runtimeWorkspaceRoots: ie,
-      model: h.model,
-      effort: h.reasoningEffort,
-      serviceTier: null,
-      summary: n.Xi,
-      personality: null,
-      outputSchema: null,
-      collaborationMode: null,
-    },
-    ce;
-  try {
-    ce = y?.({
-      appServerConnection: i,
-      threadId: B.thread.id,
-      notificationPolicy: r.notificationPolicy,
-    });
-  } catch (e) {
-    xs().warning(`Failed to prepare automation task unread state`, {
-      safe: {},
-      sensitive: { error: e },
-    });
-  }
-  try {
-    await i.startTurn(se, {
-      automationKind: r.kind,
-      notificationPolicy: r.notificationPolicy,
-      sessionId: B.thread.sessionId,
-    });
-  } catch (e) {
-    throw (ce?.handleStartFailure(), e);
-  }
-}
+var cronAutomationRunRuntime = createCronAutomationRunRuntime({
+  automationInstructions: eae,
+  createProjectlessThreadPaths: createProjectlessThreadPathsViaAppServer,
+  projectlessWorkspaceRootSettingKey: n.Fa.projectlessWorkspaceRoot.key,
+  homeDirectory: p.homedir,
+  shouldNormalizeDesktopPaths: n.zi,
+  normalizeDesktopPath: zn,
+  normalizePath: n.Ns,
+  readStoredAgentMode: uae,
+  projectlessWorkspaceInstructions,
+  buildDeveloperInstructions: n.Rt,
+  resolveAutomationPermissions: Ds,
+  scheduleComputerUseConfigWrite: ns,
+  buildBrowserUseThreadConfig: $o,
+  buildAppServerThreadConfig: os,
+  dynamicToolsConfigKey: n.Dc,
+  randomUUID: _.randomUUID,
+  recordAutomationRunStart: n.Qr,
+  resolveDefaultRemoteBranchStartingState: cae,
+  desktopWorktreesRoot: n.ms,
+  threadIdOf: n.$u,
+  threadWorkspaceRootHintsKey: n.iu.THREAD_WORKSPACE_ROOT_HINTS,
+  threadProjectlessOutputDirectoriesKey: n.iu.THREAD_PROJECTLESS_OUTPUT_DIRECTORIES,
+  replaceAutomationRunThread: n.ni,
+  markAutomationRunFailed: n.ti,
+  collectAutomationWritableRoots: lae,
+  visualizationIdForThread: n.qi,
+  turnSummary: n.Xi,
+  updateAutomationThreadTitle: _ae,
+  logger: xs(),
+});
+var {
+  createAutomationScheduler: pae,
+  runAutomationNow: mae,
+} = createAutomationSchedulerRuntime({
+  defaultDesktopFeatureAvailability: vr,
+  listDueAutomations: n.jr,
+  updateAutomationNextRun: n.zr,
+  isHeartbeatAutomation: n.xd,
+  runScheduledHeartbeat: vae,
+  runHeartbeatNow: yae,
+  getAutomation: n.xr,
+  markAutomationRun: n.Pr,
+  computeAutomationNextRun: n.Tr,
+  hasAnchoredSchedule: n.kr,
+  resolveAutomationModelRouting: Ln,
+  selectAutomationModel: n.yd,
+  resolveAutomationProjectTarget: ps,
+  automationTargetCwd: cronAutomationRunRuntime.automationTargetCwd,
+  forEachSequentially: fae,
+  executeCronAutomationTarget: cronAutomationRunRuntime.executeCronAutomationTarget,
+  checkHostedAutomationAppAvailable: js,
+  executionConfigErrorClass: n.Wn,
+  settleInterruptedAutomationRuns: n.ii,
+  markSchedulerStarted: n._r,
+  now: Date.now,
+  isOnline: () => l.net.isOnline(),
+  logger: xs(),
+});
 var ChunkedWebContentsMessageSender = createChunkedWebContentsMessageSenderClass({
   ChunkedMessageSenderBase: n.It,
   createLogger: r.i,

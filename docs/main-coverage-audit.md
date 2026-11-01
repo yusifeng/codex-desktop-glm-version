@@ -3736,3 +3736,16 @@ prompt/TTL aliases 删除，scheduler 只保留调用入口。新 focused suite 
 与 scheduled turn、permission selection、notification-before-response、completion cleanup 和 tail-history listener finally；execution policy、
 AutomationsService、Habitat runtime/service、update tool 与 Electron fetch 六组相邻回归通过。测试索引 1843，no-unwired gate 扩至
 1004 项。
+
+### 大型 owner 抽取：automation cron run 与 scheduler runtime
+
+新增并真实接回 `automations/cron-run.ts` 与 `automations/scheduler-runtime.ts`。Cron run owner 完整持有 project/projectless/worktree
+target、pending run record、thread start、project assignment、owner metadata、writable/visualization roots、最终 permissions、unread-state
+preparation 与 turn start failure 顺序；scheduler owner 持有 capability gate、tick single-flight、host sync throttle、per-heartbeat thread
+exclusion、active sets、AbortController、renderer state maps、run-now 分派和 dispose 清理。既有 heartbeat runtime 仍是唯一 heartbeat executor。
+
+主 chunk 原 `pae/mae/Os/ks/As/hae/js/gae` 约 638 行 scheduler/cron 实现及专用 timing/tool aliases 删除；hosted app
+availability policy 收敛进既有 execution policy，主装配层只注入真实 adapters。新 focused suite 43 项覆盖 projectless 副作用顺序、
+pending→resolved run、assignment/state hints、permissions/turn、worktree gate、capability/tick、heartbeat blocker、dynamic tools、run-now 与
+dispose；execution policy suite 扩至 55 项，heartbeat/Automations/Habitat/update-tool/fetch 相邻回归通过。测试索引 1844，
+no-unwired gate 扩至 1020 项。

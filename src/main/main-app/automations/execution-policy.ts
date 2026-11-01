@@ -29,6 +29,7 @@ type AutomationExecutionPolicyDependencies = {
   requestedPermissionMode(config: any): string;
   isGuardianApprovalsMode(mode: string): boolean;
   permissionConfig(mode: string, writableRoots: string[], config: any): any;
+  appServerProtocolVersion(): number[];
   logger: {
     warning(message: string, details: { safe: Record<string, unknown>; sensitive: Record<string, unknown> }): void;
   };
@@ -333,9 +334,23 @@ export function createAutomationExecutionPolicy(dependencies: AutomationExecutio
     );
   }
 
+  async function checkHostedAutomationAppAvailable(check: () => Promise<boolean>) {
+    if (dependencies.appServerProtocolVersion()[0] !== 0) return false;
+    try {
+      return await check();
+    } catch (error) {
+      dependencies.logger.warning(`Failed to check hosted Automations availability`, {
+        safe: {},
+        sensitive: { error },
+      });
+      return false;
+    }
+  }
+
   return {
     assertWorktreeAutomationTarget,
     classifyAutomationSchedule,
+    checkHostedAutomationAppAvailable,
     collectAutomationWritableRoots,
     findCompatibleAutomationPermissions,
     forEachSequentially,

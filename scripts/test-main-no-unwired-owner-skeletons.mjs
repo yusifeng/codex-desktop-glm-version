@@ -146,6 +146,8 @@ const realOwners = [
   ["src/main/main-app/browser-use/desktop-feature-availability.ts", "BrowserUseDesktopFeatureAvailability"],
   ["src/main/main-app/automations/execution-policy.ts", "createAutomationExecutionPolicy"],
   ["src/main/main-app/automations/heartbeat-runtime.ts", "createHeartbeatAutomationRuntime"],
+  ["src/main/main-app/automations/cron-run.ts", "createCronAutomationRunRuntime"],
+  ["src/main/main-app/automations/scheduler-runtime.ts", "createAutomationSchedulerRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -170,6 +172,10 @@ for (const path of removedSkeletons) {
 
 const main = fs.readFileSync(
   new URL(".reference/originals/main/main-C-Mhak1n.ts", root),
+  "utf8",
+);
+const automationCronRun = fs.readFileSync(
+  new URL("src/main/main-app/automations/cron-run.ts", root),
   "utf8",
 );
 const inboxOwner = fs.readFileSync(
@@ -759,7 +765,12 @@ assert.equal(main.includes("appEntryDelivery.subscribeAppEvents({"), true, "app-
 assert.equal(main.includes("Se.appEvent.subscribe((e) =>"), false, "startup no longer owns the app-entry event listener inline");
 assert.equal(main.includes("U.setPetWakeRequestHandler"), false, "startup no longer wires PiP wake errors inline");
 assert.equal(main.includes('require("./main-app/misc/projectless-workspace.js")'), true, "projectless workspace runtime is wired");
-assert.equal(main.includes("await createProjectlessThreadPathsViaAppServer({"), true, "automation projectless paths use the semantic runtime");
+assert.equal(
+  main.includes("createProjectlessThreadPaths: createProjectlessThreadPathsViaAppServer") &&
+    automationCronRun.includes("await dependencies.createProjectlessThreadPaths({"),
+  true,
+  "automation projectless paths use the semantic runtime",
+);
 assert.equal(main.includes("ds: createProjectlessThreadPathsViaAppServer"), true, "fetch handler uses the semantic projectless creator");
 assert.equal(main.includes("Qie: resolveProjectlessWorkspaceRootViaAppServer"), true, "fetch handler uses the semantic workspace-root resolver");
 assert.equal(main.includes("xt: defaultWorkspaceRoot"), true, "fetch handler uses the semantic default-root policy");
@@ -949,5 +960,16 @@ for (const generatedName of [
     `generated heartbeat owner ${generatedName} must be removed`,
   );
 }
+assert.equal(main.includes('require("./main-app/automations/cron-run.js")'), true, "automation cron-run runtime is wired");
+assert.equal(main.includes('require("./main-app/automations/scheduler-runtime.js")'), true, "automation scheduler runtime is wired");
+assert.equal(main.includes("createCronAutomationRunRuntime({"), true, "automation cron-run runtime is composed");
+assert.equal(main.includes("createAutomationSchedulerRuntime({"), true, "automation scheduler runtime is composed");
+for (const generatedName of ["pae", "mae", "Os", "ks", "As", "hae", "js", "gae"]) {
+  assert.equal(
+    new RegExp(`^(?:async )?function ${generatedName}\\(`, "m").test(main),
+    false,
+    `generated automation scheduler owner ${generatedName} must be removed`,
+  );
+}
 
-console.log("1004 main unwired-owner skeleton assertions passed");
+console.log("1020 main unwired-owner skeleton assertions passed");

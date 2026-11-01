@@ -5575,3 +5575,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   resume/permissions、turn start/completion wait、archive pause/delete 与 listener/timer cleanup；没有复制 in-flight state。
 - 主 chunk 旧 `_ae..Fs` 16 个 heartbeat 定义及专用 prompt/TTL aliases 删除，scheduler 保留单一调用面。
 - focused 44 项及 execution-policy/Automations/Habitat/update-tool/fetch 六组回归通过；测试索引 1843，no-unwired gate 1004 项。
+
+# 2026-11-01 automation cron-run and scheduler runtime extraction
+
+- 新增并接回 `automations/cron-run.ts` 与 `automations/scheduler-runtime.ts`：前者持有 projectless/worktree/thread/assignment/
+  permissions/turn 完整副作用顺序，后者持有 tick single-flight、sync throttle、active/renderer maps、AbortController 与 dispose。
+- 主 chunk 旧 `pae/mae/Os/ks/As/hae/js/gae` 约 638 行实现及专用 aliases 删除；heartbeat runtime 保持唯一 heartbeat executor。
+- focused 43 项、execution policy 55 项及 automation 邻接回归通过；测试索引 1844，no-unwired gate 1020 项。

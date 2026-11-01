@@ -57,6 +57,7 @@ const dependencies = {
     sandboxPolicy: config.sandboxPolicy ?? { type: "workspaceWrite", roots },
     mode,
   }),
+  appServerProtocolVersion: () => [0, 1, 0],
   logger: { warning: (...args) => warnings.push(args) },
 };
 const policy = createAutomationExecutionPolicy(dependencies);
@@ -197,6 +198,9 @@ await policy.forEachSequentially(["a", "b", "c"], async (value, index) => {
 });
 equal(order, ["a", "b", "c"]);
 equal(dependencyCalls, [0, 1, 2]);
+equal(await policy.checkHostedAutomationAppAvailable(async () => true), true);
+equal(await policy.checkHostedAutomationAppAvailable(async () => { throw new Error("offline"); }), false);
+equal(warnings.at(-1)[0], "Failed to check hosted Automations availability");
 
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
 equal(main.includes('require("./main-app/automations/execution-policy.js")'), true);
