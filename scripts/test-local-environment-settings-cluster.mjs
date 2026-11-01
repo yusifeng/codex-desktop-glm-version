@@ -45,7 +45,7 @@ async function load(name) {
                 return {
                   loader: "js",
                   contents:
-                    "export const I3=()=>globalThis.__jsx;export const G2=(messages)=>messages;export const K2=()=>{};export const FX=()=>{};export const QI=()=>{};export const ZI={};export const pZ=(_scope,value)=>{const signal={kind:'signal',value};globalThis.__definedSignals.push(signal);return signal};export const rZ=(_scope,derive)=>{const family={kind:'family',derive};globalThis.__definedSignals.push(family);return family};",
+                    "export const I3=()=>globalThis.__jsx;export const e6=()=>{};export const G2=(messages)=>messages;export const K2=()=>{};export const FX=()=>{};export const QI=()=>{};export const ZI={};export const pZ=(_scope,value)=>{const signal={kind:'signal',value};globalThis.__definedSignals.push(signal);return signal};export const rZ=(_scope,derive)=>{const family={kind:'family',derive};globalThis.__definedSignals.push(family);return family};",
                 };
               if (modulePath === "app-initial")
                 return {

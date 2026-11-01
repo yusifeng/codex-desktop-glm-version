@@ -396,17 +396,8 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
 // clarified, without changing their behavior or export surface.
 export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["onboarding-page", "onboarding-page-905dd8894724.js"],
-  [
-    "cloud-environments-settings-page",
-    "cloud-environments-settings-page-b47c295bea65.js",
-  ],
-  [
-    "local-environments-settings-page",
-    "local-environments-settings-page-6e0104d39e76.js",
-  ],
   ["app-connect-modal", "app-connect-modal-7b842fd077d6.js"],
   ["gpt-about-dialog-core", "gpt-about-dialog-7509f0d1e79e.js"],
-  ["about-you-summary", "about-you-summary-ee1fdcc83db8.js"],
   ["sketch-composer-host-core", "composer-host-ac9410930773.js"],
   [
     "codex-micro-mini-game-composer",
@@ -446,7 +437,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
     "local-conversation-git-actions",
     "local-conversation-git-actions-f71520dad4b4.js",
   ],
-  ["local-environment-editor", "local-environment-editor-c4a981e88476.js"],
   ["mcp-tool-activity-label", "mcp-tool-activity-label-87ba9ef42b0b.js"],
   ["thread-handoff-modal", "thread-handoff-modal-ccac59d04293.js"],
   ["thread-panel-toggle-button", "thread-panel-toggle-button-d0ce9733e408.js"],
@@ -462,10 +452,13 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   // accurately represent unfinished route work instead of already-restored
   // dependencies pulled in transitively by the conversation roots.
   ...EXACT_ROUTE_SOURCE_OWNERS.values(),
+  "about-you-summary-ee1fdcc83db8.js",
   "appgen-settings-page-95e95458752b.js",
+  "cloud-environments-settings-page-b47c295bea65.js",
   "codex-micro-settings-cbf47e1d3359.js",
   "general-settings-3d550f75d0eb.js",
   "personalization-settings-c52a4963cfd3.js",
+  "local-environments-settings-page-6e0104d39e76.js",
   "remote-connections-settings-12e860fd2983.js",
   "File-4270090fca79.js",
   "PlatformUIKitProvider-748f2efe0f2a.js",

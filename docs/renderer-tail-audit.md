@@ -1,5 +1,16 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Environment/About You runtime 大批次：
+`cloud-environments-settings-page`、`local-environments-settings-page`、
+`local-environment-editor` 与 `about-you-summary` 已从 release-faithful owner 迁出，
+一次删除 10,857 行原始 owner。Cloud 路由保留 list/search/pagination、
+detail/create/edit、permissions、reset/delete 与 query/mutation 状态；Local 路由保留 host
+选择、cloud/local tab、catalog/editor/personal-vault，editor 保留 TOML serialization、
+platform scripts/actions 验证、revision conflict 与保存后 cache invalidation。About You 保留
+account header、stream/cancel/abort/fallback、section update/correction/delete 与 memory disable 契约。
+Focused environment/pages、local environment、memory/notifications 和 dialog suites 通过；
+严格剩余清单由 28 个 / 134,156 行降至 24 个 / 123,299 行。
+
 2026-11-02 Device/personalization/AppGen settings 大批次：
 `codex-micro-settings`、`personalization-settings` 与 `appgen-settings-page` 已从
 release-faithful owner 迁到真实 React/TypeScript，一次删除 12,446 行原始 owner。
