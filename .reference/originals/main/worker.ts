@@ -154,10 +154,6 @@ const { listGitWorktreeFiles } = require("./worker/git-worktree-files");
 const { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitPerformanceFields, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, getGitPerformanceResultFields, isGitMutationRequest, mapLiveQueryPerformanceResult, recordUntrackedCacheOutcome, resolveGitPerformanceOperation, selectGitPerformanceSample } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
 const { classifyWorkerMessageCategory } = require("./worker/message-category");
-const { buildParcelWatcherOptions } = require("./worker/parcel-watcher-options");
-const { projectParcelWatcherEvents } = require("./worker/parcel-watcher-events");
-const { isPathAtOrBelowAnyRoot, isPathBelowAnyRoot } = require("./worker/parcel-watcher-paths");
-const { isParcelWatcherMissingPathError } = require("./worker/parcel-watcher-errors");
 const { startParcelWatcher } = require("./worker/parcel-watcher-runtime");
 const { describeShell, resolvePowerShellExecutable } = require("./worker/shell-config");
 const { createShellEnvironmentResolver } = require("./worker/git-shell-environment");
@@ -42375,10 +42371,6 @@ function Fz(e) {
     unquotedQuery: t,
   };
 }
-var Bz = `remote-control`;
-function Vz(e) {
-  return e?.kind === Bz;
-}
 function Hz(e) {
   return e?.kind === `ssh`;
 }
@@ -42905,7 +42897,7 @@ var OB = H()
     ),
   kB = H()
     .trim()
-    .regex(/^[a-fA-formatLocalBranchRef-9]{64}$/);
+    .regex(/^[a-fA-F0-9]{64}$/);
 K({
   internalCdnUrl: H()
     .trim()
@@ -43465,7 +43457,7 @@ var kV = H()
     ),
   AV = H()
     .trim()
-    .regex(/^[a-fA-formatLocalBranchRef-9]{64}$/),
+    .regex(/^[a-fA-F0-9]{64}$/),
   jV = H()
     .trim()
     .pipe(Mj())
@@ -48457,69 +48449,6 @@ async function eG(e, t, n) {
       );
     })
   );
-}
-function legacy_tG(e) {
-  return decodeCommandOutput(e);
-  let t;
-  if (Buffer.isBuffer(e)) {
-    let n = e;
-    if (n.length === 0) return ``;
-    if (n.length >= 2 && n[0] === 255 && n[1] === 254) t = n.subarray(2).toString(`utf16le`);
-    else if (n.length >= 3 && n[0] === 239 && n[1] === 187 && n[2] === 191)
-      t = n.subarray(3).toString(`utf8`);
-    else {
-      let e = Math.min(n.length - (n.length % 2), 256),
-        r = !1;
-      if (e > 0) {
-        let t = 0,
-          i = 0;
-        for (let r = 0; r < e; r += 2) (i++, n[r + 1] === 0 && t++);
-        r = i > 0 && t / i > 0.6;
-      }
-      t = r ? n.toString(`utf16le`) : n.toString(`utf8`);
-    }
-  } else t = e;
-  return t
-    .replace(/^\uFEFF/, ``)
-    .replace(
-      /\r\n/g,
-      `
-`,
-    )
-    .trim();
-}
-function legacy_nG(e) {
-  return findActiveDistro(e);
-  let t = e
-    .split(
-      `
-`,
-    )
-    .map((e) => e.trim())
-    .find((e) => e.startsWith(`*`));
-  return (
-    (t &&
-      t
-        .slice(1)
-        .trim()
-        .split(/\s{2,}|\t+/)[0]) ||
-    null
-  );
-}
-function legacy_rG(e) {
-  return orderEligibleDistros(e);
-  let t = legacy_nG(e),
-    n = e
-      .split(
-        `
-`,
-      )
-      .slice(1)
-      .map((e) => e.replace(/^\s*\*?\s*/, ``).split(/\s{2,}|\t+/))
-      .filter(([, , e]) => e === `2`)
-      .map(([e]) => e)
-      .filter((e) => e != null);
-  return t == null || !n.includes(t) ? n : [t, ...n.filter((e) => e !== t)];
 }
 function iG(e, t = UW()) {
   if (zH(e) || BH(e)) return WH(e);
@@ -67053,7 +66982,6 @@ function g0(e) {
     : { type: `unknown` };
 }
 var _0 = 33554432,
-  kpe = 67108864,
   Ape = [
     `-c`,
     `diff.mnemonicPrefix=false`,
@@ -67955,21 +67883,6 @@ async function j4(e, t) {
 function M4(e) {
   return `${xge}/${e}`;
 }
-function N4(e) {
-  return `Codex worktree snapshot: ${e}`;
-}
-function Mge(e) {
-  let t = {};
-  for (let n of e.split(/\r?\n/)) {
-    let e = n.trim();
-    if (!e) continue;
-    let r = e.split(/\s+/);
-    if (r.length < 3) continue;
-    let [i, a, o] = r;
-    o === `(push)` && t[i] == null && (t[i] = a);
-  }
-  return t;
-}
 async function c3({
   baseBranch: e,
   commitSha: t,
@@ -68384,19 +68297,6 @@ function uve(e, t) {
 }
 function dve(e) {
   return createLineDecoder(e);
-}
-function dveLegacy(e) {
-  let t = new TextDecoder(),
-    n = ``;
-  return (r) => {
-    for (n += t.decode(r, { stream: !0 }); ;) {
-      let t = n.indexOf(`
-`);
-      if (t === -1) break;
-      let r = n.slice(0, t);
-      ((n = n.slice(t + 1)), e(r));
-    }
-  };
 }
 function fve(e) {
   let t = [],
@@ -68815,11 +68715,6 @@ function M6(e, t, n) {
   /* istanbul ignore next -- retained generated implementation for source parity reference */
   let r = e.relative(t, n);
   return r === `` || (r !== `..` && !r.startsWith(`..${e.sep}`) && !e.isAbsolute(r));
-}
-function N6(e, t, n) {
-  return isWatchedRefPath(e, t, n);
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  return !n.endsWith(`.lock`) && M6(e, t, n);
 }
 function P6(e, t, n) {
   return isWorktreeTopologyPath(e, t, n, ebe);
@@ -69294,9 +69189,7 @@ function fbe(e) {
     kernelPid: U().int().positive(),
     startedAtMs: U().int().nonnegative(),
   }).loose());
-var pbe = [`git.exe`, `git`],
-  mbe = (0, c.promisify)(p.execFile),
-  W6;
+var mbe = (0, c.promisify)(p.execFile);
 function hbe(e, t, n, r = null, i = async () => e.kill()) {
   let a = null,
     o = () => {
@@ -69400,41 +69293,8 @@ function vbe(e, t, n, r = G6(t)) {
     : [a, ...e.slice(1)];
   */
 }
-function ybe(e) {
-  let t = { ...process.env };
-  if (G6(e)) for (let e of Object.keys(t)) e.toLowerCase() === `path` && delete t[e];
-  return { ...t, ...e };
-}
 function G6(e) {
   return e != null && Object.keys(e).some((e) => e.toLowerCase() === `path`);
-}
-function bbe(e, t) {
-  if (!t && W6 != null) return W6;
-  let n = pbe.map((t) => xbe(t, e)).find((e) => e != null);
-  if (n == null) throw Error(`Failed to locate git executable in PATH`);
-  return (t || (W6 = n), n);
-}
-function xbe(e, t) {
-  let n = (0, p.spawnSync)(Sbe(t), [`$PATH:${e}`], { env: t, windowsHide: !0, encoding: `utf8` });
-  return n.status !== 0 || typeof n.stdout != `string`
-    ? null
-    : (n.stdout
-        .split(/\r?\n/)
-        .map((e) => e.trim())
-        .find((e) => e.length > 0) ?? null);
-}
-function Sbe(e) {
-  let t = K6(e, `SystemRoot`) ?? K6(e, `windir`) ?? `C:\\Windows`;
-  return g.default.win32.join(t, `System32`, `where.exe`);
-}
-function K6(e, t) {
-  return (
-    e[
-      Object.keys(e)
-        .reverse()
-        .find((e) => e.toLowerCase() === t.toLowerCase()) ?? ``
-    ]?.trim() || void 0
-  );
 }
 var Cbe = class {
   runsInsideWsl;
@@ -70497,7 +70357,6 @@ var uxe = K({
   fxe =
     /<(?:img|video)\b[^>]*\bsrc="(?<src>https:\/\/private-user-images\.githubusercontent\.com\/[^"]+)"/gi,
   pxe = /^\/\d+\/\d+-(?<assetId>[0-9a-f-]{36})\.[^/]+$/,
-  mxe = 6e4,
   hxe = K({ exp: U() }),
   x8 = createGithubUserAttachmentUrlCache(),
   gxe = `
@@ -71220,77 +71079,6 @@ async function Vxe(e, t, n) {
     logger: Bxe(),
   })(e, t);
 }
-async function N8({
-  appServerClient: e,
-  gitManager: t,
-  request: { cwd: n, hostId: r, repo: i, searchQuery: a },
-}) {
-  try {
-    await r8(e);
-    let o = await t.getWorktreeRepository(n, e);
-    if (o?.root == null)
-      return { error: `No git repository found for pull request board`, status: `error` };
-    if (i != null)
-      return {
-        items: F8({
-          items: await I8({ appServerClient: e, cwd: o.root, repoArg: i, searchQuery: a }),
-          cwd: n,
-          hostId: r,
-          repo: i,
-          searchQuery: a,
-        }),
-        status: `success`,
-      };
-    let s = await (await t.getRepoRepository(n, e))?.getOriginUrl(),
-      c = await o.getConfigValue(`remote.upstream.url`);
-    return {
-      items: F8({
-        items: await Wxe({
-          appServerClient: e,
-          cwd: o.root,
-          originUrl: s,
-          preferredRepoArg: i,
-          searchQuery: a,
-          upstreamUrl: c,
-        }),
-        cwd: n,
-        hostId: r,
-        repo: i,
-        searchQuery: a,
-      }),
-      status: `success`,
-    };
-  } catch (e) {
-    return (
-      Bxe().warning(`gh.pr.board.failed`, {
-        safe: { hasPreferredRepo: i != null },
-        sensitive: { error: e },
-      }),
-      { error: e instanceof Error ? e.message : String(e), status: `error` }
-    );
-  }
-}
-async function Hxe({
-  gitManager: e,
-  getAppServerClient: t,
-  request: { repos: n, searchQuery: r },
-}) {
-  let i = await Promise.all(
-    n.map((n) =>
-      N8({
-        appServerClient: t(n.hostId),
-        gitManager: e,
-        request: { cwd: n.cwd, hostId: n.hostId, repo: n.repo, searchQuery: r },
-      }),
-    ),
-  );
-  return i.some((e) => e.status === `success`)
-    ? { items: Uxe(i.flatMap((e) => (e.status === `success` ? e.items : []))), status: `success` }
-    : (i[0] ?? { items: [], status: `success` });
-}
-function Uxe(e) {
-  return [...e].sort((e, t) => t.updatedAt.localeCompare(e.updatedAt));
-}
 async function P8({
   appServerClient: e,
   cwd: t,
@@ -71305,100 +71093,6 @@ async function P8({
   );
   if (!o.success) throw Error(Q6(o, `Failed to list pull requests`));
   return $6(o.stdout || `[]`, nxe);
-}
-function F8({ cwd: e, hostId: t, items: n, repo: r, searchQuery: i }) {
-  return n.flatMap((n) => {
-    let a = i == null,
-      o = n.state.toUpperCase();
-    if (o !== `OPEN` && o !== `MERGED`) return [];
-    if (o === `MERGED`)
-      return [
-        {
-          additions: n.additions,
-          baseBranch: n.baseRefName,
-          canMerge: !1,
-          ciStatus: `none`,
-          createdAt: n.createdAt,
-          cwd: e,
-          deletions: n.deletions,
-          headBranch: n.headRefName,
-          hostId: t,
-          isAuthor: a,
-          mergeBlocker: null,
-          number: n.number,
-          repo: r ?? void 0,
-          state: `merged`,
-          title: n.title,
-          updatedAt: n.updatedAt,
-          url: n.url,
-        },
-      ];
-    let { ciStatus: s } = kz(Oz(n.statusCheckRollup)),
-      c = Az({
-        hasOpenPr: !0,
-        isDraft: n.isDraft,
-        mergeStateStatus: n.mergeStateStatus,
-        mergeable: n.mergeable,
-      });
-    return [
-      {
-        additions: n.additions,
-        baseBranch: n.baseRefName,
-        canMerge: c,
-        ciStatus: s,
-        createdAt: n.createdAt,
-        cwd: e,
-        deletions: n.deletions,
-        headBranch: n.headRefName,
-        hostId: t,
-        isAuthor: a,
-        mergeBlocker: jz({ mergeStateStatus: n.mergeStateStatus, mergeable: n.mergeable }),
-        number: n.number,
-        repo: r ?? void 0,
-        state: qxe({ canMerge: c, ciStatus: s, isDraft: n.isDraft }),
-        title: n.title,
-        updatedAt: n.updatedAt,
-        url: n.url,
-      },
-    ];
-  });
-}
-async function Wxe({
-  appServerClient: e,
-  cwd: t,
-  originUrl: n,
-  preferredRepoArg: r,
-  searchQuery: i,
-  upstreamUrl: a,
-}) {
-  if (r != null) return I8({ appServerClient: e, cwd: t, repoArg: r, searchQuery: i });
-  let o = Gxe({
-      originRepoArg: n == null ? null : c8(n),
-      upstreamRepoArg: a == null ? null : c8(a),
-    }),
-    s = [];
-  for (let n of o)
-    if (((s = await I8({ appServerClient: e, cwd: t, repoArg: n, searchQuery: i })), s.length > 0))
-      return s;
-  return s;
-}
-async function I8({ appServerClient: e, cwd: t, repoArg: n, searchQuery: r }) {
-  if (r != null) return P8({ appServerClient: e, cwd: t, repoArg: n, searchQuery: r });
-  let [i, a] = await Promise.all([
-    P8({ appServerClient: e, cwd: t, repoArg: n, searchQuery: null, state: `open` }),
-    P8({
-      appServerClient: e,
-      cwd: t,
-      includePullRequestStatusFields: !1,
-      repoArg: n,
-      searchQuery: null,
-      state: `merged`,
-    }),
-  ]);
-  return [...i, ...a];
-}
-function Gxe({ originRepoArg: e, upstreamRepoArg: t }) {
-  return Array.from(new Set([t, e].filter((e) => e != null)));
 }
 function Kxe({
   includePullRequestStatusFields: e = !0,
@@ -71422,17 +71116,6 @@ function Kxe({
     t != null && a.push(`--repo`, t),
     a
   );
-}
-function qxe({ canMerge: e, ciStatus: t, isDraft: n }) {
-  if (n) return `draft`;
-  switch (t) {
-    case `failing`:
-      return `failing`;
-    case `none`:
-    case `passing`:
-    case `pending`:
-      return e ? `ready` : `in_progress`;
-  }
 }
 async function Jxe(e, t) {
   try {
@@ -71473,8 +71156,7 @@ async function Yxe({
   );
   return a.success ? { status: `success` } : Z6(a, `Failed to merge pull request`);
 }
-var L8 = new Map(),
-  R8 = H().regex(/^[a-f\d]{40}$/i),
+var R8 = H().regex(/^[a-f\d]{40}$/i),
   z8 = H()
     .min(1)
     .refine(
@@ -71482,8 +71164,6 @@ var L8 = new Map(),
         !g.posix.isAbsolute(e) && g.posix.normalize(e) === e && e !== `..` && !e.startsWith(`../`),
       `Expected a repository-relative file path`,
     ),
-  Xxe = K({ type: J(`file`), encoding: H(), size: U().int().nonnegative(), content: H() }),
-  B8 = 1048576,
   Zxe = K({ base: K({ sha: R8 }), head: K({ sha: R8 }) }),
   Qxe = G(
     K({
@@ -71531,24 +71211,6 @@ async function eSe(e, t, n) {
 }
 async function tSe(e, t, n) {
   return revisionHandlers.file(e, t, n);
-}
-async function V8(e, t, n, r, i) {
-  if (n == null) return ``;
-  let a = n.split(`/`).map(encodeURIComponent).join(`/`),
-    o = Xxe.parse(
-      JSON.parse(
-        await U8(
-          e,
-          t,
-          `contents/${a}?ref=${r}`,
-          [`-H`, `Accept: application/vnd.github.object+json`],
-          i,
-        ),
-      ),
-    );
-  if (o.size > B8 || o.encoding !== `base64`) return null;
-  let s = Buffer.from(o.content, `base64`);
-  return s.byteLength > B8 || s.includes(0) || !(0, k.isUtf8)(s) ? null : s.toString(`utf8`);
 }
 async function H8(e, t) {
   let n = await n8(t, a8(e, t).hostname);
@@ -71888,121 +71550,14 @@ async function Z8(e, t, n, r) {
   if (!s.success) throw Error(s.stderr || `Could not load pull request stack`);
   return JSON.parse(s.stdout);
 }
-var lSe = 60,
-  uSe = 20,
-  dSe = OW(`github`),
-  Q8 = new Map(),
-  fSe = K({
-    number: U(),
-    url: H(),
-    title: H(),
-    baseRefName: H(),
-    headRefName: H(),
-    state: q([`OPEN`, `CLOSED`, `MERGED`]),
-    isDraft: W(),
-    mergeable: H(),
-    mergeStateStatus: H(),
-    headRefOid: H(),
-    headRepository: K({ url: H() }).nullable(),
-    commits: K({
-      nodes: G(
-        K({
-          commit: K({
-            oid: H(),
-            statusCheckRollup: K({
-              contexts: K({
-                nodes: G(b8.nullable()),
-                pageInfo: K({ hasNextPage: W(), endCursor: H().nullable() }),
-              }),
-            }).nullable(),
-          }),
-        }),
-      ),
-    }),
-  }),
+var dSe = OW(`github`),
   pSe = K({
     data: cN(H(), zM()).nullable().optional(),
     errors: G(K({ path: G(QM([H(), U()])).optional() })).optional(),
-  }),
-  mSe = K({ login: H() }),
-  hSe = K({ pullRequest: fSe.nullable() }).nullable();
+  });
 function gSe(e, t, n) {
   a8(e, t);
   return githubPullRequestSummary(e, t, n);
-}
-async function vSe(e, t, n, r) {
-  let i = n.map(() => ({ status: `unavailable` })),
-    a = n.map((e, t) => ({
-      pullRequest: e,
-      index: t,
-      cursor: null,
-      headRevision: null,
-      checks: [],
-    }));
-  for (let n = 0; a.length > 0 && n < uSe && r(); n++) {
-    let n = `query { viewer { login } ${a.map(({ pullRequest: e, index: t, cursor: n }) => `p${t}: repository(owner:${JSON.stringify(e.owner)},name:${JSON.stringify(e.repository)}) { pullRequest(number:${e.number}) { number url title baseRefName headRefName state isDraft mergeable mergeStateStatus headRefOid headRepository { url } commits(last:1) { nodes { commit { oid statusCheckRollup { contexts(first:100,after:${JSON.stringify(n)}) { nodes { __typename ... on CheckRun { name status conclusion startedAt completedAt detailsUrl checkSuite { workflowRun { event workflow { name } } } } ... on StatusContext { context state createdAt description targetUrl } } pageInfo { hasNextPage endCursor } } } } } } } }`).join(` `)} }`,
-      r = await Y6([`api`, `graphql`, `--hostname`, e.hostname, `-f`, `query=${n}`], {
-        appServerClient: t,
-        timeoutMs: 15e3,
-      }),
-      o;
-    try {
-      o = $6(r.stdout || `{}`, pSe);
-    } catch {
-      return i;
-    }
-    let { data: s, errors: c } = o,
-      l = mSe.safeParse(s?.viewer);
-    if (!l.success || l.data.login.toLowerCase() !== e.login.toLowerCase()) return i;
-    let u = [];
-    for (let e of a) {
-      if (c?.some((t) => t.path == null || t.path[0] === `p${e.index}`)) continue;
-      let t = hSe.safeParse(s?.[`p${e.index}`]);
-      if (!t.success) continue;
-      let n = t.data?.pullRequest;
-      if (n == null) {
-        i[e.index] = { status: `not-found` };
-        continue;
-      }
-      let r = n.commits.nodes[0]?.commit;
-      if (
-        n.number !== e.pullRequest.number ||
-        r?.oid !== n.headRefOid ||
-        (e.headRevision != null && e.headRevision !== n.headRefOid)
-      )
-        continue;
-      let a = r.statusCheckRollup?.contexts,
-        o = [...e.checks, ...(a?.nodes ?? [])];
-      if (n.state === `OPEN` && a?.pageInfo.hasNextPage) {
-        a.pageInfo.endCursor != null &&
-          a.pageInfo.endCursor !== e.cursor &&
-          u.push({ ...e, checks: o, cursor: a.pageInfo.endCursor, headRevision: n.headRefOid });
-        continue;
-      }
-      let l = n.state === `OPEN`,
-        d = kz(l ? Dz(o) : []);
-      i[e.index] = {
-        status: `success`,
-        baseBranch: n.baseRefName,
-        canMerge: Az({ ...n, hasOpenPr: l }),
-        checks: d.checks,
-        checksComplete: !0,
-        ciStatus: d.ciStatus,
-        headBranch: n.headRefName,
-        hasOpenPr: l,
-        hasPendingChecks: d.ciStatus === `pending` || d.checks.some((e) => e.status === `pending`),
-        headRepository: n.headRepository == null ? null : wB(n.headRepository.url),
-        headRevision: n.headRefOid,
-        isDraft: n.isDraft,
-        mergeBlocker: l ? jz(n) : null,
-        state: { OPEN: `open`, MERGED: `merged`, CLOSED: `closed` }[n.state],
-        title: n.title,
-        url: n.url,
-      };
-    }
-    a = u;
-  }
-  return i;
 }
 var ySe = new Set([`github.com`, `raw.githubusercontent.com`, `user-images.githubusercontent.com`]),
   bSe = /^\/([^/]+)\/([^/]+)\/releases\/download\/([^/]+)\/([^/]+)$/,
@@ -74735,7 +74290,6 @@ function Vwe({ env: e, resourcesPath: t }) {
   return e[Bwe]?.trim() || t;
 }
 var Hwe = K({ iconSmallForAppPath: aP((e) => typeof e == `function`) }),
-  Uwe = 100,
   Wwe = 1e4,
   Gwe = `computer-use-app-icons.node`,
   v7 = createWindowsNativeAppIconCache((e) => Jwe(e), 100),
@@ -78119,12 +77673,6 @@ function $7({ hostConfig: e, remoteWorkspaceRoot: t, remotePath: n, location: r 
   let i = `ssh-remote+${OTe(e)}`;
   return buildRemoteOpenArgs({ hostConfig: e, remoteAuthority: i, remoteWorkspaceRoot: t, remotePath: n, location: r });
 }
-function NTe({ remoteAuthority: e, remoteWorkspaceRoot: t, path: n, location: r }) {
-  return buildRemoteEditorArgs({ remoteAuthority: e, remoteWorkspaceRoot: t, path: n, location: r });
-}
-function e9(e, t) {
-  return buildRemoteUri(e, t);
-}
 function n9({ id: e, label: t, icon: n, kind: r, hidden: i, darwin: a, win32: o, linux: s }) {
   return createCrossPlatformTarget({ id: e, label: t, icon: n, kind: r, hidden: i, darwin: a, win32: o, linux: s });
 }
@@ -79347,276 +78895,6 @@ function dDe(e) {
 }
 async function j9(e, t) {
   return startParcelWatcher(e, t);
-}
-var fDe = class {
-  parcelWatcher;
-  params;
-  options;
-  closed = vR();
-  supplementalSubscriptions = new Map();
-  activeDirectoryPathChecks = new Map();
-  queuedDirectoryPathChecks = new Map();
-  rootSubscription = null;
-  closeResult = null;
-  closePromise = null;
-  subscriptionOperationTail = Promise.resolve();
-  directorySubscriptionSetupPromise = null;
-  constructor(e, t, n) {
-    ((this.parcelWatcher = e), (this.params = t), (this.options = n));
-  }
-  getWatcherOptions(e) {
-    return buildParcelWatcherOptions(g.posix, e, this.options.ignoredPaths);
-  }
-  async start() {
-    return (
-      await this.queueSubscriptionOperation(() => this.startRootSubscription()),
-      this.closeResult != null && (await this.close(this.closeResult).catch(() => {})),
-      {
-        coverage: { recursive: !0, typedPathChanges: !0 },
-        path: this.params.path,
-        closed: this.closed.promise,
-        dispose: async () => {
-          await this.close({ reason: `disposed` });
-        },
-      }
-    );
-  }
-  onWatcherEvents = (e, t) => {
-    if (this.closeResult != null) return;
-    if (e != null) {
-      this.close({ reason: `watch-error`, error: e }).catch(() => {});
-      return;
-    }
-    if (t.length === 0) return;
-    const projection = projectParcelWatcherEvents(g.posix, this.params.path, t, this.params.renameEventHandling);
-    this.emitChange({ changedPaths: projection.changedPaths, pathChanges: projection.pathChanges });
-    if (projection.rootDeleted) {
-      this.close({ reason: `watch-error`, error: Error(`File watch root was deleted`) }).catch(
-        () => {},
-      );
-      return;
-    }
-    let i = new Set(projection.pathsToCheck);
-    (this.removeSupplementalSubscriptionsAtOrBelowPaths(i),
-      t.forEach((e) => {
-        e.type !== `delete` && e.path !== this.params.path && this.queueDirectoryPathCheck(e.path);
-      }),
-      this.attachSupplementalSubscriptionsForDirectories());
-  };
-  queueDirectoryPathCheck(e) {
-    let t = this.activeDirectoryPathChecks.get(e);
-    t != null &&
-      ((t.active = !1),
-      this.queuedDirectoryPathChecks.get(e) === t && this.queuedDirectoryPathChecks.delete(e));
-    let n = { active: !0, path: e };
-    (this.activeDirectoryPathChecks.set(e, n), this.queuedDirectoryPathChecks.set(e, n));
-  }
-  attachSupplementalSubscriptionsForDirectories() {
-    this.queuedDirectoryPathChecks.size !== 0 &&
-      this.directorySubscriptionSetupPromise == null &&
-      this.closeResult == null &&
-      (this.directorySubscriptionSetupPromise = (async () => {
-        for (; this.queuedDirectoryPathChecks.size > 0 && this.closeResult == null;) {
-          let e = [...this.queuedDirectoryPathChecks.values()];
-          e.forEach((e) => {
-            this.queuedDirectoryPathChecks.get(e.path) === e &&
-              this.queuedDirectoryPathChecks.delete(e.path);
-          });
-          try {
-            let t = (
-                await Promise.all(
-                  e.map(async (e) => {
-                    if (!e.active) return null;
-                    let t = await pDe(e.path);
-                    return !e.active || !t ? null : e;
-                  }),
-                )
-              ).filter((e) => e != null),
-              n = new Set(t.map((e) => e.path)),
-              r = t.filter((e) => !isPathBelowAnyRoot(g.posix, e.path, n)),
-              i = new Set(
-                r.filter((e) => !this.supplementalSubscriptions.has(e.path)).map((e) => e.path),
-              );
-            if (i.size > 0) {
-              let e = this.takeSupplementalSubscriptionsAtOrBelowPaths(i);
-              e.length > 0 &&
-                (await this.queueSubscriptionOperation(async () => {
-                  await this.unsubscribeSubscriptions(e);
-                }));
-            }
-            let a = !1;
-            for (let e of r) (await this.startSupplementalSubscriptionForDirectory(e)) && (a = !0);
-            a && this.emitChange({ changedPaths: [] });
-          } finally {
-            e.forEach((e) => {
-              ((e.active = !1),
-                this.activeDirectoryPathChecks.get(e.path) === e &&
-                  this.activeDirectoryPathChecks.delete(e.path));
-            });
-          }
-        }
-      })()
-        .catch((e) => {
-          this.close({ reason: `watch-error`, error: e }).catch(() => {});
-        })
-        .finally(() => {
-          ((this.directorySubscriptionSetupPromise = null),
-            this.queuedDirectoryPathChecks.size > 0 &&
-              this.attachSupplementalSubscriptionsForDirectories());
-        }));
-  }
-  async startSupplementalSubscriptionForDirectory(e) {
-    let t = !1;
-    return (
-      await this.queueSubscriptionOperation(async () => {
-        if (!e.active || this.closeResult != null || this.supplementalSubscriptions.has(e.path))
-          return;
-        let n = { active: !0, path: e.path, subscription: null };
-        this.supplementalSubscriptions.set(e.path, n);
-        let r;
-        try {
-          r = await this.parcelWatcher.subscribe(
-            e.path,
-            (e, t) => {
-              n.active &&
-                this.supplementalSubscriptions.get(n.path) === n &&
-                this.onWatcherEvents(e, t);
-            },
-            this.getWatcherOptions(e.path),
-          );
-        } catch (t) {
-          if (
-            (this.supplementalSubscriptions.get(e.path) === n &&
-              this.supplementalSubscriptions.delete(e.path),
-            (n.active = !1),
-            !e.active || !(await M9(e.path)))
-          )
-            return;
-          throw t;
-        }
-        if (
-          !e.active ||
-          !n.active ||
-          this.closeResult != null ||
-          this.supplementalSubscriptions.get(e.path) !== n
-        ) {
-          (this.supplementalSubscriptions.get(e.path) === n &&
-            this.supplementalSubscriptions.delete(e.path),
-            (n.active = !1),
-            await r.unsubscribe());
-          return;
-        }
-        ((n.subscription = r), (t = !0));
-      }),
-      t
-    );
-  }
-  removeSupplementalSubscriptionsAtOrBelowPaths(e) {
-    if (e.size === 0) return;
-    this.deactivateDirectoryPathChecksAtOrBelowPaths(e);
-    let t = this.takeSupplementalSubscriptionsAtOrBelowPaths(e);
-    t.length !== 0 &&
-      this.queueSubscriptionOperation(async () => {
-        await this.unsubscribeSubscriptions(t);
-      }).catch((e) => {
-        this.close({ reason: `watch-error`, error: e }).catch(() => {});
-      });
-  }
-  close(e) {
-    let t = (this.closeResult ??= e);
-    if (this.closePromise != null) return this.closePromise;
-    let n = this.rootSubscription;
-    this.rootSubscription = null;
-    let r = this.takeSupplementalSubscriptionsAtOrBelowPaths(new Set([this.params.path]));
-    return (
-      this.activeDirectoryPathChecks.forEach((e) => {
-        e.active = !1;
-      }),
-      this.activeDirectoryPathChecks.clear(),
-      this.queuedDirectoryPathChecks.clear(),
-      (this.closePromise = this.queueSubscriptionOperation(async () => {
-        await this.unsubscribeSubscriptions([...(n == null ? [] : [n]), ...r]);
-      }).then(
-        () => {
-          this.closed.resolve(t);
-        },
-        (e) => {
-          throw (this.closed.resolve({ reason: `watch-error`, error: e }), e);
-        },
-      )),
-      this.closePromise
-    );
-  }
-  async startRootSubscription() {
-    let e = await this.parcelWatcher.subscribe(
-      this.params.path,
-      this.onWatcherEvents,
-      this.getWatcherOptions(this.params.path),
-    );
-    if (this.closeResult != null) {
-      await e.unsubscribe();
-      return;
-    }
-    this.rootSubscription = e;
-  }
-  queueSubscriptionOperation(e) {
-    let t = this.subscriptionOperationTail.then(e);
-    return ((this.subscriptionOperationTail = t.catch(() => {})), t);
-  }
-  async unsubscribeSubscriptions(e) {
-    await Promise.all(e.map((e) => e.unsubscribe()));
-  }
-  takeSupplementalSubscriptionsAtOrBelowPaths(e) {
-    let t = [];
-    return (
-      this.supplementalSubscriptions.forEach((n, r) => {
-        isPathAtOrBelowAnyRoot(g.posix, r, e) &&
-          ((n.active = !1),
-          this.supplementalSubscriptions.delete(r),
-          n.subscription != null && t.push(n.subscription));
-      }),
-      t
-    );
-  }
-  deactivateDirectoryPathChecksAtOrBelowPaths(e) {
-    this.activeDirectoryPathChecks.forEach((t) => {
-      isPathAtOrBelowAnyRoot(g.posix, t.path, e) &&
-        ((t.active = !1),
-        this.activeDirectoryPathChecks.delete(t.path),
-        this.queuedDirectoryPathChecks.get(t.path) === t &&
-          this.queuedDirectoryPathChecks.delete(t.path));
-    });
-  }
-  emitChange(e) {
-    if (this.closeResult == null)
-      try {
-        this.params.onChange(e);
-      } catch (e) {
-        this.close({ reason: `watch-error`, error: e }).catch(() => {});
-      }
-  }
-};
-async function pDe(e) {
-  if (!(await M9(e))) return !1;
-  try {
-    let t = await (0, D.opendir)(e);
-    try {
-      return (await t.read()) != null;
-    } finally {
-      await t.close();
-    }
-  } catch (e) {
-    if (isParcelWatcherMissingPathError(e, `ENOENT`) || isParcelWatcherMissingPathError(e, `ENOTDIR`)) return !1;
-    throw e;
-  }
-}
-async function M9(e) {
-  try {
-    return (await (0, D.lstat)(e)).isDirectory();
-  } catch (e) {
-    if (isParcelWatcherMissingPathError(e, `ENOENT`) || isParcelWatcherMissingPathError(e, `ENOTDIR`)) return !1;
-    throw e;
-  }
 }
 function mDe(e, t, n) {
   switch (e) {

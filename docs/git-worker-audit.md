@@ -1,5 +1,15 @@
 # Git worker 逐段审计
 
+Worker 源码完整性门禁现直接用 Acorn 解析完整 `worker.ts` 与 `browser-page-preload.ts`。本轮修复历史机械替换把两处 SHA-256
+schema 的 `[a-fA-F0-9]` 错写成非法正则的问题；同时确认 metadata 与 working-tree watcher 的唯一真实入口已委托
+`worker/parcel-watcher-runtime.ts` 后，物理删除零消费者的旧 `fDe` Parcel watcher 类及其私有 helper/import。
+同轮 AST 引用审计还删除 6 个无副作用、零消费者的旧阈值/超时/Map 残留。`scripts/test-worker-source-parse-integrity.mjs`
+继续递归追踪上层删除后暴露的私有依赖，共收敛 40 个顶层零消费者定义（legacy WSL parser、旧 Git executable helper、
+旧 PR board/status/revision helpers、editor URI wrappers 等）；当前 worker 顶层 single-reference definition 已清零。
+`scripts/test-worker-source-parse-integrity.mjs` 锁定完整解析、两处 schema、真实 runtime 接线，并动态审计零消费者定义不得回流。
+相邻 15 组 focused suites、20 项源码完整性断言、typecheck、测试索引 1857、chunk verify 11/11 与全量
+`npm run check`（12448/12448 transform-only files）均通过。
+
 Review section changes 的纯策略（错误响应 envelope、gitlink SHA 解析及 cwd/repository 路径归一化）
 位于 `src/main/worker/git-review-section-policy.ts`，由
 `scripts/test-worker-git-review-section-policy.mjs` 覆盖；入口模块仅负责 repository、Git diff

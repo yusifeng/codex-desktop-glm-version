@@ -1,5 +1,14 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成 worker 源码完整性与 Parcel watcher 重复 owner 收敛：修复历史 `formatLocalBranchRef` 机械替换误伤两处
+SHA-256 schema、把 `[a-fA-F0-9]` 破坏成非法正则导致完整 worker 无法解析的问题。metadata/working-tree watcher
+已由 `worker/parcel-watcher-runtime.ts` 唯一真实消费，因此物理删除零消费者的旧 `fDe` 类、目录探测 helper 和四条
+死 import；同轮 AST 审计移除 6 个无副作用、零消费者的阈值/超时/Map 残留。新增完整 Acorn parse 门禁，
+并递归收敛 legacy WSL、旧 Git executable、PR board/status/revision 和 editor URI 等共 40 个顶层零消费者定义；
+当前 worker 顶层 single-reference definition 清零。门禁同时锁定两处 schema、runtime 委托并动态禁止零消费者定义回流；
+相邻 15 组 focused suites、20 项源码完整性断言、typecheck、测试索引 1857、chunk verify 11/11 与全量
+`npm run check`（12448/12448 transform-only files）均通过。
+
 完成 shared project-state 与 WSL predicate 收敛：新增 `shared/project-state.ts`，等价恢复 `qo/iD` 对 persisted local projects 的 record/
 entry 校验、非法项过滤、未知字段剥离和 rootPaths copy，并将 project-state、migration、ProjectsManager、automation policy 四条真实消费链
 全部改接，移除 `n.qo/runtime.qo`。export-table 复核同时修正旧 `Ui/Wi/Hi` 语义错配：分别对应 WSL UNC、WSL mount、distro extraction；
