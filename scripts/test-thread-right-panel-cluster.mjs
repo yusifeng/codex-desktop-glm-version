@@ -42,7 +42,8 @@ const overrides = {
 };
 function mockModule(name) {
   if (name === "rolldown-runtime") return "export {};";
-  return [...(imports.get(name) ?? [])].map((exportName) => `export const ${exportName} = ${overrides[name]?.[exportName] ?? "undefined"};`).join("\n");
+  const names = name === "app-shared" ? Object.keys(overrides["app-shared"]) : [...(imports.get(name) ?? [])];
+  return names.map((exportName) => `export const ${exportName} = ${overrides[name]?.[exportName] ?? "undefined"};`).join("\n");
 }
 let bundleIndex = 0;
 async function bundle(directory) {
@@ -81,7 +82,7 @@ const toggle = await bundle("thread-panel-toggle-button");
 assert.deepEqual(Object.keys(toggle).sort(), ["_", "a", "b", "c", "d", "f", "g", "h", "i", "l", "m", "n", "o", "p", "r", "s", "t", "u", "v", "y"]);
 toggle.n(); toggle.n();
 assert.equal(state.lazyLoaders.length, 1);
-assert.equal(toggle.p(), "LazySideChat");
+assert.equal(toggle.p, "LazySideChat");
 const iconButton = toggle._({ children: "icon" });
 assert.equal(iconButton.type, "Button");
 assert.equal(iconButton.props.size, "toolbar");
@@ -117,12 +118,12 @@ assert.equal(openChange, true);
 
 const toolbar = toggle.r({ mainToolbar: "toolbar" });
 assert.equal(toolbar.type, "Fragment");
-assert.equal(toolbar.props.children, "toolbar");
+assert.equal(toolbar.props.children[1], "toolbar");
 const toolbarButton = toggle.t({ children: "review", color: "outline", label: "Review", pressed: true, shortcut: "⌘R" });
 assert.equal(toolbarButton.props.color, "outlineActive");
 assert.equal(toolbarButton.props.title, "Review (⌘R)");
 assert.equal(toolbarButton.props["aria-pressed"], true);
-assert.equal(toggle.b(), null);
+assert.equal(toggle.b(), undefined);
 assert.equal(toggle.y(), null);
 
 console.log("thread right panel cluster tests passed");

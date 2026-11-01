@@ -418,12 +418,10 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   // Complete eager first-party dependency closure of the four conversation
   // React roots. These owners remove structurally approximate implementations
   // from the live conversation path while retaining vendor/generated boundaries.
-  ["content-quick-chat-overlay", "content-quick-chat-overlay-ed4d1aa8ed4b.js"],
   [
     "git-action-new-branch-field",
     "git-action-new-branch-field-a2e24da5e504.js",
   ],
-  ["thread-panel-toggle-button", "thread-panel-toggle-button-d0ce9733e408.js"],
 ]);
 
 export const SEMANTIC_ROUTE_OVERRIDES = new Set([

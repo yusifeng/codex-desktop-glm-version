@@ -1,14 +1,8 @@
+// Thread panel launcher, new-tab actions, toolbar controls and layout bridge.
 import "@rchunk/rolldown-runtime";
-import {
-  I3 as getJsxRuntime,
-  Jm as createLazyComponent,
-  Y2 as FormattedMessage,
-  Yh as Button,
-  e6 as ReactRuntime,
-  m4 as classNames,
-} from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/app-primary";
+import * as sharedChunk from "@rchunk/app-shared";
+import * as initialChunk from "@rchunk/app-initial";
+import * as primaryChunk from "@rchunk/app-primary";
 import "@rchunk/thread-shell-runtime";
 import "@rchunk/appgen-card-layout";
 import "@rchunk/google-drive-resource-icon";
@@ -26,126 +20,200 @@ import "@rchunk/quick-chat-drop-zones";
 import "@rchunk/view-control-labels";
 import "@rchunk/registered-conversation-thumbnail";
 import "@rchunk/thread-tab-entity";
+import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
 
-interface PanelAction {
-  deferSelectionUntilDropdownClose?: boolean;
-  disabled?: boolean;
-  icon?: unknown;
-  id: string;
-  label: string;
-  onSelect(): void;
-  shortcut?: string;
+type UnknownRecord = Record<string, unknown>;
+export interface PanelArtifact { id?: string; name?: string; title?: string; type?: string; url?: string; [key: string]: unknown }
+export interface PanelAction {
+  deferSelectionUntilDropdownClose?: boolean; disabled?: boolean; icon?: unknown; id: string;
+  keyboardShortcut?: string; label: string; onSelect(): boolean | void; shortcut?: string; subText?: unknown;
 }
-interface LauncherState {
-  actions: PanelAction[];
-  hasOutputArtifacts: boolean;
-  onOpenArtifact?(artifact: unknown): void;
-  outputArtifacts: unknown[];
+export interface LauncherState {
+  actions: PanelAction[]; hasOutputArtifacts: boolean; onOpenArtifact?(artifact: PanelArtifact): void; outputArtifacts: PanelArtifact[];
 }
-interface PanelLauncherProps {
-  actions?: PanelAction[];
-  children?: unknown;
-  isCommandActive?: boolean;
-  onActionSelect?(action: PanelAction): void;
-  onClose?(): void;
-  surface?: "new-tab" | "panel-launcher";
-  target?: "left" | "right";
+export interface PanelLauncherOptions {
+  actions?: PanelAction[]; capabilities?: Partial<Record<string, boolean>>; isCommandActive?: boolean;
+  loadArtifactSuggestions?: boolean; onClose?(): void; onOpenArtifact?(artifact: PanelArtifact): void;
+  outputArtifacts?: PanelArtifact[]; surface?: "new-tab" | "panel-launcher"; target?: "left" | "right" | "bottom";
+  onOpenBrowser?(): void; onOpenReview?(): void; onOpenSideChat?(): void; onOpenTerminal?(): void; onSearchFiles?(): void;
+}
+export interface PanelLauncherProps extends PanelLauncherOptions {
+  children?: unknown; onActionSelect?(action: PanelAction): void; onToggleBottomPanel?(): void;
 }
 
-function ToolbarIconButton(props: Record<string, unknown> & { size?: string }): unknown {
+const shared = sharedChunk as unknown as UnknownRecord;
+const initial = initialChunk as unknown as UnknownRecord;
+const primary = primaryChunk as unknown as UnknownRecord;
+let jsx: JsxRuntime;
+let React: ReactRuntime;
+let LazyLocalConversationSideChatTab: unknown;
+let initialized = false;
+
+function getJsx(): JsxRuntime {
+  if (jsx == null) jsx = (sharedChunk.I3 as () => JsxRuntime)();
+  return jsx;
+}
+function getReact(): ReactRuntime {
+  if (React == null) {
+    const candidate = sharedChunk.e6 as unknown;
+    React = (typeof candidate === "function" && !(candidate as { useState?: unknown }).useState
+      ? (candidate as () => ReactRuntime)()
+      : candidate) as ReactRuntime;
+  }
+  return React;
+}
+function classNames(...values: Array<string | false | null | undefined>): string {
+  const runtimeClassNames = shared.m4;
+  return typeof runtimeClassNames === "function" ? (runtimeClassNames as (...input: unknown[]) => string)(...values) : values.filter(Boolean).join(" ");
+}
+
+function ToolbarIconButton(props: UnknownRecord & { size?: string }): unknown {
   const { size = "toolbar", ...rest } = props;
-  return getJsxRuntime().jsx(Button, { size, ...rest });
+  const Button = shared.Yh ?? "button";
+  return getJsx().jsx(Button as never, { size, ...rest });
 }
-
-function TabStackIcon(props: { count?: number | null }): unknown {
-  const runtime = getJsxRuntime();
-  const count = props.count ?? 0;
-  return runtime.jsxs("span", { className: "relative inline-flex shrink-0", "aria-hidden": true, children: [
-    runtime.jsx("span", { children: "▣" }),
-    count <= 0 ? null : runtime.jsx("span", { className: "tab-stack-count", "data-multiple-digits": count > 9, children: count > 9 ? "9+" : count }),
+function initializeToolbarIconButton(): void { getJsx(); }
+function TabStackIcon({ count = 0 }: { count?: number | null }): unknown {
+  const r = getJsx();
+  return r.jsxs("span", { className: "relative inline-flex shrink-0", "aria-hidden": true, children: [
+    r.jsx("span", { className: "tab-stack-icon", children: count === 0 ? "□" : "▣" }),
+    count > 0 ? r.jsx("span", { className: "tab-stack-count", "data-multiple-digits": count > 9, children: count > 9 ? "9+" : count }) : null,
   ] });
 }
+function initializeTabStackIcon(): void { getJsx(); }
 
-function usePanelLauncher(options: { actions?: PanelAction[] } = {}): LauncherState {
-  const actions = options.actions ?? [];
-  return { actions, hasOutputArtifacts: false, outputArtifacts: [] };
+function createDefaultActions(options: PanelLauncherOptions): PanelAction[] {
+  const capability = (id: string): boolean => options.capabilities?.[id] !== false;
+  const definitions: Array<[string, string, (() => void) | undefined, string]> = [
+    ["search-files", "Search files", options.onSearchFiles, "⌘P"],
+    ["side-chat", "Open side chat", options.onOpenSideChat, "⌘⇧I"],
+    ["browser", "Open browser", options.onOpenBrowser, "⌘⇧B"],
+    ["review", "Open review", options.onOpenReview, "⌘⇧R"],
+    ["terminal", "Toggle terminal", options.onOpenTerminal, "⌘J"],
+  ];
+  const actions: PanelAction[] = [];
+  for (const [id, label, handler, shortcut] of definitions) {
+    if (handler == null && options.capabilities?.[id] == null) continue;
+    actions.push({ id, label, shortcut, keyboardShortcut: shortcut, disabled: !capability(id), onSelect: () => { if (!capability(id)) return false; handler?.(); options.onClose?.(); return true; } });
+  }
+  return actions;
 }
+function usePanelLauncher(options: PanelLauncherOptions = {}): LauncherState {
+  // The published hook derives these from scoped runtime signals. Explicit props remain the
+  // testable boundary, while injected runtime state supplies them in the desktop app.
+  const injected = typeof initial.usePanelLauncherState === "function"
+    ? (initial.usePanelLauncherState as (input: PanelLauncherOptions) => Partial<LauncherState>)(options)
+    : undefined;
+  const actions = options.actions ?? injected?.actions ?? createDefaultActions(options);
+  const outputArtifacts = options.outputArtifacts ?? injected?.outputArtifacts ?? [];
+  const onOpenArtifact = options.onOpenArtifact ?? injected?.onOpenArtifact;
+  return { actions, outputArtifacts, onOpenArtifact, hasOutputArtifacts: outputArtifacts.length > 0 };
+}
+function initializePanelLauncherActions(): void { getJsx(); }
 
+function ActionList({ actions, onActionSelect }: { actions: PanelAction[]; onActionSelect(action: PanelAction): void }): unknown {
+  const r = getJsx();
+  return r.jsx("ul", { role: "menu", className: "panel-launcher-actions", children: actions.map((action) => r.jsx("li", {
+    children: r.jsxs("button", { type: "button", role: "menuitem", disabled: action.disabled,
+      onClick: () => onActionSelect(action), children: [action.icon, r.jsx("span", { children: action.label }),
+        action.shortcut == null ? null : r.jsx("kbd", { children: action.shortcut })] }),
+  }, action.id)) });
+}
+function ArtifactList({ artifacts, onOpen }: { artifacts: PanelArtifact[]; onOpen?(artifact: PanelArtifact): void }): unknown {
+  if (artifacts.length === 0) return null;
+  const r = getJsx();
+  return r.jsxs("section", { "aria-label": "Output artifacts", children: [r.jsx("h3", { children: "Output" }), r.jsx("ul", {
+    children: artifacts.map((artifact, index) => r.jsx("li", { children: r.jsx("button", { type: "button", onClick: () => onOpen?.(artifact),
+      children: artifact.title ?? artifact.name ?? artifact.id ?? `Artifact ${index + 1}` }) }, String(artifact.id ?? index))),
+  })] });
+}
 function PanelLauncher(props: PanelLauncherProps = {}): unknown {
-  const runtime = getJsxRuntime();
-  const launcher = usePanelLauncher({ actions: props.actions });
-  const select = props.onActionSelect ?? ((action: PanelAction) => action.onSelect());
-  return runtime.jsxs("div", { "data-panel-launcher-surface": props.surface ?? "panel-launcher", "data-panel-target": props.target ?? "right", children: [
-    props.children,
-    runtime.jsx("ul", { children: launcher.actions.map((action) => runtime.jsx("li", { children: runtime.jsx("button", { type: "button", disabled: action.disabled, onClick: () => select(action), children: [action.icon, action.label] }) }, action.id)) }),
-  ] });
+  const r = getJsx();
+  const launcher = usePanelLauncher(props);
+  const select = props.onActionSelect ?? ((action: PanelAction) => { action.onSelect(); });
+  const list = ActionList({ actions: launcher.actions, onActionSelect: select });
+  const artifacts = ArtifactList({ artifacts: launcher.outputArtifacts, onOpen: launcher.onOpenArtifact });
+  if (props.surface === "new-tab") {
+    return r.jsx("div", { "data-new-tab-scroll-root": true, className: "new-tab-panel-launcher", children: r.jsxs("div", {
+      className: "new-tab-panel-launcher__content", children: [list, props.children, artifacts],
+    }) });
+  }
+  return r.jsxs("div", { "data-panel-launcher-surface": props.surface ?? "panel-launcher", "data-panel-target": props.target ?? "right",
+    children: [list, artifacts] });
 }
+function initializePanelLauncher(): void { getJsx(); getReact(); }
 
 function PanelLauncherDropdown(props: { launcher: LauncherState; onOpenChange?(open: boolean): void; open: boolean; triggerButton: unknown }): unknown {
-  const runtime = getJsxRuntime();
-  return runtime.jsxs("div", { "data-panel-launcher-dropdown": props.open, children: [props.triggerButton, props.open ? runtime.jsx(PanelLauncher, { actions: props.launcher.actions }) : null] });
+  const r = getJsx();
+  return r.jsxs("div", { "data-panel-launcher-dropdown": props.open, children: [props.triggerButton,
+    props.open ? PanelLauncher({ actions: props.launcher.actions, outputArtifacts: props.launcher.outputArtifacts,
+      onOpenArtifact: props.launcher.onOpenArtifact, onClose: () => props.onOpenChange?.(false) }) : null] });
+}
+function initializePanelLauncherDropdown(): void { getJsx(); }
+
+function PanelLauncherContextMenu(props: PanelLauncherProps & { children: unknown; onOpenChange?(open: boolean): void }): unknown {
+  const state = getReact();
+  const [open, setOpen] = state.useState(false);
+  const launcher = usePanelLauncher(props);
+  const setOpenState = (next: boolean) => { setOpen(next); props.onOpenChange?.(next); };
+  const trigger = getJsx().jsx("span", { onContextMenu: (event: { preventDefault(): void; stopPropagation(): void }) => {
+    event.preventDefault(); event.stopPropagation(); setOpenState(true);
+  }, children: props.children });
+  return getJsx().jsx(PanelLauncherDropdown, { launcher, open, onOpenChange: setOpenState, triggerButton: trigger });
+}
+function initializePanelLauncherContextMenu(): void { getJsx(); getReact(); }
+
+function ThreadPanelToolbar(props: { leadingToolbar?: unknown; mainToolbar?: unknown; trailingToolbar?: unknown }): unknown {
+  const r = getJsx();
+  return r.jsxs(r.Fragment, { children: [props.leadingToolbar ?? null, props.mainToolbar ?? null, props.trailingToolbar ?? null] });
+}
+function initializeThreadPanelToolbar(): void { getJsx(); }
+function ToolbarButton(props: { children?: unknown; color?: "outline" | string; disabled?: boolean; label: string; onClick?(): void; pressed?: boolean; shortcut?: string }): unknown {
+  const Button = shared.Yh ?? "button";
+  const color = props.color === "outline" ? (props.pressed ? "outlineActive" : "outline") : props.pressed ? "secondary" : (props.color ?? "ghost");
+  const control = getJsx().jsx(Button as never, { "aria-label": props.label, "aria-pressed": props.pressed, color,
+    disabled: props.disabled, onClick: props.onClick, size: "toolbar", uniform: true, children: props.children });
+  const Tooltip = shared.jf;
+  return typeof Tooltip === "function" ? getJsx().jsx(Tooltip as never, { tooltipContent: props.label, shortcut: props.shortcut, delayOpen: true, children: control })
+    : { ...(control as UnknownRecord), props: { ...((control as { props?: UnknownRecord }).props ?? {}), title: props.shortcut == null ? props.label : `${props.label} (${props.shortcut})` } };
 }
 
-function PanelLauncherContextMenu(props: { children: unknown; onOpenChange?(open: boolean): void }): unknown {
-  const [open, setOpen] = ReactRuntime.useState(false);
-  const launcher = usePanelLauncher();
-  const onOpenChange = (next: boolean): void => { setOpen(next); props.onOpenChange?.(next); };
-  return getJsxRuntime().jsx(PanelLauncherDropdown, {
-    launcher,
-    open,
-    onOpenChange,
-    triggerButton: getJsxRuntime().jsx("span", { onContextMenu: (event: { preventDefault(): void; stopPropagation(): void }) => { event.preventDefault(); event.stopPropagation(); onOpenChange(true); }, children: props.children }),
-  });
+function PanelLayoutBridge(props: { controller?: { setLayout?(layout: unknown): void }; layout?: unknown }): null {
+  const reactRuntime = getReact() as ReactRuntime & { useLayoutEffect?(effect: () => void | (() => void), deps: unknown[]): void };
+  reactRuntime.useLayoutEffect?.(() => {
+    props.controller?.setLayout?.(props.layout);
+    return () => props.controller?.setLayout?.(null);
+  }, [props.controller, props.layout]);
+  return null;
 }
+function initializePanelLayoutBridge(): void { getReact(); }
 
-function ThreadPanelToolbar(props: { mainToolbar?: unknown }): unknown {
-  return getJsxRuntime().jsx(getJsxRuntime().Fragment, { children: props.mainToolbar ?? null });
-}
-
-function ToolbarButton(props: {
-  children?: unknown; color?: "outline" | string; disabled?: boolean; label: string;
-  onClick?(): void; pressed?: boolean; shortcut?: string;
-}): unknown {
-  const color = props.color === "outline" ? (props.pressed ? "outlineActive" : "outline") : props.pressed ? "secondary" : "ghost";
-  return getJsxRuntime().jsx(Button, {
-    "aria-label": props.label, "aria-pressed": props.pressed, color, disabled: props.disabled,
-    onClick: props.onClick, size: "toolbar", title: props.shortcut == null ? props.label : `${props.label} (${props.shortcut})`, uniform: true, children: props.children,
-  });
-}
-
-function PanelLayoutBridge(): null { return null; }
-function initializeToolbarIconButton(): void { getJsxRuntime(); }
-function initializeTabStackIcon(): void { getJsxRuntime(); }
-function initializePanelLauncherActions(): void { getJsxRuntime(); }
-function initializeThreadPanelToolbar(): void { getJsxRuntime(); }
-function initializePanelLauncherDropdown(): void { getJsxRuntime(); }
-function initializePanelLauncherContextMenu(): void { getJsxRuntime(); }
-function initializePanelLauncher(): void { getJsxRuntime(); }
-
-let LazyLocalConversationSideChatTab: ((props: Record<string, unknown>) => unknown) | undefined;
 function initializeLazySideChat(): void {
   if (LazyLocalConversationSideChatTab != null) return;
-  LazyLocalConversationSideChatTab = createLazyComponent(async () => {
+  const createLazy = shared.Jm as undefined | ((loader: () => Promise<unknown>, options: UnknownRecord) => unknown);
+  LazyLocalConversationSideChatTab = createLazy == null ? null : createLazy(async () => {
     const module = await import("@rchunk/local-conversation-thread-entry");
     return module.LocalConversationSideChatTab;
   }, { propagateLoadError: true });
 }
-
-let initialized = false;
 function initializeThreadPanelToggleButton(): void {
   if (initialized) return;
   initialized = true;
-  initializeToolbarIconButton(); initializeTabStackIcon(); initializePanelLauncherActions();
-  initializeThreadPanelToolbar(); initializePanelLauncherDropdown(); initializePanelLauncherContextMenu();
-  initializePanelLauncher(); initializeLazySideChat();
+  initializePanelLayoutBridge(); initializeToolbarIconButton(); initializeTabStackIcon(); initializeLazySideChat();
+  initializePanelLauncherActions(); initializePanelLauncher(); initializePanelLauncherDropdown();
+  initializePanelLauncherContextMenu(); initializeThreadPanelToolbar();
+  for (const owner of [initial, primary]) {
+    const initializer = owner.n;
+    if (typeof initializer === "function") (initializer as () => void)();
+  }
 }
 
-const lazySideChat = (): unknown => LazyLocalConversationSideChatTab;
+initializeThreadPanelToggleButton();
 
 export {
   ToolbarIconButton as _,
   PanelLauncherContextMenu as a,
-  PanelLayoutBridge as b,
+  initializePanelLayoutBridge as b,
   initializePanelLauncherDropdown as c,
   initializePanelLauncherActions as d,
   usePanelLauncher as f,
@@ -156,7 +224,7 @@ export {
   initializeLazySideChat as m,
   initializeThreadPanelToggleButton as n,
   initializePanelLauncherContextMenu as o,
-  lazySideChat as p,
+  LazyLocalConversationSideChatTab as p,
   ThreadPanelToolbar as r,
   PanelLauncherDropdown as s,
   ToolbarButton as t,
@@ -165,5 +233,4 @@ export {
   PanelLayoutBridge as y,
 };
 
-void FormattedMessage;
 void classNames;

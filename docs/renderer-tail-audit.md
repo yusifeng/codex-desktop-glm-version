@@ -1,5 +1,16 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Thread panel/Quick Chat 大批次：`thread-panel-toggle-button` 与
+`content-quick-chat-overlay` 已从 release-faithful owner 迁到可维护 React/TypeScript，
+一次删除 7,084 行原始 owner。Thread panel 纠正发布短导出 `b`（layout bridge initializer）
+与 `p`（lazy SideChat component）被旧测试固化的错位，恢复 runtime-derived launcher actions、
+artifact list、new-tab/panel surfaces、dropdown/context menu、三段 toolbar 与 layout lifecycle；
+Quick Chat 恢复 portal、ResizeObserver geometry、main-content reservation、dock/presentation/minimize、
+Escape、drag-edge 与 transcript/composer 生命周期。新增 35 项 focused assertions，并通过既有
+thread right-panel 与 23 项 quick-chat/window clusters、typecheck、renderer source-build 及
+1,888/1,888、0 failures 结构校验。严格剩余由 17 个 / 102,104 行降至
+15 个 / 95,020 行。
+
 2026-11-02 Git/thread interaction 大批次：`git-branch-switcher`、
 `local-conversation-git-actions` 与 `thread-handoff-modal` 已从 release-faithful owner
 迁到可维护 TypeScript，一次删除 6,342 行原始 owner。此批纠正旧语义实现中被测试固化的
