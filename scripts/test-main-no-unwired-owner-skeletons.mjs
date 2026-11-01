@@ -783,5 +783,16 @@ assert.equal(main.includes("function dt("), false, "generated repository origin 
 assert.equal(main.includes("function ft("), false, "generated repository URL parser must be removed");
 assert.equal(main.includes("function pt("), false, "generated SCP-like repository parser must be removed");
 assert.equal(main.includes("function mt("), false, "generated repository path parser must be removed");
+assert.equal(main.includes('require("./main-app/sidebar/thread-order.js")'), true, "thread ordering policy is wired");
+assert.equal(main.includes("reorderPinnedThreadIds: moveThreadBefore"), true, "pinned-thread server uses semantic ordering");
+assert.equal(main.includes('require("./main-app/misc/codex-home.js")'), true, "Codex-home policy is wired");
+assert.equal(main.includes("bt: homeDirectoryFromCodexHome"), true, "fetch handler uses semantic home derivation");
+assert.equal(main.includes("RollingWindowCounter, createGitWorkerInvocationSampler"), true, "rolling-window counter is imported");
+assert.equal(main.includes("new RollingWindowCounter(windowMs)"), true, "Git worker sampler uses the semantic rolling counter");
+assert.equal(main.includes("var jt = class"), false, "generated rolling-window counter must be removed");
+assert.equal(main.includes("function _t("), false, "generated thread ordering policy must be removed");
+assert.equal(main.includes("function bt("), false, "generated Codex-home policy must be removed");
+assert.equal(main.includes("function ht("), false, "dead generated personality predicate must be removed");
+assert.equal(main.includes("function gt("), false, "dead generated personality normalizer must be removed");
 
-console.log("778 main unwired-owner skeleton assertions passed");
+console.log("789 main unwired-owner skeleton assertions passed");

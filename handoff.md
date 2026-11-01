@@ -5501,3 +5501,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 新增并真实接回 typed `misc/git-repository-origin.ts`，覆盖 URL/SCP-like、Windows drive 排除、`.git` 归一与 nested owner；
   runtime `parseRepoOrigin` consumer 已切换，主 chunk 旧 `dt/ft/pt/mt` 删除。
 - focused suite 19 项；测试索引 1833，no-unwired gate 扩至 778 项。
+
+# 2026-11-01 early utility policy residue convergence
+
+- 新增并接回 `sidebar/thread-order.ts` 与 `misc/codex-home.ts`；扩展 `worker/invocation-sampler.ts`，以 typed
+  `RollingWindowCounter` 持有 count/sum、窗口 prune 与 compaction。主 chunk 旧 `_t/bt/jt` 删除。
+- 无 consumer 的 `ht/gt` personality helpers 直接删除；utility focused 18 项，worker sampler 源码级 suite 10 项；
+  测试索引 1834，no-unwired gate 扩至 789 项。

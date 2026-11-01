@@ -230,7 +230,7 @@ const { shouldApplyWindowsOpacityWorkaround } = require("./main-app/startup/wind
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { sendTelemetryRequest } = require("./main-app/worker/telemetry-request.js");
 const { createSentryRpcHandlerClass } = require("./main-app/worker/sentry-envelope-transport.js");
-const { createGitWorkerInvocationSampler } = require("./main-app/worker/invocation-sampler.js");
+const { RollingWindowCounter, createGitWorkerInvocationSampler } = require("./main-app/worker/invocation-sampler.js");
 const { createWorkerMainProtocol } = require("./main-app/worker/worker-main-protocol.js");
 const { createWorkerBusClass } = require("./main-app/worker/worker-bus.js");
 const { createWorkerManagerClass } = require("./main-app/worker/worker-manager.js");
@@ -318,6 +318,8 @@ const { parseRepositoryOrigin } = require("./main-app/misc/git-repository-origin
 const { createLinuxApplicationsRuntime } = require("./main-app/platform/linux-applications.js");
 const { createThreadSectionServerClass } = require("./main-app/sidebar/thread-section-server.js");
 const { PINNED_THREAD_SECTION_ID, ThreadSectionEngine } = require("./main-app/sidebar/thread-section-engine.js");
+const { moveThreadBefore } = require("./main-app/sidebar/thread-order.js");
+const { homeDirectoryFromCodexHome } = require("./main-app/misc/codex-home.js");
 const { createSavedSectionUndoRedoStackClass } = require("./main-app/sidebar/saved-section-undo-redo-stack.js");
 const { createSavedSectionTransitionClass } = require("./main-app/sidebar/saved-section-transition.js");
 const { createSavedSectionReconciliationClass } = require("./main-app/sidebar/saved-section-reconciliation.js");
@@ -1035,46 +1037,7 @@ var at = `codex-workspace-settings-`,
       return this.canPass(e) ? (this.mark(e), !0) : !1;
     }
   };
-function ht(e) {
-  return e === `friendly` || e === `pragmatic`;
-}
-function gt(e) {
-  return ht(e) ? e : null;
-}
-function _t({ threadIds: e, threadId: t, beforeThreadId: n }) {
-  let r = e.filter((e) => e !== t);
-  if (n == null) return [...r, t];
-  let i = r.indexOf(n);
-  return i === -1 ? [...r, t] : [...r.slice(0, i), t, ...r.slice(i)];
-}
-function bt({ codexHome: e, path: t }) {
-  let n = e.replace(/[\\/]+$/, ``);
-  return t.basename(n) === `.codex` ? t.dirname(n) : n;
-}
-var jt = class {
-    windowMs;
-    entries = [];
-    headIndex = 0;
-    rollingSum = 0;
-    constructor(e) {
-      this.windowMs = e.windowMs;
-    }
-    record(e, t = Date.now()) {
-      (this.entries.push({ atMs: t, value: e }), (this.rollingSum += e), this.prune(t));
-    }
-    getSnapshot(e = Date.now()) {
-      return (this.prune(e), { count: this.entries.length - this.headIndex, sum: this.rollingSum });
-    }
-    prune(e) {
-      let t = e - this.windowMs;
-      for (; this.headIndex < this.entries.length && this.entries[this.headIndex].atMs < t;)
-        ((this.rollingSum -= this.entries[this.headIndex].value), (this.headIndex += 1));
-      this.headIndex !== 0 &&
-        (this.headIndex * 2 < this.entries.length ||
-          (this.entries.splice(0, this.headIndex), (this.headIndex = 0)));
-    }
-  },
-  Mt = [`OwlOpenAIGoLinks`, `OwlRemoteSearchSuggestions`],
+var Mt = [`OwlOpenAIGoLinks`, `OwlRemoteSearchSuggestions`],
   Nt = 6e4,
   Pt = {
     powershell: `PowerShell`,
@@ -34555,7 +34518,7 @@ var jH = createPinnedThreadsServiceClass({
     pinnedSectionId: PINNED_THREAD_SECTION_ID,
     pinnedThreadIdsKey: n.iu.PINNED_THREAD_IDS,
     readPinnedThreadIds: hH,
-    reorderPinnedThreadIds: _t,
+    reorderPinnedThreadIds: moveThreadBefore,
   }),
   oBe = n.wf({
     userId: n.Of().nullable(),
@@ -34672,7 +34635,7 @@ var GH = !!process.env.WSL_DISTRO_NAME,
     a,
     avatarOverlayAcceleratorFromKeymap,
     b,
-    bt,
+    bt: homeDirectoryFromCodexHome,
     bundledSkillsRoot,
     readBrowserUseOriginState,
     cT: readAccountInfoFromToken,
@@ -55493,7 +55456,8 @@ var bst = createWorkerManagerClass({
   });
 var xst = createWorkerRuntimeFactory({
     AppEventPublisher,
-    createGitInvocationSampler: () => createGitWorkerInvocationSampler((options) => new jt(options)),
+    createGitInvocationSampler: () =>
+      createGitWorkerInvocationSampler(({ windowMs }) => new RollingWindowCounter(windowMs)),
     WorkerBus: H9,
     createShortcutLinkReader,
     readShortcutLink: (path) => l.shell.readShortcutLink(path),

@@ -3616,3 +3616,13 @@ no-unwired gate 扩至 772 项。
 归一、nested owner path 和 invalid input 降级。唯一 runtime `parseRepoOrigin` consumer 已切换，主 chunk 原 `dt/ft/pt/mt`
 机械函数删除。focused suite 19 项覆盖 HTTPS/SSH/SCP/nested owner/drive/invalid 与真实 wiring；测试索引增至 1833，
 no-unwired gate 扩至 778 项。
+
+### 批量收敛：early utility policy residue
+
+一次处理四个早期第一方小边界：新增 `sidebar/thread-order.ts` 并接回 pinned-thread reorder；新增 `misc/codex-home.ts`
+并接回 Electron fetch handler 的 remote-home fallback；扩展 `worker/invocation-sampler.ts`，由 typed
+`RollingWindowCounter` 直接拥有 count/sum、窗口边界与 amortized compaction；无任何 consumer 的 `ht/gt` personality helpers
+作为死代码删除。
+
+主 chunk 原 `_t/bt/jt/ht/gt` 与 rolling-window 私有状态全部删除，Git worker runtime 直接构造语义 counter。新 utility suite
+18 项、worker sampler suite 恢复为源码级真实执行并扩至 10 项；测试索引 1834，no-unwired gate 扩至 789 项。

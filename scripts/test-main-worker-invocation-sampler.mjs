@@ -1,9 +1,13 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
-import { createRequire } from "node:module";
+import fs from "node:fs";
+import { transform } from "esbuild";
 
-const require = createRequire(import.meta.url);
-const { WorkerInvocationSampler } = require("../app/.vite/build/main-app/worker/invocation-sampler.js");
+const source = fs.readFileSync(new URL("../src/main/main-app/worker/invocation-sampler.ts", import.meta.url), "utf8");
+const transpiled = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+const loaded = { exports: {} };
+Function("module", "exports", transpiled.code)(loaded, loaded.exports);
+const { RollingWindowCounter, WorkerInvocationSampler } = loaded.exports;
 const calls = [];
 const counter = {
   record(value, atMs) {
@@ -25,4 +29,18 @@ assert.deepEqual(calls, [
   { type: `record`, value: 1, atMs: 140 },
   { type: `snapshot`, atMs: 160 },
 ]);
-console.log(`4 main worker invocation sampler assertions passed`);
+
+const rolling = new RollingWindowCounter(100);
+rolling.record(2, 0);
+rolling.record(3, 50);
+rolling.record(4, 100);
+assert.deepEqual(rolling.getSnapshot(100), { count: 3, sum: 9 });
+assert.deepEqual(rolling.getSnapshot(101), { count: 2, sum: 7 });
+assert.deepEqual(rolling.getSnapshot(150), { count: 2, sum: 7 });
+assert.deepEqual(rolling.getSnapshot(151), { count: 1, sum: 4 });
+
+const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
+assert.equal(main.includes("new RollingWindowCounter(windowMs)"), true);
+assert.equal(main.includes("var jt = class"), false);
+
+console.log(`10 main worker invocation sampler assertions passed`);
