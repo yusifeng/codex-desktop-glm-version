@@ -1,10 +1,12 @@
 import path from "node:path";
 import {
   iu as stateKeys,
-  qo as parseLocalProjects,
   Ko as preferProjectForRoot,
   Wo as firstWorkspaceRoot,
 } from "@chunk/shared";
+import { parseLocalProjects } from "../../shared/project-state";
+
+export { parseLocalProjects } from "../../shared/project-state";
 
 type GlobalState = {
   get(key: unknown): any;

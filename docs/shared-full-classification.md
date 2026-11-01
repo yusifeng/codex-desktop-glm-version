@@ -113,7 +113,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Hc` | `yS` | 18533 | settings-threads | semantic | `browser-tab-mentions` (`mentionsWithinBudget`) |
 | `Hd` | `Ug` | 16079 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `Hf` | `lt` | 2676 | core-path-utils | semantic | `rpc-core` (`RpcStubLike`) |
-| `Hi` | `lre` | 24111 | hosts-wsl-plugins | semantic | `wsl-paths` (`isWslUncPath`) |
+| `Hi` | `lre` | 24111 | hosts-wsl-plugins | semantic | `wsl-paths` (`wslDistroFromUnc`) |
 | `Hl` | `Bb` | 17912 | settings-threads | semantic | `app-constants` (`buildAutoInstallOptOutKey`) |
 | `Hn` | `dY` | 42234 | mcp-rpc | semantic | `mcp-runtime` (`setWindowsCoreRoot`) |
 | `Ho` | `fD` | 20959 | hosts-wsl-plugins | semantic | `hosts-runtime` (`pluginsConfigSchema`) |
@@ -279,7 +279,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Uc` | `hS` | 18511 | settings-threads | semantic | `browser-tab-mentions` (`browserTabMentionSchema`) |
 | `Ud` | `Hg` | 16071 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `Uf` | `dt` | 2678 | core-path-utils | semantic | `rpc-core` (`RpcTarget`) |
-| `Ui` | `Ij` | 24108 | hosts-wsl-plugins | semantic | `wsl-paths` (`isWslPath`) |
+| `Ui` | `Ij` | 24108 | hosts-wsl-plugins | semantic | `wsl-paths` (`isWslUncPath`) |
 | `Ul` | `_ne` | 17902 | settings-threads | semantic | `app-constants` (`marketplaceNameForFlavor`) |
 | `Un` | `tY` | 42184 | mcp-rpc | semantic | `mcp-runtime` (`setCoreGate`) |
 | `Uo` | `sD` | 20924 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
@@ -305,7 +305,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Wc` | `_S` | 18516 | settings-threads | semantic | `browser-tab-mentions` (`tabDedupeKey`) |
 | `Wd` | `Rg` | 15995 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `Wf` | `ft` | 2679 | core-path-utils | semantic | `rpc-core` (`connectRpc`) |
-| `Wi` | `Pj` | 24102 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
+| `Wi` | `Pj` | 24102 | hosts-wsl-plugins | semantic | `wsl-paths` (`isWslPath`) |
 | `Wl` | `Rb` | 17905 | settings-threads | semantic | `app-constants` (`isBundledMarketplaceName`) |
 | `Wn` | `XJ` | 42154 | mcp-rpc | semantic | `runtime-state` (`Wn`) |
 | `Wo` | `oD` | 20921 | hosts-wsl-plugins | semantic | `hosts-runtime` (`joinProjectRootsAsCwd`) |
@@ -576,7 +576,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `qi` | `Mj` | 24041 | hosts-wsl-plugins | semantic | `browser-context` (`visualizationDateOf`) |
 | `ql` | `vb` | 17791 | settings-threads | semantic | `app-constants` (`NODE_REPL_MODULE_DIR_ENV_KEY`) |
 | `qn` | `sJ` | 41256 | mcp-rpc | semantic | `mcp-runtime` (`executableResolver`) |
-| `qo` | `iD` | 20906 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
+| `qo` | `iD` | 20906 | hosts-wsl-plugins | semantic | `project-state` (`parseLocalProjects`) |
 | `qr` | `AI` | 27944 | sql-git-registry | preserved | original sql-git-registry implementation retained for compatibility |
 | `qs` | `Uw` | 19942 | settings-threads | semantic | `http-headers` (`wantsDeviceCheckToken`) |
 | `qt` | `A2` | 54213 | streams | semantic | `streams-runtime` (`chromeHostsConfigPath`) |

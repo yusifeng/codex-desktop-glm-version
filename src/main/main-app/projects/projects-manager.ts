@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import { parseLocalProjects } from "../../shared/project-state";
+
 /** Owns local and remote project CRUD, ordering, appearance, membership recovery, and renderer broadcasts. */
 export function createProjectsManagerClass(dependencies: Record<string, any>) {
   const {
@@ -462,7 +464,7 @@ const r8e = n.wf({
     }
     getLocalProjectsForDesktopState(e) {
       return Object.fromEntries(
-        Object.entries(n.qo(e)).map(([e, t]) => [
+        Object.entries(parseLocalProjects(e)).map(([e, t]) => [
           e,
           { ...t, rootPaths: Hn(t.rootPaths, this.#u()) },
         ]),

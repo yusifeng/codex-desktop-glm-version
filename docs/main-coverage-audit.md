@@ -1,5 +1,17 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 shared project-state and WSL predicate convergence
+
+`audit-shared-consumption` 定位到最后两个仍被主进程直接消费、但没有语义声明的 shared exports：`Wi/Pj` 与 `qo/iD`。新增
+`shared/project-state.ts`，以类型明确的 `StoredLocalProject` 恢复 LOCAL_PROJECTS record admission、逐项校验、非法项丢弃、未知字段剥离与
+root array copy；project-state、local-data migrations、ProjectsManager 和 automation execution policy 的全部真实 consumers 已改接该 parser，
+不再通过 `n.qo/runtime.qo`。
+
+同时核对 export table 发现旧声明把 `Ui/Ij` 错映成 `/mnt` predicate；现校正为 `Ui=isWslUncPath`、`Wi=isWslPath`、
+`Hi=wslDistroFromUnc`，project path policy 直接消费语义 WSL/Windows predicates。39 项 shared parity/接线断言、project path/state 62、
+migrations 30、ProjectsManager 45、automation policy 55、防回退 1250 项通过；shared raw-consumer audit 从 2 降至 0，测试索引为 1856。
+typecheck、chunk verify 11/11 与全量 build check 同步通过。
+
 ## 2026-11-01 browser webview comment callback ownership correction
 
 对主 chunk 做零消费定义审计时，发现已迁出的 `browser-page-webview-binding-controller.ts` 仍在 `onComment` 回调中读取原

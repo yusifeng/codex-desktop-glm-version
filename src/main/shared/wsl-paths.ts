@@ -2,9 +2,9 @@
 // hosts-wsl-plugins 子区）。
 //
 // 对应 src-DldfpmrL.ts 的 L24,102-24,729 区段：
-//   - Pj（Ui）：/mnt/<drive> 或 \\MNT\<drive> 判定
+//   - Pj（Wi）：/mnt/<drive> 或 \\MNT\<drive> 判定
 //   - Fj：Windows 路径判定（盘符或双斜杠）
-//   - Ij（Hi）：WSL UNC 前缀判定（\\wsl$\ 或 \\wsl.localhost\，
+//   - Ij（Ui）：WSL UNC 前缀判定（\\wsl$\ 或 \\wsl.localhost\，
 //     含 \\?\UNC\ 变体）
 //   - lre：UNC 前缀里的 distro 名提取
 //   - Lj：/mnt/<drive> → <Drive>:\ 反向换算（含 \\MNT\ 与
@@ -32,7 +32,7 @@
 //   - Z（Di）：app-server 文件系统门面（readFile/writeFile/mkdir/
 //     stat/readdir/rm/copyFile/cp——经 ExecutionHost 转发）
 //
-// 兼容导出：Ui/Hi/Vi/Bi/Li/Ri/zi/Mi/Ni/Ai/Fi/ji/Oi/ki/Di。
+// 兼容导出：Wi/Ui/Hi/Vi/Bi/Li/Ri/zi/Mi/Ni/Ai/Fi/ji/Oi/ki/Di。
 
 import { execFile, execFileSync, spawnSync } from "node:child_process";
 import { homedir } from "node:os";
@@ -48,17 +48,17 @@ const log = memoizedTaggedLogger("wsl");
 // 路径谓词与换算（原 `Pj`/`Fj`/`Ij`/`lre`/`Lj`/`Rj`/`zj`）
 // ---------------------------------------------------------------------------
 
-/** /mnt 路径判定（原 `Pj`，导出 `Ui`）。 */
+/** /mnt 路径判定（原 `Pj`，导出 `Wi`）。 */
 export function isWslPath(path: string): boolean {
   return /^\/mnt\/[a-zA-Z](?:\/|$)/.test(path) ? true : /^\\{1,2}[Mm][Nn][Tt]\\[a-zA-Z](?:\\|$)/.test(path);
 }
 
 /** Windows 路径判定（原 `Fj`）。 */
-function isWindowsPath(path: string): boolean {
+export function isWindowsPath(path: string): boolean {
   return /^[a-zA-Z]:[\\/]/.test(path) ? true : path.startsWith("\\\\") || path.startsWith("//");
 }
 
-/** WSL UNC 前缀判定（原 `Ij`，导出 `Hi`）。 */
+/** WSL UNC 前缀判定（原 `Ij`，导出 `Ui`）。 */
 export function isWslUncPath(path: string): boolean {
   return /^(\\\\|\/\/)(?:\?[\\/]UNC[\\/])?(wsl\$|wsl\.localhost)[\\/]/i.test(path);
 }
@@ -675,7 +675,8 @@ export const appServerFileSystem = {
 // ---------------------------------------------------------------------------
 
 export {
-  isWslPath as Ui,
+  isWslPath as Wi,
+  isWslUncPath as Ui,
   wslDistroFromUnc as Hi,
   windowsToWslPath as Vi,
   sanitizedProcessEnv as Bi,

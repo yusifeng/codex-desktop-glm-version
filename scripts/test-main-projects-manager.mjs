@@ -9,7 +9,16 @@ const source = fs.readFileSync(
 );
 const transpiled = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
 const loaded = { exports: {} };
-Function("module", "exports", transpiled.code)(loaded, loaded.exports);
+Function("require", "module", "exports", transpiled.code)(
+  (specifier) => {
+    if (specifier === "../../shared/project-state") return {
+      parseLocalProjects: (value) => value ?? {},
+    };
+    throw new Error(`Unexpected require: ${specifier}`);
+  },
+  loaded,
+  loaded.exports,
+);
 const { createProjectsManagerClass } = loaded.exports;
 
 class Schema {
@@ -63,7 +72,7 @@ const runtime = {
   ya: (remotePath) => remotePath.trim(),
   va: (remotePath) => remotePath.toLowerCase(),
   _a: (remotePath) => path.basename(remotePath),
-  qo: (projects) => projects,
+  qo: () => { throw new Error("raw shared project parser must not be used"); },
   zi: () => false,
   Es: () => false,
 };

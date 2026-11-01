@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成 shared project-state 与 WSL predicate 收敛：新增 `shared/project-state.ts`，等价恢复 `qo/iD` 对 persisted local projects 的 record/
+entry 校验、非法项过滤、未知字段剥离和 rootPaths copy，并将 project-state、migration、ProjectsManager、automation policy 四条真实消费链
+全部改接，移除 `n.qo/runtime.qo`。export-table 复核同时修正旧 `Ui/Wi/Hi` 语义错配：分别对应 WSL UNC、WSL mount、distro extraction；
+project path policy 现直接使用语义 predicates。相关五组 focused suites、防回退 1250 项和 typecheck 通过；shared raw-consumer audit
+由 2 清零，测试索引增至 1856；chunk verify 11/11 与全量 build check 同步通过。
+
 完成 Browser page WebContents binding 的评论菜单接线修复：迁出模块原 `onComment` 仍错误捕获主 chunk 私有 `aZe`，跨 CommonJS
 边界运行时不可见。现在 `browser-page-webview-binding-controller.ts` 自持类型化 annotate/quick-annotate action/source 投影，真实回调消费
 该 owner，原 chunk 对象删除。相同 AST 审计同时移除 icon、detached-window、saved-section 与 IAB 的零消费纯兼容残留；当前 main

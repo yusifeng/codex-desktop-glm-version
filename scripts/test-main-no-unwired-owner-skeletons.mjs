@@ -149,6 +149,7 @@ const realOwners = [
   ["src/main/main-app/app-server/sqlite-recovery-warning.ts", "parseSqliteRecoveryNotification"],
   ["src/main/main-app/projects/path-policy.ts", "createProjectPathPolicy"],
   ["src/main/main-app/projects/project-state.ts", "getLocalProjects"],
+  ["src/main/shared/project-state.ts", "parseLocalProjects"],
   ["src/main/main-app/misc/model-routing.ts", "resolveAutomationModelRouting"],
   ["src/main/main-app/startup/deferred-startup-work.ts", "scheduleDeferredStartupWork"],
   ["src/main/main-app/ambient-suggestions/runtime.ts", "createAmbientSuggestionsRuntime"],
@@ -249,6 +250,22 @@ const browserWebviewListenerRuntime = fs.readFileSync(
 );
 const browserPageWebviewBindingController = fs.readFileSync(
   new URL("src/main/main-app/browser-sidebar/browser-page-webview-binding-controller.ts", root),
+  "utf8",
+);
+const projectPathPolicy = fs.readFileSync(
+  new URL("src/main/main-app/projects/path-policy.ts", root),
+  "utf8",
+);
+const projectState = fs.readFileSync(
+  new URL("src/main/main-app/projects/project-state.ts", root),
+  "utf8",
+);
+const projectLocalDataMigrations = fs.readFileSync(
+  new URL("src/main/main-app/projects/local-data-migrations.ts", root),
+  "utf8",
+);
+const projectsManager = fs.readFileSync(
+  new URL("src/main/main-app/projects/projects-manager.ts", root),
   "utf8",
 );
 assert.equal(inboxOwner.includes("export class InboxItemsFacade"), true, "InboxItemsFacade must remain a real owner");
@@ -1001,6 +1018,12 @@ assert.equal(main.includes('require("./main-app/projects/path-policy.js")'), tru
 assert.equal(main.includes('require("./main-app/projects/project-state.js")'), true, "project state policy is wired");
 assert.equal(main.includes("normalizeProjectRoots: Gn"), true, "project consumers receive semantic root normalization");
 assert.equal(main.includes("getLocalProjects: jr"), true, "project consumers receive semantic local-project lookup");
+assert.equal(main.includes("parseLocalProjects,"), true, "automation policy receives the semantic local-project parser");
+assert.equal(main.includes("parseLocalProjects: n.qo"), false, "automation policy must not retain the raw shared parser");
+assert.equal(projectPathPolicy.includes('from "../../shared/wsl-paths"'), true, "project path policy consumes semantic WSL predicates");
+assert.equal(projectState.includes('from "../../shared/project-state"'), true, "project state consumes the semantic persisted-state parser");
+assert.equal(projectLocalDataMigrations.includes("runtime.qo"), false, "project migrations must not retain the raw shared parser");
+assert.equal(projectsManager.includes("n.qo("), false, "projects manager must not retain the raw shared parser");
 for (const generatedName of [
   "Rn", "zn", "Bn", "Vn", "Hn", "xte", "Qn", "Wn", "yte", "Gn", "qn", "Yn", "Kn", "vte", "bte", "Jn", "Xn", "Zn", "Un",
   "jr", "Mr", "Nr", "Pr", "Fr", "Ir", "Lr", "Rr", "Nte", "Pte",
@@ -1217,4 +1240,4 @@ for (const deadOwner of ["iconAssetNames =", "nBe = [", "RY = ADD_BROWSER_USE_DO
   assert.equal(main.includes(deadOwner), false, `${deadOwner} zero-consumer composition residue must stay removed`);
 }
 
-console.log("1242 main unwired-owner skeleton assertions passed");
+console.log("1250 main unwired-owner skeleton assertions passed");

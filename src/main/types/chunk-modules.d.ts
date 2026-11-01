@@ -311,7 +311,7 @@ declare module "@chunk/shared" {
   export { browserTabMentionSchema as Uc } from "../../shared/browser-tab-mentions";
   export const Ud: any; // 内部符号: Hg
   export { RpcTarget as Uf } from "../../shared/rpc-core";
-  export { isWslPath as Ui } from "../../shared/wsl-paths";
+  export { isWslUncPath as Ui } from "../../shared/wsl-paths";
   export { marketplaceNameForFlavor as Ul } from "../../shared/app-constants";
   export { setCoreGate as Un } from "../../shared/mcp-runtime";
   export const Uo: any; // 内部符号: sD
@@ -342,7 +342,7 @@ declare module "@chunk/shared" {
     mainObject: unknown,
     options?: Record<string, unknown>,
   ) => unknown;
-  export const Wi: any; // 内部符号: Pj
+  export { isWslPath as Wi } from "../../shared/wsl-paths";
   export { isBundledMarketplaceName as Wl } from "../../shared/app-constants";
   export { Wn } from "../../shared/runtime-state";
   export { DisposableBag as Wr } from "../../shared/sql-git-registry";
@@ -766,7 +766,7 @@ declare module "@chunk/shared" {
     isAllowedAttachmentType as xa,
     appNameForFlavor as zo
   } from "../../shared/hosts-runtime";
-  export const qo: any; // 内部符号: iD
+  export { parseLocalProjects as qo } from "../../shared/project-state";
 }
 declare module "@chunk/electron-resources-path" {
   // electron-resources-path-BDLw2lp0.js —— 已重写 chunk（src/main/electron-resources-path/）。

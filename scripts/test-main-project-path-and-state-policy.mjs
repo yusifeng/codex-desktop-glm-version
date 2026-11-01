@@ -15,7 +15,18 @@ async function load(relativePath, shared) {
   const transpiled = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
   const module = { exports: {} };
   Function("require", "module", "exports", transpiled.code)(
-    (specifier) => specifier === "@chunk/shared" ? shared : nativeRequire(specifier),
+    (specifier) => {
+      if (specifier === "@chunk/shared") return shared;
+      if (specifier === "../../shared/wsl-paths") return {
+        isWindowsPath: (value) => /^[A-Z]:/.test(value),
+        isWslPath: shared.Wi,
+        isWslUncPath: shared.Ui,
+      };
+      if (specifier === "../../shared/project-state") return {
+        parseLocalProjects: shared.qo,
+      };
+      return nativeRequire(specifier);
+    },
     module,
     module.exports,
   );
@@ -30,7 +41,7 @@ const sharedPath = {
   zi: (host) => host.allowDesktop === true,
   Es: (host) => host.kind === "remote",
   Wi: (value) => value.startsWith("native:"),
-  Ui: (value) => /^[A-Z]:/.test(value),
+  Ui: (value) => value.startsWith("unc:"),
   bl: (value) => value.startsWith("resolve:"),
 };
 const pathModule = await load("../src/main/main-app/projects/path-policy.ts", sharedPath);

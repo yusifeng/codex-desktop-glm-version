@@ -417,6 +417,7 @@ const {
   },
 } = require("./main-app/projects/path-policy.js");
 const {
+  parseLocalProjects,
   getLocalProjects: jr,
   findLocalProjectForRoot: Mr,
   getSelectedProject: Nr,
@@ -2630,7 +2631,7 @@ var {
   appConfigStateKey: a.J,
   agentModeByHostKey: n.Td,
   agentModeSchema: n.Ed,
-  parseLocalProjects: n.qo,
+  parseLocalProjects,
   normalizePath: n.Ns,
   defaultPermissions: n.Od,
   permissionProfileOf: n.Md,

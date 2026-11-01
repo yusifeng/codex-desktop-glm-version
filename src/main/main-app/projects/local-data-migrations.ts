@@ -1,6 +1,8 @@
 import type { Hash } from "node:crypto";
 import type path from "node:path";
 
+import { parseLocalProjects as parseStoredLocalProjects } from "../../shared/project-state";
+
 export interface GlobalStateMigrationStore {
   get(key: unknown): any;
   getStored(key: unknown): any;
@@ -103,7 +105,7 @@ export function createProjectLocalDataMigrationRuntime(dependencies: ProjectMigr
   const normalizeProjectFiles = runtime.Po as (value: unknown) => Record<string, Array<{ path: string }>>;
   const normalizeSidebarProjectOrders = runtime.Ca as (value: unknown) => Record<string, any>;
   const normalizeThreadAssignments = runtime.ca as (value: unknown) => Record<string, any>;
-  const normalizeLocalProjects = runtime.qo as (value: unknown) => Record<string, LocalProject>;
+  const normalizeLocalProjects = parseStoredLocalProjects as (value: unknown) => Record<string, LocalProject>;
   const commonRootPath = runtime.Wo as (paths: string[]) => string | null;
   const insertLocalProject = runtime.Go as (input: { localProjects: Record<string, LocalProject>; projectId: string; project: LocalProject }) => Record<string, LocalProject>;
   const migrateAutomationCwds = runtime.Ir as (map: (cwd: string) => Promise<unknown>) => Promise<number>;

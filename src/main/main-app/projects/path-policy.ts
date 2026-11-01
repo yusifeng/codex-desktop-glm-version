@@ -8,10 +8,9 @@ import {
   ji as normalizeStoragePathValue,
   zi as hostAllowsDesktopPathNormalization,
   Es as isRemoteHostConfig,
-  Wi as isNativePlatformPath,
-  Ui as isWindowsDrivePath,
   bl as shouldResolveWindowsRealpath,
 } from "@chunk/shared";
+import { isWindowsPath, isWslPath, isWslUncPath } from "../../shared/wsl-paths";
 
 export type HostConfig = { home_dir?: string | null; [key: string]: unknown };
 
@@ -56,15 +55,15 @@ export function createProjectPathPolicy(adapters: ProjectPathPolicyAdapters) {
         : path;
   }
 
-  function isPosixOrWindowsDrivePath(path: string): boolean {
-    return isWindowsDrivePath(path) || path === "/" || /^\/(?!\/)/.test(path);
+  function isPosixOrWslUncPath(path: string): boolean {
+    return isWslUncPath(path) || path === "/" || /^\/(?!\/)/.test(path);
   }
 
   function normalizeProjectPathForHost(path: string, hostConfig: HostConfig, allowWslPaths: boolean): string {
-    if (isRemoteHostConfig(hostConfig) || (adapters.platform !== "win32" && isNativePlatformPath(path)))
+    if (isRemoteHostConfig(hostConfig) || (adapters.platform !== "win32" && isWslPath(path)))
       return path;
     if (allowWslPaths) return normalizeDesktopPathWithFlag(path, true);
-    if (isPosixOrWindowsDrivePath(path)) return normalizeStoragePathWithFlag(path, true);
+    if (isPosixOrWslUncPath(path)) return normalizeStoragePathWithFlag(path, true);
     return path;
   }
 
@@ -87,7 +86,7 @@ export function createProjectPathPolicy(adapters: ProjectPathPolicyAdapters) {
   }
 
   function pathForRealpath(path: string, hostConfig: HostConfig): string {
-    return adapters.platform !== "win32" || isRemoteHostConfig(hostConfig) || !isPosixOrWindowsDrivePath(path)
+    return adapters.platform !== "win32" || isRemoteHostConfig(hostConfig) || !isPosixOrWslUncPath(path)
       ? path
       : normalizeStoragePathWithFlag(path, true);
   }
@@ -151,7 +150,7 @@ export function createProjectPathPolicy(adapters: ProjectPathPolicyAdapters) {
       return normalized;
     try {
       const resolved = await adapters.realpath(normalized);
-      return isWindowsDrivePath(resolved) ? resolved : normalized;
+      return isWindowsPath(resolved) ? resolved : normalized;
     } catch {
       return normalized;
     }
