@@ -47,12 +47,12 @@ function ResponseSpacer({ initialPlacementKey, onResponseSpacerStateChange }: Re
   const frame = React.useRef<number | null>(null);
   const elementRef = React.useRef<HTMLDivElement | null>(null);
   const controller = (scroll.r as () => {
-    addScrollListener(listener: (element: HTMLElement) => void): () => void;
+    addScrollListener(listener: (distanceFromBottomPx: number) => void): () => void;
     addUserScrollListener(listener: (current: number, previous: number | null) => void): () => void;
     compensateScrollToDistanceFromBottomPx(distance: number): void;
     getLastScrollDistanceFromBottomPx(): number;
     getScrollElement(): HTMLElement | null;
-    getUnroundedScrollDistanceFromBottomPx(element: HTMLElement): number;
+    getUnroundedScrollDistanceFromBottomPx(distanceFromBottomPx: number): number;
     scrollToBottom(): void;
     scrollToDistanceFromBottomPx(distance: number, behavior: "instant"): void;
   })();
@@ -137,8 +137,8 @@ function ResponseSpacer({ initialPlacementKey, onResponseSpacerStateChange }: Re
     return () => intersection.disconnect();
   }, [controller, reconcile]);
   React.useLayoutEffect(() => {
-    const removeScroll = controller.addScrollListener(element => {
-      if (height.current > 0 && controller.getUnroundedScrollDistanceFromBottomPx(element) === 0) clear();
+    const removeScroll = controller.addScrollListener(distance => {
+      if (height.current > 0 && controller.getUnroundedScrollDistanceFromBottomPx(distance) === 0) clear();
     });
     const removeUserScroll = controller.addUserScrollListener((current, previous) => {
       if (previous == null || current - previous <= 0) return;

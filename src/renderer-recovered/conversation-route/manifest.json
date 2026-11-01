@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "moduleCount": 203,
+  "moduleCount": 201,
   "modules": [
     "BarChart-2010e7d67e4a.js",
     "ComposedChart-12232a23b4b3.js",
@@ -84,7 +84,6 @@
     "home-artifact-templates-1e0738b7ddeb.js",
     "home-task-suggestions-e29a02e9b466.js",
     "hooks-settings-fde35406d6f4.js",
-    "hover-card-data-95a14e835743.js",
     "import-settings-ec2688b74a01.js",
     "init-cd6c1f803e47.js",
     "input-f296e047d4b5.js",
@@ -181,7 +180,6 @@
     "thread-handoff-modal-ccac59d04293.js",
     "thread-overflow-menu-51894ca4476d.js",
     "thread-panel-toggle-button-d0ce9733e408.js",
-    "thread-scroll-layout-27da424d79e0.js",
     "time-510b3d922182.js",
     "tokenize-math-block-92dba400da42.js",
     "trusted-contact-settings-b71f926a1121.js",
