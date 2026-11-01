@@ -28,6 +28,7 @@ interface ToolItem {
   invocation: { arguments?: unknown; server?: string | null; tool: string };
   invocationResourceUri?: string | null;
   isMcpAppWidgetSuperseded?: boolean;
+  mcpAppUi?: { preferredModelDisplayMode?: string | null } | null;
   pluginId?: string | null;
   result?: ToolResult | null;
   source?: { backend?: string; kind?: string } | null;
@@ -47,6 +48,8 @@ interface ToolItemContentProps {
   summary?: string | null;
   summaryIcon?: unknown;
   toolActivityTurnKey?: string;
+  widgetStatePersistence?: unknown;
+  widgetOnly?: boolean;
 }
 interface IntlShape { formatMessage(descriptor: { defaultMessage: string; description?: string; id?: string }, values?: Record<string, unknown>): string }
 interface McpAppResource {
@@ -412,6 +415,7 @@ function ToolItemContent(props: ToolItemContentProps): unknown {
   const react = (sharedChunk as any).e6?.();
   const [expanded, setExpanded] = react?.useState?.(props.shouldAutoExpandMcpApp === true) ?? [props.shouldAutoExpandMcpApp === true, () => undefined];
   const [opening, setOpening] = react?.useState?.(false) ?? [false, () => undefined];
+  const recipient = typeof (sharedChunk as any).LX === "function" ? (sharedChunk as any).LX((initialChunk as any).kht) : null;
   const toggle = (): void => { if (!expanded) props.onExpand?.(); setOpening(true); setExpanded(!expanded); setOpening(false); };
   const raw = record(item.result?.raw);
   const metadata = resultMetadata(item.result);
@@ -419,6 +423,39 @@ function ToolItemContent(props: ToolItemContentProps): unknown {
   const resultBody = item.result == null ? null : jsx().jsx(ResultContent, { businessFailed, hideTextBlocksWithStructuredContent: props.hideTextBlocksWithStructuredContent, result: item.result });
   const reviews = item.automaticApprovalReviews?.length ? jsx().jsx(AutomaticApprovalReviews, { reviews: item.automaticApprovalReviews }) : null;
   const appName = props.matchingApp?.name ?? item.appContext?.appName ?? item.invocation.server ?? "app";
+  if (props.widgetOnly === true) {
+    const PersistentWidget = (sharedChunk as any).Xf;
+    if (resourceUri == null || typeof PersistentWidget !== "function") return null;
+    const toolResult = item.result?.raw ?? (item.result?.type === "error"
+      ? { content: [{ type: "text", text: item.result.error }], structuredContent: { error: item.result.error } }
+      : item.result);
+    return jsx().jsx(PersistentWidget, {
+      conversationId: props.conversationId,
+      hostDisplayModes: (initialChunk as any).Cct ?? ["inline", "fullscreen", "pip"],
+      hostId: props.hostId,
+      hostedInThreadScrollLayout: true,
+      legacyPreferredDisplayMode: item.mcpAppUi?.preferredModelDisplayMode,
+      lifetime: "thread",
+      mcpAppId: appRuntime.appId,
+      mcpAppScope: {
+        appContext: item.appContext,
+        invocationResourceUri: item.invocationResourceUri,
+        originCallId: item.invocation.server === "codex_apps" && item.appContext != null ? item.callId : null,
+        originResourceUri: resourceUri,
+        originTool: item.invocation.tool,
+      },
+      openOnRegistration: props.shouldAutoExpandMcpApp === true,
+      recipient,
+      resource: { data: appRuntime.renderData, error: appRuntime.resourceError, isLoading: appRuntime.resourcePending || appRuntime.catalogPending },
+      resourceIdentity: null,
+      resourceUri,
+      server: item.invocation.server,
+      title: `${item.invocation.server ?? "MCP"} ${item.invocation.tool}`,
+      toolArguments: item.invocation.arguments,
+      toolResult,
+      widgetStatePersistence: props.widgetStatePersistence,
+    });
+  }
   const appSurface = resourceUri == null ? null : jsx().jsx(McpAppSurface, { appName, expanded, loading: opening, state: appRuntime, onOpen: toggle });
   const appValidation = resourceValidation(appRuntime.resource, appRuntime.renderData);
   const canDisplayApp = resourceUri != null

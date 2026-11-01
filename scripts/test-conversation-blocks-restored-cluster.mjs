@@ -7,6 +7,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const calls = [];
 globalThis.__conversationBlocksTest = {
   calls,
+  registeredApps: new Set(),
   jsx: {
     Fragment: "Fragment",
     jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; },
@@ -24,11 +25,13 @@ const result = await esbuild.build({
   plugins: [{ name: "conversation-block-mocks", setup(build) {
     build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" }));
     build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: name }) => ({ loader: "js", contents:
-      name === "app-shared" ? "export const $3=()=>globalThis.__conversationBlocksTest.calls.push('$3');export const I3=()=>globalThis.__conversationBlocksTest.jsx;export const e6=()=>({useState:value=>[value,()=>{}]});export const lY=value=>String(value).replace(/^thread:/,'');"
-      : name === "app-initial" ? "export const C=()=>globalThis.__conversationBlocksTest.calls.push('initial');"
+      name === "app-shared" ? "export const $3=()=>globalThis.__conversationBlocksTest.calls.push('$3');export const I3=()=>globalThis.__conversationBlocksTest.jsx;export const e6=()=>({useState:value=>[typeof value==='function'?value():value,()=>{}]});export const eU=value=>'app:'+value;export const rZ=()=>({kind:'registered-mcp-app'});export const BX=(descriptor,value)=>descriptor?.kind==='registered-mcp-app'&&globalThis.__conversationBlocksTest.registeredApps.has(value);export const lY=value=>String(value).replace(/^thread:/,'');"
+      : name === "app-initial" ? "export const $en={};export const cct={};export const gct={};export const Ern=({apps})=>apps?.[0]??null;export const C=()=>globalThis.__conversationBlocksTest.calls.push('initial');"
       : name === "app-primary" ? "export const d=()=>globalThis.__conversationBlocksTest.calls.push('primary');"
       : name === "agent-activity-item" ? "export const n=()=>globalThis.__conversationBlocksTest.calls.push('activity-item');export const t=x=>x;"
       : name === "agent-activity-units" ? "export const n=()=>globalThis.__conversationBlocksTest.calls.push('activity-units');"
+      : name === "mcp-tool-item-content" ? "export const n=()=>{};export const t=props=>({type:'mcp-tool-content',props});"
+      : name === "plan-summary-item-content" ? "export const n=()=>{};export const t=props=>({type:'plan-summary',props});"
       : name === "scroll-to-match" ? "export const n=()=>globalThis.__conversationBlocksTest.calls.push('scroll');"
       : "export const n=()=>globalThis.__conversationBlocksTest.calls.push('n');export const i=()=>globalThis.__conversationBlocksTest.calls.push('i');export const a=()=>globalThis.__conversationBlocksTest.calls.push('a');export const u=()=>globalThis.__conversationBlocksTest.calls.push('u');",
     }));
@@ -62,7 +65,7 @@ assert.equal(activityGroups[0].anchorItemId, "activity");
 assert.ok(Array.isArray(activityGroups[0].rows));
 
 const unit = (type, extra = {}) => ({ kind: "standalone", item: { item: { type, ...extra } } });
-const assembled = blocks.a({ renderMcpApps: true, keepMcpAppEntriesPersistent: true, units: [
+const assembled = blocks.a({ conversationId: "conversation", hostId: "local", renderMcpApps: true, keepMcpAppEntriesPersistent: true, units: [
   unit("realtime-transcript"),
   unit("assistant-message"),
   unit("realtime-transcript"),
@@ -72,7 +75,24 @@ const assembled = blocks.a({ renderMcpApps: true, keepMcpAppEntriesPersistent: t
 ] });
 assert.ok(find(assembled, node => node.props?.["data-turn-blocks"] === true));
 assert.ok(find(assembled, node => node.props?.["data-turn-unit-type"] === "assistant-message") ?? find(assembled, node => node.props?.["data-conversation-block"] === "assistant-message"));
+assert.equal(find(assembled, node => node.type === "mcp-tool-content").props.conversationId, "conversation");
+assert.equal(find(assembled, node => node.type === "mcp-tool-content").props.hostId, "local");
+assert.equal(find(assembled, node => node.type === "mcp-tool-content").props.renderMcpApps, true);
 assert.doesNotMatch(JSON.stringify(assembled), /worked-for/);
+const imageFailure = blocks.r({ units: [unit("generated-image", { failure: { message: "generation failed" }, status: "failed" })] });
+assert.ok(find(imageFailure, node => node.props?.["data-image-generation-error"] === true));
+const imagePending = blocks.r({ units: [unit("generated-image", { status: "inProgress" })] });
+assert.ok(find(imagePending, node => node.props?.["data-image-generation-pending"] === true));
+const imageFinishedWithoutSource = blocks.r({ units: [unit("generated-image", { status: "completed" })] });
+assert.equal(find(imageFinishedWithoutSource, node => node.props?.["data-image-generation-pending"] === true), undefined);
+const persistence = { load() {}, save() {} };
+assert.equal(find(blocks.Y({ conversationId: "c", hostId: "h", items: [{ callId: "call", type: "mcp-tool-call", invocation: { server: "s", tool: "t" } }], widgetStatePersistence: persistence }), node => node.type === "mcp-tool-content"), undefined);
+globalThis.__conversationBlocksTest.registeredApps.add("app:call");
+const registeredWidget = find(blocks.Y({ conversationId: "c", hostId: "h", items: [{ callId: "call", type: "mcp-tool-call", invocation: { server: "s", tool: "t" } }], resolvedApps: [{ id: "app" }], widgetStatePersistence: persistence }), node => node.type === "mcp-tool-content");
+assert.equal(registeredWidget.props.widgetStatePersistence, persistence);
+assert.equal(registeredWidget.props.matchingApp.id, "app");
+assert.doesNotThrow(() => blocks.W({ item: { content: [{ text: "structured" }] } }));
+assert.match(JSON.stringify(blocks.W({ item: { content: [{ text: "structured" }] } })), /structured/);
 
 blocks.i(); blocks.i(); blocks.n(); blocks.t();
 assert.equal(calls.filter(value => value === "activity-item").length, 1);

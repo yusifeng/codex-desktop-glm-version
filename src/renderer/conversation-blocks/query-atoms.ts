@@ -8,6 +8,9 @@
 //   - em（导出 Y）：McpAppWidgets —— mcp-tool-call 批量 widget 渲染
 //   - tm（导出 J）：WidgetCleanupEffect —— callIds 卸载时清理 widget 状态
 
+import * as appSharedChunk from "@rchunk/app-shared";
+import * as appInitialChunk from "@rchunk/app-initial";
+
 /** 连接器资产标题缓存条目。 */
 interface ConnectorAssetCacheEntry {
   resolvedAt: number;
@@ -25,19 +28,26 @@ interface ToolCallDescriptor {
   arguments?: unknown;
   cacheKey: string;
   server: string;
+  sourceAppId: string;
   tool: string;
 }
 
 /** url 解析为工具调用（原 Vp）。 */
 function parseToolCallUrl(url: string): ToolCallDescriptor | null {
+  const initial = appInitialChunk as unknown as Record<string, any>;
   try {
     const parsed = new URL(url);
-    if (parsed.protocol !== "codex-tool:") return null;
+    const source = typeof initial.Q0t === "function" ? initial.Q0t(url) : null;
+    if (source?.appId !== "google-drive") return null;
+    const linkId = typeof initial.R9t === "function" ? initial.R9t(parsed) : parsed.searchParams.get("link_id");
+    const fileId = parsed.pathname.match(/\/(?:d|folders)\/(?:e\/)?([^/]+)/u)?.[1] ?? parsed.searchParams.get("id");
+    if (linkId == null || fileId == null) return null;
     return {
-      cacheKey: `${parsed.hostname}${parsed.pathname}`,
-      server: parsed.searchParams.get("server") ?? "",
-      tool: parsed.searchParams.get("tool") ?? "",
-      arguments: JSON.parse(parsed.searchParams.get("arguments") ?? "{}"),
+      arguments: { fields: "id,name,mimeType,webViewLink", fileId },
+      cacheKey: `google-drive:${linkId}:${fileId}`,
+      server: "codex_apps",
+      sourceAppId: "google-drive",
+      tool: "google_drive.get_file_metadata",
     };
   } catch {
     return null;
@@ -46,9 +56,14 @@ function parseToolCallUrl(url: string): ToolCallDescriptor | null {
 
 /** 工具结果 → 资产标题（原 Hp 语义）。 */
 function assetTitleFromToolResult(descriptor: ToolCallDescriptor, toolResult: unknown): string | null {
-  void descriptor;
+  const initial = appInitialChunk as unknown as Record<string, any>;
+  if (descriptor.sourceAppId === "google-drive" && typeof initial.F9t === "function") {
+    const structured = initial.F9t((toolResult as { structuredContent?: unknown } | null)?.structuredContent);
+    if (typeof structured?.title === "string" && structured.title.trim()) return structured.title;
+  }
   if (typeof toolResult != "object" || toolResult == null) return null;
-  const title = (toolResult as { title?: unknown }).title;
+  const title = (toolResult as { title?: unknown; structuredContent?: { title?: unknown } }).title
+    ?? (toolResult as { structuredContent?: { title?: unknown } }).structuredContent?.title;
   return typeof title == "string" && title.trim().length > 0 ? title : null;
 }
 
@@ -57,7 +72,7 @@ function assetTitleFromToolResult(descriptor: ToolCallDescriptor, toolResult: un
  * 查询 options（enabled/queryKey/staleTime 5min/retry false）；
  * 命中缓存（1 天内）直接返回；否则经工具调用取标题并写缓存。
  */
-export const connectorAssetTitleQuery = {
+const fallbackConnectorAssetTitleQuery = {
   keyFor({ hostId, url }: { hostId: string; url: string }): string {
     return JSON.stringify([hostId, parseToolCallUrl(url)?.cacheKey ?? url]);
   },
@@ -82,6 +97,53 @@ export const connectorAssetTitleQuery = {
     return null;
   },
 };
+
+export let connectorAssetTitleQuery: unknown = fallbackConnectorAssetTitleQuery;
+
+/** 原 Zp 初始化后装配真实 scoped query family。 */
+export function initializeConnectorAssetTitleQueryRuntime(): void {
+  if (connectorAssetTitleQuery !== fallbackConnectorAssetTitleQuery) return;
+  const shared = appSharedChunk as unknown as Record<string, any>;
+  const initial = appInitialChunk as unknown as Record<string, any>;
+  if (typeof shared.QX !== "function" || shared.ZI == null || typeof initial.dun !== "function") return;
+  const cacheSignal = initial.dun("conversation-sources:connector-asset-title-cache", {});
+  const cacheAvailable = typeof shared.sZ === "function"
+    ? shared.sZ(shared.ZI, ({ get }: { get(signal: unknown): unknown }) => get(cacheSignal) != null)
+    : null;
+  connectorAssetTitleQuery = shared.QX(
+    shared.ZI,
+    ({ hostId, url }: { hostId: string; url: string }, { get, scope }: { get(signal: unknown): any; scope: { get(signal: unknown): any; set(signal: unknown, value: unknown): void } }) => {
+      const descriptor = parseToolCallUrl(url);
+      const cacheKey = descriptor == null ? null : JSON.stringify([hostId, descriptor.cacheKey]);
+      const hasCache = cacheAvailable == null ? true : get(cacheAvailable);
+      return {
+        enabled: descriptor != null && hasCache,
+        queryFn: async () => {
+          const cache = scope.get(cacheSignal) as Record<string, ConnectorAssetCacheEntry> | null;
+          if (descriptor == null || cacheKey == null || cache == null) return null;
+          const cached = cache[cacheKey];
+          if (cached != null && Date.now() - cached.resolvedAt < ASSET_TITLE_CACHE_TTL_MS) return cached.title;
+          try {
+            if (typeof initial.Rdt !== "function") return null;
+            const raw = await initial.Rdt(scope, hostId, descriptor.server, descriptor.tool, descriptor.arguments);
+            const toolResult = typeof initial.sXt === "function"
+              ? initial.sXt({ isCodexAppsServer: descriptor.server === "codex_apps", toolResult: raw })
+              : raw;
+            const title = assetTitleFromToolResult(descriptor, toolResult);
+            if (title != null) scope.set(cacheSignal, { ...scope.get(cacheSignal), [cacheKey]: { resolvedAt: Date.now(), title } });
+            return title;
+          } catch {
+            return null;
+          }
+        },
+        queryKey: ["connector-asset-title", cacheKey ?? JSON.stringify([hostId, url])],
+        retry: false,
+        staleTime: (shared.$O?.FIVE_MINUTES as number | undefined) ?? 300_000,
+      };
+    },
+    { key: ({ hostId, url }: { hostId: string; url: string }) => JSON.stringify([hostId, parseToolCallUrl(url)?.cacheKey ?? url]) },
+  );
+}
 
 /** MCP 工具调用投影条目。 */
 export interface McpToolCallProjection {
@@ -109,4 +171,44 @@ export function createConversationMcpToolCallItems(
     }
   }
   return projections;
+}
+
+const fallbackConversationMcpToolCallItems = {
+  resolve: createConversationMcpToolCallItems,
+};
+export let conversationMcpToolCallItems: unknown = fallbackConversationMcpToolCallItems;
+
+/** 原 $p 初始化后装配 thread-keyed MCP item family。 */
+export function initializeConversationMcpToolCallItemsRuntime(): void {
+  if (conversationMcpToolCallItems !== fallbackConversationMcpToolCallItems) return;
+  const shared = appSharedChunk as unknown as Record<string, any>;
+  const initial = appInitialChunk as unknown as Record<string, any>;
+  if (typeof shared.rZ !== "function" || shared.ZI == null) return;
+  conversationMcpToolCallItems = shared.rZ(
+    shared.ZI,
+    (threadKey: { threadId: string }, { get, scope }: { get(signal: unknown, parameter?: unknown): any; scope: unknown }) => {
+      const projections = new Map<string, McpToolCallProjection>();
+      const sources = get(initial.I_t, threadKey);
+      if (sources == null) return projections;
+      for (const source of sources) {
+        get(initial.V_t, source);
+        const thread = typeof initial.j_t === "function" ? initial.j_t(scope, source) : null;
+        const items = typeof initial.w$t === "function" ? initial.w$t(thread?.items ?? []) : (thread?.items ?? []);
+        for (const item of items) {
+          if (item?.type !== "mcpToolCall" || item.id == null) continue;
+          const projected = get(initial.A_t, { ...source, itemId: item.id });
+          projections.set(item.id, projected?.type === "mcpToolCall" ? projected : item);
+        }
+      }
+      return projections;
+    },
+    {
+      owner: (key: { threadId: string }) => key.threadId,
+      isEqual: (left: Map<string, unknown>, right: Map<string, unknown>) => {
+        if (left.size !== right.size) return false;
+        for (const [key, value] of left) if (right.get(key) !== value) return false;
+        return true;
+      },
+    },
+  );
 }

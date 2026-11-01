@@ -57,7 +57,10 @@ void appSharedLazy, appInitialInit, appPrimaryInit, activeToolActivityLabel, aai
 
 import {
   connectorAssetTitleQuery,
+  conversationMcpToolCallItems,
   createConversationMcpToolCallItems,
+  initializeConnectorAssetTitleQueryRuntime,
+  initializeConversationMcpToolCallItemsRuntime,
   type McpToolCallProjection,
 } from "./query-atoms";
 import * as blocks from "./block-components";
@@ -88,8 +91,8 @@ const initializeActivitySummaryGroup = once(() => { initializeActivitySummary();
 const initializeSvgIcon = once(() => { call(appSharedLazy); void jsx(); });
 const initializeDefaultNames = once(() => { call(appSharedLazy); });
 const initializeQueryAtoms = once(() => { call(appSharedLazy); call(appInitialInit); });
-const initializeConnectorAssetTitleQuery = once(() => { initializeQueryAtoms(); call((mcpToolActivityLabel as any).i); });
-const initializeConversationMcpToolCallItems = once(() => { initializeQueryAtoms(); });
+const initializeConnectorAssetTitleQuery = once(() => { initializeQueryAtoms(); call((mcpToolActivityLabel as any).i); initializeConnectorAssetTitleQueryRuntime(); });
+const initializeConversationMcpToolCallItems = once(() => { initializeQueryAtoms(); initializeConversationMcpToolCallItemsRuntime(); });
 const initializeMcpAppWidgets = once(() => { initializeConversationMcpToolCallItems(); call((mcpToolItemContent as any).n); call((mcpAppAnalytics as any).n); void jsx(); });
 const initializeSearchResultsBlock = once(() => { call(appSharedLazy); void jsx(); });
 const initializeImageAndAttachmentBlocks = once(() => { call(appSharedLazy); call(appInitialInit); call((workspaceFileContextMenuTrigger as any).n); void jsx(); });
@@ -168,7 +171,9 @@ function ActivitySummaryGroup(props: {
 /** 活动行（原 `aw`，导出 s）。 */
 function ActivityRow(props: { historyEntityKey?: unknown; hostId?: string; item: Record<string, unknown> }): unknown {
   const type = String(props.item.type ?? "activity");
-  return jsx().jsx("div", { "data-activity-row": type, children: (props.item.title ?? props.item.summary ?? type) as any });
+  const value = props.item.title ?? props.item.summary ?? type;
+  const label = typeof value === "string" || typeof value === "number" ? value : type;
+  return jsx().jsx("div", { "data-activity-row": type, children: label });
 }
 
 /** 活动行组（原 `sw`，导出 c）。 */
@@ -178,11 +183,13 @@ function ActivityRowGroup(props: { historyEntityKey?: unknown; hostId?: string; 
 }
 
 /** TurnBodyAssembly（原 `_w`，导出 a；45 号 memo-cache 的 turn 渲染编排）。 */
-function TurnBodyAssembly(props: { activeCommentaryItem?: unknown; keepMcpAppEntriesPersistent?: boolean; mcpServerStatuses?: unknown; renderMcpApps?: boolean; units: any[] }): unknown {
+function TurnBodyAssembly(props: { activeCommentaryItem?: unknown; conversationId?: string; cwd?: string; hostId?: string; keepMcpAppEntriesPersistent?: boolean; mcpServerStatuses?: unknown; renderMcpApps?: boolean; turnId?: string; units: any[] }): unknown {
   const parts = partitionCollapsibleUnits(props.units as any, props);
+  const turnBlockProps = { conversationId: props.conversationId, cwd: props.cwd, hostId: props.hostId, renderMcpApps: props.renderMcpApps, turnId: props.turnId };
   return jsx().jsxs(jsx().Fragment, { children: [
-    parts.preToggleUnits.length ? jsx().jsx(TurnBlocks as any, { units: parts.preToggleUnits }) : null,
-    parts.expandedUnits.length ? jsx().jsx(TurnBlocks as any, { units: parts.expandedUnits }) : null,
+    parts.preToggleUnits.length ? jsx().jsx(TurnBlocks as any, { ...turnBlockProps, units: parts.preToggleUnits }) : null,
+    parts.expandedUnits.length ? jsx().jsx(TurnBlocks as any, { ...turnBlockProps, units: parts.expandedUnits }) : null,
+    parts.persistentUnits.length ? jsx().jsx(TurnBlocks as any, { ...turnBlockProps, units: parts.persistentUnits }) : null,
     props.activeCommentaryItem == null ? null : jsx().jsx(ActivityRow, { item: props.activeCommentaryItem as Record<string, unknown> }),
   ] });
 }
@@ -242,7 +249,7 @@ export {
   initializeDefaultNames as N,
   RtlIcon as O,
   ActivitySummaryGroup as P,
-  initializeQueryAtoms as Q,
+  conversationMcpToolCallItems as Q,
   TurnBodyAssembly as R,
   ImageStackBlock as S,
   initializeImageAndAttachmentBlocks as T,
