@@ -13,9 +13,15 @@ const MODULES = [
 ];
 const state = globalThis.__conversationPreviewSourcesTest = {
   externalOpens: [],
+  eligible: false,
   initialized: [],
   lazyComponents: [],
+  lifecycleEvents: [],
+  modal: null,
+  parameterReads: [],
+  session: { conversationId: "conversation-side-effects", hostId: null },
   sources: null,
+  usageStatus: { rate_limit_upsell: { ctas: [] } },
   webMcpEnabled: true,
 };
 state.jsx = {
@@ -47,13 +53,23 @@ for (const directory of MODULES) {
     imports.set(match[2], names);
   }
 }
+for (const name of ["JN", "LN", "RN", "Uzt", "Vzt", "X8", "XN", "Y8", "YN", "Z8", "ZN", "d0t", "eP", "f0t", "fit", "itn", "nqt", "pit", "tP", "tqt"])
+  imports.get("app-initial")?.add(name);
+for (const name of ["$3", "Ah", "Ef", "H3", "K2", "Lh", "Oh", "Ph", "QI", "Rh", "Zh", "dg", "fg", "h4", "jh", "kh", "qm", "zh"])
+  imports.get("app-shared")?.add(name);
+for (const name of ["Lo", "df", "pf"]) imports.get("app-primary")?.add(name);
+imports.get("conversation-blocks")?.add("y");
 
 const marker = (name) => `() => globalThis.__conversationPreviewSourcesTest.initialized.push(${JSON.stringify(name)})`;
 const component = (name) => JSON.stringify(name);
 const overrides = {
   "app-shared": {
+    $3: marker("runtime"), Ah: component("DialogTitleBlock"), Ef: marker("popover"), H3: marker("lazy-runtime"), K2: marker("spring"),
+    Lh: component("DialogSubtitleContents"), Oh: component("DialogBody"), Ph: marker("dialog-body"), QI: marker("i18n"), Rh: component("DialogTitleContents"),
+    Zh: marker("dialog"), dg: marker("dialog-actions"), fg: `() => false`, h4: marker("intl-context"), jh: component("DialogSection"), kh: component("ButtonGroup"), qm: marker("compact-menu"), zh: marker("dialog-title"),
     $d: component("CodeBlock"), A_: component("GlobeIcon"), Cf: component("PopoverContent"),
-    FX: marker("signals"), HF: `{ event: "analytics" }`, HX: `() => globalThis.__conversationPreviewSourcesTest.webMcpEnabled`,
+    BX: `(signal, key) => { const state=globalThis.__conversationPreviewSourcesTest; state.parameterReads.push([signal,key]); return signal?.id === "eligibility" ? state.eligible : undefined; }`,
+    FX: marker("signals"), HF: `{ event: "analytics" }`, HX: `signal => signal?.id === "session" ? globalThis.__conversationPreviewSourcesTest.session : globalThis.__conversationPreviewSourcesTest.webMcpEnabled`,
     I3: `() => globalThis.__conversationPreviewSourcesTest.jsx`, Ih: component("Dialog"),
     Jm: `loader => { const name = "Lazy" + globalThis.__conversationPreviewSourcesTest.lazyComponents.length; globalThis.__conversationPreviewSourcesTest.lazyComponents.push(loader); return name; }`,
     LX: `() => globalThis.__conversationPreviewSourcesTest.scope`, S_: component("IconAsset"),
@@ -65,6 +81,13 @@ const overrides = {
   },
   "app-initial": {
     $en: `{ id: "route" }`, Dbt: `{ id: "keyed-expanded" }`, Ebt: marker("preview-state"),
+    LN: component("BannerActions"), Uzt: `(scope, component, props) => { globalThis.__conversationPreviewSourcesTest.modal={scope,component,props}; }`,
+    Y8: `"✦"`, YN: `() => true`, Z8: `{ id: "eligibility" }`,
+    ZN: `(scope,event) => globalThis.__conversationPreviewSourcesTest.lifecycleEvents.push(event)`,
+    eP: `{ CODEX_LUNA_RESERVE_LIFECYCLE_ACTION_HEADER_BUTTON_CLICKED:"header", CODEX_LUNA_RESERVE_LIFECYCLE_ACTION_MODAL_OPENED:"opened", CODEX_LUNA_RESERVE_LIFECYCLE_ACTION_ERROR:"error", CODEX_LUNA_RESERVE_LIFECYCLE_ACTION_MODAL_CTA_CLICKED:"cta" }`,
+    f0t: `{ id: "usage-status" }`, fit: component("ReserveBadge"), tqt: `{ id: "conversation-side-effects" }`,
+    JN: marker("luna-banner"), RN: marker("luna-actions"), Vzt: marker("luna-modal"), X8: marker("usage"), XN: marker("luna-telemetry"),
+    d0t: marker("luna-rate-limit"), itn: marker("lazy-state"), nqt: marker("lazy-query"), pit: marker("luna-badge"), tP: marker("luna-state"),
     Fbt: `{ id: "default-expanded" }`, G3: `{}`, Oft: `input => globalThis.__conversationPreviewSourcesTest.externalOpens.push(input)`,
     W3: component("DefaultAppIcon"), bS: `{ SourcesSidePanel: "SourcesSidePanel", SourcesSidePanelList: "SourcesSidePanelList", SourceDetails: "SourceDetails" }`,
     bbt: `(key, expanded) => ({ [key]: expanded })`, mmn: `source => source.id ?? source.label`,
@@ -72,9 +95,9 @@ const overrides = {
     wbt: `(value, key) => typeof key === "boolean" ? Boolean(value) : Boolean(value?.[key])`,
     xpn: `(...args) => { globalThis.__conversationPreviewSourcesTest.lastExpansion = args; }`,
   },
-  "app-primary": { Io: `{ Item: "DisclosureItem", DisclosureRow: "DisclosureRow", DisclosureBody: "DisclosureBody", Body: "DisclosureBodyContent" }` },
-  "virtualized-turn-list": { u: `{ id: "panel-mode" }` },
-  "conversation-blocks": { v: component("ConversationBlocks") },
+  "app-primary": { Io: `{ Item: "DisclosureItem", DisclosureRow: "DisclosureRow", DisclosureBody: "DisclosureBody", Body: "DisclosureBodyContent" }`, Lo: marker("disclosure"), df: marker("lazy-primary"), pf: `{ id: "session" }` },
+  "virtualized-turn-list": { c: marker("panel-surface"), u: `{ id: "panel-mode" }` },
+  "conversation-blocks": { v: component("ConversationBlocks"), y: marker("conversation-blocks") },
   "open-pending-site-preview": { OpenPendingSitePreview: component("OpenPendingSitePreview") },
   "site-preview-persistence-bridge": { SitePreviewPersistenceBridge: component("SitePreviewPersistenceBridge") },
   "artifact-file-preview-icon": { n: marker("file-preview"), t: component("FilePreviewIcon") },
@@ -126,7 +149,8 @@ const preview = await bundle("latest-turn-preview");
 assert.deepEqual(Object.keys(preview).sort(), ["a", "c", "i", "l", "n", "o", "r", "s", "t", "u"]);
 preview.r(); preview.r();
 assert.equal(state.initialized.filter((name) => name === "preview-state").length, 1);
-assert.equal(state.initialized.filter((name) => name === "signals").length, 1);
+assert.equal(state.initialized.filter((name) => name === "panel-surface").length, 1);
+assert.equal(state.initialized.filter((name) => name === "signals").length, 0);
 
 const defaultSignal = { id: "default-expanded" };
 const keyedSignal = { id: "keyed-expanded" };
@@ -134,6 +158,7 @@ const panelSignal = { id: "panel-mode" };
 const writes = [];
 let panel = { displayMode: "shift", isPopoverOpen: false };
 state.scope = {
+  query: { getData() { return state.usageStatus; } },
   get(signal, key) {
     if (signal?.id === panelSignal.id) return panel;
     if (signal?.id === defaultSignal.id) return true;
@@ -183,11 +208,45 @@ const content = find(popover, (node) => node.type === "PopoverContent");
 content.props.onOpenAutoFocus({ preventDefault() { prevented++; } });
 content.props.onPointerDownOutside({ target: new Element({ closest: true }), preventDefault() { prevented++; } });
 assert.equal(prevented, 2);
+preview.o(); preview.u(); preview.n();
+for (const dependency of ["popover", "luna-state", "luna-telemetry", "conversation-blocks", "disclosure"])
+  assert.equal(state.initialized.includes(dependency), true);
 preview.c(); preview.c();
 assert.equal(state.lazyComponents.length, 2);
-assert.equal(preview.s().type, "Fragment");
-assert.equal(preview.l({ hostId: "h", visible: false }), null);
-assert.equal(preview.l({ hostId: "h" }).type, "Button");
+for (const dependency of ["lazy-query", "compact-menu", "lazy-state", "lazy-primary", "lazy-runtime"])
+  assert.equal(state.initialized.includes(dependency), true);
+assert.equal(preview.s(), null);
+assert.deepEqual(state.parameterReads.at(-1), [{ id: "conversation-side-effects" }, "conversation-side-effects"]);
+assert.equal(preview.l({ hostId: "h" }), null);
+state.eligible = true;
+const reserveButton = preview.l({ hostId: "h" });
+assert.equal(reserveButton.type, "Button");
+state.usageStatus = null;
+reserveButton.props.onClick();
+assert.deepEqual(state.lifecycleEvents.map((event) => event.action), ["header", "error"]);
+state.lifecycleEvents.length = 0;
+state.usageStatus = { rate_limit_upsell: { ctas: [{ action: "upgrade", label: "Upgrade" }, { action: "credits", label: "Credits" }] } };
+reserveButton.props.onClick();
+assert.deepEqual(state.lifecycleEvents.map((event) => event.action), ["header", "opened"]);
+assert.equal(state.modal.props.hostId, "h");
+assert.equal(state.modal.props.rateLimitStatus, state.usageStatus);
+let closed = 0;
+const modalTree = state.modal.component({ ...state.modal.props, onClose() { closed++; } });
+assert.equal(modalTree.type, "Dialog");
+assert.match(find(modalTree, (node) => node.type === "img").props.src, /hero-light/);
+assert.match(find(modalTree, (node) => node.type === "img").props.className, /-mb-6/);
+const bannerActions = find(modalTree, (node) => node.type === "BannerActions");
+const actionCalls = [];
+const ctaTree = bannerActions.props.renderContent({ actions: {
+  credits: { disabled: false, log() { actionCalls.push("log-credits"); }, onClick() { actionCalls.push("click-credits"); } },
+  upgrade: { disabled: false, log() { actionCalls.push("log-upgrade"); }, onClick() { actionCalls.push("click-upgrade"); } },
+} });
+const ctaButtons = findAll(ctaTree, (node) => node.type === "Button");
+assert.deepEqual(ctaButtons.map((node) => node.props.children), ["Credits", "Upgrade"]);
+ctaButtons[0].props.onClick({});
+assert.equal(closed, 1);
+assert.deepEqual(actionCalls, ["log-credits", "click-credits"]);
+assert.equal(state.lifecycleEvents.at(-1).action, "cta");
 
 // local-conversation-sources-side-panel-tab-core: grouping and all open paths.
 state.sources = {

@@ -36,9 +36,9 @@ const replies = [];
 const urlUi = approval.r({ conversationId: "c", hostId: "h", requestId: "r", action: { message: "Sign in", url: "https://example.test" }, onReply(value) { replies.push(value); } });
 assert.match(text(urlUi), /Action required/);
 assert.match(text(urlUi), /https:\/\/example.test/);
-find(urlUi, node => node.props?.children === "Decline").props.onClick();
+find(urlUi, node => node.type === "button" && text(node).includes("Decline")).props.onClick();
 assert.equal(replies[0], "decline");
-find(urlUi, node => node.props?.children === "Open link").props.onClick();
+find(urlUi, node => node.type === "button" && text(node).includes("Open link")).props.onClick();
 assert.equal(replies[1], "accept");
 assert.match(text(approval.s({ conversationId: "c", hostId: "h", requestId: "r", auth: { connector: { connector_name: "Slack" } } })), /Connect Slack/);
 assert.match(text(approval.a({ conversationId: "c", hostId: "h", requestId: "r", suggestion: { tool_title: "Calendar" } })), /Enable this tool/);
@@ -46,7 +46,7 @@ const scopes = approval.d({ authorization: { origin: "example.test", scopes: [{ 
 assert.match(text(scopes), /Allow example.test to:/);
 assert.equal(all(scopes, node => node.type === "li").length, 2);
 assert.equal(text(approval.t({ message: { descriptor: { defaultMessage: "Continue here" } } })), "Continue here");
-assert.match(text(approval.o({ conversationId: "c", hostId: "h", requestId: "r" })), /Approval required/);
+assert.equal(approval.o(), undefined);
 assert.equal(approval.c(), undefined);
 assert.equal(approval.n(), undefined);
 
