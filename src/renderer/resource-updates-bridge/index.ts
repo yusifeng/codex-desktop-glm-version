@@ -34,6 +34,12 @@ interface AppInitialRuntime {
   [key: string]: unknown;
 }
 
+type DebounceFactory = (
+  callback: () => void,
+  delay: number,
+  options: { leading: boolean },
+) => Debounced;
+
 const shared = appSharedChunk as unknown as AppSharedRuntime;
 const initial = appInitialChunk as unknown as AppInitialRuntime;
 const React = shared.e6();
@@ -44,6 +50,17 @@ function websocketUrl(response: unknown): unknown {
     "websocket_url" in response
     ? response.websocket_url
     : undefined;
+}
+
+function resolveDebounceFactory(): DebounceFactory | undefined {
+  const initializeDebounceModule = initial.IPt;
+  if (typeof initializeDebounceModule !== "function") return undefined;
+  const module = initializeDebounceModule() as
+    | DebounceFactory
+    | { default?: DebounceFactory }
+    | undefined;
+  if (typeof module === "function") return module;
+  return typeof module?.default === "function" ? module.default : undefined;
 }
 
 function ResourceUpdatesBridge(): null {
@@ -63,13 +80,7 @@ function ResourceUpdatesBridge(): null {
         ) {
           return;
         }
-        const debounce = initial.IPt as
-          | ((
-              callback: () => void,
-              delay: number,
-              options: { leading: boolean },
-            ) => Debounced)
-          | undefined;
+        const debounce = resolveDebounceFactory();
         const invalidate = initial.ctt as
           ((store: Store, accountId: unknown) => void) | undefined;
         const debounced = debounce?.(

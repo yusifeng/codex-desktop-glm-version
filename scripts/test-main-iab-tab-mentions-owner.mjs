@@ -172,13 +172,13 @@ const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
 );
-equal(main.includes("HOe = IabTabMentions"), true);
+equal(main.includes('const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js")'), true);
 equal(main.includes("HOe = class"), false);
 equal(main.includes("browserTabs: new HOe(s.iabTabMentions, e)"), false);
 const windowContext = fs.readFileSync(
   new URL("../src/main/main-app/window/window-context.ts", import.meta.url),
   "utf8",
 );
-equal(windowContext.includes("browserTabs: new HOe(s.iabTabMentions, e)"), true);
+equal(windowContext.includes("browserTabs: new IabTabMentions(s.iabTabMentions, e)"), true);
 
 console.log(`${assertions} main IAB tab mentions owner assertions passed`);

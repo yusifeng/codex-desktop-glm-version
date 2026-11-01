@@ -172,6 +172,23 @@ export const HOME_ROUTE_ROOTS = [
   "worktree-onboarding-state-7d07364a277a.js",
 ];
 
+// Semantic drafts that still expose structural `{ kind, props }` view models
+// where the application expects real React components. Keep their complete
+// implementations in the recovered source graph until those drafts reproduce
+// the original component contracts. This list is intentionally exhaustive and
+// guarded by test-renderer-recovered-route-source-build.mjs.
+export const STRUCTURAL_COMPONENT_ROOTS = [
+  "content-bd6ed75ea274.js",
+  "equation-44cf0b1d4b75.js",
+  "hover-card-data-95a14e835743.js",
+  "library-cloud-file-preview-b3ddfaa823c0.js",
+  "open-a618d40921b2.js",
+  "page-268e2fb6d880.js",
+  "registered-259e95b201a1.js",
+  "workbook-review-utils-3e78f7501b68.js",
+  "workspace-agent-detail-query-3cb2bb771d2e.js",
+];
+
 export const CONVERSATION_ROUTE_ROOTS = [
   "local-conversation-page-bcc7eca0b3ab.js",
   "local-conversation-thread-c6e40fdd6d59.js",
@@ -190,6 +207,7 @@ export const CONVERSATION_ROUTE_ROOTS = [
   // cannot break home or conversation rendering.
   ...COMPOSER_ROUTE_ROOTS,
   ...HOME_ROUTE_ROOTS,
+  ...STRUCTURAL_COMPONENT_ROOTS,
 ];
 
 export const RECONSTRUCTED_ROUTE_CORE = new Set([

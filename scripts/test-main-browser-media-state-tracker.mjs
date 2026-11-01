@@ -98,6 +98,6 @@ const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n
 const bindingController = fs.readFileSync(new URL("../src/main/main-app/browser-sidebar/browser-page-webview-binding-controller.ts", import.meta.url), "utf8");
 equal(main.includes('require("./main-app/browser-sidebar/browser-media-state-tracker.js")'), true);
 equal(main.includes("function KX("), false);
-equal(main.includes("mediaIndicator: KX()"), true);
+equal(main.includes("mediaIndicator: KX()"), false);
 equal(bindingController.includes("KX({\n        initialState:"), true);
 console.log(`${assertions} main browser media state tracker assertions passed`);

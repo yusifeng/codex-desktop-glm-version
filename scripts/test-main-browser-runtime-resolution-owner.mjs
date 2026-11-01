@@ -175,7 +175,9 @@ equal(main.includes("applyBundledContentVariant: tre"), true);
 equal(main.includes("var Cne = `CODEX_ELECTRON_BUNDLED_PLUGINS_RESOURCES_PATH`"), false);
 equal(main.includes("function Qne("), false);
 equal(main.includes("async function tre("), false);
-equal(main.includes("resourcesPath: Hi("), true);
-equal(main.includes("await tre({"), true);
+const orchestrator = fs.readFileSync(new URL("../src/main/main-app/plugins/orchestrator.ts", import.meta.url), "utf8");
+const marketplace = fs.readFileSync(new URL("../src/main/main-app/plugins/marketplace.ts", import.meta.url), "utf8");
+equal(orchestrator.includes("getBundledPluginsResourcesPath({ env })"), true);
+equal(marketplace.includes("await applyBundledContentVariant({"), true);
 
 console.log(`${assertions} main browser runtime resolution owner assertions passed`);

@@ -159,8 +159,10 @@ equal(
 equal(main.includes("bke = class"), false);
 equal(main.includes("var Cke = class"), false);
 equal(main.includes("wke = class"), false);
-equal(main.includes("new wke(n)"), true);
-equal(main.includes("new bke("), true);
+const hostService = fs.readFileSync(new URL("../src/main/main-app/browser-sidebar/browser-host-service.ts", import.meta.url), "utf8");
+const messageHandler = fs.readFileSync(new URL("../src/main/main-app/window/electron-message-handler.ts", import.meta.url), "utf8");
+equal(hostService.includes("new dependencies.ExtensionActionMenus(origin)"), true);
+equal(messageHandler.includes("new bke("), true);
 const windowContext = fs.readFileSync(new URL("../src/main/main-app/window/window-context.ts", import.meta.url), "utf8");
 equal(windowContext.includes("browserAutocomplete: new Cke("), true);
 

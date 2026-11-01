@@ -64,12 +64,23 @@ async function listSourceFiles(dir) {
   return out;
 }
 
+// Route composition roots and their eager dependency closure are maintained as
+// one recovered ESM graph. Resolve that graph before the semantic chunk pass so
+// draft rewrites are not needlessly bundled and then replaced.
+const recoveredRouteSourceDir = path.join(ROOT, "src/renderer-recovered/conversation-route");
+const recoveredRouteChunks = await collectConversationRouteClosure(recoveredRouteSourceDir);
+
 // ---- bundle：已重写的 renderer chunk ----
 const errors = [];
 const bundleSummaries = [];
+let skippedSemanticRouteDrafts = 0;
 for (const name of REWRITTEN) {
   const entry = path.join(ROOT, "src/renderer", name, "index.ts");
   const outfile = path.join(ROOT, "app/webview/assets", CHUNKS[name]);
+  if (recoveredRouteChunks.has(CHUNKS[name])) {
+    skippedSemanticRouteDrafts += 1;
+    continue;
+  }
   try {
     const result = await esbuild.build({
       entryPoints: [entry],
@@ -105,25 +116,31 @@ for (const name of REWRITTEN) {
 // whose target demonstrably has no default export; namespace imports preserve the
 // module evaluation and remain usable by the few owners that inspect the module.
 const assetsDir = path.join(ROOT, "app/webview/assets");
-// These route-critical chunks still contain structural ViewNode placeholders in
-// the readable reconstruction.  Keep the shipped implementations active until
-// their React component trees have been fully recovered; otherwise a successful
-// turn/start navigates into a page that returns `{ kind, props }` to React.
-// The route chunks are compiled as one release graph: their small helper chunks
-// share minified export aliases with the release copies of their callers. Mixing
-// reconstructed helpers into that graph can leave syntactically valid imports
-// whose values are semantically wrong (for example React becoming a plain
-// namespace without createContext). Preserve the complete non-core dependency
-// closure so the route runs with the exact module contracts it was built against.
-const recoveredRouteSourceDir = path.join(ROOT, "src/renderer-recovered/conversation-route");
-const recoveredRouteChunks = await collectConversationRouteClosure(recoveredRouteSourceDir);
-for (const name of recoveredRouteChunks) {
-  await fs.copyFile(
-    path.join(recoveredRouteSourceDir, name),
-    path.join(assetsDir, name),
-  );
-}
-console.log(`built ${recoveredRouteChunks.size} exact-recovery runtime-route chunks from checked-in source`);
+// The route-critical graph is recovered as checked-in ESM source rather than as
+// runtime release assets.  Compile every module from that source graph so the
+// application build has one reproducible source pipeline and never copies a
+// published JavaScript file into the runtime tree.  Keeping the graph together
+// also preserves its exact cross-chunk aliases while the readable semantic
+// composition roots continue to be recovered independently.
+const routeCompileErrors = [];
+await Promise.all(
+  [...recoveredRouteChunks].map(async (name) => {
+    try {
+      const source = await fs.readFile(path.join(recoveredRouteSourceDir, name), "utf8");
+      const result = await esbuild.transform(source, {
+        ...common,
+        format: "esm",
+        loader: "js",
+        sourcefile: name,
+      });
+      await fs.writeFile(path.join(assetsDir, name), result.code);
+    } catch (error) {
+      routeCompileErrors.push(`${name}: ${error.message.split("\n")[0]}`);
+    }
+  }),
+);
+if (routeCompileErrors.length > 0) errors.push(...routeCompileErrors);
+console.log(`compiled ${recoveredRouteChunks.size - routeCompileErrors.length}/${recoveredRouteChunks.size} recovered runtime-route source modules`);
 const assetNames = (await fs.readdir(assetsDir)).filter((name) => name.endsWith(".js"));
 const assetSources = new Map(
   await Promise.all(assetNames.map(async (name) => [name, await fs.readFile(path.join(assetsDir, name), "utf8")])),
@@ -161,6 +178,7 @@ for (const name of REWRITTEN) {
 
 for (const e of errors) console.error(`error: ${e}`);
 console.log(`built ${bundleSummaries.length}/${REWRITTEN.size} rewritten renderer chunks`);
+console.log(`skipped ${skippedSemanticRouteDrafts} superseded semantic route drafts`);
 for (const b of bundleSummaries)
   console.log(`  ${b.file} <- src/renderer/${b.name}/ (exports: ${b.exports.join(", ") || "none"})`);
 if (errors.length) process.exit(1);

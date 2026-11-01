@@ -1,8 +1,8 @@
 type GitRequestAdmissionDependencies = {
   requestId: string;
   tracked: boolean;
-  signal: AbortSignal;
-  beginRequest: (id: string, tracked: boolean, signal: AbortSignal) => string;
+  controller: AbortController;
+  beginRequest: (id: string, tracked: boolean, controller: AbortController) => string;
   emitCancellation: (input: any) => void;
   cancellationInput: any;
   operation: any;
@@ -11,8 +11,8 @@ type GitRequestAdmissionDependencies = {
 
 /** Admits a Git request or completes the pre-canceled request lifecycle. */
 function admitGitRequest(dependencies: GitRequestAdmissionDependencies): boolean {
-  const { requestId, tracked, signal, beginRequest, emitCancellation, cancellationInput, operation, recordOutcome } = dependencies;
-  if (beginRequest(requestId, tracked, signal) !== `canceled`) return true;
+  const { requestId, tracked, controller, beginRequest, emitCancellation, cancellationInput, operation, recordOutcome } = dependencies;
+  if (beginRequest(requestId, tracked, controller) !== `canceled`) return true;
   emitCancellation(cancellationInput);
   if (operation == null) recordOutcome(`canceled`);
   return false;

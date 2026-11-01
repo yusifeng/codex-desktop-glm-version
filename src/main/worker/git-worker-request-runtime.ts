@@ -284,7 +284,7 @@ let i = new AbortController(),
   d = null,
   f =
   isGitRequestTracked(e.method);
-if (!admitGitRequest({ requestId: e.id, tracked: f, signal: i.signal, beginRequest: (id, tracked, signal) => owner.requestLifecycle.begin(id, tracked, signal),
+if (!admitGitRequest({ requestId: e.id, tracked: f, controller: i, beginRequest: (id, tracked, controller) => owner.requestLifecycle.begin(id, tracked, controller),
   emitCancellation: (input) => owner.emitGitPerformanceOperation(input), cancellationInput: createGitRequestCancellationTelemetry({ attribution: n, durationMs: Date.now() - r, host: o, operation: t, enqueuedAtMs: e.enqueuedAtMs, repoIndexSizeBucket: c, result: l, reviewSource: resolveGitRequestPerformanceContext(e).reviewSource, source: e.params.operationSource, startedAtMs: r }), operation: t, recordOutcome: (outcome) => jH(outcome) })) return;
 let p;
 try {

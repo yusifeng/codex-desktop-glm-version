@@ -28,7 +28,12 @@ const createHarness = ({ canceled = false, dispatchError = null, available = tru
     liveQueryRegistry: { refreshRepository: async () => events.push("refresh") },
     watchRegistry: { getWatches: () => [] },
     requestLifecycle: {
-      begin: () => { events.push("begin"); return canceled ? "canceled" : "active"; },
+      begin: (_id, _tracked, controller) => {
+        assert.equal(controller instanceof AbortController, true);
+        assertions += 1;
+        events.push("begin");
+        return canceled ? "canceled" : "active";
+      },
       finish: () => events.push("finish"),
     },
     emitGitPerformanceOperation: (input) => events.push(input.kind === "cancel" ? "cancel-performance" : "performance"),

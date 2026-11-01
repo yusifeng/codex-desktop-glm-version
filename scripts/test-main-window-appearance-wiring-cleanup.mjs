@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import * as appearance from "../src/main/main-app/window-appearance.ts";
+import * as appearance from "../app/.vite/build/main-app/window-appearance.js";
 
 let assertions = 0;
 const equal = (actual, expected) => {
@@ -73,8 +73,13 @@ equal(main.includes("function R9("), false);
 equal(main.includes("k9 = `#00000000`"), false);
 equal(main.includes("Lot = 3840"), false);
 equal(main.includes("zot = 320"), false);
-equal(main.includes("return windowAppearance.windowOptions("), true);
-equal(main.includes("return windowAppearance.minimumWindowSize("), true);
-equal(main.includes("return windowAppearance.windowSurfaceColors("), true);
+equal(main.includes("windowAppearance,"), true);
+const policyAdapters = fs.readFileSync(
+  new URL("../src/main/main-app/window/browser-window-policy-adapters.ts", import.meta.url),
+  "utf8",
+);
+equal(policyAdapters.includes("windowOptions: dependencies.windowAppearance.windowOptions"), true);
+equal(policyAdapters.includes("minimumWindowSize: dependencies.windowAppearance.minimumWindowSize"), true);
+equal(policyAdapters.includes("windowSurfaceColors: dependencies.windowAppearance.windowSurfaceColors"), true);
 
 console.log(`${assertions} main window-appearance wiring cleanup assertions passed`);

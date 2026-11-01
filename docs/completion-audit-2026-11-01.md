@@ -38,3 +38,16 @@ was source-backed, that all dependency-injection contracts worked at runtime, or
 The preserved code was supported by line-level manifests and owner audits, but several retained renderer and process roots
 later proved to contain runtime-critical behavior and placeholders. They are therefore reconstruction work, even when their
 exports were previously classified. Current completion requires source-backed builds plus a passing E2E workflow matrix.
+
+## Current runtime-source recovery status
+
+The renderer build now compiles the classified conversation, settings, composer, home/onboarding, and structural roots plus
+their eager dependency closure from 635 checked-in, formatted, release-derived ESM modules. It no longer copies published
+JavaScript directly into the runtime output. The graph supersedes 594 semantic drafts whose cross-chunk or React component
+contracts are not yet equivalent, and the build skips those drafts instead of compiling and then overwriting them. The
+source-build gate verifies the dependency closure, manifest, disk inventory, actual compilation of every recovered module,
+absence of release-tree build dependencies, and coverage of every known structural component draft.
+
+This removes direct build-time copying and supplies the real React implementations while semantic recovery continues. It does
+not close the semantic-decompilation gap: the 594 superseded drafts still need contract-complete readable replacements. The
+consolidated E2E workflow matrix and remaining runtime-contract validation also have to pass before the project is complete.

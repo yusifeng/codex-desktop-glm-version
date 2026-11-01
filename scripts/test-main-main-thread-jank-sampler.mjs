@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { EventEmitter } from "node:events";
 import fs from "node:fs";
-import { MainThreadJankSampler } from "../src/main/main-app/startup/main-thread-jank-sampler.ts";
+import { MainThreadJankSampler } from "../app/.vite/build/main-app/startup/main-thread-jank-sampler.js";
 
 const powerMonitor = new EventEmitter();
 let currentTimeMs = 0;
@@ -62,11 +62,11 @@ assert.deepEqual(cleared, [interval]);
 assert.equal(powerMonitor.listenerCount("suspend"), 0);
 assert.equal(powerMonitor.listenerCount("resume"), 0);
 
-const main = fs.readFileSync(
-  new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
+const messageHandler = fs.readFileSync(
+  new URL("../src/main/main-app/window/electron-message-handler.ts", import.meta.url),
   "utf8",
 );
-assert.match(main, /jankSampler: new MainThreadJankSampler\(\{/);
-assert.doesNotMatch(main, /vQe = class/);
+assert.match(messageHandler, /jankSampler: new MainThreadJankSampler\(\{/);
+assert.doesNotMatch(messageHandler, /vQe = class/);
 
 console.log("main thread jank sampler assertions: 22");

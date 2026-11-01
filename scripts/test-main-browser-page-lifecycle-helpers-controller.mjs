@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { createBrowserPageLifecycleHelpersControllerClass } from "../src/main/main-app/browser-sidebar/browser-page-lifecycle-helpers-controller.ts";
+import { createBrowserPageLifecycleHelpersControllerClass } from "../app/.vite/build/main-app/browser-sidebar/browser-page-lifecycle-helpers-controller.js";
 
 let sessionUpdates = 0;
 let syncs = 0;

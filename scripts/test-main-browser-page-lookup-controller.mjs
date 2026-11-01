@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { createBrowserPageLookupControllerClass } from "../src/main/main-app/browser-sidebar/browser-page-lookup-controller.ts";
+import { createBrowserPageLookupControllerClass } from "../app/.vite/build/main-app/browser-sidebar/browser-page-lookup-controller.js";
 
 const webContents = { id: 17 };
 const pageState = { page: { view: { webContents } } };

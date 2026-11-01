@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { createWindowRpcServiceAdapters } from "../src/main/main-app/window/rpc-service-adapters.ts";
+import { createWindowRpcServiceAdapters } from "../app/.vite/build/main-app/window/rpc-service-adapters.js";
 
 let assertions = 0;
 function equal(actual, expected, message) {

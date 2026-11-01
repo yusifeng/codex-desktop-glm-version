@@ -18,6 +18,7 @@ const BrowserFamilyService = Function(
   "isChromiumBrowserInstalled", "BuildFlavor", "resolveChromeExtensionSet",
   "findInstalledExtensionId", "defaultBrowserInfo", "getMissingChromeExtensionInstallInfo",
   "openBrowserExtensionSettings", "openChromiumUrl",
+  "RpcTarget",
   `${transpiled.code.slice(classNode.start, classNode.end)}; return BrowserFamilyService;`,
 )(
   async () => undefined,
@@ -31,6 +32,7 @@ const BrowserFamilyService = Function(
   (value) => value,
   async (value) => calls.push(["settings", value]),
   async (value) => calls.push(["url", value]),
+  class RpcTarget {},
 );
 const service = new BrowserFamilyService({ getCompatibleExtensionIds: async () => ["extension-1"] });
 equal(await service.getInstalledBrowserFamilies(), ["chrome"]);
