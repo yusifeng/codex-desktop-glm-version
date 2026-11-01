@@ -212,7 +212,6 @@ export const CONVERSATION_ROUTE_ROOTS = [
   "conversation-blocks-3f59e850f9fb.js",
   "agent-activity-item-792873f87aad.js",
   "agent-activity-units-9397783428a4.js",
-  "user-message-e36f9e2dfe24.js",
   // Still owned by the incremental/transform-only path; keep it explicit when
   // a promoted route stops pulling it into the eager compatibility closure.
   "math-block-utils-ca3c4f5321e8.js",
@@ -640,6 +639,7 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   "popup-dbb4bbacd7ea.js",
   "home-artifact-template-card-b9932e48e350.js",
   "latest-turn-preview-3395407f9d40.js",
+  "user-message-e36f9e2dfe24.js",
   "notices-dbed4ccd62e0.js",
   "conversation-source-a25a6a9a1e11.js",
   "appgen-site-detail-layout-26be1094f84a.js",
