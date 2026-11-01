@@ -2,6 +2,11 @@ import { access, writeFile } from "node:fs/promises";
 import { createReadStream } from "node:fs";
 import { join } from "node:path";
 import { createInterface } from "node:readline";
+import { createRequire } from "node:module";
+
+const requireFromMain = createRequire(
+  import.meta.url.startsWith("file:") ? import.meta.url : `${process.cwd()}/package.json`,
+);
 
 export const APP_SERVER_SQLITE_FILENAME = `state_5.sqlite`;
 export const APP_SERVER_SQLITE_RECONCILIATION_MARKER = `.app-server-state-reconciled-v1`;
@@ -160,7 +165,7 @@ export async function pathExists(path: string): Promise<boolean> {
 
 export function loadSqliteDatabase(): SqliteDatabaseConstructor {
   try {
-    return require("better-sqlite3") as SqliteDatabaseConstructor;
+    return requireFromMain("better-sqlite3") as SqliteDatabaseConstructor;
   } catch {
     throw Error(`better-sqlite3 is only bundled with the Electron app`);
   }

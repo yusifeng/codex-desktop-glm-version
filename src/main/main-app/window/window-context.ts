@@ -120,7 +120,6 @@ export function createWindowContextClass(dependencies) {
     BrowserHistoryService,
     Xnt,
     Xtt,
-    Y,
     HotkeyWindowService,
     Y6e,
     Y8e,
@@ -202,7 +201,6 @@ export function createWindowContextClass(dependencies) {
     p$e,
     p2,
     pke,
-    q,
     BrowserProfileImportService,
     qnt,
     r,
@@ -1075,8 +1073,7 @@ export function createWindowContextClass(dependencies) {
       createAppHost(e) {
         let t = this.initialStartupWebContentsId === e.id;
         t && (this.initialStartupWebContentsId = null);
-        let r = l.BrowserWindow.fromWebContents(e),
-          i = this.appServerConnectionRegistry.getConnection(J),
+        let i = this.appServerConnectionRegistry.getConnection(J),
           s = this.messageHandler.getBrowserHostManager();
         this.detachedWindowManager =
           this.detachedWindowManager ?? new Jje(this.options.windowManager, { browser: createDetachedBrowserKindHandler(s) });

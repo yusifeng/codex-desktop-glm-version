@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 const DEVICE_CHECK_ADDON = "devicecheck.node";
 const TOKEN_VERSION = "v1";
-const requireFromMain = createRequire(typeof __filename === "string" ? __filename : `${process.cwd()}/package.json`);
+const requireFromMain = createRequire(import.meta.url);
 
 export interface DeviceCheckLogger {
   info(message: string, details: { safe: Record<string, unknown>; sensitive: Record<string, unknown> }): void;

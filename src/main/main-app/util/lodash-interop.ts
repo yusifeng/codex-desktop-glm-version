@@ -11,11 +11,11 @@
 //
 // 本模块把这些调用点收敛为语义名。shared 重写后此层移除。
 
-import deepEqualDefault from "@chunk/main-shared";
+import { isDeepStrictEqual } from "node:util";
 import { Do as requireFindLast, Oo as requireFindLastIndex, dr as requireMemoize } from "@chunk/shared";
 
 /** 原版 G.default：深度相等比较。 */
-export const deepEqual: (a: unknown, b: unknown) => boolean = deepEqualDefault;
+export const deepEqual: (a: unknown, b: unknown) => boolean = isDeepStrictEqual;
 
 /** 原版 It.default：findLast——取最后一个满足谓词的元素。 */
 export const findLast: <T>(

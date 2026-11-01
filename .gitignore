@@ -7,6 +7,9 @@
 # Generated from src/ by `npm run build` — never edit these directly.
 /app/.vite/build/
 /app/webview/**/*.js
+/app/node_modules/immer/
+/app/node_modules/yaml/
+/app/node_modules/zod/
 
 .DS_Store
 /.reference/*

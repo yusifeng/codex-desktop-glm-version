@@ -105,6 +105,8 @@ const nativeSource = fs.readFileSync(
   new URL("../src/main/main-app/windows/native-app-icons.ts", import.meta.url),
   "utf8",
 );
+equal(nativeSource.includes("createRequire(import.meta.url)"), true);
+equal(/\b__filename\b|\b__dirname\b/.test(nativeSource), false);
 const privacySource = await declarationSource(nativeSource, "isPrivacySettingsTerminationRequest");
 const nativeVideoSource = await declarationSource(
   nativeSource,

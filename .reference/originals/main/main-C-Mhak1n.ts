@@ -153,6 +153,7 @@ const {
   UnsubscribeHandle,
   ComposerItemsBridge,
   PrimaryWindowActionsBridge,
+  redactUrl: fT,
 } = require("./main-app/api/desktop-fetch.js");
 const { createAccountInputsOwnerClass } = require("./main-app/account/account-inputs-owner.js");
 const {
@@ -188,7 +189,7 @@ const { InboxItemsFacade } = require("./main-app/automations/inbox-items.js");
 const { registerPushNotifications, deregisterPushNotifications } = require("./main-app/notifications/push-registration.js");
 const { O_e, zv, Bv, Vv, D_e } = require("./main-app/threads/patch-classification.js");
 const { mx, yx } = require("./main-app/threads/start-config.js");
-const { hasCanonicalVoiceHistory: q_, parseHeartbeatDecision: J_, parseAutomationUserMessage: n_e, AUTOMATION_DETECTOR: Y_ } = require("./main-app/threads/automation-detector.js");
+const { hasCanonicalVoiceHistory: q_, parseHeartbeatDecision: J_, parseAutomationUserMessage: n_e, decideAutomationNotification: $y, AUTOMATION_DETECTOR: Y_ } = require("./main-app/threads/automation-detector.js");
 const { conversationFromThreadSummary: V_, cleanThreadTitle: Cv, truncateText: wv, threadPreviewTitle: v_e, threadTimestamps: Tv, mergedRecencyAt: Ev, environmentSelection: Dv, subAgentMetadata: H_, subAgentNickname: $ge } = require("./main-app/threads/projection.js");
 const { configureMarkdownPlainTextRuntime } = require("./main-app/markdown/plain-text.js");
 const { me, Xt } = require("./main-app/misc/thread-errors.js");
@@ -468,7 +469,7 @@ const { createAppUpdateLifecycle } = require("./main-app/startup/app-update-life
 const { runLocalAppServerStartup } = require("./main-app/startup/local-app-server-startup.js");
 const { createDockMenuLifecycle } = require("./main-app/startup/dock-menu-lifecycle.js");
 const { createApplicationMenuRefreshLifecycle } = require("./main-app/startup/application-menu-refresh-lifecycle.js");
-const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
+const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, parseVoiceTimelineRecord: yw, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
 const { createBrowserHostServiceClass } = require("./main-app/browser-sidebar/browser-host-service.js");
 const { createBrowserExtensionRuntime } = require("./main-app/browser-sidebar/browser-extension-runtime.js");
@@ -493,6 +494,7 @@ const {
   ensureGlobalDictationPermissions: XV,
   validateGlobalDictationHotkey: QV,
   watchGlobalDictationRelease: $V,
+  isBareModifierAccelerator: IV,
 } = require("./main-app/hotkey/global-shortcut.js");
 const {
   appIconDataUrl: oH,
@@ -559,6 +561,7 @@ const {
   isPendingNavigationError: PU,
   matchesLoadError: FU,
   openExternalActionUrl: DHe,
+  escapeHtml: escapeHtmlValue,
 } = require("./main-app/browser-sidebar/error-pages.js");
 const {
   sendToTabWindows: WU,
@@ -640,6 +643,7 @@ const {
   createExternalAgentImportAdapter,
   createExternalAgentImportHandlers,
   finalizeImportedProjects,
+  parseImportCompletion: NI,
   readConnectorCandidates,
   readImportStatus,
 } = require("./main-app/import/external-agent-import.js");
@@ -706,7 +710,7 @@ const {
 });
 const { DebugService, createDemoTools } = require("./main-app/debug/export-logs.js");
 const { AvatarManager } = require("./main-app/avatar/pet-install.js");
-const { ComputerUseSettingsService, setCuaAppshotSoundEnabled: tje } = require("./main-app/computer-use/approvals.js");
+const { ComputerUseSettingsService, macAppIconPng: VAe, setCuaAppshotSoundEnabled: tje } = require("./main-app/computer-use/approvals.js");
 const { createDesktopLogArchive: URe, deleteDesktopLogArchive: TV, createFeedbackArchive: wV } = require("./main-app/feedback/desktop-log-archive.js");
 const { loadWindowsAccountAddon: kO, isAdministratorCapable: SO, getWindowsSystemDiagnostics: CO, supportsPersistentAcls: wO, isNetworkDrive: TO, readRegistryValue: EO, registerWindowsProcessListProvider: DO } = require("./main-app/platform/windows-account.js");
 const { BrowserFamilyService: MO } = require("./main-app/platform/browser-family.js");
@@ -745,7 +749,7 @@ const {
   normalizePath: n.Ns,
   firstWorkspaceRoot: n.Wo,
   getSelectedLocalProject: Pr,
-  homeDirectory: p.homedir,
+  homeDirectory: require("node:os").homedir,
   readAmbientSuggestions: n.pi,
   generateAmbientSuggestions: n.hi,
   resolveModelRouting: Ln,
@@ -779,7 +783,7 @@ const { createAppServerTransportFactory } = require("./main-app/app-server/trans
 const { createRequirementsAuthRecoveryRuntime } = require("./main-app/app-server/requirements-auth-recovery.js");
 const { createHostedManagerRegistryClass } = require("./main-app/app-server/hosted-manager-registry.js");
 const { createHostClientCoordinationClass } = require("./main-app/app-server/host-client-coordination.js");
-const { createHostedAppServerManagerFactory, createCodexHomeServiceClass } = require("./main-app/app-server/host-assembly.js");
+const { DynamicAppToolPendingResponses: IT, createHostedAppServerManagerFactory, createCodexHomeServiceClass } = require("./main-app/app-server/host-assembly.js");
 const { createGithubRequestClientFactory } = require("./main-app/github/github-request-client.js");
 const { createVisualizationServiceRuntime } = require("./main-app/visualizations/visualization-service.js");
 const { createHistorySwipeNavigationServiceClass } = require("./main-app/window/history-swipe-navigation-service.js");
@@ -25506,6 +25510,52 @@ var Zze = e.t((e, t) => {
     t.exports = i;
   }),
   mH = e.a(Zze());
+var {
+    affectedStateGuardsMatch: SH,
+    applyAffectedState: wH,
+    applySavedSectionOperation: _H,
+    captureAffectedStateGuards: xH,
+    commitReconciledState: vH,
+    describeAffectedState: bH,
+    isRpcErrorCode: gH,
+    projectAffectedState: CH,
+    readPinnedThreadIds: hH,
+    reconcileHostSectionList,
+    reconcileHostSectionMembers,
+    stripSectionAppearance: Wb,
+  } = createSavedSectionPolicy({
+    dedupe: mH.default,
+    deepEqual: G.default,
+    isInternalThreadId: n.hu,
+    pinnedThreadIdsKey: n.iu.PINNED_THREAD_IDS,
+  }),
+  Vb = n.jf([
+    n.kf([`codex:thread:local:`, n.Of()]),
+    n.kf([`codex:thread:remote:`, n.Of()]),
+    n.kf([`codex:project:`, n.Of()]),
+    n.kf([`chatgpt:conversation:`, n.Of()]),
+    n.kf([`chatgpt:project:`, n.Of()]),
+    n.kf([`space:page:`, n.Of(), `:`, n.Of()]),
+    n.kf([`space:space:`, n.Of(), `:`, n.Of()]),
+    n.kf([`content-tab:`, n.Of()]),
+  ]),
+  Hb = `sidebar-custom-sections-v3`,
+  Ub = n.wf({
+    sections: n.hf(
+      n.wf({
+        id: n.Of().min(1),
+        name: n.Of().min(1),
+        hostSectionIds: n.Ef(n.Of(), n.Of()).optional(),
+        pendingDeletionHostIdsByItemKey: n.Ef(n.Of(), n.hf(n.Of())).optional(),
+        itemKeys: n.hf(Vb),
+      }),
+    ),
+    collapsedSectionIds: n.hf(n.Of()),
+    sectionOrder: n.hf(n.Of()),
+    threadHostIds: n.Ef(n.Of(), n.Of()).optional(),
+    appServerLegacySectionIds: n.hf(n.Of()).optional(),
+    appServerMigratedHostIds: n.hf(n.Of()).optional(),
+  });
 var Qze = n.wf({ thread: n.wf({ id: n.Of() }) }),
   $ze = createThreadSectionServerClass({
     Qze,
@@ -25757,7 +25807,7 @@ var {
   electronSession: l.session,
   isSafeExternalUrl: MH,
   openLink: IH,
-  partitionPrefix: at,
+  partitionPrefix: `codex-workspace-settings-`,
 });
 var {
   basePartition: NG,
@@ -25959,8 +26009,9 @@ var iabCapabilityRuntime = createIabCapabilityRuntime({
 var zY = CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD,
   BY = NOTIFY_BROWSER_USE_DOWNLOAD_CHANGE,
   DYe = createIabBrowserUseApiClass({
-    LY, a, capabilities: iabCapabilityRuntime, l, n, _, Tr,
-  });
+    LY: r.i(`browser-use-iab-api`), a, capabilities: iabCapabilityRuntime, l, n, _, Tr,
+  }),
+  oX = (e) => e;
 var {
   browserRouteKey: lX,
   pageRecordKey: uX,
@@ -26197,7 +26248,13 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
           }));
       },
     });
-    constructor(e, t, r = J, i = QBe(), a = new cX(), o = NHe(), s = {}) {
+    onWebNotificationClicked() {
+      let primaryWindow = this.windowManager.getPrimaryWindow();
+      if (primaryWindow != null && !primaryWindow.isDestroyed()) {
+        this.windowManager.showPrimaryWindow(primaryWindow);
+      }
+    }
+    constructor(e, t, browserPageLifecycleClass = J, i = QBe(), a = new cX(), o = NHe(), s = {}) {
       ((this.windowManager = e),
         (this.errorReporter = t),
         (this.commentModeBlocklistLookup = i),
@@ -26211,7 +26268,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
         (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ hX, fq, tq, KU, EZ, lifecycleHelpersClass: createBrowserPageLifecycleHelpersControllerClass, WU, dZ, QU, Ze: normalizeUrlOrBlank, n, pX, dZe, oX, dq, isEqual: G.default }))(this)),
         (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW, fq, matchesLoadError: FU, normalizeUrl: normalizeUrlOrBlank, resetCaptureState: (page) => { page.isCapturingUserMedia = !1; page.isCapturingCamera = void 0; page.isCapturingMicrophone = void 0; }, clearSiteTools: XX, serializePageState: eW, shouldIgnoreLoadError: NU, shouldRetryLoadError: PU, logger: r.i, setTimer: setTimeout, retryDelayMs: 50, maxAttempts: 100 }))(this)),
         (this.pageLookupController = new (createBrowserPageLookupControllerClass({}))(this)),
-(this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze: normalizeUrlOrBlank, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, THe, X, fe, zGe, G, me, pU, hU, At, HGe, zX, mU, run, _e, on, Xc, LXe, xU, to, al, ul, audio, WX, bn, GX, JXe, YXe, EXe, n, a, iZ, tZ, eZ, nZ, rZ, WXe, RX }))(this)),
+(this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze: normalizeUrlOrBlank, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, THe, zGe, G, me, pU, hU, HGe, zX, mU, _e, on, Xc, LXe, xU, al, ul, WX, bn, GX, JXe, YXe, EXe, n, a, iZ, tZ, eZ, nZ, rZ, WXe, RX }))(this)),
         (this.hostPolicyController = new (createBrowserHostPolicyControllerClass({ DXe, OXe, kXe, mq, VG, Yc, Xc, DZ, hX }))(this)),
         (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
         (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, installBrowserWebviewListeners, aXe, gX, qU, oXe, vX, tq, KU, l, EZ, logger: r.i(`browser-sidebar-manager`) }))(this)),
@@ -26671,6 +26728,11 @@ var r$e = createElectronMessageHandlerClass({
   shared: n,
   bootstrap: a,
   electron: l,
+  crypto: _,
+  path: h,
+  fsPromises: b,
+  perfHooks: R,
+  deepEqual: G.default,
   createLogger: r.i,
   DynamicAppToolResponses: IT,
   ProjectFolderPicker: iQe,
@@ -26698,10 +26760,7 @@ var r$e = createElectronMessageHandlerClass({
     ZBe,
     applySparseStateWrite,
     performanceTriggerMinIntervalMs,
-    broadcastPersistedAtomUpdate,
-    deletePersistedBrowserConversation,
     combinePerformanceSpanSnapshots,
-    forwardBrowserNavigationUrl,
     lWe,
     summarizeWindowAttention,
     rZe,
@@ -40198,7 +40257,8 @@ var Fnt = createTracingRpcServiceClass({
     RpcHandlerBase: n.Uf,
     electron: l,
     platform: process.platform,
-    getSandboxWebContents: Z$,
+    getSandboxWebContents: (owner, sandboxId, initId) =>
+      mcpSandboxLifecycle.findGuest(owner, sandboxId, initId),
     projectCaptureRect: projectBrowserCaptureRect,
     getFeatureFlags: Tr,
     temporaryDirectory: p.tmpdir,
@@ -40241,8 +40301,31 @@ var Xnt = createHistorySwipeNavigationServiceClass({ RpcHandlerBase: n.Uf });
 var Znt = createGithubRequestClientFactory({ RequestClient: n.E });
 var G5 = r.r(`WindowContext`),
   Qnt = new z6e(),
-  $nt = 100,
-  ert = createWindowContextClass({
+  $nt = 100;
+var { hostKindForConfig: trt, createAppServerTransport: K5 } =
+  createAppServerTransportFactory({
+    isRemoteControlHostConfig: n.ws,
+    isWslHostConfig: n.ks,
+    resolveSshWebsocketConfig: createTransport,
+    SshWebsocketTransport: AppServerTransportSshWebsocket,
+    RemoteControlTransport: RemoteControlWebsocketTransport,
+    isRemoteStdioHostConfig: n.As,
+    RemoteStdioTransport: AppServerTransportWslStdio,
+    resolveWebsocketUrl: W5,
+    isCloudHostId: n.Cs,
+    accountIdFromToken: a.yt,
+    authenticatedPrincipalFromToken: n._i,
+    protocolsForToken: appServerProtocolsForToken,
+    resolveSocksProxyUrl: Ynt,
+    getCACertificates: ne.getCACertificates,
+    WebsocketTransport: n.pn,
+    AuthenticatedTransport: HybridWebsocketHttpTransport,
+    DesktopApiTokenClient: AppServerHttpClient,
+    LocalStdioTransport: n.dn,
+    getConfigOverrides: Xie,
+    logger: G5,
+  });
+var ert = createWindowContextClass({
     $0e,
     $j,
     createDetachedBrowserKindHandler,
@@ -40361,7 +40444,6 @@ var G5 = r.r(`WindowContext`),
     BrowserHistoryService,
     Xnt,
     Xtt,
-    Y,
     HotkeyWindowService,
     Y6e,
     Y8e,
@@ -40391,7 +40473,7 @@ var G5 = r.r(`WindowContext`),
     AppUpdateService,
     AppServerConnectionRegistry,
     cr,
-    crypto,
+    crypto: _,
     ctt,
     d,
     d1e,
@@ -40443,7 +40525,6 @@ var G5 = r.r(`WindowContext`),
     p$e,
     p2,
     pke,
-    q,
     BrowserProfileImportService,
     qnt,
     r,
@@ -40484,29 +40565,6 @@ var G5 = r.r(`WindowContext`),
     zje,
     znt,
     getVoiceController,
-  });
-var { hostKindForConfig: trt, createAppServerTransport: K5 } =
-  createAppServerTransportFactory({
-    isRemoteControlHostConfig: n.ws,
-    isWslHostConfig: n.ks,
-    resolveSshWebsocketConfig: createTransport,
-    SshWebsocketTransport: AppServerTransportSshWebsocket,
-    RemoteControlTransport: RemoteControlWebsocketTransport,
-    isRemoteStdioHostConfig: n.As,
-    RemoteStdioTransport: AppServerTransportWslStdio,
-    resolveWebsocketUrl: W5,
-    isCloudHostId: n.Cs,
-    accountIdFromToken: a.yt,
-    authenticatedPrincipalFromToken: n._i,
-    protocolsForToken: appServerProtocolsForToken,
-    resolveSocksProxyUrl: Ynt,
-    getCACertificates: ne.getCACertificates,
-    WebsocketTransport: n.pn,
-    AuthenticatedTransport: HybridWebsocketHttpTransport,
-    DesktopApiTokenClient: AppServerHttpClient,
-    LocalStdioTransport: n.dn,
-    getConfigOverrides: Xie,
-    logger: G5,
   });
 var rrt = createRequirementsAuthRecoveryRuntime({
   isCloudRequirementsAuthError: n.jc,
@@ -40769,7 +40827,7 @@ var { showAboutDialog: Qrt } = createAboutDialog({
   resolveWindowsIcon: TT,
   resolveLinuxIcon: wT,
   iconBaseName,
-  escapeHtml: OU.default,
+  escapeHtml: escapeHtmlValue,
 });
 var sit = createApplicationMenuBuilder({
   shared: n,
@@ -40945,7 +41003,7 @@ var yit = createQuitStateClass(),
     createStartupProgressWindowRuntime({
       BrowserWindow: l.BrowserWindow,
       getNativeIntl: a.hn,
-      escapeHtml: OU.default,
+      escapeHtml: escapeHtmlValue,
       createDelayedProgressWindow,
     });
 var { Git, Wit } = createWindowsNativeCaptureBridgeModule({
@@ -45515,7 +45573,7 @@ var Qot = createBrowserWindowManagerClass({
 function dst({
   applicationNetwork: e,
   chunkedMessageSender: t,
-  buildFlavor: r,
+  buildFlavor,
   allowDevtools: i,
   allowInspectElement: o,
   allowDebugMenu: s,
@@ -45554,7 +45612,7 @@ function dst({
         setMacAppIcon: Lj,
       },
       {
-        buildFlavor: r,
+        buildFlavor,
         devDockIconsPath: y ? process.env.CODEX_ELECTRON_DEV_DOCK_ICONS_PATH : void 0,
         flavorPolicy: { agent: a.in.Agent, nightly: a.in.Nightly, internalAlpha: a.in.InternalAlpha, publicBeta: a.in.PublicBeta, dev: a.in.Dev, prod: a.in.Prod },
         iconsRoot: E,

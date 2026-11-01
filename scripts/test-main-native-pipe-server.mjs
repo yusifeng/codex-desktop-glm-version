@@ -100,5 +100,11 @@ const sessionRegistry = fs.readFileSync(
 );
 assert.equal(sessionRegistry.includes("createBrowserUseNativePipeServer({"), true);
 assert.equal(sessionRegistry.includes("socketPeerAuthorizer: createSocketPeerAuthorizer()"), true);
+const peerAuthorizer = fs.readFileSync(
+  new URL("../src/main/main-app/native-pipe/peer-socket-authorizer.ts", import.meta.url),
+  "utf8",
+);
+assert.match(peerAuthorizer, /createRequire\(import\.meta\.url\)/);
+assert.doesNotMatch(peerAuthorizer, /\b__filename\b|\b__dirname\b/);
 
-console.log("main native pipe server: 26 assertions passed");
+console.log("main native pipe server: 28 assertions passed");

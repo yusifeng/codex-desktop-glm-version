@@ -8,6 +8,15 @@ cd "$(dirname "$0")/.."
 
 node scripts/build.mjs
 
+# Semantic main-process modules keep these two upstream libraries external.
+# Copy their installed package trees into the app payload before creating the
+# asar so Node's ESM resolver can load them at runtime.
+mkdir -p app/node_modules
+for package_name in immer yaml zod; do
+  rm -rf "app/node_modules/$package_name"
+  cp -R "node_modules/$package_name" "app/node_modules/$package_name"
+done
+
 R=shell/ChatGPT.app/Contents/Resources
 [[ -d "$R" ]] || ./scripts/setup-shell.sh
 

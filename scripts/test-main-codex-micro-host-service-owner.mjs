@@ -6,6 +6,8 @@ import { transform } from "esbuild";
 let assertions = 0;
 const equal = (actual, expected) => { assert.deepEqual(actual, expected); assertions += 1; };
 const source = fs.readFileSync(new URL("../src/main/main-app/device/codex-micro-host-service.ts", import.meta.url), "utf8");
+equal(source.includes("createRequire(import.meta.url)"), true);
+equal(/\b__filename\b|\b__dirname\b/.test(source), false);
 const transpiled = await transform(source, { loader: "ts", format: "esm", target: "es2022" });
 const ast = acorn.parse(transpiled.code, { ecmaVersion: "latest", sourceType: "module" });
 const declaration = (name) => ast.body.find((node) =>

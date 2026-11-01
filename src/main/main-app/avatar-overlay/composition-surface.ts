@@ -22,10 +22,9 @@
 //
 // 模块加载期副作用：无（类定义 + 常量）。
 
-import { promisify } from "node:util";
+import { isDeepStrictEqual as deepEqual, promisify } from "node:util";
 import { execFile } from "node:child_process";
 import { app, BrowserWindow, powerMonitor, screen } from "electron";
-import deepEqual from "@chunk/main-shared";
 import {
   F as AVATAR_OVERLAY_OPEN_KEY,
   P as AVATAR_OVERLAY_BOUNDS_KEY,

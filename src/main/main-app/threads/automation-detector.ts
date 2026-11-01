@@ -79,6 +79,39 @@ function parseAutomationUserMessage(message: string): {
     : parseHeartbeatDecision(message);
 }
 
+/** Resolve whether an automation turn should notify the user (original `$y`). */
+export function decideAutomationNotification({
+  automationKind,
+  notificationPolicy,
+  lastAgentMessage,
+  didCompleteSuccessfully,
+}: {
+  automationKind: string;
+  notificationPolicy?: string | null;
+  lastAgentMessage?: string | null;
+  didCompleteSuccessfully: boolean;
+}) {
+  const heartbeatAssistantMessage =
+    lastAgentMessage == null
+      ? null
+      : automationKind === `heartbeat`
+        ? parseAutomationUserMessage(lastAgentMessage)
+        : parseHeartbeatDecision(lastAgentMessage);
+  let decision = heartbeatAssistantMessage?.decision ?? null;
+  if (
+    decision == null &&
+    automationKind === `heartbeat` &&
+    didCompleteSuccessfully &&
+    !lastAgentMessage?.trim()
+  ) {
+    decision = `DONT_NOTIFY` as const;
+  }
+  if (notificationPolicy === `failed_runs_only`) {
+    decision = didCompleteSuccessfully ? `DONT_NOTIFY` : `NOTIFY`;
+  }
+  return { decision, heartbeatAssistantMessage };
+}
+
 /**
  * automation 判定器（原版 Y_）——兼作 turnMergePolicy（isAutomationUserInput/
  * isAutomationAssistantMessage 两个方法面）。

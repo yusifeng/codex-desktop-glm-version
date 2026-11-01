@@ -34,7 +34,7 @@ export function createAnnotationContextMenuActions(
 
 /** Owns the complete page-to-WebContents binding lifecycle for Browser sidebar pages. */
 export function createBrowserPageWebviewBindingControllerClass(dependencies: Record<string, any>) {
-  const { e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, THe, X, fe, zGe, G, me, pU, hU, At, HGe, zX, mU, run, _e, on, Xc, LXe, xU, to, al, ul, audio, WX, bn, GX, JXe, YXe, EXe, n, a, iZ, tZ, eZ, nZ, rZ } = dependencies;
+  const { e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, THe, zGe, G, me, pU, hU, HGe, zX, mU, _e, on, Xc, LXe, xU, al, ul, WX, bn, GX, JXe, YXe, EXe, n, a, iZ, tZ, eZ, nZ, rZ } = dependencies;
   const annotationContextMenuActions = createAnnotationContextMenuActions(n.gu);
   const pendingObservers = new WeakMap<object, any>();
   const resetCaptureState = (page: any) => {

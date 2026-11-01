@@ -13,7 +13,7 @@ import { in as registerProcessListProvider } from "@chunk/shared";
 import { resolveElectronResourcesPath } from "@chunk/electron-resources-path";
 
 const HKCU_PREFIX = "HKCU\\";
-const requireAddon = createRequire(__filename);
+const requireAddon = createRequire(import.meta.url);
 /** addon 模块缓存（原 `xO`）。 */
 let addonModule: WindowsAccountAddon | null = null;
 

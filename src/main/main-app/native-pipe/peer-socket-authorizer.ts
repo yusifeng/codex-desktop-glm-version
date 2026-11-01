@@ -40,7 +40,7 @@ export interface SocketPeerAuthorization {
 export type SocketPeerAuthorizer = (socket: unknown) => SocketPeerAuthorization;
 
 /** 原生 addon 的 require（原 `Rse`，模块加载期 createRequire，纯调用无 I/O）。 */
-const requireNative = createRequire(__filename);
+const requireNative = createRequire(import.meta.url);
 
 /** 具名 logger（原 `Zl`，r.i 记忆化 tag logger）。 */
 const peerAuthorizerLogger = memoizedTaggedLogger(`browser-use-native-pipe-peer-authorizer`);

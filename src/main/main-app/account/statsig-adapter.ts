@@ -23,14 +23,17 @@ import {
   xf as looseObjectSchema,
   bf as literalSchema,
   vf as discriminatedUnionSchema,
-  ac as jsonSchema,
-  Uf as EventEmitterBase,
-  Wr as disposableBag,
-  rc as composeDefaultEnableFeatures,
-  Ra as mapValuesModule,
-  ci as openStateSqlite,
-  oi as stateDatabasePath,
-} from "@chunk/shared";
+  yf as jsonSchema,
+} from "../../shared/zod-facade";
+import { composeDefaultEnableFeatures } from "../../shared/app-config";
+import { mapValuesModule } from "../../shared/hosts-runtime";
+import {
+  DisposableBag as disposableBag,
+  openSqlite as openStateSqlite,
+  stateDatabasePath,
+} from "../../shared/sql-git-registry";
+
+class EventEmitterBase {}
 type StatsigClientLike = {
   dataAdapter: { setData(data: string): void };
   initializeSync(options?: unknown): { success: boolean };
@@ -263,8 +266,8 @@ const statsigUserSchema = objectSchema({
   custom: recordSchema(stringSchema(), unionSchema([stringSchema(), numberSchema(), booleanSchema(), arraySchema(stringSchema()), undefinedSchema()])).optional(),
   privateAttributes: recordSchema(stringSchema(), unionSchema([stringSchema(), numberSchema(), booleanSchema(), arraySchema(stringSchema()), undefinedSchema()])).nullable().optional(),
   analyticsOnlyMetadata: recordSchema(stringSchema(), unionSchema([stringSchema(), numberSchema(), booleanSchema()])).optional(),
-}).loose();
-const statsigClientOptionsSchema = objectSchema({ user: statsigUserSchema }).loose();
+}).passthrough();
+const statsigClientOptionsSchema = objectSchema({ user: statsigUserSchema }).passthrough();
 
 /**
  * 已发布的 statsig 求值（原 `STe`）。
@@ -377,9 +380,9 @@ class PublishedStatsig extends EventEmitterBase {
       },
       values: (publication as StatsigPublication & { executionValues: unknown }).executionValues,
       defaultEnableFeatures: composeDefaultEnableFeatures(
-        (publication as StatsigPublication & { defaultEnableFeatures: unknown }).defaultEnableFeatures,
-        ((publication as StatsigPublication & { executionValues: { guardianV2Experiment?: boolean } }).executionValues).guardianV2Experiment,
-        requestedFeatures,
+        (publication as StatsigPublication & { defaultEnableFeatures: Record<string, unknown> }).defaultEnableFeatures,
+        ((publication as StatsigPublication & { executionValues: { guardianV2Experiment?: unknown } }).executionValues).guardianV2Experiment as any,
+        requestedFeatures as string | null,
       ),
     };
   }

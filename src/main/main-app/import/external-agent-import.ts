@@ -755,7 +755,7 @@ interface ImportCompletion {
 }
 
 /** 完成通知解析（原 `NI`）：失败摘要 + SESSIONS target 收集。 */
-function parseImportCompletion(params: unknown): (ImportCompletion & {
+export function parseImportCompletion(params: unknown): (ImportCompletion & {
   failureSummary: { errorType: string; failureStage: string; subErrorType: string } | null;
   importedSessionThreadIds: string[];
 }) | null {

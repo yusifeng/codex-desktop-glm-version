@@ -26,6 +26,8 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "zod": "^3.25.76"
+    "immer": "10.1.1",
+    "yaml": "2.9.0",
+    "zod": "3.25.76"
   }
 }

@@ -179,6 +179,9 @@ if (needsLock && !app.requestSingleInstanceLock()) {
       await runMainAppStartup();
     } catch (error) {
       for (const window of BrowserWindow.getAllWindows()) if (!window.isDestroyed()) window.destroy();
+      if (process.env.CODEX_DESKTOP_STARTUP_DEBUG === "1") {
+        console.error("Desktop bootstrap failed to start the main app", error);
+      }
       getLogger().error("Desktop bootstrap failed to start the main app", { safe: failureContext, sensitive: {} });
       desktopSentry.captureException(error, { tags: failureContext });
       await sparkleManager.startUpdaterAfterStartupFailure();

@@ -15,7 +15,7 @@
 // 锁定 marked v13 形态，升级版本前必须核对该调用点。
 // ============================================================
 // @ts-nocheck
-const e = require("@chunk/bundler-runtime");
+import * as e from "@chunk/bundler-runtime";
 function Bx() {
   return {
     async: !1,

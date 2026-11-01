@@ -10,34 +10,35 @@
 //     previewPetInstall/installPet，WSL 探测）
 import { net } from "electron";
 import {
-  wf as objectSchema,
-  Of as stringSchema,
-  Nf as urlSchema,
-  jf as unionSchema,
-  bf as literalSchema,
-  zf as neverSchema,
   Uf as EventEmitterBase,
   vt as validateSpritesheet,
   ht as installPreparedPetAsset,
   _t as loadAvatarState,
   gt as loadAvatarById,
 } from "@chunk/shared";
+import {
+  wf as objectSchema,
+  Of as stringSchema,
+  Nf as urlSchema,
+  jf as unionSchema,
+  bf as literalSchema,
+} from "../../shared/zod-facade";
 
 // ---------------------------------------------------------------------------
 // schema（原 `zN`）
 // ---------------------------------------------------------------------------
 
 const petInstallRequestSchema = objectSchema({
-  name: (stringSchema() as unknown as { trim(): { min(n: number): unknown } }).trim().min(1),
-  description: (stringSchema() as unknown as { nullish(): { transform(fn: (value: unknown) => unknown): unknown } })
+  name: stringSchema().trim().min(1),
+  description: stringSchema()
     .nullish()
     .transform((value) => (value as string | undefined)?.trim() || null),
-  imageUrl: (urlSchema as unknown as { transform(fn: (value: string, ctx: unknown) => unknown): unknown }).transform(
+  imageUrl: urlSchema().transform(
     (value: string, ctx: unknown) => {
       const url = new URL(value);
       return url.protocol !== "https:" || url.hostname === "localhost"
         ? ((ctx as { addIssue(issue: unknown): void }).addIssue({ code: "custom", message: "Pet spritesheet URL is invalid" }),
-          neverSchema)
+          undefined)
         : url.toString();
     },
   ),

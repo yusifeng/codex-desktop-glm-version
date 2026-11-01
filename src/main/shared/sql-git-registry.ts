@@ -1,7 +1,10 @@
 import { mkdirSync } from "node:fs";
 import { dirname, posix, win32 } from "node:path";
+import { createRequire } from "node:module";
 
-type SqlStatement = { get(...params: unknown[]): Record<string, unknown> | undefined; all(...params: unknown[]): unknown[]; run(...params: unknown[]): { changes?: number } };
+const requireFromShared = createRequire(import.meta.url);
+
+type SqlStatement = { get(...params: unknown[]): Record<string, unknown> | undefined; all(...params: unknown[]): unknown[]; run(...params: unknown[]): { changes: number } };
 export interface SqliteDatabase {
   close(): void;
   exec(sql: string): void;
@@ -12,7 +15,7 @@ type SqliteConstructor = new (path: string) => SqliteDatabase;
 
 function sqliteConstructor(): SqliteConstructor {
   try {
-    return require("better-sqlite3") as SqliteConstructor;
+    return requireFromShared("better-sqlite3") as SqliteConstructor;
   } catch {
     throw Error("better-sqlite3 is only bundled with the Electron app");
   }

@@ -26,7 +26,8 @@ import { createRequire } from "node:module";
 import { randomUUID } from "node:crypto";
 import { readdir } from "node:fs/promises";
 import { endianness } from "node:os";
-import { join as pathJoin } from "node:path";
+import { dirname, join as pathJoin } from "node:path";
+import { fileURLToPath } from "node:url";
 import { Buffer } from "node:buffer";
 
 import { app } from "electron";
@@ -77,7 +78,8 @@ const WINDOWS_ICON_ADDON_NAME = `computer-use-app-icons.node`;
 const windowsIconCache = new Map<string, Promise<string | null>>();
 
 /** windows 图标 addon 的 require（原 `Nae`）。 */
-const requireWindowsIconAddon = createRequire(__filename);
+const requireWindowsIconAddon = createRequire(import.meta.url);
+const moduleDirectory = dirname(fileURLToPath(import.meta.url));
 
 /** 具名 logger（原 `Ls`，r.r → 直接 Logger 实例）。 */
 const windowsIconLogger = createTaggedLogger(`windows-native-app-icon`);
@@ -93,7 +95,7 @@ export async function getWindowsAppIconSmall(
   appPath: string,
   {
     addon,
-    electronAppPath = pathJoin(__dirname, `..`),
+    electronAppPath = pathJoin(moduleDirectory, `..`),
     resourcesPath = resolveElectronResourcesPath({
       env: process.env,
       resourcesPath: process.resourcesPath,
@@ -227,7 +229,7 @@ function loadWindowsIconAddon({
 const SKY_ADDON_NAME = `sky.node`;
 
 /** sky addon 的 require（原 `Iae`）。 */
-const requireSkyAddon = createRequire(__filename);
+const requireSkyAddon = createRequire(import.meta.url);
 
 /**
  * 加载 sky addon（原 `Vs`，惰性：每次调用重新探测）：

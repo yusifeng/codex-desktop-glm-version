@@ -21,7 +21,7 @@ import {
   P as listWebBrowsersFromShared,
   j as isBackgroundApp,
 } from "@chunk/shared";
-import { parse as parseYaml } from "@main-vendor/yaml";
+import { parse as parseYaml } from "yaml";
 import { getAppIconMedium } from "../windows/native-app-icons";
 import { appForBundleId, listWebUrlHandlers } from "../mac/launch-services";
 

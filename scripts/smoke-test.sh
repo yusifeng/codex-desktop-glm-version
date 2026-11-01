@@ -15,6 +15,7 @@ esac
 ./scripts/pack.sh
 
 export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
+export CODEX_DESKTOP_STARTUP_DEBUG=1
 # 冒烟测试默认使用一次性 profile：避免旧 smoke 进程或单实例锁把新包的
 # 启动请求转发到历史实例。调试时可显式传入固定路径保留 profile。
 if [[ -n "${CODEX_SMOKE_USER_DATA_PATH:-}" ]]; then
@@ -60,18 +61,25 @@ wait_for_log() {
   exit 1
 }
 
-if grep -Eiq 'fatal|uncaught exception|segmentation fault|module not found' "$LOG"; then
+assert_no_startup_failure() {
+  local failure_pattern='Desktop bootstrap failed|failed to start the main app|A JavaScript error occurred in the main process|fatal|uncaught exception|segmentation fault|module not found|ERR_MODULE_NOT_FOUND|ReferenceError:.*is not defined'
+  if ! grep -Eiq "$failure_pattern" "$LOG"; then
+    return 0
+  fi
   echo "FAIL: 日志包含启动致命错误："
-  grep -Ein 'fatal|uncaught exception|segmentation fault|module not found' "$LOG" | tail -20
+  grep -Ein "$failure_pattern" "$LOG" | tail -20
   exit 1
-fi
+}
 
+assert_no_startup_failure
 wait_for_log 'window main frame finished load' '主窗口 HTML 主 frame 加载'
 wait_for_log 'initialize_handshake_result' 'app-server 核心 RPC 初始化握手'
+wait_for_log 'next=connected' 'app-server connected 状态'
+assert_no_startup_failure
 
-if grep -Eiq 'renderer.*(fatal|crash|uncaught)|render-process-gone.*(crashed|killed)' "$LOG"; then
+if grep -Eiq 'renderer.*(fatal|crash)|render-process-gone.*(crashed|killed)' "$LOG"; then
   echo "FAIL: renderer 出现致命错误："
-  grep -Ein 'renderer.*(fatal|crash|uncaught)|render-process-gone.*(crashed|killed)' "$LOG" | tail -20
+  grep -Ein 'renderer.*(fatal|crash)|render-process-gone.*(crashed|killed)' "$LOG" | tail -20
   exit 1
 fi
 

@@ -12,7 +12,7 @@ const INPUT_MONITORING_ADDON = "input-monitoring-permission.node";
 const DEVELOPMENT_INPUT_MONITORING_ADDON = "input_monitoring_permission.node";
 const INPUT_MONITORING_SETTINGS_URL =
   "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent";
-const requireAddon = createRequire(__filename);
+const requireAddon = createRequire(import.meta.url);
 const permissionLogger = createTaggedLogger("input-monitoring-permission");
 
 interface InputMonitoringAddon {

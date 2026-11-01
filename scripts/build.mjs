@@ -26,6 +26,11 @@ const check = process.argv.includes("--check");
 const tsconfigRaw = { compilerOptions: { verbatimModuleSyntax: true } };
 const common = { target: "esnext", charset: "utf8", legalComments: "inline" };
 
+// These trees are entirely generated from semantic source. Clear them before
+// emission so deleted modules cannot survive as stale packaged JS.
+for (const generatedTree of ["main-app", "shared"])
+  await fs.rm(path.join(ROOT, "app/.vite/build", generatedTree), { recursive: true, force: true });
+
 // main-app modules are emitted as ESM files and loaded from the CommonJS main
 // chunk through Node's native module loader. Node's ESM resolver does not add
 // file extensions to relative specifiers, while TypeScript source imports are
@@ -127,8 +132,7 @@ async function worker() {
         /[\\/]src[\\/]main[\\/]worker[\\/]/.test(src) ||
         /[\\/]src[\\/]main[\\/]browser-page-preload[\\/]/.test(src) ||
         src.endsWith("/src/main/main-app/util/main-business.ts") ||
-        src.endsWith("/src/main/main-app/util/url-trust.ts") ||
-        src.endsWith("/src/main/main-app/hotkey/appshot-shortcut.ts");
+        src.endsWith("/src/main/main-app/util/url-trust.ts");
       const ts = await esbuild.transform(code, {
         ...common,
         loader: "ts",
@@ -145,7 +149,7 @@ async function worker() {
         if (js.code !== ts.code) mismatches.push(src);
       }
       await fs.mkdir(path.dirname(dst), { recursive: true });
-      const emitted = /[\\/]src[\\/]main[\\/]main-app[\\/]/.test(src)
+      const emitted = /[\\/]src[\\/]main[\\/](?:main-app|shared)[\\/]/.test(src)
         ? withJsExtensions(rewriteChunkImports(ts.code, dst))
         : ts.code;
       await fs.writeFile(dst, emitted);

@@ -2,22 +2,25 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { createRequire } from "node:module";
+import { pathToFileURL } from "node:url";
 import * as esbuild from "esbuild";
 
 const root = path.resolve(import.meta.dirname, "..");
+const source = await fs.readFile(path.join(root, "src/main/main-app/security/device-check.ts"), "utf8");
+assert.match(source, /createRequire\(import\.meta\.url\)/);
+assert.doesNotMatch(source, /\b__filename\b|\b__dirname\b/);
 const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-device-check-"));
-const output = path.join(tempDir, "device-check.cjs");
+const output = path.join(tempDir, "device-check.mjs");
 await esbuild.build({
   entryPoints: [path.join(root, "src/main/main-app/security/device-check.ts")],
   outfile: output,
   bundle: true,
-  format: "cjs",
+  format: "esm",
   platform: "node",
   target: "esnext",
   logLevel: "silent",
 });
-const deviceCheck = createRequire(import.meta.url)(output);
+const deviceCheck = await import(pathToFileURL(output).href);
 
 assert.equal(deviceCheck.isDeviceCheckPlatform("darwin"), true);
 assert.equal(deviceCheck.isDeviceCheckPlatform("linux"), false);
@@ -54,4 +57,4 @@ assert.equal(loggerEvents.at(-1)[1], "DeviceCheck attestation unavailable");
 
 assert.equal(await deviceCheck.generateDeviceCheckToken({ platform: "darwin", arch: "x64", addon }), null);
 assert.match(deviceCheck.encodeAttestation({ bundleIdentifier: "com.example.app", errorCode: 2 }), /^v1\./);
-console.log("main DeviceCheck assertions passed (13 assertions)");
+console.log("main DeviceCheck assertions passed (15 assertions)");

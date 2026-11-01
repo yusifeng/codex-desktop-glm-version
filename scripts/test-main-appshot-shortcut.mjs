@@ -1,14 +1,11 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
-import vm from "node:vm";
 import * as esbuild from "esbuild";
 
 const source = await fs.readFile("src/main/main-app/hotkey/appshot-shortcut.ts", "utf8");
-const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
-const module = { exports: {} };
-vm.runInNewContext(code, { module, exports: module.exports });
-const shortcut = module.exports;
+const { code } = await esbuild.transform(source, { loader: "ts", format: "esm" });
+const shortcut = await import(`data:text/javascript;base64,${Buffer.from(code).toString("base64")}`);
 
 for (const value of ["DoubleAlt", "double-alt", " double_alt ", "LEFTALT+RIGHTALT", "DoubleShift", "left_shift+right_shift"]) {
   assert.equal(shortcut.isDoubleModifierShortcut(value), true, value);
@@ -23,4 +20,6 @@ const manager = await fs.readFile(
 );
 assert.match(manager, /import \{ isDoubleModifierShortcut \} from "\.\/appshot-shortcut"/);
 assert.match(manager, /isDoubleModifierShortcut\(this\.configuredHotkey\)/);
-console.log("12 appshot shortcut assertions passed");
+const build = await fs.readFile("scripts/build.mjs", "utf8");
+assert.doesNotMatch(build, /commonJsHelper[\s\S]*appshot-shortcut\.ts/);
+console.log("13 appshot shortcut assertions passed");
