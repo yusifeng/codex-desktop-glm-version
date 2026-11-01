@@ -16,7 +16,7 @@
     "audit-test-index": "node scripts/audit-test-index.mjs",
     "pack": "./scripts/pack.sh",
     "setup": "./scripts/setup-shell.sh",
-    "start": "npm run build && npm run pack && ./scripts/run.sh"
+    "start": "npm run pack && ./scripts/run.sh"
   },
   "devDependencies": {
     "@types/node": "^26.6.2",

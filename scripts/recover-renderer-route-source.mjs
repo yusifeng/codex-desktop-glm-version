@@ -1,4 +1,4 @@
-// Materialize the exact conversation-route module graph as reviewable source.
+// Materialize the exact runtime-route module graphs as reviewable source.
 // This is a recovery tool, not part of the application build: the build consumes
 // the checked-in output and never falls back to .reference release assets.
 
@@ -32,7 +32,7 @@ await fs.writeFile(
 );
 await fs.writeFile(
   path.join(sourceDirectory, "README.md"),
-  `# Recovered conversation route\n\nThis directory is the checked-in, formatted source recovery of the release conversation-route module graph. The renderer build consumes these files directly; it does not read \`.reference\` or copy release assets at build time. Semantic rewrites remain under \`src/renderer/\` and can replace these exact-recovery modules one graph segment at a time.\n`,
+  `# Recovered runtime route graphs\n\nThis directory is the checked-in, formatted source recovery of the release conversation route plus the classified settings entry points and their eager runtime dependencies. The renderer build consumes these files directly; it does not read \`.reference\` or copy release assets at build time. Semantic rewrites remain under \`src/renderer/\` and can replace these exact-recovery modules one graph segment at a time.\n`,
 );
 
-console.log(`recovered ${recovered.size} conversation-route modules into ${path.relative(ROOT, sourceDirectory)}`);
+console.log(`recovered ${recovered.size} runtime-route modules into ${path.relative(ROOT, sourceDirectory)}`);

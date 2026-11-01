@@ -1,0 +1,112 @@
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+import { $3 as t, BX as n, FX as r, I3 as i, K2 as a, Y2 as o, n4 as s } from "./app-shared-7b9edc1bfb7f.js";
+import {
+  Dft as c,
+  Hln as l,
+  Oft as u,
+  Rln as d,
+  eEt as f,
+  jTt as p,
+  n7 as m,
+  r7 as h,
+  rht as g,
+  sP as _,
+  uP as v,
+  uht as y,
+} from "./app-initial-51da50e6c6e3.js";
+import { Jp as b, Yp as x } from "./app-primary-d66705000d76.js";
+import { n as S, r as C, t as w } from "./state-92adb03a8a05.js";
+function T() {
+  let e = (0, D.c)(21),
+    t = s(),
+    { data: r, isLoading: i } = y(),
+    a;
+  e[0] === r
+    ? (a = e[1])
+    : ((a = r?.structure === `workspace` && r.account_user_role === `account-owner` && l(r.plan_type) ? r.id : null),
+      (e[0] = r),
+      (e[1] = a));
+  let c = a,
+    { data: u, isLoading: d } = n(C, c),
+    f;
+  e[2] === u
+    ? (f = e[3])
+    : ((f = u?.grace_period_end_timestamp == null ? null : Date.parse(u.grace_period_end_timestamp)),
+      (e[2] = u),
+      (e[3] = f));
+  let p = v(f),
+    h,
+    g,
+    _,
+    x,
+    S;
+  if (e[4] !== c || e[5] !== t || e[6] !== i || e[7] !== d || e[8] !== p || e[9] !== u) {
+    let n = w(u, p);
+    ((h = `workspace-renewal-payment`),
+      (g = n),
+      (_ = c != null && n != null),
+      (x = i || (c != null && d)),
+      (S =
+        n == null
+          ? null
+          : (0, O.jsx)(m, {
+              ariaLive: `polite`,
+              content: (0, O.jsx)(o, {
+                id: `codex.workspaceRenewalPaymentBanner.description`,
+                defaultMessage: `Update your payment method before {date} to keep access to your workspace`,
+                description: `Warning that a Business workspace payment must be updated before {date}, when the grace period ends`,
+                values: { date: t.formatDate(n, { month: `long`, day: `numeric` }) },
+              }),
+              Icon: b,
+              layout: `warningCallout`,
+              onPrimaryCtaClick: E,
+              primaryCtaText: (0, O.jsx)(o, {
+                id: `codex.workspaceRenewalPaymentBanner.updatePayment`,
+                defaultMessage: `Update payment`,
+                description: `Opens workspace billing settings to update the payment method`,
+              }),
+              role: `status`,
+              stackOnNarrow: !0,
+              title: (0, O.jsx)(o, {
+                id: `codex.workspaceRenewalPaymentBanner.title`,
+                defaultMessage: `Workspace renewal failed`,
+                description: `Title shown when a Business workspace renewal payment fails`,
+              }),
+              type: `warning`,
+            })),
+      (e[4] = c),
+      (e[5] = t),
+      (e[6] = i),
+      (e[7] = d),
+      (e[8] = p),
+      (e[9] = u),
+      (e[10] = h),
+      (e[11] = g),
+      (e[12] = _),
+      (e[13] = x),
+      (e[14] = S));
+  } else ((h = e[10]), (g = e[11]), (_ = e[12]), (x = e[13]), (S = e[14]));
+  let T;
+  return (
+    e[15] !== h || e[16] !== g || e[17] !== _ || e[18] !== x || e[19] !== S
+      ? ((T = { id: h, gracePeriodEnd: g, isEligible: _, isLoading: x, content: S }),
+        (e[15] = h),
+        (e[16] = g),
+        (e[17] = _),
+        (e[18] = x),
+        (e[19] = S),
+        (e[20] = T))
+      : (T = e[20]),
+    T
+  );
+}
+function E(e) {
+  u({ event: e, href: p, initiator: `open_in_browser_bridge` });
+}
+var D, O;
+function k() {
+  return (k = e(() => {
+    ((D = t()), r(), a(), S(), g(), f(), h(), c(), _(), x(), d(), (O = i()));
+  }))();
+}
+export { T as n, k as t };

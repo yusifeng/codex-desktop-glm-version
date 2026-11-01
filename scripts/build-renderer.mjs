@@ -123,7 +123,7 @@ for (const name of recoveredRouteChunks) {
     path.join(assetsDir, name),
   );
 }
-console.log(`built ${recoveredRouteChunks.size} exact-recovery conversation-route chunks from checked-in source`);
+console.log(`built ${recoveredRouteChunks.size} exact-recovery runtime-route chunks from checked-in source`);
 const assetNames = (await fs.readdir(assetsDir)).filter((name) => name.endsWith(".js"));
 const assetSources = new Map(
   await Promise.all(assetNames.map(async (name) => [name, await fs.readFile(path.join(assetsDir, name), "utf8")])),

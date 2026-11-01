@@ -7,6 +7,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 node scripts/build.mjs
+node scripts/build-renderer.mjs
 
 # Semantic main-process modules keep these two upstream libraries external.
 # Copy their installed package trees into the app payload before creating the

@@ -1,0 +1,34 @@
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+import { pL as t } from "./app-shared-7b9edc1bfb7f.js";
+import { pdn as n, udn as r } from "./app-initial-51da50e6c6e3.js";
+function i(e) {
+  return t({
+    queryKey: [`consumer-billing`, e, `billing-info`],
+    queryFn: ({ signal: t }) =>
+      r.safeGet(`/payments/billing_info`, { parameters: { query: { account_id: e } }, signal: t }),
+    staleTime: 0,
+    retry: !1,
+  });
+}
+function a(e) {
+  return t({
+    queryKey: [`consumer-billing`, e, `payment-methods`],
+    queryFn: ({ signal: t }) =>
+      r.safeGet(`/payments/payment_methods`, { parameters: { query: { account_id: e } }, signal: t }),
+    staleTime: 0,
+    retry: !1,
+  });
+}
+async function o(e, t) {
+  await Promise.all([
+    e.queryClient.invalidateQueries({ queryKey: [`consumer-billing`, t] }),
+    e.queryClient.invalidateQueries({ queryKey: [`accounts`] }),
+    e.queryClient.invalidateQueries({ queryKey: [`usage-settings`] }),
+  ]);
+}
+function s() {
+  return (s = e(() => {
+    n();
+  }))();
+}
+export { o as i, s as n, a as r, i as t };
