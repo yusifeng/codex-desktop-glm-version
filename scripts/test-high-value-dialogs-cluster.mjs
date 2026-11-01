@@ -26,7 +26,7 @@ for (const directory of MODULES) {
   }
 }
 const overrides = {
-  "app-shared": { I3: "() => globalThis.__highValueDialogsTest.jsxRuntime", e6: "() => globalThis.__highValueDialogsTest.reactRuntime" },
+  "app-shared": { I3: "() => globalThis.__highValueDialogsTest.jsxRuntime", e6: "Object.assign(() => globalThis.__highValueDialogsTest.reactRuntime, globalThis.__highValueDialogsTest.reactRuntime)" },
   "app-initial": { cJt: "() => globalThis.__highValueDialogsTest.initialized.push('api')", rJt: "globalThis.__highValueDialogsTest.apiClient" },
 };
 const sideEffects = new Set(["rolldown-runtime", "pepper-persona", "chatgpt-accent-messages", "voice-personalization-dialog-entry", "appgen-access", "appgen-site-card", "dialog-action", "permission-dropdown", "app-primary", "use-codex-worktrees", "git-branch-switcher", "country-codes", "google-logo", "connector-post-connect-dialog", "computer-use-app-approvals-query", "use-home-directory", "security-browser"]);
@@ -88,25 +88,31 @@ assert.equal(state.initialized.includes("api"), true);
 
 // app-connect-modal: 14
 const connect = await bundle("app-connect-modal");
-assert.deepEqual(connect.a({ availableAppIds: ["drive"], companionConnectorIds: ["calendar", "drive"], companionConnectors: [], companionLinks: [] }), ["calendar", "drive"]);
-assert.equal(connect.c({ connectorId: "admin:salesforce" }), true);
-assert.deepEqual(connect.d({ availableAppIds: ["drive", "calendar"], companionConnectorIds: [], companionConnectors: [], companionLinks: [], connectors: [{ id: "drive" }] }), ["drive"]);
-assert.deepEqual(connect.f({ connectorId: "drive" }), ["connector:drive"]);
-assert.equal(connect.i("Use [Drive](https://drive.google.com) files"), "Use Drive files");
-assert.equal(connect.l({ id: "drive", name: "Drive", description: "Cloud files" }), "Cloud files");
-assert.equal(connect.m("missing", ["drive", "calendar"]), "drive");
-assert.deepEqual(connect.o("drive"), ["drive:default"]);
-assert.deepEqual(connect.p("drive", ["drive:one", "calendar:one"]), ["drive:one"]);
+const gmailId = "connector_2128aebfecb84f64a069897515042a44";
+const outlookId = "connector_4aaab2856305417b993eca9a216aaf6e";
+const outlookConnector = { id: "outlook", status: "READY" };
+assert.deepEqual(connect.a({ availableAppIds: new Set([outlookId]), companionConnectorIds: [outlookId], companionConnectors: [outlookConnector], companionLinks: [null] })[0].connector, outlookConnector);
+const enabledStatsig = { checkGate: () => true };
+assert.equal(connect.c({ connectorId: outlookId, statsigClient: enabledStatsig }), true);
+const googleDefinitions = [{ connectorId: gmailId, kind: "gmail" }];
+assert.deepEqual(connect.d({ availableAppIds: new Set([gmailId]), companionConnectorIds: [gmailId], companionConnectors: [{ status: "READY" }], companionLinks: [null], connectors: googleDefinitions })[0].definition, googleDefinitions[0]);
+assert.equal(connect.f({ connectorId: gmailId, statsigClient: enabledStatsig }).length, 4);
+assert.deepEqual(connect.m(gmailId, googleDefinitions), googleDefinitions[0]);
+assert.equal(connect.o(outlookId).length, 3);
+assert.deepEqual(connect.p(gmailId, googleDefinitions), []);
 let connected = false;
 let oauthEvent = null;
 state.nextPostResult = { oauth_url: "https://example.com/oauth" };
-const connectTree = connect.t({ app: { id: "drive", name: "Drive", description: "Cloud files" }, onOpenChange: () => {}, onConnected: () => { connected = true; }, onOAuthStarted: event => { oauthEvent = event; } });
+const connectTree = connect.t({ app: { id: "drive", name: "Drive", description: "Use [Drive](https://drive.google.com) files" }, onOpenChange: () => {}, onConnected: () => { connected = true; }, onOAuthStarted: event => { oauthEvent = event; } });
 assert.equal(byText(connectTree, "Connect Drive").type, "h2");
+assert.equal(byText(connectTree, "Use Drive files").type, "p");
 await button(connectTree, "Connect").props.onClick();
 assert.equal(state.apiCalls.at(-1).pathname, "/connectors/{connector_id}/connect");
 assert.equal(state.apiCalls.at(-1).options.parameters.path.connector_id, "drive");
-assert.equal(oauthEvent.oauthUrl, "https://example.com/oauth");
-assert.equal(connected, true);
+assert.equal(oauthEvent.redirectUrl, "https://example.com/oauth");
+assert.equal(connected, false);
+connect.n();
+assert.equal(state.initialized.includes("api"), true);
 state.nextPostResult = null;
 
 // codex-mobile-setup-dialog: 9

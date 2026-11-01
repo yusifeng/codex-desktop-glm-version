@@ -1,5 +1,16 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Connector/GPT contract reconstruction（owner 尚未迁出）：继续逐函数对照
+`app-connect-modal` 与 `gpt-about-dialog-core` 发布源码后，确认现有 TypeScript 并非可删除
+owner 的完成态。App Connect 原先 15 个导出中多项映射错位，Google/Microsoft companion
+列表、bundle gate、connector lookup、post-connect launcher、OAuth/直连/失败回调形状及
+OverflowFade passive scroll/ResizeObserver 契约现已校正；GPT About 原先把 query-key、阻断
+原因和初始化器误写成名称/作者 helper，且真实 `gizmo` props 会崩溃，现已恢复 discovery/search
+query keys、tag 优先级、resource/loading/error/capability/related-GPT/start-chat surface。新增两套
+focused contract suites 共 62 项断言，全量 `npm run check` 通过。由于两个大组件尚未覆盖发布版
+全部数据查询、菜单、pin/report/migration 与动态 post-connect dialog 分支，本批不删除原始 owner，
+严格剩余仍为 24 个 / 123,299 行，避免把“主要路径已修正”误报为“完整反编译”。
+
 2026-11-02 Environment/About You runtime 大批次：
 `cloud-environments-settings-page`、`local-environments-settings-page`、
 `local-environment-editor` 与 `about-you-summary` 已从 release-faithful owner 迁出，

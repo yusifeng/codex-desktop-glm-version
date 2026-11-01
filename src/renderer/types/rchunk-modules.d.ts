@@ -5783,13 +5783,13 @@ declare module "@rchunk/create-project-dialog-core" {
   export const t: (props: Record<string, unknown>) => unknown;
 }
 declare module "@rchunk/gpt-about-dialog-core" {
-  export const a: (...arguments_: unknown[]) => string;
+  export const a: (accountId: string, query: unknown, cursor: unknown) => unknown[];
   export const c: () => void;
-  export const i: (resource: Record<string, unknown>) => string;
+  export const i: (accountId: string) => unknown[];
   export const n: () => void;
-  export const o: (resource: Record<string, unknown>) => string | null;
-  export const r: (...arguments_: unknown[]) => unknown;
-  export const s: (...arguments_: unknown[]) => boolean;
+  export const o: () => void;
+  export const r: (accountId: string, category: unknown, cursor: unknown) => unknown[];
+  export const s: (tags: readonly string[], workspaceAllowsSpecific: boolean) => string | null;
   export const t: (props: Record<string, unknown>) => unknown;
 }
 declare module "@rchunk/create-dialog" {
@@ -5840,17 +5840,31 @@ declare module "@rchunk/codex-mobile-setup-dialog" {
 }
 
 declare module "@rchunk/app-connect-modal" {
-  export const a: (input: Record<string, unknown>) => unknown[];
+  export interface ConnectorDefinition extends Record<string, unknown> {
+    connectorId: string;
+    kind?: string;
+  }
+  export interface CompanionConnector extends Record<string, unknown> {
+    id?: string;
+    status?: string;
+  }
+  export interface CompanionQueryInput {
+    availableAppIds: ReadonlySet<string>;
+    companionConnectorIds: readonly string[];
+    companionConnectors: readonly (CompanionConnector | null | undefined)[];
+    companionLinks: readonly (Record<string, unknown> | null | undefined)[];
+  }
+  export const a: (input: CompanionQueryInput) => Array<{ connector: CompanionConnector; definition: ConnectorDefinition }>;
   export const c: (input: { connectorId: string; disableExposureLog?: boolean; statsigClient?: unknown }) => boolean;
-  export const d: (input: Record<string, unknown>) => unknown[];
-  export const f: (input: { connectorId: string }) => string[];
+  export const d: (input: CompanionQueryInput & { connectors: readonly ConnectorDefinition[] }) => Array<{ connector: CompanionConnector; definition: ConnectorDefinition }>;
+  export const f: (input: { connectorId: string; disableExposureLog?: boolean; statsigClient?: unknown }) => ConnectorDefinition[];
   export const h: () => void;
-  export const i: (value: unknown) => string;
-  export const l: (app: { description?: string; id: string; name: string }) => string;
-  export const m: (connectorId: string, connectorIds: string[]) => string | null;
+  export const i: (input: { scope: unknown; accountId: string | null; connectorId: string; source?: string; onBeforeLaunch?(): void }) => Promise<boolean>;
+  export const l: (props: Record<string, unknown>) => unknown;
+  export const m: (connectorId: string, connectors: readonly ConnectorDefinition[]) => ConnectorDefinition | undefined;
   export const n: () => void;
   export const o: (connectorId: string) => string[];
-  export const p: (connectorId: string, connectors: unknown[]) => string[];
+  export const p: (connectorId: string, connectors: readonly ConnectorDefinition[]) => string[];
   export const r: () => void;
   export const s: () => void;
   export const t: (props: Record<string, unknown>) => unknown;
@@ -7896,7 +7910,10 @@ declare module "@rchunk/gpt-about-dialog-core" {
   export const n: () => void;
   export const t: (props: {
     accountId?: string;
-    gizmo: { id: string; short_url?: string | null };
+    gizmo: { id: string; short_url?: string | null } | {
+      gizmo: { id: string; short_url?: string | null };
+      tools?: Array<{ type?: string }>;
+    } | string;
     isOwnerAndWorkspaceAllowsSpecific: boolean;
     onClose(): void;
     onStartChat(selected: {
