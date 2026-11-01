@@ -906,8 +906,8 @@ declare module "@rchunk/app-shared" {
   // React 兼容导出（e6 为可延迟初始化、也可直接访问的 React 模块命名空间）。
   export const e6: (() => ReactRuntime) & ReactRuntime;
   // virtualized-turn-list 消费的压缩导出面（语义见该模块头注释）：
-  /** initializeJsxRuntimeLazy（rolldown lazy 辅助）。 */
-  export const $3: () => void;
+  /** React compiler memo-cache runtime. */
+  export const $3: () => { c(size: number): unknown[] };
   /** Multi-agent Home banner analytics events. */
   export const AM: unknown;
   export const OM: unknown;
@@ -1204,6 +1204,8 @@ declare module "@rchunk/app-shared" {
   export const jZ: () => void;
   /** motion components（Wallet enrollment 过渡容器）。 */
   export const o$: { div: unknown; span: unknown };
+  export const Xf: unknown;
+  export const tp: () => void;
   /** initializeComposerEditorState（CME Home 入口依赖）。 */
   export const Eu: () => void;
   /** CME 图标组件。 */
@@ -2628,8 +2630,8 @@ declare module "@rchunk/app-shared" {
   export const qm: () => void;
   export const r$: unknown;
   export const t$: unknown;
-  export const x_: unknown; // useIconScaleContext（_3）
-  export const y_: unknown;
+  export const x_: () => unknown; // useIconScaleContext（_3）
+  export const y_: () => void;
   export const G4: <Key extends string, Value>(
     key: SafeParseSchema<Key>,
     value: SafeParseSchema<Value>,
@@ -4264,6 +4266,17 @@ declare module "@rchunk/app-initial" {
       | undefined,
   ) => boolean;
   export const Slt: () => boolean;
+  export const Ait: (props: { body: unknown; disclosure?: { expanded: boolean; onToggle(): void }; icon?: unknown; summary: unknown }) => unknown;
+  export const Dit: () => void;
+  export const Eit: (props: { children?: unknown; indent: boolean; ref?: (element: HTMLElement | null) => void }) => unknown;
+  export const Sat: () => void;
+  export const Vat: () => void;
+  export const jit: () => void;
+  export const wat: (onResize: (entry: ResizeObserverEntry) => void) => (element: HTMLElement | null) => void;
+  export const zat: (props: { active: boolean; children?: unknown; className?: string }) => unknown;
+  export const $n: (rect: DOMRect, screen: { screenX: number; screenY: number }) => { height: number; width: number; x: number; y: number };
+  export const Qn: (velocity: { x: number; y: number }, scale: unknown, maximum: number) => { x: number; y: number };
+  export const Zn: (origin: { width: number; x: number; y: number }, bounds: { height: number; width: number; x: number; y: number }, scale: unknown, maximum: number) => { x: number; y: number };
   export const Let: (props: Record<string, unknown>) => unknown;
   export const Ret: () => void;
   export const Xl: () => void;
@@ -5742,9 +5755,9 @@ declare module "@rchunk/codex-mobile-setup-dialog" {
 }
 
 declare module "@rchunk/app-connect-modal" {
-  export const a: (input: Record<string, unknown[]>) => string[];
+  export const a: (input: Record<string, unknown>) => unknown[];
   export const c: (input: { connectorId: string; disableExposureLog?: boolean; statsigClient?: unknown }) => boolean;
-  export const d: (input: Record<string, unknown[]>) => string[];
+  export const d: (input: Record<string, unknown>) => unknown[];
   export const f: (input: { connectorId: string }) => string[];
   export const h: () => void;
   export const i: (value: unknown) => string;
@@ -5752,11 +5765,35 @@ declare module "@rchunk/app-connect-modal" {
   export const m: (connectorId: string, connectorIds: string[]) => string | null;
   export const n: () => void;
   export const o: (connectorId: string) => string[];
-  export const p: (connectorId: string, links: string[]) => string[];
+  export const p: (connectorId: string, connectors: unknown[]) => string[];
   export const r: () => void;
   export const s: () => void;
   export const t: (props: Record<string, unknown>) => unknown;
   export const u: () => void;
+}
+
+declare module "@rchunk/app-initial" {
+  export const FEt: (appId: string) => {
+    queryKey: readonly unknown[];
+    [key: string]: unknown;
+  };
+  export const Iv: (value: unknown) => Set<string>;
+  export const Lv: () => void;
+  export const Rv: (hostId: string) => boolean;
+  export const W6t: (scope: unknown) => string | null | undefined;
+  export const X3t: (appId: string) => {
+    queryKey: readonly unknown[];
+    [key: string]: unknown;
+  };
+  export const cDt: (input: Record<string, unknown>) => {
+    queryKey: readonly unknown[];
+    [key: string]: unknown;
+  };
+  export const uDt: () => void;
+  export const z$: (input: Record<string, unknown>) => {
+    queryKey: readonly unknown[];
+    [key: string]: unknown;
+  };
 }
 
 declare module "@rchunk/app-main" {}
@@ -6004,7 +6041,6 @@ declare module "@rchunk/quick-chat-drop-zones" {
 declare module "@rchunk/remote-hosted-pip-anchor-bridge" {
   export const i: () => void;
   export const n: (scale?: number) => {
-    computeLayout(input: Record<string, unknown>): Record<string, unknown>;
     setCodexHomeAvailable(available: boolean): void;
     stop(): void;
   };

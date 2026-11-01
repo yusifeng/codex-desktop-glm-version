@@ -520,9 +520,16 @@ const connectById = await loadModule("app-connect-modal-by-id", {
     export const t = "ConnectModal";
   `,
   "app-initial":
-    "export const V$ = () => globalThis.__homeOnboardingTest.connectorQuery;",
-  "app-shared": "export const I3 = globalThis.__homeOnboardingTest.jsx;",
+    "export const B$=()=>{}; export const V$ = () => globalThis.__homeOnboardingTest.connectorQuery;",
+  "app-shared": `
+    const noop=()=>{}; const cache=[];
+    export const $3=()=>({c:size=>{while(cache.length<size)cache.push(Symbol.for("react.memo_cache_sentinel"));return cache}});
+    export const $h=noop,K2=noop,Ph=noop,Zh=noop,zh=noop;
+    export const I3=()=>globalThis.__homeOnboardingTest.jsx;
+    export const Ah="DialogHeader",Ih="Dialog",Lh="DialogDescription",Oh="DialogBody",Qh="Spinner",Rh="DialogTitle",Y2="Message",Yh="Button",kh="DialogFooter";
+  `,
 });
+connectById.r();
 const byIdTree = connectById.n({
   connectorId: "gmail",
   hostId: "local",
@@ -542,9 +549,9 @@ const loadingTree = connectById.n({
 });
 const loadingDialog = loadingTree.type(loadingTree.props);
 check(
-  loadingDialog.props["aria-busy"] === true &&
-    loadingDialog.props.role === "dialog",
-  "renders an accessible loading dialog",
+  loadingDialog.type === "Dialog" &&
+    loadingDialog.props.children.props.children.type === "DialogHeader",
+  "renders the standard loading dialog",
 );
 globalThis.__homeOnboardingTest.connectorQuery.isPending = false;
 const errorTree = connectById.n({
@@ -553,7 +560,7 @@ const errorTree = connectById.n({
 });
 const errorDialog = errorTree.type(errorTree.props);
 const errorActions =
-  errorDialog.props.children.props.children[2].props.children;
+  errorDialog.props.children.props.children.props.children[1].props.children;
 errorActions[1].props.onClick();
 check(
   globalThis.__homeOnboardingTest.connect.at(-1)[0] === "refetch",

@@ -25,18 +25,31 @@ for (const directory of MODULES) {
 }
 const overrides = {
   "app-shared": {
+    $3: "() => ({ c: size => Array(size).fill(Symbol.for('react.memo_cache_sentinel')) })",
     I3: "() => globalThis.__mcpToolPrimitivesTest.jsx",
+    Xf: "({ duration: .2 })",
+    a$: "({ div: 'div' })",
     e6: "() => globalThis.__mcpToolPrimitivesTest.react",
     fI: "() => undefined",
     oj: "({ name: 'elicitation-event' })",
+    o$: "() => undefined",
+    tp: "() => undefined",
   },
   "app-initial": {
+    Ait: "props => globalThis.__mcpToolPrimitivesTest.jsx.jsxs('section', { children: [globalThis.__mcpToolPrimitivesTest.jsx.jsx('button', { disabled: props.disclosure == null, 'aria-expanded': props.disclosure?.expanded ?? false, onClick: props.disclosure?.onToggle }), props.body] })",
     Cpn: "({ name: 'elicitation-state' })",
+    Dit: "() => undefined",
+    Eit: "props => globalThis.__mcpToolPrimitivesTest.jsx.jsx('div', props)",
     GPt: "({ name: 'window-focused' })",
     KPt: "() => undefined",
+    Sat: "() => undefined",
     Spn: "({ name: 'blocked' })",
+    Vat: "() => undefined",
+    jit: "() => undefined",
+    wat: "() => () => undefined",
     xpn: "(_scope, descriptor, event) => globalThis.__mcpToolPrimitivesTest.emitted.push({ descriptor, event })",
     ypn: "() => undefined",
+    zat: "props => globalThis.__mcpToolPrimitivesTest.jsx.jsx('span', props)",
   },
 };
 const sideEffects = new Set(["rolldown-runtime", "skill-exploration-labels", "result-values"]);
@@ -100,15 +113,14 @@ measurement.elementRef({ scrollHeight: 84 });
 assert.equal(typeof measurement.elementRef, "function");
 let expanded = 0;
 const disclosureTree = disclosure.t({ children: "details", defaultExpanded: false, onExpand: () => { expanded++; }, status: "complete", summary: "Ran command" });
-const toggle = nodeOfType(disclosureTree, "button");
-assert.equal(toggle.props["aria-expanded"], false);
-assert.equal(toggle.props.disabled, false);
-toggle.props.onClick();
+const toggle = disclosureTree.props.disclosure;
+assert.equal(toggle.expanded, false);
+toggle.onToggle();
 assert.equal(expanded, 1);
-assert.equal(nodeOfType(disclosureTree, "div").props.hidden, true);
+assert.equal(disclosureTree.props.body.props["aria-hidden"], true);
 const runningTree = disclosure.t({ children: "output", status: "running", summary: "Running" });
-assert.equal(nodeOfType(runningTree, "button").props["aria-expanded"], true);
-assert.equal(disclosure.t({ summary: "No details" }).props.children[0].props.disabled, true);
+assert.equal(runningTree.props.disclosure.expanded, true);
+assert.equal(disclosure.t({ summary: "No details" }).props.disclosure, undefined);
 
 // elicitation-events: 5
 const elicitation = await bundle("elicitation-events");

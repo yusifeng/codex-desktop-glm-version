@@ -256,14 +256,14 @@ assert.equal(memoryGate.n(), undefined);
 // hooks-settings-copy: 7
 const copy = await bundle("hooks-settings-copy");
 const intl = { formatMessage: (message, values) => message.defaultMessage.replace("{index}", String(values?.index ?? "")) };
+copy.a();
+assert.equal(state.initialized.includes("internationalization"), true);
 assert.equal(copy.n("preToolUse", intl), "PreToolUse");
 assert.equal(copy.n("interrupt", intl), "Interrupt");
 assert.equal(copy.t("subagentStop", intl), "When a subagent stops");
 assert.equal(copy.r(2, intl), "Hook 3");
 assert.equal(copy.i("plugin-name@1.2.3"), "plugin-name");
 assert.equal(copy.i(""), null);
-copy.a();
-assert.equal(state.initialized.includes("internationalization"), true);
 
 // hooks-settings-model: 15
 const model = await bundle("hooks-settings-model");

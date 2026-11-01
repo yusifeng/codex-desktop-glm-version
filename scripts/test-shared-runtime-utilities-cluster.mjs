@@ -5,7 +5,51 @@ import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__sharedRuntimeUtilitiesTest = { aboutYouInitializations: 0, jsx: { Fragment: "Fragment", jsx(type, props, key) { return { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return { type, props: props ?? {}, key }; } }, memorySummary(props) { return { type: "memory-summary", props }; }, savedMemories(props) { return { type: "saved-memories", props }; } };
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "shared-runtime-utilities-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => { const name = path.basename(importPath); const contents = name === "app-shared" ? "export const I3=()=>globalThis.__sharedRuntimeUtilitiesTest.jsx;" : name === "saved-memories" ? "export const t=globalThis.__sharedRuntimeUtilitiesTest.savedMemories;" : name === "about-you-summary" ? "export const i=()=>globalThis.__sharedRuntimeUtilitiesTest.aboutYouInitializations++,n=globalThis.__sharedRuntimeUtilitiesTest.memorySummary;" : "export {};"; return { contents, loader: "js" }; }); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+async function bundle(directory) {
+  const result = await esbuild.build({
+    entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")],
+    bundle: true,
+    format: "esm",
+    platform: "node",
+    target: "node22",
+    write: false,
+    logLevel: "silent",
+    plugins: [{
+      name: "shared-runtime-utilities-mocks",
+      setup(build) {
+        build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({
+          path: importPath.slice(8), namespace: "mock",
+        }));
+        build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => {
+          const name = path.basename(importPath);
+          const contents = name === "app-shared"
+            ? `export const I3=()=>globalThis.__sharedRuntimeUtilitiesTest.jsx;
+               export const $O={FIVE_MINUTES:300000}; export const VJ=()=>true;
+               export const ek=()=>{}; export const wL=()=>{};`
+            : name === "app-initial"
+              ? `const option=(kind,id,input={})=>({kind,id,input,queryKey:[kind,id]});
+                 export const B$=()=>{},G6t=()=>{},HEt=()=>{},HZt=()=>{},Lv=()=>{},s6t=()=>{},uDt=()=>{};
+                 export const Ifn={}; export const FEt=id=>option("link",id); export const X3t=id=>option("details",id);
+                 export const cDt=input=>option("remote",input.appIds.join(","),input); export const z$=input=>option("local",input.appIds.join(","),input);
+                 export const Iv=value=>new Set(value?.map?.(item=>typeof item==="string"?item:item.id)??[]);
+                 export const Rv=hostId=>hostId!=="local"; export const W6t=()=>"scope-account";`
+              : name === "app-connect-modal"
+                ? `export const h=()=>{},s=()=>{};
+                   export const o=()=>["drive","slack"]; export const p=(_id,connectors)=>connectors.map(item=>item.id);
+                   const available=input=>input.companionConnectors.flatMap((item,index)=>item!=null&&input.companionLinks[index]==null?[input.connectors?.find(connector=>connector.id===item.id)??item]:[]);
+                   export const a=available,d=available;`
+                : name === "saved-memories"
+                  ? "export const t=globalThis.__sharedRuntimeUtilitiesTest.savedMemories;"
+                  : name === "about-you-summary"
+                    ? "export const i=()=>globalThis.__sharedRuntimeUtilitiesTest.aboutYouInitializations++,n=globalThis.__sharedRuntimeUtilitiesTest.memorySummary;"
+                    : "export {};";
+          return { contents, loader: "js" };
+        });
+      },
+    }],
+  });
+  return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`);
+}
 function nodes(root) { const output = []; const visit = value => { if (value == null || typeof value !== "object") return; if (Array.isArray(value)) return value.forEach(visit); output.push(value); visit(value.props?.children); }; visit(root); return output; }
 function find(root, predicate) { return nodes(root).find(predicate); }
 
@@ -83,13 +127,28 @@ assert.throws(() => jwt.n("bad.bm90LWpzb24.sig"), /invalid json/);
 const availability = await bundle("app-connect-availability");
 assert.deepEqual(Object.keys(availability), ["i", "n", "r", "t"]);
 const connectors = [{ id: "drive", label: "Drive" }, { id: "slack", label: "Slack" }];
-assert.deepEqual(await availability.i({ appId: "primary", primaryLink: { id: "linked" }, companionConnectorIds: ["drive"], connectors, availableAppIds: ["drive"] }), []);
-let linkChecks = 0;
-const available = await availability.i({ appId: "primary", async getLink() { linkChecks++; return null; }, companionConnectorIds: ["drive", "slack"], connectors, availableAppIds: ["drive"] });
-assert.equal(linkChecks, 1);
+const queryCalls = [];
+const cached = [];
+const queryClient = {
+  async fetchQuery(options) {
+    queryCalls.push(options);
+    if (options.kind === "link") return options.id === "slack" ? { id: "linked" } : null;
+    if (options.kind === "details") return { id: options.id, label: options.id };
+    if (options.kind === "local") return [{ id: "drive" }];
+    if (options.kind === "remote") return [{ id: "slack" }];
+    throw new Error("unexpected query");
+  },
+  setQueryData(queryKey, value) { cached.push({ queryKey, value }); },
+};
+const availabilityScope = { get: () => ({ appRead: true }) };
+assert.deepEqual(await availability.i({ appId: "primary", hostId: "local", primaryLink: { id: "linked" }, connectors, queryClient, scope: availabilityScope }), []);
+assert.deepEqual(cached, [{ queryKey: ["link", "primary"], value: { id: "linked" } }]);
+const available = await availability.i({ appId: "primary", hostId: "local", connectors, queryClient, scope: availabilityScope, freshLinkChecks: true });
+assert.equal(queryCalls.find(call => call.kind === "link" && call.id === "primary").staleTime, 0);
 assert.deepEqual(available, [connectors[0]]);
-assert.deepEqual(await availability.n({ appId: "primary", companionConnectorIds: ["slack"], connectors, availableAppIds: ["slack"] }), [connectors[1]]);
-assert.deepEqual(await availability.n({ appId: "primary", companionConnectorIds: [], connectors, availableAppIds: ["drive"] }), []);
+assert.deepEqual(await availability.n({ appId: "primary", hostId: "remote", queryClient, scope: availabilityScope }), []);
+const noAppsClient = { ...queryClient, fetchQuery: async options => options.kind === "local" ? [] : queryClient.fetchQuery(options) };
+assert.deepEqual(await availability.n({ appId: "primary", hostId: "local", queryClient: noAppsClient, scope: availabilityScope }), []);
 assert.equal(typeof availability.r, "function");
 
 console.log("46 shared runtime utilities cluster assertions passed");
