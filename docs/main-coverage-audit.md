@@ -3670,3 +3670,17 @@ Electron fetch handler 与 WindowContext 已改用语义类/解析器，主 chun
 相邻主 chunk 955–2411 行经源码结构与既有深度审计复核，为完整 vendored `@tanstack/query-core v5`（Subscribable、
 focus/online/timeout manager、Retryer、Query/Mutation、两类 cache 与 QueryClient）；无第一方 owner 或独立 consumer 边界，继续按
 vendor/generated 保留，避免把第三方状态机伪装成应用语义模块。
+
+### 整域收敛：project path policy 与 project state policy
+
+新增并真实接回 `projects/path-policy.ts` 与 `projects/project-state.ts`。前者统一 desktop/storage/host-aware 路径规范化、
+remote-home 映射、root 去重、label key 迁移以及 async/sync realpath canonicalization；后者统一 local project 查询、selected/default
+project、workspace root options、project selection/update 与初始 selection。ProjectsManager、remote connections、Electron fetch、
+conversational onboarding、terminal/session 与 WindowContext 保持既有调用顺序，通过主装配层兼容别名消费同一组语义函数，没有
+复制 project 状态 owner。
+
+主 chunk 原 `Rn/zn/Bn/Vn/Hn/xte/Qn/Wn/yte/Gn/qn/Yn/Kn/vte/bte/Jn/Xn/Zn/Un` 路径函数及
+`jr/Mr/Nr/Pr/Fr/Ir/Lr/Rr/Nte/Pte` 状态函数共 29 个定义已物理删除。新 focused suite 62 项覆盖 Windows/remote 路径、
+dedupe、collision first-wins、realpath failure/fallback、home remap 和 project CRUD/selection；ProjectsManager 与 remote handler 的
+直接 `.ts` 测试入口恢复为源码级执行，并修正已迁入 WindowContext 的静态 consumer 定位。测试索引 1839，no-unwired gate
+扩至 920 项。

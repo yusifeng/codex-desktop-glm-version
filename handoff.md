@@ -5535,3 +5535,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - Electron fetch handler/WindowContext 直接消费语义 owner，主 chunk 旧 `cee/Vee/Hee/Gee/Kee/qee` 删除。focused 40 项，
   五组相邻 owner 166 项回归通过；修复其中三个直接 `.ts` 失效入口。测试索引 1838，no-unwired gate 扩至 883 项。
 - 复核确认相邻 955–2411 行为完整 vendored `@tanstack/query-core v5` 状态机，按 vendor/generated 保留，不伪拆业务 facade。
+
+# 2026-11-01 project path and state policy convergence
+
+- 新增并接回 `projects/path-policy.ts` 与 `projects/project-state.ts`，统一 host-aware path/root/canonical/label policy 以及 local
+  project 查询、selection、workspace roots、update/initialization；既有 ProjectsManager/WindowContext consumers 继续使用同一状态源。
+- 主 chunk 29 个 `Rn..Un` / `jr..Pte` 机械函数已删除，没有保留重复实现或未接线 facade。focused suite 62 项；相关
+  ProjectsManager、remote、fetch、onboarding、terminal 回归恢复为源码级真实执行并通过。
+- 测试索引 1839，no-unwired gate 扩至 920 项。

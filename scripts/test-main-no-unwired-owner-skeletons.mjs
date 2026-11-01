@@ -136,6 +136,8 @@ const realOwners = [
   ["src/main/main-app/conversation/queued-message-locks.ts", "QueuedMessageLocks"],
   ["src/main/main-app/window/shared-object-repository.ts", "SharedObjectRepository"],
   ["src/main/main-app/app-server/sqlite-recovery-warning.ts", "parseSqliteRecoveryNotification"],
+  ["src/main/main-app/projects/path-policy.ts", "createProjectPathPolicy"],
+  ["src/main/main-app/projects/project-state.ts", "getLocalProjects"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -877,5 +879,19 @@ assert.equal(main.includes("Hee = class"), false, "generated shared-object owner
 assert.equal(/^function Gee\(/m.test(main), false, "generated SQLite recovery text parser must be removed");
 assert.equal(/^function Kee\(/m.test(main), false, "generated SQLite recovery notification parser must be removed");
 assert.equal(/^function qee\(/m.test(main), false, "generated warning line parser must be removed");
+assert.equal(main.includes('require("./main-app/projects/path-policy.js")'), true, "project path policy is wired");
+assert.equal(main.includes('require("./main-app/projects/project-state.js")'), true, "project state policy is wired");
+assert.equal(main.includes("normalizeProjectRoots: Gn"), true, "project consumers receive semantic root normalization");
+assert.equal(main.includes("getLocalProjects: jr"), true, "project consumers receive semantic local-project lookup");
+for (const generatedName of [
+  "Rn", "zn", "Bn", "Vn", "Hn", "xte", "Qn", "Wn", "yte", "Gn", "qn", "Yn", "Kn", "vte", "bte", "Jn", "Xn", "Zn", "Un",
+  "jr", "Mr", "Nr", "Pr", "Fr", "Ir", "Lr", "Rr", "Nte", "Pte",
+]) {
+  assert.equal(
+    new RegExp(`^(?:async )?function ${generatedName}\\(`, "m").test(main),
+    false,
+    `generated project helper ${generatedName} must be removed`,
+  );
+}
 
-console.log("883 main unwired-owner skeleton assertions passed");
+console.log("920 main unwired-owner skeleton assertions passed");

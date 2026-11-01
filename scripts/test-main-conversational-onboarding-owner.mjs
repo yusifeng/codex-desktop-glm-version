@@ -154,7 +154,7 @@ equal(
   main.includes('const { ConversationalOnboardingService } = require("./main-app/onboarding/conversational-onboarding.js");'),
   true,
 );
-equal(main.includes("var kN = ConversationalOnboardingService,"), true);
+equal(/var kN = ConversationalOnboardingService[;,]/.test(main), true);
 equal(main.includes("kN = class"), false);
 equal(main.includes("this.conversationalOnboarding = new kN("), false);
 

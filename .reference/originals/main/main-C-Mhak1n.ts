@@ -364,6 +364,35 @@ const { createLocalProjectCacheClass } = require("./main-app/projects/local-proj
 const { createProjectFolderConsentRuntime } = require("./main-app/projects/project-folder-consent.js");
 const { createThreadMembershipInference } = require("./main-app/projects/thread-membership-inference.js");
 const { createProjectsManagerClass } = require("./main-app/projects/projects-manager.js");
+const {
+  projectPathPolicy: {
+    normalizeDesktopPath: Rn,
+    normalizeDesktopPathWithFlag: zn,
+    normalizeStoragePath: Bn,
+    normalizeStoragePathWithFlag: Vn,
+    normalizeDesktopRootPaths: Hn,
+    resolveHomeMappedStoragePath: Un,
+    normalizeProjectPathForHost: Wn,
+    normalizeProjectRoots: Gn,
+    canonicalizeRoots: Kn,
+    getCanonicalPathMapSync: vte,
+    normalizeLabels: Jn,
+    normalizeProjectRoot: Xn,
+    normalizeProjectRootsAsync: Zn,
+  },
+} = require("./main-app/projects/path-policy.js");
+const {
+  getLocalProjects: jr,
+  findLocalProjectForRoot: Mr,
+  getSelectedProject: Nr,
+  getSelectedLocalProject: Pr,
+  getLocalWorkspaceRootOptions: Fr,
+  getDefaultWorkspaceRoot: Ir,
+  selectProject: Lr,
+  updateLocalProject: Rr,
+  initializeSelectedProject: Nte,
+  getRemoteWorkspaceRootOptions: Pte,
+} = require("./main-app/projects/project-state.js");
 const { createInteractionRpcServices } = require("./main-app/window/interaction-rpc-services.js");
 const { createAirpodsMicrophoneMuteRuntime } = require("./main-app/realtime/airpods-microphone-mute.js");
 const { createRealtimeContinuityHistoryRuntime } = require("./main-app/realtime/continuity-history.js");
@@ -2419,185 +2448,6 @@ async function Ln(e) {
   } catch {
     return n.Sd;
   }
-}
-function Rn(e) {
-  return zn(e, n.Ri());
-}
-function zn(e, t) {
-  return t ? n.Vi(e) : e;
-}
-function Bn(e) {
-  return Vn(e, n.Ri());
-}
-function Vn(e, t) {
-  return t ? n.ji(e, n.Mi()) : e;
-}
-function Hn(e, t) {
-  return e.map((e) => Vn(e, t));
-}
-function Un(e, t) {
-  let r = xte(e, t);
-  return r && Vn(r, n.zi(t));
-}
-function Wn(e, t, r) {
-  return n.Es(t) || (process.platform !== `win32` && n.Wi(e))
-    ? e
-    : r
-      ? zn(e, !0)
-      : Qn(e)
-        ? Vn(e, !0)
-        : e;
-}
-function Gn(e, t, n) {
-  return yte(e, (e) => Wn(e, t, n));
-}
-async function Kn(e, t, n) {
-  let r = qn(e, t, n),
-    i = await Promise.all(
-      Array.from(r, async ([e, r]) => {
-        try {
-          return [e, Wn(await (0, b.realpath)(Yn(r, t)), t, n)];
-        } catch {
-          return null;
-        }
-      }),
-    );
-  return Object.fromEntries(i.filter((e) => e != null));
-}
-function vte(e, t, n) {
-  let r = Array.from(qn(e, t, n), ([e, r]) => {
-    try {
-      return [e, Wn((0, v.realpathSync)(Yn(r, t)), t, n)];
-    } catch {
-      return null;
-    }
-  });
-  return Object.fromEntries(r.filter((e) => e != null));
-}
-function qn(e, t, n) {
-  let r = new Map();
-  for (let i of e) {
-    let e = Wn(i, t, n);
-    r.has(e) || r.set(e, i);
-  }
-  return r;
-}
-function Jn(e, t, n) {
-  return bte(e, (e) => Wn(e, t, n));
-}
-function Yn(e, t) {
-  return process.platform !== `win32` || n.Es(t) || !Qn(e) ? e : Vn(e, !0);
-}
-async function Xn(e, t) {
-  let r = Yn(e, t);
-  if (process.platform !== `win32` || n.Es(t) || !n.bl(r)) return r;
-  try {
-    let e = await (0, b.realpath)(r);
-    return n.Ui(e) ? e : r;
-  } catch {
-    return r;
-  }
-}
-async function Zn(e, t) {
-  return [...new Set(await Promise.all(e.map((e) => Xn(e, t))))];
-}
-function yte(e, t) {
-  let n = new Set();
-  return e.map(t).filter((e) => !n.has(e) && (n.add(e), !0));
-}
-function bte(e, t) {
-  let n = {};
-  return (
-    Object.entries(e).forEach(([e, r]) => {
-      let i = t(e);
-      n[i] ?? (n[i] = r);
-    }),
-    n
-  );
-}
-function Qn(e) {
-  return n.Ui(e) || e === `/` || /^\/(?!\/)/.test(e);
-}
-function xte(e, t) {
-  if (!e) return e ?? null;
-  if (!n.Es(t)) return e;
-  let r = t.home_dir;
-  if (!r) return e;
-  let i = (0, p.homedir)();
-  return e === r ? i : e.startsWith(`${r}/`) ? `${i}${e.slice(r.length)}` : e;
-}
-function jr(e) {
-  return n.qo(e.get(n.iu.LOCAL_PROJECTS));
-}
-function Mr(e, t) {
-  let r = null;
-  for (let i of Object.values(jr(e)))
-    i.rootPaths.some((e) => h.default.relative(e, t) === ``) &&
-      (r == null ||
-        n.Ko({ ...i, projectId: i.id, rootPath: t }, { ...r, projectId: r.id, rootPath: t })) &&
-      (r = i);
-  return r;
-}
-function Nr(e) {
-  return e.get(n.iu.SELECTED_PROJECT) ?? null;
-}
-function Pr(e) {
-  let t = Nr(e);
-  return t?.type === `local` ? (jr(e)[t.projectId] ?? null) : null;
-}
-function Fr(e) {
-  let t = jr(e),
-    r = e.get(n.iu.PROJECT_ORDER) ?? [],
-    i = [
-      ...r.flatMap((e) => {
-        let n = t[e];
-        return n == null ? [] : [n];
-      }),
-      ...Object.values(t).filter((e) => !r.includes(e.id)),
-    ],
-    a = [],
-    o = {},
-    s = new Set();
-  for (let e of i)
-    for (let t of e.rootPaths)
-      s.has(t) ||
-        (s.add(t),
-        a.push(t),
-        e.rootPaths.length === 1 && e.name.trim().length > 0 && (o[t] = e.name));
-  return { roots: a, labels: o };
-}
-function Ir(e) {
-  return n.Wo(Pr(e)?.rootPaths) || (Fr(e).roots[0] ?? null);
-}
-function Lr(e, t) {
-  e.set(n.iu.SELECTED_PROJECT, t);
-}
-function Rr(e, t, r) {
-  let i = jr(e),
-    a = i[t];
-  if (a == null) return null;
-  let o = r(a),
-    s = { ...i };
-  return (o == null ? delete s[t] : (s[t] = o), e.set(n.iu.LOCAL_PROJECTS, s), o);
-}
-function Nte(e) {
-  if (e.getStored(n.iu.SELECTED_PROJECT) !== void 0) return;
-  let t = Object.values(jr(e))[0];
-  t != null && Lr(e, { type: `local`, projectId: t.id });
-}
-function Pte(e, t) {
-  let r = e.get(n.iu.REMOTE_PROJECTS) ?? [],
-    i = [],
-    a = {},
-    o = new Set();
-  for (let e of r) {
-    if (e.hostId !== t) continue;
-    let n = e.remotePath.trim();
-    if (n.length === 0) continue;
-    let r = e.label.trim();
-    o.has(n) || (i.push(n), o.add(n), r.length > 0 && (a[n] = r));
-  }
-  return { roots: i, labels: a };
 }
 var zr = 1e4;
 function Br({ startupPhases: e, phase: t, fallback: n, start: r, onError: i }) {

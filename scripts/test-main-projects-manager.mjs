@@ -1,7 +1,16 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import { createProjectsManagerClass } from "../src/main/main-app/projects/projects-manager.ts";
+import { transform } from "esbuild";
+
+const source = fs.readFileSync(
+  new URL("../src/main/main-app/projects/projects-manager.ts", import.meta.url),
+  "utf8",
+);
+const transpiled = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+const loaded = { exports: {} };
+Function("module", "exports", transpiled.code)(loaded, loaded.exports);
+const { createProjectsManagerClass } = loaded.exports;
 
 class Schema {
   parse(value) { return value; }
@@ -218,9 +227,13 @@ assert.equal(messages.some((message) => message.type === "workspace-root-options
 assert.equal(selected.length, 0);
 
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
+const windowContext = fs.readFileSync(
+  new URL("../src/main/main-app/window/window-context.ts", import.meta.url),
+  "utf8",
+);
 assert.match(main, /o8e = createProjectsManagerClass\(\{/);
 assert.doesNotMatch(main, /o8e = class/);
 assert.doesNotMatch(main, /function m2\(/);
-assert.match(main, /this\.projectsManager = new o8e\(/);
+assert.match(windowContext, /this\.projectsManager = new o8e\(/);
 
 console.log("projects manager assertions: 45");
