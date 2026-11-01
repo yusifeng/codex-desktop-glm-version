@@ -131,7 +131,7 @@ export function createWindowContextClass(dependencies) {
     DesktopFetchService,
     Zet,
     Zj,
-    Zk,
+    installEnvironmentConfigRequestUserInputAutoResolution,
     Znt,
     _,
     _$e,
@@ -2091,7 +2091,7 @@ export function createWindowContextClass(dependencies) {
               resourcesPath: u,
             }),
           }),
-          Zk(p, this.scopedState),
+          installEnvironmentConfigRequestUserInputAutoResolution(p, this.scopedState),
           p
         );
       }

@@ -5627,3 +5627,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 主 chunk 旧 `EAe/DAe/OAe/kAe/AAe` 与 `HO..Bk` schema/helper belt 共约 596 行物理删除，并移除零 consumer 的 `Fa/wo`
   插件别名。focused 63 项、Environment Config/marketplace/WindowContext/orchestrator/reconciliation 相邻回归 165 项通过；测试索引
   1848，no-unwired gate 1122 项。
+
+# 2026-11-01 automation update schema and environment request auto-resolution convergence
+
+- 扩展既有 `automations/automation-update-tool.ts`，由同一模块持有 view/create/update/delete、cron/heartbeat、immediate/suggested、
+  worktree compatibility、notification policy、UUID 与 DTSTART safety 的完整输入 schema；主组合根只消费一次构造的 input schema。
+- 新增并接回 `environment-config/request-user-input-auto-resolution.ts`，持有 local-host gate、internal request handler、blocking/
+  existing-timeout gate、scoped config reference 校验和 thread/request id normalization 后的 snooze 顺序；WindowContext 直接消费语义 installer。
+- 主 chunk 旧 `aMe.._Me` schema belt 与 `Yk/Xk/Zk` 共约 137 行物理删除，中间约 6,100 行 YAML vendor 保持原样未拆。
+  focused 60 项、automation tool/service 与 WindowContext 相邻回归 67 项通过；测试索引 1850，no-unwired gate 1151 项。

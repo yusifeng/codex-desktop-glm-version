@@ -1,5 +1,129 @@
-// Semantic automation_update tool executor. The Zod schema remains in the
-// composition root; this module owns validated input projection and mutations.
+// Semantic automation_update input boundary and mutation executor.
+
+export const AUTOMATION_UPDATE_TOOL_NAME = "automation_update";
+
+export function createAutomationUpdateSchemas({
+  schema,
+  notificationPolicySchema,
+  reasoningEffortSchema,
+}: {
+  schema: any;
+  notificationPolicySchema: any;
+  reasoningEffortSchema: any;
+}) {
+  const status = schema
+    .df(["ACTIVE", "PAUSED"])
+    .describe("One of ACTIVE or PAUSED. Default to ACTIVE unless the user asks to start paused.");
+  const requiredText = schema.Of().trim().min(1);
+  const existingRrule = requiredText.describe(
+    "RRULE schedule string. Preserve the existing value for unrelated updates. When changing the schedule, interpret requested times in the user's locale and do not include DTSTART or convert local wall-clock times to UTC; encode them directly with FREQ, BYDAY, BYHOUR, and BYMINUTE. Cron automations use hourly interval or weekly schedules. Heartbeat automations attached to a thread can use minute-based intervals such as FREQ=MINUTELY;INTERVAL=30 or daily/weekly wall-clock schedules.",
+  );
+  const createRrule = requiredText.describe(
+    "RRULE schedule string. Interpret requested times in the user's locale. For mode=create, do not include DTSTART or convert local wall-clock times to UTC; encode them directly with FREQ, BYDAY, BYHOUR, and BYMINUTE. When the user intentionally requests a DTSTART-anchored or timezone-specific schedule, use mode=suggested_create so they can review it before saving. Cron automations use hourly interval or weekly schedules. Heartbeat automations attached to a thread can use minute-based intervals such as FREQ=MINUTELY;INTERVAL=30 or daily/weekly wall-clock schedules.",
+  );
+  const executionEnvironment = schema
+    .df(["worktree", "local"])
+    .describe("Cron automation execution environment. New automations must use local; updates may preserve worktree for existing automations.");
+  const heartbeatDestination = schema
+    .df(["local", "thread"])
+    .describe("Optional automation destination. Use thread for heartbeat automations attached to the current local thread.");
+  const projectId = schema
+    .Of()
+    .trim()
+    .min(1)
+    .nullable()
+    .describe("Cron automations only. The target project id, or null for Threads. Use list_projects to find project ids.");
+  const automationId = requiredText.describe(
+    "Automation id. Required for mode=view, mode=update, mode=delete, and mode=suggested_update. Omit for mode=create and mode=suggested_create.",
+  );
+  const common = schema.Df({
+    name: requiredText.describe("Short human-readable automation name. If the user does not provide one, choose a concise name."),
+    prompt: requiredText.describe(
+      "The automation prompt. Describe only the task itself; do not include schedule, workspace, or thread details because those are provided separately. Keep it self-sufficient, include output expectations when useful, and do not ask it to write a file or announce nothing to do unless the user explicitly asked for that.",
+    ),
+    rrule: existingRrule,
+    status,
+    notificationPolicy: notificationPolicySchema
+      .nullable()
+      .optional()
+      .describe(
+        "Optional notification policy. Use failed_runs_only when the user asks to mute or suppress completed-run notifications. For updates, omit to preserve the existing value and use null only when the user explicitly asks to unmute. On create, omit for the existing default behavior.",
+      ),
+  });
+  const cron = common.extend({
+    kind: schema
+      .bf("cron")
+      .describe("Use cron only when the user explicitly wants each run to start a new task or standalone recurring work against a workspace."),
+    projectId,
+    model: requiredText.describe("Model to use for cron automations."),
+    reasoningEffort: reasoningEffortSchema.describe(
+      "Reasoning effort to use for cron automations. One of none, minimal, low, medium, high, xhigh, max, or ultra.",
+    ),
+  });
+  const heartbeat = common.extend({
+    kind: schema
+      .bf("heartbeat")
+      .describe("Default to heartbeat so recurring runs continue in this thread. Use cron only when the user explicitly wants a new task for each run."),
+    destination: heartbeatDestination.optional(),
+    targetThreadId: requiredText
+      .meta({ format: "uuid" })
+      .describe(
+        "Target thread UUID for heartbeat automations. Prefer destination=thread for the current local thread instead of inventing or copying raw thread ids.",
+      )
+      .optional(),
+  });
+  const view = schema.Df({ mode: schema.bf("view"), id: automationId });
+  const remove = schema.Df({ mode: schema.bf("delete"), id: automationId });
+  const createMode = schema.df(["create", "suggested_create"]);
+  const updateMode = schema.df(["update", "suggested_update"]);
+  const legacyCronFields = {
+    destination: schema.df(["local", "worktree"]).optional(),
+    executionEnvironment,
+    localEnvironmentConfigPath: schema.Of().trim().min(1).nullable().optional(),
+  };
+  const immediateCronCreate = cron.extend({
+    mode: createMode,
+    destination: schema.bf("local").optional(),
+    executionEnvironment: schema.bf("local"),
+    rrule: createRrule,
+  });
+  const legacyCronCreate = cron.extend({ mode: createMode, ...legacyCronFields });
+  const heartbeatCreate = heartbeat
+    .extend({ mode: createMode, rrule: createRrule })
+    .superRefine(validateHeartbeatTarget);
+  const cronUpdate = cron.extend({ mode: updateMode, id: automationId, ...legacyCronFields });
+  const heartbeatUpdate = heartbeat
+    .extend({ mode: updateMode, id: automationId })
+    .superRefine(validateHeartbeatTarget);
+  const immediateCreate = schema
+    .vf("kind", [immediateCronCreate, heartbeatCreate])
+    .refine(
+      ({ mode, rrule }: any) => mode !== "create" || !/(^|[;\n])\s*DTSTART\b/i.test(rrule),
+      {
+        message: "Immediate automation creates cannot include DTSTART because it may change local wall-clock times to UTC. Omit DTSTART, or retry with mode=suggested_create when the user intentionally requested anchored or timezone-specific RFC semantics.",
+        path: ["rrule"],
+      },
+    );
+  const update = schema.vf("kind", [cronUpdate, heartbeatUpdate]);
+  const inputSchema = schema
+    .vf("mode", [view, immediateCreate, update, remove])
+    .refine(
+      (input: any) =>
+        !("targetThreadId" in input) ||
+        input.targetThreadId == null ||
+        schema.Pf().safeParse(input.targetThreadId).success,
+      { message: "Invalid UUID", path: ["targetThreadId"] },
+    )
+    .transform(normalizeAutomationToolInputMode);
+
+  // Preserve construction of the compatibility create schema used by older
+  // worktree callers even though the immediate tool surface consumes inputSchema.
+  schema
+    .vf("mode", [view, schema.vf("kind", [legacyCronCreate, heartbeatCreate]), update, remove])
+    .transform(normalizeAutomationToolInputMode);
+
+  return { inputSchema, toolName: AUTOMATION_UPDATE_TOOL_NAME };
+}
 
 const MISSING_AUTOMATION = "Automation does not exist in the app and could not be updated. It may have been deleted manually by the user.";
 const NO_FUTURE_RUNS = "Automation schedule has no future runs. Check that its start time, interval, and BYHOUR/BYMINUTE/BYSECOND values can reach a future occurrence.";

@@ -317,7 +317,7 @@ const { applySparseStateWrite, createFetchHandlerStateRuntime } = require("./mai
 const { createWorkspaceDirectoryBrowser } = require("./main-app/workspace/directory-browser.js");
 const { createThirdPartyNoticesReader, createWorkspaceSettingsServiceClass, resolveSystemBackdropSupport } = require("./main-app/settings/workspace-settings-service.js");
 const { createAutomationsServiceClass } = require("./main-app/automations/automations-service.js");
-const { createAutomationUpdateTool, normalizeAutomationToolInputMode, validateHeartbeatTarget } = require("./main-app/automations/automation-update-tool.js");
+const { createAutomationUpdateSchemas, createAutomationUpdateTool } = require("./main-app/automations/automation-update-tool.js");
 const { createHabitatAutomationsServiceClass } = require("./main-app/automations/habitat-automations-service.js");
 const { createHabitatAutomationRuntime } = require("./main-app/automations/habitat-runtime.js");
 const {
@@ -462,6 +462,7 @@ const { createExtensionRecentUseRegistryFactory } = require("./main-app/browser-
 const { createChatGptProjectFilesServiceClass } = require("./main-app/projects/chatgpt-project-files.js");
 const { createEnvironmentConfigServiceClass } = require("./main-app/environment-config/service.js");
 const { createEnvironmentConfigSchemas, ENVIRONMENT_SETUP_SERVER_CONFIGS_KEY } = require("./main-app/environment-config/schemas.js");
+const { createEnvironmentConfigRequestUserInputAutoResolutionInstaller } = require("./main-app/environment-config/request-user-input-auto-resolution.js");
 const { createCodexMicroServiceManagerClass } = require("./main-app/device/codex-micro-service-manager.js");
 const { createArtifactTemplatePickerRuntime } = require("./main-app/artifacts/template-picker-runtime.js");
 const { compileLatexArtifact: QRe, findLatexPluginPath: ize } = require("./main-app/latex/compile.js");
@@ -20325,29 +20326,14 @@ var EnvironmentConfigService = createEnvironmentConfigServiceClass({
   now: Date.now,
   schemas: environmentConfigSchemas,
 });
-var Yk = n.Ef(n.Of(), n.Mf()),
-  Xk = n.wf({ accountId: n.Of().min(1), userId: n.Of().min(1), configId: n.Of().min(1) });
-function Zk(e, t) {
-  n.Cs(e.hostId) &&
-    e.registerInternalServerRequestHandler({
-      methods: [`item/tool/requestUserInput`],
-      handler: (r) => {
-        if (
-          r.method !== `item/tool/requestUserInput` ||
-          r.params.isBlocking === !0 ||
-          r.params.autoResolutionMs != null
-        )
-          return null;
-        let i = Yk.safeParse(t.get(a.J)?.[ENVIRONMENT_SETUP_SERVER_CONFIGS_KEY]);
-        return (
-          i.success &&
-            Xk.safeParse(i.data[r.params.threadId]).success &&
-            e.requestUserInputAutoResolution.snoozeRequest(n.$u(r.params.threadId), n.ed(r.id)),
-          null
-        );
-      },
-    });
-}
+var installEnvironmentConfigRequestUserInputAutoResolution =
+  createEnvironmentConfigRequestUserInputAutoResolutionInstaller({
+    environmentSetupStateKey: a.J,
+    environmentSetupServerConfigsKey: ENVIRONMENT_SETUP_SERVER_CONFIGS_KEY,
+    isLocalHostId: n.Cs,
+    normalizeThreadId: n.$u,
+    normalizeRequestId: n.ed,
+  });
 var CodexMicroServiceManager = createCodexMicroServiceManagerClass({
   logger: r.r(`CodexMicroServiceManager`),
   loadServiceClass: () =>
@@ -26488,118 +26474,11 @@ var loadArtifactTemplatePickerConfig = createArtifactTemplatePickerRuntime({
   resolveDevResourcesPath: (resourcesPath) => o.t({ env: process.env, resourcesPath }),
   resolveNodeExecutable: n.Ln,
 });
-var aMe = n
-    .df([`ACTIVE`, `PAUSED`])
-    .describe(`One of ACTIVE or PAUSED. Default to ACTIVE unless the user asks to start paused.`),
-  XN = n.Of().trim().min(1),
-  oMe = XN.describe(
-    `RRULE schedule string. Preserve the existing value for unrelated updates. When changing the schedule, interpret requested times in the user's locale and do not include DTSTART or convert local wall-clock times to UTC; encode them directly with FREQ, BYDAY, BYHOUR, and BYMINUTE. Cron automations use hourly interval or weekly schedules. Heartbeat automations attached to a thread can use minute-based intervals such as FREQ=MINUTELY;INTERVAL=30 or daily/weekly wall-clock schedules.`,
-  ),
-  ZN = XN.describe(
-    `RRULE schedule string. Interpret requested times in the user's locale. For mode=create, do not include DTSTART or convert local wall-clock times to UTC; encode them directly with FREQ, BYDAY, BYHOUR, and BYMINUTE. When the user intentionally requests a DTSTART-anchored or timezone-specific schedule, use mode=suggested_create so they can review it before saving. Cron automations use hourly interval or weekly schedules. Heartbeat automations attached to a thread can use minute-based intervals such as FREQ=MINUTELY;INTERVAL=30 or daily/weekly wall-clock schedules.`,
-  ),
-  sMe = n
-    .df([`worktree`, `local`])
-    .describe(
-      `Cron automation execution environment. New automations must use local; updates may preserve worktree for existing automations.`,
-    ),
-  cMe = n
-    .df([`local`, `thread`])
-    .describe(
-      `Optional automation destination. Use thread for heartbeat automations attached to the current local thread.`,
-    ),
-  lMe = n
-    .Of()
-    .trim()
-    .min(1)
-    .nullable()
-    .describe(
-      `Cron automations only. The target project id, or null for Threads. Use list_projects to find project ids.`,
-    ),
-  QN = XN.describe(
-    `Automation id. Required for mode=view, mode=update, mode=delete, and mode=suggested_update. Omit for mode=create and mode=suggested_create.`,
-  ),
-  $N = n.Df({
-    name: XN.describe(
-      `Short human-readable automation name. If the user does not provide one, choose a concise name.`,
-    ),
-    prompt: XN.describe(
-      `The automation prompt. Describe only the task itself; do not include schedule, workspace, or thread details because those are provided separately. Keep it self-sufficient, include output expectations when useful, and do not ask it to write a file or announce nothing to do unless the user explicitly asked for that.`,
-    ),
-    rrule: oMe,
-    status: aMe,
-    notificationPolicy: n.gd
-      .nullable()
-      .optional()
-      .describe(
-        `Optional notification policy. Use failed_runs_only when the user asks to mute or suppress completed-run notifications. For updates, omit to preserve the existing value and use null only when the user explicitly asks to unmute. On create, omit for the existing default behavior.`,
-      ),
-  }),
-  eP = $N.extend({
-    kind: n
-      .bf(`cron`)
-      .describe(
-        `Use cron only when the user explicitly wants each run to start a new task or standalone recurring work against a workspace.`,
-      ),
-    projectId: lMe,
-    model: XN.describe(`Model to use for cron automations.`),
-    reasoningEffort: n._d.describe(
-      `Reasoning effort to use for cron automations. One of none, minimal, low, medium, high, xhigh, max, or ultra.`,
-    ),
-  }),
-  tP = $N.extend({
-    kind: n
-      .bf(`heartbeat`)
-      .describe(
-        `Default to heartbeat so recurring runs continue in this thread. Use cron only when the user explicitly wants a new task for each run.`,
-      ),
-    destination: cMe.optional(),
-    targetThreadId: XN.meta({ format: `uuid` })
-      .describe(
-        `Target thread UUID for heartbeat automations. Prefer destination=thread for the current local thread instead of inventing or copying raw thread ids.`,
-      )
-      .optional(),
-  }),
-  nP = n.Df({ mode: n.bf(`view`), id: QN }),
-  rP = n.Df({ mode: n.bf(`delete`), id: QN }),
-  iP = n.df([`create`, `suggested_create`]),
-  aP = n.df([`update`, `suggested_update`]),
-  oP = {
-    destination: n.df([`local`, `worktree`]).optional(),
-    executionEnvironment: sMe,
-    localEnvironmentConfigPath: n.Of().trim().min(1).nullable().optional(),
-  },
-  uMe = eP.extend({
-    mode: iP,
-    destination: n.bf(`local`).optional(),
-    executionEnvironment: n.bf(`local`),
-    rrule: ZN,
-  }),
-  dMe = eP.extend({ mode: iP, ...oP }),
-  sP = tP.extend({ mode: iP, rrule: ZN }).superRefine(validateHeartbeatTarget),
-  fMe = eP.extend({ mode: aP, id: QN, ...oP }),
-  pMe = tP.extend({ mode: aP, id: QN }).superRefine(validateHeartbeatTarget),
-  mMe = n
-    .vf(`kind`, [uMe, sP])
-    .refine(({ mode: e, rrule: t }) => e !== `create` || !/(^|[;\n])\s*DTSTART\b/i.test(t), {
-      message: `Immediate automation creates cannot include DTSTART because it may change local wall-clock times to UTC. Omit DTSTART, or retry with mode=suggested_create when the user intentionally requested anchored or timezone-specific RFC semantics.`,
-      path: [`rrule`],
-    }),
-  cP = n.vf(`kind`, [fMe, pMe]),
-  hMe = n
-    .vf(`mode`, [nP, mMe, cP, rP])
-    .refine(
-      (e) =>
-        !(`targetThreadId` in e) ||
-        e.targetThreadId == null ||
-        n.Pf().safeParse(e.targetThreadId).success,
-      { message: `Invalid UUID`, path: [`targetThreadId`] },
-    ),
-  gMe = n.vf(`kind`, [dMe, sP]),
-  _Me = n.vf(`mode`, [nP, gMe, cP, rP]),
-  lP = hMe.transform(normalizeAutomationToolInputMode);
-_Me.transform(normalizeAutomationToolInputMode);
-var vMe = `automation_update`;
+var { inputSchema: lP, toolName: vMe } = createAutomationUpdateSchemas({
+  schema: n,
+  notificationPolicySchema: n.gd,
+  reasoningEffortSchema: n._d,
+});
 n.yf().parse(n.Rf(lP, { io: `input`, reused: `ref` }));
 var CMe = createAutomationsServiceClass({
   DisposableBase: n.Uf,
@@ -46659,7 +46538,7 @@ var G5 = r.r(`WindowContext`),
     DesktopFetchService,
     Zet,
     Zj,
-    Zk,
+    installEnvironmentConfigRequestUserInputAutoResolution,
     Znt,
     _,
     _$e,

@@ -74,6 +74,7 @@ const realOwners = [
   ["src/main/main-app/browser-use/iab-capabilities.ts", "createIabCapabilityRuntime"],
   ["src/main/main-app/automations/habitat-runtime.ts", "createHabitatAutomationRuntime"],
   ["src/main/main-app/automations/automation-update-tool.ts", "createAutomationUpdateTool"],
+  ["src/main/main-app/automations/automation-update-tool.ts", "createAutomationUpdateSchemas"],
   ["src/main/main-app/artifacts/template-picker-runtime.ts", "createArtifactTemplatePickerRuntime"],
   ["src/main/main-app/latex/compile.ts", "compileLatexArtifact"],
   ["src/main/main-app/plugins/download-internal-plugins.ts", "downloadInternalPlugins"],
@@ -117,6 +118,7 @@ const realOwners = [
   ["src/main/main-app/projects/chatgpt-project-files.ts", "createChatGptProjectFilesServiceClass"],
   ["src/main/main-app/environment-config/service.ts", "createEnvironmentConfigServiceClass"],
   ["src/main/main-app/environment-config/schemas.ts", "createEnvironmentConfigSchemas"],
+  ["src/main/main-app/environment-config/request-user-input-auto-resolution.ts", "createEnvironmentConfigRequestUserInputAutoResolutionInstaller"],
   ["src/main/main-app/plugins/chrome-native-host-service.ts", "createChromeNativeHostServiceClass"],
   ["src/main/main-app/device/codex-micro-service-manager.ts", "createCodexMicroServiceManagerClass"],
   ["src/main/main-app/import/external-agent-import.ts", "createExternalAgentImportHandlers"],
@@ -1061,7 +1063,7 @@ assert.equal(main.includes("OAe = createChromeNativeHostServiceClass({"), true, 
 assert.equal(main.includes('require("./main-app/environment-config/schemas.js")'), true, "environment-config schemas are wired");
 assert.equal(main.includes("environmentConfigSchemas = createEnvironmentConfigSchemas(n)"), true, "environment-config schemas are composed once");
 assert.equal(main.includes("schemas: environmentConfigSchemas"), true, "EnvironmentConfigService consumes the semantic schema owner");
-assert.equal(main.includes("t.get(a.J)?.[ENVIRONMENT_SETUP_SERVER_CONFIGS_KEY]"), true, "request auto-resolution consumes the semantic config key");
+assert.equal(main.includes("environmentSetupServerConfigsKey: ENVIRONMENT_SETUP_SERVER_CONFIGS_KEY"), true, "request auto-resolution consumes the semantic config key");
 assert.equal(/^var OAe = class/m.test(main), false, "generated Chrome native-host service must be removed");
 for (const generatedName of ["kAe", "AAe", "uk", "dk"]) {
   assert.equal(
@@ -1079,5 +1081,24 @@ for (const generatedSchema of ["EAe", "DAe", "HO", "UO", "WO", "GO", "YO", "XO",
 }
 assert.equal(main.includes("reconcileBundledPluginsMarketplace: Fa"), false, "dead marketplace reconcile alias must stay removed");
 assert.equal(main.includes("syncCuaSkillsForPlugins: wo"), false, "dead CUA skill sync alias must stay removed");
+assert.equal(main.includes("createAutomationUpdateSchemas({"), true, "automation update schemas are composed");
+assert.equal(main.includes("createAutomationUpdateTool({ inputSchema: lP, toolName: vMe })"), true, "automation service consumes the semantic update schema");
+assert.equal(main.includes("normalizeAutomationToolInputMode, validateHeartbeatTarget"), false, "automation schema internals must not leak into the composition root");
+for (const generatedSchema of [
+  "aMe", "XN", "oMe", "ZN", "sMe", "cMe", "lMe", "QN", "$N", "eP", "tP", "nP", "rP", "mMe", "hMe", "_Me",
+]) {
+  const escapedName = generatedSchema.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  assert.equal(
+    new RegExp(`^[ ]{0,2}${escapedName} = `, "m").test(main),
+    false,
+    `generated automation update schema ${generatedSchema} must be removed`,
+  );
+}
+assert.equal(main.includes('require("./main-app/environment-config/request-user-input-auto-resolution.js")'), true, "environment request auto-resolution is wired");
+assert.equal(main.includes("createEnvironmentConfigRequestUserInputAutoResolutionInstaller({"), true, "environment request auto-resolution is composed");
+assert.equal(windowContext.includes("installEnvironmentConfigRequestUserInputAutoResolution(p, this.scopedState)"), true, "WindowContext consumes semantic auto-resolution installer");
+assert.equal(/^function Zk\(/m.test(main), false, "generated request auto-resolution installer must be removed");
+assert.equal(/^[ ]{0,2}Yk = /m.test(main), false, "generated environment setup record schema must be removed");
+assert.equal(/^[ ]{0,2}Xk = /m.test(main), false, "generated environment config reference schema must be removed");
 
-console.log("1122 main unwired-owner skeleton assertions passed");
+console.log("1151 main unwired-owner skeleton assertions passed");

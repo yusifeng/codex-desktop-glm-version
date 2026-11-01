@@ -3805,3 +3805,16 @@ resourcesPath fail-fast、codexHome 与 reconcile/uninstall 顺序；WindowConte
 主 chunk 原 `EAe/DAe/OAe/kAe/AAe` 以及 `HO..Bk` schema/helper belt 共约 596 行已物理删除，两个零 consumer 插件 import alias
 `Fa/wo` 也已清理。新生产模块合计 712 行；focused 44 + 19 项，相邻 Environment Config service、marketplace、WindowContext、
 plugin orchestrator/reconciliation 共 165 项回归通过。测试索引增至 1848，no-unwired gate 扩至 1122 项。
+
+### 既有 owner 收敛：automation update schema 与 environment request auto-resolution
+
+`automations/automation-update-tool.ts` 现同时持有 mutation executor 和其真实输入边界：view/delete、cron/heartbeat create/update、
+immediate/suggested mode normalization、local/worktree compatibility、notification policy、reasoning effort、heartbeat target UUID、缺失 target
+以及 immediate create 的 DTSTART safety 均在同一语义模块构造。主组合根只保留 schema-to-tool 注入和原有 schema introspection gate，
+不再展开机械 `aMe.._Me` definitions。
+
+新增 `environment-config/request-user-input-auto-resolution.ts`，完整持有 local execution-host gate、`item/tool/requestUserInput` 注册、
+blocking/already-timed request 排除、scoped environment config reference 校验、thread/request id normalization 与 snooze 调用。WindowContext
+直接消费 semantic installer，旧 `Yk/Xk/Zk` 已删除。两块合计从主 chunk 物理删除约 137 行；中间 bundled YAML vendor 约 6,100 行
+有明确第三方边界，保持不拆。focused 42 + 18 项，automation tool/service 与 WindowContext 67 项相邻回归通过；测试索引增至
+1850，no-unwired gate 扩至 1151 项。
