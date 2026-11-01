@@ -3111,8 +3111,10 @@ declare module "@rchunk/app-initial" {
   export interface ComposerEditorLike {
     focus?(): void;
     hasText(): boolean;
+    setPromptText?(text: string): void;
     view: { state: unknown };
   }
+  export const $9t: (position: number) => number;
   export const $Bt: () => void;
   export const HZ: () => ComposerEditorLike;
   export const M9: () => void;
@@ -3123,6 +3125,11 @@ declare module "@rchunk/app-initial" {
     unknown[]
   >;
   export const RIt: () => void;
+  export const PIt: import("@rchunk/app-shared").ScopedSignalFamily<
+    Record<string, unknown>,
+    unknown,
+    unknown[]
+  >;
   export const UZ: <Value>(
     value: Value | undefined,
     predicate: (value: Value) => boolean,
@@ -3146,6 +3153,16 @@ declare module "@rchunk/app-initial" {
   export const v2: import("@rchunk/app-shared").ScopedSignal<
     Record<string, unknown>,
     unknown
+  >;
+  export const xIt: import("@rchunk/app-shared").ScopedSignalFamily<
+    Record<string, unknown>,
+    unknown,
+    boolean
+  >;
+  export const yIt: import("@rchunk/app-shared").ScopedSignalFamily<
+    Record<string, unknown>,
+    unknown,
+    unknown[]
   >;
   export const vln: () => void;
   export const y2: () => void;
@@ -5006,6 +5023,13 @@ declare module "@rchunk/confirm-subscription-upgrade" {
 }
 
 declare module "@rchunk/app-primary" {
+  export const Ia: unknown;
+  export const La: () => void;
+  export const au: () => void;
+  export const ru: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    conversationId: unknown,
+  ) => void;
   /** Pull-request comment markdown renderer and initializer. */
   export const af: () => void;
   const PullRequestMarkdownRenderer: (props: Record<string, unknown>) => unknown;

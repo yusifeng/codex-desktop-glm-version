@@ -653,9 +653,15 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   "form-options-1e57f86b2564.js",
   "status-4490b546d383.js",
   "codex-mobile-setup-flow-97da9896ea18.js",
-  "plugin-picker-menu-content-a51d37a29207.js",
   "exec-shell-container-acf07586aee6.js",
   "google-logo-fc56f9e3f0e8.js",
+  "followup-suggestions-822629129cd6.js",
+  "composer-project-picker-content-e81ba084d408.js",
+  "composer-work-home-plugins-control-8beac401e5e1.js",
+  "home-suggestion-list-1614a03f93b0.js",
+  "home-composer-mode-toggle-ceb4980e314e.js",
+  "home-suggestion-surface-6b043b722abb.js",
+  "composer-action-bar-run-location-dropdown-4c846a804c36.js",
   "usd-5d2c7710cf01.js",
 ]);
 
