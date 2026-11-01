@@ -1,5 +1,12 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成主 chunk orphaned vendor/dead dependency belt 收敛：turn-submission 旧岛删除后，原 Immer patch/produce、lodash omit、
+pagination schema、Marked/Moo directive parser 与 Alea 入口均已无主 chunk consumer；其业务能力分别由 `threads/operations.ts`、
+`threads/start-config.ts`、`threads/maybe-resume.ts`、`util/lodash-interop.ts`、`markdown/writing-blocks.ts` 和独立 semantic vendor 模块
+真实消费。引用审计确认连续区间无外部出口后，整段 3,630 行孤立副本物理删除，主 chunk 缩至 46,745 行。
+thread/turn/markdown 七组行为回归共 281 项、防回退 1234 项及 typecheck 通过。
+测试索引 1855、chunk verify 11/11 与全量 `npm run check` 同步通过。
+
 完成 conversation turn-submission 与 writing-block dead belt 收敛：当前唯一 runtime consumers 已真实使用
 `conversation/turn-submission.ts` 的 safety-buffer retry、follow-up、conversation creation + first turn、continuation owners，并通过
 `markdown/writing-blocks.ts` 复用编辑快照上下文。引用图确认主 chunk 原 `wxe/Txe/Exe/Dxe`、`eC` 及其私有 marked-directive

@@ -1191,5 +1191,19 @@ for (const oldTurnOwner of [
 ]) {
   assert.equal(main.includes(oldTurnOwner), false, `${oldTurnOwner} generated turn-submission belt must stay removed`);
 }
+for (const orphanedVendorEntry of [
+  "immer-nothing",
+  "function Lhe(",
+  "var gb =",
+  "function bb(",
+  "Bb = e.a(",
+  "var Lye =",
+  "function Bx(",
+  "var NS =",
+  "PS = e.a(",
+  "var FS =",
+]) {
+  assert.equal(main.includes(orphanedVendorEntry), false, `${orphanedVendorEntry} orphaned vendor belt must stay removed`);
+}
 
-console.log("1224 main unwired-owner skeleton assertions passed");
+console.log("1234 main unwired-owner skeleton assertions passed");

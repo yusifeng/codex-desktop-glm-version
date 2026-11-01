@@ -1,5 +1,16 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 orphaned vendor dependency belt removal
+
+删除 turn-submission/writing-block 旧岛后，紧邻的 bundled Immer、lodash omit、Marked/Moo directive parser、Alea 以及原
+side-conversation/token-budget/pagination glue 已没有主 chunk consumer。对应业务路径现由 `threads/operations.ts`、
+`threads/start-config.ts`、`threads/maybe-resume.ts`、`util/lodash-interop.ts`、`markdown/writing-blocks.ts` 与 semantic vendor
+模块真实持有；AST/ref search 未发现区间外入口，因此连续 3,630 行孤立副本整带删除。当前 main 为 46,745 行。
+
+thread operations 52、start config 55、maybe-resume 56、fork rollback 27、turn-submission 54、markdown 37、防回退 1234 项
+均通过，typecheck 通过；防回退 gate 锁定十个旧 vendor/glue 入口不得回流。
+测试索引 1855、chunk verify 11/11 与全量 build check 同步通过。
+
 ## 2026-11-01 conversation turn-submission dead belt convergence
 
 主 chunk 仍残留原 `wxe/Txe/Exe/Dxe` turn-submission owners、`eC` writing-block context 及其专用 marked-directive 适配带，
