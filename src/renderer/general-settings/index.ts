@@ -26,7 +26,7 @@
 // file-diff/import-settings-gate/middle-truncated-text/notifications-settings/
 // permissions-mode-visibility/plugins-settings-row/settings-route-state）。
 
-import { $3 as runtimeLazy } from "@rchunk/app-shared";
+import { $3 as runtimeLazy, I3 as getJsxRuntime } from "@rchunk/app-shared";
 import { default as fileDiff } from "@rchunk/file-diff-alt";
 import { default as chatgptAccentMessages } from "@rchunk/chatgpt-accent-messages";
 import { default as dockIconSettingVisibility } from "@rchunk/dock-icon-setting-visibility";
@@ -120,13 +120,13 @@ function HotkeyWindowSettings(): SettingsViewNode | null {
 }
 
 /** 外部 Agent 导入设置区（原 `is`，导出 i）。 */
-function ImportSettingsSection(): SettingsViewNode {
-  return { kind: "settings-import-section" };
+function ImportSettingsSection(): unknown {
+  return getJsxRuntime().jsx("section", { "data-settings-import-section": true, children: getJsxRuntime().jsx("h3", { children: "Import from other agents" }) });
 }
 
 /** 会话详情级设置区（原 `ds`，导出 n；STEPS_COMMANDS 判定）。 */
-function ConversationDetailSettings(): SettingsViewNode {
-  return { kind: "settings-conversation-detail" };
+function ConversationDetailSettings(): unknown {
+  return getJsxRuntime().jsx("section", { "data-settings-conversation-detail": true, children: getJsxRuntime().jsx("h3", { children: "Conversation detail" }) });
 }
 
 /**
@@ -135,30 +135,21 @@ function ConversationDetailSettings(): SettingsViewNode {
  * 回车行为 + daybreak + projectless + 通知 + Mac 菜单栏 + 电源 + 跟进队列 +
  * 实验性。
  */
-function GeneralSettingsPage(): SettingsViewNode {
-  return {
-    kind: "general-settings-page",
-    props: {
-      sections: {
-        appearance: true,
-        daybreak: true,
-        enterBehavior: true,
-        externalAgentImport: true,
-        experimental: true,
-        macMenuBar: true,
-        notifications: true,
-        popoutWindows: true,
-        power: true,
-        projectless: true,
-      } satisfies GeneralSettingsSections,
-      themeOptions: THEME_OPTIONS,
-      themePreviewColors: THEME_PREVIEW_COLORS,
-    },
-  };
+function GeneralSettingsPage(): unknown {
+  const jsx = getJsxRuntime();
+  const sections = ["Appearance", "Enter behavior", "Daybreak", "Projectless tasks", "Notifications", "Pop-out windows", "Mac menu bar", "Power", "Experimental"];
+  return jsx.jsxs("section", { "data-general-settings-page": true, children: [
+    jsx.jsx("h2", { children: "General" }),
+    jsx.jsx("div", { "data-theme-options": THEME_OPTIONS.map((option) => option.id).join(","), "data-theme-preview-colors": Object.keys(THEME_PREVIEW_COLORS).join(",") }),
+    sections.map((label) => jsx.jsxs("section", { children: [jsx.jsx("h3", { children: label }), jsx.jsx("div", { "data-general-settings-section": label })] }, label)),
+    jsx.jsx(ImportSettingsSection, {}),
+    jsx.jsx(ConversationDetailSettings, {}),
+  ] });
 }
 
 /** 主初始化器（原 `ec`，导出 o）。 */
-function initializeGeneralSettings(): void {}
+let initialized = false;
+function initializeGeneralSettings(): void { if (initialized) return; initialized = true; for (const dependency of [runtimeLazy, appInitialInit, appPrimaryInit]) if (typeof dependency === "function") dependency(); void getJsxRuntime(); }
 
 // ---------------------------------------------------------------------------
 // 原版压缩导出名（chunk 间契约）

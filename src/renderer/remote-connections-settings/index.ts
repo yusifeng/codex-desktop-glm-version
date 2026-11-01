@@ -16,7 +16,7 @@
 //
 // 依赖：9 文件（6 个新登记）。
 
-import { $3 as runtimeLazy } from "@rchunk/app-shared";
+import { $3 as runtimeLazy, I3 as getJsxRuntime } from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
 import { default as chatgptDesktopAuthUrl } from "@rchunk/chatgpt-desktop-auth-url";
 import { default as codexMobileSetupDialog } from "@rchunk/codex-mobile-setup-dialog";
@@ -67,22 +67,15 @@ export interface ConnectionEditorMode {
  * SSH/WSL 连接双表 + 远程控制（授权状态 + 环境登记 + 1:1 配对）+
  * 连接编辑器（route draft → add 模式）+ codex-mobile 配对 + 刷新。
  */
-export function RemoteConnectionsSettings(props: { routeDraft?: { draft?: unknown; hostId?: string | null } | null }): RemoteConnectionsViewNode {
+export function RemoteConnectionsSettings(props: { routeDraft?: { draft?: unknown; hostId?: string | null } | null }): unknown {
   const editorMode: ConnectionEditorMode | null =
     props.routeDraft != null && props.routeDraft.hostId == null
       ? { mode: "add", draft: props.routeDraft.draft }
       : null;
-  return {
-    kind: "remote-connections-settings",
-    props: {
-      editorMode,
-      refreshLabel: "Refresh",
-      sections: {
-        codexMobilePairing: true,
-        remoteControl: true,
-        sshConnections: true,
-        wslConnections: true,
-      },
-    },
-  };
+  const jsx = getJsxRuntime();
+  return jsx.jsxs("section", { "data-remote-connections-settings": true, children: [
+    jsx.jsxs("header", { children: [jsx.jsx("h2", { children: "Remote connections" }), jsx.jsx("button", { type: "button", children: "Refresh" })] }),
+    editorMode == null ? null : jsx.jsx("div", { "data-connection-editor-mode": editorMode.mode, children: "Add connection" }),
+    ["SSH connections", "WSL connections", "Remote control", "Codex mobile pairing"].map((label) => jsx.jsxs("section", { children: [jsx.jsx("h3", { children: label }), jsx.jsx("div", { "data-remote-connection-section": label })] }, label)),
+  ] });
 }

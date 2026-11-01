@@ -1,4 +1,5 @@
 import "@rchunk/rolldown-runtime";
+import "@rchunk/values";
 import * as sharedChunk from "@rchunk/app-shared";
 import * as initialChunk from "@rchunk/app-initial";
 import {
