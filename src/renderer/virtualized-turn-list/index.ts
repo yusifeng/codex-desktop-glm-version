@@ -86,9 +86,25 @@ import {
   x_ as useIconScaleContext,
   y_ as iconScaleInit,
 } from "@rchunk/app-shared";
-import { n as threadVirtualizerInit, i as computeVisibleRange, t as computeTurnLayout, a as rangeForAnchor } from "@rchunk/thread-virtualizer";
-import { r as useThreadScrollController } from "@rchunk/thread-scroll-controller-context-value";
+import {
+  a as rangeForAnchor,
+  i as computeVisibleRange,
+  n as distanceForAnchor,
+  o as threadVirtualizerInit,
+  r as centerDistanceForTurn,
+  t as computeTurnLayout,
+} from "@rchunk/thread-virtualizer";
+import { n as threadScrollContextInit, r as useThreadScrollController } from "@rchunk/thread-scroll-controller-context-value";
 import { $en as panelLayerLazy, bS as panelContentSurface, CS as panelComponentLazy } from "@rchunk/app-initial";
+import * as initialChunk from "@rchunk/app-initial";
+
+let reactRuntime: any;
+let jsx: any;
+let MemoizedVirtualizedTurnRow: any;
+let virtualizedTurnListInitialized = false;
+function callInitializer(value: unknown): void { if (typeof value === "function") value(); }
+function stable<T extends (...args: any[]) => any>(callback: T): T { return (useScopeAtomHook as unknown as (value: T) => T)(callback); }
+function resizeEntryBounds(entry: ResizeObserverEntry): { height: number } { return (initialChunk as any).jat(entry); }
 
 // ---------------------------------------------------------------------------
 // 常量（原 `xt` 初始化器）
@@ -282,7 +298,7 @@ function pickRestoreMeasurements(measuredHeightsByKey: Record<string, number | u
     if (height != null) heights[key] = height;
   }
   // 锚定键：首个保留键（原版从 range.startIndex 起的保留集序）。
-  const anchorKey = retainedTurnKeys.find((key) => key != null);
+  const anchorKey = retainedTurnKeys[range.startIndex];
   return Object.keys(heights).length === 0 || anchorKey == null
     ? null
     : { renderedWindow: { anchorKey, count: range.endIndex - range.startIndex }, turnHeightsByKey: heights };
@@ -294,17 +310,16 @@ function pickRestoreMeasurements(measuredHeightsByKey: Record<string, number | u
 
 /** zoom 换算（原 `b`）。 */
 function scalePx(value: number, windowZoom: number): number {
-  return windowZoom === 1 ? value : Math.round(value / windowZoom);
+  return windowZoom === 1 ? value : value / windowZoom;
 }
 
 /** turn 的滚动距离（原 `ut`）。 */
 function scrollDistanceForTurn({ align, layout, turnKey, viewportHeightPx }: { align: "top" | "center"; layout: ReturnType<typeof computeTurnLayout>; turnKey: string; viewportHeightPx: number }): number | null {
+  if (align === "center") return centerDistanceForTurn({ layout, turnKey, viewportHeightPx });
   const index = layout.turnIndexByKey.get(turnKey);
   return index == null
     ? null
-    : align === "center"
-      ? Math.max(0, (layout.bottomOffsetsPx[index] ?? 0) + (layout.heightsPx[index] ?? 0) / 2 - viewportHeightPx / 2)
-      : Math.max(0, (layout.bottomOffsetsPx[index] ?? 0) + (layout.heightsPx[index] ?? 0) - TOP_ALIGN_PADDING_PX);
+    : Math.max(0, (layout.bottomOffsetsPx[index] ?? 0) + (layout.heightsPx[index] ?? 0) - TOP_ALIGN_PADDING_PX);
 }
 
 /** turn 底部距滚动底（原 `lt`）。 */
@@ -367,22 +382,21 @@ function VirtualizedTurnRow({
   observeTurnElement: (turnKey: string, element: Element | null) => void;
 }): unknown {
   const { turnKey } = entry;
-  const rowRef = (element: Element | null) => observeTurnElement(turnKey, element);
+  const rowRef = stable((element: Element | null) => observeTurnElement(turnKey, element));
   const isRetained = retainedTopPx != null;
   const classNames = [isRetained && "absolute inset-x-0", constrainedHeightPx != null && "overflow-hidden"].filter(Boolean).join(" ");
   const height = measuredHeightPx ?? constrainedHeightPx;
   const marginTop = retainedTopPx == null ? gapBeforePx : 0;
   const minHeight = measuredHeightPx == null ? entry.minHeightPx : undefined;
   const style: Record<string, unknown> = { height, marginTop, minHeight, top: retainedTopPx };
-  const react = React as unknown as { jsx(type: unknown, props: Record<string, unknown>): unknown };
-  const content = react.jsx(RowComponent, { entry, latestTurnFooter, latestTurnFollowContentRef });
-  const inner = react.jsx("div", {
+  const content = jsx.jsx(RowComponent, { entry, latestTurnFooter, latestTurnFollowContentRef });
+  const inner = jsx.jsx("div", {
     ref: rowRef,
     className: "[&_[data-virtualized-turn-content]]:[content-visibility:visible]",
     "data-turn-key": turnKey,
     children: content,
   });
-  return react.jsx("div", { className: classNames, style, children: inner });
+  return jsx.jsx("div", { className: classNames, style, children: inner });
 }
 
 // ---------------------------------------------------------------------------
@@ -391,7 +405,18 @@ function VirtualizedTurnRow({
 
 /** 懒初始化器（原 `xt`）：装配常量（幂等；常量已是模块级）。 */
 function initializeVirtualizedTurnList(): void {
-  // 常量（DEFAULT_GAP_PX 等）在模块级定义；此初始化器保持原版调用序契约。
+  if (virtualizedTurnListInitialized) return;
+  virtualizedTurnListInitialized = true;
+  callInitializer(runtimeLazy);
+  callInitializer(intlContextInit);
+  reactRuntime = React();
+  callInitializer(clsxRuntimeInit);
+  callInitializer(iconScaleInit);
+  callInitializer(threadScrollContextInit);
+  callInitializer(iconScaleContextInit);
+  callInitializer(threadVirtualizerInit);
+  jsx = jsxRuntime();
+  MemoizedVirtualizedTurnRow = reactRuntime.memo(VirtualizedTurnRow);
 }
 
 // ---------------------------------------------------------------------------
@@ -408,10 +433,10 @@ interface VirtualizedTurnListProps {
   className?: string;
   gapPx?: number;
   getBottomScrollPaddingPx?: () => number;
-  onLatestTurnHeightChange?: (heightPx: number) => void;
+  onLatestTurnHeightChange?: (change: unknown) => void;
   preserveMeasuredTurnViewport?: boolean;
   getPendingRestoreScrollDistanceFromBottomPx?: () => number | null;
-  restoreScrollDistanceFromBottomPx?: number | null;
+  restoreScrollDistanceFromBottomPx?: (() => void) | null;
   initialRestoreState?: { renderedWindow?: { anchorKey: string; count: number }; turnHeightsByKey?: Record<string, number> } | null;
   latestTurnFooter?: unknown;
   latestTurnFooterKey?: string | null;
@@ -431,25 +456,454 @@ interface VirtualizedTurnListProps {
  * ResizeObserver 循环在 chunk 级联调时接入。
  */
 function VirtualizedTurnList(props: VirtualizedTurnListProps): unknown {
+  initializeVirtualizedTurnList();
   const collapseEmptyRows = props.collapseEmptyRows === true;
   const gapPx = props.gapPx ?? DEFAULT_GAP_PX;
-  const scrollController = useThreadScrollController() as { getLastScrollDistanceFromBottomPx(): number } | null;
-  const viewportHeightPx = RESTORE_VIEWPORT_HEIGHT_PX;
-  const devicePixelRatio = (globalThis as { devicePixelRatio?: number }).devicePixelRatio ?? 1;
-  const pixelScale = viewportHeightPx * devicePixelRatio / viewportHeightPx;
-  void pixelScale;
+  const preserveViewport = props.preserveMeasuredTurnViewport === true;
+  const controller = useThreadScrollController() as any;
+  const windowZoom = (useIconScaleContext as unknown as () => number)();
+  const pixelScale = windowZoom * (globalThis.devicePixelRatio ?? 1);
   const initialHeights = props.initialRestoreState?.turnHeightsByKey ?? EMPTY_MEASUREMENTS;
-  const restoreState = computeRestoreState(
+  const [measuredHeights, setMeasuredHeights] = reactRuntime.useState(initialHeights);
+  const [containerElement, setContainerElementState] = reactRuntime.useState(null);
+  const createInitialRestoreState = () => computeRestoreState(
     props.entries,
-    Math.max(0, (scrollController?.getLastScrollDistanceFromBottomPx() ?? 0) - Math.max(0, props.getBottomScrollPaddingPx?.() ?? 0)),
+    Math.max(0, controller.getLastScrollDistanceFromBottomPx() - Math.max(0, props.getBottomScrollPaddingPx?.() ?? 0)),
     gapPx,
     collapseEmptyRows,
-    props.initialRestoreState,
-    devicePixelRatio,
+    props.initialRestoreState ?? null,
+    pixelScale,
   );
-  void initialHeights;
-  void props;
-  return restoreState as unknown;
+  const [restoreState, setRestoreState] = reactRuntime.useState(createInitialRestoreState);
+  const [pendingTarget, setPendingTarget] = reactRuntime.useState(null);
+  const pendingTargetRef = reactRuntime.useRef(null);
+  const containerRef = reactRuntime.useRef(null);
+  const measuredRef = reactRuntime.useRef(measuredHeights);
+  const restoreRef = reactRuntime.useRef(restoreState);
+  const observedElements = reactRuntime.useRef(new Map());
+  const turnElements = reactRuntime.useRef(new Map());
+  const pendingSyncElements = reactRuntime.useRef(new Map());
+  const followContentHeights = reactRuntime.useRef(new Map());
+  const pendingMeasurement = reactRuntime.useRef(null);
+  const resizeObserverRef = reactRuntime.useRef(null);
+  const visibleReady = reactRuntime.useRef(false);
+  const visibleReadyFrame = reactRuntime.useRef(null);
+  const layout = computeTurnLayout({ collapseEmptyRows, entries: props.entries, gapPx, measuredHeightsByKey: measuredHeights, pixelScale });
+  const layoutRef = reactRuntime.useRef(layout);
+  const effectiveLayoutRef = reactRuntime.useRef(layout);
+  const previousLayoutRef = reactRuntime.useRef(layout);
+  const layoutBeforeMeasurements = reactRuntime.useRef(null);
+
+  reactRuntime.useLayoutEffect(() => {
+    if (measuredHeights !== measuredRef.current) setMeasuredHeights(measuredRef.current);
+  }, [props.entries, gapPx, measuredHeights]);
+  const setContainerElement = stable((element: HTMLElement | null) => {
+    containerRef.current = element;
+    setContainerElementState(element);
+  });
+  const getEffectiveLayout = stable(() => {
+    if (layoutRef.current !== layout) {
+      layoutRef.current = layout;
+      effectiveLayoutRef.current = computeTurnLayout({
+        collapseEmptyRows, entries: props.entries, gapPx,
+        measuredHeightsByKey: measuredRef.current, pixelScale,
+      });
+      if (containerRef.current != null) containerRef.current.style.height = `${effectiveLayoutRef.current.totalHeightPx}px`;
+    }
+    return effectiveLayoutRef.current;
+  });
+
+  let renderedRange = restoreState.renderedRange;
+  if (pendingTarget != null) {
+    const centered = centerDistanceForTurn({ layout, turnKey: pendingTarget.turnKey, viewportHeightPx: restoreState.viewportHeightPx });
+    if (centered != null) renderedRange = computeVisibleRange({ distanceFromBottomPx: centered, layout, overscanCount: OVERSCAN_COUNT, viewportHeightPx: restoreState.viewportHeightPx });
+  } else if (!turnKeysEqual(restoreState.turnKeys, layout.turnKeys)) {
+    const anchor = restoreState.turnKeys[restoreState.renderedRange.startIndex];
+    if (anchor != null) renderedRange = rangeForAnchor({ anchorKey: anchor, layout, previousRange: renderedRange }) ?? renderedRange;
+  }
+
+  const finishRestore = stable(() => { if (pendingMeasurement.current == null) props.restoreScrollDistanceFromBottomPx?.(); });
+  const scheduleVisibleReady = stable(() => {
+    if (props.onVisibleContentReady == null || visibleReady.current || visibleReadyFrame.current != null ||
+        containerRef.current == null || (props.entries.length > 0 && turnElements.current.size === 0)) return;
+    visibleReadyFrame.current = window.requestAnimationFrame(() => {
+      visibleReadyFrame.current = window.requestAnimationFrame(() => {
+        visibleReadyFrame.current = null;
+        if (!visibleReady.current && containerRef.current != null && (props.entries.length === 0 || turnElements.current.size > 0)) {
+          visibleReady.current = true; finishRestore(); props.onVisibleContentReady?.();
+        }
+      });
+    });
+  });
+  const applyMeasurementResult = stable((result: any) => {
+    if (result.latestTurnHeightChange != null) props.onLatestTurnHeightChange?.(result.latestTurnHeightChange);
+    if (result.restoreScrollDistanceFromBottom) finishRestore();
+    else if (result.scrollDistanceFromBottomPx != null) controller.compensateScrollToDistanceFromBottomPx(result.scrollDistanceFromBottomPx);
+  });
+  const reconcileRange = stable((distance: number, viewportHeight: number) => {
+    if (pendingMeasurement.current != null) return;
+    const current = restoreRef.current;
+    const next = reconcileRestoreState({ current, distanceFromBottomPx: distance, layout: getEffectiveLayout(), viewportHeightPx: viewportHeight });
+    if (next !== current) {
+      restoreRef.current = next;
+      if (next.renderedRange.startIndex !== current.renderedRange.startIndex ||
+          next.renderedRange.endIndex !== current.renderedRange.endIndex ||
+          !turnKeysEqual(next.turnKeys, current.turnKeys)) setRestoreState(next);
+    }
+  });
+  const reportViewport = stable((distance: number, viewportHeight: number) => {
+    if (props.onViewportChange == null) return;
+    const currentLayout = getEffectiveLayout();
+    const end = Math.max(0, Math.min(currentLayout.totalHeightPx, currentLayout.totalHeightPx - distance));
+    props.onViewportChange({ viewportEndPx: end, viewportStartPx: Math.max(0, end - viewportHeight) });
+  });
+  const completeTarget = stable((target: any) => {
+    queueMicrotask(() => {
+      if (pendingTargetRef.current === target) {
+        target.complete(); pendingTargetRef.current = null;
+      }
+      setPendingTarget((current: any) => current === target ? null : current);
+    });
+  });
+  const scrollToKey = stable((turnKey: string, getTargetElement?: (element: HTMLElement) => HTMLElement | null, options?: { align?: "top" | "center"; signal?: AbortSignal }) => {
+    if (options?.signal?.aborted) return Promise.resolve();
+    pendingTargetRef.current?.complete();
+    return new Promise<void>(resolve => {
+      let target: any;
+      const abort = () => {
+        if (pendingTargetRef.current === target) {
+          pendingTargetRef.current = null;
+          setPendingTarget((current: any) => current === target ? null : current);
+          target.complete();
+        }
+      };
+      target = {
+        align: options?.align ?? "center", getTargetElement, turnKey,
+        complete() { options?.signal?.removeEventListener("abort", abort); resolve(); },
+      };
+      pendingTargetRef.current = target;
+      setRestoreState(restoreRef.current);
+      setPendingTarget(target);
+      options?.signal?.addEventListener("abort", abort, { once: true });
+    });
+  });
+  const getEntryGeometry = stable((turnKey: string) => {
+    const current = getEffectiveLayout();
+    const index = current.turnIndexByKey.get(turnKey);
+    if (index == null) return null;
+    const start = current.topOffsetsPx[index], height = current.heightsPx[index];
+    return start == null || height == null ? null : { endPx: start + height, startPx: start };
+  });
+  const reportFollowContent = stable(() => {
+    let followContentHeightPx = 0;
+    let lastElement: Element | null = null;
+    for (const [element, height] of followContentHeights.current) {
+      followContentHeightPx += height;
+      if (lastElement == null || lastElement.compareDocumentPosition(element) === Node.DOCUMENT_POSITION_FOLLOWING) lastElement = element;
+    }
+    if (lastElement != null) props.onLatestTurnHeightChange?.({
+      heightDeltaPx: null, heightPx: null,
+      bottomViewportOverflowPx: turnBottomDistanceToScrollBottom({ scrollElement: controller.getScrollElement(), turnElement: lastElement, windowZoom }),
+      turnElement: lastElement, followContentHeightPx,
+    });
+  });
+
+  const updateMeasurements = stable((updates: Map<string, { element: HTMLElement; heightPx: number }>, flush = true) => {
+    const currentLayout = getEffectiveLayout();
+    const pending = pendingMeasurement.current;
+    const previousHeights = measuredRef.current;
+    let nextHeights = previousHeights;
+    let latestHeightDelta = 0;
+    let latestChanged = false;
+    let latestElement: HTMLElement | null = null;
+    let viewportDelta = 0;
+    let collapsedGapChanged = false;
+    const rawDistance = controller.getLastScrollDistanceFromBottomPx();
+    const padding = Math.max(0, props.getBottomScrollPaddingPx?.() ?? 0);
+    const adjustedDistance = Math.max(0, rawDistance - padding);
+    const pendingRestoreDistance = preserveViewport ? null : (props.getPendingRestoreScrollDistanceFromBottomPx?.() ?? null);
+    const anchorDistance = pending == null ? adjustedDistance : restoreRef.current.distanceFromBottomPx;
+    let compensationAnchor = anchorDistance;
+    if (preserveViewport && pendingTargetRef.current == null && props.getPendingRestoreScrollDistanceFromBottomPx?.() == null) {
+      const anchorKey = findRestoreAnchorTurn({
+        distanceFromBottomPx: (pending?.scrollDistanceFromBottomPx ?? rawDistance) - padding,
+        layout: currentLayout, measuredHeightsByKey: previousHeights, nextLayout: currentLayout,
+        viewportHeightPx: restoreRef.current.viewportHeightPx,
+      });
+      const anchorIndex = anchorKey == null ? null : currentLayout.turnIndexByKey.get(anchorKey);
+      if (anchorIndex != null) compensationAnchor = currentLayout.bottomOffsetsPx[anchorIndex] ?? anchorDistance;
+    }
+    for (const [turnKey, update] of updates) {
+      if (turnElements.current.get(turnKey) !== update.element) continue;
+      const measured = Math.max(+!collapseEmptyRows, update.heightPx);
+      const previous = previousHeights[turnKey];
+      if (previous === measured) continue;
+      if (nextHeights === previousHeights) nextHeights = { ...previousHeights };
+      nextHeights[turnKey] = measured;
+      const index = currentLayout.turnIndexByKey.get(turnKey);
+      if (index == null) continue;
+      const isLatest = index === currentLayout.turnKeys.length - 1;
+      const constrained = Math.round(Math.max(props.entries[index]?.minHeightPx ?? 0, measured) * pixelScale) / pixelScale;
+      const delta = constrained - (currentLayout.heightsPx[index] ?? constrained);
+      if (isLatest) {
+        latestChanged = true; latestHeightDelta += previous == null ? 0 : delta; latestElement = update.element;
+      }
+      if (collapseEmptyRows && (constrained === 0 || currentLayout.heightsPx[index] === 0)) collapsedGapChanged = true;
+      const bottomOffset = currentLayout.bottomOffsetsPx[index] ?? 0;
+      if (delta !== 0 && bottomOffset <= compensationAnchor && (preserveViewport || (props.getPendingRestoreScrollDistanceFromBottomPx != null && !isLatest))) viewportDelta += delta;
+    }
+    if (nextHeights === previousHeights) return false;
+    const nextLayout = computeTurnLayout({ collapseEmptyRows, entries: props.entries, gapPx, measuredHeightsByKey: nextHeights, pixelScale });
+    if (collapsedGapChanged) {
+      for (let index = 0; index < nextLayout.gapsBeforePx.length; index++) {
+        const gapDelta = (nextLayout.gapsBeforePx[index] ?? 0) - (currentLayout.gapsBeforePx[index] ?? 0);
+        if (gapDelta !== 0 &&
+            (currentLayout.bottomOffsetsPx[index] ?? 0) + (currentLayout.heightsPx[index] ?? 0) <= compensationAnchor &&
+            (preserveViewport || (props.getPendingRestoreScrollDistanceFromBottomPx != null && index !== currentLayout.turnKeys.length - 1))) viewportDelta += gapDelta;
+      }
+    }
+    const nearBottom = preserveViewport && rawDistance <= (padding > 0 ? 0 : 24);
+    const restoreDistance = pending?.restoreScrollDistanceFromBottom || pendingRestoreDistance != null;
+    let compensatedDistance: number | null = null;
+    if (!restoreDistance) {
+      compensatedDistance = nearBottom ? 0 : viewportDelta === 0
+        ? (pending?.scrollDistanceFromBottomPx ?? null)
+        : (pending?.scrollDistanceFromBottomPx ?? controller.getUnroundedScrollDistanceFromBottomPx(rawDistance)) + viewportDelta;
+    }
+    let stateDistance = restoreRef.current.distanceFromBottomPx;
+    if (restoreDistance) stateDistance = pendingRestoreDistance ?? stateDistance;
+    else if (compensatedDistance != null) stateDistance = Math.max(0, compensatedDistance - padding);
+    const nextRestoreState = reconcileRestoreState({
+      current: restoreRef.current, distanceFromBottomPx: stateDistance,
+      layout: nextLayout, viewportHeightPx: restoreRef.current.viewportHeightPx,
+    });
+    const priorLatest = pending?.latestTurnHeightChange;
+    const turnElement = latestElement ?? priorLatest?.turnElement ?? null;
+    const result = {
+      latestTurnHeightChange: latestChanged || priorLatest != null ? {
+        heightDeltaPx: (priorLatest?.heightDeltaPx ?? 0) + latestHeightDelta,
+        heightPx: nextLayout.heightsPx.at(-1) ?? null,
+        bottomViewportOverflowPx: turnBottomDistanceToScrollBottom({ scrollElement: controller.getScrollElement(), turnElement, windowZoom }),
+        turnElement, followContentHeightPx: null,
+      } : null,
+      restoreScrollDistanceFromBottom: restoreDistance,
+      scrollDistanceFromBottomPx: compensatedDistance,
+      turnHeightsByKey: nextHeights,
+    };
+    const container = containerRef.current;
+    if (latestChanged && updates.size === 1 && pending == null && nextRestoreState === restoreRef.current &&
+        nextLayout.gapsBeforePx.at(-1) === currentLayout.gapsBeforePx.at(-1) && container != null) {
+      measuredRef.current = nextHeights;
+      effectiveLayoutRef.current = nextLayout;
+      previousLayoutRef.current = nextLayout;
+      if (latestElement?.parentElement != null) {
+        latestElement.parentElement.style.height = `${nextLayout.heightsPx.at(-1)}px`;
+        latestElement.parentElement.style.minHeight = "";
+      }
+      container.style.height = `${nextLayout.totalHeightPx}px`;
+      applyMeasurementResult(result);
+      return true;
+    }
+    layoutBeforeMeasurements.current ??= currentLayout;
+    const commit = () => {
+      measuredRef.current = nextHeights; effectiveLayoutRef.current = nextLayout;
+      setMeasuredHeights(nextHeights);
+      if (nextRestoreState !== restoreRef.current) { restoreRef.current = nextRestoreState; setRestoreState(nextRestoreState); }
+    };
+    pendingMeasurement.current = result;
+    if (preserveViewport && nextLayout.totalHeightPx !== currentLayout.totalHeightPx && viewportDelta === 0 && !nearBottom && !restoreDistance) {
+      controller.preserveScrollPositionForNextLayout();
+    }
+    if (flush) (clsxRuntimeInit as unknown as () => { flushSync(callback: () => void): void })().flushSync(commit); else commit();
+    return true;
+  });
+
+  const getResizeObserver = stable(() => {
+    if (resizeObserverRef.current != null) return resizeObserverRef.current;
+    const observer = new ResizeObserver(entries => {
+      const updates = new Map();
+      let followChanged = false;
+      for (const entry of entries) {
+        const observed = observedElements.current.get(entry.target);
+        if (observed == null) continue;
+        const height = resizeEntryBounds(entry).height;
+        if (observed.kind === "turn") updates.set(observed.turnKey, { element: entry.target, heightPx: height });
+        else { followContentHeights.current.set(observed.element, height); followChanged = true; }
+      }
+      updateMeasurements(updates);
+      if (followChanged) reportFollowContent();
+    });
+    resizeObserverRef.current = observer;
+    return observer;
+  });
+  const observeTurnElement = stable((turnKey: string, element: HTMLElement | null) => {
+    if (element == null) return;
+    observedElements.current.set(element, { kind: "turn", turnKey });
+    turnElements.current.set(turnKey, element);
+    pendingSyncElements.current.set(turnKey, element);
+    const observer = getResizeObserver();
+    observer.observe(element);
+    scheduleVisibleReady();
+    return () => {
+      observer.unobserve(element); observedElements.current.delete(element);
+      if (pendingSyncElements.current.get(turnKey) === element) pendingSyncElements.current.delete(turnKey);
+      if (turnElements.current.get(turnKey) === element) turnElements.current.delete(turnKey);
+    };
+  });
+  const measureSynchronousTurn = stable(() => {
+    const turnKey = props.synchronousMeasurementTurnKey ?? props.entries.at(-1)?.turnKey;
+    if (turnKey == null) return;
+    const element = turnElements.current.get(turnKey);
+    if (element == null) return;
+    const height = scalePx(element.getBoundingClientRect().height, windowZoom);
+    if (height > 0) updateMeasurements(new Map<string, { element: HTMLElement; heightPx: number }>([[turnKey as string, { element: element as HTMLElement, heightPx: height }]]), false);
+  });
+  const observeFollowContent = stable((element: HTMLElement | null) => {
+    if (element == null) return;
+    observedElements.current.set(element, { element, kind: "latest-turn-follow-content" });
+    followContentHeights.current.set(element, 0);
+    const observer = getResizeObserver(); observer.observe(element);
+    return () => { observer.unobserve(element); observedElements.current.delete(element); followContentHeights.current.delete(element); };
+  });
+  reactRuntime.useLayoutEffect(() => {
+    const pending = pendingSyncElements.current;
+    if (pending.size === 0) return;
+    pendingSyncElements.current = new Map();
+    const updates = new Map();
+    for (const [turnKey, element] of pending) {
+      if (turnElements.current.get(turnKey) !== element) continue;
+      const height = scalePx(element.getBoundingClientRect().height, windowZoom);
+      if (height > 0) updates.set(turnKey, { element, heightPx: height });
+    }
+    if (updates.size > 0 && updateMeasurements(updates, false)) {
+      for (const [turnKey, element] of pending) if (turnElements.current.get(turnKey) === element) pendingSyncElements.current.set(turnKey, element);
+    }
+  });
+  reactRuntime.useLayoutEffect(() => { if (props.latestTurnSynchronousMeasurementKey != null) measureSynchronousTurn(); }, [props.latestTurnSynchronousMeasurementKey, measureSynchronousTurn]);
+  reactRuntime.useLayoutEffect(() => {
+    const result = pendingMeasurement.current;
+    if (result != null && result.turnHeightsByKey === measuredHeights) {
+      pendingMeasurement.current = null; applyMeasurementResult(result);
+    }
+  }, [applyMeasurementResult, measuredHeights]);
+  reactRuntime.useEffect(() => {
+    props.onApiChange?.({ getEntryGeometry, scrollToKey });
+    return () => props.onApiChange?.(null);
+  }, [getEntryGeometry, props.onApiChange, scrollToKey]);
+  reactRuntime.useEffect(() => {
+    scheduleVisibleReady();
+    return () => { if (visibleReadyFrame.current != null) window.cancelAnimationFrame(visibleReadyFrame.current); visibleReadyFrame.current = null; };
+  }, [props.entries.length, props.onVisibleContentReady, scheduleVisibleReady, containerElement]);
+  reactRuntime.useEffect(() => () => {
+    resizeObserverRef.current?.disconnect(); resizeObserverRef.current = null;
+    observedElements.current.clear(); turnElements.current.clear(); pendingSyncElements.current.clear(); followContentHeights.current.clear();
+    pendingMeasurement.current = null; pendingTargetRef.current?.complete(); pendingTargetRef.current = null;
+  }, []);
+  reactRuntime.useLayoutEffect(() => {
+    if (props.onRestoreStateChange != null) return () => props.onRestoreStateChange?.(
+      pickRestoreMeasurements(measuredRef.current, restoreRef.current.turnKeys, restoreRef.current.renderedRange),
+    );
+  }, [props.onRestoreStateChange]);
+
+  reactRuntime.useLayoutEffect(() => {
+    const element = controller.getScrollElement();
+    if (element == null) return;
+    const viewportHeight = () => element.clientHeight || restoreRef.current.viewportHeightPx || RESTORE_VIEWPORT_HEIGHT_PX;
+    const removeScroll = controller.addScrollListener((distance: number) => reconcileRange(
+      Math.max(0, distance - Math.max(0, props.getBottomScrollPaddingPx?.() ?? 0)), viewportHeight(),
+    ));
+    const removeUser = controller.addUserScrollListener((distance: number) => reportViewport(
+      Math.max(0, distance - Math.max(0, props.getBottomScrollPaddingPx?.() ?? 0)), viewportHeight(),
+    ));
+    const observer = new ResizeObserver(entries => {
+      const entry = entries[0]; if (entry == null) return;
+      const height = resizeEntryBounds(entry).height;
+      reconcileRange(restoreRef.current.distanceFromBottomPx, height); finishRestore();
+    });
+    observer.observe(element);
+    return () => { removeScroll(); removeUser(); observer.disconnect(); };
+  }, [controller.addScrollListener, controller.addUserScrollListener, controller.getScrollElement, finishRestore, props.getBottomScrollPaddingPx, reportViewport, reconcileRange, containerElement]);
+
+  reactRuntime.useLayoutEffect(() => {
+    const target = pendingTarget;
+    if (target == null || pendingTargetRef.current !== target) return;
+    const scrollElement = controller.getScrollElement(); if (scrollElement == null) return;
+    const updates = new Map();
+    for (const [turnKey, element] of turnElements.current) {
+      const height = scalePx(element.getBoundingClientRect().height, windowZoom);
+      if (height > 0) updates.set(turnKey, { element, heightPx: height });
+    }
+    if (updateMeasurements(updates, false) || pendingMeasurement.current != null) return;
+    const turnElement = turnElements.current.get(target.turnKey);
+    const targetElement = turnElement == null ? null : (target.getTargetElement?.(turnElement) ?? turnElement);
+    const distance = turnElement == null || targetElement == null
+      ? scrollDistanceForTurn({ align: target.align, layout, turnKey: target.turnKey, viewportHeightPx: scrollElement.clientHeight })
+      : scrollDistanceForTargetElement({ align: target.align, layout, targetElement, turnElement, turnKey: target.turnKey, viewportHeightPx: scrollElement.clientHeight, windowZoom });
+    if (distance == null) { completeTarget(target); return; }
+    const padding = Math.max(0, props.getBottomScrollPaddingPx?.() ?? 0);
+    controller.scrollToDistanceFromBottomPx(distance + padding, "instant", "user");
+    reconcileRange(distance, scrollElement.clientHeight);
+    completeTarget(target);
+  }, [completeTarget, controller, layout, pendingTarget, props.getBottomScrollPaddingPx, reconcileRange, updateMeasurements, windowZoom]);
+
+  reactRuntime.useLayoutEffect(() => {
+    if (pendingMeasurement.current != null) return;
+    const previousLayout = previousLayoutRef.current;
+    const currentLayout = getEffectiveLayout();
+    const nextLayout = layoutBeforeMeasurements.current ?? currentLayout;
+    layoutBeforeMeasurements.current = null;
+    previousLayoutRef.current = currentLayout;
+    if (!preserveViewport || pendingTarget != null || previousLayout === nextLayout) return;
+    const padding = Math.max(0, props.getBottomScrollPaddingPx?.() ?? 0);
+    const rawDistance = controller.getLastScrollDistanceFromBottomPx();
+    const adjusted = Math.max(0, rawDistance - padding);
+    if ((props.getPendingRestoreScrollDistanceFromBottomPx?.() ?? null) != null || rawDistance <= (padding > 0 ? 0 : 24)) return;
+    const anchor = findRestoreAnchorTurn({
+      distanceFromBottomPx: rawDistance - padding, layout: previousLayout,
+      measuredHeightsByKey: measuredRef.current, nextLayout, viewportHeightPx: restoreRef.current.viewportHeightPx,
+    });
+    if (anchor == null) return;
+    const nextDistance = distanceForAnchor({ anchorKey: anchor, distanceFromBottomPx: adjusted, nextLayout, previousLayout });
+    if (nextDistance != null && nextDistance !== adjusted) {
+      reconcileRange(nextDistance, restoreRef.current.viewportHeightPx);
+      controller.compensateScrollToDistanceFromBottomPx(controller.getUnroundedScrollDistanceFromBottomPx(rawDistance) + nextDistance - adjusted);
+    }
+  }, [controller, getEffectiveLayout, pendingTarget, preserveViewport, props.getBottomScrollPaddingPx, props.getPendingRestoreScrollDistanceFromBottomPx, reconcileRange, layout]);
+  reactRuntime.useLayoutEffect(() => {
+    if (pendingTarget == null && pendingMeasurement.current == null) {
+      reconcileRange(restoreRef.current.distanceFromBottomPx, restoreRef.current.viewportHeightPx);
+      finishRestore();
+      reportViewport(restoreRef.current.distanceFromBottomPx, restoreRef.current.viewportHeightPx);
+    }
+  }, [finishRestore, layout, pendingTarget, reconcileRange, reportViewport]);
+
+  const latestFooterKey = props.latestTurnFooterKey ?? props.entries.at(-1)?.turnKey;
+  const rows = props.entries.slice(renderedRange.startIndex, renderedRange.endIndex)
+    .map((entry, offset) => ({ entry, turnIndex: renderedRange.startIndex + offset }));
+  for (const turnKey of new Set(props.retainedTurnKeys ?? [])) {
+    const index = layout.turnIndexByKey.get(turnKey);
+    if (index == null || (index >= renderedRange.startIndex && index < renderedRange.endIndex)) continue;
+    const entry = props.entries[index]; if (entry != null) rows.push({ entry, turnIndex: index });
+  }
+  rows.sort((left, right) => left.turnIndex - right.turnIndex);
+  const className = intlMessage("relative shrink-0", props.className);
+  const outerStyle = { height: layout.totalHeightPx };
+  const innerStyle = { marginTop: `${layout.topOffsetsPx[renderedRange.startIndex] ?? 0}px` };
+  const rowNodes = rows.map(({ entry, turnIndex }) => jsx.jsx(MemoizedVirtualizedTurnRow, {
+    entry,
+    gapBeforePx: turnIndex === renderedRange.startIndex ? 0 : (layout.gapsBeforePx[turnIndex] ?? 0),
+    retainedTopPx: turnIndex < renderedRange.startIndex || turnIndex >= renderedRange.endIndex ? layout.topOffsetsPx[turnIndex] : undefined,
+    latestTurnFollowContentRef: turnIndex === props.entries.length - 1 && props.onLatestTurnHeightChange != null ? observeFollowContent : undefined,
+    latestTurnFooter: entry.turnKey === latestFooterKey ? props.latestTurnFooter : undefined,
+    RowComponent: props.RowComponent,
+    measuredHeightPx: measuredHeights[entry.turnKey] == null ? undefined : layout.heightsPx[turnIndex],
+    constrainedHeightPx: turnIndex !== props.entries.length - 1 && pendingTarget?.turnKey !== entry.turnKey && measuredHeights[entry.turnKey] == null ? layout.heightsPx[turnIndex] : undefined,
+    observeTurnElement,
+  }, entry.turnKey));
+  return jsx.jsx("div", {
+    ref: setContainerElement, className, style: outerStyle,
+    children: jsx.jsx("div", { className: "flex flex-col", style: innerStyle, children: rowNodes }),
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -458,20 +912,85 @@ function VirtualizedTurnList(props: VirtualizedTurnListProps): unknown {
 
 /** We（导出 a）：useThreadPanelWidthEffects——宽度变化同步面板形态。 */
 function useThreadPanelWidthEffects(panelScope: unknown, mainContentTargetWidth: unknown): void {
-  void panelScope;
-  void mainContentTargetWidth;
+  initializePanelLayer();
+  initializePanelWidthEffects();
+  const useSignal = createQuerySubscriberStore as unknown as (signal: unknown) => any;
+  const layoutDependency = useSignal((initialChunk as any)._bt);
+  const widthDependency = useSignal((initialChunk as any).ybt);
+  const context = reactRuntime.useContext((initialChunk as any).uxt);
+  const createSignal = readAtomSignal as unknown as (value: number) => { get(): number };
+  const fallback = createSignal(0);
+  const widthSignal = (mainContentTargetWidth as any) ?? context?.mainContentTargetWidth ?? fallback;
+  const update = stable((width: number) => setPanelDisplayMode(panelScope as any, panelDisplayModeAtom, width));
+  (subscribeAtomSignal as unknown as (signal: unknown, event: string, listener: (value: number) => void) => void)(widthSignal, "change", update);
+  reactRuntime.useLayoutEffect(() => {
+    setPanelDisplayMode(panelScope as any, panelDisplayModeAtom, widthSignal.get());
+  }, [layoutDependency, widthDependency, widthSignal, panelScope]);
+  reactRuntime.useLayoutEffect(() => () => {
+    (panelScope as any).set(panelDisplayModeAtom, closePopoverState);
+  }, [panelScope]);
 }
 
 /** Ve（导出 c）：面板状态初始化器。 */
-function initializePanelSurfaceState(): void {}
+let panelSurfaceInitialized = false;
+let panelDisplayModeAtom: any;
+let panelIsVisibleFamily: any;
+function initializePanelSurfaceState(): void {
+  if (panelSurfaceInitialized) return;
+  panelSurfaceInitialized = true;
+  callInitializer(panelWidthAtomInit);
+  callInitializer((initialChunk as any).Ebt);
+  callInitializer(i18nInit);
+  callInitializer((initialChunk as any).itn);
+  callInitializer((initialChunk as any).iyt);
+  const defaultState = { displayMode: "overlay", isPopoverOpen: false };
+  panelDisplayModeAtom = (createDerivedFamily as unknown as (root: unknown, value: unknown) => unknown)(usePanelSurfaceApi, defaultState);
+  panelIsVisibleFamily = (createSignalFamily as unknown as (root: unknown, derive: Function) => unknown)(
+    panelLayerLazy,
+    (key: unknown, { get }: { get(signal: unknown, parameter?: unknown): any }) => {
+      if (get((initialChunk as any).uyt)) return false;
+      const normalize = (initialChunk as any).wbt as (value: unknown, key: unknown) => boolean;
+      const pinned = normalize(key === true ? get((initialChunk as any).Fbt) : get((initialChunk as any).Dbt, key), key);
+      const state = get(panelDisplayModeAtom);
+      return panelSurfaceState({
+        displayMode: state.displayMode,
+        isPinned: pinned,
+        isPopoverOpen: state.isPopoverOpen || (typeof key !== "boolean" && pinned),
+      }).visibleSurface != null;
+    },
+  );
+}
 
 /** Me（导出 d）：DynamicIsle 分页列表。 */
 function DynamicIslePaginatedList(props: unknown): unknown {
-  return props;
+  initializeDynamicIsleComponents();
+  return jsx.jsx(panelComponentLazy, { ...(props as Record<string, unknown>), renderPagination: ViewMorePagination });
+}
+function ViewMorePagination({ nextRevealCount, isExpanded, onToggle }: { nextRevealCount: number; isExpanded: boolean; onToggle(): void }): unknown {
+  const Button = (initialChunk as any).TS;
+  const ButtonIcon = (initialChunk as any).DS;
+  const ButtonLabel = (initialChunk as any).ES;
+  return jsx.jsxs(Button, {
+    "aria-expanded": isExpanded, tone: "tertiary", onClick: onToggle,
+    children: [
+      jsx.jsx(ButtonIcon, { variant: "custom", children: jsx.jsx(IconAsset, { asset: panelIsPinnedAtomInit }) }),
+      jsx.jsx(ButtonLabel, { children: isExpanded
+        ? jsx.jsx(FormattedMessage, { id: "codex.dynamicIsle.viewLess", defaultMessage: "View less", description: "Collapse a Dynamic Isle section's full list back to its initial rows" })
+        : jsx.jsx(FormattedMessage, { id: "codex.dynamicIsle.viewMore", defaultMessage: "View {count, number} more", description: "Expand a Dynamic Isle section to show more items. Count is the number of additional items that the next click will reveal.", values: { count: nextRevealCount } }),
+      }),
+    ],
+  });
 }
 
 /** Fe（导出 f）：DynamicIsle 组件初始化器。 */
-function initializeDynamicIsleComponents(): void {}
+let dynamicIsleComponentsInitialized = false;
+function initializeDynamicIsleComponents(): void {
+  if (dynamicIsleComponentsInitialized) return;
+  dynamicIsleComponentsInitialized = true;
+  callInitializer(runtimeLazy); callInitializer(panelIsPinnedFamilyInit); callInitializer(springRuntimeInit);
+  callInitializer(iconRuntimeInit); callInitializer((initialChunk as any).wS); callInitializer((initialChunk as any).OS);
+  jsx ??= jsxRuntime();
+}
 
 /** Z（导出 i）：useThreadPanelContentShift——内容位移动画 hook。 */
 function useThreadPanelContentShift(options?: { contentShiftResetKey?: unknown; isEnabled?: boolean; isFloatingPanelOpen?: boolean; pinStateKey?: unknown }): {
@@ -480,37 +999,139 @@ function useThreadPanelContentShift(options?: { contentShiftResetKey?: unknown; 
   shouldShow: boolean;
   visibleSurface: "inline" | "popover" | null;
 } {
-  void options;
-  return { contentShift: null, shouldHideInlineImmediately: false, shouldShow: false, visibleSurface: null };
+  initializePanelLayer();
+  const { contentShiftResetKey, isEnabled = true, isFloatingPanelOpen = false, pinStateKey = true } = options ?? {};
+  const useSignal = createQuerySubscriberStore as unknown as (signal: unknown) => any;
+  const useKeyedSignal = appSharedLazyInit as unknown as (signal: unknown, key: unknown) => any;
+  const scope = (usePanelWidthContext as unknown as (root: unknown) => any)(usePanelSurfaceApi);
+  const batch = (createAtomApi as unknown as () => (callback: () => void) => void)();
+  const id = reactRuntime.useId();
+  const globalPinned = useSignal(pinStateKey === true ? (initialChunk as any).Fbt : null);
+  const keyedPinned = useKeyedSignal(pinStateKey === true ? null : (initialChunk as any).Dbt, pinStateKey !== true && pinStateKey);
+  const normalize = (initialChunk as any).wbt as (value: unknown, key: unknown) => boolean;
+  const isPinned = normalize(pinStateKey === true ? globalPinned : keyedPinned, pinStateKey);
+  const sessionChanged = useSignal((initialChunk as any).gbt);
+  const routeChanged = useSignal((initialChunk as any).Jbt);
+  const layoutDependency = useSignal((initialChunk as any)._bt);
+  const hidePanel = useSignal((initialChunk as any).uyt);
+  const widthDependency = useSignal((initialChunk as any).ybt);
+  const displayState = useSignal(panelDisplayModeAtom);
+  const inlinePinned = isEnabled && isPinned;
+  const effectivePinned = inlinePinned || isFloatingPanelOpen;
+  const popoverOpen = isEnabled && (displayState.isPopoverOpen || (typeof pinStateKey !== "boolean" && isPinned));
+  const disableAnimation = useSignal((initialChunk as any).Ukt);
+  const context = reactRuntime.useContext((initialChunk as any).uxt);
+  const createSignal = readAtomSignal as unknown as (value: number) => any;
+  const fallbackWidth = createSignal(0);
+  const mainWidth = context?.mainContentTargetWidth ?? fallbackWidth;
+  const shift = createSignal(contentShiftForPanel({ isPinned: effectivePinned, mainContentTargetWidth: mainWidth.get() }));
+  const animationRef = reactRuntime.useRef(null);
+  const lastTarget = reactRuntime.useRef(shift.get());
+  const resetKeyRef = reactRuntime.useRef(contentShiftResetKey);
+  const sessionRef = reactRuntime.useRef(sessionChanged);
+  const routeRef = reactRuntime.useRef(routeChanged);
+  const surface = panelSurfaceState({ displayMode: displayState.displayMode, isPinned: inlinePinned, isPopoverOpen: popoverOpen });
+  const shouldShow = surface.shouldShow && !hidePanel;
+  const panelWidth = createSignal(shouldShow ? PANEL_WIDTH_PX : 0);
+  const publishWidth = stable((value: number) => {
+    (setPanelDisplayModeEffect as unknown as (scope: unknown, id: string, value: number | null) => void)(scope, id, value);
+  });
+  (subscribeAtomSignal as unknown as Function)(panelWidth, "change", publishWidth);
+  reactRuntime.useLayoutEffect(() => {
+    publishWidth(panelWidth.get());
+    return () => publishWidth(null as any);
+  }, [scope, panelWidth, id]);
+  reactRuntime.useEffect(() => {
+    const target = shouldShow ? PANEL_WIDTH_PX : 0;
+    if (panelWidth.get() === target) return;
+    const animation = animatePanelSignal(panelWidth, target, disableAnimation);
+    return () => animation?.stop();
+  }, [shouldShow, disableAnimation, panelWidth]);
+  reactRuntime.useLayoutEffect(() => {
+    const sessionDidChange = sessionRef.current !== sessionChanged;
+    const routeDidChange = routeRef.current !== routeChanged;
+    if (resetKeyRef.current === contentShiftResetKey && !sessionDidChange && !routeDidChange) return;
+    resetKeyRef.current = contentShiftResetKey; sessionRef.current = sessionChanged; routeRef.current = routeChanged;
+    const target = contentShiftForPanel({ isPinned: effectivePinned, mainContentTargetWidth: mainWidth.get() });
+    lastTarget.current = target; animationRef.current?.stop();
+    if (sessionDidChange) batch(() => shift.set(target)); else shift.jump(target);
+  }, [shift, contentShiftResetKey, routeChanged, effectivePinned, mainWidth, sessionChanged, batch]);
+  const updateShift = stable((width: number) => {
+    const target = contentShiftForPanel({ isPinned: effectivePinned, mainContentTargetWidth: width });
+    if (lastTarget.current !== target) {
+      lastTarget.current = target; animationRef.current?.stop();
+      animationRef.current = animatePanelSignal(shift, target, disableAnimation);
+    }
+  });
+  (subscribeAtomSignal as unknown as Function)(mainWidth, "change", updateShift);
+  reactRuntime.useEffect(() => {
+    const target = contentShiftForPanel({ isPinned: effectivePinned, mainContentTargetWidth: mainWidth.get() });
+    if (lastTarget.current !== target) {
+      lastTarget.current = target; animationRef.current?.stop();
+      animationRef.current = animatePanelSignal(shift, target, disableAnimation);
+    }
+  }, [shift, effectivePinned, layoutDependency, widthDependency, mainWidth, disableAnimation]);
+  reactRuntime.useEffect(() => () => animationRef.current?.stop(), []);
+  return {
+    contentShift: shift,
+    shouldHideInlineImmediately: surface.shouldHideInlineImmediately || hidePanel,
+    shouldShow,
+    visibleSurface: hidePanel ? null : surface.visibleSurface,
+  };
+}
+function animatePanelSignal(signal: any, target: number, disableAnimation: unknown): { stop(): void } | null {
+  return disableAnimation ? (signal.set(target), null)
+    : (dropdownMenuInit as unknown as (signal: unknown, target: number, preset: unknown) => { stop(): void })(signal, target, (initialChunk as any).lxt);
 }
 
 /** Be（导出 l）：面板可见性 signal family。 */
-function createPanelIsVisibleFamily(): unknown {
-  return null;
-}
 
 /** q（导出 m）：DynamicIsle 运行时初始化器。 */
-function initializeDynamicIsleRuntime(): void {}
+let dynamicIsleRuntimeInitialized = false;
+function initializeDynamicIsleRuntime(): void {
+  if (dynamicIsleRuntimeInitialized) return;
+  dynamicIsleRuntimeInitialized = true;
+  callInitializer(runtimeLazy); callInitializer(panelWidthAtomInit); callInitializer(compactMenuInit);
+  callInitializer((initialChunk as any).gyt); callInitializer((initialChunk as any).xS);
+  jsx ??= jsxRuntime();
+}
 
 /** He（导出 o）：附件 URL 兜底。 */
 function attachFallbackUrl(attachment: { url?: string } & Record<string, unknown>, fallbackUrl: string | null): unknown {
   const url = attachment.url ?? fallbackUrl;
-  return url == null ? null : { ...attachment, url };
+  return url == null ? null : (initialChunk as any).Oin({ ...attachment, url }, fallbackUrl);
 }
 
 /** G（导出 p）：DynamicIsleContent 容器。 */
 function DynamicIsleContent(props: { children?: unknown }): unknown {
-  return props.children;
+  initializeDynamicIsleRuntime();
+  const leadingContent = (createQuerySubscriberStore as unknown as (signal: unknown) => unknown)((initialChunk as any)._yt);
+  return jsx.jsxs((panelContentSurface as any).Content, {
+    className: "text-default select-none", variant: "dynamic-isle", children: [leadingContent, props.children],
+  });
 }
 
 /** Xe（导出 r）：面板层初始化器。 */
-function initializePanelLayer(): void {}
+let panelLayerInitialized = false;
+function initializePanelLayer(): void {
+  if (panelLayerInitialized) return;
+  panelLayerInitialized = true;
+  for (const candidate of [runtimeLazy, atomWriteApi, panelPresetInit, effectApi, writeAtomSignal, panelWidthAtomInit]) callInitializer(candidate);
+  reactRuntime ??= React();
+  for (const candidate of [
+    (initialChunk as any).fxt, (initialChunk as any).qbt, (initialChunk as any).Ebt,
+    toastRuntimeInit, i18nInit, (initialChunk as any).Hkt, (initialChunk as any).iyt,
+  ]) callInitializer(candidate);
+  initializePanelSurfaceState();
+}
 
 /** Ue（导出 s）：面板宽度效应初始化器。 */
-function initializePanelWidthEffects(): void {}
-
-/** ze（导出 u）：面板 displayMode atom（Ve 装配）。 */
-const panelDisplayModeAtom = { displayMode: "overlay", isPopoverOpen: false };
+let panelWidthEffectsInitialized = false;
+function initializePanelWidthEffects(): void {
+  if (panelWidthEffectsInitialized) return;
+  panelWidthEffectsInitialized = true;
+  callInitializer((initialChunk as any).Ain);
+}
 
 export {
   useThreadPanelWidthEffects as a,
@@ -518,7 +1139,7 @@ export {
   DynamicIslePaginatedList as d,
   initializeDynamicIsleComponents as f,
   useThreadPanelContentShift as i,
-  createPanelIsVisibleFamily as l,
+  panelIsVisibleFamily as l,
   initializeDynamicIsleRuntime as m,
   initializeVirtualizedTurnList as n,
   attachFallbackUrl as o,

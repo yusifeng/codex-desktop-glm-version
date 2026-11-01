@@ -327,6 +327,7 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   "use-git-config-value-d5ec387379f6.js",
   "use-home-directory-590afb3c7fc1.js",
   "use-element-in-view-4e918ffaac4a.js",
+  "virtualized-turn-list-a260a21e3c40.js",
   "virtualized-file-diff-line-position-c13dbee45987.js",
   "workspace-file-context-menu-trigger-91e9150d0a73.js",
   "x-like-435c693d8722.js",
