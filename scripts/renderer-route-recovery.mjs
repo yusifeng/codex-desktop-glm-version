@@ -396,10 +396,6 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
 // clarified, without changing their behavior or export surface.
 export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["realtime-voice-controls-surface", "controls-fedbfda05b6b.js"],
-  [
-    "use-imported-setup-opportunity",
-    "use-imported-setup-opportunity-fe980a908289.js",
-  ],
   ["artifact-source-bootstrap", "artifact-source-bootstrap-583ed8de587e.js"],
   ["text-underline-icon", "TextUnderlineIcon-6110dcc4e55d.js"],
   [
@@ -428,6 +424,7 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   "xterm-window-zoom-15fe24cf01f9.js",
   "activity-chart-816f6e49aa7a.js",
   "billing-analytics-9a493b3c8aaf.js",
+  "use-imported-setup-opportunity-fe980a908289.js",
   "codex-micro-mini-game-composer-c7d8a016e5c4.js",
   "composer-host-ac9410930773.js",
   "right-panel-composer-overlay-fdca4b46e82c.js",

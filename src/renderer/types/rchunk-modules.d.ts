@@ -8374,6 +8374,9 @@ declare module "@exact-chunk/step-cc59eba019a7.js";
 declare module "@exact-chunk/monotone-68fb4f84bd88.js";
 declare module "@exact-chunk/BarChart-2010e7d67e4a.js";
 declare module "@exact-chunk/queries-a53713419c4d.js";
+declare module "@exact-chunk/visualization-directive-renderer-59d128f8ff01.js";
+declare module "@rchunk/visualization-standalone-document";
+declare module "@rchunk/external-agent-import-setup";
 declare module "@rchunk/symbol-browser" {
   export interface SymbolBrowserSelection {
     kind: "emoji" | "icon";

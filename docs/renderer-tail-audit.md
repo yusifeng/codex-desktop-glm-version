@@ -1,5 +1,13 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Imported setup 大批次：`use-imported-setup-opportunity` 不再保留
+7,139 行发布版聚合 owner。可维护 TypeScript 恢复侧栏 checklist 的特殊动作、远端任务定义、
+plugin slot/mention、可持久化 snapshot 与 prompt/instructions 替换；导入后 setup 恢复 foreground
+时间窗/provider 过滤、Apps/Plugins 规范化名称关联、MCP 鉴权、Hooks/MCP/connector 检测、
+Apps/MCP/Hooks 分栏状态和 initial-tab/loading/error 决策。发布版 74 项短导出 ABI 继续保留，
+新增 focused contract 并通过 sidebar/onboarding、source-build、semantic override 与 typecheck。
+严格剩余由 7 个 / 46,168 行降至 6 个 / 39,029 行。
+
 2026-11-02 Analytics 大批次：`activity-chart` 与 `billing-analytics` 不再保留
 12,817 行发布版 owner。Activity Chart 不再内嵌混杂的 Recharts 子集，改为可维护的
 TypeScript/SVG 运行时，恢复 area/bar/stacked-bar、日期范围、可隐藏/隔离图例、键盘焦点、
