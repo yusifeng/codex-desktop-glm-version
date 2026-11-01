@@ -3536,3 +3536,12 @@ enable/disable、setup failure non-fatal report 与 ensure-window 降级。低�
 `Ust` 原 `Pst/Ge/Ke` 启动闭包删除，IPC 直接消费 tray owner 方法。原 tray focused suite 的直接 `.ts` import 失效入口修复后，
 既有与新增共 85 项行为断言真实执行；computer-history actions、main IPC、native status-item 相邻 110 项回归通过，no-unwired gate
 扩至 703 项。
+
+### 整块抽取：dynamic app-tools native-pipe lifecycle
+
+新增并接回 `native-pipe/dynamic-app-tools-lifecycle.ts`，统一旧环境清理、peer-authorizer 惰性创建、server start、pipe path 发布、
+WindowContext 回填与 dispose 顺序。启动失败仍记录原 warning 并提供安全空 lifecycle；成功 cleanup 严格保持
+`context path=null → delete env → await server dispose` 原顺序，pending tool-call abort 继续由既有 server owner 负责。
+
+`Ust` 原 `Oe/as` 状态和 direct `createDynamicAppToolsServer` 装配删除，call/list callbacks 仍延迟解析同一个 WindowContext。
+14 项 focused 与 native-pipe/computer-use runtime 相邻 51 项回归通过，no-unwired gate 扩至 712 项。

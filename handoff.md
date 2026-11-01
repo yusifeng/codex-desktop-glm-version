@@ -5441,3 +5441,9 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   non-fatal failure 与 ensure-window fallback；未创建第二状态 owner。
 - `Ust` 旧 `Pst/Ge/Ke` 删除，IPC 直接消费 lifecycle。修复 tray suite 直接 import `.ts` 的失效入口后 85 项真实执行，
   相邻三组 110 项回归通过，no-unwired gate 扩至 703 项。
+
+# 2026-11-01 dynamic app-tools native-pipe lifecycle extraction
+
+- 新增并真实接回 `native-pipe/dynamic-app-tools-lifecycle.ts`，统一 env reset/publish、惰性 peer authorizer、server start、
+  WindowContext bind 与 `context null→env delete→server dispose` cleanup；失败返回安全空 lifecycle。
+- `Ust` 旧 `Oe/as` 和 direct server construction 删除；focused 14 项、相邻两组 51 项回归通过，no-unwired gate 扩至 712 项。

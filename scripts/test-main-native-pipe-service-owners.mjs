@@ -93,12 +93,13 @@ await host.dispose();
 await rm(directory, { force: true, recursive: true });
 
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
-equal(main.includes('require("./main-app/native-pipe/dynamic-app-tools-server.js")'), true);
+equal(main.includes('require("./main-app/native-pipe/dynamic-app-tools-server.js")'), false);
+equal(main.includes('require("./main-app/native-pipe/dynamic-app-tools-lifecycle.js")'), true);
 equal(main.includes('require("./main-app/native-pipe/host-services-server.js")'), false);
 equal(main.includes('require("./main-app/computer-use/managed-service-lifecycle.js")'), true);
 equal(main.includes("async function Hse("), false);
 equal(main.includes("async function Hce("), false);
-equal(main.includes("createDynamicAppToolsServer({"), true);
+equal(main.includes("createDynamicAppToolsServer({"), false);
 equal(main.includes("createHostServicesServer({"), false);
 
 console.log(`${assertions} main native pipe service owner assertions passed`);

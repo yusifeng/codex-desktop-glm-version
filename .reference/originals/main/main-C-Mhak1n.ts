@@ -696,7 +696,7 @@ const { ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER, CONSUME_ALLOWED_BROWSER_USE_DO
 const { createIabCapabilityRuntime } = require("./main-app/browser-use/iab-capabilities.js");
 const { createSocketPeerAuthorizer } = require("./main-app/native-pipe/peer-socket-authorizer.js");
 const { createBrowserUseNativePipeServer } = require("./main-app/browser-use/native-pipe-server.js");
-const { createDynamicAppToolsServer } = require("./main-app/native-pipe/dynamic-app-tools-server.js");
+const { startDynamicAppToolsLifecycle } = require("./main-app/native-pipe/dynamic-app-tools-lifecycle.js");
 const {
   getWindowsAppIconSmall: Pae,
   loadSkyAddon: Vs,
@@ -746,7 +746,6 @@ const {
   buildThreadStartConfigOverrides: $o,
 } = require("./main-app/misc/automation-thread-config.js");
 const {
-  CODEX_APP_TOOLS_PIPE_PATH: as,
   resolveCodexAppMcpOverrides: os,
 } = require("./main-app/misc/codex-app-tools-config.js");
 const {
@@ -56357,24 +56356,14 @@ async function Ust() {
         a.f(databasePath, backupFolder, window),
       showPrimaryWindow: windowActivation.showPrimaryWindow,
     });
-  delete process.env[as];
-  let Oe = await createDynamicAppToolsServer({
+  let dynamicAppToolsLifecycle = await startDynamicAppToolsLifecycle({
     callTool: (e, t) => je.getWindowContext().callDynamicAppTool(e, t),
+    createSocketPeerAuthorizer,
+    environment: process.env,
     listTools: (e) =>
       je.getWindowContext().getMessageHandler().requestDynamicToolsForThreadStart(null, !0, e),
-    socketPeerAuthorizer: createSocketPeerAuthorizer(),
-  }).catch(
-    (e) => (
-      r
-        .n()
-        .warning(`Failed to start the Codex app tools native pipe`, {
-          safe: {},
-          sensitive: { error: e },
-        }),
-      null
-    ),
-  );
-  Oe != null && (process.env[as] = Oe.pipePath);
+    logger: r.n(),
+  });
   let ke =
       a.in.resolve() === a.in.Dev
         ? process.env.CODEX_ELECTRON_ARTIFACT_SESSION_RUNTIME_ROOT
@@ -56446,11 +56435,7 @@ async function Ust() {
         .isBrowserPresentedForConversation(e, t) ?? !1,
   );
   let K = je.getWindowContext();
-  Oe != null &&
-    (K.setDynamicAppToolsPipePath(Oe.pipePath),
-    I.add(() => {
-      (K.setDynamicAppToolsPipePath(null), delete process.env[as], Oe.dispose());
-    }));
+  dynamicAppToolsLifecycle.bindWindowContext(K, (dispose) => I.add(dispose));
   let Me = () => stopServiceWithTimeout(() => K.stopCodexMicro()),
     Ne = createRemoteControlInstallSnapshot((e) => {
       V.globalState.update(a.J, (t) => ({ ...t, [Ht]: e }));

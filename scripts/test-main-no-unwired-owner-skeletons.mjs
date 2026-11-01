@@ -18,6 +18,7 @@ const realOwners = [
   ["src/main/main-app/startup/dock-menu-lifecycle.ts", "createDockMenuLifecycle"],
   ["src/main/main-app/startup/application-menu-refresh-lifecycle.ts", "createApplicationMenuRefreshLifecycle"],
   ["src/main/main-app/computer-use/managed-service-lifecycle.ts", "createManagedComputerUseLifecycle"],
+  ["src/main/main-app/native-pipe/dynamic-app-tools-lifecycle.ts", "startDynamicAppToolsLifecycle"],
   ["src/main/main-app/plugins/startup-reconciliation-lifecycle.ts", "createPluginReconciliationLifecycle"],
   ["src/main/main-app/startup/window-icon-lifecycle.ts", "createWindowIconLifecycle"],
   ["src/main/main-app/fetch-handler/electron-fetch-handler.ts", "createElectronFetchHandlerClass"],
@@ -709,5 +710,13 @@ assert.equal(main.includes("startTrayForCurrentPlatform()"), true, "startup dele
 assert.equal(main.includes("start: Pst"), false, "generated tray start alias must be removed");
 assert.equal(main.includes("let Ge = async"), false, "generated tray setup closure must be removed");
 assert.equal(main.includes("Ke = async"), false, "generated macOS tray toggle closure must be removed");
+assert.equal(main.includes('require("./main-app/native-pipe/dynamic-app-tools-lifecycle.js")'), true, "dynamic app-tools lifecycle owner is wired");
+assert.equal(main.includes("dynamicAppToolsLifecycle = await startDynamicAppToolsLifecycle({"), true, "startup awaits one dynamic app-tools lifecycle");
+assert.equal(main.includes("dynamicAppToolsLifecycle.bindWindowContext(K"), true, "WindowContext receives the lifecycle pipe binding");
+assert.equal(main.includes('require("./main-app/native-pipe/dynamic-app-tools-server.js")'), false, "startup no longer constructs the dynamic app-tools server directly");
+assert.equal(main.includes("CODEX_APP_TOOLS_PIPE_PATH: as"), false, "startup no longer aliases the dynamic app-tools environment key");
+assert.equal(main.includes("let Oe = await createDynamicAppToolsServer"), false, "generated dynamic server owner must be removed");
+assert.equal(main.includes("process.env[as]"), false, "generated dynamic pipe environment mutations must be removed");
+assert.equal(main.includes("callTool: (e, t) => je.getWindowContext().callDynamicAppTool(e, t)"), true, "runtime dynamic tool consumer remains wired through the lifecycle");
 
-console.log("703 main unwired-owner skeleton assertions passed");
+console.log("712 main unwired-owner skeleton assertions passed");
