@@ -44,7 +44,7 @@ const mockModules = {
     export const Bfn = () => {}; export const M6t = () => {};
     export const xwt = "account-collection"; export const bwt = "debug-override";
     export const uwt = () => null;
-    export const ke = (scope, accountId) => globalThis.__sidebarChecklistTest.views.push({ scope, accountId });
+    export const Ewt = (scope, accountId) => globalThis.__sidebarChecklistTest.views.push({ scope, accountId });
     export const vwt = (scope, accountId, collapsed) => globalThis.__sidebarChecklistTest.collapsed.push({ scope, accountId, collapsed });
     export const cwt = (scope, accountId) => globalThis.__sidebarChecklistTest.dismissed.push({ scope, accountId });
   `,

@@ -3,15 +3,16 @@ import "@rchunk/rolldown-runtime";
 import "@rchunk/app-primary";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as appSharedChunk from "@rchunk/app-shared";
-import "@rchunk/browser-use-origin-state-queries";
+import * as browserUseOriginStateChunk from "@rchunk/browser-use-origin-state-queries";
 import "@rchunk/settings-loading-row";
 import "@rchunk/assert-never";
 
 interface PluginRecord { displayName?: string; marketplaceName?: string; marketplacePath?: string; plugin: { enabled?: boolean; id: string; installed?: boolean; name: string } }
 interface PluginItem { action?: unknown; description?: unknown; enabled?: boolean; expanded?: boolean; icon?: unknown; id: string; kind?: "app" | "disclosure" | "plugin" | "unavailable"; onToggleEnabled?(enabled: boolean): void; onToggleExpanded?(): void; plugin?: PluginRecord; showEnableToggle?: boolean; title: unknown; toggleAriaLabel?: string }
 interface PluginsQuery { errorMessage?: string | null; isLoading?: boolean; reload?(): void; retry?(): void }
-const shared = appSharedChunk as unknown as { I3(): import("@rchunk/app-shared").JsxRuntime; an?(): unknown; Hi?(value: unknown): string | null | undefined; A_?(marketplaceName: string | undefined): boolean; mr?(path: string | undefined, candidate: string | undefined): boolean };
-const initial = appInitialChunk as unknown as { Gv?(): { selectedHostId: string }; browserConfigStatus?: unknown };
+const shared = appSharedChunk as unknown as { BX?<Value>(signal: unknown, key: string): Value; I3(): import("@rchunk/app-shared").JsxRuntime; an?(): unknown; Hi?(value: unknown): string | null | undefined; A_?(marketplaceName: string | undefined): boolean; mr?(path: string | undefined, candidate: string | undefined): boolean };
+const initial = appInitialChunk as unknown as { Gv?(): { selectedHostId: string } };
+const browserConfigStatusSignal = (browserUseOriginStateChunk as unknown as { n?: unknown }).n;
 let jsx: import("@rchunk/app-shared").JsxRuntime;
 
 function SettingRow(props: { control?: unknown; description?: unknown; icon?: unknown; label: unknown; muted?: boolean }): unknown {
@@ -22,7 +23,10 @@ function Toggle(props: { ariaLabel?: string; checked: boolean; disabled?: boolea
 }
 function BrowserUseSettingsSection(props: { backend?: unknown; browserUseEnabled?: boolean; configStatus?: "error" | "loading" | "supported" | "unsupported"; showHistory?: boolean; showWebMcp?: boolean; siteSettingsRow?: unknown }): unknown {
   const host = initial.Gv?.().selectedHostId;
-  const status = props.configStatus ?? (initial.browserConfigStatus as typeof props.configStatus | undefined) ?? "unsupported";
+  const runtimeStatus = host == null || browserConfigStatusSignal == null
+    ? undefined
+    : shared.BX?.<typeof props.configStatus>(browserConfigStatusSignal, host);
+  const status = props.configStatus ?? runtimeStatus ?? "unsupported";
   if (status === "loading") return jsx.jsx("div", { role: "status", children: "Loading browser settings…" });
   if (status === "error") return jsx.jsx("div", { role: "alert", children: "Unable to load browser settings" });
   const enabled = props.browserUseEnabled !== false;

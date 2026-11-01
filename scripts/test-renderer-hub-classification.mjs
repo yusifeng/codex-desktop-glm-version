@@ -9,6 +9,11 @@ for (const result of results) {
   assert.ok(result.consumedCount <= result.exportCount);
   assert.ok(result.unconsumed.every((alias) => /^[A-Za-z_$][\w$]*$/.test(alias)));
   assert.deepEqual(result.unreviewed, [], `${result.hub} must not contain unknown exports`);
+  assert.deepEqual(
+    result.invalidConsumedAliases,
+    [],
+    `${result.hub} consumers must use real published aliases`,
+  );
 }
 const primary = results[2];
 // Cast-narrowed namespace bindings are real consumers too.  Keep a floor for
@@ -16,7 +21,10 @@ const primary = results[2];
 assert.ok(results[0].consumedCount >= 350, "app-shared named/cast consumers must be counted");
 assert.ok(results[1].consumedCount >= 1400, "app-initial named/cast consumers must be counted");
 assert.ok(results[1].consumedAliases.includes("ggt"), "multi-character named imports must be counted");
-assert.ok(primary.consumedCount >= 170, "app-primary named/cast consumers must be counted");
+assert.ok(primary.consumedCount >= 160, "app-primary named/cast consumers must be counted");
+assert.ok(results[1].consumedAliases.includes("Ewt"), "sidebar view telemetry must use the published Ewt alias");
+assert.ok(results[1].consumedAliases.includes("o_n"), "beacon navigation must use the published o_n alias");
+assert.ok(primary.consumedAliases.includes("dr"), "announcement entries must use the published dr alias");
 for (const alias of ["Du", "Jm", "Rf"]) {
   assert.equal(
     primary.consumedAliases.includes(alias),

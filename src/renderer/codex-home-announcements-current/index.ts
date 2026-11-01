@@ -55,7 +55,7 @@ const {
 const {
   $p: getAnnouncementStatus,
   Ch: useHomeBeaconCandidate,
-  Ne: AnnouncementEntriesHost,
+  dr: AnnouncementEntriesHost,
 } = appPrimaryChunk;
 const {
   r: initializeBeaconAnnouncement,

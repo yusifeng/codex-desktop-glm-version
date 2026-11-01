@@ -75,7 +75,7 @@ const result = await esbuild.build({
                   export const vN = "FastIcon";
                 `,
                 "app-primary": `
-                  export const Ne = "AnnouncementEntries";
+                  export const dr = "AnnouncementEntries";
                   export const $p = input => input.isLoading ? "loading" : input.isEligible ? "eligible" : "ineligible";
                 `,
                 "home-announcement-state": `

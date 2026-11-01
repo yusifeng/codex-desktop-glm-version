@@ -14,7 +14,6 @@ void runtimeChunk;
 
 const {
   ANt: initializeBeaconActionAnalytics,
-  Ae: useNavigate,
   CNt: isHomepageTakeoverBeacon,
   DNt: initializeBeaconPredicates,
   Dft: initializeExternalLinkBridge,
@@ -27,6 +26,7 @@ const {
   ONt: logBeaconLifecycle,
   Oft: openExternalLink,
   Oln: initializeNavigation,
+  o_n: useNavigate,
   Qgn: initializeAccountQueries,
   Sqt: initializeManagedDialogState,
   TNt: isCarouselBeaconRecord,
@@ -670,7 +670,9 @@ function BeaconAnnouncementController({
   const [connectorRequest, setConnectorRequest] =
     React.useState<ConnectorRequest | null>(null);
   const financeAbort = React.useRef<AbortController | null>(null);
-  const navigate = useNavigate?.() ?? props.navigate;
+  const navigate = (useNavigate?.() ?? props.navigate) as
+    | ((destination: unknown) => void)
+    | undefined;
   const identity = useAccountIdentity?.() ?? {};
   const trustedAccountId =
     props.actionAccountId ?? identity.accountId ?? props.accountId;

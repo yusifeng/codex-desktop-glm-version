@@ -105,7 +105,7 @@ const beaconModule = await loadModule({
     export const wNt = beacon => beacon.ui_info.type === "beacon_modal_info";
     export const TNt = beacon => beacon.ui_info.type === "beacon_carousel_info";
     export const N6t = () => ({ accountId: "account-1", userId: "user-1" });
-    export const Ae = () => target => { globalThis.__beaconAnnouncementTest.navigated = target; };
+    export const o_n = () => target => { globalThis.__beaconAnnouncementTest.navigated = target; };
     export const ONt = payload => globalThis.__beaconAnnouncementTest.lifecycle.push(payload);
     export const Oft = payload => { globalThis.__beaconAnnouncementTest.external = payload.href; };
     export const jNt = () => {};

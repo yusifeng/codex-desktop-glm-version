@@ -3794,7 +3794,7 @@ declare module "@rchunk/app-initial" {
     accountId: string,
     debugOverride: unknown,
   ) => SidebarChecklistAccountState | null;
-  export const ke: (
+  export const Ewt: (
     scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
     accountId: string,
   ) => void;
@@ -4210,7 +4210,6 @@ declare module "@rchunk/app-initial" {
   export const vt: (props: Record<string, unknown>) => unknown;
   export const yt: () => void;
   export const ANt: () => void;
-  export const Ae: () => (destination: unknown) => void;
   export const FNt: (
     scope: unknown,
     beacon: unknown,
@@ -5297,7 +5296,7 @@ declare module "@rchunk/app-primary" {
     isEligible: boolean;
     isLoading: boolean;
   }) => AnnouncementStatus;
-  export const Ne: (props: {
+  export const dr: (props: {
     entries: import("@rchunk/app-initial").HomeAnnouncementCandidate[];
     trackVisibility?: boolean;
   }) => unknown;

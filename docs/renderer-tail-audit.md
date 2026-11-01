@@ -1,5 +1,14 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Hub public-ABI correction batch：消费审计现在区分 TypeScript 类型成员与真实运行时引用，
+并校验每个命名/namespace consumer 确实存在于 Hub 的公开 export table。审计发现此前多个恢复模块
+误把发布 chunk 内部的压缩局部名当作公共 alias；已修正 Codex Home announcement、Home Beacon、
+sidebar onboarding、worktrees/hooks/general/plugin settings 等运行路径，并删除 automations/settings
+中不存在的注入契约。严格真实消费数为 app-shared 370/3,185、app-initial 1,481/8,204、
+app-primary 168/917，三者均为 0 unreviewed、0 invalid consumers。该校验已进入 renderer 正式构建，
+会在写入 packaged assets 前拒绝无效 ESM binding；manifest strict gate 同样拒绝无效 consumer。
+这里修复的是运行时 ABI 与证据可信度，并不把 automations 或 settings 的静态 fallback 误报为完整恢复。
+
 2026-11-02 Hub coupled-runtime extraction batch：修正 namespace destructuring 审计器允许
 `[\s\S]*?` 跨越前一个对象解构的问题；这类跨 hub 串线曾把 app-shared/app-initial 的别名
 错误算进后续 hub。真实消费面现在为 app-shared 375/3,185、app-initial 1,483/8,204、

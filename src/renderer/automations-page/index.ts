@@ -119,11 +119,6 @@ interface AppSharedBindings {
   Yh?: unknown;
 }
 
-interface AppInitialBindings {
-  automationsPagePresentation?: AutomationsPresentation;
-  getAutomationsPagePresentation?(): AutomationsPresentation;
-}
-
 interface InitializerBindings {
   n?(): void;
   t?(): void;
@@ -174,8 +169,7 @@ interface DocumentSearchBindings {
 
 const { $3: initializeJsx, I3: getJsxRuntime, K2: initializeShared } =
   appSharedChunk as unknown as AppSharedBindings;
-const { automationsPagePresentation, getAutomationsPagePresentation } =
-  appInitialChunk as unknown as AppInitialBindings;
+void appInitialChunk;
 const { n: initializePrimary } = appPrimaryChunk as unknown as InitializerBindings;
 const { n: initializeElicitationEvents, t: initializeElicitationRuntime } =
   elicitationEventsChunk as unknown as InitializerBindings;
@@ -235,12 +229,7 @@ function jsx(): JsxRuntime {
 }
 
 function currentPresentation(explicit?: AutomationsPresentation): AutomationsPresentation {
-  return (
-    explicit ??
-    getAutomationsPagePresentation?.() ??
-    automationsPagePresentation ??
-    EMPTY_PRESENTATION
-  );
+  return explicit ?? EMPTY_PRESENTATION;
 }
 
 function displayName(item: AutomationItem): string {

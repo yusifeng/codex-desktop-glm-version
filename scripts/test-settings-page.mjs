@@ -26,7 +26,7 @@ mocks["app-shared"] = [
   "export const HX=signal=>signal==='dirty'?r.state.dirty:r.state.narrow;export const LX=()=>({set(){}});",
 ].join("\n");
 mocks["app-initial"] = [
-  "const r=globalThis.__settingsPage;export const CE='dirty';export const qe='narrow';export const ugn='local';export const Vfn=()=>r.state.host;export const Ul=section=>'/settings/'+section;",
+  "const r=globalThis.__settingsPage;export const CE='dirty';export const ew='narrow';export const ugn='local';export const Vfn=()=>r.state.host;export const Ul=section=>'/settings/'+section;",
   "export const Gv=()=>({connectedRemoteConnections:[{displayName:'Build box',hostId:'remote-1'}],selectedHostId:r.state.selectedHostId,setSelectedHostId:hostId=>{r.state.selectedHostId=hostId;r.state.hostSelections.push(hostId)}});",
   "export const i_n=()=>r.state.location;export const a_n=()=>({params:{section:r.state.location.pathname.split('/').filter(Boolean)[1]}});export const o_n=()=>(destination,options)=>r.state.navigations.push({destination,options});",
   "export const Xgn=({context,hostId})=>{r.state.routeRenders.push({context,hostId});return {type:'route-content',props:{children:'Content for '+r.state.location.pathname}}};",

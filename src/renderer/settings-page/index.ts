@@ -42,10 +42,10 @@ const initialRuntime = appInitialChunk as unknown as {
   a_n(pattern: string): { params: { section?: string } } | null;
   i_n(): LocationState;
   o_n(): Navigate;
-  qe: unknown;
+  ew: unknown;
   ugn: string;
 };
-const { CE: dirtySettingsSignal, Gv: useSettingsHosts, Ul: buildSettingsPath, Vfn: getHost, Xgn: SettingsRouteContent, a_n: useRouteMatch, i_n: useLocation, o_n: useNavigate, qe: narrowSettingsSignal, ugn: localHostId } = initialRuntime;
+const { CE: dirtySettingsSignal, Gv: useSettingsHosts, Ul: buildSettingsPath, Vfn: getHost, Xgn: SettingsRouteContent, a_n: useRouteMatch, i_n: useLocation, o_n: useNavigate, ew: narrowSettingsSignal, ugn: localHostId } = initialRuntime;
 
 const visibleRuntime = visibleSectionsChunk as unknown as {
   n(activeSection?: string | null, isLocalHost?: boolean, hostId?: string): SettingsSection[] | VisibleSettingsResult;

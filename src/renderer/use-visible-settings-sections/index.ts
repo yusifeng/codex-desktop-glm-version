@@ -32,8 +32,8 @@ interface SettingsRuntimeState {
   visibility: Readonly<Record<string, SettingsVisibility>>;
 }
 
-const shared = appSharedChunk as unknown as { HX?<Value>(signal: unknown): Value };
-const initial = appInitialChunk as unknown as { NT?: readonly SettingsSection[]; ugn?: string; settingsNavigationState?: unknown };
+void appSharedChunk;
+const initial = appInitialChunk as unknown as { NT?: readonly SettingsSection[]; ugn?: string };
 const analyticsGateId = "3895602085";
 const externalSettings = {
   account: { href: "https://chatgpt.com/#settings", icon: "account", message: "Account" },
@@ -57,8 +57,7 @@ function titleForSlug(slug: string): string { return slug.split("-").map((part) 
 const fallbackSections: readonly SettingsSection[] = fallbackSlugs.map((slug) => ({ label: titleForSlug(slug), slug }));
 
 function readRuntimeState(): SettingsRuntimeState {
-  const injected = shared.HX != null && initial.settingsNavigationState != null ? shared.HX<Partial<SettingsRuntimeState>>(initial.settingsNavigationState) : undefined;
-  return { buildFlavor: injected?.buildFlavor ?? "codex", enterprisePlan: injected?.enterprisePlan === true, pluginsSettingsVisible: injected?.pluginsSettingsVisible !== false, sections: injected?.sections ?? initial.NT ?? fallbackSections, visibility: injected?.visibility ?? {} };
+  return { buildFlavor: "codex", enterprisePlan: false, pluginsSettingsVisible: true, sections: initial.NT ?? fallbackSections, visibility: {} };
 }
 function surfaceVisible(surface: SettingsSurface | undefined, flavor: SettingsRuntimeState["buildFlavor"], local: boolean): boolean {
   if (surface === "chatGpt") return flavor === "chatgpt";

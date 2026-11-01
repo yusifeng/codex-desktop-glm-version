@@ -7,8 +7,8 @@
 //   - "@rchunk/<语义名>" 的 import 映射为 `./<输出文件名>` 的 external import
 //     （renderer chunk 间是相对路径的 ESM 互引）
 //   - CSS：src/renderer/<语义名>/index.css（若有）按同哈希名输出到 assets/
-//   - transform-only 兜底树继续由 src/webview/assets/<文件名>.ts 提供
-//     （scripts/build.mjs 已经处理它；本脚本跳过）
+//   - 非语义业务边界由 checked-in TypeScript source/preserved manifests 提供；
+//     conversation-route 发布 JS 回拷与 exact owner 清单都必须保持为空
 //
 //   node scripts/build-renderer.mjs           build
 //   node scripts/build-renderer.mjs --check   transform 一致性检查（交 build.mjs）
@@ -18,6 +18,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { CHUNKS, IMPORT_ALIASES, REWRITTEN } from "./renderer-chunk-manifest.mjs";
+import { classifyHub } from "./audit-renderer-hub-classification.mjs";
 import {
   EXACT_ROUTE_SOURCE_OWNERS,
   PRESERVED_ROUTE_SOURCE_OUTPUTS,
@@ -25,6 +26,22 @@ import {
 } from "./renderer-route-recovery.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+// A locally minified binding name is not necessarily the public export alias.
+// Reject invalid hub consumers before writing any packaged asset so a typo can
+// never become an undefined ESM binding that only fails during application boot.
+for (const hub of ["app-shared", "app-initial", "app-primary"]) {
+  const classification = classifyHub(hub);
+  if (classification.unreviewed.length > 0 || classification.invalidConsumedAliases.length > 0) {
+    throw new Error(
+      `${hub} hub gate failed: ${classification.unreviewed.length} unreviewed exports, ` +
+        `${classification.invalidConsumedAliases.length} invalid consumers` +
+        (classification.invalidConsumedAliases.length > 0
+          ? ` (${classification.invalidConsumedAliases.join(", ")})`
+          : ""),
+    );
+  }
+}
 
 const tsconfigRaw = { compilerOptions: { verbatimModuleSyntax: true, jsx: "react-jsx" } };
 const common = { target: "esnext", charset: "utf8", legalComments: "inline" };

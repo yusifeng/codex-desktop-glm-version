@@ -41,6 +41,15 @@ exports were previously classified. Current completion requires source-backed bu
 
 ## Current runtime-source recovery status
 
+The latest public-ABI correction distinguishes TypeScript-only namespace members from runtime hub consumers and rejects
+every named or namespace consumer that is absent from the hub's actual export table. It found several reconstructed modules
+using a minified local binding rather than the published alias. The Codex Home announcement, Home Beacon, sidebar onboarding,
+worktrees/hooks/general/plugin settings paths now use their real public aliases, while phantom automations/settings injection
+contracts were removed. Strict counts are app-shared 370/3,185, app-initial 1,481/8,204, and app-primary 168/917, with zero
+unreviewed exports and zero invalid consumers. Both the manifest gate and the renderer build now enforce this invariant before
+packaged assets are written. This establishes a runtime ABI gate; it does not claim that the remaining static presentation
+fallbacks are semantically complete.
+
 The latest hub audit fixed a second consumer-accounting bug: namespace
 destructuring could cross an earlier object boundary and attribute app-shared
 or app-initial aliases to app-primary. Corrected named/namespace/cast counts are

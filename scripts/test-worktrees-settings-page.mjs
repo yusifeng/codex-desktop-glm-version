@@ -67,7 +67,7 @@ const mocks = {
   "app-initial": [
     "const runtime=globalThis.__worktreesSettingsPage;const state=runtime.state;",
     "export const Xl=()=>{state.initialized+=1};export const su=()=>{state.initialized+=1};",
-    "export const _e=()=>({selectedHostId:state.hostId});export const Vfn=hostId=>({hostId,kind:'local'});",
+    "export const Gv=()=>({selectedHostId:state.hostId});export const Vfn=hostId=>({hostId,kind:'local'});",
     "export const F$=()=>((conversationId,hostId)=>state.openedConversations.push({conversationId,hostId}));",
     "export const Gp=(_scope,options)=>state.newChats.push(options);",
     "export const Qln=(command,request)=>{state.commands.push({command,request});state.lastCommandPromise=Promise.resolve().then(()=>{if(state.failCommand)throw Error('delete failed');return {ok:true};});return state.lastCommandPromise};",

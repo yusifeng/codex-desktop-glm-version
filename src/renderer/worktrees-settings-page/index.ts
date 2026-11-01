@@ -53,7 +53,7 @@ const appRuntime = appInitialChunk as unknown as {
   Qln: (command: string, request: { params: { hostId: string; reason: string; worktree: string } }) => Promise<unknown>;
   Vfn: (hostId: string) => unknown;
   Xl: () => void;
-  _e: () => { selectedHostId: string };
+  Gv: () => { selectedHostId: string };
   su: () => void;
 };
 const {
@@ -62,7 +62,7 @@ const {
   Qln: invokeMainCommand,
   Vfn: normalizeHost,
   Xl: initializeSettingsPage,
-  _e: useSelectedHost,
+  Gv: useSelectedHost,
   su: initializeSettingsRuntime,
 } = appRuntime;
 

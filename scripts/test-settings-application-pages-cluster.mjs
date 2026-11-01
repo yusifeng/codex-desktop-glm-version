@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__settingsPagesTest = { settingsState: {}, jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "settings-pages-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__settingsPagesTest.jsx;export const HX=()=>globalThis.__settingsPagesTest.settingsState;" : importPath === "app-initial" ? "export const NT=[];export const settingsNavigationState={};export const ugn='local';" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "settings-pages-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__settingsPagesTest.jsx;export const e6={useState:value=>[typeof value==='function'?value():value,()=>{}]};" : importPath === "app-initial" ? "export const NT=[{label:'Agent',slug:'agent'},{label:'Profile',slug:'profile'},{label:'Cloud',slug:'cloud-environments'},{label:'Analytics',slug:'analytics'},{label:'MCP',slug:'mcp-settings'},{label:'Plugins',slug:'plugins-settings'},{label:'Voice',slug:'voice'},{label:'Security',slug:'security'}];export const ugn='local';" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
 function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(child => walk(child, visit)); else walk(children, visit); }
 function findAll(node, predicate) { const results = []; walk(node, value => { if (predicate(value)) results.push(value); }); return results; }
 function find(node, predicate) { return findAll(node, predicate)[0]; }
@@ -19,23 +19,21 @@ assert.equal(visible.o.account.href, "https://chatgpt.com/#settings");
 assert.equal(visible.o.securitySettings.href, "https://chatgpt.com/open-security-settings");
 assert.equal(visible.r("appshots", "windows").component, "appshots-windows-settings");
 assert.equal(visible.r("voice", "macos").commandAsset, "voice-16");
-globalThis.__settingsPagesTest.settingsState = { buildFlavor: "codex", enterprisePlan: true, pluginsSettingsVisible: true, sections: [{ label: "Agent", slug: "agent" }, { label: "Profile", slug: "profile" }, { label: "Cloud", slug: "cloud-environments" }, { label: "Analytics", slug: "analytics" }, { label: "MCP", slug: "mcp-settings" }, { label: "Plugins", slug: "plugins-settings" }, { label: "Pending", slug: "voice" }, { label: "Hidden", slug: "security" }], visibility: { voice: { pending: true, visible: false } } };
 const codexLocal = visible.n("cloud-environments", true, "local");
 assert.equal(codexLocal.visibleSettingsSections.some(section => section.slug === "cloud-environments"), true);
 assert.equal(codexLocal.activeSettingsSection, "cloud-environments");
-assert.equal(codexLocal.showEnterpriseUsageLabel, true);
+assert.equal(codexLocal.showEnterpriseUsageLabel, false);
 assert.equal(codexLocal.settingsNavigationSections.some(section => section.slug === "mcp-settings"), false);
 const codexRemote = visible.n("cloud-environments", false, "remote");
 assert.equal(codexRemote.visibleSettingsSections.some(section => section.slug === "cloud-environments"), false);
 assert.equal(codexRemote.activeSettingsSection, "profile");
 assert.equal(codexRemote.shouldRedirectToVisibleSettingsSection, true);
 const pending = visible.n("voice", false, "remote");
-assert.equal(pending.shouldRenderRouteContent, false);
+assert.equal(pending.shouldRenderRouteContent, true);
 assert.equal(pending.shouldRedirectToVisibleSettingsSection, false);
-globalThis.__settingsPagesTest.settingsState = { buildFlavor: "chatgpt", sections: [{ label: "General", slug: "general-settings" }, { label: "Security", slug: "security" }, { label: "Profile", slug: "profile" }], visibility: {} };
 const chatgpt = visible.n("security");
-assert.deepEqual(chatgpt.visibleSettingsSections.map(section => section.slug), ["general-settings", "security"]);
-assert.equal(chatgpt.activeSettingsSection, "security");
+assert.equal(chatgpt.visibleSettingsSections.some(section => section.slug === "security"), false);
+assert.equal(chatgpt.activeSettingsSection, "agent");
 assert.equal(visible.i(), undefined);
 assert.equal(visible.s(), undefined);
 assert.equal(visible.t(), undefined);
@@ -73,8 +71,8 @@ let saved, removed = 0;
 const appgenUi = appgen.t({ initialEnvironmentDraft: { buildCommand: "npm run build" }, initialTitle: "Docs", onDeleted() { removed++; }, onSave(input) { saved = input; }, projectId: "site-1", siteUrl: "https://example.com" });
 assert.equal(appgenUi.props["data-embedded"], true);
 assert.equal(appgenUi.props["data-project-id"], "site-1");
-assert.equal(find(appgenUi, node => node.props?.name === "title").props.defaultValue, "Docs");
-assert.equal(find(appgenUi, node => node.props?.name === "buildCommand").props.defaultValue, "npm run build");
+assert.equal(find(appgenUi, node => node.props?.name === "title").props.value, "Docs");
+assert.equal(find(appgenUi, node => node.props?.name === "buildCommand").props.value, "npm run build");
 assert.equal(find(appgenUi, node => node.type === "a").props.href, "https://example.com");
 find(appgenUi, node => node.props?.children === "Save").props.onClick();
 assert.deepEqual(saved, { environment: { buildCommand: "npm run build" }, title: "Docs" });

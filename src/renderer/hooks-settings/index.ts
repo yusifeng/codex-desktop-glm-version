@@ -85,22 +85,22 @@ const {
 } = sharedRuntime;
 
 const initialRuntime = appInitialChunk as unknown as {
-  Ee: (hostId: string) => { kind: "local" | "remote" | string };
+  Vfn: (hostId: string) => { kind: "local" | "remote" | string };
   Gv: () => { selectedHostId: string; setSelectedHostId(hostId: string): void };
-  Ne: unknown;
+  bcn: unknown;
   Qut: (input: { cwd: string | null; hostId: string; path?: string }) => void;
-  Ve: unknown;
+  kEt: unknown;
   d_n: () => [URLSearchParams, (params: URLSearchParams, options?: { replace?: boolean }) => void];
-  he: unknown;
+  EEt: unknown;
 };
 const {
-  Ee: useHost,
+  Vfn: useHost,
   Gv: useSelectedHost,
-  Ne: projectRootsQuery,
+  bcn: projectRootsQuery,
   Qut: openConfigFile,
-  Ve: hookUpdateMutation,
+  kEt: hookUpdateMutation,
   d_n: useSearchParams,
-  he: hooksQuery,
+  EEt: hooksQuery,
 } = initialRuntime;
 
 const hooksSettingsRouteRuntime = hooksSettingsRouteChunk as unknown as {

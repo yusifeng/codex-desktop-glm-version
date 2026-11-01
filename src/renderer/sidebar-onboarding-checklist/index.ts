@@ -45,7 +45,7 @@ const {
   N6t: useAuthentication,
   bwt: onboardingDebugOverrideSignal,
   cwt: dismissOnboardingChecklist,
-  ke: recordOnboardingChecklistView,
+  Ewt: recordOnboardingChecklistView,
   pnt: appServices,
   uwt: selectOnboardingAccountState,
   vwt: setOnboardingChecklistCollapsed,

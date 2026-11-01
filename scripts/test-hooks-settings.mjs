@@ -28,8 +28,8 @@ mocks["app-shared"] = [
   "export const BX=(query)=>query==='roots-query'?runtime.state.roots:query==='hooks-query'?{...runtime.state.hooks,refetch:async()=>{runtime.state.refetches+=1;return {isSuccess:runtime.state.hooks.error==null}}}:{data:{isPending:false,mutate:updates=>runtime.state.updates.push(updates)},error:null,isFetching:false,isPending:false,refetch:async()=>({isSuccess:true})};",
 ].join("\n");
 mocks["app-initial"] = [
-  "const state=globalThis.__hooksSettings.state;export const Ne='roots-query';export const he='hooks-query';export const Ve='update-query';",
-  "export const Gv=()=>({selectedHostId:state.selectedHostId,setSelectedHostId:value=>{state.selectedHostId=value}});export const Ee=()=>state.host;",
+  "const state=globalThis.__hooksSettings.state;export const bcn='roots-query';export const EEt='hooks-query';export const kEt='update-query';",
+  "export const Gv=()=>({selectedHostId:state.selectedHostId,setSelectedHostId:value=>{state.selectedHostId=value}});export const Vfn=()=>state.host;",
   "export const d_n=()=>[state.params,(params)=>{state.params=params}];export const Qut=input=>state.opened.push(input);",
 ].join("\n");
 mocks["hooks-settings-copy"] = [

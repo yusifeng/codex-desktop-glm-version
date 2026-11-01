@@ -19,6 +19,7 @@ const LINE_CLASSIFICATIONS_PATH = path.join(ROOT, "docs/renderer-hub-line-classi
 const hubSymbolSets = new Map();
 const hubLineCache = new Map();
 const hubExportMapCache = new Map();
+const TYPE_ONLY_NAMESPACE_MEMBERS = new Set(["JsxRuntime", "ReactRuntime"]);
 
 function getHubLines(hub) {
   if (!hubLineCache.has(hub)) {
@@ -114,13 +115,15 @@ function readExports(hub) {
 function readConsumption(hub) {
   const named = new Set();
   const namespaceMembers = new Set();
+  const declaredCastMembers = new Set();
   let sideEffectImports = 0;
   for (const file of walk(RENDERER)) {
     const source = fs.readFileSync(file, "utf8");
-    const importPattern = new RegExp(`import\\s+([^;]*?)\\s+from\\s+["']@rchunk/${hub}["']|import\\s+["']@rchunk/${hub}["']`, "g");
+    const importPattern = new RegExp(`import\\s+(?!type\\b)([^;]*?)\\s+from\\s+["']@rchunk/${hub}["']|import\\s+["']@rchunk/${hub}["']`, "g");
     for (const match of source.matchAll(importPattern)) {
       const clause = match[1]?.trim();
       if (!clause) { sideEffectImports++; continue; }
+      if (clause.startsWith("type ")) continue;
       const namespace = clause.match(/\*\s+as\s+([A-Za-z_$][\w$]*)/);
       if (namespace) {
         const re = new RegExp(`\\b${namespace[1]}\\.([A-Za-z_$][\\w$]*)\\b`, "g");
@@ -176,6 +179,7 @@ function readConsumption(hub) {
           let objectDepth = 0;
           let objectQuote = null;
           let objectEscaped = false;
+          let fieldStart = true;
           for (let index = 0; index < objectType.length; index++) {
             const character = objectType[index];
             if (objectQuote) {
@@ -188,34 +192,47 @@ function readConsumption(hub) {
               objectQuote = character;
               continue;
             }
-            if (character === "{" || character === "(" || character === "[") objectDepth++;
+            if (character === "{" || character === "(" || character === "[" || character === "<") objectDepth++;
             else if (character === "}" || character === ")" || character === "]") objectDepth--;
+            else if (character === ">" && objectDepth > 0) objectDepth--;
             if (objectDepth !== 0) continue;
-            const property = objectType.slice(index).match(/^([A-Za-z_$][\w$]*)\s*\??\s*(?=:|\()/);
+            if (character === ";" || character === ",") {
+              fieldStart = true;
+              continue;
+            }
+            if (!fieldStart || /\s/.test(character)) continue;
+            const property = objectType.slice(index).match(/^(?:readonly\s+)?([A-Za-z_$][\w$]*)\s*\??\s*(?=:|\()/);
             if (property) {
-              namespaceMembers.add(property[1]);
+              declaredCastMembers.add(property[1]);
               index += property[0].length - 1;
             }
+            fieldStart = false;
           }
         }
       }
       const braces = clause.match(/\{([\s\S]*)\}/);
       if (braces) {
         for (const binding of braces[1].split(",")) {
-          const alias = binding.trim().split(/\s+as\s+/)[0].replace(/^type\s+/, "");
+          if (binding.trim().startsWith("type ")) continue;
+          const alias = binding.trim().split(/\s+as\s+/)[0];
           if (/^[A-Za-z_$][\w$]*$/.test(alias)) named.add(alias);
         }
       }
     }
   }
-  return { named, namespaceMembers, sideEffectImports };
+  return { named, namespaceMembers, declaredCastMembers, sideEffectImports };
 }
 
 export function classifyHub(hub) {
   if (!(hub in HUBS)) throw new Error(`unknown renderer hub: ${hub}`);
   const exports = readExports(hub);
   const consumption = readConsumption(hub);
-  const consumed = new Set([...consumption.named, ...consumption.namespaceMembers].filter((name) => exports.has(name)));
+  const runtimeReferencedAliases = new Set([...consumption.named, ...consumption.namespaceMembers]);
+  const referencedAliases = new Set([...runtimeReferencedAliases, ...consumption.declaredCastMembers]);
+  const consumed = new Set([...referencedAliases].filter((name) => exports.has(name)));
+  const invalidConsumedAliases = [...runtimeReferencedAliases]
+    .filter((name) => !exports.has(name) && !TYPE_ONLY_NAMESPACE_MEMBERS.has(name))
+    .sort();
   const unconsumed = [...exports].filter((name) => !consumed.has(name)).sort();
   const reviewed = readLineClassifications().filter((entry) => entry.hub === hub);
   const reviewedAliases = new Set(reviewed.map((entry) => entry.alias));
@@ -228,6 +245,7 @@ export function classifyHub(hub) {
     exportCount: exports.size,
     consumedCount: consumed.size,
     consumedAliases: [...consumed].sort(),
+    invalidConsumedAliases,
     sideEffectImports: consumption.sideEffectImports,
     unconsumed,
     unreviewed,
@@ -239,8 +257,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const strict = process.argv.includes("--strict");
   const hubs = Object.keys(HUBS).map(classifyHub);
   for (const result of hubs) {
-    console.log(`${result.hub}: ${result.consumedCount}/${result.exportCount} consumed; ${result.sideEffectImports} side-effect imports; ${result.unconsumed.length} unconsumed; ${result.unreviewed.length} unreviewed`);
+    console.log(`${result.hub}: ${result.consumedCount}/${result.exportCount} consumed; ${result.sideEffectImports} side-effect imports; ${result.unconsumed.length} unconsumed; ${result.unreviewed.length} unreviewed; ${result.invalidConsumedAliases.length} invalid consumers`);
     if (result.unreviewed.length > 0 && process.argv.includes("--list")) console.log(`  ${result.unreviewed.join(", ")}`);
+    if (result.invalidConsumedAliases.length > 0 && process.argv.includes("--list")) {
+      console.log(`  invalid: ${result.invalidConsumedAliases.join(", ")}`);
+    }
   }
-  if (strict && hubs.some((result) => result.unreviewed.length > 0)) process.exit(1);
+  if (strict && hubs.some((result) => result.unreviewed.length > 0 || result.invalidConsumedAliases.length > 0)) process.exit(1);
 }
