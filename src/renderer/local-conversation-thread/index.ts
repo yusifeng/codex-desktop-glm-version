@@ -63,7 +63,7 @@ import { default as pullRequestFixWorkflow } from "@rchunk/pull-request-fix-work
 import { default as pullRequestStatusLabel } from "@rchunk/pull-request-status-label";
 import { default as openThreadPullRequestCodeTab } from "@rchunk/open-thread-pull-request-code-tab";
 import { default as gitActions } from "@rchunk/local-conversation-git-actions";
-import { default as gitActionNewBranchField } from "@rchunk/git-action-new-branch-field";
+import "@rchunk/git-action-new-branch-field";
 import { default as useGitConfigValue } from "@rchunk/use-git-config-value";
 import { default as threadTurnEntries } from "@rchunk/local-conversation-thread-turn-entries";
 import { default as planModel } from "@rchunk/local-conversation-plan-model";
@@ -116,7 +116,7 @@ void conversationBlocks;  void splitItems;
 void timestampSeparator; void threadHandoffModal; void sidePanel;
 void planSidePanel; void pullRequest; void pullRequestDetailModel;
 void pullRequestFixWorkflow; void pullRequestStatusLabel;
-void openThreadPullRequestCodeTab; void gitActions; void gitActionNewBranchField;
+void openThreadPullRequestCodeTab; void gitActions;
 void useGitConfigValue; void threadTurnEntries; void planModel;
 void webmcpToolsModel; void sideChatRuntime; void summaryPanelImagePreview;
 void artifactsSignals; void externalResourceIcon; void useLocalConversationSources;

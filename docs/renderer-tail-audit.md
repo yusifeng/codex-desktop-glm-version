@@ -1,5 +1,15 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Onboarding/Git action 大批次：`onboarding-page` 与
+`git-action-new-branch-field` 已从 release-faithful owner 迁到可维护 TypeScript，
+一次删除 15,778 行原始 owner。Onboarding 不以旧版 42 项标准流程测试作为完成依据，
+额外对照发布 chunk 恢复 Finance 数据源连接、Rosalind、Teen welcome/interests/prompts、
+Windows sandbox、外部 agent migration 以及它们的完成结果持久化，focused 覆盖扩到
+70 项；Git action 复用已恢复的 workflow state、blocked-reason/capability、diff summary、
+prompt 与 branch field 语义，并将错误的 default import 改为真实 side-effect 契约。
+两套 focused suites 共 138 项断言，source-build、semantic override 与 typecheck 通过。
+严格剩余由 12 个 / 87,000 行降至 10 个 / 71,222 行。
+
 2026-11-02 Account dialogs/review model 大批次：`app-connect-modal`、
 `gpt-about-dialog-core` 与 `review-preferences-model` 已从 release-faithful owner
 迁到可维护 TypeScript，一次删除 8,032 行原始 owner。前两者在上一轮已恢复

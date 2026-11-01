@@ -100,4 +100,54 @@ pendingWrite = new Promise((resolve) => { resolveWrite = resolve; }); globalThis
 state.page = { gate: "open", shouldShowRosalindWelcome: true }; resetHooks(); view = render(); assert.equal(textContent(view).includes("Welcome to ChatGPT for Life Sciences"), true);
 state.page = { gate: "open", shouldShowFinanceWelcome: true }; resetHooks(); view = render(); assert.equal(textContent(view).includes("Welcome to ChatGPT for Finance"), true);
 
-console.log("onboarding-page tests passed (42 assertions)");
+let connectedFinanceSource = null;
+state.page = { gate: "open", shouldShowFinanceWelcome: true, financeSources: [
+  { id: "sp-global", name: "S&P Global", connected: true },
+  { id: "factset", name: "FactSet", description: "Market research" },
+], connectFinanceSource: (sourceId) => { connectedFinanceSource = sourceId; } };
+resetHooks(); view = render(); button(view, "Continue").props.onClick(); view = render();
+assert.equal(view.props["data-onboarding-step"], "finance-sources");
+assert.equal(textContent(view).includes("company filings"), true);
+assert.equal(textContent(view).includes("S&P Global"), true); assert.equal(textContent(view).includes("Connected"), true);
+await button(view, "Connect FactSet").props.onClick(); assert.equal(connectedFinanceSource, "factset");
+button(view, "Continue").props.onClick(); view = render(); assert.equal(view.props["data-onboarding-step"], "role");
+
+state.page = { gate: "open", shouldShowRosalindWelcome: true }; resetHooks(); view = render();
+button(view, "Continue").props.onClick(); view = render();
+assert.equal(view.props["data-onboarding-step"], "rosalind-welcome");
+assert.equal(textContent(view).includes("scientific reasoning"), true);
+button(view, "Continue").props.onClick(); view = render(); assert.equal(input(view, "Life Sciences").props.checked, true);
+
+let savedTeenInterests = null; let submittedTeenPrompt = undefined;
+state.page = { gate: "open", shouldShowTeenOnboarding: true,
+  saveTeenInterests: (interests) => { savedTeenInterests = interests; },
+  submitTeenPrompt: (prompt) => { submittedTeenPrompt = prompt; } };
+resetHooks(); view = render(); button(view, "Continue").props.onClick(); view = render();
+assert.equal(view.props["data-onboarding-step"], "teen-welcome");
+button(view, "Continue").props.onClick(); view = render(); assert.equal(view.props["data-onboarding-step"], "teen-interests");
+assert.equal(button(view, "Next").props.disabled, true);
+input(view, "Coding").props.onChange(); view = render(); assert.equal(input(view, "Coding").props.checked, true);
+button(view, "Next").props.onClick(); view = render(); assert.equal(view.props["data-onboarding-step"], "teen-prompts");
+const firstPrompt = walk(view).find((node) => node.type === "button" && node.props?.["aria-pressed"] === false); firstPrompt.props.onClick(); view = render();
+assert.equal(walk(view).some((node) => node.type === "button" && node.props?.["aria-pressed"] === true), true);
+button(view, "Use prompt").props.onClick(); view = render(); await button(view, "Get Started").props.onClick();
+assert.deepEqual(savedTeenInterests, ["Coding"]); assert.equal(submittedTeenPrompt.id, "dodging-game");
+assert.deepEqual(state.settingWrites.at(-1).value.teenInterests, ["Coding"]); assert.equal(state.settingWrites.at(-1).value.teenPromptId, "dodging-game");
+
+let sandboxSetups = 0;
+state.page = { gate: "open", shouldShowWindowsSandboxSetup: true, enableWindowsSandbox: () => { sandboxSetups += 1; } };
+resetHooks(); view = render(); button(view, "Continue").props.onClick(); view = render();
+assert.equal(view.props["data-onboarding-step"], "windows-sandbox");
+await button(view, "Set up sandbox").props.onClick(); view = render(); assert.equal(sandboxSetups, 1); assert.equal(view.props["data-onboarding-step"], "role");
+
+let migratedProviders = null;
+state.page = { gate: "open", shouldShowAgentMigration: true, migrationProviders: [{ id: "claude", name: "Claude", itemCount: 3 }],
+  finishAgentMigration: (ids) => { migratedProviders = ids; } };
+resetHooks(); view = render(); button(view, "Continue").props.onClick(); view = render(); input(view, "Engineering").props.onChange(); view = render(); button(view, "Continue").props.onClick(); view = render();
+assert.equal(view.props["data-onboarding-step"], "agent-migration-source");
+assert.equal(button(view, "Continue").props.disabled, true); input(view, "claude").props.onChange(); view = render();
+button(view, "Continue").props.onClick(); view = render(); assert.equal(view.props["data-onboarding-step"], "agent-migration-items");
+assert.equal(textContent(view).includes("Claude — 3 items"), true); button(view, "Import and continue").props.onClick(); view = render();
+button(view, "Continue").props.onClick(); view = render(); await button(view, "Get Started").props.onClick(); assert.deepEqual(migratedProviders, ["claude"]);
+
+console.log("onboarding-page tests passed (70 assertions)");
