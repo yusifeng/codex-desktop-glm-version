@@ -1,5 +1,16 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Analytics 大批次：`activity-chart` 与 `billing-analytics` 不再保留
+12,817 行发布版 owner。Activity Chart 不再内嵌混杂的 Recharts 子集，改为可维护的
+TypeScript/SVG 运行时，恢复 area/bar/stacked-bar、日期范围、可隐藏/隔离图例、键盘焦点、
+tooltip、单位格式、loading/error/empty/update 状态以及 release 的 43 项短导出 ABI；D3 曲线与
+BarChart 等已审计 vendor 边界继续保持发布依赖边。Billing Analytics 重新接入真实
+`/wham/usage/plan_limit_history` 查询，覆盖账户隔离、5 分钟缓存/轮询、7/30 天、5 小时与
+周周期、feature/model/product/surface/turn-trigger 分组、top-three+Other 合并、用量卡片和
+重试/空态。新增 34 项 owner contract，typecheck、source-build、semantic override 与
+1,888/1,888、0 failures 结构校验通过。严格剩余由 9 个 / 58,985 行降至
+7 个 / 46,168 行。
+
 2026-11-02 Xterm runtime 大批次：`xterm-window-zoom` 不再保留发布 bundle 中
 12,237 行嵌入式 xterm.js/FitAddon/WebLinksAddon 与混杂的桌面桥。第三方边界恢复为与发布
 API 匹配的官方 pinned packages（`@xterm/xterm@5.5.0`、`@xterm/addon-fit@0.10.0`、

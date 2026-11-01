@@ -8349,6 +8349,11 @@ declare module "@rchunk/worktrees-settings-page" {
   export const WorktreesSettingsPage: () => unknown;
 }
 declare module "@rchunk/activity-chart" {
+  export type ActivityChartUnit = "calls" | "credits" | "issues" | "lines" | "percent" | "reactions" | "reviews" | "tokens" | "turns" | "usd" | "uses";
+  export interface ActivitySeries { color?: string; key: string; name?: string; total?: number; tooltip?: unknown }
+  export interface ActivityPoint { date: string; total?: number; values?: Record<string, number | null | undefined>; [key: string]: unknown }
+  export interface ActivityChartData { data: ActivityPoint[]; dataFreshnessTimestamp?: string | null; series: ActivitySeries[]; total?: number }
+  export interface ActivityChartStatus { animateDataChanges?: boolean; isError?: boolean; isLoading?: boolean; isUpdating?: boolean; onAnimationEnd?(): void; onRetry?(): void; preserveEmptyLayout?: boolean; reduceMotion?: boolean }
   export const H: (props: {
     ariaLabel: string;
     days: number;
@@ -8358,6 +8363,17 @@ declare module "@rchunk/activity-chart" {
   export const n: () => void;
   export const t: (props: Record<string, unknown>) => unknown;
 }
+declare module "@rchunk/line";
+declare module "@rchunk/area";
+declare module "@rchunk/step";
+declare module "@rchunk/monotone";
+declare module "@exact-chunk/linear-51abf1a86c3b.js";
+declare module "@exact-chunk/line-5171f1d885cc.js";
+declare module "@exact-chunk/area-76377dfd01aa.js";
+declare module "@exact-chunk/step-cc59eba019a7.js";
+declare module "@exact-chunk/monotone-68fb4f84bd88.js";
+declare module "@exact-chunk/BarChart-2010e7d67e4a.js";
+declare module "@exact-chunk/queries-a53713419c4d.js";
 declare module "@rchunk/symbol-browser" {
   export interface SymbolBrowserSelection {
     kind: "emoji" | "icon";
