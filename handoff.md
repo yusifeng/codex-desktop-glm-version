@@ -5616,3 +5616,14 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   `Fke/RD/zD/Ike/Lke/Rke/zke/Bke/Vke/BD/VD/HD/UD/WD/GD/Hke/Uke/KD` 约 294 行实现已物理删除，没有留下第二份
   subscription 或 favicon state owner。
 - focused 62 项及 BrowserHost/BrowserHistory/Electron handler 112 项相邻回归通过；测试索引 1846，no-unwired gate 1092 项。
+
+# 2026-11-01 Environment Config schemas and Chrome native-host service extraction
+
+- 新增并真实接回 `environment-config/schemas.ts`，整带迁出 config CRUD、draft/approval/operation、VPN、personal secrets、outbound
+  identity 请求/响应 schemas，以及 subject-template placeholder、UTF-8 byte limit、reserved claim 和 actor-email 约束；既有
+  `EnvironmentConfigService` 现在只消费一次构造的语义 schema owner。
+- 新增并接回 `plugins/chrome-native-host-service.ts`，持有 install/uninstall request normalization、local-host gate、resourcesPath
+  检查、codexHome 获取与 reconcile/uninstall 副作用顺序；WindowContext 继续消费同一 service class。
+- 主 chunk 旧 `EAe/DAe/OAe/kAe/AAe` 与 `HO..Bk` schema/helper belt 共约 596 行物理删除，并移除零 consumer 的 `Fa/wo`
+  插件别名。focused 63 项、Environment Config/marketplace/WindowContext/orchestrator/reconciliation 相邻回归 165 项通过；测试索引
+  1848，no-unwired gate 1122 项。

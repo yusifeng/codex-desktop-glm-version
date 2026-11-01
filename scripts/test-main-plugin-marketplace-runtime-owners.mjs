@@ -190,10 +190,10 @@ for (const definition of [
   "function Ai(",
   "async function Sne(",
 ]) equal(main.includes(definition), false);
-equal(main.includes("reconcileBundledPluginsMarketplace: Fa"), true);
-equal(main.includes("syncCuaSkillsForPlugins: wo"), true);
+equal(main.includes("reconcileBundledPluginsMarketplace: Fa"), false);
+equal(main.includes("syncCuaSkillsForPlugins: wo"), false);
 equal(main.includes("syncCuaReplMcpConfig: Sne"), true);
-equal(main.includes("await Fa({"), true);
-equal(main.includes("await wo({"), true);
+equal(marketplaceSource.includes("export async function reconcileBundledPluginsMarketplace("), true);
+equal(chromeSource.includes("export async function syncCuaSkillsForPlugins("), true);
 
 console.log(`${assertions} main plugin marketplace runtime owner assertions passed`);

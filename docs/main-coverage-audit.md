@@ -3792,3 +3792,16 @@ pin/context-menu，以及 favicon iconURL/page fallback、per-webContents/per-si
 `Fke/RD/zD/Ike/Lke/Rke/zke/Bke/Vke/BD/VD/HD/UD/WD/GD/Hke/Uke/KD` 约 294 行已物理删除，因此不存在重复的 listener、
 subscription 或 favicon size state。focused suite 62 项覆盖行为、竞态清理与旧 owner 缺席，BrowserHost/BrowserHistory/Electron
 handler 三组 112 项相邻回归通过；测试索引增至 1846，no-unwired gate 扩至 1092 项。
+
+### 大型 schema/owner 抽取：Environment Config 与 Chrome native host
+
+新增并真实接回 `environment-config/schemas.ts`，由单一 `createEnvironmentConfigSchemas` 构造 config create/patch/list/delete、
+draft approval/operation、VPN、personal secrets 和 outbound identity 全部请求/响应边界。subject template placeholder 白名单、UTF-8
+512-byte 上限、reserved/OAI claim、actor-email opt-in、connection/alias uniqueness、draft non-empty patch 和 response projection 均已用
+语义名称恢复；auto-resolution 也消费同模块导出的持久化 key。既有 `environment-config/service.ts` 不再依赖主 chunk 的机械 schemas。
+
+新增 `plugins/chrome-native-host-service.ts`，完整持有 install/uninstall request trim/validation、execution-host lookup、remote-host no-op、
+resourcesPath fail-fast、codexHome 与 reconcile/uninstall 顺序；WindowContext 的 `chromeNativeHost` consumer 仍实例化这一唯一 class。
+主 chunk 原 `EAe/DAe/OAe/kAe/AAe` 以及 `HO..Bk` schema/helper belt 共约 596 行已物理删除，两个零 consumer 插件 import alias
+`Fa/wo` 也已清理。新生产模块合计 712 行；focused 44 + 19 项，相邻 Environment Config service、marketplace、WindowContext、
+plugin orchestrator/reconciliation 共 165 项回归通过。测试索引增至 1848，no-unwired gate 扩至 1122 项。
