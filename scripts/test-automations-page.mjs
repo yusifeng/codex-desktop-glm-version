@@ -27,12 +27,20 @@ const state = {
     cloud: { accountId: "account-1", items: [{ automation: { id: "runtime-cloud", name: "Cloud monitor", prompt: "Watch changes", status: "PAUSED" } }] },
     local: { items: [{ id: "runtime-local", name: "Runtime brief", prompt: "Summarize", status: "ACTIVE" }] },
     history: {
-      items: [{ id: "runtime-run", automationId: "runtime-local", createdAt: 4, status: "COMPLETED", threadId: "runtime-thread", title: "Runtime result" }],
+      items: [{ id: "runtime-run", automationId: "runtime-local", createdAt: 4, status: "COMPLETED", threadId: "runtime-thread", title: "Runtime result", unread: true }],
       markAllRead: () => { state.runtime.markedAllRead = true; },
+      markRead: id => state.runtime.readChanges.push(["read", id]),
+      markUnread: id => state.runtime.readChanges.push(["unread", id]),
       unreadRunCounts: { automationIds: ["runtime-local"] },
     },
     mutations: [],
     cloudMutations: [],
+    archives: [],
+    invalidations: [],
+    migration: { data: { status: "failed" } },
+    migrationVisibility: [],
+    navigation: [],
+    readChanges: [],
     refetches: 0,
   },
   jsx: {
@@ -50,9 +58,12 @@ const mocks = {
     export const $3 = () => state.initialized.push("app-shared:$3");
     export const K2 = () => state.initialized.push("app-shared:K2");
     export const BX = (signal, input) => signal === "capability" ? ({ isCapable: input.name === "automations.local" || input.name === "automations.cloud" }) : false;
-    export const HX = signal => signal === "account" ? state.runtime.account : signal === "local" ? ({ data: state.runtime.local, isLoading: false }) : signal.startsWith?.("cloud-") ? ({ mutate: variables => state.runtime.cloudMutations.push([signal, variables]) }) : ({ data: state.runtime.cloud, isFetching: false, refetch: () => { state.runtime.refetches += 1; } });
+    export const HX = signal => signal === "account" ? state.runtime.account : signal === "user" ? "user-1" : signal === "migration-query" ? state.runtime.migration : signal === "local" ? ({ data: state.runtime.local, isLoading: false, refetch: () => {} }) : signal.startsWith?.("cloud-") ? ({ mutate: variables => state.runtime.cloudMutations.push([signal, variables]) }) : ({ data: state.runtime.cloud, isFetching: false, refetch: () => { state.runtime.refetches += 1; } });
     const react = { useState: initial => [initial, () => {}] };
     export const e6 = Object.assign(() => react, react);
+    export const LX = () => ({ get: () => true, set: (signal, value) => state.runtime.migrationVisibility.push([signal, value]) });
+    export const CL = () => ({ invalidateQueries: input => state.runtime.invalidations.push(input) });
+    export const lY = threadId => "conversation:" + threadId;
   `,
   "app-initial": `
     export const Xet = "capability";
@@ -60,6 +71,7 @@ const mocks = {
     export const QCt = "local";
     export const itt = "cloud";
     export const MC = () => globalThis.__automationsPageTest.runtime.history;
+    export const F$ = () => threadId => globalThis.__automationsPageTest.runtime.navigation.push(threadId);
     export const iun = (operation, options) => ({ mutate: variables => { globalThis.__automationsPageTest.runtime.mutations.push([operation, variables]); options?.onSuccess?.({ success: true }, variables); } });
     export const Ftt = input => ({ contract: "create", ...input });
     export const Vtt = input => ({ contract: "update", ...input });
@@ -68,6 +80,12 @@ const mocks = {
     export const ptt = "cloud-update";
     export const att = "cloud-delete";
     export const htt = (draft, timeZone) => ({ contract: "cloud", name: draft.name, prompt: draft.prompt, timeZone });
+    export const $en = "scope";
+    export const Ugn = () => ({ archiveConversation: (id, options) => globalThis.__automationsPageTest.runtime.archives.push(["archive", id, options]), unarchiveConversation: (id, options) => globalThis.__automationsPageTest.runtime.archives.push(["unarchive", id, options]) });
+    export const N1t = "pins";
+    export const $ln = (name, input) => [name, input];
+    export const ugn = "local";
+    export const mw = "user";
   `,
   "app-primary": `export const n = () => globalThis.__automationsPageTest.initialized.push("app-primary");`,
   "elicitation-events": `export const n = () => globalThis.__automationsPageTest.initialized.push("elicitation:n"); export const t = () => globalThis.__automationsPageTest.initialized.push("elicitation:t");`,
@@ -76,7 +94,7 @@ const mocks = {
   "editor-dialog": `export const a = () => globalThis.__automationsPageTest.initialized.push("editor:a"); export const h = () => globalThis.__automationsPageTest.initialized.push("editor:h"); export const i = () => globalThis.__automationsPageTest.initialized.push("editor:i"); export const m = () => globalThis.__automationsPageTest.initialized.push("editor:m");`,
   "automation-delete-confirmation-dialog": `export const n = () => globalThis.__automationsPageTest.initialized.push("delete"); export const t = props => ({ type: "DeleteDialog", props });`,
   "schedule-fields": `export const i = () => globalThis.__automationsPageTest.initialized.push("schedule"); export const a = () => {};`,
-  "habitat-automation-migration-state": `export const n = () => globalThis.__automationsPageTest.initialized.push("migration"); export const r = () => ({}); export const t = state => state?.status === "complete";`,
+  "habitat-automation-migration-state": `export const n = "migration-query"; export const r = "migration-visibility"; export const t = () => globalThis.__automationsPageTest.initialized.push("migration");`,
   "use-plugin-scheduled-tasks": `export const t = () => globalThis.__automationsPageTest.initialized.push("plugins"); export const n = input => input.tasks;`,
   "document-search": `export const n = () => globalThis.__automationsPageTest.initialized.push("document-search"); export const t = props => ({ type: "DocumentSearch", props });`,
   "rolldown-runtime": "export {};",
@@ -205,6 +223,12 @@ node = page.AutomationsLayoutPage();
 check(findAll(node, (entry) => entry.type === "span" && entry.props.children === "Runtime brief").length > 0, "loads local scheduled tasks from the production runtime signals");
 check(findAll(node, (entry) => entry.type === "span" && entry.props.children === "Cloud monitor").length > 0, "loads account-scoped cloud scheduled tasks from the production runtime signals");
 check(findButton(node, "Runtime result") != null, "attaches runtime history items to their local automation");
+findButton(node, "Runtime result").props.onClick();
+check(state.runtime.navigation.includes("runtime-thread"), "opens a run through the published conversation navigator");
+findButton(node, "Mark as read").props.onClick();
+check(state.runtime.readChanges.some(([operation, id]) => operation === "read" && id === "runtime-run"), "marks an individual run read through the history contract");
+findButton(node, "Retry sync").props.onClick();
+check(state.runtime.migrationVisibility.some(([signal, value]) => signal === "migration-visibility" && value.accountId === "account-1" && value.userId === "user-1" && value.visibility === "open"), "opens the published migration consent state for the signed-in account");
 findButton(node, "Mark all as read").props.onClick();
 check(state.runtime.markedAllRead === true, "connects the production history mark-all-read action");
 findButton(node, "Run now").props.onClick();
@@ -214,6 +238,15 @@ check(state.runtime.mutations.some(([operation, input]) => operation === "automa
 check(state.runtime.mutations.some(([operation, input]) => operation === "automation-update" && input.contract === "status" && input.status === "PAUSED"), "uses the published status-update request builder");
 check(state.runtime.mutations.some(([operation, input]) => operation === "automation-delete" && input.id === "runtime-local"), "uses the published delete mutation contract");
 check(source.includes('useAutomationMutation?.("automation-create"') && source.includes("buildCreateAutomationRequest?.(input)"), "wires create and update request builders into the live page");
+await findButton(node, "Archive all").props.onClick();
+await findButton(node, "Archive").props.onClick();
+check(state.runtime.archives.some(([operation, id, options]) => operation === "archive" && id === "conversation:runtime-thread" && options.source === "automation_history"), "archives automation conversations through the published service contract");
+state.runtime.history.items[0].status = "ARCHIVED";
+state.runtime.history.items[0].archived = true;
+node = page.AutomationsLayoutPage();
+await findButton(node, "Unarchive").props.onClick();
+check(state.runtime.archives.some(([operation, id]) => operation === "unarchive" && id === "conversation:runtime-thread"), "unarchives automation conversations through the published service contract");
+check(state.runtime.invalidations.some(input => input.queryKey[0] === "inbox-items"), "invalidates the inbox history query after archive changes");
 
 state.runtime.local.items = [];
 node = page.AutomationsLayoutPage();

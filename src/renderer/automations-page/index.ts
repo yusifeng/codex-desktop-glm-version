@@ -118,6 +118,10 @@ interface AppSharedBindings {
   BX?: (...arguments_: unknown[]) => unknown;
   HX?: <Value>(signal: unknown, ...arguments_: unknown[]) => Value;
   e6?: (() => ReactRuntime) & ReactRuntime;
+  /** Runtime scope, query client, and canonical conversation id adapter. */
+  LX?: (scopeSignal: unknown) => RuntimeScope;
+  CL?: () => RuntimeQueryClient;
+  lY?: (threadId: string) => unknown;
   Qh?: unknown;
   Y2?: unknown;
   Yh?: unknown;
@@ -145,6 +149,29 @@ interface AppInitialBindings {
   ptt?: unknown;
   att?: unknown;
   htt?: (draft: AutomationDraft, timeZone: string) => Record<string, unknown>;
+  /** Run-history conversation archive contracts. */
+  $en?: unknown;
+  Ugn?: (scope: RuntimeScope, hostId?: string) => ConversationArchiveService;
+  N1t?: unknown;
+  $ln?: (name: string, input: Record<string, unknown>) => unknown;
+  ugn?: string;
+  mw?: unknown;
+  /** Canonical conversation navigator used by automation history rows. */
+  F$?: () => (threadId: string, event?: unknown, options?: Record<string, unknown>) => void;
+}
+
+interface RuntimeScope {
+  get<Value>(key: unknown, argument?: unknown): Value;
+  set?(key: unknown, value: unknown): void;
+}
+
+interface RuntimeQueryClient {
+  invalidateQueries?(input: { queryKey: unknown }): Promise<unknown> | unknown;
+}
+
+interface ConversationArchiveService {
+  archiveConversation?(conversationId: unknown, options: Record<string, unknown>): Promise<unknown> | unknown;
+  unarchiveConversation?(conversationId: unknown, options: Record<string, unknown>): Promise<unknown> | unknown;
 }
 
 interface MutationOptions {
@@ -179,8 +206,11 @@ interface QueryState<Value> {
 }
 
 interface AutomationHistoryState {
+  isLoading?: boolean;
   items?: RawAutomationRun[];
   markAllRead?(): Promise<void> | void;
+  markRead?(itemId: string): Promise<void> | void;
+  markUnread?(itemId: string): Promise<void> | void;
   unreadRunCounts?: { automationIds?: string[] };
 }
 
@@ -244,9 +274,9 @@ interface ScheduleFieldsBindings {
 }
 
 interface MigrationBindings {
-  n?(): void;
-  r?: (service: unknown, accountId: string, userId: string, enabled?: boolean) => Record<string, unknown>;
-  t?: (state: Record<string, unknown> | null) => boolean;
+  n?: unknown;
+  r?: unknown;
+  t?(): void;
 }
 
 interface PluginTasksBindings {
@@ -261,7 +291,14 @@ interface DocumentSearchBindings {
 
 const { $3: initializeJsx, I3: getJsxRuntime, K2: initializeShared } =
   appSharedChunk as unknown as AppSharedBindings;
-const { BX: useRuntimeQuery, HX: useRuntimeSignal, e6: getReactRuntime } = appSharedChunk as unknown as AppSharedBindings;
+const {
+  BX: useRuntimeQuery,
+  HX: useRuntimeSignal,
+  e6: getReactRuntime,
+  LX: useRuntimeScope,
+  CL: useRuntimeQueryClient,
+  lY: toConversationId,
+} = appSharedChunk as unknown as AppSharedBindings;
 const {
   Xet: automationCapabilitySignal,
   yun: accountSignal,
@@ -276,6 +313,13 @@ const {
   ptt: cloudUpdateMutationSignal,
   att: cloudDeleteMutationSignal,
   htt: buildCloudAutomationRequest,
+  $en: runtimeScopeSignal,
+  Ugn: getConversationArchiveService,
+  N1t: useAppServerPinsSignal,
+  $ln: buildInboxQueryKey,
+  ugn: localHostId,
+  mw: userIdSignal,
+  F$: useOpenConversation,
 } = appInitialChunk as unknown as AppInitialBindings;
 const { n: initializePrimary } = appPrimaryChunk as unknown as InitializerBindings;
 const { n: initializeElicitationEvents, t: initializeElicitationRuntime } =
@@ -294,8 +338,8 @@ const { n: initializeDeleteDialog, t: AutomationDeleteConfirmationDialog } =
   deleteDialogChunk as unknown as DeleteDialogBindings;
 const { a: openAutomationConversation, i: initializeScheduleFields } =
   scheduleFieldsChunk as unknown as ScheduleFieldsBindings;
-const { n: initializeMigration, r: createMigrationQuery, t: isMigrationComplete } =
-  migrationStateChunk as unknown as MigrationBindings;
+const migrationBindings = migrationStateChunk as unknown as MigrationBindings;
+const { t: initializeMigration } = migrationBindings;
 const { n: usePluginScheduledTasks, t: initializePluginTasks } =
   pluginTasksChunk as unknown as PluginTasksBindings;
 const { n: initializeDocumentSearch, t: DocumentSearch } =
@@ -323,7 +367,6 @@ function initializeAutomationsPage(): void {
   initializeMigration?.();
   initializePluginTasks?.();
   initializeDocumentSearch?.();
-  void createMigrationQuery;
   void openAutomationConversation;
   jsxRuntime = getJsxRuntime();
   initialized = true;
@@ -386,9 +429,12 @@ function runtimePresentation(react?: ReactRuntime): AutomationsPresentation {
   const [statusFilter, setStatusFilter] = react?.useState<StatusFilter>("all") ?? ["all" as StatusFilter, () => undefined];
   const [mode, setMode] = react?.useState<PageMode>("list") ?? ["list" as PageMode, () => undefined];
   const [draft, setDraft] = react?.useState<AutomationDraft | null>(null) ?? [null, () => undefined];
+  const scope = useRuntimeScope?.(runtimeScopeSignal);
+  const queryClient = useRuntimeQueryClient?.();
   const localCapability = queryCapability("automations.local");
   const cloudCapability = queryCapability("automations.cloud");
   const account = readSignal<{ accountId?: string | null }>(accountSignal, {});
+  const userId = readSignal<string | null>(userIdSignal, null);
   const cloudDisabled = useRuntimeQuery?.(false, "4283773748") === true;
   const localQuery = readSignal<QueryState<AutomationCollection>>(
     localAutomationsSignal,
@@ -405,6 +451,8 @@ function runtimePresentation(react?: ReactRuntime): AutomationsPresentation {
   const cloudUpdateMutation = readSignal<AutomationMutation>(cloudUpdateMutationSignal, {});
   const cloudDeleteMutation = readSignal<AutomationMutation>(cloudDeleteMutationSignal, {});
   const history = useAutomationHistory?.() ?? {};
+  const openConversation = useOpenConversation?.();
+  const migrationQuery = readSignal<QueryState<MigrationState>>(migrationBindings.n, {});
   const mutationOptions: MutationOptions = {
     onSuccess: () => {
       void localQuery.refetch?.();
@@ -469,6 +517,19 @@ function runtimePresentation(react?: ReactRuntime): AutomationsPresentation {
     const raw: RawAutomation = { ...item };
     updateMutation.mutate?.(buildAutomationStatusRequest?.(raw, nextStatus) ?? { id: item.id, status: nextStatus });
   };
+  const archiveRun = async (run: AutomationRun, archive: boolean): Promise<void> => {
+    if (scope == null || run.threadId == null || getConversationArchiveService == null) return;
+    const service = getConversationArchiveService(scope, localHostId);
+    const conversationId = toConversationId?.(run.threadId) ?? run.threadId;
+    const options = { useAppServerPins: scope.get<boolean>(useAppServerPinsSignal) };
+    if (archive) await service.archiveConversation?.(conversationId, { ...options, source: "automation_history" });
+    else await service.unarchiveConversation?.(conversationId, options);
+    const queryKey = buildInboxQueryKey?.("inbox-items", { limit: 200 });
+    if (queryKey != null) await queryClient?.invalidateQueries?.({ queryKey });
+  };
+  const archiveRuns = async (runs: AutomationRun[]): Promise<void> => {
+    await Promise.allSettled(runs.map((run) => archiveRun(run, true)));
+  };
   return {
     ...EMPTY_PRESENTATION,
     automations,
@@ -478,10 +539,13 @@ function runtimePresentation(react?: ReactRuntime): AutomationsPresentation {
     cloudLoading: cloudQuery.isFetching === true,
     draft,
     mode: mode === "list" && selected != null ? "detail" : mode,
+    migration: migrationQuery.data ?? null,
     query,
     selectedAutomationId: selected?.id ?? null,
     selectedSource: selected?.source ?? null,
     statusFilter,
+    onArchiveAll: archiveRuns,
+    onArchiveRun: (run) => archiveRun(run, true),
     onCloseEditor: () => setMode(selected == null ? "list" : "detail"),
     onCreate: (source) => {
       setDraft({ kind: "cron", name: "", prompt: "", scheduleConfig: { mode: "daily", time: "09:00" }, source, status: "ACTIVE" });
@@ -496,6 +560,15 @@ function runtimePresentation(react?: ReactRuntime): AutomationsPresentation {
       setMode("edit");
     },
     onMarkAllRead: () => history.markAllRead?.(),
+    onMarkRunRead: (run, read) => read ? history.markRead?.(run.id) : history.markUnread?.(run.id),
+    onMigrate: () => {
+      if (migrationBindings.r != null && account.accountId != null && userId != null) {
+        scope?.set?.(migrationBindings.r, { accountId: account.accountId, userId, visibility: "open" });
+      }
+    },
+    onOpenChat: (run) => {
+      if (run.threadId != null) openConversation?.(run.threadId);
+    },
     onQueryChange: setQuery,
     onRetryCloud: () => { void cloudQuery.refetch?.(); },
     onRun: (item) => {
@@ -505,6 +578,7 @@ function runtimePresentation(react?: ReactRuntime): AutomationsPresentation {
     onSelect: (item) => setSelectedKey(`${item.source}:${item.id}`),
     onPause: updateStatus,
     onStatusFilterChange: setStatusFilter,
+    onUnarchiveRun: (run) => archiveRun(run, false),
   };
 }
 
@@ -564,7 +638,7 @@ function PageHeader({ presentation }: { presentation: AutomationsPresentation })
 
 function MigrationBanner({ presentation }: { presentation: AutomationsPresentation }): unknown {
   const migration = presentation.migration;
-  if (migration == null || isMigrationComplete?.(migration as unknown as Record<string, unknown>) === true || migration.status === "complete") return null;
+  if (migration == null || migration.status === "complete") return null;
   const failed = migration.status === "failed" || migration.status === "unavailable";
   return jsx().jsxs("aside", {
     role: failed ? "alert" : "status",

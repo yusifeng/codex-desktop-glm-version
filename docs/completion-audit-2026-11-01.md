@@ -49,8 +49,11 @@ default route rather than hard-coding a Codex build flavor. Focused Automations 
 gates, the renderer build, and 1,888/1,888 verification pass. The follow-up reconnects the published local
 `automation-create|update|delete|run-now` mutation factory and request builders, plus the cloud create/update/delete mutation
 signals and request serializer. Creation/edit save, run-now, pause/resume, and delete are no longer inert production controls.
-Run-history archive/unarchive, migration consent, and complete release detail/editor composition remain outstanding, so this
-is evidence of concrete runtime restoration rather than a completion claim.
+The next follow-up restores run-history archive/unarchive, per-run read state, conversation navigation, inbox invalidation,
+and failure-isolated bulk archive behavior. It also corrects the Habitat migration owner's published ABI (`n` query signal,
+`r` consent visibility signal, `t` lazy initializer), consumes the live migration query, and opens consent for the signed-in
+account/user. Complete release detail/editor composition remains outstanding, so this is evidence of concrete runtime
+restoration rather than a completion claim.
 
 The latest public-ABI correction distinguishes TypeScript-only namespace members from runtime hub consumers and rejects
 every named or namespace consumer that is absent from the hub's actual export table. It found several reconstructed modules

@@ -9,9 +9,13 @@
 本批随后接回 local `iun(automation-create|update|delete|run-now)` mutation factory 和原版
 `Ftt/Vtt/Btt` request builders；cloud create/update/delete 则恢复 `dtt/ptt/att` mutation signals 与
 `htt` request serializer。生产页面的创建/编辑保存、立即运行、暂停/恢复和删除不再是无回调按钮。
-focused automations 34 项、settings cluster 44 项、typecheck、strict hub gate、renderer build 与
-1,888/1,888 verify 通过。历史会话 archive/unarchive、migration consent 和发布页面的完整 detail/editor
-视觉组合仍需继续恢复，因此不把核心 mutation 已接通误报为 Automations 全量完成。
+follow-up 又按发布 ABI 恢复了历史会话 archive/unarchive、单条 mark-read/mark-unread、会话导航和
+inbox query invalidation；批量归档使用独立 settled 结果，单条失败不会中断其余记录。Habitat migration
+owner 的公开契约也已纠正为 `n=query signal`、`r=consent visibility signal`、`t=lazy initializer`，页面会读取
+真实迁移 query 并为当前 account/user 打开 consent state。focused automations 40 项、automation infrastructure
+cluster、settings cluster 44 项、typecheck、strict hub gate、1,911-script index、1,888/1,888 renderer
+verify 和 12,448/12,448 full check 通过。发布页面更丰富的 detail/editor 视觉组合仍需继续恢复，因此不把这些运行链路已接通误报为
+Automations 全量完成。
 
 2026-11-02 Hub public-ABI correction batch：消费审计现在区分 TypeScript 类型成员与真实运行时引用，
 并校验每个命名/namespace consumer 确实存在于 Hub 的公开 export table。审计发现此前多个恢复模块
