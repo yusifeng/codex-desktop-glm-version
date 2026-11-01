@@ -24,6 +24,7 @@ const {
   $3: initializeJsxRuntimeLazy,
   I3: jsxRuntime,
   K2: initializeIntl,
+  HX: useSignalValue,
   LX: useSignalScope,
   Y2: FormattedMessage,
   ZI: applicationScope,
@@ -40,6 +41,8 @@ const {
   CNt: useRateLimitResetCandidate,
   D0t: useHomeAnnouncementOverrides,
   Fk: useRealtimeVoiceStart,
+  F$: useNavigateToLocalConversation,
+  HZ: useComposerEditor,
   Nk: useWeeklyRecapCandidate,
   i_n: useRouterLocation,
   kNt: getBeaconTreatment,
@@ -47,6 +50,7 @@ const {
   sbt: shouldHideHomePromos,
   vN: FastModeIcon,
   xpn: logAnalyticsEvent,
+  U2: usePluginInstallDetails,
 } = appInitialChunk;
 const {
   $p: getAnnouncementStatus,
@@ -59,10 +63,17 @@ const {
   t: BeaconAnnouncement,
 } = beaconChunk;
 const {
+  f: useReplayCandidate,
+  g: computerHistoryStatusSignal,
+  h: computerHistoryDismissedSignal,
   i: useGiftCreditsCandidate,
   o: useBrowserProfileImportCandidate,
-  s: useComputerHistoryCandidate,
-  t: initializeAnnouncementEntryPoints,
+  p: ReplayAnnouncement,
+  s: ExternalImportAnnouncement,
+  t: GiftCreditsAnnouncement,
+  u: launchReplay,
+  v: ComputerHistoryAnnouncement,
+  y: initializeAnnouncementEntryPoints,
 } = entryPointsChunk;
 const { n: initializeHomeAnnouncementSlot } = announcementSlotChunk;
 const { t: CustomGptBanner } = bannerChunk;
@@ -104,6 +115,16 @@ interface AnnouncementEntry {
   isEligible: boolean;
   isLoading: boolean;
   pageContextClaim?: unknown;
+}
+
+interface EntryPointCandidate {
+  dismiss(): void;
+  isEligible: boolean;
+  isLoading: boolean;
+  markShown?(): void;
+  openGiftCredits?(): void;
+  openImport?(): void;
+  replay?(): void;
 }
 
 interface FastModeCandidate extends AnnouncementEntry {
@@ -331,6 +352,7 @@ function HomeAnnouncementCandidates({
   isLocalModeRemote,
   shouldHideOnboardingPromos,
 }: HomeAnnouncementCandidatesProps): unknown {
+  const scope = useSignalScope?.(applicationScope);
   const candidateOverride = useHomeAnnouncementOverrides?.()
     ?.homeAnnouncementCandidates;
   if (candidateOverride != null)
@@ -353,6 +375,19 @@ function HomeAnnouncementCandidates({
     beaconProduct === "work_tab" ? "work" : entryPoint,
   );
   const voiceAvailable = useRealtimeVoiceAvailability?.();
+  const gift = (useGiftCreditsCandidate?.({ enabled: !shouldHideOnboardingPromos }) ?? {
+    dismiss() {}, isEligible: false, isLoading: false, openGiftCredits() {},
+  }) as EntryPointCandidate;
+  const externalImport = (useBrowserProfileImportCandidate?.({ enabled: true }) ?? {
+    dismiss() {}, isEligible: false, isLoading: false, markShown() {}, openImport() {},
+  }) as EntryPointCandidate & { providerId?: string };
+  const replay = (useReplayCandidate?.({ enabled: true }) ?? {
+    dismiss() {}, isEligible: false, isLoading: false, markShown() {}, replay() {},
+  }) as EntryPointCandidate;
+  const historyStatus = computerHistoryStatusSignal == null ? "ineligible" : useSignalValue?.(computerHistoryStatusSignal);
+  const editor = useComposerEditor?.();
+  const navigateToLocalConversation = useNavigateToLocalConversation?.();
+  const pluginInstall = usePluginInstallDetails?.();
   const voiceEntry: AnnouncementEntry = {
     isEligible: voiceStart != null && voiceAvailable === true,
     isLoading: voiceStart != null && voiceAvailable === undefined,
@@ -388,25 +423,63 @@ function HomeAnnouncementCandidates({
       onDismiss: recap.dismiss,
     }),
   };
+  const giftEntry: AnnouncementEntry = {
+    isEligible: !shouldHideOnboardingPromos && gift.isEligible,
+    isLoading: !shouldHideOnboardingPromos && gift.isLoading,
+    content: GiftCreditsAnnouncement == null ? null : jsx.jsx(GiftCreditsAnnouncement, {
+      onDismiss: gift.dismiss,
+      onOpenGiftCredits: gift.openGiftCredits ?? (() => {}),
+    }),
+  };
+  const importEntry: AnnouncementEntry = {
+    isEligible: externalImport.isEligible,
+    isLoading: externalImport.isLoading,
+    content: ExternalImportAnnouncement == null ? null : jsx.jsx(ExternalImportAnnouncement, {
+      onDismiss: externalImport.dismiss,
+      onImport: externalImport.openImport ?? (() => {}),
+      onShown: externalImport.markShown,
+      providerId: externalImport.providerId,
+    }),
+  };
+  const historyAllowed = !shouldHideOnboardingPromos && !isLocalModeRemote && beaconProduct !== "chatgpt";
+  const dismissHistory = () => scope?.set?.(computerHistoryDismissedSignal, true);
+  const historyEntry: AnnouncementEntry = {
+    isEligible: historyAllowed && historyStatus === "eligible",
+    isLoading: historyAllowed && historyStatus === "loading",
+    content: ComputerHistoryAnnouncement == null ? null : jsx.jsx(ComputerHistoryAnnouncement, {
+      onDismiss: dismissHistory,
+      onViewRecap: (prompt: string) => {
+        dismissHistory();
+        editor?.setPromptText?.(prompt);
+        editor?.eventEmitter?.emit?.("submit");
+      },
+    }),
+  };
+  const replayEntry: AnnouncementEntry = {
+    isEligible: replay.isEligible,
+    isLoading: replay.isLoading,
+    content: ReplayAnnouncement == null ? null : jsx.jsx(ReplayAnnouncement, {
+      onDismiss: replay.dismiss,
+      onShown: replay.markShown,
+      onReplay: () => {
+        if (scope == null || launchReplay == null) return;
+        void launchReplay({
+          scope,
+          navigateToLocalConversation,
+          onReplay: replay.replay,
+          showPluginInstallDetails: pluginInstall?.showPluginInstallDetails,
+        });
+      },
+    }),
+  };
   const entries = [
-    useGiftCreditsCandidate?.({ enabled: !shouldHideOnboardingPromos }) ?? {
-      isEligible: false,
-      isLoading: false,
-      content: null,
-    },
+    giftEntry,
     voiceEntry,
-    useBrowserProfileImportCandidate?.({ enabled: true }) ?? {
-      isEligible: false,
-      isLoading: false,
-      content: null,
-    },
+    importEntry,
     worktreeEntry,
     recapEntry,
-    useComputerHistoryCandidate?.({ enabled: true }) ?? {
-      isEligible: false,
-      isLoading: false,
-      content: null,
-    },
+    historyEntry,
+    replayEntry,
   ];
   return jsx.jsx(AnnouncementEntries, { entries, trackVisibility: false });
 }

@@ -3173,6 +3173,7 @@ declare module "@rchunk/app-initial" {
     Record<string, unknown>
   >;
   export interface ComposerEditorLike {
+    eventEmitter?: { emit?(event: string): void };
     focus?(): void;
     hasText(): boolean;
     setPromptText?(text: string): void;
@@ -3181,6 +3182,17 @@ declare module "@rchunk/app-initial" {
   export const $9t: (position: number) => number;
   export const $Bt: () => void;
   export const HZ: () => ComposerEditorLike;
+  export const F$: () => (conversationId: string) => void;
+  export const U2: () => {
+    showPluginInstallDetails(
+      plugin: unknown,
+      options: {
+        hostId: string;
+        marketplaceAnalytics: string;
+        onSuccess(): Promise<void>;
+      },
+    ): boolean;
+  };
   export const M9: () => void;
   export const N9: (query: string) => boolean;
   export const NIt: import("@rchunk/app-shared").ScopedSignalFamily<
@@ -8164,7 +8176,26 @@ declare module "@rchunk/home-suggestion-surface" {
 }
 
 declare module "@rchunk/composer-banners" { export const ComposerBanners: unknown; }
-declare module "@rchunk/usage" { export const n: (props: { canShowUsageBanners?: boolean; imageGenerationLimit?: boolean; modelName?: string; resetAt?: string | number | Date | null; showModelLimit?: boolean; showWorkspaceUsageLimit?: boolean; showUpsell?: boolean; onDismissImageGenerationLimit?(): void }) => unknown; export const t: () => void; }
+declare module "@rchunk/usage" {
+  export interface UsageBannerProps {
+    canShowUsageBanners?: boolean;
+    hostId?: string;
+    imageGenerationLimit?: unknown;
+    modelName?: string;
+    onDismissImageGenerationLimit?(): void;
+    rateLimit?: Record<string, unknown> | null;
+    rateLimitWarningThreshold?: number | null;
+    resetAt?: string | number | Date | null;
+    selectedModel?: string | null;
+    showBackendRateLimitUpsell?: boolean;
+    showLunaReserveNotice?: boolean;
+    showModelLimit?: boolean;
+    showUpsell?: boolean;
+    showWorkspaceUsageLimit?: boolean;
+  }
+  export const n: (props: UsageBannerProps) => unknown;
+  export const t: () => void;
+}
 declare module "@rchunk/task-announcement-candidates" {
   export interface TaskAnnouncementCandidatesProps {
     conversationId?: string | null;
@@ -8612,17 +8643,8 @@ declare module "@rchunk/announcement-entry-points" {
     markShown(): void;
     replay(): void;
   };
-  export const g: (
-    intervals: readonly { endMs: number; startMs: number }[],
-    nowMs?: number,
-  ) => boolean;
-  export const h: (
-    histories: readonly {
-      completedAtMs: number | string;
-      successes: readonly unknown[];
-    }[],
-    status: { latestImportedAtMs?: number | null },
-  ) => number | null;
+  export const g: unknown;
+  export const h: import("@rchunk/app-shared").ReadableSignal<boolean>;
   export const i: (options?: { enabled?: boolean }) => CandidateState & {
     openGiftCredits(): void;
   };
@@ -8632,13 +8654,18 @@ declare module "@rchunk/announcement-entry-points" {
   export const o: (options?: { enabled?: boolean }) => CandidateState & {
     markShown(): void;
     openImport(): void;
-    providerId: null;
+    providerId?: "cursor" | "claude-code" | "claude-cowork";
   };
   export const p: (props: Record<string, unknown>) => unknown;
   export const r: () => void;
   export const s: (props: Record<string, unknown>) => unknown;
-  export const t: (props?: Record<string, unknown>) => unknown;
-  export const u: (scope: unknown) => Promise<void>;
+  export const t: (props: { onDismiss(): void; onOpenGiftCredits(): void; onShown?(): void }) => unknown;
+  export const u: (options: {
+    navigateToLocalConversation?(conversationId: string): void;
+    onReplay?(): void;
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>;
+    showPluginInstallDetails?(plugin: unknown, options: { hostId: string; marketplaceAnalytics: string; onSuccess(): Promise<void> }): boolean;
+  }) => Promise<void>;
   export const v: (props: Record<string, unknown>) => unknown;
   export const y: () => void;
 }
@@ -14476,21 +14503,9 @@ declare module "@rchunk/about-you-summary" {
 }
 
 declare module "@rchunk/notifications-settings" {
-  interface NotificationSettings {
-    permissionsEnabled: boolean;
-    questionsEnabled: boolean;
-    sound?: string;
-    turnMode: "off" | "unfocused" | "always";
-  }
-  interface NotificationSettingsProps {
-    loading?: boolean;
-    onChange?(settings: NotificationSettings): void;
-    settings?: Partial<NotificationSettings>;
-    soundOptions?: readonly string[];
-  }
-  export const n: (props?: NotificationSettingsProps & { available?: boolean }) => unknown;
+  export const n: () => unknown;
   export const r: () => void;
-  export const t: (props: NotificationSettingsProps) => unknown;
+  export const t: () => unknown;
 }
 
 declare module "@rchunk/settings-host-dropdown" {

@@ -1,5 +1,16 @@
 # Renderer 尾部资产审计
 
+2026-11-02 route owner 大批次：`usage`、`notifications-settings` 与
+`announcement-entry-points` 已从 release-faithful `exact.js` 迁至可维护 TypeScript。
+Usage 恢复账户/用户隔离、warning/blocking/image/model 分支、backend upsell、fallback model
+conversation notice 与 `turn/started` 清理；Notifications 恢复本地持久化偏好、macOS
+系统/自定义声音、预览/错误 toast、ChatGPT account gate、带 `ChatGPT-Account-ID` 的 GET/PATCH、
+optimistic cache/rollback/abort cleanup 及 teen-safety 联系方式过滤；Home announcements 恢复
+Computer History 派生状态、Replay 按账户曝光、external import 30/60 天冷却与 provider
+个性化、gift credits 7/14/30 天冷却及一次性曝光。focused suites 覆盖 50、60、36 项断言；
+严格剩余清单由 43 个 / 183,586 行降至 40 个 / 180,678 行。这里的“迁移”仅指已删除
+对应原始 owner 并通过 source-build/语义门禁的模块，不再把分类或占位实现计作完成。
+
 2026-10-31 A5 composer plugin-state consumer：确认 app-primary `po` 闭包捕获的 `Ec` 即
 app-shared 已公开且已有消费者的 `wu` plugin-state reader；home artifact templates 现直接调用
 `isActiveEntity(wu, editorState)`。semantic/hub 交叉集合缩至同属 browser registry owner 的

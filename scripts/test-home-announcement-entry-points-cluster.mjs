@@ -13,8 +13,19 @@ const MODULES = [
   "announcement-entry-points",
 ];
 const state = (globalThis.__homeAnnouncementEntryPointTest = {
+  accountId: "account-1",
+  analytics: [],
+  discovery: {
+    detectedItems: [{ providerId: "cursor" }],
+    hasDetectionRefreshError: false,
+    hasImportableItems: true,
+    isDetectionError: false,
+    isDetectionFetching: false,
+  },
   homeDirectory: "/Users/tester",
   imported: [],
+  launched: [],
+  signals: new Map(),
 });
 state.jsx = {
   Fragment: Symbol("Fragment"),
@@ -25,9 +36,72 @@ state.jsx = {
 const mocks = {
   "app-shared": `
     export const I3 = () => globalThis.__homeAnnouncementEntryPointTest.jsx;
-    export const BX = (_query, variables) => ({ data: variables == null ? undefined : { homeDirectory: globalThis.__homeAnnouncementEntryPointTest.homeDirectory } });
+    export const ZI = Symbol('app-scope');
+    export const Y2 = undefined;
+    const react = {
+      useEffect: (effect) => { const cleanup = effect(); void cleanup; },
+      useEffectEvent: (callback) => callback,
+      useId: () => 'test-id',
+      useRef: (value) => ({ current: value }),
+      useState: (initial) => { let value = typeof initial === 'function' ? initial() : initial; return [value, (next) => { value = typeof next === 'function' ? next(value) : next; }]; },
+    };
+    export const e6 = () => react;
+    export const n4 = () => ({ formatMessage: (descriptor) => descriptor.defaultMessage });
+    export const LX = () => ({
+      get: (signal) => globalThis.__homeAnnouncementEntryPointTest.signals.get(signal.key),
+      set: (signal, value) => {
+        const current = globalThis.__homeAnnouncementEntryPointTest.signals.get(signal.key);
+        globalThis.__homeAnnouncementEntryPointTest.signals.set(signal.key, typeof value === 'function' ? value(current) : value);
+      },
+    });
+    export const HX = (signal) => globalThis.__homeAnnouncementEntryPointTest.signals.get(signal.key);
+    export const sZ = (_scope, derive) => ({ kind: 'derived', derive });
+    export const BX = (query, variables) => {
+      const test = globalThis.__homeAnnouncementEntryPointTest;
+      if (query?.kind === 'home-directory') return { data: variables == null ? undefined : { homeDirectory: test.homeDirectory } };
+      if (query?.kind === 'histories') return { data: [{ completedAtMs: Date.now() - 70 * 86400000, successes: [1] }], isLoading: false };
+      if (query?.kind === 'status') return { data: {}, isLoading: false };
+      return { data: undefined, isLoading: false };
+    };
   `,
-  "app-initial": "export const gcn = Symbol('home-directory-query');",
+  "app-initial": `
+    export const gcn = { kind: 'home-directory' };
+    export const ZA = { kind: 'histories' };
+    export const _A = { kind: 'status' };
+    export const ugn = 'local';
+    export const vj = { key: 'announcements-disabled' };
+    export const dun = (key, value) => {
+      const test = globalThis.__homeAnnouncementEntryPointTest;
+      if (!test.signals.has(key)) test.signals.set(key, value);
+      return { key };
+    };
+    export const N6t = () => ({ accountId: globalThis.__homeAnnouncementEntryPointTest.accountId, isLoading: false });
+    export const mht = () => ({ data: { desktop_onboarding_completed_at: new Date(Date.now() - 86400000).toISOString() }, isLoading: false });
+    const experiment = (id) => ({
+      __evaluation: { is_experiment_active: id === '1602805785', is_user_in_experiment: id === '1602805785' },
+      get: (key, fallback) => key === 'enabled' ? true : fallback,
+    });
+    export const cfn = () => ({ getExperiment: experiment, isLoading: false });
+    export const nfn = (_client, id) => experiment(id);
+    export const i_n = () => ({ key: 'home-route', pathname: '/' });
+    export const sbt = () => false;
+    export const ofn = () => true;
+    export const zA = () => ['cursor', 'claude-code', 'claude-cowork'];
+    export const sj = () => false;
+    export const IA = () => ({});
+    export const CA = () => globalThis.__homeAnnouncementEntryPointTest.discovery;
+    export const ngn = (_key, fallback) => fallback;
+    export const xpn = (_scope, event, payload) => globalThis.__homeAnnouncementEntryPointTest.analytics.push({ event, payload });
+    export const e4t = Symbol('plugin-query');
+    export const h4t = plugin => plugin;
+    export const Gwt = async input => { globalThis.__homeAnnouncementEntryPointTest.launched.push({ reload: input.hostId }); };
+    export const zdn = async () => ({ data: [{ name: 'codex-replay', tools: { open_controller: { name: 'open_controller' } } }] });
+    export const _Et = () => true;
+    export const VDt = async () => ({ cwd: '/tmp/replay', projectlessOutputDirectory: 'output', workspaceRoots: ['/tmp/replay'] });
+    export const Zgt = async () => 'default';
+    export const gpt = async () => ({ conversationId: 'conversation-replay', firstTurn: { status: 'accepted', turnId: 'turn-1' }, status: 'accepted' });
+    export const mpt = () => null;
+  `,
   "app-primary": "export const Sm = null;",
   "composer-announcement-slot": "export const t = null;",
   "computer-history-plugin-icon": "export const t = 'computer-history.png';",
@@ -35,6 +109,12 @@ const mocks = {
     export const runExternalAgentImportCommand = async (scope, source) => {
       globalThis.__homeAnnouncementEntryPointTest.imported.push({ scope, source });
     };
+  `,
+  "computer-history-query": "export const i = { key: 'computer-history-query' };",
+  "computer-history-suggestions": "export const i = { key: 'computer-history-enabled' };",
+  "entry-point-availability": `
+    export const n = ({ enabled }) => enabled;
+    export const a = (_input, entryPoint) => globalThis.__homeAnnouncementEntryPointTest.launched.push({ entryPoint });
   `,
 };
 
@@ -148,21 +228,20 @@ announcements.m();
 announcements.n();
 announcements.r();
 announcements.y();
-const now = 10 * 24 * 60 * 60 * 1000;
-const hour = 60 * 60 * 1000;
-assert.equal(announcements.g([{ startMs: now - 8 * 24 * hour, endMs: now }], now), true);
-assert.equal(announcements.g([{ startMs: now - 8 * 24 * hour, endMs: now - 7 * 24 * hour }], now), false);
-assert.equal(announcements.g([], now), false);
-assert.equal(announcements.h([{ completedAtMs: 300, successes: [1] }, { completedAtMs: 500, successes: [] }], { latestImportedAtMs: 200 }), 300);
-assert.equal(announcements.h([], {}), null);
+assert.equal(announcements.g.kind, "derived");
+assert.equal(announcements.h.key, "computer-history-weekly-insights-announcement-dismissed-v1");
 const replayState = announcements.f({ enabled: true });
 assert.equal(replayState.isEligible, true);
 replayState.dismiss();
-assert.equal(replayState.isEligible, false);
+assert.equal(state.signals.get("codex-replay-home-announcement-shown-account-ids")["account-1"], true);
 assert.equal(announcements.f({ enabled: false }).isEligible, false);
 const importState = announcements.o();
-assert.equal(importState.providerId, null);
+assert.equal(importState.providerId, "cursor");
 assert.equal(importState.isLoading, false);
+assert.equal(importState.isEligible, true);
+importState.markShown();
+assert.equal(typeof state.signals.get("external-agent-import-home-beacon-last-shown-at"), "number");
+importState.openImport();
 assert.equal(announcements.i().isEligible, true);
 let replayed = false;
 let shown = false;
@@ -183,8 +262,25 @@ let recapPrompt = null;
 const historyTree = announcements.v({ onDismiss() {}, onViewRecap(prompt) { recapPrompt = prompt; } });
 nodes(historyTree).find((node) => node.type === "button" && node.props.children === "View recap").props.onClick();
 assert.match(recapPrompt, /Computer History/);
-await announcements.u("scope-1");
-assert.deepEqual(state.imported, [{ scope: "scope-1", source: "home_beacon" }]);
+let replayConversation = null;
+let replayCompleted = false;
+let installCompletion;
+const replayScope = {
+  queryClient: { fetchQuery: async options => ({ id: 'codex-replay', options }) },
+  query: { getOptions: (_query, input) => ({ queryKey: ['plugin', input.pluginName] }) },
+  get: () => ({ logProductEvent() {} }),
+};
+await announcements.u({
+  scope: replayScope,
+  navigateToLocalConversation(id) { replayConversation = id; },
+  onReplay() { replayCompleted = true; },
+  showPluginInstallDetails(_plugin, options) { installCompletion = options.onSuccess(); return true; },
+});
+await installCompletion;
+assert.equal(replayConversation, "conversation-replay");
+assert.equal(replayCompleted, true);
+await new Promise((resolve) => setTimeout(resolve, 0));
+assert.equal(state.imported.length, 1);
 
 const assertionCount = [...fs.readFileSync(fileURLToPath(import.meta.url), "utf8").matchAll(/\bassert\.(?:equal|deepEqual|match|ok)\s*\(/g)].length;
 console.log(`${assertionCount} home announcement entry-point cluster assertions passed`);
