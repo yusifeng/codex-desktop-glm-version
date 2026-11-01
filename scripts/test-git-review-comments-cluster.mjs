@@ -15,7 +15,7 @@ const imports = new Map();
 for (const directory of MODULES) { const source = fs.readFileSync(path.join(ROOT, "src/renderer", directory, "index.ts"), "utf8"); for (const match of source.matchAll(/import\s*{([\s\S]*?)}\s*from\s*"@rchunk\/([^"]+)";/g)) { const names = imports.get(match[2]) ?? new Set(); for (const item of match[1].split(",")) { const name = item.trim().split(/\s+as\s+/)[0]; if (name && !name.startsWith("type ")) names.add(name); } imports.set(match[2], names); } }
 const overrides = { "app-shared": { $3: `() => { const cache=[]; return { c:size => { while(cache.length<size) cache.push(Symbol.for("react.memo_cache_sentinel")); return cache; } }; }`, BX: "() => new Set(['turn-one'])", FX: "() => undefined", I3: "() => globalThis.__gitReviewCommentsTest.jsx", LX: "() => ({})", __: "callback => callback", e6: "() => globalThis.__gitReviewCommentsTest.react", g_: "() => undefined", gg: "() => undefined", h4: "() => undefined", m4: "(...values) => values.filter(Boolean).join(' ')", mg: "path => 'FileIcon'", qm: "() => undefined" } };
 const sideEffects = new Set(["rolldown-runtime", "app-initial", "pull-request-revision-queries-core", "pull-request-code-review-navigation-core", "pull-request-code-review-core", "revision-review-unavailable-message", "pull-request-status-label", "pull-request-checks-summary", "app-primary", "file-diff-alt", "diff-comment-card", "thread-user-message-navigation-rail-app"]);
-function mock(name) { if (name === "app-initial") return "export const $en={};export const d1t={};export const f1t=()=>{};export const ifn=()=>{};export const itn=()=>{};export const ofn=()=>true;export const p1t=(...args)=>globalThis.__gitReviewCommentsTest.bookmarkWrites.push(args);export const u1t={};"; if (name === "thread-user-message-navigation-rail-app") return "export const AppThreadUserMessageNavigationRail=props=>globalThis.__gitReviewCommentsTest.jsx.jsx('nav',{children:props.items.map(item=>globalThis.__gitReviewCommentsTest.jsx.jsx('button',{onClick:()=>props.onRevealItem?.(item),onMouseEnter:()=>props.onPreviewItem?.(item),onDoubleClick:()=>props.onBookmarkChange?.(item,false)},item.id))});"; if (sideEffects.has(name)) return "export {};"; return [...(imports.get(name) ?? [])].map(exportName => `export const ${exportName} = ${overrides[name]?.[exportName] ?? "() => undefined"};`).join("\n"); }
+function mock(name) { if (name === "app-shared") return "export const JX=(scope,factory)=>({scope,factory});export const ZI={};export const rZ=(scope,factory)=>({scope,factory,derived:true});export const FX=()=>{};export const QI=()=>{};"+[...(imports.get(name) ?? [])].filter(key=>!["JX","ZI","rZ","FX","QI"].includes(key)).map(exportName => `export const ${exportName} = ${overrides[name]?.[exportName] ?? "() => undefined"};`).join("\n"); if (name === "app-initial") return "export const $en={};export const pnt={};export const d1t={};export const f1t=()=>{};export const ifn=()=>{};export const itn=()=>{};export const ofn=()=>true;export const p1t=(...args)=>globalThis.__gitReviewCommentsTest.bookmarkWrites.push(args);export const u1t={};export const gmn=()=>{};export const nrn=()=>{};export const Yy=()=>{};export const i5t=()=>{};export const Y6=()=>{};export const Ry=()=>{};export const Hy=()=>{};export const Oy=()=>{};export const $fn=()=>{};export const nun=()=>{};"; if (name === "thread-user-message-navigation-rail-app") return "export const AppThreadUserMessageNavigationRail=props=>globalThis.__gitReviewCommentsTest.jsx.jsx('nav',{children:props.items.map(item=>globalThis.__gitReviewCommentsTest.jsx.jsx('button',{onClick:()=>props.onRevealItem?.(item),onMouseEnter:()=>props.onPreviewItem?.(item),onDoubleClick:()=>props.onBookmarkChange?.(item,false)},item.id))});"; if (sideEffects.has(name)) return "export {};"; return [...(imports.get(name) ?? [])].map(exportName => `export const ${exportName} = ${overrides[name]?.[exportName] ?? "() => undefined"};`).join("\n"); }
 async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "git-review-comments-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: mock(importPath), loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
 function nodes(root) { const output = []; const visit = value => { if (value == null || typeof value !== "object") return; if (Array.isArray(value)) return value.forEach(visit); if ("type" in value && "props" in value) output.push(value); visit(value.props?.children); }; visit(root); return output; }
 const nodeOfType = (tree, type) => nodes(tree).find(node => node.type === type);
@@ -39,14 +39,14 @@ assert.match(generated, /Keep concise/);
 const generationError = new actions.f("head_changed");
 assert.equal(generationError.reason, "head_changed");
 assert.equal(generationError.name, "PullRequestDescriptionGenerationError");
-assert.equal(typeof actions.a, "symbol");
-assert.equal(typeof actions.c, "symbol");
-assert.equal(typeof actions.d, "symbol");
-assert.equal(typeof actions.i, "symbol");
-assert.equal(typeof actions.l, "symbol");
-assert.equal(typeof actions.n, "symbol");
-assert.equal(typeof actions.r, "symbol");
-assert.equal(typeof actions.s, "symbol");
+assert.equal(typeof actions.a, "object");
+assert.equal(typeof actions.c, "object");
+assert.equal(typeof actions.d, "object");
+assert.equal(typeof actions.i, "object");
+assert.equal(typeof actions.l, "object");
+assert.equal(typeof actions.n, "object");
+assert.equal(typeof actions.r, "object");
+assert.equal(typeof actions.s, "object");
 
 // pull-request-revision-tab
 const revisionTab = await bundle("pull-request-revision-tab");

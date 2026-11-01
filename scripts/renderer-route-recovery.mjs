@@ -334,6 +334,9 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "drop-zones-5d14ded04e79.js",
   "open-in-button-c51945f2c9d6.js",
   "plugin-picker-menu-content-a51d37a29207.js",
+  "create-pull-request-modal-content-a56e677534f4.js",
+  "pull-request-actions-5ac6dcc71dec.js",
+  "realtime-voice-launch-surface-20e3f20aea6c.js",
   "tokenize-math-block-92dba400da42.js",
   "use-app-connect-flow-e16aee878521.js",
   "visualization-standalone-document-45332507e418.js",
@@ -395,10 +398,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["gpt-about-dialog-core", "gpt-about-dialog-7509f0d1e79e.js"],
   ["about-you-summary", "about-you-summary-ee1fdcc83db8.js"],
   ["notifications-settings", "notifications-settings-42b7c5801f48.js"],
-  [
-    "realtime-voice-launch-surface",
-    "realtime-voice-launch-surface-20e3f20aea6c.js",
-  ],
   ["announcement-entry-points", "entry-points-24b83c9c7664.js"],
   ["work-onboarding-suggestions", "suggestions-92e2efd3926f.js"],
   [
@@ -454,10 +453,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   // from the live conversation path while retaining vendor/generated boundaries.
   ["content-quick-chat-overlay", "content-quick-chat-overlay-ed4d1aa8ed4b.js"],
   [
-    "create-pull-request-modal-content",
-    "create-pull-request-modal-content-a56e677534f4.js",
-  ],
-  [
     "git-action-new-branch-field",
     "git-action-new-branch-field-a2e24da5e504.js",
   ],
@@ -472,7 +467,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
     "open-in-google-drive-menu-item",
     "open-in-google-drive-menu-item-b5e143939095.js",
   ],
-  ["pull-request-actions", "pull-request-actions-5ac6dcc71dec.js"],
   ["thread-handoff-modal", "thread-handoff-modal-ccac59d04293.js"],
   ["thread-panel-toggle-button", "thread-panel-toggle-button-d0ce9733e408.js"],
 ]);

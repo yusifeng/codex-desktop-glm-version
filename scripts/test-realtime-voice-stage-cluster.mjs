@@ -7,6 +7,10 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const state = (globalThis.__voiceStageTest = {
   experiment: true,
   platform: "macOS",
+  launch: null,
+  voiceStage: { phase: "inactive", activity: "idle" },
+  handoff: null,
+  actions: [],
 });
 state.jsx = {
   Fragment: Symbol("Fragment"),
@@ -50,12 +54,19 @@ async function bundle(directory) {
       export const n$=value=>({get:()=>value,set:next=>{value=next}});
       export const e$=(value,mapper)=>typeof value==='function'?{get:value}:{get:()=>mapper(value.get())};
       export const o$={div:'MotionDiv',span:'MotionSpan'};
+      export const ZI={id:'scope'}; export const LX=()=>({id:'runtime-scope'});
+      export const HX=signal=>signal==='launch'?globalThis.__voiceStageTest.launch:signal==='voice-stage'?globalThis.__voiceStageTest.voiceStage:globalThis.__voiceStageTest.handoff;
+      export const Y2='FormattedMessage'; export const Yh='Button'; export const FX=()=>{}; export const K2=()=>{};
       export const m4=(...values)=>values.filter(Boolean).join(' ');
       export const x_=()=>1;export const y_=()=>{};`
                     : value === "app-initial"
-                      ? "export const Mrn=()=>globalThis.__voiceStageTest.platform;export const ofn=()=>globalThis.__voiceStageTest.experiment;export const Slt=()=>false;export const xlt=()=>{};export const $n=(rect,screen)=>({height:rect.height,width:rect.width,x:rect.x+screen.screenX,y:rect.y+screen.screenY});export const Qn=value=>value;export const Zn=(origin,bounds)=>({x:origin.x-bounds.x,y:origin.y-bounds.y});"
+                      ? "export const Mrn=()=>globalThis.__voiceStageTest.platform;export const ofn=()=>globalThis.__voiceStageTest.experiment;export const Slt=()=>false;export const xlt=()=>{};export const FV='launch';export const M1t='voice-stage';export const qn='handoff';export const i_n=()=>({pathname:'/c/new',search:''});export const PV=()=>true;export const NV=(launch,id,hostId)=>launch!=null&&id==='c1'&&hostId==='local';export const jV=(...args)=>globalThis.__voiceStageTest.actions.push(['handoff',...args]);export const DV='microphone_permission_denied';export const pnt=Object.assign(()=>{}, {systemPermissions:{openMicrophoneSettings:async()=>globalThis.__voiceStageTest.actions.push(['settings'])}});export const IV=async(...args)=>globalThis.__voiceStageTest.actions.push(['retry',...args]);export const _Et=(...args)=>globalThis.__voiceStageTest.actions.push(['feedback',...args]);export const OV=async(...args)=>globalThis.__voiceStageTest.actions.push(['back',...args]);export const AV=(...args)=>globalThis.__voiceStageTest.actions.push(['complete',...args]);export const eA='VoiceOrb';export const Qgn=()=>{};export const hEt=()=>{};export const tA=()=>{};export const mnt=()=>{};export const $n=(rect,screen)=>({height:rect.height,width:rect.width,x:rect.x+screen.screenX,y:rect.y+screen.screenY});export const Qn=value=>value;export const Zn=(origin,bounds)=>({x:origin.x-bounds.x,y:origin.y-bounds.y});"
                       : value === "realtime-voice-motion"
                         ? "export const i=()=>{};export const n={duration:.28};export const r={duration:0};export const t={duration:.2,ease:[.16,1,.3,1]};"
+                        : value === "realtime-voice-stage-layout"
+                          ? "export const a=()=>{};export const s=()=>{};export const n='stage-shell';export const t='stage-center';export const i='translateY(-28px)';export const r='translateY(52px)';export const o='StageLayout';"
+                          : value === "use-realtime-voice-native-overlay-transition-enabled"
+                            ? "export const t=()=>{};export const n=()=>globalThis.__voiceStageTest.experiment&&globalThis.__voiceStageTest.platform==='macOS';"
                         : "export {};",
               loader: "js",
             }),
@@ -148,30 +159,28 @@ assert.equal(
 );
 const launch = await bundle("realtime-voice-launch-surface");
 launch.n();
-assert.equal(launch.t({ phase: "connected" }), null);
+assert.equal(launch.t({}), null);
+state.launch = { request: { source: "composer_button_new_thread" }, phase: "connecting", originPath: "/" };
 const connecting = launch.t({
-  phase: "connecting",
   threadLocator: { conversationId: "c1", hostId: "local" },
 });
-assert.equal(connecting.props["aria-busy"], true);
-assert.equal(connecting.props["data-thread-id"], "c1");
-let settings = false;
+assert.equal(connecting.type, "MotionDiv");
+assert.deepEqual(connecting.props.animate, { opacity: 1 });
+assert.equal(nodes(connecting).find(node => node.type === "StageLayout").props.orb.type, "VoiceOrb");
+state.launch = { request: { source: "composer_button_new_thread" }, phase: "failed", error: "microphone_permission_denied", originPath: "/" };
 const failed = launch.t({
-  phase: "failed",
-  microphonePermissionDenied: true,
-  onOpenSettings() {
-    settings = true;
-  },
+  threadLocator: { conversationId: "c1", hostId: "local" },
 });
 assert.equal(failed.props.role, "alert");
 assert.equal(
-  nodes(failed).find((node) => node.type === "h2").props.children,
+  nodes(failed).find((node) => node.type === "h2").props.children.props.defaultMessage,
   "Microphone permission denied",
 );
 nodes(failed)
   .find(
-    (node) => node.type === "button" && node.props.children === "Open settings",
+    (node) => node.type === "Button" && node.props.children.props.defaultMessage === "Open system settings",
   )
   .props.onClick();
-assert.equal(settings, true);
+await Promise.resolve();
+assert.equal(state.actions.some(([kind]) => kind === "settings"), true);
 console.log("23 realtime voice stage cluster assertions passed");

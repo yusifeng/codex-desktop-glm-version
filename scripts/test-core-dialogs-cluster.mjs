@@ -52,16 +52,18 @@ const byText = (tree, text) => nodes(tree).find(node => node.props?.children ===
 const pr = await bundle("create-pull-request-modal-content");
 const prActions = [];
 const prTree = pr.t({ isGitLab: false, repositoryName: "repo", baseBranch: "main", headBranch: "feature", title: "Ship", description: "Ready", includeLocalChanges: true, onTitleChange: value => prActions.push(["title", value]), onDescriptionChange: value => prActions.push(["description", value]), onIncludeLocalChangesChange: value => prActions.push(["local", value]), onCreate: value => prActions.push(["create", value]), onOpenPullRequest: () => {} });
-assert.equal(prTree.props["aria-label"], "Create pull request");
-assert.equal(byText(prTree, "Create pull request").type, "h2");
-assert.match(nodes(prTree).find(node => node.type === "p").props.children, /main ← feature/);
+const prSection = nodes(prTree).find(node => node.type === "section");
+assert.equal(prSection.props["aria-label"], "Create PR");
+assert.equal(byText(prTree, "Create PR").type, "h2");
+assert.equal(prSection.props["data-default-value"], "create-pr");
+assert.match(String(nodes(prTree).find(node => node.type === "span" && Array.isArray(node.props.children)).props.children.flat().join("")), /feature → main/);
 nodes(prTree).find(node => node.type === "input" && node.props.value === "Ship").props.onChange({ currentTarget: { value: "New title" } });
 assert.deepEqual(prActions.at(-1), ["title", "New title"]);
 nodes(prTree).find(node => node.props.type === "checkbox").props.onChange({ currentTarget: { checked: false } });
 assert.deepEqual(prActions.at(-1), ["local", false]);
-byText(prTree, "Create draft").props.onClick();
+nodes(prTree).find(node => node.props["data-value"] === "create-draft-pr").props.onClick({});
 assert.deepEqual(prActions.at(-1), ["create", true]);
-assert.equal(nodes(prTree).find(node => node.type === "button" && node.props.children === "Create pull request").props.disabled, false);
+assert.equal(nodes(prTree).find(node => node.props["data-value"] === "create-pr").props.disabled, false);
 
 // automation-dialog: 7
 const automation = await bundle("automation-dialog");
