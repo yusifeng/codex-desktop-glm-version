@@ -344,6 +344,9 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "workspace-agent-detail-query-3cb2bb771d2e.js",
   "presentation-f4eb8ac38003.js",
   "result-card-17125719c243.js",
+  "runtime-4b6d284756d8.js",
+  "thread-app-shell-chrome-e245ed2613ae.js",
+  "thread-overflow-menu-51894ca4476d.js",
 ]);
 
 // Full release-faithful React/runtime modules promoted into their semantic
@@ -502,10 +505,7 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["pull-request-actions", "pull-request-actions-5ac6dcc71dec.js"],
   ["pull-request-fix-workflow", "pull-request-fix-workflow-1561e22a0cbc.js"],
   ["quick-chat-obstacles", "quick-chat-obstacles-c569ea17ffc9.js"],
-  ["thread-shell-runtime", "runtime-4b6d284756d8.js"],
-  ["thread-app-shell-chrome", "thread-app-shell-chrome-e245ed2613ae.js"],
   ["thread-handoff-modal", "thread-handoff-modal-ccac59d04293.js"],
-  ["thread-overflow-menu", "thread-overflow-menu-51894ca4476d.js"],
   ["thread-panel-toggle-button", "thread-panel-toggle-button-d0ce9733e408.js"],
   ["use-app-connect-flow", "use-app-connect-flow-e16aee878521.js"],
   ["worktree-setup-auto-fix", "worktree-setup-auto-fix-4dc0f12b7219.js"],

@@ -41,10 +41,10 @@ exports were previously classified. Current completion requires source-backed bu
 
 ## Current runtime-source recovery status
 
-The renderer build now emits and verifies all 1,888 registered rewritten chunks. There are 93 remaining release-faithful source owners
+The renderer build now emits and verifies all 1,888 registered rewritten chunks. There are 90 remaining release-faithful source owners
 under their semantic `src/renderer/<name>/` directories, including the settings/composer surfaces and the complete local
 conversation dependency closure. Their checked-in `exact.js` files are generated from the published ESM with only cross-chunk
-import specifiers rewritten; the source-build gate regenerates all 93 owners and requires exact source equality. The build
+import specifiers rewritten; the source-build gate regenerates all 90 owners and requires exact source equality. The build
 therefore no longer substitutes the earlier partial view-model approximations for these production components.
 
 The remaining route compatibility closure contains 33 checked-in ESM modules, down from 77 before the exact-owner promotion,
@@ -55,7 +55,7 @@ explicitly audited as vendor or generated boundaries (Recharts/D3,
 Three.js, date/phone/form runtimes, generated icons and entry shims); a gate requires that inventory to match the closure
 exactly. Six former incremental hubs now also have exact source owners; only the three shared renderer hubs remain incremental.
 Renderer verification passes 1,888/1,888 outputs, TypeScript typechecking passes, and the recovery gate covers 11 source-build
-assertions, 33 compatibility modules, 93 exact owners, and seven reviewed structural drafts. The packaged app now starts from
+assertions, 33 compatibility modules, 90 exact owners, and seven reviewed structural drafts. The packaged app now starts from
 the reconstructed build, renders the home composer, resumes a real signed-in local conversation, hydrates its turns, and renders
 the virtualized user/assistant transcript without loading original JavaScript as a runtime fallback. The build also rejects
 build-only `@exact-chunk` aliases if any leak into packaged assets.
@@ -80,7 +80,7 @@ tab-activity, and session-registration behavior. Browser-page preload initializa
 annotation owners initialize lazily after their runtime bindings, WebMCP retains a real ESM named export, and every extracted
 annotation controller is bound before registry construction. Focused regressions cover these ordering and ownership contracts.
 
-The 93 exact owners are still outstanding readability and semantic-recovery work and must not be described as a completely
+The 90 exact owners are still outstanding readability and semantic-recovery work and must not be described as a completely
 decompiled renderer. The current build is source-backed and runnable, but final completion additionally requires replacing
 those owners with maintainable semantic TypeScript (or explicitly justified generated/vendor boundaries), keeping the
 critical E2E matrix green, and eliminating the remaining stable runtime contract errors.

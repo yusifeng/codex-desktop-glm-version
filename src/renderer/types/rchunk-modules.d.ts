@@ -6770,11 +6770,11 @@ declare module "@rchunk/thread-shell-runtime" {
   export interface TerminalSession { context: ThreadTerminalContext; id: string; panel: TerminalPanel; snapshot?: unknown }
   export interface TerminalScope { activePanel?: TerminalPanel; context?: ThreadTerminalContext | null; defaultTerminalLocation?: TerminalPanel; sessions: TerminalSession[]; terminalHidden?: boolean }
   export const a: (scope: TerminalScope) => void;
-  export const c: (scope: TerminalScope) => boolean;
+  export const c: unknown;
   export const d: { getId(session: TerminalSession): string; getTitle(session: TerminalSession): string; open(scope: TerminalScope, sessionId?: string, panel?: TerminalPanel, options?: { snapshot?: unknown }): string | null; preloadExisting(scope: TerminalScope, sessionId: string, snapshot: unknown): Promise<boolean> };
   export const f: (scope: TerminalScope) => void;
   export const i: (scope: TerminalScope, input: { panel: TerminalPanel; sessionId: string; snapshot: unknown }) => void;
-  export const l: (scope: TerminalScope) => TerminalPanel;
+  export const l: unknown;
   export const m: (scope: TerminalScope) => () => void;
   export const n: () => void;
   export const o: (scope: TerminalScope, panel: TerminalPanel, replaceTabId?: string) => void;
@@ -6782,7 +6782,7 @@ declare module "@rchunk/thread-shell-runtime" {
   export const r: (scope: TerminalScope, sessionId?: string, panel?: TerminalPanel, options?: { snapshot?: unknown }) => string | null;
   export const s: (scope: TerminalScope) => void;
   export const t: (scope: TerminalScope) => boolean;
-  export const u: (scope: TerminalScope) => boolean;
+  export const u: unknown;
 }
 declare module "@rchunk/artifact-viewer" {
   export interface ConversationItem { completed?: boolean; id?: string; messageId?: string; status?: string; type: string; [key: string]: unknown }
