@@ -5590,3 +5590,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - `WindowContext` disk apply 与 deep-link consumer 已真实接回语义入口，主 chunk 旧 `vl/xoe/yl/Soe`、schemas 和 aliases
   约 197 行删除。
 - focused 65 项，WindowContext/ProjectsManager/remote-connections 相邻回归通过；测试索引 1844，no-unwired gate 1030 项。
+
+# 2026-11-01 markdown plain-text runtime convergence
+
+- `markdown/plain-text.ts` 改为由主组合根注入发布 chunk 的真实 HTML/mdast/GFM/directive vendor 入口；thread catalog、hydration、
+  projection 与 native notifications 共用同一个 configured runtime，没有复制 parser 状态。
+- 主 chunk 旧 `Hme/Ume/Vp/Yme/Xme/Zme/Hp/Qme` 和 aliases 约 116 行删除；移除引用六个未随 app 发布 npm packages 的
+  `vendor/mdast.ts` 失效 adapter，消除实际启动风险。
+- 新 focused 37 项，notification/thread-catalog/hydration/projection 相邻回归共 318 项通过；五个直接 `.ts` 测试入口已恢复
+  真实执行。测试索引 1845，no-unwired gate 1047 项。

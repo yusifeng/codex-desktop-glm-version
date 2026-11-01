@@ -3759,3 +3759,14 @@ no-unwired gate 扩至 1020 项。
 主 chunk 原 `vl/xoe/yl/Soe`、四层 schema 和专用 aliases 共约 197 行已物理删除。focused suite 扩至 65 项，覆盖 missing/read/
 JSON/version/schema、默认值与 trim、全部错误文案、dialog/copy/no-op，并与 WindowContext lifecycle、ProjectsManager、remote
 connections 共 133 项相邻回归通过；测试索引仍为 1844 个唯一脚本，no-unwired gate 扩至 1030 项。
+
+### 收敛既有 owner：markdown plain-text runtime
+
+`markdown/plain-text.ts` 现由主组合根注入发布 chunk 中既有的 HTML DOM、mdast、GFM 与 directive vendor 入口，并以单一
+configured runtime 同时服务 thread catalog/hydration/projection 和 native notifications。这样保留原 autolink 未闭合 label guard、
+directive fence、私有占位符、HTML script/style/comment 过滤和容器空格语义，同时不复制 micromark 状态机。
+
+主 chunk 原 `Hme/Ume/Vp/Yme/Xme/Zme/Hp/Qme` 及 parser/pattern aliases 约 116 行已删除。此前 `vendor/mdast.ts` 引用了发布
+app 中未安装的六个裸 npm packages，已删除该失效 adapter，改由组合根传入同一发布 vendor 实例。新 focused suite 37 项，
+notification/thread-catalog/hydration/projection 九组共 318 项相邻回归真实执行并通过；修复五个直接 import `.ts` 的失效测试入口。
+测试索引增至 1845，no-unwired gate 扩至 1047 项。

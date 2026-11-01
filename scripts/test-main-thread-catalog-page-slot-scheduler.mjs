@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { createThreadCatalogPageSlotSchedulerClass } from "../src/main/main-app/thread-catalog/page-slot-scheduler.ts";
+import { transform } from "esbuild";
+
+const schedulerSource = fs.readFileSync(new URL("../src/main/main-app/thread-catalog/page-slot-scheduler.ts", import.meta.url), "utf8");
+const schedulerOutput = await transform(schedulerSource, { loader: "ts", format: "esm", target: "node22" });
+const { createThreadCatalogPageSlotSchedulerClass } = await import(`data:text/javascript;base64,${Buffer.from(schedulerOutput.code).toString("base64")}`);
 
 let assertions = 0;
 const equal = (actual, expected) => {

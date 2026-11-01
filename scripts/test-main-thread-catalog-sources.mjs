@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { z } from "zod";
-import { createThreadCatalogSources } from "../src/main/main-app/thread-catalog/sources.ts";
+import { transform } from "esbuild";
+
+const sourcesSource = fs.readFileSync(new URL("../src/main/main-app/thread-catalog/sources.ts", import.meta.url), "utf8");
+const sourcesOutput = await transform(sourcesSource, { loader: "ts", format: "esm", target: "node22" });
+const { createThreadCatalogSources } = await import(`data:text/javascript;base64,${Buffer.from(sourcesOutput.code).toString("base64")}`);
 
 let assertions = 0;
 function equal(actual, expected, message) {

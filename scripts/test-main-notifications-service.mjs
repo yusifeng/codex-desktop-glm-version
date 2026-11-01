@@ -2,7 +2,16 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { EventEmitter } from "node:events";
 import { z } from "zod";
-import { createNotificationsServiceClass } from "../src/main/main-app/notifications/notifications-service.ts";
+import { transform } from "esbuild";
+
+const source = fs.readFileSync(
+  new URL("../src/main/main-app/notifications/notifications-service.ts", import.meta.url),
+  "utf8",
+);
+const output = await transform(source, { loader: "ts", format: "cjs", target: "node22" });
+const runtimeModule = { exports: {} };
+Function("module", "exports", output.code)(runtimeModule, runtimeModule.exports);
+const { createNotificationsServiceClass } = runtimeModule.exports;
 
 const processes = [];
 const managerCalls = [];
@@ -43,5 +52,8 @@ assert.equal(dismissed, 3);
 desktop.onClose();
 assert.equal(actions.at(-1), "disposed");
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
-assert.match(main, /Xet = createNotificationsServiceClass\(\{/); assert.doesNotMatch(main, /Xet = class/); assert.match(main, /notifications: new Xet\(/);
+const windowContext = fs.readFileSync(new URL("../src/main/main-app/window/window-context.ts", import.meta.url), "utf8");
+assert.match(main, /Xet = createNotificationsServiceClass\(\{/);
+assert.doesNotMatch(main, /Xet = class/);
+assert.match(windowContext, /notifications: new Xet\(/);
 console.log("notifications service assertions: 16");

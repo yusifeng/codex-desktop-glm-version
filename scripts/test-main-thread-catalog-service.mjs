@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
 import fs from "node:fs";
-import { createThreadCatalogServiceClass } from "../src/main/main-app/thread-catalog/service.ts";
+import { transform } from "esbuild";
+
+const serviceSource = fs.readFileSync(new URL("../src/main/main-app/thread-catalog/service.ts", import.meta.url), "utf8");
+const serviceOutput = await transform(serviceSource, { loader: "ts", format: "esm", target: "node22" });
+const { createThreadCatalogServiceClass } = await import(`data:text/javascript;base64,${Buffer.from(serviceOutput.code).toString("base64")}`);
 
 let assertions = 0;
 const equal = (actual, expected) => {

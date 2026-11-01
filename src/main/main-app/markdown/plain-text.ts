@@ -10,39 +10,82 @@
 //   - Hp/Qme：mdast 树递归纯文本化，跨 html 分片的未闭合 <script>/<style>
 //     开标签用状态机跳过其后的子节点直到闭合分片。
 //
-// 模块加载期副作用（与原版一致）：求值 Jme = createPatchedGfmExtension()
-// （纯内存对象构建，无 I/O），以及 Bme = 惰性加载 HTML DOM parser 模块。
+// vendor parser 保持在发布 main chunk 内；本 owner 由组合根注入其七个真实入口，
+// 避免重新打包一套 micromark 状态机或依赖发布包中不存在的裸 npm modules。
 
-import { t as loadHtmlDomParserModule } from "@chunk/css-selector";
-import {
-  createDirectiveMdastExtension,
-  createDirectiveMicromarkExtension,
-  createGfmMdastExtension,
-  fromMarkdown,
-  mdastNodeToString,
-  type MdastNode,
-} from "../vendor/mdast";
-import { createGfmMicromarkExtension } from "../vendor/mdast";
+type MdastNode = any;
 
-/** 惰性 HTML DOM parser 模块（原版 Bme = s.t()，26,445）。 */
-const htmlDomParser = loadHtmlDomParserModule();
+type PlainTextDependencies = {
+  loadHtmlDomParserModule(): {
+    parse(html: string): {
+      querySelectorAll(selector: string): { remove(): void }[];
+      structuredText: string;
+    };
+  };
+  fromMarkdown(
+    value: string,
+    options?: { extensions?: unknown[]; mdastExtensions?: unknown[] },
+  ): MdastNode;
+  mdastNodeToString(node: MdastNode, options?: unknown): string;
+  createGfmMdastExtension(): unknown;
+  createDirectiveMdastExtension(): unknown;
+  createDirectiveMicromarkExtension(options?: unknown): unknown;
+  createGfmMicromarkExtension(options?: unknown): unknown;
+};
+
+type PlainTextRuntime = {
+  plainTextFromMarkdown(input: string): string;
+};
+
+let configuredRuntime: PlainTextRuntime | null = null;
 
 /** 纯散文判定：仅常见文字/标点字符，且不是列表项/有序标题形态。 */
 const PLAIN_PROSE_PATTERN = /^[\p{L}\p{M}\p{N} .,!?'"’()-]+$/u;
 
-/** markdown 文本 → 单行纯文本（线程标题提取入口，原版 Vp）。 */
+/** 构造 markdown 文本 owner；vendor 入口全部来自发布 main chunk 的单一实例。 */
+export function createMarkdownPlainTextRuntime(
+  dependencies: PlainTextDependencies,
+): PlainTextRuntime {
+  const htmlDomParser = dependencies.loadHtmlDomParserModule();
+  const patchedGfmExtension = createPatchedGfmExtension(
+    dependencies.createGfmMicromarkExtension,
+  );
+  const mdastToPlainText = createMdastToPlainText(
+    htmlDomParser,
+    dependencies.mdastNodeToString,
+  );
+
+  function plainTextFromMarkdown(input: string): string {
+    let stripped = stripPrivateUsePlaceholders(unescapeDirectives(input)).trim();
+    if (stripped.length === 0) return ``;
+    if (isPlainProseText(stripped)) return stripped.replace(/ +/g, ` `);
+    return mdastToPlainText(
+      dependencies.fromMarkdown(stripped, {
+        extensions: [patchedGfmExtension, dependencies.createDirectiveMicromarkExtension()],
+        mdastExtensions: [
+          dependencies.createGfmMdastExtension(),
+          dependencies.createDirectiveMdastExtension(),
+        ],
+      }),
+    )
+      .replace(/\s+/g, ` `)
+      .trim();
+  }
+
+  return { plainTextFromMarkdown };
+}
+
+/** 组合根只配置一次；所有直接 import consumer 与通知 owner 共用该实例。 */
+export function configureMarkdownPlainTextRuntime(dependencies: PlainTextDependencies) {
+  configuredRuntime ??= createMarkdownPlainTextRuntime(dependencies);
+  return configuredRuntime;
+}
+
+/** 线程目录/hydration/projection 的稳定兼容入口。 */
 export function plainTextFromMarkdown(input: string): string {
-  let stripped = stripPrivateUsePlaceholders(unescapeDirectives(input)).trim();
-  if (stripped.length === 0) return ``;
-  if (isPlainProseText(stripped)) return stripped.replace(/ +/g, ` `);
-  return mdastToPlainText(
-    fromMarkdown(stripped, {
-      extensions: [patchedGfmExtension, createDirectiveMicromarkExtension()],
-      mdastExtensions: [createGfmMdastExtension(), createDirectiveMdastExtension()],
-    }),
-  )
-    .replace(/\s+/g, ` `)
-    .trim();
+  if (configuredRuntime == null)
+    throw Error("Markdown plain-text runtime has not been configured");
+  return configuredRuntime.plainTextFromMarkdown(input);
 }
 
 /** 纯散文快速路径判定（原版 Hme）。 */
@@ -115,7 +158,7 @@ function stripPrivateUsePlaceholders(text: string): string {
  *     （防止 `[www.example.com]` 的链接标签内被识别为字面 autolink）；
  *   - 扫到 _gfmAutolinkLiteralWalkedInto 标记即停（gfm 内部约定边界）。
  */
-function createPatchedGfmExtension(): unknown {
+function createPatchedGfmExtension(createGfmMicromarkExtension: () => unknown): unknown {
   let extension = createGfmMicromarkExtension();
   let textConstructs = (extension as { text?: Record<string, unknown> }).text;
   if (textConstructs == null) return extension;
@@ -161,9 +204,6 @@ function createPatchedGfmExtension(): unknown {
   return extension;
 }
 
-/** 打了 autolink 补丁的 gfm 扩展实例（模块加载期构建一次，原版 Jme = Zme()）。 */
-const patchedGfmExtension = createPatchedGfmExtension();
-
 // ---------------------------------------------------------------------------
 // mdast 树 → 纯文本（原版 Hp/Qme）
 // ---------------------------------------------------------------------------
@@ -200,33 +240,39 @@ const BLOCK_CONTAINER_TYPES = new Set([
  *   子节点文本按容器类型以空格或空串连接；
  * - 叶子节点：mdast-util-to-string。
  */
-function mdastToPlainText(node: MdastNode): string {
-  if (node.type === `html`) {
-    if (COMMENT_ONLY_HTML_PATTERN.test(node.value.trim())) return ``;
-    let document = htmlDomParser.parse(node.value);
-    for (let element of [
-      ...document.querySelectorAll(`script`),
-      ...document.querySelectorAll(`style`),
-    ])
-      element.remove();
-    return document.structuredText;
-  }
-  if (`children` in node) {
-    let parts: string[] = [];
-    let openTagKind: 'script' | 'style' | null = null;
-    for (let child of node.children) {
-      if (openTagKind != null) {
-        // 处于未闭合的 script/style 内：只找闭合分片，其余跳过。
-        if (child.type === `html` && CLOSING_TAG_PATTERNS[openTagKind].test(child.value))
-          openTagKind = null;
-        continue;
-      }
-      if (child.type === `html` && (openTagKind = openingTagKind(child.value)) != null) continue;
-      parts.push(mdastToPlainText(child));
+function createMdastToPlainText(
+  htmlDomParser: ReturnType<PlainTextDependencies["loadHtmlDomParserModule"]>,
+  mdastNodeToString: PlainTextDependencies["mdastNodeToString"],
+) {
+  function mdastToPlainText(node: MdastNode): string {
+    if (node.type === `html`) {
+      if (COMMENT_ONLY_HTML_PATTERN.test(node.value.trim())) return ``;
+      let document = htmlDomParser.parse(node.value);
+      for (let element of [
+        ...document.querySelectorAll(`script`),
+        ...document.querySelectorAll(`style`),
+      ])
+        element.remove();
+      return document.structuredText;
     }
-    return parts.join(BLOCK_CONTAINER_TYPES.has(node.type) ? ` ` : ``);
+    if (`children` in node) {
+      let parts: string[] = [];
+      let openTagKind: 'script' | 'style' | null = null;
+      for (let child of node.children) {
+        if (openTagKind != null) {
+          // 处于未闭合的 script/style 内：只找闭合分片，其余跳过。
+          if (child.type === `html` && CLOSING_TAG_PATTERNS[openTagKind].test(child.value))
+            openTagKind = null;
+          continue;
+        }
+        if (child.type === `html` && (openTagKind = openingTagKind(child.value)) != null) continue;
+        parts.push(mdastToPlainText(child));
+      }
+      return parts.join(BLOCK_CONTAINER_TYPES.has(node.type) ? ` ` : ``);
+    }
+    return mdastNodeToString(node);
   }
-  return mdastNodeToString(node);
+  return mdastToPlainText;
 }
 
 /**

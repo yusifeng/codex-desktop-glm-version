@@ -148,6 +148,7 @@ const realOwners = [
   ["src/main/main-app/automations/heartbeat-runtime.ts", "createHeartbeatAutomationRuntime"],
   ["src/main/main-app/automations/cron-run.ts", "createCronAutomationRunRuntime"],
   ["src/main/main-app/automations/scheduler-runtime.ts", "createAutomationSchedulerRuntime"],
+  ["src/main/main-app/markdown/plain-text.ts", "configureMarkdownPlainTextRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -172,6 +173,10 @@ for (const path of removedSkeletons) {
 
 const main = fs.readFileSync(
   new URL(".reference/originals/main/main-C-Mhak1n.ts", root),
+  "utf8",
+);
+const markdownPlainText = fs.readFileSync(
+  new URL("src/main/main-app/markdown/plain-text.ts", root),
   "utf8",
 );
 const codexAppConfigRuntime = fs.readFileSync(
@@ -989,5 +994,19 @@ for (const generatedName of ["pae", "mae", "Os", "ks", "As", "hae", "js", "gae"]
     `generated automation scheduler owner ${generatedName} must be removed`,
   );
 }
+assert.equal(main.includes('require("./main-app/markdown/plain-text.js")'), true, "markdown plain-text runtime is wired");
+assert.equal(main.includes("configureMarkdownPlainTextRuntime({"), true, "markdown plain-text runtime is composed");
+assert.equal(main.includes("sanitizeText: Vp"), true, "native notifications consume the semantic markdown owner");
+for (const generatedName of ["Hme", "Ume", "Vp", "Yme", "Xme", "Zme", "Hp", "Qme"]) {
+  assert.equal(
+    new RegExp(`^function ${generatedName}\\(`, "m").test(main),
+    false,
+    `generated markdown plain-text helper ${generatedName} must be removed`,
+  );
+}
+assert.equal(/^var Bme = /m.test(main), false, "generated HTML parser alias must be removed");
+assert.equal(/^[ ]*Vme = /m.test(main), false, "generated prose-pattern alias must be removed");
+assert.equal(markdownPlainText.includes('../vendor/mdast'), false, "markdown owner must not depend on unshipped npm adapter");
+assert.equal(fs.existsSync(new URL("src/main/main-app/vendor/mdast.ts", root)), false, "unshippable mdast adapter must stay removed");
 
-console.log("1030 main unwired-owner skeleton assertions passed");
+console.log("1047 main unwired-owner skeleton assertions passed");

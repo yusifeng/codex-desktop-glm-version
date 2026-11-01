@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { createThreadCatalogSyncCoordinatorClass } from "../src/main/main-app/thread-catalog/sync-coordinator.ts";
+import { transform } from "esbuild";
+
+const syncSource = fs.readFileSync(new URL("../src/main/main-app/thread-catalog/sync-coordinator.ts", import.meta.url), "utf8");
+const syncOutput = await transform(syncSource, { loader: "ts", format: "esm", target: "node22" });
+const { createThreadCatalogSyncCoordinatorClass } = await import(`data:text/javascript;base64,${Buffer.from(syncOutput.code).toString("base64")}`);
 
 let assertions = 0;
 const equal = (actual, expected) => {

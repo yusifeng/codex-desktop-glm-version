@@ -185,6 +185,7 @@ const { O_e, zv, Bv, Vv, D_e } = require("./main-app/threads/patch-classificatio
 const { mx, yx } = require("./main-app/threads/start-config.js");
 const { hasCanonicalVoiceHistory: q_, parseHeartbeatDecision: J_, parseAutomationUserMessage: n_e, AUTOMATION_DETECTOR: Y_ } = require("./main-app/threads/automation-detector.js");
 const { conversationFromThreadSummary: V_, cleanThreadTitle: Cv, truncateText: wv, threadPreviewTitle: v_e, threadTimestamps: Tv, mergedRecencyAt: Ev, environmentSelection: Dv, subAgentMetadata: H_, subAgentNickname: $ge } = require("./main-app/threads/projection.js");
+const { configureMarkdownPlainTextRuntime } = require("./main-app/markdown/plain-text.js");
 const { me, Xt } = require("./main-app/misc/thread-errors.js");
 const { attachmentsFromInput: X_, normalizeImageGenerationItem: Z_, turnParamsFromReadResponse: $_, projectReadResponseTurns: ev, projectTurns: tv, projectItems: nv, ensureTurnFields: iv, registerThreadMetadata: av, activeAncestryIds: ov, isSubagentThread: sv, effectiveRuntimeStatus: cv, isDescendantOf: lv, parentThreadIdOf: uv, isSurfaceableThread: dv, environmentInputResult: fv, pendingInteractionKind: pv, pendingInteraction: mv, RetryLookupCache } = require("./main-app/threads/hydration.js");
 const { Yv, Xv, L_e, Zv, Qv } = require("./main-app/requests/item-synthesis.js");
@@ -10055,122 +10056,15 @@ function Rme(e, t, n) {
 function zme(e) {
   return hf([ume(), bme(), Ome(e), Mme(), Ime()]);
 }
-var Bme = s.t(),
-  Vme = /^[\p{L}\p{M}\p{N} .,!?'"’()-]+$/u;
-function Hme(e) {
-  return Vme.test(e) && !e.startsWith(`-`) && !/^\d+[.)](?: |$)/.test(e);
-}
-function Ume(e, t) {
-  let n = t.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
-  if (n == null) return e;
-  let [, r = ``, i = ``] = n,
-    a = r.startsWith("`") ? "`" : `~`;
-  return e == null
-    ? a === "`" && i.includes("`")
-      ? null
-      : { length: r.length, marker: a }
-    : a === e.marker && r.length >= e.length && i.trim().length === 0
-      ? null
-      : e;
-}
-var Wme = /^(?:<!--(?:(?!-->)[\s\S])*-->\s*)+$/,
-  Gme = /(^|[^:])::([A-Za-z][A-Za-z0-9_-]*)(?=[[{])/g,
-  Bp = { script: /<\/\s*script\s*>/i, style: /<\/\s*style\s*>/i },
-  Kme = /<\s*(script|style)\b[^>]*>/i,
-  qme = new Set([
-    `root`,
-    `blockquote`,
-    `list`,
-    `listItem`,
-    `table`,
-    `tableRow`,
-    `tableCell`,
-    `containerDirective`,
-  ]),
-  Jme = Zme();
-function Vp(e) {
-  let t = Yme(Xme(e)).trim();
-  return t.length === 0
-    ? ``
-    : Hme(t)
-      ? t.replace(/ +/g, ` `)
-      : Hp(Jfe(t, { extensions: [Jme, sme()], mdastExtensions: [Bpe(), Wue()] }))
-          .replace(/\s+/g, ` `)
-          .trim();
-}
-function Yme(e) {
-  if (!e.includes(`::`)) return e;
-  let t = [],
-    n = null;
-  for (let r of e.split(`
-`)) {
-    let e = n != null;
-    ((n = Ume(n, r)), t.push(e || n != null ? r : r.replace(Gme, `$1:$2`)));
-  }
-  return t.join(`
-`);
-}
-function Xme(e) {
-  return e.replaceAll(/\uE200[^\uE201]*\uE201/g, ``);
-}
-function Zme() {
-  let e = zme(),
-    t = e.text;
-  if (t == null) return e;
-  let n = new WeakMap();
-  for (let [e, r] of Object.entries(t))
-    r != null &&
-      (t[e] = (Array.isArray(r) ? r : [r]).map((e) => {
-        if (!e.name?.endsWith(`Autolink`)) return e;
-        let t = e.previous;
-        return {
-          ...e,
-          previous(e) {
-            if (t != null && !t.call(this, e)) return !1;
-            let r = n.get(this.events);
-            if (r != null && this.events[r.index]?.[1] === r.token && !r.token._balanced) return !1;
-            for (let e = this.events.length - 1; e >= 0; --e) {
-              let t = this.events[e][1];
-              if ((t.type === `labelLink` || t.type === `labelImage`) && !t._balanced)
-                return (n.set(this.events, { index: e, token: t }), !1);
-              if (`_gfmAutolinkLiteralWalkedInto` in t && t._gfmAutolinkLiteralWalkedInto === !0)
-                break;
-            }
-            return !0;
-          },
-        };
-      }));
-  return e;
-}
-function Hp(e) {
-  if (e.type === `html`) {
-    if (Wme.test(e.value.trim())) return ``;
-    let t = (0, Bme.parse)(e.value);
-    for (let e of [...t.querySelectorAll(`script`), ...t.querySelectorAll(`style`)]) e.remove();
-    return t.structuredText;
-  }
-  if (`children` in e) {
-    let t = [],
-      n = null;
-    for (let r of e.children) {
-      if (n != null) {
-        r.type === `html` && Bp[n].test(r.value) && (n = null);
-        continue;
-      }
-      (r.type === `html` && ((n = Qme(r.value)), n != null)) || t.push(Hp(r));
-    }
-    return t.join(qme.has(e.type) ? ` ` : ``);
-  }
-  return lf(e);
-}
-function Qme(e) {
-  let t = Kme.exec(e),
-    n = t?.[0],
-    r = t?.[1];
-  return (r !== `script` && r !== `style`) || n == null || n.endsWith(`/>`) || Bp[r].test(e)
-    ? null
-    : r;
-}
+var { plainTextFromMarkdown: Vp } = configureMarkdownPlainTextRuntime({
+  loadHtmlDomParserModule: s.t,
+  fromMarkdown: Jfe,
+  mdastNodeToString: lf,
+  createGfmMdastExtension: Bpe,
+  createDirectiveMdastExtension: Wue,
+  createDirectiveMicromarkExtension: sme,
+  createGfmMicromarkExtension: zme,
+});
 var hhe = LocalThreadCatalogStore;
 var { resolveSoundCommand: _m, resolveMacBuiltinSound: gm, getCustomSoundDirectory: vm } =
     createNotificationSoundHelpers({ electron: l, fs: v, os: p.default, path: h.default, process }),
