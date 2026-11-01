@@ -1,5 +1,16 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Device/personalization/AppGen settings 大批次：
+`codex-micro-settings`、`personalization-settings` 与 `appgen-settings-page` 已从
+release-faithful owner 迁到真实 React/TypeScript，一次删除 12,446 行原始 owner。
+Codex Micro 现从 app services 读取真实 device service，恢复 connection/permission、
+layout/agent source/single-tap keys、lighting/auto-off 与 microphone action 交互；
+Personalization 恢复 account/personalization gate、loading/error/unavailable、about-you、memory、
+Computer History、reference photos、base style 与 agent instructions；AppGen 修正原占位实现
+一直保存初始值的错误，恢复受控 title/root/build/output draft、async saving、
+loading/error、slug/open/delete 动作。Focused suite 31 项、typecheck 通过；
+严格剩余清单由 31 个 / 146,602 行降至 28 个 / 134,156 行。
+
 2026-11-02 General/remote settings 大批次：`general-settings` 与
 `remote-connections-settings` 已从 release-faithful owner 迁到可维护 React/TypeScript，
 一次删除 14,930 行原始 owner。General 恢复主设置、外观、发送键行为、

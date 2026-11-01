@@ -416,10 +416,7 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
     "right-panel-composer-overlay",
     "right-panel-composer-overlay-fdca4b46e82c.js",
   ],
-  ["codex-micro-settings", "codex-micro-settings-cbf47e1d3359.js"],
-  ["personalization-settings", "personalization-settings-c52a4963cfd3.js"],
   ["review-preferences-model", "review-preferences-model-677402e96a42.js"],
-  ["appgen-settings-page", "appgen-settings-page-95e95458752b.js"],
   ["activity-chart", "activity-chart-816f6e49aa7a.js"],
   ["billing-analytics", "billing-analytics-9a493b3c8aaf.js"],
   ["realtime-voice-controls-surface", "controls-fedbfda05b6b.js"],
@@ -465,7 +462,10 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   // accurately represent unfinished route work instead of already-restored
   // dependencies pulled in transitively by the conversation roots.
   ...EXACT_ROUTE_SOURCE_OWNERS.values(),
+  "appgen-settings-page-95e95458752b.js",
+  "codex-micro-settings-cbf47e1d3359.js",
   "general-settings-3d550f75d0eb.js",
+  "personalization-settings-c52a4963cfd3.js",
   "remote-connections-settings-12e860fd2983.js",
   "File-4270090fca79.js",
   "PlatformUIKitProvider-748f2efe0f2a.js",

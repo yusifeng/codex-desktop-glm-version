@@ -1,108 +1,87 @@
-// codex-micro-settings —— Codex Micro 实体键盘设置页（156KB / 3,550 行）。
-//
-// 原版：app/webview/assets/codex-micro-settings-cbf47e1d3359.js。
-//
-// 唯一导出：CodexMicroSettings（原 `ai`）——无 codexMicro 服务时 null，
-// 否则 oi 主组件（180 号 memo-cache）。
-//
-// 设置区块（消息 id 前缀统计，共 ~211 条）：
-//   - keycaps（37）：键帽编辑（键位/标签/模拟动作标题）
-//   - analog（28）：模拟旋钮/摇杆动作
-//   - editor（23）：动作编辑器（insertText 描述等）
-//   - custom（20）：自定义键
-//   - knob（19）：旋钮（knobTooltip）
-//   - connection（19）：连接状态
-//   - keyboard（16）：键盘布局（layout 预设 + 键盘面 surface）
-//   - agent（13）：agent 键（agentSource 云/本地 + 单击直开）
-//   - lighting（11）：灯光（亮度 + 自动关闭）
-//   - microphone（9）：麦克风键（语音聊天/按键说话/拆分键）
-//   - encoder（9）：编码器
-//   - input（6）：输入
-//   - battery/options：电池/选项
-//
-// 状态绑定（app-shared settings）：layout/agentSource/singleTapAgentKeys/
-// lightingBrightness/lightingAutoOff（persisted-atom 五键）。
-//
-// 依赖：11 文件（7 个新登记：analog-action-title/commands/keyboard-surface/
-// layout/slot-signals + command-messages/keyboard-shortcuts-search-input）。
+import "@rchunk/rolldown-runtime";
+import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import { pnt as appServices } from "@rchunk/app-initial";
+import "@rchunk/app-primary";
+import "@rchunk/codex-micro-analog-action-title";
+import "@rchunk/codex-micro-commands";
+import "@rchunk/codex-micro-keyboard-surface";
+import "@rchunk/codex-micro-layout";
+import "@rchunk/codex-micro-slot-signals";
+import "@rchunk/command-messages";
+import "@rchunk/keyboard-shortcuts-search-input";
 
-import { $3 as runtimeLazy } from "@rchunk/app-shared";
-import { C as appInitialInit } from "@rchunk/app-initial";
-import { d as appPrimaryInit } from "@rchunk/app-primary";
-import { default as analogActionTitle } from "@rchunk/codex-micro-analog-action-title";
-import { default as commands } from "@rchunk/codex-micro-commands";
-import { default as keyboardSurface } from "@rchunk/codex-micro-keyboard-surface";
-import { default as layoutPresets } from "@rchunk/codex-micro-layout";
-import { default as slotSignals } from "@rchunk/codex-micro-slot-signals";
-import { default as commandMessages } from "@rchunk/command-messages";
-import { default as keyboardShortcutsSearchInput } from "@rchunk/keyboard-shortcuts-search-input";
-
-void runtimeLazy; void appInitialInit; void appPrimaryInit;
-void analogActionTitle; void commands; void keyboardSurface;
-void layoutPresets; void slotSignals; void commandMessages;
-void keyboardShortcutsSearchInput;
-
-// ---------------------------------------------------------------------------
-// 类型
-// ---------------------------------------------------------------------------
-
-/** 视图描述。 */
-export interface CodexMicroViewNode {
-  kind: string;
-  props?: Record<string, unknown>;
-}
-
-/** Codex Micro 服务面（appHost 上的 codexMicro）。 */
 export interface CodexMicroService {
-  [key: string]: unknown;
+  getInputMonitoringPermissionStatus?(): Promise<"denied" | "granted" | "unavailable">;
+  openInputMonitoringSettings?(): Promise<void> | void;
+  ownsPrimaryWindow?(): Promise<boolean>;
 }
-
-/** 持久化设置五键（app-shared settings-schema desktop 组）。 */
 export interface CodexMicroSettingsState {
-  agentSource: string;
+  agentSource: "cloud" | "local";
   layout: string;
   lightingAutoOff: string;
   lightingBrightness: number;
   singleTapAgentKeys: boolean;
 }
+export interface CodexMicroSettingsProps {
+  codexMicro?: CodexMicroService | null;
+  connectionStatus?: "connected" | "connection-failed" | "discovery-failed" | "transport-unavailable";
+  microphoneMode?: "push-to-talk" | "realtime";
+  onMicrophoneModeChange?(value: "push-to-talk" | "realtime"): void;
+  onSettingChange?<Key extends keyof CodexMicroSettingsState>(key: Key, value: CodexMicroSettingsState[Key]): void;
+  permissionStatus?: "denied" | "granted" | "unavailable";
+  settings?: Partial<CodexMicroSettingsState>;
+}
 
-// ---------------------------------------------------------------------------
-// 主组件
-// ---------------------------------------------------------------------------
+const DEFAULT_SETTINGS: CodexMicroSettingsState = {
+  agentSource: "local",
+  layout: "default",
+  lightingAutoOff: "10-minutes",
+  lightingBrightness: 75,
+  singleTapAgentKeys: false,
+};
+let runtime: JsxRuntime | undefined;
+function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
 
-/**
- * CodexMicroSettings（原 `ai`，唯一导出）：
- * codexMicro 服务缺失 → null；否则设置主装配（180 号 memo-cache）。
- * 十五个设置区块全量挂载（keycaps/analog/editor/custom/knob/connection/
- * keyboard/agent/lighting/microphone/encoder/input/battery/options）。
- */
-export function CodexMicroSettings(props: { codexMicro?: CodexMicroService | null }): CodexMicroViewNode | null {
-  if (props.codexMicro == null) return null;
-  return {
-    kind: "codex-micro-settings",
-    props: {
-      sections: {
-        analog: true,
-        battery: true,
-        connection: true,
-        custom: true,
-        editor: true,
-        encoder: true,
-        input: true,
-        keycaps: true,
-        keyboard: true,
-        knob: true,
-        lighting: true,
-        microphone: true,
-        options: true,
-      },
-      settingsKeys: {
-        agentSource: "codex-micro-agent-source",
-        layout: "codex-micro-layout",
-        lightingAutoOff: "codex-micro-lighting-auto-off",
-        lightingBrightness: "codex-micro-lighting-brightness",
-        singleTapAgentKeys: "codex-micro-single-tap-agent-keys",
-      } satisfies Record<keyof CodexMicroSettingsState, string>,
-    },
-  };
+function SelectRow(props: { label: string; value: string; options: readonly { label: string; value: string }[]; onChange(value: string): void }): unknown {
+  return jsx().jsxs("label", { children: [
+    jsx().jsx("span", { children: props.label }),
+    jsx().jsx("select", {
+      "aria-label": props.label,
+      value: props.value,
+      onChange: (event: { currentTarget: { value: string } }) => props.onChange(event.currentTarget.value),
+      children: props.options.map((option) => jsx().jsx("option", { value: option.value, children: option.label }, option.value)),
+    }),
+  ] });
+}
+
+export function CodexMicroSettings(props: CodexMicroSettingsProps = {}): unknown {
+  const service = props.codexMicro === undefined ? appServices.codexMicro : props.codexMicro;
+  if (service == null) return null;
+  const settings = { ...DEFAULT_SETTINGS, ...props.settings };
+  const update = <Key extends keyof CodexMicroSettingsState>(key: Key, value: CodexMicroSettingsState[Key]) => props.onSettingChange?.(key, value);
+  const connectionStatus = props.connectionStatus ?? "connected";
+  return jsx().jsxs("section", { "data-settings-page": "codex-micro", children: [
+    jsx().jsx("h1", { children: "Codex Micro" }),
+    jsx().jsxs("section", { children: [
+      jsx().jsx("h2", { children: "Connection" }),
+      jsx().jsx("p", { role: connectionStatus === "connected" ? "status" : "alert", children: connectionStatus === "connected" ? "Keyboard connected" : connectionStatus.replaceAll("-", " ") }),
+      props.permissionStatus === "denied" ? jsx().jsx("button", { type: "button", onClick: () => void service.openInputMonitoringSettings?.(), children: "Open Input Monitoring settings" }) : null,
+    ] }),
+    jsx().jsxs("section", { children: [
+      jsx().jsx("h2", { children: "Keyboard" }),
+      jsx().jsx(SelectRow, { label: "Layout", value: settings.layout, options: [{ value: "default", label: "Default" }, { value: "developer", label: "Developer" }, { value: "custom", label: "Custom" }], onChange: (value: string) => update("layout", value) }),
+      jsx().jsx(SelectRow, { label: "Agent source", value: settings.agentSource, options: [{ value: "local", label: "Local" }, { value: "cloud", label: "Cloud" }], onChange: (value: string) => update("agentSource", value as CodexMicroSettingsState["agentSource"]) }),
+      jsx().jsxs("label", { children: [jsx().jsx("span", { children: "Single-tap agent keys" }), jsx().jsx("input", { type: "checkbox", checked: settings.singleTapAgentKeys, onChange: (event: { currentTarget: { checked: boolean } }) => update("singleTapAgentKeys", event.currentTarget.checked) })] }),
+    ] }),
+    jsx().jsxs("section", { children: [
+      jsx().jsx("h2", { children: "Lighting" }),
+      jsx().jsxs("label", { children: [jsx().jsx("span", { children: "Brightness" }), jsx().jsx("input", { type: "range", min: 0, max: 100, value: settings.lightingBrightness, onChange: (event: { currentTarget: { valueAsNumber: number } }) => update("lightingBrightness", event.currentTarget.valueAsNumber) })] }),
+      jsx().jsx(SelectRow, { label: "Turn lights off after", value: settings.lightingAutoOff, options: ["off", "30-seconds", "1-minute", "3-minutes", "10-minutes", "30-minutes", "1-hour"].map((value) => ({ value, label: value.replaceAll("-", " ") })), onChange: (value: string) => update("lightingAutoOff", value) }),
+    ] }),
+    jsx().jsxs("section", { children: [
+      jsx().jsx("h2", { children: "Microphone key" }),
+      jsx().jsx(SelectRow, { label: "Microphone action", value: props.microphoneMode ?? "push-to-talk", options: [{ value: "push-to-talk", label: "Push to talk" }, { value: "realtime", label: "Voice chat" }], onChange: (value: string) => props.onMicrophoneModeChange?.(value as "push-to-talk" | "realtime") }),
+    ] }),
+    jsx().jsxs("section", { children: [jsx().jsx("h2", { children: "Custom keys" }), jsx().jsx("p", { children: "Configure keycaps, analog controls, encoder and knob actions." })] }),
+  ] });
 }

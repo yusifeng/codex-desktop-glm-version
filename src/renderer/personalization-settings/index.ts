@@ -1,72 +1,78 @@
-// personalization-settings —— ChatGPT 个性化设置页（109KB / 2,273 行）。
-//
-// 原版：app/webview/assets/personalization-settings-c52a4963cfd3.js。
-//
-// 唯一导出：ChatGptPersonalizationSettings（原 `zr`）：
-//   - 用户上下文（accountId）+ 个性化 flag（3466753652）门控
-//   - codex.browser capability 判定（浏览器侧能力）
-//   - about-you-summary（个人简介摘要）
-//   - 记忆（memory）：memory-manager-gate 门控 + saved-memories 列表 +
-//     manage/unavailable 文案 + host 副标题
-//   - chronicle（Computer History）：chronicle-settings + service-queries
-//   - 参考照片（referencePhotos.remove）+ 基础风格（baseStyle）
-//   - agents 保存（save + save.success.host）+ updateError
-//   - settings-host-dropdown + settings-loading-row + state
-//
-// 依赖：13 文件（9 个新登记）。
+import "@rchunk/rolldown-runtime";
+import { HX as useSignalValue, I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import { U6t as accountIdSignal, ofn as useFeatureGate, xun as personalizationEnabledSignal } from "@rchunk/app-initial";
+import "@rchunk/app-primary";
+import "@rchunk/about-you-summary";
+import "@rchunk/chatgpt-user-context";
+import "@rchunk/chronicle-service-queries";
+import "@rchunk/chronicle-settings";
+import "@rchunk/memory-manager-gate";
+import "@rchunk/saved-memories";
+import "@rchunk/settings-host-dropdown";
+import "@rchunk/settings-loading-row";
+import "@rchunk/personalization-state";
+import "@rchunk/virtual-try-on";
 
-import { $3 as runtimeLazy } from "@rchunk/app-shared";
-import { C as appInitialInit } from "@rchunk/app-initial";
-import { d as appPrimaryInit } from "@rchunk/app-primary";
-import { default as aboutYouSummary } from "@rchunk/about-you-summary";
-import { default as chatgptUserContext } from "@rchunk/chatgpt-user-context";
-import { default as chronicleServiceQueries } from "@rchunk/chronicle-service-queries";
-import { default as chronicleSettings } from "@rchunk/chronicle-settings";
-import { default as memoryManagerGate } from "@rchunk/memory-manager-gate";
-import { default as savedMemories } from "@rchunk/saved-memories";
-import { default as settingsHostDropdown } from "@rchunk/settings-host-dropdown";
-import { default as settingsLoadingRow } from "@rchunk/settings-loading-row";
-import { default as stateChunk } from "@rchunk/personalization-state";
-import { default as virtualTryOn } from "@rchunk/virtual-try-on";
-
-void runtimeLazy; void appInitialInit; void appPrimaryInit;
-void aboutYouSummary; void chatgptUserContext; void chronicleServiceQueries;
-void chronicleSettings; void memoryManagerGate; void savedMemories;
-void settingsHostDropdown; void settingsLoadingRow; void stateChunk; void virtualTryOn;
-
-// ---------------------------------------------------------------------------
-// 类型
-// ---------------------------------------------------------------------------
-
-/** 视图描述。 */
-export interface PersonalizationViewNode {
-  kind: string;
-  props?: Record<string, unknown>;
+export interface PersonalizationSettingsProps {
+  accountId?: string | null;
+  aboutYou?: string | null;
+  agentInstructions?: string;
+  baseStyle?: string;
+  chronicleEnabled?: boolean;
+  error?: string | null;
+  isLoading?: boolean;
+  memories?: readonly { id: string; text: string }[];
+  memoryEnabled?: boolean;
+  onAgentInstructionsChange?(value: string): void;
+  onBaseStyleChange?(value: string): void;
+  onChronicleEnabledChange?(value: boolean): void;
+  onMemoryEnabledChange?(value: boolean): void;
+  onRemoveMemory?(id: string): void;
+  onRemoveReferencePhoto?(id: string): void;
+  onSave?(): Promise<void> | void;
+  personalizationEnabled?: boolean;
+  referencePhotos?: readonly { id: string; name?: string }[];
 }
 
-// ---------------------------------------------------------------------------
-// 主组件
-// ---------------------------------------------------------------------------
+let runtime: JsxRuntime | undefined;
+function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
+function Toggle(props: { checked: boolean; label: string; onChange?(checked: boolean): void }): unknown {
+  return jsx().jsxs("label", { children: [
+    jsx().jsx("span", { children: props.label }),
+    jsx().jsx("input", { type: "checkbox", checked: props.checked, onChange: (event: { currentTarget: { checked: boolean } }) => props.onChange?.(event.currentTarget.checked) }),
+  ] });
+}
 
-/**
- * ChatGptPersonalizationSettings（原 `zr`，唯一导出）：
- * accountId + 个性化 flag 双门控；记忆管理（gate + saved-memories）、
- * chronicle、参考照片、基础风格、agents 保存。
- */
-export function ChatGptPersonalizationSettings(props: { accountId?: string | null; personalizationEnabled?: boolean }): PersonalizationViewNode | null {
-  if (!(props.accountId != null && props.personalizationEnabled === true)) return null;
-  return {
-    kind: "chatgpt-personalization-settings",
-    props: {
-      accountId: props.accountId,
-      sections: {
-        aboutYouSummary: true,
-        agents: true,
-        baseStyle: true,
-        chronicle: true,
-        memory: true,
-        referencePhotos: true,
-      },
-    },
-  };
+export function ChatGptPersonalizationSettings(props: PersonalizationSettingsProps = {}): unknown {
+  const activeAccountId = useSignalValue(accountIdSignal);
+  const enabledBySignal = useSignalValue(personalizationEnabledSignal);
+  const enabledByGate = useFeatureGate("3466753652");
+  const accountId = props.accountId === undefined ? activeAccountId : props.accountId;
+  const personalizationEnabled = props.personalizationEnabled ?? (enabledBySignal && enabledByGate);
+  if (props.isLoading) return jsx().jsx("div", { role: "status", children: "Loading personalization settings" });
+  if (props.error) return jsx().jsx("div", { role: "alert", children: props.error });
+  if (accountId == null || !personalizationEnabled) return jsx().jsxs("section", { "data-settings-page": "personalization", children: [jsx().jsx("h1", { children: "Personalization" }), jsx().jsx("p", { children: "Personalization is unavailable for this account." })] });
+
+  const memories = props.memories ?? [];
+  const photos = props.referencePhotos ?? [];
+  return jsx().jsxs("section", { "data-account-id": accountId, "data-settings-page": "personalization", children: [
+    jsx().jsx("h1", { children: "Personalization" }),
+    jsx().jsxs("section", { children: [jsx().jsx("h2", { children: "About you" }), jsx().jsx("p", { children: props.aboutYou || "Tell ChatGPT more about you to improve responses." })] }),
+    jsx().jsxs("section", { children: [
+      jsx().jsx("h2", { children: "Memory" }),
+      jsx().jsx(Toggle, { label: "Use saved memories", checked: props.memoryEnabled ?? true, onChange: props.onMemoryEnabledChange }),
+      memories.length === 0 ? jsx().jsx("p", { children: "No saved memories" }) : jsx().jsx("ul", { children: memories.map((memory) => jsx().jsxs("li", { children: [jsx().jsx("span", { children: memory.text }), jsx().jsx("button", { type: "button", onClick: () => props.onRemoveMemory?.(memory.id), children: "Remove" })] }, memory.id)) }),
+    ] }),
+    jsx().jsxs("section", { children: [jsx().jsx("h2", { children: "Computer History" }), jsx().jsx(Toggle, { label: "Use Computer History", checked: props.chronicleEnabled ?? false, onChange: props.onChronicleEnabledChange })] }),
+    jsx().jsxs("section", { children: [
+      jsx().jsx("h2", { children: "Reference photos" }),
+      photos.length === 0 ? jsx().jsx("p", { children: "No reference photos" }) : jsx().jsx("ul", { children: photos.map((photo) => jsx().jsxs("li", { children: [jsx().jsx("span", { children: photo.name ?? "Reference photo" }), jsx().jsx("button", { type: "button", onClick: () => props.onRemoveReferencePhoto?.(photo.id), children: "Remove" })] }, photo.id)) }),
+    ] }),
+    jsx().jsxs("label", { children: [
+      jsx().jsx("span", { children: "Base style" }),
+      jsx().jsx("select", { "aria-label": "Base style", value: props.baseStyle ?? "default", onChange: (event: { currentTarget: { value: string } }) => props.onBaseStyleChange?.(event.currentTarget.value), children: ["default", "professional", "friendly", "concise", "quirky"].map((value) => jsx().jsx("option", { value, children: value }, value)) }),
+    ] }),
+    jsx().jsxs("label", { children: [jsx().jsx("span", { children: "Agent instructions" }), jsx().jsx("textarea", { value: props.agentInstructions ?? "", onChange: (event: { currentTarget: { value: string } }) => props.onAgentInstructionsChange?.(event.currentTarget.value) })] }),
+    jsx().jsx("button", { type: "button", onClick: () => void props.onSave?.(), children: "Save" }),
+  ] });
 }
