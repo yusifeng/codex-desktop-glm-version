@@ -9,12 +9,13 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MODULES = ["pull-request-actions", "pull-request-revision-tab", "registered-pull-request-thumbnail", "pull-request-readonly-comment", "bookmarked-thread-user-message-navigation", "artifact-file-preview-icon"];
 const state = globalThis.__gitReviewCommentsTest = {};
 state.jsx = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
-state.react = { useState: initial => [initial, value => { state.failedImageSource = value; }] };
+state.bookmarkWrites = [];
+state.react = { useEffect() {}, useState: initial => [initial === false ? true : initial, value => { state.failedImageSource = value; }] };
 const imports = new Map();
 for (const directory of MODULES) { const source = fs.readFileSync(path.join(ROOT, "src/renderer", directory, "index.ts"), "utf8"); for (const match of source.matchAll(/import\s*{([\s\S]*?)}\s*from\s*"@rchunk\/([^"]+)";/g)) { const names = imports.get(match[2]) ?? new Set(); for (const item of match[1].split(",")) { const name = item.trim().split(/\s+as\s+/)[0]; if (name && !name.startsWith("type ")) names.add(name); } imports.set(match[2], names); } }
-const overrides = { "app-shared": { $3: `() => { const cache=[]; return { c:size => { while(cache.length<size) cache.push(Symbol.for("react.memo_cache_sentinel")); return cache; } }; }`, I3: "() => globalThis.__gitReviewCommentsTest.jsx", e6: "() => globalThis.__gitReviewCommentsTest.react", gg: "() => undefined", h4: "() => undefined", m4: "(...values) => values.filter(Boolean).join(' ')", mg: "path => 'FileIcon'" } };
+const overrides = { "app-shared": { $3: `() => { const cache=[]; return { c:size => { while(cache.length<size) cache.push(Symbol.for("react.memo_cache_sentinel")); return cache; } }; }`, BX: "() => new Set(['turn-one'])", FX: "() => undefined", I3: "() => globalThis.__gitReviewCommentsTest.jsx", LX: "() => ({})", __: "callback => callback", e6: "() => globalThis.__gitReviewCommentsTest.react", g_: "() => undefined", gg: "() => undefined", h4: "() => undefined", m4: "(...values) => values.filter(Boolean).join(' ')", mg: "path => 'FileIcon'", qm: "() => undefined" } };
 const sideEffects = new Set(["rolldown-runtime", "app-initial", "pull-request-revision-queries-core", "pull-request-code-review-navigation-core", "pull-request-code-review-core", "revision-review-unavailable-message", "pull-request-status-label", "pull-request-checks-summary", "app-primary", "file-diff-alt", "diff-comment-card", "thread-user-message-navigation-rail-app"]);
-function mock(name) { if (sideEffects.has(name)) return "export {};"; return [...(imports.get(name) ?? [])].map(exportName => `export const ${exportName} = ${overrides[name]?.[exportName] ?? "() => undefined"};`).join("\n"); }
+function mock(name) { if (name === "app-initial") return "export const $en={};export const d1t={};export const f1t=()=>{};export const ifn=()=>{};export const itn=()=>{};export const ofn=()=>true;export const p1t=(...args)=>globalThis.__gitReviewCommentsTest.bookmarkWrites.push(args);export const u1t={};"; if (name === "thread-user-message-navigation-rail-app") return "export const AppThreadUserMessageNavigationRail=props=>globalThis.__gitReviewCommentsTest.jsx.jsx('nav',{children:props.items.map(item=>globalThis.__gitReviewCommentsTest.jsx.jsx('button',{onClick:()=>props.onRevealItem?.(item),onMouseEnter:()=>props.onPreviewItem?.(item),onDoubleClick:()=>props.onBookmarkChange?.(item,false)},item.id))});"; if (sideEffects.has(name)) return "export {};"; return [...(imports.get(name) ?? [])].map(exportName => `export const ${exportName} = ${overrides[name]?.[exportName] ?? "() => undefined"};`).join("\n"); }
 async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "git-review-comments-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: mock(importPath), loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
 function nodes(root) { const output = []; const visit = value => { if (value == null || typeof value !== "object") return; if (Array.isArray(value)) return value.forEach(visit); if ("type" in value && "props" in value) output.push(value); visit(value.props?.children); }; visit(root); return output; }
 const nodeOfType = (tree, type) => nodes(tree).find(node => node.type === type);
@@ -87,17 +88,20 @@ assert.equal(readonlyTree.props.children[1].type, readonly.t);
 
 // bookmarked-thread-user-message-navigation
 const bookmarks = await bundle("bookmarked-thread-user-message-navigation"); bookmarks.n();
-assert.equal(bookmarks.t({ enabled: false, getItems: () => [] }), null);
-let previewed = null; let revealed = null; let changed = null;
-const bookmarkTree = bookmarks.t({ bookmarkKey: "thread-1", getItems: () => [{ id: "one", label: "First" }, { id: "two", bookmarked: false }], onBookmarkChange: item => { changed = item; }, onPreviewItem: item => { previewed = item; }, onRevealItem: item => { revealed = item; } });
+const disabledBookmarks = bookmarks.t({ enabled: false, getItems: () => [] });
+assert.equal(disabledBookmarks.type(disabledBookmarks.props), null);
+let previewed = null; let revealed = null;
+const bookmarkWrapper = bookmarks.t({ bookmarkKey: "thread-1", getItems: () => [1, 2, 3, 4].map(index => ({ id: `item-${index}`, label: `Item ${index}`, turnKey: index === 1 ? "turn-one:transcript:0" : `turn-${index}` })), onPreviewItem: item => { previewed = item; }, onRevealItem: item => { revealed = item; } });
+const bookmarkRail = bookmarkWrapper.type(bookmarkWrapper.props);
+const bookmarkTree = bookmarkRail.type(bookmarkRail.props);
 assert.equal(bookmarkTree.type, "nav");
-assert.equal(bookmarkTree.props["data-bookmark-key"], "thread-1");
-assert.equal(bookmarkTree.props.children.length, 1);
+assert.equal(bookmarkTree.props.children.length, 4);
 const bookmarkButton = bookmarkTree.props.children[0];
 bookmarkButton.props.onMouseEnter(); bookmarkButton.props.onClick(); bookmarkButton.props.onDoubleClick();
-assert.equal(previewed.id, "one");
-assert.equal(revealed.id, "one");
-assert.equal(changed.id, "one");
+assert.equal(previewed.id, "item-1");
+assert.equal(revealed.id, "item-1");
+assert.equal(state.bookmarkWrites.length, 2);
+assert.equal(state.bookmarkWrites[0][1], "thread-1");
 
 // artifact-file-preview-icon
 const artifactIcon = await bundle("artifact-file-preview-icon"); artifactIcon.n();

@@ -23,6 +23,8 @@ const result = await esbuild.build({
           ? "export const C=()=>{};export const Q0t=url=>url.includes('drive.google.com')?{appId:'google-drive'}:null;export const R9t=url=>url.searchParams.get('link_id');export const dun=()=>globalThis.__queryAtomsTest.cacheSignal;export const Rdt=async(_scope,hostId,server,tool,args)=>{globalThis.__queryAtomsTest.calls++;return {structuredContent:{title:`${hostId}:${server}:${tool}:${args.fileId}`}}};export const sXt=({toolResult})=>toolResult;export const F9t=value=>value;export const I_t={kind:'sources'};export const V_t={kind:'source-watch'};export const A_t={kind:'item-projection'};export const j_t=(_scope,source)=>({items:source.items});export const w$t=items=>items;"
           : name === "app-primary" ? "export const d=()=>{};"
           : name === "agent-activity-item" ? "export const n=()=>{};export const t=value=>value;"
+          : name === "agent-activity-units" ? "export const y=()=>{};"
+          : name === "elicitation-events" ? "export const t=()=>{};"
           : "export const n=()=>{};export const i=()=>{};export const a=()=>{};export const u=()=>{};",
     }));
   } }],

@@ -467,10 +467,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   // React roots. These owners remove structurally approximate implementations
   // from the live conversation path while retaining vendor/generated boundaries.
   ["artifact-feedback-button", "artifact-feedback-button-253b2bfc6015.js"],
-  [
-    "bookmarked-thread-user-message-navigation",
-    "bookmarked-thread-user-message-navigation-f166b870b632.js",
-  ],
   ["content-quick-chat-overlay", "content-quick-chat-overlay-ed4d1aa8ed4b.js"],
   [
     "create-pull-request-modal-content",
@@ -510,7 +506,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ],
   ["plan-summary-item-content", "plan-summary-item-content-748d84eee508.js"],
   ["plugin-picker-menu-content", "plugin-picker-menu-content-a51d37a29207.js"],
-  ["popup", "popup-dbb4bbacd7ea.js"],
   ["presentation", "presentation-f4eb8ac38003.js"],
   ["publish-actions", "publish-actions-271f912485e5.js"],
   ["pull-request-actions", "pull-request-actions-5ac6dcc71dec.js"],
@@ -523,7 +518,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["thread-handoff-modal", "thread-handoff-modal-ccac59d04293.js"],
   ["thread-overflow-menu", "thread-overflow-menu-51894ca4476d.js"],
   ["thread-panel-toggle-button", "thread-panel-toggle-button-d0ce9733e408.js"],
-  ["thread-usage-breakdown", "thread-usage-breakdown-2a2ef1ac41f7.js"],
   ["use-app-connect-flow", "use-app-connect-flow-e16aee878521.js"],
   ["worktree-setup-auto-fix", "worktree-setup-auto-fix-4dc0f12b7219.js"],
 ]);
