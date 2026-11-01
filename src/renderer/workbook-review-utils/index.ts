@@ -1,56 +1,728 @@
 import "@rchunk/rolldown-runtime";
-import { a as columnIndexToName, f as rowReferenceToIndex, i as columnNameToIndex, s as initializeSpreadsheetUtils } from "@rchunk/spreadsheet-utils";
+import {
+  a as columnIndexToName,
+  f as rowReferenceToIndex,
+  i as columnNameToIndex,
+  s as initializeSpreadsheetUtils,
+} from "@rchunk/spreadsheet-utils";
 import "@rchunk/app-primary";
-import { d as handleMetrics, m as initializeRotationCursor, o as initializeFrameGeometry, r as frameCorners } from "@rchunk/drawing-frame-geometry";
-import { a as splitFrozenWorldRect, i as initializeFreezePanes, l as worldToLogical, o as splitFrozenScreenRect, u as worldToFrozenScreen } from "@rchunk/freeze-panes";
+import {
+  d as handleMetrics,
+  m as initializeRotationCursor,
+  o as initializeFrameGeometry,
+  r as frameCorners,
+} from "@rchunk/drawing-frame-geometry";
+import {
+  a as splitFrozenWorldRect,
+  i as initializeFreezePanes,
+  l as worldToLogical,
+  o as splitFrozenScreenRect,
+  u as worldToFrozenScreen,
+} from "@rchunk/freeze-panes";
 import { t as drawPresenceLabel } from "@rchunk/draw-presence-label";
 
-export interface Point { x: number; y: number }
-export interface CameraTransform { k: number; x: number; y: number }
-export interface FreezePanes { columnCount: number; rowCount: number }
-export interface CellPoint { col: number; row: number }
-export interface CellRect { c1: number; c2: number; r1: number; r2: number }
-export interface Bounds { height: number; left: number; top: number; width: number }
-export interface WorkbookGrid { camera: CameraTransform; columnWidths: number[]; freezePanes: FreezePanes; rowHeights: number[] }
-export interface WorkbookRangeTarget { anchorPoint?: Point; cols: number; rangeAddress: string; rect: CellRect; rows: number; sheetName: string; type: "workbook-range" }
-export interface WorkbookFloatingElementTarget { anchorPoint?: Point; elementId: string; elementKind: string; elementOffset?: Point; logicalBounds: { height: number; width: number; x: number; y: number }; rotation?: number; sheetName: string; type: "workbook-floating-element" }
-export interface WorkbookDrawingRegionTarget { coveredCells: CellRect | null; logicalBounds: Bounds; rangeAddress: string | null; sheetName: string; type: "workbook-drawing-region"; viewportBounds: Bounds }
-export type WorkbookReviewTarget = WorkbookRangeTarget | WorkbookFloatingElementTarget;
-
-const prefixOffsets = (values: readonly number[]): number[] => { const offsets = [0]; for (const value of values) offsets.push((offsets.at(-1) ?? 0) + value); return offsets; };
-const normalizeCellRect = (first: CellPoint, second: CellPoint): CellRect => ({ r1: Math.min(first.row, second.row), c1: Math.min(first.col, second.col), r2: Math.max(first.row, second.row), c2: Math.max(first.col, second.col) });
-function parseClipboardValue(value: string): string | number | boolean { const trimmed = value.trim(); if (trimmed.length === 0) return ""; if (trimmed.toLowerCase() === "true") return true; if (trimmed.toLowerCase() === "false") return false; const number = Number(trimmed); return !Number.isNaN(number) && trimmed === String(number) ? number : value; }
-const escapeHtml = (value: string): string => value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
-const valuesToHtmlTable = (values: readonly (readonly unknown[])[]): string => `<table>${values.map(row => `<tr>${row.map(value => `<td>${escapeHtml(value == null ? "" : String(value))}</td>`).join("")}</tr>`).join("")}</table>`;
-function textToClipboardPayload(text: string): { formulas: Array<Array<string | null>>; html: string; kind: "copy"; plainText: string; source: { range: CellRect; sheetName: string }; values: Array<Array<string | number | boolean>> } { const rows = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n").map(row => row.split("\t")); const values = rows.map(row => row.map(value => value.trimStart().startsWith("=") ? value : parseClipboardValue(value))); const formulas = rows.map(row => row.map(value => value.trimStart().startsWith("=") ? value.trimStart() : null)); return { kind: "copy", source: { sheetName: "", range: { r1: 0, c1: 0, r2: Math.max(rows.length - 1, 0), c2: Math.max(...rows.map(row => row.length), 1) - 1 } }, values, formulas, plainText: text, html: valuesToHtmlTable(values) }; }
-function htmlToPlainText(html: string): string { if (typeof DOMParser !== "undefined") try { const document = new DOMParser().parseFromString(html, "text/html"), table = document.querySelector("table"); return table ? Array.from(table.rows).map(row => Array.from(row.cells).map(cell => cell.textContent ?? "").join("\t")).join("\n") : document.body?.textContent ?? ""; } catch {} return html.replace(/<br\s*\/?>/gi, "\n").replace(/<\/tr>/gi, "\n").replace(/<\/t[dh]>/gi, "\t").replace(/<[^>]+>/g, "").replace(/&nbsp;/gi, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/\t+\n/g, "\n").trimEnd(); }
-function htmlToClipboardPayload(html: string, plainText?: string): ReturnType<typeof textToClipboardPayload> { return { ...textToClipboardPayload(plainText && plainText.length > 0 ? plainText : htmlToPlainText(html)), html }; }
-const addressToCellPoint = (address: string): CellPoint => ({ row: rowReferenceToIndex(address), col: columnNameToIndex(address) });
-const cellPointToAddress = (row: number, col: number): string => `${columnIndexToName(col)}${row + 1}`;
-
-function fillHandleBounds(input: WorkbookGrid & { selectionRect: CellRect; sizePx?: number }): Bounds | null { const col = Math.min(Math.max(input.selectionRect.c1, input.selectionRect.c2), input.columnWidths.length - 1), row = Math.min(Math.max(input.selectionRect.r1, input.selectionRect.r2), input.rowHeights.length - 1); if (col < 0 || row < 0) return null; const colOffsets = prefixOffsets(input.columnWidths), rowOffsets = prefixOffsets(input.rowHeights), point = worldToLogical({ camera: input.camera, worldX: 40 + (colOffsets[col + 1] ?? 0), worldY: 20 + (rowOffsets[row + 1] ?? 0), freezePanes: input.freezePanes, columnWidths: input.columnWidths, rowHeights: input.rowHeights }), zoom = Math.max(input.camera.k, 2 ** -52), size = (input.sizePx ?? 6) / zoom; return { left: point.x - size / 2, top: point.y - size / 2, width: size, height: size }; }
-function hitFillHandle(input: WorkbookGrid & { screenX: number; screenY: number; selectionRect: CellRect }): boolean { const bounds = fillHandleBounds({ ...input, sizePx: 12 }), zoom = Math.max(input.camera.k, 2 ** -52); return Boolean(bounds && input.screenX >= bounds.left * zoom && input.screenX <= (bounds.left + bounds.width) * zoom && input.screenY >= bounds.top * zoom && input.screenY <= (bounds.top + bounds.height) * zoom); }
-function mergedCellMap(sheet?: { mergedCells?: Array<{ endAddress: string; startAddress: string }> } | null): Map<string, CellRect> { const result = new Map<string, CellRect>(); for (const merged of sheet?.mergedCells ?? []) { const rect = normalizeCellRect(addressToCellPoint(merged.startAddress), addressToCellPoint(merged.endAddress)); for (let row = rect.r1; row <= rect.r2; row += 1) for (let col = rect.c1; col <= rect.c2; col += 1) result.set(`${row}:${col}`, rect); } return result; }
-function selectionScreenBounds(input: WorkbookGrid & { activeCell?: CellPoint | null; selectionRect: CellRect; selectionStart?: CellPoint | null; selectionEnd?: CellPoint | null; sheet?: { mergedCells?: Array<{ endAddress: string; startAddress: string }> } | null }): Bounds | null { const normalized = { r1: Math.min(input.selectionRect.r1, input.selectionRect.r2), c1: Math.min(input.selectionRect.c1, input.selectionRect.c2), r2: Math.max(input.selectionRect.r1, input.selectionRect.r2), c2: Math.max(input.selectionRect.c1, input.selectionRect.c2) }, colOffsets = prefixOffsets(input.columnWidths), rowOffsets = prefixOffsets(input.rowHeights), merged = mergedCellMap(input.sheet), active = input.activeCell ?? { row: normalized.r1, col: normalized.c1 }, start = input.selectionStart ?? active, end = input.selectionEnd ?? { row: start.row === normalized.r1 ? normalized.r2 : normalized.r1, col: start.col === normalized.c1 ? normalized.c2 : normalized.c1 }; const raw = normalizeCellRect(start, end), resolved = raw.r1 === raw.r2 && raw.c1 === raw.c2 ? merged.get(`${raw.r1}:${raw.c1}`) ?? raw : raw; if (resolved.c1 < 0 || resolved.r1 < 0 || resolved.c2 >= input.columnWidths.length || resolved.r2 >= input.rowHeights.length) return null; const point = worldToLogical({ camera: input.camera, worldX: 40 + (colOffsets[resolved.c1] ?? 0), worldY: 20 + (rowOffsets[resolved.r1] ?? 0), freezePanes: input.freezePanes, columnWidths: input.columnWidths, rowHeights: input.rowHeights }), zoom = Math.max(input.camera.k, 2 ** -52); return { left: point.x * zoom, top: point.y * zoom, width: ((colOffsets[resolved.c2 + 1] ?? 0) - (colOffsets[resolved.c1] ?? 0)) * zoom, height: ((rowOffsets[resolved.r2 + 1] ?? 0) - (rowOffsets[resolved.r1] ?? 0)) * zoom }; }
-function strokeRoundedRect(input: { accentStroke: string; coordinateScale?: number; ctx: CanvasRenderingContext2D; rect: { height: number; width: number; x: number; y: number } }): void { const { ctx, rect } = input, scale = Math.max(input.coordinateScale ?? 1, 2 ** -52), radius = Math.max(0, Math.min(2 / scale, rect.width / 2, rect.height / 2)); ctx.strokeStyle = input.accentStroke; ctx.lineWidth = 2 / scale; ctx.beginPath(); ctx.moveTo(rect.x + radius, rect.y); ctx.arcTo(rect.x + rect.width, rect.y, rect.x + rect.width, rect.y + rect.height, radius); ctx.arcTo(rect.x + rect.width, rect.y + rect.height, rect.x, rect.y + rect.height, radius); ctx.arcTo(rect.x, rect.y + rect.height, rect.x, rect.y, radius); ctx.arcTo(rect.x, rect.y, rect.x + rect.width, rect.y, radius); ctx.closePath(); ctx.stroke(); }
-function drawWorkbookOverlay(input: WorkbookGrid & { accentStroke: string; overlayCanvas?: HTMLCanvasElement | null; selectionRect: CellRect; syncViewportCanvases(): void; viewportMetrics: { dpr: number; height: number; width: number } }): void { if (!input.overlayCanvas) return; const ctx = input.overlayCanvas.getContext("2d"); if (!ctx) return; if (input.viewportMetrics.width <= 0 || input.viewportMetrics.height <= 0 || input.viewportMetrics.dpr <= 0) input.syncViewportCanvases(); ctx.setTransform(input.viewportMetrics.dpr, 0, 0, input.viewportMetrics.dpr, 0, 0); ctx.clearRect(0, 0, input.viewportMetrics.width, input.viewportMetrics.height); const bounds = selectionScreenBounds(input); if (bounds) strokeRoundedRect({ ctx, accentStroke: input.accentStroke, rect: { x: bounds.left / input.camera.k, y: bounds.top / input.camera.k, width: bounds.width / input.camera.k, height: bounds.height / input.camera.k }, coordinateScale: input.camera.k }); void drawPresenceLabel; void handleMetrics; void frameCorners; }
-
-function unionBounds(bounds: readonly Bounds[]): Bounds | null { if (bounds.length === 0) return null; let left = bounds[0]?.left ?? 0, top = bounds[0]?.top ?? 0, right = left + (bounds[0]?.width ?? 0), bottom = top + (bounds[0]?.height ?? 0); for (const item of bounds.slice(1)) { left = Math.min(left, item.left); top = Math.min(top, item.top); right = Math.max(right, item.left + item.width); bottom = Math.max(bottom, item.top + item.height); } return { left, top, width: Math.max(0, right - left), height: Math.max(0, bottom - top) }; }
-function rangeTargetFromAddresses(input: { endAddress: string; endCol: number; endRow: number; sheetName: string; startAddress: string; startCol: number; startRow: number }): WorkbookRangeTarget { const rangeAddress = input.startAddress === input.endAddress ? input.startAddress : `${input.startAddress}:${input.endAddress}`; return { type: "workbook-range", sheetName: input.sheetName, rangeAddress, rect: { r1: input.startRow, c1: input.startCol, r2: input.endRow, c2: input.endCol }, rows: input.endRow - input.startRow + 1, cols: input.endCol - input.startCol + 1 }; }
-function rangeTargetFromSelection(input: { anchorPoint?: Point | null; selectionSummary: { cols: number; rangeAddress: string; rect?: CellRect | null; rows: number }; sheetName: string }): WorkbookRangeTarget | null { const rect = input.selectionSummary.rect; return rect ? { type: "workbook-range", sheetName: input.sheetName, rangeAddress: input.selectionSummary.rangeAddress, rect: { ...rect }, rows: input.selectionSummary.rows, cols: input.selectionSummary.cols, ...(input.anchorPoint == null ? {} : { anchorPoint: { ...input.anchorPoint } }) } : null; }
-function floatingElementTarget(input: { anchorPoint?: Point | null; selectedFloatingElement: { id: string; kind: string; logicalBounds: { height: number; width: number; x: number; y: number }; rotation?: number }; sheetName: string }): WorkbookFloatingElementTarget { const anchorPoint = input.anchorPoint == null ? null : { ...input.anchorPoint }; return { type: "workbook-floating-element", sheetName: input.sheetName, elementId: input.selectedFloatingElement.id, elementKind: input.selectedFloatingElement.kind, logicalBounds: { ...input.selectedFloatingElement.logicalBounds }, rotation: input.selectedFloatingElement.rotation, ...(anchorPoint == null ? {} : { anchorPoint, elementOffset: { x: anchorPoint.x - input.selectedFloatingElement.logicalBounds.x, y: anchorPoint.y - input.selectedFloatingElement.logicalBounds.y } }) }; }
-const reviewTargetLabel = (target: WorkbookReviewTarget): string => target.type === "workbook-range" ? `${target.sheetName}!${target.rangeAddress}` : `${target.sheetName} · ${target.elementKind === "xlsx-chart" ? "Chart" : target.elementKind === "xlsx-image" ? "Image" : "Shape"}`;
-const rangeHighlightFromTarget = (input: { color: string; rect: CellRect }): CellRect & { borderRadiusPx: number; borderWidthPx: number; color: string; dashed: boolean; fillAlpha: number; visibleWhenCellSelectionSuppressed: boolean } => ({ ...input.rect, color: input.color, dashed: true, fillAlpha: 0.12, borderWidthPx: 2, borderRadiusPx: 0, visibleWhenCellSelectionSuppressed: true });
-function coveredCellsForBounds(input: { colOffsets: number[]; columnWidths: number[]; logicalBounds: Bounds; rowHeights: number[]; rowOffsets: number[] }): { coveredCells: CellRect | null; rangeAddress: string | null } { if (input.columnWidths.length === 0 || input.rowHeights.length === 0) return { rangeAddress: null, coveredCells: null }; const indexAt = (value: number, offsets: number[], count: number): number => { if (value <= 0) return 0; if (value >= (offsets[count] ?? 0)) return count - 1; let index = 0; while (index < count && (offsets[index + 1] ?? 0) <= value) index += 1; return Math.max(0, Math.min(index, count - 1)); }, left = Math.max(0, input.logicalBounds.left - 40), top = Math.max(0, input.logicalBounds.top - 20), right = Math.max(left, input.logicalBounds.left + input.logicalBounds.width - 40), bottom = Math.max(top, input.logicalBounds.top + input.logicalBounds.height - 20), rect = { r1: indexAt(top, input.rowOffsets, input.rowHeights.length), c1: indexAt(left, input.colOffsets, input.columnWidths.length), r2: indexAt(bottom, input.rowOffsets, input.rowHeights.length), c2: indexAt(right, input.colOffsets, input.columnWidths.length) }; return { rangeAddress: rect.r1 === rect.r2 && rect.c1 === rect.c2 ? cellPointToAddress(rect.r1, rect.c1) : `${cellPointToAddress(rect.r1, rect.c1)}:${cellPointToAddress(rect.r2, rect.c2)}`, coveredCells: rect };
+export interface Point {
+  x: number;
+  y: number;
 }
-function drawingRegionTarget(input: { coveredCells?: CellRect | null; logicalBounds: Bounds; rangeAddress?: string | null; sheetName: string; viewportBounds: Bounds }): WorkbookDrawingRegionTarget { return { type: "workbook-drawing-region", sheetName: input.sheetName, logicalBounds: { ...input.logicalBounds }, viewportBounds: { ...input.viewportBounds }, rangeAddress: input.rangeAddress ?? null, coveredCells: input.coveredCells == null ? null : { ...input.coveredCells } }; }
-const drawingRegionLabel = (target: WorkbookDrawingRegionTarget): string => target.rangeAddress ? `${target.sheetName}!${target.rangeAddress} · Drawing` : `${target.sheetName} · Drawing`;
-function frozenBounds(input: WorkbookGrid & { bounds: Bounds }): Bounds | null { return unionBounds(splitFrozenScreenRect({ camera: input.camera, worldX: input.bounds.left, worldY: input.bounds.top, width: input.bounds.width, height: input.bounds.height, freezePanes: input.freezePanes, columnWidths: input.columnWidths, rowHeights: input.rowHeights }).map(rect => ({ left: rect.x, top: rect.y, width: rect.width, height: rect.height }))); }
-function targetScreenBounds(input: WorkbookGrid & { sheet?: { mergedCells?: Array<{ endAddress: string; startAddress: string }> }; target: WorkbookReviewTarget }): Bounds | null { return input.target.type === "workbook-range" ? selectionScreenBounds({ ...input, selectionRect: input.target.rect, sheet: input.sheet }) : frozenBounds({ ...input, bounds: { left: input.target.logicalBounds.x, top: input.target.logicalBounds.y, width: input.target.logicalBounds.width, height: input.target.logicalBounds.height } }); }
-function annotationAnchorBounds(input: WorkbookGrid & { sheet?: { mergedCells?: Array<{ endAddress: string; startAddress: string }> }; target: WorkbookReviewTarget }): Bounds | null { if (input.target.type === "workbook-range" || input.target.anchorPoint == null) return targetScreenBounds(input); const point = worldToFrozenScreen({ camera: input.camera, worldX: input.target.anchorPoint.x, worldY: input.target.anchorPoint.y, freezePanes: input.freezePanes, columnWidths: input.columnWidths, rowHeights: input.rowHeights }); return { left: point.x, top: point.y, width: 0, height: 0 }; }
-function currentReviewTarget(input: { floatingAnchorPoint?: Point | null; rangeAnchorPoint?: Point | null; selectedFloatingElement?: { id: string; kind: string; logicalBounds: { height: number; width: number; x: number; y: number }; rotation?: number } | null; selectionSummary: { cols: number; rangeAddress: string; rect?: CellRect | null; rows: number }; snapshot: { activeSheetName: string } }): WorkbookReviewTarget | null { return input.selectedFloatingElement ? floatingElementTarget({ sheetName: input.snapshot.activeSheetName, selectedFloatingElement: input.selectedFloatingElement, anchorPoint: input.floatingAnchorPoint }) : rangeTargetFromSelection({ sheetName: input.snapshot.activeSheetName, selectionSummary: input.selectionSummary, anchorPoint: input.rangeAnchorPoint }); }
-function initializeSelectionGeometry(): void { initializeFreezePanes(); initializeSpreadsheetUtils(); }
+export interface CameraTransform {
+  k: number;
+  x: number;
+  y: number;
+}
+export interface FreezePanes {
+  columnCount: number;
+  rowCount: number;
+}
+export interface CellPoint {
+  col: number;
+  row: number;
+}
+export interface CellRect {
+  c1: number;
+  c2: number;
+  r1: number;
+  r2: number;
+}
+export interface Bounds {
+  height: number;
+  left: number;
+  top: number;
+  width: number;
+}
+export interface WorkbookGrid {
+  camera: CameraTransform;
+  columnWidths: number[];
+  freezePanes: FreezePanes;
+  rowHeights: number[];
+}
+export interface WorkbookRangeTarget {
+  anchorPoint?: Point;
+  cols: number;
+  rangeAddress: string;
+  rect: CellRect;
+  rows: number;
+  sheetName: string;
+  type: "workbook-range";
+}
+export interface WorkbookFloatingElementTarget {
+  anchorPoint?: Point;
+  elementId: string;
+  elementKind: string;
+  elementOffset?: Point;
+  logicalBounds: { height: number; width: number; x: number; y: number };
+  rotation?: number;
+  sheetName: string;
+  type: "workbook-floating-element";
+}
+export interface WorkbookDrawingRegionTarget {
+  coveredCells: CellRect | null;
+  logicalBounds: Bounds;
+  rangeAddress: string | null;
+  sheetName: string;
+  type: "workbook-drawing-region";
+  viewportBounds: Bounds;
+}
+export type WorkbookReviewTarget =
+  WorkbookRangeTarget | WorkbookFloatingElementTarget;
+
+const prefixOffsets = (values: readonly number[]): number[] => {
+  const offsets = [0];
+  for (const value of values) offsets.push((offsets.at(-1) ?? 0) + value);
+  return offsets;
+};
+const normalizeCellRect = (first: CellPoint, second: CellPoint): CellRect => ({
+  r1: Math.min(first.row, second.row),
+  c1: Math.min(first.col, second.col),
+  r2: Math.max(first.row, second.row),
+  c2: Math.max(first.col, second.col),
+});
+function parseClipboardValue(value: string): string | number | boolean {
+  const trimmed = value.trim();
+  if (trimmed.length === 0) return "";
+  if (trimmed.toLowerCase() === "true") return true;
+  if (trimmed.toLowerCase() === "false") return false;
+  const number = Number(trimmed);
+  return !Number.isNaN(number) && trimmed === String(number) ? number : value;
+}
+const escapeHtml = (value: string): string =>
+  value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+const valuesToHtmlTable = (values: readonly (readonly unknown[])[]): string =>
+  `<table>${values.map((row) => `<tr>${row.map((value) => `<td>${escapeHtml(value == null ? "" : String(value))}</td>`).join("")}</tr>`).join("")}</table>`;
+function textToClipboardPayload(text: string): {
+  formulas: Array<Array<string | null>>;
+  html: string;
+  kind: "copy";
+  plainText: string;
+  source: { range: CellRect; sheetName: string };
+  values: Array<Array<string | number | boolean>>;
+} {
+  const rows = text
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .split("\n")
+    .map((row) => row.split("\t"));
+  const values = rows.map((row) =>
+    row.map((value) =>
+      value.trimStart().startsWith("=") ? value : parseClipboardValue(value),
+    ),
+  );
+  const formulas = rows.map((row) =>
+    row.map((value) =>
+      value.trimStart().startsWith("=") ? value.trimStart() : null,
+    ),
+  );
+  return {
+    kind: "copy",
+    source: {
+      sheetName: "",
+      range: {
+        r1: 0,
+        c1: 0,
+        r2: Math.max(rows.length - 1, 0),
+        c2: Math.max(...rows.map((row) => row.length), 1) - 1,
+      },
+    },
+    values,
+    formulas,
+    plainText: text,
+    html: valuesToHtmlTable(values),
+  };
+}
+function htmlToPlainText(html: string): string {
+  if (typeof DOMParser !== "undefined")
+    try {
+      const document = new DOMParser().parseFromString(html, "text/html"),
+        table = document.querySelector("table");
+      return table
+        ? Array.from(table.rows)
+            .map((row) =>
+              Array.from(row.cells)
+                .map((cell) => cell.textContent ?? "")
+                .join("\t"),
+            )
+            .join("\n")
+        : (document.body?.textContent ?? "");
+    } catch {}
+  return html
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/tr>/gi, "\n")
+    .replace(/<\/t[dh]>/gi, "\t")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/\t+\n/g, "\n")
+    .trimEnd();
+}
+function htmlToClipboardPayload(
+  html: string,
+  plainText?: string,
+): ReturnType<typeof textToClipboardPayload> {
+  return {
+    ...textToClipboardPayload(
+      plainText && plainText.length > 0 ? plainText : htmlToPlainText(html),
+    ),
+    html,
+  };
+}
+const addressToCellPoint = (address: string): CellPoint => ({
+  row: rowReferenceToIndex(address),
+  col: columnNameToIndex(address),
+});
+const cellPointToAddress = (row: number, col: number): string =>
+  `${columnIndexToName(col)}${row + 1}`;
+
+function fillHandleBounds(
+  input: WorkbookGrid & { selectionRect: CellRect; sizePx?: number },
+): Bounds | null {
+  const col = Math.min(
+      Math.max(input.selectionRect.c1, input.selectionRect.c2),
+      input.columnWidths.length - 1,
+    ),
+    row = Math.min(
+      Math.max(input.selectionRect.r1, input.selectionRect.r2),
+      input.rowHeights.length - 1,
+    );
+  if (col < 0 || row < 0) return null;
+  const colOffsets = prefixOffsets(input.columnWidths),
+    rowOffsets = prefixOffsets(input.rowHeights),
+    point = worldToLogical({
+      camera: input.camera,
+      worldX: 40 + (colOffsets[col + 1] ?? 0),
+      worldY: 20 + (rowOffsets[row + 1] ?? 0),
+      freezePanes: input.freezePanes,
+      columnWidths: input.columnWidths,
+      rowHeights: input.rowHeights,
+    }),
+    zoom = Math.max(input.camera.k, 2 ** -52),
+    size = (input.sizePx ?? 6) / zoom;
+  return {
+    left: point.x - size / 2,
+    top: point.y - size / 2,
+    width: size,
+    height: size,
+  };
+}
+function hitFillHandle(
+  input: WorkbookGrid & {
+    screenX: number;
+    screenY: number;
+    selectionRect: CellRect;
+  },
+): boolean {
+  const bounds = fillHandleBounds({ ...input, sizePx: 12 }),
+    zoom = Math.max(input.camera.k, 2 ** -52);
+  return Boolean(
+    bounds &&
+    input.screenX >= bounds.left * zoom &&
+    input.screenX <= (bounds.left + bounds.width) * zoom &&
+    input.screenY >= bounds.top * zoom &&
+    input.screenY <= (bounds.top + bounds.height) * zoom,
+  );
+}
+function mergedCellMap(
+  sheet?: {
+    mergedCells?: Array<{ endAddress: string; startAddress: string }>;
+  } | null,
+): Map<string, CellRect> {
+  const result = new Map<string, CellRect>();
+  for (const merged of sheet?.mergedCells ?? []) {
+    const rect = normalizeCellRect(
+      addressToCellPoint(merged.startAddress),
+      addressToCellPoint(merged.endAddress),
+    );
+    for (let row = rect.r1; row <= rect.r2; row += 1)
+      for (let col = rect.c1; col <= rect.c2; col += 1)
+        result.set(`${row}:${col}`, rect);
+  }
+  return result;
+}
+function selectionScreenBounds(
+  input: WorkbookGrid & {
+    activeCell?: CellPoint | null;
+    selectionRect: CellRect;
+    selectionStart?: CellPoint | null;
+    selectionEnd?: CellPoint | null;
+    sheet?: {
+      mergedCells?: Array<{ endAddress: string; startAddress: string }>;
+    } | null;
+  },
+): Bounds | null {
+  const normalized = {
+      r1: Math.min(input.selectionRect.r1, input.selectionRect.r2),
+      c1: Math.min(input.selectionRect.c1, input.selectionRect.c2),
+      r2: Math.max(input.selectionRect.r1, input.selectionRect.r2),
+      c2: Math.max(input.selectionRect.c1, input.selectionRect.c2),
+    },
+    colOffsets = prefixOffsets(input.columnWidths),
+    rowOffsets = prefixOffsets(input.rowHeights),
+    merged = mergedCellMap(input.sheet),
+    active = input.activeCell ?? { row: normalized.r1, col: normalized.c1 },
+    start = input.selectionStart ?? active,
+    end = input.selectionEnd ?? {
+      row: start.row === normalized.r1 ? normalized.r2 : normalized.r1,
+      col: start.col === normalized.c1 ? normalized.c2 : normalized.c1,
+    };
+  const raw = normalizeCellRect(start, end),
+    resolved =
+      raw.r1 === raw.r2 && raw.c1 === raw.c2
+        ? (merged.get(`${raw.r1}:${raw.c1}`) ?? raw)
+        : raw;
+  if (
+    resolved.c1 < 0 ||
+    resolved.r1 < 0 ||
+    resolved.c2 >= input.columnWidths.length ||
+    resolved.r2 >= input.rowHeights.length
+  )
+    return null;
+  const point = worldToLogical({
+      camera: input.camera,
+      worldX: 40 + (colOffsets[resolved.c1] ?? 0),
+      worldY: 20 + (rowOffsets[resolved.r1] ?? 0),
+      freezePanes: input.freezePanes,
+      columnWidths: input.columnWidths,
+      rowHeights: input.rowHeights,
+    }),
+    zoom = Math.max(input.camera.k, 2 ** -52);
+  return {
+    left: point.x * zoom,
+    top: point.y * zoom,
+    width:
+      ((colOffsets[resolved.c2 + 1] ?? 0) - (colOffsets[resolved.c1] ?? 0)) *
+      zoom,
+    height:
+      ((rowOffsets[resolved.r2 + 1] ?? 0) - (rowOffsets[resolved.r1] ?? 0)) *
+      zoom,
+  };
+}
+function strokeRoundedRect(input: {
+  accentStroke: string;
+  coordinateScale?: number;
+  ctx: CanvasRenderingContext2D;
+  rect: { height: number; width: number; x: number; y: number };
+}): void {
+  const { ctx, rect } = input,
+    scale = Math.max(input.coordinateScale ?? 1, 2 ** -52),
+    radius = Math.max(0, Math.min(2 / scale, rect.width / 2, rect.height / 2));
+  ctx.strokeStyle = input.accentStroke;
+  ctx.lineWidth = 2 / scale;
+  ctx.beginPath();
+  ctx.moveTo(rect.x + radius, rect.y);
+  ctx.arcTo(
+    rect.x + rect.width,
+    rect.y,
+    rect.x + rect.width,
+    rect.y + rect.height,
+    radius,
+  );
+  ctx.arcTo(
+    rect.x + rect.width,
+    rect.y + rect.height,
+    rect.x,
+    rect.y + rect.height,
+    radius,
+  );
+  ctx.arcTo(rect.x, rect.y + rect.height, rect.x, rect.y, radius);
+  ctx.arcTo(rect.x, rect.y, rect.x + rect.width, rect.y, radius);
+  ctx.closePath();
+  ctx.stroke();
+}
+function drawWorkbookOverlay(
+  input: WorkbookGrid & {
+    accentStroke: string;
+    overlayCanvas?: HTMLCanvasElement | null;
+    selectionRect: CellRect;
+    syncViewportCanvases(): void;
+    viewportMetrics: { dpr: number; height: number; width: number };
+  },
+): void {
+  if (!input.overlayCanvas) return;
+  const ctx = input.overlayCanvas.getContext("2d");
+  if (!ctx) return;
+  if (
+    input.viewportMetrics.width <= 0 ||
+    input.viewportMetrics.height <= 0 ||
+    input.viewportMetrics.dpr <= 0
+  )
+    input.syncViewportCanvases();
+  ctx.setTransform(
+    input.viewportMetrics.dpr,
+    0,
+    0,
+    input.viewportMetrics.dpr,
+    0,
+    0,
+  );
+  ctx.clearRect(
+    0,
+    0,
+    input.viewportMetrics.width,
+    input.viewportMetrics.height,
+  );
+  const bounds = selectionScreenBounds(input);
+  if (bounds)
+    strokeRoundedRect({
+      ctx,
+      accentStroke: input.accentStroke,
+      rect: {
+        x: bounds.left / input.camera.k,
+        y: bounds.top / input.camera.k,
+        width: bounds.width / input.camera.k,
+        height: bounds.height / input.camera.k,
+      },
+      coordinateScale: input.camera.k,
+    });
+  void drawPresenceLabel;
+  void handleMetrics;
+  void frameCorners;
+}
+
+function unionBounds(bounds: readonly Bounds[]): Bounds | null {
+  if (bounds.length === 0) return null;
+  let left = bounds[0]?.left ?? 0,
+    top = bounds[0]?.top ?? 0,
+    right = left + (bounds[0]?.width ?? 0),
+    bottom = top + (bounds[0]?.height ?? 0);
+  for (const item of bounds.slice(1)) {
+    left = Math.min(left, item.left);
+    top = Math.min(top, item.top);
+    right = Math.max(right, item.left + item.width);
+    bottom = Math.max(bottom, item.top + item.height);
+  }
+  return {
+    left,
+    top,
+    width: Math.max(0, right - left),
+    height: Math.max(0, bottom - top),
+  };
+}
+function rangeTargetFromAddresses(input: {
+  endAddress: string;
+  endCol: number;
+  endRow: number;
+  sheetName: string;
+  startAddress: string;
+  startCol: number;
+  startRow: number;
+}): WorkbookRangeTarget {
+  const rangeAddress =
+    input.startAddress === input.endAddress
+      ? input.startAddress
+      : `${input.startAddress}:${input.endAddress}`;
+  return {
+    type: "workbook-range",
+    sheetName: input.sheetName,
+    rangeAddress,
+    rect: {
+      r1: input.startRow,
+      c1: input.startCol,
+      r2: input.endRow,
+      c2: input.endCol,
+    },
+    rows: input.endRow - input.startRow + 1,
+    cols: input.endCol - input.startCol + 1,
+  };
+}
+function rangeTargetFromSelection(input: {
+  anchorPoint?: Point | null;
+  selectionSummary: {
+    cols: number;
+    rangeAddress: string;
+    rect?: CellRect | null;
+    rows: number;
+  };
+  sheetName: string;
+}): WorkbookRangeTarget | null {
+  const rect = input.selectionSummary.rect;
+  return rect
+    ? {
+        type: "workbook-range",
+        sheetName: input.sheetName,
+        rangeAddress: input.selectionSummary.rangeAddress,
+        rect: { ...rect },
+        rows: input.selectionSummary.rows,
+        cols: input.selectionSummary.cols,
+        ...(input.anchorPoint == null
+          ? {}
+          : { anchorPoint: { ...input.anchorPoint } }),
+      }
+    : null;
+}
+function floatingElementTarget(input: {
+  anchorPoint?: Point | null;
+  selectedFloatingElement: {
+    id: string;
+    kind: string;
+    logicalBounds: { height: number; width: number; x: number; y: number };
+    rotation?: number;
+  };
+  sheetName: string;
+}): WorkbookFloatingElementTarget {
+  const anchorPoint =
+    input.anchorPoint == null ? null : { ...input.anchorPoint };
+  return {
+    type: "workbook-floating-element",
+    sheetName: input.sheetName,
+    elementId: input.selectedFloatingElement.id,
+    elementKind: input.selectedFloatingElement.kind,
+    logicalBounds: { ...input.selectedFloatingElement.logicalBounds },
+    rotation: input.selectedFloatingElement.rotation,
+    ...(anchorPoint == null
+      ? {}
+      : {
+          anchorPoint,
+          elementOffset: {
+            x: anchorPoint.x - input.selectedFloatingElement.logicalBounds.x,
+            y: anchorPoint.y - input.selectedFloatingElement.logicalBounds.y,
+          },
+        }),
+  };
+}
+const reviewTargetLabel = (target: WorkbookReviewTarget): string =>
+  target.type === "workbook-range"
+    ? `${target.sheetName}!${target.rangeAddress}`
+    : `${target.sheetName} · ${target.elementKind === "xlsx-chart" ? "Chart" : target.elementKind === "xlsx-image" ? "Image" : "Shape"}`;
+const rangeHighlightFromTarget = (input: {
+  color: string;
+  rect: CellRect;
+}): CellRect & {
+  borderRadiusPx: number;
+  borderWidthPx: number;
+  color: string;
+  dashed: boolean;
+  fillAlpha: number;
+  visibleWhenCellSelectionSuppressed: boolean;
+} => ({
+  ...input.rect,
+  color: input.color,
+  dashed: true,
+  fillAlpha: 0.12,
+  borderWidthPx: 2,
+  borderRadiusPx: 0,
+  visibleWhenCellSelectionSuppressed: true,
+});
+function coveredCellsForBounds(input: {
+  colOffsets: number[];
+  columnWidths: number[];
+  logicalBounds: Bounds;
+  rowHeights: number[];
+  rowOffsets: number[];
+}): { coveredCells: CellRect | null; rangeAddress: string | null } {
+  if (input.columnWidths.length === 0 || input.rowHeights.length === 0)
+    return { rangeAddress: null, coveredCells: null };
+  const indexAt = (value: number, offsets: number[], count: number): number => {
+      if (value <= 0) return 0;
+      if (value >= (offsets[count] ?? 0)) return count - 1;
+      let index = 0;
+      while (index < count && (offsets[index + 1] ?? 0) <= value) index += 1;
+      return Math.max(0, Math.min(index, count - 1));
+    },
+    left = Math.max(0, input.logicalBounds.left - 40),
+    top = Math.max(0, input.logicalBounds.top - 20),
+    right = Math.max(
+      left,
+      input.logicalBounds.left + input.logicalBounds.width - 40,
+    ),
+    bottom = Math.max(
+      top,
+      input.logicalBounds.top + input.logicalBounds.height - 20,
+    ),
+    rect = {
+      r1: indexAt(top, input.rowOffsets, input.rowHeights.length),
+      c1: indexAt(left, input.colOffsets, input.columnWidths.length),
+      r2: indexAt(bottom, input.rowOffsets, input.rowHeights.length),
+      c2: indexAt(right, input.colOffsets, input.columnWidths.length),
+    };
+  return {
+    rangeAddress:
+      rect.r1 === rect.r2 && rect.c1 === rect.c2
+        ? cellPointToAddress(rect.r1, rect.c1)
+        : `${cellPointToAddress(rect.r1, rect.c1)}:${cellPointToAddress(rect.r2, rect.c2)}`,
+    coveredCells: rect,
+  };
+}
+function drawingRegionTarget(input: {
+  coveredCells?: CellRect | null;
+  logicalBounds: Bounds;
+  rangeAddress?: string | null;
+  sheetName: string;
+  viewportBounds: Bounds;
+}): WorkbookDrawingRegionTarget {
+  return {
+    type: "workbook-drawing-region",
+    sheetName: input.sheetName,
+    logicalBounds: { ...input.logicalBounds },
+    viewportBounds: { ...input.viewportBounds },
+    rangeAddress: input.rangeAddress ?? null,
+    coveredCells: input.coveredCells == null ? null : { ...input.coveredCells },
+  };
+}
+const drawingRegionLabel = (target: WorkbookDrawingRegionTarget): string =>
+  target.rangeAddress
+    ? `${target.sheetName}!${target.rangeAddress} · Drawing`
+    : `${target.sheetName} · Drawing`;
+function frozenBounds(input: WorkbookGrid & { bounds: Bounds }): Bounds | null {
+  return unionBounds(
+    splitFrozenScreenRect({
+      camera: input.camera,
+      worldX: input.bounds.left,
+      worldY: input.bounds.top,
+      width: input.bounds.width,
+      height: input.bounds.height,
+      freezePanes: input.freezePanes,
+      columnWidths: input.columnWidths,
+      rowHeights: input.rowHeights,
+    }).map((rect) => ({
+      left: rect.x,
+      top: rect.y,
+      width: rect.width,
+      height: rect.height,
+    })),
+  );
+}
+function targetScreenBounds(
+  input: WorkbookGrid & {
+    sheet?: {
+      mergedCells?: Array<{ endAddress: string; startAddress: string }>;
+    };
+    target: WorkbookReviewTarget;
+  },
+): Bounds | null {
+  return input.target.type === "workbook-range"
+    ? selectionScreenBounds({
+        ...input,
+        selectionRect: input.target.rect,
+        sheet: input.sheet,
+      })
+    : frozenBounds({
+        ...input,
+        bounds: {
+          left: input.target.logicalBounds.x,
+          top: input.target.logicalBounds.y,
+          width: input.target.logicalBounds.width,
+          height: input.target.logicalBounds.height,
+        },
+      });
+}
+function annotationAnchorBounds(
+  input: WorkbookGrid & {
+    sheet?: {
+      mergedCells?: Array<{ endAddress: string; startAddress: string }>;
+    };
+    target: WorkbookReviewTarget;
+  },
+): Bounds | null {
+  if (
+    input.target.type === "workbook-range" ||
+    input.target.anchorPoint == null
+  )
+    return targetScreenBounds(input);
+  const point = worldToFrozenScreen({
+    camera: input.camera,
+    worldX: input.target.anchorPoint.x,
+    worldY: input.target.anchorPoint.y,
+    freezePanes: input.freezePanes,
+    columnWidths: input.columnWidths,
+    rowHeights: input.rowHeights,
+  });
+  return { left: point.x, top: point.y, width: 0, height: 0 };
+}
+function currentReviewTarget(input: {
+  floatingAnchorPoint?: Point | null;
+  rangeAnchorPoint?: Point | null;
+  selectedFloatingElement?: {
+    id: string;
+    kind: string;
+    logicalBounds: { height: number; width: number; x: number; y: number };
+    rotation?: number;
+  } | null;
+  selectionSummary: {
+    cols: number;
+    rangeAddress: string;
+    rect?: CellRect | null;
+    rows: number;
+  };
+  snapshot: { activeSheetName: string };
+}): WorkbookReviewTarget | null {
+  return input.selectedFloatingElement
+    ? floatingElementTarget({
+        sheetName: input.snapshot.activeSheetName,
+        selectedFloatingElement: input.selectedFloatingElement,
+        anchorPoint: input.floatingAnchorPoint,
+      })
+    : rangeTargetFromSelection({
+        sheetName: input.snapshot.activeSheetName,
+        selectionSummary: input.selectionSummary,
+        anchorPoint: input.rangeAnchorPoint,
+      });
+}
+function initializeSelectionGeometry(): void {
+  initializeFreezePanes();
+  initializeSpreadsheetUtils();
+}
 function initializeCanvasOverlay(): void {}
-function initializeReviewTargets(): void { initializeSpreadsheetUtils(); initializeFreezePanes(); initializeRotationCursor(); initializeFrameGeometry(); }
-function initializeWorkbookReviewUtils(): void { initializeSpreadsheetUtils(); initializeReviewTargets(); initializeFreezePanes(); initializeCanvasOverlay(); }
-export { normalizeCellRect as C, initializeSelectionGeometry as S, valuesToHtmlTable as _, rangeHighlightFromTarget as a, htmlToClipboardPayload as b, drawingRegionLabel as c, drawWorkbookOverlay as d, initializeWorkbookReviewUtils as f, initializeCanvasOverlay as g, strokeRoundedRect as h, floatingElementTarget as i, annotationAnchorBounds as l, rangeTargetFromAddresses as m, rangeTargetFromSelection as n, unionBounds as o, initializeReviewTargets as p, drawingRegionTarget as r, coveredCellsForBounds as s, currentReviewTarget as t, targetScreenBounds as u, initializeSelectionGeometry as v, hitFillHandle as w, textToClipboardPayload as x, addressToCellPoint as y };
+function initializeReviewTargets(): void {
+  initializeSpreadsheetUtils();
+  initializeFreezePanes();
+  initializeRotationCursor();
+  initializeFrameGeometry();
+}
+function initializeWorkbookReviewUtils(): void {
+  initializeSpreadsheetUtils();
+  initializeReviewTargets();
+  initializeFreezePanes();
+  initializeCanvasOverlay();
+}
+export {
+  normalizeCellRect as C,
+  initializeSelectionGeometry as S,
+  valuesToHtmlTable as _,
+  rangeHighlightFromTarget as a,
+  htmlToClipboardPayload as b,
+  drawingRegionLabel as c,
+  drawWorkbookOverlay as d,
+  initializeWorkbookReviewUtils as f,
+  initializeCanvasOverlay as g,
+  strokeRoundedRect as h,
+  floatingElementTarget as i,
+  annotationAnchorBounds as l,
+  rangeTargetFromAddresses as m,
+  rangeTargetFromSelection as n,
+  unionBounds as o,
+  initializeReviewTargets as p,
+  drawingRegionTarget as r,
+  coveredCellsForBounds as s,
+  currentReviewTarget as t,
+  targetScreenBounds as u,
+  initializeSelectionGeometry as v,
+  hitFillHandle as w,
+  textToClipboardPayload as x,
+  addressToCellPoint as y,
+};

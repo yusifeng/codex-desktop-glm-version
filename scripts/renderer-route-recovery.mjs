@@ -445,14 +445,8 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["checkout-session", "session-3ec40b7dd28e.js"],
   ["mark-session-create", "mark-session-create-6f7d531b2a15.js"],
   ["xterm-window-zoom", "xterm-window-zoom-15fe24cf01f9.js"],
-  [
-    "codex-app-home-beacon-announcement-core",
-    "codex-app-home-beacon-announcement-8c94f69eb080.js",
-  ],
   ["content", "content-bd6ed75ea274.js"],
-  ["library-cloud-file-preview", "library-cloud-file-preview-b3ddfaa823c0.js"],
   ["open-conversation-files", "open-a618d40921b2.js"],
-  ["workbook-review-utils", "workbook-review-utils-3e78f7501b68.js"],
   // Complete eager first-party dependency closure of the four conversation
   // React roots. These owners remove structurally approximate implementations
   // from the live conversation path while retaining vendor/generated boundaries.
