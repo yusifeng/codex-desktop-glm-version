@@ -1,5 +1,14 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Popcorn 编辑器 surface 大批次：`text-underline-icon` 与
+`popcorn-electron-surface-style` 不再保留合计 10,191 行发布版 owner。可维护 TypeScript
+恢复 presentation/document toolbar、shape/font/color inspector、页码导航与 underline 图标；
+同时恢复 sortable 几何策略、批注 marker/ordinal/collision、drawing stroke/crop/screenshot、
+评论/presence UI、artifact badge、格式控件、CRDT bootstrap/restore 和 Codex surface theme。
+发布版 37/65 项短导出 ABI 保持不变，新增 58 项 focused contract，并通过三个既有
+Popcorn/panel suites、source-build、semantic override 与 typecheck。严格剩余由
+5 个 / 33,730 行降至 3 个 / 23,539 行。
+
 2026-11-02 Checkout session 大批次：`checkout-session` 不再保留 5,299 行发布版 owner。
 可维护 TypeScript 恢复 checkout return processor/session schema、plan 映射、币种 minor-unit
 格式化、折扣与年付节省、billing interval、Business standard/premium seat 默认值/边界/line-item
@@ -259,11 +268,11 @@ presentation/workbook/spreadsheet 编辑器和纯 SVG/persona/icon 数据。该�
 声明不含 `any`，并且消费侧不存在直接 namespace 成员访问。
 
 `artifact-source-bootstrap`、`text-underline-icon` 和
-`popcorn-electron-surface-style` 的发布资产分别暴露 79、37、65 个压缩导出，
-但 renderer 语义源码对三者全部只有副作用导入。它们是打包器形成的跨模块聚合
-边界，而不是 181 个值得复制的业务 API。`scripts/test-renderer-incremental-hubs.mjs`
-固定原资产、导出数量和消费方式；若未来出现命名导入，该测试会立即失败，届时应
-只把实际消费的能力拆成语义源码并补充精确声明。
+`popcorn-electron-surface-style` 的发布资产分别暴露 79、37、65 个压缩导出。
+三者现有 renderer 消费仍主要是副作用边，但这不再被当作“已完成”的替代证据：
+后两者已经迁移为可维护语义源码并由 focused contract 固定 ABI 和行为；
+`artifact-source-bootstrap` 仍是最后三个严格 owner 之一，必须继续消除其发布版回退。
+`scripts/test-renderer-incremental-hubs.mjs` 同时固定 rewritten 分类、发布导出数量和消费方式。
 
 `node scripts/audit-renderer-hub-classification.mjs` 对 `app-shared`、`app-initial`
 和 `app-primary` 的发布 export 表与 `src/renderer` 的实际命名消费做交叉分类：
