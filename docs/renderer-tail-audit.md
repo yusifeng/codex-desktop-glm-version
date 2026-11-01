@@ -1,5 +1,12 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Checkout session 大批次：`checkout-session` 不再保留 5,299 行发布版 owner。
+可维护 TypeScript 恢复 checkout return processor/session schema、plan 映射、币种 minor-unit
+格式化、折扣与年付节省、billing interval、Business standard/premium seat 默认值/边界/line-item
+映射、促销 query/request、legacy metadata、checkout verify URL，以及 purchase/success 路由实际使用的
+CheckoutShell、错误、表单和 summary 组件。60 项短导出 ABI 保持不变，并新增 focused contract。
+严格剩余由 6 个 / 39,029 行降至 5 个 / 33,730 行。
+
 2026-11-02 Imported setup 大批次：`use-imported-setup-opportunity` 不再保留
 7,139 行发布版聚合 owner。可维护 TypeScript 恢复侧栏 checklist 的特殊动作、远端任务定义、
 plugin slot/mention、可持久化 snapshot 与 prompt/instructions 替换；导入后 setup 恢复 foreground
