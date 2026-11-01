@@ -312,6 +312,7 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "agent-activity-item-792873f87aad.js",
   "agent-activity-units-9397783428a4.js",
   "agent-settings-27cdda401037.js",
+  "artifact-feedback-button-253b2bfc6015.js",
   "billing-settings-d5b5419393a0.js",
   "chronicle-settings-page-e92cf619a884.js",
   "computer-use-settings-6786672692bb.js",
@@ -336,6 +337,7 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "mcp-tool-item-content-d63cc703d211.js",
   "onboarding-d0bfce15e4cc.js",
   "open-a618d40921b2.js",
+  "open-thread-pull-request-side-panel-tab-4cc87983599f.js",
   "page-268e2fb6d880.js",
   "pending-onboarding-9e794fa64b02.js",
   "plan-summary-item-content-748d84eee508.js",
@@ -447,7 +449,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   // Complete eager first-party dependency closure of the four conversation
   // React roots. These owners remove structurally approximate implementations
   // from the live conversation path while retaining vendor/generated boundaries.
-  ["artifact-feedback-button", "artifact-feedback-button-253b2bfc6015.js"],
   ["content-quick-chat-overlay", "content-quick-chat-overlay-ed4d1aa8ed4b.js"],
   [
     "create-pull-request-modal-content",
@@ -469,10 +470,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   [
     "open-in-google-drive-menu-item",
     "open-in-google-drive-menu-item-b5e143939095.js",
-  ],
-  [
-    "open-thread-pull-request-side-panel-tab",
-    "open-thread-pull-request-side-panel-tab-4cc87983599f.js",
   ],
   ["plugin-picker-menu-content", "plugin-picker-menu-content-a51d37a29207.js"],
   ["pull-request-actions", "pull-request-actions-5ac6dcc71dec.js"],

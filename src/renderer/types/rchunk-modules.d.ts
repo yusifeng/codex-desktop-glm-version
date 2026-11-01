@@ -2903,6 +2903,29 @@ declare module "@rchunk/thumbnail-worker-pdf-runtime" {
 }
 
 declare module "@rchunk/app-initial" {
+  export const Cdt: () => void;
+  export const Cf: (scope: unknown, hostId: string) => Promise<{ hostId: string; [key: string]: unknown }>;
+  export const E$: () => void;
+  export const Ef: () => void;
+  export const FXt: (scope: unknown) => boolean;
+  export const Syt: import("@rchunk/app-shared").ReadableSignal<string>;
+  export const T$: (props: Record<string, unknown>) => unknown;
+  export const _3t: () => void;
+  export const _g: unknown;
+  export const a5t: (candidate: { url: string }, pullRequest: unknown) => boolean;
+  export const g3t: (props: Record<string, unknown>) => unknown;
+  export const gf: unknown;
+  export const gg: unknown;
+  export const hdt: unknown;
+  export const hf: () => void;
+  export const hg: () => void;
+  export const of: (summary: unknown) => string | null;
+  export const s5t: (url: string) => unknown;
+  export const sf: (input: Record<string, unknown>) => string;
+  export const vg: () => void;
+  export const w$: (props: Record<string, unknown>) => unknown;
+  export const wf: (scope: unknown, input: unknown) => Promise<{ title: string }>;
+  export const xdt: (target: unknown) => unknown;
   export const Fcn: () => void;
   export const R5t: () => void;
   export const Wpn: (text: string, offset: number) => { end: number; path: string } | null;
@@ -4745,10 +4768,24 @@ declare module "@rchunk/app-initial" {
 }
 
 declare module "@rchunk/app-shared" {
+  export const FC: (props: Record<string, unknown>) => unknown;
+  export const aW: (path: string) => string;
+  export const _w: unknown;
+  export const gw: () => void;
+  export const hw: unknown;
+  export const mw: () => void;
+}
+
+declare module "@rchunk/app-shared" {
   export const $I: (options: unknown) => unknown;
 }
 
 declare module "@rchunk/app-initial" {
+  export const $rt: (props: Record<string, unknown>) => unknown;
+  export const Hi: () => void;
+  export const Vi: (props: Record<string, unknown>) => unknown;
+  export const rit: () => void;
+  export const rtn: (scopeValue: unknown) => string;
   export const Gv: () => { selectedHostId: string };
 }
 
