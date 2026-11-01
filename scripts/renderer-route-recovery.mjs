@@ -331,7 +331,11 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "keyboard-shortcuts-settings-5511d1126168.js",
   "library-cloud-file-preview-b3ddfaa823c0.js",
   "math-block-utils-ca3c4f5321e8.js",
+  "drop-zones-5d14ded04e79.js",
+  "open-in-button-c51945f2c9d6.js",
+  "plugin-picker-menu-content-a51d37a29207.js",
   "tokenize-math-block-92dba400da42.js",
+  "use-app-connect-flow-e16aee878521.js",
   "visualization-standalone-document-45332507e418.js",
   "mcp-tool-approval-message-cfc9b358efc1.js",
   "mcp-tool-item-content-d63cc703d211.js",
@@ -444,7 +448,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["checkout-session", "session-3ec40b7dd28e.js"],
   ["mark-session-create", "mark-session-create-6f7d531b2a15.js"],
   ["xterm-window-zoom", "xterm-window-zoom-15fe24cf01f9.js"],
-  ["content", "content-bd6ed75ea274.js"],
   ["open-conversation-files", "open-a618d40921b2.js"],
   // Complete eager first-party dependency closure of the four conversation
   // React roots. These owners remove structurally approximate implementations
@@ -454,7 +457,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
     "create-pull-request-modal-content",
     "create-pull-request-modal-content-a56e677534f4.js",
   ],
-  ["quick-chat-drop-zones", "drop-zones-5d14ded04e79.js"],
   [
     "git-action-new-branch-field",
     "git-action-new-branch-field-a2e24da5e504.js",
@@ -466,16 +468,13 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ],
   ["local-environment-editor", "local-environment-editor-c4a981e88476.js"],
   ["mcp-tool-activity-label", "mcp-tool-activity-label-87ba9ef42b0b.js"],
-  ["open-in-button", "open-in-button-c51945f2c9d6.js"],
   [
     "open-in-google-drive-menu-item",
     "open-in-google-drive-menu-item-b5e143939095.js",
   ],
-  ["plugin-picker-menu-content", "plugin-picker-menu-content-a51d37a29207.js"],
   ["pull-request-actions", "pull-request-actions-5ac6dcc71dec.js"],
   ["thread-handoff-modal", "thread-handoff-modal-ccac59d04293.js"],
   ["thread-panel-toggle-button", "thread-panel-toggle-button-d0ce9733e408.js"],
-  ["use-app-connect-flow", "use-app-connect-flow-e16aee878521.js"],
 ]);
 
 export const SEMANTIC_ROUTE_OVERRIDES = new Set([

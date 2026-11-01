@@ -41,11 +41,11 @@ exports were previously classified. Current completion requires source-backed bu
 
 ## Current runtime-source recovery status
 
-The renderer build now emits and verifies all 1,888 registered rewritten chunks. There are 53 remaining release-faithful source owners
+The renderer build now emits and verifies all 1,888 registered rewritten chunks. There are 48 remaining release-faithful source owners
 under their semantic `src/renderer/<name>/` directories, including the settings/composer surfaces and the complete local
 conversation dependency closure. Their checked-in `exact.js` files are generated from the published ESM with only cross-chunk
-import specifiers rewritten; the source-build gate regenerates all 53 owners and requires exact source equality. The remaining
-inventory contains 189,349 formatted release-derived lines. The build therefore no longer substitutes the earlier partial
+import specifiers rewritten; the source-build gate regenerates all 48 owners and requires exact source equality. The remaining
+inventory contains 186,847 formatted release-derived lines. The build therefore no longer substitutes the earlier partial
 view-model approximations for these production components.
 
 The remaining route compatibility closure contains 35 checked-in ESM modules, down from 77 before the exact-owner promotion.
@@ -56,7 +56,7 @@ explicitly audited as vendor or generated boundaries (Recharts/D3,
 Three.js, date/phone/form runtimes, generated icons and entry shims); a gate requires that inventory to match the closure
 exactly. Six former incremental hubs now also have exact source owners; only the three shared renderer hubs remain incremental.
 Renderer verification passes 1,888/1,888 outputs, TypeScript typechecking passes, and the recovery gate covers 11 source-build
-assertions, 35 compatibility modules, 53 exact owners, and six reviewed structural drafts. The packaged app now starts from
+assertions, 35 compatibility modules, 48 exact owners, and six reviewed structural drafts. The packaged app now starts from
 the reconstructed build, renders the home composer, resumes a real signed-in local conversation, hydrates its turns, and renders
 the virtualized user/assistant transcript without loading original JavaScript as a runtime fallback. The build also rejects
 build-only `@exact-chunk` aliases if any leak into packaged assets.
@@ -81,7 +81,7 @@ tab-activity, and session-registration behavior. Browser-page preload initializa
 annotation owners initialize lazily after their runtime bindings, WebMCP retains a real ESM named export, and every extracted
 annotation controller is bound before registry construction. Focused regressions cover these ordering and ownership contracts.
 
-The 53 exact owners are still outstanding readability and semantic-recovery work and must not be described as a completely
+The 48 exact owners are still outstanding readability and semantic-recovery work and must not be described as a completely
 decompiled renderer. The current build is source-backed and runnable, but final completion additionally requires replacing
 those owners with maintainable semantic TypeScript (or explicitly justified generated/vendor boundaries), keeping the
 critical E2E matrix green, and eliminating the remaining stable runtime contract errors.
@@ -98,3 +98,11 @@ tabs now retain board/canonical descriptors, GitHub/GitLab resolution, status pr
 focus behavior, and guarded restoration. Artifact feedback now retains lazy dialog loading, app-info capture, upload
 coordination, plan/correlation metadata, three button variants, error logging, and user-visible submission failure handling.
 Their differential suites exercise actual open/restore and open/submit workflows rather than export-shape checks.
+
+The next five-owner semantic batch restores the quick-chat drop-zone portal, tool-icon and memory-write content,
+plugin picker, app-connect flow, and artifact Open In surface. It removes placeholder contracts that rendered ordinary
+buttons or returned unrelated selection helpers in place of the published exports. The recovered implementations retain
+drag selection capture and bottom-panel geometry; safe remote icon resolution and memory-management dialogs; installed,
+featured, and recent-plugin state; OAuth pending/resume and connector installation behavior; and native artifact target
+discovery, upload snapshots, file-manager reveal, and download actions. Focused owner tests plus the existing connector,
+extension-discovery, quick-chat, and tool-result clusters cover these workflows.
