@@ -8319,6 +8319,7 @@ declare module "@rchunk/chatgpt-image-home" {
 }
 
 declare module "@rchunk/image-suggestions-core" {
+  export const n: () => void;
   export const t: unknown;
 }
 

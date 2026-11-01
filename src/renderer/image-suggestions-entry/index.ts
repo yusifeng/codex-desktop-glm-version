@@ -5,6 +5,11 @@
 // 以公开名 `ImageSuggestions` 转发。
 
 import "@rchunk/app-shared";
-import { t as ImageSuggestions } from "@rchunk/image-suggestions-core";
+import {
+  n as initializeImageSuggestions,
+  t as ImageSuggestions,
+} from "@rchunk/image-suggestions-core";
+
+initializeImageSuggestions();
 
 export { ImageSuggestions };

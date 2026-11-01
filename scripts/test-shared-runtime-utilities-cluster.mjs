@@ -4,8 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-globalThis.__sharedRuntimeUtilitiesTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return { type, props: props ?? {}, key }; } }, memorySummary(props) { return { type: "memory-summary", props }; }, savedMemories(props) { return { type: "saved-memories", props }; } };
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "shared-runtime-utilities-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => { const name = path.basename(importPath); const contents = name === "app-shared" ? "export const I3=()=>globalThis.__sharedRuntimeUtilitiesTest.jsx;" : name === "saved-memories" ? "export const t=globalThis.__sharedRuntimeUtilitiesTest.savedMemories;" : name === "about-you-summary" ? "export const n=globalThis.__sharedRuntimeUtilitiesTest.memorySummary;" : "export {};"; return { contents, loader: "js" }; }); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+globalThis.__sharedRuntimeUtilitiesTest = { aboutYouInitializations: 0, jsx: { Fragment: "Fragment", jsx(type, props, key) { return { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return { type, props: props ?? {}, key }; } }, memorySummary(props) { return { type: "memory-summary", props }; }, savedMemories(props) { return { type: "saved-memories", props }; } };
+async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "shared-runtime-utilities-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => { const name = path.basename(importPath); const contents = name === "app-shared" ? "export const I3=()=>globalThis.__sharedRuntimeUtilitiesTest.jsx;" : name === "saved-memories" ? "export const t=globalThis.__sharedRuntimeUtilitiesTest.savedMemories;" : name === "about-you-summary" ? "export const i=()=>globalThis.__sharedRuntimeUtilitiesTest.aboutYouInitializations++,n=globalThis.__sharedRuntimeUtilitiesTest.memorySummary;" : "export {};"; return { contents, loader: "js" }; }); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
 function nodes(root) { const output = []; const visit = value => { if (value == null || typeof value !== "object") return; if (Array.isArray(value)) return value.forEach(visit); output.push(value); visit(value.props?.children); }; visit(root); return output; }
 function find(root, predicate) { return nodes(root).find(predicate); }
 
@@ -17,6 +17,7 @@ assert.equal(saved.SavedMemoriesDialog({ accountId: "a" }).type, "saved-memories
 // chatgpt-about-you-summary-panel: 2
 const summary = await bundle("chatgpt-about-you-summary-panel");
 assert.deepEqual(Object.keys(summary), ["MemorySummaryDialog"]);
+assert.equal(globalThis.__sharedRuntimeUtilitiesTest.aboutYouInitializations, 1);
 assert.equal(summary.MemorySummaryDialog({ accountId: "a" }).type, "memory-summary");
 
 // chatgpt-projects-runtime: 6
@@ -91,4 +92,4 @@ assert.deepEqual(await availability.n({ appId: "primary", companionConnectorIds:
 assert.deepEqual(await availability.n({ appId: "primary", companionConnectorIds: [], connectors, availableAppIds: ["drive"] }), []);
 assert.equal(typeof availability.r, "function");
 
-console.log("45 shared runtime utilities cluster assertions passed");
+console.log("46 shared runtime utilities cluster assertions passed");

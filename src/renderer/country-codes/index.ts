@@ -8,5 +8,4 @@ function initializeCountryCodes(): void {
     ),
   );
 }
-initializeCountryCodes();
 export { initializeCountryCodes as n, supportedCountryCodes as t };

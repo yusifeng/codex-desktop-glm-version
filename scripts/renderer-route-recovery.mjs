@@ -217,6 +217,43 @@ export const RECONSTRUCTED_ROUTE_CORE = new Set([
   "rolldown-runtime-2d059c5e81f4.js",
 ]);
 
+// Route modules whose readable TypeScript implementations have been checked
+// against the release import/export contract.  They deliberately break out of
+// the compatibility closure: importers keep the same hashed filename, while
+// build-renderer emits that filename from src/renderer/<semantic-name>.
+export const SEMANTIC_ROUTE_OVERRIDES = new Set([
+  "about-you-summary-9b607a4e7d80.js",
+  "appgen-settings-page-ea4f4a5684c3.js",
+  "array-15adaa1bc228.js",
+  "assert-never-a6e685100dc6.js",
+  "browser-composer-disclaimer-f364f51499b5.js",
+  "codex-app-home-beacon-announcement-8a3d3ccd4244.js",
+  "command-execution-command-615dea847916.js",
+  "composer-host-f4bf944e323d.js",
+  "composer-state-fe0ac7960e24.js",
+  "country-codes-1c845666fc28.js",
+  "dialog-launcher-7402d22a7e21.js",
+  "diff-summary-f7ac0660791a.js",
+  "format-bytes-9f828acaa58f.js",
+  "general-settings-4d0f64b22132.js",
+  "git-action-review-state-3172c139d671.js",
+  "home-composer-mode-toggle-edaa8aaec97d.js",
+  "home-composer-route-a340373310ac.js",
+  "home-task-suggestions-b757487c0d5e.js",
+  "import-settings-gate-7fb85d759733.js",
+  "memory-manager-gate-c50f1c5729d4.js",
+  "noop-4d1a48b9db0c.js",
+  "notifications-settings-ebea0dc9da14.js",
+  "onboarding-interactive-tools-f11479e8dd9a.js",
+  "plan-implementation-request-0cd55f1ae7b1.js",
+  "plugins-settings-a6cc8c327ff7.js",
+  "realtime-voice-launch-surface-2fa961db54d2.js",
+  "suggestions-c9112ed2bf9b.js",
+  "tiny-invariant-b34bc475860a.js",
+  "turn-preview-body-items-84e9457d1850.js",
+  "usd-5d2c7710cf01.js",
+]);
+
 // Follow eager imports only. Backtick imports in the release graph are lazy
 // product-wide route registries; recursively activating those exact chunks can
 // overwrite unrelated semantic routes and mix incompatible graph segments.
@@ -228,7 +265,11 @@ export async function collectConversationRouteClosure(assetDirectory) {
   const pending = [...CONVERSATION_ROUTE_ROOTS];
   while (pending.length > 0) {
     const name = pending.pop();
-    if (recovered.has(name) || RECONSTRUCTED_ROUTE_CORE.has(name)) continue;
+    if (
+      recovered.has(name) ||
+      RECONSTRUCTED_ROUTE_CORE.has(name) ||
+      SEMANTIC_ROUTE_OVERRIDES.has(name)
+    ) continue;
     const code = await fs.readFile(path.join(assetDirectory, name), "utf8");
     recovered.add(name);
     for (const match of code.matchAll(STATIC_IMPORT_RE)) pending.push(match[1]);
