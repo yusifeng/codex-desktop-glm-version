@@ -10,8 +10,11 @@ import {
   HZt as initializeSidePanelRoutes,
   Mg as initializeBackgroundAgentModel,
   Og as initializeBackgroundAgentTabs,
+  Pin as getConversationMessages,
   RQt as activeConversationIdsByHost,
+  Ugn as getConversationHydrator,
   Wvt as initializeSidePanel,
+  Lin as hasCompleteConversationHistory,
   jg as getBackgroundAgentTabId,
   kg as createBackgroundAgentPanelDefinition,
   vZt as hostServiceById,
@@ -19,11 +22,11 @@ import {
 } from "@rchunk/app-initial";
 import {
   Bl as ThreadAvatar,
-  Ur as ensureConversationReady,
   Vl as initializeThreadAvatar,
   Wr as initializeConversationSurface,
 } from "@rchunk/app-primary";
 import { r as initializeOpenTarget } from "@rchunk/open-target";
+import { ensureConversationReady } from "../app-primary/runtime/ensure-conversation-ready";
 
 export interface BackgroundAgent {
   canInteract: boolean;
@@ -69,6 +72,12 @@ async function openLocalConversationBackgroundAgent(
     scope,
     backgroundAgent.conversationId,
     hostId,
+    {
+      conversationStore: hostServiceById,
+      getHydrationService: getConversationHydrator,
+      getMessages: getConversationMessages,
+      hasCompleteHistory: hasCompleteConversationHistory,
+    },
   );
   if (available !== true && !(await available)) return null;
 

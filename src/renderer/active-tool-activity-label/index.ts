@@ -1,7 +1,6 @@
 import { n as onceExport } from "@rchunk/rolldown-runtime";
 import {
   G2 as defineMessages,
-  II as displayPath,
   K2 as initializeInternationalization,
   RI as initializePathRuntime,
 } from "@rchunk/app-shared";
@@ -20,6 +19,7 @@ import {
   u as visualizationMessages,
 } from "@rchunk/skill-exploration-labels";
 import type { MessageDescriptor } from "@rchunk/app-shared";
+import { getPathBasename as displayPath } from "../app-shared/runtime/get-path-basename";
 
 interface ParsedCommand {
   cmd: string;

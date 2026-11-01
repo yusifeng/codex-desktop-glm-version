@@ -3373,6 +3373,19 @@ import {
   zpt as vE,
   zrn as yE,
 } from "./app-initial-51da50e6c6e3.js";
+import { n as recoveredSourceAnnotationRegistry } from "./source-annotation-host-registry-60c474ef605e.js";
+const {
+  registerBrowserContextProvider: recoveredRegisterBrowserContextProvider,
+  getBrowserTabUrlState: recoveredGetBrowserTabUrlState,
+  initializeBrowserTabUrlState: recoveredInitializeBrowserTabUrlState,
+  resolveBrowserContext: recoveredResolveBrowserContext,
+  setBrowserTabUrlState: recoveredSetBrowserTabUrlState,
+  registerBrowserCommentHandler: recoveredRegisterBrowserCommentHandler,
+  hasBrowserCommentHandler: recoveredHasBrowserCommentHandler,
+  submitBrowserComment: recoveredSubmitBrowserComment,
+  subscribeBrowserCommentReadiness: recoveredSubscribeBrowserCommentReadiness,
+  waitForBrowserCommentHandler: recoveredWaitForBrowserCommentHandler,
+} = recoveredSourceAnnotationRegistry.browserComments;
 function bE(e) {
   let t = e?.ownerDocument.defaultView;
   if (!e || !t) return AE;
@@ -36779,51 +36792,25 @@ function vK() {
   }))();
 }
 function WWe(e, t) {
-  return ZWe(bK, e, t);
+  return recoveredRegisterBrowserContextProvider(e, t);
 }
 function GWe(e) {
-  for (let t of bK.get(e.conversationId) ?? []) {
-    let n = t(e);
-    if (n != null) return n;
-  }
+  return recoveredResolveBrowserContext(e);
 }
 function KWe(e, t) {
-  return ZWe(xK, e, t);
+  return recoveredRegisterBrowserCommentHandler(e, t);
 }
 function qWe(e, t) {
-  return yK(e, t) != null;
+  return recoveredHasBrowserCommentHandler(e, t);
 }
 function JWe(e) {
-  let t = yK(e.conversationId, e.browserTabId);
-  if (t != null) return (async () => t.submit(e))();
+  return recoveredSubmitBrowserComment(e);
 }
 function YWe(e, t) {
-  let n = SK.get(e) ?? new Set();
-  return (
-    n.add(t),
-    SK.set(e, n),
-    () => {
-      (n.delete(t), n.size === 0 && SK.delete(e));
-    }
-  );
+  return recoveredSubscribeBrowserCommentReadiness(e, t);
 }
 function XWe(e, t, n, r) {
-  return n.aborted
-    ? Promise.resolve(!1)
-    : yK(e, t) == null
-      ? new Promise((i) => {
-          let a = (e) => {
-              (c(), clearTimeout(l), n.removeEventListener(`abort`, s), i(e));
-            },
-            o = () => {
-              yK(e, t) != null && a(!0);
-            },
-            s = () => a(!1),
-            c = YWe(e, o),
-            l = setTimeout(() => a(!1), r);
-          (n.addEventListener(`abort`, s, { once: !0 }), o());
-        })
-      : Promise.resolve(!0);
+  return recoveredWaitForBrowserCommentHandler(e, t, n, r);
 }
 function yK(e, t) {
   for (let n of xK.get(e) ?? []) if (n.acceptsTab(t)) return n;
@@ -36843,19 +36830,14 @@ function CK() {
   }))();
 }
 function QWe(e, t, n, { isOpen: r, url: i }) {
-  let a = i.trim();
-  e.set(TK, $We(t, n), { currentUrls: a.length > 0 ? [a] : [], isOpen: r });
+  return recoveredSetBrowserTabUrlState(e, t, n, { isOpen: r, url: i });
 }
 function wK(e, t, n) {
-  return t == null || n == null ? null : e.get(TK, $We(t, n));
+  return recoveredGetBrowserTabUrlState(e, t, n);
 }
-function $We(e, t) {
-  return `${e}\0${t}`;
-}
-var TK;
 function EK() {
   return (EK = e(() => {
-    (Y(), en(), (TK = Xo(Ir, (e) => null)));
+    (Y(), en(), recoveredInitializeBrowserTabUrlState(Xo, Ir));
   }))();
 }
 var DK, eGe;

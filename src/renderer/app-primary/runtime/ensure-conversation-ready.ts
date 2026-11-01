@@ -5,9 +5,8 @@
  * the store and hydration services structural makes the policy usable by both
  * local and remote conversation routes without importing the aggregate hub.
  */
-export interface ConversationReadyScope<Conversation> {
-  getConversationStore(hostId: string): ConversationStore<Conversation> | null | undefined;
-  getHydrationService(hostId: string): ConversationHydrationService;
+export interface ConversationReadyScope {
+  get(signal: unknown, parameter?: unknown): unknown;
 }
 
 export interface ConversationStore<Conversation> {
@@ -20,33 +19,41 @@ export interface ConversationHydrationService {
 }
 
 export interface ConversationReadiness<Conversation> {
-  isResumed(conversation: Conversation): boolean;
-  hasSufficientHistory(conversation: Conversation): boolean;
+  conversationStore: unknown;
+  getHydrationService(scope: ConversationReadyScope, hostId: string): ConversationHydrationService;
+  getMessages(conversation: Conversation): readonly unknown[];
+  hasCompleteHistory(conversation: Conversation): boolean;
 }
 
 export function ensureConversationReady<Conversation>(
-  scope: ConversationReadyScope<Conversation>,
+  scope: ConversationReadyScope,
   conversationId: string,
   hostId: string,
   readiness: ConversationReadiness<Conversation>,
 ): true | Promise<boolean> {
-  const store = scope.getConversationStore(hostId);
+  const store = scope.get(readiness.conversationStore, hostId) as ConversationStore<Conversation> | null | undefined;
   const conversation = store?.getConversation(conversationId);
   if (conversation == null) {
-    return scope
-      .getHydrationService(hostId)
+    return readiness
+      .getHydrationService(scope, hostId)
       .hydrateBackgroundThreads([conversationId])
       .then(() => {
-        const hydrated = scope.getConversationStore(hostId)?.getConversation(conversationId);
+        const hydrated = (scope
+          .get(readiness.conversationStore, hostId) as ConversationStore<Conversation> | null | undefined)
+          ?.getConversation(conversationId);
         return hydrated == null
           ? false
           : ensureConversationReady(scope, conversationId, hostId, readiness);
       });
   }
 
-  if (!readiness.isResumed(conversation) || !readiness.hasSufficientHistory(conversation)) {
-    return scope
-      .getHydrationService(hostId)
+  const resumeState = (conversation as { resumeState?: unknown }).resumeState;
+  if (
+    resumeState !== "resumed" ||
+    (readiness.getMessages(conversation).length === 0 && !readiness.hasCompleteHistory(conversation))
+  ) {
+    return readiness
+      .getHydrationService(scope, hostId)
       .loadOlderConversationHistoryPage(conversationId)
       .then(() => true);
   }

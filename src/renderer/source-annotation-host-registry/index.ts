@@ -1,4 +1,16 @@
 import { n as createLazyInitializerValue } from "@rchunk/rolldown-runtime";
+import {
+  hasBrowserCommentHandler,
+  getBrowserTabUrlState,
+  initializeBrowserTabUrlState,
+  registerBrowserCommentHandler,
+  registerBrowserContextProvider,
+  resolveBrowserContext,
+  setBrowserTabUrlState,
+  subscribeBrowserCommentReadiness,
+  submitBrowserComment,
+  waitForBrowserCommentHandler,
+} from "../app-primary-browser-comment-runtime";
 
 type AnnotationHostCallback = () => boolean;
 type RegistryListener = () => void;
@@ -54,6 +66,21 @@ function registerSourceAnnotationHost(
 const initializeSourceAnnotationHostRegistry = createLazyInitializer(() => {
   annotationHosts = new Map<string, AnnotationHostCallback>();
   registryListeners = new Map<string, Set<RegistryListener>>();
+});
+
+Object.assign(initializeSourceAnnotationHostRegistry, {
+  browserComments: {
+    hasBrowserCommentHandler,
+    getBrowserTabUrlState,
+    initializeBrowserTabUrlState,
+    registerBrowserCommentHandler,
+    registerBrowserContextProvider,
+    resolveBrowserContext,
+    setBrowserTabUrlState,
+    subscribeBrowserCommentReadiness,
+    submitBrowserComment,
+    waitForBrowserCommentHandler,
+  },
 });
 
 export {

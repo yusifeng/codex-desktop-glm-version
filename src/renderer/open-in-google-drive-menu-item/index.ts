@@ -3,6 +3,7 @@ import * as initialChunk from "@rchunk/app-initial";
 import * as primaryChunk from "@rchunk/app-primary";
 import * as connectModalChunk from "@rchunk/app-connect-modal";
 import type { JsxRuntime } from "@rchunk/app-shared";
+import { getPathBasename } from "../app-shared/runtime/get-path-basename";
 
 export type GoogleWorkspaceTarget = "document" | "presentation" | "spreadsheet";
 type Callable = (...args: unknown[]) => unknown;
@@ -37,7 +38,7 @@ const GOOGLE_URL = /https?:\/\/(?:docs|drive)\.google\.com\/[^\s"'<>),]+/i;
 
 function invoke<T>(value: unknown, ...args: unknown[]): T { return (value as Callable)(...args) as T; }
 function element(type: unknown, props: Record<string, unknown>): unknown { return jsx.jsx(type as never, props); }
-function fileName(path: string): string { return typeof shared.II === "function" ? invoke<string>(shared.II, path) : (path.replace(/\\/g, "/").split("/").pop() ?? path); }
+function fileName(path: string): string { return getPathBasename(path); }
 function extension(path: string): string { const name = fileName(path); const dot = name.lastIndexOf("."); return dot < 0 ? "" : name.slice(dot + 1).toLowerCase(); }
 function targetForPath(path: string): GoogleWorkspaceTarget | null {
   switch (extension(path)) { case "docx": return "document"; case "xlsx": return "spreadsheet"; case "pptx": return "presentation"; default: return null; }

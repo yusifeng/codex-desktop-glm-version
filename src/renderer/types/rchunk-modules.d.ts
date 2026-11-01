@@ -15926,7 +15926,24 @@ declare module "@rchunk/link-layout" { export const TrustedContactLinkLayout: ()
 declare module "@rchunk/artifact-tab-content-shell" { export const ArtifactTabContentShell: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/comment-light-dismiss";
 declare module "@rchunk/comment-popup-portal";
-declare module "@rchunk/source-annotation-host-registry" { export const a: (browserTabId: string, conversationId: string, listener: () => void) => () => void; export const i: (browserTabId: string, conversationId: string, callback: () => boolean) => () => void; export const n: () => void; export const r: (browserTabId: string, conversationId: string) => boolean; export const t: (browserTabId: string, conversationId: string) => boolean; }
+declare module "@rchunk/source-annotation-host-registry" {
+  export const a: (browserTabId: string, conversationId: string, listener: () => void) => () => void;
+  export const i: (browserTabId: string, conversationId: string, callback: () => boolean) => () => void;
+  export const n: (() => void) & { browserComments: {
+    hasBrowserCommentHandler(conversationId: string, browserTabId: string): boolean;
+    getBrowserTabUrlState(scope: { get<Value>(signal: unknown, key: string): Value | null | undefined }, conversationId: string | null | undefined, browserTabId: string | null | undefined): { currentUrls: string[]; isOpen: boolean } | null | undefined;
+    initializeBrowserTabUrlState(createStateFamily: (scope: unknown, defaultValue: (key: string) => null) => unknown, appScope: unknown): void;
+    registerBrowserCommentHandler<Message, Result>(conversationId: string, handler: { acceptsTab(browserTabId: string): boolean; submit(message: Message): Promise<Result> | Result }): () => void;
+    registerBrowserContextProvider<Request extends { conversationId: string }, Result>(conversationId: string, provider: (request: Request) => Result | null | undefined): () => void;
+    resolveBrowserContext<Request extends { conversationId: string }, Result>(request: Request): Result | undefined;
+    setBrowserTabUrlState(scope: { set<Value>(signal: unknown, key: string, value: Value): void }, conversationId: string, browserTabId: string, state: { isOpen: boolean; url: string }): void;
+    subscribeBrowserCommentReadiness(conversationId: string, listener: () => void): () => void;
+    submitBrowserComment<Message, Result>(message: Message & { browserTabId: string; conversationId: string }): Promise<Result> | null;
+    waitForBrowserCommentHandler(conversationId: string, browserTabId: string, signal: AbortSignal, timeoutMs: number): Promise<boolean>;
+  } };
+  export const r: (browserTabId: string, conversationId: string) => boolean;
+  export const t: (browserTabId: string, conversationId: string) => boolean;
+}
 declare module "@rchunk/selected-text-annotation-editor" { export const SelectedTextAnnotationEditor: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/detached-browser-annotation-host" { export const DetachedBrowserAnnotationHost: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/pierre-file-editor" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }

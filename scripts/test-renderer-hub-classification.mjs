@@ -13,10 +13,17 @@ for (const result of results) {
 const primary = results[2];
 // Cast-narrowed namespace bindings are real consumers too.  Keep a floor for
 // each hub so a future audit cannot silently regress to dot-access-only scans.
-assert.ok(results[0].consumedCount >= 430, "app-shared named/cast consumers must be counted");
-assert.ok(results[1].consumedCount >= 1600, "app-initial named/cast consumers must be counted");
+assert.ok(results[0].consumedCount >= 350, "app-shared named/cast consumers must be counted");
+assert.ok(results[1].consumedCount >= 1400, "app-initial named/cast consumers must be counted");
 assert.ok(results[1].consumedAliases.includes("ggt"), "multi-character named imports must be counted");
-assert.ok(primary.consumedCount >= 210, "app-primary named/cast consumers must be counted");
+assert.ok(primary.consumedCount >= 170, "app-primary named/cast consumers must be counted");
+for (const alias of ["Du", "Jm", "Rf"]) {
+  assert.equal(
+    primary.consumedAliases.includes(alias),
+    false,
+    `${alias} belongs to an earlier hub destructuring and must not leak into app-primary consumption`,
+  );
+}
 // Namespace imports are frequently narrowed through a destructuring binding
 // (`const { Sm: AnnouncementShell } = appPrimaryChunk`).  The audit must count
 // the public alias on the left-hand side as a real consumer, not classify it as

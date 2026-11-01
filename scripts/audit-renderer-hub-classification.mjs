@@ -129,7 +129,13 @@ function readConsumption(hub) {
         // binding table (`const { alias: semanticName } = chunk`).  Those
         // aliases are real consumers just like `chunk.alias`; include the
         // left-hand export name while retaining the existing namespace scan.
-        const destructuring = new RegExp(`(?:const|let|var)\\s*\\{([\\s\\S]*?)\\}\\s*=\\s*${namespace[1]}\\b`, "g");
+        // A destructuring binding cannot cross another object boundary.  Using
+        // `[\\s\\S]*?` here made a later `}= appPrimaryChunk` consume earlier
+        // app-shared/app-initial destructurings and attributed their aliases to
+        // the wrong hub.  Keep this deliberately conservative: nested object
+        // patterns are not used at these generated chunk boundaries and are
+        // handled by explicit member/cast scans instead.
+        const destructuring = new RegExp(`(?:const|let|var)\\s*\\{([^{}]*?)\\}\\s*=\\s*${namespace[1]}\\b`, "g");
         for (const binding of source.matchAll(destructuring)) {
           for (const item of binding[1].split(",")) {
             const exportName = item.trim().split(/\s*:\s*/)[0].replace(/^type\s+/, "");

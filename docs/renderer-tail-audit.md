@@ -1,5 +1,16 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Hub coupled-runtime extraction batch：修正 namespace destructuring 审计器允许
+`[\s\S]*?` 跨越前一个对象解构的问题；这类跨 hub 串线曾把 app-shared/app-initial 的别名
+错误算进后续 hub。真实消费面现在为 app-shared 375/3,185、app-initial 1,483/8,204、
+app-primary 177/917，三者仍为 0 unreviewed。迁移同时不再停留在纯函数：browser-comment
+tab URL reactive state、context/handler 注册、按 tab 接受、readiness listener、timeout、AbortSignal 与 submit promise
+整个耦合状态簇已恢复到 `app-primary-browser-comment-runtime`，并打包进既有
+`source-annotation-host-registry` owner；app-primary 内部注册和 detached annotation consumer
+使用同一模块实例，公开别名 `Bs/Gs/Hs/Ks/Rs/Us/Vs` 均有精确语义 owner。路径 basename 与会话
+readiness 也已从 hub 直接消费切到 TypeScript owner。focused 22 项、typecheck、12,448/12,448
+build-check、1,888/1,888 renderer verify 和 11/11 main verify 通过。
+
 2026-11-02 Hub evidence/usage contract batch：修正聚合 hub 消费审计器把正则字面量中的
 `\w` 二次转义的问题；真实命名、namespace destructuring 与 typed-cast 消费数现在分别为
 app-shared 432/3,185、app-initial 1,621/8,204、app-primary 214/917，三者仍为 0 unreviewed。

@@ -41,6 +41,17 @@ exports were previously classified. Current completion requires source-backed bu
 
 ## Current runtime-source recovery status
 
+The latest hub audit fixed a second consumer-accounting bug: namespace
+destructuring could cross an earlier object boundary and attribute app-shared
+or app-initial aliases to app-primary. Corrected named/namespace/cast counts are
+375/3,185, 1,483/8,204, and 177/917 respectively, with zero unreviewed exports.
+This stricter count is lower because false consumers were removed, not because
+runtime coverage regressed. The app-primary browser-comment registry is also
+now source-owned as one coupled unit (tab URL state, context and handler registration,
+readiness, timeout/abort, and submit), shared by the hub's internal callers and
+the detached annotation consumer through the existing source-annotation
+registry chunk.
+
 The renderer build now emits and verifies all 1,888 registered rewritten chunks. As of the 2026-11-02 voice batch,
 `EXACT_ROUTE_SOURCE_OWNERS` is empty: the final `mark-session-create` and realtime-controls owners compile directly from
 checked-in TypeScript and preserve their 69/41-symbol release ABIs. This is an exact-owner milestone, not by itself proof that

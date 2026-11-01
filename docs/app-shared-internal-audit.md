@@ -19,7 +19,10 @@ The authoritative executable contract is
 `scripts/audit-renderer-hub-classification.mjs --strict`. It counts named
 imports, namespace member access, namespace destructuring, and typed namespace
 casts with the same parser used by the exhaustive manifest. The current result
-is 432/3,185 consumed exports and 0 unreviewed. The older
+is 375/3,185 consumed exports and 0 unreviewed. The same parser reports
+1,483/8,204 for app-initial and 177/917 for app-primary, all with 0 unreviewed.
+The 2026-11-02 recheck also rejects cross-object namespace destructuring so an
+earlier hub's aliases cannot be attributed to a later hub. The older
 `audit-app-shared-consumption.mjs` report remains useful for locating direct
 namespace access, but it is not the exhaustive completion gate and must not be
 cited as proof of zero namespace use.
@@ -46,6 +49,15 @@ and application-owned state are semantic boundaries; bundled library facades,
 asset registration, and lazy chunk tables are preserved. `verify-renderer.mjs`
 checks the full 1,888-chunk graph, and the renderer classification report keeps
 the preserved asset families explicit.
+
+The browser-comment context/handler registry is now a concrete example of a
+coupled extraction rather than a compatibility facade. Registration, tab
+acceptance, tab URL state, readiness listeners, timeout/abort cleanup, and async submission
+are owned by `src/renderer/app-primary-browser-comment-runtime/index.ts` and
+bundled into the existing source-annotation registry chunk. Both app-primary's
+internal registration calls and the detached annotation consumer resolve the
+same module instance; `Bs/Gs/Hs/Ks/Rs/Us/Vs` no longer depend on the old hub-owned
+maps for runtime behavior.
 
 ## Re-audit procedure
 
