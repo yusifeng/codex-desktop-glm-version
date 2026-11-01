@@ -1,12 +1,15 @@
 import "@rchunk/rolldown-runtime";
 
-const chatGptCmeHomeEntryClicked = {
-  $type: "protobuf_analytics_events.v1.ChatgptCmeHomeEntryClicked",
-} as const;
-const chatGptCmeClaimSubmitted = {
-  $type: "protobuf_analytics_events.v1.ChatgptCmeClaimSubmitted",
-} as const;
-function initializeChatGptCmeEvents(): void {}
+let chatGptCmeHomeEntryClicked: { readonly $type: string };
+let chatGptCmeClaimSubmitted: { readonly $type: string };
+function initializeChatGptCmeEvents(): void {
+  chatGptCmeHomeEntryClicked = {
+    $type: "protobuf_analytics_events.v1.ChatgptCmeHomeEntryClicked",
+  };
+  chatGptCmeClaimSubmitted = {
+    $type: "protobuf_analytics_events.v1.ChatgptCmeClaimSubmitted",
+  };
+}
 export {
   chatGptCmeHomeEntryClicked as n,
   initializeChatGptCmeEvents as r,

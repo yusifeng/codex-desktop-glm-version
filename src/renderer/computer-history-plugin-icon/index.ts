@@ -7,7 +7,6 @@ function initializeComputerHistoryPluginIcon(): void {
     import.meta.url,
   ).href;
 }
-initializeComputerHistoryPluginIcon();
 export {
   initializeComputerHistoryPluginIcon as n,
   computerHistoryPluginIconUrl as t,

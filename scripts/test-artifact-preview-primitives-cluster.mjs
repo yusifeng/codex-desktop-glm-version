@@ -12,6 +12,7 @@ function find(root, predicate) { return nodes(root).find(predicate); }
 // editor-header-controls: 3
 const controls = await bundle("editor-header-controls");
 assert.deepEqual(Object.keys(controls), ["n", "t"]);
+controls.n();
 assert.deepEqual(Object.keys(controls.t).sort(), ["annotationControl", "commentsControl", "editingControls", "navigationControl", "supplementalActions", "zoomControl"]);
 assert.equal(controls.t.zoomControl, null);
 
@@ -93,4 +94,4 @@ assert.equal(find(emptyUi, node => node.props?.["data-slot"] === "title").props.
 assert.equal(find(emptyUi, node => node.props?.["data-slot"] === "description").props.children, "Try again");
 assert.equal(find(emptyUi, node => node.props?.["data-slot"] === "actions").props.children, "Refresh");
 
-console.log("48 artifact preview primitives cluster assertions passed");
+console.log("49 artifact preview primitives cluster assertions passed");
