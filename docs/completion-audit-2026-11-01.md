@@ -41,6 +41,17 @@ exports were previously classified. Current completion requires source-backed bu
 
 ## Current runtime-source recovery status
 
+The in-progress Automations/settings live-state batch removes two more synthetic runtime assumptions. The Automations page
+now consumes the published local/cloud capability, signed-in account, local/cloud task query, and run-history ABIs instead of
+rendering an empty production presentation; history is joined by automation id and retry/mark-all-read actions are live.
+Settings navigation now reads the published ChatGPT/Codex/local/work surface signals, host-aware plugin visibility, and local
+default route rather than hard-coding a Codex build flavor. Focused Automations and settings suites, typecheck, strict hub
+gates, the renderer build, and 1,888/1,888 verification pass. The follow-up reconnects the published local
+`automation-create|update|delete|run-now` mutation factory and request builders, plus the cloud create/update/delete mutation
+signals and request serializer. Creation/edit save, run-now, pause/resume, and delete are no longer inert production controls.
+Run-history archive/unarchive, migration consent, and complete release detail/editor composition remain outstanding, so this
+is evidence of concrete runtime restoration rather than a completion claim.
+
 The latest public-ABI correction distinguishes TypeScript-only namespace members from runtime hub consumers and rejects
 every named or namespace consumer that is absent from the hub's actual export table. It found several reconstructed modules
 using a minified local binding rather than the published alias. The Codex Home announcement, Home Beacon, sidebar onboarding,

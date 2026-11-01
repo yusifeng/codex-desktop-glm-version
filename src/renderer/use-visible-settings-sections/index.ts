@@ -25,15 +25,27 @@ export interface VisibleSettingsResult {
   visibleSettingsSections: SettingsSection[];
 }
 interface SettingsRuntimeState {
-  buildFlavor: "chatgpt" | "codex" | "work";
   enterprisePlan: boolean;
   pluginsSettingsVisible: boolean;
   sections: readonly SettingsSection[];
+  surfaces: Readonly<Record<SettingsSurface, boolean>>;
   visibility: Readonly<Record<string, SettingsVisibility>>;
 }
 
-void appSharedChunk;
-const initial = appInitialChunk as unknown as { NT?: readonly SettingsSection[]; ugn?: string };
+const shared = appSharedChunk as unknown as { HX?<Value>(signal: unknown): Value };
+const initial = appInitialChunk as unknown as {
+  /** Published settings section registry and default local route. */
+  NT?: readonly SettingsSection[];
+  MT?: string;
+  ugn?: string;
+  /** Runtime surface signals used by the published hook. */
+  LS?: unknown;
+  gmn?: unknown;
+  Sht?: unknown;
+  htt?: unknown;
+  /** Host-aware plugins settings availability hook. */
+  Wgn?(input: { hostId?: string }): boolean;
+};
 const analyticsGateId = "3895602085";
 const externalSettings = {
   account: { href: "https://chatgpt.com/#settings", icon: "account", message: "Account" },
@@ -56,16 +68,30 @@ const fallbackSlugs = ["general-settings", "notifications", "import", "profile",
 function titleForSlug(slug: string): string { return slug.split("-").map((part) => part.length === 0 ? part : part[0]!.toUpperCase() + part.slice(1)).join(" "); }
 const fallbackSections: readonly SettingsSection[] = fallbackSlugs.map((slug) => ({ label: titleForSlug(slug), slug }));
 
-function readRuntimeState(): SettingsRuntimeState {
-  return { buildFlavor: "codex", enterprisePlan: false, pluginsSettingsVisible: true, sections: initial.NT ?? fallbackSections, visibility: {} };
+function readBooleanSignal(signal: unknown, fallback: boolean): boolean {
+  return signal == null || shared.HX == null ? fallback : shared.HX<boolean>(signal) === true;
 }
-function surfaceVisible(surface: SettingsSurface | undefined, flavor: SettingsRuntimeState["buildFlavor"], local: boolean): boolean {
-  if (surface === "chatGpt") return flavor === "chatgpt";
-  if (surface === "codex") return flavor === "codex";
-  if (surface === "codexLocal") return flavor === "codex" && local;
-  if (surface === "codexOrWorkLocal") return (flavor === "codex" || flavor === "work") && local;
-  if (surface === "chatGptOrCodex") return flavor === "chatgpt" || flavor === "codex";
-  return true;
+function readRuntimeState(hostId?: string): SettingsRuntimeState {
+  const chatGpt = readBooleanSignal(initial.htt, false);
+  const codex = readBooleanSignal(initial.LS, true);
+  return {
+    enterprisePlan: false,
+    pluginsSettingsVisible: initial.Wgn?.({ hostId }) ?? true,
+    sections: initial.NT ?? fallbackSections,
+    surfaces: {
+      chatGpt,
+      chatGptOrCodex: chatGpt || codex,
+      codex,
+      codexLocal: readBooleanSignal(initial.gmn, codex),
+      codexOrWorkLocal: readBooleanSignal(initial.Sht, codex),
+    },
+    visibility: {},
+  };
+}
+function surfaceVisible(surface: SettingsSurface | undefined, state: SettingsRuntimeState, local: boolean): boolean {
+  if (surface == null) return true;
+  const localSurface = surface === "codexLocal" || surface === "codexOrWorkLocal";
+  return state.surfaces[surface] && (!localSurface || local);
 }
 function getSectionAsset(slug: string, platform?: string): { commandAsset: string; component: string; navigation: { ariaHidden: boolean; assets: { 16: string; 20: string } } } {
   const key = slug === "appshots" && platform === "windows" ? "appshots-windows" : slug;
@@ -74,18 +100,17 @@ function getSectionAsset(slug: string, platform?: string): { commandAsset: strin
 function initializeSectionAssets(): void {}
 function initializeExternalSettings(): void {}
 function useVisibleSettingsSections(requestedSlug?: string | null, isLocalHost = true, hostId = initial.ugn): VisibleSettingsResult {
-  void hostId;
-  const state = readRuntimeState();
+  const state = readRuntimeState(hostId);
   const evaluated = state.sections.map((section) => {
     const override = state.visibility[section.slug];
     const hostAllowed = isLocalHost || alwaysAvailableRemotely.has(section.slug);
-    const defaultVisible = !section.disabled && hostAllowed && surfaceVisible(section.surface ?? sectionSurfaces[section.slug], state.buildFlavor, isLocalHost);
+    const defaultVisible = !section.disabled && hostAllowed && surfaceVisible(section.surface ?? sectionSurfaces[section.slug], state, isLocalHost);
     return { error: override?.error === true, pending: override?.pending === true, section, visible: override?.visible ?? defaultVisible };
   });
   const visibleSettingsSections = evaluated.filter((entry) => entry.visible).map((entry) => entry.section);
   const requested = requestedSlug == null ? undefined : evaluated.find((entry) => entry.section.slug === requestedSlug);
   const shouldRedirectToVisibleSettingsSection = requested != null && !requested.visible && !requested.pending && !requested.error;
-  const defaultSlug = state.buildFlavor === "chatgpt" ? "general-settings" : "agent";
+  const defaultSlug = isLocalHost ? initial.MT ?? "agent" : "agent";
   const fallback = visibleSettingsSections.find((section) => section.slug === defaultSlug)?.slug ?? visibleSettingsSections[0]?.slug ?? defaultSlug;
   const activeSettingsSection = requested != null && !shouldRedirectToVisibleSettingsSection ? requested.section.slug : fallback;
   const settingsNavigationSections = visibleSettingsSections.filter((section) => !(section.slug === "mcp-settings" && state.pluginsSettingsVisible));

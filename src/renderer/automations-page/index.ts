@@ -14,10 +14,10 @@ import * as scheduleFieldsChunk from "@rchunk/schedule-fields";
 import * as migrationStateChunk from "@rchunk/habitat-automation-migration-state";
 import * as pluginTasksChunk from "@rchunk/use-plugin-scheduled-tasks";
 import * as documentSearchChunk from "@rchunk/document-search";
-import type { JsxRuntime } from "@rchunk/app-shared";
+import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
 
 type AutomationSource = "cloud" | "local";
-type AutomationStatus = "ACTIVE" | "DELETED" | "PAUSED";
+type AutomationStatus = "ACTIVE" | "COMPLETED" | "DELETED" | "PAUSED";
 type PageMode = "create" | "detail" | "edit" | "list";
 type StatusFilter = "active" | "all" | "paused";
 
@@ -39,6 +39,7 @@ interface AutomationDraft {
 }
 
 interface AutomationRun {
+  automationId?: string | null;
   archived?: boolean;
   createdAt: string | number;
   description?: string | null;
@@ -114,9 +115,100 @@ interface AppSharedBindings {
   $3?(): void;
   I3(): JsxRuntime;
   K2?(): void;
+  BX?: (...arguments_: unknown[]) => unknown;
+  HX?: <Value>(signal: unknown, ...arguments_: unknown[]) => Value;
+  e6?: (() => ReactRuntime) & ReactRuntime;
   Qh?: unknown;
   Y2?: unknown;
   Yh?: unknown;
+}
+
+interface AppInitialBindings {
+  /** Capability query signal used with `{ name: "automations.local|cloud" }`. */
+  Xet?: unknown;
+  /** Signed-in account projection. */
+  yun?: unknown;
+  /** Local automations query signal. */
+  QCt?: unknown;
+  /** Cloud automations query signal. */
+  itt?: unknown;
+  /** Local automation run-history hook. */
+  MC?: () => AutomationHistoryState;
+  /** Published local automation mutation factory. */
+  iun?: (operation: "automation-create" | "automation-delete" | "automation-run-now" | "automation-update", options?: MutationOptions) => AutomationMutation;
+  /** Release request builders for create, full update, and status-only update. */
+  Ftt?: (input: AutomationMutationDraft) => unknown;
+  Vtt?: (input: AutomationMutationDraft & { status: AutomationStatus }) => unknown;
+  Btt?: (automation: RawAutomation, status: AutomationStatus) => unknown;
+  /** Cloud automation mutations and the release request serializer. */
+  dtt?: unknown;
+  ptt?: unknown;
+  att?: unknown;
+  htt?: (draft: AutomationDraft, timeZone: string) => Record<string, unknown>;
+}
+
+interface MutationOptions {
+  onError?(error: unknown, variables: unknown): void;
+  onSuccess?(result: unknown, variables: unknown): void;
+}
+
+interface AutomationMutation {
+  isPending?: boolean;
+  mutate?(variables: unknown, options?: MutationOptions): void;
+  variables?: unknown;
+}
+
+interface AutomationMutationDraft {
+  draft: AutomationDraft;
+  name: string;
+  prompt: string;
+  rrule: string | null;
+}
+
+interface CapabilityState {
+  isCapable?: boolean;
+  isLoading?: boolean;
+}
+
+interface QueryState<Value> {
+  data?: Value;
+  error?: unknown;
+  isFetching?: boolean;
+  isLoading?: boolean;
+  refetch?(): unknown;
+}
+
+interface AutomationHistoryState {
+  items?: RawAutomationRun[];
+  markAllRead?(): Promise<void> | void;
+  unreadRunCounts?: { automationIds?: string[] };
+}
+
+interface RawAutomationRun extends Omit<AutomationRun, "id" | "createdAt" | "status"> {
+  automation_id?: string | null;
+  created_at?: string | number;
+  createdAt?: string | number;
+  id?: string;
+  status?: AutomationRun["status"];
+  thread_id?: string | null;
+}
+
+interface RawAutomation {
+  automation?: RawAutomation;
+  canManage?: boolean;
+  id?: string;
+  kind?: string;
+  name?: string;
+  next_run_at?: string | number | null;
+  nextRunAt?: string | number | null;
+  prompt?: string;
+  status?: AutomationStatus | "COMPLETED";
+  title?: string;
+}
+
+interface AutomationCollection {
+  accountId?: string | null;
+  items?: RawAutomation[];
 }
 
 interface InitializerBindings {
@@ -169,7 +261,22 @@ interface DocumentSearchBindings {
 
 const { $3: initializeJsx, I3: getJsxRuntime, K2: initializeShared } =
   appSharedChunk as unknown as AppSharedBindings;
-void appInitialChunk;
+const { BX: useRuntimeQuery, HX: useRuntimeSignal, e6: getReactRuntime } = appSharedChunk as unknown as AppSharedBindings;
+const {
+  Xet: automationCapabilitySignal,
+  yun: accountSignal,
+  QCt: localAutomationsSignal,
+  itt: cloudAutomationsSignal,
+  MC: useAutomationHistory,
+  iun: useAutomationMutation,
+  Ftt: buildCreateAutomationRequest,
+  Vtt: buildUpdateAutomationRequest,
+  Btt: buildAutomationStatusRequest,
+  dtt: cloudCreateMutationSignal,
+  ptt: cloudUpdateMutationSignal,
+  att: cloudDeleteMutationSignal,
+  htt: buildCloudAutomationRequest,
+} = appInitialChunk as unknown as AppInitialBindings;
 const { n: initializePrimary } = appPrimaryChunk as unknown as InitializerBindings;
 const { n: initializeElicitationEvents, t: initializeElicitationRuntime } =
   elicitationEventsChunk as unknown as InitializerBindings;
@@ -228,8 +335,177 @@ function jsx(): JsxRuntime {
   return jsxRuntime;
 }
 
-function currentPresentation(explicit?: AutomationsPresentation): AutomationsPresentation {
-  return explicit ?? EMPTY_PRESENTATION;
+function queryCapability(name: "automations.cloud" | "automations.local"): CapabilityState {
+  if (useRuntimeQuery == null || automationCapabilitySignal == null) return {};
+  return (useRuntimeQuery(automationCapabilitySignal, { name }) ?? {}) as CapabilityState;
+}
+
+function readSignal<Value>(signal: unknown, fallback: Value, ...arguments_: unknown[]): Value {
+  if (useRuntimeSignal == null || signal == null) return fallback;
+  return useRuntimeSignal<Value>(signal, ...arguments_) ?? fallback;
+}
+
+function normalizeRun(run: RawAutomationRun, index: number): AutomationRun {
+  return {
+    ...run,
+    automationId: run.automationId ?? run.automation_id ?? null,
+    createdAt: run.createdAt ?? run.created_at ?? 0,
+    id: run.id ?? `automation-run-${index}`,
+    status: run.status ?? "COMPLETED",
+    threadId: run.threadId ?? run.thread_id ?? null,
+  };
+}
+
+function normalizeAutomation(
+  candidate: RawAutomation,
+  source: AutomationSource,
+  runsByAutomationId: ReadonlyMap<string, AutomationRun[]>,
+  index: number,
+): AutomationItem | null {
+  const raw = candidate.automation ?? candidate;
+  const id = raw.id;
+  if (id == null || id.length === 0) return null;
+  const rawStatus = raw.status;
+  const status: AutomationStatus = rawStatus === "PAUSED" ? "PAUSED" : rawStatus === "DELETED" ? "DELETED" : rawStatus === "COMPLETED" ? "COMPLETED" : "ACTIVE";
+  return {
+    canManage: raw.canManage ?? candidate.canManage,
+    id,
+    kind: raw.kind,
+    name: raw.name ?? raw.title ?? `Scheduled task ${index + 1}`,
+    nextRunAt: raw.nextRunAt ?? raw.next_run_at,
+    prompt: raw.prompt,
+    runs: runsByAutomationId.get(id),
+    source,
+    status,
+  };
+}
+
+function runtimePresentation(react?: ReactRuntime): AutomationsPresentation {
+  const [selectedKey, setSelectedKey] = react?.useState<string | null>(null) ?? [null, () => undefined];
+  const [query, setQuery] = react?.useState("") ?? ["", () => undefined];
+  const [statusFilter, setStatusFilter] = react?.useState<StatusFilter>("all") ?? ["all" as StatusFilter, () => undefined];
+  const [mode, setMode] = react?.useState<PageMode>("list") ?? ["list" as PageMode, () => undefined];
+  const [draft, setDraft] = react?.useState<AutomationDraft | null>(null) ?? [null, () => undefined];
+  const localCapability = queryCapability("automations.local");
+  const cloudCapability = queryCapability("automations.cloud");
+  const account = readSignal<{ accountId?: string | null }>(accountSignal, {});
+  const cloudDisabled = useRuntimeQuery?.(false, "4283773748") === true;
+  const localQuery = readSignal<QueryState<AutomationCollection>>(
+    localAutomationsSignal,
+    {},
+    { enabled: localCapability.isCapable === true },
+  );
+  const cloudEnabled = cloudCapability.isCapable === true && cloudDisabled !== true;
+  const cloudQuery = readSignal<QueryState<AutomationCollection>>(
+    cloudAutomationsSignal,
+    {},
+    { enabled: cloudEnabled },
+  );
+  const cloudCreateMutation = readSignal<AutomationMutation>(cloudCreateMutationSignal, {});
+  const cloudUpdateMutation = readSignal<AutomationMutation>(cloudUpdateMutationSignal, {});
+  const cloudDeleteMutation = readSignal<AutomationMutation>(cloudDeleteMutationSignal, {});
+  const history = useAutomationHistory?.() ?? {};
+  const mutationOptions: MutationOptions = {
+    onSuccess: () => {
+      void localQuery.refetch?.();
+      setMode("detail");
+    },
+  };
+  const createMutation = useAutomationMutation?.("automation-create", mutationOptions) ?? {};
+  const updateMutation = useAutomationMutation?.("automation-update", mutationOptions) ?? {};
+  const deleteMutation = useAutomationMutation?.("automation-delete", mutationOptions) ?? {};
+  const runMutation = useAutomationMutation?.("automation-run-now", mutationOptions) ?? {};
+  const runsByAutomationId = new Map<string, AutomationRun[]>();
+  for (const [index, rawRun] of (history.items ?? []).entries()) {
+    const run = normalizeRun(rawRun, index);
+    if (run.automationId == null) continue;
+    const existing = runsByAutomationId.get(run.automationId) ?? [];
+    existing.push(run);
+    runsByAutomationId.set(run.automationId, existing);
+  }
+  const local = localCapability.isCapable === true ? localQuery.data?.items ?? [] : [];
+  const cloud = account.accountId != null && cloudQuery.data?.accountId === account.accountId
+    ? cloudQuery.data.items ?? []
+    : [];
+  const automations = [
+    ...local.map((item, index) => normalizeAutomation(item, "local", runsByAutomationId, index)),
+    ...cloud.map((item, index) => normalizeAutomation(item, "cloud", runsByAutomationId, index)),
+  ].filter((item): item is AutomationItem => item != null);
+  const selected = automations.find((item) => `${item.source}:${item.id}` === selectedKey) ?? automations[0];
+  const saveDraft = (nextDraft: AutomationDraft): void => {
+    if (nextDraft.source === "cloud") {
+      const requestBody = buildCloudAutomationRequest?.(
+        { ...nextDraft, name: nextDraft.name.trim(), prompt: nextDraft.prompt.trim() },
+        Intl.DateTimeFormat().resolvedOptions().timeZone,
+      ) ?? {
+        name: nextDraft.name.trim(),
+        prompt: nextDraft.prompt.trim(),
+        schedule: nextDraft.scheduleConfig,
+      };
+      if (nextDraft.id == null) cloudCreateMutation.mutate?.({ requestBody, team: null });
+      else cloudUpdateMutation.mutate?.({ automationId: nextDraft.id, requestBody });
+      return;
+    }
+    const input: AutomationMutationDraft = {
+      draft: nextDraft,
+      name: nextDraft.name.trim(),
+      prompt: nextDraft.prompt.trim(),
+      rrule: nextDraft.scheduleConfig.customRrule ?? null,
+    };
+    if (nextDraft.id == null) {
+      createMutation.mutate?.(buildCreateAutomationRequest?.(input) ?? input);
+      return;
+    }
+    updateMutation.mutate?.(
+      buildUpdateAutomationRequest?.({ ...input, status: nextDraft.status }) ?? { ...input, status: nextDraft.status },
+    );
+  };
+  const updateStatus = (item: AutomationItem): void => {
+    const nextStatus: AutomationStatus = item.status === "PAUSED" ? "ACTIVE" : "PAUSED";
+    if (item.source === "cloud") {
+      cloudUpdateMutation.mutate?.({ automationId: item.id, isEnabled: nextStatus === "ACTIVE" });
+      return;
+    }
+    const raw: RawAutomation = { ...item };
+    updateMutation.mutate?.(buildAutomationStatusRequest?.(raw, nextStatus) ?? { id: item.id, status: nextStatus });
+  };
+  return {
+    ...EMPTY_PRESENTATION,
+    automations,
+    canCreateCloud: cloudCapability.isCapable === true && account.accountId != null && cloudDisabled !== true,
+    canCreateLocal: localCapability.isCapable === true,
+    cloudError: cloudQuery.error == null ? null : "Cloud scheduled tasks could not be loaded",
+    cloudLoading: cloudQuery.isFetching === true,
+    draft,
+    mode: mode === "list" && selected != null ? "detail" : mode,
+    query,
+    selectedAutomationId: selected?.id ?? null,
+    selectedSource: selected?.source ?? null,
+    statusFilter,
+    onCloseEditor: () => setMode(selected == null ? "list" : "detail"),
+    onCreate: (source) => {
+      setDraft({ kind: "cron", name: "", prompt: "", scheduleConfig: { mode: "daily", time: "09:00" }, source, status: "ACTIVE" });
+      setMode("create");
+    },
+    onDelete: (item) => {
+      if (item.source === "local") deleteMutation.mutate?.({ id: item.id });
+      else cloudDeleteMutation.mutate?.({ automationId: item.id });
+    },
+    onEdit: (item) => {
+      setDraft({ id: item.id, kind: item.kind ?? "cron", name: item.name, prompt: item.prompt ?? "", scheduleConfig: {}, source: item.source, status: item.status });
+      setMode("edit");
+    },
+    onMarkAllRead: () => history.markAllRead?.(),
+    onQueryChange: setQuery,
+    onRetryCloud: () => { void cloudQuery.refetch?.(); },
+    onRun: (item) => {
+      if (item.source === "local") runMutation.mutate?.({ id: item.id, collaborationMode: null, permissions: null });
+    },
+    onSave: saveDraft,
+    onSelect: (item) => setSelectedKey(`${item.source}:${item.id}`),
+    onPause: updateStatus,
+    onStatusFilterChange: setStatusFilter,
+  };
 }
 
 function displayName(item: AutomationItem): string {
@@ -328,7 +604,7 @@ function TaskRow({ item, presentation }: { item: AutomationItem; presentation: A
         }),
         jsx().jsx("span", {
           className: "text-xs uppercase text-token-text-secondary",
-          children: item.status === "PAUSED" ? "Paused" : "Active",
+          children: item.status === "PAUSED" ? "Paused" : item.status === "COMPLETED" ? "Completed" : "Active",
         }),
       ],
     }),
@@ -478,6 +754,7 @@ function CloudDetail({ item, presentation }: { item: AutomationItem; presentatio
     onClose: () => presentation.onSelect?.({ ...item, id: "" }),
     onDelete: () => presentation.onDelete?.(item),
     onEdit: () => presentation.onEdit?.(item),
+    onPause: () => presentation.onPause?.(item),
     onRunNow: () => presentation.onRun?.(item),
   });
 }
@@ -549,7 +826,7 @@ function DeleteDialog({ items, presentation }: { items: AutomationItem[]; presen
 
 function AutomationsLayoutPage({ presentation: explicit }: PageProps = {}): unknown {
   initializeAutomationsPage();
-  const presentation = currentPresentation(explicit);
+  const presentation = explicit ?? runtimePresentation(getReactRuntime?.());
   const items = normalizedItems(presentation);
   return jsx().jsxs("main", {
     className: "flex h-full min-h-0 flex-col bg-token-main-surface-primary",

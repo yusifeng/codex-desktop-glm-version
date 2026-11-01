@@ -1,5 +1,18 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Automations/settings live-state recovery batch（进行中）：`automations-page` 的生产路径不再
+默认落到空 `presentation`。页面现在通过发布 ABI `app-shared.BX/HX` 与
+`app-initial.Xet/yun/QCt/itt/MC` 读取 local/cloud capability、当前 account、本地/云端任务、
+运行历史、未读状态和 retry/mark-all-read 操作，并把历史记录按 automation id 接回详情页；测试注入
+仍只用于 focused contract。`use-visible-settings-sections` 同时不再把 build flavor 静态写死为 Codex，
+而是读取发布版 `LS/gmn/Sht/htt` surface signals、`Wgn` host-aware plugin visibility 与 `MT` 默认路由。
+本批随后接回 local `iun(automation-create|update|delete|run-now)` mutation factory 和原版
+`Ftt/Vtt/Btt` request builders；cloud create/update/delete 则恢复 `dtt/ptt/att` mutation signals 与
+`htt` request serializer。生产页面的创建/编辑保存、立即运行、暂停/恢复和删除不再是无回调按钮。
+focused automations 34 项、settings cluster 44 项、typecheck、strict hub gate、renderer build 与
+1,888/1,888 verify 通过。历史会话 archive/unarchive、migration consent 和发布页面的完整 detail/editor
+视觉组合仍需继续恢复，因此不把核心 mutation 已接通误报为 Automations 全量完成。
+
 2026-11-02 Hub public-ABI correction batch：消费审计现在区分 TypeScript 类型成员与真实运行时引用，
 并校验每个命名/namespace consumer 确实存在于 Hub 的公开 export table。审计发现此前多个恢复模块
 误把发布 chunk 内部的压缩局部名当作公共 alias；已修正 Codex Home announcement、Home Beacon、
