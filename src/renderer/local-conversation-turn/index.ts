@@ -366,6 +366,8 @@ function LocalConversationTurnComponent(props: LocalConversationTurnProps): unkn
   const initial = appInitialChunk as unknown as Record<string, any>;
   const openAIFormElicitationsEnabled = typeof shared.HX === "function" && initial.Nfn != null ? Boolean(shared.HX(initial.Nfn)) : false;
   const requestUserInputAsyncUiEnabled = typeof shared.BX === "function" && initial.Vr != null ? Boolean(shared.BX(initial.Vr, props.conversationId)) : false;
+  const shouldHideUserMessage = typeof shared.BX === "function" && Boolean(shared.BX(false, props.conversationId)) && props.turnNumber === 1;
+  const showStrictReviewNotices = typeof initial.ofn === "function" ? Boolean(initial.ofn("1052186321")) : false;
   const interruptedTurnIds = typeof shared.BX === "function" && initial.Ffn != null ? shared.BX(initial.Ffn, props.conversationId) : null;
   const preserveServerUserMessages = props.preserveServerUserMessages === true;
   const isBackgroundSubagentsEnabled = props.isBackgroundSubagentsEnabled === true;
@@ -392,6 +394,8 @@ function LocalConversationTurnComponent(props: LocalConversationTurnProps): unkn
       openAIFormElicitationsEnabled,
       preserveServerUserMessages,
       requestUserInputAsyncUiEnabled,
+      showStrictReviewNotices,
+      ...(shouldHideUserMessage ? { shouldHideUserMessage: () => true } : {}),
     });
 
   // ② superseded 标记
