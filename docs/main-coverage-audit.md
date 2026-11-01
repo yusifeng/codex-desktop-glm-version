@@ -1,5 +1,17 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 browser webview comment callback ownership correction
+
+对主 chunk 做零消费定义审计时，发现已迁出的 `browser-page-webview-binding-controller.ts` 仍在 `onComment` 回调中读取原
+chunk 私有的 `aZe`。CommonJS 模块没有共享词法作用域，因此该分支实际会在用户从页面菜单发起 annotate/quick-annotate 时触发
+`ReferenceError`。现由 binding controller 通过类型明确的 `createAnnotationContextMenuActions` 自持两类 action/source 投影，真实回调消费
+同一映射；主 chunk 悬空对象已删除。
+
+同一 AST pass 证明 icon flavor wrapper、detached-window 旧别名/常量、saved-section 字段数组与 IAB download-listener 别名均为纯
+零消费残留，已同步物理删除；删除后主 chunk 的 single-reference definitions 只剩六个 vendor 初始化入口，没有第一方 owner。
+Browser page 相邻链、binding/detached focused tests、防回退 1242 项、typecheck、测试索引 1855、chunk verify 11/11 与
+全量 build check 均通过。
+
 ## 2026-11-01 orphaned vendor dependency belt removal
 
 删除 turn-submission/writing-block 旧岛后，紧邻的 bundled Immer、lodash omit、Marked/Moo directive parser、Alea 以及原

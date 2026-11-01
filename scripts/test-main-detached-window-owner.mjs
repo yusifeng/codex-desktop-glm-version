@@ -78,10 +78,7 @@ const main = fs.readFileSync(
 );
 const aliases = {
   GN: "PrewarmSlot",
-  qje: "DetachedWindowPrewarmer",
   Jje: "DetachedWindowManager",
-  Yje: "DetachedWindowService",
-  Xje: "ThreadHandoffLease",
   Qje: "DeviceCheckCookieManager",
   eMe: "CallIdClaimRegistry",
 };
@@ -90,5 +87,12 @@ for (const [generatedName, semanticName] of Object.entries(aliases)) {
   equal(main.includes(`${generatedName} = class`), false);
 }
 equal(main.includes('require("./main-app/window/detached-window-manager.js")'), true);
+for (const deadAlias of ["qje", "Yje", "Xje"]) {
+  equal(new RegExp(`\\b${deadAlias}\\s*=`, "m").test(main), false);
+}
+for (const deadConstant of ["Gje", "Kje", "qN", "Zje", "$je"]) {
+  const escapedName = deadConstant.replace("$", "\\$");
+  equal(new RegExp(`\\b${escapedName}\\s*=`, "m").test(main), false);
+}
 
 console.log(`${assertions} main detached window owner assertions passed`);

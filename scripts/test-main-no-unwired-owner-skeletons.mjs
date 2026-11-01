@@ -113,6 +113,7 @@ const realOwners = [
   ["src/main/main-app/browser-sidebar/checkout-webview.ts", "createCheckoutWebviewRuntime"],
   ["src/main/main-app/browser-sidebar/workspace-settings-webview-runtime.ts", "createWorkspaceSettingsWebviewRuntime"],
   ["src/main/main-app/browser-sidebar/browser-webview-identity-policy.ts", "createBrowserWebviewIdentityPolicy"],
+  ["src/main/main-app/browser-sidebar/browser-page-webview-binding-controller.ts", "createAnnotationContextMenuActions"],
   ["src/main/main-app/browser-sidebar/site-page-event-runtime.ts", "createSitePageEventRuntime"],
   ["src/main/main-app/browser-sidebar/browser-host-service.ts", "createBrowserHostServiceClass"],
   ["src/main/main-app/browser-sidebar/browser-extension-runtime.ts", "createBrowserExtensionRuntime"],
@@ -244,6 +245,10 @@ const browserWindowThreadStateController = fs.readFileSync(
 );
 const browserWebviewListenerRuntime = fs.readFileSync(
   new URL("src/main/main-app/browser-sidebar/browser-webview-listener-runtime.ts", root),
+  "utf8",
+);
+const browserPageWebviewBindingController = fs.readFileSync(
+  new URL("src/main/main-app/browser-sidebar/browser-page-webview-binding-controller.ts", root),
   "utf8",
 );
 assert.equal(inboxOwner.includes("export class InboxItemsFacade"), true, "InboxItemsFacade must remain a real owner");
@@ -1206,4 +1211,10 @@ for (const orphanedVendorEntry of [
   assert.equal(main.includes(orphanedVendorEntry), false, `${orphanedVendorEntry} orphaned vendor belt must stay removed`);
 }
 
-console.log("1234 main unwired-owner skeleton assertions passed");
+assert.equal(browserPageWebviewBindingController.includes("annotationContextMenuActions[a]"), true, "webview comment callback consumes its semantic projection");
+assert.equal(browserPageWebviewBindingController.includes("aZe[a]"), false, "webview binding must not capture a chunk-private annotation mapping");
+for (const deadOwner of ["iconAssetNames =", "nBe = [", "RY = ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER", "aZe = {"]) {
+  assert.equal(main.includes(deadOwner), false, `${deadOwner} zero-consumer composition residue must stay removed`);
+}
+
+console.log("1242 main unwired-owner skeleton assertions passed");

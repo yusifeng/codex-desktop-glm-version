@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成 Browser page WebContents binding 的评论菜单接线修复：迁出模块原 `onComment` 仍错误捕获主 chunk 私有 `aZe`，跨 CommonJS
+边界运行时不可见。现在 `browser-page-webview-binding-controller.ts` 自持类型化 annotate/quick-annotate action/source 投影，真实回调消费
+该 owner，原 chunk 对象删除。相同 AST 审计同时移除 icon、detached-window、saved-section 与 IAB 的零消费纯兼容残留；当前 main
+single-reference definitions 已无第一方业务项，只剩 vendor 初始化入口。Browser page 相邻链、focused binding/detached 回归、防回退
+1242 项、typecheck、测试索引 1855、chunk verify 11/11 与全量 build check 均通过。
+
 完成主 chunk orphaned vendor/dead dependency belt 收敛：turn-submission 旧岛删除后，原 Immer patch/produce、lodash omit、
 pagination schema、Marked/Moo directive parser 与 Alea 入口均已无主 chunk consumer；其业务能力分别由 `threads/operations.ts`、
 `threads/start-config.ts`、`threads/maybe-resume.ts`、`util/lodash-interop.ts`、`markdown/writing-blocks.ts` 和独立 semantic vendor 模块

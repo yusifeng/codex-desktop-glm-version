@@ -1,8 +1,41 @@
 // @ts-nocheck
 
+export interface AnnotationContextMenuKinds {
+  BATCH: PropertyKey;
+  QUICK: PropertyKey;
+}
+
+export interface AnnotationContextMenuAction {
+  action: `annotate` | `quick-annotate`;
+  annotationModeEntrySource: `context-menu-annotate` | `context-menu-quick-annotate`;
+}
+
+/**
+ * Builds the context-menu projection owned by the page/webview binding runtime.
+ *
+ * The published chunk used to keep this object in its outer composition scope.
+ * A semantic CommonJS module cannot see that lexical binding, so keeping the
+ * projection here is required for the onComment callback to be executable.
+ */
+export function createAnnotationContextMenuActions(
+  kinds: AnnotationContextMenuKinds,
+): Record<PropertyKey, AnnotationContextMenuAction> {
+  return {
+    [kinds.BATCH]: {
+      action: `annotate`,
+      annotationModeEntrySource: `context-menu-annotate`,
+    },
+    [kinds.QUICK]: {
+      action: `quick-annotate`,
+      annotationModeEntrySource: `context-menu-quick-annotate`,
+    },
+  };
+}
+
 /** Owns the complete page-to-WebContents binding lifecycle for Browser sidebar pages. */
 export function createBrowserPageWebviewBindingControllerClass(dependencies: Record<string, any>) {
   const { e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, THe, X, fe, zGe, G, me, pU, hU, At, HGe, zX, mU, run, _e, on, Xc, LXe, xU, to, al, ul, audio, WX, bn, GX, JXe, YXe, EXe, n, a, iZ, tZ, eZ, nZ, rZ } = dependencies;
+  const annotationContextMenuActions = createAnnotationContextMenuActions(n.gu);
   const pendingObservers = new WeakMap<object, any>();
   const resetCaptureState = (page: any) => {
     page.isCapturingUserMedia = false;
@@ -660,7 +693,7 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
               },
               onComment: (n, a, o) => {
                 if (G()?.page !== r || r.view.webContents !== i || c.owner.isDestroyed()) return;
-                let { action: s, annotationModeEntrySource: l } = aZe[a];
+                let { action: s, annotationModeEntrySource: l } = annotationContextMenuActions[a];
                 (e.windowManager.sendMessageToWebContents(c.owner, {
                   type: `browser-sidebar-context-menu-action`,
                   action: s,
@@ -945,4 +978,7 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
   };
 }
 
-if (typeof module !== `undefined`) module.exports = { createBrowserPageWebviewBindingControllerClass };
+if (typeof module !== `undefined`) module.exports = {
+  createAnnotationContextMenuActions,
+  createBrowserPageWebviewBindingControllerClass,
+};

@@ -14764,7 +14764,6 @@ configureStatsigAdapterRuntime({
   makeTypedGet: Yw._makeTypedGet,
 });
 const iconBaseName = (e) => resolveFlavorIconBaseName(e, { agent: a.in.Agent, nightly: a.in.Nightly, internalAlpha: a.in.InternalAlpha, publicBeta: a.in.PublicBeta, dev: a.in.Dev, prod: a.in.Prod });
-const iconAssetNames = (e) => resolveFlavorIconAssetNames(e, { agent: a.in.Agent, nightly: a.in.Nightly, internalAlpha: a.in.InternalAlpha, publicBeta: a.in.PublicBeta, dev: a.in.Dev, prod: a.in.Prod });
 var HostClientCoordination = createHostClientCoordinationClass({
   ClientCoordination: n.v,
   ClientCoordinationService: n.p,
@@ -21203,16 +21202,8 @@ var Eje = AvatarManager;
 var zje = DebugService,
   Wje = createDemoTools;
 var GN = PrewarmSlot;
-var Gje = 2e3,
-  Kje = 3e4,
-  qje = DetachedWindowPrewarmer,
-  Jje = DetachedWindowManager,
-  Yje = DetachedWindowService,
-  Xje = ThreadHandoffLease,
-  qN = `_devicecheck`,
-  Zje = 6e4,
+var Jje = DetachedWindowManager,
   Qje = DeviceCheckCookieManager,
-  $je = 1024,
   eMe = CallIdClaimRegistry;
 var loadArtifactTemplatePickerConfig = createArtifactTemplatePickerRuntime({
   existsSync: v.existsSync,
@@ -25531,14 +25522,7 @@ var tBe = createSavedSectionTransitionClass({
     RpcHandlerBase: n.Uf,
     createLogger: r.i,
     isInternalThreadId: n.hu,
-  }),
-  nBe = [
-    `threadHostIds`,
-    `collapsedSectionIds`,
-    `sectionOrder`,
-    `appServerLegacySectionIds`,
-    `appServerMigratedHostIds`,
-  ];
+  });
 var yH = createSavedSectionUndoRedoStackClass({
   CH,
   G,
@@ -25971,8 +25955,7 @@ var iabCapabilityRuntime = createIabCapabilityRuntime({
   dispatchBrowserCommand: lte,
   isWebMcpEnabled: MG,
 });
-var RY = ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER,
-  zY = CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD,
+var zY = CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD,
   BY = NOTIFY_BROWSER_USE_DOWNLOAD_CHANGE,
   DYe = createIabBrowserUseApiClass({
     LY, a, capabilities: iabCapabilityRuntime, l, n, _, Tr,
@@ -26108,14 +26091,7 @@ var eZ = `-owl-native-contents-close`,
   tZ = `being-captured-state-changed`,
   nZ = `password-manager-open-settings`,
   rZ = `page-info-open-site-settings`,
-  iZ = `owl-favicon-image-updated`,
-  aZe = {
-    [n.gu.BATCH]: { action: `annotate`, annotationModeEntrySource: `context-menu-annotate` },
-    [n.gu.QUICK]: {
-      action: `quick-annotate`,
-      annotationModeEntrySource: `context-menu-quick-annotate`,
-    },
-  };
+  iZ = `owl-favicon-image-updated`;
 var {
   securityStateForPage: dZe,
   syncBackgroundThrottling: dZ,
