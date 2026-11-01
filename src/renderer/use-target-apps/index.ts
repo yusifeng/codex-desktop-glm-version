@@ -1,4 +1,4 @@
-import "@rchunk/rolldown-runtime";
+import { n as onceExport } from "@rchunk/rolldown-runtime";
 import {
   $3 as initializeCompilerRuntime,
   $O as queryDurations,
@@ -9,7 +9,7 @@ import {
   PK as isFilePath,
   UI as awaitHostRequest,
   _L as useQuery,
-  e6 as ReactRuntime,
+  e6 as getReactRuntime,
   ek as initializeMutationRuntime,
   gL as initializeUseQuery,
   lk as initializeHooksRuntime,
@@ -47,6 +47,9 @@ interface TargetApp extends Record<string, unknown> {
   resolvedIcon?: unknown;
   target: string;
 }
+
+const once = onceExport as (initializer: () => void) => () => void;
+let ReactRuntime: ReturnType<typeof getReactRuntime>;
 
 interface TargetAppsResult extends Record<string, unknown> {
   availableTargets?: string[];
@@ -228,9 +231,11 @@ async function loadTargetApps(input: {
   return (await fetchTargetApps(params, signal)) as TargetAppsResult;
 }
 
-function useTargetAppsQuery(options: TargetAppsParameters & {
-  isQueryEnabled?: boolean;
-}): UseQueryResult<TargetAppsResult> {
+function useTargetAppsQuery(
+  options: TargetAppsParameters & {
+    isQueryEnabled?: boolean;
+  },
+): UseQueryResult<TargetAppsResult> {
   const {
     cwd,
     deferEnrichment = false,
@@ -245,9 +250,9 @@ function useTargetAppsQuery(options: TargetAppsParameters & {
     path,
     ...(deferEnrichment ? { deferEnrichment: true } : {}),
   };
-  const baseOptions = (
-    targetAppsQuery as TargetAppsQueryDefinition
-  ).getOptions(parameters);
+  const baseOptions = (targetAppsQuery as TargetAppsQueryDefinition).getOptions(
+    parameters,
+  );
   const queryClient = scope.queryClient as TargetAppsQueryClient;
   return useQuery<TargetAppsResult>({
     ...baseOptions,
@@ -263,9 +268,11 @@ function useTargetAppsQuery(options: TargetAppsParameters & {
   });
 }
 
-function useOpenTarget(options: UseTargetAppsOptions & {
-  targets?: TargetApp[];
-}): (target: string, options: OpenTargetOptions) => void {
+function useOpenTarget(
+  options: UseTargetAppsOptions & {
+    targets?: TargetApp[];
+  },
+): (target: string, options: OpenTargetOptions) => void {
   const {
     cwd,
     deferEnrichment = false,
@@ -278,23 +285,20 @@ function useOpenTarget(options: UseTargetAppsOptions & {
   const intl = useIntl();
   const showError = (): void => {
     scope.get(toastManagerSignal).danger(
-      String(intl.formatMessage({
-        id: "localConversation.openTarget.error",
-        defaultMessage: "Unable to open item",
-        description: "Toast shown when opening a file or website externally fails",
-      })),
+      String(
+        intl.formatMessage({
+          id: "localConversation.openTarget.error",
+          defaultMessage: "Unable to open item",
+          description:
+            "Toast shown when opening a file or website externally fails",
+        }),
+      ),
       { errorAnalytics: { toastId: "localConversation.openTarget.error" } },
     );
   };
   return (target, openOptions) => {
-    const {
-      appPath,
-      column,
-      line,
-      openMode,
-      path,
-      persistPreferred,
-    } = openOptions;
+    const { appPath, column, line, openMode, path, persistPreferred } =
+      openOptions;
     const resolvedPath = path ?? openPath ?? cwd;
     if (!resolvedPath) return;
     const selectedTarget = targets?.find(
@@ -303,9 +307,10 @@ function useOpenTarget(options: UseTargetAppsOptions & {
         (candidate.appPath ?? null) === (appPath ?? null),
     );
     if (selectedTarget?.kind === "editor" && turnId != null) {
-      const attribution = analyticsAttributionSignal == null
-        ? null
-        : scope.get(analyticsAttributionSignal);
+      const attribution =
+        analyticsAttributionSignal == null
+          ? null
+          : scope.get(analyticsAttributionSignal);
       if (attribution != null) {
         scope.get(analyticsServiceSignal).submitCodexAnalyticsEvent?.({
           action: "open_in_ide",
@@ -321,9 +326,9 @@ function useOpenTarget(options: UseTargetAppsOptions & {
         setData(
           query: unknown,
           parameters: TargetAppsParameters,
-          updater: (current: TargetAppsResult | undefined) =>
-            | TargetAppsResult
-            | undefined,
+          updater: (
+            current: TargetAppsResult | undefined,
+          ) => TargetAppsResult | undefined,
         ): void;
       };
       queryApi.setData(
@@ -354,9 +359,7 @@ function useOpenTarget(options: UseTargetAppsOptions & {
         line,
         column,
         openMode,
-        ...(persistPreferred && cwd
-          ? { persistPreferredTargetPath: cwd }
-          : {}),
+        ...(persistPreferred && cwd ? { persistPreferredTargetPath: cwd } : {}),
         hostId,
       },
       {
@@ -417,11 +420,13 @@ function PrefetchTargetApps(props: PrefetchTargetAppsProps): null {
     isQueryEnabled: immediatelyEnabled,
     path: openPath,
   });
-  const refetchEvent = ReactRuntime.useEffectEvent?.(() => {
-    void refetch();
-  }) ?? (() => {
-    void refetch();
-  });
+  const refetchEvent =
+    ReactRuntime.useEffectEvent?.(() => {
+      void refetch();
+    }) ??
+    (() => {
+      void refetch();
+    });
   ReactRuntime.useEffect(() => {
     if (immediatelyEnabled || !loadable || data != null) return;
     const timeout = window.setTimeout(refetchEvent, delayMs);
@@ -430,15 +435,12 @@ function PrefetchTargetApps(props: PrefetchTargetAppsProps): null {
   return null;
 }
 
-let initialized = false;
-function initializeUseTargetApps(): void {
-  if (initialized) return;
-  initialized = true;
+const initializeUseTargetApps = once((): void => {
   initializeCompilerRuntime();
   initializeUseQuery();
   initializeSignalRuntime();
   initializeQueryOptions();
-  ReactRuntime();
+  ReactRuntime = getReactRuntime();
   initializeIntlRuntime();
   initializeHooksRuntime();
   initializeOpenTargetMutation();
@@ -449,7 +451,7 @@ function initializeUseTargetApps(): void {
   initializeAccountState();
   initializeMutationRuntime();
   initializeAppServices();
-}
+});
 
 export {
   initializeUseTargetApps as n,

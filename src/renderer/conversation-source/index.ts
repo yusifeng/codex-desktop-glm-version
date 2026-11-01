@@ -1,4 +1,4 @@
-import "@rchunk/rolldown-runtime";
+import { n as onceExport } from "@rchunk/rolldown-runtime";
 import {
   $3 as initializeCompilerCache,
   FX as initializeSignalRuntime,
@@ -36,6 +36,8 @@ import {
   n as scrollToMatch,
   t as initializeScrollToMatch,
 } from "@rchunk/scroll-to-match";
+
+const once = onceExport as (initializer: () => void) => () => void;
 
 export interface ConversationSearchLocation extends Record<string, unknown> {
   contextId: string;
@@ -86,7 +88,10 @@ export interface ConversationSearchRequest {
 
 interface ScrollAdapter {
   getTurnContainer(turnKey: string): ParentNode | null;
-  scrollToTurn(turnKey: string, options?: { signal?: AbortSignal }): Promise<unknown>;
+  scrollToTurn(
+    turnKey: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<unknown>;
 }
 
 interface NormalizedMath {
@@ -119,11 +124,14 @@ const DELIMITER_COMMAND =
   /^\\(?:left|right|middle|big|Big|bigg|Bigg|bigl|bigr|Bigl|Bigr|biggl|biggr|Biggl|Biggr)$/u;
 
 function normalizeMath(source: string): NormalizedMath | null {
-  const sourceTokens = Array.from(source.matchAll(/\\[a-zA-Z]+|\\[^\r\n]|[^\s]/gu), (match) => ({
-    value: match[0],
-    start: match.index,
-    end: match.index + match[0].length,
-  }));
+  const sourceTokens = Array.from(
+    source.matchAll(/\\[a-zA-Z]+|\\[^\r\n]|[^\s]/gu),
+    (match) => ({
+      value: match[0],
+      start: match.index,
+      end: match.index + match[0].length,
+    }),
+  );
   const groups: NormalizedMath["groups"] = [];
   const delimiters: Array<{ end: number; start: number }> = [];
   let cursor = 0;
@@ -142,7 +150,8 @@ function normalizeMath(source: string): NormalizedMath | null {
 
   const parseToken = (): NormalizedMath["tokens"] => {
     const token = sourceTokens[cursor++];
-    if (token == null || token.value === "}") throw new Error("Incomplete math");
+    if (token == null || token.value === "}")
+      throw new Error("Incomplete math");
     if (token.value === "{") {
       const nested: NormalizedMath["tokens"] = [];
       while (sourceTokens[cursor]?.value !== "}") nested.push(...parseToken());
@@ -167,22 +176,35 @@ function normalizeMath(source: string): NormalizedMath | null {
         if (bounds == null) throw new Error("Unpaired delimiter");
         bounds.end = delimiter.end;
       }
-      return delimiter.value === "." ? [] : [{ ...delimiter, start: token.start, delimiter: bounds }];
+      return delimiter.value === "."
+        ? []
+        : [{ ...delimiter, start: token.start, delimiter: bounds }];
     }
     if (/^\\[dt]?frac$/u.test(token.value)) {
-      return [{ ...token, value: "\\frac" }, ...parseArgument(), ...parseArgument()];
+      return [
+        { ...token, value: "\\frac" },
+        ...parseArgument(),
+        ...parseArgument(),
+      ];
     }
     if (
-      /^(?:[_^]|\\(?:sqrt|vec|hat|bar|overline|underline))$/u.test(token.value) ||
+      /^(?:[_^]|\\(?:sqrt|vec|hat|bar|overline|underline))$/u.test(
+        token.value,
+      ) ||
       (token.value.startsWith("\\") &&
-        !MATH_ALIASES.has(token.value.slice(1).replace(/^var/u, "").toLowerCase()) &&
+        !MATH_ALIASES.has(
+          token.value.slice(1).replace(/^var/u, "").toLowerCase(),
+        ) &&
         sourceTokens[cursor]?.value === "{")
     ) {
-      if (sourceTokens[cursor]?.value === "[") throw new Error("Indexed argument");
+      if (sourceTokens[cursor]?.value === "[")
+        throw new Error("Indexed argument");
       return [token, ...parseArgument()];
     }
     let normalized = token.value.replace(/^\\/u, "");
-    normalized = MATH_ALIASES.get(normalized.replace(/^var/u, "").toLowerCase()) ?? token.value;
+    normalized =
+      MATH_ALIASES.get(normalized.replace(/^var/u, "").toLowerCase()) ??
+      token.value;
     normalized = normalized
       .replace(/[\u{1D400}-\u{1D7FF}]/gu, (value) => value.normalize("NFKC"))
       .toLowerCase();
@@ -221,9 +243,17 @@ function findMathMatches(
       index >= 0;
       index = lowerSource.indexOf(lowerQuery, index + lowerQuery.length)
     ) {
-      if (!commands.some((command) => index > command.index && index < command.index + command[0].length)) {
+      if (
+        !commands.some(
+          (command) =>
+            index > command.index && index < command.index + command[0].length,
+        )
+      ) {
         offsets.push(
-          clampSearchOffset(source, { start: index, end: index + query.length }) as {
+          clampSearchOffset(source, {
+            start: index,
+            end: index + query.length,
+          }) as {
             end: number;
             start: number;
           },
@@ -242,12 +272,16 @@ function findMathMatches(
   ) {
     if (
       !normalizedQuery.tokens.every(
-        (token, tokenIndex) => token.value === normalizedSource.tokens[index + tokenIndex].value,
+        (token, tokenIndex) =>
+          token.value === normalizedSource.tokens[index + tokenIndex].value,
       )
     ) {
       continue;
     }
-    const matched = normalizedSource.tokens.slice(index, index + normalizedQuery.tokens.length);
+    const matched = normalizedSource.tokens.slice(
+      index,
+      index + normalizedQuery.tokens.length,
+    );
     let start = matched[0].start;
     let end = matched.at(-1)?.end ?? start;
     for (const token of matched) {
@@ -255,8 +289,10 @@ function findMathMatches(
       end = Math.max(end, token.delimiter?.end ?? end);
     }
     for (const group of normalizedSource.groups) {
-      if (start < group.start && end > group.start && end < group.end) end = group.end;
-      if (start > group.start && start < group.end && end > group.end) start = group.start;
+      if (start < group.start && end > group.start && end < group.end)
+        end = group.end;
+      if (start > group.start && start < group.end && end > group.end)
+        start = group.start;
     }
     totalMatches += 1;
     if (offsets.length < limit) offsets.push({ start, end });
@@ -269,16 +305,26 @@ function mergeSearchResults(
   current: ConversationSearchResult,
   persisted: ConversationSearchResult,
 ): ConversationSearchResult {
-  const currentById = new Map(current.matches.map((match) => [match.id, match]));
+  const currentById = new Map(
+    current.matches.map((match) => [match.id, match]),
+  );
   const matches = [
     ...persisted.matches.map((match) => currentById.get(match.id) ?? match),
     ...current.matches,
-  ].filter((match, index, all) => all.findIndex(({ id }) => id === match.id) === index)
+  ]
+    .filter(
+      (match, index, all) =>
+        all.findIndex(({ id }) => id === match.id) === index,
+    )
     .map((match, index) => ({ ...match, ordinal: index + 1 }));
   return {
     ...current,
     matches,
-    totalMatches: Math.max(matches.length, current.totalMatches, persisted.totalMatches),
+    totalMatches: Math.max(
+      matches.length,
+      current.totalMatches,
+      persisted.totalMatches,
+    ),
     isCapped: current.isCapped || persisted.isCapped,
   };
 }
@@ -291,7 +337,10 @@ async function searchConversation(
 ): Promise<ConversationSearchResult> {
   const query = request.query.trim();
   const regex =
-    searchMath && query.length > 1 && query.startsWith("/") && query.endsWith("/")
+    searchMath &&
+    query.length > 1 &&
+    query.startsWith("/") &&
+    query.endsWith("/")
       ? query.slice(1, -1)
       : undefined;
   const texts = turns.flatMap((turn) =>
@@ -304,7 +353,12 @@ async function searchConversation(
           equationIndex: undefined as number | undefined,
         };
         const equation = searchMath ? unit.equations?.[index] : undefined;
-        return equation == null ? [searchable] : [searchable, { ...searchable, text: equation, equationIndex: index }];
+        return equation == null
+          ? [searchable]
+          : [
+              searchable,
+              { ...searchable, text: equation, equationIndex: index },
+            ];
       }),
     ),
   );
@@ -319,31 +373,49 @@ async function searchConversation(
     isCapped: false,
   };
   if (query.length === 0) return result;
-  const regexResult = regex == null
-    ? null
-    : await runRegexSearch(
-        {
-          query: regex,
-          texts: texts.map(({ text }) => text),
-          mathTexts: texts.map(({ equationIndex }) => equationIndex != null),
-          maxMatches: MAX_MATCHES,
-        },
-        signal,
-      ) as { error?: unknown; offsets?: Array<Array<{ end: number; start: number }>>; totalMatches?: number } | null;
-  if (regexResult?.error != null) return { ...result, error: regexResult.error };
+  const regexResult =
+    regex == null
+      ? null
+      : ((await runRegexSearch(
+          {
+            query: regex,
+            texts: texts.map(({ text }) => text),
+            mathTexts: texts.map(({ equationIndex }) => equationIndex != null),
+            maxMatches: MAX_MATCHES,
+          },
+          signal,
+        )) as {
+          error?: unknown;
+          offsets?: Array<Array<{ end: number; start: number }>>;
+          totalMatches?: number;
+        } | null);
+  if (regexResult?.error != null)
+    return { ...result, error: regexResult.error };
   result.totalMatches = regexResult?.totalMatches ?? 0;
   const textMatchCountByUnit = new Map<string, number>();
   for (const [textIndex, searchable] of texts.entries()) {
-    const unitKey = getContentSearchUnitKey(searchable.turnKey, searchable.unitId) as string;
+    const unitKey = getContentSearchUnitKey(
+      searchable.turnKey,
+      searchable.unitId,
+    ) as string;
     const previousMatchCount = textMatchCountByUnit.get(unitKey) ?? 0;
-    const matchResult = regexResult == null
-      ? searchable.equationIndex == null
-        ? (findTextMatches(searchable.text, query, MAX_MATCHES - result.matches.length) as {
-            offsets: Array<{ end: number; start: number }>;
-            totalMatches: number;
-          })
-        : findMathMatches(searchable.text, query, MAX_MATCHES - result.matches.length)
-      : { offsets: regexResult.offsets?.[textIndex] ?? [], totalMatches: 0 };
+    const matchResult =
+      regexResult == null
+        ? searchable.equationIndex == null
+          ? (findTextMatches(
+              searchable.text,
+              query,
+              MAX_MATCHES - result.matches.length,
+            ) as {
+              offsets: Array<{ end: number; start: number }>;
+              totalMatches: number;
+            })
+          : findMathMatches(
+              searchable.text,
+              query,
+              MAX_MATCHES - result.matches.length,
+            )
+        : { offsets: regexResult.offsets?.[textIndex] ?? [], totalMatches: 0 };
     result.totalMatches += matchResult.totalMatches;
     for (const [matchIndex, range] of matchResult.offsets.entries()) {
       const location: ConversationSearchLocation = {
@@ -351,7 +423,10 @@ async function searchConversation(
         contextId: request.contextId,
         turnKey: searchable.turnKey,
         unitId: searchable.unitId,
-        matchIndex: searchable.equationIndex == null ? previousMatchCount + matchIndex : matchIndex,
+        matchIndex:
+          searchable.equationIndex == null
+            ? previousMatchCount + matchIndex
+            : matchIndex,
         equationIndex: searchable.equationIndex,
         equationRange: searchable.equationIndex == null ? undefined : range,
       };
@@ -363,7 +438,10 @@ async function searchConversation(
       });
     }
     if (searchable.equationIndex == null) {
-      textMatchCountByUnit.set(unitKey, previousMatchCount + matchResult.offsets.length);
+      textMatchCountByUnit.set(
+        unitKey,
+        previousMatchCount + matchResult.offsets.length,
+      );
     }
   }
   result.isCapped = result.totalMatches > result.matches.length;
@@ -381,44 +459,74 @@ function createConversationSearchSource({
 }: {
   contextId: string;
   getTurns(): SearchableTurn[];
-  hydratePersistedMatch?(location: ConversationSearchLocation, options?: { signal?: AbortSignal }): Promise<boolean>;
+  hydratePersistedMatch?(
+    location: ConversationSearchLocation,
+    options?: { signal?: AbortSignal },
+  ): Promise<boolean>;
   revealUnrenderedMatches?: boolean;
-  searchPersisted?(request: ConversationSearchRequest, options?: { signal?: AbortSignal }): Promise<ConversationSearchResult | null>;
+  searchPersisted?(
+    request: ConversationSearchRequest,
+    options?: { signal?: AbortSignal },
+  ): Promise<ConversationSearchResult | null>;
   searchMath?: boolean;
   scrollAdapter: ScrollAdapter;
 }) {
   return {
     domain: "conversation" as const,
     contextId,
-    async search(request: ConversationSearchRequest, options?: { signal?: AbortSignal }) {
-      const current = await searchConversation(request, getTurns(), searchMath, options?.signal);
+    async search(
+      request: ConversationSearchRequest,
+      options?: { signal?: AbortSignal },
+    ) {
+      const current = await searchConversation(
+        request,
+        getTurns(),
+        searchMath,
+        options?.signal,
+      );
       if (searchMath || searchPersisted == null) return current;
       const persisted = await searchPersisted(request, options);
-      return persisted == null ? current : mergeSearchResults(current, persisted);
+      return persisted == null
+        ? current
+        : mergeSearchResults(current, persisted);
     },
-    async ensureVisible(location: ConversationSearchLocation, options?: { signal?: AbortSignal }) {
+    async ensureVisible(
+      location: ConversationSearchLocation,
+      options?: { signal?: AbortSignal },
+    ) {
       if (
         location.domain !== "conversation" ||
         location.contextId !== contextId ||
         (location.turnCursor != null &&
           hydratePersistedMatch != null &&
-          (!(await hydratePersistedMatch(location, options)) || options?.signal?.aborted))
-      ) return;
+          (!(await hydratePersistedMatch(location, options)) ||
+            options?.signal?.aborted))
+      )
+        return;
       const hadCursor = location.turnCursor != null;
       let container = scrollAdapter.getTurnContainer(location.turnKey);
       const matchId = getContentSearchMatchId(location) as string;
       const needsReveal =
         revealUnrenderedMatches &&
         container != null &&
-        findMatchElement({ container, matchId, includeShadowRoots: false }) == null;
+        findMatchElement({ container, matchId, includeShadowRoots: false }) ==
+          null;
       if (container == null || hadCursor || needsReveal) {
         if (options?.signal?.aborted) return;
-        await scrollAdapter.scrollToTurn(location.turnKey, options?.signal == null ? undefined : { signal: options.signal });
+        await scrollAdapter.scrollToTurn(
+          location.turnKey,
+          options?.signal == null ? undefined : { signal: options.signal },
+        );
         if (options?.signal?.aborted) return;
         container = scrollAdapter.getTurnContainer(location.turnKey);
       }
       if (container != null) {
-        await scrollToMatch({ container, matchId, includeShadowRoots: false, signal: options?.signal });
+        await scrollToMatch({
+          container,
+          matchId,
+          includeShadowRoots: false,
+          signal: options?.signal,
+        });
       }
     },
   };
@@ -431,27 +539,48 @@ function useConversationSearchHighlights({
   containerRef: { current: ParentNode | null };
   contextId: string;
 }): void {
-  const React = getReact() as { useEffect(effect: () => void | (() => void), dependencies: unknown[]): void };
-  const search = useSignalValue(activeContentSearch) as ConversationSearchResult | null;
-  const activeMatch = useSignalValue(currentContentSearchMatch) as ConversationSearchMatch | null;
+  const React = getReact() as {
+    useEffect(effect: () => void | (() => void), dependencies: unknown[]): void;
+  };
+  const search = useSignalValue(
+    activeContentSearch,
+  ) as ConversationSearchResult | null;
+  const activeMatch = useSignalValue(
+    currentContentSearchMatch,
+  ) as ConversationSearchMatch | null;
   React.useEffect(() => {
     const container = containerRef.current;
     if (container == null) return;
     clearSearchHighlights(container, { includeShadowRoots: false });
     if (search?.contextId !== contextId) return;
-    const grouped = groupConversationMatches(search.matches) as Map<string, ConversationSearchMatch[]>;
-    for (const element of Array.from(container.querySelectorAll?.("[data-content-search-unit-key]") ?? [])) {
+    const grouped = groupConversationMatches(search.matches) as Map<
+      string,
+      ConversationSearchMatch[]
+    >;
+    for (const element of Array.from(
+      container.querySelectorAll?.("[data-content-search-unit-key]") ?? [],
+    )) {
       const candidate = element as Element & { dataset: DOMStringMap };
-      const matches = grouped.get(candidate.dataset.contentSearchUnitKey ?? "") ?? [];
-      const highlights = findTextMatches(candidate.textContent ?? "", search.query, matches.length) as {
+      const matches =
+        grouped.get(candidate.dataset.contentSearchUnitKey ?? "") ?? [];
+      const highlights = findTextMatches(
+        candidate.textContent ?? "",
+        search.query,
+        matches.length,
+      ) as {
         offsets: Array<{ end: number; start: number }>;
       };
       for (const [index, match] of matches.entries()) {
-        markSearchMatch({ element: candidate, matchId: match.id, range: highlights.offsets[index] });
+        markSearchMatch({
+          element: candidate,
+          matchId: match.id,
+          range: highlights.offsets[index],
+        });
         setMatchSelected(candidate, match.id === activeMatch?.id);
       }
     }
-    return () => clearSearchHighlights(container, { includeShadowRoots: false });
+    return () =>
+      clearSearchHighlights(container, { includeShadowRoots: false });
   }, [activeMatch?.id, containerRef, contextId, search?.runId]);
   void mutationsAffectSearch;
   void createDomSearchHighlighter;
@@ -460,7 +589,7 @@ function useConversationSearchHighlights({
   void initializeConversationSearchDom;
 }
 
-function initializeConversationSearchHighlights(): void {
+const initializeConversationSearchHighlights = once((): void => {
   initializeCompilerCache();
   initializeSignalRuntime();
   initializeHighlightSelectors();
@@ -468,19 +597,19 @@ function initializeConversationSearchHighlights(): void {
   initializeSearchHighlighting();
   initializePreloadRuntime();
   void import("@rchunk/katex-renderer");
-}
+});
 
-function initializeConversationSource(): void {
+const initializeConversationSource = once((): void => {
   initializeUniqBy();
   initializeMatchFinder();
   initializeMathSearch();
   initializeScrollToMatch();
   initializeConversationSearchHighlights();
-}
+});
 
-function initializeMathSearch(): void {
+const initializeMathSearch = once((): void => {
   void findMathTextMatches;
-}
+});
 
 export {
   useConversationSearchHighlights as i,

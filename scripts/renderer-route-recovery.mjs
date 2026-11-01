@@ -200,7 +200,6 @@ export const STRUCTURAL_COMPONENT_ROOTS = [
   "library-cloud-file-preview-b3ddfaa823c0.js",
   "open-a618d40921b2.js",
   "page-268e2fb6d880.js",
-  "registered-259e95b201a1.js",
   "workbook-review-utils-3e78f7501b68.js",
 ];
 
@@ -465,7 +464,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["open-conversation-files", "open-a618d40921b2.js"],
   ["detached-browser-page", "page-268e2fb6d880.js"],
   ["pets-settings-route", "pets-settings-route-965aa70e25ab.js"],
-  ["registered-automation-thumbnail", "registered-259e95b201a1.js"],
   ["trusted-contact-settings", "trusted-contact-settings-b71f926a1121.js"],
   ["voice-settings", "voice-settings-3a0651cd977e.js"],
   [
@@ -486,14 +484,12 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   // Complete eager first-party dependency closure of the four conversation
   // React roots. These owners remove structurally approximate implementations
   // from the live conversation path while retaining vendor/generated boundaries.
-  ["ansi-block", "ansi-block-5043e88b0254.js"],
   ["artifact-feedback-button", "artifact-feedback-button-253b2bfc6015.js"],
   [
     "bookmarked-thread-user-message-navigation",
     "bookmarked-thread-user-message-navigation-f166b870b632.js",
   ],
   ["content-quick-chat-overlay", "content-quick-chat-overlay-ed4d1aa8ed4b.js"],
-  ["conversation-source", "conversation-source-a25a6a9a1e11.js"],
   [
     "create-pull-request-modal-content",
     "create-pull-request-modal-content-a56e677534f4.js",
@@ -508,12 +504,7 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["git-branch-switcher", "git-branch-switcher-96861524e333.js"],
   ["google-logo", "google-logo-fc56f9e3f0e8.js"],
   ["tab-address-input", "input-f296e047d4b5.js"],
-  ["latest-turn-preview", "latest-turn-preview-3395407f9d40.js"],
   ["layout", "layout-a912dff4540d.js"],
-  [
-    "local-conversation-external-resources",
-    "local-conversation-external-resources-c392ed595266.js",
-  ],
   [
     "local-conversation-git-actions",
     "local-conversation-git-actions-f71520dad4b4.js",
@@ -553,11 +544,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["thread-scroll-layout", "thread-scroll-layout-27da424d79e0.js"],
   ["thread-usage-breakdown", "thread-usage-breakdown-2a2ef1ac41f7.js"],
   ["use-app-connect-flow", "use-app-connect-flow-e16aee878521.js"],
-  [
-    "use-resume-conversation-if-needed",
-    "use-resume-conversation-if-needed-5447ec5aebcd.js",
-  ],
-  ["use-target-apps", "use-target-apps-976e88a40210.js"],
   ["user-message", "user-message-e36f9e2dfe24.js"],
   ["worktree-setup-auto-fix", "worktree-setup-auto-fix-4dc0f12b7219.js"],
 ]);
@@ -576,6 +562,7 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   "PlatformUIKitProvider-748f2efe0f2a.js",
   "active-tool-activity-label-f837b1d602a5.js",
   "plaid-link-a9255a11a708.js",
+  "registered-259e95b201a1.js",
   "add-method-2829ddee8c5b.js",
   "allowed-domains-input-2ddf45ddb4ff.js",
   "animated-icon-ac1b587a8839.js",

@@ -1,4 +1,4 @@
-import "@rchunk/rolldown-runtime";
+import { n as onceExport } from "@rchunk/rolldown-runtime";
 import {
   BX as useSignalFamilyValue,
   K2 as initializeInternationalization,
@@ -35,6 +35,8 @@ interface ResumeState {
   retryResume(): void;
 }
 
+const once = onceExport as (initializer: () => void) => () => void;
+
 interface ScopeLike {
   get(signal: unknown, parameter?: unknown): unknown;
 }
@@ -46,13 +48,20 @@ interface ToastHandle {
 interface ReactLike {
   useEffect(effect: () => void | (() => void), dependencies: unknown[]): void;
   useRef<Value>(value: Value): { current: Value };
-  useState<Value>(value: Value): [Value, (next: Value | ((current: Value) => Value)) => void];
+  useState<Value>(
+    value: Value,
+  ): [Value, (next: Value | ((current: Value) => Value)) => void];
 }
 
-function getConfigErrorDetails(error: unknown): { detail: string; location: string } | null {
-  const parsed = parseConfigError(error) as
-    | { column?: number; detail: string; filePath?: string; line?: number }
-    | null;
+function getConfigErrorDetails(
+  error: unknown,
+): { detail: string; location: string } | null {
+  const parsed = parseConfigError(error) as {
+    column?: number;
+    detail: string;
+    filePath?: string;
+    line?: number;
+  } | null;
   if (parsed == null) return null;
   return {
     location:
@@ -89,7 +98,15 @@ function shouldShowResumeError({
   return !isSubagentChildThread && (!hasShownResumeError || !shouldAutoRetry);
 }
 
-function formatResumeError(intl: { formatMessage(message: Record<string, unknown>, values?: Record<string, unknown>): string }, error: unknown): string {
+function formatResumeError(
+  intl: {
+    formatMessage(
+      message: Record<string, unknown>,
+      values?: Record<string, unknown>,
+    ): string;
+  },
+  error: unknown,
+): string {
   const message = getErrorMessage(error);
   if (message === "FailedPrecondition: history_notes_extension_unsupported") {
     return intl.formatMessage({
@@ -111,7 +128,8 @@ function formatResumeError(intl: { formatMessage(message: Record<string, unknown
   return isLiveWriterConflict(error)
     ? intl.formatMessage({
         id: "localTaskRow.resumeLiveWriterError",
-        defaultMessage: "This task is active elsewhere. Close it there, then retry here.",
+        defaultMessage:
+          "This task is active elsewhere. Close it there, then retry here.",
       })
     : intl.formatMessage(
         {
@@ -128,18 +146,36 @@ function useResumeConversationIfNeeded(
 ): ResumeState {
   const React = getReact() as ReactLike;
   const scope = (useAppScope as unknown as () => ScopeLike)();
-  const account = useCurrentAccount() as { intl?: { formatMessage(message: Record<string, unknown>, values?: Record<string, unknown>): string } };
-  const usePermissionDefault = useSignalFamilyValue(useAppServerPermissionDefault, "4226282475");
-  const collaboration = useCollaborationMode(conversationId) as { activeMode?: unknown };
+  const account = useCurrentAccount() as {
+    intl?: {
+      formatMessage(
+        message: Record<string, unknown>,
+        values?: Record<string, unknown>,
+      ): string;
+    };
+  };
+  const usePermissionDefault = useSignalFamilyValue(
+    useAppServerPermissionDefault,
+    "4226282475",
+  );
+  const collaboration = useCollaborationMode(conversationId) as {
+    activeMode?: unknown;
+  };
   const readConversationSignal = useSignalFamilyValue as unknown as (
     signal: unknown,
     parameter: string | null,
   ) => unknown;
-  const available = Boolean(readConversationSignal(conversationAvailable, conversationId));
+  const available = Boolean(
+    readConversationSignal(conversationAvailable, conversationId),
+  );
   const [isResuming, setIsResuming] = React.useState(available);
-  const [failedConversationId, setFailedConversationId] = React.useState<string | null>(null);
-  const [unavailableConversationId, setUnavailableConversationId] = React.useState<string | null>(null);
-  const [writerConflictConversationId, setWriterConflictConversationId] = React.useState<string | null>(null);
+  const [failedConversationId, setFailedConversationId] = React.useState<
+    string | null
+  >(null);
+  const [unavailableConversationId, setUnavailableConversationId] =
+    React.useState<string | null>(null);
+  const [writerConflictConversationId, setWriterConflictConversationId] =
+    React.useState<string | null>(null);
   const [retryGeneration, setRetryGeneration] = React.useState(0);
   const inFlight = React.useRef<string | null>(null);
   const blocked = React.useRef<string | null>(null);
@@ -152,7 +188,13 @@ function useResumeConversationIfNeeded(
   };
 
   React.useEffect(() => {
-    if (conversationId == null || !available || inFlight.current === conversationId || blocked.current === conversationId) return;
+    if (
+      conversationId == null ||
+      !available ||
+      inFlight.current === conversationId ||
+      blocked.current === conversationId
+    )
+      return;
     let cancelled = false;
     inFlight.current = conversationId;
     setIsResuming(true);
@@ -165,18 +207,26 @@ function useResumeConversationIfNeeded(
         const roots = await resolveWorkspaceRoots(scope, conversationId, {
           allowProjectSourceRoots: true,
         });
-        if (cancelled || !scope.get(conversationAvailable, conversationId)) return;
+        if (cancelled || !scope.get(conversationAvailable, conversationId))
+          return;
         hostId = scope.get(conversationHostId, conversationId) as string;
-        const catalogEntry = scope.get(knownConversationCatalogEntry, conversationId) as
-          | { hostId?: string; threadId?: string }
-          | null;
+        const catalogEntry = scope.get(
+          knownConversationCatalogEntry,
+          conversationId,
+        ) as { hostId?: string; threadId?: string } | null;
         const knownCatalogEntry =
-          catalogEntry?.hostId === hostId && catalogEntry.threadId === conversationId
+          catalogEntry?.hostId === hostId &&
+          catalogEntry.threadId === conversationId
             ? catalogEntry
             : undefined;
-        await (getHostConversationService(scope, hostId) as unknown as {
-          resumeConversation(input: Record<string, unknown>, options: Record<string, unknown>): Promise<unknown>;
-        }).resumeConversation(
+        await (
+          getHostConversationService(scope, hostId) as unknown as {
+            resumeConversation(
+              input: Record<string, unknown>,
+              options: Record<string, unknown>,
+            ): Promise<unknown>;
+          }
+        ).resumeConversation(
           {
             conversationId,
             threadAccess,
@@ -200,23 +250,41 @@ function useResumeConversationIfNeeded(
         }
         if (
           hostId != null &&
-          isMissingPullRequestTaskError(scope, { hostId, threadId: conversationId }, error)
+          isMissingPullRequestTaskError(
+            scope,
+            { hostId, threadId: conversationId },
+            error,
+          )
         ) {
           blocked.current = conversationId;
           setUnavailableConversationId(conversationId);
           return;
         }
-        if (isLiveWriterConflict(error)) setWriterConflictConversationId(conversationId);
+        if (isLiveWriterConflict(error))
+          setWriterConflictConversationId(conversationId);
         else setFailedConversationId(conversationId);
         const autoRetry = shouldAutoRetryResume(error);
-        const isSubagent = scope.get(parentConversation, conversationId) != null;
-        if (shouldShowResumeError({ hasShownResumeError: toast.current != null, isSubagentChildThread: isSubagent, shouldAutoRetry: autoRetry })) {
+        const isSubagent =
+          scope.get(parentConversation, conversationId) != null;
+        if (
+          shouldShowResumeError({
+            hasShownResumeError: toast.current != null,
+            isSubagentChildThread: isSubagent,
+            shouldAutoRetry: autoRetry,
+          })
+        ) {
           const intl = account.intl ?? {
-            formatMessage: (descriptor: Record<string, unknown>) => String(descriptor.defaultMessage ?? ""),
+            formatMessage: (descriptor: Record<string, unknown>) =>
+              String(descriptor.defaultMessage ?? ""),
           };
-          toast.current = (scope.get(toastManager) as {
-            danger(message: string, options: Record<string, unknown>): ToastHandle;
-          }).danger(formatResumeError(intl, error), {
+          toast.current = (
+            scope.get(toastManager) as {
+              danger(
+                message: string,
+                options: Record<string, unknown>,
+              ): ToastHandle;
+            }
+          ).danger(formatResumeError(intl, error), {
             id: `resume-task-error-${conversationId}`,
             primaryAction: isRetryableResumeError(error)
               ? { label: "Retry", onClick: retryResume }
@@ -224,7 +292,10 @@ function useResumeConversationIfNeeded(
           });
         }
         if (autoRetry) {
-          globalThis.setTimeout(() => setRetryGeneration((generation) => generation + 1), 750);
+          globalThis.setTimeout(
+            () => setRetryGeneration((generation) => generation + 1),
+            750,
+          );
         } else {
           blocked.current = conversationId;
         }
@@ -243,19 +314,29 @@ function useResumeConversationIfNeeded(
 
   return {
     isResuming: available && isResuming,
-    hasResumeFailed: available && conversationId != null && failedConversationId === conversationId,
+    hasResumeFailed:
+      available &&
+      conversationId != null &&
+      failedConversationId === conversationId,
     isUnavailable:
-      available && conversationId != null && unavailableConversationId === conversationId,
+      available &&
+      conversationId != null &&
+      unavailableConversationId === conversationId,
     isWriterConflict:
-      available && conversationId != null && writerConflictConversationId === conversationId,
+      available &&
+      conversationId != null &&
+      writerConflictConversationId === conversationId,
     retryResume,
   };
 }
 
-function initializeUseResumeConversationIfNeeded(): void {
+const initializeUseResumeConversationIfNeeded = once((): void => {
   initializeInternationalization();
   initializeUtilities();
   void resolvedConversationHost;
-}
+});
 
-export { useResumeConversationIfNeeded as n, initializeUseResumeConversationIfNeeded as t };
+export {
+  useResumeConversationIfNeeded as n,
+  initializeUseResumeConversationIfNeeded as t,
+};

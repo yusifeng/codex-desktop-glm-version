@@ -45,7 +45,7 @@ for (const directory of MODULES) {
   }
 }
 
-const marker = name =>
+const marker = (name) =>
   `() => globalThis.__resumeSecurityTest.initialized.push(${JSON.stringify(name)})`;
 const overrides = {
   "app-shared": {
@@ -102,11 +102,12 @@ function generic(moduleName, exportName) {
 }
 
 function mockModule(name) {
-  if (name === "rolldown-runtime") return "export {};";
+  if (name === "rolldown-runtime")
+    return "export const n=initializer=>{let done=false;return()=>{if(!done){done=true;initializer();}}};";
   const names = importedNamesByModule.get(name) ?? new Set();
   return [...names]
     .map(
-      exportName =>
+      (exportName) =>
         `export const ${exportName} = ${overrides[name]?.[exportName] ?? generic(name, exportName)};`,
     )
     .join("\n");
@@ -121,19 +122,24 @@ async function bundle(directory) {
     target: "node22",
     write: false,
     logLevel: "silent",
-    plugins: [{
-      name: "resume-security-mocks",
-      setup(build) {
-        build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({
-          path: importPath.slice("@rchunk/".length),
-          namespace: "mock",
-        }));
-        build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({
-          contents: mockModule(importPath),
-          loader: "js",
-        }));
+    plugins: [
+      {
+        name: "resume-security-mocks",
+        setup(build) {
+          build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({
+            path: importPath.slice("@rchunk/".length),
+            namespace: "mock",
+          }));
+          build.onLoad(
+            { filter: /.*/, namespace: "mock" },
+            ({ path: importPath }) => ({
+              contents: mockModule(importPath),
+              loader: "js",
+            }),
+          );
+        },
       },
-    }],
+    ],
   });
   return import(
     `data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`
@@ -143,20 +149,37 @@ async function bundle(directory) {
 const securityClient = await bundle("security-client");
 securityClient.t();
 const queries = securityClient.n("account-1");
-assert.deepEqual(queries.mfa.queryKey, ["chatgpt-security", "account-1", "mfa"]);
+assert.deepEqual(queries.mfa.queryKey, [
+  "chatgpt-security",
+  "account-1",
+  "mfa",
+]);
 assert.equal(queries.mfa.staleTime, 60000);
 assert.equal(queries.mfa.retry, false);
 assert.equal(queries.protection.refetchOnWindowFocus, "always");
 assert.equal(Object.keys(queries).length, 7);
 await queries.linkedApps.queryFn({ signal: "signal-1" });
 assert.equal(state.requests.at(-1).path, "/client_applications");
-assert.equal(state.requests.at(-1).options.additionalHeaders["ChatGPT-Account-ID"], "account-1");
+assert.equal(
+  state.requests.at(-1).options.additionalHeaders["ChatGPT-Account-ID"],
+  "account-1",
+);
 assert.equal(state.requests.at(-1).options.signal, "signal-1");
-assert.deepEqual(state.initialized.slice(0, 3), ["api-client", "http-runtime", "api-routes"]);
+assert.deepEqual(state.initialized.slice(0, 3), [
+  "api-client",
+  "http-runtime",
+  "api-routes",
+]);
 
 const securityShared = await bundle("security-shared");
 let backed = 0;
-const subpage = securityShared.r({ title: "Security", subtitle: "Manage", action: "Action", onBack: () => backed++, children: "Body" });
+const subpage = securityShared.r({
+  title: "Security",
+  subtitle: "Manage",
+  action: "Action",
+  onBack: () => backed++,
+  children: "Body",
+});
 assert.equal(subpage.type, "SettingsSubpageLayout");
 assert.equal(subpage.props.children, "Body");
 subpage.props.backSlot.props.onClick();
@@ -169,30 +192,56 @@ failed.props.children[1].props.onClick();
 assert.equal(backed, 2);
 let confirmed = 0;
 let closed = 0;
-const confirmation = securityShared.t({ title: "Remove", confirmLabel: "Remove", onConfirm: () => confirmed++, onClose: () => closed++ });
+const confirmation = securityShared.t({
+  title: "Remove",
+  confirmLabel: "Remove",
+  onConfirm: () => confirmed++,
+  onClose: () => closed++,
+});
 assert.equal(confirmation.props.open, true);
 confirmation.props.children.props.onSubmit({ preventDefault() {} });
 assert.equal(confirmed, 1);
 confirmation.props.onOpenChange(false);
 assert.equal(closed, 1);
-const pendingConfirmation = securityShared.t({ title: "Remove", confirmLabel: "Remove", isPending: true, onConfirm: () => confirmed++, onClose: () => closed++ });
+const pendingConfirmation = securityShared.t({
+  title: "Remove",
+  confirmLabel: "Remove",
+  isPending: true,
+  onConfirm: () => confirmed++,
+  onClose: () => closed++,
+});
 pendingConfirmation.props.children.props.onSubmit({ preventDefault() {} });
 assert.equal(confirmed, 1);
 
 const securitySource = await bundle("security-src");
 securitySource.t();
 assert.equal(securitySource.a("openid"), securitySource.a("email"));
-assert.equal(securitySource.a("openid").defaultMessage, "Access your basic profile information");
-assert.equal(securitySource.a("resource.invoke").defaultMessage, "Resource actions");
-assert.equal(securitySource.a("chatgpt.tokens.use.direct"), securitySource.a("chatpass.enable.request"));
+assert.equal(
+  securitySource.a("openid").defaultMessage,
+  "Access your basic profile information",
+);
+assert.equal(
+  securitySource.a("resource.invoke").defaultMessage,
+  "Resource actions",
+);
+assert.equal(
+  securitySource.a("chatgpt.tokens.use.direct"),
+  securitySource.a("chatpass.enable.request"),
+);
 assert.equal(securitySource.i("profile"), securitySource.i("openid"));
 assert.equal(securitySource.i("resource.invoke"), undefined);
-assert.match(securitySource.i("offline_access").defaultMessage, /connection active/);
+assert.match(
+  securitySource.i("offline_access").defaultMessage,
+  /connection active/,
+);
 assert.equal(securitySource.a("unknown.scope"), undefined);
 
 const securityKeys = await bundle("security-keys");
 securityKeys.n();
-const icon = securityKeys.t({ className: "security-icon", "aria-hidden": true });
+const icon = securityKeys.t({
+  className: "security-icon",
+  "aria-hidden": true,
+});
 assert.equal(icon.type, "svg");
 assert.equal(icon.props.width, 20);
 assert.equal(icon.props.height, 20);
@@ -209,16 +258,21 @@ state.react = {
   useState(initial) {
     const index = state.stateCursor++;
     const value = state.stateValues[index] ?? initial;
-    return [value, next => {
-      state.stateValues[index] = typeof next === "function" ? next(value) : next;
-    }];
+    return [
+      value,
+      (next) => {
+        state.stateValues[index] =
+          typeof next === "function" ? next(value) : next;
+      },
+    ];
   },
 };
 state.scope = {
   get(signal, parameter) {
     if (signal?.id === "available") return state.available;
     if (signal?.id === "host") return "host-1";
-    if (signal?.id === "catalog") return { hostId: "host-1", threadId: parameter };
+    if (signal?.id === "catalog")
+      return { hostId: "host-1", threadId: parameter };
     if (signal?.id === "parent") return null;
     if (signal?.id === "toast") return { danger: () => ({ close() {} }) };
     return undefined;
@@ -240,7 +294,7 @@ state.available = true;
 state.stateCursor = 0;
 state.stateValues = [];
 resumeState = resume.n("thread-1", "private");
-await new Promise(resolve => setImmediate(resolve));
+await new Promise((resolve) => setImmediate(resolve));
 assert.equal(resumeState.isResuming, true);
 assert.equal(state.resumeCalls.length, 1);
 assert.deepEqual(state.resumeCalls[0].input.workspaceRoots, ["/workspace"]);

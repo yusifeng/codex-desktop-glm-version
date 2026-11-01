@@ -1,4 +1,4 @@
-import "@rchunk/rolldown-runtime";
+import { n as onceExport } from "@rchunk/rolldown-runtime";
 import {
   RH as parseMcpResourceMetadata,
   wL as initializeUtilities,
@@ -21,7 +21,10 @@ import {
 } from "@rchunk/app-initial";
 import { flattenConversationItems } from "../app-initial/runtime/flatten-conversation-items";
 
-export type ExternalResourceActivity = "provided" | "read" | "created" | "updated";
+const once = onceExport as (initializer: () => void) => () => void;
+
+export type ExternalResourceActivity =
+  "provided" | "read" | "created" | "updated";
 
 export interface ExternalResourceProvider {
   id: string;
@@ -56,7 +59,10 @@ interface ResourceCandidate {
   url: string;
 }
 
-interface MergedResource extends Omit<ResourceCandidate, "activities" | "aliases"> {
+interface MergedResource extends Omit<
+  ResourceCandidate,
+  "activities" | "aliases"
+> {
   activities: Set<ExternalResourceActivity>;
   aliases: Set<string>;
   activitiesByTurn: Map<number, Set<ExternalResourceActivity>>;
@@ -93,18 +99,26 @@ const PROVIDER_MATCHERS: ProviderMatcher[] = [
   {
     identity: { id: "google-drive", name: "Google Drive" },
     matches: (url) =>
-      ["docs.google.com", "drive.google.com", "sheets.google.com", "slides.google.com"].includes(
-        url.hostname,
-      ),
+      [
+        "docs.google.com",
+        "drive.google.com",
+        "sheets.google.com",
+        "slides.google.com",
+      ].includes(url.hostname),
     getResourceKey: (url) => {
       const documentMatch = url.pathname.match(
         /^\/(document|spreadsheets|presentation)\/d\/(?:e\/)?([^/]+)/u,
       );
       if (
-        ["docs.google.com", "sheets.google.com", "slides.google.com"].includes(url.hostname) &&
+        ["docs.google.com", "sheets.google.com", "slides.google.com"].includes(
+          url.hostname,
+        ) &&
         documentMatch != null
       ) {
-        const kind = documentMatch[1] === "spreadsheets" ? "spreadsheet" : documentMatch[1];
+        const kind =
+          documentMatch[1] === "spreadsheets"
+            ? "spreadsheet"
+            : documentMatch[1];
         return `google:${kind}:${documentMatch[2]}`;
       }
       if (url.hostname !== "drive.google.com") return null;
@@ -124,14 +138,18 @@ const PROVIDER_MATCHERS: ProviderMatcher[] = [
       const id = Array.from(
         url.pathname.matchAll(/[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f-]{27}/giu),
       ).at(-1)?.[0];
-      return id == null ? null : `notion:${id.replaceAll("-", "").toLowerCase()}`;
+      return id == null
+        ? null
+        : `notion:${id.replaceAll("-", "").toLowerCase()}`;
     },
   },
   {
     identity: { id: "linear", name: "Linear" },
     matches: (url) => url.hostname === "linear.app",
     getResourceKey: (url) => {
-      const match = url.pathname.match(/^\/([^/]+)\/(issue|project|document)\/([^/]+)/u);
+      const match = url.pathname.match(
+        /^\/([^/]+)\/(issue|project|document)\/([^/]+)/u,
+      );
       return match == null
         ? null
         : `linear:${match[1]?.toLowerCase()}:${match[2]}:${match[3]?.toLowerCase()}`;
@@ -139,15 +157,19 @@ const PROVIDER_MATCHERS: ProviderMatcher[] = [
   },
   {
     identity: { id: "figma", name: "Figma" },
-    matches: (url) => url.hostname === "figma.com" || url.hostname.endsWith(".figma.com"),
+    matches: (url) =>
+      url.hostname === "figma.com" || url.hostname.endsWith(".figma.com"),
     getResourceKey: (url) => {
-      const key = url.pathname.match(/^\/(?:board|design|file|make|proto|slides)\/([^/]+)/u)?.[1];
+      const key = url.pathname.match(
+        /^\/(?:board|design|file|make|proto|slides)\/([^/]+)/u,
+      )?.[1];
       return key == null ? null : `figma:${key}`;
     },
   },
   {
     identity: { id: "github", name: "GitHub" },
-    matches: (url) => url.hostname === "github.com" || url.hostname.endsWith(".github.com"),
+    matches: (url) =>
+      url.hostname === "github.com" || url.hostname.endsWith(".github.com"),
     getResourceKey: () => null,
   },
 ];
@@ -191,7 +213,9 @@ function getUrlResourceKey(url: URL): string | null {
 
 function getExternalResourceKey(value: string): string | null {
   const url = parseHttpUrl(value);
-  return url == null ? null : (getUrlResourceKey(url) ?? `url:${normalizeUrl(url)}`);
+  return url == null
+    ? null
+    : (getUrlResourceKey(url) ?? `url:${normalizeUrl(url)}`);
 }
 
 function titleFromUrl(url: URL): string {
@@ -230,7 +254,8 @@ function buildCandidate({
     providerResourceId == null || providerScope == null
       ? null
       : `provider:${providerScope}:${providerResourceId}`;
-  if (providerKey != null && canonicalKey !== providerKey) aliases.push(providerKey);
+  if (providerKey != null && canonicalKey !== providerKey)
+    aliases.push(providerKey);
   const resolvedProvider = provider ?? getProviderIdentity(url);
   const trimmedTitle = title?.trim();
   return {
@@ -238,27 +263,39 @@ function buildCandidate({
     aliases,
     key: canonicalKey,
     mimeType: mimeType?.trim() || null,
-    openInitiator: provider == null ? "markdown_link_click" : "mcp_app_resource",
+    openInitiator:
+      provider == null ? "markdown_link_click" : "mcp_app_resource",
     openInitiatorPriority: provider == null ? 1 : 2,
     provider: resolvedProvider,
     providerPriority: provider == null ? (resolvedProvider == null ? 0 : 1) : 2,
     title: trimmedTitle || titleFromUrl(url),
-    titlePriority: trimmedTitle == null || trimmedTitle.length === 0 ? 0 : titlePriority,
+    titlePriority:
+      trimmedTitle == null || trimmedTitle.length === 0 ? 0 : titlePriority,
     url: url.href,
   };
 }
 
-function extractMarkdownLinks(text: string): Array<{ label: string | null; url: string }> {
+function extractMarkdownLinks(
+  text: string,
+): Array<{ label: string | null; url: string }> {
   const links: Array<{ label: string | null; url: string }> = [];
   const markdownPattern = /\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/giu;
   const seenRanges: Array<[number, number]> = [];
   for (const match of text.matchAll(markdownPattern)) {
     const label = match[1]?.trim();
-    links.push({ label: label === "" || label === match[2] ? null : label ?? null, url: match[2] });
+    links.push({
+      label: label === "" || label === match[2] ? null : (label ?? null),
+      url: match[2],
+    });
     seenRanges.push([match.index, match.index + match[0].length]);
   }
   for (const match of text.matchAll(/https?:\/\/[^\s<>)\]]+/giu)) {
-    if (seenRanges.some(([start, end]) => match.index >= start && match.index < end)) continue;
+    if (
+      seenRanges.some(
+        ([start, end]) => match.index >= start && match.index < end,
+      )
+    )
+      continue;
     links.push({ label: null, url: match[0] });
   }
   return links;
@@ -272,11 +309,16 @@ function collectTextResources(
   if (!Array.isArray(content)) return [];
   const resources: ResourceCandidate[] = [];
   for (const item of content) {
-    if (typeof item !== "object" || item == null || (item as { type?: string }).type !== "text") {
+    if (
+      typeof item !== "object" ||
+      item == null ||
+      (item as { type?: string }).type !== "text"
+    ) {
       continue;
     }
     const textItem = item as { text: string };
-    let links = labelCache?.get(item) as ReturnType<typeof extractMarkdownLinks> | undefined;
+    let links = labelCache?.get(item) as
+      ReturnType<typeof extractMarkdownLinks> | undefined;
     if (links == null) {
       links = extractMarkdownLinks(textItem.text);
       labelCache?.set(item, links);
@@ -288,7 +330,10 @@ function collectTextResources(
         titlePriority: link.label == null ? 0 : 1,
         url: link.url,
       });
-      if (candidate != null && (includePages || !candidate.url.startsWith("page://"))) {
+      if (
+        candidate != null &&
+        (includePages || !candidate.url.startsWith("page://"))
+      ) {
         resources.push(candidate);
       }
     }
@@ -309,7 +354,10 @@ function getProviderForToolCall(
   }) as unknown as ExternalResourceProvider | null;
   return matchingApp == null
     ? {
-        id: call.appContext?.connectorId ?? call.pluginId ?? `mcp-server:${call.server}`,
+        id:
+          call.appContext?.connectorId ??
+          call.pluginId ??
+          `mcp-server:${call.server}`,
         name:
           call.appContext?.appName ??
           call.appContext?.connectorId ??
@@ -327,9 +375,15 @@ function getProviderForToolCall(
       };
 }
 
-function getToolCallCandidates(call: McpToolCall, apps: unknown[]): ResourceCandidate[] {
+function getToolCallCandidates(
+  call: McpToolCall,
+  apps: unknown[],
+): ResourceCandidate[] {
   const provider = getProviderForToolCall(call, apps);
-  const metadata = call.result?._meta == null ? null : parseMcpResourceMetadata(call.result._meta);
+  const metadata =
+    call.result?._meta == null
+      ? null
+      : parseMcpResourceMetadata(call.result._meta);
   if (
     metadata != null &&
     typeof metadata === "object" &&
@@ -364,10 +418,15 @@ function getToolCallCandidates(call: McpToolCall, apps: unknown[]): ResourceCand
   if (isGoogleWorkspaceToolCall(call as unknown as Record<string, unknown>)) {
     const toolName = getGoogleWorkspaceToolName(call.tool);
     const activity = getGoogleWorkspaceActivity(toolName);
-    const resource = parseGoogleWorkspaceStructuredContent(call.result?.structuredContent) as
-      | { mimeType?: string; title?: string; urls?: string[] }
-      | null;
-    if (resource == null || resource.urls?.[0] == null || activity === "unknown") return [];
+    const resource = parseGoogleWorkspaceStructuredContent(
+      call.result?.structuredContent,
+    ) as { mimeType?: string; title?: string; urls?: string[] } | null;
+    if (
+      resource == null ||
+      resource.urls?.[0] == null ||
+      activity === "unknown"
+    )
+      return [];
     const candidate = buildCandidate({
       activities: [activity === "read" ? "read" : "updated"],
       mimeType: resource.mimeType,
@@ -381,7 +440,11 @@ function getToolCallCandidates(call: McpToolCall, apps: unknown[]): ResourceCand
   return [];
 }
 
-function mergeCandidate(target: MergedResource, candidate: ResourceCandidate, turnIndex: number): void {
+function mergeCandidate(
+  target: MergedResource,
+  candidate: ResourceCandidate,
+  turnIndex: number,
+): void {
   for (const alias of candidate.aliases) target.aliases.add(alias);
   for (const activity of candidate.activities) target.activities.add(activity);
   const turnActivities = target.activitiesByTurn.get(turnIndex) ?? new Set();
@@ -391,7 +454,8 @@ function mergeCandidate(target: MergedResource, candidate: ResourceCandidate, tu
     target.title = candidate.title;
     target.titlePriority = candidate.titlePriority;
   }
-  if (target.mimeType == null && candidate.mimeType != null) target.mimeType = candidate.mimeType;
+  if (target.mimeType == null && candidate.mimeType != null)
+    target.mimeType = candidate.mimeType;
   if (candidate.providerPriority > target.providerPriority) {
     target.provider = candidate.provider;
     target.providerPriority = candidate.providerPriority;
@@ -426,26 +490,40 @@ function collectExternalResources(
     }
     mergeCandidate(target, candidate, turnIndex);
     for (const duplicate of matches.slice(1)) {
-      mergeCandidate(target, {
-        ...duplicate,
-        aliases: [...duplicate.aliases],
-        activities: [...duplicate.activities],
-      }, turnIndex);
+      mergeCandidate(
+        target,
+        {
+          ...duplicate,
+          aliases: [...duplicate.aliases],
+          activities: [...duplicate.activities],
+        },
+        turnIndex,
+      );
       merged.splice(merged.indexOf(duplicate), 1);
     }
   };
 
   for (let turnIndex = turns.length - 1; turnIndex >= 0; turnIndex -= 1) {
     const turn = turns[turnIndex];
-    const items = flattenConversationItems(turn.items) as Array<Record<string, unknown>>;
+    const items = flattenConversationItems(turn.items) as Array<
+      Record<string, unknown>
+    >;
     for (let itemIndex = items.length - 1; itemIndex >= 0; itemIndex -= 1) {
       const item = items[itemIndex];
       if (item.type === "userMessage") {
-        for (const candidate of collectTextResources(item.content, includePages, labelCache)) {
+        for (const candidate of collectTextResources(
+          item.content,
+          includePages,
+          labelCache,
+        )) {
           addCandidate(candidate, turnIndex);
         }
       } else if (item.type === "steeringUserMessage") {
-        for (const candidate of collectTextResources(item.input, includePages, labelCache)) {
+        for (const candidate of collectTextResources(
+          item.input,
+          includePages,
+          labelCache,
+        )) {
           addCandidate(candidate, turnIndex);
         }
       } else if (
@@ -464,26 +542,41 @@ function collectExternalResources(
         item.error == null &&
         item.result != null
       ) {
-        for (const candidate of getToolCallCandidates(item as unknown as McpToolCall, apps)) {
+        for (const candidate of getToolCallCandidates(
+          item as unknown as McpToolCall,
+          apps,
+        )) {
           addCandidate(candidate, turnIndex);
         }
       }
     }
-    for (const candidate of collectTextResources(turn.params.input, includePages, labelCache)) {
+    for (const candidate of collectTextResources(
+      turn.params.input,
+      includePages,
+      labelCache,
+    )) {
       addCandidate(candidate, turnIndex);
     }
   }
 
-  const activityOrder: ExternalResourceActivity[] = ["provided", "read", "created", "updated"];
+  const activityOrder: ExternalResourceActivity[] = [
+    "provided",
+    "read",
+    "created",
+    "updated",
+  ];
   return merged.map((resource) => ({
     key: resource.key,
     url: resource.url,
     title: resource.title,
     mimeType: resource.mimeType,
-    activities: activityOrder.filter((activity) => resource.activities.has(activity)),
+    activities: activityOrder.filter((activity) =>
+      resource.activities.has(activity),
+    ),
     isSource: Array.from(resource.activitiesByTurn.values()).some(
       (activities) =>
-        activities.has("provided") || (activities.has("read") && !activities.has("created")),
+        activities.has("provided") ||
+        (activities.has("read") && !activities.has("created")),
     ),
     provider: resource.provider,
     openInitiator: resource.openInitiator,
@@ -495,10 +588,13 @@ function isExternalSource(resource: ExternalResource): boolean {
 }
 
 function isWrittenExternalResource(resource: ExternalResource): boolean {
-  return resource.activities.includes("created") || resource.activities.includes("updated");
+  return (
+    resource.activities.includes("created") ||
+    resource.activities.includes("updated")
+  );
 }
 
-function initializeLocalConversationExternalResources(): void {
+const initializeLocalConversationExternalResources = once((): void => {
   initializeMarkdownParser();
   initializeUtilities();
   initializeAppMatching();
@@ -508,7 +604,7 @@ function initializeLocalConversationExternalResources(): void {
   initializeGoogleWorkspaceTools();
   void parseMarkdown;
   void walkMarkdown;
-}
+});
 
 export {
   isExternalSource as a,
