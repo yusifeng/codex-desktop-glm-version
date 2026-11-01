@@ -1,14 +1,21 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { transform } from "esbuild";
+import { build } from "esbuild";
 
-const source = fs.readFileSync(
-  new URL("../src/main/main-app/remote/codex-app-config-runtime.ts", import.meta.url),
-  "utf8",
-);
-const transpiled = await transform(source, { loader: "ts", format: "esm", target: "es2022" });
+const modulePath = new URL(
+  "../src/main/main-app/remote/codex-app-config-runtime.ts",
+  import.meta.url,
+).pathname;
+const bundled = await build({
+  entryPoints: [modulePath],
+  bundle: true,
+  format: "esm",
+  platform: "node",
+  target: "node22",
+  write: false,
+});
 const { createCodexAppConfigRuntime } = await import(
-  `data:text/javascript;base64,${Buffer.from(transpiled.code).toString("base64")}`
+  `data:text/javascript;base64,${Buffer.from(bundled.outputFiles[0].text).toString("base64")}`
 );
 
 let assertions = 0;
@@ -26,6 +33,13 @@ const keys = {
   appliedRemoteDeclarations: "applied",
 };
 const warnings = [];
+const configWarnings = [];
+const dialogCalls = [];
+const clipboardWrites = [];
+let configExists = true;
+let configSource = "{}";
+let configReadError = null;
+let dialogResponse = 1;
 let uuid = 0;
 const runtime = createCodexAppConfigRuntime({
   keys,
@@ -34,8 +48,100 @@ const runtime = createCodexAppConfigRuntime({
   defaultProjectLabel: (path) => path.split("/").filter(Boolean).at(-1) ?? "root",
   hostIdForSshAlias: (alias) => `discovered:${alias}`,
   randomUUID: () => `uuid-${++uuid}`,
+  joinPath: (...parts) => parts.join("/"),
+  existsSync: () => configExists,
+  readFile: async () => {
+    if (configReadError != null) throw configReadError;
+    return configSource;
+  },
+  dialog: {
+    showMessageBox: async (...args) => {
+      dialogCalls.push(args);
+      return { response: dialogResponse };
+    },
+  },
+  clipboard: { writeText: (text) => clipboardWrites.push(text) },
+  configLogger: { warning: (...args) => configWarnings.push(args) },
   logger: { warning: (...args) => warnings.push(args) },
 });
+
+equal(runtime.codexAppConfigPath("/codex-home"), "/codex-home/codex-app/config.json");
+configExists = false;
+equal(await runtime.loadCodexAppConfig("/codex-home"), {
+  status: "missing",
+  configPath: "/codex-home/codex-app/config.json",
+});
+configExists = true;
+configSource = JSON.stringify({
+  remoteConnectionMaxRetryAttempts: 2,
+  sshConnectTimeoutSeconds: 8,
+  remoteConnections: [{ sshAlias: " host ", projects: [{ remotePath: " /repo " }] }],
+});
+equal(await runtime.loadCodexAppConfig("/codex-home"), {
+  status: "loaded",
+  configPath: "/codex-home/codex-app/config.json",
+  config: {
+    version: 1,
+    remoteConnectionMaxRetryAttempts: 2,
+    sshConnectTimeoutSeconds: 8,
+    remoteConnections: [{ sshAlias: "host", projects: [{ remotePath: "/repo" }] }],
+  },
+});
+configReadError = new Error("read denied");
+equal((await runtime.loadCodexAppConfig("/codex-home")).status, "read-error");
+equal(configWarnings.at(-1)[0], "failed_to_read_config");
+configReadError = null;
+configSource = "{";
+equal((await runtime.loadCodexAppConfig("/codex-home")).status, "invalid-json");
+equal(configWarnings.at(-1)[0], "failed_to_parse_config");
+configSource = JSON.stringify({ version: 7 });
+equal(await runtime.loadCodexAppConfig("/codex-home"), {
+  status: "unsupported-version",
+  configPath: "/codex-home/codex-app/config.json",
+  version: 7,
+  supportedVersion: 1,
+});
+equal(configWarnings.at(-1)[0], "unsupported_config_version");
+configSource = JSON.stringify({ remoteConnections: [{ sshAlias: "" }] });
+equal((await runtime.loadCodexAppConfig("/codex-home")).status, "invalid-config");
+equal(configWarnings.at(-1)[0], "invalid_config");
+
+const missingMessage = runtime.formatCodexAppConfigError({
+  status: "missing",
+  configPath: "/missing/config.json",
+});
+equal(missingMessage.message, "ChatGPT couldn't find remote setup config");
+equal(missingMessage.detail.includes("Expected file: /missing/config.json"), true);
+equal(
+  runtime.formatCodexAppConfigError({
+    status: "applied",
+    configPath: "/config.json",
+    result: { missingSshAliases: [] },
+  }),
+  null,
+);
+const partialMessage = runtime.formatCodexAppConfigError({
+  status: "applied",
+  configPath: "/config.json",
+  result: { missingSshAliases: ["alpha", "beta"] },
+});
+equal(partialMessage.detail.includes("- alpha\n- beta"), true);
+dialogResponse = 0;
+await runtime.showCodexAppConfigResult({}, {
+  status: "unexpected-error",
+  configPath: "/config.json",
+  error: new Error("boom"),
+});
+equal(dialogCalls.length, 1);
+equal(dialogCalls[0][1].buttons, ["Copy details", "OK"]);
+equal(clipboardWrites.length, 1);
+equal(clipboardWrites[0].includes("Error: boom"), true);
+await runtime.showCodexAppConfigResult({}, {
+  status: "applied",
+  configPath: "/config.json",
+  result: { missingSshAliases: [] },
+});
+equal(dialogCalls.length, 1);
 
 function createState(initial = {}) {
   const values = new Map(Object.entries(initial));
@@ -221,10 +327,19 @@ const windowContext = fs.readFileSync(
 );
 equal(main.includes('require("./main-app/remote/codex-app-config-runtime.js")'), true);
 equal(main.includes("createCodexAppConfigRuntime({"), true);
+equal(main.includes("loadCodexAppConfig,"), true);
+equal(main.includes("showCodexAppConfigResult(e,"), true);
+equal(main.includes("configPath: codexAppConfigPath(V.codexHome)"), true);
+equal(main.includes("function vl("), false);
+equal(main.includes("async function xoe("), false);
+equal(main.includes("async function yl("), false);
+equal(main.includes("function Soe("), false);
 equal(main.includes("function dOe("), false);
 equal(main.includes("async function fOe("), false);
 equal(main.includes("async function hOe("), false);
 equal(main.includes("function gOe("), false);
+equal(windowContext.includes("let t = await loadCodexAppConfig(e);"), true);
+equal(windowContext.includes("await xoe(e)"), false);
 equal(windowContext.includes("stageRemoteConnectionDeclarations({"), true);
 equal(windowContext.includes("await applyRemoteDeclarations({"), true);
 

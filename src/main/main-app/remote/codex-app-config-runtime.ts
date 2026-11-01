@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 type StateKey = unknown;
 
 type GlobalState = {
@@ -16,9 +18,32 @@ type RemoteConnectionDeclaration = {
 };
 
 type CodexAppConfig = {
+  version?: 1;
   remoteConnections: RemoteConnectionDeclaration[];
   remoteConnectionMaxRetryAttempts?: number;
+  sshConnectTimeoutSeconds?: number;
 };
+
+type ConfigLoadResult =
+  | { status: "loaded"; configPath: string; config: CodexAppConfig }
+  | { status: "missing"; configPath: string }
+  | { status: "read-error" | "invalid-json"; configPath: string; error: unknown }
+  | {
+      status: "unsupported-version";
+      configPath: string;
+      version: number;
+      supportedVersion: 1;
+    }
+  | { status: "invalid-config"; configPath: string; error: z.ZodError };
+
+type ConfigApplicationResult =
+  | ConfigLoadResult
+  | {
+      status: "applied";
+      configPath: string;
+      result: { missingSshAliases: string[] };
+    }
+  | { status: "unexpected-error"; configPath: string; error: unknown };
 
 type ManagedRemoteConnection = {
   hostId: string;
@@ -53,6 +78,30 @@ type RuntimeDependencies = {
   defaultProjectLabel(path: string): string;
   hostIdForSshAlias(alias: string): string;
   randomUUID(): string;
+  joinPath(...parts: string[]): string;
+  existsSync(path: string): boolean;
+  readFile(path: string, encoding: "utf8"): Promise<string>;
+  dialog: {
+    showMessageBox(
+      parentWindow: unknown,
+      options: {
+        type: "error";
+        buttons: string[];
+        defaultId: number;
+        cancelId: number;
+        noLink: boolean;
+        message: string;
+        detail: string;
+      },
+    ): Promise<{ response: number }>;
+  };
+  clipboard: { writeText(text: string): void };
+  configLogger: {
+    warning(
+      message: string,
+      fields: { safe: Record<string, unknown>; sensitive: Record<string, unknown> },
+    ): void;
+  };
   logger: {
     warning(
       message: string,
@@ -60,6 +109,26 @@ type RuntimeDependencies = {
     ): void;
   };
 };
+
+const SUPPORTED_CONFIG_VERSION = 1 as const;
+const versionProbeSchema = z.object({ version: z.number().int().optional() });
+const remoteProjectDeclarationSchema = z
+  .object({ remotePath: z.string().trim().min(1), label: z.string().optional() })
+  .strict();
+const remoteConnectionDeclarationSchema = z
+  .object({
+    sshAlias: z.string().trim().min(1),
+    projects: z.array(remoteProjectDeclarationSchema).default([]),
+  })
+  .strict();
+const codexAppConfigSchema = z
+  .object({
+    version: z.literal(SUPPORTED_CONFIG_VERSION).optional().default(SUPPORTED_CONFIG_VERSION),
+    remoteConnectionMaxRetryAttempts: z.number().int().nonnegative().optional(),
+    sshConnectTimeoutSeconds: z.number().int().nonnegative().optional(),
+    remoteConnections: z.array(remoteConnectionDeclarationSchema).default([]),
+  })
+  .strict();
 
 type RemoteConnectionMatch = {
   connectionConfig: RemoteConnectionDeclaration;
@@ -104,6 +173,188 @@ function stringArraysEqual(left: string[], right: string[]) {
 /** Restores the codex-app/config remote connection and project declaration runtime. */
 export function createCodexAppConfigRuntime(dependencies: RuntimeDependencies) {
   const { keys } = dependencies;
+
+  function codexAppConfigPath(codexHome: string) {
+    return dependencies.joinPath(codexHome, "codex-app", "config.json");
+  }
+
+  async function loadCodexAppConfig(codexHome: string): Promise<ConfigLoadResult> {
+    const configPath = codexAppConfigPath(codexHome);
+    if (!dependencies.existsSync(configPath)) return { status: "missing", configPath };
+
+    let source: string;
+    try {
+      source = await dependencies.readFile(configPath, "utf8");
+    } catch (error) {
+      dependencies.configLogger.warning("failed_to_read_config", {
+        safe: {},
+        sensitive: { configPath, error },
+      });
+      return { status: "read-error", configPath, error };
+    }
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(source);
+    } catch (error) {
+      dependencies.configLogger.warning("failed_to_parse_config", {
+        safe: {},
+        sensitive: { configPath, error },
+      });
+      return { status: "invalid-json", configPath, error };
+    }
+
+    const versionProbe = versionProbeSchema.safeParse(parsed);
+    if (
+      versionProbe.success &&
+      versionProbe.data.version != null &&
+      versionProbe.data.version !== SUPPORTED_CONFIG_VERSION
+    ) {
+      dependencies.configLogger.warning("unsupported_config_version", {
+        safe: {
+          version: versionProbe.data.version,
+          supportedVersion: SUPPORTED_CONFIG_VERSION,
+        },
+        sensitive: { configPath },
+      });
+      return {
+        status: "unsupported-version",
+        configPath,
+        version: versionProbe.data.version,
+        supportedVersion: SUPPORTED_CONFIG_VERSION,
+      };
+    }
+
+    const result = codexAppConfigSchema.safeParse(parsed);
+    if (result.success)
+      return { status: "loaded", configPath, config: result.data as CodexAppConfig };
+    dependencies.configLogger.warning("invalid_config", {
+      safe: {},
+      sensitive: { configPath, error: result.error },
+    });
+    return { status: "invalid-config", configPath, error: result.error };
+  }
+
+  function formatCodexAppConfigError(result: ConfigApplicationResult) {
+    switch (result.status) {
+      case "loaded":
+        return null;
+      case "applied": {
+        const { missingSshAliases } = result.result;
+        return missingSshAliases.length === 0
+          ? null
+          : {
+              message: "ChatGPT couldn't finish remote setup",
+              detail: [
+                "Your remote workspace was not set up completely.",
+                "",
+                "Please copy these details and send them to your administrator.",
+                "",
+                "Details:",
+                "ChatGPT could not find these SSH aliases after checking SSH config:",
+                "",
+                ...missingSshAliases.map((alias) => `- ${alias}`),
+                "",
+                `Config file: ${result.configPath}`,
+                "",
+                "Ask your administrator to confirm that the setup command completed and that these SSH aliases exist.",
+              ].join("\n"),
+            };
+      }
+      case "missing":
+        return {
+          message: "ChatGPT couldn't find remote setup config",
+          detail: [
+            "Your remote workspace was not set up completely.",
+            "",
+            "Please copy these details and send them to your administrator.",
+            "",
+            "Details:",
+            "ChatGPT could not find the setup config file.",
+            "",
+            `Expected file: ${result.configPath}`,
+          ].join("\n"),
+        };
+      case "read-error":
+        return configReadError(
+          "ChatGPT couldn't read remote setup config",
+          "ChatGPT could not read the setup config file.",
+          result,
+        );
+      case "invalid-json":
+        return configReadError(
+          "ChatGPT couldn't read remote setup config",
+          "The setup config file is not valid JSON.",
+          result,
+        );
+      case "unsupported-version":
+        return {
+          message: "ChatGPT couldn't apply remote setup config",
+          detail: [
+            "Your remote workspace was not set up completely.",
+            "",
+            "Please copy these details and send them to your administrator.",
+            "",
+            "Details:",
+            `Setup config version ${result.version} is not supported by this version of ChatGPT.`,
+            "",
+            `Supported version: ${result.supportedVersion}`,
+            `Config file: ${result.configPath}`,
+          ].join("\n"),
+        };
+      case "invalid-config":
+        return configReadError(
+          "ChatGPT couldn't apply remote setup config",
+          "The setup config file does not match the format ChatGPT expects.",
+          result,
+        );
+      case "unexpected-error":
+        return configReadError(
+          "ChatGPT couldn't finish remote setup",
+          "ChatGPT hit an unexpected error while applying the setup config.",
+          result,
+        );
+    }
+  }
+
+  function configReadError(
+    message: string,
+    explanation: string,
+    result: { configPath: string; error: unknown },
+  ) {
+    return {
+      message,
+      detail: [
+        "Your remote workspace was not set up completely.",
+        "",
+        "Please copy these details and send them to your administrator.",
+        "",
+        "Details:",
+        explanation,
+        "",
+        `Config file: ${result.configPath}`,
+        `Error: ${result.error instanceof Error ? result.error.message : String(result.error)}`,
+      ].join("\n"),
+    };
+  }
+
+  async function showCodexAppConfigResult(
+    parentWindow: unknown,
+    result: ConfigApplicationResult,
+  ) {
+    const error = formatCodexAppConfigError(result);
+    if (error == null) return;
+    const { response } = await dependencies.dialog.showMessageBox(parentWindow, {
+      type: "error",
+      buttons: ["Copy details", "OK"],
+      defaultId: 1,
+      cancelId: 1,
+      noLink: true,
+      message: error.message,
+      detail: error.detail,
+    });
+    if (response === 0) dependencies.clipboard.writeText(error.detail);
+  }
 
   function stageRemoteConnectionDeclarations({
     config,
@@ -413,5 +664,12 @@ export function createCodexAppConfigRuntime(dependencies: RuntimeDependencies) {
     };
   }
 
-  return { stageRemoteConnectionDeclarations, applyRemoteDeclarations };
+  return {
+    codexAppConfigPath,
+    loadCodexAppConfig,
+    formatCodexAppConfigError,
+    showCodexAppConfigResult,
+    stageRemoteConnectionDeclarations,
+    applyRemoteDeclarations,
+  };
 }

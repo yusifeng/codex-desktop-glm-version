@@ -11,6 +11,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 
 ## Recent semantic extraction suites
 
+- [`test-main-codex-app-config-runtime.mjs`](./test-main-codex-app-config-runtime.mjs)
 - [`test-main-automation-scheduler-runtime.mjs`](./test-main-automation-scheduler-runtime.mjs)
 - [`test-main-automation-heartbeat-runtime.mjs`](./test-main-automation-heartbeat-runtime.mjs)
 - [`test-main-automation-execution-policy.mjs`](./test-main-automation-execution-policy.mjs)
@@ -92,7 +93,6 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-main-habitat-automation-runtime.mjs`](./test-main-habitat-automation-runtime.mjs)
 - [`test-main-remote-control-client-runtime.mjs`](./test-main-remote-control-client-runtime.mjs)
 - [`test-main-host-app-server-assembly.mjs`](./test-main-host-app-server-assembly.mjs)
-- [`test-main-codex-app-config-runtime.mjs`](./test-main-codex-app-config-runtime.mjs)
 - [`test-main-desktop-capability-services.mjs`](./test-main-desktop-capability-services.mjs)
 - [`test-main-account-inputs-owner.mjs`](./test-main-account-inputs-owner.mjs)
 - [`test-main-window-rpc-service-adapters.mjs`](./test-main-window-rpc-service-adapters.mjs)

@@ -174,6 +174,14 @@ const main = fs.readFileSync(
   new URL(".reference/originals/main/main-C-Mhak1n.ts", root),
   "utf8",
 );
+const codexAppConfigRuntime = fs.readFileSync(
+  new URL("src/main/main-app/remote/codex-app-config-runtime.ts", root),
+  "utf8",
+);
+const windowContext = fs.readFileSync(
+  new URL("src/main/main-app/window/window-context.ts", root),
+  "utf8",
+);
 const automationCronRun = fs.readFileSync(
   new URL("src/main/main-app/automations/cron-run.ts", root),
   "utf8",
@@ -595,6 +603,16 @@ assert.equal(main.includes("function EOe("), false, "generated environment signa
 assert.equal(main.includes("function DOe("), false, "generated environment signal projector must be removed");
 assert.equal(main.includes("ApplicationMenuSnapshotService,"), true, "semantic menu snapshot service must be wired");
 assert.equal(main.includes("createCodexAppConfigRuntime({"), true, "real codex app config runtime is wired");
+assert.equal(codexAppConfigRuntime.includes("async function loadCodexAppConfig("), true, "config runtime must own disk loading");
+assert.equal(codexAppConfigRuntime.includes("function formatCodexAppConfigError("), true, "config runtime must own error projection");
+assert.equal(main.includes("loadCodexAppConfig,"), true, "semantic config loader must be wired");
+assert.equal(main.includes("showCodexAppConfigResult(e,"), true, "deep-link config result UI must use semantic runtime");
+assert.equal(main.includes("configPath: codexAppConfigPath(V.codexHome)"), true, "deep-link failure must use semantic config path");
+assert.equal(main.includes("function vl("), false, "generated config path helper must be removed");
+assert.equal(main.includes("async function xoe("), false, "generated config loader must be removed");
+assert.equal(main.includes("async function yl("), false, "generated config result dialog must be removed");
+assert.equal(main.includes("function Soe("), false, "generated config error formatter must be removed");
+assert.equal(windowContext.includes("await loadCodexAppConfig(e)"), true, "WindowContext must consume semantic config loader");
 assert.equal(main.includes("function dOe("), false, "generated remote connection declaration stager must be removed");
 assert.equal(main.includes("async function fOe("), false, "generated remote declaration apply owner must be removed");
 assert.equal(main.includes("function pOe("), false, "generated retry state updater must be removed");
@@ -972,4 +990,4 @@ for (const generatedName of ["pae", "mae", "Os", "ks", "As", "hae", "js", "gae"]
   );
 }
 
-console.log("1020 main unwired-owner skeleton assertions passed");
+console.log("1030 main unwired-owner skeleton assertions passed");

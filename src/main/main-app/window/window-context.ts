@@ -230,7 +230,7 @@ export function createWindowContextClass(dependencies) {
     getThreadSummariesDb,
     wie,
     x,
-    xoe,
+    loadCodexAppConfig,
     y,
     OwlRuntimeFeaturesService,
     y8e,
@@ -1567,7 +1567,7 @@ export function createWindowContextClass(dependencies) {
             });
       }
       async applyCodexAppConfigFromDisk(e) {
-        let t = await xoe(e);
+        let t = await loadCodexAppConfig(e);
         return t.status === `loaded`
           ? {
               status: `applied`,

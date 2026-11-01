@@ -2710,203 +2710,6 @@ var ChunkedWebContentsMessageSender = createChunkedWebContentsMessageSenderClass
   createLogger: r.i,
   inlineMessageChannel: a.At,
 });
-var gl = r.i(`codex-app-config`),
-  hoe = `codex-app`,
-  goe = `config.json`,
-  _l = 1,
-  _oe = n.wf({ version: n.Cf().int().optional() }),
-  voe = n.wf({ remotePath: n.Of().trim().min(1), label: n.Of().optional() }).strict(),
-  yoe = n.wf({ sshAlias: n.Of().trim().min(1), projects: n.hf(voe).default([]) }).strict(),
-  boe = n
-    .wf({
-      version: n.bf(_l).optional().default(1),
-      remoteConnectionMaxRetryAttempts: n.Cf().int().nonnegative().optional(),
-      sshConnectTimeoutSeconds: n.Cf().int().nonnegative().optional(),
-      remoteConnections: n.hf(yoe).default([]),
-    })
-    .strict();
-function vl(e) {
-  return (0, h.join)(e, hoe, goe);
-}
-async function xoe(e) {
-  let t = vl(e);
-  if (!(0, v.existsSync)(t)) return { status: `missing`, configPath: t };
-  let n;
-  try {
-    n = await (0, b.readFile)(t, `utf8`);
-  } catch (e) {
-    return (
-      gl().warning(`failed_to_read_config`, { safe: {}, sensitive: { configPath: t, error: e } }),
-      { status: `read-error`, configPath: t, error: e }
-    );
-  }
-  let r;
-  try {
-    r = JSON.parse(n);
-  } catch (e) {
-    return (
-      gl().warning(`failed_to_parse_config`, { safe: {}, sensitive: { configPath: t, error: e } }),
-      { status: `invalid-json`, configPath: t, error: e }
-    );
-  }
-  let i = _oe.safeParse(r);
-  if (i.success && i.data.version != null && i.data.version !== _l)
-    return (
-      gl().warning(`unsupported_config_version`, {
-        safe: { version: i.data.version, supportedVersion: _l },
-        sensitive: { configPath: t },
-      }),
-      {
-        status: `unsupported-version`,
-        configPath: t,
-        version: i.data.version,
-        supportedVersion: _l,
-      }
-    );
-  let a = boe.safeParse(r);
-  return a.success
-    ? { status: `loaded`, configPath: t, config: a.data }
-    : (gl().warning(`invalid_config`, { safe: {}, sensitive: { configPath: t, error: a.error } }),
-      { status: `invalid-config`, configPath: t, error: a.error });
-}
-async function yl(e, t) {
-  let n = Soe(t);
-  n != null &&
-    (
-      await l.dialog.showMessageBox(e, {
-        type: `error`,
-        buttons: [`Copy details`, `OK`],
-        defaultId: 1,
-        cancelId: 1,
-        noLink: !0,
-        message: n.message,
-        detail: n.detail,
-      })
-    ).response === 0 &&
-    l.clipboard.writeText(n.detail);
-}
-function Soe(e) {
-  switch (e.status) {
-    case `applied`: {
-      let { missingSshAliases: t } = e.result;
-      return t.length === 0
-        ? null
-        : {
-            message: `ChatGPT couldn't finish remote setup`,
-            detail: [
-              `Your remote workspace was not set up completely.`,
-              ``,
-              `Please copy these details and send them to your administrator.`,
-              ``,
-              `Details:`,
-              `ChatGPT could not find these SSH aliases after checking SSH config:`,
-              ``,
-              ...t.map((e) => `- ${e}`),
-              ``,
-              `Config file: ${e.configPath}`,
-              ``,
-              `Ask your administrator to confirm that the setup command completed and that these SSH aliases exist.`,
-            ].join(`
-`),
-          };
-    }
-    case `missing`:
-      return {
-        message: `ChatGPT couldn't find remote setup config`,
-        detail: [
-          `Your remote workspace was not set up completely.`,
-          ``,
-          `Please copy these details and send them to your administrator.`,
-          ``,
-          `Details:`,
-          `ChatGPT could not find the setup config file.`,
-          ``,
-          `Expected file: ${e.configPath}`,
-        ].join(`
-`),
-      };
-    case `read-error`:
-      return {
-        message: `ChatGPT couldn't read remote setup config`,
-        detail: [
-          `Your remote workspace was not set up completely.`,
-          ``,
-          `Please copy these details and send them to your administrator.`,
-          ``,
-          `Details:`,
-          `ChatGPT could not read the setup config file.`,
-          ``,
-          `Config file: ${e.configPath}`,
-          `Error: ${e.error instanceof Error ? e.error.message : String(e.error)}`,
-        ].join(`
-`),
-      };
-    case `invalid-json`:
-      return {
-        message: `ChatGPT couldn't read remote setup config`,
-        detail: [
-          `Your remote workspace was not set up completely.`,
-          ``,
-          `Please copy these details and send them to your administrator.`,
-          ``,
-          `Details:`,
-          `The setup config file is not valid JSON.`,
-          ``,
-          `Config file: ${e.configPath}`,
-          `Error: ${e.error instanceof Error ? e.error.message : String(e.error)}`,
-        ].join(`
-`),
-      };
-    case `unsupported-version`:
-      return {
-        message: `ChatGPT couldn't apply remote setup config`,
-        detail: [
-          `Your remote workspace was not set up completely.`,
-          ``,
-          `Please copy these details and send them to your administrator.`,
-          ``,
-          `Details:`,
-          `Setup config version ${e.version} is not supported by this version of ChatGPT.`,
-          ``,
-          `Supported version: ${e.supportedVersion}`,
-          `Config file: ${e.configPath}`,
-        ].join(`
-`),
-      };
-    case `invalid-config`:
-      return {
-        message: `ChatGPT couldn't apply remote setup config`,
-        detail: [
-          `Your remote workspace was not set up completely.`,
-          ``,
-          `Please copy these details and send them to your administrator.`,
-          ``,
-          `Details:`,
-          `The setup config file does not match the format ChatGPT expects.`,
-          ``,
-          `Config file: ${e.configPath}`,
-          `Error: ${e.error.message}`,
-        ].join(`
-`),
-      };
-    case `unexpected-error`:
-      return {
-        message: `ChatGPT couldn't finish remote setup`,
-        detail: [
-          `Your remote workspace was not set up completely.`,
-          ``,
-          `Please copy these details and send them to your administrator.`,
-          ``,
-          `Details:`,
-          `ChatGPT hit an unexpected error while applying the setup config.`,
-          ``,
-          `Config file: ${e.configPath}`,
-          `Error: ${e.error instanceof Error ? e.error.message : String(e.error)}`,
-        ].join(`
-`),
-      };
-  }
-}
 var yu = e.a(n.en());
 var {
   migrations: projectLocalDataMigrations,
@@ -20456,8 +20259,13 @@ var HostedManagerRegistry = createHostedManagerRegistryClass({
   identitiesEqual: isSameAuthIdentity,
   scheduleMicrotask: queueMicrotask,
 });
-var { stageRemoteConnectionDeclarations, applyRemoteDeclarations } =
-  createCodexAppConfigRuntime({
+var {
+  codexAppConfigPath,
+  loadCodexAppConfig,
+  showCodexAppConfigResult,
+  stageRemoteConnectionDeclarations,
+  applyRemoteDeclarations,
+} = createCodexAppConfigRuntime({
     keys: {
       managedRemoteConnections: n.iu.CODEX_MANAGED_REMOTE_CONNECTIONS,
       remoteProjects: n.iu.REMOTE_PROJECTS,
@@ -20471,6 +20279,12 @@ var { stageRemoteConnectionDeclarations, applyRemoteDeclarations } =
     defaultProjectLabel: n._a,
     hostIdForSshAlias: n.ys,
     randomUUID: _.randomUUID,
+    joinPath: h.join,
+    existsSync: v.existsSync,
+    readFile: b.readFile,
+    dialog: l.dialog,
+    clipboard: l.clipboard,
+    configLogger: r.i(`codex-app-config`)(),
     logger: r.i(`codex-app-config/apply`)(),
   });
 var AOe = createHabitatAutomationsServiceClass({
@@ -48095,7 +47909,7 @@ var G5 = r.r(`WindowContext`),
     getThreadSummariesDb,
     wie,
     x,
-    xoe,
+    loadCodexAppConfig,
     y,
     OwlRuntimeFeaturesService,
     y8e,
@@ -53852,7 +53666,7 @@ async function Ust() {
       projectsManager: q,
       applyCodexAppConfig: async (e) => {
         try {
-          await yl(e, await K.applyCodexAppConfigFromDisk(V.codexHome));
+          await showCodexAppConfigResult(e, await K.applyCodexAppConfigFromDisk(V.codexHome));
         } catch (t) {
           (r
             .n()
@@ -53860,7 +53674,11 @@ async function Ust() {
               safe: {},
               sensitive: { error: t },
             }),
-            await yl(e, { status: `unexpected-error`, configPath: vl(V.codexHome), error: t }));
+            await showCodexAppConfigResult(e, {
+              status: `unexpected-error`,
+              configPath: codexAppConfigPath(V.codexHome),
+              error: t,
+            }));
         }
       },
       getLocalAppServerConnection: Pe,

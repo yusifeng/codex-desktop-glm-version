@@ -3749,3 +3749,13 @@ availability policy 收敛进既有 execution policy，主装配层只注入真�
 pending→resolved run、assignment/state hints、permissions/turn、worktree gate、capability/tick、heartbeat blocker、dynamic tools、run-now 与
 dispose；execution policy suite 扩至 55 项，heartbeat/Automations/Habitat/update-tool/fetch 相邻回归通过。测试索引 1844，
 no-unwired gate 扩至 1020 项。
+
+### 收敛既有 owner：Codex app config disk/UI runtime
+
+扩展既有 `remote/codex-app-config-runtime.ts`，使同一 typed owner 除远程 connection/project declaration 应用外，也完整持有
+`codex-app/config.json` 路径、磁盘读取、JSON/version/Zod 校验、失败结果投影、Electron 错误弹窗与 copy-details 行为。
+`WindowContext.applyCodexAppConfigFromDisk` 和 deep-link 应用入口均已改用语义 API，没有建立第二份 config 状态或 facade。
+
+主 chunk 原 `vl/xoe/yl/Soe`、四层 schema 和专用 aliases 共约 197 行已物理删除。focused suite 扩至 65 项，覆盖 missing/read/
+JSON/version/schema、默认值与 trim、全部错误文案、dialog/copy/no-op，并与 WindowContext lifecycle、ProjectsManager、remote
+connections 共 133 项相邻回归通过；测试索引仍为 1844 个唯一脚本，no-unwired gate 扩至 1030 项。
