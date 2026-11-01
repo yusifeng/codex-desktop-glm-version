@@ -125,6 +125,8 @@ const realOwners = [
   ["src/main/main-app/tray/tray-lifecycle.ts", "createTrayLifecycle"],
   ["src/main/main-app/tray/native-status-item-event-protocol.ts", "createNativeStatusItemEventProtocol"],
   ["src/main/main-app/sidebar/thread-section-engine.ts", "ThreadSectionEngine"],
+  ["src/main/main-app/misc/env-toml-stringifier.ts", "stringifyToml"],
+  ["src/main/main-app/window/thread-storage-keys.ts", "threadClientIdStorageKey"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -794,5 +796,23 @@ assert.equal(main.includes("function _t("), false, "generated thread ordering po
 assert.equal(main.includes("function bt("), false, "generated Codex-home policy must be removed");
 assert.equal(main.includes("function ht("), false, "dead generated personality predicate must be removed");
 assert.equal(main.includes("function gt("), false, "dead generated personality normalizer must be removed");
+assert.equal(main.includes('require("./main-app/window/thread-storage-keys.js")'), true, "thread storage keys are wired");
+assert.equal(main.includes("Vt: localThreadClientIdStorageKey"), true, "message handler uses the semantic local client key");
+assert.equal(main.includes("tee: threadTabRoutesStorageKey"), true, "message handler uses the semantic tab-routes key");
+assert.equal(main.includes("function Lt("), false, "dead generated workspace-state key must be removed");
+assert.equal(main.includes("function Rt("), false, "dead generated goal command formatter must be removed");
+assert.equal(main.includes("function Bt("), false, "generated thread client key must be removed");
+assert.equal(main.includes("function Vt("), false, "generated local thread client key must be removed");
+assert.equal(main.includes("function tee("), false, "generated thread tab-routes key must be removed");
+assert.equal(main.includes("function ree("), false, "dead generated identity wrapper must be removed");
+assert.equal(main.includes("function Wt("), false, "generated TOML type classifier must be removed");
+assert.equal(main.includes("function aee("), false, "generated TOML table-array classifier must be removed");
+assert.equal(main.includes("function Gt("), false, "generated TOML string encoder must be removed");
+assert.equal(main.includes("function Kt("), false, "generated TOML value serializer must be removed");
+assert.equal(main.includes("function oee("), false, "generated TOML object serializer must be removed");
+assert.equal(main.includes("function see("), false, "generated TOML array serializer must be removed");
+assert.equal(main.includes("function qt("), false, "generated TOML table-array serializer must be removed");
+assert.equal(main.includes("function Jt("), false, "generated TOML table serializer must be removed");
+assert.equal(main.includes("function Yt("), false, "generated TOML entry point must be removed");
 
-console.log("789 main unwired-owner skeleton assertions passed");
+console.log("811 main unwired-owner skeleton assertions passed");

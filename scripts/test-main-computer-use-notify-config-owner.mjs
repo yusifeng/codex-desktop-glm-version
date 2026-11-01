@@ -44,5 +44,10 @@ equal(main.includes('const { ensureComputerUseNotifyConfig: iie } = require("./m
 equal(main.includes("async function iie("), false);
 equal(main.includes("function aie("), false);
 equal(main.includes("function Vo("), false);
-equal(main.includes("ensureNotifyConfig: t = iie"), true);
+const nativePipeService = fs.readFileSync(
+  new URL("../src/main/main-app/computer-use/native-pipe-service.ts", import.meta.url),
+  "utf8",
+);
+equal(nativePipeService.includes('import { ensureComputerUseNotifyConfig } from "./notify-config"'), true);
+equal(nativePipeService.includes("ensureNotifyConfig = ensureComputerUseNotifyConfig"), true);
 console.log(`${assertions} main computer-use notify config owner assertions passed`);

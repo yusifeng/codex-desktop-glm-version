@@ -8,8 +8,9 @@
 //   - 值：number（NaN→nan、±Infinity→±inf、整数在 numbersAsFloat 或非安全
 //     整数时补 `.0`）、bigint/boolean、string（JSON 转义 + \x7f→\u007f）、
 //     date（ISO，非法抛 TypeError）、内联 object/array（`{ }` / `[ ]`）；
-//   - null/undefined 值跳过；symbol/function 抛 TypeError；数组内
-//     null/undefined 抛 TypeError；
+//   - null/undefined 顶层/表值跳过；顶层/表 symbol/function 抛 TypeError；
+//     原实现对内联对象/数组里的 unsupported value 会 fall through 并拼成
+//     `undefined`，这里为保持兼容而保留；数组内 null/undefined 仍抛 TypeError；
 //   - 键：bare（/^[a-z0-9-_]+$/i）原样，否则 JSON 字符串引号；
 //   - maxDepth（默认 1000）防递归失控。
 //
@@ -40,7 +41,7 @@ function encodeString(value: string): string {
 }
 
 /** 单值序列化（原 `Kt`）。 */
-function stringifyValue(value: unknown, type: string, depth: number, numbersAsFloat: boolean): string {
+function stringifyValue(value: unknown, type: string, depth: number, numbersAsFloat: boolean): string | undefined {
   if (depth === 0) throw new Error(`Could not stringify the object: maximum object depth exceeded`);
   if (type === `number`) {
     const num = value as number;
@@ -59,8 +60,8 @@ function stringifyValue(value: unknown, type: string, depth: number, numbersAsFl
   }
   if (type === `object`) return stringifyInlineObject(value as Record<string, unknown>, depth, numbersAsFloat);
   if (type === `array`) return stringifyInlineArray(value as unknown[], depth, numbersAsFloat);
-  // symbol/function 等不可序列化类型（原版在键遍历处抛错；此处兜底同语义）
-  throw new TypeError(`cannot serialize values of type '${type}'`);
+  // 原 Kt 对 unsupported inline values 返回 undefined；顶层 table path 会先抛错。
+  return undefined;
 }
 
 /** 内联对象 `{ k = v, ... }`（原 `oee`）。 */
@@ -73,7 +74,7 @@ function stringifyInlineObject(value: Record<string, unknown>, depth: number, nu
     if (i) out += `, `;
     out += BARE_KEY_PATTERN.test(key) ? key : encodeString(key);
     out += ` = `;
-    out += stringifyValue(value[key], tomlTypeOf(value[key]), depth - 1, numbersAsFloat);
+    out += String(stringifyValue(value[key], tomlTypeOf(value[key]), depth - 1, numbersAsFloat));
   }
   return out + ` }`;
 }
@@ -86,7 +87,7 @@ function stringifyInlineArray(value: unknown[], depth: number, numbersAsFloat: b
     if (i) out += `, `;
     if (value[i] === null || value[i] === undefined)
       throw new TypeError(`arrays cannot contain null or undefined values`);
-    out += stringifyValue(value[i], tomlTypeOf(value[i]), depth - 1, numbersAsFloat);
+    out += String(stringifyValue(value[i], tomlTypeOf(value[i]), depth - 1, numbersAsFloat));
   }
   return out + ` ]`;
 }
@@ -147,7 +148,7 @@ function stringifyTable(
       } else {
         scalars += encodedKey;
         scalars += ` = `;
-        scalars += stringifyValue(table[key], type, depth, numbersAsFloat);
+        scalars += String(stringifyValue(table[key], type, depth, numbersAsFloat));
         scalars += `\n`;
       }
     }

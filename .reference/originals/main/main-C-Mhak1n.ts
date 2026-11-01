@@ -313,6 +313,7 @@ const { createElectronFetchHandlerClass } = require("./main-app/fetch-handler/el
 const { createWindowContextClass } = require("./main-app/window/window-context.js");
 const { createDesktopCapabilityServices } = require("./main-app/window/desktop-capability-services.js");
 const { createElectronMessageHandlerClass } = require("./main-app/window/electron-message-handler.js");
+const { localThreadClientIdStorageKey, threadTabRoutesStorageKey } = require("./main-app/window/thread-storage-keys.js");
 const { createOpenInServiceClass, isOpenableUrl } = require("./main-app/misc/open-in-service.js");
 const { parseRepositoryOrigin } = require("./main-app/misc/git-repository-origin.js");
 const { createLinuxApplicationsRuntime } = require("./main-app/platform/linux-applications.js");
@@ -1047,23 +1048,6 @@ var Mt = [`OwlOpenAIGoLinks`, `OwlRemoteSearchSuggestions`],
   },
   Ft = e.a(n.Oo()),
   It = e.a(n.Do());
-function Lt(e) {
-  return `thread-workspace-state-v1:${e}`;
-}
-function Rt(e) {
-  return `/goal ${e}`;
-}
-var zt = `thread-client-id-v1:`;
-function Bt(e) {
-  return `${zt}${encodeURIComponent(e)}`;
-}
-function Vt(e) {
-  return Bt(`local:${e}`);
-}
-var eee = `thread-tab-routes-v1:`;
-function tee(e) {
-  return `${eee}${encodeURIComponent(e)}`;
-}
 var Ht = `update-resume-state-v1`,
   nee = 9e5;
 var {
@@ -1086,126 +1070,7 @@ var {
   isRemoteControlSessionActive,
   appSessionId: a.on,
 });
-function ree(e) {
-  return e;
-}
-var iee = [`git`],
-  Ut = /^[a-z0-9-_]+$/i;
-function Wt(e) {
-  let t = typeof e;
-  if (t === `object`) {
-    if (Array.isArray(e)) return `array`;
-    if (e instanceof Date) return `date`;
-  }
-  return t;
-}
-function aee(e) {
-  for (let t = 0; t < e.length; t++) if (Wt(e[t]) !== `object`) return !1;
-  return e.length != 0;
-}
-function Gt(e) {
-  return JSON.stringify(e).replace(/\x7f/g, `\\u007f`);
-}
-function Kt(e, t, n, r) {
-  if (n === 0) throw Error(`Could not stringify the object: maximum object depth exceeded`);
-  if (t === `number`)
-    return isNaN(e)
-      ? `nan`
-      : e === 1 / 0
-        ? `inf`
-        : e === -1 / 0
-          ? `-inf`
-          : Number.isInteger(e) && (r || !Number.isSafeInteger(e))
-            ? e.toFixed(1)
-            : e.toString();
-  if (t === `bigint` || t === `boolean`) return e.toString();
-  if (t === `string`) return Gt(e);
-  if (t === `date`) {
-    if (isNaN(e.getTime())) throw TypeError(`cannot serialize invalid date`);
-    return e.toISOString();
-  }
-  if (t === `object`) return oee(e, n, r);
-  if (t === `array`) return see(e, n, r);
-}
-function oee(e, t, n) {
-  let r = Object.keys(e);
-  if (r.length === 0) return `{}`;
-  let i = `{ `;
-  for (let a = 0; a < r.length; a++) {
-    let o = r[a];
-    (a && (i += `, `),
-      (i += Ut.test(o) ? o : Gt(o)),
-      (i += ` = `),
-      (i += Kt(e[o], Wt(e[o]), t - 1, n)));
-  }
-  return i + ` }`;
-}
-function see(e, t, n) {
-  if (e.length === 0) return `[]`;
-  let r = `[ `;
-  for (let i = 0; i < e.length; i++) {
-    if ((i && (r += `, `), e[i] === null || e[i] === void 0))
-      throw TypeError(`arrays cannot contain null or undefined values`);
-    r += Kt(e[i], Wt(e[i]), t - 1, n);
-  }
-  return r + ` ]`;
-}
-function qt(e, t, n, r) {
-  if (n === 0) throw Error(`Could not stringify the object: maximum object depth exceeded`);
-  let i = ``;
-  for (let a = 0; a < e.length; a++)
-    ((i += `${
-      i &&
-      `
-`
-    }[[${t}]]\n`),
-      (i += Jt(0, e[a], t, n, r)));
-  return i;
-}
-function Jt(e, t, n, r, i) {
-  if (r === 0) throw Error(`Could not stringify the object: maximum object depth exceeded`);
-  let a = ``,
-    o = ``,
-    s = Object.keys(t);
-  for (let e = 0; e < s.length; e++) {
-    let c = s[e];
-    if (t[c] !== null && t[c] !== void 0) {
-      let e = Wt(t[c]);
-      if (e === `symbol` || e === `function`)
-        throw TypeError(`cannot serialize values of type '${e}'`);
-      let s = Ut.test(c) ? c : Gt(c);
-      if (e === `array` && aee(t[c]))
-        o +=
-          (o &&
-            `
-`) + qt(t[c], n ? `${n}.${s}` : s, r - 1, i);
-      else if (e === `object`) {
-        let e = n ? `${n}.${s}` : s;
-        o +=
-          (o &&
-            `
-`) + Jt(e, t[c], e, r - 1, i);
-      } else
-        ((a += s),
-          (a += ` = `),
-          (a += Kt(t[c], e, r, i)),
-          (a += `
-`));
-    }
-  }
-  return (e && (a || !o) && (a = a ? `[${e}]\n${a}` : `[${e}]`), a && o ? `${a}\n${o}` : a || o);
-}
-function Yt(e, { maxDepth: t = 1e3, numbersAsFloat: n = !1 } = {}) {
-  if (Wt(e) !== `object`) throw TypeError(`stringify can only be called with an object`);
-  let r = Jt(0, e, ``, t, n);
-  return r[r.length - 1] ===
-    `
-`
-    ? r
-    : r +
-        `
-`;
-}
+var iee = [`git`];
 var cee = class {
     connections = new Map();
     subscribers = new Set();
@@ -36422,7 +36287,7 @@ var r$e = createElectronMessageHandlerClass({
     MainThreadJankSampler,
     Mze,
     OZ,
-    Vt,
+    Vt: localThreadClientIdStorageKey,
     readHostWorktreeSettings,
     XQe,
     ZBe,
@@ -36438,7 +36303,7 @@ var r$e = createElectronMessageHandlerClass({
     rt: threadBrowserTabStorageKey,
     setRemoteControlEnabled,
     setRemoteControlSessionActive,
-    tee,
+    tee: threadTabRoutesStorageKey,
     uEe,
     performanceRequestTtlMs,
     performanceHeartbeatIntervalMs,
@@ -55451,7 +55316,7 @@ var bst = createWorkerManagerClass({
   H9 = createWorkerBusClass({
     WorkerManager: bst,
     createLogger: r.r,
-    createRequestId: () => ree(`main-` + (0, _.randomUUID)()),
+    createRequestId: () => `main-` + (0, _.randomUUID)(),
     channelForWorker: a.Jt,
   });
 var xst = createWorkerRuntimeFactory({

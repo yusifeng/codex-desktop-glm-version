@@ -5508,3 +5508,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   `RollingWindowCounter` 持有 count/sum、窗口 prune 与 compaction。主 chunk 旧 `_t/bt/jt` 删除。
 - 无 consumer 的 `ht/gt` personality helpers 直接删除；utility focused 18 项，worker sampler 源码级 suite 10 项；
   测试索引 1834，no-unwired gate 扩至 789 项。
+
+# 2026-11-01 storage identity and TOML runtime convergence
+
+- 新增并接回 `window/thread-storage-keys.ts`，Electron message handler 直接使用 local-client 与 tab-routes 语义 key；主 chunk
+  旧 `Bt/Vt/tee` 删除。无 consumer 的 `Lt/Rt` 与单次 identity wrapper `ree` 同步清理。
+- 删除主 chunk 重复的 `Ut/Wt/aee/Gt/Kt/oee/see/qt/Jt/Yt` TOML serializer；既有 typed
+  `misc/env-toml-stringifier.ts` 已由五个真实 consumer 使用，并补齐 inline unsupported value 的原始 fallthrough 语义。
+- 新 focused suites 37 项，相关 owner/storage 回归通过；修复 Computer Use notify suite 已过时的 main 直连断言，使其验证当前
+  `native-pipe-service` 真实 consumer。测试索引 1836，no-unwired gate 扩至 811 项。

@@ -3626,3 +3626,15 @@ no-unwired gate 扩至 778 项。
 
 主 chunk 原 `_t/bt/jt/ht/gt` 与 rolling-window 私有状态全部删除，Git worker runtime 直接构造语义 counter。新 utility suite
 18 项、worker sampler suite 恢复为源码级真实执行并扩至 10 项；测试索引 1834，no-unwired gate 扩至 789 项。
+
+### 批量收敛：thread storage identity 与 TOML serializer residue
+
+新增并真实接回 `window/thread-storage-keys.ts`，统一 thread client ID、local thread client ID 与 tab-routes 的版本前缀及
+`encodeURIComponent` 边界；Electron message handler 直接消费语义导出，主 chunk 原 `Bt/Vt/tee` 和常量删除。审计确认
+`Lt` workspace-state key、`Rt` goal formatter 没有 consumer，`ree` 只是单次 identity wrapper，分别作为死代码删除或内联。
+
+主 chunk 旧 `Ut/Wt/aee/Gt/Kt/oee/see/qt/Jt/Yt` TOML serializer 与既有
+`misc/env-toml-stringifier.ts` 完全重复，且后者已由 cowork import、Computer Use notify/approvals 与 browser origin-state 五个
+真实 consumer 使用，因此物理删除旧实现；同时补齐原 `Kt` 对 inline unsupported value fallthrough 为 `undefined` 的兼容细节。
+新 focused suites 共 37 项，TOML 五个 consumer、Electron message handler、browser settings storage 与 Computer Use notify
+相邻回归通过；测试索引 1836，no-unwired gate 扩至 811 项。
