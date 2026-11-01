@@ -312,6 +312,7 @@ export const RECONSTRUCTED_ROUTE_CORE = new Set([
 export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "agent-activity-item-792873f87aad.js",
   "agent-activity-units-9397783428a4.js",
+  "local-conversation-side-chat-48c6730ec06a.js",
   "codex-app-home-beacon-announcement-8c94f69eb080.js",
   "codex-micro-onboarding-host-85407a96e02a.js",
   "composer-utility-bar-a9b94a95b731.js",
@@ -453,7 +454,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ],
   ["content", "content-bd6ed75ea274.js"],
   ["git-settings", "git-settings-537e4135cecb.js"],
-  ["hooks-settings", "hooks-settings-fde35406d6f4.js"],
   ["import-settings", "import-settings-ec2688b74a01.js"],
   ["library-cloud-file-preview", "library-cloud-file-preview-b3ddfaa823c0.js"],
   ["open-conversation-files", "open-a618d40921b2.js"],
@@ -461,11 +461,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["pets-settings-route", "pets-settings-route-965aa70e25ab.js"],
   ["trusted-contact-settings", "trusted-contact-settings-b71f926a1121.js"],
   ["voice-settings", "voice-settings-3a0651cd977e.js"],
-  ["subscription-onboarding", "subscription-onboarding-bdae6e918350.js"],
-  [
-    "subscription-onboarding-content",
-    "subscription-onboarding-dcd9d9af0fe0.js",
-  ],
   ["workbook-review-utils", "workbook-review-utils-3e78f7501b68.js"],
   // Complete eager first-party dependency closure of the four conversation
   // React roots. These owners remove structurally approximate implementations
@@ -488,10 +483,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   [
     "local-conversation-git-actions",
     "local-conversation-git-actions-f71520dad4b4.js",
-  ],
-  [
-    "local-conversation-side-chat",
-    "local-conversation-side-chat-48c6730ec06a.js",
   ],
   ["local-environment-editor", "local-environment-editor-c4a981e88476.js"],
   ["mcp-tool-activity-label", "mcp-tool-activity-label-87ba9ef42b0b.js"],
