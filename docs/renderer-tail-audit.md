@@ -1,5 +1,16 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Git/thread interaction 大批次：`git-branch-switcher`、
+`local-conversation-git-actions` 与 `thread-handoff-modal` 已从 release-faithful owner
+迁到可维护 TypeScript，一次删除 6,342 行原始 owner。此批纠正旧语义实现中被测试固化的
+短导出错位：发布版 `p` 恢复为 Commit Modal、`r` 恢复为 BranchList，query initializer、
+status/recent-branch 查询与 BranchSwitcher 重新接回；conversation actions 恢复 summary menu、
+command registration、commit/push/PR/branch workflow，handoff 恢复 local checkout 与 managed
+worktree 两个方向、branch/workspace/host payload、校验、pending/error 生命周期。新增 30 项
+focused assertions，并通过既有 68 项 Git/worktree cluster、44 项 dialog cluster、typecheck、
+renderer source-build 与 1,888/1,888、0 failures 结构校验。严格剩余由 20 个 / 108,446 行
+降至 17 个 / 102,104 行。
+
 2026-11-02 Composer runtime 大批次：`codex-micro-mini-game-composer`、
 `right-panel-composer-overlay` 与 `sketch-composer-host-core` 已从 release-faithful owner
 迁到可维护 React/TypeScript，一次删除 4,823 行原始 owner。Codex Micro 不再是通用 canvas

@@ -8,6 +8,12 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
 globalThis.__jsx = jsx;
 globalThis.__gitSignals = [];
+globalThis.__gitReact = {
+  useState(initial) {
+    const value = typeof initial === "function" ? initial() : initial;
+    return [value, (next) => { globalThis.__gitLastState = typeof next === "function" ? next(value) : next; }];
+  },
+};
 
 async function loadModule(name) {
   const result = await esbuild.build({
@@ -20,6 +26,7 @@ async function loadModule(name) {
           export const FX=()=>{},ZI={};
           export const pZ=(_scope,value)=>{const signal={value};globalThis.__gitSignals.push(signal);return signal};
           export const I3=()=>globalThis.__jsx;
+          export const e6=globalThis.__gitReact;
         `,
       } : { loader: "js", contents: "export {};" });
     } }],
@@ -94,21 +101,30 @@ branches.n();
 const hostConfig = { id: "local" };
 assert.equal(branches.h({ cwd: "/workspace/my-repo/", hostConfig }), "my-repo");
 assert.equal(branches.h({ cwd: "/workspace/repo", repo: "org/repo", hostConfig }), "org/repo");
-assert.deepEqual(branches.u("/repo", hostConfig, "composer"), { method: "recent-branches", params: { root: "/repo", operationSource: "composer", limit: 100 }, hostConfig });
+const recentQuery = branches.u("/repo", hostConfig, "composer");
+assert.equal(recentQuery.method, "recent-branches");
+assert.deepEqual(recentQuery.params, { root: "/repo", operationSource: "composer", limit: 100 });
+assert.equal(recentQuery.liveQuery.method, "recent-branches");
 const statusQuery = branches.c("/repo", hostConfig, "composer");
 assert.equal(statusQuery.method, "status-summary");
 assert.equal(statusQuery.params.includeUntrackedFiles, false);
 assert.equal(statusQuery.liveQuery.params.includeUntrackedFiles, true);
-assert.match(branches.s({ cwd: "/repo", enabled: true, hostConfig, operationSource: "composer", query: "feat" }), /"query":"feat"/);
-const checkout = branches.f({ cwd: "/repo", hostConfig, hostId: "local" }, "composer");
-assert.deepEqual(checkout.mutationKey, ["vscode", "git-checkout-branch", "/repo", "local"]);
-assert.equal((await checkout.mutationFn({ branch: "feature" })).status, "success");
-const create = branches.r({ cwd: "/repo", hostConfig, hostId: "local" }, "composer");
-assert.equal((await create.mutationFn({ branch: "new", mode: "worktree" })).params.branch, "new");
+assert.equal(typeof branches.d, "object");
+assert.equal(branches.f(), undefined);
+assert.equal(branches.s(), undefined);
 const header = branches.a({ showSetPrefix: true });
 assert.equal(header.props.children[0].props.children, "Branch name");
 assert.equal(header.props.children[1].props.children, "Set prefix");
-assert.equal(branches.p({ id: "git-dialog" }).props.role, "dialog");
+assert.equal(branches.o(), undefined);
+const branchList = branches.r({ branches: ["main", "feature"], repositoryName: "repo", selectedBranch: "main" });
+assert.equal(branchList.props.children[0].props["aria-label"], "Search repo branches");
+assert.equal(branchList.props.children[1].props.children.length, 2);
+let modalClosed = false;
+const commitModal = branches.p({ open: true, target: { cwd: "/repo", hostConfig }, onOpenChange: (value) => { modalClosed = !value; } });
+assert.equal(commitModal.type, "dialog");
+assert.equal(commitModal.props["aria-label"], "Commit");
+commitModal.props.children[4].props.children[0].props.onClick();
+assert.equal(modalClosed, true);
 let opened = false;
 const switcher = branches.t({ cwd: "/repo", gitRoot: "/repo", hostConfig, open: false, onOpenChange: (value) => { opened = value; } });
 assert.equal(switcher.props.children[0].props.children, "repo");

@@ -423,12 +423,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
     "git-action-new-branch-field",
     "git-action-new-branch-field-a2e24da5e504.js",
   ],
-  ["git-branch-switcher", "git-branch-switcher-96861524e333.js"],
-  [
-    "local-conversation-git-actions",
-    "local-conversation-git-actions-f71520dad4b4.js",
-  ],
-  ["thread-handoff-modal", "thread-handoff-modal-ccac59d04293.js"],
   ["thread-panel-toggle-button", "thread-panel-toggle-button-d0ce9733e408.js"],
 ]);
 
