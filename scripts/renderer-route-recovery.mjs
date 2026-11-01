@@ -438,11 +438,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["checkout-session", "session-3ec40b7dd28e.js"],
   ["mark-session-create", "mark-session-create-6f7d531b2a15.js"],
   ["xterm-window-zoom", "xterm-window-zoom-15fe24cf01f9.js"],
-  ["codex-home-announcements", "codex-home-announcements-327826cf904d.js"],
-  [
-    "codex-home-announcements-current",
-    "codex-home-announcements-cc03f986780c.js",
-  ],
   [
     "codex-app-home-beacon-announcement-core",
     "codex-app-home-beacon-announcement-8c94f69eb080.js",
@@ -456,29 +451,16 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["git-settings", "git-settings-537e4135cecb.js"],
   ["hooks-settings", "hooks-settings-fde35406d6f4.js"],
   ["import-settings", "import-settings-ec2688b74a01.js"],
-  [
-    "keyboard-shortcuts-settings",
-    "keyboard-shortcuts-settings-5511d1126168.js",
-  ],
   ["library-cloud-file-preview", "library-cloud-file-preview-b3ddfaa823c0.js"],
   ["open-conversation-files", "open-a618d40921b2.js"],
   ["detached-browser-page", "page-268e2fb6d880.js"],
   ["pets-settings-route", "pets-settings-route-965aa70e25ab.js"],
   ["trusted-contact-settings", "trusted-contact-settings-b71f926a1121.js"],
   ["voice-settings", "voice-settings-3a0651cd977e.js"],
-  [
-    "settings-search-documents",
-    "_virtual_settings-search-documents-d81257e4909b.js",
-  ],
   ["subscription-onboarding", "subscription-onboarding-bdae6e918350.js"],
   [
     "subscription-onboarding-content",
     "subscription-onboarding-dcd9d9af0fe0.js",
-  ],
-  ["home-artifact-templates", "home-artifact-templates-1e0738b7ddeb.js"],
-  [
-    "wallet-onboarding-announcement-content",
-    "wallet-onboarding-announcement-content-28d619ce7d4e.js",
   ],
   ["workbook-review-utils", "workbook-review-utils-3e78f7501b68.js"],
   // Complete eager first-party dependency closure of the four conversation
@@ -541,10 +523,8 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["thread-handoff-modal", "thread-handoff-modal-ccac59d04293.js"],
   ["thread-overflow-menu", "thread-overflow-menu-51894ca4476d.js"],
   ["thread-panel-toggle-button", "thread-panel-toggle-button-d0ce9733e408.js"],
-  ["thread-scroll-layout", "thread-scroll-layout-27da424d79e0.js"],
   ["thread-usage-breakdown", "thread-usage-breakdown-2a2ef1ac41f7.js"],
   ["use-app-connect-flow", "use-app-connect-flow-e16aee878521.js"],
-  ["user-message", "user-message-e36f9e2dfe24.js"],
   ["worktree-setup-auto-fix", "worktree-setup-auto-fix-4dc0f12b7219.js"],
 ]);
 
