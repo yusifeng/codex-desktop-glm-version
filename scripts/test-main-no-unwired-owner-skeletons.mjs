@@ -69,6 +69,7 @@ const realOwners = [
   ["src/main/main-app/remote/codex-app-config-runtime.ts", "createCodexAppConfigRuntime"],
   ["src/main/main-app/app-server/host-client-coordination.ts", "createHostClientCoordinationClass"],
   ["src/main/main-app/app-server/host-assembly.ts", "createHostedAppServerManagerFactory"],
+  ["src/main/main-app/conversation/turn-submission.ts", "runConversationCreationWithFirstTurn"],
   ["src/main/main-app/app-server/cloud-backend.ts", "AppServerFeatureEnablement"],
   ["src/main/main-app/remote-control/client.ts", "authorizeRemoteControlEnvironments"],
   ["src/main/main-app/app-server/transports.ts", "AppServerTransportWslStdio"],
@@ -1180,5 +1181,15 @@ assert.equal(main.includes("resolveCodexHomeRequest: (params) => n.et("), false,
 assert.equal(fsDiagnostics.includes("function collectRolloutDiagnostics"), false, "all-zero rollout diagnostics skeleton must stay removed");
 assert.equal(fsDiagnostics.includes("function countFilesWithBudget"), false, "unconsumed bounded file-count skeleton must stay removed");
 assert.equal(rpcCore.includes("not wired: RPC wire protocol"), false, "throwing RPC facade must stay removed");
+for (const oldTurnOwner of [
+  "var Abe =",
+  "function eC(",
+  "async function wxe(",
+  "async function Txe(",
+  "async function Exe(",
+  "async function Dxe(",
+]) {
+  assert.equal(main.includes(oldTurnOwner), false, `${oldTurnOwner} generated turn-submission belt must stay removed`);
+}
 
-console.log("1216 main unwired-owner skeleton assertions passed");
+console.log("1224 main unwired-owner skeleton assertions passed");

@@ -1,5 +1,13 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成 conversation turn-submission 与 writing-block dead belt 收敛：当前唯一 runtime consumers 已真实使用
+`conversation/turn-submission.ts` 的 safety-buffer retry、follow-up、conversation creation + first turn、continuation owners，并通过
+`markdown/writing-blocks.ts` 复用编辑快照上下文。引用图确认主 chunk 原 `wxe/Txe/Exe/Dxe`、`eC` 及其私有 marked-directive
+适配带仅在岛内互相引用后，整段 1,212 行旧副本物理删除。新增 54 项运行时断言覆盖 revert、settings/message projection、
+callback dup/disposal、empty-first-turn settlement、continuation 和 writing-block extraction/override；防空壳门禁同步锁定旧 belt 不得回流。
+相邻 conversation/turn 回归 163 项、防空壳 1224 项、测试索引 1855、typecheck、chunk verify 11/11 与全量
+`npm run check` 均通过。
+
 完成 rollout diagnostics 真实运行时恢复：新增 `main-app/diagnostics/rollout-diagnostics.ts`，按原 `Zie` 恢复 sessions 年/月/日遍历、
 mtime 新鲜度筛选与上限、JSONL 容错解析、task started/completed 配对、token/wall-time 汇总及 standard/fast/saved 时间估算，并由
 codex-home IPC 的 `resolveCodexHomeRequest` 真实消费。删除原先永远返回全零的同名 skeleton 和无 consumer 的 `Qie` 文件计数骨架；

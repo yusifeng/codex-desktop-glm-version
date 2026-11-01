@@ -1,5 +1,18 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 conversation turn-submission dead belt convergence
+
+主 chunk 仍残留原 `wxe/Txe/Exe/Dxe` turn-submission owners、`eC` writing-block context 及其专用 marked-directive 适配带，
+但当前 `AppServerConversationManager` 的四个真实入口均已消费 `conversation/turn-submission.ts`，writing-block extraction/merge 也由
+`markdown/writing-blocks.ts` 被 turn dispatch/context 消费。AST identifier 审计确认该连续区间所有符号只在岛内互引、没有运行时
+consumer，因此整段 1,212 行旧副本物理删除，而不是删除有效 owner。
+
+新增 54 项 focused runtime assertions，覆盖 paginated retry 的 interrupt/revert/apply/start 顺序、follow-up resume/settings/message
+projection、conversation creation callback dup + settlement + disposer 顺序、continuation，以及 writing-block edited snapshot extraction/override；
+防空壳 gate 同步锁定语义 owner 与旧定义缺席。
+相邻 conversation/turn suites 共 163 项、防空壳 1224 项、1855 项测试索引审计、typecheck、11/11 chunk verify 与
+全量 build check 均通过。
+
 ## 2026-11-01 rollout diagnostics and RPC facade correction
 
 原 `shared/fs-diagnostics.ts` 的 rollout diagnostics 只是固定返回全零的未接线 skeleton；现新增
