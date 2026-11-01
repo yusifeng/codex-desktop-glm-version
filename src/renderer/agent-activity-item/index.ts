@@ -31,8 +31,10 @@
 
 import {
   $3 as runtimeLazy,
+  I3 as getJsxRuntime,
 } from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
+import * as appInitial from "@rchunk/app-initial";
 import { d as appPrimaryInit } from "@rchunk/app-primary";
 import * as presentationChunk from "@rchunk/presentation";
 import * as resultCard from "@rchunk/result-card";
@@ -48,7 +50,7 @@ void presentationChunk; void resultCard; void skillExplorationLabels; void toolA
 
 /** 动态工具描述符（注册表条目）。 */
 export interface DynamicToolDescriptor {
-  namespace: string;
+  namespace: string | null;
   tool: string;
   continuesLiveActivityBetweenCalls?: boolean;
   persistentInCollapsedConversation?: boolean;
@@ -89,33 +91,103 @@ export interface ActivityEntry {
 // 动态工具注册表（原 `mn` = zt + cn + Et + Wt 四表合并）
 // ---------------------------------------------------------------------------
 
-/** 动态工具注册表（四源合并；具体表内容在 presentation/result-card 等依赖接入后装配）。 */
+/** 动态工具注册表（Chrome、环境、设置及 Codex app-control 四源合并）。 */
 const dynamicToolRegistry: DynamicToolDescriptor[] = [];
+let registryInitialized = false;
+
+function releaseValue(alias: string, fallback: string): string {
+  const value = (appInitial as Record<string, unknown>)[alias];
+  return typeof value === "string" ? value : fallback;
+}
+
+function register(descriptor: DynamicToolDescriptor): void {
+  if (!dynamicToolRegistry.some((candidate) => candidate.namespace === descriptor.namespace && candidate.tool === descriptor.tool)) {
+    dynamicToolRegistry.push(descriptor);
+  }
+}
+
+function ensureDynamicToolRegistry(): void {
+  if (registryInitialized) return;
+  registryInitialized = true;
+  const codex = releaseValue("oZt", "codex_app");
+  register({
+    namespace: releaseValue("zsn", "chrome_extension"),
+    tool: releaseValue("vsn", "get_tab_context"),
+    getCompletedSummaryPartKey: (item) => typeof item.callId === "string" ? item.callId : undefined,
+  });
+  for (const namespace of [codex, null]) {
+    register({ namespace, tool: releaseValue("Khn", "environment_setup"), persistentInCollapsedConversation: true, standaloneInConversation: true });
+  }
+  register({ namespace: codex, tool: releaseValue("tZt", "read_settings") });
+  register({ namespace: codex, tool: releaseValue("nZt", "write_settings") });
+
+  const ordinary = [
+    ["zXt", "create_thread"], ["RXt", "read_thread"], ["HXt", "send_message_to_thread"],
+    ["WXt", "wait_threads"], ["UXt", "list_threads"], ["GXt", "list_archived_threads"],
+    ["XXt", "get_usage_limits"], ["ZXt", "list_projects"],
+  ] as const;
+  for (const [alias, fallback] of ordinary) register({ namespace: codex, tool: releaseValue(alias, fallback) });
+  register({
+    namespace: codex,
+    tool: releaseValue("JXt", "handoff_thread"),
+    standaloneInConversation: true,
+    getCompletedSummaryPartKey: completedHandoffKey,
+  });
+  register({
+    namespace: codex,
+    tool: releaseValue("qXt", "get_handoff_status"),
+    summaryOnlyInConversationGroup: true,
+    getCompletedSummaryPartKey: operationIdKey,
+  });
+  register({ namespace: codex, tool: releaseValue("BXt", "create_worktree"), continuesLiveActivityBetweenCalls: true });
+  register({ namespace: codex, tool: releaseValue("VXt", "fork_thread"), continuesLiveActivityBetweenCalls: true });
+}
+
+function parsedArguments(item: Record<string, unknown>): Record<string, unknown> | null {
+  const value = item.arguments;
+  if (value != null && typeof value === "object" && !Array.isArray(value)) return value as Record<string, unknown>;
+  if (typeof value !== "string") return null;
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return parsed != null && typeof parsed === "object" && !Array.isArray(parsed) ? parsed as Record<string, unknown> : null;
+  } catch { return null; }
+}
+
+function completedHandoffKey(item: Record<string, unknown>): string | undefined {
+  const args = parsedArguments(item);
+  return typeof args?.threadId === "string" ? JSON.stringify([args.threadId, typeof args.destinationHostId === "string" ? args.destinationHostId : null]) : undefined;
+}
+
+function operationIdKey(item: Record<string, unknown>): string | undefined {
+  const args = parsedArguments(item);
+  return typeof args?.operationId === "string" ? args.operationId : undefined;
+}
 
 /** 注册表查找（原 `Q`，导出 o）。 */
-function findDynamicToolDescriptor(item: { namespace?: string; tool?: string }): DynamicToolDescriptor | undefined {
+function findDynamicToolDescriptor(item: { namespace?: string | null; tool?: string }): DynamicToolDescriptor | undefined {
+  ensureDynamicToolRegistry();
   return dynamicToolRegistry.find(
     (descriptor) => descriptor.namespace === item.namespace && descriptor.tool === item.tool,
   );
 }
 
 /** continuesLiveActivityBetweenCalls（原 `un`，导出 i）。 */
-function continuesLiveActivityBetweenCalls(item: { namespace?: string; tool?: string }): boolean {
+function continuesLiveActivityBetweenCalls(item: { namespace?: string | null; tool?: string }): boolean {
   return findDynamicToolDescriptor(item)?.continuesLiveActivityBetweenCalls === true;
 }
 
 /** persistentInCollapsedConversation（原 `dn`，导出 c）。 */
-function persistentInCollapsedConversation(item: { namespace?: string; tool?: string }): boolean {
+function persistentInCollapsedConversation(item: { namespace?: string | null; tool?: string }): boolean {
   return findDynamicToolDescriptor(item)?.persistentInCollapsedConversation === true;
 }
 
 /** summaryOnlyInConversationGroup（原 `fn`，导出 l）。 */
-function summaryOnlyInConversationGroup(item: { namespace?: string; tool?: string }): boolean {
+function summaryOnlyInConversationGroup(item: { namespace?: string | null; tool?: string }): boolean {
   return findDynamicToolDescriptor(item)?.summaryOnlyInConversationGroup === true;
 }
 
 /** 完成态摘要部件键（原 `pn`，导出 a）。 */
-function completedSummaryPartKey(item: { namespace?: string; tool?: string } & Record<string, unknown>): string {
+function completedSummaryPartKey(item: { namespace?: string | null; tool?: string } & Record<string, unknown>): string {
   const labelKey = activityLabelKey(item as ActivityEntryItem);
   const partKey = findDynamicToolDescriptor(item)?.getCompletedSummaryPartKey?.(item);
   return `${item.namespace}:${item.tool}:${partKey ?? ""}:${labelKey ?? ""}`;
@@ -156,8 +228,13 @@ function isCodexAppsServerResult(server: string | undefined, result: { type?: st
 
 /** 注册表应用解析（原 `qe`：server/tool/成功 raw 命中）。 */
 function resolveRegisteredApp(request: { mcpServerStatuses?: unknown; server?: string; tool?: string; toolResult: unknown }): unknown {
-  void request;
-  return null;
+  const resolver = (appInitial as Record<string, unknown>).rXt;
+  if (typeof resolver !== "function") return null;
+  try {
+    return (resolver as (input: typeof request) => unknown)(request);
+  } catch {
+    return null;
+  }
 }
 
 /** isMcpAppWidget（原 `xt`，导出 m）。 */
@@ -248,9 +325,16 @@ function isExplorationActivity(item: ActivityEntryItem, nextItem: ActivityEntryI
 
 /** 大读取摘要判定（原 `dt`/`ht` 语义：read 摘要行数超阈值）。 */
 function isLargeReadSummary(parsedCmd: { type?: string; cmd?: string | null }, cwd: string | null): boolean {
-  void cwd;
-  void parsedCmd;
-  return false;
+  const summarize = (skillExplorationLabels as Record<string, unknown>).t;
+  const isLarge = (skillExplorationLabels as Record<string, unknown>).c;
+  if (typeof summarize === "function" && typeof isLarge === "function") {
+    try {
+      const summary = (summarize as (input: unknown) => unknown)({ summary: parsedCmd, cwd });
+      return Boolean((isLarge as (input: unknown) => unknown)(summary));
+    } catch { /* use the structural fallback below */ }
+  }
+  const command = parsedCmd.cmd ?? "";
+  return command.split(/\r?\n/).length >= 20 || command.length >= 2_000;
 }
 
 /**
@@ -377,12 +461,7 @@ export interface RouteDispatch {
  * 本地线程 → codex://threads deep-link。compact（size-7/rounded-md）与
  * default（size-8/rounded-lg）双变体。
  */
-function CreatedThreadCard(props: { compact?: boolean; dispatch: RouteDispatch; result: CreatedThreadResult }): {
-  ariaLabel: string;
-  title: string;
-  route: string;
-  variant: "compact" | "default";
-} {
+function CreatedThreadCard(props: { compact?: boolean; dispatch?: RouteDispatch; result: CreatedThreadResult }): unknown {
   const isChatGPT = props.result.kind === "chatgpt";
   const isClientThread = !isChatGPT && "clientThreadId" in props.result;
   const threadKey = isClientThread ? props.result.clientThreadId! : props.result.threadId;
@@ -391,12 +470,27 @@ function CreatedThreadCard(props: { compact?: boolean; dispatch: RouteDispatch; 
     : isClientThread
       ? `/local/client-new-thread:${encodeURIComponent(threadKey)}`
       : `codex://threads/${encodeURIComponent(props.result.threadId)}`;
-  return {
-    ariaLabel: CREATED_THREAD_MESSAGES.openCreatedThread.defaultMessage,
-    route,
-    title: isClientThread ? CREATED_THREAD_MESSAGES.worktreeChat.defaultMessage : CREATED_THREAD_MESSAGES.threadCreated.defaultMessage,
-    variant: props.compact ? "compact" : "default",
+  const title = isClientThread ? CREATED_THREAD_MESSAGES.worktreeChat.defaultMessage : CREATED_THREAD_MESSAGES.threadCreated.defaultMessage;
+  const onClick = (): void => {
+    if (props.dispatch != null) {
+      props.dispatch.dispatchHostMessage({ type: "navigate-to-route", path: route });
+      return;
+    }
+    const dispatcher = (appInitial as Record<string, unknown>).dispatchHostMessage;
+    if (typeof dispatcher === "function") (dispatcher as (message: { type: string; path: string }) => void)({ type: "navigate-to-route", path: route });
   };
+  const jsx = getJsxRuntime();
+  return jsx.jsx("button", {
+    type: "button",
+    "aria-label": CREATED_THREAD_MESSAGES.openCreatedThread.defaultMessage,
+    className: `w-full cursor-interaction text-start ${props.compact ? "rounded-md" : "rounded-lg"}`,
+    onClick,
+    children: jsx.jsxs("span", { className: "flex items-center gap-2", children: [
+      jsx.jsx("span", { "aria-hidden": true, children: props.compact ? "↗" : "◫" }),
+      jsx.jsx("span", { children: title }),
+      jsx.jsx("span", { "aria-hidden": true, children: "›" }),
+    ] }),
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -416,11 +510,7 @@ export interface ToolOperation {
  * 运行中 → running spinner；完成 → success ? completed : failed；
  * 标签（图标 + message + values）；row/summary 两种变体（截断）。
  */
-function ToolActivityRow(props: { agentActivityIcon?: unknown; item: (ActivityEntryItem & { contentItems?: Array<{ operationId?: string; status?: string }> | null }) | null; operation?: ToolOperation | null; variant: "row" | "summary-text" | string }): {
-  state: "running" | "completed" | "failed";
-  hasLabel: boolean;
-  truncate: boolean;
-} {
+function ToolActivityRow(props: { agentActivityIcon?: unknown; item: (ActivityEntryItem & { contentItems?: Array<{ operationId?: string; status?: string }> | null }) | null; operation?: ToolOperation | null; variant: "row" | "summary-text" | string }): unknown {
   const item = props.item;
   const contentOperation = item != null && item.completed === true && item.success === true ? (item.contentItems ?? []).find((entry) => entry.operationId != null) ?? null : null;
   const operation = props.operation ?? contentOperation;
@@ -428,11 +518,20 @@ function ToolActivityRow(props: { agentActivityIcon?: unknown; item: (ActivityEn
   const succeeded = operation == null ? item?.success === true : operation.status === "error" ? false : operation.status === "success" || operation.status === "warning";
   const state = isDone ? (succeeded === false ? "failed" : "completed") : "running";
   const label = item == null ? null : activityLabelKey(item);
-  return {
-    state,
-    hasLabel: label != null,
-    truncate: props.variant !== "summary-text",
-  };
+  const jsx = getJsxRuntime();
+  const icon = props.variant === "summary-text" ? null : (props.agentActivityIcon ?? jsx.jsx("span", { "aria-hidden": true, children: state === "running" ? "◌" : state === "failed" ? "!" : "✓" }));
+  const text = label == null ? operationLabel(operation, state) : label;
+  const content = jsx.jsxs("span", { className: `text-size-chat${props.variant === "summary-text" ? "" : " min-w-0 truncate"}`, "data-tool-state": state, children: [icon, jsx.jsx("span", { children: text })] });
+  if (props.variant !== "row") return content;
+  const steps = Array.isArray((operation as Record<string, unknown> | null)?.steps) ? (operation as Record<string, unknown>).steps as Array<Record<string, unknown>> : [];
+  return jsx.jsxs("div", { className: "tool-activity-row", "data-status": state, children: [content, steps.length === 0 ? null : jsx.jsx("ol", { children: steps.map((step, index) => jsx.jsx("li", { children: String(step.label ?? step.status ?? `Step ${index + 1}`) }, String(step.id ?? index))) })] });
+}
+
+function operationLabel(operation: ToolOperation | null | undefined, state: "running" | "completed" | "failed"): string {
+  const destination = typeof operation?.destinationHostDisplayName === "string" ? operation.destinationHostDisplayName : "destination";
+  if (state === "running") return `Handing off to ${destination}`;
+  if (state === "failed") return `Failed to hand off to ${destination}`;
+  return `Handed off to ${destination}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -440,19 +539,33 @@ function ToolActivityRow(props: { agentActivityIcon?: unknown; item: (ActivityEn
 // ---------------------------------------------------------------------------
 
 /** 初始化器（原 `wt`，导出 h）。 */
-function initializeMcpAppDecisions(): void {}
+function initializeMcpAppDecisions(): void {
+  for (const name of ["pXt", "lXt"] as const) {
+    const initializer = (appInitial as Record<string, unknown>)[name];
+    if (typeof initializer === "function") (initializer as () => void)();
+  }
+}
 
 /** 注册表初始化器（原 `hn`，导出 s）：四表合并（依赖接入后填充）。 */
-function initializeDynamicToolRegistry(): void {}
+function initializeDynamicToolRegistry(): void { ensureDynamicToolRegistry(); }
 
 /** 操作状态 schema 初始化器（原 `G`，导出 p）。 */
-function initializeOperationStatusSchema(): void {}
+function initializeOperationStatusSchema(): void { ensureDynamicToolRegistry(); }
 
 /** 线程卡片消息初始化器（原 `J`，导出 d）。 */
-function initializeCreatedThreadMessages(): void {}
+function initializeCreatedThreadMessages(): void { void CREATED_THREAD_MESSAGES; }
 
 /** 主初始化器（原 `yn`，导出 n）。 */
-function initializeAgentActivityItem(): void {}
+function initializeAgentActivityItem(): void {
+  initializeMcpAppDecisions();
+  initializeCreatedThreadMessages();
+  initializeOperationStatusSchema();
+  initializeDynamicToolRegistry();
+  const explorationInitializers = skillExplorationLabels as Record<string, unknown>;
+  for (const initializer of [presentationChunk.a, resultCard.r, explorationInitializers.s, explorationInitializers.n]) {
+    if (typeof initializer === "function") initializer();
+  }
+}
 
 // ---------------------------------------------------------------------------
 // 原版压缩导出名（chunk 间契约）

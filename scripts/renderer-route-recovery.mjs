@@ -309,6 +309,7 @@ export const RECONSTRUCTED_ROUTE_CORE = new Set([
 // Route dependencies promoted as a verified batch. Keeping this set named lets
 // the source-build gate validate the full dependency graph of each new owner.
 export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
+  "agent-activity-item-792873f87aad.js",
   "agent-activity-units-9397783428a4.js",
   "codex-app-home-beacon-announcement-8c94f69eb080.js",
   "codex-micro-onboarding-host-85407a96e02a.js",
@@ -341,6 +342,8 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "wallet-onboarding-announcement-content-28d619ce7d4e.js",
   "workbook-review-utils-3e78f7501b68.js",
   "workspace-agent-detail-query-3cb2bb771d2e.js",
+  "presentation-f4eb8ac38003.js",
+  "result-card-17125719c243.js",
 ]);
 
 // Full release-faithful React/runtime modules promoted into their semantic
@@ -394,7 +397,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
     "right-panel-composer-overlay",
     "right-panel-composer-overlay-fdca4b46e82c.js",
   ],
-  ["agent-activity-item", "agent-activity-item-792873f87aad.js"],
   ["general-settings", "general-settings-3d550f75d0eb.js"],
   ["security-settings", "security-settings-2da2a3b205ab.js"],
   [
@@ -496,12 +498,10 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
     "open-thread-pull-request-side-panel-tab-4cc87983599f.js",
   ],
   ["plugin-picker-menu-content", "plugin-picker-menu-content-a51d37a29207.js"],
-  ["presentation", "presentation-f4eb8ac38003.js"],
   ["publish-actions", "publish-actions-271f912485e5.js"],
   ["pull-request-actions", "pull-request-actions-5ac6dcc71dec.js"],
   ["pull-request-fix-workflow", "pull-request-fix-workflow-1561e22a0cbc.js"],
   ["quick-chat-obstacles", "quick-chat-obstacles-c569ea17ffc9.js"],
-  ["result-card", "result-card-17125719c243.js"],
   ["thread-shell-runtime", "runtime-4b6d284756d8.js"],
   ["thread-app-shell-chrome", "thread-app-shell-chrome-e245ed2613ae.js"],
   ["thread-handoff-modal", "thread-handoff-modal-ccac59d04293.js"],
