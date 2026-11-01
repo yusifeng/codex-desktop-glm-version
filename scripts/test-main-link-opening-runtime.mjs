@@ -61,6 +61,11 @@ const runtime = await import(`data:text/javascript;base64,${Buffer.from(output.o
 
 equal(runtime.isHttpUrl("https://example.com"), true);
 equal(runtime.isHttpUrl("mailto:test@example.com"), false);
+equal(runtime.isHtmlFileName("index.HTML"), true);
+equal(runtime.isHtmlFileName("notes.md"), false);
+equal(runtime.localHttpPort("http://localhost:4312/path"), 4312);
+equal(runtime.localHttpPort("https://demo.localhost/path"), 443);
+equal(runtime.localHttpPort("https://example.com/path"), null);
 equal(runtime.isLocalUrl("http://localhost:3000"), true);
 equal(runtime.isLocalUrl("https://example.com"), false);
 equal(runtime.isSupportedExternalUrl("mailto:test@example.com"), true);
@@ -68,6 +73,13 @@ equal(runtime.isSecureOrLocalHttpUrl("http://example.com"), false);
 equal(runtime.normalizeUrlOrBlank("about:blank"), "");
 equal(runtime.threadBrowserTabStorageKey("a/b"), "thread-browser-tabs-v1:a%2Fb");
 equal(runtime.browserRoutePartition("owner", "thread"), "persist:codex-browser-app-route:owner%00thread");
+equal(runtime.threadBrowserTabKey("thread"), "thread");
+equal(runtime.BROWSER_ROUTE_PARTITION_PREFIX, "persist:codex-browser-app-route:");
+equal(runtime.PAGE_RESTORE_ATTRIBUTE, "data-browser-sidebar-page-restore");
+equal(runtime.shouldOpenLinkInAppBrowser({
+  browserPaneEnabled: true,
+  link: { type: "file", path: "/tmp/index.html" },
+}), true);
 equal(runtime.resolveOpenLinkPreference(undefined), "external-browser");
 equal(runtime.resolveOpenLinkPreference({ get: () => "in-app-browser" }), "in-app-browser");
 equal(runtime.resolveLinkOpenTarget({ browserPaneEnabled: true, openTarget: "in-app-browser", url: "https://example.com" }), "in-app-browser");
@@ -116,5 +128,19 @@ equal(main.includes("function MH("), false);
 equal(main.includes("async function IH("), false);
 equal(main.includes("function mBe("), false);
 equal(main.includes("function bBe("), false);
+equal(main.includes("browserRoutePartitionPrefix: BROWSER_ROUTE_PARTITION_PREFIX"), true);
+equal(main.includes("makePartitionKey: browserRoutePartition"), true);
+equal(main.includes("canOpenExternalUrl: isSupportedExternalUrl"), true);
+equal(main.includes("normalizeUrl: normalizeUrlOrBlank"), true);
+equal(main.includes("getLocalhostPort: localHttpPort"), true);
+equal(main.includes("rt: threadBrowserTabStorageKey"), true);
+equal(main.includes("isHtml: isHtmlFileName"), true);
+equal(main.includes("shouldOpenInBrowserPane: shouldOpenLinkInAppBrowser"), true);
+for (const name of ["ze", "Be", "Ve", "He", "Ue", "We", "Ge", "Ke", "qe", "Je", "Ye", "Xe", "Ze"])
+  equal(main.includes(`function ${name}(`), false);
+equal(main.includes("var Qe = `persist:codex-browser-app-route:`"), false);
+equal(main.includes("function nt("), false);
+equal(main.includes("function rt("), false);
+equal(main.includes("function it("), false);
 
 console.log(`${assertions} main link-opening runtime assertions passed`);

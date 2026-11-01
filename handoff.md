@@ -5479,3 +5479,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   中被局部变量遮蔽且从未读取的 `Se` 注入同步清理。
 - 新 focused suite 37 项；修复 thread-section server、pinned service 及 saved-section transition/reconciliation/undo-redo/manager
   六个直接 `.ts` 失效入口，相关 cluster 134 项真实通过；no-unwired gate 扩至 754 项。
+
+# 2026-11-01 link-opening policy convergence
+
+- 将主 chunk 残留 `ze..Ze` URL policy 与 `Qe..it` browser route identity 的所有真实 consumer 切到既有
+  `browser/link-opening.ts`，补充导出 HTML-file/localhost-port 两个缺失语义入口；旧重复实现整体删除。
+- browser session/presentation/runtime sync/navigation context/persistence、open-in、Electron message handler 与 localhost
+  navigation 均已真实接回；Browser Page WebView 未读取的 `Xe` dependency 同步清理。
+- link-opening focused suite 扩至 61 项；相关 browser/open-in/message-handler 九组回归通过，修复其中 4 个直接 `.ts`
+  import 失效入口。no-unwired gate 扩至 766 项。

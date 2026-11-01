@@ -3587,3 +3587,15 @@ app-server adapter 注入新 engine，没有复制 cache 或 mutation queue。
 create reservation `ye` 和 UUID alias `ve` 删除。Browser WebView controller 中未读取、且被方法局部变量遮蔽的同名 `Se`
 dependency 也一并删除。新 focused suite 37 项，saved-section/pinned cluster 共 134 项真实通过；修复其中 6 个直接 `.ts`
 import 的失效入口，no-unwired gate 扩至 754 项。
+
+### 收敛既有 owner：link-opening URL policy 与 browser route identity
+
+既有 `browser/link-opening.ts` 已拥有原 `ze..Ze` URL policy 和 `Qe..it` browser identity，但主 chunk 仍保留一整套重复实现。
+本轮导出缺失的 HTML-file/localhost-port 语义入口，并把 browser session/presentation/runtime-sync/navigation-context/
+persistence、open-in service、Electron message handler 与 localhost navigation 全部切换到语义导出；主 chunk 旧 URL 判定、
+protocol whitelist、file normalization、route constants/key builders 已物理删除。
+
+Browser Page WebView factory 中从未读取的 `Xe` normalize-path dependency 同步删除；`normalizeUrlOrBlank` 仍以明确 adapter key
+注入需要压缩兼容名 `Ze` 的已迁模块。link-opening focused suite 扩至 61 项并覆盖新增导出与全部旧定义消失；相关
+navigation/persistence/presentation/webview/runtime-sync/message-handler/open-in/localhost 九组回归通过，并修复其中 4 个直接
+`.ts` import 的失效入口。no-unwired gate 扩至 766 项。

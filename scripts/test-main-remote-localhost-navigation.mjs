@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { createRemoteLocalhostNavigationForwarder } from "../src/main/main-app/browser-sidebar/remote-localhost-navigation.ts";
+import { transform } from "esbuild";
+
+const ownerText = fs.readFileSync(new URL("../src/main/main-app/browser-sidebar/remote-localhost-navigation.ts", import.meta.url), "utf8");
+const ownerRuntime = await transform(ownerText, { loader: "ts", format: "cjs", target: "es2022" });
+const ownerModule = { exports: {} };
+Function("module", "exports", ownerRuntime.code)(ownerModule, ownerModule.exports);
+const { createRemoteLocalhostNavigationForwarder } = ownerModule.exports;
 
 const calls = [];
 const forward = createRemoteLocalhostNavigationForwarder({

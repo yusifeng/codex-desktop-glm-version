@@ -425,9 +425,20 @@ const {
   relocateToWsl: pH,
 } = require("./main-app/util/app-paths.js");
 const {
+  BROWSER_ROUTE_PARTITION_PREFIX,
+  PAGE_RESTORE_ATTRIBUTE,
+  browserRoutePartition,
+  isHtmlFileName,
   isHttpUrl: MH,
+  isLocalUrl,
+  isSupportedExternalUrl,
+  localHttpPort,
+  normalizeUrlOrBlank,
   resolveOpenLinkPreference: FH,
   openLinkInPreferredTarget: IH,
+  shouldOpenLinkInAppBrowser,
+  threadBrowserTabKey,
+  threadBrowserTabStorageKey,
 } = require("./main-app/browser/link-opening.js");
 const {
   createCommentModeSiteStatus: ZBe,
@@ -1038,134 +1049,7 @@ var Fe = {
     proximityEnterDistance: 40,
     proximityExitDistance: 56,
     transitionDurationMs: 200,
-  },
-  Ie = /\.html?$/i,
-  q = new Set([`localhost`, `127.0.0.1`, `0.0.0.0`, `[::1]`, `::1`]),
-  Le = new Set([`mailto:`, `sms:`, `tel:`]),
-  Re = new Set([`file`, `vscode-remote`]);
-function ze(e) {
-  return Ie.test(e);
-}
-function Be(e) {
-  let t = e.toLowerCase();
-  return t.endsWith(`.localhost`) || q.has(t);
-}
-function Ve(e) {
-  if (He(e) != null) return !0;
-  let t;
-  try {
-    t = new URL(e);
-  } catch {
-    return !1;
-  }
-  return t.protocol === `file:` && Ye(t);
-}
-function He(e) {
-  let t;
-  try {
-    t = new URL(e);
-  } catch {
-    return null;
-  }
-  return (t.protocol !== `http:` && t.protocol !== `https:`) || !Be(t.hostname)
-    ? null
-    : Number(t.port || (t.protocol === `https:` ? 443 : 80));
-}
-function Ue({
-  browserPaneEnabled: e,
-  link: t,
-  openLinkInTargetPreference: r = n.ef,
-  openLocalUrlInTargetPreference: i = n.ef,
-}) {
-  if (!e) return !1;
-  switch (t.type) {
-    case `file`:
-      return t.target == null && t.location == null && ze(t.path);
-    case `url`:
-      return Ve(t.url) ? i === `in-app-browser` : r === `in-app-browser` && Je(t.url);
-  }
-}
-function We(e) {
-  try {
-    let t = new URL(e),
-      { protocol: n } = t;
-    return n === `file:` || n === `http:` || n === `https:` || qe(t);
-  } catch {
-    return !1;
-  }
-}
-function Ge(e) {
-  try {
-    let { protocol: t } = new URL(e);
-    return t === `https:` || (t === `http:` && Ve(e));
-  } catch {
-    return !1;
-  }
-}
-function Ke({
-  browserPaneEnabled: e,
-  openLinkInTargetPreference: t = n.ef,
-  openLocalUrlInTargetPreference: r = n.ef,
-  openTarget: i,
-  url: a,
-  useExternalBrowser: o,
-}) {
-  return o === !0 || i === `external-browser`
-    ? `external-browser`
-    : Ue({
-          browserPaneEnabled: e,
-          link: { type: `url`, url: a },
-          openLinkInTargetPreference: i ?? t,
-          openLocalUrlInTargetPreference: i ?? r,
-        })
-      ? `in-app-browser`
-      : `external-browser`;
-}
-function qe(e) {
-  return e.protocol === `vscode:` || e.protocol === `vscode-insiders:`
-    ? e.username.length === 0 && e.password.length === 0 && Re.has(e.host)
-    : Le.has(e.protocol);
-}
-function Je(e) {
-  try {
-    let { protocol: t } = new URL(e);
-    return t === `http:` || t === `https:`;
-  } catch {
-    return !1;
-  }
-}
-function Ye(e) {
-  let t = e.hostname.toLowerCase();
-  if (t.length > 0 && t !== `localhost`) return !1;
-  let r = Xe(e.pathname);
-  return n.bl(r) ? !0 : !n.xl(r);
-}
-function Xe(e) {
-  let t = n.Tl(e).replace(/^\/{3,}/, `//`);
-  return n.El(t);
-}
-function Ze(e) {
-  let t = e.length === 0 || e === `about:blank` ? `` : e;
-  if (t.length === 0) return t;
-  try {
-    return new URL(t).href;
-  } catch {
-    return t;
-  }
-}
-var Qe = `persist:codex-browser-app-route:`,
-  $e = `:host:`,
-  et = `thread-browser-tabs-v1:`,
-  tt = `data-browser-sidebar-page-restore`;
-function nt(e) {
-  return e;
-}
-function rt(e) {
-  return `${et}${encodeURIComponent(e)}`;
-}
-function it(e, t) {
-  return `${Qe}${encodeURIComponent(`${e}\0${t}`)}`;
-}
+  };
 var at = `codex-workspace-settings-`,
   ot = {
     file: `file-menu`,
@@ -23348,7 +23232,7 @@ var BrowserHostService = createBrowserHostServiceClass({
   RpcHandlerBase: n.Uf,
   ExtensionActionMenus: wke,
   browserMessageChannel: a.At,
-  browserStorageIdOf: nt,
+  browserStorageIdOf: threadBrowserTabKey,
   browserTabIdOf: a.bn,
   getExtensionActions: Ike,
   subscribeExtensionProfile: Lke,
@@ -34959,8 +34843,8 @@ var {
   resolveSynchronousAnnotationPolicy: hWe,
   routeFromWebviewParams: vWe,
 } = createBrowserWebviewIdentityPolicy({
-  browserRoutePartitionPrefix: Qe,
-  hashBrowserStorageId: nt,
+    browserRoutePartitionPrefix: BROWSER_ROUTE_PARTITION_PREFIX,
+    hashBrowserStorageId: threadBrowserTabKey,
   isInternalEnvironment: n.cu.isInternal,
   parseBrowserTabId: a.bn,
   webviewPartitionSuffix: $e,
@@ -35098,11 +34982,11 @@ function SWe({
           w != null &&
           (j.browserTabId !== w.browserTabId || j.conversationId !== w.conversationId),
         N = M ? null : (j ?? w),
-        P = A ? s[tt] : void 0,
+        P = A ? s[PAGE_RESTORE_ATTRIBUTE] : void 0,
         F = P === `none` || P === `required` ? P : null,
         I = P != null && F == null,
         L = s[`data-browser-sidebar-page-storage-id`] ?? null,
-        R = F != null && L?.length > 0 ? nt(L) : null,
+        R = F != null && L?.length > 0 ? threadBrowserTabKey(L) : null,
         z = j?.pagePersistence ?? null,
         B = z != null && R != null && z.browserStorageId !== R,
         V = z != null && F != null && z.restore !== F,
@@ -35310,7 +35194,7 @@ function SWe({
           t.preventDefault());
         return;
       }
-      (Ve(QU(le)) && (i.backgroundThrottling = !1),
+      (isLocalUrl(QU(le)) && (i.backgroundThrottling = !1),
         v.pendingWebviewRoutesByInstanceId.set(W, {
           hostGeneration: se,
           initialNavigationOwner: `app`,
@@ -35968,7 +35852,7 @@ var {
   makeBrowserStorageId: PG,
   makePageRecordKey: qU,
   makePageKey: KU,
-  makePartitionKey: it,
+  makePartitionKey: browserRoutePartition,
   makeTransferKey: n.ku,
   normalizeWindowId: oX,
   pageHandleForThread: lW,
@@ -35999,7 +35883,7 @@ var {
   canCommentOnSnapshot: zX,
   showBrowserContextMenu: LXe,
 } = createBrowserContextMenuRuntime({
-  canOpenExternalUrl: We,
+  canOpenExternalUrl: isSupportedExternalUrl,
   clipboard: l.clipboard,
   getIntl: a.hn,
   isHttpUrl: MH,
@@ -36022,7 +35906,7 @@ var {
   deserializeColdHistory: FHe,
   deserializeHistory: nW,
   isRouteNavigationDisabled: nl,
-  normalizeUrl: Ze,
+  normalizeUrl: normalizeUrlOrBlank,
   routePathForUrl: n.dl,
 });
 var {
@@ -36061,7 +35945,7 @@ var eZ = `-owl-native-contents-close`,
 var {
   securityStateForPage: dZe,
   syncBackgroundThrottling: dZ,
-} = createBrowserPagePresentationPolicy({ isFirstPartyUrl: Ve, pageUrl: QU });
+} = createBrowserPagePresentationPolicy({ isFirstPartyUrl: isLocalUrl, pageUrl: QU });
 var BrowserSessionService = createBrowserSessionServiceClass({
   decodeRedirectTarget: a.v,
   fromPartition: (partition, options) => l.session.fromPartition(partition, options),
@@ -36173,10 +36057,10 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
         (this.commentModeController = new (createBrowserCommentModeControllerClass({ EU, cW, yVe, tq, n }))(this)),
         (this.annotationInteractionController = new (createBrowserAnnotationInteractionControllerClass({ hX, EU, dispatchPageEvent: dispatchSitePageEvent, n, SU, mVe, gVe }))(this)),
         (this.pageMaterializationController = new (createBrowserPageMaterializationControllerClass({ eW, KX, oX, n }))(this)),
-        (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ hX, fq, tq, KU, EZ, lifecycleHelpersClass: createBrowserPageLifecycleHelpersControllerClass, WU, dZ, QU, Ze, n, pX, dZe, oX, dq, isEqual: G.default }))(this)),
-        (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW, fq, matchesLoadError: FU, normalizeUrl: Ze, resetCaptureState: (page) => { page.isCapturingUserMedia = !1; page.isCapturingCamera = void 0; page.isCapturingMicrophone = void 0; }, clearSiteTools: XX, serializePageState: eW, shouldIgnoreLoadError: NU, shouldRetryLoadError: PU, logger: r.i, setTimer: setTimeout, retryDelayMs: 50, maxAttempts: 100 }))(this)),
+        (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ hX, fq, tq, KU, EZ, lifecycleHelpersClass: createBrowserPageLifecycleHelpersControllerClass, WU, dZ, QU, Ze: normalizeUrlOrBlank, n, pX, dZe, oX, dq, isEqual: G.default }))(this)),
+        (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW, fq, matchesLoadError: FU, normalizeUrl: normalizeUrlOrBlank, resetCaptureState: (page) => { page.isCapturingUserMedia = !1; page.isCapturingCamera = void 0; page.isCapturingMicrophone = void 0; }, clearSiteTools: XX, serializePageState: eW, shouldIgnoreLoadError: NU, shouldRetryLoadError: PU, logger: r.i, setTimer: setTimeout, retryDelayMs: 50, maxAttempts: 100 }))(this)),
         (this.pageLookupController = new (createBrowserPageLookupControllerClass({}))(this)),
-(this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, Xe, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ, WXe, RX }))(this)),
+(this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze: normalizeUrlOrBlank, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ, WXe, RX }))(this)),
         (this.hostPolicyController = new (createBrowserHostPolicyControllerClass({ DXe, OXe, kXe, mq, VG, Yc, Xc, DZ, hX }))(this)),
         (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
         (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, SWe, aXe, gX, qU, oXe, vX, tq, KU, l, EZ, logger: r.i(`browser-sidebar-manager`) }))(this)),
@@ -36198,7 +36082,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
           onWebNotificationClicked: this.onWebNotificationClicked.bind(this),
           onPermissionPrompt: (e) => this.permissionPrompts.show(e),
         })),
-        (this.browserPersistence = new (createBrowserPagePersistenceControllerClass({ pX, n, PG, qU, it, NX }))(
+        (this.browserPersistence = new (createBrowserPagePersistenceControllerClass({ pX, n, PG, qU, it: browserRoutePartition, NX }))(
           this.browserPageSnapshots,
           this.browserSessionRegistry,
           this.windowManager,
@@ -36522,7 +36406,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
   };
 var OZ = createRemoteLocalhostNavigationForwarder({
     createLogger: r.i,
-    getLocalhostPort: He,
+    getLocalhostPort: localHttpPort,
     isSshHostConfig: n.Os,
   }),
   kZ = WebContentsHostClient,
@@ -36670,7 +36554,7 @@ var r$e = createElectronMessageHandlerClass({
     lWe,
     summarizeWindowAttention,
     rZe,
-    rt,
+    rt: threadBrowserTabStorageKey,
     setRemoteControlEnabled,
     setRemoteControlSessionActive,
     tee,
@@ -45277,8 +45161,8 @@ var N0 = createOpenInServiceClass({
     translateHostPath: Un,
     defaultCwd: Ir,
     resolvePath: pH,
-    isUrl: (value) => isOpenableUrl(value, Ve),
-    isHtml: ze,
+    isUrl: (value) => isOpenableUrl(value, isLocalUrl),
+    isHtml: isHtmlFileName,
     isNativeDocument: u4e,
     isDarwinNativeDocument: h1,
     isPlatformDefaultViewerDocument: g1,
@@ -45287,7 +45171,7 @@ var N0 = createOpenInServiceClass({
     discoverDocumentApplications: _6e,
     discoverNativeApplications: g6e,
     openExternalLink: IH,
-    shouldOpenInBrowserPane: Ue,
+    shouldOpenInBrowserPane: shouldOpenLinkInAppBrowser,
     browserPaneEnabled: () => Tr().browserPane,
     pathToFileUrl: (path) => (0, c.pathToFileURL)(path).toString(),
     isPathOnPlatform: n.f,

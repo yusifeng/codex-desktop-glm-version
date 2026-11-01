@@ -759,5 +759,17 @@ assert.equal(main.includes("var Se = class"), false, "generated thread-section e
 assert.equal(main.includes("ye = new Map()"), false, "generated section-create reservation state must be removed");
 assert.equal(main.includes("01984de2-8f74-7c91-a3b2-5c5e937cf318"), false, "pinned section ID must not be duplicated in main");
 assert.equal(main.includes("GX, Se, JXe"), false, "unused generated engine injection must be removed from browser webview wiring");
+assert.equal(main.includes("browserRoutePartitionPrefix: BROWSER_ROUTE_PARTITION_PREFIX"), true, "browser sessions use the semantic route prefix");
+assert.equal(main.includes("s[PAGE_RESTORE_ATTRIBUTE]"), true, "browser restore reads the semantic attribute constant");
+assert.equal(main.includes("isFirstPartyUrl: isLocalUrl"), true, "browser presentation uses semantic local-URL policy");
+assert.equal(main.includes("canOpenExternalUrl: isSupportedExternalUrl"), true, "browser runtime uses semantic external-URL policy");
+assert.equal(main.includes("normalizeUrl: normalizeUrlOrBlank"), true, "browser runtime uses semantic URL normalization");
+assert.equal(main.includes("getLocalhostPort: localHttpPort"), true, "localhost navigation uses semantic port resolution");
+assert.equal(main.includes("rt: threadBrowserTabStorageKey"), true, "message handler uses semantic tab storage keys");
+assert.equal(main.includes("it: browserRoutePartition"), true, "page persistence uses semantic partition routing");
+assert.equal(main.includes("function ze("), false, "generated HTML-file policy must be removed");
+assert.equal(main.includes("function Ve("), false, "generated local-URL policy must be removed");
+assert.equal(main.includes("function Ze("), false, "generated URL normalization must be removed");
+assert.equal(main.includes("var Qe = `persist:codex-browser-app-route:`"), false, "generated browser route constants must be removed");
 
-console.log("754 main unwired-owner skeleton assertions passed");
+console.log("766 main unwired-owner skeleton assertions passed");

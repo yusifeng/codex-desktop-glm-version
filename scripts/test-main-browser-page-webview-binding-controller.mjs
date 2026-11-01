@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { createBrowserPageWebviewBindingControllerClass } from "../src/main/main-app/browser-sidebar/browser-page-webview-binding-controller.ts";
+import { transform } from "esbuild";
+
+const ownerText = readFileSync(new URL("../src/main/main-app/browser-sidebar/browser-page-webview-binding-controller.ts", import.meta.url), "utf8");
+const ownerRuntime = await transform(ownerText, { loader: "ts", format: "cjs", target: "es2022" });
+const ownerModule = { exports: {} };
+Function("module", "exports", ownerRuntime.code)(ownerModule, ownerModule.exports);
+const { createBrowserPageWebviewBindingControllerClass } = ownerModule.exports;
 
 const Controller = createBrowserPageWebviewBindingControllerClass({});
 const controller = new Controller({ marker: "main-host" });

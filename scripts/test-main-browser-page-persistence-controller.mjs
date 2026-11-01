@@ -1,5 +1,12 @@
 import assert from "node:assert/strict";
-import { createBrowserPagePersistenceControllerClass } from "../src/main/main-app/browser-sidebar/browser-page-persistence-controller.ts";
+import { readFileSync } from "node:fs";
+import { transform } from "esbuild";
+
+const ownerText = readFileSync(new URL("../src/main/main-app/browser-sidebar/browser-page-persistence-controller.ts", import.meta.url), "utf8");
+const ownerRuntime = await transform(ownerText, { loader: "ts", format: "cjs", target: "es2022" });
+const ownerModule = { exports: {} };
+Function("module", "exports", ownerRuntime.code)(ownerModule, ownerModule.exports);
+const { createBrowserPagePersistenceControllerClass } = ownerModule.exports;
 
 const events = [];
 const snapshots = new Map();

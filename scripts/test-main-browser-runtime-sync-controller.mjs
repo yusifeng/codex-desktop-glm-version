@@ -1,5 +1,12 @@
 import assert from "node:assert/strict";
-import { createBrowserRuntimeSyncControllerClass } from "../src/main/main-app/browser-sidebar/browser-runtime-sync-controller.ts";
+import { readFileSync } from "node:fs";
+import { transform } from "esbuild";
+
+const ownerText = readFileSync(new URL("../src/main/main-app/browser-sidebar/browser-runtime-sync-controller.ts", import.meta.url), "utf8");
+const ownerRuntime = await transform(ownerText, { loader: "ts", format: "cjs", target: "es2022" });
+const ownerModule = { exports: {} };
+Function("module", "exports", ownerRuntime.code)(ownerModule, ownerModule.exports);
+const { createBrowserRuntimeSyncControllerClass } = ownerModule.exports;
 
 const calls = [];
 const hX = (windowState, conversationId, browserTabId) =>

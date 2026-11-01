@@ -43,7 +43,7 @@ const LOCAL_HOSTNAMES = new Set(["localhost", "127.0.0.1", "0.0.0.0", "[::1]", "
 const EXTERNAL_LINK_PROTOCOLS = new Set(["mailto:", "sms:", "tel:"]);
 const VSCODE_ALLOWED_HOSTS = new Set(["file", "vscode-remote"]);
 
-function isHtmlFileName(path: string): boolean {
+export function isHtmlFileName(path: string): boolean {
   return HTML_FILE_PATTERN.test(path);
 }
 
@@ -54,7 +54,7 @@ function isLocalHostname(hostname: string): boolean {
 }
 
 /** 本地 http(s) 端口（原 `He`）：回环主机返回端口，其余 null。 */
-function localHttpPort(url: string): number | null {
+export function localHttpPort(url: string): number | null {
   let parsed: URL;
   try {
     parsed = new URL(url);
