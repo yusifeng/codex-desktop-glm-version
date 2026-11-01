@@ -5447,3 +5447,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 新增并真实接回 `native-pipe/dynamic-app-tools-lifecycle.ts`，统一 env reset/publish、惰性 peer authorizer、server start、
   WindowContext bind 与 `context null→env delete→server dispose` cleanup；失败返回安全空 lifecycle。
 - `Ust` 旧 `Oe/as` 和 direct server construction 删除；focused 14 项、相邻两组 51 项回归通过，no-unwired gate 扩至 712 项。
+
+# 2026-11-01 workspace-policy/settings startup convergence
+
+- 扩展既有 `startup/workspace-policy-runtime.ts`，同一 checker lifecycle 统一 notification/config-refresh observers、disposer 与
+  desktop settings bootstrap；保留 resolve→check→initialize 和 reject→warning 顺序及 batch-write RPC。
+- `Ust` 旧 `Ie`、inline subscriptions/settings promise chain 删除；focused 11 项、startup-adapter 33 项回归通过，no-unwired
+  gate 扩至 719 项。
+- Artifact-session 审计确认主启动仅剩 runtime-path 选择、既有 typed owner `start` 与 warning fallback，不再强抽无状态 facade。

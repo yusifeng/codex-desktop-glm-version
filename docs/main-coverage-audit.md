@@ -3545,3 +3545,13 @@ WindowContext 回填与 dispose 顺序。启动失败仍记录原 warning 并提
 
 `Ust` 原 `Oe/as` 状态和 direct `createDynamicAppToolsServer` 装配删除，call/list callbacks 仍延迟解析同一个 WindowContext。
 14 项 focused 与 native-pipe/computer-use runtime 相邻 51 项回归通过，no-unwired gate 扩至 712 项。
+
+### 扩展既有 owner：workspace-policy observers 与 settings bootstrap
+
+扩展已接回的 `startup/workspace-policy-runtime.ts`，由同一 checker lifecycle 注册 app-server notification/config-refresh observers、
+统一 disposer，并在 local host ready 后拥有 desktop settings bootstrap。成功路径保持 `startupConfig.resolve → policy check →
+settingsStore.initialize` 顺序，batch-write 仍调用 `config/batchWrite`；失败路径保持 `startupConfig.reject → warning` 顺序。
+
+`Ust` 原 `Ie` alias、inline subscriptions 与 settings promise chain 删除，update-policy IPC consumer 也直接复用 lifecycle。
+11 项 focused 与 startup adapter 33 项回归通过，no-unwired gate 扩至 719 项。Artifact-session 启动经复核已仅剩 dev runtime-path
+选择、typed `ArtifactSessionHostLifecycle.start` 调用和 warning fallback；其私有状态、retry/process/cleanup 均已在 owner 内，保留为组合装配。

@@ -718,5 +718,12 @@ assert.equal(main.includes("CODEX_APP_TOOLS_PIPE_PATH: as"), false, "startup no 
 assert.equal(main.includes("let Oe = await createDynamicAppToolsServer"), false, "generated dynamic server owner must be removed");
 assert.equal(main.includes("process.env[as]"), false, "generated dynamic pipe environment mutations must be removed");
 assert.equal(main.includes("callTool: (e, t) => je.getWindowContext().callDynamicAppTool(e, t)"), true, "runtime dynamic tool consumer remains wired through the lifecycle");
+assert.equal(main.includes("workspacePolicyLifecycle = Tst({"), true, "startup creates one workspace-policy lifecycle");
+assert.equal(main.includes("workspacePolicyLifecycle.installConnectionObservers({"), true, "policy notification observers belong to the lifecycle");
+assert.equal(main.includes("workspacePolicyLifecycle.initializeDesktopSettings({"), true, "desktop settings bootstrap belongs to the lifecycle");
+assert.equal(main.includes("workspacePolicyLifecycle.checkForChanges()"), true, "update-policy changes reuse the lifecycle checker");
+assert.equal(main.includes("let Ie = Tst({"), false, "generated workspace-policy checker alias must be removed");
+assert.equal(main.includes("Pe().registerInternalNotificationHandler"), false, "startup no longer wires policy notifications inline");
+assert.equal(main.includes("Failed to initialize desktop settings"), false, "startup no longer owns settings bootstrap failure handling");
 
-console.log("712 main unwired-owner skeleton assertions passed");
+console.log("719 main unwired-owner skeleton assertions passed");

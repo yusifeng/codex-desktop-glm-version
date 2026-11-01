@@ -56480,22 +56480,16 @@ async function Ust() {
   let Pe = () => K.appServerConnectionRegistry.getConnection(J),
     Fe = Jse(m, (e) => Pe().sendAppServerRequest(`experimentalFeature/list`, e));
   m.registerCheck(() => g.hasInAppUpdatesPolicyChanges());
-  let Ie = Tst({
+  let workspacePolicyLifecycle = Tst({
     quitState: ye,
     isAppQuitting: () => W.windowManager.appQuitting,
     getAuthMethod: () => Pe().getAuthMethod(),
     hasStartupPolicyChanges: () => m.hasChanges(() => Pe().getUserSavedConfiguration()),
   });
-  (I.add(
-    Pe().registerInternalNotificationHandler((e) => {
-      Ie.handleNotification(e);
-    }),
-  ),
-    I.add(
-      Pe().registerInternalConfigRefreshHandler(() => {
-        Ie.checkForChanges();
-      }),
-    ));
+  workspacePolicyLifecycle.installConnectionObservers({
+    connection: Pe(),
+    registerDispose: (dispose) => I.add(dispose),
+  });
   let q = K.getProjectsManager(),
     Le = _it({
       settingsStore: V.settingsStore,
@@ -56765,7 +56759,7 @@ async function Ust() {
       W.avatarOverlayManager.setFeedbackDiagnosticsEnabled(e);
     },
     latchInAppUpdatesEnabledForLaunch: (e) => {
-      (g.latchInAppUpdatesEnabledForLaunch(e), Ie.checkForChanges());
+      (g.latchInAppUpdatesEnabledForLaunch(e), workspacePolicyLifecycle.checkForChanges());
     },
     setAutomaticBackgroundDownloadsEnabled: (e) => {
       g.setAutomaticBackgroundDownloadsEnabled(e);
@@ -56856,27 +56850,12 @@ async function Ust() {
   ),
     _.reach(`host_ready`),
     M(`local app-server sqlite initialized`, L),
-    tt
-      .getUserSavedConfiguration()
-      .then(
-        (e) => (
-          p.resolve(e),
-          Ie.checkForChanges(),
-          V.settingsStore.initialize({
-            config: e,
-            batchWriteConfigValues: (e) => tt.sendAppServerRequest(`config/batchWrite`, e),
-          })
-        ),
-      )
-      .catch((e) => {
-        (p.reject(e),
-          r
-            .n()
-            .warning(`Failed to initialize desktop settings`, {
-              safe: {},
-              sensitive: { error: e },
-            }));
-      }),
+    workspacePolicyLifecycle.initializeDesktopSettings({
+      connection: tt,
+      logger: r.n(),
+      settingsStore: V.settingsStore,
+      startupConfig: p,
+    }),
     removeLegacyRemoteControlConfig({
       appServerConnection: tt,
       completedStateKey: a.X,
