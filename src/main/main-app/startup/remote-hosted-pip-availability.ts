@@ -4,7 +4,7 @@
 export function createRemoteHostedPipAvailabilityReconciler(options: Record<string, any>) {
   const {
     getEnabled,
-    getLogger,
+    logger,
     reconcileContentHostLifecycle,
     reconcileOverlayContentHost,
   } = options;
@@ -14,7 +14,7 @@ export function createRemoteHostedPipAvailabilityReconciler(options: Record<stri
     const enabled = getEnabled();
     reconcileContentHostLifecycle();
     if (previousEnabled !== enabled) {
-      getLogger().info(`Remote hosted PiP availability changed`, { safe: { enabled } });
+      logger.info(`Remote hosted PiP availability changed`, { safe: { enabled } });
       reconcileOverlayContentHost();
     }
     previousEnabled = enabled;

@@ -9,6 +9,7 @@
     "check": "node scripts/build.mjs --check",
     "typecheck": "tsc --noEmit",
     "build-renderer": "node scripts/build-renderer.mjs",
+    "recover-renderer-route-source": "node scripts/recover-renderer-route-source.mjs",
     "verify-renderer": "node scripts/verify-renderer.mjs",
     "verify-renderer-cluster": "node scripts/verify-renderer-cluster.mjs",
     "verify": "node scripts/verify-chunks.mjs",

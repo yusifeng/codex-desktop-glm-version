@@ -1,9 +1,13 @@
-# Semantic decompilation completion audit — 2026-11-01
+# Semantic classification audit — 2026-11-01
 
-The repository now meets the semantic-decompilation completion criteria used by this project. This means every reviewed
-first-party owner that could be separated without duplicating state or changing lifecycle ordering is implemented in a typed
-semantic module and wired to its runtime consumer. Remaining generated surfaces are explicitly classified as vendor/generated,
-composition roots, or stateful I/O runtimes; they are not counted as unfinished semantic owners.
+> Historical scope note: this audit established classification coverage, not a fully runnable decompilation. It must not be
+> cited as evidence that reconstruction was complete. Subsequent real E2E testing found startup/runtime contract failures,
+> structural renderer placeholders, and build-time release-asset fallback. Those findings supersede the former completion
+> wording.
+
+The repository met the semantic-classification criteria used at the time: every reviewed first-party owner was assigned to a
+typed semantic module or an explicitly retained boundary. Classification did not prove that every retained composition root
+was source-backed, that all dependency-injection contracts worked at runtime, or that key user workflows passed E2E.
 
 ## Coverage evidence
 
@@ -18,7 +22,7 @@ composition roots, or stateful I/O runtimes; they are not counted as unfinished 
 - Worker A1 owner review has no remaining separable manager/watch/session lifecycle. Retained worker boundaries are the
   host/composition root, transport, query/fsmonitor caches, command/filesystem I/O, and computer-use service dispatcher.
 
-## Final validation
+## Validation recorded by the classification audit
 
 - Relevant worker and preload focused suites passed, including 37 original-source integrity assertions and the 1,250-assertion
   unwired-owner gate.
@@ -29,9 +33,8 @@ composition roots, or stateful I/O runtimes; they are not counted as unfinished 
 - Full build check passed 12,448/12,448 transform-only files and bundled 11/11 rewritten chunks.
 - The final convergence commits are `a0843088` (worker runtime residues) and `a5ae149d` (cross-original preload/source audit).
 
-## Intentionally retained boundaries
+## Boundaries retained by that audit
 
-The preserved code is supported by line-level manifests and owner audits. It consists of bundled vendor/generated runtime,
-renderer surfaces whose state and cleanup belong to the generated composition lifecycle, and process/host I/O roots whose
-extraction would create a duplicate owner or a facade without moving behavior. These are explicit terminal classifications,
-not unreviewed work or placeholder implementations.
+The preserved code was supported by line-level manifests and owner audits, but several retained renderer and process roots
+later proved to contain runtime-critical behavior and placeholders. They are therefore reconstruction work, even when their
+exports were previously classified. Current completion requires source-backed builds plus a passing E2E workflow matrix.

@@ -62,7 +62,7 @@ const pipCalls = [];
 let pipEnabled = false;
 const reconcilePip = createRemoteHostedPipAvailabilityReconciler({
   getEnabled: () => (pipCalls.push(["get-enabled"]), pipEnabled),
-  getLogger: () => ({ info: (...args) => pipCalls.push(["log", ...args]) }),
+  logger: { info: (...args) => pipCalls.push(["log", ...args]) },
   reconcileContentHostLifecycle: () => pipCalls.push(["native-reconcile"]),
   reconcileOverlayContentHost: () => pipCalls.push(["overlay-reconcile"]),
 });

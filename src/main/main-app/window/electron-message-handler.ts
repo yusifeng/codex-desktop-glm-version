@@ -1429,7 +1429,7 @@ class ElectronMessageHandler {
     let r = this.windowManager.getPrimaryWindow();
     if (!r || r.isDestroyed() || r.id !== n.id) return;
     let i = n$e(t);
-    if ((0, G.default)(this.primaryWindowMode, t)) {
+    if (G(this.primaryWindowMode, t)) {
       i != null && this.showPrimaryWindow(n);
       return;
     }

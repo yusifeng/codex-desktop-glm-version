@@ -197,8 +197,9 @@ export async function createBrowserUseNativePipeServer({
   const addDownloadListener = apiImpl[ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER];
   if (typeof addDownloadListener === "function") {
     unsubscribes.push(
-      (addDownloadListener as (listener: (change: { path: string; tabId: string }) => void) => () => void)((change) =>
-        protocol.sendDownloadChange(change),
+      (addDownloadListener as (listener: (change: { path: string; tabId: string }) => void) => () => void).call(
+        apiImpl,
+        (change) => protocol.sendDownloadChange(change),
       ),
     );
   }

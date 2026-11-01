@@ -1,0 +1,96 @@
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "./local-conversation-sources-side-panel-tab-bf34acdaf32e.js",
+      "./rolldown-runtime-2d059c5e81f4.js",
+      "./app-shared-7b9edc1bfb7f.js",
+      "./app-shared-fa570b9eb9dd.css",
+      "./app-initial-51da50e6c6e3.js",
+      "./app-initial-e8ceb32eb626.css",
+      "./artifact-file-preview-icon-4afbe35ea2fc.js",
+      "./local-conversation-webmcp-tools-model-933537f85a0f.js",
+      "./webmcp-tool-calls-3e31ce94dbaa.js",
+      "./local-conversation-external-resource-icon-8c1a5a427843.js",
+      "./google-drive-resource-icon-96468341d044.js",
+      "./use-local-conversation-sources-b8198a1018b6.js",
+      "./local-conversation-external-resources-c392ed595266.js",
+      "./local-conversation-sources-signals-ad456834558e.js",
+      "./local-conversation-summary-panel-sources-model-c892be9130a7.js",
+      "./mcp-tool-activity-label-87ba9ef42b0b.js",
+      "./presentation-f4eb8ac38003.js",
+      "./mcp-app-analytics-7a30d3890ba8.js",
+      "./tool-activity-disclosure-e65bed71282a.js",
+      "./mcp-tool-item-content-d63cc703d211.js",
+      "./open-automation-side-panel-tab-e60c04bac713.js",
+      "./elicitation-events-bfb932b10fdd.js",
+      "./site-automation-setup-state-75f372a61373.js",
+      "./chatgpt_tasks-5e437f7d5423.js",
+      "./computer-use-native-app-metadata-c9103eda0b76.js",
+      "./registered-sources-1291c9a6cab3.js",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+import { H3 as t, I3 as n, Jm as r, V3 as i, qm as a } from "./app-shared-7b9edc1bfb7f.js";
+import { FDt as o, IDt as s, Qen as c, Zen as l } from "./app-initial-51da50e6c6e3.js";
+import { n as u, t as d } from "./open-sources-side-panel-tab-67bcb2ae2bb1.js";
+function f({ open: e }) {
+  return s(l.SOURCES, m, {
+    dropDestinations: [`left`, `right`, `bottom`],
+    getId: () => l.SOURCES,
+    isAvailable: (e) => e.value.routeKind === `local-thread`,
+    open: e,
+    renderThumbnail: (e, t) => (0, p.jsx)(h, { conversationId: e.conversationId, hostId: e.hostId, title: t.title }),
+  });
+}
+var p, m, h;
+function g() {
+  return (g = e(() => {
+    (o(),
+      a(),
+      c(),
+      (p = n()),
+      t(),
+      (m = r(
+        async () => {
+          let { LocalConversationSourcesSidePanelTab: e } = await i(
+            async () => {
+              let { LocalConversationSourcesSidePanelTab: e } = await import(
+                `./local-conversation-sources-side-panel-tab-bf34acdaf32e.js`
+              );
+              return { LocalConversationSourcesSidePanelTab: e };
+            },
+            __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]),
+            import.meta.url,
+          );
+          return e;
+        },
+        { propagateLoadError: !0 },
+      )),
+      (h = r(
+        async () => {
+          let { RegisteredLocalSourcesThumbnail: e } = await i(
+            async () => {
+              let { RegisteredLocalSourcesThumbnail: e } = await import(`./registered-sources-1291c9a6cab3.js`);
+              return { RegisteredLocalSourcesThumbnail: e };
+            },
+            __vite__mapDeps([25, 1, 2, 3, 4, 5, 12, 7, 8, 14, 15, 16, 17]),
+            import.meta.url,
+          );
+          return e;
+        },
+        { propagateLoadError: !0 },
+      )));
+  }))();
+}
+function _(e, t, n, r) {
+  u(e, v, t, n, r);
+}
+var v;
+function y() {
+  return (y = e(() => {
+    (g(), d(), (v = f({ open: _ })));
+  }))();
+}
+export { _ as n, y as t };

@@ -25,7 +25,7 @@ function importsOf(code) {
   const set = new Set();
   // 静态 import ... from "./x.js" / 动态 import("./x.js") / import.meta 之外的形式
   for (const m of code.matchAll(/from\s*["'](\.\/[^"']+)["']/g)) set.add(m[1]);
-  for (const m of code.matchAll(/import\(\s*["'](\.\/[^"']+)["']\s*\)/g)) set.add(m[1]);
+  for (const m of code.matchAll(/import\(\s*["'`](\.\/[^"'`]+)["'`]\s*\)/g)) set.add(m[1]);
   for (const m of code.matchAll(/import\s*["'](\.\/[^"']+)["']/g)) set.add(m[1]);
   // 重写后的 chunk 用 esbuild 打包，不再引 rolldown runtime 辅助。
   for (const r of [...set]) if (/^\.\/rolldown-runtime-/.test(r)) set.delete(r);

@@ -26488,6 +26488,47 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
     getBrowserPageRestoreResults(...args) { return this.hostPolicyController.getBrowserPageRestoreResults(...args); }
     deletePersistedBrowserConversation(...args) { return this.hostPolicyController.deletePersistedBrowserConversation(...args); }
     isPrimaryWindowPersistenceOwner(...args) { return this.hostPolicyController.isPrimaryWindowPersistenceOwner(...args); }
+    setTweaksFeatureEnabled(enabled) {
+      if (this.isTweaksFeatureEnabled === enabled) return;
+      this.isTweaksFeatureEnabled = enabled;
+      for (const windowState of this.windows.values()) {
+        for (const threadState of windowState.threads.values()) {
+          if (!enabled) {
+            const comments = n.Ou(threadState.snapshot.comments, false, true);
+            const snapshot = {
+              ...threadState.snapshot,
+              annotationEditorMode: `comment`,
+              isDesignModifierPressed: false,
+              isOriginalViewEnabled: false,
+              isTweaksEditorOpen: false,
+              comments,
+            };
+            if (
+              threadState.snapshot.annotationEditorMode !== snapshot.annotationEditorMode ||
+              threadState.snapshot.isDesignModifierPressed !== snapshot.isDesignModifierPressed ||
+              threadState.snapshot.isOriginalViewEnabled !== snapshot.isOriginalViewEnabled ||
+              threadState.snapshot.isTweaksEditorOpen !== snapshot.isTweaksEditorOpen ||
+              threadState.snapshot.comments.some((comment) => comment.designChange != null)
+            ) {
+              threadState.snapshot = snapshot;
+              this.syncThreadState(windowState, threadState.conversationId, threadState);
+            }
+          }
+          if (threadState.page != null) this.syncRuntimeStateToPage(threadState.page, threadState);
+        }
+      }
+    }
+    setAnnotationMultiSelectFeatureEnabled(enabled) {
+      if (this.isAnnotationMultiSelectFeatureEnabled === enabled) return;
+      this.isAnnotationMultiSelectFeatureEnabled = enabled;
+      for (const windowState of this.windows.values())
+        for (const threadState of windowState.threads.values())
+          if (threadState.page != null) this.syncRuntimeStateToPage(threadState.page, threadState);
+    }
+    setSiteAnnotationApiFeatureEnabled(enabled, permissionRequired) {
+      this.siteAnnotationFeatures.setApiEnabled(enabled);
+      this.siteAnnotationPermissions.setRequired(permissionRequired);
+    }
     getPageLifecycleHelpers(...args) { return this.runtimeSyncController.getPageLifecycleHelpers(...args); }
     syncThreadState(...args) { return this.runtimeSyncController.syncThreadState(...args); }
     syncThreadStateFromOrigin(...args) { return this.runtimeSyncController.syncThreadStateFromOrigin(...args); }
@@ -26496,6 +26537,15 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
     materializeThreadPageState(...args) { return this.pageMaterializationController.materializeThreadPageState(...args); }
     getPageState(...args) { return this.navigationContextController.getPageState(...args); }
     getCurrentPageCommandContext(...args) { return this.navigationContextController.getCurrentPageCommandContext(...args); }
+    closeActiveExtensionActionMenu(windowState) {
+      if (windowState.activeConversationId == null || windowState.activeBrowserTabId == null) return;
+      const webContents = this.getCurrentPageCommandContext(
+        windowState.owner,
+        windowState.activeConversationId,
+        windowState.activeBrowserTabId,
+      )?.page.view.webContents;
+      if (webContents != null && !webContents.isDestroyed()) webContents.closeExtensionActionContextMenu();
+    }
     ensureThreadCommandContext(...args) { return this.navigationContextController.ensureThreadCommandContext(...args); }
     ensureThreadPageForCommand(...args) { return this.navigationContextController.ensureThreadPageForCommand(...args); }
     navigateCurrentPageHistory(...args) { return this.navigationContextController.navigateCurrentPageHistory(...args); }
@@ -26635,7 +26685,7 @@ var OZ = createRemoteLocalhostNavigationForwarder({
   uQe = createElectronPerformanceSnapshotCollectorClass({
     basename: h.basename,
     createLogger: r.i,
-    desktopSnapshot: n.y.snapshot,
+    desktopSnapshot: () => n.y.snapshot(),
     electron: l,
     freeMemory: p.freemem,
     getSystemMetrics: CO,

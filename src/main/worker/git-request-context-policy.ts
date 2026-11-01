@@ -48,6 +48,13 @@ function classifyGitRequestException(error: unknown, gitUnavailableError: unknow
   return `exception`;
 }
 
+/** Applies command-attribution failures to the public review result shape. */
+function applyGitReviewAttribution<T>(result: T, stats: { failedCommandCount?: number } | null): T | Record<string, unknown> {
+  const value = result as Record<string, any> | null;
+  if (value?.type !== `expected` || stats == null || stats.failedCommandCount === 0) return result;
+  return { type: `error`, source: value.source, failureReason: `review_comparison` };
+}
+
 /** Projects review-summary live-query results when the comparison command failed. */
 function projectGitReviewSummaryResult(response: { method: string; result: any }, stats: { failedCommandCount: number } | null): { method: string; result: any } {
   if (response.method !== `review-summary`) return response;
@@ -68,5 +75,5 @@ function resolveGitRequestPerformanceContext(request: GitRequest): { root?: stri
   };
 }
 
-export { classifyGitRequestException, isGitRequestFailure, projectGitReviewSummaryResult, resolveGitRequestPerformanceContext, resolveRequestRoot, resolveReviewCwd, resolveReviewSource };
-if (typeof module !== `undefined`) module.exports = { classifyGitRequestException, isGitRequestFailure, projectGitReviewSummaryResult, resolveGitRequestPerformanceContext, resolveRequestRoot, resolveReviewCwd, resolveReviewSource };
+export { applyGitReviewAttribution, classifyGitRequestException, isGitRequestFailure, projectGitReviewSummaryResult, resolveGitRequestPerformanceContext, resolveRequestRoot, resolveReviewCwd, resolveReviewSource };
+if (typeof module !== `undefined`) module.exports = { applyGitReviewAttribution, classifyGitRequestException, isGitRequestFailure, projectGitReviewSummaryResult, resolveGitRequestPerformanceContext, resolveRequestRoot, resolveReviewCwd, resolveReviewSource };

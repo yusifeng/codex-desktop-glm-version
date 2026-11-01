@@ -1,7 +1,16 @@
 import assert from "node:assert/strict";
 import path from "node:path";
 import fs from "node:fs";
-import { createElectronPerformanceSnapshotCollectorClass } from "../src/main/main-app/startup/electron-performance-snapshot-collector.ts";
+import { transform } from "esbuild";
+
+const collectorSource = fs.readFileSync(
+  new URL("../src/main/main-app/startup/electron-performance-snapshot-collector.ts", import.meta.url),
+  "utf8",
+);
+const collectorOutput = await transform(collectorSource, { loader: "ts", format: "cjs", target: "es2022" });
+const collectorModule = { exports: {} };
+Function("module", "exports", collectorOutput.code)(collectorModule, collectorModule.exports);
+const { createElectronPerformanceSnapshotCollectorClass } = collectorModule.exports;
 
 const calls = [];
 const memoryUsage = () => ({

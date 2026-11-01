@@ -1,0 +1,46 @@
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+import { $3 as t, I3 as n, K2 as r, Y2 as i } from "./app-shared-7b9edc1bfb7f.js";
+import { Dft as a, Oft as o } from "./app-initial-51da50e6c6e3.js";
+function s() {
+  let e = (0, u.c)(1),
+    t;
+  return (
+    e[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, d.jsx)(`div`, {
+          className: `text-sm text-codex-description`,
+          children: (0, d.jsx)(i, {
+            id: `turnRatingControls.feedbackLegalNotice`,
+            defaultMessage: `Your feedback can be used to improve ChatGPT. <link>Learn more</link>.`,
+            description: `Legal notice shown below feedback details`,
+            values: { link: c },
+          }),
+        })),
+        (e[0] = t))
+      : (t = e[0]),
+    t
+  );
+}
+function c(e) {
+  return (0, d.jsx)(`a`, {
+    className: `underline underline-offset-2`,
+    href: f,
+    rel: `noreferrer`,
+    target: `_blank`,
+    onClick: l,
+    children: e,
+  });
+}
+function l(e) {
+  o({ event: e, href: f, initiator: `open_in_browser_bridge`, openTarget: `external-browser` });
+}
+var u, d, f;
+function p() {
+  return (p = e(() => {
+    ((u = t()),
+      r(),
+      a(),
+      (d = n()),
+      (f = `https://help.openai.com/en/articles/5722486-how-your-data-is-used-to-improve-model-performance`));
+  }))();
+}
+export { p as n, s as t };

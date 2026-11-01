@@ -18,6 +18,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { CHUNKS, IMPORT_ALIASES, REWRITTEN } from "./renderer-chunk-manifest.mjs";
+import { collectConversationRouteClosure } from "./renderer-route-recovery.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -108,51 +109,21 @@ const assetsDir = path.join(ROOT, "app/webview/assets");
 // the readable reconstruction.  Keep the shipped implementations active until
 // their React component trees have been fully recovered; otherwise a successful
 // turn/start navigates into a page that returns `{ kind, props }` to React.
-const preserveOriginalChunkRoots = [
-  "local-conversation-page-bcc7eca0b3ab.js",
-  "local-conversation-thread-c6e40fdd6d59.js",
-  "local-conversation-turn-14bf296d5217.js",
-  "conversation-blocks-3f59e850f9fb.js",
-  "agent-activity-item-792873f87aad.js",
-  "agent-activity-units-9397783428a4.js",
-  "user-message-e36f9e2dfe24.js",
-];
 // The route chunks are compiled as one release graph: their small helper chunks
 // share minified export aliases with the release copies of their callers. Mixing
 // reconstructed helpers into that graph can leave syntactically valid imports
 // whose values are semantically wrong (for example React becoming a plain
 // namespace without createContext). Preserve the complete non-core dependency
 // closure so the route runs with the exact module contracts it was built against.
-const originalAssetsDir = path.join(ROOT, ".reference/app-original/webview/assets");
-const reconstructedCoreChunks = new Set([
-  "app-initial-51da50e6c6e3.js",
-  "app-primary-d66705000d76.js",
-  "app-shared-7b9edc1bfb7f.js",
-  "rolldown-runtime-2d059c5e81f4.js",
-]);
-const preserveOriginalChunks = new Set();
-const pendingOriginalChunks = [...preserveOriginalChunkRoots];
-while (pendingOriginalChunks.length > 0) {
-  const name = pendingOriginalChunks.pop();
-  if (preserveOriginalChunks.has(name) || reconstructedCoreChunks.has(name)) continue;
-  let code;
-  try {
-    code = await fs.readFile(path.join(originalAssetsDir, name), "utf8");
-  } catch {
-    continue;
-  }
-  preserveOriginalChunks.add(name);
-  for (const match of code.matchAll(/(?:from\s*|import\s*)(?:\(\s*)?["']\.\/([^"']+\.js)["']/g)) {
-    pendingOriginalChunks.push(match[1]);
-  }
-}
-for (const name of preserveOriginalChunks) {
+const recoveredRouteSourceDir = path.join(ROOT, "src/renderer-recovered/conversation-route");
+const recoveredRouteChunks = await collectConversationRouteClosure(recoveredRouteSourceDir);
+for (const name of recoveredRouteChunks) {
   await fs.copyFile(
-    path.join(originalAssetsDir, name),
+    path.join(recoveredRouteSourceDir, name),
     path.join(assetsDir, name),
   );
 }
-console.log(`preserved ${preserveOriginalChunks.size} original conversation-route chunks`);
+console.log(`built ${recoveredRouteChunks.size} exact-recovery conversation-route chunks from checked-in source`);
 const assetNames = (await fs.readdir(assetsDir)).filter((name) => name.endsWith(".js"));
 const assetSources = new Map(
   await Promise.all(assetNames.map(async (name) => [name, await fs.readFile(path.join(assetsDir, name), "utf8")])),

@@ -179,7 +179,7 @@ const { createGitRequestCancellationTelemetry } = require("./worker/git-request-
 const { createGitWorkerResponse } = require("./worker/git-response-envelope");
 const { shouldContinueComputerUseCaptureUpdates } = require("./worker/computer-use-capture-policy");
 const { isGitMutationMethod, resolveGitInvalidationTarget, resolveMutationRoot } = require("./worker/git-request-invalidation-policy");
-const { classifyGitRequestException, isGitRequestFailure, projectGitReviewSummaryResult, resolveGitRequestPerformanceContext, resolveRequestRoot, resolveReviewCwd, resolveReviewSource } = require("./worker/git-request-context-policy");
+const { applyGitReviewAttribution, classifyGitRequestException, isGitRequestFailure, projectGitReviewSummaryResult, resolveGitRequestPerformanceContext, resolveRequestRoot, resolveReviewCwd, resolveReviewSource } = require("./worker/git-request-context-policy");
 const { handleGitLiveQuery } = require("./worker/git-live-query-handler");
 const { dispatchReadOnlyGitRequest } = require("./worker/git-read-request-dispatch");
 const { dispatchBranchReadRequest } = require("./worker/git-branch-read-dispatch");
@@ -68771,8 +68771,9 @@ var I6 = kW(`git`),
   },
   gitWorkerRequestRuntimeDependencies = {
     ...gitWorkerRequestDispatchRuntime,
+    gitWorkerRequestDispatchRuntime,
     $, a2, AH, applyGitChangesBetweenTrees, applyGitPatchRuntime,
-    applyReviewSectionChanges, bz, c3, classifyGitRequestException,
+    applyReviewSectionChanges, applyGitReviewAttribution, bz, c3, classifyGitRequestException,
     cleanupHostHandoffTransferFiles, collectSyncedBranchState,
     createGitBranchRequest, createGitRequestCancellationTelemetry,
     createGitWorkerResponse, createReviewDiffFallback, Cge, CW, EV, f2, fbe,
