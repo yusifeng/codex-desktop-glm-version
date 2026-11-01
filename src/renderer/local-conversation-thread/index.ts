@@ -140,12 +140,6 @@ void triangleWarning;
 // 类型
 // ---------------------------------------------------------------------------
 
-/** 视图描述。 */
-export interface ThreadViewNode {
-  kind: string;
-  props?: Record<string, unknown>;
-}
-
 /** 恢复状态机（原 `ky` 的返回形态）。 */
 export interface ResumeState {
   hasResumeFailed: boolean;
@@ -209,6 +203,12 @@ function voiceTimelineEnabled(conversationId: string | null): boolean {
   const configured = query<{ existingThreadVoiceEnabled?: boolean }>(initial.b1t);
   try { return initial.ACt?.(voiceState) === true || configured?.existingThreadVoiceEnabled === true; }
   catch { return configured?.existingThreadVoiceEnabled === true; }
+}
+function withThreadPlacementScope(child: unknown, conversationId: string | null, placement: "main" | "side", sourceConversationId: string | null, clientThreadId?: string | null): unknown {
+  const Provider = shared.UX;
+  if (typeof Provider !== "function" || initial.kht == null || typeof initial.jht !== "function") return child;
+  const value = initial.jht(conversationId, placement, sourceConversationId, clientThreadId);
+  return jsx().jsx(Provider, { scope: initial.kht, value, children: child });
 }
 function interactionMarksRead(event: { defaultPrevented?: boolean; key?: string; type?: string }): boolean {
   return event.defaultPrevented !== true && (event.type !== "keydown" || !["Meta", "Control", "Alt", "AltGraph", "Shift"].includes(event.key ?? ""));
@@ -714,7 +714,8 @@ function SideChatThread(props: {
     children: content,
   });
   const Context = (sideChatRuntime as any).t;
-  return Context?.Provider == null ? surface : jsx().jsx(Context.Provider, { value: SideChat, children: surface });
+  const contextual = Context?.Provider == null ? surface : jsx().jsx(Context.Provider, { value: SideChat, children: surface });
+  return withThreadPlacementScope(contextual, conversationId, "main", currentRouteConversationId(scope), clientThreadId);
 }
 
 /**
@@ -768,9 +769,10 @@ function SideChat(props: {
       });
   const Context = (sideChatRuntime as any).t;
   const contextual = Context?.Provider == null ? body : jsx().jsx(Context.Provider, { value: SideChat, children: body });
+  const scoped = withThreadPlacementScope(contextual, props.conversationId ?? null, "side", sourceConversationId, props.clientThreadId);
   return voiceTimelineEnabled(props.conversationId ?? null)
-    ? jsx().jsx("div", { className: "group/realtime-voice-thread relative flex h-full min-h-0 flex-1 flex-col overflow-clip", "data-realtime-voice-perspective": true, children: contextual })
-    : contextual;
+    ? jsx().jsx("div", { className: "group/realtime-voice-thread relative flex h-full min-h-0 flex-1 flex-col overflow-clip", "data-realtime-voice-perspective": true, children: scoped })
+    : scoped;
 }
 
 function ExpiredSideChat(props: {

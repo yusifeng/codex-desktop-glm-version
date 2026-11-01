@@ -35,7 +35,9 @@ import { default as openLocalConversationSubagentsPanel } from "@rchunk/open-loc
 void appPrimaryInit, runtimeChunk, openThreadPullRequestSidePanelTab, rightPanelComposerOverlay, threadPanelToggleButton, localConversationSideChat, threadEmoji, threadAppShellChrome, pullRequestFixWorkflow, threadOverflowMenu, threadUsageBreakdown, localConversationTurn, turnPreviewBodyItems, openLocalConversationSubagentsPanel;
 
 import { $3 as appSharedLazy } from "@rchunk/app-shared";
+import * as appSharedChunk from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
+import * as appInitialChunk from "@rchunk/app-initial";
 import * as localConversationThread from "@rchunk/local-conversation-thread";
 import { default as latestTurnPreview } from "@rchunk/latest-turn-preview";
 import { default as documentTitle } from "@rchunk/document-title";
@@ -88,6 +90,18 @@ export interface RouteContextValue {
   clientThreadId?: string | null;
 }
 
+type JsxRuntime = { Fragment: unknown; jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown; jsxs(type: unknown, props: Record<string, unknown>, key?: string): unknown };
+type ScopeLike = { get(signal: unknown, parameter?: unknown): any; value?: RouteContextValue; queryClient?: { invalidateQueries(options: unknown): unknown } };
+const shared = appSharedChunk as unknown as Record<string, any>;
+const initial = appInitialChunk as unknown as Record<string, any>;
+let jsxRuntime: JsxRuntime | undefined;
+let archivedInitialized = false;
+let pageInitialized = false;
+function jsx(): JsxRuntime { jsxRuntime ??= shared.I3?.(); if (jsxRuntime == null) throw new Error("local-conversation-page requires JSX runtime"); return jsxRuntime; }
+function call(value: unknown): void { if (typeof value === "function") value(); }
+function appScope(): ScopeLike | null { try { return shared.LX?.(initial.$en) ?? null; } catch { return null; } }
+function query<Value>(signal: unknown, parameter?: unknown): Value | undefined { return typeof shared.BX === "function" && signal != null ? shared.BX(signal, parameter) as Value : undefined; }
+
 // ---------------------------------------------------------------------------
 // 归档预览消息（原文）
 // ---------------------------------------------------------------------------
@@ -111,22 +125,40 @@ const ARCHIVED_PREVIEW_MESSAGES = {
  *    toast（View now 主操作）+ archived-threads 查询失效；
  * ④ 打开失败/取消归档失败 toast。
  */
-function ArchivedConversationPage(props: { conversationId: string; hostId?: string }): PageViewNode {
-  return {
-    kind: "archived-conversation-page",
-    props: {
-      conversationId: props.conversationId,
-      hostId: props.hostId,
-      messages: ARCHIVED_PREVIEW_MESSAGES,
-      unarchiveMutation: {
-        invalidateKeys: [["archived-threads", props.hostId]],
-      },
-    },
+function ArchivedConversationPage(props: { conversationId: string; hostId?: string }): unknown {
+  const react = shared.e6?.();
+  const [restoring, setRestoring] = react?.useState?.(false) ?? [false, () => undefined];
+  const [error, setError] = react?.useState?.(null) ?? [null, () => undefined];
+  const scope = appScope();
+  const hostId = props.hostId ?? query<string>(initial.wQt, props.conversationId) ?? "local";
+  const archived = query<boolean>(initial.JZt, props.conversationId) === true;
+  const navigate = typeof initial.o_n === "function" ? initial.o_n() : null;
+  const done = () => {
+    const location = typeof initial.i_n === "function" ? initial.i_n() : null;
+    navigate?.({ pathname: location?.pathname ?? `/thread/${props.conversationId}`, search: location?.search ?? "", hash: location?.hash ?? "" }, { replace: true, state: { ...location?.state, archivedConversationPreview: false } });
   };
+  const restore = () => {
+    if (scope == null || restoring) return;
+    setRestoring(true); setError(null);
+    Promise.resolve(initial.Ugn?.(scope, hostId)?.unarchiveConversation?.(props.conversationId, { useAppServerPins: scope.get(initial.Kt) }))
+      .then(() => { scope.queryClient?.invalidateQueries({ queryKey: ["archived-threads", hostId] }); done(); })
+      .catch((reason) => { setRestoring(false); setError(reason); });
+  };
+  return jsx().jsxs("section", { className: "flex h-full min-h-0 flex-col", "data-archived-conversation-page": props.conversationId, children: [
+    jsx().jsx((localConversationThread as any).t, { canInteract: false, conversationId: props.conversationId, hostId, shouldResume: false }),
+    jsx().jsxs("footer", { className: "shrink-0", children: [
+      error == null ? null : jsx().jsx("div", { role: "alert", children: ARCHIVED_PREVIEW_MESSAGES.unarchiveError.defaultMessage }),
+      archived ? jsx().jsx("button", { disabled: restoring, onClick: restore, type: "button", children: restoring ? "Restoring…" : "Unarchive and open" }) : jsx().jsx("button", { onClick: done, type: "button", children: "Done" }),
+    ] }),
+  ] });
 }
 
 /** 归档页初始化器（原 `Xs`，导出 a）。 */
-function initializeArchivedConversationPage(): void {}
+function initializeArchivedConversationPage(): void {
+  if (archivedInitialized) return;
+  archivedInitialized = true;
+  call(appSharedLazy); call(appInitialInit); call((localConversationThread as any).s); void jsx();
+}
 
 // ---------------------------------------------------------------------------
 // 路由守卫（原 `Ll`，导出 t）
@@ -138,8 +170,22 @@ function initializeArchivedConversationPage(): void {}
  * hostId 路由参数与实际 host 不符 → host 骨架；chatgpt 能力 + 本地 thread
 //  上下文导航分发。
  */
-function LocalConversationRouteGuard(props: { children?: unknown }): PageViewNode {
-  return { kind: "local-conversation-route-guard", props: { children: props.children } };
+function LocalConversationRouteGuard(props: { children?: unknown }): unknown {
+  const scope = appScope();
+  const route = scope?.value;
+  const supported = route?.routeKind === "local-thread" || route?.routeKind === "client-local-thread";
+  const conversationId = route?.routeKind === "local-thread" ? route.conversationId ?? null : null;
+  const routeHostId = route?.routeKind === "local-thread" ? route.hostId ?? null : null;
+  const actualHostId = query<string>(initial.wQt, conversationId);
+  if (!supported) {
+    const Redirect = initial.Ygn;
+    return typeof Redirect === "function" ? jsx().jsx(Redirect, { replace: true, to: "/" }) : jsx().jsx("a", { href: "/", children: "Back to home" });
+  }
+  if (routeHostId != null && actualHostId != null && routeHostId !== actualHostId) {
+    const Loading = initial.Let;
+    return typeof Loading === "function" ? jsx().jsx(Loading, { debugName: "LocalConversationPage.host" }) : jsx().jsx("div", { role: "status", children: "Loading task…" });
+  }
+  return props.children ?? null;
 }
 
 // ---------------------------------------------------------------------------
@@ -156,12 +202,45 @@ function isArchivedPreview(route: RouteContextValue, location: RouteLocationLike
  * 路由守卫 + Rl 内容装配（归档预览 → 空骨架；否则 El 会话装配 + Pa +
  * hl 线程装配 + openThreadInNewWindow 键注册）。
  */
-function LocalConversationPage(): PageViewNode {
-  return { kind: "local-conversation-page", props: { guard: true, content: true } };
+function LocalConversationPage(): unknown {
+  const scope = appScope();
+  const route = scope?.value;
+  const conversationId = route?.routeKind === "local-thread" ? route.conversationId ?? null : null;
+  const clientThreadId = route?.clientThreadId ?? null;
+  const hostId = conversationId == null ? undefined : query<string>(initial.wQt, conversationId);
+  const isArchived = conversationId != null && query<boolean>(initial.JZt, conversationId) === true;
+  const isReadOnly = query<boolean>(initial.jY) === true;
+  const location = typeof initial.i_n === "function" ? initial.i_n() as RouteLocationLike : { hash: "", pathname: "", search: "", state: null };
+  const archivedPreview = isArchivedPreview(route ?? { routeKind: "client-local-thread", clientThreadId }, location, { isArchived, isReadOnly });
+  let content: unknown;
+  if (conversationId != null && archivedPreview) {
+    content = jsx().jsx(ArchivedConversationPage, { conversationId, hostId });
+  } else {
+    const Thread = (localConversationThread as any).i;
+    content = typeof Thread === "function"
+      ? jsx().jsx(Thread, {
+          allowMissingConversation: conversationId != null && query(initial.o0t, conversationId) != null,
+          isReadOnly,
+          shouldResume: true,
+          showComposer: true,
+          showSummaryPanel: true,
+          showUtilityBar: false,
+        }, String(clientThreadId ?? conversationId ?? "pending"))
+      : null;
+  }
+  return jsx().jsx(LocalConversationRouteGuard, {
+    children: jsx().jsx("main", { className: "relative h-full min-h-0", "data-local-conversation-page": conversationId ?? clientThreadId ?? true, children: content }),
+  });
 }
 
 /** 页面初始化器（原 `Gl`，导出 r）。 */
-function initializeLocalConversationPage(): void {}
+function initializeLocalConversationPage(): void {
+  if (pageInitialized) return;
+  pageInitialized = true;
+  initializeArchivedConversationPage();
+  for (const dependency of [appPrimaryInit, (localConversationThread as any).p, (localConversationThread as any)._, (localConversationTurn as any).n, (agentActivityUnits as any).n, (splitItems as any).t, (virtualizedTurnList as any).n]) call(dependency);
+  void jsx();
+}
 
 // ---------------------------------------------------------------------------
 // 原版压缩导出名（chunk 间契约）

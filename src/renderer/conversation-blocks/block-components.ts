@@ -48,12 +48,13 @@ function renderableText(value: unknown, fallback = ""): string | number {
 }
 
 /** 兼容恢复期间仍被少量纯算法调用使用的视图描述。 */
-export interface ViewNode {
+export interface ConversationBlockNode {
   className?: string;
   data?: Record<string, unknown>;
   kind: string;
   props?: Record<string, unknown>;
 }
+export type ViewNode = ConversationBlockNode;
 
 /** 活动状态归约（原 `Wg`，导出 L）。 */
 export function mergeActivityStatuses(statuses: string[]): "active" | "interrupted" | "updated" | "completed" {
