@@ -202,7 +202,7 @@ assert.equal(
 );
 byText(reportTree, "Cancel").props.onClick();
 assert.equal(reportClosed, true);
-assert.equal(byText(reportTree, "Submit").props.disabled, true);
+assert.equal(byText(reportTree, "Next").props.disabled, true);
 
 // codex-thread-report-dialog: 10
 const codexReport = await bundle("codex-thread-report-dialog");

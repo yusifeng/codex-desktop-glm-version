@@ -2,7 +2,7 @@ import "@rchunk/rolldown-runtime";
 import { I3 as getJsxRuntime, n4 as useIntl, type JsxRuntime } from "@rchunk/app-shared";
 import * as sharedChunk from "@rchunk/app-shared";
 import * as initialChunk from "@rchunk/app-initial";
-import "@rchunk/chatgpt-tasks-runtime";
+import * as chatgptTasksRuntime from "@rchunk/chatgpt-tasks-runtime";
 import "@rchunk/computer-use-native-app-metadata";
 import { i as initializeMcpToolActivityLabels, t as formatToolActivityLabel } from "@rchunk/mcp-tool-activity-label";
 import { n as openAutomationSidePanelTab, t as initializeOpenAutomationSidePanelTab } from "@rchunk/open-automation-side-panel-tab";
@@ -471,8 +471,63 @@ function ToolItemContent(props: ToolItemContentProps): unknown {
     ...webCalls.map((call, index) => jsx().jsx(WebMcpOutput, { call, fallbackPageUrl: browserPageUrl(item) }, `${item.callId}:webmcp:${index}:${call.name}`)),
   ] });
 }
-function TrackTaskView(_props?: { conversationId?: string }): null { return null; }
-function initializeTrackTaskView(): void { void jsx(); }
+let trackTaskViewedSignal: unknown;
+function TrackTaskView(props: { conversationId?: string }): null {
+  const taskOpenDestinations = (chatgptTasksRuntime as any).a ?? {};
+  const taskEvent = (chatgptTasksRuntime as any).n;
+  const taskEventTypes = (chatgptTasksRuntime as any).r ?? {};
+  const react = (sharedChunk as any).e6?.();
+  const scope = typeof (sharedChunk as any).LX === "function"
+    ? (sharedChunk as any).LX((initialChunk as any).$en)
+    : null;
+  const route = typeof (initialChunk as any).i_n === "function"
+    ? (initialChunk as any).i_n()
+    : null;
+  react?.useEffect?.(() => {
+    if (
+      props.conversationId == null
+      || scope?.value?.routeKind !== "chatgpt-thread"
+      || typeof scope.watch !== "function"
+    ) return;
+    const currentConversationId = scope.value.conversationId;
+    return scope.watch((state: any) => {
+      const taskConversationId = state.get?.((initialChunk as any).wVt, props.conversationId);
+      if (
+        taskConversationId == null
+        || taskConversationId !== state.get?.((initialChunk as any).wVt, currentConversationId)
+      ) return;
+      const identity = { conversationId: taskConversationId, locationKey: route?.key };
+      if (trackTaskViewedSignal != null && state.get?.(trackTaskViewedSignal, identity)) return;
+      if (trackTaskViewedSignal != null) state.set?.(trackTaskViewedSignal, identity, true);
+      const submitTaskEvent = (initialChunk as any).xpn;
+      if (typeof submitTaskEvent === "function") {
+        submitTaskEvent(scope, taskEvent, {
+          conversationId: taskConversationId,
+          eventKind: taskEventTypes.CHATGPT_TASKS_EVENT_TYPE_CONVERSATION_WITH_TASK_VIEWED,
+          openDestination: taskOpenDestinations.CHATGPT_TASKS_OPEN_DESTINATION_CONVERSATION,
+        });
+      }
+    });
+  }, [props.conversationId, route?.key, scope]);
+  return null;
+}
+function initializeTrackTaskView(): void {
+  (chatgptTasksRuntime as any).s?.();
+  for (const initializer of [
+    (sharedChunk as any).$3,
+    (sharedChunk as any).V4,
+    (sharedChunk as any).K2,
+    (sharedChunk as any).gL,
+    (initialChunk as any).Qgn,
+    (initialChunk as any).ypn,
+    (initialChunk as any).itn,
+    (initialChunk as any).uHt,
+  ]) if (typeof initializer === "function") initializer();
+  if (trackTaskViewedSignal == null && typeof (sharedChunk as any).rZ === "function") {
+    trackTaskViewedSignal = (sharedChunk as any).rZ((initialChunk as any).$en, () => false);
+  }
+  void jsx();
+}
 function initializeResolvePluginLogo(): void {}
 function initializePluginLogoRuntime(): void { void jsx(); }
 function initializeAutomationItem(): void { initializeOpenAutomationSidePanelTab(); void jsx(); }

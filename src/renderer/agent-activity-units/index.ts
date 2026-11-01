@@ -30,6 +30,7 @@ import {
   $3 as runtimeLazy,
 } from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
+import * as appInitialChunk from "@rchunk/app-initial";
 import * as agentActivityItem from "@rchunk/agent-activity-item";
 import * as assertNever from "@rchunk/assert-never";
 import * as patchDiffStats from "@rchunk/patch-diff-stats";
@@ -70,14 +71,14 @@ export interface ActivityItem {
 
 /** 分组节点。 */
 export type ActivityUnit =
-  | { kind: "group"; key: string; items: Array<{ item: ActivityItem }> }
-  | { kind: "standalone"; key: string; item: { item: ActivityItem } };
+  | { kind: "group"; key: string; items: ActivityItem[] }
+  | { kind: "standalone"; key: string; item: ActivityItem };
 
 /** 最新单元状态。 */
 export type LatestUnitState =
   | { kind: "summary" }
   | { kind: "thinking" }
-  | { kind: "active"; item: { item: ActivityConversationItem } | { item: ActivityItem } };
+  | { kind: "active"; item: ActivityItem };
 
 // ---------------------------------------------------------------------------
 // 进行中判定（原 `W`，导出 m）
@@ -128,9 +129,16 @@ function isItemInProgress(item: ActivityConversationItem): boolean {
     case "dynamic-tool-call":
       return item.completed !== true;
     case "automatic-approval-review":
+    case "multi-agent-action":
       return (item as { status?: string }).status === "inProgress";
     case "web-search":
+    case "userInput":
+    case "user-input-response":
+    case "mcp-server-elicitation":
+    case "permission-request":
       return item.completed !== true;
+    case "todo-list":
+      return ((item as { plan?: Array<{ status?: string }> }).plan ?? []).some(entry => entry.status !== "completed");
     default:
       return false;
   }
@@ -141,8 +149,27 @@ function isItemInProgress(item: ActivityConversationItem): boolean {
 // ---------------------------------------------------------------------------
 
 /** 单元键（原 `Q`）。 */
-function activityUnitKey(item: unknown, sourceIndex: number): string {
-  return `${(item as { key?: string }).key ?? ""}:${sourceIndex}`;
+function activityUnitKey(value: unknown, sourceIndex: number): string {
+  const outer = value as { item?: unknown };
+  const inner = outer?.item as { item?: unknown } | undefined;
+  const item = (inner?.item ?? outer?.item ?? value) as ActivityConversationItem & {
+    callId?: string;
+    delivery?: string;
+    handoffId?: string;
+    id?: string;
+    requestId?: string;
+    requestUserInputAsync?: unknown;
+    searchItemId?: string;
+  };
+  if (
+    item.type === "assistant-message"
+    && (item.delivery === "async" || item.requestUserInputAsync != null)
+    && item.searchItemId != null
+  ) return item.searchItemId;
+  for (const candidate of [item.id, item.callId, item.requestId, item.handoffId]) {
+    if (typeof candidate === "string") return candidate;
+  }
+  return `${item.type}:${sourceIndex}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -156,19 +183,47 @@ function activityUnitKey(item: unknown, sourceIndex: number): string {
  */
 function expandCodexFollowup(markdown: string): string {
   if (!markdown.includes(":codex-followup[")) return markdown;
-  let result = "";
-  let consumed = 0;
-  let searchFrom = 0;
-  // 简化的指令匹配（原版走 markdown AST；此处按指令语法直接匹配）
-  const directivePattern = /:codex-followup\[([^\]]*)\]/g;
-  for (const match of markdown.matchAll(directivePattern)) {
-    const index = match.index ?? 0;
-    if (index < searchFrom) continue;
-    result += markdown.slice(consumed, index) + match[1];
-    consumed = index + match[0].length;
-    searchFrom = consumed;
+  let output = "";
+  let cursor = 0;
+  let index = 0;
+  let fenced = false;
+  let fenceMarker = "";
+  let inlineTicks = 0;
+  while (index < markdown.length) {
+    const lineStart = index === 0 || markdown[index - 1] === "\n";
+    if (lineStart) {
+      const fence = markdown.slice(index).match(/^(\s*)(`{3,}|~{3,})/);
+      if (fence != null) {
+        const marker = fence[2][0];
+        if (!fenced) {
+          fenced = true;
+          fenceMarker = marker;
+        } else if (marker === fenceMarker) {
+          fenced = false;
+          fenceMarker = "";
+        }
+      }
+    }
+    if (!fenced && markdown[index] === "`") {
+      let count = 1;
+      while (markdown[index + count] === "`") count += 1;
+      inlineTicks = inlineTicks === count ? 0 : inlineTicks === 0 ? count : inlineTicks;
+      index += count;
+      continue;
+    }
+    if (!fenced && inlineTicks === 0 && markdown.startsWith(":codex-followup[", index)) {
+      const contentStart = index + ":codex-followup[".length;
+      const close = markdown.indexOf("]", contentStart);
+      if (close !== -1) {
+        output += markdown.slice(cursor, index) + markdown.slice(contentStart, close);
+        cursor = close + 1;
+        index = cursor;
+        continue;
+      }
+    }
+    index += 1;
   }
-  return result + markdown.slice(consumed);
+  return output + markdown.slice(cursor);
 }
 
 // ---------------------------------------------------------------------------
@@ -177,7 +232,21 @@ function expandCodexFollowup(markdown: string): string {
 
 /** web 搜索命令（原 `k`）：curl/wget/ping/dig 等。 */
 function isWebSearchCommand(command: string): boolean {
-  return /^\s*(?:curl|wget|ping|dig|nslookup|host|traceroute|ssh|scp|rsync)(?:\s|$)/.test(command);
+  if (
+    !/^\s*curl(?:\s|$)/.test(command)
+    || CURL_MUTATING_REQUEST_PATTERN.test(command)
+    || CURL_DATA_PATTERN.test(command)
+    || CURL_SHORT_DATA_PATTERN.test(command)
+  ) return false;
+  const urls = command.match(/\bhttps?:\/\/[^\s'"<>]+/gi);
+  return urls?.some(value => {
+    try {
+      const hostname = new URL(value).hostname.toLowerCase();
+      return hostname !== "localhost" && !hostname.startsWith("127.");
+    } catch {
+      return false;
+    }
+  }) === true;
 }
 
 // ---------------------------------------------------------------------------
@@ -191,11 +260,11 @@ function isWebSearchCommand(command: string): boolean {
  * pluginId/connectorId/linkId/invocationResourceUri + 自定义摘要；
  * 键相同且紧邻 → 同簇。
  */
-function clusterGroupableMcpCalls(items: Array<{ item: ActivityItem }>, summarize: (item: ActivityConversationItem) => unknown): Array<Array<{ item: ActivityItem }>> {
-  const clusters: Array<Array<{ item: ActivityItem }>> = [];
+function clusterGroupableMcpCalls(items: ActivityItem[], summarize: (item: ActivityConversationItem) => unknown): ActivityItem[][] {
+  const clusters: ActivityItem[][] = [];
   let lastKey: string | null = null;
   for (const entry of items) {
-    const item = entry.item.item;
+    const item = entry.item;
     let key: string | null = null;
     if (
       entry.item.grouping === "groupable" &&
@@ -204,7 +273,8 @@ function clusterGroupableMcpCalls(items: Array<{ item: ActivityItem }>, summariz
       item.source == null &&
       item.invocation?.server !== "computer-use" &&
       item.result?.type === "success" &&
-      !(item.automaticApprovalReviews?.length)
+      !(item.automaticApprovalReviews?.length) &&
+      !isCodexAppsToolResult(item)
     ) {
       key = JSON.stringify([
         item.invocation?.server,
@@ -225,6 +295,16 @@ function clusterGroupableMcpCalls(items: Array<{ item: ActivityItem }>, summariz
   return clusters;
 }
 
+function isCodexAppsToolResult(item: ActivityConversationItem): boolean {
+  const isCodexAppsServer = typeof (appInitialChunk as any).mXt === "function"
+    ? Boolean((appInitialChunk as any).mXt(item.invocation?.server))
+    : item.invocation?.server === "codex_apps";
+  if (typeof (appInitialChunk as any).uXt === "function") {
+    return Boolean((appInitialChunk as any).uXt({ isCodexAppsServer, result: item.result }));
+  }
+  return isCodexAppsServer;
+}
+
 // ---------------------------------------------------------------------------
 // 分组（原 `He`/`We`/`qe`，导出 r）
 // ---------------------------------------------------------------------------
@@ -236,9 +316,11 @@ function clusterGroupableMcpCalls(items: Array<{ item: ActivityItem }>, summariz
  * strict-review-notice 不与前一 strict-review-notice standalone 合并；
  * startsGroup 集合触发强制断组。
  */
-function groupActivityItems(items: ActivityItem[], options: { includeGeneratedImages?: boolean; groupStartItems?: Set<ActivityConversationItem>; mcpServerStatuses?: unknown } = {}): ActivityUnit[] {
+function groupConvertedActivityItems(
+  items: Array<{ activityItem: ActivityItem; sourceIndex: number; startsGroup: boolean }>,
+): ActivityUnit[] {
   const units: ActivityUnit[] = [];
-  let pending: Array<{ item: ActivityItem }> = [];
+  let pending: ActivityItem[] = [];
   let groupStartIndex = 0;
   const flushGroup = () => {
     const first = pending[0];
@@ -247,23 +329,48 @@ function groupActivityItems(items: ActivityItem[], options: { includeGeneratedIm
       pending = [];
     }
   };
-  for (const [index, activityItem] of items.entries()) {
-    if (options.groupStartItems?.has(activityItem.item as ActivityConversationItem)) flushGroup();
+  for (const { activityItem, sourceIndex, startsGroup } of items) {
+    if (startsGroup) flushGroup();
     if (activityItem.grouping === "groupable") {
-      if (pending.length === 0) groupStartIndex = index;
-      pending.push({ item: activityItem });
+      if (pending.length === 0) groupStartIndex = sourceIndex;
+      pending.push(activityItem);
       continue;
     }
     flushGroup();
     const last = units.at(-1);
     const isStrictReview = activityItem.item.type === "strict-review-notice";
-    const lastIsStrictReview = last?.kind === "standalone" && (last.item as { item: { item: { type?: string } } }).item?.item?.type === "strict-review-notice";
+    const lastIsStrictReview = last?.kind === "standalone" && last.item.item.type === "strict-review-notice";
     if (!(isStrictReview && lastIsStrictReview)) {
-      units.push({ kind: "standalone", key: `agent-activity-standalone:${activityUnitKey(activityItem, index)}`, item: { item: activityItem } });
+      units.push({ kind: "standalone", key: `agent-activity-standalone:${activityUnitKey(activityItem, sourceIndex)}`, item: activityItem });
     }
   }
   flushGroup();
   return units;
+}
+
+function groupActivityItems(
+  items: ActivityConversationItem[],
+  options: { includeGeneratedImages?: boolean; groupStartItems?: Set<ActivityConversationItem>; mcpServerStatuses?: unknown } = {},
+): ActivityUnit[] {
+  const converted: Array<{ activityItem: ActivityItem; sourceIndex: number; startsGroup: boolean }> = [];
+  for (const [sourceIndex, item] of items.entries()) {
+    const linkedToFollowingPatch = typeof (agentActivityItem as any).r === "function"
+      && (agentActivityItem as any).r(item, items[sourceIndex + 1]) === true;
+    if (linkedToFollowingPatch) continue;
+    const activityItem = typeof (agentActivityItem as any).t === "function"
+      ? (agentActivityItem as any).t(item, {
+          includeGeneratedImages: options.includeGeneratedImages === true,
+          mcpServerStatuses: options.mcpServerStatuses,
+        }) as ActivityItem | null
+      : null;
+    if (activityItem == null) continue;
+    converted.push({
+      activityItem,
+      sourceIndex,
+      startsGroup: options.groupStartItems?.has(item) === true,
+    });
+  }
+  return groupConvertedActivityItems(converted);
 }
 
 // ---------------------------------------------------------------------------
@@ -271,8 +378,8 @@ function groupActivityItems(items: ActivityItem[], options: { includeGeneratedIm
 // ---------------------------------------------------------------------------
 
 /** 组含进行中条目（原 `Z`）。 */
-function groupHasInProgress(entry: { item: ActivityItem }): boolean {
-  return isItemInProgress(entry.item.item);
+function groupHasInProgress(entry: ActivityItem): boolean {
+  return isItemInProgress(entry.item);
 }
 
 /**
@@ -282,7 +389,9 @@ function groupHasInProgress(entry: { item: ActivityItem }): boolean {
  */
 function pruneActivityGroups(units: ActivityUnit[], keepLastGroup: boolean): ActivityUnit[] {
   const lastMeaningfulIndex = units.findLastIndex(
-    (unit) => unit.kind !== "standalone" || (unit.item as { item: { item: ActivityConversationItem } }).item.item.type !== "assistant-message" || ((unit.item as { item: { item: ActivityConversationItem } }).item.item.completed ?? true) !== true,
+    unit => unit.kind !== "standalone"
+      || unit.item.item.type !== "assistant-message"
+      || unit.item.item.completed !== true,
   );
   return units.filter((unit, index) => unit.kind !== "group" || (keepLastGroup && index === lastMeaningfulIndex) || unit.items.some(groupHasInProgress));
 }
@@ -299,8 +408,15 @@ function pruneActivityGroups(units: ActivityUnit[], keepLastGroup: boolean): Act
 function promoteSingleItemGroup(unit: ActivityUnit, state: { kind: string }, summarize: (item: ActivityConversationItem) => unknown): ActivityUnit {
   void summarize;
   const first = unit.kind === "group" ? unit.items[0] : null;
-  const firstEntry = first as { item: { item: ActivityConversationItem } } | null;
-  return state.kind !== "summary" || unit.kind !== "group" || unit.items.length !== 1 || firstEntry == null || groupHasInProgress(first) || (firstEntry.item.item.type === "patch" && Object.keys((firstEntry.item.item as { changes?: Record<string, unknown> }).changes ?? {}).length !== 1)
+  return state.kind !== "summary"
+    || unit.kind !== "group"
+    || unit.items.length !== 1
+    || first == null
+    || groupHasInProgress(first)
+    || (first.item.type === "patch" && (
+      Object.keys((first.item as { changes?: Record<string, unknown> }).changes ?? {}).length !== 1
+      || (((first.item as { visualizationActivities?: unknown[] }).visualizationActivities?.length ?? 0) > 0)
+    ))
     ? unit
     : { kind: "standalone", key: unit.key, item: first };
 }
@@ -322,7 +438,7 @@ function latestUnitState({
   isActivitySliceClosed,
   isExploring,
 }: {
-  unit: { items: Array<{ item: ActivityItem }> };
+  unit: { items: ActivityItem[] };
   isLatestVisibleUnit: boolean;
   isTurnInProgress: boolean;
   isActivitySliceClosed: boolean;
@@ -336,18 +452,18 @@ function latestUnitState({
   for (let index = unit.items.length - 1; index >= 0; --index) {
     const entry = unit.items[index];
     if (entry != null && groupHasInProgress(entry)) {
-      return (entry.item as { item: ActivityConversationItem }).item.type === "automatic-approval-review" ? { kind: "thinking" } : { kind: "active", item: entry };
+      return entry.item.type === "automatic-approval-review" ? { kind: "thinking" } : { kind: "active", item: entry };
     }
   }
   return { kind: "thinking" };
 }
 
 /** exploration 倒找（原 `Ye`）。 */
-function lastExplorationInProgress(unit: { items: Array<{ item: ActivityItem }> }): { item: ActivityItem } | null {
-  let found: { item: ActivityItem } | null = null;
+function lastExplorationInProgress(unit: { items: ActivityItem[] }): ActivityItem | null {
+  let found: ActivityItem | null = null;
   for (let index = unit.items.length - 1; index >= 0; --index) {
     const entry = unit.items[index];
-    const type = (entry?.item as { item: { type?: string } }).item?.type;
+    const type = entry?.item.type;
     if (type !== "exec" || !isExplorationEntry(entry)) {
       if (found != null) break;
       continue;
@@ -359,8 +475,8 @@ function lastExplorationInProgress(unit: { items: Array<{ item: ActivityItem }> 
 }
 
 /** exploration 判定（原 `F`，导出 g：read/search/list_files 的 exec）。 */
-function isExplorationEntry(entry: { item: ActivityItem } | null | undefined): boolean {
-  const parsedCmd = (entry?.item as { item: { parsedCmd?: { type?: string } } }).item?.parsedCmd;
+function isExplorationEntry(entry: ActivityItem | null | undefined): boolean {
+  const parsedCmd = entry?.item.parsedCmd;
   const type = parsedCmd?.type;
   return type === "read" || type === "search" || type === "list_files";
 }
@@ -370,18 +486,30 @@ function isExplorationEntry(entry: { item: ActivityItem } | null | undefined): b
 // ---------------------------------------------------------------------------
 
 /** 懒初始化器（原 `G`，导出 p）。 */
-function initializeAgentActivityUnits(): void {}
+let activityUnitsInitialized = false;
+function initializeAgentActivityUnits(): void {
+  if (activityUnitsInitialized) return;
+  activityUnitsInitialized = true;
+  for (const initializer of [
+    runtimeLazy,
+    appInitialInit,
+    (agentActivityItem as any).n,
+    (patchDiffStats as any).n,
+    (presentationChunk as any).i,
+    (skillExplorationLabels as any).n,
+  ]) if (typeof initializer === "function") initializer();
+}
 
 /** 初始化器（原 `Ve`，导出 u）。 */
-function initializeCompletedHeader(): void {}
+function initializeCompletedHeader(): void { initializeAgentActivityUnits(); }
 
 /** 初始化器（原 `O`，导出 y）。 */
-function initializeFollowupExpansion(): void {}
+function initializeFollowupExpansion(): void { initializeAgentActivityUnits(); }
 
 
 
 /** codex-followup 装配初始化器（原 `D`，导出 S）。 */
-function initializeCodexFollowupDirective(): void {}
+function initializeCodexFollowupDirective(): void { initializeFollowupExpansion(); }
 
 /** curl 正则装配初始化器（原 `P`，导出 _）。 */
 function initializeCurlPatterns(): void {
@@ -395,7 +523,7 @@ const CURL_DATA_PATTERN = /(?:^|\s)(?:--data(?:-[^\s=]+)?|--json|--form|--upload
 const CURL_SHORT_DATA_PATTERN = /(?:^|\s)-(?:d|F|T)(?:=|\s|$)/;
 
 /** 空初始化器（原 `I`，导出 h）。 */
-function initializeNoop(): void {}
+function initializeNoop(): void { initializeAgentActivityUnits(); }
 
 // ---------------------------------------------------------------------------
 // 补充导出（原 We/E/$/J/K）
@@ -403,17 +531,17 @@ function initializeNoop(): void {}
 
 /** 无起组标记的分组（原 `We`，导出 a）。 */
 function groupActivityItemsPlain(items: ActivityItem[]): ActivityUnit[] {
-  return groupActivityItems(items);
+  return groupConvertedActivityItems(items.map((activityItem, sourceIndex) => ({ activityItem, sourceIndex, startsGroup: false })));
 }
 
 /** codex-followup 指令名常量（原 `E`，导出 b）。 */
 const CODEX_FOLLOWUP_DIRECTIVE = "codex-followup";
 
 /** We 初始化器（原 `$`，导出 c）。 */
-function initializeGroupPlain(): void {}
+function initializeGroupPlain(): void { initializeAgentActivityUnits(); }
 
 /** J 初始化器（原 `J`，导出 d）。 */
-function initializeRenderGrouping(): void {}
+function initializeRenderGrouping(): void { initializeAgentActivityUnits(); }
 
 /** 可渲染代理条目（K 的返回形态）。 */
 export interface RenderableAgentItems {
