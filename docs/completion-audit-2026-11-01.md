@@ -41,13 +41,17 @@ exports were previously classified. Current completion requires source-backed bu
 
 ## Current runtime-source recovery status
 
-The renderer build now compiles the classified conversation, settings, composer, home/onboarding, and structural roots plus
-their eager dependency closure from 635 checked-in, formatted, release-derived ESM modules. It no longer copies published
-JavaScript directly into the runtime output. The graph supersedes 594 semantic drafts whose cross-chunk or React component
-contracts are not yet equivalent, and the build skips those drafts instead of compiling and then overwriting them. The
-source-build gate verifies the dependency closure, manifest, disk inventory, actual compilation of every recovered module,
-absence of release-tree build dependencies, and coverage of every known structural component draft.
+The renderer build now builds all 1,875 registered rewritten chunks. Forty large settings, composer, onboarding, activity, and
+supporting React modules have release-faithful source owners under their semantic `src/renderer/<name>/` directories. Their
+checked-in `exact.js` files are generated from the published ESM with only cross-chunk import specifiers rewritten; a parity
+gate regenerates all forty from the release input and requires exact source equality. The build therefore no longer substitutes
+the earlier partial view-model approximations for these production components.
 
-This removes direct build-time copying and supplies the real React implementations while semantic recovery continues. It does
-not close the semantic-decompilation gap: the 594 superseded drafts still need contract-complete readable replacements. The
-consolidated E2E workflow matrix and remaining runtime-contract validation also have to pass before the project is complete.
+The remaining route compatibility closure contains 39 checked-in ESM modules, down from 77 before the exact-owner promotion.
+The build compiles those modules as source and has zero skipped semantic drafts. Dependency-owner checks ensure every exact
+owner import is supplied by a semantic owner, transform-only owner, reconstructed core, or the checked-in compatibility graph;
+renderer verification passes 1,875/1,875 outputs.
+
+This is substantial runtime-source recovery, not proof that the entire project is complete. The 39 compatibility modules still
+need semantic ownership where they are first-party, the exact owners still retain release-local identifiers that can be renamed
+for readability, preserved main/renderer boundaries remain, and the consolidated E2E workflow matrix has not yet passed.

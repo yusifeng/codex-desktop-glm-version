@@ -46,6 +46,7 @@ export const SETTINGS_ROUTE_ROOTS = [
   "notifications-settings-ebea0dc9da14.js",
   "personalization-settings-c52a4963cfd3.js",
   "pets-settings-route-965aa70e25ab.js",
+  "phone-number-input-6ac1e964b07b.js",
   "plugin-settings-url-cb4b412ead63.js",
   "plugins-settings-a104e9fe3d0b.js",
   "plugins-settings-a6cc8c327ff7.js",
@@ -205,6 +206,21 @@ export const STRUCTURAL_COMPONENT_ROOTS = [
   "workspace-agent-detail-query-3cb2bb771d2e.js",
 ];
 
+// Static and lazy dependencies referenced by exact semantic owners that do not
+// yet have their own renderer or transform-only source owner. Keeping them as
+// explicit roots makes clean builds independent of stale app/webview output.
+export const EXACT_ROUTE_DEPENDENCY_ROOTS = [
+  "presentation-eeb7ac6fced2.js",
+  "invitations-44091c7ba43a.js",
+  "three.core-cb39b1271a0d.js",
+  "three.module-b65ff644899d.js",
+  "Icon-994cd6bb9e69.js",
+  "NewsPaper-4739abdcdbac.js",
+  "use-imported-setup-opportunity-fe980a908289.js",
+  "useForm-f8b6846e7263.js",
+  "browser-5e2e016ba055.js",
+];
+
 export const CONVERSATION_ROUTE_ROOTS = [
   "local-conversation-page-bcc7eca0b3ab.js",
   "local-conversation-thread-c6e40fdd6d59.js",
@@ -233,6 +249,7 @@ export const CONVERSATION_ROUTE_ROOTS = [
   ...COMPOSER_ROUTE_ROOTS,
   ...HOME_ROUTE_ROOTS,
   ...STRUCTURAL_COMPONENT_ROOTS,
+  ...EXACT_ROUTE_DEPENDENCY_ROOTS,
 ];
 
 export const RECONSTRUCTED_ROUTE_CORE = new Set([
@@ -278,6 +295,55 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "workspace-agent-detail-query-3cb2bb771d2e.js",
 ]);
 
+// Full release-faithful React/runtime modules promoted into their semantic
+// source directories as exact.ts. These are not approximations: the promotion
+// tool formats the published ESM, rewrites only its import specifiers, and the
+// renderer build compiles that checked-in source directly. This lets large UI
+// modules leave the compatibility graph before their local names are manually
+// clarified, without changing their behavior or export surface.
+export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
+  ["safety-settings", "safety-settings-aa3588e3b94c.js"],
+  ["agent-settings", "agent-settings-27cdda401037.js"],
+  ["billing-settings", "billing-settings-d5b5419393a0.js"],
+  ["chronicle-settings-page", "chronicle-settings-page-e92cf619a884.js"],
+  ["computer-use-settings", "computer-use-settings-6786672692bb.js"],
+  ["settings", "settings-e03d8d0b0de2.js"],
+  ["settings-page", "settings-page-9811299ef92c.js"],
+  ["onboarding-page", "onboarding-page-905dd8894724.js"],
+  ["onboarding", "onboarding-d0bfce15e4cc.js"],
+  ["worktrees-settings-page", "worktrees-settings-page-f7e1c38f9bb4.js"],
+  ["cloud-environments-settings-page", "cloud-environments-settings-page-b47c295bea65.js"],
+  ["local-environments-settings-page", "local-environments-settings-page-6e0104d39e76.js"],
+  ["app-connect-modal", "app-connect-modal-7b842fd077d6.js"],
+  ["gpt-about-dialog-core", "gpt-about-dialog-7509f0d1e79e.js"],
+  ["about-you-summary", "about-you-summary-ee1fdcc83db8.js"],
+  ["notifications-settings", "notifications-settings-42b7c5801f48.js"],
+  ["realtime-voice-launch-surface", "realtime-voice-launch-surface-20e3f20aea6c.js"],
+  ["announcement-entry-points", "entry-points-24b83c9c7664.js"],
+  ["composer-utility-bar", "composer-utility-bar-a9b94a95b731.js"],
+  ["work-onboarding-suggestions", "suggestions-92e2efd3926f.js"],
+  ["home-ambient-suggestions-content", "home-ambient-suggestions-content-a1c4fe488b63.js"],
+  ["image-suggestions-core", "suggestions-1907f4f59b11.js"],
+  ["home-task-suggestions-core", "home-task-suggestions-e29a02e9b466.js"],
+  ["browser-composer-disclaimer-core", "browser-composer-disclaimer-6a73b502bd51.js"],
+  ["sketch-composer-host-core", "composer-host-ac9410930773.js"],
+  ["browser-address-suggestion-overlay", "browser-address-suggestion-overlay-59b25209907d.js"],
+  ["codex-micro-mini-game-composer", "codex-micro-mini-game-composer-c7d8a016e5c4.js"],
+  ["right-panel-composer-overlay", "right-panel-composer-overlay-fdca4b46e82c.js"],
+  ["agent-activity-units", "agent-activity-units-9397783428a4.js"],
+  ["agent-activity-item", "agent-activity-item-792873f87aad.js"],
+  ["general-settings", "general-settings-3d550f75d0eb.js"],
+  ["security-settings", "security-settings-2da2a3b205ab.js"],
+  ["remote-connections-settings", "remote-connections-settings-12e860fd2983.js"],
+  ["codex-micro-settings", "codex-micro-settings-cbf47e1d3359.js"],
+  ["personalization-settings", "personalization-settings-c52a4963cfd3.js"],
+  ["settings-plugin-selection", "settings-plugin-selection-e42895d573ba.js"],
+  ["review-preferences-model", "review-preferences-model-677402e96a42.js"],
+  ["usage", "usage-5ab4582aac77.js"],
+  ["use-visible-settings-sections", "use-visible-settings-sections-5efd0081496f.js"],
+  ["appgen-settings-page", "appgen-settings-page-95e95458752b.js"],
+]);
+
 export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   // These keep their published filenames, but are now built from readable
   // TypeScript instead of the formatted release compatibility graph.
@@ -287,6 +353,7 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   // them outside the compatibility closure makes the remaining recovered graph
   // accurately represent unfinished route work instead of already-restored
   // dependencies pulled in transitively by the conversation roots.
+  ...EXACT_ROUTE_SOURCE_OWNERS.values(),
   "File-4270090fca79.js",
   "PlatformUIKitProvider-748f2efe0f2a.js",
   "active-tool-activity-label-f837b1d602a5.js",

@@ -41,7 +41,9 @@
 │   │   ├── types/chunk-modules.d.ts  # 未重写 chunk 的 @chunk/* 类型声明
 │   │   ├── <语义名>/              # 已重写 chunk 的真实源码（见下表）
 │   │   └── <语义名>/              # 主进程真实源码与抽取的业务 helper
-│   └── webview/                  # 渲染进程（11202 个 chunk，全部未重写）
+│   ├── renderer/                 # 渲染进程语义源码与 release-faithful exact owners
+│   ├── renderer-recovered/       # 尚未提升的路由兼容源码闭包（构建不读取 .reference）
+│   └── webview/                  # 渲染进程 transform-only 源码
 ├── app/                          # asar 运行树（payload 提交；*.js 由 build 生成，gitignore）
 │   ├── package.json              #   原版应用的 package.json（入口 .vite/build/early-bootstrap.js）
 │   ├── node_modules/             #   原生模块（better-sqlite3、node-pty、objc-js、device-kit 等）

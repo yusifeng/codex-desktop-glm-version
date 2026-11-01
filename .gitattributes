@@ -1,0 +1,3 @@
+# Three.js shader template literals intentionally preserve spaces and tabs at
+# physical line endings because they are part of the recovered GLSL source.
+src/renderer-recovered/conversation-route/three.*.js whitespace=-blank-at-eol

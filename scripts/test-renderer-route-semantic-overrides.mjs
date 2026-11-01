@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 import { CHUNKS, IMPORT_ALIASES, REWRITTEN } from "./renderer-chunk-manifest.mjs";
 import {
+  EXACT_ROUTE_SOURCE_OWNERS,
   collectConversationRouteClosure,
   SEMANTIC_ROUTE_OVERRIDES,
 } from "./renderer-route-recovery.mjs";
@@ -31,7 +32,12 @@ for (const output of [...SEMANTIC_ROUTE_OVERRIDES].sort()) {
   assert.ok(semanticName, `${output} maps to a rewritten semantic module`);
   assert.equal(closure.has(output), false, `${output} is no longer compatibility-owned`);
 
-  const entry = path.join(root, "src/renderer", semanticName, "index.ts");
+  const entry = path.join(
+    root,
+    "src/renderer",
+    semanticName,
+    EXACT_ROUTE_SOURCE_OWNERS.has(semanticName) ? "exact.js" : "index.ts",
+  );
   const source = await fs.readFile(entry, "utf8");
   assert.doesNotMatch(
     source,
@@ -56,6 +62,10 @@ for (const output of [...SEMANTIC_ROUTE_OVERRIDES].sort()) {
           assert.ok(target, `${semanticName} has a known chunk dependency ${name}`);
           return { path: `./${target}`, external: true };
         });
+        build.onResolve({ filter: /^@exact-chunk\// }, (args) => ({
+          path: `./${args.path.slice("@exact-chunk/".length)}`,
+          external: true,
+        }));
       },
     }],
   });
