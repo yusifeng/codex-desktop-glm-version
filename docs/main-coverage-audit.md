@@ -3829,3 +3829,16 @@ migrated host 顺序投影、bound thread 保留、跨 section 去重和最终 t
 `reconcileHostSectionList` / `reconcileHostSectionMembers`，没有复制 state。主 chunk 原 `TH/EH` 约 123 行物理删除；focused 64 + 15 项，
 transition/undo-redo/manager/server/engine/pinned 相邻回归 107 项通过。测试索引仍为 1850，no-unwired gate 扩至 1155 项；相邻
 tar/minipass 约 15,000 行具备完整第三方实现边界，记录为 vendor/generated 保留而不拆成伪业务模块。
+
+### 大型生命周期 owner 抽取：Browser webview listener runtime
+
+新增 `browser-sidebar/browser-webview-listener-runtime.ts`，由一次构造的 typed runtime 完整持有 owner WebContents 的
+will/did-attach 生命周期：window transfer token、adoption lease/host generation、已知 checkout/first-party/workspace-settings 分流、browser
+settings mount/session/instance、route 与 persistence reconciliation、storage/restore mismatch rejection、existing webview reattach、pending route、
+同步 annotation/WebMCP policy、Win32 延迟 attach、Alt key hit-test/forward 以及 dispose 时 listener/map/navigation disposer 清理均保持原顺序。
+
+`browser-window-thread-state-controller.ts` 只注入 window/thread consumers，不再依赖主 chunk 的 `SWe`。旧 `SWe` 与专用 logger/WeakSet
+约 485 行物理删除，WeakSet 被保留在单一 runtime closure。对照初始恢复 commit 还确认当前入口存在三个实际未定义引用：早期 checkout 与
+workspace-settings 迁移漏接 `isCheckoutAttachParams` / `isWorkspaceSettingsAttachParams`，原 WebMCP `pW` 常量删除后两个 consumer 未更新；本批
+恢复两个语义 predicate，并导出 `WEB_MCP_LIMITS` 供 listener IPC 和 site-page event 共用。focused 51 项、八组相邻回归 399 项通过；测试索引
+1851，no-unwired gate 扩至 1167 项。

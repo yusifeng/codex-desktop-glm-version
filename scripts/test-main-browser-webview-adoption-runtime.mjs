@@ -294,13 +294,20 @@ const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
 );
+const listenerRuntime = fs.readFileSync(
+  new URL(
+    "../src/main/main-app/browser-sidebar/browser-webview-listener-runtime.ts",
+    import.meta.url,
+  ),
+  "utf8",
+);
 equal(
   main.includes(
     'require("./main-app/browser-sidebar/browser-webview-adoption-runtime.js")',
   ),
   true,
 );
-equal(main.includes("attachPendingAdoptedWebview({"), true);
+equal(listenerRuntime.includes("attachPendingAdoptedWebview({"), true);
 for (const oldOwner of [
   "function GG(",
   "function KG(",

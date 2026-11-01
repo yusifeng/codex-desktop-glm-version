@@ -103,7 +103,7 @@ const controller = new (createBrowserWindowThreadStateControllerClass({
   fq: () => undefined,
   gXe: () => undefined,
   oX: (value) => value,
-  SWe: (options) => {
+  installBrowserWebviewListeners: (options) => {
     webviewOptions = options;
     return () => calls.push(["dispose-webview-listeners"]);
   },

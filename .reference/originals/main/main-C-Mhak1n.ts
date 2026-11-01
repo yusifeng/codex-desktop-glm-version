@@ -278,6 +278,10 @@ const {
   takePendingWebviewRoute: FWe,
   attachPendingAdoptedWebview,
 } = require("./main-app/browser-sidebar/browser-webview-adoption-runtime.js");
+const {
+  WEB_MCP_LIMITS,
+  createBrowserWebviewListenerRuntime,
+} = require("./main-app/browser-sidebar/browser-webview-listener-runtime.js");
 const { createBrowserCommentOverlayManagerClass } = require("./main-app/browser-sidebar/browser-comment-overlay-manager.js");
 const { createBrowserCommentControllerClass } = require("./main-app/browser-sidebar/browser-comment-controller.js");
 const { createBrowserSessionRegistryRuntime } = require("./main-app/browser-use/session-registry.js");
@@ -31001,6 +31005,7 @@ var computeScreenshotTarget = createScreenshotTargetResolver({
   getDisplayMatching: (frame) => l.screen.getDisplayMatching(frame),
 });
 var {
+  isCheckoutAttachParams: GW,
   installCheckoutWebviewLifecycle: RUe,
   isCheckoutWebContents: KW,
   updateCheckoutPresentation: LUe,
@@ -31015,6 +31020,7 @@ var {
   shared: n,
 });
 var {
+  isWorkspaceSettingsAttachParams: TG,
   installWorkspaceSettingsWebviewLifecycle: uWe,
   isWorkspaceSettingsWebContents: EG,
   updateWorkspaceSettingsPresentation: lWe,
@@ -31043,9 +31049,7 @@ var {
   parseBrowserTabId: a.bn,
   webviewPartitionSuffix: HOST_GENERATION_SUFFIX,
 });
-var FG = r.i(`browser-sidebar-manager`),
-  LG = new WeakSet(),
-  xWe = [
+var xWe = [
     { allowedNavigationUrls: n.el, canOpenPopup: ({ url: e }) => MH(e), partition: n.tl },
     {
       allowedNavigationUrls: [n.nl],
@@ -31079,489 +31083,42 @@ var {
   getPartitionName: () => Jc(`app`),
   syncColorScheme: GU,
 });
-function SWe({
-  admitBrowserTab: e,
-  cancelPendingWebviewAttaches: t,
-  reconcileBrowserStorageId: r,
-  attachWebview: i,
-  attachedWebviewHosts: a,
-  configureBrowserSession: o,
-  getAnnotationApiPolicy: s,
-  subscribeAnnotationApiAvailability: c,
-  ensureThreadStateForWindow: u,
-  handleWebviewDestroyedBeforeAttach: d,
-  isPagePersistenceAllowed: f,
-  openBrowserSettingsUrlInTab: p,
-  owner: m,
-  prepareWebviewAttach: h,
-  preloadPath: g,
-  recordDebugEvent: _,
-  state: v,
-  windowId: y,
-}) {
-  let b = (t, i, s, c) => {
-      if (c != null) {
-        (v.pendingWindowTransfer?.token !== c.token ||
-          v.pendingWindowTransfer.webContents !== c.webContents) &&
-          t.preventDefault();
-        return;
-      }
-      let l = NWe(s),
-        d = PWe(s),
-        p = yWe(s),
-        b = d == null || !l ? null : (v.pendingAdoptedWebviewsByWebContentsId.get(d) ?? null);
-      if (l) {
-        if (b == null || b.adoptionLease !== s[IG] || b.acceptedHostIdentity != null) {
-          t.preventDefault();
-          return;
-        }
-        queueMicrotask(() => {
-          let e = v.threads.get(qU(b.route));
-          t.defaultPrevented &&
-            p != null &&
-            v.rendererInstanceId === p.rendererInstanceId &&
-            e?.hostGeneration === p.hostGeneration &&
-            v.pendingAdoptedWebviewsByWebContentsId.get(b.webContents.id) === b &&
-            (b.stopTracking(), b.webContents.isDestroyed() || b.webContents.destroy());
-        });
-      }
-      if (n.is(s.partition) != null || GW(s) || AW(s) || TG(s)) return;
-      let x = TWe(s);
-      if (x != null) {
-        if (v.browserSettingsWebviewMountIds.size === 0) {
-          (FG().warning(`IAB_LIFECYCLE rejected browser settings webview outside settings route`, {
-            safe: { ownerWebContentsId: m.id, windowId: y },
-            sensitive: {},
-          }),
-            t.preventDefault());
-          return;
-        }
-        let e = o();
-        if (e == null) {
-          t.preventDefault();
-          return;
-        }
-        wWe({ browserSession: e, params: s, webPreferences: i });
-        let n = GG(s);
-        if (n == null) {
-          (FG().warning(
-            `IAB_LIFECYCLE rejected browser settings webview attachment without instance id`,
-            { safe: { ownerWebContentsId: m.id, windowId: y }, sensitive: {} },
-          ),
-            t.preventDefault());
-          return;
-        }
-        v.pendingBrowserSettingsWebviewsByInstanceId.set(n, x);
-        return;
-      }
-      if (!e()) {
-        t.preventDefault();
-        return;
-      }
-      let S = NG(s.partition),
-        C = S == null ? null : (v.registeredWebviewHostsByRoutePartition.get(S) ?? null),
-        w = vWe(s),
-        T = C ?? w,
-        E = T == null ? null : (v.threads.get(qU(T)) ?? null),
-        D =
-          C != null ||
-          s[`data-browser-sidebar-page-restore`] != null ||
-          s[`data-browser-sidebar-page-storage-id`] != null,
-        O = T != null && E != null && E.browserStorageId !== PG(T),
-        k = (D || O) && f(),
-        A = D && k,
-        j = A ? C : null,
-        M =
-          j != null &&
-          w != null &&
-          (j.browserTabId !== w.browserTabId || j.conversationId !== w.conversationId),
-        N = M ? null : (j ?? w),
-        P = A ? s[PAGE_RESTORE_ATTRIBUTE] : void 0,
-        F = P === `none` || P === `required` ? P : null,
-        I = P != null && F == null,
-        L = s[`data-browser-sidebar-page-storage-id`] ?? null,
-        R = F != null && L?.length > 0 ? threadBrowserTabKey(L) : null,
-        z = j?.pagePersistence ?? null,
-        B = z != null && R != null && z.browserStorageId !== R,
-        V = z != null && F != null && z.restore !== F,
-        ee = z == null && F != null && R == null,
-        te;
-      !B &&
-        !V &&
-        (z == null
-          ? R != null && F != null && (te = { browserStorageId: R, restore: F })
-          : (te = z));
-      let ne = te?.browserStorageId ?? null,
-        H = N == null ? null : (v.threads.get(qU(N)) ?? null),
-        re = H != null && !r(H, te),
-        U = ne != null && H != null && H.browserStorageId !== ne,
-        ie = H?.pendingTeardown != null,
-        ae =
-          k &&
-          te == null &&
-          (j != null || (N != null && H != null && H.browserStorageId !== PG(N)));
-      if (
-        N == null ||
-        (b != null &&
-          (b.route.browserTabId !== N.browserTabId ||
-            b.route.conversationId !== N.conversationId)) ||
-        re ||
-        U ||
-        I ||
-        ee ||
-        ae ||
-        B ||
-        V ||
-        ie
-      ) {
-        (_({
-          browserTabId: N?.browserTabId ?? null,
-          conversationId: N?.conversationId ?? null,
-          guestWebContentsId: null,
-          kind: `browser-webview-attach-rejected`,
-          message: `Rejected Browser sidebar webview attachment`,
-          ownerWebContentsId: m.id,
-          pageKey: null,
-          windowId: y,
-        }),
-          FG().warning(`IAB_LIFECYCLE rejected browser sidebar webview attachment`, {
-            safe: {
-              browserTabId: N?.browserTabId ?? null,
-              conversationId: N?.conversationId ?? null,
-              hasBrowserStorageReconciliationFailure: re,
-              hasBrowserStorageMismatch: U,
-              hasInvalidRestoreIntent: I,
-              hasMissingBrowserStorageId: ee,
-              hasMissingRestoreIntent: ae,
-              hasRegisteredBrowserStorageMismatch: B,
-              hasRegisteredRestoreIntentMismatch: V,
-              hasRegisteredRouteMismatch: M,
-              ownerWebContentsId: m.id,
-              threadExists: H != null,
-              teardownReason: H?.pendingTeardown?.reason ?? null,
-              windowId: y,
-            },
-            sensitive: {},
-          }),
-          t.preventDefault());
-        return;
-      }
-      let oe = u(N.conversationId, N.browserTabId);
-      if (
-        p == null ||
-        v.rendererInstanceId !== p.rendererInstanceId ||
-        oe.hostGeneration !== p.hostGeneration
-      ) {
-        (FG().warning(`IAB_LIFECYCLE rejected stale browser sidebar host attachment`, {
-          safe: {
-            browserTabId: N.browserTabId,
-            conversationId: N.conversationId,
-            hostGeneration: p?.hostGeneration ?? null,
-            threadHostGeneration: oe.hostGeneration,
-            ownerWebContentsId: m.id,
-            windowId: y,
-          },
-          sensitive: {},
-        }),
-          t.preventDefault());
-        return;
-      }
-      let { hostGeneration: se, rendererInstanceId: ce } = p;
-      if (H == null && !r(oe, te)) {
-        (_({
-          browserTabId: N.browserTabId,
-          conversationId: N.conversationId,
-          guestWebContentsId: null,
-          kind: `browser-webview-attach-rejected`,
-          message: `Rejected Browser sidebar webview storage ownership`,
-          ownerWebContentsId: m.id,
-          pageKey: null,
-          windowId: y,
-        }),
-          t.preventDefault());
-        return;
-      }
-      FG().info(`IAB_LIFECYCLE browser sidebar will attach webview`, {
-        safe: {
-          browserTabId: N.browserTabId,
-          conversationId: N.conversationId,
-          ownerWebContentsId: m.id,
-          pendingAdoptedAttachCount: v.pendingAdoptedWebviewsByWebContentsId.size,
-          pendingAttachCount: v.pendingWebviewRoutesByInstanceId.size,
-          windowId: y,
-        },
-        sensitive: {},
-      });
-      let le = h(oe, { title: oe.snapshot.title, url: oe.snapshot.url }, te);
-      if (le == null) {
-        t.preventDefault();
-        return;
-      }
-      let ue = le.view.webContents,
-        de = ue == null ? null : a.get(ue);
-      if (
-        ue != null &&
-        !ue.isDestroyed() &&
-        de?.hostGeneration === se &&
-        de.rendererInstanceId === ce
-      ) {
-        (_({
-          browserTabId: N.browserTabId,
-          conversationId: N.conversationId,
-          guestWebContentsId: ue.id,
-          kind: `browser-webview-reattach-existing`,
-          message: `Reattached existing Browser sidebar webview`,
-          ownerWebContentsId: m.id,
-          pageKey: null,
-          windowId: y,
-        }),
-          FG().info(`IAB_LIFECYCLE reattaching existing browser sidebar webview`, {
-            safe: {
-              browserTabId: N.browserTabId,
-              conversationId: N.conversationId,
-              guestWebContentsId: ue.id,
-              ownerWebContentsId: m.id,
-              windowId: y,
-            },
-            sensitive: {},
-          }));
-        return;
-      }
-      (_({
-        browserTabId: N.browserTabId,
-        conversationId: N.conversationId,
-        details: [
-          { label: `hasPendingUrl`, value: String(le.pendingUrl.length > 0) },
-          { label: `hasUrl`, value: String(le.url.length > 0) },
-        ],
-        guestWebContentsId: null,
-        kind: `browser-webview-attach-requested`,
-        message: `Requested Browser sidebar webview attachment`,
-        ownerWebContentsId: m.id,
-        pageKey: null,
-        windowId: y,
-      }),
-        FG().info(`IAB_LIFECYCLE requested browser sidebar webview attachment`, {
-          safe: {
-            browserTabId: N.browserTabId,
-            conversationId: N.conversationId,
-            ownerWebContentsId: m.id,
-            hasPendingUrl: le.pendingUrl.length > 0,
-            hasUrl: le.url.length > 0,
-            windowId: y,
-          },
-          sensitive: {},
-        }));
-      let fe = o();
-      if (fe == null) {
-        t.preventDefault();
-        return;
-      }
-      if ((CWe({ browserSession: fe, params: s, preloadPath: g, webPreferences: i }), b != null)) {
-        ((b.acceptedHostIdentity = p),
-          FG().info(`IAB_ADOPTION queued adopted webview attach`, {
-            safe: {
-              adoptedWebContentsId: d,
-              browserTabId: N.browserTabId,
-              conversationId: N.conversationId,
-              windowId: y,
-            },
-            sensitive: {},
-          }));
-        return;
-      }
-      s.src = ``;
-      let W = GG(s);
-      if (W == null) {
-        (FG().warning(
-          `IAB_LIFECYCLE rejected browser sidebar webview attachment without instance id`,
-          {
-            safe: {
-              browserTabId: N.browserTabId,
-              conversationId: N.conversationId,
-              ownerWebContentsId: m.id,
-              windowId: y,
-            },
-            sensitive: {},
-          },
-        ),
-          t.preventDefault());
-        return;
-      }
-      (isLocalUrl(QU(le)) && (i.backgroundThrottling = !1),
-        v.pendingWebviewRoutesByInstanceId.set(W, {
-          hostGeneration: se,
-          initialNavigationOwner: `app`,
-          rendererInstanceId: ce,
-          route: N,
-        }),
-        FG().info(`IAB_LIFECYCLE queued browser sidebar webview route`, {
-          safe: {
-            browserTabId: N.browserTabId,
-            conversationId: N.conversationId,
-            instanceId: W,
-            hostGeneration: se,
-            ownerWebContentsId: m.id,
-            pendingAttachCount: v.pendingWebviewRoutesByInstanceId.size,
-            windowId: y,
-          },
-          sensitive: {},
-        }),
-        _({
-          browserTabId: N.browserTabId,
-          conversationId: N.conversationId,
-          details: [
-            { label: `instanceId`, value: String(W) },
-            { label: `hostGeneration`, value: String(se) },
-          ],
-          guestWebContentsId: null,
-          kind: `browser-webview-attach-route-queued`,
-          message: `Queued Browser sidebar webview route`,
-          ownerWebContentsId: m.id,
-          pageKey: null,
-          windowId: y,
-        }));
-    },
-    x = (e, t) => {
-      if (v.pendingWindowTransfer?.webContents === t || mWe(t.session) || KW(t) || jW(t) || EG(t))
-        return;
-      let n = EWe(t, v);
-      if (n != null) {
-        DWe({
-          browserSettingsWebview: n,
-          openBrowserSettingsUrlInTab: p,
-          state: v,
-          webContents: t,
-        });
-        return;
-      }
-      (LG.has(t) ||
-        (LG.add(t),
-        t.on(`ipc-message-sync`, (e, n) => {
-          if (n === `codex_desktop:get-browser-annotation-api-policy`) {
-            let n = () => {
-              t.isDestroyed() || hWe(e, t, m, s, c);
-            };
-            process.platform === `win32` && process.versions.electron != null
-              ? setImmediate(n)
-              : n();
-          }
-          if (n === `codex_desktop:get-browser-webmcp-policy`) {
-            let t = Tr();
-            e.returnValue = {
-              enabled: MG(`prod`, t.webMcp),
-              limits: {
-                maxTools: t.webMcpMaxTools,
-                maxTotalDescriptorBytes: pW.maxTotalDescriptorBytes,
-              },
-            };
-          }
-        })),
-        _({
-          browserTabId: null,
-          conversationId: null,
-          guestWebContentsId: t.id,
-          kind: `browser-webview-did-attach`,
-          message: `Did attach Browser sidebar webview`,
-          ownerWebContentsId: m.id,
-          pageKey: null,
-          windowId: y,
-        }),
-        FG().info(`IAB_LIFECYCLE did attach browser sidebar webview`, {
-          safe: {
-            guestWebContentsId: t.id,
-            ownerWebContentsId: m.id,
-            pendingAdoptedAttachCount: v.pendingAdoptedWebviewsByWebContentsId.size,
-            pendingAttachCount: v.pendingWebviewRoutesByInstanceId.size,
-            windowId: y,
-          },
-          sensitive: {},
-        }));
-      let r = (e, n) => {
-          if (process.platform !== `win32` || process.versions.electron == null) {
-            n();
-            return;
-          }
-          setImmediate(() => {
-            if (t.isDestroyed()) {
-              d(e);
-              return;
-            }
-            n();
-          });
-        },
-        a = FWe(t, v);
-      if (a != null) {
-        r(a.route, () => {
-          i(t, a);
-        });
-        return;
-      }
-      attachPendingAdoptedWebview({
-        attachWebview: i,
-        routeKey: qU,
-        state: v,
-        webContents: t,
-      });
-    },
-    S = null,
-    C = (e, t, n) => {
-      e.sendInputEvent({ type: t, keyCode: `Alt`, modifiers: n ? [`alt`] : [] });
-    },
-    w = (e, t) => {
-      if ((t.type !== `keyDown` && t.type !== `keyUp`) || t.key !== `Alt` || t.isAutoRepeat) return;
-      if (t.type === `keyUp`) {
-        let e = S;
-        ((S = null), e != null && !e.isDestroyed() && C(e, `keyUp`, t.alt === !0));
-        return;
-      }
-      if (v.activeConversationId == null || v.activeBrowserTabId == null) return;
-      let n = v.threads.get(
-          qU({ browserTabId: v.activeBrowserTabId, conversationId: v.activeConversationId }),
-        ),
-        r = n?.page?.view.webContents;
-      if (
-        n?.visible !== !0 ||
-        !n.presented ||
-        n.snapshot.interactionMode !== `browse` ||
-        n.bounds == null ||
-        r == null ||
-        r.isDestroyed()
-      )
-        return;
-      let i = l.screen.getCursorScreenPoint(),
-        a = v.window.getContentBounds(),
-        o = i.x - a.x - n.bounds.x,
-        s = i.y - a.y - n.bounds.y;
-      o < 0 ||
-        s < 0 ||
-        o >= n.bounds.width ||
-        s >= n.bounds.height ||
-        (C(r, `keyDown`, t.alt === !0), (S = r));
-    },
-    T = m;
-  return (
-    T.on(`current-render-view-deleted`, t),
-    m.on(`destroyed`, t),
-    m.on(`did-navigate`, t),
-    m.on(`render-process-gone`, t),
-    m.on(`will-attach-webview`, b),
-    m.on(`did-attach-webview`, x),
-    m.on(`before-input-event`, w),
-    () => {
-      (t(),
-        T.removeListener(`current-render-view-deleted`, t),
-        m.removeListener(`destroyed`, t),
-        m.removeListener(`did-navigate`, t),
-        m.removeListener(`render-process-gone`, t),
-        m.removeListener(`will-attach-webview`, b),
-        m.removeListener(`did-attach-webview`, x),
-        m.removeListener(`before-input-event`, w),
-        v.pendingBrowserSettingsWebviewsByInstanceId.clear());
-      for (let e of v.browserSettingsWebviewNavigationDisposersByWebContentsId.values()) e();
-    }
-  );
-}
+var installBrowserWebviewListeners = createBrowserWebviewListenerRuntime({
+  adoptionLeaseAttribute: IG,
+  attachPendingAdoptedWebview,
+  basePartition: NG,
+  bindBrowserSettingsWebview: DWe,
+  configureBrowserPageWebviewPreferences: CWe,
+  configureBrowserSettingsWebviewPreferences: wWe,
+  createLogger: r.i,
+  effectivePageUrl: QU,
+  findBrowserSettingsWebviewDefinition: TWe,
+  getAdoptedWebContentsId: PWe,
+  getDesktopFeatureAvailability: Tr,
+  getWebviewInstanceId: GG,
+  hasWebviewAdoptionLease: NWe,
+  hostIdentityFromWebviewParams: yWe,
+  isBrowserRoutePartition: (partition) => n.is(partition) != null,
+  isCheckoutAttachParams: GW,
+  isCheckoutWebContents: KW,
+  isFirstPartyAuthenticatedPartition: AW,
+  isFirstPartyAuthenticatedSession: jW,
+  isLocalUrl,
+  isTrustedSession: mWe,
+  isWebMcpEnabled: MG,
+  isWorkspaceSettingsAttachParams: TG,
+  isWorkspaceSettingsWebContents: EG,
+  makeBrowserStorageId: PG,
+  pageRestoreAttribute: PAGE_RESTORE_ATTRIBUTE,
+  resolveSynchronousAnnotationPolicy: hWe,
+  routeFromWebviewParams: vWe,
+  routeKey: qU,
+  screen: l.screen,
+  takePendingBrowserSettingsWebview: EWe,
+  takePendingWebviewRoute: FWe,
+  threadBrowserTabKey,
+  webMcpLimits: WEB_MCP_LIMITS,
+});
 var {
   isValidVirtualAnchorState: KWe,
   normalizeAnchorState: $G,
@@ -32151,7 +31708,7 @@ var BrowserSessionService = createBrowserSessionServiceClass({
 var { dispatchPageEvent: dispatchSitePageEvent } = createSitePageEventRuntime({
   browserWindowFromWebContents: (owner) => l.BrowserWindow.fromWebContents(owner),
   getFeatureFlags: Tr,
-  maxTotalDescriptorBytes: pW.maxTotalDescriptorBytes,
+  maxTotalDescriptorBytes: WEB_MCP_LIMITS.maxTotalDescriptorBytes,
   isWebMcpEnabled: (flag) => MG(`prod`, flag),
   applyWebMcpTools: qX,
   normalizeWindowId: oX,
@@ -32257,7 +31814,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
 (this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze: normalizeUrlOrBlank, eW, QU, D, k, j, M, N, YX, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, THe, X, fe, zGe, G, me, pU, hU, At, HGe, zX, mU, run, _e, on, Xc, LXe, xU, to, al, ul, audio, WX, bn, GX, JXe, YXe, EXe, n, a, iZ, tZ, eZ, nZ, rZ, WXe, RX }))(this)),
         (this.hostPolicyController = new (createBrowserHostPolicyControllerClass({ DXe, OXe, kXe, mq, VG, Yc, Xc, DZ, hX }))(this)),
         (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
-        (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, SWe, aXe, gX, qU, oXe, vX, tq, KU, l, EZ, logger: r.i(`browser-sidebar-manager`) }))(this)),
+        (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, installBrowserWebviewListeners, aXe, gX, qU, oXe, vX, tq, KU, l, EZ, logger: r.i(`browser-sidebar-manager`) }))(this)),
         (this.getSiteBootstrapToken = s.getSiteBootstrapToken),
         (this.getCommandKeymapState = s.getCommandKeymapState ?? n.Ct),
         (this.ownerCommandAccelerators = mq(this.getCommandKeymapState())),

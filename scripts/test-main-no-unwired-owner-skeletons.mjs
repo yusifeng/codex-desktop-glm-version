@@ -101,6 +101,7 @@ const realOwners = [
   ["src/main/main-app/browser-sidebar/browser-use-open-request-registry.ts", "BrowserUseOpenRequestRegistry"],
   ["src/main/main-app/browser-sidebar/browser-settings-webview-runtime.ts", "createBrowserSettingsWebviewRuntime"],
   ["src/main/main-app/browser-sidebar/browser-webview-adoption-runtime.ts", "attachPendingAdoptedWebview"],
+  ["src/main/main-app/browser-sidebar/browser-webview-listener-runtime.ts", "createBrowserWebviewListenerRuntime"],
   ["src/main/main-app/browser-sidebar/browser-annotation-anchor-policy.ts", "createBrowserAnnotationAnchorPolicy"],
   ["src/main/main-app/browser-sidebar/browser-comment-policy.ts", "createBrowserCommentPolicy"],
   ["src/main/main-app/sidebar/saved-section-policy.ts", "createSavedSectionPolicy"],
@@ -217,6 +218,10 @@ const browserWindowThreadStateController = fs.readFileSync(
   new URL("src/main/main-app/browser-sidebar/browser-window-thread-state-controller.ts", root),
   "utf8",
 );
+const browserWebviewListenerRuntime = fs.readFileSync(
+  new URL("src/main/main-app/browser-sidebar/browser-webview-listener-runtime.ts", root),
+  "utf8",
+);
 assert.equal(inboxOwner.includes("export class InboxItemsFacade"), true, "InboxItemsFacade must remain a real owner");
 assert.equal(main.includes("new InboxItemsFacade({"), true, "InboxItemsFacade must remain wired");
 assert.equal(main.includes("PBe = createElectronFetchHandlerClass({"), true, "real Electron fetch owner is wired");
@@ -256,6 +261,15 @@ assert.equal(main.includes('require("./main-app/browser-sidebar/browser-session-
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-use-open-request-registry.js")'), true, "browser open-request registry is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-settings-webview-runtime.js")'), true, "browser settings webview runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-webview-adoption-runtime.js")'), true, "browser webview adoption runtime is wired");
+assert.equal(main.includes('require("./main-app/browser-sidebar/browser-webview-listener-runtime.js")'), true, "browser webview listener runtime is wired");
+assert.equal(main.includes("createBrowserWebviewListenerRuntime({"), true, "browser webview listener runtime is composed");
+assert.equal(main.includes("installBrowserWebviewListeners, aXe"), true, "window thread-state controller consumes the webview listener runtime");
+assert.equal(main.includes("isCheckoutAttachParams: GW"), true, "checkout attach predicate is restored");
+assert.equal(main.includes("isWorkspaceSettingsAttachParams: TG"), true, "workspace-settings attach predicate is restored");
+assert.equal(main.includes("function SWe("), false, "generated webview listener owner must be removed");
+assert.equal(/^var FG =/m.test(main), false, "generated webview listener logger owner must be removed");
+assert.equal(/^\s*LG = new WeakSet/m.test(main), false, "generated webview listener policy registry must be removed");
+assert.equal(/\bpW\.maxTotalDescriptorBytes\b/.test(main), false, "deleted WebMCP limit alias must not remain referenced");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-annotation-anchor-policy.js")'), true, "browser annotation anchor policy is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-comment-policy.js")'), true, "browser comment policy is wired");
 assert.equal(main.includes('require("./main-app/browser-use/iab-capabilities.js")'), true, "IAB capability runtime is wired");
@@ -832,7 +846,8 @@ assert.equal(main.includes("01984de2-8f74-7c91-a3b2-5c5e937cf318"), false, "pinn
 assert.equal(main.includes("GX, Se, JXe"), false, "unused generated engine injection must be removed from browser webview wiring");
 assert.equal(main.includes("browserRoutePartitionPrefix: BROWSER_ROUTE_PARTITION_PREFIX"), true, "browser sessions use the semantic route prefix");
 assert.equal(main.includes("webviewPartitionSuffix: HOST_GENERATION_SUFFIX"), true, "browser webviews use the semantic host-generation suffix");
-assert.equal(main.includes("s[PAGE_RESTORE_ATTRIBUTE]"), true, "browser restore reads the semantic attribute constant");
+assert.equal(main.includes("pageRestoreAttribute: PAGE_RESTORE_ATTRIBUTE"), true, "browser restore receives the semantic attribute constant");
+assert.equal(browserWebviewListenerRuntime.includes("params[pageRestoreAttribute]"), true, "browser restore reads the injected semantic attribute constant");
 assert.equal(main.includes("isFirstPartyUrl: isLocalUrl"), true, "browser presentation uses semantic local-URL policy");
 assert.equal(main.includes("canOpenExternalUrl: isSupportedExternalUrl"), true, "browser runtime uses semantic external-URL policy");
 assert.equal(main.includes("normalizeUrl: normalizeUrlOrBlank"), true, "browser runtime uses semantic URL normalization");
@@ -1103,4 +1118,4 @@ assert.equal(/^function Zk\(/m.test(main), false, "generated request auto-resolu
 assert.equal(/^[ ]{0,2}Yk = /m.test(main), false, "generated environment setup record schema must be removed");
 assert.equal(/^[ ]{0,2}Xk = /m.test(main), false, "generated environment config reference schema must be removed");
 
-console.log("1155 main unwired-owner skeleton assertions passed");
+console.log("1167 main unwired-owner skeleton assertions passed");

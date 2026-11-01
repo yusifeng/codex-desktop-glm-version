@@ -4,8 +4,22 @@
 export function createBrowserWindowThreadStateControllerClass(
   dependencies: Record<string, any>,
 ) {
-  const { hX, fq, gXe, oX, SWe, aXe, gX, qU, oXe, vX, tq, KU, l, EZ } =
-    dependencies;
+  const {
+    hX,
+    fq,
+    gXe,
+    oX,
+    installBrowserWebviewListeners,
+    aXe,
+    gX,
+    qU,
+    oXe,
+    vX,
+    tq,
+    KU,
+    l,
+    EZ,
+  } = dependencies;
   const logger = dependencies.logger ?? (() => ({ warning() {} }));
 
   return class BrowserWindowThreadStateController {
@@ -207,7 +221,7 @@ export function createBrowserWindowThreadStateControllerClass(
         window.removeListener(`unmaximize`, updateBounds);
         window.removeListener(`restore`, updateBounds);
       };
-      state.disposeWebviewListeners = SWe({
+      state.disposeWebviewListeners = installBrowserWebviewListeners({
         admitBrowserTab: () => this.host.admitBrowserTab(`webview-attach`),
         cancelPendingWebviewAttaches: () =>
           this.host.browserPageHostLifecycle.cancelPendingWebviewAttaches(

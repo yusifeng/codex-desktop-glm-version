@@ -5645,3 +5645,14 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   `reconcileHostSectionList` / `reconcileHostSectionMembers`；主 chunk 旧 `TH/EH` 约 123 行物理删除，没有第二份 state owner。
 - policy/reconciliation focused 79 项及 transition、undo/redo、manager、server、engine、pinned 六组相邻回归 107 项通过；测试索引仍为
   1850 个唯一脚本，no-unwired gate 扩至 1155 项。紧邻约 15,000 行 tar/minipass 实现有完整第三方边界，继续按 vendor 保留。
+
+# 2026-11-01 Browser webview listener lifecycle extraction
+
+- 新增并真实接回 `browser-sidebar/browser-webview-listener-runtime.ts`，整块接管 will/did-attach admission、adoption lease、
+  persistence/host identity 校验、browser-settings 分流、同步 annotation/WebMCP policy、Win32 attach turn、Alt 输入转发和 listener cleanup。
+- 主 chunk 旧 `SWe`、模块级 logger/WeakSet 约 485 行物理删除；`browser-window-thread-state-controller.ts` 改用语义 installer，
+  WeakSet 仍由一次构造的 runtime 独占，未复制 attach state 或 window lifecycle。
+- 对照初始恢复源码发现并修复早期迁移遗留：checkout/workspace-settings attach predicate 未从各自 runtime 解构，WebMCP 限额
+  `pW` 已被删除却仍有两个 consumer。现恢复两个 predicate，并以 `WEB_MCP_LIMITS` 同时服务同步 IPC 与 site-page event。
+- focused 51 项及 controller/adoption/identity/settings/checkout/site-event/page-host/BrowserHost 八组相邻回归 399 项通过；测试索引
+  1851，no-unwired gate 扩至 1167 项。
