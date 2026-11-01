@@ -6,8 +6,8 @@ import {
 } from "@rchunk/app-shared";
 import {
   hEt as initializeElectronCommands,
+  mEt as isElectronCommandEnabled,
 } from "@rchunk/app-initial";
-import { isElectronCommandEnabled } from "../app-initial/runtime/electron-command-policy";
 
 interface CommandDefinition {
   id: string;
