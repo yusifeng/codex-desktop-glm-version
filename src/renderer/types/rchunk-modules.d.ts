@@ -6350,7 +6350,31 @@ declare module "@rchunk/mark-session-create" {
   export const t: (scope: unknown, options?: { resetTimings?: boolean }) => void;
 }
 declare module "@rchunk/terminal-panel-bootstrap" { export const t: () => void; }
-declare module "@rchunk/xterm-window-zoom" {}
+declare module "@rchunk/xterm-window-zoom" {
+  export const _: () => { Terminal: typeof import("@xterm/xterm").Terminal };
+  export const a: (fonts: { code: string; codeFace?: import("@rchunk/theme-font-family").ThemeFontFace | null }) => string;
+  export const c: (terminal: import("@xterm/xterm").Terminal) => boolean;
+  export const d: (element: HTMLElement) => import("@xterm/xterm").ITheme;
+  export const f: () => void;
+  export const g: () => void;
+  export const h: { activate(event: MouseEvent, href: string): void };
+  export const i: (fontFamily: string, size: number) => Promise<void>;
+  export const l: (terminal: import("@xterm/xterm").Terminal) => Array<{ text: string; style?: Record<string, string | undefined> }>;
+  export const m: (event: MouseEvent, href: string) => void;
+  export const n: (terminal: import("@xterm/xterm").Terminal, getScale: () => unknown) => () => void;
+  export const o: (output: string) => string;
+  export const p: () => void;
+  export const r: (terminal: import("@xterm/xterm").Terminal) => {
+    dispose(): void;
+    replaceOutput(output: string, done?: () => void, afterReset?: () => void): void;
+    write(output: string): void;
+  };
+  export const s: () => void;
+  export const t: () => void;
+  export const u: () => void;
+  export const v: () => { WebLinksAddon: typeof import("@xterm/addon-web-links").WebLinksAddon };
+  export const y: () => { FitAddon: typeof import("@xterm/addon-fit").FitAddon };
+}
 declare module "@rchunk/app-initial" {
   export interface TerminalSnapshot {
     error?: unknown;

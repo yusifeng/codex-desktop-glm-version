@@ -410,7 +410,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ],
   ["checkout-session", "session-3ec40b7dd28e.js"],
   ["mark-session-create", "mark-session-create-6f7d531b2a15.js"],
-  ["xterm-window-zoom", "xterm-window-zoom-15fe24cf01f9.js"],
 ]);
 
 export const SEMANTIC_ROUTE_OVERRIDES = new Set([
@@ -428,6 +427,7 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   "review-preferences-model-677402e96a42.js",
   "onboarding-page-905dd8894724.js",
   "git-action-new-branch-field-a2e24da5e504.js",
+  "xterm-window-zoom-15fe24cf01f9.js",
   "codex-micro-mini-game-composer-c7d8a016e5c4.js",
   "composer-host-ac9410930773.js",
   "right-panel-composer-overlay-fdca4b46e82c.js",

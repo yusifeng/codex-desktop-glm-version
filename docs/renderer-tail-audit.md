@@ -1,5 +1,13 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Xterm runtime 大批次：`xterm-window-zoom` 不再保留发布 bundle 中
+12,237 行嵌入式 xterm.js/FitAddon/WebLinksAddon 与混杂的桌面桥。第三方边界恢复为与发布
+API 匹配的官方 pinned packages（`@xterm/xterm@5.5.0`、`@xterm/addon-fit@0.10.0`、
+`@xterm/addon-web-links@0.11.0`），本地 TypeScript 保留 ANSI/CSS theme、styled output
+snapshot、增量/replace writer、字体加载、外链与窗口缩放 mouse-coordinate bridge。
+新增 32 项 owner contract，并通过 25 项 output-panel runtime、source-build、semantic override
+与 typecheck。严格剩余由 10 个 / 71,222 行降至 9 个 / 58,985 行。
+
 2026-11-02 Onboarding/Git action 大批次：`onboarding-page` 与
 `git-action-new-branch-field` 已从 release-faithful owner 迁到可维护 TypeScript，
 一次删除 15,778 行原始 owner。Onboarding 不以旧版 42 项标准流程测试作为完成依据，
