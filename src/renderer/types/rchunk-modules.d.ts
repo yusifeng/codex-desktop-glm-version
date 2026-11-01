@@ -908,6 +908,8 @@ declare module "@rchunk/app-shared" {
   // virtualized-turn-list 消费的压缩导出面（语义见该模块头注释）：
   /** React compiler memo-cache runtime. */
   export const $3: () => { c(size: number): unknown[] };
+  export const $f: unknown;
+  export const Eh: () => void;
   /** Multi-agent Home banner analytics events. */
   export const AM: unknown;
   export const OM: unknown;
@@ -2638,6 +2640,9 @@ declare module "@rchunk/app-shared" {
   ) => RecordSchema<Key, Value>;
   export const Gs: unknown; // jbt：pin-window-light-16 IconAsset
   export const H3: () => void; // detachedWindow 入口的 preload helper
+  export const NB: string;
+  export const PB: string;
+  export const aq: string;
   export const RI: {
     (): void;
     (...segments: string[]): string;
@@ -2896,6 +2901,23 @@ declare module "@rchunk/thumbnail-worker-pdf-runtime" {
 }
 
 declare module "@rchunk/app-initial" {
+  export const R5t: () => void;
+  export const Wpn: (text: string, offset: number) => { end: number; path: string } | null;
+  export const _9t: () => void;
+  export const b9t: (path: string) => string;
+  export const g9t: (path: string) => Record<string, unknown> | null;
+  export const qpn: (path: string) => string;
+  export const $g: { height: number; width: number };
+  export const AS: (props: Record<string, unknown>) => unknown;
+  export const MS: { floatingSurface: string; singleLineSurface: string };
+  export const NS: () => void;
+  export const Qat: (...refs: unknown[]) => unknown;
+  export const Zat: () => void;
+  export const jS: () => void;
+  export const OLt: (props: Record<string, unknown>) => unknown;
+  export const RY: (props: Record<string, unknown>) => unknown;
+  export const ion: (markdown: string) => { body: string; entries: Array<{ key: string; value: string | string[] }> } | null;
+  export const kLt: () => void;
   export const E_t: unknown;
   export const aa: (props: Record<string, unknown>) => unknown;
   export const oa: (props: Record<string, unknown>) => unknown;
@@ -11282,6 +11304,10 @@ declare module "@rchunk/app-initial" {
   export const xW: () => void;
   /** Browser Skills authentication and experiment dependencies. */
   export const G6t: () => void;
+  export const H6t: import("@rchunk/app-shared").ReadableSignal<unknown>;
+  export const LEt: (hostId: string, experiment: unknown, options?: unknown) => readonly unknown[];
+  export const Qsn: (scope: unknown, queryClient: unknown, hostId: string) => Promise<{ expectedVersion?: unknown; filePath?: string | null } | null>;
+  export const ffn: (scope: unknown, experimentId: string) => unknown;
   export const K6t: unknown;
   export const gfn: unknown;
   export const vfn: unknown;

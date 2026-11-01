@@ -24,16 +24,36 @@ for (const directory of MODULES) {
 }
 const overrides = {
   "app-shared": {
+    $3: "() => ({ c: size => Array(size).fill(Symbol.for('react.memo_cache_sentinel')) })",
     $O: "{ FIVE_MINUTES: 300000 }",
     BX: "(family, parameter) => ({ data: family?.read?.(parameter) ?? null })",
     FX: "() => undefined",
+    G2: "value => value",
+    H3: "() => undefined",
+    HI: "(...parts) => parts.join('/')",
     I3: "() => globalThis.__toolResultPrimitivesTest.jsx",
+    Jm: "load => props => ({ type: 'lazy', props, load })",
+    K2: "() => undefined",
+    NB: "'persisted'",
+    PB: "'live'",
     QI: "() => undefined",
+    RI: "() => undefined",
+    V3: "load => load()",
     ZI: "{ id: 'app-scope' }",
+    aq: "'visualize'",
     e6: "() => globalThis.__toolResultPrimitivesTest.react",
     ek: "() => undefined",
+    c_: "() => undefined",
+    o_: "'Tooltip'",
+    oq: "'visualize'",
+    qm: "() => undefined",
+    wL: "() => undefined",
   },
   "app-initial": {
+    R5t: "() => undefined",
+    Wpn: "(text,offset) => { const match=/plugin:\\/\\/[^\\s]+/g; match.lastIndex=offset; const found=match.exec(text); return found ? { path: found[0], end: match.lastIndex } : null; }",
+    _9t: "() => undefined",
+    b9t: "path => path",
     eun: `(scope, method, options) => ({
       method,
       options,
@@ -47,6 +67,8 @@ const overrides = {
       },
     })`,
     nun: "() => undefined",
+    g9t: "path => path.endsWith('SKILL.md') ? { isSkillDefinitionFile: true, skillId: 'visualize' } : null",
+    qpn: "path => path",
   },
 };
 const sideEffects = new Set(["rolldown-runtime", "diff-preview-content", "ansi-block", "shell-label", "use-app-connect-flow", "open-in-google-drive-menu-item"]);
@@ -96,11 +118,12 @@ assert.equal(typeof nativeApp.t, "function");
 const diffPreview = await bundle("diff-preview-tooltip");
 diffPreview.n();
 const diffTree = diffPreview.t({ children: "main.ts", diff: { metadata: { path: "main.ts" } }, disabled: true, displayPath: "main.ts", linesAdded: 3, linesRemoved: 1 });
-assert.equal(diffTree.type, "span");
-assert.equal(diffTree.props.className, "group/diff-preview");
-assert.equal(nodes(diffTree).find(node => node.props["aria-disabled"] === true).props.children, "main.ts");
-assert.equal(nodeOfType(diffTree, "aside"), undefined);
-assert.equal(typeof diffTree.props.onPointerEnter, "function");
+assert.equal(diffTree.type, state.jsx.Fragment);
+const diffTooltip = nodeOfType(diffTree, "Tooltip");
+assert.equal(diffTooltip.props.disabled, true);
+assert.equal(diffTooltip.props.children, "main.ts");
+assert.equal(diffTooltip.props.delayDuration, 800);
+assert.equal(typeof diffTooltip.props.onPointerEnter, "function");
 
 // exec-shell-container: 10
 const shell = await bundle("exec-shell-container");
@@ -135,18 +158,19 @@ assert.equal(buttons[1].props.children, "Download");
 // skill-exploration-labels: 12
 const skills = await bundle("skill-exploration-labels");
 skills.n(); skills.s();
-assert.equal(skills.a("mkdir visualizations/demo"), "create");
-assert.equal(skills.a("apply_patch\n*** Update File: visualizations/demo/index.html"), "update");
-assert.equal(skills.a("apply_patch\n*** Delete File: visualizations/demo/index.html"), null);
+assert.equal(skills.a("mkdir ./visualizations/demo"), "create");
+assert.equal(skills.a("apply_patch\n*** Update File: /tmp/visualizations/demo/index.html"), "update");
+assert.equal(skills.a("apply_patch\n*** Delete File: /tmp/visualizations/demo/index.html"), null);
 assert.equal(skills.a("echo hello"), null);
 assert.equal(skills.l("completed"), true);
 assert.equal(skills.l("failed"), false);
 assert.equal(skills.c({ isSkillDefinitionFile: true, skillId: "visualize" }), true);
 assert.equal(skills.c({ isSkillDefinitionFile: true, skillId: "live", pluginId: "visualize" }), true);
-assert.equal(skills.i({ kind: "create", isFinished: false, isLeadingSegment: true }), "Creating visualization");
-assert.equal(skills.i({ kind: "update", isFinished: true, isLeadingSegment: false }), "updated visualization");
+const skillIntl={formatMessage:descriptor=>descriptor.defaultMessage};
+assert.equal(skills.i({ intl:skillIntl,kind: "create", isFinished: false, isLeadingSegment: true }), "Creating visualization");
+assert.equal(skills.i({ intl:skillIntl,kind: "update", isFinished: true, isLeadingSegment: false }), "updated visualization");
 assert.equal(skills.o([{ type: "text", text: "Create an interactive chart" }]), "soft");
-assert.equal(skills.r({ summary: { isSkillDefinitionFile: true } }), true);
+assert.equal(skills.r({ summary: { type:"read",path:"/tmp/SKILL.md" } }), true);
 
 // result-values: 10
 const values = await bundle("result-values");

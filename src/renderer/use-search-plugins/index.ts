@@ -246,11 +246,11 @@ function initializeSearchPlugins(): void {
   if (initialized) return;
   initialized = true;
   for (const name of ["jZ", "$I", "SL", "FX", "wL"]) shared[name]?.();
-  for (const name of ["z3t", "Wgn", "HZt", "G6t", "M6t", "$6t", "zv", "K3t", "xv", "E4t", "_cn", "Bfn", "ifn", "pdn", "Sht", "_v", "P6t", "i4t"]) initial[name]?.();
+  for (const name of ["z3t", "Wgn", "HZt", "G6t", "M6t", "$6t", "zv", "K3t", "xv", "E4t"]) initial[name]?.();
   shared.QI?.();
+  for (const name of ["_cn", "Bfn", "ifn"]) initial[name]?.();
   shared.ek?.();
+  for (const name of ["pdn", "Sht", "_v", "P6t", "i4t"]) initial[name]?.();
 }
-
-initializeSearchPlugins();
 
 export { useSearchPlugins as n, initializeSearchPlugins as t };

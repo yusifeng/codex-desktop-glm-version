@@ -6,33 +6,47 @@ import * as esbuild from "esbuild";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = { Fragment: "Fragment", jsx(type, props, key) { return { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return { type, props: props ?? {}, key }; } };
 globalThis.__connectorFlowTest = { jsx, connectModal(props) { return { type: "connect-modal", props }; } };
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "connector-flow-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => { const name = path.basename(importPath); const contents = name === "app-shared" ? "export const I3=()=>globalThis.__connectorFlowTest.jsx;" : name === "codex-app-home-beacon-connect-modal" ? "export const CodexAppHomeBeaconConnectModal=globalThis.__connectorFlowTest.connectModal;" : "export {};"; return { contents, loader: "js" }; }); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "connector-flow-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => { const name = path.basename(importPath); const contents = name === "app-shared" ? `
+export const I3=()=>globalThis.__connectorFlowTest.jsx;
+export const $3=()=>({c:size=>Array(size).fill(Symbol.for('react.memo_cache_sentinel'))});
+export const CL=()=>globalThis.__connectorFlowTest.queryClient;
+export const FX=()=>{};export const G2=value=>value;export const HX=()=>({});export const K2=()=>{};
+export const LX=()=>globalThis.__connectorFlowTest.scope;export const Q3={error:(message,details)=>globalThis.__connectorFlowTest.logs.push({message,details})};
+export const QI=()=>{};export const SL=()=>{};export const Z3=()=>{};export const ZI={};export const lk=()=>{};export const pk={};export const rL=()=>{};
+export const n4=()=>({formatMessage:(descriptor,values)=>descriptor.defaultMessage.replace('{appName}',values?.appName??'')});
+export const iL=options=>({isPending:false,variables:undefined,mutateAsync:async update=>{const context=await options.onMutate(update);try{const data=await options.mutationFn(update);await options.onSuccess(data,update,context);return data;}catch(error){options.onError(error,update,context);throw error;}finally{await options.onSettled();}}});
+` : name === "app-initial" ? `
+export const $sn=()=>{};export const Bfn=()=>{};export const G6t=()=>{};export const Gsn=['available-dependency'];export const H6t={};export const HEt=()=>{};
+export const Jsn=['apps-list'];export const Ksn=['connectors-dependency'];export const LEt=hostId=>['available-apps',hostId];
+export const Qsn=async()=>({filePath:'/config.json',expectedVersion:7});export const Ugn=()=>({sendRequest:(method,payload)=>globalThis.__connectorFlowTest.sendRequest(method,payload)});
+export const Wgn=()=>{};export const aun=()=>{};export const ffn=()=>true;export const pfn=()=>{};export const sun=()=>async key=>globalThis.__connectorFlowTest.invalidations.push(key);
+` : name === "new-chat-page-suggestions-eligibility" ? "export const a=()=>{};export const n=hostId=>['suggestions',hostId];" : name === "codex-app-home-beacon-connect-modal" ? "export const CodexAppHomeBeaconConnectModal=globalThis.__connectorFlowTest.connectModal;" : "export {};"; return { contents, loader: "js" }; }); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
 
 // apps-availability: 15
 const availability = await bundle("apps-availability");
 assert.deepEqual(Object.keys(availability), ["n", "t"]);
-let apps = [{ id: "drive", name: "Drive", isEnabled: false }, { id: "slack", name: "Slack", isEnabled: true }];
-const writes = []; const invalidations = []; const notifications = [];
-const controller = availability.n({ hostId: "remote", readApps: () => apps, writeOptimistic(next) { apps = next; }, async writeConfig(input) { writes.push(input); return { status: "ok" }; }, invalidate(key) { invalidations.push(key); }, notify(...args) { notifications.push(args); } });
+availability.t();
+const flowState=globalThis.__connectorFlowTest;flowState.apps=[{ id: "drive", name: "Drive", isEnabled: false }, { id: "slack", name: "Slack", isEnabled: true }];flowState.invalidations=[];flowState.notifications=[];flowState.logs=[];flowState.writes=[];flowState.response={status:"ok"};
+flowState.queryClient={async cancelQueries(){},getQueryData(){return flowState.apps;},setQueryData(_key,value){flowState.apps=value;}};
+flowState.scope={get(){return{success:message=>flowState.notifications.push(["success",message]),danger:message=>flowState.notifications.push(["danger",message])};}};
+flowState.sendRequest=async(method,payload)=>{flowState.writes.push({method,payload});if(flowState.failure)throw flowState.failure;return flowState.response;};
+const controller = availability.n({ hostId: "remote" });
 assert.equal(controller.isUpdating, false);
-const update = controller.setAppEnabled({ appId: "drive", enabled: true });
-assert.equal(controller.isUpdating, true);
-assert.equal(controller.updatingAppId, "drive");
-await update;
+await controller.setAppEnabled({ appId: "drive", enabled: true });
 assert.equal(controller.isUpdating, false);
 assert.equal(controller.updatingAppId, null);
-assert.equal(apps[0].isEnabled, true);
-assert.equal(writes[0].hostId, "remote");
-assert.deepEqual(writes[0].edits, [{ keyPath: "apps.drive.enabled", value: true, mergeStrategy: "upsert" }]);
-assert.equal(invalidations.length, 3);
-assert.deepEqual(notifications[0], ["success", "Drive app enabled"]);
-const original = apps;
-const failing = availability.n({ readApps: () => apps, writeOptimistic(next) { apps = next; }, async writeConfig() { throw new Error("failed"); }, notify(...args) { notifications.push(args); } });
-await assert.rejects(() => failing.setAppEnabled({ appId: "slack", enabled: false }), /failed/);
-assert.equal(apps, original);
-assert.deepEqual(notifications.at(-1), ["danger", "Failed to update app"]);
-const overridden = availability.n({ async writeConfig() { return { status: "okOverridden" }; } });
-await assert.rejects(() => overridden.setAppEnabled({ appId: "drive", enabled: true }), /overridden/);
+assert.equal(flowState.apps[0].isEnabled, true);
+assert.equal(flowState.writes[0].method,"config/batchWrite");
+assert.equal(flowState.writes[0].payload.filePath,"/config.json");
+assert.deepEqual(flowState.writes[0].payload.edits, [{ keyPath: "apps.drive.enabled", value: true, mergeStrategy: "upsert" }]);
+assert.equal(flowState.invalidations.length, 7);
+assert.deepEqual(flowState.notifications[0], ["success", "Drive app enabled"]);
+const original = flowState.apps;flowState.failure=new Error("failed");
+await assert.rejects(() => controller.setAppEnabled({ appId: "slack", enabled: false }), /failed/);
+assert.equal(flowState.apps, original);
+assert.deepEqual(flowState.notifications.at(-1), ["danger", "Failed to update app"]);
+flowState.failure=null;flowState.response={status:"okOverridden"};
+await assert.rejects(() => controller.setAppEnabled({ appId: "drive", enabled: true }), /overridden/);
 
 // pca-connector-eligibility: 25
 const pca = await bundle("pca-connector-eligibility");
