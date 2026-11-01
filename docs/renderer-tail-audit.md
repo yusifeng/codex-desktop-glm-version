@@ -1,5 +1,12 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Security settings owner：`security-settings` 已从 release-faithful owner
+迁至真实 React 页面，删除 5,964 行原始 owner。恢复 account signal fallback、按账户隔离的
+MFA/sessions/linked-apps/advanced-protection 查询、并行 loading/error/retry、MFA 状态、活动会话
+登出、连接应用断开以及 login connections/developer/lockdown/advanced-protection 入口；页面状态
+由查询结果直接派生，不再返回静态 `{kind, props}` view-model。security flow cluster 40 项与
+typecheck 通过；严格剩余清单由 34 个 / 167,496 行降至 33 个 / 161,532 行。
+
 2026-11-02 Settings runtime contract 批次：`use-visible-settings-sections` 与
 `settings-plugin-selection` 已从 release-faithful owner 迁到 TypeScript，一次删除 5,092 行
 原始 owner。前者修正原占位实现最关键的跨 chunk 契约：`n` 现在接收 requested slug、local

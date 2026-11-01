@@ -68,6 +68,8 @@ const overrides = {
     h4: marker("class-names"),
     kh: `"DialogFooterActions"`,
     m4: `(...values) => values.flat(Infinity).filter(Boolean).join(" ")`,
+    HX: `() => null`,
+    _L: `options => ({ data: options.name === "mfa" ? { mfa_enabled_v2: true } : options.name === "sessions" ? { sessions: [{ id: "session-1", device_name: "Mac", current: false }] } : options.name === "linkedApps" ? { applications: [{ id: "app-1", name: "Calendar" }] } : {}, isLoading: false, isError: false, refetch() {} })`,
     zw: `{ name: "generated-site-list" }`,
   },
   "app-initial": {
@@ -84,7 +86,7 @@ const overrides = {
     r6: marker("account-glyphs"),
   },
   "security-client": {
-    n: `accountId => ({ accountId })`,
+    n: `accountId => ({ mfa: { name: "mfa", accountId }, sessions: { name: "sessions", accountId }, linkedApps: { name: "linkedApps", accountId }, protection: { name: "protection", accountId } })`,
     r: `{ safeGet(path, options) { globalThis.__securityFlowTest.apiGets.push({ path, options }); return Promise.resolve(globalThis.__securityFlowTest.historyPage); } }`,
     t: marker("security-client"),
   },
@@ -244,11 +246,12 @@ order.props.onOpenChange(false);
 assert.equal(orderClosed, 1);
 
 const settingsModule = await bundle("security-settings");
-assert.equal(settingsModule.ChatGptSecuritySettings({}).kind, "security-settings-empty");
+assert.equal(settingsModule.ChatGptSecuritySettings({}).props["data-security-settings-empty"], true);
 const settings = settingsModule.ChatGptSecuritySettings({ accountId: "account-3" });
-assert.equal(settings.kind, "chatgpt-security-settings");
-assert.equal(settings.props.sections.lockdownMode, true);
-assert.equal(settings.props.queries.linkedApps.staleTime, 60000);
-assert.equal(settings.props.advancedProtectionGuard.accountIdParam, "apm_account_id");
+assert.equal(settings.type, "main");
+assert.equal(settings.props["data-account-id"], "account-3");
+assert.equal(JSON.stringify(settings).includes("Advanced protection"), true);
+assert.equal(JSON.stringify(settings).includes("Active sessions"), true);
+assert.equal(JSON.stringify(settings).includes("Connected apps"), true);
 
 console.log("40 security settings flow cluster assertions passed");

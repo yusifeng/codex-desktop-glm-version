@@ -417,7 +417,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
     "right-panel-composer-overlay-fdca4b46e82c.js",
   ],
   ["general-settings", "general-settings-3d550f75d0eb.js"],
-  ["security-settings", "security-settings-2da2a3b205ab.js"],
   [
     "remote-connections-settings",
     "remote-connections-settings-12e860fd2983.js",
@@ -503,6 +502,7 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   "configuration-fields-56633f88c571.js",
   "content-quick-chat-overlay-ed4d1aa8ed4b.js",
   "settings-plugin-selection-e42895d573ba.js",
+  "security-settings-2da2a3b205ab.js",
   "use-visible-settings-sections-5efd0081496f.js",
   "create-dialog-ae36d087f814.js",
   "draw-presence-label-8b53715001e2.js",
