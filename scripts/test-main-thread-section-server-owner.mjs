@@ -1,13 +1,22 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { createThreadSectionServerClass } from "../src/main/main-app/sidebar/thread-section-server.ts";
+import { transform } from "esbuild";
+
+const source = fs.readFileSync(
+  new URL("../src/main/main-app/sidebar/thread-section-server.ts", import.meta.url),
+  "utf8",
+);
+const transpiled = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+const loaded = { exports: {} };
+Function("module", "exports", transpiled.code)(loaded, loaded.exports);
+const { createThreadSectionServerClass } = loaded.exports;
 
 let assertions = 0;
 const equal = (actual, expected) => { assert.deepEqual(actual, expected); assertions += 1; };
 class SectionEngine {
   constructor(transport) { this.transport = transport; }
 }
-const dependencies = new Proxy({ Se: SectionEngine }, {
+const dependencies = new Proxy({ ThreadSectionEngine: SectionEngine, pinnedThreadSectionId: "pinned" }, {
   get(target, property) { return Object.hasOwn(target, property) ? target[property] : (() => undefined); },
 });
 const ThreadSectionServer = createThreadSectionServerClass(dependencies);

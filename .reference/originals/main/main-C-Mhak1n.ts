@@ -316,6 +316,7 @@ const { createElectronMessageHandlerClass } = require("./main-app/window/electro
 const { createOpenInServiceClass, isOpenableUrl } = require("./main-app/misc/open-in-service.js");
 const { createLinuxApplicationsRuntime } = require("./main-app/platform/linux-applications.js");
 const { createThreadSectionServerClass } = require("./main-app/sidebar/thread-section-server.js");
+const { PINNED_THREAD_SECTION_ID, ThreadSectionEngine } = require("./main-app/sidebar/thread-section-engine.js");
 const { createSavedSectionUndoRedoStackClass } = require("./main-app/sidebar/saved-section-undo-redo-stack.js");
 const { createSavedSectionTransitionClass } = require("./main-app/sidebar/saved-section-transition.js");
 const { createSavedSectionReconciliationClass } = require("./main-app/sidebar/saved-section-reconciliation.js");
@@ -961,141 +962,14 @@ function ge(e) {
     /^invalid thread id:/i.test(e)
   );
 }
-var _e = e.a(n.id()),
-  ve = `01984de2-8f74-7c91-a3b2-5c5e937cf318`,
-  ye = new Map();
+var _e = e.a(n.id());
 function be(e) {
   return e != null && n.Qu(e) && n.Zu(e, `0.148.0-alpha.7`) >= 0;
 }
 function xe(e) {
   return be(e);
 }
-var Se = class {
-    adapter;
-    constructor(e) {
-      this.adapter = e;
-    }
-    async listHostSectionThreadIds(e, t = e.pinnedSectionId) {
-      let n = [],
-        r = null;
-      do {
-        let i = await this.adapter.listThreads(e, {
-          cursor: r,
-          limit: 100,
-          modelProviders: [],
-          sectionId: t,
-          sortKey: `section_position`,
-          useStateDbOnly: !0,
-        });
-        (n.push(...i.data.map((e) => e.id)), (r = i.nextCursor));
-      } while (r != null);
-      return n;
-    }
-    async listSections(e) {
-      let t = await Promise.all(
-        e.map(async (e) => {
-          let t = [],
-            n = null;
-          do {
-            let r = await this.adapter.listSections(e, { cursor: n, limit: 100 });
-            (t.push(
-              ...r.data
-                .filter(({ id: e }) => e !== ve)
-                .map(({ id: t, name: n }) => ({ hostId: e.hostId, id: t, name: n })),
-            ),
-              (n = r.nextCursor));
-          } while (n != null);
-          return t;
-        }),
-      );
-      return { hostIds: e.map(({ hostId: e }) => e), sections: t.flat() };
-    }
-    async createSection(e, t, n) {
-      let r = `${e.hostId}\0${n}`,
-        i = ye.get(r);
-      if (i != null) return i;
-      let a = this.adapter
-        .createSection(e, { name: t })
-        .then(({ section: { id: e, name: t } }) => ({ id: e, name: t }));
-      ye.set(r, a);
-      try {
-        return await a;
-      } finally {
-        ye.get(r) === a && ye.delete(r);
-      }
-    }
-    async updateSection(e, t, n) {
-      await this.adapter.updateSection(e, { sectionId: t, name: n });
-    }
-    async deleteSection(e, t) {
-      await this.adapter.deleteSection(e, { sectionId: t });
-    }
-    async findThreadOwner(e, t, n = {}) {
-      let r = (
-        await Promise.all(
-          t.map(async (t) => {
-            try {
-              let r = await this.adapter.readThread(t, e, n.forDiscovery === !0);
-              return r?.id === e
-                ? {
-                    ...t,
-                    isPinned: r.section?.id === t.pinnedSectionId,
-                    sectionId: r.section?.id ?? null,
-                  }
-                : null;
-            } catch (e) {
-              if (n.throwOnMissingThread || !(e instanceof Error) || !me(e)) throw e;
-              return null;
-            }
-          }),
-        )
-      ).filter((e) => e != null);
-      if (r.length <= 1 || !n.throwOnAmbiguousOwner) return r.length === 1 ? (r[0] ?? null) : null;
-      throw Error(`Pinned thread ownership is ambiguous across app-server hosts`);
-    }
-    async setThreadPinned(e, t) {
-      let { threadId: n, pinned: r, beforeThreadId: i } = t;
-      if (e.isPinned === r) return !1;
-      let a = r && i != null ? await this.findThreadOwner(i, [e]) : null;
-      return this.setThreadSection(e, {
-        beforeThreadId: a?.isPinned ? i : null,
-        sectionId: r ? e.pinnedSectionId : null,
-        threadId: n,
-      });
-    }
-    async setThreadSection(e, t) {
-      let { threadId: n, sectionId: r, beforeThreadId: i, previousSectionId: a } = t;
-      if ((a != null && e.sectionId !== a) || (e.sectionId === r && i === void 0)) return !1;
-      let o = !1;
-      r != null &&
-        r !== e.pinnedSectionId &&
-        e.sectionId !== r &&
-        i != null &&
-        (await this.adapter.moveThread(e, { beforeThreadId: null, sectionId: r, threadId: n }),
-        (o = !0));
-      try {
-        await this.adapter.moveThread(e, { beforeThreadId: i ?? null, sectionId: r, threadId: n });
-      } catch (t) {
-        throw (
-          o &&
-            (await this.adapter.moveThread(e, {
-              beforeThreadId: null,
-              sectionId: e.sectionId,
-              threadId: n,
-            })),
-          t
-        );
-      }
-      return !0;
-    }
-    async movePinnedThread(e, t) {
-      let { threadId: n, beforeThreadId: r } = t;
-      return e.isPinned
-        ? this.setThreadSection(e, { beforeThreadId: r, sectionId: e.pinnedSectionId, threadId: n })
-        : !1;
-    }
-  },
-  Ce = `codex-app-server`,
+var Ce = `codex-app-server`,
   we = `openai-bearer.`;
 function Te(e) {
   return [Ce, `${we}${e}`];
@@ -34695,14 +34569,14 @@ var Zze = e.t((e, t) => {
 var Qze = n.wf({ thread: n.wf({ id: n.Of() }) }),
   $ze = createThreadSectionServerClass({
     Qze,
-    Se,
+    ThreadSectionEngine,
     be,
     gH,
     hH,
     he,
     me,
     n,
-    ve,
+    pinnedThreadSectionId: PINNED_THREAD_SECTION_ID,
     xe,
   });
 var tBe = createSavedSectionTransitionClass({
@@ -34876,7 +34750,7 @@ var jH = createPinnedThreadsServiceClass({
     PinnedThreadServer: $ze,
     SavedCustomSectionsManager: iBe,
     dedupe: mH.default,
-    pinnedSectionId: ve,
+    pinnedSectionId: PINNED_THREAD_SECTION_ID,
     pinnedThreadIdsKey: n.iu.PINNED_THREAD_IDS,
     readPinnedThreadIds: hH,
     reorderPinnedThreadIds: _t,
@@ -36302,7 +36176,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
         (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ hX, fq, tq, KU, EZ, lifecycleHelpersClass: createBrowserPageLifecycleHelpersControllerClass, WU, dZ, QU, Ze, n, pX, dZe, oX, dq, isEqual: G.default }))(this)),
         (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW, fq, matchesLoadError: FU, normalizeUrl: Ze, resetCaptureState: (page) => { page.isCapturingUserMedia = !1; page.isCapturingCamera = void 0; page.isCapturingMicrophone = void 0; }, clearSiteTools: XX, serializePageState: eW, shouldIgnoreLoadError: NU, shouldRetryLoadError: PU, logger: r.i, setTimer: setTimeout, retryDelayMs: 50, maxAttempts: 100 }))(this)),
         (this.pageLookupController = new (createBrowserPageLookupControllerClass({}))(this)),
-(this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, Xe, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, Se, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ, WXe, RX }))(this)),
+(this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, Xe, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ, WXe, RX }))(this)),
         (this.hostPolicyController = new (createBrowserHostPolicyControllerClass({ DXe, OXe, kXe, mq, VG, Yc, Xc, DZ, hX }))(this)),
         (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
         (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, SWe, aXe, gX, qU, oXe, vX, tq, KU, l, EZ, logger: r.i(`browser-sidebar-manager`) }))(this)),

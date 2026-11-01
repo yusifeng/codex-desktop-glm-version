@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { createSavedSectionReconciliationClass } from "../src/main/main-app/sidebar/saved-section-reconciliation.ts";
+import { transform } from "esbuild";
+
+const ownerText = fs.readFileSync(new URL("../src/main/main-app/sidebar/saved-section-reconciliation.ts", import.meta.url), "utf8");
+const ownerRuntime = await transform(ownerText, { loader: "ts", format: "cjs", target: "es2022" });
+const ownerModule = { exports: {} };
+Function("module", "exports", ownerRuntime.code)(ownerModule, ownerModule.exports);
+const { createSavedSectionReconciliationClass } = ownerModule.exports;
 
 let assertions = 0;
 const equal = (actual, expected) => { assert.deepEqual(actual, expected); assertions += 1; };

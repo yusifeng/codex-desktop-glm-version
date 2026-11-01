@@ -3575,3 +3575,15 @@ handler、Library files backend 与 directory chooser。语义 owner 统一拥�
 审计同时依据原始 `src-DldfpmrL.ts` 导出表修正 shared `Hi`：它是 UNC distro 提取器 `lre`，不是布尔型
 `isWslUncPath`。新 focused suite 30 项覆盖目录冲突、split 降级、WSL/remote 路径、missing/existing root 与真实 wiring；修复
 projectless chooser 测试的直接 `.ts` 失效入口后原 18 项也重新真实执行。no-unwired gate 扩至 744 项。
+
+### 整块抽取：thread-section engine 与 pinned section 常量
+
+新增并真实接回 `sidebar/thread-section-engine.ts`，完整迁出主 chunk 原 `Se` owner：跨页 thread/section listing、内建 pinned
+section 过滤、logical create single-flight、跨 host owner discovery、missing/ambiguous 策略、pin/unpin、custom section 两阶段
+定位 move 与失败回滚均由具名 typed class 持有。`ThreadSectionServer` 继续是唯一上层 connection/migration owner，只将底层
+app-server adapter 注入新 engine，没有复制 cache 或 mutation queue。
+
+内建 pinned section UUID 同步迁为 `PINNED_THREAD_SECTION_ID`，server discovery 与 host assembly 共用；主 chunk 原 `Se`、
+create reservation `ye` 和 UUID alias `ve` 删除。Browser WebView controller 中未读取、且被方法局部变量遮蔽的同名 `Se`
+dependency 也一并删除。新 focused suite 37 项，saved-section/pinned cluster 共 134 项真实通过；修复其中 6 个直接 `.ts`
+import 的失效入口，no-unwired gate 扩至 754 项。

@@ -3,14 +3,14 @@
 export function createThreadSectionServerClass(dependencies) {
   const {
     Qze,
-    Se,
+    ThreadSectionEngine,
     be,
     gH,
     hH,
     he,
     me,
     n,
-    ve,
+    pinnedThreadSectionId,
     xe,
   } = dependencies;
   return class ThreadSectionServer {
@@ -21,7 +21,7 @@ export function createThreadSectionServerClass(dependencies) {
       pinnedSectionIdsByConnection = new WeakMap();
       pendingHostMutations = new Map();
       pendingMigrationMarkers = new Set();
-      threadSectionEngine = new Se({
+      threadSectionEngine = new ThreadSectionEngine({
         readThread: (e, t, n) => this.readThread(e.connection, t, n, e.beforeSendRequest),
         listThreads: (e, t) => e.connection.listThreads(t, void 0, e.beforeSendRequest),
         moveThread: async (e, t) => {
@@ -321,7 +321,7 @@ export function createThreadSectionServerClass(dependencies) {
               let s = this.pinnedSectionIdsByConnection.get(r);
               if (!this.pinnedSectionIdsByConnection.has(r)) {
                 if (
-                  ((s = o == null ? await this.findPinnedSectionId(r, i) : ve),
+                  ((s = o == null ? await this.findPinnedSectionId(r, i) : pinnedThreadSectionId),
                   s != null && o == null)
                 )
                   try {
@@ -374,7 +374,7 @@ export function createThreadSectionServerClass(dependencies) {
               throw e;
             return null;
           }
-          let i = r.data.find(({ id: e }) => e === ve);
+          let i = r.data.find(({ id: e }) => e === pinnedThreadSectionId);
           if (i != null) return i.id;
           n = r.nextCursor;
         } while (n != null);

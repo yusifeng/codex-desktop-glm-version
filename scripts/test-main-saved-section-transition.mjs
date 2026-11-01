@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import * as acorn from "acorn";
 import { transform } from "esbuild";
-import { createSavedSectionTransitionClass } from "../src/main/main-app/sidebar/saved-section-transition.ts";
 
 let assertions = 0;
 const equal = (actual, expected) => {
@@ -14,6 +13,10 @@ const sourceText = fs.readFileSync(
   new URL("../src/main/main-app/sidebar/saved-section-transition.ts", import.meta.url),
   "utf8",
 );
+const runtimeTranspiled = await transform(sourceText, { loader: "ts", format: "cjs", target: "es2022" });
+const runtimeModule = { exports: {} };
+Function("module", "exports", runtimeTranspiled.code)(runtimeModule, runtimeModule.exports);
+const { createSavedSectionTransitionClass } = runtimeModule.exports;
 const transpiled = await transform(sourceText, { loader: "ts", format: "esm", target: "es2022" });
 const ast = acorn.parse(transpiled.code, { ecmaVersion: "latest", sourceType: "module" });
 let classNode;

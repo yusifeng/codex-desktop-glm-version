@@ -5469,3 +5469,13 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 主 chunk 旧 `vt/xt/St/Ct/wt/Tt/Et/Dt/Ot/kt/At/us/ds/Qie/$ie` 已删除。依据原始 shared bundle 导出表修复
   `Hi` 映射为 UNC distro extractor，避免 WSL 校验把 boolean 当 distro string。
 - 新 focused suite 30 项；projectless chooser 失效的直接 `.ts` import 已修复并恢复 18 项真实执行；no-unwired gate 扩至 744 项。
+
+# 2026-11-01 thread-section engine extraction
+
+- 新增并真实接回 typed `sidebar/thread-section-engine.ts`，迁出跨页 listing、hidden pinned filtering、logical-create
+  single-flight、跨 host owner discovery、pin/section move 与 staged-move rollback；既有 `ThreadSectionServer` 保持 connection、
+  migration 和 mutation serialization 的唯一上层 owner。
+- pinned UUID 统一为 `PINNED_THREAD_SECTION_ID`，server/host assembly 共享；主 chunk 旧 `Se/ye/ve` 删除，Browser WebView
+  中被局部变量遮蔽且从未读取的 `Se` 注入同步清理。
+- 新 focused suite 37 项；修复 thread-section server、pinned service 及 saved-section transition/reconciliation/undo-redo/manager
+  六个直接 `.ts` 失效入口，相关 cluster 134 项真实通过；no-unwired gate 扩至 754 项。

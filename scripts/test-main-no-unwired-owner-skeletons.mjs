@@ -124,6 +124,7 @@ const realOwners = [
   ["src/main/main-app/worker/worker-main-protocol.ts", "createWorkerMainProtocol"],
   ["src/main/main-app/tray/tray-lifecycle.ts", "createTrayLifecycle"],
   ["src/main/main-app/tray/native-status-item-event-protocol.ts", "createNativeStatusItemEventProtocol"],
+  ["src/main/main-app/sidebar/thread-section-engine.ts", "ThreadSectionEngine"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -750,5 +751,13 @@ assert.equal(main.includes("async function ds({"), false, "generated app-server 
 assert.equal(main.includes("async function Qie({"), false, "generated projectless root resolver must be removed");
 assert.equal(main.includes("function us("), false, "generated projectless WSL validator must be removed");
 assert.equal(main.includes("function $ie("), false, "generated projectless filesystem adapter must be removed");
+assert.equal(main.includes('require("./main-app/sidebar/thread-section-engine.js")'), true, "thread-section engine is wired");
+assert.equal(main.includes("ThreadSectionEngine,"), true, "thread-section server receives the semantic engine");
+assert.equal(main.includes("pinnedThreadSectionId: PINNED_THREAD_SECTION_ID"), true, "thread-section server receives the semantic pinned ID");
+assert.equal(main.includes("pinnedSectionId: PINNED_THREAD_SECTION_ID"), true, "host assembly reuses the semantic pinned ID");
+assert.equal(main.includes("var Se = class"), false, "generated thread-section engine must be removed");
+assert.equal(main.includes("ye = new Map()"), false, "generated section-create reservation state must be removed");
+assert.equal(main.includes("01984de2-8f74-7c91-a3b2-5c5e937cf318"), false, "pinned section ID must not be duplicated in main");
+assert.equal(main.includes("GX, Se, JXe"), false, "unused generated engine injection must be removed from browser webview wiring");
 
-console.log("744 main unwired-owner skeleton assertions passed");
+console.log("754 main unwired-owner skeleton assertions passed");
