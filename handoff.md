@@ -1,5 +1,12 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成 rollout diagnostics 真实运行时恢复：新增 `main-app/diagnostics/rollout-diagnostics.ts`，按原 `Zie` 恢复 sessions 年/月/日遍历、
+mtime 新鲜度筛选与上限、JSONL 容错解析、task started/completed 配对、token/wall-time 汇总及 standard/fast/saved 时间估算，并由
+codex-home IPC 的 `resolveCodexHomeRequest` 真实消费。删除原先永远返回全零的同名 skeleton 和无 consumer 的 `Qie` 文件计数骨架；
+同时移除 `rpc-core.ts` 中调用即抛 `not wired` 的假 connectRpc facade，恢复 `workers-module` 注入的真实 RpcTarget 基类选择，wire protocol
+继续由发布 shared chunk 唯一持有。focused suite 19 项、IPC/startup/worker 相邻回归 177 项、防空壳审计 1216 项通过；
+`typecheck`、test-index 1854、chunk verify 11/11 与全量 `npm run check` 均通过。
+
 完成 Cloud Backend 与 Statsig 运行时收敛：既有 `app-server/cloud-backend.ts` 不再是未接线语义副本，主组合根、Environment Config、
 transport factory、WindowContext 和 ElectronMessageHandler 现真实消费 `AppServerHttpClient`、`HybridWebsocketHttpTransport`、
 `AppServerFeatureEnablement`、host descriptor 与 request interceptor。保留在主 chunk 的唯一 Statsig vendor 实例通过显式 runtime injection

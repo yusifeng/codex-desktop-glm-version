@@ -1,5 +1,18 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 rollout diagnostics and RPC facade correction
+
+原 `shared/fs-diagnostics.ts` 的 rollout diagnostics 只是固定返回全零的未接线 skeleton；现新增
+`main-app/diagnostics/rollout-diagnostics.ts`，完整恢复原 `Zie` 的 sessions tree 扫描、mtime/数量边界、JSONL 容错、turn lifecycle、
+token 与 wall-time 汇总和三档时间估算，并由 codex-home IPC 唯一 consumer 真实调用。原 `n.et` 调用与假实现已删除；无 consumer 的
+`Qie` 文件计数骨架也不再伪装成已迁移 owner。
+
+审计同时确认 worker RPC sessions 仍直接消费发布 shared chunk 的 `Wf`，因此删除本地调用即抛 `not wired` 的 connectRpc facade；
+`RpcTarget` 则按原始语义恢复为 `globalThis[Symbol.for("workers-module")]?.RpcTarget` 回退空基类。`Hf/Vf/Wf` 在类型声明中明确标记为
+preserved shared-chunk wire protocol，而不是错误指向本地假实现。19 条 focused runtime/接线断言通过。
+IPC/startup/worker 相邻回归共 177 条、防空壳审计 1216 条、typecheck、1854 项测试索引审计、11/11 chunk verify 与全量 build check
+均通过。
+
 ## 2026-11-01 Cloud Backend runtime and Zod facade convergence
 
 既有 `app-server/cloud-backend.ts` 已从未接线模块变为真实运行时 owner：主组合根解构语义入口，Environment Config 创建

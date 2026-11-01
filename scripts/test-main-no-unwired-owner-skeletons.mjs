@@ -38,6 +38,7 @@ const realOwners = [
   ["src/main/main-app/mcp-sandbox/lifecycle.ts", "createMcpSandboxLifecycleRuntime"],
   ["src/main/main-app/mcp-sandbox/network-runtime.ts", "createMcpSandboxNetworkRuntime"],
   ["src/main/main-app/diagnostics/native-command-crash.ts", "createNativeCommandCrashRuntime"],
+  ["src/main/main-app/diagnostics/rollout-diagnostics.ts", "collectRolloutDiagnostics"],
   ["src/main/main-app/browser-session/browser-session-probe.ts", "createBrowserSessionProbeRuntime"],
   ["src/main/main-app/open-target/open-target-foundation.ts", "createOpenTargetFoundation"],
   ["src/main/main-app/open-target/open-target-registry-runtime.ts", "createOpenTargetRegistryRuntime"],
@@ -198,6 +199,14 @@ const hostAssembly = fs.readFileSync(
 );
 const statsigAdapter = fs.readFileSync(
   new URL("src/main/main-app/account/statsig-adapter.ts", root),
+  "utf8",
+);
+const fsDiagnostics = fs.readFileSync(
+  new URL("src/main/shared/fs-diagnostics.ts", root),
+  "utf8",
+);
+const rpcCore = fs.readFileSync(
+  new URL("src/main/shared/rpc-core.ts", root),
   "utf8",
 );
 const markdownPlainText = fs.readFileSync(
@@ -1165,4 +1174,11 @@ for (const oldOwner of ["Xw = {", "Zw =", "function hTe(", "function xTe(", "fun
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated Statsig override owner must be removed`);
 }
 
-console.log("1208 main unwired-owner skeleton assertions passed");
+assert.equal(main.includes('require("./main-app/diagnostics/rollout-diagnostics.js")'), true, "rollout diagnostics owner is wired");
+assert.equal(main.includes("collectRolloutDiagnostics({ codexHome: V.codexHome, params })"), true, "codex-home IPC consumes semantic rollout diagnostics");
+assert.equal(main.includes("resolveCodexHomeRequest: (params) => n.et("), false, "codex-home IPC must not call the generated rollout owner");
+assert.equal(fsDiagnostics.includes("function collectRolloutDiagnostics"), false, "all-zero rollout diagnostics skeleton must stay removed");
+assert.equal(fsDiagnostics.includes("function countFilesWithBudget"), false, "unconsumed bounded file-count skeleton must stay removed");
+assert.equal(rpcCore.includes("not wired: RPC wire protocol"), false, "throwing RPC facade must stay removed");
+
+console.log("1216 main unwired-owner skeleton assertions passed");

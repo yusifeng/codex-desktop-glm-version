@@ -39,6 +39,7 @@ const { parseSqliteRecoveryNotification } = require("./main-app/app-server/sqlit
 const { isValidAppServerVersion, supportsAppServerSections } = require("./main-app/app-server/version-capabilities.js");
 const { appServerProtocolsForToken } = require("./main-app/app-server/auth-protocols.js");
 const { ChildProcessGoneDiagnostics } = require("./main-app/startup/child-process-gone-diagnostics.js");
+const { collectRolloutDiagnostics } = require("./main-app/diagnostics/rollout-diagnostics.js");
 const { configureBundledGitEnvironment } = require("./main-app/startup/bundled-git-environment.js");
 const {
   FILES_MENTIONED_SECTION: Up,
@@ -51329,7 +51330,7 @@ async function Ust() {
       WEBMCP_UI_TOOLS_CHANGED_EVENT.type,
       SITE_ANNOTATION_FEATURES_CHANGED_EVENT.type,
     ]),
-    resolveCodexHomeRequest: (params) => n.et({ codexHome: V.codexHome, params }),
+    resolveCodexHomeRequest: (params) => collectRolloutDiagnostics({ codexHome: V.codexHome, params }),
     createMessagePortRemoteMain: lrt,
     isTrayMenuThreadsChangedMessage,
     relaunchApp: relaunchAndQuit,

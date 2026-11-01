@@ -156,7 +156,8 @@ declare module "@chunk/shared" {
   export const H: any; // 内部符号: q5
   export { mentionsWithinBudget as Hc } from "../../shared/browser-tab-mentions";
   export const Hd: any; // 内部符号: Ug
-  export { RpcStubLike as Hf } from "../../shared/rpc-core";
+  /** Preserved shared-chunk RpcStub wire protocol. */
+  export const Hf: any;
   export { wslDistroFromUnc as Hi } from "../../shared/wsl-paths";
   export { buildAutoInstallOptOutKey as Hl } from "../../shared/app-constants";
   export { setWindowsCoreRoot as Hn } from "../../shared/mcp-runtime";
@@ -322,7 +323,8 @@ declare module "@chunk/shared" {
   export const Va: any; // 内部符号: RA
   export { BROWSER_PLUGIN_DESCRIPTORS as Vc } from "../../shared/browser-tab-mentions";
   export const Vd: any; // 内部符号: Xg
-  export { RpcConnectionLike as Vf } from "../../shared/rpc-core";
+  /** Preserved shared-chunk RpcConnection wire protocol. */
+  export const Vf: any;
   export { windowsToWslPath as Vi } from "../../shared/wsl-paths";
   export { DEFAULT_MARKETPLACE_NAME as Vl } from "../../shared/app-constants";
   export { recordExecutableResolution as Vn } from "../../shared/mcp-runtime";
@@ -334,7 +336,12 @@ declare module "@chunk/shared" {
   export { resolveModelServiceTier as Wa } from "../../shared/hosts-runtime";
   export { tabDedupeKey as Wc } from "../../shared/browser-tab-mentions";
   export const Wd: any; // 内部符号: Rg
-  export { connectRpc as Wf } from "../../shared/rpc-core";
+  /** Preserved shared-chunk MessagePort RPC connector. */
+  export const Wf: (
+    port: MessagePort,
+    mainObject: unknown,
+    options?: Record<string, unknown>,
+  ) => unknown;
   export const Wi: any; // 内部符号: Pj
   export { isBundledMarketplaceName as Wl } from "../../shared/app-constants";
   export { Wn } from "../../shared/runtime-state";
