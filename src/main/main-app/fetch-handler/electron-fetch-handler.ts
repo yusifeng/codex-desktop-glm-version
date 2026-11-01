@@ -29,7 +29,7 @@ export function createElectronFetchHandlerClass(dependencies) {
     Tr,
     Un,
     finalizeImportedProjects,
-    Vee,
+    QueuedMessageLocks,
     Vr,
     XH,
     YH,
@@ -129,7 +129,7 @@ export function createElectronFetchHandlerClass(dependencies) {
       realtimeSessionRecorder;
       realtimeVoiceHotkeyController;
       voiceActivationController;
-      queuedFollowUpSendLocks = new Vee();
+      queuedFollowUpSendLocks = new QueuedMessageLocks();
       getInitialSidebarWorkspaceState() {
         let e = this.shouldUseWslPaths();
         return {

@@ -1,6 +1,15 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { createThreadReadStateRuntime } from "../src/main/main-app/thread-read-state/runtime.ts";
+import { transform } from "esbuild";
+
+const source = fs.readFileSync(
+  new URL("../src/main/main-app/thread-read-state/runtime.ts", import.meta.url),
+  "utf8",
+);
+const transpiled = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+const loaded = { exports: {} };
+Function("module", "exports", transpiled.code)(loaded, loaded.exports);
+const { createThreadReadStateRuntime } = loaded.exports;
 
 let assertions = 0;
 function equal(actual, expected, message) {

@@ -132,6 +132,10 @@ const realOwners = [
   ["src/main/main-app/window/renderer-window-identity.ts", "parseBrowserCommentPopupFrameName"],
   ["src/main/main-app/files/workspace-file-policy.ts", "sanitizeWorkspaceDownloadFileName"],
   ["src/main/main-app/util/minimum-interval-gate.ts", "MinimumIntervalGate"],
+  ["src/main/main-app/app-server/connection-registry.ts", "AppServerConnectionRegistry"],
+  ["src/main/main-app/conversation/queued-message-locks.ts", "QueuedMessageLocks"],
+  ["src/main/main-app/window/shared-object-repository.ts", "SharedObjectRepository"],
+  ["src/main/main-app/app-server/sqlite-recovery-warning.ts", "parseSqliteRecoveryNotification"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -859,5 +863,19 @@ assert.equal(main.includes("ct = class {"), false, "generated interval gate must
 assert.equal(main.includes("ae, oe, se, ce, THe"), false, "dead policy injection cluster must be removed");
 assert.equal(main.includes("maxFileBytes: Ae"), false, "generated max-file alias must be removed");
 assert.equal(main.includes("protocolsForToken: Te"), false, "generated auth-protocol alias must be removed");
+assert.equal(main.includes('require("./main-app/app-server/connection-registry.js")'), true, "app-server connection registry is wired");
+assert.equal(main.includes('require("./main-app/conversation/queued-message-locks.js")'), true, "queued-message locks are wired");
+assert.equal(main.includes('require("./main-app/window/shared-object-repository.js")'), true, "shared-object repository is wired");
+assert.equal(main.includes('require("./main-app/app-server/sqlite-recovery-warning.js")'), true, "SQLite recovery parser is wired");
+assert.equal(main.includes("QueuedMessageLocks,"), true, "fetch handler receives semantic queued-message locks");
+assert.equal(main.includes("SharedObjectRepository,"), true, "WindowContext receives semantic shared-object storage");
+assert.equal(main.includes("AppServerConnectionRegistry,"), true, "WindowContext receives semantic connection registry");
+assert.equal(main.includes("parseSqliteRecoveryNotification,"), true, "WindowContext receives semantic recovery parser");
+assert.equal(main.includes("var cee = class"), false, "generated connection registry must be removed");
+assert.equal(main.includes("Vee = class"), false, "generated queued-message lock owner must be removed");
+assert.equal(main.includes("Hee = class"), false, "generated shared-object owner must be removed");
+assert.equal(/^function Gee\(/m.test(main), false, "generated SQLite recovery text parser must be removed");
+assert.equal(/^function Kee\(/m.test(main), false, "generated SQLite recovery notification parser must be removed");
+assert.equal(/^function qee\(/m.test(main), false, "generated warning line parser must be removed");
 
-console.log("861 main unwired-owner skeleton assertions passed");
+console.log("883 main unwired-owner skeleton assertions passed");

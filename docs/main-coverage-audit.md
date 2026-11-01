@@ -3654,3 +3654,19 @@ Electron message handler 均已切换到具名语义入口。Hosted manager 与 
 新 focused suite 48 项，八组相邻 owner 共 288 项及 main-business 5 项回归通过；修复 workspace files、Artifact Documents 与 app-server transport
 三组直接 `.ts` import 的失效入口，其中 Artifact Documents 也改为验证当前 WindowContext 真实 consumer。测试索引 1837，
 no-unwired gate 扩至 861 项。
+
+### 整块抽取：connection / queued-message / shared-object runtime owners
+
+新增并真实接回四个 typed owner：`app-server/connection-registry.ts` 保持 replacement 时 removed→added 事件顺序与 subscribe
+即时 replay；`conversation/queued-message-locks.ts` 保持 start-turn single-flight、每会话 2 分钟 active lock、已发送消息 10 分钟
+去重与惰性 expiry；`window/shared-object-repository.ts` 持有 snapshot/发布状态；`app-server/sqlite-recovery-warning.ts` 解析
+`configWarning` 的 database/backup recovery payload。
+
+Electron fetch handler 与 WindowContext 已改用语义类/解析器，主 chunk 原 `cee/Vee/Hee/Gee/Kee/qee` 及 TTL aliases 物理删除。
+新 focused suite 40 项，fetch handler、WindowContext owner/lifecycle、thread read-state、startup recovery 五组共 166 项回归通过；
+并修复 fetch handler、WindowContext、thread read-state 三个直接 `.ts` import 的失效测试。测试索引 1838，no-unwired gate
+扩至 883 项。
+
+相邻主 chunk 955–2411 行经源码结构与既有深度审计复核，为完整 vendored `@tanstack/query-core v5`（Subscribable、
+focus/online/timeout manager、Retryer、Query/Mutation、两类 cache 与 QueryClient）；无第一方 owner 或独立 consumer 边界，继续按
+vendor/generated 保留，避免把第三方状态机伪装成应用语义模块。

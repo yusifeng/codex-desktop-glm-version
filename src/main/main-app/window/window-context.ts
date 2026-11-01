@@ -46,7 +46,7 @@ export function createWindowContextClass(dependencies) {
     H,
     H5,
     IabTabMentions,
-    Hee,
+    SharedObjectRepository,
     Het,
     I,
     I5,
@@ -59,7 +59,7 @@ export function createWindowContextClass(dependencies) {
     Jje,
     Jnt,
     K5,
-    Kee,
+    parseSqliteRecoveryNotification,
     EnvironmentConfigService,
     BrowserHostService,
     L,
@@ -148,7 +148,7 @@ export function createWindowContextClass(dependencies) {
     c8e,
     cA,
     AppUpdateService,
-    cee,
+    AppServerConnectionRegistry,
     cr,
     crypto,
     ctt,
@@ -364,7 +364,7 @@ export function createWindowContextClass(dependencies) {
             devApiBaseUrl: e.devApiBaseUrl,
             prodApiBaseUrl: e.prodApiBaseUrl,
           })),
-          (this.sharedObjectRepository = new Hee()),
+          (this.sharedObjectRepository = new SharedObjectRepository()),
           this.sharedObjectRepository.set(`host_config`, ls),
           this.sharedObjectRepository.set(
             `is_default_browser`,
@@ -444,7 +444,7 @@ export function createWindowContextClass(dependencies) {
           o.t({ env: process.env, resourcesPath: process.resourcesPath }),
         )),
           this.executionHostRegistry.add(J, c),
-          (this.appServerConnectionRegistry = new cee()),
+          (this.appServerConnectionRegistry = new AppServerConnectionRegistry()),
           this.appServerConnectionRegistry.addConnection(J, r),
           this.disposables.add(
             new vEe(this.appServerConnectionRegistry, this.publishedStatsig, (e) =>
@@ -2069,7 +2069,7 @@ export function createWindowContextClass(dependencies) {
         if (t.id === `local` && this.options.onAppServerSqliteRecovery != null) {
           let e = this.options.onAppServerSqliteRecovery;
           p.registerInternalNotificationHandler((t) => {
-            let n = Kee(t);
+            let n = parseSqliteRecoveryNotification(t);
             n != null &&
               (G5.info(`App-server SQLite recovery config warning received`, {
                 safe: {},

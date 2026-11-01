@@ -28,6 +28,8 @@ const { loadReactDevToolsExtension } = require("./main-app/startup/react-devtool
 const { removeLegacyRemoteControlConfig } = require("./main-app/startup/legacy-remote-control-config.js");
 const { createSqliteRecoveryConfirmationQueue } = require("./main-app/app-server/sqlite-recovery.js");
 const { reconcileAppServerSqliteState } = require("./main-app/app-server/sqlite-state-reconciliation.js");
+const { AppServerConnectionRegistry } = require("./main-app/app-server/connection-registry.js");
+const { parseSqliteRecoveryNotification } = require("./main-app/app-server/sqlite-recovery-warning.js");
 const { isValidAppServerVersion, supportsAppServerSections } = require("./main-app/app-server/version-capabilities.js");
 const { appServerProtocolsForToken } = require("./main-app/app-server/auth-protocols.js");
 const { ChildProcessGoneDiagnostics } = require("./main-app/startup/child-process-gone-diagnostics.js");
@@ -167,6 +169,7 @@ const {
   checkRemoteControlAuthorization,
 } = require("./main-app/remote-control/client.js");
 const { QueuedFollowUpsCoordinator } = require("./main-app/conversation/queued-follow-ups.js");
+const { QueuedMessageLocks } = require("./main-app/conversation/queued-message-locks.js");
 const { AppServerConversationManager } = require("./main-app/conversation/app-server-manager.js");
 const { addWorktreeInitSyntheticTurn } = require("./main-app/streams/notifications-apply.js");
 const { controlFallbackValue } = require("./main-app/conversation/turn-context.js");
@@ -315,6 +318,7 @@ const { createElectronFetchHandlerClass } = require("./main-app/fetch-handler/el
 const { createWindowContextClass } = require("./main-app/window/window-context.js");
 const { createDesktopCapabilityServices } = require("./main-app/window/desktop-capability-services.js");
 const { createElectronMessageHandlerClass } = require("./main-app/window/electron-message-handler.js");
+const { SharedObjectRepository } = require("./main-app/window/shared-object-repository.js");
 const { localThreadClientIdStorageKey, threadTabRoutesStorageKey } = require("./main-app/window/thread-storage-keys.js");
 const { BROWSER_COMMENT_POPUP_WINDOW_ID, parseBrowserCommentPopupFrameName } = require("./main-app/window/renderer-window-identity.js");
 const { MinimumIntervalGate } = require("./main-app/util/minimum-interval-gate.js");
@@ -950,49 +954,7 @@ var {
   appSessionId: a.on,
 });
 var iee = [`git`];
-var cee = class {
-    connections = new Map();
-    subscribers = new Set();
-    addConnection(e, t) {
-      let n = this.connections.get(e);
-      n !== t &&
-        (n != null &&
-          (this.connections.delete(e),
-          this.notifySubscribers({ type: `removed`, hostId: e, connection: n })),
-        this.connections.set(e, t),
-        this.notifySubscribers({ type: `added`, hostId: e, connection: t }));
-    }
-    removeConnection(e) {
-      let t = this.connections.get(e);
-      t != null &&
-        (this.connections.delete(e),
-        this.notifySubscribers({ type: `removed`, hostId: e, connection: t }));
-    }
-    getMaybeConnection(e) {
-      return this.connections.get(e) ?? null;
-    }
-    getConnection(e) {
-      let t = this.getMaybeConnection(e);
-      if (!t) throw Error(`Connection for host ID ${e} not found`);
-      return t;
-    }
-    getAllHostIds() {
-      return Array.from(this.connections.keys());
-    }
-    subscribe(e) {
-      for (let [t, n] of this.connections) e({ type: `added`, hostId: t, connection: n });
-      return (
-        this.subscribers.add(e),
-        () => {
-          this.subscribers.delete(e);
-        }
-      );
-    }
-    notifySubscribers(e) {
-      for (let t of this.subscribers) t(e);
-    }
-  },
-  Zt = class {
+var Zt = class {
     constructor() {
       ((this.listeners = new Set()), (this.subscribe = this.subscribe.bind(this)));
     }
@@ -2450,101 +2412,6 @@ var Mee = class extends Zt {
       (this.#e.clear(), this.#t.clear());
     }
   };
-var zee = 12e4,
-  Bee = 6e5,
-  Vee = class {
-    now;
-    startingTurns = new Set();
-    activeLocks = new Map();
-    sentMessages = new Map();
-    constructor(e = Date.now) {
-      this.now = e;
-    }
-    tryAcquireStartTurn(e) {
-      return !this.startingTurns.has(e) && (this.startingTurns.add(e), !0);
-    }
-    releaseStartTurn(e) {
-      this.startingTurns.delete(e);
-    }
-    tryAcquire({ conversationId: e, messageId: t, lockId: n }) {
-      let r = this.now();
-      if ((this.deleteExpiredSentMessages(r), this.sentMessages.has(this.getSentMessageKey(e, t))))
-        return !1;
-      let i = this.activeLocks.get(e);
-      return i != null && i.expiresAtMs > r
-        ? !1
-        : (this.activeLocks.set(e, { lockId: n, expiresAtMs: r + zee }), !0);
-    }
-    release({ conversationId: e, messageId: t, lockId: n, sent: r }) {
-      (this.activeLocks.get(e)?.lockId === n && this.activeLocks.delete(e),
-        r && this.sentMessages.set(this.getSentMessageKey(e, t), this.now() + Bee));
-    }
-    getSentMessageKey(e, t) {
-      return `${e}\n${t}`;
-    }
-    deleteExpiredSentMessages(e) {
-      for (let [t, n] of this.sentMessages) n <= e && this.sentMessages.delete(t);
-    }
-  },
-  Hee = class {
-    store = {};
-    subscribers = new Set();
-    get(e) {
-      if (e in this.store) return this.store[e];
-    }
-    getSnapshot() {
-      return { ...this.store };
-    }
-    set(e, t) {
-      (t === void 0 ? delete this.store[e] : (this.store[e] = t), this.notifySubscribers(e, t));
-    }
-    addSubscriber(e) {
-      return (
-        this.subscribers.add(e),
-        () => {
-          this.subscribers.delete(e);
-        }
-      );
-    }
-    notifySubscribers(e, t) {
-      this.subscribers.forEach((n) => n(e, t));
-    }
-  },
-  En = `Codex rebuilt its local database.`,
-  Uee = `Database path: `,
-  Wee = `Backup folder: `;
-function Gee(e) {
-  let t = qee(e);
-  if (!t.some((e) => e.includes(En))) return null;
-  let n = null,
-    r = null;
-  for (let e of t) {
-    if (e.startsWith(Uee)) {
-      n = e.slice(15).trim();
-      continue;
-    }
-    e.startsWith(Wee) && (r = e.slice(15).trim());
-  }
-  return n == null || n.length === 0 || r == null || r.length === 0 || r === `unavailable`
-    ? null
-    : { databasePath: n, backupFolder: r };
-}
-function Kee(e) {
-  if (e.method !== `configWarning`) return null;
-  let { params: t } = e;
-  return t == null || t.summary !== En
-    ? null
-    : Gee(
-        [En, typeof t.details == `string` ? t.details : ``].join(`
-`),
-      );
-}
-function qee(e) {
-  return e
-    .split(/\r?\n/)
-    .map((e) => e.trim())
-    .filter((e) => e.length > 0);
-}
 async function Ln(e) {
   try {
     let t = await e?.getClient();
@@ -34369,7 +34236,7 @@ var GH = !!process.env.WSL_DISTRO_NAME,
     Tr,
     Un,
     finalizeImportedProjects,
-    Vee,
+    QueuedMessageLocks,
     Vr,
     XH,
     YH,
@@ -49761,7 +49628,7 @@ var G5 = r.r(`WindowContext`),
     H,
     H5,
     IabTabMentions,
-    Hee,
+    SharedObjectRepository,
     Het,
     I,
     I5,
@@ -49774,7 +49641,7 @@ var G5 = r.r(`WindowContext`),
     Jje,
     Jnt,
     K5,
-    Kee,
+    parseSqliteRecoveryNotification,
     EnvironmentConfigService,
     BrowserHostService,
     L,
@@ -49863,7 +49730,7 @@ var G5 = r.r(`WindowContext`),
     c8e,
     cA,
     AppUpdateService,
-    cee,
+    AppServerConnectionRegistry,
     cr,
     crypto,
     ctt,

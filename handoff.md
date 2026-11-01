@@ -5527,3 +5527,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   UI constants 及 WebView 虚假注入已删除，没有创建重复 owner。
 - 新 focused suite 48 项，八组相邻 owner 共 288 项及 main-business 5 项回归通过；修复 workspace files、Artifact Documents、app-server transport
   三个直接 `.ts` 失效测试。测试索引 1837，no-unwired gate 扩至 861 项。
+
+# 2026-11-01 runtime registry owner extraction
+
+- 新增并接回 `AppServerConnectionRegistry`、`QueuedMessageLocks`、`SharedObjectRepository` 与 SQLite recovery warning parser；
+  保留 replacement event、subscribe replay、2/10 分钟锁 TTL、snapshot 隔离和 configWarning 降级语义。
+- Electron fetch handler/WindowContext 直接消费语义 owner，主 chunk 旧 `cee/Vee/Hee/Gee/Kee/qee` 删除。focused 40 项，
+  五组相邻 owner 166 项回归通过；修复其中三个直接 `.ts` 失效入口。测试索引 1838，no-unwired gate 扩至 883 项。
+- 复核确认相邻 955–2411 行为完整 vendored `@tanstack/query-core v5` 状态机，按 vendor/generated 保留，不伪拆业务 facade。

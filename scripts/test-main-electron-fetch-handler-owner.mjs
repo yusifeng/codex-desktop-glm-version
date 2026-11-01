@@ -1,6 +1,15 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { createElectronFetchHandlerClass } from "../src/main/main-app/fetch-handler/electron-fetch-handler.ts";
+import { transform } from "esbuild";
+
+const source = fs.readFileSync(
+  new URL("../src/main/main-app/fetch-handler/electron-fetch-handler.ts", import.meta.url),
+  "utf8",
+);
+const transpiled = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+const loaded = { exports: {} };
+Function("module", "exports", transpiled.code)(loaded, loaded.exports);
+const { createElectronFetchHandlerClass } = loaded.exports;
 
 let assertions = 0;
 const equal = (actual, expected) => { assert.deepEqual(actual, expected); assertions += 1; };
@@ -15,7 +24,7 @@ const specific = {
   GH: false,
   KH: () => ({ warning: () => {} }),
   NBe: { getState: () => ({ supported: false }) },
-  Vee: QueueLocks,
+  QueuedMessageLocks: QueueLocks,
   XH: UnsupportedElectronHandlerError,
   bundledSkillsRoot: () => "/skills",
   jH: PinnedThreadsService,
