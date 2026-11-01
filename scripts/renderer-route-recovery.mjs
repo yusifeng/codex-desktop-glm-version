@@ -216,6 +216,9 @@ export const CONVERSATION_ROUTE_ROOTS = [
   // still release-derived. Keep that dependency explicit so a clean output
   // build cannot accidentally rely on a stale app/webview asset.
   "tokenize-math-block-92dba400da42.js",
+  // Pets settings initializes the shared realtime controls chunk for its
+  // cross-surface side effects. That dependency remains release-derived.
+  "controls-fedbfda05b6b.js",
   // Still owned by the incremental/transform-only path; keep it explicit when
   // a promoted route stops pulling it into the eager compatibility closure.
   "math-block-utils-ca3c4f5321e8.js",
@@ -250,12 +253,20 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "codex-micro-onboarding-host-85407a96e02a.js",
   "content-bd6ed75ea274.js",
   "equation-44cf0b1d4b75.js",
+  "git-settings-537e4135cecb.js",
+  "hooks-settings-fde35406d6f4.js",
+  "import-settings-ec2688b74a01.js",
+  "keyboard-shortcuts-settings-5511d1126168.js",
   "library-cloud-file-preview-b3ddfaa823c0.js",
   "math-block-utils-ca3c4f5321e8.js",
   "open-a618d40921b2.js",
   "page-268e2fb6d880.js",
   "pending-onboarding-9e794fa64b02.js",
+  "pets-settings-route-965aa70e25ab.js",
   "registered-259e95b201a1.js",
+  "trusted-contact-settings-b71f926a1121.js",
+  "voice-settings-3a0651cd977e.js",
+  "_virtual_settings-search-documents-d81257e4909b.js",
   "subscription-onboarding-bdae6e918350.js",
   "subscription-onboarding-dcd9d9af0fe0.js",
   "home-artifact-templates-1e0738b7ddeb.js",

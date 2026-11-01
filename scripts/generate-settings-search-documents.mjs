@@ -19,7 +19,11 @@ const SRC = path.resolve(
 const OUT = path.join(ROOT, "src/renderer/settings-search-documents/index.ts");
 
 const text = fs.readFileSync(SRC, "utf8");
-const start = text.indexOf("t = {") + "t = {".length - 1;
+const assignment = /\bt\s*=\s*\{/.exec(text);
+if (assignment == null) {
+  throw new Error(`Could not locate the settings search document assignment in ${SRC}`);
+}
+const start = assignment.index + assignment[0].lastIndexOf("{");
 let depth = 0;
 let i = start;
 let inBacktick = false;
@@ -37,8 +41,14 @@ while (i < text.length) {
   }
   i += 1;
 }
+if (depth !== 0 || i >= text.length) {
+  throw new Error(`Could not parse a complete settings search document object from ${SRC}`);
+}
 const definition = text.slice(start, i + 1);
 const entries = (definition.match(/defaultMessage/g) ?? []).length;
+if (entries === 0) {
+  throw new Error(`Refusing to overwrite settings search documents with an empty extraction from ${SRC}`);
+}
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(
