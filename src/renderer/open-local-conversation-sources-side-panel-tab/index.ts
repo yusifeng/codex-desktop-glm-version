@@ -3,6 +3,7 @@ import {
   H3 as initializeLazyComponents,
   I3 as getJsxRuntime,
   Jm as createLazyComponent,
+  V3 as preloadDynamicImport,
   qm as initializePanelComponents,
 } from "@rchunk/app-shared";
 import {
@@ -16,7 +17,7 @@ import {
   t as initializeOpenSourcesSidePanelTab,
 } from "@rchunk/open-sources-side-panel-tab";
 
-const jsx = getJsxRuntime();
+let jsx: ReturnType<typeof getJsxRuntime>;
 let SourcesPanel: (props: Record<string, unknown>) => unknown;
 let SourcesThumbnail: (props: Record<string, unknown>) => unknown;
 let sourcesPanelDefinition: unknown;
@@ -47,15 +48,34 @@ function initializeSourcesPanelComponents(): void {
   initializeSidePanelDefinitions();
   initializePanelComponents();
   initializeSourcesPanelModel();
+  jsx = getJsxRuntime();
   initializeLazyComponents();
   SourcesPanel = createLazyComponent(
-    async () => (await import("@rchunk/local-conversation-sources-side-panel-tab-core"))
-      .LocalConversationSourcesSidePanelTab,
+    async () => {
+      const { LocalConversationSourcesSidePanelTab } = await preloadDynamicImport(
+        async () => {
+          const { LocalConversationSourcesSidePanelTab } = await import("@rchunk/local-conversation-sources-side-panel-tab-core");
+          return { LocalConversationSourcesSidePanelTab };
+        },
+        [],
+        import.meta.url,
+      );
+      return LocalConversationSourcesSidePanelTab;
+    },
     { propagateLoadError: true },
   );
   SourcesThumbnail = createLazyComponent(
-    async () => (await import("@rchunk/registered-sources"))
-      .RegisteredLocalSourcesThumbnail,
+    async () => {
+      const { RegisteredLocalSourcesThumbnail } = await preloadDynamicImport(
+        async () => {
+          const { RegisteredLocalSourcesThumbnail } = await import("@rchunk/registered-sources");
+          return { RegisteredLocalSourcesThumbnail };
+        },
+        [],
+        import.meta.url,
+      );
+      return RegisteredLocalSourcesThumbnail;
+    },
     { propagateLoadError: true },
   );
 }

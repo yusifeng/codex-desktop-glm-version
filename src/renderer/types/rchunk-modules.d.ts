@@ -42,13 +42,16 @@ declare module "@rchunk/app-shared" {
     parse(value: unknown): T;
     safeParse(value: unknown): SafeParseSuccess<T> | SafeParseFailure;
   }
+  export interface RefinableSchema<T> extends SafeParseSchema<T> {
+    refine(predicate: (value: T) => boolean): RefinableSchema<T>;
+  }
   export interface OptionalSchema<T> extends SafeParseSchema<T | undefined> {
     optional(): OptionalSchema<T>;
   }
   export interface NullishSchema<T> extends SafeParseSchema<T | null | undefined> {
     nullish(): NullishSchema<T>;
   }
-  export interface StringSchema extends SafeParseSchema<string> {
+  export interface StringSchema extends RefinableSchema<string> {
     min(length: number): StringSchema;
     nullable(): OptionalSchema<string | null>;
     optional(): OptionalSchema<string>;
@@ -64,6 +67,7 @@ declare module "@rchunk/app-shared" {
   }
   export interface BooleanSchema extends SafeParseSchema<boolean> {
     nullish(): NullishSchema<boolean>;
+    optional(): OptionalSchema<boolean>;
   }
   export interface RecordSchema<Key extends string, Value>
     extends SafeParseSchema<Record<Key, Value>> {
@@ -73,6 +77,10 @@ declare module "@rchunk/app-shared" {
     shape: Record<string, SafeParseSchema<unknown>>,
   ) => ObjectSchema<T>;
   export const R4: <T>(value: T) => OptionalSchema<T>;
+  export const M4: <T>(
+    discriminator: string,
+    schemas: readonly SafeParseSchema<unknown>[],
+  ) => SafeParseSchema<T>;
   export const q4: () => StringSchema;
   export const V4: () => NumberSchema;
   export const k4: () => BooleanSchema;
@@ -11347,6 +11355,11 @@ declare module "@rchunk/app-shared" {
 
 declare module "@rchunk/app-primary" {
   export const Bl: (props: Record<string, unknown>) => unknown;
+  export const Ur: (
+    scope: unknown,
+    conversationId: string,
+    hostId: string,
+  ) => boolean | Promise<boolean>;
   export const Vl: () => void;
   export const Wr: () => void;
   export const mn: () => void;

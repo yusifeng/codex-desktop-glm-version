@@ -46,7 +46,7 @@ async function bundle(directory) {
           if (value === "app-shared") return { contents: `
             const state=globalThis.__chatPanelTest;
             const noop=()=>{};
-            export const $3=noop,FX=noop,K2=noop,lw=noop,Z3=noop,H3=noop,qm=noop,wL=noop;
+            export const $3=()=>{const cache=[];return{c:size=>{while(cache.length<size)cache.push(Symbol.for("react.memo_cache_sentinel"));return cache}}},FX=noop,K2=noop,lw=noop,Z3=noop,H3=noop,qm=noop,wL=noop;
             export const I3=()=>state.jsx; export const Y2=Symbol("FormattedMessage"); export const V_=Symbol("UnarchiveIcon");
             export const V3=async(loader)=>loader();
             const react={useLayoutEffect(effect){state.effects.push(effect);const cleanup=effect();if(cleanup)state.cleanup=cleanup},createElement:(type,props)=>({type,props})};

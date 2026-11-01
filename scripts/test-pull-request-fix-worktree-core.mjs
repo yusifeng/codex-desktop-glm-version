@@ -26,7 +26,7 @@ function appSharedMock() {
     export const lY = value => "conversation:" + value;
     export const wL = () => globalThis.__pullRequestFixWorktreeTest.initialized.push("automation-runtime");
     export const zY = value => value != null && typeof value === "object" && typeof value.id === "string";
-    export const $3 = () => {};
+    export const $3 = () => { const cache = []; return { c: size => { while (cache.length < size) cache.push(Symbol.for("react.memo_cache_sentinel")); return cache; } }; };
     export const $O = { INFINITE: Infinity };
     export const BX = () => globalThis.__pullRequestFixWorktreeTest.signalConfig;
     export const EU = { worktreeRoot: { key: "worktreesRoot" } };

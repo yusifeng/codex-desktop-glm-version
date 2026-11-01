@@ -39,7 +39,9 @@ import {
   won as getRpcClient,
 } from "@rchunk/app-initial";
 
-void reactCompilerRuntime;
+interface CompilerRuntime {
+  c(size: number): unknown[];
+}
 
 export interface WorktreeSetting<Value = unknown> {
   key: string;
@@ -75,6 +77,7 @@ let worktreeConfig$: import("@rchunk/app-shared").ScopedDerivedFamily<
   string,
   import("@rchunk/app-shared").ResolvedWorktreeSettings | null
 >;
+let compilerRuntime: CompilerRuntime;
 
 async function updateWorktreeSetting<Value>(
   scope: WorktreeScope,
@@ -183,28 +186,75 @@ function useCodexWorktrees(
   operationSource: string,
   options?: { enabled?: boolean },
 ): unknown {
-  const hostConfig = normalizeHostConfig(host);
+  const cache = compilerRuntime.c(13);
+  let hostConfig: ReturnType<typeof normalizeHostConfig>;
+  if (cache[0] === host) {
+    hostConfig = cache[1] as ReturnType<typeof normalizeHostConfig>;
+  } else {
+    hostConfig = normalizeHostConfig(host);
+    cache[0] = host;
+    cache[1] = hostConfig;
+  }
   const config = useSignalValue(worktreeConfig$, hostConfig) as {
     worktreesRoot?: string | null;
   } | null;
   const worktreesRoot = config?.worktreesRoot ?? null;
   const enabled = config != null && (options?.enabled ?? true);
-  const queryKey = codexWorktreesQueryKey(hostConfig, worktreesRoot);
-  return useQuery({
-    enabled,
-    queryKey,
-    queryFn: ({ signal }) =>
+  let queryKey: readonly unknown[];
+  if (cache[2] !== hostConfig || cache[3] !== worktreesRoot) {
+    queryKey = codexWorktreesQueryKey(hostConfig, worktreesRoot);
+    cache[2] = hostConfig;
+    cache[3] = worktreesRoot;
+    cache[4] = queryKey;
+  } else {
+    queryKey = cache[4] as readonly unknown[];
+  }
+  let queryFn: (context: { signal: AbortSignal }) => Promise<unknown>;
+  if (
+    cache[5] !== host ||
+    cache[6] !== operationSource ||
+    cache[7] !== worktreesRoot
+  ) {
+    queryFn = ({ signal }) =>
       getRpcClient("git").request({
         method: "codex-worktrees",
         params: { hostConfig: host, operationSource, worktreesRoot },
         signal,
-      }),
-    staleTime: timeConstants.INFINITE,
-    gcTime: 1_800_000,
-  });
+      });
+    cache[5] = host;
+    cache[6] = operationSource;
+    cache[7] = worktreesRoot;
+    cache[8] = queryFn;
+  } else {
+    queryFn = cache[8] as typeof queryFn;
+  }
+  let queryOptions: {
+    enabled: boolean;
+    gcTime: number;
+    queryFn: typeof queryFn;
+    queryKey: readonly unknown[];
+    staleTime: number;
+  };
+  if (cache[9] !== enabled || cache[10] !== queryKey || cache[11] !== queryFn) {
+    queryOptions = {
+      enabled,
+      queryKey,
+      queryFn,
+      staleTime: timeConstants.INFINITE,
+      gcTime: 1_800_000,
+    };
+    cache[9] = enabled;
+    cache[10] = queryKey;
+    cache[11] = queryFn;
+    cache[12] = queryOptions;
+  } else {
+    queryOptions = cache[12] as typeof queryOptions;
+  }
+  return useQuery(queryOptions);
 }
 
 function initializeUseCodexWorktrees(): void {
+  compilerRuntime = reactCompilerRuntime() as unknown as CompilerRuntime;
   initializeReactQuery();
   initializeSignalRuntime();
   initializeQueryHooks();

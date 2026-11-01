@@ -70,7 +70,7 @@ interface SiteAutomationProposal extends Record<string, unknown> {
   title?: string;
 }
 
-const jsx = getJsxRuntime();
+let jsx: ReturnType<typeof getJsxRuntime>;
 let AutomationSidePanelTabIcon: (props: Record<string, unknown>) => unknown;
 let automationPanelDefinition: unknown;
 
@@ -202,6 +202,7 @@ function openAutomationPanel({
         if (seed.elicitation != null
           && typeof state === "object"
           && state != null
+          && "savedAutomationId" in state
           && state.savedAutomationId == null) {
           resolveElicitation(
             closingScope,
@@ -226,6 +227,7 @@ function initializeOpenAutomationSidePanelTab(): void {
   initializeAutomationTabId();
   initializeAutomationDetailQuery();
   initializeSiteAutomationSetupState();
+  jsx = getJsxRuntime();
   initializeLazyComponents();
   AutomationSidePanelTabIcon = createLazyComponent(
     async () => (await import("@rchunk/automation-side-panel-tab-core"))

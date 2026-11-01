@@ -13,9 +13,10 @@ const module = await import(`data:text/javascript;base64,${Buffer.from(result.ou
 let assertions = 0;
 const equal = (actual, expected) => { assertions += 1; assert.deepEqual(actual, expected); };
 equal(/\bany\b/.test(source), false);
-equal(consumerSource.includes('../app-primary/runtime/ensure-conversation-ready'), true);
-equal(consumerSource.includes('Ur as ensureConversationAvailable'), false);
-equal(consumerSource.includes('hasCompleteConversationHistory(conversation)'), true);
+equal(consumerSource.includes('../app-primary/runtime/ensure-conversation-ready'), false);
+equal(consumerSource.includes('Ur as ensureConversationReady'), true);
+equal(consumerSource.includes('Lin as hasCompleteConversationHistory'), false);
+equal(consumerSource.includes('Pin as getConversationMessages'), false);
 const serviceCalls = [];
 const conversations = new Map();
 const scope = {

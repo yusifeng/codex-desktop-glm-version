@@ -1,5 +1,14 @@
-import "@rchunk/app-shared";
 import "@rchunk/rolldown-runtime";
+import {
+  E4 as arraySchema,
+  H4 as objectSchema,
+  M4 as discriminatedUnionSchema,
+  R4 as literalSchema,
+  g4 as initializeValidationRuntime,
+  k4 as booleanSchema,
+  q4 as stringSchema,
+  type SafeParseSchema,
+} from "@rchunk/app-shared";
 
 interface WebMcpCall {
   description?: string;
@@ -14,47 +23,57 @@ interface WebMcpCall {
   title?: string;
 }
 
-function validOptionalString(value: unknown, nonEmpty = false): boolean {
-  return (
-    value == null ||
-    (typeof value === "string" && (!nonEmpty || value.length > 0))
-  );
-}
-
-function isWebMcpCall(value: unknown): value is WebMcpCall {
-  if (value == null || typeof value !== "object") return false;
-  const call = value as Record<string, unknown>;
-  if (call.kind === "listTools") {
-    if (call.name !== "webmcp_list_tools") return false;
-  } else if (call.kind === "invokeTool") {
-    if (typeof call.name !== "string" || call.name.trim().length === 0)
-      return false;
-  } else return false;
-  return (
-    validOptionalString(call.title, true) &&
-    validOptionalString(call.description) &&
-    validOptionalString(call.sourceHostname, true) &&
-    validOptionalString(call.inputJson) &&
-    validOptionalString(call.outputJson) &&
-    (call.readOnlyHint == null || typeof call.readOnlyHint === "boolean") &&
-    (call.inputTruncated == null || call.inputTruncated === true) &&
-    (call.outputTruncated == null || call.outputTruncated === true)
-  );
-}
+let webMcpCallSchema: SafeParseSchema<WebMcpCall>;
+let webMcpMetadataSchema: SafeParseSchema<{
+  "codex/toolSurface": {
+    kind: "browserUse";
+    webMcpCalls: WebMcpCall[];
+  };
+}>;
 
 function webMcpCallsFromMetadata(metadata: unknown): WebMcpCall[] {
-  if (metadata == null || typeof metadata !== "object") return [];
-  const surface = (metadata as Record<string, unknown>)["codex/toolSurface"];
-  if (surface == null || typeof surface !== "object") return [];
-  const record = surface as Record<string, unknown>;
-  if (
-    record.kind !== "browserUse" ||
-    !Array.isArray(record.webMcpCalls) ||
-    !record.webMcpCalls.every(isWebMcpCall)
-  )
-    return [];
-  return record.webMcpCalls;
+  const parsed = webMcpMetadataSchema.safeParse(metadata);
+  return parsed.success
+    ? parsed.data["codex/toolSurface"].webMcpCalls
+    : [];
 }
 
-function initializeWebMcpToolCalls(): void {}
+function initializeWebMcpToolCalls(): void {
+  initializeValidationRuntime();
+  webMcpCallSchema = discriminatedUnionSchema("kind", [
+    objectSchema({
+      kind: literalSchema("listTools"),
+      name: literalSchema("webmcp_list_tools"),
+      title: stringSchema().min(1).optional(),
+      description: stringSchema().optional(),
+      readOnlyHint: booleanSchema().optional(),
+      sourceHostname: stringSchema().min(1).optional(),
+      outputJson: stringSchema().optional(),
+      outputTruncated: literalSchema(true).optional(),
+    }),
+    objectSchema({
+      kind: literalSchema("invokeTool"),
+      name: stringSchema().refine((name) => name.trim().length > 0),
+      title: stringSchema().min(1).optional(),
+      description: stringSchema().optional(),
+      readOnlyHint: booleanSchema().optional(),
+      sourceHostname: stringSchema().min(1).optional(),
+      inputJson: stringSchema().optional(),
+      inputTruncated: literalSchema(true).optional(),
+      outputJson: stringSchema().optional(),
+      outputTruncated: literalSchema(true).optional(),
+    }),
+  ]) as SafeParseSchema<WebMcpCall>;
+  webMcpMetadataSchema = objectSchema({
+    "codex/toolSurface": objectSchema({
+      kind: literalSchema("browserUse"),
+      webMcpCalls: arraySchema(webMcpCallSchema),
+    }),
+  }) as SafeParseSchema<{
+    "codex/toolSurface": {
+      kind: "browserUse";
+      webMcpCalls: WebMcpCall[];
+    };
+  }>;
+}
 export { initializeWebMcpToolCalls as n, webMcpCallsFromMetadata as t };

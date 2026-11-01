@@ -176,10 +176,12 @@ const overrides = {
     sjt: `title => title.toUpperCase()`,
     t0: `(props) => ({ type: "LinkIcon", props })`,
     vat: `14`,
+    vZt: `{ id: "host-service" }`,
     w$t: `items => items`,
     wg: `definition => definition`,
     xat: `() => ({ setTextMeasurementRef: "measure-ref", textMeasurement: null })`,
     z9t: `url => String(url).includes("docs.google.com") ? "document" : null`,
+    zZt: `{ id: "thread-exists" }`,
   },
   "app-primary": {
     Bl: `(props) => ({ type: "ThreadAvatar", props })`,
@@ -316,8 +318,11 @@ assert.equal(threadBridge.t(), null);
 assert.equal(typeof threadBridge.n, "function");
 
 const backgroundAgent = await bundle("open-local-conversation-background-agent");
-state.scope.get = () => {
-  return { activateThreadSummary: () => {}, getConversation: () => null };
+state.scope.get = (signal) => {
+  if (signal?.id === "host-service") return { activateThreadSummary: () => {} };
+  if (signal?.id === "thread-exists") return false;
+  if (signal?.__value !== undefined) return signal.__value;
+  return null;
 };
 assert.equal(await backgroundAgent.r(state.scope, { backgroundAgent: { canInteract: true, conversationId: "child", displayName: "Worker" }, hostId: "local" }), null);
 assert.equal(typeof backgroundAgent.n, "function");

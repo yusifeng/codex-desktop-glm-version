@@ -88,7 +88,7 @@ function computeTurnLayout({
     if (pixelScale != null) height = Math.round(height * pixelScale) / pixelScale;
     // 原文：collapseEmptyRows ? (累积高度 > 0 && 当前行高 > 0) : index > 0
     const isFirst = collapseEmptyRows ? totalHeightPx > 0 && height > 0 : index > 0;
-    let gapBeforePx = isFirst ? entry.gapBeforePx ?? gapPx ?? 0 : 0;
+    let gapBeforePx = isFirst ? entry.gapBeforePx ?? gapPx : 0;
     if (pixelScale != null) gapBeforePx = Math.round(gapBeforePx * pixelScale) / pixelScale;
     totalHeightPx += gapBeforePx;
     gapsBeforePx.push(gapBeforePx);

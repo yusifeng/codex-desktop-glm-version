@@ -25,6 +25,19 @@ const appSharedMock = `
   export const I3=()=>s.jsx;
   export const RR={bash:"Bash",zsh:"Z shell",pwsh:"PowerShell","pwsh.exe":"PowerShell","powershell.exe":"PowerShell"};
   export const wL=()=>s.initializations.push("shell-labels");
+  const schema=(parse)=>({
+    safeParse(value){try{return{success:true,data:parse(value)}}catch{return{success:false}}},
+    optional(){return schema(value=>value===undefined?undefined:parse(value))},
+    min(length){return schema(value=>{const parsed=parse(value);if(parsed.length<length)throw Error();return parsed})},
+    refine(predicate){return schema(value=>{const parsed=parse(value);if(!predicate(parsed))throw Error();return parsed})},
+  });
+  export const q4=()=>schema(value=>{if(typeof value!=="string")throw Error();return value});
+  export const k4=()=>schema(value=>{if(typeof value!=="boolean")throw Error();return value});
+  export const R4=expected=>schema(value=>{if(value!==expected)throw Error();return value});
+  export const E4=item=>schema(value=>{if(!Array.isArray(value))throw Error();return value.map(entry=>{const parsed=item.safeParse(entry);if(!parsed.success)throw Error();return parsed.data})});
+  export const H4=shape=>schema(value=>{if(value==null||typeof value!=="object"||Array.isArray(value))throw Error();const output={};for(const [key,item] of Object.entries(shape)){const parsed=item.safeParse(value[key]);if(!parsed.success)throw Error();if(parsed.data!==undefined)output[key]=parsed.data}return output});
+  export const M4=(key,items)=>schema(value=>{for(const item of items){const parsed=item.safeParse(value);if(parsed.success)return parsed.data}throw Error()});
+  export const g4=()=>s.initializations.push("validation");
 `;
 const appInitialMock = `
   const s=globalThis.__entryBridgeTest;
