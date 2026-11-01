@@ -319,6 +319,10 @@ const { createAutomationsServiceClass } = require("./main-app/automations/automa
 const { createAutomationUpdateTool, normalizeAutomationToolInputMode, validateHeartbeatTarget } = require("./main-app/automations/automation-update-tool.js");
 const { createHabitatAutomationsServiceClass } = require("./main-app/automations/habitat-automations-service.js");
 const { createHabitatAutomationRuntime } = require("./main-app/automations/habitat-runtime.js");
+const {
+  HEARTBEAT_RETRY_MS: vs,
+  createAutomationExecutionPolicy,
+} = require("./main-app/automations/execution-policy.js");
 const { createPinnedThreadsServiceClass } = require("./main-app/sidebar/pinned-threads-service.js");
 const { createElectronFetchHandlerClass } = require("./main-app/fetch-handler/electron-fetch-handler.js");
 const { createWindowContextClass } = require("./main-app/window/window-context.js");
@@ -2577,44 +2581,11 @@ var eae = `Response MUST end with a remark-directive block.
   </instructions>
 </heartbeat>
 `;
-function fs(e, t) {
-  let r = [e.approvalsReviewer, ...(t?.allowedApprovalsReviewers ?? [])],
-    i = [e.approvalPolicy, ...(t?.allowedApprovalPolicies ?? [])],
-    a = [e.sandboxPolicy, n.Od().sandboxPolicy];
-  for (let o of a)
-    if (o.type !== `dangerFullAccess` && t?.allowedPermissionProfiles == null) {
-      for (let a of r)
-        for (let r of i)
-          if ((r !== `never` || e.approvalPolicy === `never`) && n.Fd(t, n.Md(o), r, a))
-            return {
-              ...e,
-              activePermissionProfile: null,
-              sandboxPolicy: o,
-              approvalPolicy: r,
-              approvalsReviewer: a,
-            };
-    }
-  throw Error(`No compatible automation permissions satisfy the managed requirements`);
-}
-function ps(e, t) {
-  if (t.type === `projectless`) return null;
-  let r = n.qo(e.get(n.iu.LOCAL_PROJECTS))[t.projectId];
-  if (r == null) throw Error(`Automation project no longer exists`);
-  return { projectId: t.projectId, roots: r.rootPaths.map(n.Ns) };
-}
-function ms(e, t) {
-  return t == null ? [n.Ns(`~`)] : (ps(e, { type: `project`, projectId: t })?.roots ?? []);
-}
-function hs({ compatibilityCwds: e, executionEnvironment: t, projectId: n }) {
-  if (t === `worktree` && (n == null || e.length === 0))
-    throw Error(`Worktree automations require a project with a folder`);
-}
 var nae = 3e4,
   gs = 6e4,
   _s = 3e5,
   rae = 3,
   iae = 12e4,
-  vs = 6e4,
   ys = 3e4,
   aae = 6e5,
   bs = `set_thread_archived`,
@@ -2622,176 +2593,44 @@ var nae = 3e4,
   xs = r.i(`automations`),
   Ss = async () => [],
   Cs = async () => !1;
-function ws({ nextScheduledRunAt: e, now: t }) {
-  return e == null ? t + vs : Math.min(e, t + vs);
-}
-function sae({ rrule: e, now: t }) {
-  let r = n.wr(e);
-  return {
-    scheduleKind: r == null ? `wall_clock` : `interval`,
-    intervalMs: r,
-    nextScheduledRunAt: n.Er({ rrule: e, now: t }),
-  };
-}
-function Ts(e, t = !1) {
-  return e == null
-    ? null
-    : {
-        ...e,
-        settings: {
-          ...e.settings,
-          developer_instructions: n.zt({
-            baseInstructions: e.settings.developer_instructions,
-            hostedAutomationsEnabled: t,
-          }),
-        },
-      };
-}
-async function Es({ automation: e, appServerConnection: t, collaborationMode: r }) {
-  try {
-    let i = [],
-      a = null;
-    do {
-      let e = await t.listModels({ includeHidden: !0, cursor: a, limit: 100 });
-      (i.push(...e.data), (a = e.nextCursor));
-    } while (a != null);
-    if (i.length === 0) return r;
-    let o = n.yd({
-        automation: {
-          ...e,
-          model: n.vd(i, r.settings.model)?.upgrade ?? r.settings.model,
-          reasoningEffort: r.settings.reasoning_effort ?? null,
-        },
-        models: i,
-      }),
-      s = r.settings.model !== o.model;
-    return (
-      s &&
-        xs().warning(`Heartbeat model changed for run`, {
-          safe: { automationId: e.id, requestedModel: r.settings.model, selectedModel: o.model },
-          sensitive: {},
-        }),
-      {
-        ...r,
-        settings: {
-          ...r.settings,
-          model: o.model,
-          reasoning_effort: s || r.settings.reasoning_effort != null ? o.reasoningEffort : null,
-        },
-      }
-    );
-  } catch (t) {
-    return (
-      xs().warning(`Failed to load models for heartbeat run`, {
-        safe: { automationId: e.id },
-        sensitive: { error: t },
-      }),
-      r
-    );
-  }
-}
-async function cae(e, t, n) {
-  let { branch: r } = await t({
-    method: `default-remote-branch`,
-    params: { cwd: e, hostConfig: n.hostConfig, operationSource: `git_direct_call` },
-  });
-  return { type: `branch`, branchName: r ?? `HEAD` };
-}
-async function lae({
-  sourceCwds: e,
-  worktreeCwd: t,
-  requestGitWorker: r,
-  appServerClient: i,
-  automationId: a,
-  includeGitRoots: o,
-}) {
-  let s = e.length > 0 ? e : [n.Ns(t)],
-    [c, l, u] = await Promise.all([
-      i.codexHome(),
-      i.platformPath(),
-      Promise.all(
-        o
-          ? s.map((e) =>
-              r({
-                method: `automation-writable-roots`,
-                params: {
-                  sourceCwd: e,
-                  worktreeCwd: t,
-                  hostConfig: i.hostConfig,
-                  operationSource: `git_direct_call`,
-                },
-              }).then(({ roots: e }) => e),
-            )
-          : [],
-      ),
-    ]);
-  return [...new Set([...e, t, l.join(zn(c, n.zi(i.hostConfig)), `automations`, a), ...u.flat()])];
-}
-function Ds(e, t, r, i = null, a = !1) {
-  let o;
-  o =
-    t.sandbox_mode != null || t.approval_policy != null
-      ? `custom`
-      : n.Pd(n.Ad(t))
-        ? `guardian-approvals`
-        : `auto`;
-  let s = i ?? o,
-    c = n.Id(r, t),
-    l = [o, `auto`, `granular`, `guardian-approvals`, `read-only`].find((e) => c.includes(e)),
-    u = c.includes(s) ? s : l;
-  if (u == null) return fs(n.Dd(s, e, t), r);
-  let d = n.Dd(u, e, t),
-    f = r?.allowedApprovalPolicies == null || r.allowedApprovalPolicies.includes(`never`),
-    p =
-      a &&
-      f &&
-      (r?.allowedApprovalsReviewers == null || r.allowedApprovalsReviewers.includes(`user`))
-        ? `user`
-        : d.approvalsReviewer;
-  return {
-    approvalPolicy: f && (a || (u !== `granular` && p === `user`)) ? `never` : d.approvalPolicy,
-    approvalsReviewer: p,
-    sandboxPolicy:
-      a &&
-      d.sandboxPolicy.type === `workspaceWrite` &&
-      t.sandbox_mode === `workspace-write` &&
-      t.sandbox_workspace_write?.network_access === !0
-        ? { ...d.sandboxPolicy, networkAccess: !0 }
-        : d.sandboxPolicy,
-  };
-}
-function uae(e, t) {
-  let r = e.get(a.J)?.[n.Td];
-  if (typeof r != `object` || !r || Array.isArray(r)) return null;
-  let i = Object.getOwnPropertyDescriptor(r, t)?.value,
-    o = n.Ed.safeParse(i);
-  return o.success ? o.data : null;
-}
-function dae(e, t, r) {
-  let i = n.Id(r, t),
-    a = n.Ad(t),
-    o =
-      t.sandbox_mode != null || t.approval_policy != null
-        ? `custom`
-        : n.Pd(a)
-          ? `guardian-approvals`
-          : `auto`,
-    s = o;
-  if (!i.includes(s)) {
-    if (o === `auto` && i.includes(`guardian-approvals`)) s = `guardian-approvals`;
-    else if (o === `guardian-approvals` && i.includes(`auto`)) s = `auto`;
-    else if (i.includes(`read-only`)) s = `read-only`;
-    else {
-      let a = i.find((e) => e !== `full-access`);
-      if (a == null) return fs(n.Dd(o, e, t), r);
-      s = a;
-    }
-  }
-  return n.Dd(s, e, t);
-}
-function fae(e, t) {
-  return e.reduce((e, n, r) => e.then(() => t(n, r)), Promise.resolve());
-}
+var {
+  findCompatibleAutomationPermissions: fs,
+  resolveAutomationProjectTarget: ps,
+  resolveAutomationCompatibilityCwds: ms,
+  assertWorktreeAutomationTarget: hs,
+  nextHeartbeatPollAt: ws,
+  classifyAutomationSchedule: sae,
+  withHostedAutomationInstructions: Ts,
+  resolveHeartbeatCollaborationMode: Es,
+  resolveDefaultRemoteBranchStartingState: cae,
+  collectAutomationWritableRoots: lae,
+  resolveAutomationPermissions: Ds,
+  readStoredAgentMode: uae,
+  resolveAutomationPermissionSelection: dae,
+  forEachSequentially: fae,
+} = createAutomationExecutionPolicy({
+  localProjectsKey: n.iu.LOCAL_PROJECTS,
+  appConfigStateKey: a.J,
+  agentModeByHostKey: n.Td,
+  agentModeSchema: n.Ed,
+  parseLocalProjects: n.qo,
+  normalizePath: n.Ns,
+  defaultPermissions: n.Od,
+  permissionProfileOf: n.Md,
+  managedRequirementsAllow: n.Fd,
+  parseIntervalMs: n.wr,
+  computeNextRun: n.Er,
+  withHostedAutomationInstructions: n.zt,
+  selectAutomationModel: n.yd,
+  findModel: n.vd,
+  shouldNormalizeDesktopPaths: n.zi,
+  normalizeDesktopPath: zn,
+  permissionModes: n.Id,
+  requestedPermissionMode: n.Ad,
+  isGuardianApprovalsMode: n.Pd,
+  permissionConfig: n.Dd,
+  logger: xs(),
+});
 function pae({
   appVersion: e,
   statsig: t,

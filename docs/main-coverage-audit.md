@@ -3710,3 +3710,16 @@ local-stdio interceptor、thread source gate、trusted service env 合并，以�
 常量全部删除。新 focused suite 52 项覆盖 override/relocation/WSL/dev discovery、config build、source/transport gates、nested key
 cleanup、trusted env 和 adapter cleanup；Artifact host lifecycle/environment、Electron fetch、WindowContext、Windows capture 与
 first-party webview 六组相邻回归通过。测试索引 1841，no-unwired gate 扩至 966 项。
+
+### 整带抽取：automation execution policy
+
+新增并真实接回 `automations/execution-policy.ts`，将 AutomationsService 与 scheduler/heartbeat 共用的无状态策略整组迁出：project
+target/compatibility roots、worktree target validation、heartbeat poll 与 RRULE classification、hosted instructions、分页 model upgrade、
+default branch、automation writable roots、stored agent mode、managed approval/sandbox fallback 以及严格顺序执行。策略以明确 adapters
+复用现有 project/path/config requirements 状态，没有复制 scheduler 的 in-flight、heartbeat renderer state 或 AbortController owner。
+
+主 chunk 原 `fs/ps/ms/hs/ws/sae/Ts/Es/cae/lae/Ds/uae/dae/fae` 14 个机械 helper 已删除，scheduler 和
+`automations-service.ts` 均消费同一语义 runtime。新 focused suite 52 项覆盖 target 缺失、worktree gate、timing、model pagination/
+fallback、writable roots、agent mode、managed permissions/network access 与 sequential ordering；修复 AutomationsService 直接 `.ts`
+失效入口后，AutomationsService、Habitat runtime/service、automation update tool 四组相邻回归通过。测试索引 1842，no-unwired gate
+扩至 984 项。

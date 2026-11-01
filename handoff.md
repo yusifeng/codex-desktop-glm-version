@@ -5560,3 +5560,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - `browser-use/desktop-feature-availability.ts` 接管唯一 feature adapter；主 chunk 旧路径 helper、thread-config belt、配套常量与
   `pne` class 整带删除，没有保留重复 owner。
 - focused 52 项及 Artifact host/fetch/WindowContext/Windows capture/webview 六组回归通过；测试索引 1841，no-unwired gate 966 项。
+
+# 2026-11-01 automation execution policy extraction
+
+- 新增并接回 `automations/execution-policy.ts`，整组迁出 project targets、worktree gate、RRULE/heartbeat timing、hosted
+  instructions、model upgrade、default branch、writable roots、stored agent mode、managed approval/sandbox fallback 与 sequential runner。
+- scheduler 与 AutomationsService 共用同一 policy；主 chunk 旧 14 个 `fs..fae` helper 删除，未复制 scheduler 的并发/abort/state owner。
+- focused 52 项及 automation/Habitat/update-tool 四组相邻回归通过；AutomationsService 直接 `.ts` 失效测试已修复。测试索引
+  1842，no-unwired gate 984 项。

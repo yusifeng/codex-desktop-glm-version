@@ -1,6 +1,15 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { createAutomationsServiceClass } from "../src/main/main-app/automations/automations-service.ts";
+import { transform } from "esbuild";
+
+const source = fs.readFileSync(
+  new URL("../src/main/main-app/automations/automations-service.ts", import.meta.url),
+  "utf8",
+);
+const transpiled = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+const loaded = { exports: {} };
+Function("module", "exports", transpiled.code)(loaded, loaded.exports);
+const { createAutomationsServiceClass } = loaded.exports;
 
 let assertions = 0;
 const equal = (actual, expected) => { assert.deepEqual(actual, expected); assertions += 1; };

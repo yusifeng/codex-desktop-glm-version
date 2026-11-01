@@ -144,6 +144,7 @@ const realOwners = [
   ["src/main/main-app/artifact-session/runtime-paths.ts", "resolveRuntimePaths"],
   ["src/main/main-app/artifact-session/thread-config.ts", "createArtifactSessionThreadConfigRuntime"],
   ["src/main/main-app/browser-use/desktop-feature-availability.ts", "BrowserUseDesktopFeatureAvailability"],
+  ["src/main/main-app/automations/execution-policy.ts", "createAutomationExecutionPolicy"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -925,5 +926,16 @@ for (const generatedName of [
   );
 }
 assert.equal(/^var pne = class/m.test(main), false, "generated browser availability adapter must be removed");
+assert.equal(main.includes('require("./main-app/automations/execution-policy.js")'), true, "automation execution policy is wired");
+assert.equal(main.includes("createAutomationExecutionPolicy({"), true, "automation execution policy is composed");
+for (const generatedName of [
+  "fs", "ps", "ms", "hs", "ws", "sae", "Ts", "Es", "cae", "lae", "Ds", "uae", "dae", "fae",
+]) {
+  assert.equal(
+    new RegExp(`^(?:async )?function ${generatedName}\\(`, "m").test(main),
+    false,
+    `generated automation policy ${generatedName} must be removed`,
+  );
+}
 
-console.log("966 main unwired-owner skeleton assertions passed");
+console.log("984 main unwired-owner skeleton assertions passed");
