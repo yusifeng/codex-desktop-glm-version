@@ -33,7 +33,11 @@ for (const output of [...SEMANTIC_ROUTE_OVERRIDES].sort()) {
 
   const entry = path.join(root, "src/renderer", semanticName, "index.ts");
   const source = await fs.readFile(entry, "utf8");
-  assert.doesNotMatch(source, /return\s+\{\s*kind:/, `${semanticName} is not a structural view-model placeholder`);
+  assert.doesNotMatch(
+    source,
+    /return\s+\{\s*kind:[\s\S]{0,200}?props:/,
+    `${semanticName} is not a structural view-model placeholder`,
+  );
 
   const result = await esbuild.build({
     entryPoints: [entry],

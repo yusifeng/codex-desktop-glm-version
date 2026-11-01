@@ -2,8 +2,8 @@ import { FX as initializeSignalRuntime } from "@rchunk/app-shared";
 import {
   i as sourceLinksByThread,
   n as initializeLocalConversationSourcesSignals,
-  r as conversationTurnsForSources,
-  t as priorConversationTurns,
+  r as priorConversationTurns,
+  t as conversationTurnsForSources,
 } from "@rchunk/local-conversation-sources-signals";
 
 initializeSignalRuntime();

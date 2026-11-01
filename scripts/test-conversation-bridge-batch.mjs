@@ -74,7 +74,7 @@ function coreMock(name) {
     "conversation-ui": `export const i = () => globalThis.__conversationBridgeTest.initialized.push("conversation-ui"); export const n = "BusinessAgentConversationHeader"; export const r = "BusinessAgentHomeHero";`,
     "local-conversation-thread": `export const r = "LocalConversationSideChatTab"; export const s = () => globalThis.__conversationBridgeTest.initialized.push("local-thread"); export const t = "LocalConversationBackgroundAgentTab";`,
     "local-conversation-webmcp-tools-model": `export const i = () => globalThis.__conversationBridgeTest.initialized.push("webmcp-model"); export const n = calls => calls.filter(call => call.visible); export const r = calls => new Map([["tool", calls]]); export const t = url => new URL(url).hostname;`,
-    "local-conversation-sources-signals": `export const i = { id: "source-links" }; export const n = { id: "prior-turns" }; export const r = { id: "source-turns" }; export const t = () => globalThis.__conversationBridgeTest.initialized.push("source-signals");`,
+    "local-conversation-sources-signals": `export const i = { id: "source-links" }; export const n = () => globalThis.__conversationBridgeTest.initialized.push("source-signals"); export const r = { id: "prior-turns" }; export const t = { id: "source-turns" };`,
     "open-thread-pull-request-side-panel-tab": `export const i = globalThis.__conversationBridgeMarker("restore-pr-panel"); export const n = globalThis.__conversationBridgeMarker("open-canonical-pr-panel"); export const r = globalThis.__conversationBridgeMarker("open-pr-panel"); export const t = () => globalThis.__conversationBridgeTest.initialized.push("pr-panel");`,
   };
   return simple[name] ?? "export const sideEffect = true;";
