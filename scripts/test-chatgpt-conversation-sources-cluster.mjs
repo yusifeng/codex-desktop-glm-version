@@ -20,7 +20,8 @@ for (const directory of MODULES) {
 }
 const categories = Object.fromEntries(["apps", "files", "links", "memory", "more", "skills", "web"].map((key) => [key, { defaultMessage: key[0].toUpperCase() + key.slice(1) }]));
 function mockModule(name) {
-  if (name === "app-shared") return `export const I3 = () => globalThis.__conversationSourcesTest.jsx; export const Yh = (props) => ({ type: "Button", props });`;
+  if (name === "app-shared") return `export const I3 = () => globalThis.__conversationSourcesTest.jsx; export const Yh = (props) => ({ type: "Button", props }); export const QI=()=>{};export const ZI={};export const QX=(scope,factory)=>({scope,factory});export const rZ=(scope,factory)=>({scope,factory});export const Rv='FilesIcon';export const HX=()=>null;export const BX=()=>({data:[],refetch:async()=>{}});export const LX=()=>({});`;
+  if (name === "app-initial") return `export const Sun=()=>{};export const cJt=()=>{};export const Wvt=()=>{};export const FDt=()=>{};export const IDt=(kind,component,options)=>({kind,component,...options});export const mun='account';export const _un='user';export const mpn='intl';export const $en={};export const Gvt=()=>{};export const gvt=()=>null;export const RVt={};export const jVt={};export const rJt={safeGet:async()=>({items:[]})};`;
   if (name === "chatgpt-sources-message") return `export const i={defaultMessage:"Sources"}; export const n={skill:{defaultMessage:"Skill"}}; export const r=${JSON.stringify(categories)}; export const t={userInstructions:{defaultMessage:"Custom instructions"},userMemory:{defaultMessage:"Saved memory"},generalMemory:{defaultMessage:"Memory"}};`;
   return "export {};";
 }

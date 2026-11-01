@@ -333,6 +333,7 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "math-block-utils-ca3c4f5321e8.js",
   "drop-zones-5d14ded04e79.js",
   "open-in-button-c51945f2c9d6.js",
+  "open-in-google-drive-menu-item-b5e143939095.js",
   "plugin-picker-menu-content-a51d37a29207.js",
   "create-pull-request-modal-content-a56e677534f4.js",
   "pull-request-actions-5ac6dcc71dec.js",
@@ -447,7 +448,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["checkout-session", "session-3ec40b7dd28e.js"],
   ["mark-session-create", "mark-session-create-6f7d531b2a15.js"],
   ["xterm-window-zoom", "xterm-window-zoom-15fe24cf01f9.js"],
-  ["open-conversation-files", "open-a618d40921b2.js"],
   // Complete eager first-party dependency closure of the four conversation
   // React roots. These owners remove structurally approximate implementations
   // from the live conversation path while retaining vendor/generated boundaries.
@@ -463,10 +463,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ],
   ["local-environment-editor", "local-environment-editor-c4a981e88476.js"],
   ["mcp-tool-activity-label", "mcp-tool-activity-label-87ba9ef42b0b.js"],
-  [
-    "open-in-google-drive-menu-item",
-    "open-in-google-drive-menu-item-b5e143939095.js",
-  ],
   ["thread-handoff-modal", "thread-handoff-modal-ccac59d04293.js"],
   ["thread-panel-toggle-button", "thread-panel-toggle-button-d0ce9733e408.js"],
 ]);
