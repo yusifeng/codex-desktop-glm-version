@@ -1,3 +1,4 @@
+import "@rchunk/rolldown-runtime";
 import {
   lY as getConversationId,
   wL as initializeAutomationRuntime,

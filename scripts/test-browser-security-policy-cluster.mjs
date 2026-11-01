@@ -194,7 +194,7 @@ const approvalMutation = policy.o();
 await approvalMutation.options.mutationFn("always");
 assert.equal(state.commands.at(-1).command, "browser-use-approval-mode-write");
 await approvalMutation.options.onSuccess();
-assert.deepEqual(state.invalidations.at(-1), ["browser-use-origin-state-read"]);
+assert.deepEqual(state.invalidations.at(-1), ["vscode", "browser-use-origin-state-read"]);
 const fileMutation = policy.c();
 await fileMutation.options.mutationFn({ approvalMode: "ask", kind: "upload" });
 assert.equal(state.commands.at(-1).payload.params.kind, "upload");

@@ -65,7 +65,13 @@ export function parseOriginPattern(value: string): OriginPattern | null {
   if (pattern.startsWith("*.")) {
     return { canonicalPattern: pattern, hostnamePattern: pattern.slice(2), kind: "subdomains-only" };
   }
-  return { canonicalPattern: pattern, hostnamePattern: pattern, kind: "exact" };
+  return {
+    canonicalPattern: pattern,
+    hostnamePattern: pattern,
+    kind: pattern === "localhost" || isValidIpLiteral(pattern)
+      ? "exact"
+      : "apex-and-subdomains",
+  };
 }
 
 function matchesWildcard(pattern: string, value: string): boolean {
@@ -110,7 +116,7 @@ export function domainMatchesPattern(
 ): boolean {
   const normalizedHostname = normalizeHost(hostname);
   const hostnamePattern = pattern.hostnamePattern ?? pattern.hostname ?? "";
-  switch (pattern.kind ?? "exact") {
+  switch (pattern.kind ?? "apex-and-subdomains") {
     case "exact":
       return matchesWildcard(hostnamePattern, normalizedHostname);
     case "subdomains-only":

@@ -23,7 +23,11 @@ async function bundle(directory) {
     logLevel: "silent",
     plugins: [{ name: "subscription-billing-support-mocks", setup(build) {
       build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" }));
-      build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__subscriptionBillingSupportTest.jsx;" : "export {};", loader: "js" }));
+      build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared"
+        ? "export const I3=()=>globalThis.__subscriptionBillingSupportTest.jsx;"
+        : importPath === "app-initial"
+          ? "export const EI=({currencyCode})=>['JPY','KRW','CLP'].includes(currencyCode)?0:['BHD','KWD'].includes(currencyCode)?3:2;"
+          : "export {};", loader: "js" }));
     } }],
   });
   return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`);

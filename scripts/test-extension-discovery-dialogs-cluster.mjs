@@ -7,7 +7,11 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
 globalThis.__extensionCluster = { jsx };
 async function bundle(directory) {
-  const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: value }) => ({ path: value.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: value }) => ({ contents: value === "app-shared" ? "export const I3=()=>globalThis.__extensionCluster.jsx;" : "export {};", loader: "js" })); } }] });
+  const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: value }) => ({ path: value.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: value }) => ({ contents: value === "app-shared"
+    ? "export const I3=()=>globalThis.__extensionCluster.jsx; export const $O={FIVE_MINUTES:300000}; export const ek=()=>{};"
+    : value === "app-initial"
+      ? "export const G3t=()=>({}); export const K3t=()=>{}; export const pdn=()=>{}; export const q6t=value=>value; export const udn={safeGet:async()=>({})};"
+      : "export {};", loader: "js" })); } }] });
   return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`);
 }
 const nodes = (root) => { const out=[]; const visit=(v)=>{ if(v==null||typeof v!=="object") return; if(Array.isArray(v)) return v.forEach(visit); if("type" in v&&"props" in v) out.push(v); visit(v.props?.children); }; visit(root); return out; };
