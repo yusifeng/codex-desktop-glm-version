@@ -246,13 +246,20 @@ export const RECONSTRUCTED_ROUTE_CORE = new Set([
 // Route dependencies promoted as a verified batch. Keeping this set named lets
 // the source-build gate validate the full dependency graph of each new owner.
 export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
+  "codex-app-home-beacon-announcement-8c94f69eb080.js",
+  "codex-micro-onboarding-host-85407a96e02a.js",
   "content-bd6ed75ea274.js",
   "equation-44cf0b1d4b75.js",
   "library-cloud-file-preview-b3ddfaa823c0.js",
   "math-block-utils-ca3c4f5321e8.js",
   "open-a618d40921b2.js",
   "page-268e2fb6d880.js",
+  "pending-onboarding-9e794fa64b02.js",
   "registered-259e95b201a1.js",
+  "subscription-onboarding-bdae6e918350.js",
+  "subscription-onboarding-dcd9d9af0fe0.js",
+  "home-artifact-templates-1e0738b7ddeb.js",
+  "wallet-onboarding-announcement-content-28d619ce7d4e.js",
   "workbook-review-utils-3e78f7501b68.js",
   "workspace-agent-detail-query-3cb2bb771d2e.js",
 ]);
