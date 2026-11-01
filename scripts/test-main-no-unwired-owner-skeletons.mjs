@@ -145,6 +145,7 @@ const realOwners = [
   ["src/main/main-app/artifact-session/thread-config.ts", "createArtifactSessionThreadConfigRuntime"],
   ["src/main/main-app/browser-use/desktop-feature-availability.ts", "BrowserUseDesktopFeatureAvailability"],
   ["src/main/main-app/automations/execution-policy.ts", "createAutomationExecutionPolicy"],
+  ["src/main/main-app/automations/heartbeat-runtime.ts", "createHeartbeatAutomationRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -937,5 +938,16 @@ for (const generatedName of [
     `generated automation policy ${generatedName} must be removed`,
   );
 }
+assert.equal(main.includes('require("./main-app/automations/heartbeat-runtime.js")'), true, "automation heartbeat runtime is wired");
+assert.equal(main.includes("createHeartbeatAutomationRuntime({"), true, "automation heartbeat runtime is composed");
+for (const generatedName of [
+  "_ae", "vae", "yae", "Ms", "bae", "xae", "Sae", "Cae", "wae", "Tae", "Ns", "Ps", "Eae", "Dae", "Oae", "Fs",
+]) {
+  assert.equal(
+    new RegExp(`^(?:async )?function ${generatedName}\\(`, "m").test(main),
+    false,
+    `generated heartbeat owner ${generatedName} must be removed`,
+  );
+}
 
-console.log("984 main unwired-owner skeleton assertions passed");
+console.log("1004 main unwired-owner skeleton assertions passed");

@@ -323,6 +323,9 @@ const {
   HEARTBEAT_RETRY_MS: vs,
   createAutomationExecutionPolicy,
 } = require("./main-app/automations/execution-policy.js");
+const {
+  createHeartbeatAutomationRuntime,
+} = require("./main-app/automations/heartbeat-runtime.js");
 const { createPinnedThreadsServiceClass } = require("./main-app/sidebar/pinned-threads-service.js");
 const { createElectronFetchHandlerClass } = require("./main-app/fetch-handler/electron-fetch-handler.js");
 const { createWindowContextClass } = require("./main-app/window/window-context.js");
@@ -2572,22 +2575,11 @@ var eae = `Response MUST end with a remark-directive block.
   - \`::inbox-item{title="Choose API shape for filters" summary="Two options drafted; pick A vs B"}\`
 - Status update with next step:
   - \`::inbox-item{title="PR comments addressed" summary="Ready for re-review; focus on auth edge case"}\`
-`,
-  tae = `<heartbeat>
-  <automation_id>{{AUTOMATION_ID}}</automation_id>
-  <current_time_iso>{{NOW_ISO}}</current_time_iso>
-  <instructions>
-{{AUTOMATION_PROMPT}}
-  </instructions>
-</heartbeat>
 `;
 var nae = 3e4,
   gs = 6e4,
   _s = 3e5,
   rae = 3,
-  iae = 12e4,
-  ys = 3e4,
-  aae = 6e5,
   bs = `set_thread_archived`,
   oae = `write_settings`,
   xs = r.i(`automations`),
@@ -2630,6 +2622,29 @@ var {
   isGuardianApprovalsMode: n.Pd,
   permissionConfig: n.Dd,
   logger: xs(),
+});
+var {
+  updateAutomationThreadTitle: _ae,
+  runScheduledHeartbeat: vae,
+  runHeartbeatNow: yae,
+} = createHeartbeatAutomationRuntime({
+  classifyAutomationSchedule: sae,
+  nextHeartbeatPollAt: ws,
+  withHostedAutomationInstructions: Ts,
+  checkHostedAutomationAppAvailable: js,
+  resolveHeartbeatCollaborationMode: Es,
+  resolveAutomationPermissionSelection: dae,
+  updateAutomationNextRun: n.zr,
+  computeAutomationNextRun: n.Tr,
+  markAutomationRun: n.Pr,
+  automationErrorKind: n.$i,
+  getAutomation: n.xr,
+  updateAutomation: n.Vr,
+  supportsAppServerFeature: n.Wu,
+  supportsListThreadTurns: n.Ku,
+  turnSummary: n.Xi,
+  logger: xs(),
+  now: Date.now,
 });
 function pae({
   appVersion: e,
@@ -3266,448 +3281,6 @@ async function gae({
     });
   } catch (e) {
     throw (ce?.handleStartFailure(), e);
-  }
-}
-async function _ae({ automation: e, threadId: t, appServerConnection: n }) {
-  try {
-    await n.updateThreadTitle(t, e.name, null);
-  } catch (n) {
-    xs().warning(`Failed to set automation thread title`, {
-      safe: { automationId: e.id, threadId: t, error: n },
-      sensitive: {},
-    });
-  }
-}
-async function vae({
-  automation: e,
-  now: t,
-  appServerConnection: r,
-  signal: i,
-  assertCurrent: a,
-  heartbeatThreadRendererStates: o,
-  heartbeatThreadCollaborationModes: s,
-  heartbeatThreadPermissions: c,
-  updateCanonicalAutomation: l,
-  deleteArchivedHeartbeat: u,
-  isHostedAutomationAppAvailable: d,
-}) {
-  let f = sae({ rrule: e.rrule, now: t }),
-    p = await r.readThread(e.targetThreadId).catch(() => null);
-  if ((a(), p == null)) {
-    let r = ws({ nextScheduledRunAt: f.nextScheduledRunAt, now: t });
-    (n.zr(e.id, r),
-      xs().warning(`Heartbeat automation skipped: thread missing`, {
-        safe: {
-          automationId: e.id,
-          targetThreadId: e.targetThreadId,
-          blockReason: `thread_missing`,
-          nextRunAt: r,
-          ...f,
-        },
-        sensitive: {},
-      }));
-    return;
-  }
-  let m = Tae({ expectedThreadId: e.targetThreadId, heartbeatThreadRendererStates: o });
-  if (m != null) {
-    let r = ws({ nextScheduledRunAt: f.nextScheduledRunAt, now: t });
-    (n.zr(e.id, r),
-      xs().debug(`Heartbeat automation blocked by renderer state`, {
-        safe: {
-          automationId: e.id,
-          targetThreadId: e.targetThreadId,
-          blockReason: m,
-          nextRunAt: r,
-          ...f,
-        },
-        sensitive: {},
-      }));
-    return;
-  }
-  let h = Ts(wae(s, e.targetThreadId), await js(d));
-  if (h == null) {
-    let r = ws({ nextScheduledRunAt: f.nextScheduledRunAt, now: t });
-    (n.zr(e.id, r),
-      xs().debug(`Heartbeat automation waiting for renderer mode state`, {
-        safe: {
-          automationId: e.id,
-          targetThreadId: e.targetThreadId,
-          blockReason: `missing_collaboration_mode`,
-          nextRunAt: r,
-          ...f,
-        },
-        sensitive: {},
-      }));
-    return;
-  }
-  let g = await Ns({ thread: p, appServerConnection: r, signal: i, assertCurrent: a });
-  if (g != null) {
-    let r = ws({ nextScheduledRunAt: f.nextScheduledRunAt, now: t });
-    (n.zr(e.id, r),
-      xs().debug(`Heartbeat automation blocked by thread state`, {
-        safe: {
-          automationId: e.id,
-          targetThreadId: e.targetThreadId,
-          blockReason: g,
-          nextRunAt: r,
-          ...f,
-        },
-        sensitive: {},
-      }));
-    return;
-  }
-  let _ = n.Tr({ automation: e, now: t });
-  (n.Pr(e.id, _),
-    r.notifyAutomationRunTriggered({
-      automationKind: e.kind,
-      cwd: p.cwd,
-      executionEnvironment: null,
-      model: null,
-      pluginTemplateId: null,
-      reasoningEffort: null,
-      rrule: e.rrule,
-      runTrigger: `scheduled`,
-    }));
-  try {
-    await Ms({
-      automation: e,
-      thread: p,
-      appServerConnection: r,
-      collaborationMode: await Es({ automation: e, appServerConnection: r, collaborationMode: h }),
-      permissions: c.get(e.targetThreadId) ?? null,
-      waitForCompletion: !0,
-      runTrigger: `scheduled`,
-    });
-  } catch (t) {
-    if (n.$i(t) !== `thread_archived`) throw t;
-    a();
-    let i = n.xr(e.id);
-    if (i?.kind !== `heartbeat` || i.status !== `ACTIVE` || i.targetThreadId !== e.targetThreadId)
-      return;
-    (u == null ? n.Vr({ ...i, status: `PAUSED` }) != null : (await u(i.id)) === `deleted`) &&
-      r.notifyAutomationRunsUpdated();
-  }
-}
-async function yae({
-  automation: e,
-  appServerConnection: t,
-  collaborationMode: r,
-  permissions: i,
-  isHostedAutomationAppAvailable: a,
-}) {
-  let o = await t.readThread(e.targetThreadId).catch(() => null);
-  if (o == null) throw Error(`Heartbeat thread not found.`);
-  if ((await Ns({ thread: o, appServerConnection: t })) != null)
-    throw Error(`Heartbeat thread is busy right now.`);
-  let s = n.Tr({ automation: e, now: Date.now() });
-  (n.Pr(e.id, s),
-    t.notifyAutomationRunTriggered({
-      automationKind: e.kind,
-      cwd: o.cwd,
-      executionEnvironment: null,
-      model: null,
-      pluginTemplateId: null,
-      reasoningEffort: null,
-      rrule: e.rrule,
-      runTrigger: `run_now`,
-    }));
-  let c = Ts(r, await js(a));
-  if (c == null) throw Error(`Heartbeat thread mode is still loading.`);
-  await Ms({
-    automation: e,
-    thread: o,
-    appServerConnection: t,
-    collaborationMode: await Es({ automation: e, appServerConnection: t, collaborationMode: c }),
-    permissions: i,
-    waitForCompletion: !1,
-    runTrigger: `run_now`,
-  });
-}
-async function Ms({
-  automation: e,
-  thread: t,
-  appServerConnection: n,
-  collaborationMode: r,
-  permissions: i,
-  waitForCompletion: a,
-  runTrigger: o,
-}) {
-  let s = await bae({ thread: t, appServerConnection: n }),
-    c = i ?? (await xae({ appServerConnection: n, cwd: s.cwd })),
-    l = Sae(e);
-  await Eae({
-    automation: e,
-    appServerConnection: n,
-    sessionId: s.sessionId,
-    threadId: s.id,
-    cwd: s.cwd,
-    prompt: l,
-    collaborationMode: r,
-    approvalPolicy: c.approvalPolicy,
-    approvalsReviewer: c.approvalsReviewer,
-    sandboxPolicy: c.sandboxPolicy,
-    model: null,
-    effort: null,
-    waitForCompletion: a,
-    runTrigger: o,
-  });
-}
-async function bae({ thread: e, appServerConnection: t }) {
-  let n = await t.resumeThread(e.id, { cwd: e.cwd, path: e.path });
-  return {
-    id: n.thread.id,
-    cwd: n.thread.cwd || n.cwd || e.cwd,
-    path: n.thread.path ?? e.path,
-    sessionId: n.thread.sessionId,
-  };
-}
-async function xae({ appServerConnection: e, cwd: t }) {
-  let [n, r] = await Promise.all([
-    e.getUserSavedConfiguration(t),
-    e.getConfigRequirements().catch(() => ({ requirements: null })),
-  ]);
-  return dae([t], n, r.requirements);
-}
-function Sae(e) {
-  return tae
-    .replaceAll(`{{AUTOMATION_ID}}`, e.id)
-    .replaceAll(`{{NOW_ISO}}`, new Date().toISOString())
-    .replaceAll(`{{AUTOMATION_PROMPT}}`, e.prompt);
-}
-function Cae(e, t) {
-  let n = e.get(t);
-  return n == null ? null : Date.now() - n.updatedAtMs > iae ? (e.delete(t), null) : n;
-}
-function wae(e, t) {
-  return e.get(t) ?? null;
-}
-function Tae({ expectedThreadId: e, heartbeatThreadRendererStates: t }) {
-  let n = Cae(t, e);
-  return n == null || n.isEligible ? null : (n.reason ?? `renderer_ineligible`);
-}
-async function Ns({ thread: e, appServerConnection: t, signal: r, assertCurrent: i }) {
-  if ((i?.(), r?.throwIfAborted(), e.status.type !== `active`)) return null;
-  let a = Ps(e.status);
-  if (a != null) return a;
-  if (t.appServerVersion == null || t.appServerVersion === `0.0.0`)
-    return `active_history_unavailable`;
-  let o = new AbortController(),
-    s = AbortSignal.any([o.signal, AbortSignal.timeout(ys), ...(r == null ? [] : [r])]),
-    c = !1,
-    l = t.registerInternalNotificationHandler((t) => {
-      t.method === `account/updated` ||
-      (t.method === `thread/deleted` && t.params?.threadId === e.id)
-        ? o.abort()
-        : (t.method === `turn/started` ||
-            t.method === `item/started` ||
-            t.method === `item/completed` ||
-            t.method === `thread/status/changed`) &&
-          t.params?.threadId === e.id &&
-          (c = !0);
-    }),
-    u = t.registerInternalAuthenticatedPrincipalChangeHandler(() => o.abort()),
-    d = t.registerInternalConnectionStateHandler((e) => {
-      e !== `connected` && o.abort();
-    }),
-    f = { priority: `background`, source: `tail_history`, timeoutMs: ys, signal: s };
-  try {
-    let r = n.Ku(t.appServerVersion)
-      ? (await t.listThreadTurns(e.id, { limit: 1, itemsView: `notLoaded` }, f)).data[0]
-      : (await t.readThread(e.id, { includeTurns: !0 }, f))?.turns.at(-1);
-    if ((i?.(), s.throwIfAborted(), c)) return `active_recent_turn_activity`;
-    if (r?.status !== `completed`) return `active_without_completed_turn`;
-    let a = await t.readThread(e.id, void 0, f);
-    return (
-      i?.(),
-      s.throwIfAborted(),
-      c
-        ? `active_recent_turn_activity`
-        : a?.id === e.id
-          ? Ps(a.status)
-          : `active_history_unavailable`
-    );
-  } catch (e) {
-    if (e instanceof Error && e.name === `AbortError`) throw e;
-    return (i?.(), r?.throwIfAborted(), o.signal.throwIfAborted(), `active_history_unavailable`);
-  } finally {
-    (l(), u(), d());
-  }
-}
-function Ps(e) {
-  return e.type === `active`
-    ? e.activeFlags.includes(`waitingOnUserInput`)
-      ? `waiting_on_user_input`
-      : e.activeFlags.includes(`waitingOnApproval`)
-        ? `waiting_on_approval`
-        : e.activeFlags.length > 0
-          ? `active_with_flags`
-          : null
-    : null;
-}
-async function Eae({
-  automation: e,
-  appServerConnection: t,
-  sessionId: r,
-  threadId: i,
-  cwd: a,
-  prompt: o,
-  collaborationMode: s,
-  approvalPolicy: c,
-  approvalsReviewer: l,
-  sandboxPolicy: u,
-  model: d,
-  effort: f,
-  waitForCompletion: p,
-  runTrigger: m,
-}) {
-  let h = n.Wu(t.appServerVersion, `serviceTierForTurn`),
-    g = {
-      threadId: i,
-      turnTrigger: `automation_heartbeat_${m}`,
-      input: [{ type: `text`, text: o, text_elements: [] }],
-      cwd: a,
-      approvalPolicy: c,
-      approvalsReviewer: l,
-      sandboxPolicy: u,
-      model: d,
-      effort: f,
-      serviceTier: h ? void 0 : null,
-      serviceTierForTurn: h ? `default` : void 0,
-      summary: n.Xi,
-      personality: null,
-      outputSchema: null,
-      collaborationMode: s,
-    };
-  if (p) {
-    await Dae({
-      automation: e,
-      appServerConnection: t,
-      sessionId: r,
-      threadId: i,
-      turnStartParams: g,
-    });
-    return;
-  }
-  let _ = Oae({ appServerConnection: t, threadId: i });
-  try {
-    let n = await t.startTurn(g, {
-      automationKind: `heartbeat`,
-      ...(e.notificationPolicy == null ? {} : { notificationPolicy: e.notificationPolicy }),
-      sessionId: r,
-    });
-    await _.waitForTurn(n.turn.id);
-  } catch (e) {
-    throw (_.dispose(), e);
-  }
-}
-async function Dae({
-  automation: e,
-  appServerConnection: t,
-  sessionId: n,
-  threadId: r,
-  turnStartParams: i,
-}) {
-  let a = null,
-    o = () => {},
-    s = new Promise((e, n) => {
-      let i = setTimeout(() => {
-          (o(), e());
-        }, aae),
-        s = t.registerInternalNotificationHandler((t) => {
-          Fs({
-            notification: t,
-            threadId: r,
-            turnId: a,
-            onTurnStarted: (e) => {
-              a = e;
-            },
-            onCompleted: (t, r) => {
-              if (((a = t), o(), r !== `completed`)) {
-                n(Error(`Heartbeat automation did not complete.`));
-                return;
-              }
-              e();
-            },
-          });
-        });
-      o = () => {
-        (clearTimeout(i), s(), (o = () => {}));
-      };
-    });
-  try {
-    ((a = (
-      await t.startTurn(i, {
-        automationKind: `heartbeat`,
-        ...(e.notificationPolicy == null ? {} : { notificationPolicy: e.notificationPolicy }),
-        sessionId: n,
-      })
-    ).turn.id),
-      await s);
-  } catch (e) {
-    throw (o(), e);
-  }
-}
-function Oae({ appServerConnection: e, threadId: t }) {
-  let n = new Set(),
-    r = null,
-    i = null,
-    a = null,
-    o = null,
-    s = !1,
-    c = () => {
-      r != null && n.has(r) && a?.();
-    },
-    l = e.registerInternalNotificationHandler((e) => {
-      Fs({
-        notification: e,
-        threadId: t,
-        turnId: null,
-        onTurnStarted: (e) => {
-          (n.add(e), c());
-        },
-        onCompleted: (e) => {
-          (n.add(e), c());
-        },
-      });
-    }),
-    u = new Promise((e, t) => {
-      ((a = e), (o = t));
-    }),
-    d = () => {
-      s || ((s = !0), i != null && (clearTimeout(i), (i = null)), l());
-    };
-  return {
-    dispose: d,
-    waitForTurn: async (e) => {
-      ((r = e),
-        (i = setTimeout(() => {
-          o?.(Error(`Timed out waiting for heartbeat automation to start.`));
-        }, ys)),
-        c());
-      try {
-        await u;
-      } finally {
-        d();
-      }
-    },
-  };
-}
-function Fs({ notification: e, threadId: t, turnId: n, onTurnStarted: r, onCompleted: i }) {
-  switch (e.method) {
-    case `turn/started`: {
-      let n = e.params;
-      if (n.threadId !== t) return;
-      r(n.turn.id);
-      return;
-    }
-    case `turn/completed`: {
-      let r = e.params;
-      if (r.threadId !== t || (n != null && r.turn.id !== n)) return;
-      i(r.turn.id, r.turn.status);
-      return;
-    }
-    default:
-      return;
   }
 }
 var ChunkedWebContentsMessageSender = createChunkedWebContentsMessageSenderClass({

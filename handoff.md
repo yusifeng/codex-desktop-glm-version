@@ -5568,3 +5568,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - scheduler 与 AutomationsService 共用同一 policy；主 chunk 旧 14 个 `fs..fae` helper 删除，未复制 scheduler 的并发/abort/state owner。
 - focused 52 项及 automation/Habitat/update-tool 四组相邻回归通过；AutomationsService 直接 `.ts` 失效测试已修复。测试索引
   1842，no-unwired gate 984 项。
+
+# 2026-11-01 automation heartbeat runtime extraction
+
+- 新增并接回 `automations/heartbeat-runtime.ts`，整块迁出 scheduled/run-now heartbeat、renderer TTL、tail-history/abort race、
+  resume/permissions、turn start/completion wait、archive pause/delete 与 listener/timer cleanup；没有复制 in-flight state。
+- 主 chunk 旧 `_ae..Fs` 16 个 heartbeat 定义及专用 prompt/TTL aliases 删除，scheduler 保留单一调用面。
+- focused 44 项及 execution-policy/Automations/Habitat/update-tool/fetch 六组回归通过；测试索引 1843，no-unwired gate 1004 项。

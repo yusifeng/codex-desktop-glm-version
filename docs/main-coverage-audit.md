@@ -3723,3 +3723,16 @@ default branch、automation writable roots、stored agent mode、managed approva
 fallback、writable roots、agent mode、managed permissions/network access 与 sequential ordering；修复 AutomationsService 直接 `.ts`
 失效入口后，AutomationsService、Habitat runtime/service、automation update tool 四组相邻回归通过。测试索引 1842，no-unwired gate
 扩至 984 项。
+
+### 大型 owner 抽取：automation heartbeat runtime
+
+新增并真实接回 `automations/heartbeat-runtime.ts`，整块迁出 scheduled/run-now heartbeat owner：renderer eligibility TTL、
+collaboration/hosted mode、thread busy/tail-history probe、account/deletion/activity/connection abort 竞态、resume/permissions、turn start、
+start acknowledgement、completion wait、notification filtering、archive pause/delete 和所有 listener/timer cleanup 均由同一 typed runtime
+持有。没有把 in-flight state 或 waiter 拆成第二 owner。
+
+主 chunk 原 `_ae/vae/yae/Ms/bae/xae/Sae/Cae/wae/Tae/Ns/Ps/Eae/Dae/Oae/Fs` 16 个 owner/helper 及专用
+prompt/TTL aliases 删除，scheduler 只保留调用入口。新 focused suite 44 项覆盖 missing/renderer/mode/busy gates、stale eviction、run-now
+与 scheduled turn、permission selection、notification-before-response、completion cleanup 和 tail-history listener finally；execution policy、
+AutomationsService、Habitat runtime/service、update tool 与 Electron fetch 六组相邻回归通过。测试索引 1843，no-unwired gate 扩至
+1004 项。
