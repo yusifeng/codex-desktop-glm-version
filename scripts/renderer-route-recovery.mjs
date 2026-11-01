@@ -208,7 +208,6 @@ export const STRUCTURAL_COMPONENT_ROOTS = [
 // explicit roots makes clean builds independent of stale app/webview output.
 export const EXACT_ROUTE_DEPENDENCY_ROOTS = [
   "BarChart-2010e7d67e4a.js",
-  "presentation-eeb7ac6fced2.js",
   "invitations-44091c7ba43a.js",
   "three.core-cb39b1271a0d.js",
   "three.module-b65ff644899d.js",
@@ -276,10 +275,6 @@ export const CONVERSATION_ROUTE_ROOTS = [
   "conversation-blocks-3f59e850f9fb.js",
   "agent-activity-item-792873f87aad.js",
   "agent-activity-units-9397783428a4.js",
-  // equation-analysis is now semantic source, but its tokenizer dependency is
-  // still release-derived. Keep that dependency explicit so a clean output
-  // build cannot accidentally rely on a stale app/webview asset.
-  "tokenize-math-block-92dba400da42.js",
   // Pets settings initializes the shared realtime controls chunk for its
   // cross-surface side effects. That dependency remains release-derived.
   "controls-fedbfda05b6b.js",
@@ -336,6 +331,7 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "library-cloud-file-preview-b3ddfaa823c0.js",
   "math-block-utils-ca3c4f5321e8.js",
   "tokenize-math-block-92dba400da42.js",
+  "visualization-standalone-document-45332507e418.js",
   "mcp-tool-approval-message-cfc9b358efc1.js",
   "mcp-tool-item-content-d63cc703d211.js",
   "onboarding-d0bfce15e4cc.js",
@@ -361,6 +357,7 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "workbook-review-utils-3e78f7501b68.js",
   "workspace-agent-detail-query-3cb2bb771d2e.js",
   "presentation-f4eb8ac38003.js",
+  "presentation-eeb7ac6fced2.js",
   "pull-request-fix-workflow-1561e22a0cbc.js",
   "publish-actions-271f912485e5.js",
   "result-card-17125719c243.js",
@@ -432,14 +429,9 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["activity-chart", "activity-chart-816f6e49aa7a.js"],
   ["billing-analytics", "billing-analytics-9a493b3c8aaf.js"],
   ["realtime-voice-controls-surface", "controls-fedbfda05b6b.js"],
-  ["settings-parental-presentation", "presentation-eeb7ac6fced2.js"],
   [
     "use-imported-setup-opportunity",
     "use-imported-setup-opportunity-fe980a908289.js",
-  ],
-  [
-    "visualization-standalone-document",
-    "visualization-standalone-document-45332507e418.js",
   ],
   ["artifact-source-bootstrap", "artifact-source-bootstrap-583ed8de587e.js"],
   ["text-underline-icon", "TextUnderlineIcon-6110dcc4e55d.js"],

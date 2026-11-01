@@ -15968,3 +15968,35 @@ declare module "@rchunk/app-primary" {
 }
 declare module "@rchunk/color-channel-runtime-modern" { export const at: (source: string) => unknown; export const ot: { lang: { round(value: number): number } }; }
 declare module "@rchunk/color-channel-runtime-legacy" { export const ft: (source: string) => unknown; export const ht: () => void; export const mt: { lang: { round(value: number): number } }; export const pt: () => void; }
+declare module "@rchunk/app-initial" {
+  /** Current parental-controls access state signal. */
+  export const bL: unknown;
+  /** Initializes parental-control query definitions. */
+  export const fpn: () => void;
+  /** Initializes family notification state. */
+  export const gdn: () => void;
+  /** Returns the locale used by the parental settings layout endpoint. */
+  export const hdn: () => string;
+  /** Request header carrying the parental settings locale. */
+  export const mdn: string;
+  /** Initializes the active-account provider used by parental controls. */
+  export const xL: () => void;
+  /** Default standalone visualization surface background. */
+  export const Cnt: string;
+  /** Trusted visualization CSP domain policy. */
+  export const Dnt: { resourceDomains: string[] };
+  /** Initializes the visualization document renderer. */
+  export const Ent: () => void;
+  /** Renders a model-authored visualization fragment into a complete document body. */
+  export const Ont: (
+    fragment: string,
+    options: {
+      lockDocumentOverflow: boolean;
+      reportToHost: boolean;
+      styles: string;
+      treatment: boolean;
+    },
+  ) => string;
+  /** Initializes visualization security and bootstrap constants. */
+  export const knt: () => void;
+}
