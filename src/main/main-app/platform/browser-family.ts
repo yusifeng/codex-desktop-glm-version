@@ -18,6 +18,7 @@ import {
   Ul as marketplaceNameForFlavor,
   Al as devChromeHostPath,
   on as listDirectory,
+  Uf as RpcTarget,
 } from "@chunk/shared";
 import { in as BuildFlavor } from "@chunk/bootstrap";
 import {
@@ -96,10 +97,11 @@ async function getCompatibleExtensionIds(flavor: string): Promise<string[] | und
 }
 
 /** 浏览器族服务（原 `MO`）。 */
-class BrowserFamilyService {
+class BrowserFamilyService extends RpcTarget {
   getCompatibleExtensionIds: (flavor: string) => Promise<string[] | undefined>;
 
   constructor({ getCompatibleExtensionIds: resolver = getCompatibleExtensionIds } = {}) {
+    super();
     this.getCompatibleExtensionIds = resolver;
   }
 

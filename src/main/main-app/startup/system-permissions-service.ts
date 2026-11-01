@@ -1,3 +1,5 @@
+import { Uf as RpcTarget } from "@chunk/shared";
+
 type Logger = {
   error(message: string, context: unknown): void;
 };
@@ -31,10 +33,11 @@ const WINDOWS_NOTIFICATION_SETTINGS = "ms-settings:notifications";
 const WINDOWS_MICROPHONE_SETTINGS = "ms-settings:privacy-microphone";
 
 /** Provides the renderer-facing OS permission status, request, and settings operations. */
-export class SystemPermissionsService {
+export class SystemPermissionsService extends RpcTarget {
   private readonly dependencies: SystemPermissionsServiceDependencies;
 
   constructor(dependencies: SystemPermissionsServiceDependencies) {
+    super();
     this.dependencies = dependencies;
   }
 

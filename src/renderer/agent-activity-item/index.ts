@@ -34,10 +34,10 @@ import {
 } from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
 import { d as appPrimaryInit } from "@rchunk/app-primary";
-import { default as presentationChunk } from "@rchunk/presentation";
-import { default as resultCard } from "@rchunk/result-card";
-import { default as skillExplorationLabels } from "@rchunk/skill-exploration-labels";
-import { default as toolActivityDisclosure } from "@rchunk/tool-activity-disclosure";
+import * as presentationChunk from "@rchunk/presentation";
+import * as resultCard from "@rchunk/result-card";
+import * as skillExplorationLabels from "@rchunk/skill-exploration-labels";
+import * as toolActivityDisclosure from "@rchunk/tool-activity-disclosure";
 
 void runtimeLazy; void appInitialInit; void appPrimaryInit;
 void presentationChunk; void resultCard; void skillExplorationLabels; void toolActivityDisclosure;

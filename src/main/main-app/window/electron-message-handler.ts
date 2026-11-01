@@ -1,3 +1,6 @@
+import { randomUUID } from "node:crypto";
+import pathApi from "node:path";
+
 interface ElectronMessageHandlerDependencies {
   shared: any;
   bootstrap: any;
@@ -253,7 +256,7 @@ class ElectronMessageHandler {
         browserSessionRegistry: this.browserSessionRegistry,
         clearInterval: (e) => clearInterval(e),
         combineCpuSnapshots: combinePerformanceSpanSnapshots,
-        createId: () => (0, _.randomUUID)(),
+        createId: () => randomUUID(),
         desktopSentry: this.desktopSentry,
         electronSampler: w,
         getAllWindows: () => l.BrowserWindow.getAllWindows(),
@@ -1407,7 +1410,7 @@ class ElectronMessageHandler {
         throw Error(`"${t.type}" is not implemented in Electron.`);
       case `open-config-toml`: {
         let e = n.Oi({ preferWsl: this.shouldUseWslPaths() }),
-          t = h.join(e, `config.toml`);
+          t = pathApi.join(e, `config.toml`);
         await (0, b.mkdir)(e, { recursive: !0 });
         try {
           await (0, b.writeFile)(t, ``, { flag: `wx`, mode: 384 });
@@ -1664,7 +1667,7 @@ class ElectronMessageHandler {
     }
   }
   sanitizeDefaultProjectName(e) {
-    let t = Array.from(String(h.basename(e)).trim(), (e: string) =>
+    let t = Array.from(String(pathApi.basename(e)).trim(), (e: string) =>
       e.charCodeAt(0) < 32 || `<>:"/\\|?*`.includes(e) ? `_` : e,
     )
       .join(``)
@@ -1677,7 +1680,7 @@ class ElectronMessageHandler {
   }
   async findAvailableDefaultWorkspaceRoot(e, t, n) {
     let r = n == null ? t : `${t} ${n}`,
-      i = h.join(e, r);
+      i = pathApi.join(e, r);
     if (!(await this.folderExists(i))) return i;
     let a = n == null ? 2 : n + 1;
     return this.findAvailableDefaultWorkspaceRoot(e, t, a);
@@ -1687,7 +1690,7 @@ class ElectronMessageHandler {
       throw Error(`Creating a default workspace is only supported for local hosts`);
     let r = this.sanitizeDefaultProjectName(e),
       i = await this.findAvailableDefaultWorkspaceRoot(
-        h.join(l.app.getPath(`documents`), `ChatGPT`),
+        pathApi.join(l.app.getPath(`documents`), `ChatGPT`),
         r,
         void 0,
       );

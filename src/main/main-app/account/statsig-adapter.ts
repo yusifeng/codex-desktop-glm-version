@@ -26,6 +26,7 @@ import {
   yf as jsonSchema,
 } from "../../shared/zod-facade";
 import { composeDefaultEnableFeatures } from "../../shared/app-config";
+import { Uf as EventEmitterBase } from "@chunk/shared";
 import { mapValuesModule } from "../../shared/hosts-runtime";
 import {
   DisposableBag as disposableBag,
@@ -33,7 +34,6 @@ import {
   stateDatabasePath,
 } from "../../shared/sql-git-registry";
 
-class EventEmitterBase {}
 type StatsigClientLike = {
   dataAdapter: { setData(data: string): void };
   initializeSync(options?: unknown): { success: boolean };

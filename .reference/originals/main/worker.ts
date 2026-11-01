@@ -528,6 +528,8 @@ const gitWorktreeListDeps = {
   queryKey: (...args) => Q(...args),
   runGit: (...args) => $(...args),
 };
+const $2 = (repository, signal) =>
+  listGitWorktrees(repository, signal, gitWorktreeListDeps);
 const gitMergeBaseDeps = {
   getConfigQueryMeta: () => y1,
   getQueryMeta: () => x1,
@@ -564,6 +566,9 @@ const handoffRollbackDeps = {
 };
 const restoreHandoffState = (params) => restoreHandoffBranchAndStash(params, handoffRollbackDeps);
 const restoreSourceHandoffState = (params) => restoreHandoffSource(params, handoffRollbackDeps);
+function e2(repository, signal) {
+  return getSafeAttributeFilterOverrides(repository, signal, gitSafeAttributeFilterDeps);
+}
 const handoffDestinationDeps = {
   getStatusConfig: e2,
   getHeadCommit: (repository, signal) =>
@@ -68781,7 +68786,7 @@ var I6 = kW(`git`),
     gitCommitMessageDiffDeps, gitIndexInfoDeps, gitRepositoryIdentityDeps,
     gitReviewBranchStatsDeps, gitReviewCommitQueryDeps, gitReviewDiffDeps,
     gitReviewPatchDeps, gitReviewSectionChangesDeps, gitSubmodulePathsDeps,
-    gitWorktreeListDeps, g_e, H6, hostHandoffDeps, I6,
+    gitWorktreeListDeps, g_e, hostHandoffDeps, I6,
     isGitMutationMethod, isGitRequestFailure, isGitRequestTracked, J2, jH,
     KX, L1, L6, listCodexWorktrees, listGitWorktrees, M4,
     managedWorktreeDiscoveryDeps, m4, M_e, moveToLocalDeps,

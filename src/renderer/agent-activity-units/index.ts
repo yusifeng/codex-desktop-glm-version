@@ -32,9 +32,9 @@ import {
 import { C as appInitialInit } from "@rchunk/app-initial";
 import * as agentActivityItem from "@rchunk/agent-activity-item";
 import * as assertNever from "@rchunk/assert-never";
-import { default as patchDiffStats } from "@rchunk/patch-diff-stats";
-import { default as presentationChunk } from "@rchunk/presentation";
-import { default as skillExplorationLabels } from "@rchunk/skill-exploration-labels";
+import * as patchDiffStats from "@rchunk/patch-diff-stats";
+import * as presentationChunk from "@rchunk/presentation";
+import * as skillExplorationLabels from "@rchunk/skill-exploration-labels";
 
 void runtimeLazy; void appInitialInit; void agentActivityItem;
 void assertNever; void patchDiffStats; void presentationChunk; void skillExplorationLabels;

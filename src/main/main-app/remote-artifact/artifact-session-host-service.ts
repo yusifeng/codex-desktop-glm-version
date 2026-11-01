@@ -1,3 +1,5 @@
+import { Uf as RpcTarget } from "@chunk/shared";
+
 type AnyRecord = Record<string, any>;
 
 type ConnectionInfo = unknown;
@@ -74,7 +76,7 @@ const PING_METHOD = "host.ping";
 const NATIVE_SNAPSHOT_CAPABILITY = "native-snapshot-v1";
 
 /** Owns the Artifact Session host connection and composes all host-backed child lifecycles. */
-export class ArtifactSessionHostService {
+export class ArtifactSessionHostService extends RpcTarget {
   private readonly dependencies: ArtifactSessionHostServiceDependencies;
   private readonly externalDocuments: ExternalDocumentRegistry;
   private readonly nativeFiles: NativeFileService;
@@ -88,6 +90,7 @@ export class ArtifactSessionHostService {
   private unsubscribeConnectionInfo?: () => void;
 
   constructor(dependencies: ArtifactSessionHostServiceDependencies) {
+    super();
     this.dependencies = dependencies;
     this.externalDocuments = dependencies.createExternalDocuments((kind) =>
       this.connectExternalDocumentHost(kind),

@@ -1,3 +1,5 @@
+import { Uf as RpcTarget } from "@chunk/shared";
+
 type RendererPhase = "renderer_ready" | "first_content_visible" | "background_ready";
 
 type Origin = {
@@ -29,7 +31,7 @@ export type StartupRendererCoordinatorDependencies = {
 };
 
 /** Coordinates renderer startup phases with host readiness and primary-window ownership. */
-export class StartupRendererCoordinator {
+export class StartupRendererCoordinator extends RpcTarget {
   private readonly dependencies: StartupRendererCoordinatorDependencies;
   private readonly bufferedPhases: RendererPhase[] = [];
   private unsubscribeFromStartupPhases: (() => void) | undefined;
@@ -38,6 +40,7 @@ export class StartupRendererCoordinator {
   private isDisposed = false;
 
   constructor(dependencies: StartupRendererCoordinatorDependencies) {
+    super();
     this.dependencies = dependencies;
     this.isStartupReady = dependencies.startupReady == null;
     dependencies.startupReady?.then(() => {

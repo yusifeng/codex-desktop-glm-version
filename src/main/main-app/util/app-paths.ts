@@ -185,7 +185,11 @@ function isPathInside(path: string, parent: string): boolean {
 }
 
 /** WSL 路径重定位（原 `pH`）：/a/、/b/ 前缀剥除 + 尾段回退匹配。 */
-function relocateToWsl(path: string, wslRoot: string | null, pathModule = { normalize, sep, join, basename } as typeof import("node:path")): string {
+function relocateToWsl(
+  path: string,
+  wslRoot: string | null,
+  pathModule = { normalize, sep, join, basename, isAbsolute } as typeof import("node:path"),
+): string {
   const stripped = path.replace(/^([ab])[\\/]/, "");
   const normalized = pathModule.normalize(pathModule.sep === "\\" ? (stripCygdrivePrefix as (path: string) => string)(stripped) : stripped);
   if ((isPathlike as (path: string, pathModule?: unknown) => boolean)(normalized, pathModule) || !wslRoot) return normalized;

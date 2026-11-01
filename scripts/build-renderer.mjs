@@ -97,6 +97,81 @@ for (const name of REWRITTEN) {
   }
 }
 
+// Recovered semantic chunks often keep a dependency only for its initialization
+// side effects.  Some of those imports were reconstructed as default imports even
+// though the release chunk exposes named exports only, which makes the browser
+// reject the whole module graph before any code can run.  Normalize only imports
+// whose target demonstrably has no default export; namespace imports preserve the
+// module evaluation and remain usable by the few owners that inspect the module.
+const assetsDir = path.join(ROOT, "app/webview/assets");
+// These route-critical chunks still contain structural ViewNode placeholders in
+// the readable reconstruction.  Keep the shipped implementations active until
+// their React component trees have been fully recovered; otherwise a successful
+// turn/start navigates into a page that returns `{ kind, props }` to React.
+const preserveOriginalChunkRoots = [
+  "local-conversation-page-bcc7eca0b3ab.js",
+  "local-conversation-thread-c6e40fdd6d59.js",
+  "local-conversation-turn-14bf296d5217.js",
+  "conversation-blocks-3f59e850f9fb.js",
+  "agent-activity-item-792873f87aad.js",
+  "agent-activity-units-9397783428a4.js",
+  "user-message-e36f9e2dfe24.js",
+];
+// The route chunks are compiled as one release graph: their small helper chunks
+// share minified export aliases with the release copies of their callers. Mixing
+// reconstructed helpers into that graph can leave syntactically valid imports
+// whose values are semantically wrong (for example React becoming a plain
+// namespace without createContext). Preserve the complete non-core dependency
+// closure so the route runs with the exact module contracts it was built against.
+const originalAssetsDir = path.join(ROOT, ".reference/app-original/webview/assets");
+const reconstructedCoreChunks = new Set([
+  "app-initial-51da50e6c6e3.js",
+  "app-primary-d66705000d76.js",
+  "app-shared-7b9edc1bfb7f.js",
+  "rolldown-runtime-2d059c5e81f4.js",
+]);
+const preserveOriginalChunks = new Set();
+const pendingOriginalChunks = [...preserveOriginalChunkRoots];
+while (pendingOriginalChunks.length > 0) {
+  const name = pendingOriginalChunks.pop();
+  if (preserveOriginalChunks.has(name) || reconstructedCoreChunks.has(name)) continue;
+  let code;
+  try {
+    code = await fs.readFile(path.join(originalAssetsDir, name), "utf8");
+  } catch {
+    continue;
+  }
+  preserveOriginalChunks.add(name);
+  for (const match of code.matchAll(/(?:from\s*|import\s*)(?:\(\s*)?["']\.\/([^"']+\.js)["']/g)) {
+    pendingOriginalChunks.push(match[1]);
+  }
+}
+for (const name of preserveOriginalChunks) {
+  await fs.copyFile(
+    path.join(originalAssetsDir, name),
+    path.join(assetsDir, name),
+  );
+}
+console.log(`preserved ${preserveOriginalChunks.size} original conversation-route chunks`);
+const assetNames = (await fs.readdir(assetsDir)).filter((name) => name.endsWith(".js"));
+const assetSources = new Map(
+  await Promise.all(assetNames.map(async (name) => [name, await fs.readFile(path.join(assetsDir, name), "utf8")])),
+);
+const hasDefaultExport = (code) =>
+  /export\s+default\b|export\s*\{[^}]*\bas\s+default\b/.test(code);
+for (const [name, originalCode] of assetSources) {
+  let code = originalCode.replace(
+    /import\s+\{\s*default\s+as\s+([A-Za-z_$][\w$]*)\s*\}\s+from\s+(["'])\.\/([^"']+\.js)\2;/g,
+    (statement, binding, quote, target) => {
+      const targetCode = assetSources.get(target);
+      return targetCode != null && !hasDefaultExport(targetCode)
+        ? `import * as ${binding} from ${quote}./${target}${quote};`
+        : statement;
+    },
+  );
+  if (code !== originalCode) await fs.writeFile(path.join(assetsDir, name), code);
+}
+
 // ---- CSS：src/renderer/<语义名>/index.css → assets/<chunk 基名>.css ----
 for (const name of REWRITTEN) {
   const cssEntry = path.join(ROOT, "src/renderer", name, "index.css");

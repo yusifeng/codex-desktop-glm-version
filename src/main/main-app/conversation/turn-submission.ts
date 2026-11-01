@@ -515,11 +515,18 @@ export async function runConversationCreationWithFirstTurn(
                     localTurnMetadata,
                     beforeSendRequest: hasBeforeStartHooks
                       ? async () => {
-                          worktreeInit != null && appendWorktreeInitItem(manager, conversationId, worktreeInit, facade.history);
-                          beforeFirstTurn != null &&
-                            gitInfoPromise != null &&
-                            (firstTurnContext.gitInfo = firstTurnContext.gitInfo ?? (await gitInfoPromise));
-                          await (beforeFirstTurnHandle ?? beforeFirstTurn)?.(firstTurnContext);
+                          try {
+                            worktreeInit != null && appendWorktreeInitItem(manager, conversationId, worktreeInit, facade.history);
+                            beforeFirstTurn != null &&
+                              gitInfoPromise != null &&
+                              (firstTurnContext.gitInfo = firstTurnContext.gitInfo ?? (await gitInfoPromise));
+                            await (beforeFirstTurnHandle ?? beforeFirstTurn)?.(firstTurnContext);
+                          } catch (error) {
+                            manager.logger.warning(`First-turn preparation failed; continuing without optional workspace metadata`, {
+                              safe: { conversationId },
+                              sensitive: { error },
+                            });
+                          }
                         }
                       : undefined,
                   },

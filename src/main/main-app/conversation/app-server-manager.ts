@@ -454,7 +454,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
       logger: this.logger,
       hostId: this.hostId,
       host: {
-        threadMode: this.runtime.threadMode(this.hostId),
+        threadMode: (hostKind: string) => this.runtime.threadMode(hostKind),
         readThreadListOriginators: () => settings.history.readThreadListOriginators?.(),
         threadRecognition: this.threadRecognition,
         workspace: this.projectlessConversations as never,

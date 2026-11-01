@@ -24,6 +24,7 @@ import {
   Vi as toWslPath,
   Ji as toWslPathAlt,
   Mi as wslDistroAlt,
+  Uf as RpcTarget,
 } from "@chunk/shared";
 import { createTaggedLogger, type Logger } from "@chunk/logger";
 import { ut as conversationalOnboardingResultSchema, lt as CONVERSATIONAL_ONBOARDING_COMPLETIONS_KEY } from "@chunk/bootstrap";
@@ -114,7 +115,7 @@ interface GlobalStateLike {
 }
 
 /** 会话式引导服务（原 `kN`）。 */
-class ConversationalOnboardingService {
+class ConversationalOnboardingService extends RpcTarget {
   appServerConnection: AppServerConnectionLike;
   globalState: GlobalStateLike;
   requestComputerUseWorker: ((request: { method: string; params: unknown }) => Promise<unknown>) | null;
@@ -130,6 +131,7 @@ class ConversationalOnboardingService {
     requestComputerUseWorker: ConversationalOnboardingService["requestComputerUseWorker"],
     onTaskCompletionChanged: ConversationalOnboardingService["onTaskCompletionChanged"],
   ) {
+    super();
     this.appServerConnection = appServerConnection;
     this.globalState = globalState;
     this.requestComputerUseWorker = requestComputerUseWorker;
