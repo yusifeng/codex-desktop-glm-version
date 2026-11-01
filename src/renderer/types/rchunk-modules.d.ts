@@ -1198,6 +1198,8 @@ declare module "@rchunk/app-shared" {
     parameter: Param,
   ) => void;
   export const IQ: unknown;
+  /** Convert a filesystem path to its user-facing display form. */
+  export const II: (path: string) => string;
   export const JQ: unknown;
   export const K2: () => void;
   /** initializeDialogComponents（Wallet enrollment 对话框依赖）。 */
@@ -2901,6 +2903,7 @@ declare module "@rchunk/thumbnail-worker-pdf-runtime" {
 }
 
 declare module "@rchunk/app-initial" {
+  export const Fcn: () => void;
   export const R5t: () => void;
   export const Wpn: (text: string, offset: number) => { end: number; path: string } | null;
   export const _9t: () => void;
@@ -2971,6 +2974,7 @@ declare module "@rchunk/app-initial" {
   export const Put: (input: Record<string, unknown>) => Array<Record<string, unknown>>;
   export const T9t: (input: Record<string, unknown>) => Array<Record<string, unknown>>;
   export const V9t: () => void;
+  export const v9t: (skill: Record<string, unknown>) => boolean;
   export const bQt: unknown;
   export const ein: () => void;
   export const i$t: unknown;
@@ -3678,6 +3682,7 @@ declare module "@rchunk/app-initial" {
     account_user_id?: string | null;
     account_user_role?: string | null;
     id: string;
+    name?: string | null;
     plan_type?: string | null;
     structure: "personal" | "workspace" | string;
   }
@@ -10411,8 +10416,11 @@ declare module "@rchunk/skill-exploration-labels" {
   export const o: (content?: Array<{ type?: string; text?: string }>) => "explicit" | "soft" | "none";
   export const r: (input: { summary: Record<string, unknown> }) => boolean;
   export const s: () => void;
-  export const t: (input: { summary: Record<string, unknown> }) => Record<string, unknown> | null;
-  export const u: { activeCreating: string; activeUpdating: string };
+  export const t: (input: { cwd?: string; summary: Record<string, unknown> }) => Record<string, unknown> | null;
+  export const u: {
+    activeCreating: import("@rchunk/app-shared").MessageDescriptor;
+    activeUpdating: import("@rchunk/app-shared").MessageDescriptor;
+  };
   const _default: unknown;
   export default _default;
 }

@@ -1,4 +1,4 @@
-import "@rchunk/rolldown-runtime";
+import { n as onceExport } from "@rchunk/rolldown-runtime";
 import { l3 as initializeDeepEqual } from "@rchunk/app-shared";
 import {
   A_ as isEstimatedTurnEntry,
@@ -25,11 +25,18 @@ import {
 
 interface ConversationTurn {
   finalAssistantStartedAtMs?: number;
-  items: Array<{ id?: string; src?: string | null; text?: string; type: string }>;
+  items: Array<{
+    id?: string;
+    src?: string | null;
+    text?: string;
+    type: string;
+  }>;
   params: { input: unknown[] };
   status?: string;
   turnStartedAtMs?: number;
 }
+
+const once = onceExport as (initializer: () => void) => () => void;
 
 interface VisibleTurnEntry extends Record<string, unknown> {
   historyEntityKey?: string;
@@ -48,7 +55,11 @@ interface RenderedTurnEntry extends Record<string, unknown> {
   isAeonThread?: boolean;
   preserveServerUserMessages?: boolean;
   threadHandoffOperation?: { id: string };
-  transcriptBlock?: { key: string; type: string; [key: string]: unknown } | null;
+  transcriptBlock?: {
+    key: string;
+    type: string;
+    [key: string]: unknown;
+  } | null;
   turn?: ConversationTurn;
   turnId?: string;
   turnKey: string;
@@ -94,9 +105,12 @@ function isRenderedTurnEntry(entry: RenderedTurnEntry): boolean {
     !isEstimatedTurnEntry(entry) &&
     !(
       "type" in entry &&
-      ["child-elicitation", "voice-nux", "voice-presentation", "voice-transcript"].includes(
-        String(entry.type),
-      )
+      [
+        "child-elicitation",
+        "voice-nux",
+        "voice-presentation",
+        "voice-transcript",
+      ].includes(String(entry.type))
     )
   );
 }
@@ -117,59 +131,80 @@ function collectGeneratedImages({
   visibleTurnEntries: VisibleTurnEntry[];
 }): unknown[] {
   const previous = previousEntries[0]?.generatedImages;
-  const images = visibleTurnEntries.flatMap(({ preserveServerUserMessages, requests, turn }) => {
-    if (
-      turn == null ||
-      !turn.items.some((item) => item.type === "imageGeneration" && item.src != null)
-    ) {
-      return [];
-    }
-    const projected = (projectConversationTurn as unknown as (
-      turn: Record<string, unknown>,
-      requests: unknown,
-      options: Record<string, unknown>,
-    ) => { items: unknown[]; status: unknown })(
-      turn as unknown as Record<string, unknown>,
-      requests,
-      {
+  const images = visibleTurnEntries.flatMap(
+    ({ preserveServerUserMessages, requests, turn }) => {
+      if (
+        turn == null ||
+        !turn.items.some(
+          (item) => item.type === "imageGeneration" && item.src != null,
+        )
+      ) {
+        return [];
+      }
+      const projected = (
+        projectConversationTurn as unknown as (
+          turn: Record<string, unknown>,
+          requests: unknown,
+          options: Record<string, unknown>,
+        ) => { items: unknown[]; status: unknown }
+      )(turn as unknown as Record<string, unknown>, requests, {
         includeAeonProjection: isAeonThread || preserveServerUserMessages,
         isBackgroundSubagentsEnabled,
         requestUserInputAsyncUiEnabled,
         preserveServerUserMessages,
-      },
-    );
-    const groups = splitProjectedItems(projected.items, projected.status, "all") as {
-      assistantItem?: { content?: unknown };
-      toolOutputItems: Array<{ src?: string | null }>;
-    };
-    const resourcePaths = resolveArtifactResourcePaths(
-      parseArtifacts({
-        assistantContent: groups.assistantItem?.content ?? null,
-        projectlessOutputDirectory,
-        turn: projected,
-      }),
-    );
-    return (
-      (buildGeneratedImageGroup({
-        completedImages: groups.toolOutputItems.filter(({ src }) => src != null),
-        endResourcePaths: resourcePaths,
-        pendingPlaceholderCount: 0,
-      }) as { images?: unknown[] } | null)?.images ?? []
-    );
-  });
-  return deepEqual(previous, images) ? previous ?? [] : images;
+      });
+      const groups = splitProjectedItems(
+        projected.items,
+        projected.status,
+        "all",
+      ) as {
+        assistantItem?: { content?: unknown };
+        toolOutputItems: Array<{ src?: string | null }>;
+      };
+      const resourcePaths = resolveArtifactResourcePaths(
+        parseArtifacts({
+          assistantContent: groups.assistantItem?.content ?? null,
+          projectlessOutputDirectory,
+          turn: projected,
+        }),
+      );
+      return (
+        (
+          buildGeneratedImageGroup({
+            completedImages: groups.toolOutputItems.filter(
+              ({ src }) => src != null,
+            ),
+            endResourcePaths: resourcePaths,
+            pendingPlaceholderCount: 0,
+          }) as { images?: unknown[] } | null
+        )?.images ?? []
+      );
+    },
+  );
+  return deepEqual(previous, images) ? (previous ?? []) : images;
 }
 
 function deepEqual(left: unknown, right: unknown): boolean {
   if (Object.is(left, right)) return true;
   if (Array.isArray(left) && Array.isArray(right)) {
-    return left.length === right.length && left.every((value, index) => deepEqual(value, right[index]));
+    return (
+      left.length === right.length &&
+      left.every((value, index) => deepEqual(value, right[index]))
+    );
   }
-  if (typeof left === "object" && left != null && typeof right === "object" && right != null) {
+  if (
+    typeof left === "object" &&
+    left != null &&
+    typeof right === "object" &&
+    right != null
+  ) {
     const leftRecord = left as Record<string, unknown>;
     const rightRecord = right as Record<string, unknown>;
     const keys = Object.keys(leftRecord);
-    return keys.length === Object.keys(rightRecord).length && keys.every((key) => deepEqual(leftRecord[key], rightRecord[key]));
+    return (
+      keys.length === Object.keys(rightRecord).length &&
+      keys.every((key) => deepEqual(leftRecord[key], rightRecord[key]))
+    );
   }
   return false;
 }
@@ -180,17 +215,29 @@ function areTranscriptBlocksEqual(
 ): boolean {
   if (previous == null || next == null) return previous === next;
   if (previous.type !== next.type || previous.key !== next.key) return false;
-  if (previous.type !== "assistant-message" || next.type !== "assistant-message") return true;
+  if (
+    previous.type !== "assistant-message" ||
+    next.type !== "assistant-message"
+  )
+    return true;
   if (!deepEqual(previous.item, next.item)) return false;
-  const previousActivities = (previous.attachedActivityItems as Array<{ key: string }> | undefined) ?? [];
-  const nextActivities = (next.attachedActivityItems as Array<{ key: string }> | undefined) ?? [];
+  const previousActivities =
+    (previous.attachedActivityItems as Array<{ key: string }> | undefined) ??
+    [];
+  const nextActivities =
+    (next.attachedActivityItems as Array<{ key: string }> | undefined) ?? [];
   return (
     previousActivities.length === nextActivities.length &&
-    previousActivities.every(({ key }, index) => key === nextActivities[index]?.key)
+    previousActivities.every(
+      ({ key }, index) => key === nextActivities[index]?.key,
+    )
   );
 }
 
-function canReuseTurnEntry(previous: RenderedTurnEntry, next: RenderedTurnEntry): boolean {
+function canReuseTurnEntry(
+  previous: RenderedTurnEntry,
+  next: RenderedTurnEntry,
+): boolean {
   const comparedKeys = [
     "gapBeforePx",
     "minHeightPx",
@@ -235,7 +282,13 @@ function canReuseTurnEntry(previous: RenderedTurnEntry, next: RenderedTurnEntry)
   ];
   if (comparedKeys.some((key) => previous[key] !== next[key])) return false;
   if (!deepEqual(previous.replyChain, next.replyChain)) return false;
-  if (!deepEqual(previous.supersededMcpAppWidgetCallIds, next.supersededMcpAppWidgetCallIds)) return false;
+  if (
+    !deepEqual(
+      previous.supersededMcpAppWidgetCallIds,
+      next.supersededMcpAppWidgetCallIds,
+    )
+  )
+    return false;
   if (previous.turn?.status !== next.turn?.status) return false;
   if (previous.turn !== next.turn) {
     const stableItems =
@@ -243,19 +296,21 @@ function canReuseTurnEntry(previous: RenderedTurnEntry, next: RenderedTurnEntry)
       previous.turnState == null &&
       next.turnState == null &&
       previous.turn?.items.length === next.turn?.items.length &&
-      previous.turn?.items.every((item, index) => item.id === next.turn?.items[index]?.id);
+      previous.turn?.items.every(
+        (item, index) => item.id === next.turn?.items[index]?.id,
+      );
     if (!stableItems) return false;
   }
   return (
-    (previous.turnState as { transcriptItems?: unknown } | undefined)?.transcriptItems ===
-      (next.turnState as { transcriptItems?: unknown } | undefined)?.transcriptItems &&
+    (previous.turnState as { transcriptItems?: unknown } | undefined)
+      ?.transcriptItems ===
+      (next.turnState as { transcriptItems?: unknown } | undefined)
+        ?.transcriptItems &&
     areTranscriptBlocksEqual(previous.transcriptBlock, next.transcriptBlock)
   );
 }
 
-function buildLocalConversationTurnEntries(
-  options: BuildTurnEntriesOptions,
-): {
+function buildLocalConversationTurnEntries(options: BuildTurnEntriesOptions): {
   entries: RenderedTurnEntry[];
   initialAeonMessageSentAtMs: null;
   latestRenderedTurnKey: string | null;
@@ -265,15 +320,21 @@ function buildLocalConversationTurnEntries(
   if (options.compactAeonAssistantMessageRevealState != null) {
     options.compactAeonAssistantMessageRevealState.hasSeededInitialSnapshot = false;
   }
-  const previousByKey = new Map(options.previousEntries.map((entry) => [entry.turnKey, entry]));
+  const previousByKey = new Map(
+    options.previousEntries.map((entry) => [entry.turnKey, entry]),
+  );
   const previousVisible = options.previousEntries.filter(isRenderedTurnEntry);
   const handoffTurnKey =
     options.threadHandoffOperation == null
       ? null
-      : previousVisible.find(
-          (entry) => entry.threadHandoffOperation?.id === options.threadHandoffOperation?.id,
-        )?.turnKey ?? null;
-  const visibleEntries = options.renderEntries.filter((entry) => !isEstimatedTurnEntry(entry));
+      : (previousVisible.find(
+          (entry) =>
+            entry.threadHandoffOperation?.id ===
+            options.threadHandoffOperation?.id,
+        )?.turnKey ?? null);
+  const visibleEntries = options.renderEntries.filter(
+    (entry) => !isEstimatedTurnEntry(entry),
+  );
   const generatedImages = collectGeneratedImages({
     isAeonThread: options.isAeonThread,
     isBackgroundSubagentsEnabled: options.isBackgroundSubagentsEnabled,
@@ -292,8 +353,8 @@ function buildLocalConversationTurnEntries(
       const previous = previousByKey.get(entry.turnKey);
       entries.push(
         previous != null &&
-        isEstimatedTurnEntry(previous) &&
-        previous.estimatedHeightPx === entry.estimatedHeightPx
+          isEstimatedTurnEntry(previous) &&
+          previous.estimatedHeightPx === entry.estimatedHeightPx
           ? previous
           : entry,
       );
@@ -338,7 +399,8 @@ function buildLocalConversationTurnEntries(
       resolvedApps: options.resolvedApps,
       showFullTranscript: options.showFullTranscript,
       showInProgressFixedContent:
-        options.showInProgressFixedContent && visibleIndex === visibleEntries.length - 1,
+        options.showInProgressFixedContent &&
+        visibleIndex === visibleEntries.length - 1,
       supersededMcpAppWidgetCallIds: options.supersededMcpAppWidgetCallIds,
       turnId: entry.turnId,
       turnKey,
@@ -355,17 +417,30 @@ function buildLocalConversationTurnEntries(
 
   const timestampSeparators = attachTimestampSeparators(
     entries.map((entry) => {
-      if (!isRenderedTurnEntry(entry) || entry.isAeonThread || entry.preserveServerUserMessages || entry.turn == null) return null;
+      if (
+        !isRenderedTurnEntry(entry) ||
+        entry.isAeonThread ||
+        entry.preserveServerUserMessages ||
+        entry.turn == null
+      )
+        return null;
       const timestamps: Array<{ role: string; sentAtMs?: number }> = [];
-      if (entry.turn.params.input.length > 0) timestamps.push({ role: "user", sentAtMs: entry.turn.turnStartedAtMs });
+      if (entry.turn.params.input.length > 0)
+        timestamps.push({ role: "user", sentAtMs: entry.turn.turnStartedAtMs });
       if (entry.turn.items.some(({ type }) => type === "agentMessage")) {
-        timestamps.push({ role: "assistant", sentAtMs: entry.turn.finalAssistantStartedAtMs });
+        timestamps.push({
+          role: "assistant",
+          sentAtMs: entry.turn.finalAssistantStartedAtMs,
+        });
       }
       return timestamps;
     }),
   ) as Array<number | null>;
   const handoffTarget =
-    handoffTurnKey != null && entries.some((entry) => isRenderedTurnEntry(entry) && entry.turnKey === handoffTurnKey)
+    handoffTurnKey != null &&
+    entries.some(
+      (entry) => isRenderedTurnEntry(entry) && entry.turnKey === handoffTurnKey,
+    )
       ? handoffTurnKey
       : latestRenderedTurnKey;
   let previousReplyChainId: unknown;
@@ -374,8 +449,12 @@ function buildLocalConversationTurnEntries(
     const numberedTurn = turnNumberByIndex.get(index);
     if (numberedTurn == null) continue;
     const replyChain = entry.replyChain as { id?: unknown } | undefined;
-    const showReplyQuote = replyChain != null && replyChain.id !== previousReplyChainId;
-    if (entry.transcriptBlock?.type === "user-message" || entry.transcriptBlock?.type === "assistant-message") {
+    const showReplyQuote =
+      replyChain != null && replyChain.id !== previousReplyChainId;
+    if (
+      entry.transcriptBlock?.type === "user-message" ||
+      entry.transcriptBlock?.type === "assistant-message"
+    ) {
       previousReplyChainId = replyChain?.id;
     }
     const next: RenderedTurnEntry = {
@@ -390,14 +469,19 @@ function buildLocalConversationTurnEntries(
       showInProgressFixedContent:
         options.showInProgressFixedContent && numberedTurn === turnNumber,
       threadHandoffOperation:
-        entry.turnKey === handoffTarget ? options.threadHandoffOperation ?? undefined : undefined,
+        entry.turnKey === handoffTarget
+          ? (options.threadHandoffOperation ?? undefined)
+          : undefined,
       totalTurnCount: turnNumber,
       turnNumber: numberedTurn,
     };
     const previous = previousByKey.get(entry.turnKey);
-    entries[index] = previous != null && isRenderedTurnEntry(previous) && canReuseTurnEntry(previous, next)
-      ? previous
-      : next;
+    entries[index] =
+      previous != null &&
+      isRenderedTurnEntry(previous) &&
+      canReuseTurnEntry(previous, next)
+        ? previous
+        : next;
   }
   const stableEntries =
     options.previousEntries.length === entries.length &&
@@ -412,7 +496,7 @@ function buildLocalConversationTurnEntries(
   };
 }
 
-function initializeLocalConversationThreadTurnEntries(): void {
+const initializeLocalConversationThreadTurnEntries = once((): void => {
   initializeTurnEntryRuntime();
   initializeTimestampConstants();
   initializeGeneratedImageOutputVisibility();
@@ -421,11 +505,11 @@ function initializeLocalConversationThreadTurnEntries(): void {
   initializeTurnEntryModel();
   void initializeDeepEqual;
   initializeSplitItemsIntoRenderGroups();
-}
+});
 
-function initializeTurnEntryModelOnly(): void {
+const initializeTurnEntryModelOnly = once((): void => {
   initializeTurnEntryModel();
-}
+});
 
 export {
   isRenderedTurnEntry as a,

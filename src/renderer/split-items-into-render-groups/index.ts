@@ -30,12 +30,30 @@
 //   - C：system-error 判定
 //   - d：可显示 assistant（非 async + 无 requestUserInputAsync + 排除器不命中）
 
+import { n as onceExport } from "@rchunk/rolldown-runtime";
 import { l3 as lodashInterop } from "@rchunk/app-shared";
-import { P0t as uniqBy, fhn as connectorEquals, gmn as groupBy, wfn as otherInit } from "@rchunk/app-initial";
-import { n as agentActivityItemInit, r as isGroupableContinuation, t as groupingOf } from "@rchunk/agent-activity-item";
+import {
+  P0t as uniqBy,
+  fhn as connectorEquals,
+  gmn as groupBy,
+  wfn as otherInit,
+} from "@rchunk/app-initial";
+import {
+  n as agentActivityItemInit,
+  r as isGroupableContinuation,
+  t as groupingOf,
+} from "@rchunk/agent-activity-item";
 
-void lodashInterop; void uniqBy; void connectorEquals; void groupBy; void otherInit;
-void agentActivityItemInit; void isGroupableContinuation; void groupingOf;
+void lodashInterop;
+void uniqBy;
+void connectorEquals;
+void groupBy;
+void otherInit;
+void agentActivityItemInit;
+void isGroupableContinuation;
+void groupingOf;
+
+const once = onceExport as (initializer: () => void) => () => void;
 
 // ---------------------------------------------------------------------------
 // 类型
@@ -67,7 +85,8 @@ export interface RenderGroupItem {
 export interface RenderGroups {
   agentItems: RenderGroupItem[];
   approvalItem: RenderGroupItem | null;
-  assistantItem: (RenderGroupItem & { automationCitations?: RenderGroupItem[] }) | null;
+  assistantItem:
+    (RenderGroupItem & { automationCitations?: RenderGroupItem[] }) | null;
   automationUpdateItems: RenderGroupItem[];
   currentCommentaryItem: RenderGroupItem | null;
   forkedFromConversationItems: RenderGroupItem[];
@@ -97,12 +116,20 @@ export interface RenderGroups {
 
 /** patch 待审批（原 `h`）。 */
 function isPendingPatchApproval(item: RenderGroupItem): boolean {
-  return item.type === "patch" && item.approvalRequestId != null && item.success == null;
+  return (
+    item.type === "patch" &&
+    item.approvalRequestId != null &&
+    item.success == null
+  );
 }
 
 /** exec 待审批（原 `g`）。 */
 function isPendingExecApproval(item: RenderGroupItem): boolean {
-  return item.type === "exec" && item.approvalRequestId != null && ((item as { output?: { exitCode?: number } }).output?.exitCode === undefined);
+  return (
+    item.type === "exec" &&
+    item.approvalRequestId != null &&
+    (item as { output?: { exitCode?: number } }).output?.exitCode === undefined
+  );
 }
 
 /** assistant-message 判定（原 `_`）。 */
@@ -111,18 +138,37 @@ function isAssistantMessage(item: RenderGroupItem | null | undefined): boolean {
 }
 
 /** 可显示 assistant（原 `d`）。 */
-function isDisplayableAssistant(item: RenderGroupItem | null | undefined, exclude?: (item: RenderGroupItem) => boolean): boolean {
-  return isAssistantMessage(item) && (item as { delivery?: string }).delivery !== "async" && (item as { requestUserInputAsync?: unknown }).requestUserInputAsync == null && exclude?.(item as RenderGroupItem) !== true;
+function isDisplayableAssistant(
+  item: RenderGroupItem | null | undefined,
+  exclude?: (item: RenderGroupItem) => boolean,
+): boolean {
+  return (
+    isAssistantMessage(item) &&
+    (item as { delivery?: string }).delivery !== "async" &&
+    (item as { requestUserInputAsync?: unknown }).requestUserInputAsync ==
+      null &&
+    exclude?.(item as RenderGroupItem) !== true
+  );
 }
 
 /** generated-image 用量超限（原 `v`）。 */
-function isUsageLimitedImage(item: RenderGroupItem | null | undefined): boolean {
-  const failure = (item as { failure?: { type?: string; limitId?: string } } | null | undefined)?.failure;
-  return item?.type === "generated-image" && failure?.type === "usageLimitExceeded" && failure.limitId === "image_gen";
+function isUsageLimitedImage(
+  item: RenderGroupItem | null | undefined,
+): boolean {
+  const failure = (
+    item as { failure?: { type?: string; limitId?: string } } | null | undefined
+  )?.failure;
+  return (
+    item?.type === "generated-image" &&
+    failure?.type === "usageLimitExceeded" &&
+    failure.limitId === "image_gen"
+  );
 }
 
 /** 末尾审批审阅剥离（原 `y`）。 */
-function popTrailingApprovalReviews(items: RenderGroupItem[]): RenderGroupItem[] {
+function popTrailingApprovalReviews(
+  items: RenderGroupItem[],
+): RenderGroupItem[] {
   const popped: RenderGroupItem[] = [];
   for (;;) {
     const last = items[items.length - 1];
@@ -135,8 +181,15 @@ function popTrailingApprovalReviews(items: RenderGroupItem[]): RenderGroupItem[]
 
 /** 目标条目键（原 `x`）。 */
 function approvalTargetKey(item: RenderGroupItem): string | null {
-  if (item.type !== "exec" && item.type !== "patch" && item.type !== "mcp-tool-call") return null;
-  return item.type === "exec" ? (item.commandExecutionItemId ?? item.callId ?? null) : (item.callId ?? null);
+  if (
+    item.type !== "exec" &&
+    item.type !== "patch" &&
+    item.type !== "mcp-tool-call"
+  )
+    return null;
+  return item.type === "exec"
+    ? (item.commandExecutionItemId ?? item.callId ?? null)
+    : (item.callId ?? null);
 }
 
 /** 审批复用（原 `b`）：exec 用 commandExecutionItemId；denied 的 mcp 目标不内联。 */
@@ -145,13 +198,27 @@ function inlineApprovalReviews(items: RenderGroupItem[]): RenderGroupItem[] {
   const targetTypes = new Map<string, string>();
   const inlinedIds = new Set<unknown>();
   for (const item of items) {
-    if (item.type !== "exec" && item.type !== "patch" && item.type !== "mcp-tool-call") continue;
+    if (
+      item.type !== "exec" &&
+      item.type !== "patch" &&
+      item.type !== "mcp-tool-call"
+    )
+      continue;
     const key = approvalTargetKey(item);
     if (key != null) targetTypes.set(key, item.type);
   }
   for (const item of items) {
-    const targetType = item.type === "automatic-approval-review" && item.targetItemId != null ? targetTypes.get(item.targetItemId) : undefined;
-    if (item.type === "automatic-approval-review" && item.targetItemId != null && targetType != null && ((item as { status?: string }).status !== "denied" || targetType !== "mcp-tool-call")) {
+    const targetType =
+      item.type === "automatic-approval-review" && item.targetItemId != null
+        ? targetTypes.get(item.targetItemId)
+        : undefined;
+    if (
+      item.type === "automatic-approval-review" &&
+      item.targetItemId != null &&
+      targetType != null &&
+      ((item as { status?: string }).status !== "denied" ||
+        targetType !== "mcp-tool-call")
+    ) {
       inlinedIds.add(item.id);
       const existing = reviewsByTarget.get(item.targetItemId);
       if (existing == null) reviewsByTarget.set(item.targetItemId, [item]);
@@ -159,16 +226,28 @@ function inlineApprovalReviews(items: RenderGroupItem[]): RenderGroupItem[] {
     }
   }
   return items.flatMap((item) => {
-    if (item.type === "automatic-approval-review" && inlinedIds.has(item.id)) return [];
+    if (item.type === "automatic-approval-review" && inlinedIds.has(item.id))
+      return [];
     const key = approvalTargetKey(item);
-    const reviews = key == null ? null : reviewsByTarget.get(key) ?? null;
-    return reviews == null ? [item] : [{ ...item, automaticApprovalReviews: reviews }];
+    const reviews = key == null ? null : (reviewsByTarget.get(key) ?? null);
+    return reviews == null
+      ? [item]
+      : [{ ...item, automaticApprovalReviews: reviews }];
   });
 }
 
 /** elicitation 服务器键（原 `S`）。 */
 function elicitationServerKey(item: RenderGroupItem): string | null {
-  const elicitation = (item as { elicitation?: { kind?: string; serverName?: string; approval?: { connector_id?: string }; connector?: { connector_id?: string } } }).elicitation;
+  const elicitation = (
+    item as {
+      elicitation?: {
+        kind?: string;
+        serverName?: string;
+        approval?: { connector_id?: string };
+        connector?: { connector_id?: string };
+      };
+    }
+  ).elicitation;
   switch (elicitation?.kind) {
     case "userVerification":
     case "browserAuth":
@@ -246,7 +325,8 @@ function splitItemsIntoRenderGroups(
   let sawNonMessageSubagent = false;
 
   for (const item of items) {
-    const isNonMessageSubagent = item.type === "subagent-activity" && !item.isMessage;
+    const isNonMessageSubagent =
+      item.type === "subagent-activity" && !item.isMessage;
     const startsSubagentGroup = isNonMessageSubagent && !sawNonMessageSubagent;
     sawNonMessageSubagent = isNonMessageSubagent;
     // heartbeat 触发的用户消息与首个 worktree-init 前的用户消息
@@ -262,19 +342,37 @@ function splitItemsIntoRenderGroups(
     // latest 模式：commentary 跟踪与 upNext 清除
     if (mode === "latest") {
       if (item.type === "assistant-message") {
-        const hasContent = String(item.content ?? "").trim().length > 0 || item.structuredOutput != null;
-        if (item.phase === "commentary" && item.delivery !== "async" && item.requestUserInputAsync == null) {
+        const hasContent =
+          String(item.content ?? "").trim().length > 0 ||
+          item.structuredOutput != null;
+        if (
+          item.phase === "commentary" &&
+          item.delivery !== "async" &&
+          item.requestUserInputAsync == null
+        ) {
           commentaryItems.push(item);
           commentarySet.add(item);
-          if (item.completed !== true || hasContent) currentCommentaryItem = item;
+          if (item.completed !== true || hasContent)
+            currentCommentaryItem = item;
           continue;
         }
-        if (item.delivery === "async" || item.requestUserInputAsync != null || (item.phase === "final_answer" && hasContent)) {
+        if (
+          item.delivery === "async" ||
+          item.requestUserInputAsync != null ||
+          (item.phase === "final_answer" && hasContent)
+        ) {
           currentCommentaryItem = null;
         }
       } else if (
-        (item.type === "user-message" && item.deliveryStatus !== "not-sent" && item.hookFeedback !== true && item.heartbeatTrigger == null && item.codexDelegation == null) ||
-        (item.type === "realtime-transcript" && ((item as { entries?: Array<{ role?: string }> }).entries ?? []).some(({ role }) => role === "user"))
+        (item.type === "user-message" &&
+          item.deliveryStatus !== "not-sent" &&
+          item.hookFeedback !== true &&
+          item.heartbeatTrigger == null &&
+          item.codexDelegation == null) ||
+        (item.type === "realtime-transcript" &&
+          ((item as { entries?: Array<{ role?: string }> }).entries ?? []).some(
+            ({ role }) => role === "user",
+          ))
       ) {
         upNextStatusItem = null;
         currentCommentaryItem = null;
@@ -288,7 +386,8 @@ function splitItemsIntoRenderGroups(
     }
     if (item.type === "remote-task-created") remoteTaskCreatedItems.push(item);
     if (item.type === "personality-changed") personalityChangedItems.push(item);
-    if (item.type === "forked-from-conversation") forkedFromConversationItems.push(item);
+    if (item.type === "forked-from-conversation")
+      forkedFromConversationItems.push(item);
     if (item.type === "model-changed") {
       modelChangedItems.push(item);
       continue;
@@ -303,7 +402,11 @@ function splitItemsIntoRenderGroups(
     }
     if (item.type === "mcp-server-elicitation") {
       if (item.completed === true) {
-        if ((item as { elicitation?: { kind?: string } }).elicitation?.kind !== "unsupportedOpenAIForm") commentaryItems.push(item);
+        if (
+          (item as { elicitation?: { kind?: string } }).elicitation?.kind !==
+          "unsupportedOpenAIForm"
+        )
+          commentaryItems.push(item);
         continue;
       }
       const serverKey = elicitationServerKey(item);
@@ -333,7 +436,8 @@ function splitItemsIntoRenderGroups(
     if (item.type === "generated-image") {
       const usageLimited = isUsageLimitedImage(item);
       if (!usageLimited) toolOutputItems.push(item);
-      if (turnStatus === "in_progress" || usageLimited) commentaryItems.push(item);
+      if (turnStatus === "in_progress" || usageLimited)
+        commentaryItems.push(item);
       continue;
     }
     if (item.type === "automation-update") {
@@ -352,7 +456,12 @@ function splitItemsIntoRenderGroups(
       } else subagentActivityItemGroups.at(-1)?.push(item);
       continue;
     }
-    if (item.type === "reasoning" || item.type === "automatic-approval-review" || groupingOf(item) != null) commentaryItems.push(item);
+    if (
+      item.type === "reasoning" ||
+      item.type === "automatic-approval-review" ||
+      groupingOf(item) != null
+    )
+      commentaryItems.push(item);
   }
 
   const automationUpdateItems = automationUpdateBuffer;
@@ -360,23 +469,39 @@ function splitItemsIntoRenderGroups(
   // 审批复用
   const inlined = inlineApprovalReviews(commentaryItems);
   // 末尾审批审阅剥离（非 latest 模式移到 postAssistant）
-  const trailingReviews = mode === "latest" ? [] : popTrailingApprovalReviews([...inlined]);
+  const trailingReviews =
+    mode === "latest" ? [] : popTrailingApprovalReviews([...inlined]);
   // latest 模式的可见性过滤
   let hadCommentary = false;
-  let visible = mode === "latest" || pendingElicitationServers.size > 0
-    ? inlined.filter((item, index) => {
-        if (commentarySet.has(item)) {
-          hadCommentary = true;
-          return item === currentCommentaryItem;
-        }
-        if (item.type === "mcp-tool-call" && item.completed !== true && pendingElicitationServers.has(String((item as { invocation?: { server?: string } }).invocation?.server ?? ""))) return false;
-        if (hadCommentary && groupingOf(item)?.grouping === "groupable" && !isGroupableContinuation(item, inlined[index + 1])) {
-          toolGroupStartItems.add(item);
-          hadCommentary = false;
-        }
-        return true;
-      })
-    : inlined;
+  let visible =
+    mode === "latest" || pendingElicitationServers.size > 0
+      ? inlined.filter((item, index) => {
+          if (commentarySet.has(item)) {
+            hadCommentary = true;
+            return item === currentCommentaryItem;
+          }
+          if (
+            item.type === "mcp-tool-call" &&
+            item.completed !== true &&
+            pendingElicitationServers.has(
+              String(
+                (item as { invocation?: { server?: string } }).invocation
+                  ?.server ?? "",
+              ),
+            )
+          )
+            return false;
+          if (
+            hadCommentary &&
+            groupingOf(item)?.grouping === "groupable" &&
+            !isGroupableContinuation(item, inlined[index + 1])
+          ) {
+            toolGroupStartItems.add(item);
+            hadCommentary = false;
+          }
+          return true;
+        })
+      : inlined;
   if (mode === "latest") visible = [...visible, ...trailingReviews];
 
   // 末尾 assistant 剥离（跳过 elicitation 尾巴）
@@ -391,18 +516,31 @@ function splitItemsIntoRenderGroups(
         item?.type !== "subagent-activity" &&
         !isUsageLimitedImage(item) &&
         (item?.type !== "reasoning" || item.completed !== false) &&
-        (item?.type !== "exec" || turnStatus !== "complete" || ((item as { parsedCmd?: { isFinished?: boolean } }).parsedCmd?.isFinished !== true)) &&
-        (item?.type !== "dynamic-tool-call" || turnStatus !== "complete" || item.completed !== true)
+        (item?.type !== "exec" ||
+          turnStatus !== "complete" ||
+          (item as { parsedCmd?: { isFinished?: boolean } }).parsedCmd
+            ?.isFinished !== true) &&
+        (item?.type !== "dynamic-tool-call" ||
+          turnStatus !== "complete" ||
+          item.completed !== true)
       )
         break;
       --probe;
     }
     const candidate = visible[probe];
-    if (isDisplayableAssistant(candidate, excludeAssistant) && candidate.phase === "final_answer") lastIndex = probe;
+    if (
+      isDisplayableAssistant(candidate, excludeAssistant) &&
+      candidate.phase === "final_answer"
+    )
+      lastIndex = probe;
   }
   const lastItem = visible[lastIndex];
-  const extracted = isDisplayableAssistant(lastItem, excludeAssistant) ? lastItem : null;
-  const hasAssistantContent = String(extracted?.content ?? "").trim().length > 0 || extracted?.structuredOutput != null;
+  const extracted = isDisplayableAssistant(lastItem, excludeAssistant)
+    ? lastItem
+    : null;
+  const hasAssistantContent =
+    String(extracted?.content ?? "").trim().length > 0 ||
+    extracted?.structuredOutput != null;
   if (extracted) {
     visible.splice(lastIndex, 1);
     // 搜索项合并：相邻同 searchItemId 的 final_answer
@@ -421,34 +559,56 @@ function splitItemsIntoRenderGroups(
 
   // system-error 收尾
   const finalItem = visible[visible.length - 1];
-  const trailingSystemError = turnStatus !== "in_progress" && !hasAssistantContent && isSystemError(finalItem) ? finalItem : null;
+  const trailingSystemError =
+    turnStatus !== "in_progress" &&
+    !hasAssistantContent &&
+    isSystemError(finalItem)
+      ? finalItem
+      : null;
   if (trailingSystemError) visible.pop();
 
   // automation 引用（uniqBy 语义：automationId ?? arguments.id ?? callId）
   const automationCitations = dedupeBy(
     [...automationUpdateItems].reverse(),
-    (item) => (item as { result?: { automationId?: string } }).result?.automationId ?? (item as { arguments?: { id?: string } }).arguments?.id ?? item.callId,
+    (item) =>
+      (item as { result?: { automationId?: string } }).result?.automationId ??
+      (item as { arguments?: { id?: string } }).arguments?.id ??
+      item.callId,
   ).reverse();
   const assistantWithCitations =
-    extracted != null && extracted.completed === true && automationCitations.length > 0 ? { ...extracted, automationCitations } : extracted;
+    extracted != null &&
+    extracted.completed === true &&
+    automationCitations.length > 0
+      ? { ...extracted, automationCitations }
+      : extracted;
 
   // connectorAuth 去重
   const dedupedElicitations = dedupeAdjacent(
     mcpServerElicitationItems,
     (a, b) =>
-      (a as { elicitation?: { kind?: string; connector?: unknown } }).elicitation?.kind === "connectorAuth" &&
-      (b as { elicitation?: { kind?: string; connector?: unknown } }).elicitation?.kind === "connectorAuth" &&
-      (a as { elicitation?: { connector?: unknown } }).elicitation?.connector === (b as { elicitation?: { connector?: unknown } }).elicitation?.connector,
+      (a as { elicitation?: { kind?: string; connector?: unknown } })
+        .elicitation?.kind === "connectorAuth" &&
+      (b as { elicitation?: { kind?: string; connector?: unknown } })
+        .elicitation?.kind === "connectorAuth" &&
+      (a as { elicitation?: { connector?: unknown } }).elicitation
+        ?.connector ===
+        (b as { elicitation?: { connector?: unknown } }).elicitation?.connector,
   );
 
   return {
     userItems,
     agentItems: visible,
     toolGroupStartItems,
-    upNextStatusItem: mode === "latest" && turnStatus === "in_progress" ? upNextStatusItem : null,
+    upNextStatusItem:
+      mode === "latest" && turnStatus === "in_progress"
+        ? upNextStatusItem
+        : null,
     automationUpdateItems: extracted == null ? automationCitations : [],
     assistantItem: assistantWithCitations,
-    currentCommentaryItem: currentCommentaryItem === extracted ? assistantWithCitations : currentCommentaryItem,
+    currentCommentaryItem:
+      currentCommentaryItem === extracted
+        ? assistantWithCitations
+        : currentCommentaryItem,
     toolOutputItems,
     postAssistantItems,
     systemEventItem: trailingSystemError,
@@ -501,6 +661,9 @@ function dedupeAdjacent<T>(items: T[], equals: (a: T, b: T) => boolean): T[] {
 // ---------------------------------------------------------------------------
 
 /** 初始化器（原 `w`，导出 t）：判定器为模块级函数，保持幂等契约。 */
-function initializeSplitItemsIntoRenderGroups(): void {}
+const initializeSplitItemsIntoRenderGroups = once((): void => {});
 
-export { splitItemsIntoRenderGroups as n, initializeSplitItemsIntoRenderGroups as t };
+export {
+  splitItemsIntoRenderGroups as n,
+  initializeSplitItemsIntoRenderGroups as t,
+};

@@ -14,8 +14,7 @@ export const SETTINGS_ROUTE_ROOTS = [
   "appshots-settings-69ae88c8d2f5.js",
   "billing-settings-d5b5419393a0.js",
   "billing-analytics-9a493b3c8aaf.js",
-  // The readable Plaid draft is still a thin UI approximation. Keep the
-  // release implementation even when promoted billing helpers stop importing it.
+  // Plaid is registered indirectly from the personal-finance surface.
   "plaid-link-a9255a11a708.js",
   "chronicle-settings-d16251f05467.js",
   "chronicle-settings-page-e92cf619a884.js",
@@ -440,7 +439,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["checkout-session", "session-3ec40b7dd28e.js"],
   ["mark-session-create", "mark-session-create-6f7d531b2a15.js"],
   ["xterm-window-zoom", "xterm-window-zoom-15fe24cf01f9.js"],
-  ["plaid-link", "plaid-link-a9255a11a708.js"],
   ["codex-home-announcements", "codex-home-announcements-327826cf904d.js"],
   [
     "codex-home-announcements-current",
@@ -488,12 +486,7 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   // Complete eager first-party dependency closure of the four conversation
   // React roots. These owners remove structurally approximate implementations
   // from the live conversation path while retaining vendor/generated boundaries.
-  ["active-tool-activity-label", "active-tool-activity-label-f837b1d602a5.js"],
   ["ansi-block", "ansi-block-5043e88b0254.js"],
-  [
-    "appgen-access-state-messages",
-    "appgen-access-state-messages-ba11f4e596b6.js",
-  ],
   ["artifact-feedback-button", "artifact-feedback-button-253b2bfc6015.js"],
   [
     "bookmarked-thread-user-message-navigation",
@@ -518,10 +511,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["latest-turn-preview", "latest-turn-preview-3395407f9d40.js"],
   ["layout", "layout-a912dff4540d.js"],
   [
-    "local-conversation-artifacts-signals",
-    "local-conversation-artifacts-signals-adff984a1c7d.js",
-  ],
-  [
     "local-conversation-external-resources",
     "local-conversation-external-resources-c392ed595266.js",
   ],
@@ -532,10 +521,6 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   [
     "local-conversation-side-chat",
     "local-conversation-side-chat-48c6730ec06a.js",
-  ],
-  [
-    "local-conversation-thread-turn-entries",
-    "local-conversation-thread-turn-entries-5bba2186bc7d.js",
   ],
   ["local-environment-editor", "local-environment-editor-c4a981e88476.js"],
   ["mcp-tool-activity-label", "mcp-tool-activity-label-87ba9ef42b0b.js"],
@@ -560,12 +545,7 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["quick-chat-obstacles", "quick-chat-obstacles-c569ea17ffc9.js"],
   ["report-dialog-core", "report-dialog-75a130d615ed.js"],
   ["result-card", "result-card-17125719c243.js"],
-  ["result-values", "result-values-d618934c5c1e.js"],
   ["thread-shell-runtime", "runtime-4b6d284756d8.js"],
-  [
-    "split-items-into-render-groups",
-    "split-items-into-render-groups-19560a11b33a.js",
-  ],
   ["thread-app-shell-chrome", "thread-app-shell-chrome-e245ed2613ae.js"],
   ["thread-handoff-modal", "thread-handoff-modal-ccac59d04293.js"],
   ["thread-overflow-menu", "thread-overflow-menu-51894ca4476d.js"],
@@ -595,6 +575,7 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   "File-4270090fca79.js",
   "PlatformUIKitProvider-748f2efe0f2a.js",
   "active-tool-activity-label-f837b1d602a5.js",
+  "plaid-link-a9255a11a708.js",
   "add-method-2829ddee8c5b.js",
   "allowed-domains-input-2ddf45ddb4ff.js",
   "animated-icon-ac1b587a8839.js",

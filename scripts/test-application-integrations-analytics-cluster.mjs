@@ -166,6 +166,7 @@ assert.equal(api.a({ name: "PLUGIN.TAR.GZ", size: 12 }), null);
 // plaid-link: 12
 const plaid = await bundle("plaid-link");
 assert.deepEqual(Object.keys(plaid), ["i", "n", "r", "t"]);
+plaid.n();
 const storage = new Map();
 globalThis.window = globalThis;
 globalThis.sessionStorage = {

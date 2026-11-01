@@ -2,7 +2,7 @@
 // token submission, and connection-status polling.
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as appSharedChunk from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
+import { n as onceExport } from "@rchunk/rolldown-runtime";
 
 interface PlaidHandler {
   destroy(): void;
@@ -29,8 +29,10 @@ interface PlaidScope {
 
 const shared = appSharedChunk as unknown as Record<string, any>;
 const initial = appInitialChunk as unknown as Record<string, any>;
+const once = onceExport as (initializer: () => void) => () => void;
 
-const PLAID_SCRIPT_URL = "https://cdn.plaid.com/link/v2/stable/link-initialize.js";
+const PLAID_SCRIPT_URL =
+  "https://cdn.plaid.com/link/v2/stable/link-initialize.js";
 const PLAID_SCRIPT_SELECTOR = "script[data-codex-plaid-link]";
 const STORAGE_KEY = "codex:finance:pending-plaid-link";
 const STORAGE_TTL_MS = 30 * 60 * 1000;
@@ -39,16 +41,21 @@ const POLL_INTERVAL_MS = 2_000;
 
 let activeFlow: AbortController | null = null;
 let plaidRuntimePromise: Promise<PlaidRuntime> | null = null;
-let initialized = false;
 
 function isPendingPlaidLink(value: unknown): value is PendingPlaidLink {
   if (value == null || typeof value !== "object") return false;
   const record = value as Record<string, unknown>;
-  return typeof record.accountId === "string" && record.accountId.length > 0 &&
-    typeof record.createdAt === "number" && Number.isFinite(record.createdAt) &&
-    typeof record.linkToken === "string" && record.linkToken.length > 0 &&
-    typeof record.oauthStateId === "string" && record.oauthStateId.length > 0 &&
-    typeof record.returnTo === "string";
+  return (
+    typeof record.accountId === "string" &&
+    record.accountId.length > 0 &&
+    typeof record.createdAt === "number" &&
+    Number.isFinite(record.createdAt) &&
+    typeof record.linkToken === "string" &&
+    record.linkToken.length > 0 &&
+    typeof record.oauthStateId === "string" &&
+    record.oauthStateId.length > 0 &&
+    typeof record.returnTo === "string"
+  );
 }
 
 function storePendingLink(value: PendingPlaidLink): void {
@@ -73,7 +80,11 @@ function pendingLink(accountId: string): PendingPlaidLink | null {
     const raw = window.sessionStorage.getItem(STORAGE_KEY);
     if (raw == null) return null;
     const value = JSON.parse(raw);
-    if (!isPendingPlaidLink(value) || value.accountId !== accountId || Date.now() - value.createdAt > STORAGE_TTL_MS) {
+    if (
+      !isPendingPlaidLink(value) ||
+      value.accountId !== accountId ||
+      Date.now() - value.createdAt > STORAGE_TTL_MS
+    ) {
       clearPendingLink(accountId);
       return null;
     }
@@ -88,16 +99,28 @@ function readReturnTo(accountId: string): string {
   return pendingLink(accountId)?.returnTo ?? "/finances";
 }
 
-function loadPlaidRuntime(targetWindow: Window & { Plaid?: PlaidRuntime }): Promise<PlaidRuntime> {
+function loadPlaidRuntime(
+  targetWindow: Window & { Plaid?: PlaidRuntime },
+): Promise<PlaidRuntime> {
   return new Promise((resolve, reject) => {
-    const existing = document.querySelector<HTMLScriptElement>(PLAID_SCRIPT_SELECTOR);
+    const existing = document.querySelector<HTMLScriptElement>(
+      PLAID_SCRIPT_SELECTOR,
+    );
     const script = existing ?? document.createElement("script");
-    const timeout = window.setTimeout(() => finish(new Error("The financial account connection took too long to load")), SCRIPT_TIMEOUT_MS);
+    const timeout = window.setTimeout(
+      () =>
+        finish(
+          new Error("The financial account connection took too long to load"),
+        ),
+      SCRIPT_TIMEOUT_MS,
+    );
     const loaded = () => {
-      if (targetWindow.Plaid == null) finish(new Error("The financial account provider could not be loaded"));
+      if (targetWindow.Plaid == null)
+        finish(new Error("The financial account provider could not be loaded"));
       else finish(null, targetWindow.Plaid);
     };
-    const failed = () => finish(new Error("The financial account provider could not be loaded"));
+    const failed = () =>
+      finish(new Error("The financial account provider could not be loaded"));
     const finish = (error: Error | null, runtime?: PlaidRuntime) => {
       window.clearTimeout(timeout);
       script.removeEventListener("load", loaded);
@@ -116,14 +139,17 @@ function loadPlaidRuntime(targetWindow: Window & { Plaid?: PlaidRuntime }): Prom
       script.dataset.codexPlaidLink = "true";
       script.referrerPolicy = "no-referrer";
       script.src = PLAID_SCRIPT_URL;
-      const nonce = document.querySelector<HTMLScriptElement>("script[nonce]")?.nonce;
+      const nonce =
+        document.querySelector<HTMLScriptElement>("script[nonce]")?.nonce;
       if (nonce != null && nonce.length > 0) script.nonce = nonce;
       document.head.appendChild(script);
     }
   });
 }
 
-async function getPlaidRuntime(signal: AbortSignal): Promise<PlaidRuntime | null> {
+async function getPlaidRuntime(
+  signal: AbortSignal,
+): Promise<PlaidRuntime | null> {
   if (signal.aborted) return null;
   const targetWindow = window as Window & { Plaid?: PlaidRuntime };
   if (targetWindow.Plaid != null) return targetWindow.Plaid;
@@ -146,13 +172,24 @@ async function getPlaidRuntime(signal: AbortSignal): Promise<PlaidRuntime | null
 
 function openPlaid(
   runtime: PlaidRuntime,
-  { linkToken, receivedRedirectUri, signal }: { linkToken: string; receivedRedirectUri?: string; signal: AbortSignal },
+  {
+    linkToken,
+    receivedRedirectUri,
+    signal,
+  }: { linkToken: string; receivedRedirectUri?: string; signal: AbortSignal },
 ): Promise<{ publicToken?: string | null; type: "cancelled" | "completed" }> {
   return new Promise((resolve, reject) => {
     let handler: PlaidHandler | null = null;
     let loadedBeforeAssignment = false;
     let settled = false;
-    const timeout = window.setTimeout(() => finish(null, new Error("The financial account connection took too long to open")), SCRIPT_TIMEOUT_MS);
+    const timeout = window.setTimeout(
+      () =>
+        finish(
+          null,
+          new Error("The financial account connection took too long to open"),
+        ),
+      SCRIPT_TIMEOUT_MS,
+    );
     const cancelled = () => finish({ type: "cancelled" });
     const interceptExternalNavigation = (event: MessageEvent) => {
       const message = shared.q3(event);
@@ -160,16 +197,29 @@ function openPlaid(
         message?.type === "toggle-browser-panel" &&
         message.initiator === "window_open" &&
         message.url != null &&
-        initial.kft({ href: message.url, initiator: "open_in_browser_bridge", openTarget: "external-browser" })
-      ) event.stopImmediatePropagation();
+        initial.kft({
+          href: message.url,
+          initiator: "open_in_browser_bridge",
+          openTarget: "external-browser",
+        })
+      )
+        event.stopImmediatePropagation();
     };
-    const finish = (result: { publicToken?: string | null; type: "cancelled" | "completed" } | null, error?: Error) => {
+    const finish = (
+      result: {
+        publicToken?: string | null;
+        type: "cancelled" | "completed";
+      } | null,
+      error?: Error,
+    ) => {
       if (settled) return;
       settled = true;
       window.clearTimeout(timeout);
       signal.removeEventListener("abort", cancelled);
       window.removeEventListener("message", interceptExternalNavigation, true);
-      try { handler?.destroy(); } catch {}
+      try {
+        handler?.destroy();
+      } catch {}
       if (error == null) {
         if (result != null) resolve(result);
       } else reject(error);
@@ -186,20 +236,36 @@ function openPlaid(
           window.clearTimeout(timeout);
           if (handler == null) loadedBeforeAssignment = true;
           else if (!signal.aborted) {
-            try { handler.open(); } catch { finish(null, new Error("The financial account connection could not open")); }
+            try {
+              handler.open();
+            } catch {
+              finish(
+                null,
+                new Error("The financial account connection could not open"),
+              );
+            }
           }
         },
-        onSuccess: (token: unknown) => finish({
-          publicToken: typeof token === "string" && token.length > 0 ? token : null,
-          type: "completed",
-        }),
-        onExit: (error: unknown) => error == null
-          ? finish({ type: "cancelled" })
-          : finish(null, new Error("The financial account connection failed")),
+        onSuccess: (token: unknown) =>
+          finish({
+            publicToken:
+              typeof token === "string" && token.length > 0 ? token : null,
+            type: "completed",
+          }),
+        onExit: (error: unknown) =>
+          error == null
+            ? finish({ type: "cancelled" })
+            : finish(
+                null,
+                new Error("The financial account connection failed"),
+              ),
       });
       if (loadedBeforeAssignment && !signal.aborted) handler.open();
     } catch {
-      finish(null, new Error("The financial account connection could not open"));
+      finish(
+        null,
+        new Error("The financial account connection could not open"),
+      );
     }
   });
 }
@@ -217,21 +283,35 @@ function delay(signal: AbortSignal): Promise<void> {
   });
 }
 
-async function waitForConnection(scope: PlaidScope, accountId: string, oauthStateId: string, signal: AbortSignal): Promise<boolean> {
+async function waitForConnection(
+  scope: PlaidScope,
+  accountId: string,
+  oauthStateId: string,
+  signal: AbortSignal,
+): Promise<boolean> {
   const deadline = Date.now() + STORAGE_TTL_MS;
   while (!signal.aborted && Date.now() < deadline) {
     try {
-      const state = await scope.get(initial.WW).getOAuthState(oauthStateId, signal);
+      const state = await scope
+        .get(initial.WW)
+        .getOAuthState(oauthStateId, signal);
       if (state.finished || state.connected_accounts > 0) {
         scope.query.invalidate?.(initial.ly, accountId);
-        await scope.queryClient.invalidateQueries({ queryKey: ["personal-finance", accountId] });
+        await scope.queryClient.invalidateQueries({
+          queryKey: ["personal-finance", accountId],
+        });
         return true;
       }
       if (state.status === "error" || state.status === "disconnected") {
         throw new Error("The financial account connection was declined");
       }
     } catch (error) {
-      if (signal.aborted || (error instanceof Error && error.message === "The financial account connection was declined")) throw error;
+      if (
+        signal.aborted ||
+        (error instanceof Error &&
+          error.message === "The financial account connection was declined")
+      )
+        throw error;
     }
     await delay(signal);
   }
@@ -240,7 +320,13 @@ async function waitForConnection(scope: PlaidScope, accountId: string, oauthStat
 
 async function connectPlaid(
   scope: PlaidScope,
-  { accountId, linkId, receivedRedirectUri, returnTo = initial.Pzt, signal }: {
+  {
+    accountId,
+    linkId,
+    receivedRedirectUri,
+    returnTo = initial.Pzt,
+    signal,
+  }: {
     accountId: string;
     linkId?: string;
     receivedRedirectUri?: string;
@@ -249,7 +335,8 @@ async function connectPlaid(
   },
 ): Promise<boolean> {
   initializePlaidLink();
-  if (activeFlow != null) throw new Error("A financial account connection is already in progress");
+  if (activeFlow != null)
+    throw new Error("A financial account connection is already in progress");
   if (signal?.aborted) return false;
   const controller = new AbortController();
   activeFlow = controller;
@@ -257,29 +344,65 @@ async function connectPlaid(
   signal?.addEventListener("abort", abort, { once: true });
   try {
     const pending = receivedRedirectUri == null ? null : pendingLink(accountId);
-    if (receivedRedirectUri != null && (pending == null || !new URL(receivedRedirectUri).searchParams.get("oauth_state_id"))) {
+    if (
+      receivedRedirectUri != null &&
+      (pending == null ||
+        !new URL(receivedRedirectUri).searchParams.get("oauth_state_id"))
+    ) {
       throw new Error("The financial account connection could not be resumed");
     }
-    const flow = pending == null
-      ? await scope.get(initial.WW).startOAuthFlow({ link_id: linkId, native_android: false, native_ios: false }, controller.signal)
-      : { oauth_state_id: pending.oauthStateId, token: pending.linkToken };
+    const flow =
+      pending == null
+        ? await scope
+            .get(initial.WW)
+            .startOAuthFlow(
+              { link_id: linkId, native_android: false, native_ios: false },
+              controller.signal,
+            )
+        : { oauth_state_id: pending.oauthStateId, token: pending.linkToken };
     if (controller.signal.aborted) return false;
     if (typeof flow.token !== "string" || flow.token.length === 0) {
-      throw new Error("The financial account connection did not provide a token");
+      throw new Error(
+        "The financial account connection did not provide a token",
+      );
     }
     if (receivedRedirectUri == null) {
-      storePendingLink({ accountId, createdAt: Date.now(), linkToken: flow.token, oauthStateId: flow.oauth_state_id, returnTo });
+      storePendingLink({
+        accountId,
+        createdAt: Date.now(),
+        linkToken: flow.token,
+        oauthStateId: flow.oauth_state_id,
+        returnTo,
+      });
     }
     const runtime = await getPlaidRuntime(controller.signal);
     if (runtime == null) return false;
-    const result = await openPlaid(runtime, { linkToken: flow.token, receivedRedirectUri, signal: controller.signal });
+    const result = await openPlaid(runtime, {
+      linkToken: flow.token,
+      receivedRedirectUri,
+      signal: controller.signal,
+    });
     if (result.type === "cancelled" || controller.signal.aborted) return false;
-    await scope.get(initial.WW).markOAuthFlowInitializing(flow.oauth_state_id).catch(() => undefined);
+    await scope
+      .get(initial.WW)
+      .markOAuthFlowInitializing(flow.oauth_state_id)
+      .catch(() => undefined);
     if (controller.signal.aborted) return false;
     if (result.publicToken != null) {
-      scope.get(initial.WW).submitPlaidPublicToken({ link_token: flow.token, public_token: result.publicToken }).catch(() => undefined);
+      scope
+        .get(initial.WW)
+        .submitPlaidPublicToken({
+          link_token: flow.token,
+          public_token: result.publicToken,
+        })
+        .catch(() => undefined);
     }
-    return await waitForConnection(scope, accountId, flow.oauth_state_id, controller.signal);
+    return await waitForConnection(
+      scope,
+      accountId,
+      flow.oauth_state_id,
+      controller.signal,
+    );
   } finally {
     controller.abort();
     signal?.removeEventListener("abort", abort);
@@ -292,22 +415,52 @@ async function connectPlaid(
 
 async function openPlaidFromWidget(
   scope: PlaidScope,
-  { accountId, linkToken, oauthStateId, signal }: { accountId: string; linkToken: string; oauthStateId: string; signal?: AbortSignal },
-): Promise<{ plaidErrorCode?: string; plaidExitStatus?: string; publicToken?: string; type: "completed" | "exited" }> {
+  {
+    accountId,
+    linkToken,
+    oauthStateId,
+    signal,
+  }: {
+    accountId: string;
+    linkToken: string;
+    oauthStateId: string;
+    signal?: AbortSignal;
+  },
+): Promise<{
+  plaidErrorCode?: string;
+  plaidExitStatus?: string;
+  publicToken?: string;
+  type: "completed" | "exited";
+}> {
   initializePlaidLink();
-  if (activeFlow != null) return { type: "exited", plaidErrorCode: "flow_already_in_progress" };
-  if (signal?.aborted) return { type: "exited", plaidErrorCode: "launch_cancelled" };
+  if (activeFlow != null)
+    return { type: "exited", plaidErrorCode: "flow_already_in_progress" };
+  if (signal?.aborted)
+    return { type: "exited", plaidErrorCode: "launch_cancelled" };
   const controller = new AbortController();
   activeFlow = controller;
   const abort = () => controller.abort();
   signal?.addEventListener("abort", abort, { once: true });
-  storePendingLink({ accountId, createdAt: Date.now(), linkToken, oauthStateId, returnTo: initial.Pzt });
+  storePendingLink({
+    accountId,
+    createdAt: Date.now(),
+    linkToken,
+    oauthStateId,
+    returnTo: initial.Pzt,
+  });
   try {
     const runtime = await getPlaidRuntime(controller.signal);
-    if (runtime == null) return { type: "exited", plaidErrorCode: "launch_cancelled" };
-    const result = await openPlaid(runtime, { linkToken, signal: controller.signal });
-    if (result.type === "cancelled") return { type: "exited", plaidExitStatus: "exited" };
-    scope.queryClient.invalidateQueries({ queryKey: ["personal-finance", accountId] });
+    if (runtime == null)
+      return { type: "exited", plaidErrorCode: "launch_cancelled" };
+    const result = await openPlaid(runtime, {
+      linkToken,
+      signal: controller.signal,
+    });
+    if (result.type === "cancelled")
+      return { type: "exited", plaidExitStatus: "exited" };
+    scope.queryClient.invalidateQueries({
+      queryKey: ["personal-finance", accountId],
+    });
     return { publicToken: result.publicToken ?? undefined, type: "completed" };
   } finally {
     controller.abort();
@@ -319,13 +472,22 @@ async function openPlaidFromWidget(
   }
 }
 
-function initializePlaidLink(): void {
-  if (initialized) return;
-  initialized = true;
-  for (const name of ["g4", "H4", "J3", "V4", "q3", "q4"]) shared[name]?.();
-  for (const name of ["_6t", "Dft", "uy", "UW", "Izt"]) initial[name]?.();
-}
+const initializePlaidLink = once((): void => {
+  // Preserve the release initializer order. H4/V4/q4/m6t are schema
+  // constructors consumed while building the pending-link validator, not
+  // standalone initializers, and therefore must not be invoked by themselves.
+  shared.g4?.();
+  initial._6t?.();
+  initial.Dft?.();
+  shared.J3?.();
+  initial.uy?.();
+  initial.UW?.();
+  initial.Izt?.();
+});
 
-initializePlaidLink();
-
-export { openPlaidFromWidget as i, initializePlaidLink as n, connectPlaid as r, readReturnTo as t };
+export {
+  openPlaidFromWidget as i,
+  initializePlaidLink as n,
+  connectPlaid as r,
+  readReturnTo as t,
+};

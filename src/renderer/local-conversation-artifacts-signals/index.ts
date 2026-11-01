@@ -1,4 +1,4 @@
-import "@rchunk/rolldown-runtime";
+import { n as onceExport } from "@rchunk/rolldown-runtime";
 import {
   BI as normalizeArtifactPath,
   FX as initializeSignalRuntime,
@@ -62,11 +62,33 @@ import {
 
 export type ConversationArtifact =
   | { path: string; producedAtMs?: number; type: "file" }
-  | { imageGenerationItemId: string; path: string; producedAtMs?: number; type: "generated-image" }
-  | { producedAtMs?: number; resource: ExternalResource; type: "external-resource" }
-  | { producedAtMs?: number; type: "google-drive"; url: string; [key: string]: unknown }
-  | { producedAtMs?: number; projectId: string; type: "appgen-app"; url?: string; [key: string]: unknown }
+  | {
+      imageGenerationItemId: string;
+      path: string;
+      producedAtMs?: number;
+      type: "generated-image";
+    }
+  | {
+      producedAtMs?: number;
+      resource: ExternalResource;
+      type: "external-resource";
+    }
+  | {
+      producedAtMs?: number;
+      type: "google-drive";
+      url: string;
+      [key: string]: unknown;
+    }
+  | {
+      producedAtMs?: number;
+      projectId: string;
+      type: "appgen-app";
+      url?: string;
+      [key: string]: unknown;
+    }
   | { producedAtMs?: number; target: string; type: "website" };
+
+const once = onceExport as (initializer: () => void) => () => void;
 
 interface ConversationTurn {
   items: Array<Record<string, unknown>>;
@@ -102,7 +124,9 @@ function getArtifactKey(artifact: ConversationArtifact): string {
     case "external-resource":
       return artifact.resource.key;
     case "google-drive":
-      return getExternalResourceKey(artifact.url) ?? `google-drive:${artifact.url}`;
+      return (
+        getExternalResourceKey(artifact.url) ?? `google-drive:${artifact.url}`
+      );
     case "appgen-app":
       return `appgen-app:${artifact.projectId}`;
     case "website":
@@ -112,7 +136,9 @@ function getArtifactKey(artifact: ConversationArtifact): string {
   }
 }
 
-function mergeArtifactGroups(groups: ConversationArtifact[][]): ConversationArtifact[] {
+function mergeArtifactGroups(
+  groups: ConversationArtifact[][],
+): ConversationArtifact[] {
   const artifacts: ConversationArtifact[] = [];
   const indexByKey = new Map<string, number>();
   for (const group of groups) {
@@ -143,14 +169,19 @@ function getAssistantArtifactContent(turn: ConversationTurn): unknown {
   for (let index = turn.items.length - 1; index >= 0; index -= 1) {
     const item = turn.items[index];
     if (item?.type !== "agentMessage") continue;
-    const stripped = stripAssistantMetadata(item.text, false) as { content: string; removed: boolean };
+    const stripped = stripAssistantMetadata(item.text, false) as {
+      content: string;
+      removed: boolean;
+    };
     if (stripped.removed && stripped.content.length === 0) return null;
-    return (getArtifactScanContent({
-      content: stripped.content,
-      isHeartbeatAutomationTurn: isHeartbeatAutomationTurn(
-        turn as unknown as Record<string, unknown>,
-      ),
-    }) as { artifactScanContent: unknown }).artifactScanContent;
+    return (
+      getArtifactScanContent({
+        content: stripped.content,
+        isHeartbeatAutomationTurn: isHeartbeatAutomationTurn(
+          turn as unknown as Record<string, unknown>,
+        ),
+      }) as { artifactScanContent: unknown }
+    ).artifactScanContent;
   }
   return null;
 }
@@ -161,7 +192,8 @@ function collectTurnLocalArtifacts(
   includeGeneratedImages: boolean,
 ): ConversationArtifact[] {
   const status = turn.status === "completed" ? "complete" : turn.status;
-  const cwd = turn.params.cwd == null ? null : normalizeFilePath(turn.params.cwd);
+  const cwd =
+    turn.params.cwd == null ? null : normalizeFilePath(turn.params.cwd);
   const artifacts: ConversationArtifact[] = [];
   const indexByKey = new Map<string, number>();
   const add = (artifact: ConversationArtifact) => {
@@ -181,7 +213,9 @@ function collectTurnLocalArtifacts(
     }
   };
 
-  const imageItems = includeGeneratedImages ? turn.items.slice().reverse() : turn.items;
+  const imageItems = includeGeneratedImages
+    ? turn.items.slice().reverse()
+    : turn.items;
   for (const item of imageItems) {
     if (
       item.type === "imageGeneration" &&
@@ -189,12 +223,22 @@ function collectTurnLocalArtifacts(
       isGeneratedImageResource(item.src) &&
       !isWorkspaceResource({ cwd, resourcePath: item.src }) &&
       (includeGeneratedImages ||
-        isProjectlessOutputResource({ cwd, projectlessOutputDirectory: projectlessDirectory, resourcePath: item.src }))
+        isProjectlessOutputResource({
+          cwd,
+          projectlessOutputDirectory: projectlessDirectory,
+          resourcePath: item.src,
+        }))
     ) {
       const path = cwd == null ? item.src : joinPath(cwd, item.src);
-      add(includeGeneratedImages
-        ? { type: "generated-image", imageGenerationItemId: String(item.id), path }
-        : { type: "file", path });
+      add(
+        includeGeneratedImages
+          ? {
+              type: "generated-image",
+              imageGenerationItemId: String(item.id),
+              path,
+            }
+          : { type: "file", path },
+      );
     }
   }
   if (status !== "complete") return artifacts;
@@ -207,22 +251,28 @@ function collectTurnLocalArtifacts(
       artifacts: getTurnArtifactPaths(turn),
       collaborationMode: turn.params.collaborationMode ?? null,
       cwd,
-      items: ((projectConversationTurn as unknown as (
-        turn: Record<string, unknown>,
-        requests: unknown,
-        options: Record<string, unknown>,
-      ) => { items: unknown[] })(
-        turn as unknown as Record<string, unknown>,
-        [],
-        { includeTurnDiff: false },
-      )).items,
+      items: (
+        projectConversationTurn as unknown as (
+          turn: Record<string, unknown>,
+          requests: unknown,
+          options: Record<string, unknown>,
+        ) => { items: unknown[] }
+      )(turn as unknown as Record<string, unknown>, [], {
+        includeTurnDiff: false,
+      }).items,
       status,
     },
   }) as Array<Record<string, unknown>>;
   for (const artifact of parsed) {
     switch (artifact.type) {
       case "file":
-        add({ type: "file", path: cwd == null ? String(artifact.path) : joinPath(cwd, String(artifact.path)) });
+        add({
+          type: "file",
+          path:
+            cwd == null
+              ? String(artifact.path)
+              : joinPath(cwd, String(artifact.path)),
+        });
         break;
       case "google-drive":
       case "appgen-app":
@@ -230,19 +280,32 @@ function collectTurnLocalArtifacts(
         break;
       case "website": {
         const target = String(artifact.target);
-        add({ type: "website", target: isHttpUrl(target) || cwd == null ? target : joinPath(cwd, target) });
+        add({
+          type: "website",
+          target:
+            isHttpUrl(target) || cwd == null ? target : joinPath(cwd, target),
+        });
         break;
       }
     }
   }
   const inputItems = [
     ...turn.params.input,
-    ...turn.items.flatMap((item) => item.type === "userMessage" ? (item.content as Array<Record<string, unknown>>) : []),
+    ...turn.items.flatMap((item) =>
+      item.type === "userMessage"
+        ? (item.content as Array<Record<string, unknown>>)
+        : [],
+    ),
   ];
   for (const item of inputItems) {
     if (item.type !== "text") continue;
-    for (const app of extractAppgenLinks(String(item.text)) as Array<Record<string, unknown>>) {
-      artifacts.push({ ...app, type: "appgen-app" } as unknown as ConversationArtifact);
+    for (const app of extractAppgenLinks(String(item.text)) as Array<
+      Record<string, unknown>
+    >) {
+      artifacts.push({
+        ...app,
+        type: "appgen-app",
+      } as unknown as ConversationArtifact);
     }
   }
   return artifacts;
@@ -257,29 +320,40 @@ function collectArtifactGroups(
     projectlessOutputDirectory: outputDirectory = null,
   }: CollectArtifactOptions = {},
 ): ConversationArtifact[][] {
-  const canonicalExternalResources = apps == null
-    ? null
-    : new Map(
-        collectExternalResources(turns, apps, includePages)
-          .filter(isWrittenExternalResource)
-          .map((resource) => [resource.key, resource]),
-      );
+  const canonicalExternalResources =
+    apps == null
+      ? null
+      : new Map(
+          collectExternalResources(turns, apps, includePages)
+            .filter(isWrittenExternalResource)
+            .map((resource) => [resource.key, resource]),
+        );
   const groups: ConversationArtifact[][] = [];
   for (let index = turns.length - 1; index >= 0; index -= 1) {
     const turn = turns[index];
-    const externalArtifacts = apps == null || canonicalExternalResources == null
-      ? []
-      : collectExternalResources([turn], apps, includePages)
-          .filter(isWrittenExternalResource)
-          .map((resource) => ({
-            type: "external-resource" as const,
-            resource: canonicalExternalResources.get(resource.key) ?? resource,
-          }));
+    const externalArtifacts =
+      apps == null || canonicalExternalResources == null
+        ? []
+        : collectExternalResources([turn], apps, includePages)
+            .filter(isWrittenExternalResource)
+            .map((resource) => ({
+              type: "external-resource" as const,
+              resource:
+                canonicalExternalResources.get(resource.key) ?? resource,
+            }));
     groups.push(
-      [...externalArtifacts, ...collectTurnLocalArtifacts(turn, outputDirectory, includeGeneratedImages)]
-        .map((artifact) => turn.turnStartedAtMs == null
+      [
+        ...externalArtifacts,
+        ...collectTurnLocalArtifacts(
+          turn,
+          outputDirectory,
+          includeGeneratedImages,
+        ),
+      ].map((artifact) =>
+        turn.turnStartedAtMs == null
           ? artifact
-          : { ...artifact, producedAtMs: turn.turnStartedAtMs }),
+          : { ...artifact, producedAtMs: turn.turnStartedAtMs },
+      ),
     );
   }
   return groups;
@@ -297,7 +371,9 @@ function filterExistingArtifacts(
   existingPaths: Iterable<string> | null,
 ): ConversationArtifact[] {
   if (existingPaths == null) return artifacts;
-  const normalizedPaths = new Set(Array.from(existingPaths, normalizeArtifactPath));
+  const normalizedPaths = new Set(
+    Array.from(existingPaths, normalizeArtifactPath),
+  );
   return artifacts.filter((artifact) => {
     switch (artifact.type) {
       case "file":
@@ -310,15 +386,15 @@ function filterExistingArtifacts(
 }
 
 function turnHasNonWebMcpCall(turn: ConversationTurn): boolean {
-  return (flattenConversationItems(turn.items) as Array<Record<string, unknown>>).some(
-    (item) => item.type === "mcpToolCall" && !isWebMcpServer(item.server),
-  );
+  return (
+    flattenConversationItems(turn.items) as Array<Record<string, unknown>>
+  ).some((item) => item.type === "mcpToolCall" && !isWebMcpServer(item.server));
 }
 
 let artifactsWithExternalResources: unknown;
 let localArtifacts: unknown;
 
-function initializeLocalConversationArtifactsSignals(): void {
+const initializeLocalConversationArtifactsSignals = once((): void => {
   initializeSignalRuntime();
   initializeUtilities();
   initializeConversationScope();
@@ -329,18 +405,31 @@ function initializeLocalConversationArtifactsSignals(): void {
 
   const allArtifacts = createScopedSignalFamily(
     appScope,
-    ({ conversationId, hostId }: { conversationId: string; hostId: string }, { get }: { get(signal: unknown, parameter: unknown): unknown }) => {
-      const turns = (get(priorConversationTurns, conversationId) as ConversationTurn[] | null) ?? [];
-      const latest = get(latestConversationTurn, conversationId) as ConversationTurn | null;
+    (
+      { conversationId, hostId }: { conversationId: string; hostId: string },
+      { get }: { get(signal: unknown, parameter: unknown): unknown },
+    ) => {
+      const turns =
+        (get(priorConversationTurns, conversationId) as
+          ConversationTurn[] | null) ?? [];
+      const latest = get(
+        latestConversationTurn,
+        conversationId,
+      ) as ConversationTurn | null;
       const combined = latest == null ? turns : [...turns, latest];
       const needsProviders = combined.some(turnHasNonWebMcpCall);
       const apps = needsProviders
-        ? ((get(externalSourceProviderQuery, hostId) as { data?: unknown[] })?.data ?? [])
+        ? ((get(externalSourceProviderQuery, hostId) as { data?: unknown[] })
+            ?.data ?? [])
         : undefined;
       return collectConversationArtifacts(combined, {
         apps,
-        includeGeneratedImages: get(conversationMode, conversationId) === "projectless",
-        projectlessOutputDirectory: get(projectlessOutputDirectory, conversationId) as string | null,
+        includeGeneratedImages:
+          get(conversationMode, conversationId) === "projectless",
+        projectlessOutputDirectory: get(
+          projectlessOutputDirectory,
+          conversationId,
+        ) as string | null,
       });
     },
     { isEqual: Object.is },
@@ -348,19 +437,33 @@ function initializeLocalConversationArtifactsSignals(): void {
   artifactsWithExternalResources = allArtifacts;
   localArtifacts = createScopedSignalFamily(
     appScope,
-    ({ conversationId }: { conversationId: string }, { get }: { get(signal: unknown, parameter: unknown): unknown }) => {
-      const turns = (get(priorConversationTurns, conversationId) as ConversationTurn[] | null) ?? [];
-      const latest = get(latestConversationTurn, conversationId) as ConversationTurn | null;
-      return collectConversationArtifacts(latest == null ? turns : [...turns, latest], {
-        includeGeneratedImages: false,
-        projectlessOutputDirectory: get(projectlessOutputDirectory, conversationId) as string | null,
-      });
+    (
+      { conversationId }: { conversationId: string },
+      { get }: { get(signal: unknown, parameter: unknown): unknown },
+    ) => {
+      const turns =
+        (get(priorConversationTurns, conversationId) as
+          ConversationTurn[] | null) ?? [];
+      const latest = get(
+        latestConversationTurn,
+        conversationId,
+      ) as ConversationTurn | null;
+      return collectConversationArtifacts(
+        latest == null ? turns : [...turns, latest],
+        {
+          includeGeneratedImages: false,
+          projectlessOutputDirectory: get(
+            projectlessOutputDirectory,
+            conversationId,
+          ) as string | null,
+        },
+      );
     },
   );
   void externalSourceProvidersQuery;
-}
+});
 
-function initializeArtifactModel(): void {
+const initializeArtifactModel = once((): void => {
   initializeUtilities();
   initializeAppgenArtifactLinks();
   initializeArtifactUrls();
@@ -374,7 +477,7 @@ function initializeArtifactModel(): void {
   initializePathUtilities();
   initializeLocalConversationExternalResources();
   void initializeDeepEqual;
-}
+});
 
 export {
   initializeArtifactModel as a,

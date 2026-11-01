@@ -32,6 +32,7 @@ const result = await esbuild.build({
           ({ path: importPath }) => ({
             contents:
               {
+                "rolldown-runtime": `export const n = initializer => { let done = false; return () => { if (!done) { done = true; initializer(); } }; };`,
                 "app-shared": `
                   export const I3 = () => globalThis.__accessStateMessagesTest.jsx;
                   export const G2 = (messages) => messages; export const A_ = "PublicIcon";

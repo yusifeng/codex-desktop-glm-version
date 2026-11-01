@@ -19,8 +19,13 @@ const state = (globalThis.__conversationDerivedTest = {
 
 const importedNamesByModule = new Map();
 for (const directory of MODULES) {
-  const source = fs.readFileSync(path.join(ROOT, "src/renderer", directory, "index.ts"), "utf8");
-  for (const match of source.matchAll(/import\s*{([^;]*?)}\s*from\s*"@rchunk\/([^"]+)";/g)) {
+  const source = fs.readFileSync(
+    path.join(ROOT, "src/renderer", directory, "index.ts"),
+    "utf8",
+  );
+  for (const match of source.matchAll(
+    /import\s*{([^;]*?)}\s*from\s*"@rchunk\/([^"]+)";/g,
+  )) {
     const names = importedNamesByModule.get(match[2]) ?? new Set();
     for (const rawSpecifier of match[1].split(",")) {
       const specifier = rawSpecifier.trim();
@@ -31,10 +36,11 @@ for (const directory of MODULES) {
   }
 }
 
-const marker = name => `() => globalThis.__conversationDerivedTest.initialized.push(${JSON.stringify(name)})`;
+const marker = (name) =>
+  `() => globalThis.__conversationDerivedTest.initialized.push(${JSON.stringify(name)})`;
 const overrides = {
   "app-shared": {
-    "$3": marker("compiler"),
+    $3: marker("compiler"),
     BI: `value => String(value).replaceAll("\\\\", "/").toLowerCase()`,
     FX: marker("signals"),
     H3: marker("preload"),
@@ -148,11 +154,16 @@ function generic(moduleName, exportName) {
 }
 
 function mockModule(name) {
-  if (name === "rolldown-runtime") return "export {};";
-  if (name === "katex-renderer") return "export default { renderToString: value => value };";
+  if (name === "rolldown-runtime")
+    return "export const n = initializer => { let done = false; return () => { if (!done) { done = true; initializer(); } }; };";
+  if (name === "katex-renderer")
+    return "export default { renderToString: value => value };";
   const names = importedNamesByModule.get(name) ?? new Set();
   return [...names]
-    .map(exportName => `export const ${exportName} = ${overrides[name]?.[exportName] ?? generic(name, exportName)};`)
+    .map(
+      (exportName) =>
+        `export const ${exportName} = ${overrides[name]?.[exportName] ?? generic(name, exportName)};`,
+    )
     .join("\n");
 }
 
@@ -165,41 +176,62 @@ async function bundle(directory) {
     target: "node22",
     write: false,
     logLevel: "silent",
-    plugins: [{
-      name: "conversation-derived-mocks",
-      setup(build) {
-        build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({
-          path: importPath.slice("@rchunk/".length),
-          namespace: "mock",
-        }));
-        build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({
-          contents: mockModule(importPath),
-          loader: "js",
-        }));
+    plugins: [
+      {
+        name: "conversation-derived-mocks",
+        setup(build) {
+          build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({
+            path: importPath.slice("@rchunk/".length),
+            namespace: "mock",
+          }));
+          build.onLoad(
+            { filter: /.*/, namespace: "mock" },
+            ({ path: importPath }) => ({
+              contents: mockModule(importPath),
+              loader: "js",
+            }),
+          );
+        },
       },
-    }],
+    ],
   });
-  return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`);
+  return import(
+    `data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`
+  );
 }
 
 const conversationSource = await bundle("conversation-source");
-const turns = [{
-  turnKey: "turn-1",
-  units: [{ unitId: "unit-1", text: "Alpha beta alpha" }],
-}];
+const turns = [
+  {
+    turnKey: "turn-1",
+    units: [{ unitId: "unit-1", text: "Alpha beta alpha" }],
+  },
+];
 const scrollAdapter = {
   getTurnContainer: () => ({ id: "container" }),
-  scrollToTurn: async turnKey => state.scrolls.push({ turnKey }),
+  scrollToTurn: async (turnKey) => state.scrolls.push({ turnKey }),
 };
-const source = conversationSource.t({ contextId: "thread-1", getTurns: () => turns, scrollAdapter });
-const result = await source.search({ domain: "conversation", contextId: "thread-1", query: "alpha" });
+const source = conversationSource.t({
+  contextId: "thread-1",
+  getTurns: () => turns,
+  scrollAdapter,
+});
+const result = await source.search({
+  domain: "conversation",
+  contextId: "thread-1",
+  query: "alpha",
+});
 assert.equal(result.matches.length, 2);
 assert.equal(result.totalMatches, 2);
 assert.equal(result.matches[0].ordinal, 1);
 assert.equal(result.matches[1].location.matchIndex, 1);
 assert.equal(result.matches[0].id, "thread-1:turn-1:unit-1:text:0");
 assert.equal(result.isCapped, false);
-const empty = await source.search({ domain: "conversation", contextId: "thread-1", query: "" });
+const empty = await source.search({
+  domain: "conversation",
+  contextId: "thread-1",
+  query: "",
+});
 assert.equal(empty.matches.length, 0);
 const persistedSource = conversationSource.t({
   contextId: "thread-1",
@@ -211,7 +243,11 @@ const persistedSource = conversationSource.t({
     totalMatches: 4,
   }),
 });
-const merged = await persistedSource.search({ domain: "conversation", contextId: "thread-1", query: "alpha" });
+const merged = await persistedSource.search({
+  domain: "conversation",
+  contextId: "thread-1",
+  query: "alpha",
+});
 assert.equal(merged.matches.length, 3);
 assert.equal(merged.matches[0].id, "persisted");
 assert.equal(merged.totalMatches, 4);
@@ -219,11 +255,27 @@ await source.ensureVisible(result.matches[0].location);
 assert.equal(state.scrolls.at(-1).matchId, result.matches[0].id);
 const mathSource = conversationSource.t({
   contextId: "math",
-  getTurns: () => [{ turnKey: "turn-math", units: [{ unitId: "equation", text: "x", textChunks: ["x"], equations: ["\\alpha + β"] }] }],
+  getTurns: () => [
+    {
+      turnKey: "turn-math",
+      units: [
+        {
+          unitId: "equation",
+          text: "x",
+          textChunks: ["x"],
+          equations: ["\\alpha + β"],
+        },
+      ],
+    },
+  ],
   scrollAdapter,
   searchMath: true,
 });
-const mathResult = await mathSource.search({ domain: "conversation", contextId: "math", query: "α" });
+const mathResult = await mathSource.search({
+  domain: "conversation",
+  contextId: "math",
+  query: "α",
+});
 assert.equal(mathResult.matches.length, 1);
 assert.equal(mathResult.matches[0].location.equationIndex, 0);
 conversationSource.n();
@@ -231,7 +283,10 @@ assert.equal(state.initialized.includes("scroll-to-match"), true);
 
 const artifacts = await bundle("local-conversation-artifacts-signals");
 assert.equal(artifacts.i("ig_abcdefabcdefabcdefabcdefabcdefab.png"), true);
-assert.equal(artifacts.i("exec-12345678-1234-1234-1234-123456789abc.webp"), true);
+assert.equal(
+  artifacts.i("exec-12345678-1234-1234-1234-123456789abc.webp"),
+  true,
+);
 assert.equal(artifacts.i("ordinary.png"), false);
 artifacts.r();
 assert.equal(typeof artifacts.n.factory, "function");
@@ -247,15 +302,27 @@ const values = new Map([
   ["conversation-mode", "projectless"],
   ["output-directory", "/out"],
 ]);
-const get = signal => values.get(signal?.id);
+const get = (signal) => values.get(signal?.id);
 const artifactList = artifacts.n.factory(
   { conversationId: "thread", hostId: "host" },
   { get },
 );
-assert.equal(artifactList.some(item => item.type === "generated-image"), true);
-assert.equal(artifactList.some(item => item.type === "appgen-app"), true);
-const localArtifactList = artifacts.t.factory({ conversationId: "thread" }, { get });
-assert.equal(localArtifactList.some(item => item.type === "file"), true);
+assert.equal(
+  artifactList.some((item) => item.type === "generated-image"),
+  true,
+);
+assert.equal(
+  artifactList.some((item) => item.type === "appgen-app"),
+  true,
+);
+const localArtifactList = artifacts.t.factory(
+  { conversationId: "thread" },
+  { get },
+);
+assert.equal(
+  localArtifactList.some((item) => item.type === "file"),
+  true,
+);
 assert.equal(state.initialized.includes("external-resources"), true);
 
 const turnEntries = await bundle("local-conversation-thread-turn-entries");
@@ -268,11 +335,17 @@ const generated = turnEntries.n({
   requestUserInputAsyncUiEnabled: false,
   previousEntries: [],
   projectlessOutputDirectory: null,
-  visibleTurnEntries: [{
-    turnKey: "turn-1",
-    turnSearchKey: "search-1",
-    turn: { status: "completed", params: { input: [] }, items: [{ type: "imageGeneration", id: "image", src: "image.png" }] },
-  }],
+  visibleTurnEntries: [
+    {
+      turnKey: "turn-1",
+      turnSearchKey: "search-1",
+      turn: {
+        status: "completed",
+        params: { input: [] },
+        items: [{ type: "imageGeneration", id: "image", src: "image.png" }],
+      },
+    },
+  ],
 });
 assert.equal(generated.length, 1);
 const options = {
@@ -281,13 +354,21 @@ const options = {
   hostId: "host-1",
   isBackgroundSubagentsEnabled: false,
   previousEntries: [],
-  renderEntries: [{
-    turnKey: "source-key",
-    turnSearchKey: "search-key",
-    turnId: "turn-id",
-    isLatestTurn: true,
-    turn: { status: "completed", params: { input: [{ type: "text", text: "hello" }] }, items: [{ id: "agent", type: "agentMessage" }], turnStartedAtMs: 10, finalAssistantStartedAtMs: 20 },
-  }],
+  renderEntries: [
+    {
+      turnKey: "source-key",
+      turnSearchKey: "search-key",
+      turnId: "turn-id",
+      isLatestTurn: true,
+      turn: {
+        status: "completed",
+        params: { input: [{ type: "text", text: "hello" }] },
+        items: [{ id: "agent", type: "agentMessage" }],
+        turnStartedAtMs: 10,
+        finalAssistantStartedAtMs: 20,
+      },
+    },
+  ],
   requestUserInputAsyncUiEnabled: false,
   showInProgressFixedContent: true,
   threadHandoffOperation: { id: "handoff" },

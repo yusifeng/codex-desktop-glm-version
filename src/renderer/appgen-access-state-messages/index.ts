@@ -12,7 +12,7 @@ import type {
 } from "@rchunk/appgen-access";
 import type { JsxRuntime, MessageDescriptor } from "@rchunk/app-shared";
 
-void runtimeChunk;
+const once = runtimeChunk.n as (initializer: () => void) => () => void;
 const {
   $3: initializeReactRuntime,
   A_: PublicIcon,
@@ -22,19 +22,13 @@ const {
   e6: initializeReact,
   j_: initializePublicIcon,
 } = appSharedChunk;
-const {
-  n: initializeLockIcon,
-  t: LockIcon,
-} = lockChunk;
+const { n: initializeLockIcon, t: LockIcon } = lockChunk;
 const {
   c: isEmptyRestrictedAccess,
   r: summarizeAccessPolicy,
   s: initializeAppgenAccess,
 } = appgenAccessChunk;
-const {
-  n: initializeBuildingIcon,
-  t: BuildingIcon,
-} = buildingChunk;
+const { n: initializeBuildingIcon, t: BuildingIcon } = buildingChunk;
 
 type AccessStateKey =
   | "groups"
@@ -59,7 +53,7 @@ let fullMessages: Record<AccessStateKey, MessageDescriptor>;
 let shortMessages: Record<AccessStateKey, MessageDescriptor>;
 let siteMessages: Record<AccessStateKey, MessageDescriptor>;
 
-function initializePeopleIcon(): void {
+const initializePeopleIcon = once((): void => {
   initializeReact();
   jsx = getJsxRuntime();
   PeopleIcon = (props: SvgIconProps) =>
@@ -75,7 +69,7 @@ function initializePeopleIcon(): void {
         fill: "currentColor",
       }),
     });
-}
+});
 
 function AccessStateIcon(props: AccessStateIconProps): unknown {
   const { accessPolicy, accessState, ...iconProps } = props;
@@ -83,7 +77,10 @@ function AccessStateIcon(props: AccessStateIconProps): unknown {
   switch (state.accessMode) {
     case "admins_only":
     case "custom":
-      return jsx.jsx(isEmptyRestrictedAccess(state) ? LockIcon : PeopleIcon, iconProps);
+      return jsx.jsx(
+        isEmptyRestrictedAccess(state) ? LockIcon : PeopleIcon,
+        iconProps,
+      );
     case "workspace_all":
       return jsx.jsx(BuildingIcon, iconProps);
     case "public":
@@ -133,7 +130,7 @@ function siteAccessMessage(
   return key == null ? undefined : siteMessages[key];
 }
 
-function initializeAccessStateIcon(): void {
+const initializeAccessStateIcon = once((): void => {
   initializeReactRuntime();
   initializeBuildingIcon();
   initializePublicIcon();
@@ -141,9 +138,9 @@ function initializeAccessStateIcon(): void {
   initializePeopleIcon();
   initializeAppgenAccess();
   jsx = getJsxRuntime();
-}
+});
 
-function initializeAccessStateMessages(): void {
+const initializeAccessStateMessages = once((): void => {
   initializeInternationalization();
   initializeAppgenAccess();
   fullMessages = defineMessages({
@@ -251,7 +248,7 @@ function initializeAccessStateMessages(): void {
         "Tooltip for a site link shared with anyone in the workspace",
     },
   });
-}
+});
 
 export {
   AccessStateIcon as a,
