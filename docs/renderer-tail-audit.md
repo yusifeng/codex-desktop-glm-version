@@ -1,5 +1,13 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Artifact source bootstrap 大批次：`artifact-source-bootstrap` 不再保留
+15,318 行发布版 owner。可维护 TypeScript 恢复 artifact header/layout/zoom、worker transport、
+external store、viewport camera、hidden textarea、文本 layout/hit-test/selection、pointer click、
+image upload、insert menu 与 alignment icons；约 12,000 行 Office preset shape 纯数据拆为
+可再生的 checked-in TypeScript 模块，运行时不再回拷原 JS，同时继续向 workbook runtime
+安装完整 shape catalog。发布版 79 项短导出 ABI 保持不变，新增 50 项 focused contract，
+并通过 build/verify。严格剩余由 3 个 / 23,539 行降至 2 个 / 8,221 行。
+
 2026-11-02 Popcorn 编辑器 surface 大批次：`text-underline-icon` 与
 `popcorn-electron-surface-style` 不再保留合计 10,191 行发布版 owner。可维护 TypeScript
 恢复 presentation/document toolbar、shape/font/color inspector、页码导航与 underline 图标；
@@ -270,8 +278,8 @@ presentation/workbook/spreadsheet 编辑器和纯 SVG/persona/icon 数据。该�
 `artifact-source-bootstrap`、`text-underline-icon` 和
 `popcorn-electron-surface-style` 的发布资产分别暴露 79、37、65 个压缩导出。
 三者现有 renderer 消费仍主要是副作用边，但这不再被当作“已完成”的替代证据：
-后两者已经迁移为可维护语义源码并由 focused contract 固定 ABI 和行为；
-`artifact-source-bootstrap` 仍是最后三个严格 owner 之一，必须继续消除其发布版回退。
+三者均已迁移为可维护语义源码并由 focused contract 固定 ABI 和行为；其中
+`artifact-source-bootstrap` 的大型 shape catalog 被明确拆成可再生纯数据，而不是发布 JS 回退。
 `scripts/test-renderer-incremental-hubs.mjs` 同时固定 rewritten 分类、发布导出数量和消费方式。
 
 `node scripts/audit-renderer-hub-classification.mjs` 对 `app-shared`、`app-initial`

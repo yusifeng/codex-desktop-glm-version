@@ -396,7 +396,6 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
 // clarified, without changing their behavior or export surface.
 export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["realtime-voice-controls-surface", "controls-fedbfda05b6b.js"],
-  ["artifact-source-bootstrap", "artifact-source-bootstrap-583ed8de587e.js"],
   ["mark-session-create", "mark-session-create-6f7d531b2a15.js"],
 ]);
 
@@ -422,6 +421,7 @@ export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   "session-3ec40b7dd28e.js",
   "TextUnderlineIcon-6110dcc4e55d.js",
   "popcorn-electron-surface-style-734d538e9445.js",
+  "artifact-source-bootstrap-583ed8de587e.js",
   "codex-micro-mini-game-composer-c7d8a016e5c4.js",
   "composer-host-ac9410930773.js",
   "right-panel-composer-overlay-fdca4b46e82c.js",

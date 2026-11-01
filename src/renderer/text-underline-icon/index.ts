@@ -7,8 +7,8 @@ import { I3 as getJsxRuntime } from "@rchunk/app-shared";
 
 interface JsxRuntime {
   Fragment: unknown;
-  jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown;
-  jsxs(type: unknown, props: Record<string, unknown>, key?: string): unknown;
+  jsx(type: unknown, props: Record<string, unknown>, key?: string | number): unknown;
+  jsxs(type: unknown, props: Record<string, unknown>, key?: string | number): unknown;
 }
 interface Rect {
   height: number;
