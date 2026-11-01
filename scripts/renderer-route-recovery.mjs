@@ -336,6 +336,7 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "plaid-link-a9255a11a708.js",
   "registered-259e95b201a1.js",
   "report-dialog-75a130d615ed.js",
+  "safety-settings-aa3588e3b94c.js",
   "trusted-contact-settings-b71f926a1121.js",
   "use-search-plugins-12df8f20afed.js",
   "voice-settings-3a0651cd977e.js",
@@ -363,7 +364,6 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
 // modules leave the compatibility graph before their local names are manually
 // clarified, without changing their behavior or export surface.
 export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
-  ["safety-settings", "safety-settings-aa3588e3b94c.js"],
   ["agent-settings", "agent-settings-27cdda401037.js"],
   ["billing-settings", "billing-settings-d5b5419393a0.js"],
   ["chronicle-settings-page", "chronicle-settings-page-e92cf619a884.js"],
@@ -453,14 +453,9 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
     "codex-micro-onboarding-host-85407a96e02a.js",
   ],
   ["content", "content-bd6ed75ea274.js"],
-  ["git-settings", "git-settings-537e4135cecb.js"],
-  ["import-settings", "import-settings-ec2688b74a01.js"],
   ["library-cloud-file-preview", "library-cloud-file-preview-b3ddfaa823c0.js"],
   ["open-conversation-files", "open-a618d40921b2.js"],
   ["detached-browser-page", "page-268e2fb6d880.js"],
-  ["pets-settings-route", "pets-settings-route-965aa70e25ab.js"],
-  ["trusted-contact-settings", "trusted-contact-settings-b71f926a1121.js"],
-  ["voice-settings", "voice-settings-3a0651cd977e.js"],
   ["workbook-review-utils", "workbook-review-utils-3e78f7501b68.js"],
   // Complete eager first-party dependency closure of the four conversation
   // React roots. These owners remove structurally approximate implementations
