@@ -42,7 +42,9 @@ import { default as gitlabMergeRequestFormDialog } from "@rchunk/gitlab-merge-re
 void openAutomationSidePanelTab2, googleDriveResourceIcon, scrollToMatchInit2, useThreadScrollController2, resultCard2, gitlabMergeRequestFormDialog;
 
 import { $3 as appSharedLazy } from "@rchunk/app-shared";
+import * as appSharedChunk from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
+import * as appInitialChunk from "@rchunk/app-initial";
 import { d as appPrimaryInit } from "@rchunk/app-primary";
 import * as virtualizedTurnList from "@rchunk/virtualized-turn-list";
 import * as localConversationTurn from "@rchunk/local-conversation-turn";
@@ -77,7 +79,7 @@ import { default as localEnvironmentEditor } from "@rchunk/local-environment-edi
 import { default as localEnvironmentWorkflowMessages } from "@rchunk/local-environment-workflow-messages";
 import { default as openLocalConversationBackgroundTerminalTab } from "@rchunk/open-local-conversation-background-terminal-tab";
 import { default as openLocalConversationSourcesSidePanelTab } from "@rchunk/open-local-conversation-sources-side-panel-tab";
-import { default as useResumeConversationIfNeeded } from "@rchunk/use-resume-conversation-if-needed";
+import * as resumeConversationChunk from "@rchunk/use-resume-conversation-if-needed";
 import { default as worktreeSetupAutoFix } from "@rchunk/worktree-setup-auto-fix";
 import { default as realtimeVoiceHandoffTarget } from "@rchunk/realtime-voice-handoff-target";
 import { default as realtimeVoiceLaunchSurface } from "@rchunk/realtime-voice-launch-surface";
@@ -102,6 +104,7 @@ import { default as layout } from "@rchunk/layout";
 import { default as lock } from "@rchunk/lock";
 import { default as modelPickerChevronDownSm } from "@rchunk/model-picker-chevron-down-sm";
 import { default as openTarget } from "@rchunk/open-target";
+import * as openTargetChunk from "@rchunk/open-target";
 import { default as triangleWarning } from "@rchunk/triangle-warning";
 
 void appSharedLazy; void appInitialInit; void appPrimaryInit;
@@ -118,7 +121,7 @@ void artifactsSignals; void externalResourceIcon; void useLocalConversationSourc
 void conversationSource; void creationTargetQuery; void environmentLabels;
 void localEnvironmentEditor; void localEnvironmentWorkflowMessages;
 void openLocalConversationBackgroundTerminalTab; void openLocalConversationSourcesSidePanelTab;
-void useResumeConversationIfNeeded; void worktreeSetupAutoFix;
+void resumeConversationChunk; void worktreeSetupAutoFix;
 void realtimeVoiceHandoffTarget; void realtimeVoiceLaunchSurface;
 void realtimeVoiceMotion; void realtimeVoiceStageLayout;
 void useRealtimeVoiceNativeOverlayTransitionEnabled; void remoteHostedPipAnchorBridge;
@@ -148,6 +151,66 @@ export interface ResumeState {
   isUnavailable: boolean;
   isWriterConflict: boolean;
   retryResume: () => void;
+}
+
+interface JsxRuntime {
+  Fragment: unknown;
+  jsx(type: unknown, props: Record<string, unknown>, key?: string | number): unknown;
+  jsxs(type: unknown, props: Record<string, unknown>, key?: string | number): unknown;
+}
+
+interface ReactRuntime {
+  useEffect(effect: () => void | (() => void), dependencies: unknown[]): void;
+}
+
+type ScopeLike = {
+  get(signal: unknown, parameter?: unknown): any;
+  set?(signal: unknown, value: unknown, parameter?: unknown): void;
+};
+
+const shared = appSharedChunk as unknown as Record<string, any>;
+const initial = appInitialChunk as unknown as Record<string, any>;
+const resumeRuntime = resumeConversationChunk as unknown as Record<string, any>;
+let jsxRuntime: JsxRuntime | undefined;
+let threadMountInitialized = false;
+let setupInitialized = false;
+let localThreadInitialized = false;
+let moduleInitialized = false;
+
+function jsx(): JsxRuntime {
+  jsxRuntime ??= shared.I3?.() as JsxRuntime;
+  if (jsxRuntime == null) throw new Error("local-conversation-thread requires the JSX runtime");
+  return jsxRuntime;
+}
+
+function call(value: unknown): void { if (typeof value === "function") value(); }
+function query<Value>(signal: unknown, parameter?: unknown): Value | undefined {
+  return typeof shared.BX === "function" && signal != null ? shared.BX(signal, parameter) as Value : undefined;
+}
+function appScope(): ScopeLike | null {
+  if (typeof shared.LX !== "function") return null;
+  try { return shared.LX(initial.$en ?? shared.ZI) as ScopeLike; } catch { return null; }
+}
+function interactionMarksRead(event: { defaultPrevented?: boolean; key?: string; type?: string }): boolean {
+  return event.defaultPrevented !== true && (event.type !== "keydown" || !["Meta", "Control", "Alt", "AltGraph", "Shift"].includes(event.key ?? ""));
+}
+function unavailableResumeState(): ResumeState {
+  return { hasResumeFailed: false, isResuming: false, isUnavailable: false, isWriterConflict: false, retryResume: () => undefined };
+}
+type BackgroundAgentTarget = { canInteract?: boolean; conversationId: string; displayName?: string };
+function backgroundAgentCallbacks(scope: ScopeLike | null, parentConversationId: string, hostId: string | undefined, onOpen?: (agent: BackgroundAgentTarget) => void) {
+  const resolve = (conversationId: string): BackgroundAgentTarget | null => {
+    const resolver = (openTargetChunk as unknown as Record<string, any>).t;
+    if (typeof resolver !== "function" || scope == null) return { conversationId };
+    return resolver(scope, parentConversationId, hostId, conversationId) ?? null;
+  };
+  return {
+    canOpen(conversationId: string): boolean { return resolve(conversationId) != null; },
+    open(conversationId: string): void {
+      const target = resolve(conversationId);
+      if (target != null && (target.canInteract !== false || onOpen != null)) onOpen?.(target);
+    },
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -192,7 +255,7 @@ function agentDisplayName({ agentNickname, conversationId, useGeneratedFallback 
  * 已有线程（Fa 命中）→ 原值；会话源（Yp）launchMode=create-stable-worktree
  * → null；否则 → clientThreadId。
  */
-const clientThreadIdForFamily = {
+const fallbackClientThreadIdForFamily = {
   resolve(conversationId: string | null, lookup: (key: unknown, id: string | null) => unknown): string | null {
     if (conversationId != null && lookup(null, conversationId) != null) return conversationId;
     const source = lookup(null, conversationId) as { launchMode?: string; clientThreadId?: string } | null;
@@ -201,9 +264,22 @@ const clientThreadIdForFamily = {
     return source.clientThreadId ?? null;
   },
 };
+let clientThreadIdForFamily: unknown = fallbackClientThreadIdForFamily;
 
 /** family 装配初始化器（原 `sM`，导出 c）。 */
-function initializeClientThreadIdFamily(): void {}
+function initializeClientThreadIdFamily(): void {
+  if (clientThreadIdForFamily !== fallbackClientThreadIdForFamily) return;
+  call(shared.$3);
+  call(shared.QI);
+  call(initial.C);
+  const createDerivedFamily = shared.rZ;
+  if (typeof createDerivedFamily !== "function" || shared.ZI == null) return;
+  clientThreadIdForFamily = createDerivedFamily(shared.ZI, (conversationId: string | null, helpers: { get(signal: unknown, parameter?: unknown): any }) => {
+    if (conversationId != null && helpers.get(initial.Ltn, conversationId) != null) return conversationId;
+    const source = helpers.get(initial.y_t, conversationId);
+    return source == null ? source : source.launchMode === "create-stable-worktree" ? null : source.clientThreadId;
+  });
+}
 
 // ---------------------------------------------------------------------------
 // 恢复重试卡 / writer 冲突卡（原 `yM`/`dM`，导出 a/o）
@@ -217,13 +293,34 @@ const WRITER_CONFLICT_MESSAGES = {
 } as const;
 
 /** 重试卡（原 `yM`，导出 a）。 */
-function ResumeRetryCard(props: { onRetry?: () => void }): ThreadViewNode {
-  return { kind: "resume-retry-card", props: { onRetry: props.onRetry } };
+function ResumeRetryCard(props: { onRetry?: () => void }): unknown {
+  const Button = shared.Yh ?? "button";
+  return jsx().jsx("section", {
+    className: "flex h-full flex-col items-center justify-center gap-3 select-none",
+    "data-thread-state": "unavailable",
+    role: "alert",
+    children: jsx().jsxs(jsx().Fragment, { children: [
+      jsx().jsx("h2", { children: "Task unavailable" }),
+      jsx().jsx(Button, { color: "outline", type: "button", onClick: props.onRetry, children: "Retry" }),
+    ] }),
+  });
 }
 
 /** writer 冲突卡（原 `dM`，导出 o）。 */
-function WriterConflictCard(props: { isResuming?: boolean; onRetry?: () => void }): ThreadViewNode {
-  return { kind: "writer-conflict-card", props: { isResuming: props.isResuming === true, onRetry: props.onRetry, ...WRITER_CONFLICT_MESSAGES } };
+function WriterConflictCard(props: { isResuming?: boolean; onRetry?: () => void }): unknown {
+  const Button = shared.Yh ?? "button";
+  return jsx().jsxs("section", {
+    className: "flex flex-wrap items-center gap-3 rounded-lg border border-warning p-3",
+    "data-thread-state": "writer-conflict",
+    role: "alert",
+    children: [
+      jsx().jsxs("div", { className: "min-w-0 flex-1", children: [
+        jsx().jsx("strong", { children: WRITER_CONFLICT_MESSAGES.title.defaultMessage }),
+        jsx().jsx("p", { children: WRITER_CONFLICT_MESSAGES.description.defaultMessage }),
+      ] }),
+      jsx().jsx(Button, { color: "ghostActive", disabled: props.isResuming === true, type: "button", onClick: props.onRetry, children: WRITER_CONFLICT_MESSAGES.retry.defaultMessage }),
+    ],
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -237,35 +334,76 @@ function WriterConflictCard(props: { isResuming?: boolean; onRetry?: () => void 
  * 包裹 min-h-0 flex-1。
  */
 function ThreadContainer(props: {
+  backgroundAgentCallbacks?: { canOpen(conversationId: string): boolean; open(conversationId: string): void };
+  children?: unknown;
   conversationId: string;
   hostId?: string;
   isReadOnly?: boolean;
   retainActiveInterest?: boolean;
   showSideChatEmptyState?: boolean;
   trackReadState?: boolean;
-}): ThreadViewNode {
+  onMarkRead?: (conversationId: string) => void;
+}): unknown {
   const trackReadState = props.trackReadState === true;
   const isReadOnly = props.isReadOnly === true;
   const retainActiveInterest = props.retainActiveInterest !== false;
-  return {
-    kind: "thread-container",
-    props: {
-      className: "min-h-0 flex-1",
-      conversationId: props.conversationId,
-      enableMcpApps: false,
-      hostId: props.hostId,
-      initialScrollOffset: null,
-      initialVirtualizedTurnListRestoreState: null,
-      isBackgroundSubagentsEnabled: false,
-      isReadOnly,
-      isResuming: false,
-      retainActiveInterest,
-      showInProgressFixedContent: true,
-      showSideChatEmptyState: props.showSideChatEmptyState === true,
-      trackReadState,
-      usesUnifiedTimeline: true,
-    },
+  const scope = appScope();
+  const projected = query<{ renderEntries?: Array<Record<string, any>>; visibleTurnEntries?: Array<Record<string, any>> }>(initial.M_, {
+    conversationId: props.conversationId,
+    isBackgroundSubagentsEnabled: true,
+  });
+  const markRead = (event?: { defaultPrevented?: boolean; key?: string; type?: string }) => {
+    if (!trackReadState || (event != null && !interactionMarksRead(event))) return;
+    if (props.onMarkRead != null) { props.onMarkRead(props.conversationId); return; }
+    try {
+      const hostId = props.hostId ?? scope?.get(initial.wQt, props.conversationId);
+      initial.Ugn?.(scope, hostId)?.markConversationAsRead?.(props.conversationId);
+    } catch { /* read tracking must never break the thread */ }
   };
+  const react = shared.e6?.() as ReactRuntime | undefined;
+  react?.useEffect?.(() => { markRead(); }, [props.conversationId, trackReadState]);
+  const entries = projected?.visibleTurnEntries ?? projected?.renderEntries ?? [];
+  const Turn = (localConversationTurn as any).t;
+  const body = props.children ?? jsx().jsx("div", {
+    className: "flex min-h-0 flex-1 flex-col overflow-y-auto",
+    "data-local-conversation-body": true,
+    "data-conversation-id": props.conversationId,
+    "data-host-id": props.hostId,
+    "data-read-only": isReadOnly || undefined,
+    "data-retain-active-interest": retainActiveInterest,
+    "data-show-side-chat-empty-state": props.showSideChatEmptyState === true || undefined,
+    children: entries.length === 0
+      ? (props.showSideChatEmptyState === true ? jsx().jsx("div", { "data-side-chat-empty-state": true, children: "No messages yet" }) : null)
+      : entries.map((entry, index) => entry.turn == null || typeof Turn !== "function"
+        ? null
+        : jsx().jsx(Turn, {
+            conversationId: props.conversationId,
+            historyEntityKey: entry.historyEntityKey,
+            hostId: props.hostId,
+            isBackgroundSubagentsEnabled: true,
+            isLatestTurn: entry.isLatestTurn === true || index === entries.length - 1,
+            isMostRecentTurn: index === entries.length - 1,
+            isReadOnly,
+            preserveServerUserMessages: entry.preserveServerUserMessages === true,
+            renderMcpApps: true,
+            totalTurnCount: entries.length,
+            turn: entry.turn,
+            turnNumber: index + 1,
+            turnRequests: entry.requests,
+            turnSearchKey: entry.turnSearchKey,
+          }, String(entry.turnKey ?? entry.turnId ?? index))),
+  });
+  return jsx().jsx("div", {
+    className: "min-h-0 flex-1",
+    "data-local-conversation-thread-container": true,
+    onPointerDownCapture: markRead,
+    onKeyDownCapture: markRead,
+    onClickCapture: props.backgroundAgentCallbacks == null ? undefined : (event: { target?: { closest?(selector: string): { getAttribute(name: string): string | null } | null } }) => {
+      const conversationId = event.target?.closest?.("[data-background-agent-id]")?.getAttribute("data-background-agent-id");
+      if (conversationId != null && props.backgroundAgentCallbacks?.canOpen(conversationId)) props.backgroundAgentCallbacks.open(conversationId);
+    },
+    children: body,
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -289,45 +427,78 @@ function LocalConversationThread(props: {
   hideThreadContent?: boolean;
   hostId?: string;
   hostMcpApps?: boolean;
-  onOpenBackgroundAgent?: (conversationId: string) => void;
+  onOpenBackgroundAgent?: (agent: BackgroundAgentTarget) => void;
   shouldResume?: boolean;
   threadAccess?: unknown;
-}): ThreadViewNode {
+}): unknown {
   const canInteract = props.canInteract !== false;
   const shouldResume = props.shouldResume !== false;
-  const resumeState: ResumeState = {
-    hasResumeFailed: false,
-    isResuming: false,
-    isUnavailable: false,
-    isWriterConflict: false,
-    retryResume: () => {},
-  };
+  const scope = appScope();
+  const knownConversationSignal = query<boolean>(initial.zZt, props.conversationId);
+  const threadProjection = query<{ visibleTurnEntries?: unknown[] }>(initial.M_, {
+    conversationId: props.conversationId,
+    isBackgroundSubagentsEnabled: true,
+  });
+  const hasVisibleThreadContent = (threadProjection?.visibleTurnEntries?.length ?? 0) > 0;
+  const knownConversation = knownConversationSignal ?? false;
+  const projectedHostId = query<string>(initial.wQt, props.conversationId);
+  const resolvedHostId = props.hostId ?? projectedHostId;
+  const isShared = props.threadAccess === "shared" || (typeof props.threadAccess === "object" && props.threadAccess != null && (props.threadAccess as { kind?: string }).kind === "shared");
+  const resumeConversationId = shouldResume && canInteract && (knownConversation || isShared) ? props.conversationId : null;
+  const resumeHook = resumeRuntime.n as ((conversationId: string | null, threadAccess?: string) => ResumeState) | undefined;
+  const resumeState = resumeHook?.(resumeConversationId, isShared ? "shared" : "private") ?? unavailableResumeState();
   // 不可用（共享线程）
-  if (resumeState.isUnavailable) return { kind: "thread-unavailable", props: { onRetry: resumeState.retryResume } };
+  if (isShared && resumeState.isUnavailable && !hasVisibleThreadContent) return jsx().jsx(ResumeRetryCard, { onRetry: resumeState.retryResume });
   // 恢复失败（非冲突且无内容）
-  if (resumeState.hasResumeFailed && !resumeState.isWriterConflict) return ResumeRetryCard({ onRetry: resumeState.retryResume });
+  if (isShared && resumeState.hasResumeFailed && !resumeState.isWriterConflict && !hasVisibleThreadContent) return jsx().jsx(ResumeRetryCard, { onRetry: resumeState.retryResume });
   // writer 冲突卡
-  const writerConflictCard = resumeState.isWriterConflict ? WriterConflictCard({ isResuming: resumeState.isResuming, onRetry: resumeState.retryResume }) : null;
+  const writerConflictCard = resumeState.isWriterConflict ? jsx().jsx(WriterConflictCard, { isResuming: resumeState.isResuming, onRetry: resumeState.retryResume }) : null;
   const isReadOnly = !canInteract || resumeState.isWriterConflict;
-  return {
-    kind: "local-conversation-thread",
-    props: {
-      composerDisabled: props.composerSubmitDisabled === true || isReadOnly,
-      conversationId: props.conversationId,
-      header: props.header,
-      hideThreadContent: props.hideThreadContent === true,
-      hostId: props.hostId,
-      isReadOnly,
-      onOpenBackgroundAgent: props.onOpenBackgroundAgent,
-      resumeState,
-      shouldResume,
+  const showComposer = canInteract && !resumeState.isWriterConflict;
+  const composerDisabled = props.composerSubmitDisabled === true || isReadOnly || resumeState.isResuming;
+  const agentCallbacks = backgroundAgentCallbacks(scope, props.conversationId, resolvedHostId, props.onOpenBackgroundAgent);
+  const thread = props.hideThreadContent === true ? null : jsx().jsx(ThreadContainer, {
+    backgroundAgentCallbacks: agentCallbacks,
+    conversationId: props.conversationId,
+    hostId: resolvedHostId,
+    isReadOnly,
+    retainActiveInterest: true,
+  });
+  return jsx().jsxs("section", {
+    className: "flex h-full min-h-0 flex-col",
+    "data-local-conversation-thread": props.conversationId,
+    "data-host-id": resolvedHostId,
+    "data-resuming": resumeState.isResuming || undefined,
+    "data-writer-conflict": resumeState.isWriterConflict || undefined,
+    children: [
+      props.header == null ? null : jsx().jsx("header", { "data-thread-header": true, children: props.header }),
+      jsx().jsx("div", { className: "relative flex min-h-0 flex-1 flex-col", children: thread }),
       writerConflictCard,
-    },
-  };
+      props.hostMcpApps === true ? jsx().jsx("div", { "data-host-mcp-apps": true }) : null,
+      showComposer ? jsx().jsx("div", {
+        className: "shrink-0",
+        "data-thread-composer": true,
+        "data-composer-presentation": typeof props.composerPresentation === "string" ? props.composerPresentation : undefined,
+        "aria-disabled": composerDisabled,
+      }) : null,
+    ],
+  });
 }
 
 /** fM 初始化器（原 `OM`，导出 s）。 */
-function initializeLocalConversationThread(): void {}
+function initializeLocalConversationThread(): void {
+  if (localThreadInitialized) return;
+  localThreadInitialized = true;
+  initializeThreadMountDependencies();
+  initializeClientThreadIdFamily();
+  call(resumeRuntime.t);
+  call((virtualizedTurnList as any).n);
+  call((virtualizedTurnList as any).r);
+  call((localConversationTurn as any).n);
+  call((conversationBlocks as any).p);
+  call((splitItems as any).t);
+  call((userMessage as any).r);
+}
 
 // ---------------------------------------------------------------------------
 // 侧聊线程（原 `cM`/`lM`，导出 i/r）
@@ -349,7 +520,7 @@ function SideChatThread(props: {
   isReadOnly?: boolean;
   isTranscriptVisible?: boolean;
   lockedCollaborationMode?: unknown;
-  onOpenBackgroundAgent?: (conversationId: string) => void;
+  onOpenBackgroundAgent?: (agent: BackgroundAgentTarget) => void;
   onOpenPullRequestSidePanel?: () => void;
   onOpenSubagentsPanel?: () => void;
   renderLayout?: unknown;
@@ -359,8 +530,29 @@ function SideChatThread(props: {
   showMessagingToggle?: boolean;
   showSummaryPanel?: boolean;
   showUtilityBar?: boolean;
-}): ThreadViewNode {
-  return { kind: "side-chat-thread", props: props as Record<string, unknown> };
+}): unknown {
+  const clientThreadContext = typeof shared.LX === "function" && initial.wtn != null ? shared.LX(initial.wtn) : null;
+  const clientThreadId = clientThreadContext?.value?.clientThreadId ?? clientThreadContext?.value ?? null;
+  return jsx().jsx("section", {
+    className: props.composerSurfaceClassName,
+    "data-side-chat-thread": clientThreadId ?? true,
+    "data-hide-when-covered": props.hideWhenCoveredByRightPanel !== false || undefined,
+    "data-transcript-visible": props.isTranscriptVisible !== false || undefined,
+    children: jsx().jsxs(jsx().Fragment, { children: [
+      props.showUtilityBar === false ? null : jsx().jsx(ThreadPanelsBar, {
+        onOpenBackgroundAgent: props.onOpenBackgroundAgent,
+        onOpenPullRequestSidePanel: props.onOpenPullRequestSidePanel,
+        onOpenSubagentsPanel: props.onOpenSubagentsPanel,
+      }),
+      clientThreadId == null ? props.footerContent ?? null : jsx().jsx(LocalConversationThread, {
+        canInteract: props.isReadOnly !== true,
+        composerPresentation: props.composerPresentation,
+        conversationId: clientThreadId,
+        onOpenBackgroundAgent: props.onOpenBackgroundAgent,
+        shouldResume: props.shouldResume !== false,
+      }),
+    ] }),
+  });
 }
 
 /**
@@ -373,8 +565,28 @@ function SideChat(props: {
   conversationId?: string | null;
   lockedCollaborationMode?: unknown;
   target?: unknown;
-}): ThreadViewNode {
-  return { kind: "side-chat", props: props as Record<string, unknown> };
+}): unknown {
+  const available = query<boolean>(initial.zZt, props.conversationId ?? null);
+  const isActive = query<boolean>(initial.XZt, props.conversationId ?? null);
+  const hostId = query<string>(initial.wQt, props.conversationId ?? null);
+  if (props.conversationId != null && available === false) {
+    return jsx().jsxs("section", { className: "flex h-full flex-col items-center justify-center gap-2", "data-side-chat-expired": true, children: [
+      jsx().jsx("h2", { children: "Side chat expired" }),
+      jsx().jsx("p", { children: "This temporary side chat is no longer available; start a new side chat to continue" }),
+    ] });
+  }
+  const readOnly = isActive === true;
+  return jsx().jsx("section", {
+    className: "flex h-full min-h-0 flex-col",
+    "data-side-chat": props.conversationId ?? props.clientThreadId ?? true,
+    children: jsx().jsx(ThreadContainer, {
+      conversationId: props.conversationId ?? props.clientThreadId ?? "",
+      hostId,
+      isReadOnly: readOnly,
+      retainActiveInterest: !readOnly,
+      showSideChatEmptyState: isActive === false,
+    }),
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -383,11 +595,14 @@ function SideChat(props: {
 
 /** 面板条（原 `yE`，导出 g）。 */
 function ThreadPanelsBar(props: {
-  onOpenBackgroundAgent?: (conversationId: string) => void;
+  onOpenBackgroundAgent?: (agent: BackgroundAgentTarget) => void;
   onOpenPullRequestSidePanel?: () => void;
   onOpenSubagentsPanel?: () => void;
-}): ThreadViewNode {
-  return { kind: "thread-panels-bar", props: props as Record<string, unknown> };
+}): unknown {
+  return jsx().jsxs("nav", { "aria-label": "Thread panels", "data-thread-panels-bar": true, children: [
+    props.onOpenSubagentsPanel == null ? null : jsx().jsx("button", { type: "button", onClick: props.onOpenSubagentsPanel, children: "Subagents" }),
+    props.onOpenPullRequestSidePanel == null ? null : jsx().jsx("button", { type: "button", onClick: props.onOpenPullRequestSidePanel, children: "Pull request" }),
+  ] });
 }
 
 /** 线程装配页（原 `Ej`，导出 f；49 号 memo-cache）。 */
@@ -397,8 +612,20 @@ function ThreadSetup(props: {
   onRetry?: () => void;
   onWorktreeCancel?: () => void;
   submittable?: boolean;
-}): ThreadViewNode {
-  return { kind: "thread-setup", props: props as Record<string, unknown> };
+  submittedThreadStart?: { hostId?: string; prompt?: string; status?: string } | null;
+}): unknown {
+  const pending = props.submittedThreadStart;
+  const status = pending?.status ?? "creating";
+  return jsx().jsxs("section", { className: "flex flex-col gap-4", "data-thread-setup": props.clientThreadId ?? true, "aria-live": status === "creating" || status === "queued" ? "polite" : "assertive", children: [
+    pending?.prompt == null ? null : jsx().jsx("div", { "data-pending-user-message": true, children: pending.prompt }),
+    status === "creating" || status === "queued" ? jsx().jsx("p", { role: "status", children: "Starting your task" }) : null,
+    status === "outcome-unknown" ? jsx().jsx("p", { role: "alert", children: "Task creation is not yet confirmed. Do not submit it again while Codex checks its outcome" }) : null,
+    status === "failed" ? jsx().jsxs("div", { role: "alert", children: [
+      jsx().jsx("span", { children: "Could not start this chat" }),
+      jsx().jsx("button", { type: "button", onClick: props.onRetry ?? props.onBack, children: props.onRetry == null ? "Go back" : "Try again" }),
+    ] }) : null,
+    pending == null && props.onWorktreeCancel != null ? jsx().jsx("button", { type: "button", onClick: props.onWorktreeCancel, children: "Cancel" }) : null,
+  ] });
 }
 
 // ---------------------------------------------------------------------------
@@ -406,7 +633,22 @@ function ThreadSetup(props: {
 // ---------------------------------------------------------------------------
 
 /** 挂载初始化器（原 `OE`，导出 _）。 */
-function initializeThreadMountDependencies(): void {}
+function initializeThreadMountDependencies(): void {
+  if (threadMountInitialized) return;
+  threadMountInitialized = true;
+  call(shared.$3);
+  call(shared.K2);
+  call(shared.FX);
+  call(shared.wL);
+  call(initial.C);
+  call(appPrimaryInit);
+  call((virtualizedTurnList as any).r);
+  call((localConversationTurn as any).n);
+  call((conversationBlocks as any).p);
+  call((splitItems as any).t);
+  call((userMessage as any).r);
+  call((resumeConversationChunk as any).t);
+}
 
 /** 空初始化器（原 `aM`，导出 d）。 */
 function initializeNoop(): void {}
@@ -415,7 +657,22 @@ function initializeNoop(): void {}
 function initializeBackgroundAgentCallbacks(): void {}
 
 /** 主初始化器（原 `Aj`，导出 p；50+ 依赖装配）。 */
-function initializeLocalConversationThreadModule(): void {}
+function initializeLocalConversationThreadModule(): void {
+  if (moduleInitialized) return;
+  moduleInitialized = true;
+  initializeThreadMountDependencies();
+  initializeClientThreadIdFamily();
+  initializeLocalConversationThread();
+  if (!setupInitialized) {
+    setupInitialized = true;
+    call((pendingOnboarding as any)?.t);
+    call((worktreeSetupAutoFix as any)?.t);
+    call((threadTurnEntries as any)?.t);
+    call((threadBridge as any)?.t);
+    call((threadPinShortcutBridge as any)?.t);
+    call((useLocalConversationSources as any)?.t);
+  }
+}
 
 // ---------------------------------------------------------------------------
 // 原版压缩导出名（chunk 间契约，17 个全部对齐）

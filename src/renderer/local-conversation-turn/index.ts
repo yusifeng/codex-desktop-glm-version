@@ -29,12 +29,13 @@ import {
   $h as resourceIconHelpers,
   $r as appgenHelpers,
   BK as agentActivityApi,
-  BX as appSharedInit,
   Bk as appgenAccessApi,
   I3 as getJsxRuntime,
   e6 as getReact,
 } from "@rchunk/app-shared";
-import { C as environmentSetupInit } from "@rchunk/app-initial";
+import * as appSharedChunk from "@rchunk/app-shared";
+import { C as environmentSetupInit, mnn as projectConversationTurn } from "@rchunk/app-initial";
+import * as appInitialChunk from "@rchunk/app-initial";
 import { d as appPrimaryInit } from "@rchunk/app-primary";
 import * as conversationBlocksTurnBody from "@rchunk/conversation-blocks";
 import * as aboveComposerFixedContentSurface from "@rchunk/above-composer-fixed-content-surface";
@@ -65,7 +66,7 @@ import { default as IconChunk } from "@rchunk/Icon";
 void IconChunk;
 
 void runtimeLazy; void resourceIconHelpers; void appgenHelpers; void agentActivityApi;
-void appSharedInit; void appgenAccessApi; void environmentSetupInit; void appPrimaryInit;
+void appgenAccessApi; void environmentSetupInit; void appPrimaryInit;
 void conversationBlocksTurnBody; void aboveComposerFixedContentSurface; void agentActivityItem;
 void agentActivityUnits; void appgenAccess; void appgenAccessStateMessages;
 void appgenAutomationsState; void artifactFeedbackButton; void artifactOriginatingTurn;
@@ -217,8 +218,21 @@ function initialize(value: unknown): void { if (typeof value === "function") val
  * shouldHideUserMessage 场景（首个 turn 的用户消息隐藏）附加。
  */
 function projectTurnState(turn: unknown, requests: unknown[], options: TurnProjectionOptions): ProjectedTurn {
-  void options;
-  void requests;
+  if (typeof projectConversationTurn === "function") {
+    const projected = (projectConversationTurn as any)(turn, requests, {
+      includeAeonProjection: options.includeAeonProjection,
+      isBackgroundSubagentsEnabled: options.isBackgroundSubagentsEnabled === true,
+      isLatestTurn: options.isLatestTurn,
+      openAIFormElicitationsEnabled: options.openAIFormElicitationsEnabled,
+      preserveServerUserMessages: options.preserveServerUserMessages,
+      requestUserInputAsyncUiEnabled: options.requestUserInputAsyncUiEnabled,
+      showStrictReviewNotices: options.showStrictReviewNotices,
+      ...(options.shouldHideUserMessage == null ? {} : { shouldHideUserMessage: options.shouldHideUserMessage }),
+      includeTurnDiff: true,
+      projectionBudget: { fits: () => true, select: <Value>(values: readonly Value[], predicate?: (value: Value) => boolean, limit?: number) => { const selected = predicate == null ? [...values] : values.filter(predicate); return limit == null ? selected : selected.slice(0, limit); } },
+    });
+    if (projected != null && typeof projected === "object" && Array.isArray((projected as ProjectedTurn).items)) return projected as ProjectedTurn;
+  }
   const source = turn as { items?: ProjectedTurn["items"]; cwd?: string | null };
   return {
     ...(source as object),
@@ -348,6 +362,11 @@ function EnvironmentSetupStageMessage(props: { stage: "creating" | "connecting" 
  * ⑤ 全部 props 透传渲染体（原 rl，在 conversation-blocks chunk）。
  */
 function LocalConversationTurnComponent(props: LocalConversationTurnProps): unknown {
+  const shared = appSharedChunk as unknown as Record<string, any>;
+  const initial = appInitialChunk as unknown as Record<string, any>;
+  const openAIFormElicitationsEnabled = typeof shared.HX === "function" && initial.Nfn != null ? Boolean(shared.HX(initial.Nfn)) : false;
+  const requestUserInputAsyncUiEnabled = typeof shared.BX === "function" && initial.Vr != null ? Boolean(shared.BX(initial.Vr, props.conversationId)) : false;
+  const interruptedTurnIds = typeof shared.BX === "function" && initial.Ffn != null ? shared.BX(initial.Ffn, props.conversationId) : null;
   const preserveServerUserMessages = props.preserveServerUserMessages === true;
   const isBackgroundSubagentsEnabled = props.isBackgroundSubagentsEnabled === true;
   const isMostRecentTurn = props.isMostRecentTurn === true;
@@ -370,7 +389,9 @@ function LocalConversationTurnComponent(props: LocalConversationTurnProps): unkn
       includeAeonProjection: isAeonThread || preserveServerUserMessages,
       isBackgroundSubagentsEnabled,
       isLatestTurn: props.isLatestTurn,
+      openAIFormElicitationsEnabled,
       preserveServerUserMessages,
+      requestUserInputAsyncUiEnabled,
     });
 
   // ② superseded 标记
@@ -406,28 +427,51 @@ function LocalConversationTurnComponent(props: LocalConversationTurnProps): unkn
   const TurnBody = (conversationBlocksTurnBody as any).a ?? (conversationBlocksTurnBody as any).R;
   const bodyProps = {
     activitySummaryWithoutAssistant: props.activitySummaryWithoutAssistant,
+    clientUserMessageId: props.turn.params?.clientUserMessageId ?? null,
     commentaryDisplay: props.commentaryDisplay,
+    completedThreadGoal: props.completedThreadGoal,
+    conversationDetailLevel: props.conversationDetailLevel,
     conversationId: props.conversationId,
     cwd: effectiveTurn.cwd ?? props.cwd,
+    emptyUserMessageOverride: props.emptyUserMessageOverride,
+    excludedSubagentThreadIds: props.excludedSubagentThreadIds,
+    generatedImages: props.generatedImages,
     hostId: props.hostId,
-    interruptedByThisClient: false,
+    historyEntityKey: props.historyEntityKey,
+    includeEndResources: props.includeEndResources,
+    includeTranscriptTurnExtras: props.includeTranscriptTurnExtras,
+    interruptedByThisClient: props.turn.turnId != null && interruptedTurnIds instanceof Set && interruptedTurnIds.has(props.turn.turnId),
     isBackgroundSubagentsEnabled,
     isCollapsed: props.isCollapsed,
     isMostRecentTurn,
     isReadOnly,
+    latestTurnFollowContentRef: props.latestTurnFollowContentRef,
+    messageActions: props.messageActions,
+    messageHeader: props.messageHeader,
+    modelProvider: props.modelProvider,
     onEditUserMessage,
     onForkTurn,
+    onSetCollapsed: props.onSetCollapsed,
+    parentThreadAttachment: props.parentThreadAttachment,
+    previousTurnNumber: isMostRecentTurn ? undefined : props.turnNumber,
     projectlessOutputDirectory,
     renderMcpApps,
+    keepMcpAppEntriesPersistent: renderMcpApps,
+    resolvedApps: props.resolvedApps,
     reportEntityType,
     shouldAutoExpandMcpApps: renderMcpApps,
     showInProgressFixedContent,
     startAfterTurnIntro,
     supersededCount: superseded.size,
     deferOffscreenDiffRendering,
+    threadHandoffOperation: props.threadHandoffOperation,
+    totalTurnCount: props.totalTurnCount,
+    transcriptBlock: props.transcriptBlock,
     turn: effectiveTurn,
     turnId: props.turn.turnId,
     units: effectiveTurn.items.map(item => ({ kind: "standalone", item: { item } })),
+    voiceWorkActivity: props.voiceWorkActivity,
+    workedDurationMs: props.turn.status === "inProgress" ? null : props.turn.durationMs ?? null,
   };
   return typeof TurnBody === "function"
     ? jsx().jsx(TurnBody, bodyProps)
@@ -442,7 +486,7 @@ let LocalConversationTurn = LocalConversationTurnComponent;
 // ---------------------------------------------------------------------------
 
 /** SubagentActivityInlineGroup 初始化器（原 `Rs`，导出 c）。 */
-function initializeSubagentActivityInlineGroup(): void { initialize(runtimeLazy); initialize(appSharedInit); void jsx(); }
+function initializeSubagentActivityInlineGroup(): void { initialize(runtimeLazy); void jsx(); }
 
 /** 资源上下文初始化器（原 `Us`，导出 o）。 */
 function initializeTurnResourceContext(): void { initialize(runtimeLazy); initialize(resourceIconHelpers); void jsx(); }
@@ -455,7 +499,7 @@ let initialized = false;
 function initializeLocalConversationTurn(): void {
   if (initialized) return;
   initialized = true;
-  for (const dependency of [runtimeInit, runtimeLazy, appSharedInit, environmentSetupInit, appPrimaryInit,
+  for (const dependency of [runtimeInit, runtimeLazy, environmentSetupInit, appPrimaryInit,
     (conversationBlocksTurnBody as any).i, (conversationBlocksTurnBody as any).n,
     (conversationBlocksTurnBody as any).t, initializeSubagentActivityInlineGroup,
     initializeTurnResourceContext, initializeEnvironmentSetupStageMessage]) initialize(dependency);

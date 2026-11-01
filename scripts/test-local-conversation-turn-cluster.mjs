@@ -26,7 +26,7 @@ const result = await esbuild.build({
         export const $3=()=>{};export const $h=()=>{};export const $r=()=>{};export const BK=()=>{};export const BX=()=>{};export const Bk=()=>{};
         export const I3=()=>globalThis.__localTurnJsx;export const e6=()=>({memo:value=>value,useState:value=>[value,()=>{}]});
       ` };
-      if (importPath === "app-initial") return { loader: "js", contents: "export const C=()=>{};export default {};" };
+      if (importPath === "app-initial") return { loader: "js", contents: "export const C=()=>{};export const mnn=(turn,requests,options)=>({...turn,projectedRequestCount:requests.length,projectionOptions:options});export default {};" };
       if (importPath === "app-primary") return { loader: "js", contents: "export const d=()=>{};export default {};" };
       if (importPath === "rolldown-runtime") return { loader: "js", contents: "export const o=()=>{};export default {};" };
       if (importPath === "conversation-blocks") return { loader: "js", contents: "export const a=props=>({type:'turn-body',props});export const i=()=>{};export const n=()=>{};export const t=()=>{};export default {};" };
@@ -83,6 +83,8 @@ const rendered = turn.t({
 });
 assert.equal(rendered.type, "turn-body");
 assert.equal(rendered.props.turn.items[0].isMcpAppWidgetSuperseded, true);
+assert.equal(rendered.props.turn.projectedRequestCount, 0);
+assert.equal(rendered.props.turn.projectionOptions.isBackgroundSubagentsEnabled, false);
 await rendered.props.onEditUserMessage("updated");
 rendered.props.onForkTurn();
 assert.equal(edits[0].message, "updated");

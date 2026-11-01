@@ -49,6 +49,29 @@ interface ToolItemContentProps {
   toolActivityTurnKey?: string;
 }
 interface IntlShape { formatMessage(descriptor: { defaultMessage: string; description?: string; id?: string }, values?: Record<string, unknown>): string }
+interface McpAppResource {
+  blob?: string;
+  heightHint?: number | null;
+  html?: string;
+  mimeType?: string;
+  minFrameHeight?: number | null;
+  prefersBorder?: boolean;
+  text?: string;
+  uri: string;
+}
+interface McpAppCatalogEntry { connectorId?: string | null; kind?: string; resourceUri?: string | null; uri?: string | null }
+interface McpAppRuntimeState {
+  appId: string;
+  catalogError: unknown;
+  catalogPending: boolean;
+  presentation: "fallback" | "inline" | "launcher" | "pending";
+  refetch(): void;
+  renderData: unknown;
+  resource: McpAppResource | null;
+  resourceError: unknown;
+  resourcePending: boolean;
+  resourceUri: string | null;
+}
 
 let runtime: JsxRuntime | undefined;
 function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
@@ -98,6 +121,161 @@ function browserPageUrl(item: ToolItem): string | null {
     if (typeof value === "string" && /^https?:\/\//i.test(value)) return value;
   }
   return null;
+}
+
+function optionalCall<T>(candidate: unknown, ...args: unknown[]): T | undefined {
+  return typeof candidate === "function" ? (candidate as (...values: unknown[]) => T)(...args) : undefined;
+}
+function queryValue<T>(descriptor: unknown, input: unknown, options?: unknown): { data?: T; error?: unknown; isFetching?: boolean; isPending?: boolean } {
+  const useQuery = (sharedChunk as any).BX;
+  if (typeof useQuery !== "function" || descriptor == null) return {};
+  try { return useQuery(descriptor, input, options) ?? {}; } catch { return {}; }
+}
+function signalValue<T>(descriptor: unknown, input: unknown, options?: unknown): T | undefined {
+  const useSignal = (sharedChunk as any).BX;
+  if (typeof useSignal !== "function" || descriptor == null) return undefined;
+  try { return useSignal(descriptor, input, options) as T; } catch { return undefined; }
+}
+function resourceFromResult(result: ToolResult | null | undefined, uri: string): McpAppResource | null {
+  for (const block of result?.content ?? []) {
+    if (block.type !== "embedded_resource" || block.resource.uri !== uri) continue;
+    return { uri, mimeType: block.resource.mimeType, text: block.resource.text, blob: block.resource.blob };
+  }
+  return null;
+}
+function normalizeResource(value: unknown, fallbackUri: string): McpAppResource | null {
+  const source = record(value);
+  if (source == null) return null;
+  const resource = record(source.resource) ?? source;
+  const uri = typeof resource.uri === "string" ? resource.uri : fallbackUri;
+  const text = typeof resource.text === "string" ? resource.text : undefined;
+  const blob = typeof resource.blob === "string" ? resource.blob : undefined;
+  const mimeType = typeof resource.mimeType === "string" ? resource.mimeType : undefined;
+  const html = typeof source.html === "string" ? source.html : mimeType?.includes("html") ? text : undefined;
+  return {
+    uri, text, blob, mimeType, html,
+    heightHint: typeof source.heightHint === "number" ? source.heightHint : null,
+    minFrameHeight: typeof source.minFrameHeight === "number" ? source.minFrameHeight : null,
+    prefersBorder: typeof source.prefersBorder === "boolean" ? source.prefersBorder : undefined,
+  };
+}
+function catalogResource(data: unknown, item: ToolItem, descriptorOnly: boolean, catalogPending: boolean, registeredResourceUri: string | null, toolResult: unknown): { isPending: boolean; resourceUri: string | null } {
+  const exactResolver = (initialChunk as any).aXt;
+  if (typeof exactResolver === "function") {
+    try {
+      const resolved = exactResolver({
+        item,
+        mcpServerStatuses: data,
+        descriptorOnly,
+        toolResult,
+        isCatalogPending: catalogPending,
+        registeredResourceUri,
+      });
+      if (resolved != null) return {
+        isPending: resolved.isPending === true,
+        resourceUri: typeof resolved.resourceUri === "string" ? resolved.resourceUri : null,
+      };
+    } catch { /* fall through to the recovered semantic resolver */ }
+  }
+  const direct = mcpAppResourceUri(item);
+  if (direct != null) return { isPending: false, resourceUri: direct };
+  const entries = Array.isArray(data) ? data : Array.isArray(record(data)?.resources) ? record(data)!.resources as unknown[] : [];
+  const server = item.invocation.server;
+  const tool = item.invocation.tool;
+  for (const value of entries) {
+    const entry = record(value) as McpAppCatalogEntry | null;
+    if (entry == null) continue;
+    const entryRecord = value as Record<string, unknown>;
+    if (entryRecord.server != null && entryRecord.server !== server) continue;
+    if (entryRecord.tool != null && entryRecord.tool !== tool) continue;
+    const uri = entry.resourceUri ?? entry.uri;
+    if (typeof uri === "string" && uri.trim()) return { isPending: false, resourceUri: uri.trim() };
+  }
+  return { isPending: catalogPending, resourceUri: null };
+}
+function errorMessage(value: unknown): string {
+  if (value instanceof Error) return value.message;
+  const object = record(value);
+  return typeof object?.message === "string" ? object.message : typeof value === "string" ? value : "Unable to load app";
+}
+function resourceValidation(resource: McpAppResource | null, renderData: unknown): "error" | "ok" | "too-large" {
+  if (resource == null) return "ok";
+  const exactValidation = optionalCall<{ kind?: string }>((initialChunk as any).Ect, { data: renderData, error: null, isLoading: false }, (initialChunk as any).Cct ?? ["inline", "fullscreen", "pip"]);
+  if (exactValidation?.kind === "too-large" || exactValidation?.kind === "error") return exactValidation.kind;
+  const payload = resource.html ?? resource.text ?? resource.blob ?? "";
+  return payload.length > 1_000_000 ? "too-large" : "ok";
+}
+
+function useMcpAppRuntime(item: ToolItem, props: ToolItemContentProps, enabled: boolean): McpAppRuntimeState {
+  const appId = optionalCall<string>((sharedChunk as any).eU, item.callId) ?? item.callId;
+  const registered = signalValue<Record<string, any>>((initialChunk as any).act, appId);
+  const registeredResourceUri = typeof registered?.content?.mcpAppScope?.originResourceUri === "string"
+    ? registered.content.mcpAppScope.originResourceUri
+    : null;
+  const liveToolResult = item.result?.raw ?? registered?.content?.toolResult ?? null;
+  const threadId = signalValue<string>((initialChunk as any).NU, { hostId: props.hostId, conversationId: props.conversationId });
+  const queryInput = {
+    appContext: item.appContext,
+    hostId: props.hostId,
+    invocationResourceUri: item.invocationResourceUri,
+    server: item.invocation.server,
+    threadId: threadId ?? item.threadId ?? props.conversationId,
+    tool: item.invocation.tool,
+  };
+  const catalog = queryValue<unknown>((initialChunk as any).PU, queryInput, { enabled });
+  const target = signalValue<McpAppCatalogEntry>((initialChunk as any).FU, queryInput, { enabled });
+  const resolvedResource = enabled
+    ? catalogResource(catalog.data, item, props.conversationId?.startsWith("chatgpt:") === true, catalog.isPending === true || catalog.isFetching === true, registeredResourceUri, liveToolResult)
+    : { isPending: false, resourceUri: null };
+  const resourceUri = resolvedResource.resourceUri;
+  const exactResourceHook = (initialChunk as any).LU;
+  let resourceQuery: { data?: unknown; error?: unknown; isFetching?: boolean; isPending?: boolean; refetch?: (options?: unknown) => unknown } = {};
+  if (typeof exactResourceHook === "function") {
+    try {
+      resourceQuery = exactResourceHook({
+        connectorId: target?.connectorId ?? null,
+        connectorTarget: target?.kind === "target" ? target : null,
+        hostId: props.hostId,
+        originCallId: item.invocation.server === "codex_apps" && item.appContext != null ? item.callId : null,
+        server: item.invocation.server, threadId: props.conversationId,
+        uri: resourceUri,
+        enabled: enabled && resourceUri != null && !resolvedResource.isPending
+          && !(item.completed === true && item.result == null && liveToolResult == null)
+          && (item.invocation.server !== "codex_apps" || item.appContext == null || item.completed === true),
+      }) ?? {};
+    } catch { resourceQuery = {}; }
+  }
+  const embedded = resourceUri == null ? null : resourceFromResult(item.result, resourceUri);
+  const queriedResource = record(resourceQuery.data)?.resource ?? resourceQuery.data;
+  const parsedResource = optionalCall<unknown>((initialChunk as any).EU, queriedResource);
+  const resource = resourceUri == null ? null : normalizeResource(resourceQuery.data, resourceUri) ?? embedded;
+  const renderData = parsedResource ?? resource;
+  let presentation: McpAppRuntimeState["presentation"] = "fallback";
+  if (resourceUri != null && (resolvedResource.isPending || resourceQuery.isPending || resourceQuery.isFetching) && resource == null) presentation = "pending";
+  else if (resourceUri != null && resource != null) {
+    const exactMode = optionalCall<{ kind?: string }>((initialChunk as any).TU, {
+      hasResourceError: resourceQuery.error != null,
+      isResourceLoading: false,
+      isDilEnabled: false,
+      renderData,
+      resourceUri,
+      shouldRenderMcpApp: enabled,
+    });
+    const kind = exactMode?.kind;
+    presentation = kind === "launcher" || kind === "inline" || kind === "pending" ? kind : "inline";
+  } else if (resourceUri != null && resourceQuery.error == null && catalog.error == null) presentation = "launcher";
+  return {
+    appId,
+    catalogError: catalog.error,
+    catalogPending: catalog.isPending === true || catalog.isFetching === true,
+    presentation,
+    refetch: () => { resourceQuery.refetch?.({ cancelRefetch: false }); },
+    renderData,
+    resource,
+    resourceError: resourceQuery.error,
+    resourcePending: resourceQuery.isPending === true || resourceQuery.isFetching === true,
+    resourceUri,
+  };
 }
 
 function ContentBlock({ block }: { block: McpContentBlock }): unknown {
@@ -160,11 +338,46 @@ function WebMcpOutput({ call, fallbackPageUrl }: { call: WebMcpCall; fallbackPag
   ] });
 }
 function sentenceLabel(value: string): string { const text = value.replace(/[_-]+/g, " ").trim(); return text ? text[0].toUpperCase() + text.slice(1) : "Tool"; }
-function McpAppSurface({ appName, expanded, inline, loading, resourceUri, onOpen }: { appName: string; expanded: boolean; inline: boolean; loading: boolean; resourceUri: string; onOpen(): void }): unknown {
-  return jsx().jsxs("section", { "data-mcp-app-card": inline || undefined, "data-mcp-app-resource-uri": resourceUri, "data-mcp-app-state": loading ? "pending" : expanded ? "open" : "launcher", children: [
-    jsx().jsx("button", { type: "button", "aria-expanded": expanded, onClick: onOpen, children: loading ? `Opening ${appName}` : expanded ? appName : `Open ${appName}` }),
-    expanded ? jsx().jsxs("div", { "data-mcp-app-widget": true, children: [jsx().jsx("strong", { children: appName }), jsx().jsx("span", { children: resourceUri })] }) : null,
-  ] });
+function McpAppWidget({ appName, state }: { appName: string; state: McpAppRuntimeState }): unknown {
+  const resource = state.resource;
+  const payload = resource?.html ?? resource?.text ?? (resource?.blob == null ? null : `data:${resource.mimeType ?? "text/html"};base64,${resource.blob}`);
+  const exactRenderer = (initialChunk as any).WH;
+  if (typeof exactRenderer === "function") {
+    return jsx().jsx(exactRenderer, {
+      hostDisplayModes: ["inline", "fullscreen", "pip"],
+      inlineSurface: state.presentation === "inline" ? "card" : "standalone",
+      mcpAppId: state.appId,
+      onRetryResourceRead: state.refetch,
+      pluginName: appName,
+      presentation: state.presentation,
+      resource: { data: state.renderData, error: state.resourceError, isLoading: state.resourcePending },
+      showLoadingStatus: false,
+    });
+  }
+  void payload;
+  return null;
+}
+function McpAppSurface({ appName, expanded, loading, onOpen, state }: { appName: string; expanded: boolean; loading: boolean; onOpen(): void; state: McpAppRuntimeState }): unknown {
+  const error = state.resourceError ?? state.catalogError;
+  const validation = resourceValidation(state.resource, state.renderData);
+  const pending = loading || state.catalogPending || state.resourcePending || state.presentation === "pending";
+  const lifecycle = typeof (initialChunk as any).IH === "function"
+    ? jsx().jsx((initialChunk as any).IH, { isInlineRequested: expanded && state.presentation === "inline", mcpAppId: state.appId })
+    : null;
+  let body: unknown = null;
+  if (pending) body = jsx().jsx("div", { role: "status", "data-mcp-app-pending": true, children: `Opening ${appName}` });
+  else if (expanded && error != null) body = jsx().jsxs("div", { role: "alert", "data-mcp-app-error": true, children: [errorMessage(error), jsx().jsx("button", { type: "button", onClick: state.refetch, children: "Retry" })] });
+  else if (expanded && validation === "too-large") body = jsx().jsx("div", { role: "alert", "data-mcp-app-too-large": true, children: "This app is too large to display." });
+  else if (expanded && validation === "error") body = jsx().jsxs("div", { role: "alert", "data-mcp-app-error": true, children: ["Unable to display this app.", jsx().jsx("button", { type: "button", onClick: state.refetch, children: "Retry" })] });
+  else if ((expanded || state.presentation === "launcher") && state.resource != null) body = jsx().jsx("div", { "data-mcp-app-widget": true, children: jsx().jsx(McpAppWidget, { appName, state }) });
+  else if (expanded) body = jsx().jsxs("div", { role: "alert", "data-mcp-app-error": true, children: ["App resource is unavailable.", jsx().jsx("button", { type: "button", onClick: state.refetch, children: "Retry" })] });
+  return jsx().jsxs("section", {
+    "data-mcp-app-card": state.presentation === "inline" || undefined,
+    "data-mcp-app-presentation": state.presentation,
+    "data-mcp-app-resource-uri": state.resourceUri,
+    "data-mcp-app-state": pending ? "pending" : expanded ? "open" : "launcher",
+    children: [lifecycle, jsx().jsx("button", { type: "button", "aria-expanded": expanded, onClick: onOpen, children: pending ? `Opening ${appName}` : expanded ? appName : `Open ${appName}` }), body],
+  });
 }
 
 function ResultContent({ businessFailed, hideTextBlocksWithStructuredContent, result }: { businessFailed: boolean; hideTextBlocksWithStructuredContent?: boolean; result: ToolResult }): unknown {
@@ -193,7 +406,9 @@ function ToolItemContent(props: ToolItemContentProps): unknown {
     : item.result?.type === "error";
   const label = props.summary ?? formatToolActivityLabel({ appContext: item.appContext, completed, intl, matchingApp: props.matchingApp, serverName: item.invocation.server, source: item.source, toolArguments: item.invocation.arguments, toolName: item.invocation.tool, toolResult: item.result });
   const status = businessFailed ? "error" : completed ? "success" : "active";
-  const resourceUri = props.renderMcpApps === false || item.isMcpAppWidgetSuperseded === true || businessFailed ? null : mcpAppResourceUri(item);
+  const canRenderMcpApp = props.renderMcpApps !== false && item.isMcpAppWidgetSuperseded !== true && !businessFailed;
+  const appRuntime = useMcpAppRuntime(item, props, canRenderMcpApp);
+  const resourceUri = appRuntime.resourceUri;
   const react = (sharedChunk as any).e6?.();
   const [expanded, setExpanded] = react?.useState?.(props.shouldAutoExpandMcpApp === true) ?? [props.shouldAutoExpandMcpApp === true, () => undefined];
   const [opening, setOpening] = react?.useState?.(false) ?? [false, () => undefined];
@@ -204,9 +419,16 @@ function ToolItemContent(props: ToolItemContentProps): unknown {
   const resultBody = item.result == null ? null : jsx().jsx(ResultContent, { businessFailed, hideTextBlocksWithStructuredContent: props.hideTextBlocksWithStructuredContent, result: item.result });
   const reviews = item.automaticApprovalReviews?.length ? jsx().jsx(AutomaticApprovalReviews, { reviews: item.automaticApprovalReviews }) : null;
   const appName = props.matchingApp?.name ?? item.appContext?.appName ?? item.invocation.server ?? "app";
-  const appSurface = resourceUri == null ? null : jsx().jsx(McpAppSurface, { appName, expanded, inline: expanded, loading: opening, resourceUri, onOpen: toggle });
-  const details = resourceUri != null && expanded ? appSurface : resultBody;
-  const disclosure = props.expandedContentOnly ? details : jsx().jsx(ToolActivityDisclosure as any, { defaultExpanded: completed === false, icon: jsx().jsx(RemoteToolLogo, { fallback: props.summaryIcon, hostId: props.hostId, item, loadRemoteLogos: props.loadRemoteLogos }), status: status === "active" ? "running" : status === "error" ? "error" : "complete", summary: label, onExpand: props.onExpand, children: resourceUri == null ? jsx().jsxs(jsx().Fragment, { children: [reviews, resultBody] }) : jsx().jsxs(jsx().Fragment, { children: [reviews, appSurface] }) });
+  const appSurface = resourceUri == null ? null : jsx().jsx(McpAppSurface, { appName, expanded, loading: opening, state: appRuntime, onOpen: toggle });
+  const appValidation = resourceValidation(appRuntime.resource, appRuntime.renderData);
+  const canDisplayApp = resourceUri != null
+    && appRuntime.resourceError == null
+    && appRuntime.catalogError == null
+    && appValidation === "ok"
+    && (appRuntime.resource != null || appRuntime.resourcePending || appRuntime.catalogPending)
+    && typeof (initialChunk as any).WH === "function";
+  const details = canDisplayApp ? appSurface : resultBody;
+  const disclosure = props.expandedContentOnly ? details : jsx().jsx(ToolActivityDisclosure as any, { defaultExpanded: completed === false, icon: jsx().jsx(RemoteToolLogo, { fallback: props.summaryIcon, hostId: props.hostId, item, loadRemoteLogos: props.loadRemoteLogos }), status: status === "active" ? "running" : status === "error" ? "error" : "complete", summary: label, onExpand: props.onExpand, children: jsx().jsxs(jsx().Fragment, { children: [reviews, details] }) });
   return jsx().jsxs(jsx().Fragment, { children: [
     jsx().jsx("div", { "aria-label": label, "data-tool-status": status, "data-tool-activity-turn-key": props.toolActivityTurnKey, children: disclosure }),
     ...webCalls.map((call, index) => jsx().jsx(WebMcpOutput, { call, fallbackPageUrl: browserPageUrl(item) }, `${item.callId}:webmcp:${index}:${call.name}`)),
@@ -219,9 +441,27 @@ function initializePluginLogoRuntime(): void { void jsx(); }
 function initializeAutomationItem(): void { initializeOpenAutomationSidePanelTab(); void jsx(); }
 function initializeAutomationList(): void { initializeAutomationItem(); initializeTrackTaskView(); void jsx(); }
 function initializeRemoteToolLogo(): void { void jsx(); }
+let toolItemContentInitialized = false;
 function initializeToolItemContent(): void {
-  for (const dependency of [(sharedChunk as any).$3, (sharedChunk as any).FX, (sharedChunk as any).h4,
-    (sharedChunk as any).K2, (sharedChunk as any).QI, (sharedChunk as any).Zh]) {
+  if (toolItemContentInitialized) return;
+  toolItemContentInitialized = true;
+  for (const dependency of [
+    (sharedChunk as any).$3, (sharedChunk as any).Wi, (sharedChunk as any).cT, (sharedChunk as any).ww,
+    (sharedChunk as any).ai, (sharedChunk as any).gL, (sharedChunk as any).h4, (sharedChunk as any).a$,
+    (sharedChunk as any).FX, (sharedChunk as any).wL, (initialChunk as any).Vrn, (sharedChunk as any).e6,
+    (sharedChunk as any).K2, (initialChunk as any).pXt, (initialChunk as any).en, (initialChunk as any).oqt,
+    (initialChunk as any).h1, (initialChunk as any).Olt, (sharedChunk as any).Zh, (sharedChunk as any).ef,
+    (sharedChunk as any).Of, (sharedChunk as any).zh, (sharedChunk as any).Ph, (initialChunk as any).n0,
+    (sharedChunk as any).C_, (initialChunk as any).Gat, (sharedChunk as any).sm, (sharedChunk as any).c_,
+    (initialChunk as any).T6t, (sharedChunk as any).Bg, (initialChunk as any).QB, (initialChunk as any).kU,
+    (initialChunk as any).qH, (initialChunk as any).DU, (initialChunk as any).GH, (initialChunk as any).Oct,
+    (initialChunk as any).ict, (initialChunk as any).i4t, (initialChunk as any).E4t, (initialChunk as any).IU,
+    (initialChunk as any).$2t, (initialChunk as any).Rht, (initialChunk as any).itn, (initialChunk as any).ifn,
+    (sharedChunk as any).tp, (sharedChunk as any).Z3, (initialChunk as any).aat, (initialChunk as any).MU,
+    (initialChunk as any).Zdt, (initialChunk as any).wrn, (initialChunk as any).jit, (initialChunk as any).kit,
+    (initialChunk as any).lXt, (initialChunk as any).Vat, (initialChunk as any).Dit, (initialChunk as any).Fit,
+    (initialChunk as any).Nit, (sharedChunk as any).QI,
+  ]) {
     if (typeof dependency === "function") dependency();
   }
   initializeMcpToolActivityLabels();
