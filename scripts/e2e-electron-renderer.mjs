@@ -753,6 +753,7 @@ if (mode === "smoke-readonly") {
     return true;
   })()`);
   const restored = [];
+  const deepChecks = [];
   try {
     for (const label of switchLabels) {
       const initial = await readSwitch(label);
@@ -808,7 +809,182 @@ if (mode === "smoke-readonly") {
     await waitUntil("general settings after route regression", () => evaluate(`
       document.querySelector('[aria-label="纯文本编辑器"]') != null
     `));
+
+    await clickText("外观");
+    await waitUntil("appearance controls", () => evaluate(`
+      document.querySelector('[role="switch"][aria-label="使用指针光标"]') != null &&
+      document.querySelector('input[type="radio"][aria-label="浅色"]') != null
+    `));
+    for (const label of ["使用指针光标", "字体平滑"]) {
+      const initial = await readSwitch(label);
+      if (!['true', 'false'].includes(initial)) throw new Error(`Appearance switch has no boolean state: ${label}=${initial}`);
+      await toggleSwitch(label);
+      await waitUntil(`${label} appearance change`, async () => (await readSwitch(label)) !== initial);
+      await toggleSwitch(label);
+      await waitUntil(`${label} appearance restore`, async () => (await readSwitch(label)) === initial);
+      deepChecks.push(`appearance switch: ${label}`);
+      await assertNoInteractionException(`restoring appearance switch ${label}`);
+    }
+    const themeResult = await evaluate(`(() => {
+      const radios = [...document.querySelectorAll('input[type="radio"][aria-label]')]
+        .filter((element) => ['系统', '浅色', '深色'].includes(element.getAttribute('aria-label')));
+      const initial = radios.find((element) => element.checked);
+      const alternate = radios.find((element) => !element.checked);
+      if (initial == null || alternate == null) throw new Error('Theme radio state is incomplete');
+      const result = { initial: initial.getAttribute('aria-label'), alternate: alternate.getAttribute('aria-label') };
+      alternate.click();
+      return result;
+    })()`);
+    await waitUntil("alternate theme selection", () => evaluate(`
+      document.querySelector('input[type="radio"][aria-label=${JSON.stringify(themeResult.alternate)}]')?.checked === true
+    `));
+    await evaluate(`document.querySelector('input[type="radio"][aria-label=${JSON.stringify(themeResult.initial)}]')?.click()`);
+    await waitUntil("theme selection restore", () => evaluate(`
+      document.querySelector('input[type="radio"][aria-label=${JSON.stringify(themeResult.initial)}]')?.checked === true
+    `));
+    deepChecks.push(`appearance theme: ${themeResult.initial} -> ${themeResult.alternate} -> ${themeResult.initial}`);
+    await assertNoInteractionException("restoring theme selection");
+
+    await clickText("浏览器");
+    await waitUntil("browser settings controls", () => evaluate(`
+      document.querySelector('[role="switch"][aria-label="下载前询问保存位置"]') != null
+    `));
+    {
+      const label = "下载前询问保存位置";
+      const initial = await readSwitch(label);
+      await toggleSwitch(label);
+      await waitUntil(`${label} browser change`, async () => (await readSwitch(label)) !== initial);
+      await toggleSwitch(label);
+      await waitUntil(`${label} browser restore`, async () => (await readSwitch(label)) === initial);
+      deepChecks.push(`browser switch: ${label}`);
+      await assertNoInteractionException(`restoring browser switch ${label}`);
+    }
+
+    await clickText("Git");
+    await waitUntil("Git settings controls", () => evaluate(`
+      document.querySelector('input[aria-label="分支前缀"]') != null &&
+      document.querySelector('textarea[aria-label="提交指令"]') != null
+    `));
+    const gitOriginal = await evaluate(`(() => ({
+      branchPrefix: document.querySelector('input[aria-label="分支前缀"]').value,
+      commitInstructions: document.querySelector('textarea[aria-label="提交指令"]').value,
+    }))()`);
+    const gitProbe = {
+      branchPrefix: `${gitOriginal.branchPrefix}e2e-probe/`,
+      commitInstructions: `${gitOriginal.commitInstructions}${gitOriginal.commitInstructions ? '\n' : ''}[temporary e2e probe]`,
+    };
+    const setGitField = (selector, value) => evaluate(`(() => {
+      const target = document.querySelector(${JSON.stringify(selector)});
+      if (target == null) throw new Error('Git field not found: ' + ${JSON.stringify(selector)});
+      target.focus();
+      const prototype = target instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+      Object.getOwnPropertyDescriptor(prototype, 'value').set.call(target, ${JSON.stringify(value)});
+      target.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: null }));
+      target.dispatchEvent(new Event('change', { bubbles: true }));
+      target.blur();
+      return true;
+    })()`);
+    try {
+      await setGitField('input[aria-label="分支前缀"]', gitProbe.branchPrefix);
+      await setGitField('textarea[aria-label="提交指令"]', gitProbe.commitInstructions);
+      await waitUntil("Git probe values", () => evaluate(`
+        document.querySelector('input[aria-label="分支前缀"]')?.value === ${JSON.stringify(gitProbe.branchPrefix)} &&
+        document.querySelector('textarea[aria-label="提交指令"]')?.value === ${JSON.stringify(gitProbe.commitInstructions)}
+      `));
+      // Instruction textareas auto-save after 3 seconds; the branch prefix saves on blur.
+      await new Promise((resolve) => setTimeout(resolve, 3_750));
+      await clickText("外观");
+      await waitUntil("appearance during Git remount", () => evaluate(`document.querySelector('[aria-label="使用指针光标"]') != null`));
+      await clickText("Git");
+      await waitUntil("persisted Git probe values", () => evaluate(`
+        document.querySelector('input[aria-label="分支前缀"]')?.value === ${JSON.stringify(gitProbe.branchPrefix)} &&
+        document.querySelector('textarea[aria-label="提交指令"]')?.value === ${JSON.stringify(gitProbe.commitInstructions)}
+      `));
+      deepChecks.push("Git input persistence across remount");
+    } finally {
+      await setGitField('input[aria-label="分支前缀"]', gitOriginal.branchPrefix);
+      await setGitField('textarea[aria-label="提交指令"]', gitOriginal.commitInstructions);
+      await waitUntil("Git fields restore", () => evaluate(`
+        document.querySelector('input[aria-label="分支前缀"]')?.value === ${JSON.stringify(gitOriginal.branchPrefix)} &&
+        document.querySelector('textarea[aria-label="提交指令"]')?.value === ${JSON.stringify(gitOriginal.commitInstructions)}
+      `));
+      await new Promise((resolve) => setTimeout(resolve, 3_750));
+    }
+    await assertNoInteractionException("restoring Git settings");
+
+    await clickText("连接");
+    await waitUntil("connection settings tabs", () => evaluate(`
+      [...document.querySelectorAll('button')].some((element) => element.innerText?.trim() === 'SSH')
+    `));
+    await clickText("SSH");
+    await waitUntil("SSH add button", () => evaluate(`
+      [...document.querySelectorAll('button')].some((element) => element.innerText?.trim() === '添加')
+    `));
+    await clickText("添加");
+    await waitUntil("SSH discovery dialog", () => evaluate(`document.querySelector('[role="dialog"]') != null`));
+    try {
+      const selectableHost = await evaluate(`(() => {
+        const checkbox = [...document.querySelectorAll('[role="dialog"] [role="checkbox"][aria-label^="选择"]')]
+          .find((element) => element.getAttribute('aria-checked') === 'false');
+        if (checkbox == null) return null;
+        return checkbox.getAttribute('aria-label');
+      })()`);
+      if (selectableHost != null) {
+        await evaluate(`document.querySelector('[role="checkbox"][aria-label=${JSON.stringify(selectableHost)}]')?.click()`);
+        await waitUntil("SSH host selection", () => evaluate(`
+          document.querySelector('[role="checkbox"][aria-label=${JSON.stringify(selectableHost)}]')?.getAttribute('aria-checked') === 'true'
+        `));
+        await waitUntil("SSH add enabled", () => evaluate(`
+          [...document.querySelectorAll('[role="dialog"] button[type="submit"]')]
+            .some((element) => element.innerText?.trim() === '添加' && !element.disabled)
+        `));
+        await evaluate(`document.querySelector('[role="checkbox"][aria-label=${JSON.stringify(selectableHost)}]')?.click()`);
+        await waitUntil("SSH host selection restore", () => evaluate(`
+          document.querySelector('[role="checkbox"][aria-label=${JSON.stringify(selectableHost)}]')?.getAttribute('aria-checked') === 'false'
+        `));
+        deepChecks.push(`SSH discovery selection: ${selectableHost}`);
+      }
+    } finally {
+      await command('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape' });
+      await command('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape' });
+      await waitUntil("SSH dialog close", () => evaluate(`document.querySelector('[role="dialog"]') == null`));
+    }
+    await assertNoInteractionException("SSH discovery dialog interaction");
+
+    await clickText("Worktrees");
+    await waitUntil("Worktrees controls", () => evaluate(`
+      document.querySelector('[role="switch"][aria-label="创建工作树前始终获取上游更新"]') != null &&
+      document.querySelector('button[aria-label="刷新"]') != null
+    `));
+    {
+      const label = "创建工作树前始终获取上游更新";
+      const initial = await readSwitch(label);
+      await toggleSwitch(label);
+      await waitUntil(`${label} worktree change`, async () => (await readSwitch(label)) !== initial);
+      await waitUntil(`${label} worktree save`, () => evaluate(`
+        document.querySelector('[role="switch"][aria-label=${JSON.stringify(label)}]')?.disabled === false
+      `));
+      await toggleSwitch(label);
+      await waitUntil(`${label} worktree restore`, async () => (await readSwitch(label)) === initial);
+      await waitUntil(`${label} worktree restore save`, () => evaluate(`
+        document.querySelector('[role="switch"][aria-label=${JSON.stringify(label)}]')?.disabled === false
+      `));
+      deepChecks.push(`Worktrees switch: ${label}`);
+    }
+    await evaluate(`document.querySelector('button[aria-label="刷新"]')?.click()`);
+    await waitUntil("Worktrees refresh completion", () => evaluate(`
+      document.querySelector('button[aria-label="刷新"]') != null &&
+      !document.querySelector('button[aria-label="刷新"]').disabled
+    `));
+    deepChecks.push("Worktrees refresh");
+    await assertNoInteractionException("Worktrees settings interaction");
   } finally {
+    if (initialSwitchStates.size > 0 && await evaluate(`document.querySelector('[aria-label="常规"]') != null`)) {
+      await clickText("常规");
+      await waitUntil("general settings for emergency restore", () => evaluate(`
+        document.querySelector('[aria-label="纯文本编辑器"]') != null
+      `));
+    }
     for (const [label, initial] of initialSwitchStates) {
       if ((await readSwitch(label)) !== initial) {
         await toggleSwitch(label);
@@ -818,7 +994,7 @@ if (mode === "smoke-readonly") {
   }
   const exceptions = protocolEvents.filter((event) => event.method === "Runtime.exceptionThrown").map(protocolEventDetails);
   if (exceptions.length > 0) throw new Error(`Renderer exceptions during settings interactions: ${JSON.stringify(exceptions)}`);
-  console.log(JSON.stringify({ mode, restored, search: "passed", menu: "passed", exceptions }, null, 2));
+  console.log(JSON.stringify({ mode, restored, deepChecks, search: "passed", menu: "passed", exceptions }, null, 2));
 } else if (mode === "fill" || mode === "append") {
   if (argument.length === 0) throw new Error(`${mode} requires non-empty message text`);
   const result = await evaluate(`(() => {
@@ -1119,6 +1295,28 @@ if (mode === "smoke-readonly") {
   }
 } else if (mode === "inspect") {
   console.log(JSON.stringify(await composerState(), null, 2));
+} else if (mode === "dump-controls") {
+  console.log(JSON.stringify(await evaluate(`(() => {
+    const visible = (element) => {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none';
+    };
+    return [...document.querySelectorAll('button, input, textarea, select, [role="switch"], [role="tab"], [role="combobox"]')]
+      .filter(visible)
+      .map((element) => ({
+        ariaChecked: element.getAttribute('aria-checked'),
+        ariaLabel: element.getAttribute('aria-label'),
+        ariaPressed: element.getAttribute('aria-pressed'),
+        dataState: element.getAttribute('data-state'),
+        disabled: element.matches(':disabled, [aria-disabled="true"]'),
+        role: element.getAttribute('role'),
+        tagName: element.tagName,
+        text: element.innerText?.trim().slice(0, 160) ?? '',
+        type: element.getAttribute('type'),
+        value: 'value' in element ? element.value : null,
+      }));
+  })()`), null, 2));
 } else if (mode === "dump-conversation") {
   console.log(JSON.stringify(await evaluate(`(() => ({
     bodyText: document.body?.innerText ?? '',

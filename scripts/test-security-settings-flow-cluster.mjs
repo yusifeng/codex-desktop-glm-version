@@ -51,7 +51,7 @@ const marker = name =>
   `() => globalThis.__securityFlowTest.initialized.push(${JSON.stringify(name)})`;
 const overrides = {
   "app-shared": {
-    $3: marker("runtime"),
+    $3: `() => { globalThis.__securityFlowTest.initialized.push("runtime"); return { c(size) { return Array(size).fill(Symbol.for("react.memo_cache_sentinel")); } }; }`,
     AS: `"ConnectedAppsGlyph"`,
     I3: `() => globalThis.__securityFlowTest.jsx`,
     K2: marker("internationalization"),
@@ -69,6 +69,7 @@ const overrides = {
     m4: `(...values) => values.flat(Infinity).filter(Boolean).join(" ")`,
     HX: `() => null`,
     _L: `options => ({ data: options.name === "mfa" ? { mfa_enabled_v2: true } : options.name === "sessions" ? { sessions: [{ id: "session-1", device_name: "Mac", current: false }] } : options.name === "linkedApps" ? { applications: [{ id: "app-1", name: "Calendar" }] } : {}, isLoading: false, isError: false, refetch() {} })`,
+    xD: `() => ({ c(size) { return Array(size).fill(Symbol.for("react.memo_cache_sentinel")); } })`,
     zw: `{ name: "generated-site-list" }`,
   },
   "app-initial": {
@@ -162,20 +163,25 @@ state.react = {
 };
 
 const logoModule = await bundle("linked-app-logo");
-let logo = logoModule.n({ app: { name: "calendar", logo_uri: "http://cdn.openai.com/logo.png" } });
-assert.equal(logo.type.name ?? logo.type, "LogoFrame");
-assert.equal(logo.props.children[0].props.children, "C");
-assert.equal(logo.props.children[1], null);
-logo = logoModule.n({ app: { name: "calendar", logo_uri: "https://cdn.openai.com/logo.png" }, size: "detail" });
-assert.equal(logo.props.children[1].props.src, "https://cdn.openai.com/logo.png");
-assert.match(logo.props.children[1].props.className, /size-10/);
-assert.equal(logo.props.children[1].props.referrerPolicy, "no-referrer");
-const generatedLogo = logoModule.n({ app: { name: "Site", client_app_type: "codex_generated_site" }, size: "detail" });
-assert.equal(generatedLogo.props.children[0].props.asset.name, "generated-site-detail");
-const connectionLogo = logoModule.t({ app: { name: "Codex", type: "codex_cli" }, borderless: true });
-assert.equal(connectionLogo.props.children.type, "CodexGlyph");
-assert.equal(connectionLogo.props.borderless, true);
 logoModule.r();
+let logo = logoModule.n({ app: { name: "calendar", logo_uri: "http://cdn.openai.com/logo.png" } });
+assert.equal(typeof logo.type, "function");
+let logoFrame = logo.type(logo.props);
+assert.equal(logoFrame.type, "span");
+assert.equal(logoFrame.props.children[0].props.children, "C");
+assert.equal(logoFrame.props.children[1], null);
+logo = logoModule.n({ app: { name: "calendar", logo_uri: "https://cdn.openai.com/logo.png" }, size: "detail" });
+logoFrame = logo.type(logo.props);
+assert.equal(logoFrame.props.children[1].props.src, "https://cdn.openai.com/logo.png");
+assert.match(logoFrame.props.children[1].props.className, /size-10/);
+assert.equal(logoFrame.props.children[1].props.referrerPolicy, "no-referrer");
+const generatedLogo = logoModule.n({ app: { name: "Site", client_app_type: "codex_generated_site" }, size: "detail" });
+const generatedLogoFrame = generatedLogo.type(generatedLogo.props);
+assert.equal(generatedLogoFrame.props.children[0].props.asset.name, "generated-site-detail");
+const connectionLogo = logoModule.t({ app: { name: "Codex", type: "codex_cli" }, borderless: true });
+const connectionLogoFrame = connectionLogo.type(connectionLogo.props);
+assert.equal(connectionLogoFrame.props.children.type, "CodexGlyph");
+assert.equal(connectionLogo.props.borderless, true);
 assert.equal(state.initialized.includes("account-glyphs"), true);
 
 const confirmationModule = await bundle("confirmation");
@@ -190,9 +196,11 @@ confirmation.props.onClose();
 assert.equal(closed, 1);
 let restrictionItems = confirmation.props.children.props.children[2].props.children;
 assert.equal(restrictionItems.length, 6);
+assert.notEqual(restrictionItems[4], null);
 confirmation = confirmationModule.LockdownConfirmation({ disablesDeveloperMode: false, isPending: false, onConfirm() {}, onClose() {} });
 restrictionItems = confirmation.props.children.props.children[2].props.children;
-assert.equal(restrictionItems.length, 5);
+assert.equal(restrictionItems.length, 6);
+assert.equal(restrictionItems[4], null);
 const descriptionMessage = confirmation.props.children.props.children[0].props.children;
 const learnLink = descriptionMessage.props.values.link("Learn more");
 assert.match(learnLink.props.href, /lockdown-mode/);
