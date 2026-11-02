@@ -7,7 +7,7 @@ import * as esbuild from "esbuild";
 import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["open-conversation-files"];
+const MODULES = [];
 const state = globalThis.__conversationSourcesTest = {};
 state.jsx = { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } };
 const imports = new Map();
@@ -39,18 +39,6 @@ const releaseAssertions = assertReleaseOwner("chatgpt-sources-side-panel-tab", [
 
 const audioReleaseAssertions = assertReleaseOwner("open-audio-summary-dialog");
 
-// open-conversation-files: 8
-const files = await bundle("open-conversation-files");
-assert.deepEqual(Object.keys(files), ["openConversationFiles"]);
-let panelRequest;
-const filesHost = { accountId: "account", userId: "user", openPanel(panel) { panelRequest = panel; } };
-files.openConversationFiles(filesHost, { conversationId: "conversation-3" });
-assert.equal(panelRequest.id, "chatgpt-conversation-files");
-assert.equal(panelRequest.kind, "chatgpt-conversation-files");
-assert.equal(panelRequest.target, "right");
-assert.equal(panelRequest.title, "Files in chat");
-assert.deepEqual(panelRequest.props, { accountId: "account", conversationId: "conversation-3", userId: "user" });
-panelRequest = undefined; files.openConversationFiles({ ...filesHost, accountId: null }); assert.equal(panelRequest, undefined);
-assert.equal(typeof files.openConversationFiles, "function");
+const filesReleaseAssertions = assertReleaseOwner("open-conversation-files");
 
-console.log(`chatgpt conversation sources cluster tests passed with ${releaseAssertions + audioReleaseAssertions} release assertions`);
+console.log(`chatgpt conversation sources cluster tests passed with ${releaseAssertions + audioReleaseAssertions + filesReleaseAssertions} release assertions`);

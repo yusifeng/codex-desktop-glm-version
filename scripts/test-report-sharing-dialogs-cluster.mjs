@@ -246,34 +246,7 @@ const connectorTree = codexReport.t({
 });
 assert.equal(connectorTree.props.title.props.defaultMessage, "Report app");
 
-// remote-connection-editor-dialog: 7
-const remote = await bundle("remote-connection-editor-dialog");
-remote.n();
-assert.equal(state.initialized.includes("remote-draft"), true);
-const remoteSubmissions = [];
-const remoteTree = remote.t({
-  open: true,
-  mode: "add",
-  draft: { displayName: "Prod", sshHost: "user@host", authMode: "none" },
-  existingConnections: [],
-  onOpenChange: (value) => {
-    state.remoteOpen = value;
-  },
-  onSubmit: (...args) => remoteSubmissions.push(args),
-});
-assert.equal(byText(remoteTree, "Add SSH connection").type, "h2");
-assert.equal(
-  nodes(remoteTree).filter((node) => node.type === "input").length >= 3,
-  true,
-);
-nodes(remoteTree)
-  .find((node) => node.type === "form")
-  .props.onSubmit({ preventDefault() {} });
-assert.equal(state.validationInputs.at(-1).draft.sshHost, "user@host");
-assert.equal(remoteSubmissions.length, 1);
-assert.equal(remoteSubmissions[0][0].displayName, "Prod");
-byText(remoteTree, "Cancel").props.onClick();
-assert.equal(state.remoteOpen, false);
+const remoteConnectionReleaseAssertions = assertReleaseOwner("remote-connection-editor-dialog");
 
 const sharedTaskReleaseAssertions = assertReleaseOwner("scheduled-shared-task-dialog-core");
 const skillShareReleaseAssertions = assertReleaseOwner("skill-share-dialog-runtime");
@@ -311,4 +284,4 @@ assert.equal(mergeRequests[0].title, "Ship feature");
 assert.equal(gitlabClosed, true);
 assert.equal(byText(gitlabTree, "Open in browser").type, "button");
 
-console.log(`37 report/sharing dialog assertions, ${sharedTaskReleaseAssertions} shared task, ${skillShareReleaseAssertions} skill share, and ${pluginShareAssertions} plugin share release assertions passed`);
+console.log(`report/sharing dialogs passed with ${remoteConnectionReleaseAssertions} remote connection, ${sharedTaskReleaseAssertions} shared task, ${skillShareReleaseAssertions} skill share, and ${pluginShareAssertions} plugin share release assertions`);

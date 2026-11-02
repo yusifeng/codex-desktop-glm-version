@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__paymentMethodEditorTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return { type, props: props ?? {}, key }; } } };
 async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "payment-method-editor-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__paymentMethodEditorTest.jsx;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
@@ -32,27 +33,6 @@ assert.equal(find(busyAdd, node => node.props?.children === "Close").props.disab
 find(busyAdd, node => node.props?.children === "Close").props.onClick();
 assert.equal(addClosed, 1);
 
-// edit-payment-method: 12
-const edit = await bundle("edit-payment-method");
-assert.deepEqual(Object.keys(edit), ["n", "t"]);
-assert.equal(find(edit.t({ accountId: "a", methodId: "m", isLoading: true, onClose() {} }), node => node.props?.role === "status").props.children, "Loading payment method…");
-assert.match(text(edit.t({ accountId: "a", methodId: "m", method: null, onClose() {} })), /Payment method unavailable/);
-const method = { id: "pm", card: { brand: "Visa", last4: "4242", exp_month: 10, exp_year: 2027 }, billing_details: { name: "David" } };
-let saved, editClosed = 0;
-const editUi = edit.t({ accountId: "account", methodId: "pm", method, now: new Date("2026-09-01T00:00:00Z"), onClose() { editClosed++; }, onSave(input) { saved = input; } });
-assert.match(text(editUi), /Visa •••• 4242.*Expiration month.*Expiration year.*Billing name.*Save/);
-await find(editUi, node => node.type === "form").props.onSubmit({ preventDefault() {}, currentTarget: { elements: { expMonth: { value: "11" }, expYear: { value: "2028" }, billingName: { value: " New Name " } } } });
-assert.deepEqual(saved, { accountId: "account", methodId: "pm", billingName: "New Name", expMonth: 11, expYear: 2028 });
-assert.equal(editClosed, 1);
-saved = undefined;
-await find(editUi, node => node.type === "form").props.onSubmit({ preventDefault() {}, currentTarget: { elements: { expMonth: { value: "8" }, expYear: { value: "2026" }, billingName: { value: "David" } } } });
-assert.equal(saved, undefined);
-assert.equal(editClosed, 1);
-const busyEdit = edit.t({ accountId: "a", methodId: "pm", method, isSubmitting: true, onClose() { editClosed++; } });
-assert.equal(find(busyEdit, node => node.props?.children === "Close").props.disabled, true);
-assert.equal(find(busyEdit, node => node.props?.children === "Saving…").props.disabled, true);
-find(busyEdit, node => node.props?.children === "Close").props.onClick();
-assert.equal(editClosed, 1);
-assert.equal(find(editUi, node => node.props?.["aria-label"] === "Edit payment method").props["aria-modal"], true);
+const editReleaseAssertions = assertReleaseOwner("edit-payment-method");
 
-console.log("22 payment method editor cluster assertions passed");
+console.log(`add payment method assertions and ${editReleaseAssertions} edit payment release assertions passed`);

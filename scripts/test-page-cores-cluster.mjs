@@ -7,7 +7,7 @@ import * as esbuild from "esbuild";
 import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["credit-purchase-page-core", "mcp-extension-view-page-core"];
+const MODULES = ["mcp-extension-view-page-core"];
 const state = globalThis.__pageCoresTest = { apiCalls: [], initialized: [] };
 const jsxRuntime = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
 const reactRuntime = { useState(initial) { let value = typeof initial === "function" ? initial() : initial; return [value, next => { value = typeof next === "function" ? next(value) : next; }]; } };
@@ -46,24 +46,7 @@ const button = (tree, text) => nodes(tree).find(node => node.type === "button" &
 
 const workHomeReleaseAssertions = assertReleaseOwner("chatgpt-work-home-page-core");
 
-// credit-purchase-page-core: 11
-const purchase = await bundle("credit-purchase-page-core");
-purchase.n();
-let purchaseResult = null;
-const purchaseTree = purchase.t({ accountId: "account-1", audience: "workspace", currencyCode: "EUR", defaultQuantity: 3000, onComplete: result => { purchaseResult = result; } });
-assert.equal(byText(purchaseTree, "Purchase credits").type, "h1");
-assert.equal(nodes(purchaseTree).find(node => node.type === "input").props.value, 3000);
-assert.equal(nodes(purchaseTree).find(node => node.type === "input").props.step, 250);
-assert.equal(byText(purchaseTree, "3,000 credits · EUR").type, "p");
-assert.equal(button(purchaseTree, "Continue").props.disabled, false);
-await nodes(purchaseTree).find(node => node.type === "form").props.onSubmit({ preventDefault() {} });
-assert.equal(state.apiCalls.at(-1).pathname, "/consumer/billing/credits/purchase");
-assert.equal(state.apiCalls.at(-1).options.additionalHeaders["ChatGPT-Account-ID"], "account-1");
-assert.deepEqual(state.apiCalls.at(-1).options.requestBody, { audience: "workspace", currency: "EUR", quantity: 3000 });
-assert.equal(purchaseResult.checkoutId, "checkout-1");
-const invalidPurchaseTree = purchase.t({ defaultQuantity: 501 });
-assert.equal(button(invalidPurchaseTree, "Continue").props.disabled, true);
-assert.equal(nodes(invalidPurchaseTree).filter(node => node.props.role === "alert").length, 1);
+const purchaseReleaseAssertions = assertReleaseOwner("credit-purchase-page-core");
 
 const skillsReleaseAssertions = assertReleaseOwner("skills-page-core");
 
@@ -73,4 +56,4 @@ const homeTaskSuggestionsReleaseAssertions = assertReleaseOwner("home-task-sugge
 
 const viewFrameReleaseAssertions = assertReleaseOwner("view-frame");
 
-console.log(`11 page core assertions, ${workHomeReleaseAssertions} work home, ${skillsReleaseAssertions} skills, ${mcpReleaseAssertions} MCP, ${homeTaskSuggestionsReleaseAssertions} home task suggestions, and ${viewFrameReleaseAssertions} view frame release assertions passed`);
+console.log(`page core release assertions passed: ${workHomeReleaseAssertions} work home, ${purchaseReleaseAssertions} purchase, ${skillsReleaseAssertions} skills, ${mcpReleaseAssertions} MCP, ${homeTaskSuggestionsReleaseAssertions} home task suggestions, and ${viewFrameReleaseAssertions} view frame`);

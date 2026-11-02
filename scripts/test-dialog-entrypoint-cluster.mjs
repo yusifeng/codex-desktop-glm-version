@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const cases = [
@@ -73,4 +74,5 @@ for (const entryCase of cases) {
 }
 
 assert.equal(assertions, 8);
-console.log(`${assertions} dialog entrypoint cluster assertions passed`);
+const downgradeReleaseAssertions = assertReleaseOwner("plan-downgrade-dialog-core");
+console.log(`${assertions} dialog entrypoint and ${downgradeReleaseAssertions} downgrade release assertions passed`);

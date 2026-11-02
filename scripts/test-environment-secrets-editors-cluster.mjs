@@ -324,4 +324,5 @@ assert.equal(requestedInput.namespace, "sensitive");
 assert.equal(requestedInput.secrets[0].value, "secret");
 assert.equal(personalClosed, 1);
 
-console.log(`environment secrets editors cluster complete with ${secretRowReleaseAssertions} secret row release assertions`);
+const personalSecretReleaseAssertions = assertReleaseOwner("personal-secret-dialog");
+console.log(`environment secrets editors cluster complete with ${secretRowReleaseAssertions} secret row and ${personalSecretReleaseAssertions} personal secret release assertions`);

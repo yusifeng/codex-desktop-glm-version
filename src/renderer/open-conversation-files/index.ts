@@ -1,142 +1,791 @@
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-import type { JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
-
-type Callable = (...args: unknown[]) => unknown;
-export interface ConversationFilesRequest {
-  accountId?: string | null; conversationId?: string | null; serverConversationId?: string | null;
-  userId?: string | null; onClose?(): void; onOpenMessage?(messageId: string): void; [key: string]: unknown;
-}
-export interface ConversationFilesHost {
-  accountId?: string | null; userId?: string | null;
-  openPanel?(panel: { id: string; kind: string; props: ConversationFilesRequest; target: "right"; title: string }): void;
-}
-interface RemoteFile { file_id: string; file_name: string; file_size_bytes?: number | null; gizmo_id?: string | null; id?: string | null; is_project?: boolean; library_artifact_type?: string | null; mime_type?: string | null; origination_message_id?: string | null; origination_thread_id?: string | null }
-interface MessageFile { downloadTarget?: unknown; fileId?: string | null; key?: string; libraryFileId?: string | null; messageId?: string; mimeType?: string | null; name: string; sandboxPath?: string | null; sizeBytes?: number | null }
-interface FileItem { file: MessageFile; gizmoId?: string | null; libraryArtifactType?: string | null }
-interface Scope { get<T>(signal: unknown, parameter?: unknown): T }
-
-const shared = sharedChunk as unknown as Record<string, unknown>;
-const initial = initialChunk as unknown as Record<string, unknown>;
-const PANEL_KIND = "chatgpt-conversation-files";
-let jsx: JsxRuntime;
-let filesQuery: unknown;
-let fileItems: unknown;
-let panelDefinition: unknown;
-
-function invoke<T>(value: unknown, ...args: unknown[]): T { return (value as Callable)(...args) as T; }
-async function fetchConversationFiles(serverConversationId: string, accountId: string, signal: AbortSignal): Promise<RemoteFile[]> {
-  const files = new Map<string, RemoteFile>(); const cursors = new Set<string>(); let cursor: string | undefined;
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  $3 as n,
+  BX as r,
+  FX as i,
+  HX as a,
+  I3 as o,
+  K2 as s,
+  LX as c,
+  QI as l,
+  QX as u,
+  Rv as d,
+  Y2 as f,
+  Yh as p,
+  ZI as m,
+  Zh as h,
+  e6 as g,
+  iL as _,
+  l3 as v,
+  lk as y,
+  lw as b,
+  n4 as x,
+  pk as ee,
+  rL as te,
+  rZ as ne,
+} from "@rchunk/app-shared";
+import {
+  $Lt as S,
+  $R as re,
+  $en as C,
+  $kt as ie,
+  ALt as ae,
+  AVt as oe,
+  DR as se,
+  EGt as ce,
+  FDt as le,
+  GLt as w,
+  Gvt as ue,
+  HLt as de,
+  IDt as fe,
+  J9t as pe,
+  Jct as me,
+  KLt as he,
+  LGt as ge,
+  LLt as _e,
+  MLt as T,
+  NLt as E,
+  NM as ve,
+  Non as ye,
+  OR as be,
+  OYt as xe,
+  PM as Se,
+  Q9t as Ce,
+  QR as we,
+  RLt as Te,
+  RVt as Ee,
+  SYt as De,
+  Sun as D,
+  TYt as Oe,
+  VLt as O,
+  VVt as k,
+  Vct as ke,
+  Wct as Ae,
+  Wvt as je,
+  Y9t as Me,
+  _Bt as A,
+  _un as j,
+  _vt as Ne,
+  bS as M,
+  cJt as Pe,
+  cYt as Fe,
+  dRt as Ie,
+  dYt as Le,
+  eAt as Re,
+  ez as ze,
+  fRt as Be,
+  gvt as Ve,
+  iqt as N,
+  itn as He,
+  jGt as P,
+  jLt as Ue,
+  jVt as We,
+  kGt as Ge,
+  mYt as Ke,
+  mnt as qe,
+  mpn as Je,
+  mun as F,
+  oqt as Ye,
+  pnt as Xe,
+  ppn as Ze,
+  qct as Qe,
+  rJt as $e,
+  tRt as et,
+  ten as I,
+  uHt as L,
+  vBt as R,
+  wGt as tt,
+  wYt as nt,
+  xS as rt,
+  xpn as z,
+  ypn as it,
+  zLt as at,
+} from "@rchunk/app-initial";
+async function ot(e, t, n) {
+  let r = new Map(),
+    i = new Set(),
+    a;
   do {
-    signal.throwIfAborted();
-    const apiClient = initial.rJt as { safeGet: unknown };
-    const page = await invoke<Promise<{ cursor?: string | null; items: RemoteFile[] }>>(apiClient.safeGet,
-      "/conversations/{conversation_id}/files", { parameters: { path: { conversation_id: serverConversationId }, query: { limit: 200, cursor } },
-        additionalHeaders: { "ChatGPT-Account-ID": accountId }, expectedErrorStatuses: [401, 403, 404], signal });
-    signal.throwIfAborted();
-    for (const file of page.items) if (!files.has(file.file_id)) files.set(file.file_id, file);
-    cursor = page.cursor ?? undefined; if (cursor == null || cursors.has(cursor)) break; cursors.add(cursor);
-  } while (cursor != null);
-  return [...files.values()];
+    n.throwIfAborted();
+    let o = await $e.safeGet(`/conversations/{conversation_id}/files`, {
+      parameters: { path: { conversation_id: e }, query: { limit: 200, cursor: a } },
+      additionalHeaders: { "ChatGPT-Account-ID": t },
+      expectedErrorStatuses: [401, 403, 404],
+      signal: n,
+    });
+    n.throwIfAborted();
+    for (let e of o.items) r.has(e.file_id) || r.set(e.file_id, e);
+    if (((a = o.cursor ?? void 0), a == null || i.has(a))) break;
+    i.add(a);
+  } while (a != null);
+  return [...r.values()];
 }
-function visibleMessages(messages: Array<Record<string, unknown>>): Array<Record<string, unknown>> {
-  return messages.filter((message) => {
-    const author = message.author as { role?: string } | undefined; const metadata = message.metadata as Record<string, unknown> | undefined;
-    const content = message.content as { content_type?: string } | undefined;
-    return content?.content_type !== "gizmo_instructions_context" && !["system", "developer", "tool"].includes(author?.role ?? "") &&
-      message.recipient === "all" && (!metadata?.is_visually_hidden_from_conversation || Boolean(metadata?.targeted_reply_label));
-  });
+var B;
+function V() {
+  return (V = e(() => {
+    (i(),
+      D(),
+      Pe(),
+      l(),
+      (B = u(m, (e, { get: t }) => ({
+        enabled: e.accountId === t(F) && e.userId === t(j),
+        queryKey: [`conversation-files`, e.accountId, e.userId, e.serverConversationId],
+        queryFn: ({ signal: t }) => ot(e.serverConversationId, e.accountId, t),
+        staleTime: 3e4,
+        retry: !1,
+      }))));
+  }))();
 }
-function messageAttachments(messages: Array<Record<string, unknown>>): MessageFile[] {
-  if (typeof initial.$kt === "function") {
-    const extracted = invoke<{ inputs?: MessageFile[]; outputs?: MessageFile[] }>(initial.$kt, messages);
-    return [...(extracted.inputs ?? []), ...(extracted.outputs ?? [])];
+function st(e, t, n) {
+  let r = new Set();
+  for (let t of e)
+    if (t.content.content_type === `gizmo_instructions_context`)
+      for (let e of De(t.metadata)) e.fileId != null && r.add(e.fileId);
+  let i = e.filter(
+      (e) =>
+        e.content.content_type !== `gizmo_instructions_context` &&
+        e.author.role !== `system` &&
+        e.author.role !== `developer` &&
+        e.author.role !== `tool` &&
+        e.recipient === `all` &&
+        (!e.metadata?.is_visually_hidden_from_conversation || !!e.metadata?.targeted_reply_label),
+    ),
+    a = new Set(i.map(xe)),
+    o = ie(i),
+    s = [...o.inputs, ...o.outputs],
+    c = new Map(s.flatMap((e) => (e.fileId == null ? [] : [[e.fileId, e]]))),
+    l = new Map();
+  for (let e of t ?? []) {
+    let t = c.get(e.file_id),
+      i = e.origination_message_id != null && a.has(e.origination_message_id);
+    ((!r.has(e.file_id) &&
+      ((e.gizmo_id == null && e.is_project !== !0) || e.origination_thread_id === n)) ||
+      t != null ||
+      i) &&
+      l.set(e.file_id, {
+        file: {
+          downloadTarget:
+            t?.downloadTarget?.type === `mounted-library`
+              ? t.downloadTarget
+              : ce(
+                  { file_id: e.file_id, library_file_id: e.id, mime_type: e.mime_type },
+                  { fileName: e.file_name },
+                ),
+          fileId: e.file_id,
+          key: e.file_id,
+          kind: `file`,
+          libraryFileId: e.id,
+          messageId:
+            t?.messageId ??
+            (i || e.origination_thread_id === n ? (e.origination_message_id ?? ``) : ``),
+          mimeType: e.mime_type ?? t?.mimeType ?? null,
+          name: e.file_name,
+          sandboxPath: t?.sandboxPath ?? null,
+          sizeBytes: e.file_size_bytes ?? t?.sizeBytes ?? null,
+        },
+        gizmoId: e.gizmo_id,
+        libraryArtifactType: e.library_artifact_type,
+      });
   }
-  return messages.flatMap((message) => {
-    const metadata = message.metadata as { attachments?: Array<Record<string, unknown>> } | undefined;
-    return (metadata?.attachments ?? []).flatMap((attachment) => typeof attachment.name === "string" ? [{ fileId: attachment.file_id as string | undefined,
-      key: String(attachment.file_id ?? `${message.id}:${attachment.name}`), messageId: String(message.id ?? ""), mimeType: attachment.mime_type as string | undefined,
-      name: attachment.name, sizeBytes: attachment.size as number | undefined }] : []);
-  });
-}
-function collectFiles(messages: Array<Record<string, unknown>>, remoteFiles: RemoteFile[] | undefined, serverConversationId: string): FileItem[] {
-  const visible = visibleMessages(messages); const visibleMessageIds = new Set(visible.map((message) => String(message.id ?? "")));
-  const attachments = messageAttachments(visible); const byFileId = new Map(attachments.flatMap((file) => file.fileId == null ? [] : [[file.fileId, file]]));
-  const output = new Map<string, FileItem>();
-  for (const remote of remoteFiles ?? []) {
-    const attachment = byFileId.get(remote.file_id); const originatedHere = remote.origination_thread_id === serverConversationId;
-    const originatedInVisibleMessage = remote.origination_message_id != null && visibleMessageIds.has(remote.origination_message_id);
-    if ((remote.gizmo_id != null || remote.is_project === true) && !originatedHere && attachment == null && !originatedInVisibleMessage) continue;
-    const downloadTarget = attachment?.downloadTarget ?? (typeof initial.EGt === "function" ? invoke(initial.EGt,
-      { file_id: remote.file_id, library_file_id: remote.id, mime_type: remote.mime_type }, { fileName: remote.file_name }) : { type: "file-id", fileId: remote.file_id });
-    output.set(remote.file_id, { file: { downloadTarget, fileId: remote.file_id, key: remote.file_id, libraryFileId: remote.id,
-      messageId: attachment?.messageId ?? (originatedHere || originatedInVisibleMessage ? (remote.origination_message_id ?? "") : ""),
-      mimeType: remote.mime_type ?? attachment?.mimeType ?? null, name: remote.file_name, sandboxPath: attachment?.sandboxPath ?? null,
-      sizeBytes: remote.file_size_bytes ?? attachment?.sizeBytes ?? null }, gizmoId: remote.gizmo_id, libraryArtifactType: remote.library_artifact_type });
+  for (let e of s) {
+    let t = e.fileId ?? `${e.messageId}:${e.name}`;
+    l.has(t) || l.set(t, { file: e });
   }
-  for (const file of attachments) { const key = file.fileId ?? `${file.messageId}:${file.name}`; if (!output.has(key)) output.set(key, { file: { ...file, key: file.key ?? key } }); }
-  return [...output.values()];
+  return [...l.values()];
 }
-
-function FilesPanel(props: ConversationFilesRequest & { isActive?: boolean }): unknown {
-  const accountId = invoke<string | null>(shared.HX, initial.mun); const userId = invoke<string | null>(shared.HX, initial._un);
-  if (!props.isActive || props.accountId !== accountId || props.userId !== userId || props.conversationId == null || props.serverConversationId == null) return null;
-  const key = { accountId, userId, conversationId: props.conversationId, serverConversationId: props.serverConversationId };
-  const query = invoke<{ isError?: boolean; isFetching?: boolean; isPending?: boolean; refetch(): Promise<unknown> }>(shared.BX, filesQuery, key);
-  const items = invoke<FileItem[]>(shared.BX, fileItems, key);
-  const scope = invoke<Scope>(shared.LX, initial.$en);
-  const open = (item: FileItem) => {
-    const target = item.file.downloadTarget;
-    if (target == null) { if (item.file.messageId) { props.onClose?.(); props.onOpenMessage?.(item.file.messageId); } return; }
-    props.onClose?.();
-    if (typeof initial.OR === "function") void invoke<Promise<unknown>>(initial.OR, scope, { conversationId: props.serverConversationId,
-      fileName: item.file.name, gizmoId: item.gizmoId, target, tabKey: item.file.key, browserPreview: true, openHtmlInBrowser: false });
+function H() {
+  return (H = e(() => {
+    (nt(), P(), Re());
+  }))();
+}
+var U, W;
+function G() {
+  return (G = e(() => {
+    ((U = t(v(), 1)),
+      i(),
+      L(),
+      l(),
+      H(),
+      V(),
+      (W = ne(
+        m,
+        (e, { get: t }) => {
+          let { data: n } = t(B, e),
+            r = t(Ee, e.conversationId);
+          return st(
+            r == null ? [] : Oe({ mapping: r, current_node: t(We, e.conversationId) }),
+            n,
+            e.serverConversationId,
+          );
+        },
+        { isEqual: U.default },
+      )));
+  }))();
+}
+function ct(e, t, n) {
+  let r = K(e, t, n);
+  z(e, T, {
+    ...r,
+    action: E.CHATGPT_FILE_LIBRARY_ACTION_SHOWN,
+    entryPoint: at.CHATGPT_FILE_LIBRARY_ENTRY_POINT_CONVERSATION_MENU,
+  });
+  let i = null,
+    a,
+    o = e.watch((e) => {
+      if (e.get(F) !== t.accountId || e.get(j) !== t.userId) return;
+      let {
+          dataUpdatedAt: o,
+          error: s,
+          errorUpdatedAt: c,
+          fetchStatus: l,
+          status: u,
+        } = e.get(B, t),
+        d = e.get(W, t),
+        f = { ...r, loadType: he.CHATGPT_FILE_LIBRARY_LOAD_TYPE_REFRESH };
+      if (l === `fetching` && i == null)
+        ((i = { operationId: crypto.randomUUID(), dataUpdatedAt: o, errorUpdatedAt: c }),
+          z(e, w, { ...f, operationId: i.operationId }));
+      else if (l === `idle` && i != null) {
+        let t = i.operationId;
+        (u === `success` && o > i.dataUpdatedAt
+          ? z(e, w, { ...f, operationId: t, success: !0, itemCount: I(d.length) })
+          : u === `error` &&
+            c > i.errorUpdatedAt &&
+            z(e, w, {
+              ...f,
+              operationId: t,
+              success: !1,
+              itemCount: I(d.length),
+              errorType: `request_failed`,
+              error: we(s),
+            }),
+          (i = null));
+      }
+      let p = JSON.stringify(d.map(({ file: e }) => e.libraryFileId ?? e.fileId ?? e.messageId));
+      (d.length > 0 || (u === `success` && l === `idle`)) &&
+        p !== a &&
+        ((a = p),
+        z(e, et, {
+          sessionId: n,
+          libraryVariant: r.libraryVariant,
+          productExperience: r.productExperience,
+          visibleItemCount: I(d.length),
+          emptyReason:
+            d.length === 0 ? Te.CHATGPT_FILE_LIBRARY_EMPTY_REASON_NO_LIBRARY_FILES : void 0,
+        }));
+    });
+  return () => {
+    (o(),
+      e.get(F) === t.accountId &&
+        e.get(j) === t.userId &&
+        z(e, T, { ...r, action: E.CHATGPT_FILE_LIBRARY_ACTION_DISMISSED }));
   };
-  if (query.isPending) return jsx.jsx("div", { className: "px-4 py-4 text-sm text-codex-description", role: "status", children: "Loading files…" });
-  if (query.isError) return jsx.jsxs("div", { className: "flex items-center justify-between gap-3 px-4 py-4 text-sm text-codex-description", role: "alert", children: ["Couldn’t load files", jsx.jsx("button", { type: "button", disabled: query.isFetching, onClick: () => void query.refetch(), children: "Try again" })] });
-  if (items.length === 0) return jsx.jsx("div", { className: "px-4 py-4 text-sm text-codex-description", children: "No files referenced yet" });
-  return jsx.jsx("ul", { "aria-label": "Files in chat", className: "flex flex-col", children: items.map((item) => jsx.jsx("li", { children:
-    jsx.jsx("button", { type: "button", disabled: item.file.downloadTarget == null && !item.file.messageId, onClick: () => open(item), children:
-      jsx.jsxs("span", { children: [jsx.jsx("strong", { children: item.file.name }), item.file.mimeType == null ? null : jsx.jsx("small", { children: item.file.mimeType })] }) }) }, item.file.key)) });
 }
-
-function initialize(): void {
-  if (panelDefinition != null) return;
-  for (const value of [initial.Sun, initial.cJt, shared.QI, initial.Wvt, initial.FDt]) if (typeof value === "function") invoke(value);
-  jsx = invoke<JsxRuntime>(shared.I3);
-  filesQuery = invoke(shared.QX, shared.ZI, (key: { accountId: string; userId: string; serverConversationId: string }, context: { get<T>(signal: unknown): T }) => ({
-    enabled: key.accountId === context.get(initial.mun) && key.userId === context.get(initial._un),
-    queryKey: ["conversation-files", key.accountId, key.userId, key.serverConversationId],
-    queryFn: ({ signal }: { signal: AbortSignal }) => fetchConversationFiles(key.serverConversationId, key.accountId, signal), staleTime: 30_000, retry: false,
-  }));
-  fileItems = invoke(shared.rZ, shared.ZI, (key: { conversationId: string; serverConversationId: string }, context: { get<T>(signal: unknown, parameter?: unknown): T }) => {
-    const remote = context.get<{ data?: RemoteFile[] }>(filesQuery, key).data;
-    const mapping = context.get<Record<string, unknown> | null>(initial.RVt, key.conversationId);
-    const currentNode = context.get(initial.jVt, key.conversationId);
-    const messages: Array<Record<string, unknown>> = mapping == null ? [] : (typeof initial.TYt === "function" ? invoke<Array<Record<string, unknown>>>(initial.TYt, { mapping, current_node: currentNode }) : Object.values(mapping) as Array<Record<string, unknown>>);
-    return collectFiles(messages, remote, key.serverConversationId);
-  });
-  panelDefinition = invoke(initial.IDt, PANEL_KIND, FilesPanel, { getId: () => PANEL_KIND,
-    isAvailable: (route: { value?: { routeKind?: string }; routeKind?: string }) => (route.value?.routeKind ?? route.routeKind) === "chatgpt-thread",
-    open: openConversationFiles, showInNewTabLauncher: false });
+function lt(e, t, n, { file: r }) {
+  if (
+    r.fileId == null ||
+    (r.libraryFileId == null && !r.fileId.startsWith(`file-`) && !r.fileId.startsWith(`file_`))
+  )
+    return;
+  let i = r.mimeType,
+    a = `other`;
+  (i?.startsWith(`image/`)
+    ? (a = `image`)
+    : i?.startsWith(`video/`)
+      ? (a = `video`)
+      : i?.startsWith(`audio/`)
+        ? (a = `audio`)
+        : i === `application/pdf`
+          ? (a = `pdf`)
+          : i?.startsWith(`text/`) && (a = `text`),
+    z(e, O, {
+      ...K(e, t, n),
+      interactionType: de.CHATGPT_FILE_LIBRARY_FILE_INTERACTION_TYPE_OPENED,
+      libraryFileIds: r.libraryFileId == null ? void 0 : [r.libraryFileId],
+      fileCategory: a,
+    }));
 }
-
-function openConversationFiles(host: ConversationFilesHost | Scope, request: ConversationFilesRequest = {}): void {
-  initialize();
-  if (typeof (host as ConversationFilesHost).openPanel === "function") {
-    const legacy = host as ConversationFilesHost; const accountId = request.accountId ?? legacy.accountId; const userId = request.userId ?? legacy.userId;
-    if (accountId == null || userId == null) return;
-    legacy.openPanel?.({ id: PANEL_KIND, kind: PANEL_KIND, props: { ...request, accountId, userId }, target: "right", title: "Files in chat" }); return;
+function ut(e, t, n, { file: r }) {
+  if (e.get(F) !== t.accountId || e.get(j) !== t.userId) return;
+  let i =
+    r.downloadTarget?.type === `mounted-library`
+      ? r.downloadTarget.mountedLibraryFileId
+      : r.libraryFileId;
+  if (i == null) return;
+  let a = JSON.stringify({ libraryFileIds: [i] }).length <= 2e3 ? [i] : [],
+    o = S.CHATGPT_FILE_LIBRARY_ORIGIN_FILE_PREVIEW;
+  (z(e, _e, {
+    artifactIds: a,
+    itemCount: I(1),
+    libraryOrigin: o,
+    conversationId: t.serverConversationId,
+  }),
+    z(e, O, {
+      ...K(e, t, n),
+      libraryOrigin: o,
+      interactionType: de.CHATGPT_FILE_LIBRARY_FILE_INTERACTION_TYPE_DOWNLOAD,
+      libraryFileIds: a.length > 0 ? a : void 0,
+      provider: re(i),
+      selectedCount: I(1),
+    }));
+}
+function K(e, t, n) {
+  let r = e.get(oe, t.conversationId);
+  return {
+    conversationId: t.serverConversationId,
+    libraryOrigin: S.CHATGPT_FILE_LIBRARY_ORIGIN_CONVERSATION_MENU,
+    libraryVariant: Ie.CHATGPT_FILE_LIBRARY_VARIANT_CONVERSATION_FILES,
+    productExperience: r === `tpp` || r === `flora` ? `work` : `chat`,
+    sessionId: n,
+  };
+}
+function q() {
+  return (q = e(() => {
+    (Ce(), Be(), D(), L(), ze(), it(), V(), G());
+  }))();
+}
+function dt(e) {
+  let t = (0, ft.c)(29),
+    { conversationKey: n, onOpenFile: i } = e,
+    a = x(),
+    o = r(A, n.conversationId),
+    s = r(W, n),
+    { isPending: c, isError: l, isFetching: u, refetch: d } = r(B, n),
+    m;
+  t[0] === c
+    ? (m = t[1])
+    : ((m = c
+        ? (0, J.jsxs)(`div`, {
+            className: `px-4 py-4 text-sm text-codex-description select-none`,
+            role: `status`,
+            children: [
+              (0, J.jsx)(`span`, {
+                className: `sr-only`,
+                children: (0, J.jsx)(f, {
+                  id: `chatgptConversations.files.loading`,
+                  defaultMessage: `Loading files…`,
+                  description: `Screen reader status while the Files in chat panel loads files referenced in the current conversation`,
+                }),
+              }),
+              (0, J.jsx)(ve, { lines: 3 }),
+            ],
+          })
+        : null),
+      (t[0] = c),
+      (t[1] = m));
+  let h;
+  t[2] !== l || t[3] !== u || t[4] !== d
+    ? ((h = l
+        ? (0, J.jsxs)(`div`, {
+            className: `flex items-center justify-between gap-3 px-4 py-4 text-sm text-codex-description select-none`,
+            role: `alert`,
+            children: [
+              (0, J.jsx)(`span`, {
+                children: (0, J.jsx)(f, {
+                  id: `chatgptConversations.files.loadError`,
+                  defaultMessage: `Couldn’t load files`,
+                  description: `Error message in the Files in chat panel when the conversation file list fails to load; a nearby button retries the request`,
+                }),
+              }),
+              (0, J.jsx)(p, {
+                color: `secondary`,
+                loading: u,
+                size: `compact`,
+                onClick: () => void d(),
+                children: (0, J.jsx)(f, {
+                  id: `chatgptConversations.files.retry`,
+                  defaultMessage: `Try again`,
+                  description: `Compact button that retries a failed file-list request in the Files in chat panel`,
+                }),
+              }),
+            ],
+          })
+        : null),
+      (t[2] = l),
+      (t[3] = u),
+      (t[4] = d),
+      (t[5] = h))
+    : (h = t[5]);
+  let g;
+  t[6] !== s.length || t[7] !== l || t[8] !== c
+    ? ((g =
+        s.length === 0 && !c && !l
+          ? (0, J.jsx)(`div`, {
+              className: `px-4 py-4 text-sm text-codex-description select-none`,
+              children: (0, J.jsx)(f, {
+                id: `chatgptConversations.files.empty`,
+                defaultMessage: `No files referenced yet`,
+                description: `Empty state in the Files in chat panel after the current conversation’s file list loads successfully with no visible references`,
+              }),
+            })
+          : null),
+      (t[6] = s.length),
+      (t[7] = l),
+      (t[8] = c),
+      (t[9] = g))
+    : (g = t[9]);
+  let _;
+  t[10] === a
+    ? (_ = t[11])
+    : ((_ = a.formatMessage({
+        id: `chatgptConversations.files.listLabel`,
+        defaultMessage: `Files in chat`,
+        description: `Accessible label of the list of files referenced in the current ChatGPT conversation`,
+      })),
+      (t[10] = a),
+      (t[11] = _));
+  let v;
+  if (t[12] !== s || t[13] !== a || t[14] !== o || t[15] !== i) {
+    let e;
+    (t[17] !== a || t[18] !== o || t[19] !== i
+      ? ((e = (e) =>
+          (0, J.jsx)(
+            M.SourceDetails,
+            {
+              label: e.file.name,
+              meta:
+                pe(e.file.name) ??
+                a.formatMessage(
+                  Le(Ke({ fileName: e.file.name, mimeType: e.file.mimeType ?? void 0 }).category),
+                ),
+              icon: (0, J.jsx)(ae, {
+                fileName: e.file.name,
+                mimeType: e.file.mimeType ?? void 0,
+                libraryArtifactType: e.libraryArtifactType,
+                size: 16,
+              }),
+              onOpen: o ? void 0 : () => i(e),
+            },
+            e.file.key,
+          )),
+        (t[17] = a),
+        (t[18] = o),
+        (t[19] = i),
+        (t[20] = e))
+      : (e = t[20]),
+      (v = s.map(e)),
+      (t[12] = s),
+      (t[13] = a),
+      (t[14] = o),
+      (t[15] = i),
+      (t[16] = v));
+  } else v = t[16];
+  let y;
+  t[21] !== _ || t[22] !== v
+    ? ((y = (0, J.jsx)(M.SourcesSidePanelList, { label: _, children: v })),
+      (t[21] = _),
+      (t[22] = v),
+      (t[23] = y))
+    : (y = t[23]);
+  let b;
+  return (
+    t[24] !== m || t[25] !== h || t[26] !== g || t[27] !== y
+      ? ((b = (0, J.jsxs)(M.SourcesSidePanel, { children: [m, h, g, y] })),
+        (t[24] = m),
+        (t[25] = h),
+        (t[26] = g),
+        (t[27] = y),
+        (t[28] = b))
+      : (b = t[28]),
+    b
+  );
+}
+var ft, J;
+function pt() {
+  return (pt = e(() => {
+    ((ft = n()), Fe(), i(), s(), R(), h(), Se(), Me(), Ue(), rt(), V(), G(), (J = o()));
+  }))();
+}
+function mt(e) {
+  let t = (0, X.c)(3),
+    n = a(F),
+    r = a(j);
+  if (!e.isActive || e.accountId !== n || e.userId !== r) return null;
+  let i = `${n}:${r}:${e.conversationId}`,
+    o;
+  return (
+    t[0] !== e || t[1] !== i
+      ? ((o = (0, Q.jsx)(ht, { ...e }, i)), (t[0] = e), (t[1] = i), (t[2] = o))
+      : (o = t[2]),
+    o
+  );
+}
+function ht(e) {
+  let t = (0, X.c)(25),
+    {
+      accountId: n,
+      userId: r,
+      conversationId: i,
+      serverConversationId: a,
+      onClose: o,
+      onOpenMessage: s,
+    } = e,
+    l = c(C),
+    u = x(),
+    d;
+  t[0] !== n || t[1] !== i || t[2] !== a || t[3] !== r
+    ? ((d = { accountId: n, userId: r, conversationId: i, serverConversationId: a }),
+      (t[0] = n),
+      (t[1] = i),
+      (t[2] = a),
+      (t[3] = r),
+      (t[4] = d))
+    : (d = t[4]);
+  let f = d,
+    [p] = (0, Z.useState)(gt),
+    m,
+    h;
+  (t[5] !== n || t[6] !== i || t[7] !== l || t[8] !== a || t[9] !== p || t[10] !== r
+    ? ((m = () =>
+        ct(l, { accountId: n, userId: r, conversationId: i, serverConversationId: a }, p)),
+      (h = [l, n, r, i, a, p]),
+      (t[5] = n),
+      (t[6] = i),
+      (t[7] = l),
+      (t[8] = a),
+      (t[9] = p),
+      (t[10] = r),
+      (t[11] = m),
+      (t[12] = h))
+    : ((m = t[11]), (h = t[12])),
+    (0, Z.useEffect)(m, h));
+  let g;
+  t[13] !== i ||
+  t[14] !== u ||
+  t[15] !== f ||
+  t[16] !== o ||
+  t[17] !== s ||
+  t[18] !== l ||
+  t[19] !== a ||
+  t[20] !== p
+    ? ((g = (e) => {
+        if (Y(l, f)) return;
+        let { file: t } = e,
+          n = t.downloadTarget;
+        if (
+          n == null ||
+          (n.type === `file-id` &&
+            t.libraryFileId == null &&
+            !n.fileId.startsWith(`file-`) &&
+            !n.fileId.startsWith(`file_`))
+        ) {
+          t.messageId && (o(), Ae(l, l.get(me).chat), s(t.messageId));
+          return;
+        }
+        (lt(l, f, p, e),
+          o(),
+          be(l, {
+            conversationId: N(a),
+            fileName: n.type === `mounted-library` ? Ge(t.name, n.mimeType) : t.name,
+            gizmoId: e.gizmoId ?? l.get(k, i),
+            target: n,
+            isAccessBlocked: (e) => Y(e, f),
+            headerActions: (0, Q.jsx)(_t, { conversationKey: f, item: e, sessionId: p }),
+            tabKey: t.key,
+            browserPreview: !0,
+            openHtmlInBrowser: !1,
+            onDownload: (t) => vt(l, f, e, p, t),
+          }).catch(() => {
+            Y(l, f) ||
+              l
+                .get(ee)
+                .danger(
+                  u.formatMessage({
+                    id: `chatgptConversations.files.openError`,
+                    defaultMessage: `Couldn’t open file`,
+                    description: `Error toast after selecting a file in the Files in chat panel when its preview or download fails`,
+                  }),
+                  { errorAnalytics: { toastId: `chatgptConversations.files.openError` } },
+                );
+          }));
+      }),
+      (t[13] = i),
+      (t[14] = u),
+      (t[15] = f),
+      (t[16] = o),
+      (t[17] = s),
+      (t[18] = l),
+      (t[19] = a),
+      (t[20] = p),
+      (t[21] = g))
+    : (g = t[21]);
+  let _;
+  return (
+    t[22] !== f || t[23] !== g
+      ? ((_ = (0, Q.jsx)(dt, { conversationKey: f, onOpenFile: g })),
+        (t[22] = f),
+        (t[23] = g),
+        (t[24] = _))
+      : (_ = t[24]),
+    _
+  );
+}
+function gt() {
+  return crypto.randomUUID();
+}
+function _t(e) {
+  let t = (0, X.c)(19),
+    { conversationKey: n, item: i, sessionId: a } = e,
+    o = c(C),
+    s = x(),
+    l = r(A, n.conversationId),
+    u;
+  t[0] !== n || t[1] !== i || t[2] !== o || t[3] !== a
+    ? ((u = () => vt(o, n, i, a)), (t[0] = n), (t[1] = i), (t[2] = o), (t[3] = a), (t[4] = u))
+    : (u = t[4]);
+  let d;
+  t[5] !== n || t[6] !== s || t[7] !== o
+    ? ((d = () => {
+        Y(o, n) ||
+          o
+            .get(ee)
+            .danger(
+              s.formatMessage({
+                id: `chatgptConversations.files.downloadError`,
+                defaultMessage: `Couldn’t download file`,
+                description: `Error toast after the user selects Download in a file preview opened from Files in chat and the download fails`,
+              }),
+              { errorAnalytics: { toastId: `chatgptConversations.files.downloadError` } },
+            );
+      }),
+      (t[5] = n),
+      (t[6] = s),
+      (t[7] = o),
+      (t[8] = d))
+    : (d = t[8]);
+  let m;
+  t[9] !== u || t[10] !== d
+    ? ((m = { mutationFn: u, onError: d }), (t[9] = u), (t[10] = d), (t[11] = m))
+    : (m = t[11]);
+  let { mutate: h, isPending: g } = _(m),
+    v;
+  t[12] === h ? (v = t[13]) : ((v = () => h()), (t[12] = h), (t[13] = v));
+  let y;
+  t[14] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((y = (0, Q.jsx)(f, {
+        id: `chatgptConversations.files.download`,
+        defaultMessage: `Download`,
+        description: `Button in a preview opened from Files in chat that downloads the original file to the user's device`,
+      })),
+      (t[14] = y))
+    : (y = t[14]);
+  let b;
+  return (
+    t[15] !== l || t[16] !== g || t[17] !== v
+      ? ((b = (0, Q.jsx)(p, {
+          color: `secondary`,
+          disabled: l,
+          size: `toolbar`,
+          loading: g,
+          onClick: v,
+          children: y,
+        })),
+        (t[15] = l),
+        (t[16] = g),
+        (t[17] = v),
+        (t[18] = b))
+      : (b = t[18]),
+    b
+  );
+}
+async function vt(e, t, n, r, i) {
+  if (n.file.downloadTarget == null) return;
+  let a = new AbortController(),
+    o = e.watch((e) => (Y(e, t) && a.abort(), () => a.abort()));
+  try {
+    if ((a.signal.throwIfAborted(), i == null))
+      await tt({
+        conversationId: N(t.serverConversationId),
+        fileName: n.file.name,
+        gizmoId: n.gizmoId ?? e.get(k, t.conversationId),
+        signal: a.signal,
+        target: n.file.downloadTarget,
+      });
+    else {
+      let e = await Xe.workspaceFiles.read({
+        hostId: i.hostId,
+        path: i.path,
+        representation: `blob`,
+      });
+      (a.signal.throwIfAborted(),
+        ge(new Blob([`blob` in e ? ye(e.blob) : e.text]), i.fileName ?? n.file.name));
+    }
+    a.signal.aborted || ut(e, t, r, n);
+  } catch (e) {
+    if (!a.signal.aborted) throw e;
+  } finally {
+    o();
   }
-  const scope = host as Scope; const accountId = scope.get<string | null>(initial.mun); const userId = scope.get<string | null>(initial._un);
-  if (accountId == null || userId == null) return;
-  const formatter = scope.get<{ formatMessage(descriptor: { defaultMessage: string; description: string; id: string }): string }>(initial.mpn);
-  invoke(initial.Gvt, scope, panelDefinition, { revealAndFocus: true, id: PANEL_KIND, kind: PANEL_KIND,
-    icon: element(shared.Rv, {}), props: { ...request, accountId, userId }, target: invoke(initial.gvt, scope, PANEL_KIND) ?? "right",
-    title: formatter.formatMessage({ id: "chatgptConversations.files.title", defaultMessage: "Files in chat", description: "Title of the conversation files side panel" }) });
 }
-function element(type: unknown, props: Record<string, unknown>): unknown { return jsx.jsx(type as never, props); }
-
-initialize();
-export { openConversationFiles };
+function Y(e, t) {
+  return e.get(F) !== t.accountId || e.get(j) !== t.userId || e.get(A, t.conversationId);
+}
+var X, Z, Q;
+function yt() {
+  return (yt = e(() => {
+    ((X = n()),
+      te(),
+      i(),
+      (Z = g()),
+      s(),
+      D(),
+      R(),
+      P(),
+      Ye(),
+      L(),
+      se(),
+      h(),
+      y(),
+      qe(),
+      He(),
+      ke(),
+      Qe(),
+      q(),
+      pt(),
+      (Q = o()));
+  }))();
+}
+function bt(e, t) {
+  let n = e.get(F),
+    r = e.get(j);
+  n != null &&
+    r != null &&
+    ue(e, St, {
+      revealAndFocus: !0,
+      id: $,
+      kind: $,
+      icon: (0, xt.jsx)(d, {}),
+      props: { ...t, accountId: n, userId: r },
+      target: Ve(e, $) ?? `right`,
+      title: e
+        .get(Je)
+        .formatMessage({
+          id: `chatgptConversations.files.title`,
+          defaultMessage: `Files in chat`,
+          description: `Title of the side panel listing files referenced in the current ChatGPT conversation, opened from the header overflow menu`,
+        }),
+    });
+}
+var xt, $, St;
+function Ct() {
+  return (Ct = e(() => {
+    (je(),
+      le(),
+      D(),
+      b(),
+      Ze(),
+      Ne(),
+      yt(),
+      (xt = o()),
+      ($ = `chatgpt-conversation-files`),
+      (St = fe($, mt, {
+        getId: () => $,
+        isAvailable: (e) => e.value.routeKind === `chatgpt-thread`,
+        open: bt,
+        showInNewTabLauncher: !1,
+      })));
+  }))();
+}
+Ct();
+export { bt as openConversationFiles };

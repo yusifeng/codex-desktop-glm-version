@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
@@ -74,19 +75,6 @@ assert.equal(demoPage.props.children[3].props.children[0].props.children.props.d
 assert.equal(demoPage.props.children[3].props.children[3].props.children, "Ready to launch");
 assert.equal(demoPage.props.children[2], null);
 
-const callback = await load("app-connect-oauth-callback-page");
-globalThis.__location = { ...globalThis.__location, search: "?app_id=calendar" };
-globalThis.__stateOverrides = [{ success: true, appId: "calendar" }];
-const successPage = callback.AppConnectOAuthCallbackPage();
-assert.equal(successPage.props.children[0].props.children, "App connected");
-successPage.props.children[1].props.onClick();
-assert.equal(globalThis.__navigations.at(-1).path, "/settings/connectors/calendar");
-globalThis.__location = { ...globalThis.__location, search: "?error=denied" };
-globalThis.__stateOverrides = [{ success: false, error: "denied" }];
-const failedPage = callback.AppConnectOAuthCallbackPage();
-assert.equal(failedPage.props.children[0].props.children, "Couldn’t connect app");
-assert.equal(failedPage.props.children[1].props.children, "denied");
-failedPage.props.children[2].props.onClick();
-assert.equal(globalThis.__navigations.at(-1).options.replace, true);
+const callbackReleaseAssertions = assertReleaseOwner("app-connect-oauth-callback-page");
 
-console.log("recovery route pages cluster complete");
+console.log(`recovery route pages cluster complete with ${callbackReleaseAssertions} OAuth callback release assertions`);

@@ -1,13 +1,12 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const sourcePath = new URL("../src/renderer/app-shared/runtime/status-to-color.ts", import.meta.url).pathname;
-const consumerSource = fs.readFileSync(new URL("../src/renderer/codex-micro-keyboard-surface/index.ts", import.meta.url), "utf8");
-assert.match(consumerSource, /app-shared\/runtime\/status-to-color/);
-assert.doesNotMatch(consumerSource, /\bEX as getCodexMicroStatusColor\b/);
+assertReleaseOwner("codex-micro-keyboard-surface");
 const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
 const mod = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
 assert.equal(mod.statusToColor("working"), 3166206);
 assert.equal(mod.statusToColor("awaiting-response"), 16739584);
 assert.equal(mod.statusToColor("unknown"), undefined);
-console.log("app-shared status to color: 5 assertions passed");
+console.log("app-shared status to color runtime and keyboard surface release assertions passed");

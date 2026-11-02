@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const assetRoot = "/Users/david/Workspace/ppio_github/chatgpt-desktop-src/app/webview/assets";
@@ -148,4 +149,5 @@ const rewriteCount = catalog.length - preserveCount;
 assert.equal(preserveCount, 52);
 assert.equal(rewriteCount, 3);
 assertions += 2;
-console.log("incremental generated-language hubs: " + assertions + " assertions passed; preserve=" + preserveCount + ", rewrite=" + rewriteCount + ".");
+const resumeReleaseAssertions = assertReleaseOwner("resume-chatgpt-completion");
+console.log("incremental generated-language hubs: " + assertions + " assertions passed; preserve=" + preserveCount + ", rewrite=" + rewriteCount + "; resume release=" + resumeReleaseAssertions + ".");
