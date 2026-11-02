@@ -1,1192 +1,3677 @@
-// Popcorn editor surface primitives shared by presentation, workbook, and document artifacts.
-
-import "@rchunk/rolldown-runtime";
-import "@rchunk/artifact-source-bootstrap";
-import "@rchunk/app-initial";
-import "@rchunk/yjs-runtime";
-import "@rchunk/popcorn-icons";
-import "@rchunk/app-primary";
-import "@rchunk/draw-presence-label";
-import { I3 as getJsxRuntime } from "@rchunk/app-shared";
-
-interface JsxRuntime {
-  Fragment: unknown;
-  jsx(
-    type: unknown,
-    props: Record<string, unknown>,
-    key?: string | number,
-  ): unknown;
-  jsxs(
-    type: unknown,
-    props: Record<string, unknown>,
-    key?: string | number,
-  ): unknown;
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  C$ as n,
+  D$ as r,
+  E$ as i,
+  I3 as a,
+  O$ as o,
+  P3 as s,
+  S$ as c,
+  T$ as l,
+  _$ as u,
+  b$ as d,
+  d1 as f,
+  e6 as p,
+  f1 as m,
+  g$ as h,
+  h$ as g,
+  h4 as _,
+  l1 as v,
+  m1 as y,
+  m4 as b,
+  p1 as x,
+  s1 as ee,
+  u1 as te,
+  v$ as S,
+  w$ as C,
+  x$ as w,
+  y$ as T,
+} from "@rchunk/app-shared";
+import {
+  $Sn as E,
+  QSn as ne,
+  YSn as D,
+  cCn as re,
+  dCn as ie,
+  fCn as O,
+  lCn as ae,
+  nCn as oe,
+  oCn as se,
+  rCn as k,
+  tCn as ce,
+  uCn as A,
+} from "@rchunk/app-initial";
+import { W as j, z as M } from "@rchunk/yjs-runtime";
+import {
+  D as N,
+  I as P,
+  M as le,
+  O as ue,
+  P as de,
+  a as fe,
+  h as F,
+  i as I,
+  j as pe,
+  l as me,
+  m as he,
+  s as ge,
+  t as L,
+} from "@rchunk/popcorn-icons";
+import { gt as _e, mt as R, nt as z, rt as ve } from "@rchunk/artifact-source-bootstrap";
+import {
+  Ag as ye,
+  Dg as be,
+  Hg as xe,
+  Ig as Se,
+  Og as Ce,
+  Rg as we,
+  Ug as Te,
+  Zg as Ee,
+  jg as De,
+} from "@rchunk/app-primary";
+import {
+  d as Oe,
+  f as ke,
+  i as Ae,
+  l as je,
+  r as Me,
+  u as Ne,
+} from "@rchunk/draw-presence-label";
+function Pe(e, t, n) {
+  let r = e.slice();
+  return (r.splice(n < 0 ? r.length + n : n, 0, r.splice(t, 1)[0]), r);
 }
-interface Point {
-  x: number;
-  y: number;
+function Fe(e, t) {
+  return e.reduce((e, n, r) => {
+    let i = t.get(n);
+    return (i && (e[r] = i), e);
+  }, Array(e.length));
 }
-interface Rect {
-  height: number;
-  left: number;
-  top: number;
-  width: number;
+function Ie(e) {
+  return e !== null && e >= 0;
 }
-interface Stroke {
-  color: string;
-  points: Point[];
-  strokeWidth: number;
+function Le(e, t) {
+  if (e === t) return !0;
+  if (e.length !== t.length) return !1;
+  for (let n = 0; n < e.length; n++) if (e[n] !== t[n]) return !1;
+  return !0;
 }
-interface DisabledState {
-  draggable: boolean;
-  droppable: boolean;
+function Re(e) {
+  return typeof e == `boolean` ? { draggable: e, droppable: e } : e;
 }
-interface SortableItem {
-  id: string | number;
+function ze(e, t, n) {
+  let r = e[t],
+    i = e[t - 1],
+    a = e[t + 1];
+  return !r || (!i && !a)
+    ? 0
+    : n < t
+      ? i
+        ? r.left - (i.left + i.width)
+        : a.left - (r.left + r.width)
+      : a
+        ? a.left - (r.left + r.width)
+        : r.left - (i.left + i.width);
 }
-interface CrdtController {
-  applyCrdtUpdate?(update: Uint8Array): Promise<void> | void;
-  flushCrdtUpdates?(): Promise<void>;
-  requestCrdtSnapshot?(): Promise<Uint8Array>;
-  subscribeCrdtUpdates?(
-    listener: (update: Uint8Array) => void,
-  ): (() => void) | void;
+function Be(e) {
+  let { children: t, id: n, items: r, strategy: i = Ke, disabled: a = !1 } = e,
+    { active: o, dragOverlay: s, droppableRects: c, over: l, measureDroppableContainers: u } = ce(),
+    d = O(qe, n),
+    f = s.rect !== null,
+    p = (0, B.useMemo)(() => r.map((e) => (typeof e == `object` && `id` in e ? e.id : e)), [r]),
+    m = o != null,
+    h = o ? p.indexOf(o.id) : -1,
+    g = l ? p.indexOf(l.id) : -1,
+    _ = (0, B.useRef)(p),
+    v = !Le(p, _.current),
+    y = (g !== -1 && h === -1) || v,
+    b = Re(a);
+  (ie(() => {
+    v && m && u(p);
+  }, [v, p, m, u]),
+    (0, B.useEffect)(() => {
+      _.current = p;
+    }, [p]));
+  let x = (0, B.useMemo)(
+    () => ({
+      activeIndex: h,
+      containerId: d,
+      disabled: b,
+      disableTransforms: y,
+      items: p,
+      overIndex: g,
+      useDragOverlay: f,
+      sortedRects: Fe(p, c),
+      strategy: i,
+    }),
+    [h, d, b.draggable, b.droppable, y, p, g, c, f, i],
+  );
+  return B.createElement(Je.Provider, { value: x }, t);
 }
-interface RestoreState {
-  artifactLabel?: string;
-  errorMessage?: string;
-  kind: "failed" | "restoring";
-  pendingUpdateCount: number;
-}
-
-const FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 32, 48, 64] as const;
-const COLORS = [
-  { label: "White", value: "#FFFFFF" },
-  { label: "Black", value: "#000000" },
-  { label: "Gray", value: "#64748B" },
-  { label: "Red", value: "#EF4444" },
-  { label: "Orange", value: "#F97316" },
-  { label: "Yellow", value: "#EAB308" },
-  { label: "Green", value: "#22C55E" },
-  { label: "Blue", value: "#3B82F6" },
-  { label: "Purple", value: "#A855F7" },
-] as const;
-const CODEX_THEME: Record<string, string> = {
-  "--color-token-main-surface-primary": "var(--color-surface)",
-  "--color-token-side-bar-background": "var(--color-surface)",
-  "--color-background-accent": "var(--color-background-info-soft)",
-  "--color-background-accent-hover": "var(--color-background-info-soft)",
-  "--color-background-accent-active": "var(--color-background-info-soft)",
-  "--interactive-bg-secondary-hover":
-    "var(--color-background-primary-ghost-hover)",
-  "--interactive-bg-secondary-press":
-    "var(--color-background-primary-ghost-active)",
-  "--color-token-bg-primary": "var(--color-surface)",
-  "--color-token-bg-secondary": "var(--color-surface-secondary)",
-  "--color-token-bg-tertiary": "var(--color-surface-tertiary)",
-  "--color-token-charts-blue": "var(--color-blue)",
-  "--color-token-interactive-bg-secondary-hover":
-    "var(--interactive-bg-secondary-hover)",
-  "--color-token-interactive-bg-secondary-press":
-    "var(--interactive-bg-secondary-press)",
-  "--color-token-interactive-bg-secondary-selected":
-    "var(--color-background-primary-soft-active)",
-  "--color-token-interactive-bg-accent-muted-hover":
-    "var(--color-background-info-soft)",
-  "--color-token-interactive-bg-accent-muted-press":
-    "var(--color-background-info-soft)",
-  "--color-token-foreground": "var(--color-text)",
-  "--color-token-description-foreground": "var(--color-text-tertiary)",
-  "--color-token-interactive-label-secondary-default":
-    "var(--color-token-text-primary)",
-  "--color-token-interactive-label-accent-default":
-    "var(--color-token-text-link-foreground)",
-  "--color-token-focus-border": "var(--color-ring)",
-  "--color-token-list-hover-background":
-    "var(--color-background-primary-ghost-hover)",
-  "--color-token-text-primary": "var(--color-text)",
-  "--color-token-text-secondary": "var(--color-text-secondary)",
-  "--color-token-text-tertiary": "var(--color-text-tertiary)",
-  "--color-token-border-default": "var(--color-border)",
-  "--color-token-border-light": "var(--color-border-subtle)",
-};
-
-let jsx: JsxRuntime;
-let initialized = false;
-let drawingId = 0;
-function initializeSurface(): void {
-  if (initialized) return;
-  jsx = getJsxRuntime();
-  initialized = true;
-}
-function cx(...values: Array<string | false | null | undefined>): string {
-  return values.filter(Boolean).join(" ");
-}
-function reorder<T>(items: readonly T[], from: number, to: number): T[] {
-  const result = items.slice();
-  const normalizedTo = to < 0 ? result.length + to : to;
-  const [item] = result.splice(from, 1);
-  if (item !== undefined) result.splice(normalizedTo, 0, item);
-  return result;
-}
-function mapRects<T extends string | number>(
-  items: readonly T[],
-  rects: Map<T, Rect>,
-): Array<Rect | undefined> {
-  return items.map((item) => rects.get(item));
-}
-function isValidIndex(index: number | null): index is number {
-  return index !== null && index >= 0;
-}
-function arraysEqual<T>(left: readonly T[], right: readonly T[]): boolean {
-  if (left === right) return true;
-  if (left.length !== right.length) return false;
-  return left.every((item, index) => item === right[index]);
-}
-function normalizeDisabled(
-  value: boolean | Partial<DisabledState>,
-): DisabledState {
-  return typeof value === "boolean"
-    ? { draggable: value, droppable: value }
-    : {
-        draggable: value.draggable ?? false,
-        droppable: value.droppable ?? false,
-      };
-}
-function resolveDisabled(
-  value: boolean | Partial<DisabledState> | undefined,
-  inherited: DisabledState,
-): DisabledState {
-  if (typeof value === "boolean") return { draggable: value, droppable: false };
-  return {
-    draggable: value?.draggable ?? inherited.draggable,
-    droppable: value?.droppable ?? inherited.droppable,
-  };
-}
-function itemGap(
-  rects: Array<Rect | undefined>,
-  index: number,
-  activeIndex: number,
-): number {
-  const rect = rects[index];
-  const previous = rects[index - 1];
-  const next = rects[index + 1];
-  if (!rect || (!previous && !next)) return 0;
-  if (activeIndex < index)
-    return previous
-      ? rect.left - (previous.left + previous.width)
-      : next!.left - (rect.left + rect.width);
-  return next
-    ? next.left - (rect.left + rect.width)
-    : rect.left - (previous!.left + previous!.width);
-}
-function rectSortingStrategy({
-  rects,
-  activeIndex,
-  overIndex,
-  index,
-}: {
-  rects: Array<Rect | undefined>;
-  activeIndex: number;
-  overIndex: number;
-  index: number;
-}): Record<string, number> | null {
-  const reordered = reorder(rects, overIndex, activeIndex);
-  const current = rects[index];
-  const next = reordered[index];
-  return !current || !next
-    ? null
-    : {
-        x: next.left - current.left,
-        y: next.top - current.top,
-        scaleX: next.width / current.width,
-        scaleY: next.height / current.height,
-      };
-}
-function horizontalSortingStrategy({
-  rects,
-  activeNodeRect,
-  activeIndex,
-  overIndex,
-  index,
-}: {
-  rects: Array<Rect | undefined>;
-  activeNodeRect?: Rect | null;
-  activeIndex: number;
-  overIndex: number;
-  index: number;
-}): Record<string, number> | null {
-  const active = rects[activeIndex] ?? activeNodeRect;
-  if (!active) return null;
-  const gap = itemGap(rects, index, activeIndex);
-  if (index === activeIndex) {
-    const over = rects[overIndex];
-    return over
-      ? {
-          x:
-            activeIndex < overIndex
-              ? over.left + over.width - (active.left + active.width)
-              : over.left - active.left,
-          y: 0,
-          scaleX: 1,
-          scaleY: 1,
+function Ve(e) {
+  let { disabled: t, index: n, node: r, rect: i } = e,
+    [a, o] = (0, B.useState)(null),
+    s = (0, B.useRef)(n);
+  return (
+    ie(() => {
+      if (!t && n !== s.current && r.current) {
+        let e = i.current;
+        if (e) {
+          let t = ne(r.current, { ignoreTransform: !0 }),
+            n = {
+              x: e.left - t.left,
+              y: e.top - t.top,
+              scaleX: e.width / t.width,
+              scaleY: e.height / t.height,
+            };
+          (n.x || n.y) && o(n);
         }
-      : null;
-  }
-  if (index > activeIndex && index <= overIndex)
-    return { x: -active.width - gap, y: 0, scaleX: 1, scaleY: 1 };
-  if (index < activeIndex && index >= overIndex)
-    return { x: active.width + gap, y: 0, scaleX: 1, scaleY: 1 };
-  return { x: 0, y: 0, scaleX: 1, scaleY: 1 };
+      }
+      n !== s.current && (s.current = n);
+    }, [t, n, r, i]),
+    (0, B.useEffect)(() => {
+      a && o(null);
+    }, [a]),
+    a
+  );
 }
-function sortableNewIndex<T>({
-  id,
-  items,
-  activeIndex,
-  overIndex,
-}: {
-  id: T;
-  items: T[];
-  activeIndex: number;
-  overIndex: number;
-}): number {
-  return reorder(items, activeIndex, overIndex).indexOf(id);
-}
-
-function SortableContext({
-  children,
-  id = "Sortable",
-  items,
-  disabled = false,
-  strategy = rectSortingStrategy,
-}: {
-  children?: unknown;
-  id?: string;
-  items: Array<string | number | SortableItem>;
-  disabled?: boolean | Partial<DisabledState>;
-  strategy?: unknown;
-}): unknown {
-  initializeSurface();
-  const ids = items.map((item) => (typeof item === "object" ? item.id : item));
-  return jsx.jsx("div", {
-    "data-popcorn-sortable-context": id,
-    "data-items": ids.join(","),
-    "data-disabled": JSON.stringify(normalizeDisabled(disabled)),
-    "data-strategy":
-      strategy === horizontalSortingStrategy ? "horizontal" : "rect",
-    children,
-  });
-}
-function useSortable({
-  id,
-  items = [],
-  activeId = null,
-  overId = null,
-  disabled = false,
-}: {
-  id: string | number;
-  items?: Array<string | number>;
-  activeId?: string | number | null;
-  overId?: string | number | null;
-  disabled?: boolean | Partial<DisabledState>;
-}): Record<string, unknown> {
-  const index = items.indexOf(id);
-  const activeIndex = activeId == null ? -1 : items.indexOf(activeId);
-  const overIndex = overId == null ? -1 : items.indexOf(overId);
-  return {
-    active: activeId,
-    activeIndex,
-    attributes: { "aria-roledescription": "sortable" },
-    data: { sortable: { containerId: "Sortable", index, items } },
-    disabled: resolveDisabled(disabled, { draggable: false, droppable: false }),
-    index,
-    isDragging: activeId === id,
-    isSorting: activeId != null,
-    newIndex:
-      isValidIndex(activeIndex) && isValidIndex(overIndex)
-        ? sortableNewIndex({ id, items, activeIndex, overIndex })
-        : index,
-    overIndex,
-    transform: null,
-    transition: "transform 200ms ease",
-  };
-}
-
-function annotationTargetKey(target: unknown): string {
-  if (typeof target !== "object" || target === null || !("type" in target))
-    return String(target);
-  const value = target as Record<string, unknown>;
-  if (value.type === "workbook-range") {
-    const rect = value.rect as Record<string, unknown>;
-    return `${value.type}:${value.sheetName}:${rect.r1}:${rect.c1}:${rect.r2}:${rect.c2}`;
-  }
-  if (value.type === "workbook-floating-element")
-    return `${value.type}:${value.sheetName}:${value.elementId}`;
-  if (value.type === "presentation-element-selection")
-    return `${value.type}:${value.slideId}:${[...((value.elementIds as Iterable<string>) ?? [])].sort().join(",")}`;
-  if (value.type === "presentation-region") {
-    const frame = value.frame as Rect;
-    return `${value.type}:${value.slideId}:${frame.left}:${frame.top}:${frame.width}:${frame.height}`;
-  }
-  return String(value.type);
-}
-function annotationOrdinals(
-  annotations: Array<{ annotationId: string; target: unknown }>,
-): Map<string, number> {
-  const result = new Map<string, number>();
-  const counts = new Map<string, number>();
-  for (const annotation of annotations) {
-    const key = annotationTargetKey(annotation.target);
-    const ordinal = counts.get(key) ?? 0;
-    result.set(annotation.annotationId, ordinal);
-    counts.set(key, ordinal + 1);
-  }
-  return result;
-}
-function markerPosition(
-  rect: Rect,
-  placement:
-    "top-left" | "top-right" | "bottom-left" | "bottom-right" = "top-right",
-  ordinal = 0,
-): { left: number; top: number } {
-  const offset = ordinal * 20;
-  if (rect.width === 0 && rect.height === 0)
-    return { left: rect.left, top: rect.top + offset };
-  return {
-    left: placement.endsWith("-left") ? rect.left : rect.left + rect.width,
-    top:
-      Math.max(
-        13,
-        placement.startsWith("bottom-") ? rect.top + rect.height : rect.top,
-      ) + offset,
-  };
-}
-function avoidMarkerCollisions(
-  position: { left: number; top: number },
-  occupied: Array<{ left: number; top: number }>,
-): { left: number; top: number } {
-  const next = { ...position };
-  for (const marker of [...occupied].sort((a, b) => a.top - b.top))
-    if (
-      Math.abs(next.left - marker.left) < 26 &&
-      Math.abs(next.top - marker.top) < 26
-    )
-      next.top = marker.top + 26;
-  return next;
-}
-function AnnotationMarker({
-  position,
-  icon,
-  color,
-  draft = false,
-  selected = false,
-  testId,
-  title,
-  onClick,
-}: {
-  position: { left: number; top: number };
-  icon?: unknown;
-  color?: string;
-  draft?: boolean;
-  selected?: boolean;
-  testId?: string;
-  title?: string;
-  onClick?(): void;
-}): unknown {
-  initializeSurface();
-  const type = onClick ? "button" : "div";
-  return jsx.jsxs(type, {
-    type: onClick ? "button" : undefined,
-    "data-testid": testId,
-    "data-popcorn-annotation-marker": "true",
-    "data-draft": draft,
-    "aria-pressed": selected,
-    title,
-    className: "absolute z-30 flex size-[26px] items-center justify-center",
-    style: {
-      color: color ?? "var(--color-token-text-link-foreground, #339cff)",
-      left: position.left,
-      top: position.top,
-      transform: `translate(-50%, -50%)${selected ? " scale(1.08)" : ""}`,
-    },
-    onClick,
-    children: [
-      jsx.jsx("span", {
-        "aria-hidden": true,
-        className: "absolute inset-0 rounded-full bg-blue-500",
-      }),
-      icon == null
-        ? null
-        : jsx.jsx("span", { className: "relative text-white", children: icon }),
-    ],
-  });
-}
-function PresenceMarker({
-  position,
-  author,
-  isUnreadAssistant = false,
-  children,
-  onClick,
-}: {
-  position: { left: number; top: number };
-  author?: { avatarUrl?: string; displayName: string; initials?: string };
-  isUnreadAssistant?: boolean;
-  children?: unknown;
-  onClick?(): void;
-}): unknown {
-  initializeSurface();
-  const fallback = author?.initials ?? author?.displayName.slice(0, 1) ?? "●";
-  return jsx.jsx("button", {
-    type: "button",
-    "data-popcorn-annotation-marker": "true",
-    "aria-label": author?.displayName ?? "Comment",
-    className: cx(
-      "absolute z-30 flex size-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full",
-      isUnreadAssistant
-        ? "bg-text-info text-info-solid"
-        : "bg-surface text-default",
+function He(e) {
+  let {
+      animateLayoutChanges: t = Xe,
+      attributes: n,
+      disabled: r,
+      data: i,
+      getNewIndex: a = Ye,
+      id: o,
+      strategy: s,
+      resizeObserverConfig: c,
+      transition: l = Ze,
+    } = e,
+    {
+      items: u,
+      containerId: d,
+      activeIndex: f,
+      disabled: p,
+      disableTransforms: m,
+      sortedRects: h,
+      overIndex: g,
+      useDragOverlay: _,
+      strategy: v,
+    } = (0, B.useContext)(Je),
+    y = Ue(r, p),
+    b = u.indexOf(o),
+    x = (0, B.useMemo)(
+      () => ({ sortable: { containerId: d, index: b, items: u }, ...i }),
+      [d, i, b, u],
     ),
-    style: { left: position.left, top: position.top },
-    onClick,
-    children:
-      children ??
-      (author?.avatarUrl
-        ? jsx.jsx("img", {
-            alt: "",
-            src: author.avatarUrl,
-            className: "size-4 rounded-full",
-          })
-        : fallback),
-  });
+    ee = (0, B.useMemo)(() => u.slice(u.indexOf(o)), [u, o]),
+    {
+      rect: te,
+      node: S,
+      isOver: C,
+      setNodeRef: w,
+    } = k({
+      id: o,
+      data: x,
+      disabled: y.droppable,
+      resizeObserverConfig: { updateMeasurementsFor: ee, ...c },
+    }),
+    {
+      active: T,
+      activatorEvent: E,
+      activeNodeRect: ne,
+      attributes: D,
+      setNodeRef: re,
+      listeners: ie,
+      isDragging: O,
+      over: ce,
+      setActivatorNodeRef: j,
+      transform: M,
+    } = oe({ id: o, data: x, attributes: { ...et, ...n }, disabled: y.draggable }),
+    N = A(w, re),
+    P = !!T,
+    le = P && !m && Ie(f) && Ie(g),
+    ue = !_ && O,
+    de = le
+      ? ((ue && le ? M : null) ??
+        (s ?? v)({ rects: h, activeNodeRect: ne, activeIndex: f, overIndex: g, index: b }))
+      : null,
+    fe = Ie(f) && Ie(g) ? a({ id: o, items: u, activeIndex: f, overIndex: g }) : b,
+    F = T?.id,
+    I = (0, B.useRef)({ activeId: F, items: u, newIndex: fe, containerId: d }),
+    pe = u !== I.current.items,
+    me = t({
+      active: T,
+      containerId: d,
+      isDragging: O,
+      isSorting: P,
+      id: o,
+      index: b,
+      items: u,
+      newIndex: I.current.newIndex,
+      previousItems: I.current.items,
+      previousContainerId: I.current.containerId,
+      transition: l,
+      wasDragging: I.current.activeId != null,
+    }),
+    he = Ve({ disabled: !me, index: b, node: S, rect: te });
+  return (
+    (0, B.useEffect)(() => {
+      (P && I.current.newIndex !== fe && (I.current.newIndex = fe),
+        d !== I.current.containerId && (I.current.containerId = d),
+        u !== I.current.items && (I.current.items = u));
+    }, [P, fe, d, u]),
+    (0, B.useEffect)(() => {
+      if (F === I.current.activeId) return;
+      if (F != null && I.current.activeId == null) {
+        I.current.activeId = F;
+        return;
+      }
+      let e = setTimeout(() => {
+        I.current.activeId = F;
+      }, 50);
+      return () => clearTimeout(e);
+    }, [F]),
+    {
+      active: T,
+      activeIndex: f,
+      attributes: D,
+      data: x,
+      rect: te,
+      index: b,
+      newIndex: fe,
+      items: u,
+      isOver: C,
+      isSorting: P,
+      isDragging: O,
+      listeners: ie,
+      node: S,
+      overIndex: g,
+      over: ce,
+      setNodeRef: N,
+      setActivatorNodeRef: j,
+      setDroppableNodeRef: w,
+      setDraggableNodeRef: re,
+      transform: he ?? de,
+      transition: ge(),
+    }
+  );
+  function ge() {
+    if (he || (pe && I.current.newIndex === b)) return $e;
+    if (!((ue && !ae(E)) || !l) && (P || me)) return se.Transition.toString({ ...l, property: Qe });
+  }
 }
-function Highlight({
-  bounds,
-  appearance,
-  borderRadius,
-  fillOnly,
-  borderWidthPx,
-  borderColor,
-  fillColor,
-  shadow,
-  testId,
-}: {
-  bounds: Rect;
-  appearance?: string;
-  borderRadius?: number;
-  fillOnly?: boolean;
-  borderWidthPx?: number;
-  borderColor?: string;
-  fillColor?: string;
-  shadow?: string;
-  testId?: string;
-}): unknown {
-  initializeSurface();
-  return jsx.jsx("div", {
-    "data-testid": testId,
-    "data-appearance": appearance,
-    className: "pointer-events-none absolute box-border",
+function Ue(e, t) {
+  return typeof e == `boolean`
+    ? { draggable: e, droppable: !1 }
+    : { draggable: e?.draggable ?? t.draggable, droppable: e?.droppable ?? t.droppable };
+}
+var B, We, Ge, Ke, qe, Je, Ye, Xe, Ze, Qe, $e, et;
+function tt() {
+  return (tt = e(() => {
+    ((B = t(p())),
+      E(),
+      re(),
+      (We = { scaleX: 1, scaleY: 1 }),
+      (Ge = (e) => {
+        let { rects: t, activeNodeRect: n, activeIndex: r, overIndex: i, index: a } = e,
+          o = t[r] ?? n;
+        if (!o) return null;
+        let s = ze(t, a, r);
+        if (a === r) {
+          let e = t[i];
+          return e
+            ? { x: r < i ? e.left + e.width - (o.left + o.width) : e.left - o.left, y: 0, ...We }
+            : null;
+        }
+        return a > r && a <= i
+          ? { x: -o.width - s, y: 0, ...We }
+          : a < r && a >= i
+            ? { x: o.width + s, y: 0, ...We }
+            : { x: 0, y: 0, ...We };
+      }),
+      (Ke = (e) => {
+        let { rects: t, activeIndex: n, overIndex: r, index: i } = e,
+          a = Pe(t, r, n),
+          o = t[i],
+          s = a[i];
+        return !s || !o
+          ? null
+          : {
+              x: s.left - o.left,
+              y: s.top - o.top,
+              scaleX: s.width / o.width,
+              scaleY: s.height / o.height,
+            };
+      }),
+      (qe = `Sortable`),
+      (Je = B.createContext({
+        activeIndex: -1,
+        containerId: qe,
+        disableTransforms: !1,
+        items: [],
+        overIndex: -1,
+        useDragOverlay: !1,
+        sortedRects: [],
+        strategy: Ke,
+        disabled: { draggable: !1, droppable: !1 },
+      })),
+      (Ye = (e) => {
+        let { id: t, items: n, activeIndex: r, overIndex: i } = e;
+        return Pe(n, r, i).indexOf(t);
+      }),
+      (Xe = (e) => {
+        let {
+          containerId: t,
+          isSorting: n,
+          wasDragging: r,
+          index: i,
+          items: a,
+          newIndex: o,
+          previousItems: s,
+          previousContainerId: c,
+          transition: l,
+        } = e;
+        return !l || !r || (s !== a && i === o) ? !1 : n ? !0 : o !== i && t === c;
+      }),
+      (Ze = { duration: 200, easing: `ease` }),
+      (Qe = `transform`),
+      ($e = se.Transition.toString({ property: Qe, duration: 0, easing: `linear` })),
+      (et = { roleDescription: `sortable` }),
+      D.Down,
+      D.Right,
+      D.Up,
+      D.Left);
+  }))();
+}
+function nt(e) {
+  switch (e.type) {
+    case `workbook-range`:
+      return `${e.type}:${e.sheetName}:${e.rect.r1}:${e.rect.c1}:${e.rect.r2}:${e.rect.c2}`;
+    case `workbook-floating-element`:
+      return `${e.type}:${e.sheetName}:${e.elementId}`;
+    case `presentation-element-selection`:
+      return `${e.type}:${e.slideId}:${[...e.elementIds].sort().join(`,`)}`;
+    case `presentation-region`:
+      return `${e.type}:${e.slideId}:${e.frame.left}:${e.frame.top}:${e.frame.width}:${e.frame.height}`;
+    default:
+      return e;
+  }
+}
+function rt(e) {
+  let t = new Map(),
+    n = new Map();
+  for (let r of e) {
+    let e = nt(r.target),
+      i = n.get(e) ?? 0;
+    (t.set(r.annotationId, i), n.set(e, i + 1));
+  }
+  return t;
+}
+function it() {
+  return (it = e(() => {}))();
+}
+function at(e, t, n) {
+  return e + (t - n) / 2;
+}
+function ot(e, t = `top-right`, n = 0) {
+  let r = n * _t;
+  return e.width === 0 && e.height === 0
+    ? { left: e.left, top: e.top + r }
+    : {
+        left: t.endsWith(`-left`) ? e.left : e.left + e.width,
+        top: Math.max(13, t.startsWith(`bottom-`) ? e.top + e.height : e.top) + r,
+      };
+}
+function st(e, t) {
+  let n = { ...e };
+  for (let e of [...t].sort((e, t) => e.top - t.top))
+    Math.abs(n.left - e.left) < 26 && Math.abs(n.top - e.top) < 26 && (n.top = e.top + 26);
+  return n;
+}
+function ct({
+  position: e,
+  icon: t,
+  color: n,
+  draft: r = !1,
+  selected: i = !1,
+  testId: a,
+  title: o,
+  onClick: s,
+  onMouseEnter: c,
+  onMouseLeave: l,
+  onFocus: u,
+  onBlur: d,
+}) {
+  let [f, p] = (0, ht.useState)(!1),
+    m = s != null || c != null || l != null || u != null || d != null,
+    h = b(
+      `absolute z-30 flex items-center justify-center border-0 bg-transparent p-0`,
+      m ? `pointer-events-auto cursor-pointer` : `pointer-events-none`,
+    ),
+    g = {
+      color: n ?? `var(--color-token-text-link-foreground, #339cff)`,
+      left: e.left,
+      top: e.top,
+      width: 26,
+      height: 26,
+      zIndex: i ? 31 : void 0,
+      transform: i || f ? `translate(-50%, -50%) scale(${be})` : `translate(-50%, -50%)`,
+    },
+    _ =
+      t == null
+        ? null
+        : (0, V.jsx)(`span`, {
+            "aria-hidden": `true`,
+            className: `pointer-events-none relative z-10 flex size-4 items-center justify-center text-white`,
+            children: t,
+          });
+  return m
+    ? (0, V.jsxs)(`button`, {
+        type: `button`,
+        "data-testid": a,
+        "data-popcorn-annotation-marker": `true`,
+        className: h,
+        style: g,
+        title: o,
+        onClick: s,
+        onMouseEnter: () => {
+          (p(!0), c?.());
+        },
+        onMouseLeave: () => {
+          (p(!1), l?.());
+        },
+        onFocus: u,
+        onBlur: d,
+        children: [
+          (0, V.jsx)(Ce, { appearance: `review`, className: `absolute inset-0 size-full` }),
+          _,
+        ],
+      })
+    : (0, V.jsxs)(`div`, {
+        "data-testid": a,
+        className: h,
+        style: g,
+        title: o,
+        children: [
+          (0, V.jsx)(Ce, { appearance: `review`, className: `absolute inset-0 size-full` }),
+          _,
+        ],
+      });
+}
+function lt({
+  bounds: e,
+  containerElement: t,
+  collisionBoundaryElement: n,
+  label: r = `Ask ChatGPT`,
+  assistantIcon: i,
+  onClick: a,
+  onShown: o,
+  onCommentClick: s,
+  placement: c = `bottom-right`,
+  shortcutScopeElement: l,
+  testId: u = `popcorn-ask-for-edit-button`,
+}) {
+  let d = (0, ht.useRef)(!1),
+    p = (0, ht.useMemo)(
+      () =>
+        t
+          ? {
+              contextElement: t,
+              getBoundingClientRect: () => {
+                let n = z(t, e.left, e.top),
+                  r = z(t, e.left + e.width, e.top + e.height);
+                return new DOMRect(n.x, n.y, r.x - n.x, r.y - n.y);
+              },
+            }
+          : null,
+      [e.height, e.left, e.top, e.width, t],
+    ),
+    m = n ?? t,
+    {
+      refs: h,
+      x: g,
+      y: _,
+      strategy: v,
+      isPositioned: b,
+    } = x({
+      placement: ut(c),
+      strategy: `absolute`,
+      middleware: [
+        te(vt),
+        ...(n ? [ee({ padding: yt, boundary: n })] : []),
+        f({ padding: yt, ...(m ? { boundary: m } : {}), ...(n ? { crossAxis: !0 } : {}) }),
+      ],
+      whileElementsMounted: y,
+    }),
+    S = !t || (b && g != null && _ != null);
+  (ft({ onClick: a, shortcutScopeElement: l }),
+    (0, ht.useEffect)(() => {
+      S && !d.current && o != null && ((d.current = !0), o());
+    }, [S, o]),
+    (0, ht.useEffect)(() => {
+      h.setReference(p);
+    }, [h, p]));
+  let C = pt(),
+    w = (e) => {
+      (e.preventDefault(), e.stopPropagation());
+    },
+    T = dt(e, c),
+    E = t
+      ? g != null && _ != null
+        ? { fontFamily: gt, position: v, left: g, top: _, visibility: S ? void 0 : `hidden` }
+        : { ...T, visibility: `hidden` }
+      : T,
+    ne = (0, V.jsxs)(V.Fragment, {
+      children: [
+        (0, V.jsx)(`span`, { className: `h-[18px]`, style: { fontFamily: gt }, children: r }),
+        (0, V.jsx)(`span`, {
+          "aria-hidden": `true`,
+          className: `inline-flex h-[18px] items-center rounded-full bg-token-bg-secondary px-[6px] text-[12px] leading-[18px] font-[500] tracking-[-0.3px] text-token-text-secondary`,
+          style: { fontFamily: gt },
+          children: C,
+        }),
+      ],
+    });
+  return s == null
+    ? (0, V.jsx)(`button`, {
+        ref: h.setFloating,
+        type: `button`,
+        "aria-label": r,
+        "data-popcorn-ask-for-edit": `true`,
+        "data-popcorn-ask-for-edit-placement": c,
+        "data-testid": u,
+        className: `pointer-events-auto absolute z-40 inline-flex h-6 min-w-max cursor-interaction items-center gap-2 rounded-full border-0 bg-token-main-surface-primary py-[3px] ps-2 pe-[3px] text-[12px] leading-[18px] font-[400] tracking-[-0.3px] whitespace-nowrap text-token-text-primary shadow-[0_8px_18px_-6px_rgba(0,0,0,0.55)] ring-[1px] ring-token-border-light hover:bg-token-bg-secondary`,
+        style: E,
+        onMouseDown: w,
+        onClick: (e) => {
+          (w(e), a(`ask_codex_button`));
+        },
+        children: ne,
+      })
+    : (0, V.jsxs)(`div`, {
+        ref: h.setFloating,
+        role: `toolbar`,
+        "aria-label": `Selection actions`,
+        "data-testid": `${u}-toolbar`,
+        className: `pointer-events-auto absolute z-40 inline-flex h-6 min-w-max items-center gap-[3px] rounded-full border-0 bg-token-main-surface-primary py-[3px] ps-2 pe-[3px] text-[12px] leading-[18px] font-[400] tracking-[-0.3px] whitespace-nowrap text-token-text-primary shadow-[0_8px_18px_-6px_rgba(0,0,0,0.55)] ring-[1px] ring-token-border-light`,
+        style: E,
+        children: [
+          (0, V.jsxs)(`button`, {
+            type: `button`,
+            "aria-label": r,
+            "data-popcorn-ask-for-edit": `true`,
+            "data-popcorn-ask-for-edit-placement": c,
+            "data-testid": u,
+            className: `inline-flex h-[18px] cursor-interaction items-center gap-2 border-0 bg-transparent p-0 text-inherit`,
+            onMouseDown: w,
+            onClick: (e) => {
+              (w(e), a(`ask_codex_button`));
+            },
+            children: [
+              i != null &&
+                (0, V.jsx)(`span`, {
+                  "aria-hidden": `true`,
+                  className: `inline-flex size-4 items-center`,
+                  children: i,
+                }),
+              ne,
+            ],
+          }),
+          (0, V.jsx)(`span`, {
+            "aria-hidden": `true`,
+            className: `h-4 w-px bg-token-border-light`,
+          }),
+          (0, V.jsx)(`button`, {
+            type: `button`,
+            "aria-label": `Add comment`,
+            "data-testid": `${u}-comment`,
+            className: `inline-flex size-[18px] shrink-0 cursor-interaction items-center justify-center rounded-full border-0 bg-transparent p-0 text-inherit hover:bg-token-bg-tertiary`,
+            onMouseDown: w,
+            onClick: (e) => {
+              (w(e), s());
+            },
+            children: (0, V.jsx)(fe, { "aria-hidden": `true`, className: `h-4 w-4 opacity-65` }),
+          }),
+        ],
+      });
+}
+function ut(e) {
+  switch (e) {
+    case `bottom-left`:
+      return `bottom-start`;
+    case `bottom-right`:
+      return `bottom-end`;
+    case `top-left`:
+      return `top-start`;
+    case `top-right`:
+      return `top-end`;
+  }
+}
+function dt(e, t) {
+  switch (t) {
+    case `bottom-left`:
+      return { fontFamily: gt, left: e.left, top: e.top + e.height + vt };
+    case `bottom-right`:
+      return {
+        fontFamily: gt,
+        left: e.left + e.width,
+        top: e.top + e.height + vt,
+        transform: `translateX(-100%)`,
+      };
+    case `top-left`:
+      return { fontFamily: gt, left: e.left, top: e.top - vt, transform: `translateY(-100%)` };
+    case `top-right`:
+      return {
+        fontFamily: gt,
+        left: e.left + e.width,
+        top: e.top - vt,
+        transform: `translate(-100%, -100%)`,
+      };
+  }
+}
+function ft({ enabled: e = !0, onClick: t, shortcutScopeElement: n }) {
+  (0, ht.useEffect)(() => {
+    let r = n?.ownerDocument.defaultView;
+    if (!e || r == null || n == null) return;
+    let i = (e) => {
+      let i = e.target instanceof r.Node && n.contains(e.target),
+        a = n.ownerDocument.activeElement,
+        o = a instanceof r.Node && n.contains(a);
+      e.defaultPrevented ||
+        e.repeat ||
+        (!e.metaKey && !e.ctrlKey) ||
+        e.altKey ||
+        e.shiftKey ||
+        e.key.toLowerCase() !== `i` ||
+        (!i && !o) ||
+        (e.preventDefault(), e.stopPropagation(), t(`ask_codex_shortcut`));
+    };
+    return (
+      r.addEventListener(`keydown`, i, !0),
+      () => {
+        r.removeEventListener(`keydown`, i, !0);
+      }
+    );
+  }, [e, t, n]);
+}
+function pt() {
+  return typeof navigator < `u` && /Win|Linux/.test(navigator.platform) ? `Ctrl I` : `⌘I`;
+}
+function mt({
+  bounds: e,
+  appearance: t,
+  borderRadius: n,
+  fillOnly: r,
+  borderWidthPx: i,
+  borderColor: a,
+  fillColor: o,
+  shadow: s,
+  testId: c,
+}) {
+  return (0, V.jsx)(`div`, {
+    "data-testid": c,
+    className: b(`pointer-events-none absolute box-border`),
     style: {
-      left: bounds.left,
-      top: bounds.top,
-      width: bounds.width,
-      height: bounds.height,
-      borderRadius,
-      borderStyle: fillOnly ? undefined : "solid",
-      borderWidth: borderWidthPx,
-      borderColor,
-      backgroundColor: fillColor,
-      boxShadow: shadow,
+      left: e.left,
+      top: e.top,
+      width: e.width,
+      height: e.height,
+      ...ye({
+        appearance: t,
+        fillOnly: r,
+        borderWidthPx: i,
+        borderColor: a,
+        fillColor: o,
+        shadow: s,
+      }),
+      ...(n == null ? void 0 : { borderRadius: n }),
     },
   });
 }
-
-function pointsPath(points: Point[]): string {
-  return points
-    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
-    .join(" ");
+var ht, V, gt, _t, vt, yt;
+function bt() {
+  return (bt = e(() => {
+    (v(),
+      _(),
+      (ht = p()),
+      P(),
+      Ee(),
+      De(),
+      (V = a()),
+      (gt = `-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Segoe UI", sans-serif`),
+      (_t = 20),
+      (vt = 6),
+      (yt = 12));
+  }))();
 }
-function pointsBounds(points: Point[]): Rect | null {
-  const first = points[0];
-  if (!first) return null;
-  let left = first.x;
-  let right = first.x;
-  let top = first.y;
-  let bottom = first.y;
-  for (const point of points.slice(1)) {
-    left = Math.min(left, point.x);
-    right = Math.max(right, point.x);
-    top = Math.min(top, point.y);
-    bottom = Math.max(bottom, point.y);
-  }
-  return { left, top, width: right - left, height: bottom - top };
+function xt(e) {
+  let [t] = e;
+  return t
+    ? e.length === 1
+      ? `M ${t.x} ${t.y}`
+      : e.reduce((e, t, n) => `${e}${n === 0 ? `` : ` `}${n === 0 ? `M` : `L`} ${t.x} ${t.y}`, ``)
+    : ``;
 }
-function strokesBounds(strokes: Stroke[]): Rect | null {
-  return pointsBounds(strokes.flatMap((stroke) => stroke.points));
+function St(e) {
+  let t = e[0];
+  if (!t) return null;
+  let n = t.x,
+    r = t.x,
+    i = t.y,
+    a = t.y;
+  for (let t of e.slice(1))
+    ((n = Math.min(n, t.x)),
+      (r = Math.max(r, t.x)),
+      (i = Math.min(i, t.y)),
+      (a = Math.max(a, t.y)));
+  return { left: n, top: i, width: r - n, height: a - i };
 }
-function paddedRect(
-  rect: Rect,
-  {
-    paddingPx = 24,
-    minSizePx = 96,
-  }: { paddingPx?: number; minSizePx?: number } = {},
-): Rect {
-  const width = Math.max(minSizePx, rect.width + paddingPx * 2);
-  const height = Math.max(minSizePx, rect.height + paddingPx * 2);
+function Ct(e) {
+  return St(e.flatMap((e) => e.points));
+}
+function wt(e, { paddingPx: t = 24, minSizePx: n = 96 } = {}) {
+  let r = e.width + t * 2,
+    i = e.height + t * 2,
+    a = Math.max(n, r),
+    o = Math.max(n, i);
+  return { left: e.left - (a - e.width) / 2, top: e.top - (o - e.height) / 2, width: a, height: o };
+}
+function Tt(e, t) {
+  let n = Math.min(t.width, e.width),
+    r = Math.min(t.height, e.height);
   return {
-    left: rect.left - (width - rect.width) / 2,
-    top: rect.top - (height - rect.height) / 2,
-    width,
-    height,
+    left: Math.min(Math.max(0, e.left), Math.max(0, t.width - n)),
+    top: Math.min(Math.max(0, e.top), Math.max(0, t.height - r)),
+    width: n,
+    height: r,
   };
 }
-function clampRect(
-  rect: Rect,
-  viewport: { width: number; height: number },
-): Rect {
-  const width = Math.min(viewport.width, rect.width);
-  const height = Math.min(viewport.height, rect.height);
-  return {
-    left: Math.min(Math.max(0, rect.left), Math.max(0, viewport.width - width)),
-    top: Math.min(Math.max(0, rect.top), Math.max(0, viewport.height - height)),
-    width,
-    height,
-  };
-}
-function drawingCommentPayload({
-  drawingId: id,
-  screenshot,
-  markerViewportPoint,
-  viewportSize,
-}: {
-  drawingId: string;
-  screenshot: Record<string, unknown>;
-  markerViewportPoint?: Point;
-  viewportSize?: { width: number; height: number };
-}): Record<string, unknown> {
+function Et({ drawingId: e, screenshot: t, markerViewportPoint: n, viewportSize: r }) {
   return {
     localBrowserCommentMetadata: {
-      kind: "region",
-      ...(markerViewportPoint
-        ? { markerViewportPoint: { ...markerViewportPoint } }
-        : {}),
-      ...(viewportSize ? { viewportSize: { ...viewportSize } } : {}),
+      kind: `region`,
+      ...(n == null ? {} : { markerViewportPoint: { ...n } }),
+      ...(r == null ? {} : { viewportSize: { ...r } }),
     },
-    localBrowserScreenshot: { ...screenshot, commentId: id },
+    localBrowserScreenshot: { ...t, commentId: e },
   };
 }
-async function exportDrawingScreenshot({
-  cropRect,
-  viewportSize,
-  baseCanvas,
-  overlayCanvases = [],
-  strokes,
-  projectPoint,
-  mimeType = "image/png",
-}: {
-  cropRect: Rect;
-  viewportSize: { width: number; height: number };
-  baseCanvas: HTMLCanvasElement | OffscreenCanvas;
-  overlayCanvases?: Array<HTMLCanvasElement | OffscreenCanvas | null>;
-  strokes: Stroke[];
-  projectPoint(point: Point): Point | null;
-  mimeType?: string;
-}): Promise<{ blob: Blob; height: number; mimeType: string; width: number }> {
-  if (
-    typeof OffscreenCanvas === "undefined" ||
-    typeof OffscreenCanvas.prototype.convertToBlob !== "function"
-  )
-    throw new Error(
-      "Popcorn drawing screenshot export requires OffscreenCanvas support.",
-    );
-  const scaleX = baseCanvas.width / Math.max(1, viewportSize.width);
-  const scaleY = baseCanvas.height / Math.max(1, viewportSize.height);
-  const width = Math.max(1, Math.round(cropRect.width * scaleX));
-  const height = Math.max(1, Math.round(cropRect.height * scaleY));
-  const canvas = new OffscreenCanvas(width, height);
-  const context = canvas.getContext("2d");
-  if (!context)
-    throw new Error("Failed to acquire OffscreenCanvas 2d context.");
-  context.fillStyle = "#ffffff";
-  context.fillRect(0, 0, width, height);
-  for (const source of [baseCanvas, ...overlayCanvases])
-    if (source && source.width > 0 && source.height > 0)
-      context.drawImage(
-        source,
-        cropRect.left * (source.width / Math.max(1, viewportSize.width)),
-        cropRect.top * (source.height / Math.max(1, viewportSize.height)),
-        cropRect.width * (source.width / Math.max(1, viewportSize.width)),
-        cropRect.height * (source.height / Math.max(1, viewportSize.height)),
+async function Dt({
+  cropRect: e,
+  viewportSize: t,
+  baseCanvas: n,
+  overlayCanvases: r = [],
+  strokes: i,
+  projectPoint: a,
+  mimeType: o = `image/png`,
+}) {
+  if (typeof OffscreenCanvas > `u` || typeof OffscreenCanvas.prototype.convertToBlob != `function`)
+    throw Error(`Popcorn drawing screenshot export requires OffscreenCanvas support.`);
+  let s = n.width / Math.max(1, t.width),
+    c = n.height / Math.max(1, t.height),
+    l = Math.max(1, Math.round(e.width * s)),
+    u = Math.max(1, Math.round(e.height * c)),
+    d = new OffscreenCanvas(l, u),
+    f = d.getContext(`2d`);
+  if (!f) throw Error(`Failed to acquire OffscreenCanvas 2d context.`);
+  ((f.imageSmoothingEnabled = !0),
+    (f.imageSmoothingQuality = `high`),
+    (f.fillStyle = `#ffffff`),
+    f.fillRect(0, 0, l, u));
+  let p = l / Math.max(1, e.width),
+    m = u / Math.max(1, e.height);
+  for (let i of [n, ...r])
+    !i ||
+      i.width <= 0 ||
+      i.height <= 0 ||
+      f.drawImage(
+        i,
+        e.left * (i.width / Math.max(1, t.width)),
+        e.top * (i.height / Math.max(1, t.height)),
+        e.width * (i.width / Math.max(1, t.width)),
+        e.height * (i.height / Math.max(1, t.height)),
         0,
         0,
-        width,
-        height,
+        l,
+        u,
       );
-  for (const stroke of strokes) {
-    const points = stroke.points
-      .map(projectPoint)
-      .filter((point): point is Point => point !== null);
-    if (points.length === 0) continue;
-    context.beginPath();
-    context.strokeStyle = stroke.color;
-    context.fillStyle = stroke.color;
-    context.lineWidth =
-      stroke.strokeWidth *
-      Math.max(width / cropRect.width, height / cropRect.height);
-    context.lineCap = "round";
-    context.lineJoin = "round";
-    points.forEach((point, index) =>
-      index === 0
-        ? context.moveTo(
-            ((point.x - cropRect.left) * width) / cropRect.width,
-            ((point.y - cropRect.top) * height) / cropRect.height,
-          )
-        : context.lineTo(
-            ((point.x - cropRect.left) * width) / cropRect.width,
-            ((point.y - cropRect.top) * height) / cropRect.height,
+  for (let t of i) {
+    let n = t.points.map((e) => a(e)).filter((e) => e != null);
+    if (n.length !== 0) {
+      if (
+        (f.save(),
+        (f.strokeStyle = t.color),
+        (f.fillStyle = t.color),
+        (f.lineCap = `round`),
+        (f.lineJoin = `round`),
+        (f.lineWidth = t.strokeWidth * Math.max(p, m)),
+        n.length === 1)
+      ) {
+        let [r] = n;
+        if (!r) {
+          f.restore();
+          continue;
+        }
+        (f.beginPath(),
+          f.arc(
+            (r.x - e.left) * p,
+            (r.y - e.top) * m,
+            (t.strokeWidth * Math.max(p, m)) / 2,
+            0,
+            Math.PI * 2,
           ),
-    );
-    if (points.length === 1)
-      (context.arc(
-        ((points[0]!.x - cropRect.left) * width) / cropRect.width,
-        ((points[0]!.y - cropRect.top) * height) / cropRect.height,
-        context.lineWidth / 2,
-        0,
-        Math.PI * 2,
-      ),
-        context.fill());
-    else context.stroke();
+          f.fill(),
+          f.restore());
+        continue;
+      }
+      (f.beginPath(),
+        n.forEach((t, n) => {
+          let r = (t.x - e.left) * p,
+            i = (t.y - e.top) * m;
+          n === 0 ? f.moveTo(r, i) : f.lineTo(r, i);
+        }),
+        f.stroke(),
+        f.restore());
+    }
   }
-  return {
-    blob: await canvas.convertToBlob({ type: mimeType }),
-    width,
-    height,
-    mimeType,
-  };
+  return { blob: await d.convertToBlob({ type: o }), width: l, height: u, mimeType: o };
 }
-function DrawingOverlay({
-  strokes,
-  projectPoint,
-  testId,
-  clipBounds,
-}: {
-  strokes: Stroke[];
-  projectPoint(point: Point): Point | null;
-  testId?: string;
-  clipBounds?: Rect;
-}): unknown {
-  initializeSurface();
-  if (strokes.length === 0) return null;
-  return jsx.jsx("svg", {
-    "data-testid": testId,
-    className: "pointer-events-none absolute inset-0 z-20",
-    width: "100%",
-    height: "100%",
-    viewBox: clipBounds
-      ? `${clipBounds.left} ${clipBounds.top} ${clipBounds.width} ${clipBounds.height}`
-      : undefined,
-    children: strokes.map((stroke, index) => {
-      const points = stroke.points
-        .map(projectPoint)
-        .filter((point): point is Point => point !== null);
-      return points.length === 1
-        ? jsx.jsx(
-            "circle",
-            {
-              cx: points[0]!.x,
-              cy: points[0]!.y,
-              r: stroke.strokeWidth / 2,
-              fill: stroke.color,
-            },
-            index,
-          )
-        : jsx.jsx(
-            "path",
-            {
-              d: pointsPath(points),
-              fill: "none",
-              stroke: stroke.color,
-              strokeWidth: stroke.strokeWidth,
-              strokeLinecap: "round",
-              strokeLinejoin: "round",
-            },
-            index,
-          );
+var Ot;
+function kt() {
+  return (kt = e(() => {
+    Ot = `#111111`;
+  }))();
+}
+function At(e, t) {
+  return e.points.map((e) => t(e)).filter((e) => e != null);
+}
+function jt({ stroke: e, projectPoint: t }) {
+  let n = At(e, t);
+  if (n.length === 0) return null;
+  if (n.length === 1) {
+    let [t] = n;
+    return t
+      ? (0, H.jsx)(`circle`, { cx: t.x, cy: t.y, r: e.strokeWidth / 2, fill: e.color })
+      : null;
+  }
+  return (0, H.jsx)(`path`, {
+    d: xt(n),
+    fill: `none`,
+    stroke: e.color,
+    strokeWidth: e.strokeWidth,
+    strokeLinecap: `round`,
+    strokeLinejoin: `round`,
+  });
+}
+function Mt({ strokes: e, projectPoint: t, testId: n, clipBounds: r }) {
+  let i = `popcorn-drawing-overlay-${(0, Nt.useId)().replace(/[:]/g, ``)}`;
+  return e.length === 0
+    ? null
+    : (0, H.jsxs)(`svg`, {
+        "data-testid": n,
+        className: `pointer-events-none absolute inset-0 z-20 overflow-hidden`,
+        width: `100%`,
+        height: `100%`,
+        children: [
+          r
+            ? (0, H.jsx)(`defs`, {
+                children: (0, H.jsx)(`clipPath`, {
+                  id: i,
+                  children: (0, H.jsx)(`rect`, {
+                    x: r.left,
+                    y: r.top,
+                    width: r.width,
+                    height: r.height,
+                  }),
+                }),
+              })
+            : null,
+          (0, H.jsx)(`g`, {
+            clipPath: r ? `url(#${i})` : void 0,
+            children: e.map((e, n) =>
+              (0, H.jsx)(jt, { stroke: e, projectPoint: t }, `${n}-${e.points.length}`),
+            ),
+          }),
+        ],
+      });
+}
+var Nt, H;
+function Pt() {
+  return (Pt = e(() => {
+    ((Nt = p()), kt(), (H = a()));
+  }))();
+}
+function Ft(e) {
+  return ((It += 1), `${e}-${Date.now().toString(36)}-${It.toString(36)}`);
+}
+var It;
+function Lt() {
+  return (Lt = e(() => {
+    It = 0;
+  }))();
+}
+function Rt({
+  active: e,
+  disabled: t = !1,
+  onClick: n,
+  label: r,
+  activeLabel: i = r,
+  icon: a,
+  testId: o,
+}) {
+  let s = (0, Ht.useRef)(null),
+    [c, l] = (0, Ht.useState)(!1),
+    [u, d] = (0, Ht.useState)(!1);
+  (0, Ht.useEffect)(() => {
+    if (e) return;
+    (l(!1), d(!1));
+    let t = s.current;
+    typeof document < `u` && t != null && t === document.activeElement && t.blur();
+  }, [e]);
+  let f = u && !c ? 15 : 10,
+    p = `color-mix(in srgb, var(--color-token-bg-primary) ${100 - f}%, var(--color-token-charts-blue, #339cff) ${f}%)`,
+    m = e && i != null ? i : r;
+  return (0, Ut.jsx)(`button`, {
+    ref: s,
+    type: `button`,
+    "data-testid": o,
+    "aria-label": m,
+    "aria-pressed": e,
+    disabled: t,
+    className: b(
+      `ease-basic inline-flex h-token-button-composer min-w-8 appearance-none items-center overflow-hidden rounded-lg border border-transparent text-base leading-[18px] outline-none transition-[max-width,padding-inline,background-color,background-size,border-color,color] duration-relaxed [will-change:max-width,background-size] motion-reduce:transition-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:shadow-none`,
+      `disabled:cursor-not-allowed disabled:opacity-100`,
+      e ? `max-w-40 justify-start px-2.5` : `max-w-8 justify-center px-0`,
+      e
+        ? `border-token-charts-blue/40`
+        : `bg-transparent text-token-text-tertiary hover:bg-token-list-hover-background`,
+    ),
+    style: e
+      ? {
+          backgroundColor: p,
+          color: `var(--color-text-tip, var(--color-token-text-link-foreground, #339cff))`,
+        }
+      : void 0,
+    onClick: () => {
+      (l(!e), n());
+    },
+    onPointerEnter: () => {
+      d(!0);
+    },
+    onPointerLeave: () => {
+      (d(!1), l(!1));
+    },
+    children: (0, Ut.jsxs)(`span`, {
+      className: b(`flex min-w-0 items-center`, e ? `justify-start` : `w-full justify-center`),
+      children: [
+        a({
+          className: b(
+            `icon-sm shrink-0 transition-transform duration-relaxed ease-basic motion-reduce:transition-none`,
+            e ? `-translate-x-0.5` : `translate-x-0`,
+          ),
+        }),
+        (0, Ut.jsx)(`span`, {
+          className: b(
+            `ease-basic min-w-0 overflow-hidden whitespace-nowrap text-sm transition-[max-width,opacity,margin-inline-start] duration-relaxed motion-reduce:transition-none`,
+            e ? `ms-1.5 max-w-32 opacity-100` : `ms-0 max-w-0 opacity-0`,
+          ),
+          children: m,
+        }),
+      ],
     }),
   });
 }
-function createDrawingId(prefix: string): string {
-  drawingId += 1;
-  return `${prefix}-${Date.now().toString(36)}-${drawingId.toString(36)}`;
-}
-
-function ModeButton({
-  active,
-  disabled = false,
-  onClick,
-  label,
-  activeLabel = label,
-  testId,
-  icon,
-}: {
-  active: boolean;
-  disabled?: boolean;
-  onClick(): void;
-  label: string;
-  activeLabel?: string;
-  testId?: string;
-  icon?: unknown;
-}): unknown {
-  initializeSurface();
-  return jsx.jsxs("button", {
-    type: "button",
-    "data-testid": testId,
-    "aria-label": active ? activeLabel : label,
-    "aria-pressed": active,
-    disabled,
-    className: cx(
-      "inline-flex h-8 items-center rounded-lg",
-      active ? "bg-info-soft px-2.5 text-info" : "size-8 justify-center",
-    ),
-    onClick,
-    children: [
-      icon ?? jsx.jsx("span", { "aria-hidden": true, children: "●" }),
-      active
-        ? jsx.jsx("span", { className: "ms-1.5", children: activeLabel })
-        : null,
-    ],
+function zt({ active: e, disabled: t = !1, onClick: n, testId: r = `popcorn-annotation-button` }) {
+  return (0, Ut.jsx)(Rt, {
+    active: e,
+    activeLabel: `Annotating`,
+    disabled: t,
+    onClick: n,
+    label: `Annotation`,
+    icon: L,
+    testId: r,
   });
 }
-function AnnotationButton(
-  props: Omit<Parameters<typeof ModeButton>[0], "label" | "activeLabel">,
-): unknown {
-  return ModeButton({
-    ...props,
-    label: "Annotation",
-    activeLabel: "Annotating",
+function Bt({
+  active: e,
+  disabled: t = !1,
+  onClick: n,
+  testId: r = `popcorn-presentation-comments-button`,
+}) {
+  return (0, Ut.jsx)(`button`, {
+    type: `button`,
+    "aria-label": `Comments`,
+    "aria-expanded": e,
+    "data-testid": r,
+    disabled: t,
+    onClick: n,
+    className: `enabled:hover:bg-token-list-hover-background enabled:hover:text-token-text-primary text-token-text-tertiary inline-flex size-8 items-center justify-center rounded-md border border-transparent transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-token-focus-border disabled:cursor-not-allowed disabled:opacity-40`,
+    children: (0, Ut.jsx)(F, { className: `icon-sm` }),
   });
 }
-function CommentsButton({
-  active,
-  disabled = false,
-  onClick,
-  testId = "popcorn-presentation-comments-button",
-}: {
-  active: boolean;
-  disabled?: boolean;
-  onClick(): void;
-  testId?: string;
-}): unknown {
-  initializeSurface();
-  return jsx.jsx("button", {
-    type: "button",
-    "aria-label": "Comments",
-    "aria-expanded": active,
-    "data-testid": testId,
-    disabled,
-    onClick,
-    children: "Comments",
+function Vt({ active: e, disabled: t = !1, onClick: n, testId: r = `popcorn-drawing-button` }) {
+  return (0, Ut.jsx)(Rt, {
+    active: e,
+    disabled: t,
+    onClick: n,
+    label: `Drawing`,
+    icon: ue,
+    testId: r,
   });
 }
-function DrawingButton(
-  props: Omit<Parameters<typeof ModeButton>[0], "label">,
-): unknown {
-  return ModeButton({ ...props, label: "Drawing" });
+var Ht, Ut;
+function Wt() {
+  return (Wt = e(() => {
+    (_(), (Ht = p()), P(), (Ut = a()));
+  }))();
 }
-function ArtifactBadge({
-  kind,
-  children,
-  className,
-}: {
-  kind: "workbook" | "presentation" | "document" | "whiteboard";
-  children?: unknown;
-  className?: string;
-}): unknown {
-  initializeSurface();
-  return jsx.jsx("div", {
-    "data-kind": kind,
-    className: cx(
-      "inline-flex items-center justify-center rounded-md p-1",
-      kind === "workbook"
-        ? "bg-[#04b84c] text-white"
-        : kind === "presentation"
-          ? "bg-orange-300 text-white"
-          : "border border-token-border-light",
-      className,
-    ),
-    children,
-  });
+function Gt({ text: e, hasMultipleBlocks: t, measureElement: n, surfaceElement: r }) {
+  let i = e.trim();
+  if (i.length === 0) return !1;
+  if (t) return !0;
+  let a = Kt(r),
+    o = qt(e, n);
+  return a == null || o == null ? i.length >= Cn : o + wn > a;
 }
-function ActionMenu({
-  trigger,
-  actions,
-}: {
-  trigger?: unknown;
-  actions: Array<{
-    color?: string;
-    disabled?: boolean;
-    icon?: unknown;
-    id: string;
-    kind?: "button" | "separator";
-    label?: string;
-    onSelect?(): void;
-    testId?: string;
-  }>;
-}): unknown {
-  initializeSurface();
-  return jsx.jsxs("div", {
-    className: "relative",
-    children: [
-      trigger,
-      jsx.jsx("div", {
-        role: "menu",
-        children: actions.map((action) =>
-          action.kind === "separator"
-            ? jsx.jsx("hr", {}, action.id)
-            : jsx.jsx(
-                "button",
-                {
-                  type: "button",
-                  role: "menuitem",
-                  disabled: action.disabled,
-                  "data-testid": action.testId,
-                  className:
-                    action.color === "danger" ? "text-red-600" : undefined,
-                  onClick: action.onSelect,
-                  children: action.label,
-                },
-                action.id,
-              ),
-        ),
-      }),
-    ],
-  });
+function Kt(e) {
+  if (e == null) return null;
+  let t = e.getBoundingClientRect();
+  if (t.width === 0) return null;
+  let n = e.querySelector(`[data-browser-comment-submit]`)?.getBoundingClientRect().width ?? yn;
+  return t.width - xn - Sn - n - bn;
 }
-function CommentThread({
-  thread,
-  label,
-  sourceLabel,
-  onSelect,
-}: {
-  thread: { comments?: unknown[]; threadId: string };
-  label?: string;
-  sourceLabel?: string;
-  onSelect?(id: string): void;
-}): unknown {
-  initializeSurface();
-  return jsx.jsxs("article", {
-    "data-thread-id": thread.threadId,
-    "aria-label": label ?? "Comment thread",
-    onClick: () => onSelect?.(thread.threadId),
-    children: [
-      sourceLabel ? jsx.jsx("small", { children: sourceLabel }) : null,
-      jsx.jsx("div", { children: `${thread.comments?.length ?? 0} comments` }),
-    ],
-  });
+function qt(e, t) {
+  return t == null ? null : ((t.textContent = e), t.getBoundingClientRect().width);
 }
-function CommentsSidebar({
-  threads,
-  onClose,
-  sidebarLabel = "Comments",
-}: {
-  threads: Array<{ threadId: string; comments?: unknown[] }>;
-  onClose?(): void;
-  sidebarLabel?: string;
-}): unknown {
-  initializeSurface();
-  return jsx.jsxs("aside", {
-    "aria-label": sidebarLabel,
-    children: [
-      jsx.jsx("button", {
-        type: "button",
-        "aria-label": "Close comments",
-        onClick: onClose,
-        children: "×",
-      }),
-      threads.length === 0
-        ? jsx.jsx("p", { children: "No comments yet" })
-        : threads.map((thread) =>
-            jsx.jsx(CommentThread, { thread }, thread.threadId),
-          ),
-    ],
-  });
+function Jt(e) {
+  return Math.max(1, e.split(/\r\n|\r|\n/).length);
 }
-
-function FontSizePicker({
-  fontSize,
-  onChange,
-}: {
-  fontSize: number;
-  onChange(value: number): void;
-}): unknown {
-  initializeSurface();
-  return jsx.jsx("div", {
-    role: "listbox",
-    "aria-label": "Font size",
-    children: FONT_SIZES.map((size) =>
-      jsx.jsxs(
-        "button",
-        {
-          type: "button",
-          role: "option",
-          "aria-selected": size === fontSize,
-          onClick: () => onChange(size),
-          children: [size, " pt"],
-        },
-        size,
-      ),
-    ),
-  });
-}
-function colorsEqual(left: string, right: string): boolean {
-  return left.toUpperCase() === right.toUpperCase();
-}
-function shortcutLabel(): string {
-  return typeof navigator !== "undefined" &&
-    /Win|Linux/.test(navigator.platform)
-    ? "Ctrl I"
-    : "⌘I";
-}
-function ColorPicker({
-  color,
-  onChange,
-  label = "Color",
-  allowNone = false,
-}: {
-  color?: string | null;
-  onChange(value: string | null): void;
-  label?: string;
-  allowNone?: boolean;
-}): unknown {
-  initializeSurface();
-  const options: Array<{ label: string; value: string | null }> = allowNone
-    ? [{ label: "No fill", value: null }, ...COLORS]
-    : [...COLORS];
-  return jsx.jsx("div", {
-    role: "group",
-    "aria-label": label,
-    children: options.map((option) =>
-      jsx.jsx(
-        "button",
-        {
-          type: "button",
-          "aria-label": option.label,
-          "aria-pressed":
-            option.value === null
-              ? color == null
-              : color != null && colorsEqual(color, option.value),
-          style: { backgroundColor: option.value ?? "transparent" },
-          onClick: () => onChange(option.value),
-        },
-        option.value ?? "none",
-      ),
-    ),
-  });
-}
-
-function withTimeout<T>(
-  promise: Promise<T>,
-  timeoutMs: number | undefined,
-  message: string,
-): Promise<T> {
-  if (timeoutMs === undefined) return promise;
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(
-      () => reject(new Error(message)),
-      Math.max(0, timeoutMs),
-    );
-    promise.then(
-      (value) => {
-        clearTimeout(timer);
-        resolve(value);
-      },
-      (error) => {
-        clearTimeout(timer);
-        reject(error);
-      },
-    );
-  });
-}
-function nonEmptyUpdates(updates?: Uint8Array[]): Uint8Array[] {
-  return (updates ?? []).filter((update) => update.length > 0);
-}
-function mergeUpdates(updates: Uint8Array[]): Uint8Array | null {
-  const values = nonEmptyUpdates(updates);
-  if (values.length === 0) return null;
-  if (values.length === 1) return values[0] ?? null;
-  const length = values.reduce((sum, update) => sum + update.length, 0);
-  const merged = new Uint8Array(length);
-  let offset = 0;
-  for (const update of values) {
-    merged.set(update, offset);
-    offset += update.length;
+function Yt(e) {
+  if (e == null) return;
+  let t = e.ownerDocument;
+  (Xt(t), e.classList.remove(Tn));
+  let n = t.defaultView;
+  if (n == null) {
+    e.classList.add(Tn);
+    return;
   }
-  return merged;
+  let r = On.get(e);
+  r != null && n.cancelAnimationFrame(r);
+  let i = n.requestAnimationFrame(() => {
+    (On.delete(e), e.classList.add(Tn));
+  });
+  On.set(e, i);
 }
-function bootstrapCrdtState({
-  initialCrdtState,
-  externalCrdtUpdates,
-}: {
-  initialCrdtState?: Uint8Array;
-  externalCrdtUpdates?: Uint8Array[];
-}): {
-  bootstrappedExternalCrdtUpdates: Uint8Array[];
-  externalCrdtUpdates: Uint8Array[];
-  initialCrdtState?: Uint8Array;
-} {
-  const updates = nonEmptyUpdates(externalCrdtUpdates);
-  const initial =
-    mergeUpdates([
-      ...(initialCrdtState?.length ? [initialCrdtState] : []),
-      ...updates,
-    ]) ?? initialCrdtState;
-  return {
-    initialCrdtState: initial ?? undefined,
-    bootstrappedExternalCrdtUpdates: updates,
-    externalCrdtUpdates: [],
-  };
+function Xt(e) {
+  if (e.getElementById(En) != null) return;
+  let t = e.createElement(`style`);
+  ((t.id = En), (t.textContent = Dn), e.head.appendChild(t));
 }
-function restoreErrorMessage(error: unknown, artifactLabel: string): string {
-  return error instanceof Error && error.message.trim().length > 0
-    ? error.message
-    : `Failed to restore external ${artifactLabel.toLowerCase()} edits.`;
+var U,
+  Zt,
+  W,
+  Qt,
+  $t,
+  en,
+  tn,
+  nn,
+  rn,
+  an,
+  on,
+  sn,
+  cn,
+  ln,
+  un,
+  dn,
+  fn,
+  pn,
+  mn,
+  hn,
+  gn,
+  _n,
+  vn,
+  yn,
+  bn,
+  xn,
+  Sn,
+  Cn,
+  wn,
+  Tn,
+  En,
+  Dn,
+  On,
+  kn;
+function An() {
+  return (An = e(() => {
+    (v(),
+      _(),
+      (U = p()),
+      (Zt = s()),
+      P(),
+      bt(),
+      (W = a()),
+      (Qt = 294),
+      ($t = 336),
+      (en = 320),
+      (tn = 138),
+      (nn = 12),
+      (rn = 12),
+      (an = 4),
+      (on = 112),
+      (sn = 44),
+      (cn = 24),
+      (ln = 20),
+      (un = 72),
+      (dn = b(
+        `text-token-dropdown-foreground placeholder:text-token-description-foreground min-h-0 w-full resize-none border-0 bg-transparent p-0 font-sans leading-normal outline-none`,
+        `appearance-none shadow-none [text-decoration:none]`,
+        `focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus:border-transparent focus-visible:border-transparent`,
+        `[outline:none] [box-shadow:none] [-webkit-appearance:none]`,
+        `!min-h-0 max-h-full flex-1 overflow-y-auto text-[length:var(--codex-chat-font-size,13px)] leading-6`,
+      )),
+      (fn = { "--codex-chat-font-size": `13px`, fontSize: `var(--codex-chat-font-size, 13px)` }),
+      (pn = { "--codex-chat-font-size": `14px`, fontSize: `var(--codex-chat-font-size, 14px)` }),
+      (mn = `pointer-events-none absolute inset-x-0 top-0 flex flex-col overflow-visible bg-transparent`),
+      (hn = `pointer-events-auto relative w-full overflow-hidden bg-token-dropdown-background transition-[height] duration-150 ease-out motion-reduce:transition-none [background-color:var(--color-token-dropdown-background,var(--color-token-main-surface-primary,white))]`),
+      (gn = `absolute left-4 min-w-0 overflow-hidden transition-[width,top,bottom] duration-150 ease-out motion-reduce:transition-none`),
+      (_n = `absolute right-3 bottom-2 left-2 flex origin-bottom-left items-center transition-[opacity,transform] duration-150 ease-out motion-reduce:transition-none`),
+      (vn = `pointer-events-none absolute top-0 left-0 whitespace-pre text-[length:var(--codex-chat-font-size,13px)] leading-5 font-sans opacity-0`),
+      (yn = 28),
+      (bn = 8),
+      (xn = 16),
+      (Sn = 8),
+      (Cn = 40),
+      (wn = 12),
+      (Tn = `browser-comment-popup-shake`),
+      (En = `popcorn-annotation-editor-shake-style`),
+      (Dn = `
+@keyframes browser-comment-popup-shake {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  12% {
+    transform: translateX(6px) rotate(0.75deg);
+  }
+  26% {
+    transform: translateX(-12px) rotate(-1.5deg);
+  }
+  40% {
+    transform: translateX(16px) rotate(2deg);
+  }
+  54% {
+    transform: translateX(-16px) rotate(-2deg);
+  }
+  68% {
+    transform: translateX(12px) rotate(1.5deg);
+  }
+  82% {
+    transform: translateX(-6px) rotate(-0.75deg);
+  }
 }
-function CrdtRestoreOverlay({
-  artifactLabel,
-  restoreState,
-}: {
-  artifactLabel: string;
-  restoreState: RestoreState | null;
-}): unknown {
-  initializeSurface();
-  if (!restoreState) return null;
-  return jsx.jsx("div", {
-    className: "absolute inset-0 z-10 flex items-end",
-    role: restoreState.kind === "failed" ? "alert" : "status",
-    children:
-      restoreState.kind === "failed"
-        ? `Could not restore ${artifactLabel.toLowerCase()} edits. ${restoreState.errorMessage ?? ""} Pending CRDT updates: ${restoreState.pendingUpdateCount}.`
-        : `Restoring ${artifactLabel.toLowerCase()} edits. Compacting and applying ${restoreState.pendingUpdateCount} CRDT updates.`,
+
+.browser-comment-popup-shake {
+  animation: browser-comment-popup-shake 900ms linear both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .browser-comment-popup-shake {
+    animation: none;
+  }
+}
+`),
+      (On = new WeakMap()),
+      (kn = (0, U.forwardRef)(function (
+        {
+          anchorBounds: e,
+          containerElement: t,
+          collisionBoundaryElement: n = null,
+          portalContainerElement: r = null,
+          value: i,
+          onChange: a,
+          onCancel: o,
+          onSubmit: s,
+          mode: c = `create`,
+          allowDirectSubmitOnEdit: l = !1,
+          defaultCreateSubmitMode: u = `direct`,
+          savedSubmitDisabled: d = !1,
+          dictationControls: p,
+          placeholder: h = `Describe a change or ask a question`,
+          isComment: g = !1,
+          commentComposer: _,
+          nativeFileCommentLabel: v,
+          onDelete: S,
+          placement: C,
+          onDictationBusyChange: w,
+          testId: T = `popcorn-annotation-editor`,
+        },
+        E,
+      ) {
+        let ne = (0, U.useRef)(null),
+          D = (0, U.useRef)(null),
+          re = (0, U.useRef)(null),
+          ie = (0, U.useRef)(null),
+          [O, ae] = (0, U.useState)(!1),
+          [oe, se] = (0, U.useState)(!1),
+          k = c === `edit`,
+          ce = !k && _ != null,
+          A = !k && g,
+          j = ce || A,
+          M = i.trim().length > 0,
+          N = j && (M || A),
+          P = N ? ln : cn,
+          le = j && e != null && (e.width > 0 || e.height > 0),
+          ue = u === `direct` ? `saved` : `direct`,
+          F = oe ? ue : u,
+          pe = F === `direct`,
+          he = d && !k && !A,
+          ge = !M || (he && !pe),
+          L = (...e) => {
+            (he && e[0] === `saved`) || s(...e);
+          },
+          _e = n ?? r ?? t,
+          R = (0, U.useMemo)(() => (e ? ot(e, C) : null), [e, C]),
+          ve = C?.endsWith(`-left`) ?? !1,
+          ye = (0, U.useMemo)(
+            () =>
+              !R || !t
+                ? null
+                : le && e
+                  ? {
+                      contextElement: t,
+                      getBoundingClientRect: () => {
+                        let n = z(t, e.left, e.top),
+                          r = z(t, e.left + e.width, e.top + e.height);
+                        return new DOMRect(n.x, n.y, r.x - n.x, r.y - n.y);
+                      },
+                    }
+                  : {
+                      contextElement: t,
+                      getBoundingClientRect: () => {
+                        let e = z(t, R.left, R.top - sn / 2),
+                          n = z(t, R.left, R.top + sn / 2);
+                        return new DOMRect(e.x, e.y, 0, n.y - e.y);
+                      },
+                    },
+            [e, t, R, le],
+          ),
+          be = { fallbackPlacements: [`left-start`], placement: `right-start` };
+        (ve && ((be.fallbackPlacements = [`right-start`]), (be.placement = `left-start`)),
+          le && ((be.fallbackPlacements = [`top-end`]), (be.placement = `bottom-end`)));
+        let {
+            refs: xe,
+            x: Se,
+            y: Ce,
+            strategy: we,
+            update: Te,
+          } = x({
+            placement: be.placement,
+            strategy: `absolute`,
+            middleware: [
+              te(j ? rn : 20),
+              ee({
+                fallbackPlacements: be.fallbackPlacements,
+                padding: nn,
+                ...(_e ? { boundary: _e } : {}),
+              }),
+              f({ padding: nn, ...(_e ? { boundary: _e } : {}) }),
+              m({
+                padding: nn,
+                ...(_e ? { boundary: _e } : {}),
+                apply({ availableWidth: e, elements: t }) {
+                  t.floating.style.maxWidth = `${Math.max(0, e)}px`;
+                },
+              }),
+            ],
+            whileElementsMounted: y,
+          }),
+          Ee = A ? tn : on,
+          De = O || N ? Ee : sn,
+          Oe = { top: Ce ?? void 0 };
+        Ce != null && !le && (Oe.top = C == null ? Ce + (Ee - De) / 2 + an : at(Ce, sn, De));
+        let ke = (0, U.useCallback)(
+          (e) => {
+            if (((ne.current = e), xe.setFloating(e), typeof E == `function`)) {
+              E(e);
+              return;
+            }
+            E && (E.current = e);
+          },
+          [E, xe],
+        );
+        if (
+          ((0, U.useEffect)(() => {
+            e && D.current?.focus();
+          }, [e]),
+          (0, U.useEffect)(() => {
+            let e = ce ? ne.current : D.current;
+            if (e == null) return;
+            let t = (e) => {
+              e.stopPropagation();
+            };
+            return (
+              e.addEventListener(`wheel`, t, { passive: !0 }),
+              () => {
+                e.removeEventListener(`wheel`, t);
+              }
+            );
+          }, [e, ce]),
+          (0, U.useLayoutEffect)(() => {
+            let e = D.current;
+            if (!e) return;
+            let t = Jt(i),
+              n =
+                k ||
+                Gt({
+                  text: i,
+                  hasMultipleBlocks: t > 1,
+                  measureElement: ie.current,
+                  surfaceElement: re.current,
+                });
+            if (n !== O) {
+              ae(n);
+              return;
+            }
+            if (n) {
+              ((e.style.height = `0px`),
+                (e.style.height = `${Math.min(Math.max(e.scrollHeight, t * P), un)}px`));
+              return;
+            }
+            e.style.height = `${P}px`;
+          }, [k, O, P, i]),
+          (0, U.useEffect)(() => {
+            xe.setReference(ye);
+          }, [xe, ye]),
+          (0, U.useEffect)(() => {
+            if (j) return;
+            let e = (e) => {
+                se(e.metaKey || e.ctrlKey);
+              },
+              t = () => {
+                se(!1);
+              };
+            return (
+              window.addEventListener(`keydown`, e, !0),
+              window.addEventListener(`keyup`, e, !0),
+              window.addEventListener(`blur`, t),
+              () => {
+                (window.removeEventListener(`keydown`, e, !0),
+                  window.removeEventListener(`keyup`, e, !0),
+                  window.removeEventListener(`blur`, t));
+              }
+            );
+          }, [j]),
+          (0, U.useEffect)(() => {
+            e && Te?.();
+          }, [e?.height, e?.left, e?.top, e?.width, i, O, Te]),
+          !e)
+        )
+          return null;
+        if (ce) {
+          let e = (0, W.jsx)(`div`, {
+            ref: ke,
+            "data-testid": T,
+            "data-popcorn-annotation-editor-placement": C,
+            className: `pointer-events-auto z-40`,
+            style: { position: we, left: Se ?? 0, top: Ce ?? 0, width: $t },
+            onMouseDown: (e) => e.stopPropagation(),
+            children: _,
+          });
+          return r == null ? e : (0, Zt.createPortal)(e, r);
+        }
+        let Ae = (e) => {
+            let t = e?.isBusy ?? !1,
+              n = e?.isDictating ?? !1,
+              r = e?.dictationButton ?? null,
+              s = e?.recordingOverlay ?? null,
+              c = !j && !n && r != null && (O || !M),
+              d = !j && !t && (O || M || r == null),
+              f = (O && (k || r != null)) || N,
+              p = f ? `top-2 bottom-11` : `top-2 bottom-2`,
+              m = f ? xn : 44;
+            return (0, W.jsx)(`div`, {
+              ref: ke,
+              "data-testid": T,
+              "data-popcorn-annotation-editor-placement": C,
+              className: `pointer-events-auto z-40`,
+              style: { position: we, left: Se ?? 0, top: Oe.top ?? 0, width: A ? en : j ? $t : Qt },
+              onMouseDown: (e) => {
+                e.stopPropagation();
+              },
+              children: (0, W.jsx)(`form`, {
+                className: b(
+                  `pointer-events-none relative w-full overflow-visible bg-transparent text-token-foreground`,
+                  A ? `h-[138px]` : `h-[112px]`,
+                ),
+                style: N ? pn : fn,
+                onSubmit: (e) => {
+                  (e.preventDefault(), !t && M && L(k ? `saved` : A ? `direct` : F, `button`));
+                },
+                children: (0, W.jsx)(`div`, {
+                  className: mn,
+                  style: { height: Ee },
+                  children: (0, W.jsxs)(`div`, {
+                    ref: re,
+                    "data-browser-comment-editor-surface": !0,
+                    className: b(
+                      hn,
+                      A
+                        ? `@container rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.15)] ring-1 ring-token-border-light backdrop-blur-[16px]`
+                        : N
+                          ? `@container rounded-[14px] shadow-md ring-1 ring-token-border-light backdrop-blur-[24px]`
+                          : `rounded-[22px] shadow-md ring-1 ring-token-border-light`,
+                    ),
+                    style: {
+                      height: De,
+                      backgroundColor: A
+                        ? `color-mix(in srgb, var(--color-token-dropdown-background, var(--color-token-main-surface-primary, white)) 85%, transparent)`
+                        : `var(--color-token-dropdown-background, var(--color-token-main-surface-primary, white))`,
+                    },
+                    children: [
+                      A &&
+                        v != null &&
+                        (0, W.jsxs)(`div`, {
+                          className: `absolute inset-x-2 top-2 flex h-[26px] items-center gap-2 rounded-md bg-artifact-powerpoint-surface px-2 py-1.5 text-xs leading-[14px] font-normal tracking-[-0.15px] text-artifact-powerpoint-foreground`,
+                          "data-testid": `${T}-native-file-label`,
+                          children: [
+                            (0, W.jsx)(fe, { "aria-hidden": !0, className: `size-3.5` }),
+                            (0, W.jsx)(`span`, { children: v }),
+                          ],
+                        }),
+                      (0, W.jsx)(`div`, {
+                        className: b(
+                          gn,
+                          n && `invisible`,
+                          A && v != null
+                            ? `top-11 right-[14px] bottom-[43px] left-[14px]`
+                            : N
+                              ? `top-[13px] right-[14px] bottom-[43px] left-[14px]`
+                              : C == null
+                                ? f
+                                  ? `top-2 bottom-11 w-[calc(100%-32px)]`
+                                  : `top-2 bottom-2 w-[calc(100%-60px)]`
+                                : p,
+                        ),
+                        style: C == null || N ? void 0 : { left: xn, right: m },
+                        children: (0, W.jsx)(`div`, {
+                          className: b(
+                            `h-full min-h-0 translate-y-0.5`,
+                            j && `flex items-start gap-1`,
+                          ),
+                          children: (0, W.jsx)(`textarea`, {
+                            ref: D,
+                            inert: t,
+                            value: i,
+                            onChange: (e) => a(e.target.value),
+                            onKeyDown: (e) => {
+                              if (t) {
+                                (e.preventDefault(), e.stopPropagation());
+                                return;
+                              }
+                              if (e.key === `Escape`) {
+                                (e.preventDefault(), e.stopPropagation(), o());
+                                return;
+                              }
+                              if (
+                                e.key === `Enter` &&
+                                !e.altKey &&
+                                !e.shiftKey &&
+                                !e.nativeEvent.isComposing &&
+                                M
+                              ) {
+                                if ((e.preventDefault(), e.stopPropagation(), k)) {
+                                  L(l && (e.metaKey || e.ctrlKey) ? `direct` : `saved`, `keyboard`);
+                                  return;
+                                }
+                                if (A) {
+                                  L(`direct`, `keyboard`);
+                                  return;
+                                }
+                                if (e.metaKey || e.ctrlKey) {
+                                  L(ue, `keyboard`);
+                                  return;
+                                }
+                                L(u, `keyboard`);
+                              }
+                            },
+                            placeholder: h,
+                            rows: 1,
+                            className: b(dn, !O && `!overflow-hidden whitespace-nowrap`),
+                            style: {
+                              fontSize: `var(--codex-chat-font-size, 13px)`,
+                              lineHeight: `${P}px`,
+                              appearance: `none`,
+                              WebkitAppearance: `none`,
+                              outline: `none`,
+                              boxShadow: `none`,
+                              border: `0 none transparent`,
+                              borderImage: `none`,
+                              backgroundColor: `transparent`,
+                              backgroundImage: `none`,
+                            },
+                          }),
+                        }),
+                      }),
+                      (0, W.jsx)(`span`, {
+                        ref: ie,
+                        "aria-hidden": `true`,
+                        className: vn,
+                        style: {
+                          fontSize: `var(--codex-chat-font-size, 13px)`,
+                          lineHeight: `${cn}px`,
+                        },
+                        children: i,
+                      }),
+                      k
+                        ? (0, W.jsxs)(`div`, {
+                            "aria-hidden": !O || n,
+                            className: b(
+                              _n,
+                              `justify-between`,
+                              O && !n
+                                ? `scale-100 opacity-100`
+                                : `pointer-events-none scale-95 opacity-0`,
+                            ),
+                            children: [
+                              t
+                                ? null
+                                : (0, W.jsx)(`button`, {
+                                    type: `button`,
+                                    "aria-label": `Delete annotation`,
+                                    className: `inline-flex h-8 w-8 items-center justify-center rounded-full text-token-text-secondary hover:bg-token-bg-tertiary hover:text-token-text-primary`,
+                                    onClick: S,
+                                    children: (0, W.jsx)(de, { className: `size-4` }),
+                                  }),
+                              (0, W.jsxs)(`div`, {
+                                className: `flex items-center gap-1.5`,
+                                children: [
+                                  c ? r : null,
+                                  t
+                                    ? null
+                                    : (0, W.jsxs)(W.Fragment, {
+                                        children: [
+                                          (0, W.jsx)(`button`, {
+                                            type: `button`,
+                                            tabIndex: O ? void 0 : -1,
+                                            className: `inline-flex h-8 items-center rounded-full border border-token-border-light bg-token-main-surface-primary px-3 text-[length:var(--codex-chat-font-size,13px)] font-medium text-token-text-primary hover:bg-token-bg-tertiary`,
+                                            style: {
+                                              fontSize: `var(--codex-chat-font-size, 13px)`,
+                                              lineHeight: `20px`,
+                                            },
+                                            onClick: o,
+                                            children: `Cancel`,
+                                          }),
+                                          (0, W.jsx)(`button`, {
+                                            type: `submit`,
+                                            disabled: !M,
+                                            className: b(
+                                              `inline-flex h-8 items-center rounded-full px-3 text-[length:var(--codex-chat-font-size,13px)] font-medium transition-colors`,
+                                              M
+                                                ? `bg-token-text-primary text-token-main-surface-primary hover:opacity-90`
+                                                : `bg-token-bg-tertiary text-token-text-tertiary cursor-not-allowed`,
+                                            ),
+                                            style: {
+                                              fontSize: `var(--codex-chat-font-size, 13px)`,
+                                              lineHeight: `20px`,
+                                            },
+                                            children: `Save`,
+                                          }),
+                                        ],
+                                      }),
+                                ],
+                              }),
+                            ],
+                          })
+                        : null,
+                      !k &&
+                        !j &&
+                        (0, W.jsxs)(`div`, {
+                          className: `absolute right-2 bottom-2 flex items-center gap-2`,
+                          children: [
+                            c ? r : null,
+                            d
+                              ? (0, W.jsx)(`button`, {
+                                  "aria-label": `Comment`,
+                                  "data-browser-comment-submit": !0,
+                                  type: `button`,
+                                  disabled: ge,
+                                  className: b(
+                                    `inline-flex size-7 items-center justify-center rounded-full transition-colors`,
+                                    ge
+                                      ? `bg-token-bg-tertiary text-token-text-tertiary cursor-not-allowed`
+                                      : `bg-token-text-primary text-token-main-surface-primary hover:opacity-90`,
+                                  ),
+                                  onMouseDown: (e) => {
+                                    e.preventDefault();
+                                  },
+                                  onClick: () => {
+                                    M && L(F, `button`);
+                                  },
+                                  children: pe
+                                    ? (0, W.jsx)(I, { className: `size-4` })
+                                    : (0, W.jsx)(me, { className: `size-4` }),
+                                })
+                              : null,
+                          ],
+                        }),
+                      N &&
+                        !t &&
+                        (0, W.jsx)(`div`, {
+                          className: `absolute inset-x-0 bottom-0 flex h-[43px] items-center justify-end gap-3 px-2 py-1.5`,
+                          children: (0, W.jsxs)(`button`, {
+                            type: `button`,
+                            disabled: !M,
+                            className: `inline-flex h-7 shrink-0 items-center gap-2 rounded-md bg-[var(--color-background-success-solid,#008635)] py-[3px] ps-2 pe-1.5 text-[13px] font-medium text-[color:var(--color-text-success-solid,white)] hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40`,
+                            onClick: () => {
+                              L(`direct`, `button`);
+                            },
+                            children: [
+                              `Send`,
+                              (0, W.jsx)(`span`, {
+                                "aria-hidden": `true`,
+                                className: `text-white/75 [@container_(max-width:319px)]:hidden`,
+                                children: `⏎`,
+                              }),
+                            ],
+                          }),
+                        }),
+                      s,
+                    ],
+                  }),
+                }),
+              }),
+            });
+          },
+          je = p,
+          Me =
+            je == null
+              ? Ae(null)
+              : (0, W.jsx)(je, {
+                  value: i,
+                  onChange: a,
+                  onBusyChange: w,
+                  onSubmit: (e) => {
+                    L(k ? `saved` : A ? `direct` : u, `dictation`, e);
+                  },
+                  tooltipPortalContainer: r,
+                  children: Ae,
+                });
+        return r ? (0, Zt.createPortal)(Me, r) : Me;
+      })));
+  }))();
+}
+function jn(e, t, n) {
+  return Math.min(n, Math.max(t, e));
+}
+function Mn(e) {
+  let t = Math.min(Ln, Math.max(1, e.boundary.width - 32)),
+    n = Math.min(e.previewWidth && e.previewWidth > 0 ? e.previewWidth : t, t),
+    r = e.boundary.left + Rn,
+    i = e.boundary.top + Rn,
+    a = e.boundary.top + e.boundary.height - Rn,
+    o = jn(e.markerPoint.left - n / 2, r, Math.max(r, e.boundary.left + e.boundary.width - n - Rn)),
+    s = e.markerPoint.top - 25 - In;
+  if (s >= i && s + In <= a) return { left: o, top: s, maxWidth: t };
+  let c = e.markerPoint.top + 25;
+  return c >= i && c + In <= a
+    ? { left: o, top: c, maxWidth: t }
+    : { left: o, top: jn(s, i, Math.max(i, a - In)), maxWidth: t };
+}
+function Nn({
+  body: e,
+  markerPosition: t,
+  containerElement: n,
+  collisionBoundaryElement: r = null,
+  testId: i = `popcorn-annotation-preview`,
+}) {
+  let a = (0, Pn.useRef)(null),
+    [o, s] = (0, Pn.useState)(null),
+    [c, l] = (0, Pn.useState)(null);
+  if (
+    ((0, Pn.useLayoutEffect)(() => {
+      let e = a.current;
+      if (!e || !n || !r) return;
+      let t = () => {
+          let e = r.getBoundingClientRect(),
+            t = ve(n, e.left, e.top),
+            i = ve(n, e.right, e.bottom),
+            a = { left: t.x, top: t.y, width: i.x - t.x, height: i.y - t.y };
+          l((e) =>
+            e?.left === a.left && e.top === a.top && e.width === a.width && e.height === a.height
+              ? e
+              : a,
+          );
+        },
+        i = y(n, e, t),
+        o = typeof ResizeObserver > `u` ? null : new ResizeObserver(t);
+      return (
+        o?.observe(r),
+        () => {
+          (i(), o?.disconnect());
+        }
+      );
+    }, [n, r]),
+    (0, Pn.useLayoutEffect)(() => {
+      let e = a.current;
+      if (!e) return;
+      let t = Math.ceil(e.getBoundingClientRect().width);
+      s((e) => (e === t ? e : t));
+    }, [e, t.left, t.top, c?.width]),
+    !n)
+  )
+    return null;
+  let u = Mn({
+    markerPoint: t,
+    boundary:
+      r != null && c != null
+        ? c
+        : { left: 0, top: 0, width: n.clientWidth, height: n.clientHeight },
+    previewWidth: o ?? void 0,
+  });
+  return (0, Fn.jsx)(`div`, {
+    ref: a,
+    "data-testid": i,
+    className: `pointer-events-none absolute z-40 flex select-none items-center overflow-hidden rounded-lg border px-2 py-1 text-sm shadow-lg`,
+    style: {
+      ...u,
+      backgroundColor: zn,
+      borderColor: Vn,
+      color: Bn,
+      height: In,
+      width: `fit-content`,
+      backdropFilter: `blur(8px)`,
+      WebkitBackdropFilter: `blur(8px)`,
+    },
+    children: (0, Fn.jsx)(`div`, {
+      className: `min-w-0 overflow-hidden text-ellipsis whitespace-nowrap leading-5 text-inherit`,
+      children: e.replace(/\s+/g, ` `).trim(),
+    }),
   });
 }
-function createCrdtBridge({
-  artifactLabel,
-  controller,
-  externalCrdtUpdates = [],
-  onCrdtUpdate,
-}: {
-  artifactLabel: string;
-  controller?: CrdtController;
-  externalCrdtUpdates?: Uint8Array[];
-  onCrdtUpdate?(update: Uint8Array): void;
-}): {
-  crdtPublishingReady: boolean;
-  restore: () => Promise<void>;
-  restoreState: RestoreState | null;
-} {
-  const pending = nonEmptyUpdates(externalCrdtUpdates);
-  return {
-    crdtPublishingReady: controller != null,
-    restoreState:
-      pending.length >= 500
-        ? { kind: "restoring", pendingUpdateCount: pending.length }
-        : null,
-    restore: async () => {
-      const update = mergeUpdates(pending);
-      if (update && controller?.applyCrdtUpdate)
-        await controller.applyCrdtUpdate(update);
-      if (update) onCrdtUpdate?.(update);
-      if (controller?.requestCrdtSnapshot)
-        await withTimeout(
-          controller.requestCrdtSnapshot(),
-          5_000,
-          `${artifactLabel} CRDT drain attempt timed out.`,
-        );
+var Pn, Fn, In, Ln, Rn, zn, Bn, Vn;
+function Hn() {
+  return (Hn = e(() => {
+    (v(),
+      (Pn = p()),
+      (Fn = a()),
+      (In = 32),
+      (Ln = 294),
+      (Rn = 16),
+      (zn = `var(--color-token-dropdown-background, var(--color-token-main-surface-primary, white))`),
+      (Bn = `var(--color-token-foreground, var(--color-token-text-primary, rgb(38, 38, 38)))`),
+      (Vn = `var(--color-token-border-default, var(--color-token-border-light, rgba(13, 13, 13, 0.08)))`));
+  }))();
+}
+function Un(e, t) {
+  return t != null && e.artifactKind !== t
+    ? !1
+    : e.artifactKind === `workbook`
+      ? e.target.type === `workbook-range` || e.target.type === `workbook-floating-element`
+      : e.target.type === `presentation-element-selection` ||
+        e.target.type === `presentation-region`;
+}
+function Wn(e, t) {
+  let n = [];
+  for (let r of e ?? [])
+    Un(r, t) &&
+      n.push({
+        annotationId: r.annotationId,
+        artifactKind: r.artifactKind,
+        body: r.body,
+        label: r.label,
+        target: r.target,
+      });
+  return n;
+}
+function Gn(e, t) {
+  let n = t?.artifactKey,
+    r = t?.artifactKind,
+    i = t?.initialAnnotations,
+    a = (0, G.useRef)(t?.canReplaceSource);
+  a.current = t?.canReplaceSource;
+  let o = t?.onFocusAnnotation,
+    s = t?.onDismissAnnotation,
+    c = t?.onDismissAllAnnotations,
+    [l, u] = (0, G.useState)(n),
+    [d, f] = (0, G.useState)(() => Wn(i, r)),
+    p = (0, G.useRef)(null);
+  l !== n && ((p.current = null), u(n), f(Wn(i, r)));
+  let m = (0, G.useRef)(d);
+  m.current = d;
+  let h = (0, G.useCallback)(
+      (e, t = !1) => {
+        let n = m.current.find((t) => t.annotationId === e);
+        return n == null || o == null || !o(n, t, m.current) ? !1 : ((p.current = e), !0);
+      },
+      [o],
+    ),
+    g = (0, G.useCallback)(
+      (e, t) => {
+        let n = Se(t, p.current, e);
+        return n != null && h(n, !0);
+      },
+      [h],
+    ),
+    _ = (0, G.useCallback)(
+      (e) => {
+        (p.current === e && (p.current = null),
+          f((t) => t.filter((t) => t.annotationId !== e)),
+          s?.(e));
+      },
+      [s],
+    ),
+    v = (0, G.useCallback)(() => {
+      ((p.current = null), f([]), c?.());
+    }, [c]),
+    y = (0, G.useCallback)((e) => {
+      f((t) => [...t, e]);
+    }, []),
+    b = (0, G.useCallback)((e, t) => {
+      f((n) => n.map((n) => (n.annotationId === e ? { ...n, ...t } : n)));
+    }, []);
+  return (
+    (0, G.useEffect)(() => {
+      if (!e) return;
+      let t = {
+        canReplaceSource: () => a.current?.() ?? !1,
+        focusAnnotation: h,
+        navigateAnnotation: g,
+        dismissAnnotation: _,
+        dismissAllAnnotations: v,
+      };
+      return (
+        (e.current = t),
+        () => {
+          e.current === t && (e.current = null);
+        }
+      );
+    }, [v, _, h, g, e]),
+    {
+      annotations: d,
+      addPendingAnnotation: y,
+      updatePendingAnnotation: b,
+      focusAnnotation: h,
+      dismissAnnotation: _,
+      dismissAllAnnotations: v,
+    }
+  );
+}
+var G;
+function Kn() {
+  return (Kn = e(() => {
+    G = p();
+  }))();
+}
+function qn(e) {
+  let [t, n] = (0, Jn.useState)([]),
+    r = (0, Jn.useCallback)((e) => {
+      n((t) => t.filter((t) => t.drawingId !== e));
+    }, []),
+    i = (0, Jn.useCallback)(() => {
+      n([]);
+    }, []),
+    a = (0, Jn.useCallback)((e) => {
+      n((t) => [
+        ...t,
+        {
+          drawingId: e.drawingId,
+          artifactKind: e.artifactKind,
+          label: e.label,
+          target: e.target,
+          strokes: e.strokes,
+        },
+      ]);
+    }, []);
+  return (
+    (0, Jn.useEffect)(() => {
+      if (!e) return;
+      let t = { dismissDrawing: r, dismissAllDrawings: i };
+      return (
+        (e.current = t),
+        () => {
+          e.current === t && (e.current = null);
+        }
+      );
+    }, [i, r, e]),
+    { drawings: t, addPendingDrawing: a, dismissDrawing: r, dismissAllDrawings: i }
+  );
+}
+var Jn;
+function Yn() {
+  return (Yn = e(() => {
+    Jn = p();
+  }))();
+}
+function Xn({ kind: e, children: t, className: n }) {
+  return (0, Zn.jsx)(`div`, {
+    className: b(`inline-flex items-center justify-center rounded-md p-1`, Qn[e], n),
+    style:
+      e === `whiteboard`
+        ? {
+            backgroundColor: `color-mix(in srgb, var(--color-token-charts-blue, #339cff) 12%, transparent)`,
+            color: `var(--color-token-text-link-foreground, #339cff)`,
+          }
+        : void 0,
+    children: t,
+  });
+}
+var Zn, Qn;
+function $n() {
+  return ($n = e(() => {
+    (_(),
+      (Zn = a()),
+      (Qn = {
+        workbook: `bg-[#04b84c] text-white`,
+        presentation: `bg-orange-300 text-white`,
+        document: `bg-token-bg-elevated-secondary border-token-border-light border text-token-text-primary`,
+        whiteboard: `border-token-border-light border`,
+      }));
+  }))();
+}
+function er({ trigger: e, actions: t, onCloseAutoFocus: n }) {
+  return (0, K.jsxs)(S, {
+    children: [
+      (0, K.jsx)(d, { asChild: !0, children: e }),
+      (0, K.jsx)(u, {
+        children: (0, K.jsx)(g, {
+          className: `border-token-border-light bg-token-bg-primary z-50 min-w-[160px] rounded-xl border p-1 shadow-lg`,
+          onCloseAutoFocus: n,
+          children: t.map((e) => {
+            if (e.kind === `separator`)
+              return (0, K.jsx)(T, { className: `bg-token-border-light my-1 h-px` }, e.id);
+            let t = e.icon;
+            return (0, K.jsxs)(
+              h,
+              {
+                disabled: e.disabled,
+                "data-testid": e.testId,
+                onSelect: () => {
+                  e.disabled || e.onSelect();
+                },
+                className: b(
+                  `text-token-text-primary flex w-full cursor-default items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-token-bg-secondary`,
+                  e.color === `danger` ? `text-red-600` : null,
+                ),
+                children: [
+                  (0, K.jsx)(t, { className: `size-4` }),
+                  (0, K.jsx)(`span`, { children: e.label }),
+                ],
+              },
+              e.id,
+            );
+          }),
+        }),
+      }),
+    ],
+  });
+}
+var K;
+function tr() {
+  return (tr = e(() => {
+    (w(), _(), (K = a()));
+  }))();
+}
+function nr(e) {
+  let { controller: t, commentAuthor: n } = e,
+    r = ke();
+  return (0, ar.jsx)(je, {
+    threads: e.threads,
+    embedded: e.embedded,
+    testId: `${e.testIdPrefix}-comments-sidebar`,
+    labels: {
+      sidebar: e.sidebarLabel,
+      heading: `Comments`,
+      close: `Close comments`,
+      filter: `Filter comments`,
+      open: `Open`,
+      empty: `No comments yet`,
+      emptyDescription: e.emptyDescription,
+      filteredEmpty: `Adjust filters to see comments`,
+      showOpen: `Show all open threads`,
+      showResolved: `Show resolved threads`,
+      resolved: `Resolved`,
+      resolvedCount: ({ count: e, label: t }) =>
+        (0, ar.jsxs)(ar.Fragment, { children: [t(`Resolved`), ` · `, e] }),
+      deleteAll: `Delete all`,
     },
+    onClose: e.onClose,
+    onDeleteAll:
+      n == null
+        ? void 0
+        : (e) => {
+            for (let n of e) t.deleteCommentThread(n.threadId);
+          },
+    renderThread: (t) => (0, ar.jsx)(rr, { thread: t, sidebar: e, timestampNow: r }),
+  });
+}
+function rr({ thread: e, sidebar: t, timestampNow: n }) {
+  let {
+      controller: r,
+      commentAuthor: i,
+      selectedThreadId: a,
+      onSelectThread: o,
+      onHoverThread: s,
+    } = t,
+    c = e.threadId === a,
+    l = (0, ir.useRef)(null);
+  return (
+    (0, ir.useEffect)(() => {
+      c && l.current?.scrollIntoView?.({ behavior: `smooth`, block: `nearest` });
+    }, [c]),
+    (0, ar.jsx)(`div`, {
+      ref: l,
+      "data-selected": c ? `true` : void 0,
+      "data-testid": `${t.testIdPrefix}-comment-sidebar-thread-${e.threadId}`,
+      children: (0, ar.jsx)(Me, {
+        thread: e,
+        isSelected: c,
+        sourceLabel: t.getThreadSourceLabel(e),
+        selectLabel: `Select comment thread for ${e.label}`,
+        selectRepliesLabel: `Select replies for ${e.label}`,
+        onSelect: o,
+        onHover: s,
+        timestampNow: n,
+        viewerAuthor: i,
+        onReply: i == null ? void 0 : (t) => r.replyToCommentThread(e.threadId, t, i),
+        onResolve: i == null ? void 0 : () => r.resolveCommentThread(e.threadId, i),
+        onReopen: i == null ? void 0 : () => r.reopenCommentThread(e.threadId),
+        onDelete: i == null ? void 0 : () => r.deleteCommentThread(e.threadId),
+        onDeleteComment: i == null ? void 0 : (t) => r.deleteThreadComment(e.threadId, t),
+        onToggleReaction:
+          i == null ? void 0 : (t, n) => r.toggleCommentReaction(e.threadId, t, n, i),
+      }),
+    })
+  );
+}
+var ir, ar;
+function or() {
+  return (or = e(() => {
+    ((ir = p()), Oe(), Ne(), Ae(), (ar = a()));
+  }))();
+}
+function sr({
+  position: e,
+  author: t,
+  isUnreadAssistant: n = !1,
+  children: r,
+  onPointerDown: i,
+  onClick: a,
+  ...o
+}) {
+  return (0, q.jsx)(`button`, {
+    ...o,
+    type: `button`,
+    "data-popcorn-annotation-marker": `true`,
+    className: b(
+      `pointer-events-auto absolute z-30 flex size-6 -translate-x-1/2 -translate-y-1/2 cursor-interaction items-center justify-center overflow-hidden rounded-full rounded-bl-2xs border border-default p-0 shadow-lg-stronger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring`,
+      n ? `bg-text-info text-info-solid` : `bg-surface text-default`,
+    ),
+    style: { left: e.left, top: e.top },
+    onPointerDown: (e) => {
+      (e.stopPropagation(), i?.(e));
+    },
+    onClick: (e) => {
+      (e.stopPropagation(), a?.(e));
+    },
+    children:
+      r ??
+      (t == null
+        ? (0, q.jsx)(F, { "aria-hidden": !0, className: `size-4` })
+        : (0, q.jsx)(ur, { author: t }, t.avatarUrl)),
+  });
+}
+function cr({
+  threadId: e,
+  position: t,
+  author: n,
+  markerContent: r,
+  markerLabel: i,
+  markerTestId: a,
+  isUnreadAssistant: o = !1,
+  isSelected: s,
+  hoveredThreadId: c,
+  threadVisibleInSidebar: l,
+  collisionBoundaryElement: u,
+  portalContainerElement: d,
+  onSelect: f,
+  onHover: p,
+  renderThread: m,
+  renderPopover: h = lr,
+}) {
+  let g = (0, dr.useRef)(null),
+    [_, v] = (0, dr.useState)(null);
+  (0, dr.useEffect)(() => {
+    if (_ !== `leaving`) return;
+    let t = setTimeout(() => {
+      (v(null), (c === void 0 || c === e) && p?.(null));
+    }, fr);
+    return () => clearTimeout(t);
+  }, [_, c, p, e]);
+  function y() {
+    (v(`hovered`), p?.(e));
+  }
+  function b() {
+    v((e) => (e == null ? null : `leaving`));
+  }
+  let x = s && !l,
+    ee = _ != null || x;
+  return h({
+    open: ee,
+    onOpenChange: (t) => {
+      t || (v(null), (c === void 0 || c === e) && p?.(null), x && f(null));
+    },
+    collisionBoundaryElement: u,
+    portalContainerElement: d,
+    onPointerEnter: y,
+    onPointerLeave: b,
+    onFocusOutside: (e) => {
+      e.detail.originalEvent.target === g.current && e.preventDefault();
+    },
+    marker: (0, q.jsx)(sr, {
+      ref: g,
+      position: t,
+      author: n,
+      isUnreadAssistant: o,
+      "aria-label": i,
+      "aria-expanded": ee,
+      "data-testid": a,
+      onPointerEnter: y,
+      onPointerLeave: b,
+      onFocus: y,
+      onBlur: b,
+      onClick: () => f(e),
+      children: r,
+    }),
+    content: (0, q.jsx)(`div`, { className: `w-80 max-w-full`, children: m({ expanded: x }) }),
+  });
+}
+function lr({
+  open: e,
+  onOpenChange: t,
+  marker: n,
+  content: r,
+  collisionBoundaryElement: a,
+  portalContainerElement: o,
+  onPointerEnter: s,
+  onPointerLeave: u,
+  onFocusOutside: d,
+}) {
+  return (0, q.jsxs)(i, {
+    open: e,
+    onOpenChange: t,
+    children: [
+      (0, q.jsx)(c, { asChild: !0, children: n }),
+      (0, q.jsx)(l, {
+        container: o ?? void 0,
+        children: (0, q.jsx)(C, {
+          align: `start`,
+          side: `right`,
+          sideOffset: 4,
+          collisionPadding: 6,
+          collisionBoundary: a,
+          className: `z-50 flex w-fit origin-[var(--radix-popover-content-transform-origin)] flex-col overflow-y-auto rounded-2xl bg-surface-elevated-secondary text-default shadow-lg-stronger ring-1 ring-border-subtle outline-hidden`,
+          style: {
+            maxWidth: `min(var(--radix-popover-content-available-width), calc(100vw - 16px))`,
+            maxHeight: `min(var(--radix-popover-content-available-height), calc(100vh - 16px))`,
+          },
+          onOpenAutoFocus: (e) => e.preventDefault(),
+          onFocusOutside: d,
+          onPointerEnter: s,
+          onPointerLeave: u,
+          children: r,
+        }),
+      }),
+    ],
+  });
+}
+function ur({ author: e }) {
+  let [t, n] = (0, dr.useState)(!1);
+  return e.avatarUrl != null && !t
+    ? (0, q.jsx)(`img`, {
+        alt: ``,
+        draggable: !1,
+        className: `size-4.5 shrink-0 rounded-full object-cover`,
+        src: e.avatarUrl,
+        onError: () => n(!0),
+      })
+    : (0, q.jsx)(`span`, {
+        "aria-hidden": !0,
+        className: `flex size-4.5 shrink-0 items-center justify-center rounded-full bg-text-tertiary text-[10px] leading-none font-normal text-inverse select-none`,
+        children: e.initials ?? e.displayName.slice(0, 1),
+      });
+}
+var dr, q, fr;
+function pr() {
+  return (pr = e(() => {
+    (o(), _(), (dr = p()), P(), (q = a()), (fr = 100));
+  }))();
+}
+function mr({
+  thread: e,
+  label: t,
+  sourceLabel: n,
+  viewerAuthor: r,
+  isEditing: i,
+  onReply: a,
+  onResolve: o,
+  onReopen: s,
+  onDeleteThread: c,
+  onToggleReaction: l,
+  onDeleteComment: u,
+  ...d
+}) {
+  let f = i && (r != null || e.viewerAuthorId != null),
+    p = e.comments.findLast((e) => !e.isDeleted)?.author;
+  return (0, hr.jsx)(cr, {
+    ...d,
+    threadId: e.threadId,
+    author: p,
+    markerLabel: `Open comment thread for ${t}`,
+    renderThread: ({ expanded: i }) =>
+      (0, hr.jsx)(Me, {
+        thread: e,
+        borderless: !0,
+        preview: !i,
+        isSelected: i,
+        viewerAuthor: r,
+        viewerAuthorId: e.viewerAuthorId ?? r?.id,
+        sourceLabel: n,
+        selectLabel: `Select comment thread for ${t}`,
+        selectRepliesLabel: `Select replies for ${t}`,
+        onSelect: d.onSelect,
+        onReply: f && a ? (t) => a(e.threadId, t) : void 0,
+        onResolve: f && o ? () => o(e.threadId) : void 0,
+        onReopen: f && s ? () => s(e.threadId) : void 0,
+        onDelete: f && c ? () => c(e.threadId) : void 0,
+        onToggleReaction: f && l ? (t, n) => l(e.threadId, t, n) : void 0,
+        onDeleteComment: f && u ? (t) => u(e.threadId, t) : void 0,
+      }),
+  });
+}
+var hr;
+function gr() {
+  return (gr = e(() => {
+    (pr(), Ae(), (hr = a()));
+  }))();
+}
+var _r, vr;
+function yr() {
+  return (yr = e(() => {
+    ((_r = p()), (vr = (0, _r.createContext)(void 0)));
+  }))();
+}
+function br({ fontSize: e, onChange: t }) {
+  return (0, J.jsx)(`div`, {
+    className: `w-32 rounded-xl border border-token-border-default bg-token-main-surface-primary p-1 shadow-xl`,
+    children: wr.map((r) => {
+      let i = r === e;
+      return (0, J.jsx)(
+        n,
+        {
+          asChild: !0,
+          children: (0, J.jsxs)(`button`, {
+            type: `button`,
+            "aria-pressed": i,
+            onClick: () => t(r),
+            className: b(
+              `flex h-7 w-full cursor-pointer items-center justify-between rounded-lg px-2 text-left text-sm`,
+              i ? `bg-info-soft text-info` : `hover:bg-primary-ghost-hover`,
+            ),
+            children: [
+              (0, J.jsx)(`span`, { children: r }),
+              (0, J.jsx)(`span`, {
+                className: i ? `text-info` : `text-token-text-tertiary`,
+                children: `pt`,
+              }),
+            ],
+          }),
+        },
+        r,
+      );
+    }),
+  });
+}
+function xr({ color: e, onChange: t, label: r = `Color`, allowNone: i = !1 }) {
+  return (0, J.jsxs)(`div`, {
+    className: `rounded-xl border border-token-border-default bg-token-main-surface-primary p-3 shadow-xl`,
+    children: [
+      (0, J.jsx)(`p`, {
+        className: `mb-2 text-xs font-medium text-token-text-secondary`,
+        children: r,
+      }),
+      (0, J.jsxs)(`div`, {
+        className: `grid grid-cols-4 gap-2`,
+        children: [
+          i
+            ? (0, J.jsx)(n, {
+                asChild: !0,
+                children: (0, J.jsx)(`button`, {
+                  type: `button`,
+                  "aria-label": `No fill`,
+                  "aria-pressed": e == null,
+                  onClick: () => t(null),
+                  className: b(
+                    `flex size-7 cursor-pointer items-center justify-center rounded-lg border border-token-border-light bg-token-main-surface-primary text-token-text-secondary`,
+                    e == null
+                      ? `ring-2 ring-text-info`
+                      : `hover:ring-2 hover:ring-token-border-light`,
+                  ),
+                  children: (0, J.jsx)(`span`, { "aria-hidden": !0, children: `×` }),
+                }),
+              })
+            : null,
+          Cr.map((r) => {
+            let i = e != null && Sr(e, r.value);
+            return (0, J.jsx)(
+              n,
+              {
+                asChild: !0,
+                children: (0, J.jsx)(`button`, {
+                  type: `button`,
+                  "aria-label": r.label,
+                  "aria-pressed": i,
+                  onClick: () => t(r.value),
+                  className: b(
+                    `size-7 cursor-pointer rounded-lg border border-token-border-light`,
+                    i ? `ring-2 ring-text-info` : `hover:ring-2 hover:ring-token-border-light`,
+                  ),
+                  style: { backgroundColor: r.value },
+                }),
+              },
+              r.value,
+            );
+          }),
+        ],
+      }),
+    ],
+  });
+}
+function Sr(e, t) {
+  return e.toUpperCase() === t.toUpperCase();
+}
+var J, Cr, wr;
+function Tr() {
+  return (Tr = e(() => {
+    (o(),
+      _(),
+      (J = a()),
+      (Cr = [
+        { label: `White`, value: `#FFFFFF` },
+        { label: `Black`, value: `#000000` },
+        { label: `Gray`, value: `#64748B` },
+        { label: `Red`, value: `#EF4444` },
+        { label: `Orange`, value: `#F97316` },
+        { label: `Yellow`, value: `#EAB308` },
+        { label: `Green`, value: `#22C55E` },
+        { label: `Blue`, value: `#3B82F6` },
+        { label: `Purple`, value: `#A855F7` },
+      ]),
+      (wr = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 32, 48, 64]));
+  }))();
+}
+var Er;
+function Dr() {
+  return (Dr = e(() => {
+    Er = {
+      Purple: {
+        1e3: `#000000`,
+        900: `#200D53`,
+        800: `#35158E`,
+        700: `#4C20CA`,
+        600: `#6D3FDC`,
+        500: `#875BE1`,
+        400: `#A47EE7`,
+        300: `#BC9EED`,
+        200: `#D3BEF2`,
+        100: `#E8DFF6`,
+        0: `#FFFFFF`,
+      },
+      Pink: {
+        1e3: `#000000`,
+        900: `#310E28`,
+        800: `#541945`,
+        700: `#782563`,
+        600: `#9D3383`,
+        500: `#D347B0`,
+        400: `#E659C2`,
+        300: `#EC8ACF`,
+        200: `#F1B4DD`,
+        100: `#F5DBEC`,
+        0: `#FFFFFF`,
+      },
+      Red: {
+        1e3: `#000000`,
+        900: `#360C19`,
+        800: `#5B142D`,
+        700: `#831D42`,
+        600: `#AB2958`,
+        500: `#D53670`,
+        400: `#EE4D83`,
+        300: `#F28BA6`,
+        200: `#F5B5C3`,
+        100: `#F7DBE1`,
+        0: `#FFFFFF`,
+      },
+      Orange: {
+        1e3: `#000000`,
+        900: `#29170C`,
+        800: `#4D2510`,
+        700: `#723414`,
+        600: `#96461C`,
+        500: `#BB5926`,
+        400: `#E36E30`,
+        300: `#EF9262`,
+        200: `#F3B99C`,
+        100: `#F6DDD1`,
+        0: `#FFFFFF`,
+      },
+      Yellow: {
+        1e3: `#000000`,
+        900: `#231A07`,
+        800: `#3F2D07`,
+        700: `#5C4107`,
+        600: `#7A570C`,
+        500: `#996E12`,
+        400: `#B98618`,
+        300: `#DB9F1E`,
+        200: `#F1B023`,
+        100: `#FADEB3`,
+        0: `#FFFFFF`,
+      },
+      Olive: {
+        1e3: `#000000`,
+        900: `#1E1C06`,
+        800: `#323204`,
+        700: `#494903`,
+        600: `#616106`,
+        500: `#7A7A0A`,
+        400: `#95950E`,
+        300: `#B0B013`,
+        200: `#CCCC24`,
+        100: `#EAE848`,
+        0: `#FFFFFF`,
+      },
+      Green: {
+        1e3: `#000000`,
+        900: `#0E2008`,
+        800: `#0C380D`,
+        700: `#135215`,
+        600: `#1D6D1E`,
+        500: `#268928`,
+        400: `#30A633`,
+        300: `#3DCB40`,
+        200: `#4DE24E`,
+        100: `#94F98A`,
+        0: `#FFFFFF`,
+      },
+      Turquoise: {
+        1e3: `#000000`,
+        900: `#06201A`,
+        800: `#08372F`,
+        700: `#0A5044`,
+        600: `#116B5B`,
+        500: `#188673`,
+        400: `#20A38C`,
+        300: `#27C0A6`,
+        200: `#2CD1B4`,
+        100: `#67FBDC`,
+        0: `#FFFFFF`,
+      },
+      Cyan: {
+        1e3: `#000000`,
+        900: `#061F26`,
+        800: `#053642`,
+        700: `#044E5F`,
+        600: `#08687E`,
+        500: `#0C839E`,
+        400: `#129FBF`,
+        300: `#16B7DB`,
+        200: `#51D7FC`,
+        100: `#BCEBFB`,
+        0: `#FFFFFF`,
+      },
+      Blue: {
+        1e3: `#000000`,
+        900: `#0D1B37`,
+        800: `#15305F`,
+        700: `#1E4788`,
+        600: `#2A5EB1`,
+        500: `#3A7DE8`,
+        400: `#6490F0`,
+        300: `#91AAF3`,
+        200: `#B8C6F6`,
+        100: `#DDE2F8`,
+        0: `#FFFFFF`,
+      },
+      DesaturatedCool: {
+        1e3: `#000000`,
+        900: `#1A1A1A`,
+        800: `#262626`,
+        700: `#333333`,
+        600: `#474747`,
+        500: `#595959`,
+        400: `#747474`,
+        300: `#8C8C8C`,
+        200: `#B3B3B3`,
+        100: `#D8D8D8`,
+        0: `#FFFFFF`,
+      },
+      DesaturatedWarm: {
+        1e3: `#000000`,
+        900: `#1E1C1B`,
+        800: `#2C2927`,
+        700: `#393634`,
+        600: `#4E4947`,
+        500: `#62605E`,
+        400: `#7A7775`,
+        300: `#928E8D`,
+        200: `#B3ACAB`,
+        100: `#D8D1D0`,
+        0: `#FFFFFF`,
+      },
+    };
+  }))();
+}
+function Or({
+  icon: e,
+  hideLabel: t,
+  isActive: n,
+  label: r,
+  subLabel: i,
+  iconClassName: a,
+  labelClassName: o,
+  subLabelId: s,
+}) {
+  return (0, Y.jsxs)(Y.Fragment, {
+    children: [
+      e
+        ? (0, Y.jsx)(e, {
+            className: b(
+              `size-4`,
+              {
+                "me-0.5": !t,
+                "text-token-text-tertiary": !t && !n,
+                "text-token-text-primary": t && !n,
+                "text-info": n,
+              },
+              a,
+            ),
+          })
+        : null,
+      t
+        ? null
+        : (0, Y.jsx)(`span`, {
+            className: b(`truncate text-sm`, { "text-token-text-primary": !n, "text-info": n }, o),
+            children: r,
+          }),
+      i == null
+        ? null
+        : (0, Y.jsxs)(Y.Fragment, {
+            children: [
+              t ? null : ` `,
+              (0, Y.jsx)(`span`, { id: s, className: `contents`, children: i }),
+            ],
+          }),
+    ],
+  });
+}
+function kr({ children: e, ariaLabel: t, onKeyDown: n }) {
+  return (0, Y.jsx)(`div`, {
+    role: `toolbar`,
+    "aria-label": t,
+    ref: (e) => {
+      if (!e) return;
+      let t = Nr(e);
+      Pr(t, t.find((e) => e === document.activeElement) ?? t.find((e) => e.tabIndex === 0));
+    },
+    className: `relative m-0 flex h-9 w-fit min-w-0 shrink items-center overflow-hidden rounded-xl bg-surface-elevated-secondary/90 p-1 font-sans text-sm shadow-lg ring-[0.5px] ring-border backdrop-blur-sm select-none`,
+    onFocusCapture: (e) => {
+      e.target instanceof HTMLButtonElement &&
+        e.target.matches(Ir) &&
+        Pr(Nr(e.currentTarget), e.target);
+    },
+    onKeyDown: (e) => {
+      let t = e.key.toLowerCase();
+      if (!e.defaultPrevented && !e.altKey && (t === `z` || t === `y`) && (e.metaKey || e.ctrlKey))
+        return;
+      if (e.defaultPrevented) {
+        e.stopPropagation();
+        return;
+      }
+      if (!(e.target instanceof HTMLElement)) return;
+      if (!e.currentTarget.contains(e.target)) {
+        e.stopPropagation();
+        return;
+      }
+      if (e.target.closest(`input, textarea, [contenteditable]:not([contenteditable='false'])`)) {
+        e.stopPropagation();
+        return;
+      }
+      if ((n?.(e), e.defaultPrevented)) {
+        e.stopPropagation();
+        return;
+      }
+      if (e.isPropagationStopped()) return;
+      let r = e.target.closest(Ir);
+      if (!r || !e.currentTarget.contains(r)) return;
+      let i = Nr(e.currentTarget),
+        a = i.indexOf(r),
+        o;
+      if (e.key === `ArrowRight`) o = i[(a + 1) % i.length];
+      else if (e.key === `ArrowLeft`) o = i[(a - 1 + i.length) % i.length];
+      else if (e.key === `Home`) o = i[0];
+      else if (e.key === `End`) o = i.at(-1);
+      else if (e.key === `Escape`) return;
+      else {
+        e.stopPropagation();
+        return;
+      }
+      (e.preventDefault(), e.stopPropagation(), Pr(i, o), o?.focus());
+    },
+    children: e,
+  });
+}
+function Ar({
+  actionId: e,
+  label: t,
+  subLabel: n,
+  icon: r,
+  isDisabled: i = !1,
+  isActive: a,
+  hideLabel: o = !1,
+  onClick: s,
+  onMouseDown: c,
+  iconClassName: l,
+  labelClassName: u,
+}) {
+  let d = (0, Fr.useId)();
+  return (0, Y.jsx)(`button`, {
+    type: `button`,
+    tabIndex: -1,
+    "data-toolbar-action": e,
+    className: b(
+      `flex h-full cursor-interaction items-center gap-2 rounded-md px-2 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset disabled:cursor-default disabled:opacity-40`,
+      a
+        ? `bg-text-info/10 enabled:hover:bg-text-info/15`
+        : `enabled:hover:bg-primary-ghost-hover enabled:active:bg-primary-ghost-active`,
+    ),
+    onClick: s,
+    onMouseDown: c,
+    "aria-label": o ? t : void 0,
+    "aria-describedby": o && n != null ? d : void 0,
+    disabled: i,
+    "aria-pressed": a,
+    "data-state": a ? `on` : void 0,
+    children: (0, Y.jsx)(Or, {
+      icon: r,
+      hideLabel: o,
+      label: t,
+      subLabel: n,
+      isActive: a,
+      iconClassName: l,
+      labelClassName: u,
+      subLabelId: d,
+    }),
+  });
+}
+function jr({
+  actionId: e,
+  label: t,
+  hideLabel: n,
+  icon: a,
+  subLabel: o,
+  children: s,
+  align: c = `end`,
+  portalContainerElement: u,
+}) {
+  let d = (0, Fr.useId)();
+  return (0, Y.jsxs)(i, {
+    children: [
+      (0, Y.jsx)(r, {
+        asChild: !0,
+        children: (0, Y.jsx)(`button`, {
+          type: `button`,
+          tabIndex: -1,
+          "data-toolbar-action": e,
+          className: `flex h-full cursor-interaction items-center gap-2 rounded-md px-2 hover:bg-primary-ghost-hover focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset active:bg-primary-ghost-active data-[state=open]:bg-primary-ghost-hover`,
+          "aria-label": n ? t : void 0,
+          "aria-describedby": n && o != null ? d : void 0,
+          children: (0, Y.jsx)(Or, { icon: a, hideLabel: n, label: t, subLabel: o, subLabelId: d }),
+        }),
+      }),
+      u
+        ? (0, Y.jsx)(l, {
+            container: u,
+            children: (0, Y.jsx)(C, {
+              "aria-label": t,
+              align: c,
+              sideOffset: 8,
+              className: `pointer-events-auto z-50`,
+              children: s,
+            }),
+          })
+        : null,
+    ],
+  });
+}
+function Mr() {
+  return (0, Y.jsx)(`div`, {
+    role: `separator`,
+    "aria-orientation": `vertical`,
+    className: `mx-1 h-3 w-px bg-token-border-default`,
+  });
+}
+function Nr(e) {
+  return Array.from(e.querySelectorAll(Ir));
+}
+function Pr(e, t = e[0]) {
+  for (let n of e) n.tabIndex = n === t ? 0 : -1;
+}
+var Fr, Y, Ir;
+function Lr() {
+  return (Lr = e(() => {
+    (o(), _(), (Fr = p()), (Y = a()), (Ir = `button[data-toolbar-action]:not([disabled])`));
+  }))();
+}
+function Rr({
+  bounds: e,
+  boundsSource: t,
+  containerElement: n,
+  collisionBoundaryElement: r,
+  zoom: i = 1,
+  isVisible: a,
+  items: o,
+  ariaLabel: s = `Editing tools`,
+  overlayContent: c,
+  overlayVisible: l = !1,
+  onKeyDown: u,
+}) {
+  let d = a ? t : void 0,
+    p = (0, X.useSyncExternalStore)(
+      d?.subscribe ?? Hr,
+      d?.getSnapshot ?? (() => e),
+      d?.getSnapshot ?? (() => e),
+    ),
+    m = t ? 1 : i,
+    h = (0, X.useMemo)(
+      () =>
+        !n || !p
+          ? null
+          : {
+              contextElement: n,
+              getBoundingClientRect: () => {
+                let e = z(n, p.left * m, p.top * m),
+                  t = z(n, (p.left + p.width) * m, (p.top + p.height) * m);
+                return new DOMRect(e.x, e.y, t.x - e.x, t.y - e.y);
+              },
+            },
+      [p?.height, p?.left, p?.top, p?.width, m, n],
+    ),
+    g = r ?? n,
+    [_, v] = (0, X.useState)(() => typeof window > `u`),
+    [S, C] = (0, X.useState)(null),
+    {
+      refs: w,
+      floatingStyles: T,
+      update: E,
+    } = x({
+      placement: `top`,
+      strategy: `absolute`,
+      middleware: [
+        te(Vr),
+        ee({ fallbackPlacements: [`bottom`], ...(g ? { boundary: g, padding: 12 } : {}) }),
+        f({ padding: g ? 12 : 8, ...(g ? { boundary: g, crossAxis: !0 } : {}) }),
+      ],
+      whileElementsMounted: y,
+    }),
+    ne = (0, X.useCallback)((e) => {
+      (e.preventDefault(), e.stopPropagation());
+    }, []);
+  if (
+    ((0, X.useEffect)(() => {
+      n && w.setReference(h);
+    }, [n, w, h]),
+    (0, X.useEffect)(() => {
+      if (typeof window > `u`) {
+        v(!0);
+        return;
+      }
+      if (!a) {
+        v(!1);
+        return;
+      }
+      v(!0);
+    }, [a]),
+    (0, X.useEffect)(() => {
+      a && E?.();
+    }, [p?.height, p?.left, p?.top, p?.width, a, E, m]),
+    !p || !a || o.length === 0)
+  )
+    return null;
+  let D = (p.left + p.width / 2) * m,
+    re = Math.max(8, p.top * m - Vr);
+  return (0, Z.jsxs)(`div`, {
+    ref: C,
+    "data-popcorn-edit-toolbar-root": `true`,
+    className: `pointer-events-none absolute inset-0 z-30`,
+    children: [
+      !n &&
+        (0, Z.jsx)(`div`, {
+          ref: w.setReference,
+          "data-testid": `popcorn-edit-toolbar-anchor`,
+          className: `pointer-events-none absolute`,
+          style: { left: D, top: re, width: 1, height: 1 },
+        }),
+      (0, Z.jsx)(`div`, {
+        ref: w.setFloating,
+        className: `pointer-events-auto absolute`,
+        style: { ...T, zIndex: 30 },
+        "data-testid": `popcorn-edit-toolbar`,
+        children: (0, Z.jsx)(`div`, {
+          className: b(
+            `transition-all duration-150 ease-out`,
+            _ ? `translate-y-0 opacity-100` : `translate-y-2 opacity-0`,
+          ),
+          children: (0, Z.jsxs)(kr, {
+            ariaLabel: s,
+            onKeyDown: u,
+            children: [
+              (0, Z.jsx)(`div`, {
+                "aria-hidden": l,
+                inert: l,
+                className: b(
+                  `flex h-full items-center transition-[opacity,transform] duration-150 ease-out motion-reduce:transition-none`,
+                  l ? `pointer-events-none scale-[0.98] opacity-0` : `scale-100 opacity-100`,
+                ),
+                children: o.map((e) => {
+                  switch (e.kind) {
+                    case `button`:
+                      return (0, Z.jsx)(
+                        Ar,
+                        {
+                          actionId: e.id,
+                          label: e.label,
+                          icon: e.icon,
+                          hideLabel: e.hideLabel,
+                          isActive: e.isActive,
+                          isDisabled: e.isDisabled,
+                          subLabel: e.subLabel,
+                          iconClassName: e.iconClassName,
+                          labelClassName: e.labelClassName,
+                          onClick: (t) => {
+                            (ne(t), e.onClick?.());
+                          },
+                        },
+                        e.id,
+                      );
+                    case `popover`:
+                      return (0, Z.jsx)(
+                        jr,
+                        {
+                          actionId: e.id,
+                          label: e.label,
+                          icon: e.icon,
+                          hideLabel: e.hideLabel,
+                          subLabel: e.subLabel,
+                          align: e.align,
+                          portalContainerElement: S,
+                          children: e.content,
+                        },
+                        e.id,
+                      );
+                    case `separator`:
+                      return (0, Z.jsx)(Mr, {}, e.id);
+                  }
+                }),
+              }),
+              (0, Z.jsx)(`div`, {
+                "aria-hidden": !l,
+                className: b(
+                  `absolute inset-1 transition-[opacity,transform] duration-150 ease-out motion-reduce:transition-none`,
+                  l
+                    ? `pointer-events-auto scale-100 opacity-100`
+                    : `pointer-events-none scale-[0.98] opacity-0`,
+                ),
+                children: c,
+              }),
+            ],
+          }),
+        }),
+      }),
+    ],
+  });
+}
+function zr({
+  bounds: e,
+  zoom: t,
+  isVisible: r,
+  selectionRangeAddress: i,
+  runWorksheetEdit: a,
+  formatting: o,
+  manualEditUiEnabled: s = !1,
+  isInspectorOpen: c = !1,
+  selectionActions: l,
+  selectionKey: u,
+  shortcutScopeElement: d,
+  onDismiss: f,
+  onToggleInspector: p,
+  onAskSelectionContext: m,
+  onCommentSelection: h,
+}) {
+  let [g, _] = (0, X.useState)(``),
+    [v, y] = (0, X.useState)(!1),
+    b = (0, X.useRef)(null),
+    x = (0, X.useMemo)(
+      () =>
+        Ur.flatMap((e) =>
+          Wr.map((t) => {
+            let n = Er[e];
+            return { key: `${e}-${t}`, label: `${e} shade ${t}`, hex: n?.[t] ?? `#000000` };
+          }),
+        ),
+      [],
+    ),
+    ee = (0, X.useCallback)(
+      (e) => {
+        i && a && a(`applyRangeFill`, { rangeAddress: i, hex: e });
+      },
+      [a, i],
+    ),
+    te = (0, X.useCallback)(
+      (e) => {
+        i && a && a(`applyRangeFontColor`, { rangeAddress: i, hex: e });
+      },
+      [a, i],
+    ),
+    S = s && r && !v && l != null,
+    C = l?.onAskForEditShown;
+  (0, X.useEffect)(() => {
+    S && u != null && b.current !== u && C != null && ((b.current = u), C());
+  }, [S, C, u]);
+  let w = (0, X.useCallback)(
+    (e) => {
+      l && (l.startAskChat(e), l.opensAnnotationEditor || y(!0));
+    },
+    [l],
+  );
+  ft({ enabled: S, onClick: w, shortcutScopeElement: d });
+  let T = () => {
+      (_(``), y(!1), f?.());
+    },
+    E = (e, t) => {
+      l &&
+        g.trim() &&
+        (((t ? l.defaultSubmitMode !== `saved` : l.defaultSubmitMode === `saved`) &&
+          l.savedSubmitDisabled) ||
+          (l.submitAskChat(g, e, t), T()));
+    };
+  if (s) {
+    let n = i != null && o != null,
+      s = [
+        ...(l
+          ? [
+              {
+                kind: `button`,
+                id: `ask-chat`,
+                label: l?.askForEditLabel ?? `Ask for change`,
+                subLabel: (0, Z.jsx)(`span`, {
+                  className: `text-[11px] leading-none text-token-text-tertiary`,
+                  children: pt(),
+                }),
+                onClick: () => w(`ask_codex_button`),
+              },
+              ...(n || p ? [{ kind: `separator`, id: `ask-chat-separator` }] : []),
+            ]
+          : []),
+        ...(n
+          ? [
+              {
+                kind: `button`,
+                id: `bold`,
+                label: `Bold`,
+                icon: ge,
+                hideLabel: !0,
+                isActive: o.bold,
+                onClick: () => {
+                  a?.(`toggleRangeBold`, { rangeAddress: i, value: !o.bold });
+                },
+              },
+              {
+                kind: `popover`,
+                id: `text-color`,
+                label: `Text color`,
+                hideLabel: !0,
+                subLabel: (0, Z.jsx)(`span`, {
+                  "aria-hidden": !0,
+                  className: `block size-4 rounded-full border border-token-border-light`,
+                  style: { backgroundColor: o.fontColor },
+                }),
+                align: `center`,
+                content: (0, Z.jsx)(xr, {
+                  color: o.fontColor,
+                  label: `Text color`,
+                  onChange: (e) => {
+                    e != null && te(e);
+                  },
+                }),
+              },
+              {
+                kind: `popover`,
+                id: `text-size`,
+                label: `Text size`,
+                hideLabel: !0,
+                subLabel: (0, Z.jsx)(`span`, {
+                  "aria-hidden": !0,
+                  className: `text-sm font-medium text-token-text-primary`,
+                  children: o.fontSize,
+                }),
+                align: `center`,
+                content: (0, Z.jsx)(br, {
+                  fontSize: o.fontSize,
+                  onChange: (e) => {
+                    a?.(`applyRangeFontSize`, { rangeAddress: i, size: e });
+                  },
+                }),
+              },
+            ]
+          : []),
+        ...(p
+          ? [
+              ...(n ? [{ kind: `separator`, id: `style-picker-separator` }] : []),
+              {
+                kind: `button`,
+                id: `style-picker`,
+                label: `Open style picker`,
+                icon: he,
+                hideLabel: !0,
+                isActive: c,
+                onClick: p,
+              },
+            ]
+          : []),
+        ...(h
+          ? [
+              { kind: `separator`, id: `comment-separator` },
+              {
+                kind: `button`,
+                id: `comment`,
+                label: `Comment`,
+                icon: F,
+                hideLabel: !0,
+                onClick: h,
+              },
+            ]
+          : []),
+      ],
+      u = v
+        ? (0, Z.jsxs)(`form`, {
+            className: `flex h-full w-full items-center gap-2 px-1`,
+            onSubmit: (e) => {
+              (e.preventDefault(), e.stopPropagation(), E(`button`, !1));
+            },
+            onKeyDown: (e) => {
+              if ((e.stopPropagation(), e.key === `Enter` && !e.nativeEvent.isComposing)) {
+                (e.preventDefault(), E(`keyboard`, e.metaKey || e.ctrlKey));
+                return;
+              }
+              if (e.key !== `Escape`) return;
+              e.preventDefault();
+              let t = e.currentTarget.closest(`[role='toolbar']`);
+              ((0, Br.flushSync)(() => y(!1)),
+                t?.querySelector(`button[data-toolbar-action='ask-chat']`)?.focus());
+            },
+            children: [
+              (0, Z.jsx)(`input`, {
+                autoFocus: !0,
+                "aria-label": `Ask for change about this selection`,
+                className: `min-w-0 flex-1 bg-transparent text-sm text-token-text-primary outline-none placeholder:text-token-text-tertiary`,
+                placeholder: `Ask for change about this selection`,
+                value: g,
+                onChange: (e) => _(e.currentTarget.value),
+              }),
+              (0, Z.jsx)(`button`, {
+                type: `submit`,
+                "aria-label": `Send to Chat`,
+                disabled: !g.trim() || (l?.defaultSubmitMode === `saved` && l.savedSubmitDisabled),
+                className: `flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full bg-token-text-primary text-token-bg-primary transition-transform duration-100 hover:opacity-80 active:scale-95 disabled:cursor-not-allowed disabled:opacity-35 disabled:active:scale-100`,
+                children: (0, Z.jsx)(I, { className: `size-4` }),
+              }),
+            ],
+          })
+        : null;
+    return (0, Z.jsx)(Rr, {
+      ariaLabel: v ? `Ask for change` : `Selection actions`,
+      bounds: e,
+      zoom: t,
+      isVisible: r,
+      items: s,
+      overlayContent: u,
+      overlayVisible: v,
+      onKeyDown: (e) => {
+        e.key === `Escape` && (e.preventDefault(), e.stopPropagation(), T());
+      },
+    });
+  }
+  return (0, Z.jsx)(Rr, {
+    bounds: e,
+    zoom: t,
+    isVisible: r,
+    items: [
+      { kind: `button`, id: `text-style`, label: `Text styles`, icon: le },
+      {
+        kind: `button`,
+        id: `bold`,
+        label: `Bold`,
+        icon: ge,
+        hideLabel: !0,
+        onClick: () => {
+          i && a && a(`toggleRangeBold`, { rangeAddress: i });
+        },
+      },
+      {
+        kind: `button`,
+        id: `italic`,
+        label: `Italic`,
+        icon: N,
+        hideLabel: !0,
+        onClick: () => {
+          i && a && a(`toggleRangeItalic`, { rangeAddress: i });
+        },
+      },
+      { kind: `separator`, id: `text-separator` },
+      {
+        kind: `popover`,
+        id: `fill-color`,
+        label: `Fill color`,
+        icon: ue,
+        hideLabel: !0,
+        align: `center`,
+        content: (0, Z.jsxs)(`div`, {
+          "data-walnut-edit-popover": `true`,
+          className: `rounded-lg border border-token-border-light bg-white p-3 shadow-xl`,
+          children: [
+            (0, Z.jsx)(`p`, {
+              className: `mb-2 text-xs font-medium text-token-text-secondary`,
+              children: `Background color`,
+            }),
+            (0, Z.jsx)(`div`, {
+              className: `grid grid-cols-7 gap-1`,
+              children: x.map((e) =>
+                (0, Z.jsx)(
+                  n,
+                  {
+                    asChild: !0,
+                    children: (0, Z.jsx)(`button`, {
+                      type: `button`,
+                      className: `focus-visible:ring-token-focus h-5 w-5 rounded-[2px] border border-black/10 transition hover:scale-105 focus:outline-none focus-visible:ring-2`,
+                      style: { backgroundColor: e.hex },
+                      onClick: (t) => {
+                        (t.preventDefault(), t.stopPropagation(), ee(e.hex));
+                      },
+                      children: (0, Z.jsx)(`span`, { className: `sr-only`, children: e.label }),
+                    }),
+                  },
+                  e.key,
+                ),
+              ),
+            }),
+          ],
+        }),
+      },
+      {
+        kind: `popover`,
+        id: `text-color`,
+        label: `Text color`,
+        icon: he,
+        hideLabel: !0,
+        align: `center`,
+        content: (0, Z.jsxs)(`div`, {
+          "data-walnut-edit-popover": `true`,
+          className: `rounded-lg border border-token-border-light bg-white p-3 shadow-xl`,
+          children: [
+            (0, Z.jsx)(`p`, {
+              className: `mb-2 text-xs font-medium text-token-text-secondary`,
+              children: `Text color`,
+            }),
+            (0, Z.jsx)(`div`, {
+              className: `grid grid-cols-7 gap-1`,
+              children: x.map((e) =>
+                (0, Z.jsx)(
+                  n,
+                  {
+                    asChild: !0,
+                    children: (0, Z.jsx)(`button`, {
+                      type: `button`,
+                      className: `focus-visible:ring-token-focus h-5 w-5 rounded-[2px] border border-black/10 transition hover:scale-105 focus:outline-none focus-visible:ring-2`,
+                      style: { backgroundColor: e.hex },
+                      onClick: (t) => {
+                        (t.preventDefault(), t.stopPropagation(), te(e.hex));
+                      },
+                      children: (0, Z.jsx)(`span`, { className: `sr-only`, children: e.label }),
+                    }),
+                  },
+                  `text-${e.key}`,
+                ),
+              ),
+            }),
+          ],
+        }),
+      },
+      {
+        kind: `button`,
+        id: `borders`,
+        label: `Borders`,
+        icon: pe,
+        hideLabel: !0,
+        onClick: () => {
+          i && a && a(`applyRangeBorders`, { rangeAddress: i });
+        },
+      },
+      { kind: `separator`, id: `ask-separator` },
+      {
+        kind: `button`,
+        id: `ask`,
+        label: `Ask`,
+        subLabel: (0, Z.jsx)(`span`, {
+          className: `text-[11px] leading-none text-token-text-tertiary`,
+          children: `⌘I`,
+        }),
+        onClick: () => {
+          m?.();
+        },
+      },
+    ],
+  });
+}
+var X, Br, Z, Vr, Hr, Ur, Wr;
+function Gr() {
+  return (Gr = e(() => {
+    (v(),
+      o(),
+      _(),
+      (X = p()),
+      (Br = s()),
+      bt(),
+      Tr(),
+      Dr(),
+      Lr(),
+      P(),
+      (Z = a()),
+      (Vr = 12),
+      (Hr = () => () => {}),
+      (Ur = [`DesaturatedWarm`, `Purple`, `Red`, `Orange`, `Yellow`, `Green`, `Cyan`, `Blue`]),
+      (Wr = [700, 600, 500, 400, 300, 200, 100]));
+  }))();
+}
+function Kr(e, t, n) {
+  return t === void 0
+    ? e
+    : new Promise((r, i) => {
+        let a = setTimeout(() => i(Error(n)), Math.max(0, t));
+        e.then(
+          (e) => {
+            (clearTimeout(a), r(e));
+          },
+          (e) => {
+            (clearTimeout(a), i(e));
+          },
+        );
+      });
+}
+function qr(e) {
+  return (e ?? []).filter((e) => e.length > 0);
+}
+function Jr(e, t) {
+  let n = e.slice(t).filter((e) => e.length > 0);
+  return n.length === 0 ? null : n.length === 1 ? (n[0] ?? null) : j(n);
+}
+function Yr(e, t) {
+  if (e === t) return !0;
+  if (e.length !== t.length) return !1;
+  for (let n = 0; n < e.length; n += 1) if (e[n] !== t[n]) return !1;
+  return !0;
+}
+function Xr(e, t) {
+  if (e === t) return !0;
+  if (e.length !== t.length) return !1;
+  for (let n = 0; n < e.length; n += 1) {
+    let r = e[n],
+      i = t[n];
+    if (!r || !i || !Yr(r, i)) return !1;
+  }
+  return !0;
+}
+function Zr(e) {
+  let t = qr(e.externalCrdtUpdates);
+  return (
+    e.initialCrdtState && e.initialCrdtState.length > 0 && t.unshift(e.initialCrdtState),
+    t.length === 0 ? e.initialCrdtState : t.length === 1 ? t[0] : j(t)
+  );
+}
+function Qr(e) {
+  let t = qr(e.externalCrdtUpdates);
+  return {
+    initialCrdtState: Zr({ initialCrdtState: e.initialCrdtState, externalCrdtUpdates: t }),
+    bootstrappedExternalCrdtUpdates: t,
   };
 }
-function resolveSurfaceStyle(
-  theme: string,
-  baseTheme: Record<string, string> = {},
-): Record<string, string> {
-  return theme === "codex" ? CODEX_THEME : baseTheme;
+function $r(e) {
+  let t = qr(e.updates),
+    n = e.bootstrapState.bootstrappedExternalCrdtUpdates;
+  if (n.length === 0 || t.length < n.length) return t;
+  for (let e = 0; e < n.length; e += 1) {
+    let r = n[e],
+      i = t[e];
+    if (!r || !i || !Yr(r, i)) return t;
+  }
+  return t.slice(n.length);
 }
-
-function noopInitializer(): void {
-  initializeSurface();
+function ei(e, t) {
+  return e instanceof Error && e.message.trim().length > 0
+    ? e.message
+    : `Failed to restore external ${t.toLowerCase()} edits.`;
 }
-const AnnotationContext = {
-  Consumer: ({ children }: { children(value: undefined): unknown }) =>
-    children(undefined),
-  Provider: ({ children }: { children?: unknown }) => children,
-};
-const DEFAULT_DRAWING_COLOR = "#111111";
-
+function ti({ initialCrdtState: e, externalCrdtUpdates: t }) {
+  let n = (0, Q.useRef)(null);
+  n.current ??= Qr({ initialCrdtState: e, externalCrdtUpdates: t });
+  let r = n.current;
+  return {
+    initialCrdtState: r.initialCrdtState,
+    externalCrdtUpdates: $r({ bootstrapState: r, updates: t }),
+  };
+}
+function ni({
+  artifactLabel: e,
+  controller: t,
+  crdtDrainAttemptTimeoutMs: n,
+  crdtDrainMaxAttempts: r,
+  externalCrdtUpdates: i,
+  onCrdtDrain: a,
+  onCrdtDrainAttemptFailed: o,
+  onCrdtUpdate: s,
+}) {
+  let c = (0, Q.useRef)(0),
+    l = (0, Q.useRef)(i ?? []),
+    [u, d] = (0, Q.useState)(s == null),
+    [f, p] = (0, Q.useState)(null),
+    m = (0, Q.useRef)(a),
+    h = (0, Q.useRef)(o),
+    g = (0, Q.useRef)(s),
+    _ = s != null,
+    v = i ?? [];
+  Xr(l.current, v) || (l.current = v);
+  let y = l.current;
+  return (
+    (0, Q.useEffect)(() => {
+      ((m.current = a), (h.current = o), (g.current = s));
+    }, [a, o, s]),
+    (0, Q.useEffect)(() => {
+      if (!t || !_) {
+        d(!0);
+        return;
+      }
+      d(!1);
+      let i = !0,
+        a = null,
+        o = !1,
+        s = [],
+        c = null,
+        l = null,
+        u = (e) => {
+          g.current?.(e);
+        },
+        f = t.subscribeCrdtUpdates((e) => {
+          if (a == null) {
+            s.push(new Uint8Array(e));
+            return;
+          }
+          if (!o) {
+            (u(j([a, e])), (o = !0));
+            return;
+          }
+          u(e);
+        }),
+        p = (e) => {
+          ((a = new Uint8Array(e)),
+            s.length > 0 && (u(j([a, ...s])), (o = !0), (s.length = 0)),
+            i && d(!0));
+        },
+        v = () => {
+          c = t
+            .requestCrdtSnapshot()
+            .then(p)
+            .catch((e) => {
+              !i || e instanceof R || (l = setTimeout(v, ai));
+            });
+        };
+      return (
+        v(),
+        () => {
+          ((i = !1), l != null && clearTimeout(l));
+          let o = 0,
+            u = () => (
+              (o += 1),
+              Kr(
+                (async () => {
+                  let e = t.flushCrdtUpdates?.() ?? Promise.resolve();
+                  (await Promise.all([e, c ?? Promise.resolve()]),
+                    s.length > 0 && a == null && p(await t.requestCrdtSnapshot()),
+                    f());
+                })(),
+                n,
+                `${e} CRDT drain attempt timed out.`,
+              ).catch((e) => {
+                if ((h.current?.(), e instanceof R)) {
+                  f();
+                  return;
+                }
+                if (r !== void 0 && o >= Math.max(1, r)) throw (f(), e);
+                return new Promise((e) => {
+                  setTimeout(e, ai);
+                }).then(u);
+              })
+            ),
+            d = u();
+          (m.current?.(d), d.catch(() => void 0));
+        }
+      );
+    }, [e, t, n, r, _]),
+    (0, Q.useEffect)(() => {
+      if (!t) return;
+      let n = y;
+      if (n.length < c.current) {
+        ((c.current = n.length), p(null));
+        return;
+      }
+      if (n.length === c.current) {
+        p(null);
+        return;
+      }
+      let r = !1;
+      return (
+        (async () => {
+          let i = n.length - c.current;
+          p(i >= ii ? { kind: `restoring`, pendingUpdateCount: i } : null);
+          try {
+            let e = Jr(n, c.current);
+            if (r || (e && (await t.applyCrdtUpdate(e), r))) return;
+            ((c.current = n.length), p(null));
+          } catch (t) {
+            if (r) return;
+            p({ kind: `failed`, artifactLabel: e, errorMessage: ei(t, e), pendingUpdateCount: i });
+          }
+        })(),
+        () => {
+          r = !0;
+        }
+      );
+    }, [e, t, y]),
+    { crdtPublishingReady: u, restoreState: f }
+  );
+}
+function ri({ artifactLabel: e, restoreState: t }) {
+  return t
+    ? (0, $.jsx)(`div`, {
+        className: `absolute inset-0 z-10 flex items-end bg-token-bg-primary/35 p-3 backdrop-blur-[2px]`,
+        children: (0, $.jsx)(`div`, {
+          className: b(
+            `w-full rounded-xl border px-3 py-2 text-xs shadow-lg`,
+            t.kind === `failed`
+              ? `border-token-border-default bg-token-bg-primary text-token-editor-warning-foreground`
+              : `border-token-border-default bg-token-bg-primary text-token-text-secondary`,
+          ),
+          role: t.kind === `failed` ? `alert` : `status`,
+          children:
+            t.kind === `failed`
+              ? (0, $.jsxs)(`div`, {
+                  className: `flex flex-col gap-1`,
+                  children: [
+                    (0, $.jsxs)(`div`, {
+                      className: `font-medium text-token-text-primary`,
+                      children: [`Could not restore `, e.toLowerCase(), ` edits`],
+                    }),
+                    (0, $.jsxs)(`div`, {
+                      children: [
+                        t.errorMessage,
+                        ` Pending CRDT updates:`,
+                        ` `,
+                        t.pendingUpdateCount,
+                        `.`,
+                      ],
+                    }),
+                  ],
+                })
+              : (0, $.jsxs)(`div`, {
+                  className: `flex flex-col gap-1`,
+                  children: [
+                    (0, $.jsxs)(`div`, {
+                      className: `font-medium text-token-text-primary`,
+                      children: [`Restoring `, e.toLowerCase(), ` edits`],
+                    }),
+                    (0, $.jsxs)(`div`, {
+                      children: [
+                        `Compacting and applying `,
+                        t.pendingUpdateCount,
+                        ` CRDT updates.`,
+                      ],
+                    }),
+                  ],
+                }),
+        }),
+      })
+    : null;
+}
+var Q, $, ii, ai;
+function oi() {
+  return (oi = e(() => {
+    (_(), (Q = p()), M(), _e(), ($ = a()), (ii = 500), (ai = 250));
+  }))();
+}
+function si(e) {
+  return e === `codex` ? ci : xe(e);
+}
+var ci;
+function li() {
+  return (li = e(() => {
+    (Te(),
+      (ci = {
+        ...we,
+        "--color-token-main-surface-primary": `var(--color-surface)`,
+        "--color-token-side-bar-background": `var(--color-surface)`,
+        "--color-background-accent": `var(--color-background-info-soft)`,
+        "--color-background-accent-hover": `var(--color-background-info-soft)`,
+        "--color-background-accent-active": `var(--color-background-info-soft)`,
+        "--interactive-bg-secondary-hover": `var(--color-background-primary-ghost-hover)`,
+        "--interactive-bg-secondary-press": `var(--color-background-primary-ghost-active)`,
+        "--color-token-bg-primary": `var(--color-surface)`,
+        "--color-token-bg-secondary": `var(--color-surface-secondary)`,
+        "--color-token-bg-tertiary": `var(--color-surface-tertiary)`,
+        "--color-token-charts-blue": `var(--color-blue)`,
+        "--color-token-interactive-bg-secondary-hover": `var(--interactive-bg-secondary-hover)`,
+        "--color-token-interactive-bg-secondary-press": `var(--interactive-bg-secondary-press)`,
+        "--color-token-interactive-bg-secondary-selected": `var(--color-background-primary-soft-active)`,
+        "--color-token-interactive-bg-accent-muted-hover": `var(--color-background-info-soft)`,
+        "--color-token-interactive-bg-accent-muted-press": `var(--color-background-info-soft)`,
+        "--color-token-foreground": `var(--color-text)`,
+        "--color-token-description-foreground": `var(--color-text-tertiary)`,
+        "--color-token-interactive-label-secondary-default": `var(--color-token-text-primary)`,
+        "--color-token-interactive-label-accent-default": `var(--color-token-text-link-foreground)`,
+        "--color-token-focus-border": `var(--color-ring)`,
+        "--color-token-list-hover-background": `var(--color-background-primary-ghost-hover)`,
+        "--color-token-text-primary": `var(--color-text)`,
+        "--color-token-text-secondary": `var(--color-text-secondary)`,
+        "--color-token-text-tertiary": `var(--color-text-tertiary)`,
+        "--color-token-border-default": `var(--color-border)`,
+        "--color-token-border-light": `var(--color-border-subtle)`,
+      }));
+  }))();
+}
 export {
-  AnnotationMarker as $,
-  noopInitializer as A,
-  createDrawingId as B,
-  ActionMenu as C,
-  noopInitializer as D,
-  noopInitializer as E,
-  noopInitializer as F,
-  exportDrawingScreenshot as G,
-  DrawingOverlay as H,
-  AnnotationButton as I,
-  strokesBounds as J,
-  clampRect as K,
-  CommentsButton as L,
-  annotationTargetKey as M,
-  markerPosition as N,
-  avoidMarkerCollisions as O,
-  noopInitializer as P,
-  Highlight as Q,
-  DrawingButton as R,
-  noopInitializer as S,
-  ArtifactBadge as T,
-  noopInitializer as U,
-  noopInitializer as V,
-  DEFAULT_DRAWING_COLOR as W,
-  noopInitializer as X,
-  paddedRect as Y,
-  ModeButton as Z,
-  CommentThread as _,
-  bootstrapCrdtState as a,
-  annotationOrdinals as at,
-  noopInitializer as b,
-  CommentsSidebar as c,
-  horizontalSortingStrategy as ct,
-  ColorPicker as d,
-  useSortable as dt,
-  shortcutLabel as et,
-  FontSizePicker as f,
-  noopInitializer as g,
-  AnnotationContext as h,
-  noopInitializer as i,
-  noopInitializer as it,
-  PresenceMarker as j,
-  noopInitializer as k,
-  noopInitializer as l,
-  noopInitializer as lt,
-  colorsEqual as m,
-  noopInitializer as n,
-  noopInitializer as nt,
-  createCrdtBridge as o,
-  noopInitializer as ot,
-  noopInitializer as p,
-  drawingCommentPayload as q,
-  CrdtRestoreOverlay as r,
-  avoidMarkerCollisions as rt,
-  restoreErrorMessage as s,
-  SortableContext as st,
-  resolveSurfaceStyle as t,
-  markerPosition as tt,
-  COLORS as u,
-  rectSortingStrategy as ut,
-  noopInitializer as v,
-  noopInitializer as w,
-  CommentsSidebar as x,
-  PresenceMarker as y,
-  noopInitializer as z,
+  ct as $,
+  Gn as A,
+  Ft as B,
+  er as C,
+  Yn as D,
+  $n as E,
+  Yt as F,
+  Dt as G,
+  Mt as H,
+  zt as I,
+  Ct as J,
+  Tt as K,
+  Bt as L,
+  Hn as M,
+  kn as N,
+  qn as O,
+  An as P,
+  mt as Q,
+  Vt as R,
+  or as S,
+  Xn as T,
+  Pt as U,
+  Lt as V,
+  Ot as W,
+  kt as X,
+  wt as Y,
+  lt as Z,
+  mr as _,
+  ti as a,
+  rt as at,
+  pr as b,
+  zr as c,
+  Ge as ct,
+  xr as d,
+  He as dt,
+  pt as et,
+  br as f,
+  yr as g,
+  vr as h,
+  oi as i,
+  ft as it,
+  Nn as j,
+  Kn as k,
+  Gr as l,
+  tt as lt,
+  Sr as m,
+  li as n,
+  bt as nt,
+  ni as o,
+  it as ot,
+  Tr as p,
+  Et as q,
+  ri as r,
+  st as rt,
+  Rr as s,
+  Be as st,
+  si as t,
+  ot as tt,
+  Cr as u,
+  Ke as ut,
+  gr as v,
+  tr as w,
+  nr as x,
+  sr as y,
+  Wt as z,
 };
-
-initializeSurface();

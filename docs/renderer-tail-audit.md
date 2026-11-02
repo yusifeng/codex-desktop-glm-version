@@ -1,5 +1,16 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Onboarding/quick-chat/settings/preview release-owner recovery：一次性恢复
+`work-onboarding-suggestions`、`personal-finance-page`、`subscription-onboarding-content`、
+`gpt-builder-page`、`ad-control-dialog-runtime`、`quick-chat-window`、
+`popcorn-electron-surface-style`、`home-ambient-suggestions-content`、`settings`、
+`appgen-share-dialog`、`library-cloud-file-preview`、`pull-request-tab-content` 与
+`request-panel` 十三个发布 owner，约 3.6 万行，并将绑定旧 mock ABI 的测试改为发布一致性验证。
+整批通过 12,448/12,448 transform check、1,888/1,888 renderer build/verify、2,247/2,247
+app-code coverage、0 semantic tail 与 typecheck。严格 hub 消费推进到 app-shared 1,453/3,185、
+app-initial 4,623/8,204、app-primary 608/917，仍为 0 unreviewed、0 invalid consumers。
+该批仍不把 conversation-route 原始回退、main runtime 契约或真实 E2E 视为已经完成。
+
 2026-11-02 PR/Git/settings/browser release-owner recovery：一次性恢复
 `pull-request-code-review-core`、`pull-request-route`、`git-action-new-branch-field`、
 `git-branch-switcher`、`review-file-source-breadcrumb`、`cloud-environments-settings-page`、
