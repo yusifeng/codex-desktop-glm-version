@@ -4,8 +4,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-globalThis.__popcornBridgeTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "popcorn-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__popcornBridgeTest.jsx;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+globalThis.__popcornBridgeTest = {
+  jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } },
+  react: { useEffect(effect) { effect(); }, useRef(value) { return { current: value }; }, useState(initial) { let value = typeof initial === "function" ? initial() : initial; return [value, next => { value = typeof next === "function" ? next(value) : next; }]; } },
+};
+async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "popcorn-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__popcornBridgeTest.jsx;export const e6=()=>globalThis.__popcornBridgeTest.react;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
 function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(child => walk(child, visit)); else walk(children, visit); }
 function findAll(node, predicate) { const values = []; walk(node, value => { if (predicate(value)) values.push(value); }); return values; }
 function find(node, predicate) { return findAll(node, predicate)[0]; }
@@ -29,6 +32,7 @@ assert.equal(presentationController.getSelectedSlideIndex(), 0);
 assert.equal(presentationInteractions, 1);
 presentationController.setZoom(2);
 assert.equal(presentationInteractions, 2);
+assert.equal(presentationController.getZoom(), 2);
 assert.equal(findAll(presentationUi, node => node.type === "button").length, 2);
 
 // popcorn-workbook-panel: 13
@@ -41,7 +45,7 @@ assert.equal(workbookUi.props["data-editing"], false);
 assert.match(text(workbookUi), /Budget/);
 assert.match(text(workbookUi), /Revenue/);
 assert.match(text(workbookUi), /42/);
-assert.equal(find(workbookUi, node => node.props?.role === "toolbar").props.children, "B2");
+assert.equal(find(workbookUi, node => node.props?.role === "toolbar").props.children[0], "B2");
 assert.equal(workbookReady, 1);
 assert.equal(workbookController.getActiveSheetName(), "Summary");
 workbookController.setActiveSheetName("Data");
@@ -49,14 +53,16 @@ assert.equal(workbookController.getActiveSheetName(), "Data");
 workbookController.setSelectedAddress("C3");
 workbookController.setZoom(1.5);
 assert.equal(workbookInteractions, 3);
+assert.equal(workbookController.getSelectedAddress(), "C3");
+assert.equal(workbookController.getZoom(), 1.5);
 assert.equal(findAll(workbookUi, node => node.type === "button").length, 2);
 assert.equal(workbook.PopcornElectronWorkbookPanel({ toolbarHidden: true }).props.children[1], null);
 
 // popcorn-document-panel: 14
 const documentPanel = await bundle("popcorn-document-panel");
 assert.deepEqual(Object.keys(documentPanel), ["PopcornElectronDocumentPanel"]);
-let documentReady = 0, zoomControlValue;
-const documentUi = documentPanel.PopcornElectronDocumentPanel({ documentProtoVersion: 4, enablePageNavigation: true, initialZoom: 1.1, navigationTarget: { pageNumber: 2, requestId: "nav-1" }, onImportReady() { documentReady++; }, pages: [{ id: "p1", content: "First" }, { id: "p2", content: "Second" }], renderHeaderZoomControl(zoom) { zoomControlValue = zoom; return "Zoom"; }, title: "Proposal" });
+let documentReady = 0, documentController, documentInteractions = 0, zoomControlValue;
+const documentUi = documentPanel.PopcornElectronDocumentPanel({ documentProtoVersion: 4, enablePageNavigation: true, initialZoom: 1.1, navigationTarget: { pageNumber: 2, requestId: "nav-1" }, onControllerReady(controller) { documentController = controller; }, onImportReady() { documentReady++; }, onInteractionAttempt() { documentInteractions++; }, pages: [{ id: "p1", content: "First" }, { id: "p2", content: "Second" }], renderHeaderZoomControl(zoom) { zoomControlValue = zoom; return "Zoom"; }, title: "Proposal" });
 assert.equal(documentUi.props["data-testid"], "popcorn-electron-document-panel");
 assert.equal(documentUi.props["data-codex-popcorn-editor"], true);
 assert.match(text(documentUi), /Proposal/);
@@ -69,7 +75,17 @@ assert.equal(documentMain.props["data-zoom"], 1.1);
 assert.equal(find(documentUi, node => node.type === "article").props["data-page-id"], "p2");
 assert.equal(zoomControlValue, 1.1);
 assert.equal(documentReady, 1);
+assert.equal(documentController.getPageIndex(), 1);
+documentController.goToPage(0);
+documentController.setZoom(2);
+assert.equal(documentController.getPageIndex(), 0);
+assert.equal(documentController.getZoom(), 2);
+assert.equal(documentInteractions, 2);
 assert.match(text(documentPanel.PopcornElectronDocumentPanel({})), /Empty document/);
 assert.equal(documentPanel.PopcornElectronDocumentPanel({ renderLayout: ({ panel }) => ({ type: "layout", props: { children: panel } }) }).type, "layout");
 
-console.log("40 Popcorn editor bridge cluster assertions passed");
+let importError;
+workbook.PopcornElectronWorkbookPanel({ initialSourceBytes: new Uint8Array(), initialSourceFormat: "xlsx", onImportError(error) { importError = error; } });
+assert.match(importError.message, /empty/);
+
+console.log("48 Popcorn editor bridge cluster assertions passed");
