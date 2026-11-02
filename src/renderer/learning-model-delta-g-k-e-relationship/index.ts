@@ -1,81 +1,62 @@
-// Electrochemical relationship among standard cell potential, delta G, and equilibrium K.
-// Release chunk: app/webview/assets/model-f237c900e681.js.
-import "@rchunk/rolldown-runtime";
-
-interface ElectrochemicalValues {
-  standard_cell_potential_volts?: number | null; electrons_transferred?: number | null; temperature_kelvin?: number | null;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `DELTA_G_K_E_RELATIONSHIP`),
+      (n = `delta-g-k-e-relationship-v1`),
+      (r = {
+        standard_cell_potential_volts: { kind: `number`, defaultValue: 0.12, min: -0.3, max: 0.3 },
+        electrons_transferred: { kind: `integer`, defaultValue: 2, min: 1, max: 6 },
+        temperature_kelvin: { kind: `number`, defaultValue: 298.15, min: 250, max: 400 },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-interface ElectrochemicalManifest {
-  type: string; version: number; thumbnailAssetKey: string;
-  parameters: {
-    standard_cell_potential_volts: { kind: "number"; defaultValue: number; min: number; max: number };
-    electrons_transferred: { kind: "integer"; defaultValue: number; min: number; max: number };
-    temperature_kelvin: { kind: "number"; defaultValue: number; min: number; max: number };
-  };
+var o, s, c, l, u, d, f, p, m, h;
+function g() {
+  return (g = e(() => {
+    (a(),
+      (o = i.parameters),
+      (s = {
+        ...o.standard_cell_potential_volts,
+        step: 0.02,
+        variable: String.raw`E^\circ_{\mathrm{cell}}`,
+        unit: `V`,
+      }),
+      (c = { ...o.electrons_transferred, step: 1, variable: `n` }),
+      (l = o.temperature_kelvin),
+      (u = 96485.33212),
+      (d = 8.314462618),
+      (f = Math.LN10),
+      (p = (e, t, n, r) => (Number.isFinite(e) ? Math.min(r, Math.max(n, e)) : t)),
+      (m = (e) => ({
+        standard_cell_potential_volts: p(
+          e.standard_cell_potential_volts,
+          s.defaultValue,
+          s.min,
+          s.max,
+        ),
+        electrons_transferred: Math.round(p(e.electrons_transferred, c.defaultValue, c.min, c.max)),
+        temperature_kelvin: p(e.temperature_kelvin, l.defaultValue, l.min, l.max),
+      })),
+      (h = (e) => {
+        let t = m(e),
+          n = t.standard_cell_potential_volts,
+          r = t.electrons_transferred,
+          i = t.temperature_kelvin,
+          a = (-r * u * n) / 1e3,
+          o = (r * u * n) / (d * i),
+          s = o / f,
+          c = n > 0 ? `forward` : n < 0 ? `reverse` : `balanced`;
+        return {
+          ...t,
+          deltaGKilojoules: n === 0 ? 0 : a,
+          lnK: n === 0 ? 0 : o,
+          log10K: n === 0 ? 0 : s,
+          regime: c,
+        };
+      }));
+  }))();
 }
-
-let electrochemicalManifest: ElectrochemicalManifest;
-let standardPotentialControl: ElectrochemicalManifest["parameters"]["standard_cell_potential_volts"] & { step: number; variable: string; unit: string };
-let electronCountControl: ElectrochemicalManifest["parameters"]["electrons_transferred"] & { step: number; variable: string };
-let temperatureControl: ElectrochemicalManifest["parameters"]["temperature_kelvin"];
-let calculateElectrochemicalRelationship: (values: ElectrochemicalValues) => {
-  standard_cell_potential_volts: number; electrons_transferred: number; temperature_kelvin: number;
-  deltaGKilojoules: number; lnK: number; log10K: number; regime: "forward" | "reverse" | "balanced";
-};
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeElectrochemicalManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  electrochemicalManifest = {
-    type: "DELTA_G_K_E_RELATIONSHIP", version: 2, thumbnailAssetKey: "delta-g-k-e-relationship-v1",
-    parameters: {
-      standard_cell_potential_volts: { kind: "number", defaultValue: 0.12, min: -0.3, max: 0.3 },
-      electrons_transferred: { kind: "integer", defaultValue: 2, min: 1, max: 6 },
-      temperature_kelvin: { kind: "number", defaultValue: 298.15, min: 250, max: 400 },
-    },
-  };
-}
-
-function initializeElectrochemicalRelationshipModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializeElectrochemicalManifest();
-  const parameters = electrochemicalManifest.parameters;
-  standardPotentialControl = {
-    ...parameters.standard_cell_potential_volts, step: 0.02,
-    variable: String.raw`E^\circ_{\mathrm{cell}}`, unit: "V",
-  };
-  electronCountControl = { ...parameters.electrons_transferred, step: 1, variable: "n" };
-  temperatureControl = parameters.temperature_kelvin;
-  const faradayConstant = 96_485.33212;
-  const gasConstant = 8.314462618;
-  const normalizeFinite = (value: number | null | undefined, fallback: number, minimum: number, maximum: number): number =>
-    typeof value === "number" && Number.isFinite(value) ? Math.min(maximum, Math.max(minimum, value)) : fallback;
-  calculateElectrochemicalRelationship = values => {
-    const standardCellPotential = normalizeFinite(
-      values.standard_cell_potential_volts, standardPotentialControl.defaultValue, standardPotentialControl.min, standardPotentialControl.max,
-    );
-    const electronsTransferred = Math.round(normalizeFinite(
-      values.electrons_transferred, electronCountControl.defaultValue, electronCountControl.min, electronCountControl.max,
-    ));
-    const temperatureKelvin = normalizeFinite(
-      values.temperature_kelvin, temperatureControl.defaultValue, temperatureControl.min, temperatureControl.max,
-    );
-    const deltaGKilojoules = -electronsTransferred * faradayConstant * standardCellPotential / 1_000;
-    const lnK = electronsTransferred * faradayConstant * standardCellPotential / (gasConstant * temperatureKelvin);
-    const log10K = lnK / Math.LN10;
-    return {
-      standard_cell_potential_volts: standardCellPotential, electrons_transferred: electronsTransferred, temperature_kelvin: temperatureKelvin,
-      deltaGKilojoules: standardCellPotential === 0 ? 0 : deltaGKilojoules,
-      lnK: standardCellPotential === 0 ? 0 : lnK, log10K: standardCellPotential === 0 ? 0 : log10K,
-      regime: standardCellPotential > 0 ? "forward" : standardCellPotential < 0 ? "reverse" : "balanced",
-    };
-  };
-}
-
-export {
-  initializeElectrochemicalRelationshipModel as a, calculateElectrochemicalRelationship as i, standardPotentialControl as n,
-  initializeElectrochemicalManifest as o, temperatureControl as r, electrochemicalManifest as s, electronCountControl as t,
-};
+export { g as a, h as i, s as n, a as o, l as r, i as s, c as t };

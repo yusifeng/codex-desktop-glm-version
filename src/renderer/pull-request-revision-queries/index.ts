@@ -1,16 +1,9 @@
-import {
-  a as pullRequestRevisionDiffQuery,
-  i as pullRequestRevisionCapability,
-  n as initializePullRequestRevisionQueries,
-  r as pullRequestReviewSnapshotQuery,
-  t as createPullRequestRevisionFileLoader,
-} from "@rchunk/pull-request-revision-queries-core";
-
-initializePullRequestRevisionQueries();
-
+// @ts-nocheck
+import { a as e, i as t, n, r, t as i } from "@rchunk/pull-request-revision-queries-core";
+n();
 export {
-  createPullRequestRevisionFileLoader,
-  pullRequestReviewSnapshotQuery as pullRequestReviewSnapshotQuery$,
-  pullRequestRevisionCapability as pullRequestRevisionCapability$,
-  pullRequestRevisionDiffQuery as pullRequestRevisionDiffQuery$,
+  i as createPullRequestRevisionFileLoader,
+  r as pullRequestReviewSnapshotQuery$,
+  t as pullRequestRevisionCapability$,
+  e as pullRequestRevisionDiffQuery$,
 };

@@ -1,105 +1,104 @@
-// auth-handoff-page —— 浏览器认证回跳的成功、等待与重试共用视图。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as pageLayoutChunk from "@rchunk/page-layout";
-void runtimeChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  I3: getJsxRuntime,
-  K2: initializeSharedUi,
-  Y2: FormattedMessage,
-  Yh: Button,
-  Zh: initializeButton,
-} = appSharedChunk;
-const { n: initializePageLayout, t: PageLayout } = pageLayoutChunk;
-
-export type AuthHandoffResult = { ok: true; url: string } | { ok: false };
-
-interface AuthHandoffPageProps {
-  onRetry(): void;
-  pending: boolean;
-  result?: AuthHandoffResult;
-}
-
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function AuthHandoffPage({
-  result,
-  pending,
-  onRetry,
-}: AuthHandoffPageProps): unknown {
-  const title = jsx.jsx(FormattedMessage, {
-    id: "browser.auth.handoff.title",
-    defaultMessage: "Continue to sign in",
-    description:
-      "Heading while automatically continuing an authentication flow",
-  });
-  const success = result?.ok
-    ? jsx.jsx("a", {
-        ref: (element: unknown) => {
-          if (element) window.location.replace(result.url);
-        },
-        href: result.url,
-        children: jsx.jsx(FormattedMessage, {
-          id: "browser.auth.handoff.continue",
-          defaultMessage: "Continue",
-          description:
-            "Fallback link to continue authentication if automatic navigation did not occur",
-        }),
-      })
-    : null;
-  const status =
-    !result?.ok && pending
-      ? jsx.jsx("p", {
-          role: "status",
-          children: jsx.jsx(FormattedMessage, {
-            id: "browser.auth.login.pending",
-            defaultMessage: "Connecting…",
-            description:
-              "Label while the ChatGPT browser login page waits for the selected authentication provider",
-          }),
-        })
-      : null;
-  const failure =
-    !result?.ok && !pending
-      ? jsx.jsxs(jsx.Fragment, {
-          children: [
-            jsx.jsx("p", {
-              role: "alert",
-              className: "text-sm text-danger",
-              children: jsx.jsx(FormattedMessage, {
-                id: "browser.auth.handoff.failed",
-                defaultMessage: "We couldn’t sign you in. Please try again",
-                description:
-                  "Error after an automatic authentication handoff fails; the user can retry the same handoff",
-              }),
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i, Yh as a, Zh as o } from "@rchunk/app-shared";
+import { n as s, t as c } from "@rchunk/page-layout";
+function l(e) {
+  let t = (0, u.c)(14),
+    { result: n, pending: r, onRetry: o } = e,
+    s;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((s = (0, d.jsx)(i, {
+        id: `browser.auth.handoff.title`,
+        defaultMessage: `Continue to sign in`,
+        description: `Heading while automatically continuing an authentication flow`,
+      })),
+      (t[0] = s))
+    : (s = t[0]);
+  let l;
+  t[1] === n
+    ? (l = t[2])
+    : ((l = n?.ok
+        ? (0, d.jsx)(`a`, {
+            ref: (e) => {
+              e && window.location.replace(n.url);
+            },
+            href: n.url,
+            children: (0, d.jsx)(i, {
+              id: `browser.auth.handoff.continue`,
+              defaultMessage: `Continue`,
+              description: `Fallback link to continue authentication if automatic navigation did not occur`,
             }),
-            jsx.jsx(Button, {
-              type: "button",
-              color: "primary",
-              size: "auth",
-              onClick: onRetry,
-              children: jsx.jsx(FormattedMessage, {
-                id: "browser.auth.handoff.retry",
-                defaultMessage: "Try again",
-                description:
-                  "Button to retry the same authentication handoff after it fails",
+          })
+        : null),
+      (t[1] = n),
+      (t[2] = l));
+  let f;
+  t[3] !== r || t[4] !== n?.ok
+    ? ((f =
+        !n?.ok && r
+          ? (0, d.jsx)(`p`, {
+              role: `status`,
+              children: (0, d.jsx)(i, {
+                id: `browser.auth.login.pending`,
+                defaultMessage: `Connecting…`,
+                description: `Label while the ChatGPT browser login page waits for the selected authentication provider`,
               }),
-            }),
-          ],
-        })
-      : null;
-  return jsx.jsxs(PageLayout, { title, children: [success, status, failure] });
+            })
+          : null),
+      (t[3] = r),
+      (t[4] = n?.ok),
+      (t[5] = f))
+    : (f = t[5]);
+  let p;
+  t[6] !== o || t[7] !== r || t[8] !== n?.ok
+    ? ((p =
+        !n?.ok && !r
+          ? (0, d.jsxs)(d.Fragment, {
+              children: [
+                (0, d.jsx)(`p`, {
+                  role: `alert`,
+                  className: `text-sm text-danger`,
+                  children: (0, d.jsx)(i, {
+                    id: `browser.auth.handoff.failed`,
+                    defaultMessage: `We couldn’t sign you in. Please try again`,
+                    description: `Error after an automatic authentication handoff fails; the user can retry the same handoff`,
+                  }),
+                }),
+                (0, d.jsx)(a, {
+                  type: `button`,
+                  color: `primary`,
+                  size: `auth`,
+                  onClick: o,
+                  children: (0, d.jsx)(i, {
+                    id: `browser.auth.handoff.retry`,
+                    defaultMessage: `Try again`,
+                    description: `Button to retry the same authentication handoff after it fails`,
+                  }),
+                }),
+              ],
+            })
+          : null),
+      (t[6] = o),
+      (t[7] = r),
+      (t[8] = n?.ok),
+      (t[9] = p))
+    : (p = t[9]);
+  let m;
+  return (
+    t[10] !== l || t[11] !== f || t[12] !== p
+      ? ((m = (0, d.jsxs)(c, { title: s, children: [l, f, p] })),
+        (t[10] = l),
+        (t[11] = f),
+        (t[12] = p),
+        (t[13] = m))
+      : (m = t[13]),
+    m
+  );
 }
-
-function initializeAuthHandoffPage(): void {
-  initializeRuntimeLazy();
-  initializeSharedUi();
-  initializeButton();
-  initializePageLayout();
-  jsx = getJsxRuntime();
+var u, d;
+function f() {
+  return (f = e(() => {
+    ((u = t()), r(), o(), s(), (d = n()));
+  }))();
 }
-
-initializeAuthHandoffPage();
-export { initializeAuthHandoffPage as n, AuthHandoffPage as t };
+export { f as n, l as t };

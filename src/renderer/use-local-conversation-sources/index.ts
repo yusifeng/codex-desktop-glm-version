@@ -1,184 +1,88 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as getCompilerRuntime,
-  BX as useSignalFamilyValue,
-  FX as initializeSignalRuntime,
-  HX as useSignalValue,
-  K2 as initializeInternationalization,
-  hq as isWebMcpServer,
-  n4 as useCurrentAccount,
-  wL as initializeUtilities,
-  zX as useScopedSignalValue,
+  $3 as t,
+  BX as n,
+  FX as r,
+  HX as i,
+  K2 as a,
+  hq as o,
+  n4 as s,
+  wL as c,
+  zX as l,
 } from "@rchunk/app-shared";
 import {
-  $sn as initializeExternalResources,
-  GEt as useExternalSourceProviders,
-  HEt as initializeExternalSourceProviderQuery,
-  ecn as externalSourceMetadata,
-  ict as initializeConversationNavigation,
-  uct as includeInternalSourcesSignal,
+  $sn as u,
+  GEt as d,
+  HEt as f,
+  ecn as p,
+  ict as m,
+  uct as h,
 } from "@rchunk/app-initial";
+import { a as g, n as _, r as v } from "@rchunk/local-conversation-external-resources";
+import { i as y, n as b, t as x } from "@rchunk/local-conversation-sources-signals";
+import { i as S, n as C } from "@rchunk/local-conversation-webmcp-tools-model";
 import {
-  a as isVisibleExternalSource,
-  n as mergeExternalSources,
-  r as initializeLocalConversationExternalResources,
-} from "@rchunk/local-conversation-external-resources";
-import {
-  i as sourceLinksByThread,
-  n as initializeLocalConversationSourcesSignals,
-  t as allConversationTurnsForSources,
-} from "@rchunk/local-conversation-sources-signals";
-import {
-  i as initializeLocalConversationWebMcpToolsModel,
-  n as collectCompletedWebMcpCalls,
-} from "@rchunk/local-conversation-webmcp-tools-model";
-import {
-  a as initializeSummaryPanelSourcesModel,
-  i as buildExternalAndWebSearchSources,
-  n as buildToolSources,
-  r as getWebSearchSource,
-  t as getFileSources,
+  a as w,
+  i as T,
+  n as E,
+  r as D,
+  t as O,
 } from "@rchunk/local-conversation-summary-panel-sources-model";
-
-export interface LocalConversationSourcesResult {
-  externalSources: Array<Record<string, unknown>>;
-  fileSources: unknown[];
-  toolSources: unknown[];
-  webMcpCalls: unknown[];
-  webSearchSource: unknown;
+function k(e, t) {
+  let r = (0, N.c)(13),
+    a = s(),
+    o;
+  r[0] !== e || r[1] !== t
+    ? ((o = e == null ? null : { hostId: t, threadId: e }), (r[0] = e), (r[1] = t), (r[2] = o))
+    : (o = r[2]);
+  let c = l(y, o),
+    u = i(null) === !0,
+    f = n(x, e) ?? [],
+    m = i(h),
+    v = f.some(j),
+    { data: b } = d({ enabled: v, hostId: t }),
+    S = b === void 0 ? [] : b,
+    { data: w } = n(p, t, { enabled: v }),
+    { externalSources: k, webSearchSource: M } = T(_(f, S, u, c).filter(g), D(f)),
+    P = E(f, S, a, m, w, new Set(k.flatMap(A)), u),
+    F;
+  r[3] === f ? (F = r[4]) : ((F = O(f)), (r[3] = f), (r[4] = F));
+  let I;
+  r[5] === f ? (I = r[6]) : ((I = C(f)), (r[5] = f), (r[6] = I));
+  let L;
+  return (
+    r[7] !== k || r[8] !== F || r[9] !== I || r[10] !== P || r[11] !== M
+      ? ((L = {
+          externalSources: k,
+          fileSources: F,
+          toolSources: P,
+          webMcpCalls: I,
+          webSearchSource: M,
+        }),
+        (r[7] = k),
+        (r[8] = F),
+        (r[9] = I),
+        (r[10] = P),
+        (r[11] = M),
+        (r[12] = L))
+      : (L = r[12]),
+    L
+  );
 }
-
-interface CompilerRuntime {
-  c(size: number): unknown[];
+function A(e) {
+  return e.provider == null ? [] : [e.provider.id];
 }
-
-let compilerRuntime: CompilerRuntime;
-
-function getProviderIds(source: Record<string, unknown>): string[] {
-  const provider = source.provider as { id?: string } | null | undefined;
-  return provider == null ? [] : [provider.id as string];
+function j(e) {
+  return e.items.some(M);
 }
-
-function turnUsesNonWebMcp(turn: { items: unknown[] }): boolean {
-  return turn.items.some((item) => {
-    const candidate = item as { server?: unknown; type?: string };
-    return candidate.type === "mcpToolCall" && !isWebMcpServer(candidate.server);
-  });
+function M(e) {
+  return e.type === `mcpToolCall` && !o(e.server);
 }
-
-function useLocalConversationSources(
-  conversationId: string | null,
-  hostId: string,
-): LocalConversationSourcesResult {
-  const cache = compilerRuntime.c(13);
-  const readSignalFamily = useSignalFamilyValue as unknown as (
-    signal: unknown,
-    parameter: unknown,
-    options?: Record<string, unknown>,
-  ) => unknown;
-  const readScopedSignal = useScopedSignalValue as unknown as (
-    signal: unknown,
-    parameter: unknown,
-  ) => unknown;
-  const account = useCurrentAccount();
-  let sourceOwner: { hostId: string; threadId: string } | null;
-  if (cache[0] !== conversationId || cache[1] !== hostId) {
-    sourceOwner = conversationId == null ? null : { hostId, threadId: conversationId };
-    cache[0] = conversationId;
-    cache[1] = hostId;
-    cache[2] = sourceOwner;
-  } else {
-    sourceOwner = cache[2] as typeof sourceOwner;
-  }
-  const sourceLinks = readScopedSignal(sourceLinksByThread, sourceOwner);
-  const includeInternalSources = useSignalValue(includeInternalSourcesSignal) === true;
-  const turns =
-    (readSignalFamily(allConversationTurnsForSources, conversationId) as unknown as Array<{
-      items: unknown[];
-    }> | null) ?? [];
-  const sourceMetadata = useSignalValue(externalSourceMetadata);
-  const needsProviders = turns.some(turnUsesNonWebMcp);
-  const providerQuery = useExternalSourceProviders({ enabled: needsProviders, hostId }) as {
-    data?: unknown[];
-  };
-  const providers = providerQuery.data ?? [];
-  const metadataQuery = readSignalFamily(externalSourceMetadata, hostId, {
-    enabled: needsProviders,
-  }) as { data?: unknown };
-  const { externalSources, webSearchSource } = buildExternalAndWebSearchSources(
-    (mergeExternalSources(turns, providers, includeInternalSources, sourceLinks) as Array<
-      Record<string, unknown>
-    >).filter(isVisibleExternalSource),
-    getWebSearchSource(turns),
-  ) as {
-    externalSources: Array<Record<string, unknown>>;
-    webSearchSource: unknown;
-  };
-  const toolSources = buildToolSources(
-    turns,
-    providers,
-    account,
-    sourceMetadata,
-    metadataQuery.data,
-    new Set(externalSources.flatMap(getProviderIds)),
-    includeInternalSources,
-  ) as unknown[];
-
-  let fileSources: unknown[];
-  if (cache[3] === turns) {
-    fileSources = cache[4] as unknown[];
-  } else {
-    fileSources = getFileSources(turns) as unknown[];
-    cache[3] = turns;
-    cache[4] = fileSources;
-  }
-  let webMcpCalls: unknown[];
-  if (cache[5] === turns) {
-    webMcpCalls = cache[6] as unknown[];
-  } else {
-    webMcpCalls = collectCompletedWebMcpCalls(turns);
-    cache[5] = turns;
-    cache[6] = webMcpCalls;
-  }
-  let result: LocalConversationSourcesResult;
-  if (
-    cache[7] !== externalSources ||
-    cache[8] !== fileSources ||
-    cache[9] !== webMcpCalls ||
-    cache[10] !== toolSources ||
-    cache[11] !== webSearchSource
-  ) {
-    result = {
-      externalSources,
-      fileSources,
-      toolSources,
-      webMcpCalls,
-      webSearchSource,
-    };
-    cache[7] = externalSources;
-    cache[8] = fileSources;
-    cache[9] = webMcpCalls;
-    cache[10] = toolSources;
-    cache[11] = webSearchSource;
-    cache[12] = result;
-  } else {
-    result = cache[12] as LocalConversationSourcesResult;
-  }
-  return result;
+var N;
+function P() {
+  return (P = e(() => {
+    ((N = t()), r(), c(), a(), m(), f(), u(), v(), b(), w(), S());
+  }))();
 }
-
-function initializeUseLocalConversationSources(): void {
-  compilerRuntime = getCompilerRuntime() as unknown as CompilerRuntime;
-  initializeSignalRuntime();
-  initializeUtilities();
-  initializeInternationalization();
-  initializeConversationNavigation();
-  initializeExternalSourceProviderQuery();
-  initializeExternalResources();
-  initializeLocalConversationExternalResources();
-  initializeLocalConversationSourcesSignals();
-  initializeLocalConversationWebMcpToolsModel();
-  initializeSummaryPanelSourcesModel();
-}
-
-export { useLocalConversationSources as n, initializeUseLocalConversationSources as t };
+export { k as n, P as t };

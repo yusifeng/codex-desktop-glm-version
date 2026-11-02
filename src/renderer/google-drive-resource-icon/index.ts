@@ -1,65 +1,54 @@
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-const { $3: getCompilerRuntime, I3: getJsxRuntime } = appSharedChunk;
-const {
-  D3t: initializeDocumentIcon,
-  E3t: SpreadsheetIcon,
-  O3t: DocumentIcon,
-  T3t: initializePresentationIcon,
-  f3t: DriveIcon,
-  k3t: initializeSpreadsheetIcon,
-  p3t: initializeDriveIcon,
-  w3t: PresentationIcon,
-} = appInitialChunk;
-let jsx: JsxRuntime;
-interface CompilerRuntime {
-  c(size: number): unknown[];
-}
-let compilerRuntime: CompilerRuntime;
-
-function GoogleDriveResourceIcon({
-  className,
-  resourceKind,
-}: {
-  className?: string;
-  resourceKind: "document" | "drive" | "presentation" | "spreadsheet";
-}): unknown {
-  initializeGoogleDriveResourceIcon();
-  const cache = compilerRuntime.c(8);
-  const renderCached = (
-    offset: number,
-    component: unknown,
-  ): unknown => {
-    if (cache[offset] !== className) {
-      cache[offset] = className;
-      cache[offset + 1] = jsx.jsx(component, { className });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n } from "@rchunk/app-shared";
+import {
+  D3t as r,
+  E3t as i,
+  O3t as a,
+  T3t as o,
+  f3t as s,
+  k3t as c,
+  p3t as l,
+  w3t as u,
+} from "@rchunk/app-initial";
+function d(e) {
+  let t = (0, f.c)(8),
+    { className: n, resourceKind: r } = e;
+  switch (r) {
+    case `document`: {
+      let e;
+      return (
+        t[0] === n ? (e = t[1]) : ((e = (0, p.jsx)(a, { className: n })), (t[0] = n), (t[1] = e)),
+        e
+      );
     }
-    return cache[offset + 1];
-  };
-  switch (resourceKind) {
-    case "document":
-      return renderCached(0, DocumentIcon);
-    case "spreadsheet":
-      return renderCached(2, SpreadsheetIcon);
-    case "presentation":
-      return renderCached(4, PresentationIcon);
-    case "drive":
-      return renderCached(6, DriveIcon);
+    case `spreadsheet`: {
+      let e;
+      return (
+        t[2] === n ? (e = t[3]) : ((e = (0, p.jsx)(i, { className: n })), (t[2] = n), (t[3] = e)),
+        e
+      );
+    }
+    case `presentation`: {
+      let e;
+      return (
+        t[4] === n ? (e = t[5]) : ((e = (0, p.jsx)(u, { className: n })), (t[4] = n), (t[5] = e)),
+        e
+      );
+    }
+    case `drive`: {
+      let e;
+      return (
+        t[6] === n ? (e = t[7]) : ((e = (0, p.jsx)(s, { className: n })), (t[6] = n), (t[7] = e)),
+        e
+      );
+    }
   }
 }
-
-let initialized = false;
-function initializeGoogleDriveResourceIcon(): void {
-  if (initialized) return;
-  compilerRuntime = getCompilerRuntime() as unknown as CompilerRuntime;
-  initializeSpreadsheetIcon();
-  initializeDocumentIcon();
-  initializePresentationIcon();
-  initializeDriveIcon();
-  jsx = getJsxRuntime();
-  initialized = true;
+var f, p;
+function m() {
+  return (m = e(() => {
+    ((f = t()), c(), r(), o(), l(), (p = n()));
+  }))();
 }
-export { initializeGoogleDriveResourceIcon as n, GoogleDriveResourceIcon as t };
+export { m as n, d as t };

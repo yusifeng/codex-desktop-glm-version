@@ -1,18 +1,17 @@
-// Solution-dilution learning-model manifest. Release chunk: type-b20da9986277.js.
-import "@rchunk/rolldown-runtime";
-
-const solutionDilutionSpecification = {
-  type: "SOLUTION_DILUTION",
-  version: 1,
-  thumbnailAssetKey: "solution-dilution-v2",
-  canonicalFormula: "M_1V_1=M_2V_2",
-  parameters: {
-    initialConcentrationMolesPerLiter: { kind: "number" as const, defaultValue: 1.5, min: 0.1, max: 3 },
-    initialVolumeLiters: { kind: "number" as const, defaultValue: 2, min: 0.5, max: 5 },
-    waterAddedLiters: { kind: "number" as const, defaultValue: 3, min: 0, max: 5 },
-  },
-};
-
-function initializeSolutionDilutionSpecification(): void {}
-
-export { solutionDilutionSpecification as n, initializeSolutionDilutionSpecification as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `SOLUTION_DILUTION`),
+      (n = `solution-dilution-v2`),
+      (r = `M_1V_1=M_2V_2`),
+      (i = {
+        initialConcentrationMolesPerLiter: { kind: `number`, defaultValue: 1.5, min: 0.1, max: 3 },
+        initialVolumeLiters: { kind: `number`, defaultValue: 2, min: 0.5, max: 5 },
+        waterAddedLiters: { kind: `number`, defaultValue: 3, min: 0, max: 5 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+export { a as n, o as t };

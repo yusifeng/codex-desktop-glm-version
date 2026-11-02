@@ -1,262 +1,255 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeCompilerRuntime,
-  Bk as appgenInteractionActions,
-  Eu as initializeComposerEditorState,
-  FX as initializeMaitai,
-  Hk as appgenInteractionSources,
-  I3 as getJsxRuntime,
-  LX as getScopeApi,
-  QI as initializeScope,
-  ZI as appScope,
-  e6 as getReactRuntime,
-  wu as composerMentionState,
+  $3 as t,
+  Bk as n,
+  Eu as r,
+  FX as i,
+  Hk as a,
+  I3 as o,
+  LX as ee,
+  QI as s,
+  ZI as te,
+  e6 as c,
+  wu as l,
 } from "@rchunk/app-shared";
-import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
 import {
-  HZ as useComposerEditor,
-  Man as initializeComposerSearch,
-  Nan as initializeAppgenAnalytics,
-  Pan as logAppgenInteraction,
-  UZ as useEditorSelector,
-  VZ as initializeEditorSelector,
-  jan as sitesPluginId,
+  HZ as u,
+  Man as d,
+  Nan as f,
+  Pan as ne,
+  UZ as re,
+  VZ as p,
+  jan as m,
 } from "@rchunk/app-initial";
 import {
-  Al as initializeMentionRanking,
-  Gl as isSpecializedMentionSource,
-  Hl as mergeMentionSections,
-  Sl as useThreadMentionSource,
-  Ul as initializeMentionSources,
-  Wl as initializeMentionList,
-  bl as initializeMentionSearch,
-  jl as useMentionSections,
-  vl as SpecializedComposerAtMentionList,
-  xl as initializeThreadMentionSource,
-  yl as ComposerAtMentionList,
+  Al as h,
+  Gl as g,
+  Hl as _,
+  Sl as v,
+  Ul as y,
+  Wl as b,
+  bl as x,
+  jl as ie,
+  vl as S,
+  xl as C,
+  yl as ae,
 } from "@rchunk/app-primary";
-
-interface MentionItem {
-  key: string;
-  searchTerms?: string[] | null;
-  [key: string]: unknown;
-}
-interface MentionSection {
-  items: MentionItem[];
-  [key: string]: unknown;
-}
-interface MentionSectionsResult {
-  sections: MentionSection[];
-}
-interface PrimaryComposerAtMentionListProps extends Record<string, unknown> {
-  backgroundAgents?: unknown[];
-  className?: string;
-  chromeVariant?: string;
-  excludedAgentConversationIds?: string[];
-  excludedThreadReferences?: unknown[];
-  fileSearchRootPaths?: string[];
-  hostId?: string;
-  isHomeMenu?: boolean;
-  keyboardEventTarget?: unknown;
-  leadingItems?: MentionItem[];
-  onAddContext?(context: unknown): void;
-  onRequestClose?(): void;
-  onUpdateSelectedMention?(mention: unknown): void;
-  placement?: string;
-  pluginHostId?: string;
-  query?: string;
-  rankingContext?: unknown;
-  selectedModel?: unknown;
-  skillRoots?: string[];
-  source?: unknown;
-  threadSearchRoots?: string[];
-  typedSitesMentionRef?: { current: number | null };
-}
-
-const once = onceExport as (initializer: () => void) => () => void;
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-
-function itemIsSitesMention({ key, searchTerms }: MentionItem): boolean {
+function w(e) {
+  let t = (0, k.c)(10),
+    n,
+    r,
+    i;
+  if (
+    (t[0] === e
+      ? ((n = t[1]), (r = t[2]), (i = t[3]))
+      : (({ source: n, typedSitesMentionRef: i, ...r } = e),
+        (t[0] = e),
+        (t[1] = n),
+        (t[2] = r),
+        (t[3] = i)),
+    g(n))
+  ) {
+    let e;
+    return (
+      t[4] !== n || t[5] !== r
+        ? ((e = (0, j.jsx)(S, { ...r, source: n })), (t[4] = n), (t[5] = r), (t[6] = e))
+        : (e = t[6]),
+      e
+    );
+  }
+  let a;
   return (
-    key.startsWith("site:") ||
-    key === `plugin:plugin://${sitesPluginId}` ||
-    (key.startsWith("app:") &&
-      searchTerms?.some((term) => term.trim().toLowerCase() === "sites") ===
-        true)
+    t[7] !== r || t[8] !== i
+      ? ((a = (0, j.jsx)(T, { ...r, typedSitesMentionRef: i })), (t[7] = r), (t[8] = i), (t[9] = a))
+      : (a = t[9]),
+    a
   );
 }
-
-function sectionHasSitesMention(section: MentionSection): boolean {
-  return section.items.some(itemIsSitesMention);
+function T(e) {
+  let t = (0, k.c)(43),
+    {
+      backgroundAgents: r,
+      className: i,
+      chromeVariant: o,
+      excludedAgentConversationIds: s,
+      excludedThreadReferences: c,
+      hostId: l,
+      isHomeMenu: d,
+      keyboardEventTarget: f,
+      leadingItems: p,
+      pluginHostId: m,
+      onAddContext: h,
+      onRequestClose: g,
+      onUpdateSelectedMention: y,
+      placement: b,
+      query: x,
+      rankingContext: S,
+      fileSearchRootPaths: C,
+      selectedModel: w,
+      skillRoots: T,
+      threadSearchRoots: E,
+      typedSitesMentionRef: D,
+    } = e,
+    M;
+  t[0] === r ? (M = t[1]) : ((M = r === void 0 ? [] : r), (t[0] = r), (t[1] = M));
+  let N = M,
+    P = o === void 0 ? `default` : o,
+    F;
+  t[2] === s ? (F = t[3]) : ((F = s === void 0 ? [] : s), (t[2] = s), (t[3] = F));
+  let I = F,
+    L;
+  t[4] === c ? (L = t[5]) : ((L = c === void 0 ? [] : c), (t[4] = c), (t[5] = L));
+  let R = L,
+    z = d !== void 0 && d,
+    se = p === void 0 ? [] : p,
+    B = b === void 0 ? `top` : b,
+    V = ee(te),
+    ce = u(),
+    H = re(ce, O),
+    U = (0, A.useRef)(null),
+    W;
+  t[6] !== R || t[7] !== l || t[8] !== x || t[9] !== E
+    ? ((W = { excludedThreadReferences: R, hostId: l, query: x, roots: E }),
+      (t[6] = R),
+      (t[7] = l),
+      (t[8] = x),
+      (t[9] = E),
+      (t[10] = W))
+    : (W = t[10]);
+  let G = v(W),
+    K;
+  t[11] !== N ||
+  t[12] !== I ||
+  t[13] !== C ||
+  t[14] !== l ||
+  t[15] !== m ||
+  t[16] !== x ||
+  t[17] !== w ||
+  t[18] !== T ||
+  t[19] !== G
+    ? ((K = {
+        backgroundAgents: N,
+        excludedAgentConversationIds: I,
+        hostId: l,
+        pluginHostId: m,
+        query: x,
+        roots: C,
+        selectedModel: w,
+        skillRoots: T,
+        threadSource: G,
+      }),
+      (t[11] = N),
+      (t[12] = I),
+      (t[13] = C),
+      (t[14] = l),
+      (t[15] = m),
+      (t[16] = x),
+      (t[17] = w),
+      (t[18] = T),
+      (t[19] = G),
+      (t[20] = K))
+    : (K = t[20]);
+  let { sections: le } = ie(K),
+    q = _(le, x, se, !1, S),
+    J = q.some(oe),
+    Y;
+  t[21] === V
+    ? (Y = t[22])
+    : ((Y = () => {
+        ne(V, {
+          action: n.CODEX_APPGEN_INTERACTION_ACTION_MENTION_SUGGESTIONS_LOADED,
+          source: a.CODEX_APPGEN_INTERACTION_SOURCE_AT_MENTION,
+        });
+      }),
+      (t[21] = V),
+      (t[22] = Y));
+  let X = (0, A.useEffectEvent)(Y),
+    Z;
+  t[23] !== J || t[24] !== X || t[25] !== H || t[26] !== D
+    ? ((Z = () => {
+        if (H == null || D?.current !== H) {
+          U.current = null;
+          return;
+        }
+        J && U.current !== H && ((U.current = H), X());
+      }),
+      (t[23] = J),
+      (t[24] = X),
+      (t[25] = H),
+      (t[26] = D),
+      (t[27] = Z))
+    : (Z = t[27]);
+  let Q;
+  (t[28] !== J || t[29] !== H || t[30] !== D
+    ? ((Q = [J, H, D]), (t[28] = J), (t[29] = H), (t[30] = D), (t[31] = Q))
+    : (Q = t[31]),
+    (0, A.useEffect)(Z, Q));
+  let $;
+  return (
+    t[32] !== P ||
+    t[33] !== i ||
+    t[34] !== z ||
+    t[35] !== f ||
+    t[36] !== h ||
+    t[37] !== g ||
+    t[38] !== y ||
+    t[39] !== B ||
+    t[40] !== x ||
+    t[41] !== q
+      ? (($ = (0, j.jsx)(ae, {
+          className: i,
+          chromeVariant: P,
+          isHomeMenu: z,
+          keyboardEventTarget: f,
+          onAddContext: h,
+          onRequestClose: g,
+          onUpdateSelectedMention: y,
+          placement: B,
+          query: x,
+          sections: q,
+        })),
+        (t[32] = P),
+        (t[33] = i),
+        (t[34] = z),
+        (t[35] = f),
+        (t[36] = h),
+        (t[37] = g),
+        (t[38] = y),
+        (t[39] = B),
+        (t[40] = x),
+        (t[41] = q),
+        (t[42] = $))
+      : ($ = t[42]),
+    $
+  );
 }
-
-function typedAtMentionPosition(editor: {
-  view: { state: unknown };
-}): number | null {
-  const state = composerMentionState.getState(editor.view.state) as
-    | {
-        active?: boolean;
-        activation?: string;
-        kind?: string;
-        range?: { from?: number };
-        trigger?: string;
-      }
-    | undefined;
-  return state?.active === true &&
-    state.activation === "typed" &&
-    state.kind === "at-mention" &&
-    state.trigger === "@"
-    ? (state.range?.from ?? null)
+function oe(e) {
+  return e.items.some(E);
+}
+function E(e) {
+  let { key: t, searchTerms: n } = e;
+  return (
+    t.startsWith(`site:`) || t === `plugin:plugin://${m}` || (t.startsWith(`app:`) && n?.some(D))
+  );
+}
+function D(e) {
+  return e.trim().toLowerCase() === `sites`;
+}
+function O(e) {
+  let t = l.getState(e.view.state);
+  return t?.active === !0 &&
+    t.activation === `typed` &&
+    t.kind === `at-mention` &&
+    t.trigger === `@`
+    ? (t.range?.from ?? null)
     : null;
 }
-
-function PrimaryMentionList({
-  typedSitesMentionRef,
-  ...props
-}: PrimaryComposerAtMentionListProps): unknown {
-  const {
-    backgroundAgents = [],
-    className,
-    chromeVariant = "default",
-    excludedAgentConversationIds = [],
-    excludedThreadReferences = [],
-    fileSearchRootPaths,
-    hostId,
-    isHomeMenu = false,
-    keyboardEventTarget,
-    leadingItems = [],
-    onAddContext,
-    onRequestClose,
-    onUpdateSelectedMention,
-    placement = "top",
-    pluginHostId,
-    query,
-    rankingContext,
-    selectedModel,
-    skillRoots,
-    threadSearchRoots,
-  } = props;
-  const scope = getScopeApi(appScope);
-  const editor = useComposerEditor();
-  const typedMentionPosition = (
-    useEditorSelector as unknown as (
-      value: unknown,
-      selector: (value: { view: { state: unknown } }) => number | null,
-    ) => number | null
-  )(editor, typedAtMentionPosition);
-  const lastReportedPosition = React.useRef<number | null>(null);
-  const threadSource = (
-    useThreadMentionSource as unknown as (
-      input: Record<string, unknown>,
-    ) => unknown
-  )({
-    excludedThreadReferences,
-    hostId,
-    query,
-    roots: threadSearchRoots,
-  });
-  const sectionResult = (
-    useMentionSections as unknown as (
-      input: Record<string, unknown>,
-    ) => MentionSectionsResult
-  )({
-    backgroundAgents,
-    excludedAgentConversationIds,
-    hostId,
-    pluginHostId,
-    query,
-    roots: fileSearchRootPaths,
-    selectedModel,
-    skillRoots,
-    threadSource,
-  });
-  const sections = (
-    mergeMentionSections as unknown as (
-      sections: MentionSection[],
-      query: string | undefined,
-      leading: MentionItem[],
-      includeEmpty: boolean,
-      rankingContext: unknown,
-    ) => MentionSection[]
-  )(sectionResult.sections, query, leadingItems, false, rankingContext);
-  const hasSitesSuggestions = sections.some(sectionHasSitesMention);
-  const reportSuggestionsLoaded = () => {
-    (
-      logAppgenInteraction as unknown as (
-        scope: unknown,
-        event: Record<string, unknown>,
-      ) => void
-    )(scope, {
-      action:
-        appgenInteractionActions.CODEX_APPGEN_INTERACTION_ACTION_MENTION_SUGGESTIONS_LOADED,
-      source:
-        appgenInteractionSources.CODEX_APPGEN_INTERACTION_SOURCE_AT_MENTION,
-    });
-  };
-  const effectEvent =
-    (
-      React.useEffectEvent as undefined | ((callback: () => void) => () => void)
-    )?.(reportSuggestionsLoaded) ?? reportSuggestionsLoaded;
-  React.useEffect(() => {
-    if (
-      typedMentionPosition == null ||
-      typedSitesMentionRef?.current !== typedMentionPosition
-    ) {
-      lastReportedPosition.current = null;
-      return;
-    }
-    if (
-      hasSitesSuggestions &&
-      lastReportedPosition.current !== typedMentionPosition
-    ) {
-      lastReportedPosition.current = typedMentionPosition;
-      effectEvent();
-    }
-  }, [hasSitesSuggestions, typedMentionPosition, typedSitesMentionRef]);
-  return jsx.jsx(ComposerAtMentionList, {
-    className,
-    chromeVariant,
-    isHomeMenu,
-    keyboardEventTarget,
-    onAddContext,
-    onRequestClose,
-    onUpdateSelectedMention,
-    placement,
-    query,
-    sections,
-  });
+var k, A, j;
+function M() {
+  return (M = e(() => {
+    ((k = t()), i(), (A = c()), f(), b(), d(), s(), x(), y(), r(), p(), h(), C(), (j = o()));
+  }))();
 }
-
-function PrimaryComposerAtMentionList({
-  source,
-  typedSitesMentionRef,
-  ...props
-}: PrimaryComposerAtMentionListProps): unknown {
-  return (isSpecializedMentionSource as unknown as (value: unknown) => boolean)(
-    source,
-  )
-    ? jsx.jsx(SpecializedComposerAtMentionList, { ...props, source })
-    : jsx.jsx(PrimaryMentionList, { ...props, typedSitesMentionRef });
-}
-
-const initializePrimaryComposerAtMentionList = once(() => {
-  initializeCompilerRuntime();
-  initializeMaitai();
-  React = getReactRuntime();
-  initializeAppgenAnalytics();
-  initializeMentionList();
-  initializeComposerSearch();
-  initializeScope();
-  initializeMentionSearch();
-  initializeMentionSources();
-  initializeComposerEditorState();
-  initializeEditorSelector();
-  initializeMentionRanking();
-  initializeThreadMentionSource();
-  jsx = getJsxRuntime();
-});
-
-initializePrimaryComposerAtMentionList();
-
-export { PrimaryComposerAtMentionList };
+M();
+export { w as PrimaryComposerAtMentionList };

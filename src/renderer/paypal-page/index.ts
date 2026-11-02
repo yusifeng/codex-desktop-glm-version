@@ -1,286 +1,284 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeCompilerRuntime,
-  I3 as getJsxRuntime,
-  _L as useQuery,
-  dg as initializeThemeSubscription,
-  e6 as getReactRuntime,
-  fg as useIsDarkTheme,
-  gL as initializeQueryRuntime,
-  vW as expectedAccountIdHeader,
-  wL as initializeSharedRuntime,
-  type JsxRuntime,
-  type ReactRuntime,
+  $3 as t,
+  I3 as n,
+  _L as r,
+  dg as i,
+  e6 as a,
+  fg as o,
+  gL as s,
+  vW as c,
+  wL as l,
 } from "@rchunk/app-shared";
 import {
-  M6t as initializeAuthentication,
-  N6t as useAuthentication,
-  Qgn as initializeRouter,
-  Ygn as Navigate,
-  cJt as initializeApiClient,
-  i_n as useLocation,
-  ifn as initializeAccountQueries,
-  lfn as useStatsig,
-  rJt as apiClient,
-  rfn as getExperiment,
+  M6t as u,
+  N6t as d,
+  Qgn as f,
+  Ygn as p,
+  _0 as m,
+  cJt as h,
+  i_n as g,
+  ifn as _,
+  lfn as v,
+  rJt as y,
+  r_n as b,
+  rfn as x,
+  v0 as S,
 } from "@rchunk/app-initial";
-// @ts-expect-error The release route helper is not declared semantically yet.
-import { _0 as buildPricingLocation } from "@rchunk/app-initial";
-// @ts-expect-error The release absolute-route helper is not declared semantically yet.
-import { r_n as toAbsoluteRoute } from "@rchunk/app-initial";
-// @ts-expect-error The release experiment initializer is not declared semantically yet.
-import { v0 as initializeExperiments } from "@rchunk/app-initial";
-import {
-  a as selectEligiblePromotion,
-  f as initializePricingPromotions,
-  type PromotionMetadata,
-} from "@rchunk/pricing-promotions";
-import {
-  S as initializeCheckoutPolicy,
-  _ as buildPayPalCheckoutRequest,
-} from "@rchunk/checkout-policy";
-import {
-  m as initializeCheckoutPreparation,
-  p as CheckoutPreparation,
-} from "@rchunk/checkout-confirm-latency";
-import {
-  n as HostedCheckoutPage,
-  r as initializeCheckoutPage,
-} from "@rchunk/checkout-page-core";
-// @ts-expect-error The release create-session chunk has not received a declaration yet.
-import { n as initSession, t as createSession } from "@rchunk/create-session";
-
-interface CheckoutAccount {
-  account: { plan_type: string };
-  eligible_promo_campaigns?: { plus?: PromotionMetadata | null };
-  entitlement: { has_active_subscription: boolean };
-}
-
-interface AccountsCheckResponse {
-  accounts: Record<string, CheckoutAccount | undefined>;
-}
-
-interface CouponCheckResponse {
-  coupon?: string;
-  state?: string;
-}
-
-interface CustomCheckoutSession {
-  checkout_session_id: string;
-  processor_entity: string;
-  tag: "custom_checkout_session";
-}
-
-interface HostedCheckoutSession {
-  url?: string | null;
-}
-
-type CheckoutSession = CustomCheckoutSession | HostedCheckoutSession;
-type CheckoutRequest = Record<string, unknown>;
-type PayPalCheckoutResult =
-  | { search: string; type: "pricing" }
-  | { inferredCampaign?: string; type: "purchase" }
-  | {
-      request: CheckoutRequest;
-      session: CheckoutSession;
-      type: "checkout";
-    };
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-
-function PayPalCheckoutPage(): unknown {
-  const { accountId, userId } = useAuthentication();
-  const location = useLocation();
-  if (accountId == null || userId == null)
-    return jsx.jsx(CheckoutPreparation, { loading: true, onRetry: noop });
-
-  return jsx.jsx(
-    AuthenticatedPayPalCheckoutPage,
-    { accountId, userId },
-    `${accountId}:${userId}:${location.key}`,
+import { a as C, f as w } from "@rchunk/pricing-promotions";
+import { S as T, _ as E } from "@rchunk/checkout-policy";
+import { m as D, p as O } from "@rchunk/checkout-confirm-latency";
+import { n as k, r as A } from "@rchunk/checkout-page-core";
+import { n as j, t as M } from "@rchunk/create-session";
+function N() {
+  let e = (0, L.c)(5),
+    { accountId: t, userId: n } = d(),
+    r = g();
+  if (t == null || n == null) {
+    let t;
+    return (
+      e[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, z.jsx)(O, { loading: !0, onRetry: P })), (e[0] = t))
+        : (t = e[0]),
+      t
+    );
+  }
+  let i = `${t}:${n}:${r.key}`,
+    a;
+  return (
+    e[1] !== t || e[2] !== i || e[3] !== n
+      ? ((a = (0, z.jsx)(F, { accountId: t, userId: n }, i)),
+        (e[1] = t),
+        (e[2] = i),
+        (e[3] = n),
+        (e[4] = a))
+      : (a = e[4]),
+    a
   );
 }
-
-function noop(): void {}
-
-function AuthenticatedPayPalCheckoutPage({
-  accountId,
-  userId,
-}: {
-  accountId: string;
-  userId: string;
-}): unknown {
-  const location = useLocation();
-  const statsig = useStatsig();
-  const isDark = useIsDarkTheme();
-  const [attemptId] = React.useState(createAttemptId);
-  const parameters = new URLSearchParams(location.search);
-  parameters.delete("login_hint");
-  const cleanSearch = parameters.size === 0 ? "" : `?${parameters}`;
-  const pricingLocation = buildPricingLocation({ search: cleanSearch });
-  const cancelRoute = toAbsoluteRoute(pricingLocation);
-
-  const query = useQuery<PayPalCheckoutResult>({
-    queryKey: [
-      "paypal-promotion-checkout",
-      accountId,
-      userId,
-      attemptId,
-      cleanSearch,
-    ],
-    queryFn: async ({ signal }) => {
-      const additionalHeaders = {
-        "ChatGPT-Account-ID": accountId,
-        [expectedAccountIdHeader]: accountId,
-      };
-      const accountResponse = await apiClient.safeGet<AccountsCheckResponse>(
-        "/accounts/check/{version}",
-        {
-          additionalHeaders,
-          parameters: { path: { version: "v4-2023-04-27" } },
-          signal,
-        },
-      );
-      signal.throwIfAborted();
-      const checkoutAccount = accountResponse.accounts[accountId];
-      if (checkoutAccount == null)
-        throw new Error("Checkout account unavailable");
-
-      if (checkoutAccount.entitlement.has_active_subscription) {
-        const pricingParameters = new URLSearchParams(cleanSearch);
-        pricingParameters.set("plan", "plus");
-        return { type: "pricing", search: `?${pricingParameters}` };
-      }
-
-      const requestedCampaign =
-        parameters.get("promo_campaign")?.trim() || undefined;
-      const campaignId =
-        requestedCampaign ??
-        selectEligiblePromotion(
-          "plus",
-          checkoutAccount.account.plan_type,
-          checkoutAccount.eligible_promo_campaigns?.plus,
-        )?.id;
-      const couponResponse =
-        campaignId == null
-          ? null
-          : await apiClient.safeGet<CouponCheckResponse>(
-              "/promo_campaign/check_coupon",
-              {
-                additionalHeaders,
-                parameters: {
-                  query: {
-                    coupon: campaignId,
-                    is_coupon_from_query_param: requestedCampaign != null,
-                  },
-                },
-                signal,
-              },
-            );
-      signal.throwIfAborted();
-      const eligibleCampaign =
-        couponResponse?.state === "eligible"
-          ? couponResponse.coupon
-          : undefined;
-
-      const payPalCheckoutEnabled = getExperiment(statsig, "662604060").get(
-        "paypal_promo_checkout_enabled",
-        false,
-      );
-      if (!payPalCheckoutEnabled)
+function P() {}
+function F(e) {
+  let t = (0, L.c)(48),
+    { accountId: n, userId: i } = e,
+    a = g(),
+    s = v(),
+    l = o(),
+    [u] = (0, R.useState)(I),
+    d;
+  t[0] === a.search
+    ? (d = t[1])
+    : ((d = new URLSearchParams(a.search)), d.delete(`login_hint`), (t[0] = a.search), (t[1] = d));
+  let f = d.size === 0 ? `` : `?${d}`,
+    h;
+  t[2] === f ? (h = t[3]) : ((h = m({ search: f })), (t[2] = f), (t[3] = h));
+  let _ = b(h),
+    S;
+  t[4] !== n || t[5] !== u || t[6] !== f || t[7] !== i
+    ? ((S = [`paypal-promotion-checkout`, n, i, u, f]),
+      (t[4] = n),
+      (t[5] = u),
+      (t[6] = f),
+      (t[7] = i),
+      (t[8] = S))
+    : (S = t[8]);
+  let w;
+  t[9] !== n ||
+  t[10] !== u ||
+  t[11] !== _ ||
+  t[12] !== l ||
+  t[13] !== d ||
+  t[14] !== f ||
+  t[15] !== s
+    ? ((w = async (e) => {
+        let { signal: t } = e,
+          r = { "ChatGPT-Account-ID": n, [c]: n },
+          i = await y.safeGet(`/accounts/check/{version}`, {
+            parameters: { path: { version: `v4-2023-04-27` } },
+            additionalHeaders: r,
+            signal: t,
+          });
+        t.throwIfAborted();
+        let a = i.accounts[n];
+        if (a == null) throw Error(`Checkout account unavailable`);
+        if (a.entitlement.has_active_subscription) {
+          let e = new URLSearchParams(f);
+          return (e.set(`plan`, `plus`), { type: `pricing`, search: `?${e}` });
+        }
+        let o = d.get(`promo_campaign`)?.trim() || void 0,
+          p = o ?? C(`plus`, a.account.plan_type, a.eligible_promo_campaigns?.plus)?.id,
+          m =
+            p == null
+              ? null
+              : await y.safeGet(`/promo_campaign/check_coupon`, {
+                  additionalHeaders: r,
+                  parameters: { query: { coupon: p, is_coupon_from_query_param: o != null } },
+                  signal: t,
+                });
+        t.throwIfAborted();
+        let h = m?.state === `eligible` ? m.coupon : void 0;
+        if (!x(s, `662604060`).get(`paypal_promo_checkout_enabled`, !1))
+          return { type: `purchase`, inferredCampaign: o == null ? h : void 0 };
+        let g = E({
+          promoCode: d.get(`promoCode`) ?? void 0,
+          eligibleCampaign: h,
+          isCampaignFromQuery: o != null,
+        });
         return {
-          type: "purchase",
-          inferredCampaign:
-            requestedCampaign == null ? eligibleCampaign : undefined,
+          type: `checkout`,
+          request: g,
+          session: await M({
+            accountId: n,
+            request: g,
+            statsig: s,
+            isDark: !!l,
+            attemptId: u,
+            signal: t,
+            cancelUrl: new URL(_, window.location.origin).href,
+          }),
         };
-
-      const request = buildPayPalCheckoutRequest({
-        promoCode: parameters.get("promoCode") ?? undefined,
-        eligibleCampaign,
-        isCampaignFromQuery: requestedCampaign != null,
-      }) as CheckoutRequest;
-      const session = (await createSession({
-        accountId,
-        request,
-        statsig,
-        isDark: Boolean(isDark),
-        attemptId,
-        signal,
-        cancelUrl: new URL(cancelRoute, window.location.origin).href,
-      })) as CheckoutSession;
-      return { type: "checkout", request, session };
-    },
-    staleTime: Infinity,
-    gcTime: 0,
-    retry: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
-
-  if (query.data?.type === "pricing")
-    return jsx.jsx(Navigate, {
-      to: buildPricingLocation({ search: query.data.search }),
-      replace: true,
-    });
-
-  if (query.data?.type === "purchase")
-    return jsx.jsx(Navigate, {
-      to: {
-        pathname: "/purchase/plus",
-        search: cleanSearch,
-        hash: location.hash,
-      },
-      state: {
-        "account-payment-modal-promo-campaign-handoff":
-          query.data.inferredCampaign,
-      },
-      replace: true,
-    });
-
-  if (query.data?.type === "checkout") {
-    const { session } = query.data;
-    if ("tag" in session && session.tag === "custom_checkout_session")
-      return jsx.jsx(Navigate, {
-        to: {
-          pathname: `/checkout/${session.processor_entity}/${session.checkout_session_id}`,
-          search: cleanSearch,
-        },
-        state: { checkoutRequest: query.data.request },
-        replace: true,
-      });
-    if ("url" in session && session.url != null)
-      return jsx.jsx(HostedCheckoutPage, { url: session.url });
+      }),
+      (t[9] = n),
+      (t[10] = u),
+      (t[11] = _),
+      (t[12] = l),
+      (t[13] = d),
+      (t[14] = f),
+      (t[15] = s),
+      (t[16] = w))
+    : (w = t[16]);
+  let T;
+  t[17] !== S || t[18] !== w
+    ? ((T = {
+        queryKey: S,
+        queryFn: w,
+        staleTime: 1 / 0,
+        gcTime: 0,
+        retry: !1,
+        refetchOnWindowFocus: !1,
+        refetchOnReconnect: !1,
+      }),
+      (t[17] = S),
+      (t[18] = w),
+      (t[19] = T))
+    : (T = t[19]);
+  let { data: D, error: A, isPending: j, refetch: N } = r(T);
+  if (D?.type === `pricing`) {
+    let e;
+    t[20] === D.search
+      ? (e = t[21])
+      : ((e = m({ search: D.search })), (t[20] = D.search), (t[21] = e));
+    let n;
+    return (
+      t[22] === e
+        ? (n = t[23])
+        : ((n = (0, z.jsx)(p, { to: e, replace: !0 })), (t[22] = e), (t[23] = n)),
+      n
+    );
   }
-
-  return jsx.jsx(CheckoutPreparation, {
-    loading: query.isPending,
-    error: query.error,
-    onRetry: () => {
-      query.refetch();
-    },
-  });
+  if (D?.type === `purchase`) {
+    let e;
+    t[24] !== a.hash || t[25] !== f
+      ? ((e = { pathname: `/purchase/plus`, search: f, hash: a.hash }),
+        (t[24] = a.hash),
+        (t[25] = f),
+        (t[26] = e))
+      : (e = t[26]);
+    let n;
+    t[27] === D.inferredCampaign
+      ? (n = t[28])
+      : ((n = { "account-payment-modal-promo-campaign-handoff": D.inferredCampaign }),
+        (t[27] = D.inferredCampaign),
+        (t[28] = n));
+    let r = n,
+      i;
+    return (
+      t[29] !== e || t[30] !== r
+        ? ((i = (0, z.jsx)(p, { to: e, state: r, replace: !0 })),
+          (t[29] = e),
+          (t[30] = r),
+          (t[31] = i))
+        : (i = t[31]),
+      i
+    );
+  }
+  if (D?.type === `checkout`) {
+    let { session: e } = D;
+    if (`tag` in e && e.tag === `custom_checkout_session`) {
+      let n = `/checkout/${e.processor_entity}/${e.checkout_session_id}`,
+        r;
+      t[32] !== f || t[33] !== n
+        ? ((r = { pathname: n, search: f }), (t[32] = f), (t[33] = n), (t[34] = r))
+        : (r = t[34]);
+      let i;
+      t[35] === D.request
+        ? (i = t[36])
+        : ((i = { checkoutRequest: D.request }), (t[35] = D.request), (t[36] = i));
+      let a = i,
+        o;
+      return (
+        t[37] !== r || t[38] !== a
+          ? ((o = (0, z.jsx)(p, { to: r, state: a, replace: !0 })),
+            (t[37] = r),
+            (t[38] = a),
+            (t[39] = o))
+          : (o = t[39]),
+        o
+      );
+    }
+    if (e.url != null) {
+      let n;
+      return (
+        t[40] === e.url
+          ? (n = t[41])
+          : ((n = (0, z.jsx)(k, { url: e.url })), (t[40] = e.url), (t[41] = n)),
+        n
+      );
+    }
+  }
+  let P;
+  t[42] === N
+    ? (P = t[43])
+    : ((P = () => {
+        N();
+      }),
+      (t[42] = N),
+      (t[43] = P));
+  let F;
+  return (
+    t[44] !== A || t[45] !== j || t[46] !== P
+      ? ((F = (0, z.jsx)(O, { loading: j, error: A, onRetry: P })),
+        (t[44] = A),
+        (t[45] = j),
+        (t[46] = P),
+        (t[47] = F))
+      : (F = t[47]),
+    F
+  );
 }
-
-function createAttemptId(): string {
+function I() {
   return crypto.randomUUID();
 }
-
-initializeCompilerRuntime();
-initializeCheckoutPolicy();
-initializePricingPromotions();
-initializeQueryRuntime();
-initializeSharedRuntime();
-React = getReactRuntime();
-initializeRouter();
-initializeAuthentication();
-initializeApiClient();
-initializeExperiments();
-initializeAccountQueries();
-initializeThemeSubscription();
-initializeCheckoutPage();
-initSession();
-initializeCheckoutPreparation();
-jsx = getJsxRuntime();
-
-export { PayPalCheckoutPage };
+var L, R, z;
+function B() {
+  return (B = e(() => {
+    ((L = t()),
+      T(),
+      w(),
+      s(),
+      l(),
+      (R = a()),
+      f(),
+      u(),
+      h(),
+      S(),
+      _(),
+      i(),
+      A(),
+      j(),
+      D(),
+      (z = n()));
+  }))();
+}
+B();
+export { N as PayPalCheckoutPage };

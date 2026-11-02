@@ -1,204 +1,192 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/pull-request-revision-tab",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/pull-request-revision-queries-core",
+      "@rchunk/full-content-metadata",
+      "@rchunk/pull-request-code-review-navigation-core",
+      "@rchunk/virtualized-file-diff-line-position",
+      "@rchunk/pull-request-actions",
+      "@rchunk/pull-request-code-review-core",
+      "@rchunk/app-primary",
+      "./app-primary-484df789f2f5.css",
+      "@rchunk/codex-diff-css",
+      "@rchunk/review-preferences-model",
+      "@rchunk/diff-comment-card",
+      "./diff-comment-card-2288e5b28f03.css",
+      "@rchunk/pull-request-readonly-comment",
+      "@rchunk/file-diff-alt",
+      "@rchunk/file-diff-presentation-core",
+      "@rchunk/register-pierre-themes",
+      "@rchunk/review-row",
+      "@rchunk/pull-request-comment",
+      "@rchunk/pull-request-detail-model",
+      "@rchunk/arrow-curved-right",
+      "@rchunk/review-diff-virtualizer-metrics",
+      "@rchunk/review-file-tree-pane",
+      "@rchunk/use-target-apps",
+      "@rchunk/codex-analytics-attribution",
+      "@rchunk/text-shorter",
+      "@rchunk/code-diff",
+      "@rchunk/code-diff-context-menu",
+      "@rchunk/binary-preview-source",
+      "@rchunk/surface",
+      "@rchunk/undo",
+      "@rchunk/pull-request-error-description",
+      "@rchunk/middle-truncated-text",
+      "@rchunk/layout",
+      "@rchunk/revision-review-unavailable-message",
+      "@rchunk/registered-pull-request-thumbnail",
+      "@rchunk/pull-request-status-label",
+      "@rchunk/pull-request-checks-summary",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  CS as PullRequestIcon,
-  H3 as initializeSidePanelRuntime,
-  I3 as getJsxRuntime,
-  Jm as createLazyComponent,
-  V3 as preloadModule,
-  lw as initializePullRequestIcon,
-  qm as initializeSidePanelIcons,
+  CS as t,
+  H3 as n,
+  I3 as r,
+  Jm as i,
+  V3 as a,
+  lw as o,
+  qm as s,
 } from "@rchunk/app-shared";
-import type { JsxRuntime } from "@rchunk/app-shared";
 import {
-  FDt as initializePullRequestTabRuntime,
-  Gvt as openRegisteredTab,
-  IDt as registerTabKind,
-  Wvt as initializeTabRegistry,
-  X8t as pullRequestIdentity,
-  Z8t as normalizeHostname,
-  _vt as initializeTabStore,
-  by as pullRequestQuery,
-  e5t as normalizeAccount,
-  gvt as findTabPlacement,
-  hvt as placementStore,
-  i5t as initializePullRequestQuery,
-  mpn as conversationIntl,
-  ppn as initializeConversationIntl,
-  vvt as focusPlacement,
-  yy as initializePullRequestIdentity,
+  FDt as c,
+  Gvt as l,
+  IDt as u,
+  Wvt as d,
+  X8t as f,
+  Z8t as p,
+  _vt as m,
+  by as h,
+  e5t as g,
+  gvt as _,
+  hvt as v,
+  i5t as y,
+  mpn as b,
+  ppn as x,
+  vvt as S,
+  yy as C,
 } from "@rchunk/app-initial";
-
-interface PullRequestRequest {
-  account: { hostId: string; [key: string]: unknown };
-  pullRequest: {
-    hostname: string;
-    owner: string;
-    repository: string;
-    number: number;
-    [key: string]: unknown;
-  };
-  [key: string]: unknown;
-}
-interface Scope {
-  get(signal: unknown, parameter?: unknown): any;
-}
-interface TabRegistration {
-  dropDestinations: string[];
-  [key: string]: unknown;
-}
-
-const once = onceExport as (initializer: () => void) => () => void;
-let jsx: JsxRuntime;
-let registration: TabRegistration;
-let PullRequestRevisionTab: (props: Record<string, unknown>) => unknown;
-let RegisteredPullRequestThumbnail: (props: Record<string, unknown>) => unknown;
-
-function createTabDescriptor(
-  scope: Scope,
-  request: PullRequestRequest,
-  providedTitle?: string,
-): Record<string, unknown> {
-  const pullRequest = {
-    ...request.pullRequest,
-    hostname: normalizeHostname(request.pullRequest.hostname),
-    owner: request.pullRequest.owner.toLowerCase(),
-    repository: request.pullRequest.repository.toLowerCase(),
-  };
-  const normalizedRequest = {
-    account: normalizeAccount(request.account),
-    pullRequest,
-  };
-  const identity = pullRequestIdentity(pullRequest);
-  const id = `pull-request-code:${encodeURIComponent(request.account.hostId)}|${identity}`;
-  const fallbackTitle = scope.get(conversationIntl).formatMessage(
-    {
-      id: "thread.sidePanel.pullRequestTab.title",
-      defaultMessage: "PR #{number}",
-      description: "Title for a pull request side-panel tab",
+function w(e, t, n) {
+  let r = {
+      ...t.pullRequest,
+      hostname: p(t.pullRequest.hostname),
+      owner: t.pullRequest.owner.toLowerCase(),
+      repository: t.pullRequest.repository.toLowerCase(),
     },
-    { number: pullRequest.number },
-  );
-  const title =
-    providedTitle ??
-    scope.get(pullRequestQuery, { request, source: "pull_requests_page" }).data
-      ?.title ??
-    "";
-  return {
-    id,
-    props: { request: normalizedRequest },
-    title: title.trim() || fallbackTitle,
-    tooltip: `${pullRequest.hostname}/${pullRequest.owner}/${pullRequest.repository} #${pullRequest.number} — ${title} (${request.account.hostId})`,
-  };
-}
-
-function createRegistration({
-  open,
-}: {
-  open: typeof openThreadPullRequestCodeTab;
-}): TabRegistration {
-  return registerTabKind("pull-request-code", PullRequestRevisionTab, {
-    defaultState: () => ({ snapshot: null, commitSha: null }),
-    getIcon: () => jsx.jsx(PullRequestIcon, {}),
-    isAvailable: () => true,
-    open,
-    renderThumbnail: (props: Record<string, unknown>, tab: { title: string }) =>
-      jsx.jsx(RegisteredPullRequestThumbnail, {
-        props: {
-          request: {
-            provider: "github",
-            ...(props.request as Record<string, unknown>),
-          },
+    i = { account: g(t.account), pullRequest: r },
+    a = f(r),
+    o = `pull-request-code:${encodeURIComponent(t.account.hostId)}|${a}`,
+    s = e
+      .get(b)
+      .formatMessage(
+        {
+          id: `thread.sidePanel.pullRequestTab.title`,
+          defaultMessage: `PR #{number}`,
+          description: `Title for a pull request side-panel tab`,
         },
-        title: tab.title,
-      }),
-  }) as TabRegistration;
-}
-
-function openThreadPullRequestCodeTab(
-  scope: Scope,
-  request: PullRequestRequest,
-  title?: string,
-  reset = false,
-  requestedPlacement = "right",
-): { tabId: string; placement: string; status: "existing" | "opened" } {
-  const descriptor = createTabDescriptor(scope, request, title);
-  const tabId = descriptor.id as string;
-  const existingPlacement = findTabPlacement(scope, tabId);
-  const placement =
-    existingPlacement ??
-    (registration.dropDestinations.includes(requestedPlacement)
-      ? requestedPlacement
-      : "right");
-  openRegisteredTab(scope, registration, {
-    ...descriptor,
-    kind: "pull-request-code",
-    requiresWorkspaceReady: false,
-    target: placement,
-    revealAndFocus: true,
-  });
-  if (reset) {
-    (
-      placementStore(placement) as {
-        updateTabState(scope: Scope, id: string, updater: () => unknown): void;
-      }
-    ).updateTabState(scope, tabId, () => ({ snapshot: null, commitSha: null }));
-  }
-  focusPlacement(scope, placement);
+        { number: r.number },
+      ),
+    c = n ?? e.get(h, { request: t, source: `pull_requests_page` }).data?.title ?? ``;
   return {
-    tabId,
-    placement,
-    status: existingPlacement == null ? "opened" : "existing",
+    id: o,
+    props: { request: i },
+    title: c.trim() || s,
+    tooltip: `${r.hostname}/${r.owner}/${r.repository} #${r.number} — ${c} (${t.account.hostId})`,
   };
 }
-
-const initializeLazyComponents = once(() => {
-  initializePullRequestTabRuntime();
-  initializePullRequestIcon();
-  initializeSidePanelIcons();
-  jsx = getJsxRuntime();
-  initializeSidePanelRuntime();
-  PullRequestRevisionTab = createLazyComponent(
-    async () => {
-      const loaded = await preloadModule(
-        async () => import("@rchunk/pull-request-revision-tab"),
-        [],
-        import.meta.url,
-      );
-      return (
-        loaded as {
-          PullRequestRevisionTab: (props: Record<string, unknown>) => unknown;
-        }
-      ).PullRequestRevisionTab;
-    },
-    { propagateLoadError: true },
+function T() {
+  return (T = e(() => {
+    (x(), y(), C());
+  }))();
+}
+function E({ open: e }) {
+  return u(`pull-request-code`, O, {
+    defaultState: () => ({ snapshot: null, commitSha: null }),
+    getIcon: () => (0, D.jsx)(t, {}),
+    isAvailable: () => !0,
+    open: e,
+    renderThumbnail: (e, t) =>
+      (0, D.jsx)(k, { props: { request: { provider: `github`, ...e.request } }, title: t.title }),
+  });
+}
+var D, O, k;
+function A() {
+  return (A = e(() => {
+    (c(),
+      o(),
+      s(),
+      (D = r()),
+      n(),
+      (O = i(
+        async () => {
+          let { PullRequestRevisionTab: e } = await a(
+            async () => {
+              let { PullRequestRevisionTab: e } = await import(
+                `@rchunk/pull-request-revision-tab`
+              );
+              return { PullRequestRevisionTab: e };
+            },
+            __vite__mapDeps([
+              0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+              24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+            ]),
+            import.meta.url,
+          );
+          return e;
+        },
+        { propagateLoadError: !0 },
+      )),
+      (k = i(
+        async () => {
+          let { RegisteredPullRequestThumbnail: e } = await a(
+            async () => {
+              let { RegisteredPullRequestThumbnail: e } = await import(
+                `@rchunk/registered-pull-request-thumbnail`
+              );
+              return { RegisteredPullRequestThumbnail: e };
+            },
+            __vite__mapDeps([40, 1, 2, 3, 4, 5, 41, 42]),
+            import.meta.url,
+          );
+          return e;
+        },
+        { propagateLoadError: !0 },
+      )));
+  }))();
+}
+function j(e, t, n, r = !1, i = `right`) {
+  let a = w(e, t, n),
+    o = a.id,
+    s = _(e, o),
+    c = s ?? (M.dropDestinations.includes(i) ? i : `right`);
+  return (
+    l(e, M, {
+      ...a,
+      kind: `pull-request-code`,
+      requiresWorkspaceReady: !1,
+      target: c,
+      revealAndFocus: !0,
+    }),
+    r && v(c).updateTabState(e, o, () => ({ snapshot: null, commitSha: null })),
+    S(e, c),
+    { tabId: o, placement: c, status: s == null ? `opened` : `existing` }
   );
-  RegisteredPullRequestThumbnail = createLazyComponent(
-    async () => {
-      const loaded = await preloadModule(
-        async () => import("@rchunk/registered-pull-request-thumbnail"),
-        [],
-        import.meta.url,
-      );
-      return (
-        loaded as {
-          RegisteredPullRequestThumbnail: (
-            props: Record<string, unknown>,
-          ) => unknown;
-        }
-      ).RegisteredPullRequestThumbnail;
-    },
-    { propagateLoadError: true },
-  );
-});
-
-const initializePullRequestCodeTab = once(() => {
-  initializeTabRegistry();
-  initializeConversationIntl();
-  initializePullRequestQuery();
-  initializePullRequestIdentity();
-  initializeLazyComponents();
-  initializeTabStore();
-  registration = createRegistration({ open: openThreadPullRequestCodeTab });
-});
-
-export { openThreadPullRequestCodeTab as n, initializePullRequestCodeTab as t };
+}
+var M;
+function N() {
+  return (N = e(() => {
+    (d(), T(), A(), m(), (M = E({ open: j })));
+  }))();
+}
+export { j as n, N as t };

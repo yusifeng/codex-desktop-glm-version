@@ -1,225 +1,174 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $O as timeConstants,
-  FX as initializeSignalRuntime,
-  FZ as missingQueryParameter,
-  QI as initializeQueryRuntime,
-  QX as createQueryFamily,
-  ZI as appScope,
-  ek as initializeQuerySignals,
-  jZ as initializeMotionRuntime,
-  lk as initializeToastRuntime,
-  oZ as createSignalFamily,
-  pk as toastManagerSignal,
-  rZ as createDerivedFamily,
+  $O as t,
+  FX as n,
+  FZ as r,
+  QI as i,
+  QX as a,
+  ZI as o,
+  ek as s,
+  jZ as c,
+  lk as l,
+  oZ as u,
+  pk as d,
+  rZ as f,
 } from "@rchunk/app-shared";
 import {
-  $K as memoryCitationFeedbackFamily,
-  Ozt as initializeCitationFeedback,
-  Sdn as ApiError,
-  Sqt as initializePepperOnboarding,
-  Tzt as getApiErrorCode,
-  U6t as currentAccountIdSignal,
-  cJt as initializeApiClient,
-  eq as initializeSavedMemoryApi,
-  mpn as intlSignal,
-  pdn as initializeAccountApi,
-  ppn as initializeIntlRuntime,
-  rJt as apiClient,
-  udn as memoryApiClient,
-  ydn as initializeMemoryApiClient,
+  $K as p,
+  Ozt as m,
+  Sdn as h,
+  Sqt as g,
+  Tzt as _,
+  U6t as v,
+  cJt as y,
+  eq as b,
+  mpn as x,
+  pdn as S,
+  ppn as C,
+  rJt as w,
+  udn as T,
+  ydn as E,
 } from "@rchunk/app-initial";
-
-interface SavedMemory {
-  id: string;
-  [key: string]: unknown;
-}
-
-interface SavedMemoriesResponse {
-  memories: SavedMemory[];
-  [key: string]: unknown;
-}
-
-interface MemoryCitationSource {
-  citationUuid?: string | null;
-  feedback?: unknown;
-  memoryId?: string | null;
-}
-
-interface DeleteMemoryInput {
-  accountId: string;
-  conversationId?: string | null;
-  messageId?: string | null;
-  onDeleteFailed(): void;
-  source: MemoryCitationSource;
-}
-
-interface MemoryScope {
-  get<Value>(signal: unknown, parameter?: unknown): Value;
-  set<Value>(signal: unknown, parameter: unknown, value: Value | ((current: Value) => Value)): void;
-  query: {
-    cancel(query: unknown, parameter: unknown): Promise<unknown>;
-    invalidate(query: unknown, parameter: unknown): Promise<unknown>;
-    setData<Value>(query: unknown, parameter: unknown, update: (current: Value | undefined) => Value | undefined): void;
-  };
-  queryClient: {
-    invalidateQueries(options: { queryKey: readonly unknown[] }): Promise<unknown>;
-  };
-}
-
-let savedMemoriesQuery: unknown;
-let deletingMemoryIds: unknown;
-let isMemoryDeleted: unknown;
-
-async function deleteMemoryRequest(
-  memoryId: string,
-  accountId: string,
-): Promise<"already_deleted" | "deleted"> {
+async function D(e, t) {
   try {
-    const response = await apiClient.safeDelete<{ success: boolean }>(
-      "/memories/{memory_id}",
-      {
-        additionalHeaders: { "ChatGPT-Account-ID": accountId },
-        parameters: { path: { memory_id: memoryId.trim() } },
-      },
-    );
-    if (!response.success) throw new Error("Memory deletion failed");
-    return "deleted";
-  } catch (error) {
-    if (!(error instanceof ApiError
-      && (error.status === 404 || getApiErrorCode(error)?.toLowerCase() === "memory_not_found"))) {
-      throw error;
-    }
-    return "already_deleted";
+    if (
+      !(
+        await w.safeDelete(`/memories/{memory_id}`, {
+          additionalHeaders: { "ChatGPT-Account-ID": t },
+          parameters: { path: { memory_id: e.trim() } },
+        })
+      ).success
+    )
+      throw Error(`Memory deletion failed`);
+    return `deleted`;
+  } catch (e) {
+    if (!(e instanceof h && (e.status === 404 || _(e)?.toLowerCase() === `memory_not_found`)))
+      throw e;
+    return `already_deleted`;
   }
 }
-
-async function deleteSavedMemory(scope: MemoryScope, input: DeleteMemoryInput): Promise<void> {
-  const { accountId, conversationId, messageId, source, onDeleteFailed } = input;
-  const memoryId = source.memoryId;
-  const deleting = memoryId == null
-    ? []
-    : scope.get<string[]>(deletingMemoryIds, accountId);
-  if (memoryId == null || scope.get(currentAccountIdSignal) !== accountId || deleting.includes(memoryId)) {
-    return;
-  }
-  scope.set<string[]>(deletingMemoryIds, accountId, (current) => [...current, memoryId]);
-  try {
-    const result = await deleteMemoryRequest(memoryId, accountId);
-    await scope.query.cancel(savedMemoriesQuery, accountId);
-    scope.query.setData<SavedMemoriesResponse>(savedMemoriesQuery, accountId, (current) =>
-      current == null
-        ? current
-        : { ...current, memories: current.memories.filter((memory) => memory.id.trim() !== memoryId) });
-    const refreshes: Promise<unknown>[] = [
-      scope.query.invalidate(savedMemoriesQuery, accountId),
-      scope.queryClient.invalidateQueries({
-        queryKey: ["chatgpt-saved-memory-history", accountId],
-      }),
-    ];
-    if (conversationId != null) {
-      refreshes.push(scope.queryClient.invalidateQueries({
-        queryKey: ["chatgpt-conversation-context-sources", conversationId, messageId],
-      }));
-      if (source.citationUuid != null) {
-        const feedback = scope.get<{ feedback?: unknown } | null>(memoryCitationFeedbackFamily, {
-          accountId,
-          conversationId,
-          messageId,
-          citationUuid: source.citationUuid,
-        });
-        refreshes.push(apiClient.safePost(
-          "/sidebar/conversation_context_citation_feedback",
-          {
-            additionalHeaders: { "ChatGPT-Account-ID": accountId },
-            requestBody: {
-              citation_uuid: source.citationUuid,
-              conversation_id: conversationId,
-              deleted: true,
-              feedback: feedback == null ? (source.feedback ?? null) : feedback.feedback,
-              message_id: messageId,
-            },
-          },
+async function O(
+  e,
+  { accountId: t, conversationId: n, messageId: r, source: i, onDeleteFailed: a },
+) {
+  let o = i.memoryId;
+  if (!(o == null || e.get(v) !== t || e.get(A, t).includes(o))) {
+    e.set(A, t, (e) => [...e, o]);
+    try {
+      let a = await D(o, t);
+      (await e.query.cancel(k, t),
+        e.query.setData(k, t, (e) =>
+          e == null ? e : { ...e, memories: e.memories.filter((e) => e.id.trim() !== o) },
         ));
+      let s = [
+        e.query.invalidate(k, t),
+        e.queryClient.invalidateQueries({ queryKey: [`chatgpt-saved-memory-history`, t] }),
+      ];
+      if (
+        n != null &&
+        (s.push(
+          e.queryClient.invalidateQueries({
+            queryKey: [`chatgpt-conversation-context-sources`, n, r],
+          }),
+        ),
+        i.citationUuid != null)
+      ) {
+        let a = e.get(p, {
+          accountId: t,
+          conversationId: n,
+          messageId: r,
+          citationUuid: i.citationUuid,
+        });
+        s.push(
+          w.safePost(`/sidebar/conversation_context_citation_feedback`, {
+            additionalHeaders: { "ChatGPT-Account-ID": t },
+            requestBody: {
+              citation_uuid: i.citationUuid,
+              conversation_id: n,
+              deleted: !0,
+              feedback: a == null ? (i.feedback ?? null) : a.feedback,
+              message_id: r,
+            },
+          }),
+        );
       }
+      (Promise.all(s).catch(() => void 0),
+        e.get(v) === t &&
+          e
+            .get(d)
+            .success(
+              a === `already_deleted`
+                ? e
+                    .get(x)
+                    .formatMessage({
+                      id: `chatgptConversations.summaryPanel.sources.memory.delete.alreadyDeleted`,
+                      defaultMessage: `Memory already deleted`,
+                      description: `Success toast when a memory deleted from Sources was already absent on the server.`,
+                    })
+                : e
+                    .get(x)
+                    .formatMessage({
+                      id: `chatgptConversations.summaryPanel.sources.memory.delete.success`,
+                      defaultMessage: `Memory deleted`,
+                      description: `Success toast after an end user permanently deletes a cited saved account memory from the ChatGPT Sources side panel.`,
+                    }),
+            ));
+    } catch {
+      e.get(v) === t &&
+        (e
+          .get(d)
+          .danger(
+            e
+              .get(x)
+              .formatMessage({
+                id: `chatgptConversations.summaryPanel.sources.memory.delete.failed`,
+                defaultMessage: `Failed to forget memory`,
+                description: `Error toast when deleting a memory from Sources fails; the saved memories manager opens to let the user manage it there.`,
+              }),
+            { errorAnalytics: { toastId: `memory_delete_failed` } },
+          ),
+        a());
+    } finally {
+      e.set(A, t, (e) => e.filter((e) => e !== o));
     }
-    Promise.all(refreshes).catch(() => undefined);
-    if (scope.get(currentAccountIdSignal) === accountId) {
-      const intl = scope.get<{ formatMessage(input: Record<string, unknown>): string }>(intlSignal);
-      scope.get<import("@rchunk/app-shared").ToastManager>(toastManagerSignal).success(
-        intl.formatMessage(result === "already_deleted" ? {
-          id: "chatgptConversations.summaryPanel.sources.memory.delete.alreadyDeleted",
-          defaultMessage: "Memory already deleted",
-          description: "Success toast when a memory deleted from Sources was already absent on the server.",
-        } : {
-          id: "chatgptConversations.summaryPanel.sources.memory.delete.success",
-          defaultMessage: "Memory deleted",
-          description: "Success toast after an end user permanently deletes a cited saved account memory from the ChatGPT Sources side panel.",
-        }),
-      );
-    }
-  } catch {
-    if (scope.get(currentAccountIdSignal) === accountId) {
-      const intl = scope.get<{ formatMessage(input: Record<string, unknown>): string }>(intlSignal);
-      scope.get<import("@rchunk/app-shared").ToastManager>(toastManagerSignal).danger(
-        intl.formatMessage({
-          id: "chatgptConversations.summaryPanel.sources.memory.delete.failed",
-          defaultMessage: "Failed to forget memory",
-          description: "Error toast when deleting a memory from Sources fails; the saved memories manager opens to let the user manage it there.",
-        }),
-        { errorAnalytics: { toastId: "memory_delete_failed" } },
-      );
-      onDeleteFailed();
-    }
-  } finally {
-    scope.set<string[]>(deletingMemoryIds, accountId, (current) =>
-      current.filter((id) => id !== memoryId));
   }
 }
-
-function initializeSavedMemoryState(): void {
-  initializeMotionRuntime();
-  initializeSignalRuntime();
-  initializeToastRuntime();
-  initializeIntlRuntime();
-  initializeQueryRuntime();
-  initializeQuerySignals();
-  initializeAccountApi();
-  initializeMemoryApiClient();
-  initializeCitationFeedback();
-  initializeSavedMemoryApi();
-  initializeApiClient();
-  initializePepperOnboarding();
-  savedMemoriesQuery = createQueryFamily(appScope, (accountId: string | null) => ({
-    enabled: accountId != null,
-    queryFn: accountId == null
-      ? missingQueryParameter
-      : () => memoryApiClient.safeGet<SavedMemoriesResponse>("/memories", {
-        additionalHeaders: { "ChatGPT-Account-ID": accountId },
-        parameters: { query: { include_memory_entries: true } },
-      }),
-    queryKey: ["chatgpt-saved-memories", accountId],
-    staleTime: timeConstants.THIRTY_SECONDS,
-    refetchOnMount: true,
-  }));
-  deletingMemoryIds = createSignalFamily(appScope, () => [] as string[]);
-  isMemoryDeleted = createDerivedFamily(
-    appScope,
-    ({ accountId, memoryId }: { accountId: string; memoryId?: string | null }, { get }) => {
-      if (memoryId == null) return false;
-      const result = get(savedMemoriesQuery, accountId) as {
-        data?: SavedMemoriesResponse;
-        isSuccess: boolean;
-      };
-      return (get(deletingMemoryIds, accountId) as string[]).includes(memoryId)
-        || (result.isSuccess && !result.data?.memories.some((memory) => memory.id.trim() === memoryId));
-    },
-  );
+var k, A, j;
+function M() {
+  return (M = e(() => {
+    (c(),
+      n(),
+      l(),
+      C(),
+      i(),
+      s(),
+      S(),
+      E(),
+      m(),
+      b(),
+      y(),
+      g(),
+      (k = a(o, (e) => ({
+        enabled: e != null,
+        queryFn:
+          e == null
+            ? r
+            : () =>
+                T.safeGet(`/memories`, {
+                  additionalHeaders: { "ChatGPT-Account-ID": e },
+                  parameters: { query: { include_memory_entries: !0 } },
+                }),
+        queryKey: [`chatgpt-saved-memories`, e],
+        staleTime: t.THIRTY_SECONDS,
+        refetchOnMount: !0,
+      }))),
+      (A = u(o, (e) => [])),
+      (j = f(o, ({ accountId: e, memoryId: t }, { get: n }) => {
+        if (t == null) return !1;
+        let { data: r, isSuccess: i } = n(k, e);
+        return n(A, e).includes(t) || (i && !r.memories.some((e) => e.id.trim() === t));
+      })));
+  }))();
 }
-
-export {
-  initializeSavedMemoryState as i,
-  isMemoryDeleted as n,
-  deleteSavedMemory as r,
-  savedMemoriesQuery as t,
-};
+export { M as i, j as n, O as r, k as t };

@@ -1,9 +1,4 @@
-import {
-  n as initializePullRequestCodeReviewNavigation,
-  r as requestPullRequestCodeLocation,
-  t as getPullRequestCodeFileId,
-} from "@rchunk/pull-request-code-review-navigation-core";
-
-initializePullRequestCodeReviewNavigation();
-
-export { getPullRequestCodeFileId, requestPullRequestCodeLocation };
+// @ts-nocheck
+import { n as e, r as t, t as n } from "@rchunk/pull-request-code-review-navigation-core";
+e();
+export { n as getPullRequestCodeFileId, t as requestPullRequestCodeLocation };

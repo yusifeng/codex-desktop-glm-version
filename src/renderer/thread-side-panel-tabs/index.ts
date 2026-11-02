@@ -1,34 +1,15 @@
-import {
-  Qen as initializeSidePanelRegistry,
-  jct as initializeThreadSidePanelState,
-} from "@rchunk/app-initial";
-
-export interface SidePanelTabOptions extends Record<string, unknown> {}
-
-function hasThreadSidePanelTab(
-  _scope: unknown,
-  _tabType: unknown,
-  _options: SidePanelTabOptions = {},
-): boolean {
-  return false;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { Qen as t, jct as n } from "@rchunk/app-initial";
+function r(e, t, n = {}) {
+  return !1;
 }
-
-function openThreadSidePanelTab(
-  _scope: unknown,
-  _tabType: unknown,
-  _reveal = true,
-  _options: SidePanelTabOptions = {},
-): boolean {
-  return false;
+function i(e, t, n = !0, r = {}) {
+  return !1;
 }
-
-function initializeThreadSidePanelTabs(): void {
-  initializeSidePanelRegistry();
-  initializeThreadSidePanelState();
+function a() {
+  return (a = e(() => {
+    (t(), n());
+  }))();
 }
-
-export {
-  openThreadSidePanelTab as n,
-  hasThreadSidePanelTab as r,
-  initializeThreadSidePanelTabs as t,
-};
+export { i as n, r, a as t };

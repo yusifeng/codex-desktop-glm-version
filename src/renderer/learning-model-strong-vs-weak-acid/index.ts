@@ -1,15 +1,14 @@
-// Strong-versus-weak-acid learning-model manifest. Release chunk: type-e8c4aa2e5b51.js.
-import "@rchunk/rolldown-runtime";
-
-const strongVsWeakAcidSpecification = {
-  type: "STRONG_VS_WEAK_ACID",
-  version: 2,
-  thumbnailAssetKey: "strong-vs-weak-acid-v2",
-  parameters: {
-    initial_concentration_molar: { kind: "number" as const, defaultValue: 0.15, min: 0.1, max: 0.25 },
-  },
-};
-
-function initializeStrongVsWeakAcidSpecification(): void {}
-
-export { strongVsWeakAcidSpecification as n, initializeStrongVsWeakAcidSpecification as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `STRONG_VS_WEAK_ACID`),
+      (n = `strong-vs-weak-acid-v2`),
+      (r = {
+        initial_concentration_molar: { kind: `number`, defaultValue: 0.15, min: 0.1, max: 0.25 },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+export { i as n, a as t };

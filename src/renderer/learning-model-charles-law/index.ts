@@ -1,33 +1,27 @@
-// Charles's law learning-model manifest. Release chunk: type-ff2ce34a0edd.js.
-import "@rchunk/rolldown-runtime";
-
-const charlesLawSpecification = {
-  type: "CHARLES_LAW",
-  version: 2,
-  thumbnailAssetKey: "charles-law-v1",
-  canonicalFormula: "\\frac{V_1}{T_1} = \\frac{V_2}{T_2}",
-  canonicalFormulaAliases: [
-    "V_1/T_1 = V_2/T_2",
-    "v1/t1=v2/t2",
-    "v2/t2=v1/t1",
-    "v/t=k",
-    "k=v/t",
-    "v=kt",
-    "kt=v",
-  ],
-  parameters: {
-    v1: { kind: "number" as const, defaultValue: 12, min: 0.01, max: 10_000 },
-    t1: { kind: "number" as const, defaultValue: 300, min: 1, max: 5_000 },
-    v2: { kind: "number" as const, defaultValue: 18, min: 0.01, max: 10_000 },
-    t2: { kind: "number" as const, defaultValue: 450, min: 1, max: 5_000 },
-    solveFor: {
-      kind: "enum" as const,
-      defaultValue: "v2",
-      allowedValues: ["v1", "t1", "v2", "t2"],
-    },
-  },
-};
-
-function initializeCharlesLawSpecification(): void {}
-
-export { charlesLawSpecification as n, initializeCharlesLawSpecification as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o;
+function s() {
+  return (s = e(() => {
+    ((t = `CHARLES_LAW`),
+      (n = `charles-law-v1`),
+      (r = `\\frac{V_1}{T_1} = \\frac{V_2}{T_2}`),
+      (i = [`V_1/T_1 = V_2/T_2`, `v1/t1=v2/t2`, `v2/t2=v1/t1`, `v/t=k`, `k=v/t`, `v=kt`, `kt=v`]),
+      (a = {
+        v1: { kind: `number`, defaultValue: 12, min: 0.01, max: 1e4 },
+        t1: { kind: `number`, defaultValue: 300, min: 1, max: 5e3 },
+        v2: { kind: `number`, defaultValue: 18, min: 0.01, max: 1e4 },
+        t2: { kind: `number`, defaultValue: 450, min: 1, max: 5e3 },
+        solveFor: { kind: `enum`, defaultValue: `v2`, allowedValues: [`v1`, `t1`, `v2`, `t2`] },
+      }),
+      (o = {
+        type: t,
+        version: 2,
+        thumbnailAssetKey: n,
+        canonicalFormula: r,
+        canonicalFormulaAliases: i,
+        parameters: a,
+      }));
+  }))();
+}
+export { o as n, s as t };

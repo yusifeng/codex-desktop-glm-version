@@ -1,62 +1,61 @@
-// Even-, odd-, and neither-function symmetry learning model.
-import "@rchunk/rolldown-runtime";
-
-type SymmetryType = "even" | "odd" | "neither";
-interface FunctionSymmetryValues { symmetryType?: unknown; x?: number | null }
-
-const functionSymmetryType = "EVEN_ODD_FUNCTION_SYMMETRY";
-const functionSymmetryThumbnail = "even-odd-function-symmetry-v1";
-const functionSymmetryParameters = {
-  symmetryType: { kind: "enum", defaultValue: "even" as SymmetryType, allowedValues: ["even", "odd", "neither"] as SymmetryType[] },
-  x: { kind: "number", defaultValue: 3, min: 1.25, max: 4.5 },
-};
-const functionSymmetryDefinition = { type: functionSymmetryType, version: 1, thumbnailAssetKey: functionSymmetryThumbnail, parameters: functionSymmetryParameters };
-const xControl = { ...functionSymmetryDefinition.parameters.x, step: 0.25 };
-const symmetryOptions = functionSymmetryDefinition.parameters.symmetryType.allowedValues.map((symmetryType, value) => ({ value, symmetryType }));
-const symmetryFormulas: Record<SymmetryType, string> = {
-  even: "y = 0.2x^2 - 2",
-  odd: "y = 0.025x^3 + 0.2x",
-  neither: "y = 0.12(x - 1)^2 - 3",
-};
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const clampX = (value: number): number => clamp(value, xControl.min, xControl.max);
-const snapXToControl = (value: number): number => {
-  const clamped = clampX(value);
-  const snapped = xControl.min + Math.round((clamped - xControl.min) / xControl.step) * xControl.step;
-  return Number(clampX(snapped).toFixed(2));
-};
-const isSymmetryType = (value: unknown): value is SymmetryType => functionSymmetryDefinition.parameters.symmetryType.allowedValues.includes(value as SymmetryType);
-const normalizeFunctionSymmetryValues = (values: FunctionSymmetryValues) => ({
-  symmetryType: isSymmetryType(values.symmetryType) ? values.symmetryType : functionSymmetryDefinition.parameters.symmetryType.defaultValue,
-  x: clampX(Number.isFinite(values.x) ? values.x as number : xControl.defaultValue),
-});
-const evaluateSymmetryFunction = (symmetryType: SymmetryType, x: number): number => symmetryType === "even"
-  ? 0.2 * x * x - 2
-  : symmetryType === "odd" ? 0.025 * x * x * x + 0.2 * x : 0.12 * (x - 1) * (x - 1) - 3;
-
-function deriveFunctionSymmetryPoints(values: FunctionSymmetryValues) {
-  const normalized = normalizeFunctionSymmetryValues(values);
-  const y = evaluateSymmetryFunction(normalized.symmetryType, normalized.x);
-  return {
-    point: { x: normalized.x, y },
-    evenCandidate: { x: -normalized.x, y },
-    oddCandidate: { x: -normalized.x, y: -y },
-    actualOppositeX: { x: -normalized.x, y: evaluateSymmetryFunction(normalized.symmetryType, -normalized.x) },
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `EVEN_ODD_FUNCTION_SYMMETRY`),
+      (n = `even-odd-function-symmetry-v1`),
+      (r = {
+        symmetryType: {
+          kind: `enum`,
+          defaultValue: `even`,
+          allowedValues: [`even`, `odd`, `neither`],
+        },
+        x: { kind: `number`, defaultValue: 3, min: 1.25, max: 4.5 },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-const symmetryTypeToIndex = (symmetryType: SymmetryType): number => symmetryOptions.find((option) => option.symmetryType === symmetryType)?.value ?? 0;
-
-function initializeFunctionSymmetrySchema(): void {}
-function initializeFunctionSymmetryModel(): void {}
-
-export {
-  initializeFunctionSymmetryModel as a,
-  initializeFunctionSymmetrySchema as c,
-  symmetryTypeToIndex as i,
-  functionSymmetryDefinition as l,
-  symmetryOptions as n,
-  normalizeFunctionSymmetryValues as o,
-  deriveFunctionSymmetryPoints as r,
-  snapXToControl as s,
-  symmetryFormulas as t,
-};
+var o, s, c, l, u, d, f, p, m, h, g;
+function _() {
+  return (_ = e(() => {
+    (a(),
+      (o = { ...i.parameters.x, step: 0.25 }),
+      (s = i.parameters.symmetryType.allowedValues.map((e, t) => ({ value: t, symmetryType: e }))),
+      (c = {
+        even: `y = 0.2x^2 - 2`,
+        odd: `y = 0.025x^3 + 0.2x`,
+        neither: `y = 0.12(x - 1)^2 - 3`,
+      }),
+      (l = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (u = (e) => l(e, o.min, o.max)),
+      (d = (e) => {
+        let t = u(e),
+          n = o.min + Math.round((t - o.min) / o.step) * o.step;
+        return Number(u(n).toFixed(2));
+      }),
+      (f = (e) => i.parameters.symmetryType.allowedValues.includes(e)),
+      (p = (e) => ({
+        symmetryType: f(e.symmetryType) ? e.symmetryType : i.parameters.symmetryType.defaultValue,
+        x: u(Number.isFinite(e.x) ? e.x : o.defaultValue),
+      })),
+      (m = (e, t) =>
+        e === `even`
+          ? 0.2 * t * t - 2
+          : e === `odd`
+            ? 0.025 * t * t * t + 0.2 * t
+            : 0.12 * (t - 1) * (t - 1) - 3),
+      (h = (e) => {
+        let t = p(e),
+          n = m(t.symmetryType, t.x);
+        return {
+          point: { x: t.x, y: n },
+          evenCandidate: { x: -t.x, y: n },
+          oddCandidate: { x: -t.x, y: -n },
+          actualOppositeX: { x: -t.x, y: m(t.symmetryType, -t.x) },
+        };
+      }),
+      (g = (e) => s.find((t) => t.symmetryType === e)?.value ?? 0));
+  }))();
+}
+export { _ as a, a as c, g as i, i as l, s as n, p as o, h as r, d as s, c as t };

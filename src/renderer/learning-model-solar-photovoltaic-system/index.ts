@@ -1,15 +1,12 @@
-// Solar-photovoltaic-system learning-model manifest. Release chunk: type-f31fc951c570.js.
-import "@rchunk/rolldown-runtime";
-
-const solarPhotovoltaicSystemSpecification = {
-  type: "SOLAR_PHOTOVOLTAIC_SYSTEM",
-  version: 2,
-  thumbnailAssetKey: "solar-photovoltaic-system-v2",
-  parameters: {
-    array_capacity_kw: { kind: "number" as const, defaultValue: 6, min: 1, max: 20 },
-  },
-};
-
-function initializeSolarPhotovoltaicSystemSpecification(): void {}
-
-export { solarPhotovoltaicSystemSpecification as n, initializeSolarPhotovoltaicSystemSpecification as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `SOLAR_PHOTOVOLTAIC_SYSTEM`),
+      (n = `solar-photovoltaic-system-v2`),
+      (r = { array_capacity_kw: { kind: `number`, defaultValue: 6, min: 1, max: 20 } }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+export { i as n, a as t };

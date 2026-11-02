@@ -1,22 +1,20 @@
-// Landfill water-pathway teaching model. Release chunk: model-8e907fa97b63.js.
-import "@rchunk/rolldown-runtime";
-
-type LandfillPathway = "gas" | "leachate";
-interface LandfillInput { waterEntry?: number; pathway?: LandfillPathway }
-
-const waterEntryControl = { min: 0, max: 100, step: 1, defaultValue: 45 };
-const pathwayControl = { defaultValue: "leachate" as const };
-const pathwayToggleControl = { min: 0, max: 1, step: 1, defaultValue: 0 };
-const normalizeLandfillInput = (input: LandfillInput) => ({
-  waterEntry: Number.isFinite(input.waterEntry)
-    ? Math.min(waterEntryControl.max, Math.max(waterEntryControl.min, input.waterEntry ?? 0))
-    : waterEntryControl.defaultValue,
-  pathway: input.pathway === "gas" ? "gas" as const : "leachate" as const,
-});
-const pathwayToToggle = (pathway: LandfillPathway): number => +(pathway === "gas");
-const toggleToPathway = (value: number): LandfillPathway => value >= 0.5 ? "gas" : "leachate";
-const describeWaterEntry = (value: number): "dry" | "moderate" | "heavy" =>
-  value < 20 ? "dry" : value < 65 ? "moderate" : "heavy";
-function initializeLandfillWaterPathwaysModel(): void {}
-
-export { pathwayToToggle as a, normalizeLandfillInput as c, toggleToPathway as i, pathwayToggleControl as n, describeWaterEntry as o, waterEntryControl as r, initializeLandfillWaterPathwaysModel as s, pathwayControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s;
+function c() {
+  return (c = e(() => {
+    ((t = { min: 0, max: 100, step: 1, defaultValue: 45 }),
+      (n = { defaultValue: `leachate` }),
+      (r = { min: 0, max: 1, step: 1, defaultValue: 0 }),
+      (i = (e) => ({
+        waterEntry: Number.isFinite(e.waterEntry)
+          ? Math.min(t.max, Math.max(t.min, e.waterEntry ?? 0))
+          : t.defaultValue,
+        pathway: e.pathway === `gas` ? `gas` : `leachate`,
+      })),
+      (a = (e) => +(e === `gas`)),
+      (o = (e) => (e >= 0.5 ? `gas` : `leachate`)),
+      (s = (e) => (e < 20 ? `dry` : e < 65 ? `moderate` : `heavy`)));
+  }))();
+}
+export { a, i as c, o as i, r as n, s as o, t as r, c as s, n as t };

@@ -1,61 +1,39 @@
-// Ideal-gas PV=nRT specification. Release chunk: type-4bab13b66760.js.
-import "@rchunk/rolldown-runtime";
-
-interface NumberParameter {
-  kind: "number";
-  defaultValue: number;
-  min: number;
-  max: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o;
+function s() {
+  return (s = e(() => {
+    ((t = `PV_NRT_EQUATION`),
+      (n = `pvnrt-v1`),
+      (r = `PV = nRT`),
+      (i = [
+        `P V = n R T`,
+        `P = nRT / V`,
+        `P = \\frac{nRT}{V}`,
+        `V = nRT / P`,
+        `V = \\frac{nRT}{P}`,
+        `n = PV / RT`,
+        `n = \\frac{PV}{RT}`,
+        `T = PV / nR`,
+        `T = \\frac{PV}{nR}`,
+        `R = PV / nT`,
+        `R = \\frac{PV}{nT}`,
+      ]),
+      (a = {
+        P: { kind: `number`, defaultValue: 1, min: 0.01, max: 100 },
+        V: { kind: `number`, defaultValue: 24, min: 0.01, max: 1e4 },
+        n: { kind: `number`, defaultValue: 1, min: 0.01, max: 1e3 },
+        T: { kind: `number`, defaultValue: 298, min: 1, max: 5e3 },
+        solveFor: { kind: `enum`, defaultValue: `P`, allowedValues: [`P`, `V`, `n`, `T`] },
+      }),
+      (o = {
+        type: t,
+        version: 2,
+        thumbnailAssetKey: n,
+        canonicalFormula: r,
+        canonicalFormulaAliases: i,
+        parameters: a,
+      }));
+  }))();
 }
-interface Specification {
-  type: "PV_NRT_EQUATION";
-  version: 2;
-  thumbnailAssetKey: "pvnrt-v1";
-  canonicalFormula: "PV = nRT";
-  canonicalFormulaAliases: string[];
-  parameters: {
-    P: NumberParameter;
-    V: NumberParameter;
-    n: NumberParameter;
-    T: NumberParameter;
-    solveFor: {
-      kind: "enum";
-      defaultValue: "P";
-      allowedValues: ["P", "V", "n", "T"];
-    };
-  };
-}
-let specification: Specification;
-function initializeSpecification(): void {
-  specification ??= {
-    type: "PV_NRT_EQUATION",
-    version: 2,
-    thumbnailAssetKey: "pvnrt-v1",
-    canonicalFormula: "PV = nRT",
-    canonicalFormulaAliases: [
-      "P V = n R T",
-      "P = nRT / V",
-      "P = \\frac{nRT}{V}",
-      "V = nRT / P",
-      "V = \\frac{nRT}{P}",
-      "n = PV / RT",
-      "n = \\frac{PV}{RT}",
-      "T = PV / nR",
-      "T = \\frac{PV}{nR}",
-      "R = PV / nT",
-      "R = \\frac{PV}{nT}",
-    ],
-    parameters: {
-      P: { kind: "number", defaultValue: 1, min: 0.01, max: 100 },
-      V: { kind: "number", defaultValue: 24, min: 0.01, max: 10_000 },
-      n: { kind: "number", defaultValue: 1, min: 0.01, max: 1_000 },
-      T: { kind: "number", defaultValue: 298, min: 1, max: 5_000 },
-      solveFor: {
-        kind: "enum",
-        defaultValue: "P",
-        allowedValues: ["P", "V", "n", "T"],
-      },
-    },
-  };
-}
-export { specification as n, initializeSpecification as t };
+export { o as n, s as t };

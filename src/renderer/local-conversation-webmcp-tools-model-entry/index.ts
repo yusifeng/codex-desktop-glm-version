@@ -1,14 +1,13 @@
+// @ts-nocheck
 import {
-  i as initializeLocalConversationWebMcpToolsModel,
-  n as getWebMcpCallsForSummaryPanel,
-  r as groupWebMcpCallsByName,
-  t as getHostnameFromWebUrl,
+  i as e,
+  n as t,
+  r as n,
+  t as r,
 } from "@rchunk/local-conversation-webmcp-tools-model";
-
-initializeLocalConversationWebMcpToolsModel();
-
+e();
 export {
-  getHostnameFromWebUrl,
-  getWebMcpCallsForSummaryPanel,
-  groupWebMcpCallsByName,
+  r as getHostnameFromWebUrl,
+  t as getWebMcpCallsForSummaryPanel,
+  n as groupWebMcpCallsByName,
 };

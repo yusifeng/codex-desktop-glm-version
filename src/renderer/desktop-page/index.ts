@@ -1,140 +1,122 @@
-// desktop-page —— 浏览器认证完成后拉起桌面应用，并提供复制回跳链接的兜底。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as pageLayoutChunk from "@rchunk/page-layout";
-void runtimeChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  I3: getJsxRuntime,
-  K2: initializeSharedUi,
-  Y2: FormattedMessage,
-  Yh: Button,
-  Zh: initializeButton,
-  e6: reactRuntime,
-} = appSharedChunk;
-const { Qgn: initializeAccountContext, d_n: useSearchParams } = appInitialChunk;
-const { n: initializePageLayout, t: PageLayout } = pageLayoutChunk;
-
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function BrowserOpenInDesktopPage(): unknown {
-  const [searchParams] = useSearchParams();
-  const [showFallback, setShowFallback] = reactRuntime.useState(false);
-  const [copyFailed, setCopyFailed] = reactRuntime.useState(false);
-  const didLaunch = reactRuntime.useRef(false);
-  const desktopUrl = createDesktopAuthUrl(searchParams, navigator.userAgent);
-  const title = jsx.jsx(FormattedMessage, {
-    id: "browser.auth.desktop.title",
-    defaultMessage: "Continue in the desktop app",
-    description:
-      "Heading on the browser page that finishes authentication in the ChatGPT desktop app",
-  });
-  if (desktopUrl == null) {
-    return jsx.jsx(PageLayout, {
-      title,
-      children: jsx.jsx("p", {
-        role: "alert",
-        children: jsx.jsx(FormattedMessage, {
-          id: "browser.auth.desktop.invalid",
-          defaultMessage:
-            "This sign-in link is incomplete. Return to the desktop app and try again",
-          description:
-            "Error when a desktop authentication callback lacks its path, code, or state; instruct the user to restart in the app",
-        }),
-      }),
-    });
-  }
-  return jsx.jsx(PageLayout, {
-    title,
-    children: jsx.jsxs("div", {
-      ref: () => {
-        if (!didLaunch.current) {
-          didLaunch.current = true;
-          window.location.assign(desktopUrl);
-        }
-        const timeout = window.setTimeout(() => setShowFallback(true), 3_000);
-        return () => window.clearTimeout(timeout);
-      },
-      className: "flex w-full flex-col gap-3",
-      children: [
-        jsx.jsx(Button, {
-          type: "button",
-          color: "primary",
-          size: "auth",
-          onClick: () => window.location.assign(desktopUrl),
-          children: jsx.jsx(FormattedMessage, {
-            id: "OpenInDesktopApp.launchButton",
-            defaultMessage: "Launch ChatGPT desktop app",
-            description:
-              "Button on the browser authentication callback page that opens and authenticates the ChatGPT desktop app",
-          }),
-        }),
-        showFallback
-          ? jsx.jsx(Button, {
-              type: "button",
-              color: "outlineSurface",
-              size: "auth",
-              onClick: () => {
-                navigator.clipboard.writeText(desktopUrl).then(
-                  () => setCopyFailed(false),
-                  () => setCopyFailed(true),
-                );
-              },
-              children: jsx.jsx(FormattedMessage, {
-                id: "OpenInDesktopApp.secondaryButton",
-                defaultMessage: "Not launching? Click here instead",
-                description:
-                  "Fallback button on the desktop authentication callback page; copies the desktop sign-in link to the clipboard",
-              }),
-            })
-          : null,
-        copyFailed
-          ? jsx.jsx("p", {
-              role: "alert",
-              className: "text-sm text-danger",
-              children: jsx.jsx(FormattedMessage, {
-                id: "browser.auth.desktop.copyFailed",
-                defaultMessage:
-                  "Couldn’t copy the link. Try launching the app again",
-                description:
-                  "Inline error when the browser refuses to copy the desktop sign-in link",
-              }),
-            })
-          : null,
-      ],
-    }),
-  });
-}
-
-function createDesktopAuthUrl(
-  searchParams: URLSearchParams,
-  userAgent: string,
-): string | null {
-  const path = searchParams.get("path");
-  const code = searchParams.get("code");
-  const state = searchParams.get("state");
-  if (!path || !code || !state || /[?#]/.test(path)) return null;
-  const scheme = /Macintosh|MacIntel|MacPPC|Mac68K/.test(userAgent)
-    ? "chatgpt-alt"
-    : "chatgpt";
-  const url = new URL(
-    `${scheme}://oauth_complete${path.startsWith("/") ? path : `/${path}`}`,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  I3 as n,
+  K2 as r,
+  Y2 as i,
+  Yh as a,
+  Zh as o,
+  e6 as s,
+} from "@rchunk/app-shared";
+import { Qgn as c, d_n as l } from "@rchunk/app-initial";
+import { n as u, t as d } from "@rchunk/page-layout";
+function f() {
+  let e = (0, m.c)(7),
+    [t] = l(),
+    [n, r] = (0, h.useState)(!1),
+    [o, s] = (0, h.useState)(!1),
+    c = (0, h.useRef)(!1),
+    u;
+  e[0] === t ? (u = e[1]) : ((u = p(t, navigator.userAgent)), (e[0] = t), (e[1] = u));
+  let f = u,
+    _;
+  e[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((_ = (0, g.jsx)(i, {
+        id: `browser.auth.desktop.title`,
+        defaultMessage: `Continue in the desktop app`,
+        description: `Heading on the browser page that finishes authentication in the ChatGPT desktop app`,
+      })),
+      (e[2] = _))
+    : (_ = e[2]);
+  let v;
+  return (
+    e[3] !== o || e[4] !== f || e[5] !== n
+      ? ((v = (0, g.jsx)(d, {
+          title: _,
+          children:
+            f == null
+              ? (0, g.jsx)(`p`, {
+                  role: `alert`,
+                  children: (0, g.jsx)(i, {
+                    id: `browser.auth.desktop.invalid`,
+                    defaultMessage: `This sign-in link is incomplete. Return to the desktop app and try again`,
+                    description: `Error when a desktop authentication callback lacks its path, code, or state; instruct the user to restart in the app`,
+                  }),
+                })
+              : (0, g.jsxs)(`div`, {
+                  ref: () => {
+                    c.current || ((c.current = !0), window.location.assign(f));
+                    let e = window.setTimeout(() => r(!0), 3e3);
+                    return () => window.clearTimeout(e);
+                  },
+                  className: `flex w-full flex-col gap-3`,
+                  children: [
+                    (0, g.jsx)(a, {
+                      type: `button`,
+                      color: `primary`,
+                      size: `auth`,
+                      onClick: () => window.location.assign(f),
+                      children: (0, g.jsx)(i, {
+                        id: `OpenInDesktopApp.launchButton`,
+                        defaultMessage: `Launch ChatGPT desktop app`,
+                        description: `Button on the browser authentication callback page that opens and authenticates the ChatGPT desktop app`,
+                      }),
+                    }),
+                    n
+                      ? (0, g.jsx)(a, {
+                          type: `button`,
+                          color: `outlineSurface`,
+                          size: `auth`,
+                          onClick: () => {
+                            navigator.clipboard.writeText(f).then(
+                              () => s(!1),
+                              () => s(!0),
+                            );
+                          },
+                          children: (0, g.jsx)(i, {
+                            id: `OpenInDesktopApp.secondaryButton`,
+                            defaultMessage: `Not launching? Click here instead`,
+                            description: `Fallback button on the desktop authentication callback page; copies the desktop sign-in link to the clipboard`,
+                          }),
+                        })
+                      : null,
+                    o
+                      ? (0, g.jsx)(`p`, {
+                          role: `alert`,
+                          className: `text-sm text-danger`,
+                          children: (0, g.jsx)(i, {
+                            id: `browser.auth.desktop.copyFailed`,
+                            defaultMessage: `Couldn’t copy the link. Try launching the app again`,
+                            description: `Inline error when the browser refuses to copy a desktop sign-in link`,
+                          }),
+                        })
+                      : null,
+                  ],
+                }),
+        })),
+        (e[3] = o),
+        (e[4] = f),
+        (e[5] = n),
+        (e[6] = v))
+      : (v = e[6]),
+    v
   );
-  url.search = new URLSearchParams({ code, state }).toString();
-  return url.toString();
 }
-
-function initializeDesktopPage(): void {
-  initializeRuntimeLazy();
-  reactRuntime();
-  initializeSharedUi();
-  initializeAccountContext();
-  initializeButton();
-  initializePageLayout();
-  jsx = getJsxRuntime();
+function p(e, t) {
+  let n = e.get(`path`),
+    r = e.get(`code`),
+    i = e.get(`state`);
+  if (!n || !r || !i || /[\\?#]/.test(n)) return null;
+  let a = /Macintosh|MacIntel|MacPPC|Mac68K/.test(t) ? `chatgpt-alt` : `chatgpt`,
+    o = new URL(`${a}://oauth_complete${n.startsWith(`/`) ? n : `/${n}`}`);
+  return ((o.search = new URLSearchParams({ code: r, state: i }).toString()), o.toString());
 }
-
-initializeDesktopPage();
-export { BrowserOpenInDesktopPage };
+var m, h, g;
+function _() {
+  return (_ = e(() => {
+    ((m = t()), (h = s()), r(), c(), o(), u(), (g = n()));
+  }))();
+}
+_();
+export { f as BrowserOpenInDesktopPage };

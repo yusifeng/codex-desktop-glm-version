@@ -1,65 +1,28 @@
-// Circle-area model and visualization template. Release chunk: template-97cafe2997c3.js.
-import "@rchunk/rolldown-runtime";
-interface Specification {
-  type: "CIRCLE_AREA";
-  version: 2;
-  thumbnailAssetKey: "circle-area-v1";
-  canonicalFormula: string;
-  canonicalFormulaAliases: string[];
-  parameters: {
-    radius: { kind: "number"; defaultValue: 3; min: 0.01; max: 10000 };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o;
+function s() {
+  return (s = e(() => {
+    ((t = `CIRCLE_AREA`),
+      (n = `circle-area-v1`),
+      (r = `A = \\pi r^2`),
+      (i = [`A = \\frac{\\pi d^2}{4}`, `\\pi r^2`, `\\frac{\\pi d^2}{4}`, `pir^2=a`, `pid^2/4=a`]),
+      (a = { radius: { kind: `number`, defaultValue: 3, min: 0.01, max: 1e4 } }),
+      (o = {
+        type: t,
+        version: 2,
+        thumbnailAssetKey: n,
+        canonicalFormula: r,
+        canonicalFormulaAliases: i,
+        parameters: a,
+      }));
+  }))();
 }
-interface RadiusControl {
-  label: "r";
-  min: 0.5;
-  max: 10;
-  step: 0.1;
-  defaultValue: 3;
-  thumbnailDefaultValue: 10;
+var c, l;
+function u() {
+  return (u = e(() => {
+    ((c = { label: `r`, min: 0.5, max: 10, step: 0.1, defaultValue: 3, thumbnailDefaultValue: 10 }),
+      (l = { properties: { radius: c } }));
+  }))();
 }
-let specification: Specification;
-let radiusControl: RadiusControl;
-let visualizationTemplate: { properties: { radius: RadiusControl } };
-let specInitialized = false;
-let templateInitialized = false;
-function initializeSpecification(): void {
-  if (specInitialized) return;
-  specInitialized = true;
-  specification = {
-    type: "CIRCLE_AREA",
-    version: 2,
-    thumbnailAssetKey: "circle-area-v1",
-    canonicalFormula: "A = \\pi r^2",
-    canonicalFormulaAliases: [
-      "A = \\frac{\\pi d^2}{4}",
-      "\\pi r^2",
-      "\\frac{\\pi d^2}{4}",
-      "pir^2=a",
-      "pid^2/4=a",
-    ],
-    parameters: {
-      radius: { kind: "number", defaultValue: 3, min: 0.01, max: 10000 },
-    },
-  };
-}
-function initializeTemplate(): void {
-  if (templateInitialized) return;
-  templateInitialized = true;
-  radiusControl = {
-    label: "r",
-    min: 0.5,
-    max: 10,
-    step: 0.1,
-    defaultValue: 3,
-    thumbnailDefaultValue: 10,
-  };
-  visualizationTemplate = { properties: { radius: radiusControl } };
-}
-export {
-  specification as a,
-  initializeSpecification as i,
-  radiusControl as n,
-  initializeTemplate as r,
-  visualizationTemplate as t,
-};
+export { o as a, s as i, c as n, u as r, l as t };

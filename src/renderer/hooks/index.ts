@@ -1,51 +1,43 @@
-import * as appSharedChunk from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-const { I3: getJsxRuntime, e6: getReactRuntime } = appSharedChunk;
-let jsx: JsxRuntime;
-
-function HooksIcon(props: Record<string, unknown>): unknown {
-  initializeHooksIcon();
-  return jsx.jsxs("svg", {
-    width: 18,
-    height: 18,
-    viewBox: "0 0 18 18",
-    fill: "none",
-    xmlns: "http://www.w3.org/2000/svg",
-    ...props,
-    children: [
-      jsx.jsx("circle", {
-        cx: 8.99805,
-        cy: 4.875,
-        r: 1.875,
-        stroke: "currentColor",
-        strokeWidth: 1.5,
-      }),
-      jsx.jsx("path", {
-        d: "M9 6.75V12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12V9.75L13.5 11.25",
-        stroke: "currentColor",
-        strokeWidth: 1.5,
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-      }),
-      jsx.jsx("path", {
-        d: "M9 6.75V12C9 13.6569 7.65685 15 6 15C4.34315 15 3 13.6569 3 12V9.75L4.5 11.25",
-        stroke: "currentColor",
-        strokeWidth: 1.5,
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-      }),
-    ],
-  });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { I3 as t, e6 as n } from "@rchunk/app-shared";
+var r, i;
+function a() {
+  return (a = e(() => {
+    (n(),
+      (r = t()),
+      (i = (e) =>
+        (0, r.jsxs)(`svg`, {
+          width: 18,
+          height: 18,
+          viewBox: `0 0 18 18`,
+          fill: `none`,
+          xmlns: `http://www.w3.org/2000/svg`,
+          ...e,
+          children: [
+            (0, r.jsx)(`circle`, {
+              cx: 8.99805,
+              cy: 4.875,
+              r: 1.875,
+              stroke: `currentColor`,
+              strokeWidth: 1.5,
+            }),
+            (0, r.jsx)(`path`, {
+              d: `M9 6.75V12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12V9.75L13.5 11.25`,
+              stroke: `currentColor`,
+              strokeWidth: 1.5,
+              strokeLinecap: `round`,
+              strokeLinejoin: `round`,
+            }),
+            (0, r.jsx)(`path`, {
+              d: `M9 6.75V12C9 13.6569 7.65685 15 6 15C4.34315 15 3 13.6569 3 12V9.75L4.5 11.25`,
+              stroke: `currentColor`,
+              strokeWidth: 1.5,
+              strokeLinecap: `round`,
+              strokeLinejoin: `round`,
+            }),
+          ],
+        })));
+  }))();
 }
-
-let initialized = false;
-function initializeHooksIcon(): void {
-  if (initialized) return;
-  getReactRuntime();
-  jsx = getJsxRuntime();
-  initialized = true;
-}
-
-export { initializeHooksIcon as n, HooksIcon as t };
+export { a as n, i as t };

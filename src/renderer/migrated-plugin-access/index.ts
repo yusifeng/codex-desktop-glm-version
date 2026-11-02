@@ -1,249 +1,101 @@
-// migrated-plugin-access —— GPT 迁移为插件时的资格、权限与目标插件访问查询。
-// 原版：app/webview/assets/migrated-plugin-access-912829d71f23.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import type {
-  DerivedScopedSignalContext,
-  ScopedQueryFamily,
-} from "@rchunk/app-shared";
-
-void runtimeChunk;
-
-interface GptPermissions {
-  can_preview_business_agent_tools?: boolean | null;
-  can_read?: boolean;
-  can_view_config?: boolean;
-  can_write?: boolean;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, QI as n, QX as r, ZI as i } from "@rchunk/app-shared";
+import {
+  G3t as a,
+  G6t as o,
+  K3t as s,
+  K6t as c,
+  Sun as l,
+  _un as u,
+  f4t as d,
+  p4t as f,
+  pdn as p,
+  udn as m,
+} from "@rchunk/app-initial";
+function h({
+  resource: e,
+  account: t,
+  accountId: n,
+  userId: r,
+  enabled: i,
+  allowMigrated: a = !1,
+}) {
+  let { gizmo: o } = e;
+  return !i ||
+    n == null ||
+    t?.id !== n ||
+    !v(e) ||
+    (!a && o.migrated_plugin_id != null) ||
+    (o.workspace_id ?? null) !== (t.structure === `workspace` ? t.id : null)
+    ? !1
+    : o.author.user_id === (t.structure === `personal` ? r : t.account_user_id)
+      ? o.current_user_permission?.can_view_config === !0 &&
+        o.current_user_permission.can_write === !0
+      : t.structure === `workspace` &&
+        (t.account_user_role === `account-owner` || t.account_user_role === `account-admin`) &&
+        o.share_recipient !== `private` &&
+        o.current_user_permission?.can_read === !0;
 }
-
-interface GptResource {
-  gizmo: {
-    author: { user_id: string };
-    current_user_permission?: GptPermissions | null;
-    gizmo_type: string;
-    live_version?: number | null;
-    migrated_plugin_id?: string | null;
-    share_recipient?: string | null;
-    workspace_id?: string | null;
-  };
+function g(e, t, n) {
+  return e == null
+    ? !1
+    : e.structure === `personal` || !t || n?.includes(`chatgpt.workspace_plugins.use`) === !0;
 }
-
-interface Account {
-  account_user_id?: string | null;
-  account_user_role?: string | null;
-  id: string;
-  structure: "personal" | "workspace" | string;
-}
-
-interface MigrationEligibility {
-  resource: GptResource;
-  account: Account | null;
-  accountId: string | null;
-  userId: string | null;
-  enabled: boolean;
-  allowMigrated?: boolean;
-}
-
-interface PluginBatchResponse {
-  results: Array<{
-    plugin: {
-      id: string;
-      installation_policy: string;
-      status: string;
-    };
-  }>;
-}
-
-interface AppInitialBindings {
-  G3t(product: string): Record<string, string>;
-  G6t(): void;
-  K3t(): void;
-  K6t: unknown;
-  Sun(): void;
-  _un: unknown;
-  f4t(signal: AbortSignal): AbortSignal;
-  p4t(): void;
-  pdn(): void;
-  udn: {
-    safePost<Result>(
-      path: string,
-      options: {
-        additionalHeaders: Record<string, string>;
-        requestBody: { plugin_ids: string[] };
-        signal: AbortSignal;
-      },
-    ): Promise<Result>;
-  };
-}
-
-const {
-  G3t: getProductHeaders,
-  G6t: initializeGptResources,
-  K3t: initializeAccountState,
-  K6t: accountIdSignal,
-  Sun: initializeGptPermissions,
-  _un: userIdSignal,
-  f4t: normalizeAbortSignal,
-  p4t: initializePluginState,
-  pdn: initializeWorkspaceSubscriptions,
-  udn: appApiClient,
-} = appInitialChunk as unknown as AppInitialBindings;
-const {
-  FX: initializeMaitaiRuntime,
-  QI: initializeQueryBridge,
-  QX: createQueryFamily,
-  ZI: AppScope,
-} = appSharedChunk;
-
-function isLiveGptResource({ gizmo }: GptResource): boolean {
+function _({ resource: e, account: t, accountId: n, permissions: r }) {
   return (
-    gizmo.gizmo_type === "gpt" &&
-    gizmo.current_user_permission?.can_preview_business_agent_tools == null &&
-    (gizmo.live_version ?? 0) > 0
+    t?.structure === `workspace` &&
+    t.id === n &&
+    e.gizmo.workspace_id === t.id &&
+    e.gizmo.author.user_id === t.account_user_id &&
+    v(e) &&
+    r != null &&
+    !r.includes(`chatgpt.workspace_plugins.use`)
   );
 }
-
-function canMigrateGpt({
-  resource,
-  account,
-  accountId,
-  userId,
-  enabled,
-  allowMigrated = false,
-}: MigrationEligibility): boolean {
-  const { gizmo } = resource;
-  if (
-    !enabled ||
-    accountId == null ||
-    account?.id !== accountId ||
-    !isLiveGptResource(resource) ||
-    (!allowMigrated && gizmo.migrated_plugin_id != null) ||
-    (gizmo.workspace_id ?? null) !==
-      (account.structure === "workspace" ? account.id : null)
-  )
-    return false;
-  const ownerId =
-    account.structure === "personal" ? userId : account.account_user_id;
-  if (gizmo.author.user_id === ownerId)
-    return (
-      gizmo.current_user_permission?.can_view_config === true &&
-      gizmo.current_user_permission.can_write === true
-    );
+function v({ gizmo: e }) {
   return (
-    account.structure === "workspace" &&
-    (account.account_user_role === "account-owner" ||
-      account.account_user_role === "account-admin") &&
-    gizmo.share_recipient !== "private" &&
-    gizmo.current_user_permission?.can_read === true
+    e.gizmo_type === `gpt` &&
+    e.current_user_permission?.can_preview_business_agent_tools == null &&
+    (e.live_version ?? 0) > 0
   );
 }
-
-function accountCanUseWorkspacePlugins(
-  account: Account | null | undefined,
-  workspaceGate: boolean,
-  permissions?: string[],
-): boolean {
-  return account == null
-    ? false
-    : account.structure === "personal" ||
-        !workspaceGate ||
-        permissions?.includes("chatgpt.workspace_plugins.use") === true;
+function y() {
+  return (y = e(() => {}))();
 }
-
-function shouldShowWorkspacePluginRetirement({
-  resource,
-  account,
-  accountId,
-  permissions,
-}: {
-  resource: GptResource;
-  account: Account | null;
-  accountId: string | null;
-  permissions?: string[];
-}): boolean {
-  return (
-    account?.structure === "workspace" &&
-    account.id === accountId &&
-    resource.gizmo.workspace_id === account.id &&
-    resource.gizmo.author.user_id === account.account_user_id &&
-    isLiveGptResource(resource) &&
-    permissions != null &&
-    !permissions.includes("chatgpt.workspace_plugins.use")
-  );
+var b;
+function x() {
+  return (x = e(() => {
+    (t(),
+      o(),
+      l(),
+      s(),
+      f(),
+      n(),
+      p(),
+      (b = r(i, (e, { get: t }) => {
+        let n = t(c),
+          r = t(u);
+        return {
+          enabled: n != null && r != null,
+          queryKey: [`plugins`, `gpt-migration-access`, e, n, r],
+          queryFn: async ({ signal: t }) => {
+            let { results: n } = await m.safePost(`/ps/plugins/batch`, {
+              requestBody: { plugin_ids: [e] },
+              additionalHeaders: a(`chatgpt`),
+              signal: d(t),
+            });
+            return n.some(
+              ({ plugin: t }) =>
+                t.id === e && t.status === `ENABLED` && t.installation_policy !== `NOT_AVAILABLE`,
+            );
+          },
+          staleTime: 0,
+          refetchOnMount: `always`,
+          refetchOnWindowFocus: !0,
+          retry: !1,
+        };
+      })));
+  }))();
 }
-
-let pluginAccessQuery: ScopedQueryFamily<
-  Record<string, unknown>,
-  string,
-  boolean
->;
-let initialized = false;
-function initializeMigratedPluginAccess(): void {
-  if (initialized) return;
-  initializeMaitaiRuntime();
-  initializeGptResources();
-  initializeGptPermissions();
-  initializeAccountState();
-  initializePluginState();
-  initializeQueryBridge();
-  initializeWorkspaceSubscriptions();
-  pluginAccessQuery = createQueryFamily<
-    Record<string, unknown>,
-    string,
-    boolean
-  >(
-    AppScope,
-    (
-      pluginId: string,
-      { get }: DerivedScopedSignalContext<Record<string, unknown>>,
-    ) => {
-      const accountId = get<string | null>(accountIdSignal);
-      const userId = get<string | null>(userIdSignal);
-      return {
-        enabled: accountId != null && userId != null,
-        queryKey: [
-          "plugins",
-          "gpt-migration-access",
-          pluginId,
-          accountId,
-          userId,
-        ],
-        queryFn: async ({ signal }: { signal: AbortSignal }) => {
-          const { results } = await appApiClient.safePost<PluginBatchResponse>(
-            "/ps/plugins/batch",
-            {
-              requestBody: { plugin_ids: [pluginId] },
-              additionalHeaders: getProductHeaders("chatgpt"),
-              signal: normalizeAbortSignal(signal),
-            },
-          );
-          return results.some(
-            ({ plugin }) =>
-              plugin.id === pluginId &&
-              plugin.status === "ENABLED" &&
-              plugin.installation_policy !== "NOT_AVAILABLE",
-          );
-        },
-        staleTime: 0,
-        refetchOnMount: "always",
-        refetchOnWindowFocus: true,
-        retry: false,
-      };
-    },
-  );
-  initialized = true;
-}
-
-function initializeMigratedPluginAccessTypes(): void {}
-
-initializeMigratedPluginAccess();
-export {
-  initializeMigratedPluginAccessTypes as a,
-  accountCanUseWorkspacePlugins as i,
-  pluginAccessQuery as n,
-  shouldShowWorkspacePluginRetirement as o,
-  canMigrateGpt as r,
-  initializeMigratedPluginAccess as t,
-};
+export { y as a, g as i, b as n, _ as o, h as r, x as t };

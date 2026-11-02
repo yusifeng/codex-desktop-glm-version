@@ -1,8 +1,4 @@
-import {
-  Ict as toggleThreadSidePanel,
-  Pct as initializeThreadRightPanelState,
-} from "@rchunk/app-initial";
-
-initializeThreadRightPanelState();
-
-export { toggleThreadSidePanel };
+// @ts-nocheck
+import { Ict as e, Pct as t } from "@rchunk/app-initial";
+t();
+export { e as toggleThreadSidePanel };

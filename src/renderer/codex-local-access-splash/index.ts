@@ -1,74 +1,56 @@
-// Codex 本地模式访问受限页。
-
-import {
-  n as initializeAccessSplash,
-  t as AccessSplash,
-} from "@rchunk/access-splash";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-
-void runtimeChunk;
-
-const {
-  $3: initializeJsxRuntime,
-  I3: getJsxRuntime,
-  K2: initializeFormattedMessage,
-  Y2: FormattedMessage,
-} = appSharedChunk;
-
-interface CodexLocalAccessSplashMessage {
-  defaultMessage: string;
-  description: string;
-  id: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i } from "@rchunk/app-shared";
+import { n as a, t as o } from "@rchunk/access-splash";
+function s() {
+  let e = (0, c.c)(4),
+    t,
+    n,
+    r;
+  e[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((t = (0, l.jsx)(i, {
+        id: `composer.codexAccessSplash.accessMessage`,
+        defaultMessage: `You don’t have access to Codex yet. Contact your admin to request access.`,
+        description: `Status shown above the Codex access splash when the user's workspace has not enabled local Codex, directing them to contact their admin`,
+      })),
+      (n = (0, l.jsx)(i, {
+        id: `composer.codexAccessSplash.description`,
+        defaultMessage: `Use Codex to understand codebases, build features, fix bugs, and review changes`,
+        description: `Description shown when a user selects Codex but their workspace has not enabled local Codex`,
+      })),
+      (r = (0, l.jsx)(i, {
+        id: `composer.codexAccessSplash.learnMore`,
+        defaultMessage: `Learn more about Codex`,
+        description: `Link below the Codex access splash that opens an overview of Codex`,
+      })),
+      (e[0] = t),
+      (e[1] = n),
+      (e[2] = r))
+    : ((t = e[0]), (n = e[1]), (r = e[2]));
+  let a;
+  return (
+    e[3] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((a = (0, l.jsx)(o, {
+          accessMessage: t,
+          description: n,
+          learnMoreLabel: r,
+          learnMoreUrl: `https://chatgpt.com/codex/`,
+          title: (0, l.jsx)(i, {
+            id: `composer.codexAccessSplash.title`,
+            defaultMessage: `Take coding tasks from idea to pull request`,
+            description: `Title shown when a user selects Codex but their workspace has not enabled local Codex`,
+          }),
+        })),
+        (e[3] = a))
+      : (a = e[3]),
+    a
+  );
 }
-
-function CodexLocalAccessSplash(): unknown {
-  initializeCodexLocalAccessSplash();
-  const jsx =
-    typeof getJsxRuntime === "function" ? getJsxRuntime() : getJsxRuntime;
-  const message = ({
-    id,
-    defaultMessage,
-    description,
-  }: CodexLocalAccessSplashMessage) =>
-    jsx.jsx(FormattedMessage, { id, defaultMessage, description });
-  return jsx.jsx(AccessSplash, {
-    accessMessage: message({
-      id: "composer.codexAccessSplash.accessMessage",
-      defaultMessage:
-        "You don’t have access to Codex yet. Contact your admin to request access.",
-      description:
-        "Status shown above the Codex access splash when the user's workspace has not enabled local Codex, directing them to contact their admin",
-    }),
-    description: message({
-      id: "composer.codexAccessSplash.description",
-      defaultMessage:
-        "Use Codex to understand codebases, build features, fix bugs, and review changes",
-      description:
-        "Description shown when a user selects Codex but their workspace has not enabled local Codex",
-    }),
-    learnMoreLabel: message({
-      id: "composer.codexAccessSplash.learnMore",
-      defaultMessage: "Learn more about Codex",
-      description:
-        "Link below the Codex access splash that opens an overview of Codex",
-    }),
-    learnMoreUrl: "https://chatgpt.com/codex/",
-    title: message({
-      id: "composer.codexAccessSplash.title",
-      defaultMessage: "Take coding tasks from idea to pull request",
-      description:
-        "Title shown when a user selects Codex but their workspace has not enabled local Codex",
-    }),
-  });
+var c, l;
+function u() {
+  return (u = e(() => {
+    ((c = t()), r(), a(), (l = n()));
+  }))();
 }
-
-function initializeCodexLocalAccessSplash(): void {
-  initializeJsxRuntime?.();
-  initializeFormattedMessage?.();
-  initializeAccessSplash();
-}
-
-initializeCodexLocalAccessSplash();
-
-export { CodexLocalAccessSplash };
+u();
+export { s as CodexLocalAccessSplash };

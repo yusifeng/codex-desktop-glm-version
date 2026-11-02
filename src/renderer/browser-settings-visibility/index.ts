@@ -1,133 +1,125 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  n as initializeClearBrowsingDataDialog,
-  t as ClearBrowsingDataDialogView,
-} from "@rchunk/browser-browsing-data-dialog";
-
-const {
-  $3: initializeRuntimeLazy,
-  FX: initializeMaitaiRuntime,
-  I3: getJsxRuntime,
-  LX: useScope,
-  QI: initializeToastRuntime,
-  SL: initializeQueryClientRuntime,
-  ZI: AppScope,
-  lk: initializeToastManager,
-  pk: toastManagerSignal,
-  xL: QueryClientProvider,
-} = appSharedChunk;
-const {
-  C6t: initializeHostFeatureAvailability,
-  ifn: initializeExperimentRuntime,
-  ofn: readBooleanGate,
-  sfn: readBooleanGateLoading,
-  w6t: useHostFeatureAvailability,
-} = appInitialChunk;
-
-export interface BrowserSettingVisibility {
-  enabled: boolean;
-  isLoading: boolean;
+  $3 as t,
+  FX as n,
+  I3 as r,
+  LX as i,
+  QI as a,
+  SL as o,
+  ZI as s,
+  lk as c,
+  pk as l,
+  xL as u,
+} from "@rchunk/app-shared";
+import { C6t as d, ifn as f, ofn as p, sfn as m, w6t as h } from "@rchunk/app-initial";
+import { n as g, t as _ } from "@rchunk/browser-browsing-data-dialog";
+function v(e) {
+  let t = (0, y.c)(13),
+    { browsingDataSettings: n, browsingHistory: r, onClose: a } = e,
+    o = i(s),
+    c;
+  t[0] === o.queryClient
+    ? (c = t[1])
+    : ((c = async (e) => {
+        await Promise.all([
+          o.queryClient.invalidateQueries({ queryKey: [`browser-browsing-history`] }),
+          ...(e.includes(`downloads`)
+            ? [o.queryClient.invalidateQueries({ queryKey: [`browser-download-history`] })]
+            : []),
+        ]);
+      }),
+      (t[0] = o.queryClient),
+      (t[1] = c));
+  let d = c,
+    f;
+  t[2] === o
+    ? (f = t[3])
+    : ((f = (e) =>
+        o
+          .get(l)
+          .danger(e, {
+            errorAnalytics: { toastId: `browserClearBrowsingDataDialog.clearBrowsingData` },
+          })),
+      (t[2] = o),
+      (t[3] = f));
+  let p;
+  t[4] !== n || t[5] !== r || t[6] !== d || t[7] !== a || t[8] !== f
+    ? ((p = (0, b.jsx)(_, {
+        browsingDataSettings: n,
+        browsingHistory: r,
+        onCleared: d,
+        onClose: a,
+        onError: f,
+      })),
+      (t[4] = n),
+      (t[5] = r),
+      (t[6] = d),
+      (t[7] = a),
+      (t[8] = f),
+      (t[9] = p))
+    : (p = t[9]);
+  let m;
+  return (
+    t[10] !== o.queryClient || t[11] !== p
+      ? ((m = (0, b.jsx)(u, { client: o.queryClient, children: p })),
+        (t[10] = o.queryClient),
+        (t[11] = p),
+        (t[12] = m))
+      : (m = t[12]),
+    m
+  );
 }
-
-export interface BrowserSettingsVisibility {
-  contactInfo: BrowserSettingVisibility;
-  downloads: BrowserSettingVisibility;
-  extensions: BrowserSettingVisibility;
-  history: BrowserSettingVisibility;
-  passwordManager: BrowserSettingVisibility;
-  siteSettings: BrowserSettingVisibility;
+var y, b;
+function x() {
+  return (x = e(() => {
+    ((y = t()), o(), n(), c(), a(), g(), (b = r()));
+  }))();
 }
-
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function BrowserClearBrowsingDataDialog(props: {
-  browsingDataSettings?: unknown;
-  browsingHistory?: unknown;
-  onClose?: () => void;
-}): unknown {
-  initializeBrowserClearBrowsingDataDialog();
-  const scope = useScope(AppScope) as {
-    get<Value>(signal: unknown): Value;
-    queryClient: {
-      invalidateQueries(options: { queryKey: readonly unknown[] }): Promise<unknown>;
-    };
-  };
-  const onCleared = async (categories: readonly string[]) => {
-    await Promise.all([
-      scope.queryClient.invalidateQueries({ queryKey: ["browser-browsing-history"] }),
-      ...(categories.includes("downloads")
-        ? [scope.queryClient.invalidateQueries({ queryKey: ["browser-download-history"] })]
-        : []),
-    ]);
-  };
-  const onError = (message: string) =>
-    scope.get<import("@rchunk/app-shared").ToastManager>(toastManagerSignal).danger(
-      message,
-      { errorAnalytics: { toastId: "browserClearBrowsingDataDialog.clearBrowsingData" } },
-    );
-  return jsx.jsx(QueryClientProvider, {
-    client: scope.queryClient,
-    children: jsx.jsx(ClearBrowsingDataDialogView, {
-      ...props,
-      onCleared,
-      onError,
-    }),
-  });
+function S(e) {
+  let t = (0, C.c)(11),
+    { hostId: n } = e,
+    r;
+  t[0] === n
+    ? (r = t[1])
+    : ((r = { featureName: `in_app_browser`, hostId: n }), (t[0] = n), (t[1] = r));
+  let i = h(r),
+    a = p(`2982604767`),
+    o = m(`2982604767`),
+    s = i.enabled && !i.isLoading,
+    c;
+  t[2] !== i.isLoading || t[3] !== s
+    ? ((c = { enabled: s, isLoading: i.isLoading }), (t[2] = i.isLoading), (t[3] = s), (t[4] = c))
+    : (c = t[4]);
+  let l = c,
+    u = l.enabled && a,
+    d = i.isLoading || o,
+    f;
+  t[5] !== u || t[6] !== d
+    ? ((f = { enabled: u, isLoading: d }), (t[5] = u), (t[6] = d), (t[7] = f))
+    : (f = t[7]);
+  let g;
+  return (
+    t[8] !== l || t[9] !== f
+      ? ((g = {
+          contactInfo: l,
+          downloads: l,
+          extensions: f,
+          history: l,
+          passwordManager: l,
+          siteSettings: l,
+        }),
+        (t[8] = l),
+        (t[9] = f),
+        (t[10] = g))
+      : (g = t[10]),
+    g
+  );
 }
-
-function getBrowserSettingsVisibility({ hostId }: { hostId: string }): BrowserSettingsVisibility {
-  initializeBrowserSettingsVisibility();
-  const availability = useHostFeatureAvailability({
-    featureName: "in_app_browser",
-    hostId,
-  });
-  const extensionsEnabled = readBooleanGate("2982604767");
-  const extensionsLoading = readBooleanGateLoading("2982604767");
-  const browser = {
-    enabled: availability.enabled && !availability.isLoading,
-    isLoading: availability.isLoading,
-  };
-  const extensions = {
-    enabled: browser.enabled && extensionsEnabled,
-    isLoading: availability.isLoading || extensionsLoading,
-  };
-  return {
-    contactInfo: browser,
-    downloads: browser,
-    extensions,
-    history: browser,
-    passwordManager: browser,
-    siteSettings: browser,
-  };
+var C;
+function w() {
+  return (w = e(() => {
+    ((C = t()), d(), f());
+  }))();
 }
-
-let clearDialogInitialized = false;
-function initializeBrowserClearBrowsingDataDialog(): void {
-  if (clearDialogInitialized) return;
-  initializeRuntimeLazy();
-  initializeQueryClientRuntime();
-  initializeMaitaiRuntime();
-  initializeToastManager();
-  initializeToastRuntime();
-  initializeClearBrowsingDataDialog();
-  jsx = getJsxRuntime();
-  clearDialogInitialized = true;
-}
-
-let visibilityInitialized = false;
-function initializeBrowserSettingsVisibility(): void {
-  if (visibilityInitialized) return;
-  initializeRuntimeLazy();
-  initializeHostFeatureAvailability();
-  initializeExperimentRuntime();
-  visibilityInitialized = true;
-}
-
-export {
-  initializeBrowserClearBrowsingDataDialog as i,
-  getBrowserSettingsVisibility as n,
-  BrowserClearBrowsingDataDialog as r,
-  initializeBrowserSettingsVisibility as t,
-};
+export { x as i, S as n, v as r, w as t };

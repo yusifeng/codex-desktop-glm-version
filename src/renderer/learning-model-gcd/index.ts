@@ -1,30 +1,14 @@
-// GCD learning-model specification. Release chunk: type-a2fa2066a9f8.js.
-import "@rchunk/rolldown-runtime";
-interface IntegerParameter {
-  kind: "integer";
-  defaultValue: number;
-  min: number;
-  max: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r;
+function i() {
+  return (i = e(() => {
+    ((t = `gcd-v1`),
+      (n = {
+        first_number: { kind: `integer`, defaultValue: 18, min: 2, max: 24 },
+        second_number: { kind: `integer`, defaultValue: 12, min: 2, max: 24 },
+      }),
+      (r = { type: `GCD`, version: 1, thumbnailAssetKey: t, parameters: n }));
+  }))();
 }
-interface Specification {
-  type: "GCD";
-  version: 1;
-  thumbnailAssetKey: "gcd-v1";
-  parameters: {
-    first_number: IntegerParameter;
-    second_number: IntegerParameter;
-  };
-}
-let specification: Specification;
-function initializeSpecification(): void {
-  specification ??= {
-    type: "GCD",
-    version: 1,
-    thumbnailAssetKey: "gcd-v1",
-    parameters: {
-      first_number: { kind: "integer", defaultValue: 18, min: 2, max: 24 },
-      second_number: { kind: "integer", defaultValue: 12, min: 2, max: 24 },
-    },
-  };
-}
-export { specification as n, initializeSpecification as t };
+export { r as n, i as t };

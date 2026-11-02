@@ -1,176 +1,92 @@
-// start-appgen-conversation —— 从 Sites 页面启动创建、编辑与发布会话。
-// 原版：app/webview/assets/start-appgen-conversation-75d2f33c6ac2.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import { createPrefilledPluginPrompt as createPluginPrompt } from "../app-primary/runtime/create-prefilled-plugin-prompt";
-
-void runtimeChunk;
-const { wL: initializeAppSharedRuntime } = appSharedChunk;
-const {
-  Dft: initializeAppgenState,
-  GWt: initializeSiteMentions,
-  HWt: createSiteMention,
-  Man: initializeAppgenNavigation,
-  Sun: initializeSubscriptionState,
-  _pn: navigateToAppgenConversation,
-  _un: currentUserIdSignal,
-  gpn: initializeAppgenConversation,
-  jan: sitesPluginId,
-  lnn: initializeAppgenQueries,
-  mpn: intlSignal,
-  mun: currentAccountIdSignal,
-  ppn: initializeAppgenPrompts,
-  snn: getSiteConversationRoute,
-} = appInitialChunk;
-const {
-  Bf: initializeArtifactTypes,
-  Bh: artifactTypes,
-  Hh: initializePluginPrompts,
-} = appPrimaryChunk;
-
-type StartAppgenRequest =
-  | {
-      assetType: "document" | "spreadsheet" | "presentation" | "pdf" | "image";
-      cloudLibraryEnabled?: boolean;
-      type: "create-asset";
-    }
-  | { type: "create" }
-  | {
-      latestEditContext?: unknown;
-      liveUrl?: string | null;
-      projectId: string;
-      projectTitle: string;
-      type: "edit";
-    }
-  | { projectId: string; projectTitle: string; type: "publish" };
-
-interface ConversationLaunchOptions extends Record<string, unknown> {
-  activeProject?: unknown;
-  libraryFileCreation?: boolean;
-  prefillPrompt?: string;
-  startInSidebar?: boolean;
-}
-
-function startAppgenConversation(
-  scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
-  startConversation: (options: ConversationLaunchOptions) => void,
-  request: StartAppgenRequest,
-  options: Record<string, unknown>,
-): void {
-  const intl =
-    scope.get<import("@rchunk/app-initial").AppgenConversationIntl>(intlSignal);
-  let prefillPrompt: string | undefined;
-
-  switch (request.type) {
-    case "create-asset":
-      switch (request.assetType) {
-        case "document":
-        case "spreadsheet":
-        case "presentation":
-        case "pdf": {
-          const artifact =
-            request.assetType === "pdf"
-              ? { label: "PDF", pluginId: "pdf@openai-primary-runtime" }
-              : artifactTypes[request.assetType].artifact;
-          prefillPrompt = createPluginPrompt({
-            defaultPrompt: null,
-            pluginDisplayName: artifact.label,
-            pluginId: artifact.pluginId,
-          });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { wL as t } from "@rchunk/app-shared";
+import {
+  Dft as n,
+  GWt as r,
+  HWt as i,
+  Man as a,
+  Sun as o,
+  _pn as s,
+  _un as c,
+  gpn as l,
+  jan as u,
+  lnn as d,
+  mpn as f,
+  mun as p,
+  ppn as m,
+  snn as h,
+} from "@rchunk/app-initial";
+import { Bf as g, Bh as _, Hh as v, Rf as y } from "@rchunk/app-primary";
+function b(e, t, n, r) {
+  let a = e.get(f),
+    o;
+  switch (n.type) {
+    case `create-asset`:
+      switch (n.assetType) {
+        case `document`:
+        case `spreadsheet`:
+        case `presentation`:
+        case `pdf`: {
+          let e =
+            n.assetType === `pdf`
+              ? { label: `PDF`, pluginId: `pdf@openai-primary-runtime` }
+              : _[n.assetType].artifact;
+          o = y({ defaultPrompt: null, pluginDisplayName: e.label, pluginId: e.pluginId });
           break;
         }
-        case "image":
-          prefillPrompt = intl.formatMessage({
-            id: "appgenPage.createMenu.imagePrompt",
-            defaultMessage: "Create an image of …",
-            description:
-              "Prefill prompt for creating an image from the Library",
+        case `image`:
+          o = a.formatMessage({
+            id: `appgenPage.createMenu.imagePrompt`,
+            defaultMessage: `Create an image of …`,
+            description: `Prefill prompt for creating an image from the Library`,
           });
       }
       break;
-
-    case "create":
-      prefillPrompt = createPluginPrompt({
-        defaultPrompt: intl.formatMessage({
-          id: "appgenConversation.createPrompt",
-          defaultMessage: "Create a website that …",
-          description: "Prompt for starting a new site from the Sites page",
+    case `create`:
+      o = y({
+        defaultPrompt: a.formatMessage({
+          id: `appgenConversation.createPrompt`,
+          defaultMessage: `Create a website that …`,
+          description: `Prompt for starting a new site from the Sites page`,
         }),
-        pluginDisplayName: "Sites",
-        pluginId: sitesPluginId,
+        pluginDisplayName: `Sites`,
+        pluginId: u,
       });
       break;
-
-    case "edit":
-      navigateToAppgenConversation(
-        scope,
-        getSiteConversationRoute(request.projectId),
-        {
-          state: {
-            ...options,
-            siteEditLiveUrl: request.liveUrl,
-            siteEditContext: {
-              accountId: scope.get<string | null>(currentAccountIdSignal),
-              userId: scope.get<string | null>(currentUserIdSignal),
-              projectId: request.projectId,
-              projectTitle: request.projectTitle,
-              latestEditContext: request.latestEditContext,
-            },
+    case `edit`:
+      s(e, h(n.projectId), {
+        state: {
+          ...r,
+          siteEditLiveUrl: n.liveUrl,
+          siteEditContext: {
+            accountId: e.get(p),
+            userId: e.get(c),
+            projectId: n.projectId,
+            projectTitle: n.projectTitle,
+            latestEditContext: n.latestEditContext,
           },
         },
-      );
-      return;
-
-    case "publish": {
-      const siteMention = createSiteMention({
-        projectId: request.projectId,
-        title: request.projectTitle,
       });
-      prefillPrompt = `${createPluginPrompt({
-        defaultPrompt: intl.formatMessage(
-          {
-            id: "appgenConversation.publishPrompt",
-            defaultMessage: "{siteMention} publish this site",
-            description:
-              "Prompt for asking the model to publish an existing unpublished Site",
-          },
-          { siteMention },
-        ),
-        pluginDisplayName: "Sites",
-        pluginId: sitesPluginId,
-      })} `;
+      return;
+    case `publish`: {
+      let e = i({ projectId: n.projectId, title: n.projectTitle });
+      o = `${y({ defaultPrompt: a.formatMessage({ id: `appgenConversation.publishPrompt`, defaultMessage: `{siteMention} publish this site`, description: `Prompt for asking the model to publish an existing unpublished Site` }, { siteMention: e }), pluginDisplayName: `Sites`, pluginId: u })} `;
       break;
     }
   }
-
-  startConversation({
-    ...options,
+  t({
+    ...r,
     activeProject: null,
     libraryFileCreation:
-      request.type === "create-asset" &&
-      request.assetType !== "image" &&
-      request.cloudLibraryEnabled
-        ? true
-        : undefined,
-    prefillPrompt,
-    startInSidebar: true,
+      n.type === `create-asset` && n.assetType !== `image` && n.cloudLibraryEnabled ? !0 : void 0,
+    prefillPrompt: o,
+    startInSidebar: !0,
   });
 }
-
-function initializeStartAppgenConversation(): void {
-  initializeAppSharedRuntime();
-  initializePluginPrompts();
-  initializeAppgenConversation();
-  initializeSubscriptionState();
-  initializeSiteMentions();
-  initializeAppgenState();
-  initializeAppgenPrompts();
-  initializeArtifactTypes();
-  initializeAppgenNavigation();
-  initializeAppgenQueries();
+function x() {
+  return (x = e(() => {
+    (t(), v(), l(), o(), r(), n(), m(), g(), a(), d());
+  }))();
 }
-
-export { startAppgenConversation as n, initializeStartAppgenConversation as t };
+export { b as n, x as t };

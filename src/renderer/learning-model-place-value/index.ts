@@ -1,28 +1,12 @@
-// Place-value integer metadata. Release chunk: type-98cbaaa40c49.js.
-import "@rchunk/rolldown-runtime";
-
-interface PlaceValueSpecification {
-  type: "PLACE_VALUE";
-  version: 1;
-  thumbnailAssetKey: "place-value-v1";
-  parameters: {
-    number: { kind: "integer"; defaultValue: 2654; min: 0; max: 9999 };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `PLACE_VALUE`),
+      (n = `place-value-v1`),
+      (r = { number: { kind: `integer`, defaultValue: 2654, min: 0, max: 9999 } }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-let placeValueSpecification: PlaceValueSpecification;
-let initialized = false;
-function initializePlaceValueSpecification(): void {
-  if (initialized) return;
-  initialized = true;
-  placeValueSpecification = {
-    type: "PLACE_VALUE",
-    version: 1,
-    thumbnailAssetKey: "place-value-v1",
-    parameters: {
-      number: { kind: "integer", defaultValue: 2654, min: 0, max: 9999 },
-    },
-  };
-}
-
-export { placeValueSpecification as n, initializePlaceValueSpecification as t };
+export { i as n, a as t };

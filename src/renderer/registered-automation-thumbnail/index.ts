@@ -1,344 +1,325 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  n as initializeReasoningTranslations,
-  t as ReasoningEffortTranslation,
-} from "@rchunk/model-and-reasoning-effort-translations";
-
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>): unknown;
-  jsxs(type: unknown, props: Record<string, unknown>): unknown;
-}
-interface ReactRuntime {
-  useState<T>(initial: T | (() => T)): [T, (value: T) => void];
-}
-interface IntlRuntime {
-  formatMessage(descriptor: {
-    defaultMessage: string;
-    description?: string;
-    id: string;
-  }): string;
-}
-interface QueryClient {
-  getData(key: unknown, id?: string): unknown;
-}
-interface AutomationScope {
-  query: QueryClient;
-}
-interface AutomationPreview {
-  cloudAutomation?: unknown;
-  destination: "cloud" | "existing-chat" | "new-chat";
-  model: string | null;
-  reasoningEffort: string | null;
-  rrule: string | null;
-  scheduleLabel: string | null;
-  title: string;
-}
-interface AutomationRequest {
-  proposal?: { rrule?: string | null };
-  type: string;
-}
-interface AutomationThumbnailProps {
-  readState(): { savedAutomationId?: string | null } | null;
-  request: AutomationRequest;
-  title: string;
-}
-
-const once = onceExport as (initializer: () => void) => () => void;
-
-const {
-  $3: initializeRuntime,
-  FX: initializeSignals,
-  I3: getJsxRuntime,
-  K2: initializeCompiler,
-  LX: useScope,
-  Y2: FormattedMessage,
-  e6: getReactRuntime,
-  lw: initializeIcons,
-  n4: useIntl,
-  wL: initializeLinks,
-  wy: AutomationIcon,
-  zY: isHeartbeatAutomation,
-} = appSharedChunk as unknown as {
-  $3(): void;
-  FX(): void;
-  I3(): JsxRuntime;
-  K2(): void;
-  LX(signal: unknown): AutomationScope;
-  Y2: unknown;
-  e6(): ReactRuntime;
-  lw(): void;
-  n4(): IntlRuntime;
-  wL(): void;
-  wy: unknown;
-  zY(value: unknown): boolean;
-};
-const {
-  Ctt: formatCloudSchedule,
-  Dtt: initializeAutomationFormatting,
-  GYt: initializeScheduleFormatting,
-  HYt: formatSchedule,
-  Lg: resolveAutomationRequest,
-  M0t: isReasoningEffort,
-  N0t: initializeReasoningEffort,
-  QCt: localAutomationsQuery,
-  Rtt: mergeAutomationSeed,
-  Xd: TabThumbnail,
-  Xtt: initializeAutomationRequests,
-  ZCt: initializeAutomationSelectors,
-  cet: appScope,
-  let: initializeAppScope,
-  stt: cloudAutomationSignal,
-  ttt: initializeCloudAutomation,
-} = appInitialChunk as unknown as {
-  Ctt(value: unknown, intl: IntlRuntime): unknown;
-  Dtt(): void;
-  GYt(): void;
-  HYt(input: {
-    fallbackMessage: string;
-    intl: IntlRuntime;
-    rrule: string;
-  }): unknown;
-  Lg(input: {
-    request: AutomationRequest;
-    savedAutomationId: string | null;
-  }): Record<string, unknown>;
-  M0t(value: string): boolean;
-  N0t(): void;
-  QCt: unknown;
-  Rtt(input: {
-    seed: unknown;
-    targetAutomation: unknown;
-  }): Record<string, unknown>;
-  Xd: unknown;
-  Xtt(): void;
-  ZCt(): void;
-  cet: unknown;
-  let(): void;
-  stt: unknown;
-  ttt(): void;
-};
-
-let jsx: JsxRuntime;
-function metadataRow(label: unknown, value: unknown): Record<string, unknown> {
-  return {
-    kind: "block",
-    content: jsx.jsxs("div", {
-      className: "flex items-start justify-between gap-3 text-xs leading-4",
-      children: [
-        jsx.jsx("span", {
-          className: "shrink-0 text-codex-description",
-          children: label,
-        }),
-        jsx.jsx("span", {
-          className: "min-w-0 text-end text-secondary",
-          children: value,
-        }),
-      ],
-    }),
-  };
-}
-function AutomationThumbnailView({
-  cloudAutomation,
-  destination,
-  model,
-  reasoningEffort,
-  rrule,
-  scheduleLabel,
-  title,
-}: AutomationPreview): unknown {
-  const intl = useIntl();
-  const schedule =
-    cloudAutomation == null
-      ? (scheduleLabel ??
-        (rrule == null
-          ? null
-          : formatSchedule({
-              rrule,
-              intl,
-              fallbackMessage: intl.formatMessage({
-                id: "settings.automations.rruleSummaryFallback",
-                defaultMessage: "Custom schedule",
-                description:
-                  "Fallback label when RRULE summary cannot be generated",
+  $3 as t,
+  FX as n,
+  I3 as r,
+  K2 as i,
+  LX as a,
+  Y2 as o,
+  e6 as s,
+  lw as c,
+  n4 as l,
+  wL as u,
+  wy as d,
+  zY as f,
+} from "@rchunk/app-shared";
+import {
+  Ctt as p,
+  Dtt as m,
+  GYt as h,
+  HYt as g,
+  Lg as _,
+  M0t as v,
+  N0t as y,
+  QCt as b,
+  Rtt as x,
+  Xd as S,
+  Xtt as C,
+  ZCt as w,
+  Zd as T,
+  cet as E,
+  let as D,
+  stt as O,
+  ttt as k,
+} from "@rchunk/app-initial";
+import { n as A, t as j } from "@rchunk/model-and-reasoning-effort-translations";
+function M(e) {
+  let t = (0, I.c)(30),
+    {
+      cloudAutomation: n,
+      destination: r,
+      model: i,
+      reasoningEffort: a,
+      rrule: s,
+      scheduleLabel: c,
+      title: u,
+    } = e,
+    f = l(),
+    m;
+  t[0] !== n || t[1] !== f || t[2] !== s || t[3] !== c
+    ? ((m =
+        n == null
+          ? (c ??
+            g({
+              rrule: s,
+              intl: f,
+              fallbackMessage: f.formatMessage({
+                id: `settings.automations.rruleSummaryFallback`,
+                defaultMessage: `Custom schedule`,
+                description: `Fallback label when RRULE summary cannot be generated`,
               }),
-            })))
-      : formatCloudSchedule(cloudAutomation, intl);
-  const destinationLabel = jsx.jsx(
-    FormattedMessage,
-    destination === "cloud"
-      ? {
-          id: "tabThumbnail.automation.destination.cloud",
-          defaultMessage: "Cloud",
-          description:
-            "Destination metadata shown in a scheduled task tab thumbnail for a task that runs in the cloud",
-        }
-      : destination === "existing-chat"
-        ? {
-            id: "tabThumbnail.automation.destination.existingChat",
-            defaultMessage: "Existing chat",
-            description:
-              "Destination metadata shown in a scheduled task tab thumbnail for a task that runs in an existing chat",
-          }
-        : {
-            id: "tabThumbnail.automation.destination.newChat",
-            defaultMessage: "New chat",
-            description:
-              "Destination metadata shown in a scheduled task tab thumbnail for a task that starts a new chat",
-          },
+            }))
+          : p(n, f)),
+      (t[0] = n),
+      (t[1] = f),
+      (t[2] = s),
+      (t[3] = c),
+      (t[4] = m))
+    : (m = t[4]);
+  let h = m,
+    _;
+  bb0: switch (r) {
+    case `cloud`: {
+      let e;
+      (t[5] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, L.jsx)(o, {
+            id: `tabThumbnail.automation.destination.cloud`,
+            defaultMessage: `Cloud`,
+            description: `Destination metadata shown in a scheduled task tab thumbnail for a task that runs in the cloud`,
+          })),
+          (t[5] = e))
+        : (e = t[5]),
+        (_ = e));
+      break bb0;
+    }
+    case `existing-chat`: {
+      let e;
+      (t[6] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, L.jsx)(o, {
+            id: `tabThumbnail.automation.destination.existingChat`,
+            defaultMessage: `Existing chat`,
+            description: `Destination metadata shown in a scheduled task tab thumbnail for a task that runs in an existing chat`,
+          })),
+          (t[6] = e))
+        : (e = t[6]),
+        (_ = e));
+      break bb0;
+    }
+    case `new-chat`: {
+      let e;
+      (t[7] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, L.jsx)(o, {
+            id: `tabThumbnail.automation.destination.newChat`,
+            defaultMessage: `New chat`,
+            description: `Destination metadata shown in a scheduled task tab thumbnail for a task that starts a new chat`,
+          })),
+          (t[7] = e))
+        : (e = t[7]),
+        (_ = e));
+    }
+  }
+  let v;
+  t[8] === a
+    ? (v = t[9])
+    : ((v = a != null && y(a) ? (0, L.jsx)(j, { effort: a }) : null), (t[8] = a), (t[9] = v));
+  let b = v,
+    x;
+  t[10] === h
+    ? (x = t[11])
+    : ((x =
+        h == null
+          ? null
+          : {
+              label: (0, L.jsx)(o, {
+                id: `tabThumbnail.automation.schedule`,
+                defaultMessage: `Schedule`,
+                description: `Label for schedule metadata in a scheduled task tab thumbnail`,
+              }),
+              value: h,
+            }),
+      (t[10] = h),
+      (t[11] = x));
+  let C;
+  t[12] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((C = (0, L.jsx)(o, {
+        id: `tabThumbnail.automation.destination`,
+        defaultMessage: `Runs in`,
+        description: `Label for destination metadata in a scheduled task tab thumbnail`,
+      })),
+      (t[12] = C))
+    : (C = t[12]);
+  let w;
+  t[13] === _ ? (w = t[14]) : ((w = { label: C, value: _ }), (t[13] = _), (t[14] = w));
+  let T;
+  t[15] === i
+    ? (T = t[16])
+    : ((T =
+        i == null
+          ? null
+          : {
+              label: (0, L.jsx)(o, {
+                id: `tabThumbnail.automation.modelLabel`,
+                defaultMessage: `Model`,
+                description: `Label for model metadata in a scheduled task tab thumbnail`,
+              }),
+              value: i,
+            }),
+      (t[15] = i),
+      (t[16] = T));
+  let E;
+  t[17] === b
+    ? (E = t[18])
+    : ((E =
+        b == null
+          ? null
+          : {
+              label: (0, L.jsx)(o, {
+                id: `tabThumbnail.automation.reasoning`,
+                defaultMessage: `Reasoning`,
+                description: `Label for reasoning metadata in a scheduled task tab thumbnail`,
+              }),
+              value: b,
+            }),
+      (t[17] = b),
+      (t[18] = E));
+  let D;
+  t[19] !== x || t[20] !== w || t[21] !== T || t[22] !== E
+    ? ((D = [x, w, T, E].filter(P)),
+      (t[19] = x),
+      (t[20] = w),
+      (t[21] = T),
+      (t[22] = E),
+      (t[23] = D))
+    : (D = t[23]);
+  let O = D,
+    k;
+  t[24] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((k = (0, L.jsx)(d, {})), (t[24] = k))
+    : (k = t[24]);
+  let A;
+  t[25] === O ? (A = t[26]) : ((A = O.map(N)), (t[25] = O), (t[26] = A));
+  let M;
+  return (
+    t[27] !== A || t[28] !== u
+      ? ((M = (0, L.jsx)(S, { icon: k, subtitle: null, title: u, sections: A })),
+        (t[27] = A),
+        (t[28] = u),
+        (t[29] = M))
+      : (M = t[29]),
+    M
   );
-  const reasoning =
-    reasoningEffort != null && isReasoningEffort(reasoningEffort)
-      ? jsx.jsx(ReasoningEffortTranslation, { effort: reasoningEffort })
-      : null;
-  const label = (id: string, defaultMessage: string, description: string) =>
-    jsx.jsx(FormattedMessage, { id, defaultMessage, description });
-  const rows = [
-    schedule == null
-      ? null
-      : metadataRow(
-          label(
-            "tabThumbnail.automation.schedule",
-            "Schedule",
-            "Label for schedule metadata in a scheduled task tab thumbnail",
-          ),
-          schedule,
-        ),
-    metadataRow(
-      label(
-        "tabThumbnail.automation.destination",
-        "Runs in",
-        "Label for destination metadata in a scheduled task tab thumbnail",
-      ),
-      destinationLabel,
-    ),
-    model == null
-      ? null
-      : metadataRow(
-          label(
-            "tabThumbnail.automation.modelLabel",
-            "Model",
-            "Label for model metadata in a scheduled task tab thumbnail",
-          ),
-          model,
-        ),
-    reasoning == null
-      ? null
-      : metadataRow(
-          label(
-            "tabThumbnail.automation.reasoning",
-            "Reasoning",
-            "Label for reasoning metadata in a scheduled task tab thumbnail",
-          ),
-          reasoning,
-        ),
-  ].filter((value): value is Record<string, unknown> => value != null);
-  return jsx.jsx(TabThumbnail, {
-    icon: jsx.jsx(AutomationIcon, {}),
-    subtitle: null,
-    title,
-    sections: rows,
-  });
 }
-
-function RegisteredAutomationThumbnail({
-  readState,
-  request,
-  title,
-}: AutomationThumbnailProps): unknown {
-  const scope = useScope(appScope);
-  const [preview] = getReactRuntime().useState<AutomationPreview | null>(() => {
-    if (request.type === "site")
-      return {
-        destination: "cloud",
-        model: null,
-        reasoningEffort: null,
-        rrule: request.proposal?.rrule ?? null,
-        scheduleLabel: null,
-        title,
-      };
-    const resolved = resolveAutomationRequest({
-      request,
-      savedAutomationId: readState()?.savedAutomationId ?? null,
-    });
-    if (resolved.type === "proposal") {
-      const items =
-        (
-          scope.query.getData(localAutomationsQuery) as
-            { items?: Array<{ id: string }> } | undefined
-        )?.items ?? [];
-      const targetAutomation =
-        items.find((item) => item.id === resolved.targetAutomationId) ?? null;
-      const seed = mergeAutomationSeed({
-        seed: resolved.seed,
-        targetAutomation,
-      });
-      const heartbeat = seed.kind === "heartbeat";
-      return {
-        destination: heartbeat ? "existing-chat" : "new-chat",
-        model: heartbeat ? null : (seed.model as string),
-        reasoningEffort: heartbeat ? null : (seed.reasoningEffort as string),
-        rrule: seed.rawRrule as string | null,
-        scheduleLabel: null,
-        title,
-      };
-    }
-    const id =
-      typeof resolved.automationId === "string" ? resolved.automationId : "";
-    const local = (
-      (
-        scope.query.getData(localAutomationsQuery) as
-          { items?: Array<Record<string, unknown>> } | undefined
-      )?.items ?? []
-    ).find((item) => item.id === id);
-    if (local != null) {
-      const heartbeat = isHeartbeatAutomation(local);
-      return {
-        destination: heartbeat ? "existing-chat" : "new-chat",
-        model: heartbeat ? null : (local.model as string),
-        reasoningEffort: heartbeat ? null : (local.reasoningEffort as string),
-        rrule: local.rrule as string | null,
-        scheduleLabel: null,
-        title,
-      };
-    }
-    const cloud = scope.query.getData(cloudAutomationSignal, id);
-    return cloud == null
-      ? null
-      : {
-          cloudAutomation: cloud,
-          destination: "cloud",
-          model: null,
-          reasoningEffort: null,
-          rrule: null,
-          scheduleLabel: null,
-          title,
-        };
-  });
-  return preview == null
-    ? null
-    : jsx.jsx(
-        AutomationThumbnailView,
-        preview as unknown as Record<string, unknown>,
-      );
+function N(e) {
+  let { label: t, value: n } = e;
+  return { kind: `block`, content: (0, L.jsx)(F, { label: t, value: n }) };
 }
-
-const initializeRegisteredAutomationThumbnail = once((): void => {
-  initializeRuntime();
-  initializeCompiler();
-  initializeAppScope();
-  initializeReasoningEffort();
-  initializeReasoningTranslations();
-  initializeIcons();
-  initializeScheduleFormatting();
-  initializeAutomationFormatting();
-  initializeCloudAutomation();
-  initializeSignals();
-  initializeLinks();
-  initializeAutomationSelectors();
-  initializeAutomationRequests();
-  jsx = getJsxRuntime();
-});
-initializeRegisteredAutomationThumbnail();
-export { RegisteredAutomationThumbnail };
+function P(e) {
+  return e != null;
+}
+function F(e) {
+  let t = (0, I.c)(7),
+    { label: n, value: r } = e,
+    i;
+  t[0] === n
+    ? (i = t[1])
+    : ((i = (0, L.jsx)(`span`, { className: `shrink-0 text-codex-description`, children: n })),
+      (t[0] = n),
+      (t[1] = i));
+  let a;
+  t[2] === r
+    ? (a = t[3])
+    : ((a = (0, L.jsx)(`span`, { className: `min-w-0 text-end text-secondary`, children: r })),
+      (t[2] = r),
+      (t[3] = a));
+  let o;
+  return (
+    t[4] !== i || t[5] !== a
+      ? ((o = (0, L.jsxs)(`div`, {
+          className: `flex items-start justify-between gap-3 text-xs leading-4`,
+          children: [i, a],
+        })),
+        (t[4] = i),
+        (t[5] = a),
+        (t[6] = o))
+      : (o = t[6]),
+    o
+  );
+}
+var I, L;
+function R() {
+  return (R = e(() => {
+    ((I = t()), v(), i(), T(), A(), c(), h(), m(), (L = r()));
+  }))();
+}
+function z(e) {
+  let t = (0, B.c)(7),
+    { readState: n, request: r, title: i } = e,
+    o = a(E),
+    s;
+  t[0] !== n || t[1] !== r || t[2] !== o || t[3] !== i
+    ? ((s = () => {
+        if (r.type === `site`)
+          return {
+            destination: `cloud`,
+            model: null,
+            reasoningEffort: null,
+            rrule: r.proposal.rrule ?? null,
+            scheduleLabel: null,
+            title: i,
+          };
+        let e = _({ request: r, savedAutomationId: n()?.savedAutomationId ?? null });
+        if (e.type === `proposal`) {
+          let t =
+              e.targetAutomationId == null
+                ? null
+                : (o.query.getData(b)?.items.find((t) => t.id === e.targetAutomationId) ?? null),
+            n = x({ seed: e.seed, targetAutomation: t }),
+            r = n.kind === `heartbeat`;
+          return {
+            destination: r ? `existing-chat` : `new-chat`,
+            model: r ? null : n.model,
+            reasoningEffort: r ? null : n.reasoningEffort,
+            rrule: n.rawRrule,
+            scheduleLabel: null,
+            title: i,
+          };
+        }
+        let t = o.query.getData(b)?.items.find((t) => t.id === e.automationId);
+        if (t != null) {
+          let e = f(t);
+          return {
+            destination: e ? `existing-chat` : `new-chat`,
+            model: e ? null : t.model,
+            reasoningEffort: e ? null : t.reasoningEffort,
+            rrule: t.rrule,
+            scheduleLabel: null,
+            title: i,
+          };
+        }
+        let a = o.query.getData(k, e.automationId);
+        return a == null
+          ? null
+          : {
+              cloudAutomation: a,
+              destination: `cloud`,
+              model: null,
+              reasoningEffort: null,
+              rrule: null,
+              scheduleLabel: null,
+              title: i,
+            };
+      }),
+      (t[0] = n),
+      (t[1] = r),
+      (t[2] = o),
+      (t[3] = i),
+      (t[4] = s))
+    : (s = t[4]);
+  let [c] = (0, V.useState)(s),
+    l;
+  return (
+    t[5] === c
+      ? (l = t[6])
+      : ((l = c == null ? null : (0, H.jsx)(M, { ...c })), (t[5] = c), (t[6] = l)),
+    l
+  );
+}
+var B, V, H;
+function U() {
+  return (U = e(() => {
+    ((B = t()), n(), u(), (V = s()), D(), R(), w(), C(), O(), (H = r()));
+  }))();
+}
+U();
+export { z as RegisteredAutomationThumbnail };

@@ -1,209 +1,148 @@
-// Imports a shared Codex snapshot into the composer. Release chunk: shared-snapshot-continuation-c3634fe7a1b8.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>): unknown;
-}
-interface Scope {
-  get(signal: unknown): unknown;
-  set(signal: unknown, updater: (value: unknown) => unknown): void;
-}
-interface SharedRuntime {
-  $3(): unknown;
-  BX(query: unknown, input: Record<string, unknown>): unknown;
-  FX(): void;
-  I3(): JsxRuntime;
-  K2(): void;
-  QX(
-    key: unknown,
-    factory: (
-      input: ContinuationInput,
-      context: { get(signal: unknown): unknown; scope: Scope },
-    ) => QueryOptions,
-  ): unknown;
-  Y2: unknown;
-  lk(): void;
-  n4(): { formatMessage(descriptor: Record<string, string>): string };
-  pk: unknown;
-}
-interface InitialRuntime {
-  B4: unknown;
-  Dyt: unknown;
-  M6(): void;
-  M6t(): void;
-  N6t(): { accountId: string | null; userId: string | null };
-  O6(
-    scope: Scope,
-    input: { hostId: unknown; id: string; preview: string },
-  ): { isPending(): boolean; succeed(): void; fail(): void };
-  Rht(): void;
-  byt(): void;
-  d3: unknown;
-  kht: unknown;
-  mst(value: unknown): Record<string, unknown> | null;
-  pdn(): void;
-  pst(): void;
-  udn: {
-    safeGet(path: string, options: Record<string, unknown>): Promise<unknown>;
-  };
-  x3(): void;
-}
-interface PrimaryRuntime {
-  gr(): void;
-  pr(input: {
-    scope: Scope;
-    executionHostId: unknown;
-    label: string;
-    text: string;
-    shouldDiscard(): boolean;
-  }): Promise<Record<string, unknown> | null>;
-}
-interface ContinuationInput {
-  accountId: string | null;
-  fallbackTitle: string;
-  shareId: string;
-  userId: string | null;
-}
-interface QueryOptions {
-  queryKey: unknown[];
-  enabled: boolean;
-  gcTime: number;
-  staleTime: number;
-  retry: false;
-  queryFn(context: { signal: AbortSignal }): Promise<boolean | null>;
-}
-
-const sharedRuntime = appSharedChunk as unknown as SharedRuntime;
-const initialRuntime = appInitialChunk as unknown as InitialRuntime;
-const primaryRuntime = appPrimaryChunk as unknown as PrimaryRuntime;
-let jsx: JsxRuntime;
-let continuationQuery: unknown;
-
-function SharedSnapshotContinuation({ shareId }: { shareId: string }): null {
-  const intl = sharedRuntime.n4();
-  const { accountId, userId } = initialRuntime.N6t();
-  const fallbackTitle = intl.formatMessage({
-    id: "codex.sharedSnapshot.continuationUntitled",
-    defaultMessage: "Shared Codex chat",
-    description:
-      "Composer attachment title for a shared Codex thread that has no user-provided title",
-  });
-  sharedRuntime.BX(continuationQuery, {
-    accountId,
-    fallbackTitle,
-    shareId,
-    userId,
-  });
-  return null;
-}
-
-function initialize(): void {
-  sharedRuntime.$3();
-  sharedRuntime.FX();
-  sharedRuntime.K2();
-  initialRuntime.M6t();
-  initialRuntime.x3();
-  primaryRuntime.gr();
-  initialRuntime.M6();
-  sharedRuntime.lk();
-  initialRuntime.Rht();
-  initialRuntime.byt();
-  initialRuntime.pdn();
-  initialRuntime.pst();
-  jsx = sharedRuntime.I3();
-  continuationQuery = sharedRuntime.QX(
-    initialRuntime.kht,
-    ({ accountId, fallbackTitle, shareId, userId }, { get, scope }) => {
-      const hostId = get(initialRuntime.Dyt);
-      return {
-        queryKey: [
-          "shared-codex-snapshot-continuation",
-          accountId,
-          userId,
-          hostId,
-          shareId,
-        ],
-        enabled: accountId != null && userId != null,
-        gcTime: 0,
-        staleTime: Infinity,
-        retry: false,
-        queryFn: ({ signal }) => {
-          const composerVersion = scope.get(initialRuntime.B4);
-          const progress = initialRuntime.O6(scope, {
-            hostId,
-            id: shareId,
-            preview: fallbackTitle,
-          });
-          return initialRuntime.udn
-            .safeGet("/wham/shared_threads/{share_id}", {
-              parameters: { path: { share_id: shareId } },
-              signal,
-            })
-            .then(async (response) => {
-              signal.throwIfAborted();
-              const snapshot = initialRuntime.mst(response);
-              if (snapshot == null)
-                throw new Error("Invalid shared Codex snapshot");
-              const title =
-                typeof snapshot.title === "string" && snapshot.title.trim()
-                  ? snapshot.title.trim()
-                  : fallbackTitle;
-              const text = JSON.stringify({
-                source: "codex_shared_thread",
-                shareId,
-                snapshot,
-              });
-              const file = await primaryRuntime.pr({
-                scope,
-                executionHostId: hostId,
-                label: title,
-                text,
-                shouldDiscard: () =>
-                  signal.aborted ||
-                  !progress.isPending() ||
-                  scope.get(initialRuntime.B4) !== composerVersion ||
-                  scope.get(initialRuntime.Dyt) !== hostId,
-              });
-              if (file != null) {
-                scope.set(initialRuntime.d3, (value) => [
-                  ...((value as unknown[]) ?? []),
-                  { file: { ...file, sharedThread: { shareId } }, hostId },
-                ]);
-                progress.succeed();
-                return true;
-              }
-              return null;
-            })
-            .catch((error) => {
-              if (!signal.aborted) {
-                const toast = scope.get(sharedRuntime.pk) as {
-                  danger(node: unknown, options: Record<string, unknown>): void;
-                };
-                toast.danger(
-                  jsx.jsx(sharedRuntime.Y2, {
-                    id: "codex.sharedSnapshot.continuationUnavailable",
-                    defaultMessage: "This shared snapshot is unavailable",
-                    description:
-                      "Error shown when the current Codex account cannot access or validate a shared thread snapshot",
-                  }),
-                  {
-                    errorAnalytics: {
-                      toastId: "codex.sharedSnapshot.continuationUnavailable",
-                    },
-                  },
-                );
-              }
-              throw error;
-            })
-            .finally(() => progress.fail());
-        },
-      };
-    },
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  I3 as i,
+  K2 as a,
+  QX as o,
+  Y2 as s,
+  lk as c,
+  n4 as l,
+  pk as u,
+} from "@rchunk/app-shared";
+import {
+  B4 as d,
+  Dyt as f,
+  M6 as p,
+  M6t as m,
+  N6t as h,
+  O6 as g,
+  Rht as _,
+  byt as v,
+  d3 as y,
+  kht as b,
+  mst as x,
+  pdn as S,
+  pst as C,
+  udn as w,
+  x3 as T,
+} from "@rchunk/app-initial";
+import { gr as E, pr as D } from "@rchunk/app-primary";
+function O(e) {
+  let t = (0, k.c)(7),
+    { shareId: r } = e,
+    i = l(),
+    { accountId: a, userId: o } = h(),
+    s;
+  t[0] === i
+    ? (s = t[1])
+    : ((s = i.formatMessage({
+        id: `codex.sharedSnapshot.continuationUntitled`,
+        defaultMessage: `Shared Codex chat`,
+        description: `Composer attachment title for a shared Codex thread that has no user-provided title`,
+      })),
+      (t[0] = i),
+      (t[1] = s));
+  let c;
+  return (
+    t[2] !== a || t[3] !== r || t[4] !== s || t[5] !== o
+      ? ((c = { accountId: a, fallbackTitle: s, shareId: r, userId: o }),
+        (t[2] = a),
+        (t[3] = r),
+        (t[4] = s),
+        (t[5] = o),
+        (t[6] = c))
+      : (c = t[6]),
+    n(j, c),
+    null
   );
 }
-initialize();
-
-export { SharedSnapshotContinuation };
+var k, A, j;
+function M() {
+  return (M = e(() => {
+    ((k = t()),
+      r(),
+      a(),
+      m(),
+      T(),
+      E(),
+      p(),
+      c(),
+      _(),
+      v(),
+      S(),
+      C(),
+      (A = i()),
+      (j = o(
+        b,
+        ({ accountId: e, fallbackTitle: t, shareId: n, userId: r }, { get: i, scope: a }) => {
+          let o = i(f);
+          return {
+            queryKey: [`shared-codex-snapshot-continuation`, e, r, o, n],
+            enabled: e != null && r != null,
+            gcTime: 0,
+            staleTime: 1 / 0,
+            retry: !1,
+            queryFn: ({ signal: e }) => {
+              let r = a.get(d),
+                i = g(a, { hostId: o, id: n, preview: t });
+              return w
+                .safeGet(`/wham/shared_threads/{share_id}`, {
+                  parameters: { path: { share_id: n } },
+                  signal: e,
+                })
+                .then(async (s) => {
+                  e.throwIfAborted();
+                  let c = x(s);
+                  if (c == null) throw Error(`Invalid shared Codex snapshot`);
+                  let l = c.title?.trim() || t,
+                    u = JSON.stringify({ source: `codex_shared_thread`, shareId: n, snapshot: c }),
+                    p = await D({
+                      scope: a,
+                      executionHostId: o,
+                      label: l,
+                      text: u,
+                      shouldDiscard: () =>
+                        e.aborted || !i.isPending() || a.get(d) !== r || a.get(f) !== o,
+                    });
+                  return (
+                    p != null &&
+                    (a.set(y, (e) => [
+                      ...e,
+                      { file: { ...p, sharedThread: { shareId: n } }, hostId: o },
+                    ]),
+                    i.succeed(),
+                    !0)
+                  );
+                })
+                .catch((t) => {
+                  throw (
+                    e.aborted ||
+                      a
+                        .get(u)
+                        .danger(
+                          (0, A.jsx)(s, {
+                            id: `codex.sharedSnapshot.continuationUnavailable`,
+                            defaultMessage: `This shared snapshot is unavailable`,
+                            description: `Error shown when the current Codex account cannot access or validate a shared thread snapshot`,
+                          }),
+                          {
+                            errorAnalytics: {
+                              toastId: `codex.sharedSnapshot.continuationUnavailable`,
+                            },
+                          },
+                        ),
+                    t
+                  );
+                })
+                .finally(() => i.fail());
+            },
+          };
+        },
+      )));
+  }))();
+}
+M();
+export { O as SharedSnapshotContinuation };

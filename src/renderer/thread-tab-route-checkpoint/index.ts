@@ -1,11 +1,4 @@
-// thread-tab-route-checkpoint —— 捕获线程标签页路由检查点的公开桥。
-import * as appPrimaryChunk from "@rchunk/app-primary";
-
-const {
-  gc: initializeThreadTabRouteCheckpoint,
-  hc: captureThreadTabRouteCheckpoint,
-} = appPrimaryChunk;
-
-initializeThreadTabRouteCheckpoint();
-
-export { captureThreadTabRouteCheckpoint };
+// @ts-nocheck
+import { gc as e, hc as t } from "@rchunk/app-primary";
+e();
+export { t as captureThreadTabRouteCheckpoint };

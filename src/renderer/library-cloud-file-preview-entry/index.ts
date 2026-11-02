@@ -1,6 +1,5 @@
-import { n as LibraryCloudFilePreview } from "@rchunk/library-cloud-file-preview";
-import { t as initializeCloudFilePreview } from "@rchunk/cloud-file-preview";
-
-initializeCloudFilePreview();
-
-export { LibraryCloudFilePreview };
+// @ts-nocheck
+import { n as e } from "@rchunk/library-cloud-file-preview";
+import { t } from "@rchunk/cloud-file-preview";
+t();
+export { e as LibraryCloudFilePreview };

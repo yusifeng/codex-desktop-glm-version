@@ -1,1368 +1,946 @@
-// sidebar-onboarding-checklist-task-config —— 侧边栏对话式 onboarding 状态机。
-//
-// 原版：app/webview/assets/sidebar-onboarding-checklist-task-config-2c7fbbcf69d8.js。
-// 还原范围：角色/任务/权限/能力阶段转换、对话启动去重与取消、
-// 完成结果投影、候选任务过滤、远程任务配置校验与本地化文案。
-
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as mailProviderChunk from "@rchunk/onboarding-mail-provider";
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-
-void runtimeChunk;
-
-const appInitial = appInitialChunk as Record<string, any>;
-const mailProvider = mailProviderChunk as Record<string, any>;
-
-const {
-  FX: initializeSignalRuntime,
-  QI: initializeSharedRuntime,
-  ZI: applicationScope,
-  cX: isPermissionPresetAllowed,
-  oZ: createSignalFamily,
-  pZ: createScopedSignal,
-  rZ: createDerivedFamily,
-  sZ: createDerivedSignal,
-} = appSharedChunk;
-
-type PermissionStatus = "not-requested" | "pending" | "allowed" | "denied";
-type WorkflowPhase =
-  "role" | "task" | "permission" | "execution" | "capabilities";
-
-export interface ConversationalOnboardingWorkflow {
-  advancedCapabilitiesStatus?: "pending" | "completed";
-  advancedCapabilitiesToSetup?: string[];
-  completedImport?: boolean;
-  computerUseAccessGranted?: boolean;
-  declinedTasks: string[];
-  permissionStatus: PermissionStatus;
-  phase: WorkflowPhase;
-  selectedRole: string | null;
-  selectedTask: string | null;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  E4 as n,
+  FX as r,
+  G4 as i,
+  H4 as a,
+  K4 as o,
+  QI as s,
+  QX as c,
+  Z4 as l,
+  ZI as u,
+  cX as d,
+  g4 as f,
+  k4 as p,
+  lY as m,
+  oZ as h,
+  pZ as g,
+  q4 as _,
+  rZ as v,
+  sZ as ee,
+  wL as te,
+  x4 as ne,
+} from "@rchunk/app-shared";
+import {
+  $Dt as re,
+  $ht as ie,
+  GU as ae,
+  HDt as oe,
+  HU as se,
+  HZt as ce,
+  Kyt as le,
+  M0t as ue,
+  Mpn as de,
+  Mwt as fe,
+  N1t as pe,
+  Nmn as me,
+  Nwt as he,
+  O4 as ge,
+  P1t as _e,
+  Pdn as ve,
+  Pwt as ye,
+  QDt as be,
+  Qgt as xe,
+  Rln as Se,
+  Sun as Ce,
+  UDt as we,
+  Ugn as Te,
+  VDt as Ee,
+  Wgn as De,
+  _un as Oe,
+  afn as ke,
+  dun as Ae,
+  egt as je,
+  gdn as Me,
+  gpt as Ne,
+  hdn as Pe,
+  hpt as Fe,
+  ifn as Ie,
+  jpn as Le,
+  k0t as Re,
+  k4 as ze,
+  lZt as Be,
+  mnt as Ve,
+  mpt as He,
+  mun as Ue,
+  n$t as We,
+  ngn as y,
+  ogn as b,
+  pnt as x,
+  qyt as Ge,
+  rgn as Ke,
+  uZt as qe,
+  uun as Je,
+} from "@rchunk/app-initial";
+import { a as Ye, o as Xe } from "@rchunk/onboarding-mail-provider";
+function S(e) {
+  return e.get(T) ?? y(C, w);
 }
-
-export interface SignalReader {
-  get<T>(signal: unknown, key?: unknown): T;
-}
-
-export interface SignalStore extends SignalReader {
-  set<T>(signal: unknown, value: T | ((previous: T) => T)): void;
-  queryClient?: { setQueriesData(filter: unknown, value: unknown): void };
-  when?(predicate: (reader: SignalStore) => boolean): Promise<void>;
-}
-
-export interface CapabilityStatus {
-  id: string;
-  status: "checking" | "enabled" | "unavailable" | string;
-}
-
-interface CompletionQueryValue {
-  data?: { completion?: unknown; status?: string };
-}
-
-interface ConversationTurn {
-  items: unknown[];
-  status?: string;
-}
-
-export interface TaskMessage {
-  defaultMessage: string;
-  description: string;
-  id: string;
-  translations?: Record<string, string>;
-}
-
-export interface OnboardingTaskDefinition {
-  instructions?: string;
-  is_auto_submit_enabled?: boolean;
-  messages: { label: TaskMessage; prompt: TaskMessage };
-  origin: "checked_in" | "remote";
-  pluginSlots?: Record<string, string>;
-}
-
-export interface ParsedRemoteTaskConfig {
-  fallbackTaskIds: string[];
-  taskDefinitions: Record<string, OnboardingTaskDefinition>;
-}
-
-const WORKFLOW_STORAGE_KEY = "electron:conversational-onboarding-workflow";
-const CONVERSATION_STORAGE_KEY =
-  "electron:conversational-onboarding-conversation";
-const CONVERSATION_IDS_STORAGE_KEY =
-  "electron:conversational-onboarding-conversation-ids";
-const REMOTE_TASK_CONFIG_EXPERIMENT = "1540453652";
-const ROLE_ASSIGNMENT_EXPERIMENT = "2214619544";
-const CODEX_APPS_READY_TIMEOUT_MS = 35_000;
-const NOTIFICATION_PROMPT_DELAY_MS = 2_000;
-
-const LOCAL_TASK_IDS = [
-  "desktop_note",
-  "csv_chart",
-  "hold_next_free_hour",
-  "send_message_to_self",
-] as const;
-const RESERVED_REMOTE_TASK_IDS = new Set([
-  "create_project",
-  "enable_notifications",
-  "explore_codex",
-  "finish_connecting_imported_tools",
-  "review_latest_plans",
-  "claude_import",
-  ...LOCAL_TASK_IDS,
-]);
-
-const DEFAULT_WORKFLOW: ConversationalOnboardingWorkflow = {
-  declinedTasks: [],
-  phase: "role",
-  selectedRole: null,
-  selectedTask: null,
-  permissionStatus: "not-requested",
-};
-
-const CHATGPT_ROLE_TASKS = [
-  "enable_notifications",
-  "create_automation",
-  "triage_github_prs",
-  "catch_up_linear",
-];
-const GENERAL_ROLE_TASKS = [
-  "enable_notifications",
-  "create_automation",
-  "summarize_inbox",
-  "catch_up_updates_and_blockers",
-  "summarize_current_priorities",
-];
-const REPRESENTATIVE_ROLE_TASK: Record<string, string> = {
-  product_management: "review_roadmaps_and_projects",
-  design: "review_design_briefs",
-  marketing: "review_campaigns",
-  sales: "review_account_plans",
-  finance: "review_forecasts",
-  operations: "review_operating_plans",
-  people_hr: "review_people_plans_and_policies",
-  legal: "review_contracts_and_policies",
-  student: "review_class_materials",
-};
-const GOOGLE_WORKSPACE_PLUGIN_IDS = new Set([
-  "gmail",
-  "google-calendar",
-  "google-drive",
-]);
-
-const LOCALE_TO_TRANSLATION_KEY: Record<string, string> = {
-  "bg-BG": "bg",
-  "bn-BD": "bn",
-  "bs-BA": "bs",
-  "ca-ES": "ca",
-  "cs-CZ": "cs",
-  "da-DK": "da",
-  "de-DE": "de",
-  "el-GR": "el",
-  "es-419": "es-419",
-  "es-ES": "es",
-  "et-EE": "et",
-  "fi-FI": "fi",
-  "fr-CA": "fr-CA",
-  "fr-FR": "fr",
-  "gu-IN": "gu",
-  "hi-IN": "hi",
-  "hr-HR": "hr",
-  "hu-HU": "hu",
-  "hy-AM": "hy",
-  "id-ID": "id",
-  "is-IS": "is",
-  "it-IT": "it",
-  "ja-JP": "ja",
-  "ka-GE": "ka",
-  "kn-IN": "kn",
-  "ko-KR": "ko",
-  "lv-LV": "lv",
-  "mk-MK": "mk",
-  "mr-IN": "mr",
-  "ms-MY": "ms",
-  "my-MM": "my",
-  "nb-NO": "nb",
-  "nl-NL": "nl",
-  "pl-PL": "pl",
-  "pt-BR": "pt",
-  "pt-PT": "pt-PT",
-  "ro-RO": "ro",
-  "ru-RU": "ru",
-  "sk-SK": "sk",
-  "sl-SI": "sl",
-  "so-SO": "so",
-  "sq-AL": "sq",
-  "sr-RS": "sr",
-  "sv-SE": "sv",
-  "sw-TZ": "sw",
-  "ta-IN": "ta",
-  "te-IN": "te",
-  "th-TH": "th",
-  "tr-TR": "tr",
-  "uk-UA": "uk",
-  "vi-VN": "vi",
-  "zh-CN": "zh",
-  "zh-HK": "zh-HK",
-  "zh-TW": "zh-Hant",
-};
-
-let workflowSignal: unknown = Symbol(WORKFLOW_STORAGE_KEY);
-let completedImportSignal: unknown = Symbol("completed-import");
-let conversationStateFamily: unknown = Symbol("conversation-state-family");
-let completionConversationIdSignal: unknown = Symbol(
-  "completion-conversation-id",
-);
-let permissionPromptDisabledSignal: unknown = Symbol("permission-disabled");
-let permissionPromptVisibleSignal: unknown = Symbol("permission-visible");
-let permissionPromptDelayedSignal: unknown = Symbol("permission-delayed");
-let completionQueryFamily: unknown = Symbol("completion-query-family");
-let completionResultFamily: unknown = Symbol("completion-result-family");
-let completionFailedFamily: unknown = Symbol("completion-failed-family");
-let notificationPromptTimer: ReturnType<typeof setTimeout> | undefined;
-let workflowStateInitialized = false;
-let conversationStateFamilyInitialized = false;
-let conversationRuntimeInitialized = false;
-let permissionDelayStateInitialized = false;
-let permissionPromptStateInitialized = false;
-
-const inFlightStarts = new Map<
-  string,
-  {
-    appPluginName: string | null;
-    generation: number;
-    promise: Promise<StoredConversation>;
-    selectedTask: string;
-  }
->();
-const inFlightTurns = new Map<string, Promise<void>>();
-const startGeneration = new Map<string, number>();
-
-function createSchema<T>(parse: (value: unknown) => T | null) {
-  return {
-    safeParse(
-      value: unknown,
-    ): { success: true; data: T } | { success: false; error: Error } {
-      const data = parse(value);
-      return data == null
-        ? { success: false, error: new Error("Invalid value") }
-        : { success: true, data };
-    },
-  };
-}
-
-const taskIdSchema = createSchema<string>((value) =>
-  typeof value === "string" && value.length > 0 ? value : null,
-);
-const localTaskIdSchema = createSchema<string>((value) =>
-  typeof value === "string" &&
-  (LOCAL_TASK_IDS as readonly string[]).includes(value)
-    ? value
-    : null,
-);
-const taskIconSchema = createSchema<{ iconAppId?: string; label: string }>(
-  (value) => {
-    if (value == null || typeof value !== "object") return null;
-    const record = value as Record<string, unknown>;
-    if (typeof record.label !== "string" || record.label.length === 0)
-      return null;
-    if (
-      record.iconAppId != null &&
-      (typeof record.iconAppId !== "string" || record.iconAppId.length === 0)
-    )
-      return null;
-    return {
-      label: record.label,
-      ...(record.iconAppId == null
-        ? {}
-        : { iconAppId: record.iconAppId as string }),
-    };
-  },
-);
-
-function initializeWorkflowState(): void {
-  if (workflowStateInitialized) return;
-  workflowStateInitialized = true;
-  initializeSignalRuntime?.();
-  initializeSharedRuntime?.();
-  if (typeof appInitial.dun === "function") {
-    workflowSignal = appInitial.dun(WORKFLOW_STORAGE_KEY, DEFAULT_WORKFLOW);
-  }
-  if (typeof createDerivedSignal === "function") {
-    completedImportSignal = createDerivedSignal(
-      applicationScope,
-      ({ get }: SignalReader) =>
-        get<ConversationalOnboardingWorkflow | null>(workflowSignal)
-          ?.completedImport,
-    );
-  }
-}
-
-function getWorkflow(store: SignalStore): ConversationalOnboardingWorkflow {
-  initializeWorkflowState();
-  return (
-    store.get<ConversationalOnboardingWorkflow | null>(workflowSignal) ?? {
-      ...DEFAULT_WORKFLOW,
-      declinedTasks: [],
-    }
-  );
-}
-
-function selectRole(store: SignalStore, role: string): void {
-  initializeWorkflowState();
-  store.set(workflowSignal, {
+function Ze(e, t) {
+  e.set(T, {
     declinedTasks: [],
-    phase: "task",
-    selectedRole: role,
+    phase: `task`,
+    selectedRole: t,
     selectedTask: null,
-    permissionStatus: "not-requested",
+    permissionStatus: `not-requested`,
   });
 }
-
-function selectTask(store: SignalStore, task: string): void {
-  const needsPermission =
-    task !== "csv_chart" && task !== "data_science_csv_chart";
-  store.set(workflowSignal, {
-    ...getWorkflow(store),
-    advancedCapabilitiesStatus: undefined,
-    advancedCapabilitiesToSetup: undefined,
-    phase: needsPermission ? "permission" : "execution",
-    selectedTask: task,
-    permissionStatus: needsPermission ? "pending" : "not-requested",
+function Qe(e, t) {
+  let n = t !== `csv_chart` && t !== `data_science_csv_chart`;
+  e.set(T, {
+    ...S(e),
+    advancedCapabilitiesStatus: void 0,
+    advancedCapabilitiesToSetup: void 0,
+    phase: n ? `permission` : `execution`,
+    selectedTask: t,
+    permissionStatus: n ? `pending` : `not-requested`,
   });
 }
-
-function returnToTaskSelection(
-  store: SignalStore,
-  declinedTask?: string,
-): void {
-  const current = getWorkflow(store);
-  store.set(workflowSignal, {
-    ...current,
-    declinedTasks:
-      declinedTask == null
-        ? current.declinedTasks
-        : [...(current.declinedTasks ?? []), declinedTask],
-    advancedCapabilitiesStatus: undefined,
-    advancedCapabilitiesToSetup: undefined,
-    phase: "task",
+function $e(e, t) {
+  let n = S(e);
+  e.set(T, {
+    ...n,
+    declinedTasks: t == null ? n.declinedTasks : [...(n.declinedTasks ?? []), t],
+    advancedCapabilitiesStatus: void 0,
+    advancedCapabilitiesToSetup: void 0,
+    phase: `task`,
     selectedTask: null,
-    permissionStatus: "not-requested",
+    permissionStatus: `not-requested`,
   });
 }
-
-function setPermissionStatus(
-  store: SignalStore,
-  status: PermissionStatus,
-): void {
-  const current = getWorkflow(store);
-  store.set(workflowSignal, {
-    ...current,
-    permissionStatus: status,
+function et(e, t) {
+  let n = S(e);
+  e.set(T, {
+    ...n,
+    permissionStatus: t,
     computerUseAccessGranted:
-      (current.selectedTask === "computer_use" && status === "allowed") ||
-      current.computerUseAccessGranted,
+      (n.selectedTask === `computer_use` && t === `allowed`) || n.computerUseAccessGranted,
   });
 }
-
-function enterCapabilitiesPhase(
-  store: SignalStore,
-  capabilities: CapabilityStatus[],
-): void {
-  const current = getWorkflow(store);
+function tt(e, t) {
+  let n = S(e);
   if (
-    current.phase !== "execution" ||
-    current.selectedTask == null ||
-    (current.advancedCapabilitiesToSetup == null &&
-      capabilities.some(({ status }) => status === "checking"))
+    n.phase !== `execution` ||
+    n.selectedTask == null ||
+    (n.advancedCapabilitiesToSetup == null && t.some(({ status: e }) => e === `checking`))
   )
     return;
-  const toSetup =
-    current.advancedCapabilitiesToSetup ??
-    capabilities
-      .filter(({ status }) => status !== "enabled" && status !== "unavailable")
-      .map(({ id }) => id);
-  store.set(workflowSignal, {
-    ...current,
-    phase: "capabilities",
-    advancedCapabilitiesToSetup: toSetup,
+  let r =
+    n.advancedCapabilitiesToSetup ??
+    t.filter(({ status: e }) => e !== `enabled` && e !== `unavailable`).map(({ id: e }) => e);
+  e.set(T, {
+    ...n,
+    phase: `capabilities`,
+    advancedCapabilitiesToSetup: r,
     advancedCapabilitiesStatus:
-      toSetup.length === 0
-        ? "completed"
-        : (current.advancedCapabilitiesStatus ?? "pending"),
+      r.length === 0 ? `completed` : (n.advancedCapabilitiesStatus ?? `pending`),
   });
 }
-
-function completeCapabilities(store: SignalStore): void {
-  const current = getWorkflow(store);
-  if (current.phase === "capabilities") {
-    store.set(workflowSignal, {
-      ...current,
-      advancedCapabilitiesStatus: "completed",
-    });
-  }
+function nt(e) {
+  let t = S(e);
+  t.phase === `capabilities` && e.set(T, { ...t, advancedCapabilitiesStatus: `completed` });
 }
-
-function isSelectedTaskBeforeCapabilities(
-  store: SignalStore,
-  task: string,
-): boolean {
-  const current = getWorkflow(store);
-  return current.phase !== "capabilities" && current.selectedTask === task;
+function rt(e, t) {
+  let n = S(e);
+  return n.phase !== `capabilities` && n.selectedTask === t;
 }
-
-function resetWorkflow(store: SignalStore): void {
-  initializeWorkflowState();
-  store.set(workflowSignal, { ...DEFAULT_WORKFLOW, declinedTasks: [] });
+function it(e) {
+  e.set(T, w);
 }
-
-function setExecutionPhase(store: SignalStore): void {
-  store.set(workflowSignal, { ...getWorkflow(store), phase: "execution" });
+function at(e) {
+  e.set(T, { ...S(e), phase: `execution` });
 }
-
-interface StoredConversation {
-  appPluginName: string | null;
-  approvedWritableRoot: string | null;
-  conversationId: string;
-  hostId: string;
-  selectedTask: string;
+var C, w, T, ot;
+function E() {
+  return (E = e(() => {
+    (r(),
+      s(),
+      Ke(),
+      Je(),
+      (C = `electron:conversational-onboarding-workflow`),
+      (w = {
+        declinedTasks: [],
+        phase: `role`,
+        selectedRole: null,
+        selectedTask: null,
+        permissionStatus: `not-requested`,
+      }),
+      (T = Ae(C, w)),
+      (ot = ee(u, ({ get: e }) => e(T)?.completedImport)));
+  }))();
 }
-
-function readPersisted<T>(key: string, fallback: T): T {
-  return typeof appInitial.ngn === "function"
-    ? appInitial.ngn(key, fallback)
-    : fallback;
+var D;
+function O() {
+  return (O = e(() => {
+    (r(),
+      s(),
+      (D = h(u, (e) => null, void 0, { key: ({ hostId: e, threadId: t }) => `${e}:${t}` })));
+  }))();
 }
-
-function writePersisted(key: string, value: unknown): void {
-  appInitial.ogn?.(key, value);
+var k, A, st, ct;
+function j() {
+  return (j = e(() => {
+    (f(),
+      (k = [`desktop_note`, `csv_chart`, `hold_next_free_hour`, `send_message_to_self`]),
+      (A = _().min(1)),
+      (st = ne([`desktop_note`, `csv_chart`, `data_science_csv_chart`, `view_protein_structure`])),
+      (ct = a({ iconAppId: _().min(1).optional(), label: _().min(1) })));
+  }))();
 }
-
-function parseStoredConversation(value: unknown): StoredConversation | null {
-  if (value == null || typeof value !== "object") return null;
-  const record = value as Record<string, unknown>;
-  if (
-    typeof record.conversationId !== "string" ||
-    record.conversationId.length === 0 ||
-    typeof record.hostId !== "string" ||
-    record.hostId.length === 0 ||
-    typeof record.selectedTask !== "string" ||
-    record.selectedTask.length === 0 ||
-    (record.approvedWritableRoot != null &&
-      typeof record.approvedWritableRoot !== "string")
-  )
-    return null;
-  if (
-    record.selectedTask === "desktop_note" &&
-    record.approvedWritableRoot == null
-  )
-    return null;
-  return {
-    appPluginName:
-      typeof record.appPluginName === "string" ? record.appPluginName : null,
-    approvedWritableRoot: record.approvedWritableRoot as string | null,
-    conversationId: record.conversationId,
-    hostId: record.hostId,
-    selectedTask: record.selectedTask,
+function M(e, t = y(N, null)) {
+  let n = ht.safeParse(t);
+  return n.success && n.data.hostId === e ? n.data : null;
+}
+function lt(e) {
+  (b(N, e), ut(e.conversationId));
+}
+function ut(e) {
+  let t = dt();
+  t.includes(e) || b(P, [...t, e]);
+}
+function dt() {
+  return mt.catch([]).parse(y(P, []));
+}
+function ft() {
+  b(P, []);
+}
+function pt(e) {
+  return M(e.hostId)?.conversationId === e.conversationId && (b(N, null), !0);
+}
+var N, P, mt, ht;
+function gt() {
+  return (gt = e(() => {
+    (te(),
+      f(),
+      Ke(),
+      j(),
+      (N = `electron:conversational-onboarding-conversation`),
+      (P = `electron:conversational-onboarding-conversation-ids`),
+      (mt = n(_().min(1).transform(m))),
+      (ht = o({
+        appPluginName: _().nullable().default(null),
+        approvedWritableRoot: _().min(1).nullable(),
+        conversationId: _().min(1).transform(m),
+        hostId: _().min(1),
+        selectedTask: A,
+      }).refine(
+        ({ approvedWritableRoot: e, selectedTask: t }) => t !== `desktop_note` || e != null,
+        {
+          message: `Local file onboarding requires an approved writable root`,
+          path: [`approvedWritableRoot`],
+        },
+      )));
+  }))();
+}
+async function _t(
+  e,
+  {
+    agentMode: t,
+    hostId: n,
+    permissionProfileId: r,
+    permissionsRequirements: i,
+    projectRoot: a,
+    prompt: o,
+    serviceTier: s,
+    shouldSendPermissionOverrides: c,
+  },
+) {
+  let l = Ot(o),
+    u = [a],
+    f = we(u),
+    p = await Ee(u, { prompt: l }),
+    m = p.cwd ?? a;
+  if (f && p.projectlessOutputDirectory == null)
+    throw Error(`No projectless output directory found`);
+  let { config: h } = await Te(e, n).sendRequest(
+      `config/read`,
+      { includeLayers: !1, cwd: m },
+      { priority: `critical` },
+    ),
+    g = ge({
+      addedFiles: [],
+      additionalDeveloperInstructions: At.replaceAll(`{locale}`, Pe()),
+      agentMode: d(`granular`, i) ? `granular` : t,
+      permissionProfileId: r,
+      shouldSendPermissionOverrides: c,
+      collaborationMode: null,
+      config: me(h),
+      configOverrides: { model: Re, model_reasoning_effort: `low` },
+      cwd: m,
+      fileAttachments: [],
+      input: [],
+      model: Re,
+      projectlessOutputDirectory: p.projectlessOutputDirectory,
+      reasoningEffort: `low`,
+      serviceTier: s,
+      threadSource: `conversational_onboarding`,
+      turnTrigger: `conversational_onboarding`,
+      threadStartKind: `conversational_onboarding`,
+      workspaceKind: f ? `projectless` : `project`,
+      workspaceRoots: p.workspaceRoots,
+    }),
+    _ = await Ne(e, n, g);
+  _.status === `created` && ut(_.conversationId);
+  let v = He(e, _);
+  if (v != null) throw v;
+  if (_.status !== `created`) throw Error(`Task creation is not confirmed`);
+  return _.conversationId;
+}
+function vt(e, t) {
+  return (at(e), xt(e, t));
+}
+async function yt(e, t) {
+  let n = await F(e, t),
+    r = L.get(n.conversationId);
+  return (
+    r != null && (await r, L.get(n.conversationId) === r && L.delete(n.conversationId)),
+    e.set(z, n.conversationId),
+    vt(e, t)
+  );
+}
+function bt(e, t) {
+  return F(e, t);
+}
+function F(e, t) {
+  let n = R.get(t.hostId) ?? 0,
+    r = M(t.hostId);
+  if (r?.appPluginName === t.appPluginName && r.selectedTask === t.selectedTask)
+    return Promise.resolve(r);
+  let i = I.get(t.hostId),
+    a = t.appPluginName;
+  if (i?.appPluginName === a && i?.generation === n && i.selectedTask === t.selectedTask)
+    return i.promise;
+  if (i?.generation === n)
+    return Promise.reject(Error(`Another conversational onboarding task is already starting`));
+  let o = Tt(e, t, n);
+  I.set(t.hostId, { appPluginName: a, generation: n, promise: o, selectedTask: t.selectedTask });
+  let s = () => {
+    I.get(t.hostId)?.promise === o && I.delete(t.hostId);
   };
+  return (o.then(s, s), o);
 }
-
-function getStoredConversation(
-  hostId: string,
-  raw = readPersisted(CONVERSATION_STORAGE_KEY, null),
-): StoredConversation | null {
-  const parsed = parseStoredConversation(raw);
-  return parsed?.hostId === hostId ? parsed : null;
-}
-
-function rememberConversation(conversation: StoredConversation): void {
-  writePersisted(CONVERSATION_STORAGE_KEY, conversation);
-  rememberConversationId(conversation.conversationId);
-}
-
-function rememberConversationId(conversationId: string): void {
-  const ids = getRememberedConversationIds();
-  if (!ids.includes(conversationId))
-    writePersisted(CONVERSATION_IDS_STORAGE_KEY, [...ids, conversationId]);
-}
-
-function getRememberedConversationIds(): string[] {
-  const value = readPersisted<unknown>(CONVERSATION_IDS_STORAGE_KEY, []);
-  return Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === "string")
-    : [];
-}
-
-function clearRememberedConversationIds(): void {
-  writePersisted(CONVERSATION_IDS_STORAGE_KEY, []);
-}
-
-function clearStoredConversation(conversation: StoredConversation): boolean {
+async function xt(e, t) {
+  let n = R.get(t.hostId) ?? 0,
+    r = await F(e, t);
   if (
-    getStoredConversation(conversation.hostId)?.conversationId !==
-    conversation.conversationId
+    (t.requiresCodexAppsReady === !0 && (await Dt(e, t.hostId, r.conversationId)),
+    (R.get(t.hostId) ?? 0) !== n)
   )
-    return false;
-  writePersisted(CONVERSATION_STORAGE_KEY, null);
-  return true;
-}
-
-function initializeConversationStateFamily(): void {
-  if (conversationStateFamilyInitialized) return;
-  conversationStateFamilyInitialized = true;
-  initializeSignalRuntime?.();
-  initializeSharedRuntime?.();
-  if (typeof createSignalFamily === "function") {
-    conversationStateFamily = createSignalFamily(
-      applicationScope,
-      () => null,
-      undefined,
-      {
-        key: ({ hostId, threadId }: { hostId: string; threadId: string }) =>
-          `${hostId}:${threadId}`,
-      },
-    );
-  }
-}
-
-const ONBOARDING_DEVELOPER_INSTRUCTIONS = [
-  "Execute the selected conversational onboarding task immediately",
-  "Do not invoke an onboarding skill or interactive onboarding tool",
-  "Do not ask follow-up questions or offer task choices",
-  "Use a sensible default when optional details are unavailable",
-  "Immediately acknowledge the task before calling any tool, using one short user-visible sentence",
-  "Always write natural-language text in the user's app language ({locale}), including progress updates and final responses",
-  "Give brief progress updates in an ELI5 style without being patronizing",
-  "Use one short plain-language sentence describing the user-visible goal, not the implementation",
-  "Never mention commands, tools, code, paths, API parameters, filename checks, validation steps, or fallback logic",
-  "Do not repeat acknowledgements",
-  "Prefer the simplest reliable local toolchain already available and do not install packages",
-  "Honor every writable root approved before this conversation",
-  `Before the final response, call ${appInitial.lZt} with exactly one terminal outcome. Write completion tool output in the user's app language ({locale}) using that locale's conventions for dates, times, weekday and month names, numbers, and punctuation. Localize task-specific output examples instead of copying their language or formatting. Use {"outcome":"completed","output":"<task-specific output>","url":"<created or affected resource URL>"} when the intended action happened, following any selected task output instruction exactly. Use {"outcome":"not_completed","output":"<friendly first-person sentence>"} when execution succeeded but the intended result could not be achieved. Focus a not_completed output on the user's goal. Omit technical details, tool names, raw constraints, time zones, and error text. Authentication, connector, tool, and runtime errors are execution failures; explain them briefly and stop without calling the completion tool. If the completion tool rejects a terminal result, correct it and retry. After it succeeds, do not call it again`,
-  "Give one concise final response and stop",
-].join(". ");
-
-function normalizePrompt(prompt: string | (() => string)): unknown {
-  const text = typeof prompt === "function" ? prompt() : prompt;
-  return typeof appInitial.Mpn === "function"
-    ? appInitial.Mpn({
-        addedFiles: [],
-        fileAttachments: [],
-        ideContext: null,
-        imageAttachments: [],
-        prompt: text,
-      })
-    : text;
-}
-
-async function createOnboardingConversation(
-  _store: SignalStore,
-  options: Record<string, any>,
-): Promise<string> {
-  const prompt = normalizePrompt(options.prompt);
-  const roots = [options.projectRoot];
-  const projectless = appInitial.UDt?.(roots);
-  const workspace = (await appInitial.VDt?.(roots, { prompt })) ?? {
-    cwd: options.projectRoot,
-    workspaceRoots: roots,
-  };
-  const cwd = workspace.cwd ?? options.projectRoot;
-  if (projectless && workspace.projectlessOutputDirectory == null)
-    throw new Error("No projectless output directory found");
-  const response = await appInitial
-    .Ugn(options.store ?? _store, options.hostId)
-    .sendRequest(
-      "config/read",
-      { includeLayers: false, cwd },
-      { priority: "critical" },
-    );
-  const configuration = appInitial.O4({
-    addedFiles: [],
-    additionalDeveloperInstructions:
-      ONBOARDING_DEVELOPER_INSTRUCTIONS.replaceAll(
-        "{locale}",
-        appInitial.hdn?.() ?? "en",
-      ),
-    agentMode: isPermissionPresetAllowed?.(
-      "granular",
-      options.permissionsRequirements,
+    throw Error(`Conversational onboarding start was cancelled`);
+  let i = L.get(r.conversationId);
+  if (i != null) return (await i, r);
+  let a = (async () => {
+    if (
+      (await x.conversationalOnboarding?.expectTaskCompletion({
+        conversationId: r.conversationId,
+        hostId: t.hostId,
+        isRevert: t.isRevert,
+        selectedTask: t.selectedTask,
+      })) !== !0 ||
+      (R.get(t.hostId) ?? 0) !== n
     )
-      ? "granular"
-      : options.agentMode,
-    permissionProfileId: options.permissionProfileId,
-    shouldSendPermissionOverrides: options.shouldSendPermissionOverrides,
-    collaborationMode: null,
-    config: appInitial.Nmn?.(response.config) ?? response.config,
-    configOverrides: { model: appInitial.k0t, model_reasoning_effort: "low" },
-    cwd,
-    fileAttachments: [],
-    input: [],
-    model: appInitial.k0t,
-    projectlessOutputDirectory: workspace.projectlessOutputDirectory,
-    reasoningEffort: "low",
-    serviceTier: options.serviceTier,
-    threadSource: "conversational_onboarding",
-    turnTrigger: "conversational_onboarding",
-    threadStartKind: "conversational_onboarding",
-    workspaceKind: projectless ? "projectless" : "project",
-    workspaceRoots: workspace.workspaceRoots,
-  });
-  if (typeof appInitial.gpt !== "function") {
-    throw new Error("Conversation creation is unavailable");
+      throw Error(`Conversational onboarding start was cancelled`);
+    (e.queryClient.setQueriesData(
+      { queryKey: [`conversational-onboarding-completion`, r.conversationId] },
+      { status: `pending` },
+    ),
+      await ae(e, t.hostId, r.conversationId, {
+        request: {
+          turnTrigger: t.isRevert
+            ? `conversational_onboarding_revert`
+            : `conversational_onboarding`,
+          threadId: r.conversationId,
+          input: [
+            ...(t.skill == null ? [] : [t.skill]),
+            { type: `text`, text: Ot(t.prompt), text_elements: [] },
+          ],
+          serviceTier: t.serviceTier,
+        },
+      }));
+  })();
+  L.set(r.conversationId, a);
+  try {
+    await a;
+  } catch (e) {
+    throw (L.delete(r.conversationId), e);
   }
-  const result = await appInitial.gpt(_store, options.hostId, configuration);
-  if (result?.status === "created")
-    rememberConversationId(result.conversationId);
-  const failure = appInitial.mpt?.(_store, result);
-  if (failure != null) throw failure;
-  if (result?.status !== "created")
-    throw new Error("Task creation is not confirmed");
-  return result.conversationId;
+  return r;
 }
-
-function extractCompletionFromTurns(
-  turns: Array<{ items: unknown[] }> | null | undefined,
-): unknown {
-  if (turns == null) return null;
-  for (let turnIndex = turns.length - 1; turnIndex >= 0; turnIndex--) {
-    const turn = turns[turnIndex];
-    if (turn == null) continue;
-    for (let itemIndex = turn.items.length - 1; itemIndex >= 0; itemIndex--) {
-      const item = turn.items[itemIndex] as { type?: string } | undefined;
-      if (item?.type !== "dynamicToolCall" && item?.type !== "mcpToolCall")
-        continue;
-      const completion = appInitial.$Dt?.(item);
-      if (completion != null) return completion;
-    }
+function St(e, t) {
+  R.set(t, (R.get(t) ?? 0) + 1);
+  let n = M(t);
+  n != null && Et(e, n).catch(() => void 0);
+}
+async function Ct(e, t) {
+  (await Promise.all(
+    dt().map((n) =>
+      Te(e, t)
+        .archiveConversation(n, {
+          useAppServerPins: e.get(pe),
+          source: `conversational-onboarding-complete`,
+        })
+        .then(async () => {
+          await x.conversationalOnboarding?.clearTaskCompletionExpectation({
+            hostId: t,
+            conversationId: n,
+          });
+        }),
+    ),
+  ),
+    ft());
+}
+function wt(e) {
+  if (e == null) return null;
+  for (let t = e.length - 1; t >= 0; --t) {
+    let n = e[t];
+    if (n != null)
+      for (let e = n.items.length - 1; e >= 0; --e) {
+        let t = n.items[e];
+        if (t?.type !== `dynamicToolCall` && t?.type !== `mcpToolCall`) continue;
+        let r = re(t);
+        if (r != null) return r;
+      }
   }
   return null;
 }
-
-function initializeConversationRuntime(): void {
-  if (conversationRuntimeInitialized) return;
-  conversationRuntimeInitialized = true;
-  initializeWorkflowState();
-  initializeConversationStateFamily();
-  completionConversationIdSignal =
-    createScopedSignal?.(applicationScope, null) ??
-    completionConversationIdSignal;
-  completionQueryFamily =
-    createDerivedFamily?.(
-      applicationScope,
-      (conversationId: string, { get }: SignalReader) => ({
-        enabled: appInitial.pnt?.conversationalOnboarding != null,
-        queryKey: ["conversational-onboarding-completion", conversationId],
-        queryFn: async () =>
-          (await appInitial.pnt?.conversationalOnboarding?.getTaskCompletionState(
-            { hostId: "local", conversationId },
-          )) ?? { status: "unavailable" },
-        staleTime: 0,
+async function Tt(e, t, n) {
+  let r = M(t.hostId);
+  r != null && (await Et(e, r));
+  let i = await _t(e, t);
+  if ((R.get(t.hostId) ?? 0) !== n)
+    throw (
+      je(e, { conversationId: i, hostId: t.hostId, initiatedBy: `system` }),
+      await x.conversationalOnboarding?.clearTaskCompletionExpectation({
+        conversationId: i,
+        hostId: t.hostId,
       }),
-    ) ?? completionQueryFamily;
-  completionResultFamily =
-    createDerivedFamily?.(
-      applicationScope,
-      (conversationId: string | null, { get }: SignalReader) => {
-        if (conversationId == null) return null;
-        const service = appInitial.pnt?.conversationalOnboarding;
-        if (service != null) {
-          const state = get<CompletionQueryValue>(
-            completionQueryFamily,
-            conversationId,
-          ).data;
-          if (state?.status === "completed") return state.completion;
-          if (state?.status !== "absent") return null;
-        }
-        const turns = get<ConversationTurn[] | null>(
-          appInitial.n$t,
-          conversationId,
-        );
-        return extractCompletionFromTurns(
-          get<string | null>(completionConversationIdSignal) === conversationId
-            ? turns?.slice(-1)
-            : turns,
-        );
-      },
-    ) ?? completionResultFamily;
-  completionFailedFamily =
-    createDerivedFamily?.(
-      applicationScope,
-      (conversationId: string | null, { get }: SignalReader) => {
-        if (conversationId == null) return false;
-        const lastTurn = get<ConversationTurn[] | null>(
-          appInitial.n$t,
-          conversationId,
-        )?.at(-1);
-        return (
-          lastTurn != null &&
-          lastTurn.status !== "inProgress" &&
-          get(completionResultFamily, conversationId) == null
-        );
-      },
-    ) ?? completionFailedFamily;
-}
-
-async function disposeStoredConversation(
-  store: SignalStore,
-  conversation: StoredConversation,
-): Promise<void> {
-  if (clearStoredConversation(conversation)) {
-    inFlightTurns.delete(conversation.conversationId);
-    appInitial.egt?.(store, {
-      conversationId: conversation.conversationId,
-      hostId: conversation.hostId,
-      initiatedBy: "system",
-    });
-    await appInitial.pnt?.conversationalOnboarding?.clearTaskCompletionExpectation(
-      {
-        conversationId: conversation.conversationId,
-        hostId: conversation.hostId,
-      },
+      Error(`Conversational onboarding start was cancelled`)
     );
-  }
-}
-
-async function createStoredConversation(
-  store: SignalStore,
-  options: Record<string, any>,
-  generation: number,
-): Promise<StoredConversation> {
-  const current = getStoredConversation(options.hostId);
-  if (current != null) await disposeStoredConversation(store, current);
-  const conversationId = await createOnboardingConversation(store, {
-    ...options,
-    store,
-  });
-  if ((startGeneration.get(options.hostId) ?? 0) !== generation) {
-    appInitial.egt?.(store, {
-      conversationId,
-      hostId: options.hostId,
-      initiatedBy: "system",
-    });
-    await appInitial.pnt?.conversationalOnboarding?.clearTaskCompletionExpectation(
-      { conversationId, hostId: options.hostId },
-    );
-    throw new Error("Conversational onboarding start was cancelled");
-  }
-  const conversation = {
-    appPluginName: options.appPluginName ?? null,
+  let a = {
+    appPluginName: t.appPluginName,
     approvedWritableRoot: null,
-    conversationId,
-    hostId: options.hostId,
-    selectedTask: options.selectedTask,
+    conversationId: i,
+    hostId: t.hostId,
+    selectedTask: t.selectedTask,
   };
-  rememberConversation(conversation);
-  return conversation;
+  return (lt(a), a);
 }
-
-function startConversation(
-  store: SignalStore,
-  options: Record<string, any>,
-): Promise<StoredConversation> {
-  const generation = startGeneration.get(options.hostId) ?? 0;
-  const current = getStoredConversation(options.hostId);
-  if (
-    current?.appPluginName === options.appPluginName &&
-    current.selectedTask === options.selectedTask
-  )
-    return Promise.resolve(current);
-  const inFlight = inFlightStarts.get(options.hostId);
-  if (
-    inFlight?.appPluginName === options.appPluginName &&
-    inFlight.generation === generation &&
-    inFlight.selectedTask === options.selectedTask
-  )
-    return inFlight.promise;
-  if (inFlight?.generation === generation)
-    return Promise.reject(
-      new Error("Another conversational onboarding task is already starting"),
-    );
-  const promise = createStoredConversation(store, options, generation);
-  inFlightStarts.set(options.hostId, {
-    appPluginName: options.appPluginName ?? null,
-    generation,
-    promise,
-    selectedTask: options.selectedTask,
-  });
-  const clear = () => {
-    if (inFlightStarts.get(options.hostId)?.promise === promise)
-      inFlightStarts.delete(options.hostId);
-  };
-  promise.then(clear, clear);
-  return promise;
+async function Et(e, t) {
+  pt(t) &&
+    (L.delete(t.conversationId),
+    je(e, { conversationId: t.conversationId, hostId: t.hostId, initiatedBy: `system` }),
+    await x.conversationalOnboarding?.clearTaskCompletionExpectation({
+      conversationId: t.conversationId,
+      hostId: t.hostId,
+    }));
 }
-
-async function waitForCodexAppsReady(
-  store: SignalStore,
-  hostId: string,
-  threadId: string,
-): Promise<void> {
-  if (store.when == null) return;
-  const key = { hostId, threadId };
-  let timer: ReturnType<typeof setTimeout> | undefined;
+async function Dt(e, t, n) {
+  let r = { hostId: t, threadId: n },
+    i = null;
   try {
-    const state = await Promise.race([
-      store
-        .when((reader) => {
-          const value = reader.get<any>(conversationStateFamily, key);
-          return value != null && value.status !== "starting";
-        })
-        .then(() => store.get<any>(conversationStateFamily, key)),
-      new Promise<null>((resolve) => {
-        timer = setTimeout(() => resolve(null), CODEX_APPS_READY_TIMEOUT_MS);
-      }),
-    ]);
-    if (state?.status !== "ready")
-      throw new Error("Codex Apps did not become ready for onboarding");
-  } finally {
-    if (timer != null) clearTimeout(timer);
-  }
-}
-
-async function startOnboardingTurn(
-  store: SignalStore,
-  options: Record<string, any>,
-): Promise<StoredConversation> {
-  const generation = startGeneration.get(options.hostId) ?? 0;
-  const conversation = await startConversation(store, options);
-  if (options.requiresCodexAppsReady === true)
-    await waitForCodexAppsReady(
-      store,
-      options.hostId,
-      conversation.conversationId,
-    );
-  if ((startGeneration.get(options.hostId) ?? 0) !== generation)
-    throw new Error("Conversational onboarding start was cancelled");
-  const existing = inFlightTurns.get(conversation.conversationId);
-  if (existing != null) {
-    await existing;
-    return conversation;
-  }
-  const turn = (async () => {
-    const expected =
-      await appInitial.pnt?.conversationalOnboarding?.expectTaskCompletion({
-        conversationId: conversation.conversationId,
-        hostId: options.hostId,
-        isRevert: options.isRevert,
-        selectedTask: options.selectedTask,
-      });
     if (
-      expected !== true ||
-      (startGeneration.get(options.hostId) ?? 0) !== generation
+      (
+        await Promise.race([
+          e
+            .when((e) => {
+              let t = e.get(D, r);
+              return t != null && t.status !== `starting`;
+            })
+            .then(() => e.get(D, r)),
+          new Promise((e) => {
+            i = setTimeout(() => e(null), kt);
+          }),
+        ])
+      )?.status !== `ready`
     )
-      throw new Error("Conversational onboarding start was cancelled");
-    store.queryClient?.setQueriesData(
-      {
-        queryKey: [
-          "conversational-onboarding-completion",
-          conversation.conversationId,
-        ],
-      },
-      { status: "pending" },
-    );
-    await appInitial.GU?.(store, options.hostId, conversation.conversationId, {
-      request: {
-        turnTrigger: options.isRevert
-          ? "conversational_onboarding_revert"
-          : "conversational_onboarding",
-        threadId: conversation.conversationId,
-        input: [
-          ...(options.skill == null ? [] : [options.skill]),
-          {
-            type: "text",
-            text: normalizePrompt(options.prompt),
-            text_elements: [],
-          },
-        ],
-        serviceTier: options.serviceTier,
-      },
-    });
-  })();
-  inFlightTurns.set(conversation.conversationId, turn);
-  try {
-    await turn;
-  } catch (error) {
-    inFlightTurns.delete(conversation.conversationId);
-    throw error;
+      throw Error(`Codex Apps did not become ready for onboarding`);
+  } finally {
+    i != null && clearTimeout(i);
   }
-  return conversation;
 }
-
-function startOnboardingFromExecution(
-  store: SignalStore,
-  options: Record<string, any>,
-): Promise<StoredConversation> {
-  setExecutionPhase(store);
-  return startOnboardingTurn(store, options);
-}
-
-async function startAndSelectConversation(
-  store: SignalStore,
-  options: Record<string, any>,
-): Promise<StoredConversation> {
-  const conversation = await startConversation(store, options);
-  const existing = inFlightTurns.get(conversation.conversationId);
-  if (existing != null) {
-    await existing;
-    if (inFlightTurns.get(conversation.conversationId) === existing)
-      inFlightTurns.delete(conversation.conversationId);
-  }
-  store.set(completionConversationIdSignal, conversation.conversationId);
-  setExecutionPhase(store);
-  return conversation;
-}
-
-function cancelConversationStart(store: SignalStore, hostId: string): void {
-  startGeneration.set(hostId, (startGeneration.get(hostId) ?? 0) + 1);
-  const current = getStoredConversation(hostId);
-  if (current != null) void disposeStoredConversation(store, current);
-}
-
-async function archiveOnboardingConversations(
-  store: SignalStore,
-  hostId: string,
-): Promise<void> {
-  await Promise.all(
-    getRememberedConversationIds().map(async (conversationId) => {
-      await appInitial.Ugn(store, hostId).archiveConversation(conversationId, {
-        useAppServerPins: store.get(appInitial.N1t),
-        source: "conversational-onboarding-complete",
-      });
-      await appInitial.pnt?.conversationalOnboarding?.clearTaskCompletionExpectation(
-        { hostId, conversationId },
-      );
-    }),
-  );
-  clearRememberedConversationIds();
-}
-
-function initializePermissionDelayState(): void {
-  if (permissionDelayStateInitialized) return;
-  permissionDelayStateInitialized = true;
-  initializeSignalRuntime?.();
-  initializeSharedRuntime?.();
-  permissionPromptDisabledSignal =
-    createScopedSignal?.(applicationScope, false) ??
-    permissionPromptDisabledSignal;
-  permissionPromptDelayedSignal =
-    createScopedSignal?.(applicationScope, false) ??
-    permissionPromptDelayedSignal;
-}
-
-function initializePermissionPromptState(): void {
-  if (permissionPromptStateInitialized) return;
-  permissionPromptStateInitialized = true;
-  initializePermissionDelayState();
-  permissionPromptVisibleSignal =
-    createScopedSignal?.(applicationScope, "not-determined") ??
-    permissionPromptVisibleSignal;
-}
-
-function clearNotificationPromptTimer(): void {
-  if (notificationPromptTimer != null) clearTimeout(notificationPromptTimer);
-  notificationPromptTimer = undefined;
-}
-
-function deferNotificationPrompt(store: SignalStore): void {
-  initializePermissionPromptState();
-  store.set(permissionPromptVisibleSignal, "disabled");
-  clearNotificationPromptTimer();
-  notificationPromptTimer = setTimeout(() => {
-    notificationPromptTimer = undefined;
-    store.set(permissionPromptDelayedSignal, false);
-    store.set(permissionPromptDisabledSignal, true);
-  }, NOTIFICATION_PROMPT_DELAY_MS);
-}
-
-function showNotificationPrompt(store: SignalStore): void {
-  clearNotificationPromptTimer();
-  store.set(permissionPromptDelayedSignal, false);
-  store.set(permissionPromptDisabledSignal, true);
-}
-
-function resetNotificationPrompt(store: SignalStore): void {
-  clearNotificationPromptTimer();
-  store.set(permissionPromptVisibleSignal, "not-determined");
-  store.set(permissionPromptDisabledSignal, false);
-  store.set(permissionPromptDelayedSignal, false);
-}
-
-function roleFallbackTask(role: string | null | undefined): string {
-  return (
-    (role == null ? undefined : REPRESENTATIVE_ROLE_TASK[role]) ??
-    "review_business_and_project_plans"
-  );
-}
-
-function shouldUseChatGptTaskDefaults(
-  configuration: { apps: unknown[]; appTemplates: unknown[] },
-  mode: string,
-): boolean {
-  return (
-    mode === "chatgpt" ||
-    (configuration.apps.length === 0 && configuration.appTemplates.length === 0)
-  );
-}
-
-function fallbackTasks(
-  roles: unknown,
-  representativeRole: string | null | undefined,
-): string[] {
-  const base = appInitial.Kyt?.(roles)
-    ? CHATGPT_ROLE_TASKS
-    : GENERAL_ROLE_TASKS;
-  return [...base, roleFallbackTask(representativeRole)];
-}
-
-function isPluginEligible(
-  pluginId: string,
-  plan: unknown,
-  allowedPlans: unknown[] | null = null,
-): boolean {
-  const freePlans = new Set([appInitial.Pdn?.FREE, appInitial.Pdn?.GO]);
-  return (
-    plan == null ||
-    ((allowedPlans == null || allowedPlans.includes(plan)) &&
-      !(freePlans.has(plan) && GOOGLE_WORKSPACE_PLUGIN_IDS.has(pluginId)))
-  );
-}
-
-function filterCandidateTasks({
-  canEnableNotifications,
-  candidateItemIds,
-  hideGoogleWorkspaceItems,
-  mailProvider: provider,
-  plan,
-  taskDefinitions,
-}: {
-  canEnableNotifications: boolean;
-  candidateItemIds: string[];
-  hideGoogleWorkspaceItems: boolean;
-  mailProvider: unknown;
-  plan: unknown;
-  taskDefinitions: Record<string, OnboardingTaskDefinition>;
-}): string[] {
-  const providerKind = mailProvider.a?.(provider, plan);
-  return [...new Set(candidateItemIds)]
-    .filter((taskId) => {
-      if (taskId === "enable_notifications") return canEnableNotifications;
-      if (
-        [
-          "create_project",
-          "claude_import",
-          "finish_connecting_imported_tools",
-        ].includes(taskId)
-      )
-        return true;
-      const task = taskDefinitions[taskId];
-      if (task == null) return false;
-      return (
-        providerKind !== "google" ||
-        !Object.values(task.pluginSlots ?? {}).some(
-          (pluginId) =>
-            !isPluginEligible(pluginId, plan) ||
-            (hideGoogleWorkspaceItems &&
-              GOOGLE_WORKSPACE_PLUGIN_IDS.has(pluginId)),
-        )
-      );
-    })
-    .slice(0, 10);
-}
-
-function chooseChecklistTasks({
-  assignmentParameter,
-  canEnableNotifications,
-  generalAssignment,
-  hideGoogleWorkspaceItems,
-  mailProvider: provider,
-  plan,
-  representativeRole,
-  roleAssignment,
-  roles,
-  taskDefinitions,
-}: Record<string, any>): {
-  exposureParameter: string | null;
-  itemIds: string[];
-} {
-  const assigned =
-    Array.isArray(roleAssignment) &&
-    roleAssignment.every((item) => typeof item === "string") &&
-    roleAssignment.length > 0
-      ? roleAssignment
-      : null;
-  const general =
-    Array.isArray(generalAssignment) &&
-    generalAssignment.every((item) => typeof item === "string") &&
-    generalAssignment.length > 0
-      ? generalAssignment
-      : null;
-  const chosenAssignment =
-    assignmentParameter === undefined
-      ? representativeRole
-      : assignmentParameter;
-  let exposureParameter: string | null = null;
-  let candidates: string[];
-  if (chosenAssignment != null && assigned != null) {
-    exposureParameter = chosenAssignment;
-    candidates = assigned;
-  } else if (general != null) {
-    exposureParameter = "general";
-    candidates = general;
-  } else candidates = fallbackTasks(roles, representativeRole);
-  const itemIds = filterCandidateTasks({
-    canEnableNotifications,
-    candidateItemIds: candidates,
-    hideGoogleWorkspaceItems,
-    mailProvider: provider,
-    plan,
-    taskDefinitions,
+function Ot(e) {
+  return de({
+    addedFiles: [],
+    fileAttachments: [],
+    ideContext: null,
+    imageAttachments: [],
+    prompt: typeof e == `function` ? e() : e,
   });
-  return itemIds.length > 0
-    ? { exposureParameter, itemIds }
+}
+var kt, At, I, L, R, z, jt, B, Mt;
+function Nt() {
+  return (Nt = e(() => {
+    (r(),
+      te(),
+      qe(),
+      ue(),
+      Le(),
+      De(),
+      be(),
+      ie(),
+      ce(),
+      Fe(),
+      se(),
+      xe(),
+      Ce(),
+      ze(),
+      oe(),
+      _e(),
+      Ve(),
+      s(),
+      Me(),
+      E(),
+      O(),
+      gt(),
+      (kt = 35e3),
+      (At = [
+        `Execute the selected conversational onboarding task immediately`,
+        `Do not invoke an onboarding skill or interactive onboarding tool`,
+        `Do not ask follow-up questions or offer task choices`,
+        `Use a sensible default when optional details are unavailable`,
+        `Immediately acknowledge the task before calling any tool, using one short user-visible sentence`,
+        `Always write natural-language text in the user's app language ({locale}), including progress updates and final responses`,
+        `Give brief progress updates in an ELI5 style without being patronizing`,
+        `Use one short plain-language sentence describing the user-visible goal, not the implementation`,
+        `Never mention commands, tools, code, paths, API parameters, filename checks, validation steps, or fallback logic`,
+        `Do not repeat acknowledgements`,
+        `Prefer the simplest reliable local toolchain already available and do not install packages`,
+        `Honor every writable root approved before this conversation`,
+        `Before the final response, call ${Be} with exactly one terminal outcome. Write completion tool output in the user's app language ({locale}) using that locale's conventions for dates, times, weekday and month names, numbers, and punctuation. Localize task-specific output examples instead of copying their language or formatting. Use {"outcome":"completed","output":"<task-specific output>","url":"<created or affected resource URL>"} when the intended action happened, following any selected task output instruction exactly. Use {"outcome":"not_completed","output":"<friendly first-person sentence>"} when execution succeeded but the intended result could not be achieved. Focus a not_completed output on the user's goal. Omit technical details, tool names, raw constraints, time zones, and error text. Authentication, connector, tool, and runtime errors are execution failures; explain them briefly and stop without calling the completion tool. If the completion tool rejects a terminal result, correct it and retry. After it succeeds, do not call it again`,
+        `Give one concise final response and stop`,
+      ].join(`. `)),
+      (I = new Map()),
+      (L = new Map()),
+      (R = new Map()),
+      (z = g(u, null)),
+      (jt = c(u, (e, { get: t }) => {
+        let n = x.conversationalOnboarding,
+          r = t(Ue),
+          i = t(Oe);
+        return {
+          enabled: n != null && r != null && i != null,
+          queryKey: [`conversational-onboarding-completion`, e, r, i],
+          queryFn: async () =>
+            (await n?.getTaskCompletionState({ hostId: `local`, conversationId: e })) ?? {
+              status: `unavailable`,
+            },
+          staleTime: 0,
+        };
+      })),
+      (B = v(u, (e, { get: t }) => {
+        if (e == null) return null;
+        if (x.conversationalOnboarding != null) {
+          let n = t(jt, e).data;
+          if (n?.status === `completed`) return n.completion;
+          if (n?.status !== `absent`) return null;
+        }
+        let n = t(We, e);
+        return wt(t(z) === e ? n?.slice(-1) : n);
+      })),
+      (Mt = v(u, (e, { get: t }) => {
+        if (e == null) return !1;
+        let n = t(We, e)?.at(-1);
+        return n != null && n.status !== `inProgress` && t(B, e) == null;
+      })));
+  }))();
+}
+var V, H;
+function U() {
+  return (U = e(() => {
+    (r(), s(), (V = g(u, !1)), (H = g(u, !1)));
+  }))();
+}
+function Pt(e) {
+  (e.set(K, `disabled`),
+    W(),
+    (G = setTimeout(() => {
+      ((G = void 0), e.set(H, !1), e.set(V, !0));
+    }, Lt)));
+}
+function Ft(e) {
+  (W(), e.set(H, !1), e.set(V, !0));
+}
+function It(e) {
+  (W(), e.set(K, `not-determined`), e.set(V, !1), e.set(H, !1));
+}
+function W() {
+  (clearTimeout(G), (G = void 0));
+}
+var Lt, G, K;
+function Rt() {
+  return (Rt = e(() => {
+    (r(), s(), U(), (Lt = 2e3), (K = g(u, `not-determined`)));
+  }))();
+}
+function zt(e, t) {
+  return t === `chatgpt` || (e.apps.length === 0 && e.appTemplates.length === 0);
+}
+function Bt(e, t, n = null) {
+  return t == null || ((n == null || n.includes(t)) && !(Vt.has(t) && q.has(e)));
+}
+var q, Vt;
+function J() {
+  return (J = e(() => {
+    (Se(),
+      (q = new Set([`gmail`, `google-calendar`, `google-drive`])),
+      (Vt = new Set([ve.FREE, ve.GO])));
+  }))();
+}
+function Ht({
+  assignmentParameter: e,
+  canEnableNotifications: t,
+  generalAssignment: n,
+  hideGoogleWorkspaceItems: r,
+  mailProvider: i,
+  plan: a,
+  representativeRole: o,
+  roleAssignment: s,
+  roles: c,
+  taskDefinitions: l,
+}) {
+  let u = Y.safeParse(s),
+    d = Y.safeParse(n),
+    f = u.success && u.data.length > 0 ? u.data : null,
+    p = d.success && d.data.length > 0 ? d.data : null,
+    m = e === void 0 ? o : e,
+    h = null,
+    g;
+  m != null && f != null
+    ? ((h = m), (g = f))
+    : p == null
+      ? (g = Wt(c, o))
+      : ((h = `general`), (g = p));
+  let _ = Gt({
+    canEnableNotifications: t,
+    candidateItemIds: g,
+    hideGoogleWorkspaceItems: r,
+    mailProvider: i,
+    plan: a,
+    taskDefinitions: l,
+  });
+  return _.length > 0
+    ? { exposureParameter: h, itemIds: _ }
     : {
-        exposureParameter,
-        itemIds: filterCandidateTasks({
-          canEnableNotifications,
-          candidateItemIds: fallbackTasks(roles, representativeRole),
-          hideGoogleWorkspaceItems,
-          mailProvider: provider,
-          plan,
-          taskDefinitions,
+        exposureParameter: h,
+        itemIds: Gt({
+          canEnableNotifications: t,
+          candidateItemIds: Wt(c, o),
+          hideGoogleWorkspaceItems: r,
+          mailProvider: i,
+          plan: a,
+          taskDefinitions: l,
         }),
       };
 }
-
-function extractTemplateVariables(text: string): Set<string> | null {
-  const variables = new Set<string>();
-  const remainder = text.replace(
-    /\{([A-Za-z][A-Za-z0-9_]*)\}/g,
-    (_match, name: string) => {
-      variables.add(name);
-      return "";
-    },
-  );
-  return /[{}]/.test(remainder) ? null : variables;
+function Ut(e) {
+  return (e == null ? void 0 : Xt[e]) ?? `review_business_and_project_plans`;
 }
-
-function isTaskMessage(value: unknown): value is TaskMessage {
-  if (value == null || typeof value !== "object") return false;
-  const message = value as Record<string, unknown>;
+function Wt(e, t) {
+  return [...(le(e) ? Jt : Yt), Ut(t)];
+}
+function Gt({
+  canEnableNotifications: e,
+  candidateItemIds: t,
+  hideGoogleWorkspaceItems: n,
+  mailProvider: r,
+  plan: i,
+  taskDefinitions: a,
+}) {
+  let o = Ye(r, i);
+  return Array.from(new Set(t))
+    .filter((t) => {
+      if (t === `enable_notifications`) return e;
+      if (
+        t === `create_project` ||
+        t === `claude_import` ||
+        t === `finish_connecting_imported_tools`
+      )
+        return !0;
+      let r = a[t];
+      return r == null
+        ? !1
+        : o !== `google` ||
+            !Object.values(r.pluginSlots ?? {}).some((e) => !Bt(e, i) || (n && q.has(e)));
+    })
+    .slice(0, qt);
+}
+var Kt, qt, Jt, Yt, Xt, Y;
+function Zt() {
+  return (Zt = e(() => {
+    (f(),
+      Xe(),
+      J(),
+      Ge(),
+      (Kt = `2214619544`),
+      (qt = 10),
+      (Jt = [`enable_notifications`, `create_automation`, `triage_github_prs`, `catch_up_linear`]),
+      (Yt = [
+        `enable_notifications`,
+        `create_automation`,
+        `summarize_inbox`,
+        `catch_up_updates_and_blockers`,
+        `summarize_current_priorities`,
+      ]),
+      (Xt = {
+        product_management: `review_roadmaps_and_projects`,
+        design: `review_design_briefs`,
+        marketing: `review_campaigns`,
+        sales: `review_account_plans`,
+        finance: `review_forecasts`,
+        operations: `review_operating_plans`,
+        people_hr: `review_people_plans_and_policies`,
+        legal: `review_contracts_and_policies`,
+        student: `review_class_materials`,
+      }),
+      (Y = n(_().min(1))));
+  }))();
+}
+var X;
+function Z() {
+  return (Z = e(() => {
+    X = {
+      "bg-BG": `bg`,
+      "bn-BD": `bn`,
+      "bs-BA": `bs`,
+      "ca-ES": `ca`,
+      "cs-CZ": `cs`,
+      "da-DK": `da`,
+      "de-DE": `de`,
+      "el-GR": `el`,
+      "es-419": `es-419`,
+      "es-ES": `es`,
+      "et-EE": `et`,
+      "fi-FI": `fi`,
+      "fr-CA": `fr-CA`,
+      "fr-FR": `fr`,
+      "gu-IN": `gu`,
+      "hi-IN": `hi`,
+      "hr-HR": `hr`,
+      "hu-HU": `hu`,
+      "hy-AM": `hy`,
+      "id-ID": `id`,
+      "is-IS": `is`,
+      "it-IT": `it`,
+      "ja-JP": `ja`,
+      "ka-GE": `ka`,
+      "kn-IN": `kn`,
+      "ko-KR": `ko`,
+      "lv-LV": `lv`,
+      "mk-MK": `mk`,
+      "mr-IN": `mr`,
+      "ms-MY": `ms`,
+      "my-MM": `my`,
+      "nb-NO": `nb`,
+      "nl-NL": `nl`,
+      "pl-PL": `pl`,
+      "pt-BR": `pt`,
+      "pt-PT": `pt-PT`,
+      "ro-RO": `ro`,
+      "ru-RU": `ru`,
+      "sk-SK": `sk`,
+      "sl-SI": `sl`,
+      "so-SO": `so`,
+      "sq-AL": `sq`,
+      "sr-RS": `sr`,
+      "sv-SE": `sv`,
+      "sw-TZ": `sw`,
+      "ta-IN": `ta`,
+      "te-IN": `te`,
+      "th-TH": `th`,
+      "tr-TR": `tr`,
+      "uk-UA": `uk`,
+      "vi-VN": `vi`,
+      "zh-CN": `zh`,
+      "zh-HK": `zh-HK`,
+      "zh-TW": `zh-Hant`,
+    };
+  }))();
+}
+function Qt(e) {
+  let t = (0, Q.c)(6),
+    n;
+  t[0] === e ? (n = t[1]) : ((n = e === void 0 ? {} : e), (t[0] = e), (t[1] = n));
+  let { disableExposureLog: r } = n,
+    i = r !== void 0 && r,
+    a;
+  t[2] === i ? (a = t[3]) : ((a = { disableExposureLog: i }), (t[2] = i), (t[3] = a));
+  let { value: o } = ke($, a),
+    s;
+  return (t[4] === o ? (s = t[5]) : ((s = nn(o)), (t[4] = o), (t[5] = s)), s);
+}
+function $t(e) {
+  let t = (0, Q.c)(4),
+    n;
+  t[0] === e ? (n = t[1]) : ((n = e === void 0 ? {} : e), (t[0] = e), (t[1] = n));
+  let { disableExposureLog: r } = n,
+    i = r !== void 0 && r,
+    a;
   return (
-    typeof message.id === "string" &&
-    message.id.length > 0 &&
-    typeof message.defaultMessage === "string" &&
-    message.defaultMessage.length > 0 &&
-    typeof message.description === "string" &&
-    message.description.length > 0 &&
-    (message.translations == null ||
-      (typeof message.translations === "object" &&
-        Object.values(message.translations as object).every(
-          (entry) => typeof entry === "string" && entry.length > 0,
-        )))
+    t[2] === i ? (a = t[3]) : ((a = { disableExposureLog: i }), (t[2] = i), (t[3] = a)),
+    Qt(a).taskDefinitions
   );
 }
-
-function parseTaskDefinition(value: unknown): OnboardingTaskDefinition | null {
-  if (value == null || typeof value !== "object") return null;
-  const task = value as Record<string, any>;
-  if (
-    !isTaskMessage(task.messages?.label) ||
-    !isTaskMessage(task.messages?.prompt)
-  )
-    return null;
-  const labelCopies = [
-    task.messages.label.defaultMessage,
-    ...Object.values(task.messages.label.translations ?? {}),
-  ] as string[];
-  if (labelCopies.some((copy) => extractTemplateVariables(copy)?.size !== 0))
-    return null;
-  const pluginSlots = task.pluginSlots == null ? {} : task.pluginSlots;
-  if (
-    typeof pluginSlots !== "object" ||
-    Object.values(pluginSlots).some(
-      (entry) => typeof entry !== "string" || entry.length === 0,
-    )
-  )
-    return null;
-  const expected = new Set(Object.keys(pluginSlots));
-  const instructionVariables = extractTemplateVariables(
-    task.instructions ?? "",
-  );
-  const promptCopies = [
-    task.messages.prompt.defaultMessage,
-    ...Object.values(task.messages.prompt.translations ?? {}),
-  ] as string[];
-  const mismatch =
-    instructionVariables == null ||
-    promptCopies.some((copy) => {
-      const variables = extractTemplateVariables(copy);
-      if (variables == null) return true;
-      const combined = new Set([...instructionVariables, ...variables]);
-      return (
-        combined.size !== expected.size ||
-        [...expected].some((name) => !combined.has(name))
-      );
-    });
-  if (mismatch) return null;
-  return {
-    is_auto_submit_enabled:
-      typeof task.is_auto_submit_enabled === "boolean"
-        ? task.is_auto_submit_enabled
-        : undefined,
-    instructions:
-      typeof task.instructions === "string" && task.instructions.length > 0
-        ? task.instructions
-        : undefined,
-    pluginSlots,
-    messages: task.messages,
-    origin: "remote",
-  };
+function en() {
+  let e = (0, Q.c)(3),
+    t;
+  e[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((t = { disableExposureLog: !0 }), (e[0] = t))
+    : (t = e[0]);
+  let { value: n } = ke($, t),
+    r;
+  return (e[1] === n ? (r = e[2]) : ((r = tn(n)), (e[1] = n), (e[2] = r)), r);
 }
-
-function checkedInTaskDefinitions(): Record<string, OnboardingTaskDefinition> {
-  return (appInitial.Mwt ?? {}) as Record<string, OnboardingTaskDefinition>;
+function tn(e) {
+  let t = ln.safeParse(e);
+  return t.success ? t.data.remotePluginIds : void 0;
 }
-
-function checkedInFallbackTasks(): string[] {
-  return Array.isArray(appInitial.Nwt) ? appInitial.Nwt : [];
-}
-
-function parseRemoteTaskConfig(value: unknown): ParsedRemoteTaskConfig {
-  const fallback = {
-    fallbackTaskIds: checkedInFallbackTasks(),
-    taskDefinitions: checkedInTaskDefinitions(),
-  };
-  if (value == null || typeof value !== "object") return fallback;
-  const config = value as Record<string, any>;
-  if (config.tasks == null || typeof config.tasks !== "object") return fallback;
-  const taskDefinitions = { ...checkedInTaskDefinitions() };
-  for (const [taskId, definition] of Object.entries(config.tasks)) {
-    if (taskId.length === 0 || RESERVED_REMOTE_TASK_IDS.has(taskId)) continue;
-    const parsed = parseTaskDefinition(definition);
-    if (parsed != null) taskDefinitions[taskId] = parsed;
+function nn(e) {
+  let t = ln.safeParse(e);
+  if (!t.success) return { fallbackTaskIds: he, taskDefinitions: fe };
+  let n = { ...fe };
+  for (let [e, r] of Object.entries(t.data.tasks)) {
+    if (on.has(e)) continue;
+    let t = cn.safeParse(r);
+    t.success && (n[e] = { ...t.data, origin: `remote` });
   }
-  const fallbackTaskIds =
-    Array.isArray(config.fallback_tasks) &&
-    config.fallback_tasks.every(
-      (item: unknown) => typeof item === "string" && item.length > 0,
-    )
-      ? config.fallback_tasks
-      : checkedInFallbackTasks();
+  let r = un.safeParse(t.data.fallback_tasks);
+  return { fallbackTaskIds: r.success ? r.data : he, taskDefinitions: n };
+}
+function rn(e, t, n) {
+  if (e.origin === `checked_in`) return e.messages[t];
+  let r = e.messages[t];
   return {
-    fallbackTaskIds,
-    taskDefinitions,
+    id: `${r.id}.statsig.${n}`,
+    defaultMessage: r.translations?.[X[n] ?? n] ?? r.defaultMessage,
+    description: r.description,
   };
 }
-
-function localizedTaskMessage(
-  task: OnboardingTaskDefinition,
-  key: "label" | "prompt",
-  locale: string,
-): TaskMessage {
-  if (task.origin === "checked_in") return task.messages[key];
-  const message = task.messages[key];
-  return {
-    id: `${message.id}.statsig.${locale}`,
-    defaultMessage:
-      message.translations?.[LOCALE_TO_TRANSLATION_KEY[locale] ?? locale] ??
-      message.defaultMessage,
-    description: message.description,
-  };
+function an(e) {
+  let t = new Set(),
+    n = e.replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g, (e, n) => (t.add(n), ``));
+  return /[{}]/.test(n) ? null : t;
 }
-
-function readRemoteConfig(
-  options: { disableExposureLog?: boolean } = {},
-): ParsedRemoteTaskConfig {
-  const result = appInitial.afn?.(REMOTE_TASK_CONFIG_EXPERIMENT, {
-    disableExposureLog: options.disableExposureLog === true,
-  });
-  return parseRemoteTaskConfig(result?.value);
+var Q, $, on, sn, cn, ln, un;
+function dn() {
+  return (dn = e(() => {
+    ((Q = t()),
+      f(),
+      Z(),
+      j(),
+      Ie(),
+      ye(),
+      ($ = `1540453652`),
+      (on = new Set([
+        `create_project`,
+        `enable_notifications`,
+        `explore_codex`,
+        `finish_connecting_imported_tools`,
+        `review_latest_plans`,
+        `claude_import`,
+        ...k,
+      ])),
+      (sn = a({
+        id: _().min(1),
+        defaultMessage: _().min(1),
+        description: _().min(1),
+        translations: i(_(), _().min(1)).optional(),
+      })),
+      (cn = a({
+        is_auto_submit_enabled: p().optional(),
+        instructions: _().min(1).optional(),
+        pluginSlots: i(_().min(1), _().min(1)).optional(),
+        messages: a({ label: sn, prompt: sn }),
+      }).superRefine((e, t) => {
+        [
+          e.messages.label.defaultMessage,
+          ...Object.values(e.messages.label.translations ?? {}),
+        ].some((e) => an(e)?.size !== 0) &&
+          t.addIssue({
+            code: `custom`,
+            message: `Label copy cannot contain variables`,
+            path: [`messages`, `label`],
+          });
+        let n = new Set(Object.keys(e.pluginSlots ?? {})),
+          r = an(e.instructions ?? ``),
+          i = [
+            e.messages.prompt.defaultMessage,
+            ...Object.values(e.messages.prompt.translations ?? {}),
+          ];
+        (r == null ||
+          i.some((e) => {
+            let t = an(e);
+            if (t == null) return !0;
+            let i = new Set([...r, ...t]);
+            return i.size !== n.size || Array.from(n).some((e) => !i.has(e));
+          })) &&
+          t.addIssue({
+            code: `custom`,
+            message: `Prompt and instruction variables must exactly match pluginSlots`,
+            path: [`pluginSlots`],
+          });
+      })),
+      (ln = a({
+        fallback_tasks: l().optional(),
+        remotePluginIds: i(_().min(1), _().min(1)).optional(),
+        tasks: i(_().min(1), l()),
+      })),
+      (un = n(_().min(1))));
+  }))();
 }
-
-function useRemoteTaskDefinitions(
-  options: { disableExposureLog?: boolean } = {},
-): Record<string, OnboardingTaskDefinition> {
-  return readRemoteConfig(options).taskDefinitions;
-}
-
-function parseRemotePluginIds(
-  value: unknown,
-): Record<string, string> | undefined {
-  if (value == null || typeof value !== "object") return undefined;
-  const ids = (value as Record<string, unknown>).remotePluginIds;
-  return ids != null &&
-    typeof ids === "object" &&
-    Object.values(ids).every(
-      (entry) => typeof entry === "string" && entry.length > 0,
-    )
-    ? (ids as Record<string, string>)
-    : undefined;
-}
-
-function useRemotePluginIds(): Record<string, string> | undefined {
-  const result = appInitial.afn?.(REMOTE_TASK_CONFIG_EXPERIMENT, {
-    disableExposureLog: true,
-  });
-  return parseRemotePluginIds(result?.value);
-}
-
-function initializeTaskSchemas(): void {}
-function initializeCandidateTaskSelection(): void {}
-function initializeRemoteTaskConfig(): void {}
-function initializeCandidateTaskConstants(): void {}
-function initializeLocaleMap(): void {}
-
 export {
-  setExecutionPhase as $,
-  initializeConversationRuntime as A,
-  initializeConversationStateFamily as B,
-  initializePermissionDelayState as C,
-  startAndSelectConversation as D,
-  archiveOnboardingConversations as E,
-  taskIconSchema as F,
-  initializeWorkflowState as G,
-  completedImportSignal as H,
-  taskIdSchema as I,
-  returnToTaskSelection as J,
-  isSelectedTaskBeforeCapabilities as K,
-  localTaskIdSchema as L,
-  cancelConversationStart as M,
-  startOnboardingFromExecution as N,
-  completionFailedFamily as O,
-  LOCAL_TASK_IDS as P,
-  enterCapabilitiesPhase as Q,
-  initializeTaskSchemas as R,
-  permissionPromptVisibleSignal as S,
-  permissionPromptDelayedSignal as T,
-  workflowSignal as U,
-  completeCapabilities as V,
-  getWorkflow as W,
-  selectTask as X,
-  selectRole as Y,
-  setPermissionStatus as Z,
-  isPluginEligible as _,
-  initializeRemoteTaskConfig as a,
-  deferNotificationPrompt as b,
-  useRemoteTaskDefinitions as c,
-  ROLE_ASSIGNMENT_EXPERIMENT as d,
-  chooseChecklistTasks as f,
-  shouldUseChatGptTaskDefaults as g,
-  initializeCandidateTaskSelection as h,
-  parseRemoteTaskConfig as i,
-  startConversation as j,
-  completionResultFamily as k,
-  LOCALE_TO_TRANSLATION_KEY as l,
-  initializeCandidateTaskConstants as m,
-  localizedTaskMessage as n,
-  useRemotePluginIds as o,
-  roleFallbackTask as p,
-  resetWorkflow as q,
-  parseRemotePluginIds as r,
-  readRemoteConfig as s,
-  REMOTE_TASK_CONFIG_EXPERIMENT as t,
-  initializeLocaleMap as u,
-  initializePermissionPromptState as v,
-  permissionPromptDisabledSignal as w,
-  resetNotificationPrompt as x,
-  showNotificationPrompt as y,
-  conversationStateFamily as z,
+  at as $,
+  Nt as A,
+  O as B,
+  U as C,
+  yt as D,
+  Ct as E,
+  ct as F,
+  E as G,
+  ot as H,
+  A as I,
+  $e as J,
+  rt as K,
+  st as L,
+  St as M,
+  vt as N,
+  Mt as O,
+  k as P,
+  tt as Q,
+  j as R,
+  K as S,
+  H as T,
+  T as U,
+  nt as V,
+  S as W,
+  Qe as X,
+  Ze as Y,
+  et as Z,
+  Bt as _,
+  dn as a,
+  Pt as b,
+  $t as c,
+  Kt as d,
+  Ht as f,
+  zt as g,
+  J as h,
+  nn as i,
+  bt as j,
+  B as k,
+  X as l,
+  Zt as m,
+  rn as n,
+  en as o,
+  Ut as p,
+  it as q,
+  tn as r,
+  Qt as s,
+  $ as t,
+  Z as u,
+  Rt as v,
+  V as w,
+  It as x,
+  Ft as y,
+  D as z,
 };

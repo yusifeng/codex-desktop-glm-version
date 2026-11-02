@@ -1,37 +1,30 @@
-// use-searchable-page-title-visibility —— 标题滚出搜索页正文时显示工具栏标题。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as elementInViewChunk from "@rchunk/use-element-in-view";
-void runtimeChunk;
-
-const { $3: initializeRuntimeLazy, e6: reactRuntime } = appSharedChunk;
-const { n: useElementInView, t: initializeElementInView } = elementInViewChunk;
-
-type RefTarget = Element | null;
-
-interface SearchablePageTitleVisibility {
-  scrollContainerRef(element: RefTarget): void;
-  showTitleInToolbar: boolean;
-  titleRef(element: RefTarget): void;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, e6 as n } from "@rchunk/app-shared";
+import { n as r, t as i } from "@rchunk/use-element-in-view";
+function a() {
+  let e = (0, o.c)(5),
+    [t, n] = (0, s.useState)(null),
+    [i, a] = (0, s.useState)(null),
+    c;
+  e[0] !== t || e[1] !== i
+    ? ((c = { container: t, target: i }), (e[0] = t), (e[1] = i), (e[2] = c))
+    : (c = e[2]);
+  let l = !r(c),
+    u;
+  return (
+    e[3] === l
+      ? (u = e[4])
+      : ((u = { scrollContainerRef: n, showTitleInToolbar: l, titleRef: a }),
+        (e[3] = l),
+        (e[4] = u)),
+    u
+  );
 }
-
-function useSearchablePageTitleVisibility(): SearchablePageTitleVisibility {
-  const [container, setContainer] = reactRuntime.useState<RefTarget>(null);
-  const [target, setTarget] = reactRuntime.useState<RefTarget>(null);
-  return {
-    scrollContainerRef: setContainer,
-    showTitleInToolbar: !useElementInView({ container, target }),
-    titleRef: setTarget,
-  };
+var o, s;
+function c() {
+  return (c = e(() => {
+    ((o = t()), (s = n()), i());
+  }))();
 }
-
-function initializeSearchablePageTitleVisibility(): void {
-  initializeRuntimeLazy();
-  reactRuntime();
-  initializeElementInView();
-}
-
-export {
-  useSearchablePageTitleVisibility as n,
-  initializeSearchablePageTitleVisibility as t,
-};
+export { a as n, c as t };

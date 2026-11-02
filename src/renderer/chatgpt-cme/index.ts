@@ -1,17 +1,10 @@
-import "@rchunk/rolldown-runtime";
-
-let chatGptCmeHomeEntryClicked: { readonly $type: string };
-let chatGptCmeClaimSubmitted: { readonly $type: string };
-function initializeChatGptCmeEvents(): void {
-  chatGptCmeHomeEntryClicked = {
-    $type: "protobuf_analytics_events.v1.ChatgptCmeHomeEntryClicked",
-  };
-  chatGptCmeClaimSubmitted = {
-    $type: "protobuf_analytics_events.v1.ChatgptCmeClaimSubmitted",
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n;
+function r() {
+  return (r = e(() => {
+    ((t = { $type: `protobuf_analytics_events.v1.ChatgptCmeHomeEntryClicked` }),
+      (n = { $type: `protobuf_analytics_events.v1.ChatgptCmeClaimSubmitted` }));
+  }))();
 }
-export {
-  chatGptCmeHomeEntryClicked as n,
-  initializeChatGptCmeEvents as r,
-  chatGptCmeClaimSubmitted as t,
-};
+export { t as n, r, n as t };

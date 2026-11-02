@@ -1,50 +1,17 @@
-// Pascal's law hydraulics specification. Release chunk: type-d4e64b7c7369.js.
-import "@rchunk/rolldown-runtime";
-
-interface NumberParameter {
-  kind: "number";
-  defaultValue: number;
-  min: number;
-  max: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `PASCALS_LAW_HYDRAULICS`),
+      (n = `pascals-law-hydraulics-v2`),
+      (r = `p = \\frac{F}{A}`),
+      (i = {
+        inputForceNewtons: { kind: `number`, defaultValue: 100, min: 20, max: 200 },
+        inputAreaSquareCentimeters: { kind: `number`, defaultValue: 10, min: 5, max: 25 },
+        outputAreaSquareCentimeters: { kind: `number`, defaultValue: 50, min: 25, max: 100 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-interface Specification {
-  type: "PASCALS_LAW_HYDRAULICS";
-  version: 1;
-  thumbnailAssetKey: "pascals-law-hydraulics-v2";
-  canonicalFormula: "p = \\frac{F}{A}";
-  parameters: {
-    inputForceNewtons: NumberParameter;
-    inputAreaSquareCentimeters: NumberParameter;
-    outputAreaSquareCentimeters: NumberParameter;
-  };
-}
-let specification: Specification;
-function initializeSpecification(): void {
-  specification ??= {
-    type: "PASCALS_LAW_HYDRAULICS",
-    version: 1,
-    thumbnailAssetKey: "pascals-law-hydraulics-v2",
-    canonicalFormula: "p = \\frac{F}{A}",
-    parameters: {
-      inputForceNewtons: {
-        kind: "number",
-        defaultValue: 100,
-        min: 20,
-        max: 200,
-      },
-      inputAreaSquareCentimeters: {
-        kind: "number",
-        defaultValue: 10,
-        min: 5,
-        max: 25,
-      },
-      outputAreaSquareCentimeters: {
-        kind: "number",
-        defaultValue: 50,
-        min: 25,
-        max: 100,
-      },
-    },
-  };
-}
-export { specification as n, initializeSpecification as t };
+export { a as n, o as t };

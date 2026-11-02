@@ -1,26 +1,18 @@
-// Semantic restoration. Release chunk: external-agent-import-setup-66dccaf0e5b4.js.
+// @ts-nocheck
 import { n as e } from "@rchunk/rolldown-runtime";
 import { $3 as t, BX as ee, FX as n, I3 as te, e6 as r } from "@rchunk/app-shared";
 import {
   $sn as i,
-  // @ts-ignore -- published chunk binding is preserved locally.
   E4t as a,
   GEt as ne,
   HEt as o,
-  // @ts-ignore -- published chunk binding is preserved locally.
   N4t as re,
-  // @ts-ignore -- published chunk binding is preserved locally.
   ZA as ie,
-  // @ts-ignore -- published chunk binding is preserved locally.
   cj as ae,
-  // @ts-ignore -- published chunk binding is preserved locally.
   ij as oe,
-  // @ts-ignore -- published chunk binding is preserved locally.
   lj as se,
   ncn as ce,
-  // @ts-ignore -- published chunk binding is preserved locally.
   rj as le,
-  // @ts-ignore -- published chunk binding is preserved locally.
   uj as ue,
 } from "@rchunk/app-initial";
 import { n as s, t as de } from "@rchunk/app-connect-modal";
@@ -30,7 +22,7 @@ import {
   o as me,
   t as he,
 } from "@rchunk/use-external-agent-import-setup-actions";
-import { n as ge, r as c, t as _e } from "@rchunk/setup";
+import { n as ge, r as c, t as _e } from "@rchunk/plugin-setup";
 function l(e) {
   let t = (0, ye.c)(106),
     { hostId: n, initialTab: te, onClose: r, onEvent: i, restoreFocus: a } = e,
@@ -41,10 +33,8 @@ function l(e) {
     c = he || o === `hooks`,
     l;
   t[0] === n ? (l = t[1]) : ((l = { enabled: !1, hostId: n }), (t[0] = n), (t[1] = l));
-  // @ts-ignore -- published chunk binding is preserved locally.
   let { hardRefetchAppsList: f, loadError: p } = ne(l),
     m = ee(ge, n),
-    // @ts-ignore -- published chunk binding is preserved locally.
     be = m.status === `ready` && m.data.kind === `plugin-directory`,
     h;
   t[2] === be ? (h = t[3]) : ((h = { enabled: be }), (t[2] = be), (t[3] = h));
@@ -75,7 +65,6 @@ function l(e) {
     T = he && w,
     E;
   t[16] === T ? (E = t[17]) : ((E = { enabled: T }), (t[16] = T), (t[17] = E));
-  // @ts-ignore -- published chunk binding is preserved locally.
   let { data: D, error: O, refetch: Ee } = ee(ce, n, E),
     k;
   t[18] === Te
@@ -149,12 +138,9 @@ function l(e) {
     : ((P = v?.appsRequiringConnection ?? []), (t[34] = v?.appsRequiringConnection), (t[35] = P));
   let Re = P,
     F;
-  // @ts-ignore -- published chunk binding is preserved locally.
   t[36] !== b || t[37] !== D?.data
-    // @ts-ignore -- published chunk binding is preserved locally.
     ? ((F = le({ histories: b ?? [], mcpServerStatuses: D?.data ?? [] })),
       (t[36] = b),
-      // @ts-ignore -- published chunk binding is preserved locally.
       (t[37] = D?.data),
       (t[38] = F))
     : (F = t[38]);
@@ -182,7 +168,6 @@ function l(e) {
     : ((B = v?.importedPlugins ?? []), (t[45] = v?.importedPlugins), (t[46] = B));
   let Ve = p == null ? _.status : `error`,
     He = I,
-    // @ts-ignore -- published chunk binding is preserved locally.
     Ue = D?.data,
     V;
   t[47] !== b || t[48] !== x || t[49] !== O || t[50] !== Ue
@@ -375,7 +360,6 @@ function l(e) {
 function ve() {}
 var ye, u, d;
 function f() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (f = e(() => {
     ((ye = t()), n(), (u = r()), a(), o(), i(), s(), ue(), me(), c(), he(), (d = te()));
   }))();

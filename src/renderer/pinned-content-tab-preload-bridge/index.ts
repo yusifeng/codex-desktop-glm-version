@@ -1,685 +1,518 @@
-// Preloads durable pinned content tabs while their route is inactive. Release chunk: preload-bridge-a281bb5f90a3.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as webviewChunk from "@rchunk/webview";
-
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  I3 as r,
+  LX as i,
+  Mm as a,
+  Nm as o,
+  Q3 as s,
+  QI as c,
+  Z3 as l,
+  ZI as u,
+  __ as d,
+  e6 as f,
+  g_ as p,
+  kB as m,
+  wL as h,
+  x_ as ee,
+  y_ as te,
+} from "@rchunk/app-shared";
+import {
+  $en as g,
+  BDt as ne,
+  CY as _,
+  F0t as v,
+  FDt as y,
+  Fgt as re,
+  H0t as ie,
+  I0t as ae,
+  Jst as oe,
+  Ken as b,
+  L0t as x,
+  LDt as se,
+  Mgt as ce,
+  Q_t as S,
+  SY as le,
+  Vvt as ue,
+  Wvt as de,
+  Yen as fe,
+  Yst as pe,
+  Z_t as C,
+  _gt as w,
+  aut as T,
+  bl as E,
+  clt as D,
+  cyt as O,
+  dut as k,
+  dyt as A,
+  etn as j,
+  evt as M,
+  fpn as N,
+  ggt as P,
+  itn as F,
+  iyt as I,
+  jDt as L,
+  lpn as R,
+  mun as z,
+  nct as B,
+  ng as me,
+  nvt as he,
+  out as ge,
+  oyt as _e,
+  qvt as ve,
+  rg as ye,
+  slt as be,
+  tct as xe,
+  tvt as V,
+  uut as Se,
+  xl as Ce,
+  zDt as we,
+} from "@rchunk/app-initial";
+import { n as Te, t as Ee } from "@rchunk/browser-webview-host";
+function De() {
+  let e = (0, q.c)(2),
+    t = (0, J.useContext)(E),
+    n;
+  return (
+    e[0] === t ? (n = e[1]) : ((n = t ? (0, Y.jsx)(Oe, {}) : null), (e[0] = t), (e[1] = n)),
+    n
+  );
 }
-interface ReactRuntime {
-  useContext(context: unknown): unknown;
-  useState<Value>(factory: () => Value): [Value];
-  useSyncExternalStore<Value>(
-    subscribe: (listener: () => void) => () => void,
-    getSnapshot: () => Value,
-    getServerSnapshot: () => Value,
-  ): Value;
-  useRef<Value>(value: Value): { current: Value };
+function Oe() {
+  let e = (0, q.c)(8),
+    t = i(u),
+    n;
+  e[0] === t ? (n = e[1]) : ((n = () => new Z(t)), (e[0] = t), (e[1] = n));
+  let [r] = (0, J.useState)(n),
+    a = (0, J.useSyncExternalStore)(r.subscribe, r.getSnapshot, r.getServerSnapshot),
+    o;
+  e[2] === a ? (o = e[3]) : ((o = a == null ? null : U(a.pin)), (e[2] = a), (e[3] = o));
+  let s = o,
+    c;
+  return (
+    e[4] !== a || e[5] !== s || e[6] !== r
+      ? ((c =
+          a == null || s == null
+            ? null
+            : (0, Y.jsx)(
+                le,
+                { route: s, children: (0, Y.jsx)(ke, { pin: a.pin, scheduler: r }) },
+                a.key,
+              )),
+        (e[4] = a),
+        (e[5] = s),
+        (e[6] = r),
+        (e[7] = c))
+      : (c = e[7]),
+    c
+  );
 }
-interface Scope {
-  value: { routeKind: string; conversationId: string };
-  get(signal: unknown, parameter?: unknown): unknown;
-  watch(listener: (scope: Scope) => void): () => void;
+function ke(e) {
+  let t = (0, q.c)(8),
+    { pin: n, scheduler: r } = e,
+    a = i(g),
+    o;
+  t[0] !== n || t[1] !== r || t[2] !== a
+    ? ((o = () => new Q(a, n, r)), (t[0] = n), (t[1] = r), (t[2] = a), (t[3] = o))
+    : (o = t[3]);
+  let [s] = (0, J.useState)(o),
+    c = (0, J.useSyncExternalStore)(s.subscribe, s.getSnapshot, s.getServerSnapshot),
+    l;
+  return (
+    t[4] !== c || t[5] !== n || t[6] !== a
+      ? ((l =
+          c == null
+            ? null
+            : (0, Y.jsx)(Ae, { browserTabId: c, conversationId: b(a) ?? n.threadId, pin: n })),
+        (t[4] = c),
+        (t[5] = n),
+        (t[6] = a),
+        (t[7] = l))
+      : (l = t[7]),
+    l
+  );
 }
-interface Pin {
-  id: string;
-  accountId?: string;
-  hostId?: string;
-  threadId: string;
-  clientThreadId?: string;
-  tabId: string;
-  tabKind: string;
-  routePath: string;
-  routeSearch: string;
+function Ae(e) {
+  let t = (0, q.c)(12),
+    { browserTabId: n, conversationId: r, pin: a } = e,
+    o = i(g),
+    s = (0, J.useRef)(null),
+    c = ee(),
+    l;
+  t[0] !== a || t[1] !== o
+    ? ((l = () => !H(o, a) && !W(o.get(R), a)), (t[0] = a), (t[1] = o), (t[2] = l))
+    : (l = t[2]);
+  let u = d(l),
+    f;
+  t[3] !== n || t[4] !== r
+    ? ((f = ce(r, n) ?? `about:blank`), (t[3] = n), (t[4] = r), (t[5] = f))
+    : (f = t[5]);
+  let p;
+  return (
+    t[6] !== n || t[7] !== r || t[8] !== u || t[9] !== f || t[10] !== c
+      ? ((p = (0, Y.jsx)(Ee, {
+          bounds: null,
+          browserTabId: n,
+          conversationId: r,
+          initialUrl: f,
+          isVisible: !1,
+          scale: 1,
+          shouldBootstrapWhenHidden: !0,
+          shouldDisposeOnUnmount: u,
+          shouldPaint: !1,
+          webviewRef: s,
+          windowZoom: c,
+        })),
+        (t[6] = n),
+        (t[7] = r),
+        (t[8] = u),
+        (t[9] = f),
+        (t[10] = c),
+        (t[11] = p))
+      : (p = t[11]),
+    p
+  );
 }
-interface Descriptor {
-  kind: string;
-  tabId: string;
-  payloadVersion?: number;
+function H(e, t) {
+  let n = e.get(x, t.id),
+    r = e.get(M),
+    i = e.get(R);
+  return (
+    n != null &&
+    G(n) === G(t) &&
+    e.get(S).includes(t.id) &&
+    e.get(V, t) == null &&
+    !W(i, t) &&
+    r?.accountId === t.accountId &&
+    r.hostId === t.hostId &&
+    r.threadId === t.threadId &&
+    r.clientThreadId === t.clientThreadId
+  );
 }
-interface Layout {
-  routes: Descriptor[];
-  topology: { right: { tabIds: string[] }; bottom: { tabIds: string[] } };
-}
-interface TabManager {
-  tabById$: unknown;
-}
-interface PageSnapshot {
-  isLoading?: boolean;
-  isSuspended?: boolean;
-}
-interface PageRegistry {
-  getSnapshot(scope: unknown, tabId: string): PageSnapshot | null;
-  subscribe(listener: () => void): () => void;
-  pages: {
-    getHost(
-      scope: unknown,
-      tabId: string,
-    ): { hasRegisteredNativeHost(): boolean } | null;
-  };
-  isBrowserUseTab(scope: unknown, tabId: string): boolean;
-}
-interface SharedRuntime {
-  $3(): unknown;
-  FX(): void;
-  I3(): JsxRuntime;
-  LX(context: unknown): Scope;
-  Mm: string;
-  Nm(): void;
-  Q3: { error(message: string, details: unknown): void };
-  QI(): void;
-  Z3(): void;
-  ZI: unknown;
-  __<Value>(factory: () => Value): Value;
-  e6(): ReactRuntime;
-  g_(): void;
-  kB: string;
-  wL(): void;
-  x_(): number;
-  y_(): void;
-}
-interface InitialRuntime {
-  $en: unknown;
-  BDt(scope: Scope, tabId: string): boolean;
-  CY(): void;
-  F0t(): void;
-  FDt(): void;
-  Fgt(): void;
-  H0t(): void;
-  I0t(): void;
-  Jst: string;
-  Ken(scope: Scope): string | null;
-  L0t: unknown;
-  LDt(scope: Scope, descriptor: Descriptor): boolean;
-  Mgt(conversationId: string, browserTabId: string): string | null;
-  Q_t: unknown;
-  SY: unknown;
-  Vvt: TabManager;
-  Wvt(): void;
-  Yen(): void;
-  Yst(): void;
-  Z_t(): void;
-  _gt(): void;
-  aut: string;
-  bl: unknown;
-  clt(descriptor: Descriptor): { browserTabId: string } | null;
-  cyt: unknown;
-  dut(): void;
-  dyt: unknown;
-  etn(input: { pathname: string; routeTemplate: string; search: string }): {
-    routeKind: string;
-    conversationId?: string;
-    hostId?: string;
-  };
-  evt: unknown;
-  fpn(): void;
-  ggt: PageRegistry;
-  itn(): void;
-  iyt(): void;
-  jDt(kind: string): {
-    durableRoute?: { version?: number };
-    isAvailable(scope: Scope): boolean;
-  } | null;
-  lpn: unknown;
-  mun: unknown;
-  nct(): void;
-  ng(): void;
-  nvt(): void;
-  out(): void;
-  oyt(layout: unknown): Layout | null;
-  qvt: TabManager;
-  rg(input: {
-    scope: Scope;
-    revealAndFocus: false;
-    descriptor: Descriptor;
-    insertPosition: undefined;
-    isDisconnected(): boolean;
-    reason: string;
-    target: string;
-  }): Promise<boolean>;
-  slt(): void;
-  tct: string;
-  tvt: unknown;
-  uut: string;
-  xl(): void;
-  zDt(): void;
-}
-interface WebviewRuntime {
-  n(): void;
-  t: unknown;
-}
-
-const shared = appSharedChunk as unknown as SharedRuntime;
-const initial = appInitialChunk as unknown as InitialRuntime;
-const webview = webviewChunk as unknown as WebviewRuntime;
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let eligibleKinds: Set<string>;
-
-function pinKey(pin: Pin): string {
-  return JSON.stringify([
-    pin.id,
-    pin.accountId,
-    pin.hostId,
-    pin.threadId,
-    pin.clientThreadId,
-    pin.tabId,
-    pin.tabKind,
-    pin.routePath,
-    pin.routeSearch,
-  ]);
-}
-function routeForPin(pin: Pin) {
-  const route = initial.etn({
-    pathname: pin.routePath,
-    routeTemplate: shared.kB,
-    search: pin.routeSearch,
-  });
-  return route.routeKind === "local-thread" &&
-    route.conversationId === pin.threadId &&
-    (route.hostId == null || route.hostId === pin.hostId)
-    ? route
+function U(e) {
+  let t = j({ pathname: e.routePath, routeTemplate: m, search: e.routeSearch });
+  return t.routeKind === `local-thread` &&
+    t.conversationId === e.threadId &&
+    (t.hostId == null || t.hostId === e.hostId)
+    ? t
     : null;
 }
-function matchesCurrentRoute(
-  route: { pathname?: string; search?: string } | null,
-  pin: Pin,
-): boolean {
+function W(e, t) {
   return (
-    route?.pathname === pin.routePath &&
-    new URLSearchParams(route.search).get("hostId") ===
-      new URLSearchParams(pin.routeSearch).get("hostId")
+    e?.pathname === t.routePath &&
+    new URLSearchParams(e.search).get(`hostId`) === new URLSearchParams(t.routeSearch).get(`hostId`)
   );
 }
-function isCurrentPin(scope: Scope, pin: Pin): boolean {
-  const current = scope.get(initial.L0t, pin.id) as Pin | null;
-  const identity = scope.get(initial.evt) as Pin | null;
-  const route = scope.get(initial.lpn) as {
-    pathname?: string;
-    search?: string;
-  } | null;
-  return (
-    current != null &&
-    pinKey(current) === pinKey(pin) &&
-    (scope.get(initial.Q_t) as string[]).includes(pin.id) &&
-    scope.get(initial.tvt, pin) == null &&
-    !matchesCurrentRoute(route, pin) &&
-    identity?.accountId === pin.accountId &&
-    identity.hostId === pin.hostId &&
-    identity.threadId === pin.threadId &&
-    identity.clientThreadId === pin.clientThreadId
-  );
-}
-
-function waitForPageReady(
-  pageScope: unknown,
-  tabId: string,
-  previous: PageSnapshot | null,
-  signal: AbortSignal,
-): Promise<boolean> {
-  return new Promise((resolve) => {
-    let settled = false;
-    let unsubscribe = () => undefined;
-    const timeout = globalThis.setTimeout(() => finish(false), 15000);
-    const finish = (value: boolean) => {
-      if (settled) return;
-      settled = true;
-      unsubscribe();
-      globalThis.clearTimeout(timeout);
-      signal.removeEventListener("abort", abort);
-      resolve(value);
-    };
-    const abort = () => finish(false);
-    const check = () => {
-      const snapshot = initial.ggt.getSnapshot(pageScope, tabId);
-      if (
-        initial.ggt.pages
-          .getHost(pageScope, tabId)
-          ?.hasRegisteredNativeHost() &&
-        snapshot != null &&
-        (previous == null || snapshot !== previous) &&
-        !snapshot.isLoading &&
-        !snapshot.isSuspended
-      )
-        finish(true);
-    };
-    unsubscribe = initial.ggt.subscribe(check);
-    signal.addEventListener("abort", abort, { once: true });
-    if (signal.aborted) finish(false);
-    else check();
-  });
-}
-
-class PreloadScheduler {
-  private accountId: unknown;
-  private completed = new Set<string>();
-  private errors = new Set<string>();
-  private retry = new Map<string, { attempts: number; at: number }>();
-  private listeners = new Set<() => void>();
-  private pending: { key: string; pin: Pin } | null = null;
-  private stopWatch: (() => void) | null = null;
-  private cancelIdle: (() => void) | null = null;
-  private retryTimer: ReturnType<typeof setTimeout> | null = null;
-  constructor(private scope: Scope) {}
-  getSnapshot = () => this.pending;
-  getServerSnapshot = () => null;
-  subscribe = (listener: () => void) => {
-    this.listeners.add(listener);
-    if (this.listeners.size === 1)
-      this.stopWatch = this.scope.watch((scope) => this.schedule(scope));
-    return () => {
-      this.listeners.delete(listener);
-      if (this.listeners.size === 0) {
-        this.stopWatch?.();
-        this.stopWatch = null;
-        this.cancelScheduled();
-        this.pending = null;
-      }
-    };
-  };
-  finish(key: string, result: "prepared" | "deferred" | "ineligible") {
-    if (this.pending?.key !== key) return;
-    this.pending = null;
-    if (result === "deferred") {
-      const attempts = (this.retry.get(key)?.attempts ?? 0) + 1;
-      this.retry.set(key, {
-        attempts,
-        at: Date.now() + Math.min(60000, 1000 * 5 ** (attempts - 1)),
-      });
-    } else {
-      this.completed.add(key);
-      this.retry.delete(key);
-    }
-    this.emit();
-  }
-  continue() {
-    this.schedule();
-  }
-  reportError(key: string, kind: string, error: unknown) {
-    if (this.errors.has(key)) return;
-    this.errors.add(key);
-    shared.Q3.error("Failed to preload pinned content tab", {
-      safe: { kind },
-      sensitive: { error },
-    });
-  }
-  schedule(snapshot: Scope = this.scope) {
-    this.cancelScheduled();
-    if (this.listeners.size === 0) return;
-    // I0t is the pinned-content-tab collection. dyt is the active
-    // conversation id used while materialising a saved tab route. Keeping
-    // these two obfuscated exports distinct is important: subscribing to dyt
-    // as though it were the pin collection makes the scope watcher throw an
-    // AggregateError as soon as the bridge mounts.
-    const pins = snapshot.get(initial.I0t) as Pin[];
-    const pinnedIds = new Set(snapshot.get(initial.Q_t) as string[]);
-    const accountId = snapshot.get(initial.mun);
-    if (this.accountId !== accountId) {
-      this.accountId = accountId;
-      if (this.pending) this.completed.add(this.pending.key);
-      for (const key of this.retry.keys()) this.completed.add(key);
-      this.retry.clear();
-      this.pending = null;
-      this.emit();
-    }
-    const route = snapshot.get(initial.lpn) as {
-      pathname?: string;
-      search?: string;
-    } | null;
-    const validKeys = new Set(pins.map(pinKey));
-    for (const key of this.completed)
-      if (!validKeys.has(key)) this.completed.delete(key);
-    for (const key of this.retry.keys())
-      if (!validKeys.has(key)) this.retry.delete(key);
-    const candidates = pins.filter(
-      (pin) =>
-        pinnedIds.has(pin.id) &&
-        routeForPin(pin) != null &&
-        !matchesCurrentRoute(route, pin) &&
-        snapshot.get(initial.tvt, pin) == null,
-    );
-    if (
-      this.pending &&
-      !candidates.some((pin) => pinKey(pin) === this.pending?.key)
-    ) {
-      this.pending = null;
-      this.emit();
-      return;
-    }
-    if (this.pending) return;
-    const now = Date.now();
-    const candidate = candidates.find(
-      (pin) =>
-        !this.completed.has(pinKey(pin)) &&
-        (this.retry.get(pinKey(pin))?.at ?? 0) <= now,
-    );
-    if (candidate) {
-      const run = () => {
-        this.cancelIdle = null;
-        const current = this.scope.get(initial.L0t, candidate.id) as Pin | null;
-        if (
-          this.listeners.size !== 0 &&
-          this.scope.get(initial.mun) === accountId &&
-          current &&
-          pinKey(current) === pinKey(candidate) &&
-          this.scope.get(initial.tvt, candidate) == null &&
-          (this.scope.get(initial.Q_t) as string[]).includes(candidate.id) &&
-          routeForPin(candidate) != null &&
-          !matchesCurrentRoute(
-            this.scope.get(initial.lpn) as {
-              pathname?: string;
-              search?: string;
-            } | null,
-            candidate,
-          )
-        ) {
-          this.pending = { key: pinKey(candidate), pin: candidate };
-          this.emit();
-        } else this.schedule();
-      };
-      const idleId =
-        typeof window !== "undefined"
-          ? window.requestIdleCallback?.(run, { timeout: 2000 })
-          : undefined;
-      if (idleId == null) {
-        const timer = globalThis.setTimeout(run, 0);
-        this.cancelIdle = () => globalThis.clearTimeout(timer);
-      } else this.cancelIdle = () => window.cancelIdleCallback?.(idleId);
-      return;
-    }
-    const retryTimes = candidates.flatMap((pin) => {
-      const entry = this.retry.get(pinKey(pin));
-      return !this.completed.has(pinKey(pin)) && entry ? [entry.at] : [];
-    });
-    if (retryTimes.length)
-      this.retryTimer = globalThis.setTimeout(
-        () => this.schedule(),
-        Math.max(0, Math.min(...retryTimes) - now),
-      );
-  }
-  private cancelScheduled() {
-    this.cancelIdle?.();
-    this.cancelIdle = null;
-    if (this.retryTimer) {
-      globalThis.clearTimeout(this.retryTimer);
-      this.retryTimer = null;
-    }
-  }
-  private emit() {
-    for (const listener of this.listeners) listener();
-  }
-}
-
-class PinPreloader {
-  private listeners = new Set<() => void>();
-  private browserTabId: string | null = null;
-  private stopWatch: (() => void) | null = null;
-  private abort: AbortController | null = null;
-  private accountId: unknown;
-  constructor(
-    private scope: Scope,
-    private pin: Pin,
-    private scheduler: PreloadScheduler,
-  ) {
-    this.accountId = scope.get(initial.mun);
-  }
-  getSnapshot = () => this.browserTabId;
-  getServerSnapshot = () => null;
-  subscribe = (listener: () => void) => {
-    this.listeners.add(listener);
-    if (this.listeners.size === 1) {
-      const controller = new AbortController();
-      this.abort = controller;
-      if (!this.isCurrent()) {
-        controller.abort();
-        this.scheduler.finish(pinKey(this.pin), "deferred");
-        return () => {
-          this.listeners.delete(listener);
-          this.scheduler.continue();
-        };
-      }
-      this.stopWatch = this.scope.watch((scope) => {
-        if (
-          scope.get(initial.mun) !== this.accountId ||
-          !isCurrentPin(scope, this.pin)
-        ) {
-          controller.abort();
-          this.scheduler.finish(pinKey(this.pin), "deferred");
-        }
-      });
-      if (!controller.signal.aborted)
-        void this.prepare(controller)
-          .catch((error) => {
-            if (!controller.signal.aborted && this.isCurrent())
-              this.scheduler.reportError(
-                pinKey(this.pin),
-                this.pin.tabKind,
-                error,
-              );
-            return "deferred" as const;
-          })
-          .then((result) => {
-            if (!controller.signal.aborted && this.isCurrent())
-              this.scheduler.finish(pinKey(this.pin), result);
-          });
-    }
-    return () => {
-      this.listeners.delete(listener);
-      if (this.listeners.size === 0) {
-        this.abort?.abort();
-        this.abort = null;
-        this.stopWatch?.();
-        this.stopWatch = null;
-        this.scheduler.continue();
-      }
-    };
-  };
-  private setBrowserTabId(tabId: string) {
-    this.browserTabId = tabId;
-    for (const listener of this.listeners) listener();
-  }
-  private isCurrent() {
-    return (
-      this.scope.get(initial.mun) === this.accountId &&
-      isCurrentPin(this.scope, this.pin)
-    );
-  }
-  private async prepare(
-    controller: AbortController,
-  ): Promise<"prepared" | "deferred" | "ineligible"> {
-    const disconnected = () => controller.signal.aborted || !this.isCurrent();
-    if (disconnected() || this.scope.value.routeKind !== "local-thread")
-      return "deferred";
-    const conversationId = this.scope.value.conversationId;
-    const layout = initial.oyt(this.scope.get(initial.cyt, conversationId));
-    const descriptor = layout?.routes.find(
-      (route) =>
-        route.tabId === this.pin.tabId && route.kind === this.pin.tabKind,
-    );
-    const target = layout?.topology.right.tabIds.includes(this.pin.tabId)
-      ? "right"
-      : layout?.topology.bottom.tabIds.includes(this.pin.tabId)
-        ? "bottom"
-        : null;
-    if (!layout || !descriptor || !target) return "deferred";
-    if (
-      !eligibleKinds.has(descriptor.kind) ||
-      initial.BDt(this.scope, this.pin.tabId) ||
-      !initial.LDt(this.scope, descriptor)
-    )
-      return "ineligible";
-    const definition = initial.jDt(descriptor.kind);
-    if (!definition) return "deferred";
-    if (definition.durableRoute?.version !== descriptor.payloadVersion)
-      return "ineligible";
-    if (definition.isAvailable(this.scope) !== true) return "deferred";
-    const manager = target === "right" ? initial.qvt : initial.Vvt;
-    const routeActive = this.scope.get(initial.dyt) === conversationId;
-    const tab = this.scope.get(manager.tabById$, this.pin.tabId);
-    if (
-      !routeActive &&
-      tab == null &&
-      !(await initial.rg({
-        scope: this.scope,
-        revealAndFocus: false,
-        descriptor,
-        insertPosition: undefined,
-        isDisconnected: disconnected,
-        reason: "pinned-tab-preload",
-        target,
-      }))
-    )
-      return "deferred";
-    if (disconnected()) return "deferred";
-    if (descriptor.kind === "terminal") return "prepared";
-    if (this.scope.get(manager.tabById$, this.pin.tabId) == null)
-      return "deferred";
-    if (descriptor.kind !== "browser") return "prepared";
-    const browser = initial.clt(descriptor);
-    if (!browser) return "ineligible";
-    const pageScope = initial.Ken(this.scope);
-    if (!pageScope) return "deferred";
-    if (initial.ggt.isBrowserUseTab(pageScope, browser.browserTabId))
-      return "ineligible";
-    const host = initial.ggt.pages.getHost(pageScope, browser.browserTabId);
-    const previous = initial.ggt.getSnapshot(pageScope, browser.browserTabId);
-    if (!host) this.setBrowserTabId(browser.browserTabId);
-    return (await waitForPageReady(
-      pageScope,
-      browser.browserTabId,
-      host ? null : previous,
-      controller.signal,
-    ))
-      ? "prepared"
-      : "deferred";
-  }
-}
-
-function HiddenBrowser({
-  browserTabId,
-  conversationId,
-  pin,
-}: {
-  browserTabId: string;
-  conversationId: string;
-  pin: Pin;
-}): unknown {
-  const scope = shared.LX(initial.$en);
-  const webviewRef = React.useRef(null);
-  const zoom = shared.x_();
-  const shouldDispose = shared.__(
-    () =>
-      !isCurrentPin(scope, pin) &&
-      !matchesCurrentRoute(
-        scope.get(initial.lpn) as { pathname?: string; search?: string } | null,
-        pin,
-      ),
-  );
-  return jsx.jsx(webview.t, {
-    bounds: null,
-    browserTabId,
-    conversationId,
-    initialUrl: initial.Mgt(conversationId, browserTabId) ?? "about:blank",
-    isVisible: false,
-    scale: 1,
-    shouldBootstrapWhenHidden: true,
-    shouldDisposeOnUnmount: shouldDispose,
-    shouldPaint: false,
-    webviewRef,
-    windowZoom: zoom,
-  });
-}
-function PreloadPin({
-  pin,
-  scheduler,
-}: {
-  pin: Pin;
-  scheduler: PreloadScheduler;
-}): unknown {
-  const scope = shared.LX(initial.$en);
-  const [preloader] = React.useState(
-    () => new PinPreloader(scope, pin, scheduler),
-  );
-  const browserTabId = React.useSyncExternalStore(
-    preloader.subscribe,
-    preloader.getSnapshot,
-    preloader.getServerSnapshot,
-  );
-  return browserTabId == null
-    ? null
-    : jsx.jsx(HiddenBrowser, {
-        browserTabId,
-        conversationId: initial.Ken(scope) ?? pin.threadId,
-        pin,
-      });
-}
-function BridgeContent(): unknown {
-  const scope = shared.LX(shared.ZI);
-  const [scheduler] = React.useState(() => new PreloadScheduler(scope));
-  const pending = React.useSyncExternalStore(
-    scheduler.subscribe,
-    scheduler.getSnapshot,
-    scheduler.getServerSnapshot,
-  );
-  if (!pending) return null;
-  const route = routeForPin(pending.pin);
-  return route == null
-    ? null
-    : jsx.jsx(
-        initial.SY,
-        {
-          route,
-          children: jsx.jsx(PreloadPin, { pin: pending.pin, scheduler }),
-        },
-        pending.key,
-      );
-}
-function PinnedContentTabPreloadBridge(): unknown {
-  return React.useContext(initial.bl) ? jsx.jsx(BridgeContent, {}) : null;
-}
-
-function initialize(): void {
-  shared.$3();
-  shared.FX();
-  shared.wL();
-  React = shared.e6();
-  initial.H0t();
-  initial.nvt();
-  initial.zDt();
-  initial.Wvt();
-  initial.FDt();
-  shared.y_();
-  initial.out();
-  initial._gt();
-  initial.Fgt();
-  shared.Nm();
-  initial.Yen();
-  initial.slt();
-  webview.n();
-  initial.fpn();
-  initial.dut();
-  shared.QI();
-  initial.itn();
-  initial.CY();
-  initial.Yst();
-  initial.nct();
-  initial.ng();
-  initial.iyt();
-  shared.Z3();
-  initial.xl();
-  shared.g_();
-  initial.Z_t();
-  initial.F0t();
-  jsx = shared.I3();
-  eligibleKinds = new Set([
-    initial.aut,
-    shared.Mm,
-    initial.Jst,
-    initial.tct,
-    initial.uut,
+function G(e) {
+  return JSON.stringify([
+    e.id,
+    e.accountId,
+    e.hostId,
+    e.threadId,
+    e.clientThreadId,
+    e.tabId,
+    e.tabKind,
+    e.routePath,
+    e.routeSearch,
   ]);
 }
-initialize();
-
-export { PinnedContentTabPreloadBridge };
+function K(e, t, n, r) {
+  return new Promise((i) => {
+    let a = !1,
+      o = () => void 0,
+      s = globalThis.setTimeout(() => c(!1), 15e3),
+      c = (e) => {
+        a || ((a = !0), o(), globalThis.clearTimeout(s), r.removeEventListener(`abort`, l), i(e));
+      },
+      l = () => c(!1),
+      u = () => {
+        let r = P.getSnapshot(e, t);
+        P.pages.getHost(e, t)?.hasRegisteredNativeHost() &&
+          r != null &&
+          (n == null || r !== n) &&
+          !r.isLoading &&
+          !r.isSuspended &&
+          c(!0);
+      };
+    ((o = P.subscribe(u)),
+      a && o(),
+      r.addEventListener(`abort`, l, { once: !0 }),
+      r.aborted ? c(!1) : u());
+  });
+}
+var q, J, Y, X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((q = t()),
+      n(),
+      h(),
+      (J = f()),
+      ie(),
+      he(),
+      we(),
+      de(),
+      y(),
+      te(),
+      ge(),
+      w(),
+      re(),
+      o(),
+      fe(),
+      be(),
+      Te(),
+      N(),
+      k(),
+      c(),
+      F(),
+      _(),
+      pe(),
+      B(),
+      me(),
+      I(),
+      l(),
+      Ce(),
+      p(),
+      C(),
+      v(),
+      (Y = r()),
+      (X = new Set([T, a, oe, xe, Se])),
+      (Z = class {
+        scope;
+        accountId;
+        completedKeys = new Set();
+        reportedErrors = new Set();
+        retryByKey = new Map();
+        listeners = new Set();
+        pending = null;
+        stopWatch = null;
+        cancelIdle = null;
+        retryTimer = null;
+        constructor(e) {
+          this.scope = e;
+        }
+        getSnapshot = () => this.pending;
+        getServerSnapshot = () => null;
+        subscribe = (e) => (
+          this.listeners.add(e),
+          this.listeners.size === 1 && (this.stopWatch = this.scope.watch((e) => this.schedule(e))),
+          () => {
+            (this.listeners.delete(e),
+              this.listeners.size === 0 &&
+                (this.stopWatch?.(),
+                (this.stopWatch = null),
+                this.cancelScheduled(),
+                (this.pending = null)));
+          }
+        );
+        finish(e, t) {
+          if (this.pending?.key === e) {
+            if (((this.pending = null), t === `deferred`)) {
+              let t = (this.retryByKey.get(e)?.attempts ?? 0) + 1;
+              this.retryByKey.set(e, {
+                attempts: t,
+                at: Date.now() + Math.min(6e4, 1e3 * 5 ** (t - 1)),
+              });
+            } else (this.completedKeys.add(e), this.retryByKey.delete(e));
+            this.emit();
+          }
+        }
+        continue() {
+          this.schedule();
+        }
+        reportError(e, t, n) {
+          this.reportedErrors.has(e) ||
+            (this.reportedErrors.add(e),
+            s.error(`Failed to preload pinned content tab`, {
+              safe: { kind: t },
+              sensitive: { error: n },
+            }));
+        }
+        schedule(e = this.scope) {
+          if ((this.cancelScheduled(), this.listeners.size === 0)) return;
+          let t = e.get(ae),
+            n = new Set(e.get(S)),
+            r = e.get(z);
+          if (this.accountId !== r) {
+            ((this.accountId = r),
+              this.pending != null && this.completedKeys.add(this.pending.key));
+            for (let e of this.retryByKey.keys()) this.completedKeys.add(e);
+            (this.retryByKey.clear(), (this.pending = null), this.emit());
+          }
+          let i = e.get(R),
+            a = new Set(t.map(G));
+          for (let e of this.completedKeys) a.has(e) || this.completedKeys.delete(e);
+          for (let e of this.retryByKey.keys()) a.has(e) || this.retryByKey.delete(e);
+          let o = t.filter((t) => n.has(t.id) && U(t) != null && !W(i, t) && e.get(V, t) == null);
+          if (this.pending != null && !o.some((e) => G(e) === this.pending?.key)) {
+            ((this.pending = null), this.emit());
+            return;
+          }
+          if (this.pending != null) return;
+          let s = Date.now(),
+            c = o.find(
+              (e) => !this.completedKeys.has(G(e)) && (this.retryByKey.get(G(e))?.at ?? 0) <= s,
+            );
+          if (c != null) {
+            let e = () => {
+                this.cancelIdle = null;
+                let e = this.scope.get(x, c.id);
+                this.listeners.size !== 0 &&
+                this.scope.get(z) === r &&
+                e != null &&
+                G(e) === G(c) &&
+                this.scope.get(V, c) == null &&
+                this.scope.get(S).includes(c.id) &&
+                U(c) != null &&
+                !W(this.scope.get(R), c)
+                  ? ((this.pending = { key: G(c), pin: c }), this.emit())
+                  : this.schedule();
+              },
+              t = window.requestIdleCallback?.(e, { timeout: 2e3 });
+            if (t == null) {
+              let t = globalThis.setTimeout(e, 0);
+              this.cancelIdle = () => globalThis.clearTimeout(t);
+            } else this.cancelIdle = () => window.cancelIdleCallback?.(t);
+            return;
+          }
+          let l = o.flatMap((e) => {
+            let t = G(e),
+              n = this.retryByKey.get(t);
+            return !this.completedKeys.has(t) && n != null ? [n.at] : [];
+          });
+          l.length > 0 &&
+            (this.retryTimer = globalThis.setTimeout(
+              () => this.schedule(),
+              Math.max(0, Math.min(...l) - s),
+            ));
+        }
+        cancelScheduled() {
+          (this.cancelIdle?.(),
+            (this.cancelIdle = null),
+            this.retryTimer != null &&
+              (globalThis.clearTimeout(this.retryTimer), (this.retryTimer = null)));
+        }
+        emit() {
+          for (let e of this.listeners) e();
+        }
+      }),
+      (Q = class {
+        scope;
+        pin;
+        scheduler;
+        accountId;
+        listeners = new Set();
+        browserTabId = null;
+        stopWatch = null;
+        abort = null;
+        constructor(e, t, n) {
+          ((this.scope = e), (this.pin = t), (this.scheduler = n), (this.accountId = e.get(z)));
+        }
+        getSnapshot = () => this.browserTabId;
+        getServerSnapshot = () => null;
+        subscribe = (e) => {
+          if ((this.listeners.add(e), this.listeners.size === 1)) {
+            let t = new AbortController();
+            if (((this.abort = t), !this.isCurrent()))
+              return (
+                t.abort(),
+                this.scheduler.finish(G(this.pin), `deferred`),
+                () => {
+                  (this.listeners.delete(e), this.scheduler.continue());
+                }
+              );
+            ((this.stopWatch = this.scope.watch((e) => {
+              (e.get(z) !== this.accountId || !H(e, this.pin)) &&
+                (t.abort(), this.scheduler.finish(G(this.pin), `deferred`));
+            })),
+              t.signal.aborted && (this.stopWatch(), (this.stopWatch = null)),
+              t.signal.aborted ||
+                this.prepare(t)
+                  .catch(
+                    (e) => (
+                      !t.signal.aborted &&
+                        this.isCurrent() &&
+                        this.scheduler.reportError(G(this.pin), this.pin.tabKind, e),
+                      `deferred`
+                    ),
+                  )
+                  .then((e) => {
+                    !t.signal.aborted && this.isCurrent() && this.scheduler.finish(G(this.pin), e);
+                  }));
+          }
+          return () => {
+            (this.listeners.delete(e),
+              this.listeners.size === 0 &&
+                (this.abort?.abort(),
+                (this.abort = null),
+                this.stopWatch?.(),
+                (this.stopWatch = null),
+                this.scheduler.continue()));
+          };
+        };
+        setBrowserTabId(e) {
+          this.browserTabId = e;
+          for (let e of this.listeners) e();
+        }
+        isCurrent() {
+          return this.scope.get(z) === this.accountId && H(this.scope, this.pin);
+        }
+        async prepare(e) {
+          let { scope: t, pin: n } = this,
+            r = () => e.signal.aborted || !this.isCurrent();
+          if (r() || t.value.routeKind !== `local-thread`) return `deferred`;
+          let i = t.value.conversationId,
+            a = _e(t.get(O, i)),
+            o = a?.routes.find((e) => e.tabId === n.tabId && e.kind === n.tabKind),
+            s = null;
+          if (
+            (a?.topology.right.tabIds.includes(n.tabId)
+              ? (s = `right`)
+              : a?.topology.bottom.tabIds.includes(n.tabId) && (s = `bottom`),
+            a == null || o == null || s == null)
+          )
+            return `deferred`;
+          if (!X.has(o.kind) || ne(t, n.tabId) || !se(t, o)) return `ineligible`;
+          let c = L(o.kind);
+          if (c == null) return `deferred`;
+          if (c.durableRoute?.version !== o.payloadVersion) return `ineligible`;
+          if (c.isAvailable(t) !== !0) return `deferred`;
+          let l = s === `right` ? ve : ue,
+            u = t.get(A) === i,
+            d = t.get(l.tabById$, n.tabId);
+          if (
+            (!u &&
+              d == null &&
+              !(await ye({
+                scope: t,
+                revealAndFocus: !1,
+                descriptor: o,
+                insertPosition: void 0,
+                isDisconnected: r,
+                reason: `pinned-tab-preload`,
+                target: s,
+              }))) ||
+            r()
+          )
+            return `deferred`;
+          if (o.kind === `terminal`) return `prepared`;
+          if (t.get(l.tabById$, n.tabId) == null) return `deferred`;
+          if (o.kind !== `browser`) return `prepared`;
+          let f = D(o);
+          if (f == null) return `ineligible`;
+          let p = b(t);
+          if (p == null) return `deferred`;
+          if (P.isBrowserUseTab(p, f.browserTabId)) return `ineligible`;
+          let m = P.pages.getHost(p, f.browserTabId),
+            h = P.getSnapshot(p, f.browserTabId);
+          return (
+            m ?? this.setBrowserTabId(f.browserTabId),
+            (await K(p, f.browserTabId, m == null ? h : null, e.signal)) ? `prepared` : `deferred`
+          );
+        }
+      }));
+  }))();
+}
+$();
+export { De as PinnedContentTabPreloadBridge };

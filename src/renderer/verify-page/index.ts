@@ -1,631 +1,520 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as checkoutPolicyChunk from "@rchunk/checkout-policy";
-// @ts-expect-error Published checkout error chunk has no standalone declaration yet.
-import * as errorChunk from "@rchunk/error";
-// @ts-expect-error Published Stripe loader chunk has no standalone declaration yet.
-import * as stripeLoaderChunk from "@rchunk/pure";
-// @ts-expect-error Published integrity chunk has no standalone declaration yet.
-import * as integrityChunk from "@rchunk/chatgpt-account-action-integrity";
-// @ts-expect-error Published checkout session chunk has no standalone declaration yet.
-import * as sessionChunk from "@rchunk/session";
-
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown;
-  jsxs(type: unknown, props: Record<string, unknown>, key?: string): unknown;
-}
-interface ParsedRoute {
-  checkoutSessionId: string;
-  processorEntity: string;
-}
-interface ParseResult {
-  data?: ParsedRoute;
-  success: boolean;
-}
-interface AccountState {
-  accountId?: string | null;
-}
-interface CheckoutSession {
-  checkout_kind?: string;
-  confirm_return_url?: string | null;
-  credit_payment_state?: string | null;
-  publishable_key?: string;
-  processor_entity?: string;
-  checkout_session_id?: string;
-  status?: "complete" | "expired" | "open" | string;
-  tag?: string;
-}
-interface ContinuationResult {
-  accountId: string;
-  failed: boolean;
-  response: Record<string, unknown> | null;
-}
-interface QueryResult<Value> {
-  data?: Value;
-  error?: unknown;
-  isFetching?: boolean;
-  isPending?: boolean;
-  refetch(): Promise<unknown> | unknown;
-}
-interface ApiClient {
-  safeGet(
-    path: string,
-    options: Record<string, unknown>,
-  ): Promise<CheckoutSession>;
-  safePost(
-    path: string,
-    options: Record<string, unknown>,
-  ): Promise<Record<string, unknown>>;
-}
-interface RouteSchema {
-  safeParse(value: {
-    checkoutSessionId: string | null;
-    processorEntity: string | null;
-  }): ParseResult;
-}
-interface ErrorViewProps {
-  error?: unknown;
-  kind: "payment";
-  loading?: boolean;
-  onRetry(): void;
-}
-interface WrapperProps {
-  children: unknown;
-  returnPath?: string;
-}
-
-const sharedRuntime = appSharedChunk as unknown as {
-  $3?(): void;
-  I3(): JsxRuntime;
-  K2?(): void;
-  Mh?: (props: { children?: unknown }) => unknown;
-  Ph?(): void;
-  Y2?: (props: Record<string, unknown>) => unknown;
-  Yh?: (props: Record<string, unknown>) => unknown;
-  Zh?(): void;
-  _L?<Value>(options: Record<string, unknown>): QueryResult<Value>;
-  gL?(): void;
-};
-const initialRuntime = appInitialChunk as unknown as {
-  M6t?(): void;
-  N6t?(): AccountState;
-  Qgn?(): void;
-  Ygn?: (props: { replace?: boolean; to: string }) => unknown;
-  _0?(): string;
-  _T?: (props: Record<string, unknown>) => unknown;
-  cJt?(): void;
-  d_n?(): [URLSearchParams];
-  o_n?(): (destination: string, options?: { replace?: boolean }) => void;
-  rJt?: ApiClient;
-  r_n?(path: string): string;
-  v0?(): void;
-  vT?(): void;
-};
-const primaryRuntime = appPrimaryChunk as unknown as {
-  ch?(
-    params: URLSearchParams,
-    source: URLSearchParams,
-    baseUrl: URL,
-  ): URLSearchParams;
-  ih?(params: URLSearchParams, url: URL): string | null;
-  sh?(): void;
-};
-const policyRuntime = checkoutPolicyChunk as unknown as {
-  A?(input: URLSearchParams, output: URLSearchParams): URLSearchParams;
-  S?(): void;
-  f?(value: string | null): string;
-  k?(): void;
-  l?(
-    checkout: Record<string, unknown>,
-    query: URLSearchParams,
-    successPath?: string,
-  ): string | null;
-  n?: { StandaloneCredit: string };
-};
-const errorRuntime = errorChunk as unknown as {
-  a?: (props: ErrorViewProps) => unknown;
-  o?(): void;
-};
-const stripeRuntime = stripeLoaderChunk as unknown as {
-  r?(publishableKey: string): Promise<{
-    confirmPayment(
-      options: Record<string, unknown>,
-    ): Promise<{ error?: unknown }>;
-  } | null>;
-  t?(): void;
-};
-const integrityRuntime = integrityChunk as unknown as {
-  n?(action: string): Promise<Record<string, string>>;
-  r?(): void;
-};
-const sessionRuntime = sessionChunk as unknown as {
-  d?(): void;
-  i?(accountId: string, route: ParsedRoute): Record<string, unknown>;
-  o?(): void;
-  r?: RouteSchema;
-  u?: (props: WrapperProps) => unknown;
-};
-const {
-  $3: initializeSharedRuntime,
-  I3: getJsxRuntime,
-  K2: initializeSharedUi,
-  Mh: Page,
-  Ph: initializePage,
-  Y2: Message,
-  Yh: Button,
-  Zh: initializeSharedMessages,
-  _L: useQuery,
-  gL: initializeQueryRuntime,
-} = sharedRuntime;
-const {
-  M6t: initializeAccountState,
-  N6t: useAccountState,
-  Qgn: initializeQueries,
-  Ygn: Navigate,
-  _0: fallbackPath,
-  _T: LoadingPage,
-  cJt: initializeNavigation,
-  d_n: useSearchParams,
-  o_n: useNavigate,
-  rJt: api,
-  r_n: resolvePath,
-  v0: initializeRoutes,
-  vT: initializeCheckoutState,
-} = initialRuntime;
-const {
-  ch: mergeReturnParams,
-  ih: beaconReturnPath,
-  sh: initializePrimaryPayments,
-} = primaryRuntime;
-const {
-  A: copyCheckoutSource,
-  S: initializeCheckoutPolicy,
-  f: paymentState,
-  k: initializeCheckoutKinds,
-  l: teamSuccessPath,
-  n: CheckoutKind,
-} = policyRuntime;
-const { a: ErrorView, o: initializeErrorView } = errorRuntime;
-const { r: loadStripe, t: initializeStripeLoader } = stripeRuntime;
-const { n: getIntegrityHeaders, r: initializeIntegrity } = integrityRuntime;
-const {
-  d: initializeSessionState,
-  i: sessionQueryOptions,
-  o: initializeSessionUi,
-  r: routeSchema,
-  u: CheckoutSessionWrapper,
-} = sessionRuntime;
-
-initializeSharedRuntime?.();
-initializeCheckoutPolicy?.();
-initializeCheckoutKinds?.();
-initializeStripeLoader?.();
-initializeQueryRuntime?.();
-initializeSharedUi?.();
-initializeQueries?.();
-initializeAccountState?.();
-initializeIntegrity?.();
-initializeNavigation?.();
-initializeSharedMessages?.();
-initializePage?.();
-initializePrimaryPayments?.();
-initializeRoutes?.();
-initializeCheckoutState?.();
-initializeErrorView?.();
-initializeSessionUi?.();
-initializeSessionState?.();
-
-const jsx = getJsxRuntime();
-
-function parseRoute(params: URLSearchParams): ParseResult {
-  const input = {
-    processorEntity: params.get("processor_entity"),
-    checkoutSessionId: params.get("stripe_session_id"),
-  };
-  if (routeSchema != null) return routeSchema.safeParse(input);
-  return input.processorEntity && input.checkoutSessionId
-    ? {
-        success: true,
-        data: {
-          processorEntity: input.processorEntity,
-          checkoutSessionId: input.checkoutSessionId,
-        },
-      }
-    : { success: false };
-}
-function navigate(to: string): unknown {
-  return Navigate == null
-    ? jsx.jsx("a", { href: to, children: "Continue" })
-    : jsx.jsx(Navigate, { to, replace: true });
-}
-function loading(): unknown {
-  return LoadingPage == null
-    ? jsx.jsx("main", { role: "status", children: "Verifying payment…" })
-    : jsx.jsx(LoadingPage, {});
-}
-function errorView(
-  error: unknown,
-  loadingState: boolean,
-  retry: () => void,
-): unknown {
-  return ErrorView == null
-    ? jsx.jsxs("section", {
-        role: "alert",
-        children: [
-          jsx.jsx("p", {
-            children:
-              error instanceof Error
-                ? error.message
-                : "Payment verification failed",
-          }),
-          jsx.jsx("button", {
-            type: "button",
-            disabled: loadingState,
-            onClick: retry,
-            children: loadingState ? "Retrying…" : "Retry",
-          }),
-        ],
-      })
-    : jsx.jsx(ErrorView, {
-        kind: "payment",
-        loading: loadingState,
-        error,
-        onRetry: retry,
-      });
-}
-function emptyQuery<Value>(): QueryResult<Value> {
-  return { refetch: () => undefined };
-}
-function waitForPoll(resolve: () => void): number {
-  return window.setTimeout(resolve, 500);
-}
-
-async function confirmConditionalOffer(
-  route: ParsedRoute,
-  signal: AbortSignal,
-): Promise<void> {
-  if (api == null) throw new Error("Payment service unavailable");
-  const checkout = await api.safeGet(
-    "/payments/checkout/{processor_entity}/{checkout_session_id}",
-    {
-      parameters: {
-        path: {
-          processor_entity: route.processorEntity,
-          checkout_session_id: route.checkoutSessionId,
-        },
-      },
-      signal,
-    },
-  );
-  if (
-    checkout.tag === "custom_checkout_session" &&
-    checkout.status === "complete"
-  )
-    return;
-  const stripe = await loadStripe?.(checkout.publishable_key ?? "");
-  if (stripe == null) throw new Error("Stripe failed to load");
-  const headers =
-    (await getIntegrityHeaders?.("checkout_session_approval")) ?? {};
-  signal.throwIfAborted();
-  const response = await api.safePost("/payments/checkout/confirm", {
-    additionalHeaders: headers,
-    requestBody: { checkout_session_id: route.checkoutSessionId },
-    signal,
-  });
-  if (
-    response.status !== "success" ||
-    response.type !== "payment_intent" ||
-    response.conditional_offer_preflight !== true ||
-    typeof response.client_secret !== "string"
-  )
-    throw new Error("Conditional offer did not return a payment intent");
-  signal.throwIfAborted();
-  const result = await stripe.confirmPayment({
-    clientSecret: response.client_secret,
-    redirect: "if_required",
-  });
-  if (result.error != null)
-    throw new Error("Conditional offer payment confirmation failed");
-}
-
-function VerificationContent({
-  accountId,
-  appBaseUrl,
-  beaconPath,
-  params,
-  route,
-}: {
-  accountId: string;
-  appBaseUrl: URL;
-  beaconPath: string | null;
-  params: URLSearchParams;
-  route: ParsedRoute;
-}): unknown {
-  const navigateTo = useNavigate?.() ?? (() => undefined);
-  const redirectResult = params.get("redirectResult");
-  const conditionalOffer = params.get("conditional_offer_preflight") === "true";
-  const walletCovered = params.get("wallet_covered") === "true";
-  const continuationRequested = redirectResult != null || conditionalOffer;
-  const continuation =
-    useQuery?.<ContinuationResult>({
-      queryKey: [
-        "checkout-payment-continuation",
-        route.processorEntity,
-        route.checkoutSessionId,
-        redirectResult,
-        conditionalOffer,
-      ],
-      enabled: continuationRequested,
-      retry: false,
-      staleTime: Number.POSITIVE_INFINITY,
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      queryFn: async ({ signal }: { signal: AbortSignal }) => {
-        if (conditionalOffer) {
-          try {
-            await confirmConditionalOffer(route, signal);
-            return {
-              accountId,
-              response: { status: "pending" },
-              failed: false,
-            };
-          } catch {
-            return { accountId, response: null, failed: true };
-          }
-        }
-        if (redirectResult == null || api == null)
-          throw new Error("Invalid payment return");
-        try {
-          const response = await api.safePost(
-            "/payments/checkout/custom_payment_method/continue",
-            {
-              requestBody: {
-                checkout_session_id: route.checkoutSessionId,
-                action_result: { redirectResult },
-              },
-              signal,
-            },
-          );
-          return { accountId, response, failed: false };
-        } catch {
-          return { accountId, response: null, failed: true };
-        }
-      },
-    }) ?? emptyQuery<ContinuationResult>();
-  const accountMismatch =
-    continuation.data != null && continuation.data.accountId !== accountId;
-  const continuationAccepted =
-    continuation.data?.response?.status === "pending" ||
-    continuation.data?.response?.status === "success";
-  const pendingFromReturn =
-    (redirectResult != null && continuationAccepted) ||
-    params.get("pending") === "true";
-  const verificationEnabled =
-    !walletCovered &&
-    !accountMismatch &&
-    (!continuationRequested || continuationAccepted);
-  const baseOptions = sessionQueryOptions?.(accountId, route) ?? {
-    queryKey: [
-      "checkout-session",
-      accountId,
-      route.processorEntity,
-      route.checkoutSessionId,
-    ],
-  };
-  const verification =
-    useQuery?.<CheckoutSession>({
-      ...baseOptions,
-      queryKey: [
-        ...((baseOptions.queryKey as unknown[] | undefined) ?? []),
-        "verification",
-      ],
-      enabled: verificationEnabled,
-      staleTime: 0,
-      queryFn: async ({ signal }: { signal: AbortSignal }) => {
-        if (api == null) throw new Error("Payment service unavailable");
-        for (let attempt = 0; ; attempt += 1) {
-          signal.throwIfAborted();
-          const checkout = await api.safeGet(
-            "/payments/checkout/{processor_entity}/{checkout_session_id}",
-            {
-              parameters: {
-                path: {
-                  processor_entity: route.processorEntity,
-                  checkout_session_id: route.checkoutSessionId,
-                },
-              },
-              signal,
-            },
-          );
-          const creditState =
-            checkout.credit_payment_state == null
-              ? null
-              : (paymentState?.(checkout.credit_payment_state) ??
-                checkout.credit_payment_state);
-          if (
-            checkout.tag !== "custom_checkout_session" ||
-            checkout.status !== "open" ||
-            pendingFromReturn ||
-            (checkout.checkout_kind === CheckoutKind?.StandaloneCredit &&
-              creditState !== "succeeded") ||
-            attempt === 2
-          )
-            return checkout;
-          await new Promise<void>(waitForPoll);
-        }
-      },
-      refetchInterval: ({ state }: { state: { data?: CheckoutSession } }) => {
-        const current = state.data;
-        const currentCreditState =
-          current?.credit_payment_state == null
-            ? null
-            : (paymentState?.(current.credit_payment_state) ??
-              current.credit_payment_state);
-        if (
-          (current?.tag === "custom_checkout_session" &&
-            current.checkout_kind === CheckoutKind?.StandaloneCredit &&
-            currentCreditState === "processing") ||
-          (current == null && continuationAccepted)
-        )
-          return 5_000;
-        if (
-          current?.tag !== "custom_checkout_session" ||
-          current.status !== "open"
-        )
-          return false;
-        return pendingFromReturn ? 5_000 : false;
-      },
-    }) ?? emptyQuery<CheckoutSession>();
-  const checkout = verification.data;
-  const status =
-    checkout?.tag === "custom_checkout_session" ? checkout.status : undefined;
-  const creditState =
-    checkout?.credit_payment_state == null
-      ? null
-      : (paymentState?.(checkout.credit_payment_state) ??
-        checkout.credit_payment_state);
-  const source =
-    copyCheckoutSource?.(
-      params,
-      new URLSearchParams({
-        processor_entity: route.processorEntity,
-        stripe_session_id: route.checkoutSessionId,
-      }),
-    ) ??
-    new URLSearchParams({
-      processor_entity: route.processorEntity,
-      stripe_session_id: route.checkoutSessionId,
-    });
-  const query =
-    mergeReturnParams?.(params, source, appBaseUrl) ??
-    new URLSearchParams(source);
-  if (walletCovered) query.set("wallet_covered", "true");
-  const confirmParams =
-    checkout?.tag === "custom_checkout_session" &&
-    checkout.confirm_return_url != null
-      ? new URL(checkout.confirm_return_url, window.location.origin)
-          .searchParams
-      : null;
-  for (const key of ["plan_type", "campaign"]) {
-    const value = confirmParams?.get(key) ?? params.get(key);
-    if (value != null) query.set(key, value);
-  }
-  const accountParam = params.get("account_id");
-  if (accountParam != null) query.set("account_id", accountParam);
-  const successful =
-    !accountMismatch &&
-    (walletCovered ||
-      (status === "complete" &&
-        (creditState == null || creditState === "succeeded")) ||
-      (continuation.data?.response?.status === "success" &&
-        checkout?.tag === "custom_checkout_session" &&
-        checkout.status !== "expired"));
-  if (successful) {
-    const successTeamPath =
-      resolvePath?.("/payments/success-team") ?? "/payments/success-team";
-    const teamPath =
-      checkout?.tag === "custom_checkout_session"
-        ? teamSuccessPath?.(
-            checkout as Record<string, unknown>,
-            params,
-            successTeamPath,
-          )
-        : null;
-    return navigate(teamPath ?? `/payments/success?${query.toString()}`);
-  }
-  const failed =
-    accountMismatch ||
-    (continuation.data != null && !continuationAccepted) ||
-    status === "expired" ||
-    creditState === "failed" ||
-    creditState === "requires_action";
-  const busy = continuationRequested
-    ? continuation.isPending === true
-    : verification.isPending === true;
-  if (!failed && verification.error == null && busy) return loading();
-  let main: unknown;
-  if (
-    !failed &&
-    (pendingFromReturn || creditState === "processing") &&
-    (verification.error == null || continuationAccepted)
-  )
-    main = jsx.jsx("p", {
-      role: "status",
-      children: jsx.jsx(Message ?? "span", {
-        id: "checkout.paymentPending",
-        defaultMessage:
-          "Your payment is still processing. We’ll check for confirmation automatically.",
-        description:
-          "The payment provider has not reported a final outcome. The page polls server-owned status without submitting another payment.",
-      }),
-    });
-  else
-    main = errorView(
-      verification.error ??
-        (failed ? new Error("Payment verification failed") : undefined),
-      !failed &&
-        ((continuationRequested && continuation.isPending === true) ||
-          verification.isPending === true ||
-          verification.isFetching === true),
-      () => {
-        if (accountMismatch) navigateTo(fallbackPath?.() ?? "/");
-        else if (continuation.data?.failed) void continuation.refetch();
-        else void verification.refetch();
-      },
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  I3 as n,
+  K2 as r,
+  Mh as i,
+  Ph as a,
+  Y2 as o,
+  Yh as s,
+  Zh as c,
+  _L as l,
+  gL as ee,
+} from "@rchunk/app-shared";
+import {
+  M6t as u,
+  N6t as d,
+  Qgn as f,
+  Ygn as te,
+  _0 as ne,
+  _T as re,
+  cJt as p,
+  d_n as m,
+  o_n as ie,
+  rJt as h,
+  r_n as ae,
+  v0 as g,
+  vT as _,
+} from "@rchunk/app-initial";
+import { ch as oe, ih as v, sh as y } from "@rchunk/app-primary";
+import {
+  A as se,
+  S as b,
+  f as x,
+  k as S,
+  l as ce,
+  n as le,
+} from "@rchunk/checkout-policy";
+import { a as ue, o as C } from "@rchunk/checkout-error";
+import { r as w, t as T } from "@rchunk/stripe-pure";
+import { n as E, r as D } from "@rchunk/account-action-integrity";
+import { d as O, i as de, o as k, r as A, u as fe } from "@rchunk/checkout-session";
+function j() {
+  let e = (0, N.c)(14),
+    [t] = m(),
+    n = ae(`/`),
+    r,
+    i;
+  e[0] !== t || e[1] !== n
+    ? ((r = new URL(n, window.location.origin)),
+      (i = v(t, r)),
+      (e[0] = t),
+      (e[1] = n),
+      (e[2] = r),
+      (e[3] = i))
+    : ((r = e[2]), (i = e[3]));
+  let a = i,
+    { accountId: o } = d(),
+    s;
+  e[4] === t
+    ? (s = e[5])
+    : ((s = A.safeParse({
+        processorEntity: t.get(`processor_entity`),
+        checkoutSessionId: t.get(`stripe_session_id`),
+      })),
+      (e[4] = t),
+      (e[5] = s));
+  let c = s;
+  if (!c.success) {
+    let t;
+    return (
+      e[6] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, P.jsx)(te, { to: ne(), replace: !0 })), (e[6] = t))
+        : (t = e[6]),
+      t
     );
-  const resume =
-    status === "open" &&
-    !accountMismatch &&
-    !pendingFromReturn &&
-    creditState !== "processing" &&
-    verification.isFetching !== true
-      ? jsx.jsx(Button ?? "button", {
-          onClick: () => {
-            const resumeQuery =
-              mergeReturnParams?.(params, new URLSearchParams(), appBaseUrl) ??
-              new URLSearchParams(params);
-            const suffix = resumeQuery.toString();
-            navigateTo(
-              `/checkout/${route.processorEntity}/${route.checkoutSessionId}${suffix.length === 0 ? "" : `?${suffix}`}`,
-              { replace: true },
-            );
-          },
-          children: jsx.jsx(Message ?? "span", {
-            id: "checkout.resumePayment",
-            defaultMessage: "Return to payment details",
-            description:
-              "Return to the existing unpaid checkout after payment verification did not report completion",
-          }),
-        })
-      : null;
-  const body = jsx.jsxs(Page ?? "main", { children: [main, resume] });
-  return CheckoutSessionWrapper == null
-    ? body
-    : jsx.jsx(CheckoutSessionWrapper, {
-        returnPath: beaconPath ?? undefined,
-        children: body,
-      });
+  }
+  if (o == null) {
+    let t;
+    return (
+      e[7] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, P.jsx)(re, {})), (e[7] = t))
+        : (t = e[7]),
+      t
+    );
+  }
+  let l;
+  return (
+    e[8] !== o || e[9] !== r || e[10] !== a || e[11] !== t || e[12] !== c.data
+      ? ((l = (0, P.jsx)(M, {
+          accountId: o,
+          route: c.data,
+          params: t,
+          appBaseUrl: r,
+          beaconReturnPath: a,
+        })),
+        (e[8] = o),
+        (e[9] = r),
+        (e[10] = a),
+        (e[11] = t),
+        (e[12] = c.data),
+        (e[13] = l))
+      : (l = e[13]),
+    l
+  );
 }
-
-function CheckoutVerifyPage(): unknown {
-  const [params] = useSearchParams?.() ?? [new URLSearchParams()];
-  const appBaseUrl = new URL(resolvePath?.("/") ?? "/", window.location.origin);
-  const beaconPath = beaconReturnPath?.(params, appBaseUrl) ?? null;
-  const { accountId } = useAccountState?.() ?? {};
-  const parsed = parseRoute(params);
-  if (!parsed.success || parsed.data == null)
-    return navigate(fallbackPath?.() ?? "/");
-  if (accountId == null) return loading();
-  return jsx.jsx(VerificationContent, {
-    accountId,
-    route: parsed.data,
-    params,
-    appBaseUrl,
-    beaconPath,
+function M(e) {
+  let t = (0, N.c)(90),
+    { accountId: n, route: r, params: a, appBaseUrl: c, beaconReturnPath: ee } = e,
+    u = ie(),
+    d = ae(`/payments/success-team`),
+    f;
+  t[0] === a ? (f = t[1]) : ((f = a.get(`redirectResult`)), (t[0] = a), (t[1] = f));
+  let p = f,
+    m;
+  t[2] === a ? (m = t[3]) : ((m = a.get(`conditional_offer_preflight`)), (t[2] = a), (t[3] = m));
+  let g = m === `true`,
+    _ = p != null || g,
+    v;
+  t[4] === a ? (v = t[5]) : ((v = a.get(`wallet_covered`)), (t[4] = a), (t[5] = v));
+  let y = v === `true`,
+    b;
+  t[6] !== g || t[7] !== p || t[8] !== r.checkoutSessionId || t[9] !== r.processorEntity
+    ? ((b = [`checkout-payment-continuation`, r.processorEntity, r.checkoutSessionId, p, g]),
+      (t[6] = g),
+      (t[7] = p),
+      (t[8] = r.checkoutSessionId),
+      (t[9] = r.processorEntity),
+      (t[10] = b))
+    : (b = t[10]);
+  let S;
+  t[11] !== n || t[12] !== g || t[13] !== p || t[14] !== r
+    ? ((S = async (e) => {
+        let { signal: t } = e;
+        if (g)
+          return me(r, t).then(
+            () => ({ accountId: n, response: { status: `pending` }, failed: !1 }),
+            () => ({ accountId: n, response: null, failed: !0 }),
+          );
+        if (p == null) throw Error(`Invalid payment return`);
+        return h
+          .safePost(`/payments/checkout/custom_payment_method/continue`, {
+            requestBody: {
+              checkout_session_id: r.checkoutSessionId,
+              action_result: { redirectResult: p },
+            },
+            signal: t,
+          })
+          .then(
+            (e) => ({ accountId: n, response: e, failed: !1 }),
+            () => ({ accountId: n, response: null, failed: !0 }),
+          );
+      }),
+      (t[11] = n),
+      (t[12] = g),
+      (t[13] = p),
+      (t[14] = r),
+      (t[15] = S))
+    : (S = t[15]);
+  let C;
+  t[16] !== _ || t[17] !== b || t[18] !== S
+    ? ((C = {
+        queryKey: b,
+        enabled: _,
+        queryFn: S,
+        staleTime: 1 / 0,
+        retry: !1,
+        refetchOnMount: !1,
+        refetchOnWindowFocus: !1,
+        refetchOnReconnect: !1,
+      }),
+      (t[16] = _),
+      (t[17] = b),
+      (t[18] = S),
+      (t[19] = C))
+    : (C = t[19]);
+  let { data: w, isPending: T, refetch: E } = l(C),
+    D = w != null && w.accountId !== n,
+    O = w?.response?.status === `pending` || w?.response?.status === `success`,
+    k;
+  t[20] !== O || t[21] !== a || t[22] !== p
+    ? ((k = (p != null && O) || a.get(`pending`) === `true`),
+      (t[20] = O),
+      (t[21] = a),
+      (t[22] = p),
+      (t[23] = k))
+    : (k = t[23]);
+  let A = k,
+    j,
+    M,
+    F;
+  if (t[24] !== n || t[25] !== r) {
+    let e = de(n, r);
+    ((j = l),
+      (M = e),
+      (F = [...e.queryKey, `verification`]),
+      (t[24] = n),
+      (t[25] = r),
+      (t[26] = j),
+      (t[27] = M),
+      (t[28] = F));
+  } else ((j = t[26]), (M = t[27]), (F = t[28]));
+  let I;
+  t[29] !== r.checkoutSessionId || t[30] !== r.processorEntity || t[31] !== A
+    ? ((I = async (e) => {
+        let { signal: t } = e;
+        for (let e = 0; ; e++) {
+          t.throwIfAborted();
+          let n = await h.safeGet(`/payments/checkout/{processor_entity}/{checkout_session_id}`, {
+            parameters: {
+              path: {
+                processor_entity: r.processorEntity,
+                checkout_session_id: r.checkoutSessionId,
+              },
+            },
+            signal: t,
+          });
+          if (
+            n.tag !== `custom_checkout_session` ||
+            n.status !== `open` ||
+            A ||
+            (n.checkout_kind === le.StandaloneCredit &&
+              n.credit_payment_state != null &&
+              x(n.credit_payment_state) !== `succeeded`) ||
+            e === 2
+          )
+            return n;
+          await new Promise(pe);
+        }
+      }),
+      (t[29] = r.checkoutSessionId),
+      (t[30] = r.processorEntity),
+      (t[31] = A),
+      (t[32] = I))
+    : (I = t[32]);
+  let L = !y && !D && (!_ || O),
+    R;
+  t[33] !== O || t[34] !== A
+    ? ((R = (e) => {
+        let t = e.state.data;
+        return (t?.tag === `custom_checkout_session` &&
+          t.checkout_kind === le.StandaloneCredit &&
+          t.credit_payment_state != null &&
+          x(t.credit_payment_state) === `processing`) ||
+          (e.state.data == null && O)
+          ? 5e3
+          : e.state.data?.tag !== `custom_checkout_session` || e.state.data.status !== `open`
+            ? !1
+            : A
+              ? 5e3
+              : !1;
+      }),
+      (t[33] = O),
+      (t[34] = A),
+      (t[35] = R))
+    : (R = t[35]);
+  let z;
+  t[36] !== I || t[37] !== L || t[38] !== R || t[39] !== M || t[40] !== F
+    ? ((z = { ...M, queryKey: F, staleTime: 0, queryFn: I, enabled: L, refetchInterval: R }),
+      (t[36] = I),
+      (t[37] = L),
+      (t[38] = R),
+      (t[39] = M),
+      (t[40] = F),
+      (t[41] = z))
+    : (z = t[41]);
+  let { data: B, error: V, isPending: H, refetch: U, isFetching: W } = j(z),
+    G = B?.tag === `custom_checkout_session` ? B.status : void 0,
+    K;
+  t[42] === B
+    ? (K = t[43])
+    : ((K =
+        B?.tag === `custom_checkout_session` &&
+        B.checkout_kind === le.StandaloneCredit &&
+        B.credit_payment_state != null
+          ? x(B.credit_payment_state)
+          : null),
+      (t[42] = B),
+      (t[43] = K));
+  let q = K,
+    J;
+  if (
+    t[44] !== c ||
+    t[45] !== a ||
+    t[46] !== r.checkoutSessionId ||
+    t[47] !== r.processorEntity ||
+    t[48] !== B ||
+    t[49] !== y
+  ) {
+    ((J = oe(
+      a,
+      se(
+        a,
+        new URLSearchParams({
+          processor_entity: r.processorEntity,
+          stripe_session_id: r.checkoutSessionId,
+        }),
+      ),
+      c,
+    )),
+      y && J.set(`wallet_covered`, `true`));
+    let e =
+      B?.tag === `custom_checkout_session` && B.confirm_return_url != null
+        ? new URL(B.confirm_return_url, window.location.origin).searchParams
+        : null;
+    for (let t of [`plan_type`, `campaign`]) {
+      let n = e?.get(t) ?? a.get(t);
+      n != null && J.set(t, n);
+    }
+    let n = a.get(`account_id`);
+    (n != null && J.set(`account_id`, n),
+      (t[44] = c),
+      (t[45] = a),
+      (t[46] = r.checkoutSessionId),
+      (t[47] = r.processorEntity),
+      (t[48] = B),
+      (t[49] = y),
+      (t[50] = J));
+  } else J = t[50];
+  if (
+    !D &&
+    (y ||
+      (G === `complete` && (q == null || q === `succeeded`)) ||
+      (w?.response?.status === `success` &&
+        B?.tag === `custom_checkout_session` &&
+        B.status !== `expired`))
+  ) {
+    let e;
+    t[51] !== d || t[52] !== a || t[53] !== J || t[54] !== B
+      ? ((e =
+          B?.tag === `custom_checkout_session`
+            ? (ce(B, a, d) ?? `/payments/success?${J}`)
+            : `/payments/success?${J}`),
+        (t[51] = d),
+        (t[52] = a),
+        (t[53] = J),
+        (t[54] = B),
+        (t[55] = e))
+      : (e = t[55]);
+    let n;
+    return (
+      t[56] === e
+        ? (n = t[57])
+        : ((n = (0, P.jsx)(te, { to: e, replace: !0 })), (t[56] = e), (t[57] = n)),
+      n
+    );
+  }
+  let Y = D || (w != null && !O) || G === `expired` || q === `failed` || q === `requires_action`;
+  if (!Y && V == null && (_ ? T : H)) {
+    let e;
+    return (
+      t[58] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, P.jsx)(re, {})), (t[58] = e))
+        : (e = t[58]),
+      e
+    );
+  }
+  let he = ee ?? void 0,
+    X;
+  t[59] !== D ||
+  t[60] !== O ||
+  t[61] !== w?.failed ||
+  t[62] !== T ||
+  t[63] !== q ||
+  t[64] !== V ||
+  t[65] !== Y ||
+  t[66] !== _ ||
+  t[67] !== W ||
+  t[68] !== H ||
+  t[69] !== u ||
+  t[70] !== U ||
+  t[71] !== E ||
+  t[72] !== A
+    ? ((X =
+        (A || q === `processing`) && !Y && (V == null || O)
+          ? (0, P.jsx)(`p`, {
+              role: `status`,
+              children: (0, P.jsx)(o, {
+                id: `checkout.paymentPending`,
+                defaultMessage: `Your payment is still processing. We’ll check for confirmation automatically.`,
+                description: `The payment provider has not reported a final outcome. The page polls server-owned status without submitting another payment.`,
+              }),
+            })
+          : (0, P.jsx)(ue, {
+              kind: `payment`,
+              loading: !Y && ((_ && T) || H || W),
+              error: V ?? (Y ? Error(`Payment verification failed`) : void 0),
+              onRetry: () => {
+                D ? u(ne()) : w?.failed ? E() : U();
+              },
+            })),
+      (t[59] = D),
+      (t[60] = O),
+      (t[61] = w?.failed),
+      (t[62] = T),
+      (t[63] = q),
+      (t[64] = V),
+      (t[65] = Y),
+      (t[66] = _),
+      (t[67] = W),
+      (t[68] = H),
+      (t[69] = u),
+      (t[70] = U),
+      (t[71] = E),
+      (t[72] = A),
+      (t[73] = X))
+    : (X = t[73]);
+  let Z;
+  t[74] !== D ||
+  t[75] !== c ||
+  t[76] !== q ||
+  t[77] !== W ||
+  t[78] !== u ||
+  t[79] !== a ||
+  t[80] !== r ||
+  t[81] !== G ||
+  t[82] !== A
+    ? ((Z =
+        G === `open` && !D && !A && q !== `processing` && !W
+          ? (0, P.jsx)(s, {
+              onClick: () => {
+                let e = oe(a, new URLSearchParams(), c).toString();
+                u(
+                  `/checkout/${r.processorEntity}/${r.checkoutSessionId}${e.length === 0 ? `` : `?${e}`}`,
+                  { replace: !0 },
+                );
+              },
+              children: (0, P.jsx)(o, {
+                id: `checkout.resumePayment`,
+                defaultMessage: `Return to payment details`,
+                description: `Return to the existing unpaid checkout after payment verification did not report completion`,
+              }),
+            })
+          : null),
+      (t[74] = D),
+      (t[75] = c),
+      (t[76] = q),
+      (t[77] = W),
+      (t[78] = u),
+      (t[79] = a),
+      (t[80] = r),
+      (t[81] = G),
+      (t[82] = A),
+      (t[83] = Z))
+    : (Z = t[83]);
+  let Q;
+  t[84] !== X || t[85] !== Z
+    ? ((Q = (0, P.jsxs)(i, { children: [X, Z] })), (t[84] = X), (t[85] = Z), (t[86] = Q))
+    : (Q = t[86]);
+  let $;
+  return (
+    t[87] !== he || t[88] !== Q
+      ? (($ = (0, P.jsx)(fe, { returnPath: he, children: Q })),
+        (t[87] = he),
+        (t[88] = Q),
+        (t[89] = $))
+      : ($ = t[89]),
+    $
+  );
+}
+function pe(e) {
+  return window.setTimeout(e, 500);
+}
+async function me(e, t) {
+  let n = await h.safeGet(`/payments/checkout/{processor_entity}/{checkout_session_id}`, {
+    parameters: {
+      path: { processor_entity: e.processorEntity, checkout_session_id: e.checkoutSessionId },
+    },
+    signal: t,
   });
+  if (n.tag === `custom_checkout_session` && n.status === `complete`) return;
+  let r = await w(n.publishable_key);
+  if (r == null) throw Error(`Stripe failed to load`);
+  let i = await E(`checkout_session_approval`);
+  t.throwIfAborted();
+  let a = await h.safePost(`/payments/checkout/confirm`, {
+    requestBody: { checkout_session_id: e.checkoutSessionId },
+    additionalHeaders: i,
+    signal: t,
+  });
+  if (
+    a.status !== `success` ||
+    a.type !== `payment_intent` ||
+    a.conditional_offer_preflight !== !0 ||
+    a.client_secret == null
+  )
+    throw Error(`Conditional offer did not return a payment intent`);
+  if (
+    (t.throwIfAborted(),
+    (await r.confirmPayment({ clientSecret: a.client_secret, redirect: `if_required` })).error !=
+      null)
+  )
+    throw Error(`Conditional offer payment confirmation failed`);
 }
-
-export { CheckoutVerifyPage };
+var N, P;
+function F() {
+  return (F = e(() => {
+    ((N = t()),
+      b(),
+      S(),
+      T(),
+      ee(),
+      r(),
+      f(),
+      u(),
+      D(),
+      p(),
+      c(),
+      a(),
+      y(),
+      g(),
+      _(),
+      C(),
+      k(),
+      O(),
+      (P = n()));
+  }))();
+}
+F();
+export { j as CheckoutVerifyPage };

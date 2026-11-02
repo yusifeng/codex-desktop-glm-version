@@ -1,134 +1,127 @@
-// chatgpt-saved-memory-source-delete-dialog —— 来源面板内账户记忆的删除确认弹窗。
-// 原版：app/webview/assets/chatgpt-saved-memory-source-delete-dialog-d168320d4ec2.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-void runtimeChunk;
-const {
-  $3: initializeJsxRuntime,
-  Ah: DialogHeader,
-  I3: getJsxRuntime,
-  Ih: Dialog,
-  K2: initializeIntlRuntime,
-  Lh: DialogDescription,
-  Oh: DialogBody,
-  Ph: initializeDialogLayout,
-  Rh: DialogTitle,
-  Y2: FormattedMessage,
-  Yh: Button,
-  Zh: initializeButton,
-  jh: DialogSection,
-  kh: DialogFooter,
-  zh: initializeDialog,
-} = appSharedChunk;
-
-let jsxRuntime: JsxRuntime | null = null;
-
-interface ChatGptSavedMemorySourceDeleteDialogProps {
-  title: string;
-  onClose(): void;
-  onConfirm(): void;
-}
-
-interface FormSubmitEvent {
-  preventDefault(): void;
-}
-
-function ChatGptSavedMemorySourceDeleteDialog({
-  title,
-  onClose,
-  onConfirm,
-}: ChatGptSavedMemorySourceDeleteDialogProps): unknown {
-  const jsx = getInitializedJsxRuntime();
-  const handleOpenChange = (open: boolean) => {
-    if (!open) onClose();
-  };
-  const handleSubmit = (event: FormSubmitEvent) => {
-    event.preventDefault();
-    onConfirm();
-  };
-  const heading = jsx.jsx(DialogSection, {
-    children: jsx.jsx(DialogHeader, {
-      title: jsx.jsx(DialogTitle, {
-        children: jsx.jsx(FormattedMessage, {
-          id: "chatgptConversations.summaryPanel.sources.memory.delete.title",
-          defaultMessage: "Delete this memory?",
-          description:
-            "Title of the confirmation dialog opened from a saved-memory citation in the ChatGPT Sources side panel before permanently deleting that account memory.",
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Ah as n,
+  I3 as r,
+  Ih as i,
+  K2 as a,
+  Lh as o,
+  Oh as s,
+  Ph as c,
+  Rh as l,
+  Y2 as u,
+  Yh as d,
+  Zh as f,
+  jh as p,
+  kh as m,
+  zh as h,
+} from "@rchunk/app-shared";
+function g(e) {
+  let t = (0, _.c)(20),
+    { title: r, onClose: a, onConfirm: c } = e,
+    f;
+  t[0] === a
+    ? (f = t[1])
+    : ((f = (e) => {
+        e || a();
+      }),
+      (t[0] = a),
+      (t[1] = f));
+  let h;
+  t[2] === c
+    ? (h = t[3])
+    : ((h = (e) => {
+        (e.preventDefault(), c());
+      }),
+      (t[2] = c),
+      (t[3] = h));
+  let g;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((g = (0, v.jsx)(p, {
+        children: (0, v.jsx)(n, {
+          title: (0, v.jsx)(l, {
+            children: (0, v.jsx)(u, {
+              id: `chatgptConversations.summaryPanel.sources.memory.delete.title`,
+              defaultMessage: `Delete this memory?`,
+              description: `Title of the confirmation dialog opened from a saved-memory citation in the ChatGPT Sources side panel before permanently deleting that account memory.`,
+            }),
+          }),
         }),
-      }),
-    }),
-  });
-  const description = jsx.jsx(DialogSection, {
-    children: jsx.jsx(DialogDescription, {
-      children: jsx.jsx(FormattedMessage, {
-        id: "chatgptConversations.summaryPanel.sources.memory.delete.descriptionWithTitle",
-        defaultMessage:
-          '"{title}" will be deleted. ChatGPT may not remember this information going forward.',
-        description:
-          "Warning in the confirmation dialog opened from a saved-memory citation in the ChatGPT Sources side panel. Explains that one account memory, not conversation history, will be deleted.",
-        values: { title },
-      }),
-    }),
-  });
-  const cancelButton = jsx.jsx(Button, {
-    color: "secondary",
-    type: "button",
-    onClick: onClose,
-    children: jsx.jsx(FormattedMessage, {
-      id: "chatgptConversations.summaryPanel.sources.memory.delete.cancel",
-      defaultMessage: "Cancel",
-      description:
-        "Secondary button that closes saved-memory deletion confirmation from the ChatGPT Sources side panel without changing account memory.",
-    }),
-  });
-  const deleteButton = jsx.jsx(Button, {
-    color: "danger",
-    type: "submit",
-    children: jsx.jsx(FormattedMessage, {
-      id: "chatgptConversations.summaryPanel.sources.memory.delete.confirm",
-      defaultMessage: "Delete",
-      description:
-        "Destructive confirmation button that permanently deletes the cited saved account memory from the ChatGPT Sources side panel.",
-    }),
-  });
-  const form = jsx.jsxs(DialogBody, {
-    as: "form",
-    onSubmit: handleSubmit,
-    children: [
-      heading,
-      description,
-      jsx.jsxs(DialogFooter, { children: [cancelButton, deleteButton] }),
-    ],
-  });
-
-  return jsx.jsx(Dialog, {
-    open: true,
-    onOpenChange: handleOpenChange,
-    children: form,
-  });
+      })),
+      (t[4] = g))
+    : (g = t[4]);
+  let y;
+  t[5] === r
+    ? (y = t[6])
+    : ((y = (0, v.jsx)(p, {
+        children: (0, v.jsx)(o, {
+          children: (0, v.jsx)(u, {
+            id: `chatgptConversations.summaryPanel.sources.memory.delete.descriptionWithTitle`,
+            defaultMessage: `"{title}" will be deleted. ChatGPT may not remember this information going forward.`,
+            description: `Warning in the confirmation dialog opened from a saved-memory citation in the ChatGPT Sources side panel. Explains that one account memory, not conversation history, will be deleted.`,
+            values: { title: r },
+          }),
+        }),
+      })),
+      (t[5] = r),
+      (t[6] = y));
+  let b;
+  t[7] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((b = (0, v.jsx)(u, {
+        id: `chatgptConversations.summaryPanel.sources.memory.delete.cancel`,
+        defaultMessage: `Cancel`,
+        description: `Secondary button that closes saved-memory deletion confirmation from the ChatGPT Sources side panel without changing account memory.`,
+      })),
+      (t[7] = b))
+    : (b = t[7]);
+  let x;
+  t[8] === a
+    ? (x = t[9])
+    : ((x = (0, v.jsx)(d, { color: `secondary`, type: `button`, onClick: a, children: b })),
+      (t[8] = a),
+      (t[9] = x));
+  let S;
+  t[10] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((S = (0, v.jsx)(d, {
+        color: `danger`,
+        type: `submit`,
+        children: (0, v.jsx)(u, {
+          id: `chatgptConversations.summaryPanel.sources.memory.delete.confirm`,
+          defaultMessage: `Delete`,
+          description: `Destructive confirmation button that permanently deletes the cited saved account memory from the ChatGPT Sources side panel.`,
+        }),
+      })),
+      (t[10] = S))
+    : (S = t[10]);
+  let C;
+  t[11] === x
+    ? (C = t[12])
+    : ((C = (0, v.jsxs)(m, { children: [x, S] })), (t[11] = x), (t[12] = C));
+  let w;
+  t[13] !== h || t[14] !== y || t[15] !== C
+    ? ((w = (0, v.jsxs)(s, { as: `form`, onSubmit: h, children: [g, y, C] })),
+      (t[13] = h),
+      (t[14] = y),
+      (t[15] = C),
+      (t[16] = w))
+    : (w = t[16]);
+  let T;
+  return (
+    t[17] !== f || t[18] !== w
+      ? ((T = (0, v.jsx)(i, { open: !0, onOpenChange: f, children: w })),
+        (t[17] = f),
+        (t[18] = w),
+        (t[19] = T))
+      : (T = t[19]),
+    T
+  );
 }
-
-function initializeChatGptSavedMemorySourceDeleteDialog(): void {
-  if (jsxRuntime != null) return;
-  initializeJsxRuntime();
-  initializeIntlRuntime();
-  initializeButton();
-  initializeDialog();
-  initializeDialogLayout();
-  jsxRuntime = getJsxRuntime();
+var _, v;
+function y() {
+  return (y = e(() => {
+    ((_ = t()), a(), f(), h(), c(), (v = r()));
+  }))();
 }
-
-function getInitializedJsxRuntime(): JsxRuntime {
-  initializeChatGptSavedMemorySourceDeleteDialog();
-  if (jsxRuntime == null) {
-    throw new Error("Saved memory delete dialog JSX runtime failed to initialize");
-  }
-  return jsxRuntime;
-}
-
-initializeChatGptSavedMemorySourceDeleteDialog();
-
-export { ChatGptSavedMemorySourceDeleteDialog };
+y();
+export { g as ChatGptSavedMemorySourceDeleteDialog };

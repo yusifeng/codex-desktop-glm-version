@@ -1,35 +1,20 @@
-// Specific heat specification. Release chunk: type-34ba530d4dd9.js.
-import "@rchunk/rolldown-runtime";
-
-interface Specification {
-  type: "SPECIFIC_HEAT";
-  version: 1;
-  thumbnailAssetKey: "specific-heat-v2";
-  canonicalFormula: "\\Delta T = \\frac{q}{mc}";
-  parameters: {
-    material: {
-      kind: "enum";
-      defaultValue: "water";
-      allowedValues: ["copper", "sand", "water"];
-    };
-    heatKj: { kind: "number"; defaultValue: 40; min: 0; max: 60 };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `SPECIFIC_HEAT`),
+      (n = `specific-heat-v2`),
+      (r = `\\Delta T = \\frac{q}{mc}`),
+      (i = {
+        material: {
+          kind: `enum`,
+          defaultValue: `water`,
+          allowedValues: [`copper`, `sand`, `water`],
+        },
+        heatKj: { kind: `number`, defaultValue: 40, min: 0, max: 60 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-let specification: Specification;
-function initializeSpecification(): void {
-  specification ??= {
-    type: "SPECIFIC_HEAT",
-    version: 1,
-    thumbnailAssetKey: "specific-heat-v2",
-    canonicalFormula: "\\Delta T = \\frac{q}{mc}",
-    parameters: {
-      material: {
-        kind: "enum",
-        defaultValue: "water",
-        allowedValues: ["copper", "sand", "water"],
-      },
-      heatKj: { kind: "number", defaultValue: 40, min: 0, max: 60 },
-    },
-  };
-}
-export { specification as n, initializeSpecification as t };
+export { a as n, o as t };

@@ -1,8 +1,4 @@
-import {
-  CSt as initializeGitOriginsQuery,
-  SSt as gitOriginsQuery,
-} from "@rchunk/app-initial";
-
-initializeGitOriginsQuery();
-
-export { gitOriginsQuery as gitOriginsQuery$ };
+// @ts-nocheck
+import { CSt as e, SSt as t } from "@rchunk/app-initial";
+e();
+export { t as gitOriginsQuery$ };

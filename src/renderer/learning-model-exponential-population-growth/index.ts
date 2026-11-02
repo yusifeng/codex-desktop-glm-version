@@ -1,18 +1,17 @@
-// Exponential-population-growth manifest. Release chunk: type-d30facd9fda1.js.
-import "@rchunk/rolldown-runtime";
-
-const exponentialPopulationGrowthSpecification = {
-  type: "EXPONENTIAL_POPULATION_GROWTH",
-  version: 1,
-  thumbnailAssetKey: "exponential-population-growth-v1",
-  canonicalFormula: "N(t)=N_0(1+r)^t",
-  parameters: {
-    initial_population: { kind: "integer" as const, defaultValue: 200, min: 20, max: 2_000 },
-    growth_rate_percent: { kind: "number" as const, defaultValue: 10, min: 4, max: 15 },
-    elapsed_periods: { kind: "number" as const, defaultValue: 10, min: 0, max: 20 },
-  },
-};
-
-function initializeExponentialPopulationGrowthSpecification(): void {}
-
-export { exponentialPopulationGrowthSpecification as n, initializeExponentialPopulationGrowthSpecification as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `EXPONENTIAL_POPULATION_GROWTH`),
+      (n = `exponential-population-growth-v1`),
+      (r = `N(t)=N_0(1+r)^t`),
+      (i = {
+        initial_population: { kind: `integer`, defaultValue: 200, min: 20, max: 2e3 },
+        growth_rate_percent: { kind: `number`, defaultValue: 10, min: 4, max: 15 },
+        elapsed_periods: { kind: `number`, defaultValue: 10, min: 0, max: 20 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+export { a as n, o as t };

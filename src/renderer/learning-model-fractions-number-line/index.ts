@@ -1,82 +1,61 @@
-// Fractions-on-a-number-line learning model. Release chunk: model-e01a7cfd8d48.js.
-import "@rchunk/rolldown-runtime";
-
-interface FractionValues { numerator?: number | null; denominator?: number | null }
-interface NormalizedFractionValues { numerator: number; denominator: number }
-interface FractionsManifest {
-  type: string; version: number; thumbnailAssetKey: string;
-  parameters: {
-    numerator: { kind: "integer"; defaultValue: number; min: number; max: number };
-    denominator: { kind: "integer"; defaultValue: number; min: number; max: number };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `FRACTIONS_NUMBER_LINE`),
+      (n = `fractions-number-line-v1`),
+      (r = {
+        numerator: { kind: `integer`, defaultValue: 7, min: 0, max: 36 },
+        denominator: { kind: `integer`, defaultValue: 4, min: 2, max: 12 },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-let fractionsManifest: FractionsManifest;
-let numeratorControl: FractionsManifest["parameters"]["numerator"];
-let denominatorControl: FractionsManifest["parameters"]["denominator"];
-let normalizeFractionValues: (values: FractionValues) => NormalizedFractionValues;
-let calculateFractionPosition: (values: FractionValues) => {
-  classification: "zero" | "proper" | "one" | "whole" | "improper"; denominator: number; maxNumerator: number;
-  numerator: number; positionRatio: number; remainder: number; value: number; visibleMaxNumerator: number; visibleUnits: number; whole: number;
-};
-let generateSubdivisionIndices: (denominator: number, visibleUnits: number) => number[];
-let generateLabelNumerators: (visibleMaxNumerator: number) => number[];
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeFractionsManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  fractionsManifest = {
-    type: "FRACTIONS_NUMBER_LINE", version: 2, thumbnailAssetKey: "fractions-number-line-v1",
-    parameters: {
-      numerator: { kind: "integer", defaultValue: 7, min: 0, max: 36 },
-      denominator: { kind: "integer", defaultValue: 4, min: 2, max: 12 },
-    },
-  };
+var o, s, c, l, u, d, f, p;
+function m() {
+  return (m = e(() => {
+    (a(),
+      (o = i.parameters.numerator),
+      (s = i.parameters.denominator),
+      (c = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (l = (e, t, n, r) => c(Math.round(Number.isFinite(e) ? (e ?? t) : t), n, r)),
+      (u = (e) => ({
+        denominator: l(e.denominator, s.defaultValue, s.min, s.max),
+        numerator: l(e.numerator, o.defaultValue, o.min, o.max),
+      })),
+      (d = (e) => {
+        let { denominator: t, numerator: n } = u(e),
+          r = Math.floor(n / t),
+          i = n % t,
+          a = Math.max(1, Math.ceil(n / t)),
+          s = o.max,
+          c = a * t;
+        return {
+          classification:
+            n === 0 ? `zero` : n < t ? `proper` : n === t ? `one` : i === 0 ? `whole` : `improper`,
+          denominator: t,
+          maxNumerator: s,
+          numerator: n,
+          positionRatio: n / c,
+          remainder: i,
+          value: n / t,
+          visibleMaxNumerator: c,
+          visibleUnits: a,
+          whole: r,
+        };
+      }),
+      (f = (e, t) => {
+        let n = u({ denominator: e, numerator: 0 }).denominator,
+          r = Math.max(1, Math.round(t));
+        return Array.from({ length: n * r + 1 }, (e, t) => t);
+      }),
+      (p = (e) => {
+        let t = Math.max(1, Math.round(e)),
+          n = Math.max(1, Math.ceil(t / 6)),
+          r = Array.from({ length: Math.floor(t / n) + 1 }, (e, t) => t * n);
+        return (r.at(-1) !== t && r.push(t), r);
+      }));
+  }))();
 }
-
-function initializeFractionsNumberLineModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializeFractionsManifest();
-  numeratorControl = fractionsManifest.parameters.numerator;
-  denominatorControl = fractionsManifest.parameters.denominator;
-  const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-  const normalizeInteger = (value: number | null | undefined, fallback: number, minimum: number, maximum: number): number =>
-    clamp(Math.round(typeof value === "number" && Number.isFinite(value) ? value : fallback), minimum, maximum);
-  normalizeFractionValues = values => ({
-    denominator: normalizeInteger(values.denominator, denominatorControl.defaultValue, denominatorControl.min, denominatorControl.max),
-    numerator: normalizeInteger(values.numerator, numeratorControl.defaultValue, numeratorControl.min, numeratorControl.max),
-  });
-  calculateFractionPosition = values => {
-    const { denominator, numerator } = normalizeFractionValues(values);
-    const whole = Math.floor(numerator / denominator);
-    const remainder = numerator % denominator;
-    const visibleUnits = Math.max(1, Math.ceil(numerator / denominator));
-    const visibleMaxNumerator = visibleUnits * denominator;
-    return {
-      classification: numerator === 0 ? "zero" : numerator < denominator ? "proper" : numerator === denominator ? "one" : remainder === 0 ? "whole" : "improper",
-      denominator, maxNumerator: numeratorControl.max, numerator, positionRatio: numerator / visibleMaxNumerator, remainder,
-      value: numerator / denominator, visibleMaxNumerator, visibleUnits, whole,
-    };
-  };
-  generateSubdivisionIndices = (denominator, visibleUnits) => {
-    const normalizedDenominator = normalizeFractionValues({ denominator, numerator: 0 }).denominator;
-    const normalizedUnits = Math.max(1, Math.round(visibleUnits));
-    return Array.from({ length: normalizedDenominator * normalizedUnits + 1 }, (_unused, index) => index);
-  };
-  generateLabelNumerators = visibleMaxNumerator => {
-    const maximum = Math.max(1, Math.round(visibleMaxNumerator));
-    const step = Math.max(1, Math.ceil(maximum / 6));
-    const labels = Array.from({ length: Math.floor(maximum / step) + 1 }, (_unused, index) => index * step);
-    if (labels.at(-1) !== maximum) labels.push(maximum);
-    return labels;
-  };
-}
-
-export {
-  generateLabelNumerators as a, initializeFractionsManifest as c, generateSubdivisionIndices as i, fractionsManifest as l,
-  numeratorControl as n, initializeFractionsNumberLineModel as o, calculateFractionPosition as r,
-  normalizeFractionValues as s, denominatorControl as t,
-};
+export { p as a, a as c, f as i, i as l, o as n, m as o, d as r, u as s, s as t };

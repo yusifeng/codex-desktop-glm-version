@@ -1,150 +1,98 @@
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $O as queryConstants,
-  CL as useQueryClient,
-  SL as initializeQueries,
-  _L as useQuery,
-  ek as initializeMutations,
-  gL as initializeQueryClient,
-  iL as useMutation,
-  rL as initializeQueryRuntime,
+  $3 as t,
+  $O as n,
+  CL as r,
+  SL as i,
+  _L as a,
+  ek as o,
+  gL as s,
+  iL as c,
+  rL as l,
 } from "@rchunk/app-shared";
-import {
-  pdn as initializeCloudPreferencesApi,
-  udn as cloudPreferencesApi,
-} from "@rchunk/app-initial";
-import "@rchunk/rolldown-runtime";
-
-export interface PathTemplateVariable {
-  value: string;
-  example: string;
-  char_count: number;
-}
-
-export type PathTemplateError =
-  | "bracket-mismatch"
-  | "invalid-characters"
-  | "invalid-pattern"
-  | "leading-slash"
-  | "missing-pattern"
-  | "too-long";
-
-interface PreferencesApi {
-  safeGet(path: string): Promise<unknown>;
-  safePatch(path: string, options: { requestBody: unknown }): Promise<unknown>;
-}
-
-const cloudUserPreferencesQueryKey = ["cloud-user-preferences"];
-const cloudPreferencesConfigQueryKey = ["cloud-preferences-config"];
-
-function useCloudUserPreferences(): unknown {
-  return useQuery({
-    queryKey: cloudUserPreferencesQueryKey,
-    queryFn: fetchCloudUserPreferences,
-    retry: false,
-    staleTime: queryConstants.FIVE_MINUTES,
-  });
-}
-
-function fetchCloudUserPreferences(): Promise<unknown> {
-  return (cloudPreferencesApi as PreferencesApi).safeGet("/wham/settings/user");
-}
-
-function useCloudPreferencesConfig(): unknown {
-  return useQuery({
-    queryKey: cloudPreferencesConfigQueryKey,
-    queryFn: fetchCloudPreferencesConfig,
-    retry: false,
-    staleTime: queryConstants.FIVE_MINUTES,
-  });
-}
-
-function fetchCloudPreferencesConfig(): Promise<unknown> {
-  return (cloudPreferencesApi as PreferencesApi).safeGet(
-    "/wham/settings/configs/user-preferences",
+import { pdn as u, udn as d } from "@rchunk/app-initial";
+function f() {
+  let e = (0, x.c)(1),
+    t;
+  return (
+    e[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = { queryKey: S, queryFn: p, retry: !1, staleTime: n.FIVE_MINUTES }), (e[0] = t))
+      : (t = e[0]),
+    a(t)
   );
 }
-
-function useUpdateCloudUserPreferences(): unknown {
-  const queryClient = useQueryClient() as unknown as {
-    setQueryData(queryKey: readonly unknown[], value: unknown): void;
-  };
-  return useMutation({
-    mutationFn: updateCloudUserPreferences,
-    onSuccess: (value: unknown) => {
-      queryClient.setQueryData(cloudUserPreferencesQueryKey, value);
-    },
-  });
+function p() {
+  return d.safeGet(`/wham/settings/user`);
 }
-
-function updateCloudUserPreferences(value: unknown): Promise<unknown> {
-  return (cloudPreferencesApi as PreferencesApi).safePatch(
-    "/wham/settings/user",
-    {
-      requestBody: value,
-    },
+function m() {
+  let e = (0, x.c)(1),
+    t;
+  return (
+    e[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = { queryKey: C, queryFn: h, retry: !1, staleTime: n.FIVE_MINUTES }), (e[0] = t))
+      : (t = e[0]),
+    a(t)
   );
 }
-
-function substitutePathTemplate(
-  template: string,
-  variables: readonly PathTemplateVariable[],
-  value: (variable: PathTemplateVariable) => string,
-): string {
-  let result = template;
-  for (const variable of variables)
-    result = result.replaceAll(variable.value, value(variable));
-  return result;
+function h() {
+  return d.safeGet(`/wham/settings/configs/user-preferences`);
 }
-
-function validatePathTemplate(
-  template: string,
-  maxLength: number,
-  variables: readonly PathTemplateVariable[],
-): PathTemplateError | null {
-  const opening = (template.match(/{/g) ?? []).length;
-  if (opening !== (template.match(/}/g) ?? []).length)
-    return "bracket-mismatch";
-  if (opening === 0) return "missing-pattern";
-  const allowed = variables.map((variable) => variable.value);
-  if (
-    (template.match(/{([^}]+)}/g) ?? []).some(
-      (pattern) => !allowed.includes(pattern),
-    )
-  ) {
-    return "invalid-pattern";
-  }
-  const expanded = substitutePathTemplate(template, variables, (variable) =>
-    "x".repeat(variable.char_count),
-  );
-  if (expanded.length > maxLength) return "too-long";
-  if (expanded.startsWith("/")) return "leading-slash";
-  return /^[a-zA-Z0-9./\-_]+$/.test(expanded) ? null : "invalid-characters";
-}
-
-function previewPathTemplate(
-  template: string,
-  variables: readonly PathTemplateVariable[],
-): string {
-  return substitutePathTemplate(
-    template,
-    variables,
-    (variable) => variable.example,
+function g() {
+  let e = (0, x.c)(2),
+    t = r(),
+    n;
+  return (
+    e[0] === t
+      ? (n = e[1])
+      : ((n = {
+          mutationFn: _,
+          onSuccess: (e) => {
+            t.setQueryData(S, e);
+          },
+        }),
+        (e[0] = t),
+        (e[1] = n)),
+    c(n)
   );
 }
-
-function initializeCloudPreferences(): void {
-  initializeQueryRuntime();
-  initializeQueryClient();
-  initializeQueries();
-  initializeMutations();
-  initializeCloudPreferencesApi();
+function _(e) {
+  return d.safePatch(`/wham/settings/user`, { requestBody: e });
 }
-
-export {
-  useCloudUserPreferences as a,
-  useCloudPreferencesConfig as i,
-  validatePathTemplate as n,
-  useUpdateCloudUserPreferences as o,
-  initializeCloudPreferences as r,
-  previewPathTemplate as t,
-};
+function v(e, t, n) {
+  let r = (e.match(/{/g) ?? []).length;
+  if (r !== (e.match(/}/g) ?? []).length) return `bracket-mismatch`;
+  if (r === 0) return `missing-pattern`;
+  let i = n.map((e) => e.value);
+  if ((e.match(/{([^}]+)}/g) ?? []).some((e) => !i.includes(e))) return `invalid-pattern`;
+  let a = b(e, n, (e) => `x`.repeat(e.char_count));
+  return a.length > t
+    ? `too-long`
+    : a.startsWith(`/`)
+      ? `leading-slash`
+      : /^[a-zA-Z0-9./\-_]+$/.test(a)
+        ? null
+        : `invalid-characters`;
+}
+function y(e, t) {
+  return b(e, t, (e) => e.example);
+}
+function b(e, t, n) {
+  let r = e;
+  for (let e of t) r = r.replaceAll(e.value, n(e));
+  return r;
+}
+var x, S, C;
+function w() {
+  return (w = e(() => {
+    ((x = t()),
+      l(),
+      s(),
+      i(),
+      o(),
+      u(),
+      (S = [`cloud-user-preferences`]),
+      (C = [`cloud-preferences-config`]));
+  }))();
+}
+export { f as a, m as i, v as n, g as o, w as r, y as t };

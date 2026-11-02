@@ -1,111 +1,69 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { H4 as t, V4 as n, g4 as r, q4 as i } from "@rchunk/app-shared";
 import {
-  H4 as objectSchema,
-  V4 as numberSchema,
-  g4 as initializeValidationRuntime,
-  q4 as stringSchema,
-} from "@rchunk/app-shared";
-import {
-  Ix as initializeReauthentication,
-  Run as initializeAuthUrl,
-  Rx as createReauthenticationUrl,
-  Sdn as ApiError,
-  Vun as getAccessToken,
-  bfn as initializeAuthenticationState,
-  pdn as initializeApiHeaders,
-  udn as apiClient,
-  wdn as initializeApiClient,
-  yfn as getAuthenticationState,
+  Ix as a,
+  Run as o,
+  Rx as s,
+  Sdn as c,
+  Vun as l,
+  bfn as u,
+  pdn as d,
+  udn as f,
+  wdn as p,
+  yfn as m,
 } from "@rchunk/app-initial";
-import {
-  n as decodeJwt,
-  t as initializeJwtDecoder,
-} from "@rchunk/browser-mfa-jwt";
-
-interface AccessTokenClaims extends Record<string, unknown> {
-  pwd_auth_time?: number;
-  "https://api.openai.com/mfa"?: { required?: string };
-}
-
-let accessTokenSchema: ReturnType<typeof objectSchema>;
-let initialized = false;
-function initializeBrowserMfaSession(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeJwtDecoder();
-  initializeValidationRuntime();
-  initializeAuthUrl();
-  initializeAuthenticationState();
-  initializeApiHeaders();
-  initializeApiClient();
-  initializeReauthentication();
-  accessTokenSchema = objectSchema({
-    pwd_auth_time: numberSchema().optional(),
-    "https://api.openai.com/mfa": objectSchema({
-      required: stringSchema(),
-    }).optional(),
-  });
-}
-
-async function needsRecentAuthentication(ignoreMfaRequirement?: boolean): Promise<boolean> {
-  const accessToken = await getAccessToken();
-  if (!accessToken) return true;
+import { n as h, t as g } from "@rchunk/browser-mfa-jwt";
+async function _(e) {
+  let t = await l();
+  if (!t) return !0;
   try {
-    const claims = accessTokenSchema.parse(
-      decodeJwt(accessToken.accessToken),
-    ) as AccessTokenClaims;
-    return !claims.pwd_auth_time ||
-      Date.now() - claims.pwd_auth_time > 240_000 ||
-      (ignoreMfaRequirement === true && claims["https://api.openai.com/mfa"]?.required !== "yes");
+    let n = x.parse(h(t.accessToken));
+    return (
+      !n.pwd_auth_time ||
+      Date.now() - n.pwd_auth_time > 24e4 ||
+      (e && n[`https://api.openai.com/mfa`]?.required !== `yes`)
+    );
   } catch {
-    return true;
+    return !0;
   }
 }
-
-async function startReauthentication(
-  url: string,
-  signal?: AbortSignal,
-): Promise<boolean> {
-  const result = await createReauthenticationUrl(
-    url,
-    getAuthenticationState().auth.reauthenticationParams,
-    signal,
-  );
-  if (!result.ok || signal?.aborted) return false;
-  window.location.assign(result.url);
-  return true;
+async function v(e, t) {
+  let n = await s(e, m().auth.reauthenticationParams, t);
+  return !n.ok || t?.aborted ? !1 : (window.location.assign(n.url), !0);
 }
-
-function isReauthenticationError(error: unknown): boolean {
-  return error instanceof ApiError && (
-    error.status === 401 ||
-    error.errorCode === "recent_auth_required" ||
-    error.errorCode === "reauth_required"
+function y(e) {
+  return (
+    e instanceof c &&
+    (e.status === 401 ||
+      e.errorCode === `recent_auth_required` ||
+      e.errorCode === `reauth_required`)
   );
 }
-
-function getMfaInfoQueryOptions(accountId: string): {
-  gcTime: 0;
-  queryFn(context: { signal: AbortSignal }): Promise<unknown>;
-  queryKey: [string, string];
-  refetchOnWindowFocus: false;
-  retry: false;
-  staleTime: 0;
-} {
+function b(e) {
   return {
-    queryKey: ["browser-mfa-info", accountId],
-    queryFn: ({ signal }) => apiClient.safeGet("/accounts/mfa_info", { signal }),
+    queryKey: [`browser-mfa-info`, e],
+    queryFn: ({ signal: e }) => f.safeGet(`/accounts/mfa_info`, { signal: e }),
     staleTime: 0,
     gcTime: 0,
-    retry: false,
-    refetchOnWindowFocus: false,
+    retry: !1,
+    refetchOnWindowFocus: !1,
   };
 }
-
-export {
-  startReauthentication as a,
-  needsRecentAuthentication as i,
-  initializeBrowserMfaSession as n,
-  isReauthenticationError as r,
-  getMfaInfoQueryOptions as t,
-};
+var x;
+function S() {
+  return (S = e(() => {
+    (g(),
+      r(),
+      o(),
+      u(),
+      d(),
+      p(),
+      a(),
+      (x = t({
+        pwd_auth_time: n().optional(),
+        "https://api.openai.com/mfa": t({ required: i() }).optional(),
+      })));
+  }))();
+}
+export { v as a, _ as i, S as n, y as r, b as t };

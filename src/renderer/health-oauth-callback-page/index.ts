@@ -1,139 +1,138 @@
-// health-oauth-callback-page —— 健康服务 OAuth 回跳确认与窗口关闭兜底。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-void runtimeChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  $h: initializeLoadingSpinner,
-  BX: useSignalFamilyValue,
-  FX: initializeSignalRuntime,
-  FZ: rejectMissingQueryParameter,
-  HX: useSignalValue,
-  I3: getJsxRuntime,
-  K2: initializeSharedUi,
-  QI: initializeScopeRuntime,
-  QX: createQueryFamily,
-  Qh: LoadingSpinner,
-  Y2: FormattedMessage,
-  ZI: appScope,
-  e6: reactRuntime,
-  jZ: initializeMotionRuntime,
-} = appSharedChunk;
-const {
-  Qgn: initializeAccountContext,
-  Sun: initializeHealthProvider,
-  cJt: initializeApiClient,
-  i_n: useLocation,
-  mun: currentAccountIdSignal,
-  o_n: useNavigate,
-  rJt: apiClient,
-} = appInitialChunk;
-
-interface HealthOAuthCallbackResult {
-  postAuthRedirectPath: string;
-}
-
-interface HealthOAuthCallbackParameter {
-  accountId: string | null;
-  url: string;
-}
-
-let callbackQuery: import("@rchunk/app-shared").ScopedQueryFamily<
-  Record<string, unknown>,
-  HealthOAuthCallbackParameter,
-  HealthOAuthCallbackResult
->;
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function HealthOAuthCallbackPage(): unknown {
-  const accountId = useSignalValue(currentAccountIdSignal);
-  return accountId == null
-    ? jsx.jsx(LoadingSpinner, {})
-    : jsx.jsx(HealthOAuthCallbackContent, { currentAccountId: accountId });
-}
-
-function HealthOAuthCallbackContent({
-  currentAccountId,
-}: {
-  currentAccountId: string;
-}): unknown {
-  const [initialAccountId] = reactRuntime.useState(currentAccountId);
-  const location = useLocation();
-  const navigate = useNavigate();
-  const url = new URL(
-    `${location.pathname}${location.search}${location.hash}`,
-    window.location.origin,
-  ).href;
-  const accountChanged = currentAccountId !== initialAccountId;
-  const query = useSignalFamilyValue(callbackQuery, {
-    accountId: accountChanged ? null : initialAccountId,
-    url,
-  });
-  reactRuntime.useEffect(() => {
-    if (accountChanged) return;
-    if (query.isError) {
-      navigate("/", { replace: true });
-      return;
-    }
-    if (query.data == null) return;
-    window.close();
-    const timeout = window.setTimeout(() => {
-      navigate(query.data!.postAuthRedirectPath, { replace: true });
-    }, 150);
-    return () => window.clearTimeout(timeout);
-  }, [query.data, query.isError, accountChanged, navigate]);
-  return jsx.jsx("div", {
-    className: "flex min-h-32 flex-col items-center justify-center gap-3",
-    role: "status",
-    children: accountChanged
-      ? jsx.jsx(FormattedMessage, {
-          id: "health.oauth.error",
-          defaultMessage: "Couldn’t finish connecting your provider",
-          description:
-            "Error shown when the user switches accounts before the Health provider connection finishes",
-        })
-      : jsx.jsx(LoadingSpinner, {}),
-  });
-}
-
-function initializeHealthOAuthCallbackPage(): void {
-  initializeRuntimeLazy();
-  initializeMotionRuntime();
-  initializeSignalRuntime();
-  reactRuntime();
-  initializeSharedUi();
-  initializeAccountContext();
-  initializeHealthProvider();
-  initializeApiClient();
-  initializeLoadingSpinner();
-  initializeScopeRuntime();
-  jsx = getJsxRuntime();
-  callbackQuery = createQueryFamily(
-    appScope,
-    ({ accountId, url }, { get }) => ({
-      queryKey: ["health", accountId, "oauth-callback", url],
-      enabled: get(currentAccountIdSignal) === accountId,
-      queryFn:
-        accountId == null
-          ? rejectMissingQueryParameter
-          : ({ signal }) =>
-              apiClient.safePost<HealthOAuthCallbackResult>(
-                "/aip/olympic/oauth/callback",
-                {
-                  additionalHeaders: { "ChatGPT-Account-ID": accountId },
-                  requestBody: { full_redirect_url: url },
-                  signal,
-                },
-              ),
-      staleTime: Infinity,
-      gcTime: 0,
-      retry: false,
-      refetchOnReconnect: false,
-    }),
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $h as n,
+  BX as r,
+  FX as i,
+  FZ as a,
+  HX as o,
+  I3 as s,
+  K2 as c,
+  QI as l,
+  QX as u,
+  Qh as d,
+  Y2 as f,
+  ZI as p,
+  e6 as m,
+  jZ as h,
+} from "@rchunk/app-shared";
+import {
+  Qgn as g,
+  Sun as _,
+  cJt as v,
+  i_n as y,
+  mun as b,
+  o_n as x,
+  rJt as S,
+} from "@rchunk/app-initial";
+function C(e) {
+  let t = (0, T.c)(2),
+    n = o(b),
+    r;
+  return (
+    t[0] === n
+      ? (r = t[1])
+      : ((r = n == null ? (0, D.jsx)(d, {}) : (0, D.jsx)(w, { currentAccountId: n })),
+        (t[0] = n),
+        (t[1] = r)),
+    r
   );
 }
-
-initializeHealthOAuthCallbackPage();
-export { HealthOAuthCallbackPage };
+function w(e) {
+  let t = (0, T.c)(13),
+    { currentAccountId: n } = e,
+    [i] = (0, E.useState)(n),
+    a = y(),
+    o = x(),
+    s = `${a.pathname}${a.search}${a.hash}`,
+    c;
+  t[0] === s ? (c = t[1]) : ((c = new URL(s, window.location.origin)), (t[0] = s), (t[1] = c));
+  let l = c.href,
+    u = n !== i,
+    p = u ? null : i,
+    m;
+  t[2] !== p || t[3] !== l
+    ? ((m = { accountId: p, url: l }), (t[2] = p), (t[3] = l), (t[4] = m))
+    : (m = t[4]);
+  let { data: h, isError: g } = r(O, m),
+    _,
+    v;
+  (t[5] !== u || t[6] !== h || t[7] !== g || t[8] !== o
+    ? ((_ = () => {
+        if (u) return;
+        if (g) {
+          o(`/`, { replace: !0 });
+          return;
+        }
+        if (h == null) return;
+        window.close();
+        let e = window.setTimeout(() => {
+          o(h.postAuthRedirectPath, { replace: !0 });
+        }, 150);
+        return () => window.clearTimeout(e);
+      }),
+      (v = [h, g, u, o]),
+      (t[5] = u),
+      (t[6] = h),
+      (t[7] = g),
+      (t[8] = o),
+      (t[9] = _),
+      (t[10] = v))
+    : ((_ = t[9]), (v = t[10])),
+    (0, E.useEffect)(_, v));
+  let b;
+  return (
+    t[11] === u
+      ? (b = t[12])
+      : ((b = (0, D.jsx)(`div`, {
+          className: `flex min-h-32 flex-col items-center justify-center gap-3`,
+          role: `status`,
+          children: u
+            ? (0, D.jsx)(f, {
+                id: `health.oauth.error`,
+                defaultMessage: `Couldn’t finish connecting your provider`,
+                description: `Error shown when the user switches accounts before the Health provider connection finishes`,
+              })
+            : (0, D.jsx)(d, {}),
+        })),
+        (t[11] = u),
+        (t[12] = b)),
+    b
+  );
+}
+var T, E, D, O;
+function k() {
+  return (k = e(() => {
+    ((T = t()),
+      h(),
+      i(),
+      (E = m()),
+      c(),
+      g(),
+      _(),
+      v(),
+      n(),
+      l(),
+      (D = s()),
+      (O = u(p, ({ accountId: e, url: t }, { get: n }) => ({
+        queryKey: [`health`, e, `oauth-callback`, t],
+        enabled: n(b) === e,
+        queryFn:
+          e == null
+            ? a
+            : ({ signal: n }) =>
+                S.safePost(`/aip/olympic/oauth/callback`, {
+                  additionalHeaders: { "ChatGPT-Account-ID": e },
+                  requestBody: { full_redirect_url: t },
+                  signal: n,
+                }),
+        staleTime: 1 / 0,
+        gcTime: 0,
+        retry: !1,
+        refetchOnReconnect: !1,
+      }))));
+  }))();
+}
+k();
+export { C as HealthOAuthCallbackPage };

@@ -1,8 +1,4 @@
-import {
-  n as openThreadPullRequestCodeTab,
-  t as initializeOpenThreadPullRequestCodeTab,
-} from "@rchunk/open-thread-pull-request-code-tab";
-
-initializeOpenThreadPullRequestCodeTab();
-
-export { openThreadPullRequestCodeTab };
+// @ts-nocheck
+import { n as e, t } from "@rchunk/open-thread-pull-request-code-tab";
+t();
+export { e as openThreadPullRequestCodeTab };

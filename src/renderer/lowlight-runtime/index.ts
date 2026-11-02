@@ -1,247 +1,133 @@
-// Lowlight syntax-highlighting runtime. Release chunk: lowlight-62906d2993ab.js.
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import "@rchunk/app-initial";
-import * as lowlightCoreChunk from "@rchunk/lowlight-core";
-
-interface TextNode {
-  type: "text";
-  value: string;
-}
-interface ElementNode {
-  type: "element";
-  tagName: "span";
-  properties: { className: string[] };
-  children: HastNode[];
-}
-interface RootNode {
-  type: "root";
-  children: HastNode[];
-  data: { language: string | undefined; relevance: number };
-}
-type HastNode = TextNode | ElementNode;
-type LanguageDefinition = (core: unknown) => unknown;
-interface HighlightResult {
-  language?: string;
-  relevance: number;
-  errorRaised?: unknown;
-  _emitter: LowlightEmitter;
-}
-interface HighlightCore {
-  getLanguage(name: string): unknown;
-  configure(options: {
-    __emitter: typeof LowlightEmitter;
-    classPrefix: string;
-  }): void;
-  highlight(
-    code: string,
-    options: { ignoreIllegals: true; language: string },
-  ): HighlightResult;
-  listLanguages(): string[];
-  registerLanguage(name: string, definition: LanguageDefinition): void;
-  registerAliases(
-    aliases: string | string[],
-    options: { languageName: string },
-  ): void;
-}
-interface LowlightCoreRuntime {
-  n(): void;
-  t: { newInstance(): HighlightCore };
-}
-interface LowlightOptions {
-  prefix?: string;
-  subset?: string[];
-}
-type LanguageMap = Record<string, LanguageDefinition>;
-type AliasMap = Record<string, string | string[]>;
-
-const { n: initializeLowlightCore, t: highlightCore } =
-  lowlightCoreChunk as unknown as LowlightCoreRuntime;
-const defaultPrefix = "hljs-";
-
-class LowlightEmitter {
-  readonly root: RootNode = {
-    type: "root",
-    children: [],
-    data: { language: undefined, relevance: 0 },
-  };
-  private readonly stack: Array<RootNode | ElementNode> = [this.root];
-
-  constructor(private readonly options: { classPrefix: string }) {}
-
-  addText(value: string): void {
-    if (value === "") return;
-    const parent = this.stack[this.stack.length - 1];
-    if (!parent) return;
-    const previous = parent.children[parent.children.length - 1];
-    if (previous?.type === "text") previous.value += value;
-    else parent.children.push({ type: "text", value });
-  }
-
-  startScope(scope: unknown): void {
-    this.openNode(String(scope));
-  }
-
-  endScope(): void {
-    this.closeNode();
-  }
-
-  __addSublanguage(
-    emitter: LowlightEmitter,
-    language: string | undefined,
-  ): void {
-    const parent = this.stack[this.stack.length - 1];
-    if (!parent) return;
-    if (language) {
-      parent.children.push({
-        type: "element",
-        tagName: "span",
-        properties: { className: [language] },
-        children: emitter.root.children,
-      });
-    } else parent.children.push(...emitter.root.children);
-  }
-
-  openNode(scope: string): void {
-    const className = scope
-      .split(".")
-      .map((part, index) =>
-        index === 0
-          ? this.options.classPrefix + part
-          : part + "_".repeat(index),
-      );
-    const parent = this.stack[this.stack.length - 1];
-    if (!parent) return;
-    const node: ElementNode = {
-      type: "element",
-      tagName: "span",
-      properties: { className },
-      children: [],
-    };
-    parent.children.push(node);
-    this.stack.push(node);
-  }
-
-  closeNode(): void {
-    this.stack.pop();
-  }
-
-  finalize(): void {}
-  toHTML(): string {
-    return "";
-  }
-}
-
-function createLowlight(initialLanguages?: LanguageMap) {
-  const core = highlightCore.newInstance();
-  if (initialLanguages) register(initialLanguages);
-
-  function highlight(
-    language: string,
-    code: string,
-    options: LowlightOptions = {},
-  ): RootNode {
-    const prefix =
-      typeof options.prefix === "string" ? options.prefix : defaultPrefix;
-    if (!core.getLanguage(language)) {
-      throw new Error("Unknown language: " + language + " is not registered");
+import { n as t, t as n } from "@rchunk/mermaid-parser-core-default-bridge";
+function r(e) {
+  let t = n.newInstance();
+  return (
+    e && l(e),
+    {
+      highlight: r,
+      highlightAuto: s,
+      listLanguages: c,
+      register: l,
+      registerAlias: u,
+      registered: d,
     }
-    core.configure({ __emitter: LowlightEmitter, classPrefix: prefix });
-    const result = core.highlight(code, { ignoreIllegals: true, language });
-    if (result.errorRaised) {
-      throw new Error("Could not highlight with Highlight.js", {
-        cause: result.errorRaised,
-      });
-    }
-    const root = result._emitter.root;
-    root.data.language = result.language;
-    root.data.relevance = result.relevance;
-    return root;
+  );
+  function r(e, n, r) {
+    let s = r || i,
+      c = typeof s.prefix == `string` ? s.prefix : a;
+    if (!t.getLanguage(e)) throw Error("Unknown language: `" + e + "` is not registered");
+    t.configure({ __emitter: o, classPrefix: c });
+    let l = t.highlight(n, { ignoreIllegals: !0, language: e });
+    if (l.errorRaised)
+      throw Error("Could not highlight with `Highlight.js`", { cause: l.errorRaised });
+    let u = l._emitter.root,
+      d = u.data;
+    return ((d.language = l.language), (d.relevance = l.relevance), u);
   }
-
-  function highlightAuto(
-    code: string,
-    options: LowlightOptions = {},
-  ): RootNode {
-    const subset = options.subset ?? listLanguages();
-    let bestRelevance = 0;
-    let best: RootNode | undefined;
-    for (const language of subset) {
-      if (!core.getLanguage(language)) continue;
-      const candidate = highlight(language, code, options);
-      if (candidate.data.relevance > bestRelevance) {
-        bestRelevance = candidate.data.relevance;
-        best = candidate;
-      }
+  function s(e, n) {
+    let a = (n || i).subset || c(),
+      o = -1,
+      s = 0,
+      l;
+    for (; ++o < a.length;) {
+      let i = a[o];
+      if (!t.getLanguage(i)) continue;
+      let c = r(i, e, n);
+      c.data &&
+        c.data.relevance !== void 0 &&
+        c.data.relevance > s &&
+        ((s = c.data.relevance), (l = c));
     }
-    return (
-      best ?? {
-        type: "root",
-        children: [],
-        data: { language: undefined, relevance: bestRelevance },
-      }
-    );
+    return l || { type: `root`, children: [], data: { language: void 0, relevance: s } };
   }
-
-  function listLanguages(): string[] {
-    return core.listLanguages();
+  function c() {
+    return t.listLanguages();
   }
-
-  function register(name: string, definition: LanguageDefinition): void;
-  function register(languages: LanguageMap): void;
-  function register(
-    nameOrLanguages: string | LanguageMap,
-    definition?: LanguageDefinition,
-  ): void {
-    if (typeof nameOrLanguages === "string") {
-      if (definition) core.registerLanguage(nameOrLanguages, definition);
-      return;
-    }
-    for (const [name, languageDefinition] of Object.entries(nameOrLanguages)) {
-      core.registerLanguage(name, languageDefinition);
+  function l(e, n) {
+    if (typeof e == `string`) t.registerLanguage(e, n);
+    else {
+      let n;
+      for (n in e) Object.hasOwn(e, n) && t.registerLanguage(n, e[n]);
     }
   }
-
-  function registerAlias(language: string, aliases: string | string[]): void;
-  function registerAlias(aliases: AliasMap): void;
-  function registerAlias(
-    languageOrAliases: string | AliasMap,
-    aliases?: string | string[],
-  ): void {
-    if (typeof languageOrAliases === "string") {
-      if (aliases) {
-        core.registerAliases(
-          typeof aliases === "string" ? aliases : [...aliases],
-          { languageName: languageOrAliases },
-        );
-      }
-      return;
-    }
-    for (const [language, languageAliases] of Object.entries(
-      languageOrAliases,
-    )) {
-      core.registerAliases(
-        typeof languageAliases === "string"
-          ? languageAliases
-          : [...languageAliases],
-        { languageName: language },
-      );
+  function u(e, n) {
+    if (typeof e == `string`)
+      t.registerAliases(typeof n == `string` ? n : [...n], { languageName: e });
+    else {
+      let n;
+      for (n in e)
+        if (Object.hasOwn(e, n)) {
+          let r = e[n];
+          t.registerAliases(typeof r == `string` ? r : [...r], { languageName: n });
+        }
     }
   }
-
-  function registered(language: string): boolean {
-    return Boolean(core.getLanguage(language));
+  function d(e) {
+    return !!t.getLanguage(e);
   }
-
-  return {
-    highlight,
-    highlightAuto,
-    listLanguages,
-    register,
-    registerAlias,
-    registered,
-  };
 }
-
-initializeLowlightCore();
-
-export { createLowlight };
+var i, a, o;
+function s() {
+  return (s = e(() => {
+    (t(),
+      (i = {}),
+      (a = `hljs-`),
+      (o = class {
+        constructor(e) {
+          ((this.options = e),
+            (this.root = { type: `root`, children: [], data: { language: void 0, relevance: 0 } }),
+            (this.stack = [this.root]));
+        }
+        addText(e) {
+          if (e === ``) return;
+          let t = this.stack[this.stack.length - 1],
+            n = t.children[t.children.length - 1];
+          n && n.type === `text` ? (n.value += e) : t.children.push({ type: `text`, value: e });
+        }
+        startScope(e) {
+          this.openNode(String(e));
+        }
+        endScope() {
+          this.closeNode();
+        }
+        __addSublanguage(e, t) {
+          let n = this.stack[this.stack.length - 1],
+            r = e.root.children;
+          t
+            ? n.children.push({
+                type: `element`,
+                tagName: `span`,
+                properties: { className: [t] },
+                children: r,
+              })
+            : n.children.push(...r);
+        }
+        openNode(e) {
+          let t = this,
+            n = e.split(`.`).map(function (e, n) {
+              return n ? e + `_`.repeat(n) : t.options.classPrefix + e;
+            }),
+            r = this.stack[this.stack.length - 1],
+            i = { type: `element`, tagName: `span`, properties: { className: n }, children: [] };
+          (r.children.push(i), this.stack.push(i));
+        }
+        closeNode() {
+          this.stack.pop();
+        }
+        finalize() {}
+        toHTML() {
+          return ``;
+        }
+      }));
+  }))();
+}
+function c() {
+  return (c = e(() => {
+    s();
+  }))();
+}
+c();
+export { r as createLowlight };

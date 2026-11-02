@@ -1,253 +1,172 @@
-// Adaptive numeric slider bounds. Release chunk: adaptive-slider-7a51d6c629a2.js.
-import "@rchunk/rolldown-runtime";
-
-interface Range {
-  min: number;
-  max: number;
-}
-interface Bounds extends Range {
-  step: number;
-}
-interface AdaptiveSliderConfig {
-  allowed: Range;
-  base: Bounds;
-  localWindowRatio?: number;
-  maxAlignedWindowStepCount?: number;
-  maxFractionDigits?: number;
-  maxPreciseWindowStepCount?: number;
-  minWindowStepHeadroom?: number;
-  targetLocalStepCount?: number;
-}
-
-let configsEqual: (
-  left: AdaptiveSliderConfig,
-  right: AdaptiveSliderConfig,
-) => boolean;
-let clampValue: (
-  value: number,
-  range: Range,
-  options?: { maxFractionDigits?: number },
-) => number;
-let fractionDigits: (value: number) => number;
-let chooseAlignedStep: (
-  value: number,
-  range: Range,
-  options?: {
-    maxFractionDigits?: number;
-    maxPreciseWindowStepCount?: number;
-    targetLocalStepCount?: number;
-  },
-) => number;
-let minimumFractionDigits: (value: number, maximum?: number) => number;
-let isStepAligned: (value: number, minimum: number, step: number) => boolean;
-let computeAdaptiveBounds: (
-  value: number,
-  config: AdaptiveSliderConfig,
-) => Bounds;
-let maximumAlignedWindowStepCount: number;
-let roundTo: (value: number, digits: number) => number;
-
-function initializeAdaptiveSlider(): void {
-  const epsilon = 1e-9;
-  const defaultLocalWindowRatio = 0.2;
-  configsEqual = (left, right) =>
-    left.allowed.min === right.allowed.min &&
-    left.allowed.max === right.allowed.max &&
-    left.base.min === right.base.min &&
-    left.base.max === right.base.max &&
-    left.base.step === right.base.step &&
-    left.localWindowRatio === right.localWindowRatio &&
-    left.maxAlignedWindowStepCount === right.maxAlignedWindowStepCount &&
-    left.maxFractionDigits === right.maxFractionDigits &&
-    left.maxPreciseWindowStepCount === right.maxPreciseWindowStepCount &&
-    left.minWindowStepHeadroom === right.minWindowStepHeadroom &&
-    left.targetLocalStepCount === right.targetLocalStepCount;
-  maximumAlignedWindowStepCount = 5_000;
-  const clamp = (value: number, minimum: number, maximum: number) =>
-    Math.min(Math.max(value, minimum), maximum);
-  fractionDigits = (value) => {
-    const text = value.toString();
-    if (text.includes("e-")) return Number(text.split("e-")[1]);
-    return text.split(".")[1]?.length ?? 0;
-  };
-  roundTo = (value, digits) => {
-    const scale = 10 ** digits;
-    return Math.round((value + Number.EPSILON) * scale) / scale;
-  };
-  isStepAligned = (value, minimum, step) => {
-    const steps = (value - minimum) / step;
-    return Math.abs(steps - Math.round(steps)) < epsilon;
-  };
-  minimumFractionDigits = (value, maximum = 2) => {
-    const rounded = roundTo(value, maximum);
-    for (let digits = 0; digits <= maximum; digits += 1) {
-      if (Math.abs(rounded - roundTo(rounded, digits)) < epsilon) return digits;
-    }
-    return maximum;
-  };
-  const nearestNiceStep = (desired: number, maxDigits: number) => {
-    const minimum = 10 ** -maxDigits;
-    const normalized = Math.max(desired, minimum);
-    const exponent = Math.floor(Math.log10(normalized));
-    let best = minimum;
-    let bestDistance = Number.POSITIVE_INFINITY;
-    for (const candidateExponent of [exponent - 1, exponent, exponent + 1]) {
-      for (const multiplier of [1, 2, 5]) {
-        const candidate = multiplier * 10 ** candidateExponent;
-        if (candidate < minimum - epsilon) continue;
-        const distance = Math.abs(candidate - normalized);
-        if (distance < bestDistance - epsilon) {
-          best = candidate;
-          bestDistance = distance;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d, f, p, m, h, g, _;
+function v() {
+  return (v = e(() => {
+    ((t = (e, t) =>
+      e.allowed.min === t.allowed.min &&
+      e.allowed.max === t.allowed.max &&
+      e.base.min === t.base.min &&
+      e.base.max === t.base.max &&
+      e.base.step === t.base.step &&
+      e.localWindowRatio === t.localWindowRatio &&
+      e.maxAlignedWindowStepCount === t.maxAlignedWindowStepCount &&
+      e.maxFractionDigits === t.maxFractionDigits &&
+      e.maxPreciseWindowStepCount === t.maxPreciseWindowStepCount &&
+      e.minWindowStepHeadroom === t.minWindowStepHeadroom &&
+      e.targetLocalStepCount === t.targetLocalStepCount),
+      (n = 1e-9),
+      (r = 0.2),
+      (i = 5e3),
+      (a = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (o = (e) => {
+        let t = e.toString();
+        if (t.includes(`e-`)) {
+          let [, e] = t.split(`e-`);
+          return Number(e);
         }
-      }
-    }
-    return best;
-  };
-  const candidateSteps = (maximum: number, maxDigits: number) => {
-    const minimum = 10 ** -maxDigits;
-    const normalized = Math.max(maximum, minimum);
-    const maxExponent = Math.ceil(Math.log10(normalized));
-    const result = new Set([normalized, minimum]);
-    for (let exponent = -maxDigits; exponent <= maxExponent; exponent += 1) {
-      for (const multiplier of [1, 2, 5]) {
-        const candidate = multiplier * 10 ** exponent;
-        if (
-          candidate >= minimum - epsilon &&
-          candidate <= normalized + epsilon
-        ) {
-          result.add(candidate);
+        let [, n] = t.split(`.`);
+        return n?.length ?? 0;
+      }),
+      (s = (e, t) => {
+        let n = 10 ** t;
+        return Math.round((e + 2 ** -52) * n) / n;
+      }),
+      (c = (e, t, r) => {
+        let i = (e - t) / r;
+        return Math.abs(i - Math.round(i)) < n;
+      }),
+      (l = (e, t = 2) => {
+        let r = s(e, t);
+        for (let e = 0; e <= t; e += 1) if (Math.abs(r - s(r, e)) < n) return e;
+        return t;
+      }),
+      (u = (e, t) => {
+        let r = 10 ** -t,
+          i = Math.max(e, r),
+          a = Math.floor(Math.log10(i)),
+          o = [1, 2, 5],
+          s = [a - 1, a, a + 1],
+          c = r,
+          l = 1 / 0;
+        for (let e of s)
+          for (let t of o) {
+            let a = t * 10 ** e;
+            if (a < r - n) continue;
+            let o = Math.abs(a - i);
+            o < l - n && ((c = a), (l = o));
+          }
+        return c;
+      }),
+      (d = (e, t) => {
+        let r = 10 ** -t,
+          i = Math.max(e, r),
+          a = Math.ceil(Math.log10(i)),
+          o = new Set([i, r]);
+        for (let e = -t; e <= a; e += 1)
+          for (let t of [1, 2, 5]) {
+            let a = t * 10 ** e;
+            a < r - n || a > i + n || o.add(a);
+          }
+        return [...o].sort((e, t) => t - e);
+      }),
+      (f = (e, t, { maxFractionDigits: n = 2 } = {}) =>
+        Number.isFinite(e) ? a(s(e, n), t.min, t.max) : t.min),
+      (p = (
+        e,
+        t,
+        {
+          maxFractionDigits: r = 2,
+          maxPreciseWindowStepCount: i = 500,
+          targetLocalStepCount: a = 40,
+        },
+      ) => {
+        let o = l(e, r);
+        if (o > 0) {
+          let e = 10 ** -o;
+          if (t / e <= i + n) return e;
         }
-      }
-    }
-    return [...result].sort((left, right) => right - left);
-  };
-  clampValue = (value, range, { maxFractionDigits = 2 } = {}) =>
-    Number.isFinite(value)
-      ? clamp(roundTo(value, maxFractionDigits), range.min, range.max)
-      : range.min;
-  const chooseStep = (
-    value: number,
-    windowSize: number,
-    {
-      maxFractionDigits = 2,
-      maxPreciseWindowStepCount = 500,
-      targetLocalStepCount = 40,
-    },
-  ) => {
-    const digits = minimumFractionDigits(value, maxFractionDigits);
-    if (digits > 0) {
-      const preciseStep = 10 ** -digits;
-      if (windowSize / preciseStep <= maxPreciseWindowStepCount + epsilon) {
-        return preciseStep;
-      }
-    }
-    return nearestNiceStep(
-      windowSize / targetLocalStepCount,
-      maxFractionDigits,
-    );
-  };
-  const localStep = (
-    value: number,
-    {
-      localWindowRatio = defaultLocalWindowRatio,
-      maxFractionDigits = 2,
-      maxPreciseWindowStepCount = 500,
-      targetLocalStepCount = 40,
-    }: AdaptiveSliderConfig,
-  ) =>
-    chooseStep(value, Math.abs(value) * localWindowRatio * 2, {
-      maxFractionDigits,
-      maxPreciseWindowStepCount,
-      targetLocalStepCount,
-    });
-  const rangeStep = (
-    value: number,
-    range: Range,
-    {
-      maxFractionDigits = 2,
-      maxPreciseWindowStepCount = 500,
-      targetLocalStepCount = 40,
-    } = {},
-  ) =>
-    chooseStep(value, range.max - range.min, {
-      maxFractionDigits,
-      maxPreciseWindowStepCount,
-      targetLocalStepCount,
-    });
-  chooseAlignedStep = (value, range, options = {}) => {
-    const maxDigits = options.maxFractionDigits ?? 2;
-    const initial = rangeStep(value, range, options);
-    for (const step of candidateSteps(initial, maxDigits)) {
-      if (isStepAligned(value, range.min, step)) return step;
-    }
-    return 10 ** -maxDigits;
-  };
-  computeAdaptiveBounds = (value, config) => {
-    const {
-      allowed,
-      base,
-      localWindowRatio = defaultLocalWindowRatio,
-      minWindowStepHeadroom = 4,
-      maxFractionDigits = 2,
-      maxPreciseWindowStepCount = 500,
-      targetLocalStepCount = 40,
-    } = config;
-    const safeValue = clampValue(value, allowed, { maxFractionDigits });
-    if (
-      safeValue >= base.min - epsilon &&
-      safeValue <= base.max + epsilon &&
-      isStepAligned(safeValue, base.min, base.step)
-    ) {
-      return { min: base.min, max: base.max, step: base.step };
-    }
-    const step = localStep(safeValue, {
-      ...config,
-      localWindowRatio,
-      maxFractionDigits,
-      maxPreciseWindowStepCount,
-      targetLocalStepCount,
-    });
-    const digits = Math.max(
-      fractionDigits(step),
-      minimumFractionDigits(safeValue, maxFractionDigits),
-    );
-    const desired = Math.max(
-      minWindowStepHeadroom,
-      Math.ceil((Math.abs(safeValue) * localWindowRatio) / step - epsilon),
-    );
-    const total = desired * 2;
-    const availableBelow = Math.max(
-      0,
-      Math.floor((safeValue - allowed.min) / step + epsilon),
-    );
-    const availableAbove = Math.max(
-      0,
-      Math.floor((allowed.max - safeValue) / step + epsilon),
-    );
-    let below = Math.min(desired, availableBelow);
-    let above = Math.min(desired, availableAbove);
-    if (below < desired)
-      above += Math.min(total - below - above, availableAbove - above);
-    if (above < desired)
-      below += Math.min(total - below - above, availableBelow - below);
-    return {
-      min: roundTo(safeValue - below * step, digits),
-      max: roundTo(safeValue + above * step, digits),
-      step,
-    };
-  };
+        return u(t / a, r);
+      }),
+      (m = (
+        e,
+        {
+          localWindowRatio: t = r,
+          maxFractionDigits: n = 2,
+          maxPreciseWindowStepCount: i = 500,
+          targetLocalStepCount: a = 40,
+        },
+      ) =>
+        p(e, Math.abs(e) * t * 2, {
+          maxFractionDigits: n,
+          maxPreciseWindowStepCount: i,
+          targetLocalStepCount: a,
+        })),
+      (h = (
+        e,
+        t,
+        {
+          maxFractionDigits: n = 2,
+          maxPreciseWindowStepCount: r = 500,
+          targetLocalStepCount: i = 40,
+        } = {},
+      ) =>
+        p(e, t.max - t.min, {
+          maxFractionDigits: n,
+          maxPreciseWindowStepCount: r,
+          targetLocalStepCount: i,
+        })),
+      (g = (
+        e,
+        t,
+        {
+          maxFractionDigits: n = 2,
+          maxPreciseWindowStepCount: r = 500,
+          targetLocalStepCount: i = 40,
+        } = {},
+      ) => {
+        let a = h(e, t, {
+          maxFractionDigits: n,
+          maxPreciseWindowStepCount: r,
+          targetLocalStepCount: i,
+        });
+        for (let r of d(a, n)) if (c(e, t.min, r)) return r;
+        return 10 ** -n;
+      }),
+      (_ = (e, t) => {
+        let {
+            allowed: i,
+            base: a,
+            localWindowRatio: u = r,
+            minWindowStepHeadroom: d = 4,
+            maxFractionDigits: p = 2,
+            maxPreciseWindowStepCount: h = 500,
+            targetLocalStepCount: g = 40,
+          } = t,
+          _ = f(e, i, { maxFractionDigits: p });
+        if (_ >= a.min - n && _ <= a.max + n && c(_, a.min, a.step))
+          return { min: a.min, max: a.max, step: a.step };
+        let v = m(_, {
+            localWindowRatio: u,
+            maxFractionDigits: p,
+            maxPreciseWindowStepCount: h,
+            targetLocalStepCount: g,
+          }),
+          y = o(v),
+          b = l(_, p),
+          x = Math.max(y, b),
+          S = Math.max(d, Math.ceil((Math.abs(_) * u) / v - n)),
+          C = S * 2,
+          w = Math.max(0, Math.floor((_ - i.min) / v + n)),
+          T = Math.max(0, Math.floor((i.max - _) / v + n)),
+          E = Math.min(S, w),
+          D = Math.min(S, T);
+        return (
+          E < S && (D += Math.min(C - E - D, T - D)),
+          D < S && (E += Math.min(C - E - D, w - E)),
+          { min: s(_ - E * v, x), max: s(_ + D * v, x), step: v }
+        );
+      }));
+  }))();
 }
-
-export {
-  initializeAdaptiveSlider as a,
-  clampValue as c,
-  fractionDigits as i,
-  chooseAlignedStep as l,
-  minimumFractionDigits as n,
-  isStepAligned as o,
-  computeAdaptiveBounds as r,
-  configsEqual as s,
-  maximumAlignedWindowStepCount as t,
-  roundTo as u,
-};
+export { v as a, f as c, o as i, g as l, l as n, c as o, _ as r, t as s, i as t, s as u };

@@ -1,6 +1,5 @@
-// Semantic restoration. Release chunk: connect-code-execution-sandbox-b02ae1d03047.js.
+// @ts-nocheck
 import { n as e } from "@rchunk/rolldown-runtime";
-// @ts-ignore -- published chunk binding is preserved locally.
 import { G4 as t, H4 as n, R4 as r, S4 as i, g4 as a, q4 as o } from "@rchunk/app-shared";
 function s(e) {
   let t = c(e, new WeakMap());
@@ -39,9 +38,7 @@ function c(e, t) {
   if (ArrayBuffer.isView(e) && !(e instanceof DataView))
     try {
       let t = e.constructor;
-      // @ts-ignore -- published chunk binding is preserved locally.
       if (typeof e.slice == `function`) return e.slice();
-      // @ts-ignore -- published chunk binding is preserved locally.
       let n = new t(e.length);
       return (n.set(e), n);
     } catch {
@@ -84,7 +81,6 @@ function c(e, t) {
       r;
     try {
       let e = n.constructor;
-      // @ts-ignore -- published chunk binding is preserved locally.
       r = typeof e == `function` ? new e(n.message) : Error(n.message);
     } catch {
       r = Error(n.message);
@@ -187,12 +183,10 @@ function d(e, t) {
             e.postMessage([p, ...n], [o, ...(t.transfer || [])]));
         }),
     r = n({});
-  // @ts-ignore -- published chunk binding is preserved locally.
   return ((r.withOptions = n), r);
 }
 var f, p, m, h;
 function g() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (g = e(() => {
     ((f = `ABORT`), (p = `CALL`), (m = `REJECT`), (h = `RESOLVE`));
   }))();
@@ -236,13 +230,9 @@ function _(e, t) {
               u.close(),
               f.close());
           },
-          // @ts-ignore -- published chunk binding is preserved locally.
           h = d(i).withOptions(p),
-          // @ts-ignore -- published chunk binding is preserved locally.
           g = d(o).withOptions(p),
-          // @ts-ignore -- published chunk binding is preserved locally.
           _ = d(c).withOptions(p),
-          // @ts-ignore -- published chunk binding is preserved locally.
           y = d(u).withOptions(p),
           b = !1,
           x = async (e) => {
@@ -286,12 +276,10 @@ function _(e, t) {
       };
     },
     r = n({});
-  // @ts-ignore -- published chunk binding is preserved locally.
   return ((r.withOptions = n), r);
 }
 var v;
 function y() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (y = e(() => {
     (g(), (v = `GENERATOR_GENERATE`));
   }))();
@@ -318,12 +306,10 @@ async function b(e) {
     let l = new Set(e.generatorKeys ?? [`runUserCode`]),
       u = Object.fromEntries(
         Object.entries(r).map(([e, t]) => {
-          // @ts-ignore -- published chunk binding is preserved locally.
           let r = l.has(e) ? _(t) : d(t);
           if (n == null) return [e, r];
           let i = (e) => {
-            let t = e.signal == null ? o.signal : combineAbortSignals(o.signal, e.signal),
-              // @ts-ignore -- published chunk binding is preserved locally.
+            let t = e.signal == null ? o.signal : AbortSignal.any([o.signal, e.signal]),
               n = r.withOptions({ ...e, signal: t });
             return (...e) => (t.throwIfAborted(), n(...e));
           };
@@ -338,16 +324,6 @@ async function b(e) {
   } catch (e) {
     throw (s(), e);
   }
-}
-function combineAbortSignals(e, t) {
-  let n = new AbortController(),
-    r = () => n.abort();
-  if (e.aborted || t.aborted) n.abort();
-  else {
-    e.addEventListener(`abort`, r, { once: !0 });
-    t.addEventListener(`abort`, r, { once: !0 });
-  }
-  return n.signal;
 }
 function x(e) {
   return e.constructor.name === `AsyncGeneratorFunction`;
@@ -383,7 +359,6 @@ function S({ iframe: e, origin: a, signal: s }) {
   });
 }
 function C() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (C = e(() => {
     (y(), g(), a());
   }))();

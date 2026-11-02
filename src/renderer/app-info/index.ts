@@ -1,30 +1,25 @@
-// app-info —— Connector API app 转 UI app model。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import type { AppInfo, ConnectorApp } from "@rchunk/app-info";
-
-void runtimeChunk;
-
-function toAppInfo(app: ConnectorApp): AppInfo {
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e) {
   return {
-    id: app.id,
-    name: app.name,
-    description: app.description,
-    logoUrl: app.iconUrl,
-    logoUrlDark: app.iconUrlDark,
+    id: e.id,
+    name: e.name,
+    description: e.description,
+    logoUrl: e.iconUrl,
+    logoUrlDark: e.iconUrlDark,
     iconAssets: null,
     iconDarkAssets: null,
-    distributionChannel: app.distributionChannel,
+    distributionChannel: e.distributionChannel,
     branding: null,
     appMetadata: null,
     labels: null,
-    installUrl: app.installUrl,
-    isAccessible: false,
-    isEnabled: true,
-    pluginDisplayNames: app.pluginDisplayNames ?? [],
+    installUrl: e.installUrl,
+    isAccessible: !1,
+    isEnabled: !0,
+    pluginDisplayNames: e.pluginDisplayNames ?? [],
   };
 }
-
-function initializeAppInfo(): void {}
-
-export { initializeAppInfo as n, toAppInfo as t };
+function n() {
+  return (n = e(() => {}))();
+}
+export { n, t };

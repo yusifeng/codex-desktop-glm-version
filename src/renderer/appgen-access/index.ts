@@ -1,284 +1,111 @@
-// appgen-access —— Site 分享访问策略的规范化、统计与变更请求构造。
-// 原版：app/webview/assets/appgen-access-50974c702eaf.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appInitialChunk from "@rchunk/app-initial";
-
-void runtimeChunk;
-const { z2t: loadUniqueValues } = appInitialChunk;
-
-type UniqueValues = <Value>(values: readonly Value[]) => Value[];
-
-export interface AppgenAccessGroup extends Record<string, unknown> {
-  id: string;
-  source?: "tenant" | "workspace" | string;
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import { z2t as n } from "@rchunk/app-initial";
+function r(e) {
+  return e?.current_user_role === `owner`;
 }
-
-export interface AppgenAccessUser extends Record<string, unknown> {
-  account_user_id: string;
-  email?: string | null;
+function i({ availableAccessModes: e, currentAccessMode: t, isWorkspaceAccount: n }) {
+  let r = e ?? (n ? [`workspace_all`, `custom`] : []),
+    i = r.map((e) => ({ disabled: !1, value: e }));
+  return r.some((e) => e === t) ? i : [...i, { disabled: !0, value: t }];
 }
-
-export interface AppgenAccessPolicy extends Record<string, unknown> {
-  access_mode: string;
-  allowed_account_user_ids: string[];
-  allowed_editors?: AppgenAccessUser[];
-  allowed_groups?: AppgenAccessGroup[];
-  allowed_tenant_group_ids: string[];
-  allowed_users?: AppgenAccessUser[];
-  allowed_workspace_group_ids: string[];
-  current_user_role?: string;
-  external_visitor_count?: number;
-}
-
-export interface AppgenEditableAccessPolicy extends AppgenAccessPolicy {
-  allowed_groups: AppgenAccessGroup[];
-  allowed_users: AppgenAccessUser[];
-}
-
-export interface AppgenAccessSummary {
-  accessMode: string;
-  groupCount: number;
-  userCount: number;
-}
-
-export interface AppgenAccessModeOption {
-  disabled: boolean;
-  value: string;
-}
-
-export interface AppgenAccessUpdate extends Record<string, unknown> {
-  allowed_tenant_group_ids?: string[];
-  allowed_user_emails?: string[];
-  allowed_workspace_group_ids?: string[];
-  editor_changes?: {
-    add_editor_account_user_ids?: string[];
-    remove_editor_account_user_ids?: string[];
-  };
-}
-
-export interface BuildAppgenAccessUpdateInput {
-  accessGroups: AppgenAccessGroup[];
-  allowedUserEmails: Array<string | null | undefined>;
-  canManageInvitees: boolean;
-  editorAccountUserIds?: string[];
-  existingGroups: AppgenAccessGroup[];
-  knownAccessGroups: AppgenAccessGroup[];
-  removedEditorAccountUserIds?: string[];
-  selectedGroups: AppgenAccessGroup[];
-}
-
-interface BuildGroupChangesInput {
-  accessGroups: AppgenAccessGroup[];
-  existingGroups: AppgenAccessGroup[];
-  knownAccessGroups: AppgenAccessGroup[];
-  removedGroups: AppgenAccessGroup[];
-  selectedGroups: AppgenAccessGroup[];
-}
-
-let uniqueValues: UniqueValues;
-
-function isOwner(
-  accessPolicy: { current_user_role?: string } | null | undefined,
-): boolean {
-  return accessPolicy?.current_user_role === "owner";
-}
-
-function buildAccessModeOptions({
-  availableAccessModes,
-  currentAccessMode,
-  isWorkspaceAccount,
-}: {
-  availableAccessModes?: string[] | null;
-  currentAccessMode: string;
-  isWorkspaceAccount: boolean;
-}): AppgenAccessModeOption[] {
-  const modes =
-    availableAccessModes ??
-    (isWorkspaceAccount ? ["workspace_all", "custom"] : []);
-  const options = modes.map((value) => ({ disabled: false, value }));
-  return modes.some((value) => value === currentAccessMode)
-    ? options
-    : [...options, { disabled: true, value: currentAccessMode }];
-}
-
-function compactUnique(values: Array<string | null | undefined>): string[] {
-  return uniqueValues(
-    values.flatMap((value) => (value == null ? [] : [value])),
-  );
-}
-
-function uniqueGroupIds(groups: AppgenAccessGroup[]): string[] {
-  return Array.from(new Set(groups.map((group) => group.id)));
-}
-
-function buildGroupChanges({
-  accessGroups,
-  knownAccessGroups,
-  existingGroups,
-  removedGroups,
-  selectedGroups,
-}: BuildGroupChangesInput): AppgenAccessUpdate {
-  const groupsById = new Map(
-    [...knownAccessGroups, ...accessGroups].map((group) => [group.id, group]),
-  );
-  const canonicalExisting = existingGroups.flatMap((group) => {
-    const canonical = groupsById.get(group.id);
-    return canonical == null ? [] : [canonical];
-  });
-  const canonicalRemoved = removedGroups.flatMap((group) => {
-    const canonical = groupsById.get(group.id);
-    return canonical == null ? [] : [canonical];
-  });
-  const allowedGroups = [...canonicalExisting, ...selectedGroups];
-  const changedGroups = [...selectedGroups, ...canonicalRemoved];
-  const workspaceChanged = changedGroups.some(
-    (group) => group.source === "workspace",
-  );
-  const tenantChanged = changedGroups.some(
-    (group) => group.source === "tenant",
-  );
+function a({
+  accessGroups: e,
+  allowedUserEmails: t,
+  canManageInvitees: n,
+  editorAccountUserIds: r = [],
+  existingGroups: i,
+  knownAccessGroups: a,
+  removedEditorAccountUserIds: o = [],
+  selectedGroups: s,
+}) {
   return {
-    ...(workspaceChanged
-      ? {
-          allowed_workspace_group_ids: uniqueGroupIds(
-            allowedGroups.filter((group) => group.source === "workspace"),
-          ),
-        }
-      : {}),
-    ...(tenantChanged
-      ? {
-          allowed_tenant_group_ids: uniqueGroupIds(
-            allowedGroups.filter((group) => group.source === "tenant"),
-          ),
-        }
-      : {}),
-  };
-}
-
-function buildAccessUpdate({
-  accessGroups,
-  allowedUserEmails,
-  canManageInvitees,
-  editorAccountUserIds = [],
-  existingGroups,
-  knownAccessGroups,
-  removedEditorAccountUserIds = [],
-  selectedGroups,
-}: BuildAppgenAccessUpdateInput): AppgenAccessUpdate {
-  return {
-    ...(canManageInvitees && {
-      allowed_user_emails: compactUnique(allowedUserEmails),
-      ...buildGroupChanges({
-        accessGroups,
-        knownAccessGroups,
-        existingGroups,
+    ...(n && {
+      allowed_user_emails: c(t),
+      ...d({
+        accessGroups: e,
+        knownAccessGroups: a,
+        existingGroups: i,
         removedGroups: [],
-        selectedGroups,
+        selectedGroups: s,
       }),
     }),
-    ...((editorAccountUserIds.length > 0 ||
-      removedEditorAccountUserIds.length > 0) && {
+    ...((r.length > 0 || o.length > 0) && {
       editor_changes: {
-        ...(editorAccountUserIds.length > 0 && {
-          add_editor_account_user_ids: uniqueValues(editorAccountUserIds),
-        }),
-        ...(removedEditorAccountUserIds.length > 0 && {
-          remove_editor_account_user_ids: uniqueValues(
-            removedEditorAccountUserIds,
-          ),
-        }),
+        ...(r.length > 0 && { add_editor_account_user_ids: (0, p.default)(r) }),
+        ...(o.length > 0 && { remove_editor_account_user_ids: (0, p.default)(o) }),
       },
     }),
   };
 }
-
-function summarizeAccessPolicy(
-  accessPolicy: AppgenAccessPolicy | null | undefined,
-): AppgenAccessSummary {
-  if (accessPolicy == null) {
-    return { accessMode: "admins_only", groupCount: 0, userCount: 0 };
-  }
-  const primaryUserId = accessPolicy.allowed_account_user_ids[0];
-  const userIds = new Set(accessPolicy.allowed_account_user_ids.slice(1));
-  for (const editor of accessPolicy.allowed_editors ?? []) {
-    if (editor.account_user_id !== primaryUserId) {
-      userIds.add(editor.account_user_id);
-    }
-  }
+function o(e) {
+  if (e == null) return { accessMode: `admins_only`, groupCount: 0, userCount: 0 };
+  let t = e.allowed_account_user_ids[0],
+    n = new Set(e.allowed_account_user_ids.slice(1));
+  for (let r of e.allowed_editors ?? []) r.account_user_id !== t && n.add(r.account_user_id);
   return {
-    accessMode: accessPolicy.access_mode,
-    groupCount:
-      accessPolicy.allowed_tenant_group_ids.length +
-      accessPolicy.allowed_workspace_group_ids.length,
-    userCount: userIds.size + (accessPolicy.external_visitor_count ?? 0),
+    accessMode: e.access_mode,
+    groupCount: e.allowed_tenant_group_ids.length + e.allowed_workspace_group_ids.length,
+    userCount: n.size + (e.external_visitor_count ?? 0),
   };
 }
-
-function isEmptyRestrictedAccess({
-  accessMode,
-  groupCount,
-  userCount,
-}: AppgenAccessSummary): boolean {
-  return (
-    (accessMode === "admins_only" || accessMode === "custom") &&
-    groupCount === 0 &&
-    userCount === 0
-  );
+function s({ accessMode: e, groupCount: t, userCount: n }) {
+  return (e === `admins_only` || e === `custom`) && t === 0 && n === 0;
 }
-
-function buildRemoveUserRequest(
-  accessPolicy: AppgenEditableAccessPolicy,
-  accountUserId: string,
-): AppgenAccessUpdate {
+function c(e) {
+  return (0, p.default)(e.flatMap((e) => (e == null ? [] : [e])));
+}
+function l(e, t) {
   return {
-    allowed_user_emails: compactUnique(
-      accessPolicy.allowed_users
-        .filter((user) => user.account_user_id !== accountUserId)
-        .map((user) => user.email),
+    allowed_user_emails: c(
+      e.allowed_users.filter((e) => e.account_user_id !== t).map((e) => e.email),
     ),
   };
 }
-
-function buildRemoveGroupRequest({
-  accessGroups,
-  accessPolicy,
-  group,
-  knownAccessGroups,
-}: {
-  accessGroups: AppgenAccessGroup[];
-  accessPolicy: AppgenEditableAccessPolicy;
-  group: AppgenAccessGroup;
-  knownAccessGroups: AppgenAccessGroup[];
-}): AppgenAccessUpdate {
+function u({ accessGroups: e, accessPolicy: t, group: n, knownAccessGroups: r }) {
   return {
-    allowed_user_emails: compactUnique(
-      accessPolicy.allowed_users.map((user) => user.email),
-    ),
-    ...buildGroupChanges({
-      accessGroups,
-      knownAccessGroups,
-      existingGroups: accessPolicy.allowed_groups.filter(
-        (candidate) => candidate.id !== group.id,
-      ),
-      removedGroups: [group],
+    allowed_user_emails: c(t.allowed_users.map((e) => e.email)),
+    ...d({
+      accessGroups: e,
+      knownAccessGroups: r,
+      existingGroups: t.allowed_groups.filter((e) => e.id !== n.id),
+      removedGroups: [n],
       selectedGroups: [],
     }),
   };
 }
-
-function initializeAppgenAccess(): void {
-  const loaded = loadUniqueValues();
-  uniqueValues = typeof loaded === "function" ? loaded : loaded.default;
+function d({
+  accessGroups: e,
+  knownAccessGroups: t,
+  existingGroups: n,
+  removedGroups: r,
+  selectedGroups: i,
+}) {
+  let a = new Map([...t, ...e].map((e) => [e.id, e])),
+    o = n.flatMap((e) => {
+      let t = a.get(e.id);
+      return t == null ? [] : [t];
+    }),
+    s = r.flatMap((e) => {
+      let t = a.get(e.id);
+      return t == null ? [] : [t];
+    }),
+    c = [...o, ...i],
+    l = [...i, ...s],
+    u = l.some((e) => e.source === `workspace`),
+    d = l.some((e) => e.source === `tenant`);
+  return {
+    ...(u ? { allowed_workspace_group_ids: f(c.filter((e) => e.source === `workspace`)) } : {}),
+    ...(d ? { allowed_tenant_group_ids: f(c.filter((e) => e.source === `tenant`)) } : {}),
+  };
 }
-
-export {
-  buildRemoveGroupRequest as a,
-  isEmptyRestrictedAccess as c,
-  buildAccessUpdate as i,
-  buildAccessModeOptions as n,
-  buildRemoveUserRequest as o,
-  summarizeAccessPolicy as r,
-  initializeAppgenAccess as s,
-  isOwner as t,
-};
+function f(e) {
+  return Array.from(new Set(e.map((e) => e.id)));
+}
+var p;
+function m() {
+  return (m = e(() => {
+    p = t(n(), 1);
+  }))();
+}
+export { u as a, s as c, a as i, i as n, l as o, o as r, m as s, r as t };

@@ -1,31 +1,24 @@
-// Semantic restoration. Release chunk: details-cache-7f541ad230b1.js.
+// @ts-nocheck
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import { FX as n, lZ as r } from "@rchunk/app-shared";
 import {
   $en as i,
-  // @ts-ignore -- published chunk binding is preserved locally.
   SKt as a,
   Sun as o,
   _un as s,
-  // @ts-ignore -- published chunk binding is preserved locally.
   aYt as c,
   cJt as l,
   gmn as u,
   gpn as d,
-  // @ts-ignore -- published chunk binding is preserved locally.
   hpn as f,
-  // @ts-ignore -- published chunk binding is preserved locally.
   iYt as p,
   itn as m,
   mun as h,
-  // @ts-ignore -- published chunk binding is preserved locally.
   nYt as g,
   rJt as _,
-  // @ts-ignore -- published chunk binding is preserved locally.
   sYt as v,
   uHt as y,
   wVt as b,
-  // @ts-ignore -- published chunk binding is preserved locally.
   xKt as x,
 } from "@rchunk/app-initial";
 import { n as S, t as C } from "@rchunk/request-context";
@@ -58,7 +51,6 @@ function E(e, t) {
   return { ...e.shopping_vto, ...t.shopping_vto, generated_images: r };
 }
 function D() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (D = e(() => {}))();
 }
 function O(e, t = `short`) {
@@ -115,9 +107,7 @@ function j(e, t) {
 }
 var M;
 function N() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (N = e(() => {
-    // @ts-ignore -- published chunk binding is preserved locally.
     ((M = t(u(), 1)), v());
   }))();
 }
@@ -129,9 +119,7 @@ function P(e, t, n, r) {
     C(e, n, t).isSourceCatalog
   )
     return;
-  // @ts-ignore -- published chunk binding is preserved locally.
   let i = F(e, t, n, r);
-  // @ts-ignore -- published chunk binding is preserved locally.
   Promise.all([i.loadOffers(), i.loadReviews(!0)]);
 }
 function F(e, t, n, r, i) {
@@ -156,7 +144,6 @@ function F(e, t, n, r, i) {
         !1,
         (e) => {
           let n = { product_query: t.title, product_lookup_key: t.product_lookup_key };
-          // @ts-ignore -- published chunk binding is preserved locally.
           return _.streamPost(`/search/product_update`, {
             body: JSON.stringify(n),
             onEvent: (t) => {
@@ -220,7 +207,6 @@ function F(e, t, n, r, i) {
 }
 var I;
 function L() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (L = e(() => {
     (n(),
       v(),
@@ -236,7 +222,6 @@ function L() {
         let r = t({ product: void 0, references: [], status: `idle` }),
           i = null,
           a = (t, o, c, l) => {
-            // @ts-ignore -- published chunk binding is preserved locally.
             if (l?.aborted || n.get(h) !== e.accountId || n.get(s) !== e.userId)
               return Promise.resolve();
             if (i != null) {
@@ -251,7 +236,6 @@ function L() {
             let u = new AbortController(),
               d = () => {},
               p = new Promise((e) => {
-                // @ts-ignore -- published chunk binding is preserved locally.
                 d = e;
               }),
               m = { promise: p, controller: u, cacheOnly: o, cancelled: !1 };
@@ -280,7 +264,6 @@ function L() {
               n.set(r, (e) => ({ ...e, status: `loading` })),
               (y = n.watch(
                 (t) => (
-                  // @ts-ignore -- published chunk binding is preserved locally.
                   (t.get(h) !== e.accountId || t.get(s) !== e.userId || t.get(f).pathname !== _) &&
                     u.abort(),
                   S

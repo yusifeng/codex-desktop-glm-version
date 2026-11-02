@@ -1,56 +1,42 @@
-// Combined-gas-law learning model.
-import "@rchunk/rolldown-runtime";
-
-interface CombinedGasLawValues { pressure2Atm?: number | null; temperature2Kelvin?: number | null }
-
-const initialGasState = { pressureAtm: 1, volumeLiters: 12, temperatureKelvin: 300 };
-const pressureControl = { min: 0.7, max: 1.6, step: 0.05, defaultValue: 1.3 };
-const temperatureControl = { min: 240, max: 420, step: 10, defaultValue: 330 };
-const minimumParticleScale = 0.8;
-const baselineParticleScale = 2.4;
-const clampOrDefault = (value: number | null | undefined, minimum: number, maximum: number, fallback: number): number =>
-  typeof value !== "number" || !Number.isFinite(value) ? fallback : Math.min(Math.max(value, minimum), maximum);
-const createDefaultCombinedGasLawValues = () => ({ pressure2Atm: pressureControl.defaultValue, temperature2Kelvin: temperatureControl.defaultValue });
-const normalizeCombinedGasLawValues = (values: CombinedGasLawValues) => ({
-  pressure2Atm: clampOrDefault(values.pressure2Atm, pressureControl.min, pressureControl.max, pressureControl.defaultValue),
-  temperature2Kelvin: clampOrDefault(values.temperature2Kelvin, temperatureControl.min, temperatureControl.max, temperatureControl.defaultValue),
-});
-
-function calculateCombinedGasLaw(values: CombinedGasLawValues) {
-  const normalized = normalizeCombinedGasLawValues(values);
-  const volume2Liters = initialGasState.pressureAtm * initialGasState.volumeLiters * normalized.temperature2Kelvin
-    / (initialGasState.temperatureKelvin * normalized.pressure2Atm);
-  const state1Ratio = initialGasState.pressureAtm * initialGasState.volumeLiters / initialGasState.temperatureKelvin;
-  const state2Ratio = normalized.pressure2Atm * volume2Liters / normalized.temperature2Kelvin;
-  return { ...normalized, volume2Liters, state1Ratio, state2Ratio };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d, f, p;
+function m() {
+  return (m = e(() => {
+    ((t = { pressureAtm: 1, volumeLiters: 12, temperatureKelvin: 300 }),
+      (n = { min: 0.7, max: 1.6, step: 0.05, defaultValue: 1.3 }),
+      (r = { min: 240, max: 420, step: 10, defaultValue: 330 }),
+      (i = 0.8),
+      (a = 2.4),
+      (o = (e, t, n, r) =>
+        typeof e != `number` || !Number.isFinite(e) ? r : Math.min(Math.max(e, t), n)),
+      (s = () => ({ pressure2Atm: n.defaultValue, temperature2Kelvin: r.defaultValue })),
+      (c = (e) => ({
+        pressure2Atm: o(e.pressure2Atm, n.min, n.max, n.defaultValue),
+        temperature2Kelvin: o(e.temperature2Kelvin, r.min, r.max, r.defaultValue),
+      })),
+      (l = (e) => {
+        let n = c(e),
+          r =
+            (t.pressureAtm * t.volumeLiters * n.temperature2Kelvin) /
+            (t.temperatureKelvin * n.pressure2Atm),
+          i = (t.pressureAtm * t.volumeLiters) / t.temperatureKelvin,
+          a = (n.pressure2Atm * r) / n.temperature2Kelvin;
+        return { ...n, volume2Liters: r, state1Ratio: i, state2Ratio: a };
+      }),
+      (u = (e) => Math.min(Math.max(e / 26, 0), 1)),
+      (d = (e) => (e - n.min) / (n.max - n.min)),
+      (f = (e) =>
+        e < t.temperatureKelvin ? `cooling` : e > t.temperatureKelvin ? `heating` : `same`),
+      (p = (e) => {
+        let n = Math.min(Math.max(e, r.min), r.max);
+        if (n <= t.temperatureKelvin) {
+          let e = (n - r.min) / (t.temperatureKelvin - r.min);
+          return i + e * 1.5999999999999999;
+        }
+        let o = (n - t.temperatureKelvin) / (r.max - t.temperatureKelvin);
+        return a + o * 3.6;
+      }));
+  }))();
 }
-
-const volumeToParticleFraction = (volumeLiters: number): number => Math.min(Math.max(volumeLiters / 26, 0), 1);
-const pressureToFraction = (pressureAtm: number): number => (pressureAtm - pressureControl.min) / (pressureControl.max - pressureControl.min);
-const classifyTemperatureChange = (temperatureKelvin: number): "cooling" | "heating" | "same" =>
-  temperatureKelvin < initialGasState.temperatureKelvin ? "cooling" : temperatureKelvin > initialGasState.temperatureKelvin ? "heating" : "same";
-const temperatureToParticleCount = (temperatureKelvin: number): number => {
-  const temperature = Math.min(Math.max(temperatureKelvin, temperatureControl.min), temperatureControl.max);
-  if (temperature <= initialGasState.temperatureKelvin) {
-    const progress = (temperature - temperatureControl.min) / (initialGasState.temperatureKelvin - temperatureControl.min);
-    return minimumParticleScale + progress * 1.5999999999999999;
-  }
-  const progress = (temperature - initialGasState.temperatureKelvin) / (temperatureControl.max - initialGasState.temperatureKelvin);
-  return baselineParticleScale + progress * 3.6;
-};
-
-function initializeCombinedGasLawModel(): void {}
-
-export {
-  pressureToFraction as a,
-  volumeToParticleFraction as c,
-  calculateCombinedGasLaw as d,
-  createDefaultCombinedGasLawValues as i,
-  initializeCombinedGasLawModel as l,
-  initialGasState as n,
-  temperatureToParticleCount as o,
-  temperatureControl as r,
-  classifyTemperatureChange as s,
-  pressureControl as t,
-  normalizeCombinedGasLawValues as u,
-};
+export { d as a, u as c, l as d, s as i, m as l, t as n, p as o, r, f as s, n as t, c as u };

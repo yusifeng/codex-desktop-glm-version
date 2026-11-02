@@ -1,41 +1,21 @@
-// Compound-interest mode and input metadata. Release chunk: type-1a3e6eca2001.js.
-import "@rchunk/rolldown-runtime";
-type Mode = "lump_sum" | "annuity_fv" | "annuity_pv" | "continuous";
-interface Specification {
-  type: "COMPOUND_INTEREST";
-  version: 5;
-  thumbnailAssetKey: "compound-interest-v1";
-  parameters: {
-    mode: { kind: "enum"; defaultValue: Mode; allowedValues: Mode[] };
-    amount: { kind: "number"; defaultValue: 1000; min: 0.01; max: 1000000000 };
-    ratePercent: { kind: "number"; defaultValue: 5; min: 0; max: 100 };
-    periods: { kind: "number"; defaultValue: 20; min: 0; max: 1000 };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `COMPOUND_INTEREST`),
+      (n = `compound-interest-v1`),
+      (r = {
+        mode: {
+          kind: `enum`,
+          defaultValue: `lump_sum`,
+          allowedValues: [`lump_sum`, `annuity_fv`, `annuity_pv`, `continuous`],
+        },
+        amount: { kind: `number`, defaultValue: 1e3, min: 0.01, max: 1e9 },
+        ratePercent: { kind: `number`, defaultValue: 5, min: 0, max: 100 },
+        periods: { kind: `number`, defaultValue: 20, min: 0, max: 1e3 },
+      }),
+      (i = { type: t, version: 5, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-let specification: Specification;
-let initialized = false;
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  specification = {
-    type: "COMPOUND_INTEREST",
-    version: 5,
-    thumbnailAssetKey: "compound-interest-v1",
-    parameters: {
-      mode: {
-        kind: "enum",
-        defaultValue: "lump_sum",
-        allowedValues: ["lump_sum", "annuity_fv", "annuity_pv", "continuous"],
-      },
-      amount: {
-        kind: "number",
-        defaultValue: 1000,
-        min: 0.01,
-        max: 1000000000,
-      },
-      ratePercent: { kind: "number", defaultValue: 5, min: 0, max: 100 },
-      periods: { kind: "number", defaultValue: 20, min: 0, max: 1000 },
-    },
-  };
-}
-export { specification as n, initialize as t };
+export { i as n, a as t };

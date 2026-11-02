@@ -1,37 +1,26 @@
-// Unit circle specification. Release chunk: type-d8fc0e5b690c.js.
-import "@rchunk/rolldown-runtime";
-
-interface Specification {
-  type: "UNIT_CIRCLE";
-  version: 2;
-  thumbnailAssetKey: "unit-circle-v1";
-  canonicalFormula: "x^2 + y^2 = 1";
-  canonicalFormulaAliases: [
-    "1 = x^2 + y^2",
-    "x^2 + y^2 = 1^2",
-    "(x-0)^2 + (y+0)^2 = 1",
-    "(\\cos\\theta, \\sin\\theta)",
-  ];
-  parameters: {
-    angleDeg: { kind: "number"; defaultValue: 45; min: -36_000; max: 36_000 };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o;
+function s() {
+  return (s = e(() => {
+    ((t = `UNIT_CIRCLE`),
+      (n = `unit-circle-v1`),
+      (r = `x^2 + y^2 = 1`),
+      (i = [
+        `1 = x^2 + y^2`,
+        `x^2 + y^2 = 1^2`,
+        `(x-0)^2 + (y+0)^2 = 1`,
+        `(\\cos\\theta, \\sin\\theta)`,
+      ]),
+      (a = { angleDeg: { kind: `number`, defaultValue: 45, min: -36e3, max: 36e3 } }),
+      (o = {
+        type: t,
+        version: 2,
+        thumbnailAssetKey: n,
+        canonicalFormula: r,
+        canonicalFormulaAliases: i,
+        parameters: a,
+      }));
+  }))();
 }
-let specification: Specification;
-function initializeSpecification(): void {
-  specification ??= {
-    type: "UNIT_CIRCLE",
-    version: 2,
-    thumbnailAssetKey: "unit-circle-v1",
-    canonicalFormula: "x^2 + y^2 = 1",
-    canonicalFormulaAliases: [
-      "1 = x^2 + y^2",
-      "x^2 + y^2 = 1^2",
-      "(x-0)^2 + (y+0)^2 = 1",
-      "(\\cos\\theta, \\sin\\theta)",
-    ],
-    parameters: {
-      angleDeg: { kind: "number", defaultValue: 45, min: -36_000, max: 36_000 },
-    },
-  };
-}
-export { specification as n, initializeSpecification as t };
+export { o as n, s as t };

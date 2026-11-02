@@ -1,20 +1,14 @@
-// Semantic restoration. Release chunk: constant-acceleration-visualization-5cb4c2e637e4.js.
+// @ts-nocheck
 import { n as e } from "@rchunk/rolldown-runtime";
 import { I3 as t, K2 as n, Y2 as r, n4 as i } from "@rchunk/app-shared";
 import { a, r as o } from "@rchunk/control-panel";
-// @ts-ignore -- published chunk binding is preserved locally.
 import { n as s, r as c, t as l } from "@rchunk/input-selector-group";
-// @ts-ignore -- published chunk binding is preserved locally.
 import { n as u, t as d } from "@rchunk/math-block-coordinate-plane";
-// @ts-ignore -- published chunk binding is preserved locally.
 import { i as f, r as p, t as m } from "@rchunk/format-number-input";
-// @ts-ignore -- published chunk binding is preserved locally.
 import { n as h, t as g } from "@rchunk/escape-latex-text";
-// @ts-ignore -- published chunk binding is preserved locally.
 import { n as _, t as v } from "@rchunk/learning-model-kinematics-velocity";
 var y, b, x, S;
 function C() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (C = e(() => {
     (v(),
       (y = (e, t) => {
@@ -47,7 +41,6 @@ function C() {
 }
 var w, T, E, D, O, k, A, j, M, N, P, F, I, L, R, z, B, V, H;
 function U() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (U = e(() => {
     (n(),
       c(),

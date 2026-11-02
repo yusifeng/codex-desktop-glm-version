@@ -1,65 +1,28 @@
-// Michaelis-Menten enzyme-kinetics learning model.
-import "@rchunk/rolldown-runtime";
-
-interface NumericControl {
-  defaultValue: number;
-  max: number;
-  min: number;
-  step: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c;
+function l() {
+  return (l = e(() => {
+    ((t = { min: 0, max: 20, step: 0.25, defaultValue: 6 }),
+      (n = { min: 1, max: 8, step: 0.25, defaultValue: 4 }),
+      (r = { min: 2, max: 10, step: 0.25, defaultValue: 8 }),
+      (i = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (a = (e, t, n, r) => (Number.isFinite(e) ? i(e ?? t, n, r) : t)),
+      (o = (e) => ({
+        substrateConcentration: a(e.substrateConcentration, t.defaultValue, t.min, t.max),
+        km: a(e.km, n.defaultValue, n.min, n.max),
+        vmax: a(e.vmax, r.defaultValue, r.min, r.max),
+      })),
+      (s = ({ substrateConcentration: e, km: t, vmax: n }) => (e === 0 ? 0 : (n * e) / (t + e))),
+      (c = (e) => {
+        let t = o(e);
+        return {
+          ...t,
+          reactionVelocity: s(t),
+          halfVmax: t.vmax / 2,
+          kmVelocity: s({ ...t, substrateConcentration: t.km }),
+        };
+      }));
+  }))();
 }
-
-interface EnzymeKineticsValues {
-  km?: number | null;
-  substrateConcentration?: number | null;
-  vmax?: number | null;
-}
-
-interface NormalizedEnzymeKineticsValues {
-  km: number;
-  substrateConcentration: number;
-  vmax: number;
-}
-
-const substrateConcentrationControl: NumericControl = { min: 0, max: 20, step: 0.25, defaultValue: 6 };
-const kmControl: NumericControl = { min: 1, max: 8, step: 0.25, defaultValue: 4 };
-const vmaxControl: NumericControl = { min: 2, max: 10, step: 0.25, defaultValue: 8 };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-
-function finiteControlValue(value: number | null | undefined, control: NumericControl): number {
-  return Number.isFinite(value) ? clamp(value ?? control.defaultValue, control.min, control.max) : control.defaultValue;
-}
-
-function normalizeEnzymeKineticsValues(values: EnzymeKineticsValues): NormalizedEnzymeKineticsValues {
-  return {
-    substrateConcentration: finiteControlValue(values.substrateConcentration, substrateConcentrationControl),
-    km: finiteControlValue(values.km, kmControl),
-    vmax: finiteControlValue(values.vmax, vmaxControl),
-  };
-}
-
-function michaelisMentenVelocity(values: NormalizedEnzymeKineticsValues): number {
-  return values.substrateConcentration === 0
-    ? 0
-    : values.vmax * values.substrateConcentration / (values.km + values.substrateConcentration);
-}
-
-function calculateEnzymeKinetics(values: EnzymeKineticsValues) {
-  const normalized = normalizeEnzymeKineticsValues(values);
-  return {
-    ...normalized,
-    reactionVelocity: michaelisMentenVelocity(normalized),
-    halfVmax: normalized.vmax / 2,
-    kmVelocity: michaelisMentenVelocity({ ...normalized, substrateConcentration: normalized.km }),
-  };
-}
-
-function initializeMichaelisMentenKineticsModel(): void {}
-
-export {
-  initializeMichaelisMentenKineticsModel as a,
-  calculateEnzymeKinetics as i,
-  substrateConcentrationControl as n,
-  normalizeEnzymeKineticsValues as o,
-  vmaxControl as r,
-  kmControl as t,
-};
+export { l as a, c as i, t as n, o, r, n as t };

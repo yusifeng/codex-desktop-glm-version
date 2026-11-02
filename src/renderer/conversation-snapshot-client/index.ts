@@ -1,295 +1,160 @@
-// Conversation snapshot SharedWorker client. Release chunk: client-206f71f5a32c.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-
-interface Metrics {
-  count(namespace: string, metric: string, tags: Record<string, unknown>): void;
-  hist(
-    namespace: string,
-    metric: string,
-    tags: Record<string, unknown>,
-    value: number,
-  ): void;
-}
-interface Scope {
-  get(key: unknown): Metrics | undefined;
-}
-interface Snapshot {
-  conversation_id: string;
-  [key: string]: unknown;
-}
-type ReadResult =
-  | {
-      status: "hit";
-      byteLength: number;
-      decodeDurationMs: number;
-      [key: string]: unknown;
-    }
-  | { status: "miss"; reason: string; [key: string]: unknown };
-type WriteResult =
-  | { status: "written"; byteLength: number; encodeDurationMs: number }
-  | { status: "rejected"; reason: string };
-interface RpcClient {
-  request(
-    request: Record<string, unknown>,
-    transfer?: unknown,
-  ): Promise<unknown>;
-  [Symbol.dispose](): void;
-}
-interface SharedRuntime {
-  DI(port: MessagePort): RpcClient;
-  EI(): void;
-}
-interface InitialRuntime {
-  GHt: unknown;
-  KHt(): void;
-  UHt: string;
-  WHt: string;
-  eJt: unknown;
-  nJt: Metrics;
-  tJt(): void;
-}
-
-const shared = appSharedChunk as unknown as SharedRuntime;
-const initial = appInitialChunk as unknown as InitialRuntime;
-
-function metricsFor(scope?: Scope): Metrics {
-  return scope?.get(initial.eJt) ?? initial.nJt;
-}
-
-function createConversationSnapshotClient(
-  scope?: Scope,
-  activationScope?: unknown,
-  onInvalidated?: (artifactId: string) => void,
-) {
-  if (activationScope != null) {
-    localStorage.setItem(initial.WHt, "1");
-    if (
-      localStorage.getItem("codex.conversation_snapshot_cache.persisted") !==
-      "1"
-    ) {
-      throw new Error("conversation_snapshot_persistence_marker_unavailable");
-    }
-  }
-  const worker = new SharedWorker(
-    new URL(
-      new URL("worker-3fe306248590.js", import.meta.url).href,
-      import.meta.url,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { DI as t, EI as n, yI as r } from "@rchunk/app-shared";
+import {
+  GHt as i,
+  KHt as a,
+  UHt as o,
+  WHt as s,
+  eJt as c,
+  nJt as l,
+  tJt as u,
+} from "@rchunk/app-initial";
+function d(e, n, a) {
+  if (
+    n != null &&
+    (localStorage.setItem(s, `1`),
+    localStorage.getItem(`codex.conversation_snapshot_cache.persisted`) !== `1`)
+  )
+    throw Error(`conversation_snapshot_persistence_marker_unavailable`);
+  let o = new SharedWorker(
+      new URL(`` + new URL(`worker-3fe306248590.js`, import.meta.url).href, `` + import.meta.url),
+      { type: `module` },
     ),
-    { type: "module" },
-  );
-  const rpc = shared.DI(worker.port);
-  worker.addEventListener("error", () => rpc[Symbol.dispose](), { once: true });
-
-  async function perform(
-    operation: string,
-    request: Record<string, unknown>,
-    suppliedSignal?: AbortSignal,
-  ): Promise<unknown> {
-    const metrics = metricsFor(scope);
-    const startedAt = performance.now();
-    const signal =
-      suppliedSignal ??
-      AbortSignal.timeout(
-        operation === "write" || operation === "clear" ? 2_000 : 1_000,
-      );
-    let abortListener: (() => void) | undefined;
+    u = t(o.port);
+  o.addEventListener(`error`, () => u[Symbol.dispose](), { once: !0 });
+  async function d(t, n, i) {
+    let o = e?.get(c) ?? l,
+      s = performance.now(),
+      d = i ?? AbortSignal.timeout(t === `write` || t === `clear` ? 2e3 : 1e3),
+      f;
     try {
-      signal.throwIfAborted();
-      const response = rpc.request(
-        request,
-        request.type === "activateScope" ? onInvalidated : undefined,
-      );
-      const result = await Promise.race([
-        response,
-        new Promise<never>((_resolve, reject) => {
-          abortListener = () =>
-            reject(
-              new DOMException(
-                "Conversation snapshot operation aborted",
-                "AbortError",
-              ),
-            );
-          signal.addEventListener("abort", abortListener, { once: true });
-        }),
-      ]);
-      if (operation !== "read" && operation !== "write") {
-        metrics.count("default", "conversation_snapshot_cache", {
-          operation,
-          result: "ok",
-        });
-      }
-      metrics.hist(
-        "default",
-        `conversation_snapshot_cache.${operation}_ms`,
-        {},
-        performance.now() - startedAt,
-      );
-      return result;
-    } catch (error) {
-      if (suppliedSignal?.aborted) {
-        metrics.hist(
-          "default",
-          "conversation_snapshot_cache.cancelled_ms",
-          {
-            operation,
-            reason:
-              suppliedSignal.reason === "server_won"
-                ? "server_won"
-                : "cancelled",
-          },
-          performance.now() - startedAt,
+      try {
+        var p = r();
+        d.throwIfAborted();
+        let e = p.u(u.request(n, n.type === `activateScope` ? a : void 0)),
+          i = p.u(
+            await Promise.race([
+              Promise.resolve(e),
+              new Promise((e, t) => {
+                ((f = () =>
+                  t(new DOMException(`Conversation snapshot operation aborted`, `AbortError`))),
+                  d.addEventListener(`abort`, f, { once: !0 }));
+              }),
+            ]),
+          );
+        return (
+          t !== `read` &&
+            t !== `write` &&
+            o.count(`default`, `conversation_snapshot_cache`, { operation: t, result: `ok` }),
+          o.hist(`default`, `conversation_snapshot_cache.${t}_ms`, {}, performance.now() - s),
+          i
         );
-      } else if (operation !== "read" && operation !== "write") {
-        metrics.count("default", "conversation_snapshot_cache", {
-          operation,
-          result: "error",
-        });
+      } catch (e) {
+        p.e = e;
+      } finally {
+        p.d();
       }
-      throw error;
+    } catch (e) {
+      throw (
+        i?.aborted
+          ? o.hist(
+              `default`,
+              `conversation_snapshot_cache.cancelled_ms`,
+              { operation: t, reason: i.reason === `server_won` ? `server_won` : `cancelled` },
+              performance.now() - s,
+            )
+          : t !== `read` &&
+            t !== `write` &&
+            o.count(`default`, `conversation_snapshot_cache`, { operation: t, result: `error` }),
+        e
+      );
     } finally {
-      if (abortListener != null)
-        signal.removeEventListener("abort", abortListener);
+      f != null && d.removeEventListener(`abort`, f);
     }
   }
-
-  if (activationScope != null) {
-    void perform("activate", {
-      type: "activateScope",
-      scope: activationScope,
-      limits: initial.GHt,
-    }).catch(() => undefined);
-  }
-
-  return {
-    async read(
-      artifactId: string,
-      includePayload: boolean,
-      signal?: AbortSignal,
-    ): Promise<ReadResult> {
-      const metrics = metricsFor(scope);
-      const response = (await perform(
-        "read",
-        {
-          type: "readSnapshot",
-          artifactId,
-          includePayload,
-        },
-        signal,
-      ).catch(() => undefined)) as Partial<ReadResult> | undefined;
-      const result: ReadResult =
-        response?.status === "hit" || response?.status === "miss"
-          ? (response as ReadResult)
-          : { status: "miss", reason: "worker_failure" };
-      if (result.status === "miss" && signal?.aborted) {
-        result.reason =
-          signal.reason === "server_won" ? "server_won" : "cancelled";
-      }
-      metrics.count("default", "conversation_snapshot_cache", {
-        operation: "read",
-        result: result.status,
-        ...(result.status === "miss" ? { reason: result.reason } : {}),
-      });
-      if (result.status === "hit") {
-        metrics.hist(
-          "default",
-          "conversation_snapshot_cache.read_bytes",
-          {},
-          result.byteLength,
+  return (
+    n != null && d(`activate`, { type: `activateScope`, scope: n, limits: i }).catch(() => {}),
+    {
+      async read(t, n, r) {
+        let i = e?.get(c) ?? l,
+          a = await d(`read`, { type: `readSnapshot`, artifactId: t, includePayload: n }, r).catch(
+            () => void 0,
+          ),
+          o =
+            a?.status === `hit` || a?.status === `miss`
+              ? a
+              : { status: `miss`, reason: `worker_failure` };
+        return (
+          o.status === `miss` &&
+            r?.aborted &&
+            (o.reason = r.reason === `server_won` ? `server_won` : `cancelled`),
+          i.count(`default`, `conversation_snapshot_cache`, {
+            operation: `read`,
+            result: o.status,
+            ...(o.status === `miss` ? { reason: o.reason } : {}),
+          }),
+          o.status === `hit` &&
+            (i.hist(`default`, `conversation_snapshot_cache.read_bytes`, {}, o.byteLength),
+            i.hist(`default`, `conversation_snapshot_cache.decode_ms`, {}, o.decodeDurationMs)),
+          o
         );
-        metrics.hist(
-          "default",
-          "conversation_snapshot_cache.decode_ms",
-          {},
-          result.decodeDurationMs,
+      },
+      async write(t, n) {
+        let r = await d(`write`, {
+            type: `writeSnapshot`,
+            artifactId: t.conversation_id,
+            payload: t,
+            requestStartedAt: n,
+          }).catch(() => void 0),
+          i =
+            r?.status === `written` || r?.status === `rejected`
+              ? r
+              : { status: `rejected`, reason: `worker_failure` },
+          a = e?.get(c) ?? l;
+        return (
+          a.count(`default`, `conversation_snapshot_cache`, {
+            operation: `write`,
+            result: i.status,
+            ...(i.status === `rejected` ? { reason: i.reason } : {}),
+          }),
+          i.status === `written` &&
+            (localStorage.setItem(s, `1`),
+            a.hist(`default`, `conversation_snapshot_cache.write_bytes`, {}, i.byteLength),
+            a.hist(`default`, `conversation_snapshot_cache.encode_ms`, {}, i.encodeDurationMs)),
+          i
         );
-      }
-      return result;
-    },
-    async write(
-      snapshot: Snapshot,
-      requestStartedAt: number,
-    ): Promise<WriteResult> {
-      const response = (await perform("write", {
-        type: "writeSnapshot",
-        artifactId: snapshot.conversation_id,
-        payload: snapshot,
-        requestStartedAt,
-      }).catch(() => undefined)) as Partial<WriteResult> | undefined;
-      const result: WriteResult =
-        response?.status === "written" || response?.status === "rejected"
-          ? (response as WriteResult)
-          : { status: "rejected", reason: "worker_failure" };
-      const metrics = metricsFor(scope);
-      metrics.count("default", "conversation_snapshot_cache", {
-        operation: "write",
-        result: result.status,
-        ...(result.status === "rejected" ? { reason: result.reason } : {}),
-      });
-      if (result.status === "written") {
-        localStorage.setItem(initial.WHt, "1");
-        metrics.hist(
-          "default",
-          "conversation_snapshot_cache.write_bytes",
-          {},
-          result.byteLength,
-        );
-        metrics.hist(
-          "default",
-          "conversation_snapshot_cache.encode_ms",
-          {},
-          result.encodeDurationMs,
-        );
-      }
-      return result;
-    },
-    async delete(artifactId: string): Promise<void> {
-      const result = (await perform("delete", {
-        type: "deleteSnapshot",
-        artifactId,
-      })) as { status?: string } | undefined;
-      if (result?.status === "rejected") {
-        throw new Error("conversation_snapshot_delete_failed");
-      }
-    },
-    async clear(): Promise<void> {
-      try {
-        const result = (await perform("clear", { type: "clearDatabase" })) as
-          { status?: string } | undefined;
-        if (result?.status !== "rejected") localStorage.removeItem(initial.WHt);
-      } finally {
-        rpc[Symbol.dispose]();
-        worker.port.close();
-      }
-    },
-  };
+      },
+      async delete(e) {
+        if ((await d(`delete`, { type: `deleteSnapshot`, artifactId: e }))?.status === `rejected`)
+          throw Error(`conversation_snapshot_delete_failed`);
+      },
+      async clear() {
+        try {
+          (await d(`clear`, { type: `clearDatabase` }))?.status !== `rejected` &&
+            localStorage.removeItem(s);
+        } finally {
+          (u[Symbol.dispose](), o.port.close());
+        }
+      },
+    }
+  );
 }
-
-async function clearPersistedConversationSnapshots(): Promise<void> {
-  if (typeof SharedWorker !== "undefined") {
-    return createConversationSnapshotClient().clear();
-  }
-  await new Promise<void>((resolve, reject) => {
-    const request = indexedDB.deleteDatabase(initial.UHt);
-    request.onsuccess = () => {
-      localStorage.removeItem(initial.WHt);
-      resolve();
-    };
-    request.onerror = () =>
-      reject(
-        request.error ?? new Error("conversation_snapshot_cleanup_failed"),
-      );
-    request.onblocked = () =>
-      reject(new Error("conversation_snapshot_cleanup_failed"));
+async function f() {
+  if (typeof SharedWorker < `u`) return d(void 0).clear();
+  await new Promise((e, t) => {
+    let n = indexedDB.deleteDatabase(o);
+    ((n.onsuccess = () => {
+      (localStorage.removeItem(s), e());
+    }),
+      (n.onerror = () => t(n.error ?? Error(`conversation_snapshot_cleanup_failed`))),
+      (n.onblocked = () => t(Error(`conversation_snapshot_cleanup_failed`))));
   });
 }
-
-shared.EI();
-initial.tJt();
-initial.KHt();
-
-export {
-  clearPersistedConversationSnapshots,
-  createConversationSnapshotClient,
-};
+function p() {
+  return (p = e(() => {
+    (n(), u(), a());
+  }))();
+}
+p();
+export { f as clearPersistedConversationSnapshots, d as createConversationSnapshotClient };

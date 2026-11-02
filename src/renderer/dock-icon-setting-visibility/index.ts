@@ -1,25 +1,12 @@
-import "@rchunk/rolldown-runtime";
-import { Cq as BuildFlavor, wL as initializeUtilities } from "@rchunk/app-shared";
-
-interface DockIconSettingVisibilityProps {
-  buildFlavor?: string;
-  dockIconPreviews: unknown;
-  platform: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { Cq as t, wL as n } from "@rchunk/app-shared";
+function r({ platform: e, dockIconPreviews: n, buildFlavor: r = `prod` }) {
+  return e !== `macOS` || r === t.Agent ? null : n;
 }
-
-function DockIconSettingVisibility({
-  platform,
-  dockIconPreviews,
-  buildFlavor = "prod",
-}: DockIconSettingVisibilityProps): unknown {
-  const agentBuildFlavor = (BuildFlavor as unknown as { Agent: string }).Agent;
-  return platform !== "macOS" || buildFlavor === agentBuildFlavor
-    ? null
-    : dockIconPreviews;
+function i() {
+  return (i = e(() => {
+    n();
+  }))();
 }
-
-function initializeDockIconSettingVisibility(): void {
-  initializeUtilities();
-}
-
-export { initializeDockIconSettingVisibility as n, DockIconSettingVisibility as t };
+export { i as n, r as t };

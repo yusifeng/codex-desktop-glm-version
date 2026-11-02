@@ -1,38 +1,23 @@
-import * as appInitialChunk from "@rchunk/app-initial";
-
-const threadRuntime = appInitialChunk as unknown as {
-  Cyt: unknown;
-  Dyt: unknown;
-  Eyt: unknown;
-  Syt: unknown;
-  Tyt: unknown;
-  byt(): void;
-  wyt: unknown;
-  xyt: unknown;
-  yyt: unknown;
-};
-
-const {
-  Cyt: fileGitHostConfigByHostId$,
-  Dyt: threadHostId$,
-  Eyt: threadHostConfig$,
-  Syt: threadCwd$,
-  Tyt: threadGitHostKey$,
-  byt: initializeThreadContext,
-  wyt: threadGitHostConfig$,
-  xyt: threadCodexHome$,
-  yyt: threadExecutorTarget$,
-} = threadRuntime;
-
-initializeThreadContext();
-
+// @ts-nocheck
+import {
+  Cyt as e,
+  Dyt as t,
+  Eyt as n,
+  Syt as r,
+  Tyt as i,
+  byt as a,
+  wyt as o,
+  xyt as s,
+  yyt as c,
+} from "@rchunk/app-initial";
+a();
 export {
-  fileGitHostConfigByHostId$,
-  threadCodexHome$,
-  threadCwd$,
-  threadExecutorTarget$,
-  threadGitHostConfig$,
-  threadGitHostKey$,
-  threadHostConfig$,
-  threadHostId$,
+  c as fileGitHostConfigByHostId$,
+  s as threadCodexHome$,
+  r as threadCwd$,
+  e as threadExecutorTarget$,
+  o as threadGitHostConfig$,
+  i as threadGitHostKey$,
+  n as threadHostConfig$,
+  t as threadHostId$,
 };

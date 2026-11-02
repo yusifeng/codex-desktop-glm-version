@@ -1,41 +1,33 @@
-// Pythagorean-theorem template and manifest. Release chunk: type-e9e5c33af31e.js.
-import "@rchunk/rolldown-runtime";
-
-const legTemplateBounds = { min: 5, max: 15, step: 0.1 };
-const firstLegTemplateProperty = { ...legTemplateBounds, label: "a", defaultValue: 15 };
-const secondLegTemplateProperty = { ...legTemplateBounds, label: "b", defaultValue: 15 };
-
-const pythagoreanTheoremTemplate = {
-  properties: {
-    a: firstLegTemplateProperty,
-    b: secondLegTemplateProperty,
-  },
-};
-
-const pythagoreanTheoremSpecification = {
-  type: "PYTHAGOREAN_THEOREM",
-  version: 2,
-  thumbnailAssetKey: "pythagorean-v1",
-  canonicalFormula: "a^2 + b^2 = c^2",
-  canonicalFormulaAliases: [
-    "c^2 = a^2 + b^2",
-    "c = \\sqrt{a^2 + b^2}",
-    "c = \\sqrt{(a^2 + b^2)}",
-  ],
-  parameters: {
-    a: { kind: "number" as const, defaultValue: 15, min: 0.01, max: 10_000 },
-    b: { kind: "number" as const, defaultValue: 15, min: 0.01, max: 10_000 },
-  },
-};
-
-function initializePythagoreanTheoremTemplate(): void {}
-function initializePythagoreanTheoremSpecification(): void {}
-
-export {
-  pythagoreanTheoremTemplate as a,
-  secondLegTemplateProperty as i,
-  pythagoreanTheoremSpecification as n,
-  initializePythagoreanTheoremTemplate as o,
-  firstLegTemplateProperty as r,
-  initializePythagoreanTheoremSpecification as t,
-};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = { min: 5, max: 15, step: 0.1 }),
+      (n = { ...t, label: `a`, defaultValue: 15 }),
+      (r = { ...t, label: `b`, defaultValue: 15 }),
+      (i = { properties: { a: n, b: r } }));
+  }))();
+}
+var o, s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    ((o = `PYTHAGOREAN_THEOREM`),
+      (s = `pythagorean-v1`),
+      (c = `a^2 + b^2 = c^2`),
+      (l = [`c^2 = a^2 + b^2`, `c = \\sqrt{a^2 + b^2}`, `c = \\sqrt{(a^2 + b^2)}`]),
+      (u = {
+        a: { kind: `number`, defaultValue: 15, min: 0.01, max: 1e4 },
+        b: { kind: `number`, defaultValue: 15, min: 0.01, max: 1e4 },
+      }),
+      (d = {
+        type: o,
+        version: 2,
+        thumbnailAssetKey: s,
+        canonicalFormula: c,
+        canonicalFormulaAliases: l,
+        parameters: u,
+      }));
+  }))();
+}
+export { i as a, r as i, d as n, a as o, n as r, f as t };

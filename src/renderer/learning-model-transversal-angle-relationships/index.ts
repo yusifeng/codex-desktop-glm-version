@@ -1,56 +1,43 @@
-// Transversal angle-relationship learning model for parallel lines.
-import "@rchunk/rolldown-runtime";
-
-interface TransversalValues { angleDeg?: number | null; handleX?: number | null; handleY?: number | null; relationshipIndex?: number | null }
-
-const angleRelationships = [
-  { index: 0, label: "Corresponding", outcome: "equal" },
-  { index: 1, label: "Alternate interior", outcome: "equal" },
-  { index: 2, label: "Alternate exterior", outcome: "equal" },
-  { index: 3, label: "Same-side interior", outcome: "supplementary" },
-] as const;
-const angleControl = { min: 25, max: 155, step: 1, defaultValue: 62 };
-const relationshipIndexControl = { min: 0, max: angleRelationships.length - 1, step: 1, defaultValue: 0 };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-const finiteCoordinate = (value: number | null | undefined): number | undefined =>
-  typeof value === "number" && Number.isFinite(value) ? value : undefined;
-const normalizeAngle = (value: number | null | undefined): number => {
-  const angle = typeof value === "number" && Number.isFinite(value) ? value : angleControl.defaultValue;
-  return clamp(Math.round(angle / angleControl.step) * angleControl.step, angleControl.min, angleControl.max);
-};
-const normalizeRelationshipIndex = (value: number | null | undefined): number => {
-  const index = typeof value === "number" && Number.isFinite(value) ? Math.round(value) : relationshipIndexControl.defaultValue;
-  return clamp(index, relationshipIndexControl.min, relationshipIndexControl.max);
-};
-const normalizeTransversalValues = (values: TransversalValues) => ({
-  angleDeg: normalizeAngle(values.angleDeg),
-  handleX: finiteCoordinate(values.handleX),
-  handleY: finiteCoordinate(values.handleY),
-  relationshipIndex: normalizeRelationshipIndex(values.relationshipIndex),
-});
-const getAngleRelationship = (index: number) => angleRelationships[index];
-
-function calculateTransversalAnglePair(values: TransversalValues) {
-  const normalized = normalizeTransversalValues(values);
-  const relationship = getAngleRelationship(normalized.relationshipIndex);
-  const angle = normalized.angleDeg;
-  const supplement = 180 - angle;
-  if (relationship.outcome === "supplementary") {
-    return { ...normalized, relationship, pair: [supplement, angle], equation: `${supplement}° + ${angle}° = 180°` };
-  }
-  const pairedAngle = relationship.index === 0 ? angle : supplement;
-  return { ...normalized, relationship, pair: [pairedAngle, pairedAngle], equation: `${pairedAngle}° = ${pairedAngle}°` };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u;
+function d() {
+  return (d = e(() => {
+    ((t = [
+      { index: 0, label: `Corresponding`, outcome: `equal` },
+      { index: 1, label: `Alternate interior`, outcome: `equal` },
+      { index: 2, label: `Alternate exterior`, outcome: `equal` },
+      { index: 3, label: `Same-side interior`, outcome: `supplementary` },
+    ]),
+      (n = { min: 25, max: 155, step: 1, defaultValue: 62 }),
+      (r = { min: 0, max: t.length - 1, step: 1, defaultValue: 0 }),
+      (i = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (a = (e) => (typeof e == `number` && Number.isFinite(e) ? e : void 0)),
+      (o = (e) => {
+        let t = typeof e == `number` && Number.isFinite(e) ? e : n.defaultValue;
+        return i(Math.round(t / n.step) * n.step, n.min, n.max);
+      }),
+      (s = (e) => {
+        let t = typeof e == `number` && Number.isFinite(e) ? Math.round(e) : r.defaultValue;
+        return i(t, r.min, r.max);
+      }),
+      (c = (e) => ({
+        angleDeg: o(e.angleDeg),
+        handleX: a(e.handleX),
+        handleY: a(e.handleY),
+        relationshipIndex: s(e.relationshipIndex),
+      })),
+      (l = (e) => t[e]),
+      (u = (e) => {
+        let t = c(e),
+          n = l(t.relationshipIndex),
+          r = t.angleDeg,
+          i = 180 - r;
+        if (n.outcome === `supplementary`)
+          return { ...t, relationship: n, pair: [i, r], equation: `${i}° + ${r}° = 180°` };
+        let a = n.index === 0 ? r : i;
+        return { ...t, relationship: n, pair: [a, a], equation: `${a}° = ${a}°` };
+      }));
+  }))();
 }
-
-function initializeTransversalAngleRelationshipsModel(): void {}
-
-export {
-  normalizeAngle as a,
-  calculateTransversalAnglePair as c,
-  initializeTransversalAngleRelationshipsModel as i,
-  relationshipIndexControl as n,
-  normalizeRelationshipIndex as o,
-  angleRelationships as r,
-  normalizeTransversalValues as s,
-  angleControl as t,
-};
+export { o as a, u as c, d as i, r as n, s as o, t as r, c as s, n as t };

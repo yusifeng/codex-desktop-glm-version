@@ -1,11 +1,9 @@
-import "@rchunk/rolldown-runtime";
-
-let keyboardShortcutsFeatureId: string | undefined;
-let initialized = false;
-function initializeKeyboardShortcutsGate(): void {
-  if (initialized) return;
-  initialized = true;
-  keyboardShortcutsFeatureId = "1932174607";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t;
+function n() {
+  return (n = e(() => {
+    t = `1932174607`;
+  }))();
 }
-
-export { initializeKeyboardShortcutsGate as n, keyboardShortcutsFeatureId as t };
+export { n, t };

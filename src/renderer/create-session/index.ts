@@ -1,11 +1,9 @@
-// Semantic restoration. Release chunk: create-session-976e086b152c.js.
+// @ts-nocheck
 import { n as e } from "@rchunk/rolldown-runtime";
 import { cJt as t, ifn as n, rJt as r, rfn as i } from "@rchunk/app-initial";
 import { E as a, S as o } from "@rchunk/checkout-policy";
-// @ts-ignore -- published chunk binding is preserved locally.
-import { n as s, r as c } from "@rchunk/chatgpt-account-action-integrity";
-// @ts-ignore -- published chunk binding is preserved locally.
-import { D as l, I as u } from "@rchunk/session";
+import { n as s, r as c } from "@rchunk/account-action-integrity";
+import { D as l, I as u } from "@rchunk/checkout-session";
 import { n as d, r as f } from "@rchunk/promo-funnel-context";
 async function p({
   accountId: e,
@@ -41,7 +39,6 @@ async function p({
       additionalHeaders: p,
       signal: d,
     });
-  // @ts-ignore -- published chunk binding is preserved locally.
   if ((d.throwIfAborted(), !(`tag` in h && h.tag === `custom_checkout_session`) && h.url == null))
     throw Error(`Checkout URL unavailable`);
   let g = t.discount_code;
@@ -57,7 +54,6 @@ async function p({
   );
 }
 function m() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (m = e(() => {
     (u(), o(), c(), t(), n(), d());
   }))();

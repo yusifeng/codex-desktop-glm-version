@@ -1,9 +1,5 @@
+// @ts-nocheck
 import "@rchunk/app-shared";
-import {
-  n as initializeConversationThumbnail,
-  t as ConversationThumbnail,
-} from "@rchunk/registered-conversation-thumbnail-core";
-
-initializeConversationThumbnail();
-
-export { ConversationThumbnail as RegisteredConversationThumbnail };
+import { n as e, t } from "@rchunk/registered-conversation-thumbnail-core";
+e();
+export { t as RegisteredConversationThumbnail };

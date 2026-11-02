@@ -1,14 +1,11 @@
-// @ts-expect-error The semantic dependency is registered by the shared manifest owner.
-import { a as editablePlanContentByKey$, i as editablePlanByKey$, r as activePlan$ } from "@rchunk/editable-plan-tab";
-// @ts-expect-error The semantic dependency declaration is maintained by the shared manifest owner.
-import { n as openPlanSidePanel, r as openReadOnlyPlanSidePanel, t as initializePlanSidePanel } from "@rchunk/plan-side-panel";
-
-initializePlanSidePanel();
-
+// @ts-nocheck
+import { a as e, i as t, r as n } from "@rchunk/editable-plan-tab";
+import { n as r, r as i, t as a } from "@rchunk/plan-side-panel";
+a();
 export {
-  activePlan$,
-  editablePlanByKey$,
-  editablePlanContentByKey$,
-  openPlanSidePanel,
-  openReadOnlyPlanSidePanel,
+  n as activePlan$,
+  t as editablePlanByKey$,
+  e as editablePlanContentByKey$,
+  r as openPlanSidePanel,
+  i as openReadOnlyPlanSidePanel,
 };

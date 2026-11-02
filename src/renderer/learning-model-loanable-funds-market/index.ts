@@ -1,44 +1,34 @@
-// Loanable-funds market learning model with saving and investment shifts.
-import "@rchunk/rolldown-runtime";
-
-interface LoanableFundsValues { scenario?: number | null }
-
-const loanableFundsGraphBounds = { quantityMin: 0, quantityMax: 100, rateMin: 0, rateMax: 10 };
-const defaultLoanableFundsValues = { scenario: 0 };
-const shiftMagnitude = 20;
-const savingBaseRate = 1.5;
-const investmentBaseRate = 8.5;
-const slope = 0.07;
-
-function normalizeScenario(value: number | null | undefined): number {
-  return Number.isFinite(value) ? Math.min(4, Math.max(0, Math.round(value ?? 0))) : 0;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    ((t = { quantityMin: 0, quantityMax: 100, rateMin: 0, rateMax: 10 }),
+      (n = { scenario: 0 }),
+      (r = 20),
+      (i = 1.5),
+      (a = 8.5),
+      (o = 0.07),
+      (s = (e) => ({
+        scenario: Number.isFinite(e.scenario)
+          ? Math.min(4, Math.max(0, Math.round(e.scenario ?? 0)))
+          : 0,
+      })),
+      (c = (e, t = 0) => i + o * (e - t)),
+      (l = (e, t = 0) => a - o * (e - t)),
+      (u = (e) => {
+        let { scenario: t } = s(e),
+          n = t === 1 ? r : t === 2 ? -20 : 0,
+          i = t === 3 ? r : t === 4 ? -20 : 0,
+          a = (7 + o * n + o * i) / (2 * o);
+        return {
+          scenario: t,
+          savingShift: n,
+          investmentShift: i,
+          equilibrium: { quantity: a, realRate: c(a, n) },
+        };
+      }),
+      (d = u(n).equilibrium));
+  }))();
 }
-
-const savingRate = (quantity: number, shift = 0): number => savingBaseRate + slope * (quantity - shift);
-const investmentRate = (quantity: number, shift = 0): number => investmentBaseRate - slope * (quantity - shift);
-
-function calculateLoanableFundsEquilibrium(values: LoanableFundsValues) {
-  const scenario = normalizeScenario(values.scenario);
-  const savingShift = scenario === 1 ? shiftMagnitude : scenario === 2 ? -shiftMagnitude : 0;
-  const investmentShift = scenario === 3 ? shiftMagnitude : scenario === 4 ? -shiftMagnitude : 0;
-  const quantity = (7 + slope * savingShift + slope * investmentShift) / (2 * slope);
-  return {
-    scenario,
-    savingShift,
-    investmentShift,
-    equilibrium: { quantity, realRate: savingRate(quantity, savingShift) },
-  };
-}
-
-const defaultLoanableFundsEquilibrium = calculateLoanableFundsEquilibrium(defaultLoanableFundsValues).equilibrium;
-function initializeLoanableFundsMarketModel(): void {}
-
-export {
-  investmentRate as a,
-  calculateLoanableFundsEquilibrium as i,
-  defaultLoanableFundsValues as n,
-  savingRate as o,
-  loanableFundsGraphBounds as r,
-  initializeLoanableFundsMarketModel as s,
-  defaultLoanableFundsEquilibrium as t,
-};
+export { l as a, u as i, n, c as o, t as r, f as s, d as t };

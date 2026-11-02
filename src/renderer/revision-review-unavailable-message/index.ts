@@ -1,185 +1,180 @@
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as reactCompilerRuntime,
-  I3 as getJsxRuntime,
-  If as initializeMenu,
-  Yh as Button,
-  Zh as initializeButton,
-  h4 as initializeStyleRuntime,
-  iy as CheckIcon,
-  jf as Menu,
-  kf as DropdownMenu,
-  lw as initializeBrowserIcons,
-  m4 as classNames,
-  sy as ChevronDownIcon,
+  $3 as t,
+  I3 as n,
+  If as r,
+  Yh as i,
+  Zh as a,
+  h4 as o,
+  iy as s,
+  jf as c,
+  kf as l,
+  lw as u,
+  m4 as d,
+  sy as f,
 } from "@rchunk/app-shared";
-import {
-  dat as initializeDiffStats,
-  uat as DiffStats,
-} from "@rchunk/app-initial";
-
-void reactCompilerRuntime;
-
-export interface RevisionDiffStats {
-  additions: number;
-  deletions: number;
+import { dat as p, uat as m } from "@rchunk/app-initial";
+function h(e) {
+  let t = (0, v.c)(22),
+    { children: n, diffStats: r, label: a, onOpenChange: o, reviewV2Enabled: s } = e,
+    c = s === void 0 || s,
+    u = c && `gap-1.5`,
+    p;
+  t[0] === u
+    ? (p = t[1])
+    : ((p = d(`w-fit max-w-[320px] border-transparent px-1.5`, u)), (t[0] = u), (t[1] = p));
+  let m = c ? `gap-3` : `gap-1.5 truncate`,
+    h;
+  t[2] === m
+    ? (h = t[3])
+    : ((h = d(`flex max-w-full min-w-0 items-center`, m)), (t[2] = m), (t[3] = h));
+  let _;
+  t[4] === a
+    ? (_ = t[5])
+    : ((_ = (0, y.jsx)(`span`, { className: `min-w-0 truncate`, children: a })),
+      (t[4] = a),
+      (t[5] = _));
+  let b;
+  t[6] !== r || t[7] !== c
+    ? ((b = c && r != null ? (0, y.jsx)(g, { ...r, reviewV2Enabled: !0 }) : null),
+      (t[6] = r),
+      (t[7] = c),
+      (t[8] = b))
+    : (b = t[8]);
+  let x;
+  t[9] !== h || t[10] !== _ || t[11] !== b
+    ? ((x = (0, y.jsxs)(`span`, { className: h, children: [_, b] })),
+      (t[9] = h),
+      (t[10] = _),
+      (t[11] = b),
+      (t[12] = x))
+    : (x = t[12]);
+  let S;
+  t[13] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((S = (0, y.jsx)(f, {})), (t[13] = S))
+    : (S = t[13]);
+  let C;
+  t[14] !== p || t[15] !== x
+    ? ((C = (0, y.jsxs)(i, {
+        className: p,
+        allowShrink: !0,
+        color: `ghostActive`,
+        size: `toolbar`,
+        children: [x, S],
+      })),
+      (t[14] = p),
+      (t[15] = x),
+      (t[16] = C))
+    : (C = t[16]);
+  let w = c ? `menuWide` : `menuBounded`,
+    T;
+  return (
+    t[17] !== n || t[18] !== o || t[19] !== C || t[20] !== w
+      ? ((T = (0, y.jsx)(l, { onOpenChange: o, triggerButton: C, contentWidth: w, children: n })),
+        (t[17] = n),
+        (t[18] = o),
+        (t[19] = C),
+        (t[20] = w),
+        (t[21] = T))
+      : (T = t[21]),
+    T
+  );
 }
-
-export interface RevisionSourceDropdownProps {
-  children?: unknown;
-  diffStats?: RevisionDiffStats | null;
-  label: unknown;
-  onOpenChange?: (open: boolean) => void;
-  reviewV2Enabled?: boolean;
+function g(e) {
+  let t = (0, v.c)(6),
+    { additions: n, deletions: r, reviewV2Enabled: i } = e;
+  if (n === 0 && r === 0) return null;
+  let a = i ? `text-sm` : `text-size-chat`,
+    o;
+  t[0] === a ? (o = t[1]) : ((o = d(`me-1 shrink-0 select-none`, a)), (t[0] = a), (t[1] = o));
+  let s;
+  return (
+    t[2] !== n || t[3] !== r || t[4] !== o
+      ? ((s = (0, y.jsx)(m, { className: o, linesAdded: n, linesRemoved: r })),
+        (t[2] = n),
+        (t[3] = r),
+        (t[4] = o),
+        (t[5] = s))
+      : (s = t[5]),
+    s
+  );
 }
-
-export interface RevisionSourceMenuItemProps {
-  diffStats?: RevisionDiffStats | null;
-  isSelected: boolean;
-  label: unknown;
-  showDiffStats?: boolean;
-  showSelectionIndicator?: boolean;
+function _(e) {
+  let t = (0, v.c)(12),
+    { diffStats: n, isSelected: r, label: i, showDiffStats: a, showSelectionIndicator: o } = e,
+    l = o === void 0 || o,
+    u;
+  t[0] !== r || t[1] !== l
+    ? ((u = l
+        ? (0, y.jsx)(c.ItemIcon, { size: `xs`, children: r ? (0, y.jsx)(s, {}) : null })
+        : null),
+      (t[0] = r),
+      (t[1] = l),
+      (t[2] = u))
+    : (u = t[2]);
+  let d;
+  t[3] === i
+    ? (d = t[4])
+    : ((d = (0, y.jsx)(`span`, { className: `min-w-0 flex-1 truncate`, children: i })),
+      (t[3] = i),
+      (t[4] = d));
+  let f;
+  t[5] !== n || t[6] !== a
+    ? ((f =
+        a &&
+        n != null &&
+        (n.additions === 0 && n.deletions === 0
+          ? (0, y.jsx)(`span`, {
+              "aria-hidden": !0,
+              className: `shrink-0 text-codex-description`,
+              children: b,
+            })
+          : (0, y.jsx)(m, {
+              className: `shrink-0`,
+              linesAdded: n.additions,
+              linesRemoved: n.deletions,
+            }))),
+      (t[5] = n),
+      (t[6] = a),
+      (t[7] = f))
+    : (f = t[7]);
+  let p;
+  return (
+    t[8] !== u || t[9] !== d || t[10] !== f
+      ? ((p = (0, y.jsxs)(`span`, {
+          className: `flex min-w-0 flex-1 items-center gap-1.5`,
+          children: [u, d, f],
+        })),
+        (t[8] = u),
+        (t[9] = d),
+        (t[10] = f),
+        (t[11] = p))
+      : (p = t[11]),
+    p
+  );
 }
-
-function RevisionDiffStatsView({
-  additions,
-  deletions,
-  reviewV2Enabled,
-}: RevisionDiffStats & { reviewV2Enabled?: boolean }): unknown {
-  if (additions === 0 && deletions === 0) return null;
-  const { jsx } = getJsxRuntime();
-  return jsx(DiffStats, {
-    className: classNames(
-      "me-1 shrink-0 select-none",
-      reviewV2Enabled ? "text-sm" : "text-size-chat",
-    ),
-    linesAdded: additions,
-    linesRemoved: deletions,
-  });
+var v, y, b;
+function x() {
+  return (x = e(() => {
+    ((v = t()), o(), a(), r(), u(), p(), (y = n()), (b = `—`));
+  }))();
 }
-
-function RevisionSourceDropdown({
-  children,
-  diffStats,
-  label,
-  onOpenChange,
-  reviewV2Enabled = true,
-}: RevisionSourceDropdownProps): unknown {
-  const { jsx, jsxs } = getJsxRuntime();
-  const triggerButton = jsxs(Button, {
-    className: classNames(
-      "w-fit max-w-[320px] border-transparent px-1.5",
-      reviewV2Enabled && "gap-1.5",
-    ),
-    allowShrink: true,
-    color: "ghostActive",
-    size: "toolbar",
-    children: [
-      jsxs("span", {
-        className: classNames(
-          "flex max-w-full min-w-0 items-center",
-          reviewV2Enabled ? "gap-3" : "gap-1.5 truncate",
-        ),
-        children: [
-          jsx("span", { className: "min-w-0 truncate", children: label }),
-          reviewV2Enabled && diffStats != null
-            ? jsx(RevisionDiffStatsView, { ...diffStats, reviewV2Enabled: true })
-            : null,
-        ],
-      }),
-      jsx(ChevronDownIcon, {}),
-    ],
-  });
-  return jsx(DropdownMenu, {
-    onOpenChange,
-    triggerButton,
-    contentWidth: reviewV2Enabled ? "menuWide" : "menuBounded",
-    children,
-  });
+function S(e, t) {
+  if (t !== `available`)
+    return t === `loading`
+      ? e.formatMessage({
+          id: `pullRequestRevision.checking`,
+          defaultMessage: `Checking review availability…`,
+          description: `Status while checking exact-revision review support`,
+        })
+      : e.formatMessage({
+          id: `pullRequestRevision.cliRequired`,
+          defaultMessage: `Exact-revision review requires GitHub CLI signed in to this GitHub account on the selected host. The GitHub connector does not yet provide fixed-revision comparisons.`,
+          description: `Explains why a connector-backed pull request cannot open an immutable code review`,
+        });
 }
-
-function RevisionSourceMenuItem({
-  diffStats,
-  isSelected,
-  label,
-  showDiffStats,
-  showSelectionIndicator = true,
-}: RevisionSourceMenuItemProps): unknown {
-  const { jsx, jsxs } = getJsxRuntime();
-  const selection = showSelectionIndicator
-    ? jsx(Menu.ItemIcon, {
-        size: "xs",
-        children: isSelected ? jsx(CheckIcon, {}) : null,
-      })
-    : null;
-  let stats: unknown = null;
-  if (showDiffStats && diffStats != null) {
-    stats =
-      diffStats.additions === 0 && diffStats.deletions === 0
-        ? jsx("span", {
-            "aria-hidden": true,
-            className: "shrink-0 text-codex-description",
-            children: "—",
-          })
-        : jsx(DiffStats, {
-            className: "shrink-0",
-            linesAdded: diffStats.additions,
-            linesRemoved: diffStats.deletions,
-          });
-  }
-  return jsxs("span", {
-    className: "flex min-w-0 flex-1 items-center gap-1.5",
-    children: [
-      selection,
-      jsx("span", { className: "min-w-0 flex-1 truncate", children: label }),
-      stats,
-    ],
-  });
+function C() {
+  return (C = e(() => {}))();
 }
-
-export interface RevisionAvailabilityIntl {
-  formatMessage(descriptor: {
-    defaultMessage: string;
-    description: string;
-    id: string;
-  }): string;
-}
-
-function getRevisionUnavailableMessage(
-  intl: RevisionAvailabilityIntl,
-  availability: "account-mismatch" | "available" | "cli-required" | "loading",
-): string | undefined {
-  if (availability === "available") return undefined;
-  return availability === "loading"
-    ? intl.formatMessage({
-        id: "pullRequestRevision.checking",
-        defaultMessage: "Checking review availability…",
-        description: "Status while checking exact-revision review support",
-      })
-    : intl.formatMessage({
-        id: "pullRequestRevision.cliRequired",
-        defaultMessage:
-          "Exact-revision review requires GitHub CLI signed in to this GitHub account on the selected host. The GitHub connector does not yet provide fixed-revision comparisons.",
-        description:
-          "Explains why a connector-backed pull request cannot open an immutable code review",
-      });
-}
-
-function initializeRevisionSourceUi(): void {
-  initializeStyleRuntime();
-  initializeButton();
-  initializeMenu();
-  initializeBrowserIcons();
-  initializeDiffStats();
-  getJsxRuntime();
-}
-
-function initializeRevisionUnavailableMessage(): void {}
-
-export {
-  RevisionSourceMenuItem as a,
-  RevisionSourceDropdown as i,
-  initializeRevisionUnavailableMessage as n,
-  initializeRevisionSourceUi as o,
-  RevisionDiffStatsView as r,
-  getRevisionUnavailableMessage as t,
-};
+export { _ as a, h as i, C as n, x as o, g as r, S as t };

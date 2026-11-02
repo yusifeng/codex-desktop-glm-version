@@ -1,113 +1,50 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  Chn as getThreadDisplayName,
-  Dpn as initializeConversationHistory,
-  HZt as initializeConversationSources,
-  PQt as parentConversationId,
-  Pnn as getAgentPathDisplayName,
-  Thn as getThreadSourceMetadata,
-  _Qt as conversationTurns,
-  jQt as threadSourceById,
+  Chn as t,
+  Dpn as n,
+  HZt as r,
+  PQt as i,
+  Pnn as a,
+  Thn as o,
+  _Qt as s,
+  jQt as c,
 } from "@rchunk/app-initial";
-import {
-  mn as initializeBackgroundAgents,
-  pn as backgroundAgentsByParent,
-} from "@rchunk/app-primary";
-
-export interface OpenTargetScope {
-  get(signal: unknown, parameter?: unknown): unknown;
-}
-
-export interface OpenTarget {
-  canInteract: boolean;
-  conversationId: string;
-  displayName: string;
-}
-
-function findOpenTargetInConversation(
-  scope: OpenTargetScope,
-  parentConversationIdValue: string,
-  targetConversationId: string,
-): OpenTarget | null {
-  const turns = (scope.get(conversationTurns, parentConversationIdValue) as Array<{
-    items: Array<Record<string, unknown>>;
-  }> | null) ?? [];
-  for (const turn of turns) {
-    for (const item of turn.items) {
-      if (
-        item.type === "collabAgentToolCall" &&
-        item.tool === "spawnAgent" &&
-        item.senderThreadId === parentConversationIdValue &&
-        (item.receiverThreadIds as string[]).includes(targetConversationId)
-      ) {
-        const receiverThread = (
-          item.receiverThreads as Array<{
-            threadId: string;
-            thread?: Record<string, unknown>;
-          }>
-        ).find((candidate) => candidate.threadId === targetConversationId)?.thread;
-        const source = getThreadSourceMetadata(
-          receiverThread?.source ?? scope.get(threadSourceById, targetConversationId),
-        ) as { agentNickname?: string; parentThreadId?: string } | null;
-        const recordedParent = scope.get(parentConversationId, targetConversationId);
-        if (
-          (source?.parentThreadId != null && source.parentThreadId !== parentConversationIdValue) ||
-          (recordedParent != null && recordedParent !== parentConversationIdValue)
-        ) {
-          continue;
-        }
-        const displayName =
-          (getThreadDisplayName(receiverThread) as string | null) ?? source?.agentNickname?.trim();
-        if (displayName == null || displayName.length === 0) continue;
-        return {
-          canInteract: true,
-          conversationId: targetConversationId,
-          displayName,
-        };
-      }
-      if (
-        item.type === "subAgentActivity" &&
-        item.kind === "started" &&
-        item.agentThreadId === targetConversationId
-      ) {
-        const displayName = getAgentPathDisplayName(item.agentPath);
-        if (displayName != null) {
-          return {
-            canInteract: false,
-            conversationId: targetConversationId,
-            displayName,
-          };
-        }
-      }
-    }
-  }
-  return null;
-}
-
-function getOpenTarget(
-  scope: OpenTargetScope,
-  parentConversationIdValue: string,
-  hostId: string,
-  targetConversationId: string,
-): OpenTarget | null {
-  const knownTargets = scope.get(backgroundAgentsByParent, {
-    conversationId: parentConversationIdValue,
-    hostId,
-  }) as OpenTarget[];
+import { mn as l, pn as u } from "@rchunk/app-primary";
+function d(e, t, n, r) {
   return (
-    knownTargets.find((target) => target.conversationId === targetConversationId) ??
-    findOpenTargetInConversation(scope, parentConversationIdValue, targetConversationId)
+    e.get(u, { conversationId: t, hostId: n }).find((e) => e.conversationId === r) ?? f(e, t, r)
   );
 }
-
-function initializeOpenTarget(): void {
-  initializeConversationHistory();
-  initializeConversationSources();
-  initializeBackgroundAgents();
+function f(e, n, r) {
+  let l = e.get(s, n) ?? [];
+  for (let s of l)
+    for (let l of s.items) {
+      if (
+        l.type === `collabAgentToolCall` &&
+        l.tool === `spawnAgent` &&
+        l.senderThreadId === n &&
+        l.receiverThreadIds.includes(r)
+      ) {
+        let a = l.receiverThreads.find((e) => e.threadId === r)?.thread,
+          s = o(a?.source ?? e.get(c, r)),
+          u = e.get(i, r);
+        if ((s?.parentThreadId != null && s.parentThreadId !== n) || (u != null && u !== n))
+          continue;
+        let d = t(a) ?? s?.agentNickname?.trim();
+        if (d == null || d.length === 0) continue;
+        return { canInteract: !0, conversationId: r, displayName: d };
+      }
+      if (l.type === `subAgentActivity` && l.kind === `started` && l.agentThreadId === r) {
+        let e = a(l.agentPath);
+        if (e != null) return { canInteract: !1, conversationId: r, displayName: e };
+      }
+    }
+  return null;
 }
-
-export {
-  findOpenTargetInConversation as n,
-  initializeOpenTarget as r,
-  getOpenTarget as t,
-};
+function p() {
+  return (p = e(() => {
+    (n(), r(), l());
+  }))();
+}
+export { f as n, p as r, d as t };

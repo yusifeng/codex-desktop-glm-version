@@ -1,17 +1,16 @@
-// DC-circuit power manifest. Release chunk: type-4140aed3b047.js.
-import "@rchunk/rolldown-runtime";
-
-const dcCircuitPowerSpecification = {
-  type: "DC_CIRCUIT_POWER",
-  version: 1,
-  thumbnailAssetKey: "dc-circuit-power-v1",
-  canonicalFormula: "P = VI",
-  parameters: {
-    voltageVolts: { kind: "number" as const, defaultValue: 12, min: 1, max: 24 },
-    resistanceOhms: { kind: "number" as const, defaultValue: 6, min: 1, max: 24 },
-  },
-};
-
-function initializeDcCircuitPowerSpecification(): void {}
-
-export { dcCircuitPowerSpecification as n, initializeDcCircuitPowerSpecification as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `DC_CIRCUIT_POWER`),
+      (n = `dc-circuit-power-v1`),
+      (r = `P = VI`),
+      (i = {
+        voltageVolts: { kind: `number`, defaultValue: 12, min: 1, max: 24 },
+        resistanceOhms: { kind: `number`, defaultValue: 6, min: 1, max: 24 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+export { a as n, o as t };

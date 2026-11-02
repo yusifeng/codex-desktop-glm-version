@@ -1,50 +1,35 @@
-import * as appInitialChunk from "@rchunk/app-initial";
-import "@rchunk/rolldown-runtime";
-
-const { $3t: getProductSku, s6t: initializePluginSettings } = appInitialChunk;
-
-function pluginPageUrl(pluginId: string, version?: number): string {
-  const url = new URL(
-    `/plugins/${encodeURIComponent(pluginId)}`,
-    "https://chatgpt.com",
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3t as t, s6t as n } from "@rchunk/app-initial";
+function r(e, t) {
+  let n = new URL(`/plugins/${encodeURIComponent(e)}`, `https://chatgpt.com`);
+  return (
+    n.searchParams.set(`no_universal_links`, `1`),
+    t === 1 && (n.hash = `settings/Plugins/${encodeURIComponent(e)}?product-sku=CODEX`),
+    n.toString()
   );
-  url.searchParams.set("no_universal_links", "1");
-  if (version === 1)
-    url.hash = `settings/Plugins/${encodeURIComponent(pluginId)}?product-sku=CODEX`;
-  return url.toString();
 }
-
-function pluginInstallUrl({
-  appId,
-  installUrl,
-  remotePluginId,
-}: {
-  appId: string;
-  installUrl?: string | null;
-  remotePluginId?: string | null;
-}): string {
-  const url = new URL(
-    remotePluginId == null
-      ? "/plugins"
-      : `/plugins/${encodeURIComponent(remotePluginId)}`,
-    installUrl?.trim() || "https://chatgpt.com",
+function i({ appId: e, installUrl: n, remotePluginId: r }) {
+  let i = new URL(
+    r == null ? `/plugins` : `/plugins/${encodeURIComponent(r)}`,
+    n?.trim() || `https://chatgpt.com`,
   );
-  url.hash =
-    remotePluginId == null
-      ? `settings/Connectors?${new URLSearchParams({ connector: appId, "product-sku": getProductSku(), referrer: "codex" })}`
-      : `settings/Plugins/${encodeURIComponent(remotePluginId)}?product-sku=CODEX`;
-  return url.toString();
+  return (
+    (i.hash =
+      r == null
+        ? `settings/Connectors?${new URLSearchParams({ connector: e, "product-sku": t(), referrer: `codex` })}`
+        : `settings/Plugins/${encodeURIComponent(r)}?product-sku=CODEX`),
+    i.toString()
+  );
 }
-
-function initializePluginSettingsUrl(): void {
-  initializePluginSettings();
+function a() {
+  return (a = e(() => {
+    n();
+  }))();
 }
-function initializePluginSettingsUrlEntry(): void {
-  initializePluginSettingsUrl();
+function o() {
+  return (o = e(() => {
+    a();
+  }))();
 }
-export {
-  initializePluginSettingsUrl as i,
-  pluginInstallUrl as n,
-  pluginPageUrl as r,
-  initializePluginSettingsUrlEntry as t,
-};
+export { a as i, i as n, r, o as t };

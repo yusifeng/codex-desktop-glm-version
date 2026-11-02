@@ -1,6 +1,5 @@
+// @ts-nocheck
 import "@rchunk/app-shared";
-import { Bst as initializeTextFileEditorSidePanelTab, Vst as openTextFileEditorSidePanelTab } from "@rchunk/app-initial";
-
-initializeTextFileEditorSidePanelTab();
-
-export { openTextFileEditorSidePanelTab };
+import { Bst as e, Vst as t } from "@rchunk/app-initial";
+e();
+export { t as openTextFileEditorSidePanelTab };

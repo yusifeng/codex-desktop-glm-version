@@ -1,94 +1,73 @@
-import "@rchunk/rolldown-runtime";
-import { FX as initializeMaitaiRuntime, I3 as getJsxRuntime, LX as readScopedValue, lY as createConversationRoute, mZ as resolveRecipient, wL as initializeUtilities } from "@rchunk/app-shared";
-// @ts-expect-error The release app-initial surface is declared incrementally by the shared manifest owner.
-import { Ftn as initializeMcpExtensionFrame, Mtn as resolveConversationRoute, Rht as initializeThreadRecipients, kht as activeThreadRecipient } from "@rchunk/app-initial";
-import { n as initializeViewFrame, t as ViewFrame } from "@rchunk/view-frame";
-import { n as initializeFileViewerFrame, t as FileViewerFrame } from "@rchunk/file-viewer-frame";
-
-interface LocalRecipient {
-  conversationId: string;
-  kind: "local";
-}
-
-interface OtherRecipient {
-  kind: "other";
-}
-
-type Recipient = LocalRecipient | OtherRecipient | Record<string, unknown>;
-
-interface FileViewerContent {
-  path: string;
-  type: "file-viewer";
-  view: unknown;
-}
-
-interface ViewContent extends Record<string, unknown> {
-  sourceThreadId?: string | null;
-  type: "view";
-}
-
-export interface McpExtensionSidePanelTabFrameProps {
-  content: FileViewerContent | ViewContent;
-  tabState: { mcpAppId?: string | null };
-}
-
-let initialized = false;
-let jsxRuntime: {
-  jsx(type: unknown, props: Record<string, unknown>): unknown;
-};
-
-function initializeSidePanelTabFrame(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeMaitaiRuntime();
-  initializeUtilities();
-  initializeThreadRecipients();
-  initializeMcpExtensionFrame();
-  initializeFileViewerFrame();
-  initializeViewFrame();
-  jsxRuntime = getJsxRuntime();
-}
-
-function McpExtensionSidePanelTabFrame({ content, tabState }: McpExtensionSidePanelTabFrameProps): unknown {
-  const currentRecipient = readScopedValue(activeThreadRecipient) as { value: Recipient };
-  let recipient: unknown = currentRecipient.value.kind === "other" ? null : currentRecipient;
-  const sourceThreadId = content.type === "view" ? content.sourceThreadId : null;
-
-  if (
-    sourceThreadId != null &&
-    (currentRecipient.value.kind !== "local" || sourceThreadId !== currentRecipient.value.conversationId)
-  ) {
-    const mapRecipient = resolveRecipient as unknown as (
-      value: unknown,
-      signal: unknown,
-      route: unknown,
-    ) => unknown;
-    recipient = mapRecipient(
-      currentRecipient,
-      activeThreadRecipient,
-      resolveConversationRoute(currentRecipient, createConversationRoute(sourceThreadId)),
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  I3 as r,
+  LX as i,
+  lY as a,
+  mZ as o,
+  wL as s,
+} from "@rchunk/app-shared";
+import { Ftn as c, Mtn as l, Rht as u, kht as d } from "@rchunk/app-initial";
+import { n as f, t as p } from "@rchunk/view-frame";
+import { n as m, t as h } from "@rchunk/file-viewer-frame";
+function g(e) {
+  let t = (0, _.c)(14),
+    { content: n, tabState: r } = e,
+    s = i(d),
+    c = s.value.kind === `other` ? null : s,
+    u = n.type === `view` ? n.sourceThreadId : null;
+  if (u != null && (s.value.kind !== `local` || u !== s.value.conversationId)) {
+    let e;
+    (t[0] !== s || t[1] !== u
+      ? ((e = o(s, d, l(s, a(u)))), (t[0] = s), (t[1] = u), (t[2] = e))
+      : (e = t[2]),
+      (c = e));
+  }
+  if (n.type === `file-viewer`) {
+    let e;
+    return (
+      t[3] !== n.path || t[4] !== n.view || t[5] !== c || t[6] !== r.mcpAppId
+        ? ((e = (0, v.jsx)(h, {
+            recipient: c,
+            lifetime: `thread`,
+            mcpAppId: r.mcpAppId,
+            filePath: n.path,
+            fileViewer: n.view,
+          })),
+          (t[3] = n.path),
+          (t[4] = n.view),
+          (t[5] = c),
+          (t[6] = r.mcpAppId),
+          (t[7] = e))
+        : (e = t[7]),
+      e
     );
   }
-
-  if (content.type === "file-viewer") {
-    return jsxRuntime.jsx(FileViewerFrame, {
-      recipient,
-      lifetime: "thread",
-      mcpAppId: tabState.mcpAppId,
-      filePath: content.path,
-      fileViewer: content.view,
-    });
-  }
-
-  const { type: _type, ...viewProps } = content;
-  return jsxRuntime.jsx(ViewFrame, {
-    lifetime: "thread",
-    ...viewProps,
-    mcpAppId: tabState.mcpAppId,
-    recipient,
-  });
+  let f;
+  if (t[8] !== n) {
+    let { type: e, ...r } = n;
+    ((f = r), (t[8] = n), (t[9] = f));
+  } else f = t[9];
+  let m = p,
+    g;
+  return (
+    t[10] !== f || t[11] !== c || t[12] !== r.mcpAppId
+      ? ((g = (0, v.jsx)(m, { lifetime: `thread`, ...f, mcpAppId: r.mcpAppId, recipient: c })),
+        (t[10] = f),
+        (t[11] = c),
+        (t[12] = r.mcpAppId),
+        (t[13] = g))
+      : (g = t[13]),
+    g
+  );
 }
-
-initializeSidePanelTabFrame();
-
-export { McpExtensionSidePanelTabFrame };
+var _, v;
+function y() {
+  return (y = e(() => {
+    ((_ = t()), n(), s(), u(), c(), m(), f(), (v = r()));
+  }))();
+}
+y();
+export { g as McpExtensionSidePanelTabFrame };

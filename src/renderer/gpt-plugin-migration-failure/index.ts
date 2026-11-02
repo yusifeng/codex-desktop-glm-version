@@ -1,242 +1,222 @@
-// gpt-plugin-migration-failure —— GPT 迁移时资料文件与头像复制失败详情。
-// 原版：app/webview/assets/failure-603af107ec4d.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import type {
-  JsxRuntime,
-  ScopedSignalFamily,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  I3 as r,
+  K2 as i,
+  QI as a,
+  Y2 as o,
+  ZI as s,
+  oZ as c,
+  om as l,
+  sm as u,
 } from "@rchunk/app-shared";
-
-void runtimeChunk;
-
-export interface MigrationFailedFile extends Record<string, unknown> {
-  file_id?: string;
-  message?: string;
-  type: "knowledge_file" | "profile_picture" | string;
+import { afn as d, ifn as f, n7 as p, r7 as m } from "@rchunk/app-initial";
+var h;
+function g() {
+  return (g = e(() => {
+    (n(), a(), (h = c(s, (e) => null)));
+  }))();
 }
-
-export interface MigrationIssue extends Record<string, unknown> {
-  message?: string;
-  resource: { id?: string; name?: string; type: string };
-}
-
-export interface MigrationUploadedFile extends Record<string, unknown> {
-  file_id?: string;
-  file_response_type?: string;
-  name?: string;
-}
-
-export interface MigrationFailureValue {
-  failedFiles: MigrationFailedFile[];
-}
-
-export interface MigrationFailureDetailsProps {
-  failedFiles: MigrationFailedFile[];
-  files?: MigrationUploadedFile[];
-  issues?: MigrationIssue[];
-  migrationSucceeded: boolean;
-}
-
-const {
-  $3: initializeRuntimeLazy,
-  FX: initializeSignalRuntime,
-  I3: getJsxRuntime,
-  K2: initializeReactRuntime,
-  QI: initializeAppScope,
-  Y2: FormattedMessage,
-  ZI: appScope,
-  oZ: createSignalFamily,
-  om: Alert,
-  sm: initializeAlert,
-} = appSharedChunk;
-const {
-  afn: getExperiment,
-  ifn: initializeMigrationExperiments,
-  n7: AnnouncementBanner,
-  r7: initializeAccountPlan,
-} = appInitialChunk;
-
-let jsx: JsxRuntime;
-let migrationFailureState: ScopedSignalFamily<
-  Record<string, unknown>,
-  string,
-  MigrationFailureValue | null
->;
-
-function initializeMigrationFailureState(): void {
-  if (migrationFailureState != null) return;
-  initializeSignalRuntime();
-  initializeAppScope();
-  migrationFailureState = createSignalFamily(appScope, () => null);
-}
-
-function isKnowledgeFile(file: MigrationFailedFile): boolean {
-  return file.type === "knowledge_file";
-}
-function isProfilePicture(file: MigrationFailedFile): boolean {
-  return file.type === "profile_picture";
-}
-
-function FailedKnowledgeFile({
-  file,
-  files,
-  issues,
-}: {
-  file: MigrationFailedFile;
-  files?: MigrationUploadedFile[];
-  issues?: MigrationIssue[];
-}): unknown {
-  const matchingIssues = issues?.filter(
-    (issue) =>
-      issue.resource.type === "knowledge_file" &&
-      file.file_id != null &&
-      issue.resource.id === file.file_id,
+function _(e) {
+  let t = (0, w.c)(23),
+    { failedFiles: n, files: r, issues: i, migrationSucceeded: a } = e,
+    s = d(`2513446768`),
+    c;
+  t[0] === s ? (c = t[1]) : ((c = s.get(`disable_gpt_updates`, !1)), (t[0] = s), (t[1] = c));
+  let u = c,
+    f;
+  t[2] === n ? (f = t[3]) : ((f = n.filter(y)), (t[2] = n), (t[3] = f));
+  let m = f,
+    h,
+    g,
+    _;
+  if (t[4] !== n || t[5] !== r || t[6] !== u || t[7] !== i || t[8] !== a || t[9] !== m.length) {
+    let e = n.filter(v),
+      s;
+    if (a) {
+      let e;
+      (t[13] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, T.jsx)(o, {
+            id: `chatgptConversations.gpts.migration.referenceCopyWarningAfterSuccess`,
+            defaultMessage: `Your plugin was created without these files. Open your plugin and choose Edit plugin to add them.`,
+            description: `Warning on the destination after successful migration reports files that were not copied; the plugin already exists`,
+          })),
+          (t[13] = e))
+        : (e = t[13]),
+        (s = e));
+    } else if (u) {
+      let e;
+      (t[14] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, T.jsx)(o, {
+            id: `chatgptConversations.gpts.migration.referenceCopyFailedReadonlyDescription`,
+            defaultMessage: `Your plugin wasn’t created. Try again later.`,
+            description: `Explains that failed reference file copies prevented creating the plugin when GPT editing and publishing are no longer available, so retrying later is the available recovery action`,
+          })),
+          (t[14] = e))
+        : (e = t[14]),
+        (s = e));
+    } else {
+      let e;
+      (t[15] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, T.jsx)(o, {
+            id: `chatgptConversations.gpts.migration.referenceCopyFailedDescription`,
+            defaultMessage: `Your plugin wasn’t created. Try again, or fix these files and republish the GPT.`,
+            description: `Explains that failed reference file copies prevent creating the plugin and how to retry or fix the GPT`,
+          })),
+          (t[15] = e))
+        : (e = t[15]),
+        (s = e));
+    }
+    ((h = `flex flex-col gap-3 text-start text-sm`),
+      t[16] !== a || t[17] !== m.length
+        ? ((g =
+            m.length > 0
+              ? (0, T.jsx)(p, {
+                  type: `warning`,
+                  variant: `callout`,
+                  layout: `vertical`,
+                  role: `alert`,
+                  content: (0, T.jsx)(`p`, {
+                    className: `select-none`,
+                    children: a
+                      ? (0, T.jsx)(o, {
+                          id: `chatgptConversations.gpts.migration.profileCopyFailedAfterSuccess`,
+                          defaultMessage: `Your plugin was created, but we couldn’t copy the GPT’s profile picture. To add a logo, open your plugin and choose Edit plugin.`,
+                          description: `Notice after a GPT successfully becomes a plugin but its profile picture could not be copied; Edit plugin is the action used to upload a replacement plugin logo`,
+                        })
+                      : (0, T.jsx)(o, {
+                          id: `chatgptConversations.gpts.migration.profileCopyFailedBeforeSuccess`,
+                          defaultMessage: `We couldn’t copy the GPT’s profile picture. After migration succeeds, open your plugin and choose Edit plugin to add a logo.`,
+                          description: `Notice that the GPT profile picture could not be copied while other errors prevented creating a plugin; explains how to add a logo after resolving the blocking errors and completing migration`,
+                        }),
+                  }),
+                })
+              : null),
+          (t[16] = a),
+          (t[17] = m.length),
+          (t[18] = g))
+        : (g = t[18]),
+      (_ =
+        e.length > 0
+          ? (0, T.jsx)(l, {
+              level: `danger`,
+              children: (0, T.jsxs)(`div`, {
+                className: `flex flex-col gap-1 text-sm`,
+                children: [
+                  (0, T.jsx)(`h3`, {
+                    className: `font-semibold text-default select-none`,
+                    children: (0, T.jsx)(o, {
+                      id: `chatgptConversations.gpts.migration.referenceCopyFailed`,
+                      defaultMessage: `{count, plural, one {A reference file couldn’t be synced} other {Reference files couldn’t be synced}}`,
+                      description: `Heading for GPT reference file copy failures that prevent migration, followed by the affected filenames and errors`,
+                      values: { count: e.length },
+                    }),
+                  }),
+                  (0, T.jsx)(`p`, { className: `text-secondary select-none`, children: s }),
+                  (0, T.jsx)(`ul`, {
+                    className: `flex list-disc flex-col gap-1 ps-5`,
+                    children: e.map((e, t) => (0, T.jsx)(b, { file: e, files: r, issues: i }, t)),
+                  }),
+                ],
+              }),
+            })
+          : null),
+      (t[4] = n),
+      (t[5] = r),
+      (t[6] = u),
+      (t[7] = i),
+      (t[8] = a),
+      (t[9] = m.length),
+      (t[10] = h),
+      (t[11] = g),
+      (t[12] = _));
+  } else ((h = t[10]), (g = t[11]), (_ = t[12]));
+  let x;
+  return (
+    t[19] !== h || t[20] !== g || t[21] !== _
+      ? ((x = (0, T.jsxs)(`div`, { className: h, children: [g, _] })),
+        (t[19] = h),
+        (t[20] = g),
+        (t[21] = _),
+        (t[22] = x))
+      : (x = t[22]),
+    x
   );
-  const uploadedFile = files?.find(
-    (candidate) => candidate.file_id === file.file_id,
+}
+function v(e) {
+  return e.type === `knowledge_file`;
+}
+function y(e) {
+  return e.type === `profile_picture`;
+}
+function b(e) {
+  let t = (0, w.c)(12),
+    { file: n, files: r, issues: i } = e,
+    a,
+    s;
+  if (t[0] !== n || t[1] !== r || t[2] !== i) {
+    a = i?.filter(
+      (e) =>
+        e.resource.type === `knowledge_file` && n.file_id != null && e.resource.id === n.file_id,
+    );
+    let e;
+    t[5] !== n || t[6] !== r
+      ? ((e = r?.find((e) => e.file_id === n.file_id)), (t[5] = n), (t[6] = r), (t[7] = e))
+      : (e = t[7]);
+    let o = e;
+    ((s =
+      a?.find(C)?.resource.name ||
+      (o?.file_response_type === `full_file_response` ? o.name : void 0) ||
+      n.file_id),
+      (t[0] = n),
+      (t[1] = r),
+      (t[2] = i),
+      (t[3] = a),
+      (t[4] = s));
+  } else ((a = t[3]), (s = t[4]));
+  let c = s,
+    l;
+  return (
+    t[8] !== n || t[9] !== a?.[0]?.message || t[10] !== c
+      ? ((l = (0, T.jsx)(`li`, {
+          className: `wrap-anywhere text-default select-text`,
+          children: c
+            ? (0, T.jsx)(o, {
+                id: `chatgptConversations.gpts.migration.referenceFileCopyErrorWithFilename`,
+                defaultMessage: `<strong>{filename}</strong> — {message}`,
+                description: `One failed reference file and the server's reason it could not be copied during GPT migration`,
+                values: { filename: c, message: a?.[0]?.message || n.message, strong: S },
+              })
+            : (0, T.jsx)(o, {
+                id: `chatgptConversations.gpts.migration.unnamedReferenceFileCopyErrorWithLabel`,
+                defaultMessage: `<strong>Reference file</strong> — {message}`,
+                description: `Copy failure and the server's reason when neither a reference file's name nor identifier is available during GPT migration`,
+                values: { message: a?.[0]?.message || n.message, strong: x },
+              }),
+        })),
+        (t[8] = n),
+        (t[9] = a?.[0]?.message),
+        (t[10] = c),
+        (t[11] = l))
+      : (l = t[11]),
+    l
   );
-  const filename =
-    matchingIssues?.find((issue) => issue.resource.name)?.resource.name ||
-    (uploadedFile?.file_response_type === "full_file_response"
-      ? uploadedFile.name
-      : undefined) ||
-    file.file_id;
-  const message = matchingIssues?.[0]?.message || file.message;
-  return jsx.jsx("li", {
-    className: "wrap-anywhere text-default select-text",
-    children: filename
-      ? jsx.jsx(FormattedMessage, {
-          id: "chatgptConversations.gpts.migration.referenceFileCopyErrorWithFilename",
-          defaultMessage: "<strong>{filename}</strong> — {message}",
-          description:
-            "One failed reference file and the server's reason it could not be copied during GPT migration",
-          values: {
-            filename,
-            message,
-            strong: (children: unknown) => jsx.jsx("strong", { children }),
-          },
-        })
-      : jsx.jsx(FormattedMessage, {
-          id: "chatgptConversations.gpts.migration.unnamedReferenceFileCopyErrorWithLabel",
-          defaultMessage: "<strong>Reference file</strong> — {message}",
-          description:
-            "Copy failure and the server's reason when neither a reference file's name nor identifier is available during GPT migration",
-          values: {
-            message,
-            strong: (children: unknown) => jsx.jsx("strong", { children }),
-          },
-        }),
-  });
 }
-
-function MigrationFailureDetails({
-  failedFiles,
-  files,
-  issues,
-  migrationSucceeded,
-}: MigrationFailureDetailsProps): unknown {
-  const updatesDisabled =
-    getExperiment("2513446768").get("disable_gpt_updates", false);
-  const knowledgeFiles = failedFiles.filter(isKnowledgeFile);
-  const profilePictures = failedFiles.filter(isProfilePicture);
-  const profileWarning =
-    profilePictures.length === 0
-      ? null
-      : jsx.jsx(AnnouncementBanner, {
-          type: "warning",
-          variant: "callout",
-          layout: "vertical",
-          role: "alert",
-          content: jsx.jsx("p", {
-            className: "select-none",
-            children: jsx.jsx(FormattedMessage, {
-              id: migrationSucceeded
-                ? "chatgptConversations.gpts.migration.profileCopyFailedAfterSuccess"
-                : "chatgptConversations.gpts.migration.profileCopyFailedBeforeSuccess",
-              defaultMessage: migrationSucceeded
-                ? "Your plugin was created, but we couldn’t copy the GPT’s profile picture. To add a logo, open your plugin and choose Edit plugin."
-                : "We couldn’t copy the GPT’s profile picture. After migration succeeds, open your plugin and choose Edit plugin to add a logo.",
-              description: "GPT profile picture copy failure",
-            }),
-          }),
-        });
-  let description: unknown;
-  if (migrationSucceeded)
-    description = jsx.jsx(FormattedMessage, {
-      id: "chatgptConversations.gpts.migration.referenceCopyWarningAfterSuccess",
-      defaultMessage:
-        "Your plugin was created without these files. Open your plugin and choose Edit plugin to add them.",
-      description: "Reference files omitted after successful migration",
-    });
-  else if (updatesDisabled)
-    description = jsx.jsx(FormattedMessage, {
-      id: "chatgptConversations.gpts.migration.referenceCopyFailedReadonlyDescription",
-      defaultMessage: "Your plugin wasn’t created. Try again later.",
-      description: "Readonly GPT migration copy failure",
-    });
-  else
-    description = jsx.jsx(FormattedMessage, {
-      id: "chatgptConversations.gpts.migration.referenceCopyFailedDescription",
-      defaultMessage:
-        "Your plugin wasn’t created. Try again, or fix these files and republish the GPT.",
-      description: "GPT migration copy failure recovery",
-    });
-  const fileFailures =
-    knowledgeFiles.length === 0
-      ? null
-      : jsx.jsx(Alert, {
-          level: "danger",
-          children: jsx.jsxs("div", {
-            className: "flex flex-col gap-1 text-sm",
-            children: [
-              jsx.jsx("h3", {
-                className: "font-semibold text-default select-none",
-                children: jsx.jsx(FormattedMessage, {
-                  id: "chatgptConversations.gpts.migration.referenceCopyFailed",
-                  defaultMessage:
-                    "{count, plural, one {A reference file couldn’t be synced} other {Reference files couldn’t be synced}}",
-                  description: "GPT reference file copy failure heading",
-                  values: { count: knowledgeFiles.length },
-                }),
-              }),
-              jsx.jsx("p", {
-                className: "text-secondary select-none",
-                children: description,
-              }),
-              jsx.jsx("ul", {
-                className: "flex list-disc flex-col gap-1 ps-5",
-                children: knowledgeFiles.map((file, index) =>
-                  jsx.jsx(FailedKnowledgeFile, { file, files, issues }, index),
-                ),
-              }),
-            ],
-          }),
-        });
-  return jsx.jsxs("div", {
-    className: "flex flex-col gap-3 text-start text-sm",
-    children: [profileWarning, fileFailures],
-  });
+function x(e) {
+  return (0, T.jsx)(`strong`, { children: e });
 }
-
-let initialized = false;
-function initializeMigrationFailure(): void {
-  if (initialized) return;
-  initializeRuntimeLazy();
-  initializeReactRuntime();
-  initializeAlert();
-  initializeMigrationExperiments();
-  initializeAccountPlan();
-  jsx = getJsxRuntime();
-  initialized = true;
+function S(e) {
+  return (0, T.jsx)(`strong`, { children: e });
 }
-
-initializeMigrationFailureState();
-initializeMigrationFailure();
-export {
-  migrationFailureState as i,
-  initializeMigrationFailure as n,
-  initializeMigrationFailureState as r,
-  MigrationFailureDetails as t,
-};
+function C(e) {
+  return e.resource.name;
+}
+var w, T;
+function E() {
+  return (E = e(() => {
+    ((w = t()), i(), m(), u(), f(), (T = r()));
+  }))();
+}
+export { h as i, E as n, g as r, _ as t };

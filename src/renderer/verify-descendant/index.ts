@@ -1,96 +1,61 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  HZt as initializeSubagentsPanel,
-  PQt as parentConversationIdFamily,
-  RQt as pendingConversationIdsByHost,
-  Ugn as getConversationHydrator,
-  VZt as conversationHostFamily,
-  Wgn as initializeConversationHydration,
-  zZt as conversationExistsFamily,
+  HZt as t,
+  PQt as n,
+  RQt as r,
+  Ugn as i,
+  VZt as a,
+  Wgn as o,
+  zZt as s,
 } from "@rchunk/app-initial";
-import {
-  hn as descendantThreadsQuery,
-  mn as initializeDescendantThreadsQuery,
-} from "@rchunk/app-primary";
-
-interface DescendantScope {
-  get<Value>(signal: unknown, parameter?: unknown): Value;
-}
-
-interface VerifyDescendantInput {
-  hostId: string;
-  hydrateMissingAncestors?: boolean;
-  parentConversationId: string;
-  selectedConversationId: string;
-}
-
-function verifyDescendant(
-  scope: DescendantScope,
+import { hn as c, mn as l } from "@rchunk/app-primary";
+function u(
+  e,
   {
-    hostId,
-    hydrateMissingAncestors = false,
-    parentConversationId,
-    selectedConversationId,
-  }: VerifyDescendantInput,
-): boolean | Promise<boolean> {
-  if (selectedConversationId === parentConversationId) return false;
-  const visited = new Set<string>();
-  let currentId = selectedConversationId;
-  while (currentId !== parentConversationId) {
-    if (visited.has(currentId)
-      || scope.get<string[]>(pendingConversationIdsByHost, hostId).includes(currentId)) return false;
-    visited.add(currentId);
-    const currentHost = scope.get<string | null>(conversationHostFamily, currentId);
-    if (currentHost != null && currentHost !== hostId) return false;
-    const exists = scope.get<boolean>(conversationExistsFamily, currentId);
-    const parentId = exists
-      ? scope.get<string | null>(parentConversationIdFamily, currentId)
-      : null;
-    if (!exists || parentId == null) {
-      const selectedParent = scope.get<string | null>(
-        parentConversationIdFamily,
-        selectedConversationId,
-      );
-      if (scope.get(conversationExistsFamily, selectedConversationId)
-        && selectedParent != null
-        && selectedParent !== parentConversationId) {
-        const descendants = scope.get<{
-          descendantThreads: Array<{ id: string }>;
-          isComplete?: boolean;
-        } | null>(descendantThreadsQuery, {
-          conversationId: parentConversationId,
-          hostId,
-        });
-        if (descendants?.descendantThreads.some((thread) => thread.id === selectedConversationId) !== true
-          && (!hydrateMissingAncestors || descendants?.isComplete === true)) return false;
+    hostId: t,
+    hydrateMissingAncestors: o = !1,
+    parentConversationId: l,
+    selectedConversationId: d,
+  },
+) {
+  if (d === l) return !1;
+  let f = new Set(),
+    p = d;
+  for (; p !== l;) {
+    if (f.has(p) || e.get(r, t).includes(p)) return !1;
+    f.add(p);
+    let m = e.get(a, p);
+    if (m != null && m !== t) return !1;
+    let h = e.get(s, p),
+      g = h ? e.get(n, p) : null;
+    if (!h || g == null) {
+      let r = e.get(n, d);
+      if (e.get(s, d) && r != null && r !== l) {
+        let n = e.get(c, { conversationId: l, hostId: t });
+        if (n?.descendantThreads.some((e) => e.id === d) !== !0 && (!o || n?.isComplete === !0))
+          return !1;
       }
-      const missingId = currentId;
-      return getConversationHydrator(scope, hostId)
-        .hydrateBackgroundThreads([missingId], {
-          includeTurns: missingId === selectedConversationId || exists,
-        })
-        .then(() => !scope.get(conversationExistsFamily, missingId)
-          || scope.get(parentConversationIdFamily, missingId) == null
-          ? false
-          : verifyDescendant(scope, {
-            hostId,
-            hydrateMissingAncestors,
-            parentConversationId,
-            selectedConversationId,
-          }));
+      return i(e, t)
+        .hydrateBackgroundThreads([p], { includeTurns: p === d || h })
+        .then(() =>
+          !e.get(s, p) || e.get(n, p) == null
+            ? !1
+            : u(e, {
+                hostId: t,
+                hydrateMissingAncestors: o,
+                parentConversationId: l,
+                selectedConversationId: d,
+              }),
+        );
     }
-    currentId = parentId;
+    p = g;
   }
-  return true;
+  return !0;
 }
-
-function initializeVerifyDescendant(): void {
-  initializeConversationHydration();
-  initializeSubagentsPanel();
-  initializeDescendantThreadsQuery();
+function d() {
+  return (d = e(() => {
+    (o(), t(), l());
+  }))();
 }
-
-export {
-  verifyDescendant as n,
-  initializeVerifyDescendant as t,
-};
+export { u as n, d as t };

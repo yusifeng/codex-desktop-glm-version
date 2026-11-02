@@ -1,336 +1,300 @@
-// home-starter-prompts —— 临床工作区 Home composer 的示例提示卡片。
-
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as departmentsChunk from "@rchunk/departments";
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as shuffleChunk from "@rchunk/shuffle";
-import type {
-  DerivedScopedSignalContext,
-  MaitaiScope,
-  ReadableSignal,
-  ScopedDerivedFamily,
-  ScopedQuerySignal,
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  $3 as n,
+  $O as r,
+  BX as i,
+  C_ as a,
+  FD as o,
+  FX as s,
+  HX as c,
+  I3 as l,
+  K2 as u,
+  KD as d,
+  LX as ee,
+  PD as f,
+  QI as p,
+  S_ as m,
+  Y2 as h,
+  ZI as g,
+  e6 as _,
+  eZ as te,
+  ek as v,
+  gr as ne,
+  h4 as re,
+  hr as ie,
+  m4 as y,
+  qD as ae,
+  rZ as oe,
 } from "@rchunk/app-shared";
-
-void runtimeChunk;
-
-interface ClinicalIdentity {
-  accountId: string | null;
-  isCapable: boolean;
-  userId: string | null;
-}
-
-interface ComposerEditor {
-  focus(): void;
-  hasText(): boolean;
-  setPromptText(prompt: string): void;
-}
-
-interface ClinicalPromptsData {
-  accountId: string;
-  department: string;
-  prompts: StarterPrompt[];
-  role: string;
-  userId: string;
-}
-
-interface ClinicalExampleResponse {
-  examples: Array<{ kind: string; prompt: string }>;
-}
-
-interface AppInitialBindings {
-  A2: ReadableSignal<boolean>;
-  HZ(): ComposerEditor;
-  Qet: unknown;
-  UZ<T>(
-    editor: ComposerEditor,
-    selector: (value: ComposerEditor) => T,
-    key: string,
-  ): T;
-  Xet: ScopedDerivedFamily<
-    Record<string, unknown>,
-    { name: string },
-    { isCapable: boolean }
-  >;
-  i_n(): { search?: string };
-  kht: MaitaiScope<Record<string, unknown>>;
-  oNt(scope: unknown): boolean;
-  rJt: {
-    safePost(
-      path: string,
-      options: {
-        additionalHeaders: Record<string, string | null>;
-        requestBody: Record<string, string>;
-        signal: AbortSignal;
-      },
-    ): Promise<ClinicalExampleResponse>;
-  };
-  v2: ReadableSignal<string | undefined>;
-  yln(search: string): boolean;
-}
-
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>, key?: unknown): unknown;
-  jsxs(type: unknown, props: Record<string, unknown>, key?: unknown): unknown;
-}
-
-interface ReactRuntime {
-  useId(): string;
-}
-
-function resolveRuntimeExport<T>(value: unknown): T {
-  return (typeof value === "function" ? value() : value) as T;
-}
-
-const {
-  A2: composerInertSignal,
-  HZ: useComposerEditor,
-  Qet: identitySignal,
-  UZ: selectEditorValue,
-  Xet: capabilityFamily,
-  i_n: useLocation,
-  kht: clinicalWorkspaceScope,
-  oNt: shouldKeepEditorBlurred,
-  rJt: clinicalApiClient,
-  v2: conversationIdSignal,
-  yln: isTemporaryConversation,
-} = appInitialChunk as unknown as AppInitialBindings;
-const {
-  $O: queryStaleTimes,
-  BX: useSignalFamilyValue,
-  FX: initializeMaitaiRuntime,
-  HX: useSignalValue,
-  I3: jsxRuntimeExport,
-  LX: useScope,
-  QI: initializeQueryBridge,
-  ZI: AppScope,
-  e6: reactRuntimeExport,
-  eZ: createQuerySignal,
-  rZ: createDerivedFamily,
-} = appSharedChunk;
-const { n: initializeDepartments } = departmentsChunk as unknown as { n(): void };
-const { t: shuffleItems } = shuffleChunk as unknown as {
-  t<T>(items: T[]): T[];
-};
-
-interface StarterPrompt {
-  id: string;
-  kind:
-    "clinical_decision_support" | "documentation_query" | "latest_guidelines";
-  prompt: string;
-}
-
-let jsx: JsxRuntime;
-let React: ReactRuntime;
-let clinicalPromptsQuery: ScopedQuerySignal<
-  Record<string, unknown>,
-  ClinicalPromptsData
->;
-let conversationPromptsFamily: ScopedDerivedFamily<
-  Record<string, unknown>,
-  { conversationId?: string; isTemporaryChat: boolean },
-  ClinicalPromptsData | undefined
->;
-let initialized = false;
-
-const PROMPT_KINDS = [
-  "clinical_decision_support",
-  "documentation_query",
-  "latest_guidelines",
-] as const;
-
-function StarterPromptCards({
-  prompts,
-  disabled,
-  onSelect,
-}: {
-  prompts: StarterPrompt[];
-  disabled: boolean;
-  onSelect(prompt: StarterPrompt): void;
-}): unknown {
-  if (prompts.length === 0) return null;
-  const headingId = React.useId();
-  return jsx.jsxs("section", {
-    className: "@container flex w-full min-w-0 flex-col gap-2 select-none",
-    "aria-labelledby": headingId,
-    children: [
-      jsx.jsx("h2", {
-        id: headingId,
-        className: "px-1 text-base leading-7 text-secondary @xl:text-sm",
-        children: "Try something new",
-      }),
-      jsx.jsx("div", {
-        className: "flex items-stretch gap-3 overflow-x-auto pb-4 @xl:gap-4",
-        children: prompts.map((prompt) =>
-          jsx.jsxs(
-            "button",
+import {
+  $et as b,
+  $jt as se,
+  A2 as ce,
+  HZ as le,
+  NIt as ue,
+  Qet as x,
+  Qgn as de,
+  RIt as fe,
+  Rht as pe,
+  Sun as me,
+  UZ as he,
+  VZ as S,
+  Xet as C,
+  Zet as w,
+  Zjt as T,
+  aNt as E,
+  cJt as D,
+  i_n as O,
+  j2 as k,
+  kht as A,
+  oNt as j,
+  qjt as M,
+  rJt as N,
+  v2 as P,
+  vln as F,
+  vun as I,
+  y2 as L,
+  yln as R,
+} from "@rchunk/app-initial";
+import { t as ge } from "@rchunk/shuffle";
+import { a as _e, i as ve, n as ye, t as z } from "@rchunk/departments";
+function be(e) {
+  let t = (0, B.c)(16),
+    { prompts: n, disabled: r, onSelect: i } = e,
+    a = (0, V.useId)();
+  if (n.length === 0) return null;
+  let o;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((o = (0, H.jsx)(h, {
+        id: `clinicalStarterPrompts.trySomethingNew`,
+        defaultMessage: `Try something new`,
+        description: `Heading above three suggested clinical questions below the new-chat composer in ChatGPT clinician and healthcare workspaces. Invites healthcare professionals to try a sample clinical task; keep the heading short.`,
+      })),
+      (t[0] = o))
+    : (o = t[0]);
+  let s;
+  t[1] === a
+    ? (s = t[2])
+    : ((s = (0, H.jsx)(`h2`, {
+        id: a,
+        className: `px-1 text-base leading-7 text-secondary @xl:text-sm`,
+        children: o,
+      })),
+      (t[1] = a),
+      (t[2] = s));
+  let c;
+  if (t[3] !== r || t[4] !== i || t[5] !== n) {
+    let e;
+    (t[7] !== r || t[8] !== i
+      ? ((e = (e) =>
+          (0, H.jsxs)(
+            `button`,
             {
-              type: "button",
-              "aria-label": prompt.prompt,
-              disabled,
-              className:
-                "flex min-h-28 w-41 flex-none cursor-interaction flex-col items-start gap-2 rounded-2xl border border-default p-4 text-start text-secondary shadow-card enabled:hover:bg-primary-ghost-hover disabled:opacity-60 @xl:flex-1",
-              onClick: () => onSelect(prompt),
+              className: `flex min-h-28 w-41 flex-none cursor-interaction flex-col items-start gap-2 overflow-hidden rounded-2xl border border-default p-4 text-start text-secondary shadow-card outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset enabled:hover:bg-primary-ghost-hover disabled:cursor-default disabled:opacity-60 @xl:min-w-0 @xl:flex-1`,
+              type: `button`,
+              "aria-label": e.prompt,
+              disabled: r,
+              onClick: () => i(e),
               children: [
-                jsx.jsx("span", {
-                  "aria-hidden": true,
-                  className: "text-xs font-medium uppercase text-tertiary",
-                  children: prompt.kind.replaceAll("_", " "),
+                (0, H.jsx)(`span`, {
+                  className: `flex size-6 items-center justify-center`,
+                  children: (0, H.jsx)(m, { asset: U[e.kind] }),
                 }),
-                jsx.jsx("span", {
-                  className:
-                    "line-clamp-3 text-base leading-6.5 tracking-tight",
-                  children: prompt.prompt,
+                (0, H.jsx)(`span`, {
+                  className: `line-clamp-3 text-base leading-6.5 tracking-tight`,
+                  children: e.prompt,
                 }),
               ],
             },
-            prompt.id,
-          ),
-        ),
+            e.id,
+          )),
+        (t[7] = r),
+        (t[8] = i),
+        (t[9] = e))
+      : (e = t[9]),
+      (c = n.map(e)),
+      (t[3] = r),
+      (t[4] = i),
+      (t[5] = n),
+      (t[6] = c));
+  } else c = t[6];
+  let l;
+  t[10] === c
+    ? (l = t[11])
+    : ((l = (0, H.jsx)(`div`, {
+        className: `flex items-stretch gap-3 overflow-x-auto pb-4 @xl:gap-4`,
+        children: c,
+      })),
+      (t[10] = c),
+      (t[11] = l));
+  let u;
+  return (
+    t[12] !== a || t[13] !== s || t[14] !== l
+      ? ((u = (0, H.jsxs)(`section`, {
+          className: `@container flex w-full min-w-0 flex-col gap-2 select-none`,
+          "aria-labelledby": a,
+          children: [s, l],
+        })),
+        (t[12] = a),
+        (t[13] = s),
+        (t[14] = l),
+        (t[15] = u))
+      : (u = t[15]),
+    u
+  );
+}
+var B, V, H, U;
+function W() {
+  return (W = e(() => {
+    ((B = n()),
+      ae(),
+      o(),
+      ie(),
+      (V = _()),
+      u(),
+      a(),
+      (H = l()),
+      (U = { clinical_decision_support: f, documentation_query: ne, latest_guidelines: d }));
+  }))();
+}
+function xe(e) {
+  return e != null && Object.hasOwn(z, e);
+}
+var G, K, q, J, Y;
+function X() {
+  return (X = e(() => {
+    ((G = t(ge(), 1)),
+      s(),
+      me(),
+      fe(),
+      D(),
+      se(),
+      p(),
+      v(),
+      ye(),
+      _e(),
+      b(),
+      (K = [`clinical_decision_support`, `documentation_query`, `latest_guidelines`]),
+      (q = {
+        physician: `internal_medicine`,
+        np_pa: `internal_medicine`,
+        registered_nurse: `bedside_rn`,
+        allied_health_professional: `physical_therapist`,
+        student: `medical_student`,
       }),
-    ],
-  });
-}
-
-function ClinicalStarterPrompts(): unknown {
-  initializeClinicalStarterPrompts();
-  const scope = useScope(clinicalWorkspaceScope);
-  const editor = useComposerEditor();
-  const conversationId = useSignalValue(conversationIdSignal);
-  const inert = useSignalValue(composerInertSignal) === true;
-  const search = useLocation().search ?? "";
-  const temporaryChat = isTemporaryConversation(search) === true;
-  const capability = useSignalFamilyValue(capabilityFamily, {
-    name: "chatgpt.clinical-starter-prompts",
-  });
-  const data = useSignalFamilyValue(conversationPromptsFamily, {
-    conversationId,
-    isTemporaryChat: temporaryChat,
-  });
-  const editorEmpty = selectEditorValue(
-    editor,
-    (value) => !value.hasText(),
-    "document",
-  );
-  if (
-    !capability?.isCapable ||
-    !editorEmpty ||
-    data == null ||
-    data.prompts.length === 0
-  )
-    return null;
-  const onSelect = (prompt: StarterPrompt) => {
-    const identity = scope.get<ClinicalIdentity>(identitySignal);
-    if (
-      !editor.hasText() &&
-      scope.get(capabilityFamily, {
-        name: "chatgpt.clinical-starter-prompts",
-      }).isCapable &&
-      identity.accountId === data.accountId &&
-      identity.userId === data.userId
-    ) {
-      editor.setPromptText(prompt.prompt);
-      if (!shouldKeepEditorBlurred(scope)) editor.focus();
-    }
-  };
-  return jsx.jsx("div", {
-    className: [
-      "mt-6",
-      temporaryChat && "max-sm:hidden",
-      inert && "pointer-events-none",
-    ]
-      .filter(Boolean)
-      .join(" "),
-    inert,
-    children: jsx.jsx(StarterPromptCards, {
-      prompts: data.prompts,
-      disabled: false,
-      onSelect,
-    }),
-  });
-}
-
-function initializeClinicalStarterPrompts(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeDepartments();
-  initializeMaitaiRuntime();
-  initializeQueryBridge();
-  React = resolveRuntimeExport<ReactRuntime>(reactRuntimeExport);
-  jsx = resolveRuntimeExport<JsxRuntime>(jsxRuntimeExport);
-  clinicalPromptsQuery = createQuerySignal<
-    Record<string, unknown>,
-    ClinicalPromptsData
-  >(AppScope, ({ get }) => {
-    const identity = get<ClinicalIdentity>(identitySignal);
-    const accountId = identity.accountId;
-    const userId = identity.userId;
-    const role = "physician";
-    const department = "internal_medicine";
-    return {
-      queryKey: [
-        "quorum-starter-prompts",
-        accountId,
-        userId,
-        role,
-        department,
-      ],
-      enabled:
-        identity.isCapable &&
-        accountId != null &&
-        userId != null,
-      queryFn: async ({ signal }) => {
-        if (accountId == null || userId == null) {
-          throw new Error(
-            "Clinical starter prompts require an authenticated identity",
-          );
-        }
-        const response = await clinicalApiClient.safePost(
-          "/onboarding/quorum/examples",
-          {
-            requestBody: { source: "starter_prompts", role, department },
-            additionalHeaders: {
-              "ChatGPT-Account-ID": accountId,
-            },
-            signal,
-          },
-        );
-        const prompts = PROMPT_KINDS.flatMap((kind) => {
-          const example = response.examples.find(
-            (entry: { kind: string }) => entry.kind === kind,
-          );
-          return example == null
-            ? []
-            : [
-                {
-                  id: `health_${role}_${department}_${kind}`,
-                  kind,
-                  prompt: example.prompt,
-                },
-              ];
-        });
+      (J = te(g, ({ get: e }) => {
+        let t = e(x),
+          { accountId: n, userId: i } = t,
+          a = e(I),
+          o =
+            t.isCapable &&
+            n != null &&
+            i != null &&
+            `accountStructure` in a &&
+            a.accountStructure === `workspace`
+              ? e(ve, { accountId: n, userId: i })
+              : null,
+          s = o?.data?.role?.trim(),
+          c = xe(s) ? s : `physician`,
+          l = o?.data?.departments?.find((e) => z[c].includes(e)) ?? q[c];
         return {
-          accountId,
-          userId,
-          role,
-          department,
-          prompts: shuffleItems(prompts),
+          queryKey: [`quorum-starter-prompts`, n, i, c, l],
+          enabled: t.isCapable && n != null && i != null && (o == null || o.isFetched),
+          queryFn: async ({ signal: e }) => {
+            if (n == null || i == null)
+              throw Error(`Clinical starter prompts require a ChatGPT identity`);
+            let { examples: t } = await N.safePost(`/onboarding/quorum/examples`, {
+              requestBody: { source: `starter_prompts`, role: c, department: l },
+              additionalHeaders: { "ChatGPT-Account-ID": n },
+              signal: e,
+            });
+            return {
+              accountId: n,
+              userId: i,
+              role: c,
+              department: l,
+              prompts: (0, G.default)(
+                K.flatMap((e) => {
+                  let n = t.find((t) => t.kind === e);
+                  return n == null
+                    ? []
+                    : [{ id: `health_${c}_${l}_${e}`, kind: e, prompt: n.prompt }];
+                }),
+              ),
+            };
+          },
+          retry: !1,
+          staleTime: r.ONE_MINUTE,
         };
-      },
-      retry: false,
-      staleTime: queryStaleTimes.ONE_MINUTE,
-    };
-  });
-  conversationPromptsFamily = createDerivedFamily(
-    AppScope,
-    (
-      _key: { conversationId?: string; isTemporaryChat: boolean },
-      { get }: DerivedScopedSignalContext<Record<string, unknown>>,
-    ) => get(clinicalPromptsQuery).data,
+      })),
+      (Y = oe(g, ({ conversationId: e, isTemporaryChat: t }, { get: n, scope: r }) => {
+        let i = n(M, e);
+        if (!((t && i !== !0) || T(r, n(ue, e), t, i).includes(`cme`))) return n(J).data;
+      })));
+  }))();
+}
+function Se() {
+  let e = (0, Z.c)(13),
+    t = ee(A),
+    n = le(),
+    r = c(P),
+    a = c(ce),
+    { search: o } = O(),
+    s = R(o),
+    l;
+  e[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((l = { name: `chatgpt.clinical-starter-prompts` }), (e[0] = l))
+    : (l = e[0]);
+  let { isCapable: u } = i(C, l),
+    d = i(Y, { conversationId: r, isTemporaryChat: s }),
+    f = he(n, Ce, `document`);
+  if (!u || !f || d == null || d.prompts.length === 0) return null;
+  let p;
+  e[1] !== n || e[2] !== d.accountId || e[3] !== d.userId || e[4] !== t
+    ? ((p = (e) => {
+        let r = t.get(x);
+        !n.hasText() &&
+          t.get(C, { name: `chatgpt.clinical-starter-prompts` }).isCapable &&
+          r.accountId === d.accountId &&
+          r.userId === d.userId &&
+          (n.setPromptText(e.prompt), !j(t) && n.focus());
+      }),
+      (e[1] = n),
+      (e[2] = d.accountId),
+      (e[3] = d.userId),
+      (e[4] = t),
+      (e[5] = p))
+    : (p = e[5]);
+  let m = p,
+    h = y(`mt-6`, s && `max-sm:hidden`, a && `pointer-events-none`),
+    g;
+  e[6] !== d.prompts || e[7] !== m
+    ? ((g = (0, Q.jsx)(be, { prompts: d.prompts, disabled: !1, onSelect: m })),
+      (e[6] = d.prompts),
+      (e[7] = m),
+      (e[8] = g))
+    : (g = e[8]);
+  let _;
+  return (
+    e[9] !== a || e[10] !== h || e[11] !== g
+      ? ((_ = (0, Q.jsx)(`div`, { className: h, inert: a, children: g })),
+        (e[9] = a),
+        (e[10] = h),
+        (e[11] = g),
+        (e[12] = _))
+      : (_ = e[12]),
+    _
   );
 }
-
-initializeClinicalStarterPrompts();
-
-export { ClinicalStarterPrompts };
+function Ce(e) {
+  return !e.hasText();
+}
+var Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((Z = n()), re(), s(), de(), w(), L(), k(), F(), S(), E(), pe(), W(), b(), X(), (Q = l()));
+  }))();
+}
+$();
+export { Se as ClinicalStarterPrompts };

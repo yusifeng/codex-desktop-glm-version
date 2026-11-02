@@ -1,187 +1,166 @@
-import * as appSharedChunk from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  a as initializeTimestampConstantsExport,
-  r as groupedTimestampExport,
-} from "@rchunk/timestamps";
-import type { JsxRuntime, MessageDescriptor } from "@rchunk/app-shared";
-
-const {
-  G2: defineMessages,
-  I3: getJsxRuntime,
-  K2: initializeIntlRuntime,
-  XQ: useReducedMotion,
-  Y2: FormattedMessage,
-  YQ: initializePresenceRuntime,
-  a$: initializeAnimationRuntime,
-  d$: AnimatePresence,
-  e6: getReactRuntime,
-  f$: initializeMotionComponents,
-  h4: initializeClassNames,
-  m4: classNames,
-  n4: useIntl,
-  o$: motion,
-} = appSharedChunk;
-const initializeTimestampConstants = initializeTimestampConstantsExport;
-const groupedTimestamp = groupedTimestampExport;
-
-let jsx: JsxRuntime;
-interface CompilerRuntime { c(size: number): unknown[] }
-let animationCompilerRuntime: CompilerRuntime;
-let timestampCompilerRuntime: CompilerRuntime;
-let React: ReturnType<typeof getReactRuntime>;
-let transition: { duration: number; ease: number[] };
-let messages: Record<"recent" | "older", MessageDescriptor>;
-
-function VisibilityCollapse({
-  className,
-  children,
-  isVisible,
-}: {
-  className?: string;
-  children?: unknown;
-  isVisible: boolean;
-}): unknown {
-  initializeTimestampSeparatorAnimation();
-  const cache = animationCompilerRuntime.c(7);
-  const reducedMotion = Boolean(useReducedMotion());
-  let content: unknown;
-  if (cache[0] !== children || cache[1] !== className || cache[2] !== isVisible || cache[3] !== reducedMotion) {
-    content = isVisible ? jsx.jsx(motion.div, {
-        className: classNames("overflow-hidden", className),
-        animate: {
-          height: "auto",
-          opacity: 1,
-          transitionEnd: { overflow: "visible" },
+  $3 as t,
+  G2 as n,
+  I3 as r,
+  K2 as i,
+  XQ as a,
+  Y2 as o,
+  YQ as s,
+  a$ as c,
+  d$ as l,
+  e6 as u,
+  f$ as d,
+  h4 as f,
+  m4 as p,
+  n4 as m,
+  o$ as h,
+} from "@rchunk/app-shared";
+import { a as g, r as _ } from "@rchunk/timestamps";
+function v(e) {
+  let t = (0, y.c)(7),
+    { className: n, children: r, isVisible: i } = e,
+    o = !!a(),
+    s;
+  t[0] !== r || t[1] !== n || t[2] !== i || t[3] !== o
+    ? ((s = i
+        ? (0, b.jsx)(h.div, {
+            className: p(`overflow-hidden`, n),
+            animate: { height: `auto`, opacity: 1, transitionEnd: { overflow: `visible` } },
+            exit: o
+              ? { opacity: 0, overflow: `hidden`, pointerEvents: `none` }
+              : { height: 0, opacity: 0, overflow: `hidden`, pointerEvents: `none` },
+            transition: x,
+            children: r,
+          })
+        : null),
+      (t[0] = r),
+      (t[1] = n),
+      (t[2] = i),
+      (t[3] = o),
+      (t[4] = s))
+    : (s = t[4]);
+  let c;
+  return (
+    t[5] === s
+      ? (c = t[6])
+      : ((c = (0, b.jsx)(l, { initial: !1, children: s })), (t[5] = s), (t[6] = c)),
+    c
+  );
+}
+var y, b, x;
+function S() {
+  return (S = e(() => {
+    ((y = t()), f(), d(), c(), s(), (b = r()), (x = { duration: 0.22, ease: [0.23, 1, 0.32, 1] }));
+  }))();
+}
+function C(e) {
+  let t = (0, O.c)(20),
+    { sentAtMs: n, nowMs: r } = e,
+    i = m(),
+    [a] = (0, k.useState)(E);
+  if (!Number.isFinite(n)) return null;
+  let s, c, l, u, d;
+  if (t[0] !== i || t[1] !== a || t[2] !== r || t[3] !== n) {
+    let { date: e, time: o, includeAt: f } = _(i, new Date(n), new Date(r ?? a));
+    ((c = e),
+      (d = o),
+      (l = f ? j.older : j.recent),
+      (s = D),
+      (u = i.formatMessage(l, { date: c, time: d, day: T })),
+      (t[0] = i),
+      (t[1] = a),
+      (t[2] = r),
+      (t[3] = n),
+      (t[4] = s),
+      (t[5] = c),
+      (t[6] = l),
+      (t[7] = u),
+      (t[8] = d));
+  } else ((s = t[4]), (c = t[5]), (l = t[6]), (u = t[7]), (d = t[8]));
+  let f;
+  t[9] !== c || t[10] !== d
+    ? ((f = { date: c, time: d, day: w }), (t[9] = c), (t[10] = d), (t[11] = f))
+    : (f = t[11]);
+  let p;
+  t[12] !== l || t[13] !== f
+    ? ((p = (0, A.jsx)(o, { ...l, values: f })), (t[12] = l), (t[13] = f), (t[14] = p))
+    : (p = t[14]);
+  let h;
+  return (
+    t[15] !== s || t[16] !== n || t[17] !== u || t[18] !== p
+      ? ((h = (0, A.jsx)(s, { label: u, sentAtMs: n, children: p })),
+        (t[15] = s),
+        (t[16] = n),
+        (t[17] = u),
+        (t[18] = p),
+        (t[19] = h))
+      : (h = t[19]),
+    h
+  );
+}
+function w(e) {
+  return (0, A.jsx)(`span`, { className: `font-medium`, children: e });
+}
+function T(e) {
+  return e.join(``);
+}
+function E() {
+  return Date.now();
+}
+function D(e) {
+  let t = (0, O.c)(11),
+    { children: n, compact: r, label: i, sentAtMs: a } = e,
+    o = r !== void 0 && r,
+    s = o ? `flex justify-center py-2` : `flex justify-center py-4`,
+    c = i == null ? void 0 : `separator`,
+    l = o
+      ? `text-xs text-tertiary select-none`
+      : `text-sm leading-5 font-normal text-tertiary select-none`,
+    u;
+  t[0] === a ? (u = t[1]) : ((u = new Date(a).toISOString()), (t[0] = a), (t[1] = u));
+  let d;
+  t[2] !== n || t[3] !== l || t[4] !== u
+    ? ((d = (0, A.jsx)(`time`, { className: l, dateTime: u, children: n })),
+      (t[2] = n),
+      (t[3] = l),
+      (t[4] = u),
+      (t[5] = d))
+    : (d = t[5]);
+  let f;
+  return (
+    t[6] !== i || t[7] !== s || t[8] !== c || t[9] !== d
+      ? ((f = (0, A.jsx)(`div`, { "aria-label": i, className: s, role: c, children: d })),
+        (t[6] = i),
+        (t[7] = s),
+        (t[8] = c),
+        (t[9] = d),
+        (t[10] = f))
+      : (f = t[10]),
+    f
+  );
+}
+var O, k, A, j;
+function M() {
+  return (M = e(() => {
+    ((O = t()),
+      (k = u()),
+      i(),
+      g(),
+      (A = r()),
+      (j = n({
+        recent: {
+          id: `conversation.timestampSeparator.recent`,
+          defaultMessage: `<day>{date}</day> {time}`,
+          description: `Centered timestamp separating messages in a Codex conversation. The date is a localized relative day such as Today, Yesterday, or Monday; time is the localized time of day. The day tag emphasizes the date. Keep the complete label short and adjust its order or punctuation for the locale.`,
         },
-        exit: reducedMotion
-          ? { opacity: 0, overflow: "hidden", pointerEvents: "none" }
-          : {
-              height: 0,
-              opacity: 0,
-              overflow: "hidden",
-              pointerEvents: "none",
-            },
-        transition,
-        children,
-      }) : null;
-    cache[0] = children; cache[1] = className; cache[2] = isVisible;
-    cache[3] = reducedMotion; cache[4] = content;
-  } else content = cache[4];
-  if (cache[5] !== content) { cache[5] = content; cache[6] = jsx.jsx(AnimatePresence, { initial: false, children: content }); }
-  return cache[6];
+        older: {
+          id: `conversation.timestampSeparator.older`,
+          defaultMessage: `<day>{date}</day> at {time}`,
+          description: `Centered timestamp separating older messages in a Codex conversation. The date is a localized calendar date, including the year when more than 365 days old; time is the localized time of day. The day tag emphasizes the date. Keep the complete label short and translate the date-time relationship naturally.`,
+        },
+      })));
+  }))();
 }
-
-function Day(children: unknown): unknown {
-  return jsx.jsx("span", { className: "font-medium", children });
-}
-
-function joinDay(chunks: readonly unknown[]): string {
-  return chunks.join("");
-}
-
-function TimestampLabel({
-  children,
-  compact = false,
-  label,
-  sentAtMs,
-}: {
-  children?: unknown;
-  compact?: boolean;
-  label?: string;
-  sentAtMs: number;
-}): unknown {
-  initializeTimestampSeparator();
-  const cache = timestampCompilerRuntime.c(11);
-  const containerClass = compact ? "flex justify-center py-2" : "flex justify-center py-4";
-  const role = label == null ? undefined : "separator";
-  const timeClass = compact ? "text-xs text-tertiary select-none" : "text-sm leading-5 font-normal text-tertiary select-none";
-  let dateTime: string;
-  if (cache[0] === sentAtMs) dateTime = cache[1] as string;
-  else { dateTime = new Date(sentAtMs).toISOString(); cache[0] = sentAtMs; cache[1] = dateTime; }
-  let time: unknown;
-  if (cache[2] === children && cache[3] === timeClass && cache[4] === dateTime) time = cache[5];
-  else { time = jsx.jsx("time", { className: timeClass, dateTime, children }); cache[2] = children; cache[3] = timeClass; cache[4] = dateTime; cache[5] = time; }
-  if (cache[6] !== label || cache[7] !== containerClass || cache[8] !== role || cache[9] !== time) {
-    cache[6] = label; cache[7] = containerClass; cache[8] = role; cache[9] = time;
-    cache[10] = jsx.jsx("div", { "aria-label": label, className: containerClass, role, children: time });
-  }
-  return cache[10];
-}
-
-function TimestampSeparator({
-  sentAtMs,
-  nowMs,
-}: {
-  sentAtMs: number;
-  nowMs?: number;
-}): unknown {
-  initializeTimestampSeparator();
-  const cache = timestampCompilerRuntime.c(20);
-  const intl = useIntl();
-  const [initialNow] = React.useState(() => Date.now());
-  if (!Number.isFinite(sentAtMs)) return null;
-  let date: string, time: string, descriptor: MessageDescriptor, label: string;
-  if (cache[0] !== intl || cache[1] !== initialNow || cache[2] !== nowMs || cache[3] !== sentAtMs) {
-    const grouped = groupedTimestamp(intl, new Date(sentAtMs), new Date(nowMs ?? initialNow)) as { date: string; time: string; includeAt: boolean };
-    date = grouped.date; time = grouped.time;
-    descriptor = grouped.includeAt ? messages.older : messages.recent;
-    label = intl.formatMessage(descriptor, { date, time, day: joinDay }) as string;
-    cache[0] = intl; cache[1] = initialNow; cache[2] = nowMs; cache[3] = sentAtMs;
-    cache[4] = TimestampLabel; cache[5] = date; cache[6] = descriptor; cache[7] = label; cache[8] = time;
-  } else { date = cache[5] as string; descriptor = cache[6] as MessageDescriptor; label = cache[7] as string; time = cache[8] as string; }
-  let values: Record<string, unknown>;
-  if (cache[9] !== date || cache[10] !== time) { values = { date, time, day: Day }; cache[9] = date; cache[10] = time; cache[11] = values; }
-  else values = cache[11] as Record<string, unknown>;
-  let formatted: unknown;
-  if (cache[12] !== descriptor || cache[13] !== values) { formatted = jsx.jsx(FormattedMessage, { ...descriptor, values }); cache[12] = descriptor; cache[13] = values; cache[14] = formatted; }
-  else formatted = cache[14];
-  if (cache[15] !== TimestampLabel || cache[16] !== sentAtMs || cache[17] !== label || cache[18] !== formatted) {
-    cache[15] = TimestampLabel; cache[16] = sentAtMs; cache[17] = label; cache[18] = formatted;
-    cache[19] = jsx.jsx(TimestampLabel, { label, sentAtMs, children: formatted });
-  }
-  return cache[19];
-}
-
-let animationInitialized = false;
-function initializeTimestampSeparatorAnimation(): void {
-  if (animationInitialized) return;
-  animationCompilerRuntime = appSharedChunk.$3() as unknown as CompilerRuntime;
-  initializeClassNames();
-  initializeMotionComponents();
-  initializeAnimationRuntime();
-  initializePresenceRuntime();
-  jsx = getJsxRuntime();
-  transition = { duration: 0.22, ease: [0.23, 1, 0.32, 1] };
-  animationInitialized = true;
-}
-
-let initialized = false;
-function initializeTimestampSeparator(): void {
-  if (initialized) return;
-  timestampCompilerRuntime = appSharedChunk.$3() as unknown as CompilerRuntime;
-  React = getReactRuntime();
-  initializeIntlRuntime();
-  initializeTimestampConstants();
-  jsx = getJsxRuntime();
-  messages = defineMessages({
-    recent: {
-      id: "conversation.timestampSeparator.recent",
-      defaultMessage: "<day>{date}</day> {time}",
-      description: "Centered timestamp separating messages in a Codex conversation. The date is a localized relative day such as Today, Yesterday, or Monday; time is the localized time of day. The day tag emphasizes the date. Keep the complete label short and adjust its order or punctuation for the locale.",
-    },
-    older: {
-      id: "conversation.timestampSeparator.older",
-      defaultMessage: "<day>{date}</day> at {time}",
-      description: "Centered timestamp separating older messages in a Codex conversation. The date is a localized calendar date, including the year when more than 365 days old; time is the localized time of day. The day tag emphasizes the date. Keep the complete label short and translate the date-time relationship naturally.",
-    },
-  });
-  initialized = true;
-}
-
-export {
-  initializeTimestampSeparatorAnimation as i,
-  initializeTimestampSeparator as n,
-  VisibilityCollapse as r,
-  TimestampSeparator as t,
-};
+export { S as i, M as n, v as r, C as t };

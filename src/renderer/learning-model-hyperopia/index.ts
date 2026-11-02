@@ -1,38 +1,12 @@
-// Hyperopia object-distance metadata. Release chunk: type-28180140955e.js.
-import "@rchunk/rolldown-runtime";
-
-interface HyperopiaSpecification {
-  type: "HYPEROPIA";
-  version: 1;
-  thumbnailAssetKey: "hyperopia-v2";
-  parameters: {
-    objectDistanceMeters: {
-      kind: "number";
-      defaultValue: 0.5;
-      min: 0.25;
-      max: 6;
-    };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `HYPEROPIA`),
+      (n = `hyperopia-v2`),
+      (r = { objectDistanceMeters: { kind: `number`, defaultValue: 0.5, min: 0.25, max: 6 } }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-let hyperopiaSpecification: HyperopiaSpecification;
-let initialized = false;
-function initializeHyperopiaSpecification(): void {
-  if (initialized) return;
-  initialized = true;
-  hyperopiaSpecification = {
-    type: "HYPEROPIA",
-    version: 1,
-    thumbnailAssetKey: "hyperopia-v2",
-    parameters: {
-      objectDistanceMeters: {
-        kind: "number",
-        defaultValue: 0.5,
-        min: 0.25,
-        max: 6,
-      },
-    },
-  };
-}
-
-export { hyperopiaSpecification as n, initializeHyperopiaSpecification as t };
+export { i as n, a as t };

@@ -1,31 +1,22 @@
-// Carbohydrate-structure learning-block model.
-// Release chunk: app/webview/assets/model-1bd246abc23b.js.
-
-import "@rchunk/rolldown-runtime";
-
-type CarbohydrateExample = "glucose" | "maltose" | "amylose" | "amylopectin" | "glycogen" | "cellulose";
-
-let carbohydrateExamples: CarbohydrateExample[];
-let normalizeCarbohydrateExample: (value: unknown) => CarbohydrateExample;
-let normalizeLinkageIndex: (value: number) => number;
-let getLinkageIndex: (example: CarbohydrateExample) => number;
-let getExampleForLinkage: (example: CarbohydrateExample, linkageIndex: number) => CarbohydrateExample;
-let initialized = false;
-
-function initializeCarbohydrateStructureModel(): void {
-  if (initialized) return;
-  initialized = true;
-  carbohydrateExamples = ["glucose", "maltose", "amylose", "amylopectin", "glycogen", "cellulose"];
-  normalizeCarbohydrateExample = value => typeof value === "string" && carbohydrateExamples.includes(value as CarbohydrateExample)
-    ? value as CarbohydrateExample
-    : "amylopectin";
-  normalizeLinkageIndex = value => Number.isFinite(value) ? Math.min(2, Math.max(0, Math.round(value))) : 0;
-  getLinkageIndex = example => example === "cellulose" ? 2 : Number(example === "amylopectin" || example === "glycogen");
-  getExampleForLinkage = (example, linkageIndex) => linkageIndex === 0
-    ? example === "maltose" ? "maltose" : "amylose"
-    : linkageIndex === 1
-      ? example === "glycogen" ? "glycogen" : "amylopectin"
-      : "cellulose";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = [`glucose`, `maltose`, `amylose`, `amylopectin`, `glycogen`, `cellulose`]),
+      (n = (e) => (typeof e == `string` && t.includes(e) ? e : `amylopectin`)),
+      (r = (e) => (Number.isFinite(e) ? Math.min(2, Math.max(0, Math.round(e))) : 0)),
+      (i = (e) => (e === `cellulose` ? 2 : +(e === `amylopectin` || e === `glycogen`))),
+      (a = (e, t) =>
+        t === 0
+          ? e === `maltose`
+            ? `maltose`
+            : `amylose`
+          : t === 1
+            ? e === `glycogen`
+              ? `glycogen`
+              : `amylopectin`
+            : `cellulose`));
+  }))();
 }
-
-export { normalizeCarbohydrateExample as a, initializeCarbohydrateStructureModel as i, getLinkageIndex as n, normalizeLinkageIndex as o, getExampleForLinkage as r, carbohydrateExamples as t };
+export { n as a, o as i, i as n, r as o, a as r, t };

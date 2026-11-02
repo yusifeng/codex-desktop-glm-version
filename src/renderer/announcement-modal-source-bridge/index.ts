@@ -1,50 +1,45 @@
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as reactCompilerRuntime,
-  FX as initializeSignalRuntime,
-  I3 as getJsxRuntime,
-  LX as useScope,
-  QI as initializeScopeRuntime,
-  ZI as appScope,
-  e6 as getReactRuntime,
+  $3 as t,
+  FX as n,
+  I3 as r,
+  LX as i,
+  QI as a,
+  ZI as o,
+  e6 as s,
 } from "@rchunk/app-shared";
-import {
-  Qp as announcementModalSources,
-  em as initializeAnnouncementModalSources,
-} from "@rchunk/app-primary";
-
-void reactCompilerRuntime;
-
-export interface AnnouncementModalSourceBridgeProps {
-  candidate: unknown;
-  source: string;
+import { Qp as c, em as l } from "@rchunk/app-primary";
+function u(e) {
+  let t = (0, d.c)(5),
+    { source: n, candidate: r } = e,
+    a = i(o),
+    s = (0, f.useId)(),
+    l;
+  return (
+    t[0] !== r || t[1] !== s || t[2] !== a || t[3] !== n
+      ? ((l = (0, p.jsx)(`span`, {
+          hidden: !0,
+          ref: (e) => {
+            a.set(c, (t) => {
+              let i = new Map(t);
+              return (e == null ? i.delete(s) : i.set(s, { source: n, candidate: r }), i);
+            });
+          },
+        })),
+        (t[0] = r),
+        (t[1] = s),
+        (t[2] = a),
+        (t[3] = n),
+        (t[4] = l))
+      : (l = t[4]),
+    l
+  );
 }
-
-function AnnouncementModalSourceBridge({
-  source,
-  candidate,
-}: AnnouncementModalSourceBridgeProps): unknown {
-  const scope = useScope(appScope);
-  const id = getReactRuntime().useId();
-  return getJsxRuntime().jsx("span", {
-    hidden: true,
-    ref: (element: unknown) => {
-      scope.set(announcementModalSources, (current: Map<string, unknown>) => {
-        const next = new Map(current);
-        if (element == null) next.delete(id);
-        else next.set(id, { source, candidate });
-        return next;
-      });
-    },
-  });
+var d, f, p;
+function m() {
+  return (m = e(() => {
+    ((d = t()), n(), (f = s()), a(), l(), (p = r()));
+  }))();
 }
-
-function initializeAnnouncementModalSourceBridge(): void {
-  initializeSignalRuntime();
-  initializeScopeRuntime();
-  initializeAnnouncementModalSources();
-}
-
-export {
-  initializeAnnouncementModalSourceBridge as n,
-  AnnouncementModalSourceBridge as t,
-};
+export { m as n, u as t };

@@ -1,15 +1,13 @@
-import * as RuntimeChunk from "@rchunk/rolldown-runtime";
-
-void RuntimeChunk;
-
-function gracefulDecodeURIComponent(value: string): string {
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e) {
   try {
-    return decodeURIComponent(value.replace(/\+/g, " "));
+    return decodeURIComponent(e.replace(/\+/g, ` `));
   } catch {
-    return value;
+    return e;
   }
 }
-
-function initializeGracefulUriDecoder(): void {}
-
-export { initializeGracefulUriDecoder as n, gracefulDecodeURIComponent as t };
+function n() {
+  return (n = e(() => {}))();
+}
+export { n, t };

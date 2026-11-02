@@ -1,17 +1,10 @@
-import "@rchunk/rolldown-runtime";
-import { dun as createPersistedState } from "@rchunk/app-initial";
-
-interface WritableState<Value> {
-  value: Value;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { dun as t, uun as n } from "@rchunk/app-initial";
+var r;
+function i() {
+  return (i = e(() => {
+    (n(), (r = t(`avatar-overlay-debug-window-border-visible`, !1)));
+  }))();
 }
-
-let t: WritableState<boolean>;
-
-function n(): void {
-  t ??= createPersistedState(
-    "avatar-overlay-debug-window-border-visible",
-    false,
-  ) as unknown as WritableState<boolean>;
-}
-
-export { n, t };
+export { i as n, r as t };

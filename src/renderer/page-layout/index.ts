@@ -1,124 +1,106 @@
-// page-layout —— 浏览器认证页面共用的品牌页头、正文和政策页脚布局。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-void runtimeChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  I3: getJsxRuntime,
-  K2: initializeSharedUi,
-  Y2: FormattedMessage,
-} = appSharedChunk;
-const {
-  Jot: ExternalLink,
-  Xot: initializeExternalLink,
-  o3t: OpenAiLogo,
-  s3t: initializeOpenAiLogo,
-} = appInitialChunk;
-
-interface PageLayoutProps {
-  children?: unknown;
-  embedded?: boolean;
-  showFooter?: boolean;
-  title: unknown;
-}
-
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function PageLayout({
-  title,
-  children,
-  embedded = false,
-  showFooter = true,
-}: PageLayoutProps): unknown {
-  const header = embedded
-    ? null
-    : jsx.jsx("header", {
-        className: "shrink-0 px-6 py-4 sm:px-8",
-        children: jsx.jsx("span", {
-          className: "text-heading-lg font-semibold tracking-tight",
-          children: jsx.jsx(FormattedMessage, {
-            id: "browser.auth.brand",
-            defaultMessage: "ChatGPT",
-            description:
-              "ChatGPT brand name in the top-left header of the browser login and logout pages; do not translate the product name",
-          }),
-        }),
-      });
-  const heading = jsx.jsx("h1", {
-    className: embedded ? "sr-only" : "text-center text-3xl font-normal",
-    children: title,
-  });
-  const main = jsx.jsx("main", {
-    className:
-      "flex w-full shrink-0 grow flex-col items-center justify-center px-6 py-4",
-    children: jsx.jsxs("div", {
-      className: "flex w-full max-w-sm flex-col gap-5",
-      children: [heading, children],
-    }),
-  });
-  const footer = showFooter
-    ? jsx.jsxs("footer", {
-        className: "flex shrink-0 flex-col items-center gap-3 px-6 pt-10 pb-8",
-        children: [
-          jsx.jsx(OpenAiLogo, {
-            "aria-hidden": true,
-            className: "size-6 shrink-0",
-          }),
-          jsx.jsxs("div", {
-            className:
-              "flex flex-wrap items-center justify-center gap-3 text-xs text-secondary",
-            children: [
-              createPolicyLink(
-                "https://openai.com/policies/terms-of-use/",
-                "browser.auth.termsOfUse",
-                "Terms of use",
-                "Footer link to OpenAI's terms of use on the browser login and logout pages",
-              ),
-              jsx.jsx("div", {
-                "aria-hidden": true,
-                className: "h-3 w-px bg-border",
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i } from "@rchunk/app-shared";
+import { Jot as a, Xot as o, o3t as s, s3t as c } from "@rchunk/app-initial";
+function l(e) {
+  let t = (0, u.c)(14),
+    { title: n, children: r, embedded: o, showFooter: c } = e,
+    l = o !== void 0 && o,
+    f = c === void 0 || c,
+    p;
+  t[0] === l
+    ? (p = t[1])
+    : ((p = l
+        ? null
+        : (0, d.jsx)(`header`, {
+            className: `shrink-0 px-6 py-4 sm:px-8`,
+            children: (0, d.jsx)(`span`, {
+              className: `text-heading-lg font-semibold tracking-tight`,
+              children: (0, d.jsx)(i, {
+                id: `browser.auth.brand`,
+                defaultMessage: `ChatGPT`,
+                description: `ChatGPT brand name in the top-left header of the browser login and logout pages; do not translate the product name`,
               }),
-              createPolicyLink(
-                "https://openai.com/policies/privacy-policy/",
-                "browser.auth.privacyPolicy",
-                "Privacy policy",
-                "Footer link to OpenAI's privacy policy on the browser login and logout pages",
-              ),
+            }),
+          })),
+      (t[0] = l),
+      (t[1] = p));
+  let m = l ? `sr-only` : `text-center text-3xl font-normal`,
+    h;
+  t[2] !== m || t[3] !== n
+    ? ((h = (0, d.jsx)(`h1`, { className: m, children: n })), (t[2] = m), (t[3] = n), (t[4] = h))
+    : (h = t[4]);
+  let g;
+  t[5] !== r || t[6] !== h
+    ? ((g = (0, d.jsx)(`main`, {
+        className: `flex w-full shrink-0 grow flex-col items-center justify-center px-6 py-4`,
+        children: (0, d.jsxs)(`div`, {
+          className: `flex w-full max-w-sm flex-col gap-5`,
+          children: [h, r],
+        }),
+      })),
+      (t[5] = r),
+      (t[6] = h),
+      (t[7] = g))
+    : (g = t[7]);
+  let _;
+  t[8] === f
+    ? (_ = t[9])
+    : ((_ = f
+        ? (0, d.jsxs)(`footer`, {
+            className: `flex shrink-0 flex-col items-center gap-3 px-6 pt-10 pb-8`,
+            children: [
+              (0, d.jsx)(s, { "aria-hidden": `true`, className: `size-6 shrink-0` }),
+              (0, d.jsxs)(`div`, {
+                className: `flex flex-wrap items-center justify-center gap-3 text-xs text-secondary`,
+                children: [
+                  (0, d.jsx)(a, {
+                    appearance: `secondary`,
+                    href: `https://openai.com/policies/terms-of-use/`,
+                    initiator: `open_in_browser_bridge`,
+                    children: (0, d.jsx)(i, {
+                      id: `browser.auth.termsOfUse`,
+                      defaultMessage: `Terms of use`,
+                      description: `Footer link to OpenAI's terms of use on the browser login and logout pages`,
+                    }),
+                  }),
+                  (0, d.jsx)(`div`, { "aria-hidden": `true`, className: `h-3 w-px bg-border` }),
+                  (0, d.jsx)(a, {
+                    appearance: `secondary`,
+                    href: `https://openai.com/policies/privacy-policy/`,
+                    initiator: `open_in_browser_bridge`,
+                    children: (0, d.jsx)(i, {
+                      id: `browser.auth.privacyPolicy`,
+                      defaultMessage: `Privacy policy`,
+                      description: `Footer link to OpenAI's privacy policy on the browser login and logout pages`,
+                    }),
+                  }),
+                ],
+              }),
             ],
-          }),
-        ],
-      })
-    : null;
-  return jsx.jsxs("div", {
-    className:
-      "flex h-full w-full flex-col overflow-y-auto bg-surface text-default select-none",
-    children: [header, main, footer],
-  });
+          })
+        : null),
+      (t[8] = f),
+      (t[9] = _));
+  let v;
+  return (
+    t[10] !== p || t[11] !== g || t[12] !== _
+      ? ((v = (0, d.jsxs)(`div`, {
+          className: `flex h-full w-full flex-col overflow-y-auto bg-surface text-default select-none`,
+          children: [p, g, _],
+        })),
+        (t[10] = p),
+        (t[11] = g),
+        (t[12] = _),
+        (t[13] = v))
+      : (v = t[13]),
+    v
+  );
 }
-
-function createPolicyLink(
-  href: string,
-  id: string,
-  defaultMessage: string,
-  description: string,
-): unknown {
-  return jsx.jsx(ExternalLink, {
-    appearance: "secondary",
-    href,
-    initiator: "open_in_browser_bridge",
-    children: jsx.jsx(FormattedMessage, { id, defaultMessage, description }),
-  });
+var u, d;
+function f() {
+  return (f = e(() => {
+    ((u = t()), r(), o(), c(), (d = n()));
+  }))();
 }
-
-function initializePageLayout(): void {
-  initializeRuntimeLazy();
-  initializeSharedUi();
-  initializeExternalLink();
-  initializeOpenAiLogo();
-  jsx = getJsxRuntime();
-}
-
-initializePageLayout();
-export { initializePageLayout as n, PageLayout as t };
+export { f as n, l as t };

@@ -1,74 +1,32 @@
-// Voice-activity audio frame worklet. Release chunk: vad-audio-frame-processor-b6bea101f49a.js.
-declare const sampleRate: number;
-declare abstract class AudioWorkletProcessor {
-  readonly port: {
-    postMessage(message: unknown, transfer?: Transferable[]): void;
-  };
-  constructor(options?: unknown);
-}
-declare function registerProcessor(
-  name: string,
-  processor: new (options?: unknown) => AudioWorkletProcessor,
-): void;
-
-interface ProcessorOptions {
-  processorOptions?: { frameDurationMs?: unknown };
-}
-
-function hasProcessorOptions(value: unknown): value is ProcessorOptions {
-  return (
-    typeof value === "object" && value !== null && "processorOptions" in value
-  );
-}
-function appendSamples(
-  pending: Float32Array,
-  incoming: Float32Array,
-): Float32Array {
-  if (pending.length === 0) return incoming.slice();
-  const combined = new Float32Array(pending.length + incoming.length);
-  combined.set(pending);
-  combined.set(incoming, pending.length);
-  return combined;
-}
-
-class VoiceVadFrameProcessor extends AudioWorkletProcessor {
-  private readonly frameSize: number;
-  private pendingSamples: Float32Array<ArrayBufferLike> = new Float32Array();
-
-  constructor(options?: unknown) {
-    super(options);
-    const processorOptions = hasProcessorOptions(options)
-      ? options.processorOptions
-      : undefined;
-    const frameDurationMs =
-      typeof processorOptions?.frameDurationMs === "number"
-        ? processorOptions.frameDurationMs
-        : 10;
-    this.frameSize = Math.max(
-      1,
-      Math.round((sampleRate * frameDurationMs) / 1_000),
-    );
+// @ts-nocheck
+var e = class extends AudioWorkletProcessor {
+  frameSize;
+  pendingSamples = new Float32Array();
+  constructor(e) {
+    super();
+    let t = n(e) ? e.processorOptions : void 0,
+      r = typeof t?.frameDurationMs == `number` ? t.frameDurationMs : 10;
+    this.frameSize = Math.max(1, Math.round((sampleRate * r) / 1e3));
   }
-
-  process(inputs: Float32Array[][]): true {
-    const samples = inputs[0]?.[0];
-    if (!samples || samples.length === 0) return true;
-    this.pendingSamples = appendSamples(this.pendingSamples, samples);
-    let consumed = 0;
-    while (this.pendingSamples.length - consumed >= this.frameSize) {
-      const frame = this.pendingSamples.slice(
-        consumed,
-        consumed + this.frameSize,
-      );
-      this.port.postMessage(
-        { payload: { sampleRate, samples: frame }, type: "frame" },
-        [frame.buffer],
-      );
-      consumed += this.frameSize;
+  process(e) {
+    let n = e[0]?.[0];
+    if (!n || n.length === 0) return !0;
+    this.pendingSamples = t(this.pendingSamples, n);
+    let r = 0;
+    for (; this.pendingSamples.length - r >= this.frameSize;) {
+      let e = this.pendingSamples.slice(r, r + this.frameSize);
+      (this.port.postMessage({ payload: { sampleRate, samples: e }, type: `frame` }, [e.buffer]),
+        (r += this.frameSize));
     }
-    this.pendingSamples = this.pendingSamples.slice(consumed);
-    return true;
+    return ((this.pendingSamples = this.pendingSamples.slice(r)), !0);
   }
+};
+function t(e, t) {
+  if (e.length === 0) return t.slice();
+  let n = new Float32Array(e.length + t.length);
+  return (n.set(e), n.set(t, e.length), n);
 }
-
-registerProcessor("voice-vad-frame-processor", VoiceVadFrameProcessor);
+function n(e) {
+  return typeof e == `object` && !!e && `processorOptions` in e;
+}
+registerProcessor(`voice-vad-frame-processor`, e);

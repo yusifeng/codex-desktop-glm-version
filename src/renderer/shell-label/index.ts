@@ -1,30 +1,28 @@
-import * as appSharedChunk from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
-
-const { RR: shellLabels, wL: initializeShellLabels } = appSharedChunk;
-
-function basename(value: string): string {
-  return value.split(/[/\\]/).at(-1) ?? value;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { RR as t, wL as n } from "@rchunk/app-shared";
+function r(e) {
+  let n = i(e);
+  return n == null ? null : (t[n.toLowerCase()] ?? null);
 }
-function shellExecutable(command: string): string | null {
-  let trimmed = command.trim();
-  if (trimmed.length === 0) return null;
-  const quoted = trimmed.match(/^(['"])(.*?)\1/);
-  const quotedValue = quoted?.[2];
-  if (quotedValue) {
-    if (quoted[0].length === trimmed.length) trimmed = quotedValue.trim();
-    else return basename(quotedValue);
+function i(e) {
+  let t = e.trim();
+  if (t.length === 0) return null;
+  let n = t.match(/^(['"])(.*?)\1/),
+    r = n?.[2];
+  if (r) {
+    if (n[0].length === t.length) t = r.trim();
+    else return a(r);
   }
-  const first = trimmed.match(/^\S+/)?.[0];
-  return first == null ? null : basename(first);
+  let i = t.match(/^\S+/)?.[0];
+  return i == null ? null : a(i);
 }
-function shellLabel(command: string): string | null {
-  const executable = shellExecutable(command);
-  return executable == null
-    ? null
-    : (shellLabels[executable.toLowerCase()] ?? null);
+function a(e) {
+  return e.split(/[/\\]/).at(-1) ?? e;
 }
-function initializeShellLabel(): void {
-  initializeShellLabels();
+function o() {
+  return (o = e(() => {
+    n();
+  }))();
 }
-export { initializeShellLabel as n, shellLabel as t };
+export { o as n, r as t };

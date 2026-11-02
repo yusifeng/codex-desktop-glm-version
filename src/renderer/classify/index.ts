@@ -1,122 +1,78 @@
-// Math-expression classification helpers. Release chunk: classify-475110c4b36d.js.
-import "@rchunk/rolldown-runtime";
-import * as mathBlockUtilsChunk from "@rchunk/math-block-utils";
-
-interface MathBlockUtilsRuntime {
-  n(source: string): number[];
-  r(): void;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { n as t, r as n } from "@rchunk/math-block-utils";
+var r, i, a, o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S;
+function C() {
+  return (C = e(() => {
+    (n(),
+      (r = /(?:\\|\/)(?:displaystyle|textstyle|scriptstyle|scriptscriptstyle)\b/gi),
+      (i = (e) => e.replace(r, ``)),
+      (a = (e) => {
+        let t = e.trim(),
+          n = t;
+        return (
+          ((t.startsWith(`\\(`) && t.endsWith(`\\)`)) ||
+            (t.startsWith(`\\[`) && t.endsWith(`\\]`))) &&
+            (n = t.slice(2, -2).trim()),
+          n.startsWith(`$`) && n.endsWith(`$`) && (n = n.slice(1, -1).trim()),
+          i(n).trim()
+        );
+      }),
+      (o = (e) => {
+        let t = e.trim(),
+          n = t.match(/^\\boxed\{(?<inner>.*)\}$/);
+        return n?.groups?.inner ? i(n.groups.inner).trim() : i(t).trim();
+      }),
+      (s = (e) =>
+        i(e)
+          .replace(/\\(?:,|;|:|!|quad|qquad| )/g, ``)
+          .replace(/\\left\s*/g, ``)
+          .replace(/\\right\s*/g, ``)),
+      (c = (e) => e.replace(/\\(?:text|mathrm|operatorname)\{([^{}]+)\}/g, `$1`)),
+      (l = (e) => {
+        let t = e.trim();
+        for (; t.startsWith(`{`) && t.endsWith(`}`);) t = t.slice(1, -1).trim();
+        return t;
+      }),
+      (u = (e) => s(l(e)).replace(/\s+/g, ``)),
+      (d = /\\(?:iint|iiint|oint)(?![a-zA-Z])/),
+      (f = /\\(?:begin|end)\s*\{cases\}|\\cases(?![a-zA-Z])/),
+      (p = /\\(?:text|begin|end|Rightarrow|to|big|Big|bigg|Bigg)\b/),
+      (m = /[a-wyzA-WYZ]\s*\^\s*\{\s*-1\s*\}\s*\(/),
+      (h = (e) => f.test(s(e))),
+      (g = (e) => p.test(e) || m.test(e) || e.includes(`&`)),
+      (_ = (e) => d.test(s(e))),
+      (v =
+        /\s*(?:\\(?:Rightarrow|Longrightarrow|rightarrow|to|implies|leftrightarrow)|=>|->|⇒|→|↔)\s*/g),
+      (y = (e) =>
+        e
+          .trim()
+          .replace(/(?:[.,;]|\\\.)+$/g, ``)
+          .trim()),
+      (b = (e) =>
+        e
+          .split(v)
+          .flatMap((e) => e.split(/\r?\n+/))
+          .map((e) => y(e))
+          .filter(Boolean)),
+      (x = (e) => {
+        let n = t(e);
+        if (n.length === 0) return [y(e)];
+        let r = [],
+          i = 0;
+        for (let t of n) (r.push(y(e.slice(i, t))), (i = t + 1));
+        return (r.push(y(e.slice(i))), r.filter(Boolean));
+      }),
+      (S = (e) => {
+        let t = x(e),
+          n = [];
+        for (let e = 0; e < t.length - 1; e += 1) {
+          let r = t[e],
+            i = t[e + 1];
+          r && i && n.push({ lhs: r, rhs: i });
+        }
+        return n;
+      }));
+  }))();
 }
-const mathBlockUtils = mathBlockUtilsChunk as unknown as MathBlockUtilsRuntime;
-let stripBox: (source: string) => string;
-let stripTextWrappers: (source: string) => string;
-let isMultiStep: (source: string) => boolean;
-let stripSpacing: (source: string) => string;
-let isCases: (source: string) => boolean;
-let normalizeCompact: (source: string) => string;
-let isMultipleIntegral: (source: string) => boolean;
-let splitImplications: (source: string) => string[];
-let adjacentEquationPairs: (
-  source: string,
-) => Array<{ lhs: string; rhs: string }>;
-let normalizeMath: (source: string) => string;
-
-function initializeClassify(): void {
-  mathBlockUtils.r();
-  const stylePattern =
-    /(?:\\|\/)(?:displaystyle|textstyle|scriptstyle|scriptscriptstyle)\b/gi;
-  const removeStyles = (source: string) => source.replace(stylePattern, "");
-  normalizeMath = (source) => {
-    const trimmed = source.trim();
-    let normalized = trimmed;
-    if (
-      (trimmed.startsWith("\\(") && trimmed.endsWith("\\)")) ||
-      (trimmed.startsWith("\\[") && trimmed.endsWith("\\]"))
-    )
-      normalized = trimmed.slice(2, -2).trim();
-    if (normalized.startsWith("$") && normalized.endsWith("$")) {
-      normalized = normalized.slice(1, -1).trim();
-    }
-    return removeStyles(normalized).trim();
-  };
-  stripBox = (source) => {
-    const trimmed = source.trim();
-    const match = trimmed.match(/^\\boxed\{(?<inner>.*)\}$/);
-    return removeStyles(match?.groups?.inner ?? trimmed).trim();
-  };
-  stripSpacing = (source) =>
-    removeStyles(source)
-      .replace(/\\(?:,|;|:|!|quad|qquad| )/g, "")
-      .replace(/\\left\s*/g, "")
-      .replace(/\\right\s*/g, "");
-  stripTextWrappers = (source) =>
-    source.replace(/\\(?:text|mathrm|operatorname)\{([^{}]+)\}/g, "$1");
-  const unwrapBraces = (source: string) => {
-    let result = source.trim();
-    while (result.startsWith("{") && result.endsWith("}")) {
-      result = result.slice(1, -1).trim();
-    }
-    return result;
-  };
-  normalizeCompact = (source) =>
-    stripSpacing(unwrapBraces(source)).replace(/\s+/g, "");
-  const integralPattern = /\\(?:iint|iiint|oint)(?![a-zA-Z])/;
-  const casesPattern = /\\(?:begin|end)\s*\{cases\}|\\cases(?![a-zA-Z])/;
-  const multiStepPattern =
-    /\\(?:text|begin|end|Rightarrow|to|big|Big|bigg|Bigg)\b/;
-  const inverseFunctionPattern = /[a-wyzA-WYZ]\s*\^\s*\{\s*-1\s*\}\s*\(/;
-  isCases = (source) => casesPattern.test(stripSpacing(source));
-  isMultiStep = (source) =>
-    multiStepPattern.test(source) ||
-    inverseFunctionPattern.test(source) ||
-    source.includes("&");
-  isMultipleIntegral = (source) => integralPattern.test(stripSpacing(source));
-  const implicationPattern =
-    /\s*(?:\\(?:Rightarrow|Longrightarrow|rightarrow|to|implies|leftrightarrow)|=>|->|⇒|→|↔)\s*/g;
-  const trimPunctuation = (source: string) =>
-    source
-      .trim()
-      .replace(/(?:[.,;]|\\\.)+$/g, "")
-      .trim();
-  splitImplications = (source) =>
-    source
-      .split(implicationPattern)
-      .flatMap((part) => part.split(/\r?\n+/))
-      .map(trimPunctuation)
-      .filter(Boolean);
-  const splitEquations = (source: string) => {
-    const separators = mathBlockUtils.n(source);
-    if (separators.length === 0) return [trimPunctuation(source)];
-    const parts: string[] = [];
-    let start = 0;
-    for (const separator of separators) {
-      parts.push(trimPunctuation(source.slice(start, separator)));
-      start = separator + 1;
-    }
-    parts.push(trimPunctuation(source.slice(start)));
-    return parts.filter(Boolean);
-  };
-  adjacentEquationPairs = (source) => {
-    const parts = splitEquations(source);
-    const pairs: Array<{ lhs: string; rhs: string }> = [];
-    for (let index = 0; index < parts.length - 1; index += 1) {
-      const lhs = parts[index];
-      const rhs = parts[index + 1];
-      if (lhs && rhs) pairs.push({ lhs, rhs });
-    }
-    return pairs;
-  };
-}
-
-export {
-  initializeClassify as a,
-  stripBox as c,
-  stripTextWrappers as d,
-  isMultiStep as i,
-  stripSpacing as l,
-  isCases as n,
-  normalizeCompact as o,
-  isMultipleIntegral as r,
-  splitImplications as s,
-  adjacentEquationPairs as t,
-  normalizeMath as u,
-};
+export { C as a, o as c, c as d, g as i, s as l, h as n, u as o, _ as r, b as s, S as t, a as u };

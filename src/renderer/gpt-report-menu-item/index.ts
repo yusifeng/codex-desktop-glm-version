@@ -1,134 +1,107 @@
-// gpt-report-menu-item —— 公开第三方 GPT 的举报菜单入口。
-// 原版：app/webview/assets/gpt-report-menu-item-b10c8ec78c70.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import type {
-  JsxRuntime,
-  LazyComponent,
-  MaitaiScopeApi,
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/gpt-report-dialog",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/report-dialog-core",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  H3 as r,
+  HX as i,
+  I3 as a,
+  If as o,
+  Jm as s,
+  K2 as c,
+  LX as l,
+  QI as u,
+  V3 as d,
+  Y2 as f,
+  ZI as p,
+  jf as m,
+  lw as h,
+  mb as g,
+  qm as _,
 } from "@rchunk/app-shared";
-
-void runtimeChunk;
-
-export interface GptResource extends Record<string, unknown> {
-  gizmo: {
-    id: string;
-    share_recipient?: string | null;
-    tags?: readonly string[];
-  };
-}
-
-export interface GptReportDialogProps extends Record<string, unknown> {
-  accountId: string;
-  resource: GptResource;
-  onClose?: () => void;
-}
-
-export interface GptReportMenuItemProps {
-  resource: GptResource;
-  onSelect?: () => void;
-}
-
-const {
-  $3: initializeRuntimeLazy,
-  FX: initializeSignalRuntime,
-  H3: initializePreloadHelper,
-  HX: useSignalValue,
-  I3: getJsxRuntime,
-  If: initializeMenu,
-  Jm: createLazyComponent,
-  K2: initializeReactRuntime,
-  LX: useSignalScope,
-  QI: initializeAppScope,
-  V3: preloadModule,
-  Y2: FormattedMessage,
-  ZI: appScope,
-  jf: Menu,
-  lw: initializeReportIcon,
-  mb: ReportIcon,
-  qm: initializeQueryRuntime,
-} = appSharedChunk;
-const {
-  Sun: initializeAccountState,
-  Uzt: openDialog,
-  Vzt: initializeDialogHost,
-  mun: currentAccountIdSignal,
-} = appInitialChunk;
-
-const jsx: JsxRuntime = getJsxRuntime();
-
-const reportDialogDependencies = [
-  "./gpt-report-dialog-8f475e8bdb75.js",
-  "./rolldown-runtime-2d059c5e81f4.js",
-  "./app-shared-7b9edc1bfb7f.js",
-  "./app-shared-fa570b9eb9dd.css",
-  "./app-initial-51da50e6c6e3.js",
-  "./app-initial-e8ceb32eb626.css",
-  "./report-dialog-75a130d615ed.js",
-];
-
-const LazyGptReportDialog: LazyComponent<GptReportDialogProps> =
-  createLazyComponent<GptReportDialogProps>(async () => {
-  const loadDialog = async () => {
-    const { GptReportDialog } = await import("@rchunk/gpt-report-dialog");
-    return { GptReportDialog };
-  };
-  const loaded = await preloadModule(
-    loadDialog,
-    reportDialogDependencies,
-    import.meta.url,
-  );
-  return loaded.GptReportDialog;
-});
-
-function GptReportMenuItem({
-  resource,
-  onSelect,
-}: GptReportMenuItemProps): unknown {
-  const scope: MaitaiScopeApi<Record<string, unknown>> = useSignalScope(appScope);
-  const accountId = useSignalValue(currentAccountIdSignal);
-  const shareRecipient = resource.gizmo.share_recipient;
+import { Sun as v, Uzt as y, Vzt as b, mun as x } from "@rchunk/app-initial";
+function S(e) {
+  let t = (0, C.c)(9),
+    { resource: n, onSelect: r } = e,
+    a = l(p),
+    o = i(x);
   if (
-    accountId == null ||
-    resource.gizmo.tags?.includes("first_party") ||
-    (shareRecipient !== "marketplace" && shareRecipient !== "link")
-  ) {
+    o == null ||
+    n.gizmo.tags?.includes(`first_party`) ||
+    (n.gizmo.share_recipient !== `marketplace` && n.gizmo.share_recipient !== `link`)
+  )
     return null;
-  }
-
-  const openReportDialog = () => {
-    onSelect?.();
-    openDialog(scope, LazyGptReportDialog, { accountId, resource });
-  };
-
-  return jsx.jsxs(Menu.Item, {
-    onSelect: openReportDialog,
-    children: [
-      jsx.jsx(Menu.ItemIcon, { children: jsx.jsx(ReportIcon, {}) }),
-      jsx.jsx(FormattedMessage, {
-        id: "chatgptConversations.gpts.report.action",
-        defaultMessage: "Report GPT",
-        description: "Menu action to report a publicly shared third-party GPT",
+  let s;
+  t[0] !== o || t[1] !== r || t[2] !== n || t[3] !== a
+    ? ((s = () => {
+        (r?.(), y(a, T, { accountId: o, resource: n }));
       }),
-    ],
-  });
+      (t[0] = o),
+      (t[1] = r),
+      (t[2] = n),
+      (t[3] = a),
+      (t[4] = s))
+    : (s = t[4]);
+  let c, u;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((c = (0, w.jsx)(m.ItemIcon, { children: (0, w.jsx)(g, {}) })),
+      (u = (0, w.jsx)(f, {
+        id: `chatgptConversations.gpts.report.action`,
+        defaultMessage: `Report GPT`,
+        description: `Menu action to report a publicly shared third-party GPT`,
+      })),
+      (t[5] = c),
+      (t[6] = u))
+    : ((c = t[5]), (u = t[6]));
+  let d;
+  return (
+    t[7] === s
+      ? (d = t[8])
+      : ((d = (0, w.jsxs)(m.Item, { onSelect: s, children: [c, u] })), (t[7] = s), (t[8] = d)),
+    d
+  );
 }
-
-function initializeGptReportMenuItem(): void {
-  initializeRuntimeLazy();
-  initializeSignalRuntime();
-  initializeReactRuntime();
-  initializeAccountState();
-  initializeMenu();
-  initializeReportIcon();
-  initializeQueryRuntime();
-  initializeDialogHost();
-  initializeAppScope();
-  initializePreloadHelper();
+var C, w, T;
+function E() {
+  return (E = e(() => {
+    ((C = t()),
+      n(),
+      c(),
+      v(),
+      o(),
+      h(),
+      _(),
+      b(),
+      u(),
+      (w = a()),
+      r(),
+      (T = s(
+        async () =>
+          (
+            await d(
+              async () => {
+                let { GptReportDialog: e } = await import(`@rchunk/gpt-report-dialog`);
+                return { GptReportDialog: e };
+              },
+              __vite__mapDeps([0, 1, 2, 3, 4, 5, 6]),
+              import.meta.url,
+            )
+          ).GptReportDialog,
+      )));
+  }))();
 }
-
-initializeGptReportMenuItem();
-
-export { initializeGptReportMenuItem as n, GptReportMenuItem as t };
+export { E as n, S as t };

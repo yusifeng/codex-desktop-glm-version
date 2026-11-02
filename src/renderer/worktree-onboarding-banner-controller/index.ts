@@ -1,195 +1,164 @@
-// worktree-onboarding-banner-controller —— Worktree 建议横幅及动作控制。
-
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as announcementStateChunk from "@rchunk/home-announcement-state";
-import * as stateChunk from "@rchunk/worktree-onboarding-state";
-import type {
-  JsxRuntime,
-  MaitaiScope,
-  MaitaiScopeApi,
-  ReadableSignal,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  HX as r,
+  I3 as i,
+  K2 as a,
+  LX as o,
+  MA as s,
+  Y2 as c,
+  ag as l,
+  fI as u,
+  ig as d,
+  n4 as f,
 } from "@rchunk/app-shared";
-
-void runtimeChunk;
-
-interface WorkspaceState {
-  cwd: string;
-  hostId: string;
+import {
+  Dft as p,
+  Evt as m,
+  Oft as h,
+  QTt as g,
+  Rht as _,
+  eEt as v,
+  j3 as y,
+  jst as b,
+  kht as x,
+  kst as S,
+  mdt as C,
+  nW as w,
+  pdt as T,
+  rW as E,
+  x3 as D,
+  xpn as O,
+  xvt as k,
+  ypn as A,
+} from "@rchunk/app-initial";
+import { Cm as j, Sm as M } from "@rchunk/app-primary";
+import { r as N, t as P } from "@rchunk/worktree-onboarding-state";
+function F(e) {
+  let t = (0, I.c)(18),
+    { onDismiss: n, onLearnMore: r, onNewWorktree: i } = e,
+    a = f(),
+    o,
+    s,
+    l,
+    u;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((o = (0, L.jsx)(c, {
+        id: `composer.worktreeOnboardingBanner.title`,
+        defaultMessage: `Start another task without disturbing your work`,
+        description: `Title for the worktree onboarding banner`,
+      })),
+      (s = (0, L.jsx)(c, {
+        id: `composer.worktreeOnboardingBanner.description`,
+        defaultMessage: `A Git worktree gives your task its own workspace`,
+        description: `Description explaining how a Git worktree isolates a task`,
+      })),
+      (l = (0, L.jsx)(w, { className: `icon-sm` })),
+      (u = (0, L.jsx)(c, {
+        id: `composer.worktreeOnboardingBanner.newWorktree`,
+        defaultMessage: `New worktree`,
+        description: `Action to select a new Git worktree for the current draft`,
+      })),
+      (t[0] = o),
+      (t[1] = s),
+      (t[2] = l),
+      (t[3] = u))
+    : ((o = t[0]), (s = t[1]), (l = t[2]), (u = t[3]));
+  let p;
+  t[4] === i ? (p = t[5]) : ((p = { label: u, onClick: i }), (t[4] = i), (t[5] = p));
+  let m;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((m = (0, L.jsx)(c, {
+        id: `composer.worktreeOnboardingBanner.help`,
+        defaultMessage: `Learn more`,
+        description: `Action to open documentation about Git worktrees`,
+      })),
+      (t[6] = m))
+    : (m = t[6]);
+  let h;
+  t[7] === r ? (h = t[8]) : ((h = { label: m, onClick: r }), (t[7] = r), (t[8] = h));
+  let g;
+  t[9] === a
+    ? (g = t[10])
+    : ((g = a.formatMessage({
+        id: `composer.worktreeOnboardingBanner.dismissLabel`,
+        defaultMessage: `Dismiss worktree suggestion`,
+        description: `Accessible label for dismissing the worktree suggestion`,
+      })),
+      (t[9] = a),
+      (t[10] = g));
+  let _;
+  t[11] !== n || t[12] !== g
+    ? ((_ = { ariaLabel: g, icon: d, onClick: n }), (t[11] = n), (t[12] = g), (t[13] = _))
+    : (_ = t[13]);
+  let v;
+  return (
+    t[14] !== p || t[15] !== h || t[16] !== _
+      ? ((v = (0, L.jsx)(M, {
+          title: o,
+          description: s,
+          leadingVisual: l,
+          primaryAction: p,
+          secondaryAction: h,
+          dismissAction: _,
+        })),
+        (t[14] = p),
+        (t[15] = h),
+        (t[16] = _),
+        (t[17] = v))
+      : (v = t[17]),
+    v
+  );
 }
-
-interface WorktreeProjectKey {
-  cwd: string;
-  hostId: string;
+var I, L;
+function R() {
+  return (R = e(() => {
+    ((I = t()), a(), j(), E(), l(), (L = i()));
+  }))();
 }
-
-interface AppInitialBindings {
-  Dft(): void;
-  Evt(): void;
-  Oft(input: { event: unknown; href: string; initiator: string }): void;
-  QTt: string;
-  Rht(): void;
-  eEt(): void;
-  j3(
-    scope: MaitaiScopeApi<unknown>,
-    project: WorktreeProjectKey,
-    mode: "worktree",
-  ): void;
-  jst(): void;
-  kht: MaitaiScope<unknown>;
-  kst(input: WorktreeProjectKey): WorktreeProjectKey;
-  mdt: ReadableSignal<WorkspaceState>;
-  pdt(): void;
-  x3(): void;
-  xpn(
-    scope: MaitaiScopeApi<unknown>,
-    event: unknown,
-    details: { mode: "worktree" },
-  ): void;
-  xvt(): void;
-  ypn(): void;
-}
-
-interface WorktreeOnboardingBannerViewProps {
-  description: string;
-  dismissAction: { ariaLabel: string; icon: unknown; onClick(): void };
-  primaryAction: { label: string; onClick(): void };
-  secondaryAction: { label: string; onClick(event: unknown): void };
-  title: string;
-}
-
-interface WorktreeOnboardingBannerProps {
-  onDismiss(): void;
-  onLearnMore(event: unknown): void;
-  onNewWorktree(): void;
-}
-
-const {
-  FX: initializeSignalRuntime,
-  HX: useSignalValue,
-  I3: jsxRuntimeExport,
-  LX: useSignalScope,
-  MA: worktreeAnalyticsEvent,
-  fI: initializeIntlRuntime,
-  ig: dismissIcon,
-  n4: useIntl,
-} = appSharedChunk;
-const {
-  Dft: initializeWorktreeSelection,
-  Evt: initializeWindowActions,
-  Oft: openExternalLink,
-  QTt: worktreeDocumentationUrl,
-  Rht: initializeWorkspaceState,
-  eEt: initializeBannerRuntime,
-  j3: selectWorktreeProject,
-  jst: initializeProjectKeys,
-  kht: routeScope,
-  kst: createWorktreeProjectKey,
-  mdt: workspaceSignal,
-  pdt: initializeWorkspaceSignals,
-  x3: initializeWorktreeMode,
-  xpn: trackWorktreeAction,
-  xvt: closeWorktreePicker,
-  ypn: initializeWorktreeAnalytics,
-} = appInitialChunk as unknown as AppInitialBindings;
-const announcementState = announcementStateChunk.t as typeof announcementStateChunk.t & {
-  presentation: {
-    Banner: ((props: WorktreeOnboardingBannerViewProps) => unknown) | null;
-    initializeBanner(): void;
-  };
-};
-const {
-  Banner,
-  initializeBanner,
-} = announcementState.presentation;
-const {
-  r: worktreeOnboardingStateSignal,
-  t: initializeWorktreeOnboardingState,
-} = stateChunk;
-
-let jsx: JsxRuntime;
-
-function WorktreeOnboardingBanner({
-  onDismiss,
-  onLearnMore,
-  onNewWorktree,
-}: WorktreeOnboardingBannerProps): unknown {
-  const intl = useIntl();
-  const text = (defaultMessage: string) => defaultMessage;
-  const props = {
-    title: text("Start another task without disturbing your work"),
-    description: text("A Git worktree gives your task its own workspace"),
-    primaryAction: { label: text("New worktree"), onClick: onNewWorktree },
-    secondaryAction: { label: text("Learn more"), onClick: onLearnMore },
-    dismissAction: {
-      ariaLabel: (() => {
-        const value = intl.formatMessage({
-          id: "worktreeOnboarding.dismiss",
-          defaultMessage: "Dismiss worktree suggestion",
-        });
-        return typeof value === "string" ? value : "Dismiss worktree suggestion";
-      })(),
-      icon: dismissIcon,
-      onClick: onDismiss,
-    },
-  };
-  return Banner == null
-    ? jsx.jsx("aside", { className: "worktree-onboarding-banner", ...props })
-    : jsx.jsx(Banner, props);
-}
-
-function WorktreeOnboardingBannerController(): unknown {
-  initializeWorktreeOnboardingBanner();
-  const scope = useSignalScope(routeScope);
-  const workspace = useSignalValue(workspaceSignal);
-  const onDismiss = () => scope.set(worktreeOnboardingStateSignal, "dismissed");
-  const onNewWorktree = () => {
-    trackWorktreeAction(scope, worktreeAnalyticsEvent, { mode: "worktree" });
-    selectWorktreeProject(
-      scope,
-      createWorktreeProjectKey({
-        cwd: workspace.cwd,
-        hostId: workspace.hostId,
+function z() {
+  let e = (0, V.c)(9),
+    t = o(x),
+    n = r(C),
+    i;
+  e[0] === t
+    ? (i = e[1])
+    : ((i = () => {
+        t.set(N, `dismissed`);
       }),
-      "worktree",
-    );
-    closeWorktreePicker();
-  };
-  const onLearnMore = (event: unknown) =>
-    openExternalLink({
-      event,
-      href: worktreeDocumentationUrl,
-      initiator: "open_in_browser_bridge",
-    });
-  return jsx.jsx(WorktreeOnboardingBanner, {
-    onDismiss,
-    onLearnMore,
-    onNewWorktree,
-  });
+      (e[0] = t),
+      (e[1] = i));
+  let a;
+  e[2] !== n.cwd || e[3] !== n.hostId || e[4] !== t
+    ? ((a = () => {
+        (O(t, s, { mode: `worktree` }), y(t, S({ cwd: n.cwd, hostId: n.hostId }), `worktree`), k());
+      }),
+      (e[2] = n.cwd),
+      (e[3] = n.hostId),
+      (e[4] = t),
+      (e[5] = a))
+    : (a = e[5]);
+  let c;
+  return (
+    e[6] !== i || e[7] !== a
+      ? ((c = (0, H.jsx)(F, { onDismiss: i, onLearnMore: B, onNewWorktree: a })),
+        (e[6] = i),
+        (e[7] = a),
+        (e[8] = c))
+      : (c = e[8]),
+    c
+  );
 }
-
-function initializeWorktreeOnboardingBanner(): void {
-  if (jsx != null) return;
-  initializeIntlRuntime();
-  initializeSignalRuntime();
-  initializeBannerRuntime();
-  initializeWorktreeSelection();
-  initializeWorktreeAnalytics();
-  initializeWorkspaceSignals();
-  initializeWorkspaceState();
-  initializeProjectKeys();
-  initializeWorktreeMode();
-  initializeWindowActions();
-  initializeWorktreeOnboardingState();
-  initializeBanner();
-  jsx = resolveRuntime<JsxRuntime>(jsxRuntimeExport);
+function B(e) {
+  h({ event: e, href: g, initiator: `open_in_browser_bridge` });
 }
-
-function resolveRuntime<T>(value: unknown): T {
-  return (typeof value === "function" ? value() : value) as T;
+var V, H;
+function U() {
+  return (U = e(() => {
+    ((V = t()), u(), n(), v(), p(), A(), T(), _(), b(), D(), m(), R(), P(), (H = i()));
+  }))();
 }
-
-initializeWorktreeOnboardingBanner();
-
-export { WorktreeOnboardingBannerController };
+U();
+export { z as WorktreeOnboardingBannerController };

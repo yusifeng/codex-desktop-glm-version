@@ -1,136 +1,125 @@
-// pending-edits-dialog —— 写作块存在待处理 AI 编辑时的关闭确认弹窗。
-// 原版：app/webview/assets/pending-edits-dialog-ff879da48a98.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-void runtimeChunk;
-const {
-  $3: initializeJsxRuntime,
-  Ah: DialogHeader,
-  I3: getJsxRuntime,
-  Ih: Dialog,
-  K2: initializeIntlRuntime,
-  Lh: DialogDescription,
-  Oh: DialogBody,
-  Ph: initializeDialogLayout,
-  Rh: DialogTitle,
-  Y2: FormattedMessage,
-  Yh: Button,
-  Zh: initializeButton,
-  jh: DialogSection,
-  kh: DialogFooter,
-  zh: initializeDialog,
-} = appSharedChunk;
-
-let jsxRuntime: JsxRuntime | null = null;
-
-interface PendingEditsDialogProps {
-  onCancel(): void;
-  onConfirm(): void;
-  open: boolean;
-}
-
-interface FormSubmitEvent {
-  preventDefault(): void;
-}
-
-function PendingEditsDialog({
-  onCancel,
-  onConfirm,
-  open,
-}: PendingEditsDialogProps): unknown {
-  if (!open) return null;
-  const jsx = getInitializedJsxRuntime();
-
-  const handleOpenChange = (nextOpen: boolean) => {
-    if (!nextOpen) onCancel();
-  };
-  const handleSubmit = (event: FormSubmitEvent) => {
-    event.preventDefault();
-    onConfirm();
-  };
-  const title = jsx.jsx(DialogTitle, {
-    children: jsx.jsx(FormattedMessage, {
-      id: "codex.writingBlock.confirmCloseTitle",
-      defaultMessage: "Close editor?",
-      description:
-        "Title of the confirmation dialog when leaving an expanded writing block with pending AI edits.",
-    }),
-  });
-  const heading = jsx.jsx(DialogSection, {
-    children: jsx.jsx(DialogHeader, {
-      title,
-      subtitle: jsx.jsx(DialogDescription, {
-        children: jsx.jsx(FormattedMessage, {
-          id: "codex.writingBlock.confirmClosePendingEdits",
-          defaultMessage:
-            "You have pending edits - are you sure you want to close?",
-          description:
-            "Confirmation before closing or replacing an expanded writing block with an in-progress or unresolved AI edit, matching ChatGPT.",
-        }),
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Ah as n,
+  I3 as r,
+  Ih as i,
+  K2 as a,
+  Lh as o,
+  Oh as s,
+  Ph as c,
+  Rh as l,
+  Y2 as u,
+  Yh as d,
+  Zh as f,
+  jh as p,
+  kh as m,
+  zh as h,
+} from "@rchunk/app-shared";
+function g(e) {
+  let t = (0, _.c)(18),
+    { onCancel: r, onConfirm: a, open: c } = e;
+  if (!c) return null;
+  let f;
+  t[0] === r
+    ? (f = t[1])
+    : ((f = (e) => {
+        e || r();
       }),
-    }),
-  });
-  const cancelButton = jsx.jsx(Button, {
-    color: "outline",
-    onClick: onCancel,
-    type: "button",
-    children: jsx.jsx(FormattedMessage, {
-      id: "codex.writingBlock.confirmCloseCancel",
-      defaultMessage: "Cancel",
-      description:
-        "Cancel leaving an expanded writing block with pending AI edits.",
-    }),
-  });
-  const closeButton = jsx.jsx(Button, {
-    color: "primary",
-    type: "submit",
-    children: jsx.jsx(FormattedMessage, {
-      id: "codex.writingBlock.confirmCloseConfirm",
-      defaultMessage: "Close",
-      description:
-        "Confirm leaving an expanded writing block with pending AI edits.",
-    }),
-  });
-  const footer = jsx.jsx(DialogSection, {
-    children: jsx.jsxs(DialogFooter, {
-      children: [cancelButton, closeButton],
-    }),
-  });
-  const form = jsx.jsxs(DialogBody, {
-    as: "form",
-    onSubmit: handleSubmit,
-    children: [heading, footer],
-  });
-
-  return jsx.jsx(Dialog, {
-    open: true,
-    onOpenChange: handleOpenChange,
-    size: "compact",
-    children: form,
-  });
+      (t[0] = r),
+      (t[1] = f));
+  let h;
+  t[2] === a
+    ? (h = t[3])
+    : ((h = (e) => {
+        (e.preventDefault(), a());
+      }),
+      (t[2] = a),
+      (t[3] = h));
+  let g;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((g = (0, v.jsx)(l, {
+        children: (0, v.jsx)(u, {
+          id: `codex.writingBlock.confirmCloseTitle`,
+          defaultMessage: `Close editor?`,
+          description: `Title of the confirmation dialog when leaving an expanded writing block with pending AI edits.`,
+        }),
+      })),
+      (t[4] = g))
+    : (g = t[4]);
+  let y;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((y = (0, v.jsx)(p, {
+        children: (0, v.jsx)(n, {
+          title: g,
+          subtitle: (0, v.jsx)(o, {
+            children: (0, v.jsx)(u, {
+              id: `codex.writingBlock.confirmClosePendingEdits`,
+              defaultMessage: `You have pending edits - are you sure you want to close?`,
+              description: `Confirmation before closing or replacing an expanded writing block with an in-progress or unresolved AI edit, matching ChatGPT.`,
+            }),
+          }),
+        }),
+      })),
+      (t[5] = y))
+    : (y = t[5]);
+  let b;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((b = (0, v.jsx)(u, {
+        id: `codex.writingBlock.confirmCloseCancel`,
+        defaultMessage: `Cancel`,
+        description: `Cancel leaving an expanded writing block with pending AI edits.`,
+      })),
+      (t[6] = b))
+    : (b = t[6]);
+  let x;
+  t[7] === r
+    ? (x = t[8])
+    : ((x = (0, v.jsx)(d, { color: `outline`, onClick: r, type: `button`, children: b })),
+      (t[7] = r),
+      (t[8] = x));
+  let S;
+  t[9] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((S = (0, v.jsx)(d, {
+        color: `primary`,
+        type: `submit`,
+        children: (0, v.jsx)(u, {
+          id: `codex.writingBlock.confirmCloseConfirm`,
+          defaultMessage: `Close`,
+          description: `Confirm leaving an expanded writing block with pending AI edits.`,
+        }),
+      })),
+      (t[9] = S))
+    : (S = t[9]);
+  let C;
+  t[10] === x
+    ? (C = t[11])
+    : ((C = (0, v.jsx)(p, { children: (0, v.jsxs)(m, { children: [x, S] }) })),
+      (t[10] = x),
+      (t[11] = C));
+  let w;
+  t[12] !== h || t[13] !== C
+    ? ((w = (0, v.jsxs)(s, { as: `form`, onSubmit: h, children: [y, C] })),
+      (t[12] = h),
+      (t[13] = C),
+      (t[14] = w))
+    : (w = t[14]);
+  let T;
+  return (
+    t[15] !== f || t[16] !== w
+      ? ((T = (0, v.jsx)(i, { open: !0, onOpenChange: f, size: `compact`, children: w })),
+        (t[15] = f),
+        (t[16] = w),
+        (t[17] = T))
+      : (T = t[17]),
+    T
+  );
 }
-
-function initializePendingEditsDialog(): void {
-  if (jsxRuntime != null) return;
-  initializeJsxRuntime();
-  initializeIntlRuntime();
-  initializeButton();
-  initializeDialog();
-  initializeDialogLayout();
-  jsxRuntime = getJsxRuntime();
+var _, v;
+function y() {
+  return (y = e(() => {
+    ((_ = t()), a(), f(), h(), c(), (v = r()));
+  }))();
 }
-
-function getInitializedJsxRuntime(): JsxRuntime {
-  initializePendingEditsDialog();
-  if (jsxRuntime == null) {
-    throw new Error("Pending edits dialog JSX runtime failed to initialize");
-  }
-  return jsxRuntime;
-}
-
-initializePendingEditsDialog();
-
-export { initializePendingEditsDialog as n, PendingEditsDialog as t };
+export { y as n, g as t };

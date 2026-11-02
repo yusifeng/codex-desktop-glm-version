@@ -1,90 +1,30 @@
-// Native code-execution sandbox connector. Release chunk: native-code-execution-sandbox-fa3ec5081637.js.
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import {
-  createSandboxPartition,
-  initializeSandboxUrls,
-} from "../app-shared/runtime/sandbox-url";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as sandboxConnectionChunk from "@rchunk/code-execution-sandbox-connection";
-
-interface ClosablePort {
-  close(): void;
-}
-interface SandboxBootstrap {
-  ports: Record<string, ClosablePort | null | undefined> & {
-    prepareEnvironment?: ClosablePort | null;
-    runUserCode?: ClosablePort | null;
-    screenshot?: ClosablePort | null;
-    stop?: ClosablePort | null;
-  };
-  replyPort: ClosablePort;
-  [key: string]: unknown;
-}
-interface SandboxWebview {
-  setAttribute(name: string, value: string): void;
-}
-interface AppInitialRuntime {
-  Mnt(input: {
-    origin: string;
-    sandboxId: string;
-    signal?: AbortSignal;
-    sourceUrl: string;
-    webview: SandboxWebview;
-  }): Promise<SandboxBootstrap>;
-  Pnt(): void;
-  jon(origin: string): string;
-}
-interface SandboxConnectionRuntime {
-  n(): void;
-  t(input: SandboxBootstrap & { host: unknown; signal?: AbortSignal }): unknown;
-}
-const {
-  Mnt: createSandboxBootstrap,
-  Pnt: initializeAppSandbox,
-  jon: hashSandboxOrigin,
-} = appInitialChunk as unknown as AppInitialRuntime;
-const { n: initializeSandboxConnection, t: connectSandbox } =
-  sandboxConnectionChunk as unknown as SandboxConnectionRuntime;
-
-async function connectNativeCodeExecutionSandbox({
-  webview,
-  sourceUrl,
-  host,
-  signal,
-}: {
-  webview: SandboxWebview;
-  sourceUrl: string;
-  host: unknown;
-  signal?: AbortSignal;
-}): Promise<unknown | null> {
-  const url = new URL(sourceUrl);
-  const sandboxId = "code-execution-" + hashSandboxOrigin(url.origin);
-  url.searchParams.set("app", "skybridge");
-  url.searchParams.set("unsafeSkipTargetOriginCheck", "true");
-  webview.setAttribute("partition", createSandboxPartition(sandboxId));
-  const bootstrap = await createSandboxBootstrap({
-    origin: url.origin,
-    sandboxId,
-    signal,
-    sourceUrl: url.href,
-    webview,
-  });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { KH as t, YH as n } from "@rchunk/app-shared";
+import { Mnt as r, Pnt as i, jon as a } from "@rchunk/app-initial";
+import { n as o, t as s } from "@rchunk/code-execution-sandbox-connection";
+async function c({ webview: e, sourceUrl: n, host: i, signal: o }) {
+  let c = new URL(n),
+    l = `code-execution-${a(c.origin)}`;
+  (c.searchParams.set(`app`, `skybridge`),
+    c.searchParams.set(`unsafeSkipTargetOriginCheck`, `true`),
+    e.setAttribute(`partition`, t(l)));
+  let u = await r({ origin: c.origin, sandboxId: l, signal: o, sourceUrl: c.href, webview: e });
   if (
-    bootstrap.ports.prepareEnvironment == null ||
-    bootstrap.ports.runUserCode == null ||
-    bootstrap.ports.screenshot == null ||
-    bootstrap.ports.stop == null
+    u.ports.prepareEnvironment == null ||
+    u.ports.runUserCode == null ||
+    u.ports.screenshot == null ||
+    u.ports.stop == null
   ) {
-    for (const port of Object.values(bootstrap.ports)) port?.close();
-    bootstrap.replyPort.close();
-    return null;
+    for (let e of Object.values(u.ports)) e.close();
+    return (u.replyPort.close(), null);
   }
-  return connectSandbox({ ...bootstrap, host, signal });
+  return s({ ...u, host: i, signal: o });
 }
-
-initializeSandboxConnection();
-initializeSandboxUrls();
-initializeAppSandbox();
-
-export { connectNativeCodeExecutionSandbox };
+function l() {
+  return (l = e(() => {
+    (o(), n(), i());
+  }))();
+}
+l();
+export { c as connectNativeCodeExecutionSandbox };

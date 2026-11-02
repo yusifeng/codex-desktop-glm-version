@@ -1,37 +1,37 @@
-// Labor-market comparison teaching model. Release chunk: model-22f6fd6b2321.js.
-import "@rchunk/rolldown-runtime";
-
-interface LaborMarketInput { comparison?: number }
-
-const laborComparisonControl = { min: 0, max: 6, step: 1 };
-const laborMarketDefaults = { comparison: 0 };
-const laborMarketChartBounds = { employmentMin: 0, employmentMax: 100, wageMin: 0, wageMax: 110 };
-const demandSlope = 0.7;
-const supplySlope = 0.5;
-const curveShift = 14;
-const normalizeLaborMarketInput = (input: LaborMarketInput) => ({
-  comparison: Number.isFinite(input.comparison)
-    ? Math.min(laborComparisonControl.max, Math.max(laborComparisonControl.min, Math.round(input.comparison ?? 0)))
-    : 0,
-});
-const calculateLaborMarketComparison = (input: LaborMarketInput) => {
-  const { comparison } = normalizeLaborMarketInput(input);
-  const demandIntercept = 90 + (comparison === 3 ? curveShift : comparison === 4 ? -curveShift : 0);
-  const supplyIntercept = 20 + (comparison === 5 ? -curveShift : comparison === 6 ? curveShift : 0);
-  const employment = (demandIntercept - supplyIntercept) / 1.2;
-  const wage = supplyIntercept + supplySlope * employment;
-  const selectedWage = comparison === 1 ? 64.16666666666667 : comparison === 2 ? 34.16666666666667 : undefined;
-  return {
-    comparison,
-    demandIntercept,
-    supplyIntercept,
-    equilibrium: { employment, wage },
-    baseline: { employment: 58.333333333333336, wage: 49.16666666666667 },
-    selectedWage,
-    quantityDemanded: selectedWage === undefined ? undefined : (90 - selectedWage) / demandSlope,
-    quantitySupplied: selectedWage === undefined ? undefined : (selectedWage - 20) / supplySlope,
-  };
-};
-function initializeLaborMarketComparisonsModel(): void {}
-
-export { supplySlope as a, normalizeLaborMarketInput as c, demandSlope as i, laborComparisonControl as n, calculateLaborMarketComparison as o, laborMarketDefaults as r, initializeLaborMarketComparisonsModel as s, laborMarketChartBounds as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c;
+function l() {
+  return (l = e(() => {
+    ((t = { min: 0, max: 6, step: 1 }),
+      (n = { comparison: 0 }),
+      (r = { employmentMin: 0, employmentMax: 100, wageMin: 0, wageMax: 110 }),
+      (i = 0.7),
+      (a = 0.5),
+      (o = 14),
+      (s = (e) => ({
+        comparison: Number.isFinite(e.comparison)
+          ? Math.min(t.max, Math.max(t.min, Math.round(e.comparison)))
+          : 0,
+      })),
+      (c = (e) => {
+        let { comparison: t } = s(e),
+          n = 90 + (t === 3 ? o : t === 4 ? -14 : 0),
+          r = 20 + (t === 5 ? -14 : t === 6 ? o : 0),
+          c = (n - r) / 1.2,
+          l = r + a * c,
+          u = t === 1 ? 64.16666666666667 : t === 2 ? 34.16666666666667 : void 0;
+        return {
+          comparison: t,
+          demandIntercept: n,
+          supplyIntercept: r,
+          equilibrium: { employment: c, wage: l },
+          baseline: { employment: 58.333333333333336, wage: 49.16666666666667 },
+          selectedWage: u,
+          quantityDemanded: u === void 0 ? void 0 : (90 - u) / i,
+          quantitySupplied: u === void 0 ? void 0 : (u - 20) / a,
+        };
+      }));
+  }))();
+}
+export { a, s as c, i, t as n, c as o, n as r, l as s, r as t };

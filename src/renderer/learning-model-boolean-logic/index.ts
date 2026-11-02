@@ -1,38 +1,16 @@
-// Boolean logic inputs and operator metadata. Release chunk: type-502dfab37449.js.
-import "@rchunk/rolldown-runtime";
-type BooleanOperator = "and" | "or";
-interface Specification {
-  type: "BOOLEAN_LOGIC";
-  version: 1;
-  thumbnailAssetKey: "boolean-logic-v1";
-  parameters: {
-    inputA: { kind: "boolean"; defaultValue: true };
-    inputB: { kind: "boolean"; defaultValue: false };
-    operator: {
-      kind: "enum";
-      defaultValue: BooleanOperator;
-      allowedValues: BooleanOperator[];
-    };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `BOOLEAN_LOGIC`),
+      (n = `boolean-logic-v1`),
+      (r = {
+        inputA: { kind: `boolean`, defaultValue: !0 },
+        inputB: { kind: `boolean`, defaultValue: !1 },
+        operator: { kind: `enum`, defaultValue: `and`, allowedValues: [`and`, `or`] },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-let specification: Specification;
-let initialized = false;
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  specification = {
-    type: "BOOLEAN_LOGIC",
-    version: 1,
-    thumbnailAssetKey: "boolean-logic-v1",
-    parameters: {
-      inputA: { kind: "boolean", defaultValue: true },
-      inputB: { kind: "boolean", defaultValue: false },
-      operator: {
-        kind: "enum",
-        defaultValue: "and",
-        allowedValues: ["and", "or"],
-      },
-    },
-  };
-}
-export { specification as n, initialize as t };
+export { i as n, a as t };

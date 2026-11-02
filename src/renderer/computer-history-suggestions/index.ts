@@ -1,119 +1,94 @@
-// computer-history-suggestions —— Computer History suggestion 资格、状态合并与未读 skill 跟踪。
-// 原版：app/webview/assets/computer-history-suggestions-55e8abf166e7.js。
-
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/computer-history-query";
-
-export interface ComputerHistorySuggestion {
-  type: "skill" | "automation" | string;
-  name: string;
-  interval: { startMs: number; endMs: number };
-  [key: string]: unknown;
-}
-
-export interface ComputerHistorySuggestionState {
-  knownSuggestions: ComputerHistorySuggestion[] | null;
-  unreadSkillsSuggestions: ComputerHistorySuggestion[];
-}
-
-function sameSuggestionWindow(
-  left: ComputerHistorySuggestion,
-  right: ComputerHistorySuggestion,
-): boolean {
-  return left.type === right.type &&
-    left.name.trim().toLowerCase() === right.name.trim().toLowerCase() &&
-    left.interval.startMs < right.interval.endMs &&
-    right.interval.startMs < left.interval.endMs;
-}
-
-function retainUpdatedUnreadSuggestions(
-  unread: ComputerHistorySuggestion[],
-  incoming: ComputerHistorySuggestion[],
-): ComputerHistorySuggestion[] {
-  return unread.flatMap((suggestion) => {
-    const updated = incoming.find((candidate) => sameSuggestionWindow(suggestion, candidate));
-    return updated == null ? [] : [updated];
-  });
-}
-
-function mergeComputerHistorySuggestions(
-  state: ComputerHistorySuggestionState,
-  incoming: ComputerHistorySuggestion[] | null | undefined,
-): ComputerHistorySuggestionState {
-  if (incoming == null) return state;
-  if (state.knownSuggestions == null) {
-    return { knownSuggestions: incoming, unreadSkillsSuggestions: [] };
-  }
-  const knownSuggestions = [...state.knownSuggestions];
-  const newlyUnread: ComputerHistorySuggestion[] = [];
-  for (const suggestion of incoming) {
-    const index = knownSuggestions.findIndex((known) => sameSuggestionWindow(known, suggestion));
-    if (index === -1) {
-      knownSuggestions.push(suggestion);
-      if (suggestion.type === "skill") newlyUnread.push(suggestion);
-    } else {
-      knownSuggestions[index] = suggestion;
-    }
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  FX as t,
+  QI as n,
+  ZI as r,
+  dX as i,
+  pZ as a,
+  sZ as o,
+  wL as s,
+} from "@rchunk/app-shared";
+import {
+  $sn as c,
+  Nrn as l,
+  Prn as u,
+  Ysn as d,
+  fgn as f,
+  lcn as p,
+  mfn as m,
+  mnt as h,
+  pfn as g,
+  pnt as _,
+  ugn as v,
+} from "@rchunk/app-initial";
+import { a as y, r as b } from "@rchunk/computer-history-query";
+function x(e, t) {
+  if (t == null) return e;
+  if (e.knownSuggestions == null) return { knownSuggestions: t, unreadSkillsSuggestions: [] };
+  let n = [...e.knownSuggestions],
+    r = [];
+  for (let e of t) {
+    let t = n.findIndex((t) => C(t, e));
+    t === -1 ? (n.push(e), e.type === `skill` && r.push(e)) : (n[t] = e);
   }
   return {
-    knownSuggestions,
-    unreadSkillsSuggestions: [
-      ...retainUpdatedUnreadSuggestions(state.unreadSkillsSuggestions, incoming),
-      ...newlyUnread,
-    ],
+    knownSuggestions: n,
+    unreadSkillsSuggestions: [...S(e.unreadSkillsSuggestions, t), ...r],
   };
 }
-
-const computerHistorySuggestionsEligibility = {
-  evaluate(input: {
-    chronicleServiceAvailable: boolean;
-    platform: string;
-    featureFlagEnabled: boolean;
-    configQuerySuccess: boolean;
-    chronicleEnabled?: boolean;
-    requirementsPending: boolean;
-    chronicleRequirement?: boolean;
-  }): boolean {
-    return input.chronicleServiceAvailable &&
-      input.platform === "macOS" &&
-      input.featureFlagEnabled &&
-      input.configQuerySuccess &&
-      input.chronicleEnabled === true &&
-      !input.requirementsPending &&
-      input.chronicleRequirement !== false;
-  },
-};
-
-const currentComputerHistorySuggestions = {
-  select(input: {
-    eligible: boolean;
-    query: { isSuccess: boolean; data?: ComputerHistorySuggestion[] | null };
-  }): ComputerHistorySuggestion[] | null {
-    if (!input.eligible || !input.query.isSuccess || input.query.data == null) return null;
-    return input.query.data;
-  },
-};
-
-const computerHistorySuggestionState = {
-  initial: { knownSuggestions: null, unreadSkillsSuggestions: [] } as ComputerHistorySuggestionState,
-  merge: mergeComputerHistorySuggestions,
-};
-
-const markComputerHistorySkillSuggestionsRead = {
-  apply(state: ComputerHistorySuggestionState): ComputerHistorySuggestionState {
-    return state.unreadSkillsSuggestions.length === 0
-      ? state
-      : { ...state, unreadSkillsSuggestions: [] };
-  },
-};
-
-function initializeComputerHistorySuggestions(): void {}
-
-export {
-  initializeComputerHistorySuggestions as a,
-  computerHistorySuggestionsEligibility as i,
-  computerHistorySuggestionState as n,
-  currentComputerHistorySuggestions as r,
-  markComputerHistorySkillSuggestionsRead as t,
-};
+function S(e, t) {
+  return e.flatMap((e) => {
+    let n = t.find((t) => C(e, t));
+    return n == null ? [] : [n];
+  });
+}
+function C(e, t) {
+  return (
+    e.type === t.type &&
+    e.name.trim().toLowerCase() === t.name.trim().toLowerCase() &&
+    e.interval.startMs < t.interval.endMs &&
+    t.interval.startMs < e.interval.endMs
+  );
+}
+var w, T, E, D;
+function O() {
+  return (O = e(() => {
+    (t(),
+      s(),
+      y(),
+      l(),
+      c(),
+      h(),
+      n(),
+      f(),
+      g(),
+      (w = o(r, ({ get: e }) => {
+        if (_?.chronicle == null || e(u) !== `macOS` || !e(m, `3488289778`)) return !1;
+        let t = e(p, v);
+        if (!t.isSuccess || i(t.data?.config, `chronicle`) !== !0) return !1;
+        let n = e(d, { hostId: v });
+        return !(n.isPending || n.data?.requirements?.featureRequirements?.chronicle === !1);
+      })),
+      (T = o(r, ({ get: e }) => {
+        if (!e(w)) return null;
+        let t = e(b);
+        return !t.isSuccess || t.data == null ? null : t.data;
+      })),
+      (E = a(r, () => ({ knownSuggestions: null, unreadSkillsSuggestions: [] }), {
+        onMount: (e, t) =>
+          t.watch(({ get: t }) => {
+            let n = t(T);
+            e((e) => x(e, n));
+          }),
+      })),
+      (D = a(r, null, {
+        onMount: (e, t) =>
+          t.watch(({ get: e }) => {
+            e(E).unreadSkillsSuggestions.length > 0 &&
+              t.set(E, (e) => ({ ...e, unreadSkillsSuggestions: [] }));
+          }),
+      })));
+  }))();
+}
+export { O as a, w as i, E as n, T as r, D as t };

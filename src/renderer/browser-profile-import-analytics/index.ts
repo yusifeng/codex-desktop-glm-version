@@ -1,481 +1,282 @@
-// browser-profile-import-analytics —— 浏览器资料导入流程的分析事件协议。
-// 原版：app/webview/assets/analytics-363d04057f73.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import type { MaitaiScopeApi } from "@rchunk/app-shared";
-
-void runtimeChunk;
-const { Q3: logger, Z3: initializeQueryRuntime } = appSharedChunk;
-const {
-  Bs: entryPointEnums,
-  Fs: cookieItemResultEnums,
-  Gs: sourceEnums,
-  Hs: lifecycleStepEnums,
-  Is: cookieStatusEnums,
-  Ks: initializeAnalyticsEnums,
-  Ls: dataOutcomeEnums,
-  Rs: exitStateEnums,
-  Us: passwordStatusEnums,
-  Ux: isImportFailure,
-  Vs: browserProfileImportEvent,
-  Ws: requestOutcomeEnums,
-  qx: initializeBrowserImportRuntime,
-  xpn: emitAnalyticsEvent,
-  ypn: initializeAnalyticsEmitter,
-  zs: dismissalReasonEnums,
-} = appInitialChunk;
-
-type ImportSource = "atlas" | "chrome";
-type EntryPoint =
-  | "browser-settings-page"
-  | "in-app-browser-import-banner"
-  | "in-app-browser-import-modal"
-  | "in-app-browser-overflow-menu";
-
-type ImportRequest = {
-  source: ImportSource;
-  importCookies?: boolean;
-  importPasswords?: boolean;
-  importExtensions?: boolean;
-};
-
-type AttemptContext = {
-  flowId: string;
-  attemptIndex: number;
-  windowsChromeAdminApprovalNoticeRequired?: boolean;
-  windowsChromeAdminApprovalNoticeAcknowledged?: boolean;
-};
-
-type ImportData = {
-  status?: string;
-  imported?: number;
-  failed?: number;
-  profile?: ImportData;
-  account?: ImportData;
-};
-
-type ImportResult = {
-  cookies?: ImportData;
-  passwords?: ImportData;
-  extensions?: ImportData;
-};
-
-const ENTRY_POINTS: Record<EntryPoint, string> = {
-  "browser-settings-page":
-    "CODEX_BROWSER_PROFILE_IMPORT_ENTRY_POINT_BROWSER_SETTINGS_PAGE",
-  "in-app-browser-import-banner":
-    "CODEX_BROWSER_PROFILE_IMPORT_ENTRY_POINT_IN_APP_BROWSER_IMPORT_BANNER",
-  "in-app-browser-import-modal":
-    "CODEX_BROWSER_PROFILE_IMPORT_ENTRY_POINT_IN_APP_BROWSER_IMPORT_MODAL",
-  "in-app-browser-overflow-menu":
-    "CODEX_BROWSER_PROFILE_IMPORT_ENTRY_POINT_IN_APP_BROWSER_OVERFLOW_MENU",
-};
-
-const DISMISSAL_REASONS: Record<string, string> = {
-  backdrop: "CODEX_BROWSER_PROFILE_IMPORT_DISMISSAL_REASON_BACKDROP",
-  "secondary-button":
-    "CODEX_BROWSER_PROFILE_IMPORT_DISMISSAL_REASON_SECONDARY_BUTTON",
-  "close-button": "CODEX_BROWSER_PROFILE_IMPORT_DISMISSAL_REASON_CLOSE_BUTTON",
-  "escape-key": "CODEX_BROWSER_PROFILE_IMPORT_DISMISSAL_REASON_ESCAPE_KEY",
-  programmatic: "CODEX_BROWSER_PROFILE_IMPORT_DISMISSAL_REASON_PROGRAMMATIC",
-  "done-button": "CODEX_BROWSER_PROFILE_IMPORT_DISMISSAL_REASON_DONE_BUTTON",
-};
-
-const SOURCES: Record<ImportSource, string> = {
-  atlas: "CODEX_BROWSER_PROFILE_IMPORT_SOURCE_ATLAS",
-  chrome: "CODEX_BROWSER_PROFILE_IMPORT_SOURCE_CHROME",
-};
-
-const EXIT_STATES: Record<string, string> = {
-  "before-attempt":
-    "CODEX_BROWSER_PROFILE_IMPORT_DIALOG_EXIT_STATE_BEFORE_ATTEMPT",
-  "after-request-error":
-    "CODEX_BROWSER_PROFILE_IMPORT_DIALOG_EXIT_STATE_AFTER_REQUEST_ERROR",
-  "after-result": "CODEX_BROWSER_PROFILE_IMPORT_DIALOG_EXIT_STATE_AFTER_RESULT",
-};
-
-let nuxStepTypes: Record<string, unknown>;
-let initialized = false;
-
-function enumValue(
-  enumTable: Readonly<Record<string, unknown>>,
-  name: string,
-): unknown {
-  return enumTable[name];
-}
-
-function entryPointValue(entryPoint: EntryPoint): unknown {
-  return enumValue(entryPointEnums, ENTRY_POINTS[entryPoint]);
-}
-
-function sourceValue(source: ImportSource): unknown {
-  return enumValue(sourceEnums, SOURCES[source]);
-}
-
-function dismissalReasonValue(reason: string): unknown {
-  return enumValue(dismissalReasonEnums, DISMISSAL_REASONS[reason]);
-}
-
-function exitStateValue(exitState: string): unknown {
-  return enumValue(exitStateEnums, EXIT_STATES[exitState]);
-}
-
-function emit(
-  scope: MaitaiScopeApi<unknown>,
-  fields: Record<string, unknown>,
-): void {
-  emitAnalyticsEvent(scope, browserProfileImportEvent, fields);
-}
-
-function recordNuxLifecycleStep(
-  scope: MaitaiScopeApi<unknown>,
-  entryPoint: EntryPoint,
-  flowId: string,
-  stepName: "shown" | "dismissed" | "continue-clicked",
-  dismissalReason?: string,
-): void {
-  emit(scope, {
-    stepType: nuxStepTypes[stepName],
-    entryPoint: entryPointValue(entryPoint),
-    flowId,
-    dismissalReason:
-      dismissalReason == null
-        ? undefined
-        : dismissalReasonValue(dismissalReason),
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { Q3 as t, Z3 as n } from "@rchunk/app-shared";
+import {
+  Bs as r,
+  Fs as i,
+  Gs as a,
+  Hs as o,
+  Is as s,
+  Ks as c,
+  Ls as l,
+  Rs as u,
+  Us as d,
+  Ux as f,
+  Vs as p,
+  Ws as m,
+  qx as h,
+  xpn as g,
+  ypn as _,
+  zs as v,
+} from "@rchunk/app-initial";
+function y(e, t, n, r, i) {
+  g(e, p, {
+    stepType: V[r],
+    entryPoint: j(t),
+    flowId: n,
+    dismissalReason: i == null ? void 0 : M(i),
   });
 }
-
-function recordDialogOpened(
-  scope: MaitaiScopeApi<unknown>,
-  entryPoint: EntryPoint,
-  flowId: string,
-): void {
-  emit(scope, {
-    stepType: enumValue(
-      lifecycleStepEnums,
-      "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_DIALOG_OPENED",
-    ),
-    entryPoint: entryPointValue(entryPoint),
-    flowId,
+function b(e, t, n) {
+  g(e, p, {
+    stepType: o.CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_DIALOG_OPENED,
+    entryPoint: j(t),
+    flowId: n,
   });
 }
-
-function recordWindowsChromeAdminNoticeShown(
-  scope: MaitaiScopeApi<unknown>,
-  entryPoint: EntryPoint,
-  flowId: string,
-): void {
-  emit(scope, {
-    stepType: enumValue(
-      lifecycleStepEnums,
-      "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_WINDOWS_CHROME_ADMIN_APPROVAL_NOTICE_SHOWN",
-    ),
-    entryPoint: entryPointValue(entryPoint),
-    source: sourceValue("chrome"),
-    flowId,
-    windowsChromeAdminApprovalNoticeRequired: true,
-    windowsChromeAdminApprovalNoticeAcknowledged: false,
+function x(e, t, n) {
+  g(e, p, {
+    stepType:
+      o.CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_WINDOWS_CHROME_ADMIN_APPROVAL_NOTICE_SHOWN,
+    entryPoint: j(t),
+    source: a.CODEX_BROWSER_PROFILE_IMPORT_SOURCE_CHROME,
+    flowId: n,
+    windowsChromeAdminApprovalNoticeRequired: !0,
+    windowsChromeAdminApprovalNoticeAcknowledged: !1,
   });
 }
-
-function recordWindowsChromeAdminNoticeAcknowledged(
-  scope: MaitaiScopeApi<unknown>,
-  entryPoint: EntryPoint,
-  flowId: string,
-): void {
-  emit(scope, {
-    stepType: enumValue(
-      lifecycleStepEnums,
-      "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_WINDOWS_CHROME_ADMIN_APPROVAL_NOTICE_ACKNOWLEDGED",
-    ),
-    entryPoint: entryPointValue(entryPoint),
-    source: sourceValue("chrome"),
-    flowId,
-    windowsChromeAdminApprovalNoticeRequired: true,
-    windowsChromeAdminApprovalNoticeAcknowledged: true,
+function S(e, t, n) {
+  g(e, p, {
+    stepType:
+      o.CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_WINDOWS_CHROME_ADMIN_APPROVAL_NOTICE_ACKNOWLEDGED,
+    entryPoint: j(t),
+    source: a.CODEX_BROWSER_PROFILE_IMPORT_SOURCE_CHROME,
+    flowId: n,
+    windowsChromeAdminApprovalNoticeRequired: !0,
+    windowsChromeAdminApprovalNoticeAcknowledged: !0,
   });
 }
-
-function attemptFields(
-  entryPoint: EntryPoint,
-  request: ImportRequest,
-  attempt: AttemptContext,
-): Record<string, unknown> {
+function C(e, t, n, r) {
+  g(e, p, {
+    stepType: o.CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_ATTEMPT_STARTED,
+    ...E(t, n, r),
+  });
+}
+function w(e, n, r, i, a) {
+  let s = D(r, a);
+  g(e, p, {
+    stepType: o.CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_ATTEMPT_FINISHED,
+    ...E(n, r, i),
+    ...s,
+  });
+  let c = A(n, r, i, s);
+  a == null
+    ? t.error(`Browser profile import request failed without a result`, { safe: c })
+    : z(s) && t.warning(`Browser profile import returned failures`, { safe: c });
+}
+function T(e, t, n) {
+  g(e, p, {
+    stepType: o.CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_DIALOG_CLOSED,
+    entryPoint: j(t),
+    source: n.source == null ? void 0 : N(n.source),
+    flowId: n.flowId,
+    attemptIndex: n.attemptIndex,
+    windowsChromeAdminApprovalNoticeRequired: n.windowsChromeAdminApprovalNoticeRequired,
+    windowsChromeAdminApprovalNoticeAcknowledged: n.windowsChromeAdminApprovalNoticeAcknowledged,
+    dialogExitState: n.exitState == null ? void 0 : P(n.exitState),
+    dismissalReason: M(n.dismissalReason),
+  });
+}
+function E(e, t, n) {
   return {
-    entryPoint: entryPointValue(entryPoint),
-    source: sourceValue(request.source),
-    cookiesRequested: request.importCookies !== false,
-    passwordsRequested: request.importPasswords !== false,
-    extensionsRequested: request.importExtensions === true,
-    flowId: attempt.flowId,
-    attemptIndex: attempt.attemptIndex,
-    windowsChromeAdminApprovalNoticeRequired:
-      attempt.windowsChromeAdminApprovalNoticeRequired,
-    windowsChromeAdminApprovalNoticeAcknowledged:
-      attempt.windowsChromeAdminApprovalNoticeAcknowledged,
+    entryPoint: j(e),
+    source: N(t.source),
+    cookiesRequested: t.importCookies !== !1,
+    passwordsRequested: t.importPasswords !== !1,
+    extensionsRequested: t.importExtensions === !0,
+    flowId: n.flowId,
+    attemptIndex: n.attemptIndex,
+    windowsChromeAdminApprovalNoticeRequired: n.windowsChromeAdminApprovalNoticeRequired,
+    windowsChromeAdminApprovalNoticeAcknowledged: n.windowsChromeAdminApprovalNoticeAcknowledged,
   };
 }
-
-function recordAttemptStarted(
-  scope: MaitaiScopeApi<unknown>,
-  entryPoint: EntryPoint,
-  request: ImportRequest,
-  attempt: AttemptContext,
-): void {
-  emit(scope, {
-    stepType: enumValue(
-      lifecycleStepEnums,
-      "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_ATTEMPT_STARTED",
-    ),
-    ...attemptFields(entryPoint, request, attempt),
-  });
-}
-
-function cookieStatusValue(status?: string): unknown {
-  const suffix =
-    {
-      missing: "MISSING",
-      success: "SUCCESS",
-      failed_to_copy: "FAILED_TO_COPY",
-      failed_to_open: "FAILED_TO_OPEN",
-      failed_to_read: "FAILED_TO_READ",
-    }[status ?? "missing"] ?? "UNKNOWN";
-  return enumValue(
-    cookieStatusEnums,
-    `CODEX_BROWSER_PROFILE_IMPORT_COOKIE_STATUS_${suffix}`,
-  );
-}
-
-function passwordStatusValue(status?: string): unknown {
-  const suffix =
-    {
-      missing: "MISSING",
-      success: "SUCCESS",
-      partial: "PARTIAL_SUCCESS",
-      failed_to_copy: "FAILED_TO_COPY",
-      failed_to_initialize: "FAILED_TO_INITIALIZE",
-      failed_to_read: "FAILED_TO_READ",
-      failed_to_get_target_store: "FAILED_TO_GET_TARGET_STORE",
-      failed_to_read_target_store: "FAILED_TO_READ_TARGET_STORE",
-    }[status ?? "missing"] ?? "UNKNOWN";
-  return enumValue(
-    passwordStatusEnums,
-    `CODEX_BROWSER_PROFILE_IMPORT_PASSWORD_STATUS_${suffix}`,
-  );
-}
-
-function cookieItemResultValue(data?: ImportData): unknown {
-  const imported = (data?.imported ?? 0) > 0;
-  const failed = (data?.failed ?? 0) > 0;
-  const suffix = imported
-    ? failed
-      ? "IMPORTED_AND_FAILED"
-      : "IMPORTED_ONLY"
-    : failed
-      ? "FAILED_ONLY"
-      : "NO_IMPORTED_OR_FAILED_ITEMS";
-  return enumValue(
-    cookieItemResultEnums,
-    `CODEX_BROWSER_PROFILE_IMPORT_COOKIE_ITEM_RESULT_${suffix}`,
-  );
-}
-
-function hasSuccessfulData(data: ImportData): boolean {
-  return (
-    (data.imported ?? 0) > 0 ||
-    data.status === "success" ||
-    data.status === "partial-success"
-  );
-}
-
-function dataOutcomeValue(
-  data?: ImportData,
-  ...children: (ImportData | undefined)[]
-): unknown {
-  const outcome = (suffix: string) =>
-    enumValue(
-      dataOutcomeEnums,
-      `CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_${suffix}`,
-    );
-  if (data == null) return outcome("FAILED");
-
-  const results = [data, ...children].filter(
-    (value): value is ImportData => value != null,
-  );
-  const hasFailure = results.some((value) => isImportFailure(value));
-  const hasSuccess = results.some(hasSuccessfulData);
-  if (hasFailure) return outcome(hasSuccess ? "PARTIAL_SUCCESS" : "FAILED");
-
-  const importedCounts = results.flatMap(({ imported }) =>
-    imported == null ? [] : [imported],
-  );
-  if (
-    (importedCounts.length > 0 &&
-      importedCounts.every((count) => count === 0)) ||
-    (!hasSuccess && results.some(({ status }) => status === "missing"))
-  ) {
-    return outcome("NO_NEW_DATA");
-  }
-  return hasSuccess ? outcome("SUCCESS") : undefined;
-}
-
-function resultFields(
-  request: ImportRequest,
-  result?: ImportResult,
-): Record<string, unknown> {
-  const fields: Record<string, unknown> = {
-    requestOutcome: enumValue(
-      requestOutcomeEnums,
-      result == null
-        ? "CODEX_BROWSER_PROFILE_IMPORT_REQUEST_OUTCOME_FAILED_WITHOUT_RESULT"
-        : "CODEX_BROWSER_PROFILE_IMPORT_REQUEST_OUTCOME_RETURNED_RESULT",
-    ),
-    extensionOutcome:
-      request.importExtensions === true
-        ? dataOutcomeValue(result?.extensions)
-        : undefined,
+function D(e, t) {
+  return {
+    requestOutcome:
+      t == null
+        ? m.CODEX_BROWSER_PROFILE_IMPORT_REQUEST_OUTCOME_FAILED_WITHOUT_RESULT
+        : m.CODEX_BROWSER_PROFILE_IMPORT_REQUEST_OUTCOME_RETURNED_RESULT,
+    ...(e.importCookies === !1 ? {} : O(t)),
+    ...(e.importPasswords === !1 ? {} : k(t)),
+    extensionOutcome: e.importExtensions === !0 ? R(t?.extensions) : void 0,
   };
-  if (request.importCookies !== false) {
-    fields.cookieOutcome = dataOutcomeValue(result?.cookies);
-    if (result != null) {
-      fields.cookieStatus = cookieStatusValue(result.cookies?.status);
-      fields.cookieItemResult = cookieItemResultValue(result.cookies);
-    }
-  }
-  if (request.importPasswords !== false) {
-    fields.passwordOutcome = dataOutcomeValue(
-      result?.passwords,
-      result?.passwords?.profile,
-      result?.passwords?.account,
-    );
-    if (result != null) {
-      fields.passwordProfileStatus = passwordStatusValue(
-        result.passwords?.profile?.status,
-      );
-      fields.passwordAccountStatus = passwordStatusValue(
-        result.passwords?.account?.status,
-      );
-    }
-  }
-  return fields;
 }
-
-function recordAttemptFinished(
-  scope: MaitaiScopeApi<unknown>,
-  entryPoint: EntryPoint,
-  request: ImportRequest,
-  attempt: AttemptContext,
-  result?: ImportResult,
-): void {
-  const outcomes = resultFields(request, result);
-  emit(scope, {
-    stepType: enumValue(
-      lifecycleStepEnums,
-      "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_ATTEMPT_FINISHED",
-    ),
-    ...attemptFields(entryPoint, request, attempt),
-    ...outcomes,
-  });
-
-  const safe: Record<string, unknown> = {
-    entryPoint: entryPointValue(entryPoint),
-    source: sourceValue(request.source),
-    cookiesRequested: request.importCookies !== false,
-    passwordsRequested: request.importPasswords !== false,
-    extensionsRequested: request.importExtensions === true,
-    windowsChromeAdminApprovalNoticeRequired:
-      attempt.windowsChromeAdminApprovalNoticeRequired,
-    windowsChromeAdminApprovalNoticeAcknowledged:
-      attempt.windowsChromeAdminApprovalNoticeAcknowledged,
-    ...outcomes,
+function O(e) {
+  return e == null
+    ? { cookieOutcome: l.CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_FAILED }
+    : {
+        cookieOutcome: R(e.cookies),
+        cookieStatus: F(e.cookies?.status),
+        cookieItemResult: L(e.cookies),
+      };
+}
+function k(e) {
+  if (e == null) return { passwordOutcome: l.CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_FAILED };
+  let { passwords: t } = e;
+  return {
+    passwordOutcome: R(t, t?.profile, t?.account),
+    passwordProfileStatus: I(t?.profile?.status),
+    passwordAccountStatus: I(t?.account?.status),
   };
-  const failed = [
-    safe.cookieOutcome,
-    safe.passwordOutcome,
-    safe.extensionOutcome,
-  ].some(
-    (value) =>
-      value ===
-        enumValue(
-          dataOutcomeEnums,
-          "CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_FAILED",
-        ) ||
-      value ===
-        enumValue(
-          dataOutcomeEnums,
-          "CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_PARTIAL_SUCCESS",
-        ),
+}
+function A(e, t, n, r) {
+  return {
+    entryPoint: j(e),
+    source: N(t.source),
+    cookiesRequested: t.importCookies !== !1,
+    passwordsRequested: t.importPasswords !== !1,
+    extensionsRequested: t.importExtensions === !0,
+    windowsChromeAdminApprovalNoticeRequired: n.windowsChromeAdminApprovalNoticeRequired,
+    windowsChromeAdminApprovalNoticeAcknowledged: n.windowsChromeAdminApprovalNoticeAcknowledged,
+    ...r,
+  };
+}
+function j(e) {
+  switch (e) {
+    case `browser-settings-page`:
+      return r.CODEX_BROWSER_PROFILE_IMPORT_ENTRY_POINT_BROWSER_SETTINGS_PAGE;
+    case `in-app-browser-import-banner`:
+      return r.CODEX_BROWSER_PROFILE_IMPORT_ENTRY_POINT_IN_APP_BROWSER_IMPORT_BANNER;
+    case `in-app-browser-import-modal`:
+      return r.CODEX_BROWSER_PROFILE_IMPORT_ENTRY_POINT_IN_APP_BROWSER_IMPORT_MODAL;
+    case `in-app-browser-overflow-menu`:
+      return r.CODEX_BROWSER_PROFILE_IMPORT_ENTRY_POINT_IN_APP_BROWSER_OVERFLOW_MENU;
+  }
+}
+function M(e) {
+  switch (e) {
+    case `backdrop`:
+      return v.CODEX_BROWSER_PROFILE_IMPORT_DISMISSAL_REASON_BACKDROP;
+    case `secondary-button`:
+      return v.CODEX_BROWSER_PROFILE_IMPORT_DISMISSAL_REASON_SECONDARY_BUTTON;
+    case `close-button`:
+      return v.CODEX_BROWSER_PROFILE_IMPORT_DISMISSAL_REASON_CLOSE_BUTTON;
+    case `escape-key`:
+      return v.CODEX_BROWSER_PROFILE_IMPORT_DISMISSAL_REASON_ESCAPE_KEY;
+    case `programmatic`:
+      return v.CODEX_BROWSER_PROFILE_IMPORT_DISMISSAL_REASON_PROGRAMMATIC;
+    case `done-button`:
+      return v.CODEX_BROWSER_PROFILE_IMPORT_DISMISSAL_REASON_DONE_BUTTON;
+  }
+}
+function N(e) {
+  switch (e) {
+    case `atlas`:
+      return a.CODEX_BROWSER_PROFILE_IMPORT_SOURCE_ATLAS;
+    case `chrome`:
+      return a.CODEX_BROWSER_PROFILE_IMPORT_SOURCE_CHROME;
+  }
+}
+function P(e) {
+  switch (e) {
+    case `before-attempt`:
+      return u.CODEX_BROWSER_PROFILE_IMPORT_DIALOG_EXIT_STATE_BEFORE_ATTEMPT;
+    case `after-request-error`:
+      return u.CODEX_BROWSER_PROFILE_IMPORT_DIALOG_EXIT_STATE_AFTER_REQUEST_ERROR;
+    case `after-result`:
+      return u.CODEX_BROWSER_PROFILE_IMPORT_DIALOG_EXIT_STATE_AFTER_RESULT;
+  }
+}
+function F(e) {
+  switch (e) {
+    case void 0:
+    case `missing`:
+      return s.CODEX_BROWSER_PROFILE_IMPORT_COOKIE_STATUS_MISSING;
+    case `success`:
+      return s.CODEX_BROWSER_PROFILE_IMPORT_COOKIE_STATUS_SUCCESS;
+    case `failed_to_copy`:
+      return s.CODEX_BROWSER_PROFILE_IMPORT_COOKIE_STATUS_FAILED_TO_COPY;
+    case `failed_to_open`:
+      return s.CODEX_BROWSER_PROFILE_IMPORT_COOKIE_STATUS_FAILED_TO_OPEN;
+    case `failed_to_read`:
+      return s.CODEX_BROWSER_PROFILE_IMPORT_COOKIE_STATUS_FAILED_TO_READ;
+    default:
+      return s.CODEX_BROWSER_PROFILE_IMPORT_COOKIE_STATUS_UNKNOWN;
+  }
+}
+function I(e) {
+  switch (e) {
+    case void 0:
+    case `missing`:
+      return d.CODEX_BROWSER_PROFILE_IMPORT_PASSWORD_STATUS_MISSING;
+    case `success`:
+      return d.CODEX_BROWSER_PROFILE_IMPORT_PASSWORD_STATUS_SUCCESS;
+    case `partial`:
+      return d.CODEX_BROWSER_PROFILE_IMPORT_PASSWORD_STATUS_PARTIAL_SUCCESS;
+    case `failed_to_copy`:
+      return d.CODEX_BROWSER_PROFILE_IMPORT_PASSWORD_STATUS_FAILED_TO_COPY;
+    case `failed_to_initialize`:
+      return d.CODEX_BROWSER_PROFILE_IMPORT_PASSWORD_STATUS_FAILED_TO_INITIALIZE;
+    case `failed_to_read`:
+      return d.CODEX_BROWSER_PROFILE_IMPORT_PASSWORD_STATUS_FAILED_TO_READ;
+    case `failed_to_get_target_store`:
+      return d.CODEX_BROWSER_PROFILE_IMPORT_PASSWORD_STATUS_FAILED_TO_GET_TARGET_STORE;
+    case `failed_to_read_target_store`:
+      return d.CODEX_BROWSER_PROFILE_IMPORT_PASSWORD_STATUS_FAILED_TO_READ_TARGET_STORE;
+    default:
+      return d.CODEX_BROWSER_PROFILE_IMPORT_PASSWORD_STATUS_UNKNOWN;
+  }
+}
+function L(e) {
+  let t = (e?.imported ?? 0) > 0,
+    n = (e?.failed ?? 0) > 0;
+  return t && n
+    ? i.CODEX_BROWSER_PROFILE_IMPORT_COOKIE_ITEM_RESULT_IMPORTED_AND_FAILED
+    : t
+      ? i.CODEX_BROWSER_PROFILE_IMPORT_COOKIE_ITEM_RESULT_IMPORTED_ONLY
+      : n
+        ? i.CODEX_BROWSER_PROFILE_IMPORT_COOKIE_ITEM_RESULT_FAILED_ONLY
+        : i.CODEX_BROWSER_PROFILE_IMPORT_COOKIE_ITEM_RESULT_NO_IMPORTED_OR_FAILED_ITEMS;
+}
+function R(e, ...t) {
+  if (e == null) return l.CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_FAILED;
+  let n = [e, ...t].filter((e) => e != null),
+    r = n.some(f),
+    i = n.some(B);
+  if (r)
+    return i
+      ? l.CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_PARTIAL_SUCCESS
+      : l.CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_FAILED;
+  let a = n.flatMap(({ imported: e }) => (e == null ? [] : [e]));
+  return (a.length > 0 && a.every((e) => e === 0)) ||
+    (!i && n.some(({ status: e }) => e === `missing`))
+    ? l.CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_NO_NEW_DATA
+    : i
+      ? l.CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_SUCCESS
+      : void 0;
+}
+function z(e) {
+  return [e.cookieOutcome, e.passwordOutcome, e.extensionOutcome].some(
+    (e) =>
+      e === l.CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_FAILED ||
+      e === l.CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_PARTIAL_SUCCESS,
   );
-  if (result == null) {
-    logger.error(
-      "Browser profile import request failed without a result",
-      { safe },
-    );
-  } else if (failed) {
-    logger.warning("Browser profile import returned failures", { safe });
-  }
 }
-
-function recordDialogClosed(
-  scope: MaitaiScopeApi<unknown>,
-  entryPoint: EntryPoint,
-  state: AttemptContext & {
-    source?: ImportSource;
-    exitState?: string;
-    dismissalReason: string;
-  },
-): void {
-  emit(scope, {
-    stepType: enumValue(
-      lifecycleStepEnums,
-      "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_DIALOG_CLOSED",
-    ),
-    entryPoint: entryPointValue(entryPoint),
-    source: state.source == null ? undefined : sourceValue(state.source),
-    flowId: state.flowId,
-    attemptIndex: state.attemptIndex,
-    windowsChromeAdminApprovalNoticeRequired:
-      state.windowsChromeAdminApprovalNoticeRequired,
-    windowsChromeAdminApprovalNoticeAcknowledged:
-      state.windowsChromeAdminApprovalNoticeAcknowledged,
-    dialogExitState:
-      state.exitState == null ? undefined : exitStateValue(state.exitState),
-    dismissalReason: dismissalReasonValue(state.dismissalReason),
-  });
+function B(e) {
+  return (e.imported ?? 0) > 0 || e.status === `success` || e.status === `partial-success`;
 }
-
-function initializeBrowserProfileImportAnalytics(): void {
-  if (initialized) return;
-  initializeAnalyticsEnums();
-  initializeAnalyticsEmitter();
-  initializeQueryRuntime();
-  initializeBrowserImportRuntime();
-  nuxStepTypes = {
-    shown: enumValue(
-      lifecycleStepEnums,
-      "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_NUX_SHOWN",
-    ),
-    dismissed: enumValue(
-      lifecycleStepEnums,
-      "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_NUX_DISMISSED",
-    ),
-    "continue-clicked": enumValue(
-      lifecycleStepEnums,
-      "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_NUX_CONTINUE_CLICKED",
-    ),
-  };
-  initialized = true;
+var V;
+function H() {
+  return (H = e(() => {
+    (c(),
+      _(),
+      n(),
+      h(),
+      (V = {
+        shown: o.CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_NUX_SHOWN,
+        dismissed: o.CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_NUX_DISMISSED,
+        "continue-clicked": o.CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_NUX_CONTINUE_CLICKED,
+      }));
+  }))();
 }
-
-export {
-  recordDialogOpened as a,
-  recordWindowsChromeAdminNoticeShown as c,
-  recordDialogClosed as i,
-  recordAttemptFinished as n,
-  recordNuxLifecycleStep as o,
-  recordAttemptStarted as r,
-  recordWindowsChromeAdminNoticeAcknowledged as s,
-  initializeBrowserProfileImportAnalytics as t,
-};
+export { b as a, x as c, T as i, w as n, y as o, C as r, S as s, H as t };

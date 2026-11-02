@@ -1,44 +1,27 @@
-// Supply-and-demand learning model: solve the shifted linear-market equilibrium.
-import "@rchunk/rolldown-runtime";
-
-interface MarketValues { demandShift?: number | null; supplyShift?: number | null }
-interface MarketShifts { demandShift: number; supplyShift: number }
-
-const shiftControl = { min: -20, max: 20, step: 1 };
-const defaultMarketValues: MarketShifts = { demandShift: 0, supplyShift: 0 };
-const marketBounds = { quantityMin: 0, quantityMax: 100, priceMin: 0, priceMax: 100 };
-const demandIntercept = 84;
-const demandSlope = 0.7;
-const supplySlope = 0.6;
-
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeShift = (value: number | null | undefined): number =>
-  Number.isFinite(value) ? clamp(value as number, shiftControl.min, shiftControl.max) : 0;
-
-function normalizeMarketValues(values: MarketValues): MarketShifts {
-  return { demandShift: normalizeShift(values.demandShift), supplyShift: normalizeShift(values.supplyShift) };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    ((t = { min: -20, max: 20, step: 1 }),
+      (n = { demandShift: 0, supplyShift: 0 }),
+      (r = { quantityMin: 0, quantityMax: 100, priceMin: 0, priceMax: 100 }),
+      (i = 84),
+      (a = 0.7),
+      (o = 0.6),
+      (s = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (c = (e) => (Number.isFinite(e) ? s(e, t.min, t.max) : 0)),
+      (l = (e) => ({ demandShift: c(e.demandShift), supplyShift: c(e.supplyShift) })),
+      (u = (e, t) => i - a * e + a * t),
+      (d = (e) => {
+        let t = l(e),
+          n = (68 + a * t.demandShift + o * t.supplyShift) / 1.2999999999999998,
+          i = u(n, t.demandShift);
+        return {
+          quantity: s(n, r.quantityMin, r.quantityMax),
+          price: s(i, r.priceMin, r.priceMax),
+        };
+      }));
+  }))();
 }
-
-const demandPrice = (quantity: number, demandShift: number): number =>
-  demandIntercept - demandSlope * quantity + demandSlope * demandShift;
-
-function calculateMarketEquilibrium(values: MarketValues): { price: number; quantity: number } {
-  const shifts = normalizeMarketValues(values);
-  const quantity = (68 + demandSlope * shifts.demandShift + supplySlope * shifts.supplyShift) / 1.2999999999999998;
-  const price = demandPrice(quantity, shifts.demandShift);
-  return {
-    quantity: clamp(quantity, marketBounds.quantityMin, marketBounds.quantityMax),
-    price: clamp(price, marketBounds.priceMin, marketBounds.priceMax),
-  };
-}
-
-function initializeSupplyDemandEquilibriumModel(): void {}
-
-export {
-  initializeSupplyDemandEquilibriumModel as a,
-  calculateMarketEquilibrium as i,
-  defaultMarketValues as n,
-  normalizeMarketValues as o,
-  shiftControl as r,
-  marketBounds as t,
-};
+export { f as a, d as i, n, l as o, t as r, r as t };

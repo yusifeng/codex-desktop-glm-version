@@ -1,5 +1,20 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Comparable-owner exact closure：将剩余 837 个仍与发布证据不完全一致的
+renderer owner 一次性恢复为标准化后逐字一致的发布 TypeScript；本批 renderer 新增
+54,152 行、删除 78,571 行，净删除 24,419 行。删除项是旧手写兼容层、mock 和重复实现
+被发布实现替换，并非删除产品功能。当前 1,862/1,862 个有双方可比资产的 owner 已全部
+exact，837/837 个本批 owner 均通过直接 `assertReleaseOwner`；全文不一致项由 837 降至
+0，发布源码正向行数缺口保持 0。发布依赖图恢复后，verifier 中四条过时的预期 import
+差异也已全部移除，例外表归零。整批通过 12,448/12,448 transform check、
+1,888/1,888 renderer build/verify、2,247/2,247 app-code coverage、0 semantic tail、
+typecheck 与 1,912-script test-index。严格 hub 消费为 app-shared 1,859/3,185、
+app-initial 6,074/8,204、app-primary 808/917，仍为 0 unreviewed、0 invalid consumers。
+这表示所有当前可比 renderer owner 已完成源码一致性恢复，但不等于整个项目交付完成：
+另有 454 个缺少双方可比资产的条目仍需分类，425 个 preserved 边界及三个聚合 hub 的
+剩余耦合导出仍需核定；本轮大批恢复后的最终完整登录态 Electron E2E（启动、发消息并
+收到回复）也尚未执行。
+
 2026-11-02 Positive-gap owner closure：不再拆分剩余小批次，将全部 408 个仍有
 发布源码正向行数缺口的 renderer owner 一次性恢复为发布一致 TypeScript。范围覆盖
 settings、composer/home、plugin、conversation/thread、artifact/preview、billing、

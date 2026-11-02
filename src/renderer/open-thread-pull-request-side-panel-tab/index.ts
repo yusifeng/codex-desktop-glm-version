@@ -1,668 +1,337 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  BX as useScopedSelectorExport,
-  FC as GitLabIcon,
-  FX as initializeQueryRuntime,
-  QI as initializeScopedRuntime,
-  ZI as applicationScope,
-  aW as normalizeRepositoryRoot,
-  e6 as getReactRuntime,
-  iW as normalizeCwd,
-  lw as initializePathRuntime,
-  rZ as createScopedSelectorExport,
-  wL as initializeSelectorRuntime,
-  type ReactRuntime,
+  $3 as t,
+  BX as n,
+  FC as r,
+  FX as i,
+  QI as a,
+  ZI as o,
+  aW as s,
+  e6 as c,
+  iW as l,
+  lw as u,
+  rZ as d,
+  wL as f,
 } from "@rchunk/app-shared";
 import {
-  Cdt as initializePullRequestTabRuntime,
-  Cf as getGitLabAccountExport,
-  Dyt as currentHostId,
-  E$ as initializePullRequestSummaryRuntime,
-  Ef as initializePullRequestQueryRuntime,
-  FXt as isGitLabPullRequestEnabledExport,
-  Gvt as openSidePanelTabExport,
-  PXt as initializePullRequestUrlRuntime,
-  Syt as currentCwd,
-  T$ as PullRequestStateIcon,
-  Wvt as initializeSidePanelRuntime,
-  X8t as getPullRequestUrlExport,
-  Xy as fetchPullRequestBoardExport,
-  Yy as initializePullRequestBoardRuntime,
-  _3t as initializeGitHubIconRuntime,
-  _g as pullRequestDurableRouteKind,
-  _vt as initializeSidePanelPlacementRuntime,
-  _y as fetchCanonicalPullRequestExport,
-  a5t as pullRequestMatchesExport,
-  byt as initializeThreadContextRuntime,
-  g3t as GitHubIcon,
-  gf as pullRequestStatusQuery,
-  gg as createPullRequestTabApiExport,
-  gvt as getExistingTabPlacement,
-  gy as canonicalAccountQuery,
-  hdt as repositoryRootQuery,
-  hf as initializePullRequestStatusRuntime,
-  hg as initializePullRequestIconRuntime,
-  i5t as initializeRepositoryTargetRuntime,
-  mpn as intlSignal,
-  of as normalizePullRequestStatusExport,
-  pdt as initializeRepositoryRuntime,
-  ppn as initializeIntlRuntime,
-  s5t as parsePullRequestUrlExport,
-  sf as projectPullRequestStateExport,
-  vg as initializePullRequestRouteRuntime,
-  vvt as focusSidePanel,
-  w$ as PullRequestStatusIcon,
-  wf as fetchGitLabPullRequestExport,
-  xdt as createRepositoryTargetExport,
-  yy as initializePullRequestStateRuntime,
+  Cdt as p,
+  Cf as ee,
+  Dyt as m,
+  E$ as h,
+  Ef as te,
+  FXt as ne,
+  Gvt as g,
+  PXt as _,
+  Syt as v,
+  T$ as y,
+  Wvt as b,
+  X8t as x,
+  Xy as re,
+  Yy as ie,
+  _3t as ae,
+  _g as oe,
+  _vt as se,
+  _y as ce,
+  a5t as S,
+  byt as le,
+  g3t as ue,
+  gf as de,
+  gg as fe,
+  gvt as C,
+  gy as pe,
+  hdt as w,
+  hf as T,
+  hg as E,
+  i5t as D,
+  mpn as O,
+  of as k,
+  pdt as A,
+  ppn as j,
+  s5t as M,
+  sf as N,
+  vg as P,
+  vvt as F,
+  w$ as I,
+  wf as L,
+  xdt as R,
+  yy as z,
 } from "@rchunk/app-initial";
-
-interface PullRequestUrl {
-  hostname: string;
-  number: number;
-  owner: string;
-  repository: string;
-}
-interface RepositoryTarget {
-  cwd: string;
-  hostId: string;
-  root?: string;
-}
-interface PullRequestBoardItem {
-  cwd: string;
-  headBranch: string;
-  isDraft?: boolean;
-  number: number;
-  state: string;
-  title: string;
-  url: string;
-  [key: string]: unknown;
-}
-interface PullRequestStatusKey {
-  cwd: string;
-  headBranch: string;
-  hostId: string;
-  operationSource: string;
-  url: string;
-}
-interface BoardTabOptions {
-  defaultMergeMenuOpen?: boolean;
-  hostId?: string;
-  item: PullRequestBoardItem;
-  provider: "github";
-  repo: string;
-  repositoryTarget: RepositoryTarget;
-  statusKey: PullRequestStatusKey;
-}
-interface CanonicalRequest {
-  account: { hostId: string; [key: string]: unknown };
-  provider: "github" | "gitlab";
-  pullRequest: PullRequestUrl;
-}
-interface CanonicalTabOptions {
-  request: CanonicalRequest;
-  repositoryTarget?: RepositoryTarget;
-  title: string;
-}
-interface DurableRoute {
-  kind: unknown;
-  params: {
-    cwd: string;
-    hostId: string;
-    repositoryRoot?: string;
-    source: "board" | "canonical";
-    url: string;
+function me(
+  e,
+  { hostId: t, item: n, repo: r, repositoryTarget: i, statusKey: a, defaultMergeMenuOpen: o },
+) {
+  return {
+    id: `pull-request:${n.url}`,
+    icon: (0, U.createElement)(ge, {
+      fallbackState: n.state,
+      hostId: t ?? i.hostId,
+      statusKey: a,
+      url: n.url,
+    }),
+    props: { defaultMergeMenuOpen: o, hostId: t, item: n, repo: r, target: i },
+    title: n.title.trim() || B(e, n.number),
+    tooltip: `${n.title} — ${n.url}`,
+    requiresWorkspaceReady: !0,
+    persistence: V(n.url, i.hostId),
   };
-  payloadVersion: 1;
 }
-interface TabDescriptor {
-  defaultMergeMenuOpen?: boolean;
-  hostId?: string;
-  icon: unknown;
-  id: string;
-  item?: PullRequestBoardItem;
-  repo?: string;
-  request?: CanonicalRequest;
-  requiresWorkspaceReady: boolean;
-  repositoryTarget?: RepositoryTarget;
-  statusKey?: PullRequestStatusKey;
-  summaryOnly?: boolean;
-  title: string;
-  tooltip: string;
+function he(e, { request: t, repositoryTarget: n, title: i }) {
+  if (t.provider === `gitlab` && !ne(e)) return null;
+  let a = x(t.pullRequest);
+  return {
+    id: `pull-request:${a}`,
+    icon:
+      t.provider === `gitlab`
+        ? (0, U.createElement)(r)
+        : (0, U.createElement)(ue, { className: `icon-xs shrink-0` }),
+    props: { request: t, repositoryTarget: n, summaryOnly: !0 },
+    title: i.trim() || B(e, t.pullRequest.number),
+    tooltip: `${i} — ${a}`,
+    requiresWorkspaceReady: !1,
+    persistence: V(a, t.account.hostId),
+  };
 }
-interface QueryHost {
-  getOrFetch<Value>(query: unknown, input?: unknown): Promise<Value>;
+function ge(e) {
+  let t = (0, H.c)(10),
+    { fallbackState: r, hostId: i, statusKey: a, url: o } = e,
+    s;
+  t[0] !== r || t[1] !== i || t[2] !== a || t[3] !== o
+    ? ((s = { fallbackState: r, hostId: i, statusKey: a, url: o }),
+      (t[0] = r),
+      (t[1] = i),
+      (t[2] = a),
+      (t[3] = o),
+      (t[4] = s))
+    : (s = t[4]);
+  let c;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((c = { enabled: !1 }), (t[5] = c))
+    : (c = t[5]);
+  let l = n(W, s, c);
+  if (l === `closed` || l === `open`) {
+    let e;
+    return (
+      t[6] === l
+        ? (e = t[7])
+        : ((e = (0, U.createElement)(I, { className: `icon-xs shrink-0`, status: l })),
+          (t[6] = l),
+          (t[7] = e)),
+      e
+    );
+  }
+  let u;
+  return (
+    t[8] === l
+      ? (u = t[9])
+      : ((u = (0, U.createElement)(y, { className: `icon-xs shrink-0`, state: l })),
+        (t[8] = l),
+        (t[9] = u)),
+    u
+  );
 }
-interface PullRequestTabScope {
-  query: QueryHost;
-  value: { routeKind?: string };
-  get<Value>(signal: unknown): Value;
-}
-interface RestoreRoute {
-  cwd: string;
-  hostId: string;
-  repositoryRoot?: string;
-  source: "board" | "canonical";
-  url: string;
-}
-interface OpenTabOptions {
-  insertPosition?: number;
-  revealAndFocus?: boolean;
-  tabId?: string;
-  target?: string;
-}
-interface SelectorRead {
-  get<Value>(query: unknown, input: unknown): { data?: Value };
-}
-
-const once = onceExport as (initializer: () => void) => () => void;
-const useScopedSelector = useScopedSelectorExport as unknown as (
-  selector: unknown,
-  input: unknown,
-  options: { enabled: boolean },
-) => string;
-const createScopedSelector = createScopedSelectorExport as unknown as (
-  scope: unknown,
-  selector: (
-    input: {
-      fallbackState: string;
-      statusKey: PullRequestStatusKey;
-      url: string;
-    },
-    context: SelectorRead,
-  ) => string,
-) => unknown;
-const isGitLabPullRequestEnabled =
-  isGitLabPullRequestEnabledExport as unknown as (
-    scope: PullRequestTabScope,
-  ) => boolean;
-const getGitLabAccount = getGitLabAccountExport as unknown as (
-  scope: PullRequestTabScope,
-  hostId: string,
-) => Promise<Record<string, unknown>>;
-const getPullRequestUrl = getPullRequestUrlExport as unknown as (
-  pullRequest: PullRequestUrl,
-) => string;
-const parsePullRequestUrl = parsePullRequestUrlExport as unknown as (
-  url: string,
-) => PullRequestUrl | null;
-const pullRequestMatches = pullRequestMatchesExport as unknown as (
-  candidate: { url: string } | PullRequestBoardItem,
-  pullRequest: PullRequestUrl,
-) => boolean;
-const fetchCanonicalPullRequest =
-  fetchCanonicalPullRequestExport as unknown as (
-    scope: PullRequestTabScope,
-    input: { request: Omit<CanonicalRequest, "provider">; source: string },
-  ) => Promise<{ title?: string | null }>;
-const fetchGitLabPullRequest = fetchGitLabPullRequestExport as unknown as (
-  scope: PullRequestTabScope,
-  input: { account: Record<string, unknown>; pullRequest: PullRequestUrl },
-) => Promise<{ title: string }>;
-const fetchPullRequestBoard = fetchPullRequestBoardExport as unknown as (
-  operation: string,
-  input: { cwd: string; hostId: string; repo: string; searchQuery: string },
-  metadata: { source: string },
-) => Promise<{ items: PullRequestBoardItem[]; status: string }>;
-const createRepositoryTarget = createRepositoryTargetExport as unknown as (
-  target: RepositoryTarget,
-) => RepositoryTarget;
-const normalizePullRequestStatus =
-  normalizePullRequestStatusExport as unknown as (
-    summary: unknown,
-  ) => string | null;
-const projectPullRequestState =
-  projectPullRequestStateExport as unknown as (input: {
-    canMerge?: boolean;
-    ciStatus?: unknown;
-    hasMergeConflicts: boolean;
-    status: string;
-  }) => string;
-const openSidePanelTab = openSidePanelTabExport as unknown as (
-  scope: PullRequestTabScope,
-  api: unknown,
-  descriptor: TabDescriptor & {
-    defaultState(): Record<string, never>;
-    durableRoute?: DurableRoute;
-    insertPosition?: number;
-    revealAndFocus: boolean;
-    target: string;
-  },
-) => void;
-const createPullRequestTabApi =
-  createPullRequestTabApiExport as unknown as (handlers: {
-    open: typeof openBoardPullRequestTab;
-    restore: typeof restorePullRequestTab;
-  }) => unknown;
-
-let React: ReactRuntime;
-let pullRequestStatusSelector: unknown;
-let pullRequestTabApi: unknown;
-
-function formatPullRequestTitle(
-  scope: PullRequestTabScope,
-  number: number,
-): string {
-  return scope
-    .get<{
-      formatMessage(
-        descriptor: unknown,
-        values: Record<string, unknown>,
-      ): string;
-    }>(intlSignal)
+function B(e, t) {
+  return e
+    .get(O)
     .formatMessage(
       {
-        id: "thread.sidePanel.pullRequestTab.title",
-        defaultMessage: "PR #{number}",
-        description: "Title for a pull request side-panel tab",
+        id: `thread.sidePanel.pullRequestTab.title`,
+        defaultMessage: `PR #{number}`,
+        description: `Title for a pull request side-panel tab`,
       },
-      { number },
+      { number: t },
     );
 }
-function createPersistence(
-  url: string,
-  hostId: string,
-): { hostId: string; url: string } | undefined {
-  const parsed = parsePullRequestUrl(url);
-  return parsed == null
-    ? undefined
-    : { url: getPullRequestUrl(parsed), hostId };
+function V(e, t) {
+  let n = M(e);
+  return n == null ? void 0 : { url: x(n), hostId: t };
 }
-function PullRequestStatus({
-  fallbackState,
-  hostId,
-  statusKey,
-  url,
-}: {
-  fallbackState: string;
-  hostId: string;
-  statusKey: PullRequestStatusKey;
-  url: string;
-}): unknown {
-  const status = useScopedSelector(
-    pullRequestStatusSelector,
-    { fallbackState, hostId, statusKey, url },
-    { enabled: false },
-  );
-  return status === "closed" || status === "open"
-    ? React.createElement(
-        PullRequestStatusIcon as unknown as (
-          props: Record<string, unknown>,
-        ) => unknown,
-        { className: "icon-xs shrink-0", status },
-      )
-    : React.createElement(
-        PullRequestStateIcon as unknown as (
-          props: Record<string, unknown>,
-        ) => unknown,
-        { className: "icon-xs shrink-0", state: status },
-      );
+var H, U, W;
+function G() {
+  return (G = e(() => {
+    ((H = t()),
+      i(),
+      (U = c()),
+      u(),
+      ae(),
+      j(),
+      _(),
+      T(),
+      D(),
+      h(),
+      a(),
+      (W = d(o, ({ fallbackState: e, statusKey: t, url: n }, { get: r }) => {
+        let i = M(n);
+        if (i == null) return e;
+        let { data: a } = r(de, { ...t, url: n }),
+          o = a?.url != null && S({ url: a.url }, i) ? a : null;
+        if (o == null) return e;
+        let s = o.summary ?? o.details;
+        if (s == null) return o.state === `open` && o.isDraft ? `draft` : o.state;
+        let c = k(s);
+        return c == null
+          ? e
+          : N({
+              canMerge: s.canMerge,
+              ciStatus: s.ciStatus,
+              hasMergeConflicts: s.mergeBlocker === `conflicts`,
+              status: c,
+            });
+      })));
+  }))();
 }
-function createBoardDescriptor(
-  scope: PullRequestTabScope,
-  options: BoardTabOptions,
-) {
-  const {
-    hostId,
-    item,
-    repo,
-    repositoryTarget,
-    statusKey,
-    defaultMergeMenuOpen,
-  } = options;
-  return {
-    id: `pull-request:${item.url}`,
-    icon: React.createElement(PullRequestStatus, {
-      fallbackState: item.state,
-      hostId: hostId ?? repositoryTarget.hostId,
-      statusKey,
-      url: item.url,
-    }),
-    props: {
-      defaultMergeMenuOpen,
-      hostId,
-      item,
-      repo,
-      target: repositoryTarget,
-    },
-    title: item.title.trim() || formatPullRequestTitle(scope, item.number),
-    tooltip: `${item.title} — ${item.url}`,
-    requiresWorkspaceReady: true,
-    persistence: createPersistence(item.url, repositoryTarget.hostId),
-  };
-}
-function createCanonicalDescriptor(
-  scope: PullRequestTabScope,
-  options: CanonicalTabOptions,
-) {
-  const { request, repositoryTarget, title } = options;
-  if (request.provider === "gitlab" && !isGitLabPullRequestEnabled(scope))
-    return null;
-  const url = getPullRequestUrl(request.pullRequest);
-  return {
-    id: `pull-request:${url}`,
-    icon:
-      request.provider === "gitlab"
-        ? React.createElement(
-            GitLabIcon as unknown as (
-              props: Record<string, unknown>,
-            ) => unknown,
-            {},
-          )
-        : React.createElement(
-            GitHubIcon as unknown as (
-              props: Record<string, unknown>,
-            ) => unknown,
-            { className: "icon-xs shrink-0" },
-          ),
-    props: { request, repositoryTarget, summaryOnly: true },
-    title:
-      title.trim() || formatPullRequestTitle(scope, request.pullRequest.number),
-    tooltip: `${title} — ${url}`,
-    requiresWorkspaceReady: false,
-    persistence: createPersistence(url, request.account.hostId),
-  };
-}
-
-const initializePullRequestDescriptors = once(() => {
-  initializeQueryRuntime();
-  React = getReactRuntime();
-  initializePathRuntime();
-  initializeGitHubIconRuntime();
-  initializeIntlRuntime();
-  initializePullRequestUrlRuntime();
-  initializePullRequestStatusRuntime();
-  initializeRepositoryTargetRuntime();
-  initializePullRequestSummaryRuntime();
-  initializeScopedRuntime();
-  pullRequestStatusSelector = createScopedSelector(
-    applicationScope,
-    ({ fallbackState, statusKey, url }, { get }) => {
-      const parsed = parsePullRequestUrl(url);
-      if (parsed == null) return fallbackState;
-      const { data } = get<{
-        details?: unknown;
-        isDraft?: boolean;
-        state: string;
-        summary?: unknown;
-        url?: string;
-      }>(pullRequestStatusQuery, { ...statusKey, url });
-      const matching =
-        data?.url != null && pullRequestMatches({ url: data.url }, parsed)
-          ? data
-          : null;
-      if (matching == null) return fallbackState;
-      const summary = matching.summary ?? matching.details;
-      if (summary == null)
-        return matching.state === "open" && matching.isDraft
-          ? "draft"
-          : matching.state;
-      const status = normalizePullRequestStatus(summary);
-      return status == null
-        ? fallbackState
-        : projectPullRequestState({
-            canMerge: (summary as { canMerge?: boolean }).canMerge,
-            ciStatus: (summary as { ciStatus?: unknown }).ciStatus,
-            hasMergeConflicts:
-              (summary as { mergeBlocker?: string }).mergeBlocker ===
-              "conflicts",
-            status,
-          });
-    },
-  );
-});
-
-async function resolvePullRequestRoute(
-  scope: PullRequestTabScope,
-  { cwd, hostId, repositoryRoot, source, url }: RestoreRoute,
-): Promise<
-  | { source: "canonical"; options: CanonicalTabOptions }
-  | { source: "board"; options: BoardTabOptions }
-  | null
-> {
-  const pullRequest = parsePullRequestUrl(url);
-  if (pullRequest == null) return null;
-  if (pullRequest.hostname === "gitlab.com") {
-    const request = {
-      account: (await getGitLabAccount(scope, hostId)) as {
-        hostId: string;
-        [key: string]: unknown;
-      },
-      pullRequest,
-    };
-    const { title } = await fetchGitLabPullRequest(scope, request);
-    return {
-      source: "canonical",
-      options: { request: { provider: "gitlab", ...request }, title },
-    };
+async function K(e, { cwd: t, hostId: n, repositoryRoot: r, source: i, url: a }) {
+  let o = M(a);
+  if (o == null) return null;
+  if (o.hostname === `gitlab.com`) {
+    let t = { account: await ee(e, n), pullRequest: o },
+      { title: r } = await L(e, t);
+    return { source: `canonical`, options: { request: { provider: `gitlab`, ...t }, title: r } };
   }
-  if (source === "canonical") {
-    const accountResult = await scope.query.getOrFetch<{
-      account: { hostId: string; [key: string]: unknown };
-      status: string;
-    }>(canonicalAccountQuery, {
-      hostId,
-      hostname: pullRequest.hostname,
-      source: "pull_requests_page",
+  if (i === `canonical`) {
+    let i = await e.query.getOrFetch(pe, {
+      hostId: n,
+      hostname: o.hostname,
+      source: `pull_requests_page`,
     });
-    if (
-      accountResult.status !== "success" ||
-      accountResult.account.hostId !== hostId
-    )
-      return null;
-    const request = { account: accountResult.account, pullRequest };
-    const detail = await fetchCanonicalPullRequest(scope, {
-      request,
-      source: "pull_requests_page",
-    });
+    if (i.status !== `success` || i.account.hostId !== n) return null;
+    let a = { account: i.account, pullRequest: o },
+      c = await ce(e, { request: a, source: `pull_requests_page` });
     return {
-      source: "canonical",
+      source: `canonical`,
       options: {
-        request: { provider: "github", ...request },
-        repositoryTarget:
-          repositoryRoot == null
-            ? undefined
-            : createRepositoryTarget({
-                cwd: normalizeCwd(cwd),
-                hostId,
-                root: normalizeRepositoryRoot(repositoryRoot),
-              }),
-        title:
-          detail.title ?? formatPullRequestTitle(scope, pullRequest.number),
+        request: { provider: `github`, ...a },
+        repositoryTarget: r == null ? void 0 : R({ cwd: l(t), hostId: n, root: s(r) }),
+        title: c.title ?? B(e, o.number),
       },
     };
   }
-  const repo = `${pullRequest.hostname}/${pullRequest.owner}/${pullRequest.repository}`;
-  const [board, repository] = await Promise.all([
-    fetchPullRequestBoard(
-      "gh-pr-board",
-      {
-        cwd: normalizeCwd(cwd),
-        hostId,
-        repo,
-        searchQuery: String(pullRequest.number),
-      },
-      { source: "pull_request_board" },
-    ),
-    scope.query.getOrFetch<{ root: string } | null>(repositoryRootQuery),
-  ]);
-  if (board.status !== "success" || repository == null) return null;
-  const item = board.items.find((candidate) =>
-    pullRequestMatches(candidate, pullRequest),
-  );
-  return item == null
+  let c = `${o.hostname}/${o.owner}/${o.repository}`,
+    [u, d] = await Promise.all([
+      re(
+        `gh-pr-board`,
+        { cwd: l(t), hostId: n, repo: c, searchQuery: String(o.number) },
+        { source: `pull_request_board` },
+      ),
+      e.query.getOrFetch(w),
+    ]);
+  if (u.status !== `success` || d == null) return null;
+  let f = u.items.find((e) => S(e, o));
+  return f == null
     ? null
     : {
-        source: "board",
+        source: `board`,
         options: {
-          provider: "github",
-          hostId,
-          item,
-          repo,
-          repositoryTarget: createRepositoryTarget({
-            cwd: item.cwd,
-            hostId,
-            root: repository.root,
-          }),
+          provider: `github`,
+          hostId: n,
+          item: f,
+          repo: c,
+          repositoryTarget: R({ cwd: f.cwd, hostId: n, root: d.root }),
           statusKey: {
-            cwd: item.cwd,
-            headBranch: item.headBranch,
-            hostId,
-            operationSource: "sidebar_task_pr_chip",
-            url: item.url,
+            cwd: f.cwd,
+            headBranch: f.headBranch,
+            hostId: n,
+            operationSource: `sidebar_task_pr_chip`,
+            url: f.url,
           },
         },
       };
 }
-
-const initializeOpenPullRequestTab = once(() => {
-  initializeSelectorRuntime();
-  initializePullRequestTabRuntime();
-  initializeRepositoryRuntime();
-  initializePullRequestQueryRuntime();
-  initializeRepositoryTargetRuntime();
-  initializePullRequestStateRuntime();
-  initializePullRequestBoardRuntime();
-  initializePullRequestDescriptors();
-});
-function createDurableRoute({
-  cwd,
-  hostId,
-  repositoryRoot,
-  source,
-  url,
-}: RestoreRoute): DurableRoute | undefined {
-  if (cwd.trim() !== "" && hostId.trim() !== "")
+function q() {
+  return (q = e(() => {
+    (f(), p(), A(), te(), D(), z(), ie(), G());
+  }))();
+}
+function J(e, t, n = !0, r = `right`, { insertPosition: i, tabId: a } = {}) {
+  let { repositoryTarget: o } = t,
+    s = me(e, t);
+  if (s == null) return !1;
+  let { persistence: c, ...l } = s,
+    u = a ?? s.id,
+    d = C(e, u) ?? r,
+    f =
+      c != null && e.get(v) === o.cwd && e.get(m) === o.hostId && c.hostId === o.hostId
+        ? Z({ cwd: o.cwd, hostId: o.hostId, source: `board`, url: c.url })
+        : void 0;
+  return (
+    g(e, Q, {
+      ...l,
+      revealAndFocus: n,
+      defaultState: () => ({}),
+      durableRoute: f,
+      id: u,
+      insertPosition: i,
+      target: d,
+    }),
+    n && F(e, d),
+    !0
+  );
+}
+function Y(
+  e,
+  t,
+  { revealAndFocus: n = !0, insertPosition: r, tabId: i, target: a = `right` } = {},
+) {
+  let o = he(e, t);
+  if (o == null) return !1;
+  let { persistence: s, ...c } = o,
+    l = i ?? o.id,
+    u = C(e, l) ?? a,
+    d = e.get(m),
+    f = e.get(v),
+    p = t.repositoryTarget;
+  return (
+    g(e, Q, {
+      ...c,
+      revealAndFocus: n,
+      defaultState: () => ({}),
+      durableRoute:
+        d === s?.hostId
+          ? Z({
+              cwd: f,
+              hostId: d,
+              source: `canonical`,
+              repositoryRoot: p?.cwd === f && p.hostId === d ? p.root : void 0,
+              url: s.url,
+            })
+          : void 0,
+      id: l,
+      insertPosition: r,
+      target: u,
+    }),
+    n && F(e, u),
+    !0
+  );
+}
+async function X(
+  e,
+  { cwd: t, hostId: n, repositoryRoot: r, source: i, url: a },
+  { revealAndFocus: o, insertPosition: s, tabId: c, target: l },
+) {
+  if (e.value.routeKind !== `local-thread` || e.get(v) !== t || e.get(m) !== n) return !1;
+  try {
+    let u = await K(e, { cwd: t, hostId: n, repositoryRoot: r, source: i, url: a });
+    return u == null
+      ? !1
+      : u.source === `canonical`
+        ? Y(e, u.options, { revealAndFocus: o, insertPosition: s, tabId: c, target: l })
+        : J(e, u.options, o, l, { insertPosition: s, tabId: c });
+  } catch {
+    return !1;
+  }
+}
+function Z({ cwd: e, hostId: t, repositoryRoot: n, source: r, url: i }) {
+  if (e != null && e.trim() !== `` && t.trim() !== ``)
     return {
-      kind: pullRequestDurableRouteKind,
-      params: { cwd, hostId, repositoryRoot, source, url },
+      kind: oe,
+      params: { cwd: e, hostId: t, repositoryRoot: n, source: r, url: i },
       payloadVersion: 1,
     };
 }
-function openBoardPullRequestTab(
-  scope: PullRequestTabScope,
-  options: BoardTabOptions,
-  revealAndFocus = true,
-  target = "right",
-  {
-    insertPosition,
-    tabId,
-  }: Pick<OpenTabOptions, "insertPosition" | "tabId"> = {},
-): boolean {
-  const descriptor = createBoardDescriptor(scope, options);
-  const { persistence, ...tab } = descriptor;
-  const id = tabId ?? descriptor.id;
-  const placement = getExistingTabPlacement(scope, id) ?? target;
-  const durableRoute =
-    persistence != null &&
-    scope.get(currentCwd) === options.repositoryTarget.cwd &&
-    scope.get(currentHostId) === options.repositoryTarget.hostId &&
-    persistence.hostId === options.repositoryTarget.hostId
-      ? createDurableRoute({
-          cwd: options.repositoryTarget.cwd,
-          hostId: options.repositoryTarget.hostId,
-          source: "board",
-          url: persistence.url,
-        })
-      : undefined;
-  openSidePanelTab(scope, pullRequestTabApi, {
-    ...tab,
-    revealAndFocus,
-    defaultState: () => ({}),
-    durableRoute,
-    id,
-    insertPosition,
-    target: placement,
-  });
-  if (revealAndFocus) focusSidePanel(scope, placement);
-  return true;
+var Q;
+function $() {
+  return ($ = e(() => {
+    (b(), q(), G(), le(), E(), se(), P(), (Q = fe({ open: J, restore: X })));
+  }))();
 }
-function openCanonicalPullRequestTab(
-  scope: PullRequestTabScope,
-  options: CanonicalTabOptions,
-  {
-    revealAndFocus = true,
-    insertPosition,
-    tabId,
-    target = "right",
-  }: OpenTabOptions = {},
-): boolean {
-  const descriptor = createCanonicalDescriptor(scope, options);
-  if (descriptor == null) return false;
-  const { persistence, ...tab } = descriptor;
-  const id = tabId ?? descriptor.id;
-  const placement = getExistingTabPlacement(scope, id) ?? target;
-  const hostId = scope.get<string>(currentHostId);
-  const cwd = scope.get<string>(currentCwd);
-  const repositoryTarget = options.repositoryTarget;
-  openSidePanelTab(scope, pullRequestTabApi, {
-    ...tab,
-    revealAndFocus,
-    defaultState: () => ({}),
-    durableRoute:
-      hostId === persistence?.hostId
-        ? createDurableRoute({
-            cwd,
-            hostId,
-            source: "canonical",
-            repositoryRoot:
-              repositoryTarget?.cwd === cwd &&
-              repositoryTarget.hostId === hostId
-                ? repositoryTarget.root
-                : undefined,
-            url: persistence.url,
-          })
-        : undefined,
-    id,
-    insertPosition,
-    target: placement,
-  });
-  if (revealAndFocus) focusSidePanel(scope, placement);
-  return true;
-}
-async function restorePullRequestTab(
-  scope: PullRequestTabScope,
-  route: RestoreRoute,
-  options: OpenTabOptions,
-): Promise<boolean> {
-  if (
-    scope.value.routeKind !== "local-thread" ||
-    scope.get(currentCwd) !== route.cwd ||
-    scope.get(currentHostId) !== route.hostId
-  )
-    return false;
-  try {
-    const resolved = await resolvePullRequestRoute(scope, route);
-    if (resolved == null) return false;
-    return resolved.source === "canonical"
-      ? openCanonicalPullRequestTab(scope, resolved.options, options)
-      : openBoardPullRequestTab(
-          scope,
-          resolved.options,
-          options.revealAndFocus,
-          options.target,
-          options,
-        );
-  } catch {
-    return false;
-  }
-}
-const initializePullRequestSidePanelTab = once(() => {
-  initializeSidePanelRuntime();
-  initializeOpenPullRequestTab();
-  initializePullRequestDescriptors();
-  initializeThreadContextRuntime();
-  initializePullRequestIconRuntime();
-  initializeSidePanelPlacementRuntime();
-  initializePullRequestRouteRuntime();
-  pullRequestTabApi = createPullRequestTabApi({
-    open: openBoardPullRequestTab,
-    restore: restorePullRequestTab,
-  });
-});
-export {
-  restorePullRequestTab as i,
-  openCanonicalPullRequestTab as n,
-  openBoardPullRequestTab as r,
-  initializePullRequestSidePanelTab as t,
-};
+export { X as i, Y as n, J as r, $ as t };

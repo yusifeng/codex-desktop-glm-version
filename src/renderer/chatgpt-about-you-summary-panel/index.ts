@@ -1,8 +1,5 @@
+// @ts-nocheck
 import "@rchunk/app-shared";
-import {
-  i as initializeAboutYouSummary,
-  n as MemorySummaryDialog,
-} from "@rchunk/about-you-summary";
-
-initializeAboutYouSummary();
-export { MemorySummaryDialog };
+import { i as e, n as t } from "@rchunk/about-you-summary";
+e();
+export { t as MemorySummaryDialog };

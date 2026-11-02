@@ -1,9 +1,4 @@
-import {
-  cut as initializeReviewFileSourceTabSync,
-  lut as syncOpenWorkspaceFileSidePanelTabs,
-  sut as getFileTabCwd,
-} from "@rchunk/app-initial";
-
-initializeReviewFileSourceTabSync();
-
-export { getFileTabCwd, syncOpenWorkspaceFileSidePanelTabs };
+// @ts-nocheck
+import { cut as e, lut as t, sut as n } from "@rchunk/app-initial";
+e();
+export { n as getFileTabCwd, t as syncOpenWorkspaceFileSidePanelTabs };

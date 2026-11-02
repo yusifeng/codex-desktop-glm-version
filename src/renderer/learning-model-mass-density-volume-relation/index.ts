@@ -1,42 +1,35 @@
-// Mass-density-volume formula metadata. Release chunk: type-dd4d43aba596.js.
-import "@rchunk/rolldown-runtime";
-interface Specification {
-  type: "MASS_DENSITY_VOLUME_RELATION";
-  version: 2;
-  thumbnailAssetKey: "mass-density-volume-relation-v1";
-  canonicalFormula: string;
-  canonicalFormulaAliases: string[];
-  parameters: {
-    mass: { kind: "number"; defaultValue: 12; min: 0.01; max: 10000 };
-    volume: { kind: "number"; defaultValue: 5; min: 0.01; max: 10000 };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o;
+function s() {
+  return (s = e(() => {
+    ((t = `MASS_DENSITY_VOLUME_RELATION`),
+      (n = `mass-density-volume-relation-v1`),
+      (r = `\\rho = \\frac{m}{V}`),
+      (i = [
+        `m = \\rho V`,
+        `rho = m / V`,
+        `rho=m/v`,
+        `d=m/v`,
+        `m=rho v`,
+        `m=dv`,
+        `v=m/rho`,
+        `v=m/d`,
+        `m/v=rho`,
+        `m/v=d`,
+      ]),
+      (a = {
+        mass: { kind: `number`, defaultValue: 12, min: 0.01, max: 1e4 },
+        volume: { kind: `number`, defaultValue: 5, min: 0.01, max: 1e4 },
+      }),
+      (o = {
+        type: t,
+        version: 2,
+        thumbnailAssetKey: n,
+        canonicalFormula: r,
+        canonicalFormulaAliases: i,
+        parameters: a,
+      }));
+  }))();
 }
-let specification: Specification;
-let initialized = false;
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  specification = {
-    type: "MASS_DENSITY_VOLUME_RELATION",
-    version: 2,
-    thumbnailAssetKey: "mass-density-volume-relation-v1",
-    canonicalFormula: "\\rho = \\frac{m}{V}",
-    canonicalFormulaAliases: [
-      "m = \\rho V",
-      "rho = m / V",
-      "rho=m/v",
-      "d=m/v",
-      "m=rho v",
-      "m=dv",
-      "v=m/rho",
-      "v=m/d",
-      "m/v=rho",
-      "m/v=d",
-    ],
-    parameters: {
-      mass: { kind: "number", defaultValue: 12, min: 0.01, max: 10000 },
-      volume: { kind: "number", defaultValue: 5, min: 0.01, max: 10000 },
-    },
-  };
-}
-export { specification as n, initialize as t };
+export { o as n, s as t };

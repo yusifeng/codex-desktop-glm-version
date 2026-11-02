@@ -1,278 +1,268 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeCompilerRuntime,
-  $Q as initializeMotionValues,
-  I3 as getJsxRuntime,
-  a$ as initializeTransforms,
-  e$ as useTransform,
-  e6 as getReactRuntime,
-  h4 as initializeMotionComponents,
-  m4 as classNames,
-  n$ as motionValue,
-  o$ as motion,
-  t$ as initializeMotionRuntime,
+  $3 as t,
+  $Q as n,
+  I3 as r,
+  a$ as i,
+  e$ as a,
+  e6 as o,
+  h4 as s,
+  m4 as c,
+  n$ as l,
+  o$ as u,
+  t$ as d,
 } from "@rchunk/app-shared";
-import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
-import {
-  i as initializeVoiceMotion,
-  n as orbTransition,
-  r as reducedMotionTransition,
-} from "@rchunk/realtime-voice-motion";
-
-interface MotionValue {
-  get(): number;
-  set(value: number): void;
-}
-interface Props {
-  isConnecting: boolean;
-  onHandoffComplete?(): void;
-  orb?: unknown;
-  orbDiameter: number;
-  reduceMotion?: boolean;
-}
-
-const once = onceExport as (initializer: () => void) => () => void;
-const HANDOFF_DURATION_MS = 1125;
-const ORB_FADE_DURATION_MS = 325;
-const BLEND_DURATION_MS = 195;
-const BLEND_END_MS = 520;
-const INITIAL_DOT_DIAMETER = 12;
-const DAMPING_RATIO = 0.68;
-const cycles = 1088 / BLEND_END_MS;
-const angularFrequency = 2 * Math.PI * cycles;
-const dampedFrequency = angularFrequency * Math.sqrt(1 - DAMPING_RATIO ** 2);
-const firstPeak =
-  Math.atan(dampedFrequency / (DAMPING_RATIO * angularFrequency)) /
-  dampedFrequency;
-const amplitude =
-  0.06000000000000005 /
-  ((Math.exp(-DAMPING_RATIO * angularFrequency * firstPeak) *
-    Math.sin(dampedFrequency * firstPeak)) /
-    dampedFrequency);
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-
-function orbDiameterAt(
-  timeMs: number,
-  initialDiameter: number,
-  targetDiameter: number,
-): number {
-  const time = Math.max(0, timeMs);
-  if (time >= HANDOFF_DURATION_MS) return targetDiameter;
-  if (time <= ORB_FADE_DURATION_MS) {
-    const progress = time / ORB_FADE_DURATION_MS;
-    const smooth = progress ** 2 * (3 - 2 * progress);
-    return initialDiameter + (INITIAL_DOT_DIAMETER - initialDiameter) * smooth;
+import { i as f, n as p, r as m } from "@rchunk/realtime-voice-motion";
+function h(e, t, n) {
+  let r = Math.max(0, e);
+  if (r >= 1125) return n;
+  if (r <= v) {
+    let e = r / v,
+      n = e ** 2 * (3 - 2 * e);
+    return t + (x - t) * n;
   }
-  const ratio = INITIAL_DOT_DIAMETER / targetDiameter;
-  if (time <= BLEND_END_MS) {
-    const blendSeconds = BLEND_DURATION_MS / 1000;
-    const fadeSeconds = ORB_FADE_DURATION_MS / 1000;
-    const initialRatio = initialDiameter / targetDiameter;
-    const remaining = Math.max(1 - ratio, 1e-4);
-    const c1 = (amplitude * blendSeconds) / remaining;
-    const curvature =
-      ((6 * (initialRatio - ratio)) / fadeSeconds ** 2) *
-      (blendSeconds ** 2 / remaining);
-    const damping =
-      (-2 * DAMPING_RATIO * angularFrequency * amplitude * blendSeconds ** 2) /
-      remaining;
-    const halfCurvature = curvature / 2;
-    const p0 = 1 - halfCurvature;
-    const p1 = c1 - 2 * halfCurvature;
-    const p2 = damping - 2 * halfCurvature;
-    const a = p1 - 3 * p0;
-    const b = (p2 - 6 * p0 - 6 * a) / 2;
-    const c = a - 2 * b;
-    const d = p0 - b - c;
-    const x = (time - ORB_FADE_DURATION_MS) / BLEND_DURATION_MS;
-    const curve = x ** 2 * (b * x ** 3 + c * x ** 2 + d * x + halfCurvature);
-    return targetDiameter * (ratio + (1 - ratio) * curve);
+  let i = x / n;
+  if (r <= b) {
+    let e = y / 1e3,
+      a = v / 1e3,
+      o = t / n,
+      s = Math.max(1 - i, 1e-4),
+      c = (D * e) / s,
+      l = ((6 * (o - i)) / a ** 2) * (e ** 2 / s),
+      u = (-2 * S * w * D * e ** 2) / s,
+      d = l / 2,
+      f = 1 - d,
+      p = c - 2 * d,
+      m = u - 2 * d,
+      h = p - 3 * f,
+      g = (m - 6 * f - 6 * h) / 2,
+      _ = h - 2 * g,
+      b = f - g - _,
+      x = (r - v) / y,
+      C = x ** 2 * (g * x ** 3 + _ * x ** 2 + b * x + d);
+    return n * (i + (1 - i) * C);
   }
-  const seconds = (time - BLEND_END_MS) / 1000;
+  let a = (r - b) / 1e3;
+  return n * (1 + Math.exp(-0.68 * w * a) * (D / T) * Math.sin(T * a));
+}
+function g(e) {
+  let t = Math.min(1, Math.max(0, (e - v) / y));
+  return t ** 3 * (t * (t * 6 - 15) + 10);
+}
+var _, v, y, b, x, S, C, w, T, E, D;
+function O() {
+  return (O = e(() => {
+    ((_ = 1125),
+      (v = 325),
+      (y = 195),
+      (b = 520),
+      (x = 12),
+      (S = 0.68),
+      (C = 1088 / b),
+      (w = 2 * Math.PI * C),
+      (T = w * Math.sqrt(1 - S ** 2)),
+      (E = Math.atan(T / (S * w)) / T),
+      (D = 0.06000000000000005 / ((Math.exp(-0.68 * w * E) * Math.sin(T * E)) / T)));
+  }))();
+}
+function k(e) {
+  let t = (0, A.c)(63),
+    { isConnecting: n, onHandoffComplete: r, orb: i, orbDiameter: o, reduceMotion: s } = e,
+    d = (0, j.useRef)(null),
+    f = (0, j.useRef)(!1),
+    g = (0, j.useRef)(!1),
+    v = l(+!n),
+    y = l(50),
+    b;
+  t[0] !== v || t[1] !== o || t[2] !== y
+    ? ((b = () => h(v.get() * _, y.get(), o)), (t[0] = v), (t[1] = o), (t[2] = y), (t[3] = b))
+    : (b = t[3]);
+  let x = a(b),
+    S = a(v, te),
+    C = a(S, ee),
+    w;
+  t[4] === o ? (w = t[5]) : ((w = (e) => e / o), (t[4] = o), (t[5] = w));
+  let T = a(x, w),
+    E;
+  t[6] !== x || t[7] !== y
+    ? ((E = () => x.get() / y.get()), (t[6] = x), (t[7] = y), (t[8] = E))
+    : (E = t[8]);
+  let D = a(E),
+    O;
+  t[9] !== v || t[10] !== n || t[11] !== r || t[12] !== s
+    ? ((O = () => {
+        n || (!s && v.get() < 1) || f.current || ((f.current = !0), r?.());
+      }),
+      (t[9] = v),
+      (t[10] = n),
+      (t[11] = r),
+      (t[12] = s),
+      (t[13] = O))
+    : (O = t[13]);
+  let k = O,
+    N = (0, j.useEffectEvent)(k),
+    P;
+  t[14] !== N || t[15] !== n
+    ? ((P = () => {
+        if (n) return;
+        let e = requestAnimationFrame(N);
+        return () => {
+          cancelAnimationFrame(e);
+        };
+      }),
+      (t[14] = N),
+      (t[15] = n),
+      (t[16] = P))
+    : (P = t[16]);
+  let F;
+  (t[17] === n ? (F = t[18]) : ((F = [n]), (t[17] = n), (t[18] = F)), (0, j.useEffect)(P, F));
+  let I;
+  t[19] === o ? (I = t[20]) : ((I = { height: o, width: o }), (t[19] = o), (t[20] = I));
+  let L = s ? m : p,
+    R = n && `pointer-events-none`,
+    z;
+  t[21] === R ? (z = t[22]) : ((z = c(`absolute inset-0`, R)), (t[21] = R), (t[22] = z));
+  let B;
+  t[23] !== S || t[24] !== T
+    ? ((B = { opacity: S, scale: T }), (t[23] = S), (t[24] = T), (t[25] = B))
+    : (B = t[25]);
+  let V;
+  t[26] !== i || t[27] !== z || t[28] !== B
+    ? ((V = (0, M.jsx)(u.div, { className: z, style: B, children: i })),
+      (t[26] = i),
+      (t[27] = z),
+      (t[28] = B),
+      (t[29] = V))
+    : (V = t[29]);
+  let H;
+  t[30] !== C || t[31] !== D
+    ? ((H = { opacity: C, scale: D }), (t[30] = C), (t[31] = D), (t[32] = H))
+    : (H = t[32]);
+  let U;
+  t[33] === s
+    ? (U = t[34])
+    : ((U = (0, M.jsx)(ne, { ref: d, reduceMotion: s })), (t[33] = s), (t[34] = U));
+  let W;
+  t[35] !== H || t[36] !== U
+    ? ((W = (0, M.jsx)(u.div, {
+        className: `pointer-events-none absolute inset-0 flex items-center justify-center`,
+        style: H,
+        children: U,
+      })),
+      (t[35] = H),
+      (t[36] = U),
+      (t[37] = W))
+    : (W = t[37]);
+  let G = +!n,
+    K;
+  t[38] === G ? (K = t[39]) : ((K = { opacity: G }), (t[38] = G), (t[39] = K));
+  let q;
+  t[40] !== n || t[41] !== y
+    ? ((q = () => {
+        let e = d.current;
+        if (n) {
+          ((g.current = !1), (f.current = !1), e != null && (e.style.animationPlayState = ``));
+          return;
+        }
+        if (((g.current = !0), e == null)) return;
+        let t = e.getBoundingClientRect().width;
+        (t > 0 && y.set(t), (e.style.animationPlayState = `paused`));
+      }),
+      (t[40] = n),
+      (t[41] = y),
+      (t[42] = q))
+    : (q = t[42]);
+  let J;
+  t[43] !== k || t[44] !== n || t[45] !== s
+    ? ((J = () => {
+        !n && !s && g.current && ((g.current = !1), k());
+      }),
+      (t[43] = k),
+      (t[44] = n),
+      (t[45] = s),
+      (t[46] = J))
+    : (J = t[46]);
+  let Y;
+  t[47] === v ? (Y = t[48]) : ((Y = { opacity: v }), (t[47] = v), (t[48] = Y));
+  let X = s ? 0 : n ? 0.325 : _ / 1e3,
+    Z;
+  t[49] === X ? (Z = t[50]) : ((Z = { duration: X, ease: `linear` }), (t[49] = X), (t[50] = Z));
+  let Q;
+  t[51] !== K || t[52] !== q || t[53] !== J || t[54] !== Y || t[55] !== Z
+    ? ((Q = (0, M.jsx)(u.span, {
+        "aria-hidden": !0,
+        animate: K,
+        className: `pointer-events-none absolute size-0`,
+        initial: !1,
+        onAnimationStart: q,
+        onAnimationComplete: J,
+        style: Y,
+        transition: Z,
+      })),
+      (t[51] = K),
+      (t[52] = q),
+      (t[53] = J),
+      (t[54] = Y),
+      (t[55] = Z),
+      (t[56] = Q))
+    : (Q = t[56]);
+  let $;
   return (
-    targetDiameter *
-    (1 +
-      Math.exp(-DAMPING_RATIO * angularFrequency * seconds) *
-        (amplitude / dampedFrequency) *
-        Math.sin(dampedFrequency * seconds))
+    t[57] !== V || t[58] !== W || t[59] !== Q || t[60] !== I || t[61] !== L
+      ? (($ = (0, M.jsxs)(u.div, {
+          "aria-hidden": !0,
+          className: `relative flex items-center justify-center`,
+          initial: !1,
+          animate: I,
+          transition: L,
+          children: [V, W, Q],
+        })),
+        (t[57] = V),
+        (t[58] = W),
+        (t[59] = Q),
+        (t[60] = I),
+        (t[61] = L),
+        (t[62] = $))
+      : ($ = t[62]),
+    $
   );
 }
-
-function orbOpacityAt(timeMs: number): number {
-  const progress = Math.min(
-    1,
-    Math.max(0, (timeMs - ORB_FADE_DURATION_MS) / BLEND_DURATION_MS),
-  );
-  return progress ** 3 * (progress * (progress * 6 - 15) + 10);
+function ee(e) {
+  return 1 - e;
 }
-
-function Dot({
-  ref,
-  reduceMotion,
-}: {
-  ref: { current: HTMLElement | null };
-  reduceMotion?: boolean;
-}): unknown {
-  return jsx.jsx("div", {
-    ref,
-    className: classNames(
-      "size-[50px] rounded-full bg-primary-solid",
-      !reduceMotion && "pulsing-dot",
-    ),
-  });
+function te(e) {
+  return g(e * _);
 }
-
-function RealtimeVoiceStageLayout({
-  isConnecting,
-  onHandoffComplete,
-  orb,
-  orbDiameter,
-  reduceMotion,
-}: Props): unknown {
-  const dotRef = React.useRef<HTMLElement | null>(null);
-  const handoffCompleted = React.useRef(false);
-  const dotMeasured = React.useRef(false);
-  const progress = (motionValue as unknown as (value: number) => MotionValue)(
-    +!isConnecting,
+function ne(e) {
+  let t = (0, A.c)(5),
+    { ref: n, reduceMotion: r } = e,
+    i = !r && `pulsing-dot`,
+    a;
+  t[0] === i
+    ? (a = t[1])
+    : ((a = c(`size-[50px] rounded-full bg-primary-solid`, i)), (t[0] = i), (t[1] = a));
+  let o;
+  return (
+    t[2] !== n || t[3] !== a
+      ? ((o = (0, M.jsx)(`div`, { ref: n, className: a })), (t[2] = n), (t[3] = a), (t[4] = o))
+      : (o = t[4]),
+    o
   );
-  const dotDiameter = (
-    motionValue as unknown as (value: number) => MotionValue
-  )(50);
-  const animatedDiameter = (useTransform as any)(() =>
-    orbDiameterAt(
-      progress.get() * HANDOFF_DURATION_MS,
-      dotDiameter.get(),
-      orbDiameter,
-    ),
-  );
-  const orbOpacity = (useTransform as any)(progress, (value: number) =>
-    orbOpacityAt(value * HANDOFF_DURATION_MS),
-  );
-  const dotOpacity = (useTransform as any)(
-    orbOpacity,
-    (value: number) => 1 - value,
-  );
-  const orbScale = (useTransform as any)(
-    animatedDiameter,
-    (value: number) => value / orbDiameter,
-  );
-  const dotScale = (useTransform as any)(
-    () => animatedDiameter.get() / dotDiameter.get(),
-  );
-  const complete = () => {
-    if (
-      !isConnecting &&
-      (reduceMotion || progress.get() >= 1) &&
-      !handoffCompleted.current
-    ) {
-      handoffCompleted.current = true;
-      onHandoffComplete?.();
-    }
-  };
-  const effectComplete =
-    (
-      React.useEffectEvent as undefined | ((callback: () => void) => () => void)
-    )?.(complete) ?? complete;
-  React.useEffect(() => {
-    if (isConnecting) return;
-    const frame = requestAnimationFrame(effectComplete);
-    return () => cancelAnimationFrame(frame);
-  }, [isConnecting]);
-  const transition = reduceMotion ? reducedMotionTransition : orbTransition;
-  const onAnimationStart = () => {
-    const dot = dotRef.current;
-    if (isConnecting) {
-      dotMeasured.current = false;
-      handoffCompleted.current = false;
-      if (dot != null) dot.style.animationPlayState = "";
-      return;
-    }
-    dotMeasured.current = true;
-    if (dot == null) return;
-    const width = dot.getBoundingClientRect().width;
-    if (width > 0) dotDiameter.set(width);
-    dot.style.animationPlayState = "paused";
-  };
-  const onAnimationComplete = () => {
-    if (!isConnecting && !reduceMotion && dotMeasured.current) {
-      dotMeasured.current = false;
-      complete();
-    }
-  };
-  return jsx.jsxs(motion.div, {
-    "aria-hidden": true,
-    className: "relative flex items-center justify-center",
-    initial: false,
-    animate: { height: orbDiameter, width: orbDiameter },
-    transition,
-    children: [
-      jsx.jsx(motion.div, {
-        className: classNames(
-          "absolute inset-0",
-          isConnecting && "pointer-events-none",
-        ),
-        style: { opacity: orbOpacity, scale: orbScale },
-        children: orb,
-      }),
-      jsx.jsx(motion.div, {
-        className:
-          "pointer-events-none absolute inset-0 flex items-center justify-center",
-        style: { opacity: dotOpacity, scale: dotScale },
-        children: jsx.jsx(Dot, { ref: dotRef, reduceMotion }),
-      }),
-      jsx.jsx(motion.span, {
-        "aria-hidden": true,
-        animate: { opacity: +!isConnecting },
-        className: "pointer-events-none absolute size-0",
-        initial: false,
-        onAnimationStart,
-        onAnimationComplete,
-        style: { opacity: progress },
-        transition: {
-          duration: reduceMotion
-            ? 0
-            : isConnecting
-              ? 0.325
-              : HANDOFF_DURATION_MS / 1000,
-          ease: "linear",
-        },
-      }),
-    ],
-  });
 }
-
-const initializeRealtimeVoiceStageLayout = once(() => {
-  initializeCompilerRuntime();
-  initializeMotionComponents();
-  initializeTransforms();
-  initializeMotionRuntime();
-  initializeMotionValues();
-  React = getReactRuntime();
-  initializeVoiceMotion();
-  jsx = getJsxRuntime();
-});
-
-let stageFooterClass: string;
-let stageContentClass: string;
-let contentEnterTransform: string;
-let orbExitTransform: string;
-const initializeRealtimeVoiceStageConstants = once(() => {
-  stageFooterClass =
-    "pointer-events-none absolute inset-x-0 bottom-0 z-20 mx-auto h-52 w-full max-w-[900px] px-12";
-  stageContentClass =
-    "absolute inset-x-12 top-0 flex flex-col items-center gap-1";
-  contentEnterTransform = "translateY(52px)";
-  orbExitTransform = "translateY(-28px)";
-});
-
-export {
-  initializeRealtimeVoiceStageConstants as a,
-  orbExitTransform as i,
-  stageFooterClass as n,
-  RealtimeVoiceStageLayout as o,
-  contentEnterTransform as r,
-  initializeRealtimeVoiceStageLayout as s,
-  stageContentClass as t,
-};
+var A, j, M;
+function N() {
+  return (N = e(() => {
+    ((A = t()), s(), i(), d(), n(), (j = o()), O(), f(), (M = r()));
+  }))();
+}
+var P, F, I, L;
+function R() {
+  return (R = e(() => {
+    ((P = `pointer-events-none absolute inset-x-0 bottom-0 z-20 mx-auto h-52 w-full max-w-[900px] px-12`),
+      (F = `absolute inset-x-12 top-0 flex flex-col items-center gap-1`),
+      (I = `translateY(52px)`),
+      (L = `translateY(-28px)`));
+  }))();
+}
+export { R as a, L as i, P as n, k as o, I as r, N as s, F as t };

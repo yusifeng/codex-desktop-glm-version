@@ -1,90 +1,40 @@
-// Mermaid node-size capture runtime. Release chunk: sizeCapture-X5ZJPWSS-35cad884972a.js.
-import { n as setFunctionName } from "@rchunk/mermaid-function-name-runtime";
-
-interface CapturedNodeSize {
-  id: string;
-  width: number;
-  height: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/mermaid-function-name-runtime";
+var t = 1;
+function n() {
+  if (!(typeof globalThis > `u`)) return globalThis;
 }
-interface CapturedSizes {
-  metadata: { captureVersion: 1; capturedAt: string; capturedFrom: string };
-  nodes: CapturedNodeSize[];
+e(n, `getCaptureGlobal`);
+function r() {
+  return !!n()?.mermaidCaptureSizes;
 }
-type CaptureGlobal = typeof globalThis & {
-  mermaidCaptureSizes?: unknown;
-  mermaidCapturedSizes?: Array<{ svgId: string; sizes: CapturedSizes }>;
-  mermaidLastCapturedSizes?: { svgId: string; sizes: CapturedSizes };
-};
-interface SelectionLike {
-  node(): { id?: string; ownerSVGElement?: { id?: string } | null } | null;
+e(r, `shouldCaptureSizes`);
+function i() {
+  return typeof location > `u` ? `browser-dev` : `${location.pathname}${location.search}`;
 }
-interface LayoutNode {
-  id: string;
-  width?: number | null;
-  height?: number | null;
-  isGroup?: boolean;
+e(i, `capturedFromLocation`);
+function a(e, t) {
+  let r = n();
+  if (!r) return;
+  let i = t.node(),
+    a = ((i && `ownerSVGElement` in i ? i.ownerSVGElement : null) ?? i)?.id ?? `(unknown)`;
+  r.mermaidCapturedSizes ??= [];
+  let o = { svgId: a, sizes: e };
+  (r.mermaidCapturedSizes.push(o), (r.mermaidLastCapturedSizes = o));
 }
-
-const captureVersion = 1;
-function getCaptureGlobal(): CaptureGlobal | undefined {
-  return typeof globalThis === "undefined"
-    ? undefined
-    : (globalThis as CaptureGlobal);
-}
-setFunctionName(getCaptureGlobal, "getCaptureGlobal");
-function shouldCaptureSizes(): boolean {
-  return Boolean(getCaptureGlobal()?.mermaidCaptureSizes);
-}
-setFunctionName(shouldCaptureSizes, "shouldCaptureSizes");
-function capturedFromLocation(): string {
-  return typeof location === "undefined"
-    ? "browser-dev"
-    : location.pathname + location.search;
-}
-setFunctionName(capturedFromLocation, "capturedFromLocation");
-function emitCapturedSizes(
-  sizes: CapturedSizes,
-  selection: SelectionLike,
-): void {
-  const captureGlobal = getCaptureGlobal();
-  if (!captureGlobal) return;
-  const node = selection.node();
-  const svgId =
-    ((node && "ownerSVGElement" in node ? node.ownerSVGElement : null) ?? node)
-      ?.id ?? "(unknown)";
-  captureGlobal.mermaidCapturedSizes ??= [];
-  const captured = { svgId, sizes };
-  captureGlobal.mermaidCapturedSizes.push(captured);
-  captureGlobal.mermaidLastCapturedSizes = captured;
-}
-setFunctionName(emitCapturedSizes, "emitCapturedSizes");
-function captureNodeSizes(
-  selection: SelectionLike,
-  layout: { nodes: LayoutNode[] },
-): void {
-  const nodes: CapturedNodeSize[] = [];
-  for (const node of layout.nodes) {
-    if (!node.isGroup)
-      nodes.push({
-        id: node.id,
-        width: node.width ?? 0,
-        height: node.height ?? 0,
-      });
-  }
-  if (nodes.length !== 0) {
-    emitCapturedSizes(
+e(a, `emitCapturedSizes`);
+function o(e, n) {
+  let r = [];
+  for (let e of n.nodes)
+    e.isGroup || r.push({ id: e.id, width: e.width ?? 0, height: e.height ?? 0 });
+  r.length !== 0 &&
+    a(
       {
-        metadata: {
-          captureVersion,
-          capturedAt: new Date().toISOString(),
-          capturedFrom: capturedFromLocation(),
-        },
-        nodes,
+        metadata: { captureVersion: t, capturedAt: new Date().toISOString(), capturedFrom: i() },
+        nodes: r,
       },
-      selection,
+      e,
     );
-  }
 }
-setFunctionName(captureNodeSizes, "captureNodeSizes");
-
-export { captureNodeSizes };
+e(o, `captureNodeSizes`);
+export { o as captureNodeSizes };

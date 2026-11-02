@@ -1,60 +1,44 @@
-// Monopoly output rule: compare marginal revenue with marginal cost.
-import "@rchunk/rolldown-runtime";
-
-interface MonopolyValues { quantity?: number | null }
-interface MonopolyState { marginalRevenue: number; marginalCost: number; direction: "expand" | "reduce" | "stop" }
-
-const quantityControl = { min: 5, max: 45, step: 1, defaultValue: 30 };
-const monopolyGraphBounds = { quantityMin: 0, quantityMax: 55, valueMin: 0, valueMax: 105 };
-const defaultMonopolyValues = { quantity: quantityControl.defaultValue };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-const normalizeMonopolyValues = (values: MonopolyValues) => ({
-  quantity:
-    typeof values.quantity === "number" && Number.isFinite(values.quantity)
-      ? clamp(values.quantity, quantityControl.min, quantityControl.max)
-      : quantityControl.defaultValue,
-});
-const demandPrice = (quantity: number): number => 100 - quantity;
-const marginalRevenue = (quantity: number): number => 100 - 2 * quantity;
-const marginalCost = (quantity: number): number => 10 + quantity;
-const optimumQuantity = 30;
-
-function calculateMonopolyPricing(values: MonopolyValues) {
-  const normalized = normalizeMonopolyValues(values);
-  const revenue = marginalRevenue(normalized.quantity);
-  const cost = marginalCost(normalized.quantity);
-  const difference = revenue - cost;
-  return {
-    ...normalized,
-    price: demandPrice(normalized.quantity),
-    marginalRevenue: revenue,
-    marginalCost: cost,
-    optimumQuantity,
-    optimumPrice: demandPrice(optimumQuantity),
-    direction: Math.abs(difference) < 1e-9 ? "stop" : difference > 0 ? "expand" : "reduce",
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    ((t = { min: 5, max: 45, step: 1, defaultValue: 30 }),
+      (n = { quantityMin: 0, quantityMax: 55, valueMin: 0, valueMax: 105 }),
+      (r = { quantity: t.defaultValue }),
+      (i = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (a = (e) => ({
+        quantity: Number.isFinite(e.quantity)
+          ? i(e.quantity ?? t.defaultValue, t.min, t.max)
+          : t.defaultValue,
+      })),
+      (o = (e) => 100 - e),
+      (s = (e) => 100 - 2 * e),
+      (c = (e) => 10 + e),
+      (l = 30),
+      (u = (e) => {
+        let t = a(e),
+          n = s(t.quantity),
+          r = c(t.quantity),
+          i = n - r;
+        return {
+          ...t,
+          price: o(t.quantity),
+          marginalRevenue: n,
+          marginalCost: r,
+          optimumQuantity: l,
+          optimumPrice: o(l),
+          direction: Math.abs(i) < 1e-9 ? `stop` : i > 0 ? `expand` : `reduce`,
+        };
+      }),
+      (d = (e) => {
+        if (e.direction === `stop`) return 1;
+        for (let t = 1; t <= 10; t += 1) {
+          let n = 10 ** t;
+          if (Math.round(e.marginalRevenue * n) !== Math.round(e.marginalCost * n)) return t;
+        }
+        return 10;
+      }));
+  }))();
 }
-
-function requiredComparisonPrecision(state: MonopolyState): number {
-  if (state.direction === "stop") return 1;
-  for (let digits = 1; digits <= 10; digits += 1) {
-    const scale = 10 ** digits;
-    if (Math.round(state.marginalRevenue * scale) !== Math.round(state.marginalCost * scale)) return digits;
-  }
-  return 10;
-}
-
-function initializeMonopolyPricingModel(): void {}
-
-export {
-  demandPrice as a,
-  requiredComparisonPrecision as c,
-  calculateMonopolyPricing as i,
-  initializeMonopolyPricingModel as l,
-  defaultMonopolyValues as n,
-  marginalCost as o,
-  quantityControl as r,
-  marginalRevenue as s,
-  monopolyGraphBounds as t,
-  normalizeMonopolyValues as u,
-};
+export { o as a, d as c, u as i, f as l, r as n, c as o, t as r, s, n as t, a as u };

@@ -1,11 +1,4 @@
-import {
-  n as ensurePopcornSpreadsheetFontsLoadedExport,
-  r as initializePortableThumbnailFonts,
-  t as arePopcornSpreadsheetFontsReadyExport,
-} from "@rchunk/portable-thumbnail-font-runtime";
-
-initializePortableThumbnailFonts();
-const ensurePopcornSpreadsheetFontsLoaded =
-  ensurePopcornSpreadsheetFontsLoadedExport;
-const arePopcornSpreadsheetFontsReady = arePopcornSpreadsheetFontsReadyExport;
-export { arePopcornSpreadsheetFontsReady, ensurePopcornSpreadsheetFontsLoaded };
+// @ts-nocheck
+import { n as e, r as t, t as n } from "@rchunk/portable-thumbnail-font-runtime";
+t();
+export { n as arePopcornSpreadsheetFontsReady, e as ensurePopcornSpreadsheetFontsLoaded };

@@ -1,34 +1,32 @@
-// Absolute-value distance learning model: interpret |x| as distance from zero.
-import "@rchunk/rolldown-runtime";
-
-interface AbsoluteValueInput { x?: number | null }
-
-const absoluteValueSchema = {
-  type: "ABSOLUTE_VALUE_DISTANCE",
-  version: 1,
-  thumbnailAssetKey: "absolute-value-distance-v1",
-  canonicalFormula: "|x|",
-  parameters: { x: { kind: "number", defaultValue: -3, min: -6, max: 6 } },
-};
-const inputStep = 0.5;
-const inputControl = {
-  min: absoluteValueSchema.parameters.x.min,
-  max: absoluteValueSchema.parameters.x.max,
-  step: inputStep,
-  defaultValue: absoluteValueSchema.parameters.x.defaultValue,
-};
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-const normalizeX = (value: number | null | undefined): number => {
-  if (!Number.isFinite(value)) return inputControl.defaultValue;
-  const normalized = clamp(value ?? inputControl.defaultValue, inputControl.min, inputControl.max);
-  return Object.is(normalized, -0) ? 0 : normalized;
-};
-const calculateAbsoluteValueDistance = (input: AbsoluteValueInput) => {
-  const x = normalizeX(input.x);
-  return { x, distance: Math.abs(x), isNegative: x < 0 };
-};
-const formatCoordinate = (value: number): string => Number(value.toFixed(1)).toString();
-function initializeAbsoluteValueSchema(): void {}
-function initializeAbsoluteValueModel(): void {}
-
-export { initializeAbsoluteValueModel as a, absoluteValueSchema as c, calculateAbsoluteValueDistance as i, inputStep as n, normalizeX as o, formatCoordinate as r, initializeAbsoluteValueSchema as s, inputControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `ABSOLUTE_VALUE_DISTANCE`),
+      (n = `absolute-value-distance-v1`),
+      (r = { x: { kind: `number`, defaultValue: -3, min: -6, max: 6 } }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: `|x|`, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f;
+function p() {
+  return (p = e(() => {
+    (a(),
+      ({ x: o } = i.parameters),
+      (s = 0.5),
+      (c = { min: o.min, max: o.max, step: s, defaultValue: o.defaultValue }),
+      (l = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (u = (e) => {
+        if (!Number.isFinite(e)) return c.defaultValue;
+        let t = l(e ?? c.defaultValue, c.min, c.max);
+        return Object.is(t, -0) ? 0 : t;
+      }),
+      (d = (e) => {
+        let t = u(e.x);
+        return { x: t, distance: Math.abs(t), isNegative: t < 0 };
+      }),
+      (f = (e) => Number(e.toFixed(1)).toString()));
+  }))();
+}
+export { p as a, i as c, d as i, s as n, u as o, f as r, a as s, c as t };

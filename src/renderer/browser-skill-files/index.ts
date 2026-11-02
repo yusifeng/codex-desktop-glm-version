@@ -1,149 +1,77 @@
-import "@rchunk/rolldown-runtime";
-import {
-  FX as initializeSignalRuntime,
-  QI as initializeQueryRuntime,
-  QX as createQueryFamily,
-  ZI as appScope,
-} from "@rchunk/app-shared";
-import {
-  _dn as desktopFetch,
-  cJt as initializeAuthentication,
-  oJt as getRequestHeaders,
-  rJt as apiClient,
-  ydn as initializeApiRuntime,
-} from "@rchunk/app-initial";
-import {
-  d as browserSkillsIdentitySignal,
-  n as initializeBrowserSkillsState,
-  s as browserSkillsEnabledSignal,
-} from "@rchunk/browser-skills-state";
-
-interface BrowserSkillFileRange {
-  length: number;
-  start: number;
-}
-
-interface BrowserSkillWithFiles extends Record<string, unknown> {
-  check_sum_hash?: string | null;
-  files: Record<string, BrowserSkillFileRange | undefined>;
-  id: string;
-  permissions?: { can_read?: boolean };
-  sediment_id?: string | null;
-}
-
-interface BrowserSkillFileParameters {
-  path: string;
-  skill: BrowserSkillWithFiles;
-}
-
-async function fetchBrowserSkillFile(
-  accountId: string,
-  skill: BrowserSkillWithFiles,
-  path: string,
-  signal?: AbortSignal,
-): Promise<ArrayBuffer> {
-  if (!skill.sediment_id) {
-    const response = await desktopFetch
-      .getInstance()
-      .fetch(`/hazelnuts/${encodeURIComponent(skill.id)}/files/download`, {
-        method: "POST",
-        headers: {
-          ...getRequestHeaders(),
-          "ChatGPT-Account-ID": accountId,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ path }),
-      });
-    return response.arrayBuffer();
-  }
-  const file = skill.files[path];
-  if (file == null) throw new Error("Skill file is missing");
-  if (file.length === 0) return new ArrayBuffer(0);
-  const { download_url: downloadUrl } = await apiClient.safePost<{
-    download_url?: string | null;
-  }>("/hazelnuts/{hazelnut_id}/files/get_download_link", {
-    additionalHeaders: { "ChatGPT-Account-ID": accountId },
-    parameters: { path: { hazelnut_id: skill.id } },
-    requestBody: { file_id: skill.sediment_id },
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, QI as n, QX as r, ZI as i } from "@rchunk/app-shared";
+import { _dn as a, cJt as o, oJt as s, rJt as c, ydn as l } from "@rchunk/app-initial";
+import { d as u, n as d, s as f } from "@rchunk/browser-skills-state";
+async function p(e, t, n, r) {
+  if (!t.sediment_id)
+    return (
+      await a
+        .getInstance()
+        .fetch(`/hazelnuts/${encodeURIComponent(t.id)}/files/download`, {
+          method: `POST`,
+          headers: { ...s(), "ChatGPT-Account-ID": e, "Content-Type": `application/json` },
+          body: JSON.stringify({ path: n }),
+        })
+    ).arrayBuffer();
+  let i = t.files[n];
+  if (i == null) throw Error(`Skill file is missing`);
+  if (i.length === 0) return new ArrayBuffer(0);
+  let { download_url: o } = await c.safePost(`/hazelnuts/{hazelnut_id}/files/get_download_link`, {
+    additionalHeaders: { "ChatGPT-Account-ID": e },
+    parameters: { path: { hazelnut_id: t.id } },
+    requestBody: { file_id: t.sediment_id },
   });
-  if (!downloadUrl) throw new Error("Skill download URL is missing");
-  const response = await fetch(downloadUrl, {
-    credentials: "omit",
-    headers: { Range: `bytes=${file.start}-${file.start + file.length - 1}` },
-    signal,
+  if (!o) throw Error(`Skill download URL is missing`);
+  let l = await fetch(o, {
+    credentials: `omit`,
+    headers: { Range: `bytes=${i.start}-${i.start + i.length - 1}` },
+    signal: r,
   });
-  if (!response.ok) throw new Error("Skill file download failed");
-  let bytes = await response.arrayBuffer();
-  if (response.status === 206) {
-    const contentRange = response.headers.get("Content-Range");
-    if (contentRange != null) {
-      const match = /^bytes (\d+)-(\d+)\/(?:\d+|\*)$/iu.exec(contentRange);
-      if (
-        match == null ||
-        Number(match[1]) !== file.start ||
-        Number(match[2]) !== file.start + file.length - 1
-      ) {
-        throw new Error("Mismatched skill file range");
-      }
+  if (!l.ok) throw Error(`Skill file download failed`);
+  let u = await l.arrayBuffer();
+  if (l.status === 206) {
+    let e = l.headers.get(`Content-Range`);
+    if (e != null) {
+      let t = /^bytes (\d+)-(\d+)\/(?:\d+|\*)$/iu.exec(e);
+      if (t == null || Number(t[1]) !== i.start || Number(t[2]) !== i.start + i.length - 1)
+        throw Error(`Mismatched skill file range`);
     }
-  } else if (response.status === 200) {
-    bytes = bytes.slice(file.start, file.start + file.length);
-  } else {
-    throw new Error("Unexpected skill file response");
-  }
-  if (bytes.byteLength !== file.length) {
-    throw new Error("Incomplete skill file");
-  }
-  return bytes;
+  } else if (l.status === 200) u = u.slice(i.start, i.start + i.length);
+  else throw Error(`Unexpected skill file response`);
+  if (u.byteLength !== i.length) throw Error(`Incomplete skill file`);
+  return u;
 }
-
-let browserSkillFileQuery: ReturnType<typeof createQueryFamily>;
-let initialized = false;
-function initializeBrowserSkillFiles(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeSignalRuntime();
-  initializeAuthentication();
-  initializeQueryRuntime();
-  initializeApiRuntime();
-  initializeBrowserSkillsState();
-  browserSkillFileQuery = createQueryFamily(
-    appScope,
-    ({ skill, path }: BrowserSkillFileParameters, { get }) => {
-      const identity = get(browserSkillsIdentitySignal);
-      return {
-        queryKey: [
-          "browser-skills",
-          identity?.accountId,
-          identity?.userId,
-          "file",
-          skill.id,
-          skill.sediment_id,
-          skill.check_sum_hash,
-          path,
-        ],
-        enabled:
-          identity != null &&
-          get(browserSkillsEnabledSignal) === true &&
-          skill.permissions?.can_read !== false,
-        staleTime: 300_000,
-        queryFn: async ({ signal }) => {
-          if (identity == null) throw new Error("Skills account unavailable");
-          const bytes = await fetchBrowserSkillFile(
-            identity.accountId,
-            skill,
-            path,
-            signal,
-          );
-          return new TextDecoder().decode(bytes);
-        },
-      };
-    },
-  );
+var m;
+function h() {
+  return (h = e(() => {
+    (t(),
+      o(),
+      n(),
+      l(),
+      d(),
+      (m = r(i, ({ skill: e, path: t }, { get: n }) => {
+        let r = n(u);
+        return {
+          queryKey: [
+            `browser-skills`,
+            r?.accountId,
+            r?.userId,
+            `file`,
+            e.id,
+            e.sediment_id,
+            e.check_sum_hash,
+            t,
+          ],
+          enabled: r != null && n(f) === !0 && e.permissions?.can_read !== !1,
+          staleTime: 3e5,
+          queryFn: async ({ signal: n }) => {
+            if (r == null) throw Error(`Skills account unavailable`);
+            let i = await p(r.accountId, e, t, n);
+            return new TextDecoder().decode(i);
+          },
+        };
+      })));
+  }))();
 }
-
-export {
-  initializeBrowserSkillFiles as n,
-  browserSkillFileQuery as r,
-  fetchBrowserSkillFile as t,
-};
+export { h as n, m as r, p as t };

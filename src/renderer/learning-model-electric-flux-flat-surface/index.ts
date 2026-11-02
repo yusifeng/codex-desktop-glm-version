@@ -1,18 +1,17 @@
-// Electric-flux-through-a-flat-surface manifest. Release chunk: type-36d833db1430.js.
-import "@rchunk/rolldown-runtime";
-
-const electricFluxFlatSurfaceSpecification = {
-  type: "ELECTRIC_FLUX_FLAT_SURFACE",
-  version: 1,
-  thumbnailAssetKey: "electric-flux-flat-surface-v1",
-  canonicalFormula: "\\Phi_E = EA\\cos(\\theta)",
-  parameters: {
-    fieldStrengthNewtonsPerCoulomb: { kind: "number" as const, defaultValue: 6, min: 0, max: 10 },
-    areaSquareMeters: { kind: "number" as const, defaultValue: 3, min: 0.5, max: 5 },
-    angleDegrees: { kind: "number" as const, defaultValue: 30, min: 0, max: 90 },
-  },
-};
-
-function initializeElectricFluxFlatSurfaceSpecification(): void {}
-
-export { electricFluxFlatSurfaceSpecification as n, initializeElectricFluxFlatSurfaceSpecification as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `ELECTRIC_FLUX_FLAT_SURFACE`),
+      (n = `electric-flux-flat-surface-v1`),
+      (r = `\\Phi_E = EA\\cos(\\theta)`),
+      (i = {
+        fieldStrengthNewtonsPerCoulomb: { kind: `number`, defaultValue: 6, min: 0, max: 10 },
+        areaSquareMeters: { kind: `number`, defaultValue: 3, min: 0.5, max: 5 },
+        angleDegrees: { kind: `number`, defaultValue: 30, min: 0, max: 90 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+export { a as n, o as t };

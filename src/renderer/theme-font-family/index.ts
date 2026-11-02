@@ -1,71 +1,36 @@
-import "@rchunk/rolldown-runtime";
-
-export interface ThemeFontFace {
-  family: string;
-  fullName: string;
-  postscriptName: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e, t) {
+  return e == null || t == null || !r(e, t) ? e : `"${o(n(t))}", ${e}`;
 }
-
-function selectedFontAlias(fontFace: ThemeFontFace): string {
-  return `Codex selected ${fontFace.postscriptName}`;
+function n(e) {
+  return `Codex selected ${e.postscriptName}`;
 }
-
-function firstFontFamily(fontFamily: string): string {
-  let quote: string | null = null;
-  for (let index = 0; index < fontFamily.length; index += 1) {
-    const character = fontFamily[index];
-    if (character === "\\") index += 1;
-    else if (quote != null) {
-      if (character === quote) quote = null;
-    } else if (character === '"' || character === "'") quote = character;
-    else if (character === ",") return fontFamily.slice(0, index).trim();
+function r(e, t) {
+  return i(e)?.toLowerCase() === t.family.toLowerCase();
+}
+function i(e) {
+  return e == null
+    ? void 0
+    : a(e)
+        .replace(/^["']|["']$/g, ``)
+        .replace(/\\(.)/gsu, `$1`) || void 0;
+}
+function a(e) {
+  let t = null;
+  for (let n = 0; n < e.length; n += 1) {
+    let r = e[n];
+    if (r === `\\`) n += 1;
+    else if (t != null) r === t && (t = null);
+    else if (r === `"` || r === `'`) t = r;
+    else if (r === `,`) return e.slice(0, n).trim();
   }
-  return fontFamily.trim();
+  return e.trim();
 }
-
-function unquoteFontFamily(fontFamily?: string | null): string | undefined {
-  if (fontFamily == null) return undefined;
-  return (
-    firstFontFamily(fontFamily)
-      .replace(/^["']|["']$/g, "")
-      .replace(/\\(.)/gsu, "$1") || undefined
-  );
+function o(e) {
+  return e.replaceAll(`\\`, `\\\\`).replaceAll(`"`, `\\"`);
 }
-
-function fontFamilyMatches(
-  fontFamily: string | null | undefined,
-  fontFace: ThemeFontFace,
-): boolean {
-  return (
-    unquoteFontFamily(fontFamily)?.toLowerCase() ===
-    fontFace.family.toLowerCase()
-  );
+function s() {
+  return (s = e(() => {}))();
 }
-
-function escapeFontFamily(fontFamily: string): string {
-  return fontFamily.replaceAll("\\", "\\\\").replaceAll('"', '\\"');
-}
-
-function prependSelectedFont(
-  fontFamily: string | null | undefined,
-  fontFace: ThemeFontFace | null | undefined,
-): string | null | undefined {
-  if (
-    fontFamily == null ||
-    fontFace == null ||
-    !fontFamilyMatches(fontFamily, fontFace)
-  )
-    return fontFamily;
-  return `"${escapeFontFamily(selectedFontAlias(fontFace))}", ${fontFamily}`;
-}
-
-function initializeThemeFontFamily(): void {}
-export {
-  selectedFontAlias as a,
-  firstFontFamily as i,
-  escapeFontFamily as n,
-  prependSelectedFont as o,
-  unquoteFontFamily as r,
-  initializeThemeFontFamily as s,
-  fontFamilyMatches as t,
-};
+export { n as a, a as i, o as n, t as o, i as r, s, r as t };

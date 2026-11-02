@@ -1,50 +1,16 @@
-// Successive percent-change controls. Release chunk: type-dbcd7d4a7976.js.
-import "@rchunk/rolldown-runtime";
-interface Specification {
-  type: "SUCCESSIVE_PERCENT_CHANGE";
-  version: 1;
-  thumbnailAssetKey: "successive-percent-change-v1";
-  canonicalFormula: string;
-  parameters: {
-    firstChangePercent: {
-      kind: "number";
-      defaultValue: 50;
-      min: -95;
-      max: 100;
-    };
-    secondChangePercent: {
-      kind: "number";
-      defaultValue: -50;
-      min: -100;
-      max: 100;
-    };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `SUCCESSIVE_PERCENT_CHANGE`),
+      (n = `successive-percent-change-v1`),
+      (r = `100\\left(1+\\frac{p_1}{100}\\right)\\left(1+\\frac{p_2}{100}\\right)`),
+      (i = {
+        firstChangePercent: { kind: `number`, defaultValue: 50, min: -95, max: 100 },
+        secondChangePercent: { kind: `number`, defaultValue: -50, min: -100, max: 100 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-let specification: Specification;
-let initialized = false;
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  specification = {
-    type: "SUCCESSIVE_PERCENT_CHANGE",
-    version: 1,
-    thumbnailAssetKey: "successive-percent-change-v1",
-    canonicalFormula:
-      "100\\left(1+\\frac{p_1}{100}\\right)\\left(1+\\frac{p_2}{100}\\right)",
-    parameters: {
-      firstChangePercent: {
-        kind: "number",
-        defaultValue: 50,
-        min: -95,
-        max: 100,
-      },
-      secondChangePercent: {
-        kind: "number",
-        defaultValue: -50,
-        min: -100,
-        max: 100,
-      },
-    },
-  };
-}
-export { specification as n, initialize as t };
+export { a as n, o as t };

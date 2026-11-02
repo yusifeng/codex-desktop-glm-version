@@ -1,33 +1,26 @@
-import { n as defineInitializer } from "@rchunk/rolldown-runtime";
-import { H4 as objectSchema, R4 as optionalSchema, V4 as numberSchema, g4 as initializeSchemaRuntime, q4 as stringSchema } from "@rchunk/app-shared";
-import { GGt as initializeImageDownload, HGt as initializeImageCheckout, krt as initializeImageAssets } from "@rchunk/app-initial";
-
-export interface PendingCheckoutImageDownloadOptions {
-  hasPaidSubscription: boolean;
-  intl: unknown;
-  signal: AbortSignal;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { H4 as t, R4 as n, V4 as r, g4 as i, q4 as a } from "@rchunk/app-shared";
+import { GGt as o, HGt as s, krt as c } from "@rchunk/app-initial";
+async function l({ hasPaidSubscription: e, intl: t, signal: n }) {}
+function u() {
+  return (u = e(() => {
+    (i(),
+      o(),
+      c(),
+      s(),
+      t({
+        asset: t({
+          asset_pointer: a().min(1),
+          content_type: n(`image_asset_pointer`),
+          width: r(),
+          height: r(),
+          size_bytes: r(),
+        }),
+        conversationId: a().optional(),
+        createdAt: r(),
+      }));
+  }))();
 }
-
-async function resumePendingCheckoutImageDownload(_options: PendingCheckoutImageDownloadOptions): Promise<void> {}
-
-const initializePendingImageDownload = (defineInitializer as (factory: () => void) => () => void)(() => {
-  initializeSchemaRuntime();
-  initializeImageDownload();
-  initializeImageAssets();
-  initializeImageCheckout();
-  objectSchema({
-    asset: objectSchema({
-      asset_pointer: stringSchema().min(1),
-      content_type: optionalSchema("image_asset_pointer"),
-      width: numberSchema(),
-      height: numberSchema(),
-      size_bytes: numberSchema(),
-    }),
-    conversationId: stringSchema().optional(),
-    createdAt: numberSchema(),
-  });
-});
-
-initializePendingImageDownload();
-
-export { resumePendingCheckoutImageDownload };
+u();
+export { l as resumePendingCheckoutImageDownload };

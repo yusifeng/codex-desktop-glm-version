@@ -1,76 +1,39 @@
-// hooks-settings-route —— Hooks 设置页 URL 与查询参数同步工具。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as hooksSettingsModelChunk from "@rchunk/hooks-settings-model";
-void runtimeChunk;
-
-const { p: initializeHooksSettingsModel } = hooksSettingsModelChunk;
-
-type HooksSettingsSource =
-  | { source: "project"; projectRoot: string }
-  | { source: "plugin"; pluginId?: string | null }
-  | { source: string; projectRoot?: string; pluginId?: string | null };
-
-interface HooksSettingsRouteOptions {
-  hostId?: string;
-  pluginId?: string | null;
-  projectRoot?: string;
-  source?: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { p as t } from "@rchunk/hooks-settings-model";
+function n({ hostId: e, pluginId: t, projectRoot: n, source: r }) {
+  let i = new URLSearchParams();
+  (e != null && i.set(`hostId`, e),
+    r != null && i.set(`source`, r),
+    r != null && n != null && i.set(`projectRoot`, n),
+    r === `plugin` && t !== void 0 && i.set(`pluginId`, t ?? `__unknown__`));
+  let o = i.toString();
+  return o === `` ? a : `${a}?${o}`;
 }
-
-const UNKNOWN_PLUGIN_ID = "__unknown__";
-let hooksSettingsSegment: string;
-let settingsRoot: string;
-
-function buildHooksSettingsPath({
-  hostId,
-  pluginId,
-  projectRoot,
-  source,
-}: HooksSettingsRouteOptions): string {
-  const params = new URLSearchParams();
-  if (hostId != null) params.set("hostId", hostId);
-  if (source != null) params.set("source", source);
-  if (source != null && projectRoot != null)
-    params.set("projectRoot", projectRoot);
-  if (source === "plugin" && pluginId !== undefined)
-    params.set("pluginId", pluginId ?? UNKNOWN_PLUGIN_ID);
-  const query = params.toString();
-  return query === "" ? hooksSettingsSegment : `${hooksSettingsSegment}?${query}`;
+function r({ hostId: e, pluginId: t, projectRoot: r, source: i }) {
+  return `${o}/${n({ hostId: e, pluginId: t, projectRoot: r, source: i })}`;
 }
-
-function buildHooksSettingsUrl(options: HooksSettingsRouteOptions): string {
-  return `${settingsRoot}/${buildHooksSettingsPath(options)}`;
-}
-
-function updateHooksSettingsSearchParams(
-  params: URLSearchParams,
-  hostId: string,
-  selection: HooksSettingsSource | null,
-): void {
-  for (const key of ["hostId", "pluginId", "projectRoot", "source"])
-    params.delete(key);
-  if (selection == null) return;
-  params.set("hostId", hostId);
-  params.set("source", selection.source);
-  if (selection.source === "project") {
-    params.set("projectRoot", selection.projectRoot);
-    return;
+function i(e, t, n) {
+  if (
+    (e.delete(`hostId`),
+    e.delete(`pluginId`),
+    e.delete(`projectRoot`),
+    e.delete(`source`),
+    n != null)
+  ) {
+    if ((e.set(`hostId`, t), e.set(`source`, n.source), n.source === `project`)) {
+      e.set(`projectRoot`, n.projectRoot);
+      return;
+    }
+    n.source === `plugin` &&
+      n.pluginId !== void 0 &&
+      e.set(`pluginId`, n.pluginId ?? `__unknown__`);
   }
-  if (selection.source === "plugin" && selection.pluginId !== undefined)
-    params.set("pluginId", selection.pluginId ?? UNKNOWN_PLUGIN_ID);
 }
-
-function initializeHooksSettingsRoute(): void {
-  initializeHooksSettingsModel();
-  hooksSettingsSegment = "hooks-settings";
-  settingsRoot = "/settings";
+var a, o;
+function s() {
+  return (s = e(() => {
+    (t(), (a = `hooks-settings`), (o = `/settings`));
+  }))();
 }
-
-initializeHooksSettingsRoute();
-
-export {
-  updateHooksSettingsSearchParams as i,
-  buildHooksSettingsPath as n,
-  initializeHooksSettingsRoute as r,
-  buildHooksSettingsUrl as t,
-};
+export { i, n, s as r, r as t };

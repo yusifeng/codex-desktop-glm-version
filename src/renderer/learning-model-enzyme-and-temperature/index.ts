@@ -1,64 +1,62 @@
-// Enzyme-and-temperature learning model: collision gains followed by denaturation.
-import "@rchunk/rolldown-runtime";
-
-interface EnzymeTemperatureValues { temperatureCelsius?: number | null }
-
-const enzymeTemperatureType = "ENZYME_AND_TEMPERATURE";
-const enzymeTemperatureThumbnail = "enzyme-and-temperature-v1";
-const enzymeTemperatureParameters = { temperatureCelsius: { kind: "number", defaultValue: 25, min: 0, max: 70 } };
-const enzymeTemperatureDefinition = { type: enzymeTemperatureType, version: 1, thumbnailAssetKey: enzymeTemperatureThumbnail, parameters: enzymeTemperatureParameters };
-const temperatureParameter = enzymeTemperatureDefinition.parameters.temperatureCelsius;
-const enzymeTemperatureControl = { min: temperatureParameter.min, max: temperatureParameter.max, step: 1, defaultValue: temperatureParameter.defaultValue, optimum: 40 };
-const collisionRate = 0.045;
-const minimumMolecularSpeed = 0.45;
-const molecularSpeedExponent = 1.25;
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeTemperature = (value: number | null | undefined): number => {
-  const temperature = Number.isFinite(value) ? value ?? enzymeTemperatureControl.defaultValue : enzymeTemperatureControl.defaultValue;
-  return clamp(temperature, enzymeTemperatureControl.min, enzymeTemperatureControl.max);
-};
-const collisionFactor = (temperature: number): number => Math.exp(collisionRate * (temperature - enzymeTemperatureControl.optimum));
-const activeEnzymeFraction = (temperature: number): number => temperature <= enzymeTemperatureControl.optimum
-  ? 1
-  : Math.exp(-0.018 * (temperature - enzymeTemperatureControl.optimum) ** 2);
-const relativeEnzymeActivity = (temperature: number): number => clamp(
-  temperature <= enzymeTemperatureControl.optimum ? collisionFactor(temperature) : activeEnzymeFraction(temperature),
-  0,
-  1,
-);
-const molecularSpeed = (temperature: number): number => {
-  const normalized = (normalizeTemperature(temperature) - enzymeTemperatureControl.min) / (enzymeTemperatureControl.max - enzymeTemperatureControl.min);
-  return minimumMolecularSpeed + 1.7500000000000002 * normalized ** molecularSpeedExponent;
-};
-const classifyEnzymeState = (temperature: number, denaturedFraction: number): "cold" | "warming" | "optimal" | "denaturing" | "denatured" =>
-  temperature < 18 ? "cold" : temperature < 37 ? "warming" : temperature <= 43 ? "optimal" : denaturedFraction < 0.8 ? "denaturing" : "denatured";
-
-function deriveEnzymeTemperatureState(values: EnzymeTemperatureValues) {
-  const temperatureCelsius = normalizeTemperature(values.temperatureCelsius);
-  const collision = collisionFactor(temperatureCelsius);
-  const activeFraction = activeEnzymeFraction(temperatureCelsius);
-  const denaturedFraction = 1 - activeFraction;
-  const relativeActivity = relativeEnzymeActivity(temperatureCelsius);
-  return {
-    temperatureCelsius,
-    relativeActivity,
-    activityPercent: Math.round(relativeActivity * 100),
-    collisionFactor: collision,
-    molecularSpeed: molecularSpeed(temperatureCelsius),
-    activeFraction,
-    denaturedFraction,
-    state: classifyEnzymeState(temperatureCelsius, denaturedFraction),
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `ENZYME_AND_TEMPERATURE`),
+      (n = `enzyme-and-temperature-v1`),
+      (r = { temperatureCelsius: { kind: `number`, defaultValue: 25, min: 0, max: 70 } }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-function initializeEnzymeTemperatureSchema(): void {}
-function initializeEnzymeTemperatureModel(): void {}
-
-export {
-  initializeEnzymeTemperatureSchema as a,
-  initializeEnzymeTemperatureModel as i,
-  deriveEnzymeTemperatureState as n,
-  enzymeTemperatureDefinition as o,
-  relativeEnzymeActivity as r,
-  enzymeTemperatureControl as t,
-};
+var o, s, c, l, u, d, f, p, m, h, g, _, v;
+function y() {
+  return (y = e(() => {
+    (a(),
+      (o = i.parameters.temperatureCelsius),
+      (s = { min: o.min, max: o.max, step: 1, defaultValue: o.defaultValue, optimum: 40 }),
+      (c = 0.045),
+      (l = 0.45),
+      (u = 1.25),
+      (d = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (f = (e) => {
+        let t = Number.isFinite(e) ? (e ?? s.defaultValue) : s.defaultValue;
+        return d(t, s.min, s.max);
+      }),
+      (p = (e) => Math.exp(c * (e - s.optimum))),
+      (m = (e) => (e <= s.optimum ? 1 : Math.exp(-0.018 * (e - s.optimum) ** 2))),
+      (h = (e) => d(e <= s.optimum ? p(e) : m(e), 0, 1)),
+      (g = (e) => {
+        let t = (f(e) - s.min) / (s.max - s.min);
+        return l + 1.7500000000000002 * t ** u;
+      }),
+      (_ = (e, t) =>
+        e < 18
+          ? `cold`
+          : e < 37
+            ? `warming`
+            : e <= 43
+              ? `optimal`
+              : t < 0.8
+                ? `denaturing`
+                : `denatured`),
+      (v = (e) => {
+        let t = f(e.temperatureCelsius),
+          n = p(t),
+          r = m(t),
+          i = 1 - r,
+          a = h(t);
+        return {
+          temperatureCelsius: t,
+          relativeActivity: a,
+          activityPercent: Math.round(a * 100),
+          collisionFactor: n,
+          molecularSpeed: g(t),
+          activeFraction: r,
+          denaturedFraction: i,
+          state: _(t, i),
+        };
+      }));
+  }))();
+}
+export { a, y as i, v as n, i as o, h as r, s as t };

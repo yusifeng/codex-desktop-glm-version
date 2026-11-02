@@ -1,31 +1,12 @@
-// Similar-triangle scale metadata. Release chunk: type-d56e7431251b.js.
-import "@rchunk/rolldown-runtime";
-
-interface SimilarTrianglesSpecification {
-  type: "SIMILAR_TRIANGLES";
-  version: 1;
-  thumbnailAssetKey: "similar-triangles-v1";
-  parameters: {
-    scale: { kind: "number"; defaultValue: 1.4; min: 0.5; max: 2 };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `SIMILAR_TRIANGLES`),
+      (n = `similar-triangles-v1`),
+      (r = { scale: { kind: `number`, defaultValue: 1.4, min: 0.5, max: 2 } }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-let similarTrianglesSpecification: SimilarTrianglesSpecification;
-let initialized = false;
-function initializeSimilarTrianglesSpecification(): void {
-  if (initialized) return;
-  initialized = true;
-  similarTrianglesSpecification = {
-    type: "SIMILAR_TRIANGLES",
-    version: 1,
-    thumbnailAssetKey: "similar-triangles-v1",
-    parameters: {
-      scale: { kind: "number", defaultValue: 1.4, min: 0.5, max: 2 },
-    },
-  };
-}
-
-export {
-  similarTrianglesSpecification as n,
-  initializeSimilarTrianglesSpecification as t,
-};
+export { i as n, a as t };

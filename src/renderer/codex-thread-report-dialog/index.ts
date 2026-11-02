@@ -1,255 +1,237 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
-import {
-  $3 as initializeCompilerRuntime,
-  I3 as getJsxRuntime,
-  K2 as initializeInternationalization,
-  Y2 as FormattedMessage,
-} from "@rchunk/app-shared";
-import type { JsxRuntime } from "@rchunk/app-shared";
-import {
-  _dn as desktopHttpClient,
-  fdn as authenticatedHeaders,
-  pdn as initializeDesktopHttpClient,
-  ydn as initializeAuthenticatedHeaders,
-} from "@rchunk/app-initial";
-import {
-  n as initializeReportDialog,
-  t as ReportDialog,
-} from "@rchunk/report-dialog-core";
-
-interface ReportReason {
-  id: string;
-  [key: string]: unknown;
-}
-interface ReportRequestResponse {
-  json(): Promise<unknown>;
-  ok: boolean;
-}
-type ReportRequest = (
-  path: string,
-  options?: Record<string, unknown>,
-) => Promise<ReportRequestResponse>;
-interface AdReport {
-  loadReasons(signal: AbortSignal): Promise<unknown>;
-  queryKey?: readonly unknown[];
-  submit(
-    input: { details?: string; id: string },
-    additionalFields?: Record<string, string>,
-  ): Promise<unknown>;
-  title?: unknown;
-}
-interface CodexThreadReportDialogProps {
-  adReport?: AdReport;
-  chatGptMessageId?: string;
-  connectorId?: string;
-  contentClassName?: string;
-  onBackToFeedback?(): void;
-  onClose(): void;
-  productArea?: string;
-  reportEntityType: string;
-  reportReasonsEntityType?: string;
-  reportRequest?: ReportRequest;
-  successBody?: unknown;
-  threadId: string;
-  title?: unknown;
-}
-interface LegacyHttpClient {
-  get(
-    path: string,
-    headers: Record<string, string>,
-  ): Promise<{ body: unknown }>;
-  post(
-    path: string,
-    body: string,
-    headers: Record<string, string>,
-  ): Promise<unknown>;
-}
-
-const once = onceExport as (initializer: () => void) => () => void;
-let jsx: JsxRuntime;
-let reportReasonsQueryKey: string;
-
-function reportTitle({
-  reportEntityType,
-  title,
-}: Pick<CodexThreadReportDialogProps, "reportEntityType" | "title">): unknown {
-  if (title != null) return jsx.jsx(jsx.Fragment, { children: title });
-  if (reportEntityType === "share_link") {
-    return jsx.jsx(FormattedMessage, {
-      id: "codexThreadReportDialog.sharedConversationTitle",
-      defaultMessage: "Report a conversation",
-      description:
-        "Title for the modal where users report a shared ChatGPT conversation for safety or legal reasons",
-    });
-  }
-  if (reportEntityType === "connector") {
-    return jsx.jsx(FormattedMessage, {
-      id: "codexThreadReportDialog.connectorTitle",
-      defaultMessage: "Report app",
-      description:
-        "Title for the dialog used to report a connected app for safety or legal reasons",
-    });
-  }
-  return jsx.jsx(FormattedMessage, {
-    id: "codexThreadReportDialog.title",
-    defaultMessage: "Report response",
-    description:
-      "Title for the modal where users report a Codex response for safety or legal reasons",
-  });
-}
-
-function openExternalForm(url: string): void {
-  if (!/^https:\/\//i.test(url)) return;
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.target = "_blank";
-  anchor.rel = "noopener noreferrer";
-  anchor.click();
-}
-
-async function loadReasons(
-  reasonType: string,
-  reportRequest?: ReportRequest,
-): Promise<unknown> {
-  if (reportRequest != null) {
-    const response = await reportRequest(`/report_flow/reasons/${reasonType}`);
-    if (!response.ok) throw new Error("Could not load reporting options");
-    return response.json();
-  }
-  const client = desktopHttpClient.getInstance() as unknown as LegacyHttpClient;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i } from "@rchunk/app-shared";
+import { _dn as a, fdn as o, pdn as s, ydn as c } from "@rchunk/app-initial";
+import { n as l, t as u } from "@rchunk/report-dialog-core";
+function d(e) {
+  let t = (0, g.c)(36),
+    {
+      onBackToFeedback: n,
+      onClose: r,
+      reportRequest: i,
+      adReport: a,
+      chatGptMessageId: o,
+      reportEntityType: s,
+      reportReasonsEntityType: c,
+      productArea: l,
+      successBody: d,
+      threadId: y,
+      title: b,
+      connectorId: x,
+      contentClassName: S,
+    } = e,
+    C = s === `connector` ? x : y,
+    w = c ?? s,
+    T;
+  t[0] !== a || t[1] !== n || t[2] !== r
+    ? ((T =
+        n == null
+          ? void 0
+          : () => {
+              (a ?? r(), n());
+            }),
+      (t[0] = a),
+      (t[1] = n),
+      (t[2] = r),
+      (t[3] = T))
+    : (T = t[3]);
+  let E;
+  t[4] !== a?.queryKey || t[5] !== w
+    ? ((E = a?.queryKey ?? [v, w]), (t[4] = a?.queryKey), (t[5] = w), (t[6] = E))
+    : (E = t[6]);
+  let D;
+  t[7] !== a || t[8] !== w || t[9] !== i
+    ? ((D =
+        a == null
+          ? () => m(w, i)
+          : (e) => {
+              let { signal: t } = e;
+              return a.loadReasons(t);
+            }),
+      (t[7] = a),
+      (t[8] = w),
+      (t[9] = i),
+      (t[10] = D))
+    : (D = t[10]);
+  let O = a == null ? void 0 : 0,
+    k = a != null,
+    A = a != null,
+    j = a == null ? void 0 : `chatgpt`,
+    M;
+  t[11] !== a || t[12] !== o || t[13] !== l || t[14] !== s || t[15] !== C || t[16] !== i
+    ? ((M = (e) => {
+        let { reason: t, details: n, additionalFields: r } = e;
+        return a == null
+          ? h({ details: n, entityType: s, reasonId: t.id, threadId: C }, i, o, l)
+          : a.submit({ id: t.id, details: n || void 0 }, r);
+      }),
+      (t[11] = a),
+      (t[12] = o),
+      (t[13] = l),
+      (t[14] = s),
+      (t[15] = C),
+      (t[16] = i),
+      (t[17] = M))
+    : (M = t[17]);
+  let N = i == null ? void 0 : p,
+    P;
+  t[18] !== a?.title || t[19] !== s || t[20] !== b
+    ? ((P = a?.title ?? (0, _.jsx)(f, { reportEntityType: s, title: b })),
+      (t[18] = a?.title),
+      (t[19] = s),
+      (t[20] = b),
+      (t[21] = P))
+    : (P = t[21]);
+  let F;
   return (
-    await client.get(
-      `/report_flow/reasons/${reasonType}`,
-      authenticatedHeaders(),
-    )
-  ).body;
+    t[22] !== S ||
+    t[23] !== r ||
+    t[24] !== d ||
+    t[25] !== T ||
+    t[26] !== P ||
+    t[27] !== E ||
+    t[28] !== D ||
+    t[29] !== O ||
+    t[30] !== k ||
+    t[31] !== A ||
+    t[32] !== j ||
+    t[33] !== M ||
+    t[34] !== N
+      ? ((F = (0, _.jsx)(u, {
+          onBack: T,
+          onClose: r,
+          queryKey: E,
+          loadReasons: D,
+          gcTime: O,
+          includeServerFields: k,
+          preventCloseWhileSubmitting: A,
+          dialogVariant: j,
+          contentClassName: S,
+          submitReport: M,
+          openExternalForm: N,
+          successBody: d,
+          title: P,
+        })),
+        (t[22] = S),
+        (t[23] = r),
+        (t[24] = d),
+        (t[25] = T),
+        (t[26] = P),
+        (t[27] = E),
+        (t[28] = D),
+        (t[29] = O),
+        (t[30] = k),
+        (t[31] = A),
+        (t[32] = j),
+        (t[33] = M),
+        (t[34] = N),
+        (t[35] = F))
+      : (F = t[35]),
+    F
+  );
 }
-
-async function submitReport(
-  input: {
-    details: string;
-    entityType: string;
-    reasonId: string;
-    threadId: string;
-  },
-  reportRequest?: ReportRequest,
-  chatGptMessageId?: string,
-  productArea?: string,
-): Promise<void> {
-  const body = JSON.stringify({
-    entity_id: input.threadId,
-    entity_type: input.entityType,
-    additional_fields_values:
-      input.entityType === "project" || input.entityType === "share_link"
-        ? {}
-        : undefined,
+function f(e) {
+  let t = (0, g.c)(5),
+    { reportEntityType: n, title: r } = e;
+  if (r != null) {
+    let e;
+    return (
+      t[0] === r
+        ? (e = t[1])
+        : ((e = (0, _.jsx)(_.Fragment, { children: r })), (t[0] = r), (t[1] = e)),
+      e
+    );
+  }
+  if (n === `share_link`) {
+    let e;
+    return (
+      t[2] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, _.jsx)(i, {
+            id: `codexThreadReportDialog.sharedConversationTitle`,
+            defaultMessage: `Report a conversation`,
+            description: `Title for the modal where users report a shared ChatGPT conversation for safety or legal reasons`,
+          })),
+          (t[2] = e))
+        : (e = t[2]),
+      e
+    );
+  }
+  if (n === `connector`) {
+    let e;
+    return (
+      t[3] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, _.jsx)(i, {
+            id: `codexThreadReportDialog.connectorTitle`,
+            defaultMessage: `Report app`,
+            description: `Title for the dialog used to report a connected app for safety or legal reasons`,
+          })),
+          (t[3] = e))
+        : (e = t[3]),
+      e
+    );
+  }
+  let a;
+  return (
+    t[4] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((a = (0, _.jsx)(i, {
+          id: `codexThreadReportDialog.title`,
+          defaultMessage: `Report response`,
+          description: `Title for the modal where users report a Codex response for safety or legal reasons`,
+        })),
+        (t[4] = a))
+      : (a = t[4]),
+    a
+  );
+}
+function p(e) {
+  if (!/^https:\/\//i.test(e)) return;
+  let t = document.createElement(`a`);
+  ((t.href = e), (t.target = `_blank`), (t.rel = `noopener noreferrer`), t.click());
+}
+async function m(e, t) {
+  if (t != null) {
+    let n = await t(`/report_flow/reasons/${e}`);
+    if (!n.ok) throw Error(`Could not load reporting options`);
+    return await n.json();
+  }
+  return (await a.getInstance().get(`/report_flow/reasons/${e}`, o())).body;
+}
+async function h({ details: e, entityType: t, reasonId: n, threadId: r }, i, s, c) {
+  let l = JSON.stringify({
+    entity_id: r,
+    entity_type: t,
+    additional_fields_values: t === `project` || t === `share_link` ? {} : void 0,
     product_area:
-      productArea ??
-      (["conversation", "connector", "project", "share_link"].includes(
-        input.entityType,
-      )
-        ? "1p"
-        : "codex"),
-    reason:
-      input.details.length === 0
-        ? { id: input.reasonId }
-        : { id: input.reasonId, details: input.details },
+      c ??
+      (t === `conversation` || t === `connector` || t === `project` || t === `share_link`
+        ? `1p`
+        : `codex`),
+    reason: e.length === 0 ? { id: n } : { id: n, details: e },
   });
-  if (reportRequest != null) {
-    const response = await reportRequest("/report_flow/report", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body,
-    });
-    if (!response.ok) throw new Error("Could not submit report");
+  if (i != null) {
+    if (
+      !(
+        await i(`/report_flow/report`, {
+          method: `POST`,
+          headers: { "Content-Type": `application/json` },
+          body: l,
+        })
+      ).ok
+    )
+      throw Error(`Could not submit report`);
     return;
   }
-  const client = desktopHttpClient.getInstance() as unknown as LegacyHttpClient;
-  await client.post("/report_flow/report", body, {
-    ...authenticatedHeaders(),
-    ...(chatGptMessageId == null
-      ? {}
-      : { "chatgpt-conv-message-id": chatGptMessageId }),
-  });
+  await a
+    .getInstance()
+    .post(`/report_flow/report`, l, {
+      ...o(),
+      ...(s == null ? {} : { "chatgpt-conv-message-id": s }),
+    });
 }
-
-function CodexThreadReportDialog(props: CodexThreadReportDialogProps): unknown {
-  const {
-    adReport,
-    chatGptMessageId,
-    connectorId,
-    contentClassName,
-    onBackToFeedback,
-    onClose,
-    productArea,
-    reportEntityType,
-    reportReasonsEntityType,
-    reportRequest,
-    successBody,
-    threadId,
-    title,
-  } = props;
-  const entityId = reportEntityType === "connector" ? connectorId : threadId;
-  const reasonType = reportReasonsEntityType ?? reportEntityType;
-  const onBack =
-    onBackToFeedback == null
-      ? undefined
-      : () => {
-          if (adReport == null) onClose();
-          onBackToFeedback();
-        };
-  return jsx.jsx(ReportDialog, {
-    onBack,
-    onClose,
-    queryKey: adReport?.queryKey ?? [reportReasonsQueryKey, reasonType],
-    loadReasons:
-      adReport == null
-        ? () => loadReasons(reasonType, reportRequest)
-        : ({ signal }: { signal: AbortSignal }) => adReport.loadReasons(signal),
-    gcTime: adReport == null ? undefined : 0,
-    includeServerFields: adReport != null,
-    preventCloseWhileSubmitting: adReport != null,
-    dialogVariant: adReport == null ? undefined : "chatgpt",
-    contentClassName,
-    submitReport: ({
-      reason,
-      details,
-      additionalFields,
-    }: {
-      reason: ReportReason;
-      details: string;
-      additionalFields?: Record<string, string>;
-    }) =>
-      adReport == null
-        ? submitReport(
-            {
-              details,
-              entityType: reportEntityType,
-              reasonId: reason.id,
-              threadId: entityId ?? threadId,
-            },
-            reportRequest,
-            chatGptMessageId,
-            productArea,
-          )
-        : adReport.submit(
-            { id: reason.id, details: details || undefined },
-            additionalFields,
-          ),
-    openExternalForm: reportRequest == null ? undefined : openExternalForm,
-    successBody,
-    title: adReport?.title ?? reportTitle({ reportEntityType, title }),
-  });
+var g, _, v;
+function y() {
+  return (y = e(() => {
+    ((g = t()), r(), l(), s(), c(), (_ = n()), (v = `codex-thread-report-reasons`));
+  }))();
 }
-
-const initializeCodexThreadReportDialog = once(() => {
-  initializeCompilerRuntime();
-  initializeInternationalization();
-  initializeReportDialog();
-  initializeDesktopHttpClient();
-  initializeAuthenticatedHeaders();
-  jsx = getJsxRuntime();
-  reportReasonsQueryKey = "codex-thread-report-reasons";
-});
-
-export { initializeCodexThreadReportDialog as n, CodexThreadReportDialog as t };
+export { y as n, d as t };

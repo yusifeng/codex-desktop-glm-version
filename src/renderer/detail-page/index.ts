@@ -1,42 +1,29 @@
-// detail-page —— 详情页内容宽度与纵向节奏容器。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-void runtimeChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  I3: getJsxRuntime,
-  h4: initializeClassNames,
-  m4: classNames,
-} = appSharedChunk;
-
-interface DetailPageProps {
-  children?: unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, h4 as r, m4 as i } from "@rchunk/app-shared";
+function a(e) {
+  let t = (0, o.c)(3),
+    { children: n } = e,
+    r;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((r = i(
+        c,
+        `@container mx-auto w-full max-w-[var(--thread-content-max-width)] [--detail-page-inline-inset:var(--padding-row-x)] [--detail-page-section-gap:calc(var(--spacing)*6)]`,
+      )),
+      (t[0] = r))
+    : (r = t[0]);
+  let a;
+  return (
+    t[1] === n
+      ? (a = t[2])
+      : ((a = (0, s.jsx)(`div`, { className: r, children: n })), (t[1] = n), (t[2] = a)),
+    a
+  );
 }
-
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-let detailPageSectionClassName: string;
-
-function DetailPage({ children }: DetailPageProps): unknown {
-  return jsx.jsx("div", {
-    className: classNames(
-      detailPageSectionClassName,
-      "@container mx-auto w-full max-w-[var(--thread-content-max-width)] [--detail-page-inline-inset:var(--padding-row-x)] [--detail-page-section-gap:calc(var(--spacing)*6)]",
-    ),
-    children,
-  });
+var o, s, c;
+function l() {
+  return (l = e(() => {
+    ((o = t()), r(), (s = n()), (c = `flex flex-col gap-[var(--detail-page-section-gap)]`));
+  }))();
 }
-
-function initializeDetailPage(): void {
-  initializeRuntimeLazy();
-  initializeClassNames();
-  jsx = getJsxRuntime();
-  detailPageSectionClassName =
-    "flex flex-col gap-[var(--detail-page-section-gap)]";
-}
-
-export {
-  DetailPage as n,
-  initializeDetailPage as r,
-  detailPageSectionClassName as t,
-};
+export { a as n, l as r, c as t };

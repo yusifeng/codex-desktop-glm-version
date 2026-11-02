@@ -1,153 +1,90 @@
-import "@rchunk/rolldown-runtime";
-import {
-  NU as getDiscoveredRemoteHostId,
-  wL as initializeUtilities,
-} from "@rchunk/app-shared";
-
-export interface RemoteConnectionDraft {
-  authMode: "identity" | "none";
-  displayName: string;
-  hostId: string;
-  identity: string;
-  sshHost: string;
-  sshPort: string;
-  targetKind: "alias" | "hostname";
-}
-
-export interface RemoteConnection {
-  alias?: string | null;
-  connectionAnalyticsId?: string;
-  displayName: string;
-  hostId: string;
-  hostname?: string | null;
-  identity?: string | null;
-  source: string;
-  sshAlias?: string | null;
-  sshHost?: string;
-  sshPort?: number | null;
-}
-
-export type RemoteConnectionDraftError =
-  | "displayNameRequired"
-  | "duplicateDisplayName"
-  | "identityRequired"
-  | "sshHostRequired"
-  | "sshPortInteger"
-  | "sshPortRange";
-
-function createRemoteConnectionDraft(): RemoteConnectionDraft {
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { NU as t, wL as n } from "@rchunk/app-shared";
+function r() {
   return {
     hostId: `remote-ssh-codex-managed:${crypto.randomUUID()}`,
-    displayName: "",
-    targetKind: "hostname",
-    sshHost: "",
-    sshPort: "",
-    authMode: "none",
-    identity: "",
+    displayName: ``,
+    targetKind: `hostname`,
+    sshHost: ``,
+    sshPort: ``,
+    authMode: `none`,
+    identity: ``,
   };
 }
-
-function remoteConnectionToDraft(connection: RemoteConnection): RemoteConnectionDraft {
+function i(e) {
   return {
-    hostId: connection.hostId,
-    displayName: connection.displayName,
-    targetKind: connection.sshAlias?.trim() ? "alias" : "hostname",
-    sshHost: connection.sshAlias?.trim() || connection.sshHost || "",
-    sshPort: connection.sshPort == null ? "" : String(connection.sshPort),
-    authMode: connection.identity == null ? "none" : "identity",
-    identity: connection.identity ?? "",
+    hostId: e.hostId,
+    displayName: e.displayName,
+    targetKind: e.sshAlias?.trim() ? `alias` : `hostname`,
+    sshHost: e.sshAlias?.trim() || e.sshHost,
+    sshPort: e.sshPort == null ? `` : String(e.sshPort),
+    authMode: e.identity == null ? `none` : `identity`,
+    identity: e.identity ?? ``,
   };
 }
-
-function parseSshPort(value: string): number | null {
-  const trimmed = value.trim();
-  if (trimmed.length === 0 || !/^\d+$/.test(trimmed)) return null;
-  const port = Number(trimmed);
-  return Number.isSafeInteger(port) ? port : null;
-}
-
-function remoteConnectionFromDraft(
-  draft: RemoteConnectionDraft,
-  existing?: RemoteConnection | null,
-): RemoteConnection {
-  const displayName = draft.displayName.trim();
-  const sshHost = draft.sshHost.trim();
-  const alias = draft.targetKind === "alias" ? sshHost : null;
-  if (alias != null) {
+function a(e, n) {
+  let r = e.displayName.trim(),
+    i = e.sshHost.trim(),
+    a = e.targetKind === `alias` ? i : null;
+  if (a != null)
     return {
-      hostId: getDiscoveredRemoteHostId(alias),
-      connectionAnalyticsId: existing?.connectionAnalyticsId,
-      displayName,
-      source: "discovered",
-      alias,
+      hostId: t(a),
+      connectionAnalyticsId: n?.connectionAnalyticsId,
+      displayName: r,
+      source: `discovered`,
+      alias: a,
       hostname: null,
       sshPort: null,
       identity: null,
     };
-  }
-  let hostId = draft.hostId;
-  if (existing?.source === "codex-managed") hostId = existing.hostId;
-  else if (!hostId.startsWith("remote-ssh-codex-managed:")) {
-    hostId = `remote-ssh-codex-managed:${crypto.randomUUID()}`;
-  }
-  return {
-    hostId,
-    connectionAnalyticsId: existing?.connectionAnalyticsId,
-    displayName,
-    source: "codex-managed",
-    alias: null,
-    hostname: sshHost,
-    sshPort: parseSshPort(draft.sshPort),
-    identity: draft.authMode === "identity" ? draft.identity.trim() : null,
-  };
+  let o = e.hostId;
+  return (
+    n?.source === `codex-managed`
+      ? (o = n.hostId)
+      : o.startsWith(`remote-ssh-codex-managed:`) ||
+        (o = `remote-ssh-codex-managed:${crypto.randomUUID()}`),
+    {
+      hostId: o,
+      connectionAnalyticsId: n?.connectionAnalyticsId,
+      displayName: r,
+      source: `codex-managed`,
+      alias: null,
+      hostname: i,
+      sshPort: s(e.sshPort),
+      identity: e.authMode === `identity` ? e.identity.trim() : null,
+    }
+  );
 }
-
-function validateRemoteConnectionDraft({
-  draft,
-  editingHostId,
-  existingConnections,
-}: {
-  draft: RemoteConnectionDraft;
-  editingHostId?: string | null;
-  existingConnections: RemoteConnection[];
-}): RemoteConnectionDraftError[] {
-  const errors: RemoteConnectionDraftError[] = [];
-  const displayName = draft.displayName.trim();
-  if (displayName.length === 0) errors.push("displayNameRequired");
-  if (draft.sshHost.trim().length === 0) errors.push("sshHostRequired");
-  const port = draft.sshPort.trim();
-  if (port.length > 0) {
-    if (!/^\d+$/.test(port)) errors.push("sshPortInteger");
+function o({ draft: e, editingHostId: t, existingConnections: n }) {
+  let r = [],
+    i = e.displayName.trim();
+  (i.length === 0 && r.push(`displayNameRequired`),
+    e.sshHost.trim().length === 0 && r.push(`sshHostRequired`));
+  let a = e.sshPort.trim();
+  if (a.length > 0) {
+    if (!/^\d+$/.test(a)) r.push(`sshPortInteger`);
     else {
-      const numericPort = Number(port);
-      if (!Number.isSafeInteger(numericPort) || numericPort < 1 || numericPort > 65_535) {
-        errors.push("sshPortRange");
-      }
+      let e = Number(a);
+      (!Number.isSafeInteger(e) || e < 1 || e > 65535) && r.push(`sshPortRange`);
     }
   }
-  if (draft.authMode === "identity" && draft.identity.trim().length === 0) {
-    errors.push("identityRequired");
-  }
-  if (
-    existingConnections.some(
-      (connection) =>
-        (editingHostId == null || connection.hostId !== editingHostId) &&
-        connection.displayName.trim() === displayName,
-    )
-  ) {
-    errors.push("duplicateDisplayName");
-  }
-  return errors;
+  return (
+    e.authMode === `identity` && e.identity.trim().length === 0 && r.push(`identityRequired`),
+    n.some((e) => (t != null && e.hostId === t ? !1 : e.displayName.trim() === i)) &&
+      r.push(`duplicateDisplayName`),
+    r
+  );
 }
-
-function initializeRemoteConnectionEditorDraft(): void {
-  initializeUtilities();
+function s(e) {
+  let t = e.trim();
+  if (t.length === 0 || !/^\d+$/.test(t)) return null;
+  let n = Number(t);
+  return Number.isSafeInteger(n) ? n : null;
 }
-
-export {
-  remoteConnectionToDraft as a,
-  remoteConnectionFromDraft as i,
-  validateRemoteConnectionDraft as n,
-  initializeRemoteConnectionEditorDraft as r,
-  createRemoteConnectionDraft as t,
-};
+function c() {
+  return (c = e(() => {
+    n();
+  }))();
+}
+export { i as a, a as i, o as n, c as r, r as t };

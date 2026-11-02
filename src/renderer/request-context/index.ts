@@ -1,132 +1,60 @@
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
-  E4 as arraySchema,
-  FX as initializeSignalRuntime,
-  H4 as objectSchema,
-  QI as initializeScopeRuntime,
-  Z4 as stringSchema,
-  ZI as appScope,
-  g4 as initializeDialogRuntime,
-  l3 as isEqual,
-  rZ as createDerivedFamily,
+  E4 as n,
+  FX as r,
+  H4 as i,
+  QI as a,
+  Z4 as o,
+  ZI as s,
+  g4 as c,
+  l3 as l,
+  rZ as u,
 } from "@rchunk/app-shared";
-import {
-  RVt as conversationNodes,
-  uHt as initializeConversationNodes,
-} from "@rchunk/app-initial";
-
-export interface RequestContextPosition {
-  conversationId: string;
-  messageId: string;
+import { RVt as d, uHt as f } from "@rchunk/app-initial";
+function p(e, t, n) {
+  return m(e.get(d, t.conversationId), t, n);
 }
-
-export interface RequestContextProduct {
-  cite?: boolean;
-}
-
-export interface RequestContextResult {
-  isSourceCatalog: boolean;
-  rewrittenQueries?: string[];
-}
-
-interface ConversationNode {
-  message?: {
-    author?: { role?: string };
-    metadata?: {
-      business_agent_context?: unknown;
-      shopping?: unknown;
-    };
-  };
-  parent?: string | null;
-}
-
-const shoppingMetadataSchema = objectSchema<{ rewritten_queries: string[] }>({
-  rewritten_queries: arraySchema(stringSchema()).transform((values: unknown[]) =>
-    values.filter(
-      (value): value is string => typeof value === "string" && value !== "",
-    ),
-  ),
-});
-
-function deriveRequestContext(
-  nodes: Record<string, ConversationNode> | null | undefined,
-  position: RequestContextPosition,
-  product: RequestContextProduct,
-): RequestContextResult {
-  let messageId: string | null | undefined = position.messageId;
-  const visited = new Set<string>();
-  let rewrittenQueries: string[] | undefined;
-  let foundShopping = false;
-  let isSourceCatalog = false;
-
-  while (messageId != null && !visited.has(messageId)) {
-    visited.add(messageId);
-    const node = nodes?.[messageId];
-    if (node == null) break;
-    const message = node.message;
-    if (product.cite && message?.metadata?.business_agent_context != null) {
-      isSourceCatalog = true;
+function m(e, t, n) {
+  let r = t.messageId,
+    i = new Set(),
+    a,
+    o = !1,
+    s = !1;
+  for (; r != null && !i.has(r);) {
+    i.add(r);
+    let t = e?.[r];
+    if (t == null) break;
+    let c = t.message;
+    if (
+      (n.cite && c?.metadata?.business_agent_context != null && (s = !0),
+      !o && c?.author.role === `assistant`)
+    ) {
+      let e = g.safeParse(c.metadata?.shopping);
+      e.success &&
+        ((o = !0), (a = e.data.rewritten_queries.length ? e.data.rewritten_queries : void 0));
     }
-    if (!foundShopping && message?.author?.role === "assistant") {
-      const parsed = shoppingMetadataSchema.safeParse(message.metadata?.shopping);
-      if (parsed.success) {
-        foundShopping = true;
-        rewrittenQueries =
-          parsed.data.rewritten_queries.length > 0
-            ? parsed.data.rewritten_queries
-            : undefined;
-      }
-    }
-    if (foundShopping && (!product.cite || isSourceCatalog)) break;
-    messageId = node.parent;
+    if (o && (!n.cite || s)) break;
+    r = t.parent;
   }
-  return { rewrittenQueries, isSourceCatalog };
+  return { rewrittenQueries: a, isSourceCatalog: s };
 }
-
-function readRequestContext(
-  scope: { get(signal: unknown, parameter: string): unknown },
-  position: RequestContextPosition,
-  product: RequestContextProduct,
-): RequestContextResult {
-  return deriveRequestContext(
-    scope.get(conversationNodes, position.conversationId) as
-      | Record<string, ConversationNode>
-      | null
-      | undefined,
-    position,
-    product,
-  );
+var h, g, _;
+function v() {
+  return (v = e(() => {
+    ((h = t(l(), 1)),
+      r(),
+      c(),
+      f(),
+      a(),
+      (g = i({
+        rewritten_queries: n(o()).transform((e) =>
+          e.filter((e) => typeof e == `string` && e !== ``),
+        ),
+      })),
+      (_ = u(s, ({ context: e, product: t }, { get: n }) => m(n(d, e.conversationId), e, t), {
+        isEqual: h.default,
+      })));
+  }))();
 }
-
-let requestContextFamily: ReturnType<typeof createDerivedFamily>;
-
-function initializeRequestContext(): void {
-  initializeSignalRuntime();
-  initializeDialogRuntime();
-  initializeConversationNodes();
-  initializeScopeRuntime();
-  requestContextFamily = createDerivedFamily(
-    appScope,
-    (
-      { context, product }: {
-        context: RequestContextPosition;
-        product: RequestContextProduct;
-      },
-      { get },
-    ) =>
-      deriveRequestContext(
-        get(conversationNodes, context.conversationId) as
-          | Record<string, ConversationNode>
-          | null
-          | undefined,
-        context,
-        product,
-      ),
-    { isEqual },
-  );
-}
-
-export {
-  initializeRequestContext as n,
-  requestContextFamily as r,
-  readRequestContext as t,
-};
+export { v as n, _ as r, p as t };

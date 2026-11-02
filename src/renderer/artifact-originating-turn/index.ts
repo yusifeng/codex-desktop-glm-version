@@ -1,175 +1,73 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { HI as t, IK as n, RI as r } from "@rchunk/app-shared";
 import {
-  HI as normalizePath,
-  IK as pathsEqual,
-  RI as joinPath,
-} from "@rchunk/app-shared";
-import {
-  Dpn as initializeConversationHistory,
-  Dhn as getCanonicalHistoryEntries,
-  Fin as getConversationTurns,
-  HZt as initializeSidePanelRoutes,
-  Iin as initializeArtifactOrigins,
-  arn as initializeTurnItems,
-  d9t as getTurnMessageId,
-  f9t as initializeTurnMessages,
-  irn as getTurnFileChanges,
-  jin as getForkPoint,
-  u9t as getTurnInputMessageId,
-  vZt as hostServiceById,
+  Dhn as i,
+  Dpn as a,
+  Fin as o,
+  HZt as s,
+  Iin as c,
+  arn as l,
+  d9t as u,
+  f9t as d,
+  irn as f,
+  jin as p,
+  u9t as m,
+  vZt as h,
 } from "@rchunk/app-initial";
-
-export interface ArtifactOriginatingTurn {
-  inputMessageId?: string | null;
-  messageId?: string | null;
-  turnId: string;
-}
-
-export interface ArtifactRouteScope {
-  value: {
-    conversationId?: string;
-    hostId?: string | null;
-    routeKind: string;
-  };
-  get(signal: unknown, parameter?: unknown): unknown;
-}
-
-export interface ResolveArtifactOriginOptions {
-  fallback?: ArtifactOriginatingTurn | null;
-  hostId: string;
-  path: string;
-  conversationId: string;
-}
-
-export interface ResolvedArtifactOrigin {
-  inputMessageId: string | null;
-  messageId: string | null;
-  threadId: string | null;
-  turnId: string | null;
-}
-
-function resolveArtifactOriginFromRoute(
-  scope: ArtifactRouteScope,
-  {
-    hostId,
-    originatingTurn,
-    path,
-    threadId,
-  }: {
-    hostId: string;
-    originatingTurn?: ArtifactOriginatingTurn | null;
-    path: string;
-    threadId: string;
-  },
-): ResolvedArtifactOrigin {
-  const route = scope.value;
-  const routeThreadId =
-    route.routeKind === "local-thread" && route.conversationId === threadId
-      ? route.conversationId
-      : null;
-  const origin =
-    routeThreadId == null
-      ? undefined
-      : findArtifactOriginatingTurn(scope, {
-          conversationId: routeThreadId,
-          fallback: originatingTurn,
-          hostId,
-          path,
-        });
+function g(e, { hostId: t, originatingTurn: n, path: r, threadId: i }) {
+  let a = e.value,
+    o = a.routeKind === `local-thread` && a.conversationId === i ? a.conversationId : null,
+    s = o == null ? void 0 : _(e, { conversationId: o, fallback: n, hostId: t, path: r });
   return {
-    threadId: routeThreadId,
-    turnId: origin?.turnId ?? null,
-    inputMessageId: origin?.inputMessageId ?? null,
-    messageId: origin?.messageId ?? null,
+    threadId: o,
+    turnId: s?.turnId ?? null,
+    inputMessageId: s?.inputMessageId ?? null,
+    messageId: s?.messageId ?? null,
   };
 }
-
-function findArtifactOriginatingTurn(
-  scope: ArtifactRouteScope,
-  { conversationId, fallback, hostId, path }: ResolveArtifactOriginOptions,
-): ArtifactOriginatingTurn | undefined {
-  const route = scope.value;
+function _(e, { conversationId: r, fallback: a, hostId: s, path: c }) {
+  let l = e.value;
   if (
-    route.routeKind !== "local-thread" ||
-    route.conversationId !== conversationId ||
-    (route.hostId != null && route.hostId !== hostId)
-  ) {
-    return undefined;
+    l.routeKind !== `local-thread` ||
+    l.conversationId !== r ||
+    (l.hostId != null && l.hostId !== s)
+  )
+    return;
+  let d = e.get(h, s);
+  if (d?.getHostId() !== s) return;
+  let g = d.getConversation(l.conversationId);
+  if (g == null || g.id !== r) return;
+  let _ = o(g),
+    v = _;
+  if (p(g) == null) {
+    if (g.turnHistory?.kind !== `canonical`) return;
+    let { history: e } = g.turnHistory,
+      t = i(e)?.entries[0],
+      n = t == null ? null : e.entitiesByKey[t.value];
+    if (n?.turnId == null) return;
+    let r = _.findIndex((e) => e.turnId === n.turnId);
+    if (r < 0) return;
+    v = _.slice(r);
   }
-
-  const hostService = scope.get(hostServiceById, hostId) as
-    | {
-        getHostId(): string;
-        getConversation(id: string): Record<string, unknown> | null;
-      }
-    | null
-    | undefined;
-  if (hostService?.getHostId() !== hostId) return undefined;
-  const conversation = hostService.getConversation(conversationId);
-  if (conversation == null || conversation.id !== conversationId) return undefined;
-
-  const turns = getConversationTurns(conversation) as Array<Record<string, unknown>>;
-  let candidateTurns = turns;
-  if (getForkPoint(conversation) == null) {
-    const turnHistory = conversation.turnHistory as
-      | { kind: string; history: { islands?: Array<{ entries: unknown[]; newerBoundary?: { status?: string } | null }>; entitiesByKey: Record<string, unknown> } }
-      | undefined;
-    if (turnHistory?.kind !== "canonical") return undefined;
-    const firstEntry = getCanonicalHistoryEntries(turnHistory.history)?.entries[0] as
-      | { value: string }
-      | undefined;
-    const firstEntity =
-      firstEntry == null ? null : turnHistory.history.entitiesByKey[firstEntry.value];
-    const firstTurnId = (firstEntity as { turnId?: string } | null)?.turnId;
-    if (firstTurnId == null) return undefined;
-    const firstIndex = turns.findIndex((turn) => turn.turnId === firstTurnId);
-    if (firstIndex < 0) return undefined;
-    candidateTurns = turns.slice(firstIndex);
-  }
-
-  for (let index = candidateTurns.length - 1; index >= 0; index -= 1) {
-    const turn = candidateTurns[index];
-    if (turn?.status !== "completed") return undefined;
-    if ((turn.itemsPagination as { hasLoadedOldest?: boolean } | undefined)?.hasLoadedOldest === false) {
-      return undefined;
-    }
-    const changes = getTurnFileChanges(turn) as {
-      editedFilePaths: string[];
-      outputFilePaths: string[];
-    };
-    const cwd = String((turn.params as { cwd?: string }).cwd ?? "");
-    const containsPath = [...changes.outputFilePaths, ...changes.editedFilePaths].some(
-      (filePath) => pathsEqual(normalizePath(joinPath(cwd, filePath)), path),
-    );
-    if (!containsPath) continue;
-    if (typeof turn.turnId !== "string") return undefined;
-    const fallbackForTurn = fallback?.turnId === turn.turnId ? fallback : undefined;
+  for (let e = v.length - 1; e >= 0; --e) {
+    let r = v[e];
+    if (r?.status !== `completed` || r.itemsPagination?.hasLoadedOldest === !1) return;
+    let i = f(r);
+    if (![...i.outputFilePaths, ...i.editedFilePaths].some((e) => n(t(r.params.cwd ?? ``, e), c)))
+      continue;
+    if (r.turnId == null) return;
+    let o = a?.turnId === r.turnId ? a : void 0;
     return {
-      turnId: turn.turnId,
-      inputMessageId:
-        (getTurnInputMessageId(turn) as string | null | undefined) ??
-        fallbackForTurn?.inputMessageId ??
-        null,
-      messageId:
-        (getTurnMessageId(turn) as string | null | undefined) ??
-        fallbackForTurn?.messageId ??
-        null,
+      turnId: r.turnId,
+      inputMessageId: m(r) ?? o?.inputMessageId ?? null,
+      messageId: u(r) ?? o?.messageId ?? null,
     };
   }
-  return undefined;
 }
-
-function initializeArtifactOriginatingTurn(): void {
-  initializeConversationHistory();
-  initializeSidePanelRoutes();
-  initializeArtifactOrigins();
-  initializeTurnMessages();
-  initializeTurnItems();
-  joinPath();
+function v() {
+  return (v = e(() => {
+    (a(), s(), c(), d(), l(), r());
+  }))();
 }
-
-export {
-  initializeArtifactOriginatingTurn as n,
-  findArtifactOriginatingTurn as r,
-  resolveArtifactOriginFromRoute as t,
-};
+export { v as n, _ as r, g as t };

@@ -1,245 +1,235 @@
-// Connect Plugins submenu: recommended plugins, impression tracking, and the
-// full plugin-directory action. Restored from connect-plugins-submenu-item.
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
-import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
-
-interface PluginRecommendation extends Record<string, unknown> {
-  displayName: string;
-  id: string;
-  logoDarkPath?: string | null;
-  logoPath?: string | null;
-  name?: string | null;
-  remotePluginId?: string | null;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $O as n,
+  BX as r,
+  E4 as i,
+  FX as a,
+  FZ as o,
+  Gm as s,
+  I3 as c,
+  If as l,
+  K2 as u,
+  Km as d,
+  Oc as f,
+  QI as p,
+  QX as m,
+  Y2 as h,
+  ZI as g,
+  cT as _,
+  dO as v,
+  e6 as y,
+  ek as b,
+  g4 as x,
+  jZ as S,
+  jf as C,
+  kc as w,
+  lT as T,
+  q4 as E,
+  uO as D,
+} from "@rchunk/app-shared";
+import {
+  Dlt as O,
+  E4t as k,
+  G6t as A,
+  H6t as j,
+  I1t as M,
+  Olt as N,
+  _v as P,
+  dv as F,
+  i4t as I,
+  m4t as L,
+  pdn as R,
+  pfn as z,
+  z2t as B,
+} from "@rchunk/app-initial";
+var V;
+function H() {
+  return (H = e(() => {
+    (S(),
+      M(),
+      B(),
+      a(),
+      x(),
+      A(),
+      I(),
+      k(),
+      p(),
+      z(),
+      b(),
+      R(),
+      i(E().trim().catch(``)).catch([]),
+      (V = m(g, (e, { get: t }) => {
+        let r = t(j);
+        return {
+          enabled: !1,
+          queryKey: [...L, `work-composer-featured`, r, e, !1, void 0],
+          queryFn: o,
+          retry: !1,
+          staleTime: n.ONE_MINUTE,
+        };
+      })));
+  }))();
 }
-
-export interface ConnectPluginsSubmenuItemProps {
-  featuredPlugins: PluginRecommendation[];
-  label: unknown;
-  onConnectPlugin(plugin: PluginRecommendation): void;
-  onOpenPluginDirectory(): void;
-  onPluginImpressions?(visibleIds: string[], newlyVisibleIds: string[]): void;
-  workRecommendationsHostId: string;
+function U(e, t, n, r) {
+  let i = [...new Set(t)],
+    a = new Set(),
+    o = new IntersectionObserver(
+      (e) => {
+        for (let t of e) {
+          let e = t.target instanceof HTMLElement ? t.target.dataset.pluginImpressionId : void 0;
+          e != null && (t.isIntersecting && t.intersectionRatio >= 0.5 ? a.add(e) : a.delete(e));
+        }
+        let t = i.filter((e) => a.has(e)),
+          o = t.filter((e) => !n.has(e));
+        if (o.length > 0) {
+          for (let e of o) n.add(e);
+          r(t, o);
+        }
+      },
+      { root: e.parentElement, threshold: 0.5 },
+    );
+  for (let t of e.querySelectorAll(`[data-plugin-impression-id]`)) o.observe(t);
+  return () => o.disconnect();
 }
-
-const shared = appSharedChunk as unknown as Record<string, any>;
-const initial = appInitialChunk as unknown as Record<string, any>;
-
-let jsx: JsxRuntime;
-let React: ReactRuntime;
-let featuredPluginsQuery: unknown;
-let initialized = false;
-
-function pluginImpressionId(plugin: PluginRecommendation): string {
-  return plugin.remotePluginId ?? plugin.id;
-}
-
-function observePluginImpressions(
-  container: HTMLElement,
-  orderedIds: string[],
-  reported: Set<string>,
-  onImpressions: (visibleIds: string[], newlyVisibleIds: string[]) => void,
-): () => void {
-  const ids = [...new Set(orderedIds)];
-  const visible = new Set<string>();
-  const observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        const id =
-          entry.target instanceof HTMLElement
-            ? entry.target.dataset.pluginImpressionId
-            : undefined;
-        if (id == null) continue;
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.5)
-          visible.add(id);
-        else visible.delete(id);
-      }
-      const visibleIds = ids.filter((id) => visible.has(id));
-      const newlyVisibleIds = visibleIds.filter((id) => !reported.has(id));
-      if (newlyVisibleIds.length === 0) return;
-      for (const id of newlyVisibleIds) reported.add(id);
-      onImpressions(visibleIds, newlyVisibleIds);
-    },
-    { root: container.parentElement, threshold: 0.5 },
-  );
-  for (const item of container.querySelectorAll<HTMLElement>(
-    "[data-plugin-impression-id]",
-  )) {
-    observer.observe(item);
-  }
-  return () => observer.disconnect();
-}
-
-function initializeRecommendationQuery(): void {
-  shared.jZ();
-  initial.I1t();
-  initial.z2t();
-  shared.FX();
-  shared.g4();
-  initial.G6t();
-  initial.i4t();
-  initial.E4t();
-  shared.QI();
-  initial.pfn();
-  shared.ek();
-  initial.pdn();
-  const stringSchema = shared.q4?.();
-  if (stringSchema != null) {
-    const itemSchema = stringSchema.trim().catch("");
-    shared.E4?.(itemSchema)?.catch([]);
-  }
-  featuredPluginsQuery = shared.QX(
-    shared.ZI,
-    (hostId: string, { get }: { get(signal: unknown): unknown }) => ({
-      enabled: false,
-      queryKey: [
-        ...initial.m4t,
-        "work-composer-featured",
-        get(initial.H6t),
-        hostId,
-        false,
-        undefined,
-      ],
-      queryFn: shared.FZ,
-      retry: false,
-      staleTime: shared.$O.ONE_MINUTE,
-    }),
-  );
-}
-
-function ConnectPluginsSubmenuItem({
-  featuredPlugins,
-  label,
-  onConnectPlugin,
-  onOpenPluginDirectory,
-  onPluginImpressions,
-  workRecommendationsHostId,
-}: ConnectPluginsSubmenuItemProps): unknown {
-  initializeConnectPluginsSubmenuItem();
-  const query = shared.BX(featuredPluginsQuery, workRecommendationsHostId) as {
-    data?: unknown[];
-    isLoading: boolean;
-  };
-  const reported = React.useRef(new Set<string>());
-  const recommendations: PluginRecommendation[] =
-    query.data?.map(initial.dv) ?? featuredPlugins;
-  const Menu = shared.jf;
-  const FormattedMessage = shared.Y2;
-  const PluginLogo = initial.Dlt;
-
-  const loading = query.isLoading
-    ? jsx.jsx(Menu.Message, {
-        compact: true,
-        role: "status",
-        children: jsx.jsx("span", {
-          className: "loading-shimmer-pure-text select-none",
-          children: jsx.jsx(FormattedMessage, {
-            id: "composer.workMode.plugins.loadingRecommendations",
-            defaultMessage: "Loading plugins…",
-            description:
-              "Status in the Connect plugins submenu while recommended plugins load. Installed plugins and the Browse all plugins action remain available.",
-          }),
-        }),
-      })
-    : null;
-
-  const recommendationItems =
-    recommendations.length === 0
-      ? null
-      : jsx.jsxs(jsx.Fragment, {
-          children: [
-            jsx.jsx("div", {
-              ref: (element: HTMLElement | null) => {
-                if (element != null && onPluginImpressions != null) {
-                  return observePluginImpressions(
-                    element,
-                    recommendations.map(pluginImpressionId),
-                    reported.current,
-                    onPluginImpressions,
-                  );
-                }
-              },
-              className: "flex flex-col",
-              children: recommendations.map((plugin) =>
-                jsx.jsxs(
-                  Menu.Item,
-                  {
-                    "data-plugin-impression-id": pluginImpressionId(plugin),
-                    rightIconAsset: shared.kc,
-                    onSelect: () => onConnectPlugin(plugin),
-                    children: [
-                      jsx.jsx(Menu.ItemIcon, {
-                        size: "xs",
-                        children: jsx.jsx(PluginLogo, {
-                          alt: "",
-                          className: "size-full object-contain",
-                          knownAppId: plugin.name ?? undefined,
-                          logoDarkUrl: plugin.logoDarkPath,
-                          logoUrl: plugin.logoPath,
-                          fallback: jsx.jsx(shared.Gm, {
-                            className: "size-full text-secondary",
-                          }),
-                        }),
-                      }),
-                      jsx.jsx("span", { children: plugin.displayName }),
-                    ],
-                  },
-                  plugin.id,
-                ),
-              ),
-            }),
-            jsx.jsx(Menu.Separator, {}),
-          ],
-        });
-
-  return jsx.jsxs(Menu.FlyoutSubmenuItem, {
-    leftIconAsset: shared.lT,
-    contentSurface: "opaque",
-    contentWidth: "menuWide",
-    label,
-    onOpenChange: (open: boolean) => {
-      if (!open) reported.current.clear();
-    },
-    children: [
-      loading,
-      recommendationItems,
-      jsx.jsx(Menu.Section, {
-        className: "flex flex-col",
-        children: jsx.jsx(Menu.Item, {
-          rightIconAsset: shared.uO,
-          onSelect: onOpenPluginDirectory,
-          children: jsx.jsx(FormattedMessage, {
-            id: "composer.workMode.plugins.browseAll",
-            defaultMessage: "Browse all plugins",
-            description:
-              "Action that opens the full plugin directory from a plugin picker",
-          }),
-        }),
+function W(e) {
+  "use forget";
+  let t = (0, K.c)(19),
+    {
+      featuredPlugins: n,
+      label: i,
+      onConnectPlugin: a,
+      onOpenPluginDirectory: o,
+      onPluginImpressions: c,
+      workRecommendationsHostId: l,
+    } = e,
+    { data: u, isLoading: d } = r(V, l),
+    f;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`) ? ((f = new Set()), (t[0] = f)) : (f = t[0]);
+  let p = (0, q.useRef)(f),
+    m;
+  t[1] !== n || t[2] !== u
+    ? ((m = u?.map(F) ?? n), (t[1] = n), (t[2] = u), (t[3] = m))
+    : (m = t[3]);
+  let g = m,
+    _;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((_ = (e) => {
+        e || p.current.clear();
       }),
-    ],
-  });
+      (t[4] = _))
+    : (_ = t[4]);
+  let v;
+  t[5] === d
+    ? (v = t[6])
+    : ((v = d
+        ? (0, J.jsx)(C.Message, {
+            compact: !0,
+            role: `status`,
+            children: (0, J.jsx)(`span`, {
+              className: `loading-shimmer-pure-text select-none`,
+              children: (0, J.jsx)(h, {
+                id: `composer.workMode.plugins.loadingRecommendations`,
+                defaultMessage: `Loading plugins…`,
+                description: `Status in the Connect plugins submenu while recommended plugins load. Installed plugins and the Browse all plugins action remain available.`,
+              }),
+            }),
+          })
+        : null),
+      (t[5] = d),
+      (t[6] = v));
+  let y;
+  t[7] !== a || t[8] !== c || t[9] !== g
+    ? ((y =
+        g.length > 0
+          ? (0, J.jsxs)(J.Fragment, {
+              children: [
+                (0, J.jsx)(`div`, {
+                  ref: (e) => {
+                    if (e != null && c != null) return U(e, g.map(G), p.current, c);
+                  },
+                  className: `flex flex-col`,
+                  children: g.map((e) =>
+                    (0, J.jsxs)(
+                      C.Item,
+                      {
+                        "data-plugin-impression-id": e.remotePluginId ?? e.id,
+                        rightIconAsset: w,
+                        onSelect: () => a(e),
+                        children: [
+                          (0, J.jsx)(C.ItemIcon, {
+                            size: `xs`,
+                            children: (0, J.jsx)(O, {
+                              alt: ``,
+                              className: `size-full object-contain`,
+                              knownAppId: e.name ?? void 0,
+                              logoDarkUrl: e.logoDarkPath,
+                              logoUrl: e.logoPath,
+                              fallback: (0, J.jsx)(s, { className: `size-full text-secondary` }),
+                            }),
+                          }),
+                          (0, J.jsx)(`span`, { children: e.displayName }),
+                        ],
+                      },
+                      e.id,
+                    ),
+                  ),
+                }),
+                (0, J.jsx)(C.Separator, {}),
+              ],
+            })
+          : null),
+      (t[7] = a),
+      (t[8] = c),
+      (t[9] = g),
+      (t[10] = y))
+    : (y = t[10]);
+  let b;
+  t[11] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((b = (0, J.jsx)(h, {
+        id: `composer.workMode.plugins.browseAll`,
+        defaultMessage: `Browse all plugins`,
+        description: `Action that opens the full plugin directory from a plugin picker`,
+      })),
+      (t[11] = b))
+    : (b = t[11]);
+  let x;
+  t[12] === o
+    ? (x = t[13])
+    : ((x = (0, J.jsx)(C.Section, {
+        className: `flex flex-col`,
+        children: (0, J.jsx)(C.Item, { rightIconAsset: D, onSelect: o, children: b }),
+      })),
+      (t[12] = o),
+      (t[13] = x));
+  let S;
+  return (
+    t[14] !== i || t[15] !== v || t[16] !== y || t[17] !== x
+      ? ((S = (0, J.jsxs)(C.FlyoutSubmenuItem, {
+          leftIconAsset: T,
+          contentSurface: `opaque`,
+          contentWidth: `menuWide`,
+          label: i,
+          onOpenChange: _,
+          children: [v, y, x],
+        })),
+        (t[14] = i),
+        (t[15] = v),
+        (t[16] = y),
+        (t[17] = x),
+        (t[18] = S))
+      : (S = t[18]),
+    S
+  );
 }
-
-function initializeConnectPluginsSubmenuItem(): void {
-  if (initialized) return;
-  initialized = true;
-  shared.$3();
-  shared.dO();
-  shared.cT();
-  shared.Oc();
-  shared.FX();
-  React = shared.e6();
-  shared.K2();
-  initial.Olt();
-  shared.If();
-  shared.Km();
-  initializeRecommendationQuery();
-  initial._v();
-  jsx = shared.I3();
+function G(e) {
+  return e.remotePluginId ?? e.id;
 }
-
-export {
-  initializeConnectPluginsSubmenuItem as n,
-  ConnectPluginsSubmenuItem as t,
-};
+var K, q, J;
+function Y() {
+  return (Y = e(() => {
+    ((K = t()), v(), _(), f(), a(), (q = y()), u(), N(), l(), d(), H(), P(), (J = c()));
+  }))();
+}
+export { Y as n, W as t };

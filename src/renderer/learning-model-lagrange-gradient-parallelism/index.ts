@@ -1,16 +1,13 @@
-// Lagrange gradient-parallelism manifest. Release chunk: type-b77b9fb94c5f.js.
-import "@rchunk/rolldown-runtime";
-
-const lagrangeGradientParallelismSpecification = {
-  type: "LAGRANGE_GRADIENT_PARALLELISM",
-  version: 1,
-  thumbnailAssetKey: "lagrange-gradient-parallelism-v1",
-  canonicalFormula: "\\nabla f \\parallel \\nabla g",
-  parameters: {
-    angleDegrees: { kind: "number" as const, defaultValue: 30, min: 0, max: 360 },
-  },
-};
-
-function initializeLagrangeGradientParallelismSpecification(): void {}
-
-export { lagrangeGradientParallelismSpecification as n, initializeLagrangeGradientParallelismSpecification as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `LAGRANGE_GRADIENT_PARALLELISM`),
+      (n = `lagrange-gradient-parallelism-v1`),
+      (r = `\\nabla f \\parallel \\nabla g`),
+      (i = { angleDegrees: { kind: `number`, defaultValue: 30, min: 0, max: 360 } }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+export { a as n, o as t };

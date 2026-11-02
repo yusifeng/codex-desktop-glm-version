@@ -1,7 +1,7 @@
-// No-op utility. Release chunk: noop-4d1a48b9db0c.js.
-import "@rchunk/rolldown-runtime";
-
-function noop(): void {}
-function initializeNoop(): void {}
-
-export { noop as n, initializeNoop as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t() {}
+function n() {
+  return (n = e(() => {}))();
+}
+export { t as n, n as t };

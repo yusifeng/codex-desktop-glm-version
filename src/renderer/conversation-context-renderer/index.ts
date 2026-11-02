@@ -1,166 +1,97 @@
-import {
-  fnn as initializeTurnProjection,
-  mnn as projectTurn,
-} from "@rchunk/app-initial";
-import {
-  a as CenterTruncator,
-  i as renderTurnToMarkdown,
-  o as initializeCenterTruncator,
-  r as renderConversationTitle,
-  t as initializeConversationMarkdown,
-} from "@rchunk/conversation-markdown";
-
-export interface ProjectionBudget {
-  fits(value: unknown): boolean;
-  select<Value>(
-    values: readonly Value[],
-    predicate?: (value: Value) => boolean,
-    limit?: number,
-  ): Value[];
-}
-
-export interface VisibleTurnEntry {
-  preserveServerUserMessages?: boolean;
-  requests: unknown;
-  turn: Record<string, unknown>;
-}
-
-export interface ConversationContextOptions {
-  cwd: string | null;
-  isBackgroundSubagentsEnabled: boolean;
-  markdownLimit: {
-    maxChars: number;
-    truncationMarker: string;
-  };
-  projectlessOutputDirectory: string | null;
-  title: string | null;
-  visibleTurnEntries: VisibleTurnEntry[];
-}
-
-class TurnProjectionBudget implements ProjectionBudget {
-  remainingChars: number;
-  remainingNodes: number;
-  truncated = false;
-
-  constructor(maxChars: number) {
-    this.remainingChars = Math.max(0, maxChars * 2);
-    this.remainingNodes = Math.max(1, Math.min(2048, maxChars));
-  }
-
-  fits(value: unknown): boolean {
-    const remainingChars = this.remainingChars;
-    if (this.visit(value, 0)) return true;
-    this.remainingChars = remainingChars;
-    this.truncated = true;
-    return false;
-  }
-
-  select<Value>(
-    values: readonly Value[],
-    predicate?: (value: Value) => boolean,
-    limit = this.remainingNodes,
-  ): Value[] {
-    const count = Math.min(values.length, Math.max(0, limit));
-    const midpoint = Math.ceil(count / 2);
-    const selected: Value[] = [];
-    for (let index = 0; index < count && this.remainingNodes > 0; index++) {
-      this.remainingNodes -= 1;
-      const value =
-        values[index < midpoint ? index : values.length - count + index];
-      if (predicate?.(value) !== false) selected.push(value);
-    }
-    this.truncated ||= selected.length !== values.length;
-    return selected;
-  }
-
-  private visit(value: unknown, depth: number): boolean {
-    if (this.remainingNodes-- <= 0 || depth > 32) return false;
-    if (typeof value === "string") {
-      this.remainingChars -= value.length;
-      return this.remainingChars >= 0;
-    }
-    if (typeof value !== "object" || value == null) return true;
-    if (Array.isArray(value)) {
-      for (const item of value) if (!this.visit(item, depth + 1)) return false;
-      return true;
-    }
-    for (const [key, item] of Object.entries(value)) {
-      if (!this.visit(key, depth + 1) || !this.visit(item, depth + 1)) return false;
-    }
-    return true;
-  }
-}
-
-function renderConversationContext({
-  cwd,
-  isBackgroundSubagentsEnabled,
-  markdownLimit,
-  projectlessOutputDirectory,
-  title,
-  visibleTurnEntries,
-}: ConversationContextOptions): string {
-  const output = new CenterTruncator(markdownLimit);
-  output.append(renderConversationTitle(title, markdownLimit));
-
-  const renderEntry = (entry: VisibleTurnEntry): string | null => {
-    const projectionBudget = new TurnProjectionBudget(markdownLimit.maxChars);
-    const turn = projectTurn(entry.turn, entry.requests, {
-      includeTurnDiff: false,
-      projectionBudget,
-      isBackgroundSubagentsEnabled,
-      preserveServerUserMessages: entry.preserveServerUserMessages,
-    });
-    const rendered = renderTurnToMarkdown({
-      turn,
-      cwd,
-      projectlessOutputDirectory,
-      markdownLimit,
-    });
-    return projectionBudget.truncated
-      ? `${rendered ?? ""}${markdownLimit.truncationMarker}`
-      : rendered;
-  };
-
-  let index = 0;
-  while (index < visibleTurnEntries.length && !output.truncated) {
-    const rendered = renderEntry(visibleTurnEntries[index++]);
-    if (rendered != null) {
-      output.append("\n\n");
-      output.append(rendered);
-    }
-  }
-
-  if (index < visibleTurnEntries.length) {
-    const tailLimit = Math.ceil(
-      (markdownLimit.maxChars - markdownLimit.truncationMarker.length) / 2,
-    );
-    let tail = "";
-    for (
-      let tailIndex = visibleTurnEntries.length - 1;
-      tailIndex >= index && tail.length < tailLimit;
-      tailIndex--
-    ) {
-      const rendered = renderEntry(visibleTurnEntries[tailIndex]);
-      if (rendered != null) {
-        tail = (tail.length === 0 ? rendered : `${rendered}\n\n${tail}`).slice(
-          -tailLimit,
-        );
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { fnn as t, mnn as n } from "@rchunk/app-initial";
+import { a as r, i, o as a, r as o, t as s } from "@rchunk/conversation-markdown";
+var c;
+function l() {
+  return (l = e(() => {
+    c = class {
+      remainingChars;
+      remainingNodes;
+      truncated = !1;
+      constructor(e) {
+        ((this.remainingChars = Math.max(0, e * 2)),
+          (this.remainingNodes = Math.max(1, Math.min(2048, e))));
       }
-    }
-    if (tail.length > 0) {
-      output.append("\n\n");
-      output.append(tail);
-    }
+      fits(e) {
+        let t = this.remainingChars;
+        return this.visit(e, 0) ? !0 : ((this.remainingChars = t), (this.truncated = !0), !1);
+      }
+      select(e, t, n = this.remainingNodes) {
+        let r = Math.min(e.length, Math.max(0, n)),
+          i = Math.ceil(r / 2),
+          a = [];
+        for (let n = 0; n < r && this.remainingNodes > 0; n++) {
+          this.remainingNodes--;
+          let o = e[n < i ? n : e.length - r + n];
+          t?.(o) !== !1 && a.push(o);
+        }
+        return ((this.truncated = this.truncated || a.length !== e.length), a);
+      }
+      visit(e, t) {
+        if (this.remainingNodes-- <= 0 || t > 32) return !1;
+        if (typeof e == `string`)
+          return ((this.remainingChars -= e.length), this.remainingChars >= 0);
+        if (typeof e != `object` || !e) return !0;
+        if (Array.isArray(e)) {
+          for (let n of e) if (!this.visit(n, t + 1)) return !1;
+          return !0;
+        }
+        for (let n in e) if (!this.visit(n, t + 1) || !this.visit(e[n], t + 1)) return !1;
+        return !0;
+      }
+    };
+  }))();
+}
+function u({
+  cwd: e,
+  isBackgroundSubagentsEnabled: t,
+  markdownLimit: a,
+  projectlessOutputDirectory: s,
+  title: l,
+  visibleTurnEntries: u,
+}) {
+  let d = new r(a);
+  d.append(o(l, a));
+  let f = (r) => {
+      let o = new c(a.maxChars),
+        l = n(r.turn, r.requests, {
+          includeTurnDiff: !1,
+          projectionBudget: o,
+          isBackgroundSubagentsEnabled: t,
+          preserveServerUserMessages: r.preserveServerUserMessages,
+        }),
+        u = i({ turn: l, cwd: e, projectlessOutputDirectory: s, markdownLimit: a });
+      return o.truncated ? `${u ?? ``}${a.truncationMarker}` : u;
+    },
+    p = 0;
+  for (; p < u.length && !d.truncated;) {
+    let e = f(u[p++]);
+    e != null &&
+      (d.append(`
+
+`),
+      d.append(e));
   }
-  return `${output.toString().trimEnd()}\n`;
+  if (p < u.length) {
+    let e = Math.ceil((a.maxChars - a.truncationMarker.length) / 2),
+      t = ``;
+    for (let n = u.length - 1; n >= p && t.length < e; n--) {
+      let r = f(u[n]);
+      r != null && (t = (t.length === 0 ? r : `${r}\n\n${t}`).slice(-e));
+    }
+    t.length > 0 &&
+      (d.append(`
+
+`),
+      d.append(t));
+  }
+  return `${d.toString().trimEnd()}\n`;
 }
-
-function initializeConversationContextRenderer(): void {
-  initializeConversationMarkdown();
-  initializeTurnProjection();
-  initializeCenterTruncator();
+function d() {
+  return (d = e(() => {
+    (s(), t(), a(), l());
+  }))();
 }
-
-initializeConversationContextRenderer();
-
-export { renderConversationContext };
+d();
+export { u as renderConversationContext };

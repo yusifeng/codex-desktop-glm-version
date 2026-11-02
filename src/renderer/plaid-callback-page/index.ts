@@ -1,122 +1,111 @@
-// plaid-callback-page —— Plaid 授权完成后的确认、Toast 与返回导航。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as plaidLinkChunk from "@rchunk/plaid-link";
-void runtimeChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  $h: initializeLoadingSpinner,
-  FX: initializeSignalRuntime,
-  I3: getJsxRuntime,
-  K2: initializeSharedUi,
-  LX: useScope,
-  QI: initializeScopeRuntime,
-  Qh: LoadingSpinner,
-  ZI: appScope,
-  e6: reactRuntime,
-  lk: initializeToastRuntime,
-  n4: useIntl,
-  pk: toastManagerSignal,
-} = appSharedChunk;
-const {
-  M6t: initializeGptResource,
-  N6t: useSessionIdentity,
-  Qgn: initializeAccountContext,
-  i_n: useLocation,
-  o_n: useNavigate,
-} = appInitialChunk;
-const {
-  n: initializePlaidLink,
-  r: confirmPlaidRedirect,
-  t: getPlaidReturnPath,
-} = plaidLinkChunk;
-
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function PersonalFinancePlaidCallbackPage(): unknown {
-  const scope = useScope(appScope);
-  const { accountId } = useSessionIdentity();
-  const intl = useIntl();
-  const navigate = useNavigate();
-  const { pathname, search, hash } = useLocation();
-  const completeRedirect = async (
-    resolvedAccountId: string,
-    signal: AbortSignal,
-  ): Promise<void> => {
-    const returnPath = getPlaidReturnPath(resolvedAccountId);
-    try {
-      const connected = await confirmPlaidRedirect(scope, {
-        accountId: resolvedAccountId,
-        receivedRedirectUri: `${window.location.origin}${pathname}${search}${hash}`,
-        signal,
-      });
-      if (connected && !signal.aborted) {
-        scope.get(toastManagerSignal).success(
-          formatMessageText(intl, {
-            id: "personalFinance.accounts.connectionSuccess",
-            defaultMessage: "Your financial account is now connected",
-            description:
-              "Success toast shown after Plaid and ChatGPT confirm that a financial account was successfully connected or repaired in ChatGPT Personal Finance",
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $h as n,
+  FX as r,
+  I3 as i,
+  K2 as a,
+  LX as o,
+  QI as s,
+  Qh as c,
+  ZI as l,
+  e6 as u,
+  lk as d,
+  n4 as f,
+  pk as p,
+} from "@rchunk/app-shared";
+import { M6t as m, N6t as h, Qgn as g, i_n as _, o_n as v } from "@rchunk/app-initial";
+import { n as y, r as b, t as x } from "@rchunk/plaid-link";
+function S() {
+  let e = (0, C.c)(16),
+    t = o(l),
+    { accountId: n } = h(),
+    r = f(),
+    i = v(),
+    { pathname: a, search: s, hash: u } = _(),
+    d;
+  e[0] !== u || e[1] !== r || e[2] !== i || e[3] !== a || e[4] !== t || e[5] !== s
+    ? ((d = async (e, n) => {
+        let o = x(e);
+        try {
+          (await b(t, {
+            accountId: e,
+            receivedRedirectUri: `${window.location.origin}${a}${s}${u}`,
+            signal: n,
+          })) &&
+            !n.aborted &&
+            t
+              .get(p)
+              .success(
+                r.formatMessage({
+                  id: `personalFinance.accounts.connectionSuccess`,
+                  defaultMessage: `Your financial account is now connected`,
+                  description: `Success toast shown after Plaid and ChatGPT confirm that a financial account was successfully connected or repaired in ChatGPT Personal Finance`,
+                }),
+              );
+        } catch {
+          n.aborted ||
+            t
+              .get(p)
+              .danger(
+                r.formatMessage({
+                  id: `personalFinance.accounts.connectionError`,
+                  defaultMessage: `Your financial account couldn’t be connected`,
+                  description: `Error toast shown when starting Plaid, completing account authorization, or confirming a bank connection fails in ChatGPT Personal Finance`,
+                }),
+                { errorAnalytics: { toastId: `personalFinance.accounts.connectionError` } },
+              );
+        }
+        n.aborted || i(o, { replace: !0 });
+      }),
+      (e[0] = u),
+      (e[1] = r),
+      (e[2] = i),
+      (e[3] = a),
+      (e[4] = t),
+      (e[5] = s),
+      (e[6] = d))
+    : (d = e[6]);
+  let m = (0, w.useEffectEvent)(d),
+    g;
+  e[7] !== n || e[8] !== m
+    ? ((g = () => {
+        if (n == null) return;
+        let e = new AbortController();
+        return (
+          queueMicrotask(() => {
+            e.signal.aborted || m(n, e.signal);
           }),
+          () => e.abort()
         );
-      }
-    } catch {
-      if (!signal.aborted) {
-        scope.get(toastManagerSignal).danger(
-          formatMessageText(intl, {
-            id: "personalFinance.accounts.connectionError",
-            defaultMessage: "Your financial account couldn’t be connected",
-            description:
-              "Error toast shown when starting Plaid, completing account authorization, or confirming a bank connection fails in ChatGPT Personal Finance",
-          }),
-          {
-            errorAnalytics: {
-              toastId: "personalFinance.accounts.connectionError",
-            },
-          },
-        );
-      }
-    }
-    if (!signal.aborted) navigate(returnPath, { replace: true });
-  };
-  reactRuntime.useEffect(() => {
-    if (accountId == null) return;
-    const controller = new AbortController();
-    queueMicrotask(() => {
-      if (!controller.signal.aborted)
-        void completeRedirect(accountId, controller.signal);
-    });
-    return () => controller.abort();
-  }, [accountId, pathname, search, hash]);
-  return jsx.jsx("div", {
-    className: "flex min-h-32 items-center justify-center",
-    children: jsx.jsx(LoadingSpinner, { className: "icon-sm" }),
-  });
+      }),
+      (e[7] = n),
+      (e[8] = m),
+      (e[9] = g))
+    : (g = e[9]);
+  let y;
+  (e[10] !== n || e[11] !== u || e[12] !== a || e[13] !== s
+    ? ((y = [n, a, s, u]), (e[10] = n), (e[11] = u), (e[12] = a), (e[13] = s), (e[14] = y))
+    : (y = e[14]),
+    (0, w.useEffect)(g, y));
+  let S;
+  return (
+    e[15] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((S = (0, T.jsx)(`div`, {
+          className: `flex min-h-32 items-center justify-center`,
+          children: (0, T.jsx)(c, { className: `icon-sm` }),
+        })),
+        (e[15] = S))
+      : (S = e[15]),
+    S
+  );
 }
-
-function formatMessageText(
-  intl: import("@rchunk/app-shared").IntlShape,
-  descriptor: import("@rchunk/app-shared").MessageDescriptor,
-): string {
-  const message = intl.formatMessage(descriptor);
-  return typeof message === "string" ? message : message.map(String).join("");
+var C, w, T;
+function E() {
+  return (E = e(() => {
+    ((C = t()), r(), (w = u()), a(), g(), m(), n(), d(), s(), y(), (T = i()));
+  }))();
 }
-
-function initializePlaidCallbackPage(): void {
-  initializeRuntimeLazy();
-  initializeSignalRuntime();
-  reactRuntime();
-  initializeSharedUi();
-  initializeAccountContext();
-  initializeGptResource();
-  initializeLoadingSpinner();
-  initializeToastRuntime();
-  initializeScopeRuntime();
-  initializePlaidLink();
-  jsx = getJsxRuntime();
-}
-
-initializePlaidCallbackPage();
-export { PersonalFinancePlaidCallbackPage };
+E();
+export { S as PersonalFinancePlaidCallbackPage };

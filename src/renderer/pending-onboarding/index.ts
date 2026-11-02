@@ -1,82 +1,20 @@
-// pending-onboarding —— 尚未完成的 onboarding 会话索引。
-
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import type {
-  DerivedScopedSignalContext,
-  ScopedDerivedFamily,
-  ScopedSignal,
-} from "@rchunk/app-shared";
-
-void runtimeChunk;
-
-const {
-  Ftn: initializeThreadState,
-  Ltn: threadByIdFamily,
-  Sun: initializeAccountState,
-  _un: currentUserIdSignal,
-  mun: currentAccountIdSignal,
-} = appInitialChunk;
-const {
-  FX: initializeSignalRuntime,
-  QI: initializeAppScope,
-  ZI: appScope,
-  pZ: createScopedSignal,
-  rZ: createDerivedFamily,
-} = appSharedChunk;
-
-export interface PendingOnboarding {
-  accountId: string | null;
-  userId: string | null;
-  [key: string]: unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, QI as n, ZI as r, pZ as i, rZ as a } from "@rchunk/app-shared";
+import { Ftn as o, Ltn as s, Sun as c, _un as l, mun as u } from "@rchunk/app-initial";
+var d, f;
+function p() {
+  return (p = e(() => {
+    (t(),
+      c(),
+      n(),
+      o(),
+      (d = i(r, new Map())),
+      (f = a(r, (e, { get: t }) => {
+        if (e == null) return null;
+        let n = t(d).get(e);
+        return n != null && n.accountId === t(u) && n.userId === t(l) && t(s, e) != null ? n : null;
+      })));
+  }))();
 }
-
-type AppScopeState = Record<string, unknown>;
-type PendingOnboardingMap = Map<string, PendingOnboarding>;
-
-let pendingOnboardingByThreadSignal: ScopedSignal<
-  AppScopeState,
-  PendingOnboardingMap
->;
-let pendingOnboardingForThreadFamily: ScopedDerivedFamily<
-  AppScopeState,
-  string | null,
-  PendingOnboarding | null
->;
-let initialized = false;
-
-function initializePendingOnboarding(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeSignalRuntime();
-  initializeAccountState();
-  initializeAppScope();
-  initializeThreadState();
-  pendingOnboardingByThreadSignal = createScopedSignal(
-    appScope,
-    new Map<string, PendingOnboarding>(),
-  );
-  pendingOnboardingForThreadFamily = createDerivedFamily(
-    appScope,
-    (
-      threadId: string | null,
-      { get }: DerivedScopedSignalContext<AppScopeState>,
-    ) => {
-      if (threadId == null) return null;
-      const pending = get(pendingOnboardingByThreadSignal).get(threadId);
-      return pending != null &&
-        pending.accountId === get<string | null>(currentAccountIdSignal) &&
-        pending.userId === get<string | null>(currentUserIdSignal) &&
-        get<unknown>(threadByIdFamily, threadId) != null
-        ? pending
-        : null;
-    },
-  );
-}
-
-export {
-  pendingOnboardingForThreadFamily as n,
-  pendingOnboardingByThreadSignal as r,
-  initializePendingOnboarding as t,
-};
+export { f as n, d as r, p as t };

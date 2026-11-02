@@ -1,73 +1,63 @@
-// Logistic density-dependence learning model. Release chunk: model-43a9f02da387.js.
-import "@rchunk/rolldown-runtime";
-
-interface DensityValues { carrying_capacity?: number | null; intrinsic_growth_rate?: number | null; current_density?: number | null }
-interface NormalizedDensityValues { carrying_capacity: number; intrinsic_growth_rate: number; current_density: number }
-interface DensityManifest {
-  type: string; version: number; thumbnailAssetKey: string;
-  parameters: {
-    carrying_capacity: { kind: "integer"; defaultValue: number; min: number; max: number };
-    intrinsic_growth_rate: { kind: "number"; defaultValue: number; min: number; max: number };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `DENSITY_DEPENDENCE`),
+      (n = `density-dependence-v1`),
+      (r = {
+        carrying_capacity: { kind: `integer`, defaultValue: 100, min: 40, max: 200 },
+        intrinsic_growth_rate: { kind: `number`, defaultValue: 0.4, min: 0.1, max: 0.8 },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-let densityDependenceManifest: DensityManifest;
-let carryingCapacityControl: { defaultValue: number; min: number; max: number; step: number };
-let intrinsicGrowthControl: { defaultValue: number; min: number; max: number; step: number };
-let normalizeDensityValues: (values: DensityValues) => NormalizedDensityValues;
-let calculateDensityDependence: (values: DensityValues) => {
-  carryingCapacity: number; intrinsicGrowthRate: number; currentDensity: number; densityDependentRate: number;
-  densityIndependentRate: number; state: "stable" | "growing" | "declining";
-};
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeDensityDependenceManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  densityDependenceManifest = {
-    type: "DENSITY_DEPENDENCE", version: 2, thumbnailAssetKey: "density-dependence-v1",
-    parameters: {
-      carrying_capacity: { kind: "integer", defaultValue: 100, min: 40, max: 200 },
-      intrinsic_growth_rate: { kind: "number", defaultValue: 0.4, min: 0.1, max: 0.8 },
-    },
-  };
+var o, s, c, l, u;
+function d() {
+  return (d = e(() => {
+    (a(),
+      (o = {
+        defaultValue: i.parameters.carrying_capacity.defaultValue,
+        min: i.parameters.carrying_capacity.min,
+        max: i.parameters.carrying_capacity.max,
+        step: 1,
+      }),
+      (s = {
+        defaultValue: i.parameters.intrinsic_growth_rate.defaultValue,
+        min: i.parameters.intrinsic_growth_rate.min,
+        max: i.parameters.intrinsic_growth_rate.max,
+        step: 0.01,
+      }),
+      (c = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (l = (e) => {
+        let t = Number.isFinite(e.carrying_capacity)
+          ? c(Math.round(e.carrying_capacity), o.min, o.max)
+          : o.defaultValue;
+        return {
+          carrying_capacity: t,
+          intrinsic_growth_rate: Number.isFinite(e.intrinsic_growth_rate)
+            ? c(e.intrinsic_growth_rate, s.min, s.max)
+            : s.defaultValue,
+          current_density: Number.isFinite(e.current_density)
+            ? c(e.current_density, 1, t * 2)
+            : t * 0.6,
+        };
+      }),
+      (u = (e) => {
+        let t = l(e),
+          n = t.carrying_capacity,
+          r = t.intrinsic_growth_rate,
+          i = t.current_density,
+          a = r * (1 - i / n);
+        return {
+          carryingCapacity: n,
+          intrinsicGrowthRate: r,
+          currentDensity: i,
+          densityDependentRate: a,
+          densityIndependentRate: r * 0.65,
+          state: Math.abs(a) < 1e-9 ? `stable` : a > 0 ? `growing` : `declining`,
+        };
+      }));
+  }))();
 }
-
-function initializeDensityDependenceModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializeDensityDependenceManifest();
-  carryingCapacityControl = { ...densityDependenceManifest.parameters.carrying_capacity, step: 1 };
-  intrinsicGrowthControl = { ...densityDependenceManifest.parameters.intrinsic_growth_rate, step: 0.01 };
-  const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-  normalizeDensityValues = values => {
-    const carryingCapacity = typeof values.carrying_capacity === "number" && Number.isFinite(values.carrying_capacity)
-      ? clamp(Math.round(values.carrying_capacity), carryingCapacityControl.min, carryingCapacityControl.max)
-      : carryingCapacityControl.defaultValue;
-    return {
-      carrying_capacity: carryingCapacity,
-      intrinsic_growth_rate: typeof values.intrinsic_growth_rate === "number" && Number.isFinite(values.intrinsic_growth_rate)
-        ? clamp(values.intrinsic_growth_rate, intrinsicGrowthControl.min, intrinsicGrowthControl.max)
-        : intrinsicGrowthControl.defaultValue,
-      current_density: typeof values.current_density === "number" && Number.isFinite(values.current_density)
-        ? clamp(values.current_density, 1, carryingCapacity * 2)
-        : carryingCapacity * 0.6,
-    };
-  };
-  calculateDensityDependence = values => {
-    const normalized = normalizeDensityValues(values);
-    const densityDependentRate = normalized.intrinsic_growth_rate * (1 - normalized.current_density / normalized.carrying_capacity);
-    return {
-      carryingCapacity: normalized.carrying_capacity, intrinsicGrowthRate: normalized.intrinsic_growth_rate,
-      currentDensity: normalized.current_density, densityDependentRate,
-      densityIndependentRate: normalized.intrinsic_growth_rate * 0.65,
-      state: Math.abs(densityDependentRate) < 1e-9 ? "stable" : densityDependentRate > 0 ? "growing" : "declining",
-    };
-  };
-}
-
-export {
-  normalizeDensityValues as a, initializeDensityDependenceModel as i, intrinsicGrowthControl as n,
-  initializeDensityDependenceManifest as o, calculateDensityDependence as r, densityDependenceManifest as s, carryingCapacityControl as t,
-};
+export { l as a, d as i, s as n, a as o, u as r, i as s, o as t };

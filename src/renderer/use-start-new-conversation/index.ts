@@ -1,18 +1,10 @@
-import { FX as initializeSignalRuntime } from "@rchunk/app-shared";
-import {
-  d2 as initializeStartNewConversation,
-  f2 as revealNewChat,
-  h2 as useStartNewConversation,
-  m2 as startNewConversation,
-  p2 as shouldDefaultNewConversationsToWork,
-} from "@rchunk/app-initial";
-
-initializeSignalRuntime();
-initializeStartNewConversation();
-
+// @ts-nocheck
+import "@rchunk/app-shared";
+import { d2 as e, f2 as t, h2 as n, m2 as r, p2 as i } from "@rchunk/app-initial";
+e();
 export {
-  revealNewChat,
-  shouldDefaultNewConversationsToWork,
-  startNewConversation,
-  useStartNewConversation,
+  t as revealNewChat,
+  i as shouldDefaultNewConversationsToWork,
+  r as startNewConversation,
+  n as useStartNewConversation,
 };

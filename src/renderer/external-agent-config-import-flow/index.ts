@@ -1,8 +1,5 @@
+// @ts-nocheck
 import "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-
-const { $i: openExternalAgentImportExport, Qi: initializeExternalAgentImport } =
-  appInitialChunk;
-initializeExternalAgentImport();
-const openExternalAgentImport = openExternalAgentImportExport;
-export { openExternalAgentImport };
+import { $i as e, Qi as t } from "@rchunk/app-initial";
+t();
+export { e as openExternalAgentImport };

@@ -1,122 +1,77 @@
-export interface PromoFunnelCheckoutContext {
-  accountId?: string;
-  location: string;
-  organizationId?: string;
-  promoCampaignId?: string;
-  promoCode?: string;
-  referralCode?: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e) {
+  return typeof e == `object` && !!e && !Array.isArray(e);
 }
-
-interface StoredPromoFunnelCheckoutContext extends PromoFunnelCheckoutContext {
-  createdAt: number;
-  expiresAt: number;
+function n(e) {
+  return typeof e == `number` && Number.isFinite(e);
 }
-
-const STORAGE_KEY = "oai/apps/promoFunnelCheckoutContext";
-const OPTIONAL_STRING_FIELDS = [
-  "accountId",
-  "organizationId",
-  "promoCampaignId",
-  "promoCode",
-  "referralCode",
-] as const;
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value != null && !Array.isArray(value);
+function r(e) {
+  if (typeof e != `string`) return null;
+  let t = e.trim();
+  return t.length > 0 ? t : null;
 }
-
-function isFiniteNumber(value: unknown): value is number {
-  return typeof value === "number" && Number.isFinite(value);
+function i(e, t) {
+  return t in e ? (r(e[t]) ?? void 0) : void 0;
 }
-
-function nonEmptyString(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
+function a(e, t) {
+  return t in e && r(e[t]) == null;
 }
-
-function optionalString(
-  value: Record<string, unknown>,
-  key: string,
-): string | undefined {
-  return key in value ? nonEmptyString(value[key]) ?? undefined : undefined;
+function o(e) {
+  if (!t(e)) return null;
+  let o = r(e.location);
+  return o == null || !n(e.createdAt) || !n(e.expiresAt) || l.some((t) => a(e, t))
+    ? null
+    : {
+        accountId: i(e, `accountId`),
+        createdAt: e.createdAt,
+        expiresAt: e.expiresAt,
+        location: o,
+        organizationId: i(e, `organizationId`),
+        promoCampaignId: i(e, `promoCampaignId`),
+        promoCode: i(e, `promoCode`),
+        referralCode: i(e, `referralCode`),
+      };
 }
-
-function hasInvalidOptionalString(
-  value: Record<string, unknown>,
-  key: string,
-): boolean {
-  return key in value && nonEmptyString(value[key]) == null;
+function s(e, t = Date.now()) {
+  return { ...e, createdAt: t, expiresAt: t + 864e5 };
 }
-
-function parseStoredContext(value: unknown): StoredPromoFunnelCheckoutContext | null {
-  if (!isRecord(value)) return null;
-  const location = nonEmptyString(value.location);
-  if (
-    location == null ||
-    !isFiniteNumber(value.createdAt) ||
-    !isFiniteNumber(value.expiresAt) ||
-    OPTIONAL_STRING_FIELDS.some((key) => hasInvalidOptionalString(value, key))
-  ) {
-    return null;
-  }
-  return {
-    accountId: optionalString(value, "accountId"),
-    createdAt: value.createdAt,
-    expiresAt: value.expiresAt,
-    location,
-    organizationId: optionalString(value, "organizationId"),
-    promoCampaignId: optionalString(value, "promoCampaignId"),
-    promoCode: optionalString(value, "promoCode"),
-    referralCode: optionalString(value, "referralCode"),
-  };
+function c(e, t = Date.now()) {
+  let n = o(e);
+  return n == null || t >= n.expiresAt
+    ? null
+    : {
+        accountId: n.accountId,
+        location: n.location,
+        organizationId: n.organizationId,
+        promoCampaignId: n.promoCampaignId,
+        promoCode: n.promoCode,
+        referralCode: n.referralCode,
+      };
 }
-
-function withExpiration(
-  context: PromoFunnelCheckoutContext,
-  now = Date.now(),
-): StoredPromoFunnelCheckoutContext {
-  return { ...context, createdAt: now, expiresAt: now + 86_400_000 };
+var l;
+function u() {
+  return (u = e(() => {
+    l = [`accountId`, `organizationId`, `promoCampaignId`, `promoCode`, `referralCode`];
+  }))();
 }
-
-function readUnexpiredContext(
-  value: unknown,
-  now = Date.now(),
-): PromoFunnelCheckoutContext | null {
-  const parsed = parseStoredContext(value);
-  if (parsed == null || now >= parsed.expiresAt) return null;
-  return {
-    accountId: parsed.accountId,
-    location: parsed.location,
-    organizationId: parsed.organizationId,
-    promoCampaignId: parsed.promoCampaignId,
-    promoCode: parsed.promoCode,
-    referralCode: parsed.referralCode,
-  };
-}
-
-function storePromoFunnelCheckoutContext(
-  context: PromoFunnelCheckoutContext,
-): void {
+function d(e) {
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(withExpiration(context)));
+    window.localStorage.setItem(p, JSON.stringify(s(e)));
   } catch {}
 }
-
-function consumePromoFunnelCheckoutContext(): PromoFunnelCheckoutContext | null {
-  let value: unknown = null;
+function f() {
+  let e = null;
   try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    value = stored == null ? null : JSON.parse(stored);
-    window.localStorage.removeItem(STORAGE_KEY);
+    let t = window.localStorage.getItem(p);
+    ((e = t == null ? null : JSON.parse(t)), window.localStorage.removeItem(p));
   } catch {}
-  return readUnexpiredContext(value);
+  return c(e);
 }
-
-function initializePromoFunnelContext(): void {}
-
-export {
-  initializePromoFunnelContext as n,
-  storePromoFunnelCheckoutContext as r,
-  consumePromoFunnelCheckoutContext as t,
-};
+var p;
+function m() {
+  return (m = e(() => {
+    (u(), (p = `oai/apps/promoFunnelCheckoutContext`));
+  }))();
+}
+export { m as n, d as r, f as t };

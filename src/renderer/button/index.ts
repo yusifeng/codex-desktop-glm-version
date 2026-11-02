@@ -1,88 +1,40 @@
-// Learning-block action buttons. Release chunk: button-6de526bfdc3d.js.
-import "@rchunk/rolldown-runtime";
-import * as AppShared from "@rchunk/app-shared";
-
-type ClassValue =
-  | string
-  | number
-  | boolean
-  | null
-  | undefined
-  | readonly ClassValue[]
-  | Record<string, boolean>;
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown;
-}
-
-interface ActionButtonProps extends Record<string, unknown> {
-  className?: string;
-  onClick?: () => void;
-}
-
-interface ActionButtonGroupProps extends Record<string, unknown> {
-  children?: unknown;
-  className?: string;
-  columns?: number;
-}
-
-const sharedRuntime = AppShared as unknown as {
-  I3(): JsxRuntime;
-  h4(): void;
-  m4(...values: ClassValue[]): string;
-};
-
-let jsxRuntime: JsxRuntime;
-
-function ActionButton({
-  className,
-  onClick,
-  ...buttonProps
-}: ActionButtonProps): unknown {
-  const deferredClick = onClick
-    ? () => {
-        window.requestAnimationFrame(() => {
-          window.requestAnimationFrame(onClick);
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { I3 as t, h4 as n, m4 as r } from "@rchunk/app-shared";
+var i, a, o;
+function s() {
+  return (s = e(() => {
+    (n(),
+      (i = t()),
+      (a = ({ className: e, onClick: t, ...n }) => {
+        let a = t
+          ? () => {
+              let e = t;
+              window.requestAnimationFrame(() => {
+                window.requestAnimationFrame(e);
+              });
+            }
+          : void 0;
+        return (0, i.jsx)(`button`, {
+          ...n,
+          type: `button`,
+          className: r(
+            `interactive-button interactive-button-secondary interactive-outline-secondary flex min-h-9 w-full min-w-0 cursor-pointer items-center justify-center rounded-full px-3 py-1.5 text-center text-sm leading-5 font-medium whitespace-normal select-none transition-colors disabled:cursor-not-allowed`,
+            e,
+          ),
+          onClick: a,
         });
-      }
-    : undefined;
-
-  return jsxRuntime.jsx("button", {
-    ...buttonProps,
-    type: "button",
-    className: sharedRuntime.m4(
-      "interactive-button interactive-button-secondary interactive-outline-secondary flex min-h-9 w-full min-w-0 cursor-pointer items-center justify-center rounded-full px-3 py-1.5 text-center text-sm leading-5 font-medium whitespace-normal select-none transition-colors disabled:cursor-not-allowed",
-      className,
-    ),
-    onClick: deferredClick,
-  });
+      }),
+      (o = ({ children: e, className: t, columns: n = 1, ...a }) =>
+        (0, i.jsx)(`div`, {
+          ...a,
+          className: r(
+            `grid gap-2`,
+            n === 2 ? `grid-cols-2 [&>*:last-child:nth-child(odd)]:col-span-2` : `grid-cols-1`,
+            t,
+          ),
+          children: e,
+        })));
+  }))();
 }
-
-function ActionButtonGroup({
-  children,
-  className,
-  columns = 1,
-  ...groupProps
-}: ActionButtonGroupProps): unknown {
-  return jsxRuntime.jsx("div", {
-    ...groupProps,
-    className: sharedRuntime.m4(
-      "grid gap-2",
-      columns === 2
-        ? "grid-cols-2 [&>*:last-child:nth-child(odd)]:col-span-2"
-        : "grid-cols-1",
-      className,
-    ),
-    children,
-  });
-}
-
-function initializeLearningBlockButtons(): void {
-  sharedRuntime.h4();
-  jsxRuntime = sharedRuntime.I3();
-}
-
-export {
-  ActionButtonGroup as n,
-  initializeLearningBlockButtons as r,
-  ActionButton as t,
-};
+export { o as n, s as r, a as t };

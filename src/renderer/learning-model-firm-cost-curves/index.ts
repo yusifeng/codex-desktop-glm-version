@@ -1,53 +1,33 @@
-// Firm-cost curves learning model: compare marginal cost with AVC and ATC.
-import "@rchunk/rolldown-runtime";
-
-type CostDirection = "falling" | "minimum" | "rising";
-interface FirmCostValues { output?: number | null }
-interface FirmCostState {
-  atcDirection: CostDirection;
-  avcDirection: CostDirection;
-  averageFixedCost: number;
-  averageTotalCost: number;
-  averageVariableCost: number;
-  marginalCost: number;
-  output: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o;
+function s() {
+  return (s = e(() => {
+    ((t = { defaultValue: 4.5, min: 1, max: 8, step: 0.1 }),
+      (n = 50),
+      (r = 1e-9),
+      (i = (e, t) => (Math.abs(e - t) <= r ? `minimum` : e < t ? `falling` : `rising`)),
+      (a = (e) => ({
+        output: Number.isFinite(e.output)
+          ? Math.min(Math.max(e.output ?? t.defaultValue, t.min), t.max)
+          : t.defaultValue,
+      })),
+      (o = (e) => {
+        let { output: t } = a(e),
+          r = 35 - 8 * t + t ** 2,
+          o = n / t,
+          s = r + o,
+          c = 35 - 16 * t + 3 * t ** 2;
+        return {
+          output: t,
+          marginalCost: c,
+          averageVariableCost: r,
+          averageFixedCost: o,
+          averageTotalCost: s,
+          avcDirection: i(c, r),
+          atcDirection: i(c, s),
+        };
+      }));
+  }))();
 }
-
-const outputControl = { defaultValue: 4.5, min: 1, max: 8, step: 0.1 };
-const fixedCost = 50;
-const comparisonTolerance = 1e-9;
-
-function costDirection(marginalCost: number, averageCost: number): CostDirection {
-  return Math.abs(marginalCost - averageCost) <= comparisonTolerance
-    ? "minimum"
-    : marginalCost < averageCost ? "falling" : "rising";
-}
-
-function normalizeFirmCostValues(values: FirmCostValues): { output: number } {
-  return {
-    output: Number.isFinite(values.output)
-      ? Math.min(Math.max(values.output ?? outputControl.defaultValue, outputControl.min), outputControl.max)
-      : outputControl.defaultValue,
-  };
-}
-
-function calculateFirmCosts(values: FirmCostValues): FirmCostState {
-  const { output } = normalizeFirmCostValues(values);
-  const averageVariableCost = 35 - 8 * output + output ** 2;
-  const averageFixedCost = fixedCost / output;
-  const averageTotalCost = averageVariableCost + averageFixedCost;
-  const marginalCost = 35 - 16 * output + 3 * output ** 2;
-  return {
-    output,
-    marginalCost,
-    averageVariableCost,
-    averageFixedCost,
-    averageTotalCost,
-    avcDirection: costDirection(marginalCost, averageVariableCost),
-    atcDirection: costDirection(marginalCost, averageTotalCost),
-  };
-}
-
-function initializeFirmCostCurvesModel(): void {}
-
-export { normalizeFirmCostValues as i, calculateFirmCosts as n, initializeFirmCostCurvesModel as r, outputControl as t };
+export { a as i, o as n, s as r, t };

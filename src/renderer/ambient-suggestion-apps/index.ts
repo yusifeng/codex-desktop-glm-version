@@ -1,123 +1,79 @@
-// ambient-suggestion-apps —— Ambient suggestion 中 app id 的规范化、查询和图标资格。
-// 原版：app/webview/assets/ambient-suggestion-apps-75842c7ad68b.js。
-
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, BX as n, FX as r, QI as i, ZI as a, rZ as o } from "@rchunk/app-shared";
 import {
-  BX as useStoreFamilyValue,
-  FX as initializeStore,
-  QI as initializeQueryBridge,
-  ZI as storeFamily,
-  rZ as createDerivedFamily,
-  type DerivedScopedSignalContext,
-  type ScopedDerivedFamily,
-} from "@rchunk/app-shared";
-import {
-  $4t as initializeApps,
-  Bfn as initializeAppIcons,
-  HEt as initializeHostApps,
-  M6t as initializeAppQueries,
-  MEt as appsQueryFamily,
-  N6t as useCurrentUser,
-  X4t as resolveAppIcon,
-  oDt as initializeHostState,
-  sDt as useHostAvailable,
+  $4t as s,
+  Bfn as c,
+  HEt as l,
+  M6t as u,
+  MEt as d,
+  N6t as f,
+  X4t as p,
+  oDt as m,
+  sDt as h,
 } from "@rchunk/app-initial";
-
-export interface AmbientSuggestionApp {
-  id: string;
-  name: string;
-  pluginDisplayNames?: string[] | null;
-  [key: string]: unknown;
-}
-
-function normalizeAmbientAppId(value: string): string {
-  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
-}
-
-function createAmbientSuggestionAppIndex(
-  apps: AmbientSuggestionApp[],
-): Map<string, AmbientSuggestionApp> {
-  const index = new Map<string, AmbientSuggestionApp>();
-  for (const app of apps) {
-    const aliases = [
-      app.id,
-      normalizeAmbientAppId(app.id),
-      normalizeAmbientAppId(app.name),
-      ...(app.pluginDisplayNames ?? []).map(normalizeAmbientAppId),
-    ];
-    if (app.id.startsWith("connector_")) aliases.push(normalizeAmbientAppId(app.id.slice(10)));
-    for (const alias of aliases) {
-      if (alias.length > 0 && !index.has(alias)) index.set(alias, app);
-    }
+function g(e) {
+  let t = new Map();
+  for (let n of e) {
+    let e = [n.id, b(n.id), b(n.name), ...(n.pluginDisplayNames ?? []).map(b)];
+    n.id.startsWith(`connector_`) && e.push(b(n.id.slice(10)));
+    for (let r of e) r.length > 0 && !t.has(r) && t.set(r, n);
   }
-  return index;
+  return t;
 }
-
-function resolveAmbientSuggestionApps(
-  index: Map<string, AmbientSuggestionApp>,
-  appIds: readonly string[],
-): AmbientSuggestionApp[] {
-  const matches = new Set<AmbientSuggestionApp>();
-  for (const appId of appIds) {
-    const app = index.get(appId) ?? index.get(normalizeAmbientAppId(appId));
-    if (app != null) matches.add(app);
+function _(e, t) {
+  let n = new Set();
+  for (let r of t) {
+    let t = e.get(r) ?? e.get(b(r));
+    t != null && n.add(t);
   }
-  return Array.from(matches);
+  return Array.from(n);
 }
-
-function hasAppWithoutIcon(apps: Iterable<AmbientSuggestionApp>): boolean {
-  for (const app of apps) if (resolveAppIcon(app) == null) return true;
-  return false;
-}
-
-interface AppsQueryResult {
-  data?: AmbientSuggestionApp[];
-}
-
-let appIndexFamily: ScopedDerivedFamily<
-  Record<string, unknown>,
-  string,
-  Map<string, AmbientSuggestionApp> | undefined
->;
-
-function initializeAmbientSuggestionApps(): void {
-  if (appIndexFamily != null) return;
-  initializeStore();
-  initializeApps();
-  initializeAppQueries();
-  initializeHostState();
-  initializeHostApps();
-  initializeQueryBridge();
-  initializeAppIcons();
-  appIndexFamily = createDerivedFamily(
-    storeFamily,
-    (hostId: string, context: DerivedScopedSignalContext<Record<string, unknown>>) => {
-      const apps = context.get<AppsQueryResult>(appsQueryFamily, hostId).data;
-      return apps == null ? undefined : createAmbientSuggestionAppIndex(apps);
-    },
+function v(e) {
+  let t = (0, x.c)(7),
+    { appIds: r, enabled: i, hostId: a } = e,
+    o = i === void 0 || i,
+    s = a ?? `local`,
+    c = f(),
+    l;
+  t[0] === s ? (l = t[1]) : ((l = { hostId: s }), (t[0] = s), (t[1] = l));
+  let u = h(l),
+    d = o && u && !c.isLoading && c.userId != null,
+    p;
+  t[2] === d ? (p = t[3]) : ((p = { enabled: d }), (t[2] = d), (t[3] = p));
+  let m = n(S, s, p);
+  if (m == null) return;
+  let g;
+  return (
+    t[4] !== m || t[5] !== r ? ((g = _(m, r)), (t[4] = m), (t[5] = r), (t[6] = g)) : (g = t[6]),
+    g
   );
 }
-
-function useAmbientSuggestionApps(input: {
-  appIds: readonly string[];
-  enabled?: boolean;
-  hostId?: string | null;
-}): AmbientSuggestionApp[] | undefined {
-  initializeAmbientSuggestionApps();
-  const enabled = input.enabled ?? true;
-  const hostId = input.hostId ?? "local";
-  const user = useCurrentUser();
-  const hostAvailable = useHostAvailable({ hostId });
-  const canQuery = enabled && hostAvailable && !user.isLoading && user.userId != null;
-  const index = useStoreFamilyValue(appIndexFamily, hostId, { enabled: canQuery }) as
-    | Map<string, AmbientSuggestionApp>
-    | undefined;
-  return index == null ? undefined : resolveAmbientSuggestionApps(index, input.appIds);
+function y(e) {
+  for (let t of e) return p(t) == null;
+  return !1;
 }
-
-export {
-  useAmbientSuggestionApps as a,
-  hasAppWithoutIcon as i,
-  resolveAmbientSuggestionApps as n,
-  initializeAmbientSuggestionApps as r,
-  createAmbientSuggestionAppIndex as t,
-};
+function b(e) {
+  return e
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, `-`);
+}
+var x, S;
+function C() {
+  return (C = e(() => {
+    ((x = t()),
+      r(),
+      s(),
+      u(),
+      m(),
+      l(),
+      i(),
+      c(),
+      (S = o(a, (e, { get: t }) => {
+        let n = t(d, e).data;
+        return n == null ? void 0 : g(n);
+      })));
+  }))();
+}
+export { v as a, y as i, _ as n, C as r, g as t };

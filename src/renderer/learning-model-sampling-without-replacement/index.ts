@@ -1,27 +1,15 @@
-// Sampling-without-replacement category counts. Release chunk: type-9a0c50e93ce3.js.
-import "@rchunk/rolldown-runtime";
-interface Specification {
-  type: "SAMPLING_WITHOUT_REPLACEMENT";
-  version: 3;
-  thumbnailAssetKey: "sampling-without-replacement-v1";
-  parameters: {
-    category_a_count: { kind: "integer"; defaultValue: 4; min: 1; max: 10 };
-    category_b_count: { kind: "integer"; defaultValue: 3; min: 1; max: 10 };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `SAMPLING_WITHOUT_REPLACEMENT`),
+      (n = `sampling-without-replacement-v1`),
+      (r = {
+        category_a_count: { kind: `integer`, defaultValue: 4, min: 1, max: 10 },
+        category_b_count: { kind: `integer`, defaultValue: 3, min: 1, max: 10 },
+      }),
+      (i = { type: t, version: 3, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-let specification: Specification;
-let initialized = false;
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  specification = {
-    type: "SAMPLING_WITHOUT_REPLACEMENT",
-    version: 3,
-    thumbnailAssetKey: "sampling-without-replacement-v1",
-    parameters: {
-      category_a_count: { kind: "integer", defaultValue: 4, min: 1, max: 10 },
-      category_b_count: { kind: "integer", defaultValue: 3, min: 1, max: 10 },
-    },
-  };
-}
-export { specification as n, initialize as t };
+export { i as n, a as t };

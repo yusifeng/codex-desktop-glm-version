@@ -1,49 +1,16 @@
-// Cardiac-output product controls. Release chunk: type-b94332d030e5.js.
-import "@rchunk/rolldown-runtime";
-interface Specification {
-  type: "CARDIAC_OUTPUT_PRODUCT";
-  version: 2;
-  thumbnailAssetKey: "cardiac-output-product-v3";
-  canonicalFormula: string;
-  parameters: {
-    heartRateBeatsPerMinute: {
-      kind: "number";
-      defaultValue: 70;
-      min: 40;
-      max: 180;
-    };
-    strokeVolumeMilliliters: {
-      kind: "number";
-      defaultValue: 70;
-      min: 30;
-      max: 120;
-    };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `CARDIAC_OUTPUT_PRODUCT`),
+      (n = `cardiac-output-product-v3`),
+      (r = `CO = HR \\times SV`),
+      (i = {
+        heartRateBeatsPerMinute: { kind: `number`, defaultValue: 70, min: 40, max: 180 },
+        strokeVolumeMilliliters: { kind: `number`, defaultValue: 70, min: 30, max: 120 },
+      }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-let specification: Specification;
-let initialized = false;
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  specification = {
-    type: "CARDIAC_OUTPUT_PRODUCT",
-    version: 2,
-    thumbnailAssetKey: "cardiac-output-product-v3",
-    canonicalFormula: "CO = HR \\times SV",
-    parameters: {
-      heartRateBeatsPerMinute: {
-        kind: "number",
-        defaultValue: 70,
-        min: 40,
-        max: 180,
-      },
-      strokeVolumeMilliliters: {
-        kind: "number",
-        defaultValue: 70,
-        min: 30,
-        max: 120,
-      },
-    },
-  };
-}
-export { specification as n, initialize as t };
+export { a as n, o as t };

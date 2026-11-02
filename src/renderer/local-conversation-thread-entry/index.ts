@@ -1,11 +1,5 @@
-import { wL as initializeAppRuntime } from "@rchunk/app-shared";
-import {
-  r as LocalConversationSideChatTab,
-  s as initializeLocalConversationThread,
-  t as LocalConversationBackgroundAgentTab,
-} from "@rchunk/local-conversation-thread";
-
-initializeAppRuntime();
-initializeLocalConversationThread();
-
-export { LocalConversationBackgroundAgentTab, LocalConversationSideChatTab };
+// @ts-nocheck
+import "@rchunk/app-shared";
+import { r as e, s as t, t as n } from "@rchunk/local-conversation-thread";
+t();
+export { n as LocalConversationBackgroundAgentTab, e as LocalConversationSideChatTab };

@@ -1,219 +1,112 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { Q3 as t, RI as n, WK as r, Z3 as i, wL as a, zU as o } from "@rchunk/app-shared";
 import {
-  Q3 as logger,
-  RI as joinPath,
-  WK as joinWorkspacePath,
-  Z3 as initializeErrors,
-  wL as initializeUtilities,
-  zU as isRemoteHost,
-} from "@rchunk/app-shared";
-import {
-  Bst as initializePlanStorage,
-  Dyt as activeHostId,
-  Gvt as openSidePanelTab,
-  HZt as initializeSidePanelRoutes,
-  Qen as initializeSidePanelRegistry,
-  Sg as planRouteKind,
-  Vst as EditablePlanPanel,
-  Wvt as initializeSidePanel,
-  Zen as sidePanelTabIds,
-  _cn as initializeWorkspaceFileState,
-  bg as createPlanPanelDefinition,
-  byt as initializePlanSidePanelState,
-  mcn as codexHomeQuery,
-  mnt as initializeConversationModel,
-  pnt as appServices,
-  xg as savedPlanRouteKind,
-  yZt as hostRpcClient,
-  yg as initializePlanRoutes,
+  Bst as s,
+  Dyt as c,
+  Gvt as l,
+  HZt as u,
+  Qen as d,
+  Sg as f,
+  Vst as p,
+  Wvt as m,
+  Zen as h,
+  _cn as g,
+  bg as _,
+  byt as v,
+  mcn as y,
+  mnt as b,
+  pnt as x,
+  xg as S,
+  yZt as C,
+  yg as w,
 } from "@rchunk/app-initial";
-import {
-  n as initializeTextFileStorage,
-  r as readTextFile,
-} from "@rchunk/text-file-storage";
-import {
-  i as editablePlanSaveController,
-  n as openEditablePlanTab,
-  o as initializeEditablePlanStorage,
-  r as activeEditablePlan,
-  t as initializeEditablePlanTab,
-} from "@rchunk/editable-plan-tab";
-
-export interface PlanDescriptor {
-  content: string;
-  conversationId: string;
-  cwd?: string;
-  hideCodeBlocks?: boolean;
-  key: string;
-  planKey?: string;
-  title: string;
-}
-
-export interface PlanScope {
-  get(signal: unknown, parameter?: unknown): unknown;
-  set(signal: unknown, value: unknown): void;
-  query: {
-    getOrFetch(signal: unknown, input: unknown): Promise<unknown>;
-  };
-}
-
-export interface OpenPlanPanelOptions {
-  insertPosition?: unknown;
-  revealAndFocus?: boolean;
-  tabId?: string;
-}
-
-let planPanelDefinition: unknown;
-
-function openPlanSidePanel(scope: PlanScope, plan: PlanDescriptor): void {
-  const workspaceWrite = (
-    appServices as {
-      workspaceFiles?: {
-        write?: (input: Record<string, unknown>) => Promise<Record<string, unknown>>;
-      };
-    }
-  )?.workspaceFiles?.write;
-  if (workspaceWrite != null) {
-    const hostId = scope.get(activeHostId) as string;
-    if (!isRemoteHost(hostId)) {
-      void openEditablePlan(scope, plan, hostId)
-        .then((result) => {
-          if (result === "unavailable") openReadonlyPlan(scope, plan);
+import { n as T, r as E } from "@rchunk/text-file-storage";
+import { i as D, n as O, o as k, r as A, t as j } from "@rchunk/editable-plan-tab";
+function M(e, n) {
+  if (x?.workspaceFiles.write) {
+    let r = e.get(c);
+    if (!o(r)) {
+      N(e, n, r)
+        .then((t) => {
+          t === `unavailable` && F(e, n);
         })
-        .catch((error: unknown) => {
-          logger.warning("Failed to open editable plan", {
-            safe: {},
-            sensitive: { error },
-          });
-          openReadonlyPlan(scope, plan);
+        .catch((r) => {
+          (t.warning(`Failed to open editable plan`, { safe: {}, sensitive: { error: r } }),
+            F(e, n));
         });
       return;
     }
   }
-  openReadonlyPlan(scope, plan);
+  F(e, n);
 }
-
-async function openEditablePlan(
-  scope: PlanScope,
-  { content, conversationId, key, title }: PlanDescriptor,
-  hostId: string,
-): Promise<"opened" | "unavailable" | "unsaved"> {
-  const workspaceWrite = (
-    appServices as {
-      workspaceFiles?: {
-        write?: (input: Record<string, unknown>) => Promise<{
-          outcome: string;
-        }>;
-      };
-    }
-  ).workspaceFiles?.write;
-  if (workspaceWrite == null) return "unavailable";
-
-  const activePlan = scope.get(activeEditablePlan) as { key: string } | null;
-  if (activePlan != null && activePlan.key !== key) {
-    const save = (
-      scope.get(editablePlanSaveController, `${hostId}:${conversationId}:${activePlan.key}`) as
-        | { save?: () => Promise<boolean> }
-        | null
-    )?.save;
-    if (save != null && !(await save())) return "unsaved";
+async function N(e, { content: t, conversationId: n, key: i, title: a }, o) {
+  let s = x.workspaceFiles.write;
+  if (s == null) return `unavailable`;
+  let c = e.get(A);
+  if (c != null && c.key !== i) {
+    let t = e.get(D, `${o}:${n}:${c.key}`)?.save;
+    if (t != null && !(await t())) return `unsaved`;
   }
-
-  const { codexHome } = (await scope.query.getOrFetch(codexHomeQuery, { hostId })) as {
-    codexHome: string;
-  };
-  const directory = joinWorkspacePath(codexHome, "plans", conversationId, key);
-  const path = joinWorkspacePath(directory, "PLAN.md");
-  await (
-    scope.get(hostRpcClient, hostId) as {
-      sendRequest(method: string, input: unknown): Promise<unknown>;
-    }
-  ).sendRequest("fs/createDirectory", { path: directory, recursive: true });
-  const writeResult = await workspaceWrite({
-    bytes: new TextEncoder().encode(content),
-    hostId,
-    ifMatch: "missing",
-    path,
-  });
-  if (writeResult.outcome === "too-large") return "unavailable";
-
-  const controllerId = `${hostId}:${conversationId}:${key}`;
-  let resolvedContent = content;
-  if (writeResult.outcome === "conflict") {
-    const controller = scope.get(editablePlanSaveController, controllerId) as
-      | { content: string; path: string }
-      | null;
-    resolvedContent =
-      controller?.path === path
-        ? controller.content
-        : (await readTextFile({ filePath: path, hostId })).content;
+  let { codexHome: l } = await e.query.getOrFetch(y, { hostId: o }),
+    u = r(l, `plans`, n, i),
+    d = r(u, `PLAN.md`);
+  await e.get(C, o).sendRequest(`fs/createDirectory`, { path: u, recursive: !0 });
+  let f = await s({ bytes: new TextEncoder().encode(t), hostId: o, ifMatch: `missing`, path: d });
+  if (f.outcome === `too-large`) return `unavailable`;
+  let p = `${o}:${n}:${i}`,
+    m = t;
+  if (f.outcome === `conflict`) {
+    let t = e.get(D, p);
+    m = t?.path === d ? t.content : (await E({ filePath: d, hostId: o })).content;
   }
-  return openEditablePlanTab(
-    scope,
-    { content: resolvedContent, conversationId, hostId, key, path, title },
-    EditablePlanPanel,
-  )
-    ? "opened"
-    : "unavailable";
+  return P(e, { content: m, conversationId: n, hostId: o, key: i, path: d, title: a })
+    ? `opened`
+    : `unavailable`;
 }
-
-function openReadonlyPlan(
-  scope: PlanScope,
-  {
-    content,
-    conversationId,
-    cwd,
-    hideCodeBlocks,
-    key,
-    planKey,
-    title,
-  }: PlanDescriptor,
-  {
-    revealAndFocus = true,
-    insertPosition,
-    tabId = sidePanelTabIds.PLAN,
-  }: OpenPlanPanelOptions = {},
-): unknown {
-  scope.set(activeEditablePlan, { key, tabId });
-  return openSidePanelTab(scope, planPanelDefinition, {
-    revealAndFocus,
-    defaultState: () => ({ planKey: key, scrollTop: 0 }),
-    durableRoute:
-      planKey == null
-        ? undefined
-        : { kind: savedPlanRouteKind, params: { planKey }, payloadVersion: 1 },
-    id: tabId,
-    insertPosition,
-    onClose: (closingScope: PlanScope) => {
-      const active = closingScope.get(activeEditablePlan) as { key?: string } | null;
-      if (active?.key === key) closingScope.set(activeEditablePlan, null);
-    },
-    props: { content, conversationId, cwd, hideCodeBlocks, planKey: key },
-    title,
-  });
+function P(e, t) {
+  return O(e, t, p);
 }
-
-function initializePlanSidePanel(): void {
-  initializeUtilities();
-  initializeSidePanelRoutes();
-  initializeSidePanel();
-  initializeConversationModel();
-  initializePlanSidePanelState();
-  initializeWorkspaceFileState();
-  initializePlanRoutes();
-  initializePlanStorage();
-  initializeTextFileStorage();
-  initializeSidePanelRegistry();
-  initializeErrors();
-  initializeEditablePlanTab();
-  initializeEditablePlanStorage();
-  joinPath();
-  (planRouteKind as unknown as () => void)();
-  planPanelDefinition = createPlanPanelDefinition({ open: openReadonlyPlan });
+function F(
+  e,
+  { content: t, conversationId: n, cwd: r, hideCodeBlocks: i, key: a, planKey: o, title: s },
+  { revealAndFocus: c = !0, insertPosition: u, tabId: d = h.PLAN } = {},
+) {
+  return (
+    e.set(A, { key: a, tabId: d }),
+    l(e, I, {
+      revealAndFocus: c,
+      defaultState: () => ({ planKey: a, scrollTop: 0 }),
+      durableRoute: o == null ? void 0 : { kind: S, params: { planKey: o }, payloadVersion: 1 },
+      id: d,
+      insertPosition: u,
+      onClose: (e) => {
+        e.get(A)?.key === a && e.set(A, null);
+      },
+      props: { content: t, conversationId: n, cwd: r, hideCodeBlocks: i, planKey: a },
+      title: s,
+    })
+  );
 }
-
-export {
-  openPlanSidePanel as n,
-  openReadonlyPlan as r,
-  initializePlanSidePanel as t,
-};
+var I;
+function L() {
+  return (L = e(() => {
+    (a(),
+      u(),
+      m(),
+      b(),
+      v(),
+      g(),
+      w(),
+      s(),
+      T(),
+      d(),
+      i(),
+      n(),
+      j(),
+      k(),
+      f(),
+      (I = _({ open: F })));
+  }))();
+}
+export { M as n, F as r, L as t };

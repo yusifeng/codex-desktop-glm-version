@@ -1,37 +1,18 @@
-// Divide-and-conquer recurrence tree specification. Release chunk: type-603f86db5a64.js.
-import "@rchunk/rolldown-runtime";
-
-type RecurrenceExample =
-  "T(n) = 2T(n/2) + 1" | "T(n) = 2T(n/2) + n" | "T(n) = 2T(n/2) + n^2";
-interface Specification {
-  type: "DIVIDE_CONQUER_RECURRENCE_TREE";
-  version: 1;
-  thumbnailAssetKey: "divide-conquer-recurrence-tree-v1";
-  parameters: {
-    recurrence_example: {
-      kind: "enum";
-      defaultValue: "T(n) = 2T(n/2) + n";
-      allowedValues: RecurrenceExample[];
-    };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `DIVIDE_CONQUER_RECURRENCE_TREE`),
+      (n = `divide-conquer-recurrence-tree-v1`),
+      (r = {
+        recurrence_example: {
+          kind: `enum`,
+          defaultValue: `T(n) = 2T(n/2) + n`,
+          allowedValues: [`T(n) = 2T(n/2) + 1`, `T(n) = 2T(n/2) + n`, `T(n) = 2T(n/2) + n^2`],
+        },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-let specification: Specification;
-function initializeSpecification(): void {
-  specification ??= {
-    type: "DIVIDE_CONQUER_RECURRENCE_TREE",
-    version: 1,
-    thumbnailAssetKey: "divide-conquer-recurrence-tree-v1",
-    parameters: {
-      recurrence_example: {
-        kind: "enum",
-        defaultValue: "T(n) = 2T(n/2) + n",
-        allowedValues: [
-          "T(n) = 2T(n/2) + 1",
-          "T(n) = 2T(n/2) + n",
-          "T(n) = 2T(n/2) + n^2",
-        ],
-      },
-    },
-  };
-}
-export { specification as n, initializeSpecification as t };
+export { i as n, a as t };

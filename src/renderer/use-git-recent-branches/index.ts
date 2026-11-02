@@ -1,91 +1,72 @@
-import { $3 as reactCompilerRuntime } from "@rchunk/app-shared";
-import {
-  Kan as initializeLiveGitQuery,
-  Yan as useLiveGitQuery,
-} from "@rchunk/app-initial";
-
-void reactCompilerRuntime;
-
-export interface GitRootInput {
-  root: string;
-}
-
-export interface BaseBranchQueryParameters {
-  operationSource: string;
-  root: string;
-}
-
-export interface RecentBranchesQueryParameters extends BaseBranchQueryParameters {
-  limit: number;
-}
-
-export interface RecentBranchesResult {
-  branches: unknown[];
-}
-
-type LiveQueryOptions = Record<string, unknown>;
-
-function baseBranchLiveQuery(parameters: BaseBranchQueryParameters) {
-  return { method: "base-branch", params: parameters };
-}
-
-function useGitBaseBranch(
-  host: unknown,
-  roots: readonly GitRootInput[],
-  operationSource: string,
-  options?: LiveQueryOptions,
-): unknown {
-  return useLiveGitQuery(
-    host,
-    roots,
-    "base-branch",
-    ({ root }) => ({ operationSource, root }),
-    operationSource,
-    { liveQuery: baseBranchLiveQuery, staleTime: Infinity, ...options },
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t } from "@rchunk/app-shared";
+import { Kan as n, Yan as r } from "@rchunk/app-initial";
+function i(e, t, n, i) {
+  let s = (0, o.c)(4),
+    c;
+  s[0] === n
+    ? (c = s[1])
+    : ((c = (e) => {
+        let { root: t } = e;
+        return { operationSource: n, root: t };
+      }),
+      (s[0] = n),
+      (s[1] = c));
+  let l;
+  return (
+    s[2] === i
+      ? (l = s[3])
+      : ((l = { liveQuery: a, staleTime: 1 / 0, ...i }), (s[2] = i), (s[3] = l)),
+    r(e, t, `base-branch`, c, n, l)
   );
 }
-
-function recentBranchesLiveQuery(parameters: RecentBranchesQueryParameters) {
-  return { method: "recent-branches", params: parameters };
+function a(e) {
+  return { method: `base-branch`, params: e };
 }
-
-function selectRecentBranches(result: RecentBranchesResult): unknown[] {
-  return result.branches;
+var o;
+function s() {
+  return (s = e(() => {
+    ((o = t()), n());
+  }))();
 }
-
-function useGitRecentBranches(
-  host: unknown,
-  roots: readonly GitRootInput[],
-  operationSource: string,
-  options?: LiveQueryOptions & { limit?: number },
-): unknown {
-  const { limit = 100, ...queryOptions } = options ?? {};
-  return useLiveGitQuery(
-    host,
-    roots,
-    "recent-branches",
-    ({ root }) => ({ limit, operationSource, root }),
-    operationSource,
-    {
-      liveQuery: recentBranchesLiveQuery,
-      select: selectRecentBranches,
-      staleTime: Infinity,
-      ...queryOptions,
-    },
+function c(e, t, n, i) {
+  let a = (0, d.c)(10),
+    o;
+  a[0] === i ? (o = a[1]) : ((o = i ?? {}), (a[0] = i), (a[1] = o));
+  let s, c;
+  a[2] === o
+    ? ((s = a[3]), (c = a[4]))
+    : (({ limit: c, ...s } = o), (a[2] = o), (a[3] = s), (a[4] = c));
+  let f = c === void 0 ? 100 : c,
+    p;
+  a[5] !== f || a[6] !== n
+    ? ((p = (e) => {
+        let { root: t } = e;
+        return { operationSource: n, root: t, limit: f };
+      }),
+      (a[5] = f),
+      (a[6] = n),
+      (a[7] = p))
+    : (p = a[7]);
+  let m;
+  return (
+    a[8] === s
+      ? (m = a[9])
+      : ((m = { liveQuery: u, select: l, staleTime: 1 / 0, ...s }), (a[8] = s), (a[9] = m)),
+    r(e, t, `recent-branches`, p, n, m)
   );
 }
-
-function initializeUseGitBaseBranch(): void {
-  initializeLiveGitQuery();
+function l(e) {
+  return e.branches;
 }
-
-function initializeUseGitRecentBranches(): void {
-  initializeLiveGitQuery();
+function u(e) {
+  return { method: `recent-branches`, params: e };
 }
-
-export {
-  useGitBaseBranch as i,
-  useGitRecentBranches as n,
-  initializeUseGitBaseBranch as r,
-  initializeUseGitRecentBranches as t,
-};
+var d;
+function f() {
+  return (f = e(() => {
+    ((d = t()), n());
+  }))();
+}
+export { i, c as n, s as r, f as t };

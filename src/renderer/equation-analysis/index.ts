@@ -1,14 +1,11 @@
-// Semantic restoration. Release chunk: equation-44cf0b1d4b75.js.
+// @ts-nocheck
 import { n as e } from "@rchunk/rolldown-runtime";
 import { a as t, n } from "@rchunk/build-graph-data";
 import { n as r, r as i } from "@rchunk/tokenize-math-block";
-// @ts-ignore -- published chunk binding is preserved locally.
-import { i as a, r as o } from "@rchunk/x-like";
-// @ts-ignore -- published chunk binding is preserved locally.
+import { i as a, r as o } from "@rchunk/x-like-identifier-normalization";
 import { a as s, c, u as l } from "@rchunk/classify";
 var u, d, f, p;
 function m() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (m = e(() => {
     ((u = (e) =>
       e
@@ -127,7 +124,6 @@ var h,
   Q,
   $;
 function Oe() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (Oe = e(() => {
     (r(),
       t(),
@@ -291,7 +287,6 @@ function Oe() {
         if (le.test(e)) return null;
         let n = _e(ge(e));
         if (ue.test(n)) return null;
-        // @ts-ignore -- published chunk binding is preserved locally.
         let r = i(`y=${n}`, {
           ...t,
           customFunctionNames: new Set([...(t?.customFunctionNames ?? []), ...v]),
@@ -591,7 +586,6 @@ function Oe() {
         let i = J(e, n, r);
         return i === void 0 ? !R(e) && !R(t) : Number.isFinite(i) && i !== 0;
       }),
-      // @ts-ignore -- published chunk binding is preserved locally.
       (Se = (e, { constants: t = {}, resolveFunction: n } = {}) => {
         if (e.kind === `compound-2d-inequality` || e.kind === `compound-3d-inequality`)
           return { kind: `implicit` };

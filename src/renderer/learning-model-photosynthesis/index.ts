@@ -1,51 +1,24 @@
-// Photosynthesis limiting-factor metadata. Release chunk: type-5b3d00b051e8.js.
-import "@rchunk/rolldown-runtime";
-type Intensity = "low" | "medium" | "high";
-interface Specification {
-  type: "PHOTOSYNTHESIS";
-  version: 2;
-  thumbnailAssetKey: "photosynthesis-v3";
-  parameters: {
-    lightIntensity: {
-      kind: "enum";
-      defaultValue: Intensity;
-      allowedValues: Intensity[];
-    };
-    carbonDioxide: {
-      kind: "enum";
-      defaultValue: Intensity;
-      allowedValues: Intensity[];
-    };
-    water: {
-      kind: "enum";
-      defaultValue: Intensity;
-      allowedValues: Intensity[];
-    };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `PHOTOSYNTHESIS`),
+      (n = `photosynthesis-v3`),
+      (r = {
+        lightIntensity: {
+          kind: `enum`,
+          defaultValue: `low`,
+          allowedValues: [`low`, `medium`, `high`],
+        },
+        carbonDioxide: {
+          kind: `enum`,
+          defaultValue: `low`,
+          allowedValues: [`low`, `medium`, `high`],
+        },
+        water: { kind: `enum`, defaultValue: `low`, allowedValues: [`low`, `medium`, `high`] },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-let specification: Specification;
-let initialized = false;
-const levels: Intensity[] = ["low", "medium", "high"];
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  specification = {
-    type: "PHOTOSYNTHESIS",
-    version: 2,
-    thumbnailAssetKey: "photosynthesis-v3",
-    parameters: {
-      lightIntensity: {
-        kind: "enum",
-        defaultValue: "low",
-        allowedValues: [...levels],
-      },
-      carbonDioxide: {
-        kind: "enum",
-        defaultValue: "low",
-        allowedValues: [...levels],
-      },
-      water: { kind: "enum", defaultValue: "low", allowedValues: [...levels] },
-    },
-  };
-}
-export { specification as n, initialize as t };
+export { i as n, a as t };

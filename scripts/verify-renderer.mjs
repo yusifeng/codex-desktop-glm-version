@@ -21,33 +21,9 @@ const ORIGINAL_DIR = path.resolve(
   originalArgIndex !== -1 ? args[originalArgIndex + 1] : "../chatgpt-desktop-src",
 );
 
-// Semantic owner extraction deliberately moves selected hub dependencies into
-// smaller rewritten chunks. Keep these dependency-graph changes explicit and
-// per chunk so an unrelated missing/extra import still fails verification.
-const EXPECTED_IMPORT_CHANGES = new Map([
-  [
-    CHUNKS["worktree-onboarding-banner-controller"],
-    {
-      missing: new Set([`./${CHUNKS["app-primary"]}`]),
-      extra: new Set([`./${CHUNKS["home-announcement-state"]}`]),
-    },
-  ],
-  [
-    CHUNKS["home-announcement-state"],
-    { missing: new Set([`./${CHUNKS["app-primary"]}`]), extra: new Set() },
-  ],
-  [
-    CHUNKS["realtime-voice-home-announcement"],
-    {
-      missing: new Set([`./${CHUNKS["app-primary"]}`]),
-      extra: new Set([`./${CHUNKS["home-announcement-state"]}`]),
-    },
-  ],
-  [
-    CHUNKS["gpt-plugin-migration-banner-content"],
-    { missing: new Set([`./${CHUNKS["app-primary"]}`]), extra: new Set() },
-  ],
-]);
+// Every comparable renderer owner now preserves the published dependency graph.
+// Keep the mechanism so future intentional graph changes remain explicit.
+const EXPECTED_IMPORT_CHANGES = new Map();
 
 function importsOf(code) {
   const set = new Set();

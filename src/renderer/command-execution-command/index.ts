@@ -1,31 +1,19 @@
-import "@rchunk/rolldown-runtime";
-
-export interface CommandExecution {
-  command: string;
-  commandActions: Array<{ command?: string | null } | null>;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e) {
+  for (let t = e.commandActions.length - 1; t >= 0; --t) {
+    let r = e.commandActions[t]?.command.trim() ?? ``;
+    if (r.length > 0 && !n(r)) return r;
+  }
+  let t = e.command.trim();
+  return n(t) ? `` : t;
 }
-
-function isShellInvocation(command: string): boolean {
+function n(e) {
   return /^(?:.*[/\\])?(?:bash|cmd(?:\.exe)?|fish|powershell(?:\.exe)?|pwsh(?:\.exe)?|sh|zsh)(?:\s|$)/i.test(
-    command,
+    e,
   );
 }
-
-function commandExecutionDisplayCommand(execution: CommandExecution): string {
-  for (
-    let index = execution.commandActions.length - 1;
-    index >= 0;
-    index -= 1
-  ) {
-    const command = execution.commandActions[index]?.command?.trim() ?? "";
-    if (command.length > 0 && !isShellInvocation(command)) return command;
-  }
-  const command = execution.command.trim();
-  return isShellInvocation(command) ? "" : command;
+function r() {
+  return (r = e(() => {}))();
 }
-
-function initializeCommandExecutionCommand(): void {}
-export {
-  initializeCommandExecutionCommand as n,
-  commandExecutionDisplayCommand as t,
-};
+export { r as n, t };

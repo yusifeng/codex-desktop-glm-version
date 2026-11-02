@@ -1,13 +1,10 @@
-// Semantic restoration. Release chunk: cone-visualization-221d5bdd2dfe.js.
+// @ts-nocheck
 import { n as e } from "@rchunk/rolldown-runtime";
 import { I3 as t } from "@rchunk/app-shared";
-// @ts-ignore -- published chunk binding is preserved locally.
 import { n, t as r } from "@rchunk/circular-solid-geometry";
-// @ts-ignore -- published chunk binding is preserved locally.
 import { a as i, l as a, o, p as s, t as c } from "@rchunk/geometry-shapes";
 var l, u, d, f, p, m;
 function h() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (h = e(() => {
     (n(),
       s(),

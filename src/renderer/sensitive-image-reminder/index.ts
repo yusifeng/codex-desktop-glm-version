@@ -1,312 +1,267 @@
-// Sensitive-image upload reminder controller. Release chunk: sensitive-image-reminder-e42962fc2c0e.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as reminderDialogChunk from "@rchunk/chatgpt-image-upload-reminder-dialog-core";
-
-interface JsxRuntime {
-  Fragment: unknown;
-  jsx(type: unknown, props: Record<string, unknown>): unknown;
-  jsxs(type: unknown, props: Record<string, unknown>): unknown;
-}
-interface ReactRuntime {
-  useRef<Value>(value: Value): { current: Value };
-  useSyncExternalStore<Value>(
-    subscribe: (listener: () => void) => () => void,
-    getSnapshot: () => Value,
-    getServerSnapshot: () => Value,
-  ): Value;
-}
-interface UploadFile {
-  uploadId: string;
-  fileId?: string;
-  result?: boolean | null;
-}
-interface UploadBatch {
-  accountId: string;
-  userId: string;
-  batchId: string;
-  gizmoId?: string;
-  acknowledged?: boolean;
-  experimentEnabled?: boolean;
-  files: UploadFile[];
-}
-interface Scope {
-  get(signal: unknown, parameter?: string): unknown;
-  set(
-    signal: unknown,
-    parameter: string,
-    updater: (value: UploadBatch[]) => UploadBatch[],
-  ): void;
-}
-interface SharedRuntime {
-  $3(): unknown;
-  BX(signal: unknown, parameter: string): UploadBatch[];
-  FX(): void;
-  HX(signal: unknown): { accountId: string; userId: string };
-  I3(): JsxRuntime;
-  LX(context: unknown): Scope;
-  QI(): void;
-  ZI: unknown;
-  e6(): ReactRuntime;
-  vL(): void;
-  yL(input: { queries: unknown[]; combine(results: unknown[]): null }): unknown;
-}
-interface InitialRuntime {
-  Gzt(): boolean;
-  Sqt(): void;
-  Vzt(): void;
-  cJt(): void;
-  hRt(): void;
-  ifn(): void;
-  lfn(): unknown;
-  mRt(): void;
-  pRt: unknown;
-  rJt: {
-    safePost(
-      path: string,
-      options: Record<string, unknown>,
-    ): Promise<{ is_sensitive?: boolean | null }>;
-  };
-  rfn(
-    experiments: unknown,
-    id: string,
-  ): { get(key: string, fallback: boolean): boolean };
-  vqt: unknown;
-}
-interface PrimaryRuntime {
-  Ma(): void;
-  Na(listener: () => void): () => void;
-}
-interface DialogRuntime {
-  n(): void;
-  t: unknown;
-}
-interface Props {
-  conversationId: string;
-  hasCompetingDialog: boolean;
-}
-
-const sharedRuntime = appSharedChunk as unknown as SharedRuntime;
-const initialRuntime = appInitialChunk as unknown as InitialRuntime;
-const primaryRuntime = appPrimaryChunk as unknown as PrimaryRuntime;
-const dialogRuntime = reminderDialogChunk as unknown as DialogRuntime;
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-const candidateSelector = "[data-chatgpt-sensitive-image-reminder-candidate]";
-const overlayClassName = "chatgpt-sensitive-image-reminder-overlay";
-
-function isCandidateVisible(element: Element | null): boolean {
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  LX as o,
+  QI as s,
+  ZI as c,
+  e6 as l,
+  vL as u,
+  yL as d,
+} from "@rchunk/app-shared";
+import {
+  Gzt as f,
+  Sqt as p,
+  Vzt as m,
+  cJt as h,
+  hRt as g,
+  ifn as _,
+  lfn as v,
+  mRt as y,
+  pRt as b,
+  rJt as x,
+  rfn as S,
+  vqt as C,
+} from "@rchunk/app-initial";
+import { Ma as w, Na as T } from "@rchunk/app-primary";
+import { n as E, t as D } from "@rchunk/chatgpt-image-upload-reminder-dialog-core";
+function O(e) {
   return (
-    element != null &&
-    typeof document !== "undefined" &&
-    document.querySelector(candidateSelector) === element &&
-    document.querySelector(`.codex-dialog-overlay:not(.${overlayClassName})`) ==
-      null
+    e != null &&
+    typeof document < `u` &&
+    document.querySelector(I) === e &&
+    document.querySelector(`.codex-dialog-overlay:not(.${L})`) == null
   );
 }
-function containsSensitiveFile(file: UploadFile): boolean {
-  return file.result === true;
-}
-function combineQueries(): null {
-  return null;
-}
-function serverVisibilitySnapshot(): false {
-  return false;
-}
-
-function ChatGptSensitiveImageReminder({
-  conversationId,
-  hasCompetingDialog,
-}: Props): unknown {
-  const scope = sharedRuntime.LX(sharedRuntime.ZI);
-  const experiments = initialRuntime.lfn();
-  const uploadBatches = sharedRuntime.BX(initialRuntime.pRt, conversationId);
-  const account = sharedRuntime.HX(initialRuntime.vqt);
-  const dialogOpen = initialRuntime.Gzt();
-  const markerRef = React.useRef<Element | null>(null);
-  const visible = React.useSyncExternalStore(
-    primaryRuntime.Na,
-    () => isCandidateVisible(markerRef.current),
-    serverVisibilitySnapshot,
-  );
-  const pendingFiles = uploadBatches.flatMap((batch) =>
-    batch.accountId === account.accountId && batch.userId === account.userId
-      ? batch.files.flatMap((file) =>
-          typeof file.fileId === "string" && file.result === undefined
-            ? [
-                {
-                  accountId: batch.accountId,
-                  userId: batch.userId,
-                  batchId: batch.batchId,
-                  uploadId: file.uploadId,
-                  fileId: file.fileId,
-                  gizmoId: batch.gizmoId,
-                },
-              ]
-            : [],
-        )
-      : [],
-  );
-  const queries = pendingFiles.map((pending) => ({
-    queryKey: [
-      "chatgpt-image-safety-preview",
-      pending.accountId,
-      pending.userId,
-      conversationId,
-      pending.batchId,
-      pending.uploadId,
-      pending.fileId,
-      pending.gizmoId,
-    ],
-    queryFn: async ({ signal }: { signal: AbortSignal }) => {
-      const batches = scope.get(
-        initialRuntime.pRt,
-        conversationId,
-      ) as UploadBatch[];
-      const batch = batches.find(
-        (candidate) => candidate.batchId === pending.batchId,
-      );
-      const file = batch?.files.find(
-        (candidate) => candidate.uploadId === pending.uploadId,
-      );
-      const currentAccount = scope.get(initialRuntime.vqt) as {
-        accountId: string;
-        userId: string;
-      };
-      if (
-        signal.aborted ||
-        file?.fileId !== pending.fileId ||
-        file.result !== undefined ||
-        batch?.accountId !== currentAccount.accountId ||
-        batch.userId !== currentAccount.userId
-      )
-        return null;
-      const enabled =
-        batch.experimentEnabled ??
-        initialRuntime
-          .rfn(experiments, "67629032")
-          .get("enable_new_sensitive_image_upload_reminder", false);
-      scope.set(initialRuntime.pRt, conversationId, (value) =>
-        value.map((item) =>
-          item.batchId === batch.batchId
-            ? { ...item, experimentEnabled: enabled }
-            : item,
-        ),
-      );
-      let result: boolean | null = null;
-      if (enabled) {
-        try {
-          result =
-            (
-              await initialRuntime.rJt.safePost(
-                "/files/{file_id}/image_safety_preview",
-                {
-                  additionalHeaders: { "ChatGPT-Account-ID": batch.accountId },
-                  parameters: {
-                    path: { file_id: pending.fileId },
-                    query:
-                      batch.gizmoId == null
-                        ? undefined
-                        : { gizmo_id: batch.gizmoId },
-                  },
-                  signal,
-                },
+function k(e) {
+  let t = (0, N.c)(31),
+    { conversationId: r, hasCompetingDialog: a } = e,
+    s = o(c),
+    l = v(),
+    u = n(b, r),
+    p = i(C),
+    m = f(),
+    h = (0, P.useRef)(null),
+    _;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((_ = () => O(h.current)), (t[0] = _))
+    : (_ = t[0]);
+  let y = (0, P.useSyncExternalStore)(T, _, M),
+    w,
+    E;
+  if (t[1] !== u || t[2] !== r || t[3] !== p || t[4] !== s || t[5] !== l) {
+    let e;
+    t[8] === p
+      ? (e = t[9])
+      : ((e = (e) =>
+          e.accountId === p.accountId && e.userId === p.userId
+            ? e.files.flatMap((t) =>
+                typeof t.fileId == `string` && t.result === void 0
+                  ? [
+                      {
+                        accountId: e.accountId,
+                        userId: e.userId,
+                        batchId: e.batchId,
+                        uploadId: t.uploadId,
+                        fileId: t.fileId,
+                        gizmoId: e.gizmoId,
+                      },
+                    ]
+                  : [],
               )
-            ).is_sensitive ?? null;
-        } catch {
-          result = null;
-        }
-      }
-      const latestAccount = scope.get(initialRuntime.vqt) as {
-        accountId: string;
-        userId: string;
-      };
-      if (
-        !signal.aborted &&
-        latestAccount.accountId === batch.accountId &&
-        latestAccount.userId === batch.userId
-      ) {
-        scope.set(initialRuntime.pRt, conversationId, (value) =>
-          value
-            .map((item) =>
-              item.batchId === batch.batchId
-                ? {
-                    ...item,
-                    files: item.files.map((candidate) =>
-                      candidate.uploadId === pending.uploadId &&
-                      candidate.fileId === pending.fileId
-                        ? { ...candidate, result }
-                        : candidate,
-                    ),
-                  }
-                : item,
+            : []),
+        (t[8] = p),
+        (t[9] = e));
+    let n = u.flatMap(e);
+    E = d;
+    let i;
+    (t[10] !== r || t[11] !== s || t[12] !== l
+      ? ((i = (e) => ({
+          queryKey: [
+            `chatgpt-image-safety-preview`,
+            e.accountId,
+            e.userId,
+            r,
+            e.batchId,
+            e.uploadId,
+            e.fileId,
+            e.gizmoId,
+          ],
+          queryFn: async (t) => {
+            let { signal: n } = t,
+              i = s.get(b, r).find((t) => t.batchId === e.batchId),
+              a = i?.files.find((t) => t.uploadId === e.uploadId),
+              o = s.get(C);
+            if (
+              n.aborted ||
+              a?.fileId !== e.fileId ||
+              a.result !== void 0 ||
+              i?.accountId !== o.accountId ||
+              i.userId !== o.userId
             )
-            .filter((item) => item.files.length > 0),
-        );
-      }
-      return null;
-    },
-    gcTime: 0,
-    retry: false,
-    staleTime: Infinity,
-  }));
-  sharedRuntime.yL({ queries, combine: combineQueries });
-  const reminder = uploadBatches.find(
-    (batch) =>
-      batch.accountId === account.accountId &&
-      batch.userId === account.userId &&
-      !batch.acknowledged &&
-      batch.files.some(containsSensitiveFile),
-  );
-  if (reminder == null) return null;
-  const marker = jsx.jsx("span", {
-    ref: markerRef,
-    hidden: true,
-    "data-chatgpt-sensitive-image-reminder-candidate": true,
-  });
-  const dialog =
-    visible && !hasCompetingDialog && !dialogOpen
-      ? jsx.jsx(dialogRuntime.t, {
-          overlayClassName,
-          onAcknowledge: () => {
-            const latest = scope.get(initialRuntime.vqt) as {
-              accountId: string;
-              userId: string;
-            };
-            scope.set(initialRuntime.pRt, conversationId, (value) =>
-              value
-                .map((batch) =>
-                  batch.batchId === reminder.batchId &&
-                  batch.accountId === latest.accountId &&
-                  batch.userId === latest.userId
-                    ? { ...batch, acknowledged: true }
-                    : batch,
-                )
-                .filter((batch) => batch.files.length > 0),
+              return null;
+            let c =
+              i.experimentEnabled ??
+              S(l, `67629032`).get(`enable_new_sensitive_image_upload_reminder`, !1);
+            s.set(b, r, (e) =>
+              e.map((e) => (e.batchId === i.batchId ? { ...e, experimentEnabled: c } : e)),
+            );
+            let u = null;
+            if (c)
+              try {
+                u = (
+                  await x.safePost(`/files/{file_id}/image_safety_preview`, {
+                    additionalHeaders: { "ChatGPT-Account-ID": i.accountId },
+                    parameters: {
+                      path: { file_id: e.fileId },
+                      query: i.gizmoId == null ? void 0 : { gizmo_id: i.gizmoId },
+                    },
+                    signal: n,
+                  })
+                ).is_sensitive;
+              } catch {}
+            let d = s.get(C);
+            return (
+              !n.aborted &&
+                d.accountId === i.accountId &&
+                d.userId === i.userId &&
+                s.set(b, r, (t) =>
+                  t
+                    .map((t) =>
+                      t.batchId === i.batchId
+                        ? {
+                            ...t,
+                            files: t.files.map((t) =>
+                              t.uploadId === e.uploadId && t.fileId === e.fileId
+                                ? { ...t, result: u }
+                                : t,
+                            ),
+                          }
+                        : t,
+                    )
+                    .filter(g),
+                ),
+              null
             );
           },
-        })
-      : null;
-  return jsx.jsxs(jsx.Fragment, { children: [marker, dialog] });
+          gcTime: 0,
+          retry: !1,
+          staleTime: 1 / 0,
+        })),
+        (t[10] = r),
+        (t[11] = s),
+        (t[12] = l),
+        (t[13] = i))
+      : (i = t[13]),
+      (w = n.map(i)),
+      (t[1] = u),
+      (t[2] = r),
+      (t[3] = p),
+      (t[4] = s),
+      (t[5] = l),
+      (t[6] = w),
+      (t[7] = E));
+  } else ((w = t[6]), (E = t[7]));
+  let k;
+  (t[14] === w ? (k = t[15]) : ((k = { queries: w, combine: j }), (t[14] = w), (t[15] = k)), E(k));
+  let I;
+  if (t[16] !== u || t[17] !== p) {
+    let e;
+    (t[19] === p
+      ? (e = t[20])
+      : ((e = (e) =>
+          e.accountId === p.accountId &&
+          e.userId === p.userId &&
+          !e.acknowledged &&
+          e.files.some(A)),
+        (t[19] = p),
+        (t[20] = e)),
+      (I = u.find(e)),
+      (t[16] = u),
+      (t[17] = p),
+      (t[18] = I));
+  } else I = t[18];
+  let R = I;
+  if (R == null) return null;
+  let z;
+  t[21] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((z = (0, F.jsx)(`span`, {
+        ref: h,
+        hidden: !0,
+        "data-chatgpt-sensitive-image-reminder-candidate": !0,
+      })),
+      (t[21] = z))
+    : (z = t[21]);
+  let B;
+  t[22] !== y || t[23] !== r || t[24] !== a || t[25] !== m || t[26] !== s || t[27] !== R
+    ? ((B =
+        y && !a && !m
+          ? (0, F.jsx)(D, {
+              overlayClassName: L,
+              onAcknowledge: () => {
+                let e = s.get(C);
+                s.set(b, r, (t) =>
+                  t
+                    .map((t) =>
+                      t.batchId === R.batchId &&
+                      t.accountId === e.accountId &&
+                      t.userId === e.userId
+                        ? { ...t, acknowledged: !0 }
+                        : t,
+                    )
+                    .filter(g),
+                );
+              },
+            })
+          : null),
+      (t[22] = y),
+      (t[23] = r),
+      (t[24] = a),
+      (t[25] = m),
+      (t[26] = s),
+      (t[27] = R),
+      (t[28] = B))
+    : (B = t[28]);
+  let V;
+  return (
+    t[29] === B
+      ? (V = t[30])
+      : ((V = (0, F.jsxs)(F.Fragment, { children: [z, B] })), (t[29] = B), (t[30] = V)),
+    V
+  );
 }
-
-function initialize(): void {
-  sharedRuntime.$3();
-  sharedRuntime.vL();
-  sharedRuntime.FX();
-  React = sharedRuntime.e6();
-  primaryRuntime.Ma();
-  initialRuntime.Vzt();
-  sharedRuntime.QI();
-  initialRuntime.ifn();
-  dialogRuntime.n();
-  initialRuntime.cJt();
-  initialRuntime.Sqt();
-  initialRuntime.mRt();
-  jsx = sharedRuntime.I3();
+function A(e) {
+  return e.result === !0;
 }
-initialize();
-
-export { ChatGptSensitiveImageReminder };
+function j() {
+  return null;
+}
+function M() {
+  return !1;
+}
+var N, P, F, I, L;
+function R() {
+  return (R = e(() => {
+    ((N = t()),
+      u(),
+      r(),
+      (P = l()),
+      w(),
+      m(),
+      s(),
+      _(),
+      E(),
+      h(),
+      p(),
+      y(),
+      (F = a()),
+      (I = `[data-chatgpt-sensitive-image-reminder-candidate]`),
+      (L = `chatgpt-sensitive-image-reminder-overlay`));
+  }))();
+}
+R();
+export { k as ChatGptSensitiveImageReminder };

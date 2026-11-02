@@ -1,61 +1,28 @@
-import * as appInitialChunk from "@rchunk/app-initial";
-import "@rchunk/rolldown-runtime";
-
-const { CUt: initializeHighlightLocations, _Ut: conversationHighlightKey } =
-  appInitialChunk;
-
-interface ConversationHighlightLocation {
-  domain: "conversation";
-  turnKey: string;
-  unitId: string;
-}
-
-interface DiffHighlightLocation {
-  domain: "diff";
-  path: string;
-}
-
-export interface Highlight {
-  location:
-    ConversationHighlightLocation | DiffHighlightLocation | { domain: string };
-  [key: string]: unknown;
-}
-
-function selectConversationHighlights(
-  highlights: readonly Highlight[],
-): Map<string, Highlight[]> {
-  const grouped = new Map<string, Highlight[]>();
-  for (const highlight of highlights) {
-    if (highlight.location.domain !== "conversation") continue;
-    const location = highlight.location as ConversationHighlightLocation;
-    const key = conversationHighlightKey(location.turnKey, location.unitId);
-    const matches = grouped.get(key) ?? [];
-    matches.push(highlight);
-    grouped.set(key, matches);
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { CUt as t, _Ut as n } from "@rchunk/app-initial";
+function r(e) {
+  let t = new Map();
+  for (let r of e) {
+    if (r.location.domain !== `conversation`) continue;
+    let e = n(r.location.turnKey, r.location.unitId),
+      i = t.get(e) ?? [];
+    (i.push(r), t.set(e, i));
   }
-  return grouped;
+  return t;
 }
-
-function selectDiffHighlights(
-  highlights: readonly Highlight[],
-): Map<string, Highlight[]> {
-  const grouped = new Map<string, Highlight[]>();
-  for (const highlight of highlights) {
-    if (highlight.location.domain !== "diff") continue;
-    const path = (highlight.location as DiffHighlightLocation).path;
-    const matches = grouped.get(path) ?? [];
-    matches.push(highlight);
-    grouped.set(path, matches);
+function i(e) {
+  let t = new Map();
+  for (let n of e) {
+    if (n.location.domain !== `diff`) continue;
+    let e = t.get(n.location.path) ?? [];
+    (e.push(n), t.set(n.location.path, e));
   }
-  return grouped;
+  return t;
 }
-
-function initializeHighlightSelectors(): void {
-  initializeHighlightLocations();
+function a() {
+  return (a = e(() => {
+    t();
+  }))();
 }
-
-export {
-  selectDiffHighlights as n,
-  initializeHighlightSelectors as r,
-  selectConversationHighlights as t,
-};
+export { i as n, a as r, r as t };

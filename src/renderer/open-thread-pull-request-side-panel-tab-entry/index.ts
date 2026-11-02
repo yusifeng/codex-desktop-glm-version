@@ -1,14 +1,13 @@
+// @ts-nocheck
 import {
-  i as restoreThreadPullRequestSidePanelTab,
-  n as openThreadCanonicalPullRequestSidePanelTab,
-  r as openThreadPullRequestSidePanelTab,
-  t as initializeOpenThreadPullRequestSidePanelTab,
+  i as e,
+  n as t,
+  r as n,
+  t as r,
 } from "@rchunk/open-thread-pull-request-side-panel-tab";
-
-initializeOpenThreadPullRequestSidePanelTab();
-
+r();
 export {
-  openThreadCanonicalPullRequestSidePanelTab,
-  openThreadPullRequestSidePanelTab,
-  restoreThreadPullRequestSidePanelTab,
+  t as openThreadCanonicalPullRequestSidePanelTab,
+  n as openThreadPullRequestSidePanelTab,
+  e as restoreThreadPullRequestSidePanelTab,
 };

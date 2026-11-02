@@ -1,18 +1,17 @@
-// Distributive-property learning-model manifest. Release chunk: type-50c9fc73ec1d.js.
-import "@rchunk/rolldown-runtime";
-
-const distributivePropertySpecification = {
-  type: "DISTRIBUTIVE_PROPERTY",
-  version: 2,
-  thumbnailAssetKey: "distributive-property-v1",
-  canonicalFormula: "a(b+c)=ab+ac",
-  parameters: {
-    a: { kind: "integer" as const, defaultValue: 8, min: 2, max: 8 },
-    b: { kind: "integer" as const, defaultValue: 7, min: 2, max: 8 },
-    c: { kind: "integer" as const, defaultValue: 7, min: 2, max: 8 },
-  },
-};
-
-function initializeDistributivePropertySpecification(): void {}
-
-export { distributivePropertySpecification as n, initializeDistributivePropertySpecification as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `DISTRIBUTIVE_PROPERTY`),
+      (n = `distributive-property-v1`),
+      (r = `a(b+c)=ab+ac`),
+      (i = {
+        a: { kind: `integer`, defaultValue: 8, min: 2, max: 8 },
+        b: { kind: `integer`, defaultValue: 7, min: 2, max: 8 },
+        c: { kind: `integer`, defaultValue: 7, min: 2, max: 8 },
+      }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+export { a as n, o as t };

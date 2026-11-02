@@ -1,30 +1,15 @@
-export interface GitActionReviewStateInput {
-  currentBranch?: string | null;
-  storedThreadBranch?: string | null;
-}
-
-export interface GitActionReviewState {
-  currentBranchName: string;
-  hasThreadBranchMismatch: boolean;
-  storedThreadBranchName: string;
-}
-
-function getGitActionReviewState({
-  currentBranch,
-  storedThreadBranch,
-}: GitActionReviewStateInput): GitActionReviewState {
-  const currentBranchName = currentBranch?.trim() ?? "";
-  const storedThreadBranchName = storedThreadBranch?.trim() ?? "";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t({ currentBranch: e, storedThreadBranch: t }) {
+  let n = e?.trim() ?? ``,
+    r = t?.trim() ?? ``;
   return {
-    currentBranchName,
-    hasThreadBranchMismatch:
-      currentBranchName.length > 0 &&
-      storedThreadBranchName.length > 0 &&
-      currentBranchName !== storedThreadBranchName,
-    storedThreadBranchName,
+    currentBranchName: n,
+    hasThreadBranchMismatch: n.length > 0 && r.length > 0 && n !== r,
+    storedThreadBranchName: r,
   };
 }
-
-function initializeGitActionReviewState(): void {}
-
-export { initializeGitActionReviewState as n, getGitActionReviewState as t };
+function n() {
+  return (n = e(() => {}))();
+}
+export { n, t };

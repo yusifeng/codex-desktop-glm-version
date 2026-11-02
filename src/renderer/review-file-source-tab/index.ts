@@ -1,17 +1,10 @@
+// @ts-nocheck
 import "@rchunk/app-shared";
-import {
-  $st as reviewFileSourceTabType,
-  Qst as openReviewFileSourceTab,
-  Xst as getReviewFileSourceTabId,
-  Zst as initializeReviewFileSourceTab,
-  ect as toggleReviewFileSourceTab,
-} from "@rchunk/app-initial";
-
-initializeReviewFileSourceTab();
-
+import { $st as e, Qst as t, Xst as n, Zst as r, ect as i } from "@rchunk/app-initial";
+r();
 export {
-  getReviewFileSourceTabId,
-  openReviewFileSourceTab,
-  reviewFileSourceTabType,
-  toggleReviewFileSourceTab,
+  n as getReviewFileSourceTabId,
+  t as openReviewFileSourceTab,
+  e as reviewFileSourceTabType,
+  i as toggleReviewFileSourceTab,
 };

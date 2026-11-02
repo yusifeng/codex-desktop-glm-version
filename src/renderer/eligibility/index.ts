@@ -1,4 +1,4 @@
-// Semantic restoration. Release chunk: eligibility-d6f5d74b3829.js.
+// @ts-nocheck
 import { n as e } from "@rchunk/rolldown-runtime";
 import { E4 as t, g4 as n, q4 as r } from "@rchunk/app-shared";
 function i(e) {
@@ -28,7 +28,6 @@ function o(e, t, n) {
 }
 var s;
 function c() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (c = e(() => {
     s = {
       invalid_or_unavailable: `generic`,
@@ -74,7 +73,6 @@ function u(e, t, n) {
   return { canRedeem: r, showWallet: i, usdBalance: a };
 }
 function d() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (d = e(() => {
     (c(), n());
   }))();

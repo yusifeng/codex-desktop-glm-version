@@ -1,53 +1,25 @@
-import {
-  L_n as initializeVirtualizedFileDiff,
-  PSn as virtualizedFileDiffSelector,
-  hvn as VirtualizedFileDiffController,
-} from "@rchunk/app-initial";
-
-interface LinePosition {
-  height: number;
-  top: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { L_n as t, PSn as n, hvn as r } from "@rchunk/app-initial";
+function i(e, t) {
+  t instanceof r && c.set(e, t);
 }
-
-const controllers = new WeakMap<Element, VirtualizedFileDiffController>();
-
-function registerVirtualizedFileDiffController(
-  element: Element,
-  controller: unknown,
-): void {
-  if (controller instanceof VirtualizedFileDiffController) {
-    controllers.set(element, controller);
-  }
+function a(e, t, n) {
+  let r = s(e),
+    i = r?.getLinePosition(t, n);
+  if (r?.top != null && i != null) return { height: i.height, top: r.top + i.top };
 }
-
-function getController(root: Element): VirtualizedFileDiffController | undefined {
-  const element = root.querySelector(virtualizedFileDiffSelector);
-  return element == null ? undefined : controllers.get(element);
+function o(e, t) {
+  s(e)?.setSelectedLines(t, { notify: !0 });
 }
-
-function getVirtualizedLinePosition(
-  root: Element,
-  line: number,
-  side: string,
-): LinePosition | undefined {
-  const controller = getController(root);
-  const position = controller?.getLinePosition(line, side);
-  if (controller?.top != null && position != null) {
-    return { height: position.height, top: controller.top + position.top };
-  }
+function s(e) {
+  let t = e.querySelector(n);
+  return t == null ? void 0 : c.get(t);
 }
-
-function setSelectedDiffLines(root: Element, selection: unknown): void {
-  getController(root)?.setSelectedLines(selection, { notify: true });
+var c;
+function l() {
+  return (l = e(() => {
+    (t(), (c = new WeakMap()));
+  }))();
 }
-
-function initializeVirtualizedLinePosition(): void {
-  initializeVirtualizedFileDiff();
-}
-
-export {
-  setSelectedDiffLines as i,
-  initializeVirtualizedLinePosition as n,
-  registerVirtualizedFileDiffController as r,
-  getVirtualizedLinePosition as t,
-};
+export { o as i, l as n, i as r, a as t };

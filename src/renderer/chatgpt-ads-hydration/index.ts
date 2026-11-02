@@ -1,212 +1,133 @@
-// Hydrates ChatGPT ads for eligible conversations. Release chunk: hydration-8c45073f777c.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { vW as t, wL as n } from "@rchunk/app-shared";
 import {
-  o as initializeAdsPlacementPolicy,
-  s as isAdsPolicyEnabled,
-} from "@rchunk/ads-placement-policy";
-
-interface Scope {
-  get(signal: unknown, parameter?: unknown): unknown;
-  query: {
-    getData(signal: unknown, parameter?: unknown): unknown;
-    snapshot(signal: unknown): { getOrFetch(): Promise<unknown> };
-  };
-}
-interface HydrationOptions {
-  enabled: boolean;
-  useSheepEndpoint: boolean;
-  rotatingFallbackEnabled: boolean;
-  projectId?: string;
-  ownerUserId?: string;
-}
-interface ConversationData {
-  conversation_id?: string;
-  is_temporary_chat?: boolean;
-  owner?: { user_id?: string };
-}
-interface CapabilityResult {
-  isCapable: boolean;
-}
-interface AppSharedRuntime {
-  vW: string;
-  wL(): void;
-}
-interface ApiClient {
-  safeGet(path: string, options: unknown): Promise<unknown>;
-}
-interface AppInitialRuntime {
-  [key: string]: unknown;
-}
-
-const shared = appSharedChunk as unknown as AppSharedRuntime;
-const initial = appInitialChunk as unknown as AppInitialRuntime;
-const accountIdSignal = initial.U6t;
-const apiClient = initial.rJt as ApiClient;
-
-function abortableDelay(
-  milliseconds: number,
-  signal: AbortSignal,
-): Promise<boolean> {
-  if (signal.aborted) return Promise.resolve(false);
-  return new Promise((resolve) => {
-    const onAbort = () => {
-      clearTimeout(timeout);
-      resolve(false);
-    };
-    const timeout = setTimeout(() => {
-      signal.removeEventListener("abort", onAbort);
-      resolve(true);
-    }, milliseconds);
-    signal.addEventListener("abort", onAbort, { once: true });
-  });
-}
-
-async function fetchAds(
-  scope: Scope,
-  {
-    conversationId,
-    options,
-    signal,
-  }: { conversationId: string; options: HydrationOptions; signal: AbortSignal },
-): Promise<unknown | null> {
-  const accountId = scope.get(accountIdSignal);
-  if (!options.enabled || signal.aborted || accountId == null) return null;
-  const headers: Record<string, string> = {
-    "ChatGPT-Account-ID": String(accountId),
-    [shared.vW]: String(accountId),
-  };
-  if (options.useSheepEndpoint) headers["x-openai-use-sheep"] = "1";
-  if (options.projectId != null) {
-    headers["chatgpt-project-id"] = options.projectId;
-    if (options.ownerUserId != null) {
-      headers["chatgpt-conv-owner-id"] = options.ownerUserId;
-    }
-  }
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    const endpoints = options.rotatingFallbackEnabled
-      ? (["stable", "rotating"] as const)
-      : (["stable"] as const);
-    for (const endpoint of endpoints) {
-      if (signal.aborted || scope.get(accountIdSignal) !== accountId)
-        return null;
+  $Bt as r,
+  AVt as i,
+  BBt as a,
+  FVt as o,
+  Sdn as s,
+  Sqt as c,
+  U6t as l,
+  VVt as u,
+  Xet as d,
+  YHt as f,
+  Zet as p,
+  bqt as m,
+  cJt as h,
+  ffn as g,
+  gfn as _,
+  iUt as v,
+  ifn as y,
+  mPt as b,
+  pfn as x,
+  qVt as S,
+  rJt as C,
+  rfn as w,
+  sPt as T,
+  uHt as E,
+  wdn as D,
+} from "@rchunk/app-initial";
+import { o as O, s as k } from "@rchunk/ads-placement-policy";
+async function A(e, { conversationId: n, options: r, signal: i }) {
+  let a = e.get(l);
+  if (!r.enabled || i.aborted || a == null) return null;
+  let o = { "ChatGPT-Account-ID": a, [t]: a };
+  (r.useSheepEndpoint && (o[`x-openai-use-sheep`] = `1`),
+    r.projectId != null &&
+      ((o[`chatgpt-project-id`] = r.projectId),
+      r.ownerUserId != null && (o[`chatgpt-conv-owner-id`] = r.ownerUserId)));
+  for (let t = 0; t < 3; t += 1) {
+    let c = r.rotatingFallbackEnabled ? [`stable`, `rotating`] : [`stable`];
+    for (let t of c) {
+      if (i.aborted || e.get(l) !== a) return null;
       try {
-        const result = await apiClient.safeGet(
-          endpoint === "stable"
-            ? "/bazaar/conversation/{conversation_id}/ads"
-            : "/conversations/{conversation_id}/message_supplements",
-          {
-            parameters: { path: { conversation_id: conversationId } },
-            additionalHeaders: headers,
-            signal,
-          },
+        let r = await C.safeGet(
+          t === `stable`
+            ? `/bazaar/conversation/{conversation_id}/ads`
+            : `/conversations/{conversation_id}/message_supplements`,
+          { parameters: { path: { conversation_id: n } }, additionalHeaders: o, signal: i },
         );
-        return signal.aborted || scope.get(accountIdSignal) !== accountId
-          ? null
-          : result;
-      } catch (error) {
+        return i.aborted || e.get(l) !== a ? null : r;
+      } catch (e) {
         if (
-          signal.aborted ||
-          (error instanceof Error && error.name === "AbortError") ||
-          (typeof error === "object" &&
-            error !== null &&
-            "errorCode" in error &&
-            error.errorCode === "account_changed")
-        ) {
+          i.aborted ||
+          (e instanceof Error && e.name === `AbortError`) ||
+          (e instanceof s && e.errorCode === `account_changed`)
+        )
           return null;
-        }
       }
     }
-    if (attempt < 2 && !(await abortableDelay(500 * 2 ** attempt, signal))) {
-      return null;
-    }
+    if (t < 2 && !(await j(500 * 2 ** t, i))) return null;
   }
   return null;
 }
-
-function hydrationExperimentEnabled(scope: Scope): boolean {
-  if (!isAdsPolicyEnabled(scope)) return false;
-  const configuration = scope.get(initial.gfn);
-  const getExperiment = initial.rfn as
-    | ((
-        configuration: unknown,
-        id: string,
-      ) => { get(name: string, fallback: boolean): boolean })
-    | undefined;
-  return (
-    configuration != null &&
-    (getExperiment?.(configuration, "1402002035").get(
-      "conversation_ads_hydration_enabled",
-      false,
-    ) ??
-      false)
-  );
+function j(e, t) {
+  return t.aborted
+    ? Promise.resolve(!1)
+    : new Promise((n) => {
+        let r = setTimeout(() => {
+            (t.removeEventListener(`abort`, i), n(!0));
+          }, e),
+          i = () => {
+            (clearTimeout(r), n(!1));
+          };
+        t.addEventListener(`abort`, i, { once: !0 });
+      });
 }
-
-async function hydrateChatGptAds(
-  scope: Scope,
-  conversationId: string,
-  signal: AbortSignal,
-): Promise<unknown | null> {
-  const accountId = scope.get(accountIdSignal);
-  const conversation = scope.query.getData(initial.BBt, conversationId) as
-    ConversationData | undefined;
-  const isEligible = () => {
-    const experience = scope.get(initial.AVt, conversationId);
-    const capability = scope.get(initial.Xet, { name: "chatgpt.ads" }) as
-      CapabilityResult | undefined;
-    return (
-      !signal.aborted &&
-      accountId != null &&
-      scope.get(accountIdSignal) === accountId &&
-      experience !== "tpp" &&
-      experience !== "flora" &&
-      !scope.get(initial.FVt, conversationId) &&
-      scope.get(initial.qVt, conversationId) == null &&
-      capability?.isCapable === true &&
-      conversation?.conversation_id === conversationId &&
-      conversation.is_temporary_chat !== true
-    );
-  };
-  if (!isEligible()) return null;
+function M() {
+  return (M = e(() => {
+    (n(), D(), h(), c());
+  }))();
+}
+async function N(e, t, n) {
+  let r = e.get(l),
+    s = () => {
+      let s = e.get(i, t),
+        c = e.query.getData(a, t);
+      return (
+        !n.aborted &&
+        r != null &&
+        e.get(l) === r &&
+        s !== `tpp` &&
+        s !== `flora` &&
+        !e.get(o, t) &&
+        e.get(S, t) == null &&
+        e.get(d, { name: `chatgpt.ads` }).isCapable &&
+        c?.conversation_id === t &&
+        c.is_temporary_chat !== !0
+      );
+    };
+  if (!s()) return null;
   try {
-    await scope.query.snapshot(initial.bqt).getOrFetch();
+    await e.query.snapshot(m).getOrFetch();
   } catch {
     return null;
   }
-  if (!isEligible() || !hydrationExperimentEnabled(scope)) return null;
-  const projectId = scope.get(initial.VVt, conversationId);
-  const gate = initial.ffn as
-    ((scope: Scope, id: string) => boolean) | undefined;
-  const isProjectId = initial.iUt as
-    ((value: unknown) => value is string) | undefined;
-  const response = await fetchAds(scope, {
-    conversationId,
-    signal,
-    options: {
-      enabled: true,
-      useSheepEndpoint: gate?.(scope, "3878139664") ?? false,
-      rotatingFallbackEnabled: gate?.(scope, "3886466923") ?? false,
-      projectId: isProjectId?.(projectId) ? projectId : undefined,
-      ownerUserId: conversation.owner?.user_id,
-    },
-  });
-  const applyHydration = initial.sPt as
-    | ((
-        scope: Scope,
-        conversationId: string,
-        response: unknown,
-        accountId: unknown,
-      ) => void)
-    | undefined;
-  if (response != null && isEligible() && hydrationExperimentEnabled(scope)) {
-    applyHydration?.(scope, conversationId, response, accountId);
-  }
-  return response;
+  if (!s() || !P(e)) return null;
+  let c = e.get(u, t),
+    f = await A(e, {
+      conversationId: t,
+      signal: n,
+      options: {
+        enabled: !0,
+        useSheepEndpoint: g(e, `3878139664`),
+        rotatingFallbackEnabled: g(e, `3886466923`),
+        projectId: v(c) ? (c ?? void 0) : void 0,
+        ownerUserId: e.query.getData(a, t)?.owner?.user_id,
+      },
+    });
+  return (f != null && s() && P(e) && T(e, t, f, r), f);
 }
-
-shared.wL();
-initializeAdsPlacementPolicy();
-
-export { hydrateChatGptAds };
+function P(e) {
+  if (!k(e)) return !1;
+  let t = e.get(_);
+  return t != null && w(t, `1402002035`).get(`conversation_ads_hydration_enabled`, !1);
+}
+function F() {
+  return (F = e(() => {
+    (p(), M(), b(), r(), f(), E(), c(), y(), x(), O());
+  }))();
+}
+F();
+export { N as hydrateChatGptAds };

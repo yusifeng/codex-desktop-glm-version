@@ -1,77 +1,48 @@
-// home-prefill-artifact-preview —— Home 预填文件进入 artifact 预览桥。
-
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-
-void runtimeChunk;
-
-const {
-  $en: routeScope,
-  Dyt: hostIdSignal,
-  Hlt: initializeArtifactPreview,
-  Ult: openArtifactPreview,
-  byt: initializeHomePrefillState,
-  itn: initializeAutomationRoutes,
-} = appInitialChunk;
-const {
-  $3: initializeJsxRuntime,
-  FX: initializeSignalRuntime,
-  LX: useScope,
-  e6: getReactRuntime,
-} = appSharedChunk;
-
-interface ReactRuntime {
-  useEffect(effect: () => void, dependencies: unknown[]): void;
-  useRef<T>(value: T): { current: T };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, FX as n, LX as r, e6 as i } from "@rchunk/app-shared";
+import {
+  $en as a,
+  Dyt as o,
+  Hlt as s,
+  Ult as c,
+  byt as l,
+  itn as u,
+} from "@rchunk/app-initial";
+function d(e) {
+  let t = (0, f.c)(5),
+    { locationKey: n, previewFiles: i } = e,
+    s = r(a),
+    l = (0, p.useRef)(null),
+    u,
+    d;
+  return (
+    t[0] !== n || t[1] !== i || t[2] !== s
+      ? ((u = () => {
+          if (i.length === 0 || l.current === n) return;
+          let e = s.get(o);
+          l.current = n;
+          for (let t of i) {
+            let n = t.fsPath || t.path;
+            n != null && n.length !== 0 && c(s, n, { hostId: e, title: t.label });
+          }
+        }),
+        (d = [n, i, s]),
+        (t[0] = n),
+        (t[1] = i),
+        (t[2] = s),
+        (t[3] = u),
+        (t[4] = d))
+      : ((u = t[3]), (d = t[4])),
+    (0, p.useEffect)(u, d),
+    null
+  );
 }
-
-export interface PrefillPreviewFile {
-  fsPath?: string;
-  label?: string;
-  path?: string;
+var f, p;
+function m() {
+  return (m = e(() => {
+    ((f = t()), n(), (p = i()), s(), u(), l());
+  }))();
 }
-
-export interface HomePrefillArtifactPreviewProps {
-  locationKey: unknown;
-  previewFiles: PrefillPreviewFile[];
-}
-
-let React: ReactRuntime | null = null;
-
-function HomePrefillArtifactPreview({
-  locationKey,
-  previewFiles,
-}: HomePrefillArtifactPreviewProps): null {
-  initializeHomePrefillArtifactPreview();
-  const react = React as ReactRuntime;
-  const scope = useScope(routeScope);
-  const handledLocation = react.useRef<unknown>(null);
-  react.useEffect(() => {
-    if (previewFiles.length === 0 || handledLocation.current === locationKey)
-      return;
-    const hostId = scope.get<string>(hostIdSignal);
-    handledLocation.current = locationKey;
-    for (const file of previewFiles) {
-      const filePath = file.fsPath || file.path;
-      if (filePath != null && filePath.length !== 0) {
-        openArtifactPreview(scope, filePath, { hostId, title: file.label });
-      }
-    }
-  }, [locationKey, previewFiles, scope]);
-  return null;
-}
-
-function initializeHomePrefillArtifactPreview(): void {
-  initializeJsxRuntime?.();
-  initializeSignalRuntime?.();
-  initializeArtifactPreview?.();
-  initializeAutomationRoutes?.();
-  initializeHomePrefillState?.();
-  React ??=
-    typeof getReactRuntime === "function" ? getReactRuntime() : getReactRuntime;
-}
-
-initializeHomePrefillArtifactPreview();
-
-export { HomePrefillArtifactPreview };
+m();
+export { d as HomePrefillArtifactPreview };

@@ -1,79 +1,26 @@
-import "@rchunk/rolldown-runtime";
-import {
-  FX as initializeSignalRuntime,
-  IK as pathsEqual,
-  RI as initializePathRuntime,
-  oZ as createSignalFamily,
-} from "@rchunk/app-shared";
-import {
-  Ftn as initializeThreadState,
-  wtn as terminalBindingFamily,
-} from "@rchunk/app-initial";
-
-export interface WorkspaceTarget {
-  hostId?: string | null;
-  workspaceRoot?: string | null;
-}
-
-export interface TerminalWarningInput {
-  binding?: WorkspaceTarget | null;
-  currentTarget: WorkspaceTarget;
-  currentWorkspaceRoots: readonly string[];
-  dismissedTarget?: WorkspaceTarget | null;
-}
-
-let terminalWorkspaceWarningState: unknown;
-
-function targetsMatch(
-  left: WorkspaceTarget | null | undefined,
-  right: WorkspaceTarget,
-): boolean {
-  if (
-    left == null ||
-    (left.hostId != null &&
-      right.hostId != null &&
-      left.hostId !== right.hostId)
-  ) {
-    return false;
-  }
-  if (left.workspaceRoot == null || right.workspaceRoot == null) {
-    return left.workspaceRoot === right.workspaceRoot;
-  }
-  return pathsEqual(left.workspaceRoot, right.workspaceRoot);
-}
-
-function shouldShowTerminalWorkspaceWarning({
-  binding,
-  currentTarget,
-  currentWorkspaceRoots,
-  dismissedTarget,
-}: TerminalWarningInput): boolean {
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, IK as n, RI as r, oZ as i } from "@rchunk/app-shared";
+import { Ftn as a, wtn as o } from "@rchunk/app-initial";
+function s({ binding: e, currentTarget: t, currentWorkspaceRoots: n, dismissedTarget: r }) {
   return (
-    binding != null &&
-    !targetsMatch(binding, currentTarget) &&
-    !currentWorkspaceRoots.some((workspaceRoot) =>
-      targetsMatch(binding, { hostId: currentTarget.hostId, workspaceRoot }),
-    ) &&
-    !targetsMatch(dismissedTarget, currentTarget)
+    e != null &&
+    !c(e, t) &&
+    !n.some((n) => c(e, { hostId: t.hostId, workspaceRoot: n })) &&
+    !c(r, t)
   );
 }
-
-function initializeTerminalWorkspaceWarningState(): void {
-  initializeSignalRuntime();
-  initializeThreadState();
-  initializePathRuntime();
-  const createFamily = createSignalFamily as unknown as (
-    source: unknown,
-    initialValue: (parameter: unknown) => null,
-  ) => unknown;
-  terminalWorkspaceWarningState = createFamily(
-    terminalBindingFamily,
-    () => null,
-  );
+function c(e, t) {
+  return e == null || (e.hostId != null && t.hostId != null && e.hostId !== t.hostId)
+    ? !1
+    : e.workspaceRoot == null || t.workspaceRoot == null
+      ? e.workspaceRoot === t.workspaceRoot
+      : n(e.workspaceRoot, t.workspaceRoot);
 }
-
-export {
-  shouldShowTerminalWorkspaceWarning as n,
-  terminalWorkspaceWarningState as r,
-  initializeTerminalWorkspaceWarningState as t,
-};
+var l;
+function u() {
+  return (u = e(() => {
+    (t(), a(), r(), (l = i(o, (e) => null)));
+  }))();
+}
+export { s as n, l as r, u as t };

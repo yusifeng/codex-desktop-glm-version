@@ -1,111 +1,107 @@
-// file-already-exists-dialog —— 项目文件重名上传确认弹窗。
-// 原版：app/webview/assets/file-already-exists-dialog-8a907b310635.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-void runtimeChunk;
-const {
-  $3: initializeJsxRuntime,
-  I3: getJsxRuntime,
-  K2: initializeIntlRuntime,
-  Y2: FormattedMessage,
-  Yh: Button,
-  Zh: initializeButton,
-} = appSharedChunk;
-const {
-  Kat: CompactFormDialog,
-  qat: initializeCompactFormDialog,
-} = appInitialChunk;
-
-let jsxRuntime: JsxRuntime | null = null;
-
-interface ProjectFileAlreadyExistsDialogProps {
-  fileName: string;
-  onClose(): void;
-  onConfirm(): void;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i, Yh as a, Zh as o } from "@rchunk/app-shared";
+import { Kat as s, qat as c } from "@rchunk/app-initial";
+function l(e) {
+  let t = (0, u.c)(17),
+    { fileName: n, onClose: r, onConfirm: o } = e,
+    c;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((c = (0, d.jsx)(i, {
+        id: `chatgptProjectUpload.duplicate.title`,
+        defaultMessage: `File already exists`,
+        description: `Title of the confirmation shown to project editors before uploading a file with the same name as an existing project source`,
+      })),
+      (t[0] = c))
+    : (c = t[0]);
+  let l;
+  t[1] === n
+    ? (l = t[2])
+    : ((l = (0, d.jsx)(`span`, {
+        className: `wrap-anywhere`,
+        children: (0, d.jsx)(i, {
+          id: `chatgptProjectUpload.duplicate.description`,
+          defaultMessage: `A file with the name {fileName} already exists`,
+          description: `Explains a project source upload name conflict; fileName is the exact selected filename, including its extension. The editor can add another file or skip it.`,
+          values: { fileName: n },
+        }),
+      })),
+      (t[1] = n),
+      (t[2] = l));
+  let f;
+  t[3] !== r || t[4] !== o
+    ? ((f = () => {
+        (o(), r());
+      }),
+      (t[3] = r),
+      (t[4] = o),
+      (t[5] = f))
+    : (f = t[5]);
+  let p;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((p = (0, d.jsx)(i, {
+        id: `chatgptProjectUpload.duplicate.skip`,
+        defaultMessage: `Skip`,
+        description: `Skips only the current conflicting file in a project upload batch and continues with the other selected files`,
+      })),
+      (t[6] = p))
+    : (p = t[6]);
+  let m;
+  t[7] === r
+    ? (m = t[8])
+    : ((m = (0, d.jsx)(a, {
+        color: `secondary`,
+        size: `dialogAction`,
+        type: `button`,
+        onClick: r,
+        children: p,
+      })),
+      (t[7] = r),
+      (t[8] = m));
+  let h;
+  t[9] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((h = (0, d.jsx)(a, {
+        color: `primary`,
+        size: `dialogAction`,
+        type: `submit`,
+        children: (0, d.jsx)(i, {
+          id: `chatgptProjectUpload.duplicate.upload`,
+          defaultMessage: `Upload anyway`,
+          description: `Confirms uploading another project source with the same filename; this does not replace the existing file`,
+        }),
+      })),
+      (t[9] = h))
+    : (h = t[9]);
+  let g;
+  t[10] === m
+    ? (g = t[11])
+    : ((g = (0, d.jsxs)(d.Fragment, { children: [m, h] })), (t[10] = m), (t[11] = g));
+  let _;
+  return (
+    t[12] !== r || t[13] !== l || t[14] !== f || t[15] !== g
+      ? ((_ = (0, d.jsx)(s, {
+          size: `compact`,
+          title: c,
+          subtitle: l,
+          onClose: r,
+          onSubmit: f,
+          footer: g,
+          children: null,
+        })),
+        (t[12] = r),
+        (t[13] = l),
+        (t[14] = f),
+        (t[15] = g),
+        (t[16] = _))
+      : (_ = t[16]),
+    _
+  );
 }
-
-function ProjectFileAlreadyExistsDialog({
-  fileName,
-  onClose,
-  onConfirm,
-}: ProjectFileAlreadyExistsDialogProps): unknown {
-  const jsx = getInitializedJsxRuntime();
-  const title = jsx.jsx(FormattedMessage, {
-    id: "chatgptProjectUpload.duplicate.title",
-    defaultMessage: "File already exists",
-    description:
-      "Title of the confirmation shown to project editors before uploading a file with the same name as an existing project source",
-  });
-  const subtitle = jsx.jsx("span", {
-    className: "wrap-anywhere",
-    children: jsx.jsx(FormattedMessage, {
-      id: "chatgptProjectUpload.duplicate.description",
-      defaultMessage: "A file with the name {fileName} already exists",
-      description:
-        "Explains a project source upload name conflict; fileName is the exact selected filename, including its extension. The editor can add another file or skip it.",
-      values: { fileName },
-    }),
-  });
-  const submit = () => {
-    onConfirm();
-    onClose();
-  };
-  const skipButton = jsx.jsx(Button, {
-    color: "secondary",
-    size: "dialogAction",
-    type: "button",
-    onClick: onClose,
-    children: jsx.jsx(FormattedMessage, {
-      id: "chatgptProjectUpload.duplicate.skip",
-      defaultMessage: "Skip",
-      description:
-        "Skips only the current conflicting file in a project upload batch and continues with the other selected files",
-    }),
-  });
-  const uploadButton = jsx.jsx(Button, {
-    color: "primary",
-    size: "dialogAction",
-    type: "submit",
-    children: jsx.jsx(FormattedMessage, {
-      id: "chatgptProjectUpload.duplicate.upload",
-      defaultMessage: "Upload anyway",
-      description:
-        "Confirms uploading another project source with the same filename; this does not replace the existing file",
-    }),
-  });
-
-  return jsx.jsx(CompactFormDialog, {
-    size: "compact",
-    title,
-    subtitle,
-    onClose,
-    onSubmit: submit,
-    footer: jsx.jsxs(jsx.Fragment, { children: [skipButton, uploadButton] }),
-    children: null,
-  });
+var u, d;
+function f() {
+  return (f = e(() => {
+    ((u = t()), r(), o(), c(), (d = n()));
+  }))();
 }
-
-function initializeProjectFileAlreadyExistsDialog(): void {
-  if (jsxRuntime != null) return;
-  initializeJsxRuntime();
-  initializeIntlRuntime();
-  initializeButton();
-  initializeCompactFormDialog();
-  jsxRuntime = getJsxRuntime();
-}
-
-function getInitializedJsxRuntime(): JsxRuntime {
-  initializeProjectFileAlreadyExistsDialog();
-  if (jsxRuntime == null) {
-    throw new Error("Duplicate file dialog JSX runtime failed to initialize");
-  }
-  return jsxRuntime;
-}
-
-initializeProjectFileAlreadyExistsDialog();
-
-export { ProjectFileAlreadyExistsDialog };
+f();
+export { l as ProjectFileAlreadyExistsDialog };

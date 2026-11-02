@@ -1,170 +1,117 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $O as timeConstants,
-  FX as initializeSignals,
-  QI as initializeQueries,
-  QX as createScopedQueryFamily,
-  ZI as appScope,
-  ek as initializeHttpRuntime,
-  pL as createQueryOptions,
-  rZ as createScopedSignalFamily,
+  $O as t,
+  FX as n,
+  QI as r,
+  QX as i,
+  ZI as a,
+  ek as o,
+  pL as s,
+  rZ as c,
 } from "@rchunk/app-shared";
 import {
-  U6t as currentAccountId,
-  bRt as prepareUploadFile,
-  cJt as initializeApiClient,
-  rJt as apiClient,
-  yRt as initializePersonalizationRuntime,
+  $Bt as l,
+  BBt as u,
+  JVt as d,
+  Sqt as f,
+  Sun as p,
+  U6t as m,
+  bRt as h,
+  cJt as g,
+  hun as _,
+  pun as v,
+  rJt as y,
+  uHt as b,
+  wVt as x,
+  yRt as S,
 } from "@rchunk/app-initial";
-
-interface ReferencePhoto {
-  asset_pointer?: string;
-  created_at: string;
-  id: string;
-  kind: string;
-  [key: string]: unknown;
-}
-
-interface QueryScope {
-  get(signal: unknown): unknown;
-  queryClient: {
-    cancelQueries(options: unknown): Promise<unknown>;
-    invalidateQueries(options: unknown): Promise<unknown>;
-    setQueryData(options: unknown, updater: (current?: ReferencePhoto[]) => ReferencePhoto[]): void;
-  };
-}
-
-interface UploadReferencePhotoInput {
-  accountId: string;
-  imageFile: unknown;
-  imageTagId?: string | null;
-  kind: string;
-  signal?: AbortSignal;
-}
-
-interface PersonalizationApiClient {
-  safeGet(path: string, options: Record<string, unknown>): Promise<{ items: ReferencePhoto[] }>;
-  safePatch(path: string, options: Record<string, unknown>): Promise<ReferencePhoto>;
-  safePost(path: string, options: Record<string, unknown>): Promise<ReferencePhoto & { asset_pointer?: string }>;
-}
-
-const client = apiClient as PersonalizationApiClient;
-
-function createReferencePhotosQuery(accountId: string): Record<string, unknown> {
-  return createQueryOptions({
-    queryKey: ["chatgpt-reference-photos", accountId],
-    queryFn: async ({ signal }: { signal?: AbortSignal }) => {
-      const { items } = await client.safeGet("/images/image-tags", {
-        additionalHeaders: { "ChatGPT-Account-ID": accountId },
-        signal,
+function C(e) {
+  return s({
+    queryKey: [`chatgpt-reference-photos`, e],
+    queryFn: async ({ signal: t }) => {
+      let { items: n } = await y.safeGet(`/images/image-tags`, {
+        additionalHeaders: { "ChatGPT-Account-ID": e },
+        signal: t,
       });
-      return items;
+      return n;
     },
-    staleTime: timeConstants.ONE_MINUTE,
+    staleTime: t.ONE_MINUTE,
   });
 }
-
-function selectLatestReferencePhoto(
-  photos: ReferencePhoto[] | null | undefined,
-  kind?: string | null,
-): ReferencePhoto | null {
-  if (kind == null) {
-    return selectLatestReferencePhoto(photos, "full_body_likeness")
-      ?? selectLatestReferencePhoto(photos, "self");
-  }
-  return photos
-    ?.filter((photo) => photo.kind === kind)
-    .sort((left, right) =>
-      right.created_at.localeCompare(left.created_at)
-      || right.id.localeCompare(left.id),
-    )[0] ?? null;
+function w(e, t) {
+  return t == null
+    ? (w(e, `full_body_likeness`) ?? w(e, `self`))
+    : (e
+        ?.filter((e) => e.kind === t)
+        .sort((e, t) => t.created_at.localeCompare(e.created_at) || t.id.localeCompare(e.id))[0] ??
+        null);
 }
-
-async function uploadReferencePhoto(
-  scope: QueryScope,
-  {
-    accountId,
-    imageFile,
-    kind,
-    imageTagId,
-    signal = new AbortController().signal,
-  }: UploadReferencePhotoInput,
-): Promise<ReferencePhoto> {
-  const file = await prepareUploadFile(scope, imageFile, signal) as Blob & { name: string };
-  signal.throwIfAborted();
-  const form = new FormData();
-  form.append("file", file, file.name);
-  const uploaded = await client.safePost("/calpico/chatgpt/profile_files", {
-    additionalHeaders: { "ChatGPT-Account-ID": accountId },
-    requestBody: form,
-    signal,
+async function T(
+  e,
+  { accountId: t, imageFile: n, kind: r, imageTagId: i, signal: a = new AbortController().signal },
+) {
+  let o = await h(e, n, a);
+  a.throwIfAborted();
+  let s = new FormData();
+  s.append(`file`, o, o.name);
+  let { asset_pointer: c } = await y.safePost(`/calpico/chatgpt/profile_files`, {
+    additionalHeaders: { "ChatGPT-Account-ID": t },
+    requestBody: s,
+    signal: a,
   });
-  signal.throwIfAborted();
-  if (scope.get(currentAccountId) !== accountId) {
-    throw new DOMException("Reference photo account changed", "AbortError");
-  }
-  const fileId = /^sediment:\/\/(?:[^#]+#)?(file_[^#]+)#thumbnail$/.exec(
-    uploaded.asset_pointer ?? "",
-  )?.[1];
-  const assetPointer = fileId == null
-    ? uploaded.asset_pointer
-    : `sediment://${fileId}`;
-  const saved = imageTagId == null
-    ? await client.safePost("/images/image-tags", {
-        additionalHeaders: { "ChatGPT-Account-ID": accountId },
-        requestBody: { kind, asset_pointer: assetPointer },
-        signal,
-      })
-    : await client.safePatch("/images/image-tags/{image_tag_id}", {
-        additionalHeaders: { "ChatGPT-Account-ID": accountId },
-        parameters: { path: { image_tag_id: imageTagId } },
-        requestBody: { asset_pointer: assetPointer },
-        signal,
-      });
-  const query = createReferencePhotosQuery(accountId);
-  await scope.queryClient.cancelQueries(query);
-  scope.queryClient.setQueryData(query, (current) => [
-    saved,
-    ...(current?.filter((photo) => photo.id !== saved.id) ?? []),
-  ]);
-  await scope.queryClient.invalidateQueries(query);
-  return saved;
-}
-
-function initializeReferencePhotoUpload(): void {
-  initializeApiClient();
-  initializeHttpRuntime();
-  initializePersonalizationRuntime();
-}
-
-let referencePhotosQueryFamily: unknown;
-let referencePhotoEligibility: unknown;
-
-function initializePersonalizationState(): void {
-  initializeSignals();
-  initializeQueries();
-  initializeReferencePhotoUpload();
-  const createReferencePhotoQueries = createScopedQueryFamily as unknown as (
-    scope: unknown,
-    factory: (accountId: string) => Record<string, unknown>,
-  ) => unknown;
-  referencePhotosQueryFamily = createReferencePhotoQueries(
-    appScope,
-    (accountId: string) => createReferencePhotosQuery(accountId),
-  );
-  referencePhotoEligibility = createScopedSignalFamily(
-    appScope,
-    (accountId: string | null, { get }: { get(signal: unknown, parameter?: unknown): unknown }) =>
-      accountId != null && get(currentAccountId) != null,
+  if ((a.throwIfAborted(), e.get(m) !== t))
+    throw new DOMException(`Reference photo account changed`, `AbortError`);
+  let l = /^sediment:\/\/(?:[^#]+#)?(file_[^#]+)#thumbnail$/.exec(c)?.[1],
+    u = l == null ? c : `sediment://${l}`,
+    d =
+      i == null
+        ? await y.safePost(`/images/image-tags`, {
+            additionalHeaders: { "ChatGPT-Account-ID": t },
+            requestBody: { kind: r, asset_pointer: u },
+            signal: a,
+          })
+        : await y.safePatch(`/images/image-tags/{image_tag_id}`, {
+            additionalHeaders: { "ChatGPT-Account-ID": t },
+            parameters: { path: { image_tag_id: i } },
+            requestBody: { asset_pointer: u },
+            signal: a,
+          }),
+    f = C(t);
+  return (
+    await e.queryClient.cancelQueries(f),
+    e.queryClient.setQueryData(f.queryKey, (e) => [d, ...(e?.filter((e) => e.id !== d.id) ?? [])]),
+    e.queryClient.invalidateQueries(f),
+    d
   );
 }
-
-export {
-  createReferencePhotosQuery as a,
-  initializeReferencePhotoUpload as i,
-  initializePersonalizationState as n,
-  selectLatestReferencePhoto as o,
-  referencePhotosQueryFamily as r,
-  uploadReferencePhoto as s,
-  referencePhotoEligibility as t,
-};
+function E() {
+  return (E = e(() => {
+    (g(), f(), S(), o());
+  }))();
+}
+var D, O;
+function k() {
+  return (k = e(() => {
+    (n(),
+      p(),
+      l(),
+      b(),
+      f(),
+      r(),
+      E(),
+      (D = i(a, (e) => C(e))),
+      (O = c(a, (e, { get: t }) => {
+        if (t(m) == null) return !1;
+        if (e == null) return !0;
+        if (t(d, e) != null) return !1;
+        let n = t(x, e),
+          r = t(u, n).data?.owner?.user_id;
+        if (r == null) return !0;
+        let i = t(_),
+          a = t(v);
+        return r === (a.status === `loaded` && a.structure === `workspace` ? i : i?.split(`__`)[0]);
+      })));
+  }))();
+}
+export { C as a, E as i, k as n, w as o, D as r, T as s, O as t };

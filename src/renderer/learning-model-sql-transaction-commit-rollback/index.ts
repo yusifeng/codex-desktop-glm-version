@@ -1,63 +1,44 @@
-// SQL transaction model contrasting COMMIT with ROLLBACK after a transfer.
-import "@rchunk/rolldown-runtime";
-
-interface NumberParameter { kind: "number"; defaultValue: number; min: number; max: number; multipleOf: number }
-interface SqlTransactionValues { ending?: number; step?: number; transfer_amount?: number | null }
-
-const sqlTransactionType = "SQL_TRANSACTION_COMMIT_ROLLBACK";
-const sqlTransactionThumbnail = "sql-transaction-commit-rollback-v1";
-const sqlTransactionParameters: { transfer_amount: NumberParameter } = {
-  transfer_amount: { kind: "number", defaultValue: 150, min: 25, max: 500, multipleOf: 1 },
-};
-const sqlTransactionSpecification = {
-  type: sqlTransactionType,
-  version: 2,
-  thumbnailAssetKey: sqlTransactionThumbnail,
-  parameters: sqlTransactionParameters,
-};
-const transferAmountParameter = sqlTransactionSpecification.parameters.transfer_amount;
-const startingBalances: [number, number] = [800, 200];
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const defaultSqlTransactionValues = () => ({ ending: 0, step: 2, transfer_amount: transferAmountParameter.defaultValue });
-
-function calculateSqlTransaction(values: SqlTransactionValues) {
-  const transferCandidate =
-    typeof values.transfer_amount === "number" && Number.isFinite(values.transfer_amount)
-      ? values.transfer_amount
-      : transferAmountParameter.defaultValue;
-  const amount = clamp(
-    Math.round(transferCandidate / transferAmountParameter.multipleOf) * transferAmountParameter.multipleOf,
-    transferAmountParameter.min,
-    transferAmountParameter.max,
-  );
-  const stepCandidate = typeof values.step === "number" && Number.isFinite(values.step) ? values.step : 2;
-  const step = clamp(Math.round(stepCandidate), 0, 3);
-  const ending = Number(values.ending === 1);
-  const provisional: [number, number] = [
-    startingBalances[0] - (step >= 1 ? amount : 0),
-    startingBalances[1] + (step >= 2 ? amount : 0),
-  ];
-  const final: [number, number] = ending === 0
-    ? [startingBalances[0] - amount, startingBalances[1] + amount]
-    : startingBalances;
-  return {
-    amount,
-    current: step === 3 ? final : provisional,
-    ending,
-    final,
-    start: startingBalances,
-    step,
-    transactionActive: step < 3,
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `SQL_TRANSACTION_COMMIT_ROLLBACK`),
+      (n = `sql-transaction-commit-rollback-v1`),
+      (r = {
+        transfer_amount: { kind: `number`, defaultValue: 150, min: 25, max: 500, multipleOf: 1 },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-function initializeSqlTransactionSpecification(): void {}
-function initializeSqlTransactionModel(): void {}
-
-export {
-  sqlTransactionSpecification as a,
-  initializeSqlTransactionSpecification as i,
-  defaultSqlTransactionValues as n,
-  initializeSqlTransactionModel as r,
-  calculateSqlTransaction as t,
-};
+var o, s, c, l, u;
+function d() {
+  return (d = e(() => {
+    (a(),
+      (o = i.parameters.transfer_amount),
+      (s = [800, 200]),
+      (c = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (l = () => ({ ending: 0, step: 2, transfer_amount: o.defaultValue })),
+      (u = (e) => {
+        let t = Number.isFinite(e.transfer_amount)
+            ? (e.transfer_amount ?? o.defaultValue)
+            : o.defaultValue,
+          n = c(Math.round(t / o.multipleOf) * o.multipleOf, o.min, o.max),
+          r = Number.isFinite(e.step) ? (e.step ?? 2) : 2,
+          i = c(Math.round(r), 0, 3),
+          a = +(e.ending === 1),
+          l = [s[0] - (i >= 1 ? n : 0), s[1] + (i >= 2 ? n : 0)],
+          u = a === 0 ? [s[0] - n, s[1] + n] : s;
+        return {
+          amount: n,
+          current: i === 3 ? u : l,
+          ending: a,
+          final: u,
+          start: s,
+          step: i,
+          transactionActive: i < 3,
+        };
+      }));
+  }))();
+}
+export { i as a, a as i, l as n, d as r, u as t };

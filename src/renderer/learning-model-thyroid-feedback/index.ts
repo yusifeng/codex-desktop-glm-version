@@ -1,37 +1,25 @@
-// Hypothalamic-pituitary-thyroid feedback learning-block model.
-// Release chunk: app/webview/assets/model-e4734bd04660.js.
-
-import "@rchunk/rolldown-runtime";
-
-type ThyroidFeedbackStep = "trh-release" | "tsh-release" | "thyroid-output" | "restored-feedback";
-interface ThyroidFeedbackValues { stepIndex?: number }
-interface ThyroidFeedbackState { stepIndex: number }
-interface StepRange { min: number; max: number; step: number; defaultValue: number }
-
-let thyroidFeedbackSteps: ThyroidFeedbackStep[];
-let stepRange: StepRange;
-let clamp: (value: number, min: number, max: number) => number;
-let normalizeThyroidFeedbackState: (values: ThyroidFeedbackValues) => ThyroidFeedbackState;
-let getThyroidFeedbackStep: (values: ThyroidFeedbackValues) => ThyroidFeedbackStep;
-let initialized = false;
-
-function initializeThyroidFeedbackModel(): void {
-  if (initialized) return;
-  initialized = true;
-  thyroidFeedbackSteps = ["trh-release", "tsh-release", "thyroid-output", "restored-feedback"];
-  stepRange = { min: 0, max: thyroidFeedbackSteps.length - 1, step: 1, defaultValue: 0 };
-  clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-  normalizeThyroidFeedbackState = values => {
-    const stepIndex = values.stepIndex;
-    return {
-      stepIndex: clamp(
-        Math.round(typeof stepIndex === "number" && Number.isFinite(stepIndex) ? stepIndex : stepRange.defaultValue),
-        stepRange.min,
-        stepRange.max,
-      ),
-    };
-  };
-  getThyroidFeedbackStep = values => thyroidFeedbackSteps[normalizeThyroidFeedbackState(values).stepIndex];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = [`trh-release`, `tsh-release`, `thyroid-output`, `restored-feedback`]),
+      (n = { min: 0, max: t.length - 1, step: 1, defaultValue: 0 }),
+      (r = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (i = (e) => {
+        let t = e.stepIndex;
+        return {
+          stepIndex: r(
+            Math.round(typeof t == `number` && Number.isFinite(t) ? t : n.defaultValue),
+            n.min,
+            n.max,
+          ),
+        };
+      }),
+      (a = (e) => {
+        let { stepIndex: n } = i(e);
+        return t[n];
+      }));
+  }))();
 }
-
-export { normalizeThyroidFeedbackState as a, initializeThyroidFeedbackModel as i, stepRange as n, getThyroidFeedbackStep as r, thyroidFeedbackSteps as t };
+export { i as a, o as i, n, a as r, t };

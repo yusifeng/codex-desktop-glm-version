@@ -1,55 +1,26 @@
-// gpt-plugin-retirement —— GPT 退役日期与本地化帮助中心链接。
-// 原版：app/webview/assets/retirement-67c575376054.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appInitialChunk from "@rchunk/app-initial";
-
-void runtimeChunk;
-
-export interface LocalizedUser {
-  locale?: string | null;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { iN as t, sN as n } from "@rchunk/app-initial";
+function r(e) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(e)) return a;
+  let t = Date.parse(`${e}T00:00:00.000Z`);
+  return Number.isFinite(t) && new Date(t).toISOString().slice(0, 10) === e ? t : a;
 }
-
-const {
-  iN: getUserLocaleSettings,
-  sN: initializeUserLocaleSettings,
-} = appInitialChunk;
-const DEFAULT_RETIREMENT_TIMESTAMP = Date.UTC(2026, 11, 11);
-
-function parseRetirementDate(value: string): number {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return DEFAULT_RETIREMENT_TIMESTAMP;
-  const timestamp = Date.parse(`${value}T00:00:00.000Z`);
-  return Number.isFinite(timestamp) &&
-    new Date(timestamp).toISOString().slice(0, 10) === value
-    ? timestamp
-    : DEFAULT_RETIREMENT_TIMESTAMP;
-}
-
-function getGptHelpCenterUrl(
-  user: LocalizedUser | string | null | undefined,
-  urlTemplate: string,
-): string {
-  const locale = (getUserLocaleSettings(user)?.locale ?? "en-US").toLowerCase();
-  const language = locale === "en-us" ? "en" : locale;
-  const fallback = `https://help.openai.com/${language}/collections/8475420-gpts`;
+function i(e, n) {
+  let r = (t(e)?.locale ?? `en-US`).toLowerCase(),
+    i = r === `en-us` ? `en` : r,
+    a = `https://help.openai.com/${i}/collections/8475420-gpts`;
   try {
-    const url = new URL(urlTemplate.replaceAll("{lang}", language));
-    return url.protocol === "https:" ? url.href : fallback;
+    let e = new URL(n.replaceAll(`{lang}`, i));
+    return e.protocol === `https:` ? e.href : a;
   } catch {
-    return fallback;
+    return a;
   }
 }
-
-let initialized = false;
-function initializeGptPluginRetirement(): void {
-  if (initialized) return;
-  initializeUserLocaleSettings();
-  initialized = true;
+var a;
+function o() {
+  return (o = e(() => {
+    (n(), (a = Date.UTC(2026, 11, 11)));
+  }))();
 }
-
-initializeGptPluginRetirement();
-export {
-  getGptHelpCenterUrl as n,
-  initializeGptPluginRetirement as r,
-  parseRetirementDate as t,
-};
+export { i as n, o as r, r as t };

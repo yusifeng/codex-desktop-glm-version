@@ -1,107 +1,89 @@
-// gpt-header-about-dialog —— GPT 头部关于弹窗的账户策略与导航宿主。
-// 原版：app/webview/assets/gpt-header-about-dialog-920bca8413c4.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as gptAboutDialogChunk from "@rchunk/gpt-about-dialog-core";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-void runtimeChunk;
-
-interface GptGizmo {
-  id: string;
-  short_url?: string | null;
-}
-
-const {
-  $3: initializeRuntimeLazy,
-  BX: useSignalFamilyValue,
-  FX: initializeSignalRuntime,
-  HX: useSignalValue,
-  I3: getJsxRuntime,
-  LX: useSignalScope,
-  QI: initializeSharedRuntime,
-  ZI: applicationScope,
-} = appSharedChunk;
-const {
-  Dln: workspacePermissionsQuery,
-  F7: clearSelectedResource,
-  Het: initializeComposerMode,
-  Jet: setComposerMode,
-  Oln: initializeNavigation,
-  P7: initializeSelectedResource,
-  Qgn: initializeGptResources,
-  Sun: initializeGptPermissions,
-  mun: activeAccountIdSignal,
-  o_n: useNavigate,
-  rht: initializeAccountQuery,
-  uht: useAccountQuery,
-  xtn: initializeGptRoutes,
-  ytn: gptRoute,
-} = appInitialChunk;
-const {
-  n: initializeGptAboutDialog,
-  t: GptAboutDialog,
-} = gptAboutDialogChunk;
-
-const jsx: JsxRuntime = getJsxRuntime();
-
-function GptHeaderAboutDialog({
-  accountId,
-  resource,
-  onClose,
-}: {
-  accountId?: string;
-  resource: GptGizmo;
-  onClose: () => void;
-}): unknown {
-  const scope = useSignalScope(applicationScope);
-  const navigate = useNavigate();
-  const activeAccountId = useSignalValue(activeAccountIdSignal);
-  const { data: account } = useAccountQuery(undefined, { preview: false });
-  const isWorkspaceOwner =
-    account?.id === accountId &&
-    account?.structure === "workspace" &&
-    account.account_user_role === "account-owner";
-  const canLoadPolicy = activeAccountId === accountId && isWorkspaceOwner;
-  const { data: workspacePolicy } = useSignalFamilyValue(
-    workspacePermissionsQuery,
-    accountId ?? "",
-    { enabled: canLoadPolicy },
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  LX as o,
+  QI as s,
+  ZI as c,
+} from "@rchunk/app-shared";
+import {
+  Dln as l,
+  F7 as u,
+  Het as d,
+  Jet as f,
+  Oln as p,
+  P7 as m,
+  Qgn as h,
+  Sun as g,
+  mun as _,
+  o_n as v,
+  rht as y,
+  uht as b,
+  xtn as x,
+  ytn as S,
+} from "@rchunk/app-initial";
+import { n as C, t as w } from "@rchunk/gpt-about-dialog-core";
+function T(e) {
+  let t = (0, E.c)(12),
+    { accountId: r, resource: a, onClose: s } = e,
+    d = o(c),
+    p = v(),
+    m = i(_),
+    h;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((h = { preview: !1 }), (t[0] = h))
+    : (h = t[0]);
+  let { data: g } = b(void 0, h),
+    y = g?.id === r && g?.structure === `workspace` && g.account_user_role === `account-owner`,
+    x = m === r && y,
+    C;
+  t[1] === x ? (C = t[2]) : ((C = { enabled: x }), (t[1] = x), (t[2] = C));
+  let { data: T } = n(l, r ?? ``, C),
+    O;
+  return (
+    t[3] !== r ||
+    t[4] !== m ||
+    t[5] !== y ||
+    t[6] !== p ||
+    t[7] !== s ||
+    t[8] !== a ||
+    t[9] !== d ||
+    t[10] !== T?.allow_third_party_gpts
+      ? ((O =
+          m === r
+            ? (0, D.jsx)(w, {
+                accountId: r,
+                gizmo: a,
+                isOwnerAndWorkspaceAllowsSpecific:
+                  y && T?.allow_third_party_gpts === `allow_specific`,
+                onClose: s,
+                onStartChat: (e) => {
+                  (s(), u(d, null), f(d, `chat`), p(S(e.gizmo.short_url?.trim() || e.gizmo.id)));
+                },
+              })
+            : null),
+        (t[3] = r),
+        (t[4] = m),
+        (t[5] = y),
+        (t[6] = p),
+        (t[7] = s),
+        (t[8] = a),
+        (t[9] = d),
+        (t[10] = T?.allow_third_party_gpts),
+        (t[11] = O))
+      : (O = t[11]),
+    O
   );
-
-  if (activeAccountId !== accountId) return null;
-  return jsx.jsx(GptAboutDialog, {
-    accountId,
-    gizmo: resource,
-    isOwnerAndWorkspaceAllowsSpecific:
-      isWorkspaceOwner &&
-      workspacePolicy?.allow_third_party_gpts === "allow_specific",
-    onClose,
-    onStartChat: (selected: { gizmo: GptGizmo }) => {
-      onClose();
-      clearSelectedResource(scope, null);
-      setComposerMode(scope, "chat");
-      navigate(gptRoute(selected.gizmo.short_url?.trim() || selected.gizmo.id));
-    },
-  });
 }
-
-function initializeGptHeaderAboutDialog(): void {
-  initializeRuntimeLazy();
-  initializeSignalRuntime();
-  initializeGptResources();
-  initializeGptPermissions();
-  initializeNavigation();
-  initializeAccountQuery();
-  initializeComposerMode();
-  initializeSelectedResource();
-  initializeSharedRuntime();
-  initializeGptAboutDialog();
-  initializeGptRoutes();
+var E, D;
+function O() {
+  return (O = e(() => {
+    ((E = t()), r(), h(), g(), p(), y(), d(), m(), s(), C(), x(), (D = a()));
+  }))();
 }
-
-initializeGptHeaderAboutDialog();
-
-export { GptHeaderAboutDialog };
+O();
+export { T as GptHeaderAboutDialog };

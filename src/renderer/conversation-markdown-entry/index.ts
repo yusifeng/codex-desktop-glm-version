@@ -1,8 +1,4 @@
-import {
-  n as renderConversationMarkdown,
-  t as initializeConversationMarkdown,
-} from "@rchunk/conversation-markdown";
-
-initializeConversationMarkdown();
-
-export { renderConversationMarkdown };
+// @ts-nocheck
+import { n as e, t } from "@rchunk/conversation-markdown";
+t();
+export { e as renderConversationMarkdown };

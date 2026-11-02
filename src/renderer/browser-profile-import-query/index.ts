@@ -1,291 +1,241 @@
-// browser-profile-import-query —— 浏览器资料导入的资料源展示与查询定义。
-// 原版：app/webview/assets/query-8542d2419280.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as cookiesIconChunk from "@rchunk/browser-profile-import-cookies-icon";
-import * as historyIconChunk from "@rchunk/browser-profile-import-history-icon";
-import * as chromeIconChunk from "@rchunk/google-chrome";
-import type { JsxRuntime, MessageDescriptor } from "@rchunk/app-shared";
-
-void runtimeChunk;
-
-const {
-  n: initializeCookiesIcon,
-  t: CookiesIcon,
-} = cookiesIconChunk;
-const {
-  n: initializeHistoryIcon,
-  t: HistoryIcon,
-} = historyIconChunk;
-const {
-  n: initializeChromeIcon,
-  t: ChromeIcon,
-} = chromeIconChunk;
-
-const {
-  $3: initializeJsxRuntimeLazy,
-  AS: ExtensionsIcon,
-  G2: defineMessages,
-  I3: getJsxRuntime,
-  K2: initializeIntl,
-  Q3: logger,
-  Z3: initializeQueryRuntime,
-  lw: initializeImportIcons,
-  pL: defineQueryOptions,
-} = appSharedChunk;
-
-type BrowserProfileSource = "atlas" | "chrome";
-type BrowserProfileImportKind =
-  | "cookies"
-  | "extensions"
-  | "history"
-  | "passwords";
-
-interface ImportableBrowserProfile extends Record<string, unknown> {
-  appName: string;
-  hasExtensions?: boolean;
-  profileDirectoryName?: string;
-  profileName?: string;
-  profilePath: string;
-  source: BrowserProfileSource;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  AS as n,
+  G2 as r,
+  I3 as i,
+  K2 as a,
+  Q3 as o,
+  Z3 as s,
+  e6 as c,
+  lw as l,
+  pL as u,
+} from "@rchunk/app-shared";
+import { n as d, t as f } from "@rchunk/browser-profile-import-cookies-icon";
+import { n as p, t as m } from "@rchunk/browser-profile-import-history-icon";
+import { n as h, t as g } from "@rchunk/google-chrome";
+var _, v;
+function y() {
+  return (y = e(() => {
+    (c(),
+      (_ = i()),
+      (v = (e) =>
+        (0, _.jsxs)(`svg`, {
+          width: 20,
+          height: 20,
+          viewBox: `0 0 20 20`,
+          fill: `none`,
+          xmlns: `http://www.w3.org/2000/svg`,
+          ...e,
+          children: [
+            (0, _.jsx)(`path`, {
+              d: `M8.75 9.55V15.75L6.5 18.25L4.25 15.75V9.55C2.886 8.748 2 7.267 2 5.625C2 3.14 4.015 1.125 6.5 1.125C8.985 1.125 11 3.14 11 5.625C11 7.267 10.114 8.748 8.75 9.55Z`,
+              stroke: `currentColor`,
+              strokeWidth: 1.33,
+              strokeLinecap: `round`,
+              strokeLinejoin: `round`,
+            }),
+            (0, _.jsx)(`circle`, { cx: 6.5, cy: 5.5, r: 0.75, fill: `currentColor` }),
+            (0, _.jsx)(`path`, {
+              d: `M11.45 2.775C12.078 2.362 12.83 2.125 13.625 2.125C16.11 2.125 18.125 4.14 18.125 6.625C18.125 8.267 17.239 9.748 15.875 10.55V15.75L13.625 18.25L11.375 15.75V10.55C10.818 10.223 10.342 9.783 9.977 9.263`,
+              stroke: `currentColor`,
+              strokeWidth: 1.33,
+              strokeLinecap: `round`,
+              strokeLinejoin: `round`,
+            }),
+          ],
+        })));
+  }))();
 }
-
-interface BrowserProfileImportSignals extends Record<string, unknown> {}
-
-interface BrowserProfileImportService {
-  getImportSignals(): Promise<BrowserProfileImportSignals>;
-  listImportableBrowserProfiles(): Promise<ImportableBrowserProfile[]>;
-}
-
-let jsx: JsxRuntime;
-let PasswordsIcon: (props: Record<string, unknown>) => unknown;
-let messages: Record<string, MessageDescriptor>;
-let atlasIconUrl: string;
-let queryStaleTime: number;
-
-let dataIconsInitialized = false;
-let messagesInitialized = false;
-let sourceIconsInitialized = false;
-let queriesInitialized = false;
-
-function initializePasswordsIcon(): void {
-  if (PasswordsIcon != null) return;
-  jsx = getJsxRuntime();
-  PasswordsIcon = (props) =>
-    jsx.jsxs("svg", {
-      width: 20,
-      height: 20,
-      viewBox: "0 0 20 20",
-      fill: "none",
-      xmlns: "http://www.w3.org/2000/svg",
-      ...props,
-      children: [
-        jsx.jsx("path", {
-          d: "M8.75 9.55V15.75L6.5 18.25L4.25 15.75V9.55C2.886 8.748 2 7.267 2 5.625C2 3.14 4.015 1.125 6.5 1.125C8.985 1.125 11 3.14 11 5.625C11 7.267 10.114 8.748 8.75 9.55Z",
-          stroke: "currentColor",
-          strokeWidth: 1.33,
-          strokeLinecap: "round",
-          strokeLinejoin: "round",
-        }),
-        jsx.jsx("circle", { cx: 6.5, cy: 5.5, r: 0.75, fill: "currentColor" }),
-        jsx.jsx("path", {
-          d: "M11.45 2.775C12.078 2.362 12.83 2.125 13.625 2.125C16.11 2.125 18.125 4.14 18.125 6.625C18.125 8.267 17.239 9.748 15.875 10.55V15.75L13.625 18.25L11.375 15.75V10.55C10.818 10.223 10.342 9.783 9.977 9.263",
-          stroke: "currentColor",
-          strokeWidth: 1.33,
-          strokeLinecap: "round",
-          strokeLinejoin: "round",
-        }),
-      ],
-    });
-}
-
-function ImportDataIcon({
-  className,
-  kind,
-}: {
-  className?: string;
-  kind: BrowserProfileImportKind;
-}): unknown {
-  switch (kind) {
-    case "cookies":
-      return jsx.jsx(CookiesIcon, { className });
-    case "history":
-      return jsx.jsx(HistoryIcon, { className });
-    case "passwords":
-      return jsx.jsx(PasswordsIcon, { className });
-    case "extensions":
-      return jsx.jsx("span", {
-        className,
-        children: jsx.jsx(ExtensionsIcon, {}),
-      });
+function b(e) {
+  let t = (0, x.c)(9),
+    { className: r, kind: i } = e;
+  switch (i) {
+    case `cookies`: {
+      let e;
+      return (
+        t[0] === r ? (e = t[1]) : ((e = (0, S.jsx)(f, { className: r })), (t[0] = r), (t[1] = e)),
+        e
+      );
+    }
+    case `history`: {
+      let e;
+      return (
+        t[2] === r ? (e = t[3]) : ((e = (0, S.jsx)(m, { className: r })), (t[2] = r), (t[3] = e)),
+        e
+      );
+    }
+    case `passwords`: {
+      let e;
+      return (
+        t[4] === r ? (e = t[5]) : ((e = (0, S.jsx)(v, { className: r })), (t[4] = r), (t[5] = e)),
+        e
+      );
+    }
+    case `extensions`: {
+      let e;
+      t[6] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, S.jsx)(n, {})), (t[6] = e))
+        : (e = t[6]);
+      let i;
+      return (
+        t[7] === r
+          ? (i = t[8])
+          : ((i = (0, S.jsx)(`span`, { className: r, children: e })), (t[7] = r), (t[8] = i)),
+        i
+      );
+    }
   }
 }
-
-function initializeImportDataIcons(): void {
-  if (dataIconsInitialized) return;
-  initializeJsxRuntimeLazy();
-  initializeImportIcons();
-  initializeCookiesIcon();
-  initializeHistoryIcon();
-  initializePasswordsIcon();
-  jsx = getJsxRuntime();
-  dataIconsInitialized = true;
+var x, S;
+function C() {
+  return (C = e(() => {
+    ((x = t()), l(), d(), p(), y(), (S = i()));
+  }))();
 }
-
-function initializeBrowserProfileImportMessages(): void {
-  if (messagesInitialized) return;
-  initializeIntl();
-  messages = defineMessages({
-    cookies: {
-      id: "settings.browserUse.profileImport.cookies",
-      defaultMessage: "Cookies",
-      description: "Label for importing cookies from a browser profile",
-    },
-    passwords: {
-      id: "settings.browserUse.profileImport.passwords",
-      defaultMessage: "Saved passwords",
-      description: "Label for importing passwords from a browser profile",
-    },
-    history: {
-      id: "settings.browserUse.profileImport.history",
-      defaultMessage: "Browsing history",
-      description: "Label for importing browsing history from a Chrome profile",
-    },
-    title: {
-      id: "settings.browserUse.profileImport.title",
-      defaultMessage: "Import from your browser",
-      description: "Title for the browser profile import dialog",
-    },
-    extensions: {
-      id: "settings.browserUse.profileImport.extensions",
-      defaultMessage: "Extensions",
-      description:
-        "Label for importing Chrome extensions, toolbar pins, and permission choices",
-    },
-  });
-  messagesInitialized = true;
+var w;
+function T() {
+  return (T = e(() => {
+    (a(),
+      (w = r({
+        cookies: {
+          id: `settings.browserUse.profileImport.cookies`,
+          defaultMessage: `Cookies`,
+          description: `Label for importing cookies from a browser profile`,
+        },
+        passwords: {
+          id: `settings.browserUse.profileImport.passwords`,
+          defaultMessage: `Saved passwords`,
+          description: `Label for importing passwords from a browser profile`,
+        },
+        history: {
+          id: `settings.browserUse.profileImport.history`,
+          defaultMessage: `Browsing history`,
+          description: `Label for importing browsing history from a Chrome profile`,
+        },
+        title: {
+          id: `settings.browserUse.profileImport.title`,
+          defaultMessage: `Import from your browser`,
+          description: `Title for the browser profile import dialog`,
+        },
+        extensions: {
+          id: `settings.browserUse.profileImport.extensions`,
+          defaultMessage: `Extensions`,
+          description: `Label for importing Chrome extensions, toolbar pins, and permission choices`,
+        },
+      })));
+  }))();
 }
-
-function SourceIcon({
-  className,
-  source,
-}: {
-  className?: string;
-  source: BrowserProfileSource;
-}): unknown {
-  switch (source) {
-    case "atlas":
-      return jsx.jsx("img", {
-        "aria-hidden": true,
-        alt: "",
-        className,
-        src: atlasIconUrl,
-      });
-    case "chrome":
-      return jsx.jsx(ChromeIcon, { "aria-hidden": true, className });
+var E;
+function D() {
+  return (D = e(() => {
+    E = `` + new URL(`atlas-app-5b67bfaeebb3.png`, import.meta.url).href;
+  }))();
+}
+function O(e) {
+  let t = (0, A.c)(3),
+    { sources: n } = e;
+  if (n.length === 1) {
+    let e;
+    return (
+      t[0] === n[0]
+        ? (e = t[1])
+        : ((e = (0, j.jsx)(k, { source: n[0], className: `h-6 w-6 shrink-0 rounded-[22%]` })),
+          (t[0] = n[0]),
+          (t[1] = e)),
+      e
+    );
+  }
+  let r;
+  return (
+    t[2] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((r = (0, j.jsxs)(`div`, {
+          className: `relative h-7 w-9 shrink-0`,
+          "aria-hidden": !0,
+          children: [
+            (0, j.jsx)(k, {
+              className: `absolute top-0 left-0 h-6 w-6 rounded-[22%]`,
+              source: `atlas`,
+            }),
+            (0, j.jsx)(k, {
+              className: `absolute right-0 bottom-0 h-6 w-6 rounded-full ring-2 ring-surface`,
+              source: `chrome`,
+            }),
+          ],
+        })),
+        (t[2] = r))
+      : (r = t[2]),
+    r
+  );
+}
+function k(e) {
+  let t = (0, A.c)(4),
+    { className: n, source: r } = e;
+  switch (r) {
+    case `atlas`: {
+      let e;
+      return (
+        t[0] === n
+          ? (e = t[1])
+          : ((e = (0, j.jsx)(`img`, { "aria-hidden": !0, alt: ``, className: n, src: E })),
+            (t[0] = n),
+            (t[1] = e)),
+        e
+      );
+    }
+    case `chrome`: {
+      let e;
+      return (
+        t[2] === n
+          ? (e = t[3])
+          : ((e = (0, j.jsx)(g, { "aria-hidden": !0, className: n })), (t[2] = n), (t[3] = e)),
+        e
+      );
+    }
   }
 }
-
-function ProfileSourcesIcon({
-  sources,
-}: {
-  sources: BrowserProfileSource[];
-}): unknown {
-  if (sources.length === 1) {
-    return jsx.jsx(SourceIcon, {
-      source: sources[0],
-      className: "h-6 w-6 shrink-0 rounded-[22%]",
-    });
-  }
-  return jsx.jsxs("div", {
-    className: "relative h-7 w-9 shrink-0",
-    "aria-hidden": true,
-    children: [
-      jsx.jsx(SourceIcon, {
-        className: "absolute top-0 left-0 h-6 w-6 rounded-[22%]",
-        source: "atlas",
-      }),
-      jsx.jsx(SourceIcon, {
-        className:
-          "absolute right-0 bottom-0 h-6 w-6 rounded-full ring-2 ring-surface",
-        source: "chrome",
-      }),
-    ],
-  });
+var A, j;
+function M() {
+  return (M = e(() => {
+    ((A = t()), D(), h(), (j = i()));
+  }))();
 }
-
-function initializeSourceIcons(): void {
-  if (sourceIconsInitialized) return;
-  initializeJsxRuntimeLazy();
-  atlasIconUrl = new URL("atlas-app-5b67bfaeebb3.png", import.meta.url).href;
-  initializeChromeIcon();
-  jsx = getJsxRuntime();
-  sourceIconsInitialized = true;
+function N(e) {
+  return Array.from(new Set(e.map((e) => e.source)));
 }
-
-function uniqueProfileSources(
-  profiles: Array<{ source: BrowserProfileSource }>,
-): BrowserProfileSource[] {
-  return Array.from(new Set(profiles.map((profile) => profile.source)));
-}
-
-function importableProfilesQuery(
-  service: BrowserProfileImportService | null | undefined,
-  enabled: boolean,
-): import("@rchunk/app-shared").UseQueryOptions<ImportableBrowserProfile[]> {
-  return defineQueryOptions({
-    enabled,
-    queryKey: ["browser-profile-import-profiles"],
+function P(e, t) {
+  return u({
+    enabled: t,
+    queryKey: [`browser-profile-import-profiles`],
     queryFn: async () => {
-      if (service == null) throw Error("Browser profile import is unavailable");
+      if (e == null) throw Error(`Browser profile import is unavailable`);
       try {
-        return await service.listImportableBrowserProfiles();
-      } catch (error) {
-        logger.error("Failed to list importable browser profiles", {
-          safe: {},
-        });
-        throw error;
+        return await e.listImportableBrowserProfiles();
+      } catch (e) {
+        throw (o.error(`Failed to list importable browser profiles`, { safe: {} }), e);
       }
     },
-    retry: false,
-    staleTime: queryStaleTime,
+    retry: !1,
+    staleTime: I,
   });
 }
-
-function importSignalsQuery(
-  service: BrowserProfileImportService | null | undefined,
-  enabled: boolean,
-): import("@rchunk/app-shared").UseQueryOptions<BrowserProfileImportSignals> {
-  return defineQueryOptions({
-    enabled,
-    queryKey: ["browser-profile-import-signals"],
+function F(e, t) {
+  return u({
+    enabled: t,
+    queryKey: [`browser-profile-import-signals`],
     queryFn: async () => {
-      if (service == null) throw Error("Browser profile import is unavailable");
-      return service.getImportSignals();
+      if (e == null) throw Error(`Browser profile import is unavailable`);
+      return e.getImportSignals();
     },
-    retry: false,
-    staleTime: queryStaleTime,
+    retry: !1,
+    staleTime: I,
   });
 }
-
-function initializeBrowserProfileImportQueries(): void {
-  if (queriesInitialized) return;
-  initializeQueryRuntime();
-  queryStaleTime = 30_000;
-  queriesInitialized = true;
+var I;
+function L() {
+  return (L = e(() => {
+    (s(), (I = 3e4));
+  }))();
 }
-
-export {
-  SourceIcon as a,
-  messages as c,
-  initializeImportDataIcons as d,
-  initializeBrowserProfileImportQueries as i,
-  initializeBrowserProfileImportMessages as l,
-  importSignalsQuery as n,
-  ProfileSourcesIcon as o,
-  uniqueProfileSources as r,
-  initializeSourceIcons as s,
-  importableProfilesQuery as t,
-  ImportDataIcon as u,
-};
+export { k as a, w as c, C as d, L as i, T as l, F as n, O as o, N as r, M as s, P as t, b as u };

@@ -1,100 +1,46 @@
-import "@rchunk/rolldown-runtime";
-import {
-  J9t as getFileExtension,
-  Y9t as initializeGeneratedImages,
-} from "@rchunk/app-initial";
-
-export interface GeneratedImageItem extends Record<string, unknown> {
-  failure?: { limitId?: string; type?: string };
-  src?: string | null;
-  status?: string;
-  steeringStatus?: unknown;
-  type: string;
-}
-
-export interface GeneratedImageVisibility {
-  completedImages: GeneratedImageItem[];
-  hasPendingItems: boolean;
-  pendingPlaceholderCount: number;
-}
-
-function getGeneratedImageVisibility({
-  items,
-  interruptedByThisClient,
-  isTurnInProgress,
-}: {
-  items: GeneratedImageItem[];
-  interruptedByThisClient: boolean;
-  isTurnInProgress: boolean;
-}): GeneratedImageVisibility {
-  const completedImages: GeneratedImageItem[] = [];
-  let pendingCount = 0;
-  let steeringDepth = 0;
-  for (const item of items) {
-    if (item.type === "user-message" && item.steeringStatus != null) {
-      pendingCount = 0;
-      steeringDepth += 1;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { J9t as t, Y9t as n } from "@rchunk/app-initial";
+function r({ items: e, interruptedByThisClient: t, isTurnInProgress: n }) {
+  let r = [],
+    i = 0,
+    a = 0;
+  for (let t of e) {
+    if (t.type === `user-message` && t.steeringStatus != null) {
+      ((i = 0), (a += 1));
       continue;
     }
-    if (item.type === "steered") {
-      if (steeringDepth > 0) steeringDepth -= 1;
-      else pendingCount = 0;
+    if (t.type === `steered`) {
+      a > 0 ? --a : (i = 0);
       continue;
     }
-    if (item.type !== "generated-image") continue;
-    if (item.src != null) {
-      completedImages.push(item);
-      continue;
-    }
-    if (
-      isTurnInProgress &&
-      (item.status === "in_progress" || item.status === "inProgress")
-    ) {
-      pendingCount += 1;
+    if (t.type === `generated-image`) {
+      if (t.src != null) {
+        r.push(t);
+        continue;
+      }
+      n && (t.status === `in_progress` || t.status === `inProgress`) && (i += 1);
     }
   }
-  return {
-    completedImages,
-    hasPendingItems: pendingCount > 0,
-    pendingPlaceholderCount: interruptedByThisClient ? 0 : pendingCount,
-  };
+  return { completedImages: r, hasPendingItems: i > 0, pendingPlaceholderCount: t ? 0 : i };
 }
-
-function hasPresentationOutput(paths: string[]): boolean {
-  return paths.some((path) => getFileExtension(path) === "pptx");
+function i({ completedImages: e, endResourcePaths: t, pendingPlaceholderCount: n }) {
+  let r = o(t) ? [] : e;
+  return r.length === 0 && n === 0 ? null : { images: r, pendingImageCount: n };
 }
-
-function buildGeneratedImageOutput({
-  completedImages,
-  endResourcePaths,
-  pendingPlaceholderCount,
-}: {
-  completedImages: GeneratedImageItem[];
-  endResourcePaths: string[];
-  pendingPlaceholderCount: number;
-}): { images: GeneratedImageItem[]; pendingImageCount: number } | null {
-  const images = hasPresentationOutput(endResourcePaths) ? [] : completedImages;
-  return images.length === 0 && pendingPlaceholderCount === 0
-    ? null
-    : { images, pendingImageCount: pendingPlaceholderCount };
-}
-
-function hasDisplayableGeneratedImage(items: GeneratedImageItem[]): boolean {
-  return items.some(
-    (item) =>
-      item.type === "generated-image" &&
-      (item.failure?.type !== "usageLimitExceeded" || item.failure.limitId !== "image_gen"),
+function a(e) {
+  return e.some(
+    (e) =>
+      e.type === `generated-image` &&
+      (e.failure?.type !== `usageLimitExceeded` || e.failure.limitId !== `image_gen`),
   );
 }
-
-function initializeGeneratedImageOutputVisibility(): void {
-  initializeGeneratedImages();
+function o(e) {
+  return e.some((e) => t(e) === `pptx`);
 }
-
-export {
-  hasDisplayableGeneratedImage as a,
-  hasPresentationOutput as i,
-  buildGeneratedImageOutput as n,
-  initializeGeneratedImageOutputVisibility as r,
-  getGeneratedImageVisibility as t,
-};
+function s() {
+  return (s = e(() => {
+    n();
+  }))();
+}
+export { a, o as i, i as n, s as r, r as t };

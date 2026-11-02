@@ -1,195 +1,82 @@
-import "@rchunk/rolldown-runtime";
-// @ts-expect-error The release app-initial surface is declared incrementally by the shared manifest owner.
-import { Bgt as activateBrowserTab, Ebt as initializePanelState, Fgt as initializePanelRouting, Ibt as panelLayout, Jen as getBrowserTabId, Ken as getActiveConversationId, Vvt as bottomPanelTabs, Wvt as initializeSidePanel, Xen as isBrowserTab, Yen as initializePanelTabs, _bt as rightPanelOpen, _gt as initializePanelActions, _vt as initializePanelSelection, dgt as getBrowserTabTarget, fvt as showPanelTab, ggt as browserUseState, mbt as bottomPanelOpen, mgt as initializeBrowserPanelTabs, nlt as initializePanelLayout, pvt as closePanel, qbt as initializeRightPanel, qvt as rightPanelTabs, rlt as ensureBrowserPanelTab, tlt as resolveBrowserTabId, ugt as getLastFocusedBrowserTabId, vbt as rightPanelEnabled, ygt as clearBrowserTabTransfer } from "@rchunk/app-initial";
-// @ts-expect-error The release app-primary surface is declared incrementally by the shared manifest owner.
-import { Af as initializePanelHelpers } from "@rchunk/app-primary";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  getFallbackPanelTarget,
-  getPreferredPanelTarget,
-} from "../app-primary/runtime/panel-target-policy";
-
-interface Scope {
-  get(signal: unknown): unknown;
-}
-
-interface PanelTab {
-  tabId?: string | null;
-  type?: string;
-}
-
-interface BrowserTabTarget {
-  browserTabId?: string | null;
-  tab: PanelTab;
-  target?: "bottom" | "right" | null;
-}
-
-export interface SetPanelVisibilityOptions {
-  browserTabId?: string | null;
-  initiator?: unknown;
-  open?: boolean | null;
-  source?: unknown;
-}
-
-function findMostRecentBrowserTabId(
-  tabs: readonly PanelTab[],
-  requestedTabId?: string | null,
-): string | null {
-  if (requestedTabId != null) {
-    return tabs.some((tab) => tab.tabId === requestedTabId)
-      ? requestedTabId
-      : null;
+  Bgt as t,
+  Ebt as n,
+  Fgt as r,
+  Ibt as i,
+  Jen as a,
+  Ken as o,
+  Vvt as s,
+  Wvt as c,
+  Xen as l,
+  Yen as u,
+  _bt as d,
+  _gt as f,
+  _vt as p,
+  dgt as m,
+  fvt as h,
+  ggt as g,
+  mbt as _,
+  mgt as v,
+  nlt as y,
+  pvt as b,
+  qbt as x,
+  qvt as S,
+  rlt as C,
+  tlt as w,
+  ugt as T,
+  vbt as E,
+  ygt as D,
+} from "@rchunk/app-initial";
+import { Af as O, Df as k, Of as A } from "@rchunk/app-primary";
+function j(e, { browserTabId: n, initiator: r, open: c, source: u }) {
+  let f = o(e),
+    p = f != null && n != null ? w(n) : void 0,
+    v = f != null && p != null ? m(e, p) : null,
+    y = e.get(s.activeTab$),
+    x = e.get(S.activeTab$),
+    O =
+      f != null && p == null
+        ? k(e.get(i), { bottom: y, right: x }, { bottom: e.get(_), right: e.get(d) && e.get(E) })
+        : null,
+    j = v?.target ?? O ?? (f != null && p == null ? A(e.get(i), { bottom: y, right: x }) : null),
+    N = j === `bottom` ? e.get(_) && l(y) : e.get(d) && e.get(E) && l(x);
+  if (c === !1 || (c == null && N)) {
+    (b(e, j ?? `right`), f != null && D(f, p));
+    return;
   }
-  for (let index = tabs.length - 1; index >= 0; index -= 1) {
-    const tab = tabs[index];
-    if (tab != null && isBrowserTab(tab)) return tab.tabId ?? null;
+  if (j === `bottom`) {
+    let n = v?.browserTabId ?? a(y),
+      i = v?.tab.tabId ?? y?.tabId;
+    if (n == null || i == null) return;
+    (!N && f != null && t(f, n, { initiator: r, source: u }), h(e, `bottom`, i));
+    return;
   }
+  let P = e.get(S.tabs$),
+    F = M(P, p),
+    I = f == null ? null : g.getBrowserUseActiveBrowserTabId(f),
+    L = null;
+  if (
+    (f != null &&
+      (L = F == null ? w(p ?? I ?? void 0) : a(P.find((e) => e.tabId === F) ?? { tabId: F })),
+    F == null)
+  ) {
+    let n = C(e, { browserTabId: L ?? void 0 }),
+      i = f == null ? L : (T(e, f) ?? L);
+    n && f != null && i != null && !N && t(f, i, { initiator: r, source: u });
+    return;
+  }
+  (f != null && L != null && !N && t(f, L, { initiator: r, source: u }), h(e, `right`, F));
+}
+function M(e, t) {
+  if (t != null) return e.some((e) => e.tabId === t) ? t : null;
+  for (let t = e.length - 1; t >= 0; --t) if (l(e[t])) return e[t]?.tabId ?? null;
   return null;
 }
-
-function setPanelVisibility(
-  scope: Scope,
-  { browserTabId, initiator, open, source }: SetPanelVisibilityOptions,
-): void {
-  const bottomTabsState = bottomPanelTabs as unknown as { activeTab$: unknown };
-  const rightTabsState = rightPanelTabs as unknown as {
-    activeTab$: unknown;
-    tabs$: unknown;
-  };
-  const conversationId = getActiveConversationId(scope);
-  const resolvedBrowserTabId =
-    conversationId != null && browserTabId != null
-      ? resolveBrowserTabId(browserTabId)
-      : undefined;
-  const browserTarget: BrowserTabTarget | null =
-    conversationId != null && resolvedBrowserTabId != null
-      ? getBrowserTabTarget(scope, resolvedBrowserTabId)
-      : null;
-  const bottomActiveTab = scope.get(
-    bottomTabsState.activeTab$,
-  ) as PanelTab | null;
-  const rightActiveTab = scope.get(
-    rightTabsState.activeTab$,
-  ) as PanelTab | null;
-  const preferredTarget =
-    conversationId != null && resolvedBrowserTabId == null
-      ? getPreferredPanelTarget(
-          scope.get(panelLayout),
-          { bottom: bottomActiveTab, right: rightActiveTab },
-          {
-            bottom: Boolean(scope.get(bottomPanelOpen)),
-            right:
-              Boolean(scope.get(rightPanelOpen)) &&
-              Boolean(scope.get(rightPanelEnabled)),
-          },
-          isBrowserTab,
-        )
-      : null;
-  const target =
-    browserTarget?.target ??
-    preferredTarget ??
-    (conversationId != null && resolvedBrowserTabId == null
-      ? getFallbackPanelTarget(
-          scope.get(panelLayout),
-          {
-            bottom: bottomActiveTab,
-            right: rightActiveTab,
-          },
-          isBrowserTab,
-        )
-      : null);
-  const currentlyOpen =
-    target === "bottom"
-      ? Boolean(scope.get(bottomPanelOpen)) && isBrowserTab(bottomActiveTab)
-      : Boolean(scope.get(rightPanelOpen)) &&
-        Boolean(scope.get(rightPanelEnabled)) &&
-        isBrowserTab(rightActiveTab);
-
-  if (open === false || (open == null && currentlyOpen)) {
-    closePanel(scope, target ?? "right");
-    if (conversationId != null)
-      clearBrowserTabTransfer(conversationId, resolvedBrowserTabId);
-    return;
-  }
-
-  if (target === "bottom") {
-    const targetBrowserTabId =
-      browserTarget?.browserTabId ?? getBrowserTabId(bottomActiveTab);
-    const panelTabId = browserTarget?.tab.tabId ?? bottomActiveTab?.tabId;
-    if (targetBrowserTabId == null || panelTabId == null) return;
-    if (!currentlyOpen && conversationId != null) {
-      activateBrowserTab(conversationId, targetBrowserTabId, {
-        initiator,
-        source,
-      });
-    }
-    showPanelTab(scope, "bottom", panelTabId);
-    return;
-  }
-
-  const tabs = scope.get(rightTabsState.tabs$) as PanelTab[];
-  const panelTabId = findMostRecentBrowserTabId(tabs, resolvedBrowserTabId);
-  const activeBrowserTabId =
-    conversationId == null
-      ? null
-      : browserUseState.getBrowserUseActiveBrowserTabId(conversationId);
-  let targetBrowserTabId: string | null = null;
-  if (conversationId != null) {
-    targetBrowserTabId =
-      panelTabId == null
-        ? resolveBrowserTabId(
-            resolvedBrowserTabId ?? activeBrowserTabId ?? undefined,
-          )
-        : getBrowserTabId(
-            tabs.find((tab) => tab.tabId === panelTabId) ?? {
-              tabId: panelTabId,
-            },
-          );
-  }
-
-  if (panelTabId == null) {
-    const created = ensureBrowserPanelTab(scope, {
-      browserTabId: targetBrowserTabId ?? undefined,
-    });
-    const browserId =
-      conversationId == null
-        ? targetBrowserTabId
-        : (getLastFocusedBrowserTabId(scope, conversationId) ??
-          targetBrowserTabId);
-    if (
-      created &&
-      conversationId != null &&
-      browserId != null &&
-      !currentlyOpen
-    ) {
-      activateBrowserTab(conversationId, browserId, { initiator, source });
-    }
-    return;
-  }
-
-  if (conversationId != null && targetBrowserTabId != null && !currentlyOpen) {
-    activateBrowserTab(conversationId, targetBrowserTabId, {
-      initiator,
-      source,
-    });
-  }
-  showPanelTab(scope, "right", panelTabId);
+function N() {
+  return (N = e(() => {
+    (x(), c(), n(), f(), r(), p(), y(), v(), u(), O());
+  }))();
 }
-
-let initialized = false;
-
-function initializePanelVisibility(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeRightPanel();
-  initializeSidePanel();
-  initializePanelState();
-  initializePanelActions();
-  initializePanelRouting();
-  initializePanelSelection();
-  initializePanelLayout();
-  initializeBrowserPanelTabs();
-  initializePanelTabs();
-  initializePanelHelpers();
-}
-
-export { setPanelVisibility as n, initializePanelVisibility as t };
+export { j as n, N as t };

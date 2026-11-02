@@ -1,73 +1,55 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { fI as t, oj as n } from "@rchunk/app-shared";
 import {
-  fI as initializeElicitationEventDescriptor,
-  oj as elicitationEventDescriptor,
-  type MaitaiScopeApi,
-} from "@rchunk/app-shared";
-import {
-  Cpn as elicitationUiState,
-  GPt as appWindowFocused,
-  KPt as initializeAppWindowFocus,
-  Spn as blockedElicitationUiState,
-  xpn as emitProductEvent,
-  ypn as initializeProductEvents,
+  Cpn as r,
+  GPt as i,
+  KPt as a,
+  Spn as o,
+  xpn as s,
+  ypn as c,
 } from "@rchunk/app-initial";
-
-interface ElicitationEvent { itemId: string; threadId: string; turnId: string; [key: string]: unknown }
-type EventStore = MaitaiScopeApi<unknown>;
-
-function recordElicitationInteraction(store: EventStore, event: ElicitationEvent, action: string): void {
-  emitProductEvent(store, elicitationEventDescriptor, { ...event, stage: "interacted", action });
+function l(e, t, r) {
+  s(e, n, { ...t, stage: `interacted`, action: r });
 }
-
-function isDocumentVisible(store: EventStore, document: Document): boolean {
-  return document.visibilityState === "visible" && store.get(appWindowFocused) === true;
+function u(e, t) {
+  return t.visibilityState === `visible` && e.get(i) === !0;
 }
-
-function observeElicitationShown(store: EventStore, element: HTMLElement | null, event: ElicitationEvent | null, lastShown: { current?: string }): (() => void) | undefined {
-  if (element == null || event == null || typeof IntersectionObserver === "undefined") return undefined;
-  const eventKey = JSON.stringify([event.threadId, event.turnId, event.itemId]);
-  const ownerDocument = element.ownerDocument;
-  let visible = false;
-  const report = () => {
-    const checkVisibility = element.checkVisibility as
-      | ((options?: Record<string, boolean>) => boolean)
-      | undefined;
-    if (
-      lastShown.current !== eventKey &&
-      visible &&
-      element.isConnected &&
-      isDocumentVisible(store, ownerDocument) &&
-      (checkVisibility?.call(element, {
-        visibilityProperty: true,
-        opacityProperty: true,
-      }) ?? true) &&
-      store.get(elicitationUiState) !== blockedElicitationUiState
-    ) {
-      lastShown.current = eventKey;
-      emitProductEvent(store, elicitationEventDescriptor, { ...event, stage: "shown" });
-    }
-  };
-  const observer = new IntersectionObserver(entries => { visible = entries.some(entry => entry.intersectionRatio > 0); report(); });
-  observer.observe(element);
-  const unwatch = store.watch((nextStore) => {
-    nextStore.get(appWindowFocused);
-    nextStore.get(elicitationUiState);
-    report();
+function d(e, t, a, c) {
+  if (t == null || a == null || typeof IntersectionObserver > `u`) return;
+  let l = JSON.stringify([a.threadId, a.turnId, a.itemId]),
+    d = t.ownerDocument,
+    f = !1,
+    p = () => {
+      c.current !== l &&
+        f &&
+        t.isConnected &&
+        u(e, d) &&
+        (t.checkVisibility?.({ visibilityProperty: !0, opacityProperty: !0 }) ?? !0) &&
+        e.get(r) !== o &&
+        ((c.current = l), s(e, n, { ...a, stage: `shown` }));
+    },
+    m = new IntersectionObserver((e) => {
+      ((f = e.some((e) => e.intersectionRatio > 0)), p());
+    });
+  m.observe(t);
+  let h = e.watch((e) => {
+    (e.get(i), e.get(r), p());
   });
-  ownerDocument.addEventListener("visibilitychange", report);
-  ownerDocument.defaultView?.addEventListener("focus", report);
-  return () => {
-    observer.disconnect();
-    unwatch();
-    ownerDocument.removeEventListener("visibilitychange", report);
-    ownerDocument.defaultView?.removeEventListener("focus", report);
-  };
+  return (
+    d.addEventListener(`visibilitychange`, p),
+    d.defaultView?.addEventListener(`focus`, p),
+    () => {
+      (m.disconnect(),
+        h(),
+        d.removeEventListener(`visibilitychange`, p),
+        d.defaultView?.removeEventListener(`focus`, p));
+    }
+  );
 }
-
-function initializeElicitationEvents(): void {
-  initializeElicitationEventDescriptor();
-  initializeAppWindowFocus();
-  initializeProductEvents();
+function f() {
+  return (f = e(() => {
+    (t(), a(), c());
+  }))();
 }
-export { recordElicitationInteraction as n, observeElicitationShown as r, initializeElicitationEvents as t };
+export { l as n, d as r, f as t };

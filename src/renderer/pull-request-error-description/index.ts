@@ -1,43 +1,43 @@
-import {
-  $3 as reactCompilerRuntime,
-  I3 as getJsxRuntime,
-  K2 as initializeMessageRuntime,
-  Y2 as FormattedMessage,
-} from "@rchunk/app-shared";
-
-void reactCompilerRuntime;
-
-export interface PullRequestErrorDescriptionProps {
-  account: { login: string };
-  error: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i } from "@rchunk/app-shared";
+function a(e) {
+  let t = (0, o.c)(5),
+    { account: n, error: r } = e,
+    a = c.exec(r)?.groups?.repository;
+  if (a == null) {
+    let e;
+    return (
+      t[0] === r
+        ? (e = t[1])
+        : ((e = (0, s.jsx)(s.Fragment, { children: r })), (t[0] = r), (t[1] = e)),
+      e
+    );
+  }
+  let l;
+  return (
+    t[2] !== n.login || t[3] !== a
+      ? ((l = (0, s.jsx)(i, {
+          id: `codex.pullRequests.repositoryAccessError`,
+          defaultMessage: `GitHub account {login} can’t access {repository}. Switch accounts or request access, then try again.`,
+          description: `Actionable error shown when the active GitHub CLI account cannot access a repository`,
+          values: { login: n.login, repository: a },
+        })),
+        (t[2] = n.login),
+        (t[3] = a),
+        (t[4] = l))
+      : (l = t[4]),
+    l
+  );
 }
-
-const repositoryAccessError =
-  /Could not resolve to a Repository with the name '(?<repository>[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+)'/u;
-
-function PullRequestErrorDescription({
-  account,
-  error,
-}: PullRequestErrorDescriptionProps): unknown {
-  const { Fragment, jsx } = getJsxRuntime();
-  const repository = repositoryAccessError.exec(error)?.groups?.repository;
-  if (repository == null) return jsx(Fragment, { children: error });
-  return jsx(FormattedMessage, {
-    id: "codex.pullRequests.repositoryAccessError",
-    defaultMessage:
-      "GitHub account {login} can’t access {repository}. Switch accounts or request access, then try again.",
-    description:
-      "Actionable error shown when the active GitHub CLI account cannot access a repository",
-    values: { login: account.login, repository },
-  });
+var o, s, c;
+function l() {
+  return (l = e(() => {
+    ((o = t()),
+      r(),
+      (s = n()),
+      (c =
+        /Could not resolve to a Repository with the name '(?<repository>[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+)'/u));
+  }))();
 }
-
-function initializePullRequestErrorDescription(): void {
-  initializeMessageRuntime();
-  getJsxRuntime();
-}
-
-export {
-  initializePullRequestErrorDescription as n,
-  PullRequestErrorDescription as t,
-};
+export { l as n, a as t };

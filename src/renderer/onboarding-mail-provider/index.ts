@@ -1,102 +1,45 @@
-// onboarding-mail-provider —— onboarding 邮箱供应商识别与插件映射。
-
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-
-void runtimeChunk;
-
-const {
-  Rln: initializeAccountPlanHelpers,
-  Wln: isMicrosoftMailPlan,
-  eun: createMailProviderQueryFamily,
-  nun: initializeMailProviderQuery,
-} = appInitialChunk;
-const {
-  $O: queryStaleTimes,
-  QI: initializeQueryRuntime,
-  ZI: applicationScope,
-  ek: initializeQueryOptions,
-} = appSharedChunk;
-
-export type MailProvider = "google" | "microsoft" | "other";
-
-let pluginIdMap: Record<string, string> = {};
-let mailProviderQueryFamily: unknown = Symbol("email-domain-mail-provider");
-let initialized = false;
-
-function emailDomain(email: string | null | undefined): string | null {
-  if (email == null) return null;
-  const separator = email.lastIndexOf("@");
-  if (separator <= 0) return null;
-  const domain = email
-    .slice(separator + 1)
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $O as t, QI as n, ZI as r, ek as i } from "@rchunk/app-shared";
+import { Rln as a, Wln as o, eun as s, nun as c } from "@rchunk/app-initial";
+function l(e) {
+  if (e == null) return null;
+  let t = e.lastIndexOf(`@`);
+  if (t <= 0) return null;
+  let n = e
+    .slice(t + 1)
     .trim()
     .toLowerCase();
-  return domain.length === 0 ? null : domain;
+  return n.length === 0 ? null : n;
 }
-
-function resolveDetectedProvider({
-  debugOverride,
-  detectedProvider,
-  emailDomain: domain,
-  isError,
-}: {
-  debugOverride?: MailProvider | null;
-  detectedProvider?: MailProvider | null;
-  emailDomain?: string | null;
-  isError?: boolean;
-}): MailProvider | null {
-  return (
-    debugOverride ??
-    detectedProvider ??
-    (domain == null || isError ? "other" : null)
-  );
+function u({ debugOverride: e, detectedProvider: t, emailDomain: n, isError: r }) {
+  return e ?? t ?? (n == null || r ? `other` : null);
 }
-
-function providerForPlan(provider: MailProvider, plan: unknown): MailProvider {
-  if (provider !== "other") return provider;
-  return isMicrosoftMailPlan?.(plan) ? "microsoft" : "google";
+function d(e, t) {
+  return e === `other` ? (o(t) ? `microsoft` : `google`) : e;
 }
-
-function pluginIdForProvider(pluginId: string, provider: MailProvider): string {
-  return provider === "microsoft"
-    ? (pluginIdMap[pluginId] ?? pluginId)
-    : pluginId;
+function f(e, t) {
+  return t === `microsoft` ? (p[e] ?? e) : e;
 }
-
-function initializeOnboardingMailProvider(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeQueryRuntime?.();
-  initializeQueryOptions?.();
-  initializeAccountPlanHelpers?.();
-  initializeMailProviderQuery?.();
-  pluginIdMap = {
-    gmail: "outlook-email",
-    "google-calendar": "outlook-calendar",
-    "google-drive": "sharepoint",
-    slack: "teams",
-  };
-  if (typeof createMailProviderQueryFamily === "function") {
-    mailProviderQueryFamily = createMailProviderQueryFamily(
-      applicationScope,
-      "email-domain-mail-provider",
-      (domain: string | null) => ({
-        enabled: domain != null,
-        params: domain == null ? undefined : { domain },
-        retry: 2,
-        staleTime: queryStaleTimes.FIVE_MINUTES,
+var p, m;
+function h() {
+  return (h = e(() => {
+    (n(),
+      i(),
+      a(),
+      c(),
+      (p = {
+        gmail: `outlook-email`,
+        "google-calendar": `outlook-calendar`,
+        "google-drive": `sharepoint`,
+        slack: `teams`,
       }),
-    );
-  }
+      (m = s(r, `email-domain-mail-provider`, (e) => ({
+        enabled: e != null,
+        params: e == null ? void 0 : { domain: e },
+        retry: 2,
+        staleTime: t.FIVE_MINUTES,
+      }))));
+  }))();
 }
-
-export {
-  providerForPlan as a,
-  pluginIdForProvider as i,
-  emailDomain as n,
-  initializeOnboardingMailProvider as o,
-  resolveDetectedProvider as r,
-  mailProviderQueryFamily as t,
-};
+export { d as a, f as i, l as n, h as o, u as r, m as t };

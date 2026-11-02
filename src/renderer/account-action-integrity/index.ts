@@ -1,124 +1,107 @@
-import "@rchunk/rolldown-runtime";
-import {
-  AKt as initializeSentinelConstants,
-  DKt as sentinelHeaders,
-} from "@rchunk/app-initial";
-
-interface SentinelSdk {
-  init?(context: string): Promise<unknown>;
-  requirementsToken?(event: string): string | null;
-  sessionObserverToken?(context: string): Promise<string | null>;
-  timing?(): Promise<string | null>;
-  token(event: string): Promise<string>;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { AKt as t, DKt as n } from "@rchunk/app-initial";
+function r(e) {
+  ((d = e),
+    o(async () => {
+      let t = await l();
+      d === e && !e.aborted && (await t.init?.(`chatgpt_checkout`));
+    }).catch(() => void 0),
+    e.addEventListener(
+      `abort`,
+      () => {
+        o(async () => {
+          d === e &&
+            ((d = null), await window.SentinelSDK?.sessionObserverToken?.(`chatgpt_checkout`));
+        }).catch(() => void 0);
+      },
+      { once: !0 },
+    ));
 }
-
-declare global {
-  interface Window { SentinelSDK?: SentinelSdk; }
+async function i(e) {
+  return a(e, !0);
 }
-
-const defaultTiming = "[1,null]";
-let activeCheckoutSignal: AbortSignal | null = null;
-let queue = Promise.resolve();
-
-function enqueue<Result>(operation: () => Promise<Result>): Promise<Result> {
-  const result = queue.then(operation);
-  queue = result.then(() => undefined, () => undefined);
-  return result;
-}
-
-function loadSentinelSdk(): Promise<SentinelSdk> {
-  return Promise.reject(new Error("Sentinel SDK is browser-only"));
-}
-
-function fallbackHeaders(event: string): Record<string, string> {
-  try {
-    const requirement = window.SentinelSDK?.requirementsToken?.(event);
-    return typeof requirement !== "string" || requirement === "" ? {} : {
-      [sentinelHeaders.sentinelToken]: JSON.stringify({ e: "k9d4s6v3b2", c: requirement }),
-      [sentinelHeaders.timing]: defaultTiming,
-    };
-  } catch { return {}; }
-}
-
-function observeCheckoutSession(signal: AbortSignal): void {
-  activeCheckoutSignal = signal;
-  enqueue(async () => {
-    const sdk = await loadSentinelSdk();
-    if (activeCheckoutSignal === signal && !signal.aborted) await sdk.init?.("chatgpt_checkout");
-  }).catch(() => undefined);
-  signal.addEventListener("abort", () => {
-    enqueue(async () => {
-      if (activeCheckoutSignal === signal) {
-        activeCheckoutSignal = null;
-        await window.SentinelSDK?.sessionObserverToken?.("chatgpt_checkout");
+async function a(e, t) {
+  let r = t && e === `checkout_session_approval`,
+    i = {},
+    a = !1,
+    s = o(async () => {
+      if (a) return i;
+      let o = await l().catch(() => null);
+      if (a) return i;
+      if (r) {
+        let e = await o?.sessionObserverToken?.(`chatgpt_checkout`).catch(() => null);
+        e && (i[`OpenAI-Sentinel-SO-Token`] = e);
       }
-    }).catch(() => undefined);
-  }, { once: true });
-}
-
-async function getIntegrityHeaders(event: string, checkout: boolean): Promise<Record<string, string>> {
-  const includeObserver = checkout && event === "checkout_session_approval";
-  const headers: Record<string, string> = {};
-  let timedOut = false;
-  const work = enqueue(async () => {
-    if (timedOut) return headers;
-    const sdk = await loadSentinelSdk().catch(() => null);
-    if (timedOut) return headers;
-    if (includeObserver) {
-      const observer = await sdk?.sessionObserverToken?.("chatgpt_checkout").catch(() => null);
-      if (observer) headers["OpenAI-Sentinel-SO-Token"] = observer;
-    }
-    if (timedOut) return headers;
-    if (sdk != null) {
-      try {
-        headers[sentinelHeaders.sentinelToken] = await sdk.token(event);
-        if (timedOut) return headers;
-        headers[sentinelHeaders.timing] = (await sdk.timing?.()) ?? defaultTiming;
-      } catch {
-        if (!headers[sentinelHeaders.sentinelToken]) Object.assign(headers, fallbackHeaders(event));
-      }
-    }
-    if (checkout && !timedOut && activeCheckoutSignal != null && !activeCheckoutSignal.aborted) {
-      await sdk?.init?.("chatgpt_checkout").catch(() => null);
-    }
-    return headers;
-  });
-  let timeout: ReturnType<typeof setTimeout> | undefined;
+      if (a) return i;
+      if (o != null)
+        try {
+          if (((i[n.sentinelToken] = await o.token(e)), a)) return i;
+          i[n.timing] = (await o.timing?.()) ?? u;
+        } catch {
+          i[n.sentinelToken] || Object.assign(i, c(e));
+        }
+      return (
+        t &&
+          !a &&
+          d != null &&
+          !d.aborted &&
+          (await o?.init?.(`chatgpt_checkout`).catch(() => null)),
+        i
+      );
+    }),
+    f;
   try {
-    const result = await Promise.race([
-      work,
-      new Promise<Record<string, string>>((resolve) => {
-        timeout = setTimeout(() => {
-          timedOut = true;
-          resolve({
-            ...fallbackHeaders(event), ...headers,
-            ...(includeObserver && !headers["OpenAI-Sentinel-SO-Token"]
-              ? { "OpenAI-Sentinel-SO-Token": JSON.stringify({ e: "client_timeout" }) }
-              : {}),
-          });
-        }, 5000);
+    let o = await Promise.race([
+      s,
+      new Promise((t) => {
+        f = setTimeout(() => {
+          ((a = !0),
+            t({
+              ...c(e),
+              ...i,
+              ...(r && !i[`OpenAI-Sentinel-SO-Token`]
+                ? { "OpenAI-Sentinel-SO-Token": JSON.stringify({ e: `client_timeout` }) }
+                : {}),
+            }));
+        }, 5e3);
       }),
     ]);
-    return checkout ? {
-      [sentinelHeaders.sentinelToken]: JSON.stringify({ e: "k9d4s6v3b2" }),
-      [sentinelHeaders.timing]: defaultTiming,
-      ...result,
-    } : result;
-  } finally { clearTimeout(timeout); }
+    return t ? { [n.sentinelToken]: JSON.stringify({ e: `k9d4s6v3b2` }), [n.timing]: u, ...o } : o;
+  } finally {
+    clearTimeout(f);
+  }
 }
-
-const getCheckoutIntegrityHeaders = (event: string) => getIntegrityHeaders(event, true);
-const getActionIntegrityHeaders = (event: string) => getIntegrityHeaders(event, false);
-
-function initializeAccountActionIntegrity(): void {
-  initializeSentinelConstants();
-  activeCheckoutSignal = null;
-  queue = Promise.resolve();
+function o(e) {
+  let t = f.then(e);
+  return (
+    (f = t.then(
+      () => void 0,
+      () => void 0,
+    )),
+    t
+  );
 }
-
-export {
-  observeCheckoutSession as i,
-  getCheckoutIntegrityHeaders as n,
-  initializeAccountActionIntegrity as r,
-  getActionIntegrityHeaders as t,
-};
+async function s(e) {
+  return a(e, !1);
+}
+function c(e) {
+  try {
+    let t = window.SentinelSDK?.requirementsToken?.(e);
+    return typeof t != `string` || !t
+      ? {}
+      : { [n.sentinelToken]: JSON.stringify({ e: `k9d4s6v3b2`, c: t }), [n.timing]: u };
+  } catch {
+    return {};
+  }
+}
+function l() {
+  return Promise.reject(Error(`Sentinel SDK is browser-only`));
+}
+var u, d, f;
+function p() {
+  return (p = e(() => {
+    (t(), (u = `[1,null]`), (d = null), (f = Promise.resolve()));
+  }))();
+}
+export { r as i, i as n, p as r, s as t };

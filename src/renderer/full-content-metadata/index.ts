@@ -1,233 +1,96 @@
-import {
-  Q3 as rendererLogger,
-  Z3 as initializeQueryRuntime,
-} from "@rchunk/app-shared";
-
-export interface DiffContentBlock {
-  additionLineIndex: number;
-  additions: number;
-  deletionLineIndex: number;
-  deletions: number;
-  lines: number;
-  type: "addition" | "context" | "deletion" | string;
-  [key: string]: unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { Q3 as t, Z3 as n } from "@rchunk/app-shared";
+function r() {
+  return { type: `success`, lines: [] };
 }
-
-export interface DiffHunk {
-  additionCount: number;
-  additionStart: number;
-  deletionCount: number;
-  deletionStart: number;
-  hunkContent: DiffContentBlock[];
-  splitLineCount: number;
-  unifiedLineCount: number;
-  [key: string]: unknown;
+function i(e, t, n, { ignoreWhitespace: r = !1 } = {}) {
+  let i = a(e, t, n, r);
+  return i == null
+    ? null
+    : {
+        ...e,
+        ...i,
+        isPartial: !1,
+        deletionLines: t,
+        additionLines: n,
+        cacheKey: `${e.cacheKey ?? e.name}:full:${e.prevObjectId ?? `none`}:${e.newObjectId ?? `none`}`,
+      };
 }
-
-export interface PartialDiffMetadata {
-  additionLines: string[];
-  cacheKey?: string | null;
-  deletionLines: string[];
-  hunks: DiffHunk[];
-  name: string;
-  newObjectId?: string | null;
-  prevObjectId?: string | null;
-  [key: string]: unknown;
-}
-
-export interface FullDiffMetadata extends PartialDiffMetadata {
-  isPartial: false;
-  splitLineCount: number;
-  unifiedLineCount: number;
-}
-
-const whitespacePattern = /[ \t\r\n\f\v]/g;
-
-function emptyFullContentResult(): { lines: never[]; type: "success" } {
-  return { type: "success", lines: [] };
-}
-
-function linesMatch(left: string, right: string, ignoreWhitespace: boolean): boolean {
-  return ignoreWhitespace
-    ? left.replace(whitespacePattern, "") === right.replace(whitespacePattern, "")
-    : left === right;
-}
-
-function rangesMatch(
-  left: readonly string[],
-  right: readonly string[],
-  leftStart: number,
-  rightStart: number,
-  count: number,
-  ignoreWhitespace: boolean,
-): boolean {
-  for (let offset = 0; offset < count; offset += 1) {
-    const leftLine = left[leftStart + offset];
-    const rightLine = right[rightStart + offset];
-    if (
-      leftLine == null ||
-      rightLine == null ||
-      !linesMatch(leftLine, rightLine, ignoreWhitespace)
-    ) {
-      return false;
-    }
-  }
-  return true;
-}
-
-function rejectMetadata(metadata: PartialDiffMetadata, reason: string): null {
-  rendererLogger.warning("code_diff_full_content_metadata_rejected", {
-    safe: { reason },
-    sensitive: { fileName: metadata.name },
-  });
-  return null;
-}
-
-function rebuildHunks(
-  metadata: PartialDiffMetadata,
-  deletionLines: string[],
-  additionLines: string[],
-  ignoreWhitespace: boolean,
-): Pick<FullDiffMetadata, "hunks" | "splitLineCount" | "unifiedLineCount"> | null {
-  const rebuiltHunks: DiffHunk[] = [];
-  let splitLineCount = 0;
-  let unifiedLineCount = 0;
-  let previousAdditionEnd = 0;
-  let previousDeletionEnd = 0;
-
-  for (const hunk of metadata.hunks) {
-    const additionStart = Math.max(hunk.additionStart - 1, 0);
-    const deletionStart = Math.max(hunk.deletionStart - 1, 0);
-    const collapsedAdditionCount = additionStart - previousAdditionEnd;
-    const collapsedDeletionCount = deletionStart - previousDeletionEnd;
-    if (
-      collapsedAdditionCount < 0 ||
-      collapsedDeletionCount < 0 ||
-      collapsedAdditionCount !== collapsedDeletionCount ||
-      additionStart + hunk.additionCount > additionLines.length ||
-      deletionStart + hunk.deletionCount > deletionLines.length
-    ) {
+function a(e, t, n, r) {
+  let i = t.length,
+    a = n.length,
+    c = [],
+    l = 0,
+    u = 0,
+    d = 0,
+    f = 0;
+  for (let p of e.hunks) {
+    let m = Math.max(p.additionStart - 1, 0),
+      h = Math.max(p.deletionStart - 1, 0),
+      g = m - d,
+      _ = h - f;
+    if (g < 0 || _ < 0 || g !== _ || m + p.additionCount > a || h + p.deletionCount > i)
       return null;
-    }
-    if (
-      !rangesMatch(
-        deletionLines,
-        additionLines,
-        previousDeletionEnd,
-        previousAdditionEnd,
-        collapsedAdditionCount,
-        ignoreWhitespace,
-      )
-    ) {
-      return rejectMetadata(metadata, "collapsed_context_mismatch");
-    }
-
-    let additionCursor = additionStart;
-    let deletionCursor = deletionStart;
-    const hunkContent: DiffContentBlock[] = [];
-    for (const block of hunk.hunkContent) {
-      const additions = block.type === "context" ? block.lines : block.additions;
-      const deletions = block.type === "context" ? block.lines : block.deletions;
+    if (!s(t, n, f, d, g, r)) return (o(e, `collapsed_context_mismatch`), null);
+    let v = m,
+      y = h,
+      b = [];
+    for (let i of p.hunkContent) {
+      let a = i.type === `context` ? i.lines : i.additions,
+        o = i.type === `context` ? i.lines : i.deletions;
       if (
-        !rangesMatch(
-          metadata.deletionLines,
-          deletionLines,
-          block.deletionLineIndex,
-          deletionCursor,
-          deletions,
-          ignoreWhitespace,
-        ) ||
-        !rangesMatch(
-          metadata.additionLines,
-          additionLines,
-          block.additionLineIndex,
-          additionCursor,
-          additions,
-          ignoreWhitespace,
-        )
-      ) {
-        return null;
-      }
-      hunkContent.push({
-        ...block,
-        additionLineIndex: additionCursor,
-        deletionLineIndex: deletionCursor,
-      });
-      additionCursor += additions;
-      deletionCursor += deletions;
-    }
-    rebuiltHunks.push({
-      ...hunk,
-      collapsedBefore: collapsedAdditionCount,
-      additionLineIndex: additionStart,
-      deletionLineIndex: deletionStart,
-      hunkContent,
-      splitLineStart: splitLineCount + collapsedAdditionCount,
-      unifiedLineStart: unifiedLineCount + collapsedAdditionCount,
-    });
-    splitLineCount += collapsedAdditionCount + hunk.splitLineCount;
-    unifiedLineCount += collapsedAdditionCount + hunk.unifiedLineCount;
-    previousAdditionEnd = additionStart + hunk.additionCount;
-    previousDeletionEnd = deletionStart + hunk.deletionCount;
-  }
-
-  if (rebuiltHunks.length > 0) {
-    const trailingAdditions = additionLines.length - previousAdditionEnd;
-    const trailingDeletions = deletionLines.length - previousDeletionEnd;
-    if (trailingAdditions < 0 || trailingDeletions < 0) {
-      return rejectMetadata(metadata, "negative_trailing_context");
-    }
-    if (trailingAdditions !== trailingDeletions) {
-      return rejectMetadata(metadata, "trailing_context_line_count_mismatch");
-    }
-    if (
-      !rangesMatch(
-        deletionLines,
-        additionLines,
-        previousDeletionEnd,
-        previousAdditionEnd,
-        trailingAdditions,
-        ignoreWhitespace,
+        !s(e.deletionLines, t, i.deletionLineIndex, y, o, r) ||
+        !s(e.additionLines, n, i.additionLineIndex, v, a, r)
       )
-    ) {
-      return rejectMetadata(metadata, "trailing_context_mismatch");
+        return null;
+      (b.push({ ...i, additionLineIndex: v, deletionLineIndex: y }), (v += a), (y += o));
     }
-    splitLineCount += trailingAdditions;
-    unifiedLineCount += trailingAdditions;
+    (c.push({
+      ...p,
+      collapsedBefore: g,
+      additionLineIndex: m,
+      deletionLineIndex: h,
+      hunkContent: b,
+      splitLineStart: l + g,
+      unifiedLineStart: u + g,
+    }),
+      (l += g + p.splitLineCount),
+      (u += g + p.unifiedLineCount),
+      (d = m + p.additionCount),
+      (f = h + p.deletionCount));
   }
-
-  return { hunks: rebuiltHunks, splitLineCount, unifiedLineCount };
+  if (c.length > 0) {
+    let c = a - d,
+      p = i - f;
+    if (c < 0 || p < 0) return (o(e, `negative_trailing_context`), null);
+    if (c !== p) return (o(e, `trailing_context_line_count_mismatch`), null);
+    if (!s(t, n, f, d, c, r)) return (o(e, `trailing_context_mismatch`), null);
+    ((l += c), (u += c));
+  }
+  return { hunks: c, splitLineCount: l, unifiedLineCount: u };
 }
-
-function createFullContentMetadata(
-  metadata: PartialDiffMetadata,
-  deletionLines: string[],
-  additionLines: string[],
-  options: { ignoreWhitespace?: boolean } = {},
-): FullDiffMetadata | null {
-  const rebuilt = rebuildHunks(
-    metadata,
-    deletionLines,
-    additionLines,
-    options.ignoreWhitespace ?? false,
-  );
-  if (rebuilt == null) return null;
-  return {
-    ...metadata,
-    ...rebuilt,
-    isPartial: false,
-    deletionLines,
-    additionLines,
-    cacheKey: `${metadata.cacheKey ?? metadata.name}:full:${metadata.prevObjectId ?? "none"}:${metadata.newObjectId ?? "none"}`,
-  };
+function o(e, n) {
+  t.warning(`code_diff_full_content_metadata_rejected`, {
+    safe: { reason: n },
+    sensitive: { fileName: e.name },
+  });
 }
-
-function initializeFullContentMetadata(): void {
-  initializeQueryRuntime();
+function s(e, t, n, r, i, a) {
+  for (let o = 0; o < i; o += 1) {
+    let i = e[n + o],
+      s = t[r + o];
+    if (i == null || s == null || !c(i, s, a)) return !1;
+  }
+  return !0;
 }
-
-export {
-  emptyFullContentResult as n,
-  initializeFullContentMetadata as r,
-  createFullContentMetadata as t,
-};
+function c(e, t, n) {
+  return n ? e.replace(l, ``) === t.replace(l, ``) : e === t;
+}
+var l;
+function u() {
+  return (u = e(() => {
+    (n(), (l = /[ \t\r\n\f\v]/g));
+  }))();
+}
+export { r as n, u as r, i as t };

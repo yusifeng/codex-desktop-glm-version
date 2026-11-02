@@ -1,37 +1,35 @@
-// Dose-response learning model comparing potency and efficacy.
-import "@rchunk/rolldown-runtime";
-
-interface DoseResponseValues { logConcentration?: number | null; comparison?: number | null }
-interface DoseResponsePoint { x: number; y: number }
-
-let concentrationControl: { defaultValue: number; min: number; max: number; step: number };
-let comparisonControl: { defaultValue: number; min: number; max: number; step: number };
-let normalizeDoseResponseValues: (values: DoseResponseValues) => { logConcentration: number; comparison: number };
-let calculateDoseResponse: (values: DoseResponseValues) => { logConcentration: number; comparison: number; drugA: { ec50Log: number; emax: number; halfMax: number; response: number }; drugB: { ec50Log: number; emax: number; halfMax: number; response: number } };
-let sampleDoseResponseCurve: (ec50Log: number, emax: number) => DoseResponsePoint[];
-let initialized = false;
-
-function initializeDoseResponseCurveModel(): void {
-  if (initialized) return;
-  initialized = true;
-  concentrationControl = { defaultValue: -8, min: -11, max: -5, step: 0.1 };
-  comparisonControl = { defaultValue: 0, min: 0, max: 2, step: 1 };
-  const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-  normalizeDoseResponseValues = values => ({
-    logConcentration: Number.isFinite(values.logConcentration) ? clamp(values.logConcentration ?? concentrationControl.defaultValue, concentrationControl.min, concentrationControl.max) : concentrationControl.defaultValue,
-    comparison: Number.isFinite(values.comparison) ? Math.round(clamp(values.comparison ?? comparisonControl.defaultValue, comparisonControl.min, comparisonControl.max)) : comparisonControl.defaultValue,
-  });
-  const responseAtConcentration = (logConcentration: number, ec50Log: number, emax: number): number => emax / (1 + 10 ** (ec50Log - logConcentration));
-  calculateDoseResponse = values => {
-    const normalized = normalizeDoseResponseValues(values);
-    const ec50Log = normalized.comparison === 0 ? -7 : normalized.comparison === 1 ? -8 : -9;
-    const emax = normalized.comparison === 0 ? 100 : 60;
-    return { ...normalized, drugA: { ec50Log: -8, emax: 100, halfMax: 50, response: responseAtConcentration(normalized.logConcentration, -8, 100) }, drugB: { ec50Log, emax, halfMax: emax / 2, response: responseAtConcentration(normalized.logConcentration, ec50Log, emax) } };
-  };
-  sampleDoseResponseCurve = (ec50Log, emax) => Array.from({ length: 121 }, (_unused, index) => {
-    const x = concentrationControl.min + index * 0.05;
-    return { x, y: responseAtConcentration(x, ec50Log, emax) };
-  });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s;
+function c() {
+  return (c = e(() => {
+    ((t = { defaultValue: -8, min: -11, max: -5, step: 0.1 }),
+      (n = { defaultValue: 0, min: 0, max: 2, step: 1 }),
+      (r = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (i = (e) => ({
+        logConcentration: Number.isFinite(e.logConcentration)
+          ? r(e.logConcentration ?? t.defaultValue, t.min, t.max)
+          : t.defaultValue,
+        comparison: Number.isFinite(e.comparison)
+          ? Math.round(r(e.comparison ?? n.defaultValue, n.min, n.max))
+          : n.defaultValue,
+      })),
+      (a = (e, t, n) => n / (1 + 10 ** (t - e))),
+      (o = (e) => {
+        let t = i(e),
+          n = t.comparison === 0 ? -7 : t.comparison === 1 ? -8 : -9,
+          r = t.comparison === 0 ? 100 : 60;
+        return {
+          ...t,
+          drugA: { ec50Log: -8, emax: 100, halfMax: 50, response: a(t.logConcentration, -8, 100) },
+          drugB: { ec50Log: n, emax: r, halfMax: r / 2, response: a(t.logConcentration, n, r) },
+        };
+      }),
+      (s = (e, n) =>
+        Array.from({ length: 121 }, (r, i) => {
+          let o = t.min + i * 0.05;
+          return { x: o, y: a(o, e, n) };
+        })));
+  }))();
 }
-
-export { initializeDoseResponseCurveModel as a, sampleDoseResponseCurve as i, concentrationControl as n, normalizeDoseResponseValues as o, calculateDoseResponse as r, comparisonControl as t };
+export { c as a, s as i, t as n, i as o, o as r, n as t };

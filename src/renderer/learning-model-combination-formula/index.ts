@@ -1,33 +1,15 @@
-// Combination formula metadata. Release chunk: type-e23de7285313.js.
-import "@rchunk/rolldown-runtime";
-
-interface CombinationFormulaSpecification {
-  type: "COMBINATION_FORMULA";
-  version: 2;
-  thumbnailAssetKey: "combination-formula-v1";
-  parameters: {
-    n: { kind: "integer"; defaultValue: 6; min: 4; max: 8 };
-    r: { kind: "integer"; defaultValue: 3; min: 2; max: 4 };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `COMBINATION_FORMULA`),
+      (n = `combination-formula-v1`),
+      (r = {
+        n: { kind: `integer`, defaultValue: 6, min: 4, max: 8 },
+        r: { kind: `integer`, defaultValue: 3, min: 2, max: 4 },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-let combinationFormulaSpecification: CombinationFormulaSpecification;
-let initialized = false;
-function initializeCombinationFormulaSpecification(): void {
-  if (initialized) return;
-  initialized = true;
-  combinationFormulaSpecification = {
-    type: "COMBINATION_FORMULA",
-    version: 2,
-    thumbnailAssetKey: "combination-formula-v1",
-    parameters: {
-      n: { kind: "integer", defaultValue: 6, min: 4, max: 8 },
-      r: { kind: "integer", defaultValue: 3, min: 2, max: 4 },
-    },
-  };
-}
-
-export {
-  combinationFormulaSpecification as n,
-  initializeCombinationFormulaSpecification as t,
-};
+export { i as n, a as t };

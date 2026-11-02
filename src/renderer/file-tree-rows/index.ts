@@ -1,48 +1,32 @@
-import "@rchunk/rolldown-runtime";
-
-interface FileEntry { path: string; [key: string]: unknown }
-export type FileTreeRow<T extends FileEntry> =
-  | { depth: number; kind: "file"; file: T }
-  | { depth: number; kind: "folder"; name: string; path: string };
-
-function buildFileTreeRows<T extends FileEntry>(
-  files: readonly T[],
-  collapsedFolders: ReadonlySet<string>,
-): FileTreeRow<T>[] {
-  const children = new Map<string, FileTreeRow<T>[]>([["", []]]);
-  for (const file of files) {
-    const parts = file.path.split("/");
-    let parent = "";
-    for (let depth = 0; depth < parts.length - 1; depth += 1) {
-      const name = parts[depth];
-      const path = parent ? `${parent}/${name}` : name;
-      if (!children.has(path)) {
-        children.set(path, []);
-        children.get(parent)?.push({ depth, kind: "folder", name, path });
-      }
-      parent = path;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e, t) {
+  let n = new Map([[``, []]]);
+  for (let t of e) {
+    let e = t.path.split(`/`),
+      r = ``;
+    for (let t = 0; t < e.length - 1; t++) {
+      let i = e[t],
+        a = r ? `${r}/${i}` : i;
+      (n.has(a) || (n.set(a, []), n.get(r)?.push({ kind: `folder`, path: a, name: i, depth: t })),
+        (r = a));
     }
-    children.get(parent)?.push({ depth: parts.length - 1, file, kind: "file" });
+    n.get(r)?.push({ kind: `file`, file: t, depth: e.length - 1 });
   }
-
-  const rows: FileTreeRow<T>[] = [];
-  const append = (parent: string): void => {
-    const siblings = children.get(parent);
-    siblings?.sort((left, right) => {
-      if (left.kind !== right.kind) return left.kind === "folder" ? -1 : 1;
-      const leftName = left.kind === "folder" ? left.name : left.file.path;
-      const rightName = right.kind === "folder" ? right.name : right.file.path;
-      return leftName.localeCompare(rightName, undefined, { numeric: true, sensitivity: "base" });
-    });
-    for (const row of siblings ?? []) {
-      rows.push(row);
-      if (row.kind === "folder" && !collapsedFolders.has(row.path)) append(row.path);
-    }
-  };
-  append("");
-  return rows;
+  let r = [],
+    i = (e) => {
+      let a = n.get(e);
+      a?.sort((e, t) => {
+        if (e.kind !== t.kind) return e.kind === `folder` ? -1 : 1;
+        let n = e.kind === `folder` ? e.name : e.file.path,
+          r = t.kind === `folder` ? t.name : t.file.path;
+        return n.localeCompare(r, void 0, { numeric: !0, sensitivity: `base` });
+      });
+      for (let e of a ?? []) (r.push(e), e.kind === `folder` && !t.has(e.path) && i(e.path));
+    };
+  return (i(``), r);
 }
-
-function initializeFileTreeRows(): void {}
-
-export { initializeFileTreeRows as n, buildFileTreeRows as t };
+function n() {
+  return (n = e(() => {}))();
+}
+export { n, t };

@@ -1,510 +1,498 @@
-// wallet-onboarding-announcement-modal —— ChatGPT Wallet 引导弹窗与卡片展开动画。
-// 原版：app/webview/assets/wallet-onboarding-announcement-modal-5f24c11f1adc.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-
-void runtimeChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  h4: initializeClassNames,
-  e6: reactRuntime,
-  K2: initializeSharedComponents,
-  I3: jsxRuntime,
-  Y2: FormattedMessage,
-  m4: classNames,
-} = appSharedChunk;
-const {
-  u2: initializeAnnouncementModal,
-  xlt: initializeReducedMotion,
-  s3t: initializeWalletMark,
-  Slt: useReducedMotion,
-  l2: AnnouncementModal,
-  o3t: WalletMark,
-} = appInitialChunk;
-
-type AnimationMode = "animate" | "fanned" | "tucked";
-type AnimationSpeed = "normal" | "slow";
-
-interface WalletLayer {
-  id: string;
-  image: string;
-  cardClassName: string;
-  pocketClassName: string;
-  openCardX: number;
-  openCardRotation: number;
-  cardTravelDistance: number;
-  pocketTravelDistance: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  I3 as n,
+  K2 as r,
+  Y2 as i,
+  e6 as a,
+  h4 as o,
+  m4 as s,
+} from "@rchunk/app-shared";
+import {
+  Slt as c,
+  l2 as l,
+  o3t as u,
+  s3t as d,
+  u2 as f,
+  xlt as p,
+} from "@rchunk/app-initial";
+var m;
+function h() {
+  return (h = e(() => {
+    m = `` + new URL(`card-cyan-56def56cf458.png`, import.meta.url).href;
+  }))();
 }
-
-interface WalletOnboardingAnnouncementModalProps {
-  animationMode?: AnimationMode;
-  animationSpeed?: AnimationSpeed;
-  dismissAnnouncement(): void;
-  footer?: unknown;
-  isSettingUpWallet?: boolean;
-  onSetUpWallet(): void;
+var g;
+function _() {
+  return (_ = e(() => {
+    g = `` + new URL(`card-green-e3f7fd3abfac.png`, import.meta.url).href;
+  }))();
 }
-
-const styles = {
-  scene: "_scene_1qp35_2",
-  cardScene: "_cardScene_1qp35_2",
-  layer: "_layer_1qp35_2",
-  card: "_card_1qp35_2",
-  cardTop: "_cardTop_1qp35_2",
-  cardMiddle: "_cardMiddle_1qp35_2",
-  cardBottom: "_cardBottom_1qp35_2",
-  cardTexture: "_cardTexture_1qp35_2",
-  cardMark: "_cardMark_1qp35_2",
-  pocket: "_pocket_1qp35_2",
-  pocketTop: "_pocketTop_1qp35_2",
-  pocketMiddle: "_pocketMiddle_1qp35_2",
-  pocketBottom: "_pocketBottom_1qp35_2",
-  isAnimating: "_isAnimating_1qp35_2",
-};
-
-const SPRING = { stiffness: 123, damping: 18, mass: 1, velocity: 10.24 };
-const ANIMATION_DELAY_MS = 2_000;
-const SETTLE_DISTANCE_PX = 30;
-const RELEASE_DISTANCE_RATIO = 0.25;
-const VELOCITY_SCALE = 0.05;
-const OVERSHOOT_ROTATION = -15;
-const NORMAL_SPEED = 1.1;
-const CARD_STAGGER_MS = 50;
-const RELEASE_STAGGER_MS = 150;
-
-let React: import("@rchunk/app-shared").ReactRuntime;
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-let initialized = false;
-let layers: readonly WalletLayer[];
-
-function assetUrl(filename: string): string {
-  return new URL(filename, import.meta.url).href;
+var v;
+function y() {
+  return (y = e(() => {
+    v = `` + new URL(`card-purple-9662514d5440.png`, import.meta.url).href;
+  }))();
 }
-
-function clamp01(value: number): number {
-  return Math.min(1, Math.max(0, value));
+var b, x, S, C, w, T, E, D, O, k, A, j, M, N, P;
+function F() {
+  return (F = e(() => {
+    ((b = `_scene_1qp35_2`),
+      (x = `_cardScene_1qp35_2`),
+      (S = `_layer_1qp35_2`),
+      (C = `_card_1qp35_2`),
+      (w = `_cardTop_1qp35_2`),
+      (T = `_cardMiddle_1qp35_2`),
+      (E = `_cardBottom_1qp35_2`),
+      (D = `_cardTexture_1qp35_2`),
+      (O = `_cardMark_1qp35_2`),
+      (k = `_pocket_1qp35_2`),
+      (A = `_pocketTop_1qp35_2`),
+      (j = `_pocketMiddle_1qp35_2`),
+      (M = `_pocketBottom_1qp35_2`),
+      (N = `_isAnimating_1qp35_2`),
+      (P = {
+        scene: b,
+        cardScene: x,
+        layer: S,
+        card: C,
+        cardTop: w,
+        cardMiddle: T,
+        cardBottom: E,
+        cardTexture: D,
+        cardMark: O,
+        pocket: k,
+        pocketTop: A,
+        pocketMiddle: j,
+        pocketBottom: M,
+        isAnimating: N,
+      }));
+  }))();
 }
-
-function rotationPivotOffset(degrees: number): { x: number; y: number } {
-  const radians = (degrees * Math.PI) / 180;
+function I(e) {
+  return Math.min(1, Math.max(0, e));
+}
+function L(e) {
+  let t = (e * Math.PI) / 180;
   return {
-    x: 60 - (60 * Math.cos(radians) - 38 * Math.sin(radians)),
-    y: 38 - (60 * Math.sin(radians) + 38 * Math.cos(radians)),
+    x: 60 - (60 * Math.cos(t) - 38 * Math.sin(t)),
+    y: 38 - (60 * Math.sin(t) + 38 * Math.cos(t)),
   };
 }
-
-function transform(x: number, y: number, rotation: number): string {
-  return `translate(${x}px, ${y}px) rotate(${rotation}deg)`;
+function R(e, t, n) {
+  return `translate(${e}px, ${t}px) rotate(${n}deg)`;
 }
-
-function cardTransform(layer: WalletLayer, state: "fanned" | "tucked"): string {
-  const fanned = state === "fanned";
-  const rotation = fanned ? layer.openCardRotation : 0;
-  const pivot = rotationPivotOffset(rotation);
-  return transform(
-    (fanned ? layer.openCardX : 0) + pivot.x,
-    (fanned ? -layer.cardTravelDistance : 0) + pivot.y,
-    rotation,
+function z(e, t) {
+  let n = t === `fanned`,
+    r = n ? e.openCardRotation : 0,
+    i = L(r);
+  return R((n ? e.openCardX : 0) + i.x, (n ? -e.cardTravelDistance : 0) + i.y, r);
+}
+function ee(e, t) {
+  let n = t === `fanned`,
+    r = +!n;
+  return {
+    transform: `translateY(${n ? e.pocketTravelDistance : 0}px)`,
+    "--pocket-border-opacity": r,
+    "--pocket-surface-opacity": r,
+  };
+}
+function B(e, t, n) {
+  (e.forEach((e, t) => {
+    e.style.transform = z($[t], n);
+  }),
+    t.forEach((e, t) => {
+      let r = n === `fanned`,
+        i = +!r;
+      ((e.style.transform = `translateY(${r ? $[t].pocketTravelDistance : 0}px)`),
+        e.style.setProperty(`--pocket-border-opacity`, String(i)),
+        e.style.setProperty(`--pocket-surface-opacity`, String(i)));
+    }));
+}
+function te(e, t, n, r, i, a) {
+  let { stiffness: o, damping: s, mass: c, velocity: l } = W,
+    u = -16 / n.cardTravelDistance,
+    d = q / n.cardTravelDistance,
+    f = 0,
+    p = -Math.abs(l) * J * (K / n.cardTravelDistance),
+    m = 0,
+    h = 0,
+    g = !1,
+    _ = !1,
+    v = performance.now(),
+    y = 0,
+    b = 0.001,
+    x = 0.01,
+    S = (l) => {
+      let C = Math.min((l - v) / 1e3, 0.04) * r;
+      for (v = l; C > 0;) {
+        let e = Math.min(C, 0.008333333333333333),
+          t = (o * ((g ? 1 : u) - f) - s * p) / c,
+          n = (o * (+!!g - m) - s * h) / c;
+        ((p += t * e), (f += p * e), (h += n * e), (m += h * e), (C -= e));
+      }
+      !g && !_ && Math.abs(f - u) <= d && ((_ = !0), a());
+      let w = -n.cardTravelDistance + n.cardTravelDistance * f,
+        T,
+        E;
+      if (_) {
+        let e = I((f - u) / (1 - u));
+        ((T = (n.openCardRotation + Y) * (1 - e)), (E = n.openCardX * (1 - e)));
+      } else {
+        let e = I(f / u);
+        ((T = n.openCardRotation + Y * e), (E = n.openCardX));
+      }
+      let D = L(T),
+        O = I(m);
+      ((e.style.transform = R(E + D.x, w + D.y, T)),
+        (t.style.transform = `translateY(${n.pocketTravelDistance * (1 - m)}px)`),
+        t.style.setProperty(`--pocket-border-opacity`, String(O)),
+        t.style.setProperty(`--pocket-surface-opacity`, String(O)));
+      let k = Math.abs(1 - f) <= b && Math.abs(p) <= x,
+        A = Math.abs(1 - m) <= b && Math.abs(h) <= x;
+      if (k && A) {
+        ((e.style.transform = R(0, 0, 0)),
+          (t.style.transform = `translateY(0)`),
+          t.style.setProperty(`--pocket-border-opacity`, `1`),
+          t.style.setProperty(`--pocket-surface-opacity`, `1`),
+          i());
+        return;
+      }
+      y = window.requestAnimationFrame(S);
+    };
+  return (
+    (y = window.requestAnimationFrame(S)),
+    {
+      cancel: () => window.cancelAnimationFrame(y),
+      release: () => {
+        g = !0;
+      },
+    }
   );
 }
-
-function pocketStyle(
-  layer: WalletLayer,
-  state: "fanned" | "tucked",
-): Record<string, string | number> {
-  const fanned = state === "fanned";
-  const opacity = Number(!fanned);
-  return {
-    transform: `translateY(${fanned ? layer.pocketTravelDistance : 0}px)`,
-    "--pocket-border-opacity": opacity,
-    "--pocket-surface-opacity": opacity,
-  };
-}
-
-function applyState(
-  cards: HTMLElement[],
-  pockets: HTMLElement[],
-  state: "fanned" | "tucked",
-): void {
-  cards.forEach((card, index) => {
-    card.style.transform = cardTransform(layers[index], state);
-  });
-  pockets.forEach((pocket, index) => {
-    const fanned = state === "fanned";
-    const opacity = String(Number(!fanned));
-    pocket.style.transform = `translateY(${fanned ? layers[index].pocketTravelDistance : 0}px)`;
-    pocket.style.setProperty("--pocket-border-opacity", opacity);
-    pocket.style.setProperty("--pocket-surface-opacity", opacity);
-  });
-}
-
-function animateLayer(
-  card: HTMLElement,
-  pocket: HTMLElement,
-  layer: WalletLayer,
-  speed: number,
-  onSettled: () => void,
-  onReleaseReady: () => void,
-): { cancel(): void; release(): void } {
-  const { stiffness, damping, mass, velocity } = SPRING;
-  const fannedTarget = -16 / layer.cardTravelDistance;
-  const releaseThreshold = SETTLE_DISTANCE_PX / layer.cardTravelDistance;
-  let cardPosition = 0;
-  let cardVelocity =
-    -Math.abs(velocity) *
-    VELOCITY_SCALE *
-    (RELEASE_DISTANCE_RATIO / layer.cardTravelDistance);
-  let pocketPosition = 0;
-  let pocketVelocity = 0;
-  let released = false;
-  let releaseReady = false;
-  let previousTime = performance.now();
-  const positionTolerance = 0.001;
-  const velocityTolerance = 0.01;
-  let frame = 0;
-
-  const tick = (time: number) => {
-    let remaining = Math.min((time - previousTime) / 1_000, 0.04) * speed;
-    previousTime = time;
-    while (remaining > 0) {
-      const step = Math.min(remaining, 1 / 120);
-      const cardAcceleration =
-        (stiffness * ((released ? 1 : fannedTarget) - cardPosition) -
-          damping * cardVelocity) /
-        mass;
-      const pocketAcceleration =
-        (stiffness * (Number(released) - pocketPosition) -
-          damping * pocketVelocity) /
-        mass;
-      cardVelocity += cardAcceleration * step;
-      cardPosition += cardVelocity * step;
-      pocketVelocity += pocketAcceleration * step;
-      pocketPosition += pocketVelocity * step;
-      remaining -= step;
-    }
-    if (
-      !released &&
-      !releaseReady &&
-      Math.abs(cardPosition - fannedTarget) <= releaseThreshold
-    ) {
-      releaseReady = true;
-      onReleaseReady();
-    }
-
-    const cardY =
-      -layer.cardTravelDistance + layer.cardTravelDistance * cardPosition;
-    let rotation: number;
-    let cardX: number;
-    if (releaseReady) {
-      const progress = clamp01(
-        (cardPosition - fannedTarget) / (1 - fannedTarget),
+function ne(e, t, n, r) {
+  let i = r === `slow` ? X / 5 : X,
+    a = new Map(),
+    o = new Set(),
+    s = new Set(),
+    c = 0,
+    l = !1,
+    u = !1,
+    d = () => {
+      l ||
+        u ||
+        s.size !== $.length ||
+        ((u = !0),
+        $.forEach((e, t) => {
+          let n = (t * Q) / i;
+          if (n === 0) {
+            a.get(t)?.release();
+            return;
+          }
+          let r = window.setTimeout(() => {
+            (o.delete(r), a.get(t)?.release());
+          }, n);
+          o.add(r);
+        }));
+    },
+    f = (r) => {
+      if (l) return;
+      let o = te(
+        t[r],
+        n[r],
+        $[r],
+        i,
+        () => {
+          (a.delete(r), (c += 1), !l && c === $.length && e.classList.remove(P.isAnimating));
+        },
+        () => {
+          (s.add(r), d());
+        },
       );
-      rotation = (layer.openCardRotation + OVERSHOOT_ROTATION) * (1 - progress);
-      cardX = layer.openCardX * (1 - progress);
-    } else {
-      const progress = clamp01(cardPosition / fannedTarget);
-      rotation = layer.openCardRotation + OVERSHOOT_ROTATION * progress;
-      cardX = layer.openCardX;
-    }
-    const pivot = rotationPivotOffset(rotation);
-    card.style.transform = transform(
-      cardX + pivot.x,
-      cardY + pivot.y,
-      rotation,
-    );
-    const opacity = clamp01(pocketPosition);
-    pocket.style.transform = `translateY(${layer.pocketTravelDistance * (1 - pocketPosition)}px)`;
-    pocket.style.setProperty("--pocket-border-opacity", String(opacity));
-    pocket.style.setProperty("--pocket-surface-opacity", String(opacity));
-
-    const cardDone =
-      Math.abs(1 - cardPosition) <= positionTolerance &&
-      Math.abs(cardVelocity) <= velocityTolerance;
-    const pocketDone =
-      Math.abs(1 - pocketPosition) <= positionTolerance &&
-      Math.abs(pocketVelocity) <= velocityTolerance;
-    if (cardDone && pocketDone) {
-      card.style.transform = transform(0, 0, 0);
-      pocket.style.transform = "translateY(0)";
-      pocket.style.setProperty("--pocket-border-opacity", "1");
-      pocket.style.setProperty("--pocket-surface-opacity", "1");
-      onSettled();
-      return;
-    }
-    frame = window.requestAnimationFrame(tick);
-  };
-  frame = window.requestAnimationFrame(tick);
-  return {
-    cancel: () => window.cancelAnimationFrame(frame),
-    release: () => {
-      released = true;
-    },
-  };
-}
-
-function animateScene(
-  scene: HTMLElement,
-  cards: HTMLElement[],
-  pockets: HTMLElement[],
-  animationSpeed: AnimationSpeed,
-): () => void {
-  const speed = animationSpeed === "slow" ? NORMAL_SPEED / 5 : NORMAL_SPEED;
-  const animations = new Map<number, ReturnType<typeof animateLayer>>();
-  const timers = new Set<number>();
-  const ready = new Set<number>();
-  let settled = 0;
-  let cancelled = false;
-  let released = false;
-  const releaseAll = () => {
-    if (cancelled || released || ready.size !== layers.length) return;
-    released = true;
-    layers.forEach((_, index) => {
-      const delay = (index * RELEASE_STAGGER_MS) / speed;
-      if (delay === 0) animations.get(index)?.release();
-      else {
-        const timer = window.setTimeout(() => {
-          timers.delete(timer);
-          animations.get(index)?.release();
-        }, delay);
-        timers.add(timer);
-      }
-    });
-  };
-  const start = (index: number) => {
-    if (cancelled) return;
-    const animation = animateLayer(
-      cards[index],
-      pockets[index],
-      layers[index],
-      speed,
-      () => {
-        animations.delete(index);
-        settled += 1;
-        if (!cancelled && settled === layers.length) {
-          scene.classList.remove(styles.isAnimating);
-        }
-      },
-      () => {
-        ready.add(index);
-        releaseAll();
-      },
-    );
-    animations.set(index, animation);
-  };
-
-  scene.classList.add(styles.isAnimating);
-  layers.forEach((_, index) => {
-    const delay = (index * CARD_STAGGER_MS) / speed;
-    if (delay === 0) start(index);
-    else {
-      const timer = window.setTimeout(() => {
-        timers.delete(timer);
-        start(index);
-      }, delay);
-      timers.add(timer);
-    }
-  });
-  return () => {
-    cancelled = true;
-    timers.forEach((timer) => window.clearTimeout(timer));
-    animations.forEach((animation) => animation.cancel());
-    timers.clear();
-    animations.clear();
-    scene.classList.remove(styles.isAnimating);
-  };
-}
-
-function WalletOnboardingAnnouncementModal({
-  animationMode = "animate",
-  animationSpeed = "normal",
-  dismissAnnouncement,
-  footer,
-  isSettingUpWallet = false,
-  onSetUpWallet,
-}: WalletOnboardingAnnouncementModalProps): unknown {
-  initializeWalletOnboardingAnnouncementModal();
-  return jsx.jsx(AnnouncementModal, {
-    actionLayout: "stacked",
-    body: jsx.jsx("p", {
-      className:
-        "text-base leading-normal tracking-normal text-codex-description",
-      children: jsx.jsx(FormattedMessage, {
-        id: "codexWalletOnboardingAnnouncementModal.body",
-        defaultMessage:
-          "Add payment methods that can be securely used by ChatGPT to carry out tasks",
-        description: "Body copy explaining what ChatGPT Wallet is for",
-      }),
-    }),
-    closeButtonClassName: "dark:text-default",
-    closeButtonTone: "dark",
-    dismissLabel: jsx.jsx(FormattedMessage, {
-      id: "codexWalletOnboardingAnnouncementModal.dismissLabel",
-      defaultMessage: "Not right now",
-      description: "Secondary action to dismiss ChatGPT Wallet onboarding",
-    }),
-    footer,
-    isPrimaryActionLoading: isSettingUpWallet,
-    media: jsx.jsx(WalletCardsMedia, { animationMode, animationSpeed }),
-    mediaClassName: "h-[240px]",
-    onDismiss: dismissAnnouncement,
-    onPrimaryAction: onSetUpWallet,
-    primaryActionLabel: jsx.jsx(FormattedMessage, {
-      id: "codexWalletOnboardingAnnouncementModal.primaryActionLabel",
-      defaultMessage: "Set up ChatGPT Wallet",
-      description: "Primary action to begin setting up ChatGPT Wallet",
-    }),
-    title: jsx.jsx(FormattedMessage, {
-      id: "codexWalletOnboardingAnnouncementModal.title",
-      defaultMessage: "Introducing ChatGPT Wallet",
-      description: "Title for the ChatGPT Wallet onboarding announcement",
-    }),
-  });
-}
-
-function WalletCardsMedia({
-  animationMode,
-  animationSpeed,
-}: {
-  animationMode: AnimationMode;
-  animationSpeed: AnimationSpeed;
-}): unknown {
-  const tucked = useReducedMotion?.() || animationMode === "tucked";
-  const sceneRef = React.useRef(null);
-  React.useEffect(() => {
-    const scene: HTMLElement | null = sceneRef.current;
-    if (scene == null) return;
-    const cards = Array.from(
-      scene.querySelectorAll<HTMLElement>("[data-wallet-card]"),
-    );
-    const pockets = Array.from(
-      scene.querySelectorAll<HTMLElement>("[data-wallet-pocket]"),
-    );
-    scene.classList.remove(styles.isAnimating);
-    if (tucked) {
-      applyState(cards, pockets, "tucked");
-      return;
-    }
-    applyState(cards, pockets, "fanned");
-    if (animationMode === "fanned") return;
-    let stop: (() => void) | undefined;
-    const timer = window.setTimeout(() => {
-      stop = animateScene(scene, cards, pockets, animationSpeed);
-    }, ANIMATION_DELAY_MS);
-    return () => {
-      window.clearTimeout(timer);
-      stop?.();
+      a.set(r, o);
     };
-  }, [animationMode, animationSpeed, tucked]);
-
-  return jsx.jsx("div", {
-    ref: sceneRef,
-    "aria-hidden": true,
-    className: styles.scene,
-    children: jsx.jsx("div", {
-      className: styles.cardScene,
-      children: layers.map((layer) =>
-        jsx.jsx(
-          WalletCardLayer,
-          {
-            initialState: tucked ? "tucked" : "fanned",
-            layer,
-          },
-          layer.id,
-        ),
-      ),
+  return (
+    e.classList.add(P.isAnimating),
+    $.forEach((e, t) => {
+      let n = (t * Z) / i;
+      if (n === 0) {
+        f(t);
+        return;
+      }
+      let r = window.setTimeout(() => {
+        (o.delete(r), f(t));
+      }, n);
+      o.add(r);
     }),
-  });
+    () => {
+      ((l = !0),
+        o.forEach((e) => window.clearTimeout(e)),
+        a.forEach((e) => e.cancel()),
+        o.clear(),
+        a.clear(),
+        e.classList.remove(P.isAnimating));
+    }
+  );
 }
-
-function WalletCardLayer({
-  initialState,
-  layer,
-}: {
-  initialState: "fanned" | "tucked";
-  layer: WalletLayer;
-}): unknown {
-  return jsx.jsxs("div", {
-    className: styles.layer,
-    children: [
-      jsx.jsxs("div", {
-        className: classNames(styles.card, layer.cardClassName),
-        "data-wallet-card": true,
-        style: { transform: cardTransform(layer, initialState) },
-        children: [
-          jsx.jsx("img", {
-            alt: "",
-            className: styles.cardTexture,
-            draggable: false,
-            src: layer.image,
-          }),
-          jsx.jsx(WalletMark, {
-            className: classNames(styles.cardMark, "text-white"),
-          }),
-        ],
+function re(e) {
+  let t = (0, V.c)(13),
+    {
+      animationMode: n,
+      animationSpeed: r,
+      dismissAnnouncement: a,
+      footer: o,
+      isSettingUpWallet: s,
+      onSetUpWallet: c,
+    } = e,
+    u = n === void 0 ? `animate` : n,
+    d = r === void 0 ? `normal` : r,
+    f = s !== void 0 && s,
+    p;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((p = (0, U.jsx)(`p`, {
+        className: `text-base leading-normal tracking-normal text-codex-description`,
+        children: (0, U.jsx)(i, {
+          id: `codexWalletOnboardingAnnouncementModal.body`,
+          defaultMessage: `Add payment methods that can be securely used by ChatGPT to carry out tasks`,
+          description: `Body copy explaining what ChatGPT Wallet is for`,
+        }),
+      })),
+      (t[0] = p))
+    : (p = t[0]);
+  let m;
+  t[1] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((m = (0, U.jsx)(i, {
+        id: `codexWalletOnboardingAnnouncementModal.dismissLabel`,
+        defaultMessage: `Not right now`,
+        description: `Secondary action to dismiss ChatGPT Wallet onboarding`,
+      })),
+      (t[1] = m))
+    : (m = t[1]);
+  let h;
+  t[2] !== u || t[3] !== d
+    ? ((h = (0, U.jsx)(ie, { animationMode: u, animationSpeed: d })),
+      (t[2] = u),
+      (t[3] = d),
+      (t[4] = h))
+    : (h = t[4]);
+  let g, _;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((g = (0, U.jsx)(i, {
+        id: `codexWalletOnboardingAnnouncementModal.primaryActionLabel`,
+        defaultMessage: `Set up ChatGPT Wallet`,
+        description: `Primary action to begin setting up ChatGPT Wallet`,
+      })),
+      (_ = (0, U.jsx)(i, {
+        id: `codexWalletOnboardingAnnouncementModal.title`,
+        defaultMessage: `Introducing ChatGPT Wallet`,
+        description: `Title for the ChatGPT Wallet onboarding announcement`,
+      })),
+      (t[5] = g),
+      (t[6] = _))
+    : ((g = t[5]), (_ = t[6]));
+  let v;
+  return (
+    t[7] !== a || t[8] !== o || t[9] !== f || t[10] !== c || t[11] !== h
+      ? ((v = (0, U.jsx)(l, {
+          actionLayout: `stacked`,
+          body: p,
+          closeButtonClassName: `dark:text-default`,
+          closeButtonTone: `dark`,
+          dismissLabel: m,
+          footer: o,
+          isPrimaryActionLoading: f,
+          media: h,
+          mediaClassName: `h-[240px]`,
+          onDismiss: a,
+          onPrimaryAction: c,
+          primaryActionLabel: g,
+          title: _,
+        })),
+        (t[7] = a),
+        (t[8] = o),
+        (t[9] = f),
+        (t[10] = c),
+        (t[11] = h),
+        (t[12] = v))
+      : (v = t[12]),
+    v
+  );
+}
+function ie(e) {
+  let t = (0, V.c)(9),
+    { animationMode: n, animationSpeed: r } = e,
+    i = c() || n === `tucked`,
+    a = (0, H.useRef)(null),
+    o,
+    s;
+  (t[0] !== n || t[1] !== r || t[2] !== i
+    ? ((o = () => {
+        let e = a.current;
+        if (e == null) return;
+        let t = Array.from(e.querySelectorAll(`[data-wallet-card]`)),
+          o = Array.from(e.querySelectorAll(`[data-wallet-pocket]`));
+        if ((e.classList.remove(P.isAnimating), i)) {
+          B(t, o, `tucked`);
+          return;
+        }
+        if ((B(t, o, `fanned`), n === `fanned`)) return;
+        let s,
+          c = window.setTimeout(() => {
+            s = ne(e, t, o, r);
+          }, G);
+        return () => {
+          (window.clearTimeout(c), s?.());
+        };
       }),
-      jsx.jsx("div", {
-        className: classNames(styles.pocket, layer.pocketClassName),
-        "data-wallet-pocket": true,
-        style: pocketStyle(layer, initialState),
-      }),
-    ],
-  });
+      (s = [n, r, i]),
+      (t[0] = n),
+      (t[1] = r),
+      (t[2] = i),
+      (t[3] = o),
+      (t[4] = s))
+    : ((o = t[3]), (s = t[4])),
+    (0, H.useEffect)(o, s));
+  let l;
+  t[5] === i
+    ? (l = t[6])
+    : ((l = $.map((e) =>
+        (0, U.jsx)(ae, { initialState: i ? `tucked` : `fanned`, layer: e }, e.id),
+      )),
+      (t[5] = i),
+      (t[6] = l));
+  let u;
+  return (
+    t[7] === l
+      ? (u = t[8])
+      : ((u = (0, U.jsx)(`div`, {
+          ref: a,
+          "aria-hidden": !0,
+          className: P.scene,
+          children: (0, U.jsx)(`div`, { className: P.cardScene, children: l }),
+        })),
+        (t[7] = l),
+        (t[8] = u)),
+    u
+  );
 }
-
-function initializeWalletOnboardingAnnouncementModal(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeRuntimeLazy?.();
-  initializeClassNames?.();
-  React = typeof reactRuntime === "function" ? reactRuntime() : reactRuntime;
-  initializeSharedComponents?.();
-  initializeAnnouncementModal?.();
-  initializeReducedMotion?.();
-  initializeWalletMark?.();
-  const resolvedJsxRuntime = jsxRuntime as unknown as
-    | import("@rchunk/app-shared").JsxRuntime
-    | (() => import("@rchunk/app-shared").JsxRuntime);
-  jsx =
-    typeof resolvedJsxRuntime === "function"
-      ? resolvedJsxRuntime()
-      : resolvedJsxRuntime;
-  layers = [
-    {
-      id: "cyan",
-      image: assetUrl("card-cyan-56def56cf458.png"),
-      cardClassName: styles.cardTop,
-      pocketClassName: styles.pocketTop,
-      openCardX: -10,
-      openCardRotation: -15,
-      cardTravelDistance: 22,
-      pocketTravelDistance: 80,
-    },
-    {
-      id: "purple",
-      image: assetUrl("card-purple-9662514d5440.png"),
-      cardClassName: styles.cardMiddle,
-      pocketClassName: styles.pocketMiddle,
-      openCardX: 0,
-      openCardRotation: 0,
-      cardTravelDistance: 30,
-      pocketTravelDistance: 72,
-    },
-    {
-      id: "green",
-      image: assetUrl("card-green-e3f7fd3abfac.png"),
-      cardClassName: styles.cardBottom,
-      pocketClassName: styles.pocketBottom,
-      openCardX: -10,
-      openCardRotation: 15,
-      cardTravelDistance: 38,
-      pocketTravelDistance: 64,
-    },
-  ];
+function ae(e) {
+  let t = (0, V.c)(25),
+    { initialState: n, layer: r } = e,
+    i;
+  t[0] === r.cardClassName
+    ? (i = t[1])
+    : ((i = s(P.card, r.cardClassName)), (t[0] = r.cardClassName), (t[1] = i));
+  let a;
+  t[2] !== n || t[3] !== r ? ((a = z(r, n)), (t[2] = n), (t[3] = r), (t[4] = a)) : (a = t[4]);
+  let o;
+  t[5] === a ? (o = t[6]) : ((o = { transform: a }), (t[5] = a), (t[6] = o));
+  let c;
+  t[7] === r.image
+    ? (c = t[8])
+    : ((c = (0, U.jsx)(`img`, { alt: ``, className: P.cardTexture, draggable: !1, src: r.image })),
+      (t[7] = r.image),
+      (t[8] = c));
+  let l;
+  t[9] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((l = (0, U.jsx)(u, { className: s(P.cardMark, `text-white`) })), (t[9] = l))
+    : (l = t[9]);
+  let d;
+  t[10] !== i || t[11] !== o || t[12] !== c
+    ? ((d = (0, U.jsxs)(`div`, {
+        className: i,
+        "data-wallet-card": !0,
+        style: o,
+        children: [c, l],
+      })),
+      (t[10] = i),
+      (t[11] = o),
+      (t[12] = c),
+      (t[13] = d))
+    : (d = t[13]);
+  let f;
+  t[14] === r.pocketClassName
+    ? (f = t[15])
+    : ((f = s(P.pocket, r.pocketClassName)), (t[14] = r.pocketClassName), (t[15] = f));
+  let p;
+  t[16] !== n || t[17] !== r
+    ? ((p = ee(r, n)), (t[16] = n), (t[17] = r), (t[18] = p))
+    : (p = t[18]);
+  let m;
+  t[19] !== f || t[20] !== p
+    ? ((m = (0, U.jsx)(`div`, { className: f, "data-wallet-pocket": !0, style: p })),
+      (t[19] = f),
+      (t[20] = p),
+      (t[21] = m))
+    : (m = t[21]);
+  let h;
+  return (
+    t[22] !== d || t[23] !== m
+      ? ((h = (0, U.jsxs)(`div`, { className: P.layer, children: [d, m] })),
+        (t[22] = d),
+        (t[23] = m),
+        (t[24] = h))
+      : (h = t[24]),
+    h
+  );
 }
-
-initializeWalletOnboardingAnnouncementModal();
-
-export { WalletOnboardingAnnouncementModal };
+var V, H, U, W, G, K, q, J, Y, X, Z, Q, $;
+function oe() {
+  return (oe = e(() => {
+    ((V = t()),
+      o(),
+      (H = a()),
+      r(),
+      h(),
+      _(),
+      y(),
+      p(),
+      d(),
+      f(),
+      F(),
+      (U = n()),
+      (W = { stiffness: 123, damping: 18, mass: 1, velocity: 10.24 }),
+      (G = 2e3),
+      (K = 30),
+      (q = 0.25),
+      (J = 0.05),
+      (Y = -15),
+      (X = 1.1),
+      (Z = 50),
+      (Q = 150),
+      ($ = [
+        {
+          id: `cyan`,
+          image: m,
+          cardClassName: P.cardTop,
+          pocketClassName: P.pocketTop,
+          openCardX: -10,
+          openCardRotation: -15,
+          cardTravelDistance: 22,
+          pocketTravelDistance: 80,
+        },
+        {
+          id: `purple`,
+          image: v,
+          cardClassName: P.cardMiddle,
+          pocketClassName: P.pocketMiddle,
+          openCardX: 0,
+          openCardRotation: 0,
+          cardTravelDistance: 30,
+          pocketTravelDistance: 72,
+        },
+        {
+          id: `green`,
+          image: g,
+          cardClassName: P.cardBottom,
+          pocketClassName: P.pocketBottom,
+          openCardX: -10,
+          openCardRotation: 15,
+          cardTravelDistance: 38,
+          pocketTravelDistance: 64,
+        },
+      ]));
+  }))();
+}
+oe();
+export { re as WalletOnboardingAnnouncementModal };

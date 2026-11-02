@@ -1,40 +1,30 @@
-// Peptide-bond learning model: normalize amino-acid examples and condensation stages.
-import "@rchunk/rolldown-runtime";
-
-type AminoAcidExample = "generic R1 and R2" | "glycine and alanine" | "serine and valine";
-interface PeptideValues { aminoAcidExample?: string | null; linkageStage?: number | null }
-
-const aminoAcidExamples: readonly AminoAcidExample[] = [
-  "generic R1 and R2",
-  "glycine and alanine",
-  "serine and valine",
-];
-
-const isAminoAcidExample = (value: string | null | undefined): value is AminoAcidExample =>
-  aminoAcidExamples.some((example) => example === value);
-
-function normalizePeptideValues(values: PeptideValues) {
-  const aminoAcidExample = isAminoAcidExample(values.aminoAcidExample)
-    ? values.aminoAcidExample
-    : "generic R1 and R2";
-  const linkageStage = Number.isFinite(values.linkageStage)
-    ? Math.min(2, Math.max(0, Math.round(values.linkageStage as number)))
-    : 0;
-  const peptideBonds = linkageStage;
-  return {
-    aminoAcidExample,
-    linkageStage,
-    residueCount: linkageStage === 2 ? 3 : 2,
-    peptideBonds,
-    waterMolecules: peptideBonds,
-    sideChains: {
-      "generic R1 and R2": ["R₁", "R₂", "R₁"],
-      "glycine and alanine": ["H", "CH₃", "H"],
-      "serine and valine": ["CH₂OH", "CH(CH₃)₂", "CH₂OH"],
-    }[aminoAcidExample],
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r;
+function i() {
+  return (i = e(() => {
+    ((t = [`generic R1 and R2`, `glycine and alanine`, `serine and valine`]),
+      (n = (e) => t.some((t) => t === e)),
+      (r = (e) => {
+        let t = n(e.aminoAcidExample) ? e.aminoAcidExample : `generic R1 and R2`,
+          r = Number.isFinite(e.linkageStage)
+            ? Math.min(2, Math.max(0, Math.round(e.linkageStage)))
+            : 0,
+          i = r === 2 ? 3 : 2,
+          a = r;
+        return {
+          aminoAcidExample: t,
+          linkageStage: r,
+          residueCount: i,
+          peptideBonds: a,
+          waterMolecules: a,
+          sideChains: {
+            "generic R1 and R2": [`R₁`, `R₂`, `R₁`],
+            "glycine and alanine": [`H`, `CH₃`, `H`],
+            "serine and valine": [`CH₂OH`, `CH(CH₃)₂`, `CH₂OH`],
+          }[t],
+        };
+      }));
+  }))();
 }
-
-function initializePeptideBondFormationModel(): void {}
-
-export { normalizePeptideValues as n, initializePeptideBondFormationModel as r, aminoAcidExamples as t };
+export { r as n, i as r, t };

@@ -1,488 +1,372 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
-  BI as normalizeArtifactPath,
-  FX as initializeSignalRuntime,
-  HI as joinPath,
-  OK as normalizeUrl,
-  PK as isHttpUrl,
-  QI as initializeQueryRuntime,
-  RI as initializePathUtilities,
-  ZI as appScope,
-  hq as isWebMcpServer,
-  iW as normalizeFilePath,
-  l3 as initializeDeepEqual,
-  rZ as createScopedSignalFamily,
-  wL as initializeUtilities,
+  BI as n,
+  FX as r,
+  HI as i,
+  II as a,
+  OK as o,
+  PK as s,
+  QI as c,
+  RI as l,
+  ZI as u,
+  hq as d,
+  iW as f,
+  l3 as p,
+  rZ as m,
+  wL as h,
 } from "@rchunk/app-shared";
-import { getPathBasename } from "../app-shared/runtime/get-path-basename";
 import {
-  A9t as isProjectlessOutputResource,
-  D9t as isWorkspaceResource,
-  E9t as initializeArtifactParser,
-  Fut as initializeTurnArtifacts,
-  Grn as stripAssistantMetadata,
-  H9t as isGeneratedImageResource,
-  HEt as externalSourceProvidersQuery,
-  HZt as initializeConversationScope,
-  Hnn as initializeArtifactExtraction,
-  Knn as initializeArtifactKeys,
-  Krn as initializeArtifactTypes,
-  MEt as externalSourceProviderQuery,
-  Put as collectTurnArtifacts,
-  T9t as parseArtifacts,
-  V9t as initializeGeneratedImages,
-  arn as initializeConversationHelpers,
-  bQt as projectlessOutputDirectory,
-  ein as initializeArtifactUrls,
-  fnn as initializeConversationProjection,
-  i$t as conversationMode,
-  irn as getTurnArtifactPaths,
-  k9t as initializeArtifactMarkdown,
-  lQt as latestConversationTurn,
-  mnn as projectConversationTurn,
-  tin as isHeartbeatAutomationTurn,
-  yhn as getArtifactScanContent,
+  A9t as ee,
+  D9t as te,
+  E9t as ne,
+  Fut as re,
+  Grn as ie,
+  H9t as ae,
+  HEt as g,
+  HZt as oe,
+  Hnn as se,
+  Knn as ce,
+  Krn as le,
+  MEt as _,
+  Put as v,
+  T9t as y,
+  V9t as b,
+  arn as x,
+  bQt as S,
+  ein as ue,
+  fnn as de,
+  i$t as fe,
+  irn as pe,
+  k9t as me,
+  lQt as C,
+  mnn as he,
+  tin as ge,
+  w$t as w,
+  yhn as _e,
 } from "@rchunk/app-initial";
-import { flattenConversationItems } from "../app-initial/runtime/flatten-conversation-items";
+import { gf as ve, hf as T } from "@rchunk/app-primary";
 import {
-  gf as initializeAppgenArtifactLinks,
-  hf as extractAppgenLinks,
-} from "@rchunk/app-primary";
-import {
-  i as isWrittenExternalResource,
-  n as collectExternalResources,
-  r as initializeLocalConversationExternalResources,
-  t as getExternalResourceKey,
-  type ExternalResource,
+  i as E,
+  n as D,
+  r as O,
+  t as k,
 } from "@rchunk/local-conversation-external-resources";
-import {
-  n as initializeLocalConversationSourcesSignals,
-  r as priorConversationTurns,
-} from "@rchunk/local-conversation-sources-signals";
-
-export type ConversationArtifact =
-  | { path: string; producedAtMs?: number; type: "file" }
-  | {
-      imageGenerationItemId: string;
-      path: string;
-      producedAtMs?: number;
-      type: "generated-image";
-    }
-  | {
-      producedAtMs?: number;
-      resource: ExternalResource;
-      type: "external-resource";
-    }
-  | {
-      producedAtMs?: number;
-      type: "google-drive";
-      url: string;
-      [key: string]: unknown;
-    }
-  | {
-      producedAtMs?: number;
-      projectId: string;
-      type: "appgen-app";
-      url?: string;
-      [key: string]: unknown;
-    }
-  | { producedAtMs?: number; target: string; type: "website" };
-
-const once = onceExport as (initializer: () => void) => () => void;
-
-interface ConversationTurn {
-  items: Array<Record<string, unknown>>;
-  params: {
-    collaborationMode?: unknown;
-    cwd?: string | null;
-    input: Array<Record<string, unknown>>;
-  };
-  status: string;
-  turnId?: string;
-  turnStartedAtMs?: number;
+import { n as A, r as j } from "@rchunk/local-conversation-sources-signals";
+function M(e, t = {}) {
+  return F(N(e, t));
 }
-
-interface CollectArtifactOptions {
-  apps?: unknown[];
-  includeGeneratedImages?: boolean;
-  includePages?: boolean;
-  projectlessOutputDirectory?: string | null;
-}
-
-const GENERATED_IMAGE_FILENAME =
-  /^(?:ig_[a-f0-9]{32,}|exec-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12})\.(?:avif|gif|jpeg|jpg|png|webp)$/iu;
-
-function isGeneratedImageFilename(path: string): boolean {
-  return GENERATED_IMAGE_FILENAME.test(getPathBasename(path));
-}
-
-function getArtifactKey(artifact: ConversationArtifact): string {
-  switch (artifact.type) {
-    case "file":
-    case "generated-image":
-      return `path:${normalizeArtifactPath(artifact.path)}`;
-    case "external-resource":
-      return artifact.resource.key;
-    case "google-drive":
-      return (
-        getExternalResourceKey(artifact.url) ?? `google-drive:${artifact.url}`
-      );
-    case "appgen-app":
-      return `appgen-app:${artifact.projectId}`;
-    case "website":
-      return isHttpUrl(artifact.target)
-        ? `url:${normalizeUrl(artifact.target)}`
-        : `path:${normalizeArtifactPath(artifact.target)}`;
-  }
-}
-
-function mergeArtifactGroups(
-  groups: ConversationArtifact[][],
-): ConversationArtifact[] {
-  const artifacts: ConversationArtifact[] = [];
-  const indexByKey = new Map<string, number>();
-  for (const group of groups) {
-    for (const artifact of group) {
-      const key = getArtifactKey(artifact);
-      const existingIndex = indexByKey.get(key);
-      if (existingIndex != null) {
-        const existing = artifacts[existingIndex];
-        if (
-          (existing?.type === "file" && artifact.type === "generated-image") ||
-          (existing?.type === "appgen-app" &&
-            existing.url == null &&
-            artifact.type === "appgen-app" &&
-            artifact.url != null)
-        ) {
-          artifacts[existingIndex] = artifact;
-        }
-        continue;
-      }
-      indexByKey.set(key, artifacts.length);
-      artifacts.push(artifact);
-    }
-  }
-  return artifacts;
-}
-
-function getAssistantArtifactContent(turn: ConversationTurn): unknown {
-  for (let index = turn.items.length - 1; index >= 0; index -= 1) {
-    const item = turn.items[index];
-    if (item?.type !== "agentMessage") continue;
-    const stripped = stripAssistantMetadata(item.text, false) as {
-      content: string;
-      removed: boolean;
-    };
-    if (stripped.removed && stripped.content.length === 0) return null;
-    return (
-      getArtifactScanContent({
-        content: stripped.content,
-        isHeartbeatAutomationTurn: isHeartbeatAutomationTurn(
-          turn as unknown as Record<string, unknown>,
-        ),
-      }) as { artifactScanContent: unknown }
-    ).artifactScanContent;
-  }
-  return null;
-}
-
-function collectTurnLocalArtifacts(
-  turn: ConversationTurn,
-  projectlessDirectory: string | null,
-  includeGeneratedImages: boolean,
-): ConversationArtifact[] {
-  const status = turn.status === "completed" ? "complete" : turn.status;
-  const cwd =
-    turn.params.cwd == null ? null : normalizeFilePath(turn.params.cwd);
-  const artifacts: ConversationArtifact[] = [];
-  const indexByKey = new Map<string, number>();
-  const add = (artifact: ConversationArtifact) => {
-    const key = getArtifactKey(artifact);
-    const existingIndex = indexByKey.get(key);
-    if (existingIndex == null) {
-      indexByKey.set(key, artifacts.length);
-      artifacts.push(artifact);
-      return;
-    }
-    const existing = artifacts[existingIndex];
-    if (
-      (existing?.type === "file" || existing?.type === "generated-image") &&
-      (artifact.type === "website" || artifact.type === "generated-image")
-    ) {
-      artifacts[existingIndex] = artifact;
-    }
-  };
-
-  const imageItems = includeGeneratedImages
-    ? turn.items.slice().reverse()
-    : turn.items;
-  for (const item of imageItems) {
-    if (
-      item.type === "imageGeneration" &&
-      typeof item.src === "string" &&
-      isGeneratedImageResource(item.src) &&
-      !isWorkspaceResource({ cwd, resourcePath: item.src }) &&
-      (includeGeneratedImages ||
-        isProjectlessOutputResource({
-          cwd,
-          projectlessOutputDirectory: projectlessDirectory,
-          resourcePath: item.src,
-        }))
-    ) {
-      const path = cwd == null ? item.src : joinPath(cwd, item.src);
-      add(
-        includeGeneratedImages
-          ? {
-              type: "generated-image",
-              imageGenerationItemId: String(item.id),
-              path,
-            }
-          : { type: "file", path },
-      );
-    }
-  }
-  if (status !== "complete") return artifacts;
-
-  const parsed = parseArtifacts({
-    assistantContent: getAssistantArtifactContent(turn),
-    includeAppgenResources: true,
-    projectlessOutputDirectory: projectlessDirectory,
-    turn: {
-      artifacts: getTurnArtifactPaths(turn),
-      collaborationMode: turn.params.collaborationMode ?? null,
-      cwd,
-      items: (
-        projectConversationTurn as unknown as (
-          turn: Record<string, unknown>,
-          requests: unknown,
-          options: Record<string, unknown>,
-        ) => { items: unknown[] }
-      )(turn as unknown as Record<string, unknown>, [], {
-        includeTurnDiff: false,
-      }).items,
-      status,
-    },
-  }) as Array<Record<string, unknown>>;
-  for (const artifact of parsed) {
-    switch (artifact.type) {
-      case "file":
-        add({
-          type: "file",
-          path:
-            cwd == null
-              ? String(artifact.path)
-              : joinPath(cwd, String(artifact.path)),
-        });
-        break;
-      case "google-drive":
-      case "appgen-app":
-        add(artifact as unknown as ConversationArtifact);
-        break;
-      case "website": {
-        const target = String(artifact.target);
-        add({
-          type: "website",
-          target:
-            isHttpUrl(target) || cwd == null ? target : joinPath(cwd, target),
-        });
-        break;
-      }
-    }
-  }
-  const inputItems = [
-    ...turn.params.input,
-    ...turn.items.flatMap((item) =>
-      item.type === "userMessage"
-        ? (item.content as Array<Record<string, unknown>>)
-        : [],
-    ),
-  ];
-  for (const item of inputItems) {
-    if (item.type !== "text") continue;
-    for (const app of extractAppgenLinks(String(item.text)) as Array<
-      Record<string, unknown>
-    >) {
-      artifacts.push({
-        ...app,
-        type: "appgen-app",
-      } as unknown as ConversationArtifact);
-    }
-  }
-  return artifacts;
-}
-
-function collectArtifactGroups(
-  turns: ConversationTurn[],
+function N(
+  e,
   {
-    apps,
-    includeGeneratedImages = false,
-    includePages = false,
-    projectlessOutputDirectory: outputDirectory = null,
-  }: CollectArtifactOptions = {},
-): ConversationArtifact[][] {
-  const canonicalExternalResources =
-    apps == null
-      ? null
-      : new Map(
-          collectExternalResources(turns, apps, includePages)
-            .filter(isWrittenExternalResource)
-            .map((resource) => [resource.key, resource]),
-        );
-  const groups: ConversationArtifact[][] = [];
-  for (let index = turns.length - 1; index >= 0; index -= 1) {
-    const turn = turns[index];
-    const externalArtifacts =
-      apps == null || canonicalExternalResources == null
-        ? []
-        : collectExternalResources([turn], apps, includePages)
-            .filter(isWrittenExternalResource)
-            .map((resource) => ({
-              type: "external-resource" as const,
-              resource:
-                canonicalExternalResources.get(resource.key) ?? resource,
-            }));
-    groups.push(
-      [
-        ...externalArtifacts,
-        ...collectTurnLocalArtifacts(
-          turn,
-          outputDirectory,
-          includeGeneratedImages,
-        ),
-      ].map((artifact) =>
-        turn.turnStartedAtMs == null
-          ? artifact
-          : { ...artifact, producedAtMs: turn.turnStartedAtMs },
+    apps: t,
+    includeGeneratedImages: n = !1,
+    includePages: r = !1,
+    projectlessOutputDirectory: i = null,
+  } = {},
+) {
+  let a =
+      t == null
+        ? null
+        : new Map(
+            D(e, t, r)
+              .filter(E)
+              .map((e) => [e.key, e]),
+          ),
+    o = [];
+  for (let s = e.length - 1; s >= 0; --s) {
+    let c = e[s],
+      l =
+        t == null || a == null
+          ? []
+          : D([c], t, r)
+              .filter(E)
+              .map((e) => ({ type: `external-resource`, resource: a.get(e.key) ?? e }));
+    o.push(
+      [...l, ...be(c, i, n)].map((e) =>
+        c.turnStartedAtMs == null ? e : { ...e, producedAtMs: c.turnStartedAtMs },
       ),
     );
   }
-  return groups;
+  return o;
 }
-
-function collectConversationArtifacts(
-  turns: ConversationTurn[],
-  options: CollectArtifactOptions = {},
-): ConversationArtifact[] {
-  return mergeArtifactGroups(collectArtifactGroups(turns, options));
-}
-
-function filterExistingArtifacts(
-  artifacts: ConversationArtifact[],
-  existingPaths: Iterable<string> | null,
-): ConversationArtifact[] {
-  if (existingPaths == null) return artifacts;
-  const normalizedPaths = new Set(
-    Array.from(existingPaths, normalizeArtifactPath),
-  );
-  return artifacts.filter((artifact) => {
-    switch (artifact.type) {
-      case "file":
-      case "generated-image":
-        return normalizedPaths.has(normalizeArtifactPath(artifact.path));
-      default:
-        return true;
+function P(e, t) {
+  if (t == null) return e;
+  let r = new Set(Array.from(t, n));
+  return e.filter((e) => {
+    switch (e.type) {
+      case `file`:
+      case `generated-image`:
+        return r.has(n(e.path));
+      case `external-resource`:
+      case `google-drive`:
+      case `appgen-app`:
+      case `website`:
+        return !0;
     }
   });
 }
-
-function turnHasNonWebMcpCall(turn: ConversationTurn): boolean {
-  return (
-    flattenConversationItems(turn.items) as Array<Record<string, unknown>>
-  ).some((item) => item.type === "mcpToolCall" && !isWebMcpServer(item.server));
+function F(e) {
+  let t = [],
+    n = new Map();
+  for (let r of e)
+    for (let e of r) {
+      let r = L(e),
+        i = n.get(r);
+      if (i != null) {
+        let n = t[i];
+        ((n?.type === `file` && e.type === `generated-image`) ||
+          (n?.type === `appgen-app` &&
+            n.url == null &&
+            e.type === `appgen-app` &&
+            e.url != null)) &&
+          (t[i] = e);
+        continue;
+      }
+      (n.set(r, t.length), t.push(e));
+    }
+  return t;
 }
-
-let artifactsWithExternalResources: unknown;
-let localArtifacts: unknown;
-
-const initializeLocalConversationArtifactsSignals = once((): void => {
-  initializeSignalRuntime();
-  initializeUtilities();
-  initializeConversationScope();
-  initializeTurnArtifacts();
-  initializeQueryRuntime();
-  initializeArtifactModel();
-  initializeLocalConversationSourcesSignals();
-
-  const allArtifacts = createScopedSignalFamily(
-    appScope,
-    (
-      { conversationId, hostId }: { conversationId: string; hostId: string },
-      { get }: { get(signal: unknown, parameter: unknown): unknown },
-    ) => {
-      const turns =
-        (get(priorConversationTurns, conversationId) as
-          ConversationTurn[] | null) ?? [];
-      const latest = get(
-        latestConversationTurn,
-        conversationId,
-      ) as ConversationTurn | null;
-      const combined = latest == null ? turns : [...turns, latest];
-      const needsProviders = combined.some(turnHasNonWebMcpCall);
-      const apps = needsProviders
-        ? ((get(externalSourceProviderQuery, hostId) as { data?: unknown[] })
-            ?.data ?? [])
-        : undefined;
-      return collectConversationArtifacts(combined, {
-        apps,
-        includeGeneratedImages:
-          get(conversationMode, conversationId) === "projectless",
-        projectlessOutputDirectory: get(
-          projectlessOutputDirectory,
-          conversationId,
-        ) as string | null,
-      });
+function ye(e) {
+  return R.test(a(e));
+}
+function be(e, t, n) {
+  let r = ce(e.status),
+    i = pe(e),
+    a = e.params.cwd == null ? null : f(e.params.cwd),
+    o = I({
+      assistantContent: r === `complete` ? xe(e) : null,
+      cwd: a,
+      includeGeneratedImages: n,
+      projectlessOutputDirectory: t,
+      status: r,
+      turn: e,
+      turnArtifacts: i,
+    }),
+    s = [...e.params.input, ...e.items.flatMap((e) => (e.type === `userMessage` ? e.content : []))];
+  for (let e of s)
+    if (e.type === `text`) for (let t of T(e.text)) o.push({ ...t, type: `appgen-app` });
+  return o;
+}
+function xe(e) {
+  for (let t = e.items.length - 1; t >= 0; --t) {
+    let n = e.items[t];
+    if (n?.type === `agentMessage`) {
+      let t = ie(n.text, !1);
+      return t.removed && t.content.length === 0
+        ? null
+        : _e({ content: t.content, isHeartbeatAutomationTurn: ge(e) }).artifactScanContent;
+    }
+  }
+  return null;
+}
+function I({
+  assistantContent: e,
+  cwd: t,
+  includeGeneratedImages: n,
+  projectlessOutputDirectory: r,
+  status: a,
+  turn: o,
+  turnArtifacts: c,
+}) {
+  let l = [],
+    u = new Map(),
+    d = (e) => {
+      let t = L(e),
+        n = u.get(t);
+      if (n == null) {
+        (u.set(t, l.length), l.push(e));
+        return;
+      }
+      (l[n]?.type === `file` || l[n]?.type === `generated-image`) &&
+        (e.type === `website` || e.type === `generated-image`) &&
+        (l[n] = e);
     },
-    { isEqual: Object.is },
-  );
-  artifactsWithExternalResources = allArtifacts;
-  localArtifacts = createScopedSignalFamily(
-    appScope,
-    (
-      { conversationId }: { conversationId: string },
-      { get }: { get(signal: unknown, parameter: unknown): unknown },
-    ) => {
-      const turns =
-        (get(priorConversationTurns, conversationId) as
-          ConversationTurn[] | null) ?? [];
-      const latest = get(
-        latestConversationTurn,
-        conversationId,
-      ) as ConversationTurn | null;
-      return collectConversationArtifacts(
-        latest == null ? turns : [...turns, latest],
-        {
-          includeGeneratedImages: false,
-          projectlessOutputDirectory: get(
-            projectlessOutputDirectory,
-            conversationId,
-          ) as string | null,
-        },
+    f = n ? o.items.slice().reverse() : o.items;
+  for (let e of f)
+    if (
+      e?.type === `imageGeneration` &&
+      e.src != null &&
+      ae(e.src) &&
+      !te({ cwd: t, resourcePath: e.src }) &&
+      (n || ee({ cwd: t, projectlessOutputDirectory: r, resourcePath: e.src }))
+    ) {
+      let r = t == null ? e.src : i(t, e.src);
+      d(
+        n
+          ? { type: `generated-image`, imageGenerationItemId: e.id, path: r }
+          : { type: `file`, path: r },
       );
+    }
+  if (a !== `complete`) return l;
+  let p = y({
+    assistantContent: e,
+    includeAppgenResources: !0,
+    projectlessOutputDirectory: r,
+    turn: {
+      artifacts: c,
+      collaborationMode: o.params.collaborationMode ?? null,
+      cwd: t,
+      items: he(o, [], { includeTurnDiff: !1 }).items,
+      status: a,
     },
+  });
+  for (let e of p)
+    switch (e.type) {
+      case `page-reference`:
+        break;
+      case `file`:
+        d({ type: `file`, path: t == null ? e.path : i(t, e.path) });
+        break;
+      case `google-drive`:
+      case `appgen-app`:
+        d(e);
+        break;
+      case `website`:
+        d({ type: `website`, target: s(e.target) || t == null ? e.target : i(t, e.target) });
+    }
+  return l;
+}
+function L(e) {
+  switch (e.type) {
+    case `file`:
+    case `generated-image`:
+      return `path:${n(e.path)}`;
+    case `external-resource`:
+      return e.resource.key;
+    case `google-drive`:
+      return k(e.url) ?? `google-drive:${e.url}`;
+    case `appgen-app`:
+      return `appgen-app:${e.projectId}`;
+    case `website`:
+      return s(e.target) ? `url:${o(e.target)}` : `path:${n(e.target)}`;
+  }
+}
+var R;
+function z() {
+  return (z = e(() => {
+    (h(),
+      ve(),
+      ue(),
+      x(),
+      le(),
+      se(),
+      de(),
+      ne(),
+      me(),
+      b(),
+      l(),
+      O(),
+      (R =
+        /^(?:ig_[a-f0-9]{32,}|exec-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12})\.(?:avif|gif|jpeg|jpg|png|webp)$/i));
+  }))();
+}
+function B(e) {
+  return w(e.items).some((e) => (e.type === `mcpToolCall` && !d(e.server)) || !1);
+}
+function Se(e, t) {
+  return e == null || t == null
+    ? e === t
+    : e.turnId === t.turnId &&
+        (0, U.default)(e.params.input, t.params.input) &&
+        (0, U.default)(V(e), V(t));
+}
+function V(e) {
+  return w(e.items).filter(
+    (e) =>
+      e.type === `userMessage` ||
+      e.type === `steeringUserMessage` ||
+      e.type === `webSearch` ||
+      e.type === `mcpToolCall`,
   );
-  void externalSourceProvidersQuery;
-});
-
-const initializeArtifactModel = once((): void => {
-  initializeUtilities();
-  initializeAppgenArtifactLinks();
-  initializeArtifactUrls();
-  initializeConversationHelpers();
-  initializeArtifactTypes();
-  initializeArtifactExtraction();
-  initializeConversationProjection();
-  initializeArtifactParser();
-  initializeArtifactMarkdown();
-  initializeGeneratedImages();
-  initializePathUtilities();
-  initializeLocalConversationExternalResources();
-  void initializeDeepEqual;
-});
-
-export {
-  initializeArtifactModel as a,
-  isGeneratedImageFilename as i,
-  artifactsWithExternalResources as n,
-  initializeLocalConversationArtifactsSignals as r,
-  localArtifacts as t,
-};
+}
+function H({ artifacts: e, get: t, hostId: n }) {
+  let r = e.flatMap((e) => (e.type === `file` || e.type === `generated-image` ? [e.path] : []));
+  if (r.length === 0) return e;
+  let i = t(v, { hostId: n, paths: r });
+  return i.error == null ? P(e, new Set(i.data?.existingPaths ?? [])) : e;
+}
+var U, W, G, K, q, J, Y, X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((U = t(p(), 1)),
+      r(),
+      h(),
+      oe(),
+      re(),
+      g(),
+      c(),
+      z(),
+      A(),
+      (W = m(u, ({ conversationId: e, includeGeneratedImages: t }, { get: n }) => {
+        let r = n(j, e);
+        return r == null
+          ? []
+          : M(r, { includeGeneratedImages: t, projectlessOutputDirectory: n(S, e) });
+      })),
+      (G = m(
+        u,
+        ({ conversationId: e, includeGeneratedImages: t }, { get: n }) => {
+          let r = n(C, e);
+          return r == null
+            ? []
+            : M([r], { includeGeneratedImages: t, projectlessOutputDirectory: n(S, e) });
+        },
+        { isEqual: U.default },
+      )),
+      (K = m(
+        u,
+        ({ conversationId: e, includeGeneratedImages: t }, { get: n }) =>
+          F([
+            n(G, { conversationId: e, includeGeneratedImages: t }),
+            n(W, { conversationId: e, includeGeneratedImages: t }),
+          ]),
+        { isEqual: U.default },
+      )),
+      (q = m(u, (e, { get: t }) => t(j, e)?.some(B) ?? !1)),
+      (J = m(u, (e, { get: t }) => t(C, e), { isEqual: Se })),
+      (Y = m(
+        u,
+        ({ conversationId: e, hostId: t, includeGeneratedImages: n }, { get: r }) => {
+          let i = r(J, e);
+          if (i == null) return { latestExternalArtifacts: [], priorArtifactsByTurn: [] };
+          let a = N([...(r(j, e) ?? []), i], {
+            apps: r(_, t).data ?? [],
+            includePages: !1,
+            includeGeneratedImages: n,
+            projectlessOutputDirectory: r(S, e),
+          });
+          return {
+            latestExternalArtifacts: a[0]?.filter((e) => e.type === `external-resource`) ?? [],
+            priorArtifactsByTurn: a.slice(1),
+          };
+        },
+        { isEqual: U.default },
+      )),
+      (X = m(
+        u,
+        ({ conversationId: e, hostId: t }, { get: n }) => {
+          let r = { conversationId: e, includeGeneratedImages: n(fe, e) === `projectless` },
+            i = n(J, e);
+          if ((i == null || !B(i)) && !n(q, e)) return n(K, r);
+          let { latestExternalArtifacts: a, priorArtifactsByTurn: o } = n(Y, { ...r, hostId: t });
+          return F([[...a, ...n(G, r)], ...o]);
+        },
+        { isEqual: U.default },
+      )),
+      (Z = m(u, ({ conversationId: e, hostId: t }, { get: n }) =>
+        H({
+          artifacts: n(K, { conversationId: e, includeGeneratedImages: !1 }),
+          get: n,
+          hostId: t,
+        }),
+      )),
+      (Q = m(
+        u,
+        ({ conversationId: e, hostId: t }, { get: n }) =>
+          H({ artifacts: n(X, { conversationId: e, hostId: t }), get: n, hostId: t }),
+        { isEqual: U.default },
+      )));
+  }))();
+}
+export { z as a, ye as i, Q as n, $ as r, Z as t };

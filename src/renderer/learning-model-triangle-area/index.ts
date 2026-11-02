@@ -1,87 +1,40 @@
-// Triangle-area controls and formula metadata. Release chunk: type-dc693d0c1945.js.
-import "@rchunk/rolldown-runtime";
-
-interface DimensionControl {
-  label: string;
-  min: number;
-  max: number;
-  step: number;
-  defaultValue: number;
-  thumbnailDefaultValue: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r;
+function i() {
+  return (i = e(() => {
+    ((t = { label: `b`, min: 2, max: 20, step: 0.5, defaultValue: 8, thumbnailDefaultValue: 20 }),
+      (n = { label: `h`, min: 2, max: 16, step: 0.5, defaultValue: 6, thumbnailDefaultValue: 16 }),
+      (r = { properties: { base: t, height: n } }));
+  }))();
 }
-
-let baseControl: DimensionControl;
-let heightControl: DimensionControl;
-let visualizationTemplate: {
-  properties: { base: DimensionControl; height: DimensionControl };
-};
-let specification: {
-  type: "TRIANGLE_AREA";
-  version: 2;
-  thumbnailAssetKey: "triangle-area-v1";
-  canonicalFormula: string;
-  canonicalFormulaAliases: string[];
-  parameters: {
-    base: { kind: "number"; defaultValue: 8; min: 0.01; max: 10000 };
-    height: { kind: "number"; defaultValue: 6; min: 0.01; max: 10000 };
-  };
-};
-let templateInitialized = false;
-let specificationInitialized = false;
-
-function initializeTemplate(): void {
-  if (templateInitialized) return;
-  templateInitialized = true;
-  baseControl = {
-    label: "b",
-    min: 2,
-    max: 20,
-    step: 0.5,
-    defaultValue: 8,
-    thumbnailDefaultValue: 20,
-  };
-  heightControl = {
-    label: "h",
-    min: 2,
-    max: 16,
-    step: 0.5,
-    defaultValue: 6,
-    thumbnailDefaultValue: 16,
-  };
-  visualizationTemplate = {
-    properties: { base: baseControl, height: heightControl },
-  };
+var a, o, s, c, l, u;
+function d() {
+  return (d = e(() => {
+    ((a = `TRIANGLE_AREA`),
+      (o = `triangle-area-v1`),
+      (s = `A = \\frac{1}{2}bh`),
+      (c = [
+        `A = \\frac{1}{2} b h`,
+        `a=bh/2`,
+        `1/2bh=a`,
+        `bh/2=a`,
+        `1/2bh`,
+        `b = \\frac{2A}{h}`,
+        `h = \\frac{2A}{b}`,
+      ]),
+      (l = {
+        base: { kind: `number`, defaultValue: 8, min: 0.01, max: 1e4 },
+        height: { kind: `number`, defaultValue: 6, min: 0.01, max: 1e4 },
+      }),
+      (u = {
+        type: a,
+        version: 2,
+        thumbnailAssetKey: o,
+        canonicalFormula: s,
+        canonicalFormulaAliases: c,
+        parameters: l,
+      }));
+  }))();
 }
-
-function initializeSpecification(): void {
-  if (specificationInitialized) return;
-  specificationInitialized = true;
-  specification = {
-    type: "TRIANGLE_AREA",
-    version: 2,
-    thumbnailAssetKey: "triangle-area-v1",
-    canonicalFormula: "A = \\frac{1}{2}bh",
-    canonicalFormulaAliases: [
-      "A = \\frac{1}{2} b h",
-      "a=bh/2",
-      "1/2bh=a",
-      "bh/2=a",
-      "1/2bh",
-      "b = \\frac{2A}{h}",
-      "h = \\frac{2A}{b}",
-    ],
-    parameters: {
-      base: { kind: "number", defaultValue: 8, min: 0.01, max: 10000 },
-      height: { kind: "number", defaultValue: 6, min: 0.01, max: 10000 },
-    },
-  };
-}
-
-export {
-  visualizationTemplate as a,
-  heightControl as i,
-  specification as n,
-  initializeTemplate as o,
-  baseControl as r,
-  initializeSpecification as t,
-};
+export { r as a, n as i, u as n, i as o, t as r, d as t };

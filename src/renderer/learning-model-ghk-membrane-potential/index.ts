@@ -1,50 +1,21 @@
-// GHK membrane-potential permeability controls. Release chunk: type-b2f3bbb776a0.js.
-import "@rchunk/rolldown-runtime";
-interface Specification {
-  type: "GHK_MEMBRANE_POTENTIAL";
-  version: 1;
-  thumbnailAssetKey: "ghk-membrane-potential-v1";
-  canonicalFormula: string;
-  parameters: {
-    sodiumToPotassiumPermeabilityRatio: {
-      kind: "number";
-      defaultValue: 0.04;
-      min: 0;
-      max: 1;
-    };
-    chlorideToPotassiumPermeabilityRatio: {
-      kind: "number";
-      defaultValue: 0.45;
-      min: 0;
-      max: 1;
-    };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `GHK_MEMBRANE_POTENTIAL`),
+      (n = `ghk-membrane-potential-v1`),
+      (r = `P_{\\mathrm{ion}}\\uparrow \\Rightarrow V_m \\to E_{\\mathrm{ion}}`),
+      (i = {
+        sodiumToPotassiumPermeabilityRatio: { kind: `number`, defaultValue: 0.04, min: 0, max: 1 },
+        chlorideToPotassiumPermeabilityRatio: {
+          kind: `number`,
+          defaultValue: 0.45,
+          min: 0,
+          max: 1,
+        },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-let specification: Specification;
-let initialized = false;
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  specification = {
-    type: "GHK_MEMBRANE_POTENTIAL",
-    version: 1,
-    thumbnailAssetKey: "ghk-membrane-potential-v1",
-    canonicalFormula:
-      "P_{\\mathrm{ion}}\\uparrow \\Rightarrow V_m \\to E_{\\mathrm{ion}}",
-    parameters: {
-      sodiumToPotassiumPermeabilityRatio: {
-        kind: "number",
-        defaultValue: 0.04,
-        min: 0,
-        max: 1,
-      },
-      chlorideToPotassiumPermeabilityRatio: {
-        kind: "number",
-        defaultValue: 0.45,
-        min: 0,
-        max: 1,
-      },
-    },
-  };
-}
-export { specification as n, initialize as t };
+export { a as n, o as t };

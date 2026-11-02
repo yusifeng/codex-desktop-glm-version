@@ -1,79 +1,30 @@
-// browser-profile-import-availability —— 浏览器资料导入功能的服务端资格判断。
-// 原版：app/webview/assets/availability-7faf4f21a73f.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, QI as n, ZI as r, sZ as i } from "@rchunk/app-shared";
 import {
-  FX as initializeSignals,
-  QI as initializeQueryBridge,
-  ZI as AppScope,
-  sZ as createDerivedSignal,
-  type DerivedScopedSignalContext,
-  type ScopedDerivedSignal,
-} from "@rchunk/app-shared";
-import {
-  $sn as initializeAuthState,
-  Oln as initializeBrowserProfileImportService,
-  Sln as authStateSignal,
-  Ysn as browserProfileRequirementsQuery,
-  dgn as localHostId,
-  fgn as initializeBrowserProfileRequirements,
+  $sn as a,
+  Oln as o,
+  Sln as s,
+  Ysn as c,
+  dgn as l,
+  fgn as u,
 } from "@rchunk/app-initial";
-
-void runtimeChunk;
-
-interface AuthState {
-  authLoading: boolean;
-  authMethod: unknown;
+var d;
+function f() {
+  return (f = e(() => {
+    (t(),
+      o(),
+      a(),
+      n(),
+      u(),
+      (d = i(r, ({ get: e }) => {
+        let { authLoading: t, authMethod: n } = e(s);
+        if (t) return !1;
+        let { data: r, isError: i } = e(c, { authMethod: n, hostId: l });
+        return (
+          !i && r != null && r.requirements?.inAppBrowser?.allowExternalBrowserSettingsImport !== !1
+        );
+      })));
+  }))();
 }
-
-interface BrowserProfileRequirementsResult {
-  data?: {
-    requirements?: {
-      inAppBrowser?: {
-        allowExternalBrowserSettingsImport?: boolean;
-      };
-    };
-  };
-  isError: boolean;
-}
-
-let browserProfileImportAvailableSignal: ScopedDerivedSignal<
-  Record<string, unknown>,
-  boolean
->;
-let initialized = false;
-
-function initializeBrowserProfileImportAvailability(): void {
-  if (initialized) return;
-
-  initializeSignals();
-  initializeBrowserProfileImportService();
-  initializeAuthState();
-  initializeQueryBridge();
-  initializeBrowserProfileRequirements();
-
-  browserProfileImportAvailableSignal = createDerivedSignal(
-    AppScope,
-    ({ get }: DerivedScopedSignalContext<Record<string, unknown>>) => {
-      const { authLoading, authMethod } = get<AuthState>(authStateSignal);
-      if (authLoading) return false;
-
-      const { data, isError } = get<BrowserProfileRequirementsResult>(
-        browserProfileRequirementsQuery,
-        { authMethod, hostId: localHostId },
-      );
-      return (
-        !isError &&
-        data != null &&
-        data.requirements?.inAppBrowser?.allowExternalBrowserSettingsImport !==
-          false
-      );
-    },
-  );
-  initialized = true;
-}
-
-export {
-  browserProfileImportAvailableSignal as n,
-  initializeBrowserProfileImportAvailability as t,
-};
+export { d as n, f as t };

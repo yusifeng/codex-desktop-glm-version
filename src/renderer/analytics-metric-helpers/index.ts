@@ -1,701 +1,691 @@
-// Analytics queue, middleware, persistence, and remote-metric helpers. Release chunk: metric-helpers-107c5da7f8a5.js.
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as middlewareChunk from "@rchunk/analytics-middleware";
-import * as loadScriptChunk from "@rchunk/load-script";
-
-interface Identified {
-  id: string;
-}
-interface AnalyticsStats {
-  gauge(metric: string, value: number, tags: string[]): void;
-  increment(metric: string, value?: number, tags?: string[]): void;
-}
-interface AnalyticsContextLike {
-  event: { type: string };
-  stats: AnalyticsStats;
-  cancel(reason: unknown): void;
-  log(level: string, message: string, detail?: Record<string, unknown>): void;
-}
-interface Plugin extends Record<string, unknown> {
-  name: string;
-}
-interface MiddlewareFailure {
-  type: string;
-}
-interface MiddlewareRuntime {
-  c: new (
-    event: unknown,
-    id?: string,
-    stats?: AnalyticsStats,
-  ) => AnalyticsContextLike;
-  d(): void;
-  l(): void;
-  s: new (...arguments_: unknown[]) => MiddlewareFailure;
-  u: new () => AnalyticsStats;
-}
-interface SharedRuntime {
-  p4(): void;
-}
-interface LoadScriptRuntime {
-  p(): boolean;
-}
-interface FetchHeadersLike {
-  entries(): string[][];
-  get(name: string): string | undefined;
-  has(name: string): boolean;
-  keys(): string[];
-}
-interface FetchResponseLike {
-  blob(): Promise<Blob>;
-  clone(): FetchResponseLike;
-  headers: FetchHeadersLike;
-  json(): Promise<unknown>;
-  ok: boolean;
-  status: number;
-  statusText: string;
-  text(): Promise<string>;
-  url: string;
-}
-interface FetchOptions {
-  body?: Document | XMLHttpRequestBodyInit | null;
-  credentials?: string;
-  headers?: Record<string, string>;
-  method?: string;
-}
-interface RemoteMetric {
-  library: string;
-  library_version: string;
-  metric: string;
-  tags: Record<string, string>;
-  type: "Counter";
-  value: number;
-}
-interface RemoteMetricOptions {
-  flushTimer?: number;
-  host?: string;
-  maxQueueSize?: number;
-  protocol?: string;
-  sampleRate?: number;
-}
-interface IntegrationSettings {
-  integrations: Record<string, Record<string, unknown>>;
-}
-
-const shared = appSharedChunk as unknown as SharedRuntime;
-const middleware = middlewareChunk as unknown as MiddlewareRuntime;
-const loadScript = loadScriptChunk as unknown as LoadScriptRuntime;
-void runtimeChunk;
-
-let createDeferred:
-  | (<Value>() => {
-      isSettled(): boolean;
-      promise: Promise<Value>;
-      reject(reason?: unknown): void;
-      resolve(value: Value | PromiseLike<Value>): void;
-    })
-  | undefined;
-
-class TypedEventEmitter<Events extends { [Key in keyof Events]: unknown[] }> {
-  private readonly callbacks = new Map<
-    keyof Events,
-    Array<(...arguments_: unknown[]) => void>
-  >();
-  private warned = false;
-  constructor(private readonly maxListeners = 10) {}
-  on<Event extends keyof Events>(
-    event: Event,
-    callback: (...arguments_: Events[Event]) => void,
-  ): this {
-    const listeners = this.callbacks.get(event) ?? [];
-    listeners.push(callback as (...arguments_: unknown[]) => void);
-    this.callbacks.set(event, listeners);
-    if (
-      !this.warned &&
-      this.maxListeners > 0 &&
-      listeners.length > this.maxListeners
-    ) {
-      console.warn(
-        `Event Emitter: Possible memory leak detected; ${String(event)} has exceeded ${this.maxListeners} listeners.`,
-      );
-      this.warned = true;
-    }
-    return this;
-  }
-  once<Event extends keyof Events>(
-    event: Event,
-    callback: (...arguments_: Events[Event]) => void,
-  ): this {
-    const once = (...arguments_: Events[Event]) => {
-      this.off(event, once);
-      callback(...arguments_);
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { c4 as t, f4 as n, l4 as r, p4 as i, s4 as a, u4 as o } from "@rchunk/app-shared";
+import { c as s, d as c, l, s as u, u as ee } from "@rchunk/analytics-middleware";
+import { p as d } from "@rchunk/load-script";
+var f;
+function p() {
+  return (p = e(() => {
+    f = function () {
+      var e,
+        t,
+        n = !1,
+        r = new Promise(function (r, i) {
+          ((e = function () {
+            var e = [...arguments];
+            ((n = !0), r.apply(void 0, e));
+          }),
+            (t = function () {
+              var e = [...arguments];
+              ((n = !0), i.apply(void 0, e));
+            }));
+        });
+      return {
+        resolve: e,
+        reject: t,
+        promise: r,
+        isSettled: function () {
+          return n;
+        },
+      };
     };
-    return this.on(event, once);
-  }
-  off<Event extends keyof Events>(
-    event: Event,
-    callback: (...arguments_: Events[Event]) => void,
-  ): this {
-    const listeners = this.callbacks.get(event) ?? [];
-    this.callbacks.set(
-      event,
-      listeners.filter((listener) => listener !== callback),
-    );
-    return this;
-  }
-  emit<Event extends keyof Events>(
-    event: Event,
-    ...arguments_: Events[Event]
-  ): this {
-    for (const callback of this.callbacks.get(event) ?? [])
-      callback(...arguments_);
-    return this;
-  }
+  }))();
 }
-
-let EventEmitterClass: typeof TypedEventEmitter | undefined;
-const onRemoveFromFuture = "onRemoveFromFuture";
-type RetryQueueEvents = { onRemoveFromFuture: [] };
-
-class RetryQueue<
-  Item extends Identified,
-> extends TypedEventEmitter<RetryQueueEvents> {
-  readonly future: Item[] = [];
-  constructor(
-    private readonly maxAttempts: number,
-    public queue: Item[],
-    public seen: Record<string, number> = {},
-  ) {
-    super();
-  }
-  push(...items: Item[]): boolean[] {
-    const pushed = items.map((item) => {
-      if (this.updateAttempts(item) > this.maxAttempts || this.includes(item))
-        return false;
-      this.queue.push(item);
-      return true;
-    });
-    this.queue.sort(
-      (left, right) => this.getAttempts(left) - this.getAttempts(right),
-    );
-    return pushed;
-  }
-  pushWithBackoff(item: Item, minimumDelay = 0): boolean {
-    if (minimumDelay === 0 && this.getAttempts(item) === 0)
-      return this.push(item)[0] ?? false;
-    const attempt = this.updateAttempts(item);
-    if (attempt > this.maxAttempts || this.includes(item)) return false;
-    const delay = Math.max(minimumDelay, backoff({ attempt: attempt - 1 }));
-    setTimeout(() => {
-      this.queue.push(item);
-      const index = this.future.findIndex(
-        (candidate) => candidate.id === item.id,
+var m;
+function h() {
+  return (h = e(() => {
+    m = (function () {
+      function e(e) {
+        ((this.callbacks = {}), (this.warned = !1), (this.maxListeners = e?.maxListeners ?? 10));
+      }
+      return (
+        (e.prototype.warnIfPossibleMemoryLeak = function (e) {
+          this.warned ||
+            (this.maxListeners &&
+              this.callbacks[e].length > this.maxListeners &&
+              (console.warn(
+                `Event Emitter: Possible memory leak detected; ${String(e)} has exceeded ${this.maxListeners} listeners.`,
+              ),
+              (this.warned = !0)));
+        }),
+        (e.prototype.on = function (e, t) {
+          return (
+            this.callbacks[e]
+              ? (this.callbacks[e].push(t), this.warnIfPossibleMemoryLeak(e))
+              : (this.callbacks[e] = [t]),
+            this
+          );
+        }),
+        (e.prototype.once = function (e, t) {
+          var n = this,
+            r = function () {
+              var i = [...arguments];
+              (n.off(e, r), t.apply(n, i));
+            };
+          return (this.on(e, r), this);
+        }),
+        (e.prototype.off = function (e, t) {
+          var n = (this.callbacks[e] ?? []).filter(function (e) {
+            return e !== t;
+          });
+          return ((this.callbacks[e] = n), this);
+        }),
+        (e.prototype.emit = function (e) {
+          for (var t = this, n = [], r = 1; r < arguments.length; r++) n[r - 1] = arguments[r];
+          return (
+            (this.callbacks[e] ?? []).forEach(function (e) {
+              e.apply(t, n);
+            }),
+            this
+          );
+        }),
+        e
       );
-      if (index >= 0) this.future.splice(index, 1);
-      this.emit(onRemoveFromFuture);
-    }, delay);
-    this.future.push(item);
-    return true;
-  }
-  getAttempts(item: Item): number {
-    return this.seen[item.id] ?? 0;
-  }
-  updateAttempts(item: Item): number {
-    const attempts = this.getAttempts(item) + 1;
-    this.seen[item.id] = attempts;
-    return attempts;
-  }
-  includes(item: Item): boolean {
-    return (
-      this.queue.some(
-        (candidate) => candidate === item || candidate.id === item.id,
-      ) ||
-      this.future.some(
-        (candidate) => candidate === item || candidate.id === item.id,
-      )
-    );
-  }
-  pop(): Item | undefined {
-    return this.queue.shift();
-  }
-  get length(): number {
-    return this.queue.length;
-  }
-  get todo(): number {
-    return this.queue.length + this.future.length;
-  }
+    })();
+  }))();
 }
-
-function backoff(options: {
-  attempt: number;
-  factor?: number;
-  maxTimeout?: number;
-  minTimeout?: number;
-}): number {
-  return Math.min(
-    (Math.random() + 1) *
-      (options.minTimeout ?? 500) *
-      (options.factor ?? 2) ** options.attempt,
-    options.maxTimeout ?? Number.POSITIVE_INFINITY,
-  );
+function te(e) {
+  var t = Math.random() + 1,
+    n = e.minTimeout,
+    r = n === void 0 ? 500 : n,
+    i = e.factor,
+    a = i === void 0 ? 2 : i,
+    o = e.attempt,
+    s = e.maxTimeout,
+    c = s === void 0 ? 1 / 0 : s;
+  return Math.min(t * r * a ** +o, c);
 }
-
-async function invokePlugin(
-  context: AnalyticsContextLike,
-  plugin: Plugin,
-): Promise<unknown> {
-  context.log("debug", "plugin", { plugin: plugin.name });
-  const startedAt = Date.now();
-  const handler = plugin[context.event.type];
-  if (typeof handler !== "function") return context;
-  try {
-    const result = await (handler as (value: AnalyticsContextLike) => unknown)(
-      context,
-    );
-    context.stats.gauge("plugin_time", Date.now() - startedAt, [
-      `plugin:${plugin.name}`,
-    ]);
-    return result;
-  } catch (error) {
-    if (
-      error instanceof middleware.s &&
-      error.type === "middleware_cancellation"
-    )
-      throw error;
-    if (error instanceof middleware.s) {
-      context.log("warn", error.type, { plugin: plugin.name, error });
-      return error;
-    }
-    context.log("error", "plugin Error", { plugin: plugin.name, error });
-    context.stats.increment("plugin_error", 1, [`plugin:${plugin.name}`]);
-    return error;
-  }
-}
-
-async function invokePluginOrCancel(
-  context: AnalyticsContextLike,
-  plugin: Plugin,
-): Promise<void> {
-  const result = await invokePlugin(context, plugin);
-  if (result instanceof middleware.c) return;
-  context.log("debug", "Context canceled");
-  context.stats.increment("context_canceled");
-  context.cancel(result);
-}
-
-function canUseBrowserStorage(): boolean {
-  return loadScript.p();
-}
-function isOnline(): boolean {
-  return !canUseBrowserStorage() || window.navigator.onLine;
-}
-function isOffline(): boolean {
-  return !isOnline();
-}
-
-function xhrFetch(
-  url: string,
-  options: FetchOptions = {},
-): Promise<FetchResponseLike> {
-  return new Promise((resolve, reject) => {
-    const request = new XMLHttpRequest();
-    const headerKeys: string[] = [];
-    const headerEntries: string[][] = [];
-    const headers: Record<string, string> = {};
-    const response = (): FetchResponseLike => ({
-      ok: Math.floor(request.status / 100) === 2,
-      statusText: request.statusText,
-      status: request.status,
-      url: request.responseURL,
-      text: async () => request.responseText,
-      json: async () => JSON.parse(request.responseText) as unknown,
-      blob: async () => new Blob([request.response]),
-      clone: response,
-      headers: {
-        keys: () => headerKeys,
-        entries: () => headerEntries,
-        get: (name) => headers[name.toLowerCase()],
-        has: (name) => name.toLowerCase() in headers,
-      },
-    });
-    request.open(options.method ?? "get", url, true);
-    request.onload = () => {
-      request
-        .getAllResponseHeaders()
-        .replace(
-          /^(.*?):[^\S\n]*([\s\S]*?)$/gm,
-          (_match, rawName: string, value: string) => {
-            const name = rawName.toLowerCase();
-            headerKeys.push(name);
-            headerEntries.push([name, value]);
-            headers[name] = headers[name] ? `${headers[name]},${value}` : value;
-            return "";
-          },
+var g, _;
+function v() {
+  return (v = e(() => {
+    (i(),
+      h(),
+      (g = `onRemoveFromFuture`),
+      (_ = (function (e) {
+        r(t, e);
+        function t(t, n, r) {
+          var i = e.call(this) || this;
+          return ((i.future = []), (i.maxAttempts = t), (i.queue = n), (i.seen = r ?? {}), i);
+        }
+        return (
+          (t.prototype.push = function () {
+            for (var e = this, t = [], n = 0; n < arguments.length; n++) t[n] = arguments[n];
+            var r = t.map(function (t) {
+              return e.updateAttempts(t) > e.maxAttempts || e.includes(t)
+                ? !1
+                : (e.queue.push(t), !0);
+            });
+            return (
+              (this.queue = this.queue.sort(function (t, n) {
+                return e.getAttempts(t) - e.getAttempts(n);
+              })),
+              r
+            );
+          }),
+          (t.prototype.pushWithBackoff = function (e, t) {
+            var n = this;
+            if ((t === void 0 && (t = 0), t == 0 && this.getAttempts(e) === 0))
+              return this.push(e)[0];
+            var r = this.updateAttempts(e);
+            if (r > this.maxAttempts || this.includes(e)) return !1;
+            var i = te({ attempt: r - 1 });
+            return (
+              t > 0 && i < t && (i = t),
+              setTimeout(function () {
+                (n.queue.push(e),
+                  (n.future = n.future.filter(function (t) {
+                    return t.id !== e.id;
+                  })),
+                  n.emit(g));
+              }, i),
+              this.future.push(e),
+              !0
+            );
+          }),
+          (t.prototype.getAttempts = function (e) {
+            return this.seen[e.id] ?? 0;
+          }),
+          (t.prototype.updateAttempts = function (e) {
+            return ((this.seen[e.id] = this.getAttempts(e) + 1), this.getAttempts(e));
+          }),
+          (t.prototype.includes = function (e) {
+            return (
+              this.queue.includes(e) ||
+              this.future.includes(e) ||
+              !!this.queue.find(function (t) {
+                return t.id === e.id;
+              }) ||
+              !!this.future.find(function (t) {
+                return t.id === e.id;
+              })
+            );
+          }),
+          (t.prototype.pop = function () {
+            return this.queue.shift();
+          }),
+          Object.defineProperty(t.prototype, "length", {
+            get: function () {
+              return this.queue.length;
+            },
+            enumerable: !1,
+            configurable: !0,
+          }),
+          Object.defineProperty(t.prototype, "todo", {
+            get: function () {
+              return this.queue.length + this.future.length;
+            },
+            enumerable: !1,
+            configurable: !0,
+          }),
+          t
         );
-      resolve(response());
-    };
-    request.onerror = () => reject(new Error("Network request failed"));
-    request.withCredentials = options.credentials === "include";
-    for (const [name, value] of Object.entries(options.headers ?? {}))
-      request.setRequestHeader(name, value);
-    request.send(options.body ?? null);
+      })(m)));
+  }))();
+}
+function ne(e) {
+  return t(this, void 0, void 0, function () {
+    var t;
+    return o(this, function (n) {
+      switch (n.label) {
+        case 0:
+          return (n.trys.push([0, 2, , 3]), [4, e()]);
+        case 1:
+          return [2, n.sent()];
+        case 2:
+          return ((t = n.sent()), [2, Promise.reject(t)]);
+        case 3:
+          return [2];
+      }
+    });
   });
 }
-
-const getGlobalObject = (): typeof globalThis | null =>
-  typeof globalThis === "object" ? globalThis : null;
-const fetchRequest = (
-  url: string,
-  options?: FetchOptions,
-): Promise<FetchResponseLike> => {
-  const nativeFetch = getGlobalObject()?.fetch;
-  if (nativeFetch == null) return xhrFetch(url, options);
-  return nativeFetch(
-    url,
-    options as RequestInit,
-  ) as unknown as Promise<FetchResponseLike>;
-};
-const analyticsVersion = "1.82.0";
-const distribution = "npm";
-const remoteMetricHost = "api.segment.io/v1";
-const getDistribution = (): string => distribution;
-
-function createRemoteMetric(
-  metric: string,
-  tags: string[],
-  library: string,
-): RemoteMetric {
-  const tagRecord = Object.fromEntries(
-    tags.map((tag) => {
-      const separator = tag.indexOf(":");
-      return separator < 0
-        ? [tag, ""]
-        : [tag.slice(0, separator), tag.slice(separator + 1)];
-    }),
-  );
-  return {
-    type: "Counter",
-    metric,
-    value: 1,
-    tags: tagRecord,
-    library: "analytics.js",
-    library_version:
-      library === "web"
-        ? `next-${analyticsVersion}`
-        : `npm:next-${analyticsVersion}`,
-  };
+function re(e, t) {
+  e.log(`debug`, `plugin`, { plugin: t.name });
+  var n = new Date().getTime(),
+    r = t[e.event.type];
+  return r === void 0
+    ? Promise.resolve(e)
+    : ne(function () {
+        return r.apply(t, [e]);
+      })
+        .then(function (e) {
+          var r = new Date().getTime() - n;
+          return (e.stats.gauge(`plugin_time`, r, [`plugin:${t.name}`]), e);
+        })
+        .catch(function (n) {
+          if (n instanceof u && n.type === `middleware_cancellation`) throw n;
+          return n instanceof u
+            ? (e.log(`warn`, n.type, { plugin: t.name, error: n }), n)
+            : (e.log(`error`, `plugin Error`, { plugin: t.name, error: n }),
+              e.stats.increment(`plugin_error`, 1, [`plugin:${t.name}`]),
+              n);
+        });
 }
-
-class RemoteMetricQueue {
-  private queue: RemoteMetric[] = [];
-  private sampleRate: number;
-  private readonly host: string;
-  private readonly flushTimer: number;
-  private readonly maxQueueSize: number;
-  private readonly protocol: string;
-  constructor(options: RemoteMetricOptions = {}) {
-    this.host = options.host ?? remoteMetricHost;
-    this.sampleRate = options.sampleRate ?? 1;
-    this.flushTimer = options.flushTimer ?? 30_000;
-    this.maxQueueSize = options.maxQueueSize ?? 20;
-    this.protocol = options.protocol ?? "https";
-    if (this.sampleRate > 0) {
-      let flushing = false;
-      const schedule = () => {
-        if (!flushing) {
-          flushing = true;
-          void this.flush()
-            .catch(reportMetricError)
-            .finally(() => {
-              flushing = false;
-            });
+function ie(e, t) {
+  return re(e, t).then(function (t) {
+    if (t instanceof s) return t;
+    (e.log(`debug`, `Context canceled`), e.stats.increment(`context_canceled`), e.cancel(t));
+  });
+}
+function y() {
+  return (y = e(() => {
+    (i(), l());
+  }))();
+}
+function b() {
+  return !d() || window.navigator.onLine;
+}
+function ae() {
+  return !b();
+}
+function x() {
+  return (x = e(() => {}))();
+}
+function oe(e, t) {
+  return (
+    (t ||= {}),
+    new Promise(function (n, r) {
+      var i = new XMLHttpRequest(),
+        a = [],
+        o = [],
+        s = {},
+        c = function () {
+          return {
+            ok: ((i.status / 100) | 0) == 2,
+            statusText: i.statusText,
+            status: i.status,
+            url: i.responseURL,
+            text: function () {
+              return Promise.resolve(i.responseText);
+            },
+            json: function () {
+              return Promise.resolve(i.responseText).then(JSON.parse);
+            },
+            blob: function () {
+              return Promise.resolve(new Blob([i.response]));
+            },
+            clone: c,
+            headers: {
+              keys: function () {
+                return a;
+              },
+              entries: function () {
+                return o;
+              },
+              get: function (e) {
+                return s[e.toLowerCase()];
+              },
+              has: function (e) {
+                return e.toLowerCase() in s;
+              },
+            },
+          };
+        };
+      for (var l in (i.open(t.method || `get`, e, !0),
+      (i.onload = function () {
+        (i.getAllResponseHeaders().replace(/^(.*?):[^\S\n]*([\s\S]*?)$/gm, function (e, t, n) {
+          (a.push((t = t.toLowerCase())), o.push([t, n]), (s[t] = s[t] ? s[t] + `,` + n : n));
+        }),
+          n(c()));
+      }),
+      (i.onerror = r),
+      (i.withCredentials = t.credentials == `include`),
+      t.headers))
+        i.setRequestHeader(l, t.headers[l]);
+      i.send(t.body || null);
+    })
+  );
+}
+var S;
+function C() {
+  return (C = e(() => {
+    S = function () {
+      return typeof globalThis < `u`
+        ? globalThis
+        : typeof self < `u`
+          ? self
+          : typeof window < `u`
+            ? window
+            : typeof global < `u`
+              ? global
+              : null;
+    };
+  }))();
+}
+var w;
+function T() {
+  return (T = e(() => {
+    (C(),
+      (w = function () {
+        var e = [...arguments],
+          t = S();
+        return ((t && t.fetch) || oe).apply(void 0, e);
+      }));
+  }))();
+}
+var E;
+function D() {
+  return (D = e(() => {
+    E = `1.82.0`;
+  }))();
+}
+function O() {
+  return k;
+}
+var k;
+function A() {
+  return (A = e(() => {
+    k = `npm`;
+  }))();
+}
+var j;
+function M() {
+  return (M = e(() => {
+    j = `api.segment.io/v1`;
+  }))();
+}
+function N(e) {
+  console.error(`Error sending segment performance metrics`, e);
+}
+var P, F;
+function I() {
+  return (I = e(() => {
+    (i(),
+      T(),
+      D(),
+      A(),
+      M(),
+      (P = function (e, t, n) {
+        var r = t.reduce(function (e, t) {
+          var n = t.split(`:`),
+            r = n[0];
+          return ((e[r] = n[1]), e);
+        }, {});
+        return {
+          type: `Counter`,
+          metric: e,
+          value: 1,
+          tags: a(a({}, r), {
+            library: `analytics.js`,
+            library_version: n === `web` ? `next-${E}` : `npm:next-${E}`,
+          }),
+        };
+      }),
+      (F = (function () {
+        function e(e) {
+          var t = this;
+          if (
+            ((this.host = e?.host ?? j),
+            (this.sampleRate = e?.sampleRate ?? 1),
+            (this.flushTimer = e?.flushTimer ?? 3e4),
+            (this.maxQueueSize = e?.maxQueueSize ?? 20),
+            (this.protocol = e?.protocol ?? `https`),
+            (this.queue = []),
+            this.sampleRate > 0)
+          ) {
+            var n = !1,
+              r = function () {
+                n || ((n = !0), t.flush().catch(N), (n = !1), setTimeout(r, t.flushTimer));
+              };
+            r();
+          }
         }
-        setTimeout(schedule, this.flushTimer);
-      };
-      schedule();
-    }
-  }
-  increment(metric: string, tags: string[]): void {
-    if (
-      !metric.includes("analytics_js.") ||
-      tags.length === 0 ||
-      Math.random() > this.sampleRate ||
-      this.queue.length >= this.maxQueueSize
-    )
-      return;
-    this.queue.push(createRemoteMetric(metric, tags, distribution));
-    if (metric.includes("error")) void this.flush().catch(reportMetricError);
-  }
-  async flush(): Promise<void> {
-    if (this.queue.length === 0) return;
-    try {
-      await this.send();
-    } catch (error) {
-      reportMetricError(error);
-      this.sampleRate = 0;
-    }
-  }
-  private async send(): Promise<void> {
-    const series = this.queue;
-    this.queue = [];
-    await fetchRequest(`${this.protocol}://${this.host}/m`, {
-      headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ series }),
-      method: "POST",
-    });
-  }
-}
-function reportMetricError(error: unknown): void {
-  console.error("Error sending segment performance metrics", error);
-}
-
-let remoteMetricQueue: RemoteMetricQueue | undefined;
-class RemoteAwareStats extends middleware.u {
-  static initRemoteMetrics(options?: RemoteMetricOptions): void {
-    remoteMetricQueue = new RemoteMetricQueue(options);
-  }
-  override increment(metric: string, value?: number, tags?: string[]): void {
-    super.increment(metric, value, tags);
-    remoteMetricQueue?.increment(metric, tags ?? []);
-  }
-}
-class AnalyticsContext extends middleware.c {
-  constructor(event: unknown, id?: string) {
-    super(event, id, new RemoteAwareStats());
-  }
-  static system(): AnalyticsContext {
-    return new this({ type: "track", event: "system" });
-  }
-}
-
-const memoryStorage: Storage = {
-  get length() {
-    return 0;
-  },
-  clear() {},
-  getItem() {
-    return null;
-  },
-  key() {
-    return null;
-  },
-  removeItem() {},
-  setItem() {},
-};
-let queueStorage: Storage = memoryStorage;
-const now = (): number => Date.now();
-function withStorageLock(
-  name: string,
-  callback: () => void,
-  attempt = 0,
-): void {
-  const lockKey = `persisted-queue:v1:${name}:lock`;
-  const rawLock = queueStorage.getItem(lockKey);
-  const expiresAt = rawLock == null ? null : Number(JSON.parse(rawLock));
-  if (expiresAt == null || now() > expiresAt) {
-    queueStorage.setItem(lockKey, JSON.stringify(now() + 50));
-    try {
-      callback();
-    } finally {
-      queueStorage.removeItem(lockKey);
-    }
-  } else if (attempt < 3)
-    setTimeout(() => withStorageLock(name, callback, attempt + 1), 50);
-  else console.error("Unable to retrieve lock");
-}
-function readQueue<Item extends Identified>(key: string): Item[] {
-  const value = queueStorage.getItem(key);
-  return value == null ? [] : (JSON.parse(value) as Item[]);
-}
-function readSeen(key: string): Record<string, number> {
-  const value = queueStorage.getItem(key);
-  return value == null ? {} : (JSON.parse(value) as Record<string, number>);
-}
-class PersistedQueue<Item extends Identified> extends RetryQueue<Item> {
-  constructor(maxAttempts: number, name: string) {
-    super(maxAttempts, []);
-    const itemsKey = `persisted-queue:v1:${name}:items`;
-    const seenKey = `persisted-queue:v1:${name}:seen`;
-    withStorageLock(name, () => {
-      const saved = readQueue<Item>(itemsKey);
-      const seen = readSeen(seenKey);
-      queueStorage.removeItem(itemsKey);
-      queueStorage.removeItem(seenKey);
-      this.queue = [...saved, ...this.queue];
-      this.seen = { ...seen, ...this.seen };
-    });
-    window.addEventListener("pagehide", () => {
-      if (this.todo === 0) return;
-      withStorageLock(name, () => {
-        const byId = new Map(
-          readQueue<Item>(itemsKey).map((item) => [item.id, item]),
+        return (
+          (e.prototype.increment = function (e, t) {
+            if (
+              e.includes(`analytics_js.`) &&
+              t.length !== 0 &&
+              !(Math.random() > this.sampleRate) &&
+              !(this.queue.length >= this.maxQueueSize)
+            ) {
+              var n = P(e, t, O());
+              (this.queue.push(n), e.includes(`error`) && this.flush().catch(N));
+            }
+          }),
+          (e.prototype.flush = function () {
+            return t(this, void 0, void 0, function () {
+              var e = this;
+              return o(this, function (t) {
+                switch (t.label) {
+                  case 0:
+                    return this.queue.length <= 0
+                      ? [2]
+                      : [
+                          4,
+                          this.send().catch(function (t) {
+                            (N(t), (e.sampleRate = 0));
+                          }),
+                        ];
+                  case 1:
+                    return (t.sent(), [2]);
+                }
+              });
+            });
+          }),
+          (e.prototype.send = function () {
+            return t(this, void 0, void 0, function () {
+              var e, t, n;
+              return o(this, function (r) {
+                return (
+                  (e = { series: this.queue }),
+                  (this.queue = []),
+                  (t = { "Content-Type": `text/plain` }),
+                  (n = `${this.protocol}://${this.host}/m`),
+                  [2, w(n, { headers: t, body: JSON.stringify(e), method: `POST` })]
+                );
+              });
+            });
+          }),
+          e
         );
-        for (const item of [...this.queue, ...this.future])
-          byId.set(item.id, item);
-        queueStorage.setItem(itemsKey, JSON.stringify([...byId.values()]));
-        queueStorage.setItem(
-          seenKey,
-          JSON.stringify({ ...readSeen(seenKey), ...this.seen }),
+      })()));
+  }))();
+}
+var L, R;
+function z() {
+  return (z = e(() => {
+    (i(),
+      c(),
+      I(),
+      (R = (function (e) {
+        r(t, e);
+        function t() {
+          return (e !== null && e.apply(this, arguments)) || this;
+        }
+        return (
+          (t.initRemoteMetrics = function (e) {
+            L = new F(e);
+          }),
+          (t.prototype.increment = function (t, n, r) {
+            (e.prototype.increment.call(this, t, n, r), L?.increment(t, r ?? []));
+          }),
+          t
         );
-      });
-    });
+      })(ee)));
+  }))();
+}
+var B;
+function V() {
+  return (V = e(() => {
+    (i(),
+      l(),
+      z(),
+      (B = (function (e) {
+        r(t, e);
+        function t(t, n) {
+          return e.call(this, t, n, new R()) || this;
+        }
+        return (
+          (t.system = function () {
+            return new this({ type: `track`, event: `system` });
+          }),
+          t
+        );
+      })(s)));
+  }))();
+}
+function H(e) {
+  var t = K.getItem(e);
+  return (t ? JSON.parse(t) : []).map(function (e) {
+    return new B(e.event, e.id);
+  });
+}
+function se(e, t) {
+  var r = H(e),
+    i = n(n([], t, !0), r, !0).reduce(function (e, t) {
+      var n;
+      return a(a({}, e), ((n = {}), (n[t.id] = t), n));
+    }, {});
+  K.setItem(e, JSON.stringify(Object.values(i)));
+}
+function U(e) {
+  var t = K.getItem(e);
+  return t ? JSON.parse(t) : {};
+}
+function ce(e, t) {
+  var n = U(e);
+  K.setItem(e, JSON.stringify(a(a({}, n), t)));
+}
+function W(e) {
+  K.removeItem(e);
+}
+function G(e, t, n) {
+  n === void 0 && (n = 0);
+  var r = 50,
+    i = `persisted-queue:v1:${e}:lock`,
+    a = function (e) {
+      return new Date().getTime() > e;
+    },
+    o = K.getItem(i),
+    s = o ? JSON.parse(o) : null,
+    c = s === null || a(s);
+  if (c) {
+    (K.setItem(i, JSON.stringify(q() + r)), t(), K.removeItem(i));
+    return;
   }
+  !c && n < 3
+    ? setTimeout(function () {
+        G(e, t, n + 1);
+      }, r)
+    : console.error(`Unable to retrieve lock`);
 }
-
-async function repeatWhile<Value>(
-  predicate: (value: Value | undefined) => boolean,
-  operation: () => Promise<Value>,
-): Promise<Value | undefined> {
-  const iterate = async (value?: Value): Promise<Value | undefined> =>
-    predicate(value) ? iterate(await operation()) : value;
-  return iterate();
+var K, q, J;
+function Y() {
+  return (Y = e(() => {
+    (i(),
+      v(),
+      V(),
+      (K = { getItem: function () {}, setItem: function () {}, removeItem: function () {} }));
+    try {
+      K = d() && window.localStorage ? window.localStorage : K;
+    } catch (e) {
+      console.warn(`Unable to access localStorage`, e);
+    }
+    ((q = function () {
+      return new Date().getTime();
+    }),
+      (J = (function (e) {
+        r(t, e);
+        function t(t, r) {
+          var i = e.call(this, t, []) || this,
+            o = `persisted-queue:v1:${r}:items`,
+            s = `persisted-queue:v1:${r}:seen`,
+            c = [],
+            l = {};
+          return (
+            G(r, function () {
+              try {
+                ((c = H(o)),
+                  (l = U(s)),
+                  W(o),
+                  W(s),
+                  (i.queue = n(n([], c, !0), i.queue, !0)),
+                  (i.seen = a(a({}, l), i.seen)));
+              } catch (e) {
+                console.error(e);
+              }
+            }),
+            window.addEventListener(`pagehide`, function () {
+              if (i.todo > 0) {
+                var e = n(n([], i.queue, !0), i.future, !0);
+                try {
+                  G(r, function () {
+                    (se(o, e), ce(s, i.seen));
+                  });
+                } catch (e) {
+                  console.error(e);
+                }
+              }
+            }),
+            i
+          );
+        }
+        return t;
+      })(_)));
+  }))();
 }
-function mergeIntegrationSettings(
-  defaults: IntegrationSettings,
-  settings: { integrations?: Record<string, unknown> },
-): Record<string, Record<string, unknown>> {
-  const overrides = Object.fromEntries(
-    Object.entries(settings.integrations ?? {}).map(([name, value]) => [
-      name,
-      typeof value === "object" && value != null ? value : {},
-    ]),
-  );
-  return Object.fromEntries(
-    Object.entries(defaults.integrations).map(([name, value]) => [
-      name,
-      { ...value, ...overrides[name] },
-    ]),
-  );
+var X;
+function Z() {
+  return (Z = e(() => {
+    (i(),
+      (X = function (e, n) {
+        return t(void 0, void 0, void 0, function () {
+          var r;
+          return o(this, function (i) {
+            return (
+              (r = function (i) {
+                return t(void 0, void 0, void 0, function () {
+                  var t;
+                  return o(this, function (a) {
+                    switch (a.label) {
+                      case 0:
+                        return e(i) ? ((t = r), [4, n()]) : [3, 2];
+                      case 1:
+                        return [2, t.apply(void 0, [a.sent()])];
+                      case 2:
+                        return [2];
+                    }
+                  });
+                });
+              }),
+              [2, r(void 0)]
+            );
+          });
+        });
+      }));
+  }))();
 }
-function recordIntegrationInvocation(
-  stats: AnalyticsStats,
-  detail: {
-    didError?: boolean;
-    integrationName: string;
-    methodName: string;
-    type: string;
-  },
-): void {
-  stats.increment(
-    `analytics_js.integration.invoke${detail.didError ? ".error" : ""}`,
-    1,
-    [
-      `method:${detail.methodName}`,
-      `integration_name:${detail.integrationName}`,
-      `type:${detail.type}`,
-    ],
-  );
+function le(e, t) {
+  var n = Object.entries(t.integrations ?? {}).reduce(function (e, t) {
+    var n,
+      r,
+      i = t[0],
+      o = t[1];
+    return typeof o == `object`
+      ? a(a({}, e), ((n = {}), (n[i] = o), n))
+      : a(a({}, e), ((r = {}), (r[i] = {}), r));
+  }, {});
+  return Object.entries(e.integrations).reduce(function (e, t) {
+    var r,
+      i = t[0],
+      o = t[1];
+    return a(a({}, e), ((r = {}), (r[i] = a(a({}, o), n[i])), r));
+  }, {});
 }
-
-function initializeDeferred(): void {
-  if (createDeferred != null) return;
-  createDeferred = <Value>() => {
-    let settled = false;
-    let resolve!: (value: Value | PromiseLike<Value>) => void;
-    let reject!: (reason?: unknown) => void;
-    const promise = new Promise<Value>((resolvePromise, rejectPromise) => {
-      resolve = (value) => {
-        settled = true;
-        resolvePromise(value);
-      };
-      reject = (reason) => {
-        settled = true;
-        rejectPromise(reason);
-      };
-    });
-    return { resolve, reject, promise, isSettled: () => settled };
-  };
+function Q() {
+  return (Q = e(() => {
+    i();
+  }))();
 }
-function initializeEventEmitter(): void {
-  EventEmitterClass ??= TypedEventEmitter;
+function ue(e, t) {
+  var n = t.methodName,
+    r = t.integrationName,
+    i = t.type,
+    a = t.didError,
+    o = a !== void 0 && a;
+  e.stats.increment(`analytics_js.integration.invoke${o ? `.error` : ``}`, 1, [
+    `method:${n}`,
+    `integration_name:${r}`,
+    `type:${i}`,
+  ]);
 }
-function initializeRetryQueue(): void {
-  shared.p4();
-  initializeEventEmitter();
+function $() {
+  return ($ = e(() => {}))();
 }
-function initializeMiddlewareHelpers(): void {
-  shared.p4();
-  middleware.l();
-}
-function initializeFetch(): void {
-  initializeGlobalObject();
-}
-function initializeGlobalObject(): void {}
-function initializeVersion(): void {}
-function initializeDistribution(): void {}
-function initializeRemoteHost(): void {}
-function initializeRemoteMetrics(): void {
-  shared.p4();
-  initializeFetch();
-  initializeVersion();
-  initializeDistribution();
-  initializeRemoteHost();
-}
-function initializeRemoteStats(): void {
-  shared.p4();
-  middleware.d();
-  initializeRemoteMetrics();
-}
-function initializeAnalyticsContext(): void {
-  shared.p4();
-  middleware.l();
-  initializeRemoteStats();
-}
-function initializePersistedQueue(): void {
-  shared.p4();
-  initializeRetryQueue();
-  initializeAnalyticsContext();
-  try {
-    queueStorage =
-      canUseBrowserStorage() && window.localStorage
-        ? window.localStorage
-        : memoryStorage;
-  } catch (error) {
-    console.warn("Unable to access localStorage", error);
-  }
-}
-function initializeRepeatWhile(): void {
-  shared.p4();
-}
-function initializeIntegrationSettings(): void {
-  shared.p4();
-}
-function initializeNoop(): void {}
-
 export {
-  RetryQueue as A,
-  initializeGlobalObject as C,
-  invokePluginOrCancel as D,
-  invokePlugin as E,
-  initializeDeferred as F,
-  EventEmitterClass as M,
-  initializeEventEmitter as N,
-  initializeMiddlewareHelpers as O,
-  createDeferred as P,
-  initializeFetch as S,
-  isOnline as T,
-  initializeVersion as _,
-  initializeRepeatWhile as a,
-  initializeFetch as b,
-  initializePersistedQueue as c,
-  RemoteAwareStats as d,
-  initializeRemoteStats as f,
-  initializeDistribution as g,
-  getDistribution as h,
-  mergeIntegrationSettings as i,
-  initializeRetryQueue as j,
-  onRemoveFromFuture as k,
-  AnalyticsContext as l,
-  initializeRemoteHost as m,
-  recordIntegrationInvocation as n,
-  repeatWhile as o,
-  remoteMetricHost as p,
-  initializeIntegrationSettings as r,
-  PersistedQueue as s,
-  initializeNoop as t,
-  initializeAnalyticsContext as u,
-  analyticsVersion as v,
-  isOffline as w,
-  getGlobalObject as x,
-  fetchRequest as y,
+  _ as A,
+  x as C,
+  ie as D,
+  re as E,
+  p as F,
+  m as M,
+  h as N,
+  y as O,
+  f as P,
+  C as S,
+  b as T,
+  D as _,
+  Z as a,
+  T as b,
+  Y as c,
+  R as d,
+  z as f,
+  A as g,
+  O as h,
+  le as i,
+  v as j,
+  g as k,
+  B as l,
+  M as m,
+  ue as n,
+  X as o,
+  j as p,
+  Q as r,
+  J as s,
+  $ as t,
+  V as u,
+  E as v,
+  ae as w,
+  S as x,
+  w as y,
 };

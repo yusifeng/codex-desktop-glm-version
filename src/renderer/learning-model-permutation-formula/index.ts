@@ -1,33 +1,15 @@
-// Permutation formula metadata. Release chunk: type-df7c33e35927.js.
-import "@rchunk/rolldown-runtime";
-
-interface PermutationFormulaSpecification {
-  type: "PERMUTATION_FORMULA";
-  version: 1;
-  thumbnailAssetKey: "permutation-formula-v1";
-  parameters: {
-    n: { kind: "integer"; defaultValue: 6; min: 4; max: 8 };
-    r: { kind: "integer"; defaultValue: 3; min: 2; max: 4 };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `PERMUTATION_FORMULA`),
+      (n = `permutation-formula-v1`),
+      (r = {
+        n: { kind: `integer`, defaultValue: 6, min: 4, max: 8 },
+        r: { kind: `integer`, defaultValue: 3, min: 2, max: 4 },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-let permutationFormulaSpecification: PermutationFormulaSpecification;
-let initialized = false;
-function initializePermutationFormulaSpecification(): void {
-  if (initialized) return;
-  initialized = true;
-  permutationFormulaSpecification = {
-    type: "PERMUTATION_FORMULA",
-    version: 1,
-    thumbnailAssetKey: "permutation-formula-v1",
-    parameters: {
-      n: { kind: "integer", defaultValue: 6, min: 4, max: 8 },
-      r: { kind: "integer", defaultValue: 3, min: 2, max: 4 },
-    },
-  };
-}
-
-export {
-  permutationFormulaSpecification as n,
-  initializePermutationFormulaSpecification as t,
-};
+export { i as n, a as t };

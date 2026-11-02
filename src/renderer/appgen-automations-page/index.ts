@@ -1,309 +1,289 @@
-// appgen-automations-page —— Site 详情中的云端自动化管理页面。
-// 原版：app/webview/assets/appgen-automations-page-3aadbf574b7f.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as siteDetailLayoutChunk from "@rchunk/appgen-site-detail-layout";
-import * as automationPanelChunk from "@rchunk/open-automation-side-panel-tab";
-import * as automationsStateChunk from "@rchunk/appgen-automations-state";
-import type {
-  JsxRuntime,
-  MaitaiScope,
-  MessageDescriptor,
-  ReadableSignal,
-  ScopedQueryFamily,
-  ScopedQueryResult,
-  SignalFamily,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $h as n,
+  BX as r,
+  FX as i,
+  HX as a,
+  I3 as o,
+  K2 as s,
+  LX as c,
+  Qc as l,
+  Qh as u,
+  Y2 as d,
+  Yh as f,
+  Zc as p,
+  Zh as m,
+  al as h,
+  lw as g,
+  rl as _,
+  wy as v,
 } from "@rchunk/app-shared";
-import type { AppgenSiteDetailSite } from "@rchunk/appgen-site-detail-layout";
-
-void runtimeChunk;
-
-interface SiteAutomationAttachment {
-  automation_ids?: string[];
-}
-
-interface CloudAutomation {
-  display_emoji?: string | null;
-  id: string;
-  kind: string;
-  title: string;
-}
-
-interface CloudAutomationsResult {
-  isAvailable?: boolean;
-  items: Array<{ automation: CloudAutomation }>;
-}
-
-interface CapabilityResult {
-  isCapable: boolean;
-}
-
-interface AppInitialBindings {
-  $en: MaitaiScope<Record<string, unknown>>;
-  Dtt(): void;
-  Qgn(): void;
-  VT(): string;
-  Xet: SignalFamily<{ name: string }, CapabilityResult>;
-  Ygn: unknown;
-  Zet(): void;
-  aa: { Header: unknown };
-  au: unknown;
-  itt: ReadableSignal<ScopedQueryResult<CloudAutomationsResult>>;
-  itn(): void;
-  l_n(): { projectId?: string | null };
-  n7: unknown;
-  nnt: Record<string, MessageDescriptor>;
-  o_n(): (destination: string) => void;
-  oa(): void;
-  r7(): void;
-  rnt(): void;
-  stt(): void;
-  su(): void;
-  wtt(automation: CloudAutomation): string;
-}
-
-const {
-  $3: initializeRuntimeLazy,
-  $h: initializeResourceButton,
-  BX: useSignalFamilyValue,
-  FX: initializeSignalRuntime,
-  HX: useSignalValue,
-  I3: getJsxRuntime,
-  K2: initializeSharedComponents,
-  LX: useSignalScope,
-  Qc: initializeSettingsGroup,
-  Qh: LoadingSpinner,
-  Y2: FormattedMessage,
-  Yh: Button,
-  Zc: SettingsGroup,
-  Zh: initializeButton,
-  al: initializeSettingsRow,
-  lw: initializeBrowserProfileIcon,
-  rl: SettingsRow,
-  wy: AutomationFallbackIcon,
-} = appSharedChunk;
-const {
-  $en: routeScope,
-  Dtt: initializeAutomationTypes,
-  Qgn: initializeGptResources,
-  VT: scheduledRoute,
-  Xet: capabilityQuery,
-  Ygn: Navigate,
-  Zet: initializeCapabilities,
-  aa: pageComponents,
-  au: PageBody,
-  itt: cloudAutomationsQuery,
-  itn: initializeAutomationRoutes,
-  l_n: useRouteParams,
-  n7: ErrorState,
-  nnt: automationScheduleMessages,
-  o_n: useNavigate,
-  oa: initializePageBody,
-  r7: initializeErrorState,
-  rnt: initializeAutomationQueries,
-  stt: initializeAutomationState,
-  su: initializePageComponents,
-  wtt: getAutomationScheduleKind,
-} = appInitialChunk as unknown as AppInitialBindings;
-const {
-  n: initializeSiteDetailLayout,
-  t: SiteDetailLayout,
-} = siteDetailLayoutChunk;
-const {
-  i: openAutomationSidePanel,
-  t: initializeAutomationSidePanel,
-} = automationPanelChunk;
-const {
-  r: initializeAppgenAutomationsState,
-  t: siteAutomationAttachmentsQuery,
-} = automationsStateChunk;
-
-let jsx: JsxRuntime;
-
-function AppgenAutomationsPage() {
-  const { projectId } = useRouteParams();
-  if (projectId == null) {
-    return jsx.jsx(Navigate, { replace: true, to: "/sites" });
+import {
+  $en as y,
+  Dtt as b,
+  Qgn as x,
+  VT as S,
+  Xet as C,
+  Ygn as w,
+  Zet as T,
+  aa as E,
+  au as D,
+  itn as O,
+  itt as k,
+  l_n as A,
+  n7 as j,
+  nnt as M,
+  o_n as N,
+  oa as P,
+  r7 as F,
+  rnt as I,
+  stt as L,
+  su as R,
+  wtt as z,
+} from "@rchunk/app-initial";
+import { n as B, t as V } from "@rchunk/appgen-site-detail-layout";
+import { i as H, t as U } from "@rchunk/open-automation-side-panel-tab";
+import { r as W, t as G } from "@rchunk/appgen-automations-state";
+function K() {
+  let e = (0, Y.c)(3),
+    { projectId: t } = A();
+  if (t == null) {
+    let t;
+    return (
+      e[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, X.jsx)(w, { replace: !0, to: `/sites` })), (e[0] = t))
+        : (t = e[0]),
+      t
+    );
   }
-
-  return jsx.jsx(SiteDetailLayout, {
-    projectId,
-    selectedTab: "automations",
-    children: renderAutomationsContent,
-  });
-}
-
-function renderAutomationsContent(site: AppgenSiteDetailSite): unknown {
-  return jsx.jsx(AppgenAutomationsContent, { site });
-}
-
-function AppgenAutomationsContent({
-  site,
-}: {
-  site: AppgenSiteDetailSite;
-}): unknown {
-  const scope = useSignalScope(routeScope);
-  const navigate = useNavigate();
-  const { isCapable } = useSignalFamilyValue(capabilityQuery, {
-    name: "automations.cloud",
-  });
-  const {
-    data: attachments,
-    isLoading: attachmentsLoading,
-    isError: attachmentsError,
-    refetch: refetchAttachments,
-  } = useSignalFamilyValue(siteAutomationAttachmentsQuery, [site.id]);
-  const {
-    data: cloudAutomations,
-    isLoading: cloudLoading,
-    isError: cloudError,
-    refetch: refetchCloudAutomations,
-  } = useSignalValue(cloudAutomationsQuery);
-
-  const automationIds = attachments?.[0]?.automation_ids;
-  const matchingAutomations = cloudAutomations?.items.filter(
-    ({ automation }) => automationIds?.includes(automation.id),
+  let n;
+  return (
+    e[1] === t
+      ? (n = e[2])
+      : ((n = (0, X.jsx)(V, { projectId: t, selectedTab: `automations`, children: q })),
+        (e[1] = t),
+        (e[2] = n)),
+    n
   );
-
-  let content;
-  if (attachmentsLoading || cloudLoading) {
-    content = jsx.jsx(LoadingSpinner, {});
-  } else if (
-    attachmentsError ||
-    cloudError ||
-    cloudAutomations?.isAvailable === false
+}
+function q(e) {
+  return (0, X.jsx)(J, { site: e });
+}
+function J(e) {
+  let t = (0, Y.c)(37),
+    { site: n } = e,
+    i = c(y),
+    o = N(),
+    s;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((s = { name: `automations.cloud` }), (t[0] = s))
+    : (s = t[0]);
+  let { isCapable: l } = r(C, s),
+    m;
+  t[1] === n.id ? (m = t[2]) : ((m = [n.id]), (t[1] = n.id), (t[2] = m));
+  let { data: h, isLoading: g, isError: b, refetch: x } = r(G, m),
+    { data: w, isLoading: T, isError: O, refetch: A } = a(k),
+    P = h?.[0]?.automation_ids,
+    F;
+  if (
+    t[3] !== P ||
+    t[4] !== b ||
+    t[5] !== g ||
+    t[6] !== o ||
+    t[7] !== x ||
+    t[8] !== A ||
+    t[9] !== w?.isAvailable ||
+    t[10] !== w?.items ||
+    t[11] !== O ||
+    t[12] !== T
   ) {
-    const retry = () => {
-      Promise.all([refetchAttachments(), refetchCloudAutomations()]);
-    };
-    content = jsx.jsx(ErrorState, {
-      type: "error",
-      onPrimaryCtaClick: retry,
-      primaryCtaText: jsx.jsx(FormattedMessage, {
-        id: "appgenAutomations.retry",
-        defaultMessage: "Try again",
-        description: "Reload the Site schedules after a loading error",
-      }),
-      content: jsx.jsx(FormattedMessage, {
-        id: "appgenAutomations.loadError",
-        defaultMessage: "Couldn’t load schedules. Try again.",
-        description: "Error when the Site's scheduled tasks cannot be loaded",
-      }),
+    let e = w?.items.filter((e) => {
+      let { automation: t } = e;
+      return P?.includes(t.id);
     });
-  } else {
-    const rows =
-      matchingAutomations?.length === 0
-        ? jsx.jsx(SettingsRow, {
-            label: jsx.jsx(FormattedMessage, {
-              id: "appgenAutomations.empty",
-              defaultMessage: "No schedules yet",
-              description:
-                "Empty state for a Site with no associated scheduled tasks",
-            }),
-            control: null,
-          })
-        : matchingAutomations?.map(({ automation }) =>
-            jsx.jsx(
-              SettingsRow,
-              {
-                icon:
-                  automation.display_emoji ||
-                  jsx.jsx(AutomationFallbackIcon, {}),
-                label: automation.title,
-                description: jsx.jsx(FormattedMessage, {
-                  ...automationScheduleMessages[
-                    getAutomationScheduleKind(automation)
-                  ],
+    if (g || T) {
+      let e;
+      (t[14] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, X.jsx)(u, {})), (t[14] = e))
+        : (e = t[14]),
+        (F = e));
+    } else if (b || O || w?.isAvailable === !1) {
+      let e;
+      t[15] !== x || t[16] !== A
+        ? ((e = () => {
+            Promise.all([x(), A()]);
+          }),
+          (t[15] = x),
+          (t[16] = A),
+          (t[17] = e))
+        : (e = t[17]);
+      let n, r;
+      t[18] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((n = (0, X.jsx)(d, {
+            id: `appgenAutomations.retry`,
+            defaultMessage: `Try again`,
+            description: `Reload the Site schedules after a loading error`,
+          })),
+          (r = (0, X.jsx)(d, {
+            id: `appgenAutomations.loadError`,
+            defaultMessage: `Couldn’t load schedules. Try again.`,
+            description: `Error when the Site's scheduled tasks cannot be loaded`,
+          })),
+          (t[18] = n),
+          (t[19] = r))
+        : ((n = t[18]), (r = t[19]));
+      let i;
+      (t[20] === e
+        ? (i = t[21])
+        : ((i = (0, X.jsx)(j, {
+            type: `error`,
+            onPrimaryCtaClick: e,
+            primaryCtaText: n,
+            content: r,
+          })),
+          (t[20] = e),
+          (t[21] = i)),
+        (F = i));
+    } else {
+      let n =
+          e?.length === 0
+            ? (0, X.jsx)(_, {
+                label: (0, X.jsx)(d, {
+                  id: `appgenAutomations.empty`,
+                  defaultMessage: `No schedules yet`,
+                  description: `Empty state for a Site with no associated scheduled tasks`,
                 }),
-                control: jsx.jsx(Button, {
-                  color: "ghost",
-                  size: "toolbar",
-                  onClick: () =>
-                    void navigate(
-                      `${scheduledRoute()}?automationId=${encodeURIComponent(automation.id)}&automationSource=cloud`,
-                    ),
-                  children: jsx.jsx(FormattedMessage, {
-                    id: "appgenAutomations.manage",
-                    defaultMessage: "Open schedule",
-                    description:
-                      "Button to manage this Site's task using the Scheduled page",
-                  }),
-                }),
-              },
-              automation.id,
-            ),
-          );
-    content = jsx.jsx(SettingsGroup, { children: rows });
-  }
-
-  const title = jsx.jsx(FormattedMessage, {
-    id: "appgenSiteDetail.navigation.automations",
-    defaultMessage: "Automations",
-    description: "Tab label for a Site's cloud scheduled tasks",
-  });
-  const subtitle = jsx.jsx(FormattedMessage, {
-    id: "appgenAutomations.description",
-    defaultMessage:
-      "Scheduled work for this Site runs in the cloud. Manage it in Scheduled.",
-    description:
-      "Description of the Site Automations tab and where to edit its tasks",
-  });
-  const createDisabled = !isCapable || site.status !== "active";
-  const createSchedule = () =>
-    openAutomationSidePanel({
-      scope,
-      projectId: site.id,
-      title: site.title,
-      prompt: "",
-    });
-  const header = jsx.jsx(pageComponents.Header, {
-    title,
-    subtitle,
-    actions: jsx.jsx(Button, {
-      color: "outline",
-      size: "toolbar",
-      disabled: createDisabled,
-      onClick: createSchedule,
-      children: jsx.jsx(FormattedMessage, {
-        id: "appgenAutomations.create",
-        defaultMessage: "Create schedule",
-        description:
-          "Button to open the existing cloud task setup for this Site",
-      }),
-    }),
-  });
-
-  return jsx.jsx(PageBody, {
-    children: jsx.jsxs(pageComponents, { children: [header, content] }),
-  });
+                control: null,
+              })
+            : e?.map((e) => {
+                let { automation: t } = e;
+                return (0, X.jsx)(
+                  _,
+                  {
+                    icon: t.display_emoji || (0, X.jsx)(v, {}),
+                    label: t.title,
+                    description: (0, X.jsx)(d, { ...M[z(t)] }),
+                    control: (0, X.jsx)(f, {
+                      color: `ghost`,
+                      size: `toolbar`,
+                      onClick: () =>
+                        void o(
+                          `${S()}?automationId=${encodeURIComponent(t.id)}&automationSource=cloud`,
+                        ),
+                      children: (0, X.jsx)(d, {
+                        id: `appgenAutomations.manage`,
+                        defaultMessage: `Open schedule`,
+                        description: `Button to manage this Site's task using the Scheduled page`,
+                      }),
+                    }),
+                  },
+                  t.id,
+                );
+              }),
+        r;
+      (t[22] === n ? (r = t[23]) : ((r = (0, X.jsx)(p, { children: n })), (t[22] = n), (t[23] = r)),
+        (F = r));
+    }
+    ((t[3] = P),
+      (t[4] = b),
+      (t[5] = g),
+      (t[6] = o),
+      (t[7] = x),
+      (t[8] = A),
+      (t[9] = w?.isAvailable),
+      (t[10] = w?.items),
+      (t[11] = O),
+      (t[12] = T),
+      (t[13] = F));
+  } else F = t[13];
+  let I, L;
+  t[24] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((I = (0, X.jsx)(d, {
+        id: `appgenSiteDetail.navigation.automations`,
+        defaultMessage: `Automations`,
+        description: `Tab label for a Site's cloud scheduled tasks`,
+      })),
+      (L = (0, X.jsx)(d, {
+        id: `appgenAutomations.description`,
+        defaultMessage: `Scheduled work for this Site runs in the cloud. Manage it in Scheduled.`,
+        description: `Description of the Site Automations tab and where to edit its tasks`,
+      })),
+      (t[24] = I),
+      (t[25] = L))
+    : ((I = t[24]), (L = t[25]));
+  let R = !l || n.status !== `active`,
+    B;
+  t[26] !== i || t[27] !== n.id || t[28] !== n.title
+    ? ((B = () => H({ scope: i, projectId: n.id, title: n.title, prompt: `` })),
+      (t[26] = i),
+      (t[27] = n.id),
+      (t[28] = n.title),
+      (t[29] = B))
+    : (B = t[29]);
+  let V;
+  t[30] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((V = (0, X.jsx)(d, {
+        id: `appgenAutomations.create`,
+        defaultMessage: `Create schedule`,
+        description: `Button to open the existing cloud task setup for this Site`,
+      })),
+      (t[30] = V))
+    : (V = t[30]);
+  let U;
+  t[31] !== R || t[32] !== B
+    ? ((U = (0, X.jsx)(E.Header, {
+        title: I,
+        subtitle: L,
+        actions: (0, X.jsx)(f, {
+          color: `outline`,
+          size: `toolbar`,
+          disabled: R,
+          onClick: B,
+          children: V,
+        }),
+      })),
+      (t[31] = R),
+      (t[32] = B),
+      (t[33] = U))
+    : (U = t[33]);
+  let W;
+  return (
+    t[34] !== F || t[35] !== U
+      ? ((W = (0, X.jsx)(D, { children: (0, X.jsxs)(E, { children: [U, F] }) })),
+        (t[34] = F),
+        (t[35] = U),
+        (t[36] = W))
+      : (W = t[36]),
+    W
+  );
 }
-
-function initializeAppgenAutomationsPage(): void {
-  initializeRuntimeLazy();
-  initializeSignalRuntime();
-  initializeSharedComponents();
-  initializeGptResources();
-  initializeCapabilities();
-  initializeAutomationQueries();
-  initializeAutomationTypes();
-  initializeAutomationState();
-  initializeAutomationSidePanel();
-  initializeErrorState();
-  initializeButton();
-  initializeBrowserProfileIcon();
-  initializeResourceButton();
-  initializeAutomationRoutes();
-  initializePageComponents();
-  initializePageBody();
-  initializeSettingsRow();
-  initializeSettingsGroup();
-  initializeAppgenAutomationsState();
-  initializeSiteDetailLayout();
-  jsx = getJsxRuntime();
+var Y, X;
+function Z() {
+  return (Z = e(() => {
+    ((Y = t()),
+      i(),
+      s(),
+      x(),
+      T(),
+      I(),
+      b(),
+      L(),
+      U(),
+      F(),
+      m(),
+      g(),
+      n(),
+      O(),
+      R(),
+      P(),
+      h(),
+      l(),
+      W(),
+      B(),
+      (X = o()));
+  }))();
 }
-
-initializeAppgenAutomationsPage();
-
-export { AppgenAutomationsPage };
+Z();
+export { K as AppgenAutomationsPage };

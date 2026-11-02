@@ -1,144 +1,104 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  FX as initializeSignalRuntime,
-  QI as initializeQueryRuntime,
-  ZI as appScope,
-  jU as requestClientKey,
-  lW as contentSampleByteLimit,
-  rZ as createDerivedFamily,
-  uW as detectContentKind,
-  wL as initializeWindowRuntime,
+  FX as t,
+  QI as n,
+  ZI as r,
+  jU as i,
+  lW as a,
+  rZ as o,
+  uW as s,
+  wL as c,
 } from "@rchunk/app-shared";
 import {
-  Fon as encodeBase64,
-  HZt as initializeSubagentsPanel,
-  Non as decodeBase64,
-  Oyt as initializeFileRpc,
-  Qln as invokeHostCommand,
-  kyt as conversationTargetFamily,
-  nun as initializeHostCommands,
-  yZt as requestClientFamily,
+  Fon as l,
+  HZt as u,
+  Non as d,
+  Oyt as f,
+  Qln as p,
+  kyt as m,
+  nun as h,
+  yZt as g,
 } from "@rchunk/app-initial";
-
-interface RequestClient {
-  sendRequest<Result>(method: string, parameters: Record<string, unknown>): Promise<Result>;
-}
-
-interface CloudFileAccess {
-  environmentId: string;
-  requestClient: RequestClient;
-}
-
-interface ReadTextFileInput {
-  cloudFileAccess?: CloudFileAccess | null;
-  filePath: string;
-  hostId: string;
-  maximumSizeBytes?: number;
-  requireTextContent?: boolean;
-  signal?: AbortSignal;
-}
-
-async function readTextFile({
-  cloudFileAccess,
-  filePath,
-  hostId,
-  maximumSizeBytes,
-  requireTextContent = false,
-  signal,
-}: ReadTextFileInput): Promise<{ content: string; mtimeMs: number | null; sizeBytes: number }> {
-  if (cloudFileAccess != null) {
-    const { environmentId, requestClient } = cloudFileAccess;
-    signal?.throwIfAborted();
-    const parameters = { environmentId, path: filePath };
-    const metadata = await requestClient.sendRequest<{ modifiedAtMs: number }>("fs/getMetadata", parameters);
-    signal?.throwIfAborted();
-    const { dataBase64 } = await requestClient.sendRequest<{ dataBase64: string }>("fs/readFile", parameters);
-    signal?.throwIfAborted();
-    const bytes = decodeBase64(dataBase64);
-    if (maximumSizeBytes != null && bytes.byteLength > maximumSizeBytes) throw new Error("File is too large");
-    if (requireTextContent && await detectContentKind(bytes.subarray(0, 4096)) !== "text") {
-      throw new Error("File is not text");
-    }
-    return { content: new TextDecoder().decode(bytes), mtimeMs: metadata.modifiedAtMs, sizeBytes: bytes.byteLength };
+async function _({
+  cloudFileAccess: e,
+  filePath: t,
+  hostId: n,
+  maximumSizeBytes: r,
+  requireTextContent: i = !1,
+  signal: o,
+}) {
+  if (e != null) {
+    let { environmentId: n, requestClient: a } = e;
+    o?.throwIfAborted();
+    let c = { environmentId: n, path: t },
+      l = await a.sendRequest(`fs/getMetadata`, c);
+    o?.throwIfAborted();
+    let { dataBase64: u } = await a.sendRequest(`fs/readFile`, c);
+    o?.throwIfAborted();
+    let f = d(u);
+    if (r != null && f.byteLength > r) throw Error(`File is too large`);
+    if (i && (await s(f.subarray(0, 4096))) !== `text`) throw Error(`File is not text`);
+    return {
+      content: new TextDecoder().decode(f),
+      mtimeMs: l.modifiedAtMs,
+      sizeBytes: f.byteLength,
+    };
   }
-  const metadata = await invokeHostCommand<{
-    contentKind?: string;
-    mtimeMs?: number | null;
-    sizeBytes?: number | null;
-  }>("read-file-metadata", {
+  let {
+    contentKind: c,
+    mtimeMs: l,
+    sizeBytes: u,
+  } = await p(`read-file-metadata`, {
     params: {
-      ...(requireTextContent ? { contentSampleByteLimit, contentSampleMaxFileBytes: maximumSizeBytes } : {}),
-      hostId,
-      path: filePath,
+      ...(i ? { contentSampleByteLimit: a, contentSampleMaxFileBytes: r } : {}),
+      hostId: n,
+      path: t,
     },
-    signal,
+    signal: o,
   });
-  if (maximumSizeBytes != null && metadata.sizeBytes != null && metadata.sizeBytes > maximumSizeBytes) {
-    throw new Error("File is too large");
+  if (r != null && u != null && u > r) throw Error(`File is too large`);
+  if (i && c !== `text`) throw Error(`File is not text`);
+  let { contents: f } = await p(`read-file`, { params: { hostId: n, path: t }, signal: o }),
+    m = r == null && u != null ? u : new Blob([f]).size;
+  if (r != null && m > r) throw Error(`File is too large`);
+  return { content: f, mtimeMs: l ?? null, sizeBytes: m };
+}
+async function v({ cloudFileAccess: e, content: t, expectedMtimeMs: n, filePath: r, hostId: i }) {
+  if (e != null) {
+    let { environmentId: i, requestClient: a } = e,
+      o = { environmentId: i, path: r },
+      { modifiedAtMs: s } = await a.sendRequest(`fs/getMetadata`, o);
+    return s === n
+      ? (await a.sendRequest(`fs/writeFile`, { ...o, dataBase64: l(t) }),
+        { mtimeMs: (await a.sendRequest(`fs/getMetadata`, o)).modifiedAtMs, outcome: `saved` })
+      : { mtimeMs: s, outcome: `conflict` };
   }
-  if (requireTextContent && metadata.contentKind !== "text") throw new Error("File is not text");
-  const { contents } = await invokeHostCommand<{ contents: string }>("read-file", {
-    params: { hostId, path: filePath }, signal,
-  });
-  const sizeBytes = maximumSizeBytes == null && metadata.sizeBytes != null
-    ? metadata.sizeBytes
-    : new Blob([contents]).size;
-  if (maximumSizeBytes != null && sizeBytes > maximumSizeBytes) throw new Error("File is too large");
-  return { content: contents, mtimeMs: metadata.mtimeMs ?? null, sizeBytes };
+  return p(`write-file`, { params: { content: t, expectedMtimeMs: n, hostId: i, path: r } });
 }
-
-interface WriteTextFileInput {
-  cloudFileAccess?: CloudFileAccess | null;
-  content: string;
-  expectedMtimeMs: number;
-  filePath: string;
-  hostId: string;
+var y;
+function b() {
+  return (b = e(() => {
+    (t(),
+      c(),
+      u(),
+      n(),
+      f(),
+      h(),
+      (y = o(
+        r,
+        (e, { get: t }) => {
+          if (e != null) {
+            let n = t(m, { kind: `app-server`, conversationId: e });
+            if (n?.hostId === `durable`)
+              return { environmentId: n.environmentId, requestClient: t(g, i) };
+          }
+        },
+        {
+          isEqual: (e, t) =>
+            e?.environmentId === t?.environmentId && e?.requestClient === t?.requestClient,
+        },
+      )));
+  }))();
 }
-
-async function writeTextFile({
-  cloudFileAccess, content, expectedMtimeMs, filePath, hostId,
-}: WriteTextFileInput): Promise<unknown> {
-  if (cloudFileAccess != null) {
-    const { environmentId, requestClient } = cloudFileAccess;
-    const parameters = { environmentId, path: filePath };
-    const metadata = await requestClient.sendRequest<{ modifiedAtMs: number }>("fs/getMetadata", parameters);
-    if (metadata.modifiedAtMs !== expectedMtimeMs) {
-      return { mtimeMs: metadata.modifiedAtMs, outcome: "conflict" };
-    }
-    await requestClient.sendRequest("fs/writeFile", { ...parameters, dataBase64: encodeBase64(content) });
-    const updated = await requestClient.sendRequest<{ modifiedAtMs: number }>("fs/getMetadata", parameters);
-    return { mtimeMs: updated.modifiedAtMs, outcome: "saved" };
-  }
-  return invokeHostCommand("write-file", {
-    params: { content, expectedMtimeMs, hostId, path: filePath },
-  });
-}
-
-let cloudFileAccessFamily: unknown;
-
-function initializeTextFileStorage(): void {
-  initializeSignalRuntime();
-  initializeWindowRuntime();
-  initializeSubagentsPanel();
-  initializeQueryRuntime();
-  initializeFileRpc();
-  initializeHostCommands();
-  cloudFileAccessFamily = createDerivedFamily(
-    appScope,
-    (conversationId: string | null, { get }) => {
-      if (conversationId == null) return undefined;
-      const target = get(conversationTargetFamily, {
-        kind: "app-server", conversationId,
-      }) as { environmentId?: string; hostId?: string } | null;
-      return target?.hostId === "durable"
-        ? { environmentId: target.environmentId, requestClient: get(requestClientFamily, requestClientKey) }
-        : undefined;
-    },
-    {
-      isEqual: (left: CloudFileAccess | undefined, right: CloudFileAccess | undefined) =>
-        left?.environmentId === right?.environmentId && left?.requestClient === right?.requestClient,
-    },
-  );
-}
-
-export { writeTextFile as i, initializeTextFileStorage as n, readTextFile as r, cloudFileAccessFamily as t };
+export { v as i, b as n, _ as r, y as t };

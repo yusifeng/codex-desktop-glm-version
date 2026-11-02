@@ -1,20 +1,10 @@
-import "@rchunk/rolldown-runtime";
-import {
-  FX as initializeSignalRuntime,
-  QI as initializeQueryRuntime,
-  ZI as appScope,
-  oZ as createSignalFamily,
-} from "@rchunk/app-shared";
-
-let siteAutomationSetupState: unknown;
-
-function initializeSiteAutomationSetupState(): void {
-  initializeSignalRuntime();
-  initializeQueryRuntime();
-  siteAutomationSetupState = createSignalFamily(appScope, () => null);
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, QI as n, ZI as r, oZ as i } from "@rchunk/app-shared";
+var a;
+function o() {
+  return (o = e(() => {
+    (t(), n(), (a = i(r, (e) => null)));
+  }))();
 }
-
-export {
-  siteAutomationSetupState as n,
-  initializeSiteAutomationSetupState as t,
-};
+export { a as n, o as t };

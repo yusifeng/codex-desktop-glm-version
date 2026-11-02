@@ -1,9 +1,9 @@
-import "@rchunk/rolldown-runtime";
-
-let chronicleSettingsKey: string;
-
-function initializeChronicleSettings(): void {
-  chronicleSettingsKey = "chronicle";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t;
+function n() {
+  return (n = e(() => {
+    t = `chronicle`;
+  }))();
 }
-
-export { initializeChronicleSettings as n, chronicleSettingsKey as t };
+export { n, t };

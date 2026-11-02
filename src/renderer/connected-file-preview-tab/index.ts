@@ -1,132 +1,54 @@
-// Connected cloud-file preview tab. Release chunk: tab-d6bbb8bc9acd.js.
-import "@rchunk/rolldown-runtime";
-import * as AppShared from "@rchunk/app-shared";
-import * as AppInitial from "@rchunk/app-initial";
-import * as LibraryCloudFilePreview from "@rchunk/library-cloud-file-preview";
-import * as CloudFilePreview from "@rchunk/cloud-file-preview";
-
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown;
-}
-
-interface CompilerRuntime {
-  c(size: number): unknown[];
-}
-
-interface ConnectedFile {
-  id: string;
-  fileId: string;
-  currentVersion: unknown;
-  modifiedAt: unknown;
-  category: unknown;
-}
-
-interface ConnectedIdentity {
-  accountId: string | null;
-  userId: string | null;
-}
-
-interface ConnectedFilePreviewProps {
-  file: ConnectedFile;
-  identity: ConnectedIdentity;
-  onClose?: () => void;
-}
-
-const sharedRuntime = AppShared as unknown as {
-  $3(): CompilerRuntime;
-  FX(): void;
-  HX<Value>(signal: unknown): Value;
-  I3(): JsxRuntime;
-};
-const connectedRuntime = AppInitial as unknown as {
-  Sun(): void;
-  _un: unknown;
-  mun: unknown;
-  xun: unknown;
-};
-const libraryPreviewRuntime = LibraryCloudFilePreview as unknown as {
-  n: (props: Record<string, unknown>) => unknown;
-};
-const cloudPreviewRuntime = CloudFilePreview as unknown as { t(): void };
-
-let compilerRuntime: CompilerRuntime;
-let jsxRuntime: JsxRuntime;
-
-function ConnectedFilePreview({
-  file,
-  identity,
-  onClose,
-}: ConnectedFilePreviewProps): unknown {
-  const cache = compilerRuntime.c(11);
-  const accountId = sharedRuntime.HX<string | null>(connectedRuntime.mun);
-  const userId = sharedRuntime.HX<string | null>(connectedRuntime._un);
-  const isReady = sharedRuntime.HX<boolean>(connectedRuntime.xun);
-  if (
-    accountId !== identity.accountId ||
-    userId !== identity.userId ||
-    !isReady
-  ) {
-    return null;
-  }
-
-  let key: unknown;
-  if (
-    cache[0] === file.currentVersion &&
-    cache[1] === file.fileId &&
-    cache[2] === file.modifiedAt &&
-    cache[3] === identity
-  ) {
-    key = cache[4];
-  } else {
-    key = JSON.stringify([
-      identity,
-      file.fileId,
-      file.currentVersion,
-      file.modifiedAt,
-    ]);
-    cache[0] = file.currentVersion;
-    cache[1] = file.fileId;
-    cache[2] = file.modifiedAt;
-    cache[3] = identity;
-    cache[4] = key;
-  }
-  let item: unknown;
-  if (cache[5] === file) {
-    item = cache[6];
-  } else {
-    item = {
-      id: file.id,
-      kind: "cloud-file",
-      cloudFile: file,
-      modifiedAt: file.modifiedAt,
-      fileType: file.category,
-    };
-    cache[5] = file;
-    cache[6] = item;
-  }
-  if (cache[7] === onClose && cache[8] === key && cache[9] === item) {
-    return cache[10];
-  }
-  const preview = jsxRuntime.jsx(
-    libraryPreviewRuntime.n,
-    { item, showComposer: false, onClose },
-    key as string,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, FX as n, HX as r, I3 as i } from "@rchunk/app-shared";
+import { Sun as a, _un as o, mun as s, xun as c } from "@rchunk/app-initial";
+import { n as l } from "@rchunk/library-cloud-file-preview";
+import { t as u } from "@rchunk/cloud-file-preview";
+function d(e) {
+  let t = (0, f.c)(11),
+    { file: n, identity: i, onClose: a } = e,
+    u = r(s),
+    d = r(o),
+    m = r(c);
+  if (u !== i.accountId || d !== i.userId || !m) return null;
+  let h;
+  t[0] !== n.currentVersion || t[1] !== n.fileId || t[2] !== n.modifiedAt || t[3] !== i
+    ? ((h = JSON.stringify([i, n.fileId, n.currentVersion, n.modifiedAt])),
+      (t[0] = n.currentVersion),
+      (t[1] = n.fileId),
+      (t[2] = n.modifiedAt),
+      (t[3] = i),
+      (t[4] = h))
+    : (h = t[4]);
+  let g;
+  t[5] === n
+    ? (g = t[6])
+    : ((g = {
+        id: n.id,
+        kind: `cloud-file`,
+        cloudFile: n,
+        modifiedAt: n.modifiedAt,
+        fileType: n.category,
+      }),
+      (t[5] = n),
+      (t[6] = g));
+  let _;
+  return (
+    t[7] !== a || t[8] !== h || t[9] !== g
+      ? ((_ = (0, p.jsx)(l, { item: g, showComposer: !1, onClose: a }, h)),
+        (t[7] = a),
+        (t[8] = h),
+        (t[9] = g),
+        (t[10] = _))
+      : (_ = t[10]),
+    _
   );
-  cache[7] = onClose;
-  cache[8] = key;
-  cache[9] = item;
-  cache[10] = preview;
-  return preview;
 }
-
-function initializeConnectedFilePreview(): void {
-  compilerRuntime = sharedRuntime.$3();
-  sharedRuntime.FX();
-  connectedRuntime.Sun();
-  cloudPreviewRuntime.t();
-  jsxRuntime = sharedRuntime.I3();
+var f, p;
+function m() {
+  return (m = e(() => {
+    ((f = t()), n(), a(), u(), (p = i()));
+  }))();
 }
-
-initializeConnectedFilePreview();
-
-export { ConnectedFilePreview };
+m();
+export { d as ConnectedFilePreview };

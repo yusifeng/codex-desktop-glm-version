@@ -1,191 +1,124 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $Bt as initializeConversationCreation,
-  Izt as initializeConversationIds,
-  Mzt as defaultSystemHint,
-  Nzt as onboardingSystemHint,
-  POt as initializeConversationStartup,
-  ROt as startConversation,
-  UBt as modelOptionsSignal,
-  YVt as conversationStatusSignal,
-  jOt as deleteConversation,
-  uHt as initializeConversationLifecycle,
-  wVt as serverConversationIdSignal,
+  $Bt as t,
+  Izt as n,
+  Mzt as r,
+  Nzt as i,
+  POt as a,
+  ROt as o,
+  UBt as s,
+  YVt as c,
+  dHt as l,
+  jOt as u,
+  uHt as d,
+  wVt as f,
 } from "@rchunk/app-initial";
-import { isTerminalConversationStatus } from "../app-initial/runtime/is-terminal-conversation-status";
-
-export interface ConversationStartScope {
-  get(signal: unknown, parameter?: unknown): unknown;
-  queryClient: {
-    invalidateQueries(options: { queryKey: unknown[] }): Promise<unknown>;
-  };
-  watch(
-    callback: (context: {
-      get(signal: unknown, parameter?: unknown): unknown;
-    }) => void,
-  ): () => void;
-}
-
-export interface StartConversationOptions {
-  accountId: string;
-  forceOnboarding?: boolean;
-  onConversationStarted?(conversationId: string): void;
-  prompt: unknown;
-  requireServerConversation?: boolean;
-  signal?: AbortSignal;
-  userCompletionMessages?: unknown;
-}
-
-interface StartedConversation {
-  conversationId: string;
-  serverConversationId?: string | null;
-}
-
-async function startNewConversation(
-  scope: ConversationStartScope,
+async function p(
+  e,
   {
-    accountId,
-    forceOnboarding = false,
-    onConversationStarted,
-    prompt,
-    requireServerConversation = false,
-    signal,
-    userCompletionMessages,
-  }: StartConversationOptions,
-): Promise<string | null> {
-  if (signal?.aborted) return null;
-  const modelOptions = scope.get(modelOptionsSignal) as {
-    defaultThinkingEffortByModelSlug?: Record<string, unknown>;
-    options: Array<{ lane: string; slug: string }>;
-    versionOptions?: Array<{ modelSlugByLane: { thinking?: string } }>;
-  } | null;
-  const model =
-    modelOptions?.versionOptions?.[0]?.modelSlugByLane.thinking ??
-    modelOptions?.options.find((option) => option.lane === "thinking")?.slug;
-
-  let serverConversationId: string | null = null;
-  let deleted = false;
-  let clientConversationId: string | null = null;
-  const deleteStartedConversation = () => {
-    if (!deleted && clientConversationId != null) {
-      deleted = true;
-      deleteConversation(scope, clientConversationId);
-    }
-  };
-  const handleClientConversationId = (id: string) => {
-    clientConversationId = id;
-    if (signal?.aborted) deleteStartedConversation();
-    else if (!requireServerConversation) onConversationStarted?.(id);
-  };
-  signal?.addEventListener("abort", deleteStartedConversation);
-
-  try {
-    let result: StartedConversation | null;
-    try {
-      result = (await startConversation(scope, {
-        model,
-        onClientThreadIdChange: handleClientConversationId,
-        onServerThreadIdChange: requireServerConversation
-          ? (id: string) => {
-              serverConversationId = id;
-            }
-          : undefined,
-        prompt,
-        startupSignal: signal,
-        systemHints: forceOnboarding
-          ? [onboardingSystemHint, defaultSystemHint]
-          : [defaultSystemHint],
-        thinkingEffort:
-          model == null
-            ? null
-            : (modelOptions?.defaultThinkingEffortByModelSlug?.[model] ?? null),
-        userCompletionMessages,
-      })) as StartedConversation | null;
-    } catch (error) {
-      if (signal?.aborted) {
-        deleteStartedConversation();
-        return null;
+    accountId: t,
+    forceOnboarding: n = !1,
+    onConversationStarted: a,
+    prompt: c,
+    requireServerConversation: l = !1,
+    signal: d,
+    userCompletionMessages: f,
+  },
+) {
+  if (d?.aborted) return null;
+  let p = e.get(s).data,
+    h =
+      p?.versionOptions?.[0]?.modelSlugByLane.thinking ??
+      p?.options.find((e) => e.lane === `thinking`)?.slug,
+    g = null,
+    _ = !1,
+    v = null,
+    y = () => {
+      !_ && v != null && ((_ = !0), u(e, v));
+    },
+    b = (e) => {
+      if (((v = e), d?.aborted)) {
+        y();
+        return;
       }
-      throw error;
+      l || a?.(e);
+    };
+  d?.addEventListener(`abort`, y);
+  try {
+    let s;
+    try {
+      s = await o(e, {
+        model: h,
+        onClientThreadIdChange: b,
+        onServerThreadIdChange: l
+          ? (e) => {
+              g = e;
+            }
+          : void 0,
+        prompt: c,
+        startupSignal: d,
+        systemHints: n ? [i, r] : [r],
+        thinkingEffort: h == null ? null : (p?.defaultThinkingEffortByModelSlug?.[h] ?? null),
+        userCompletionMessages: f,
+      });
+    } catch (e) {
+      if (d?.aborted) return (y(), null);
+      throw e;
     }
-
-    clientConversationId ??= result?.conversationId ?? null;
-    if (signal?.aborted) {
-      deleteStartedConversation();
-      return null;
-    }
-    if (!requireServerConversation) {
-      await invalidateFinanceChats(scope, accountId);
-      return result?.serverConversationId ?? result?.conversationId ?? null;
-    }
-    if (serverConversationId != null) {
-      onConversationStarted?.(serverConversationId);
-      await invalidateFinanceChats(scope, accountId);
-      return serverConversationId;
-    }
-    if (result == null) return null;
-
-    const resolvedServerId =
-      result.serverConversationId ??
-      (await waitForServerConversationId(scope, result.conversationId, signal));
-    if (resolvedServerId == null || signal?.aborted) {
-      if (signal?.aborted) deleteStartedConversation();
-      return null;
-    }
-    onConversationStarted?.(resolvedServerId);
-    await invalidateFinanceChats(scope, accountId);
-    return resolvedServerId;
+    if (((v ??= s?.conversationId ?? null), d?.aborted)) return (y(), null);
+    if (!l)
+      return (
+        await e.queryClient.invalidateQueries({ queryKey: [`personal-finance`, t, `chats`] }),
+        s?.serverConversationId ?? s?.conversationId ?? null
+      );
+    if (g != null)
+      return (
+        a?.(g),
+        await e.queryClient.invalidateQueries({ queryKey: [`personal-finance`, t, `chats`] }),
+        g
+      );
+    if (s == null) return null;
+    let u = s.serverConversationId;
+    return (
+      (u ??= await m(e, s.conversationId, d)),
+      u == null || d?.aborted
+        ? (d?.aborted && y(), null)
+        : (a?.(u),
+          await e.queryClient.invalidateQueries({ queryKey: [`personal-finance`, t, `chats`] }),
+          u)
+    );
   } finally {
-    signal?.removeEventListener("abort", deleteStartedConversation);
+    d?.removeEventListener(`abort`, y);
   }
 }
-
-function invalidateFinanceChats(
-  scope: ConversationStartScope,
-  accountId: string,
-): Promise<unknown> {
-  return scope.queryClient.invalidateQueries({
-    queryKey: ["personal-finance", accountId, "chats"],
-  });
-}
-
-function waitForServerConversationId(
-  scope: ConversationStartScope,
-  conversationId: string,
-  signal?: AbortSignal,
-): Promise<string | null> {
-  return new Promise((resolve) => {
-    let settled = false;
-    let unsubscribe: (() => void) | undefined;
-    const finish = (value: string | null) => {
-      if (settled) return;
-      settled = true;
-      signal?.removeEventListener("abort", abort);
-      unsubscribe?.();
-      resolve(value);
-    };
-    const abort = () => finish(null);
-    if (signal?.aborted) {
-      finish(null);
+function m(e, t, n) {
+  return new Promise((r) => {
+    let i = !1,
+      a,
+      o = (e) => {
+        i || ((i = !0), n?.removeEventListener(`abort`, s), a?.(), r(e));
+      },
+      s = () => o(null);
+    if (n?.aborted) {
+      o(null);
       return;
     }
-    signal?.addEventListener("abort", abort, { once: true });
-    unsubscribe = scope.watch(({ get }) => {
-      const serverId = get(serverConversationIdSignal, conversationId);
-      if (typeof serverId === "string") finish(serverId);
-      else if (isTerminalConversationStatus(get(conversationStatusSignal, conversationId))) {
-        finish(null);
-      }
-    });
-    if (settled) unsubscribe();
+    (n?.addEventListener(`abort`, s, { once: !0 }),
+      (a = e.watch(({ get: e }) => {
+        let n = e(f, t);
+        if (n != null) {
+          o(n);
+          return;
+        }
+        l(e(c, t)) || o(null);
+      })),
+      i && a());
   });
 }
-
-function initializeConversationStart(): void {
-  initializeConversationCreation();
-  initializeConversationLifecycle();
-  initializeConversationStartup();
-  initializeConversationIds();
+function h() {
+  return (h = e(() => {
+    (t(), d(), a(), n());
+  }))();
 }
-
-export { startNewConversation as n, initializeConversationStart as t };
+export { p as n, h as t };

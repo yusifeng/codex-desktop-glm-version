@@ -1,31 +1,21 @@
-// Hypothalamic-pituitary-adrenal axis learning-block model.
-// Release chunk: app/webview/assets/model-81531df3f2e2.js.
-
-import "@rchunk/rolldown-runtime";
-
-type HpaAxisStep = "stressor" | "crh" | "acth" | "cortisol" | "feedback";
-interface HpaAxisValues { stepIndex?: number }
-interface HpaAxisState { stepIndex: number }
-interface StepRange { min: number; max: number; step: number; defaultValue: number }
-
-let hpaAxisSteps: HpaAxisStep[];
-let stepRange: StepRange;
-let normalizeHpaAxisState: (values: HpaAxisValues) => HpaAxisState;
-let getHpaAxisStep: (values: HpaAxisValues) => HpaAxisStep;
-let initialized = false;
-
-function initializeHpaAxisModel(): void {
-  if (initialized) return;
-  initialized = true;
-  hpaAxisSteps = ["stressor", "crh", "acth", "cortisol", "feedback"];
-  stepRange = { min: 0, max: hpaAxisSteps.length - 1, step: 1, defaultValue: 0 };
-  normalizeHpaAxisState = values => {
-    const candidate = typeof values.stepIndex === "number" && Number.isFinite(values.stepIndex)
-      ? Math.round(values.stepIndex)
-      : stepRange.defaultValue;
-    return { stepIndex: Math.min(Math.max(candidate, stepRange.min), stepRange.max) };
-  };
-  getHpaAxisStep = values => hpaAxisSteps[normalizeHpaAxisState(values).stepIndex];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = [`stressor`, `crh`, `acth`, `cortisol`, `feedback`]),
+      (n = { min: 0, max: t.length - 1, step: 1, defaultValue: 0 }),
+      (r = (e) => {
+        let t =
+          typeof e.stepIndex == `number` && Number.isFinite(e.stepIndex)
+            ? Math.round(e.stepIndex)
+            : n.defaultValue;
+        return { stepIndex: Math.min(Math.max(t, n.min), n.max) };
+      }),
+      (i = (e) => {
+        let { stepIndex: n } = r(e);
+        return t[n];
+      }));
+  }))();
 }
-
-export { normalizeHpaAxisState as a, initializeHpaAxisModel as i, stepRange as n, getHpaAxisStep as r, hpaAxisSteps as t };
+export { r as a, a as i, n, i as r, t };

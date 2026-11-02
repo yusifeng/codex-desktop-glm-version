@@ -1,92 +1,40 @@
-import { n as createLazyInitializerValue } from "@rchunk/rolldown-runtime";
-import {
-  hasBrowserCommentHandler,
-  getBrowserTabUrlState,
-  initializeBrowserTabUrlState,
-  registerBrowserCommentHandler,
-  registerBrowserContextProvider,
-  resolveBrowserContext,
-  setBrowserTabUrlState,
-  subscribeBrowserCommentReadiness,
-  submitBrowserComment,
-  waitForBrowserCommentHandler,
-} from "../app-primary-browser-comment-runtime";
-
-type AnnotationHostCallback = () => boolean;
-type RegistryListener = () => void;
-type LazyInitializer = <Value>(factory: () => Value) => () => Value;
-
-const createLazyInitializer = createLazyInitializerValue as LazyInitializer;
-
-let annotationHosts: Map<string, AnnotationHostCallback>;
-let registryListeners: Map<string, Set<RegistryListener>>;
-
-function annotationHostKey(browserTabId: string, conversationId: string): string {
-  return conversationId + "\0" + browserTabId;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e, t) {
+  return o.has(a(e, t));
 }
-
-function hasSourceAnnotationHost(browserTabId: string, conversationId: string): boolean {
-  return annotationHosts.has(annotationHostKey(browserTabId, conversationId));
+function n(e, t, n) {
+  let r = a(e, t),
+    i = s.get(r) ?? new Set();
+  return (
+    i.add(n),
+    s.set(r, i),
+    () => {
+      (i.delete(n), i.size === 0 && s.delete(r));
+    }
+  );
 }
-
-function subscribeSourceAnnotationHost(
-  browserTabId: string,
-  conversationId: string,
-  listener: RegistryListener,
-): () => void {
-  const key = annotationHostKey(browserTabId, conversationId);
-  const listeners = registryListeners.get(key) ?? new Set<RegistryListener>();
-  listeners.add(listener);
-  registryListeners.set(key, listeners);
+function r(e, t) {
+  return o.get(a(e, t))?.() ?? !1;
+}
+function i(e, t, n) {
+  let r = a(e, t);
+  o.set(r, n);
+  for (let e of s.get(r) ?? []) e();
   return () => {
-    listeners.delete(listener);
-    if (listeners.size === 0) registryListeners.delete(key);
+    if (o.get(r) === n) {
+      o.delete(r);
+      for (let e of s.get(r) ?? []) e();
+    }
   };
 }
-
-function requestSourceAnnotationHost(browserTabId: string, conversationId: string): boolean {
-  return annotationHosts.get(annotationHostKey(browserTabId, conversationId))?.() ?? false;
+function a(e, t) {
+  return `${t}\0${e}`;
 }
-
-function registerSourceAnnotationHost(
-  browserTabId: string,
-  conversationId: string,
-  callback: AnnotationHostCallback,
-): () => void {
-  const key = annotationHostKey(browserTabId, conversationId);
-  annotationHosts.set(key, callback);
-  for (const listener of registryListeners.get(key) ?? []) listener();
-  return () => {
-    if (annotationHosts.get(key) !== callback) return;
-    annotationHosts.delete(key);
-    for (const listener of registryListeners.get(key) ?? []) listener();
-  };
+var o, s;
+function c() {
+  return (c = e(() => {
+    ((o = new Map()), (s = new Map()));
+  }))();
 }
-
-const initializeSourceAnnotationHostRegistry = createLazyInitializer(() => {
-  annotationHosts = new Map<string, AnnotationHostCallback>();
-  registryListeners = new Map<string, Set<RegistryListener>>();
-});
-
-Object.assign(initializeSourceAnnotationHostRegistry, {
-  browserComments: {
-    hasBrowserCommentHandler,
-    getBrowserTabUrlState,
-    initializeBrowserTabUrlState,
-    registerBrowserCommentHandler,
-    registerBrowserContextProvider,
-    resolveBrowserContext,
-    setBrowserTabUrlState,
-    subscribeBrowserCommentReadiness,
-    submitBrowserComment,
-    waitForBrowserCommentHandler,
-  },
-});
-
-export {
-  subscribeSourceAnnotationHost as a,
-  registerSourceAnnotationHost as i,
-  initializeSourceAnnotationHostRegistry as n,
-  hasSourceAnnotationHost as r,
-  requestSourceAnnotationHost as t,
-};
+export { n as a, i, c as n, t as r, r as t };

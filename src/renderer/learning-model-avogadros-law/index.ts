@@ -1,64 +1,50 @@
-// Avogadro's-law learning model. Release chunk: model-77c142ff4062.js.
-import "@rchunk/rolldown-runtime";
-
-interface AvogadroValues { reference_amount_mol?: number | null; reference_volume_l?: number | null; amountFactor?: number | null }
-interface AvogadroManifest {
-  type: string; version: number; thumbnailAssetKey: string; canonicalFormula: string;
-  parameters: {
-    reference_amount_mol: { kind: "number"; defaultValue: number; min: number; max: number };
-    reference_volume_l: { kind: "number"; defaultValue: number; min: number; max: number };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `AVOGADROS_LAW`),
+      (n = `avogadros-law-v1`),
+      (r = `\\frac{V_1}{n_1}=\\frac{V_2}{n_2}`),
+      (i = {
+        reference_amount_mol: { kind: `number`, defaultValue: 1, min: 0.25, max: 5 },
+        reference_volume_l: { kind: `number`, defaultValue: 22.4, min: 1, max: 120 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-
-let avogadrosLawManifest: AvogadroManifest;
-let amountFactorControl: { defaultValue: number; min: number; max: number; step: number };
-let calculateAvogadrosLawState: (values: AvogadroValues) => {
-  referenceAmount: number; referenceVolume: number; amountFactor: number; amount: number; volume: number;
-  volumePerMole: number; particleCount: number; pistonFillRatio: number;
-};
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeAvogadrosLawManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  avogadrosLawManifest = {
-    type: "AVOGADROS_LAW", version: 1, thumbnailAssetKey: "avogadros-law-v1",
-    canonicalFormula: "\\frac{V_1}{n_1}=\\frac{V_2}{n_2}",
-    parameters: {
-      reference_amount_mol: { kind: "number", defaultValue: 1, min: 0.25, max: 5 },
-      reference_volume_l: { kind: "number", defaultValue: 22.4, min: 1, max: 120 },
-    },
-  };
+var s, c, l, u;
+function d() {
+  return (d = e(() => {
+    (o(),
+      (s = a.parameters),
+      (c = { defaultValue: 2, min: 0.5, max: 2.5, step: 0.1 }),
+      (l = (e, t, n, r) => (Number.isFinite(e) ? Math.min(r, Math.max(n, e)) : t)),
+      (u = (e) => {
+        let t = l(
+            e.reference_amount_mol,
+            s.reference_amount_mol.defaultValue,
+            s.reference_amount_mol.min,
+            s.reference_amount_mol.max,
+          ),
+          n = l(
+            e.reference_volume_l,
+            s.reference_volume_l.defaultValue,
+            s.reference_volume_l.min,
+            s.reference_volume_l.max,
+          ),
+          r = l(e.amountFactor, c.defaultValue, c.min, c.max);
+        return {
+          referenceAmount: t,
+          referenceVolume: n,
+          amountFactor: r,
+          amount: t * r,
+          volume: n * r,
+          volumePerMole: n / t,
+          particleCount: Math.round(12 * r),
+          pistonFillRatio: r / c.max,
+        };
+      }));
+  }))();
 }
-
-function initializeAvogadrosLawModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializeAvogadrosLawManifest();
-  const parameters = avogadrosLawManifest.parameters;
-  amountFactorControl = { defaultValue: 2, min: 0.5, max: 2.5, step: 0.1 };
-  const normalizeFinite = (value: number | null | undefined, fallback: number, minimum: number, maximum: number): number =>
-    typeof value === "number" && Number.isFinite(value) ? Math.min(maximum, Math.max(minimum, value)) : fallback;
-  calculateAvogadrosLawState = values => {
-    const referenceAmount = normalizeFinite(
-      values.reference_amount_mol, parameters.reference_amount_mol.defaultValue,
-      parameters.reference_amount_mol.min, parameters.reference_amount_mol.max,
-    );
-    const referenceVolume = normalizeFinite(
-      values.reference_volume_l, parameters.reference_volume_l.defaultValue,
-      parameters.reference_volume_l.min, parameters.reference_volume_l.max,
-    );
-    const amountFactor = normalizeFinite(values.amountFactor, amountFactorControl.defaultValue, amountFactorControl.min, amountFactorControl.max);
-    return {
-      referenceAmount, referenceVolume, amountFactor, amount: referenceAmount * amountFactor,
-      volume: referenceVolume * amountFactor, volumePerMole: referenceVolume / referenceAmount,
-      particleCount: Math.round(12 * amountFactor), pistonFillRatio: amountFactor / amountFactorControl.max,
-    };
-  };
-}
-
-export {
-  avogadrosLawManifest as a, initializeAvogadrosLawManifest as i, calculateAvogadrosLawState as n,
-  initializeAvogadrosLawModel as r, amountFactorControl as t,
-};
+export { a, o as i, u as n, d as r, c as t };

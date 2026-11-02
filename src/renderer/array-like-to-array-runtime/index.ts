@@ -1,13 +1,11 @@
-import "@rchunk/rolldown-runtime";
-
-function toArray<T>(value: ArrayLike<T> | Iterable<T>): T[] | ArrayLike<T> {
-  return typeof value === "object" && value !== null && "length" in value
-    ? value
-    : Array.from(value);
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e) {
+  return typeof e == `object` && `length` in e ? e : Array.from(e);
 }
-
-function initializeArrayLikeToArrayRuntime(): void {
-  void Array.prototype.slice;
+function n() {
+  return (n = e(() => {
+    Array.prototype.slice;
+  }))();
 }
-
-export { initializeArrayLikeToArrayRuntime as n, toArray as t };
+export { n, t };

@@ -1,56 +1,38 @@
-import "@rchunk/rolldown-runtime";
-
-interface WheelEventLike {
-  deltaY: number;
-  timeStamp: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r;
+function i() {
+  return (i = e(() => {
+    ((t = 200),
+      (n = 8),
+      (r = class {
+        activeSwipe = null;
+        begin(e, t) {
+          let n = Math.abs(e.deltaY);
+          this.activeSwipe = {
+            firstEventTimestamp: e.timeStamp,
+            hasDecelerated: !1,
+            idleMs: t,
+            lastDeltaY: n,
+            lastEventTimestamp: e.timeStamp,
+            peakDeltaY: n,
+          };
+        }
+        isContinuation(e) {
+          let r = this.activeSwipe;
+          if (r == null) return !1;
+          let i = Math.abs(e.deltaY),
+            a =
+              e.timeStamp - r.firstEventTimestamp >= t && r.hasDecelerated && i > r.lastDeltaY + n;
+          return e.timeStamp - r.lastEventTimestamp < r.idleMs && !a
+            ? ((r.peakDeltaY = Math.max(r.peakDeltaY, i)),
+              (r.hasDecelerated ||= i * 2 <= r.peakDeltaY),
+              (r.lastDeltaY = i),
+              (r.lastEventTimestamp = e.timeStamp),
+              !0)
+            : ((this.activeSwipe = null), !1);
+        }
+      }));
+  }))();
 }
-
-interface ActiveSwipe {
-  firstEventTimestamp: number;
-  hasDecelerated: boolean;
-  idleMs: number;
-  lastDeltaY: number;
-  lastEventTimestamp: number;
-  peakDeltaY: number;
-}
-
-class WheelSwipeGesture {
-  activeSwipe: ActiveSwipe | null = null;
-
-  begin(event: WheelEventLike, idleMs: number): void {
-    const deltaY = Math.abs(event.deltaY);
-    this.activeSwipe = {
-      firstEventTimestamp: event.timeStamp,
-      hasDecelerated: false,
-      idleMs,
-      lastDeltaY: deltaY,
-      lastEventTimestamp: event.timeStamp,
-      peakDeltaY: deltaY,
-    };
-  }
-
-  isContinuation(event: WheelEventLike): boolean {
-    const swipe = this.activeSwipe;
-    if (swipe == null) return false;
-    const deltaY = Math.abs(event.deltaY);
-    const restarted =
-      event.timeStamp - swipe.firstEventTimestamp >= 200 &&
-      swipe.hasDecelerated &&
-      deltaY > swipe.lastDeltaY + 8;
-    if (
-      event.timeStamp - swipe.lastEventTimestamp >= swipe.idleMs ||
-      restarted
-    ) {
-      this.activeSwipe = null;
-      return false;
-    }
-    swipe.peakDeltaY = Math.max(swipe.peakDeltaY, deltaY);
-    swipe.hasDecelerated ||= deltaY * 2 <= swipe.peakDeltaY;
-    swipe.lastDeltaY = deltaY;
-    swipe.lastEventTimestamp = event.timeStamp;
-    return true;
-  }
-}
-
-function initializeWheelSwipeGesture(): void {}
-export { initializeWheelSwipeGesture as n, WheelSwipeGesture as t };
+export { i as n, r as t };

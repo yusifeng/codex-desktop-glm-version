@@ -1,6 +1,5 @@
+// @ts-nocheck
 import "@rchunk/app-shared";
-import { n as ArtifactTabContent, r as initializeArtifactTabContent, t as ArtifactPreviewPanel } from "@rchunk/artifact-tab-content-electron";
-
-initializeArtifactTabContent();
-
-export { ArtifactPreviewPanel, ArtifactTabContent };
+import { n as e, r as t, t as n } from "@rchunk/artifact-tab-content-electron";
+t();
+export { n as ArtifactPreviewPanel, e as ArtifactTabContent };

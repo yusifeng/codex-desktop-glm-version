@@ -1,451 +1,291 @@
-// home-beacon-finance —— Finance Home Beacon 的应用安装、连接账户与开聊流程。
-
-import * as appConnectModalChunk from "@rchunk/app-connect-modal";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as conversationChunk from "@rchunk/conversation-start";
-import * as plaidLinkChunk from "@rchunk/plaid-link";
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-
-void runtimeChunk;
-
-const {
-  n: initializeAppConnectModal,
-  t: AppConnectModal,
-} = appConnectModalChunk;
-const {
-  Bfn: initializeFinanceEligibility,
-  Fzt: createFinanceAppInfo,
-  HW: financeCapabilitiesQuery,
-  Izt: initializePluginInstaller,
-  L2: initializeConversationMessages,
-  Mzt: financeSystemHint,
-  NOt: createUserCompletionMessages,
-  POt: initializeConnectorState,
-  R2: openPluginInstaller,
-  Sun: initializeFinanceAppInfo,
-  UW: initializeConnectorClient,
-  Uzt: openManagedDialog,
-  Vzt: initializeManagedDialogs,
-  WW: connectorClientSignal,
-  _fn: disabledFinanceFlag,
-  f2t: closePluginInstallRequest,
-  fW: financeConnectionEvent,
-  g2t: initializePluginInstallRequest,
-  hW: initializeFinanceQueries,
-  hfn: enabledFinanceFlag,
-  i4t: initializeConversationStart,
-  jW: initializePlaidIntegration,
-  jzt: financePluginId,
-  ly: connectorLinksQuery,
-  mfn: linkedAccountsRequiredFlag,
-  mpn: intlSignal,
-  mun: activeAccountIdSignal,
-  n4t: listAvailableApps,
-  pfn: initializeFinanceFeatureFlags,
-  ppn: initializeBeaconAnalytics,
-  q6t: normalizeCanonicalAppId,
-  uy: initializeAppConnectFlow,
-  v2t: pluginInstallRequestSignal,
-  xpn: logAnalyticsEvent,
-  yNt: isBannerBeacon,
-  ypn: initializeAnalytics,
-  zW: linkedAccountsQuery,
-  zzt: closeManagedDialog,
-} = appInitialChunk;
-const {
-  co: getMarketplacePlugin,
-  lo: initializeMarketplacePlugin,
-} = appPrimaryChunk;
-const {
-  $3: initializeJsxRuntimeLazy,
-  FX: initializeSignalRuntime,
-  I3: getJsxRuntime,
-  K2: initializeIntl,
-  LX: useSignalScope,
-  QI: initializeQueryRuntime,
-  ZI: applicationScope,
-  lk: initializeToastUi,
-  n4: useIntl,
-  pk: toastManagerSignal,
-  wL: initializeToastRuntime,
-} = appSharedChunk;
-const {
-  n: startConversation,
-  t: initializeConversationStartChunk,
-} = conversationChunk;
-const {
-  n: initializePlaidLink,
-  r: openPlaidLink,
-} = plaidLinkChunk;
-
-const FINANCE_CANONICAL_APP_ID = "connector_693864f100e4819093e6ed9b651239f1";
-const FINANCE_FEATURE_FLAG = "4135903789";
-
-type FinanceScope = import("@rchunk/app-shared").MaitaiScopeApi<
-  Record<string, unknown>
-> & {
-  get<Value>(signal: unknown, ...parameters: unknown[]): Value;
-  set(signal: unknown, value: unknown): void;
-  query: {
-    getOrFetch<Value>(query: unknown, ...parameters: unknown[]): Promise<Value>;
-    invalidate?(query: unknown, ...parameters: unknown[]): void;
-  };
-};
-
-interface FinanceApp {
-  canonicalAppId?: string | null;
-  plugin?: {
-    availability?: string;
-    disabledReason?: string;
-    enabled?: boolean;
-    installPolicy?: string;
-  };
-}
-
-interface MarketplacePlugin {
-  displayName: string;
-  pluginId: string;
-}
-
-interface PluginInstallRequest {
-  kind: string;
-  requestId?: string;
-}
-
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-let initialized = false;
-
-function PersonalFinanceConnectorConsentDialog({
-  onConnected,
-  onClose,
-}: {
-  onConnected(): void;
-  onClose(): void;
-}): unknown {
-  initializeHomeBeaconFinance();
-  const scope = useSignalScope(applicationScope) as unknown as FinanceScope;
-  const intl = useIntl();
-  const app = createFinanceAppInfo?.(
-    String(
-      intl?.formatMessage?.({
-        id: "personalFinance.accounts.connectorName",
-        defaultMessage: "ChatGPT Personal Finance",
-        description:
-          "Display name of the first-party ChatGPT Personal Finance app shown in the existing Codex connector consent and privacy-disclosure dialog",
-      }) ?? "ChatGPT Personal Finance",
-    ),
-  );
-  const connectApp = ({
-    app: selectedApp,
-  }: {
-    app: { id: string; name: string };
-  }) =>
-    scope
-      .get<{
-        createConnectorLink(
-          appId: string,
-          appName: string,
-          source: "CONNECTOR_SETTING",
-        ): unknown;
-      }>(connectorClientSignal)
-      ?.createConnectorLink?.(
-        selectedApp.id,
-        selectedApp.name,
-        "CONNECTOR_SETTING",
-      );
-  const connected = () => {
-    scope.query.invalidate?.(
-      connectorLinksQuery,
-      scope.get(activeAccountIdSignal),
-    );
-    onConnected();
-  };
-  const openChanged = (open: boolean) => {
-    if (!open) onClose();
-  };
-  return jsx.jsx(AppConnectModal, {
-    app,
-    authTypeOverride: "NONE",
-    connectApp,
-    postConnectSource: null,
-    showResultToasts: false,
-    onConnected: connected,
-    onOpenChange: openChanged,
-  });
-}
-
-function accountStillActive(
-  scope: { get(signal: unknown): unknown },
-  accountId: string,
-  signal: AbortSignal,
-): boolean {
-  return !signal.aborted && scope.get(activeAccountIdSignal) === accountId;
-}
-
-function pluginUnavailable(app: FinanceApp | null | undefined): boolean {
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  I3 as r,
+  K2 as i,
+  LX as a,
+  QI as o,
+  ZI as s,
+  lk as c,
+  n4 as l,
+  pk as u,
+  wL as d,
+} from "@rchunk/app-shared";
+import {
+  Bfn as f,
+  Fzt as p,
+  HW as m,
+  Izt as h,
+  L2 as g,
+  Mzt as _,
+  NOt as v,
+  POt as y,
+  R2 as ee,
+  Sun as b,
+  UW as x,
+  Uzt as S,
+  Vzt as C,
+  WW as w,
+  _fn as te,
+  f2t as ne,
+  fW as re,
+  g2t as ie,
+  hW as T,
+  hfn as E,
+  i4t as D,
+  jW as O,
+  jzt as k,
+  ly as A,
+  mfn as j,
+  mpn as M,
+  mun as N,
+  n4t as P,
+  pfn as F,
+  ppn as I,
+  q6t as L,
+  uy as R,
+  v2t as z,
+  xpn as ae,
+  yNt as B,
+  ypn as V,
+  zW as H,
+  zzt as U,
+} from "@rchunk/app-initial";
+import { co as W, lo as G } from "@rchunk/app-primary";
+import { n as K, t as q } from "@rchunk/app-connect-modal";
+import { n as J, t as oe } from "@rchunk/conversation-start";
+import { n as se, r as ce } from "@rchunk/plaid-link";
+function Y(e) {
+  let t = (0, X.c)(14),
+    { onConnected: n, onClose: r } = e,
+    i = a(s),
+    o = l(),
+    c;
+  t[0] === o
+    ? (c = t[1])
+    : ((c = p(
+        o.formatMessage({
+          id: `personalFinance.accounts.connectorName`,
+          defaultMessage: `ChatGPT Personal Finance`,
+          description: `Display name of the first-party ChatGPT Personal Finance app shown in the existing Codex connector consent and privacy-disclosure dialog`,
+        }),
+      )),
+      (t[0] = o),
+      (t[1] = c));
+  let u;
+  t[2] === i
+    ? (u = t[3])
+    : ((u = (e) => {
+        let { app: t } = e;
+        return i.get(w).createConnectorLink(t.id, t.name, `CONNECTOR_SETTING`);
+      }),
+      (t[2] = i),
+      (t[3] = u));
+  let d;
+  t[4] !== n || t[5] !== i
+    ? ((d = () => {
+        (i.query.invalidate(A, i.get(N)), n());
+      }),
+      (t[4] = n),
+      (t[5] = i),
+      (t[6] = d))
+    : (d = t[6]);
+  let f;
+  t[7] === r
+    ? (f = t[8])
+    : ((f = (e) => {
+        e || r();
+      }),
+      (t[7] = r),
+      (t[8] = f));
+  let m;
   return (
-    app?.plugin?.availability === "DISABLED_BY_ADMIN" ||
-    app?.plugin?.installPolicy === "NOT_AVAILABLE" ||
-    app?.plugin?.disabledReason === "plan_not_eligible"
+    t[9] !== c || t[10] !== u || t[11] !== d || t[12] !== f
+      ? ((m = (0, Z.jsx)(q, {
+          app: c,
+          authTypeOverride: `NONE`,
+          connectApp: u,
+          postConnectSource: null,
+          showResultToasts: !1,
+          onConnected: d,
+          onOpenChange: f,
+        })),
+        (t[9] = c),
+        (t[10] = u),
+        (t[11] = d),
+        (t[12] = f),
+        (t[13] = m))
+      : (m = t[13]),
+    m
   );
 }
-
-async function waitForPluginInstall(
-  scope: FinanceScope,
-  marketplacePlugin: MarketplacePlugin,
-  signal: AbortSignal,
-): Promise<boolean> {
-  return new Promise((resolve) => {
-    const opened = openPluginInstaller?.(
-      scope,
-      {
-        displayName: marketplacePlugin.displayName,
-        remotePluginId: marketplacePlugin.pluginId,
-        remoteMarketplaceName: "chatgpt-workspace",
-      },
-      {
-        hostId: "local",
-        onSuccess: () => resolve(true),
-        onCancel: () => resolve(false),
-        onError: () => resolve(false),
-      },
-    );
-    if (!opened) {
-      resolve(false);
-      return;
-    }
-    const request = scope.get<PluginInstallRequest>(pluginInstallRequestSignal);
-    signal.addEventListener(
-      "abort",
-      () => {
-        const current = scope.get<PluginInstallRequest>(
-          pluginInstallRequestSignal,
-        );
-        if (
-          current.kind !== "closed" &&
-          request.kind !== "closed" &&
-          current.requestId === request.requestId
-        ) {
-          scope.set(
-            pluginInstallRequestSignal,
-            closePluginInstallRequest(current),
-          );
-        }
-        resolve(false);
-      },
-      { once: true },
-    );
-  });
+var X, Z;
+function Q() {
+  return (Q = e(() => {
+    ((X = t()), n(), i(), b(), o(), K(), R(), x(), h(), (Z = r()));
+  }))();
 }
-
-async function waitForConnectorConsent(
-  scope: FinanceScope,
-  signal: AbortSignal,
-): Promise<boolean> {
-  const connected = await new Promise<boolean>((resolve) => {
-    openManagedDialog?.(scope, PersonalFinanceConnectorConsentDialog, {
-      onConnected: () => resolve(true),
-      onClose: () => resolve(false),
-    });
-    signal.addEventListener(
-      "abort",
-      () => {
-        closeManagedDialog?.(scope, PersonalFinanceConnectorConsentDialog);
-        resolve(false);
-      },
-      { once: true },
-    );
-  });
-  closeManagedDialog?.(scope, PersonalFinanceConnectorConsentDialog);
-  return connected;
-}
-
-async function connectPersonalFinanceFromHomeBeacon(
-  scope: FinanceScope,
-  {
-    accountId,
-    beacon,
-    onConversationStarted,
-    signal,
-    suppressAnalytics,
-  }: {
-    accountId: string;
-    beacon: unknown;
-    onConversationStarted(conversation: unknown): void;
-    signal: AbortSignal;
-    suppressAnalytics?: boolean;
-  },
-): Promise<boolean> {
-  initializeHomeBeaconFinance();
-  const intl = scope.get<import("@rchunk/app-shared").IntlShape>(intlSignal);
-  const isActive = () => accountStillActive(scope, accountId, signal);
+async function le(
+  e,
+  { accountId: t, beacon: n, onConversationStarted: r, signal: i, suppressAnalytics: a },
+) {
+  let o = e.get(M),
+    s = () => !i.aborted && e.get(N) === t;
   try {
-    const capabilities = await scope.query.getOrFetch<{ finances?: boolean }>(
-      financeCapabilitiesQuery,
-      accountId,
+    let c = await e.query.getOrFetch(m, t);
+    if (!s() || c?.finances !== !0 || e.get(te, `4135903789`) || !e.get(E, `4135903789`)) return !1;
+    if (e.get(j, `4135903789`)) {
+      let { links: n } = await e.query.getOrFetch(H, t);
+      if (!s() || n.length === 0) return !1;
+    }
+    let l = await P(e, { productContext: `chatgpt`, signal: i });
+    if (!s()) return !1;
+    let u = l.find(
+      (e) =>
+        e.canonicalAppId != null &&
+        L(e.canonicalAppId) === `connector_693864f100e4819093e6ed9b651239f1`,
     );
     if (
-      !isActive() ||
-      capabilities?.finances !== true ||
-      scope.get<boolean>(disabledFinanceFlag, FINANCE_FEATURE_FLAG) ||
-      !scope.get<boolean>(enabledFinanceFlag, FINANCE_FEATURE_FLAG)
-    ) {
-      return false;
-    }
-
-    if (scope.get<boolean>(linkedAccountsRequiredFlag, FINANCE_FEATURE_FLAG)) {
-      const linkedAccounts = await scope.query.getOrFetch<{ links: unknown[] }>(
-        linkedAccountsQuery,
-        accountId,
-      );
-      if (!isActive() || linkedAccounts.links.length === 0) return false;
-    }
-
-    const apps = await listAvailableApps?.(scope, {
-      productContext: "chatgpt",
-      signal,
-    });
-    if (!isActive()) return false;
-    const financeApp = apps?.find(
-      (app: FinanceApp) =>
-        app.canonicalAppId != null &&
-        normalizeCanonicalAppId?.(app.canonicalAppId) ===
-          FINANCE_CANONICAL_APP_ID,
-    );
-    if (pluginUnavailable(financeApp)) {
-      throw new Error("Finances is unavailable for this account");
-    }
-
-    if (!financeApp?.plugin?.enabled) {
-      const marketplacePlugin = await getMarketplacePlugin?.(
-        scope,
-        financePluginId,
-      );
+      u?.plugin.availability === `DISABLED_BY_ADMIN` ||
+      u?.plugin.installPolicy === `NOT_AVAILABLE` ||
+      u?.plugin.disabledReason === `plan_not_eligible`
+    )
+      throw Error(`Finances is unavailable for this account`);
+    if (!u?.plugin.enabled) {
+      let t = await W(e, k);
       if (
-        !isActive() ||
-        marketplacePlugin == null ||
-        !(await waitForPluginInstall(scope, marketplacePlugin, signal)) ||
-        !isActive()
-      ) {
-        return false;
-      }
+        !s() ||
+        t == null ||
+        !(await new Promise((n) => {
+          if (
+            !ee(
+              e,
+              {
+                displayName: t.displayName,
+                remotePluginId: t.pluginId,
+                remoteMarketplaceName: `chatgpt-workspace`,
+              },
+              {
+                hostId: `local`,
+                onSuccess: () => {
+                  n(!0);
+                },
+                onCancel: () => n(!1),
+                onError: () => n(!1),
+              },
+            )
+          ) {
+            n(!1);
+            return;
+          }
+          let r = e.get(z);
+          i.addEventListener(
+            `abort`,
+            () => {
+              let t = e.get(z);
+              (t.kind !== `closed` &&
+                r.kind !== `closed` &&
+                t.requestId === r.requestId &&
+                e.set(z, ne(t)),
+                n(!1));
+            },
+            { once: !0 },
+          );
+        })) ||
+        !s()
+      )
+        return !1;
     }
-
-    const connector = scope.get<{
-      getConnectorLink(
-        pluginId: string,
-        source: "CONNECTOR_SETTING",
-      ): Promise<{ link?: { auth_status?: string } }>;
-    }>(connectorClientSignal);
-    const { link } = await connector.getConnectorLink(
-      financePluginId,
-      "CONNECTOR_SETTING",
-    );
-    if (!isActive()) return false;
-    if (
-      link?.auth_status !== "ACTIVE" &&
-      (!(await waitForConnectorConsent(scope, signal)) || !isActive())
-    ) {
-      return false;
-    }
-
-    if (!(await openPlaidLink?.(scope, { accountId, signal })) || !isActive()) {
-      return false;
-    }
-
-    const prompt = String(
-      intl.formatMessage({
-        id: "personalFinance.homeBeacon.onboardingPrompt",
-        defaultMessage:
-          "What can I do with my newly connected accounts once they finish syncing?",
-        description:
-          "User message submitted after connecting bank accounts from a Finance homepage banner or modal, asking ChatGPT to explain how the connected accounts can be used",
-      }),
-    );
-    const startedConversation = await startConversation?.(scope, {
-      accountId,
-      forceOnboarding: true,
-      prompt,
-      requireServerConversation: true,
-      signal,
-      userCompletionMessages: createUserCompletionMessages?.({
-        prompt,
-        systemHints: [financeSystemHint],
-        messageMetadata: {
-          starter_prompt_id: "finance-onboarding-connect-ledger",
-          suggestion_type: "starter",
-        },
-      }),
-    });
-    if (startedConversation == null || !isActive()) return false;
-
-    if (!suppressAnalytics) {
-      logAnalyticsEvent?.(scope, financeConnectionEvent, {
-        surfaceName: "home",
-        entrypoint: isBannerBeacon?.(beacon)
-          ? "homepage_banner"
-          : "homepage_modal",
-        step: "account_linking",
-        provider: "plaid",
-        result: "success",
+    let { link: d } = await e.get(w).getConnectorLink(k, `CONNECTOR_SETTING`);
+    if (!s()) return !1;
+    if (d?.auth_status !== `ACTIVE`) {
+      let t = await new Promise((t) => {
+        (S(e, Y, { onConnected: () => t(!0), onClose: () => t(!1) }),
+          i.addEventListener(
+            `abort`,
+            () => {
+              (U(e, Y), t(!1));
+            },
+            { once: !0 },
+          ));
       });
+      if ((U(e, Y), !t || !s())) return !1;
     }
-    onConversationStarted(startedConversation);
-    return true;
-  } catch {
-    if (isActive()) {
-      scope.get<import("@rchunk/app-shared").ToastManager>(toastManagerSignal).danger(
-        String(intl.formatMessage({
-          id: "personalFinance.homeBeacon.connectionError",
-          defaultMessage:
-            "Couldn’t finish setting up Finances. Please try again.",
-          description:
-            "Error toast when connecting accounts or starting the Finance onboarding conversation from a homepage banner or modal fails",
-        })),
-        {
-          errorAnalytics: {
-            toastId: "personalFinance.homeBeacon.connectionError",
+    if (!(await ce(e, { accountId: t, signal: i })) || !s()) return !1;
+    let f = o.formatMessage({
+        id: `personalFinance.homeBeacon.onboardingPrompt`,
+        defaultMessage: `What can I do with my newly connected accounts once they finish syncing?`,
+        description: `User message submitted after connecting bank accounts from a Finance homepage banner or modal, asking ChatGPT to explain how the connected accounts can be used`,
+      }),
+      p = await J(e, {
+        accountId: t,
+        forceOnboarding: !0,
+        prompt: f,
+        requireServerConversation: !0,
+        signal: i,
+        userCompletionMessages: v({
+          prompt: f,
+          systemHints: [_],
+          messageMetadata: {
+            starter_prompt_id: `finance-onboarding-connect-ledger`,
+            suggestion_type: `starter`,
           },
-        },
-      );
-    }
-    return false;
+        }),
+      });
+    return p == null || !s()
+      ? !1
+      : (a ||
+          ae(e, re, {
+            surfaceName: `home`,
+            entrypoint: B(n) ? `homepage_banner` : `homepage_modal`,
+            step: `account_linking`,
+            provider: `plaid`,
+            result: `success`,
+          }),
+        r(p),
+        !0);
+  } catch {
+    return (
+      s() &&
+        e
+          .get(u)
+          .danger(
+            o.formatMessage({
+              id: `personalFinance.homeBeacon.connectionError`,
+              defaultMessage: `Couldn’t finish setting up Finances. Please try again.`,
+              description: `Error toast when connecting accounts or starting the Finance onboarding conversation from a homepage banner or modal fails`,
+            }),
+            { errorAnalytics: { toastId: `personalFinance.homeBeacon.connectionError` } },
+          ),
+      !1
+    );
   }
 }
-
-function initializeHomeBeaconFinance(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeJsxRuntimeLazy?.();
-  initializeSignalRuntime?.();
-  initializeIntl?.();
-  initializeFinanceAppInfo?.();
-  initializeQueryRuntime?.();
-  initializeAppConnectModal?.();
-  initializeAppConnectFlow?.();
-  initializeConnectorClient?.();
-  initializePluginInstaller?.();
-  initializeFinanceQueries?.();
-  initializeToastRuntime?.();
-  initializeConnectorState?.();
-  initializeManagedDialogs?.();
-  initializeToastUi?.();
-  initializeBeaconAnalytics?.();
-  initializePluginInstallRequest?.();
-  initializeMarketplacePlugin?.();
-  initializeConversationMessages?.();
-  initializeConversationStart?.();
-  initializeAnalytics?.();
-  initializeFinanceEligibility?.();
-  initializeFinanceFeatureFlags?.();
-  initializeConversationStartChunk?.();
-  initializePlaidLink?.();
-  initializePlaidIntegration?.();
-  jsx = typeof getJsxRuntime === "function" ? getJsxRuntime() : getJsxRuntime;
+function $() {
+  return ($ = e(() => {
+    (T(),
+      d(),
+      b(),
+      y(),
+      C(),
+      c(),
+      I(),
+      ie(),
+      G(),
+      g(),
+      D(),
+      V(),
+      f(),
+      F(),
+      x(),
+      h(),
+      oe(),
+      Q(),
+      se(),
+      O());
+  }))();
 }
-
-initializeHomeBeaconFinance();
-
-export { connectPersonalFinanceFromHomeBeacon };
+$();
+export { le as connectPersonalFinanceFromHomeBeacon };

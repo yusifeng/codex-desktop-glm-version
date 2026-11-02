@@ -1,216 +1,199 @@
-// Insertion-sort teaching model. Release chunk: model-9ce2e0b98e4f.js.
-import "@rchunk/rolldown-runtime";
-type Key = `value${1 | 2 | 3 | 4 | 5 | 6 | 7}`;
-interface Values extends Partial<Record<Key, number>> {
-  step?: number | null;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `INSERTION_SORT`),
+      (n = `insertion-sort-v1`),
+      (r = {
+        value1: { kind: `number`, defaultValue: 7, min: 1, max: 9, multipleOf: 1 },
+        value2: { kind: `number`, defaultValue: 3, min: 1, max: 9, multipleOf: 1 },
+        value3: { kind: `number`, defaultValue: 8, min: 1, max: 9, multipleOf: 1 },
+        value4: { kind: `number`, defaultValue: 2, min: 1, max: 9, multipleOf: 1 },
+        value5: { kind: `number`, defaultValue: 6, min: 1, max: 9, multipleOf: 1 },
+        value6: { kind: `number`, defaultValue: 4, min: 1, max: 9, multipleOf: 1 },
+        value7: { kind: `number`, defaultValue: 5, min: 1, max: 9, multipleOf: 1 },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-interface Item {
-  id: string;
-  originPosition: number;
-  value: number;
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y, b;
+function x() {
+  return (x = e(() => {
+    (a(),
+      (o = [`value1`, `value2`, `value3`, `value4`, `value5`, `value6`, `value7`]),
+      (s = {
+        value1: i.parameters.value1,
+        value2: i.parameters.value2,
+        value3: i.parameters.value3,
+        value4: i.parameters.value4,
+        value5: i.parameters.value5,
+        value6: i.parameters.value6,
+        value7: i.parameters.value7,
+      }),
+      (c = Math.max(...o.map((e) => s[e].max))),
+      (l = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (u = (e, t) => {
+        let n = Number.isFinite(e) ? (e ?? 0) : t.defaultValue,
+          r = l(n, t.min, t.max),
+          i = Math.round(r / t.multipleOf) * t.multipleOf;
+        return l(i, t.min, t.max);
+      }),
+      (d = (e) => ({
+        value1: u(e.value1, s.value1),
+        value2: u(e.value2, s.value2),
+        value3: u(e.value3, s.value3),
+        value4: u(e.value4, s.value4),
+        value5: u(e.value5, s.value5),
+        value6: u(e.value6, s.value6),
+        value7: u(e.value7, s.value7),
+      })),
+      (f = () => ({
+        value1: s.value1.defaultValue,
+        value2: s.value2.defaultValue,
+        value3: s.value3.defaultValue,
+        value4: s.value4.defaultValue,
+        value5: s.value5.defaultValue,
+        value6: s.value6.defaultValue,
+        value7: s.value7.defaultValue,
+        step: 0,
+      })),
+      (p = (e) => [...e]),
+      (m = (e) => o.map((t, n) => ({ id: `source-${n + 1}`, originPosition: n + 1, value: e[t] }))),
+      (h = (e) => {
+        let t = m(e),
+          n = { activeEnd: 0, items: p(t), passNumber: 0, phase: `initial`, sortedPrefixEnd: 0 },
+          r = [];
+        for (let e = 1; e < t.length; e += 1) {
+          let n = t[e];
+          if (!n) throw Error(`Insertion sort pass is missing its key item.`);
+          r.push({
+            activeEnd: e,
+            items: p(t),
+            keyId: n.id,
+            passNumber: e,
+            phase: `select`,
+            sortedPrefixEnd: e - 1,
+          });
+          let i = e,
+            a = `front`;
+          for (; i > 0;) {
+            let o = t[i - 1];
+            if (!o) throw Error(`Insertion sort comparison is missing its predecessor.`);
+            let s = o.value > n.value;
+            if (
+              (r.push({
+                activeEnd: e,
+                comparisonId: o.id,
+                comparisonOutcome: s ? `shift` : `stop`,
+                items: p(t),
+                keyId: n.id,
+                passNumber: e,
+                phase: `compare`,
+                sortedPrefixEnd: e - 1,
+              }),
+              !s)
+            ) {
+              a = `predecessor`;
+              break;
+            }
+            ((t[i] = o),
+              (t[i - 1] = n),
+              --i,
+              r.push({
+                activeEnd: e,
+                comparisonId: o.id,
+                items: p(t),
+                keyId: n.id,
+                passNumber: e,
+                phase: `shift`,
+                sortedPrefixEnd: e - 1,
+              }));
+          }
+          r.push({
+            activeEnd: e,
+            items: p(t),
+            insertionReason: a,
+            keyId: n.id,
+            passNumber: e,
+            phase: `insert`,
+            sortedPrefixEnd: e,
+          });
+        }
+        return (
+          r.push({
+            activeEnd: t.length - 1,
+            items: p(t),
+            passNumber: t.length - 1,
+            phase: `complete`,
+            sortedPrefixEnd: t.length - 1,
+          }),
+          [n, ...r]
+        );
+      }),
+      (g = (e) => {
+        let t = d(e),
+          n = h(t),
+          r = n.length - 1,
+          i = Number.isFinite(e.step) ? (e.step ?? 0) : 0,
+          a = l(Math.round(i), 0, r);
+        return { frame: n[a] ?? n[0], frames: n, maxStep: r, values: { ...t, step: a } };
+      }),
+      (_ = (e, t) => {
+        let n = l(Math.round(t), 0, e.length - 1),
+          r = e[n];
+        if (!r || r.phase === `complete`) return n;
+        let i = r.phase === `initial` ? 1 : r.phase === `insert` ? r.passNumber + 1 : r.passNumber;
+        for (let t = n + 1; t < e.length; t += 1) {
+          let n = e[t];
+          if (n?.phase === `insert` && n.passNumber === i) return t;
+        }
+        return e.length - 1;
+      }),
+      (v = (e, t) => e.every((e, n) => e === t[n])),
+      (y = (e, t = Math.random) => {
+        let n = d(e),
+          r = o.map((e) => n[e]),
+          i = [...r];
+        for (let e = i.length - 1; e > 0; --e) {
+          let n = l(Math.floor(t() * (e + 1)), 0, e),
+            r = i[e],
+            a = i[n];
+          if (r === void 0 || a === void 0)
+            throw Error(`Insertion sort shuffle received an incomplete value list.`);
+          ((i[e] = a), (i[n] = r));
+        }
+        if (v(r, i) && r.some((e) => e !== r[0])) {
+          let e = i.shift();
+          e !== void 0 && i.push(e);
+        }
+        let [a, s, c, u, f, p, m] = i;
+        if (
+          a === void 0 ||
+          s === void 0 ||
+          c === void 0 ||
+          u === void 0 ||
+          f === void 0 ||
+          p === void 0 ||
+          m === void 0
+        )
+          throw Error(`Insertion sort shuffle must retain all seven values.`);
+        return {
+          value1: a,
+          value2: s,
+          value3: c,
+          value4: u,
+          value5: f,
+          value6: p,
+          value7: m,
+          step: 0,
+        };
+      }),
+      (b = (e, t) => {
+        let n = e.items.find((e) => e.id === t);
+        if (!n) throw Error(`Insertion sort frame is missing item ${t}.`);
+        return n;
+      }));
+  }))();
 }
-interface Frame {
-  activeEnd: number;
-  items: Item[];
-  passNumber: number;
-  phase: "initial" | "select" | "compare" | "shift" | "insert" | "complete";
-  sortedPrefixEnd: number;
-  keyId?: string;
-  comparisonId?: string;
-  comparisonOutcome?: "shift" | "stop";
-  insertionReason?: "front" | "predecessor";
-}
-const keys: Key[] = [
-  "value1",
-  "value2",
-  "value3",
-  "value4",
-  "value5",
-  "value6",
-  "value7",
-];
-const defaults = [7, 3, 8, 2, 6, 4, 5];
-const definition = {
-  type: "INSERTION_SORT",
-  version: 1,
-  thumbnailAssetKey: "insertion-sort-v1",
-  parameters: Object.fromEntries(
-    keys.map((key, index) => [
-      key,
-      {
-        kind: "number",
-        defaultValue: defaults[index],
-        min: 1,
-        max: 9,
-        multipleOf: 1,
-      },
-    ]),
-  ),
-};
-const maxValue = 9;
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(Math.max(value, min), max);
-const normalize = (input: Values): Record<Key, number> =>
-  Object.fromEntries(
-    keys.map((key, index) => [
-      key,
-      clamp(
-        Math.round(
-          Number.isFinite(input[key]) ? Number(input[key]) : defaults[index],
-        ),
-        1,
-        9,
-      ),
-    ]),
-  ) as Record<Key, number>;
-const defaultValues = () => ({ ...normalize({}), step: 0 });
-const items = (values: Record<Key, number>): Item[] =>
-  keys.map((key, index) => ({
-    id: `source-${index + 1}`,
-    originPosition: index + 1,
-    value: values[key],
-  }));
-const trace = (values: Record<Key, number>): Frame[] => {
-  const list = items(values),
-    frames: Frame[] = [
-      {
-        activeEnd: 0,
-        items: [...list],
-        passNumber: 0,
-        phase: "initial",
-        sortedPrefixEnd: 0,
-      },
-    ];
-  for (let pass = 1; pass < list.length; pass += 1) {
-    const key = list[pass];
-    if (!key) throw Error("Insertion sort pass is missing its key item.");
-    frames.push({
-      activeEnd: pass,
-      items: [...list],
-      keyId: key.id,
-      passNumber: pass,
-      phase: "select",
-      sortedPrefixEnd: pass - 1,
-    });
-    let index = pass,
-      reason: "front" | "predecessor" = "front";
-    while (index > 0) {
-      const previous = list[index - 1];
-      if (!previous)
-        throw Error("Insertion sort comparison is missing its predecessor.");
-      const shift = previous.value > key.value;
-      frames.push({
-        activeEnd: pass,
-        comparisonId: previous.id,
-        comparisonOutcome: shift ? "shift" : "stop",
-        items: [...list],
-        keyId: key.id,
-        passNumber: pass,
-        phase: "compare",
-        sortedPrefixEnd: pass - 1,
-      });
-      if (!shift) {
-        reason = "predecessor";
-        break;
-      }
-      list[index] = previous;
-      list[index - 1] = key;
-      index -= 1;
-      frames.push({
-        activeEnd: pass,
-        comparisonId: previous.id,
-        items: [...list],
-        keyId: key.id,
-        passNumber: pass,
-        phase: "shift",
-        sortedPrefixEnd: pass - 1,
-      });
-    }
-    frames.push({
-      activeEnd: pass,
-      items: [...list],
-      insertionReason: reason,
-      keyId: key.id,
-      passNumber: pass,
-      phase: "insert",
-      sortedPrefixEnd: pass,
-    });
-  }
-  frames.push({
-    activeEnd: list.length - 1,
-    items: [...list],
-    passNumber: list.length - 1,
-    phase: "complete",
-    sortedPrefixEnd: list.length - 1,
-  });
-  return frames;
-};
-const derive = (input: Values) => {
-  const safe = normalize(input),
-    frames = trace(safe),
-    maxStep = frames.length - 1,
-    step = clamp(
-      Math.round(Number.isFinite(input.step) ? Number(input.step) : 0),
-      0,
-      maxStep,
-    );
-  return {
-    frame: frames[step] ?? frames[0],
-    frames,
-    maxStep,
-    values: { ...safe, step },
-  };
-};
-const nextBoundary = (frames: Frame[], step: number) => {
-  const current = clamp(Math.round(step), 0, frames.length - 1),
-    frame = frames[current];
-  if (!frame || frame.phase === "complete") return current;
-  const pass =
-    frame.phase === "initial"
-      ? 1
-      : frame.phase === "insert"
-        ? frame.passNumber + 1
-        : frame.passNumber;
-  for (let index = current + 1; index < frames.length; index += 1) {
-    const candidate = frames[index];
-    if (candidate?.phase === "insert" && candidate.passNumber === pass)
-      return index;
-  }
-  return frames.length - 1;
-};
-const shuffle = (input: Values, random: () => number = Math.random) => {
-  const safe = normalize(input),
-    original = keys.map((key) => safe[key]),
-    shuffled = [...original];
-  for (let index = shuffled.length - 1; index > 0; index -= 1) {
-    const target = clamp(Math.floor(random() * (index + 1)), 0, index);
-    [shuffled[index], shuffled[target]] = [shuffled[target]!, shuffled[index]!];
-  }
-  if (
-    shuffled.every((value, index) => value === original[index]) &&
-    original.some((value) => value !== original[0])
-  )
-    shuffled.push(shuffled.shift()!);
-  return {
-    ...Object.fromEntries(keys.map((key, index) => [key, shuffled[index]])),
-    step: 0,
-  } as Record<Key, number> & { step: number };
-};
-const findItem = (frame: Frame, id: string) => {
-  const item = frame.items.find((candidate) => candidate.id === id);
-  if (!item) throw Error(`Insertion sort frame is missing item ${id}.`);
-  return item;
-};
-function initializeSpecification(): void {}
-function initializeModel(): void {}
-export {
-  nextBoundary as a,
-  initializeSpecification as c,
-  findItem as i,
-  definition as l,
-  derive as n,
-  initializeModel as o,
-  defaultValues as r,
-  shuffle as s,
-  maxValue as t,
-};
+export { _ as a, a as c, b as i, i as l, g as n, x as o, f as r, y as s, c as t };

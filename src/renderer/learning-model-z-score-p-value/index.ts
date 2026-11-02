@@ -1,97 +1,87 @@
-// Z-score and p-value learning model. Release chunk: model-adbf96dad63f.js.
-import "@rchunk/rolldown-runtime";
-
-type TestType = "one-sided" | "two-sided";
-interface ZScoreValues { zScore?: number | null; testType?: string | null }
-interface ZScoreManifest {
-  type: string; version: number; thumbnailAssetKey: string;
-  parameters: {
-    zScore: { kind: "number"; defaultValue: number; min: number; max: number; multipleOf: number };
-    testType: { kind: "enum"; defaultValue: TestType; allowedValues: TestType[] };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `Z_SCORE_P_VALUE`),
+      (n = `z-score-p-value-v1`),
+      (r = {
+        zScore: { kind: `number`, defaultValue: 1.96, min: -3.5, max: 3.5, multipleOf: 0.01 },
+        testType: {
+          kind: `enum`,
+          defaultValue: `two-sided`,
+          allowedValues: [`one-sided`, `two-sided`],
+        },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-let zScoreManifest: ZScoreManifest;
-let oneSidedTest: TestType;
-let twoSidedTest: TestType;
-let zScoreParameter: ZScoreManifest["parameters"]["zScore"];
-let defaultTestType: TestType;
-let zScoreStep: number;
-let normalizeZScoreValues: (values: ZScoreValues) => { zScore: number; testType: TestType };
-let calculatePValue: (values: ZScoreValues) => { zScore: number; testType: TestType; magnitude: number; pValue: number };
-let standardNormalDensity: (zScore: number) => number;
-let densityAreaPolygon: (start: number, end: number) => { x: number; y: number }[];
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeZScoreManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  zScoreManifest = {
-    type: "Z_SCORE_P_VALUE", version: 1, thumbnailAssetKey: "z-score-p-value-v1",
-    parameters: {
-      zScore: { kind: "number", defaultValue: 1.96, min: -3.5, max: 3.5, multipleOf: 0.01 },
-      testType: { kind: "enum", defaultValue: "two-sided", allowedValues: ["one-sided", "two-sided"] },
-    },
-  };
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y;
+function b() {
+  return (b = e(() => {
+    (a(),
+      (o = `one-sided`),
+      (s = `two-sided`),
+      (c = i.parameters.zScore),
+      (l = i.parameters.testType),
+      (u = c.multipleOf),
+      (d = l.defaultValue),
+      (f = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (p = (e) => Number((Math.round(e / c.multipleOf) * c.multipleOf).toFixed(2))),
+      (m = (e) => ({
+        zScore: Number.isFinite(e.zScore)
+          ? p(f(e.zScore ?? c.defaultValue, c.min, c.max))
+          : c.defaultValue,
+        testType: e.testType === `one-sided` || e.testType === `two-sided` ? e.testType : d,
+      })),
+      (h = (e) => {
+        let t = Math.abs(e),
+          n = 1 / (1 + 0.5 * t),
+          r = 0.17087277;
+        ((r = -0.82215223 + n * r),
+          (r = 1.48851587 + n * r),
+          (r = -1.13520398 + n * r),
+          (r = 0.27886807 + n * r),
+          (r = -0.18628806 + n * r),
+          (r = 0.09678418 + n * r),
+          (r = 0.37409196 + n * r),
+          (r = 1.00002368 + n * r));
+        let i = n * Math.exp(-t * t - 1.26551223 + n * r);
+        return e >= 0 ? i : 2 - i;
+      }),
+      (g = (e) => {
+        let t = Math.max(0, Math.abs(e));
+        return t === 0 ? 0.5 : 0.5 * h(t / Math.SQRT2);
+      }),
+      (_ = (e) => {
+        let t = m(e),
+          n = Math.abs(t.zScore),
+          r = g(n),
+          i = t.testType === `two-sided` ? 2 * r : r;
+        return { ...t, magnitude: n, pValue: f(i, 0, 1) };
+      }),
+      (v = (e) => Math.exp(-0.5 * e * e) / Math.sqrt(2 * Math.PI)),
+      (y = (e, t) => [
+        { x: e, y: 0 },
+        ...Array.from({ length: 49 }, (n, r) => {
+          let i = e + (r / 48) * (t - e);
+          return { x: i, y: v(i) };
+        }),
+        { x: t, y: 0 },
+      ]));
+  }))();
 }
-
-function initializeZScorePValueModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializeZScoreManifest();
-  oneSidedTest = "one-sided";
-  twoSidedTest = "two-sided";
-  zScoreParameter = zScoreManifest.parameters.zScore;
-  zScoreStep = zScoreParameter.multipleOf;
-  defaultTestType = zScoreManifest.parameters.testType.defaultValue;
-  const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-  const roundToStep = (value: number): number => Number((Math.round(value / zScoreParameter.multipleOf) * zScoreParameter.multipleOf).toFixed(2));
-  normalizeZScoreValues = values => ({
-    zScore: typeof values.zScore === "number" && Number.isFinite(values.zScore)
-      ? roundToStep(clamp(values.zScore, zScoreParameter.min, zScoreParameter.max))
-      : zScoreParameter.defaultValue,
-    testType: values.testType === oneSidedTest || values.testType === twoSidedTest ? values.testType : defaultTestType,
-  });
-  const complementaryErrorFunction = (value: number): number => {
-    const magnitude = Math.abs(value);
-    const reciprocal = 1 / (1 + 0.5 * magnitude);
-    let polynomial = 0.17087277;
-    polynomial = -0.82215223 + reciprocal * polynomial;
-    polynomial = 1.48851587 + reciprocal * polynomial;
-    polynomial = -1.13520398 + reciprocal * polynomial;
-    polynomial = 0.27886807 + reciprocal * polynomial;
-    polynomial = -0.18628806 + reciprocal * polynomial;
-    polynomial = 0.09678418 + reciprocal * polynomial;
-    polynomial = 0.37409196 + reciprocal * polynomial;
-    polynomial = 1.00002368 + reciprocal * polynomial;
-    const approximation = reciprocal * Math.exp(-magnitude * magnitude - 1.26551223 + reciprocal * polynomial);
-    return value >= 0 ? approximation : 2 - approximation;
-  };
-  const upperTailProbability = (zScore: number): number => {
-    const magnitude = Math.max(0, Math.abs(zScore));
-    return magnitude === 0 ? 0.5 : 0.5 * complementaryErrorFunction(magnitude / Math.SQRT2);
-  };
-  calculatePValue = values => {
-    const normalized = normalizeZScoreValues(values);
-    const magnitude = Math.abs(normalized.zScore);
-    const oneTail = upperTailProbability(magnitude);
-    const pValue = normalized.testType === twoSidedTest ? 2 * oneTail : oneTail;
-    return { ...normalized, magnitude, pValue: clamp(pValue, 0, 1) };
-  };
-  standardNormalDensity = zScore => Math.exp(-0.5 * zScore * zScore) / Math.sqrt(2 * Math.PI);
-  densityAreaPolygon = (start, end) => [
-    { x: start, y: 0 },
-    ...Array.from({ length: 49 }, (_unused, index) => {
-      const x = start + index / 48 * (end - start);
-      return { x, y: standardNormalDensity(x) };
-    }),
-    { x: end, y: 0 },
-  ];
-}
-
 export {
-  zScoreStep as a, standardNormalDensity as c, initializeZScoreManifest as d, zScoreManifest as f, zScoreParameter as i,
-  initializeZScorePValueModel as l, oneSidedTest as n, calculatePValue as o, twoSidedTest as r,
-  densityAreaPolygon as s, defaultTestType as t, normalizeZScoreValues as u,
+  u as a,
+  v as c,
+  a as d,
+  i as f,
+  c as i,
+  b as l,
+  o as n,
+  _ as o,
+  s as r,
+  y as s,
+  d as t,
+  m as u,
 };

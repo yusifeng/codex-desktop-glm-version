@@ -1,419 +1,265 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
-  $O as staleTimes,
-  FX as initializeMaitai,
-  QI as initializeScope,
-  QX as createQueryFamily,
-  XX as createInfiniteQueryFamily,
-  ZI as appScope,
-  ek as initializeQueryRuntime,
-  pL as queryOptions,
+  $O as n,
+  FX as r,
+  QI as i,
+  QX as a,
+  XX as o,
+  ZI as s,
+  ek as c,
+  pL as l,
 } from "@rchunk/app-shared";
 import {
-  Bw as workspaceAgentEnabled,
-  Sun as initializeWorkspaceAgentEnabled,
-  XGt as parseSafeUrl,
-  YGt as initializeSafeUrl,
-  _dn as desktopHttpClient,
-  aJt as normalizeDesktopFetchUrl,
-  cJt as initializeApiClient,
-  gmn as initializeUniqueBy,
-  mun as accountIdSignal,
-  oJt as authenticatedFetchHeaders,
-  pdn as initializeDesktopHttpClient,
-  udn as workspaceAgentApi,
-  ydn as initializeAuthenticatedHeaders,
-  zw as initializeAccountSignals,
+  Bw as u,
+  Sun as d,
+  XGt as f,
+  YGt as p,
+  _dn as m,
+  aJt as h,
+  cJt as g,
+  gmn as _,
+  mun as v,
+  oJt as y,
+  pdn as b,
+  udn as x,
+  ydn as S,
+  zw as C,
 } from "@rchunk/app-initial";
-
-interface ConnectorReference {
-  connector_identifier: { connector_id?: string | null; type: string };
-}
-interface AgentMemoryFile {
-  agentId: string;
-  fileId?: string | null;
-  fileName?: string;
-  mimeType?: string | null;
-  sizeBytes?: number | null;
-  updatedAt?: string | null;
-}
-interface DesktopResponse {
-  body: ReadableStream<Uint8Array> | null;
-  headers: Headers;
-}
-interface DesktopFetcher {
-  fetch(input: string, init?: RequestInit): Promise<DesktopResponse>;
-}
-
-const once = onceExport as (initializer: () => void) => () => void;
-const MAX_TEXT_BYTES = 100_000;
-
-function workspaceAgentAppsOptions({
-  accountId,
-  connectorIds,
-  enabled = true,
-}: {
-  accountId: string;
-  connectorIds: readonly string[];
-  enabled?: boolean;
-}) {
-  const ids = [...new Set(connectorIds)].sort();
-  return queryOptions({
-    queryKey: ["workspace-agent", "apps", accountId, ids],
-    queryFn: ({ signal }: { signal: AbortSignal }) => loadApps(ids, signal),
-    enabled,
-    retry: false,
-    staleTime: staleTimes.FIVE_MINUTES,
+function w({ accountId: e, connectorIds: t, enabled: r = !0 }) {
+  let i = [...new Set(t)].sort();
+  return l({
+    queryKey: [`workspace-agent`, `apps`, e, i],
+    queryFn: ({ signal: e }) => O(i, e),
+    enabled: r,
+    retry: !1,
+    staleTime: n.FIVE_MINUTES,
   });
 }
-
-function connectorActionsOptions(accountId: string, connectorId: string) {
-  return queryOptions({
-    queryKey: ["workspace-agent", "connector-actions", accountId, connectorId],
-    queryFn: async ({ signal }: { signal: AbortSignal }) =>
+function T(e, t) {
+  return l({
+    queryKey: [`workspace-agent`, `connector-actions`, e, t],
+    queryFn: async ({ signal: e }) =>
       (
-        await workspaceAgentApi.safeGet<{ actions: unknown[] }>(
-          "/aip/connectors/{connector_id}/actions",
-          {
-            parameters: { path: { connector_id: connectorId } },
-            signal,
-          },
-        )
+        await x.safeGet(`/aip/connectors/{connector_id}/actions`, {
+          parameters: { path: { connector_id: t } },
+          signal: e,
+        })
       ).actions,
-    retry: false,
-    staleTime: staleTimes.FIVE_MINUTES,
+    retry: !1,
+    staleTime: n.FIVE_MINUTES,
   });
 }
-
-function connectorReadinessOptions({
-  accountId,
-  agentId,
-  versionScope,
-  enabled = true,
-}: {
-  accountId: string;
-  agentId: string;
-  versionScope: string;
-  enabled?: boolean;
-}) {
-  return queryOptions({
-    queryKey: [
-      "workspace-agent",
-      "connector-readiness",
-      accountId,
-      agentId,
-      versionScope,
-    ],
-    queryFn: ({ signal }: { signal: AbortSignal }) =>
-      workspaceAgentApi.safeGet(
-        "/hermes/agent/{agent_id}/list-connector-readiness",
-        {
-          parameters: {
-            path: { agent_id: agentId },
-            query: { version_scope: versionScope },
-          },
-          signal,
-        },
-      ),
-    enabled,
-    retry: false,
-    staleTime: staleTimes.ONE_MINUTE,
+function E({ accountId: e, agentId: t, versionScope: r, enabled: i = !0 }) {
+  return l({
+    queryKey: [`workspace-agent`, `connector-readiness`, e, t, r],
+    queryFn: ({ signal: e }) =>
+      x.safeGet(`/hermes/agent/{agent_id}/list-connector-readiness`, {
+        parameters: { path: { agent_id: t }, query: { version_scope: r } },
+        signal: e,
+      }),
+    enabled: i,
+    retry: !1,
+    staleTime: n.ONE_MINUTE,
   });
 }
-
-function connectorId(reference: ConnectorReference): string | null {
-  return reference.connector_identifier.type === "CONNECTOR_ID"
-    ? (reference.connector_identifier.connector_id ?? null)
+function D(e) {
+  return e.connector_identifier.type === `CONNECTOR_ID`
+    ? e.connector_identifier.connector_id
     : null;
 }
-
-async function loadApps(requestedIds: readonly string[], signal?: AbortSignal) {
-  const browse = await workspaceAgentApi.safeGet<{
-    recommended_apps: Array<Record<string, unknown> & { id: string }>;
-    workspace_apps: Array<Record<string, unknown> & { id: string }>;
-    public_apps: Array<Record<string, unknown> & { id: string }>;
-  }>("/hermes/apps/browse", { signal });
-  const indexed = new Map<
-    string,
-    Record<string, any> & { id: string; source: string }
-  >();
-  for (const [source, apps] of [
-    ["recommended", browse.recommended_apps],
-    ["workspace", browse.workspace_apps],
-    ["public", browse.public_apps],
-  ] as const) {
-    for (const app of apps)
-      if (!indexed.has(app.id)) indexed.set(app.id, { ...app, source });
-  }
-  const ids = [...new Set([...indexed.keys(), ...requestedIds])];
-  const content =
-    ids.length === 0
-      ? { apps: [], missing_app_ids: [] as string[] }
-      : await workspaceAgentApi.safePost<{
-          apps: Array<Record<string, any> & { id: string; name: string }>;
-          missing_app_ids: string[];
-        }>("/hermes/apps/content", { requestBody: { app_ids: ids }, signal });
-  const contentById = new Map(content.apps.map((app) => [app.id, app]));
-  const apps = [];
-  for (const id of ids) {
-    const item = contentById.get(id);
-    if (item == null) continue;
-    const listing = indexed.get(id);
-    apps.push({
-      id,
-      name: item.name,
-      description:
-        item.description?.trim() || listing?.subtitle?.trim() || null,
-      logoUrl: item.logo_url ?? listing?.logo_url ?? null,
-      logoDarkUrl: item.logo_url_dark ?? listing?.logo_dark_url ?? null,
-      source: listing?.source ?? "selected",
-      disabledByAdmin: listing?.disabled_by_admin === true,
-      connectorType: item.connector_type ?? null,
-      status: item.status ?? null,
-      supportedAuthTypes: item.supported_auth_types ?? null,
+async function O(e, t) {
+  let n = await x.safeGet(`/hermes/apps/browse`, { signal: t }),
+    r = [
+      [`recommended`, n.recommended_apps],
+      [`workspace`, n.workspace_apps],
+      [`public`, n.public_apps],
+    ],
+    i = (0, k.default)(
+      r.flatMap(([e, t]) => t.map((t) => ({ ...t, source: e }))),
+      `id`,
+    ),
+    a = new Map(i.map((e) => [e.id, e])),
+    o = [...new Set([...a.keys(), ...e])],
+    s =
+      o.length === 0
+        ? { apps: [], missing_app_ids: [] }
+        : await x.safePost(`/hermes/apps/content`, { requestBody: { app_ids: o }, signal: t }),
+    c = new Map(s.apps.map((e) => [e.id, e])),
+    l = [];
+  for (let e of o) {
+    let t = c.get(e);
+    if (t == null) continue;
+    let n = a.get(e);
+    l.push({
+      id: e,
+      name: t.name,
+      description: t.description?.trim() || n?.subtitle?.trim() || null,
+      logoUrl: t.logo_url ?? n?.logo_url ?? null,
+      logoDarkUrl: t.logo_url_dark ?? n?.logo_dark_url ?? null,
+      source: n?.source ?? `selected`,
+      disabledByAdmin: n?.disabled_by_admin === !0,
+      connectorType: t.connector_type ?? null,
+      status: t.status ?? null,
+      supportedAuthTypes: t.supported_auth_types ?? null,
     });
   }
-  return { apps, missingConnectorIds: content.missing_app_ids };
+  return { apps: l, missingConnectorIds: s.missing_app_ids };
 }
-
-function isTextFile(mimeType?: string | null, fileName?: string): boolean {
-  const normalized = mimeType?.split(";", 1)[0].trim().toLowerCase();
-  if (
-    normalized?.startsWith("text/") ||
-    normalized === "application/json" ||
-    normalized?.endsWith("+json") ||
-    normalized === "application/xml" ||
-    normalized?.endsWith("+xml") ||
-    normalized === "application/javascript" ||
-    normalized === "application/x-yaml"
-  )
-    return true;
-  if (normalized != null && normalized !== "application/octet-stream")
-    return false;
-  return /\.(?:css|csv|html?|js|json|jsx|log|md|mdx|py|text|toml|ts|tsx|txt|xml|ya?ml)$/i.test(
-    fileName ?? "",
-  );
+var k;
+function A() {
+  return (A = e(() => {
+    ((k = t(_(), 1)), c(), b());
+  }))();
 }
-
-async function readTextResponse(
-  response: DesktopResponse,
-  signal: AbortSignal,
-) {
-  if (response.body == null)
-    return { kind: "text" as const, content: "", truncated: false };
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let bytesRead = 0;
-  let content = "";
-  let truncated = false;
+async function j(e, t, n, r, i, a) {
+  let o = await x.safeGet(
+      `/hermes/agent/{agent_id}/persistent-folder/files/{file_id}/download_url`,
+      { parameters: { path: { agent_id: e, file_id: t } }, signal: a },
+    ),
+    s = p(o.download_url);
+  if (s == null) throw Error(`Workspace Agent memory file download URL is unsafe`);
+  if (!M(o.mime_type ?? r, o.file_name ?? n)) return { kind: `unsupported`, reason: `binary` };
+  let c = o.size_bytes ?? i;
+  if (c != null && c > P) return { kind: `unsupported`, reason: `too-large` };
+  let l = await m
+      .getInstance()
+      .fetch(h(s) ?? s, { headers: o.needs_auth_token === !0 ? y() : void 0, signal: a }),
+    u = Number(l.headers.get(`Content-Length`));
+  return Number.isFinite(u) && u > P
+    ? (await l.body?.cancel(), { kind: `unsupported`, reason: `too-large` })
+    : N(l, a);
+}
+function M(e, t) {
+  let n = e?.split(`;`, 1)[0].trim().toLowerCase();
+  return n?.startsWith(`text/`) ||
+    n === `application/json` ||
+    n?.endsWith(`+json`) ||
+    n === `application/xml` ||
+    n?.endsWith(`+xml`) ||
+    n === `application/javascript` ||
+    n === `application/x-yaml`
+    ? !0
+    : n != null && n !== `application/octet-stream`
+      ? !1
+      : /\.(?:css|csv|html?|js|json|jsx|log|md|mdx|py|text|toml|ts|tsx|txt|xml|ya?ml)$/i.test(
+          t ?? ``,
+        );
+}
+async function N(e, t) {
+  if (e.body == null) return { kind: `text`, content: ``, truncated: !1 };
+  let n = e.body.getReader(),
+    r = new TextDecoder(),
+    i = 0,
+    a = ``,
+    o = !1;
   for (;;) {
-    signal.throwIfAborted();
-    const chunk = await reader.read();
-    if (chunk.done) {
-      content += decoder.decode();
+    t.throwIfAborted();
+    let e = await n.read();
+    if (e.done) {
+      a += r.decode();
       break;
     }
-    const remaining = MAX_TEXT_BYTES - bytesRead;
-    if (chunk.value.byteLength > remaining) {
-      content += decoder.decode(chunk.value.subarray(0, remaining), {
-        stream: true,
-      });
-      content += decoder.decode();
-      truncated = true;
-      await reader.cancel();
+    let s = P - i;
+    if (e.value.byteLength > s) {
+      ((a += r.decode(e.value.subarray(0, s), { stream: !0 })),
+        (a += r.decode()),
+        (o = !0),
+        await n.cancel());
       break;
     }
-    bytesRead += chunk.value.byteLength;
-    content += decoder.decode(chunk.value, { stream: true });
+    ((i += e.value.byteLength), (a += r.decode(e.value, { stream: !0 })));
   }
-  return { kind: "text" as const, content, truncated };
+  return { kind: `text`, content: a, truncated: o };
 }
-
-async function readMemoryFile(input: AgentMemoryFile, signal: AbortSignal) {
-  const download = await workspaceAgentApi.safeGet<Record<string, any>>(
-    "/hermes/agent/{agent_id}/persistent-folder/files/{file_id}/download_url",
-    {
-      parameters: {
-        path: { agent_id: input.agentId, file_id: input.fileId ?? "" },
-      },
-      signal,
-    },
-  );
-  const safeUrl = (parseSafeUrl as unknown as (value: string) => string | null)(
-    download.download_url,
-  );
-  if (safeUrl == null)
-    throw new Error("Workspace Agent memory file download URL is unsafe");
-  if (
-    !isTextFile(
-      download.mime_type ?? input.mimeType,
-      download.file_name ?? input.fileName,
-    )
-  ) {
-    return { kind: "unsupported" as const, reason: "binary" as const };
-  }
-  const size = download.size_bytes ?? input.sizeBytes;
-  if (size != null && size > MAX_TEXT_BYTES)
-    return { kind: "unsupported" as const, reason: "too-large" as const };
-  const fetcher = desktopHttpClient.getInstance() as unknown as DesktopFetcher;
-  const response = await fetcher.fetch(
-    normalizeDesktopFetchUrl(safeUrl) ?? safeUrl,
-    {
-      headers:
-        download.needs_auth_token === true
-          ? authenticatedFetchHeaders()
-          : undefined,
-      signal,
-    },
-  );
-  const contentLength = Number(response.headers.get("Content-Length"));
-  if (Number.isFinite(contentLength) && contentLength > MAX_TEXT_BYTES) {
-    await response.body?.cancel();
-    return { kind: "unsupported" as const, reason: "too-large" as const };
-  }
-  return readTextResponse(response, signal);
-}
-
-const initializeUniqueByRuntime = once(() => {
-  initializeUniqueBy();
-  initializeQueryRuntime();
-  initializeDesktopHttpClient();
-});
-
-let detailQuery: any;
-let activityQuery: any;
-let memoryQuery: any;
-let memoryFileQuery: any;
-let appsQuery: any;
-
-const initializeWorkspaceAgentDetailQuery = once(() => {
-  initializeMaitai();
-  initializeWorkspaceAgentEnabled();
-  initializeApiClient();
-  initializeSafeUrl();
-  initializeScope();
-  initializeQueryRuntime();
-  initializeDesktopHttpClient();
-  initializeAuthenticatedHeaders();
-  initializeAccountSignals();
-  initializeUniqueByRuntime();
-  detailQuery = createQueryFamily(appScope, (agentId: string, { get }: any) => {
-    const accountId = get(accountIdSignal);
-    return {
-      enabled: accountId != null && get(workspaceAgentEnabled) === true,
-      queryKey: ["workspace-agent", "detail", accountId, agentId],
-      queryFn: ({ signal }: any) =>
-        workspaceAgentApi.safeGet("/hermes/agent/{agent_id}/detail-view", {
-          parameters: { path: { agent_id: agentId } },
-          signal,
-        }),
-      retry: false,
-      staleTime: staleTimes.ONE_MINUTE,
-    };
-  });
-  activityQuery = createInfiniteQueryFamily(
-    appScope,
-    (agentId: string, { get }: any) => {
-      const accountId = get(accountIdSignal);
-      return {
-        enabled: accountId != null && get(workspaceAgentEnabled) === true,
-        initialPageParam: null,
-        queryKey: ["workspace-agent", "activity", accountId, agentId],
-        queryFn: ({ pageParam, signal }: any) =>
-          workspaceAgentApi.safeGet("/hermes/agent/{agent_id}/conversations", {
-            parameters: {
-              path: { agent_id: agentId },
-              query: { cursor: pageParam, limit: 25 },
-            },
-            signal,
-          }),
-        getNextPageParam: (page: { cursor?: string | null }) =>
-          page.cursor ?? undefined,
-        retry: false,
-        staleTime: staleTimes.ONE_MINUTE,
-      };
-    },
-  );
-  memoryQuery = createQueryFamily(
-    appScope,
-    ({ agentId, channel }: any, { get }: any) => {
-      const accountId = get(accountIdSignal);
-      return {
-        enabled: accountId != null && get(workspaceAgentEnabled) === true,
-        queryKey: ["workspace-agent", "memory", accountId, agentId, channel],
-        queryFn: ({ signal }: any) =>
-          workspaceAgentApi.safeGet(
-            "/hermes/agent/{agent_id}/persistent-folder/tree",
-            {
+var P, F, I, L, R, z;
+function B() {
+  return (B = e(() => {
+    (r(),
+      d(),
+      g(),
+      f(),
+      i(),
+      c(),
+      b(),
+      S(),
+      C(),
+      A(),
+      (P = 1e5),
+      (F = a(s, (e, { get: t }) => {
+        let r = t(v);
+        return {
+          enabled: r != null && t(u) === !0,
+          queryKey: [`workspace-agent`, `detail`, r, e],
+          queryFn: ({ signal: t }) =>
+            x.safeGet(`/hermes/agent/{agent_id}/detail-view`, {
+              parameters: { path: { agent_id: e } },
+              signal: t,
+            }),
+          retry: !1,
+          staleTime: n.ONE_MINUTE,
+        };
+      })),
+      (I = o(s, (e, { get: t }) => {
+        let r = t(v);
+        return {
+          enabled: r != null && t(u) === !0,
+          initialPageParam: null,
+          queryKey: [`workspace-agent`, `activity`, r, e],
+          queryFn: ({ pageParam: t, signal: n }) =>
+            x.safeGet(`/hermes/agent/{agent_id}/conversations`, {
+              parameters: { path: { agent_id: e }, query: { cursor: t, limit: 25 } },
+              signal: n,
+            }),
+          getNextPageParam: (e) => e.cursor ?? void 0,
+          retry: !1,
+          staleTime: n.ONE_MINUTE,
+        };
+      })),
+      (L = a(s, ({ agentId: e, channel: t }, { get: r }) => {
+        let i = r(v);
+        return {
+          enabled: i != null && r(u) === !0,
+          queryKey: [`workspace-agent`, `memory`, i, e, t],
+          queryFn: ({ signal: n }) =>
+            x.safeGet(`/hermes/agent/{agent_id}/persistent-folder/tree`, {
               parameters: {
-                path: { agent_id: agentId },
+                path: { agent_id: e },
                 query: {
-                  channel_binding_type: channel.type,
-                  channel_binding_link_id:
-                    channel.type === "slack" ? channel.linkId : undefined,
-                  channel_binding_channel_id:
-                    channel.type === "slack" ? channel.channelId : undefined,
+                  channel_binding_type: t.type,
+                  channel_binding_link_id: t.type === `slack` ? t.linkId : void 0,
+                  channel_binding_channel_id: t.type === `slack` ? t.channelId : void 0,
                 },
               },
-              signal,
-            },
-          ),
-        retry: false,
-        staleTime: staleTimes.ONE_MINUTE,
-      };
-    },
-  );
-  memoryFileQuery = createQueryFamily(
-    appScope,
-    (input: AgentMemoryFile, { get }: any) => {
-      const accountId = get(accountIdSignal);
-      return {
-        enabled:
-          accountId != null &&
-          input.fileId != null &&
-          get(workspaceAgentEnabled) === true,
-        queryKey: [
-          "workspace-agent",
-          "memory-file",
-          accountId,
-          input.agentId,
-          input.fileId,
-          input.updatedAt,
-        ],
-        queryFn: ({ signal }: any) => readMemoryFile(input, signal),
-        retry: false,
-        staleTime: staleTimes.ONE_MINUTE,
-      };
-    },
-  );
-  appsQuery = createQueryFamily(
-    appScope,
-    (ids: readonly string[], { get }: any) => {
-      const accountId = get(accountIdSignal);
-      return {
-        ...workspaceAgentAppsOptions({
-          accountId: accountId ?? "",
-          connectorIds: ids,
-        }),
-        enabled:
-          accountId != null &&
-          ids.length > 0 &&
-          get(workspaceAgentEnabled) === true,
-      };
-    },
-  );
-});
-
-export {
-  memoryFileQuery as a,
-  connectorActionsOptions as c,
-  initializeUniqueByRuntime as d,
-  detailQuery as i,
-  connectorId as l,
-  activityQuery as n,
-  memoryQuery as o,
-  appsQuery as r,
-  workspaceAgentAppsOptions as s,
-  initializeWorkspaceAgentDetailQuery as t,
-  connectorReadinessOptions as u,
-};
+              signal: n,
+            }),
+          retry: !1,
+          staleTime: n.ONE_MINUTE,
+        };
+      })),
+      (R = a(
+        s,
+        (
+          { agentId: e, fileId: t, fileName: r, mimeType: i, sizeBytes: a, updatedAt: o },
+          { get: s },
+        ) => {
+          let c = s(v);
+          return {
+            enabled: c != null && t != null && s(u) === !0,
+            queryKey: [`workspace-agent`, `memory-file`, c, e, t, o],
+            queryFn: ({ signal: n }) => j(e, t ?? ``, r, i, a, n),
+            retry: !1,
+            staleTime: n.ONE_MINUTE,
+          };
+        },
+      )),
+      (z = a(s, (e, { get: t }) => {
+        let n = t(v);
+        return {
+          ...w({ accountId: n ?? ``, connectorIds: e }),
+          enabled: n != null && e.length > 0 && t(u) === !0,
+        };
+      })));
+  }))();
+}
+export { R as a, T as c, A as d, F as i, D as l, I as n, L as o, z as r, w as s, B as t, E as u };

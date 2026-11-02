@@ -1,38 +1,32 @@
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
-
-export interface SettingsRowDisclosureProps {
-  children: unknown;
-  content: unknown;
-  contentId: string;
-  expanded: boolean;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, $c as n, I3 as r, el as i } from "@rchunk/app-shared";
+function a(e) {
+  let t = (0, o.c)(7),
+    { children: r, content: i, contentId: a, expanded: c } = e,
+    l;
+  t[0] !== i || t[1] !== a || t[2] !== c
+    ? ((l = c ? (0, s.jsx)(`div`, { id: a, className: n, children: i }) : null),
+      (t[0] = i),
+      (t[1] = a),
+      (t[2] = c),
+      (t[3] = l))
+    : (l = t[3]);
+  let u;
+  return (
+    t[4] !== r || t[5] !== l
+      ? ((u = (0, s.jsxs)(`div`, { className: n, children: [r, l] })),
+        (t[4] = r),
+        (t[5] = l),
+        (t[6] = u))
+      : (u = t[6]),
+    u
+  );
 }
-
-let jsx: JsxRuntime;
-
-function SettingsRowDisclosure(props: SettingsRowDisclosureProps): unknown {
-  const runtime = ensureJsx();
-  return runtime.jsxs("div", {
-    className: "contents",
-    children: [
-      props.children,
-      props.expanded
-        ? runtime.jsx("div", {
-            id: props.contentId,
-            className: "contents",
-            children: props.content,
-          })
-        : null,
-    ],
-  });
+var o, s;
+function c() {
+  return (c = e(() => {
+    ((o = t()), i(), (s = r()));
+  }))();
 }
-
-function initializeSettingsRowDisclosure(): void {
-  jsx = getJsxRuntime();
-}
-function ensureJsx(): JsxRuntime {
-  if (jsx == null) jsx = getJsxRuntime();
-  return jsx;
-}
-
-export { initializeSettingsRowDisclosure as n, SettingsRowDisclosure as t };
+export { c as n, a as t };

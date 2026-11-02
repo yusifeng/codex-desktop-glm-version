@@ -1,28 +1,26 @@
-import { FX as initializeSignalRuntime } from "@rchunk/app-shared";
+// @ts-nocheck
+import "@rchunk/app-shared";
 import {
-  Bzt as hasAnyModalOpen,
-  Gzt as useHasAnyModalOpen,
-  Hzt as isModalOpen,
-  Kzt as useIsModalOpen,
-  Rzt as closeAllModals,
-  Uzt as openModal,
-  Vzt as initializeModalController,
-  Wzt as setModalBlocking,
-  qzt as useModalState,
-  zzt as closeModal,
+  Bzt as e,
+  Gzt as t,
+  Hzt as n,
+  Kzt as r,
+  Rzt as i,
+  Uzt as a,
+  Vzt as o,
+  Wzt as s,
+  qzt as c,
+  zzt as l,
 } from "@rchunk/app-initial";
-
-initializeSignalRuntime();
-initializeModalController();
-
+o();
 export {
-  closeAllModals,
-  closeModal,
-  hasAnyModalOpen as hasAnyModalOpen$,
-  isModalOpen,
-  openModal,
-  setModalBlocking,
-  useHasAnyModalOpen,
-  useIsModalOpen,
-  useModalState,
+  i as closeAllModals,
+  l as closeModal,
+  e as hasAnyModalOpen$,
+  n as isModalOpen,
+  a as openModal,
+  s as setModalBlocking,
+  t as useHasAnyModalOpen,
+  r as useIsModalOpen,
+  c as useModalState,
 };

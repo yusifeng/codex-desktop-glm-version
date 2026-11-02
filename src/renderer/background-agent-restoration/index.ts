@@ -1,168 +1,43 @@
-// Restores background-agent tab routes. Release chunk: restoration-4033c505a6bf.js.
-import "@rchunk/rolldown-runtime";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as openTargetChunk from "@rchunk/open-target";
-import * as verifyDescendantChunk from "@rchunk/verify-descendant";
-
-interface Scope {
-  value: { routeKind: string; conversationId: string };
-  get(signal: unknown, parameter: string): unknown;
-}
-
-interface RestoreInput {
-  revealAndFocus: boolean;
-  descriptor: { tabId: string };
-  insertPosition?: unknown;
-  scope: Scope;
-}
-
-interface BackgroundAgent {
-  canInteract?: boolean;
-  conversationId: string;
-  displayName?: string;
-}
-
-interface InitialRuntime {
-  GZt: unknown;
-  HZt(): void;
-  Ugn(
-    scope: Scope,
-    hostId: unknown,
-  ): {
-    ensureConversationHistoryLoaded(conversationId: string): Promise<void>;
-  };
-  Wgn(): void;
-  wQt: unknown;
-}
-
-interface OpenTargetRuntime {
-  n(
-    scope: Scope,
-    parentConversationId: string,
-    targetConversationId: string,
-  ): BackgroundAgent | null;
-  r(): void;
-  t(
-    scope: Scope,
-    parentConversationId: string,
-    hostId: unknown,
-    targetConversationId: string,
-  ): BackgroundAgent | null;
-}
-
-interface VerifyDescendantRuntime {
-  n(
-    scope: Scope,
-    input: {
-      hostId: unknown;
-      hydrateMissingAncestors: true;
-      parentConversationId: string;
-      selectedConversationId: string;
-    },
-  ): boolean | Promise<boolean>;
-  t(): void;
-}
-
-type OpenTab = (
-  scope: Scope,
-  input: {
-    revealAndFocus: boolean;
-    backgroundAgent: BackgroundAgent;
-    hostId: unknown;
-    insertPosition?: unknown;
-    tabId: string;
-    TabComponent: unknown;
-  },
-) => Promise<string | null> | string | null;
-
-const initialRuntime = appInitialChunk as unknown as InitialRuntime;
-const openTargetRuntime = openTargetChunk as unknown as OpenTargetRuntime;
-const verifyDescendantRuntime =
-  verifyDescendantChunk as unknown as VerifyDescendantRuntime;
-
-async function restoreBackgroundAgentTabRoute(
-  { revealAndFocus, descriptor, insertPosition, scope }: RestoreInput,
-  selectedConversationId: string,
-  openTab: OpenTab,
-  TabComponent: unknown,
-): Promise<boolean> {
-  if (scope.value.routeKind !== "local-thread") return false;
-  const parentConversationId = scope.value.conversationId;
-  const hostId = scope.get(initialRuntime.wQt, parentConversationId);
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { GZt as t, HZt as n, Ugn as r, Wgn as i, wQt as a } from "@rchunk/app-initial";
+import { n as o, r as s, t as c } from "@rchunk/open-target";
+import { n as l, t as u } from "@rchunk/verify-descendant";
+async function d({ revealAndFocus: e, descriptor: n, insertPosition: i, scope: s }, u, d, f) {
+  if (s.value.routeKind !== `local-thread`) return !1;
+  let p = s.value.conversationId,
+    m = s.get(a, p);
   if (
-    !(await verifyDescendantRuntime.n(scope, {
-      hostId,
-      hydrateMissingAncestors: true,
-      parentConversationId,
-      selectedConversationId,
+    !(await l(s, {
+      hostId: m,
+      hydrateMissingAncestors: !0,
+      parentConversationId: p,
+      selectedConversationId: u,
     }))
-  ) {
-    return false;
-  }
-
-  const existingTarget = openTargetRuntime.n(
-    scope,
-    parentConversationId,
-    selectedConversationId,
-  );
-  let backgroundAgent =
-    existingTarget ??
-    openTargetRuntime.t(
-      scope,
-      parentConversationId,
-      hostId,
-      selectedConversationId,
-    );
-
-  if (
-    existingTarget == null &&
-    scope.get(initialRuntime.GZt, parentConversationId) !== true
-  ) {
+  )
+    return !1;
+  let h = o(s, p, u),
+    g = h ?? c(s, p, m, u);
+  if (h == null && s.get(t, p) !== !0)
     try {
-      await initialRuntime
-        .Ugn(scope, hostId)
-        .ensureConversationHistoryLoaded(parentConversationId);
-      backgroundAgent =
-        openTargetRuntime.n(
-          scope,
-          parentConversationId,
-          selectedConversationId,
-        ) ??
-        openTargetRuntime.t(
-          scope,
-          parentConversationId,
-          hostId,
-          selectedConversationId,
-        ) ??
-        backgroundAgent;
-    } catch {
-      // Restoration may continue with the target inferred before hydration.
-    }
-  }
-
+      (await r(s, m).ensureConversationHistoryLoaded(p), (g = o(s, p, u) ?? c(s, p, m, u) ?? g));
+    } catch {}
   return (
-    backgroundAgent != null &&
-    (await openTab(scope, {
-      revealAndFocus,
-      backgroundAgent,
-      hostId,
-      insertPosition,
-      tabId: descriptor.tabId,
-      TabComponent,
-    })) === descriptor.tabId
+    g != null &&
+    (await d(s, {
+      revealAndFocus: e,
+      backgroundAgent: g,
+      hostId: m,
+      insertPosition: i,
+      tabId: n.tabId,
+      TabComponent: f,
+    })) === n.tabId
   );
 }
-
-let initialized = false;
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  initialRuntime.Wgn();
-  initialRuntime.HZt();
-  verifyDescendantRuntime.t();
-  openTargetRuntime.r();
+function f() {
+  return (f = e(() => {
+    (i(), n(), u(), s());
+  }))();
 }
-
-initialize();
-
-export { restoreBackgroundAgentTabRoute };
+f();
+export { d as restoreBackgroundAgentTabRoute };

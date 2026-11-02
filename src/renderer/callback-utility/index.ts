@@ -1,55 +1,40 @@
-// callback-utility —— 延迟执行回调、限制等待时间并隔离遥测失败。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-void runtimeChunk;
-
-interface CallbackTelemetry {
-  log(level: "warn", message: string, context: { error: unknown }): void;
-  stats: { increment(metric: "callback_error"): void };
-}
-
-function withTimeout<T>(
-  promise: PromiseLike<T>,
-  timeoutMs: number,
-): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const timeout = setTimeout(
-      () => reject(new Error("Promise timed out")),
-      timeoutMs,
-    );
-    Promise.resolve(promise)
-      .then((value) => {
-        clearTimeout(timeout);
-        resolve(value);
-      })
-      .catch(reject);
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e, t) {
+  return new Promise(function (n, r) {
+    var i = setTimeout(function () {
+      r(Error(`Promise timed out`));
+    }, t);
+    e.then(function (e) {
+      return (clearTimeout(i), n(e));
+    }).catch(r);
   });
 }
-
-function delay(delayMs: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, delayMs));
+function n(e) {
+  return new Promise(function (t) {
+    return setTimeout(t, e);
+  });
 }
-
-async function runDeferredCallback<
-  T extends CallbackTelemetry | null | undefined,
->(
-  telemetry: T,
-  callback: (telemetry: T) => unknown | PromiseLike<unknown>,
-  delayMs: number,
-): Promise<T> {
-  await delay(delayMs);
-  try {
-    await withTimeout(Promise.resolve(callback(telemetry)), 1_000);
-  } catch (error) {
-    telemetry?.log("warn", "Callback Error", { error });
-    telemetry?.stats.increment("callback_error");
-  }
-  return telemetry;
+function r(e, r, i) {
+  var a = function () {
+    try {
+      return Promise.resolve(r(e));
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+  return n(i)
+    .then(function () {
+      return t(a(), 1e3);
+    })
+    .catch(function (t) {
+      (e?.log(`warn`, `Callback Error`, { error: t }), e?.stats.increment(`callback_error`));
+    })
+    .then(function () {
+      return e;
+    });
 }
-
-function initializeCallbackUtility(): void {}
-
-export {
-  runDeferredCallback as n,
-  withTimeout as r,
-  initializeCallbackUtility as t,
-};
+function i() {
+  return (i = e(() => {}))();
+}
+export { r as n, t as r, i as t };

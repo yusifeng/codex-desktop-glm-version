@@ -1,51 +1,23 @@
-import "@rchunk/rolldown-runtime";
-import {
-  M5t as getSkillDisplayName,
-  P5t as initializeSkillMetadata,
-} from "@rchunk/app-initial";
-import {
-  i as initializeCodexMicroCommands,
-  n as getCodexMicroCommand,
-} from "@rchunk/codex-micro-commands";
-import {
-  n as formatCommandMessage,
-  r as initializeCommandMessages,
-  type CommandMessageIntl,
-} from "@rchunk/command-messages";
-
-type AnalogAction =
-  | { commandId: string; type: "command" }
-  | { skillName: string; skillPath: string; type: "skill" };
-
-interface SkillMetadata {
-  name: string;
-  path: string;
-  [key: string]: unknown;
-}
-
-function getAnalogActionTitle(
-  action: AnalogAction,
-  skills: SkillMetadata[],
-  intl: CommandMessageIntl,
-): string {
-  if (action.type === "command") {
-    const command = getCodexMicroCommand(action.commandId);
-    return command == null
-      ? action.commandId
-      : formatCommandMessage(command, intl);
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { M5t as t, P5t as n } from "@rchunk/app-initial";
+import { i as r, n as i } from "@rchunk/codex-micro-commands";
+import { n as a, r as o } from "@rchunk/command-messages";
+function s(e, n, r) {
+  switch (e.type) {
+    case `command`: {
+      let t = i(e.commandId);
+      return t == null ? e.commandId : a(t, r);
+    }
+    case `skill`: {
+      let r = n.find((t) => t.name === e.skillName && t.path === e.skillPath);
+      return `$${r == null ? e.skillName : t(r)}`;
+    }
   }
-  const skill = skills.find((candidate) =>
-    candidate.name === action.skillName && candidate.path === action.skillPath);
-  return `$${skill == null ? action.skillName : getSkillDisplayName(skill)}`;
 }
-
-function initializeCodexMicroAnalogActionTitle(): void {
-  initializeCodexMicroCommands();
-  initializeCommandMessages();
-  initializeSkillMetadata();
+function c() {
+  return (c = e(() => {
+    (r(), o(), n());
+  }))();
 }
-
-export {
-  initializeCodexMicroAnalogActionTitle as n,
-  getAnalogActionTitle as t,
-};
+export { c as n, s as t };

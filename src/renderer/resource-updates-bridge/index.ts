@@ -1,142 +1,102 @@
-// React bridge for websocket resource invalidations. Release chunk: resource-updates-bridge-2f9138580a72.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-
-interface Store {
-  watch(
-    callback: (context: {
-      get(signal: unknown): unknown;
-    }) => void | (() => void),
-  ): () => void;
-}
-interface Subscription {
-  onMessage(callback: (message: unknown) => void): () => void;
-  onSubscribed(callback: () => void): () => void;
-  onPotentialMissedMessages(callback: () => void): () => void;
-  subscribe(): void;
-  unsubscribe(): void;
-}
-interface Debounced {
-  (): void;
-  cancel(): void;
-}
-interface AppSharedRuntime {
-  LX(signal: unknown): Store;
-  ZI: unknown;
-  e6(): {
-    useEffect(effect: () => void | (() => void), dependencies: unknown[]): void;
-  };
-  vW: string;
-  wL(): void;
-}
-interface AppInitialRuntime {
-  [key: string]: unknown;
-}
-
-type DebounceFactory = (
-  callback: () => void,
-  delay: number,
-  options: { leading: boolean },
-) => Debounced;
-
-const shared = appSharedChunk as unknown as AppSharedRuntime;
-const initial = appInitialChunk as unknown as AppInitialRuntime;
-const React = shared.e6();
-
-function websocketUrl(response: unknown): unknown {
-  return typeof response === "object" &&
-    response !== null &&
-    "websocket_url" in response
-    ? response.websocket_url
-    : undefined;
-}
-
-function resolveDebounceFactory(): DebounceFactory | undefined {
-  const initializeDebounceModule = initial.IPt;
-  if (typeof initializeDebounceModule !== "function") return undefined;
-  const module = initializeDebounceModule() as
-    | DebounceFactory
-    | { default?: DebounceFactory }
-    | undefined;
-  if (typeof module === "function") return module;
-  return typeof module?.default === "function" ? module.default : undefined;
-}
-
-function ResourceUpdatesBridge(): null {
-  const store = shared.LX(shared.ZI);
-  React.useEffect(
-    () =>
-      store.watch(({ get }) => {
-        const accountId = get(initial.mun);
-        const userId = get(initial._un);
-        const authAllowed = get(initial.gun);
-        const permission = get(initial.vun) as { status?: string } | undefined;
-        if (
-          accountId == null ||
-          userId == null ||
-          !authAllowed ||
-          permission?.status !== "allowed"
-        ) {
-          return;
-        }
-        const debounce = resolveDebounceFactory();
-        const invalidate = initial.ctt as
-          ((store: Store, accountId: unknown) => void) | undefined;
-        const debounced = debounce?.(
-          () => invalidate?.(store, accountId),
-          500,
-          {
-            leading: false,
-          },
-        );
-        if (!debounced) return;
-        const createSubscription = initial.TKt as
-          | ((
-              name: string,
-              connect: () => Promise<unknown>,
-              key: string,
-            ) => Subscription)
-          | undefined;
-        const api = initial.rJt as
-          | { safeGet(path: string, options: unknown): Promise<unknown> }
-          | undefined;
-        const subscription = createSubscription?.(
-          "resource-updates",
-          () =>
-            api
-              ?.safeGet("/celsius/ws/user", {
-                additionalHeaders: { [shared.vW]: accountId },
-              })
-              .then(websocketUrl) ?? Promise.resolve(undefined),
-          JSON.stringify([accountId, userId]),
-        );
-        if (!subscription) return;
-        const stopMessage = subscription.onMessage((message) => {
-          const valid =
-            typeof message === "object" &&
-            message !== null &&
-            "type" in message &&
-            message.type === "resource-updated" &&
-            "payload" in message;
-          if (valid) debounced();
-        });
-        const stopSubscribed = subscription.onSubscribed(debounced);
-        const stopMissed = subscription.onPotentialMissedMessages(debounced);
-        subscription.subscribe();
-        return () => {
-          debounced.cancel();
-          stopMessage();
-          stopSubscribed();
-          stopMissed();
-          subscription.unsubscribe();
-        };
-      }),
-    [store],
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  $3 as n,
+  FX as r,
+  H4 as i,
+  LX as a,
+  QI as o,
+  R4 as s,
+  ZI as c,
+  e6 as l,
+  g4 as u,
+  q4 as d,
+  vW as f,
+  wL as p,
+  x4 as m,
+} from "@rchunk/app-shared";
+import {
+  EKt as h,
+  IPt as g,
+  Sun as _,
+  TKt as v,
+  _un as y,
+  cJt as b,
+  ctt as x,
+  gun as S,
+  mun as C,
+  rJt as w,
+  stt as T,
+  vun as E,
+} from "@rchunk/app-initial";
+function D(e) {
+  let t = (0, k.c)(3),
+    n = a(c),
+    r,
+    i;
+  return (
+    t[0] === n
+      ? ((r = t[1]), (i = t[2]))
+      : ((r = () =>
+          n.watch((e) => {
+            let { get: t } = e,
+              r = t(C),
+              i = t(y);
+            if (r == null || i == null || !t(S) || t(E).status !== `allowed`) return;
+            let a = (0, A.default)(
+                () => {
+                  x(n, r);
+                },
+                500,
+                { leading: !1 },
+              ),
+              o = v(
+                `resource-updates`,
+                () => w.safeGet(`/celsius/ws/user`, { additionalHeaders: { [f]: r } }).then(O),
+                JSON.stringify([r, i]),
+              ),
+              s = o.onMessage((e) => {
+                M.safeParse(e).success && a();
+              }),
+              c = o.onSubscribed(a),
+              l = o.onPotentialMissedMessages(a);
+            return (
+              o.subscribe(),
+              () => {
+                (a.cancel(), s(), c(), l(), o.unsubscribe());
+              }
+            );
+          })),
+        (i = [n]),
+        (t[0] = n),
+        (t[1] = r),
+        (t[2] = i)),
+    (0, j.useEffect)(r, i),
+    null
   );
-  return null;
 }
-
-shared.wL();
-
-export { ResourceUpdatesBridge };
+function O(e) {
+  return e.websocket_url;
+}
+var k, A, j, M;
+function N() {
+  return (N = e(() => {
+    ((k = n()),
+      (A = t(g(), 1)),
+      r(),
+      p(),
+      (j = l()),
+      u(),
+      _(),
+      T(),
+      h(),
+      b(),
+      o(),
+      (M = i({
+        type: s(`resource-updated`),
+        payload: i({ resource_type: m([`team`, `automation`]), resource_id: d() }),
+      })));
+  }))();
+}
+N();
+export { D as ResourceUpdatesBridge };

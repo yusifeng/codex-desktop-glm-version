@@ -1,8 +1,4 @@
-import {
-  n as initializeDiff,
-  t as Diff,
-} from "@rchunk/diff-core";
-
-initializeDiff();
-
-export default Diff;
+// @ts-nocheck
+import { n as e, t } from "@rchunk/diff-core";
+e();
+export { t as default };

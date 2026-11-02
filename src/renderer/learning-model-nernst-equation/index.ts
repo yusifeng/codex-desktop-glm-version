@@ -1,74 +1,56 @@
-// Nernst-equation learning model. Release chunk: model-83dea67c5a42.js.
-import "@rchunk/rolldown-runtime";
-
-interface NernstValues { standard_cell_potential_v?: number | null; transferred_electrons?: number | null; log10_q?: number | null }
-interface NernstManifest {
-  type: string; version: number; thumbnailAssetKey: string; canonicalFormula: string;
-  parameters: {
-    standard_cell_potential_v: { kind: "number"; defaultValue: number; min: number; max: number };
-    transferred_electrons: { kind: "integer"; defaultValue: number; min: number; max: number };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `NERNST_EQUATION`),
+      (n = `nernst-equation-v1`),
+      (r = `E_{\\mathrm{cell}}=E^\\circ_{\\mathrm{cell}}-\\frac{0.0592\\,\\mathrm{V}}{n}\\log_{10}Q`),
+      (i = {
+        standard_cell_potential_v: { kind: `number`, defaultValue: 1.1, min: 0.1, max: 1.3 },
+        transferred_electrons: { kind: `integer`, defaultValue: 2, min: 1, max: 4 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-
-let nernstManifest: NernstManifest;
-let standardPotentialControl: NernstManifest["parameters"]["standard_cell_potential_v"] & { step: number };
-let transferredElectronsControl: NernstManifest["parameters"]["transferred_electrons"] & { step: number };
-let reactionQuotientLogControl: { defaultValue: number; min: number; max: number; step: number };
-let chartBounds: { xMin: number; xMax: number; yMin: number; yMax: number };
-let calculateNernstState: (values: NernstValues) => {
-  standard_cell_potential_v: number; transferred_electrons: number; log10_q: number; voltsPerDecade: number;
-  cellPotentialV: number; log10K: number; region: "reactant-rich" | "product-rich" | "standard";
-  atEquilibrium: boolean; beyondEquilibrium: boolean;
-};
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeNernstManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  nernstManifest = {
-    type: "NERNST_EQUATION", version: 1, thumbnailAssetKey: "nernst-equation-v1",
-    canonicalFormula: "E_{\\mathrm{cell}}=E^\\circ_{\\mathrm{cell}}-\\frac{0.0592\\,\\mathrm{V}}{n}\\log_{10}Q",
-    parameters: {
-      standard_cell_potential_v: { kind: "number", defaultValue: 1.1, min: 0.1, max: 1.3 },
-      transferred_electrons: { kind: "integer", defaultValue: 2, min: 1, max: 4 },
-    },
-  };
+var s, c, l, u, d, f, p, m, h;
+function g() {
+  return (g = e(() => {
+    (o(),
+      (s = { ...a.parameters.standard_cell_potential_v, step: 0.01 }),
+      (c = { ...a.parameters.transferred_electrons, step: 1 }),
+      (l = { defaultValue: 0, min: -6, max: 88, step: 0.1 }),
+      (u = 0.0592),
+      (d = { xMin: l.min, xMax: l.max, yMin: -5.3, yMax: 1.8 }),
+      (f = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (p = (e, t) => (Number.isFinite(e) ? e : t)),
+      (m = (e) => ({
+        standard_cell_potential_v: f(p(e.standard_cell_potential_v, s.defaultValue), s.min, s.max),
+        transferred_electrons: f(
+          Math.round(p(e.transferred_electrons, c.defaultValue)),
+          c.min,
+          c.max,
+        ),
+        log10_q: f(p(e.log10_q, l.defaultValue), l.min, l.max),
+      })),
+      (h = (e) => {
+        let t = m(e),
+          n = u / t.transferred_electrons,
+          r = t.standard_cell_potential_v - n * t.log10_q,
+          i = t.standard_cell_potential_v / n,
+          a = t.log10_q < 0 ? `reactant-rich` : t.log10_q > 0 ? `product-rich` : `standard`,
+          o = Math.abs(t.log10_q - i) <= 0.051,
+          s = !o && r < 0;
+        return {
+          ...t,
+          voltsPerDecade: n,
+          cellPotentialV: o ? 0 : r,
+          log10K: i,
+          region: a,
+          atEquilibrium: o,
+          beyondEquilibrium: s,
+        };
+      }));
+  }))();
 }
-
-function initializeNernstEquationModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializeNernstManifest();
-  standardPotentialControl = { ...nernstManifest.parameters.standard_cell_potential_v, step: 0.01 };
-  transferredElectronsControl = { ...nernstManifest.parameters.transferred_electrons, step: 1 };
-  reactionQuotientLogControl = { defaultValue: 0, min: -6, max: 88, step: 0.1 };
-  const nernstVolts = 0.0592;
-  chartBounds = { xMin: reactionQuotientLogControl.min, xMax: reactionQuotientLogControl.max, yMin: -5.3, yMax: 1.8 };
-  const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-  const finiteOr = (value: number | null | undefined, fallback: number): number =>
-    typeof value === "number" && Number.isFinite(value) ? value : fallback;
-  calculateNernstState = values => {
-    const standardPotential = clamp(finiteOr(values.standard_cell_potential_v, standardPotentialControl.defaultValue), standardPotentialControl.min, standardPotentialControl.max);
-    const transferredElectrons = clamp(
-      Math.round(finiteOr(values.transferred_electrons, transferredElectronsControl.defaultValue)),
-      transferredElectronsControl.min, transferredElectronsControl.max,
-    );
-    const log10Q = clamp(finiteOr(values.log10_q, reactionQuotientLogControl.defaultValue), reactionQuotientLogControl.min, reactionQuotientLogControl.max);
-    const voltsPerDecade = nernstVolts / transferredElectrons;
-    const rawPotential = standardPotential - voltsPerDecade * log10Q;
-    const log10K = standardPotential / voltsPerDecade;
-    const atEquilibrium = Math.abs(log10Q - log10K) <= 0.051;
-    return {
-      standard_cell_potential_v: standardPotential, transferred_electrons: transferredElectrons, log10_q: log10Q,
-      voltsPerDecade, cellPotentialV: atEquilibrium ? 0 : rawPotential, log10K,
-      region: log10Q < 0 ? "reactant-rich" : log10Q > 0 ? "product-rich" : "standard",
-      atEquilibrium, beyondEquilibrium: !atEquilibrium && rawPotential < 0,
-    };
-  };
-}
-
-export {
-  calculateNernstState as a, nernstManifest as c, transferredElectronsControl as i, chartBounds as n,
-  initializeNernstEquationModel as o, standardPotentialControl as r, initializeNernstManifest as s, reactionQuotientLogControl as t,
-};
+export { h as a, a as c, c as i, d as n, g as o, s as r, o as s, l as t };

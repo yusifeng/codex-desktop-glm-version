@@ -1,45 +1,23 @@
-// Resistor comparison normalization helpers. Release chunk: resistor-comparison-cc070edadd95.js.
-import "@rchunk/rolldown-runtime";
-
-interface NumericRange {
-  min: number;
-  max: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (n = (e) => ({
+        min: Math.min(...e.map((e) => e.min)),
+        max: Math.max(...e.map((e) => e.max)),
+      })),
+      (r = (e, r) => {
+        let i = n(r),
+          a = i.max - i.min;
+        return e.map((e) => (a === 0 ? 0 : t((e - i.min) / a, 0, 1)));
+      }),
+      (i = (e, t) => {
+        let n = Math.max(e, 0);
+        return n / (n + Math.max(t, 2 ** -52));
+      }),
+      (a = (e, t) => e.map((e) => i(e, t))));
+  }))();
 }
-type NormalizeByRanges = (
-  values: readonly number[],
-  ranges: readonly NumericRange[],
-) => number[];
-type NormalizeAgainstScale = (
-  values: readonly number[],
-  scale: number,
-) => number[];
-type PositiveShare = (value: number, scale: number) => number;
-
-let r: NormalizeByRanges;
-let t: PositiveShare;
-let n: NormalizeAgainstScale;
-
-function i(): void {
-  const clamp = (value: number, minimum: number, maximum: number): number =>
-    Math.min(Math.max(value, minimum), maximum);
-  const encompassingRange = (
-    ranges: readonly NumericRange[],
-  ): NumericRange => ({
-    min: Math.min(...ranges.map((range) => range.min)),
-    max: Math.max(...ranges.map((range) => range.max)),
-  });
-  r ??= (values, ranges) => {
-    const range = encompassingRange(ranges);
-    const width = range.max - range.min;
-    return values.map((value) =>
-      width === 0 ? 0 : clamp((value - range.min) / width, 0, 1),
-    );
-  };
-  t ??= (value, scale) => {
-    const positiveValue = Math.max(value, 0);
-    return positiveValue / (positiveValue + Math.max(scale, Number.EPSILON));
-  };
-  n ??= (values, scale) => values.map((value) => t(value, scale));
-}
-
-export { i, n, r, t };
+export { o as i, a as n, r, i as t };

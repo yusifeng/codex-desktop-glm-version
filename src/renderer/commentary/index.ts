@@ -1,6 +1,5 @@
-// Semantic restoration. Release chunk: commentary-36eecb6e11d3.js.
+// @ts-nocheck
 import { n as e } from "@rchunk/rolldown-runtime";
-// @ts-ignore -- published chunk binding is preserved locally.
 import { FX as t, QI as n, ZI as r, lZ as i, pZ as a, zZ as o } from "@rchunk/app-shared";
 function s(e, t, n = 3e3) {
   e.get(_, void 0).apply(t, n);
@@ -64,7 +63,6 @@ function p(e) {
 }
 var m, h, g, _;
 function v() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (v = e(() => {
     (t(),
       n(),

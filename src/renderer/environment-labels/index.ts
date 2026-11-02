@@ -1,28 +1,20 @@
-import "@rchunk/rolldown-runtime";
-import {
-  RI as initializePathUtilities,
-  VI as normalizePath,
-} from "@rchunk/app-shared";
-
-export interface EnvironmentResult {
-  configPath: string;
-  environment?: { name?: string | null };
-  type: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { RI as t, VI as n } from "@rchunk/app-shared";
+function r(e, t) {
+  return t?.trim() || a(e);
 }
-
-function getPathBasename(path: string): string {
-  const normalized = normalizePath(path);
-  const parts = normalized.split("/").filter(Boolean);
-  return parts.at(-1) ?? normalized;
+function i(e) {
+  return r(e.configPath, e.type === `success` ? e.environment.name : null);
 }
-
-function getEnvironmentLabel(environment: EnvironmentResult): string {
-  const explicitName = environment.type === "success" ? environment.environment?.name : null;
-  return explicitName?.trim() || getPathBasename(environment.configPath);
+function a(e) {
+  let t = n(e),
+    r = t.split(`/`).filter(Boolean);
+  return r[r.length - 1] ?? t;
 }
-
-function initializeEnvironmentLabels(): void {
-  initializePathUtilities();
+function o() {
+  return (o = e(() => {
+    t();
+  }))();
 }
-
-export { initializeEnvironmentLabels as n, getEnvironmentLabel as t };
+export { o as n, i as t };

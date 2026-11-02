@@ -1,211 +1,210 @@
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as reactCompilerRuntime,
-  I3 as getJsxRuntime,
-  K2 as initializeMessageRuntime,
-  Lo as FailureIcon,
-  Ro as initializeFailureIcon,
-  Tc as initializeSuccessIcon,
-  Y2 as FormattedMessage,
-  e6 as initializeReactRuntime,
-  h4 as initializeStyleRuntime,
-  m4 as classNames,
-  wc as SuccessIcon,
+  $3 as t,
+  I3 as n,
+  K2 as r,
+  Lo as i,
+  Ro as a,
+  Tc as o,
+  Y2 as s,
+  e6 as c,
+  h4 as l,
+  m4 as u,
+  wc as d,
 } from "@rchunk/app-shared";
-import {
-  $v as NoChecksIcon,
-  Hg as initializeCheckIcons,
-  Vg as EmptyChecksRingIcon,
-  ey as initializePullRequestChecks,
-} from "@rchunk/app-initial";
-
-void reactCompilerRuntime;
-
-export type PullRequestCheckStatus =
-  | "failing"
-  | "neutral"
-  | "passing"
-  | "pending"
-  | "skipped"
-  | "unknown";
-
-export type PullRequestCiStatus = "failing" | "none" | "passing" | "pending";
-
-export interface PullRequestCheck {
-  status: PullRequestCheckStatus;
+import { $v as f, Hg as p, Vg as m, ey as h } from "@rchunk/app-initial";
+var g, _;
+function v() {
+  return (v = e(() => {
+    (c(),
+      (g = n()),
+      (_ = (e) =>
+        (0, g.jsx)(`svg`, {
+          xmlns: `http://www.w3.org/2000/svg`,
+          width: 20,
+          height: 20,
+          fill: `currentColor`,
+          viewBox: `0 0 20 20`,
+          ...e,
+          children: (0, g.jsx)(`path`, {
+            d: `M10.012 1.669a8.343 8.343 0 0 1 8.343 8.343 8.343 8.343 0 0 1-8.343 8.343 8.343 8.343 0 0 1-8.343-8.343 8.343 8.343 0 0 1 8.343-8.343Zm0 1.668a6.675 6.675 0 1 0 0 13.35 6.675 6.675 0 0 0 0-13.35Zm0 1.669a5.007 5.007 0 1 1 0 10.012V5.006Z`,
+          }),
+        })));
+  }))();
 }
-
-interface CheckSegment {
-  color: string;
-  key: string;
-  offset: number;
-  ratio: number;
+function y(e) {
+  let t = (0, x.c)(24),
+    { className: n, checks: r } = e,
+    i = n === void 0 ? `icon-sm shrink-0` : n,
+    a,
+    o,
+    s,
+    c,
+    l,
+    d,
+    f;
+  if (t[0] !== r || t[1] !== i) {
+    f = Symbol.for(`react.early_return_sentinel`);
+    bb0: {
+      let e = b(r),
+        n;
+      t[9] === i ? (n = t[10]) : ((n = u(`text-codex-description`, i)), (t[9] = i), (t[10] = n));
+      let p = n;
+      if (e.length === 0) {
+        let e;
+        (t[11] === p
+          ? (e = t[12])
+          : ((e = (0, S.jsx)(m, { className: p })), (t[11] = p), (t[12] = e)),
+          (f = e));
+        break bb0;
+      }
+      let h = e.length > 1 ? T : 0;
+      ((s = !0), (c = p), (l = `none`), (d = `0 0 18 18`), (a = `rotate(-90 9 9)`));
+      let g;
+      (t[13] === h
+        ? (g = t[14])
+        : ((g = (e) => {
+            let t = w * e.ratio,
+              n = `${Math.max(t - h, 0.001)} ${w}`,
+              r = -(e.offset + h / 2);
+            return (0, S.jsx)(
+              `circle`,
+              {
+                cx: `9`,
+                cy: `9`,
+                r: C,
+                stroke: e.color,
+                strokeDasharray: n,
+                strokeDashoffset: r,
+                strokeLinecap: `butt`,
+                strokeWidth: `1.7`,
+              },
+              e.key,
+            );
+          }),
+          (t[13] = h),
+          (t[14] = g)),
+        (o = e.map(g)));
+    }
+    ((t[0] = r),
+      (t[1] = i),
+      (t[2] = a),
+      (t[3] = o),
+      (t[4] = s),
+      (t[5] = c),
+      (t[6] = l),
+      (t[7] = d),
+      (t[8] = f));
+  } else ((a = t[2]), (o = t[3]), (s = t[4]), (c = t[5]), (l = t[6]), (d = t[7]), (f = t[8]));
+  if (f !== Symbol.for(`react.early_return_sentinel`)) return f;
+  let p;
+  t[15] !== a || t[16] !== o
+    ? ((p = (0, S.jsx)(`g`, { transform: a, children: o })), (t[15] = a), (t[16] = o), (t[17] = p))
+    : (p = t[17]);
+  let h;
+  return (
+    t[18] !== s || t[19] !== c || t[20] !== l || t[21] !== d || t[22] !== p
+      ? ((h = (0, S.jsx)(`svg`, {
+          "aria-hidden": s,
+          className: c,
+          fill: l,
+          viewBox: d,
+          children: p,
+        })),
+        (t[18] = s),
+        (t[19] = c),
+        (t[20] = l),
+        (t[21] = d),
+        (t[22] = p),
+        (t[23] = h))
+      : (h = t[23]),
+    h
+  );
 }
-
-const RADIUS = 5.75;
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-const SEGMENT_GAP = 1.5;
-
-function HalfCircleIcon(props: Record<string, unknown>): unknown {
-  const { jsx } = getJsxRuntime();
-  return jsx("svg", {
-    xmlns: "http://www.w3.org/2000/svg",
-    width: 20,
-    height: 20,
-    fill: "currentColor",
-    viewBox: "0 0 20 20",
-    ...props,
-    children: jsx("path", {
-      d: "M10.012 1.669a8.343 8.343 0 0 1 8.343 8.343 8.343 8.343 0 0 1-8.343 8.343 8.343 8.343 0 0 1-8.343-8.343 8.343 8.343 0 0 1 8.343-8.343Zm0 1.668a6.675 6.675 0 1 0 0 13.35 6.675 6.675 0 0 0 0-13.35Zm0 1.669a5.007 5.007 0 1 1 0 10.012V5.006Z",
-    }),
-  });
-}
-
-function initializeHalfCircleIcon(): void {
-  initializeReactRuntime();
-  getJsxRuntime();
-}
-
-function getCheckSegments(checks: readonly PullRequestCheck[]): CheckSegment[] {
-  if (checks.length === 0) return [];
-  const counts: Record<PullRequestCheckStatus, number> = {
-    failing: 0,
-    neutral: 0,
-    passing: 0,
-    pending: 0,
-    skipped: 0,
-    unknown: 0,
-  };
-  for (const check of checks) counts[check.status] += 1;
-  let offset = 0;
+function b(e) {
+  let t = e.length;
+  if (t === 0) return [];
+  let n = {
+      failing: e.filter((e) => e.status === `failing`).length,
+      neutral: e.filter((e) => e.status === `neutral`).length,
+      passing: e.filter((e) => e.status === `passing`).length,
+      pending: e.filter((e) => e.status === `pending`).length,
+      skipped: e.filter((e) => e.status === `skipped`).length,
+      unknown: e.filter((e) => e.status === `unknown`).length,
+    },
+    r = 0;
   return [
-    { color: "var(--color-chart-green)", count: counts.passing, key: "passing" },
-    { color: "var(--color-chart-red)", count: counts.failing, key: "failing" },
-    { color: "var(--color-chart-yellow)", count: counts.pending, key: "pending" },
+    { color: `var(--color-chart-green)`, count: n.passing, key: `passing` },
+    { color: `var(--color-chart-red)`, count: n.failing, key: `failing` },
+    { color: `var(--color-chart-yellow)`, count: n.pending, key: `pending` },
     {
-      color: "var(--color-codex-description)",
-      count: counts.neutral + counts.skipped + counts.unknown,
-      key: "skipped",
+      color: `var(--color-codex-description)`,
+      count: n.neutral + n.skipped + n.unknown,
+      key: `skipped`,
     },
   ]
-    .filter(({ count }) => count > 0)
-    .map(({ color, count, key }) => {
-      const ratio = count / checks.length;
-      const segment = { color, key, offset, ratio };
-      offset += CIRCUMFERENCE * ratio;
-      return segment;
+    .filter((e) => e.count > 0)
+    .map((e) => {
+      let n = e.count / t,
+        i = r;
+      return ((r += w * n), { color: e.color, key: e.key, offset: i, ratio: n });
     });
 }
-
-function ChecksRing({
-  checks,
-  className = "icon-sm shrink-0",
-}: {
-  checks: readonly PullRequestCheck[];
-  className?: string;
-}): unknown {
-  const { jsx } = getJsxRuntime();
-  const segments = getCheckSegments(checks);
-  const combinedClassName = classNames("text-codex-description", className);
-  if (segments.length === 0) return jsx(EmptyChecksRingIcon, { className: combinedClassName });
-  const gap = segments.length > 1 ? SEGMENT_GAP : 0;
-  return jsx("svg", {
-    "aria-hidden": true,
-    className: combinedClassName,
-    fill: "none",
-    viewBox: "0 0 18 18",
-    children: jsx("g", {
-      transform: "rotate(-90 9 9)",
-      children: segments.map((segment) =>
-        jsx(
-          "circle",
-          {
-            cx: "9",
-            cy: "9",
-            r: RADIUS,
-            stroke: segment.color,
-            strokeDasharray: `${Math.max(CIRCUMFERENCE * segment.ratio - gap, 0.001)} ${CIRCUMFERENCE}`,
-            strokeDashoffset: -(segment.offset + gap / 2),
-            strokeLinecap: "butt",
-            strokeWidth: "1.7",
-          },
-          segment.key,
-        ),
-      ),
-    }),
-  });
+var x, S, C, w, T;
+function E() {
+  return (E = e(() => {
+    ((x = t()), l(), p(), (S = n()), (C = 5.75), (w = 2 * Math.PI * C), (T = 1.5));
+  }))();
 }
-
-function PullRequestChecksIcon({
-  checks,
-  ciStatus,
-}: {
-  checks: readonly PullRequestCheck[];
-  ciStatus: PullRequestCiStatus;
-}): unknown {
-  const { jsx } = getJsxRuntime();
-  if (checks.length === 0) {
-    switch (ciStatus) {
-      case "failing":
-        return jsx(FailureIcon, { className: "icon-sm shrink-0 text-chart-red" });
-      case "none":
-        return jsx(NoChecksIcon, { className: "icon-sm shrink-0" });
-      case "passing":
-        return jsx(SuccessIcon, { className: "icon-sm shrink-0 text-chart-green" });
-      case "pending":
-        return jsx(HalfCircleIcon, { className: "icon-sm shrink-0 text-chart-yellow" });
+function D({ checks: e, ciStatus: t }) {
+  if (e.length === 0)
+    switch (t) {
+      case `failing`:
+        return (0, k.jsx)(i, { className: `icon-sm shrink-0 text-chart-red` });
+      case `none`:
+        return (0, k.jsx)(f, { className: `icon-sm shrink-0` });
+      case `passing`:
+        return (0, k.jsx)(d, { className: `icon-sm shrink-0 text-chart-green` });
+      case `pending`:
+        return (0, k.jsx)(_, { className: `icon-sm shrink-0 text-chart-yellow` });
     }
+  return t === `none`
+    ? (0, k.jsx)(f, { className: `icon-sm shrink-0` })
+    : (0, k.jsx)(y, { checks: e });
+}
+function O(e) {
+  switch (e) {
+    case `failing`:
+      return (0, k.jsx)(s, {
+        id: `localConversation.pullRequest.actions.checksFailing`,
+        defaultMessage: `Checks failing`,
+        description: `Status row shown when pull request checks are failing`,
+      });
+    case `none`:
+      return (0, k.jsx)(s, {
+        id: `localConversation.pullRequest.actions.noCiChecks`,
+        defaultMessage: `No CI checks`,
+        description: `Status row shown when the pull request currently has no CI checks`,
+      });
+    case `passing`:
+      return (0, k.jsx)(s, {
+        id: `localConversation.pullRequest.actions.checksSuccessful`,
+        defaultMessage: `Checks successful`,
+        description: `Status row shown when pull request checks are passing`,
+      });
+    case `pending`:
+      return (0, k.jsx)(s, {
+        id: `localConversation.pullRequest.actions.checksPending`,
+        defaultMessage: `Checks pending`,
+        description: `Status row shown when pull request checks are still pending`,
+      });
   }
-  return ciStatus === "none"
-    ? jsx(NoChecksIcon, { className: "icon-sm shrink-0" })
-    : jsx(ChecksRing, { checks });
 }
-
-const statusMessages: Record<
-  PullRequestCiStatus,
-  { defaultMessage: string; description: string; id: string }
-> = {
-  failing: {
-    id: "localConversation.pullRequest.actions.checksFailing",
-    defaultMessage: "Checks failing",
-    description: "Status row shown when pull request checks are failing",
-  },
-  none: {
-    id: "localConversation.pullRequest.actions.noCiChecks",
-    defaultMessage: "No CI checks",
-    description: "Status row shown when the pull request currently has no CI checks",
-  },
-  passing: {
-    id: "localConversation.pullRequest.actions.checksSuccessful",
-    defaultMessage: "Checks successful",
-    description: "Status row shown when pull request checks are passing",
-  },
-  pending: {
-    id: "localConversation.pullRequest.actions.checksPending",
-    defaultMessage: "Checks pending",
-    description: "Status row shown when pull request checks are still pending",
-  },
-};
-
-function PullRequestChecksMessage(status: PullRequestCiStatus): unknown {
-  const { jsx } = getJsxRuntime();
-  return jsx(FormattedMessage, statusMessages[status]);
+var k;
+function A() {
+  return (A = e(() => {
+    (r(), o(), v(), h(), a(), E(), (k = n()));
+  }))();
 }
-
-function initializePullRequestChecksSummary(): void {
-  initializeMessageRuntime();
-  initializeSuccessIcon();
-  initializeHalfCircleIcon();
-  initializePullRequestChecks();
-  initializeFailureIcon();
-  initializeCheckIcons();
-  initializeStyleRuntime();
-  getJsxRuntime();
-}
-
-export {
-  initializeHalfCircleIcon as a,
-  HalfCircleIcon as i,
-  PullRequestChecksMessage as n,
-  initializePullRequestChecksSummary as r,
-  PullRequestChecksIcon as t,
-};
+export { v as a, _ as i, O as n, A as r, D as t };

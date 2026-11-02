@@ -1,119 +1,111 @@
-// toolbar-breadcrumb —— 工具栏中的可访问面包屑导航。
-// 原版：app/webview/assets/toolbar-breadcrumb-3bb5b6f3d25b.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-
-void runtimeChunk;
-const {
-  $3: initializeRuntimeLazy,
-  C_: initializeIconAsset,
-  I3: getJsxRuntime,
-  K2: initializeSharedComponents,
-  S_: IconAsset,
-  Xd: initializeChevronAsset,
-  Yd: chevronAsset,
-  Yh: Button,
-  Zh: initializeButton,
-  e6: getReactRuntime,
-  h4: initializeClassNames,
-  m4: classNames,
-  n4: useIntl,
-} = appSharedChunk;
-
-type BreadcrumbAncestor =
-  | { content: unknown; id: string }
-  | { id: string; label: unknown; onClick(): void };
-
-interface ToolbarBreadcrumbProps {
-  ancestors: BreadcrumbAncestor[];
-  current?: unknown;
-  textSm?: boolean;
-}
-
-let React: import("@rchunk/app-shared").ReactRuntime;
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function ToolbarBreadcrumb({
-  ancestors,
-  current,
-  textSm,
-}: ToolbarBreadcrumbProps): unknown {
-  const intl = useIntl();
-  const ariaLabel = intl.formatMessage({
-    id: "toolbarBreadcrumb.label",
-    defaultMessage: "Breadcrumb",
-    description: "Accessible label for toolbar breadcrumb navigation",
-  });
-  const textClassName = textSm ? "text-sm" : "text-base";
-  const className = classNames(
-    "flex min-w-0 items-center gap-1 text-codex-description",
-    textClassName,
-  );
-  const ancestorNodes = ancestors.map((ancestor, index) =>
-    jsx.jsxs(
-      React.Fragment,
-      {
-        children: [
-          index > 0
-            ? jsx.jsx(IconAsset, {
-                className: "shrink-0",
-                asset: chevronAsset,
-              })
-            : null,
-          "content" in ancestor
-            ? ancestor.content
-            : jsx.jsx(Button, {
-                className: classNames("min-w-0", textSm && "text-sm"),
-                color: "ghost",
-                size: "toolbar",
-                onClick: ancestor.onClick,
-                children: jsx.jsx("span", {
-                  className: "min-w-0 truncate",
-                  children: ancestor.label,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  C_ as n,
+  I3 as r,
+  K2 as i,
+  S_ as a,
+  Xd as o,
+  Yd as s,
+  Yh as c,
+  Zh as l,
+  e6 as u,
+  h4 as d,
+  m4 as f,
+  n4 as p,
+} from "@rchunk/app-shared";
+function m(e) {
+  let t = (0, h.c)(17),
+    { ancestors: n, current: r, textSm: i } = e,
+    o = p(),
+    l;
+  t[0] === o
+    ? (l = t[1])
+    : ((l = o.formatMessage({
+        id: `toolbarBreadcrumb.label`,
+        defaultMessage: `Breadcrumb`,
+        description: `Accessible label for toolbar breadcrumb navigation`,
+      })),
+      (t[0] = o),
+      (t[1] = l));
+  let u = i ? `text-sm` : `text-base`,
+    d;
+  t[2] === u
+    ? (d = t[3])
+    : ((d = f(`flex min-w-0 items-center gap-1 text-codex-description`, u)),
+      (t[2] = u),
+      (t[3] = d));
+  let m;
+  if (t[4] !== n || t[5] !== i) {
+    let e;
+    (t[7] === i
+      ? (e = t[8])
+      : ((e = (e, t) =>
+          (0, _.jsxs)(
+            g.Fragment,
+            {
+              children: [
+                t > 0 ? (0, _.jsx)(a, { className: `shrink-0`, asset: s }) : null,
+                `content` in e
+                  ? e.content
+                  : (0, _.jsx)(c, {
+                      className: f(`min-w-0`, i && `text-sm`),
+                      color: `ghost`,
+                      size: `toolbar`,
+                      onClick: e.onClick,
+                      children: (0, _.jsx)(`span`, {
+                        className: `min-w-0 truncate`,
+                        children: e.label,
+                      }),
+                    }),
+              ],
+            },
+            e.id,
+          )),
+        (t[7] = i),
+        (t[8] = e)),
+      (m = n.map(e)),
+      (t[4] = n),
+      (t[5] = i),
+      (t[6] = m));
+  } else m = t[6];
+  let v;
+  t[9] !== n.length || t[10] !== r
+    ? ((v =
+        r == null
+          ? null
+          : (0, _.jsxs)(_.Fragment, {
+              children: [
+                n.length > 0 ? (0, _.jsx)(a, { className: `shrink-0`, asset: s }) : null,
+                (0, _.jsx)(`span`, {
+                  "aria-current": `page`,
+                  className: `flex h-token-button-composer min-w-0 flex-auto items-center truncate px-2 text-default`,
+                  children: r,
                 }),
-              }),
-        ],
-      },
-      ancestor.id,
-    ),
+              ],
+            })),
+      (t[9] = n.length),
+      (t[10] = r),
+      (t[11] = v))
+    : (v = t[11]);
+  let y;
+  return (
+    t[12] !== l || t[13] !== d || t[14] !== m || t[15] !== v
+      ? ((y = (0, _.jsxs)(`nav`, { "aria-label": l, className: d, children: [m, v] })),
+        (t[12] = l),
+        (t[13] = d),
+        (t[14] = m),
+        (t[15] = v),
+        (t[16] = y))
+      : (y = t[16]),
+    y
   );
-  const currentNode =
-    current == null
-      ? null
-      : jsx.jsxs(React.Fragment, {
-          children: [
-            ancestors.length > 0
-              ? jsx.jsx(IconAsset, {
-                  className: "shrink-0",
-                  asset: chevronAsset,
-                })
-              : null,
-            jsx.jsx("span", {
-              "aria-current": "page",
-              className:
-                "flex h-token-button-composer min-w-0 flex-auto items-center truncate px-2 text-default",
-              children: current,
-            }),
-          ],
-        });
-
-  return jsx.jsxs("nav", {
-    "aria-label": ariaLabel,
-    className,
-    children: [ancestorNodes, currentNode],
-  });
 }
-
-function initializeToolbarBreadcrumb(): void {
-  initializeRuntimeLazy();
-  initializeChevronAsset();
-  initializeClassNames();
-  React = getReactRuntime();
-  initializeSharedComponents();
-  initializeIconAsset();
-  initializeButton();
-  jsx = getJsxRuntime();
+var h, g, _;
+function v() {
+  return (v = e(() => {
+    ((h = t()), o(), d(), (g = u()), i(), n(), l(), (_ = r()));
+  }))();
 }
-
-export { initializeToolbarBreadcrumb as n, ToolbarBreadcrumb as t };
+export { v as n, m as t };

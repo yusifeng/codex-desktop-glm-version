@@ -1,94 +1,49 @@
-import "@rchunk/rolldown-runtime";
-import {
-  FX as initializeSignalRuntime,
-  QI as initializeQueryRuntime,
-  QX as createQueryFamily,
-  ZI as appScope,
-  pL as queryOptions,
-} from "@rchunk/app-shared";
-import {
-  cJt as initializeApiClient,
-  cdn as accountCheckQueryKey,
-  ldn as initializeAccountCheckQueries,
-  rJt as apiClient,
-} from "@rchunk/app-initial";
-
-interface AccountCheckResponse {
-  accounts: Record<string, unknown>;
-}
-
-interface WalletBalance {
-  has_redeemed_gift_card?: boolean | null;
-  [key: string]: unknown;
-}
-
-function accountCheckOptions(
-  accountId: string,
-): import("@rchunk/app-shared").ScopedQueryOptions<AccountCheckResponse> {
-  return queryOptions({
-    queryKey: accountCheckQueryKey(accountId),
-    queryFn: ({ signal }) =>
-      apiClient.safeGet<AccountCheckResponse>("/accounts/check/{version}", {
-        parameters: { path: { version: "v4-2023-04-27" } },
-        signal,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, QI as n, QX as r, ZI as i, pL as a } from "@rchunk/app-shared";
+import { cJt as o, cdn as s, ldn as c, rJt as l } from "@rchunk/app-initial";
+function u(e) {
+  return a({
+    queryKey: s(e),
+    queryFn: ({ signal: e }) =>
+      l.safeGet(`/accounts/check/{version}`, {
+        parameters: { path: { version: `v4-2023-04-27` } },
+        signal: e,
       }),
     staleTime: 0,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: "always",
-    retry: false,
-    retryOnMount: false,
-    select: (response: AccountCheckResponse) => response.accounts[accountId],
+    refetchOnMount: `always`,
+    refetchOnWindowFocus: `always`,
+    retry: !1,
+    retryOnMount: !1,
+    select: (t) => t.accounts[e],
   });
 }
-
-function walletBalanceOptions(
-  accountId: string,
-): import("@rchunk/app-shared").ScopedQueryOptions<WalletBalance> {
-  const key = ["consumer-billing", accountId, "wallet"];
-  return queryOptions({
-    queryKey: key,
-    queryFn: async ({ signal, client }) => {
-      const balance = await apiClient.safeGet<WalletBalance>(
-        "/accounts/{account_id}/customer-balance",
-        {
-          parameters: {
-            path: { account_id: accountId },
-            query: { include_redemption_status: true },
-          },
-          signal,
-        },
-      );
-      const previous = client.getQueryData<WalletBalance>(key);
-      return previous?.has_redeemed_gift_card === true
-        && balance.has_redeemed_gift_card == null
-        ? { ...balance, has_redeemed_gift_card: true }
-        : balance;
+function d(e) {
+  let t = [`consumer-billing`, e, `wallet`];
+  return a({
+    queryKey: t,
+    queryFn: async ({ signal: n, client: r }) => {
+      let i = await l.safeGet(`/accounts/{account_id}/customer-balance`, {
+        parameters: { path: { account_id: e }, query: { include_redemption_status: !0 } },
+        signal: n,
+      });
+      return r.getQueryData(t)?.has_redeemed_gift_card === !0 && i.has_redeemed_gift_card == null
+        ? { ...i, has_redeemed_gift_card: !0 }
+        : i;
     },
     staleTime: 0,
     gcTime: 0,
-    retry: false,
-    retryOnMount: false,
-    refetchOnMount: "always",
-    refetchOnReconnect: "always",
-    refetchOnWindowFocus: "always",
+    retry: !1,
+    retryOnMount: !1,
+    refetchOnMount: `always`,
+    refetchOnReconnect: `always`,
+    refetchOnWindowFocus: `always`,
   });
 }
-
-let accountCheckQuery: unknown;
-let walletBalanceQuery: unknown;
-
-function initializeAccountBillingQueries(): void {
-  initializeSignalRuntime();
-  initializeAccountCheckQueries();
-  initializeApiClient();
-  initializeQueryRuntime();
-  accountCheckQuery = createQueryFamily(appScope, accountCheckOptions);
-  walletBalanceQuery = createQueryFamily(appScope, walletBalanceOptions);
+var f, p;
+function m() {
+  return (m = e(() => {
+    (t(), c(), o(), n(), (f = r(i, u)), (p = r(i, d)));
+  }))();
 }
-
-export {
-  initializeAccountBillingQueries as i,
-  accountCheckOptions as n,
-  walletBalanceQuery as r,
-  accountCheckQuery as t,
-};
+export { m as i, u as n, p as r, f as t };

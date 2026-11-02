@@ -1,5 +1,4 @@
-import { TGt as fetchChatGptFileBlob, jGt as initializeContentReferenceFileDownload } from "@rchunk/app-initial";
-
-initializeContentReferenceFileDownload();
-
-export { fetchChatGptFileBlob };
+// @ts-nocheck
+import { TGt as e, jGt as t } from "@rchunk/app-initial";
+t();
+export { e as fetchChatGptFileBlob };

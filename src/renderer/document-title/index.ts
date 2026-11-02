@@ -1,85 +1,45 @@
-import "@rchunk/rolldown-runtime";
-import {
-  $3 as getCompilerRuntime,
-  BX as useSignalFamilyValue,
-  FX as initializeSignalRuntime,
-  I3 as getJsxRuntime,
-  LX as useScope,
-  e6 as getReactRuntime,
-} from "@rchunk/app-shared";
-import {
-  $b as routeDocumentTitle,
-  $en as conversationScope,
-  Qb as initializeDocumentTitles,
-  itn as initializeConversationScope,
-} from "@rchunk/app-initial";
-
-export interface DocumentTitleProps {
-  title?: string | null;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, BX as n, FX as r, I3 as i, LX as a, e6 as o } from "@rchunk/app-shared";
+import { $b as s, $en as c, Qb as l, itn as u } from "@rchunk/app-initial";
+function d(e) {
+  let t = (0, p.c)(2),
+    { title: r } = e,
+    i = a(c),
+    o = n(s, `${i.value.pathname}${i.value.search ?? ``}`),
+    l = r ?? o,
+    u;
+  return (t[0] === l ? (u = t[1]) : ((u = (0, h.jsx)(f, { title: l })), (t[0] = l), (t[1] = u)), u);
 }
-
-interface CompilerRuntime {
-  c(size: number): unknown[];
+function f(e) {
+  let t = (0, p.c)(3),
+    { title: n } = e,
+    r,
+    i;
+  return (
+    t[0] === n
+      ? ((r = t[1]), (i = t[2]))
+      : ((r = () => {
+          if (n == null) return;
+          let e = document.title;
+          document.title = n;
+          let t = document.title;
+          return () => {
+            document.title === t && (document.title = e);
+          };
+        }),
+        (i = [n]),
+        (t[0] = n),
+        (t[1] = r),
+        (t[2] = i)),
+    (0, m.useEffect)(r, i),
+    null
+  );
 }
-
-let compilerRuntime: CompilerRuntime;
-let React: ReturnType<typeof getReactRuntime>;
-let jsxRuntime: ReturnType<typeof getJsxRuntime>;
-
-function RouteDocumentTitle({ title }: DocumentTitleProps): unknown {
-  const cache = compilerRuntime.c(2);
-  const scope = useScope(conversationScope) as unknown as {
-    value: { pathname: string; search?: string };
-  };
-  const readSignalFamily = useSignalFamilyValue as unknown as (
-    signal: unknown,
-    parameter: unknown,
-  ) => unknown;
-  const routeTitle = readSignalFamily(
-    routeDocumentTitle,
-    `${scope.value.pathname}${scope.value.search ?? ""}`,
-  ) as string | null;
-  const resolvedTitle = title ?? routeTitle;
-  if (cache[0] !== resolvedTitle) {
-    cache[0] = resolvedTitle;
-    cache[1] = jsxRuntime.jsx(DocumentTitle, { title: resolvedTitle });
-  }
-  return cache[1];
+var p, m, h;
+function g() {
+  return (g = e(() => {
+    ((p = t()), r(), (m = o()), u(), l(), (h = i()));
+  }))();
 }
-
-function DocumentTitle({ title }: DocumentTitleProps): null {
-  const cache = compilerRuntime.c(3);
-  let effect: () => (() => void) | undefined;
-  let dependencies: Array<string | null | undefined>;
-  if (cache[0] !== title) {
-    effect = () => {
-      if (title == null) return undefined;
-      const previousTitle = document.title;
-      document.title = title;
-      const appliedTitle = document.title;
-      return () => {
-        if (document.title === appliedTitle) document.title = previousTitle;
-      };
-    };
-    dependencies = [title];
-    cache[0] = title;
-    cache[1] = effect;
-    cache[2] = dependencies;
-  } else {
-    effect = cache[1] as typeof effect;
-    dependencies = cache[2] as typeof dependencies;
-  }
-  React.useEffect(effect, dependencies);
-  return null;
-}
-
-function initializeDocumentTitle(): void {
-  compilerRuntime = getCompilerRuntime() as unknown as CompilerRuntime;
-  initializeSignalRuntime();
-  React = getReactRuntime();
-  initializeConversationScope();
-  initializeDocumentTitles();
-  jsxRuntime = getJsxRuntime();
-}
-
-export { RouteDocumentTitle as n, initializeDocumentTitle as r, DocumentTitle as t };
+export { d as n, g as r, f as t };

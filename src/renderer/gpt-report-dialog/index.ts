@@ -1,116 +1,80 @@
-// gpt-report-dialog —— GPT 举报原因查询与提交的账户隔离宿主。
-// 原版：app/webview/assets/gpt-report-dialog-8f475e8bdb75.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as reportDialogChunk from "@rchunk/report-dialog-core";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-void runtimeChunk;
-
-interface GptReportResource extends Record<string, unknown> {
-  gizmo: {
-    display: { name: string };
-    id: string;
-  };
-}
-
-interface ReportReason {
-  id: string;
-  [key: string]: unknown;
-}
-
-interface SubmitReportInput {
-  details: string;
-  reason: ReportReason;
-}
-
-const {
-  $3: initializeRuntimeLazy,
-  FX: initializeSignalRuntime,
-  HX: useSignalValue,
-  I3: getJsxRuntime,
-  K2: initializeReactRuntime,
-  LX: useSignalScope,
-  QI: initializeAppScope,
-  Y2: FormattedMessage,
-  ZI: appScope,
-} = appSharedChunk;
-const {
-  Sun: initializeAccountState,
-  cJt: initializeApiClient,
-  mun: currentAccountIdSignal,
-  rJt: apiClient,
-} = appInitialChunk;
-const {
-  n: initializeReportDialog,
-  t: ReportDialog,
-} = reportDialogChunk;
-
-const jsx: JsxRuntime = getJsxRuntime();
-
-function loadGptReportReasons(): Promise<ReportReason[]> {
-  return apiClient.safeGet<ReportReason[]>("/report_flow/reasons/{entity_type}", {
-    parameters: { path: { entity_type: "gizmo" } },
-  });
-}
-
-function GptReportDialog({
-  accountId,
-  resource,
-  onClose = () => {},
-}: {
-  accountId: string;
-  resource: GptReportResource;
-  onClose?: () => void;
-}): unknown {
-  const scope = useSignalScope(appScope);
-  const activeAccountId = useSignalValue(currentAccountIdSignal);
-  if (activeAccountId !== accountId) return null;
-
-  return jsx.jsx(
-    ReportDialog,
-    {
-      onClose,
-      queryKey: ["gpt-report-reasons", accountId],
-      loadReasons: loadGptReportReasons,
-      submitReport: async ({ reason, details }: SubmitReportInput) => {
-        if (scope.get(currentAccountIdSignal) !== accountId) {
-          onClose();
-          return;
-        }
-        await apiClient.safePost("/report_flow/report", {
-          requestBody: {
-            entity_id: resource.gizmo.id,
-            entity_type: "gizmo",
-            product_area: "gpts",
-            reason: { id: reason.id, details },
-            additional_fields_values: {},
-          },
-        });
-      },
-      title: jsx.jsx(FormattedMessage, {
-        id: "chatgptConversations.gpts.report.title",
-        defaultMessage: "Report {gptName}",
-        description: "Title of the reporting dialog for a GPT",
-        values: { gptName: resource.gizmo.display.name },
-      }),
-    },
-    resource.gizmo.id,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  HX as r,
+  I3 as i,
+  K2 as a,
+  LX as o,
+  QI as s,
+  Y2 as c,
+  ZI as l,
+} from "@rchunk/app-shared";
+import { Sun as u, cJt as d, mun as f, rJt as p } from "@rchunk/app-initial";
+import { n as m, t as h } from "@rchunk/report-dialog-core";
+function g(e) {
+  let t = (0, v.c)(6),
+    { accountId: n, resource: i, onClose: a } = e,
+    s = o(l),
+    u = r(f),
+    d;
+  return (
+    t[0] !== n || t[1] !== u || t[2] !== a || t[3] !== i || t[4] !== s
+      ? ((d =
+          u === n
+            ? (0, y.jsx)(
+                h,
+                {
+                  onClose: a,
+                  queryKey: [`gpt-report-reasons`, n],
+                  loadReasons: _,
+                  submitReport: async (e) => {
+                    let { reason: t, details: r } = e;
+                    if (s.get(f) !== n) {
+                      a();
+                      return;
+                    }
+                    await p.safePost(`/report_flow/report`, {
+                      requestBody: {
+                        entity_id: i.gizmo.id,
+                        entity_type: `gizmo`,
+                        product_area: `gpts`,
+                        reason: { id: t.id, details: r },
+                        additional_fields_values: {},
+                      },
+                    });
+                  },
+                  title: (0, y.jsx)(c, {
+                    id: `chatgptConversations.gpts.report.title`,
+                    defaultMessage: `Report {gptName}`,
+                    description: `Title of the reporting dialog for a GPT; gptName is its display name`,
+                    values: { gptName: i.gizmo.display.name },
+                  }),
+                },
+                i.gizmo.id,
+              )
+            : null),
+        (t[0] = n),
+        (t[1] = u),
+        (t[2] = a),
+        (t[3] = i),
+        (t[4] = s),
+        (t[5] = d))
+      : (d = t[5]),
+    d
   );
 }
-
-function initializeGptReportDialog(): void {
-  initializeRuntimeLazy();
-  initializeSignalRuntime();
-  initializeReactRuntime();
-  initializeAccountState();
-  initializeReportDialog();
-  initializeAppScope();
-  initializeApiClient();
+function _() {
+  return p.safeGet(`/report_flow/reasons/{entity_type}`, {
+    parameters: { path: { entity_type: `gizmo` } },
+  });
 }
-
-initializeGptReportDialog();
-
-export { GptReportDialog };
+var v, y;
+function b() {
+  return (b = e(() => {
+    ((v = t()), n(), a(), u(), m(), s(), d(), (y = i()));
+  }))();
+}
+b();
+export { g as GptReportDialog };

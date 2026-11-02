@@ -1,367 +1,146 @@
-// portable-attachment-thumbnail.worker —— Composer 附件首屏缩略图渲染 worker。
-//
-// 原版：app/webview/assets/portable-attachment-thumbnail.worker-239d300eaa56.js。
-// 支持 PDF、PPTX、DOCX、XLSX、CSV 与 TSV；所有格式最终都在
-// OffscreenCanvas 上渲染并返回 PNG Blob。
-
-import type { FontFaceSource } from "@rchunk/thumbnail-worker-font-faces";
-
-export type ThumbnailImportKind =
-  | "csv"
-  | "docx"
-  | "ipynb"
-  | "pdf"
-  | "pptx"
-  | "tex"
-  | "tsv"
-  | "xlsx";
-
-export interface AttachmentThumbnailWorkerRequest {
-  bytes: Uint8Array;
-  fonts: readonly FontFaceSource[];
-  importKind: ThumbnailImportKind;
-  pdfWorkerSrc?: string;
-  resourceBaseUrl: string;
-  size: number;
-}
-
-interface ThumbnailWorkerScope {
-  onmessage: ((event: MessageEvent<AttachmentThumbnailWorkerRequest>) => void) | null;
-  postMessage(message: Blob | null): void;
-}
-
-interface FrameLike {
-  height: number;
-  width: number;
-}
-
-interface PresentationSlideLike {
-  frame: FrameLike;
-}
-
-interface PresentationLike {
-  slides: { items: PresentationSlideLike[] };
-}
-
-interface PresentationProtoRuntime {
-  Presentation: { decode(bytes: Uint8Array): unknown };
-}
-
-interface PresentationModelRuntime {
-  Presentation: { load(value: unknown): PresentationLike };
-  Workbook: {
-    fromCSV(text: string, options?: { separator: string }): Promise<unknown> | unknown;
-    load(value: unknown): unknown;
-  };
-  drawSlideToCtx(
-    slide: PresentationSlideLike,
-    presentation: PresentationLike,
-    context: OffscreenCanvasRenderingContext2D,
-    resources: readonly unknown[],
-  ): Promise<void> | void;
-}
-
-interface WorkbookRendererRuntime {
-  renderWorkbook(
-    workbook: unknown,
-    options: {
-      center: "A1";
-      headers: false;
-      height: number;
-      scale: 1;
-      sheetIndex: 0;
-      width: number;
-    },
-  ): Promise<Blob> | Blob;
-}
-
-interface WalnutReaderExports {
-  DocxReader: { ExtractDocxProto(bytes: Uint8Array, includeUnknown: false): Uint8Array };
-  PptxReader: { ExtractSlidesProto(bytes: Uint8Array, includeUnknown: false): Uint8Array };
-  XlsxReader: { ExtractXlsxProto(bytes: Uint8Array, includeUnknown: false): Uint8Array };
-}
-
-interface WalnutReaderRuntime {
-  getPopcornWalnutReaderExports(resourceBaseUrl: URL): Promise<WalnutReaderExports>;
-}
-
-interface DocumentProtoRuntime {
-  Document: { decode(bytes: Uint8Array): unknown };
-}
-
-interface DocumentPageLike {
-  heightPx: number;
-  widthPx: number;
-}
-
-interface DocumentModelLike {
-  pagePaintContext: {
-    chartsById: unknown;
-    pageBackgroundFill: unknown;
-    themeMap: unknown;
-  };
-}
-
-interface DocumentModelRuntime {
-  DocumentModel: { load(value: unknown): DocumentModelLike };
-}
-
-interface DocumentRendererRuntime {
-  layoutDocumentPages(
-    document: DocumentModelLike,
-    context: OffscreenCanvasRenderingContext2D,
-  ): DocumentPageLike[];
-  paintRenderedDocumentPage(
-    context: OffscreenCanvasRenderingContext2D,
-    page: DocumentPageLike,
-    themeMap: unknown,
-    chartsById: unknown,
-    pageBackgroundFill: unknown,
-    images: ReadonlyMap<unknown, ImageBitmap>,
-    selection: undefined,
-    options: { drawPageOutline: false },
-  ): void;
-  preloadDocumentImageBitmaps(
-    document: DocumentModelLike,
-    pages: readonly DocumentPageLike[],
-  ): Promise<ReadonlyMap<unknown, ImageBitmap>>;
-}
-
-interface SpreadsheetProtoRuntime {
-  Workbook: { decode(bytes: Uint8Array): unknown };
-}
-
-interface PdfViewport {
-  height: number;
-  width: number;
-}
-
-interface PdfPage {
-  getViewport(options: { scale: number }): PdfViewport;
-  render(options: {
-    canvas: null;
-    canvasContext: OffscreenCanvasRenderingContext2D;
-    viewport: PdfViewport;
-  }): { promise: Promise<void> };
-}
-
-interface PdfLoadingTask {
-  destroy(): Promise<void>;
-  promise: Promise<{ getPage(pageNumber: 1): Promise<PdfPage> }>;
-}
-
-interface PdfRuntime {
-  GlobalWorkerOptions: { workerPort?: Worker };
-  getDocument(options: {
-    CanvasFactory: typeof ThumbnailCanvasFactory;
-    data: Uint8Array;
-    disableFontFace: true;
-    isEvalSupported: false;
-  }): PdfLoadingTask;
-}
-
-interface CanvasAndContext {
-  canvas: OffscreenCanvas;
-  context: OffscreenCanvasRenderingContext2D;
-}
-
-function createThumbnailCanvas(width: number, height: number, maxSize: number): CanvasAndContext {
-  if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
-    throw new Error("Thumbnail page dimensions invalid");
-  }
-  const scale = Math.min(1, maxSize / Math.max(width, height));
-  const canvas = new OffscreenCanvas(
-    Math.max(1, Math.round(width * scale)),
-    Math.max(1, Math.round(height * scale)),
-  );
-  const context = canvas.getContext("2d");
-  if (context == null) throw new Error("Thumbnail canvas unavailable");
-  context.scale(scale, scale);
-  return { canvas, context };
-}
-
-class ThumbnailCanvasFactory {
-  create(width: number, height: number): CanvasAndContext {
-    if (width <= 0 || height <= 0 || width * height > 16_777_216) {
-      throw new Error("Thumbnail intermediate canvas too large");
-    }
-    const canvas = new OffscreenCanvas(width, height);
-    const context = canvas.getContext("2d");
-    if (context == null) throw new Error("Thumbnail canvas unavailable");
-    return { canvas, context };
-  }
-
-  reset(target: CanvasAndContext, width: number, height: number): void {
-    if (width <= 0 || height <= 0 || width * height > 16_777_216) {
-      throw new Error("Thumbnail intermediate canvas too large");
-    }
-    target.canvas.width = width;
-    target.canvas.height = height;
-  }
-
-  destroy(target: CanvasAndContext): void {
-    target.canvas.width = 0;
-    target.canvas.height = 0;
-  }
-}
-
-async function renderPdfThumbnail({
-  bytes,
-  pdfWorkerSrc,
-  size,
-}: AttachmentThumbnailWorkerRequest): Promise<Blob> {
-  if (pdfWorkerSrc == null) throw new Error("PDF thumbnail worker source unavailable");
-  const pdfRuntime = await import("@rchunk/thumbnail-worker-pdf-runtime") as PdfRuntime;
-  const pdfWorker = new Worker(pdfWorkerSrc, { type: "module" });
-  try {
-    pdfRuntime.GlobalWorkerOptions.workerPort = pdfWorker;
-    const loadingTask = pdfRuntime.getDocument({
-      CanvasFactory: ThumbnailCanvasFactory,
-      data: bytes,
-      disableFontFace: true,
-      isEvalSupported: false,
-    });
-    try {
-      const page = await (await loadingTask.promise).getPage(1);
-      const naturalViewport = page.getViewport({ scale: 1 });
-      const scale = Math.min(1, size / Math.max(naturalViewport.width, naturalViewport.height));
-      const canvas = new OffscreenCanvas(
-        Math.max(1, Math.round(naturalViewport.width * scale)),
-        Math.max(1, Math.round(naturalViewport.height * scale)),
-      );
-      const context = canvas.getContext("2d");
-      if (context == null) throw new Error("Thumbnail canvas unavailable");
-      await page.render({
-        canvas: null,
-        canvasContext: context,
-        viewport: page.getViewport({ scale }),
-      }).promise;
-      return await canvas.convertToBlob({ type: "image/png" });
-    } finally {
-      await loadingTask.destroy();
-    }
-  } finally {
-    pdfWorker.terminate();
-  }
-}
-
-async function renderWorkbookThumbnail(
-  workbook: unknown,
-  size: number,
-  workbookRenderer: WorkbookRendererRuntime,
-): Promise<Blob> {
-  return await workbookRenderer.renderWorkbook(workbook, {
-    center: "A1",
-    headers: false,
-    height: Math.round(size * 9 / 16),
-    scale: 1,
-    sheetIndex: 0,
-    width: size,
-  });
-}
-
-async function renderAttachmentThumbnail(
-  request: AttachmentThumbnailWorkerRequest,
-): Promise<Blob | null> {
-  if (request.importKind === "pdf") return renderPdfThumbnail(request);
-
-  const [fontFaces, shapePresets] = await Promise.all([
-    import("@rchunk/thumbnail-worker-font-faces"),
-    import("@rchunk/thumbnail-worker-shape-presets"),
+// @ts-nocheck
+self.onmessage = ({ data: t }) => {
+  e(t)
+    .then((e) => self.postMessage(e))
+    .catch(() => self.postMessage(null));
+};
+async function e(e) {
+  if (e.importKind === `pdf`) return t(e);
+  let [{ installPopcornFontFaces: r }, { installPresetShapeDefinitions: i }] = await Promise.all([
+    import(`@rchunk/thumbnail-worker-font-faces`),
+    import(`@rchunk/thumbnail-worker-shape-presets`),
   ]);
-  await fontFaces.installPopcornFontFaces(request.fonts);
-  shapePresets.installPresetShapeDefinitions();
-
-  if (request.importKind === "csv" || request.importKind === "tsv") {
-    const [presentationModel, workbookRenderer] = await Promise.all([
-      import("@rchunk/thumbnail-worker-presentation-model") as Promise<PresentationModelRuntime>,
-      import("@rchunk/thumbnail-worker-workbook-renderer") as Promise<WorkbookRendererRuntime>,
+  if ((await r(e.fonts), i(), e.importKind === `csv` || e.importKind === `tsv`)) {
+    let [{ Workbook: t }, { renderWorkbook: n }] = await Promise.all([
+      import(`@rchunk/thumbnail-worker-presentation-model`).then((e) => e.r),
+      import(`@rchunk/thumbnail-worker-workbook-renderer`),
     ]);
-    const workbook = await presentationModel.Workbook.fromCSV(
-      new TextDecoder().decode(request.bytes),
-      request.importKind === "tsv" ? { separator: "\t" } : undefined,
+    return n(
+      await t.fromCSV(
+        new TextDecoder().decode(e.bytes),
+        e.importKind === `tsv` ? { separator: `	` } : void 0,
+      ),
+      {
+        sheetIndex: 0,
+        center: `A1`,
+        width: e.size,
+        height: Math.round((e.size * 9) / 16),
+        headers: !1,
+        scale: 1,
+      },
     );
-    return renderWorkbookThumbnail(workbook, request.size, workbookRenderer);
   }
-
-  const walnutReader = await import("@rchunk/thumbnail-worker-walnut-reader") as WalnutReaderRuntime;
-  const readers = await walnutReader.getPopcornWalnutReaderExports(new URL(request.resourceBaseUrl));
-
-  switch (request.importKind) {
-    case "pptx": {
-      const [presentationProto, presentationModel] = await Promise.all([
-        import("@rchunk/thumbnail-worker-presentation-proto") as Promise<PresentationProtoRuntime>,
-        import("@rchunk/thumbnail-worker-presentation-model") as Promise<PresentationModelRuntime>,
-      ]);
-      const presentation = presentationModel.Presentation.load(
-        presentationProto.Presentation.decode(
-          readers.PptxReader.ExtractSlidesProto(request.bytes, false),
-        ),
-      );
-      const slide = presentation.slides.items[0];
-      if (slide == null) return null;
-      const { canvas, context } = createThumbnailCanvas(
-        slide.frame.width,
-        slide.frame.height,
-        request.size,
-      );
-      await presentationModel.drawSlideToCtx(slide, presentation, context, []);
-      return await canvas.convertToBlob({ type: "image/png" });
+  let { getPopcornWalnutReaderExports: a } = await import(`@rchunk/thumbnail-worker-walnut-reader`),
+    o = await a(new URL(e.resourceBaseUrl));
+  switch (e.importKind) {
+    case `pptx`: {
+      let [{ Presentation: t }, { Presentation: r }, i] = await Promise.all([
+          import(`@rchunk/thumbnail-worker-presentation-proto`).then((e) => e.x),
+          import(`@rchunk/thumbnail-worker-presentation-model`).then((e) => e.n),
+          import(`@rchunk/thumbnail-worker-presentation-model`).then((e) => e.U),
+        ]),
+        a = r.load(t.decode(o.PptxReader.ExtractSlidesProto(e.bytes, !1))),
+        s = a.slides.items[0];
+      if (s == null) return null;
+      let { canvas: c, context: l } = n(s.frame.width, s.frame.height, e.size);
+      return (await i.drawSlideToCtx(s, a, l, []), c.convertToBlob({ type: `image/png` }));
     }
-    case "docx": {
-      const [documentProto, documentModel, documentRenderer] = await Promise.all([
-        import("@rchunk/thumbnail-worker-document-proto") as Promise<DocumentProtoRuntime>,
-        import("@rchunk/thumbnail-worker-document-model") as Promise<DocumentModelRuntime>,
-        import("@rchunk/thumbnail-worker-document-renderer") as Promise<DocumentRendererRuntime>,
-      ]);
-      const document = documentModel.DocumentModel.load(
-        documentProto.Document.decode(readers.DocxReader.ExtractDocxProto(request.bytes, false)),
-      );
-      const measuringContext = new OffscreenCanvas(1, 1).getContext("2d");
-      if (measuringContext == null) return null;
-      const page = documentRenderer.layoutDocumentPages(document, measuringContext)[0];
-      if (page == null) return null;
-      const images = await documentRenderer.preloadDocumentImageBitmaps(document, [page]);
+    case `docx`: {
+      let [{ Document: t }, { DocumentModel: r }, i] = await Promise.all([
+          import(`@rchunk/thumbnail-worker-document-proto`).then((e) => e.r),
+          import(`@rchunk/thumbnail-worker-document-model`),
+          import(`@rchunk/thumbnail-worker-document-renderer`).then((e) => e.n),
+        ]),
+        a = r.load(t.decode(o.DocxReader.ExtractDocxProto(e.bytes, !1))),
+        s = new OffscreenCanvas(1, 1).getContext(`2d`);
+      if (s == null) return null;
+      let c = i.layoutDocumentPages(a, s)[0];
+      if (c == null) return null;
+      let l = await i.preloadDocumentImageBitmaps(a, [c]);
       try {
-        const { canvas, context } = createThumbnailCanvas(page.widthPx, page.heightPx, request.size);
-        const { chartsById, pageBackgroundFill, themeMap } = document.pagePaintContext;
-        documentRenderer.paintRenderedDocumentPage(
-          context,
-          page,
-          themeMap,
-          chartsById,
-          pageBackgroundFill,
-          images,
-          undefined,
-          { drawPageOutline: false },
+        let { canvas: t, context: r } = n(c.widthPx, c.heightPx, e.size),
+          { chartsById: o, pageBackgroundFill: s, themeMap: u } = a.pagePaintContext;
+        return (
+          i.paintRenderedDocumentPage(r, c, u, o, s, l, void 0, { drawPageOutline: !1 }),
+          await t.convertToBlob({ type: `image/png` })
         );
-        return await canvas.convertToBlob({ type: "image/png" });
       } finally {
-        for (const image of images.values()) image.close();
+        for (let e of l.values()) e.close();
       }
     }
-    case "xlsx": {
-      const [spreadsheetProto, presentationModel, workbookRenderer] = await Promise.all([
-        import("@rchunk/thumbnail-worker-spreadsheet-proto") as Promise<SpreadsheetProtoRuntime>,
-        import("@rchunk/thumbnail-worker-presentation-model") as Promise<PresentationModelRuntime>,
-        import("@rchunk/thumbnail-worker-workbook-renderer") as Promise<WorkbookRendererRuntime>,
+    case `xlsx`: {
+      let [{ Workbook: t }, { Workbook: n }, { renderWorkbook: r }] = await Promise.all([
+        import(`@rchunk/thumbnail-worker-spreadsheet-proto`).then((e) => e.w),
+        import(`@rchunk/thumbnail-worker-presentation-model`).then((e) => e.r),
+        import(`@rchunk/thumbnail-worker-workbook-renderer`),
       ]);
-      const workbook = presentationModel.Workbook.load(
-        spreadsheetProto.Workbook.decode(
-          readers.XlsxReader.ExtractXlsxProto(request.bytes, false),
-        ),
-      );
-      return renderWorkbookThumbnail(workbook, request.size, workbookRenderer);
+      return r(n.load(t.decode(o.XlsxReader.ExtractXlsxProto(e.bytes, !1))), {
+        sheetIndex: 0,
+        center: `A1`,
+        width: e.size,
+        height: Math.round((e.size * 9) / 16),
+        headers: !1,
+        scale: 1,
+      });
     }
-    case "ipynb":
-    case "tex":
+    case `ipynb`:
+    case `tex`:
       return null;
   }
 }
-
-const workerScope = globalThis as unknown as ThumbnailWorkerScope;
-workerScope.onmessage = ({ data }) => {
-  void renderAttachmentThumbnail(data)
-    .then((thumbnail) => workerScope.postMessage(thumbnail))
-    .catch(() => workerScope.postMessage(null));
+async function t({ bytes: e, pdfWorkerSrc: t, size: n }) {
+  if (t == null) throw Error(`PDF thumbnail worker source unavailable`);
+  let i = await import(`@rchunk/thumbnail-worker-pdf-runtime`),
+    a = new Worker(t, { type: `module` });
+  try {
+    i.GlobalWorkerOptions.workerPort = a;
+    let t = i.getDocument({ data: e, CanvasFactory: r, disableFontFace: !0, isEvalSupported: !1 });
+    try {
+      let e = await (await t.promise).getPage(1),
+        r = e.getViewport({ scale: 1 }),
+        i = Math.min(1, n / Math.max(r.width, r.height)),
+        a = new OffscreenCanvas(
+          Math.max(1, Math.round(r.width * i)),
+          Math.max(1, Math.round(r.height * i)),
+        ),
+        o = a.getContext(`2d`);
+      if (o == null) throw Error(`Thumbnail canvas unavailable`);
+      return (
+        await e.render({ canvas: null, canvasContext: o, viewport: e.getViewport({ scale: i }) })
+          .promise,
+        await a.convertToBlob({ type: `image/png` })
+      );
+    } finally {
+      await t.destroy();
+    }
+  } finally {
+    a.terminate();
+  }
+}
+function n(e, t, n) {
+  if (!Number.isFinite(e) || !Number.isFinite(t) || e <= 0 || t <= 0)
+    throw Error(`Thumbnail page dimensions invalid`);
+  let r = Math.min(1, n / Math.max(e, t)),
+    i = new OffscreenCanvas(Math.max(1, Math.round(e * r)), Math.max(1, Math.round(t * r))),
+    a = i.getContext(`2d`);
+  if (a == null) throw Error(`Thumbnail canvas unavailable`);
+  return (a.scale(r, r), { canvas: i, context: a });
+}
+var r = class {
+  create(e, t) {
+    if (e <= 0 || t <= 0 || e * t > 16777216)
+      throw Error(`Thumbnail intermediate canvas too large`);
+    let n = new OffscreenCanvas(e, t),
+      r = n.getContext(`2d`);
+    if (r == null) throw Error(`Thumbnail canvas unavailable`);
+    return { canvas: n, context: r };
+  }
+  reset(e, t, n) {
+    if (t <= 0 || n <= 0 || t * n > 16777216)
+      throw Error(`Thumbnail intermediate canvas too large`);
+    ((e.canvas.width = t), (e.canvas.height = n));
+  }
+  destroy(e) {
+    ((e.canvas.width = 0), (e.canvas.height = 0));
+  }
 };

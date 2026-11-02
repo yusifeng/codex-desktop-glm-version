@@ -1,127 +1,49 @@
-// Cube-volume adaptive template and manifest. Release chunk: template-d8d6d1996e0d.js.
-import "@rchunk/rolldown-runtime";
-import * as AdaptiveSliderField from "@rchunk/adaptive-slider-field";
-
-interface NumericBounds {
-  min: number;
-  max: number;
-  step: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { i as t, n, r, t as i } from "@rchunk/adaptive-slider-field";
+var a, o, s, c, l, u;
+function d() {
+  return (d = e(() => {
+    ((a = `VOLUME_CUBE`),
+      (o = `volume-cube-v2`),
+      (s = `V = s^3`),
+      (c = [`V = a^3`, `s^3`]),
+      (l = { sideLength: { kind: `number`, defaultValue: 3, min: 0.01, max: 1e4 } }),
+      (u = {
+        type: a,
+        version: 2,
+        thumbnailAssetKey: o,
+        canonicalFormula: s,
+        canonicalFormulaAliases: c,
+        parameters: l,
+      }));
+  }))();
 }
-
-interface TemplateInput {
-  sideLength: unknown;
-  sideLengthBounds?: NumericBounds;
+var f, p, m, h, g, _;
+function v() {
+  return (v = e(() => {
+    (n(),
+      d(),
+      (f = { label: `s`, min: 1, max: 10, step: 1, defaultValue: 3, thumbnailDefaultValue: 3 }),
+      (p = u.parameters.sideLength),
+      (m = { baseMin: f.min, baseMax: f.max, step: f.step }),
+      (h = (e) => i(e, m, p)),
+      (g = (e) => {
+        let n = t(e.sideLength, p);
+        return {
+          sideLength: n,
+          sideLengthBounds: r({ allowed: p, bounds: e.sideLengthBounds, control: m, value: n }),
+        };
+      }),
+      (_ = {
+        properties: {
+          sideLength: f,
+          sideLengthBounds: {
+            defaultValue: h(f.defaultValue),
+            thumbnailDefaultValue: h(f.thumbnailDefaultValue),
+          },
+        },
+      }));
+  }))();
 }
-
-const adaptiveSlider = AdaptiveSliderField as unknown as {
-  i(value: unknown, allowed: { defaultValue: number; min: number; max: number }): number;
-  n(): void;
-  r(input: {
-    allowed: { defaultValue: number; min: number; max: number };
-    bounds?: NumericBounds;
-    control: { baseMin: number; baseMax: number; step: number };
-    value: number;
-  }): NumericBounds;
-  t(
-    value: number,
-    control: { baseMin: number; baseMax: number; step: number },
-    allowed: { defaultValue: number; min: number; max: number },
-  ): NumericBounds;
-};
-
-let volumeCubeSpecification: {
-  type: "VOLUME_CUBE";
-  version: 2;
-  thumbnailAssetKey: "volume-cube-v2";
-  canonicalFormula: "V = s^3";
-  canonicalFormulaAliases: string[];
-  parameters: { sideLength: { kind: "number"; defaultValue: number; min: number; max: number } };
-};
-let sideLengthControl: {
-  label: "s";
-  min: number;
-  max: number;
-  step: number;
-  defaultValue: number;
-  thumbnailDefaultValue: number;
-};
-let sideLengthAllowed: { kind: "number"; defaultValue: number; min: number; max: number };
-let sideLengthControlBounds: { baseMin: number; baseMax: number; step: number };
-
-function createDefaultBounds(value: number): NumericBounds {
-  return adaptiveSlider.t(value, sideLengthControlBounds, sideLengthAllowed);
-}
-
-function normalizeVolumeCubeTemplate(input: TemplateInput): {
-  sideLength: number;
-  sideLengthBounds: NumericBounds;
-} {
-  const sideLength = adaptiveSlider.i(input.sideLength, sideLengthAllowed);
-  return {
-    sideLength,
-    sideLengthBounds: adaptiveSlider.r({
-      allowed: sideLengthAllowed,
-      bounds: input.sideLengthBounds,
-      control: sideLengthControlBounds,
-      value: sideLength,
-    }),
-  };
-}
-
-let volumeCubeTemplate: {
-  properties: {
-    sideLength: typeof sideLengthControl;
-    sideLengthBounds: { defaultValue: NumericBounds; thumbnailDefaultValue: NumericBounds };
-  };
-};
-
-function initializeVolumeCubeSpecification(): void {
-  volumeCubeSpecification = {
-    type: "VOLUME_CUBE",
-    version: 2,
-    thumbnailAssetKey: "volume-cube-v2",
-    canonicalFormula: "V = s^3",
-    canonicalFormulaAliases: ["V = a^3", "s^3"],
-    parameters: {
-      sideLength: { kind: "number", defaultValue: 3, min: 0.01, max: 10_000 },
-    },
-  };
-}
-function initializeVolumeCubeTemplate(): void {
-  adaptiveSlider.n();
-  initializeVolumeCubeSpecification();
-  sideLengthControl = {
-    label: "s",
-    min: 1,
-    max: 10,
-    step: 1,
-    defaultValue: 3,
-    thumbnailDefaultValue: 3,
-  };
-  sideLengthAllowed = volumeCubeSpecification.parameters.sideLength;
-  sideLengthControlBounds = {
-    baseMin: sideLengthControl.min,
-    baseMax: sideLengthControl.max,
-    step: sideLengthControl.step,
-  };
-  volumeCubeTemplate = {
-    properties: {
-      sideLength: sideLengthControl,
-      sideLengthBounds: {
-        defaultValue: createDefaultBounds(sideLengthControl.defaultValue),
-        thumbnailDefaultValue: createDefaultBounds(sideLengthControl.thumbnailDefaultValue),
-      },
-    },
-  };
-}
-
-export {
-  initializeVolumeCubeTemplate as a,
-  volumeCubeSpecification as c,
-  volumeCubeTemplate as i,
-  sideLengthControl as n,
-  normalizeVolumeCubeTemplate as o,
-  sideLengthControlBounds as r,
-  initializeVolumeCubeSpecification as s,
-  sideLengthAllowed as t,
-};
+export { v as a, u as c, _ as i, f as n, g as o, m as r, d as s, p as t };

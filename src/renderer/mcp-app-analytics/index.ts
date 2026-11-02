@@ -1,19 +1,18 @@
-import "@rchunk/rolldown-runtime";
-
-interface McpAppMetadata {
-  appMetadata?: { firstPartyType?: unknown };
-  distributionChannel?: string;
-  name?: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e) {
+  if (
+    e != null &&
+    ((e.appMetadata != null &&
+      `firstPartyType` in e.appMetadata &&
+      typeof e.appMetadata.firstPartyType == `string` &&
+      e.appMetadata.firstPartyType.trim() !== ``) ||
+      e.distributionChannel === `DEFAULT_OAI_CATALOG` ||
+      e.distributionChannel === `ECOSYSTEM_DIRECTORY`)
+  )
+    return e.name;
 }
-
-function getAnalyticsAppName(app: McpAppMetadata | null | undefined): string | undefined {
-  if (app == null) return undefined;
-  const firstPartyType = app.appMetadata?.firstPartyType;
-  const isFirstParty = typeof firstPartyType === "string" && firstPartyType.trim() !== "";
-  const isCatalogApp = app.distributionChannel === "DEFAULT_OAI_CATALOG" || app.distributionChannel === "ECOSYSTEM_DIRECTORY";
-  return isFirstParty || isCatalogApp ? app.name : undefined;
+function n() {
+  return (n = e(() => {}))();
 }
-
-function initializeMcpAppAnalytics(): void {}
-
-export { initializeMcpAppAnalytics as n, getAnalyticsAppName as t };
+export { n, t };

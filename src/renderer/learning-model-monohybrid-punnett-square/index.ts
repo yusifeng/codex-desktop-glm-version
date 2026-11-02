@@ -1,96 +1,95 @@
-// Monohybrid Punnett-square learning model for a single R/r gene.
-import "@rchunk/rolldown-runtime";
-
-type Genotype = "RR" | "Rr" | "rr";
-interface ParentGenotypes { parentOne?: unknown; parentTwo?: unknown }
-
-const parentOneGenotypes: Genotype[] = ["RR", "Rr", "rr"];
-const parentTwoGenotypes: Genotype[] = ["RR", "Rr", "rr"];
-const defaultParentGenotypes = { parentOne: "Rr" as Genotype, parentTwo: "Rr" as Genotype };
-const genotypePattern = /\b([A-Za-z]{2})\b/g;
-const compareAlleles = (first: string, second: string): number => {
-  const firstLower = first.toLowerCase();
-  const secondLower = second.toLowerCase();
-  if (firstLower === secondLower) {
-    if (first === second) return 0;
-    return first === first.toUpperCase() ? -1 : 1;
-  }
-  return firstLower.localeCompare(secondLower);
-};
-const compareGenotypes = (first: string, second: string): number => {
-  const length = Math.max(first.length, second.length);
-  for (let index = 0; index < length; index += 1) {
-    const firstAllele = first[index];
-    const secondAllele = second[index];
-    if (!firstAllele || !secondAllele) return first.length - second.length;
-    const comparison = compareAlleles(firstAllele, secondAllele);
-    if (comparison !== 0) return comparison;
-  }
-  return 0;
-};
-const canonicalizeGenotype = (value: unknown): Genotype | null => {
-  const text = typeof value === "string" ? value.trim() : "";
-  if (text.length !== 2) return null;
-  const [first, second] = [...text];
-  if (!/[A-Za-z]/.test(first) || !/[A-Za-z]/.test(second)) return null;
-  const gene = first.toLowerCase();
-  if (gene !== second.toLowerCase() || gene !== "r") return null;
-  if (first === first.toUpperCase() && second === second.toUpperCase()) return "RR";
-  if (first === first.toLowerCase() && second === second.toLowerCase()) return "rr";
-  return "Rr";
-};
-const normalizeParentOne = (value: unknown): Genotype => {
-  const genotype = canonicalizeGenotype(value);
-  return genotype && parentOneGenotypes.includes(genotype) ? genotype : defaultParentGenotypes.parentOne;
-};
-const normalizeParentTwo = (value: unknown): Genotype => {
-  const genotype = canonicalizeGenotype(value);
-  return genotype && parentTwoGenotypes.includes(genotype) ? genotype : defaultParentGenotypes.parentTwo;
-};
-const normalizeParentGenotypes = (values: ParentGenotypes) => ({ parentOne: normalizeParentOne(values.parentOne), parentTwo: normalizeParentTwo(values.parentTwo) });
-const parseParentCross = (text: string) => {
-  const matches: Genotype[] = [];
-  for (const match of text.matchAll(genotypePattern)) {
-    const genotype = canonicalizeGenotype(match[1]);
-    if (genotype) {
-      matches.push(genotype);
-      if (matches.length === 2) break;
-    }
-  }
-  return normalizeParentGenotypes({ parentOne: matches[0], parentTwo: matches[1] });
-};
-const formatParentCross = (values: ParentGenotypes): string => {
-  const normalized = normalizeParentGenotypes(values);
-  return normalized.parentOne + " x " + normalized.parentTwo;
-};
-const gametes = (genotype: Genotype): string[] => [genotype[0], genotype[1]];
-const combineAlleles = (first: string, second: string): Genotype => [first, second].sort(compareAlleles).join("") as Genotype;
-
-function derivePunnettSquare(values: ParentGenotypes) {
-  const normalized = normalizeParentGenotypes(values);
-  const parentOneGametes = gametes(normalized.parentOne);
-  const parentTwoGametes = gametes(normalized.parentTwo);
-  const cells = parentTwoGametes.flatMap((rowGamete) => parentOneGametes.map((columnGamete) => ({ rowGamete, columnGamete, genotype: combineAlleles(rowGamete, columnGamete) })));
-  const counts = new Map<Genotype, number>();
-  for (const cell of cells) counts.set(cell.genotype, (counts.get(cell.genotype) ?? 0) + 1);
-  const outcomes = [...counts.entries()].map(([genotype, count]) => ({ genotype, count, probability: count / cells.length })).sort((first, second) => compareGenotypes(first.genotype, second.genotype));
-  const dominantCount = cells.filter((cell) => [...cell.genotype].some((allele) => allele === "R")).length;
-  return { parentOneGametes, parentTwoGametes, cells, outcomes, dominantPhenotypeProbability: dominantCount / cells.length, recessivePhenotypeProbability: (cells.length - dominantCount) / cells.length, isMixedGeneCross: false, geneSymbol: "R" };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d, f, p, m, h, g;
+function _() {
+  return (_ = e(() => {
+    ((t = [`RR`, `Rr`, `rr`]),
+      (n = [`RR`, `Rr`, `rr`]),
+      [...t, ...n],
+      (r = { parentOne: `Rr`, parentTwo: `Rr` }),
+      (i = /\b([A-Za-z]{2})\b/g),
+      (a = (e, t) => {
+        let n = e.toLowerCase(),
+          r = t.toLowerCase();
+        return n === r ? (e === t ? 0 : e === e.toUpperCase() ? -1 : 1) : n.localeCompare(r);
+      }),
+      (o = (e, t) => {
+        let n = Math.max(e.length, t.length);
+        for (let r = 0; r < n; r += 1) {
+          let n = e[r],
+            i = t[r];
+          if (!n || !i) return e.length - t.length;
+          let o = a(n, i);
+          if (o !== 0) return o;
+        }
+        return 0;
+      }),
+      (s = (e) => {
+        let t = e?.trim();
+        if (!t || t.length !== 2) return null;
+        let [n, r] = [...t];
+        if (!/[A-Za-z]/.test(n) || !/[A-Za-z]/.test(r)) return null;
+        let i = n.toLowerCase();
+        return i !== r.toLowerCase() || i !== `r`
+          ? null
+          : n === n.toUpperCase() && r === r.toUpperCase()
+            ? `${i.toUpperCase()}${i.toUpperCase()}`
+            : n === n.toLowerCase() && r === r.toLowerCase()
+              ? `${i}${i}`
+              : `${i.toUpperCase()}${i}`;
+      }),
+      (c = (e) => ({ parentOne: l(e.parentOne), parentTwo: u(e.parentTwo) })),
+      (l = (e) => {
+        let n = s(e);
+        return n && t.includes(n) ? n : r.parentOne;
+      }),
+      (u = (e) => {
+        let t = s(e);
+        return t && n.includes(t) ? t : r.parentTwo;
+      }),
+      (d = (e) => {
+        let t = [];
+        for (let n of e.matchAll(i)) {
+          let e = s(n[1]);
+          if (e && (t.push(e), t.length === 2)) break;
+        }
+        return c({ parentOne: t[0], parentTwo: t[1] });
+      }),
+      (f = (e) => {
+        let t = c(e);
+        return `${t.parentOne} x ${t.parentTwo}`;
+      }),
+      (p = (e) => [e[0], e[1]]),
+      (m = (e, t) => [e, t].sort(a).join(``)),
+      (h = (e) => {
+        let t = c(e),
+          n = p(t.parentOne),
+          r = p(t.parentTwo),
+          i = r.flatMap((e) =>
+            n.map((t) => ({ rowGamete: e, columnGamete: t, genotype: m(e, t) })),
+          ),
+          a = new Map();
+        for (let e of i) a.set(e.genotype, (a.get(e.genotype) ?? 0) + 1);
+        let s = [...a.entries()]
+            .map(([e, t]) => ({ genotype: e, count: t, probability: t / i.length }))
+            .sort((e, t) => o(e.genotype, t.genotype)),
+          l = i.filter((e) => [...e.genotype].some((e) => e === `R`)).length,
+          u = i.length - l;
+        return {
+          parentOneGametes: n,
+          parentTwoGametes: r,
+          cells: i,
+          outcomes: s,
+          dominantPhenotypeProbability: l / i.length,
+          recessivePhenotypeProbability: u / i.length,
+          isMixedGeneCross: !1,
+          geneSymbol: `R`,
+        };
+      }),
+      (g = (e) => {
+        let t = e * 100;
+        return Number.isInteger(t) ? `${t}%` : `${t.toFixed(1)}%`;
+      }));
+  }))();
 }
-
-const formatProbability = (probability: number): string => {
-  const percent = probability * 100;
-  return Number.isInteger(percent) ? percent + "%" : percent.toFixed(1) + "%";
-};
-function initializeMonohybridPunnettSquare(): void {}
-
-export {
-  parseParentCross as a,
-  normalizeParentGenotypes as c,
-  formatParentCross as i,
-  parentTwoGenotypes as n,
-  formatProbability as o,
-  derivePunnettSquare as r,
-  initializeMonohybridPunnettSquare as s,
-  parentOneGenotypes as t,
-};
+export { d as a, c, f as i, n, g as o, h as r, _ as s, t };

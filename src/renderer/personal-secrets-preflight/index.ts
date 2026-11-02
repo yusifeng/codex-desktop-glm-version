@@ -1,78 +1,75 @@
-// Cloud-task personal-secrets preflight gate. Release chunk: preflight-4a4cc944d9a1.js.
-import * as SharedChunk from "@rchunk/app-shared";
-import * as InitialChunk from "@rchunk/app-initial";
-import { PersonalSecretsDialog } from "@rchunk/personal-secrets-dialog";
-import { n as preflightPersonalSecrets, type PersonalSecretsSelection } from "@rchunk/personal-secrets-service";
-
-interface Scope {
-  get(signal: unknown): unknown;
-  when(predicate: (scope: Scope) => boolean): Promise<void>;
-}
-interface InitialRuntime {
-  Hzt(scope: Scope, dialog: unknown): boolean;
-  Sun(): void;
-  Uzt(scope: Scope, dialog: unknown, props: Record<string, unknown>): void;
-  Vzt(): void;
-  _cn: unknown;
-  _un: unknown;
-  mun: unknown;
-  wcn: unknown;
-  yun: unknown;
-  zzt(scope: Scope, dialog: unknown): void;
-}
-
-const initial = InitialChunk as unknown as InitialRuntime;
-let initialized = false;
-
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  initial.Sun();
-  initial.Vzt();
-  void SharedChunk;
-}
-
-function isSelectionCurrent(scope: Scope, selection: PersonalSecretsSelection & { projectId?: string | null }, isConfigCurrent: (scope: Scope, configId: string) => boolean): boolean {
-  const auth = scope.get(initial.yun) as { authLoading?: boolean };
-  const project = scope.get(initial.wcn) as { projectId?: string | null } | null;
-  return !auth.authLoading
-    && scope.get(initial.mun) === selection.accountId
-    && scope.get(initial._un) === selection.userId
-    && isConfigCurrent(scope, selection.config.id)
-    && (project?.projectId ?? null) === (selection.projectId ?? null);
-}
-
-async function preparePersonalSecrets(
-  scope: Scope,
-  selection: PersonalSecretsSelection & { projectId?: string | null },
-  isConfigCurrent: (scope: Scope, configId: string) => boolean,
-): Promise<void> {
-  initialize();
-  const preflight = await preflightPersonalSecrets(selection);
-  if (preflight?.issues.length === 0) return;
-  let active = true;
-  let closedByDialog = false;
-  const isCurrent = (): boolean => active && isSelectionCurrent(scope, selection, isConfigCurrent);
-  if (!isCurrent()) return;
-  if (initial.Hzt(scope, PersonalSecretsDialog)) {
-    throw new DOMException("A Cloud task is already awaiting personal secrets", "AbortError");
-  }
-  initial.Uzt(scope, PersonalSecretsDialog, {
-    initialPreflight: preflight,
-    isCurrent,
-    onClose: () => { closedByDialog = true; },
-    selection,
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/personal-secrets-dialog",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/personal-secrets-service",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import { H3 as t, V3 as n } from "@rchunk/app-shared";
+import {
+  Hzt as r,
+  Sun as i,
+  Uzt as a,
+  Vzt as o,
+  _cn as s,
+  _un as c,
+  mun as l,
+  wcn as u,
+  yun as d,
+  zzt as f,
+} from "@rchunk/app-initial";
+import { n as p, t as m } from "@rchunk/personal-secrets-service";
+async function h(e, t, i) {
+  let o = await p(t);
+  if (o?.issues.length === 0) return;
+  let { PersonalSecretsDialog: s } = await n(
+      async () => {
+        let { PersonalSecretsDialog: e } = await import(`@rchunk/personal-secrets-dialog`);
+        return { PersonalSecretsDialog: e };
+      },
+      __vite__mapDeps([0, 1, 2, 3, 4, 5, 6]),
+      import.meta.url,
+    ),
+    m = !0,
+    h = (e) =>
+      m &&
+      !e.get(d).authLoading &&
+      e.get(l) === t.accountId &&
+      e.get(c) === t.userId &&
+      i(e, t.config.id) &&
+      (e.get(u)?.projectId ?? null) === t.projectId;
+  if (!h(e)) return;
+  if (r(e, s))
+    throw new DOMException(`A Cloud task is already awaiting personal secrets`, `AbortError`);
+  let g = !1;
+  a(e, s, {
+    selection: t,
+    initialPreflight: o,
+    isCurrent: () => h(e),
+    onClose: () => {
+      g = !0;
+    },
   });
   try {
-    await scope.when((currentScope) => !isCurrent() || !initial.Hzt(currentScope, PersonalSecretsDialog));
-    if (!closedByDialog && isCurrent()) {
-      throw new DOMException("Personal secrets prompt was interrupted", "AbortError");
-    }
+    if ((await e.when((e) => !h(e) || !r(e, s)), !g && h(e)))
+      throw new DOMException(`Personal secrets prompt was interrupted`, `AbortError`);
   } finally {
-    active = false;
-    initial.zzt(scope, PersonalSecretsDialog);
+    ((m = !1), f(e, s));
   }
 }
-
-initialize();
-export { preparePersonalSecrets };
+function g() {
+  return (g = e(() => {
+    (i(), o(), s(), m(), t());
+  }))();
+}
+g();
+export { h as preparePersonalSecrets };

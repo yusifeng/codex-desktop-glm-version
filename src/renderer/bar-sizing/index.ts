@@ -1,129 +1,105 @@
-// Responsive chart bar sizing. Release chunk: bar-sizing-fa3b2a70455c.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-
-interface Series {
-  stack?: string | null;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, e6 as n } from "@rchunk/app-shared";
+import { OM as r, kM as i } from "@rchunk/app-initial";
+function a({ dataLength: e, defaultGapPx: t }) {
+  return e >= y ? Math.min(t, v) : e >= _ ? Math.min(t, g) : t;
 }
-interface ReactRuntime {
-  useState<T>(initial: T): [T, (updater: T | ((value: T) => T)) => void];
-  useRef<T>(initial: T): { current: T };
+function o({ dataLength: e, isHorizontalBarChart: t, series: n }) {
+  if (e !== 2 || d(n) !== 2) return t ? w : C;
 }
-let React: ReactRuntime;
-function seriesGroupCount(series: Series[]): number {
-  const stacks = new Set<string>();
-  let unstacked = 0;
-  for (const item of series)
-    item.stack == null ? (unstacked += 1) : stacks.add(item.stack);
-  return Math.max(1, stacks.size + unstacked);
+function s({ containerSize: e, dataLength: t, series: n }) {
+  if (e == null || e <= 0 || t <= 0) return b;
+  let r = (e / t / d(n)) * 0.65;
+  for (let e of S) if (r >= e.minEstimatedBarThickness) return e.radius;
+  return x;
 }
-function categoryGap({
-  dataLength,
-  defaultGapPx,
-}: {
-  dataLength: number;
-  defaultGapPx: number;
-}): number {
-  if (dataLength >= 24) return Math.min(defaultGapPx, 3);
-  if (dataLength >= 16) return Math.min(defaultGapPx, 6);
-  return defaultGapPx;
+function c() {
+  let e = (0, f.c)(5),
+    t;
+  e[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((t = { barCategoryGapPx: m, barContainerHeight: null, barContainerWidth: null }), (e[0] = t))
+    : (t = e[0]);
+  let [n, i] = (0, p.useState)(t),
+    a = (0, p.useRef)(void 0),
+    o;
+  e[1] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((o = (e, t) => {
+        i((n) => {
+          let r = u(e);
+          return n.barCategoryGapPx === r && n.barContainerHeight === t && n.barContainerWidth === e
+            ? n
+            : { barCategoryGapPx: r, barContainerHeight: t, barContainerWidth: e };
+        });
+      }),
+      (e[1] = o))
+    : (o = e[1]);
+  let s = o,
+    c;
+  e[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((c = (e) => {
+        if ((a.current?.(), (a.current = void 0), e == null)) return;
+        let { height: t, width: n } = e.getBoundingClientRect();
+        (s(n, t),
+          (a.current = r({
+            axis: `both`,
+            initialSize: !1,
+            onChange: (e) => {
+              let { height: t, width: n } = e;
+              s(n, t);
+            },
+            target: e,
+          })));
+      }),
+      (e[2] = c))
+    : (c = e[2]);
+  let l = c,
+    d;
+  return (
+    e[3] === n ? (d = e[4]) : ((d = { ...n, setBarContainer: l }), (e[3] = n), (e[4] = d)),
+    d
+  );
 }
-function twoPointMaxSize({
-  dataLength,
-  isHorizontalBarChart,
-  series,
-}: {
-  dataLength: number;
-  isHorizontalBarChart: boolean;
-  series: Series[];
-}): number | undefined {
-  if (dataLength === 2 && seriesGroupCount(series) === 2)
-    return isHorizontalBarChart ? 48 : 120;
+function l(e) {
+  if (e.chartType !== `bar` || e.layout !== `vertical`) return;
+  let t = e.data.length * d(e.series);
+  if (!(t <= E)) return { height: `${T + (t - E) * D}rem` };
 }
-function barRadius({
-  containerSize,
-  dataLength,
-  series,
-}: {
-  containerSize?: number | null;
-  dataLength: number;
-  series: Series[];
-}): number {
-  if (containerSize == null || containerSize <= 0 || dataLength <= 0) return 8;
-  const estimated =
-    (containerSize / dataLength / seriesGroupCount(series)) * 0.65;
-  for (const rule of [
-    { min: 56, radius: 8 },
-    { min: 36, radius: 6 },
-    { min: 16, radius: 4 },
-    { min: 0, radius: 2 },
-  ])
-    if (estimated >= rule.min) return rule.radius;
-  return 2;
+function u(e) {
+  for (let t of h) if (e >= t.minWidth) return t.gapPx;
+  return m;
 }
-function responsiveGap(width: number): number {
-  return width >= 768 ? 12 : 8;
+function d(e) {
+  let t = new Set(),
+    n = 0;
+  for (let r of e) r.stack == null ? (n += 1) : t.add(r.stack);
+  return Math.max(1, t.size + n);
 }
-function verticalBarChartStyle(chart: {
-  chartType: string;
-  layout: string;
-  data: unknown[];
-  series: Series[];
-}): { height: string } | undefined {
-  if (chart.chartType !== "bar" || chart.layout !== "vertical") return;
-  const bars = chart.data.length * seriesGroupCount(chart.series);
-  if (bars > 20) return { height: 27 + (bars - 20) * 1.5 + "rem" };
+var f, p, m, h, g, _, v, y, b, x, S, C, w, T, E, D;
+function O() {
+  return (O = e(() => {
+    ((f = t()),
+      (p = n()),
+      i(),
+      (m = 8),
+      (h = [{ minWidth: 768, gapPx: 12 }]),
+      (g = 6),
+      (_ = 16),
+      (v = 3),
+      (y = 24),
+      (b = 8),
+      (x = 2),
+      (S = [
+        { minEstimatedBarThickness: 56, radius: 8 },
+        { minEstimatedBarThickness: 36, radius: 6 },
+        { minEstimatedBarThickness: 16, radius: 4 },
+        { minEstimatedBarThickness: 0, radius: 2 },
+      ]),
+      (C = 120),
+      (w = 48),
+      (T = 27),
+      (E = 20),
+      (D = 1.5));
+  }))();
 }
-function useBarContainerSizing() {
-  const [state, setState] = React.useState({
-    barCategoryGapPx: 8,
-    barContainerHeight: null as number | null,
-    barContainerWidth: null as number | null,
-  });
-  const cleanup = React.useRef<(() => void) | undefined>(undefined);
-  const setBarContainer = (element: Element | null) => {
-    cleanup.current?.();
-    cleanup.current = undefined;
-    if (!element) return;
-    const update = (width: number, height: number) =>
-      setState((previous) => ({
-        barCategoryGapPx: responsiveGap(width),
-        barContainerHeight: height,
-        barContainerWidth: width,
-      }));
-    const bounds = element.getBoundingClientRect();
-    update(bounds.width, bounds.height);
-    const observe = (
-      appInitialChunk as unknown as {
-        OM(options: {
-          axis: string;
-          initialSize: boolean;
-          onChange(size: { width: number; height: number }): void;
-          target: Element;
-        }): () => void;
-      }
-    ).OM;
-    cleanup.current = observe({
-      axis: "both",
-      initialSize: false,
-      onChange: ({ width, height }) => update(width, height),
-      target: element,
-    });
-  };
-  return { ...state, setBarContainer };
-}
-function initializeBarSizing(): void {
-  React = (appSharedChunk as unknown as { e6(): ReactRuntime }).e6();
-  const init = (appInitialChunk as unknown as { kM?: () => void }).kM;
-  init?.();
-}
-
-export {
-  initializeBarSizing as a,
-  barRadius as i,
-  verticalBarChartStyle as n,
-  useBarContainerSizing as o,
-  categoryGap as r,
-  twoPointMaxSize as t,
-};
+export { O as a, s as i, l as n, c as o, a as r, o as t };

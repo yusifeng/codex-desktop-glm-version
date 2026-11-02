@@ -1,115 +1,57 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as getCompilerRuntime,
-  I3 as getJsxRuntime,
-  e6 as getReactRuntime,
-  gg as initializeFileIconRuntime,
-  h4 as initializeClassNames,
-  m4 as classNames,
-  mg as getFileIcon,
+  $3 as t,
+  I3 as n,
+  e6 as r,
+  gg as i,
+  h4 as a,
+  m4 as o,
+  mg as s,
 } from "@rchunk/app-shared";
-
-interface CompilerRuntime {
-  c(size: number): unknown[];
+function c(e) {
+  let t = (0, l.c)(18),
+    { getImagePreviewSrc: n, iconClassName: r, imageClassName: i, path: a } = e,
+    c;
+  t[0] !== n || t[1] !== a
+    ? ((c = n?.(a) ?? null), (t[0] = n), (t[1] = a), (t[2] = c))
+    : (c = t[2]);
+  let f = c,
+    [p, m] = (0, u.useState)(null);
+  if (f != null && f !== p) {
+    let e;
+    t[3] === i ? (e = t[4]) : ((e = o(`shrink-0 object-cover`, i)), (t[3] = i), (t[4] = e));
+    let n;
+    t[5] === f ? (n = t[6]) : ((n = () => m(f)), (t[5] = f), (t[6] = n));
+    let r;
+    return (
+      t[7] !== f || t[8] !== e || t[9] !== n
+        ? ((r = (0, d.jsx)(`img`, { alt: ``, className: e, src: f, onError: n })),
+          (t[7] = f),
+          (t[8] = e),
+          (t[9] = n),
+          (t[10] = r))
+        : (r = t[10]),
+      r
+    );
+  }
+  let h;
+  t[11] === a ? (h = t[12]) : ((h = s(a)), (t[11] = a), (t[12] = h));
+  let g = h,
+    _;
+  t[13] === r ? (_ = t[14]) : ((_ = o(`shrink-0`, r)), (t[13] = r), (t[14] = _));
+  let v;
+  return (
+    t[15] !== g || t[16] !== _
+      ? ((v = (0, d.jsx)(g, { className: _ })), (t[15] = g), (t[16] = _), (t[17] = v))
+      : (v = t[17]),
+    v
+  );
 }
-
-export interface ArtifactFilePreviewIconProps {
-  getImagePreviewSrc?(path: string): string | null | undefined;
-  iconClassName?: string;
-  imageClassName?: string;
-  path: string;
+var l, u, d;
+function f() {
+  return (f = e(() => {
+    ((l = t()), a(), (u = r()), i(), (d = n()));
+  }))();
 }
-
-let compilerRuntime: CompilerRuntime;
-let React: ReturnType<typeof getReactRuntime>;
-let jsxRuntime: ReturnType<typeof getJsxRuntime>;
-
-function ArtifactFilePreviewIcon({
-  getImagePreviewSrc,
-  iconClassName,
-  imageClassName,
-  path,
-}: ArtifactFilePreviewIconProps): unknown {
-  const cache = compilerRuntime.c(18);
-  let previewSource: string | null;
-  if (cache[0] !== getImagePreviewSrc || cache[1] !== path) {
-    previewSource = getImagePreviewSrc?.(path) ?? null;
-    cache[0] = getImagePreviewSrc;
-    cache[1] = path;
-    cache[2] = previewSource;
-  } else {
-    previewSource = cache[2] as string | null;
-  }
-
-  const [failedSource, setFailedSource] = React.useState<string | null>(null);
-  if (previewSource != null && previewSource !== failedSource) {
-    let imageClasses: string;
-    if (cache[3] !== imageClassName) {
-      imageClasses = classNames("shrink-0 object-cover", imageClassName);
-      cache[3] = imageClassName;
-      cache[4] = imageClasses;
-    } else {
-      imageClasses = cache[4] as string;
-    }
-    let handleError: () => void;
-    if (cache[5] !== previewSource) {
-      handleError = () => setFailedSource(previewSource);
-      cache[5] = previewSource;
-      cache[6] = handleError;
-    } else {
-      handleError = cache[6] as () => void;
-    }
-    if (
-      cache[7] !== previewSource ||
-      cache[8] !== imageClasses ||
-      cache[9] !== handleError
-    ) {
-      cache[7] = previewSource;
-      cache[8] = imageClasses;
-      cache[9] = handleError;
-      cache[10] = jsxRuntime.jsx("img", {
-        alt: "",
-        className: imageClasses,
-        src: previewSource,
-        onError: handleError,
-      });
-    }
-    return cache[10];
-  }
-
-  let Icon: unknown;
-  if (cache[11] !== path) {
-    Icon = getFileIcon(path);
-    cache[11] = path;
-    cache[12] = Icon;
-  } else {
-    Icon = cache[12];
-  }
-  let iconClasses: string;
-  if (cache[13] !== iconClassName) {
-    iconClasses = classNames("shrink-0", iconClassName);
-    cache[13] = iconClassName;
-    cache[14] = iconClasses;
-  } else {
-    iconClasses = cache[14] as string;
-  }
-  if (cache[15] !== Icon || cache[16] !== iconClasses) {
-    cache[15] = Icon;
-    cache[16] = iconClasses;
-    cache[17] = jsxRuntime.jsx(Icon, { className: iconClasses });
-  }
-  return cache[17];
-}
-
-function initializeArtifactFilePreviewIcon(): void {
-  compilerRuntime = getCompilerRuntime() as unknown as CompilerRuntime;
-  initializeClassNames();
-  React = getReactRuntime();
-  initializeFileIconRuntime();
-  jsxRuntime = getJsxRuntime();
-}
-
-export {
-  initializeArtifactFilePreviewIcon as n,
-  ArtifactFilePreviewIcon as t,
-};
+export { f as n, c as t };

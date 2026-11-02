@@ -1,63 +1,33 @@
-// Fiscal-policy learning model for closing recessionary and inflationary gaps.
-import "@rchunk/rolldown-runtime";
-
-interface FiscalPolicyValues {
-  fiscalAction?: number | null;
-  startingGap?: number | null;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r;
+function i() {
+  return (i = e(() => {
+    ((t = { startingGap: 0, fiscalAction: 0 }),
+      (n = { outputMin: 20, outputMax: 112, priceMin: 12, priceMax: 116 }),
+      (r = (e) => {
+        let t = +(e.startingGap >= 0.5),
+          n = e.fiscalAction < 0.5 ? 0 : e.fiscalAction < 1.5 ? 1 : e.fiscalAction < 2.5 ? 2 : 3,
+          r = n === 0 || n === 2,
+          i = r === (t === 0),
+          a = t === 0 ? 48 : 84,
+          o = a + (r ? 18 : -18),
+          s = 0.6 * a + 15,
+          c = 0.6 * o + 15;
+        return {
+          startingGap: t,
+          fiscalAction: n,
+          expansionary: r,
+          closesGap: i,
+          potentialOutput: 66,
+          initialOutput: a,
+          finalOutput: o,
+          initialPrice: s,
+          finalPrice: c,
+          initialAdIntercept: s + 0.55 * a,
+          finalAdIntercept: c + 0.55 * o,
+        };
+      }));
+  }))();
 }
-
-interface FiscalPolicyState {
-  closesGap: boolean;
-  expansionary: boolean;
-  finalAdIntercept: number;
-  finalOutput: number;
-  finalPrice: number;
-  fiscalAction: number;
-  initialAdIntercept: number;
-  initialOutput: number;
-  initialPrice: number;
-  potentialOutput: number;
-  startingGap: number;
-}
-
-const defaultFiscalPolicyValues = { startingGap: 0, fiscalAction: 0 };
-const fiscalPolicyGraphBounds = { outputMin: 20, outputMax: 112, priceMin: 12, priceMax: 116 };
-
-function calculateFiscalPolicyOutcome(values: FiscalPolicyValues): FiscalPolicyState {
-  const startingGap = +(Number(values.startingGap) >= 0.5);
-  const fiscalAction = Number(values.fiscalAction) < 0.5
-    ? 0
-    : Number(values.fiscalAction) < 1.5
-      ? 1
-      : Number(values.fiscalAction) < 2.5
-        ? 2
-        : 3;
-  const expansionary = fiscalAction === 0 || fiscalAction === 2;
-  const closesGap = expansionary === (startingGap === 0);
-  const initialOutput = startingGap === 0 ? 48 : 84;
-  const finalOutput = initialOutput + (expansionary ? 18 : -18);
-  const initialPrice = 0.6 * initialOutput + 15;
-  const finalPrice = 0.6 * finalOutput + 15;
-  return {
-    startingGap,
-    fiscalAction,
-    expansionary,
-    closesGap,
-    potentialOutput: 66,
-    initialOutput,
-    finalOutput,
-    initialPrice,
-    finalPrice,
-    initialAdIntercept: initialPrice + 0.55 * initialOutput,
-    finalAdIntercept: finalPrice + 0.55 * finalOutput,
-  };
-}
-
-function initializeFiscalPolicyOutputGapModel(): void {}
-
-export {
-  initializeFiscalPolicyOutputGapModel as i,
-  fiscalPolicyGraphBounds as n,
-  calculateFiscalPolicyOutcome as r,
-  defaultFiscalPolicyValues as t,
-};
+export { i, n, r, t };

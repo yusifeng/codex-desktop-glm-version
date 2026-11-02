@@ -1,65 +1,37 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  Cg as initializeBackgroundTerminalPanel,
-  Dg as initializeBackgroundTerminalModel,
-  Eg as getBackgroundTerminalTabId,
-  Gvt as openSidePanelTab,
-  Tg as backgroundTerminalRouteKind,
-  Wvt as initializeSidePanel,
-  wg as createSidePanelDefinition,
+  Cg as t,
+  Dg as n,
+  Eg as r,
+  Gvt as i,
+  Tg as a,
+  Wvt as o,
+  wg as s,
 } from "@rchunk/app-initial";
-
-export interface BackgroundTerminal {
-  command: string;
-  id: string;
-}
-
-export interface OpenBackgroundTerminalOptions {
-  backgroundTerminal: BackgroundTerminal;
-  conversationId: string;
-  fallbackTitle: string;
-  insertPosition?: unknown;
-  revealAndFocus?: boolean;
-  scope: unknown;
-  tabId?: string;
-}
-
-let backgroundTerminalPanelDefinition: unknown;
-
-function openLocalConversationBackgroundTerminalTab({
-  scope,
-  revealAndFocus = true,
-  backgroundTerminal,
-  conversationId,
-  fallbackTitle,
-  insertPosition,
-  tabId,
-}: OpenBackgroundTerminalOptions): unknown {
-  const id = tabId ?? getBackgroundTerminalTabId(conversationId, backgroundTerminal.id);
-  return openSidePanelTab(scope, backgroundTerminalPanelDefinition, {
-    revealAndFocus,
-    durableRoute: {
-      kind: backgroundTerminalRouteKind,
-      params: { terminalId: backgroundTerminal.id },
-      payloadVersion: 1,
-    },
-    id,
-    insertPosition,
-    props: { conversationId, terminalId: backgroundTerminal.id },
-    title: backgroundTerminal.command.length > 0 ? backgroundTerminal.command : fallbackTitle,
+function c({
+  scope: e,
+  revealAndFocus: t = !0,
+  backgroundTerminal: n,
+  conversationId: o,
+  fallbackTitle: s,
+  insertPosition: c,
+  tabId: u,
+}) {
+  let d = u ?? r(o, n.id);
+  return i(e, l, {
+    revealAndFocus: t,
+    durableRoute: { kind: a, params: { terminalId: n.id }, payloadVersion: 1 },
+    id: d,
+    insertPosition: c,
+    props: { conversationId: o, terminalId: n.id },
+    title: n.command.length > 0 ? n.command : s,
   });
 }
-
-function initializeOpenLocalConversationBackgroundTerminalTab(): void {
-  initializeSidePanel();
-  initializeBackgroundTerminalPanel();
-  initializeBackgroundTerminalModel();
-  backgroundTerminalPanelDefinition = createSidePanelDefinition({
-    open: openLocalConversationBackgroundTerminalTab,
-  });
+var l;
+function u() {
+  return (u = e(() => {
+    (o(), t(), n(), (l = s({ open: c })));
+  }))();
 }
-
-export {
-  openLocalConversationBackgroundTerminalTab as n,
-  initializeOpenLocalConversationBackgroundTerminalTab as t,
-};
+export { c as n, u as t };

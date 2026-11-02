@@ -1,41 +1,40 @@
-// Monopsony labor-market-power teaching model. Release chunk: model-810bae520b6d.js.
-import "@rchunk/rolldown-runtime";
-
-interface MonopsonyInput { employerPower?: number }
-
-const employerPowerControl = { min: 0, max: 100, step: 5, defaultValue: 60 };
-const monopsonyDefaults = { employerPower: employerPowerControl.defaultValue };
-const laborChartBounds = { employmentMin: 0, employmentMax: 100, wageMin: 0, wageMax: 110 };
-const demandSlope = 0.8;
-const maximumSupplySlope = 0.8;
-const clamp = (value: number, minimum: number, maximum: number): number =>
-  Math.min(maximum, Math.max(minimum, value));
-const normalizeMonopsonyInput = (input: MonopsonyInput) => ({
-  employerPower: Number.isFinite(input.employerPower)
-    ? clamp(input.employerPower ?? employerPowerControl.defaultValue, employerPowerControl.min, employerPowerControl.max)
-    : employerPowerControl.defaultValue,
-});
-const laborDemandWage = (employment: number): number => 100 - demandSlope * employment;
-const calculateMonopsonyLaborMarket = (input: MonopsonyInput) => {
-  const { employerPower } = normalizeMonopsonyInput(input);
-  const supplySlope = employerPower / 100 * maximumSupplySlope;
-  const competitiveWage = laborDemandWage(60);
-  const supplyIntercept = competitiveWage - supplySlope * 60;
-  const monopsonyEmployment = (100 - supplyIntercept) / (demandSlope + 2 * supplySlope);
-  const monopsonyWage = supplyIntercept + supplySlope * monopsonyEmployment;
-  return {
-    employerPower,
-    supplySlope,
-    supplyIntercept,
-    competitiveEmployment: 60,
-    competitiveWage,
-    monopsonyEmployment,
-    monopsonyWage,
-    marginalLaborCost: supplyIntercept + 2 * supplySlope * monopsonyEmployment,
-    totalLaborCost: monopsonyWage * monopsonyEmployment,
-    unhiredWorkers: 60 - monopsonyEmployment,
-  };
-};
-function initializeMonopsonyModel(): void {}
-
-export { laborDemandWage as a, calculateMonopsonyLaborMarket as i, monopsonyDefaults as n, initializeMonopsonyModel as o, employerPowerControl as r, normalizeMonopsonyInput as s, laborChartBounds as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l;
+function u() {
+  return (u = e(() => {
+    ((t = { min: 0, max: 100, step: 5, defaultValue: 60 }),
+      (n = { employerPower: t.defaultValue }),
+      (r = { employmentMin: 0, employmentMax: 100, wageMin: 0, wageMax: 110 }),
+      (i = 0.8),
+      (a = 0.8),
+      (o = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (s = (e) => ({
+        employerPower: Number.isFinite(e.employerPower)
+          ? o(e.employerPower ?? t.defaultValue, t.min, t.max)
+          : t.defaultValue,
+      })),
+      (c = (e) => 100 - i * e),
+      (l = (e) => {
+        let { employerPower: t } = s(e),
+          n = (t / 100) * a,
+          r = c(60),
+          o = r - n * 60,
+          l = (100 - o) / (i + 2 * n),
+          u = o + n * l;
+        return {
+          employerPower: t,
+          supplySlope: n,
+          supplyIntercept: o,
+          competitiveEmployment: 60,
+          competitiveWage: r,
+          monopsonyEmployment: l,
+          monopsonyWage: u,
+          marginalLaborCost: o + 2 * n * l,
+          totalLaborCost: u * l,
+          unhiredWorkers: 60 - l,
+        };
+      }));
+  }))();
+}
+export { c as a, l as i, n, u as o, t as r, s, r as t };

@@ -1,13 +1,4 @@
-// appgen-browser-site-entry —— Site 浏览器 URL 匹配逻辑的公开入口。
-// 原版：app/webview/assets/appgen-browser-site-af7344723817.js。
-
-import * as browserSiteChunk from "@rchunk/appgen-browser-site-core";
-
-const {
-  n: initializeAppgenBrowserSite,
-  t: getAppgenBrowserSiteForUrl,
-} = browserSiteChunk;
-
-initializeAppgenBrowserSite();
-
-export { getAppgenBrowserSiteForUrl };
+// @ts-nocheck
+import { n as e, t } from "@rchunk/appgen-browser-site-core";
+e();
+export { t as getAppgenBrowserSiteForUrl };

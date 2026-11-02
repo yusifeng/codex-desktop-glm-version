@@ -1,23 +1,20 @@
-// Object spread compatibility helper. Release chunk: extends-df342f7c2e8b.js.
-import "@rchunk/rolldown-runtime";
-
-type UnionToIntersection<Union> = (
-  Union extends unknown ? (value: Union) => void : never
-) extends (value: infer Intersection) => void
-  ? Intersection
-  : never;
-
-function extendObject<
-  Target extends object,
-  Sources extends readonly unknown[],
->(
-  target: Target,
-  ...sources: Sources
-): Target & UnionToIntersection<Exclude<Sources[number], null | undefined>> {
-  return Object.assign(target, ...sources) as Target &
-    UnionToIntersection<Exclude<Sources[number], null | undefined>>;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t() {
+  return (
+    (t = Object.assign
+      ? Object.assign.bind()
+      : function (e) {
+          for (var t = 1; t < arguments.length; t++) {
+            var n = arguments[t];
+            for (var r in n) ({}).hasOwnProperty.call(n, r) && (e[r] = n[r]);
+          }
+          return e;
+        }),
+    t.apply(null, arguments)
+  );
 }
-
-function initializeExtends(): void {}
-
-export { initializeExtends as n, extendObject as t };
+function n() {
+  return (n = e(() => {}))();
+}
+export { n, t };

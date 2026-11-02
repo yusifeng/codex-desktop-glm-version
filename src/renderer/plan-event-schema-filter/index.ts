@@ -1,104 +1,74 @@
-// Analytics schema filter. Release chunk: schema-filter-d9fe65a26d7e.js.
-import "@rchunk/rolldown-runtime";
-import { p4 as initializeObjectSpread } from "@rchunk/app-shared";
-import { n as isPlanEventEnabled } from "@rchunk/is-plan-event-enabled";
-
-interface SchemaEntry {
-  integrations?: Record<string, boolean>;
-}
-type Schema = Record<string, SchemaEntry | undefined>;
-interface RemotePlugin {
-  creationName: string;
-  name: string;
-  settings: {
-    subscriptions?: Array<{ partnerAction: string }>;
-  };
-}
-interface AnalyticsContext {
-  remotePlugins?: RemotePlugin[];
-}
-interface AnalyticsEvent {
-  event?: string;
-  integrations?: Record<string, boolean>;
-}
-interface AnalyticsFacade {
-  event: AnalyticsEvent;
-  updateEvent(
-    field: "integrations",
-    value: Record<string, boolean>,
-  ): AnalyticsFacade;
-}
-
-function disabledRemoteSubscriptions(
-  schemaEntry: SchemaEntry | undefined,
-  context: AnalyticsContext,
-): Record<string, boolean> {
-  if (!schemaEntry || Object.keys(schemaEntry).length === 0) return {};
-  const disabledCreationNames = schemaEntry.integrations
-    ? Object.keys(schemaEntry.integrations).filter(
-        (name) => schemaEntry.integrations?.[name] === false,
-      )
-    : [];
-  const disabledPluginNames: string[] = [];
-  for (const plugin of context.remotePlugins ?? []) {
-    for (const creationName of disabledCreationNames) {
-      if (plugin.creationName === creationName)
-        disabledPluginNames.push(plugin.name);
-    }
-  }
-  return (context.remotePlugins ?? []).reduce<Record<string, boolean>>(
-    (result, plugin) => {
-      if (
-        plugin.settings.subscriptions &&
-        disabledPluginNames.includes(plugin.name)
-      ) {
-        for (const subscription of plugin.settings.subscriptions) {
-          result[plugin.name + " " + subscription.partnerAction] = false;
-        }
-      }
-      return result;
-    },
-    {},
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { p4 as t, s4 as n } from "@rchunk/app-shared";
+import { n as r } from "@rchunk/is-plan-event-enabled";
+function i(e, t) {
+  if (!e || !Object.keys(e)) return {};
+  var n = e.integrations
+      ? Object.keys(e.integrations).filter(function (t) {
+          return e.integrations[t] === !1;
+        })
+      : [],
+    r = [];
+  return (
+    (t.remotePlugins ?? []).forEach(function (e) {
+      n.forEach(function (t) {
+        e.creationName == t && r.push(e.name);
+      });
+    }),
+    (t.remotePlugins ?? []).reduce(function (e, t) {
+      return (
+        t.settings.subscriptions &&
+          r.includes(t.name) &&
+          t.settings.subscriptions.forEach(function (n) {
+            return (e[`${t.name} ${n.partnerAction}`] = !1);
+          }),
+        e
+      );
+    }, {})
   );
 }
-
-function schemaFilter(schema: Schema | undefined, context: AnalyticsContext) {
-  function filterEvent(facade: AnalyticsFacade): AnalyticsFacade {
-    const eventName = facade.event.event;
-    if (schema && eventName) {
-      const entry = schema[eventName];
-      if (isPlanEventEnabled(schema, entry)) {
-        facade.updateEvent("integrations", {
-          ...facade.event.integrations,
-          ...entry?.integrations,
-          ...disabledRemoteSubscriptions(entry, context),
-        });
-      } else {
-        facade.updateEvent("integrations", {
-          ...facade.event.integrations,
-          All: false,
-          "Segment.io": true,
-        });
-        return facade;
-      }
+function a(e, t) {
+  function a(a) {
+    var o = e,
+      s = a.event.event;
+    if (o && s) {
+      var c = o[s];
+      if (r(o, c)) {
+        var l = i(c, t);
+        a.updateEvent(`integrations`, n(n(n({}, a.event.integrations), c?.integrations), l));
+      } else
+        return (
+          a.updateEvent(
+            `integrations`,
+            n(n({}, a.event.integrations), { All: !1, "Segment.io": !0 }),
+          ),
+          a
+        );
     }
-    return facade;
+    return a;
   }
-
   return {
-    name: "Schema Filter",
-    version: "0.1.0",
-    isLoaded: () => true,
-    load: () => Promise.resolve(),
-    type: "before",
-    page: filterEvent,
-    alias: filterEvent,
-    track: filterEvent,
-    identify: filterEvent,
-    group: filterEvent,
+    name: `Schema Filter`,
+    version: `0.1.0`,
+    isLoaded: function () {
+      return !0;
+    },
+    load: function () {
+      return Promise.resolve();
+    },
+    type: `before`,
+    page: a,
+    alias: a,
+    track: a,
+    identify: a,
+    group: a,
   };
 }
-
-initializeObjectSpread();
-
-export { schemaFilter };
+function o() {
+  return (o = e(() => {
+    t();
+  }))();
+}
+o();
+export { a as schemaFilter };

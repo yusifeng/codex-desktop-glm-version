@@ -1,90 +1,56 @@
-import "@rchunk/rolldown-runtime";
-import { l3 as isEqual } from "@rchunk/app-shared";
-
-type ExtensionProfile = Record<string, unknown> | null;
-
-interface ExtensionProfileSubscription {
-  [Symbol.dispose](): void;
-}
-
-interface BrowserExtensionProfileHost {
-  subscribeExtensionProfile(
-    listener: (profile: ExtensionProfile) => void,
-  ): Promise<ExtensionProfileSubscription>;
-}
-
-interface ExtensionProfileStore {
-  getSnapshot(): ExtensionProfile;
-  initialize(host: BrowserExtensionProfileHost | null | undefined): Promise<void>;
-  receive(profile: ExtensionProfile): void;
-  retry(host: BrowserExtensionProfileHost | null | undefined): void;
-  subscribe(listener: () => void): () => void;
-}
-
-let initialized = false;
-export let t: ExtensionProfileStore;
-
-async function subscribeToExtensionProfile(
-  host: BrowserExtensionProfileHost | null | undefined,
-  store: ExtensionProfileStore,
-): Promise<void> {
-  if (host == null) return;
-
-  let subscription: ExtensionProfileSubscription | null = null;
-  let pageHidden = false;
-  const cleanup = (): void => {
-    pageHidden = true;
-    subscription?.[Symbol.dispose]();
-    subscription = null;
-    window.removeEventListener("pagehide", cleanup);
-  };
-
-  window.addEventListener("pagehide", cleanup, { once: true });
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import { l3 as n } from "@rchunk/app-shared";
+async function r(e) {
+  if (e == null) return;
+  let t = null,
+    n = !1,
+    r = () => {
+      ((n = !0), t?.[Symbol.dispose](), (t = null), window.removeEventListener(`pagehide`, r));
+    };
+  window.addEventListener(`pagehide`, r, { once: !0 });
   try {
-    subscription = await host.subscribeExtensionProfile((profile) => {
-      if (!pageHidden) store.receive(profile);
-    });
-    if (pageHidden) cleanup();
-  } catch (error) {
-    cleanup();
-    throw error;
+    ((t = await e.subscribeExtensionProfile((e) => {
+      n || l.receive(e);
+    })),
+      n && r());
+  } catch (e) {
+    throw (r(), e);
   }
 }
-
-export function n(): void {
-  if (initialized) return;
-  initialized = true;
-
-  let snapshot: ExtensionProfile = null;
-  let initialization: Promise<void> | null = null;
-  let initializationFailed = false;
-  const listeners = new Set<() => void>();
-
-  t = {
-    getSnapshot: () => snapshot,
-    subscribe: (listener) => {
-      listeners.add(listener);
-      return () => {
-        listeners.delete(listener);
-      };
-    },
-    initialize: (host) => {
-      if (initialization != null) return initialization;
-      initializationFailed = false;
-      initialization = subscribeToExtensionProfile(host, t).catch(() => {
-        initialization = null;
-        initializationFailed = true;
-        t.receive(null);
-      });
-      return initialization;
-    },
-    retry: (host) => {
-      if (initializationFailed) void t.initialize(host);
-    },
-    receive: (profile) => {
-      if (isEqual(snapshot, profile)) return;
-      snapshot = profile;
-      for (const listener of listeners) listener();
-    },
-  };
+var i, a, o, s, c, l;
+function u() {
+  return (u = e(() => {
+    ((i = t(n(), 1)),
+      (a = null),
+      (o = null),
+      (s = !1),
+      (c = new Set()),
+      (l = {
+        getSnapshot: () => a,
+        subscribe: (e) => (
+          c.add(e),
+          () => {
+            c.delete(e);
+          }
+        ),
+        initialize: (e) =>
+          o ??
+          ((s = !1),
+          (o = r(e).catch(() => {
+            ((o = null), (s = !0), l.receive(null));
+          })),
+          o),
+        retry: (e) => {
+          s && l.initialize(e);
+        },
+        receive: (e) => {
+          if (!(0, i.default)(a, e)) {
+            a = e;
+            for (let e of c) e();
+          }
+        },
+      }));
+  }))();
 }
+export { u as n, l as t };

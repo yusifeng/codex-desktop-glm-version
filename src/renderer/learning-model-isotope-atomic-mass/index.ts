@@ -1,21 +1,18 @@
-// Isotope atomic-mass manifest. Release chunk: type-35ea69d98390.js.
-import "@rchunk/rolldown-runtime";
-
-type IsotopeElement = "boron" | "carbon" | "neon" | "magnesium" | "sulfur" | "chlorine" | "copper";
-
-const isotopeAtomicMassSpecification = {
-  type: "ISOTOPE_ATOMIC_MASS",
-  version: 1,
-  thumbnailAssetKey: "isotope-atomic-mass-v2",
-  parameters: {
-    element: {
-      kind: "enum" as const,
-      defaultValue: "chlorine" as IsotopeElement,
-      allowedValues: ["boron", "carbon", "neon", "magnesium", "sulfur", "chlorine", "copper"] as IsotopeElement[],
-    },
-  },
-};
-
-function initializeIsotopeAtomicMassSpecification(): void {}
-
-export { isotopeAtomicMassSpecification as n, initializeIsotopeAtomicMassSpecification as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `ISOTOPE_ATOMIC_MASS`),
+      (n = `isotope-atomic-mass-v2`),
+      (r = {
+        element: {
+          kind: `enum`,
+          defaultValue: `chlorine`,
+          allowedValues: [`boron`, `carbon`, `neon`, `magnesium`, `sulfur`, `chlorine`, `copper`],
+        },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+export { i as n, a as t };

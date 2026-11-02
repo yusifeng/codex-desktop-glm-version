@@ -1,43 +1,24 @@
-import "@rchunk/rolldown-runtime";
-import {
-  Ep as initializeCommandRegistry,
-  Xp as allCommands,
-  qp as supportsPlatform,
-} from "@rchunk/app-shared";
-import {
-  hEt as initializeElectronCommands,
-  mEt as isElectronCommandEnabled,
-} from "@rchunk/app-initial";
-
-interface CommandDefinition {
-  id: string;
-  kind: string;
-  [key: string]: unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { Ep as t, Xp as n, qp as r } from "@rchunk/app-shared";
+import { hEt as i, mEt as a } from "@rchunk/app-initial";
+function o(e) {
+  let t = e === `newThread` ? `newTask` : e;
+  return c.find((e) => e.id === t) ?? null;
 }
-
-let codexMicroCommands: CommandDefinition[];
-
-function getCodexMicroCommand(commandId: string): CommandDefinition | null {
-  const normalizedId = commandId === "newThread" ? "newTask" : commandId;
-  return codexMicroCommands.find((command) => command.id === normalizedId) ?? null;
+function s(e) {
+  let t = /^recentThread([1-6])$/.exec(e);
+  return t == null ? null : Number(t[1]) - 1;
 }
-
-function getRecentThreadCommandIndex(commandId: string): number | null {
-  const match = /^recentThread([1-6])$/.exec(commandId);
-  return match == null ? null : Number(match[1]) - 1;
+var c;
+function l() {
+  return (l = e(() => {
+    (t(),
+      i(),
+      (c = n.filter(
+        (e) =>
+          (e.kind === `webview` && r(e, `electron`)) || (e.kind === `electron-only` && a(e.id)),
+      )));
+  }))();
 }
-
-function initializeCodexMicroCommands(): void {
-  initializeCommandRegistry();
-  initializeElectronCommands();
-  codexMicroCommands = (allCommands as CommandDefinition[]).filter((command) =>
-    (command.kind === "webview" && supportsPlatform(command, "electron"))
-    || (command.kind === "electron-only" && isElectronCommandEnabled(command.id)));
-}
-
-export {
-  initializeCodexMicroCommands as i,
-  getCodexMicroCommand as n,
-  getRecentThreadCommandIndex as r,
-  codexMicroCommands as t,
-};
+export { l as i, o as n, s as r, c as t };

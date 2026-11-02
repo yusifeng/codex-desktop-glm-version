@@ -1,163 +1,83 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { I3 as t, wL as n, zU as r } from "@rchunk/app-shared";
 import {
-  I3 as getJsxRuntime,
-  wL as initializeUtilities,
-  zU as isRemoteHost,
-} from "@rchunk/app-shared";
-import {
-  Ag as backgroundAgentRouteKind,
-  Gvt as openSidePanelTab,
-  HZt as initializeSidePanelRoutes,
-  Mg as initializeBackgroundAgentModel,
-  Og as initializeBackgroundAgentTabs,
-  Pin as getConversationMessages,
-  RQt as activeConversationIdsByHost,
-  Ugn as getConversationHydrator,
-  Wvt as initializeSidePanel,
-  Lin as hasCompleteConversationHistory,
-  jg as getBackgroundAgentTabId,
-  kg as createBackgroundAgentPanelDefinition,
-  vZt as hostServiceById,
-  zZt as threadExists,
+  Ag as i,
+  Gvt as a,
+  HZt as o,
+  Mg as s,
+  Og as c,
+  RQt as l,
+  Wvt as u,
+  jg as d,
+  kg as f,
+  vZt as p,
+  zZt as m,
 } from "@rchunk/app-initial";
-import {
-  Bl as ThreadAvatar,
-  Vl as initializeThreadAvatar,
-  Wr as initializeConversationSurface,
-} from "@rchunk/app-primary";
-import { r as initializeOpenTarget } from "@rchunk/open-target";
-import { ensureConversationReady } from "../app-primary/runtime/ensure-conversation-ready";
-
-export interface BackgroundAgent {
-  canInteract: boolean;
-  conversationId: string;
-  displayName: string;
-}
-
-export interface BackgroundAgentScope {
-  get(signal: unknown, parameter?: unknown): unknown;
-}
-
-export interface OpenBackgroundAgentOptions {
-  backgroundAgent: BackgroundAgent;
-  hostId: string;
-  insertPosition?: unknown;
-  revealAndFocus?: boolean;
-  shouldResume?: boolean;
-  tabId?: string;
-  TabComponent?: unknown;
-}
-
-let backgroundAgentPanelDefinition: unknown;
-
-async function openLocalConversationBackgroundAgent(
-  scope: BackgroundAgentScope,
+import { Bl as h, Ur as g, Vl as _, Wr as v } from "@rchunk/app-primary";
+import { r as y } from "@rchunk/open-target";
+async function b(
+  e,
   {
-    revealAndFocus = true,
-    backgroundAgent,
-    hostId,
-    insertPosition,
-    shouldResume = !isRemoteHost(hostId),
-    tabId,
-    TabComponent,
-  }: OpenBackgroundAgentOptions,
-): Promise<unknown | null> {
-  const hostService = scope.get(hostServiceById, hostId) as
-    | { activateThreadSummary(id: string, options: { addToRecent: boolean }): void }
-    | null
-    | undefined;
-  hostService?.activateThreadSummary(backgroundAgent.conversationId, { addToRecent: false });
-
-  const available = ensureConversationReady(
-    scope,
-    backgroundAgent.conversationId,
-    hostId,
-    {
-      conversationStore: hostServiceById,
-      getHydrationService: getConversationHydrator,
-      getMessages: getConversationMessages,
-      hasCompleteHistory: hasCompleteConversationHistory,
-    },
-  );
-  if (available !== true && !(await available)) return null;
-
-  return renderBackgroundAgentTab(scope, {
-    revealAndFocus,
-    backgroundAgent,
-    hostId,
-    insertPosition,
-    shouldResume,
-    tabId,
-    TabComponent,
-  });
+    revealAndFocus: t = !0,
+    backgroundAgent: n,
+    hostId: i,
+    insertPosition: a,
+    shouldResume: o = !r(i),
+    tabId: s,
+    TabComponent: c,
+  },
+) {
+  e.get(p, i)?.activateThreadSummary(n.conversationId, { addToRecent: !1 });
+  let l = g(e, n.conversationId, i);
+  return l !== !0 && !(await l)
+    ? null
+    : x(e, {
+        revealAndFocus: t,
+        backgroundAgent: n,
+        hostId: i,
+        insertPosition: a,
+        shouldResume: o,
+        tabId: s,
+        TabComponent: c,
+      });
 }
-
-function renderBackgroundAgentTab(
-  scope: BackgroundAgentScope,
+function x(
+  e,
   {
-    revealAndFocus = true,
-    backgroundAgent,
-    hostId,
-    insertPosition,
-    shouldResume,
-    tabId,
-    TabComponent,
-  }: OpenBackgroundAgentOptions,
-): unknown | null {
-  const exists = scope.get(threadExists, backgroundAgent.conversationId);
-  const activeIds = scope.get(activeConversationIdsByHost, hostId) as string[];
-  if (!exists || activeIds.includes(backgroundAgent.conversationId)) return null;
-
-  const id = tabId ?? getBackgroundAgentTabId(backgroundAgent.conversationId);
-  const ReactJsx = getJsxRuntime();
-  return openSidePanelTab(scope, backgroundAgentPanelDefinition, {
-    revealAndFocus,
-    durableRoute: {
-      kind: backgroundAgentRouteKind,
-      params: { conversationId: backgroundAgent.conversationId },
-      payloadVersion: 1,
-    },
-    icon: ReactJsx.jsx(ThreadAvatar, {
-      className: "icon-sm",
-      seed: backgroundAgent.conversationId,
-    }),
-    id,
-    insertPosition,
+    revealAndFocus: t = !0,
+    backgroundAgent: n,
+    hostId: r,
+    insertPosition: o,
+    shouldResume: s,
+    tabId: c,
+    TabComponent: u,
+  },
+) {
+  if (!e.get(m, n.conversationId) || e.get(l, r).includes(n.conversationId)) return null;
+  let f = c ?? d(n.conversationId);
+  return a(e, C, {
+    revealAndFocus: t,
+    durableRoute: { kind: i, params: { conversationId: n.conversationId }, payloadVersion: 1 },
+    icon: (0, S.jsx)(h, { className: `icon-sm`, seed: n.conversationId }),
+    id: f,
+    insertPosition: o,
     props: {
-      canInteract: backgroundAgent.canInteract,
-      conversationId: backgroundAgent.conversationId,
-      hostId,
-      shouldResume,
-      onOpenBackgroundAgent: (nextAgent: BackgroundAgent) => {
-        openLocalConversationBackgroundAgent(scope, {
-          backgroundAgent: nextAgent,
-          hostId,
-          shouldResume,
-          TabComponent,
-        });
+      canInteract: n.canInteract,
+      conversationId: n.conversationId,
+      hostId: r,
+      shouldResume: s,
+      onOpenBackgroundAgent: (t) => {
+        b(e, { backgroundAgent: t, hostId: r, shouldResume: s, TabComponent: u });
       },
     },
-    title: backgroundAgent.displayName,
+    title: n.displayName,
   });
 }
-
-function initializeOpenLocalConversationBackgroundAgent(): void {
-  initializeUtilities();
-  initializeSidePanelRoutes();
-  initializeSidePanel();
-  initializeBackgroundAgentTabs();
-  initializeConversationSurface();
-  initializeBackgroundAgentModel();
-  initializeThreadAvatar();
-  getJsxRuntime();
-  initializeOpenTarget();
-  backgroundAgentPanelDefinition = createBackgroundAgentPanelDefinition({
-    open: openLocalConversationBackgroundAgent,
-  });
+var S, C;
+function w() {
+  return (w = e(() => {
+    (n(), o(), u(), c(), _(), s(), v(), (S = t()), y(), (C = f({ open: b })));
+  }))();
 }
-
-export {
-  initializeOpenLocalConversationBackgroundAgent as n,
-  openLocalConversationBackgroundAgent as r,
-  backgroundAgentPanelDefinition as t,
-};
+export { w as n, b as r, C as t };

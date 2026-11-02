@@ -1,15 +1,12 @@
-// Absorbance-spectrum learning-model manifest. Release chunk: type-725e1a69e8d4.js.
-import "@rchunk/rolldown-runtime";
-
-const absorbanceSpectrumSpecification = {
-  type: "ABSORBANCE_SPECTRUM",
-  version: 2,
-  thumbnailAssetKey: "absorbance-spectrum-v1",
-  parameters: {
-    lambda_max_nm: { kind: "number" as const, defaultValue: 520, min: 210, max: 740 },
-  },
-};
-
-function initializeAbsorbanceSpectrumSpecification(): void {}
-
-export { absorbanceSpectrumSpecification as n, initializeAbsorbanceSpectrumSpecification as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `ABSORBANCE_SPECTRUM`),
+      (n = `absorbance-spectrum-v1`),
+      (r = { lambda_max_nm: { kind: `number`, defaultValue: 520, min: 210, max: 740 } }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+export { i as n, a as t };

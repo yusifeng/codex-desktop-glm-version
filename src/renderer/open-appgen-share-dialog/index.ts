@@ -1,76 +1,44 @@
-// open-appgen-share-dialog —— 预加载并打开 Site 分享弹窗。
-// 原版：app/webview/assets/open-appgen-share-dialog-adecffea4fba.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import type {
-  MaitaiScopeApi,
-  SitesSharingSource,
-} from "@rchunk/app-shared";
-
-void runtimeChunk;
-const {
-  EF: sitesSharingEvent,
-  H3: initializeModulePreload,
-  TF: sitesSharingActions,
-  V3: preloadModule,
-  fI: initializeIntlRuntime,
-} = appSharedChunk;
-const {
-  Uzt: openLazyDialog,
-  Vzt: initializeDialogLauncher,
-  xpn: emitAnalyticsEvent,
-  ypn: initializeAnalyticsEmitter,
-} = appInitialChunk;
-
-const shareDialogDependencies = [
-  "./appgen-share-dialog-5fd465534630.js",
-  "./rolldown-runtime-2d059c5e81f4.js",
-  "./app-shared-7b9edc1bfb7f.js",
-  "./app-shared-fa570b9eb9dd.css",
-  "./app-initial-51da50e6c6e3.js",
-  "./app-initial-e8ceb32eb626.css",
-  "./appgen-access-50974c702eaf.js",
-  "./appgen-site-card-230b77db57a9.js",
-  "./app-primary-d66705000d76.js",
-  "./app-primary-484df789f2f5.css",
-  "./dialog-action-9fe7be84d34e.js",
-  "./permission-dropdown-faa59c51006d.js",
-];
-
-interface OpenAppgenShareDialogOptions extends Record<string, unknown> {
-  source: SitesSharingSource;
-}
-
-function openAppgenShareDialog(
-  scope: MaitaiScopeApi<Record<string, unknown>>,
-  projectId: string,
-  options: OpenAppgenShareDialogOptions,
-): void {
-  const loadDialog = async () => {
-    const { AppgenShareDialog } = await import("@rchunk/appgen-share-dialog");
-    return { AppgenShareDialog };
-  };
-  preloadModule(loadDialog, shareDialogDependencies, import.meta.url).then(
-    ({ AppgenShareDialog }) => {
-      try {
-        emitAnalyticsEvent(scope, sitesSharingEvent, {
-          action: sitesSharingActions.CODEX_SITES_SHARING_ACTION_OPENED,
-          projectId,
-          source: options.source,
-        });
-      } catch {}
-      openLazyDialog(scope, AppgenShareDialog, { projectId, ...options });
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/appgen-share-dialog",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/appgen-access",
+      "@rchunk/appgen-site-card",
+      "@rchunk/app-primary",
+      "./app-primary-484df789f2f5.css",
+      "@rchunk/dialog-action",
+      "@rchunk/permission-dropdown",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import { EF as t, H3 as n, TF as r, V3 as i, fI as a } from "@rchunk/app-shared";
+import { Uzt as o, Vzt as s, xpn as c, ypn as l } from "@rchunk/app-initial";
+function u(e, n, a) {
+  i(
+    async () => {
+      let { AppgenShareDialog: e } = await import(`@rchunk/appgen-share-dialog`);
+      return { AppgenShareDialog: e };
     },
-  );
+    __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
+    import.meta.url,
+  ).then(({ AppgenShareDialog: i }) => {
+    try {
+      c(e, t, { action: r.CODEX_SITES_SHARING_ACTION_OPENED, projectId: n, source: a.source });
+    } catch {}
+    o(e, i, { projectId: n, ...a });
+  });
 }
-
-function initializeOpenAppgenShareDialog(): void {
-  initializeIntlRuntime();
-  initializeDialogLauncher();
-  initializeAnalyticsEmitter();
-  initializeModulePreload();
+function d() {
+  return (d = e(() => {
+    (a(), s(), l(), n());
+  }))();
 }
-
-export { openAppgenShareDialog as n, initializeOpenAppgenShareDialog as t };
+export { u as n, d as t };

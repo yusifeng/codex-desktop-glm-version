@@ -1,369 +1,281 @@
-// home-beacon —— Home Beacon 的账户资格、选择、抑制与曝光生命周期状态。
-
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-
-void runtimeChunk;
-
-const {
-  BX: useSignalFamilyValue,
-  FX: initializeSignalRuntime,
-  HX: useSignalValue,
-  LX: useSignalScope,
-  QI: initializeSharedRuntime,
-  ZI: applicationScope,
-  _Z: releaseSignalFamilyMember,
-  e6: reactRuntime,
-} = appSharedChunk;
-const {
-  $Nt: shouldSuppressHomepageTakeover,
-  CNt: isHomepageTakeoverBeacon,
-  DNt: initializeBeaconPredicates,
-  GNt: focusedModalSuppressionSignal,
-  JNt: initializeOnboardingState,
-  KNt: getSuppressedPageContextClaims,
-  M6t: initializeIdentityState,
-  N6t: useAccountIdentity,
-  ONt: logBeaconLifecycle,
-  Qgn: initializeAccountQueries,
-  SNt: isBannerBeacon,
-  WNt: pageContextClaims,
-  YNt: activePageContextClaimsSignal,
-  ZNt: pageContextSuppressionEnabledSignal,
-  bNt: isContainerBeacon,
-  ePt: debugBeaconId,
-  iPt: initializeBeaconDebugState,
-  i_n: useRouterLocation,
-  ifn: initializeTelemetryIdentity,
-  lfn: getTelemetrySession,
-  mpn: localeSignal,
-  nPt: debugBeaconEnabledSignal,
-  ppn: initializeBeaconAnalytics,
-  rht: initializeAccountState,
-  uht: useCurrentAccount,
-} = appInitialChunk;
-const {
-  Dh: initializePageContextAvailability,
-  Eh: getPageContextAvailability,
-  Fh: defaultShouldSuppressFocusedModal,
-  Ih: createBeaconVisitKey,
-  Lh: initializeBeaconQuery,
-  Mh: initializeBeaconSelection,
-  Nh: beaconSelectionFamily,
-  Ph: initializeBeaconVisitState,
-  Th: PageContext,
-  bh: initializeBeaconLifecycle,
-  jh: beaconSelectionValueFamily,
-  wh: viewedBeaconKeysSignal,
-} = appPrimaryChunk;
-
-interface ReactRuntime {
-  useContext<Value>(context: unknown): Value;
-  useEffect(
-    effect: () => void | (() => void),
-    dependencies: readonly unknown[],
-  ): void;
-  useRef<Value>(initialValue: Value): { current: Value };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  HX as i,
+  LX as ee,
+  QI as a,
+  ZI as te,
+  _Z as ne,
+  e6 as o,
+} from "@rchunk/app-shared";
+import {
+  $Nt as re,
+  CNt as s,
+  DNt as c,
+  GNt as ie,
+  JNt as l,
+  KNt as u,
+  M6t as d,
+  N6t as ae,
+  ONt as f,
+  Qgn as p,
+  SNt as oe,
+  WNt as se,
+  YNt as ce,
+  ZNt as le,
+  bNt as ue,
+  ePt as m,
+  iPt as h,
+  i_n as de,
+  ifn as g,
+  lfn as fe,
+  mpn as pe,
+  nPt as me,
+  ppn as _,
+  rht as v,
+  uht as he,
+} from "@rchunk/app-initial";
+import {
+  Dh as y,
+  Eh as ge,
+  Fh as b,
+  Ih as _e,
+  Lh as x,
+  Mh as S,
+  Nh as ve,
+  Ph as C,
+  Th as ye,
+  bh as w,
+  jh as be,
+  wh as T,
+} from "@rchunk/app-primary";
+function xe({ accountId: e, authMethod: t, isAuthLoading: n }) {
+  return !n && t === `chatgpt` && e != null;
 }
-
-interface HomeBeaconRecord extends Record<string, unknown> {
-  beacon_id: string;
-  custom_fields?: { show_after_onboarding?: boolean };
+function Se({ isAuthLoading: e }) {
+  return e;
 }
-
-type BeaconSelection =
-  | { status: "idle" | "pending" }
-  | { beacon: HomeBeaconRecord; status: "selected" };
-
-interface HomeBeaconResult {
-  accountId: string | null;
-  beacon: HomeBeaconRecord | null;
-  containerBeacon: HomeBeaconRecord | null;
-  isEligible: boolean;
-  isLoading: boolean;
-  shouldSuppressVanillaPromos: boolean;
+function E(e, t, n) {
+  return n == null ? `${e}:session:${t}` : `${e}:${t}:${n.conversationId}:${n.messageId}`;
 }
-
-function resolveRuntime<Runtime>(runtimeOrFactory: unknown): Runtime {
-  return (typeof runtimeOrFactory === "function"
-    ? runtimeOrFactory()
-    : runtimeOrFactory) as Runtime;
-}
-
-let React: ReactRuntime;
-let debugBeacon: HomeBeaconRecord;
-let initialized = false;
-
-interface BeaconMessageIdentity {
-  conversationId: string;
-  messageId: string;
-  suppressLifecycle?: boolean;
-}
-
-function isBeaconAccountEligible(input: {
-  accountId: string | null;
-  authMethod: string | null;
-  isAuthLoading: boolean;
-}): boolean {
+function D(e, t, n, r) {
+  if (r?.suppressLifecycle === !0) return !1;
+  let i = E(t, n.beacon_id, r);
   return (
-    !input.isAuthLoading &&
-    input.authMethod === "chatgpt" &&
-    input.accountId != null
+    !e.get(T).has(i) &&
+    (e.set(T, (e) => {
+      let t = new Set(e);
+      return (t.add(i), t);
+    }),
+    f(
+      r == null
+        ? { beacon: n, eventType: `view`, accountId: t }
+        : { beacon: n, eventType: `view`, metadata: r },
+    ),
+    !0)
   );
 }
-
-function beaconExposureKey(
-  accountId: string,
-  beaconId: string,
-  message: BeaconMessageIdentity | null,
-): string {
-  return message == null
-    ? `${accountId}:session:${beaconId}`
-    : `${accountId}:${beaconId}:${message.conversationId}:${message.messageId}`;
-}
-
-function recordBeaconViewOnce(
-  scope: {
-    get(signal: unknown): Set<string>;
-    set(signal: unknown, update: (current: Set<string>) => Set<string>): void;
-  },
-  accountId: string,
-  beacon: { beacon_id: string },
-  message: BeaconMessageIdentity | null,
-): boolean {
-  initializeHomeBeacon();
-  if (message?.suppressLifecycle === true) return false;
-  const key = beaconExposureKey(accountId, beacon.beacon_id, message);
-  if (scope.get(viewedBeaconKeysSignal).has(key)) return false;
-  scope.set(viewedBeaconKeysSignal, (current) => {
-    const next = new Set(current);
-    next.add(key);
-    return next;
-  });
-  logBeaconLifecycle?.(
-    message == null
-      ? { beacon, eventType: "view", accountId }
-      : { beacon, eventType: "view", metadata: message },
+function O(e, t) {
+  let r = (0, k.c)(31),
+    a = e === void 0 ? `codex` : e,
+    { shouldSuppressFocusedModal: o } = t === void 0 ? {} : t,
+    c = o === void 0 ? b : o,
+    l = de(),
+    d = ee(te),
+    { accountId: f, authMethod: p, isLoading: m, userId: h } = ae(),
+    { data: g } = he(),
+    _ = fe(),
+    v = i(pe),
+    y = i(me),
+    x = i(ce),
+    S = (0, A.useContext)(ye),
+    C = i(ie),
+    w = i(le),
+    T = _.getContext().user?.customIDs?.account_id,
+    E = f ?? g?.id ?? T ?? h ?? null,
+    D = xe({ accountId: E, authMethod: p, isAuthLoading: m }),
+    O;
+  r[0] === m ? (O = r[1]) : ((O = Se({ isAuthLoading: m })), (r[0] = m), (r[1] = O));
+  let M = O,
+    N =
+      E == null
+        ? null
+        : _e({
+            accountId: E,
+            locale: v.locale,
+            navigationKey: l.key,
+            pathname: l.pathname,
+            product: a,
+          }),
+    P = n(be, {
+      accountId: E,
+      locale: v.locale,
+      pathname: l.pathname,
+      product: a,
+      shouldFetch: D,
+      shouldSuppressFocusedModal: c,
+      visitKey: N ?? ``,
+    }),
+    F = JSON.stringify([E, v.locale, l.pathname, a, N ?? ``]),
+    I;
+  r[2] === F ? (I = r[3]) : ((I = { activeKey: F, cleanupGeneration: 0 }), (r[2] = F), (r[3] = I));
+  let Ce = (0, A.useRef)(I),
+    L,
+    R;
+  (r[4] !== v.locale ||
+  r[5] !== l.pathname ||
+  r[6] !== a ||
+  r[7] !== F ||
+  r[8] !== E ||
+  r[9] !== d ||
+  r[10] !== N
+    ? ((L = () => {
+        let e = Ce.current,
+          t = (e.cleanupGeneration += 1);
+        return (
+          (e.activeKey = F),
+          () => {
+            queueMicrotask(() => {
+              (e.cleanupGeneration === t || e.activeKey !== F) &&
+                ne(d, ve, {
+                  accountId: E,
+                  locale: v.locale,
+                  pathname: l.pathname,
+                  product: a,
+                  shouldSuppressFocusedModal: b,
+                  visitKey: N ?? ``,
+                });
+            });
+          }
+        );
+      }),
+      (R = [v.locale, l.pathname, a, F, E, d, N]),
+      (r[4] = v.locale),
+      (r[5] = l.pathname),
+      (r[6] = a),
+      (r[7] = F),
+      (r[8] = E),
+      (r[9] = d),
+      (r[10] = N),
+      (r[11] = L),
+      (r[12] = R))
+    : ((L = r[11]), (R = r[12])),
+    (0, A.useEffect)(L, R));
+  let z = P.status === `selected` ? P.beacon : null,
+    we =
+      !y &&
+      D &&
+      re({
+        activeClaims: x,
+        isCurrentHomeBeacon: !0,
+        isHomepageTakeoverOwner: z != null && s(z),
+        isPageContextUpsellSuppressionEnabled: w,
+      }),
+    Te = !y && D && (C || we),
+    B;
+  r[13] !== y || r[14] !== w || r[15] !== x
+    ? ((B =
+        !y &&
+        u({ activeClaims: x, isPageContextUpsellSuppressionEnabled: w }).has(se.NonLegalBanners)),
+      (r[13] = y),
+      (r[14] = w),
+      (r[15] = x),
+      (r[16] = B))
+    : (B = r[16]);
+  let Ee = B,
+    V = null;
+  y ? (V = j) : D && !Te && (V = z);
+  let H;
+  r[17] === V ? (H = r[18]) : ((H = V != null && oe(V) ? V : null), (r[17] = V), (r[18] = H));
+  let U = H,
+    W;
+  r[19] === V ? (W = r[20]) : ((W = V != null && ue(V) ? V : null), (r[19] = V), (r[20] = W));
+  let G = W,
+    K;
+  r[21] !== U || r[22] !== S
+    ? ((K = ge(U != null && s(U), S)), (r[21] = U), (r[22] = S), (r[23] = K))
+    : (K = r[23]);
+  let { isPending: q, isUnavailable: J } = K;
+  (q || J) && (U = null);
+  let De = !y && D && P.status === `pending`,
+    Oe = !y && D && (P.status === `pending` || P.status === `selected`),
+    Y = M || (Oe && !J) || U != null || Ee,
+    X = y ? `debug` : E,
+    Z = U != null,
+    Q = !y && (M || De || q),
+    $;
+  return (
+    r[24] !== U || r[25] !== G || r[26] !== Y || r[27] !== X || r[28] !== Z || r[29] !== Q
+      ? (($ = {
+          accountId: X,
+          beacon: U,
+          containerBeacon: G,
+          isEligible: Z,
+          isLoading: Q,
+          shouldSuppressVanillaPromos: Y,
+        }),
+        (r[24] = U),
+        (r[25] = G),
+        (r[26] = Y),
+        (r[27] = X),
+        (r[28] = Z),
+        (r[29] = Q),
+        (r[30] = $))
+      : ($ = r[30]),
+    $
   );
-  return true;
 }
-
-function useHomeBeacon(
-  product = "codex",
-  options: { shouldSuppressFocusedModal?: () => boolean } = {},
-): HomeBeaconResult {
-  initializeHomeBeacon();
-  const shouldSuppressFocusedModal =
-    options.shouldSuppressFocusedModal ?? defaultShouldSuppressFocusedModal;
-  const navigation = useRouterLocation?.() ?? { key: "", pathname: "/" };
-  const scope = useSignalScope(applicationScope);
-  const identity = useAccountIdentity?.() ?? {};
-  const accountQuery = useCurrentAccount?.() ?? {
-    data: undefined,
-    isLoading: false,
-  };
-  const session = getTelemetrySession?.();
-  const localeState = useSignalValue<{ locale: string }>(localeSignal) ?? {
-    locale: "en",
-  };
-  const debug = useSignalValue<boolean>(debugBeaconEnabledSignal) === true;
-  const activeClaims = useSignalValue<unknown>(activePageContextClaimsSignal);
-  const focusedModalSuppressed =
-    useSignalValue<boolean>(focusedModalSuppressionSignal) === true;
-  const pageContextSuppressionEnabled =
-    useSignalValue<boolean>(pageContextSuppressionEnabledSignal) === true;
-  const pageContext = React.useContext<unknown>(PageContext);
-  const telemetryAccountId =
-    session?.getContext?.().user?.customIDs?.account_id ?? null;
-  const accountId =
-    identity.accountId ??
-    accountQuery.data?.id ??
-    telemetryAccountId ??
-    identity.userId ??
-    null;
-  const canFetch = isBeaconAccountEligible({
-    accountId,
-    authMethod: identity.authMethod,
-    isAuthLoading: identity.isLoading === true,
-  });
-  const visitKey =
-    accountId == null
-      ? null
-        : createBeaconVisitKey?.({
-          accountId,
-          locale: localeState.locale,
-          navigationKey: navigation.key,
-          pathname: navigation.pathname,
-          product,
-        });
-  const selection = (useSignalFamilyValue?.(beaconSelectionValueFamily, {
-    accountId,
-    locale: localeState.locale,
-    pathname: navigation.pathname,
-    product,
-    shouldFetch: canFetch,
-    shouldSuppressFocusedModal,
-    visitKey: visitKey ?? "",
-  }) ?? { status: "idle" }) as BeaconSelection;
-
-  const cleanupKey = JSON.stringify([
-    accountId,
-    localeState.locale,
-    navigation.pathname,
-    product,
-    visitKey ?? "",
-  ]);
-  const cleanupState = React.useRef({
-    activeKey: cleanupKey,
-    cleanupGeneration: 0,
-  });
-  React.useEffect(() => {
-    const state = cleanupState.current;
-    const generation = (state.cleanupGeneration += 1);
-    state.activeKey = cleanupKey;
-    return () => {
-      queueMicrotask(() => {
-        if (
-          state.cleanupGeneration === generation ||
-          state.activeKey !== cleanupKey
-        ) {
-          releaseSignalFamilyMember?.(scope, beaconSelectionFamily, {
-            accountId,
-            locale: localeState.locale,
-            pathname: navigation.pathname,
-            product,
-            shouldSuppressFocusedModal: defaultShouldSuppressFocusedModal,
-            visitKey: visitKey ?? "",
-          });
-        }
-      });
-    };
-  }, [
-    accountId,
-    cleanupKey,
-    localeState.locale,
-    navigation.pathname,
-    product,
-    scope,
-    visitKey,
-  ]);
-
-  const selected = selection.status === "selected" ? selection.beacon : null;
-  const homepageTakeoverSuppression =
-    !debug &&
-    canFetch &&
-    shouldSuppressHomepageTakeover?.({
-      activeClaims,
-      isCurrentHomeBeacon: true,
-      isHomepageTakeoverOwner:
-        selected != null && isHomepageTakeoverBeacon?.(selected) === true,
-      isPageContextUpsellSuppressionEnabled: pageContextSuppressionEnabled,
-    });
-  const suppressSelected =
-    !debug &&
-    canFetch &&
-    (focusedModalSuppressed || homepageTakeoverSuppression);
-  const suppressedClaims =
-    !debug &&
-    getSuppressedPageContextClaims?.({
-      activeClaims,
-      isPageContextUpsellSuppressionEnabled: pageContextSuppressionEnabled,
-    });
-  const shouldSuppressNonLegalBanners =
-    suppressedClaims?.has?.(pageContextClaims.NonLegalBanners) === true;
-
-  let candidate = null;
-  if (debug) candidate = debugBeacon;
-  else if (canFetch && !suppressSelected) candidate = selected;
-  let beacon =
-    candidate != null && isBannerBeacon?.(candidate) ? candidate : null;
-  const containerBeacon =
-    candidate != null && isContainerBeacon?.(candidate) ? candidate : null;
-  const availability = getPageContextAvailability?.(
-    beacon != null && isHomepageTakeoverBeacon?.(beacon) === true,
-    pageContext,
-  ) ?? { isPending: false, isUnavailable: false };
-  if (availability.isPending || availability.isUnavailable) beacon = null;
-
-  const selectionPending = !debug && canFetch && selection.status === "pending";
-  const selectionActive =
-    !debug &&
-    canFetch &&
-    (selection.status === "pending" || selection.status === "selected");
-
-  return {
-    accountId: debug ? "debug" : accountId,
-    beacon,
-    containerBeacon,
-    isEligible: beacon != null,
-    isLoading:
-      !debug &&
-      (identity.isLoading === true ||
-        selectionPending ||
-        availability.isPending === true),
-    shouldSuppressVanillaPromos:
-      identity.isLoading === true ||
-      (selectionActive && !availability.isUnavailable) ||
-      beacon != null ||
-      shouldSuppressNonLegalBanners,
-  };
+var k, A, j;
+function M() {
+  return (M = e(() => {
+    ((k = t()),
+      r(),
+      (A = o()),
+      p(),
+      d(),
+      c(),
+      x(),
+      C(),
+      S(),
+      v(),
+      w(),
+      h(),
+      y(),
+      _(),
+      l(),
+      a(),
+      g(),
+      (j = {
+        type: `beacon_ui_response`,
+        beacon_id: m,
+        beacon_name: `Codex App Home Beacon Debug`,
+        show_timing: `immediate`,
+        ui_info: {
+          type: `beacon_banner_info`,
+          title: `Codex app home banner`,
+          description: `Local debug preview`,
+          informational_link: null,
+          icon_image_url: null,
+          icon_image_url_dark: null,
+          icon_image_size: `large`,
+          banner_position: null,
+          banner_design: `default`,
+          dismiss_variant: `dismiss_on_send`,
+        },
+        action_items: [
+          {
+            id: `learn_more`,
+            action_v2: { action_enum: `open_url`, url: `/settings` },
+            text: `Learn more`,
+            type: `primary`,
+            icon_url: null,
+            description: null,
+          },
+        ],
+      }));
+  }))();
 }
-
-function initializeHomeBeacon(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeSignalRuntime?.();
-  React = resolveRuntime<ReactRuntime>(reactRuntime);
-  initializeAccountQueries?.();
-  initializeIdentityState?.();
-  initializeBeaconPredicates?.();
-  initializeBeaconQuery?.();
-  initializeBeaconVisitState?.();
-  initializeBeaconSelection?.();
-  initializeAccountState?.();
-  initializeBeaconLifecycle?.();
-  initializeBeaconDebugState?.();
-  initializePageContextAvailability?.();
-  initializeBeaconAnalytics?.();
-  initializeOnboardingState?.();
-  initializeSharedRuntime?.();
-  initializeTelemetryIdentity?.();
-  debugBeacon = {
-    type: "beacon_ui_response",
-    beacon_id: debugBeaconId,
-    beacon_name: "Codex App Home Beacon Debug",
-    show_timing: "immediate",
-    ui_info: {
-      type: "beacon_banner_info",
-      title: "Codex app home banner",
-      description: "Local debug preview",
-      informational_link: null,
-      icon_image_url: null,
-      icon_image_url_dark: null,
-      icon_image_size: "large",
-      banner_position: null,
-      banner_design: "default",
-      dismiss_variant: "dismiss_on_send",
-    },
-    action_items: [
-      {
-        id: "learn_more",
-        action_v2: { action_enum: "open_url", url: "/settings" },
-        text: "Learn more",
-        type: "primary",
-        icon_url: null,
-        description: null,
-      },
-    ],
-  };
-}
-
-initializeHomeBeacon();
-
-export {
-  recordBeaconViewOnce as n,
-  useHomeBeacon as r,
-  initializeHomeBeacon as t,
-};
+export { D as n, O as r, M as t };

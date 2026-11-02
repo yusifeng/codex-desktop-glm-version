@@ -1,101 +1,50 @@
-import "@rchunk/rolldown-runtime";
-import {
-  dun as createFeatureFlag,
-  uun as initializeFeatureFlags,
-} from "@rchunk/app-initial";
-
-export type PermissionMode =
-  | "auto"
-  | "custom"
-  | "full-access"
-  | "granular"
-  | "guardian-approvals"
-  | "read-only";
-
-function resolveFullAccessVisibility(
-  value: boolean | { "full-access"?: boolean } | null | undefined,
-): boolean {
-  return typeof value === "boolean" ? value : (value?.["full-access"] ?? true);
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { dun as t, uun as n } from "@rchunk/app-initial";
+function r(e) {
+  return typeof e == `boolean` ? e : (e?.[`full-access`] ?? !0);
 }
-
-function getPermissionModeVisibility({
-  canShowDefaultPermissions,
-  canSelectGuardianMode,
-  canShowConfigCustom,
-  canShowConfigFullAccess,
-  canShowGuardianOption,
-  selectionAgentModes,
-  visibleAgentModes,
-}: {
-  canShowDefaultPermissions: boolean;
-  canSelectGuardianMode: boolean;
-  canShowConfigCustom: boolean;
-  canShowConfigFullAccess: boolean;
-  canShowGuardianOption: boolean;
-  selectionAgentModes: PermissionMode[];
-  visibleAgentModes: PermissionMode[];
-}): {
-  canShowCustom: boolean;
-  canShowFullAccess: boolean;
-  optionCount: number;
-  showGuardianOption: boolean;
-} {
-  const canShowFullAccess =
-    canShowConfigFullAccess && visibleAgentModes.includes("full-access");
-  const canShowCustom = canShowConfigCustom && selectionAgentModes.includes("custom");
+function i({
+  canShowDefaultPermissions: e,
+  canSelectGuardianMode: t,
+  canShowConfigCustom: n,
+  canShowConfigFullAccess: r,
+  canShowGuardianOption: i,
+  selectionAgentModes: a,
+  visibleAgentModes: o,
+}) {
+  let s = r && o.includes(`full-access`),
+    c = n && a.includes(`custom`),
+    l = i;
   return {
-    canShowCustom,
-    canShowFullAccess,
-    optionCount:
-      Number(canShowDefaultPermissions) +
-      Number(canShowGuardianOption && canSelectGuardianMode) +
-      Number(canShowFullAccess) +
-      Number(canShowCustom),
-    showGuardianOption: canShowGuardianOption,
+    canShowCustom: c,
+    canShowFullAccess: s,
+    optionCount: +!!e + (l && t ? 1 : 0) + +!!s + +!!c,
+    showGuardianOption: l,
   };
 }
-
-function getVisiblePermissionModes({
-  availableAgentModes,
-  showFullAccessInComposer,
-}: {
-  availableAgentModes: PermissionMode[];
-  showFullAccessInComposer: boolean;
-}): PermissionMode[] {
-  return availableAgentModes.filter((mode) => {
-    if (mode === "full-access") return showFullAccessInComposer;
-    if (mode === "custom") return false;
-    return true;
+function a({ availableAgentModes: e, showFullAccessInComposer: t }) {
+  return e.filter((e) => {
+    switch (e) {
+      case `full-access`:
+        return t;
+      case `custom`:
+        return !1;
+      case `auto`:
+      case `granular`:
+      case `guardian-approvals`:
+      case `read-only`:
+        return !0;
+    }
   });
 }
-
-function getSelectablePermissionModes({
-  availableAgentModes,
-  visibleAgentModes,
-}: {
-  availableAgentModes: PermissionMode[];
-  visibleAgentModes: PermissionMode[];
-}): PermissionMode[] {
-  return availableAgentModes.includes("custom")
-    ? [...visibleAgentModes, "custom"]
-    : visibleAgentModes;
+function o({ availableAgentModes: e, visibleAgentModes: t }) {
+  return e.includes(`custom`) ? [...t, `custom`] : t;
 }
-
-let composerPermissionModeVisibility: unknown;
-
-function initializePermissionsModeVisibility(): void {
-  initializeFeatureFlags();
-  composerPermissionModeVisibility = createFeatureFlag(
-    "composer-permission-mode-visibility",
-    true,
-  );
+var s;
+function c() {
+  return (c = e(() => {
+    (n(), (s = t(`composer-permission-mode-visibility`, !0)));
+  }))();
 }
-
-export {
-  initializePermissionsModeVisibility as a,
-  getVisiblePermissionModes as i,
-  getSelectablePermissionModes as n,
-  composerPermissionModeVisibility as o,
-  resolveFullAccessVisibility as r,
-  getPermissionModeVisibility as t,
-};
+export { c as a, a as i, o as n, s as o, r, i as t };

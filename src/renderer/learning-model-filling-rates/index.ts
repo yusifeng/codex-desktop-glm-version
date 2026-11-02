@@ -1,17 +1,16 @@
-// Filling-rates learning-model manifest. Release chunk: type-419e85f400c3.js.
-import "@rchunk/rolldown-runtime";
-
-const fillingRatesSpecification = {
-  type: "FILLING_RATES",
-  version: 1,
-  thumbnailAssetKey: "filling-rates-v2",
-  canonicalFormula: "r_{\\mathrm{net}}=r_{\\mathrm{in}}-r_{\\mathrm{out}}",
-  parameters: {
-    inflowRateLitersPerMinute: { kind: "number" as const, defaultValue: 6, min: 0, max: 8 },
-    outflowRateLitersPerMinute: { kind: "number" as const, defaultValue: 2, min: 0, max: 8 },
-  },
-};
-
-function initializeFillingRatesSpecification(): void {}
-
-export { fillingRatesSpecification as n, initializeFillingRatesSpecification as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `FILLING_RATES`),
+      (n = `filling-rates-v2`),
+      (r = `r_{\\mathrm{net}}=r_{\\mathrm{in}}-r_{\\mathrm{out}}`),
+      (i = {
+        inflowRateLitersPerMinute: { kind: `number`, defaultValue: 6, min: 0, max: 8 },
+        outflowRateLitersPerMinute: { kind: `number`, defaultValue: 2, min: 0, max: 8 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+export { a as n, o as t };

@@ -1,115 +1,108 @@
-// external-signup-page —— 外部注册完成后的认证刷新与目标页回跳。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as authHandoffChunk from "@rchunk/auth-handoff-page";
-void runtimeChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  H4: objectSchema,
-  I3: getJsxRuntime,
-  _L: useQuery,
-  g4: initializeSchemaRuntime,
-  gL: initializeUseQuery,
-  q4: stringSchema,
-} = appSharedChunk;
-const {
-  Fx: sanitizeAuthTarget,
-  Ix: initializeAuthTarget,
-  Pun: createAuthUrl,
-  Qgn: initializeAccountContext,
-  Run: initializeAuthUrl,
-  Rx: performAuthHandoff,
-  dJt: initializeAuthHandoff,
-  i_n: useLocation,
-  uJt: getDeviceId,
-} = appInitialChunk;
-const { n: initializeAuthHandoffPage, t: AuthHandoffPage } = authHandoffChunk;
-
-interface ExternalSignupPageProps {
-  refresh: boolean;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  H4 as n,
+  I3 as r,
+  _L as i,
+  g4 as a,
+  gL as o,
+  q4 as s,
+} from "@rchunk/app-shared";
+import {
+  Fx as c,
+  Ix as l,
+  Pun as u,
+  Qgn as d,
+  Run as f,
+  Rx as p,
+  dJt as m,
+  i_n as h,
+  uJt as g,
+} from "@rchunk/app-initial";
+import { n as _, t as v } from "@rchunk/auth-handoff-page";
+function y(e) {
+  let t = (0, b.c)(9),
+    { refresh: n } = e,
+    r = h(),
+    a;
+  t[0] !== r.search || t[1] !== n
+    ? ((a = {
+        queryKey: [`browser-external-signup`, n, r.search],
+        queryFn: async (e) => {
+          let { signal: t } = e,
+            i = new URLSearchParams(r.search),
+            a = new URL(c(i.get(`next`))),
+            o = a.pathname + a.search + a.hash;
+          if (!n) {
+            let e = new URL(`/auth/ext_callback_refresh`, window.location.origin);
+            return (
+              e.searchParams.set(`next`, o),
+              p(e.toString(), { "ext-oai-did": g() }, t, `external-signup`)
+            );
+          }
+          try {
+            let e = await fetch(`/api/auth/session`, {
+              credentials: `same-origin`,
+              cache: `no-store`,
+              signal: AbortSignal.any([t, AbortSignal.timeout(15e3)]),
+            });
+            if (!e.ok) return { ok: !1 };
+            let n = S.safeParse(await e.json());
+            if (!n.success) return { ok: !1 };
+            if (n.data.user && n.data.error == null) return { ok: !0, url: a.toString() };
+            let r = u(`login`);
+            return (r.searchParams.set(`next`, o), { ok: !0, url: r.toString() });
+          } catch {
+            return { ok: !1 };
+          }
+        },
+        staleTime: 1 / 0,
+        gcTime: 0,
+        retry: !1,
+        refetchOnWindowFocus: !1,
+        refetchOnReconnect: !1,
+      }),
+      (t[0] = r.search),
+      (t[1] = n),
+      (t[2] = a))
+    : (a = t[2]);
+  let { data: o, isError: s, isFetching: l, refetch: d } = i(a),
+    f = l || (o == null && !s),
+    m;
+  t[3] === d
+    ? (m = t[4])
+    : ((m = () => {
+        d({ cancelRefetch: !1 });
+      }),
+      (t[3] = d),
+      (t[4] = m));
+  let _;
+  return (
+    t[5] !== o || t[6] !== f || t[7] !== m
+      ? ((_ = (0, x.jsx)(v, { result: o, pending: f, onRetry: m })),
+        (t[5] = o),
+        (t[6] = f),
+        (t[7] = m),
+        (t[8] = _))
+      : (_ = t[8]),
+    _
+  );
 }
-
-interface SessionResponse extends Record<string, unknown> {
-  error?: string;
-  user?: { id: string } | null;
+var b, x, S;
+function C() {
+  return (C = e(() => {
+    ((b = t()),
+      o(),
+      d(),
+      a(),
+      f(),
+      m(),
+      _(),
+      l(),
+      (x = r()),
+      (S = n({ user: n({ id: s().min(1) }).nullish(), error: s().optional() })));
+  }))();
 }
-
-type AuthHandoffResult = import("@rchunk/auth-handoff-page").AuthHandoffResult;
-let sessionSchema: import("@rchunk/app-shared").SafeParseSchema<SessionResponse>;
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function BrowserExternalSignupPage({
-  refresh,
-}: ExternalSignupPageProps): unknown {
-  const location = useLocation();
-  const query = useQuery<AuthHandoffResult>({
-    queryKey: ["browser-external-signup", refresh, location.search],
-    queryFn: async ({ signal }) => {
-      const searchParams = new URLSearchParams(location.search);
-      const target = new URL(sanitizeAuthTarget(searchParams.get("next")));
-      const relativeTarget = target.pathname + target.search + target.hash;
-      if (!refresh) {
-        const refreshUrl = new URL(
-          "/auth/ext_callback_refresh",
-          window.location.origin,
-        );
-        refreshUrl.searchParams.set("next", relativeTarget);
-        return performAuthHandoff(
-          refreshUrl.toString(),
-          { "ext-oai-did": getDeviceId() },
-          signal,
-          "external-signup",
-        );
-      }
-      try {
-        const response = await fetch("/api/auth/session", {
-          credentials: "same-origin",
-          cache: "no-store",
-          signal: AbortSignal.any([signal, AbortSignal.timeout(15_000)]),
-        });
-        if (!response.ok) return { ok: false };
-        const session = sessionSchema.safeParse(await response.json());
-        if (!session.success) return { ok: false };
-        if (session.data.user && session.data.error == null)
-          return { ok: true, url: target.toString() };
-        const loginUrl = createAuthUrl("login");
-        loginUrl.searchParams.set("next", relativeTarget);
-        return { ok: true, url: loginUrl.toString() };
-      } catch {
-        return { ok: false };
-      }
-    },
-    staleTime: Infinity,
-    gcTime: 0,
-    retry: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
-  const pending = query.isFetching || (query.data == null && !query.isError);
-  return jsx.jsx(AuthHandoffPage, {
-    result: query.data,
-    pending,
-    onRetry: () => void query.refetch({ cancelRefetch: false }),
-  });
-}
-
-function initializeExternalSignupPage(): void {
-  initializeRuntimeLazy();
-  initializeUseQuery();
-  initializeAccountContext();
-  initializeSchemaRuntime();
-  initializeAuthUrl();
-  initializeAuthHandoff();
-  initializeAuthHandoffPage();
-  initializeAuthTarget();
-  jsx = getJsxRuntime();
-  sessionSchema = objectSchema<SessionResponse>({
-    user: objectSchema<{ id: string }>({ id: stringSchema().min(1) }).nullish(),
-    error: stringSchema().optional(),
-  });
-}
-
-initializeExternalSignupPage();
-export { BrowserExternalSignupPage };
+C();
+export { y as BrowserExternalSignupPage };

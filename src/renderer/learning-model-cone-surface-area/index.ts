@@ -1,86 +1,39 @@
-// Cone-surface-area controls and formula metadata. Release chunk: type-3a1bd5a62fd7.js.
-import "@rchunk/rolldown-runtime";
-
-interface DimensionControl {
-  label: string;
-  min: number;
-  max: number;
-  step: number;
-  defaultValue: number;
-  thumbnailDefaultValue: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r;
+function i() {
+  return (i = e(() => {
+    ((t = { label: `r`, min: 0.5, max: 10, step: 0.1, defaultValue: 3, thumbnailDefaultValue: 10 }),
+      (n = { label: `l`, min: 1, max: 15, step: 0.5, defaultValue: 6, thumbnailDefaultValue: 15 }),
+      (r = { properties: { radius: t, slantHeight: n } }));
+  }))();
 }
-
-let radiusControl: DimensionControl;
-let slantHeightControl: DimensionControl;
-let visualizationTemplate: {
-  properties: { radius: DimensionControl; slantHeight: DimensionControl };
-};
-let specification: {
-  type: "CONE_SURFACE_AREA";
-  version: 2;
-  thumbnailAssetKey: "cone-surface-area-v1";
-  canonicalFormula: string;
-  canonicalFormulaAliases: string[];
-  parameters: {
-    radius: { kind: "number"; defaultValue: 3; min: 0.01; max: 10000 };
-    slantHeight: { kind: "number"; defaultValue: 6; min: 0.01; max: 10000 };
-  };
-};
-let templateInitialized = false;
-let specificationInitialized = false;
-
-function initializeTemplate(): void {
-  if (templateInitialized) return;
-  templateInitialized = true;
-  radiusControl = {
-    label: "r",
-    min: 0.5,
-    max: 10,
-    step: 0.1,
-    defaultValue: 3,
-    thumbnailDefaultValue: 10,
-  };
-  slantHeightControl = {
-    label: "l",
-    min: 1,
-    max: 15,
-    step: 0.5,
-    defaultValue: 6,
-    thumbnailDefaultValue: 15,
-  };
-  visualizationTemplate = {
-    properties: { radius: radiusControl, slantHeight: slantHeightControl },
-  };
+var a, o, s, c, l, u;
+function d() {
+  return (d = e(() => {
+    ((a = `CONE_SURFACE_AREA`),
+      (o = `cone-surface-area-v1`),
+      (s = `A = \\pi r(r + l)`),
+      (c = [
+        `A = \\pi r (r + l)`,
+        `A = \\pi r^2 + \\pi r l`,
+        `A = \\pi r l + \\pi r^2`,
+        `\\pi r (r + l) = A`,
+        `\\pi r^2 + \\pi r l = A`,
+        `\\pi r l + \\pi r^2 = A`,
+      ]),
+      (l = {
+        radius: { kind: `number`, defaultValue: 3, min: 0.01, max: 1e4 },
+        slantHeight: { kind: `number`, defaultValue: 6, min: 0.01, max: 1e4 },
+      }),
+      (u = {
+        type: a,
+        version: 2,
+        thumbnailAssetKey: o,
+        canonicalFormula: s,
+        canonicalFormulaAliases: c,
+        parameters: l,
+      }));
+  }))();
 }
-
-function initializeSpecification(): void {
-  if (specificationInitialized) return;
-  specificationInitialized = true;
-  specification = {
-    type: "CONE_SURFACE_AREA",
-    version: 2,
-    thumbnailAssetKey: "cone-surface-area-v1",
-    canonicalFormula: "A = \\pi r(r + l)",
-    canonicalFormulaAliases: [
-      "A = \\pi r (r + l)",
-      "A = \\pi r^2 + \\pi r l",
-      "A = \\pi r l + \\pi r^2",
-      "\\pi r (r + l) = A",
-      "\\pi r^2 + \\pi r l = A",
-      "\\pi r l + \\pi r^2 = A",
-    ],
-    parameters: {
-      radius: { kind: "number", defaultValue: 3, min: 0.01, max: 10000 },
-      slantHeight: { kind: "number", defaultValue: 6, min: 0.01, max: 10000 },
-    },
-  };
-}
-
-export {
-  slantHeightControl as a,
-  radiusControl as i,
-  specification as n,
-  initializeTemplate as o,
-  visualizationTemplate as r,
-  initializeSpecification as t,
-};
+export { n as a, t as i, u as n, i as o, r, d as t };

@@ -1,28 +1,23 @@
-import * as appSharedChunk from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-const { I3: getJsxRuntime, e6: getReactRuntime } = appSharedChunk;
-let jsx: JsxRuntime;
-function ModelPickerChevronDownSmall(props: Record<string, unknown>): unknown {
-  initializeModelPickerChevron();
-  return jsx.jsx("svg", {
-    width: 16,
-    height: 16,
-    viewBox: "0 0 16 16",
-    fill: "currentColor",
-    xmlns: "http://www.w3.org/2000/svg",
-    ...props,
-    children: jsx.jsx("path", {
-      d: "M12.1338 5.94433C12.3919 5.77382 12.7434 5.80202 12.9707 6.02929C13.1979 6.25656 13.2261 6.60807 13.0556 6.8662L12.9707 6.9707L8.47067 11.4707C8.21097 11.7304 7.78896 11.7304 7.52926 11.4707L3.02926 6.9707L2.9443 6.8662C2.77379 6.60807 2.80199 6.25656 3.02926 6.02929C3.25653 5.80202 3.60804 5.77382 3.86617 5.94433L3.97067 6.02929L7.99996 10.0586L12.0293 6.02929L12.1338 5.94433Z",
-    }),
-  });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { I3 as t, e6 as n } from "@rchunk/app-shared";
+var r, i;
+function a() {
+  return (a = e(() => {
+    (n(),
+      (r = t()),
+      (i = (e) =>
+        (0, r.jsx)(`svg`, {
+          width: 16,
+          height: 16,
+          viewBox: `0 0 16 16`,
+          fill: `currentColor`,
+          xmlns: `http://www.w3.org/2000/svg`,
+          ...e,
+          children: (0, r.jsx)(`path`, {
+            d: `M12.1338 5.94433C12.3919 5.77382 12.7434 5.80202 12.9707 6.02929C13.1979 6.25656 13.2261 6.60807 13.0556 6.8662L12.9707 6.9707L8.47067 11.4707C8.21097 11.7304 7.78896 11.7304 7.52926 11.4707L3.02926 6.9707L2.9443 6.8662C2.77379 6.60807 2.80199 6.25656 3.02926 6.02929C3.25653 5.80202 3.60804 5.77382 3.86617 5.94433L3.97067 6.02929L7.99996 10.0586L12.0293 6.02929L12.1338 5.94433Z`,
+          }),
+        })));
+  }))();
 }
-let initialized = false;
-function initializeModelPickerChevron(): void {
-  if (initialized) return;
-  getReactRuntime();
-  jsx = getJsxRuntime();
-  initialized = true;
-}
-export { initializeModelPickerChevron as n, ModelPickerChevronDownSmall as t };
+export { a as n, i as t };

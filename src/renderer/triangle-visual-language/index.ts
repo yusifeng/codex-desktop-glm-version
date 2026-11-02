@@ -1,275 +1,177 @@
-// Shared triangle SVG visual language. Release chunk: triangle-visual-language-46f026eb70c8.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-
-interface Point {
-  x: number;
-  y: number;
-}
-interface LabelPlacementOptions {
-  offset?: number;
-  avoidPoints?: Point[];
-  viewBoxWidth?: number;
-  viewBoxHeight?: number;
-}
-interface PolygonProps {
-  fill?: string;
-  points: Point[];
-  stroke?: string;
-  strokeWidth?: number;
-}
-interface VertexHandleProps {
-  ariaLabel: string;
-  cx: number;
-  cy: number;
-  interactive?: boolean;
-  isThumbnail?: boolean;
-  onKeyDown?: (event: unknown) => void;
-  onPointerDown?: (event: unknown) => void;
-}
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>): unknown;
-  jsxs(type: unknown, props: Record<string, unknown>): unknown;
-}
-interface ReactRuntime {
-  useState<T>(initial: T): [T, (value: T) => void];
-}
-interface SharedRuntime {
-  I3(): JsxRuntime;
-  e6(): ReactRuntime;
-}
-
-const shared = appSharedChunk as unknown as SharedRuntime;
-let React: ReactRuntime;
-let jsxRuntime: JsxRuntime;
-let visualizationSurface: string;
-let accentSurface: string;
-let primaryColor: string;
-let accentColor: string;
-let secondaryTextColor: string;
-let mutedTextColor: string;
-let handleFill: string;
-let handleStroke: string;
-let lineStrokeWidth: number;
-let handleRadius: number;
-
-const clamp = (value: number, minimum: number, maximum: number) =>
-  Math.min(Math.max(value, minimum), maximum);
-
-function placeTriangleLabel(
-  vertex: Point,
-  opposite: Point,
-  {
-    offset,
-    avoidPoints,
-    viewBoxWidth = 320,
-    viewBoxHeight = 240,
-  }: LabelPlacementOptions = {},
-): Point {
-  const delta = { x: vertex.x - opposite.x, y: vertex.y - opposite.y };
-  const length = Math.hypot(delta.x, delta.y);
-  const direction =
-    length > Number.EPSILON
-      ? { x: delta.x / length, y: delta.y / length }
-      : { x: 0, y: -1 };
-  const centerFor = (candidate: Point, candidateOffset = offset): Point => {
-    const diagonal =
-      Math.abs(candidate.x) > 0.01 && Math.abs(candidate.y) > 0.01;
-    const distance =
-      candidateOffset ??
-      (diagonal || Math.abs(candidate.x) > Math.abs(candidate.y) ? 52 : 38);
-    return {
-      x: clamp(vertex.x + candidate.x * distance, 40, viewBoxWidth - 40),
-      y: clamp(vertex.y + candidate.y * distance, 20, viewBoxHeight - 20),
-    };
-  };
-  const defaultCenter = centerFor(direction);
-  if (!avoidPoints?.length) return defaultCenter;
-  const clearance = (center: Point) =>
-    Math.min(
-      ...avoidPoints.map((point) =>
-        Math.hypot(
-          Math.max(Math.abs(point.x - center.x) - 36, 0),
-          Math.max(Math.abs(point.y - center.y) - 16, 0),
-        ),
-      ),
-    );
-  const diagonal = Math.SQRT1_2;
-  const directions: Point[] = [
-    direction,
-    { x: -1, y: 0 },
-    { x: 1, y: 0 },
-    { x: 0, y: -1 },
-    { x: 0, y: 1 },
-    { x: -diagonal, y: -diagonal },
-    { x: diagonal, y: -diagonal },
-    { x: -diagonal, y: diagonal },
-    { x: diagonal, y: diagonal },
-  ];
-  const offsets = offset === undefined ? [undefined, 72, 96, 128] : [offset];
-  return (
-    directions
-      .flatMap((candidateDirection) =>
-        offsets.map((candidateOffset) => ({
-          candidateDirection,
-          center: centerFor(candidateDirection, candidateOffset),
-        })),
-      )
-      .map(({ candidateDirection: _candidateDirection, center }) => {
-        const fromVertex = { x: center.x - vertex.x, y: center.y - vertex.y };
-        const distance = Math.hypot(fromVertex.x, fromVertex.y);
-        return {
-          alignment:
-            distance > Number.EPSILON
-              ? (fromVertex.x * direction.x + fromVertex.y * direction.y) /
-                distance
-              : -1,
-          center,
-          clearance: clearance(center),
-        };
-      })
-      .filter((candidate) => candidate.clearance >= 11.5)
-      .sort(
-        (left, right) =>
-          right.alignment - left.alignment || right.clearance - left.clearance,
-      )[0]?.center ?? defaultCenter
-  );
-}
-
-function pointsToSvg(points: Point[]): string {
-  return points.map((point) => point.x + "," + point.y).join(" ");
-}
-
-function arrowKeyDelta(key: string, step = 6): Point | null {
-  if (key === "ArrowLeft") return { x: -step, y: 0 };
-  if (key === "ArrowRight") return { x: step, y: 0 };
-  if (key === "ArrowUp") return { x: 0, y: -step };
-  if (key === "ArrowDown") return { x: 0, y: step };
-  return null;
-}
-
-function TrianglePolygon({
-  fill = accentSurface,
-  points,
-  stroke = primaryColor,
-  strokeWidth = 2,
-}: PolygonProps): unknown {
-  return jsxRuntime.jsx("polygon", {
-    points: pointsToSvg(points),
-    fill,
-    stroke,
-    strokeLinejoin: "round",
-    strokeWidth,
-  });
-}
-
-function TriangleAnglePill({
-  center,
-  label,
-}: {
-  center: Point;
-  label: unknown;
-}): unknown {
-  return jsxRuntime.jsx("foreignObject", {
-    x: center.x - 36,
-    y: center.y - 16,
-    width: 72,
-    height: 32,
-    pointerEvents: "none",
-    "aria-hidden": "true",
-    "data-triangle-angle-pill": "",
-    children: jsxRuntime.jsx("div", {
-      className:
-        "flex h-full w-full items-center justify-center rounded-full bg-[var(--learning-block-accent)] text-lg font-semibold text-white",
-      children: label,
-    }),
-  });
-}
-
-function TriangleVertexHandle({
-  ariaLabel,
-  cx,
-  cy,
-  interactive = true,
-  isThumbnail = false,
-  onKeyDown,
-  onPointerDown,
-}: VertexHandleProps): unknown {
-  const [focused, setFocused] = React.useState(false);
-  return jsxRuntime.jsxs("g", {
-    children: [
-      jsxRuntime.jsx("circle", {
-        cx,
-        cy,
-        r: handleRadius,
-        fill: handleFill,
-        stroke: handleStroke,
-        strokeWidth: 2,
-        pointerEvents: "none",
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { I3 as t, e6 as n } from "@rchunk/app-shared";
+var r, i, a, o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C, w, T;
+function E() {
+  return (E = e(() => {
+    ((r = n()),
+      (i = t()),
+      (a = `var(--learning-block-visualization-surface, var(--bg-primary))`),
+      (o = `var(--learning-block-accent-surface)`),
+      (s = `var(--learning-block-color-primary)`),
+      (c = `var(--learning-block-accent)`),
+      (l = `var(--text-secondary)`),
+      (u = `var(--text-secondary)`),
+      (d = `var(--learning-block-accent)`),
+      (f = a),
+      (p = 1.25),
+      (m = 5.5),
+      (h = 52),
+      (g = [72, 96, 128]),
+      (_ = Math.SQRT1_2),
+      (v = [
+        { x: -1, y: 0 },
+        { x: 1, y: 0 },
+        { x: 0, y: -1 },
+        { x: 0, y: 1 },
+        { x: -_, y: -_ },
+        { x: _, y: -_ },
+        { x: -_, y: _ },
+        { x: _, y: _ },
+      ]),
+      (y = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (b = (
+        e,
+        t,
+        { offset: n, avoidPoints: r, viewBoxWidth: i = 320, viewBoxHeight: a = 240 } = {},
+      ) => {
+        let o = { x: e.x - t.x, y: e.y - t.y },
+          s = Math.hypot(o.x, o.y),
+          c = s > 2 ** -52 ? { x: o.x / s, y: o.y / s } : { x: 0, y: -1 },
+          l = (t, r = n) => {
+            let o = Math.abs(t.x) > 0.01 && Math.abs(t.y) > 0.01,
+              s = r ?? (o || Math.abs(t.x) > Math.abs(t.y) ? h : 38);
+            return { x: y(e.x + t.x * s, 40, i - 40), y: y(e.y + t.y * s, 20, a - 20) };
+          },
+          u = l(c);
+        if (!r?.length) return u;
+        let d = (e) =>
+            Math.min(
+              ...r.map((t) => {
+                let n = Math.max(Math.abs(t.x - e.x) - 36, 0),
+                  r = Math.max(Math.abs(t.y - e.y) - 16, 0);
+                return Math.hypot(n, r);
+              }),
+            ),
+          f = n === void 0 ? [void 0, ...g] : [n];
+        return (
+          [c, ...v]
+            .flatMap((e) => f.map((t) => ({ candidateDirection: e, center: l(e, t) })))
+            .map(({ candidateDirection: t, center: n }) => {
+              let r = { x: n.x - e.x, y: n.y - e.y },
+                i = Math.hypot(r.x, r.y);
+              return {
+                alignment: i > 2 ** -52 ? (r.x * c.x + r.y * c.y) / i : -1,
+                center: n,
+                clearance: d(n),
+              };
+            })
+            .filter(({ clearance: e }) => e >= 11.5)
+            .sort((e, t) => t.alignment - e.alignment || t.clearance - e.clearance)[0]?.center ?? u
+        );
       }),
-      focused
-        ? jsxRuntime.jsx("circle", {
-            cx,
-            cy,
-            r: 12,
-            fill: "none",
-            stroke: accentColor,
-            strokeWidth: 2,
-            pointerEvents: "none",
-            "aria-hidden": "true",
-            "data-triangle-focus-halo": "",
-          })
-        : null,
-      interactive && !isThumbnail
-        ? jsxRuntime.jsx("circle", {
-            cx,
-            cy,
-            r: 12,
-            fill: "transparent",
-            stroke: "transparent",
-            strokeWidth: 2,
-            className: "cursor-grab outline-none active:cursor-grabbing",
-            role: "button",
-            tabIndex: 0,
-            "aria-label": ariaLabel,
-            onBlur: () => setFocused(false),
-            onFocus: () => setFocused(true),
-            onKeyDown,
-            onPointerDown,
-          })
-        : null,
-    ],
-  });
+      (x = (e) => e.map((e) => `${e.x},${e.y}`).join(` `)),
+      (S = (e, t = 6) =>
+        e === `ArrowLeft`
+          ? { x: -t, y: 0 }
+          : e === `ArrowRight`
+            ? { x: t, y: 0 }
+            : e === `ArrowUp`
+              ? { x: 0, y: -t }
+              : e === `ArrowDown`
+                ? { x: 0, y: t }
+                : null),
+      (C = ({ fill: e = o, points: t, stroke: n = s, strokeWidth: r = 2 }) =>
+        (0, i.jsx)(`polygon`, {
+          points: x(t),
+          fill: e,
+          stroke: n,
+          strokeLinejoin: `round`,
+          strokeWidth: r,
+        })),
+      (w = ({ center: e, label: t }) =>
+        (0, i.jsx)(`foreignObject`, {
+          x: e.x - 36,
+          y: e.y - 16,
+          width: 72,
+          height: 32,
+          pointerEvents: `none`,
+          "aria-hidden": `true`,
+          "data-triangle-angle-pill": ``,
+          children: (0, i.jsx)(`div`, {
+            className: `flex h-full w-full items-center justify-center rounded-full bg-[var(--learning-block-accent)] text-lg font-semibold text-white`,
+            children: t,
+          }),
+        })),
+      (T = ({
+        ariaLabel: e,
+        cx: t,
+        cy: n,
+        interactive: a = !0,
+        isThumbnail: o = !1,
+        onKeyDown: s,
+        onPointerDown: l,
+      }) => {
+        let [u, p] = (0, r.useState)(!1);
+        return (0, i.jsxs)(`g`, {
+          children: [
+            (0, i.jsx)(`circle`, {
+              cx: t,
+              cy: n,
+              r: m,
+              fill: d,
+              stroke: f,
+              strokeWidth: 2,
+              pointerEvents: `none`,
+            }),
+            u
+              ? (0, i.jsx)(`circle`, {
+                  cx: t,
+                  cy: n,
+                  r: 12,
+                  fill: `none`,
+                  stroke: c,
+                  strokeWidth: 2,
+                  pointerEvents: `none`,
+                  "aria-hidden": `true`,
+                  "data-triangle-focus-halo": ``,
+                })
+              : null,
+            a && !o
+              ? (0, i.jsx)(`circle`, {
+                  cx: t,
+                  cy: n,
+                  r: 12,
+                  fill: `transparent`,
+                  stroke: `transparent`,
+                  strokeWidth: 2,
+                  className: `cursor-grab outline-none active:cursor-grabbing`,
+                  role: `button`,
+                  tabIndex: 0,
+                  "aria-label": e,
+                  onBlur: () => p(!1),
+                  onFocus: () => p(!0),
+                  onKeyDown: s,
+                  onPointerDown: l,
+                })
+              : null,
+          ],
+        });
+      }));
+  }))();
 }
-
-function initializeTriangleVisualLanguage(): void {
-  React = shared.e6();
-  jsxRuntime = shared.I3();
-  visualizationSurface =
-    "var(--learning-block-visualization-surface, var(--bg-primary))";
-  accentSurface = "var(--learning-block-accent-surface)";
-  primaryColor = "var(--learning-block-color-primary)";
-  accentColor = "var(--learning-block-accent)";
-  secondaryTextColor = "var(--text-secondary)";
-  mutedTextColor = "var(--text-secondary)";
-  handleFill = "var(--learning-block-accent)";
-  handleStroke = visualizationSurface;
-  lineStrokeWidth = 1.25;
-  handleRadius = 5.5;
-}
-
 export {
-  mutedTextColor as a,
-  TriangleAnglePill as c,
-  placeTriangleLabel as d,
-  arrowKeyDelta as f,
-  handleRadius as i,
-  TriangleVertexHandle as l,
-  secondaryTextColor as n,
-  primaryColor as o,
-  initializeTriangleVisualLanguage as p,
-  lineStrokeWidth as r,
-  visualizationSurface as s,
-  accentColor as t,
-  TrianglePolygon as u,
+  u as a,
+  w as c,
+  b as d,
+  S as f,
+  m as i,
+  T as l,
+  l as n,
+  s as o,
+  E as p,
+  p as r,
+  a as s,
+  c as t,
+  C as u,
 };

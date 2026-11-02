@@ -1,49 +1,16 @@
-// Gross-versus-net primary productivity controls. Release chunk: type-1aff40f97e6c.js.
-import "@rchunk/rolldown-runtime";
-interface Specification {
-  type: "GPP_VS_NPP";
-  version: 2;
-  thumbnailAssetKey: "gpp-vs-npp-v3";
-  canonicalFormula: string;
-  parameters: {
-    gross_primary_productivity: {
-      kind: "number";
-      defaultValue: 240;
-      min: 100;
-      max: 400;
-    };
-    autotrophic_respiration: {
-      kind: "number";
-      defaultValue: 80;
-      min: 0;
-      max: 100;
-    };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `GPP_VS_NPP`),
+      (n = `gpp-vs-npp-v3`),
+      (r = `\\mathrm{NPP}=\\mathrm{GPP}-R_a`),
+      (i = {
+        gross_primary_productivity: { kind: `number`, defaultValue: 240, min: 100, max: 400 },
+        autotrophic_respiration: { kind: `number`, defaultValue: 80, min: 0, max: 100 },
+      }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-let specification: Specification;
-let initialized = false;
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  specification = {
-    type: "GPP_VS_NPP",
-    version: 2,
-    thumbnailAssetKey: "gpp-vs-npp-v3",
-    canonicalFormula: "\\mathrm{NPP}=\\mathrm{GPP}-R_a",
-    parameters: {
-      gross_primary_productivity: {
-        kind: "number",
-        defaultValue: 240,
-        min: 100,
-        max: 400,
-      },
-      autotrophic_respiration: {
-        kind: "number",
-        defaultValue: 80,
-        min: 0,
-        max: 100,
-      },
-    },
-  };
-}
-export { specification as n, initialize as t };
+export { a as n, o as t };

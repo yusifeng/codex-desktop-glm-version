@@ -1,193 +1,111 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $O as t, VJ as n, ek as r, wL as i } from "@rchunk/app-shared";
 import {
-  $O as queryDurations,
-  VJ as supportsHostCapability,
-  ek as initializeQueryHooks,
-  wL as initializeUtilities,
-} from "@rchunk/app-shared";
-import {
-  B$ as initializeConnectorQuery,
-  FEt as connectorLinkQueryOptions,
-  G6t as initializeAppReadCapability,
-  HEt as initializeExternalSourceProviderQuery,
-  HZt as initializeSidePanelRoutes,
-  Ifn as hostCapabilitiesById,
-  Iv as normalizeAvailableAppIds,
-  Lv as initializeConnectorLinks,
-  Rv as isRemoteHost,
-  W6t as getBrowserAccountId,
-  X3t as connectorDetailsQuery,
-  cDt as remoteAvailableAppsQuery,
-  s6t as initializePluginSettings,
-  uDt as initializeAvailableApps,
-  z$ as localAvailableAppsQuery,
+  B$ as a,
+  FEt as o,
+  G6t as s,
+  HEt as c,
+  HZt as l,
+  Ifn as u,
+  Iv as d,
+  Lv as f,
+  Rv as p,
+  W6t as m,
+  X3t as h,
+  cDt as g,
+  s6t as _,
+  uDt as v,
+  z$ as y,
 } from "@rchunk/app-initial";
 import {
-  a as getDefaultAvailableCompanions,
-  d as getConnectorAvailableCompanions,
-  h as initializeConnectorCompanionModel,
-  o as getDefaultCompanionConnectorIds,
-  p as getConnectorCompanionConnectorIds,
-  s as initializeDefaultCompanionModel,
+  a as b,
+  d as x,
+  h as S,
+  o as C,
+  p as w,
+  s as T,
 } from "@rchunk/app-connect-modal";
-
-interface Connector extends Record<string, unknown> {
-  id: string;
-}
-interface ConnectorDefinition extends Record<string, unknown> {
-  connectorId: string;
-}
-type ConnectorLink = Record<string, unknown>;
-interface QueryOptions extends Record<string, unknown> {
-  queryKey: readonly unknown[];
-  staleTime?: number;
-}
-interface QueryClient {
-  fetchQuery<Value>(options: QueryOptions): Promise<Value>;
-  setQueryData(queryKey: readonly unknown[], value: unknown): void;
-}
-interface AvailabilityScope {
-  get(signal: unknown, parameter?: unknown): unknown;
-}
-interface AvailabilityInput extends Record<string, unknown> {
-  appId: string;
-  browserAccountId?: string | null;
-  freshLinkChecks?: boolean;
-  hostId: string;
-  primaryLink?: unknown;
-  queryClient: QueryClient;
-  scope: AvailabilityScope;
-}
-interface ConnectorAvailabilityInput extends AvailabilityInput {
-  connectors: ConnectorDefinition[];
-}
-interface CompanionQueryInput {
-  availableAppIds: Set<string>;
-  companionConnectorIds: string[];
-  companionConnectors: Array<Connector | null>;
-  companionLinks: Array<ConnectorLink | null | undefined>;
-}
-
-async function resolveAvailableCompanions(
-  input: AvailabilityInput,
-  getAvailableCompanions: (input: CompanionQueryInput) => Connector[],
-  getCompanionConnectorIds: (appId: string) => string[],
-): Promise<Connector[]> {
-  const {
-    scope,
-    appId,
-    browserAccountId,
-    freshLinkChecks = false,
-    hostId,
-    primaryLink,
-    queryClient,
-  } = input;
-  const linkQuery = connectorLinkQueryOptions(appId) as QueryOptions;
-  const primaryLinkResult = primaryLink === undefined
-    ? await queryClient
-      .fetchQuery<unknown>({
-        ...linkQuery,
-        staleTime: freshLinkChecks ? 0 : queryDurations.FIVE_MINUTES,
-      })
-      .then((link) => ({ link }))
-      .catch(() => undefined)
-    : { link: primaryLink };
-  if (primaryLink !== undefined) {
-    queryClient.setQueryData(linkQuery.queryKey, primaryLink);
-  }
-  if (primaryLinkResult == null || primaryLinkResult.link != null) return [];
-
-  const companionIds = getCompanionConnectorIds(appId);
-  const availableAppIds = isRemoteHost(hostId)
-    ? normalizeAvailableAppIds(
-      await queryClient.fetchQuery<unknown>(remoteAvailableAppsQuery({
-        accountId: browserAccountId ?? getBrowserAccountId(scope) ?? null,
-        appIds: companionIds,
-        enabled: true,
-      }) as QueryOptions).catch(() => undefined),
-    )
-    : new Set(
-      (await queryClient.fetchQuery<Array<{ id: string }>>(localAvailableAppsQuery({
-        scope,
-        appIds: companionIds,
-        browserAccountId,
-        hostId,
-        queryClient,
-        supportsAppRead: supportsHostCapability(
-          scope.get(hostCapabilitiesById, hostId),
-          "appRead",
+async function E({
+  scope: e,
+  appId: r,
+  browserAccountId: i,
+  freshLinkChecks: a = !1,
+  getAvailableCompanions: s,
+  getCompanionConnectorIds: c,
+  hostId: l,
+  primaryLink: f,
+  queryClient: _,
+}) {
+  let v = o(r),
+    b =
+      f === void 0
+        ? await _.fetchQuery({ ...v, staleTime: a ? 0 : t.FIVE_MINUTES })
+            .then((e) => ({ link: e }))
+            .catch(() => void 0)
+        : { link: f };
+  if ((f !== void 0 && _.setQueryData(v.queryKey, f), b == null || b.link != null)) return [];
+  let x = c(r),
+    S = p(l)
+      ? d(
+          await _.fetchQuery(g({ accountId: i ?? m(e) ?? null, appIds: x, enabled: !0 })).catch(
+            () => void 0,
+          ),
+        )
+      : new Set(
+          (
+            await _.fetchQuery(
+              y({
+                scope: e,
+                appIds: x,
+                browserAccountId: i,
+                hostId: l,
+                queryClient: _,
+                supportsAppRead: n(e.get(u, l), `appRead`),
+              }),
+            ).catch(() => [])
+          ).map(({ id: e }) => e),
         ),
-      }) as QueryOptions).catch(() => []))
-        .map(({ id }) => id),
-    );
-  const availableCompanionIds = companionIds.filter((id) => availableAppIds.has(id));
-  if (availableCompanionIds.length === 0) return [];
-
-  const fetchLink = (id: string) => queryClient.fetchQuery<ConnectorLink | null>({
-    ...(connectorLinkQueryOptions(id) as QueryOptions),
-    staleTime: freshLinkChecks ? 0 : queryDurations.FIVE_MINUTES,
+    C = x.filter((e) => S.has(e));
+  if (C.length === 0) return [];
+  let w = (e) => _.fetchQuery({ ...o(e), staleTime: a ? 0 : t.FIVE_MINUTES }),
+    [T, E, D] = await Promise.all([
+      _.fetchQuery(h(r)).catch(() => null),
+      Promise.all(C.map((e) => _.fetchQuery(h(e)).catch(() => null))),
+      Promise.all(C.map((e) => w(e).catch(() => void 0))),
+    ]);
+  return T == null
+    ? []
+    : s({
+        availableAppIds: S,
+        companionConnectorIds: C,
+        companionConnectors: E,
+        companionLinks: D,
+      });
+}
+function D() {
+  return (D = e(() => {
+    (i(), l(), _(), f(), s(), a(), c(), v(), r());
+  }))();
+}
+function O(e) {
+  return E({
+    ...e,
+    getAvailableCompanions: (t) => x({ ...t, connectors: e.connectors }),
+    getCompanionConnectorIds: (t) => w(t, e.connectors),
   });
-  const [primaryConnector, companionConnectors, companionLinks] = await Promise.all([
-    queryClient.fetchQuery<Connector>(connectorDetailsQuery(appId) as QueryOptions).catch(() => null),
-    Promise.all(availableCompanionIds.map((id) =>
-      queryClient.fetchQuery<Connector>(connectorDetailsQuery(id) as QueryOptions).catch(() => null))),
-    Promise.all(availableCompanionIds.map((id) => fetchLink(id).catch(() => undefined))),
-  ]);
-  if (primaryConnector == null) return [];
-  return getAvailableCompanions({
-    availableAppIds,
-    companionConnectorIds: availableCompanionIds,
-    companionConnectors,
-    companionLinks,
-  });
 }
-
-function initializeAvailabilityCore(): void {
-  initializeUtilities();
-  initializeSidePanelRoutes();
-  initializePluginSettings();
-  initializeConnectorLinks();
-  initializeAppReadCapability();
-  initializeConnectorQuery();
-  initializeExternalSourceProviderQuery();
-  initializeAvailableApps();
-  initializeQueryHooks();
+function k() {
+  return (k = e(() => {
+    (D(), S());
+  }))();
 }
-
-function getAvailableConnectorCompanions(
-  input: ConnectorAvailabilityInput,
-): Promise<Connector[]> {
-  return resolveAvailableCompanions(
-    input,
-    (context) => getConnectorAvailableCompanions({ ...context, connectors: input.connectors })
-      .map(({ connector }) => connector as Connector),
-    (appId) => getConnectorCompanionConnectorIds(appId, input.connectors),
-  );
+function A(e) {
+  return E({ ...e, getAvailableCompanions: b, getCompanionConnectorIds: C });
 }
-
-function initializeConnectorAvailability(): void {
-  initializeAvailabilityCore();
-  initializeConnectorCompanionModel();
+function j() {
+  return (j = e(() => {
+    (D(), T());
+  }))();
 }
-
-function getAvailableDefaultCompanions(
-  input: AvailabilityInput,
-): Promise<Connector[]> {
-  return resolveAvailableCompanions(
-    input,
-    getDefaultAvailableCompanions as unknown as (input: CompanionQueryInput) => Connector[],
-    getDefaultCompanionConnectorIds,
-  );
-}
-
-function initializeDefaultAvailability(): void {
-  initializeAvailabilityCore();
-  initializeDefaultCompanionModel();
-}
-
-export {
-  getAvailableConnectorCompanions as i,
-  getAvailableDefaultCompanions as n,
-  initializeConnectorAvailability as r,
-  initializeDefaultAvailability as t,
-};
+export { O as i, A as n, k as r, j as t };

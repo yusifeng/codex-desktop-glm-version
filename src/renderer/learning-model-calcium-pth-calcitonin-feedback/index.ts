@@ -1,40 +1,36 @@
-// Calcium homeostasis feedback model involving PTH and calcitonin.
-import "@rchunk/rolldown-runtime";
-
-type CalciumCondition = "low" | "high";
-type CalciumFeedbackStage = "sensing" | "hormones" | "targets" | "feedback";
-interface CalciumFeedbackValues { calciumCondition?: string; stageIndex?: number }
-
-let calciumFeedbackManifest: { type: string; version: number; thumbnailAssetKey: string; parameters: { calciumCondition: { kind: "enum"; defaultValue: string; allowedValues: string[] } } };
-let calciumConditions: CalciumCondition[];
-let calciumFeedbackStages: CalciumFeedbackStage[];
-let stageRange: { min: number; max: number; step: number; defaultValue: number };
-let defaultCalciumCondition: CalciumCondition;
-let normalizeCalciumFeedbackState: (values: CalciumFeedbackValues) => { calciumCondition: CalciumCondition; stageIndex: number };
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeCalciumFeedbackManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  calciumFeedbackManifest = { type: "CALCIUM_PTH_CALCITONIN_FEEDBACK", version: 2, thumbnailAssetKey: "calcium-pth-calcitonin-feedback-v1", parameters: { calciumCondition: { kind: "enum", defaultValue: "low", allowedValues: ["low", "high"] } } };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `CALCIUM_PTH_CALCITONIN_FEEDBACK`),
+      (n = `calcium-pth-calcitonin-feedback-v1`),
+      (r = {
+        calciumCondition: { kind: `enum`, defaultValue: `low`, allowedValues: [`low`, `high`] },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-function initializeCalciumFeedbackModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializeCalciumFeedbackManifest();
-  calciumConditions = ["low", "high"];
-  calciumFeedbackStages = ["sensing", "hormones", "targets", "feedback"];
-  stageRange = { min: 0, max: calciumFeedbackStages.length - 1, step: 1, defaultValue: 0 };
-  const isCondition = (value: string | undefined): value is CalciumCondition => calciumConditions.some(condition => condition === value);
-  const manifestDefault = calciumFeedbackManifest.parameters.calciumCondition.defaultValue;
-  if (!isCondition(manifestDefault)) throw new Error("Invalid default calcium condition in type manifest");
-  defaultCalciumCondition = manifestDefault;
-  normalizeCalciumFeedbackState = values => {
-    const candidate = typeof values.stageIndex === "number" && Number.isFinite(values.stageIndex) ? Math.round(values.stageIndex) : stageRange.defaultValue;
-    return { calciumCondition: isCondition(values.calciumCondition) ? values.calciumCondition : defaultCalciumCondition, stageIndex: Math.min(Math.max(candidate, stageRange.min), stageRange.max) };
-  };
+var o, s, c, l, u, d, f, p, m;
+function h() {
+  return (h = e(() => {
+    (a(),
+      (o = [`low`, `high`]),
+      (s = [`sensing`, `hormones`, `targets`, `feedback`]),
+      (c = { min: 0, max: s.length - 1, step: 1, defaultValue: 0 }),
+      (l = (e) => o.some((t) => t === e)),
+      (u = () => {
+        let e = i.parameters.calciumCondition.defaultValue;
+        if (!l(e)) throw Error(`Invalid default calcium condition in type manifest`);
+        return e;
+      }),
+      (d = u()),
+      (f = (e) => (l(e) ? e : d)),
+      (p = (e) => {
+        let t = typeof e == `number` && Number.isFinite(e) ? Math.round(e) : c.defaultValue;
+        return Math.min(Math.max(t, c.min), c.max);
+      }),
+      (m = (e) => ({ calciumCondition: f(e.calciumCondition), stageIndex: p(e.stageIndex) })));
+  }))();
 }
-
-export { initializeCalciumFeedbackModel as a, calciumFeedbackManifest as c, defaultCalciumCondition as i, calciumFeedbackStages as n, normalizeCalciumFeedbackState as o, stageRange as r, initializeCalciumFeedbackManifest as s, calciumConditions as t };
+export { h as a, i as c, d as i, s as n, m as o, c as r, a as s, o as t };

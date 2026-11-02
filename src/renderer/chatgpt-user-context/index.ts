@@ -1,83 +1,58 @@
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $O as timeConstants,
-  FX as initializeSignalRuntime,
-  QI as initializeScopeRuntime,
-  YX as createMutationSignal,
-  ZI as appScope,
-  eZ as createQuerySignal,
-  ek as initializeQueryHooks,
+  $O as t,
+  FX as n,
+  QI as r,
+  YX as i,
+  ZI as a,
+  eZ as o,
+  ek as s,
 } from "@rchunk/app-shared";
 import {
-  Sqt as initializeAccountState,
-  Sun as initializeSessionState,
-  U6t as accountIdSignal,
-  _un as userIdSignal,
-  cJt as initializeApiClient,
-  rJt as apiClient,
-  xun as personalizationEnabled,
+  Sqt as c,
+  Sun as l,
+  U6t as u,
+  _un as d,
+  cJt as f,
+  rJt as p,
+  xun as m,
 } from "@rchunk/app-initial";
-
-export interface ChatGptUserContext {
-  [key: string]: unknown;
+var h;
+function g() {
+  return (g = e(() => {
+    (n(),
+      l(),
+      f(),
+      r(),
+      s(),
+      c(),
+      (h = o(a, ({ scope: e }) => {
+        let n = e.get(u),
+          r = e.get(d);
+        return {
+          enabled: e.get(m) && n != null,
+          queryKey: [`chatgpt-user-context`, n, r],
+          queryFn: async ({ signal: t }) => {
+            if (e.get(u) !== n || e.get(d) !== r)
+              throw Error(`Account changed before loading personalization`);
+            return p.safeGet(`/user_system_messages`, { signal: t });
+          },
+          staleTime: t.ONE_MINUTE,
+        };
+      })),
+      i(a, ({ scope: e }) => ({
+        mutationKey: [`update-chatgpt-user-context`],
+        mutationFn: async (t) => {
+          let n = e.get(u),
+            r = e.get(d),
+            i = e.query.snapshot(h);
+          if ((await i.cancel(), e.get(u) !== n || e.get(d) !== r))
+            throw Error(`Account changed before saving personalization`);
+          let a = await p.safePatch(`/user_system_messages`, { requestBody: t });
+          i.setData(a);
+        },
+      })));
+  }))();
 }
-
-let chatGptUserContextQuery: ReturnType<typeof createQuerySignal>;
-
-function initializeChatGptUserContext(): void {
-  initializeSignalRuntime();
-  initializeSessionState();
-  initializeApiClient();
-  initializeScopeRuntime();
-  initializeQueryHooks();
-  initializeAccountState();
-
-  chatGptUserContextQuery = createQuerySignal(appScope, ({ scope }) => {
-    const accountId = scope.get(accountIdSignal);
-    const userId = scope.get(userIdSignal);
-    return {
-      enabled: scope.get(personalizationEnabled) && accountId != null,
-      queryKey: ["chatgpt-user-context", accountId, userId],
-      queryFn: async ({ signal }) => {
-        if (
-          scope.get(accountIdSignal) !== accountId ||
-          scope.get(userIdSignal) !== userId
-        ) {
-          throw Error("Account changed before loading personalization");
-        }
-        return apiClient.safeGet<ChatGptUserContext>("/user_system_messages", {
-          signal,
-        });
-      },
-      staleTime: timeConstants.ONE_MINUTE,
-    };
-  });
-
-  createMutationSignal<
-    Record<string, unknown>,
-    ChatGptUserContext,
-    Error,
-    Record<string, unknown>
-  >(appScope, ({ scope }) => ({
-    mutationKey: ["update-chatgpt-user-context"],
-    mutationFn: async (requestBody) => {
-      const accountId = scope.get(accountIdSignal);
-      const userId = scope.get(userIdSignal);
-      const snapshot = scope.query.snapshot(chatGptUserContextQuery);
-      await snapshot.cancel();
-      if (
-        scope.get(accountIdSignal) !== accountId ||
-        scope.get(userIdSignal) !== userId
-      ) {
-        throw Error("Account changed before saving personalization");
-      }
-      const response = await apiClient.safePatch<ChatGptUserContext>(
-        "/user_system_messages",
-        { requestBody },
-      );
-      snapshot.setData(response);
-      return response;
-    },
-  }));
-}
-
-export { initializeChatGptUserContext as n, chatGptUserContextQuery as t };
+export { g as n, h as t };

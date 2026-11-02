@@ -1,55 +1,29 @@
-// Mixed-number learning model: divide a numerator into sixths.
-import "@rchunk/rolldown-runtime";
-
-interface IntegerParameter {
-  defaultValue: number;
-  kind: "integer";
-  max: number;
-  min: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `MIXED_NUMBERS`),
+      (n = `mixed-numbers-v1`),
+      (r = { numerator: { kind: `integer`, defaultValue: 23, min: 7, max: 35 } }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-interface MixedNumberValues { numerator?: number | null }
-
-const mixedNumbersType = "MIXED_NUMBERS";
-const mixedNumbersThumbnailAssetKey = "mixed-numbers-v1";
-const mixedNumbersParameters: { numerator: IntegerParameter } = {
-  numerator: { kind: "integer", defaultValue: 23, min: 7, max: 35 },
-};
-const mixedNumbersSpecification = {
-  type: mixedNumbersType,
-  version: 2,
-  thumbnailAssetKey: mixedNumbersThumbnailAssetKey,
-  parameters: mixedNumbersParameters,
-};
-const numeratorParameter = mixedNumbersSpecification.parameters.numerator;
-const numeratorControl = {
-  baseMin: numeratorParameter.min,
-  baseMax: numeratorParameter.max,
-  step: 1,
-};
-
-function normalizeNumerator(value: number | null | undefined): number {
-  const fallback = numeratorParameter.defaultValue;
-  return Math.min(
-    numeratorParameter.max,
-    Math.max(numeratorParameter.min, Math.round(Number.isFinite(value) ? value ?? fallback : fallback)),
-  );
+var o, s, c, l;
+function u() {
+  return (u = e(() => {
+    (a(),
+      (o = i.parameters.numerator),
+      (s = { baseMin: i.parameters.numerator.min, baseMax: i.parameters.numerator.max, step: 1 }),
+      (c = (e) => {
+        let { defaultValue: t, min: n, max: r } = o;
+        return Math.min(r, Math.max(n, Math.round(Number.isFinite(e) ? (e ?? t) : t)));
+      }),
+      (l = (e) => {
+        let t = c(e.numerator),
+          n = Math.floor(t / 6);
+        return { denominator: 6, numerator: t, remainder: t % 6, whole: n };
+      }));
+  }))();
 }
-
-function calculateMixedNumber(values: MixedNumberValues) {
-  const numerator = normalizeNumerator(values.numerator);
-  const whole = Math.floor(numerator / 6);
-  return { denominator: 6, numerator, remainder: numerator % 6, whole };
-}
-
-function initializeMixedNumbersSpecification(): void {}
-function initializeMixedNumbersModel(): void {}
-
-export {
-  initializeMixedNumbersSpecification as a,
-  calculateMixedNumber as i,
-  numeratorControl as n,
-  mixedNumbersSpecification as o,
-  initializeMixedNumbersModel as r,
-  numeratorParameter as t,
-};
+export { a, l as i, s as n, i as o, u as r, o as t };

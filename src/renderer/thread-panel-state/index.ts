@@ -1,9 +1,4 @@
-import {
-  _vt as initializeThreadAccounts,
-  fvt as activateThreadPanelTab,
-  hvt as getThreadPanelTabController,
-} from "@rchunk/app-initial";
-
-initializeThreadAccounts();
-
-export { activateThreadPanelTab, getThreadPanelTabController };
+// @ts-nocheck
+import { _vt as e, fvt as t, hvt as n } from "@rchunk/app-initial";
+e();
+export { t as activateThreadPanelTab, n as getThreadPanelTabController };

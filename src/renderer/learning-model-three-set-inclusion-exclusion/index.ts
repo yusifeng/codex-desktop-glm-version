@@ -1,85 +1,83 @@
-// Three-set inclusion-exclusion learning model. Release chunk: model-92f4db76ba27.js.
-import "@rchunk/rolldown-runtime";
-
-interface InclusionValues { setACount?: number | null; setBCount?: number | null; setCCount?: number | null; step?: number | null }
-interface InclusionManifest {
-  type: string; version: number; thumbnailAssetKey: string; canonicalFormula: string;
-  parameters: {
-    setACount: { kind: "integer"; defaultValue: number; min: number; max: number };
-    setBCount: { kind: "integer"; defaultValue: number; min: number; max: number };
-    setCCount: { kind: "integer"; defaultValue: number; min: number; max: number };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `THREE_SET_INCLUSION_EXCLUSION`),
+      (n = `three-set-inclusion-exclusion-v1`),
+      (r = `|A \\cup B \\cup C| = |A| + |B| + |C| - |A \\cap B| - |A \\cap C| - |B \\cap C| + |A \\cap B \\cap C|`),
+      (i = {
+        setACount: { kind: `integer`, defaultValue: 21, min: 12, max: 30 },
+        setBCount: { kind: `integer`, defaultValue: 21, min: 12, max: 30 },
+        setCCount: { kind: `integer`, defaultValue: 18, min: 12, max: 30 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-
-let inclusionExclusionManifest: InclusionManifest;
-let stepControl: { min: number; max: number; defaultValue: number };
-let normalizeStep: (step: number | null | undefined) => number;
-let calculateInclusionExclusion: (values: InclusionValues) => {
-  values: { setACount: number; setBCount: number; setCCount: number; step: number }; step: number;
-  setCounts: { a: number; b: number; c: number }; atomicCounts: Record<string, number>;
-  intersectionCounts: { ab: number; ac: number; bc: number; abc: number }; unionCount: number;
-  runningTotal: number; multiplicities: Record<string, number>;
-};
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeInclusionExclusionManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  inclusionExclusionManifest = {
-    type: "THREE_SET_INCLUSION_EXCLUSION", version: 1, thumbnailAssetKey: "three-set-inclusion-exclusion-v1",
-    canonicalFormula: "|A \\cup B \\cup C| = |A| + |B| + |C| - |A \\cap B| - |A \\cap C| - |B \\cap C| + |A \\cap B \\cap C|",
-    parameters: {
-      setACount: { kind: "integer", defaultValue: 21, min: 12, max: 30 },
-      setBCount: { kind: "integer", defaultValue: 21, min: 12, max: 30 },
-      setCCount: { kind: "integer", defaultValue: 18, min: 12, max: 30 },
-    },
-  };
+var s, c, l, u, d, f, p, m, h;
+function g() {
+  return (g = e(() => {
+    (o(),
+      (s = { min: 1, max: 3, defaultValue: 1 }),
+      (c = { a: a.parameters.setACount, b: a.parameters.setBCount, c: a.parameters.setCCount }),
+      (l = { abOnly: 4, acOnly: 3, bcOnly: 5, abc: 2 }),
+      (u = { ab: l.abOnly + l.abc, ac: l.acOnly + l.abc, bc: l.bcOnly + l.abc, abc: l.abc }),
+      (d = {
+        1: { aOnly: 1, bOnly: 1, cOnly: 1, abOnly: 2, acOnly: 2, bcOnly: 2, abc: 3 },
+        2: { aOnly: 1, bOnly: 1, cOnly: 1, abOnly: 1, acOnly: 1, bcOnly: 1, abc: 0 },
+        3: { aOnly: 1, bOnly: 1, cOnly: 1, abOnly: 1, acOnly: 1, bcOnly: 1, abc: 1 },
+      }),
+      (f = (e) =>
+        Number.isFinite(e)
+          ? Math.min(s.max, Math.max(s.min, Math.round(e ?? s.defaultValue)))
+          : s.defaultValue),
+      (p = (e) => {
+        let t = (e, t) =>
+          typeof e != `number` || !Number.isFinite(e)
+            ? t.defaultValue
+            : Math.min(t.max, Math.max(t.min, Math.round(e)));
+        return {
+          setACount: t(e.setACount, c.a),
+          setBCount: t(e.setBCount, c.b),
+          setCCount: t(e.setCCount, c.c),
+          step: f(e.step),
+        };
+      }),
+      (m = (e) => d[e]),
+      (h = (e) => {
+        let t = p(e),
+          n = { a: t.setACount, b: t.setBCount, c: t.setCCount },
+          r = {
+            aOnly: n.a - l.abOnly - l.acOnly - l.abc,
+            bOnly: n.b - l.abOnly - l.bcOnly - l.abc,
+            cOnly: n.c - l.acOnly - l.bcOnly - l.abc,
+            ...l,
+          },
+          i = Object.values(r).reduce((e, t) => e + t, 0),
+          a = n.a + n.b + n.c,
+          o = u.ab + u.ac + u.bc,
+          s;
+        switch (t.step) {
+          case 1:
+            s = a;
+            break;
+          case 2:
+            s = a - o;
+            break;
+          case 3:
+            s = i;
+        }
+        return {
+          values: t,
+          step: t.step,
+          setCounts: n,
+          atomicCounts: r,
+          intersectionCounts: u,
+          unionCount: i,
+          runningTotal: s,
+          multiplicities: m(t.step),
+        };
+      }));
+  }))();
 }
-
-function initializeThreeSetInclusionExclusionModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializeInclusionExclusionManifest();
-  stepControl = { min: 1, max: 3, defaultValue: 1 };
-  const parameters = { a: inclusionExclusionManifest.parameters.setACount, b: inclusionExclusionManifest.parameters.setBCount, c: inclusionExclusionManifest.parameters.setCCount };
-  const overlaps = { abOnly: 4, acOnly: 3, bcOnly: 5, abc: 2 };
-  const intersectionCounts = { ab: overlaps.abOnly + overlaps.abc, ac: overlaps.acOnly + overlaps.abc, bc: overlaps.bcOnly + overlaps.abc, abc: overlaps.abc };
-  const multiplicities: Record<number, Record<string, number>> = {
-    1: { aOnly: 1, bOnly: 1, cOnly: 1, abOnly: 2, acOnly: 2, bcOnly: 2, abc: 3 },
-    2: { aOnly: 1, bOnly: 1, cOnly: 1, abOnly: 1, acOnly: 1, bcOnly: 1, abc: 0 },
-    3: { aOnly: 1, bOnly: 1, cOnly: 1, abOnly: 1, acOnly: 1, bcOnly: 1, abc: 1 },
-  };
-  normalizeStep = step => typeof step === "number" && Number.isFinite(step)
-    ? Math.min(stepControl.max, Math.max(stepControl.min, Math.round(step)))
-    : stepControl.defaultValue;
-  const normalizeCount = (value: number | null | undefined, parameter: { defaultValue: number; min: number; max: number }): number =>
-    typeof value !== "number" || !Number.isFinite(value)
-      ? parameter.defaultValue
-      : Math.min(parameter.max, Math.max(parameter.min, Math.round(value)));
-  calculateInclusionExclusion = values => {
-    const normalized = {
-      setACount: normalizeCount(values.setACount, parameters.a), setBCount: normalizeCount(values.setBCount, parameters.b),
-      setCCount: normalizeCount(values.setCCount, parameters.c), step: normalizeStep(values.step),
-    };
-    const setCounts = { a: normalized.setACount, b: normalized.setBCount, c: normalized.setCCount };
-    const atomicCounts = {
-      aOnly: setCounts.a - overlaps.abOnly - overlaps.acOnly - overlaps.abc,
-      bOnly: setCounts.b - overlaps.abOnly - overlaps.bcOnly - overlaps.abc,
-      cOnly: setCounts.c - overlaps.acOnly - overlaps.bcOnly - overlaps.abc, ...overlaps,
-    };
-    const unionCount = Object.values(atomicCounts).reduce((sum, count) => sum + count, 0);
-    const singleSetTotal = setCounts.a + setCounts.b + setCounts.c;
-    const pairIntersectionTotal = intersectionCounts.ab + intersectionCounts.ac + intersectionCounts.bc;
-    const runningTotal = normalized.step === 1 ? singleSetTotal : normalized.step === 2 ? singleSetTotal - pairIntersectionTotal : unionCount;
-    return {
-      values: normalized, step: normalized.step, setCounts, atomicCounts, intersectionCounts, unionCount, runningTotal,
-      multiplicities: multiplicities[normalized.step],
-    };
-  };
-}
-
-export {
-  initializeInclusionExclusionManifest as a, normalizeStep as i, calculateInclusionExclusion as n,
-  inclusionExclusionManifest as o, initializeThreeSetInclusionExclusionModel as r, stepControl as t,
-};
+export { o as a, f as i, h as n, a as o, g as r, s as t };

@@ -1,47 +1,37 @@
-// composer-overlay —— Home composer 在 quick-chat 与右侧面板 overlay 间的路由层。
-// 原版：app/webview/assets/composer-overlay-4397ac448ec8.js。
-
-import "@rchunk/app-shared";
-import "@rchunk/app-primary";
-import "@rchunk/right-panel-composer-overlay";
-import "@rchunk/content-quick-chat-overlay";
-
-export interface HomeComposerOverlayProps<T = unknown> {
-  children(): T;
-  expandComposerContentImmediately?: boolean;
-  forceExpanded?: boolean;
-  /** 原组件从 quick-chat context 读取；语义重写层允许显式传入。 */
-  quickChatEnabled?: boolean;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, FX as n, HX as r, I3 as i } from "@rchunk/app-shared";
+import { St as a, xt as o } from "@rchunk/app-primary";
+import { n as s, t as c } from "@rchunk/right-panel-composer-overlay";
+import { n as l, t as u } from "@rchunk/content-quick-chat-overlay";
+function d(e) {
+  let t = (0, f.c)(5),
+    { children: n, expandComposerContentImmediately: i, forceExpanded: o } = e,
+    s = r(a),
+    l;
+  return (
+    t[0] !== n || t[1] !== i || t[2] !== o || t[3] !== s
+      ? ((l = s
+          ? (0, p.jsx)(u, { composerOnly: !0, children: n })
+          : (0, p.jsx)(c, {
+              expandComposerContentImmediately: i,
+              forceExpanded: o,
+              children: n(),
+            })),
+        (t[0] = n),
+        (t[1] = i),
+        (t[2] = o),
+        (t[3] = s),
+        (t[4] = l))
+      : (l = t[4]),
+    l
+  );
 }
-
-export type HomeComposerOverlayView<T> =
-  | {
-      kind: "content-quick-chat-overlay";
-      composerOnly: true;
-      /** quick-chat overlay 自己决定何时求值。 */
-      children: () => T;
-    }
-  | {
-      kind: "right-panel-composer-overlay";
-      expandComposerContentImmediately?: boolean;
-      forceExpanded?: boolean;
-      children: T;
-    };
-
-function HomeComposerOverlay<T>(props: HomeComposerOverlayProps<T>): HomeComposerOverlayView<T> {
-  if (props.quickChatEnabled === true) {
-    return {
-      kind: "content-quick-chat-overlay",
-      composerOnly: true,
-      children: props.children,
-    };
-  }
-  return {
-    kind: "right-panel-composer-overlay",
-    expandComposerContentImmediately: props.expandComposerContentImmediately,
-    forceExpanded: props.forceExpanded,
-    children: props.children(),
-  };
+var f, p;
+function m() {
+  return (m = e(() => {
+    ((f = t()), n(), l(), o(), s(), (p = i()));
+  }))();
 }
-
-export { HomeComposerOverlay };
+m();
+export { d as HomeComposerOverlay };

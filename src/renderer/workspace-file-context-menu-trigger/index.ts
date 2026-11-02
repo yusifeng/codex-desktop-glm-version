@@ -1,87 +1,29 @@
-// workspace-file-context-menu-trigger —— 工作区文件的原生/网页上下文菜单触发器。
-// 原版：app/webview/assets/workspace-file-context-menu-trigger-91e9150d0a73.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-
-void runtimeChunk;
-const {
-  $3: getCompilerRuntime,
-  Df: ContextMenu,
-  FX: initializeSignalRuntime,
-  I3: getJsxRuntime,
-  LX: useSignalScope,
-  Of: initializeContextMenu,
-} = appSharedChunk;
-const {
-  $en: routeScope,
-  Jut: getWorkspaceFileContextMenuItems,
-  Yut: initializeWorkspaceFileContextMenuItems,
-  itn: initializeWorkspaceFileRuntime,
-} = appInitialChunk;
-
-type WorkspaceFileContextMenuOptions =
-  import("@rchunk/app-initial").WorkspaceFileContextMenuOptions;
-type WorkspaceFileContextMenuTriggerProps = WorkspaceFileContextMenuOptions & {
-    children: import("@rchunk/app-shared").MenuElement;
-  };
-
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-interface CompilerRuntime {
-  c(size: number): unknown[];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, Df as n, FX as r, I3 as i, LX as a, Of as o } from "@rchunk/app-shared";
+import { $en as s, Jut as c, Yut as l, itn as u } from "@rchunk/app-initial";
+function d(e) {
+  let t = (0, f.c)(9),
+    r,
+    i;
+  t[0] === e
+    ? ((r = t[1]), (i = t[2]))
+    : (({ children: r, ...i } = e), (t[0] = e), (t[1] = r), (t[2] = i));
+  let o = a(s),
+    l;
+  t[3] !== i || t[4] !== o ? ((l = () => c(o, i)), (t[3] = i), (t[4] = o), (t[5] = l)) : (l = t[5]);
+  let u;
+  return (
+    t[6] !== r || t[7] !== l
+      ? ((u = (0, p.jsx)(n, { getItems: l, children: r })), (t[6] = r), (t[7] = l), (t[8] = u))
+      : (u = t[8]),
+    u
+  );
 }
-let compilerRuntime: CompilerRuntime;
-
-function WorkspaceFileContextMenuTrigger(
-  props: WorkspaceFileContextMenuTriggerProps,
-): unknown {
-  const cache = compilerRuntime.c(9);
-  let children: WorkspaceFileContextMenuTriggerProps["children"];
-  let options: WorkspaceFileContextMenuOptions;
-  if (cache[0] !== props) {
-    ({ children, ...options } = props);
-    cache[0] = props;
-    cache[1] = children;
-    cache[2] = options;
-  } else {
-    children = cache[1] as typeof children;
-    options = cache[2] as typeof options;
-  }
-  const scope = useSignalScope(routeScope);
-  let getItems: () => unknown;
-  if (cache[3] !== options || cache[4] !== scope) {
-    getItems = () => getWorkspaceFileContextMenuItems(scope, options);
-    cache[3] = options;
-    cache[4] = scope;
-    cache[5] = getItems;
-  } else {
-    getItems = cache[5] as () => unknown;
-  }
-
-  if (cache[6] !== children || cache[7] !== getItems) {
-    cache[6] = children;
-    cache[7] = getItems;
-    cache[8] = jsx.jsx(ContextMenu, { getItems, children });
-  }
-  return cache[8];
+var f, p;
+function m() {
+  return (m = e(() => {
+    ((f = t()), r(), o(), u(), l(), (p = i()));
+  }))();
 }
-
-let initialized = false;
-function initializeWorkspaceFileContextMenuTrigger(): void {
-  if (initialized) return;
-  initialized = true;
-  compilerRuntime = getCompilerRuntime() as unknown as CompilerRuntime;
-  initializeSignalRuntime();
-  initializeContextMenu();
-  initializeWorkspaceFileRuntime();
-  initializeWorkspaceFileContextMenuItems();
-  jsx = getJsxRuntime();
-}
-
-initializeWorkspaceFileContextMenuTrigger();
-
-export {
-  initializeWorkspaceFileContextMenuTrigger as n,
-  WorkspaceFileContextMenuTrigger as t,
-};
+export { m as n, d as t };

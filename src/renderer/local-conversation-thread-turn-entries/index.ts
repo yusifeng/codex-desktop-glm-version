@@ -1,520 +1,297 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
-import { l3 as initializeDeepEqual } from "@rchunk/app-shared";
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import { l3 as n } from "@rchunk/app-shared";
 import {
-  A_ as isEstimatedTurnEntry,
-  E9t as initializeArtifactParser,
-  T9t as parseArtifacts,
-  fnn as initializeConversationProjection,
-  k_ as initializeTurnEntryModel,
-  mnn as projectConversationTurn,
-  nWt as initializeTurnEntryRuntime,
-  w9t as resolveArtifactResourcePaths,
+  A_ as r,
+  E9t as i,
+  T9t as a,
+  fnn as o,
+  k_ as s,
+  mnn as c,
+  nWt as l,
+  w9t as u,
 } from "@rchunk/app-initial";
-import {
-  a as initializeTimestampConstants,
-  i as attachTimestampSeparators,
-} from "@rchunk/timestamps";
-import {
-  n as splitProjectedItems,
-  t as initializeSplitItemsIntoRenderGroups,
-} from "@rchunk/split-items-into-render-groups";
-import {
-  n as buildGeneratedImageGroup,
-  r as initializeGeneratedImageOutputVisibility,
-} from "@rchunk/generated-image-output-visibility";
-
-interface ConversationTurn {
-  finalAssistantStartedAtMs?: number;
-  items: Array<{
-    id?: string;
-    src?: string | null;
-    text?: string;
-    type: string;
-  }>;
-  params: { input: unknown[] };
-  status?: string;
-  turnStartedAtMs?: number;
-}
-
-const once = onceExport as (initializer: () => void) => () => void;
-
-interface VisibleTurnEntry extends Record<string, unknown> {
-  historyEntityKey?: string;
-  historyPositionKey?: string;
-  isLatestTurn?: boolean;
-  preserveServerUserMessages?: boolean;
-  requests?: unknown;
-  turn?: ConversationTurn;
-  turnId?: string;
-  turnKey: string;
-  turnSearchKey: string;
-}
-
-interface RenderedTurnEntry extends Record<string, unknown> {
-  generatedImages?: unknown[];
-  isAeonThread?: boolean;
-  preserveServerUserMessages?: boolean;
-  threadHandoffOperation?: { id: string };
-  transcriptBlock?: {
-    key: string;
-    type: string;
-    [key: string]: unknown;
-  } | null;
-  turn?: ConversationTurn;
-  turnId?: string;
-  turnKey: string;
-  turnSearchKey?: string;
-}
-
-interface BuildTurnEntriesOptions extends Record<string, unknown> {
-  compactAeonAssistantMessageRevealState?: {
-    hasSeededInitialSnapshot: boolean;
-    messageStates: { clear(): void };
-  } | null;
-  completedThreadGoal?: unknown;
-  completedThreadGoalTurnKey?: string;
-  conversationId: string;
-  cwd?: string;
-  generatedImageTurnEntries: VisibleTurnEntry[];
-  hasInheritedParentTurns?: boolean;
-  hostId: string;
-  isAeonThread?: boolean;
-  isBackgroundSubagentsEnabled: boolean;
-  isProjectlessConversation?: boolean;
-  isReadOnly?: boolean;
-  latestLoadedUserTurnId?: string;
-  modelProvider?: unknown;
-  onEditLastTurnMessage?: unknown;
-  onForkTurnMessage?: unknown;
-  previousEntries: RenderedTurnEntry[];
-  projectlessOutputDirectory?: string | null;
-  renderEntries: VisibleTurnEntry[];
-  renderMcpApps?: boolean;
-  requestUserInputAsyncUiEnabled: boolean;
-  resolvedApps?: unknown;
-  showFullTranscript?: boolean;
-  showInProgressFixedContent?: boolean;
-  showStrictReviewNotices?: boolean;
-  supersededMcpAppWidgetCallIds?: unknown;
-  threadHandoffOperation?: { id: string } | null;
-  visibleSubagentParentThreadId?: string;
-}
-
-function isRenderedTurnEntry(entry: RenderedTurnEntry): boolean {
+import { a as d, i as f } from "@rchunk/timestamps";
+import { n as p, t as m } from "@rchunk/split-items-into-render-groups";
+import { n as h, r as g } from "@rchunk/generated-image-output-visibility";
+function _(e) {
   return (
-    !isEstimatedTurnEntry(entry) &&
+    !r(e) &&
     !(
-      "type" in entry &&
-      [
-        "child-elicitation",
-        "voice-nux",
-        "voice-presentation",
-        "voice-transcript",
-      ].includes(String(entry.type))
+      `type` in e &&
+      (e.type === `child-elicitation` ||
+        e.type === `voice-nux` ||
+        e.type === `voice-presentation` ||
+        e.type === `voice-transcript`)
     )
   );
 }
-
-function collectGeneratedImages({
-  isAeonThread,
-  isBackgroundSubagentsEnabled,
-  requestUserInputAsyncUiEnabled,
-  previousEntries,
-  projectlessOutputDirectory,
-  visibleTurnEntries,
-}: {
-  isAeonThread?: boolean;
-  isBackgroundSubagentsEnabled: boolean;
-  previousEntries: RenderedTurnEntry[];
-  projectlessOutputDirectory: string | null;
-  requestUserInputAsyncUiEnabled: boolean;
-  visibleTurnEntries: VisibleTurnEntry[];
-}): unknown[] {
-  const previous = previousEntries[0]?.generatedImages;
-  const images = visibleTurnEntries.flatMap(
-    ({ preserveServerUserMessages, requests, turn }) => {
-      if (
-        turn == null ||
-        !turn.items.some(
-          (item) => item.type === "imageGeneration" && item.src != null,
-        )
-      ) {
-        return [];
-      }
-      const projected = (
-        projectConversationTurn as unknown as (
-          turn: Record<string, unknown>,
-          requests: unknown,
-          options: Record<string, unknown>,
-        ) => { items: unknown[]; status: unknown }
-      )(turn as unknown as Record<string, unknown>, requests, {
-        includeAeonProjection: isAeonThread || preserveServerUserMessages,
-        isBackgroundSubagentsEnabled,
-        requestUserInputAsyncUiEnabled,
-        preserveServerUserMessages,
-      });
-      const groups = splitProjectedItems(
-        projected.items,
-        projected.status,
-        "all",
-      ) as {
-        assistantItem?: { content?: unknown };
-        toolOutputItems: Array<{ src?: string | null }>;
-      };
-      const resourcePaths = resolveArtifactResourcePaths(
-        parseArtifacts({
-          assistantContent: groups.assistantItem?.content ?? null,
-          projectlessOutputDirectory,
-          turn: projected,
-        }),
-      );
-      return (
-        (
-          buildGeneratedImageGroup({
-            completedImages: groups.toolOutputItems.filter(
-              ({ src }) => src != null,
-            ),
-            endResourcePaths: resourcePaths,
-            pendingPlaceholderCount: 0,
-          }) as { images?: unknown[] } | null
-        )?.images ?? []
-      );
-    },
-  );
-  return deepEqual(previous, images) ? (previous ?? []) : images;
+function v() {
+  return (v = e(() => {
+    s();
+  }))();
 }
-
-function deepEqual(left: unknown, right: unknown): boolean {
-  if (Object.is(left, right)) return true;
-  if (Array.isArray(left) && Array.isArray(right)) {
-    return (
-      left.length === right.length &&
-      left.every((value, index) => deepEqual(value, right[index]))
-    );
-  }
-  if (
-    typeof left === "object" &&
-    left != null &&
-    typeof right === "object" &&
-    right != null
-  ) {
-    const leftRecord = left as Record<string, unknown>;
-    const rightRecord = right as Record<string, unknown>;
-    const keys = Object.keys(leftRecord);
-    return (
-      keys.length === Object.keys(rightRecord).length &&
-      keys.every((key) => deepEqual(leftRecord[key], rightRecord[key]))
-    );
-  }
-  return false;
-}
-
-function areTranscriptBlocksEqual(
-  previous: RenderedTurnEntry["transcriptBlock"],
-  next: RenderedTurnEntry["transcriptBlock"],
-): boolean {
-  if (previous == null || next == null) return previous === next;
-  if (previous.type !== next.type || previous.key !== next.key) return false;
-  if (
-    previous.type !== "assistant-message" ||
-    next.type !== "assistant-message"
-  )
-    return true;
-  if (!deepEqual(previous.item, next.item)) return false;
-  const previousActivities =
-    (previous.attachedActivityItems as Array<{ key: string }> | undefined) ??
-    [];
-  const nextActivities =
-    (next.attachedActivityItems as Array<{ key: string }> | undefined) ?? [];
-  return (
-    previousActivities.length === nextActivities.length &&
-    previousActivities.every(
-      ({ key }, index) => key === nextActivities[index]?.key,
-    )
-  );
-}
-
-function canReuseTurnEntry(
-  previous: RenderedTurnEntry,
-  next: RenderedTurnEntry,
-): boolean {
-  const comparedKeys = [
-    "gapBeforePx",
-    "minHeightPx",
-    "timestampSeparatorAtMs",
-    "aeonThreadTimestampMarkerSentAtMs",
-    "aeonThreadTimestampFallbackMs",
-    "aeonChannelChange",
-    "showReplyQuote",
-    "conversationId",
-    "activitySummaryWithoutAssistant",
-    "hideUserMessageActions",
-    "voiceWorkActivity",
-    "cwd",
-    "historyEntityKey",
-    "hostId",
-    "isAeonThread",
-    "isLatestTurn",
-    "isMostRecentTurn",
-    "isReadOnly",
-    "totalTurnCount",
-    "turnNumber",
-    "isProjectlessConversation",
-    "modelProvider",
-    "onEditLastTurnMessage",
-    "onForkTurnMessage",
-    "completedThreadGoal",
-    "generatedImages",
-    "parentThreadAttachmentSourceConversationId",
-    "preserveServerUserMessages",
-    "renderMcpApps",
-    "requests",
-    "resolvedApps",
-    "showFullTranscript",
-    "showInProgressFixedContent",
-    "threadHandoffOperation",
-    "turnId",
-    "turnKey",
-    "turnSearchKey",
-    "includeTranscriptTurnExtras",
-    "isBackgroundSubagentsEnabled",
-    "requestUserInputAsyncUiEnabled",
-  ];
-  if (comparedKeys.some((key) => previous[key] !== next[key])) return false;
-  if (!deepEqual(previous.replyChain, next.replyChain)) return false;
-  if (
-    !deepEqual(
-      previous.supersededMcpAppWidgetCallIds,
-      next.supersededMcpAppWidgetCallIds,
-    )
-  )
-    return false;
-  if (previous.turn?.status !== next.turn?.status) return false;
-  if (previous.turn !== next.turn) {
-    const stableItems =
-      next.historyEntityKey != null &&
-      previous.turnState == null &&
-      next.turnState == null &&
-      previous.turn?.items.length === next.turn?.items.length &&
-      previous.turn?.items.every(
-        (item, index) => item.id === next.turn?.items[index]?.id,
-      );
-    if (!stableItems) return false;
-  }
-  return (
-    (previous.turnState as { transcriptItems?: unknown } | undefined)
-      ?.transcriptItems ===
-      (next.turnState as { transcriptItems?: unknown } | undefined)
-        ?.transcriptItems &&
-    areTranscriptBlocksEqual(previous.transcriptBlock, next.transcriptBlock)
-  );
-}
-
-function buildLocalConversationTurnEntries(options: BuildTurnEntriesOptions): {
-  entries: RenderedTurnEntry[];
-  initialAeonMessageSentAtMs: null;
-  latestRenderedTurnKey: string | null;
-  nextCompactAeonRevealAt: null;
-} {
-  options.compactAeonAssistantMessageRevealState?.messageStates.clear();
-  if (options.compactAeonAssistantMessageRevealState != null) {
-    options.compactAeonAssistantMessageRevealState.hasSeededInitialSnapshot = false;
-  }
-  const previousByKey = new Map(
-    options.previousEntries.map((entry) => [entry.turnKey, entry]),
-  );
-  const previousVisible = options.previousEntries.filter(isRenderedTurnEntry);
-  const handoffTurnKey =
-    options.threadHandoffOperation == null
-      ? null
-      : (previousVisible.find(
-          (entry) =>
-            entry.threadHandoffOperation?.id ===
-            options.threadHandoffOperation?.id,
-        )?.turnKey ?? null);
-  const visibleEntries = options.renderEntries.filter(
-    (entry) => !isEstimatedTurnEntry(entry),
-  );
-  const generatedImages = collectGeneratedImages({
-    isAeonThread: options.isAeonThread,
-    isBackgroundSubagentsEnabled: options.isBackgroundSubagentsEnabled,
-    requestUserInputAsyncUiEnabled: options.requestUserInputAsyncUiEnabled,
-    previousEntries: previousVisible,
-    projectlessOutputDirectory: options.projectlessOutputDirectory ?? null,
-    visibleTurnEntries: options.generatedImageTurnEntries,
-  });
-  const entries: RenderedTurnEntry[] = [];
-  const turnNumberByIndex = new Map<number, number>();
-  let latestRenderedTurnKey: string | null = null;
-  let turnNumber = 0;
-  let visibleIndex = 0;
-  for (const entry of options.renderEntries) {
-    if (isEstimatedTurnEntry(entry)) {
-      const previous = previousByKey.get(entry.turnKey);
-      entries.push(
-        previous != null &&
-          isEstimatedTurnEntry(previous) &&
-          previous.estimatedHeightPx === entry.estimatedHeightPx
-          ? previous
-          : entry,
-      );
+function y({
+  childElicitations: e = [],
+  compactAeonAssistantMessageRevealState: t,
+  compactAeonRevealTime: n = Date.now(),
+  compactAeonTypingEnabled: i = !1,
+  completedThreadGoal: a,
+  completedThreadGoalTurnKey: o,
+  conversationId: s,
+  cwd: c,
+  generatedImageTurnEntries: l,
+  hasInheritedParentTurns: u,
+  hideInitialAeonTimestampMarker: d = !1,
+  hostId: p,
+  isBackgroundSubagentsEnabled: m,
+  requestUserInputAsyncUiEnabled: h,
+  openAIFormElicitationsEnabled: g = !1,
+  isAeonThread: v,
+  isCompactAeonTranscriptReady: y = !1,
+  isProjectlessConversation: S,
+  isReadOnly: C,
+  latestLoadedUserTurnId: w,
+  modelProvider: T,
+  projectlessOutputDirectory: E = null,
+  onEditLastTurnMessage: D,
+  onForkTurnMessage: O,
+  previousEntries: k,
+  renderMcpApps: A,
+  resolvedApps: j,
+  showFullTranscript: M,
+  showInProgressFixedContent: N,
+  showStrictReviewNotices: P = !1,
+  supersededMcpAppWidgetCallIds: F,
+  threadHandoffOperation: I,
+  visibleSubagentParentThreadId: L,
+  renderEntries: R,
+}) {
+  t != null && ((t.hasSeededInitialSnapshot = !1), t.messageStates.clear());
+  let z = new Map(k.map((e) => [e.turnKey, e])),
+    B = k.filter(_),
+    V = I == null ? null : (B.find((e) => e.threadHandoffOperation?.id === I.id)?.turnKey ?? null),
+    H = R,
+    U = H.filter((e) => !r(e)),
+    W = b({
+      isAeonThread: v,
+      isBackgroundSubagentsEnabled: m,
+      requestUserInputAsyncUiEnabled: h,
+      previousEntries: B,
+      projectlessOutputDirectory: E,
+      visibleTurnEntries: l,
+    }),
+    G = [],
+    K = new Map(),
+    q = null,
+    J = 0,
+    Y = 0;
+  for (let e of H) {
+    if (r(e)) {
+      let t = z.get(e.turnKey);
+      t != null && r(t) && t.estimatedHeightPx === e.estimatedHeightPx ? G.push(t) : G.push(e);
       continue;
     }
-    turnNumber += 1;
-    const turnKey = entry.historyPositionKey ?? entry.turnSearchKey;
-    const rendered: RenderedTurnEntry = {
-      timestampSeparatorAtMs: null,
-      aeonThreadTimestampMarkerSentAtMs: null,
-      conversationId: options.conversationId,
-      cwd: options.cwd,
-      historyEntityKey: entry.historyEntityKey,
-      hostId: options.hostId,
-      isAeonThread: options.isAeonThread,
-      isLatestTurn: entry.isLatestTurn,
-      isMostRecentTurn: visibleIndex === visibleEntries.length - 1,
-      isReadOnly: options.isReadOnly,
-      showStrictReviewNotices: options.showStrictReviewNotices,
-      totalTurnCount: visibleEntries.length,
-      turnNumber,
-      isProjectlessConversation: options.isProjectlessConversation,
-      latestLoadedUserTurnId: options.latestLoadedUserTurnId,
-      modelProvider: options.modelProvider,
-      projectlessOutputDirectory: options.projectlessOutputDirectory ?? null,
-      onEditLastTurnMessage: options.onEditLastTurnMessage,
-      onForkTurnMessage: options.onForkTurnMessage,
-      completedThreadGoal:
-        options.completedThreadGoalTurnKey === entry.turnSearchKey
-          ? options.completedThreadGoal
-          : null,
-      generatedImages,
-      parentThreadAttachmentSourceConversationId:
-        visibleIndex === 0 &&
-        options.hasInheritedParentTurns &&
-        options.visibleSubagentParentThreadId != null
-          ? options.visibleSubagentParentThreadId
-          : undefined,
-      preserveServerUserMessages: entry.preserveServerUserMessages,
-      renderMcpApps: options.renderMcpApps,
-      requests: entry.requests,
-      resolvedApps: options.resolvedApps,
-      showFullTranscript: options.showFullTranscript,
-      showInProgressFixedContent:
-        options.showInProgressFixedContent &&
-        visibleIndex === visibleEntries.length - 1,
-      supersededMcpAppWidgetCallIds: options.supersededMcpAppWidgetCallIds,
-      turnId: entry.turnId,
-      turnKey,
-      turnSearchKey: entry.turnSearchKey,
-      turn: entry.turn,
-      isBackgroundSubagentsEnabled: options.isBackgroundSubagentsEnabled,
-      requestUserInputAsyncUiEnabled: options.requestUserInputAsyncUiEnabled,
-    };
-    latestRenderedTurnKey = turnKey;
-    turnNumberByIndex.set(entries.length, turnNumber);
-    entries.push(rendered);
-    visibleIndex += 1;
+    let t = e,
+      n = t.turnId,
+      i = [
+        {
+          timestampSeparatorAtMs: null,
+          aeonThreadTimestampMarkerSentAtMs: null,
+          conversationId: s,
+          cwd: c,
+          historyEntityKey: t.historyEntityKey,
+          hostId: p,
+          isAeonThread: v,
+          isLatestTurn: t.isLatestTurn,
+          isMostRecentTurn: Y === U.length - 1,
+          isReadOnly: C,
+          showStrictReviewNotices: P,
+          totalTurnCount: U.length,
+          turnNumber: Y + 1,
+          isProjectlessConversation: S,
+          latestLoadedUserTurnId: w,
+          modelProvider: T,
+          projectlessOutputDirectory: E,
+          onEditLastTurnMessage: D,
+          onForkTurnMessage: O,
+          completedThreadGoal: o === t.turnSearchKey ? a : null,
+          generatedImages: W,
+          parentThreadAttachmentSourceConversationId: Y === 0 && u && L != null ? L : void 0,
+          preserveServerUserMessages: t.preserveServerUserMessages,
+          renderMcpApps: A,
+          requests: t.requests,
+          resolvedApps: j,
+          showFullTranscript: M,
+          showInProgressFixedContent: N && Y === U.length - 1,
+          supersededMcpAppWidgetCallIds: F,
+          turnId: n,
+          turnKey: t.historyPositionKey ?? t.turnSearchKey,
+          turnSearchKey: t.turnSearchKey,
+          turn: `turn` in t ? t.turn : void 0,
+          isBackgroundSubagentsEnabled: m,
+          requestUserInputAsyncUiEnabled: h,
+        },
+      ];
+    i.length > 0 && (J += 1);
+    for (let e of i) ((q = e.turnKey), K.set(G.length, J), G.push(e));
+    Y += 1;
   }
-
-  const timestampSeparators = attachTimestampSeparators(
-    entries.map((entry) => {
-      if (
-        !isRenderedTurnEntry(entry) ||
-        entry.isAeonThread ||
-        entry.preserveServerUserMessages ||
-        entry.turn == null
-      )
-        return null;
-      const timestamps: Array<{ role: string; sentAtMs?: number }> = [];
-      if (entry.turn.params.input.length > 0)
-        timestamps.push({ role: "user", sentAtMs: entry.turn.turnStartedAtMs });
-      if (entry.turn.items.some(({ type }) => type === "agentMessage")) {
-        timestamps.push({
-          role: "assistant",
-          sentAtMs: entry.turn.finalAssistantStartedAtMs,
-        });
-      }
-      return timestamps;
-    }),
-  ) as Array<number | null>;
-  const handoffTarget =
-    handoffTurnKey != null &&
-    entries.some(
-      (entry) => isRenderedTurnEntry(entry) && entry.turnKey === handoffTurnKey,
-    )
-      ? handoffTurnKey
-      : latestRenderedTurnKey;
-  let previousReplyChainId: unknown;
-  for (const [index, entry] of entries.entries()) {
-    if (!isRenderedTurnEntry(entry) || isEstimatedTurnEntry(entry)) continue;
-    const numberedTurn = turnNumberByIndex.get(index);
-    if (numberedTurn == null) continue;
-    const replyChain = entry.replyChain as { id?: unknown } | undefined;
-    const showReplyQuote =
-      replyChain != null && replyChain.id !== previousReplyChainId;
-    if (
-      entry.transcriptBlock?.type === "user-message" ||
-      entry.transcriptBlock?.type === "assistant-message"
-    ) {
-      previousReplyChainId = replyChain?.id;
-    }
-    const next: RenderedTurnEntry = {
-      ...entry,
-      replyChain: undefined,
-      showReplyQuote,
-      gapBeforePx: undefined,
-      timestampSeparatorAtMs: timestampSeparators[index] ?? null,
+  let X = V != null && G.some((e) => _(e) && e.turnKey === V) ? V : q,
+    Z = f(
+      G.map((e) => {
+        if (!_(e) || e.isAeonThread || e.preserveServerUserMessages || e.turn == null) return null;
+        let { turn: t } = e,
+          n = [];
+        return (
+          t.params.input.length > 0 && n.push({ role: `user`, sentAtMs: t.turnStartedAtMs }),
+          t.items.some((e) => e.type === `agentMessage`) &&
+            n.push({ role: `assistant`, sentAtMs: t.finalAssistantStartedAtMs }),
+          n
+        );
+      }),
+    ),
+    Q;
+  for (let [e, t] of G.entries()) {
+    if (r(t) || !_(t)) continue;
+    let n = z.get(t.turnKey),
+      i = t.transcriptBlock,
+      a,
+      o = K.get(e);
+    if (o == null) continue;
+    let s = G[e - 1];
+    (s != null && _(s) && s.transcriptBlock, s != null && _(s) && s.replyChain?.id);
+    let c = o === J,
+      l = t.replyChain != null && t.replyChain.id !== Q;
+    (i?.type === `user-message` || i?.type === `assistant-message`) && (Q = t.replyChain?.id);
+    let u = {
+      ...t,
+      replyChain: (t.replyChain, void 0),
+      showReplyQuote: l,
+      gapBeforePx: void 0,
+      timestampSeparatorAtMs: Z[e] ?? null,
       aeonThreadTimestampMarkerSentAtMs: null,
-      aeonChannelChange: undefined,
-      isMostRecentTurn: numberedTurn === turnNumber,
-      showInProgressFixedContent:
-        options.showInProgressFixedContent && numberedTurn === turnNumber,
-      threadHandoffOperation:
-        entry.turnKey === handoffTarget
-          ? (options.threadHandoffOperation ?? undefined)
-          : undefined,
-      totalTurnCount: turnNumber,
-      turnNumber: numberedTurn,
+      aeonChannelChange: a,
+      isMostRecentTurn: c,
+      showInProgressFixedContent: N && c,
+      threadHandoffOperation: t.turnKey === X ? (I ?? void 0) : void 0,
+      totalTurnCount: J,
+      turnNumber: o,
     };
-    const previous = previousByKey.get(entry.turnKey);
-    entries[index] =
-      previous != null &&
-      isRenderedTurnEntry(previous) &&
-      canReuseTurnEntry(previous, next)
-        ? previous
-        : next;
+    G[e] = n != null && _(n) && x(n, u) ? n : u;
   }
-  const stableEntries =
-    options.previousEntries.length === entries.length &&
-    entries.every((entry, index) => options.previousEntries[index] === entry)
-      ? options.previousEntries
-      : entries;
+  let $ = G;
   return {
-    entries: stableEntries,
+    entries: k.length !== $.length || $.some((e, t) => k[t] !== e) ? $ : k,
     initialAeonMessageSentAtMs: null,
-    latestRenderedTurnKey,
+    latestRenderedTurnKey: q,
     nextCompactAeonRevealAt: null,
   };
 }
-
-const initializeLocalConversationThreadTurnEntries = once((): void => {
-  initializeTurnEntryRuntime();
-  initializeTimestampConstants();
-  initializeGeneratedImageOutputVisibility();
-  initializeConversationProjection();
-  initializeArtifactParser();
-  initializeTurnEntryModel();
-  void initializeDeepEqual;
-  initializeSplitItemsIntoRenderGroups();
-});
-
-const initializeTurnEntryModelOnly = once((): void => {
-  initializeTurnEntryModel();
-});
-
-export {
-  isRenderedTurnEntry as a,
-  initializeTurnEntryModelOnly as i,
-  collectGeneratedImages as n,
-  initializeLocalConversationThreadTurnEntries as r,
-  buildLocalConversationTurnEntries as t,
-};
+function b({
+  isAeonThread: e,
+  isBackgroundSubagentsEnabled: t,
+  requestUserInputAsyncUiEnabled: n,
+  previousEntries: r,
+  projectlessOutputDirectory: i,
+  visibleTurnEntries: o,
+}) {
+  let s = r[0]?.generatedImages,
+    l = o.flatMap(({ preserveServerUserMessages: r, requests: o, turn: s }) => {
+      if (!s.items.some((e) => e.type === `imageGeneration` && e.src != null)) return [];
+      let l = c(s, o, {
+          includeAeonProjection: e || r,
+          isBackgroundSubagentsEnabled: t,
+          requestUserInputAsyncUiEnabled: n,
+          preserveServerUserMessages: r,
+        }),
+        { assistantItem: d, toolOutputItems: f } = p(l.items, l.status, `all`),
+        m = u(a({ assistantContent: d?.content ?? null, projectlessOutputDirectory: i, turn: l }));
+      return (
+        h({
+          completedImages: f.filter((e) => e.src != null),
+          endResourcePaths: m,
+          pendingPlaceholderCount: 0,
+        })?.images ?? []
+      );
+    });
+  return (0, C.default)(s, l) ? s : l;
+}
+function x(e, t) {
+  return (
+    e.gapBeforePx === t.gapBeforePx &&
+    e.minHeightPx === t.minHeightPx &&
+    e.timestampSeparatorAtMs === t.timestampSeparatorAtMs &&
+    e.aeonThreadTimestampMarkerSentAtMs === t.aeonThreadTimestampMarkerSentAtMs &&
+    e.aeonThreadTimestampFallbackMs === t.aeonThreadTimestampFallbackMs &&
+    e.aeonChannelChange === t.aeonChannelChange &&
+    (0, C.default)(e.replyChain, t.replyChain) &&
+    e.showReplyQuote === t.showReplyQuote &&
+    e.conversationId === t.conversationId &&
+    e.activitySummaryWithoutAssistant === t.activitySummaryWithoutAssistant &&
+    e.hideUserMessageActions === t.hideUserMessageActions &&
+    e.voiceWorkActivity === t.voiceWorkActivity &&
+    e.cwd === t.cwd &&
+    e.historyEntityKey === t.historyEntityKey &&
+    e.hostId === t.hostId &&
+    e.isAeonThread === t.isAeonThread &&
+    e.isLatestTurn === t.isLatestTurn &&
+    e.isMostRecentTurn === t.isMostRecentTurn &&
+    (e.turnId == null ||
+      (e.latestLoadedUserTurnId == null
+        ? e.isMostRecentTurn
+        : e.turnId === e.latestLoadedUserTurnId) ===
+        (t.latestLoadedUserTurnId == null
+          ? t.isMostRecentTurn
+          : t.turnId === t.latestLoadedUserTurnId)) &&
+    e.isReadOnly === t.isReadOnly &&
+    e.totalTurnCount === t.totalTurnCount &&
+    e.turnNumber === t.turnNumber &&
+    e.isProjectlessConversation === t.isProjectlessConversation &&
+    e.modelProvider === t.modelProvider &&
+    e.onEditLastTurnMessage === t.onEditLastTurnMessage &&
+    e.onForkTurnMessage === t.onForkTurnMessage &&
+    e.completedThreadGoal === t.completedThreadGoal &&
+    e.generatedImages === t.generatedImages &&
+    e.parentThreadAttachmentSourceConversationId === t.parentThreadAttachmentSourceConversationId &&
+    e.preserveServerUserMessages === t.preserveServerUserMessages &&
+    e.renderMcpApps === t.renderMcpApps &&
+    e.requests === t.requests &&
+    e.resolvedApps === t.resolvedApps &&
+    e.showFullTranscript === t.showFullTranscript &&
+    e.showInProgressFixedContent === t.showInProgressFixedContent &&
+    e.threadHandoffOperation === t.threadHandoffOperation &&
+    (0, C.default)(e.supersededMcpAppWidgetCallIds, t.supersededMcpAppWidgetCallIds) &&
+    e.turn?.status === t.turn?.status &&
+    (e.turn === t.turn ||
+      (t.historyEntityKey != null &&
+        e.turnState == null &&
+        t.turnState == null &&
+        e.turn?.items.length === t.turn?.items.length &&
+        e.turn?.items.every((e, n) => e.id === t.turn?.items[n]?.id) === !0)) &&
+    e.turnId === t.turnId &&
+    e.turnKey === t.turnKey &&
+    e.turnSearchKey === t.turnSearchKey &&
+    e.turnState?.transcriptItems === t.turnState?.transcriptItems &&
+    S(e.transcriptBlock, t.transcriptBlock) &&
+    e.includeTranscriptTurnExtras === t.includeTranscriptTurnExtras &&
+    e.isBackgroundSubagentsEnabled === t.isBackgroundSubagentsEnabled &&
+    e.requestUserInputAsyncUiEnabled === t.requestUserInputAsyncUiEnabled
+  );
+}
+function S(e, t) {
+  if (e == null || t == null) return e === t;
+  if (e.type !== t.type || e.key !== t.key) return !1;
+  if (e.type !== `assistant-message` || t.type !== `assistant-message`) return !0;
+  if (!(0, C.default)(e.item.computerHandoff, t.item.computerHandoff)) return !1;
+  let n = e.attachedActivityItems ?? [],
+    r = t.attachedActivityItems ?? [];
+  return n.length === r.length && n.every(({ key: e }, t) => e === r[t]?.key);
+}
+var C;
+function w() {
+  return (w = e(() => {
+    (l(), (C = t(n(), 1)), d(), g(), o(), i(), s(), v(), m());
+  }))();
+}
+export { _ as a, v as i, b as n, w as r, y as t };

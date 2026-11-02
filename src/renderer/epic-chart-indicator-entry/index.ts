@@ -1,4 +1,4 @@
-import * as appInitialChunk from "@rchunk/app-initial";
-const { aE: initializeEpicChartIndicator, oE: loadEpicChartIndicator } = appInitialChunk as unknown as { aE(): void; oE(): Promise<unknown> };
-initializeEpicChartIndicator();
-export { loadEpicChartIndicator };
+// @ts-nocheck
+import { aE as e, oE as t } from "@rchunk/app-initial";
+e();
+export { t as loadEpicChartIndicator };

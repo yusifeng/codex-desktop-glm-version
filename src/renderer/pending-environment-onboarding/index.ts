@@ -1,70 +1,20 @@
-import {
-  FX as initializeSignals,
-  QI as initializeSignalQueries,
-  ZI as AppScope,
-  pZ as createScopedSignal,
-  rZ as createDerivedFamily,
-  type DerivedScopedSignalContext,
-  type ScopedDerivedFamily,
-  type ScopedSignal,
-} from "@rchunk/app-shared";
-import {
-  Ftn as initializeEnvironmentQueries,
-  Ltn as environmentConfigurationQuery,
-  Sun as initializeAuthSignals,
-  _un as currentUserIdSignal,
-  mun as currentAccountIdSignal,
-} from "@rchunk/app-initial";
-import "@rchunk/rolldown-runtime";
-
-export interface PendingEnvironmentOnboarding {
-  accountId: string;
-  userId: string;
-  [key: string]: unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, QI as n, ZI as r, pZ as i, rZ as a } from "@rchunk/app-shared";
+import { Ftn as o, Ltn as s, Sun as c, _un as l, mun as u } from "@rchunk/app-initial";
+var d, f;
+function p() {
+  return (p = e(() => {
+    (t(),
+      c(),
+      n(),
+      o(),
+      (d = i(r, new Map())),
+      (f = a(r, (e, { get: t }) => {
+        if (e == null) return null;
+        let n = t(d).get(e);
+        return n != null && n.accountId === t(u) && n.userId === t(l) && t(s, e) != null ? n : null;
+      })));
+  }))();
 }
-
-let pendingEnvironmentOnboardingById: ScopedSignal<
-  Record<string, unknown>,
-  Map<string, PendingEnvironmentOnboarding>
->;
-let pendingEnvironmentOnboarding: ScopedDerivedFamily<
-  Record<string, unknown>,
-  string | null,
-  PendingEnvironmentOnboarding | null
->;
-
-function initializePendingEnvironmentOnboarding(): void {
-  initializeSignals();
-  initializeAuthSignals();
-  initializeSignalQueries();
-  initializeEnvironmentQueries();
-  pendingEnvironmentOnboardingById = createScopedSignal(AppScope, new Map());
-  pendingEnvironmentOnboarding = createDerivedFamily(
-    AppScope,
-    (
-      environmentId: string | null,
-      { get }: DerivedScopedSignalContext<Record<string, unknown>>,
-    ) => {
-      if (environmentId == null) return null;
-      const pending = get(pendingEnvironmentOnboardingById).get(environmentId);
-      if (!pending) return null;
-      const accountId = get<string>(currentAccountIdSignal);
-      const userId = get<string>(currentUserIdSignal);
-      const configuration = get<unknown>(
-        environmentConfigurationQuery,
-        environmentId,
-      );
-      return pending.accountId === accountId &&
-        pending.userId === userId &&
-        configuration != null
-        ? pending
-        : null;
-    },
-  );
-}
-
-export {
-  pendingEnvironmentOnboarding as n,
-  pendingEnvironmentOnboardingById as r,
-  initializePendingEnvironmentOnboarding as t,
-};
+export { f as n, d as r, p as t };

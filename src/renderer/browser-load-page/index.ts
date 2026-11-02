@@ -1,38 +1,31 @@
-// browser-load-page —— 登录后安全恢复目标 URL 的重定向页。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-void runtimeChunk;
-
-const { $3: initializeRuntimeLazy, I3: getJsxRuntime } = appSharedChunk;
-const {
-  Fx: sanitizeReturnUrl,
-  Ix: initializeReturnUrlSanitizer,
-  Qgn: initializeAccountContext,
-  Ygn: Navigate,
-  d_n: useSearchParams,
-} = appInitialChunk;
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function BrowserLoadPageWithAuth(): unknown {
-  const [searchParams] = useSearchParams();
-  let target = "/";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n } from "@rchunk/app-shared";
+import { Fx as r, Ix as i, Qgn as a, Ygn as o, d_n as s } from "@rchunk/app-initial";
+function c() {
+  let e = (0, l.c)(6),
+    [t] = s(),
+    n = `/`;
   try {
-    target = decodeURIComponent(searchParams.get("toUrl") ?? "/");
+    let r;
+    (e[0] === t ? (r = e[1]) : ((r = t.get(`toUrl`) ?? `/`), (e[0] = t), (e[1] = r)),
+      (n = decodeURIComponent(r)));
   } catch {}
-  const url = new URL(sanitizeReturnUrl(target));
-  return jsx.jsx(Navigate, {
-    to: `${url.pathname}${url.search}${url.hash}`,
-    replace: true,
-  });
+  let i;
+  e[2] === n ? (i = e[3]) : ((i = new URL(r(n))), (e[2] = n), (e[3] = i));
+  let a = i,
+    c = `${a.pathname}${a.search}${a.hash}`,
+    d;
+  return (
+    e[4] === c ? (d = e[5]) : ((d = (0, u.jsx)(o, { to: c, replace: !0 })), (e[4] = c), (e[5] = d)),
+    d
+  );
 }
-
-function initializeBrowserLoadPage(): void {
-  initializeRuntimeLazy();
-  initializeAccountContext();
-  initializeReturnUrlSanitizer();
-  jsx = getJsxRuntime();
+var l, u;
+function d() {
+  return (d = e(() => {
+    ((l = t()), a(), i(), (u = n()));
+  }))();
 }
-
-initializeBrowserLoadPage();
-export { BrowserLoadPageWithAuth };
+d();
+export { c as BrowserLoadPageWithAuth };

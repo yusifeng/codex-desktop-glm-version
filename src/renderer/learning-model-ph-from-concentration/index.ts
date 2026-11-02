@@ -1,37 +1,20 @@
-// Hydronium concentration to pH metadata. Release chunk: type-5afefdccef0f.js.
-import "@rchunk/rolldown-runtime";
-interface Specification {
-  type: "PH_FROM_CONCENTRATION";
-  version: 2;
-  thumbnailAssetKey: "ph-from-concentration-v1";
-  canonicalFormula: string;
-  parameters: {
-    hydronium_concentration_molar: {
-      kind: "number";
-      defaultValue: 1e-7;
-      min: 1e-12;
-      max: 0.01;
-    };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `PH_FROM_CONCENTRATION`),
+      (n = `ph-from-concentration-v1`),
+      (r = `\\mathrm{pH}=-\\log_{10}([\\mathrm{H_3O^+}])`),
+      (i = {
+        hydronium_concentration_molar: {
+          kind: `number`,
+          defaultValue: 1e-7,
+          min: 1e-12,
+          max: 0.01,
+        },
+      }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-let specification: Specification;
-let initialized = false;
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  specification = {
-    type: "PH_FROM_CONCENTRATION",
-    version: 2,
-    thumbnailAssetKey: "ph-from-concentration-v1",
-    canonicalFormula: "\\mathrm{pH}=-\\log_{10}([\\mathrm{H_3O^+}])",
-    parameters: {
-      hydronium_concentration_molar: {
-        kind: "number",
-        defaultValue: 1e-7,
-        min: 1e-12,
-        max: 0.01,
-      },
-    },
-  };
-}
-export { specification as n, initialize as t };
+export { a as n, o as t };

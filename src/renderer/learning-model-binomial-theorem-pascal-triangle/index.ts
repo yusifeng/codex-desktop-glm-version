@@ -1,56 +1,47 @@
-// Binomial-theorem learning model backed by Pascal's triangle.
-import "@rchunk/rolldown-runtime";
-
-interface BinomialValues { n?: number | null }
-interface BinomialTerm { coefficient: number; aPower: number; bPower: number }
-
-const binomialTheoremType = "BINOMIAL_THEOREM_PASCAL_TRIANGLE";
-const binomialTheoremThumbnail = "binomial-theorem-pascal-triangle-v1";
-const binomialTheoremFormula = "(a+b)^n = \\sum_{k=0}^{n}\\binom{n}{k}a^{n-k}b^k";
-const binomialTheoremParameters = { n: { kind: "integer", defaultValue: 5, min: 0, max: 6 } };
-const binomialTheoremDefinition = { type: binomialTheoremType, version: 1, thumbnailAssetKey: binomialTheoremThumbnail, canonicalFormula: binomialTheoremFormula, parameters: binomialTheoremParameters };
-const exponentControl = { ...binomialTheoremDefinition.parameters.n, step: 1 };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeBinomialValues = (values: BinomialValues) => {
-  const exponent = Number.isFinite(values.n) ? Number(values.n) : exponentControl.defaultValue;
-  return { n: clamp(Math.round(exponent), exponentControl.min, exponentControl.max) };
-};
-
-function buildPascalTriangle(maximumRow = exponentControl.max): number[][] {
-  const rowCount = clamp(Math.round(maximumRow), 0, exponentControl.max);
-  const rows = [[1]];
-  for (let row = 1; row <= rowCount; row += 1) {
-    const previous = rows[row - 1] ?? [1];
-    rows.push(Array.from({ length: row + 1 }, (_unused, index) => (previous[index - 1] ?? 0) + (previous[index] ?? 0)));
-  }
-  return rows;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `BINOMIAL_THEOREM_PASCAL_TRIANGLE`),
+      (n = `binomial-theorem-pascal-triangle-v1`),
+      (r = `(a+b)^n = \\sum_{k=0}^{n}\\binom{n}{k}a^{n-k}b^k`),
+      (i = { n: { kind: `integer`, defaultValue: 5, min: 0, max: 6 } }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-
-const getBinomialTerms = (value: number): Array<BinomialTerm & { k: number }> => {
-  const exponent = normalizeBinomialValues({ n: value }).n;
-  return (buildPascalTriangle(exponent)[exponent] ?? [1]).map((coefficient, k) => ({ k, coefficient, aPower: exponent - k, bPower: k }));
-};
-const formatPower = (variable: string, power: number): string => power === 0 ? "" : power === 1 ? variable : `${variable}^{${power}}`;
-const formatBinomialTerm = ({ coefficient, aPower, bPower }: BinomialTerm): string => {
-  const variables = `${formatPower("a", aPower)}${formatPower("b", bPower)}`;
-  return variables ? `${coefficient === 1 ? "" : coefficient}${variables}` : String(coefficient);
-};
-const formatBinomialExpansion = (value: number): string => {
-  const exponent = normalizeBinomialValues({ n: value }).n;
-  return `(a+b)^{${exponent}} = ${getBinomialTerms(exponent).map(formatBinomialTerm).join(" + ")}`;
-};
-
-function initializeBinomialTheoremSchema(): void {}
-function initializeBinomialTheoremModel(): void {}
-
-export {
-  formatBinomialTerm as a,
-  initializeBinomialTheoremSchema as c,
-  buildPascalTriangle as i,
-  binomialTheoremDefinition as l,
-  getBinomialTerms as n,
-  initializeBinomialTheoremModel as o,
-  formatBinomialExpansion as r,
-  normalizeBinomialValues as s,
-  exponentControl as t,
-};
+var s, c, l, u, d, f, p, m;
+function h() {
+  return (h = e(() => {
+    (o(),
+      (s = { ...a.parameters.n, step: 1 }),
+      (c = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (l = (e) => {
+        let t = Number.isFinite(e.n) ? Number(e.n) : s.defaultValue;
+        return { n: c(Math.round(t), s.min, s.max) };
+      }),
+      (u = (e = s.max) => {
+        let t = c(Math.round(e), 0, s.max),
+          n = [[1]];
+        for (let e = 1; e <= t; e += 1) {
+          let t = n[e - 1] ?? [1];
+          n.push(Array.from({ length: e + 1 }, (e, n) => (t[n - 1] ?? 0) + (t[n] ?? 0)));
+        }
+        return n;
+      }),
+      (d = (e) => {
+        let t = l({ n: e }).n;
+        return (u(t)[t] ?? [1]).map((e, n) => ({ k: n, coefficient: e, aPower: t - n, bPower: n }));
+      }),
+      (f = (e, t) => (t === 0 ? `` : t === 1 ? e : `${e}^{${t}}`)),
+      (p = ({ coefficient: e, aPower: t, bPower: n }) => {
+        let r = `${f(`a`, t)}${f(`b`, n)}`;
+        return r ? `${e === 1 ? `` : e}${r}` : String(e);
+      }),
+      (m = (e) => {
+        let t = l({ n: e }).n;
+        return `(a+b)^{${t}} = ${d(t).map(p).join(` + `)}`;
+      }));
+  }))();
+}
+export { p as a, o as c, u as i, a as l, d as n, h as o, m as r, l as s, s as t };

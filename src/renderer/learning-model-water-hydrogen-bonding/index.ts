@@ -1,79 +1,72 @@
-// Water-molecule hydrogen-bonding geometry learning model.
-import "@rchunk/rolldown-runtime";
-
-interface Point { x: number; y: number }
-interface WaterMolecule { oxygen: Point; hydrogens: Point[] }
-interface NeighborWaterValues { neighborX?: number | null; neighborY?: number | null; neighborAngle?: number | null }
-
-const canvasSize = { width: 720, height: 340 };
-const centralOxygen = { x: 270, y: 155 };
-const waterHalfAngleDegrees = 52.25;
-const defaultNeighborWater = { neighborX: 535, neighborY: 165, neighborAngle: -127.75 };
-const neighborBounds = { x: { min: 470, max: 620 }, y: { min: 105, max: 190 }, angle: { min: -180, max: 180 } };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-const finiteOr = (value: number | null | undefined, fallback: number): number => typeof value === "number" && Number.isFinite(value) ? value : fallback;
-const degreesToRadians = (degrees: number): number => degrees * Math.PI / 180;
-const normalizeNeighborWater = (values: NeighborWaterValues) => ({
-  neighborX: clamp(finiteOr(values.neighborX, defaultNeighborWater.neighborX), neighborBounds.x.min, neighborBounds.x.max),
-  neighborY: clamp(finiteOr(values.neighborY, defaultNeighborWater.neighborY), neighborBounds.y.min, neighborBounds.y.max),
-  neighborAngle: clamp(finiteOr(values.neighborAngle, defaultNeighborWater.neighborAngle), neighborBounds.angle.min, neighborBounds.angle.max),
-});
-const pointAtAngle = (point: Point, angleDegrees: number): Point => ({
-  x: clamp(point.x + Math.cos(degreesToRadians(angleDegrees)) * 56, 16, canvasSize.width - 16),
-  y: clamp(point.y + Math.sin(degreesToRadians(angleDegrees)) * 56, 16, canvasSize.height - 16),
-});
-const buildWaterMolecule = (oxygen: Point, angleDegrees: number, bondLength = 90): WaterMolecule => {
-  const firstAngle = degreesToRadians(angleDegrees - waterHalfAngleDegrees);
-  const secondAngle = degreesToRadians(angleDegrees + waterHalfAngleDegrees);
-  return { oxygen, hydrogens: [
-    { x: oxygen.x + Math.cos(firstAngle) * bondLength, y: oxygen.y + Math.sin(firstAngle) * bondLength },
-    { x: oxygen.x + Math.cos(secondAngle) * bondLength, y: oxygen.y + Math.sin(secondAngle) * bondLength },
-  ] };
-};
-const closestHydrogenBondCandidate = (donor: WaterMolecule, acceptor: WaterMolecule) => {
-  const candidates = donor.hydrogens.map((hydrogen) => {
-    const covalentX = hydrogen.x - donor.oxygen.x;
-    const covalentY = hydrogen.y - donor.oxygen.y;
-    const hydrogenBondX = acceptor.oxygen.x - hydrogen.x;
-    const hydrogenBondY = acceptor.oxygen.y - hydrogen.y;
-    const distance = Math.hypot(hydrogenBondX, hydrogenBondY);
-    const alignment = (covalentX * hydrogenBondX + covalentY * hydrogenBondY)
-      / Math.max(2 ** -52, Math.hypot(covalentX, covalentY) * distance);
-    return { hydrogen, oxygen: acceptor.oxygen, distance, alignment };
-  });
-  return candidates[0].distance <= candidates[1].distance ? candidates[0] : candidates[1];
-};
-
-function deriveWaterHydrogenBondState(values: NeighborWaterValues) {
-  const normalized = normalizeNeighborWater(values);
-  const central = buildWaterMolecule(centralOxygen, 90);
-  const neighbor = buildWaterMolecule({ x: normalized.neighborX, y: normalized.neighborY }, normalized.neighborAngle);
-  const candidates = [closestHydrogenBondCandidate(neighbor, central), closestHydrogenBondCandidate(central, neighbor)];
-  const candidate = candidates[0].distance <= candidates[1].distance ? candidates[0] : candidates[1];
-  const oxygenDistance = Math.hypot(neighbor.oxygen.x - central.oxygen.x, neighbor.oxygen.y - central.oxygen.y);
-  const inBondingRange = oxygenDistance >= 165 && oxygenDistance <= 285;
-  const aligned = candidate.alignment >= 0.86;
-  const bonded = inBondingRange && aligned;
-  return {
-    ...normalized,
-    central,
-    neighbor,
-    hydrogenBond: bonded ? { hydrogen: candidate.hydrogen, oxygen: candidate.oxygen } : null,
-    alignment: bonded ? "bonded" : inBondingRange ? "misaligned" : "too-far",
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d, f, p;
+function m() {
+  return (m = e(() => {
+    ((t = { width: 720, height: 340 }),
+      (n = { x: 270, y: 155 }),
+      (r = 52.25),
+      (i = { neighborX: 535, neighborY: 165, neighborAngle: -127.75 }),
+      (a = {
+        x: { min: 470, max: 620 },
+        y: { min: 105, max: 190 },
+        angle: { min: -180, max: 180 },
+      }),
+      (o = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (s = (e, t) => (typeof e == `number` && Number.isFinite(e) ? e : t)),
+      (c = (e) => (e * Math.PI) / 180),
+      (l = (e) => ({
+        neighborX: o(s(e.neighborX, i.neighborX), a.x.min, a.x.max),
+        neighborY: o(s(e.neighborY, i.neighborY), a.y.min, a.y.max),
+        neighborAngle: o(s(e.neighborAngle, i.neighborAngle), a.angle.min, a.angle.max),
+      })),
+      (u = (e, n) => ({
+        x: o(e.x + Math.cos(c(n)) * 56, 16, t.width - 16),
+        y: o(e.y + Math.sin(c(n)) * 56, 16, t.height - 16),
+      })),
+      (d = (e, t, n = 90) => {
+        let i = c(t - r),
+          a = c(t + r);
+        return {
+          oxygen: e,
+          hydrogens: [
+            { x: e.x + Math.cos(i) * n, y: e.y + Math.sin(i) * n },
+            { x: e.x + Math.cos(a) * n, y: e.y + Math.sin(a) * n },
+          ],
+        };
+      }),
+      (f = (e, t) => {
+        let n = e.hydrogens.map((n) => {
+          let r = n.x - e.oxygen.x,
+            i = n.y - e.oxygen.y,
+            a = t.oxygen.x - n.x,
+            o = t.oxygen.y - n.y,
+            s = Math.hypot(a, o),
+            c = (r * a + i * o) / Math.max(2 ** -52, Math.hypot(r, i) * s);
+          return { hydrogen: n, oxygen: t.oxygen, distance: s, alignment: c };
+        });
+        return n[0].distance <= n[1].distance ? n[0] : n[1];
+      }),
+      (p = (e) => {
+        let { neighborX: t, neighborY: r, neighborAngle: i } = l(e),
+          a = d(n, 90),
+          o = d({ x: t, y: r }, i),
+          s = [f(o, a), f(a, o)],
+          c = s[0].distance <= s[1].distance ? s[0] : s[1],
+          u = Math.hypot(o.oxygen.x - a.oxygen.x, o.oxygen.y - a.oxygen.y),
+          p = u >= 165 && u <= 285,
+          m = c.alignment >= 0.86,
+          h = p && m;
+        return {
+          neighborX: t,
+          neighborY: r,
+          neighborAngle: i,
+          central: a,
+          neighbor: o,
+          hydrogenBond: h ? { hydrogen: c.hydrogen, oxygen: c.oxygen } : null,
+          alignment: h ? `bonded` : p ? `misaligned` : `too-far`,
+        };
+      }));
+  }))();
 }
-
-function initializeWaterHydrogenBondingModel(): void {}
-
-export {
-  neighborBounds as a,
-  initializeWaterHydrogenBondingModel as c,
-  waterHalfAngleDegrees as i,
-  buildWaterMolecule as l,
-  centralOxygen as n,
-  deriveWaterHydrogenBondState as o,
-  defaultNeighborWater as r,
-  pointAtAngle as s,
-  canvasSize as t,
-  normalizeNeighborWater as u,
-};
+export { a, m as c, r as i, d as l, n, p as o, i as r, u as s, t, l as u };

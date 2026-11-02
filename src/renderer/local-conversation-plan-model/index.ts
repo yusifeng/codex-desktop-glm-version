@@ -1,58 +1,24 @@
-import "@rchunk/rolldown-runtime";
-import {
-  ojt as initializeConversationPlanModel,
-  sjt as normalizePlanTitle,
-} from "@rchunk/app-initial";
-
-export interface ConversationPlanItem {
-  id: string;
-  text: string;
-  type: string;
-}
-
-export interface ConversationPlanTurn {
-  items: Array<ConversationPlanItem | null>;
-  status: string;
-  turnId?: string | null;
-}
-
-export interface ConversationPlan {
-  content: string;
-  key: string;
-  title: string | null;
-}
-
-function findLatestConversationPlan(
-  turns: Array<ConversationPlanTurn | null>,
-  requestedTurnId?: string | null,
-): ConversationPlan | null {
-  for (let turnIndex = turns.length - 1; turnIndex >= 0; turnIndex -= 1) {
-    const turn = turns[turnIndex];
-    if (turn == null || turn.status === "inProgress") continue;
-
-    for (let itemIndex = turn.items.length - 1; itemIndex >= 0; itemIndex -= 1) {
-      const item = turn.items[itemIndex];
-      if (item == null || item.type !== "plan") continue;
-
-      const key = turn.turnId ?? item.id;
-      if (requestedTurnId != null && key !== requestedTurnId) continue;
-
-      const heading = item.text.match(/^#\s+(.+)$/m)?.[1]?.trim();
-      return {
-        content: item.text,
-        key,
-        title: heading == null ? null : normalizePlanTitle(heading),
-      };
-    }
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { ojt as t, sjt as n } from "@rchunk/app-initial";
+function r(e, t) {
+  for (let r = e.length - 1; r >= 0; --r) {
+    let i = e[r];
+    if (i != null && i.status !== `inProgress`)
+      for (let e = i.items.length - 1; e >= 0; --e) {
+        let r = i.items[e];
+        if (r == null || r.type !== `plan`) continue;
+        let a = i.turnId ?? r.id;
+        if (t != null && a !== t) continue;
+        let o = r.text.match(/^#\s+(.+)$/m)?.[1]?.trim();
+        return { content: r.text, key: a, title: o == null ? null : n(o) };
+      }
   }
   return null;
 }
-
-function initializeLocalConversationPlanModel(): void {
-  initializeConversationPlanModel();
+function i() {
+  return (i = e(() => {
+    t();
+  }))();
 }
-
-export {
-  initializeLocalConversationPlanModel as n,
-  findLatestConversationPlan as t,
-};
+export { i as n, r as t };

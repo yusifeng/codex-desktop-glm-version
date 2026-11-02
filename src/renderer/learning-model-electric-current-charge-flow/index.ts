@@ -1,39 +1,16 @@
-// Electric-current charge-flow controls. Release chunk: type-e4a418c02712.js.
-import "@rchunk/rolldown-runtime";
-interface Specification {
-  type: "ELECTRIC_CURRENT_CHARGE_FLOW";
-  version: 1;
-  thumbnailAssetKey: "electric-current-charge-flow-v2";
-  canonicalFormula: string;
-  parameters: {
-    packetRatePerSecond: { kind: "number"; defaultValue: 4; min: 1; max: 8 };
-    chargePerPacketCoulombs: {
-      kind: "number";
-      defaultValue: 1;
-      min: 0.5;
-      max: 3;
-    };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `ELECTRIC_CURRENT_CHARGE_FLOW`),
+      (n = `electric-current-charge-flow-v2`),
+      (r = `I = \\frac{Q}{t}`),
+      (i = {
+        packetRatePerSecond: { kind: `number`, defaultValue: 4, min: 1, max: 8 },
+        chargePerPacketCoulombs: { kind: `number`, defaultValue: 1, min: 0.5, max: 3 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-let specification: Specification;
-let initialized = false;
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  specification = {
-    type: "ELECTRIC_CURRENT_CHARGE_FLOW",
-    version: 1,
-    thumbnailAssetKey: "electric-current-charge-flow-v2",
-    canonicalFormula: "I = \\frac{Q}{t}",
-    parameters: {
-      packetRatePerSecond: { kind: "number", defaultValue: 4, min: 1, max: 8 },
-      chargePerPacketCoulombs: {
-        kind: "number",
-        defaultValue: 1,
-        min: 0.5,
-        max: 3,
-      },
-    },
-  };
-}
-export { specification as n, initialize as t };
+export { a as n, o as t };

@@ -1,50 +1,29 @@
-// Piano-note staff learning model: map a diatonic index to pitch, keyboard, and staff geometry.
-import "@rchunk/rolldown-runtime";
-
-interface PianoNote {
-  hasBlackKeyAfter: boolean;
-  index: number;
-  letter: string;
-  octave: number;
-  pitch: string;
-  staffY: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o;
+function s() {
+  return (s = e(() => {
+    ((t = [`C`, `D`, `E`, `F`, `G`, `A`, `B`]),
+      (n = (e) => (Number.isFinite(e) ? Math.max(0, Math.min(14, Math.round(e))) : 7)),
+      (r = (e) => {
+        let r = n(e),
+          i = t[r % t.length],
+          a = 3 + Math.floor(r / t.length);
+        return {
+          index: r,
+          letter: i,
+          octave: a,
+          pitch: `${i}${a}`,
+          hasBlackKeyAfter: i !== `E` && i !== `B`,
+          staffY: 256 - r * 14,
+        };
+      }),
+      (i = () => Array.from({ length: 15 }, (e, t) => r(t))),
+      (a = (e) => {
+        let t = r(e);
+        return i().filter((e) => e.letter === t.letter);
+      }),
+      (o = (e) => n(e) === 7));
+  }))();
 }
-
-const noteLetters = ["C", "D", "E", "F", "G", "A", "B"] as const;
-
-function normalizeNoteIndex(value: number): number {
-  return Number.isFinite(value) ? Math.max(0, Math.min(14, Math.round(value))) : 7;
-}
-
-function getPianoNote(value: number): PianoNote {
-  const index = normalizeNoteIndex(value);
-  const letter = noteLetters[index % noteLetters.length];
-  const octave = 3 + Math.floor(index / noteLetters.length);
-  return {
-    index,
-    letter,
-    octave,
-    pitch: `${letter}${octave}`,
-    hasBlackKeyAfter: letter !== "E" && letter !== "B",
-    staffY: 256 - index * 14,
-  };
-}
-
-const getPianoNotes = (): PianoNote[] => Array.from({ length: 15 }, (_unused, index) => getPianoNote(index));
-
-function getMatchingLetterNotes(value: number): PianoNote[] {
-  const selected = getPianoNote(value);
-  return getPianoNotes().filter((note) => note.letter === selected.letter);
-}
-
-const isMiddleC = (value: number): boolean => normalizeNoteIndex(value) === 7;
-function initializePianoNoteStaffModel(): void {}
-
-export {
-  isMiddleC as a,
-  initializePianoNoteStaffModel as i,
-  getPianoNotes as n,
-  normalizeNoteIndex as o,
-  getMatchingLetterNotes as r,
-  getPianoNote as t,
-};
+export { o as a, s as i, i as n, n as o, a as r, r as t };

@@ -1,36 +1,15 @@
-// Randomized experiment learning-model specification. Release chunk: type-b2315d4b532d.js.
-import "@rchunk/rolldown-runtime";
-
-interface NumericParameter {
-  kind: "number" | "integer";
-  defaultValue: number;
-  min: number;
-  max: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `RANDOMIZED_EXPERIMENT`),
+      (n = `randomized-experiment-v1`),
+      (r = {
+        experimental_units: { kind: `integer`, defaultValue: 16, min: 6, max: 30 },
+        treatment_effect: { kind: `number`, defaultValue: 8, min: -20, max: 20 },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-interface Specification {
-  type: "RANDOMIZED_EXPERIMENT";
-  version: 2;
-  thumbnailAssetKey: "randomized-experiment-v1";
-  parameters: {
-    experimental_units: NumericParameter;
-    treatment_effect: NumericParameter;
-  };
-}
-let specification: Specification;
-function initializeSpecification(): void {
-  specification ??= {
-    type: "RANDOMIZED_EXPERIMENT",
-    version: 2,
-    thumbnailAssetKey: "randomized-experiment-v1",
-    parameters: {
-      experimental_units: {
-        kind: "integer",
-        defaultValue: 16,
-        min: 6,
-        max: 30,
-      },
-      treatment_effect: { kind: "number", defaultValue: 8, min: -20, max: 20 },
-    },
-  };
-}
-export { specification as n, initializeSpecification as t };
+export { i as n, a as t };

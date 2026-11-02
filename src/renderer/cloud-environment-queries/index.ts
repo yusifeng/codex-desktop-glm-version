@@ -1,551 +1,481 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $O as timeConstants,
-  FX as initializeSignalRuntime,
-  QI as initializeQueryRuntime,
-  QX as createQueryFamily,
-  XX as createInfiniteQueryFamily,
-  YX as createMutationSignal,
-  ZI as appScope,
-  eZ as createQuerySignal,
-  ek as initializeQuerySignals,
-  uL as infiniteQueryOptions,
+  $O as t,
+  FX as n,
+  QI as r,
+  QX as i,
+  XX as a,
+  YX as o,
+  ZI as s,
+  eZ as c,
+  ek as l,
+  uL as u,
 } from "@rchunk/app-shared";
 import {
-  Jr as githubConnectorId,
-  Kr as githubEnterpriseTemplateId,
-  Sdn as ApiError,
-  Yr as initializeConnectorConstants,
-  pdn as initializeAccountApi,
-  udn as apiClient,
-  wdn as initializeApiErrors,
+  Jr as ee,
+  Kr as d,
+  Sdn as te,
+  Yr as ne,
+  pdn as f,
+  udn as p,
+  wdn as m,
 } from "@rchunk/app-initial";
-
-type ShareSettings = "private" | string;
-type SecretDomain = string | null;
-
-interface RemoteSecret {
-  domain?: SecretDomain;
-  name: string;
-}
-
-interface EnvironmentSecret {
-  domain?: SecretDomain;
-  key: string;
-  previousDomain?: SecretDomain;
-  previousKey?: string;
-  value: string;
-}
-
-interface CloudEnvironment {
-  agent_network_access?: unknown;
-  auto_setup_settings?: unknown;
-  cache_settings?: unknown;
-  description?: string;
-  enable_authtranslator?: boolean;
-  enable_docker_in_docker?: boolean;
-  env_vars?: Record<string, string>;
-  etag?: string;
-  github_connector_id?: string | null;
-  label?: string;
-  machine_id?: string;
-  maintenance_setup?: string | string[];
-  repo_map?: Record<string, { repository_full_name?: string }>;
-  repos: string[];
-  secrets?: Record<string, unknown>;
-  secrets_with_domains?: RemoteSecret[];
-  setup?: string | string[];
-  share_settings?: ShareSettings;
-  share_targets?: Array<{ email: string }>;
-  task_count?: number;
-  workspace_dir?: string;
-}
-
-interface EnvironmentForm {
-  agentNetworkAccess: unknown;
-  autoSetupSettings: unknown;
-  cacheSettings: unknown;
-  description: string;
-  enableAuthtranslator: boolean;
-  enableDockerInDocker: boolean;
-  environmentVariables: Array<{ key: string; value: string }>;
-  githubConnectorId: string | null;
-  label: string;
-  machineId: string;
-  maintenanceSetupCommands: string;
-  repositoryId: string;
-  repositoryName: string;
-  secrets: EnvironmentSecret[];
-  setupCommands: string;
-  shareSettings: ShareSettings;
-  shareTargets: string[];
-  workspaceDirectory: string;
-}
-
-interface Connector {
-  id: string;
-  labels?: { admin_only_connector?: string };
-  name: string;
-  status?: string;
-  template_id?: string;
-}
-
-interface Installation {
-  account_login: string;
-  account_type: string;
-  id: string;
-}
-
-const redactedSecretValue = "<REDACTED>";
-const defaultMachineId = "wham-public/wham-universal";
-let productHeaders: Record<string, string>;
-let connectorProductHeaders: Record<string, string>;
-
-function setupCommands(value?: string | string[]): string {
-  return Array.isArray(value) ? value.join("\n") : (value ?? "");
-}
-
-function normalizeDomain(domain?: string | null): SecretDomain {
-  return domain?.trim() || null;
-}
-
-function secretIdentity(name: string, domain: SecretDomain): string {
-  return `${name}::${domain ?? "__global__"}`;
-}
-
-function remoteSecrets(environment?: CloudEnvironment | null): RemoteSecret[] {
-  if (environment?.secrets_with_domains != null) {
-    return environment.secrets_with_domains.flatMap((secret) =>
-      typeof secret.name !== "string" || secret.name === ""
-        ? []
-        : [{ name: secret.name, domain: secret.domain ?? null }]);
-  }
-  return Object.keys(environment?.secrets ?? {}).map((key) => {
-    const [domain, ...nameParts] = key.split("::");
-    return nameParts.length === 0
-      ? { name: key, domain: null }
-      : { name: nameParts.join("::") || key, domain: domain || null };
-  });
-}
-
-function environmentToForm(
-  environment?: CloudEnvironment | null,
-  fallbackConnectorId?: string | null,
-): EnvironmentForm {
-  const secrets = remoteSecrets(environment);
-  const repositoryId = environment?.repos[0] ?? "";
+function re(e, t) {
+  let n = y(e);
   return {
-    label: environment?.label ?? "",
-    description: environment?.description ?? "",
-    shareSettings: environment?.share_settings ?? "private",
-    shareTargets: environment?.share_targets?.map(({ email }) => email) ?? [],
-    machineId: environment?.machine_id ?? defaultMachineId,
-    repositoryId,
-    repositoryName:
-      environment?.repo_map?.[repositoryId]?.repository_full_name ?? repositoryId,
-    githubConnectorId: environment?.github_connector_id ?? fallbackConnectorId ?? null,
-    workspaceDirectory: environment?.workspace_dir ?? "/workspace",
-    agentNetworkAccess: environment?.agent_network_access ?? { mode: "off" },
-    setupCommands: setupCommands(environment?.setup),
-    maintenanceSetupCommands: setupCommands(environment?.maintenance_setup),
-    secrets: secrets.map(({ name, domain }) => ({
-      key: name,
-      value: redactedSecretValue,
-      domain,
-      previousKey: name,
-      previousDomain: domain,
+    label: e?.label ?? ``,
+    description: e?.description ?? ``,
+    shareSettings: e?.share_settings ?? `private`,
+    shareTargets: e?.share_targets?.map(({ email: e }) => e) ?? [],
+    machineId: e?.machine_id ?? w,
+    repositoryId: e?.repos[0] ?? ``,
+    repositoryName: e?.repo_map?.[e.repos[0] ?? ``]?.repository_full_name ?? e?.repos[0] ?? ``,
+    githubConnectorId: e?.github_connector_id ?? t ?? null,
+    workspaceDirectory: e?.workspace_dir ?? `/workspace`,
+    agentNetworkAccess: e?.agent_network_access ?? { mode: `off` },
+    setupCommands: _(e?.setup),
+    maintenanceSetupCommands: _(e?.maintenance_setup),
+    secrets: n.map(({ name: e, domain: t }) => ({
+      key: e,
+      value: C,
+      domain: t,
+      previousKey: e,
+      previousDomain: t,
     })),
-    environmentVariables: Object.entries(environment?.env_vars ?? {}).map(([key, value]) => ({ key, value })),
-    autoSetupSettings: environment?.auto_setup_settings ?? { use_auto_setup: true },
-    cacheSettings: environment?.cache_settings ?? { post_setup_cache_enabled: true },
-    enableAuthtranslator: environment?.enable_authtranslator ?? false,
-    enableDockerInDocker: environment?.enable_docker_in_docker ?? false,
+    environmentVariables: Object.entries(e?.env_vars ?? {}).map(([e, t]) => ({ key: e, value: t })),
+    autoSetupSettings: e?.auto_setup_settings ?? { use_auto_setup: !0 },
+    cacheSettings: e?.cache_settings ?? { post_setup_cache_enabled: !0 },
+    enableAuthtranslator: e?.enable_authtranslator ?? !1,
+    enableDockerInDocker: e?.enable_docker_in_docker ?? !1,
   };
 }
-
-function requiresGlobalRenameValue(secret: EnvironmentSecret): boolean {
-  return secret.previousDomain !== undefined
-    && secret.previousDomain == null
-    && normalizeDomain(secret.domain) == null
-    && secret.previousKey != null
-    && secret.previousKey !== secret.key.trim()
-    && secret.value === redactedSecretValue;
-}
-
-function validateEnvironmentForm(form: EnvironmentForm): Record<string, string> {
-  const errors: Record<string, string> = {};
-  if (form.label.trim() === "") errors.label = "required";
-  if (form.machineId === "") errors.machineId = "required";
-  if (form.repositoryId === "") errors.repositoryId = "required";
-  const secrets = form.secrets.map(({ key, domain }) => ({
-    key: key.trim(),
-    identity: secretIdentity(key.trim(), normalizeDomain(domain)),
+function h(e) {
+  let t = {};
+  (e.label.trim() === `` && (t.label = `required`),
+    e.machineId === `` && (t.machineId = `required`),
+    e.repositoryId === `` && (t.repositoryId = `required`));
+  let n = e.secrets.map(({ key: e, domain: t }) => ({
+    key: e.trim(),
+    identity: b(e.trim(), x(t)),
   }));
-  if (secrets.some(({ key }) => key === "")) errors.secrets = "name-required";
-  else if (new Set(secrets.map(({ identity }) => identity)).size !== secrets.length) {
-    errors.secrets = "duplicate-name";
-  } else if (form.secrets.some(({ value }) => value.trim() === "")) {
-    errors.secrets = "value-required";
-  } else if (form.secrets.some(requiresGlobalRenameValue)) {
-    errors.secrets = "global-rename-value-required";
-  }
-  const variableNames = form.environmentVariables.map(({ key }) => key.trim());
-  if (variableNames.some((key) => key === "")) errors.environmentVariables = "name-required";
-  else if (new Set(variableNames).size !== variableNames.length) {
-    errors.environmentVariables = "duplicate-name";
-  } else if (form.environmentVariables.some(({ value }) => value.trim() === "")) {
-    errors.environmentVariables = "value-required";
-  }
-  return errors;
+  n.some(({ key: e }) => e === ``)
+    ? (t.secrets = `name-required`)
+    : new Set(n.map(({ identity: e }) => e)).size === n.length
+      ? e.secrets.some(({ value: e }) => e.trim() === ``)
+        ? (t.secrets = `value-required`)
+        : e.secrets.some(S) && (t.secrets = `global-rename-value-required`)
+      : (t.secrets = `duplicate-name`);
+  let r = e.environmentVariables.map(({ key: e }) => e.trim());
+  return (
+    r.some((e) => e === ``)
+      ? (t.environmentVariables = `name-required`)
+      : new Set(r).size === r.length
+        ? e.environmentVariables.some(({ value: e }) => e.trim() === ``) &&
+          (t.environmentVariables = `value-required`)
+        : (t.environmentVariables = `duplicate-name`),
+    t
+  );
 }
-
-function canSaveEnvironment(form: EnvironmentForm, canChangeMachine: boolean, currentMachineId: string): boolean {
-  return (canChangeMachine || form.machineId === currentMachineId)
-    && Object.keys(validateEnvironmentForm(form)).length === 0;
+function ie(e, t, n) {
+  return (t || e.machineId === n) && Object.keys(h(e)).length === 0;
 }
-
-function shareTargets(form: EnvironmentForm) {
-  return form.shareSettings === "private" ? [] : form.shareTargets
-    .map((email) => email.trim())
-    .filter((email) => email !== "")
-    .map((email) => ({ email, permission: "editor", type: "user" }));
-}
-
-function createEnvironmentRequest(form: EnvironmentForm) {
+function g(e) {
   return {
-    label: form.label.trim(), description: form.description, machine_id: form.machineId,
-    repos: [form.repositoryId], github_connector_id: form.githubConnectorId,
-    workspace_dir: form.workspaceDirectory, agent_network_access: form.agentNetworkAccess,
-    setup: form.setupCommands, maintenance_setup: form.maintenanceSetupCommands,
-    env_vars: Object.fromEntries(form.environmentVariables.map(({ key, value }) => [key.trim(), value])),
-    secrets_with_domains: form.secrets.map(({ key, value, domain }) => ({
-      name: key.trim(), domain: normalizeDomain(domain), value,
+    label: e.label.trim(),
+    description: e.description,
+    machine_id: e.machineId,
+    repos: [e.repositoryId],
+    github_connector_id: e.githubConnectorId,
+    workspace_dir: e.workspaceDirectory,
+    agent_network_access: e.agentNetworkAccess,
+    setup: e.setupCommands,
+    maintenance_setup: e.maintenanceSetupCommands,
+    env_vars: Object.fromEntries(
+      e.environmentVariables.map(({ key: e, value: t }) => [e.trim(), t]),
+    ),
+    secrets_with_domains: e.secrets.map(({ key: e, value: t, domain: n }) => ({
+      name: e.trim(),
+      domain: x(n),
+      value: t,
     })),
-    share_settings: form.shareSettings, share_targets: shareTargets(form),
-    auto_setup_settings: form.autoSetupSettings, cache_settings: form.cacheSettings,
-    enable_authtranslator: form.enableAuthtranslator,
-    enable_docker_in_docker: form.enableDockerInDocker,
+    share_settings: e.shareSettings,
+    share_targets: v(e),
+    auto_setup_settings: e.autoSetupSettings,
+    cache_settings: e.cacheSettings,
+    enable_authtranslator: e.enableAuthtranslator,
+    enable_docker_in_docker: e.enableDockerInDocker,
   };
 }
-
-function connectorIdFromUri(value: string): string | null {
-  const separator = value.indexOf(":");
-  return separator === -1 ? null : value.slice(7, separator);
+function ae(e) {
+  let t = e.indexOf(`:`);
+  return t === -1 ? null : e.slice(7, t);
 }
-
-function secretUpdates(current: EnvironmentSecret[], previous: RemoteSecret[]) {
-  const retained = new Set<string>();
-  const updates: Array<Record<string, unknown>> = [];
-  for (const secret of current) {
-    const name = secret.key.trim();
-    const domain = normalizeDomain(secret.domain);
-    if (secret.previousDomain === undefined) {
-      if (secret.value !== "") {
-        retained.add(secretIdentity(name, domain));
-        updates.push({ name, domain, value: secret.value });
-      }
+function oe(e, t) {
+  return {
+    etag: t.etag,
+    label: e.label.trim(),
+    description: e.description,
+    machine_id: e.machineId,
+    workspace_dir: e.workspaceDirectory,
+    agent_network_access: e.agentNetworkAccess,
+    setup: e.setupCommands,
+    maintenance_setup: e.maintenanceSetupCommands,
+    env_vars: Object.fromEntries(
+      e.environmentVariables.map(({ key: e, value: t }) => [e.trim(), t]),
+    ),
+    secrets_with_domains: se(e.secrets, y(t)),
+    share_settings: e.shareSettings,
+    share_targets: v(e),
+    auto_setup_settings: e.autoSetupSettings,
+    cache_settings: e.cacheSettings,
+    enable_authtranslator: e.enableAuthtranslator,
+    enable_docker_in_docker: e.enableDockerInDocker,
+  };
+}
+function _(e) {
+  return Array.isArray(e)
+    ? e.join(`
+`)
+    : (e ?? ``);
+}
+function v(e) {
+  return e.shareSettings === `private`
+    ? []
+    : e.shareTargets
+        .map((e) => e.trim())
+        .filter((e) => e !== ``)
+        .map((e) => ({ email: e, permission: `editor`, type: `user` }));
+}
+function y(e) {
+  return e?.secrets_with_domains == null
+    ? Object.keys(e?.secrets ?? {}).map((e) => {
+        let [t, ...n] = e.split(`::`);
+        return n.length === 0
+          ? { name: e, domain: null }
+          : { name: n.join(`::`) || e, domain: t || null };
+      })
+    : e.secrets_with_domains.flatMap((e) =>
+        typeof e.name != `string` || e.name === ``
+          ? []
+          : [{ name: e.name, domain: e.domain ?? null }],
+      );
+}
+function se(e, t) {
+  let n = new Set(),
+    r = [];
+  for (let t of e) {
+    let e = t.key.trim(),
+      i = x(t.domain);
+    if (t.previousDomain === void 0) {
+      t.value !== `` && (n.add(b(e, i)), r.push({ name: e, domain: i, value: t.value }));
       continue;
     }
-    const previousName = secret.previousKey ?? secret.key;
-    const previousDomain = normalizeDomain(secret.previousDomain);
-    retained.add(secretIdentity(previousName, previousDomain));
-    const renamed = previousName !== name;
-    const moved = previousDomain !== domain;
-    const valueChanged = secret.value !== redactedSecretValue;
-    if (renamed || moved || valueChanged) {
-      updates.push({
-        name, domain, value: valueChanged ? secret.value : null,
-        previous_domain: previousDomain,
-        ...(renamed ? { previous_name: previousName } : {}),
+    let a = t.previousKey ?? t.key,
+      o = x(t.previousDomain);
+    n.add(b(a, o));
+    let s = a !== e,
+      c = o !== i,
+      l = t.value !== C;
+    (s || c || l) &&
+      r.push({
+        name: e,
+        domain: i,
+        value: l ? t.value : null,
+        previous_domain: o,
+        ...(s ? { previous_name: a } : {}),
       });
-    }
   }
-  for (const { name, domain } of previous) {
-    if (!retained.has(secretIdentity(name, domain))) {
-      updates.push({ name, domain: null, value: null, previous_domain: domain });
-    }
+  for (let { name: e, domain: i } of t) {
+    let t = b(e, i);
+    n.has(t) || r.push({ name: e, domain: null, value: null, previous_domain: i });
   }
-  return updates;
+  return r;
 }
-
-function updateEnvironmentRequest(form: EnvironmentForm, environment: CloudEnvironment) {
-  return {
-    etag: environment.etag,
-    label: form.label.trim(), description: form.description, machine_id: form.machineId,
-    workspace_dir: form.workspaceDirectory, agent_network_access: form.agentNetworkAccess,
-    setup: form.setupCommands, maintenance_setup: form.maintenanceSetupCommands,
-    env_vars: Object.fromEntries(form.environmentVariables.map(({ key, value }) => [key.trim(), value])),
-    secrets_with_domains: secretUpdates(form.secrets, remoteSecrets(environment)),
-    share_settings: form.shareSettings, share_targets: shareTargets(form),
-    auto_setup_settings: form.autoSetupSettings, cache_settings: form.cacheSettings,
-    enable_authtranslator: form.enableAuthtranslator,
-    enable_docker_in_docker: form.enableDockerInDocker,
-  };
+function b(e, t) {
+  return `${e}::${t ?? `__global__`}`;
 }
-
-function initializeEnvironmentConstants(): void {
-  // Constants are eager in maintainable source; this initializer preserves the chunk API.
+function x(e) {
+  return e?.trim() || null;
 }
-
-async function fetchGithubConnectors({ applyEligibilityFilter }: { applyEligibilityFilter: boolean }): Promise<Connector[]> {
-  const [github, { connectors }] = await Promise.all([
-    apiClient.safeGet<Connector>("/aip/connectors/{connector_id}", {
-      parameters: { path: { connector_id: githubConnectorId }, query: {
-        include_actions: false, apply_eligibility_filter: applyEligibilityFilter,
-      } },
-      additionalHeaders: productHeaders,
-      expectedErrorStatuses: [403, 404],
-    }).catch((error: unknown) => {
-      if (error instanceof ApiError && (error.status === 403 || error.status === 404)) return null;
-      throw error;
-    }),
-    apiClient.safeGet<{ connectors: Connector[] }>("/ps/connectors/by-template", {
-      parameters: { query: { template_id: githubEnterpriseTemplateId } },
-      additionalHeaders: productHeaders,
-    }),
-  ]);
-  return [...(github == null ? [] : [github]), ...connectors]
-    .filter((connector) => connector.id === "connector_76869538009648d5b282a4bb21c3d157"
-      || connector.template_id === "templated_apps_GitHubEnterprise")
-    .sort((left, right) => left.id === "connector_76869538009648d5b282a4bb21c3d157"
-      ? -1
-      : right.id === "connector_76869538009648d5b282a4bb21c3d157"
-        ? 1
-        : left.name.localeCompare(right.name));
-}
-
-function initializeConnectorQueries(): void {
-  initializeAccountApi();
-  initializeApiErrors();
-  initializeConnectorConstants();
-  productHeaders = { "OAI-Product-Sku": "CODEX" };
-}
-
-const searchEnvironments = (query: string, cursor: string | null, limit: number) =>
-  apiClient.safeGet<{ cursor?: string | null }>("/wham/environments/search", {
-    parameters: { query: { query: query || undefined, cursor: cursor ?? undefined, limit } },
-  });
-const compareEnvironmentUsage = (left: CloudEnvironment, right: CloudEnvironment) =>
-  (right.task_count ?? 0) - (left.task_count ?? 0)
-  || (left.label ?? "").localeCompare(right.label ?? "");
-const getEnvironment = (environmentId: string) => apiClient.safeGet<CloudEnvironment>(
-  "/wham/environments/{environment_id}/with-creator-and-machine",
-  { parameters: { path: { environment_id: environmentId } } },
-);
-const getMachines = () => apiClient.safeGet("/wham/machines");
-
-async function getLinkedGithubConnectors(): Promise<Connector[]> {
-  const connectors = (await fetchGithubConnectors({ applyEligibilityFilter: true }))
-    .filter((connector) => connector.status !== "DISABLED_BY_ADMIN"
-      && connector.labels?.admin_only_connector !== "true");
-  const links = await Promise.all(connectors.map((connector) => apiClient.safeGet<{ link?: unknown }>(
-    "/aip/connectors/{connector_id}/link",
-    { parameters: { path: { connector_id: connector.id } }, additionalHeaders: connectorProductHeaders },
-  )));
-  return connectors.filter((_connector, index) => links[index].link != null);
-}
-
-const searchRepositories = (query: string, connectorId: string, page?: number) =>
-  apiClient.safeGet("/wham/github/repositories/search/all-installations", {
-    parameters: { query: { query, limit: 20, page, connector_id: connectorId } },
-  });
-const getGithubHandle = async (connectorId: string) => {
-  const response = await apiClient.safeGet<{ github_handle: string }>(
-    "/wham/task_suggestions/github/user_handle",
-    { parameters: { query: { connector_id: connectorId } } },
+function S(e) {
+  return (
+    e.previousDomain !== void 0 &&
+    e.previousDomain == null &&
+    x(e.domain) == null &&
+    e.previousKey != null &&
+    e.previousKey !== e.key.trim() &&
+    e.value === `<REDACTED>`
   );
-  return response.github_handle;
-};
-const getInstallations = (connectorId: string) => apiClient.safeGet(
-  "/wham/github/installations/v2",
-  { parameters: { query: { connector_id: connectorId } } },
-);
-
-function getRepositoryPage(
-  input: { connectorId: string; installation: Installation | null; query: string },
-  page: number,
-) {
-  if (input.query !== "") {
-    return input.installation == null
-      ? searchRepositories(input.query, input.connectorId, page)
-      : apiClient.safeGet("/wham/github/repositories/search", { parameters: { query: {
-        account_login: input.installation.account_login,
-        account_type: input.installation.account_type,
-        query: input.query, page, per_page: 20, connector_id: input.connectorId,
-      } } });
-  }
-  const query = { page, per_page: 20, connector_id: input.connectorId };
-  return input.installation == null
-    ? apiClient.safeGet("/wham/github/list-repositories", { parameters: { query } })
-    : apiClient.safeGet("/wham/github/repositories/v2/{installation_id}", {
-      parameters: { path: { installation_id: input.installation.id }, query },
-    });
 }
-
-const createEnvironment = (requestBody: unknown) => apiClient.safePost("/wham/environments", { requestBody });
-const updateEnvironment = ({ environmentId, requestBody }: { environmentId: string; requestBody: unknown }) =>
-  apiClient.safePatch("/wham/environments/{environment_id}", {
-    parameters: { path: { environment_id: environmentId } }, requestBody,
+var C, w;
+function T() {
+  return (T = e(() => {
+    ((C = `<REDACTED>`), (w = `wham-public/wham-universal`));
+  }))();
+}
+async function E({ applyEligibilityFilter: e }) {
+  let [t, { connectors: n }] = await Promise.all([
+    p
+      .safeGet(`/aip/connectors/{connector_id}`, {
+        parameters: {
+          path: { connector_id: ee },
+          query: { include_actions: !1, apply_eligibility_filter: e },
+        },
+        additionalHeaders: D,
+        expectedErrorStatuses: [403, 404],
+      })
+      .catch((e) => {
+        if (e instanceof te && (e.status === 403 || e.status === 404)) return null;
+        throw e;
+      }),
+    p.safeGet(`/ps/connectors/by-template`, {
+      parameters: { query: { template_id: d } },
+      additionalHeaders: D,
+    }),
+  ]);
+  return [...(t == null ? [] : [t]), ...n]
+    .filter(
+      (e) =>
+        e.id === `connector_76869538009648d5b282a4bb21c3d157` ||
+        e.template_id === `templated_apps_GitHubEnterprise`,
+    )
+    .sort((e, t) =>
+      e.id === `connector_76869538009648d5b282a4bb21c3d157`
+        ? -1
+        : t.id === `connector_76869538009648d5b282a4bb21c3d157`
+          ? 1
+          : e.name.localeCompare(t.name),
+    );
+}
+var D;
+function O() {
+  return (O = e(() => {
+    (f(), m(), ne(), (D = { "OAI-Product-Sku": `CODEX` }));
+  }))();
+}
+function ce(e, t, n) {
+  return p.safeGet(`/wham/environments/search`, {
+    parameters: { query: { query: e || void 0, cursor: t ?? void 0, limit: n } },
   });
-const deleteEnvironment = (environmentId: string) => apiClient.safeDelete(
-  "/wham/environments/{environment_id}",
-  { parameters: { path: { environment_id: environmentId } } },
-);
-const resetEnvironmentCache = (environmentId: string) => apiClient.safePost(
-  "/wham/environments/{environment_id}/reset-cache",
-  { parameters: { path: { environment_id: environmentId } } },
-);
-
-function initializeEnvironmentApi(): void {
-  initializeConnectorQueries();
-  initializeAccountApi();
-  connectorProductHeaders = { "OAI-Product-Sku": "CODEX" };
 }
-
-function environmentSearchOptions(query: string) {
-  return infiniteQueryOptions({
-    queryKey: ["cloud-environments", "search", query],
-    queryFn: ({ pageParam }: { pageParam: string | null }) =>
-      searchEnvironments(query, pageParam, pageParam == null ? 25 : 100),
+function le(e, t) {
+  return (t.task_count ?? 0) - (e.task_count ?? 0) || e.label.localeCompare(t.label);
+}
+function ue(e) {
+  return p.safeGet(`/wham/environments/{environment_id}/with-creator-and-machine`, {
+    parameters: { path: { environment_id: e } },
+  });
+}
+function k() {
+  return p.safeGet(`/wham/machines`);
+}
+async function de() {
+  let e = (await E({ applyEligibilityFilter: !0 })).filter(
+      (e) => e.status !== `DISABLED_BY_ADMIN` && e.labels?.admin_only_connector !== `true`,
+    ),
+    t = await Promise.all(
+      e.map((e) =>
+        p.safeGet(`/aip/connectors/{connector_id}/link`, {
+          parameters: { path: { connector_id: e.id } },
+          additionalHeaders: R,
+        }),
+      ),
+    );
+  return e.filter((e, n) => t[n].link != null);
+}
+function A(e, t, n) {
+  return p.safeGet(`/wham/github/repositories/search/all-installations`, {
+    parameters: { query: { query: e, limit: 20, page: n, connector_id: t } },
+  });
+}
+async function j(e) {
+  let { github_handle: t } = await p.safeGet(`/wham/task_suggestions/github/user_handle`, {
+    parameters: { query: { connector_id: e } },
+  });
+  return t;
+}
+function M(e) {
+  return p.safeGet(`/wham/github/installations/v2`, { parameters: { query: { connector_id: e } } });
+}
+function N({ connectorId: e, installation: t, query: n }, r) {
+  if (n !== ``)
+    return t == null
+      ? A(n, e, r)
+      : p.safeGet(`/wham/github/repositories/search`, {
+          parameters: {
+            query: {
+              account_login: t.account_login,
+              account_type: t.account_type,
+              query: n,
+              page: r,
+              per_page: 20,
+              connector_id: e,
+            },
+          },
+        });
+  let i = { page: r, per_page: 20, connector_id: e };
+  return t == null
+    ? p.safeGet(`/wham/github/list-repositories`, { parameters: { query: i } })
+    : p.safeGet(`/wham/github/repositories/v2/{installation_id}`, {
+        parameters: { path: { installation_id: t.id }, query: i },
+      });
+}
+function P(e) {
+  return p.safePost(`/wham/environments`, { requestBody: e });
+}
+function F({ environmentId: e, requestBody: t }) {
+  return p.safePatch(`/wham/environments/{environment_id}`, {
+    parameters: { path: { environment_id: e } },
+    requestBody: t,
+  });
+}
+function I(e) {
+  return p.safeDelete(`/wham/environments/{environment_id}`, {
+    parameters: { path: { environment_id: e } },
+  });
+}
+function L(e) {
+  return p.safePost(`/wham/environments/{environment_id}/reset-cache`, {
+    parameters: { path: { environment_id: e } },
+  });
+}
+var R;
+function z() {
+  return (z = e(() => {
+    (O(), f(), (R = { "OAI-Product-Sku": `CODEX` }));
+  }))();
+}
+function B(e) {
+  return u({
+    queryKey: [`cloud-environments`, `search`, e],
+    queryFn: ({ pageParam: t }) => ce(e, t, t == null ? 25 : 100),
     initialPageParam: null,
-    getNextPageParam: (page: { cursor?: string | null }) => page.cursor ?? null,
-    refetchOnMount: true,
-    retry: false,
-    staleTime: timeConstants.FIVE_MINUTES,
+    getNextPageParam: (e) => e.cursor ?? null,
+    refetchOnMount: !0,
+    retry: !1,
+    staleTime: t.FIVE_MINUTES,
   });
 }
-
-interface QueryScope {
-  query: {
-    getOptions(query: unknown, parameter: unknown): { queryKey: readonly unknown[] };
-    invalidate(query: unknown, parameter: unknown, options: { exact: boolean }): Promise<unknown>;
-  };
-  queryClient: {
-    invalidateQueries(options: { queryKey: readonly unknown[] }): Promise<unknown>;
-    removeQueries(options: { queryKey: readonly unknown[] }): void;
-  };
-}
-
-async function invalidateEnvironmentLists(scope: QueryScope): Promise<void> {
+async function V(e) {
   await Promise.all([
-    scope.queryClient.invalidateQueries({ queryKey: ["cloud-environments", "search"] }),
-    scope.queryClient.invalidateQueries({ queryKey: ["environments"] }),
-    scope.queryClient.invalidateQueries({ queryKey: ["workspace", "environments-search"] }),
-    scope.queryClient.invalidateQueries({ queryKey: ["workspace", "environments-by-repo"] }),
+    e.queryClient.invalidateQueries({ queryKey: [`cloud-environments`, `search`] }),
+    e.queryClient.invalidateQueries({ queryKey: [`environments`] }),
+    e.queryClient.invalidateQueries({ queryKey: [`workspace`, `environments-search`] }),
+    e.queryClient.invalidateQueries({ queryKey: [`workspace`, `environments-by-repo`] }),
   ]);
 }
-
-let environmentDetailsQuery: unknown;
-let machinesQuery: unknown;
-let githubConnectorsQuery: unknown;
-let githubHandleQuery: unknown;
-let installationsQuery: unknown;
-let repositoryPagesQuery: unknown;
-let repositorySearchQuery: unknown;
-let createEnvironmentMutation: unknown;
-let updateEnvironmentMutation: unknown;
-let deleteEnvironmentMutation: unknown;
-let resetEnvironmentCacheMutation: unknown;
-
-function initializeCloudEnvironmentQueries(): void {
-  initializeSignalRuntime();
-  initializeQueryRuntime();
-  initializeQuerySignals();
-  initializeEnvironmentApi();
-  environmentDetailsQuery = createQueryFamily(appScope, (environmentId: string) => ({
-    queryKey: ["cloud-environments", "details", environmentId], queryFn: () => getEnvironment(environmentId),
-    refetchOnMount: true, staleTime: timeConstants.FIVE_MINUTES,
-  }));
-  machinesQuery = createQuerySignal(appScope, () => ({
-    queryKey: ["cloud-environments", "machines"], queryFn: getMachines,
-    refetchOnMount: true, retry: false, staleTime: timeConstants.FIVE_MINUTES,
-  }));
-  githubConnectorsQuery = createQuerySignal(appScope, () => ({
-    queryKey: ["cloud-environments", "github-connectors"], queryFn: getLinkedGithubConnectors,
-    refetchOnMount: true, refetchOnWindowFocus: true, retry: false, staleTime: timeConstants.FIVE_MINUTES,
-  }));
-  githubHandleQuery = createQueryFamily(appScope, (connectorId: string) => ({
-    queryKey: ["cloud-environments", "github-user-handle", connectorId], queryFn: () => getGithubHandle(connectorId),
-    refetchOnWindowFocus: false, retry: false, staleTime: timeConstants.FIVE_MINUTES,
-  }));
-  installationsQuery = createQueryFamily(appScope, (connectorId: string) => ({
-    queryKey: ["cloud-environments", "github-installations", connectorId], queryFn: () => getInstallations(connectorId),
-    refetchOnWindowFocus: false, retry: false, staleTime: timeConstants.FIVE_MINUTES,
-  }));
-  repositoryPagesQuery = createInfiniteQueryFamily(appScope, (input: {
-    connectorId: string; installation: Installation | null; query: string;
-  }) => ({
-    queryKey: ["cloud-environments", "github-repository-pages", input.connectorId, input.installation?.id ?? null, input.query],
-    initialPageParam: 1,
-    queryFn: ({ pageParam }: { pageParam: number }) => getRepositoryPage(input, pageParam),
-    getNextPageParam: (page: { repositories: unknown[] }, _pages: unknown[], pageNumber: number) =>
-      page.repositories.length === 20 ? pageNumber + 1 : undefined,
-    refetchOnWindowFocus: false, staleTime: timeConstants.FIVE_MINUTES,
-  }));
-  repositorySearchQuery = createQueryFamily(appScope, ({ connectorId, query }: {
-    connectorId: string | null; query: string;
-  }) => ({
-    queryKey: ["cloud-environments", "repositories", connectorId, query],
-    enabled: query !== "" && connectorId != null,
-    queryFn: () => {
-      if (connectorId == null) throw new Error("A connector ID is required to search repositories");
-      return searchRepositories(query, connectorId);
-    },
-    refetchOnMount: true, refetchOnWindowFocus: true, retry: false, staleTime: timeConstants.FIVE_MINUTES,
-  }));
-  createEnvironmentMutation = createMutationSignal(appScope, ({ scope }) => ({
-    mutationFn: createEnvironment,
-    onSuccess: () => invalidateEnvironmentLists(scope as unknown as QueryScope),
-  }));
-  updateEnvironmentMutation = createMutationSignal(appScope, ({ scope }) => ({
-    mutationFn: updateEnvironment,
-    onSuccess: async (_result: unknown, { environmentId }: { environmentId: string }) => {
-      await Promise.all([
-        invalidateEnvironmentLists(scope as unknown as QueryScope),
-        (scope as unknown as QueryScope).query.invalidate(environmentDetailsQuery, environmentId, { exact: true }),
-      ]);
-    },
-  }));
-  deleteEnvironmentMutation = createMutationSignal(appScope, ({ scope }) => ({
-    mutationFn: deleteEnvironment,
-    onSuccess: async (_result: unknown, environmentId: string) => {
-      const typedScope = scope as unknown as QueryScope;
-      typedScope.queryClient.removeQueries({
-        queryKey: typedScope.query.getOptions(environmentDetailsQuery, environmentId).queryKey,
-      });
-      await invalidateEnvironmentLists(typedScope);
-    },
-  }));
-  resetEnvironmentCacheMutation = createMutationSignal(appScope, ({ scope }) => ({
-    mutationFn: resetEnvironmentCache,
-    onSuccess: (_result: unknown, environmentId: string) =>
-      (scope as unknown as QueryScope).query.invalidate(environmentDetailsQuery, environmentId, { exact: true }),
-  }));
+var H, U, W, G, K, q, J, Y, X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    (n(),
+      r(),
+      l(),
+      z(),
+      (H = i(s, (e) => ({
+        queryKey: [`cloud-environments`, `details`, e],
+        queryFn: () => ue(e),
+        refetchOnMount: !0,
+        staleTime: t.FIVE_MINUTES,
+      }))),
+      (U = c(s, () => ({
+        queryKey: [`cloud-environments`, `machines`],
+        queryFn: k,
+        refetchOnMount: !0,
+        retry: !1,
+        staleTime: t.FIVE_MINUTES,
+      }))),
+      (W = c(s, () => ({
+        queryKey: [`cloud-environments`, `github-connectors`],
+        queryFn: de,
+        refetchOnMount: !0,
+        refetchOnWindowFocus: !0,
+        retry: !1,
+        staleTime: t.FIVE_MINUTES,
+      }))),
+      (G = i(s, (e) => ({
+        queryKey: [`cloud-environments`, `github-user-handle`, e],
+        queryFn: () => j(e),
+        refetchOnWindowFocus: !0,
+        retry: !1,
+        staleTime: t.FIVE_MINUTES,
+      }))),
+      (K = i(s, (e) => ({
+        queryKey: [`cloud-environments`, `github-installations`, e],
+        queryFn: () => M(e),
+        refetchOnWindowFocus: !0,
+        retry: !1,
+        staleTime: t.FIVE_MINUTES,
+      }))),
+      (q = a(s, (e) => ({
+        queryKey: [
+          `cloud-environments`,
+          `github-repository-pages`,
+          e.connectorId,
+          e.installation?.id ?? null,
+          e.query,
+        ],
+        initialPageParam: 1,
+        queryFn: ({ pageParam: t }) => N(e, t),
+        getNextPageParam: (e, t, n) => (e.repositories.length === 20 ? n + 1 : void 0),
+        refetchOnWindowFocus: !0,
+        staleTime: t.FIVE_MINUTES,
+      }))),
+      (J = i(s, ({ connectorId: e, query: n }) => ({
+        queryKey: [`cloud-environments`, `repositories`, e, n],
+        enabled: n !== `` && e != null,
+        queryFn: () => {
+          if (e == null) throw Error(`A connector ID is required to search repositories`);
+          return A(n, e);
+        },
+        refetchOnMount: !0,
+        refetchOnWindowFocus: !0,
+        retry: !1,
+        staleTime: t.FIVE_MINUTES,
+      }))),
+      (Y = o(s, ({ scope: e }) => ({ mutationFn: P, onSuccess: () => V(e) }))),
+      (X = o(s, ({ scope: e }) => ({
+        mutationFn: (e) => F(e),
+        onSuccess: async (t, { environmentId: n }) => {
+          await Promise.all([V(e), e.query.invalidate(H, n, { exact: !0 })]);
+        },
+      }))),
+      (Z = o(s, ({ scope: e }) => ({
+        mutationFn: I,
+        onSuccess: async (t, n) => {
+          (e.queryClient.removeQueries({ queryKey: e.query.getOptions(H, n).queryKey }),
+            await V(e));
+        },
+      }))),
+      (Q = o(s, ({ scope: e }) => ({
+        mutationFn: (e) => L(e),
+        onSuccess: (t, n) => e.query.invalidate(H, n, { exact: !0 }),
+      }))));
+  }))();
 }
-
 export {
-  initializeEnvironmentConstants as C,
-  updateEnvironmentRequest as S,
-  fetchGithubConnectors as _,
-  githubConnectorsQuery as a,
-  connectorIdFromUri as b,
-  githubHandleQuery as c,
-  initializeCloudEnvironmentQueries as d,
-  resetEnvironmentCacheMutation as f,
-  initializeConnectorQueries as g,
-  initializeEnvironmentApi as h,
-  environmentSearchOptions as i,
-  createEnvironmentMutation as l,
-  compareEnvironmentUsage as m,
-  machinesQuery as n,
-  installationsQuery as o,
-  updateEnvironmentMutation as p,
-  repositorySearchQuery as r,
-  repositoryPagesQuery as s,
-  environmentDetailsQuery as t,
-  deleteEnvironmentMutation as u,
-  canSaveEnvironment as v,
-  validateEnvironmentForm as w,
-  environmentToForm as x,
-  createEnvironmentRequest as y,
+  T as C,
+  oe as S,
+  E as _,
+  W as a,
+  ae as b,
+  G as c,
+  $ as d,
+  Q as f,
+  O as g,
+  z as h,
+  B as i,
+  Y as l,
+  le as m,
+  U as n,
+  K as o,
+  X as p,
+  J as r,
+  q as s,
+  H as t,
+  Z as u,
+  ie as v,
+  h as w,
+  re as x,
+  g as y,
 };

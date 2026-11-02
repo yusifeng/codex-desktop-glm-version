@@ -1,67 +1,44 @@
-// new-thread-panel-page —— 新建线程面板的兼容入口，统一回退到首页。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as announcementsChunk from "@rchunk/codex-home-announcements-current";
-void runtimeChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  FX: initializeSignalRuntime,
-  HX: useSignalValue,
-  I3: getJsxRuntime,
-  K2: initializeSharedUi,
-  n4: useIntl,
-} = appSharedChunk;
-const {
-  Dht: initializeNewThreadPanelState,
-  Du: initializeNewThreadComposer,
-  Oht: newThreadPanelState,
-  Qgn: initializeAccountContext,
-  Ygn: Navigate,
-  cln: initializeComposerLayout,
-  ifn: initializeFeatureGates,
-  ofn: useFeatureGate,
-} = appInitialChunk;
-const {
-  P: initializeNewThreadPanel,
-  ds: newThreadPanelGate,
-  dt: initializeNewThreadPanelAnalytics,
-  ko: initializeNewThreadPanelLayout,
-  r: initializeNewThreadPanelIcons,
-  rt: initializeNewThreadPanelRouting,
-  us: newThreadSurfaceGate,
-} = appPrimaryChunk;
-const { r: initializeCodexHomeAnnouncements } = announcementsChunk;
-
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function NewThreadPanelPage(): unknown {
-  useIntl();
-  useSignalValue(newThreadPanelState);
-  useFeatureGate(newThreadSurfaceGate);
-  return jsx.jsx(Navigate, { to: "/", replace: true });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, FX as n, HX as r, I3 as i, K2 as a, n4 as o } from "@rchunk/app-shared";
+import {
+  Dht as s,
+  Du as c,
+  Oht as l,
+  Qgn as u,
+  Ygn as d,
+  cln as f,
+  ifn as p,
+  ofn as m,
+} from "@rchunk/app-initial";
+import {
+  P as h,
+  ds as g,
+  dt as _,
+  ko as v,
+  r as y,
+  rt as b,
+  us as x,
+} from "@rchunk/app-primary";
+import { r as S } from "@rchunk/codex-home-announcements-current";
+function C() {
+  let e = (0, w.c)(21);
+  (o(), r(l), m(x));
+  {
+    let t;
+    return (
+      e[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, T.jsx)(d, { to: `/`, replace: !0 })), (e[0] = t))
+        : (t = e[0]),
+      t
+    );
+  }
 }
-
-function initializeNewThreadPanelPage(): void {
-  initializeRuntimeLazy();
-  initializeSignalRuntime();
-  initializeSharedUi();
-  initializeAccountContext();
-  initializeNewThreadPanel();
-  void newThreadPanelGate;
-  initializeNewThreadPanelAnalytics();
-  initializeNewThreadPanelLayout();
-  initializeComposerLayout();
-  initializeNewThreadComposer();
-  initializeNewThreadPanelState();
-  initializeNewThreadPanelIcons();
-  initializeFeatureGates();
-  initializeNewThreadPanelRouting();
-  initializeCodexHomeAnnouncements();
-  jsx = getJsxRuntime();
+var w, T;
+function E() {
+  return (E = e(() => {
+    ((w = t()), n(), a(), u(), g(), h(), S(), _(), v(), f(), c(), s(), y(), p(), b(), (T = i()));
+  }))();
 }
-
-initializeNewThreadPanelPage();
-export { NewThreadPanelPage };
+E();
+export { C as NewThreadPanelPage };

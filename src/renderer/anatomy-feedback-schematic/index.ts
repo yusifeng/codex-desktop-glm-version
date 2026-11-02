@@ -1,108 +1,59 @@
-// Anatomy negative-feedback schematic primitives. Release chunk: anatomy-feedback-schematic-88345e8df0bb.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as strokeChunk from "@rchunk/learning-block-stroke";
-import * as pathChunk from "@rchunk/learning-block-path";
-
-interface Point {
-  x: number;
-  y: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { I3 as t } from "@rchunk/app-shared";
+import { i as n, r } from "@rchunk/learning-block-stroke";
+import { n as i, t as a } from "@rchunk/learning-block-path";
+var o, s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    (i(),
+      n(),
+      (o = t()),
+      (s = `var(--text-tertiary)`),
+      (c = `var(--learning-block-visualization-surface, var(--bg-primary))`),
+      (l = `M195 78 C174 82 160 94 157 119 L145 190 M225 78 C246 82 260 94 263 119 L275 190 M180 91 C173 129 173 174 181 216 L179 326 M240 91 C247 129 247 174 239 216 L241 326 M181 216 C190 226 199 230 210 230 C221 230 230 226 239 216 M210 230 L201 326 M210 230 L219 326`),
+      (u = ({ children: e, outlineColor: t = s, surfaceColor: n = c }) =>
+        (0, o.jsxs)(`g`, {
+          "data-anatomy-body": `endocrine`,
+          children: [
+            (0, o.jsx)(`circle`, { cx: 210, cy: 44, r: 27, fill: n, stroke: t, strokeWidth: 2.5 }),
+            (0, o.jsx)(`path`, {
+              d: l,
+              fill: `none`,
+              stroke: t,
+              strokeWidth: 2.5,
+              strokeLinecap: `round`,
+              strokeLinejoin: `round`,
+            }),
+            e,
+          ],
+        })),
+      (d = ({
+        capOrientation: e = `vertical`,
+        color: t,
+        endTangent: n,
+        opacity: i,
+        path: s,
+        strokeWidth: c = 3,
+        target: l,
+      }) => {
+        let u = e === `vertical` ? { x: l.x, y: l.y - 8 } : { x: l.x - 8, y: l.y },
+          d = e === `vertical` ? { x: l.x, y: l.y + 8 } : { x: l.x + 8, y: l.y };
+        return (0, o.jsxs)(`g`, {
+          opacity: i,
+          "data-negative-feedback-path": !0,
+          children: [
+            (0, o.jsx)(a, {
+              path: s,
+              endTangent: n,
+              variant: `guideDashed`,
+              color: t,
+              strokeWidth: c,
+            }),
+            (0, o.jsx)(r, { from: u, to: d, variant: `solidAccent`, color: t, strokeWidth: c }),
+          ],
+        });
+      }));
+  }))();
 }
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>): unknown;
-  jsxs(type: unknown, props: Record<string, unknown>): unknown;
-}
-let jsxRuntime: JsxRuntime;
-const bodyPath =
-  "M195 78 C174 82 160 94 157 119 L145 190 M225 78 C246 82 260 94 263 119 L275 190 M180 91 C173 129 173 174 181 216 L179 326 M240 91 C247 129 247 174 239 216 L241 326 M181 216 C190 226 199 230 210 230 C221 230 230 226 239 216 M210 230 L201 326 M210 230 L219 326";
-function AnatomyBody({
-  children,
-  outlineColor = "var(--text-tertiary)",
-  surfaceColor = "var(--learning-block-visualization-surface, var(--bg-primary))",
-}: {
-  children?: unknown;
-  outlineColor?: string;
-  surfaceColor?: string;
-}): unknown {
-  return jsxRuntime.jsxs("g", {
-    "data-anatomy-body": "endocrine",
-    children: [
-      jsxRuntime.jsx("circle", {
-        cx: 210,
-        cy: 44,
-        r: 27,
-        fill: surfaceColor,
-        stroke: outlineColor,
-        strokeWidth: 2.5,
-      }),
-      jsxRuntime.jsx("path", {
-        d: bodyPath,
-        fill: "none",
-        stroke: outlineColor,
-        strokeWidth: 2.5,
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-      }),
-      children,
-    ],
-  });
-}
-function NegativeFeedbackPath({
-  capOrientation = "vertical",
-  color,
-  endTangent,
-  opacity,
-  path,
-  strokeWidth = 3,
-  target,
-}: {
-  capOrientation?: "vertical" | "horizontal";
-  color: string;
-  endTangent?: Point;
-  opacity?: number;
-  path: unknown;
-  strokeWidth?: number;
-  target: Point;
-}): unknown {
-  const from =
-    capOrientation === "vertical"
-      ? { x: target.x, y: target.y - 8 }
-      : { x: target.x - 8, y: target.y };
-  const to =
-    capOrientation === "vertical"
-      ? { x: target.x, y: target.y + 8 }
-      : { x: target.x + 8, y: target.y };
-  const Path = (pathChunk as unknown as { t: unknown }).t;
-  const Stroke = (strokeChunk as unknown as { r: unknown }).r;
-  return jsxRuntime.jsxs("g", {
-    opacity,
-    "data-negative-feedback-path": true,
-    children: [
-      jsxRuntime.jsx(Path, {
-        path,
-        endTangent,
-        variant: "guideDashed",
-        color,
-        strokeWidth,
-      }),
-      jsxRuntime.jsx(Stroke, {
-        from,
-        to,
-        variant: "solidAccent",
-        color,
-        strokeWidth,
-      }),
-    ],
-  });
-}
-function initializeAnatomyFeedbackSchematic(): void {
-  (pathChunk as unknown as { n?: () => void }).n?.();
-  (strokeChunk as unknown as { i?: () => void }).i?.();
-  jsxRuntime = (appSharedChunk as unknown as { I3(): JsxRuntime }).I3();
-}
-
-export {
-  NegativeFeedbackPath as n,
-  initializeAnatomyFeedbackSchematic as r,
-  AnatomyBody as t,
-};
+export { d as n, f as r, u as t };

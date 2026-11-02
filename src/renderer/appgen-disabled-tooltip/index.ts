@@ -1,73 +1,73 @@
-// appgen-disabled-tooltip —— Site 被禁用原因的提示文案。
-// 原版：app/webview/assets/appgen-disabled-tooltip-14337c05d2fb.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
-
-void runtimeChunk;
-const {
-  $3: initializeReactRuntime,
-  I3: getJsxRuntime,
-  K2: initializeInternationalization,
-  Y2: FormattedMessage,
-  e6: getReactRuntime,
-} = appSharedChunk;
-const {
-  Jot: ExternalLink,
-  Xot: initializeExternalLink,
-} = appInitialChunk;
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-const SITES_TERMS_URL = "https://openai.com/policies/chatgpt-sites-terms/";
-
-function LearnMoreLink(children: unknown): unknown {
-  return jsx.jsx(
-    ExternalLink,
-    {
-      className: "text-info underline decoration-current underline-offset-2",
-      href: SITES_TERMS_URL,
-      initiator: "sites_library",
-      children: React.Children.toArray(children),
-    },
-    "sites-terms-link",
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i, e6 as a } from "@rchunk/app-shared";
+import { Jot as o, Xot as s } from "@rchunk/app-initial";
+function c(e) {
+  let t = (0, u.c)(3),
+    { disabledBy: n } = e;
+  if (n === `openai`) {
+    let e;
+    return (
+      t[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, f.jsx)(i, {
+            id: `appgenPage.disabledByOpenAI.tooltip`,
+            defaultMessage: `Your site may violate OpenAI policies. <learnMore>Learn more</learnMore>`,
+            description: `Tooltip explaining why OpenAI disabled a site in the Sites list and linking to the ChatGPT Sites Terms`,
+            values: { learnMore: l },
+          })),
+          (t[0] = e))
+        : (e = t[0]),
+      e
+    );
+  }
+  if (n !== `workspace_admin`) {
+    let e;
+    return (
+      t[1] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, f.jsx)(i, {
+            id: `appgenPage.disabledUnknown.tooltip`,
+            defaultMessage: `Disabled`,
+            description: `Tooltip for a disabled site whose disabling actor is unavailable`,
+          })),
+          (t[1] = e))
+        : (e = t[1]),
+      e
+    );
+  }
+  let r;
+  return (
+    t[2] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((r = (0, f.jsx)(i, {
+          id: `appgenPage.disabled.tooltip`,
+          defaultMessage: `Disabled by an admin`,
+          description: `Tooltip explaining why a workspace admin disabled a site in the Sites list`,
+        })),
+        (t[2] = r))
+      : (r = t[2]),
+    r
   );
 }
-
-function AppgenDisabledTooltip({ disabledBy }: { disabledBy?: string | null }) {
-  if (disabledBy === "openai") {
-    return jsx.jsx(FormattedMessage, {
-      id: "appgenPage.disabledByOpenAI.tooltip",
-      defaultMessage:
-        "Your site may violate OpenAI policies. <learnMore>Learn more</learnMore>",
-      description:
-        "Tooltip explaining why OpenAI disabled a site in the Sites list and linking to the ChatGPT Sites Terms",
-      values: { learnMore: LearnMoreLink },
-    });
-  }
-  if (disabledBy !== "workspace_admin") {
-    return jsx.jsx(FormattedMessage, {
-      id: "appgenPage.disabledUnknown.tooltip",
-      defaultMessage: "Disabled",
-      description:
-        "Tooltip for a disabled site whose disabling actor is unavailable",
-    });
-  }
-  return jsx.jsx(FormattedMessage, {
-    id: "appgenPage.disabled.tooltip",
-    defaultMessage: "Disabled by an admin",
-    description:
-      "Tooltip explaining why a workspace admin disabled a site in the Sites list",
-  });
+function l(e) {
+  return (0, f.jsx)(
+    o,
+    {
+      className: `text-info underline decoration-current underline-offset-2`,
+      href: p,
+      initiator: `sites_library`,
+      children: d.Children.toArray(e),
+    },
+    `sites-terms-link`,
+  );
 }
-
-function initializeAppgenDisabledTooltip(): void {
-  initializeReactRuntime();
-  React = getReactRuntime();
-  initializeInternationalization();
-  initializeExternalLink();
-  jsx = getJsxRuntime();
+var u, d, f, p;
+function m() {
+  return (m = e(() => {
+    ((u = t()),
+      (d = a()),
+      r(),
+      s(),
+      (f = n()),
+      (p = `https://openai.com/policies/chatgpt-sites-terms/`));
+  }))();
 }
-
-export { initializeAppgenDisabledTooltip as n, AppgenDisabledTooltip as t };
+export { m as n, c as t };

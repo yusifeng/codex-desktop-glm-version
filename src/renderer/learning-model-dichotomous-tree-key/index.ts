@@ -1,54 +1,36 @@
-// Two-step dichotomous key for identifying four tree species.
-import "@rchunk/rolldown-runtime";
-
-interface TreeKeyValues {
-  firstChoice?: number | null;
-  secondChoice?: number | null;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = { firstChoice: -1, secondChoice: -1 }),
+      (n = (e) => (e === 0 || e === 1 ? e : -1)),
+      (r = (e) => {
+        let t = n(e.firstChoice);
+        return { firstChoice: t, secondChoice: t === -1 ? -1 : n(e.secondChoice) };
+      }),
+      (i = (e) => {
+        let t = r(e);
+        return t.firstChoice === -1
+          ? [`spruce`, `pine`, `magnolia`, `birch`]
+          : t.firstChoice === 0
+            ? t.secondChoice === -1
+              ? [`spruce`, `pine`]
+              : [t.secondChoice === 0 ? `spruce` : `pine`]
+            : t.secondChoice === -1
+              ? [`magnolia`, `birch`]
+              : [t.secondChoice === 0 ? `magnolia` : `birch`];
+      }),
+      (a = (e, t) => {
+        let n = r(e);
+        return t !== 0 && t !== 1
+          ? n
+          : n.firstChoice === -1
+            ? { firstChoice: t, secondChoice: -1 }
+            : n.secondChoice === -1
+              ? { ...n, secondChoice: t }
+              : n;
+      }));
+  }))();
 }
-
-interface NormalizedTreeKeyValues {
-  firstChoice: number;
-  secondChoice: number;
-}
-
-const defaultTreeKeyValues: NormalizedTreeKeyValues = { firstChoice: -1, secondChoice: -1 };
-const normalizeChoice = (choice: number | null | undefined): number => choice === 0 || choice === 1 ? choice : -1;
-
-function normalizeTreeKeyValues(values: TreeKeyValues): NormalizedTreeKeyValues {
-  const firstChoice = normalizeChoice(values.firstChoice);
-  return {
-    firstChoice,
-    secondChoice: firstChoice === -1 ? -1 : normalizeChoice(values.secondChoice),
-  };
-}
-
-function remainingTreeSpecies(values: TreeKeyValues): string[] {
-  const normalized = normalizeTreeKeyValues(values);
-  if (normalized.firstChoice === -1) return ["spruce", "pine", "magnolia", "birch"];
-  if (normalized.firstChoice === 0) {
-    return normalized.secondChoice === -1
-      ? ["spruce", "pine"]
-      : [normalized.secondChoice === 0 ? "spruce" : "pine"];
-  }
-  return normalized.secondChoice === -1
-    ? ["magnolia", "birch"]
-    : [normalized.secondChoice === 0 ? "magnolia" : "birch"];
-}
-
-function applyTreeKeyChoice(values: TreeKeyValues, choice: number): NormalizedTreeKeyValues {
-  const normalized = normalizeTreeKeyValues(values);
-  if (choice !== 0 && choice !== 1) return normalized;
-  if (normalized.firstChoice === -1) return { firstChoice: choice, secondChoice: -1 };
-  if (normalized.secondChoice === -1) return { ...normalized, secondChoice: choice };
-  return normalized;
-}
-
-function initializeDichotomousTreeKeyModel(): void {}
-
-export {
-  normalizeTreeKeyValues as a,
-  initializeDichotomousTreeKeyModel as i,
-  applyTreeKeyChoice as n,
-  remainingTreeSpecies as r,
-  defaultTreeKeyValues as t,
-};
+export { r as a, o as i, a as n, i as r, t };

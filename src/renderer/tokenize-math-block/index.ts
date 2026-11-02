@@ -1,1017 +1,802 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
-
-export type MathToken =
-  | { type: "number"; value: number }
-  | { type: "identifier" | "function" | "operator" | "paren"; value: string };
-
-export interface MathTokenizerOptions {
-  customFunctionNames?: ReadonlySet<string>;
-}
-
-export interface ParsedIntegral {
-  integrand: MathToken[];
-  lowerBound: MathToken[] | null;
-  upperBound: MathToken[] | null;
-  variable: string;
-}
-
-interface BalancedSegment {
-  content: string;
-  endIndex: number;
-}
-
-const BUILT_IN_FUNCTIONS = new Set([
-  "arccos",
-  "arcsin",
-  "arctan",
-  "sin",
-  "cos",
-  "sinh",
-  "cosh",
-  "tan",
-  "tanh",
-  "ln",
-  "log",
-  "sqrt",
-  "abs",
-  "exp",
-  "neg",
-  "sigmoid",
-  "relu",
-]);
-const GREEK_IDENTIFIERS = new Set(
-  "alpha.beta.gamma.delta.epsilon.varepsilon.zeta.eta.theta.vartheta.iota.kappa.lambda.mu.nu.xi.rho.varrho.sigma.varsigma.tau.upsilon.phi.varphi.chi.psi.omega".split(
-    ".",
-  ),
-);
-const KNOWN_IDENTIFIERS = new Set(["pi", ...GREEK_IDENTIFIERS]);
-const KNOWN_SYMBOLS = new Set([
-  ...BUILT_IN_FUNCTIONS,
-  ...KNOWN_IDENTIFIERS,
-  "cbrt",
-  "cot",
-  "csc",
-  "e",
-  "floor",
-  "o",
-  "sec",
-  "sgn",
-  "x",
-]);
-const SORTED_FUNCTIONS = [...BUILT_IN_FUNCTIONS].sort(
-  (left, right) => right.length - left.length,
-);
-const SORTED_IDENTIFIERS = [...KNOWN_IDENTIFIERS].sort(
-  (left, right) => right.length - left.length,
-);
-const FUNCTION_CALL = /^[a-z][a-z0-9_]*\([^)]*\)$/i;
-const FUNCTION_OF_X = /^([a-z][a-z0-9_]*)\(x\)$/i;
-const UNKNOWN_FUNCTION_CALL = /(^|[^a-zA-Z0-9_])(?:f|g|h|y)\s*\(/i;
-const MAX_TOKENS = 5_000;
-
-function stripMathDelimiters(value: string): string {
-  const trimmed = value.trim();
-  if (
-    (trimmed.startsWith("\\(") && trimmed.endsWith("\\)")) ||
-    (trimmed.startsWith("\\[") && trimmed.endsWith("\\]"))
-  )
-    return trimmed.slice(2, -2).trim();
-  return trimmed.startsWith("$") && trimmed.endsWith("$")
-    ? trimmed.slice(1, -1).trim()
-    : trimmed;
-}
-
-function unwrapBoxed(value: string): string {
-  const trimmed = value.trim();
-  return (
-    trimmed.match(/^\\boxed\{(?<inner>.*)\}$/)?.groups?.inner?.trim() ?? trimmed
-  );
-}
-
-function removeLatexSpacing(value: string): string {
-  return value
-    .replace(/\\(?:,|;|:|!| )/g, "")
-    .replace(/\\(?:quad|qquad)(?![a-zA-Z])/g, "")
-    .replace(/\\left(?![a-zA-Z])\s*/g, "")
-    .replace(/\\right(?![a-zA-Z])\s*/g, "");
-}
-
-function unwrapBraces(value: string): string {
-  let trimmed = value.trim();
-  while (trimmed.startsWith("{") && trimmed.endsWith("}"))
-    trimmed = trimmed.slice(1, -1).trim();
-  return trimmed;
-}
-
-function normalizeLeftHandSide(value: string): string {
-  return removeLatexSpacing(unwrapBraces(value)).replace(/\s+/g, "");
-}
-
-function isCustomFunctionOfX(value: string): boolean {
-  const name = value.match(FUNCTION_OF_X)?.[1]?.toLowerCase();
-  return name != null && !KNOWN_SYMBOLS.has(name);
-}
-
-function isDependentVariable(value: string): boolean {
-  return value === "y" || isCustomFunctionOfX(value);
-}
-
-function isNonDependentFunctionCall(value: string): boolean {
-  return FUNCTION_CALL.test(value) && !isDependentVariable(value);
-}
-
-function equalityIndexes(value: string): number[] {
-  const indexes: number[] = [];
-  for (let index = 0; index < value.length; index += 1)
-    if (value[index] === "=" && value[index - 1] !== "\\") indexes.push(index);
-  return indexes;
-}
-
-function stripDependentAssignment(value: string): string {
-  const unwrapped = stripMathDelimiters(value);
-  const indexes = equalityIndexes(unwrapped);
-  if (indexes.length !== 1) return value;
-  const equalityIndex = indexes[0] ?? -1;
-  const left = unwrapped.slice(0, equalityIndex).trim();
-  const right = unwrapped.slice(equalityIndex + 1).trim();
-  if (right.length === 0) return value;
-  return isDependentVariable(normalizeLeftHandSide(left).toLowerCase())
-    ? right
-    : value;
-}
-
-function balancedSegment(
-  value: string,
-  startIndex: number,
-  opener: string,
-  closer: string,
-): BalancedSegment | null {
-  if (value[startIndex] !== opener) return null;
-  let depth = 0;
-  for (let index = startIndex; index < value.length; index += 1) {
-    if (value[index] === opener) depth += 1;
-    else if (value[index] === closer && --depth === 0)
-      return {
-        content: value.slice(startIndex + 1, index),
-        endIndex: index,
-      };
-  }
-  return null;
-}
-
-const bracedSegment = (value: string, startIndex: number) =>
-  balancedSegment(value, startIndex, "{", "}");
-const parenthesizedSegment = (value: string, startIndex: number) =>
-  balancedSegment(value, startIndex, "(", ")");
-
-function bareSegment(
-  value: string,
-  startIndex: number,
-): BalancedSegment | null {
-  let endIndex = startIndex;
-  if (value[endIndex] === "+" || value[endIndex] === "-") endIndex += 1;
-  while (endIndex < value.length && /[0-9a-zA-Z.]/.test(value[endIndex] ?? ""))
-    endIndex += 1;
-  if (endIndex === startIndex) return null;
-  if (
-    endIndex === startIndex + 1 &&
-    (value[startIndex] === "+" || value[startIndex] === "-")
-  )
-    return null;
-  return {
-    content: value.slice(startIndex, endIndex),
-    endIndex: endIndex - 1,
-  };
-}
-
-function rewriteLogBases(value: string): string {
-  let output = "";
-  let cursor = 0;
-  while (cursor < value.length) {
-    if (!value.startsWith("\\log", cursor)) {
-      output += value[cursor] ?? "";
-      cursor += 1;
-      continue;
-    }
-    const logStart = cursor;
-    let segmentStart = cursor + 4;
-    while (value[segmentStart] === " ") segmentStart += 1;
-    if (value[segmentStart] !== "_") {
-      output += value.slice(logStart, segmentStart);
-      cursor = segmentStart;
-      continue;
-    }
-    segmentStart += 1;
-    while (value[segmentStart] === " ") segmentStart += 1;
-    const base =
-      bracedSegment(value, segmentStart) ??
-      parenthesizedSegment(value, segmentStart) ??
-      bareSegment(value, segmentStart);
-    if (base == null) {
-      output += "\\log";
-      cursor = logStart + 4;
-      continue;
-    }
-    segmentStart = base.endIndex + 1;
-    while (value[segmentStart] === " ") segmentStart += 1;
-    let argument =
-      bracedSegment(value, segmentStart) ??
-      parenthesizedSegment(value, segmentStart);
-    if (argument == null && /[0-9a-zA-Z.]/.test(value[segmentStart] ?? ""))
-      argument = bareSegment(value, segmentStart);
-    if (argument == null) {
-      output += "\\log";
-      cursor = logStart + 4;
-      continue;
-    }
-    output += `(ln(${argument.content.trim()})/ln(${base.content.trim()}))`;
-    cursor = argument.endIndex + 1;
-  }
-  return output;
-}
-
-function rewriteFractions(value: string): string {
-  let output = "";
-  let cursor = 0;
-  while (cursor < value.length) {
-    if (
-      !value.startsWith("\\tfrac", cursor) &&
-      !value.startsWith("\\frac", cursor)
-    ) {
-      output += value[cursor] ?? "";
-      cursor += 1;
-      continue;
-    }
-    const marker = value.startsWith("\\tfrac", cursor) ? "\\tfrac" : "\\frac";
-    cursor += marker.length;
-    while (value[cursor] === " ") cursor += 1;
-    const numerator = bracedSegment(value, cursor);
-    if (numerator == null) {
-      output += marker;
-      continue;
-    }
-    cursor = numerator.endIndex + 1;
-    while (value[cursor] === " ") cursor += 1;
-    const denominator = bracedSegment(value, cursor);
-    if (denominator == null) {
-      output += `(${numerator.content})`;
-      continue;
-    }
-    cursor = denominator.endIndex + 1;
-    output += `(${numerator.content})/(${denominator.content})`;
-  }
-  return output;
-}
-
-function rewriteSquareRoots(value: string): string {
-  let output = "";
-  let cursor = 0;
-  while (cursor < value.length) {
-    const trailing = value[cursor + 5];
-    if (
-      value.startsWith("\\sqrt", cursor) &&
-      (trailing == null || !/[a-zA-Z]/.test(trailing))
-    ) {
-      cursor += 5;
-      while (value[cursor] === " ") cursor += 1;
-      const argument = bracedSegment(value, cursor);
-      if (argument == null) {
-        output += "sqrt";
-        continue;
-      }
-      cursor = argument.endIndex + 1;
-      output += `sqrt(${argument.content})`;
-      continue;
-    }
-    output += value[cursor] ?? "";
-    cursor += 1;
-  }
-  return output;
-}
-
-function rewriteAbsoluteValues(value: string): string {
-  if ((value.match(/\|/g) ?? []).length % 2 !== 0) return value;
-  let output = "";
-  let open = false;
-  for (const character of value) {
-    if (character === "|") {
-      output += open ? ")" : "abs(";
-      open = !open;
-    } else output += character;
-  }
-  return output;
-}
-
-const TRIG_FUNCTIONS = [
-  "sinh",
-  "cosh",
-  "tanh",
-  "sin",
-  "cos",
-  "tan",
-  "sec",
-  "csc",
-  "cot",
-];
-const INVERSE_TRIG: Record<string, string> = {
-  sin: "arcsin",
-  cos: "arccos",
-  tan: "arctan",
-  sec: "arcsec",
-};
-const isWordCharacter = (value: string | undefined) =>
-  value != null && /[0-9a-zA-Z_.]/.test(value);
-
-function numberSegment(
-  value: string,
-  startIndex: number,
-): BalancedSegment | null {
-  const match = value.slice(startIndex).match(/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)/);
-  if (match == null) return null;
-  return {
-    content: match[0],
-    endIndex: startIndex + match[0].length - 1,
-  };
-}
-
-function wordSegment(
-  value: string,
-  startIndex: number,
-): BalancedSegment | null {
-  let endIndex = startIndex;
-  if (value[endIndex] === "+" || value[endIndex] === "-") endIndex += 1;
-  while (endIndex < value.length && isWordCharacter(value[endIndex]))
-    endIndex += 1;
-  if (endIndex === startIndex) return null;
-  if (
-    endIndex === startIndex + 1 &&
-    (value[startIndex] === "+" || value[startIndex] === "-")
-  )
-    return null;
-  return {
-    content: value.slice(startIndex, endIndex),
-    endIndex: endIndex - 1,
-  };
-}
-
-function rewriteTrigPowers(value: string): string {
-  let output = "";
-  let cursor = 0;
-  const isLetter = (character: string | undefined) =>
-    character != null && /[a-zA-Z]/.test(character);
-  const wordStart = (index: number) => {
-    while (index > 0 && isLetter(value[index - 1])) index -= 1;
-    return index;
-  };
-  const wordEnd = (index: number) => {
-    while (index < value.length && isLetter(value[index])) index += 1;
-    return index;
-  };
-
-  while (cursor < value.length) {
-    const name = TRIG_FUNCTIONS.find((candidate) =>
-      value.startsWith(candidate, cursor),
-    );
-    if (name == null) {
-      output += value[cursor] ?? "";
-      cursor += 1;
-      continue;
-    }
-    if (value[cursor + name.length] !== "^") {
-      output += value[cursor] ?? "";
-      cursor += 1;
-      continue;
-    }
-    const arcStart = cursor - 3;
-    if (
-      arcStart >= 0 &&
-      value.slice(arcStart, cursor + name.length).toLowerCase() === `arc${name}`
-    ) {
-      output += value[cursor] ?? "";
-      cursor += 1;
-      continue;
-    }
-    const previousIsLetter = isLetter(value[cursor - 1]);
-    const start = previousIsLetter ? wordStart(cursor) : cursor;
-    const end = wordEnd(cursor);
-    const prefix = value.slice(start, cursor).toLowerCase();
-    const fullWord = value.slice(start, end).toLowerCase();
-    const recognizedFullWord =
-      cursor > start &&
-      (BUILT_IN_FUNCTIONS.has(fullWord) || KNOWN_IDENTIFIERS.has(fullWord));
-    const recognizedPrefix =
-      prefix.length === 1 ||
-      KNOWN_IDENTIFIERS.has(prefix) ||
-      BUILT_IN_FUNCTIONS.has(prefix);
-    if (previousIsLetter && (recognizedFullWord || !recognizedPrefix)) {
-      output += value[cursor] ?? "";
-      cursor += 1;
-      continue;
-    }
-    let segmentStart = cursor + name.length + 1;
-    while (value[segmentStart] === " ") segmentStart += 1;
-    const power =
-      bracedSegment(value, segmentStart) ?? numberSegment(value, segmentStart);
-    if (power == null) {
-      output += value[cursor] ?? "";
-      cursor += 1;
-      continue;
-    }
-    segmentStart = power.endIndex + 1;
-    while (value[segmentStart] === " ") segmentStart += 1;
-    const argument =
-      bracedSegment(value, segmentStart) ??
-      parenthesizedSegment(value, segmentStart) ??
-      wordSegment(value, segmentStart);
-    if (argument == null) {
-      output += value[cursor] ?? "";
-      cursor += 1;
-      continue;
-    }
-    const exponent = power.content.trim();
-    const argumentText = argument.content.trim();
-    if (exponent === "-1") {
-      const inverse = INVERSE_TRIG[name];
-      if (inverse == null) return "";
-      output += `${inverse}(${argumentText})`;
-    } else output += `(${name}(${argumentText}))^(${exponent})`;
-    cursor = argument.endIndex + 1;
-  }
-  return output;
-}
-
-function normalizeSubscripts(value: string): string {
-  return value.replace(/([a-zA-Z]+)_\{?([a-zA-Z0-9]+)\}?/g, "$1_$2");
-}
-
-function normalizeLatex(value: string): string {
-  let normalized = removeLatexSpacing(unwrapBoxed(stripMathDelimiters(value)));
-  if (/\\begin\s*\{|\\end\s*\{|\\cases\b/.test(normalized)) return "";
-  normalized = rewriteLogBases(normalized);
-  for (let attempt = 0; attempt < 10; attempt += 1) {
-    const rewritten = rewriteFractions(normalized);
-    if (rewritten === normalized) break;
-    normalized = rewritten;
-    if (!/\\(?:tfrac|frac)/.test(normalized)) break;
-  }
-  if (/\\sqrt\s*\[/.test(normalized)) return "";
-  normalized = rewriteSquareRoots(normalized);
-  normalized = rewriteAbsoluteValues(normalized);
-  normalized = normalized.replace(/\\sigma\s*(?=\()/g, "sigmoid");
-  normalized = normalized.replace(
-    /\\(?:operatorname|mathrm|text)\s*\{\s*relu\s*\}/gi,
-    "relu",
-  );
-  normalized = normalized
-    .replace(/[−–—]/g, "-")
-    .replace(/[×·⋅]/g, "*")
-    .replace(/÷/g, "/")
-    .replace(/π/g, "pi")
-    .replace(/\\arcsin(?![a-zA-Z])/g, "arcsin")
-    .replace(/\\arccos(?![a-zA-Z])/g, "arccos")
-    .replace(/\\arctan(?![a-zA-Z])/g, "arctan")
-    .replace(/\\sin\^\{-1\}/g, "arcsin")
-    .replace(/\\cos\^\{-1\}/g, "arccos")
-    .replace(/\\tan\^\{-1\}/g, "arctan")
-    .replace(/\\pi(?![a-zA-Z])/g, "pi")
-    .replace(/\\cdot(?![a-zA-Z])/g, "*")
-    .replace(/\\times(?![a-zA-Z])/g, "*")
-    .replace(/\\sinh(?![a-zA-Z])/g, "sinh")
-    .replace(/\\cosh(?![a-zA-Z])/g, "cosh")
-    .replace(/\\sin(?![a-zA-Z])/g, "sin")
-    .replace(/\\cos(?![a-zA-Z])/g, "cos")
-    .replace(/\\tanh(?![a-zA-Z])/g, "tanh")
-    .replace(/\\tan(?![a-zA-Z])/g, "tan")
-    .replace(/\\ln(?![a-zA-Z])/g, "ln")
-    .replace(/\\log(?![a-zA-Z])/g, "log")
-    .replace(/\\exp(?![a-zA-Z])/g, "exp")
-    .replace(/sin\^\{-1\}/g, "arcsin")
-    .replace(/cos\^\{-1\}/g, "arccos")
-    .replace(/tan\^\{-1\}/g, "arctan");
-  for (const identifier of GREEK_IDENTIFIERS)
-    normalized = normalized.replace(
-      new RegExp(String.raw`\\${identifier}(?![a-zA-Z])`, "g"),
-      identifier,
-    );
-  return rewriteTrigPowers(normalizeSubscripts(normalized))
-    .replace(/{/g, "(")
-    .replace(/}/g, ")");
-}
-
-function tokenizeExpression(
-  value: string,
-  options?: MathTokenizerOptions,
-): MathToken[] | null {
-  const customFunctions = options?.customFunctionNames;
-  const normalized = normalizeLatex(stripDependentAssignment(value));
-  if (
-    normalized.trim().length === 0 ||
-    /\\[a-zA-Z]+/.test(normalized) ||
-    (UNKNOWN_FUNCTION_CALL.test(normalized) &&
-      [...normalized.matchAll(/([a-z][a-z0-9_]*)\s*\(/gi)].some(
-        ([, name]) =>
-          name != null &&
-          ["f", "g", "h", "y"].includes(name.toLowerCase()) &&
-          !customFunctions?.has(name.toLowerCase()),
-      ))
-  )
-    return null;
-
-  const tokens: MathToken[] = [];
-  let depth = 0;
-  let cursor = 0;
-  const isDigit = (character: string | undefined) =>
-    character != null && character >= "0" && character <= "9";
-  const isLetter = (character: string | undefined) =>
-    character != null &&
-    ((character >= "a" && character <= "z") ||
-      (character >= "A" && character <= "Z"));
-  const pushWord = (word: string) => {
-    const normalizedWord = word.toLowerCase();
-    tokens.push({
-      type:
-        BUILT_IN_FUNCTIONS.has(normalizedWord) ||
-        customFunctions?.has(normalizedWord)
-          ? "function"
-          : "identifier",
-      value: normalizedWord,
-    });
-  };
-
-  while (cursor < normalized.length) {
-    if (tokens.length > MAX_TOKENS) return null;
-    const character = normalized[cursor];
-    if (/\s/.test(character ?? "")) {
-      cursor += 1;
-      continue;
-    }
-    if (character === "(" || character === "[" || character === "{") {
-      tokens.push({ type: "paren", value: "(" });
-      depth += 1;
-      cursor += 1;
-      continue;
-    }
-    if (character === ")" || character === "]" || character === "}") {
-      depth -= 1;
-      if (depth < 0) return null;
-      tokens.push({ type: "paren", value: ")" });
-      cursor += 1;
-      continue;
-    }
-    if (character === "_") {
-      const previous = tokens.at(-1);
-      if (previous?.type === "identifier") {
-        const start = cursor + 1;
-        let end = start;
-        let suffix = "";
-        if (isDigit(normalized[start])) {
-          while (isDigit(normalized[end])) end += 1;
-          suffix = normalized.slice(start, end);
-        } else if (isLetter(normalized[start])) {
-          const remainder = normalized.slice(start).toLowerCase();
-          const identifier = SORTED_IDENTIFIERS.find((candidate) =>
-            remainder.startsWith(candidate),
-          );
-          if (identifier != null) {
-            end = start + identifier.length;
-            suffix = identifier;
-          } else {
-            end = start + 1;
-            suffix = normalized[start]?.toLowerCase() ?? "";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t,
+  n,
+  r,
+  i,
+  a,
+  o,
+  s,
+  c,
+  l,
+  u,
+  d,
+  f,
+  p,
+  m,
+  h,
+  g,
+  _,
+  v,
+  y,
+  b,
+  x,
+  S,
+  C,
+  w,
+  T,
+  E,
+  D,
+  O,
+  k,
+  A,
+  j,
+  M,
+  N,
+  P,
+  F,
+  I,
+  L,
+  R,
+  z,
+  B,
+  V,
+  H,
+  U,
+  W,
+  G,
+  K,
+  q,
+  J,
+  Y,
+  X,
+  Z,
+  Q,
+  $,
+  ee,
+  te;
+function ne() {
+  return (ne = e(() => {
+    ((t = (e) => {
+      if (e == null) throw Error(`Unexpected null or undefined value`);
+      return e;
+    }),
+      (n = new Set([
+        `arccos`,
+        `arcsin`,
+        `arctan`,
+        `sin`,
+        `cos`,
+        `sinh`,
+        `cosh`,
+        `tan`,
+        `tanh`,
+        `ln`,
+        `log`,
+        `sqrt`,
+        `abs`,
+        `exp`,
+        `neg`,
+        `sigmoid`,
+        `relu`,
+      ])),
+      (r = new Set(
+        `alpha.beta.gamma.delta.epsilon.varepsilon.zeta.eta.theta.vartheta.iota.kappa.lambda.mu.nu.xi.rho.varrho.sigma.varsigma.tau.upsilon.phi.varphi.chi.psi.omega`.split(
+          `.`,
+        ),
+      )),
+      (i = new Set([`pi`, ...Array.from(r)])),
+      (a = /^[a-z][a-z0-9_]*\([^)]*\)$/i),
+      (o = /^([a-z][a-z0-9_]*)\(x\)$/i),
+      (s = new Set([...n, ...i, `cbrt`, `cot`, `csc`, `e`, `floor`, `o`, `sec`, `sgn`, `x`])),
+      (c = Array.from(n).sort((e, t) => t.length - e.length)),
+      (l = Array.from(i).sort((e, t) => t.length - e.length)),
+      (u = 5e3),
+      (d = /(^|[^a-zA-Z0-9_])(?:f|g|h|y)\s*\(/i),
+      (f = (e) => {
+        let t = e.trim();
+        return (t.startsWith(`\\(`) && t.endsWith(`\\)`)) ||
+          (t.startsWith(`\\[`) && t.endsWith(`\\]`))
+          ? t.slice(2, -2).trim()
+          : t.startsWith(`$`) && t.endsWith(`$`)
+            ? t.slice(1, -1).trim()
+            : t;
+      }),
+      (p = (e) => {
+        let t = e.trim(),
+          n = t.match(/^\\boxed\{(?<inner>.*)\}$/);
+        return n?.groups?.inner ? n.groups.inner.trim() : t;
+      }),
+      (m = (e) =>
+        e
+          .replace(/\\(?:,|;|:|!| )/g, ``)
+          .replace(/\\(?:quad|qquad)(?![a-zA-Z])/g, ``)
+          .replace(/\\left(?![a-zA-Z])\s*/g, ``)
+          .replace(/\\right(?![a-zA-Z])\s*/g, ``)),
+      (h = (e) => {
+        let t = e.trim();
+        for (; t.startsWith(`{`) && t.endsWith(`}`);) t = t.slice(1, -1).trim();
+        return t;
+      }),
+      (g = (e) => m(h(e)).replace(/\s+/g, ``)),
+      (_ = (e) => {
+        let t = e.match(o);
+        if (!t) return !1;
+        let n = t[1]?.toLowerCase();
+        return n != null && !s.has(n);
+      }),
+      (v = (e) => e === `y` || _(e)),
+      (y = (e) => a.test(e) && !v(e)),
+      (b = (e) => {
+        let t = [];
+        for (let n = 0; n < e.length; n += 1) e[n] === `=` && e[n - 1] !== `\\` && t.push(n);
+        return t;
+      }),
+      (x = (e) => {
+        let t = f(e),
+          n = b(t);
+        if (n.length !== 1) return e;
+        let r = n[0],
+          i = t.slice(0, r).trim(),
+          a = t.slice(r + 1).trim();
+        if (!a) return e;
+        let o = g(i).toLowerCase();
+        return v(o) ? a : e;
+      }),
+      (S = (e, t, n, r) => {
+        if (e[t] !== n) return null;
+        let i = 0,
+          a = t;
+        for (; a < e.length; a += 1)
+          if (e[a] === n) i += 1;
+          else if (e[a] === r && (--i, i === 0)) return { content: e.slice(t + 1, a), endIndex: a };
+        return null;
+      }),
+      (C = (e, t) => S(e, t, `{`, `}`)),
+      (w = (e, t) => S(e, t, `(`, `)`)),
+      (T = (e, t) => {
+        let n = t;
+        for ((e[n] === `+` || e[n] === `-`) && (n += 1); n < e.length && /[0-9a-zA-Z.]/.test(e[n]);)
+          n += 1;
+        if (n === t) return null;
+        if (n === t + 1) {
+          let n = e[t];
+          if (n === `+` || n === `-`) return null;
+        }
+        return { content: e.slice(t, n), endIndex: n - 1 };
+      }),
+      (E = (e) => {
+        let t = ``,
+          n = 0;
+        for (; n < e.length;) {
+          if (!e.startsWith(`\\log`, n)) {
+            ((t += e[n]), (n += 1));
+            continue;
           }
-        }
-        if (suffix.length > 0) {
-          previous.value = `${previous.value}_${suffix}`;
-          cursor = end;
-          continue;
-        }
-      }
-      cursor += 1;
-      continue;
-    }
-    if (["+", "-", "*", "/", "^"].includes(character ?? "")) {
-      tokens.push({ type: "operator", value: character ?? "" });
-      cursor += 1;
-      continue;
-    }
-    if (
-      isDigit(character) ||
-      (character === "." && isDigit(normalized[cursor + 1]))
-    ) {
-      const match = normalized
-        .slice(cursor)
-        .match(/^(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?/);
-      const raw = match?.[0];
-      const number = raw == null ? Number.NaN : Number(raw);
-      if (!Number.isFinite(number)) return null;
-      tokens.push({ type: "number", value: number });
-      cursor += raw?.length ?? 0;
-      continue;
-    }
-    if (isLetter(character)) {
-      let end = cursor + 1;
-      while (isLetter(normalized[end])) end += 1;
-      const word = normalized.slice(cursor, end).toLowerCase();
-      if (
-        BUILT_IN_FUNCTIONS.has(word) ||
-        customFunctions?.has(word) ||
-        KNOWN_IDENTIFIERS.has(word) ||
-        word.length === 1
-      ) {
-        pushWord(word);
-        cursor = end;
-        continue;
-      }
-      let offset = 0;
-      while (offset < word.length) {
-        let matched = false;
-        for (const name of SORTED_FUNCTIONS) {
-          if (!word.startsWith(name, offset)) continue;
-          tokens.push({ type: "function", value: name });
-          offset += name.length;
-          matched = true;
-          break;
-        }
-        if (!matched) {
-          for (const name of SORTED_IDENTIFIERS) {
-            if (!word.startsWith(name, offset)) continue;
-            tokens.push({ type: "identifier", value: name });
-            offset += name.length;
-            matched = true;
-            break;
+          let r = n,
+            i = n + 4;
+          for (; e[i] === ` `;) i += 1;
+          if (e[i] !== `_`) {
+            ((t += e.slice(r, i)), (n = i));
+            continue;
           }
+          for (i += 1; e[i] === ` `;) i += 1;
+          let a = C(e, i) ?? w(e, i) ?? T(e, i);
+          if (!a) {
+            ((t += `\\log`), (n = r + 4));
+            continue;
+          }
+          for (i = a.endIndex + 1; e[i] === ` `;) i += 1;
+          let o = C(e, i) ?? w(e, i);
+          if (!o) {
+            let t = e[i];
+            t && /[0-9a-zA-Z.]/.test(t) && (o = T(e, i));
+          }
+          if (!o) {
+            ((t += `\\log`), (n = r + 4));
+            continue;
+          }
+          let s = a.content.trim(),
+            c = o.content.trim();
+          ((t += `(ln(${c})/ln(${s}))`), (n = o.endIndex + 1));
         }
-        if (!matched) {
-          tokens.push({ type: "identifier", value: word[offset] ?? "" });
-          offset += 1;
+        return t;
+      }),
+      (D = (e) => {
+        let t = ``,
+          n = 0;
+        for (; n < e.length;) {
+          if (e.startsWith(`\\tfrac`, n) || e.startsWith(`\\frac`, n)) {
+            let r = e.startsWith(`\\tfrac`, n) ? `\\tfrac` : `\\frac`;
+            for (n += r.length; e[n] === ` `;) n += 1;
+            let i = C(e, n);
+            if (!i) {
+              t += r;
+              continue;
+            }
+            for (n = i.endIndex + 1; e[n] === ` `;) n += 1;
+            let a = C(e, n);
+            if (!a) {
+              t += `(${i.content})`;
+              continue;
+            }
+            ((n = a.endIndex + 1), (t += `(${i.content})/(${a.content})`));
+            continue;
+          }
+          ((t += e[n]), (n += 1));
         }
-      }
-      cursor = end;
-      continue;
-    }
-    return null;
-  }
-  if (depth !== 0) return null;
-  return insertImplicitFunctionParentheses(tokens);
-}
-
-function insertImplicitFunctionParentheses(tokens: MathToken[]): MathToken[] {
-  const output: MathToken[] = [];
-  const isSign = (token: MathToken) =>
-    token.type === "operator" && (token.value === "+" || token.value === "-");
-  for (let index = 0; index < tokens.length; index += 1) {
-    const token = tokens[index]!;
-    output.push(token);
-    if (token.type !== "function") continue;
-    const next = tokens[index + 1];
-    if (next == null || (next.type === "paren" && next.value === "(")) continue;
-    output.push({ type: "paren", value: "(" });
-    let depth = 0;
-    let leadingSign = true;
-    let previous: MathToken | null = null;
-    let cursor = index + 1;
-    for (; cursor < tokens.length; cursor += 1) {
-      const candidate = tokens[cursor]!;
-      const previousWasFunction = previous?.type === "function";
-      if (
-        (depth === 0 &&
-          candidate.type === "operator" &&
-          ["+", "-", "*", "/"].includes(candidate.value) &&
-          cursor > index + 1) ||
-        (depth === 0 &&
-          candidate.type === "paren" &&
-          candidate.value === "(" &&
-          cursor > index + 1 &&
-          !leadingSign &&
-          !previousWasFunction) ||
-        (depth === 0 && candidate.type === "paren" && candidate.value === ")")
-      )
-        break;
-      output.push(candidate);
-      const atTopLevel = depth === 0;
-      if (candidate.type === "paren" && candidate.value === "(") depth += 1;
-      else if (candidate.type === "paren" && candidate.value === ")")
-        depth -= 1;
-      if (atTopLevel) {
-        if (leadingSign && !isSign(candidate)) leadingSign = false;
-        previous = candidate;
-      }
-    }
-    output.push({ type: "paren", value: ")" });
-    index = cursor - 1;
-  }
-  return output;
-}
-
-function insertImplicitMultiplication(tokens: MathToken[]): MathToken[] {
-  const output: MathToken[] = [];
-  const canEndValue = (token: MathToken) =>
-    token.type === "number" ||
-    token.type === "identifier" ||
-    (token.type === "paren" && token.value === ")");
-  const canStartValue = (token: MathToken) =>
-    token.type === "number" ||
-    token.type === "identifier" ||
-    token.type === "function" ||
-    (token.type === "paren" && token.value === "(");
-  for (const token of tokens) {
-    const previous = output.at(-1);
-    if (previous != null && canEndValue(previous) && canStartValue(token))
-      output.push({ type: "operator", value: "*" });
-    output.push(token);
-  }
-  return output;
-}
-
-function toPostfix(tokens: MathToken[]): MathToken[] | null {
-  const output: MathToken[] = [];
-  const operators: MathToken[] = [];
-  const precedence = (token: MathToken) => {
-    if (token.type !== "operator") return 0;
-    if (token.value === "^") return 4;
-    if (token.value === "*" || token.value === "/") return 3;
-    if (token.value === "+" || token.value === "-") return 2;
-    return 0;
-  };
-  const isUnaryPosition = (token: MathToken | null) =>
-    token == null ||
-    token.type === "operator" ||
-    (token.type === "paren" && token.value === "(") ||
-    token.type === "function";
-  let previous: MathToken | null = null;
-
-  for (let index = 0; index < tokens.length; index += 1) {
-    const token = tokens[index]!;
-    const next = tokens[index + 1] ?? null;
-    if (token.type === "number" || token.type === "identifier")
-      output.push(token);
-    else if (token.type === "function") operators.push(token);
-    else if (token.type === "operator") {
-      if (token.value === "+" && isUnaryPosition(previous)) {
-        previous = token;
-        continue;
-      }
-      if (token.value === "-" && isUnaryPosition(previous)) {
-        operators.push({ type: "function", value: "neg" });
-        previous = token;
-        continue;
-      }
-      while (operators.length > 0) {
-        const top = operators.at(-1)!;
-        if (top.type === "function") {
-          if (token.value === "^") break;
-          output.push(operators.pop()!);
-          continue;
+        return t;
+      }),
+      (O = (e) => {
+        let t = ``,
+          n = 0;
+        for (; n < e.length;) {
+          let r = e[n + 5];
+          if (e.startsWith(`\\sqrt`, n) && (r == null || !/[a-zA-Z]/.test(r))) {
+            for (n += 5; e[n] === ` `;) n += 1;
+            let r = C(e, n);
+            if (!r) {
+              t += `sqrt`;
+              continue;
+            }
+            ((n = r.endIndex + 1), (t += `sqrt(${r.content})`));
+            continue;
+          }
+          ((t += e[n]), (n += 1));
         }
+        return t;
+      }),
+      (k = (e) => {
+        if ((e.match(/\|/g) ?? []).length % 2 != 0) return e;
+        let t = ``,
+          n = !1;
+        for (let r = 0; r < e.length; r += 1) {
+          let i = e[r];
+          if (i === `|`) {
+            ((t += n ? `)` : `abs(`), (n = !n));
+            continue;
+          }
+          t += i;
+        }
+        return t;
+      }),
+      (A = [`sinh`, `cosh`, `tanh`, `sin`, `cos`, `tan`, `sec`, `csc`, `cot`]),
+      (j = { sin: `arcsin`, cos: `arccos`, tan: `arctan`, sec: `arcsec` }),
+      (M = (e) => /[0-9a-zA-Z_.]/.test(e)),
+      (N = (e, t) => {
+        let n = e.slice(t).match(/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)/);
+        if (!n) return null;
+        let r = n[0];
+        return { content: r, endIndex: t + r.length - 1 };
+      }),
+      (P = (e, t) => {
+        let n = t;
+        for ((e[n] === `+` || e[n] === `-`) && (n += 1); n < e.length && M(e[n]);) n += 1;
+        if (n === t) return null;
+        if (n === t + 1) {
+          let n = e[t];
+          if (n === `+` || n === `-`) return null;
+        }
+        return { content: e.slice(t, n), endIndex: n - 1 };
+      }),
+      (F = (e) => {
+        let t = ``,
+          r = 0,
+          a = (e) => e != null && /[a-zA-Z]/.test(e),
+          o = (t) => {
+            let n = t;
+            for (; n > 0 && a(e[n - 1]);) --n;
+            return n;
+          },
+          s = (t) => {
+            let n = t;
+            for (; n < e.length && a(e[n]);) n += 1;
+            return n;
+          };
+        for (; r < e.length;) {
+          let c = A.find((t) => e.startsWith(t, r));
+          if (!c) {
+            ((t += e[r]), (r += 1));
+            continue;
+          }
+          let l = e[r - 1];
+          if (e[r + c.length] !== `^`) {
+            ((t += e[r]), (r += 1));
+            continue;
+          }
+          let u = r - 3;
+          if (u >= 0 && e.slice(u, r + c.length).toLowerCase() === `arc${c}`) {
+            ((t += e[r]), (r += 1));
+            continue;
+          }
+          let d = a(l),
+            f = d ? o(r) : r,
+            p = s(r),
+            m = e.slice(f, r).toLowerCase(),
+            h = e.slice(f, p).toLowerCase(),
+            g = r > f && (n.has(h) || i.has(h)),
+            _ = m.length === 1 || i.has(m) || n.has(m);
+          if (!(!d || (!g && _))) {
+            ((t += e[r]), (r += 1));
+            continue;
+          }
+          let v = r + c.length + 1;
+          for (; e[v] === ` `;) v += 1;
+          let y = C(e, v) ?? N(e, v);
+          if (!y) {
+            ((t += e[r]), (r += 1));
+            continue;
+          }
+          for (v = y.endIndex + 1; e[v] === ` `;) v += 1;
+          let b = C(e, v) ?? w(e, v) ?? P(e, v);
+          if (!b) {
+            ((t += e[r]), (r += 1));
+            continue;
+          }
+          let x = y.content.trim(),
+            S = b.content.trim();
+          if (x === `-1`) {
+            let e = j[c];
+            if (!e) return ``;
+            ((t += `${e}(${S})`), (r = b.endIndex + 1));
+            continue;
+          }
+          ((t += `(${c}(${S}))^(${x})`), (r = b.endIndex + 1));
+        }
+        return t;
+      }),
+      (I = (e) => e.replace(/([a-zA-Z]+)_\{?([a-zA-Z0-9]+)\}?/g, `$1_$2`)),
+      (L = (e) => {
+        let t = p(f(e));
+        if (((t = m(t)), /\\begin\s*\{|\\end\s*\{|\\cases\b/.test(t))) return ``;
+        t = E(t);
+        for (let e = 0; e < 10; e += 1) {
+          let e = D(t);
+          if (e === t || ((t = e), !/\\(?:tfrac|frac)/.test(t))) break;
+        }
+        if (/\\sqrt\s*\[/.test(t)) return ``;
+        ((t = O(t)),
+          (t = k(t)),
+          (t = t.replace(/\\sigma\s*(?=\()/g, `sigmoid`)),
+          (t = t.replace(/\\(?:operatorname|mathrm|text)\s*\{\s*relu\s*\}/gi, `relu`)),
+          (t = t
+            .replace(/[−–—]/g, `-`)
+            .replace(/[×·⋅]/g, `*`)
+            .replace(/[÷]/g, `/`)
+            .replace(/π/g, `pi`)),
+          (t = t
+            .replace(/\\arcsin(?![a-zA-Z])/g, `arcsin`)
+            .replace(/\\arccos(?![a-zA-Z])/g, `arccos`)
+            .replace(/\\arctan(?![a-zA-Z])/g, `arctan`)
+            .replace(/\\sin\^\{-1\}/g, `arcsin`)
+            .replace(/\\cos\^\{-1\}/g, `arccos`)
+            .replace(/\\tan\^\{-1\}/g, `arctan`)
+            .replace(/\\pi(?![a-zA-Z])/g, `pi`)
+            .replace(/\\cdot(?![a-zA-Z])/g, `*`)
+            .replace(/\\times(?![a-zA-Z])/g, `*`)
+            .replace(/\\sinh(?![a-zA-Z])/g, `sinh`)
+            .replace(/\\cosh(?![a-zA-Z])/g, `cosh`)
+            .replace(/\\sin(?![a-zA-Z])/g, `sin`)
+            .replace(/\\cos(?![a-zA-Z])/g, `cos`)
+            .replace(/\\tanh(?![a-zA-Z])/g, `tanh`)
+            .replace(/\\tan(?![a-zA-Z])/g, `tan`)
+            .replace(/\\ln(?![a-zA-Z])/g, `ln`)
+            .replace(/\\log(?![a-zA-Z])/g, `log`)),
+          (t = t.replace(/\\exp(?![a-zA-Z])/g, `exp`)),
+          (t = t
+            .replace(/sin\^\{-1\}/g, `arcsin`)
+            .replace(/cos\^\{-1\}/g, `arccos`)
+            .replace(/tan\^\{-1\}/g, `arctan`)));
+        for (let e of r) t = t.replace(new RegExp(String.raw`\\${e}(?![a-zA-Z])`, `g`), e);
+        return ((t = I(t)), (t = F(t)), (t = t.replace(/{/g, `(`).replace(/}/g, `)`)), t);
+      }),
+      (R = (e) => {
+        let t = L(e);
+        if (!t.trim()) return null;
+        let n = B(t);
+        return n ? U(n) : null;
+      }),
+      (z = (e, t, n) =>
+        e.map((e) => (e.type === `identifier` && e.value === t ? { ...e, value: n } : e))),
+      (B = (e, t) => {
+        let r = t?.customFunctionNames,
+          a = x(e),
+          o = L(a);
         if (
-          top.type === "operator" &&
-          (precedence(top) > precedence(token) ||
-            (precedence(top) === precedence(token) && token.value !== "^"))
-        ) {
-          output.push(operators.pop()!);
-          continue;
+          !o.trim() ||
+          /\\[a-zA-Z]+/.test(o) ||
+          (d.test(o) &&
+            Array.from(o.matchAll(/([a-z][a-z0-9_]*)\s*\(/gi)).some(
+              ([, e]) => [`f`, `g`, `h`, `y`].includes(e.toLowerCase()) && !r?.has(e.toLowerCase()),
+            ))
+        )
+          return null;
+        let s = [],
+          f = (e) => e >= `0` && e <= `9`,
+          p = (e) => (e >= `a` && e <= `z`) || (e >= `A` && e <= `Z`),
+          m = (e) => {
+            let t = e.toLowerCase();
+            n.has(t) || r?.has(t)
+              ? s.push({ type: `function`, value: t })
+              : s.push({ type: `identifier`, value: t });
+          },
+          h = (e, t) => {
+            let n = e.slice(t).match(/^(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?/);
+            if (!n) return null;
+            let r = n[0],
+              i = Number(r);
+            return Number.isFinite(i) ? { raw: r, num: i } : null;
+          },
+          g = 0,
+          _ = 0;
+        for (; _ < o.length;) {
+          if (s.length > u) return null;
+          let e = o[_];
+          if (
+            e === ` ` ||
+            e ===
+              `
+` ||
+            e === `	` ||
+            e === `\r`
+          ) {
+            _ += 1;
+            continue;
+          }
+          if (e === `(` || e === `[` || e === `{`) {
+            (s.push({ type: `paren`, value: `(` }), (g += 1), (_ += 1));
+            continue;
+          }
+          if (e === `)` || e === `]` || e === `}`) {
+            if ((--g, g < 0)) return null;
+            (s.push({ type: `paren`, value: `)` }), (_ += 1));
+            continue;
+          }
+          if (e === `_`) {
+            let e = s[s.length - 1];
+            if (e?.type === `identifier`) {
+              let t = _ + 1;
+              if (t < o.length) {
+                let n = o[t],
+                  r = t,
+                  i = ``;
+                if (f(n)) {
+                  for (; r < o.length && f(o[r]);) r += 1;
+                  i = o.slice(t, r);
+                } else if (p(n)) {
+                  let e = o.slice(t).toLowerCase(),
+                    a = l.find((t) => e.startsWith(t));
+                  a ? ((r = t + a.length), (i = a)) : ((r = t + 1), (i = n.toLowerCase()));
+                }
+                if (i) {
+                  ((s[s.length - 1] = { ...e, value: `${e.value}_${i}` }), (_ = r));
+                  continue;
+                }
+              }
+            }
+            _ += 1;
+            continue;
+          }
+          if (e === `+` || e === `-` || e === `*` || e === `/` || e === `^`) {
+            (s.push({ type: `operator`, value: e }), (_ += 1));
+            continue;
+          }
+          if (f(e) || (e === `.` && _ + 1 < o.length && f(o[_ + 1]))) {
+            let e = h(o, _);
+            if (!e) return null;
+            (s.push({ type: `number`, value: e.num }), (_ += e.raw.length));
+            continue;
+          }
+          if (p(e)) {
+            let e = _ + 1;
+            for (; e < o.length && p(o[e]);) e += 1;
+            let t = o.slice(_, e).toLowerCase();
+            if (n.has(t) || r?.has(t) || i.has(t) || t.length === 1) {
+              (m(t), (_ = e));
+              continue;
+            }
+            let a = 0;
+            for (; a < t.length;) {
+              let e = !1;
+              for (let n of c)
+                if (t.startsWith(n, a)) {
+                  (s.push({ type: `function`, value: n }), (a += n.length), (e = !0));
+                  break;
+                }
+              if (!e) {
+                for (let n of l)
+                  if (t.startsWith(n, a)) {
+                    (s.push({ type: `identifier`, value: n }), (a += n.length), (e = !0));
+                    break;
+                  }
+                e || (s.push({ type: `identifier`, value: t[a] }), (a += 1));
+              }
+            }
+            _ = e;
+            continue;
+          }
+          return null;
         }
-        break;
-      }
-      operators.push(token);
-    } else if (token.value === "(") operators.push(token);
-    else {
-      let foundOpening = false;
-      while (operators.length > 0) {
-        const top = operators.pop()!;
-        if (top.type === "paren" && top.value === "(") {
-          foundOpening = true;
-          break;
+        if (g !== 0) return null;
+        let v = V(s);
+        return H(v);
+      }),
+      (V = (e) => {
+        let t = [],
+          n = (e) => e.type === `operator` && (e.value === `+` || e.value === `-`);
+        for (let r = 0; r < e.length; r += 1) {
+          let i = e[r];
+          if ((t.push(i), i.type !== `function`)) continue;
+          let a = e[r + 1];
+          if (!a || (a.type === `paren` && a.value === `(`)) continue;
+          t.push({ type: `paren`, value: `(` });
+          let o = 0,
+            s = !0,
+            c = null,
+            l = r + 1;
+          for (; l < e.length; l += 1) {
+            let i = e[l],
+              a = c?.type === `function`;
+            if (
+              (o === 0 &&
+                i.type === `operator` &&
+                (i.value === `+` || i.value === `-` || i.value === `*` || i.value === `/`) &&
+                l > r + 1) ||
+              (o === 0 && i.type === `paren` && i.value === `(` && l > r + 1 && !s && !a) ||
+              (o === 0 && i.type === `paren` && i.value === `)`)
+            )
+              break;
+            t.push(i);
+            let u = o === 0;
+            (i.type === `paren` && i.value === `(`
+              ? (o += 1)
+              : i.type === `paren` && i.value === `)` && --o,
+              u && (s && !n(i) && (s = !1), (c = i)));
+          }
+          (t.push({ type: `paren`, value: `)` }), (r = l - 1));
         }
-        output.push(top);
-      }
-      if (!foundOpening) return null;
-      const top = operators.at(-1);
-      const exponentFollows = next?.type === "operator" && next.value === "^";
-      const keepUnaryNegation =
-        top?.type === "function" && top.value === "neg" && exponentFollows;
-      if (top?.type === "function" && !keepUnaryNegation)
-        output.push(operators.pop()!);
-    }
-    previous = token;
-  }
-  while (operators.length > 0) {
-    const token = operators.pop()!;
-    if (token.type === "paren") return null;
-    output.push(token);
-  }
-  return output;
+        return t;
+      }),
+      (H = (e) => {
+        let t = [],
+          n = (e) =>
+            e.type === `number` ||
+            e.type === `identifier` ||
+            (e.type === `paren` && e.value === `)`),
+          r = (e) =>
+            e.type === `number` ||
+            e.type === `identifier` ||
+            e.type === `function` ||
+            (e.type === `paren` && e.value === `(`);
+        for (let i = 0; i < e.length; i += 1) {
+          let a = e[i],
+            o = t[t.length - 1];
+          (o && n(o) && r(a) && t.push({ type: `operator`, value: `*` }), t.push(a));
+        }
+        return t;
+      }),
+      (U = (e) => {
+        let n = [],
+          r = [],
+          i = (e) => {
+            if (e.type !== `operator`) return 0;
+            switch (e.value) {
+              case `^`:
+                return 4;
+              case `*`:
+              case `/`:
+                return 3;
+              case `+`:
+              case `-`:
+                return 2;
+              default:
+                return 0;
+            }
+          },
+          a = (e) => e.type === `operator` && e.value === `^`,
+          o = (e) =>
+            e == null ||
+            e.type === `operator` ||
+            (e.type === `paren` && e.value === `(`) ||
+            e.type === `function`,
+          s = null;
+        for (let c = 0; c < e.length; c += 1) {
+          let l = e[c],
+            u = e[c + 1] ?? null;
+          if (l.type === `number` || l.type === `identifier`) {
+            (n.push(l), (s = l));
+            continue;
+          }
+          if (l.type === `function`) {
+            (r.push(l), (s = l));
+            continue;
+          }
+          if (l.type === `operator`) {
+            if (l.value === `+` && o(s)) {
+              s = l;
+              continue;
+            }
+            if (l.value === `-` && o(s)) {
+              (r.push({ type: `function`, value: `neg` }), (s = l));
+              continue;
+            }
+            for (; r.length > 0;) {
+              let e = r[r.length - 1];
+              if (e.type === `function`) {
+                if (l.value === `^`) break;
+                n.push(t(r.pop()));
+                continue;
+              }
+              if (e.type === `operator` && (i(e) > i(l) || (i(e) === i(l) && !a(l)))) {
+                n.push(t(r.pop()));
+                continue;
+              }
+              break;
+            }
+            (r.push(l), (s = l));
+            continue;
+          }
+          if (l.type === `paren` && l.value === `(`) {
+            (r.push(l), (s = l));
+            continue;
+          }
+          if (l.type === `paren` && l.value === `)`) {
+            let e = !1;
+            for (; r.length > 0;) {
+              let i = t(r.pop());
+              if (i.type === `paren` && i.value === `(`) {
+                e = !0;
+                break;
+              }
+              n.push(i);
+            }
+            if (!e) return null;
+            if (r.length > 0) {
+              let e = r[r.length - 1],
+                i = u?.type === `operator` && u.value === `^`,
+                a = e.type === `function` && e.value === `neg` && i;
+              e.type === `function` && !a && n.push(t(r.pop()));
+            }
+            s = l;
+            continue;
+          }
+        }
+        for (; r.length > 0;) {
+          let e = t(r.pop());
+          if (e.type === `paren`) return null;
+          n.push(e);
+        }
+        return n;
+      }),
+      (W = (e, t) => {
+        let n = L(e),
+          r = b(n);
+        if (r.length !== 1) return null;
+        let i = r[0],
+          a = n.slice(0, i).trim(),
+          o = g(a).toLowerCase();
+        if (y(o)) return null;
+        let s = n.slice(i + 1).trim();
+        if (!s) return null;
+        let c = B(s, t);
+        return c ? U(c) : null;
+      }),
+      (G = /\\int(?![a-zA-Z])/),
+      (K = `\\int`),
+      (q =
+        /(?:\\mathrm\s*\(\s*d\s*\)|\\mathrm\s*\{\s*d\s*\}|\\mathrm\s*d|d)\s*(?:\\([a-zA-Z]+)|([a-zA-Z]))\s*$/),
+      (J =
+        /^((?:\\mathrm\s*\(\s*d\s*\)|\\mathrm\s*\{\s*d\s*\}|\\mathrm\s*d|d)\s*(?:\\[a-zA-Z]+|[a-zA-Z]))\s*\/\s*(.+)$/),
+      (Y = new Set([`e`, `pi`])),
+      (X = (e) => {
+        let t = e.trim().match(q);
+        return !t || t.index !== 0 ? null : ((t[1] ?? t[2])?.toLowerCase().trim() ?? null);
+      }),
+      (Z = (e, t) => {
+        let n = w(e, 0) ?? C(e, 0);
+        if (n && n.endIndex === e.length - 1) return !0;
+        let r = t[t.length - 1];
+        return (
+          r?.type === `number` ||
+          r?.type === `identifier` ||
+          r?.type === `function` ||
+          (r?.type === `operator` && r.value === `^`)
+        );
+      }),
+      (Q = (e) => {
+        let t = e.match(/^\\(?:dfrac|tfrac|frac)/)?.[0];
+        if (t) {
+          let n = t.length;
+          for (; /\s/.test(e[n] ?? ``);) n += 1;
+          let r = C(e, n);
+          if (!r) return null;
+          let i = X(r.content);
+          if (!i) return null;
+          for (n = r.endIndex + 1; /\s/.test(e[n] ?? ``);) n += 1;
+          let a = C(e, n),
+            o = a?.content.trim();
+          return !a || !o || e.slice(a.endIndex + 1).trim() || !R(o)
+            ? null
+            : { integrandText: `\\frac{1}{${o}}`, variable: i };
+        }
+        let n = e.match(J),
+          r = n?.[1],
+          i = n?.[2]?.trim();
+        if (!r || !i) return null;
+        let a = X(r),
+          o = R(i);
+        return !a || !o || !Z(i, o) ? null : { integrandText: `\\frac{1}{${i}}`, variable: a };
+      }),
+      ($ = (e) => {
+        let t = f(e);
+        if (/[∮∬∭]/.test(t)) return null;
+        let n = m(t.replaceAll(`∫`, `\\int`)),
+          r = n.search(G);
+        if (r === -1) return null;
+        let i = b(n),
+          a = n.slice(r).trim();
+        if (i.length === 1) {
+          let e = i[0];
+          r < e && (a = n.slice(r, e).trim());
+        }
+        if (!a.startsWith(K)) return null;
+        let o = 4,
+          s = () => {
+            for (; a[o] === ` `;) o += 1;
+            if (a.startsWith(`\\limits`, o)) {
+              o += 7;
+              return;
+            }
+            if (a.startsWith(`\\nolimits`, o)) {
+              o += 9;
+              return;
+            }
+          };
+        s();
+        let c = () => C(a, o) ?? w(a, o) ?? T(a, o),
+          l = null,
+          u = null;
+        for (let e = 0; e < 2; e += 1) {
+          for (; a[o] === ` `;) o += 1;
+          let e = a[o];
+          if (e !== `_` && e !== `^`) break;
+          for (o += 1; a[o] === ` `;) o += 1;
+          let t = c();
+          if (!t) return null;
+          (e === `_` && l == null && (l = t.content.trim()),
+            e === `^` && u == null && (u = t.content.trim()),
+            (o = t.endIndex + 1),
+            s());
+        }
+        let d = a.slice(o).trim();
+        if (!d || G.test(d)) return null;
+        let p = d.match(q),
+          h = p ? null : Q(d),
+          g = p?.[1]?.toLowerCase().trim() ?? p?.[2]?.toLowerCase().trim() ?? h?.variable ?? `x`,
+          _ = p ? d.slice(0, p.index).trim() : (h?.integrandText ?? d);
+        if (!_) return null;
+        let v = R(_);
+        if (!v) return null;
+        let y = g.toLowerCase();
+        if (v.some((e) => e.type === `identifier` && e.value !== y && !Y.has(e.value))) return null;
+        let x = y === `x` ? v : z(v, y, `x`),
+          S = l ? R(l) : null,
+          E = u ? R(u) : null;
+        return (l && !S) || (u && !E)
+          ? null
+          : { integrand: x, lowerBound: S, upperBound: E, variable: y };
+      }),
+      (ee = new Set([`x`, `e`, `pi`])),
+      (te = (e) => {
+        let t = new Set(),
+          n = [];
+        for (let r of e)
+          r.type !== `identifier` ||
+            ee.has(r.value) ||
+            t.has(r.value) ||
+            (t.add(r.value), n.push(r.value));
+        return n;
+      }));
+  }))();
 }
-
-function parseExpression(value: string): MathToken[] | null {
-  const tokens = tokenizeExpression(value);
-  return tokens == null
-    ? null
-    : toPostfix(insertImplicitMultiplication(tokens));
-}
-
-function tokenizeEquation(
-  value: string,
-  options?: MathTokenizerOptions,
-): MathToken[] | null {
-  const normalized = normalizeLatex(value);
-  const indexes = equalityIndexes(normalized);
-  if (indexes.length !== 1) return null;
-  const equalityIndex = indexes[0] ?? -1;
-  const left = normalized.slice(0, equalityIndex).trim();
-  if (isNonDependentFunctionCall(normalizeLeftHandSide(left).toLowerCase()))
-    return null;
-  const right = normalized.slice(equalityIndex + 1).trim();
-  if (right.length === 0) return null;
-  const tokens = tokenizeExpression(right, options);
-  return tokens == null
-    ? null
-    : toPostfix(insertImplicitMultiplication(tokens));
-}
-
-function replaceIdentifier(
-  tokens: MathToken[],
-  from: string,
-  to: string,
-): MathToken[] {
-  return tokens.map((token) =>
-    token.type === "identifier" && token.value === from
-      ? { ...token, value: to }
-      : token,
-  );
-}
-
-const INTEGRAL_MARKER = /\\int(?![a-zA-Z])/;
-const DIFFERENTIAL =
-  /(?:\\mathrm\s*\(\s*d\s*\)|\\mathrm\s*\{\s*d\s*\}|\\mathrm\s*d|d)\s*(?:\\([a-zA-Z]+)|([a-zA-Z]))\s*$/;
-const DIVIDED_DIFFERENTIAL =
-  /^((?:\\mathrm\s*\(\s*d\s*\)|\\mathrm\s*\{\s*d\s*\}|\\mathrm\s*d|d)\s*(?:\\[a-zA-Z]+|[a-zA-Z]))\s*\/\s*(.+)$/;
-const ALLOWED_INTEGRAL_CONSTANTS = new Set(["e", "pi"]);
-
-function differentialVariable(value: string): string | null {
-  const match = value.trim().match(DIFFERENTIAL);
-  return match == null || match.index !== 0
-    ? null
-    : ((match[1] ?? match[2])?.toLowerCase().trim() ?? null);
-}
-
-function isCompleteDenominator(value: string, tokens: MathToken[]): boolean {
-  const segment = parenthesizedSegment(value, 0) ?? bracedSegment(value, 0);
-  if (segment != null && segment.endIndex === value.length - 1) return true;
-  const last = tokens.at(-1);
-  return (
-    last?.type === "number" ||
-    last?.type === "identifier" ||
-    last?.type === "function" ||
-    (last?.type === "operator" && last.value === "^")
-  );
-}
-
-function parseDifferentialFraction(
-  value: string,
-): { integrandText: string; variable: string } | null {
-  const marker = value.match(/^\\(?:dfrac|tfrac|frac)/)?.[0];
-  if (marker != null) {
-    let cursor = marker.length;
-    while (/\s/.test(value[cursor] ?? "")) cursor += 1;
-    const numerator = bracedSegment(value, cursor);
-    if (numerator == null) return null;
-    const variable = differentialVariable(numerator.content);
-    if (variable == null) return null;
-    cursor = numerator.endIndex + 1;
-    while (/\s/.test(value[cursor] ?? "")) cursor += 1;
-    const denominator = bracedSegment(value, cursor);
-    const denominatorText = denominator?.content.trim();
-    if (
-      denominator == null ||
-      !denominatorText ||
-      value.slice(denominator.endIndex + 1).trim().length > 0 ||
-      parseExpression(denominatorText) == null
-    )
-      return null;
-    return {
-      integrandText: `\\frac{1}{${denominatorText}}`,
-      variable,
-    };
-  }
-  const match = value.match(DIVIDED_DIFFERENTIAL);
-  const differential = match?.[1];
-  const denominator = match?.[2]?.trim();
-  if (!differential || !denominator) return null;
-  const variable = differentialVariable(differential);
-  const tokens = parseExpression(denominator);
-  return variable == null ||
-    tokens == null ||
-    !isCompleteDenominator(denominator, tokens)
-    ? null
-    : { integrandText: `\\frac{1}{${denominator}}`, variable };
-}
-
-function parseIntegral(value: string): ParsedIntegral | null {
-  const unwrapped = stripMathDelimiters(value);
-  if (/[∮∬∭]/.test(unwrapped)) return null;
-  const normalized = removeLatexSpacing(unwrapped.replaceAll("∫", "\\int"));
-  const integralIndex = normalized.search(INTEGRAL_MARKER);
-  if (integralIndex === -1) return null;
-  const indexes = equalityIndexes(normalized);
-  let integral = normalized.slice(integralIndex).trim();
-  if (indexes.length === 1 && integralIndex < (indexes[0] ?? -1))
-    integral = normalized.slice(integralIndex, indexes[0]).trim();
-  if (!integral.startsWith("\\int")) return null;
-  let cursor = 4;
-  const skipLimits = () => {
-    while (integral[cursor] === " ") cursor += 1;
-    if (integral.startsWith("\\limits", cursor)) cursor += 7;
-    else if (integral.startsWith("\\nolimits", cursor)) cursor += 9;
-  };
-  skipLimits();
-  const readLimit = () =>
-    bracedSegment(integral, cursor) ??
-    parenthesizedSegment(integral, cursor) ??
-    bareSegment(integral, cursor);
-  let lowerText: string | null = null;
-  let upperText: string | null = null;
-  for (let count = 0; count < 2; count += 1) {
-    while (integral[cursor] === " ") cursor += 1;
-    const marker = integral[cursor];
-    if (marker !== "_" && marker !== "^") break;
-    cursor += 1;
-    while (integral[cursor] === " ") cursor += 1;
-    const limit = readLimit();
-    if (limit == null) return null;
-    if (marker === "_" && lowerText == null) lowerText = limit.content.trim();
-    if (marker === "^" && upperText == null) upperText = limit.content.trim();
-    cursor = limit.endIndex + 1;
-    skipLimits();
-  }
-  const body = integral.slice(cursor).trim();
-  if (body.length === 0 || INTEGRAL_MARKER.test(body)) return null;
-  const differential = body.match(DIFFERENTIAL);
-  const fraction =
-    differential == null ? parseDifferentialFraction(body) : null;
-  const variable =
-    differential?.[1]?.toLowerCase().trim() ??
-    differential?.[2]?.toLowerCase().trim() ??
-    fraction?.variable ??
-    "x";
-  const integrandText =
-    differential == null
-      ? (fraction?.integrandText ?? body)
-      : body.slice(0, differential.index).trim();
-  if (integrandText.length === 0) return null;
-  const integrand = parseExpression(integrandText);
-  if (integrand == null) return null;
-  const normalizedVariable = variable.toLowerCase();
-  if (
-    integrand.some(
-      (token) =>
-        token.type === "identifier" &&
-        token.value !== normalizedVariable &&
-        !ALLOWED_INTEGRAL_CONSTANTS.has(token.value),
-    )
-  )
-    return null;
-  const lowerBound = lowerText == null ? null : parseExpression(lowerText);
-  const upperBound = upperText == null ? null : parseExpression(upperText);
-  if (
-    (lowerText != null && lowerBound == null) ||
-    (upperText != null && upperBound == null)
-  )
-    return null;
-  return {
-    integrand:
-      normalizedVariable === "x"
-        ? integrand
-        : replaceIdentifier(integrand, normalizedVariable, "x"),
-    lowerBound,
-    upperBound,
-    variable: normalizedVariable,
-  };
-}
-
-function collectVariables(tokens: readonly MathToken[]): string[] {
-  const seen = new Set<string>();
-  const variables: string[] = [];
-  for (const token of tokens) {
-    if (
-      token.type !== "identifier" ||
-      ["x", "e", "pi"].includes(token.value) ||
-      seen.has(token.value)
-    )
-      continue;
-    seen.add(token.value);
-    variables.push(token.value);
-  }
-  return variables;
-}
-
-const once = onceExport as (initializer: () => void) => () => void;
-const initializeMathTokenizer = once(() => {});
-initializeMathTokenizer();
-
-export {
-  parseIntegral as i,
-  initializeMathTokenizer as n,
-  tokenizeEquation as r,
-  collectVariables as t,
-};
+export { $ as i, ne as n, W as r, te as t };

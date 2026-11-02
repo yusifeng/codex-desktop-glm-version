@@ -1,83 +1,59 @@
-// Bond-polarity learning model based on electronegativity difference. Release chunk: model-940064895671.js.
-import "@rchunk/rolldown-runtime";
-
-type ElementSymbol = "H" | "C" | "O" | "F" | "Cl";
-interface BondValues { atom1?: string | null; atom2?: string | null }
-interface NormalizedBondValues { atom1: ElementSymbol; atom2: ElementSymbol }
-interface BondManifest {
-  type: string; version: number; thumbnailAssetKey: string; canonicalFormula: string;
-  parameters: {
-    atom1: { kind: "enum"; defaultValue: ElementSymbol; allowedValues: ElementSymbol[] };
-    atom2: { kind: "enum"; defaultValue: ElementSymbol; allowedValues: ElementSymbol[] };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `BOND_POLARITY`),
+      (n = `bond-polarity-v2`),
+      (r = `\\Delta \\chi = |\\chi_2 - \\chi_1|`),
+      (i = {
+        atom1: { kind: `enum`, defaultValue: `H`, allowedValues: [`H`, `C`, `O`, `F`, `Cl`] },
+        atom2: { kind: `enum`, defaultValue: `Cl`, allowedValues: [`H`, `C`, `O`, `F`, `Cl`] },
+      }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-
-let bondPolarityManifest: BondManifest;
-let elementData: Record<ElementSymbol, { electronegativity: number }>;
-let allowedElements: ElementSymbol[];
-let defaultBondValues: NormalizedBondValues;
-let normalizeBondValues: (values: BondValues) => NormalizedBondValues;
-let calculateBondPolarity: (values: BondValues) => {
-  values: NormalizedBondValues; left: { symbol: ElementSymbol; electronegativity: number };
-  right: { symbol: ElementSymbol; electronegativity: number }; difference: number;
-  direction: "equal" | "right" | "left"; strength: number;
-};
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeBondPolarityManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  bondPolarityManifest = {
-    type: "BOND_POLARITY", version: 2, thumbnailAssetKey: "bond-polarity-v2",
-    canonicalFormula: "\\Delta \\chi = |\\chi_2 - \\chi_1|",
-    parameters: {
-      atom1: { kind: "enum", defaultValue: "H", allowedValues: ["H", "C", "O", "F", "Cl"] },
-      atom2: { kind: "enum", defaultValue: "Cl", allowedValues: ["H", "C", "O", "F", "Cl"] },
-    },
-  };
+var s, c, l, u, d, f, p, m, h;
+function g() {
+  return (g = e(() => {
+    (o(),
+      (s = {
+        H: { electronegativity: 2.2 },
+        C: { electronegativity: 2.55 },
+        O: { electronegativity: 3.44 },
+        F: { electronegativity: 3.98 },
+        Cl: { electronegativity: 3.16 },
+      }),
+      (c = {
+        atom1: new Set(a.parameters.atom1.allowedValues),
+        atom2: new Set(a.parameters.atom2.allowedValues),
+      }),
+      (l = (e, t) =>
+        typeof t == `string` && c[e].has(t) && Object.prototype.hasOwnProperty.call(s, t)),
+      (u = a.parameters.atom1.allowedValues),
+      (d = { atom1: a.parameters.atom1.defaultValue, atom2: a.parameters.atom2.defaultValue }),
+      (f = u.map((e) => s[e].electronegativity)),
+      (p = Math.max(...f) - Math.min(...f)),
+      (m = (e) => ({
+        atom1: l(`atom1`, e.atom1) ? e.atom1 : d.atom1,
+        atom2: l(`atom2`, e.atom2) ? e.atom2 : d.atom2,
+      })),
+      (h = (e) => {
+        let t = m(e),
+          n = s[t.atom1],
+          r = s[t.atom2],
+          i = r.electronegativity - n.electronegativity,
+          a = Math.abs(i),
+          o = Math.abs(i) < 0.001 ? `equal` : i > 0 ? `right` : `left`;
+        return {
+          values: t,
+          left: { symbol: t.atom1, ...n },
+          right: { symbol: t.atom2, ...r },
+          difference: a,
+          direction: o,
+          strength: Math.min(Number((a / p).toFixed(6)), 1),
+        };
+      }));
+  }))();
 }
-
-function initializeBondPolarityModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializeBondPolarityManifest();
-  elementData = {
-    H: { electronegativity: 2.2 }, C: { electronegativity: 2.55 }, O: { electronegativity: 3.44 },
-    F: { electronegativity: 3.98 }, Cl: { electronegativity: 3.16 },
-  };
-  const allowedByParameter = {
-    atom1: new Set(bondPolarityManifest.parameters.atom1.allowedValues),
-    atom2: new Set(bondPolarityManifest.parameters.atom2.allowedValues),
-  };
-  const isElementSymbol = (value: unknown): value is ElementSymbol =>
-    value === "H" || value === "C" || value === "O" || value === "F" || value === "Cl";
-  const isAllowedElement = (parameter: "atom1" | "atom2", value: unknown): value is ElementSymbol =>
-    isElementSymbol(value) && allowedByParameter[parameter].has(value)
-      && Object.prototype.hasOwnProperty.call(elementData, value);
-  allowedElements = bondPolarityManifest.parameters.atom1.allowedValues;
-  defaultBondValues = { atom1: bondPolarityManifest.parameters.atom1.defaultValue, atom2: bondPolarityManifest.parameters.atom2.defaultValue };
-  const electronegativities = allowedElements.map(element => elementData[element].electronegativity);
-  const maximumDifference = Math.max(...electronegativities) - Math.min(...electronegativities);
-  normalizeBondValues = values => ({
-    atom1: isAllowedElement("atom1", values.atom1) ? values.atom1 : defaultBondValues.atom1,
-    atom2: isAllowedElement("atom2", values.atom2) ? values.atom2 : defaultBondValues.atom2,
-  });
-  calculateBondPolarity = values => {
-    const normalized = normalizeBondValues(values);
-    const left = elementData[normalized.atom1];
-    const right = elementData[normalized.atom2];
-    const signedDifference = right.electronegativity - left.electronegativity;
-    const difference = Math.abs(signedDifference);
-    return {
-      values: normalized, left: { symbol: normalized.atom1, ...left }, right: { symbol: normalized.atom2, ...right },
-      difference, direction: Math.abs(signedDifference) < 1e-3 ? "equal" : signedDifference > 0 ? "right" : "left",
-      strength: Math.min(Number((difference / maximumDifference).toFixed(6)), 1),
-    };
-  };
-}
-
-export {
-  initializeBondPolarityModel as a, bondPolarityManifest as c, calculateBondPolarity as i, allowedElements as n,
-  normalizeBondValues as o, defaultBondValues as r, initializeBondPolarityManifest as s, elementData as t,
-};
+export { g as a, a as c, h as i, u as n, m as o, d as r, o as s, s as t };

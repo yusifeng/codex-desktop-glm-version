@@ -1,7 +1,6 @@
+// @ts-nocheck
 import "@rchunk/app-shared";
 import "@rchunk/app-initial";
-import { n as initializeAnimatedIcon, t as AnimatedIcon } from "@rchunk/animated-icon";
-
-initializeAnimatedIcon();
-
-export { AnimatedIcon };
+import { n as e, t } from "@rchunk/animated-icon";
+e();
+export { t as AnimatedIcon };

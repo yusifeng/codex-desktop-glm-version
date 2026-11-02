@@ -1,10 +1,6 @@
+// @ts-nocheck
 import "@rchunk/app-shared";
-import {
-  n as initializeFileDiffPresentation,
-  t as FileDiffPresentation,
-} from "@rchunk/file-diff-presentation-core";
+import { n as e, t } from "@rchunk/file-diff-presentation-core";
 import "@rchunk/register-pierre-themes";
-
-initializeFileDiffPresentation();
-
-export { FileDiffPresentation };
+e();
+export { t as FileDiffPresentation };

@@ -1,127 +1,65 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, FX as n, HX as r, LX as i, e6 as a } from "@rchunk/app-shared";
 import {
-  $3 as getCompilerRuntime,
-  FX as initializeSignalRuntime,
-  HX as useSignalValue,
-  LX as useScope,
-  e6 as getReactRuntime,
-} from "@rchunk/app-shared";
-import {
-  $en as conversationScope,
-  C3 as clearQueuedComposerItems,
-  Rht as initializeThreadBridgeState,
-  Tct as connectThreadScope,
-  X4 as queuedComposerItems,
-  ict as initializeConversationNavigation,
-  itn as initializeConversationScope,
-  kht as composerScope,
-  oct as activeMcpApps,
-  wct as initializeMcpAppState,
-  x3 as initializeComposerState,
-  xct as closeMcpApp,
+  $en as o,
+  C3 as s,
+  Rht as c,
+  Tct as l,
+  X4 as u,
+  ict as d,
+  itn as f,
+  kht as p,
+  oct as m,
+  wct as h,
+  x3 as g,
+  xct as _,
 } from "@rchunk/app-initial";
-
-export interface ThreadBridgeProps {
-  shouldBlockExternalEgress?: boolean;
-  transcriptMcpAppIds?: Set<string>;
+function v(e) {
+  let t = (0, y.c)(12),
+    n;
+  t[0] === e ? (n = t[1]) : ((n = e === void 0 ? {} : e), (t[0] = e), (t[1] = n));
+  let { transcriptMcpAppIds: a, shouldBlockExternalEgress: c } = n,
+    d = c !== void 0 && c,
+    f = i(o),
+    h = i(p),
+    g = r(m),
+    v,
+    x;
+  (t[2] !== h || t[3] !== g || t[4] !== f || t[5] !== d || t[6] !== a
+    ? ((v = () => {
+        d && f.value.routeKind === `chatgpt-thread` && h.get(u).length > 0 && s(h);
+        for (let [e, t] of g) (d || (t.hostedInThreadScrollLayout && a?.has(e) === !1)) && _(f, e);
+      }),
+      (x = [a, h, g, f, d]),
+      (t[2] = h),
+      (t[3] = g),
+      (t[4] = f),
+      (t[5] = d),
+      (t[6] = a),
+      (t[7] = v),
+      (t[8] = x))
+    : ((v = t[7]), (x = t[8])),
+    (0, b.useLayoutEffect)(v, x));
+  let S, C;
+  return (
+    t[9] === f
+      ? ((S = t[10]), (C = t[11]))
+      : ((S = () => {
+          l(f);
+        }),
+        (C = [f]),
+        (t[9] = f),
+        (t[10] = S),
+        (t[11] = C)),
+    (0, b.useLayoutEffect)(S, C),
+    null
+  );
 }
-
-interface CompilerRuntime {
-  c(size: number): unknown[];
+var y, b;
+function x() {
+  return (x = e(() => {
+    ((y = t()), n(), (b = a()), g(), c(), f(), h(), d());
+  }))();
 }
-
-let compilerRuntime: CompilerRuntime;
-let React: ReturnType<typeof getReactRuntime>;
-
-function ThreadBridge(props?: ThreadBridgeProps): null {
-  const cache = compilerRuntime.c(12);
-  let resolvedProps: ThreadBridgeProps;
-  if (cache[0] === props) {
-    resolvedProps = cache[1] as ThreadBridgeProps;
-  } else {
-    resolvedProps = props === undefined ? {} : props;
-    cache[0] = props;
-    cache[1] = resolvedProps;
-  }
-  const { transcriptMcpAppIds, shouldBlockExternalEgress = false } = resolvedProps;
-  const scope = useScope(conversationScope);
-  const composer = useScope(composerScope);
-  const apps = useSignalValue(activeMcpApps) as Map<
-    string,
-    { hostedInThreadScrollLayout?: boolean }
-  >;
-
-  let synchronizeThread: () => void;
-  let synchronizeDependencies: unknown[];
-  if (
-    cache[2] !== composer ||
-    cache[3] !== apps ||
-    cache[4] !== scope ||
-    cache[5] !== shouldBlockExternalEgress ||
-    cache[6] !== transcriptMcpAppIds
-  ) {
-    synchronizeThread = () => {
-      if (
-        shouldBlockExternalEgress &&
-        (scope as unknown as { value: { routeKind: string } }).value.routeKind === "chatgpt-thread" &&
-        (composer as { get(signal: unknown): unknown[] }).get(queuedComposerItems).length > 0
-      ) {
-        clearQueuedComposerItems(composer);
-      }
-      for (const [appId, app] of apps) {
-        if (
-          shouldBlockExternalEgress ||
-          (app.hostedInThreadScrollLayout && transcriptMcpAppIds?.has(appId) === false)
-        ) {
-          closeMcpApp(scope, appId);
-        }
-      }
-    };
-    synchronizeDependencies = [
-      transcriptMcpAppIds,
-      composer,
-      apps,
-      scope,
-      shouldBlockExternalEgress,
-    ];
-    cache[2] = composer;
-    cache[3] = apps;
-    cache[4] = scope;
-    cache[5] = shouldBlockExternalEgress;
-    cache[6] = transcriptMcpAppIds;
-    cache[7] = synchronizeThread;
-    cache[8] = synchronizeDependencies;
-  } else {
-    synchronizeThread = cache[7] as () => void;
-    synchronizeDependencies = cache[8] as unknown[];
-  }
-  React.useLayoutEffect(synchronizeThread, synchronizeDependencies);
-
-  let connectScope: () => void;
-  let connectDependencies: unknown[];
-  if (cache[9] !== scope) {
-    connectScope = () => connectThreadScope(scope);
-    connectDependencies = [scope];
-    cache[9] = scope;
-    cache[10] = connectScope;
-    cache[11] = connectDependencies;
-  } else {
-    connectScope = cache[10] as () => void;
-    connectDependencies = cache[11] as unknown[];
-  }
-  React.useLayoutEffect(connectScope, connectDependencies);
-  return null;
-}
-
-function initializeThreadBridge(): void {
-  compilerRuntime = getCompilerRuntime() as unknown as CompilerRuntime;
-  initializeSignalRuntime();
-  React = getReactRuntime();
-  initializeComposerState();
-  initializeThreadBridgeState();
-  initializeConversationScope();
-  initializeMcpAppState();
-  initializeConversationNavigation();
-}
-
-export { initializeThreadBridge as n, ThreadBridge as t };
+export { x as n, v as t };

@@ -1,46 +1,29 @@
-// Parallel resistor equivalent specification. Release chunk: type-fa418230ee38.js.
-import "@rchunk/rolldown-runtime";
-
-interface NumberParameter {
-  kind: "number";
-  defaultValue: number;
-  min: number;
-  max: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o;
+function s() {
+  return (s = e(() => {
+    ((t = `RESISTORS_IN_PARALLEL_EQUIVALENT`),
+      (n = `resistors-in-parallel-equivalent-v1`),
+      (r = `\\frac{1}{R_T} = \\frac{1}{R_1} + \\frac{1}{R_2} + \\frac{1}{R_3}`),
+      (i = [
+        `\\frac{1}{R_T} = \\frac{1}{R_1} + \\frac{1}{R_2}`,
+        `\\frac{1}{R_{\\text{eq}}} = \\frac{1}{R_1} + \\frac{1}{R_2} + \\frac{1}{R_3}`,
+      ]),
+      (a = {
+        r1: { kind: `number`, defaultValue: 8, min: 0.1, max: 1e5 },
+        r2: { kind: `number`, defaultValue: 8, min: 0.1, max: 1e5 },
+        r3: { kind: `number`, defaultValue: 8, min: 0.1, max: 1e5 },
+        voltage: { kind: `number`, defaultValue: 12, min: 0, max: 1e3 },
+      }),
+      (o = {
+        type: t,
+        version: 1,
+        thumbnailAssetKey: n,
+        canonicalFormula: r,
+        canonicalFormulaAliases: i,
+        parameters: a,
+      }));
+  }))();
 }
-interface Specification {
-  type: "RESISTORS_IN_PARALLEL_EQUIVALENT";
-  version: 1;
-  thumbnailAssetKey: "resistors-in-parallel-equivalent-v1";
-  canonicalFormula: "\\frac{1}{R_T} = \\frac{1}{R_1} + \\frac{1}{R_2} + \\frac{1}{R_3}";
-  canonicalFormulaAliases: [
-    "\\frac{1}{R_T} = \\frac{1}{R_1} + \\frac{1}{R_2}",
-    "\\frac{1}{R_{\\text{eq}}} = \\frac{1}{R_1} + \\frac{1}{R_2} + \\frac{1}{R_3}",
-  ];
-  parameters: {
-    r1: NumberParameter;
-    r2: NumberParameter;
-    r3: NumberParameter;
-    voltage: NumberParameter;
-  };
-}
-let specification: Specification;
-function initializeSpecification(): void {
-  specification ??= {
-    type: "RESISTORS_IN_PARALLEL_EQUIVALENT",
-    version: 1,
-    thumbnailAssetKey: "resistors-in-parallel-equivalent-v1",
-    canonicalFormula:
-      "\\frac{1}{R_T} = \\frac{1}{R_1} + \\frac{1}{R_2} + \\frac{1}{R_3}",
-    canonicalFormulaAliases: [
-      "\\frac{1}{R_T} = \\frac{1}{R_1} + \\frac{1}{R_2}",
-      "\\frac{1}{R_{\\text{eq}}} = \\frac{1}{R_1} + \\frac{1}{R_2} + \\frac{1}{R_3}",
-    ],
-    parameters: {
-      r1: { kind: "number", defaultValue: 8, min: 0.1, max: 100_000 },
-      r2: { kind: "number", defaultValue: 8, min: 0.1, max: 100_000 },
-      r3: { kind: "number", defaultValue: 8, min: 0.1, max: 100_000 },
-      voltage: { kind: "number", defaultValue: 12, min: 0, max: 1_000 },
-    },
-  };
-}
-export { specification as n, initializeSpecification as t };
+export { o as n, s as t };

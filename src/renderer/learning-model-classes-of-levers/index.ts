@@ -1,40 +1,18 @@
-// Classes-of-levers selector metadata. Release chunk: type-973549a4c4d1.js.
-import "@rchunk/rolldown-runtime";
-
-type LeverClass = "first" | "second" | "third";
-interface ClassesOfLeversSpecification {
-  type: "CLASSES_OF_LEVERS";
-  version: 2;
-  thumbnailAssetKey: "classes-of-levers-v1";
-  parameters: {
-    leverClass: {
-      kind: "enum";
-      defaultValue: LeverClass;
-      allowedValues: LeverClass[];
-    };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `CLASSES_OF_LEVERS`),
+      (n = `classes-of-levers-v1`),
+      (r = {
+        leverClass: {
+          kind: `enum`,
+          defaultValue: `first`,
+          allowedValues: [`first`, `second`, `third`],
+        },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-let classesOfLeversSpecification: ClassesOfLeversSpecification;
-let initialized = false;
-function initializeClassesOfLeversSpecification(): void {
-  if (initialized) return;
-  initialized = true;
-  classesOfLeversSpecification = {
-    type: "CLASSES_OF_LEVERS",
-    version: 2,
-    thumbnailAssetKey: "classes-of-levers-v1",
-    parameters: {
-      leverClass: {
-        kind: "enum",
-        defaultValue: "first",
-        allowedValues: ["first", "second", "third"],
-      },
-    },
-  };
-}
-
-export {
-  classesOfLeversSpecification as n,
-  initializeClassesOfLeversSpecification as t,
-};
+export { i as n, a as t };

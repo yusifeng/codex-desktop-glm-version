@@ -1,44 +1,39 @@
-// Newton's third-law learning model: normalize and index the contact-force example.
-import "@rchunk/rolldown-runtime";
-
-type ContactExample = "boxOnTable" | "collidingBalls" | "pushingBox";
-interface ContactExampleValues { example?: string | null }
-
-const defaultContactExample: ContactExample = "pushingBox";
-
-function normalizeContactExample(values: ContactExampleValues): { example: ContactExample } {
-  switch (values.example) {
-    case "pushingBox":
-    case "collidingBalls":
-    case "boxOnTable":
-      return { example: values.example };
-    default:
-      return { example: defaultContactExample };
-  }
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `pushingBox`),
+      (n = (e) => {
+        switch (e.example) {
+          case `pushingBox`:
+          case `collidingBalls`:
+          case `boxOnTable`:
+            return { example: e.example };
+          default:
+            return { example: t };
+        }
+      }),
+      (r = (e) => {
+        switch (e) {
+          case `pushingBox`:
+            return 0;
+          case `collidingBalls`:
+            return 1;
+          case `boxOnTable`:
+            return 2;
+        }
+      }),
+      (i = (e) => {
+        switch (e) {
+          case 1:
+            return `collidingBalls`;
+          case 2:
+            return `boxOnTable`;
+          default:
+            return `pushingBox`;
+        }
+      }));
+  }))();
 }
-
-function contactExampleToIndex(example: ContactExample): number {
-  switch (example) {
-    case "pushingBox": return 0;
-    case "collidingBalls": return 1;
-    case "boxOnTable": return 2;
-  }
-}
-
-function contactExampleFromIndex(index: number): ContactExample {
-  switch (index) {
-    case 1: return "collidingBalls";
-    case 2: return "boxOnTable";
-    default: return "pushingBox";
-  }
-}
-
-function initializeNewtonsThirdLawModel(): void {}
-
-export {
-  normalizeContactExample as a,
-  initializeNewtonsThirdLawModel as i,
-  contactExampleFromIndex as n,
-  contactExampleToIndex as r,
-  defaultContactExample as t,
-};
+export { n as a, a as i, i as n, r, t };

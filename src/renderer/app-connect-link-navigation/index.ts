@@ -1,15 +1,12 @@
-import { Dft as initializeAppConnectNavigation } from "@rchunk/app-initial";
-import "@rchunk/rolldown-runtime";
-
-function shouldNavigateAppConnectLink(_url: string): boolean {
-  return false;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { Dft as t } from "@rchunk/app-initial";
+function n(e) {
+  return !1;
 }
-
-let initialized = false;
-function initializeAppConnectLinkNavigation(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeAppConnectNavigation();
+function r() {
+  return (r = e(() => {
+    t();
+  }))();
 }
-
-export { shouldNavigateAppConnectLink as n, initializeAppConnectLinkNavigation as t };
+export { n, r as t };

@@ -1,31 +1,17 @@
-// Equal tangent-segment geometry controls. Release chunk: type-32562c107c2d.js.
-import "@rchunk/rolldown-runtime";
-interface Specification {
-  type: "TANGENT_SEGMENTS_COMMON_POINT";
-  version: 1;
-  thumbnailAssetKey: "tangent-segments-common-point-v1";
-  canonicalFormula: "PA = PB";
-  parameters: {
-    radius: { kind: "number"; defaultValue: 3.5; min: 2.5; max: 4.5 };
-    pointDistance: { kind: "number"; defaultValue: 7.2; min: 5.8; max: 7.2 };
-    pointAngleDeg: { kind: "number"; defaultValue: 180; min: 145; max: 215 };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `TANGENT_SEGMENTS_COMMON_POINT`),
+      (n = `tangent-segments-common-point-v1`),
+      (r = `PA = PB`),
+      (i = {
+        radius: { kind: `number`, defaultValue: 3.5, min: 2.5, max: 4.5 },
+        pointDistance: { kind: `number`, defaultValue: 7.2, min: 5.8, max: 7.2 },
+        pointAngleDeg: { kind: `number`, defaultValue: 180, min: 145, max: 215 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-let specification: Specification;
-let initialized = false;
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  specification = {
-    type: "TANGENT_SEGMENTS_COMMON_POINT",
-    version: 1,
-    thumbnailAssetKey: "tangent-segments-common-point-v1",
-    canonicalFormula: "PA = PB",
-    parameters: {
-      radius: { kind: "number", defaultValue: 3.5, min: 2.5, max: 4.5 },
-      pointDistance: { kind: "number", defaultValue: 7.2, min: 5.8, max: 7.2 },
-      pointAngleDeg: { kind: "number", defaultValue: 180, min: 145, max: 215 },
-    },
-  };
-}
-export { specification as n, initialize as t };
+export { a as n, o as t };

@@ -1,16 +1,15 @@
-// Denial-of-service overload manifest. Release chunk: type-1f93f10ec695.js.
-import "@rchunk/rolldown-runtime";
-
-const denialOfServiceOverloadSpecification = {
-  type: "DENIAL_OF_SERVICE_OVERLOAD",
-  version: 3,
-  thumbnailAssetKey: "denial-of-service-overload-v1",
-  parameters: {
-    server_capacity: { kind: "integer" as const, defaultValue: 120, min: 100, max: 300 },
-    legitimate_request_rate: { kind: "integer" as const, defaultValue: 40, min: 10, max: 80 },
-  },
-};
-
-function initializeDenialOfServiceOverloadSpecification(): void {}
-
-export { denialOfServiceOverloadSpecification as n, initializeDenialOfServiceOverloadSpecification as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `DENIAL_OF_SERVICE_OVERLOAD`),
+      (n = `denial-of-service-overload-v1`),
+      (r = {
+        server_capacity: { kind: `integer`, defaultValue: 120, min: 100, max: 300 },
+        legitimate_request_rate: { kind: `integer`, defaultValue: 40, min: 10, max: 80 },
+      }),
+      (i = { type: t, version: 3, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+export { i as n, a as t };

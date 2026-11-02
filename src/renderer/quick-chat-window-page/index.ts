@@ -1,145 +1,136 @@
-// quick-chat-window-page —— 独立 Quick Chat 窗口的会话装配与生命周期桥接。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as quickChatWindowChunk from "@rchunk/quick-chat-window";
-void runtimeChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  FX: initializeSignalRuntime,
-  HX: useSignalValue,
-  I3: getJsxRuntime,
-  LX: useScope,
-  QI: initializeScopeRuntime,
-  XN: quickChatSurfaces,
-  ZI: appScope,
-  e6: reactRuntime,
-  lY: parseConversationId,
-  qN: quickChatLifecycleActions,
-  wL: initializeWindowRuntime,
-} = appSharedChunk;
-const {
-  Evt: initializeQuickChatAnalytics,
-  G_: trackQuickChatLifecycle,
-  Qgn: initializeAccountContext,
-  W_: initializeQuickChatLifecycle,
-  aqt: normalizeConversationId,
-  bX: initializeQuickChatSession,
-  d_n: useSearchParams,
-  h_: quickChatSessionSignal,
-  i_: initializeQuickChatRoute,
-  l_n: useRouteParams,
-  mnt: initializeAppServices,
-  oqt: initializeConversationState,
-  pnt: appServices,
-  sqt: isConversationMissing,
-  xvt: prepareQuickChatWindow,
-  yX: QuickChatSurfaceProvider,
-} = appInitialChunk;
-const { n: initializeQuickChatWindow, t: QuickChatWindow } =
-  quickChatWindowChunk;
-
-interface QuickChatSession extends Record<string, unknown> {
-  contextSourceThread: { hostId: string; threadId: string } | null;
-  conversationId: string;
-  hasConversation: boolean;
-  initialScrollMode: "follow";
-  projectId: string | null;
-  projectName: string | null;
-  selectedTextSourceConversationId: string | null;
-  title: string | null;
-}
-
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function QuickChatWindowPage(): unknown {
-  const scope = useScope(appScope);
-  const { conversationId } = useRouteParams();
-  const [searchParams] = useSearchParams();
-  const storedSession = useSignalValue(
-    quickChatSessionSignal,
-  ) as QuickChatSession | null;
-
-  reactRuntime.useEffect(() => {
-    if (conversationId == null) {
-      appServices.quickChatWindow?.rendererReady(null);
-      return;
-    }
-    prepareQuickChatWindow();
-    const frame = requestAnimationFrame(() =>
-      appServices.quickChatWindow?.rendererReady(conversationId),
-    );
-    return () => cancelAnimationFrame(frame);
-  }, [conversationId]);
-  if (conversationId == null) return null;
-
-  const normalizedConversationId = normalizeConversationId(conversationId);
-  const contextSourceConversationId = searchParams.get(
-    "contextSourceConversationId",
-  );
-  const contextSourceHostId = searchParams.get("contextSourceHostId");
-  const session: QuickChatSession = storedSession ?? {
-    contextSourceThread:
-      contextSourceConversationId == null || contextSourceHostId == null
-        ? null
-        : {
-            threadId: parseConversationId(contextSourceConversationId),
-            hostId: contextSourceHostId,
-          },
-    conversationId: normalizedConversationId,
-    hasConversation: !isConversationMissing(normalizedConversationId),
-    initialScrollMode: "follow",
-    projectId: null,
-    projectName: null,
-    selectedTextSourceConversationId: null,
-    title: null,
-  };
-  const close = (source: string): void => {
-    trackQuickChatLifecycle(scope, {
-      action:
-        quickChatLifecycleActions.CODEX_QUICK_CHAT_LIFECYCLE_ACTION_CLOSED,
-      hasConversation: session.hasConversation,
-      source,
-      surface: quickChatSurfaces.CODEX_QUICK_CHAT_SURFACE_WINDOW,
-    });
-    window.close();
-  };
-  return jsx.jsx(QuickChatSurfaceProvider, {
-    value: "quick-chat",
-    children: jsx.jsx(QuickChatWindow, {
-      canPopOut: false,
-      session,
-      variant: "window",
-      onAddToComposer: addToComposer,
-      onClose: close,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  HX as r,
+  I3 as i,
+  LX as a,
+  QI as o,
+  XN as s,
+  ZI as c,
+  e6 as l,
+  lY as u,
+  qN as d,
+  wL as f,
+} from "@rchunk/app-shared";
+import {
+  Evt as p,
+  G_ as m,
+  Qgn as h,
+  W_ as g,
+  aqt as _,
+  bX as v,
+  d_n as y,
+  h_ as b,
+  i_ as x,
+  l_n as S,
+  mnt as C,
+  oqt as w,
+  pnt as T,
+  sqt as E,
+  xvt as D,
+  yX as O,
+} from "@rchunk/app-initial";
+import { n as k, t as A } from "@rchunk/quick-chat-window";
+function j() {
+  let e = (0, N.c)(15),
+    t = a(c),
+    { conversationId: n } = S(),
+    [i] = y(),
+    o = r(b),
+    l,
+    f;
+  if (
+    (e[0] === n
+      ? ((l = e[1]), (f = e[2]))
+      : ((l = () => {
+          if (n == null) {
+            T.quickChatWindow?.rendererReady(null);
+            return;
+          }
+          D();
+          let e = requestAnimationFrame(() => {
+            T.quickChatWindow?.rendererReady(n);
+          });
+          return () => cancelAnimationFrame(e);
+        }),
+        (f = [n]),
+        (e[0] = n),
+        (e[1] = l),
+        (e[2] = f)),
+    (0, P.useEffect)(l, f),
+    n == null)
+  )
+    return null;
+  let p;
+  if (e[3] !== n || e[4] !== i || e[5] !== o) {
+    let t = _(n),
+      r = i.get(`contextSourceConversationId`),
+      a;
+    e[7] === i ? (a = e[8]) : ((a = i.get(`contextSourceHostId`)), (e[7] = i), (e[8] = a));
+    let s = a;
+    ((p = o ?? {
+      contextSourceThread: r == null || s == null ? null : { threadId: u(r), hostId: s },
+      conversationId: t,
+      hasConversation: !E(t),
+      initialScrollMode: `follow`,
+      projectId: null,
+      projectName: null,
+      selectedTextSourceConversationId: null,
+      title: null,
     }),
-  });
+      (e[3] = n),
+      (e[4] = i),
+      (e[5] = o),
+      (e[6] = p));
+  } else p = e[6];
+  let h = p,
+    g;
+  e[9] !== t || e[10] !== h.hasConversation
+    ? ((g = (e) => {
+        (m(t, {
+          action: d.CODEX_QUICK_CHAT_LIFECYCLE_ACTION_CLOSED,
+          hasConversation: h.hasConversation,
+          source: e,
+          surface: s.CODEX_QUICK_CHAT_SURFACE_WINDOW,
+        }),
+          window.close());
+      }),
+      (e[9] = t),
+      (e[10] = h.hasConversation),
+      (e[11] = g))
+    : (g = e[11]);
+  let v;
+  return (
+    e[12] !== h || e[13] !== g
+      ? ((v = (0, F.jsx)(O, {
+          value: `quick-chat`,
+          children: (0, F.jsx)(A, {
+            canPopOut: !1,
+            session: h,
+            variant: `window`,
+            onAddToComposer: M,
+            onClose: g,
+          }),
+        })),
+        (e[12] = h),
+        (e[13] = g),
+        (e[14] = v))
+      : (v = e[14]),
+    v
+  );
 }
-
-async function addToComposer(content: unknown): Promise<void> {
-  const service = appServices.quickChatWindow;
-  if (service == null)
-    throw new Error("Quick Chat window service is unavailable");
-  await service.addToComposer(content);
+async function M(e) {
+  let t = T.quickChatWindow;
+  if (t == null) throw Error(`Quick Chat window service is unavailable`);
+  await t.addToComposer(e);
 }
-
-function initializeQuickChatWindowPage(): void {
-  initializeRuntimeLazy();
-  initializeSignalRuntime();
-  initializeWindowRuntime();
-  reactRuntime();
-  initializeAccountContext();
-  initializeQuickChatAnalytics();
-  initializeAppServices();
-  initializeScopeRuntime();
-  initializeQuickChatSession();
-  initializeConversationState();
-  initializeQuickChatLifecycle();
-  initializeQuickChatRoute();
-  initializeQuickChatWindow();
-  jsx = getJsxRuntime();
+var N, P, F;
+function I() {
+  return (I = e(() => {
+    ((N = t()), n(), f(), (P = l()), h(), p(), C(), o(), v(), w(), g(), x(), k(), (F = i()));
+  }))();
 }
-
-initializeQuickChatWindowPage();
-export { QuickChatWindowPage };
+I();
+export { j as QuickChatWindowPage };

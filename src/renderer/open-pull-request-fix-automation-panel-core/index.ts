@@ -1,157 +1,80 @@
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { e6 as t, lw as n, wy as r } from "@rchunk/app-shared";
 import {
-  e6 as getReactRuntime,
-  lw as initializeBrowserIcons,
-  wy as AutomationIcon,
-} from "@rchunk/app-shared";
-import {
-  FCt as initializeAutomationModel,
-  Gvt as openSidePanelTab,
-  HZt as initializeSidePanelRoutes,
-  ICt as isHeartbeatAutomation,
-  QCt as automationsQuery,
-  Ugn as getHostService,
-  Wgn as initializeHostServices,
-  Wvt as initializeSidePanel,
-  ZCt as initializeAutomationQueries,
-  _vt as initializeThreadAccounts,
-  dg as initializeRouting,
-  fg as createSidePanelDefinition,
-  gvt as getTabTarget,
-  hsn as isThreadAccount,
-  mg as initializePanelRegistry,
-  msn as initializeConversationState,
-  pg as pullRequestFixRouteKind,
-  wQt as conversationAccount,
-  zZt as threadExists,
+  FCt as i,
+  Gvt as a,
+  HZt as o,
+  ICt as s,
+  QCt as c,
+  Ugn as l,
+  Wgn as u,
+  Wvt as d,
+  ZCt as f,
+  _vt as p,
+  dg as m,
+  fg as h,
+  gvt as g,
+  hsn as _,
+  mg as v,
+  msn as y,
+  pg as b,
+  wQt as x,
+  zZt as S,
 } from "@rchunk/app-initial";
-
-export interface PullRequestFixPanelInput {
-  automationId: string;
-  targetConversationId: string;
-  title: string;
-}
-
-export interface PullRequestFixPanelOptions {
-  insertPosition?: unknown;
-  revealAndFocus?: boolean;
-  tabId?: string;
-  target?: string;
-}
-
-export interface PullRequestFixPanelScope {
-  value: { conversationId: string; routeKind: string };
-  get(signal: unknown, parameter?: unknown): unknown;
-  query: {
-    getOrFetch(signal: unknown): Promise<{
-      items: Array<{
-        id: string;
-        name: string;
-        status: string;
-        targetThreadId?: string;
-        [key: string]: unknown;
-      }>;
-    }>;
-  };
-}
-
-let pullRequestFixPanelDefinition: unknown;
-
-function openPullRequestFixAutomationPanel(
-  scope: PullRequestFixPanelScope,
-  { automationId, targetConversationId, title }: PullRequestFixPanelInput,
-  {
-    revealAndFocus = true,
-    insertPosition,
-    tabId,
-    target = "right",
-  }: PullRequestFixPanelOptions = {},
-): unknown {
-  const id = tabId ?? `pull-request-auto-fix:${targetConversationId}`;
-  const resolvedTarget =
-    (getTabTarget(scope, id) as string | null | undefined) ?? target;
-  const React = getReactRuntime();
-  return openSidePanelTab(scope, pullRequestFixPanelDefinition, {
-    revealAndFocus,
+function C(
+  e,
+  { automationId: t, targetConversationId: n, title: i },
+  { revealAndFocus: o = !0, insertPosition: s, tabId: c, target: l = `right` } = {},
+) {
+  let u = c ?? `pull-request-auto-fix:${n}`,
+    d = g(e, u) ?? l;
+  return a(e, E, {
+    revealAndFocus: o,
     durableRoute:
-      automationId.trim() === "" || targetConversationId.trim() === ""
-        ? undefined
-        : {
-            kind: pullRequestFixRouteKind,
-            params: { automationId, targetConversationId },
-            payloadVersion: 1,
-          },
-    icon: React.createElement(AutomationIcon, { "aria-hidden": false }),
-    id,
-    insertPosition,
-    props: { conversationId: targetConversationId },
-    target: resolvedTarget,
-    title,
-    tooltip: title,
+      t.trim() === `` || n.trim() === ``
+        ? void 0
+        : { kind: b, params: { automationId: t, targetConversationId: n }, payloadVersion: 1 },
+    icon: (0, T.createElement)(r, { "aria-hidden": !1 }),
+    id: u,
+    insertPosition: s,
+    props: { conversationId: n },
+    target: d,
+    title: i,
+    tooltip: i,
   });
 }
-
-async function restorePullRequestFixAutomationSidePanelTab(
-  scope: PullRequestFixPanelScope,
-  { automationId, targetConversationId }: Omit<PullRequestFixPanelInput, "title">,
-  { insertPosition, revealAndFocus, tabId, target }: PullRequestFixPanelOptions,
-): Promise<boolean> {
-  if (scope.value.routeKind !== "local-thread") return false;
-  const account = scope.get(conversationAccount, scope.value.conversationId);
-  if (!isThreadAccount(account)) return false;
+async function w(
+  e,
+  { automationId: t, targetConversationId: n },
+  { revealAndFocus: r, insertPosition: i, tabId: a, target: o },
+) {
+  if (e.value.routeKind !== `local-thread`) return !1;
+  let u = e.get(x, e.value.conversationId);
+  if (!_(u)) return !1;
   try {
-    const { items } = await scope.query.getOrFetch(automationsQuery);
-    const automation = items.find(({ id }) => id === automationId);
-    if (
-      automation == null ||
-      automation.status === "DELETED" ||
-      !isHeartbeatAutomation(automation) ||
-      automation.targetThreadId !== targetConversationId
-    ) {
-      return false;
-    }
-    if (!scope.get(threadExists, targetConversationId)) {
-      const service = getHostService(scope, account) as {
-        hydrateBackgroundThreads(ids: string[]): Promise<void>;
-      };
-      await service.hydrateBackgroundThreads([targetConversationId]);
-      if (!scope.get(threadExists, targetConversationId)) return false;
-    }
-    if (scope.get(conversationAccount, targetConversationId) !== account) return false;
-    return (
-      openPullRequestFixAutomationPanel(
-        scope,
-        {
-          automationId,
-          targetConversationId,
-          title: automation.name,
-        },
-        { insertPosition, revealAndFocus, tabId, target },
-      ) === tabId
-    );
+    let { items: d } = await e.query.getOrFetch(c),
+      f = d.find(({ id: e }) => e === t);
+    return f == null ||
+      f.status === `DELETED` ||
+      !s(f) ||
+      f.targetThreadId !== n ||
+      (!e.get(S, n) && (await l(e, u).hydrateBackgroundThreads([n]), !e.get(S, n))) ||
+      e.get(x, n) !== u
+      ? !1
+      : C(
+          e,
+          { automationId: t, targetConversationId: n, title: f.name },
+          { revealAndFocus: r, insertPosition: i, tabId: a, target: o },
+        ) === a;
   } catch {
-    return false;
+    return !1;
   }
 }
-
-function initializePullRequestFixAutomationPanel(): void {
-  initializeHostServices();
-  initializeSidePanelRoutes();
-  initializeSidePanel();
-  initializeConversationState();
-  initializeAutomationQueries();
-  initializeBrowserIcons();
-  initializeRouting();
-  initializeThreadAccounts();
-  initializeAutomationModel();
-  initializePanelRegistry();
-  pullRequestFixPanelDefinition = createSidePanelDefinition({
-    open: openPullRequestFixAutomationPanel,
-    restore: restorePullRequestFixAutomationSidePanelTab,
-  });
+var T, E;
+function D() {
+  return (D = e(() => {
+    ((T = t()), u(), o(), d(), y(), f(), n(), m(), p(), i(), v(), (E = h({ open: C, restore: w })));
+  }))();
 }
-
-export {
-  openPullRequestFixAutomationPanel as n,
-  restorePullRequestFixAutomationSidePanelTab as r,
-  initializePullRequestFixAutomationPanel as t,
-};
+export { C as n, w as r, D as t };

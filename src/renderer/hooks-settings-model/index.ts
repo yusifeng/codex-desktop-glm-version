@@ -1,325 +1,225 @@
-import "@rchunk/rolldown-runtime";
-
-type HookSourceGroup =
-  | "admin"
-  | "plugin"
-  | "project"
-  | "sessionFlags"
-  | "unknown"
-  | "user";
-
-interface HookIssue {
-  message: string;
-  path: string;
-}
-
-interface HookDefinition {
-  displayOrder: number;
-  enabled: boolean;
-  eventName: string;
-  key: string;
-  pluginId?: string | null;
-  source: string;
-  trustStatus: "managed" | "modified" | "trusted" | "untrusted" | string;
-}
-
-interface HookSettingsEntry {
-  cwd: string;
-  errors: HookIssue[];
-  hooks: HookDefinition[];
-  warnings: string[];
-}
-
-interface PluginSummary {
-  hooks: HookDefinition[];
-  summary: { id: string; installed: boolean };
-}
-
-interface SourceSelection {
-  pluginId?: string | null;
-  projectRoot?: string;
-  source: HookSourceGroup;
-}
-
-const sourceOrder: HookSourceGroup[] = [
-  "plugin",
-  "user",
-  "admin",
-  "project",
-  "sessionFlags",
-  "unknown",
-];
-const unknownPluginId = "__unknown__";
-
-function needsReview(hook: HookDefinition): boolean {
-  return hook.trustStatus === "untrusted" || hook.trustStatus === "modified";
-}
-
-function isActive(hook: HookDefinition): boolean {
-  return hook.trustStatus === "managed"
-    || (hook.enabled && hook.trustStatus === "trusted");
-}
-
-function summarizeHookEvents(hooks: HookDefinition[]): Array<Record<string, unknown>> {
-  return Array.from(new Set(hooks.map((hook) => hook.eventName)), (eventName) => {
-    const matching = hooks.filter((hook) => hook.eventName === eventName);
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e) {
+  return Array.from(new Set(e.map((e) => e.eventName)), (t) => {
+    let n = e.filter((e) => e.eventName === t);
     return {
-      eventName,
-      active: matching.filter(isActive).length,
-      installed: matching.length,
-      needsReview: matching.filter(needsReview).length,
+      eventName: t,
+      active: n.filter(S).length,
+      installed: n.length,
+      needsReview: n.filter(d).length,
     };
   });
 }
-
-function countHooksNeedingReview(hooks: HookDefinition[]): number {
-  return hooks.filter(needsReview).length;
+function n(e) {
+  return e.filter(d).length;
 }
-
-function filterHooksByEvent(hooks: HookDefinition[], eventName: string): HookDefinition[] {
-  return hooks
-    .filter((hook) => hook.eventName === eventName)
-    .sort((left, right) => left.displayOrder < right.displayOrder ? -1 : +(left.displayOrder > right.displayOrder));
+function r(e, t) {
+  if (t == null) return [];
+  let n = new Set(t.hooks.map((e) => e.key));
+  return y(
+    e?.flatMap((e) =>
+      e.hooks.filter(
+        (e) => e.source === `plugin` && e.pluginId === t.summary.id && n.has(e.key) && d(e),
+      ),
+    ) ?? [],
+  );
 }
-
-function normalizeSource(source: string | null): HookSourceGroup | null | undefined {
-  switch (source) {
-    case "plugin": return "plugin";
-    case "user": return "user";
-    case "system":
-    case "mdm":
-    case "cloudRequirements":
-    case "cloudManagedConfig":
-    case "legacyManagedConfigFile":
-    case "legacyManagedConfigMdm": return "admin";
-    case "project": return "project";
-    case "sessionFlags": return "sessionFlags";
-    case "unknown": return "unknown";
+function i(e, t, n) {
+  if (e == null || !e.summary.installed || e.hooks.length === 0) return;
+  let r = a(t, n, null);
+  return r.length === 0 ? void 0 : r;
+}
+function a(e, t, n) {
+  let r = new Set(t),
+    i = [
+      ...r,
+      ...Array.from(new Set(e))
+        .filter((e) => !r.has(e))
+        .sort((e, t) => e.localeCompare(t)),
+    ];
+  return (n != null && !i.includes(n) && i.push(n), i);
+}
+function o(e) {
+  return { issueCount: e.warnings.length + e.errors.length, needsReview: e.hooks.filter(d).length };
+}
+function s(e) {
+  let t = [];
+  for (let n of w) {
+    let r = m(e, n);
+    r != null && t.push(r);
   }
+  return t;
 }
-
-function commonSource(hooks: HookDefinition[]): HookSourceGroup | null | undefined {
-  if (hooks.length === 0) return null;
-  const sources = new Set(hooks.map((hook) => normalizeSource(hook.source)));
-  return sources.size === 1 ? sources.values().next().value ?? null : null;
+function c({ pluginId: e, source: t, projectRoot: n, projectRoots: r }) {
+  let i = C(t);
+  return (i === `project` || (i == null && t == null)) && n != null && r?.includes(n) === !0
+    ? { source: `project`, projectRoot: n }
+    : i == null || i === `project`
+      ? null
+      : i === `plugin`
+        ? e == null
+          ? { source: `plugin` }
+          : e === `__unknown__`
+            ? { source: `plugin`, pluginId: null }
+            : { source: `plugin`, pluginId: e }
+        : { source: i };
 }
-
-function mergeEventNames(
-  discovered: string[],
-  preferred: string[],
-  selected: string | null,
-): string[] {
-  const preferredSet = new Set(preferred);
-  const result = [
-    ...preferredSet,
-    ...Array.from(new Set(discovered))
-      .filter((name) => !preferredSet.has(name))
-      .sort((left, right) => left.localeCompare(right)),
-  ];
-  if (selected != null && !result.includes(selected)) result.push(selected);
-  return result;
-}
-
-function summarizeIssues(entry: HookSettingsEntry): { issueCount: number; needsReview: number } {
-  return {
-    issueCount: entry.warnings.length + entry.errors.length,
-    needsReview: entry.hooks.filter(needsReview).length,
-  };
-}
-
-function dedupeHooks(hooks: HookDefinition[]): HookDefinition[] {
-  const byKey = new Map<string, HookDefinition>();
-  for (const hook of hooks) if (!byKey.has(hook.key)) byKey.set(hook.key, hook);
-  return [...byKey.values()];
-}
-
-function dedupeIssues(issues: HookIssue[]): HookIssue[] {
-  const byLocation = new Map<string, HookIssue>();
-  for (const issue of issues) byLocation.set(`${issue.path}:${issue.message}`, issue);
-  return [...byLocation.values()];
-}
-
-function isIssueOnlyEntry(entry: HookSettingsEntry): boolean {
-  return entry.hooks.length === 0 && (entry.warnings.length > 0 || entry.errors.length > 0);
-}
-
-function combineEntries(
-  entries: HookSettingsEntry[],
-  hooks: HookDefinition[],
-  additionalEntries: HookSettingsEntry[] = [],
-): HookSettingsEntry {
-  const uniqueHooks = dedupeHooks(hooks);
-  const hookKeys = new Set(uniqueHooks.map((hook) => hook.key));
-  const relevantEntries = [
-    ...entries.filter((entry) => entry.hooks.some((hook) => hookKeys.has(hook.key))),
-    ...additionalEntries,
-  ];
-  return {
-    cwd: "",
-    hooks: uniqueHooks,
-    warnings: [...new Set(relevantEntries.flatMap((entry) => entry.warnings))],
-    errors: dedupeIssues(relevantEntries.flatMap((entry) => entry.errors)),
-  };
-}
-
-function entryForSource(
-  entries: HookSettingsEntry[],
-  source: Exclude<HookSourceGroup, "plugin" | "project">,
-): HookSettingsEntry | null {
-  const hooks = entries.flatMap((entry) =>
-    entry.hooks.filter((hook) => normalizeSource(hook.source) === source));
-  const issueOnlyEntries = source === "unknown" ? entries.filter(isIssueOnlyEntry) : [];
-  return hooks.length === 0 && issueOnlyEntries.length === 0
+function l(e, t) {
+  if (t == null) return null;
+  let n = e.find((e) => e.id === t.source);
+  return n == null
     ? null
-    : combineEntries(entries, hooks, issueOnlyEntries);
+    : t.source === `project`
+      ? n.id === `project`
+        ? (n.projectEntries.find((e) => e.cwd === t.projectRoot) ?? null)
+        : null
+      : t.source === `plugin`
+        ? n.id === `plugin`
+          ? t.pluginId === void 0
+            ? n.entry
+            : (n.pluginEntries.find((e) => e.pluginId === t.pluginId)?.entry ?? null)
+          : null
+        : n.id === t.source
+          ? n.entry
+          : null;
 }
-
-function projectEntry(entry: HookSettingsEntry): HookSettingsEntry | null {
-  const hooks = entry.hooks.filter((hook) => normalizeSource(hook.source) === "project");
-  return hooks.length === 0 ? null : { ...entry, hooks };
+function u(e, t) {
+  return e
+    .filter((e) => e.eventName === t)
+    .sort((e, t) => (e.displayOrder < t.displayOrder ? -1 : +(e.displayOrder > t.displayOrder)));
 }
-
-function pluginEntries(entries: HookSettingsEntry[]): Array<{
-  entry: HookSettingsEntry;
-  pluginId?: string | null;
-}> {
-  const hooksByPlugin = new Map<string | null | undefined, HookDefinition[]>();
-  for (const entry of entries) {
-    for (const hook of entry.hooks) {
-      if (normalizeSource(hook.source) !== "plugin") continue;
-      const hooks = hooksByPlugin.get(hook.pluginId);
-      if (hooks == null) hooksByPlugin.set(hook.pluginId, [hook]);
-      else hooks.push(hook);
+function d(e) {
+  return e.trustStatus === `untrusted` || e.trustStatus === `modified`;
+}
+function f(e) {
+  switch (e) {
+    case `plugin`:
+      return `plugin`;
+    case `user`:
+      return `user`;
+    case `system`:
+    case `mdm`:
+    case `cloudRequirements`:
+    case `cloudManagedConfig`:
+    case `legacyManagedConfigFile`:
+    case `legacyManagedConfigMdm`:
+      return `admin`;
+    case `project`:
+      return `project`;
+    case `sessionFlags`:
+      return `sessionFlags`;
+    case `unknown`:
+      return `unknown`;
+  }
+}
+function p(e) {
+  if (e.length === 0) return null;
+  let t = new Set(e.map(f));
+  return t.size === 1 ? (t.values().next().value ?? null) : null;
+}
+function m(e, t) {
+  switch (t) {
+    case `project`: {
+      let n = e.map(h).filter((e) => e != null);
+      return n.length === 0 ? null : { id: t, projectEntries: n };
+    }
+    case `plugin`: {
+      let n = _(e, t),
+        r = g(e);
+      return n == null || r.length === 0 ? null : { id: t, entry: n, pluginEntries: r };
+    }
+    case `user`:
+    case `admin`:
+    case `sessionFlags`:
+    case `unknown`: {
+      let n = _(e, t);
+      return n == null ? null : { id: t, entry: n };
     }
   }
-  return [...hooksByPlugin.entries()]
-    .sort(([left], [right]) =>
-      left == null ? 1 : right == null ? -1 : left.localeCompare(right))
-    .map(([pluginId, hooks]) => ({ pluginId, entry: combineEntries(entries, hooks) }));
 }
-
-function resolveSourceSelection({
-  pluginId,
-  source,
-  projectRoot,
-  projectRoots,
-}: {
-  pluginId?: string | null;
-  projectRoot?: string;
-  projectRoots?: string[];
-  source: string | null;
-}): SourceSelection | null {
-  const normalized = normalizeSource(source);
-  if ((normalized === "project" || (normalized == null && source == null))
-    && projectRoot != null && projectRoots?.includes(projectRoot)) {
-    return { source: "project", projectRoot };
+function h(e) {
+  let t = e.hooks.filter((e) => f(e.source) === `project`);
+  return t.length === 0 ? null : { ...e, hooks: t };
+}
+function g(e) {
+  let t = new Map();
+  for (let n of e)
+    for (let e of n.hooks) {
+      if (f(e.source) !== `plugin`) continue;
+      let n = t.get(e.pluginId);
+      n == null ? t.set(e.pluginId, [e]) : n.push(e);
+    }
+  return Array.from(t.entries())
+    .sort(([e], [t]) => (e == null ? 1 : t == null ? -1 : e.localeCompare(t)))
+    .map(([t, n]) => ({ pluginId: t, entry: v(e, n) }));
+}
+function _(e, t) {
+  let n = e.flatMap((e) => e.hooks.filter((e) => f(e.source) === t)),
+    r = t === `unknown` ? e.filter(x) : [];
+  return n.length === 0 && r.length === 0 ? null : v(e, n, r);
+}
+function v(e, t, n = []) {
+  let r = y(t),
+    i = new Set(r.map((e) => e.key)),
+    a = [...e.filter((e) => e.hooks.some((e) => i.has(e.key))), ...n];
+  return {
+    cwd: ``,
+    hooks: r,
+    warnings: Array.from(new Set(a.flatMap((e) => e.warnings))),
+    errors: b(a.flatMap((e) => e.errors)),
+  };
+}
+function y(e) {
+  let t = new Map();
+  for (let n of e) t.has(n.key) || t.set(n.key, n);
+  return Array.from(t.values());
+}
+function b(e) {
+  let t = new Map();
+  for (let n of e) t.set(`${n.path}:${n.message}`, n);
+  return Array.from(t.values());
+}
+function x(e) {
+  return e.hooks.length === 0 && (e.warnings.length > 0 || e.errors.length > 0);
+}
+function S(e) {
+  return e.trustStatus === `managed` || (e.enabled && e.trustStatus === `trusted`);
+}
+function C(e) {
+  switch (e) {
+    case `plugin`:
+    case `user`:
+    case `admin`:
+    case `project`:
+    case `sessionFlags`:
+    case `unknown`:
+      return e;
+    case null:
+      return null;
+    default:
+      return null;
   }
-  if (normalized == null || normalized === "project") return null;
-  if (normalized === "plugin") {
-    if (pluginId == null) return { source: "plugin" };
-    return {
-      source: "plugin",
-      pluginId: pluginId === unknownPluginId ? null : pluginId,
-    };
-  }
-  return { source: normalized };
 }
-
-function pluginHooksNeedingReview(
-  entries: HookSettingsEntry[] | null | undefined,
-  plugin: PluginSummary | null,
-): HookDefinition[] {
-  if (plugin == null) return [];
-  const keys = new Set(plugin.hooks.map((hook) => hook.key));
-  return dedupeHooks(entries?.flatMap((entry) =>
-    entry.hooks.filter((hook) =>
-      hook.source === "plugin"
-      && hook.pluginId === plugin.summary.id
-      && keys.has(hook.key)
-      && needsReview(hook),
-    )) ?? []);
+var w, T;
+function E() {
+  return (E = e(() => {
+    ((w = [`plugin`, `user`, `admin`, `project`, `sessionFlags`, `unknown`]), (T = `__unknown__`));
+  }))();
 }
-
-function availablePluginEvents(
-  plugin: PluginSummary | null | undefined,
-  preferred: string[],
-  discovered: string[],
-): string[] | undefined {
-  if (plugin == null || !plugin.summary.installed || plugin.hooks.length === 0) return undefined;
-  const result = mergeEventNames(preferred, discovered, null);
-  return result.length === 0 ? undefined : result;
-}
-
-function initializeHooksSettingsModel(): void {}
-
 export {
-  filterHooksByEvent as a,
-  availablePluginEvents as c,
-  resolveEntryForSource as d,
-  commonSource as f,
-  groupEntriesBySource as i,
-  pluginHooksNeedingReview as l,
-  needsReview as m,
-  summarizeIssues as n,
-  countHooksNeedingReview as o,
-  initializeHooksSettingsModel as p,
-  summarizeHookEvents as r,
-  mergeEventNames as s,
-  unknownPluginId as t,
-  resolveSourceSelection as u,
+  u as a,
+  i as c,
+  l as d,
+  p as f,
+  s as i,
+  r as l,
+  d as m,
+  o as n,
+  n as o,
+  E as p,
+  t as r,
+  a as s,
+  T as t,
+  c as u,
 };
-
-function groupEntriesBySource(entries: HookSettingsEntry[]): Array<Record<string, unknown>> {
-  const groups: Array<Record<string, unknown>> = [];
-  for (const source of sourceOrder) {
-    if (source === "project") {
-      const projectEntries = entries.map(projectEntry).filter((entry) => entry != null);
-      if (projectEntries.length > 0) groups.push({ id: source, projectEntries });
-      continue;
-    }
-    if (source === "plugin") {
-      const hooks = entries.flatMap((item) =>
-        item.hooks.filter((hook) => normalizeSource(hook.source) === "plugin"));
-      const plugins = pluginEntries(entries);
-      if (hooks.length > 0 && plugins.length > 0) {
-        groups.push({
-          id: source,
-          entry: combineEntries(entries, hooks),
-          pluginEntries: plugins,
-        });
-      }
-      continue;
-    }
-    const entry = entryForSource(entries, source);
-    if (entry != null) groups.push({ id: source, entry });
-  }
-  return groups;
-}
-
-function resolveEntryForSource(
-  groups: Array<Record<string, unknown>>,
-  selection: SourceSelection | null,
-): unknown {
-  if (selection == null) return null;
-  const group = groups.find((candidate) => candidate.id === selection.source) as
-    | {
-        entry?: unknown;
-        id: string;
-        pluginEntries?: Array<{ entry: unknown; pluginId?: string | null }>;
-        projectEntries?: Array<HookSettingsEntry>;
-      }
-    | undefined;
-  if (group == null) return null;
-  if (selection.source === "project") {
-    return group.id === "project"
-      ? group.projectEntries?.find((entry) => entry.cwd === selection.projectRoot) ?? null
-      : null;
-  }
-  if (selection.source === "plugin") {
-    if (group.id !== "plugin") return null;
-    return selection.pluginId === undefined
-      ? group.entry ?? null
-      : group.pluginEntries?.find((entry) => entry.pluginId === selection.pluginId)?.entry ?? null;
-  }
-  return group.id === selection.source ? group.entry ?? null : null;
-}

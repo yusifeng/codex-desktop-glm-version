@@ -1,32 +1,14 @@
-// Catalyst activation-energy specification. Release chunk: type-661332749edd.js.
-import "@rchunk/rolldown-runtime";
-interface Specification {
-  type: "CATALYST_ACTIVATION_ENERGY";
-  version: 1;
-  thumbnailAssetKey: "catalyst-activation-energy-v1";
-  parameters: {
-    catalystEffectivenessPercent: {
-      kind: "number";
-      defaultValue: 50;
-      min: 0;
-      max: 100;
-    };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `CATALYST_ACTIVATION_ENERGY`),
+      (n = `catalyst-activation-energy-v1`),
+      (r = {
+        catalystEffectivenessPercent: { kind: `number`, defaultValue: 50, min: 0, max: 100 },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-let specification: Specification;
-function initializeSpecification(): void {
-  specification ??= {
-    type: "CATALYST_ACTIVATION_ENERGY",
-    version: 1,
-    thumbnailAssetKey: "catalyst-activation-energy-v1",
-    parameters: {
-      catalystEffectivenessPercent: {
-        kind: "number",
-        defaultValue: 50,
-        min: 0,
-        max: 100,
-      },
-    },
-  };
-}
-export { specification as n, initializeSpecification as t };
+export { i as n, a as t };

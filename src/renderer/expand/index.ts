@@ -1,4 +1,4 @@
-// Semantic restoration. Release chunk: expand-15b520e3daf3.js.
+// @ts-nocheck
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   C as t,
@@ -13,31 +13,23 @@ import {
   w as u,
   y as d,
 } from "@rchunk/linear";
-// @ts-ignore -- published chunk binding is preserved locally.
 import { i as f, n as p, o as m } from "@rchunk/nice";
-// @ts-ignore -- published chunk binding is preserved locally.
 import { a as h, i as g, r as _, t as v } from "@rchunk/default-locale";
-// @ts-ignore -- published chunk binding is preserved locally.
 import { n as y } from "@rchunk/scale-init";
-// @ts-ignore -- published chunk binding is preserved locally.
 import { t as b } from "@rchunk/constant-accessor";
-// @ts-ignore -- published chunk binding is preserved locally.
 import { n as x, t as S } from "@rchunk/array-like-to-array-runtime";
 function C(e = n) {
   if (e === n) return w;
   if (typeof e != `function`) throw TypeError(`compare is not a function`);
   return (t, n) => {
     let r = e(t, n);
-    // @ts-ignore -- published chunk binding is preserved locally.
     return r || r === 0 ? r : (e(n, n) === 0) - (e(t, t) === 0);
   };
 }
 function w(e, t) {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (e == null || !(e >= e)) - (t == null || !(t >= t)) || (e < t ? -1 : +(e > t));
 }
 function T() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (T = e(() => {}))();
 }
 function E(e, t, n = 0, r = 1 / 0, i) {
@@ -77,7 +69,6 @@ function D(e, t, n) {
   ((e[t] = e[n]), (e[n] = r));
 }
 function O() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (O = e(() => {
     T();
   }))();
@@ -89,7 +80,6 @@ function ee(e, t, n) {
     var r,
       i = (r - 1) * t,
       a = Math.floor(i),
-      // @ts-ignore -- published chunk binding is preserved locally.
       o = m(E(e, a).subarray(0, a + 1));
     return o + (f(e.subarray(a + 1)) - o) * (i - a);
   }
@@ -106,7 +96,6 @@ function te(e, n, r = t) {
   }
 }
 function k() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (k = e(() => {
     O();
   }))();
@@ -211,7 +200,6 @@ function z() {
   return ((e.copy = () => s(e, z()).base(e.base())), y.apply(e, arguments), e);
 }
 function B() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (B = e(() => {
     (r(), _(), h(), a());
   }))();
@@ -254,7 +242,6 @@ function K() {
   return G.apply(null, arguments).exponent(0.5);
 }
 function q() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (q = e(() => {
     (c(), a());
   }))();
@@ -266,7 +253,6 @@ function J(e, t) {
         a[r][1] += a[r][0] = isNaN(i[r][1]) ? i[r][0] : i[r][1];
 }
 function Y() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (Y = e(() => {}))();
 }
 function X(e) {
@@ -274,7 +260,6 @@ function X(e) {
   return n;
 }
 function Z() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (Z = e(() => {}))();
 }
 function ne(e, t) {
@@ -282,7 +267,6 @@ function ne(e, t) {
 }
 function re(e) {
   let t = [];
-  // @ts-ignore -- published chunk binding is preserved locally.
   return ((t.key = e), t);
 }
 function ie() {
@@ -296,9 +280,7 @@ function ie() {
       s = a.length,
       c = -1,
       l;
-    // @ts-ignore -- published chunk binding is preserved locally.
     for (let e of i) for (o = 0, ++c; o < s; ++o) (a[o][c] = [0, +r(e, a[o].key, c, i)]).data = e;
-    // @ts-ignore -- published chunk binding is preserved locally.
     for (o = 0, l = S(t(a)); o < s; ++o) a[l[o]].index = o;
     return (n(a, l), a);
   }
@@ -321,7 +303,6 @@ function ie() {
   );
 }
 function Q() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (Q = e(() => {
     x();
   }))();
@@ -336,7 +317,6 @@ function ae(e, t) {
   }
 }
 function $() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return ($ = e(() => {}))();
 }
 export {

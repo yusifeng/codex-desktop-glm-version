@@ -1,59 +1,41 @@
-// Compare endogenous MHC I and exogenous MHC II antigen-presentation pathways.
-import "@rchunk/rolldown-runtime";
-
-type MhcPathway = "MHC I (endogenous)" | "MHC II (exogenous)";
-interface EnumParameter { kind: "enum"; defaultValue: MhcPathway; allowedValues: MhcPathway[] }
-interface MhcPresentationValues { initial_pathway?: string | null; stage?: number | null }
-
-const mhcPresentationType = "MHC_I_VS_MHC_II_PRESENTATION";
-const mhcPresentationThumbnail = "mhc-i-vs-mhc-ii-presentation-v2";
-const mhcPresentationParameters: { initial_pathway: EnumParameter } = {
-  initial_pathway: {
-    kind: "enum",
-    defaultValue: "MHC I (endogenous)",
-    allowedValues: ["MHC I (endogenous)", "MHC II (exogenous)"],
-  },
-};
-const mhcPresentationSpecification = {
-  type: mhcPresentationType,
-  version: 1,
-  thumbnailAssetKey: mhcPresentationThumbnail,
-  parameters: mhcPresentationParameters,
-};
-const pathways = mhcPresentationSpecification.parameters.initial_pathway.allowedValues;
-const pathwayControl = {
-  min: 0,
-  max: pathways.length - 1,
-  step: 1,
-  defaultValue: mhcPresentationSpecification.parameters.initial_pathway.defaultValue,
-};
-const stageControl = { min: 0, max: 3, step: 1, defaultValue: 0 };
-
-const pathwayToIndex = (pathway: string): number => Math.max(0, pathways.indexOf(pathway as MhcPathway));
-const indexToPathway = (index: number): MhcPathway =>
-  pathways[Math.min(Math.max(Math.round(index), pathwayControl.min), pathwayControl.max)] ?? pathwayControl.defaultValue;
-
-function normalizeMhcPresentationValues(values: MhcPresentationValues) {
-  const stage = typeof values.stage === "number" && Number.isFinite(values.stage)
-    ? Math.round(values.stage)
-    : stageControl.defaultValue;
-  const candidate = values.initial_pathway ?? "";
-  return {
-    initial_pathway: pathways.includes(candidate as MhcPathway) ? candidate as MhcPathway : pathwayControl.defaultValue,
-    stage: Math.min(Math.max(stage, stageControl.min), stageControl.max),
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `MHC_I_VS_MHC_II_PRESENTATION`),
+      (n = `mhc-i-vs-mhc-ii-presentation-v2`),
+      (r = {
+        initial_pathway: {
+          kind: `enum`,
+          defaultValue: `MHC I (endogenous)`,
+          allowedValues: [`MHC I (endogenous)`, `MHC II (exogenous)`],
+        },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-function initializeMhcPresentationSpecification(): void {}
-function initializeMhcPresentationModel(): void {}
-
-export {
-  initializeMhcPresentationModel as a,
-  mhcPresentationSpecification as c,
-  pathwayToIndex as i,
-  stageControl as n,
-  normalizeMhcPresentationValues as o,
-  indexToPathway as r,
-  initializeMhcPresentationSpecification as s,
-  pathwayControl as t,
-};
+var o, s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    (a(),
+      (o = i.parameters.initial_pathway.allowedValues),
+      (s = {
+        min: 0,
+        max: o.length - 1,
+        step: 1,
+        defaultValue: i.parameters.initial_pathway.defaultValue,
+      }),
+      (c = { min: 0, max: 3, step: 1, defaultValue: 0 }),
+      (l = (e) => Math.max(0, o.indexOf(e))),
+      (u = (e) => o[Math.min(Math.max(Math.round(e), s.min), s.max)] ?? s.defaultValue),
+      (d = (e) => {
+        let t = Number.isFinite(e.stage) ? Math.round(e.stage ?? c.defaultValue) : c.defaultValue;
+        return {
+          initial_pathway: o.includes(e.initial_pathway ?? ``) ? e.initial_pathway : s.defaultValue,
+          stage: Math.min(Math.max(t, c.min), c.max),
+        };
+      }));
+  }))();
+}
+export { f as a, i as c, l as i, c as n, d as o, u as r, a as s, s as t };

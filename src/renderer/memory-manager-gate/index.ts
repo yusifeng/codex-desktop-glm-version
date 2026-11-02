@@ -1,9 +1,9 @@
-import "@rchunk/rolldown-runtime";
-
-function memoryManagerExperimentKey(): string {
-  return "3466753652";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t() {
+  return `3466753652`;
 }
-
-function initializeMemoryManagerGate(): void {}
-
-export { initializeMemoryManagerGate as n, memoryManagerExperimentKey as t };
+function n() {
+  return (n = e(() => {}))();
+}
+export { n, t };

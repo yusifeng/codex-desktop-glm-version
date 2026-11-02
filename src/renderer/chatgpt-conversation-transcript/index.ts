@@ -1,415 +1,392 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as timestampChunk from "@rchunk/timestamp-separator";
-import * as viewerChunk from "@rchunk/artifact-viewer";
-import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
-
-export interface TranscriptTurn {
-  browserConversationId?: string | null;
-  conversationId?: string;
-  errorMessage?: unknown;
-  id: string;
-  isMostRecentTurn?: boolean;
-  isTemporaryChat?: boolean;
-  isWorkConversation?: boolean;
-  paragen?: Record<string, unknown> | null;
-  readAloudEnabled?: boolean;
-  role?: "assistant" | "system" | "user";
-  text?: string;
-  timestamp?: string | number;
-  timestampSeparatorAtMs?: number | null;
-  turn?: unknown;
-  turnKey?: string;
-  [key: string]: unknown;
-}
-export interface ChatgptConversationTranscriptProps {
-  browserConversationId?: string;
-  conversationId: string;
-  emptyState?: unknown;
-  flushTop?: boolean;
-  imageEngagementContext?: unknown;
-  onHandoffSuccess?: unknown;
-  paragenEnabled?: boolean;
-  paragenPortalContainer?: Element | null;
-  pendingSubmission?: {
-    attachments?: unknown;
-    renderMarkdown?: boolean;
-    text?: string;
-  } | null;
-  renderInitialContentAsComplete?: boolean;
-  renderMode?: "conversation" | "sidebar";
-  showRequestUserInputStatus?: boolean;
-  trackShownImpressions?: boolean;
-  turnActions?: unknown;
-  turns?: TranscriptTurn[];
-}
-interface QueryResult<Value> {
-  data?: Value;
-  error?: unknown;
-  isError?: boolean;
-  isLoading?: boolean;
-}
-interface SharedRuntime {
-  BX?<Value>(family: unknown, parameter: unknown): Value;
-  HX?<Value>(signal: unknown): Value;
-  I3(): JsxRuntime;
-  LX?(scope: unknown): { get(signal: unknown, parameter?: unknown): unknown };
-  Y2?: unknown;
-  ZI?: unknown;
-  e6(): ReactRuntime;
-  n4?(): { formatMessage(descriptor: Record<string, unknown>): string };
-  zX?(family: unknown, parameter: unknown): unknown;
-  [key: string]: unknown;
-}
-interface InitialRuntime {
-  [key: string]: unknown;
-}
-interface PrimaryRuntime {
-  [key: string]: unknown;
-}
-interface ViewerRuntime {
-  [key: string]: unknown;
-}
-
-const shared = appSharedChunk as unknown as SharedRuntime;
-const initial = appInitialChunk as unknown as InitialRuntime;
-const primary = appPrimaryChunk as unknown as PrimaryRuntime;
-const viewer = viewerChunk as unknown as ViewerRuntime;
-const timestamp = timestampChunk as unknown as { n?: () => void; t?: unknown };
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let initialized = false;
-const loggedErrors = new WeakSet<object>();
-
-function callInitializer(value: unknown): void {
-  if (typeof value === "function") (value as () => void)();
-}
-function initializeTranscript(): void {
-  if (initialized) return;
-  for (const value of [
-    shared.$3,
-    shared.FX,
-    shared.K2,
-    shared.QI,
-    initial.Let,
-    initial.Ret,
-    initial.hL,
-    initial.pL,
-    initial.qL,
-    initial.uHt,
-    initial.zVt,
-    primary.Ds,
-    primary.Os,
-    viewer._,
-    viewer.m,
-    viewer.n,
-    viewer.r,
-    timestamp.n,
-  ])
-    callInitializer(value);
-  React = shared.e6();
-  jsx = shared.I3();
-  initialized = true;
-}
-
-function family<Value>(
-  signal: unknown,
-  parameter: unknown,
-  fallback: Value,
-): Value {
-  return typeof shared.BX === "function" && signal != null
-    ? shared.BX<Value>(signal, parameter)
-    : fallback;
-}
-function value<Value>(signal: unknown, fallback: Value): Value {
-  return typeof shared.HX === "function" && signal != null
-    ? shared.HX<Value>(signal)
-    : fallback;
-}
-function callable<Result>(
-  target: unknown,
-  ...args: unknown[]
-): Result | undefined {
-  return typeof target === "function"
-    ? (target as (...values: unknown[]) => Result)(...args)
-    : undefined;
-}
-
-function syntheticTurns(
-  props: ChatgptConversationTranscriptProps,
-): TranscriptTurn[] {
-  return props.turns ?? [];
-}
-
-function projectLiveTurns(props: ChatgptConversationTranscriptProps): {
-  conversationQuery: QueryResult<Record<string, unknown>>;
-  isStreaming: boolean;
-  serverConversationId: string | null;
-  turns: TranscriptTurn[];
-  showPendingLoadingMessage: boolean;
-} {
-  const serverConversationId = family<string | null>(
-    initial.wVt,
-    props.conversationId,
-    null,
-  );
-  const querySignal = callable<unknown>(
-    shared.zX,
-    initial.BBt,
-    serverConversationId,
-  );
-  const conversationQuery = value<QueryResult<Record<string, unknown>>>(
-    querySignal,
-    {},
-  );
-  const currentMessage = family<unknown>(
-    initial.jVt,
-    props.conversationId,
-    null,
-  );
-  const threadMapping = family<unknown>(
-    initial.RVt,
-    props.conversationId,
-    null,
-  );
-  const workContext = family<unknown>(initial.YVt, props.conversationId, null);
-  const isStreaming = callable<boolean>(initial.dHt, workContext) ?? false;
-  const origin =
-    conversationQuery.data?.conversation_origin ??
-    family<unknown>(initial.AVt, props.conversationId, null);
-  const isWorkConversation = origin === "tpp" || origin === "flora";
-  const renderConversation = callable<{
-    renderedConversation?: unknown;
-    renderedTurns?: unknown[];
-    showPendingLoadingMessage?: boolean;
-  }>(viewer.h, {
-    conversation: conversationQuery.data,
-    clinicalSearchEnabled: value(initial.hkt, false),
-    clinicalCitationsEnabled: value(initial.mkt, false),
-    conversationOrigin: origin,
-    getRenderTelemetry: () => undefined,
-    isStreaming,
-    isWorkConversation,
-    mode: isWorkConversation ? "conversation" : (props.renderMode ?? "sidebar"),
-    moderationDisclaimersByMessageId: family(
-      initial.zVt,
-      props.conversationId,
-      null,
-    ),
-    pendingSubmission:
-      props.pendingSubmission == null
-        ? null
-        : {
-            ...props.pendingSubmission,
-            renderMarkdown: family(initial.CIt, props.conversationId, true),
-          },
-    threadCurrentNode: currentMessage,
-    threadMapping,
-  });
-  const projected = callable<TranscriptTurn[]>(viewer.g, {
-    paragen:
-      props.paragenEnabled === false || props.renderMode !== "conversation"
-        ? null
-        : family(initial.Cpn, props.conversationId, null),
-    browserConversationId: props.browserConversationId,
-    conversationId: props.conversationId,
-    errorMessage: family(initial.MVt, props.conversationId, null),
-    isWorkConversation,
-    onEditUserMessage: undefined,
-    onFork: undefined,
-    renderedTurns: renderConversation?.renderedTurns ?? [],
-    safetyReview: family(initial.GVt, props.conversationId, null),
-    showPendingLoadingMessage:
-      renderConversation?.showPendingLoadingMessage === true,
-    showRequestUserInputStatus: props.showRequestUserInputStatus === true,
-  });
-  return {
-    conversationQuery,
-    isStreaming,
-    serverConversationId,
-    turns: props.turns ?? projected ?? [],
-    showPendingLoadingMessage:
-      renderConversation?.showPendingLoadingMessage === true,
-  };
-}
-
-function PlainTurn({ turn }: { turn: TranscriptTurn }): unknown {
-  return jsx.jsxs("article", {
-    "data-role": turn.role,
-    "data-turn-id": turn.id,
-    children: [
-      turn.timestamp == null
-        ? null
-        : jsx.jsx("time", { children: String(turn.timestamp) }),
-      jsx.jsx("p", { children: turn.text }),
-    ],
-  });
-}
-
-function renderTurn(
-  props: ChatgptConversationTranscriptProps,
-  turn: TranscriptTurn,
-  index: number,
-  total: number,
-): unknown {
-  const Turn = viewer.r;
-  const TimestampSeparator = timestamp.t;
-  const content =
-    typeof Turn === "function"
-      ? jsx.jsx(Turn, {
-          browserConversationId:
-            turn.browserConversationId ?? props.browserConversationId,
-          conversationId: turn.conversationId ?? props.conversationId,
-          conversationType:
-            props.renderMode === "conversation" ? "primary" : "sidebar",
-          flushTop: props.flushTop === true && index === 0,
-          hostId: initial.ugn,
-          imageEngagementContext: props.imageEngagementContext,
-          isMostRecentTurn: turn.isMostRecentTurn ?? index === total - 1,
-          isTemporaryChat: turn.isTemporaryChat,
-          isParagen: turn.paragen != null,
-          isWorkConversation: turn.isWorkConversation,
-          readAloudEnabled: turn.readAloudEnabled,
-          onHandoffSuccess: props.onHandoffSuccess,
-          pendingSubmissionAttachments:
-            index === total - 1
-              ? props.pendingSubmission?.attachments
-              : undefined,
-          trackShownImpressions: props.trackShownImpressions !== false,
-          turnActions: index === total - 1 ? props.turnActions : null,
-          turn: turn.turn ?? turn,
-          turnId: turn.id,
-        })
-      : jsx.jsx(PlainTurn, { turn });
-  return jsx.jsxs(
-    "div",
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as ee,
+  HX as r,
+  I3 as i,
+  K2 as a,
+  LX as te,
+  QI as o,
+  Y2 as s,
+  ZI as ne,
+  e6 as c,
+  n4 as re,
+  zX as ie,
+} from "@rchunk/app-shared";
+import {
+  $Bt as l,
+  AVt as ae,
+  BBt as oe,
+  Bfn as u,
+  Cpn as se,
+  DIt as ce,
+  GVt as le,
+  JL as d,
+  LUt as ue,
+  Let as de,
+  MVt as fe,
+  RIt as pe,
+  RUt as f,
+  RVt as me,
+  Ret as p,
+  YVt as he,
+  aAt as ge,
+  akt as _e,
+  bpn as m,
+  dHt as ve,
+  dkt as h,
+  gkt as g,
+  hL as _,
+  hkt as ye,
+  jVt as be,
+  mkt as xe,
+  pL as Se,
+  qL as Ce,
+  rAt as v,
+  skt as y,
+  uHt as b,
+  ugn as x,
+  ukt as S,
+  wVt as we,
+  zVt as Te,
+} from "@rchunk/app-initial";
+import { Ds as C, Os as Ee, Sa as w, xa as T } from "@rchunk/app-primary";
+import { n as E, t as De } from "@rchunk/timestamp-separator";
+import {
+  _ as D,
+  g as Oe,
+  h as ke,
+  i as O,
+  m as k,
+  n as A,
+  p as Ae,
+  r as je,
+  t as Me,
+} from "@rchunk/artifact-viewer";
+function j(e) {
+  let t = (0, M.c)(27),
     {
-      className: "flex flex-col gap-1.5",
-      "data-chatgpt-conversation-turn": "true",
-      "data-chatgpt-conversation-turn-id": turn.id,
-      children: [
-        turn.timestampSeparatorAtMs == null ||
-        typeof TimestampSeparator !== "function"
-          ? null
-          : jsx.jsx(TimestampSeparator, {
-              sentAtMs: turn.timestampSeparatorAtMs,
+      browserConversationId: ee,
+      conversationId: i,
+      emptyState: a,
+      flushTop: o,
+      imageEngagementContext: c,
+      onHandoffSuccess: l,
+      pendingSubmission: u,
+      paragenEnabled: d,
+      paragenPortalContainer: pe,
+      renderInitialContentAsComplete: f,
+      renderMode: p,
+      showRequestUserInputStatus: m,
+      trackShownImpressions: h,
+      turnActions: g,
+    } = e,
+    _ = o !== void 0 && o,
+    v = u === void 0 ? null : u,
+    y = d === void 0 || d,
+    b = f !== void 0 && f,
+    C = p === void 0 ? `sidebar` : p,
+    w = m !== void 0 && m,
+    E = h === void 0 || h,
+    D = te(ne),
+    O = n(Ee, i),
+    k = re(),
+    A = n(_e, i),
+    j = n(ce, i),
+    I = y && C === `conversation` ? A : null,
+    L = n(we, i);
+  n(Ae, L);
+  let Ne = n(be, i),
+    R = n(ae, i),
+    Pe = n(fe, i),
+    Fe = n(me, i),
+    Ie = n(Te, i),
+    Le = n(he, i),
+    Re = n(le, i),
+    ze = ie(oe, L),
+    z = r(ze),
+    Be = Fe != null,
+    Ve = ve(Le),
+    He = z.data?.conversation_origin ?? R,
+    B = He === `tpp` || !1,
+    Ue = r(B ? null : ye) === !0,
+    We = r(B ? null : xe) === !0,
+    V;
+  t[0] === D ? (V = t[1]) : ((V = (e) => S(D.get, e)), (t[0] = D), (t[1] = V));
+  let {
+      renderedConversation: Ge,
+      renderedTurns: Ke,
+      showPendingLoadingMessage: H,
+    } = ke({
+      conversation: z.data,
+      clinicalSearchEnabled: Ue,
+      clinicalCitationsEnabled: We,
+      conversationOrigin: He,
+      getRenderTelemetry: V,
+      isStreaming: Ve,
+      isWorkConversation: B,
+      mode: B ? `conversation` : C,
+      moderationDisclaimersByMessageId: Ie,
+      pendingSubmission: v == null ? null : { ...v, renderMarkdown: j },
+      threadCurrentNode: Ne,
+      threadMapping: Fe,
+    }),
+    U = Ke.length > 0,
+    W;
+  t[2] !== U || t[3] !== b
+    ? ((W = () => !b || !U), (t[2] = U), (t[3] = b), (t[4] = W))
+    : (W = t[4]);
+  let [qe] = (0, N.useState)(W),
+    Je = Oe({
+      paragen: I,
+      browserConversationId: ee,
+      conversationId: i,
+      errorMessage: Pe,
+      isWorkConversation: B,
+      onEditUserMessage: void 0,
+      onFork: void 0,
+      renderedTurns:
+        I == null || Ge == null
+          ? Ke
+          : ue(
+              { ...Ge, current_node: I.promptMessageId },
+              {
+                clinicalSearchEnabled: Ue,
+                clinicalCitationsEnabled: We,
+                isWorkConversation: B,
+                getRenderTelemetry: (e) => S(D.get, e),
+              },
+            ),
+      safetyReview: Re,
+      showPendingLoadingMessage: H,
+      showRequestUserInputStatus: w,
+    }),
+    G;
+  t[5] === k
+    ? (G = t[6])
+    : ((G = k.formatMessage({
+        id: `chatgptConversations.loadingConversation`,
+        defaultMessage: `Loading ChatGPT conversation`,
+        description: `Accessible loading status shown while a ChatGPT conversation is loading in Codex Desktop`,
+      })),
+      (t[5] = k),
+      (t[6] = G));
+  let Ye = G,
+    Xe = L != null && z.isLoading && !Be,
+    K = z.isError && !Be,
+    q;
+  t[7] !== z.data ||
+  t[8] !== z.error ||
+  t[9] !== K ||
+  t[10] !== D ||
+  t[11] !== L ||
+  t[12] !== R ||
+  t[13] !== E
+    ? ((q = () => {
+        if (!K || !E || z.error == null || F.has(z.error)) return;
+        F.add(z.error);
+        let e = z.data?.conversation_origin ?? R;
+        ge(D.get(se).logProductEvent, {
+          conversationId: L,
+          error: z.error,
+          isWorkConversation: e == null && z.data == null ? null : e === `tpp` || e === `flora`,
+        });
+      }),
+      (t[7] = z.data),
+      (t[8] = z.error),
+      (t[9] = K),
+      (t[10] = D),
+      (t[11] = L),
+      (t[12] = R),
+      (t[13] = E),
+      (t[14] = q))
+    : (q = t[14]);
+  let J = (0, N.useEffectEvent)(q),
+    Y;
+  t[15] === J
+    ? (Y = t[16])
+    : ((Y = () => {
+        J();
+      }),
+      (t[15] = J),
+      (t[16] = Y));
+  let X;
+  (t[17] !== i || t[18] !== z.error || t[19] !== K || t[20] !== E
+    ? ((X = [i, z.error, K, E]),
+      (t[17] = i),
+      (t[18] = z.error),
+      (t[19] = K),
+      (t[20] = E),
+      (t[21] = X))
+    : (X = t[21]),
+    (0, N.useEffect)(Y, X));
+  let Z;
+  t[22] === i
+    ? (Z = t[23])
+    : ((Z = (0, P.jsx)(Se, { conversationId: i })), (t[22] = i), (t[23] = Z));
+  let Q = K
+      ? (0, P.jsx)(`div`, {
+          className: `rounded-xl border border-default bg-surface-secondary/92 p-4 text-sm text-default`,
+          children: (0, P.jsx)(s, {
+            id: `chatgptConversations.loadError`,
+            defaultMessage: `Could not load this ChatGPT conversation`,
+            description: `Error state when a ChatGPT conversation fetch fails`,
+          }),
+        })
+      : Xe
+        ? (0, P.jsx)(`div`, {
+            "aria-busy": `true`,
+            "aria-label": Ye,
+            className: `relative min-h-0 flex-1`,
+            role: `status`,
+            children: (0, P.jsx)(de, {
+              debugName: `ChatGptConversationTranscript`,
+              fillParent: !0,
             }),
-        content,
-      ],
-    },
-    turn.turnKey ?? turn.id,
+          })
+        : !U && !H
+          ? a === void 0
+            ? !O &&
+              (0, P.jsx)(`div`, {
+                className: `rounded-xl border border-default bg-surface-secondary/92 p-4 text-sm text-codex-description`,
+                children: (0, P.jsx)(s, {
+                  id: `chatgptConversations.emptyConversation`,
+                  defaultMessage: `No renderable ChatGPT messages were found in this conversation`,
+                  description: `Empty state when a ChatGPT conversation has no user or assistant text messages`,
+                }),
+              })
+            : a
+          : (0, P.jsxs)(P.Fragment, {
+              children: [
+                Je.map((e, t) =>
+                  (0, P.jsxs)(
+                    `div`,
+                    {
+                      className: `flex flex-col gap-1.5`,
+                      "data-chatgpt-conversation-turn": `true`,
+                      "data-chatgpt-conversation-turn-id": e.id,
+                      children: [
+                        e.timestampSeparatorAtMs == null
+                          ? null
+                          : (0, P.jsx)(De, { sentAtMs: e.timestampSeparatorAtMs }),
+                        (0, P.jsxs)(Ce, {
+                          value: qe,
+                          children: [
+                            (0, P.jsx)(je, {
+                              browserConversationId: e.browserConversationId,
+                              conversationId: e.conversationId,
+                              conversationType: B || C === `conversation` ? `primary` : `sidebar`,
+                              flushTop: _ && t === 0,
+                              hostId: x,
+                              imageEngagementContext: c,
+                              isMostRecentTurn: e.isMostRecentTurn,
+                              isTemporaryChat: e.isTemporaryChat,
+                              isParagen: e.paragen != null,
+                              isWorkConversation: e.isWorkConversation,
+                              readAloudEnabled: e.readAloudEnabled,
+                              onEditUserMessage: e.onEditUserMessage,
+                              onFork: e.onFork,
+                              onHandoffSuccess: l,
+                              pendingSubmissionAttachments: e.isMostRecentTurn
+                                ? v?.attachments
+                                : void 0,
+                              safetyReview: e.safetyReview,
+                              trackShownImpressions: E,
+                              turnActions: g === void 0 || t === Je.length - 1 ? g : null,
+                              turn: e.turn,
+                              turnId: e.id,
+                            }),
+                            e.paragen == null
+                              ? null
+                              : (0, P.jsx)(
+                                  Me,
+                                  {
+                                    compact: !0,
+                                    comparison: e.paragen,
+                                    conversationId: e.conversationId,
+                                    hostId: x,
+                                    isTemporaryChat: e.isTemporaryChat,
+                                    isWorkConversation: e.isWorkConversation,
+                                    portalContainer: pe,
+                                    trackTaskViews: E,
+                                  },
+                                  e.paragen.promptMessageId,
+                                ),
+                          ],
+                        }),
+                        e.isMostRecentTurn
+                          ? (0, P.jsx)(T, {
+                              conversationId: i,
+                              errorMessage: e.errorMessage,
+                              isWorkConversation: e.isWorkConversation,
+                              showPendingLoadingMessage: e.showPendingLoadingMessage,
+                              showRequestUserInputStatus: e.showRequestUserInputStatus,
+                              trackShownImpressions: E,
+                            })
+                          : null,
+                      ],
+                    },
+                    e.turnKey,
+                  ),
+                ),
+                U
+                  ? null
+                  : (0, P.jsx)(T, {
+                      conversationId: i,
+                      errorMessage: Pe,
+                      isWorkConversation: B,
+                      showPendingLoadingMessage: H,
+                      showRequestUserInputStatus: w,
+                      trackShownImpressions: E,
+                    }),
+              ],
+            }),
+    $;
+  return (
+    t[24] !== Z || t[25] !== Q
+      ? (($ = (0, P.jsxs)(`div`, {
+          className: `flex min-h-full flex-1 flex-col gap-1.5`,
+          children: [Z, Q],
+        })),
+        (t[24] = Z),
+        (t[25] = Q),
+        (t[26] = $))
+      : ($ = t[26]),
+    $
   );
 }
-
-function ChatgptConversationTranscript(
-  props: ChatgptConversationTranscriptProps,
-): unknown {
-  initializeTranscript();
-  const live = projectLiveTurns(props);
-  const [initialContentIncomplete] = React.useState(
-    () =>
-      props.renderInitialContentAsComplete !== true && live.turns.length > 0,
-  );
-  React.useEffect(() => {
-    const error = live.conversationQuery.error;
-    if (
-      !live.conversationQuery.isError ||
-      props.trackShownImpressions === false ||
-      typeof error !== "object" ||
-      error == null ||
-      loggedErrors.has(error)
-    )
-      return;
-    loggedErrors.add(error);
-    const scope = shared.LX?.(shared.ZI);
-    const analytics = scope?.get(initial.Cpn) as
-      { logProductEvent?(event: Record<string, unknown>): void } | undefined;
-    analytics?.logProductEvent?.({
-      conversationId: live.serverConversationId,
-      error,
-      source: "chatgpt-conversation-transcript-load",
-    });
-  }, [
-    live.conversationQuery.error,
-    live.conversationQuery.isError,
-    live.serverConversationId,
-    props.trackShownImpressions,
-  ]);
-
-  const turns = props.turns == null ? live.turns : syntheticTurns(props);
-  const loading =
-    live.serverConversationId != null &&
-    live.conversationQuery.isLoading === true;
-  const error = live.conversationQuery.isError === true;
-  let body: unknown;
-  if (error) {
-    body = jsx.jsx("div", {
-      className:
-        "rounded-xl border border-default bg-surface-secondary/92 p-4 text-sm text-default",
-      role: "alert",
-      children: "Could not load this ChatGPT conversation",
-    });
-  } else if (loading) {
-    body = jsx.jsx("div", {
-      "aria-busy": true,
-      "aria-label":
-        shared
-          .n4?.()
-          .formatMessage({
-            id: "chatgptConversations.loadingConversation",
-            defaultMessage: "Loading ChatGPT conversation",
-          }) ?? "Loading ChatGPT conversation",
-      className: "relative min-h-0 flex-1",
-      role: "status",
-    });
-  } else if (
-    turns.length === 0 &&
-    props.pendingSubmission == null &&
-    !live.showPendingLoadingMessage
-  ) {
-    body =
-      props.emptyState ??
-      jsx.jsx("div", {
-        className:
-          "rounded-xl border border-default bg-surface-secondary/92 p-4 text-sm text-codex-description",
-        children:
-          "No renderable ChatGPT messages were found in this conversation",
-      });
-  } else {
-    const PendingStatus = primary.xa;
-    body = jsx.jsxs(jsx.Fragment, {
-      children: [
-        turns.map((turn, index) =>
-          renderTurn(props, turn, index, turns.length),
-        ),
-        typeof PendingStatus !== "function" ||
-        (!live.showPendingLoadingMessage && props.pendingSubmission == null)
-          ? null
-          : jsx.jsx(PendingStatus, {
-              conversationId: props.conversationId,
-              showPendingLoadingMessage: live.showPendingLoadingMessage,
-              showRequestUserInputStatus:
-                props.showRequestUserInputStatus === true,
-              trackShownImpressions: props.trackShownImpressions !== false,
-            }),
-      ],
-    });
-  }
-  return jsx.jsxs("div", {
-    className: "flex min-h-full flex-1 flex-col gap-1.5",
-    "data-conversation-id": props.conversationId,
-    "data-initial-content-incomplete": initialContentIncomplete,
-    "data-render-mode": props.renderMode ?? "sidebar",
-    children: [
-      typeof initial.pL === "function"
-        ? jsx.jsx(initial.pL, { conversationId: props.conversationId })
-        : null,
-      body,
-    ],
-  });
+var M, N, P, F;
+function I() {
+  return (I = e(() => {
+    ((M = t()),
+      ee(),
+      (N = c()),
+      a(),
+      E(),
+      p(),
+      m(),
+      g(),
+      C(),
+      o(),
+      u(),
+      pe(),
+      f(),
+      l(),
+      D(),
+      w(),
+      k(),
+      O(),
+      v(),
+      d(),
+      b(),
+      y(),
+      A(),
+      _(),
+      h(),
+      (P = i()),
+      (F = new WeakSet()));
+  }))();
 }
-
-initializeTranscript();
-export { initializeTranscript as n, ChatgptConversationTranscript as t };
+export { I as n, j as t };

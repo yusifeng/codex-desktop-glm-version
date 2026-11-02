@@ -1,18 +1,10 @@
-import { FX as initializeSignalRuntime } from "@rchunk/app-shared";
-import {
-  FR as openMcpExtensionThreadSidePanelTab,
-  IR as restoreMcpExtensionSidePanelTab,
-  MR as initializeMcpExtensionSidePanelTab,
-  NR as mcpExtensionTabType,
-  PR as openMcpExtensionFileViewerSidePanelTab,
-} from "@rchunk/app-initial";
-
-initializeSignalRuntime();
-initializeMcpExtensionSidePanelTab();
-
+// @ts-nocheck
+import "@rchunk/app-shared";
+import { FR as e, IR as t, MR as n, NR as r, PR as i } from "@rchunk/app-initial";
+n();
 export {
-  mcpExtensionTabType,
-  openMcpExtensionFileViewerSidePanelTab,
-  openMcpExtensionThreadSidePanelTab,
-  restoreMcpExtensionSidePanelTab,
+  r as mcpExtensionTabType,
+  i as openMcpExtensionFileViewerSidePanelTab,
+  e as openMcpExtensionThreadSidePanelTab,
+  t as restoreMcpExtensionSidePanelTab,
 };

@@ -1,130 +1,60 @@
-// new-chat-page-suggestions-eligibility —— 新对话页 suggestions 的来源、就绪与展示资格。
-// 原版：app/webview/assets/new-chat-page-suggestions-eligibility-3faf4b7da2a4.js。
-
-import "@rchunk/rolldown-runtime";
-import {
-  $3 as getCompilerRuntime,
-  $O as timeConstants,
-  _L as useQuery,
-  ek as initializeQueryRuntime,
-  gL as initializeAppServices,
-} from "@rchunk/app-shared";
-import {
-  mnt as initializeAmbientSuggestionsService,
-  pnt as appServices,
-} from "@rchunk/app-initial";
-
-export type NewChatSuggestionSource = "generated" | "curated";
-
-function ambientSuggestionAppQueryKey(hostId: string): readonly string[] {
-  return ["new-chat-suggestion-source", "has-accessible-enabled-ambient-suggestion-app", hostId];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, $O as n, _L as r, ek as i, gL as a } from "@rchunk/app-shared";
+import { mnt as o, pnt as s } from "@rchunk/app-initial";
+function c(e) {
+  let t = (0, m.c)(9),
+    { accountId: i, enabled: a, hostId: o } = e,
+    c;
+  t[0] !== i || t[1] !== o ? ((c = l(o, i)), (t[0] = i), (t[1] = o), (t[2] = c)) : (c = t[2]);
+  let u;
+  t[3] === o
+    ? (u = t[4])
+    : ((u = async () =>
+        (await s.ambientSuggestions?.hasAccessibleAndEnabledApp({ hostId: o })) ?? !1),
+      (t[3] = o),
+      (t[4] = u));
+  let d;
+  return (
+    t[5] !== a || t[6] !== c || t[7] !== u
+      ? ((d = { queryKey: c, queryFn: u, enabled: a, retry: !1, staleTime: n.FIVE_MINUTES }),
+        (t[5] = a),
+        (t[6] = c),
+        (t[7] = u),
+        (t[8] = d))
+      : (d = t[8]),
+    r(d)
+  );
 }
-
-function ambientSuggestionAppAccountQueryKey(hostId: string, accountId: string): readonly string[] {
-  return [...ambientSuggestionAppQueryKey(hostId), accountId];
+function l(e, t) {
+  return [...u(e), t];
 }
-
-export interface AmbientSuggestionAppQueryOptions {
-  accountId: string;
-  enabled: boolean;
-  hostId: string;
+function u(e) {
+  return [`new-chat-suggestion-source`, `has-accessible-enabled-ambient-suggestion-app`, e];
 }
-
-interface CompilerRuntime {
-  c(size: number): unknown[];
+function d({ debugOverride: e, experimentEligible: t, personalized: n }) {
+  return e ?? (t && n ? `generated` : `curated`);
 }
-
-let compilerRuntime: CompilerRuntime;
-
-function createAmbientSuggestionAppQuery({
-  accountId,
-  enabled,
-  hostId,
-}: AmbientSuggestionAppQueryOptions): unknown {
-  const cache = compilerRuntime.c(9);
-  let queryKey: readonly string[];
-  if (cache[0] !== accountId || cache[1] !== hostId) {
-    queryKey = ambientSuggestionAppAccountQueryKey(hostId, accountId);
-    cache[0] = accountId;
-    cache[1] = hostId;
-    cache[2] = queryKey;
-  } else {
-    queryKey = cache[2] as readonly string[];
-  }
-
-  let queryFn: () => Promise<boolean>;
-  if (cache[3] !== hostId) {
-    queryFn = async () =>
-      (await appServices.ambientSuggestions?.hasAccessibleAndEnabledApp({ hostId })) ?? false;
-    cache[3] = hostId;
-    cache[4] = queryFn;
-  } else {
-    queryFn = cache[4] as () => Promise<boolean>;
-  }
-
-  let options: Record<string, unknown>;
-  if (cache[5] !== enabled || cache[6] !== queryKey || cache[7] !== queryFn) {
-    options = {
-      queryKey,
-      queryFn,
-      enabled,
-      retry: false,
-      staleTime: timeConstants.FIVE_MINUTES,
-    };
-    cache[5] = enabled;
-    cache[6] = queryKey;
-    cache[7] = queryFn;
-    cache[8] = options;
-  } else {
-    options = cache[8] as Record<string, unknown>;
-  }
-  return useQuery(options as never);
+function f({
+  canUsePersonalizedSuggestions: e,
+  generatedSuggestionsEnabled: t,
+  hasGeneratedSuggestionsReadSettled: n,
+  shouldUseCuratedNewChatPageSuggestions: r,
+}) {
+  return r || !t || !e ? !0 : n;
 }
-
-function selectNewChatSuggestionSource(input: {
-  debugOverride?: NewChatSuggestionSource | null;
-  experimentEligible: boolean;
-  personalized: boolean;
-}): NewChatSuggestionSource {
-  return input.debugOverride ?? (input.experimentEligible && input.personalized ? "generated" : "curated");
+function p({
+  areNewChatPageSuggestionsLoading: e,
+  hasProjectRoot: t,
+  shouldShowHomeSuggestions: n,
+  shouldUseCuratedNewChatPageSuggestions: r,
+}) {
+  return e ? !1 : r ? !0 : t && n;
 }
-
-function areNewChatSuggestionsReady(input: {
-  canUsePersonalizedSuggestions: boolean;
-  generatedSuggestionsEnabled: boolean;
-  hasGeneratedSuggestionsReadSettled: boolean;
-  shouldUseCuratedNewChatPageSuggestions: boolean;
-}): boolean {
-  return input.shouldUseCuratedNewChatPageSuggestions ||
-    !input.generatedSuggestionsEnabled ||
-    !input.canUsePersonalizedSuggestions
-    ? true
-    : input.hasGeneratedSuggestionsReadSettled;
+var m;
+function h() {
+  return (h = e(() => {
+    ((m = t()), a(), o(), i());
+  }))();
 }
-
-function shouldShowNewChatPageSuggestions(input: {
-  areNewChatPageSuggestionsLoading: boolean;
-  hasProjectRoot: boolean;
-  shouldShowHomeSuggestions: boolean;
-  shouldUseCuratedNewChatPageSuggestions: boolean;
-}): boolean {
-  if (input.areNewChatPageSuggestionsLoading) return false;
-  if (input.shouldUseCuratedNewChatPageSuggestions) return true;
-  return input.hasProjectRoot && input.shouldShowHomeSuggestions;
-}
-
-function initializeNewChatPageSuggestionsEligibility(): void {
-  compilerRuntime = getCompilerRuntime() as unknown as CompilerRuntime;
-  initializeAppServices();
-  initializeAmbientSuggestionsService();
-  initializeQueryRuntime();
-}
-
-export {
-  initializeNewChatPageSuggestionsEligibility as a,
-  areNewChatSuggestionsReady as i,
-  ambientSuggestionAppQueryKey as n,
-  createAmbientSuggestionAppQuery as o,
-  selectNewChatSuggestionSource as r,
-  shouldShowNewChatPageSuggestions as t,
-};
+export { h as a, f as i, u as n, c as o, d as r, p as t };

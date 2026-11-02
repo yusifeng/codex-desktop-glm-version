@@ -1,37 +1,21 @@
-// Conductometric-titration learning-block model.
-// Release chunk: app/webview/assets/model-ae2c3d093d91.js.
-
-import "@rchunk/rolldown-runtime";
-
-type TitrationRegime = "before" | "equivalence" | "after";
-interface TitrationValues { addedVolumeMl?: number }
-interface TitrationState { addedVolumeMl: number; conductivity: number; regime: TitrationRegime }
-interface VolumeRange { min: number; max: number; step: number; defaultValue: number }
-
-let volumeRange: VolumeRange;
-let minimumConductivity: number;
-let calculateConductivity: (addedVolumeMl: number) => number;
-let calculateTitrationState: (values: TitrationValues) => TitrationState;
-let initialized = false;
-
-function initializeConductometricTitrationModel(): void {
-  if (initialized) return;
-  initialized = true;
-  volumeRange = { min: 0, max: 40, step: 0.5, defaultValue: 12 };
-  minimumConductivity = 2.4;
-  calculateConductivity = addedVolumeMl => addedVolumeMl <= 20
-    ? minimumConductivity + (20 - addedVolumeMl) * 0.24
-    : minimumConductivity + (addedVolumeMl - 20) * 0.2;
-  calculateTitrationState = values => {
-    const addedVolumeMl = Number.isFinite(values.addedVolumeMl)
-      ? Math.min(volumeRange.max, Math.max(volumeRange.min, values.addedVolumeMl as number))
-      : volumeRange.defaultValue;
-    return {
-      addedVolumeMl,
-      conductivity: calculateConductivity(addedVolumeMl),
-      regime: addedVolumeMl < 20 ? "before" : addedVolumeMl > 20 ? "after" : "equivalence",
-    };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = { min: 0, max: 40, step: 0.5, defaultValue: 12 }),
+      (n = 2.4),
+      (r = (e) => (e <= 20 ? n + (20 - e) * 0.24 : n + (e - 20) * 0.2)),
+      (i = (e) => {
+        let n = Number.isFinite(e.addedVolumeMl)
+          ? Math.min(t.max, Math.max(t.min, e.addedVolumeMl))
+          : t.defaultValue;
+        return {
+          addedVolumeMl: n,
+          conductivity: r(n),
+          regime: n < 20 ? `before` : n > 20 ? `after` : `equivalence`,
+        };
+      }));
+  }))();
 }
-
-export { initializeConductometricTitrationModel as a, calculateConductivity as i, volumeRange as n, calculateTitrationState as r, minimumConductivity as t };
+export { a, r as i, t as n, i as r, n as t };

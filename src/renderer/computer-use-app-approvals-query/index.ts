@@ -1,175 +1,142 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $O as timeConstants,
-  FX as initializeSignalRuntime,
-  QI as initializeQueryRuntime,
-  UI as invokeDesktopBridge,
-  ZI as appScope,
-  eZ as createQuerySignal,
-  ek as initializeQuerySignals,
-  rZ as createDerivedFamily,
+  $O as t,
+  FX as n,
+  QI as r,
+  UI as i,
+  ZI as a,
+  eZ as o,
+  ek as s,
+  rZ as c,
 } from "@rchunk/app-shared";
 import {
-  $fn as initializeHostRequirements,
-  $sn as initializeRemoteControlState,
-  Qfn as readRemoteControlState,
-  Su as isComputerUseAvailable,
-  Ysn as hostRequirementsQuery,
-  mfn as featureGateFamily,
-  mnt as initializeDesktopBridge,
-  pfn as initializeFeatureGates,
-  pnt as desktopBridge,
-  xu as initializeComputerUseAvailability,
+  $fn as l,
+  $sn as u,
+  Qfn as d,
+  Su as f,
+  Ysn as p,
+  mfn as m,
+  mnt as h,
+  pfn as g,
+  pnt as _,
+  xu as v,
 } from "@rchunk/app-initial";
-
-interface HostRequirements {
-  computerUse?: { allowLockedComputerUse?: boolean };
+var y;
+function b() {
+  return (b = e(() => {
+    (n(),
+      u(),
+      v(),
+      r(),
+      l(),
+      g(),
+      (y = c(
+        a,
+        (e, { get: t }) =>
+          t(m, `2296472986`) &&
+          f({
+            remoteControlConnectionsState: d(t, `remote_control_connections_state`),
+            slingshotEnabled: t(m, `1042620455`),
+          }) &&
+          t(p, { hostId: e }).data?.requirements?.computerUse?.allowLockedComputerUse !== !1,
+      )));
+  }))();
 }
-
-interface HostRequirementsResult {
-  data?: { requirements?: HostRequirements };
+async function x(e) {
+  return i(_.computerUseSettings.removeAppApproval(e));
 }
-
-interface ComputerUseSettingsBridge {
-  getAppApprovals(): Promise<unknown>;
-  getLockedUseState(): Promise<unknown>;
-  getMessagesReadDecisions(): Promise<unknown>;
-  getMessagesSendApprovals(): Promise<unknown>;
-  getSoundMode(): Promise<unknown>;
-  removeAppApproval(id: string): Promise<unknown>;
-  removeMessagesReadDecision(id: string): Promise<unknown>;
-  removeMessagesSendApproval(id: string): Promise<unknown>;
-  searchMessagesChats(query: string): Promise<unknown>;
-  setLockedUseEnabled(enabled: boolean): Promise<unknown>;
-  setMessagesReadAccessPolicy(policy: unknown): Promise<unknown>;
-  setMessagesReadDecision(id: string, decision: unknown, metadata: unknown): Promise<unknown>;
-  setMessagesSendAllowAllChats(enabled: boolean): Promise<unknown>;
-  setSoundMode(mode: unknown): Promise<unknown>;
+async function S(e, t) {
+  let n = A.then(() => (t.throwIfAborted(), i(_.computerUseSettings.searchMessagesChats(e))));
+  A = n.then(
+    () => void 0,
+    () => void 0,
+  );
+  let r = await n;
+  return (t.throwIfAborted(), r);
 }
-
-const computerUseSettings = (desktopBridge as unknown as {
-  computerUseSettings: ComputerUseSettingsBridge;
-}).computerUseSettings;
-
-let computerUseEnabledForHost: unknown;
-let searchQueue = Promise.resolve();
-let appApprovalsQuery: unknown;
-let messagesReadDecisionsQuery: unknown;
-let messagesSendApprovalsQuery: unknown;
-let soundModeQuery: unknown;
-let lockedUseQuery: unknown;
-
-function initializeComputerUseAvailabilityQuery(): void {
-  initializeSignalRuntime();
-  initializeRemoteControlState();
-  initializeComputerUseAvailability();
-  initializeQueryRuntime();
-  initializeHostRequirements();
-  initializeFeatureGates();
-  computerUseEnabledForHost = createDerivedFamily(
-    appScope,
-    (hostId: string, { get }): boolean =>
-      get(featureGateFamily, "2296472986")
-      && isComputerUseAvailable({
-        remoteControlConnectionsState: readRemoteControlState(
-          get,
-          "remote_control_connections_state",
-        ),
-        slingshotEnabled: get(featureGateFamily, "1042620455"),
-      })
-      && (get(hostRequirementsQuery, { hostId }) as HostRequirementsResult)
-        .data?.requirements?.computerUse?.allowLockedComputerUse !== false,
-  );
+async function C(e) {
+  return i(_.computerUseSettings.setMessagesReadAccessPolicy(e));
 }
-
-const removeAppApproval = (id: string) =>
-  invokeDesktopBridge(computerUseSettings.removeAppApproval(id));
-
-async function searchMessagesChats(query: string, signal: AbortSignal): Promise<unknown> {
-  const request = searchQueue.then(() => {
-    signal.throwIfAborted();
-    return invokeDesktopBridge(computerUseSettings.searchMessagesChats(query));
-  });
-  searchQueue = request.then(() => undefined, () => undefined);
-  const result = await request;
-  signal.throwIfAborted();
-  return result;
+async function w(e, t, n) {
+  return i(_.computerUseSettings.setMessagesReadDecision(e, t, n));
 }
-
-const setMessagesReadAccessPolicy = (policy: unknown) =>
-  invokeDesktopBridge(computerUseSettings.setMessagesReadAccessPolicy(policy));
-const setMessagesReadDecision = (id: string, decision: unknown, metadata: unknown) =>
-  invokeDesktopBridge(computerUseSettings.setMessagesReadDecision(id, decision, metadata));
-const removeMessagesReadDecision = (id: string) =>
-  invokeDesktopBridge(computerUseSettings.removeMessagesReadDecision(id));
-const setMessagesSendAllowAllChats = (enabled: boolean) =>
-  invokeDesktopBridge(computerUseSettings.setMessagesSendAllowAllChats(enabled));
-const removeMessagesSendApproval = (id: string) =>
-  invokeDesktopBridge(computerUseSettings.removeMessagesSendApproval(id));
-const setSoundMode = (mode: unknown) =>
-  invokeDesktopBridge(computerUseSettings.setSoundMode(mode));
-const setLockedUseEnabled = (enabled: boolean) =>
-  invokeDesktopBridge(computerUseSettings.setLockedUseEnabled(enabled));
-
-function initializeComputerUseApprovalQueries(): void {
-  initializeSignalRuntime();
-  initializeDesktopBridge();
-  initializeQueryRuntime();
-  initializeQuerySignals();
-  const query = (
-    queryKey: string,
-    queryFn: () => Promise<unknown>,
-    staleTime: number,
-  ) => createQuerySignal(appScope, () => ({
-    queryFn,
-    queryKey: [queryKey],
-    refetchOnMount: "always",
-    refetchOnWindowFocus: true,
-    staleTime,
-  }));
-  appApprovalsQuery = query(
-    "computer-use-app-approvals",
-    () => invokeDesktopBridge(computerUseSettings.getAppApprovals()),
-    timeConstants.ONE_MINUTE,
-  );
-  messagesReadDecisionsQuery = query(
-    "messages-read-decisions",
-    () => invokeDesktopBridge(computerUseSettings.getMessagesReadDecisions()),
-    timeConstants.ONE_MINUTE,
-  );
-  messagesSendApprovalsQuery = query(
-    "messages-send-approvals",
-    () => invokeDesktopBridge(computerUseSettings.getMessagesSendApprovals()),
-    timeConstants.ONE_MINUTE,
-  );
-  soundModeQuery = query(
-    "computer-use-sound-mode",
-    () => invokeDesktopBridge(computerUseSettings.getSoundMode()),
-    timeConstants.FIVE_SECONDS,
-  );
-  lockedUseQuery = query(
-    "locked-computer-use",
-    () => invokeDesktopBridge(computerUseSettings.getLockedUseState()),
-    timeConstants.FIVE_SECONDS,
-  );
+async function T(e) {
+  return i(_.computerUseSettings.removeMessagesReadDecision(e));
 }
-
+async function E(e) {
+  return i(_.computerUseSettings.setMessagesSendAllowAllChats(e));
+}
+async function D(e) {
+  return i(_.computerUseSettings.removeMessagesSendApproval(e));
+}
+async function O(e) {
+  return i(_.computerUseSettings.setSoundMode(e));
+}
+async function k(e) {
+  return i(_.computerUseSettings.setLockedUseEnabled(e));
+}
+var A, j, M, N, P, F;
+function I() {
+  return (I = e(() => {
+    (n(),
+      h(),
+      r(),
+      s(),
+      (A = Promise.resolve()),
+      (j = o(a, () => ({
+        queryFn: ({ signal: e }) => i(_.computerUseSettings.getAppApprovals(), e),
+        queryKey: [`computer-use-app-approvals`],
+        refetchOnMount: `always`,
+        refetchOnWindowFocus: !0,
+        staleTime: t.ONE_MINUTE,
+      }))),
+      (M = o(a, () => ({
+        queryFn: ({ signal: e }) => i(_.computerUseSettings.getMessagesReadDecisions(), e),
+        queryKey: [`messages-read-decisions`],
+        refetchOnMount: `always`,
+        refetchOnWindowFocus: !0,
+        staleTime: t.ONE_MINUTE,
+      }))),
+      (N = o(a, () => ({
+        queryFn: ({ signal: e }) => i(_.computerUseSettings.getMessagesSendApprovals(), e),
+        queryKey: [`messages-send-approvals`],
+        refetchOnMount: `always`,
+        refetchOnWindowFocus: !0,
+        staleTime: t.ONE_MINUTE,
+      }))),
+      (P = o(a, () => ({
+        queryFn: ({ signal: e }) => i(_.computerUseSettings.getSoundMode(), e),
+        queryKey: [`computer-use-sound-mode`],
+        refetchOnMount: `always`,
+        refetchOnWindowFocus: !0,
+        staleTime: t.FIVE_SECONDS,
+      }))),
+      (F = o(a, () => ({
+        queryFn: ({ signal: e }) => i(_.computerUseSettings.getLockedUseState(), e),
+        queryKey: [`locked-computer-use`],
+        refetchOnMount: `always`,
+        refetchOnWindowFocus: !0,
+        staleTime: t.FIVE_SECONDS,
+      }))));
+  }))();
+}
 export {
-  initializeComputerUseAvailabilityQuery as _,
-  messagesReadDecisionsQuery as a,
-  removeMessagesReadDecision as c,
-  setLockedUseEnabled as d,
-  setMessagesReadAccessPolicy as f,
-  computerUseEnabledForHost as g,
-  setSoundMode as h,
-  lockedUseQuery as i,
-  removeMessagesSendApproval as l,
-  setMessagesSendAllowAllChats as m,
-  soundModeQuery as n,
-  messagesSendApprovalsQuery as o,
-  setMessagesReadDecision as p,
-  initializeComputerUseApprovalQueries as r,
-  removeAppApproval as s,
-  appApprovalsQuery as t,
-  searchMessagesChats as u,
+  b as _,
+  M as a,
+  T as c,
+  k as d,
+  C as f,
+  y as g,
+  O as h,
+  F as i,
+  D as l,
+  E as m,
+  P as n,
+  N as o,
+  w as p,
+  I as r,
+  x as s,
+  j as t,
+  S as u,
 };

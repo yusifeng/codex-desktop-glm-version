@@ -1,328 +1,271 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-
-const {
-  $3: initializeRuntimeLazy,
-  BX: useSignalFamilyValueExport,
-  FZ: disabledQueryExport,
-  HX: useSignalValue,
-  LX: useScope,
-  WB: buildLocalPath,
-  ZI: AppScope,
-  _L: useQuery,
-  lY: normalizeThreadId,
-} = appSharedChunk;
-const useSignalFamilyValue = useSignalFamilyValueExport as unknown as (
-  family: unknown,
-  parameter: unknown,
-) => unknown;
-const disabledQuery = disabledQueryExport as unknown as (
-  context: { signal: AbortSignal },
-) => Promise<null>;
-
-interface SiteEditContext {
-  accountId?: string | null;
-  latestEditContext?: {
-    chatgpt_conversation_id?: string | null;
-    codex_thread_id?: string | null;
-  } | null;
-  projectId?: string | null;
-  projectTitle?: string | null;
-  userId?: string | null;
-}
-
-interface SiteEditLocationState extends Record<string, unknown> {
-  siteEditContext?: SiteEditContext | null;
-  siteEditLiveUrl?: string | null;
-}
-
-interface EditDestination {
-  path: string;
-  preview?: Record<string, unknown>;
-  state: Record<string, unknown>;
-}
-
-interface ThreadManager {
-  readThread(threadId: string, options: { includeTurns: boolean }): Promise<{ thread: { cwd: string } }>;
-}
-
-interface ConversationManager {
-  loadRecentConversationIds(threadIds: string[]): Promise<string[]>;
-  resumeConversation(input: Record<string, unknown>, options: Record<string, unknown>): Promise<{ status: string }>;
-}
-
-interface SiteEditDependencies {
-  apiClient: {
-    safeGet(path: string, options: Record<string, unknown>): Promise<{
-      gizmo_id?: string | null;
-      is_archived?: boolean;
-      is_read_only?: boolean;
-    }>;
-  };
-  buildChatPath(conversationId: string, options: { gizmoId?: string | null }): string;
-  buildLocalPath(conversationId: string): string;
-  buildSiteMention(input: { projectId: string; title: string }): string;
-  getConversationManager(scope: unknown, hostId: string): ConversationManager;
-  getThread(input: {
-    requestOptions: { timeoutMs: number };
-    scope: unknown;
-    threadId: string;
-  }): Promise<{
-    hostId: string;
-    manager: ThreadManager;
-    thread?: { cwd: string } | null;
-  }>;
-  intlSignal: unknown;
-  localHostId: string;
-  navigate(scope: unknown, path: string, options: { replace: boolean; state: Record<string, unknown> }): boolean;
-  navigateHome(scope: unknown, options: Record<string, unknown>): void;
-  openInBrowser(options: Record<string, unknown>): void;
-  readResumeInputs(scope: unknown, hostId: string): unknown;
-}
-
-const siteInitial = appInitialChunk as unknown as {
-  Bet: unknown;
-  EOt: SiteEditDependencies["getThread"];
-  FC: unknown;
-  HWt: SiteEditDependencies["buildSiteMention"];
-  Icn: unknown;
-  N6t: () => { accountId?: string | null; userId?: string | null; isLoading?: boolean };
-  Rcn: unknown;
-  Ugn: SiteEditDependencies["getConversationManager"];
-  Vsn: SiteEditDependencies["readResumeInputs"];
-  _pn: SiteEditDependencies["navigate"];
-  gln: SiteEditDependencies["buildChatPath"];
-  i_n: () => import("@rchunk/app-initial").RouterLocationState;
-  kft: SiteEditDependencies["openInBrowser"];
-  l_n: () => { projectId?: string | null };
-  m2: SiteEditDependencies["navigateHome"];
-  mpn: unknown;
-  rJt: SiteEditDependencies["apiClient"];
-};
-const {
-  Bet: homeComposerModeSignal,
-  EOt: loadThread,
-  FC: effectiveWorkLocationFamily,
-  HWt: buildSiteMention,
-  Icn: workModeEnabledSignal,
-  N6t: useAuthState,
-  Rcn: appLoadingSignal,
-  Ugn: getConversationManager,
-  Vsn: readResumeInputs,
-  _pn: navigate,
-  gln: buildChatPath,
-  i_n: useLocation,
-  kft: openInBrowser,
-  l_n: useRouteParameters,
-  m2: navigateHome,
-  mpn: intlSignal,
-  rJt: apiClient,
-} = siteInitial;
-const { df: localHostId } = appPrimaryChunk as unknown as { df: string };
-
-function createPrompt(scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>, projectId: string, projectTitle?: string | null): string {
-  const intl = scope.get(intlSignal) as {
-    formatMessage(descriptor: Record<string, unknown>, values: Record<string, unknown>): string;
-  };
-  return intl.formatMessage({
-    id: "appgenConversation.editPrompt",
-    defaultMessage: "{siteMention} make these changes…",
-    description: "Prompt for continuing work on an existing site from the Sites page",
-  }, {
-    siteMention: buildSiteMention({ projectId, title: projectTitle ?? projectId }),
-  }) + " ";
-}
-
-async function resolveEditDestination(
-  scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
-  input: {
-    latestEditContext?: SiteEditContext["latestEditContext"];
-    mode: string;
-    projectId: string;
-    projectTitle?: string | null;
-    signal: AbortSignal;
-    workRunLocation?: string | null;
-  },
-): Promise<EditDestination> {
-  input.signal.throwIfAborted();
-  const prompt = createPrompt(scope, input.projectId, input.projectTitle);
-  const state = { prefillPrompt: prompt, focusComposerNonce: Date.now() };
-  const useCloudConversation = input.mode === "chat"
-    || (input.mode === "work" && input.workRunLocation === "cloud");
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  FZ as i,
+  HX as a,
+  LX as o,
+  QI as s,
+  WB as c,
+  ZI as l,
+  _L as u,
+  gL as d,
+  jU as f,
+  jZ as p,
+  lY as m,
+  wL as h,
+} from "@rchunk/app-shared";
+import {
+  Bet as g,
+  Dft as _,
+  EOt as v,
+  FC as y,
+  Fcn as b,
+  GWt as x,
+  HWt as S,
+  Het as C,
+  Hsn as w,
+  Icn as ee,
+  M6t as T,
+  N6t as te,
+  NC as E,
+  Qgn as D,
+  Rcn as O,
+  TOt as k,
+  Ugn as A,
+  Vsn as j,
+  Wet as ne,
+  Wgn as M,
+  _pn as N,
+  cJt as P,
+  d2 as F,
+  e_n as I,
+  gln as L,
+  gpn as R,
+  hpn as z,
+  i_n as B,
+  kft as V,
+  l_n as H,
+  m2 as U,
+  mpn as W,
+  ppn as G,
+  rJt as K,
+  vln as q,
+} from "@rchunk/app-initial";
+import { df as J } from "@rchunk/app-primary";
+async function Y(
+  e,
+  { projectId: t, latestEditContext: n, projectTitle: r, mode: i, workRunLocation: a, signal: o },
+) {
+  o.throwIfAborted();
+  let s = `${e.get(W).formatMessage({ id: `appgenConversation.editPrompt`, defaultMessage: `{siteMention} make these changes…`, description: `Prompt for continuing work on an existing site from the Sites page` }, { siteMention: S({ projectId: t, title: r ?? t }) })} `,
+    l = { prefillPrompt: s, focusComposerNonce: Date.now() },
+    u = i === `chat` || (i === `work` && a === `cloud`);
   try {
-    const chatConversationId = input.latestEditContext?.chatgpt_conversation_id;
-    if (useCloudConversation && chatConversationId) {
-      const conversation = await apiClient.safeGet("/conversation/{conversation_id}", {
-        parameters: { path: { conversation_id: chatConversationId } },
-        signal: input.signal,
-      });
-      input.signal.throwIfAborted();
-      if (!conversation.is_archived && !conversation.is_read_only) {
-        const search = new URLSearchParams({ prompt, promptSource: "codex-app" });
-        return {
-          path: buildChatPath(chatConversationId, { gizmoId: conversation.gizmo_id }) + "?" + search,
-          state,
-          preview: {
-            conversationId: chatConversationId,
-            projectId: input.projectId,
-            title: input.projectTitle ?? input.projectId,
-          },
-        };
-      }
-    }
-
-    const codexThreadId = input.latestEditContext?.codex_thread_id;
-    const useLocalConversation = input.mode === "codex"
-      || (input.mode === "work" && input.workRunLocation === "local");
-    if (useLocalConversation && codexThreadId) {
-      const threadId = normalizeThreadId(codexThreadId);
-      const loaded = await loadThread({
-        scope,
-        threadId,
-        requestOptions: { timeoutMs: 10_000 },
-      });
-      input.signal.throwIfAborted();
-      const thread = loaded.thread ?? (await loaded.manager.readThread(threadId, { includeTurns: false })).thread;
-      input.signal.throwIfAborted();
-      const manager = getConversationManager(scope, loaded.hostId);
-      const recentIds = await manager.loadRecentConversationIds([threadId]);
-      input.signal.throwIfAborted();
-      if (recentIds.includes(threadId)) {
-        const resumed = await manager.resumeConversation({
-          conversationId: threadId,
-          model: null,
-          preserveServerConfiguration: loaded.hostId === localHostId,
-          reasoningEffort: null,
-          serviceTier: null,
-          useAppServerPermissionDefault: false,
-          workspaceRoots: [thread.cwd],
-        }, {
-          readResumeInputs: readResumeInputs(scope, loaded.hostId),
+    if (u && n?.chatgpt_conversation_id) {
+      let e = n.chatgpt_conversation_id,
+        i = await K.safeGet(`/conversation/{conversation_id}`, {
+          parameters: { path: { conversation_id: e } },
+          signal: o,
         });
-        input.signal.throwIfAborted();
-        if (resumed.status !== "not-ready") {
+      if ((o.throwIfAborted(), !i.is_archived && !i.is_read_only))
+        return {
+          path: `${L(e, { gizmoId: i.gizmo_id })}?${new URLSearchParams({ prompt: s, promptSource: `codex-app` })}`,
+          state: l,
+          preview: { conversationId: e, projectId: t, title: r ?? t },
+        };
+    } else if ((i === `codex` || (i === `work` && a === `local`)) && n?.codex_thread_id) {
+      let i = m(n.codex_thread_id),
+        {
+          hostId: a,
+          manager: s,
+          thread: u,
+        } = await v({ scope: e, threadId: i, requestOptions: { timeoutMs: 1e4 } });
+      o.throwIfAborted();
+      let d = u ?? (await s.readThread(i, { includeTurns: !1 })).thread;
+      o.throwIfAborted();
+      let p = A(e, a),
+        h = await p.loadRecentConversationIds([i]);
+      if ((o.throwIfAborted(), h.includes(i))) {
+        let n = await p.resumeConversation(
+          {
+            conversationId: i,
+            model: null,
+            serviceTier: null,
+            reasoningEffort: null,
+            workspaceRoots: [d.cwd],
+            useAppServerPermissionDefault: !1,
+            preserveServerConfiguration: a === f,
+          },
+          { readResumeInputs: j(e, a) },
+        );
+        if ((o.throwIfAborted(), n.status !== `not-ready`))
           return {
-            path: buildLocalPath(threadId) + "?" + new URLSearchParams({ hostId: loaded.hostId }),
-            state,
-            preview: {
-              conversationId: threadId,
-              hostId: loaded.hostId,
-              projectId: input.projectId,
-              title: input.projectTitle ?? input.projectId,
-            },
+            path: `${c(i)}?${new URLSearchParams({ hostId: a })}`,
+            state: l,
+            preview: { conversationId: i, hostId: a, projectId: t, title: r ?? t },
           };
-        }
       }
     }
   } catch {
-    input.signal.throwIfAborted();
+    o.throwIfAborted();
   }
-  return {
-    path: "/",
-    state: { ...state, project: null, codexAppMode: input.mode },
-  };
+  return { path: `/`, state: { ...l, project: null, codexAppMode: i } };
 }
-
-async function applyDestination(
-  scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
-  destination: EditDestination,
-  liveUrl: string | null | undefined,
-  routeState: Record<string, unknown>,
-): Promise<void> {
-  if (destination.path === "/") {
-    navigateHome(scope, {
-      ...routeState,
+async function X(e, t, n, r) {
+  let i = e.get(z);
+  if (t.path === `/`)
+    U(e, {
+      ...r,
       activeProject: null,
-      prefillPrompt: destination.state.prefillPrompt,
-      codexAppMode: destination.state.codexAppMode,
-      startInSidebar: true,
+      prefillPrompt: t.state.prefillPrompt,
+      codexAppMode: t.state.codexAppMode,
+      startInSidebar: !0,
     });
-  } else if (!navigate(scope, destination.path, {
-    replace: true,
-    state: { ...routeState, ...destination.state },
-  })) {
-    return;
-  }
-  if (liveUrl != null) {
-    openInBrowser({
-      href: liveUrl,
-      initiator: "sites_library",
-      openTarget: "in-app-browser",
-    });
-  }
-}
-
-function SiteEditRoute(): null {
-  initializeSiteEditRoute();
-  const scope = useScope(AppScope);
-  const { projectId } = useRouteParameters();
-  const location = useLocation();
-  const routeState = (location.state ?? {}) as SiteEditLocationState;
-  const { siteEditContext, siteEditLiveUrl, ...restState } = routeState;
-  const { accountId, userId, isLoading } = useAuthState();
-  const validContext = accountId != null
-    && userId != null
-    && siteEditContext?.accountId === accountId
-    && siteEditContext.userId === userId
-    && siteEditContext.projectId === projectId
-    ? siteEditContext
-    : undefined;
-  const workModeEnabled = useSignalValue(workModeEnabledSignal);
-  const appLoading = useSignalValue(appLoadingSignal);
-  const homeComposerMode = useSignalValue(homeComposerModeSignal) as string | null;
-  const mode = workModeEnabled ? homeComposerMode : "codex";
-  const workLocation = useSignalFamilyValue(effectiveWorkLocationFamily, {
-    enforceAccess: false,
-    homeComposerMode,
-    routeProjectId: null,
-  }) as { effectiveLocation?: string | null } | string | null;
-  const effectiveLocation = typeof workLocation === "string"
-    ? workLocation
-    : workLocation?.effectiveLocation ?? null;
-  const enabled = projectId != null && mode != null && !isLoading && !appLoading;
-  useQuery({
-    queryKey: [
-      "site-edit",
-      location.key,
-      accountId,
-      userId,
-      projectId,
-      mode,
-      effectiveLocation,
-      siteEditLiveUrl,
-      validContext,
-      restState,
-    ],
-    enabled,
-    queryFn: async (context) => {
-      if (projectId == null || mode == null) return disabledQuery(context);
-      const destination = await resolveEditDestination(scope, {
-        latestEditContext: validContext?.latestEditContext,
-        mode,
-        projectId,
-        projectTitle: validContext?.projectTitle,
-        signal: context.signal,
-        workRunLocation: effectiveLocation,
-      });
-      await applyDestination(scope, destination, validContext == null ? undefined : siteEditLiveUrl, restState);
-      return null;
-    },
-    retry: false,
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnWindowFocus: false,
+  else if (!N(e, t.path, { replace: !0, state: { ...r, ...t.state } })) return;
+  if ((t.preview != null && t.preview, n == null)) return;
+  await e.when(({ get: e }) => {
+    let t = e(z);
+    return t.pathname !== i.pathname || t.search !== i.search;
   });
-  return null;
+  let a = e.get(z),
+    { pathname: o, search: s = `` } = I(t.path);
+  a.pathname === o &&
+    (a.search ?? ``) === s &&
+    V({ href: n, initiator: `sites_library`, openTarget: `in-app-browser` });
 }
-
-let initialized = false;
-function initializeSiteEditRoute(): void {
-  if (initialized) return;
-  initializeRuntimeLazy();
-  initialized = true;
+function Z() {
+  return (Z = e(() => {
+    (h(), D(), k(), R(), M(), w(), P(), q(), x(), _(), F(), G(), J());
+  }))();
 }
-
-initializeSiteEditRoute();
-export { SiteEditRoute };
+function re() {
+  let e = (0, Q.c)(33),
+    t = o(l),
+    { projectId: r } = H(),
+    { key: s, state: c } = B(),
+    d;
+  e[0] === c ? (d = e[1]) : ((d = c ?? {}), (e[0] = c), (e[1] = d));
+  let f, p, m;
+  e[2] === d
+    ? ((f = e[3]), (p = e[4]), (m = e[5]))
+    : (({ siteEditLiveUrl: f, siteEditContext: m, ...p } = d),
+      (e[2] = d),
+      (e[3] = f),
+      (e[4] = p),
+      (e[5] = m));
+  let { accountId: h, userId: _, isLoading: v } = te(),
+    b =
+      h != null && _ != null && m?.accountId === h && m.userId === _ && m.projectId === r
+        ? m
+        : void 0,
+    x = a(ee),
+    S = a(O),
+    C = a(g),
+    w = x ? C : `codex`,
+    T;
+  e[6] === x
+    ? (T = e[7])
+    : ((T = ne({ windowType: `electron`, workModeEnabled: x })), (e[6] = x), (e[7] = T));
+  let E;
+  e[8] !== C || e[9] !== T
+    ? ((E = {
+        enforceAccess: T,
+        homeComposerMode: C,
+        prefillComposerMode: void 0,
+        prefillKey: void 0,
+        routeProjectId: null,
+        selectedChatGptProjectId: null,
+        selectedWorkProject: null,
+      }),
+      (e[8] = C),
+      (e[9] = T),
+      (e[10] = E))
+    : (E = e[10]);
+  let { effectiveLocation: D } = n(y, E),
+    k;
+  e[11] !== h ||
+  e[12] !== b ||
+  e[13] !== D ||
+  e[14] !== s ||
+  e[15] !== f ||
+  e[16] !== w ||
+  e[17] !== p ||
+  e[18] !== r ||
+  e[19] !== _
+    ? ((k = [`site-edit`, s, h, _, r, w, D, f, b, p]),
+      (e[11] = h),
+      (e[12] = b),
+      (e[13] = D),
+      (e[14] = s),
+      (e[15] = f),
+      (e[16] = w),
+      (e[17] = p),
+      (e[18] = r),
+      (e[19] = _),
+      (e[20] = k))
+    : (k = e[20]);
+  let A = r != null && w != null && !v && !S,
+    j;
+  e[21] !== b ||
+  e[22] !== D ||
+  e[23] !== f ||
+  e[24] !== w ||
+  e[25] !== p ||
+  e[26] !== r ||
+  e[27] !== t
+    ? ((j =
+        r == null || w == null
+          ? i
+          : async (e) => {
+              let { signal: n } = e,
+                i = await Y(t, {
+                  projectId: r,
+                  latestEditContext: b?.latestEditContext,
+                  projectTitle: b?.projectTitle,
+                  mode: w,
+                  workRunLocation: D,
+                  signal: n,
+                });
+              return (await X(t, i, b == null ? void 0 : f, b == null ? void 0 : p), null);
+            }),
+      (e[21] = b),
+      (e[22] = D),
+      (e[23] = f),
+      (e[24] = w),
+      (e[25] = p),
+      (e[26] = r),
+      (e[27] = t),
+      (e[28] = j))
+    : (j = e[28]);
+  let M;
+  return (
+    e[29] !== k || e[30] !== A || e[31] !== j
+      ? ((M = {
+          queryKey: k,
+          enabled: A,
+          queryFn: j,
+          retry: !1,
+          staleTime: 0,
+          gcTime: 0,
+          refetchOnWindowFocus: !1,
+        }),
+        (e[29] = k),
+        (e[30] = A),
+        (e[31] = j),
+        (e[32] = M))
+      : (M = e[32]),
+    u(M),
+    null
+  );
+}
+var Q;
+function $() {
+  return ($ = e(() => {
+    ((Q = t()), p(), d(), r(), D(), T(), E(), C(), s(), b(), Z());
+  }))();
+}
+$();
+export { re as SiteEditRoute };

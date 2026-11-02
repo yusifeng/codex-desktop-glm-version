@@ -1,49 +1,37 @@
-// Adding a negative integer as leftward movement on a number line.
-import "@rchunk/rolldown-runtime";
-
-interface IntegerParameter { kind: "integer"; defaultValue: number; min: number; max: number }
-interface AddingNegativeValues { positiveInteger?: number; negativeInteger?: number }
-
-const addingNegativeIntegerType = "ADDING_NEGATIVE_INTEGER";
-const addingNegativeIntegerThumbnail = "adding-negative-integer-v1";
-const addingNegativeIntegerParameters: { positiveInteger: IntegerParameter; negativeInteger: IntegerParameter } = {
-  positiveInteger: { kind: "integer", defaultValue: 7, min: 1, max: 12 },
-  negativeInteger: { kind: "integer", defaultValue: -4, min: -12, max: -1 },
-};
-const addingNegativeIntegerSpecification = {
-  type: addingNegativeIntegerType,
-  version: 1,
-  thumbnailAssetKey: addingNegativeIntegerThumbnail,
-  parameters: addingNegativeIntegerParameters,
-};
-const positiveIntegerControl = { ...addingNegativeIntegerSpecification.parameters.positiveInteger, step: 1 };
-const negativeIntegerControl = { ...addingNegativeIntegerSpecification.parameters.negativeInteger, step: 1 };
-const domainMin = positiveIntegerControl.min + negativeIntegerControl.min - 1;
-const domainMax = positiveIntegerControl.max + 1;
-
-const normalizeInteger = (value: number | undefined, minimum: number, maximum: number, fallback: number): number =>
-  Math.min(maximum, Math.max(minimum, Math.round(typeof value === "number" && Number.isFinite(value) ? value : fallback)));
-const normalizeAddingNegativeValues = (values: AddingNegativeValues) => ({
-  positiveInteger: normalizeInteger(values.positiveInteger, positiveIntegerControl.min, positiveIntegerControl.max, positiveIntegerControl.defaultValue),
-  negativeInteger: normalizeInteger(values.negativeInteger, negativeIntegerControl.min, negativeIntegerControl.max, negativeIntegerControl.defaultValue),
-});
-const calculateAddingNegativeInteger = (values: AddingNegativeValues) => {
-  const normalized = normalizeAddingNegativeValues(values);
-  const result = normalized.positiveInteger + normalized.negativeInteger;
-  const stepCount = Math.abs(normalized.negativeInteger);
-  const positions = Array.from({ length: stepCount + 1 }, (_unused, index) => normalized.positiveInteger - index);
-  return { ...normalized, result, stepCount, positions, domainMin, domainMax };
-};
-
-function initializeAddingNegativeIntegerSpecification(): void {}
-function initializeAddingNegativeIntegerModel(): void {}
-
-export {
-  calculateAddingNegativeInteger as a,
-  normalizeAddingNegativeValues as i,
-  positiveIntegerControl as n,
-  initializeAddingNegativeIntegerSpecification as o,
-  initializeAddingNegativeIntegerModel as r,
-  addingNegativeIntegerSpecification as s,
-  negativeIntegerControl as t,
-};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `ADDING_NEGATIVE_INTEGER`),
+      (n = `adding-negative-integer-v1`),
+      (r = {
+        positiveInteger: { kind: `integer`, defaultValue: 7, min: 1, max: 12 },
+        negativeInteger: { kind: `integer`, defaultValue: -4, min: -12, max: -1 },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f;
+function p() {
+  return (p = e(() => {
+    (a(),
+      (o = { ...i.parameters.positiveInteger, step: 1 }),
+      (s = { ...i.parameters.negativeInteger, step: 1 }),
+      (c = o.min + s.min - 1),
+      (l = o.max + 1),
+      (u = (e, t, n, r) => Math.min(n, Math.max(t, Math.round(Number.isFinite(e) ? e : r)))),
+      (d = (e) => ({
+        positiveInteger: u(e.positiveInteger, o.min, o.max, o.defaultValue),
+        negativeInteger: u(e.negativeInteger, s.min, s.max, s.defaultValue),
+      })),
+      (f = (e) => {
+        let t = d(e),
+          n = t.positiveInteger + t.negativeInteger,
+          r = Math.abs(t.negativeInteger),
+          i = Array.from({ length: r + 1 }, (e, n) => t.positiveInteger - n);
+        return { ...t, result: n, stepCount: r, positions: i, domainMin: c, domainMax: l };
+      }));
+  }))();
+}
+export { f as a, d as i, o as n, a as o, p as r, i as s, s as t };

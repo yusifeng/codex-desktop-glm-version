@@ -1,17 +1,16 @@
-import "@rchunk/rolldown-runtime";
-
-interface NumberFormatter { formatNumber(value: number, options?: Intl.NumberFormatOptions): string }
-
-function coordinateSeparator(formatter: NumberFormatter): string {
-  return formatter.formatNumber(1.1, { minimumFractionDigits: 1, maximumFractionDigits: 1, useGrouping: false }).includes(".")
-    ? ", "
-    : "; ";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r;
+function i() {
+  return (i = e(() => {
+    ((t = 1.1),
+      (n = (e) =>
+        e
+          .formatNumber(t, { minimumFractionDigits: 1, maximumFractionDigits: 1, useGrouping: !1 })
+          .includes(`.`)
+          ? `, `
+          : `; `),
+      (r = (e, t, r) => `(${t}${n(e)}${r})`));
+  }))();
 }
-
-function formatCoordinatePair(formatter: NumberFormatter, first: string, second: string): string {
-  return `(${first}${coordinateSeparator(formatter)}${second})`;
-}
-
-function initializeFormatCoordinatePair(): void {}
-
-export { initializeFormatCoordinatePair as n, formatCoordinatePair as t };
+export { i as n, r as t };

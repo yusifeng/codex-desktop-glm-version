@@ -1,202 +1,167 @@
-import "@rchunk/rolldown-runtime";
-import { Q3 as logger, Z3 as initializeLogger } from "@rchunk/app-shared";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { Q3 as t, Z3 as n } from "@rchunk/app-shared";
 import {
-  GZt as conversationHydratedFamily,
-  Gvt as openSidePanelTab,
-  HZt as initializeSubagentsPanel,
-  PQt as conversationRecordFamily,
-  Ugn as getConversationHydrator,
-  Wgn as initializeConversationHydration,
-  Wvt as initializeSidePanel,
-  ag as createSidePanelDefinition,
-  cg as initializeConversationModels,
-  ig as initializeSubagentIcon,
-  kZt as lastHydratedTurnStartedAtFamily,
-  lQt as activeTurnFamily,
-  mpn as intlSignal,
-  og as subagentsRouteKind,
-  ppn as initializeIntlRuntime,
-  qvt as rightPanelState,
-  sg as getSubagentsTabId,
-  vZt as conversationStoreFamily,
-  wZt as conversationTurnsFamily,
-  zZt as conversationExistsFamily,
+  GZt as r,
+  Gvt as i,
+  HZt as a,
+  PQt as o,
+  Ugn as s,
+  Wgn as c,
+  Wvt as l,
+  ag as u,
+  cg as d,
+  ig as f,
+  kZt as p,
+  lQt as m,
+  mpn as h,
+  og as g,
+  ppn as _,
+  qvt as v,
+  sg as y,
+  vZt as b,
+  wZt as x,
+  zZt as S,
 } from "@rchunk/app-initial";
-import {
-  n as verifyDescendant,
-  t as initializeVerifyDescendant,
-} from "@rchunk/verify-descendant";
-
-interface PanelScope {
-  get<Value>(signal: unknown, parameter?: unknown): Value;
-}
-
-interface OpenSubagentsOptions extends Record<string, unknown> {
-  deferHydrationUntilActivation?: boolean;
-  hostId: string;
-  insertPosition?: unknown;
-  openOverviewWhenSelectionUnavailable?: boolean;
-  parentConversationId: string;
-  revealAndFocus?: boolean;
-  selectedConversationId?: string | null;
-  selectedDisplayName?: string | null;
-  tabId?: string;
-}
-
-let subagentsPanelDefinition: unknown;
-
-async function openLocalConversationSubagentsPanel(
-  scope: PanelScope,
+import { n as C, t as w } from "@rchunk/verify-descendant";
+async function T(
+  e,
   {
-    revealAndFocus = true,
-    deferHydrationUntilActivation = false,
-    hostId,
-    insertPosition,
-    openOverviewWhenSelectionUnavailable = false,
-    parentConversationId,
-    selectedConversationId = null,
-    selectedDisplayName = null,
-    tabId,
-  }: OpenSubagentsOptions,
-): Promise<unknown> {
-  const id = tabId ?? getSubagentsTabId(parentConversationId);
-  const conversationMissing = selectedConversationId != null
-    && (!scope.get(conversationExistsFamily, selectedConversationId)
-      || scope.get(conversationRecordFamily, selectedConversationId) == null);
-  let selectionAvailable: boolean | Promise<boolean> = true;
-  if (selectedConversationId != null && !deferHydrationUntilActivation) {
-    selectionAvailable = verifyDescendant(scope, {
-      hostId,
-      hydrateMissingAncestors: openOverviewWhenSelectionUnavailable,
-      parentConversationId,
-      selectedConversationId,
-    });
-    if (selectionAvailable === false) {
-      return openOverviewWhenSelectionUnavailable
-        ? openLocalConversationSubagentsPanel(scope, {
-          revealAndFocus, hostId, insertPosition, parentConversationId, tabId: id,
-        })
-        : null;
-    }
-  }
-  const parentNeedsHydration = selectedConversationId != null
-    && scope.get<boolean>(conversationHydratedFamily, parentConversationId) === false;
-  const isLoading = deferHydrationUntilActivation
-    || typeof selectionAvailable !== "boolean"
-    || parentNeedsHydration;
-  const panelOptions: Record<string, unknown> = {
-    durableRoute: { kind: subagentsRouteKind, params: { selectedConversationId }, payloadVersion: 1 },
-    id,
-    insertPosition,
-    onActivate: deferHydrationUntilActivation ? () => {
-      const loading = openLocalConversationSubagentsPanel(scope, {
-        revealAndFocus: false, hostId, openOverviewWhenSelectionUnavailable,
-        parentConversationId, selectedConversationId, selectedDisplayName, tabId: id,
-      });
-      const current = scope.get<{ renderPanel?: unknown } | null>(rightPanelState.tabById$, id);
-      loading.catch((error: unknown) => {
-        logger.warning("Failed to load restored subagent", { safe: {}, sensitive: { error } });
-        const next = scope.get<{ renderPanel?: unknown } | null>(rightPanelState.tabById$, id);
-        if (next != null && next.renderPanel === current?.renderPanel) {
-          void openLocalConversationSubagentsPanel(scope, {
-            revealAndFocus: false, hostId, parentConversationId, tabId: id,
+    revealAndFocus: n = !0,
+    deferHydrationUntilActivation: a = !1,
+    hostId: c,
+    insertPosition: l,
+    openOverviewWhenSelectionUnavailable: u = !1,
+    parentConversationId: d,
+    selectedConversationId: f = null,
+    selectedDisplayName: _ = null,
+    tabId: w,
+  },
+) {
+  let D = w ?? y(d),
+    O = f != null && (!e.get(S, f) || e.get(o, f) == null),
+    k = !0;
+  if (
+    f != null &&
+    !a &&
+    ((k = C(e, {
+      hostId: c,
+      hydrateMissingAncestors: u,
+      parentConversationId: d,
+      selectedConversationId: f,
+    })),
+    k === !1)
+  )
+    return u
+      ? T(e, { revealAndFocus: n, hostId: c, insertPosition: l, parentConversationId: d, tabId: D })
+      : null;
+  let A = f != null && e.get(r, d) === !1,
+    j = a || typeof k != `boolean` || A,
+    M = {
+      durableRoute: { kind: g, params: { selectedConversationId: f }, payloadVersion: 1 },
+      id: D,
+      insertPosition: l,
+      onActivate: a
+        ? () => {
+            let n = T(e, {
+                revealAndFocus: !1,
+                hostId: c,
+                openOverviewWhenSelectionUnavailable: u,
+                parentConversationId: d,
+                selectedConversationId: f,
+                selectedDisplayName: _,
+                tabId: D,
+              }),
+              r = e.get(v.tabById$, D);
+            n.catch((n) => {
+              t.warning(`Failed to load restored subagent`, { safe: {}, sensitive: { error: n } });
+              let i = e.get(v.tabById$, D);
+              i != null &&
+                i.renderPanel === r?.renderPanel &&
+                T(e, { revealAndFocus: !1, hostId: c, parentConversationId: d, tabId: D });
+            });
+          }
+        : void 0,
+      title: e
+        .get(h)
+        .formatMessage({
+          id: `localConversation.subagentsPanel.title`,
+          defaultMessage: `Subagents`,
+          description: `Title for the subagents right side panel tab`,
+        }),
+      props: {
+        hostId: c,
+        isLoading: j,
+        parentConversationId: d,
+        requestedConversationId: f,
+        requestedDisplayName: _,
+        onSelect: (t, n) => {
+          T(e, {
+            hostId: c,
+            parentConversationId: d,
+            selectedConversationId: t,
+            selectedDisplayName: n,
+            tabId: D,
           });
-        }
-      });
-    } : undefined,
-    title: scope.get<{ formatMessage(input: Record<string, unknown>): string }>(intlSignal).formatMessage({
-      id: "localConversation.subagentsPanel.title", defaultMessage: "Subagents",
-      description: "Title for the subagents right side panel tab",
-    }),
-    props: {
-      hostId, isLoading, parentConversationId,
-      requestedConversationId: selectedConversationId,
-      requestedDisplayName: selectedDisplayName,
-      onSelect: (conversationId: string, displayName: string) => {
-        void openLocalConversationSubagentsPanel(scope, {
-          hostId, parentConversationId, selectedConversationId: conversationId,
-          selectedDisplayName: displayName, tabId: id,
-        });
+        },
       },
     },
-  };
-  const openedId = openSidePanelTab(scope, subagentsPanelDefinition, {
-    ...panelOptions, revealAndFocus,
-  });
-  if (selectedConversationId == null || deferHydrationUntilActivation) return openedId;
-  const descendant = await selectionAvailable;
-  const opened = scope.get<{ props: Record<string, unknown> } | null>(rightPanelState.tabById$, openedId);
-  if (opened == null) return null;
-  if (opened.props.requestedConversationId !== selectedConversationId) return openedId;
-  if (!descendant) {
-    openSidePanelTab(scope, subagentsPanelDefinition, {
-      ...panelOptions,
-      durableRoute: { kind: subagentsRouteKind, params: { selectedConversationId: null }, payloadVersion: 1 },
-      props: { ...(panelOptions.props as Record<string, unknown>), isLoading: false,
-        requestedConversationId: null, requestedDisplayName: null },
-      revealAndFocus: false,
-    });
-    return openedId;
+    N = i(e, E, { ...M, revealAndFocus: n });
+  if (f == null || a) return N;
+  let P = await k,
+    F = e.get(v.tabById$, N);
+  if (F == null) return null;
+  if (!(`requestedConversationId` in F.props) || F.props.requestedConversationId !== f) return N;
+  if (!P)
+    return (
+      i(e, E, {
+        ...M,
+        durableRoute: { kind: g, params: { selectedConversationId: null }, payloadVersion: 1 },
+        props: {
+          ...M.props,
+          isLoading: !1,
+          requestedConversationId: null,
+          requestedDisplayName: null,
+        },
+        revealAndFocus: !1,
+      }),
+      N
+    );
+  let I = [],
+    L = e.get(b, c)?.getConversation(f);
+  A &&
+    L?.forkedFromId !== null &&
+    I.push(s(e, c).hydrateBackgroundThreads([d], { includeTurns: !0 }));
+  let R = e.get(m, f),
+    z = e.get(p, f),
+    B = R?.turnStartedAtMs != null && z != null && R.turnStartedAtMs > z,
+    V =
+      R?.turnStartedAtMs === z &&
+      R?.turnId != null &&
+      e.get(r, d) === !0 &&
+      e.get(x, d)?.some((e) => e.turnId === R.turnId) === !1,
+    H =
+      (B || V) &&
+      R?.items.some((e) => e.type === `agentMessage` && e.text.trim().length > 0) === !0;
+  if (
+    (!O &&
+      !e.get(r, f) &&
+      !H &&
+      I.push(s(e, c).hydrateBackgroundThreads([f], { includeTurns: !0 })),
+    await Promise.all(I),
+    j)
+  ) {
+    let t = e.get(v.tabById$, N);
+    if (t == null) return null;
+    if (!(`requestedConversationId` in t.props) || t.props.requestedConversationId !== f) return N;
+    i(e, E, { ...M, props: { ...M.props, isLoading: !1 }, revealAndFocus: !1 });
   }
-  const hydration: Promise<unknown>[] = [];
-  const store = scope.get<{ getConversation(id: string): { forkedFromId?: string | null } | undefined } | null>(
-    conversationStoreFamily, hostId,
-  );
-  if (parentNeedsHydration && store?.getConversation(selectedConversationId)?.forkedFromId !== null) {
-    hydration.push(getConversationHydrator(scope, hostId).hydrateBackgroundThreads(
-      [parentConversationId], { includeTurns: true },
-    ));
-  }
-  const activeTurn = scope.get<{ items: Array<{ text?: string; type: string }>; turnId?: string; turnStartedAtMs?: number } | null>(
-    activeTurnFamily, selectedConversationId,
-  );
-  const hydratedAt = scope.get<number | null>(lastHydratedTurnStartedAtFamily, selectedConversationId);
-  const activeTurnIsNewer = activeTurn?.turnStartedAtMs != null
-    && hydratedAt != null
-    && activeTurn.turnStartedAtMs > hydratedAt;
-  const activeTurnMissingFromParent = activeTurn?.turnStartedAtMs === hydratedAt
-    && activeTurn?.turnId != null
-    && scope.get(conversationHydratedFamily, parentConversationId) === true
-    && (scope.get<Array<{ turnId?: string }> | null>(conversationTurnsFamily, parentConversationId)
-      ?.some((turn) => turn.turnId === activeTurn.turnId) === false);
-  const hasVisibleActiveMessage = (activeTurnIsNewer || activeTurnMissingFromParent)
-    && activeTurn?.items.some((item) =>
-      item.type === "agentMessage" && (item.text?.trim().length ?? 0) > 0) === true;
-  if (!conversationMissing
-    && !scope.get(conversationHydratedFamily, selectedConversationId)
-    && !hasVisibleActiveMessage) {
-    hydration.push(getConversationHydrator(scope, hostId).hydrateBackgroundThreads(
-      [selectedConversationId], { includeTurns: true },
-    ));
-  }
-  void hydratedAt;
-  await Promise.all(hydration);
-  if (isLoading) {
-    const current = scope.get<{ props: Record<string, unknown> } | null>(rightPanelState.tabById$, openedId);
-    if (current == null) return null;
-    if (current.props.requestedConversationId !== selectedConversationId) return openedId;
-    openSidePanelTab(scope, subagentsPanelDefinition, {
-      ...panelOptions,
-      props: { ...(panelOptions.props as Record<string, unknown>), isLoading: false },
-      revealAndFocus: false,
-    });
-  }
-  return openedId;
+  return N;
 }
-
-function initializeOpenLocalConversationSubagentsPanel(): void {
-  initializeConversationHydration();
-  initializeSubagentsPanel();
-  initializeSidePanel();
-  initializeIntlRuntime();
-  initializeSubagentIcon();
-  initializeLogger();
-  initializeConversationModels();
-  initializeVerifyDescendant();
-  subagentsPanelDefinition = createSidePanelDefinition({ open: openLocalConversationSubagentsPanel });
+var E;
+function D() {
+  return (D = e(() => {
+    (c(), a(), l(), _(), f(), n(), d(), w(), (E = u({ open: T })));
+  }))();
 }
-
-export {
-  openLocalConversationSubagentsPanel as n,
-  initializeOpenLocalConversationSubagentsPanel as t,
-};
+export { T as n, D as t };

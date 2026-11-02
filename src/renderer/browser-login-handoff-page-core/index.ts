@@ -1,189 +1,165 @@
-// browser-login-handoff-page-core —— 登录/SSO handoff 参数构造、分析和重试视图。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as authHandoffChunk from "@rchunk/auth-handoff-page";
-void runtimeChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  FX: initializeSignalRuntime,
-  I3: getJsxRuntime,
-  LX: useScope,
-  QI: initializeScopeRuntime,
-  ZI: appScope,
-  _L: useQuery,
-  e6: reactRuntime,
-  gL: initializeUseQuery,
-} = appSharedChunk;
-const {
-  Cpn: productAnalyticsSignal,
-  Fx: sanitizeAuthTarget,
-  Ix: initializeAuthTarget,
-  Qgn: initializeAccountContext,
-  Rx: performAuthHandoff,
-  Ycn: getCookieStore,
-  an: accessFlowEntryActions,
-  cc: initializeAccessFlowEntryPoints,
-  i_n: useLocation,
-  in: accessFlowEntryEvent,
-  mn: initializeAccessFlowActions,
-  on: accessFlowEntryPoints,
-  sc: analyticsCounter,
-  sn: accessFlowEntryTriggers,
-  xpn: trackAnalytics,
-  ypn: initializeAnalyticsRuntime,
-} = appInitialChunk;
-const { n: initializeAuthHandoffPage, t: AuthHandoffPage } = authHandoffChunk;
-
-type LoginHandoffFlow = "login" | "sso";
-
-interface BrowserLoginHandoffPageProps {
-  flow: LoginHandoffFlow;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  I3 as r,
+  LX as i,
+  QI as a,
+  ZI as o,
+  _L as s,
+  e6 as c,
+  gL as l,
+} from "@rchunk/app-shared";
+import {
+  Cpn as u,
+  Fx as d,
+  Ix as f,
+  Qgn as p,
+  Rx as m,
+  Ycn as h,
+  an as g,
+  cc as _,
+  i_n as v,
+  in as y,
+  mn as b,
+  on as x,
+  sc as S,
+  sn as C,
+  xpn as w,
+  ypn as T,
+} from "@rchunk/app-initial";
+import { n as E, t as D } from "@rchunk/auth-handoff-page";
+function O(e, t, n) {
+  (w(e, y, {
+    authSessionLoggingId: t,
+    actionType: g.ACCESS_FLOW_ENTRY_ACTION_TYPE_PAGE_LOADED,
+    entryPoint: x.ACCESS_FLOW_ENTRY_POINT_AUTH_LOGIN_PAGE,
+    entryTrigger: C.ACCESS_FLOW_ENTRY_TRIGGER_AUTOMATIC,
+    cta: n == null || n === `none` ? `auto-triggerred` : `selected-plan-intent:${n}`,
+    selectedPlanType: n,
+  }),
+    S.count(`default`, `business.auth_entrypoint_opened`, {
+      action: `page_loaded`,
+      entry_point: `auth_login_page`,
+      entry_trigger: `automatic`,
+      surface: `core_web`,
+    }));
 }
-
-let cookieStore: import("@rchunk/app-initial").CookieStore;
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function trackSsoPageLoad(
-  scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
-  authSessionLoggingId: string,
-  selectedPlanType: string,
-): void {
-  trackAnalytics(scope, accessFlowEntryEvent, {
-    authSessionLoggingId,
-    actionType:
-      accessFlowEntryActions.ACCESS_FLOW_ENTRY_ACTION_TYPE_PAGE_LOADED,
-    entryPoint: accessFlowEntryPoints.ACCESS_FLOW_ENTRY_POINT_AUTH_LOGIN_PAGE,
-    entryTrigger: accessFlowEntryTriggers.ACCESS_FLOW_ENTRY_TRIGGER_AUTOMATIC,
-    cta:
-      selectedPlanType === "none"
-        ? "auto-triggerred"
-        : `selected-plan-intent:${selectedPlanType}`,
-    selectedPlanType,
-  });
-  analyticsCounter.count("default", "business.auth_entrypoint_opened", {
-    action: "page_loaded",
-    entry_point: "auth_login_page",
-    entry_trigger: "automatic",
-    surface: "core_web",
-  });
+function k() {
+  return (k = e(() => {
+    (b(), _(), T());
+  }))();
 }
-
-function initializeLoginHandoffAnalytics(): void {
-  initializeAccessFlowActions();
-  initializeAccessFlowEntryPoints();
-  initializeAnalyticsRuntime();
-}
-
-function BrowserLoginHandoffPage({
-  flow,
-}: BrowserLoginHandoffPageProps): unknown {
-  const scope = useScope(appScope);
-  const location = useLocation();
-  const trackedLocationKey = reactRuntime.useRef<string | null>(null);
-  const [authSessionLoggingId] = reactRuntime.useState<string>(() => {
-    const existing = cookieStore.getCookie("oai-asli");
-    return flow === "login" && typeof existing === "string" && existing !== ""
-      ? existing
-      : crypto.randomUUID();
-  });
-  const query = useQuery<import("@rchunk/auth-handoff-page").AuthHandoffResult>(
-    {
-      queryKey: ["browser-login-handoff", flow, location.search, location.hash],
-      queryFn: async ({ signal }) => {
-        const searchParams = new URLSearchParams(location.search);
-        const connection = searchParams.get("connection");
-        const parameters: Record<string, string> = {
-          auth_session_logging_id: authSessionLoggingId,
-        };
-        if (connection) parameters.connection = connection;
-        if (flow === "sso") {
-          if (connection)
-            parameters.connection_provider = connection.startsWith("conn_")
-              ? "2"
-              : "1";
-        } else {
-          if (cookieStore.getCookie("oai-asli") !== authSessionLoggingId) {
-            cookieStore.setCookie("oai-asli", authSessionLoggingId, {
-              path: "/",
-              sameSite: "lax",
-            });
-          }
-          const loginHint = searchParams.get("login_hint");
-          if (loginHint) parameters.login_hint = loginHint;
-          const screenHint = searchParams.get("screen_hint");
-          parameters.screen_hint =
-            screenHint === "signup" || screenHint === "login_or_signup"
-              ? screenHint
-              : "login";
-          if (
-            searchParams.get("ext-web-mobile-direct-social-login") === "true" &&
-            ["apple", "google-oauth2", "windowslive"].includes(connection ?? "")
-          ) {
-            parameters["ext-web-mobile-direct-social-login"] = "true";
-          }
+function A(e) {
+  let t = (0, M.c)(22),
+    { flow: n } = e,
+    r = i(o),
+    a = v(),
+    c = (0, P.useRef)(null),
+    l;
+  t[0] === n
+    ? (l = t[1])
+    : ((l = () => {
+        let e = (0, N.getCookie)(`oai-asli`);
+        return n === `login` && typeof e == `string` && e !== `` ? e : crypto.randomUUID();
+      }),
+      (t[0] = n),
+      (t[1] = l));
+  let [f] = (0, P.useState)(l),
+    p;
+  t[2] !== n || t[3] !== a.hash || t[4] !== a.search
+    ? ((p = [`browser-login-handoff`, n, a.search, a.hash]),
+      (t[2] = n),
+      (t[3] = a.hash),
+      (t[4] = a.search),
+      (t[5] = p))
+    : (p = t[5]);
+  let h;
+  t[6] !== f || t[7] !== n || t[8] !== a.hash || t[9] !== a.key || t[10] !== a.search || t[11] !== r
+    ? ((h = async (e) => {
+        let { signal: t } = e,
+          i = new URLSearchParams(a.search),
+          o = i.get(`connection`),
+          s = { auth_session_logging_id: f };
+        if ((o && (s.connection = o), n === `sso`))
+          o && (s.connection_provider = o.startsWith(`conn_`) ? `2` : `1`);
+        else {
+          (0, N.getCookie)(`oai-asli`) !== f &&
+            (0, N.setCookie)(`oai-asli`, f, { path: `/`, sameSite: `lax` });
+          let e = i.get(`login_hint`);
+          e && (s.login_hint = e);
+          let t = i.get(`screen_hint`);
+          ((s.screen_hint = t === `signup` || t === `login_or_signup` ? t : `login`),
+            i.get(`ext-web-mobile-direct-social-login`) === `true` &&
+              [`apple`, `google-oauth2`, `windowslive`].includes(o ?? ``) &&
+              (s[`ext-web-mobile-direct-social-login`] = `true`));
         }
-        const target = new URL(
-          flow === "sso"
-            ? sanitizeAuthTarget(searchParams.get("next"))
-            : sanitizeAuthTarget(
-                null,
-                searchParams.get("callback_path"),
-                "auth-server",
-              ),
+        let l = new URL(
+          n === `sso` ? d(i.get(`next`)) : d(null, i.get(`callback_path`), `auth-server`),
         );
-        if (flow === "sso" && location.hash) target.hash = location.hash;
-        if (flow === "sso" && trackedLocationKey.current !== location.key) {
-          trackedLocationKey.current = location.key ?? null;
-          const segments = target.pathname.split("/").filter(Boolean);
-          const candidate = segments[1] ?? "none";
-          const selectedPlanType =
-            segments.length === 2 &&
-            segments[0] === "purchase" &&
-            ["go", "plus", "pro", "pro5x"].includes(candidate)
-              ? candidate
-              : "none";
-          trackSsoPageLoad(scope, authSessionLoggingId, selectedPlanType);
-          await scope
-            .get(productAnalyticsSignal)
-            .flush(1_000)
-            .catch(() => undefined);
+        if ((n === `sso` && a.hash && (l.hash = a.hash), n === `sso` && c.current !== a.key)) {
+          c.current = a.key;
+          let e = l.pathname.split(`/`).filter(Boolean),
+            t = e[1] ?? `none`,
+            n =
+              e.length === 2 && e[0] === `purchase` && [`go`, `plus`, `pro`, `pro5x`].includes(t)
+                ? t
+                : `none`;
+          (O(r, f, n), await r.get(u).flush(1e3).catch(j));
         }
-        return performAuthHandoff(target.toString(), parameters, signal, flow);
-      },
-      staleTime: Infinity,
-      gcTime: 0,
-      retry: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-    },
+        return m(l.toString(), s, t, n);
+      }),
+      (t[6] = f),
+      (t[7] = n),
+      (t[8] = a.hash),
+      (t[9] = a.key),
+      (t[10] = a.search),
+      (t[11] = r),
+      (t[12] = h))
+    : (h = t[12]);
+  let g;
+  t[13] !== p || t[14] !== h
+    ? ((g = {
+        queryKey: p,
+        queryFn: h,
+        staleTime: 1 / 0,
+        gcTime: 0,
+        retry: !1,
+        refetchOnWindowFocus: !1,
+        refetchOnReconnect: !1,
+      }),
+      (t[13] = p),
+      (t[14] = h),
+      (t[15] = g))
+    : (g = t[15]);
+  let { data: _, isError: y, isFetching: b, refetch: x } = s(g),
+    S = b || (_ == null && !y),
+    C;
+  t[16] === x
+    ? (C = t[17])
+    : ((C = () => {
+        x({ cancelRefetch: !1 });
+      }),
+      (t[16] = x),
+      (t[17] = C));
+  let w;
+  return (
+    t[18] !== _ || t[19] !== S || t[20] !== C
+      ? ((w = (0, F.jsx)(D, { result: _, pending: S, onRetry: C })),
+        (t[18] = _),
+        (t[19] = S),
+        (t[20] = C),
+        (t[21] = w))
+      : (w = t[21]),
+    w
   );
-  const pending = query.isFetching || (query.data == null && !query.isError);
-  return jsx.jsx(AuthHandoffPage, {
-    result: query.data,
-    pending,
-    onRetry: () => void query.refetch({ cancelRefetch: false }),
-  });
 }
-
-function initializeBrowserLoginHandoffPage(): void {
-  initializeRuntimeLazy();
-  initializeUseQuery();
-  cookieStore = getCookieStore();
-  initializeSignalRuntime();
-  reactRuntime();
-  initializeAccountContext();
-  initializeAnalyticsRuntime();
-  initializeScopeRuntime();
-  initializeAuthHandoffPage();
-  initializeLoginHandoffAnalytics();
-  initializeAuthTarget();
-  jsx = getJsxRuntime();
+function j() {}
+var M, N, P, F;
+function I() {
+  return (I = e(() => {
+    ((M = t()), l(), (N = h()), n(), (P = c()), p(), T(), a(), E(), k(), f(), (F = r()));
+  }))();
 }
-
-export {
-  initializeBrowserLoginHandoffPage as n,
-  initializeLoginHandoffAnalytics as r,
-  BrowserLoginHandoffPage as t,
-};
+export { I as n, k as r, A as t };

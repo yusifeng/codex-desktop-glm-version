@@ -1,110 +1,51 @@
-// Image-edit annotation control wrapper. Release chunk: image-edit-size-control-585ada304286.js.
-import "@rchunk/rolldown-runtime";
-import * as AppShared from "@rchunk/app-shared";
-import * as AppInitial from "@rchunk/app-initial";
-
-interface CompilerRuntime {
-  c(size: number): unknown[];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, P3 as r, h4 as i, m4 as a } from "@rchunk/app-shared";
+import { GB as o, KB as s } from "@rchunk/app-initial";
+function c(e) {
+  let t = (0, l.c)(15),
+    { children: n, container: r, ref: i, zoom: s } = e,
+    c = r == null && `absolute start-button-toolbar-inline top-1/2 z-30 -translate-y-1/2`,
+    f;
+  t[0] === c ? (f = t[1]) : ((f = a(`pointer-events-none`, c)), (t[0] = c), (t[1] = f));
+  let p;
+  t[2] !== r || t[3] !== s
+    ? ((p = r == null ? { zoom: s } : void 0), (t[2] = r), (t[3] = s), (t[4] = p))
+    : (p = t[4]);
+  let m;
+  t[5] === n
+    ? (m = t[6])
+    : ((m = (0, d.jsx)(o, { className: `pointer-events-auto`, children: n })),
+      (t[5] = n),
+      (t[6] = m));
+  let h;
+  t[7] !== i || t[8] !== f || t[9] !== p || t[10] !== m
+    ? ((h = (0, d.jsx)(`div`, {
+        ref: i,
+        className: f,
+        style: p,
+        "data-annotation-control": ``,
+        children: m,
+      })),
+      (t[7] = i),
+      (t[8] = f),
+      (t[9] = p),
+      (t[10] = m),
+      (t[11] = h))
+    : (h = t[11]);
+  let g = h,
+    _;
+  return (
+    t[12] !== r || t[13] !== g
+      ? ((_ = r == null ? g : (0, u.createPortal)(g, r)), (t[12] = r), (t[13] = g), (t[14] = _))
+      : (_ = t[14]),
+    _
+  );
 }
-
-interface PortalRuntime {
-  createPortal(children: unknown, container: Element): unknown;
+var l, u, d;
+function f() {
+  return (f = e(() => {
+    ((l = t()), i(), (u = r()), s(), (d = n()));
+  }))();
 }
-
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown;
-}
-
-interface ImageEditSizeControlProps {
-  children?: unknown;
-  container?: Element | null;
-  ref?: unknown;
-  zoom?: number;
-}
-
-const sharedRuntime = AppShared as unknown as {
-  $3(): CompilerRuntime;
-  I3(): JsxRuntime;
-  P3(): PortalRuntime;
-  h4(): void;
-  m4(...values: unknown[]): string;
-};
-const imageRuntime = AppInitial as unknown as {
-  GB: (props: Record<string, unknown>) => unknown;
-  KB(): void;
-};
-
-let compilerRuntime: CompilerRuntime;
-let portalRuntime: PortalRuntime;
-let jsxRuntime: JsxRuntime;
-
-function ImageEditSizeControl({ children, container, ref, zoom }: ImageEditSizeControlProps): unknown {
-  const cache = compilerRuntime.c(15);
-  const positionClass =
-    container == null
-      ? "absolute start-button-toolbar-inline top-1/2 z-30 -translate-y-1/2"
-      : undefined;
-  let className: unknown;
-  if (cache[0] === positionClass) {
-    className = cache[1];
-  } else {
-    className = sharedRuntime.m4("pointer-events-none", positionClass);
-    cache[0] = positionClass;
-    cache[1] = className;
-  }
-  let style: unknown;
-  if (cache[2] === container && cache[3] === zoom) {
-    style = cache[4];
-  } else {
-    style = container == null ? { zoom } : undefined;
-    cache[2] = container;
-    cache[3] = zoom;
-    cache[4] = style;
-  }
-  let toolbar: unknown;
-  if (cache[5] === children) {
-    toolbar = cache[6];
-  } else {
-    toolbar = jsxRuntime.jsx(imageRuntime.GB, {
-      className: "pointer-events-auto",
-      children,
-    });
-    cache[5] = children;
-    cache[6] = toolbar;
-  }
-  let control: unknown;
-  if (cache[7] === ref && cache[8] === className && cache[9] === style && cache[10] === toolbar) {
-    control = cache[11];
-  } else {
-    control = jsxRuntime.jsx("div", {
-      ref,
-      className,
-      style,
-      "data-annotation-control": "",
-      children: toolbar,
-    });
-    cache[7] = ref;
-    cache[8] = className;
-    cache[9] = style;
-    cache[10] = toolbar;
-    cache[11] = control;
-  }
-  if (cache[12] === container && cache[13] === control) {
-    return cache[14];
-  }
-  const result = container == null ? control : portalRuntime.createPortal(control, container);
-  cache[12] = container;
-  cache[13] = control;
-  cache[14] = result;
-  return result;
-}
-
-function initializeImageEditSizeControl(): void {
-  compilerRuntime = sharedRuntime.$3();
-  sharedRuntime.h4();
-  portalRuntime = sharedRuntime.P3();
-  imageRuntime.KB();
-  jsxRuntime = sharedRuntime.I3();
-}
-
-export { initializeImageEditSizeControl as n, ImageEditSizeControl as t };
+export { f as n, c as t };

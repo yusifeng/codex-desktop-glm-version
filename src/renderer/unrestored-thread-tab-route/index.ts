@@ -1,86 +1,82 @@
-// unrestored-thread-tab-route —— 持久化标签页无法恢复时的可识别回退界面。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-void runtimeChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  I3: getJsxRuntime,
-  K2: initializeSharedUi,
-  Y2: FormattedMessage,
-  Yh: Button,
-  Zh: initializeButton,
-} = appSharedChunk;
-const { Aet: initializeEmptyState, ket: EmptyState } = appInitialChunk;
-const {
-  Jp: UnrestoredTabIllustration,
-  Yp: initializeUnrestoredTabIllustration,
-} = appPrimaryChunk;
-
-interface UnrestoredThreadTabRouteProps {
-  onClose(): void;
-  routeKind: string;
-  routeResourceLabel?: string | null;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i, Yh as a, Zh as o } from "@rchunk/app-shared";
+import { Aet as s, ket as c } from "@rchunk/app-initial";
+import { Jp as l, Yp as u } from "@rchunk/app-primary";
+function d(e) {
+  let t = (0, f.c)(11),
+    { onClose: n, routeKind: r, routeResourceLabel: o } = e,
+    s;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((s = (0, p.jsx)(i, {
+        id: `threadTabRoute.unrestored.dismiss`,
+        defaultMessage: `Dismiss`,
+        description: `Button label that dismisses a tab which could not be restored`,
+      })),
+      (t[0] = s))
+    : (s = t[0]);
+  let u;
+  t[1] === n
+    ? (u = t[2])
+    : ((u = (0, p.jsx)(a, { color: `secondary`, onClick: n, children: s })),
+      (t[1] = n),
+      (t[2] = u));
+  let d;
+  t[3] !== r || t[4] !== o
+    ? ((d =
+        o == null
+          ? (0, p.jsx)(i, {
+              id: `threadTabRoute.unrestored.routeKind`,
+              defaultMessage: `Saved tab type: {routeKind}`,
+              description: `Description identifying the type of a persisted tab that could not be restored`,
+              values: { routeKind: r },
+            })
+          : (0, p.jsx)(i, {
+              id: `threadTabRoute.unrestored.routeResource`,
+              defaultMessage: `Saved tab: {routeKind} — {routeResource}`,
+              description: `Description identifying the type and resource of a persisted tab that could not be restored`,
+              values: { routeKind: r, routeResource: o },
+            })),
+      (t[3] = r),
+      (t[4] = o),
+      (t[5] = d))
+    : (d = t[5]);
+  let m;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((m = (0, p.jsx)(l, {})), (t[6] = m))
+    : (m = t[6]);
+  let h;
+  t[7] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((h = (0, p.jsx)(i, {
+        id: `threadTabRoute.unrestored.title`,
+        defaultMessage: `This tab couldn’t be restored`,
+        description: `Title shown when a persisted tab cannot be restored`,
+      })),
+      (t[7] = h))
+    : (h = t[7]);
+  let g;
+  return (
+    t[8] !== u || t[9] !== d
+      ? ((g = (0, p.jsx)(c, {
+          className: `h-full`,
+          actions: u,
+          description: d,
+          illustration: m,
+          illustrationSize: `icon`,
+          title: h,
+        })),
+        (t[8] = u),
+        (t[9] = d),
+        (t[10] = g))
+      : (g = t[10]),
+    g
+  );
 }
-
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function UnrestoredThreadTabRoute({
-  onClose,
-  routeKind,
-  routeResourceLabel,
-}: UnrestoredThreadTabRouteProps): unknown {
-  const actions = jsx.jsx(Button, {
-    color: "secondary",
-    onClick: onClose,
-    children: jsx.jsx(FormattedMessage, {
-      id: "threadTabRoute.unrestored.dismiss",
-      defaultMessage: "Dismiss",
-      description:
-        "Button label that dismisses a tab which could not be restored",
-    }),
-  });
-  const description =
-    routeResourceLabel == null
-      ? jsx.jsx(FormattedMessage, {
-          id: "threadTabRoute.unrestored.routeKind",
-          defaultMessage: "Saved tab type: {routeKind}",
-          description:
-            "Description identifying the type of a persisted tab that could not be restored",
-          values: { routeKind },
-        })
-      : jsx.jsx(FormattedMessage, {
-          id: "threadTabRoute.unrestored.routeResource",
-          defaultMessage: "Saved tab: {routeKind} — {routeResource}",
-          description:
-            "Description identifying the type and resource of a persisted tab that could not be restored",
-          values: { routeKind, routeResource: routeResourceLabel },
-        });
-
-  return jsx.jsx(EmptyState, {
-    className: "h-full",
-    actions,
-    description,
-    illustration: jsx.jsx(UnrestoredTabIllustration, {}),
-    illustrationSize: "icon",
-    title: jsx.jsx(FormattedMessage, {
-      id: "threadTabRoute.unrestored.title",
-      defaultMessage: "This tab couldn’t be restored",
-      description: "Title shown when a persisted tab cannot be restored",
-    }),
-  });
+var f, p;
+function m() {
+  return (m = e(() => {
+    ((f = t()), r(), o(), s(), u(), (p = n()));
+  }))();
 }
-
-function initializeUnrestoredThreadTabRoute(): void {
-  initializeRuntimeLazy();
-  initializeSharedUi();
-  initializeButton();
-  initializeEmptyState();
-  initializeUnrestoredTabIllustration();
-  jsx = getJsxRuntime();
-}
-
-initializeUnrestoredThreadTabRoute();
-export { UnrestoredThreadTabRoute };
+m();
+export { d as UnrestoredThreadTabRoute };

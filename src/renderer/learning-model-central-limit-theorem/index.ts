@@ -1,22 +1,19 @@
-// Central-limit-theorem learning-model manifest. Release chunk: type-33287eb94059.js.
-import "@rchunk/rolldown-runtime";
-
-type PopulationShape = "right-skewed" | "uniform" | "bimodal" | "normal";
-
-const centralLimitTheoremSpecification = {
-  type: "CENTRAL_LIMIT_THEOREM",
-  version: 3,
-  thumbnailAssetKey: "central-limit-theorem-v1",
-  parameters: {
-    population_shape: {
-      kind: "enum" as const,
-      defaultValue: "right-skewed" as PopulationShape,
-      allowedValues: ["right-skewed", "uniform", "bimodal", "normal"] as PopulationShape[],
-    },
-    sample_size: { kind: "integer" as const, defaultValue: 5, min: 1, max: 100 },
-  },
-};
-
-function initializeCentralLimitTheoremSpecification(): void {}
-
-export { centralLimitTheoremSpecification as n, initializeCentralLimitTheoremSpecification as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `CENTRAL_LIMIT_THEOREM`),
+      (n = `central-limit-theorem-v1`),
+      (r = {
+        population_shape: {
+          kind: `enum`,
+          defaultValue: `right-skewed`,
+          allowedValues: [`right-skewed`, `uniform`, `bimodal`, `normal`],
+        },
+        sample_size: { kind: `integer`, defaultValue: 5, min: 1, max: 100 },
+      }),
+      (i = { type: t, version: 3, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+export { i as n, a as t };

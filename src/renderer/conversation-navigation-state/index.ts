@@ -1,26 +1,11 @@
-import {
-  FX as initializeSignalRuntime,
-  oZ as createScopedState,
-} from "@rchunk/app-shared";
-import {
-  $en as conversationScope,
-  itn as initializeConversationScope,
-} from "@rchunk/app-initial";
-
-let conversationNavigationPending: unknown;
-
-function initializeConversationNavigationState(): void {
-  initializeSignalRuntime();
-  initializeConversationScope();
-  conversationNavigationPending = createScopedState(
-    conversationScope,
-    () => false,
-    undefined,
-    { autoDispose: 60_000 },
-  );
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, oZ as n } from "@rchunk/app-shared";
+import { $en as r, itn as i } from "@rchunk/app-initial";
+var a;
+function o() {
+  return (o = e(() => {
+    (t(), i(), (a = n(r, (e) => !1, void 0, { autoDispose: 6e4 })));
+  }))();
 }
-
-export {
-  conversationNavigationPending as n,
-  initializeConversationNavigationState as t,
-};
+export { a as n, o as t };

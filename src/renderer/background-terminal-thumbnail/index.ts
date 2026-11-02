@@ -1,49 +1,26 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import {
-  n as initializeTerminalThumbnail,
-  t as TerminalThumbnail,
-  type TerminalOutputSpan,
-} from "@rchunk/terminal-thumbnail";
-
-const {
-  $3: initializeRuntimeLazy,
-  I3: getJsxRuntime,
-  e6: getReactRuntime,
-} = appSharedChunk;
-
-export interface BackgroundTerminalReadState {
-  readOutput?: () => readonly TerminalOutputSpan[] | null;
-}
-
-export interface BackgroundTerminalThumbnailProps {
-  readState?: () => BackgroundTerminalReadState | null | undefined;
-  title: string;
-}
-
-let React: import("@rchunk/app-shared").ReactRuntime;
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function BackgroundTerminalThumbnail({
-  title,
-  readState,
-}: BackgroundTerminalThumbnailProps): unknown {
-  initializeBackgroundTerminalThumbnail();
-  const [outputTail] = React.useState(
-    () => readState?.()?.readOutput?.() ?? null,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, e6 as r } from "@rchunk/app-shared";
+import { n as i, t as a } from "@rchunk/terminal-thumbnail";
+function o(e) {
+  let t = (0, s.c)(5),
+    { title: n, readState: r } = e,
+    i;
+  t[0] === r ? (i = t[1]) : ((i = () => r()?.readOutput?.() ?? null), (t[0] = r), (t[1] = i));
+  let [o] = (0, c.useState)(i),
+    u;
+  return (
+    t[2] !== o || t[3] !== n
+      ? ((u = (0, l.jsx)(a, { title: n, outputTail: o })), (t[2] = o), (t[3] = n), (t[4] = u))
+      : (u = t[4]),
+    u
   );
-  return jsx.jsx(TerminalThumbnail, { title, outputTail });
 }
-
-let initialized = false;
-function initializeBackgroundTerminalThumbnail(): void {
-  if (initialized) return;
-  initializeRuntimeLazy();
-  React = getReactRuntime();
-  initializeTerminalThumbnail();
-  jsx = getJsxRuntime();
-  initialized = true;
+var s, c, l;
+function u() {
+  return (u = e(() => {
+    ((s = t()), (c = r()), i(), (l = n()));
+  }))();
 }
-
-initializeBackgroundTerminalThumbnail();
-export { BackgroundTerminalThumbnail };
+u();
+export { o as BackgroundTerminalThumbnail };

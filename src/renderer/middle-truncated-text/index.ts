@@ -1,102 +1,85 @@
-import "@rchunk/rolldown-runtime";
-import {
-  $3 as initializeCompilerCache,
-  I3 as getJsxRuntime,
-  c_ as initializeTooltip,
-  h4 as initializeReact,
-  m4 as classNames,
-  o_ as Tooltip,
-} from "@rchunk/app-shared";
-import {
-  vat as fallbackFontSizePx,
-  xat as useTextMeasurement,
-  yat as initializeTextMeasurement,
-} from "@rchunk/app-initial";
-import {
-  n as getWrappedLineCount,
-  r as createTextLayout,
-  t as initializeTextLayout,
-} from "@rchunk/layout";
-
-const ELLIPSIS = "…";
-let measurementContext: CanvasRenderingContext2D | null = null;
-
-export interface MiddleTruncatedTextProps {
-  className?: string;
-  text: string;
-}
-
-function fitsOnOneLine(text: string, font: string, maxWidthPx: number): boolean {
-  measurementContext ??= document.createElement("canvas").getContext("2d");
-  if (measurementContext == null) {
-    return getWrappedLineCount(
-      createTextLayout(text, font, { whiteSpace: "pre-wrap" }),
-      maxWidthPx,
-      1,
-    ).lineCount <= 1;
-  }
-  measurementContext.font = font;
-  return measurementContext.measureText(text).width <= maxWidthPx;
-}
-
-function truncateTextInMiddle(text: string, font: string, maxWidthPx: number): string {
-  if (text.length === 0 || maxWidthPx <= 0 || fitsOnOneLine(text, font, maxWidthPx)) {
-    return text;
-  }
-  const characters = Array.from(text);
-  let low = 0;
-  let high = characters.length - 1;
-  let result = ELLIPSIS;
-  while (low <= high) {
-    const visibleCount = Math.floor((low + high) / 2);
-    const prefixLength = Math.ceil(visibleCount / 2);
-    const suffixLength = Math.floor(visibleCount / 2);
-    const candidate = `${characters.slice(0, prefixLength).join("")}${ELLIPSIS}${characters
-      .slice(characters.length - suffixLength)
-      .join("")}`;
-    if (fitsOnOneLine(candidate, font, maxWidthPx)) {
-      result = candidate;
-      low = visibleCount + 1;
-    } else {
-      high = visibleCount - 1;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, c_ as r, h4 as i, m4 as a, o_ as o } from "@rchunk/app-shared";
+import { vat as s, xat as c, yat as l } from "@rchunk/app-initial";
+import { n as u, r as d, t as f } from "@rchunk/layout";
+function p(e) {
+  let t = (0, g.c)(15),
+    { text: n, className: r } = e,
+    i;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((i = { fallbackFontSizePx: s }), (t[0] = i))
+    : (i = t[0]);
+  let { setTextMeasurementRef: l, textMeasurement: u } = c(i),
+    d;
+  bb0: {
+    if (u == null) {
+      d = n;
+      break bb0;
     }
+    let e;
+    (t[1] !== n || t[2] !== u.font || t[3] !== u.maxWidthPx
+      ? ((e = m(n, u.font, u.maxWidthPx)),
+        (t[1] = n),
+        (t[2] = u.font),
+        (t[3] = u.maxWidthPx),
+        (t[4] = e))
+      : (e = t[4]),
+      (d = e));
   }
-  return result;
+  let f = d,
+    p = f === n,
+    h;
+  t[5] === r
+    ? (h = t[6])
+    : ((h = a(`block min-w-0 overflow-hidden whitespace-nowrap`, r)), (t[5] = r), (t[6] = h));
+  let v;
+  t[7] !== f || t[8] !== l || t[9] !== h
+    ? ((v = (0, _.jsx)(`span`, { ref: l, className: h, children: f })),
+      (t[7] = f),
+      (t[8] = l),
+      (t[9] = h),
+      (t[10] = v))
+    : (v = t[10]);
+  let y;
+  return (
+    t[11] !== p || t[12] !== v || t[13] !== n
+      ? ((y = (0, _.jsx)(o, { tooltipContent: n, disabled: p, children: v })),
+        (t[11] = p),
+        (t[12] = v),
+        (t[13] = n),
+        (t[14] = y))
+      : (y = t[14]),
+    y
+  );
 }
-
-function MiddleTruncatedText({ text, className }: MiddleTruncatedTextProps): unknown {
-  const { setTextMeasurementRef, textMeasurement } = useTextMeasurement({
-    fallbackFontSizePx,
-  }) as {
-    setTextMeasurementRef: unknown;
-    textMeasurement: { font: string; maxWidthPx: number } | null;
-  };
-  const displayText =
-    textMeasurement == null
-      ? text
-      : truncateTextInMiddle(text, textMeasurement.font, textMeasurement.maxWidthPx);
-  const isUntruncated = displayText === text;
-  const jsx = getJsxRuntime();
-  const content = jsx.jsx("span", {
-    ref: setTextMeasurementRef,
-    className: classNames("block min-w-0 overflow-hidden whitespace-nowrap", className),
-    children: displayText,
-  });
-  return jsx.jsx(Tooltip, {
-    tooltipContent: text,
-    disabled: isUntruncated,
-    children: content,
-  });
+function m(e, t, n) {
+  if (e.length === 0 || n <= 0 || h(e, t, n)) return e;
+  let r = Array.from(e),
+    i = 0,
+    a = r.length - 1,
+    o = v;
+  for (; i <= a;) {
+    let e = Math.floor((i + a) / 2),
+      s = Math.ceil(e / 2),
+      c = Math.floor(e / 2),
+      l = `${r.slice(0, s).join(``)}${v}${r.slice(r.length - c).join(``)}`;
+    h(l, t, n) ? ((o = l), (i = e + 1)) : (a = e - 1);
+  }
+  return o;
 }
-
-function initializeMiddleTruncatedText(): void {
-  initializeCompilerCache();
-  initializeTextLayout();
-  initializeReact();
-  initializeTooltip();
-  initializeTextMeasurement();
-  getJsxRuntime();
-  measurementContext = null;
+function h(e, t, n) {
+  return (
+    (b ??= document.createElement(`canvas`).getContext(`2d`)),
+    b == null
+      ? u(d(e, t, { whiteSpace: `pre-wrap` }), n, y).lineCount <= 1
+      : ((b.font = t), b.measureText(e).width <= n)
+  );
 }
-
-export { initializeMiddleTruncatedText as n, MiddleTruncatedText as t };
+var g, _, v, y, b;
+function x() {
+  return (x = e(() => {
+    ((g = t()), f(), i(), r(), l(), (_ = n()), (v = `…`), (y = 1), (b = null));
+  }))();
+}
+export { x as n, p as t };

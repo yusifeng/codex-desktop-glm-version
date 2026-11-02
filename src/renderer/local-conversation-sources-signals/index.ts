@@ -1,146 +1,80 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import { FX as n, QI as r, ZI as i, l3 as a, lZ as o, rZ as s } from "@rchunk/app-shared";
 import {
-  FX as initializeSignalRuntime,
-  QI as initializeScopedSignals,
-  ZI as conversationIdScope,
-  l3 as initializeDeepEqual,
-  lZ as createScopedState,
-  rZ as createScopedDerived,
-} from "@rchunk/app-shared";
-import {
-  F_t as sourceEntityList,
-  HZt as initializeConversationSources,
-  OZt as sourceEntityByKey,
-  O_t as initializeSourceEntities,
-  TQt as sourceFallbackSignal,
-  Tfn as areConversationTurnsEqual,
-  lQt as activeConversationTurn,
-  n$t as priorConversationTurns,
-  t$t as sourceHistorySignal,
-  wQt as hostIdByConversation,
-  w$t as flattenConversationItems,
+  F_t as c,
+  HZt as l,
+  OZt as u,
+  O_t as d,
+  TQt as f,
+  Tfn as p,
+  lQt as m,
+  n$t as h,
+  t$t as g,
+  w$t as _,
+  wQt as v,
 } from "@rchunk/app-initial";
-
-export interface SourceTurn {
-  attachments?: unknown;
-  items: unknown[];
-  params: {
-    attachments?: unknown;
-    input?: unknown;
-    threadId?: string;
-  };
-  status: string;
-  turnId?: string;
+function y(e, t) {
+  return e == null || t == null
+    ? e === t
+    : e.turnId === t.turnId &&
+        e.status === t.status &&
+        e.params.threadId === t.params.threadId &&
+        (0, x.default)(e.params.input, t.params.input) &&
+        (0, x.default)(e.params.attachments, t.params.attachments) &&
+        (0, x.default)(b(e), b(t));
 }
-
-let deepEqual: (left: unknown, right: unknown) => boolean;
-
-function getRelevantSourceItems(turn: SourceTurn): unknown[] {
-  return (flattenConversationItems(turn.items) as Array<{ type?: string }>).filter(
-    (item) =>
-      item.type === "userMessage" ||
-      item.type === "steeringUserMessage" ||
-      item.type === "webSearch" ||
-      item.type === "mcpToolCall",
+function b(e) {
+  return _(e.items).filter(
+    (e) =>
+      e.type === `userMessage` ||
+      e.type === `steeringUserMessage` ||
+      e.type === `webSearch` ||
+      e.type === `mcpToolCall`,
   );
 }
-
-function areSourceTurnsEqual(
-  left: SourceTurn | null | undefined,
-  right: SourceTurn | null | undefined,
-): boolean {
-  if (left == null || right == null) return left === right;
-  return (
-    left.turnId === right.turnId &&
-    left.status === right.status &&
-    left.params.threadId === right.params.threadId &&
-    deepEqual(left.params.input, right.params.input) &&
-    deepEqual(left.params.attachments, right.params.attachments) &&
-    deepEqual(getRelevantSourceItems(left), getRelevantSourceItems(right))
-  );
+var x, S, C, w, T;
+function E() {
+  return (E = e(() => {
+    ((x = t(a(), 1)),
+      n(),
+      l(),
+      d(),
+      r(),
+      (S = o(i, (e) => new WeakMap(), { owner: (e) => e?.threadId })),
+      (C = s(
+        i,
+        (e, { get: t }) => {
+          if (e == null) return null;
+          let n = t(c, { hostId: t(v, e), threadId: e });
+          if (n == null) return (t(f, e), t(g, e), t(h, e)?.slice(0, -1) ?? null);
+          let r = n.flatMap((e) => (e.type === `content` ? [e.value] : [])),
+            i = [];
+          for (let n of r.slice(0, -1)) {
+            let r = t(u, { conversationId: e, entityKey: n });
+            if (r == null) return t(h, e)?.slice(0, -1) ?? null;
+            i.push(r);
+          }
+          return i;
+        },
+        { isEqual: (e, t) => (e == null || t == null ? e === t : p(e, t)) },
+      )),
+      (w = s(i, (e, { get: t }) => t(m, e), { isEqual: y })),
+      (T = s(
+        i,
+        (e, { get: t }) => {
+          if (e == null) return null;
+          let n = t(C, e) ?? [],
+            r = t(w, e);
+          return r == null ? n : [...n, r];
+        },
+        {
+          isEqual: (e, t) =>
+            e == null || t == null
+              ? e === t
+              : e.length === t.length && e.every((e, n) => e === t[n] || y(e, t[n])),
+        },
+      )));
+  }))();
 }
-
-let sourceLinksByThread: unknown;
-let conversationTurnsForSources: unknown;
-let activeTurnForSources: unknown;
-let allConversationTurnsForSources: unknown;
-
-function initializeLocalConversationSourcesSignals(): void {
-  const equalityRuntime = (initializeDeepEqual as unknown as () => unknown)();
-  deepEqual = (typeof equalityRuntime === "function"
-    ? equalityRuntime as (left: unknown, right: unknown) => boolean
-    : (equalityRuntime as { default: (left: unknown, right: unknown) => boolean }).default);
-  initializeSignalRuntime();
-  initializeConversationSources();
-  initializeSourceEntities();
-  initializeScopedSignals();
-
-  sourceLinksByThread = createScopedState(
-    conversationIdScope,
-    () => new WeakMap<object, unknown>(),
-    { owner: (value: { threadId?: string } | null | undefined) => value?.threadId },
-  );
-
-  conversationTurnsForSources = createScopedDerived(
-    conversationIdScope,
-    (conversationId: string | null, { get }: { get(signal: unknown, parameter?: unknown): unknown }) => {
-      if (conversationId == null) return null;
-      const hostId = get(hostIdByConversation, conversationId);
-      const entities = get(sourceEntityList, { hostId, threadId: conversationId }) as
-        | Array<{ type: string; value: unknown }>
-        | null;
-      if (entities == null) {
-        get(sourceFallbackSignal, conversationId);
-        get(sourceHistorySignal, conversationId);
-        return (get(priorConversationTurns, conversationId) as unknown[] | null)?.slice(0, -1) ?? null;
-      }
-      const keys = entities.flatMap((entity) =>
-        entity.type === "content" ? [entity.value] : [],
-      );
-      const turns: unknown[] = [];
-      for (const key of keys.slice(0, -1)) {
-        const turn = get(sourceEntityByKey, { conversationId, entityKey: key });
-        if (turn == null) {
-          return (get(priorConversationTurns, conversationId) as unknown[] | null)?.slice(0, -1) ?? null;
-        }
-        turns.push(turn);
-      }
-      return turns;
-    },
-    {
-      isEqual: (left: unknown[] | null, right: unknown[] | null) =>
-        left == null || right == null ? left === right : areConversationTurnsEqual(left, right),
-    },
-  );
-
-  activeTurnForSources = createScopedDerived(
-    conversationIdScope,
-    (conversationId: string | null, { get }: { get(signal: unknown, parameter?: unknown): unknown }) =>
-      get(activeConversationTurn, conversationId),
-    { isEqual: areSourceTurnsEqual },
-  );
-
-  allConversationTurnsForSources = createScopedDerived(
-    conversationIdScope,
-    (conversationId: string | null, { get }: { get(signal: unknown, parameter?: unknown): unknown }) => {
-      if (conversationId == null) return null;
-      const turns = (get(conversationTurnsForSources, conversationId) as SourceTurn[] | null) ?? [];
-      const activeTurn = get(activeTurnForSources, conversationId) as SourceTurn | null;
-      return activeTurn == null ? turns : [...turns, activeTurn];
-    },
-    {
-      isEqual: (left: SourceTurn[] | null, right: SourceTurn[] | null) =>
-        left == null || right == null
-          ? left === right
-          : left.length === right.length &&
-            left.every((turn, index) => turn === right[index] || areSourceTurnsEqual(turn, right[index])),
-    },
-  );
-}
-
-export {
-  sourceLinksByThread as i,
-  initializeLocalConversationSourcesSignals as n,
-  conversationTurnsForSources as r,
-  allConversationTurnsForSources as t,
-};
+export { S as i, E as n, C as r, T as t };

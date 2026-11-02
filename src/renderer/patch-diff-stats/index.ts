@@ -1,54 +1,32 @@
-import {
-  XO as parseUnifiedDiff,
-  YO as initializeUnifiedDiffParser,
-} from "@rchunk/app-initial";
-
-export interface PatchDiffStats {
-  added: number;
-  deleted: number;
-  openLocation: { line: number; path: string };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { XO as t, YO as n } from "@rchunk/app-initial";
+function r(e, n) {
+  if (!e) return null;
+  let r = i(e),
+    a = t(e)[0];
+  return a && (a.additions > 0 || a.deletions > 0 || (r.added === 0 && r.deleted === 0))
+    ? {
+        added: a.additions,
+        deleted: a.deletions,
+        openLocation: { path: n, line: a.firstAdditionLine ?? a.firstDeletionLine ?? 1 },
+      }
+    : r.added === 0 && r.deleted === 0
+      ? null
+      : { ...r, openLocation: { path: n, line: 1 } };
 }
-
-function countPatchLines(patch: string): { added: number; deleted: number } {
-  let added = 0;
-  let deleted = 0;
-  for (const line of patch.split(/\r?\n/)) {
-    if (line.startsWith("+++") || line.startsWith("---")) continue;
-    if (line.startsWith("+")) added += 1;
-    else if (line.startsWith("-")) deleted += 1;
-  }
-  return { added, deleted };
+function i(e) {
+  let t = 0,
+    n = 0;
+  for (let r of e.split(/\r?\n/))
+    r.startsWith(`+++`) ||
+      r.startsWith(`---`) ||
+      (r.startsWith(`+`) ? (t += 1) : r.startsWith(`-`) && (n += 1));
+  return { added: t, deleted: n };
 }
-
-function getPatchDiffStats(
-  patch: string | null | undefined,
-  path: string,
-): PatchDiffStats | null {
-  if (!patch) return null;
-  const fallback = countPatchLines(patch);
-  const parsed = parseUnifiedDiff(patch)[0];
-  if (
-    parsed &&
-    (parsed.additions > 0 ||
-      parsed.deletions > 0 ||
-      (fallback.added === 0 && fallback.deleted === 0))
-  ) {
-    return {
-      added: parsed.additions,
-      deleted: parsed.deletions,
-      openLocation: {
-        line: parsed.firstAdditionLine ?? parsed.firstDeletionLine ?? 1,
-        path,
-      },
-    };
-  }
-  return fallback.added === 0 && fallback.deleted === 0
-    ? null
-    : { ...fallback, openLocation: { line: 1, path } };
+function a() {
+  return (a = e(() => {
+    n();
+  }))();
 }
-
-function initializePatchDiffStats(): void {
-  initializeUnifiedDiffParser();
-}
-
-export { initializePatchDiffStats as n, getPatchDiffStats as t };
+export { a as n, r as t };

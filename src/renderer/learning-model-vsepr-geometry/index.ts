@@ -1,249 +1,197 @@
-// VSEPR geometry teaching model. Release chunk: model-cde8f9761457.js.
-import "@rchunk/rolldown-runtime";
-type Configuration =
-  | "AX2"
-  | "AX3"
-  | "AX2E"
-  | "AX4"
-  | "AX3E"
-  | "AX2E2"
-  | "AX5"
-  | "AX4E"
-  | "AX3E2"
-  | "AX2E3"
-  | "AX6"
-  | "AX5E"
-  | "AX4E2"
-  | "AX3E3"
-  | "AX2E4";
-type Direction = [number, number, number];
-interface Counts {
-  bonds: number;
-  lonePairs: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `VSEPR_GEOMETRY`),
+      (n = `vsepr-geometry-v1`),
+      (r = {
+        configuration: {
+          kind: `enum`,
+          defaultValue: `AX4`,
+          allowedValues: [
+            `AX2`,
+            `AX3`,
+            `AX2E`,
+            `AX4`,
+            `AX3E`,
+            `AX2E2`,
+            `AX5`,
+            `AX4E`,
+            `AX3E2`,
+            `AX2E3`,
+            `AX6`,
+            `AX5E`,
+            `AX4E2`,
+            `AX3E3`,
+            `AX2E4`,
+          ],
+        },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-const configurations: Configuration[] = [
-  "AX2",
-  "AX3",
-  "AX2E",
-  "AX4",
-  "AX3E",
-  "AX2E2",
-  "AX5",
-  "AX4E",
-  "AX3E2",
-  "AX2E3",
-  "AX6",
-  "AX5E",
-  "AX4E2",
-  "AX3E3",
-  "AX2E4",
-];
-const definition = {
-  type: "VSEPR_GEOMETRY",
-  version: 1,
-  thumbnailAssetKey: "vsepr-geometry-v1",
-  parameters: {
-    configuration: {
-      kind: "enum",
-      defaultValue: "AX4" as Configuration,
-      allowedValues: configurations,
-    },
-  },
-};
-const defaults = {
-  configuration: definition.parameters.configuration.defaultValue,
-};
-const counts: Record<Configuration, Counts> = Object.fromEntries(
-  configurations.map((value) => {
-    const match = /AX(\d)E?(\d)?/.exec(value);
-    return [
-      value,
-      { bonds: Number(match?.[1]), lonePairs: Number(match?.[2] ?? 0) },
-    ];
-  }),
-) as Record<Configuration, Counts>;
-const linear = { left: [-1, 0, 0] as Direction, right: [1, 0, 0] as Direction };
-const trigonal = {
-  top: [0, 1, 0] as Direction,
-  lowerLeft: [-0.866, -0.5, 0] as Direction,
-  lowerRight: [0.866, -0.5, 0] as Direction,
-};
-const tetra = {
-  frontTop: [0.577, 0.577, 0.577] as Direction,
-  backBottom: [-0.577, -0.577, 0.577] as Direction,
-  backTop: [-0.577, 0.577, -0.577] as Direction,
-  frontBottom: [0.577, -0.577, -0.577] as Direction,
-};
-const bipyramid = {
-  axialTop: [0, 1, 0] as Direction,
-  axialBottom: [0, -1, 0] as Direction,
-  equatorialFront: [0, 0, 1] as Direction,
-  equatorialBackLeft: [-0.866, 0, -0.5] as Direction,
-  equatorialBackRight: [0.866, 0, -0.5] as Direction,
-};
-const octa = {
-  top: [0, 1, 0] as Direction,
-  bottom: [0, -1, 0] as Direction,
-  left: [-1, 0, 0] as Direction,
-  right: [1, 0, 0] as Direction,
-  front: [0, 0, 1] as Direction,
-  back: [0, 0, -1] as Direction,
-};
-interface Geometry {
-  electronGeometry: string;
-  molecularGeometry: string;
-  bondDirections: Direction[];
-  lonePairDirections: Direction[];
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S;
+function C() {
+  return (C = e(() => {
+    (a(),
+      ({ configuration: o } = i.parameters),
+      (s = { configuration: o.defaultValue }),
+      (c = {
+        AX2: { bonds: 2, lonePairs: 0 },
+        AX3: { bonds: 3, lonePairs: 0 },
+        AX2E: { bonds: 2, lonePairs: 1 },
+        AX4: { bonds: 4, lonePairs: 0 },
+        AX3E: { bonds: 3, lonePairs: 1 },
+        AX2E2: { bonds: 2, lonePairs: 2 },
+        AX5: { bonds: 5, lonePairs: 0 },
+        AX4E: { bonds: 4, lonePairs: 1 },
+        AX3E2: { bonds: 3, lonePairs: 2 },
+        AX2E3: { bonds: 2, lonePairs: 3 },
+        AX6: { bonds: 6, lonePairs: 0 },
+        AX5E: { bonds: 5, lonePairs: 1 },
+        AX4E2: { bonds: 4, lonePairs: 2 },
+        AX3E3: { bonds: 3, lonePairs: 3 },
+        AX2E4: { bonds: 2, lonePairs: 4 },
+      }),
+      (l = { left: [-1, 0, 0], right: [1, 0, 0] }),
+      (u = { top: [0, 1, 0], lowerLeft: [-0.866, -0.5, 0], lowerRight: [0.866, -0.5, 0] }),
+      (d = {
+        frontTop: [0.577, 0.577, 0.577],
+        backBottom: [-0.577, -0.577, 0.577],
+        backTop: [-0.577, 0.577, -0.577],
+        frontBottom: [0.577, -0.577, -0.577],
+      }),
+      (f = {
+        axialTop: [0, 1, 0],
+        axialBottom: [0, -1, 0],
+        equatorialFront: [0, 0, 1],
+        equatorialBackLeft: [-0.866, 0, -0.5],
+        equatorialBackRight: [0.866, 0, -0.5],
+      }),
+      (p = {
+        top: [0, 1, 0],
+        bottom: [0, -1, 0],
+        left: [-1, 0, 0],
+        right: [1, 0, 0],
+        front: [0, 0, 1],
+        back: [0, 0, -1],
+      }),
+      (m = (e, t) => `${e}:${t}`),
+      (h = {
+        "2:0": {
+          electronGeometry: `linear`,
+          molecularGeometry: `linear`,
+          bondDirections: [l.left, l.right],
+          lonePairDirections: [],
+        },
+        "3:0": {
+          electronGeometry: `trigonal-planar`,
+          molecularGeometry: `trigonal-planar`,
+          bondDirections: [u.top, u.lowerLeft, u.lowerRight],
+          lonePairDirections: [],
+        },
+        "2:1": {
+          electronGeometry: `trigonal-planar`,
+          molecularGeometry: `bent`,
+          bondDirections: [u.lowerLeft, u.lowerRight],
+          lonePairDirections: [u.top],
+        },
+        "4:0": {
+          electronGeometry: `tetrahedral`,
+          molecularGeometry: `tetrahedral`,
+          bondDirections: Object.values(d),
+          lonePairDirections: [],
+        },
+        "3:1": {
+          electronGeometry: `tetrahedral`,
+          molecularGeometry: `trigonal-pyramidal`,
+          bondDirections: [d.backBottom, d.backTop, d.frontBottom],
+          lonePairDirections: [d.frontTop],
+        },
+        "2:2": {
+          electronGeometry: `tetrahedral`,
+          molecularGeometry: `bent`,
+          bondDirections: [d.backBottom, d.frontBottom],
+          lonePairDirections: [d.frontTop, d.backTop],
+        },
+        "5:0": {
+          electronGeometry: `trigonal-bipyramidal`,
+          molecularGeometry: `trigonal-bipyramidal`,
+          bondDirections: Object.values(f),
+          lonePairDirections: [],
+        },
+        "4:1": {
+          electronGeometry: `trigonal-bipyramidal`,
+          molecularGeometry: `seesaw`,
+          bondDirections: [f.axialTop, f.axialBottom, f.equatorialBackLeft, f.equatorialBackRight],
+          lonePairDirections: [f.equatorialFront],
+        },
+        "3:2": {
+          electronGeometry: `trigonal-bipyramidal`,
+          molecularGeometry: `t-shaped`,
+          bondDirections: [f.axialTop, f.axialBottom, f.equatorialFront],
+          lonePairDirections: [f.equatorialBackLeft, f.equatorialBackRight],
+        },
+        "2:3": {
+          electronGeometry: `trigonal-bipyramidal`,
+          molecularGeometry: `linear`,
+          bondDirections: [f.axialTop, f.axialBottom],
+          lonePairDirections: [f.equatorialFront, f.equatorialBackLeft, f.equatorialBackRight],
+        },
+        "6:0": {
+          electronGeometry: `octahedral`,
+          molecularGeometry: `octahedral`,
+          bondDirections: Object.values(p),
+          lonePairDirections: [],
+        },
+        "5:1": {
+          electronGeometry: `octahedral`,
+          molecularGeometry: `square-pyramidal`,
+          bondDirections: [p.top, p.left, p.right, p.front, p.back],
+          lonePairDirections: [p.bottom],
+        },
+        "4:2": {
+          electronGeometry: `octahedral`,
+          molecularGeometry: `square-planar`,
+          bondDirections: [p.left, p.right, p.front, p.back],
+          lonePairDirections: [p.top, p.bottom],
+        },
+        "3:3": {
+          electronGeometry: `octahedral`,
+          molecularGeometry: `t-shaped`,
+          bondDirections: [p.left, p.right, p.front],
+          lonePairDirections: [p.top, p.bottom, p.back],
+        },
+        "2:4": {
+          electronGeometry: `octahedral`,
+          molecularGeometry: `linear`,
+          bondDirections: [p.left, p.right],
+          lonePairDirections: [p.top, p.bottom, p.front, p.back],
+        },
+      }),
+      (g = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (_ = (e, t) => (typeof e == `number` && Number.isFinite(e) ? Math.round(e) : t)),
+      (v = (e) => g(6 - Math.round(e), 0, 4)),
+      (y = (e) => ({
+        configuration:
+          typeof e.configuration == `string` && e.configuration in c
+            ? e.configuration
+            : s.configuration,
+      })),
+      (b = (e, t) => {
+        let n = g(_(e, 2), 2, 6),
+          r = g(_(t, 0), 0, v(n));
+        return Object.entries(c).find(([, e]) => e.bonds === n && e.lonePairs === r)?.[0] ?? `AX4`;
+      }),
+      (x = (e) => {
+        let t = y(e);
+        return { ...t, ...c[t.configuration] };
+      }),
+      (S = (e) => {
+        let t = x(e);
+        return h[m(t.bonds, t.lonePairs)] ?? h[`4:0`];
+      }));
+  }))();
 }
-const geometries: Record<string, Geometry> = {
-  "2:0": {
-    electronGeometry: "linear",
-    molecularGeometry: "linear",
-    bondDirections: Object.values(linear),
-    lonePairDirections: [],
-  },
-  "3:0": {
-    electronGeometry: "trigonal-planar",
-    molecularGeometry: "trigonal-planar",
-    bondDirections: Object.values(trigonal),
-    lonePairDirections: [],
-  },
-  "2:1": {
-    electronGeometry: "trigonal-planar",
-    molecularGeometry: "bent",
-    bondDirections: [trigonal.lowerLeft, trigonal.lowerRight],
-    lonePairDirections: [trigonal.top],
-  },
-  "4:0": {
-    electronGeometry: "tetrahedral",
-    molecularGeometry: "tetrahedral",
-    bondDirections: Object.values(tetra),
-    lonePairDirections: [],
-  },
-  "3:1": {
-    electronGeometry: "tetrahedral",
-    molecularGeometry: "trigonal-pyramidal",
-    bondDirections: [tetra.backBottom, tetra.backTop, tetra.frontBottom],
-    lonePairDirections: [tetra.frontTop],
-  },
-  "2:2": {
-    electronGeometry: "tetrahedral",
-    molecularGeometry: "bent",
-    bondDirections: [tetra.backBottom, tetra.frontBottom],
-    lonePairDirections: [tetra.frontTop, tetra.backTop],
-  },
-  "5:0": {
-    electronGeometry: "trigonal-bipyramidal",
-    molecularGeometry: "trigonal-bipyramidal",
-    bondDirections: Object.values(bipyramid),
-    lonePairDirections: [],
-  },
-  "4:1": {
-    electronGeometry: "trigonal-bipyramidal",
-    molecularGeometry: "seesaw",
-    bondDirections: [
-      bipyramid.axialTop,
-      bipyramid.axialBottom,
-      bipyramid.equatorialBackLeft,
-      bipyramid.equatorialBackRight,
-    ],
-    lonePairDirections: [bipyramid.equatorialFront],
-  },
-  "3:2": {
-    electronGeometry: "trigonal-bipyramidal",
-    molecularGeometry: "t-shaped",
-    bondDirections: [
-      bipyramid.axialTop,
-      bipyramid.axialBottom,
-      bipyramid.equatorialFront,
-    ],
-    lonePairDirections: [
-      bipyramid.equatorialBackLeft,
-      bipyramid.equatorialBackRight,
-    ],
-  },
-  "2:3": {
-    electronGeometry: "trigonal-bipyramidal",
-    molecularGeometry: "linear",
-    bondDirections: [bipyramid.axialTop, bipyramid.axialBottom],
-    lonePairDirections: [
-      bipyramid.equatorialFront,
-      bipyramid.equatorialBackLeft,
-      bipyramid.equatorialBackRight,
-    ],
-  },
-  "6:0": {
-    electronGeometry: "octahedral",
-    molecularGeometry: "octahedral",
-    bondDirections: Object.values(octa),
-    lonePairDirections: [],
-  },
-  "5:1": {
-    electronGeometry: "octahedral",
-    molecularGeometry: "square-pyramidal",
-    bondDirections: [octa.top, octa.left, octa.right, octa.front, octa.back],
-    lonePairDirections: [octa.bottom],
-  },
-  "4:2": {
-    electronGeometry: "octahedral",
-    molecularGeometry: "square-planar",
-    bondDirections: [octa.left, octa.right, octa.front, octa.back],
-    lonePairDirections: [octa.top, octa.bottom],
-  },
-  "3:3": {
-    electronGeometry: "octahedral",
-    molecularGeometry: "t-shaped",
-    bondDirections: [octa.left, octa.right, octa.front],
-    lonePairDirections: [octa.top, octa.bottom, octa.back],
-  },
-  "2:4": {
-    electronGeometry: "octahedral",
-    molecularGeometry: "linear",
-    bondDirections: [octa.left, octa.right],
-    lonePairDirections: [octa.top, octa.bottom, octa.front, octa.back],
-  },
-};
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(Math.max(value, min), max);
-const maxLonePairs = (bonds: number) => clamp(6 - Math.round(bonds), 0, 4);
-const normalize = (input: { configuration?: unknown }) => ({
-  configuration:
-    typeof input.configuration === "string" && input.configuration in counts
-      ? (input.configuration as Configuration)
-      : defaults.configuration,
-});
-const configurationFor = (bonds: number, lonePairs: number) => {
-  const safeBonds = clamp(Number.isFinite(bonds) ? Math.round(bonds) : 2, 2, 6),
-    safePairs = clamp(
-      Number.isFinite(lonePairs) ? Math.round(lonePairs) : 0,
-      0,
-      maxLonePairs(safeBonds),
-    );
-  return (
-    configurations.find(
-      (configuration) =>
-        counts[configuration].bonds === safeBonds &&
-        counts[configuration].lonePairs === safePairs,
-    ) ?? "AX4"
-  );
-};
-const deriveCounts = (input: { configuration?: unknown }) => {
-  const safe = normalize(input);
-  return { ...safe, ...counts[safe.configuration] };
-};
-const deriveGeometry = (input: { configuration?: unknown }) => {
-  const safe = deriveCounts(input);
-  return geometries[`${safe.bonds}:${safe.lonePairs}`] ?? geometries["4:0"]!;
-};
-function initializeSpecification(): void {}
-function initializeModel(): void {}
-export {
-  initializeModel as a,
-  definition as c,
-  deriveGeometry as i,
-  maxLonePairs as n,
-  deriveCounts as o,
-  configurationFor as r,
-  initializeSpecification as s,
-  defaults as t,
-};
+export { C as a, i as c, S as i, v as n, x as o, b as r, a as s, s as t };

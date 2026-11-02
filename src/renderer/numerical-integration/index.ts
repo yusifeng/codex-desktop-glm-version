@@ -1,64 +1,51 @@
-// Numerical-integrand normalization. Release chunk: numerical-integration-e14603542012.js.
-import "@rchunk/rolldown-runtime";
-
-function replaceLatexFractions(expression: string): string {
-  let normalized = expression;
-  for (let pass = 0; pass < 4; pass += 1) {
-    const next = normalized.replace(/\\frac\s*\{([^{}]+)\}\s*\{([^{}]+)\}/g, "(($1)/($2))");
-    if (next === normalized) break;
-    normalized = next;
-  }
-  return normalized;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r;
+function i() {
+  return (i = e(() => {
+    ((t = (e) => {
+      let t = e;
+      for (let e = 0; e < 4; e += 1) {
+        let e = t.replace(/\\frac\s*\{([^{}]+)\}\s*\{([^{}]+)\}/g, `(($1)/($2))`);
+        if (e === t) break;
+        t = e;
+      }
+      return t;
+    }),
+      (n = (e) =>
+        e
+          .replace(/(^|[0-9x)e])pi/g, (e, t) => `${t}${t ? `*` : ``}pi`)
+          .replace(/pi(?=pi|[0-9xe(])/g, `pi*`)),
+      (r = (e) => {
+        let r = t(e ?? ``)
+            .replace(/\\pi/g, `pi`)
+            .replace(/π/g, `pi`)
+            .replace(/\\cdot/g, `*`)
+            .replace(/\\times/g, `*`)
+            .replace(/\\div/g, `/`)
+            .replace(/\\(?:left|right)(?![a-zA-Z])/g, ``)
+            .replace(/\\(?:,|;|:|!| )/g, ``)
+            .replace(/[−–—]/g, `-`)
+            .replace(/[×·⋅]/g, `*`)
+            .replace(/÷/g, `/`)
+            .replace(/[{}]/g, (e) => (e === `{` ? `(` : `)`))
+            .toLowerCase(),
+          i = !1,
+          a = ``;
+        for (let e = 0; e < r.length; e += 1) {
+          if (r.startsWith(`pi`, e)) {
+            ((a += `pi`), (e += 1));
+            continue;
+          }
+          let t = r[e];
+          if (/^[0-9xe+\-*/^().\s]$/.test(t)) {
+            a += t;
+            continue;
+          }
+          /^[a-z]$/.test(t) && (i = !0);
+        }
+        return { integrand: n(a.replace(/\s+/g, ``)), hasUnsupportedLetter: i };
+      }));
+  }))();
 }
-
-function insertPiMultiplication(expression: string): string {
-  return expression
-    .replace(/(^|[0-9x)e])pi/g, (_match, prefix: string) => prefix + (prefix ? "*" : "") + "pi")
-    .replace(/pi(?=pi|[0-9xe(])/g, "pi*");
-}
-
-function normalizeIntegrand(expression?: string | null): {
-  integrand: string;
-  hasUnsupportedLetter: boolean;
-} {
-  const sanitized = replaceLatexFractions(expression ?? "")
-    .replace(/\\pi/g, "pi")
-    .replace(/π/g, "pi")
-    .replace(/\\cdot/g, "*")
-    .replace(/\\times/g, "*")
-    .replace(/\\div/g, "/")
-    .replace(/\\(?:left|right)(?![a-zA-Z])/g, "")
-    .replace(/\\(?:,|;|:|!| )/g, "")
-    .replace(/[−–—]/g, "-")
-    .replace(/[×·⋅]/g, "*")
-    .replace(/÷/g, "/")
-    .replace(/[{}]/g, (token) => (token === "{" ? "(" : ")"))
-    .toLowerCase();
-
-  let hasUnsupportedLetter = false;
-  let integrand = "";
-  for (let index = 0; index < sanitized.length; index += 1) {
-    if (sanitized.startsWith("pi", index)) {
-      integrand += "pi";
-      index += 1;
-      continue;
-    }
-    const token = sanitized[index];
-    if (/^[0-9xe+\-*/^().\s]$/.test(token)) {
-      integrand += token;
-      continue;
-    }
-    if (/^[a-z]$/.test(token)) {
-      hasUnsupportedLetter = true;
-    }
-  }
-
-  return {
-    integrand: insertPiMultiplication(integrand.replace(/\s+/g, "")),
-    hasUnsupportedLetter,
-  };
-}
-
-function initializeNumericalIntegration(): void {}
-
-export { normalizeIntegrand as n, initializeNumericalIntegration as t };
+export { r as n, i as t };

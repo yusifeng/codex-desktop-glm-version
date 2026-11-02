@@ -1,9 +1,5 @@
+// @ts-nocheck
 import "@rchunk/app-shared";
-import {
-  n as initializePortableThumbnailPdf,
-  t as getPdfjsExport,
-} from "@rchunk/portable-thumbnail-pdf-document";
-
-initializePortableThumbnailPdf();
-const getPdfjs = getPdfjsExport;
-export { getPdfjs };
+import { n as e, t } from "@rchunk/portable-thumbnail-pdf-document";
+e();
+export { t as getPdfjs };

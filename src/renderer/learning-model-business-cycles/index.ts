@@ -1,66 +1,53 @@
-// Business-cycle learning model with smoothed expansion and contraction phases.
-import "@rchunk/rolldown-runtime";
-
-interface BusinessCycleValues { examinedTime?: number | null }
-
-const businessCycleTimeControl = { min: 0, max: 100, step: 1 };
-const defaultBusinessCycleValues = { examinedTime: 27 };
-const businessCycleTurningPoints = { firstTrough: 8, peak: 42, trough: 66 };
-const businessCycleAnchors = [
-  { time: businessCycleTimeControl.min, activity: 48 },
-  { time: businessCycleTurningPoints.firstTrough, activity: 40 },
-  { time: businessCycleTurningPoints.peak, activity: 84 },
-  { time: businessCycleTurningPoints.trough, activity: 42 },
-  { time: businessCycleTimeControl.max, activity: 78 },
-];
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-const normalizeBusinessCycleValues = (values: BusinessCycleValues) => ({
-  examinedTime: Number.isFinite(values.examinedTime)
-    ? clamp(values.examinedTime as number, businessCycleTimeControl.min, businessCycleTimeControl.max)
-    : defaultBusinessCycleValues.examinedTime,
-});
-const smoothstep = (value: number): number => value * value * (3 - 2 * value);
-
-function activityAtTime(time: number): number {
-  const safeTime = clamp(time, businessCycleTimeControl.min, businessCycleTimeControl.max);
-  const segmentIndex = businessCycleAnchors.findIndex(
-    (anchor, index) => index < businessCycleAnchors.length - 1 && safeTime >= anchor.time && safeTime <= businessCycleAnchors[index + 1].time,
-  );
-  const start = businessCycleAnchors[Math.max(0, segmentIndex)];
-  const end = businessCycleAnchors[Math.max(1, segmentIndex + 1)];
-  const progress = (safeTime - start.time) / (end.time - start.time);
-  return start.activity + (end.activity - start.activity) * smoothstep(progress);
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    ((t = { min: 0, max: 100, step: 1 }),
+      (n = { examinedTime: 27 }),
+      (r = { firstTrough: 8, peak: 42, trough: 66 }),
+      (i = [
+        { time: t.min, activity: 48 },
+        { time: r.firstTrough, activity: 40 },
+        { time: r.peak, activity: 84 },
+        { time: r.trough, activity: 42 },
+        { time: t.max, activity: 78 },
+      ]),
+      (a = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (o = (e) => ({
+        examinedTime: Number.isFinite(e.examinedTime)
+          ? a(e.examinedTime, t.min, t.max)
+          : n.examinedTime,
+      })),
+      (s = (e) => e * e * (3 - 2 * e)),
+      (c = (e) => {
+        let n = a(e, t.min, t.max),
+          r = i.findIndex((e, t) => t < i.length - 1 && n >= e.time && n <= i[t + 1].time),
+          o = i[Math.max(0, r)],
+          c = i[Math.max(1, r + 1)],
+          l = (n - o.time) / (c.time - o.time);
+        return o.activity + (c.activity - o.activity) * s(l);
+      }),
+      (l = (e) => {
+        let n = a(e, t.min, t.max);
+        return n === r.peak
+          ? `peak`
+          : n === r.firstTrough || n === r.trough
+            ? `trough`
+            : n < r.firstTrough || (n > r.peak && n < r.trough)
+              ? `contraction`
+              : `expansion`;
+      }),
+      (u = (e = t.min, n = t.max) => {
+        let r = a(e, t.min, t.max),
+          i = a(n, r, t.max),
+          o = Math.max(2, Math.ceil((i - r) * 2) + 1);
+        return Array.from({ length: o }, (e, t) => {
+          let n = r + ((i - r) * t) / (o - 1);
+          return { x: n, y: c(n) };
+        });
+      }),
+      (d = u()));
+  }))();
 }
-
-const classifyBusinessCyclePhase = (time: number): "peak" | "trough" | "contraction" | "expansion" => {
-  const safeTime = clamp(time, businessCycleTimeControl.min, businessCycleTimeControl.max);
-  return safeTime === businessCycleTurningPoints.peak ? "peak"
-    : safeTime === businessCycleTurningPoints.firstTrough || safeTime === businessCycleTurningPoints.trough ? "trough"
-      : safeTime < businessCycleTurningPoints.firstTrough || safeTime > businessCycleTurningPoints.peak && safeTime < businessCycleTurningPoints.trough ? "contraction"
-        : "expansion";
-};
-
-function sampleBusinessCycle(from = businessCycleTimeControl.min, to = businessCycleTimeControl.max) {
-  const start = clamp(from, businessCycleTimeControl.min, businessCycleTimeControl.max);
-  const end = clamp(to, start, businessCycleTimeControl.max);
-  const sampleCount = Math.max(2, Math.ceil((end - start) * 2) + 1);
-  return Array.from({ length: sampleCount }, (_unused, index) => {
-    const time = start + (end - start) * index / (sampleCount - 1);
-    return { x: time, y: activityAtTime(time) };
-  });
-}
-
-const defaultBusinessCycleSeries = sampleBusinessCycle();
-function initializeBusinessCyclesModel(): void {}
-
-export {
-  activityAtTime as a,
-  initializeBusinessCyclesModel as c,
-  businessCycleTurningPoints as i,
-  normalizeBusinessCycleValues as l,
-  defaultBusinessCycleValues as n,
-  classifyBusinessCyclePhase as o,
-  businessCycleTimeControl as r,
-  sampleBusinessCycle as s,
-  defaultBusinessCycleSeries as t,
-};
+export { c as a, f as c, r as i, o as l, n, l as o, t as r, u as s, d as t };

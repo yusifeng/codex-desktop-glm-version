@@ -1,409 +1,226 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { II as t, RI as n, eU as r, hq as i, wL as a } from "@rchunk/app-shared";
 import {
-  RI as initializeAttachmentUtilities,
-  eU as getMcpAppId,
-  hq as isWebMcpServer,
-  wL as initializeUtilities,
-} from "@rchunk/app-shared";
-import { getPathBasename } from "../app-shared/runtime/get-path-basename";
-import {
-  Brn as formatMcpServerName,
-  Drn as initializeMcpServerNames,
-  Ern as findMatchingApp,
-  Gdt as initializeFileSourceModel,
-  Vrn as initializeAppMatching,
-  Wdt as getMcpServerLogo,
-  ZGt as createViewedLink,
-  _hn as getAttachmentsFromMessageContent,
-  dmn as collectInputAttachments,
-  fmn as initializeAttachmentCollection,
-  fnn as initializeAttachmentIdentity,
-  hmn as initializeConversationItemUtilities,
-  mmn as getAttachmentKey,
-  pnn as projectMcpToolCall,
-  vhn as initializeMcpCallProjection,
-  wrn as initializeMcpProviderMetadata,
-  yrn as computerUseProviderId,
+  Brn as o,
+  Drn as s,
+  Ern as c,
+  Gdt as l,
+  Vrn as u,
+  Wdt as d,
+  ZGt as f,
+  _hn as p,
+  dmn as m,
+  fmn as h,
+  fnn as g,
+  hmn as _,
+  mmn as v,
+  pnn as y,
+  vhn as b,
+  w$t as x,
+  wrn as S,
+  yrn as C,
 } from "@rchunk/app-initial";
-import { flattenConversationItems } from "../app-initial/runtime/flatten-conversation-items";
-import {
-  i as initializeMcpToolActivityLabels,
-  t as getMcpToolActivityLabel,
-  type McpToolIntl,
-} from "@rchunk/mcp-tool-activity-label";
-import {
-  r as initializeLocalConversationExternalResources,
-  t as getExternalResourceKey,
-  type ExternalResource,
-} from "@rchunk/local-conversation-external-resources";
-import { t as getTrustedAnalyticsAppName } from "@rchunk/mcp-app-analytics";
-
-interface ConversationTurn {
-  items: unknown[];
-  params: {
-    attachments?: unknown[];
-    input: unknown[];
-  };
+import { i as w, t as T } from "@rchunk/mcp-tool-activity-label";
+import { r as E, t as D } from "@rchunk/local-conversation-external-resources";
+import { t as O } from "@rchunk/mcp-app-analytics";
+function k(e) {
+  let t = new Map();
+  for (let n of e?.data ?? []) {
+    let e = n.serverInfo;
+    if (e == null) continue;
+    let r = d(e),
+      i = e.title?.trim() || e.name.trim() || null;
+    if (r == null && i == null) continue;
+    let a = { logoUrl: r?.logoUrl ?? null, logoUrlDark: r?.logoDarkUrl ?? null, name: i };
+    for (let r of [n.name, e.name]) {
+      let e = A(r);
+      e.length > 0 && !t.has(e) && t.set(e, a);
+    }
+  }
+  return t;
 }
-
-interface FileSource {
-  fsPath?: string;
-  label?: string;
-  path?: string;
-  [key: string]: unknown;
+function A(e) {
+  return e?.trim().toLowerCase() ?? ``;
 }
-
-interface McpApp {
-  appMetadata?: { firstPartyType?: string } | null;
-  distributionChannel?: string;
-  id: string;
-  logoUrl: string | null;
-  logoUrlDark: string | null;
-  name: string;
-  pluginDisplayNames?: string[];
+function j() {
+  return (j = e(() => {
+    l();
+  }))();
 }
-
-interface McpToolCall {
-  appContext?: { appName?: string; connectorId: string } | null;
-  id: string;
-  pluginId?: string;
-  server: string;
-  tool: string;
-  type: string;
-}
-
-interface ToolActivity {
-  calls: unknown[];
-  label: string;
-}
-
-interface ToolSource {
-  activities: ToolActivity[];
-  id: string;
-  logoUrl: string | null;
-  logoUrlDark: string | null;
-  mcpAppId?: string;
-  name: string;
-  pluginDisplayNames: string[];
-  trustedAnalyticsAppName?: string;
-}
-
-interface ServerInfo {
-  logoDarkUrl?: string | null;
-  logoUrl?: string | null;
-  name: string;
-  title?: string | null;
-}
-
-interface ServerInfoQuery {
-  data?: Array<{ name: string; serverInfo?: ServerInfo | null }>;
-}
-
-export interface ViewedLink {
-  title?: string;
-  url: string;
-  [key: string]: unknown;
-}
-
-export interface WebSearchSource {
-  queries: string[];
-  queryCount: number;
-  viewedLinks: ViewedLink[];
-}
-
-function normalizeServerName(value?: string | null): string {
-  return value?.trim().toLowerCase() ?? "";
-}
-
-function buildServerMetadataMap(query?: ServerInfoQuery | null): Map<
-  string,
-  { logoUrl: string | null; logoUrlDark: string | null; name: string | null }
-> {
-  const metadata = new Map<
-    string,
-    { logoUrl: string | null; logoUrlDark: string | null; name: string | null }
-  >();
-  for (const entry of query?.data ?? []) {
-    const serverInfo = entry.serverInfo;
-    if (serverInfo == null) continue;
-    const logo = getMcpServerLogo(serverInfo as unknown as Record<string, unknown>) as
-      | { logoDarkUrl?: string | null; logoUrl?: string | null }
-      | null;
-    const name = serverInfo.title?.trim() || serverInfo.name.trim() || null;
-    if (logo == null && name == null) continue;
-    const value = {
-      logoUrl: logo?.logoUrl ?? null,
-      logoUrlDark: logo?.logoDarkUrl ?? null,
-      name,
+function M(e) {
+  let n = [],
+    r = new Set(),
+    i = (e, i) => {
+      for (let a of [
+        ...m({ attachments: e, input: i }),
+        ...i.flatMap((e) =>
+          e.type === `localImage`
+            ? [{ label: t(e.path) || e.path, path: e.path, fsPath: e.path }]
+            : [],
+        ),
+      ]) {
+        let e = v(a);
+        r.has(e) || (r.add(e), n.push(a));
+      }
     };
-    for (const alias of [entry.name, serverInfo.name]) {
-      const key = normalizeServerName(alias);
-      if (key.length > 0 && !metadata.has(key)) metadata.set(key, value);
+  for (let t = e.length - 1; t >= 0; --t) {
+    let n = e[t],
+      r = x(n.items);
+    for (let e = r.length - 1; e >= 0; --e) {
+      let t = r[e];
+      t.type === `steeringUserMessage`
+        ? i(t.attachments, t.input)
+        : t.type === `userMessage` && i(t.attachments ?? p(t.content), t.content);
+    }
+    i(n.params.attachments ?? [], n.params.input);
+  }
+  return n;
+}
+function N(e, t, n, a, o, s, l = !1) {
+  let u = [],
+    d = new Map(),
+    f = k(o);
+  for (let o = e.length - 1; o >= 0; --o) {
+    let l = e[o],
+      p = x(l.items);
+    for (let e = p.length - 1; e >= 0; --e) {
+      let o = p[e];
+      if (o.type !== `mcpToolCall` || i(o.server) || A(o.server) === `plugin-runtime`) continue;
+      let m = c({
+          appContext: o.appContext,
+          apps: t,
+          functionName: `${o.server}__${o.tool}`,
+          serverName: o.server,
+          toolName: o.tool,
+        }),
+        h = I(o, m, f);
+      if (s?.has(h.id) === !0) continue;
+      let g = r(o.id),
+        _ = a?.has(g) === !0 ? g : void 0,
+        v = d.get(h.id),
+        b = y(l, o),
+        x = T({
+          appContext: o.appContext,
+          completed: b.completed,
+          intl: n,
+          matchingApp: m,
+          serverName: o.server,
+          toolArguments: void 0,
+          toolName: o.tool,
+        });
+      if (v != null) {
+        let e = v.activities.find((e) => e.label === x);
+        (e == null ? v.activities.push({ calls: [b], label: x }) : e.calls.push(b),
+          v.mcpAppId == null && _ != null && (v.mcpAppId = _));
+        continue;
+      }
+      (_ != null && (h.mcpAppId = _),
+        h.activities.push({ calls: [b], label: x }),
+        d.set(h.id, h),
+        u.push(h));
     }
   }
-  return metadata;
+  return u;
 }
-
-function collectFileSources(turns: ConversationTurn[]): FileSource[] {
-  const sources: FileSource[] = [];
-  const seen = new Set<string>();
-  const addSources = (attachments: unknown[], input: unknown[]) => {
-    const explicitSources = collectInputAttachments({ attachments, input }) as FileSource[];
-    const localImages = input.flatMap((item) => {
-      const candidate = item as { path?: string; type?: string };
-      if (candidate.type !== "localImage" || candidate.path == null) return [];
-      return [
-        {
-          label: (getPathBasename(candidate.path) as string) || candidate.path,
-          path: candidate.path,
-          fsPath: candidate.path,
-        },
-      ];
-    });
-    for (const source of [...explicitSources, ...localImages]) {
-      const key = getAttachmentKey(source) as string;
-      if (!seen.has(key)) {
-        seen.add(key);
-        sources.push(source);
-      }
+function P(e) {
+  let t = !1,
+    n = 0,
+    r = [],
+    i = [],
+    a = new Set(),
+    o = new Set(),
+    s = (e) => {
+      let t = e.trim();
+      t.length !== 0 && ((n += 1), !a.has(t) && (a.add(t), r.push(t)));
+    },
+    c = (e) => {
+      let t = f({ url: e });
+      t == null || o.has(t.url) || (o.add(t.url), i.push(t));
+    };
+  for (let n = e.length - 1; n >= 0; --n) {
+    let r = e[n],
+      i = x(r.items);
+    for (let e = i.length - 1; e >= 0; --e) {
+      let n = i[e];
+      if (n.type !== `webSearch`) continue;
+      t = !0;
+      let r = n.action;
+      if (r == null) s(n.query);
+      else if (r.type === `search`) {
+        let e = r.queries == null || r.queries.length === 0 ? [r.query] : r.queries;
+        for (let t of e) t != null && s(t);
+      } else
+        r.type === `openPage` || r.type === `findInPage` ? r.url != null && c(r.url) : s(n.query);
     }
+  }
+  return t ? { queries: r, queryCount: n, viewedLinks: i } : null;
+}
+function F(e, t) {
+  if (t == null) return { externalSources: e, webSearchSource: null };
+  let n = new Set(
+      t.viewedLinks.flatMap((e) => {
+        let t = D(e.url);
+        return t == null ? [] : [t];
+      }),
+    ),
+    r = e.filter(
+      (e) =>
+        !(
+          e.provider == null &&
+          e.activities.length === 1 &&
+          e.activities[0] === `read` &&
+          n.has(e.key)
+        ),
+    ),
+    i = new Set(r.map((e) => e.key)),
+    a = {
+      ...t,
+      viewedLinks: t.viewedLinks.filter((e) => {
+        let t = D(e.url);
+        return t == null || !i.has(t);
+      }),
+    };
+  return {
+    externalSources: r,
+    webSearchSource: a.queryCount === 0 && a.viewedLinks.length === 0 ? null : a,
   };
-
-  for (let turnIndex = turns.length - 1; turnIndex >= 0; turnIndex -= 1) {
-    const turn = turns[turnIndex];
-    const items = flattenConversationItems(turn.items) as Array<Record<string, unknown>>;
-    for (let itemIndex = items.length - 1; itemIndex >= 0; itemIndex -= 1) {
-      const item = items[itemIndex];
-      if (item.type === "steeringUserMessage") {
-        addSources((item.attachments as unknown[]) ?? [], item.input as unknown[]);
-      } else if (item.type === "userMessage") {
-        addSources(
-          (item.attachments as unknown[] | undefined) ??
-            (getAttachmentsFromMessageContent(item.content) as unknown[]),
-          item.content as unknown[],
-        );
-      }
-    }
-    addSources(turn.params.attachments ?? [], turn.params.input);
-  }
-  return sources;
 }
-
-function buildToolSource(
-  call: McpToolCall,
-  matchingApp: McpApp | null,
-  serverMetadata: Map<
-    string,
-    { logoUrl: string | null; logoUrlDark: string | null; name: string | null }
-  >,
-): ToolSource {
-  const normalizedServer = normalizeServerName(call.server);
-  const overrideId = normalizedServer === "computer-use" ? computerUseProviderId : null;
-  if (matchingApp != null) {
+function I(e, t, n) {
+  let r = A(e.server),
+    i = r === `computer-use` ? C : null;
+  if (t != null)
     return {
-      id: overrideId ?? matchingApp.id,
-      name: matchingApp.name,
-      pluginDisplayNames: matchingApp.pluginDisplayNames ?? [],
-      logoUrl: matchingApp.logoUrl,
-      logoUrlDark: matchingApp.logoUrlDark,
+      id: i ?? t.id,
+      name: t.name,
+      pluginDisplayNames: t.pluginDisplayNames ?? [],
+      logoUrl: t.logoUrl,
+      logoUrlDark: t.logoUrlDark,
       activities: [],
-      trustedAnalyticsAppName: getTrustedAnalyticsAppName(
-        matchingApp as unknown as Record<string, unknown>,
-      ),
+      trustedAnalyticsAppName: O(t),
     };
-  }
-  if (call.appContext != null) {
+  if (e.appContext != null)
     return {
-      id: overrideId ?? call.appContext.connectorId,
-      name: call.appContext.appName ?? call.appContext.connectorId,
+      id: i ?? e.appContext.connectorId,
+      name: e.appContext.appName ?? e.appContext.connectorId,
       pluginDisplayNames: [],
       logoUrl: null,
       logoUrlDark: null,
       activities: [],
     };
-  }
-  const metadata = serverMetadata.get(normalizedServer);
+  let a = n.get(r);
   return {
-    id: overrideId ?? call.pluginId ?? `mcp-server:${call.server}`,
-    name: metadata?.name ?? formatMcpServerName(call.server),
+    id: i ?? e.pluginId ?? `mcp-server:${e.server}`,
+    name: a?.name ?? o(e.server),
     pluginDisplayNames: [],
-    logoUrl: metadata?.logoUrl ?? null,
-    logoUrlDark: metadata?.logoUrlDark ?? null,
+    logoUrl: a?.logoUrl ?? null,
+    logoUrlDark: a?.logoUrlDark ?? null,
     activities: [],
   };
 }
-
-function collectToolSources(
-  turns: ConversationTurn[],
-  apps: McpApp[],
-  intl: McpToolIntl,
-  knownMcpAppIds?: Set<string> | null,
-  serverInfoQuery?: ServerInfoQuery | null,
-  excludedProviderIds?: Set<string> | null,
-  includeInternal = false,
-): ToolSource[] {
-  const sources: ToolSource[] = [];
-  const sourcesById = new Map<string, ToolSource>();
-  const serverMetadata = buildServerMetadataMap(serverInfoQuery);
-  for (let turnIndex = turns.length - 1; turnIndex >= 0; turnIndex -= 1) {
-    const turn = turns[turnIndex];
-    const items = flattenConversationItems(turn.items) as McpToolCall[];
-    for (let itemIndex = items.length - 1; itemIndex >= 0; itemIndex -= 1) {
-      const call = items[itemIndex];
-      if (
-        call.type !== "mcpToolCall" ||
-        isWebMcpServer(call.server) ||
-        normalizeServerName(call.server) === "plugin-runtime"
-      ) {
-        continue;
-      }
-      const matchingApp = findMatchingApp({
-        appContext: call.appContext,
-        apps,
-        functionName: `${call.server}__${call.tool}`,
-        serverName: call.server,
-        toolName: call.tool,
-      }) as unknown as McpApp | null;
-      const candidate = buildToolSource(call, matchingApp, serverMetadata);
-      if (excludedProviderIds?.has(candidate.id) === true) continue;
-      const appId = getMcpAppId(call.id) as string;
-      const knownAppId = knownMcpAppIds?.has(appId) === true ? appId : undefined;
-      const projectedCall = projectMcpToolCall(
-        turn as unknown as Record<string, unknown>,
-        call as unknown as Record<string, unknown>,
-      );
-      const activityLabel = getMcpToolActivityLabel({
-        appContext: call.appContext,
-        completed: (projectedCall as { completed?: boolean }).completed,
-        intl,
-        matchingApp,
-        serverName: call.server,
-        toolArguments: undefined,
-        toolName: call.tool,
-      }) as string;
-      const existing = sourcesById.get(candidate.id);
-      if (existing != null) {
-        const activity = existing.activities.find(({ label }) => label === activityLabel);
-        if (activity == null) existing.activities.push({ calls: [projectedCall], label: activityLabel });
-        else activity.calls.push(projectedCall);
-        if (existing.mcpAppId == null && knownAppId != null) existing.mcpAppId = knownAppId;
-        continue;
-      }
-      if (knownAppId != null) candidate.mcpAppId = knownAppId;
-      candidate.activities.push({ calls: [projectedCall], label: activityLabel });
-      sourcesById.set(candidate.id, candidate);
-      sources.push(candidate);
-    }
-  }
-  void includeInternal;
-  return sources;
+function L() {
+  return (L = e(() => {
+    (a(), u(), _(), b(), h(), g(), w(), s(), j(), S(), n(), E());
+  }))();
 }
-
-function collectWebSearchSource(turns: ConversationTurn[]): WebSearchSource | null {
-  let foundWebSearch = false;
-  let queryCount = 0;
-  const queries: string[] = [];
-  const viewedLinks: ViewedLink[] = [];
-  const seenQueries = new Set<string>();
-  const seenLinks = new Set<string>();
-  const addQuery = (value: string) => {
-    const query = value.trim();
-    if (query.length === 0) return;
-    queryCount += 1;
-    if (!seenQueries.has(query)) {
-      seenQueries.add(query);
-      queries.push(query);
-    }
-  };
-  const addLink = (url: string) => {
-    const link = createViewedLink({ url }) as ViewedLink | null;
-    if (link != null && !seenLinks.has(link.url)) {
-      seenLinks.add(link.url);
-      viewedLinks.push(link);
-    }
-  };
-
-  for (let turnIndex = turns.length - 1; turnIndex >= 0; turnIndex -= 1) {
-    const items = flattenConversationItems(turns[turnIndex].items) as Array<
-      Record<string, unknown>
-    >;
-    for (let itemIndex = items.length - 1; itemIndex >= 0; itemIndex -= 1) {
-      const item = items[itemIndex];
-      if (item.type !== "webSearch") continue;
-      foundWebSearch = true;
-      const action = item.action as
-        | { queries?: string[]; query?: string; type: string; url?: string }
-        | null;
-      if (action == null) addQuery(item.query as string);
-      else if (action.type === "search") {
-        const actionQueries =
-          action.queries == null || action.queries.length === 0 ? [action.query] : action.queries;
-        for (const query of actionQueries) if (query != null) addQuery(query);
-      } else if (action.type === "openPage" || action.type === "findInPage") {
-        if (action.url != null) addLink(action.url);
-      } else addQuery(item.query as string);
-    }
-  }
-  return foundWebSearch ? { queries, queryCount, viewedLinks } : null;
-}
-
-function reconcileExternalAndWebSearchSources(
-  externalSources: ExternalResource[],
-  webSearchSource: WebSearchSource | null,
-): { externalSources: ExternalResource[]; webSearchSource: WebSearchSource | null } {
-  if (webSearchSource == null) return { externalSources, webSearchSource: null };
-  const viewedKeys = new Set(
-    webSearchSource.viewedLinks.flatMap(({ url }) => {
-      const key = getExternalResourceKey(url);
-      return key == null ? [] : [key];
-    }),
-  );
-  const filteredExternalSources = externalSources.filter(
-    (source) =>
-      !(
-        source.provider == null &&
-        source.activities.length === 1 &&
-        source.activities[0] === "read" &&
-        viewedKeys.has(source.key)
-      ),
-  );
-  const externalKeys = new Set(filteredExternalSources.map(({ key }) => key));
-  const reconciledWebSearchSource = {
-    ...webSearchSource,
-    viewedLinks: webSearchSource.viewedLinks.filter(({ url }) => {
-      const key = getExternalResourceKey(url);
-      return key == null || !externalKeys.has(key);
-    }),
-  };
-  return {
-    externalSources: filteredExternalSources,
-    webSearchSource:
-      reconciledWebSearchSource.queryCount === 0 &&
-      reconciledWebSearchSource.viewedLinks.length === 0
-        ? null
-        : reconciledWebSearchSource,
-  };
-}
-
-function initializeSummaryPanelSourcesModel(): void {
-  initializeUtilities();
-  initializeAppMatching();
-  initializeConversationItemUtilities();
-  initializeMcpCallProjection();
-  initializeAttachmentCollection();
-  initializeAttachmentIdentity();
-  initializeMcpToolActivityLabels();
-  initializeMcpServerNames();
-  initializeFileSourceModel();
-  initializeMcpProviderMetadata();
-  initializeAttachmentUtilities();
-  initializeLocalConversationExternalResources();
-}
-
-export {
-  initializeSummaryPanelSourcesModel as a,
-  reconcileExternalAndWebSearchSources as i,
-  collectToolSources as n,
-  collectWebSearchSource as r,
-  collectFileSources as t,
-};
+export { L as a, F as i, N as n, P as r, M as t };

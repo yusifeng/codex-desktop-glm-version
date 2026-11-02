@@ -1,82 +1,58 @@
-// Geometric-distribution learning model. Release chunk: model-17b71618727c.js.
-import "@rchunk/rolldown-runtime";
-
-interface GeometricValues { success_probability?: number | null; selected_trial?: number | null }
-interface NormalizedGeometricValues { success_probability: number; selected_trial: number }
-interface GeometricManifest {
-  type: string; version: number; thumbnailAssetKey: string; canonicalFormula: string;
-  parameters: {
-    success_probability: { kind: "number"; defaultValue: number; min: number; max: number };
-    selected_trial: { kind: "integer"; defaultValue: number; min: number; max: number };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `GEOMETRIC_DISTRIBUTION`),
+      (n = `geometric-distribution-v1`),
+      (r = `P(X=k)=p(1-p)^{k-1}`),
+      (i = {
+        success_probability: { kind: `number`, defaultValue: 0.25, min: 0.05, max: 0.8 },
+        selected_trial: { kind: `integer`, defaultValue: 4, min: 1, max: 16 },
+      }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-
-let geometricManifest: GeometricManifest;
-let successProbabilityControl: { defaultValue: number; min: number; max: number; step: number };
-let selectedTrialControl: { defaultValue: number; min: number; max: number; step: number };
-let normalizeGeometricValues: (values: GeometricValues) => NormalizedGeometricValues;
-let calculateGeometricDistribution: (values: GeometricValues) => {
-  successProbability: number; failureProbability: number; selectedTrial: number; selectedProbability: number;
-  expectedTrials: number; outcomes: { trial: number; probability: number }[];
-};
-let formatDecimal: (value: number, precision?: number) => string;
-let formatProbabilityPercent: (value: number) => string;
-let formatProbabilityEquation: (value: number) => string;
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeGeometricManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  geometricManifest = {
-    type: "GEOMETRIC_DISTRIBUTION", version: 2, thumbnailAssetKey: "geometric-distribution-v1",
-    canonicalFormula: "P(X=k)=p(1-p)^{k-1}",
-    parameters: {
-      success_probability: { kind: "number", defaultValue: 0.25, min: 0.05, max: 0.8 },
-      selected_trial: { kind: "integer", defaultValue: 4, min: 1, max: 16 },
-    },
-  };
+var s, c, l, u, d, f, p, m, h, g;
+function _() {
+  return (_ = e(() => {
+    (o(),
+      (s = a.parameters.success_probability),
+      (c = a.parameters.selected_trial),
+      (l = { defaultValue: s.defaultValue, min: s.min, max: s.max, step: 0.01 }),
+      (u = { defaultValue: c.defaultValue, min: c.min, max: c.max, step: 1 }),
+      (d = (e, t, n, r) => (Number.isFinite(e) ? Math.min(Math.max(e ?? t, n), r) : t)),
+      (f = (e) => ({
+        success_probability: d(e.success_probability, l.defaultValue, l.min, l.max),
+        selected_trial: Math.round(d(e.selected_trial, u.defaultValue, u.min, u.max)),
+      })),
+      (p = (e) => {
+        let t = f(e),
+          n = t.success_probability,
+          r = 1 - n,
+          i = Array.from({ length: u.max }, (e, t) => {
+            let i = t + 1;
+            return { trial: i, probability: n * r ** (i - 1) };
+          });
+        return {
+          successProbability: n,
+          failureProbability: r,
+          selectedTrial: t.selected_trial,
+          selectedProbability: n * r ** (t.selected_trial - 1),
+          expectedTrials: 1 / n,
+          outcomes: i,
+        };
+      }),
+      (m = (e, t = 3) =>
+        e
+          .toFixed(t)
+          .replace(/\.0+$/, ``)
+          .replace(/(\.\d*?)0+$/, `$1`)),
+      (h = (e) => {
+        let t = e * 100;
+        return t > 0 && t < 0.001 ? `<0.001%` : `${m(t, t >= 1 ? 1 : t >= 0.1 ? 2 : 3)}%`;
+      }),
+      (g = (e) => (e > 0 && e < 1e-5 ? `\\lt 0.00001` : `=${m(e, 5)}`)));
+  }))();
 }
-
-function initializeGeometricDistributionModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializeGeometricManifest();
-  const successParameter = geometricManifest.parameters.success_probability;
-  const trialParameter = geometricManifest.parameters.selected_trial;
-  successProbabilityControl = { defaultValue: successParameter.defaultValue, min: successParameter.min, max: successParameter.max, step: 0.01 };
-  selectedTrialControl = { defaultValue: trialParameter.defaultValue, min: trialParameter.min, max: trialParameter.max, step: 1 };
-  const normalizeFinite = (value: number | null | undefined, fallback: number, minimum: number, maximum: number): number =>
-    typeof value === "number" && Number.isFinite(value) ? Math.min(Math.max(value, minimum), maximum) : fallback;
-  normalizeGeometricValues = values => ({
-    success_probability: normalizeFinite(values.success_probability, successProbabilityControl.defaultValue, successProbabilityControl.min, successProbabilityControl.max),
-    selected_trial: Math.round(normalizeFinite(values.selected_trial, selectedTrialControl.defaultValue, selectedTrialControl.min, selectedTrialControl.max)),
-  });
-  calculateGeometricDistribution = values => {
-    const normalized = normalizeGeometricValues(values);
-    const successProbability = normalized.success_probability;
-    const failureProbability = 1 - successProbability;
-    const outcomes = Array.from({ length: selectedTrialControl.max }, (_unused, index) => {
-      const trial = index + 1;
-      return { trial, probability: successProbability * failureProbability ** (trial - 1) };
-    });
-    return {
-      successProbability, failureProbability, selectedTrial: normalized.selected_trial,
-      selectedProbability: successProbability * failureProbability ** (normalized.selected_trial - 1),
-      expectedTrials: 1 / successProbability, outcomes,
-    };
-  };
-  formatDecimal = (value, precision = 3) => value.toFixed(precision).replace(/\.0+$/, "").replace(/(\.\d*?)0+$/, "$1");
-  formatProbabilityPercent = value => {
-    const percent = value * 100;
-    if (percent > 0 && percent < 1e-3) return "<0.001%";
-    return `${formatDecimal(percent, percent >= 1 ? 1 : percent >= 0.1 ? 2 : 3)}%`;
-  };
-  formatProbabilityEquation = value => value > 0 && value < 1e-5 ? "\\lt 0.00001" : `=${formatDecimal(value, 5)}`;
-}
-
-export {
-  formatProbabilityPercent as a, normalizeGeometricValues as c, formatDecimal as i, initializeGeometricManifest as l,
-  successProbabilityControl as n, formatProbabilityEquation as o, calculateGeometricDistribution as r,
-  initializeGeometricDistributionModel as s, selectedTrialControl as t, geometricManifest as u,
-};
+export { h as a, f as c, m as i, o as l, l as n, g as o, p as r, _ as s, u as t, a as u };

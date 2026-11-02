@@ -1,25 +1,19 @@
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  B4t as initializeImagePreviewSource,
-  U3t as initializeImageOutputVisibility,
-  V3t as getImagePreview,
-  Y9t as initializeOutputVisibility,
-  q9t as getImageOutputVisibility,
-  z4t as getImagePreviewSource,
+  B4t as t,
+  U3t as n,
+  V3t as r,
+  Y9t as i,
+  q9t as a,
+  z4t as o,
 } from "@rchunk/app-initial";
-
-function getSummaryPanelImagePreview(value: unknown): unknown | null {
-  return getImageOutputVisibility(value) !== "always" || getImagePreview(value) == null
-    ? null
-    : getImagePreviewSource(value);
+function s(e) {
+  return a(e) !== `always` || r(e) == null ? null : o(e);
 }
-
-function initializeSummaryPanelImagePreview(): void {
-  initializeOutputVisibility();
-  initializeImageOutputVisibility();
-  initializeImagePreviewSource();
+function c() {
+  return (c = e(() => {
+    (i(), n(), t());
+  }))();
 }
-
-export {
-  initializeSummaryPanelImagePreview as n,
-  getSummaryPanelImagePreview as t,
-};
+export { c as n, s as t };

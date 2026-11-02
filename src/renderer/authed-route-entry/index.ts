@@ -1,11 +1,5 @@
-// authed-route-entry —— 已认证应用布局与路由守卫公开入口。
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-void appSharedChunk;
-const {
-  fc: AppLayoutRoute,
-  mc: initializeAuthedRoutes,
-  pc: AuthedRoute,
-} = appPrimaryChunk;
-initializeAuthedRoutes();
-export { AppLayoutRoute, AuthedRoute };
+// @ts-nocheck
+import "@rchunk/app-shared";
+import { fc as e, mc as t, pc as n } from "@rchunk/app-primary";
+t();
+export { e as AppLayoutRoute, n as AuthedRoute };

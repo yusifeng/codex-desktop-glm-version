@@ -1,82 +1,80 @@
-// debug-window-page —— 独立调试窗口的宿主消息订阅、权限门与分析面板。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as panelChunk from "@rchunk/panel";
-void runtimeChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  Cq: debugMenuPolicy,
-  I3: getJsxRuntime,
-  K3: useHostMessageHandler,
-  W3: initializeHostMessageBridge,
-  e6: reactRuntime,
-  wL: initializeWindowRuntime,
-} = appSharedChunk;
-const {
-  Oun: getRuntimeEnvironment,
-  Qgn: initializeAccountContext,
-  Ygn: Navigate,
-} = appInitialChunk;
-const { n: initializeDebugPanel, t: DebugPanel } = panelChunk;
-
-type OriginConversationChangedMessage =
-  import("@rchunk/app-shared").RendererHostMessage & {
-    conversationId: string | null;
-  };
-
-type AnalyticsHistoryChangedMessage =
-  import("@rchunk/app-shared").RendererHostMessage & {
-    events: readonly unknown[];
-  };
-
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function DebugWindowPage(): unknown {
-  const [conversationId, setConversationId] = reactRuntime.useState<
-    string | null
-  >(null);
-  const [clientAnalyticsHistory, setClientAnalyticsHistory] =
-    reactRuntime.useState<readonly unknown[]>([]);
-  useHostMessageHandler<OriginConversationChangedMessage>(
-    "debug-window-origin-conversation-changed",
-    ({ conversationId: nextConversationId }) =>
-      setConversationId(nextConversationId),
-  );
-  useHostMessageHandler<AnalyticsHistoryChangedMessage>(
-    "debug-window-client-analytics-history-changed",
-    ({ events }) => setClientAnalyticsHistory(events),
-  );
-  if (!debugMenuPolicy.allowDebugMenu(getRuntimeEnvironment())) {
-    return jsx.jsx(Navigate, { to: "/", replace: true });
-  }
-  return jsx.jsx(jsx.Fragment, {
-    children: jsx.jsx("main", {
-      className: "h-dvh w-full overflow-hidden bg-surface text-default",
-      children: jsx.jsx(DebugPanel, {
-        clientAnalyticsHistory,
-        conversationIdOverride: conversationId,
-        onClose: closeDebugWindow,
-        showHeader: false,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Cq as n,
+  I3 as r,
+  K3 as i,
+  W3 as a,
+  e6 as o,
+  wL as s,
+} from "@rchunk/app-shared";
+import { Oun as c, Qgn as l, Ygn as u } from "@rchunk/app-initial";
+import { n as d, t as f } from "@rchunk/panel";
+function p() {
+  let e = (0, h.c)(7),
+    [t, r] = (0, g.useState)(null),
+    a;
+  e[0] === Symbol.for(`react.memo_cache_sentinel`) ? ((a = []), (e[0] = a)) : (a = e[0]);
+  let [o, s] = (0, g.useState)(a),
+    l;
+  (e[1] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((l = (e) => {
+        let { conversationId: t } = e;
+        r(t);
       }),
-    }),
-  });
+      (e[1] = l))
+    : (l = e[1]),
+    i(`debug-window-origin-conversation-changed`, l));
+  let d;
+  if (
+    (e[2] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((d = (e) => {
+          let { events: t } = e;
+          s(t);
+        }),
+        (e[2] = d))
+      : (d = e[2]),
+    i(`debug-window-client-analytics-history-changed`, d),
+    !n.allowDebugMenu(c()))
+  ) {
+    let t;
+    return (
+      e[3] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, _.jsx)(u, { to: `/`, replace: !0 })), (e[3] = t))
+        : (t = e[3]),
+      t
+    );
+  }
+  let p;
+  return (
+    e[4] !== o || e[5] !== t
+      ? ((p = (0, _.jsx)(_.Fragment, {
+          children: (0, _.jsx)(`main`, {
+            className: `h-dvh w-full overflow-hidden bg-surface text-default`,
+            children: (0, _.jsx)(f, {
+              clientAnalyticsHistory: o,
+              conversationIdOverride: t,
+              onClose: m,
+              showHeader: !1,
+            }),
+          }),
+        })),
+        (e[4] = o),
+        (e[5] = t),
+        (e[6] = p))
+      : (p = e[6]),
+    p
+  );
 }
-
-function closeDebugWindow(): void {
-  window.close();
+function m() {
+  return window.close();
 }
-
-function initializeDebugWindowPage(): void {
-  initializeRuntimeLazy();
-  initializeWindowRuntime();
-  reactRuntime();
-  initializeAccountContext();
-  initializeHostMessageBridge();
-  initializeDebugPanel();
-  jsx = getJsxRuntime();
+var h, g, _;
+function v() {
+  return (v = e(() => {
+    ((h = t()), s(), (g = o()), l(), a(), d(), (_ = r()));
+  }))();
 }
-
-initializeDebugWindowPage();
-export { DebugWindowPage };
+v();
+export { p as DebugWindowPage };

@@ -1,31 +1,31 @@
-// remote-connections-page —— 旧远程连接入口到当前设置页的兼容重定向。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-void runtimeChunk;
-
-const { $3: initializeRuntimeLazy, I3: getJsxRuntime } = appSharedChunk;
-const {
-  C4: initializeWorkModeAccess,
-  E4: hasWorkModeAccess,
-  Qgn: initializeAccountContext,
-  Ygn: Navigate,
-} = appInitialChunk;
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function RemoteConnectionsPage(): unknown {
-  return jsx.jsx(Navigate, {
-    to: hasWorkModeAccess() ? "/settings/connections" : "/",
-    replace: true,
-  });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n } from "@rchunk/app-shared";
+import { C4 as r, E4 as i, Qgn as a, Ygn as o } from "@rchunk/app-initial";
+function s() {
+  let e = (0, c.c)(2);
+  if (!i()) {
+    let t;
+    return (
+      e[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, l.jsx)(o, { to: `/`, replace: !0 })), (e[0] = t))
+        : (t = e[0]),
+      t
+    );
+  }
+  let t;
+  return (
+    e[1] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, l.jsx)(o, { to: `/settings/connections`, replace: !0 })), (e[1] = t))
+      : (t = e[1]),
+    t
+  );
 }
-
-function initializeRemoteConnectionsPage(): void {
-  initializeRuntimeLazy();
-  initializeAccountContext();
-  initializeWorkModeAccess();
-  jsx = getJsxRuntime();
+var c, l;
+function u() {
+  return (u = e(() => {
+    ((c = t()), a(), r(), (l = n()));
+  }))();
 }
-
-initializeRemoteConnectionsPage();
-export { RemoteConnectionsPage };
+u();
+export { s as RemoteConnectionsPage };

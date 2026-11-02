@@ -1,60 +1,32 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { C_ as t, I3 as n, S_ as r, Xi as i, Yi as a } from "@rchunk/app-shared";
 import {
-  C_ as initializeIconAssets,
-  I3 as getJsxRuntime,
-  S_ as IconAsset,
-  Xi as sourcesIconAsset,
-  Yi as initializeSourcesIcon,
-} from "@rchunk/app-shared";
-import {
-  Gvt as openSidePanelTab,
-  Qen as initializeSourcesPanelModel,
-  Wvt as initializeSidePanelRuntime,
-  Zen as sidePanelKinds,
-  _vt as initializeRightPanelState,
-  gvt as getTabTarget,
+  Gvt as o,
+  Qen as s,
+  Wvt as c,
+  Zen as l,
+  _vt as u,
+  gvt as d,
 } from "@rchunk/app-initial";
-
-let jsx: ReturnType<typeof getJsxRuntime>;
-
-function openSourcesSidePanelTab(
-  scope: unknown,
-  definition: unknown,
-  props: unknown,
-  title: string,
-  openerTabId?: string,
-  trailingContent?: unknown,
-): void {
-  const target = getTabTarget(scope, sidePanelKinds.SOURCES)
-    ?? (openerTabId == null ? null : getTabTarget(scope, openerTabId))
-    ?? "right";
-  openSidePanelTab(scope, definition, {
-    revealAndFocus: true,
-    icon: jsx.jsx(IconAsset, {
-      className: "shrink-0",
-      "aria-hidden": false,
-      asset: sourcesIconAsset,
-    }),
-    id: sidePanelKinds.SOURCES,
-    kind: sidePanelKinds.SOURCES,
-    openerTabId,
-    props,
-    target,
-    title,
-    trailingContent,
+function f(e, t, n, a, s, c) {
+  let u = d(e, l.SOURCES) ?? (s == null ? null : d(e, s)) ?? `right`;
+  o(e, t, {
+    revealAndFocus: !0,
+    icon: (0, p.jsx)(r, { className: `shrink-0`, "aria-hidden": !1, asset: i }),
+    id: l.SOURCES,
+    kind: l.SOURCES,
+    openerTabId: s,
+    props: n,
+    target: u,
+    title: a,
+    trailingContent: c,
   });
 }
-
-function initializeOpenSourcesSidePanelTab(): void {
-  initializeSourcesIcon();
-  initializeSidePanelRuntime();
-  initializeIconAssets();
-  initializeRightPanelState();
-  initializeSourcesPanelModel();
-  jsx = getJsxRuntime();
+var p;
+function m() {
+  return (m = e(() => {
+    (a(), c(), t(), u(), s(), (p = n()));
+  }))();
 }
-
-export {
-  openSourcesSidePanelTab as n,
-  initializeOpenSourcesSidePanelTab as t,
-};
+export { f as n, m as t };

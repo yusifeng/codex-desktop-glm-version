@@ -1,376 +1,313 @@
-// onboarding-login-content —— Desktop onboarding 的托管登录方式解析和登录控件。
-
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import type {
-  DerivedScopedSignalContext,
-  JsxRuntime,
-  ScopedDerivedFamily,
-  ScopedQueryFamily,
-  ScopedQueryResult,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $h as n,
+  BX as r,
+  E4 as i,
+  FX as a,
+  H4 as o,
+  I3 as s,
+  K2 as c,
+  LX as l,
+  QI as u,
+  Qh as d,
+  Y2 as f,
+  Yh as p,
+  ZI as m,
+  Zh as h,
+  g4 as g,
+  n4 as _,
+  rZ as v,
+  x4 as y,
 } from "@rchunk/app-shared";
-
-void runtimeChunk;
-
-type LoginMethodState =
-  | { status: "loading" | "error" | "unsupported" }
-  | { status: "ready"; api: boolean; chatgpt: boolean };
-
-interface HostRequirementsResponse {
-  requirements?: unknown;
-}
-
-interface LocalConfigResponse {
-  config: { forced_login_method?: "api" | "chatgpt" | null };
-  configReadSucceeded: boolean;
-}
-
-interface LoginMethodReader {
-  get(
-    signal: ScopedQueryFamily<
-      Record<string, unknown>,
-      { hostId: string },
-      HostRequirementsResponse
-    >,
-    parameter: { hostId: string },
-  ): ScopedQueryResult<HostRequirementsResponse>;
-  get(
-    signal: ScopedQueryFamily<
-      Record<string, unknown>,
-      string,
-      LocalConfigResponse
-    >,
-    parameter: string,
-  ): ScopedQueryResult<LocalConfigResponse>;
-}
-
-interface AppInitialBindings {
-  $sn(): void;
-  Jat: unknown;
-  Xat(): void;
-  Ysn: ScopedQueryFamily<
-    Record<string, unknown>,
-    { hostId: string },
-    HostRequirementsResponse
-  >;
-  lcn: ScopedQueryFamily<
-    Record<string, unknown>,
-    string,
-    LocalConfigResponse
-  >;
-}
-
-const {
-  BX: useSignalFamilyValue,
-  FX: initializeSignalRuntime,
-  I3: jsxRuntimeExport,
-  K2: initializeSharedComponents,
-  LX: useSignalScope,
-  QI: initializeSharedRuntime,
-  Qh: LoadingSpinner,
-  Y2: FormattedMessage,
-  Yh: Button,
-  ZI: applicationScope,
-  Zh: initializeButton,
-  g4: initializeDialogComponents,
-  n4: useIntl,
-  rZ: createDerivedFamily,
-} = appSharedChunk;
-const {
-  $sn: initializeHostRequirements,
-  Jat: Input,
-  Xat: initializeInput,
-  Ysn: hostRequirementsQuery,
-  lcn: localConfigQuery,
-} = appInitialChunk as unknown as AppInitialBindings;
-
-let jsx: JsxRuntime;
-let loginMethodsSignal: ScopedDerivedFamily<
-  Record<string, unknown>,
-  string,
-  LoginMethodState
->;
-let stateInitialized = false;
-let contentInitialized = false;
-
-function isAllowedLoginMethods(value: unknown): value is {
-  allowedLoginMethods?: Array<"api" | "chatgpt"> | null;
-} {
-  if (value == null || typeof value !== "object") return false;
-  const methods = (value as { allowedLoginMethods?: unknown })
-    .allowedLoginMethods;
-  return (
-    methods == null ||
-    (Array.isArray(methods) &&
-      methods.every((method) => method === "api" || method === "chatgpt"))
-  );
-}
-
-function resolveLoginMethods(
-  hostId: string,
-  get: LoginMethodReader["get"],
-): LoginMethodState {
-  const requirementsQuery = get(hostRequirementsQuery, { hostId });
-  if (requirementsQuery.isPending) return { status: "loading" };
-  if (
-    requirementsQuery.isError ||
-    requirementsQuery.data?.requirements === undefined
-  ) {
-    return { status: "error" };
-  }
-  const requirements = requirementsQuery.data.requirements;
-  if (requirements == null) {
-    const configQuery = get(localConfigQuery, hostId);
-    if (configQuery.isPending) return { status: "loading" };
-    if (configQuery.isError || !configQuery.data?.configReadSucceeded) {
-      return { status: "error" };
-    }
-    const forcedMethod = configQuery.data.config.forced_login_method;
-    return {
-      status: "ready",
-      api: forcedMethod == null || forcedMethod === "api",
-      chatgpt: forcedMethod == null || forcedMethod === "chatgpt",
-    };
-  }
-  if (typeof requirements !== "object") return { status: "error" };
-  if (!("allowedLoginMethods" in requirements)) {
-    return { status: "unsupported" };
-  }
-  if (!isAllowedLoginMethods(requirements)) return { status: "error" };
-  const allowed = requirements.allowedLoginMethods;
-  return {
-    status: "ready",
-    api: allowed == null || allowed.includes("api"),
-    chatgpt: allowed == null || allowed.includes("chatgpt"),
-  };
-}
-
-function initializeLoginMethodState(): void {
-  if (stateInitialized) return;
-  stateInitialized = true;
-  initializeSignalRuntime();
-  initializeDialogComponents();
-  initializeHostRequirements();
-  initializeSharedRuntime();
-  loginMethodsSignal = createDerivedFamily(
-    applicationScope,
-    (
-      hostId: string,
-      { get }: DerivedScopedSignalContext<Record<string, unknown>>,
-    ) => resolveLoginMethods(hostId, get as LoginMethodReader["get"]),
-  );
-}
-
-function LoginMethodsUnavailable({ hostId }: { hostId: string }): unknown {
-  initializeLoginMethodsUnavailable();
-  const scope = useSignalScope(applicationScope);
-  const state = useSignalFamilyValue(loginMethodsSignal, hostId);
-  if (state.status === "loading") {
-    return jsx.jsx("div", {
-      className:
-        "flex h-full w-full flex-col items-center justify-center gap-3 text-codex-description select-none",
-      children: jsx.jsxs("div", {
-        role: "status",
-        children: [
-          jsx.jsx(LoadingSpinner, { className: "h-4 w-4 text-default" }),
-          jsx.jsx(FormattedMessage, {
-            id: "electron.loginMethods.loading",
-            defaultMessage: "Loading sign-in requirements…",
-            description:
-              "Loading message while reading managed sign-in requirements from the machine being authenticated",
-          }),
-        ],
-      }),
-    });
-  }
-  const message =
-    state.status === "unsupported"
-      ? {
-          id: "electron.loginMethods.unsupported",
-          defaultMessage:
-            "Update Codex on this machine to read its managed sign-in requirements",
-          description:
-            "An older app-server cannot expose configured managed login restrictions, so sign-in options are hidden",
-        }
-      : state.status === "ready"
-        ? {
-            id: "electron.loginMethods.noneAllowed",
-            defaultMessage:
-              "Your administrator has disabled all available sign-in methods",
-            description:
-              "No Desktop login method is permitted by managed requirements",
-          }
-        : {
-            id: "electron.loginMethods.error",
-            defaultMessage: "Unable to load sign-in requirements",
-            description:
-              "Managed sign-in requirements could not be read; sign-in options remain hidden until retry succeeds",
+import { $sn as b, Jat as x, Xat as S, Ysn as C, lcn as w } from "@rchunk/app-initial";
+var T, E;
+function D() {
+  return (D = e(() => {
+    (a(),
+      g(),
+      b(),
+      u(),
+      (T = o({ allowedLoginMethods: i(y([`api`, `chatgpt`])).nullable() })),
+      (E = v(m, (e, { get: t }) => {
+        let { data: n, isError: r, isPending: i } = t(C, { hostId: e });
+        if (i) return { status: `loading` };
+        if (r || n?.requirements === void 0) return { status: `error` };
+        if (n.requirements == null) {
+          let { data: n, isPending: r, isError: i } = t(w, e);
+          if (r) return { status: `loading` };
+          if (i || !n?.configReadSucceeded) return { status: `error` };
+          let a = n.config.forced_login_method;
+          return {
+            status: `ready`,
+            api: a == null || a === `api`,
+            chatgpt: a == null || a === `chatgpt`,
           };
-  return jsx.jsxs("div", {
-    className:
-      "flex h-full w-full flex-col items-center justify-center gap-3 text-codex-description select-none",
-    children: [
-      jsx.jsx("div", {
-        role: "alert",
-        children: jsx.jsx(FormattedMessage, message),
-      }),
-      jsx.jsx(Button, {
-        color: "secondary",
-        onClick: () => {
-          scope.get(hostRequirementsQuery, { hostId }).refetch();
-          scope.get(localConfigQuery, hostId).refetch();
-        },
-        children: jsx.jsx(FormattedMessage, {
-          id: "electron.loginMethods.retry",
-          defaultMessage: "Retry",
-          description: "Retry reading managed sign-in requirements",
-        }),
-      }),
-    ],
-  });
+        }
+        if (!(`allowedLoginMethods` in n.requirements)) return { status: `unsupported` };
+        let a = T.safeParse(n.requirements);
+        if (!a.success) return { status: `error` };
+        let o = a.data.allowedLoginMethods;
+        return {
+          status: `ready`,
+          api: o == null || o.includes(`api`),
+          chatgpt: o == null || o.includes(`chatgpt`),
+        };
+      })));
+  }))();
 }
-
-function initializeLoginMethodsUnavailable(): void {
-  initializeLoginMethodState();
-  initializeLoginContent();
+function O(e) {
+  let t = (0, k.c)(4),
+    { hostId: n } = e,
+    i = l(m),
+    a = r(E, n),
+    o;
+  return (
+    t[0] !== n || t[1] !== a.status || t[2] !== i
+      ? ((o = (0, A.jsx)(`div`, {
+          className: `flex h-full w-full flex-col items-center justify-center gap-3 text-codex-description select-none`,
+          children:
+            a.status === `loading`
+              ? (0, A.jsxs)(`div`, {
+                  role: `status`,
+                  children: [
+                    (0, A.jsx)(d, { className: `h-4 w-4 text-default` }),
+                    (0, A.jsx)(f, {
+                      id: `electron.loginMethods.loading`,
+                      defaultMessage: `Loading sign-in requirements…`,
+                      description: `Loading message while reading managed sign-in requirements from the machine being authenticated`,
+                    }),
+                  ],
+                })
+              : (0, A.jsxs)(A.Fragment, {
+                  children: [
+                    (0, A.jsxs)(`div`, {
+                      role: `alert`,
+                      children: [
+                        a.status === `unsupported`
+                          ? (0, A.jsx)(f, {
+                              id: `electron.loginMethods.unsupported`,
+                              defaultMessage: `Update Codex on this machine to read its managed sign-in requirements`,
+                              description: `An older app-server cannot expose configured managed login restrictions, so sign-in options are hidden`,
+                            })
+                          : null,
+                        a.status === `ready`
+                          ? (0, A.jsx)(f, {
+                              id: `electron.loginMethods.noneAllowed`,
+                              defaultMessage: `Your administrator has disabled all available sign-in methods`,
+                              description: `No Desktop login method is permitted by managed requirements`,
+                            })
+                          : null,
+                        a.status === `error`
+                          ? (0, A.jsx)(f, {
+                              id: `electron.loginMethods.error`,
+                              defaultMessage: `Unable to load sign-in requirements`,
+                              description: `Managed sign-in requirements could not be read; sign-in options remain hidden until retry succeeds`,
+                            })
+                          : null,
+                      ],
+                    }),
+                    (0, A.jsx)(p, {
+                      color: `secondary`,
+                      onClick: () => {
+                        (i.get(C, { hostId: n }).refetch(), i.get(w, n).refetch());
+                      },
+                      children: (0, A.jsx)(f, {
+                        id: `electron.loginMethods.retry`,
+                        defaultMessage: `Retry`,
+                        description: `Retry reading managed sign-in requirements`,
+                      }),
+                    }),
+                  ],
+                }),
+        })),
+        (t[0] = n),
+        (t[1] = a.status),
+        (t[2] = i),
+        (t[3] = o))
+      : (o = t[3]),
+    o
+  );
 }
-
-function LoginActions(props: {
-  allowApiKey: boolean;
-  allowChatGpt: boolean;
-  apiKeyValue: string;
-  isApiKeyEntryVisible: boolean;
-  isApiKeySignInPending: boolean;
-  isChatGptSignInPending: boolean;
-  onApiKeySecondaryAction(): void;
-  onApiKeySubmit(): void;
-  onApiKeyValueChange(value: string): void;
-  onChatGptSignIn(): void;
-  onShowApiKeyEntry(): void;
-  apiKeySecondaryActionLabel: unknown;
-}): unknown {
-  initializeLoginActions();
-  const intl = useIntl();
-  if (props.allowApiKey && props.isApiKeyEntryVisible) {
-    const placeholder =
-      intl.formatMessage({
-        id: "electron.onboarding.login.apikey.placeholder",
-        defaultMessage: "sk-…",
-        description: "Placeholder for API key input on desktop onboarding",
-      });
-    return jsx.jsxs("div", {
-      className: "flex w-full flex-col gap-3",
-      children: [
-        jsx.jsxs("label", {
-          className: "flex flex-col gap-2 text-base font-medium text-default",
-          children: [
-            jsx.jsx(FormattedMessage, {
-              id: "electron.onboarding.login.apikey.label",
-              defaultMessage: "OpenAI API key",
-              description: "Label for API key input on desktop onboarding",
-            }),
-            jsx.jsx(Input, {
-              autoFocus: true,
-              placeholder,
-              value: props.apiKeyValue,
-              onChange: (event: { target: { value: string } }) =>
-                props.onApiKeyValueChange(event.target.value),
-            }),
-          ],
-        }),
-        jsx.jsxs("div", {
-          className: "flex items-center gap-2",
-          children: [
-            jsx.jsx(Button, {
-              className: "flex-1 justify-center",
-              color: "secondary",
-              size: "large",
-              onClick: props.onApiKeySecondaryAction,
-              children: props.apiKeySecondaryActionLabel,
-            }),
-            jsx.jsx(Button, {
-              className: "flex-1 justify-center",
-              onClick: props.onApiKeySubmit,
-              disabled:
-                props.apiKeyValue.trim().length === 0 ||
-                props.isApiKeySignInPending,
-              loading: props.isApiKeySignInPending,
-              size: "large",
-              children: jsx.jsx(FormattedMessage, {
-                id: "electron.onboarding.login.apikey.continue",
-                defaultMessage: "Continue",
-                description:
-                  "Continue button label for API key sign-in on desktop onboarding",
-              }),
-            }),
-          ],
-        }),
-      ],
-    });
+var k, A;
+function j() {
+  return (j = e(() => {
+    ((k = t()), a(), c(), h(), n(), b(), u(), D(), (A = s()));
+  }))();
+}
+function M(e) {
+  let t = (0, N.c)(37),
+    {
+      allowApiKey: n,
+      allowChatGpt: r,
+      apiKeyValue: i,
+      isApiKeyEntryVisible: a,
+      isApiKeySignInPending: o,
+      isChatGptSignInPending: s,
+      onApiKeySecondaryAction: c,
+      onApiKeySubmit: l,
+      onApiKeyValueChange: u,
+      onChatGptSignIn: d,
+      onShowApiKeyEntry: m,
+      apiKeySecondaryActionLabel: h,
+    } = e,
+    g = _();
+  if (n && a) {
+    let e;
+    t[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, P.jsx)(f, {
+          id: `electron.onboarding.login.apikey.label`,
+          defaultMessage: `OpenAI API key`,
+          description: `Label for API key input on desktop onboarding`,
+        })),
+        (t[0] = e))
+      : (e = t[0]);
+    let n;
+    t[1] === g
+      ? (n = t[2])
+      : ((n = g.formatMessage({
+          id: `electron.onboarding.login.apikey.placeholder`,
+          defaultMessage: `sk-…`,
+          description: `Placeholder for API key input on desktop onboarding`,
+        })),
+        (t[1] = g),
+        (t[2] = n));
+    let r;
+    t[3] === u ? (r = t[4]) : ((r = (e) => u(e.target.value)), (t[3] = u), (t[4] = r));
+    let a;
+    t[5] !== i || t[6] !== n || t[7] !== r
+      ? ((a = (0, P.jsxs)(`label`, {
+          className: `flex flex-col gap-2 text-base font-medium text-default`,
+          children: [e, (0, P.jsx)(x, { autoFocus: !0, placeholder: n, value: i, onChange: r })],
+        })),
+        (t[5] = i),
+        (t[6] = n),
+        (t[7] = r),
+        (t[8] = a))
+      : (a = t[8]);
+    let s;
+    t[9] !== h || t[10] !== c
+      ? ((s = (0, P.jsx)(p, {
+          className: `flex-1 justify-center`,
+          color: `secondary`,
+          size: `large`,
+          onClick: c,
+          children: h,
+        })),
+        (t[9] = h),
+        (t[10] = c),
+        (t[11] = s))
+      : (s = t[11]);
+    let d;
+    t[12] !== i || t[13] !== o
+      ? ((d = i.trim().length === 0 || o), (t[12] = i), (t[13] = o), (t[14] = d))
+      : (d = t[14]);
+    let m;
+    t[15] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((m = (0, P.jsx)(f, {
+          id: `electron.onboarding.login.apikey.continue`,
+          defaultMessage: `Continue`,
+          description: `Continue button label for API key sign-in on desktop onboarding`,
+        })),
+        (t[15] = m))
+      : (m = t[15]);
+    let _;
+    t[16] !== o || t[17] !== l || t[18] !== d
+      ? ((_ = (0, P.jsx)(p, {
+          className: `flex-1 justify-center`,
+          onClick: l,
+          disabled: d,
+          loading: o,
+          size: `large`,
+          children: m,
+        })),
+        (t[16] = o),
+        (t[17] = l),
+        (t[18] = d),
+        (t[19] = _))
+      : (_ = t[19]);
+    let v;
+    t[20] !== s || t[21] !== _
+      ? ((v = (0, P.jsxs)(`div`, { className: `flex items-center gap-2`, children: [s, _] })),
+        (t[20] = s),
+        (t[21] = _),
+        (t[22] = v))
+      : (v = t[22]);
+    let y;
+    return (
+      t[23] !== a || t[24] !== v
+        ? ((y = (0, P.jsxs)(`div`, { className: `flex w-full flex-col gap-3`, children: [a, v] })),
+          (t[23] = a),
+          (t[24] = v),
+          (t[25] = y))
+        : (y = t[25]),
+      y
+    );
   }
-  return jsx.jsxs("div", {
-    className: "flex w-full max-w-[200px] flex-col gap-3",
-    children: [
-      props.allowChatGpt
-        ? jsx.jsx(Button, {
-            color: "primary",
-            className: "w-full justify-center py-2.5",
-            onClick: props.onChatGptSignIn,
-            children: jsx.jsx(FormattedMessage, {
-              id: props.isChatGptSignInPending
-                ? "electron.onboarding.login.chatgpt.cancel"
-                : "electron.onboarding.login.chatgpt.continue",
-              defaultMessage: props.isChatGptSignInPending
-                ? "Cancel sign-in"
-                : "Continue with ChatGPT",
-              description: props.isChatGptSignInPending
-                ? "Cancel button label while ChatGPT sign-in is in progress on desktop onboarding"
-                : "Button label to sign in with ChatGPT on desktop onboarding",
-            }),
+  let v;
+  t[26] !== r || t[27] !== s || t[28] !== d
+    ? ((v = r
+        ? (0, P.jsx)(p, {
+            color: `primary`,
+            className: `w-full justify-center py-2.5`,
+            onClick: d,
+            children: s
+              ? (0, P.jsx)(f, {
+                  id: `electron.onboarding.login.chatgpt.cancel`,
+                  defaultMessage: `Cancel sign-in`,
+                  description: `Cancel button label while ChatGPT sign-in is in progress on desktop onboarding`,
+                })
+              : (0, P.jsx)(f, {
+                  id: `electron.onboarding.login.chatgpt.continue`,
+                  defaultMessage: `Continue with ChatGPT`,
+                  description: `Button label to sign in with ChatGPT on desktop onboarding`,
+                }),
           })
-        : null,
-      props.allowApiKey && !props.isChatGptSignInPending
-        ? jsx.jsx(Button, {
-            color: "outline",
-            className: "w-full justify-center py-2.5",
-            onClick: props.onShowApiKeyEntry,
-            children: jsx.jsx(FormattedMessage, {
-              id: "electron.onboarding.login.apikey.open",
-              defaultMessage: "Enter API key",
-              description:
-                "Button label to open API key entry on desktop onboarding",
-            }),
-          })
-        : null,
-    ],
-  });
+        : null),
+      (t[26] = r),
+      (t[27] = s),
+      (t[28] = d),
+      (t[29] = v))
+    : (v = t[29]);
+  let y;
+  t[30] !== n || t[31] !== s || t[32] !== m
+    ? ((y =
+        n && !s
+          ? (0, P.jsx)(p, {
+              color: `outline`,
+              className: `w-full justify-center py-2.5`,
+              onClick: m,
+              children: (0, P.jsx)(f, {
+                id: `electron.onboarding.login.apikey.open`,
+                defaultMessage: `Enter API key`,
+                description: `Button label to open API key entry on desktop onboarding`,
+              }),
+            })
+          : null),
+      (t[30] = n),
+      (t[31] = s),
+      (t[32] = m),
+      (t[33] = y))
+    : (y = t[33]);
+  let b;
+  return (
+    t[34] !== v || t[35] !== y
+      ? ((b = (0, P.jsxs)(`div`, {
+          className: `flex w-full max-w-[200px] flex-col gap-3`,
+          children: [v, y],
+        })),
+        (t[34] = v),
+        (t[35] = y),
+        (t[36] = b))
+      : (b = t[36]),
+    b
+  );
 }
-
-function initializeLoginActions(): void {
-  initializeLoginContent();
-  initializeInput();
+var N, P;
+function F() {
+  return (F = e(() => {
+    ((N = t()), c(), h(), S(), (P = s()));
+  }))();
 }
-
-function initializeLoginContent(): void {
-  if (contentInitialized) return;
-  contentInitialized = true;
-  initializeSharedComponents();
-  initializeButton();
-  jsx = resolveRuntime<JsxRuntime>(jsxRuntimeExport);
-}
-
-function resolveRuntime<T>(value: unknown): T {
-  return (typeof value === "function" ? value() : value) as T;
-}
-
-initializeLoginMethodState();
-
-export {
-  initializeLoginMethodState as a,
-  initializeLoginMethodsUnavailable as i,
-  initializeLoginActions as n,
-  loginMethodsSignal as o,
-  LoginMethodsUnavailable as r,
-  LoginActions as t,
-};
+export { D as a, j as i, F as n, E as o, O as r, M as t };

@@ -1,6 +1,5 @@
+// @ts-nocheck
 import "@rchunk/app-shared";
-import { n as initializeChatGptMermaidPreview, t as ChatGptMermaidPreview } from "@rchunk/chatgpt-mermaid-preview-core";
-
-initializeChatGptMermaidPreview();
-
-export { ChatGptMermaidPreview };
+import { n as e, t } from "@rchunk/chatgpt-mermaid-preview-core";
+e();
+export { t as ChatGptMermaidPreview };

@@ -1,30 +1,22 @@
-// Greenhouse-effect teaching model. Release chunk: model-c4c3d4ac3d2a.js.
-import "@rchunk/rolldown-runtime";
-
-interface GreenhouseEffectInput { greenhouseGasLevel?: number }
-interface GreenhouseEffectValues { greenhouseGasLevel: number }
-
-const greenhouseGasControl = { min: 0, max: 100, step: 1, defaultValue: 55 };
-const clamp = (value: number, minimum: number, maximum: number): number =>
-  Math.min(Math.max(value, minimum), maximum);
-const normalizeGreenhouseGasLevel = (value: number | undefined): number =>
-  Number.isFinite(value)
-    ? clamp(Math.round(value as number), greenhouseGasControl.min, greenhouseGasControl.max)
-    : greenhouseGasControl.defaultValue;
-const normalizeGreenhouseEffectInput = (input: GreenhouseEffectInput): GreenhouseEffectValues => ({
-  greenhouseGasLevel: normalizeGreenhouseGasLevel(input.greenhouseGasLevel),
-});
-const calculateGreenhouseEffect = (input: GreenhouseEffectInput) => {
-  const safeValues = normalizeGreenhouseEffectInput(input);
-  const gasRatio = (safeValues.greenhouseGasLevel - greenhouseGasControl.min) /
-    (greenhouseGasControl.max - greenhouseGasControl.min);
-  return {
-    safeValues,
-    gasRatio,
-    retainedInfraredRatio: gasRatio * 0.72,
-    escapingInfraredRatio: 1 - gasRatio * 0.72,
-  };
-};
-function initializeGreenhouseEffectModel(): void {}
-
-export { calculateGreenhouseEffect as n, initializeGreenhouseEffectModel as r, greenhouseGasControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = { min: 0, max: 100, step: 1, defaultValue: 55 }),
+      (n = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (r = (e) => (Number.isFinite(e) ? n(Math.round(e), t.min, t.max) : t.defaultValue)),
+      (i = (e) => ({ greenhouseGasLevel: r(e.greenhouseGasLevel) })),
+      (a = (e) => {
+        let n = i(e),
+          r = (n.greenhouseGasLevel - t.min) / (t.max - t.min);
+        return {
+          safeValues: n,
+          gasRatio: r,
+          retainedInfraredRatio: r * 0.72,
+          escapingInfraredRatio: 1 - r * 0.72,
+        };
+      }));
+  }))();
+}
+export { a as n, o as r, t };

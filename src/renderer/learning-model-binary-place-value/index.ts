@@ -1,45 +1,39 @@
-// Binary place-value learning model for an unsigned eight-bit integer.
-import "@rchunk/rolldown-runtime";
-
-interface IntegerParameter { kind: "integer"; defaultValue: number; min: number; max: number }
-interface BinaryPlaceValueState { value: number; bits: number[]; binary: string; activePlaces: number[] }
-
-let binaryPlaceValueManifest: { type: string; version: number; thumbnailAssetKey: string; parameters: { initial_value: IntegerParameter } };
-let initialValueParameter: IntegerParameter;
-let binaryPlaces: number[];
-let normalizeBinaryValue: (value: number) => number;
-let calculateBinaryPlaceValue: (value: number) => BinaryPlaceValueState;
-let toggleBinaryPlace: (value: number, place: number) => number;
-let formatBinaryEquation: (state: BinaryPlaceValueState, format?: (value: number) => string) => string;
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeBinaryPlaceValueManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  binaryPlaceValueManifest = { type: "BINARY_PLACE_VALUE", version: 2, thumbnailAssetKey: "binary-place-value-v1", parameters: { initial_value: { kind: "integer", defaultValue: 45, min: 0, max: 255 } } };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `BINARY_PLACE_VALUE`),
+      (n = `binary-place-value-v1`),
+      (r = { initial_value: { kind: `integer`, defaultValue: 45, min: 0, max: 255 } }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-function initializeBinaryPlaceValueModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializeBinaryPlaceValueManifest();
-  initialValueParameter = binaryPlaceValueManifest.parameters.initial_value;
-  binaryPlaces = [128, 64, 32, 16, 8, 4, 2, 1];
-  normalizeBinaryValue = value => {
-    const integer = typeof value === "number" && Number.isFinite(value) ? Math.round(value) : initialValueParameter.defaultValue;
-    return Math.max(initialValueParameter.min, Math.min(initialValueParameter.max, integer));
-  };
-  calculateBinaryPlaceValue = value => {
-    const normalized = normalizeBinaryValue(value);
-    const bits = binaryPlaces.map(place => Number((normalized & place) === place));
-    return { value: normalized, bits, binary: bits.join(""), activePlaces: binaryPlaces.filter((_place, index) => bits[index] === 1) };
-  };
-  toggleBinaryPlace = (value, place) => normalizeBinaryValue(normalizeBinaryValue(value) ^ place);
-  formatBinaryEquation = (state, format = String) => {
-    const expansion = state.activePlaces.length === 0 ? format(0) : state.activePlaces.map(format).join(" + ");
-    return `${state.binary}_{2} = ${expansion} = ${format(state.value)}_{10}`;
-  };
+var o, s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    (a(),
+      (o = i.parameters.initial_value),
+      (s = [128, 64, 32, 16, 8, 4, 2, 1]),
+      (c = (e) => {
+        let t = typeof e == `number` && Number.isFinite(e) ? Math.round(e) : o.defaultValue;
+        return Math.max(o.min, Math.min(o.max, t));
+      }),
+      (l = (e) => {
+        let t = c(e),
+          n = s.map((e) => +((t & e) === e));
+        return {
+          value: t,
+          bits: n,
+          binary: n.join(``),
+          activePlaces: s.filter((e, t) => n[t] === 1),
+        };
+      }),
+      (u = (e, t) => c(c(e) ^ t)),
+      (d = (e, t = String) => {
+        let n = e.activePlaces.length === 0 ? t(0) : e.activePlaces.map(t).join(` + `);
+        return `${e.binary}_{2} = ${n} = ${t(e.value)}_{10}`;
+      }));
+  }))();
 }
-
-export { initializeBinaryPlaceValueModel as a, initializeBinaryPlaceValueManifest as c, formatBinaryEquation as i, binaryPlaceValueManifest as l, binaryPlaces as n, normalizeBinaryValue as o, calculateBinaryPlaceValue as r, toggleBinaryPlace as s, initialValueParameter as t };
+export { f as a, a as c, d as i, i as l, s as n, c as o, l as r, u as s, o as t };

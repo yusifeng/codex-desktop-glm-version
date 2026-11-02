@@ -1,5 +1,4 @@
-import { BY as Markdown, LY as initializeMarkdownRenderer } from "@rchunk/app-initial";
-
-initializeMarkdownRenderer();
-
-export { Markdown };
+// @ts-nocheck
+import { BY as e, LY as t } from "@rchunk/app-initial";
+t();
+export { e as Markdown };

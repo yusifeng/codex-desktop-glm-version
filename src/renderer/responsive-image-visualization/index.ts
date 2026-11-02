@@ -1,68 +1,48 @@
-// Responsive learning-block image renderer. Release chunk: responsive-image-visualization-9fbd0706e5fc.js.
-import "@rchunk/rolldown-runtime";
-import * as AppShared from "@rchunk/app-shared";
-
-interface ResponsiveImageSources {
-  oneX: string;
-  twoX?: string;
-  threeX?: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { I3 as t } from "@rchunk/app-shared";
+var n, r, i;
+function a() {
+  return (a = e(() => {
+    ((n = t()),
+      (r = ({ oneX: e, twoX: t, threeX: n }) => {
+        let r = [`${e} 1x`];
+        return (
+          t && r.push(`${t} 2x`),
+          n && r.push(`${n} 3x`),
+          r.length > 1 ? r.join(`,`) : void 0
+        );
+      }),
+      (i = ({
+        sources: e,
+        alt: t,
+        presentationMode: i = `standard`,
+        width: a = 320,
+        height: o = 320,
+        objectFit: s = `contain`,
+      }) => {
+        "use forget";
+        let c = i === `thumbnail`;
+        return (0, n.jsx)(`div`, {
+          className: `flex h-full w-full items-center justify-center`,
+          "data-learning-block-responsive-image": !0,
+          children: (0, n.jsx)(`img`, {
+            src: e.oneX,
+            srcSet: r(e),
+            alt: t,
+            width: a,
+            height: o,
+            className: c ? `m-0 block h-full w-full` : `m-0 block max-h-full max-w-full`,
+            style: {
+              objectFit: s,
+              width: c ? `100%` : a,
+              height: c ? `100%` : o,
+              maxWidth: `100%`,
+              maxHeight: `100%`,
+            },
+          }),
+        });
+      }));
+  }))();
 }
-
-interface ResponsiveImageProps {
-  sources: ResponsiveImageSources;
-  alt: string;
-  presentationMode?: "standard" | "thumbnail";
-  width?: number;
-  height?: number;
-  objectFit?: string;
-}
-
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown;
-}
-
-let jsxRuntime: JsxRuntime;
-
-function createSourceSet({ oneX, twoX, threeX }: ResponsiveImageSources): string | undefined {
-  const candidates = [oneX + " 1x"];
-  if (twoX) candidates.push(twoX + " 2x");
-  if (threeX) candidates.push(threeX + " 3x");
-  return candidates.length > 1 ? candidates.join(",") : undefined;
-}
-
-function ResponsiveImageVisualization({
-  sources,
-  alt,
-  presentationMode = "standard",
-  width = 320,
-  height = 320,
-  objectFit = "contain",
-}: ResponsiveImageProps): unknown {
-  "use forget";
-  const isThumbnail = presentationMode === "thumbnail";
-  return jsxRuntime.jsx("div", {
-    className: "flex h-full w-full items-center justify-center",
-    "data-learning-block-responsive-image": true,
-    children: jsxRuntime.jsx("img", {
-      src: sources.oneX,
-      srcSet: createSourceSet(sources),
-      alt,
-      width,
-      height,
-      className: isThumbnail ? "m-0 block h-full w-full" : "m-0 block max-h-full max-w-full",
-      style: {
-        objectFit,
-        width: isThumbnail ? "100%" : width,
-        height: isThumbnail ? "100%" : height,
-        maxWidth: "100%",
-        maxHeight: "100%",
-      },
-    }),
-  });
-}
-
-function initializeResponsiveImageVisualization(): void {
-  jsxRuntime = (AppShared as unknown as { I3(): JsxRuntime }).I3();
-}
-
-export { initializeResponsiveImageVisualization as n, ResponsiveImageVisualization as t };
+export { a as n, i as t };

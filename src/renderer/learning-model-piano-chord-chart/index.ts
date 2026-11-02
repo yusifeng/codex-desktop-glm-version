@@ -1,52 +1,19 @@
-// Piano chord chart specification. Release chunk: type-f409ad2953b1.js.
-import "@rchunk/rolldown-runtime";
-
-type RootNote =
-  "C" | "Db" | "D" | "Eb" | "E" | "F" | "F#" | "G" | "Ab" | "A" | "Bb" | "B";
-interface Specification {
-  type: "PIANO_CHORD_CHART";
-  version: 2;
-  thumbnailAssetKey: "piano-chord-chart-v2";
-  parameters: {
-    root_note: { kind: "enum"; defaultValue: "C"; allowedValues: RootNote[] };
-    quality: {
-      kind: "enum";
-      defaultValue: "major";
-      allowedValues: ["major", "minor"];
-    };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `PIANO_CHORD_CHART`),
+      (n = `piano-chord-chart-v2`),
+      (r = {
+        root_note: {
+          kind: `enum`,
+          defaultValue: `C`,
+          allowedValues: [`C`, `Db`, `D`, `Eb`, `E`, `F`, `F#`, `G`, `Ab`, `A`, `Bb`, `B`],
+        },
+        quality: { kind: `enum`, defaultValue: `major`, allowedValues: [`major`, `minor`] },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-let specification: Specification;
-function initializeSpecification(): void {
-  specification ??= {
-    type: "PIANO_CHORD_CHART",
-    version: 2,
-    thumbnailAssetKey: "piano-chord-chart-v2",
-    parameters: {
-      root_note: {
-        kind: "enum",
-        defaultValue: "C",
-        allowedValues: [
-          "C",
-          "Db",
-          "D",
-          "Eb",
-          "E",
-          "F",
-          "F#",
-          "G",
-          "Ab",
-          "A",
-          "Bb",
-          "B",
-        ],
-      },
-      quality: {
-        kind: "enum",
-        defaultValue: "major",
-        allowedValues: ["major", "minor"],
-      },
-    },
-  };
-}
-export { specification as n, initializeSpecification as t };
+export { i as n, a as t };

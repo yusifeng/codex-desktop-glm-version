@@ -1,34 +1,14 @@
-// Stable callback identity with immediate forwarding to the latest render callback.
-// Release chunk: useStableCallback-43628b79218b.js.
-import "@rchunk/rolldown-runtime";
-import { e6 as getReactRuntime } from "@rchunk/app-shared";
-
-interface StableCallbackReactRuntime {
-  useCallback?<Arguments extends unknown[], Result>(
-    callback: (...arguments_: Arguments) => Result,
-    dependencies: readonly unknown[],
-  ): (...arguments_: Arguments) => Result;
-  useMemo<Value>(factory: () => Value, dependencies: readonly unknown[]): Value;
-  useRef<Value>(value: Value): { current: Value };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { e6 as t } from "@rchunk/app-shared";
+function n(e) {
+  let t = (0, r.useRef)(e);
+  return ((t.current = e), (0, r.useCallback)((...e) => t.current(...e), []));
 }
-
-let React: StableCallbackReactRuntime;
-
-function initializeStableCallback(): void {
-  React ??= getReactRuntime() as unknown as StableCallbackReactRuntime;
+var r;
+function i() {
+  return (i = e(() => {
+    r = t();
+  }))();
 }
-
-function useStableCallback<Arguments extends unknown[], Result>(
-  callback: (...arguments_: Arguments) => Result,
-): (...arguments_: Arguments) => Result {
-  initializeStableCallback();
-  const callbackReference = React.useRef(callback);
-  callbackReference.current = callback;
-  const stableCallback = (...arguments_: Arguments): Result =>
-    callbackReference.current(...arguments_);
-  return React.useCallback
-    ? React.useCallback(stableCallback, [])
-    : React.useMemo(() => stableCallback, []);
-}
-
-export { useStableCallback as n, initializeStableCallback as t };
+export { n, i as t };

@@ -1,64 +1,44 @@
-// Carbon-budget learning model: compare future emissions with 1.5 C and 2 C budgets.
-// Release chunk: app/webview/assets/model-b09e8c8b101b.js.
-import "@rchunk/rolldown-runtime";
-
-interface CarbonBudgetValues { warmingLimitIndex?: number | null; futureEmissions?: number | null }
-interface NormalizedCarbonBudgetValues { warmingLimitIndex: number; futureEmissions: number }
-
-let warmingLimitControl: { defaultValue: number; min: number; max: number; step: number };
-let futureEmissionsControl: { defaultValue: number; min: number; max: number; step: number };
-let warmingLimits: number[];
-let initialRemainingBudgets: number[];
-let historicalEmissions: number;
-let warmingPerGigaton: number;
-let warmingIntercept: number;
-let gigatonsToTeratons: number;
-let teratonsToGigatons: number;
-let calculateCarbonBudget: (values: CarbonBudgetValues) => NormalizedCarbonBudgetValues & {
-  warmingLimit: number; historicalEmissions: number; cumulativeEmissions: number; impliedWarming: number;
-  allowableCumulativeEmissions: number; initialRemainingBudget: number; remainingBudget: number;
-  overshoot: number; status: "at" | "within" | "beyond";
-};
-let initialized = false;
-
-function initializeCarbonBudgetModel(): void {
-  if (initialized) return;
-  initialized = true;
-  warmingLimitControl = { defaultValue: 0, min: 0, max: 1, step: 1 };
-  futureEmissionsControl = { defaultValue: 100, min: 0, max: 1600, step: 5 };
-  warmingLimits = [1.5, 2];
-  initialRemainingBudgets = [170, 1055];
-  historicalEmissions = 2770;
-  warmingPerGigaton = (warmingLimits[1] - warmingLimits[0]) / (initialRemainingBudgets[1] - initialRemainingBudgets[0]);
-  warmingIntercept = warmingLimits[0] - initialRemainingBudgets[0] * warmingPerGigaton;
-  gigatonsToTeratons = 0.27 / 1_000;
-  teratonsToGigatons = 0.63 / 1_000;
-  const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-  const normalizeFinite = (value: number | null | undefined, fallback: number, minimum: number, maximum: number): number =>
-    typeof value === "number" && Number.isFinite(value) ? clamp(value, minimum, maximum) : fallback;
-  const normalizeValues = (values: CarbonBudgetValues): NormalizedCarbonBudgetValues => ({
-    warmingLimitIndex: Math.round(normalizeFinite(values.warmingLimitIndex, warmingLimitControl.defaultValue, warmingLimitControl.min, warmingLimitControl.max)),
-    futureEmissions: normalizeFinite(values.futureEmissions, futureEmissionsControl.defaultValue, futureEmissionsControl.min, futureEmissionsControl.max),
-  });
-  calculateCarbonBudget = values => {
-    const normalized = normalizeValues(values);
-    const warmingLimit = warmingLimits[normalized.warmingLimitIndex] ?? 1.5;
-    const initialRemainingBudget = initialRemainingBudgets[normalized.warmingLimitIndex] ?? initialRemainingBudgets[0];
-    const cumulativeEmissions = historicalEmissions + normalized.futureEmissions;
-    const allowableCumulativeEmissions = historicalEmissions + initialRemainingBudget;
-    const budgetDifference = initialRemainingBudget - normalized.futureEmissions;
-    return {
-      ...normalized, warmingLimit, historicalEmissions, cumulativeEmissions,
-      impliedWarming: warmingIntercept + normalized.futureEmissions * warmingPerGigaton,
-      allowableCumulativeEmissions, initialRemainingBudget, remainingBudget: Math.max(0, budgetDifference),
-      overshoot: Math.max(0, -budgetDifference),
-      status: Math.abs(budgetDifference) < 0.5 ? "at" : budgetDifference > 0 ? "within" : "beyond",
-    };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d, f, p;
+function m() {
+  return (m = e(() => {
+    ((t = { defaultValue: 0, min: 0, max: 1, step: 1 }),
+      (n = { defaultValue: 100, min: 0, max: 1600, step: 5 }),
+      (r = [1.5, 2]),
+      (i = [170, 1055]),
+      (a = 2770),
+      (o = (r[1] - r[0]) / (i[1] - i[0])),
+      (s = r[0] - i[0] * o),
+      (c = 0.27 / 1e3),
+      (l = 0.63 / 1e3),
+      (u = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (d = (e, t, n, r) => (Number.isFinite(e) ? u(e ?? t, n, r) : t)),
+      (f = (e) => ({
+        warmingLimitIndex: Math.round(d(e.warmingLimitIndex, t.defaultValue, t.min, t.max)),
+        futureEmissions: d(e.futureEmissions, n.defaultValue, n.min, n.max),
+      })),
+      (p = (e) => {
+        let t = f(e),
+          n = r[t.warmingLimitIndex] ?? 1.5,
+          c = i[t.warmingLimitIndex] ?? i[0],
+          l = a + t.futureEmissions,
+          u = a + c,
+          d = c - t.futureEmissions,
+          p = Math.abs(d) < 0.5 ? `at` : d > 0 ? `within` : `beyond`;
+        return {
+          ...t,
+          warmingLimit: n,
+          historicalEmissions: a,
+          cumulativeEmissions: l,
+          impliedWarming: s + t.futureEmissions * o,
+          allowableCumulativeEmissions: u,
+          initialRemainingBudget: c,
+          remainingBudget: Math.max(0, d),
+          overshoot: Math.max(0, -d),
+          status: p,
+        };
+      }));
+  }))();
 }
-
-export {
-  teratonsToGigatons as a, warmingPerGigaton as c, gigatonsToTeratons as i, calculateCarbonBudget as l,
-  futureEmissionsControl as n, warmingLimits as o, historicalEmissions as r, warmingLimitControl as s,
-  warmingIntercept as t, initializeCarbonBudgetModel as u,
-};
+export { l as a, o as c, c as i, p as l, n, r as o, a as r, t as s, s as t, m as u };

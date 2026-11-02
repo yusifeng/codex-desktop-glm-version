@@ -1,69 +1,54 @@
-// Tax-incidence learning model driven by demand and supply responsiveness.
-import "@rchunk/rolldown-runtime";
-
-interface TaxIncidenceValues { demandResponsiveness?: number | null; supplyResponsiveness?: number | null }
-interface MarketBounds { quantityMin: number; quantityMax: number; priceMin: number; priceMax: number }
-
-const responsivenessControl = { min: 0.4, max: 2.4, step: 0.01 };
-const preTaxMarket = { price: 60, quantity: 60, tax: 24 };
-const taxMarketBounds: MarketBounds = { quantityMin: 0, quantityMax: 100, priceMin: 0, priceMax: 120 };
-const defaultResponsiveness = { demandResponsiveness: 1.2, supplyResponsiveness: 1.2 };
-const normalizeResponsiveness = (value: number | null | undefined, fallback: number): number =>
-  Number.isFinite(value) ? Math.min(responsivenessControl.max, Math.max(responsivenessControl.min, value as number)) : fallback;
-const normalizeTaxIncidenceValues = (values: TaxIncidenceValues) => ({
-  demandResponsiveness: normalizeResponsiveness(values.demandResponsiveness, defaultResponsiveness.demandResponsiveness),
-  supplyResponsiveness: normalizeResponsiveness(values.supplyResponsiveness, defaultResponsiveness.supplyResponsiveness),
-});
-
-function calculateTaxIncidence(values: TaxIncidenceValues) {
-  const normalized = normalizeTaxIncidenceValues(values);
-  const totalResponsiveness = normalized.demandResponsiveness + normalized.supplyResponsiveness;
-  const buyerBurden = preTaxMarket.tax * normalized.supplyResponsiveness / totalResponsiveness;
-  const sellerBurden = preTaxMarket.tax - buyerBurden;
-  const quantityReduction = preTaxMarket.tax * normalized.demandResponsiveness * normalized.supplyResponsiveness / totalResponsiveness;
-  return {
-    ...normalized,
-    preTaxPrice: preTaxMarket.price,
-    preTaxQuantity: preTaxMarket.quantity,
-    tax: preTaxMarket.tax,
-    taxedQuantity: preTaxMarket.quantity - quantityReduction,
-    buyerPrice: preTaxMarket.price + buyerBurden,
-    sellerPrice: preTaxMarket.price - sellerBurden,
-    buyerBurden,
-    sellerBurden,
-    buyerSharePercent: buyerBurden / preTaxMarket.tax * 100,
-    sellerSharePercent: sellerBurden / preTaxMarket.tax * 100,
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d, f;
+function p() {
+  return (p = e(() => {
+    ((t = { min: 0.4, max: 2.4, step: 0.01 }),
+      (n = { price: 60, quantity: 60, tax: 24 }),
+      (r = { quantityMin: 0, quantityMax: 100, priceMin: 0, priceMax: 120 }),
+      (i = { demandResponsiveness: 1.2, supplyResponsiveness: 1.2 }),
+      (a = (e, n) => (Number.isFinite(e) ? Math.min(t.max, Math.max(t.min, e)) : n)),
+      (o = (e) => ({
+        demandResponsiveness: a(e.demandResponsiveness, i.demandResponsiveness),
+        supplyResponsiveness: a(e.supplyResponsiveness, i.supplyResponsiveness),
+      })),
+      (s = (e) => {
+        let { demandResponsiveness: t, supplyResponsiveness: r } = o(e),
+          i = t + r,
+          a = (n.tax * r) / i,
+          s = n.tax - a,
+          c = (n.tax * t * r) / i;
+        return {
+          demandResponsiveness: t,
+          supplyResponsiveness: r,
+          preTaxPrice: n.price,
+          preTaxQuantity: n.quantity,
+          tax: n.tax,
+          taxedQuantity: n.quantity - c,
+          buyerPrice: n.price + a,
+          sellerPrice: n.price - s,
+          buyerBurden: a,
+          sellerBurden: s,
+          buyerSharePercent: (a / n.tax) * 100,
+          sellerSharePercent: (s / n.tax) * 100,
+        };
+      }),
+      (c = (e, t) => n.price + (n.quantity - e) / t),
+      (l = (e, t) => n.price + (e - n.quantity) / t),
+      (u = (e) => {
+        let t = Math.round(e.buyerSharePercent * 10) / 10;
+        return { buyerSharePercent: t, sellerSharePercent: 100 - t };
+      }),
+      (d = (e, t = r) => {
+        let i = Math.max(t.quantityMin, n.quantity - e * (t.priceMax - n.price)),
+          a = Math.min(t.quantityMax, n.quantity + e * (n.price - t.priceMin));
+        return { from: { x: i, y: c(i, e) }, to: { x: a, y: c(a, e) } };
+      }),
+      (f = (e, t = r) => {
+        let i = Math.max(t.quantityMin, n.quantity - e * (n.price - t.priceMin)),
+          a = Math.min(t.quantityMax, n.quantity + e * (t.priceMax - n.price));
+        return { from: { x: i, y: l(i, e) }, to: { x: a, y: l(a, e) } };
+      }));
+  }))();
 }
-const demandPrice = (quantity: number, responsiveness: number): number => preTaxMarket.price + (preTaxMarket.quantity - quantity) / responsiveness;
-const supplyPrice = (quantity: number, responsiveness: number): number => preTaxMarket.price + (quantity - preTaxMarket.quantity) / responsiveness;
-const roundBurdenShares = (state: { buyerSharePercent: number }) => {
-  const buyerSharePercent = Math.round(state.buyerSharePercent * 10) / 10;
-  return { buyerSharePercent, sellerSharePercent: 100 - buyerSharePercent };
-};
-const buildDemandSegment = (responsiveness: number, bounds = taxMarketBounds) => {
-  const fromQuantity = Math.max(bounds.quantityMin, preTaxMarket.quantity - responsiveness * (bounds.priceMax - preTaxMarket.price));
-  const toQuantity = Math.min(bounds.quantityMax, preTaxMarket.quantity + responsiveness * (preTaxMarket.price - bounds.priceMin));
-  return { from: { x: fromQuantity, y: demandPrice(fromQuantity, responsiveness) }, to: { x: toQuantity, y: demandPrice(toQuantity, responsiveness) } };
-};
-const buildSupplySegment = (responsiveness: number, bounds = taxMarketBounds) => {
-  const fromQuantity = Math.max(bounds.quantityMin, preTaxMarket.quantity - responsiveness * (preTaxMarket.price - bounds.priceMin));
-  const toQuantity = Math.min(bounds.quantityMax, preTaxMarket.quantity + responsiveness * (bounds.priceMax - preTaxMarket.price));
-  return { from: { x: fromQuantity, y: supplyPrice(fromQuantity, responsiveness) }, to: { x: toQuantity, y: supplyPrice(toQuantity, responsiveness) } };
-};
-
-function initializeTaxIncidenceModel(): void {}
-
-export {
-  demandPrice as a,
-  roundBurdenShares as c,
-  supplyPrice as d,
-  calculateTaxIncidence as i,
-  initializeTaxIncidenceModel as l,
-  responsivenessControl as n,
-  buildDemandSegment as o,
-  taxMarketBounds as r,
-  buildSupplySegment as s,
-  defaultResponsiveness as t,
-  normalizeTaxIncidenceValues as u,
-};
+export { c as a, u as c, l as d, s as i, p as l, t as n, d as o, r, f as s, i as t, o as u };

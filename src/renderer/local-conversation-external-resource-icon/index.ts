@@ -1,164 +1,105 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, FX as n, HX as r, I3 as i, lw as a } from "@rchunk/app-shared";
 import {
-  $3 as getCompilerRuntime,
-  FX as initializeSignalRuntime,
-  HX as useSignalValue,
-  I3 as getJsxRuntime,
-  lw as initializeBrowserIcons,
-} from "@rchunk/app-shared";
-import {
-  $4t as initializeKnownAppIds,
-  Dlt as AppLogo,
-  L9t as getGoogleDriveResourceKindFromMimeType,
-  Olt as initializeAppLogo,
-  X4t as getKnownAppId,
-  _Z as initializeExternalResourceIcons,
-  gZ as ProvidedResourceIcon,
-  n0 as initializeLinkIcon,
-  t0 as LinkIcon,
-  z9t as getGoogleDriveResourceKindFromUrl,
+  $4t as o,
+  Dlt as s,
+  L9t as c,
+  Olt as l,
+  X4t as u,
+  _Z as d,
+  gZ as f,
+  n0 as p,
+  t0 as m,
+  z9t as h,
 } from "@rchunk/app-initial";
-import {
-  n as initializeGoogleDriveResourceIcon,
-  t as GoogleDriveResourceIcon,
-} from "@rchunk/google-drive-resource-icon";
-
-export interface ExternalResourceProvider {
-  id: string;
-  logoUrl?: string;
-  logoUrlDark?: string;
-  name: string;
-  pluginDisplayNames: string[];
-}
-
-export interface ExternalResource {
-  activities: string[];
-  mimeType?: string | null;
-  provider?: ExternalResourceProvider | null;
-  url: string;
-}
-
-export interface LocalConversationExternalResourceIconProps {
-  className?: string;
-  resource: ExternalResource;
-}
-
-interface CompilerRuntime {
-  c(size: number): unknown[];
-}
-
-let compilerRuntime: CompilerRuntime;
-let jsx: ReturnType<typeof getJsxRuntime>;
-
-function findKnownAppId(provider: ExternalResourceProvider): string | null {
-  for (const candidate of [provider.id, provider.name, ...provider.pluginDisplayNames]) {
-    if (getKnownAppId(candidate) != null) return candidate;
-  }
+import { n as g, t as _ } from "@rchunk/google-drive-resource-icon";
+function v(e) {
+  for (let t of [e.id, e.name, ...e.pluginDisplayNames]) if (u(t) != null) return t;
   return null;
 }
-
-function initializeExternalResourceProviderIds(): void {
-  initializeKnownAppIds();
+function y() {
+  return (y = e(() => {
+    o();
+  }))();
 }
-
-function LocalConversationExternalResourceIcon({
-  className = "icon-sm",
-  resource,
-}: LocalConversationExternalResourceIconProps): unknown {
-  const cache = compilerRuntime.c(23);
-  useSignalValue(null);
-  if (resource.activities.includes("provided")) {
-    if (cache[1] !== className) {
-      cache[1] = className;
-      cache[2] = jsx.jsx(ProvidedResourceIcon, { "aria-hidden": true, className });
-    }
-    return cache[2];
+function b(e) {
+  let t = (0, x.c)(23),
+    { className: n, resource: i } = e,
+    a = n === void 0 ? `icon-sm` : n;
+  if ((r(null), i.activities.includes(`provided`))) {
+    let e;
+    return (
+      t[1] === a
+        ? (e = t[2])
+        : ((e = (0, S.jsx)(f, { "aria-hidden": !0, className: a })), (t[1] = a), (t[2] = e)),
+      e
+    );
   }
-
-  let driveKind: unknown;
-  if (cache[3] !== resource.mimeType || cache[4] !== resource.url) {
-    driveKind = getGoogleDriveResourceKindFromMimeType(resource.mimeType) ??
-      getGoogleDriveResourceKindFromUrl(resource.url);
-    cache[3] = resource.mimeType;
-    cache[4] = resource.url;
-    cache[5] = driveKind;
-  } else {
-    driveKind = cache[5];
+  let o;
+  t[3] !== i.mimeType || t[4] !== i.url
+    ? ((o = c(i.mimeType) ?? h(i.url)), (t[3] = i.mimeType), (t[4] = i.url), (t[5] = o))
+    : (o = t[5]);
+  let l = o;
+  if (l != null) {
+    let e;
+    return (
+      t[6] !== a || t[7] !== l
+        ? ((e = (0, S.jsx)(_, { className: a, resourceKind: l })),
+          (t[6] = a),
+          (t[7] = l),
+          (t[8] = e))
+        : (e = t[8]),
+      e
+    );
   }
-  if (driveKind != null) {
-    if (cache[6] !== className || cache[7] !== driveKind) {
-      cache[6] = className;
-      cache[7] = driveKind;
-      cache[8] = jsx.jsx(GoogleDriveResourceIcon, { className, resourceKind: driveKind });
-    }
-    return cache[8];
+  let u = i.provider;
+  if (u == null) {
+    let e;
+    return (
+      t[9] !== a || t[10] !== i.url
+        ? ((e = (0, S.jsx)(m, { className: a, href: i.url })),
+          (t[9] = a),
+          (t[10] = i.url),
+          (t[11] = e))
+        : (e = t[11]),
+      e
+    );
   }
-
-  const provider = resource.provider;
-  if (provider == null) {
-    if (cache[9] !== className || cache[10] !== resource.url) {
-      cache[9] = className;
-      cache[10] = resource.url;
-      cache[11] = jsx.jsx(LinkIcon, { className, href: resource.url });
-    }
-    return cache[11];
-  }
-  let fallback: unknown;
-  if (cache[12] !== className || cache[13] !== resource.url) {
-    fallback = jsx.jsx(LinkIcon, { className, href: resource.url });
-    cache[12] = className;
-    cache[13] = resource.url;
-    cache[14] = fallback;
-  } else {
-    fallback = cache[14];
-  }
-  let knownAppId: string | null;
-  if (cache[15] !== provider) {
-    knownAppId = findKnownAppId(provider);
-    cache[15] = provider;
-    cache[16] = knownAppId;
-  } else {
-    knownAppId = cache[16] as string | null;
-  }
-  if (
-    cache[17] !== className ||
-    cache[18] !== provider.logoUrl ||
-    cache[19] !== provider.logoUrlDark ||
-    cache[20] !== fallback ||
-    cache[21] !== knownAppId
-  ) {
-    cache[17] = className;
-    cache[18] = provider.logoUrl;
-    cache[19] = provider.logoUrlDark;
-    cache[20] = fallback;
-    cache[21] = knownAppId;
-    cache[22] = jsx.jsx(AppLogo, {
-      alt: "",
-      className,
-      fallback,
-      knownAppId,
-      logoDarkUrl: provider.logoUrlDark,
-      logoUrl: provider.logoUrl,
-    });
-  }
-  return cache[22];
+  let d;
+  t[12] !== a || t[13] !== i.url
+    ? ((d = (0, S.jsx)(m, { className: a, href: i.url })),
+      (t[12] = a),
+      (t[13] = i.url),
+      (t[14] = d))
+    : (d = t[14]);
+  let p;
+  t[15] === u ? (p = t[16]) : ((p = v(u)), (t[15] = u), (t[16] = p));
+  let g;
+  return (
+    t[17] !== a || t[18] !== u.logoUrl || t[19] !== u.logoUrlDark || t[20] !== d || t[21] !== p
+      ? ((g = (0, S.jsx)(s, {
+          alt: ``,
+          className: a,
+          fallback: d,
+          knownAppId: p,
+          logoDarkUrl: u.logoUrlDark,
+          logoUrl: u.logoUrl,
+        })),
+        (t[17] = a),
+        (t[18] = u.logoUrl),
+        (t[19] = u.logoUrlDark),
+        (t[20] = d),
+        (t[21] = p),
+        (t[22] = g))
+      : (g = t[22]),
+    g
+  );
 }
-
-function initializeLocalConversationExternalResourceIcon(): void {
-  compilerRuntime = getCompilerRuntime() as unknown as CompilerRuntime;
-  initializeSignalRuntime();
-  initializeAppLogo();
-  initializeLinkIcon();
-  initializeBrowserIcons();
-  initializeExternalResourceIcons();
-  initializeGoogleDriveResourceIcon();
-  initializeExternalResourceProviderIds();
-  jsx = getJsxRuntime();
+var x, S;
+function C() {
+  return (C = e(() => {
+    ((x = t()), n(), l(), p(), a(), d(), g(), y(), (S = i()));
+  }))();
 }
-
-export {
-  initializeExternalResourceProviderIds as i,
-  initializeLocalConversationExternalResourceIcon as n,
-  findKnownAppId as r,
-  LocalConversationExternalResourceIcon as t,
-};
+export { y as i, C as n, v as r, b as t };

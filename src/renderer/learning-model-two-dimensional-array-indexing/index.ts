@@ -1,58 +1,39 @@
-// Two-dimensional array indexing teaching model.
-import "@rchunk/rolldown-runtime";
-
-interface IntegerParameter { kind: "integer"; defaultValue: number; min: number; max: number }
-interface ArrayIndexValues { rows?: number | null; columns?: number | null; rowIndex?: number | null; columnIndex?: number | null }
-
-const twoDimensionalArrayIndexingType = "TWO_DIMENSIONAL_ARRAY_INDEXING";
-const twoDimensionalArrayIndexingThumbnail = "two-dimensional-array-indexing-v1";
-const twoDimensionalArrayIndexingParameters: { rows: IntegerParameter; columns: IntegerParameter } = {
-  rows: { kind: "integer", defaultValue: 3, min: 2, max: 5 },
-  columns: { kind: "integer", defaultValue: 5, min: 2, max: 6 },
-};
-const twoDimensionalArrayIndexingSpecification = {
-  type: twoDimensionalArrayIndexingType,
-  version: 2,
-  thumbnailAssetKey: twoDimensionalArrayIndexingThumbnail,
-  parameters: twoDimensionalArrayIndexingParameters,
-};
-const { rows: rowsParameter, columns: columnsParameter } = twoDimensionalArrayIndexingSpecification.parameters;
-
-const normalizeInteger = (value: number | null | undefined, minimum: number, maximum: number, fallback: number): number =>
-  Math.min(maximum, Math.max(minimum, typeof value === "number" && Number.isFinite(value) ? Math.round(value) : fallback));
-const defaultArrayIndexValues = () => ({
-  rows: rowsParameter.defaultValue,
-  columns: columnsParameter.defaultValue,
-  rowIndex: 1,
-  columnIndex: 2,
-});
-
-function normalizeArrayIndexValues(values: ArrayIndexValues) {
-  const rows = normalizeInteger(values.rows, rowsParameter.min, rowsParameter.max, rowsParameter.defaultValue);
-  const columns = normalizeInteger(values.columns, columnsParameter.min, columnsParameter.max, columnsParameter.defaultValue);
-  return {
-    rows,
-    columns,
-    rowIndex: normalizeInteger(values.rowIndex, 0, rows - 1, 0),
-    columnIndex: normalizeInteger(values.columnIndex, 0, columns - 1, 0),
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `TWO_DIMENSIONAL_ARRAY_INDEXING`),
+      (n = `two-dimensional-array-indexing-v1`),
+      (r = {
+        rows: { kind: `integer`, defaultValue: 3, min: 2, max: 5 },
+        columns: { kind: `integer`, defaultValue: 5, min: 2, max: 6 },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-const getArrayCellValue = (rowIndex: number, columnIndex: number): number => (rowIndex + 1) * 10 + columnIndex + 1;
-const calculateArraySelection = (values: ArrayIndexValues) => {
-  const normalized = normalizeArrayIndexValues(values);
-  return { ...normalized, selectedValue: getArrayCellValue(normalized.rowIndex, normalized.columnIndex) };
-};
-
-function initializeTwoDimensionalArrayIndexingSpecification(): void {}
-function initializeTwoDimensionalArrayIndexingModel(): void {}
-
-export {
-  getArrayCellValue as a,
-  normalizeArrayIndexValues as i,
-  calculateArraySelection as n,
-  initializeTwoDimensionalArrayIndexingSpecification as o,
-  initializeTwoDimensionalArrayIndexingModel as r,
-  twoDimensionalArrayIndexingSpecification as s,
-  defaultArrayIndexValues as t,
-};
+var o, s, c, l, u, d, f;
+function p() {
+  return (p = e(() => {
+    (a(),
+      ({ rows: o, columns: s } = i.parameters),
+      (c = (e, t, n, r) => Math.min(n, Math.max(t, Number.isFinite(e) ? Math.round(e ?? r) : r))),
+      (l = () => ({ rows: o.defaultValue, columns: s.defaultValue, rowIndex: 1, columnIndex: 2 })),
+      (u = (e) => {
+        let t = c(e.rows, o.min, o.max, o.defaultValue),
+          n = c(e.columns, s.min, s.max, s.defaultValue);
+        return {
+          rows: t,
+          columns: n,
+          rowIndex: c(e.rowIndex, 0, t - 1, 0),
+          columnIndex: c(e.columnIndex, 0, n - 1, 0),
+        };
+      }),
+      (d = (e, t) => (e + 1) * 10 + t + 1),
+      (f = (e) => {
+        let t = u(e);
+        return { ...t, selectedValue: d(t.rowIndex, t.columnIndex) };
+      }));
+  }))();
+}
+export { d as a, u as i, f as n, a as o, p as r, i as s, l as t };

@@ -1,49 +1,24 @@
-// Normalize a single x-like identifier (x or x_<digits>) to x. Release chunk: x-like-435c693d8722.js.
-import "@rchunk/rolldown-runtime";
-
-interface ExpressionToken {
-  type: string;
-  value: string;
-  [key: string]: unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = /^x_\d+$/),
+      (n = (e) => e === `x` || t.test(e)),
+      (r = (e) => {
+        let t = new Set();
+        for (let r of e) r.type === `identifier` && n(r.value) && t.add(r.value);
+        return t;
+      }),
+      (i = (e) => {
+        let t = r(e);
+        if (t.size !== 1) return e;
+        let [n] = Array.from(t);
+        return n === `x`
+          ? e
+          : e.map((e) => (e.type === `identifier` && e.value === n ? { ...e, value: `x` } : e));
+      }),
+      (a = (e) => e.some((e) => e.type === `identifier` && e.value === `i`)));
+  }))();
 }
-let collectXLikeIdentifiers: (
-  tokens: readonly ExpressionToken[],
-) => Set<string>;
-let normalizeSingleXLikeIdentifier: (
-  tokens: ExpressionToken[],
-) => ExpressionToken[];
-let containsIndexIdentifier: (tokens: readonly ExpressionToken[]) => boolean;
-let initialized = false;
-function initializeXLikeIdentifierNormalization(): void {
-  if (initialized) return;
-  initialized = true;
-  const xLikePattern = /^x_\d+$/u;
-  const isXLike = (value: string): boolean =>
-    value === "x" || xLikePattern.test(value);
-  collectXLikeIdentifiers = (tokens) => {
-    const identifiers = new Set<string>();
-    for (const token of tokens)
-      if (token.type === "identifier" && isXLike(token.value))
-        identifiers.add(token.value);
-    return identifiers;
-  };
-  normalizeSingleXLikeIdentifier = (tokens) => {
-    const identifiers = collectXLikeIdentifiers(tokens);
-    if (identifiers.size !== 1) return tokens;
-    const [identifier] = identifiers;
-    if (identifier === "x") return tokens;
-    return tokens.map((token) =>
-      token.type === "identifier" && token.value === identifier
-        ? { ...token, value: "x" }
-        : token,
-    );
-  };
-  containsIndexIdentifier = (tokens) =>
-    tokens.some((token) => token.type === "identifier" && token.value === "i");
-}
-export {
-  normalizeSingleXLikeIdentifier as i,
-  containsIndexIdentifier as n,
-  initializeXLikeIdentifierNormalization as r,
-  collectXLikeIdentifiers as t,
-};
+export { i, a as n, o as r, r as t };

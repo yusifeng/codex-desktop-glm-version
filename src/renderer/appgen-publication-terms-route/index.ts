@@ -1,38 +1,27 @@
-// appgen-publication-terms-route —— 在 Site 路由内容上叠加首次发布条款提示。
-// 原版：app/webview/assets/appgen-publication-terms-route-bc1c14271f1f.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-
-void runtimeChunk;
-const {
-  $3: initializeJsxRuntime,
-  I3: getJsxRuntime,
-} = appSharedChunk;
-const {
-  dl: PublicationTermsNotice,
-  fl: initializePublicationTermsNotice,
-} = appInitialChunk;
-const jsx = getJsxRuntime();
-
-interface AppgenPublicationTermsRouteProps {
-  children?: unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n } from "@rchunk/app-shared";
+import { dl as r, fl as i } from "@rchunk/app-initial";
+function a(e) {
+  let t = (0, o.c)(3),
+    { children: n } = e,
+    i;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((i = (0, s.jsx)(r, { showWhenUnseen: !0 })), (t[0] = i))
+    : (i = t[0]);
+  let a;
+  return (
+    t[1] === n
+      ? (a = t[2])
+      : ((a = (0, s.jsxs)(s.Fragment, { children: [n, i] })), (t[1] = n), (t[2] = a)),
+    a
+  );
 }
-
-function AppgenPublicationTermsRoute({
-  children,
-}: AppgenPublicationTermsRouteProps): unknown {
-  return jsx.jsxs(jsx.Fragment, {
-    children: [children, jsx.jsx(PublicationTermsNotice, { showWhenUnseen: true })],
-  });
+var o, s;
+function c() {
+  return (c = e(() => {
+    ((o = t()), i(), (s = n()));
+  }))();
 }
-
-function initializeAppgenPublicationTermsRoute(): void {
-  initializeJsxRuntime();
-  initializePublicationTermsNotice();
-}
-
-initializeAppgenPublicationTermsRoute();
-
-export { AppgenPublicationTermsRoute };
+c();
+export { a as AppgenPublicationTermsRoute };

@@ -1,33 +1,33 @@
-// Shared math compatibility layer. Release chunk: math-d32c9f1b6861.js.
-const absolute = Math.abs;
-const atan2 = Math.atan2;
-const cosine = Math.cos;
-const maximum = Math.max;
-const minimum = Math.min;
-const sine = Math.sin;
-const squareRoot = Math.sqrt;
-const epsilon = 1e-12;
-const pi = Math.PI;
-const halfPi = pi / 2;
-const twoPi = 2 * pi;
-function safeAcos(value: number): number {
-  return value > 1 ? 0 : value < -1 ? Math.PI : Math.acos(value);
+// @ts-nocheck
+const e = Math.abs,
+  t = Math.atan2,
+  n = Math.cos,
+  r = Math.max,
+  i = Math.min,
+  a = Math.sin,
+  o = Math.sqrt,
+  s = 1e-12,
+  c = Math.PI,
+  l = c / 2,
+  u = 2 * c;
+function d(e) {
+  return e > 1 ? 0 : e < -1 ? c : Math.acos(e);
 }
-function safeAsin(value: number): number {
-  return value >= 1 ? halfPi : value <= -1 ? -halfPi : Math.asin(value);
+function f(e) {
+  return e >= 1 ? l : e <= -1 ? -l : Math.asin(e);
 }
 export {
-  cosine as a,
-  maximum as c,
-  sine as d,
-  squareRoot as f,
-  atan2 as i,
-  minimum as l,
-  safeAcos as n,
-  epsilon as o,
-  twoPi as p,
-  safeAsin as r,
-  halfPi as s,
-  absolute as t,
-  pi as u,
+  n as a,
+  r as c,
+  a as d,
+  o as f,
+  t as i,
+  i as l,
+  d as n,
+  s as o,
+  u as p,
+  f as r,
+  l as s,
+  e as t,
+  c as u,
 };

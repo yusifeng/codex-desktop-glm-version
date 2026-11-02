@@ -1,62 +1,29 @@
-// Waveform anatomy learning model: normalize wave controls and sample one cosine trace.
-import "@rchunk/rolldown-runtime";
-
-interface WaveformValues {
-  amplitude?: number | null;
-  domain?: number | null;
-  repeat?: number | null;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = { domain: 0, amplitude: 1.4, repeat: 4 }),
+      (n = (e, t, n, r) => (Number.isFinite(e) ? Math.min(n, Math.max(t, e)) : r)),
+      (r = (e) => {
+        let t = +(e.domain === 1),
+          r = n(e.amplitude, 0.8, 2, 1.4),
+          i = n(e.repeat, 2, 6, 4);
+        return {
+          domain: t,
+          amplitude: r,
+          repeat: i,
+          firstCrest: 2,
+          trough: 2 + i / 2,
+          secondCrest: 2 + i,
+          frequency: 1 / i,
+        };
+      }),
+      (i = (e) =>
+        Array.from({ length: 241 }, (t, n) => {
+          let r = n / 20;
+          return { x: r, y: e.amplitude * Math.cos((2 * Math.PI * (r - e.firstCrest)) / e.repeat) };
+        })));
+  }))();
 }
-
-interface WaveformState {
-  amplitude: number;
-  domain: number;
-  firstCrest: number;
-  frequency: number;
-  repeat: number;
-  secondCrest: number;
-  trough: number;
-}
-
-interface WaveformPoint { x: number; y: number }
-
-const defaultWaveformValues = { domain: 0, amplitude: 1.4, repeat: 4 };
-
-function clampFinite(value: number | null | undefined, minimum: number, maximum: number, fallback: number): number {
-  return Number.isFinite(value)
-    ? Math.min(maximum, Math.max(minimum, value as number))
-    : fallback;
-}
-
-function normalizeWaveformValues(values: WaveformValues): WaveformState {
-  const domain = Number(values.domain === 1);
-  const amplitude = clampFinite(values.amplitude, 0.8, 2, 1.4);
-  const repeat = clampFinite(values.repeat, 2, 6, 4);
-  return {
-    domain,
-    amplitude,
-    repeat,
-    firstCrest: 2,
-    trough: 2 + repeat / 2,
-    secondCrest: 2 + repeat,
-    frequency: 1 / repeat,
-  };
-}
-
-function sampleWaveform(state: WaveformState): WaveformPoint[] {
-  return Array.from({ length: 241 }, (_unused, index) => {
-    const x = index / 20;
-    return {
-      x,
-      y: state.amplitude * Math.cos((2 * Math.PI * (x - state.firstCrest)) / state.repeat),
-    };
-  });
-}
-
-function initializeWaveformAnatomyModel(): void {}
-
-export {
-  initializeWaveformAnatomyModel as i,
-  normalizeWaveformValues as n,
-  sampleWaveform as r,
-  defaultWaveformValues as t,
-};
+export { a as i, r as n, i as r, t };

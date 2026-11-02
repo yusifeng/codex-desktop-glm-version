@@ -1,611 +1,340 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/family-notification-surface",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/pepper-persona",
+      "@rchunk/invitations",
+      "@rchunk/radio-group",
+      "./radio-group-ae789623973e.css",
+      "@rchunk/phone-metadata-argument-wrapper",
+      "@rchunk/parental-controls-invitation-background",
+      "@rchunk/phone-number-input",
+      "@rchunk/app-primary",
+      "./app-primary-484df789f2f5.css",
+      "@rchunk/prop-types-runtime",
+      "@rchunk/u18-banner-logging",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $O as queryDurations,
-  FX as initializeQueryRuntime,
-  H3 as initializeLazyRuntime,
-  QI as initializeScopedRuntime,
-  ZI as applicationScope,
-  e6 as getReactRuntime,
-  ek as initializeAccountRuntime,
-  sZ as createDerivedSignal,
-  type ReactRuntime,
+  $3 as t,
+  $O as n,
+  FX as r,
+  H3 as i,
+  QI as a,
+  V3 as o,
+  ZI as s,
+  e6 as c,
+  ek as l,
+  sZ as u,
 } from "@rchunk/app-shared";
 import {
-  Hzt as isDialogOpen,
-  Sdn as ApiResponseError,
-  Sqt as initializePepperOnboarding,
-  Sun as initializeFamilyRuntime,
-  U6t as activeAccountId,
-  Uzt as openDialog,
-  Vzt as initializeDialogRuntime,
-  _un as activeUserId,
-  bL as parentalAccessState,
-  cJt as initializeApiClient,
-  fpn as initializeFamilyQueries,
-  gdn as initializeFamilyNotifications,
-  hdn as getSettingsLocale,
-  mdn as settingsLocaleHeader,
-  mun as familyAccountId,
-  rJt as apiClient,
-  wdn as initializeFamilySettings,
-  xL as initializeAccountProvider,
-  zzt as closeDialog,
+  Hzt as d,
+  Sdn as f,
+  Sqt as p,
+  Sun as m,
+  U6t as h,
+  Uzt as g,
+  Vzt as _,
+  _un as v,
+  bL as y,
+  cJt as b,
+  fpn as x,
+  gdn as S,
+  hdn as C,
+  mdn as w,
+  mun as T,
+  rJt as E,
+  wdn as D,
+  xL as O,
+  zzt as k,
 } from "@rchunk/app-initial";
-import type { FamilyNotification as FamilyNotificationComponent } from "@rchunk/family-notification-surface";
-
-interface AccountIdentity {
-  accountId: string;
-  userId: string;
+function A(e, t) {
+  let n = e.get(y);
+  return n.status === `allowed` && n.userId === t.userId && n.accountId === t.accountId;
 }
-
-interface ParentalAccessState {
-  accountId?: string;
-  status: "allowed" | "loading" | string;
-  userId?: string;
+function j() {
+  return (j = e(() => {
+    O();
+  }))();
 }
-
-interface FamilyNotificationItem {
-  id: string;
-  reacted_to_at?: string | null;
-  seen_at?: string | null;
-  [key: string]: unknown;
-}
-
-interface FamilyNotificationPage {
-  items: FamilyNotificationItem[];
-  [key: string]: unknown;
-}
-
-interface FamilyNotification {
-  item: FamilyNotificationItem;
-  type: string;
-  [key: string]: unknown;
-}
-
-interface QueryRecord {
-  setState(state: { data: undefined; dataUpdatedAt: number }): void;
-}
-
-interface QueryCache {
-  find(options: {
-    exact: boolean;
-    queryKey: readonly unknown[];
-  }): QueryRecord | undefined;
-  findAll(options: { queryKey: readonly unknown[] }): QueryRecord[];
-}
-
-interface QueryClient {
-  cancelQueries(options: {
-    predicate(query: QueryRecord): boolean;
-    queryKey: readonly unknown[];
-  }): void;
-  getQueryCache(): QueryCache;
-  getQueryData<Value>(key: readonly unknown[]): Value | undefined;
-}
-
-interface QueryContext {
-  client: QueryClient;
-  queryKey: readonly unknown[];
-  signal: AbortSignal;
-}
-
-interface PresentationScope {
-  readonly node: object;
-  get<Value>(signal: unknown): Value;
-  watch(listener: (scope: PresentationScope) => void): () => void;
-}
-
-interface DecisionState {
-  account: AccountIdentity;
-  decisions: Map<string, unknown>;
-  stop(): void;
-}
-
-interface NotificationHistory {
-  account: AccountIdentity;
-  ids: Set<string>;
-}
-
-interface OpenNotificationState {
-  account: AccountIdentity;
-  notificationId: string;
-  stop(): void;
-}
-
-type NotificationSurface = "info" | string;
-type FamilyNotificationDialogProps = {
-  account: AccountIdentity;
-  initialSurface: NotificationSurface;
-  notification: FamilyNotification;
-  onClose(): void;
-};
-
-const once = onceExport as (initializer: () => void) => () => void;
-let React: ReactRuntime;
-const getLocale = getSettingsLocale as () => string;
-const AccountProviderInitializer =
-  initializeAccountProvider as unknown as () => void;
-const HttpError = ApiResponseError as unknown as new (
-  ...args: never[]
-) => Error & { status: number };
-const familyDialogIsOpen = isDialogOpen as unknown as (
-  scope: PresentationScope,
-  component: unknown,
-) => boolean;
-const showDialog = openDialog as unknown as (
-  scope: PresentationScope,
-  component: unknown,
-  props: FamilyNotificationDialogProps,
-  options: { blocksOtherModals: boolean },
-) => void;
-const dismissDialog = closeDialog as unknown as (
-  scope: PresentationScope,
-  component: unknown,
-) => void;
-
-let familyInvitePending: unknown;
-let FamilyNotificationDialog: (props: FamilyNotificationDialogProps) => unknown;
-const openNotifications = new WeakMap<object, OpenNotificationState>();
-const notificationHistory = new WeakMap<object, NotificationHistory>();
-const decisions = new WeakMap<object, DecisionState>();
-const decisionSubscribers = new WeakMap<object, Set<() => void>>();
-
-function hasParentalAccess(
-  scope: PresentationScope,
-  account: AccountIdentity,
-): boolean {
-  const access = scope.get<ParentalAccessState>(parentalAccessState);
-  return (
-    access.status === "allowed" &&
-    access.userId === account.userId &&
-    access.accountId === account.accountId
-  );
-}
-
-const initializeParentalQueryDependencies = once(() => {
-  AccountProviderInitializer();
-});
-
-async function invalidateUnauthorizedFamilyQueries<Value>(
-  request: Promise<Value>,
-  { client, queryKey, signal }: QueryContext,
-  familyKey: readonly unknown[],
-  amphoraId?: string,
-): Promise<Value> {
-  try {
-    return await request;
-  } catch (error) {
-    if (
-      !signal.aborted &&
-      error instanceof HttpError &&
-      [401, 403, 404].includes(error.status)
-    ) {
-      const invalidationKey =
-        error.status === 404 &&
-        amphoraId != null &&
-        client.getQueryData<{ id?: string }>([...familyKey, "current"])?.id !==
-          amphoraId
-          ? [...familyKey, amphoraId]
-          : familyKey;
-      const activeQuery = client
-        .getQueryCache()
-        .find({ queryKey, exact: true });
-      client.cancelQueries({
-        queryKey: invalidationKey,
-        predicate: (query) => query !== activeQuery,
-      });
-      for (const query of client
-        .getQueryCache()
-        .findAll({ queryKey: invalidationKey })) {
-        query.setState({ data: undefined, dataUpdatedAt: 0 });
-      }
-    }
-    throw error;
-  }
-}
-
-function createParentalControlQueries(
-  userId: string,
-  accountId: string,
-  locale = getLocale(),
-) {
-  const familyKey = ["chatgpt-parental-controls", userId, accountId] as const;
-  const notificationsKey = [
-    "chatgpt-family-notifications",
-    userId,
-    accountId,
-  ] as const;
-  const accountHeader = { "ChatGPT-Account-ID": accountId };
+function M(e, t, r = C()) {
+  let i = [`chatgpt-parental-controls`, e, t],
+    a = [`chatgpt-family-notifications`, e, t],
+    o = { "ChatGPT-Account-ID": t };
   return {
     current: {
-      queryKey: [...familyKey, "current"],
-      queryFn: (context: QueryContext) =>
-        invalidateUnauthorizedFamilyQueries(
-          apiClient.safeGet("/amphora", {
-            additionalHeaders: accountHeader,
-            signal: context.signal,
-          }),
-          context,
-          familyKey,
-        ),
-      staleTime: queryDurations.ONE_MINUTE,
-      retry: false,
+      queryKey: [...i, `current`],
+      queryFn: (e) => N(E.safeGet(`/amphora`, { additionalHeaders: o, signal: e.signal }), e, i),
+      staleTime: n.ONE_MINUTE,
+      retry: !1,
     },
-    notifications: (cursor?: string | null) => ({
-      queryKey:
-        cursor == null ? notificationsKey : [...notificationsKey, cursor],
-      queryFn: async ({
-        signal,
-        client,
-        queryKey,
-      }: QueryContext): Promise<FamilyNotificationPage> => {
-        const before = client.getQueryData<FamilyNotificationPage>(queryKey);
-        const page = await apiClient.safeGet<FamilyNotificationPage>(
-          "/amphora/notifications",
-          {
-            additionalHeaders: accountHeader,
-            parameters: { query: { limit: 20, cursor } },
-            signal,
-          },
-        );
-        const optimistic =
-          client.getQueryData<FamilyNotificationPage>(queryKey);
+    notifications: (e) => ({
+      queryKey: e == null ? a : [...a, e],
+      queryFn: async ({ signal: t, client: n, queryKey: r }) => {
+        let i = n.getQueryData(r),
+          a = await E.safeGet(`/amphora/notifications`, {
+            additionalHeaders: o,
+            parameters: { query: { limit: 20, cursor: e } },
+            signal: t,
+          }),
+          s = n.getQueryData(r);
         return {
-          ...page,
+          ...a,
           items: [
-            ...page.items.map((item) => {
-              const current = optimistic?.items.find(
-                ({ id }) => id === item.id,
-              );
-              return current == null
-                ? item
+            ...a.items.map((e) => {
+              let t = s?.items.find(({ id: t }) => t === e.id);
+              return t == null
+                ? e
                 : {
-                    ...item,
-                    seen_at: item.seen_at ?? current.seen_at,
-                    reacted_to_at: item.reacted_to_at ?? current.reacted_to_at,
+                    ...e,
+                    seen_at: e.seen_at ?? t.seen_at,
+                    reacted_to_at: e.reacted_to_at ?? t.reacted_to_at,
                   };
             }),
-            ...(optimistic?.items.filter(
-              (item) =>
-                !page.items.some(({ id }) => id === item.id) &&
-                !before?.items.some(({ id }) => id === item.id),
+            ...(s?.items.filter(
+              (e) =>
+                !a.items.some(({ id: t }) => t === e.id) &&
+                !i?.items.some(({ id: t }) => t === e.id),
             ) ?? []),
           ],
         };
       },
-      staleTime: queryDurations.ONE_MINUTE,
-      retry: false,
+      staleTime: n.ONE_MINUTE,
+      retry: !1,
     }),
     layout: {
-      queryKey: [...familyKey, "layout", locale],
-      queryFn: ({ signal }: QueryContext) =>
-        apiClient.safeGet("/amphora/settings_layout", {
-          additionalHeaders: {
-            ...accountHeader,
-            [settingsLocaleHeader]: locale,
-          },
-          signal,
-        }),
-      staleTime: queryDurations.ONE_MINUTE,
-      retry: false,
+      queryKey: [...i, `layout`, r],
+      queryFn: ({ signal: e }) =>
+        E.safeGet(`/amphora/settings_layout`, { additionalHeaders: { ...o, [w]: r }, signal: e }),
+      staleTime: n.ONE_MINUTE,
+      retry: !1,
     },
-    settings: (amphoraId: string, memberUserId: string) => ({
-      queryKey: [...familyKey, amphoraId, memberUserId, "settings"],
-      queryFn: ({ signal }: QueryContext) =>
-        apiClient.safeGet("/amphora/{amphora_id}/members/{user_id}/settings", {
-          additionalHeaders: accountHeader,
+    settings: (e, t) => ({
+      queryKey: [...i, e, t, `settings`],
+      queryFn: ({ signal: n }) =>
+        E.safeGet(`/amphora/{amphora_id}/members/{user_id}/settings`, {
+          additionalHeaders: o,
           parameters: {
-            path: {
-              amphora_id: encodeURIComponent(amphoraId),
-              user_id: encodeURIComponent(memberUserId),
-            },
+            path: { amphora_id: encodeURIComponent(e), user_id: encodeURIComponent(t) },
           },
-          signal,
+          signal: n,
         }),
-      staleTime: queryDurations.ONE_MINUTE,
-      retry: false,
+      staleTime: n.ONE_MINUTE,
+      retry: !1,
     }),
-    members: (amphoraId: string) => ({
-      queryKey: [...familyKey, amphoraId, "members"],
-      queryFn: (context: QueryContext) =>
-        invalidateUnauthorizedFamilyQueries(
-          apiClient.safeGet("/amphora/{amphora_id}/members", {
-            additionalHeaders: accountHeader,
-            parameters: { path: { amphora_id: encodeURIComponent(amphoraId) } },
-            signal: context.signal,
+    members: (e) => ({
+      queryKey: [...i, e, `members`],
+      queryFn: (t) =>
+        N(
+          E.safeGet(`/amphora/{amphora_id}/members`, {
+            additionalHeaders: o,
+            parameters: { path: { amphora_id: encodeURIComponent(e) } },
+            signal: t.signal,
           }),
-          context,
-          familyKey,
-          amphoraId,
+          t,
+          i,
+          e,
         ),
-      staleTime: queryDurations.ONE_MINUTE,
-      retry: false,
+      staleTime: n.ONE_MINUTE,
+      retry: !1,
     }),
   };
 }
-
-const initializeParentalPresentationQueries = once(() => {
-  initializeApiClient();
-  initializeAccountRuntime();
-  initializeFamilyNotifications();
-  initializeFamilySettings();
-});
-
-function matchesActiveFamilyAccount(
-  scope: PresentationScope,
-  account: AccountIdentity,
-): boolean {
-  return (
-    scope.get(activeUserId) === account.userId &&
-    scope.get(familyAccountId) === account.accountId &&
-    scope.get(activeAccountId) === account.accountId
-  );
-}
-
-function isFamilyAccountLoading(
-  scope: PresentationScope,
-  account: AccountIdentity,
-): boolean {
-  return (
-    scope.get<ParentalAccessState>(parentalAccessState).status === "loading" &&
-    matchesActiveFamilyAccount(scope, account)
-  );
-}
-
-function notifyDecisionSubscribers(scope: PresentationScope): void {
-  decisionSubscribers.get(scope.node)?.forEach((listener) => listener());
-}
-
-function openFamilyNotification(
-  scope: PresentationScope,
-  notification: FamilyNotification,
-  account: AccountIdentity,
-  surface: NotificationSurface,
-): boolean {
-  if (
-    !hasParentalAccess(scope, account) ||
-    (notification.type === "family-invite" && scope.get(familyInvitePending))
-  ) {
-    return false;
-  }
-  if (familyDialogIsOpen(scope, FamilyNotificationDialog)) {
-    const current = openNotifications.get(scope.node);
-    if (
-      surface === "info" &&
-      current?.notificationId === notification.item.id &&
-      current.account.userId === account.userId &&
-      current.account.accountId === account.accountId
-    ) {
-      showFamilyNotification(scope, notification, account, "info");
-      return true;
+async function N(e, { client: t, queryKey: n, signal: r }, i, a) {
+  try {
+    return await e;
+  } catch (e) {
+    if (!r.aborted && e instanceof f && [401, 403, 404].includes(e.status)) {
+      let r =
+          e.status === 404 && a != null && t.getQueryData([...i, `current`])?.id !== a
+            ? [...i, a]
+            : i,
+        o = t.getQueryCache().find({ queryKey: n, exact: !0 });
+      t.cancelQueries({ queryKey: r, predicate: (e) => e !== o });
+      for (let e of t.getQueryCache().findAll({ queryKey: r }))
+        e.setState({ data: void 0, dataUpdatedAt: 0 });
     }
+    throw e;
   }
-  openNotifications.get(scope.node)?.stop();
-  openNotifications.delete(scope.node);
-  const history = notificationHistory.get(scope.node);
-  if (
-    history?.account.userId === account.userId &&
-    history.account.accountId === account.accountId
-  ) {
-    history.ids.add(notification.item.id);
-  } else {
-    notificationHistory.set(scope.node, {
-      account,
-      ids: new Set([notification.item.id]),
-    });
+}
+function P() {
+  return (P = e(() => {
+    (b(), l(), S(), D());
+  }))();
+}
+function F(e) {
+  Z.get(e.node)?.forEach((e) => e());
+}
+function I(e, t) {
+  return e.get(v) === t.userId && e.get(T) === t.accountId && e.get(h) === t.accountId;
+}
+function L(e, t) {
+  return e.get(y).status === `loading` && I(e, t);
+}
+function R(e, t, n, r) {
+  if (!A(e, n) || (t.type === `family-invite` && e.get(q))) return !1;
+  if (d(e, Q)) {
+    let i = J.get(e.node);
+    return (
+      r === `info` &&
+      i?.notificationId === t.item.id &&
+      i.account.userId === n.userId &&
+      i.account.accountId === n.accountId &&
+      (z(e, t, n, `info`), !0)
+    );
   }
-  showFamilyNotification(scope, notification, account, surface);
-  const stop = scope.watch((nextScope) => {
-    if (
-      notification.type === "family-invite" &&
-      nextScope.get(familyInvitePending)
-    ) {
-      dismissDialog(scope, FamilyNotificationDialog);
-    }
-    if (
-      !hasParentalAccess(nextScope, account) ||
-      !familyDialogIsOpen(nextScope, FamilyNotificationDialog)
-    ) {
-      cleanupFamilyPresentation(scope, account);
-    }
+  (J.get(e.node)?.stop(), J.delete(e.node));
+  let i = Y.get(e.node);
+  (i?.account.userId === n.userId && i.account.accountId === n.accountId
+    ? i.ids.add(t.item.id)
+    : Y.set(e.node, { account: n, ids: new Set([t.item.id]) }),
+    z(e, t, n, r));
+  let a = e.watch((r) => {
+    (t.type === `family-invite` && r.get(q) && k(e, Q), (!A(r, n) || !d(r, Q)) && W(e, n));
   });
-  openNotifications.set(scope.node, {
-    account,
-    notificationId: notification.item.id,
-    stop,
-  });
-  return true;
+  return (J.set(e.node, { account: n, notificationId: t.item.id, stop: a }), !0);
 }
-
-function showFamilyNotification(
-  scope: PresentationScope,
-  notification: FamilyNotification,
-  account: AccountIdentity,
-  surface: NotificationSurface,
-): void {
-  showDialog(
-    scope,
-    FamilyNotificationDialog,
+function z(e, t, n, r) {
+  g(
+    e,
+    Q,
     {
-      notification,
-      account,
-      initialSurface: surface,
+      notification: t,
+      account: n,
+      initialSurface: r,
       onClose: () => {
-        const current = openNotifications.get(scope.node);
-        if (
-          current?.notificationId === notification.item.id &&
-          current.account.userId === account.userId &&
-          current.account.accountId === account.accountId
-        ) {
-          current.stop();
-          openNotifications.delete(scope.node);
-        }
+        let r = J.get(e.node);
+        r?.notificationId === t.item.id &&
+          r.account.userId === n.userId &&
+          r.account.accountId === n.accountId &&
+          (r.stop(), J.delete(e.node));
       },
     },
-    { blocksOtherModals: surface === "info" },
+    { blocksOtherModals: r === `info` },
   );
 }
-
-function wasNotificationPresented(
-  scope: PresentationScope,
-  account: AccountIdentity,
-  notificationId: string,
-): boolean {
-  const history = notificationHistory.get(scope.node);
-  return (
-    history?.account.userId === account.userId &&
-    history.account.accountId === account.accountId &&
-    history.ids.has(notificationId)
-  );
+function B(e, t, n) {
+  let r = Y.get(e.node);
+  return r?.account.userId === t.userId && r.account.accountId === t.accountId && r.ids.has(n);
 }
-
-function getFamilyDecision(
-  scope: PresentationScope,
-  account: AccountIdentity,
-  key: string,
-): unknown {
-  const state = decisions.get(scope.node);
-  return matchesActiveFamilyAccount(scope, account) &&
-    state?.account.userId === account.userId &&
-    state.account.accountId === account.accountId
-    ? state.decisions.get(key)
-    : undefined;
+function V(e, t, n) {
+  let r = X.get(e.node);
+  return I(e, t) && r?.account.userId === t.userId && r.account.accountId === t.accountId
+    ? r.decisions.get(n)
+    : void 0;
 }
-
-function useFamilyDecision(
-  scope: PresentationScope,
-  account: AccountIdentity,
-  key: string,
-): unknown {
-  const subscribe = React.useCallback(
-    (listener: () => void) => {
-      let listeners = decisionSubscribers.get(scope.node);
-      if (listeners == null) {
-        listeners = new Set();
-        decisionSubscribers.set(scope.node, listeners);
-      }
-      listeners.add(listener);
-      return () => {
-        listeners?.delete(listener);
-        if (listeners?.size === 0) decisionSubscribers.delete(scope.node);
-      };
-    },
-    [scope.node],
-  );
-  const snapshot = React.useCallback(
-    () => getFamilyDecision(scope, account, key),
-    [account.accountId, account.userId, key, scope],
-  );
-  return React.useSyncExternalStore(subscribe, snapshot, snapshot);
+function H(e, t, n) {
+  let r = (0, G.c)(7),
+    { userId: i, accountId: a } = t,
+    o;
+  r[0] === e.node
+    ? (o = r[1])
+    : ((o = (t) => {
+        let n = Z.get(e.node);
+        return (
+          n ?? ((n = new Set()), Z.set(e.node, n)),
+          n.add(t),
+          () => {
+            (n.delete(t), n.size === 0 && Z.delete(e.node));
+          }
+        );
+      }),
+      (r[0] = e.node),
+      (r[1] = o));
+  let s = o,
+    c;
+  r[2] !== a || r[3] !== n || r[4] !== e || r[5] !== i
+    ? ((c = () => V(e, { userId: i, accountId: a }, n)),
+      (r[2] = a),
+      (r[3] = n),
+      (r[4] = e),
+      (r[5] = i),
+      (r[6] = c))
+    : (c = r[6]);
+  let l = c;
+  return (0, K.useSyncExternalStore)(s, l, l);
 }
-
-function setFamilyDecision(
-  scope: PresentationScope,
-  account: AccountIdentity,
-  key: string,
-  value: unknown,
-): void {
-  if (!matchesActiveFamilyAccount(scope, account)) return;
-  const current = decisions.get(scope.node);
-  if (
-    current?.account.userId === account.userId &&
-    current.account.accountId === account.accountId
-  ) {
-    current.decisions.set(key, value);
-    notifyDecisionSubscribers(scope);
+function U(e, t, n, r) {
+  if (!I(e, t)) return;
+  let i = X.get(e.node);
+  if (i?.account.userId === t.userId && i.account.accountId === t.accountId) {
+    (i.decisions.set(n, r), F(e));
     return;
   }
-  current?.stop();
-  const state: DecisionState = {
-    account,
-    decisions: new Map([[key, value]]),
-    stop: () => {},
-  };
-  decisions.set(scope.node, state);
-  notifyDecisionSubscribers(scope);
-  state.stop = scope.watch((nextScope) => {
-    if (
-      !matchesActiveFamilyAccount(nextScope, account) &&
-      decisions.get(scope.node) === state
-    ) {
-      decisions.delete(scope.node);
-      state.stop();
-      notifyDecisionSubscribers(scope);
-    }
-  });
+  i?.stop();
+  let a = { account: t, decisions: new Map([[n, r]]), stop: () => {} };
+  (X.set(e.node, a),
+    F(e),
+    (a.stop = e.watch((n) => {
+      !I(n, t) && X.get(e.node) === a && (X.delete(e.node), a.stop(), F(e));
+    })));
 }
-
-function cleanupFamilyPresentation(
-  scope: PresentationScope,
-  account: AccountIdentity,
-): void {
-  const inactive =
-    !hasParentalAccess(scope, account) &&
-    !isFamilyAccountLoading(scope, account);
-  const decisionState = decisions.get(scope.node);
-  if (
-    inactive &&
-    decisionState?.account.userId === account.userId &&
-    decisionState.account.accountId === account.accountId
-  ) {
-    decisionState.stop();
-    decisions.delete(scope.node);
-    notifyDecisionSubscribers(scope);
-  }
-  const history = notificationHistory.get(scope.node);
-  if (
-    inactive &&
-    history?.account.userId === account.userId &&
-    history.account.accountId === account.accountId
-  ) {
-    notificationHistory.delete(scope.node);
-  }
-  const open = openNotifications.get(scope.node);
-  if (
-    open?.account.userId === account.userId &&
-    open.account.accountId === account.accountId
-  ) {
-    if (inactive) {
-      open.stop();
-      openNotifications.delete(scope.node);
-      dismissDialog(scope, FamilyNotificationDialog);
-    } else if (!familyDialogIsOpen(scope, FamilyNotificationDialog)) {
-      open.stop();
-      openNotifications.delete(scope.node);
-    }
-  }
+function W(e, t) {
+  let n = !A(e, t) && !L(e, t),
+    r = X.get(e.node);
+  n &&
+    r?.account.userId === t.userId &&
+    r.account.accountId === t.accountId &&
+    (r.stop(), X.delete(e.node), F(e));
+  let i = Y.get(e.node);
+  n && i?.account.userId === t.userId && i.account.accountId === t.accountId && Y.delete(e.node);
+  let a = J.get(e.node);
+  a?.account.userId === t.userId &&
+    a.account.accountId === t.accountId &&
+    (n ? (a.stop(), J.delete(e.node), k(e, Q)) : d(e, Q) || (a.stop(), J.delete(e.node)));
 }
-
-const initializeParentalPresentation = once(() => {
-  initializeLazyRuntime();
-  initializeQueryRuntime();
-  initializeFamilyRuntime();
-  initializePepperOnboarding();
-  initializeDialogRuntime();
-  initializeFamilyQueries();
-  initializeScopedRuntime();
-  initializeAccountProvider();
-  initializeParentalQueryDependencies();
-  React = getReactRuntime();
-  familyInvitePending = createDerivedSignal(applicationScope, () => false);
-  FamilyNotificationDialog = React.lazy(async () => ({
-    default: (await import("@rchunk/family-notification-surface"))
-      .FamilyNotification as typeof FamilyNotificationComponent,
-  }));
-});
-
+var G, K, q, J, Y, X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((G = t()),
+      r(),
+      (K = c()),
+      m(),
+      p(),
+      _(),
+      x(),
+      a(),
+      O(),
+      j(),
+      i(),
+      (q = u(s, ({ get: e }) => !1)),
+      (J = new WeakMap()),
+      (Y = new WeakMap()),
+      (X = new WeakMap()),
+      (Z = new WeakMap()),
+      (Q = (0, K.lazy)(() =>
+        o(
+          async () => {
+            let { FamilyNotification: e } = await import(`@rchunk/family-notification-surface`);
+            return { FamilyNotification: e };
+          },
+          __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]),
+          import.meta.url,
+        ).then(({ FamilyNotification: e }) => ({ default: e })),
+      )));
+  }))();
+}
 export {
-  initializeParentalPresentation as a,
-  useFamilyDecision as c,
-  createParentalControlQueries as d,
-  initializeParentalQueryDependencies as f,
-  getFamilyDecision as i,
-  wasNotificationPresented as l,
-  cleanupFamilyPresentation as n,
-  openFamilyNotification as o,
-  hasParentalAccess as p,
-  familyInvitePending as r,
-  setFamilyDecision as s,
-  FamilyNotificationDialog as t,
-  initializeParentalPresentationQueries as u,
+  $ as a,
+  H as c,
+  M as d,
+  j as f,
+  V as i,
+  B as l,
+  W as n,
+  R as o,
+  A as p,
+  q as r,
+  U as s,
+  Q as t,
+  P as u,
 };

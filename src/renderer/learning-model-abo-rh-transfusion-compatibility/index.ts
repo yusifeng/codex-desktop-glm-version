@@ -1,49 +1,23 @@
-// ABO/Rh transfusion compatibility specification. Release chunk: type-99cca3d49ce0.js.
-import "@rchunk/rolldown-runtime";
-
-type BloodType = "O-" | "O+" | "A-" | "A+" | "B-" | "B+" | "AB-" | "AB+";
-interface BloodTypeParameter {
-  kind: "enum";
-  defaultValue: BloodType;
-  allowedValues: BloodType[];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `ABO_RH_TRANSFUSION_COMPATIBILITY`),
+      (n = `abo-rh-transfusion-compatibility-v1`),
+      (r = {
+        donorType: {
+          kind: `enum`,
+          defaultValue: `A+`,
+          allowedValues: [`O-`, `O+`, `A-`, `A+`, `B-`, `B+`, `AB-`, `AB+`],
+        },
+        recipientType: {
+          kind: `enum`,
+          defaultValue: `B-`,
+          allowedValues: [`O-`, `O+`, `A-`, `A+`, `B-`, `B+`, `AB-`, `AB+`],
+        },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-interface Specification {
-  type: "ABO_RH_TRANSFUSION_COMPATIBILITY";
-  version: 1;
-  thumbnailAssetKey: "abo-rh-transfusion-compatibility-v1";
-  parameters: {
-    donorType: BloodTypeParameter;
-    recipientType: BloodTypeParameter;
-  };
-}
-const bloodTypes: BloodType[] = [
-  "O-",
-  "O+",
-  "A-",
-  "A+",
-  "B-",
-  "B+",
-  "AB-",
-  "AB+",
-];
-let specification: Specification;
-function initializeSpecification(): void {
-  specification ??= {
-    type: "ABO_RH_TRANSFUSION_COMPATIBILITY",
-    version: 1,
-    thumbnailAssetKey: "abo-rh-transfusion-compatibility-v1",
-    parameters: {
-      donorType: {
-        kind: "enum",
-        defaultValue: "A+",
-        allowedValues: [...bloodTypes],
-      },
-      recipientType: {
-        kind: "enum",
-        defaultValue: "B-",
-        allowedValues: [...bloodTypes],
-      },
-    },
-  };
-}
-export { specification as n, initializeSpecification as t };
+export { i as n, a as t };

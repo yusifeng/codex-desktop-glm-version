@@ -1,50 +1,43 @@
-// Rational-inequality learning model: build a sign chart and solution intervals.
-import "@rchunk/rolldown-runtime";
-
-interface SignChartValues { step?: number | null }
-
-const signChartStepControl = { min: 1, max: 4, step: 1, defaultValue: 1 };
-const rationalInequalityCriticalPoints = [
-  { value: -1, source: "denominator" },
-  { value: 2, source: "numerator" },
-  { value: 4, source: "denominator" },
-] as const;
-const rationalInequalityIntervals = [
-  { id: "left", label: "(-∞, -1)", testPoint: -2 },
-  { id: "middle-left", label: "(-1, 2)", testPoint: 0 },
-  { id: "middle-right", label: "(2, 4)", testPoint: 3 },
-  { id: "right", label: "(4, ∞)", testPoint: 5 },
-] as const;
-
-const normalizeStep = (value: number | null | undefined): number =>
-  Number.isFinite(value)
-    ? Math.min(signChartStepControl.max, Math.max(signChartStepControl.min, Math.round(value as number)))
-    : signChartStepControl.defaultValue;
-const normalizeSignChartValues = (values: SignChartValues): { step: number } => ({ step: normalizeStep(values.step) });
-const factorSign = (value: number, root: number): -1 | 1 => value - root < 0 ? -1 : 1;
-
-function buildRationalInequalitySignChart() {
-  return rationalInequalityIntervals.map(({ id, label, testPoint }) => {
-    const numerator = factorSign(testPoint, 2);
-    const denominatorLeft = factorSign(testPoint, -1);
-    const denominatorRight = factorSign(testPoint, 4);
-    return { id, label, testPoint, numerator, denominatorLeft, denominatorRight, quotient: numerator * denominatorLeft * denominatorRight };
-  });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c;
+function l() {
+  return (l = e(() => {
+    ((t = { min: 1, max: 4, step: 1, defaultValue: 1 }),
+      (n = [
+        { value: -1, source: `denominator` },
+        { value: 2, source: `numerator` },
+        { value: 4, source: `denominator` },
+      ]),
+      (r = [
+        { id: `left`, label: `(-∞, -1)`, testPoint: -2 },
+        { id: `middle-left`, label: `(-1, 2)`, testPoint: 0 },
+        { id: `middle-right`, label: `(2, 4)`, testPoint: 3 },
+        { id: `right`, label: `(4, ∞)`, testPoint: 5 },
+      ]),
+      (i = (e) =>
+        Number.isFinite(e) ? Math.min(t.max, Math.max(t.min, Math.round(e))) : t.defaultValue),
+      (a = (e) => ({ step: i(e.step) })),
+      (o = (e, t) => (e - t < 0 ? -1 : 1)),
+      (s = () =>
+        r.map(({ id: e, label: t, testPoint: n }) => {
+          let r = o(n, 2),
+            i = o(n, -1),
+            a = o(n, 4);
+          return {
+            id: e,
+            label: t,
+            testPoint: n,
+            numerator: r,
+            denominatorLeft: i,
+            denominatorRight: a,
+            quotient: r * i * a,
+          };
+        })),
+      (c = () => [
+        { from: null, to: -1, includeFrom: !1, includeTo: !1, notation: `(-∞, -1)` },
+        { from: 2, to: 4, includeFrom: !0, includeTo: !1, notation: `[2, 4)` },
+      ]));
+  }))();
 }
-
-const getRationalInequalitySolution = () => [
-  { from: null, to: -1, includeFrom: false, includeTo: false, notation: "(-∞, -1)" },
-  { from: 2, to: 4, includeFrom: true, includeTo: false, notation: "[2, 4)" },
-];
-
-function initializeRationalInequalitySignChartModel(): void {}
-
-export {
-  getRationalInequalitySolution as a,
-  buildRationalInequalitySignChart as i,
-  rationalInequalityIntervals as n,
-  initializeRationalInequalitySignChartModel as o,
-  signChartStepControl as r,
-  normalizeSignChartValues as s,
-  rationalInequalityCriticalPoints as t,
-};
+export { c as a, s as i, r as n, l as o, t as r, a as s, n as t };

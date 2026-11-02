@@ -1,151 +1,110 @@
-// worktree-onboarding-state —— Home worktree 建议的持久化资格状态。
-
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as worktreesChunk from "@rchunk/use-codex-worktrees";
-import type {
-  ReactRuntime,
-  ScopedDerivedSignal,
-  ScopedSignal,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  HX as i,
+  LX as a,
+  QI as o,
+  ZI as s,
+  e6 as c,
+  sZ as l,
 } from "@rchunk/app-shared";
-
-void runtimeChunk;
-
-const {
-  $3: initializeJsxRuntime,
-  BX: useSignalFamilyValue,
-  FX: initializeSignalRuntime,
-  HX: useSignalValue,
-  LX: useSignalScope,
-  QI: initializeSharedRuntime,
-  ZI: applicationScope,
-  e6: reactRuntime,
-  sZ: createDerivedSignal,
-} = appSharedChunk;
-const {
-  Bfn: initializeHostFeatures,
-  Q4: runModeByProjectFamily,
-  Rht: initializeRunMode,
-  Vfn: getHostById,
-  dun: createPersistedSignal,
-  ifn: initializeExperiments,
-  jst: initializePromptState,
-  kht: onboardingScope,
-  kst: createProjectKey,
-  mdt: workspaceStateSignal,
-  ofn: isFeatureGateEnabled,
-  pdt: initializeWorkspaceState,
-  t3: promptSignal,
-  uun: initializeLocalHost,
-  x3: initializeProjectKey,
-} = appInitialChunk;
-const {
-  n: useCodexWorktrees,
-  t: initializeCodexWorktrees,
-} = worktreesChunk;
-
-type WorktreeOnboardingState = "dismissed" | "eligible" | "succeeded";
-
-let worktreeOnboardingStateSignal: ScopedSignal<
-  Record<string, unknown>,
-  WorktreeOnboardingState
->;
-let promptSuggestsWorktreesSignal: ScopedDerivedSignal<
-  Record<string, unknown>,
-  boolean
->;
-let React: ReactRuntime | null = null;
-let initialized = false;
-
-interface UseWorktreeOnboardingStateOptions {
-  enabled: boolean;
-  entryPoint: string;
-  isLocalModeRemote?: boolean;
+import {
+  Bfn as u,
+  Q4 as d,
+  Rht as f,
+  Vfn as p,
+  dun as m,
+  ifn as h,
+  jst as g,
+  kht as _,
+  kst as v,
+  mdt as y,
+  ofn as b,
+  pdt as x,
+  t3 as S,
+  uun as C,
+  x3 as w,
+} from "@rchunk/app-initial";
+import { n as T, t as E } from "@rchunk/use-codex-worktrees";
+function D(e, t, n) {
+  t.hostId === `local` &&
+    (t.isCodexWorktree || n) &&
+    e.get(M) === `eligible` &&
+    e.set(M, `succeeded`);
 }
-
-function promptSuggestsWorktrees(prompt: string): boolean {
+function O({ prompt: e }) {
   return /\b(?:worktrees?|parallel|another task|separate task|isolat(?:e|ed|ion)|keep my changes|without disturbing)\b/i.test(
-    prompt.trim(),
+    e.trim(),
   );
 }
-
-function useWorktreeOnboardingState({
-  enabled,
-  entryPoint,
-  isLocalModeRemote = false,
-}: UseWorktreeOnboardingStateOptions): { isEligible: boolean } {
-  initializeWorktreeOnboardingState();
-  if (React == null) {
-    throw new Error("Worktree onboarding React runtime failed to initialize");
-  }
-  const scope = useSignalScope(applicationScope);
-  const workspace = useSignalValue(workspaceStateSignal);
-  const state = useSignalValue(worktreeOnboardingStateSignal);
-  const host = getHostById(workspace.hostId);
-  const projectKey = createProjectKey({
-    cwd: workspace.cwd,
-    hostId: workspace.hostId,
-  });
-  const runMode = useSignalFamilyValue(runModeByProjectFamily, projectKey);
-  const promptEligible = useSignalValue(promptSuggestsWorktreesSignal);
-  const featureEnabled = isFeatureGateEnabled("2634243883");
-  const bannerEnabled = isFeatureGateEnabled("505458");
-  const shouldQuery =
-    enabled && state === "eligible" && featureEnabled && promptEligible;
-  const query = useCodexWorktrees(host, "home_page", { enabled: shouldQuery });
-  const hasWorktrees = (query.data?.worktrees?.length ?? 0) > 0;
-  React.useEffect(() => {
-    if (
-      workspace.hostId === "local" &&
-      (workspace.isCodexWorktree || hasWorktrees) &&
-      scope.get(worktreeOnboardingStateSignal) === "eligible"
-    ) {
-      scope.set(worktreeOnboardingStateSignal, "succeeded");
-    }
-  }, [hasWorktrees, scope, workspace]);
-  return {
-    isEligible:
-      shouldQuery &&
-      bannerEnabled &&
-      workspace.kind === "git" &&
-      runMode === "local" &&
-      query.data != null &&
-      !hasWorktrees &&
-      entryPoint === "codex" &&
-      workspace.hostId === "local" &&
-      !isLocalModeRemote,
-  };
+function k(e) {
+  let t = (0, A.c)(12),
+    { enabled: r, entryPoint: o, isLocalModeRemote: c } = e,
+    l = c !== void 0 && c,
+    u = a(s),
+    f = i(y),
+    m = i(M),
+    h = p(f.hostId),
+    g;
+  t[0] !== f.cwd || t[1] !== f.hostId
+    ? ((g = v({ cwd: f.cwd, hostId: f.hostId })), (t[0] = f.cwd), (t[1] = f.hostId), (t[2] = g))
+    : (g = t[2]);
+  let _ = n(d, g),
+    x = i(N),
+    S = b(`2634243883`),
+    C = b(`505458`),
+    w = r && m === `eligible` && S && x,
+    E;
+  t[3] === w ? (E = t[4]) : ((E = { enabled: w }), (t[3] = w), (t[4] = E));
+  let { data: O } = T(h, `home_page`, E),
+    k = O != null && O.worktrees.length > 0,
+    P,
+    F;
+  (t[5] !== k || t[6] !== f || t[7] !== u
+    ? ((P = () => {
+        D(u, f, k);
+      }),
+      (F = [k, f, u]),
+      (t[5] = k),
+      (t[6] = f),
+      (t[7] = u),
+      (t[8] = P),
+      (t[9] = F))
+    : ((P = t[8]), (F = t[9])),
+    (0, j.useEffect)(P, F));
+  let I =
+      w &&
+      C &&
+      f.kind === `git` &&
+      _ === `local` &&
+      O != null &&
+      !k &&
+      o === `codex` &&
+      f.hostId === `local` &&
+      !l,
+    L;
+  return (t[10] === I ? (L = t[11]) : ((L = { isEligible: I }), (t[10] = I), (t[11] = L)), L);
 }
-
-function initializeWorktreeOnboardingState(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeJsxRuntime?.();
-  initializeSignalRuntime?.();
-  React =
-    typeof reactRuntime === "function" ? reactRuntime() : reactRuntime;
-  initializeCodexWorktrees?.();
-  initializeWorkspaceState?.();
-  initializeSharedRuntime?.();
-  initializeRunMode?.();
-  initializeHostFeatures?.();
-  initializeExperiments?.();
-  initializeLocalHost?.();
-  initializePromptState?.();
-  initializeProjectKey?.();
-  worktreeOnboardingStateSignal = createPersistedSignal<WorktreeOnboardingState>(
-    "worktree-onboarding-state-v1",
-    "eligible",
-  );
-  promptSuggestsWorktreesSignal = createDerivedSignal(
-    onboardingScope,
-    ({ get }) => promptSuggestsWorktrees(get(promptSignal)),
-  );
+var A, j, M, N;
+function P() {
+  return (P = e(() => {
+    ((A = t()),
+      r(),
+      (j = c()),
+      E(),
+      x(),
+      o(),
+      f(),
+      u(),
+      h(),
+      C(),
+      g(),
+      w(),
+      (M = m(`worktree-onboarding-state-v1`, `eligible`)),
+      (N = l(_, ({ get: e }) => O({ prompt: e(S) }))));
+  }))();
 }
-
-export {
-  useWorktreeOnboardingState as n,
-  worktreeOnboardingStateSignal as r,
-  initializeWorktreeOnboardingState as t,
-};
+export { k as n, M as r, P as t };

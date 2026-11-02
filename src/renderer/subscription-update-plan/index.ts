@@ -1,64 +1,33 @@
-// subscription-update-plan —— 前端套餐枚举与订阅更新 API plan slug 的双向映射。
-// 原版：app/webview/assets/subscription-update-plan-21755a439e4a.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appInitialChunk from "@rchunk/app-initial";
-
-void runtimeChunk;
-
-const {
-  Pdn: subscriptionPlans,
-  Rln: initializeSubscriptionPlans,
-} = appInitialChunk;
-
-type SubscriptionPlan =
-  (typeof subscriptionPlans)[keyof typeof subscriptionPlans];
-
-type SubscriptionPlanSlug =
-  "chatgptgoplan" | "chatgptplusplan" | "chatgptprolite" | "chatgptpro";
-
-function subscriptionPlanToSlug(
-  plan: SubscriptionPlan,
-): SubscriptionPlanSlug | undefined {
-  switch (plan) {
-    case subscriptionPlans.GO:
-      return "chatgptgoplan";
-    case subscriptionPlans.PLUS:
-      return "chatgptplusplan";
-    case subscriptionPlans.PROLITE:
-      return "chatgptprolite";
-    case subscriptionPlans.PRO:
-      return "chatgptpro";
-    default:
-      return undefined;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { Pdn as t, Rln as n } from "@rchunk/app-initial";
+function r(e) {
+  switch (e) {
+    case t.GO:
+      return `chatgptgoplan`;
+    case t.PLUS:
+      return `chatgptplusplan`;
+    case t.PROLITE:
+      return `chatgptprolite`;
+    case t.PRO:
+      return `chatgptpro`;
   }
 }
-
-function subscriptionPlanFromSlug(
-  slug: string,
-): SubscriptionPlan | undefined {
-  switch (slug) {
-    case "chatgptgoplan":
-      return subscriptionPlans.GO;
-    case "chatgptplusplan":
-      return subscriptionPlans.PLUS;
-    case "chatgptprolite":
-      return subscriptionPlans.PROLITE;
-    case "chatgptpro":
-      return subscriptionPlans.PRO;
-    default:
-      return undefined;
+function i(e) {
+  switch (e) {
+    case `chatgptgoplan`:
+      return t.GO;
+    case `chatgptplusplan`:
+      return t.PLUS;
+    case `chatgptprolite`:
+      return t.PROLITE;
+    case `chatgptpro`:
+      return t.PRO;
   }
 }
-
-function initializeSubscriptionUpdatePlan(): void {
-  initializeSubscriptionPlans();
+function a() {
+  return (a = e(() => {
+    n();
+  }))();
 }
-
-initializeSubscriptionUpdatePlan();
-
-export {
-  subscriptionPlanFromSlug as n,
-  initializeSubscriptionUpdatePlan as r,
-  subscriptionPlanToSlug as t,
-};
+export { i as n, a as r, r as t };

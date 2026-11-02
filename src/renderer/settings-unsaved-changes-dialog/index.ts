@@ -1,137 +1,135 @@
-// settings-unsaved-changes-dialog —— 离开设置前丢弃未保存更改的确认弹窗。
-// 原版：app/webview/assets/settings-unsaved-changes-dialog-b754fcf540d8.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-void runtimeChunk;
-const {
-  $3: initializeJsxRuntime,
-  Ah: DialogHeader,
-  I3: getJsxRuntime,
-  Ih: Dialog,
-  K2: initializeIntlRuntime,
-  Lh: DialogDescription,
-  Oh: DialogBody,
-  Ph: initializeDialogLayout,
-  Rh: DialogTitle,
-  Y2: FormattedMessage,
-  Yh: Button,
-  Zh: initializeButton,
-  jh: DialogSection,
-  kh: DialogFooter,
-  zh: initializeDialog,
-} = appSharedChunk;
-
-let jsxRuntime: JsxRuntime | null = null;
-
-interface SettingsUnsavedChangesDialogProps {
-  pendingNavigation?: (() => void) | null;
-  onClearPendingNavigation(): void;
-}
-
-interface FormSubmitEvent {
-  preventDefault(): void;
-}
-
-function SettingsUnsavedChangesDialog({
-  pendingNavigation,
-  onClearPendingNavigation,
-}: SettingsUnsavedChangesDialogProps): unknown {
-  const jsx = getInitializedJsxRuntime();
-  const handleOpenChange = (open: boolean) => {
-    if (!open) onClearPendingNavigation();
-  };
-  const handleSubmit = (event: FormSubmitEvent) => {
-    event.preventDefault();
-    const navigate = pendingNavigation;
-    onClearPendingNavigation();
-    navigate?.();
-  };
-  const title = jsx.jsx(DialogTitle, {
-    children: jsx.jsx(FormattedMessage, {
-      id: "settings.unsavedChanges.discardTitle",
-      defaultMessage: "Discard changes?",
-      description:
-        "Title for the confirmation dialog shown before leaving Settings with unsaved changes",
-    }),
-  });
-  const heading = jsx.jsx(DialogSection, {
-    children: jsx.jsx(DialogHeader, {
-      title,
-      subtitle: jsx.jsx(DialogDescription, {
-        children: jsx.jsx(FormattedMessage, {
-          id: "settings.unsavedChanges.discardDescription",
-          defaultMessage:
-            "You have unsaved changes. If you leave now, your changes will be lost.",
-          description:
-            "Description for the confirmation dialog shown before leaving Settings with unsaved changes",
-        }),
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Ah as n,
+  I3 as r,
+  Ih as i,
+  K2 as a,
+  Lh as o,
+  Oh as s,
+  Ph as c,
+  Rh as l,
+  Y2 as u,
+  Yh as d,
+  Zh as f,
+  jh as p,
+  kh as m,
+  zh as h,
+} from "@rchunk/app-shared";
+function g(e) {
+  let t = (0, _.c)(20),
+    { pendingNavigation: r, onClearPendingNavigation: a } = e,
+    c = r != null,
+    f;
+  t[0] === a
+    ? (f = t[1])
+    : ((f = (e) => {
+        e || a();
       }),
-    }),
-  });
-  const keepEditingButton = jsx.jsx(Button, {
-    color: "secondary",
-    type: "button",
-    onClick: onClearPendingNavigation,
-    children: jsx.jsx(FormattedMessage, {
-      id: "settings.unsavedChanges.keepEditing",
-      defaultMessage: "Keep editing",
-      description:
-        "Button label for returning to Settings instead of discarding unsaved changes",
-    }),
-  });
-  const discardButton = jsx.jsx(Button, {
-    color: "danger",
-    type: "submit",
-    children: jsx.jsx(FormattedMessage, {
-      id: "settings.unsavedChanges.discard",
-      defaultMessage: "Discard changes",
-      description: "Button label for discarding unsaved Settings changes",
-    }),
-  });
-  const footer = jsx.jsx(DialogSection, {
-    children: jsx.jsxs(DialogFooter, {
-      children: [keepEditingButton, discardButton],
-    }),
-  });
-  const form = jsx.jsxs(DialogBody, {
-    as: "form",
-    onSubmit: handleSubmit,
-    children: [heading, footer],
-  });
-
-  return jsx.jsx(Dialog, {
-    open: pendingNavigation != null,
-    showDialogClose: false,
-    size: "compact",
-    onOpenChange: handleOpenChange,
-    children: form,
-  });
+      (t[0] = a),
+      (t[1] = f));
+  let h;
+  t[2] !== a || t[3] !== r
+    ? ((h = (e) => {
+        e.preventDefault();
+        let t = r;
+        (a(), t?.());
+      }),
+      (t[2] = a),
+      (t[3] = r),
+      (t[4] = h))
+    : (h = t[4]);
+  let g;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((g = (0, v.jsx)(l, {
+        children: (0, v.jsx)(u, {
+          id: `settings.unsavedChanges.discardTitle`,
+          defaultMessage: `Discard changes?`,
+          description: `Title for the confirmation dialog shown before leaving Settings with unsaved changes`,
+        }),
+      })),
+      (t[5] = g))
+    : (g = t[5]);
+  let y;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((y = (0, v.jsx)(p, {
+        children: (0, v.jsx)(n, {
+          title: g,
+          subtitle: (0, v.jsx)(o, {
+            children: (0, v.jsx)(u, {
+              id: `settings.unsavedChanges.discardDescription`,
+              defaultMessage: `You have unsaved changes. If you leave now, your changes will be lost.`,
+              description: `Description for the confirmation dialog shown before leaving Settings with unsaved changes`,
+            }),
+          }),
+        }),
+      })),
+      (t[6] = y))
+    : (y = t[6]);
+  let b;
+  t[7] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((b = (0, v.jsx)(u, {
+        id: `settings.unsavedChanges.keepEditing`,
+        defaultMessage: `Keep editing`,
+        description: `Button label for returning to Settings instead of discarding unsaved changes`,
+      })),
+      (t[7] = b))
+    : (b = t[7]);
+  let x;
+  t[8] === a
+    ? (x = t[9])
+    : ((x = (0, v.jsx)(d, { color: `secondary`, type: `button`, onClick: a, children: b })),
+      (t[8] = a),
+      (t[9] = x));
+  let S;
+  t[10] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((S = (0, v.jsx)(d, {
+        color: `danger`,
+        type: `submit`,
+        children: (0, v.jsx)(u, {
+          id: `settings.unsavedChanges.discard`,
+          defaultMessage: `Discard changes`,
+          description: `Button label for discarding unsaved Settings changes`,
+        }),
+      })),
+      (t[10] = S))
+    : (S = t[10]);
+  let C;
+  t[11] === x
+    ? (C = t[12])
+    : ((C = (0, v.jsx)(p, { children: (0, v.jsxs)(m, { children: [x, S] }) })),
+      (t[11] = x),
+      (t[12] = C));
+  let w;
+  t[13] !== h || t[14] !== C
+    ? ((w = (0, v.jsxs)(s, { as: `form`, onSubmit: h, children: [y, C] })),
+      (t[13] = h),
+      (t[14] = C),
+      (t[15] = w))
+    : (w = t[15]);
+  let T;
+  return (
+    t[16] !== c || t[17] !== w || t[18] !== f
+      ? ((T = (0, v.jsx)(i, {
+          open: c,
+          showDialogClose: !1,
+          size: `compact`,
+          onOpenChange: f,
+          children: w,
+        })),
+        (t[16] = c),
+        (t[17] = w),
+        (t[18] = f),
+        (t[19] = T))
+      : (T = t[19]),
+    T
+  );
 }
-
-function initializeSettingsUnsavedChangesDialog(): void {
-  if (jsxRuntime != null) return;
-  initializeJsxRuntime();
-  initializeIntlRuntime();
-  initializeButton();
-  initializeDialog();
-  initializeDialogLayout();
-  jsxRuntime = getJsxRuntime();
+var _, v;
+function y() {
+  return (y = e(() => {
+    ((_ = t()), a(), f(), h(), c(), (v = r()));
+  }))();
 }
-
-function getInitializedJsxRuntime(): JsxRuntime {
-  initializeSettingsUnsavedChangesDialog();
-  if (jsxRuntime == null) {
-    throw new Error("Unsaved settings dialog JSX runtime failed to initialize");
-  }
-  return jsxRuntime;
-}
-
-initializeSettingsUnsavedChangesDialog();
-
-export {
-  initializeSettingsUnsavedChangesDialog as n,
-  SettingsUnsavedChangesDialog as t,
-};
+export { y as n, g as t };

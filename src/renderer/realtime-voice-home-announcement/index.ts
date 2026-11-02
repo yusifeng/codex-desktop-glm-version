@@ -1,119 +1,106 @@
-// realtime-voice-home-announcement —— Home 页实时语音入口公告。
-// 原版：app/webview/assets/realtime-voice-home-announcement-1020c8788781.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as announcementStateChunk from "@rchunk/home-announcement-state";
-
-void runtimeChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  I3: getJsxRuntime,
-  K2: initializeSharedComponents,
-  Y2: FormattedMessage,
-  ag: initializeDismissIcon,
-  ig: dismissIcon,
-  n4: useIntl,
-} = appSharedChunk;
-const { Announcement, initializeAnnouncement } = (() => {
-  const state = announcementStateChunk.t as typeof announcementStateChunk.t & {
-    presentation: {
-      Banner: (props: Record<string, unknown>) => unknown;
-      initializeBanner(): void;
-    };
-  };
-  return {
-    Announcement: state.presentation.Banner,
-    initializeAnnouncement: state.presentation.initializeBanner,
-  };
-})();
-
-const DEFAULT_ORB_SRC =
-  "https://persistent.oaistatic.com/voice/bidi-homepage-banner-orb.21107572.webp";
-
-interface RealtimeVoiceHomeAnnouncementContentProps {
-  entryPoint: "chatgpt" | "codex" | string;
-  onDismiss(): void;
-  onStart(): void;
-  orbSrc?: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  I3 as n,
+  K2 as r,
+  Y2 as i,
+  ag as a,
+  ig as o,
+  n4 as s,
+} from "@rchunk/app-shared";
+import { Cm as c, Sm as l } from "@rchunk/app-primary";
+function u(e) {
+  let t = (0, d.c)(18),
+    { entryPoint: n, onDismiss: r, onStart: a, orbSrc: c } = e,
+    u = c === void 0 ? p : c,
+    m = s(),
+    h;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((h = (0, f.jsx)(i, {
+        id: `realtimeVoice.homeAnnouncement.title`,
+        defaultMessage: `Try ChatGPT Voice`,
+        description: `Title shown in the Home banner introducing realtime voice`,
+      })),
+      (t[0] = h))
+    : (h = t[0]);
+  let g;
+  t[1] === n
+    ? (g = t[2])
+    : ((g =
+        n === `chatgpt`
+          ? (0, f.jsx)(i, {
+              id: `realtimeVoice.homeAnnouncement.description.chatgpt`,
+              defaultMessage: `Coordinate tasks, connect tools, and explore ideas`,
+              description: `Description shown in the ChatGPT Home banner introducing realtime voice`,
+            })
+          : (0, f.jsx)(i, {
+              id: `realtimeVoice.homeAnnouncement.description.codex`,
+              defaultMessage: `Orchestrate tasks, connect tools, and explore code`,
+              description: `Description shown in the Codex Home banner introducing realtime voice`,
+            })),
+      (t[1] = n),
+      (t[2] = g));
+  let _;
+  t[3] === u
+    ? (_ = t[4])
+    : ((_ = (0, f.jsx)(`img`, { alt: ``, className: `size-full`, src: u })),
+      (t[3] = u),
+      (t[4] = _));
+  let v;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((v = (0, f.jsx)(i, {
+        id: `realtimeVoice.homeAnnouncement.action`,
+        defaultMessage: `Start Voice`,
+        description: `Button label in the Home banner that opens realtime voice onboarding`,
+      })),
+      (t[5] = v))
+    : (v = t[5]);
+  let y;
+  t[6] === a ? (y = t[7]) : ((y = { label: v, onClick: a }), (t[6] = a), (t[7] = y));
+  let b;
+  t[8] === m
+    ? (b = t[9])
+    : ((b = m.formatMessage({
+        id: `realtimeVoice.homeAnnouncement.dismiss`,
+        defaultMessage: `Dismiss voice chat banner`,
+        description: `Accessible label for dismissing the realtime voice Home banner`,
+      })),
+      (t[8] = m),
+      (t[9] = b));
+  let x;
+  t[10] !== r || t[11] !== b
+    ? ((x = { ariaLabel: b, icon: o, onClick: r }), (t[10] = r), (t[11] = b), (t[12] = x))
+    : (x = t[12]);
+  let S;
+  return (
+    t[13] !== g || t[14] !== _ || t[15] !== y || t[16] !== x
+      ? ((S = (0, f.jsx)(l, {
+          title: h,
+          description: g,
+          leadingVisual: _,
+          primaryAction: y,
+          dismissAction: x,
+        })),
+        (t[13] = g),
+        (t[14] = _),
+        (t[15] = y),
+        (t[16] = x),
+        (t[17] = S))
+      : (S = t[17]),
+    S
+  );
 }
-
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-let initialized = false;
-
-function initializeRealtimeVoiceHomeAnnouncement(): void {
-  if (initialized) return;
-  initializeRuntimeLazy();
-  initializeSharedComponents();
-  initializeAnnouncement();
-  initializeDismissIcon();
-  jsx = getJsxRuntime();
-  initialized = true;
+var d, f, p;
+function m() {
+  return (m = e(() => {
+    ((d = t()),
+      r(),
+      c(),
+      a(),
+      (f = n()),
+      (p = `https://persistent.oaistatic.com/voice/bidi-homepage-banner-orb.21107572.webp`));
+  }))();
 }
-
-function RealtimeVoiceHomeAnnouncementContent({
-  entryPoint,
-  onDismiss,
-  onStart,
-  orbSrc = DEFAULT_ORB_SRC,
-}: RealtimeVoiceHomeAnnouncementContentProps): unknown {
-  initializeRealtimeVoiceHomeAnnouncement();
-  const intl = useIntl();
-
-  const title = jsx.jsx(FormattedMessage, {
-    id: "realtimeVoice.homeAnnouncement.title",
-    defaultMessage: "Try ChatGPT Voice",
-    description: "Title shown in the Home banner introducing realtime voice",
-  });
-  const description =
-    entryPoint === "chatgpt"
-      ? jsx.jsx(FormattedMessage, {
-          id: "realtimeVoice.homeAnnouncement.description.chatgpt",
-          defaultMessage: "Coordinate tasks, connect tools, and explore ideas",
-          description:
-            "Description shown in the ChatGPT Home banner introducing realtime voice",
-        })
-      : jsx.jsx(FormattedMessage, {
-          id: "realtimeVoice.homeAnnouncement.description.codex",
-          defaultMessage: "Orchestrate tasks, connect tools, and explore code",
-          description:
-            "Description shown in the Codex Home banner introducing realtime voice",
-        });
-  const leadingVisual = jsx.jsx("img", {
-    alt: "",
-    className: "size-full",
-    src: orbSrc,
-  });
-  const primaryAction = {
-    label: jsx.jsx(FormattedMessage, {
-      id: "realtimeVoice.homeAnnouncement.action",
-      defaultMessage: "Start Voice",
-      description:
-        "Button label in the Home banner that opens realtime voice onboarding",
-    }),
-    onClick: onStart,
-  };
-  const dismissAction = {
-    ariaLabel: intl.formatMessage({
-      id: "realtimeVoice.homeAnnouncement.dismiss",
-      defaultMessage: "Dismiss voice chat banner",
-      description:
-        "Accessible label for dismissing the realtime voice Home banner",
-    }),
-    icon: dismissIcon,
-    onClick: onDismiss,
-  };
-
-  return jsx.jsx(Announcement, {
-    title,
-    description,
-    leadingVisual,
-    primaryAction,
-    dismissAction,
-  });
-}
-
-initializeRealtimeVoiceHomeAnnouncement();
-
-export { RealtimeVoiceHomeAnnouncementContent };
+m();
+export { u as RealtimeVoiceHomeAnnouncementContent };

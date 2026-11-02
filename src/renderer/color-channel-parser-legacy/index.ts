@@ -1,17 +1,10 @@
-// Lazy legacy color-channel parser bridge. Release chunk: channel-b05b0fc90e5c.js.
-import "@rchunk/rolldown-runtime";
-import * as colorRuntimeChunk from "@rchunk/color-channel-runtime-legacy";
-
-interface ParsedColor { [channel: string]: number | undefined }
-interface ColorRuntime { ft: { parse(value: string): ParsedColor }; ht(): void; mt: { lang: { round(value: number | undefined): number } }; pt(): void }
-const colorRuntime = colorRuntimeChunk as unknown as ColorRuntime;
-let initialized = false;
-let parseRoundedColorChannel: (value: string, channel: string) => number;
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  colorRuntime.ht();
-  colorRuntime.pt();
-  parseRoundedColorChannel = (value, channel) => colorRuntime.mt.lang.round(colorRuntime.ft.parse(value)[channel]);
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { ft as t, ht as n, mt as r, pt as i } from "@rchunk/color-channel-runtime-legacy";
+var a;
+function o() {
+  return (o = e(() => {
+    (n(), i(), (a = (e, n) => r.lang.round(t.parse(e)[n])));
+  }))();
 }
-export { initialize as n, parseRoundedColorChannel as t };
+export { o as n, a as t };

@@ -1,196 +1,138 @@
-// home-entry-point —— Home composer 下方的 CME 快捷入口。
-
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as cmeChunk from "@rchunk/chatgpt-cme";
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-
-void runtimeChunk;
-
-const {
-  $3: initializeJsxRuntimeLazy,
-  Eu: initializeComposerEditorState,
-  FX: initializeSignalRuntime,
-  HX: useSignalValue,
-  I3: jsxRuntime,
-  K2: initializeIntl,
-  LX: useSignalScope,
-  Vb: CmeIcon,
-  Y2: FormattedMessage,
-  Yh: Button,
-  Zh: initializeButton,
-  lw: initializeImportIcons,
-  wu: composerMentionState,
-  sZ: createDerivedSignal,
-} = appSharedChunk;
-const {
-  $Bt: initializeAccountHints,
-  HZ: useComposerEditor,
-  M9: initializeMediaQuery,
-  N9: matchesMediaQuery,
-  NIt: selectedComposerModesSignal,
-  Qgn: initializeAccountQueries,
-  RIt: initializeComposerReadiness,
-  Rht: initializeWorkspaceState,
-  Rln: initializeAccountPlanHelpers,
-  UZ: useEditorPredicate,
-  VZ: initializeComposerEditorBridge,
-  Vln: isEligibleCmePlan,
-  Xet: accountCapabilitySignal,
-  YBt: accountSystemHintsSignal,
-  Zet: initializeComposerState,
-  b2: setComposerModes,
-  i_n: useRouterLocation,
-  kht: applicationScope,
-  rht: initializeAccountState,
-  uht: useCurrentAccount,
-  v2: composerModesSignal,
-  vln: initializePlanEligibility,
-  xpn: logAnalyticsEvent,
-  y2: initializeComposerModeState,
-  yln: hasUnsupportedHomeSearch,
-  ypn: initializeAnalytics,
-} = appInitialChunk;
-const {
-  n: cmeAnalyticsEvent,
-  r: initializeCme,
-} = cmeChunk;
-
-interface JsxRuntime {
-  jsx(type: unknown, props: unknown): unknown;
-  jsxs(type: unknown, props: unknown): unknown;
-}
-
-interface ComposerEditor {
-  focus?(): void;
-  hasText(): boolean;
-  view: { state: unknown };
-}
-
-interface AccountCheckResult {
-  account_ordering?: string[];
-}
-
-type EligibilitySignal = import("@rchunk/app-shared").ScopedDerivedSignal<
-  unknown,
-  boolean
->;
-
-function resolveRuntime<Runtime>(runtimeOrFactory: unknown): Runtime {
-  return (typeof runtimeOrFactory === "function"
-    ? runtimeOrFactory()
-    : runtimeOrFactory) as Runtime;
-}
-
-let jsx: JsxRuntime | null = null;
-let cmeEligibilitySignal = Symbol(
-  "cme-home-entry-point",
-) as unknown as EligibilitySignal;
-let initialized = false;
-
-function editorIsEmpty(editor: ComposerEditor): boolean {
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Eu as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  K2 as o,
+  LX as s,
+  Vb as c,
+  Y2 as l,
+  Yh as u,
+  Zh as d,
+  lw as f,
+  sZ as p,
+  wu as m,
+} from "@rchunk/app-shared";
+import {
+  $Bt as h,
+  HZ as g,
+  M9 as _,
+  N9 as v,
+  NIt as y,
+  Qgn as b,
+  RIt as x,
+  Rht as S,
+  Rln as C,
+  UZ as w,
+  VZ as T,
+  Vln as E,
+  Xet as D,
+  YBt as O,
+  Zet as k,
+  b2 as A,
+  i_n as j,
+  kht as M,
+  rht as N,
+  uht as P,
+  v2 as F,
+  vln as I,
+  xpn as L,
+  y2 as R,
+  yln as z,
+  ypn as B,
+} from "@rchunk/app-initial";
+import { n as V, r as H } from "@rchunk/chatgpt-cme";
+function U() {
+  let e = (0, G.c)(8),
+    t = s(M),
+    n = g(),
+    r = w(n, W),
+    { data: a } = P(),
+    o = i(q),
+    { search: d } = j();
+  if (v(`(width < 48rem)`) || !E(a?.plan_type) || !o || !r || z(d)) return null;
+  let f;
+  e[0] !== n || e[1] !== a?.id || e[2] !== t
+    ? ((f = () => {
+        let e = t.queryClient.getQueryData([`accounts`, `check`]);
+        t.get(q) &&
+          e?.account_ordering?.[0] === a?.id &&
+          (A(t, t.get(F), [`cme`]), n.focus(), L(t, V, {}));
+      }),
+      (e[0] = n),
+      (e[1] = a?.id),
+      (e[2] = t),
+      (e[3] = f))
+    : (f = e[3]);
+  let p = f,
+    m,
+    h;
+  e[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((m = (0, K.jsx)(c, {})),
+      (h = (0, K.jsx)(l, {
+        id: `chatgpt.composer.connector_pill.cme.button.label`,
+        defaultMessage: `Try Continuing Medical Education (CME)`,
+        description: `Button below the new-chat composer in a clinician workspace. Selects the Continuing Medical Education tool without sending a message.`,
+      })),
+      (e[4] = m),
+      (e[5] = h))
+    : ((m = e[4]), (h = e[5]));
+  let _;
   return (
-    !editor.hasText() &&
-    composerMentionState?.getState(editor.view.state)?.active !== true
+    e[6] === p
+      ? (_ = e[7])
+      : ((_ = (0, K.jsx)(`div`, {
+          className: `mt-11 flex justify-center max-md:hidden`,
+          children: (0, K.jsxs)(u, {
+            color: `outlineGhost`,
+            radius: `full`,
+            size: `large`,
+            onClick: p,
+            children: [m, h],
+          }),
+        })),
+        (e[6] = p),
+        (e[7] = _)),
+    _
   );
 }
-
-function CmeHomeEntryPoint(): unknown {
-  initializeCmeHomeEntryPoint();
-  const scope = useSignalScope(applicationScope);
-  const editor = useComposerEditor?.() as ComposerEditor | undefined;
-  const editorReady = useEditorPredicate?.(editor, editorIsEmpty) ?? true;
-  const account = useCurrentAccount?.() ?? {
-    data: undefined,
-    isLoading: false,
-  };
-  const eligible = useSignalValue(cmeEligibilitySignal) === true;
-  const location = useRouterLocation?.() ?? { search: "" };
-  if (
-    matchesMediaQuery?.("(width < 48rem)") ||
-    !isEligibleCmePlan?.(account.data?.plan_type) ||
-    !eligible ||
-    !editorReady ||
-    hasUnsupportedHomeSearch?.(location.search)
-  ) {
-    return null;
-  }
-  const onClick = () => {
-    const queryClient = scope.queryClient as {
-      getQueryData?<Data>(queryKey: readonly unknown[]): Data | undefined;
-    };
-    const accountCheck = queryClient.getQueryData?.<AccountCheckResult>([
-      "accounts",
-      "check",
-    ]);
-    if (
-      scope.get(cmeEligibilitySignal) &&
-      accountCheck?.account_ordering?.[0] === account.data?.id
-    ) {
-      setComposerModes?.(scope, scope.get(composerModesSignal), ["cme"]);
-      editor?.focus?.();
-      logAnalyticsEvent?.(scope, cmeAnalyticsEvent, {});
-    }
-  };
-  const renderer = jsx as JsxRuntime;
-  const ButtonComponent = Button ?? "button";
-  return renderer.jsx("div", {
-    className: "mt-11 flex justify-center max-md:hidden",
-    children: renderer.jsxs(ButtonComponent, {
-      color: "outlineGhost",
-      radius: "full",
-      size: "large",
-      onClick,
-      children: [
-        CmeIcon == null ? null : renderer.jsx(CmeIcon, {}),
-        renderer.jsx(FormattedMessage, {
-          id: "chatgpt.composer.connector_pill.cme.button.label",
-          defaultMessage: "Try Continuing Medical Education (CME)",
-          description:
-            "Button below the new-chat composer in a clinician workspace.",
-        }),
-      ],
-    }),
-  });
+function W(e) {
+  return !e.hasText() && m.getState(e.view.state)?.active !== !0;
 }
-
-function initializeCmeHomeEntryPoint(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeJsxRuntimeLazy?.();
-  initializeCme?.();
-  initializeSignalRuntime?.();
-  initializeIntl?.();
-  initializeAccountQueries?.();
-  initializeComposerState?.();
-  initializeComposerReadiness?.();
-  initializeAccountHints?.();
-  initializeComposerModeState?.();
-  initializePlanEligibility?.();
-  initializeAccountState?.();
-  initializeComposerEditorState?.();
-  initializeComposerEditorBridge?.();
-  initializeButton?.();
-  initializeImportIcons?.();
-  initializeMediaQuery?.();
-  initializeAnalytics?.();
-  initializeWorkspaceState?.();
-  initializeAccountPlanHelpers?.();
-  jsx ??= resolveRuntime<JsxRuntime>(jsxRuntime);
-  cmeEligibilitySignal =
-    createDerivedSignal(
-      applicationScope,
-      ({ get }) =>
-        get<{ isCapable?: boolean }>(accountCapabilitySignal, {
-          name: "chatgpt.cme",
-        }).isCapable === true &&
-        get<unknown[]>(selectedComposerModesSignal, get(composerModesSignal)).length === 0 &&
-        get<{ data?: Array<{ system_hint?: string }> }>(accountSystemHintsSignal).data?.some(
-          (entry: { system_hint?: string }) => entry.system_hint === "cme",
-        ) === true,
-    );
+var G, K, q;
+function J() {
+  return (J = e(() => {
+    ((G = t()),
+      H(),
+      r(),
+      o(),
+      b(),
+      k(),
+      x(),
+      h(),
+      R(),
+      I(),
+      N(),
+      n(),
+      T(),
+      d(),
+      f(),
+      _(),
+      B(),
+      S(),
+      C(),
+      (K = a()),
+      (q = p(
+        M,
+        ({ get: e }) =>
+          e(D, { name: `chatgpt.cme` }).isCapable &&
+          e(y, e(F)).length === 0 &&
+          e(O).data?.some((e) => e.system_hint === `cme`) === !0,
+      )));
+  }))();
 }
-
-initializeCmeHomeEntryPoint();
-
-export { CmeHomeEntryPoint };
+J();
+export { U as CmeHomeEntryPoint };

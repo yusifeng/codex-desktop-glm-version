@@ -1,170 +1,164 @@
-import "@rchunk/rolldown-runtime";
-
-interface StripeInstance {
-  _registerWrapper?(metadata: {
-    name: string;
-    startTime: number;
-    version: string;
-  }): void;
-}
-
-interface StripeFactory {
-  (publishableKey: string, ...arguments_: unknown[]): StripeInstance;
-}
-
-interface StripeWindow extends Window {
-  Stripe?: StripeFactory;
-}
-
-interface LoadParameters {
-  advancedFraudSignals: boolean;
-}
-
-interface LoadStripe {
-  (publishableKey: string, ...arguments_: unknown[]): Promise<StripeInstance | null>;
-  setLoadParameters(parameters: LoadParameters): void;
-}
-
-const STRIPE_JS_URL = "https://js.stripe.com/basil/stripe.js";
-const WRAPPER_VERSION = "7.9.0";
-const SCRIPT_PATTERN =
-  /^https:\/\/js\.stripe\.com\/(?:v3\/?(?:\?.*)?|(?:v3|[a-z]+)\/stripe\.js(?:\?.*)?)$/;
-
-let loadParameters: LoadParameters | undefined;
-let loadStarted = false;
-let stripePromise: Promise<StripeFactory | null> | null = null;
-
-function validateLoadParameters(parameters: LoadParameters): LoadParameters {
-  if (
-    parameters == null ||
-    typeof parameters !== "object" ||
-    Object.keys(parameters).length !== 1 ||
-    typeof parameters.advancedFraudSignals !== "boolean"
-  ) {
-    throw new Error(
-      `invalid load parameters; expected object of shape\n\n    {advancedFraudSignals: boolean}\n\nbut received\n\n    ${JSON.stringify(parameters)}\n`,
-    );
-  }
-  return parameters;
-}
-
-function findStripeScript(): HTMLScriptElement | null {
-  const scripts = document.querySelectorAll<HTMLScriptElement>(
-    'script[src^="https://js.stripe.com"]',
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e) {
+  "@babel/helpers - typeof";
+  return (
+    (t =
+      typeof Symbol == `function` && typeof Symbol.iterator == `symbol`
+        ? function (e) {
+            return typeof e;
+          }
+        : function (e) {
+            return e &&
+              typeof Symbol == `function` &&
+              e.constructor === Symbol &&
+              e !== Symbol.prototype
+              ? `symbol`
+              : typeof e;
+          }),
+    t(e)
   );
-  return [...scripts].find((script) => SCRIPT_PATTERN.test(script.src)) ?? null;
 }
+var n, r, i, a, o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C;
+function w() {
+  return (w = e(() => {
+    ((n = `basil`),
+      (r = function (e) {
+        return e === 3 ? `v3` : e;
+      }),
+      (i = `https://js.stripe.com`),
+      (a = `${i}/${n}/stripe.js`),
+      (o = /^https:\/\/js\.stripe\.com\/v3\/?(\?.*)?$/),
+      (s = /^https:\/\/js\.stripe\.com\/(v3|[a-z]+)\/stripe\.js(\?.*)?$/),
+      (c = `loadStripe.setLoadParameters was called but an existing Stripe.js script already exists in the document; existing script parameters will be used`),
+      (l = function (e) {
+        return o.test(e) || s.test(e);
+      }),
+      (u = function () {
+        for (var e = document.querySelectorAll(`script[src^="${i}"]`), t = 0; t < e.length; t++) {
+          var n = e[t];
+          if (l(n.src)) return n;
+        }
+        return null;
+      }),
+      (d = function (e) {
+        var t = e && !e.advancedFraudSignals ? `?advancedFraudSignals=false` : ``,
+          n = document.createElement(`script`);
+        n.src = `${a}${t}`;
+        var r = document.head || document.body;
+        if (!r)
+          throw Error(
+            `Expected document.body not to be null. Stripe.js requires a <body> element.`,
+          );
+        return (r.appendChild(n), n);
+      }),
+      (f = function (e, t) {
+        e &&
+          e._registerWrapper &&
+          e._registerWrapper({ name: `stripe-js`, version: `7.9.0`, startTime: t });
+      }),
+      (p = null),
+      (m = null),
+      (h = null),
+      (g = function (e) {
+        return function (t) {
+          e(Error(`Failed to load Stripe.js`, { cause: t }));
+        };
+      }),
+      (_ = function (e, t) {
+        return function () {
+          window.Stripe ? e(window.Stripe) : t(Error(`Stripe.js not available`));
+        };
+      }),
+      (v = function (e) {
+        return p === null
+          ? ((p = new Promise(function (t, n) {
+              if (typeof window > `u` || typeof document > `u`) {
+                t(null);
+                return;
+              }
+              if ((window.Stripe && e && console.warn(c), window.Stripe)) {
+                t(window.Stripe);
+                return;
+              }
+              try {
+                var r = u();
+                if (r && e) console.warn(c);
+                else if (!r) r = d(e);
+                else if (r && h !== null && m !== null) {
+                  var i;
+                  (r.removeEventListener(`load`, h),
+                    r.removeEventListener(`error`, m),
+                    (i = r.parentNode) == null || i.removeChild(r),
+                    (r = d(e)));
+                }
+                ((h = _(t, n)),
+                  (m = g(n)),
+                  r.addEventListener(`load`, h),
+                  r.addEventListener(`error`, m));
+              } catch (e) {
+                n(e);
+                return;
+              }
+            })),
+            p.catch(function (e) {
+              return ((p = null), Promise.reject(e));
+            }))
+          : p;
+      }),
+      (y = function (e, t, i) {
+        if (e === null) return null;
+        var a = t[0].match(/^pk_test/),
+          o = r(e.version),
+          s = n;
+        a &&
+          o !== s &&
+          console.warn(
+            `Stripe.js@${o} was loaded on the page, but @stripe/stripe-js@7.9.0 expected Stripe.js@${s}. This may result in unexpected behavior. For more information, see https://docs.stripe.com/sdks/stripejs-versioning`,
+          );
+        var c = e.apply(void 0, t);
+        return (f(c, i), c);
+      }),
+      (b = function (e) {
+        var n = `invalid load parameters; expected object of shape
 
-function createStripeScript(parameters?: LoadParameters): HTMLScriptElement {
-  const script = document.createElement("script");
-  const query = parameters?.advancedFraudSignals === false
-    ? "?advancedFraudSignals=false"
-    : "";
-  script.src = `${STRIPE_JS_URL}${query}`;
-  const parent = document.head ?? document.body;
-  if (parent == null) {
-    throw new Error(
-      "Expected document.body not to be null. Stripe.js requires a <body> element.",
-    );
-  }
-  parent.appendChild(script);
-  return script;
+    {advancedFraudSignals: boolean}
+
+but received
+
+    ${JSON.stringify(e)}
+`;
+        if (e === null || t(e) !== `object`) throw Error(n);
+        if (Object.keys(e).length === 1 && typeof e.advancedFraudSignals == `boolean`) return e;
+        throw Error(n);
+      }),
+      (S = !1),
+      (C = function () {
+        var e = [...arguments];
+        S = !0;
+        var t = Date.now();
+        return v(x).then(function (n) {
+          return y(n, e, t);
+        });
+      }),
+      (C.setLoadParameters = function (e) {
+        if (S && x) {
+          var t = b(e);
+          if (
+            Object.keys(t).reduce(function (t, n) {
+              return t && e[n] === x?.[n];
+            }, !0)
+          )
+            return;
+        }
+        if (S) throw Error(`You cannot change load parameters after calling loadStripe`);
+        x = b(e);
+      }));
+  }))();
 }
-
-function loadStripeScript(
-  parameters?: LoadParameters,
-): Promise<StripeFactory | null> {
-  if (stripePromise != null) return stripePromise;
-
-  stripePromise = new Promise((resolve, reject) => {
-    if (typeof window === "undefined" || typeof document === "undefined") {
-      resolve(null);
-      return;
-    }
-
-    const stripeWindow = window as StripeWindow;
-    if (stripeWindow.Stripe != null) {
-      if (parameters != null) {
-        console.warn(
-          "loadStripe.setLoadParameters was called but an existing Stripe.js script already exists in the document; existing script parameters will be used",
-        );
-      }
-      resolve(stripeWindow.Stripe);
-      return;
-    }
-
-    try {
-      const existingScript = findStripeScript();
-      if (existingScript != null && parameters != null) {
-        console.warn(
-          "loadStripe.setLoadParameters was called but an existing Stripe.js script already exists in the document; existing script parameters will be used",
-        );
-      }
-      const script = existingScript ?? createStripeScript(parameters);
-      script.addEventListener(
-        "load",
-        () => {
-          const factory = (window as StripeWindow).Stripe;
-          if (factory == null) reject(new Error("Stripe.js not available"));
-          else resolve(factory);
-        },
-        { once: true },
-      );
-      script.addEventListener(
-        "error",
-        (cause) => reject(new Error("Failed to load Stripe.js", { cause })),
-        { once: true },
-      );
-    } catch (error) {
-      reject(error);
-    }
-  });
-
-  stripePromise.catch(() => {
-    stripePromise = null;
-  });
-  return stripePromise;
+function T() {
+  return (T = e(() => {
+    w();
+  }))();
 }
-
-const loadStripe = (async (
-  publishableKey: string,
-  ...arguments_: unknown[]
-) => {
-  loadStarted = true;
-  const startTime = Date.now();
-  const factory = await loadStripeScript(loadParameters);
-  if (factory == null) return null;
-  const stripe = factory(publishableKey, ...arguments_);
-  stripe._registerWrapper?.({
-    name: "stripe-js",
-    version: WRAPPER_VERSION,
-    startTime,
-  });
-  return stripe;
-}) as LoadStripe;
-
-loadStripe.setLoadParameters = (parameters) => {
-  const validated = validateLoadParameters(parameters);
-  if (
-    loadStarted &&
-    loadParameters != null &&
-    validated.advancedFraudSignals === loadParameters.advancedFraudSignals
-  ) {
-    return;
-  }
-  if (loadStarted) {
-    throw new Error("You cannot change load parameters after calling loadStripe");
-  }
-  loadParameters = validated;
-};
-
-function initializeStripePure(): void {}
-function initializeStripeLoader(): void {
-  initializeStripePure();
-}
-
-export {
-  initializeStripePure as n,
-  loadStripe as r,
-  initializeStripeLoader as t,
-};
+export { w as n, C as r, T as t };

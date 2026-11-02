@@ -1,72 +1,36 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, QI as n, ZI as r, rZ as i } from "@rchunk/app-shared";
 import {
-  FX as initializeSignalRuntime,
-  QI as initializeQueryRuntime,
-  ZI as appScope,
-  rZ as createDerivedFamily,
-} from "@rchunk/app-shared";
-import {
-  A1t as initializeActiveConversationSession,
-  M1t as activeConversationSession,
-  dun as createPersistedSignal,
-  mfn as featureGateFamily,
-  pfn as initializeFeatureGates,
-  uun as initializePersistedSignals,
+  A1t as a,
+  M1t as o,
+  dun as s,
+  mfn as c,
+  pfn as l,
+  uun as u,
 } from "@rchunk/app-initial";
-
-interface AnnouncementState {
-  dismissed: boolean;
-  impressions: number;
-  lastSessionId: string | null;
+var d, f;
+function p() {
+  return (p = e(() => {
+    (t(),
+      n(),
+      l(),
+      u(),
+      a(),
+      (d = s(`voice-reasoning-notice-v3`, { impressions: 0, lastSessionId: null, dismissed: !1 })),
+      (f = i(r, ({ conversationId: e, hostId: t }, { get: n }) => {
+        if (!n(c, `714010102`)) return null;
+        let r = n(o),
+          i = n(d);
+        return r.phase !== `active` ||
+          r.locator.conversationId !== e ||
+          r.locator.hostId !== t ||
+          i == null ||
+          i.dismissed ||
+          (i.impressions >= 3 && i.lastSessionId !== r.sessionId)
+          ? null
+          : r.sessionId;
+      })));
+  }))();
 }
-
-interface ConversationLocator {
-  conversationId: string;
-  hostId: string;
-}
-
-interface ActiveSession {
-  locator: ConversationLocator;
-  phase: string;
-  sessionId: string;
-}
-
-let voiceReasoningNoticeState: unknown;
-let activeVoiceReasoningNoticeSession: unknown;
-
-function initializeTaskAnnouncementState(): void {
-  initializeSignalRuntime();
-  initializeQueryRuntime();
-  initializeFeatureGates();
-  initializePersistedSignals();
-  initializeActiveConversationSession();
-  voiceReasoningNoticeState = createPersistedSignal<AnnouncementState>(
-    "voice-reasoning-notice-v3",
-    { impressions: 0, lastSessionId: null, dismissed: false },
-  );
-  activeVoiceReasoningNoticeSession = createDerivedFamily(
-    appScope,
-    (
-      { conversationId, hostId }: ConversationLocator,
-      { get },
-    ): string | null => {
-      if (!get(featureGateFamily, "714010102")) return null;
-      const session = get(activeConversationSession) as ActiveSession;
-      const notice = get(voiceReasoningNoticeState) as AnnouncementState | null;
-      return session.phase !== "active"
-        || session.locator.conversationId !== conversationId
-        || session.locator.hostId !== hostId
-        || notice == null
-        || notice.dismissed
-        || (notice.impressions >= 3 && notice.lastSessionId !== session.sessionId)
-        ? null
-        : session.sessionId;
-    },
-  );
-}
-
-export {
-  voiceReasoningNoticeState as n,
-  activeVoiceReasoningNoticeSession as r,
-  initializeTaskAnnouncementState as t,
-};
+export { d as n, f as r, p as t };

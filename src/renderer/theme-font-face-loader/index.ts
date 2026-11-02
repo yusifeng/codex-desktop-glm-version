@@ -1,102 +1,46 @@
-import "@rchunk/rolldown-runtime";
-import {
-  a as selectedFontAliasExport,
-  n as escapeFontFamilyExport,
-  t as fontFamilyMatchesExport,
-} from "@rchunk/theme-font-family";
-import type { ThemeFontFace } from "@rchunk/theme-font-family";
-
-const selectedFontAlias = selectedFontAliasExport;
-const escapeFontFamily = escapeFontFamilyExport;
-const fontFamilyMatches = fontFamilyMatchesExport;
-
-interface ThemeFontSelection {
-  code?: string | null;
-  codeFace?: ThemeFontFace | null;
-  content?: string | null;
-  contentFace?: ThemeFontFace | null;
-  ui?: string | null;
-  uiFace?: ThemeFontFace | null;
-}
-
-interface FontLoadState {
-  loadedAliases: Set<string>;
-  loadingByAlias: Map<string, Promise<boolean>>;
-}
-
-let loadStates = new WeakMap<FontFaceSet, FontLoadState>();
-
-function stateFor(fonts: FontFaceSet): FontLoadState {
-  let state = loadStates.get(fonts);
-  if (state == null) {
-    state = { loadedAliases: new Set(), loadingByAlias: new Map() };
-    loadStates.set(fonts, state);
-  }
-  return state;
-}
-
-async function loadThemeFontFace(fontFace: ThemeFontFace): Promise<boolean> {
-  if (typeof FontFace === "undefined" || document.fonts == null) return false;
-  const fonts = document.fonts;
-  const alias = selectedFontAlias(fontFace);
-  const state = stateFor(fonts);
-  if (state.loadedAliases.has(alias)) return true;
-  const existing = state.loadingByAlias.get(alias);
-  if (existing != null) return existing;
-  let loading: Promise<boolean>;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { a as t, n, t as r } from "@rchunk/theme-font-family";
+async function i(e) {
+  if (typeof FontFace > `u` || document.fonts == null) return !1;
+  let r = document.fonts,
+    i = t(e),
+    a = o(r);
+  if (a.loadedAliases.has(i)) return !0;
+  let s = a.loadingByAlias.get(i);
+  if (s != null) return s;
+  let c;
   try {
-    loading = new FontFace(
-      alias,
-      `local("${escapeFontFamily(fontFace.postscriptName)}"), local("${escapeFontFamily(fontFace.fullName)}")`,
-    )
+    c = new FontFace(i, `local("${n(e.postscriptName)}"), local("${n(e.fullName)}")`)
       .load()
-      .then((loaded) => {
-        fonts.add(loaded);
-        state.loadedAliases.add(alias);
-        return true;
-      })
-      .catch(() => false)
-      .finally(() => state.loadingByAlias.delete(alias));
+      .then((e) => (r.add(e), a.loadedAliases.add(i), !0))
+      .catch(() => !1)
+      .finally(() => {
+        a.loadingByAlias.delete(i);
+      });
   } catch {
-    return false;
+    return !1;
   }
-  state.loadingByAlias.set(alias, loading);
-  return loading;
+  return (a.loadingByAlias.set(i, c), c);
 }
-
-async function loadSelectedThemeFonts(
-  selections: readonly ThemeFontSelection[],
-): Promise<void> {
-  const selected = new Map<string, ThemeFontFace>();
-  for (const selection of selections) {
-    if (
-      selection.codeFace != null &&
-      fontFamilyMatches(selection.code, selection.codeFace)
-    )
-      selected.set(selectedFontAlias(selection.codeFace), selection.codeFace);
-    if (
-      selection.contentFace != null &&
-      fontFamilyMatches(selection.content ?? null, selection.contentFace)
-    )
-      selected.set(
-        selectedFontAlias(selection.contentFace),
-        selection.contentFace,
-      );
-    if (
-      selection.uiFace != null &&
-      fontFamilyMatches(selection.ui, selection.uiFace)
-    )
-      selected.set(selectedFontAlias(selection.uiFace), selection.uiFace);
-  }
-  await Promise.all([...selected.values()].map(loadThemeFontFace));
+async function a(e) {
+  let n = new Map();
+  for (let i of e)
+    (i?.codeFace != null && r(i.code, i.codeFace) && n.set(t(i.codeFace), i.codeFace),
+      i?.contentFace != null &&
+        r(i.content ?? null, i.contentFace) &&
+        n.set(t(i.contentFace), i.contentFace),
+      i?.uiFace != null && r(i.ui, i.uiFace) && n.set(t(i.uiFace), i.uiFace));
+  await Promise.all(Array.from(n.values()).map((e) => i(e)));
 }
-
-function initializeThemeFontFaceLoader(): void {
-  loadStates = new WeakMap();
+function o(e) {
+  let t = s.get(e);
+  return (t ?? ((t = { loadedAliases: new Set(), loadingByAlias: new Map() }), s.set(e, t)), t);
 }
-
-export {
-  loadThemeFontFace as n,
-  loadSelectedThemeFonts as r,
-  initializeThemeFontFaceLoader as t,
-};
+var s;
+function c() {
+  return (c = e(() => {
+    s = new WeakMap();
+  }))();
+}
+export { i as n, a as r, c as t };

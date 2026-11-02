@@ -1,272 +1,228 @@
-// Native Computer Use app approval card. Release chunk: computer-use-app-approval-request-card-63cdc4e7642f.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  C_ as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  K2 as o,
+  LX as s,
+  QI as c,
+  S_ as l,
+  Xw as u,
+  Y2 as d,
+  ZI as f,
+  Zw as p,
+  e6 as m,
+  n4 as h,
+} from "@rchunk/app-shared";
+import {
+  Ugn as g,
+  Wgn as _,
+  Whn as v,
+  cen as y,
+  len as b,
+  ngn as x,
+  rgn as S,
+  wfn as C,
+} from "@rchunk/app-initial";
+var w;
+function T() {
+  return (T = e(() => {
+    w = `` + new URL(`computer-use-plugin-icon-5eae5ff78888.png`, import.meta.url).href;
+  }))();
+}
+function E(e) {
+  let t = (0, D.c)(42),
+    {
+      ApprovalCard: n,
+      conversationId: r,
+      hostId: a,
+      onRequestSettled: o,
+      request: c,
+      requestId: u,
+    } = e,
+    m = s(f),
+    _ = h(),
+    b = i(y) ?? x(`has-approved-computer-use-app`, !1),
+    S;
+  t[0] !== r || t[1] !== a || t[2] !== u
+    ? ((S = JSON.stringify([a, r, u])), (t[0] = r), (t[1] = a), (t[2] = u), (t[3] = S))
+    : (S = t[3]);
+  let C = S,
+    T = (0, O.useRef)(null),
+    [E, A] = (0, O.useState)(null),
+    j = c.riskLevel === `high`,
+    M;
+  t[4] !== b || t[5] !== _ || t[6] !== c.subtitle
+    ? ((M =
+        [
+          b === !1
+            ? _.formatMessage({
+                id: `composer.computerUseAppApproval.disclosure`,
+                defaultMessage: `Computer Use lets ChatGPT use apps on your computer. It may take screenshots of app contents while working. You can choose which apps ChatGPT can access, stop actions at any time, and control whether screenshots are used for training.`,
+                description: `First-use disclosure explaining native Computer Use app access, screenshot capture, and user controls, shown until the user approves an app`,
+              })
+            : void 0,
+          c.subtitle,
+        ].filter(Boolean).join(`
 
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>): unknown;
-  jsxs(type: unknown, props: Record<string, unknown>): unknown;
-  Fragment: unknown;
-}
-interface ReactRuntime {
-  useRef<T>(initial: T): { current: T };
-  useState<T>(initial: T): [T, (value: T) => void];
-}
-interface IntlRuntime {
-  formatMessage(message: Record<string, unknown>): string;
-}
-interface Store {
-  set(key: unknown, value: unknown): void;
-}
-interface ApprovalRequest {
-  appDisplayName: string;
-  connectorName: string;
-  persistModes: string[];
-  riskLevel?: string;
-  subtitle?: string;
-}
-interface ApprovalActions {
-  approveLabel: unknown;
-  isLoading: boolean;
-  leadingAction?: { label: unknown; onClick(): void };
-  onApprove(): void;
-  onDeny(): void;
-}
-interface ApprovalCardProps {
-  actions: ApprovalActions;
-  headerContent: unknown;
-  subtitle?: unknown;
-  title: unknown;
-}
-interface Props {
-  ApprovalCard(props: ApprovalCardProps): unknown;
-  conversationId: string;
-  hostId: string;
-  onRequestSettled(result: "accept" | "decline"): void;
-  request: ApprovalRequest;
-  requestId: string;
-}
-interface SharedRuntime {
-  I3(): JsxRuntime;
-  e6(): ReactRuntime;
-  LX(scope: unknown): Store;
-  HX<T>(signal: unknown): T | undefined;
-  n4(): IntlRuntime;
-  ZI: unknown;
-  S_: unknown;
-  Zw: unknown;
-  Y2: unknown;
-  [key: string]: unknown;
-}
-interface InitialRuntime {
-  Ugn(
-    store: Store,
-    hostId: string,
-  ): {
-    replyWithMcpServerElicitationResponse(
-      conversationId: string,
-      requestId: string,
-      response: unknown,
-    ): Promise<unknown>;
-  };
-  Whn(
-    decision: "accept" | "decline",
-    metadata: { persist: string } | null,
-  ): unknown;
-  cen: unknown;
-  ngn(key: string, fallback: boolean): boolean;
-  [key: string]: unknown;
-}
-
-const shared = appSharedChunk as unknown as SharedRuntime;
-const initial = appInitialChunk as unknown as InitialRuntime;
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let computerUsePluginIcon: string;
-let iconInitialized = false;
-let moduleInitialized = false;
-
-function callInitializers(
-  runtime: Record<string, unknown>,
-  names: string[],
-): void {
-  for (const name of names) {
-    const initializer = runtime[name];
-    if (typeof initializer === "function") (initializer as () => void)();
-  }
-}
-
-function initializeComputerUsePluginIcon(): void {
-  if (iconInitialized) return;
-  iconInitialized = true;
-  computerUsePluginIcon = new URL(
-    "computer-use-plugin-icon-5eae5ff78888.png",
-    import.meta.url,
-  ).href;
-}
-
-function initializeComputerUseAppApprovalRequestCard(): void {
-  if (moduleInitialized) return;
-  moduleInitialized = true;
-  callInitializers(shared as unknown as Record<string, unknown>, [
-    "$3",
-    "e6",
-    "FX",
-    "K2",
-    "C_",
-    "QI",
-  ]);
-  callInitializers(initial as unknown as Record<string, unknown>, [
-    "wfn",
-    "Wgn",
-    "rgn",
-    "len",
-  ]);
-  initializeComputerUsePluginIcon();
-  React = shared.e6();
-  jsx = shared.I3();
-}
-
-function ComputerUseAppApprovalRequestCard({
-  ApprovalCard,
-  conversationId,
-  hostId,
-  onRequestSettled,
-  request,
-  requestId,
-}: Props): unknown {
-  initializeComputerUseAppApprovalRequestCard();
-  const store = shared.LX(shared.ZI);
-  const intl = shared.n4();
-  const hasApproved =
-    shared.HX<boolean>(initial.cen) ??
-    initial.ngn("has-approved-computer-use-app", false);
-  const requestKey = JSON.stringify([hostId, conversationId, requestId]);
-  const activeRequest = React.useRef<string | null>(null);
-  const [loadingKey, setLoadingKey] = React.useState<string | null>(null);
-  const elevatedRisk = request.riskLevel === "high";
-  const subtitle =
-    [
-      hasApproved === false
-        ? intl.formatMessage({
-            id: "composer.computerUseAppApproval.disclosure",
-            defaultMessage:
-              "Computer Use lets ChatGPT use apps on your computer. It may take screenshots of app contents while working. You can choose which apps ChatGPT can access, stop actions at any time, and control whether screenshots are used for training.",
-            description:
-              "First-use disclosure explaining native Computer Use app access, screenshot capture, and user controls, shown until the user approves an app",
-          })
-        : undefined,
-      request.subtitle,
-    ]
-      .filter(Boolean)
-      .join("\n\n") || undefined;
-
-  const settle = (decision: "accept" | "decline", persist?: string | null) => {
-    if (activeRequest.current === requestKey) return;
-    activeRequest.current = requestKey;
-    setLoadingKey(requestKey);
-    if (decision === "accept") store.set(initial.cen, true);
-    initial
-      .Ugn(store, hostId)
-      .replyWithMcpServerElicitationResponse(
-        conversationId,
-        requestId,
-        initial.Whn(
-          decision,
-          decision === "accept" && persist != null ? { persist } : null,
-        ),
-      )
-      .then(
-        () => onRequestSettled(decision),
-        () => {
-          if (activeRequest.current === requestKey) {
-            activeRequest.current = null;
-            setLoadingKey(null);
-          }
-        },
-      );
-  };
-
-  const headerContent = elevatedRisk
-    ? jsx.jsxs(jsx.Fragment, {
-        children: [
-          jsx.jsx(shared.S_, {
-            className: "shrink-0 text-warning",
-            "aria-hidden": false,
-            asset: shared.Zw,
-          }),
-          jsx.jsx("span", {
-            className: "font-medium text-warning",
-            children: jsx.jsx(shared.Y2, {
-              id: "composer.mcpToolCallApproval.elevatedRiskLabel",
-              defaultMessage: "Elevated Risk",
-              description:
-                "Header label for elevated-risk MCP approval requests",
-            }),
-          }),
-        ],
-      })
-    : jsx.jsxs(jsx.Fragment, {
-        children: [
-          jsx.jsx("img", {
-            alt: "",
-            className: "icon-sm rounded-[3px] object-contain",
-            draggable: false,
-            src: computerUsePluginIcon,
-          }),
-          jsx.jsx("span", { children: request.connectorName }),
-        ],
-      });
-  const title = jsx.jsx(shared.Y2, {
-    id: "composer.computerUseAppApproval.title.chatgpt",
-    defaultMessage: "Allow ChatGPT to use {appDisplayName}?",
-    description:
-      "Title asking whether ChatGPT may use an app through Computer Use",
-    values: { appDisplayName: request.appDisplayName },
-  });
-  const leadingAction = request.persistModes.includes("always")
-    ? {
-        label: jsx.jsx(shared.Y2, {
-          id: "composer.computerUseAppApproval.action.alwaysApprove",
-          defaultMessage: "Always allow",
-          description:
-            "Button label for always approving Computer Use access to an app",
-        }),
-        onClick: () => settle("accept", "always"),
-      }
-    : undefined;
-  return jsx.jsx(ApprovalCard, {
-    headerContent,
-    title,
-    subtitle:
-      subtitle == null
-        ? undefined
-        : jsx.jsx("span", {
-            className: "whitespace-pre-line",
-            children: subtitle,
-          }),
-    actions: {
-      isLoading: loadingKey === requestKey,
-      leadingAction,
-      approveLabel: jsx.jsx(shared.Y2, {
-        id: "composer.computerUseAppApproval.action.approve",
-        defaultMessage: "Allow this conversation",
-        description:
-          "Primary action label for approving Computer Use access to an app",
+`) || void 0),
+      (t[4] = b),
+      (t[5] = _),
+      (t[6] = c.subtitle),
+      (t[7] = M))
+    : (M = t[7]);
+  let N = M,
+    P;
+  t[8] !== r || t[9] !== a || t[10] !== o || t[11] !== u || t[12] !== C || t[13] !== m
+    ? ((P = (e, t) => {
+        let n = t === void 0 ? null : t;
+        T.current !== C &&
+          ((T.current = C),
+          A(C),
+          e === `accept` && m.set(y, !0),
+          g(m, a)
+            .replyWithMcpServerElicitationResponse(
+              r,
+              u,
+              v(e, e === `accept` && n != null ? { persist: n } : null),
+            )
+            .then(
+              () => o(e),
+              () => {
+                T.current === C && ((T.current = null), A(null));
+              },
+            ));
       }),
-      onApprove: () =>
-        settle(
-          "accept",
-          request.persistModes.includes("session") ? "session" : null,
-        ),
-      onDeny: () => settle("decline"),
-    },
-  });
+      (t[8] = r),
+      (t[9] = a),
+      (t[10] = o),
+      (t[11] = u),
+      (t[12] = C),
+      (t[13] = m),
+      (t[14] = P))
+    : (P = t[14]);
+  let F = P,
+    I;
+  t[15] !== j || t[16] !== c.connectorName
+    ? ((I = j
+        ? (0, k.jsxs)(k.Fragment, {
+            children: [
+              (0, k.jsx)(l, { className: `shrink-0 text-warning`, "aria-hidden": !1, asset: p }),
+              (0, k.jsx)(`span`, {
+                className: `font-medium text-warning`,
+                children: (0, k.jsx)(d, {
+                  id: `composer.mcpToolCallApproval.elevatedRiskLabel`,
+                  defaultMessage: `Elevated Risk`,
+                  description: `Header label for elevated-risk MCP approval requests`,
+                }),
+              }),
+            ],
+          })
+        : (0, k.jsxs)(k.Fragment, {
+            children: [
+              (0, k.jsx)(`img`, {
+                alt: ``,
+                className: `icon-sm rounded-[3px] object-contain`,
+                draggable: !1,
+                src: w,
+              }),
+              (0, k.jsx)(`span`, { children: c.connectorName }),
+            ],
+          })),
+      (t[15] = j),
+      (t[16] = c.connectorName),
+      (t[17] = I))
+    : (I = t[17]);
+  let L;
+  t[18] === c.appDisplayName
+    ? (L = t[19])
+    : ((L = (0, k.jsx)(d, {
+        id: `composer.computerUseAppApproval.title.chatgpt`,
+        defaultMessage: `Allow ChatGPT to use {appDisplayName}?`,
+        description: `Title asking whether ChatGPT may use an app through Computer Use`,
+        values: { appDisplayName: c.appDisplayName },
+      })),
+      (t[18] = c.appDisplayName),
+      (t[19] = L));
+  let R;
+  t[20] === N
+    ? (R = t[21])
+    : ((R = N && (0, k.jsx)(`span`, { className: `whitespace-pre-line`, children: N })),
+      (t[20] = N),
+      (t[21] = R));
+  let z = E === C,
+    B;
+  t[22] !== F || t[23] !== c.persistModes
+    ? ((B = c.persistModes.includes(`always`)
+        ? {
+            label: (0, k.jsx)(d, {
+              id: `composer.computerUseAppApproval.action.alwaysApprove`,
+              defaultMessage: `Always allow`,
+              description: `Button label for always approving Computer Use access to an app`,
+            }),
+            onClick: () => F(`accept`, `always`),
+          }
+        : void 0),
+      (t[22] = F),
+      (t[23] = c.persistModes),
+      (t[24] = B))
+    : (B = t[24]);
+  let V;
+  t[25] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((V = (0, k.jsx)(d, {
+        id: `composer.computerUseAppApproval.action.approve`,
+        defaultMessage: `Allow this conversation`,
+        description: `Primary action label for approving Computer Use access to an app`,
+      })),
+      (t[25] = V))
+    : (V = t[25]);
+  let H;
+  t[26] !== F || t[27] !== c.persistModes
+    ? ((H = () => {
+        F(`accept`, c.persistModes.includes(`session`) ? `session` : null);
+      }),
+      (t[26] = F),
+      (t[27] = c.persistModes),
+      (t[28] = H))
+    : (H = t[28]);
+  let U;
+  t[29] === F
+    ? (U = t[30])
+    : ((U = () => {
+        F(`decline`);
+      }),
+      (t[29] = F),
+      (t[30] = U));
+  let W;
+  t[31] !== H || t[32] !== U || t[33] !== z || t[34] !== B
+    ? ((W = { isLoading: z, leadingAction: B, approveLabel: V, onApprove: H, onDeny: U }),
+      (t[31] = H),
+      (t[32] = U),
+      (t[33] = z),
+      (t[34] = B),
+      (t[35] = W))
+    : (W = t[35]);
+  let G;
+  return (
+    t[36] !== n || t[37] !== W || t[38] !== I || t[39] !== L || t[40] !== R
+      ? ((G = (0, k.jsx)(n, { headerContent: I, title: L, subtitle: R, actions: W })),
+        (t[36] = n),
+        (t[37] = W),
+        (t[38] = I),
+        (t[39] = L),
+        (t[40] = R),
+        (t[41] = G))
+      : (G = t[41]),
+    G
+  );
 }
-
-export {
-  initializeComputerUsePluginIcon as i,
-  initializeComputerUseAppApprovalRequestCard as n,
-  computerUsePluginIcon as r,
-  ComputerUseAppApprovalRequestCard as t,
-};
+var D, O, k;
+function A() {
+  return (A = e(() => {
+    ((D = t()), u(), r(), C(), (O = m()), o(), _(), T(), n(), c(), S(), b(), (k = a()));
+  }))();
+}
+export { T as i, A as n, w as r, E as t };

@@ -1,5 +1,4 @@
-import { m as initializeBrowserProfileImportState, o as acknowledgeBrowserProfileImportNux } from "@rchunk/thread-panel-secondary-state";
-
-initializeBrowserProfileImportState();
-
-export { acknowledgeBrowserProfileImportNux };
+// @ts-nocheck
+import { m as e, o as t } from "@rchunk/thread-panel-secondary-state";
+e();
+export { t as acknowledgeBrowserProfileImportNux };

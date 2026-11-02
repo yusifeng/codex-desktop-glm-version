@@ -1,11 +1,5 @@
-import { wL as initializeAppRuntime } from "@rchunk/app-shared";
-import {
-  i as initializeConversationUi,
-  n as BusinessAgentConversationHeader,
-  r as BusinessAgentHomeHero,
-} from "@rchunk/conversation-ui";
-
-initializeAppRuntime();
-initializeConversationUi();
-
-export { BusinessAgentConversationHeader, BusinessAgentHomeHero };
+// @ts-nocheck
+import "@rchunk/app-shared";
+import { i as e, n as t, r as n } from "@rchunk/conversation-ui";
+e();
+export { t as BusinessAgentConversationHeader, n as BusinessAgentHomeHero };

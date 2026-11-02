@@ -1,94 +1,74 @@
-// Restriction-enzyme map and digest-fragment learning model. Release chunk: model-6e039b1d844f.js.
-import "@rchunk/rolldown-runtime";
-
-type MoleculeTopology = "circular plasmid" | "linear DNA";
-type Enzyme = "A" | "B";
-interface RestrictionValues { molecule_topology?: string | null; digest?: number | null }
-interface RestrictionSite { enzyme: Enzyme; position: number }
-interface RestrictionManifest {
-  type: string; version: number; thumbnailAssetKey: string;
-  parameters: { molecule_topology: { kind: "enum"; defaultValue: MoleculeTopology; allowedValues: MoleculeTopology[] } };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `RESTRICTION_ENZYME_MAP`),
+      (n = `restriction-enzyme-map-v1`),
+      (r = {
+        molecule_topology: {
+          kind: `enum`,
+          defaultValue: `circular plasmid`,
+          allowedValues: [`circular plasmid`, `linear DNA`],
+        },
+      }),
+      (i = { type: t, version: 3, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-let restrictionMapManifest: RestrictionManifest;
-let moleculeLength: number;
-let restrictionSites: RestrictionSite[];
-let topologyOptions: MoleculeTopology[];
-let defaultTopology: MoleculeTopology;
-let siteIncludedInDigest: (enzyme: Enzyme, digest: number) => boolean;
-let gelMigrationPosition: (fragmentSize: number) => number;
-let calculateRestrictionDigest: (values: RestrictionValues) => {
-  safeValues: { molecule_topology: MoleculeTopology; digest: number };
-  lanes: { digest: number; fragments: number[]; bands: { size: number; count: number }[] }[];
-  selectedLane: { digest: number; fragments: number[]; bands: { size: number; count: number }[] };
-  activeSites: RestrictionSite[];
-};
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeRestrictionMapManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  restrictionMapManifest = {
-    type: "RESTRICTION_ENZYME_MAP", version: 3, thumbnailAssetKey: "restriction-enzyme-map-v1",
-    parameters: {
-      molecule_topology: { kind: "enum", defaultValue: "circular plasmid", allowedValues: ["circular plasmid", "linear DNA"] },
-    },
-  };
+var o, s, c, l, u, d, f, p, m, h, g, _;
+function v() {
+  return (v = e(() => {
+    (a(),
+      (o = 6e3),
+      (s = [
+        { enzyme: `A`, position: 1e3 },
+        { enzyme: `B`, position: 2500 },
+        { enzyme: `A`, position: 4e3 },
+      ]),
+      (c = i.parameters.molecule_topology),
+      (l = (e) => typeof e == `string` && c.allowedValues.some((t) => t === e)),
+      (u = c.allowedValues.filter(l)),
+      (d = l(c.defaultValue) ? c.defaultValue : `circular plasmid`),
+      (f = (e) => ({
+        molecule_topology: l(e.molecule_topology) ? e.molecule_topology : d,
+        digest: e.digest === 0 || e.digest === 1 || e.digest === 2 ? e.digest : 2,
+      })),
+      (p = (e, t) => t === 2 || (t === 0 ? e === `A` : e === `B`)),
+      (m = (e, t) => {
+        let n = s
+          .filter(({ enzyme: e }) => p(e, t))
+          .map(({ position: e }) => e)
+          .sort((e, t) => e - t);
+        return e === `linear DNA`
+          ? [0, ...n, o].slice(1).map((e, t) => e - [0, ...n][t])
+          : n.length <= 1
+            ? [o]
+            : n.map((e, t) => {
+                let r = n[(t + 1) % n.length];
+                return r > e ? r - e : o - e + r;
+              });
+      }),
+      (h = (e) =>
+        Array.from(new Set(e))
+          .sort((e, t) => t - e)
+          .map((t) => ({ size: t, count: e.filter((e) => e === t).length }))),
+      (g = (e) => {
+        let t = o;
+        return Math.log(t / e) / Math.log(t / 1e3);
+      }),
+      (_ = (e) => {
+        let t = f(e),
+          n = [0, 1, 2].map((e) => {
+            let n = m(t.molecule_topology, e);
+            return { digest: e, fragments: n, bands: h(n) };
+          });
+        return {
+          safeValues: t,
+          lanes: n,
+          selectedLane: n[t.digest],
+          activeSites: s.filter(({ enzyme: e }) => p(e, t.digest)),
+        };
+      }));
+  }))();
 }
-
-function initializeRestrictionEnzymeMapModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializeRestrictionMapManifest();
-  moleculeLength = 6_000;
-  restrictionSites = [
-    { enzyme: "A", position: 1_000 }, { enzyme: "B", position: 2_500 }, { enzyme: "A", position: 4_000 },
-  ];
-  const topologyParameter = restrictionMapManifest.parameters.molecule_topology;
-  const isTopology = (value: unknown): value is MoleculeTopology =>
-    typeof value === "string" && topologyParameter.allowedValues.some(topology => topology === value);
-  topologyOptions = topologyParameter.allowedValues.filter(isTopology);
-  defaultTopology = isTopology(topologyParameter.defaultValue) ? topologyParameter.defaultValue : "circular plasmid";
-  const normalizeValues = (values: RestrictionValues) => ({
-    molecule_topology: isTopology(values.molecule_topology) ? values.molecule_topology : defaultTopology,
-    digest: values.digest === 0 || values.digest === 1 || values.digest === 2 ? values.digest : 2,
-  });
-  siteIncludedInDigest = (enzyme, digest) => digest === 2 || (digest === 0 ? enzyme === "A" : enzyme === "B");
-  const fragmentSizes = (topology: MoleculeTopology, digest: number): number[] => {
-    const positions = restrictionSites
-      .filter(site => siteIncludedInDigest(site.enzyme, digest))
-      .map(site => site.position)
-      .sort((left, right) => left - right);
-    if (topology === "linear DNA") {
-      const starts = [0, ...positions];
-      return [0, ...positions, moleculeLength].slice(1).map((position, index) => position - starts[index]);
-    }
-    if (positions.length <= 1) return [moleculeLength];
-    return positions.map((position, index) => {
-      const nextPosition = positions[(index + 1) % positions.length];
-      return nextPosition > position ? nextPosition - position : moleculeLength - position + nextPosition;
-    });
-  };
-  const bandsFor = (fragments: number[]): { size: number; count: number }[] =>
-    Array.from(new Set(fragments)).sort((left, right) => right - left)
-      .map(size => ({ size, count: fragments.filter(fragment => fragment === size).length }));
-  gelMigrationPosition = fragmentSize => Math.log(moleculeLength / fragmentSize) / Math.log(moleculeLength / 1_000);
-  calculateRestrictionDigest = values => {
-    const safeValues = normalizeValues(values);
-    const lanes = [0, 1, 2].map(digest => {
-      const fragments = fragmentSizes(safeValues.molecule_topology, digest);
-      return { digest, fragments, bands: bandsFor(fragments) };
-    });
-    return {
-      safeValues, lanes, selectedLane: lanes[safeValues.digest],
-      activeSites: restrictionSites.filter(site => siteIncludedInDigest(site.enzyme, safeValues.digest)),
-    };
-  };
-}
-
-export {
-  calculateRestrictionDigest as a, gelMigrationPosition as c, moleculeLength as i, initializeRestrictionMapManifest as l,
-  defaultTopology as n, initializeRestrictionEnzymeMapModel as o, topologyOptions as r,
-  siteIncludedInDigest as s, restrictionSites as t, restrictionMapManifest as u,
-};
+export { _ as a, g as c, o as i, a as l, d as n, v as o, u as r, p as s, s as t, i as u };

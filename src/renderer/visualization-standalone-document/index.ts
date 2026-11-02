@@ -1,24 +1,10 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
-import {
-  Cnt as visualizationBackground,
-  Dnt as visualizationContentSecurityPolicy,
-  Ent as initializeVisualizationDocumentRenderer,
-  Ont as renderVisualizationFragment,
-  knt as initializeVisualizationSecurityRuntime,
-} from "@rchunk/app-initial";
-
-export interface VisualizationStandaloneDocumentOptions {
-  locale: string;
-  styles?: string;
-  title: string;
-  treatment?: boolean;
-}
-
-const once = onceExport as (initializer: () => void) => () => void;
-
-let innerFrameBootstrapScript: string;
-const initializeInnerFrameBootstrap = once(() => {
-  innerFrameBootstrapScript = `(() => {
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { Cnt as t, Dnt as n, Ent as r, Ont as i, knt as a } from "@rchunk/app-initial";
+var o;
+function s() {
+  return (s = e(() => {
+    o = `(() => {
   const root = document.documentElement;
   const mediaQuery = globalThis.matchMedia("(prefers-color-scheme: dark)");
   const apply = Reflect.apply;
@@ -304,10 +290,12 @@ const initializeInnerFrameBootstrap = once(() => {
   syncTheme();
 })();
 `;
-});
-let outerFrameBootstrapScript: string;
-const initializeOuterFrameBootstrap = once(() => {
-  outerFrameBootstrapScript = `(() => {
+  }))();
+}
+var c;
+function l() {
+  return (l = e(() => {
+    c = `(() => {
   const frame = document.getElementById("codex-visualization");
   if (!(frame instanceof HTMLIFrameElement)) {
     return;
@@ -506,13 +494,14 @@ const initializeOuterFrameBootstrap = once(() => {
   delete frame.dataset.srcdoc;
 })();
 `;
-});
-function createVisualizationStandaloneDocument(
-  fragment: string,
+  }))();
+}
+function u(
+  e,
   {
-    locale,
-    treatment = false,
-    styles = `:root {
+    locale: n,
+    treatment: r = !1,
+    styles: a = `:root {
   color-scheme: light dark;
   background-color: var(
     --background,
@@ -1531,79 +1520,72 @@ svg.lucide {
   color: var(--destructive);
 }
 `,
-    title,
-  }: VisualizationStandaloneDocumentOptions,
-): string {
-  const innerDocument = `<!doctype html>
-<html lang="${escapeHtmlAttribute(locale)}">
+    title: s,
+  },
+) {
+  let l = `<!doctype html>
+<html lang="${d(n)}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="${innerContentSecurityPolicy}">
-<title>${escapeHtmlAttribute(title)}</title>
+<meta http-equiv="Content-Security-Policy" content="${p}">
+<title>${d(s)}</title>
 </head>
 <body>
 <script type="application/json" id="codex-visualization-widget-state">__CODEX_VISUALIZATION_WIDGET_STATE__<\/script>
-<script>${innerFrameBootstrapScript.replaceAll(`<\/script`, `<\\/script`)}<\/script>
-${renderVisualizationFragment(fragment, { treatment, lockDocumentOverflow: false, reportToHost: false, styles: `${styles}\nhtml>body{padding:0}` })}
+<script>${o.replaceAll(`<\/script`, `<\\/script`)}<\/script>
+${i(e, { treatment: r, lockDocumentOverflow: !1, reportToHost: !1, styles: `${a}\nhtml>body{padding:0}` })}
 </body>
 </html>
 `;
   return `<!doctype html>
-<html lang="${escapeHtmlAttribute(locale)}">
+<html lang="${d(n)}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="${outerContentSecurityPolicy}">
-<title>${escapeHtmlAttribute(title)}</title>
-<style>:root{color-scheme:light dark;background:${visualizationBackground}}html,body{margin:0}body{box-sizing:border-box;padding:1rem;background:inherit}iframe{display:block;width:100%;max-width:736px;height:calc(100vh - 2rem);margin:0 auto;border:0}</style>
+<meta http-equiv="Content-Security-Policy" content="${m}">
+<title>${d(s)}</title>
+<style>:root{color-scheme:light dark;background:${t}}html,body{margin:0}body{box-sizing:border-box;padding:1rem;background:inherit}iframe{display:block;width:100%;max-width:736px;height:calc(100vh - 2rem);margin:0 auto;border:0}</style>
 </head>
 <body>
-<iframe id="codex-visualization" sandbox="allow-scripts" scrolling="no" referrerpolicy="no-referrer" title="${escapeHtmlAttribute(title)}" data-srcdoc="${escapeHtmlAttribute(innerDocument)}"></iframe>
-<script>${outerFrameBootstrapScript.replaceAll(`<\/script`, `<\\/script`)}<\/script>
+<iframe id="codex-visualization" sandbox="allow-scripts" scrolling="no" referrerpolicy="no-referrer" title="${d(s)}" data-srcdoc="${d(l)}"></iframe>
+<script>${c.replaceAll(`<\/script`, `<\\/script`)}<\/script>
 </body>
 </html>
 `;
 }
-function escapeHtmlAttribute(value: string): string {
-  return value
+function d(e) {
+  return e
     .replaceAll(`&`, `&amp;`)
     .replaceAll(`<`, `&lt;`)
     .replaceAll(`>`, `&gt;`)
     .replaceAll(`"`, `&quot;`);
 }
-let resourceDomains: string;
-let innerContentSecurityPolicy: string;
-let outerContentSecurityPolicy: string;
-const initializeVisualizationStandaloneDocument = once(() => {
-  (initializeInnerFrameBootstrap(),
-    initializeOuterFrameBootstrap(),
-    initializeVisualizationSecurityRuntime(),
-    initializeVisualizationDocumentRenderer(),
-    (resourceDomains =
-      visualizationContentSecurityPolicy.resourceDomains.join(` `)),
-    (innerContentSecurityPolicy = [
-      `default-src 'none'`,
-      `script-src 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' ${resourceDomains}`,
-      `style-src 'unsafe-inline' ${resourceDomains}`,
-      `img-src ${resourceDomains}`,
-      `font-src ${resourceDomains}`,
-      `media-src ${resourceDomains}`,
-      `worker-src blob:`,
-      `connect-src blob: data:`,
-      `frame-src 'none'`,
-      `object-src 'none'`,
-      `base-uri 'none'`,
-      `form-action 'none'`,
-    ].join(`; `)),
-    (outerContentSecurityPolicy = innerContentSecurityPolicy.replace(
-      `frame-src 'none'`,
-      `frame-src 'self'`,
-    )));
-});
-export {
-  initializeVisualizationStandaloneDocument as n,
-  createVisualizationStandaloneDocument as t,
-};
+var f, p, m;
+function h() {
+  return (h = e(() => {
+    (s(),
+      l(),
+      a(),
+      r(),
+      (f = n.resourceDomains.join(` `)),
+      (p = [
+        `default-src 'none'`,
+        `script-src 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' ${f}`,
+        `style-src 'unsafe-inline' ${f}`,
+        `img-src ${f}`,
+        `font-src ${f}`,
+        `media-src ${f}`,
+        `worker-src blob:`,
+        `connect-src blob: data:`,
+        `frame-src 'none'`,
+        `object-src 'none'`,
+        `base-uri 'none'`,
+        `form-action 'none'`,
+      ].join(`; `)),
+      (m = p.replace(`frame-src 'none'`, `frame-src 'self'`)));
+  }))();
+}
+export { h as n, u as t };

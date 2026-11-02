@@ -1,381 +1,302 @@
-// ChatGPT ads placement and business-agent policy. Release chunk: placement-policy-c8f98920d800.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as holdoutChunk from "@rchunk/command-menu-holdout";
-
-interface BusinessAgentTarget {
-  business_agent_id?: string;
-  business_agent_gizmo_id?: string;
-  business_agent_conversation_starters?: unknown[];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, QI as n, ZI as r, dZ as i, rZ as a, sZ as o } from "@rchunk/app-shared";
+import {
+  $qt as s,
+  BKt as c,
+  Kqt as l,
+  OVt as u,
+  RKt as d,
+  Sqt as f,
+  Sun as p,
+  bqt as m,
+  gfn as h,
+  ifn as g,
+  lPt as _,
+  mPt as v,
+  mfn as y,
+  pfn as b,
+  rfn as x,
+  uHt as S,
+  vfn as C,
+  yun as w,
+  zKt as T,
+} from "@rchunk/app-initial";
+import { n as E, t as D } from "@rchunk/command-menu-holdout";
+function O(e) {
+  return e.type === `single_advertiser_ad_unit`
+    ? e.ad_cards?.length && !e.ad_cards.every((e) => e.format === `image_card_v1`)
+      ? e.ad_cards
+      : e.carousel_cards
+    : e.ads.map((e) => e.ad_card ?? e.carousel_card);
 }
-interface AdCard {
-  ad_data_token: string;
-  format?: string;
-  business_agent_target?: BusinessAgentTarget | null;
-  [key: string]: unknown;
-}
-interface SingleAdvertiserUnit {
-  type: "single_advertiser_ad_unit";
-  carousel_cards: AdCard[];
-  ad_cards?: AdCard[];
-  ads: Array<{ ad_card?: AdCard; carousel_card: AdCard }>;
-  [key: string]: unknown;
-}
-interface MultiAdvertiserUnit {
-  type: "multi_advertiser_ad_unit";
-  carousel_cards: AdCard[];
-  ad_cards?: AdCard[];
-  ads: Array<{ ad_card?: AdCard; carousel_card: AdCard }>;
-  [key: string]: unknown;
-}
-type AdUnit = SingleAdvertiserUnit | MultiAdvertiserUnit;
-interface PolicyConfig {
-  imageStreamingEnabled?: boolean;
-  [key: string]: unknown;
-}
-interface PolicyState {
-  loading: boolean;
-  enabled: boolean;
-  optedOut: boolean;
-  config?: PolicyConfig | null;
-}
-interface PlacementProps {
-  isImageGenerationTurn: boolean;
-  hasAssistantMessage: boolean;
-  hasCustomAgentMessage: boolean;
-  isAsyncCorrection: boolean;
-  isSuppressedConversation: boolean;
-}
-interface PlacementInput {
-  props: PlacementProps;
-  hasAd: boolean;
-  hasResponse: boolean;
-  hasNoContentResponse: boolean;
-  hasUnsupportedTarget: boolean;
-  hidden: boolean;
-  assistantCompleted: boolean;
-  slotTimedOut: boolean;
-  policy: PolicyState;
-}
-interface StoreLike {
-  get(signal: unknown, parameter?: unknown): unknown;
-}
-interface AppSharedRuntime {
-  FX(): void;
-  QI(): void;
-  ZI: unknown;
-  dZ(...args: unknown[]): unknown;
-  rZ(...args: unknown[]): unknown;
-  sZ(...args: unknown[]): unknown;
-}
-interface AppInitialRuntime {
-  [key: string]: unknown;
-}
-interface HoldoutRuntime {
-  n(): void;
-  t(scope: unknown): boolean;
-}
-
-const shared = appSharedChunk as unknown as AppSharedRuntime;
-const initial = appInitialChunk as unknown as AppInitialRuntime;
-const holdout = holdoutChunk as unknown as HoldoutRuntime;
-
-function flattenAdCards(unit: AdUnit): AdCard[] {
-  if (unit.type === "single_advertiser_ad_unit") {
-    if (
-      unit.ad_cards?.length &&
-      !unit.ad_cards.every((card) => card.format === "image_card_v1")
-    ) {
-      return unit.ad_cards;
-    }
-    return unit.carousel_cards;
+function k(e, t, n) {
+  let r = O(e),
+    i = r.indexOf(t);
+  if (i >= 0) return i;
+  if (r[n]?.ad_data_token === t.ad_data_token) return n;
+  let a = (e) => e === t || e?.ad_data_token === t.ad_data_token,
+    o = r.findIndex(a);
+  if (o >= 0) return o;
+  if (e.type === `multi_advertiser_ad_unit`) {
+    let t = e.ads.findIndex((e) => a(e.ad_card) || a(e.carousel_card));
+    return t >= 0 ? t : n;
   }
-  return unit.ads.map((entry) => entry.ad_card ?? entry.carousel_card);
+  let s = e.carousel_cards.findIndex(a);
+  if (s >= 0) return s;
+  let c = e.ad_cards?.findIndex(a) ?? -1;
+  return c >= 0 ? c : n;
 }
-
-function findAdCardIndex(
-  unit: AdUnit,
-  target: AdCard,
-  fallbackIndex: number,
-): number {
-  const cards = flattenAdCards(unit);
-  const directIndex = cards.indexOf(target);
-  if (directIndex >= 0) return directIndex;
-  if (cards[fallbackIndex]?.ad_data_token === target.ad_data_token)
-    return fallbackIndex;
-  const matches = (card: AdCard | undefined) =>
-    card === target || card?.ad_data_token === target.ad_data_token;
-  const cardIndex = cards.findIndex(matches);
-  if (cardIndex >= 0) return cardIndex;
-  if (unit.type === "multi_advertiser_ad_unit") {
-    const adIndex = unit.ads.findIndex(
-      (entry) => matches(entry.ad_card) || matches(entry.carousel_card),
-    );
-    return adIndex >= 0 ? adIndex : fallbackIndex;
-  }
-  const carouselIndex = unit.carousel_cards.findIndex(matches);
-  if (carouselIndex >= 0) return carouselIndex;
-  const imageIndex = unit.ad_cards?.findIndex(matches) ?? -1;
-  return imageIndex >= 0 ? imageIndex : fallbackIndex;
-}
-
-function hasBusinessAgentTarget(unit: AdUnit): boolean {
-  if (unit.type === "single_advertiser_ad_unit") {
-    return [...unit.carousel_cards, ...(unit.ad_cards ?? [])].some(
-      (card) => card.business_agent_target != null,
-    );
-  }
-  return unit.ads.some(
-    (entry) =>
-      entry.carousel_card.business_agent_target != null ||
-      entry.ad_card?.business_agent_target != null,
-  );
-}
-
-function targetsConflict(
-  left: BusinessAgentTarget | null | undefined,
-  right: BusinessAgentTarget | null | undefined,
-): boolean {
-  return (
-    left != null &&
-    right != null &&
-    (left.business_agent_id !== right.business_agent_id ||
-      left.business_agent_gizmo_id !== right.business_agent_gizmo_id)
-  );
-}
-
-function mergeBusinessTarget(card: AdCard, alternatives: AdCard[]): AdCard {
-  const alternativeTarget = alternatives.find(
-    (candidate) => candidate.ad_data_token === card.ad_data_token,
-  )?.business_agent_target;
-  const target = card.business_agent_target;
-  if (alternativeTarget == null) return card;
-  if (target == null)
-    return { ...card, business_agent_target: alternativeTarget };
-  if (
-    target.business_agent_conversation_starters != null ||
-    !alternativeTarget.business_agent_conversation_starters?.length
-  ) {
-    return card;
-  }
-  return {
-    ...card,
-    business_agent_target: {
-      ...target,
-      business_agent_conversation_starters:
-        alternativeTarget.business_agent_conversation_starters,
-    },
-  };
-}
-
-function normalizeBusinessTargets(unit: AdUnit): AdUnit | null {
-  if (!hasBusinessAgentTarget(unit)) return unit;
-  if (unit.type === "single_advertiser_ad_unit") {
-    const carouselCards = unit.carousel_cards;
-    const adCards = unit.ad_cards;
-    const targeted = [...carouselCards, ...(adCards ?? [])].filter(
-      (card) => card.business_agent_target != null,
-    );
-    for (const card of targeted) {
-      if (!card.ad_data_token.trim()) return null;
-      if (!adCards?.length) continue;
-      const carouselMatches = carouselCards.filter(
-        (candidate) => candidate.ad_data_token === card.ad_data_token,
+function A(e) {
+  return e.type === `single_advertiser_ad_unit`
+    ? [...e.carousel_cards, ...(e.ad_cards ?? [])].some((e) => e.business_agent_target != null)
+    : e.ads.some(
+        (e) =>
+          e.carousel_card.business_agent_target != null || e.ad_card?.business_agent_target != null,
       );
-      const adMatches = adCards.filter(
-        (candidate) => candidate.ad_data_token === card.ad_data_token,
-      );
+}
+function j(e) {
+  if (!A(e)) return e;
+  if (e.type === `single_advertiser_ad_unit`) {
+    let t = e.carousel_cards,
+      n = e.ad_cards,
+      r = [...t, ...(n ?? [])].filter((e) => e.business_agent_target != null);
+    for (let e of r) {
+      if (!e.ad_data_token.trim()) return null;
+      if (n == null || n.length === 0) continue;
+      let r = t.filter((t) => t.ad_data_token === e.ad_data_token),
+        i = n.filter((t) => t.ad_data_token === e.ad_data_token);
       if (
-        adMatches.length !== 1 ||
-        (carouselCards.length > 0 && carouselMatches.length !== 1) ||
-        targetsConflict(
-          carouselMatches[0]?.business_agent_target,
-          adMatches[0]?.business_agent_target,
-        )
-      ) {
-        return null;
-      }
-    }
-    if (!adCards?.length || carouselCards.length === 0) return unit;
-    const normalizedCarousel = carouselCards.map((card) =>
-      mergeBusinessTarget(card, adCards),
-    );
-    const normalizedAds = adCards.map((card) =>
-      mergeBusinessTarget(card, carouselCards),
-    );
-    return normalizedCarousel.some(
-      (card, index) => card !== carouselCards[index],
-    ) || normalizedAds.some((card, index) => card !== adCards[index])
-      ? { ...unit, carousel_cards: normalizedCarousel, ad_cards: normalizedAds }
-      : unit;
-  }
-
-  const tokenCounts = new Map<string, number>();
-  for (const entry of unit.ads) {
-    for (const token of new Set([
-      entry.carousel_card.ad_data_token,
-      entry.ad_card?.ad_data_token,
-    ])) {
-      if (token?.trim())
-        tokenCounts.set(token, (tokenCounts.get(token) ?? 0) + 1);
-    }
-  }
-  for (const entry of unit.ads) {
-    if (
-      entry.carousel_card.business_agent_target == null &&
-      entry.ad_card?.business_agent_target == null
-    ) {
-      continue;
-    }
-    const token = entry.carousel_card.ad_data_token;
-    if (
-      !token.trim() ||
-      tokenCounts.get(token) !== 1 ||
-      (entry.ad_card != null && entry.ad_card.ad_data_token !== token) ||
-      targetsConflict(
-        entry.carousel_card.business_agent_target,
-        entry.ad_card?.business_agent_target,
+        i.length !== 1 ||
+        (t.length > 0 && r.length !== 1) ||
+        N(r[0]?.business_agent_target, i[0]?.business_agent_target)
       )
-    ) {
-      return null;
+        return null;
     }
+    if (n == null || n.length === 0 || t.length === 0) return e;
+    let i = t.map((e) => P(e, n)),
+      a = n.map((e) => P(e, t));
+    return i.some((e, n) => e !== t[n]) || a.some((e, t) => e !== n[t])
+      ? { ...e, carousel_cards: i, ad_cards: a }
+      : e;
   }
-  const normalized = unit.ads.map((entry) => {
-    if (!entry.ad_card) return entry;
-    const carouselCard = mergeBusinessTarget(entry.carousel_card, [
-      entry.ad_card,
-    ]);
-    const adCard = mergeBusinessTarget(entry.ad_card, [entry.carousel_card]);
-    return carouselCard === entry.carousel_card && adCard === entry.ad_card
-      ? entry
-      : { ...entry, carousel_card: carouselCard, ad_card: adCard };
+  let t = new Map();
+  for (let n of e.ads)
+    for (let e of new Set([n.carousel_card.ad_data_token, n.ad_card?.ad_data_token]))
+      e?.trim() && t.set(e, (t.get(e) ?? 0) + 1);
+  for (let n of e.ads) {
+    if (n.carousel_card.business_agent_target == null && n.ad_card?.business_agent_target == null)
+      continue;
+    let e = n.carousel_card.ad_data_token;
+    if (
+      !e.trim() ||
+      t.get(e) !== 1 ||
+      (n.ad_card != null && n.ad_card.ad_data_token !== e) ||
+      N(n.carousel_card.business_agent_target, n.ad_card?.business_agent_target)
+    )
+      return null;
+  }
+  let n = e.ads.map((e) => {
+    if (e.ad_card == null) return e;
+    let t = P(e.carousel_card, [e.ad_card]),
+      n = P(e.ad_card, [e.carousel_card]);
+    return t === e.carousel_card && n === e.ad_card ? e : { ...e, carousel_card: t, ad_card: n };
   });
-  return normalized.some((entry, index) => entry !== unit.ads[index])
-    ? { ...unit, ads: normalized }
-    : unit;
+  return n.some((t, n) => t !== e.ads[n]) ? { ...e, ads: n } : e;
 }
-
-function removeBusinessTargetedCards(unit: AdUnit): AdUnit | null {
-  if (unit.type === "multi_advertiser_ad_unit") {
-    const ads = unit.ads.filter(
-      (entry) =>
-        entry.carousel_card.business_agent_target == null &&
-        entry.ad_card?.business_agent_target == null,
+function M(e) {
+  if (e.type === `multi_advertiser_ad_unit`) {
+    let t = e.ads.filter(
+      (e) =>
+        e.carousel_card.business_agent_target == null && e.ad_card?.business_agent_target == null,
     );
-    return ads.length > 0 ? { ...unit, ads } : null;
+    return t.length > 0 ? { ...e, ads: t } : null;
   }
-  const targetedTokens = new Set(
-    [...unit.carousel_cards, ...(unit.ad_cards ?? [])]
-      .filter((card) => card.business_agent_target != null)
-      .map((card) => card.ad_data_token),
-  );
-  const filtered: SingleAdvertiserUnit = {
-    ...unit,
-    carousel_cards: unit.carousel_cards.filter(
-      (card) => !targetedTokens.has(card.ad_data_token),
+  let t = new Set(
+      [...e.carousel_cards, ...(e.ad_cards ?? [])]
+        .filter((e) => e.business_agent_target != null)
+        .map((e) => e.ad_data_token),
     ),
-    ad_cards: unit.ad_cards?.filter(
-      (card) => !targetedTokens.has(card.ad_data_token),
-    ),
-  };
-  return flattenAdCards(filtered).length > 0 ? filtered : null;
-}
-
-function sanitizeAdContent(scope: StoreLike, content: unknown): AdUnit | null {
-  const isAdContent = initial.BKt as
-    ((value: unknown) => value is AdUnit) | undefined;
-  if (!isAdContent?.(content)) return null;
-  if (!hasBusinessAgentTarget(content)) {
-    return flattenAdCards(content).length > 0 ? content : null;
-  }
-  return scope.get(businessAgentExperimentSignal)
-    ? normalizeBusinessTargets(content)
-    : removeBusinessTargetedCards(content);
-}
-
-function isAdsPolicyEnabled(scope: StoreLike): boolean {
-  const state = scope.get(adsPolicyStateSignal) as PolicyState;
-  return !state.loading && state.enabled && !state.optedOut;
-}
-
-function computePlacementState(input: PlacementInput) {
-  const reject = (rejectionReason: unknown) => ({
-    state: "rejected",
-    rejectionReason,
-  });
-  const { props, policy } = input;
-  if (input.hidden) return { state: "hidden", rejectionReason: null };
-  if (policy.loading) return { state: "policy_loading", rejectionReason: null };
-  const imageStreaming =
-    input.hasAd &&
-    props.isImageGenerationTurn &&
-    (!input.assistantCompleted || !props.hasAssistantMessage) &&
-    !props.hasCustomAgentMessage &&
-    !props.isAsyncCorrection &&
-    !props.isSuppressedConversation &&
-    policy.enabled &&
-    policy.config?.imageStreamingEnabled === true &&
-    !policy.optedOut;
-  if (!input.assistantCompleted && !imageStreaming) {
-    return { state: "streaming", rejectionReason: null };
-  }
-  if (input.hasNoContentResponse)
-    return { state: "hidden", rejectionReason: null };
-  if (!input.hasResponse) {
-    return {
-      state: input.slotTimedOut ? "hidden" : "waiting",
-      rejectionReason: null,
+    n = {
+      ...e,
+      carousel_cards: e.carousel_cards.filter((e) => !t.has(e.ad_data_token)),
+      ad_cards: e.ad_cards?.filter((e) => !t.has(e.ad_data_token)),
     };
-  }
-  if (!input.hasAd) return reject("NON_DISPLAYABLE_CONTENT");
-  if (props.hasCustomAgentMessage) return reject("CUSTOM_AGENT");
-  if (props.isAsyncCorrection) return reject("ASYNC_CORRECTION");
-  if (props.isSuppressedConversation || input.hasUnsupportedTarget) {
-    return reject("UNSUPPORTED_SURFACE");
-  }
-  if (!policy.enabled) return reject("BAZAAR_DISABLED");
-  if (!props.hasAssistantMessage && !imageStreaming)
-    return reject("MISSING_ASSISTANT_MESSAGE");
-  if (input.slotTimedOut) return reject("LATE_ARRIVAL");
-  if (policy.optedOut) return reject("ADS_OPT_OUT");
-  return { state: "render", rejectionReason: null };
+  return O(n).length > 0 ? n : null;
 }
-
-function initializeNoop(): void {}
-
-let responseContentSignal: unknown;
-let currentAdMessageSignal: unknown;
-let businessAgentExperimentSignal: unknown;
-let adsPolicyStateSignal: unknown;
-
-function initializeAdsPlacementPolicy(): void {
-  const derive = shared.rZ;
-  const computed = shared.sZ;
-  responseContentSignal ??= derive(shared.ZI, () => null);
-  currentAdMessageSignal ??= derive(shared.ZI, () => null);
-  businessAgentExperimentSignal ??= computed(shared.ZI, () => false);
-  adsPolicyStateSignal ??= computed(shared.ZI, () => ({
-    config: null,
-    loading: true,
-    enabled: false,
-    optedOut: false,
-  }));
-  holdout.n();
-  shared.FX();
-  shared.QI();
+function N(e, t) {
+  return (
+    e != null &&
+    t != null &&
+    (e.business_agent_id !== t.business_agent_id ||
+      e.business_agent_gizmo_id !== t.business_agent_gizmo_id)
+  );
 }
-
-export {
-  sanitizeAdContent as a,
-  currentAdMessageSignal as c,
-  initializeNoop as d,
-  computePlacementState as i,
-  flattenAdCards as l,
-  businessAgentExperimentSignal as n,
-  initializeAdsPlacementPolicy as o,
-  responseContentSignal as r,
-  isAdsPolicyEnabled as s,
-  adsPolicyStateSignal as t,
-  findAdCardIndex as u,
-};
+function P(e, t) {
+  let n = t.find((t) => t.ad_data_token === e.ad_data_token)?.business_agent_target,
+    r = e.business_agent_target;
+  return n == null
+    ? e
+    : r == null
+      ? { ...e, business_agent_target: n }
+      : r.business_agent_conversation_starters != null ||
+          !n.business_agent_conversation_starters?.length
+        ? e
+        : {
+            ...e,
+            business_agent_target: {
+              ...r,
+              business_agent_conversation_starters: n.business_agent_conversation_starters,
+            },
+          };
+}
+function F() {
+  return (F = e(() => {}))();
+}
+function I(e) {
+  let t = e.get(W);
+  return !t.loading && t.enabled && !t.optedOut;
+}
+function L(e, t) {
+  return c(t) ? (A(t) ? (e.get(G) ? j(t) : M(t)) : O(t).length > 0 ? t : null) : null;
+}
+function R({
+  props: e,
+  hasAd: t,
+  hasResponse: n,
+  hasNoContentResponse: r,
+  hasUnsupportedTarget: i,
+  hidden: a,
+  assistantCompleted: o,
+  slotTimedOut: s,
+  policy: c,
+}) {
+  let u = (e) => ({ state: `rejected`, rejectionReason: e });
+  if (a) return { state: `hidden`, rejectionReason: null };
+  if (c.loading) return { state: `policy_loading`, rejectionReason: null };
+  let d =
+    t &&
+    e.isImageGenerationTurn &&
+    (!o || !e.hasAssistantMessage) &&
+    !e.hasCustomAgentMessage &&
+    !e.isAsyncCorrection &&
+    !e.isSuppressedConversation &&
+    c.enabled &&
+    c.config?.imageStreamingEnabled === !0 &&
+    !c.optedOut;
+  return !o && !d
+    ? { state: `streaming`, rejectionReason: null }
+    : r
+      ? { state: `hidden`, rejectionReason: null }
+      : n
+        ? t
+          ? e.hasCustomAgentMessage
+            ? u(l.CHATGPT_ADS_PLACEMENT_REJECTION_REASON_CUSTOM_AGENT)
+            : e.isAsyncCorrection
+              ? u(l.CHATGPT_ADS_PLACEMENT_REJECTION_REASON_ASYNC_CORRECTION)
+              : e.isSuppressedConversation || i
+                ? u(l.CHATGPT_ADS_PLACEMENT_REJECTION_REASON_UNSUPPORTED_SURFACE)
+                : c.enabled
+                  ? !e.hasAssistantMessage && !d
+                    ? u(l.CHATGPT_ADS_PLACEMENT_REJECTION_REASON_MISSING_ASSISTANT_MESSAGE)
+                    : s
+                      ? u(l.CHATGPT_ADS_PLACEMENT_REJECTION_REASON_LATE_ARRIVAL)
+                      : c.optedOut
+                        ? u(l.CHATGPT_ADS_PLACEMENT_REJECTION_REASON_ADS_OPT_OUT)
+                        : { state: `render`, rejectionReason: null }
+                  : u(l.CHATGPT_ADS_PLACEMENT_REJECTION_REASON_BAZAAR_DISABLED)
+          : u(l.CHATGPT_ADS_PLACEMENT_REJECTION_REASON_NON_DISPLAYABLE_CONTENT)
+        : { state: s ? `hidden` : `waiting`, rejectionReason: null };
+}
+function z(e, t) {
+  let n = x(e, `1402002035`),
+    r = n.get(`web_discard_timeout_after_slot_visibility_ms`, 1500),
+    i = typeof r == `number` ? r : Number(r),
+    a = t && e.checkGate(`665873859`),
+    o = !t && e.checkGate(`912212197`);
+  return {
+    authenticatedEnabled: a,
+    anonymousEnabled: o,
+    adsSuppressed: (a || o) && D(e),
+    optOutEnabled: e.checkGate(`1613860123`),
+    imageStreamingEnabled: n.get(`enable_image_gen_render_while_streaming`, !1),
+    visibleTimeoutMs: Number.isFinite(i) && i >= 1500 && i <= 1e4 ? i : 1500,
+  };
+}
+var B, V, H, U, W, G;
+function K() {
+  return (K = e(() => {
+    (s(),
+      t(),
+      p(),
+      E(),
+      T(),
+      v(),
+      S(),
+      f(),
+      n(),
+      g(),
+      b(),
+      (B = a(r, (e, t) => {
+        let n = t.get(_, e);
+        return n != null && d(n.response) ? L(t, n.response.content) : null;
+      })),
+      (V = a(r, (e, { get: t }) => {
+        let n = t(u, e);
+        if (n == null) return null;
+        for (let r = n.length - 1; r >= 0; --r) {
+          let i = n[r];
+          if (t(B, { conversationId: e, userMessageId: i }) != null) return i;
+        }
+        return null;
+      })),
+      (H = a(r, (e, { get: t }) => t(V, e.conversationId) === e.userMessageId)),
+      (U = i(
+        r,
+        ({ get: e }) => {
+          let t = e(h),
+            n = e(w);
+          return t == null || n.authLoading ? null : z(t, n.authMethod === `chatgpt`);
+        },
+        ({ get: e, set: t }) => {
+          let n = e(h),
+            r = e(w);
+          if (n == null) return;
+          let i = () => {
+            t(r.authLoading ? null : z(n, r.authMethod === `chatgpt`));
+          };
+          return (n.on(`values_updated`, i), () => n.off(`values_updated`, i));
+        },
+      )),
+      (W = o(r, ({ get: e }) => {
+        let t = e(U),
+          n = e(w),
+          r = n.authMethod === `chatgpt`,
+          i = r ? e(m) : null;
+        return {
+          config: t,
+          loading:
+            t == null || e(C) || n.authLoading || n.accountLoading || (i != null && i.data == null),
+          enabled:
+            t != null &&
+            !t.adsSuppressed &&
+            (i?.data?.bazaarConsentRequired !== !0 ||
+              i.data.bazaarPersonalizationUnavailable === !0) &&
+            (r ? t.authenticatedEnabled : t.anonymousEnabled),
+          optedOut: t?.optOutEnabled === !0 && i?.data?.freeAdsOptOut === !0,
+        };
+      })),
+      (G = o(r, ({ get: e }) => {
+        let t = e(w);
+        return (
+          !t.authLoading &&
+          !t.accountLoading &&
+          t.authMethod === `chatgpt` &&
+          !e(C) &&
+          e(y, `699583893`) &&
+          e(y, `199045523`)
+        );
+      })));
+  }))();
+}
+export { L as a, H as c, F as d, R as i, O as l, G as n, K as o, B as r, I as s, W as t, k as u };

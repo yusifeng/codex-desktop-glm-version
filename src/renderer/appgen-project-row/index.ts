@@ -1,142 +1,116 @@
-// appgen-project-row —— Site 项目行/网格使用的截图缩略图。
-// 原版：app/webview/assets/appgen-project-row-4cd40a4dcdf9.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appgenAccessChunk from "@rchunk/appgen-access";
-import * as accessStateMessagesChunk from "@rchunk/appgen-access-state-messages";
-import * as cardLayoutChunk from "@rchunk/appgen-card-layout";
-import * as openShareDialogChunk from "@rchunk/open-appgen-share-dialog";
-import * as defaultThumbnailChunk from "@rchunk/sites-default-thumbnail";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-void runtimeChunk;
-const {
-  $3: initializeReactRuntime,
-  FX: initializeMaitaiRuntime,
-  I3: getJsxRuntime,
-  QI: initializeImageRuntime,
-  h4: initializeImageComponent,
-  m4: classNames,
-} = appSharedChunk;
-const {
-  Dft: initializeLinkNavigation,
-  E6t: getDesktopPlatform,
-  RS: initializeProjectAccess,
-  T6t: initializeSiteMetadata,
-  _an: initializeAppgenQueries,
-  a7: initializeSiteRoutes,
-  wan: useAppgenScreenshotSrc,
-  yZ: initializeImageLoading,
-} = appInitialChunk;
-const { s: initializeAppgenAccess } = appgenAccessChunk;
-const {
-  i: initializeAccessStateIcons,
-  o: initializeAccessStateMessages,
-} = accessStateMessagesChunk;
-const {
-  a: initializeCardLayout,
-  n: AppgenCardThumbnailLayout,
-} = cardLayoutChunk;
-const { t: initializeOpenShareDialog } = openShareDialogChunk;
-const {
-  i: initializeMacThumbnail,
-  n: initializeWindowsThumbnail,
-  o: initializeDefaultThumbnailRuntime,
-  r: WindowsDefaultThumbnail,
-  t: MacDefaultThumbnail,
-} = defaultThumbnailChunk;
-let jsx: JsxRuntime;
-let styles: Record<string, string>;
-
-interface AppgenProjectThumbnailProps {
-  aspectRatio?: string;
-  screenshotUrl?: string | null;
-  viewMode: "list" | "grid";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, FX as n, I3 as r, QI as i, h4 as a, m4 as o } from "@rchunk/app-shared";
+import {
+  Dft as s,
+  E6t as c,
+  RS as l,
+  T6t as u,
+  _an as d,
+  a7 as f,
+  wan as p,
+  yZ as m,
+} from "@rchunk/app-initial";
+import { s as h } from "@rchunk/appgen-access";
+import { i as g, o as _ } from "@rchunk/appgen-access-state-messages";
+import { a as v, n as y } from "@rchunk/appgen-card-layout";
+import { t as b } from "@rchunk/open-appgen-share-dialog";
+import { i as x, n as S, o as C, r as w, t as T } from "@rchunk/sites-default-thumbnail";
+var E, D, O, k;
+function A() {
+  return (A = e(() => {
+    ((E = `_openButton_1l7k7_2`),
+      (D = `_listAsset_1l7k7_2`),
+      (O = `_gridAsset_1l7k7_2`),
+      (k = { openButton: E, listAsset: D, gridAsset: O }));
+  }))();
 }
-
-function initializeStyles(): void {
-  styles = {
-    openButton: "_openButton_1l7k7_2",
-    listAsset: "_listAsset_1l7k7_2",
-    gridAsset: "_gridAsset_1l7k7_2",
-  };
+function j(e) {
+  let t = (0, N.c)(4),
+    { aspectRatio: n, screenshotUrl: r, viewMode: i } = e,
+    { data: a } = p(r),
+    s;
+  return (
+    t[0] !== n || t[1] !== a || t[2] !== i
+      ? ((s =
+          a == null
+            ? (0, P.jsx)(M, { aspectRatio: n, viewMode: i })
+            : (0, P.jsx)(y, {
+                className: `flex items-center justify-center`,
+                aspectRatio: n,
+                viewMode: i,
+                children: (0, P.jsx)(`img`, {
+                  alt: ``,
+                  className: o(
+                    i === `list` ? k.listAsset : k.gridAsset,
+                    i === `grid` ? `max-h-[72%] max-w-[72%]` : `max-h-full max-w-full`,
+                    `object-contain`,
+                  ),
+                  loading: `lazy`,
+                  src: a,
+                }),
+              })),
+        (t[0] = n),
+        (t[1] = a),
+        (t[2] = i),
+        (t[3] = s))
+      : (s = t[3]),
+    s
+  );
 }
-
-function DefaultSiteThumbnail({
-  aspectRatio,
-  viewMode,
-}: {
-  aspectRatio?: string;
-  viewMode: "list" | "grid";
-}) {
-  const { platform } = getDesktopPlatform();
-  const ThumbnailAsset =
-    platform === "windows" ? WindowsDefaultThumbnail : MacDefaultThumbnail;
-  const assetClassName =
-    viewMode === "list" ? styles.listAsset : styles.gridAsset;
-  const sizeClassName = viewMode === "list" ? "size-full" : "h-auto w-[72%]";
-  return jsx.jsx(AppgenCardThumbnailLayout, {
-    className: "flex items-center justify-center",
-    aspectRatio,
-    viewMode,
-    children: jsx.jsx(ThumbnailAsset, {
-      "aria-hidden": true,
-      className: classNames(assetClassName, sizeClassName),
-    }),
-  });
+function M(e) {
+  let t = (0, N.c)(10),
+    { aspectRatio: n, viewMode: r } = e,
+    { platform: i } = c(),
+    a = i === `windows` ? w : T,
+    s = r === `list` ? k.listAsset : k.gridAsset,
+    l = r === `list` ? `size-full` : `h-auto w-[72%]`,
+    u;
+  t[0] !== s || t[1] !== l ? ((u = o(s, l)), (t[0] = s), (t[1] = l), (t[2] = u)) : (u = t[2]);
+  let d;
+  t[3] !== a || t[4] !== u
+    ? ((d = (0, P.jsx)(a, { "aria-hidden": !0, className: u })), (t[3] = a), (t[4] = u), (t[5] = d))
+    : (d = t[5]);
+  let f;
+  return (
+    t[6] !== n || t[7] !== d || t[8] !== r
+      ? ((f = (0, P.jsx)(y, {
+          className: `flex items-center justify-center`,
+          aspectRatio: n,
+          viewMode: r,
+          children: d,
+        })),
+        (t[6] = n),
+        (t[7] = d),
+        (t[8] = r),
+        (t[9] = f))
+      : (f = t[9]),
+    f
+  );
 }
-
-function AppgenProjectThumbnail({
-  aspectRatio,
-  screenshotUrl,
-  viewMode,
-}: AppgenProjectThumbnailProps) {
-  const { data: screenshotSrc } = useAppgenScreenshotSrc(screenshotUrl);
-  if (screenshotSrc == null) {
-    return jsx.jsx(DefaultSiteThumbnail, { aspectRatio, viewMode });
-  }
-  return jsx.jsx(AppgenCardThumbnailLayout, {
-    className: "flex items-center justify-center",
-    aspectRatio,
-    viewMode,
-    children: jsx.jsx("img", {
-      alt: "",
-      className: classNames(
-        viewMode === "list" ? styles.listAsset : styles.gridAsset,
-        viewMode === "grid"
-          ? "max-h-[72%] max-w-[72%]"
-          : "max-h-full max-w-full",
-        "object-contain",
-      ),
-      loading: "lazy",
-      src: screenshotSrc,
-    }),
-  });
+var N, P;
+function F() {
+  return (F = e(() => {
+    ((N = t()),
+      a(),
+      n(),
+      s(),
+      f(),
+      l(),
+      u(),
+      m(),
+      v(),
+      i(),
+      h(),
+      _(),
+      g(),
+      C(),
+      d(),
+      b(),
+      x(),
+      S(),
+      A(),
+      (P = r()));
+  }))();
 }
-
-function initializeAppgenProjectRow(): void {
-  initializeReactRuntime();
-  initializeImageComponent();
-  initializeMaitaiRuntime();
-  initializeLinkNavigation();
-  initializeSiteRoutes();
-  initializeProjectAccess();
-  initializeSiteMetadata();
-  initializeImageLoading();
-  initializeCardLayout();
-  initializeImageRuntime();
-  initializeAppgenAccess();
-  initializeAccessStateMessages();
-  initializeAccessStateIcons();
-  initializeDefaultThumbnailRuntime();
-  initializeAppgenQueries();
-  initializeOpenShareDialog();
-  initializeMacThumbnail();
-  initializeWindowsThumbnail();
-  initializeStyles();
-  jsx = getJsxRuntime();
-}
-
-export { initializeAppgenProjectRow as n, AppgenProjectThumbnail as t };
+export { F as n, j as t };

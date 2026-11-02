@@ -1,95 +1,94 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, _L as n, gL as r } from "@rchunk/app-shared";
 import {
-  $3 as initializeCompilerRuntime,
-  _L as useQuery,
-  gL as initializeUseQuery,
-} from "@rchunk/app-shared";
-import {
-  Dft as initializeGiftCreditAnalytics,
-  M6t as initializeAuthentication,
-  N6t as useAuthentication,
-  Oft as openTrackedExternalUrl,
-  ifn as initializeAccountQueries,
-  kft as openExternalUrl,
-  pdn as initializeAccountApi,
-  rht as initializeFeatureConfig,
-  udn as accountApiClient,
-  ufn as useFeatureConfig,
-  uht as useAccount,
+  Dft as i,
+  M6t as a,
+  N6t as o,
+  Oft as s,
+  ifn as c,
+  kft as l,
+  pdn as u,
+  rht as d,
+  udn as f,
+  ufn as p,
+  uht as m,
 } from "@rchunk/app-initial";
-
-const featureConfigId = "3116837080";
-const purchaseFlowFlag = "purchase_flow_enabled";
-const desktopBeaconFlag = "desktop_beacon_enabled";
-let giftCreditsUrl: string;
-
-function initializeGiftCreditsUrl(): void {
-  initializeGiftCreditAnalytics();
-  giftCreditsUrl = "https://chatgpt.com/gifts/credits";
-}
-
-function openGiftCredits(event?: string, entryPoint?: string): void {
-  const href = entryPoint === undefined
-    ? giftCreditsUrl
-    : `${giftCreditsUrl}?entry_point=${entryPoint}`;
-  if (event === undefined) {
-    openExternalUrl({ href, initiator: "open_in_browser_bridge" });
+function h(e, t) {
+  let n = t === void 0 ? g : `${g}?entry_point=${t}`;
+  if (e === void 0) {
+    l({ href: n, initiator: `open_in_browser_bridge` });
     return;
   }
-  openTrackedExternalUrl({ event, href, initiator: "open_in_browser_bridge" });
+  s({ event: e, href: n, initiator: `open_in_browser_bridge` });
 }
-
-function useGiftCreditsQueryEnabled(enabled = true): boolean | undefined {
-  const { authMethod, hasChatGptToken, isLoading: authLoading } = useAuthentication();
-  const { data: account, isLoading: accountLoading } = useAccount();
-  const authenticated = authMethod === "chatgpt" && hasChatGptToken === true && account != null;
-  const queryEnabled = enabled && authenticated;
-  const queryKey = ["gift-credits", "sender-eligibility", account?.id, account?.plan_type];
-  const { data, isLoading } = useQuery({
-    enabled: queryEnabled,
-    queryFn: fetchGiftCreditEligibility,
-    queryKey,
-    retry: false,
-    staleTime: 60_000,
-  });
-  if (!enabled) return false;
-  if (!(authLoading || accountLoading || isLoading)) {
-    return authenticated && (data as { eligible?: boolean } | undefined)?.eligible === true;
-  }
+var g;
+function _() {
+  return (_ = e(() => {
+    (i(), (g = `https://chatgpt.com/gifts/credits`));
+  }))();
 }
-
-function useGiftCreditPurchaseAvailable(): boolean {
-  const eligible = useGiftCreditsQueryEnabled();
-  const config = useFeatureConfig(featureConfigId);
-  return eligible ? config.get(purchaseFlowFlag, false) : false;
+function v() {
+  let e = (0, S.c)(2),
+    t = b(),
+    n = p(C);
+  if (!t) return !1;
+  let r;
+  return (e[0] === n ? (r = e[1]) : ((r = n.get(w, !1)), (e[0] = n), (e[1] = r)), r);
 }
-
-function useGiftCreditBeaconAvailable(options?: { enabled?: boolean }): boolean | undefined {
-  const enabled = options?.enabled ?? true;
-  const eligible = useGiftCreditsQueryEnabled(enabled);
-  const config = useFeatureConfig(featureConfigId);
-  return eligible === true
-    ? config.get(purchaseFlowFlag, false) && config.get(desktopBeaconFlag, false)
-    : eligible;
+function y(e) {
+  let t = (0, S.c)(6),
+    n;
+  t[0] === e ? (n = t[1]) : ((n = e === void 0 ? {} : e), (t[0] = e), (t[1] = n));
+  let { enabled: r } = n,
+    i = b(r === void 0 || r),
+    a = p(C);
+  if (i !== !0) return i;
+  let o;
+  t[2] === a ? (o = t[3]) : ((o = a.get(w, !1)), (t[2] = a), (t[3] = o));
+  let s = o,
+    c;
+  return (t[4] === a ? (c = t[5]) : ((c = a.get(T, !1)), (t[4] = a), (t[5] = c)), s && c);
 }
-
-function fetchGiftCreditEligibility(): Promise<unknown> {
-  return accountApiClient.safeGet("/gift-credits/senders/eligibility");
+function b(e) {
+  let t = (0, S.c)(6),
+    r = e === void 0 || e,
+    { authMethod: i, hasChatGptToken: a, isLoading: s } = o(),
+    { data: c, isLoading: l } = m(),
+    u = i === `chatgpt` && a === !0 && c != null,
+    d = r && u,
+    f = c?.id,
+    p = c?.plan_type,
+    h;
+  t[0] !== f || t[1] !== p
+    ? ((h = [`gift-credits`, `sender-eligibility`, f, p]), (t[0] = f), (t[1] = p), (t[2] = h))
+    : (h = t[2]);
+  let g;
+  t[3] !== d || t[4] !== h
+    ? ((g = { enabled: d, queryFn: x, queryKey: h, retry: !1, staleTime: 6e4 }),
+      (t[3] = d),
+      (t[4] = h),
+      (t[5] = g))
+    : (g = t[5]);
+  let { data: _, isLoading: v } = n(g);
+  if (!r) return !1;
+  if (!(s || l || v)) return u && _?.eligible === !0;
 }
-
-function initializeEntryPointAvailability(): void {
-  initializeCompilerRuntime();
-  initializeUseQuery();
-  initializeAuthentication();
-  initializeFeatureConfig();
-  initializeAccountQueries();
-  initializeAccountApi();
+function x() {
+  return f.safeGet(`/gift-credits/senders/eligibility`);
 }
-
-export {
-  openGiftCredits as a,
-  initializeGiftCreditsUrl as i,
-  useGiftCreditBeaconAvailable as n,
-  useGiftCreditPurchaseAvailable as r,
-  initializeEntryPointAvailability as t,
-};
+var S, C, w, T;
+function E() {
+  return (E = e(() => {
+    ((S = t()),
+      r(),
+      a(),
+      d(),
+      c(),
+      u(),
+      (C = `3116837080`),
+      (w = `purchase_flow_enabled`),
+      (T = `desktop_beacon_enabled`));
+  }))();
+}
+export { h as a, _ as i, y as n, v as r, E as t };

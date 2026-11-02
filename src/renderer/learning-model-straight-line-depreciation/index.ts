@@ -1,79 +1,66 @@
-// Straight-line depreciation learning model. Release chunk: model-a3291de53919.js.
-import "@rchunk/rolldown-runtime";
-
-interface DepreciationValues { costUsd?: number | null; salvageFraction?: number | null; usefulLifeYears?: number | null; ageFraction?: number | null }
-interface NormalizedDepreciationValues { costUsd: number; salvageFraction: number; usefulLifeYears: number; ageFraction: number }
-interface DepreciationManifest {
-  type: string; version: number; thumbnailAssetKey: string; canonicalFormula: string;
-  parameters: {
-    costUsd: { kind: "number"; defaultValue: number; min: number; max: number };
-    salvageFraction: { kind: "number"; defaultValue: number; min: number; max: number };
-    usefulLifeYears: { kind: "integer"; defaultValue: number; min: number; max: number };
-    ageFraction: { kind: "number"; defaultValue: number; min: number; max: number };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `STRAIGHT_LINE_DEPRECIATION`),
+      (n = `straight-line-depreciation-v1`),
+      (r = `D = \\frac{C-S}{L}`),
+      (i = {
+        costUsd: { kind: `number`, defaultValue: 6e4, min: 2e4, max: 1e5 },
+        salvageFraction: { kind: `number`, defaultValue: 0.1, min: 0, max: 0.5 },
+        usefulLifeYears: { kind: `integer`, defaultValue: 5, min: 3, max: 10 },
+        ageFraction: { kind: `number`, defaultValue: 0.4, min: 0, max: 1 },
+      }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-
-let depreciationManifest: DepreciationManifest;
-let defaultDepreciationValues: NormalizedDepreciationValues;
-let normalizeDepreciationValues: (values: DepreciationValues) => NormalizedDepreciationValues;
-let calculateStraightLineDepreciation: (values: DepreciationValues) => NormalizedDepreciationValues & {
-  salvageValue: number; depreciableAmount: number; annualDepreciationExpense: number; selectedYear: number;
-  accumulatedDepreciation: number; bookValue: number; yearlyBookValues: { year: number; bookValue: number }[];
-};
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeDepreciationManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  depreciationManifest = {
-    type: "STRAIGHT_LINE_DEPRECIATION", version: 2, thumbnailAssetKey: "straight-line-depreciation-v1",
-    canonicalFormula: "D = \\frac{C-S}{L}",
-    parameters: {
-      costUsd: { kind: "number", defaultValue: 60_000, min: 20_000, max: 100_000 },
-      salvageFraction: { kind: "number", defaultValue: 0.1, min: 0, max: 0.5 },
-      usefulLifeYears: { kind: "integer", defaultValue: 5, min: 3, max: 10 },
-      ageFraction: { kind: "number", defaultValue: 0.4, min: 0, max: 1 },
-    },
-  };
+var s, c, l, u, d, f, p, m, h;
+function g() {
+  return (g = e(() => {
+    (o(),
+      (s = a.parameters.costUsd),
+      (c = a.parameters.salvageFraction),
+      (l = a.parameters.usefulLifeYears),
+      (u = a.parameters.ageFraction),
+      (d = {
+        costUsd: s.defaultValue,
+        salvageFraction: c.defaultValue,
+        usefulLifeYears: l.defaultValue,
+        ageFraction: u.defaultValue,
+      }),
+      (f = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (p = (e, t, n, r) => f(typeof e == `number` && Number.isFinite(e) ? e : t, n, r)),
+      (m = (e) => ({
+        costUsd: p(e.costUsd, s.defaultValue, s.min, s.max),
+        salvageFraction: p(e.salvageFraction, c.defaultValue, c.min, c.max),
+        usefulLifeYears: Math.round(p(e.usefulLifeYears, l.defaultValue, l.min, l.max)),
+        ageFraction: p(e.ageFraction, u.defaultValue, u.min, u.max),
+      })),
+      (h = (e) => {
+        let t = m(e),
+          n = t.costUsd * t.salvageFraction,
+          r = t.costUsd - n,
+          i = r / t.usefulLifeYears,
+          a = f(Math.round(t.ageFraction * t.usefulLifeYears), 0, t.usefulLifeYears),
+          o = a * i,
+          s = (e) => (e === t.usefulLifeYears ? n : Math.max(n, t.costUsd - e * i)),
+          c = s(a),
+          l = Array.from({ length: t.usefulLifeYears + 1 }, (e, t) => ({
+            year: t,
+            bookValue: s(t),
+          }));
+        return {
+          ...t,
+          salvageValue: n,
+          depreciableAmount: r,
+          annualDepreciationExpense: i,
+          selectedYear: a,
+          accumulatedDepreciation: o,
+          bookValue: c,
+          yearlyBookValues: l,
+        };
+      }));
+  }))();
 }
-
-function initializeStraightLineDepreciationModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializeDepreciationManifest();
-  const parameters = depreciationManifest.parameters;
-  defaultDepreciationValues = {
-    costUsd: parameters.costUsd.defaultValue, salvageFraction: parameters.salvageFraction.defaultValue,
-    usefulLifeYears: parameters.usefulLifeYears.defaultValue, ageFraction: parameters.ageFraction.defaultValue,
-  };
-  const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-  const normalizeFinite = (value: number | null | undefined, fallback: number, minimum: number, maximum: number): number =>
-    clamp(typeof value === "number" && Number.isFinite(value) ? value : fallback, minimum, maximum);
-  normalizeDepreciationValues = values => ({
-    costUsd: normalizeFinite(values.costUsd, parameters.costUsd.defaultValue, parameters.costUsd.min, parameters.costUsd.max),
-    salvageFraction: normalizeFinite(values.salvageFraction, parameters.salvageFraction.defaultValue, parameters.salvageFraction.min, parameters.salvageFraction.max),
-    usefulLifeYears: Math.round(normalizeFinite(values.usefulLifeYears, parameters.usefulLifeYears.defaultValue, parameters.usefulLifeYears.min, parameters.usefulLifeYears.max)),
-    ageFraction: normalizeFinite(values.ageFraction, parameters.ageFraction.defaultValue, parameters.ageFraction.min, parameters.ageFraction.max),
-  });
-  calculateStraightLineDepreciation = values => {
-    const normalized = normalizeDepreciationValues(values);
-    const salvageValue = normalized.costUsd * normalized.salvageFraction;
-    const depreciableAmount = normalized.costUsd - salvageValue;
-    const annualDepreciationExpense = depreciableAmount / normalized.usefulLifeYears;
-    const selectedYear = clamp(Math.round(normalized.ageFraction * normalized.usefulLifeYears), 0, normalized.usefulLifeYears);
-    const bookValueAt = (year: number): number => year === normalized.usefulLifeYears
-      ? salvageValue
-      : Math.max(salvageValue, normalized.costUsd - year * annualDepreciationExpense);
-    return {
-      ...normalized, salvageValue, depreciableAmount, annualDepreciationExpense, selectedYear,
-      accumulatedDepreciation: selectedYear * annualDepreciationExpense, bookValue: bookValueAt(selectedYear),
-      yearlyBookValues: Array.from({ length: normalized.usefulLifeYears + 1 }, (_unused, year) => ({ year, bookValue: bookValueAt(year) })),
-    };
-  };
-}
-
-export {
-  initializeDepreciationManifest as a, normalizeDepreciationValues as i, calculateStraightLineDepreciation as n,
-  depreciationManifest as o, initializeStraightLineDepreciationModel as r, defaultDepreciationValues as t,
-};
+export { o as a, m as i, h as n, a as o, g as r, d as t };

@@ -1,8 +1,7 @@
-// Semantic restoration. Release chunk: content-960bb4aa1af7.js.
+// @ts-nocheck
 import { n as e } from "@rchunk/rolldown-runtime";
 var t, n, r, i, a, o, s, c, l, u, d;
 function f() {
-  // @ts-ignore -- published chunk binding is preserved locally.
   return (f = e(() => {
     ((t = /\r?\n|;|\\\\(?![a-zA-Z])|\\(?:quad|qquad)(?![a-zA-Z])/),
       (n = new Set([

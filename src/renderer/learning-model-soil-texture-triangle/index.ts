@@ -1,28 +1,15 @@
-// Soil texture triangle learning-model specification. Release chunk: type-4ea25b9db993.js.
-import "@rchunk/rolldown-runtime";
-
-interface NumberParameter {
-  kind: "number";
-  defaultValue: number;
-  min: number;
-  max: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `SOIL_TEXTURE_TRIANGLE`),
+      (n = `soil-texture-triangle-v1`),
+      (r = {
+        sand_percent: { kind: `number`, defaultValue: 40, min: 0, max: 100 },
+        clay_percent: { kind: `number`, defaultValue: 20, min: 0, max: 100 },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-interface Specification {
-  type: "SOIL_TEXTURE_TRIANGLE";
-  version: 1;
-  thumbnailAssetKey: "soil-texture-triangle-v1";
-  parameters: { sand_percent: NumberParameter; clay_percent: NumberParameter };
-}
-let specification: Specification;
-function initializeSpecification(): void {
-  specification ??= {
-    type: "SOIL_TEXTURE_TRIANGLE",
-    version: 1,
-    thumbnailAssetKey: "soil-texture-triangle-v1",
-    parameters: {
-      sand_percent: { kind: "number", defaultValue: 40, min: 0, max: 100 },
-      clay_percent: { kind: "number", defaultValue: 20, min: 0, max: 100 },
-    },
-  };
-}
-export { specification as n, initializeSpecification as t };
+export { i as n, a as t };

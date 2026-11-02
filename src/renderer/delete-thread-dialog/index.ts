@@ -1,255 +1,231 @@
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
-
-export interface DeleteThreadDialogProps {
-  conversationId: string;
-  hostId?: string;
-  returnFocusTo?: HTMLElement | null;
-  onClose(): void;
-  onDelete?(input: { threadId: string; hostId?: string }): Promise<void> | void;
-  onError?(error: unknown): void;
-}
-
-interface Scope {
-  get(token: unknown): unknown;
-}
-interface ToastApi {
-  danger(message: unknown, options?: Record<string, unknown>): void;
-  info(message: unknown, options?: Record<string, unknown>): void;
-}
-
-const shared = appSharedChunk as unknown as Record<string, unknown>;
-const initial = appInitialChunk as unknown as Record<string, unknown>;
-let jsx: JsxRuntime;
-let React: Pick<ReactRuntime, "useRef" | "useState">;
-let initialized = false;
-
-function initializeDeleteThreadDialog(): void {
-  if (initialized) return;
-  initialized = true;
-  for (const value of [
-    shared.$3,
-    shared.FX,
-    shared.K2,
-    shared.Ph,
-    shared.QI,
-    shared.Zh,
-    shared.zh,
-    initial.Evt,
-    initial.Wgn,
-  ]) {
-    if (typeof value === "function") (value as () => void)();
-  }
-  jsx = (shared.I3 as () => JsxRuntime)();
-  React =
-    typeof shared.e6 === "function"
-      ? (shared.e6 as () => ReactRuntime)()
-      : ({
-          useRef: <Value>(current: Value) => ({ current }),
-          useState: <Value>(value: Value | (() => Value)) => [
-            typeof value === "function" ? (value as () => Value)() : value,
-            () => undefined,
-          ],
-        } as Pick<ReactRuntime, "useRef" | "useState">);
-}
-
-function translated(
-  id: string,
-  defaultMessage: string,
-  description: string,
-): unknown {
-  const Message = shared.Y2;
-  return typeof Message === "function"
-    ? jsx.jsx(Message, { id, defaultMessage, description })
-    : defaultMessage;
-}
-
-function element(
-  production: unknown,
-  fallback: unknown,
-  props: Record<string, unknown>,
-): unknown {
-  return jsx.jsx(
-    typeof production === "function" ? production : fallback,
-    props,
-  );
-}
-
-function DeleteThreadDialog(props: DeleteThreadDialogProps): unknown {
-  initializeDeleteThreadDialog();
-  const scope =
-    typeof shared.LX === "function"
-      ? (shared.LX as (token: unknown) => Scope)(shared.ZI)
-      : null;
-  const intl =
-    typeof shared.n4 === "function"
-      ? (
-          shared.n4 as () => {
-            formatMessage(descriptor: Record<string, unknown>): string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Ah as n,
+  FX as r,
+  I3 as i,
+  Ih as a,
+  K2 as o,
+  LX as s,
+  Lh as c,
+  Oh as l,
+  Ph as u,
+  QI as d,
+  Rh as f,
+  Y2 as p,
+  YC as m,
+  Yh as h,
+  ZI as g,
+  Zh as _,
+  e6 as v,
+  jh as y,
+  kh as b,
+  lk as x,
+  lw as S,
+  n4 as C,
+  pk as w,
+  zh as T,
+} from "@rchunk/app-shared";
+import { Cvt as E, Evt as D, Ugn as O, Wgn as k } from "@rchunk/app-initial";
+function A(e) {
+  let t = (0, j.c)(37),
+    { conversationId: r, hostId: i, returnFocusTo: o, onClose: u } = e,
+    d = s(g),
+    _ = C(),
+    [v, x] = (0, M.useState)(!1),
+    S = (0, M.useRef)(!1),
+    T;
+  t[0] === o ? (T = t[1]) : ((T = o?.closest(`[role="list"]`)), (t[0] = o), (t[1] = T));
+  let D;
+  t[2] === o ? (D = t[3]) : ((D = o?.closest(`nav`)), (t[2] = o), (t[3] = D));
+  let k;
+  t[4] !== o || t[5] !== T || t[6] !== D
+    ? ((k = { target: o, list: T, sidebar: D }), (t[4] = o), (t[5] = T), (t[6] = D), (t[7] = k))
+    : (k = t[7]);
+  let A = (0, M.useRef)(k),
+    P;
+  t[8] !== r || t[9] !== i || t[10] !== _ || t[11] !== u || t[12] !== d
+    ? ((P = async () => {
+        if (!S.current) {
+          ((S.current = !0), x(!0));
+          try {
+            await O(d, i).sendRequest(`thread/delete`, { threadId: r });
+          } catch {
+            ((S.current = !1),
+              x(!1),
+              d
+                .get(w)
+                .danger(
+                  _.formatMessage({
+                    id: `sidebarElectron.deleteThreadDialog.error`,
+                    defaultMessage: `Couldn't delete the task. Try again.`,
+                    description: `Error toast when deleting a Codex task fails; the confirmation stays open so the user can retry or cancel`,
+                  }),
+                  { errorAnalytics: { toastId: `sidebarElectron.deleteThreadDialog.error` } },
+                ));
+            return;
           }
-        )()
-      : null;
-  const [deleting, setDeleting] = React.useState(false);
-  const deletionStarted = React.useRef(false);
-  const focus = React.useRef({
-    target: props.returnFocusTo,
-    list: props.returnFocusTo?.closest?.('[role="list"]') ?? null,
-    sidebar: props.returnFocusTo?.closest?.("nav") ?? null,
-  });
-
-  const notify = (kind: "danger" | "info", message: unknown): void => {
-    const api = scope?.get(shared.pk) as ToastApi | undefined;
-    api?.[kind]?.(
-      message,
-      kind === "danger"
-        ? {
-            errorAnalytics: {
-              toastId: "sidebarElectron.deleteThreadDialog.error",
-            },
-          }
-        : {
-            leading:
-              typeof shared.YC === "function" ? jsx.jsx(shared.YC, {}) : null,
-          },
-    );
-  };
-  const submit = async (event?: { preventDefault?(): void }): Promise<void> => {
-    event?.preventDefault?.();
-    if (deletionStarted.current) return;
-    deletionStarted.current = true;
-    setDeleting(true);
-    try {
-      if (props.onDelete != null) {
-        await props.onDelete({
-          threadId: props.conversationId,
-          hostId: props.hostId,
-        });
-      } else {
-        const client =
-          typeof initial.Ugn === "function"
-            ? (
-                initial.Ugn as (
-                  scope: Scope | null,
-                  hostId?: string,
-                ) => {
-                  sendRequest(method: string, input: unknown): Promise<unknown>;
-                }
-              )(scope, props.hostId)
-            : null;
-        if (client == null)
-          throw new Error("Thread deletion client is unavailable");
-        await client.sendRequest("thread/delete", {
-          threadId: props.conversationId,
-        });
-      }
-    } catch (error) {
-      deletionStarted.current = false;
-      setDeleting(false);
-      notify(
-        "danger",
-        intl?.formatMessage({
-          id: "sidebarElectron.deleteThreadDialog.error",
-          defaultMessage: "Couldn't delete the task. Try again.",
-          description:
-            "Error toast when deleting a Codex task fails; the confirmation stays open so the user can retry or cancel",
-        }) ?? "Couldn't delete the task. Try again.",
-      );
-      props.onError?.(error);
-      return;
-    }
-    props.onClose();
-    notify(
-      "info",
-      translated(
-        "sidebarElectron.deleteThreadDialog.success",
-        "Task deleted",
-        "Toast shown after permanently deleting a Codex task. There is no undo action.",
-      ),
-    );
-  };
-
-  const cancel = (): void => {
-    if (!deletionStarted.current) props.onClose();
-  };
-  const contentProps = {
-    onCloseAutoFocus(event: { preventDefault(): void }): void {
-      event.preventDefault();
-      if (deletionStarted.current || typeof document === "undefined") return;
-      const target = focus.current.target;
-      if (
-        typeof HTMLElement !== "undefined" &&
-        target instanceof HTMLElement &&
-        target !== document.body &&
-        target.isConnected
-      ) {
-        target.focus();
-        if (document.activeElement === target) return;
-      }
-      const appFocused =
-        typeof initial.Cvt === "function" && (initial.Cvt as () => boolean)();
-      if (appFocused) return;
-      const fallback = focus.current.list?.isConnected
-        ? focus.current.list
-        : focus.current.sidebar?.querySelector?.("button");
-      (fallback as HTMLElement | null)?.focus?.();
-    },
-  };
-
-  const title = translated(
-    "sidebarElectron.deleteThreadDialog.title",
-    "Delete task?",
-    "Title of the irreversible Codex task deletion confirmation dialog",
-  );
-  const description = translated(
-    "sidebarElectron.deleteThreadDialog.description",
-    "This permanently deletes the task and its subagent tasks. This cannot be undone.",
-    "Warning that deleting a Codex task also deletes its subagent tasks and cannot be undone",
-  );
-  const cancelButton = element(shared.Yh, "button", {
-    autoFocus: true,
-    color: "outline",
-    disabled: deleting,
-    type: "button",
-    onClick: cancel,
-    children: translated(
-      "sidebarElectron.deleteThreadDialog.cancel",
-      "Cancel",
-      "Safe default button that closes Codex task deletion confirmation without deleting the task",
-    ),
-  });
-  const deleteButton = element(shared.Yh, "button", {
-    color: "danger",
-    loading: deleting,
-    type: "submit",
-    children: translated(
-      "sidebarElectron.deleteThreadDialog.confirm",
-      "Delete",
-      "Destructive button that confirms irreversible deletion of the Codex task",
-    ),
-  });
-  const form = jsx.jsxs("form", {
-    className: "select-none",
-    onSubmit: submit,
-    children: [
-      jsx.jsx("h1", { children: title }),
-      jsx.jsx("p", { children: description }),
-      jsx.jsx("footer", { children: [cancelButton, deleteButton] }),
-    ],
-  });
-  const Dialog = shared.Ih;
-  return typeof Dialog === "function"
-    ? jsx.jsx(Dialog, {
-        open: true,
-        onOpenChange: (open: boolean) => {
-          if (!open) cancel();
+          (u(),
+            d
+              .get(w)
+              .info(
+                (0, N.jsx)(p, {
+                  id: `sidebarElectron.deleteThreadDialog.success`,
+                  defaultMessage: `Task deleted`,
+                  description: `Toast shown after permanently deleting a Codex task. There is no undo action.`,
+                }),
+                { leading: (0, N.jsx)(m, {}) },
+              ));
+        }
+      }),
+      (t[8] = r),
+      (t[9] = i),
+      (t[10] = _),
+      (t[11] = u),
+      (t[12] = d),
+      (t[13] = P))
+    : (P = t[13]);
+  let F = P,
+    I;
+  t[14] === u
+    ? (I = t[15])
+    : ((I = (e) => {
+        !e && !S.current && u();
+      }),
+      (t[14] = u),
+      (t[15] = I));
+  let L;
+  t[16] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((L = {
+        onCloseAutoFocus: (e) => {
+          e.preventDefault();
+          let { target: t, list: n, sidebar: r } = A.current;
+          (!S.current &&
+            t instanceof HTMLElement &&
+            t !== document.body &&
+            t.isConnected &&
+            (t.focus(), document.activeElement === t)) ||
+            E() ||
+            (n?.isConnected ? n : r?.querySelector(`button`))?.focus();
         },
-        contentProps,
-        size: "compact",
-        children: form,
-      })
-    : jsx.jsx("dialog", { open: true, contentProps, children: form });
+      }),
+      (t[16] = L))
+    : (L = t[16]);
+  let R;
+  t[17] === F
+    ? (R = t[18])
+    : ((R = (e) => {
+        (e.preventDefault(), F());
+      }),
+      (t[17] = F),
+      (t[18] = R));
+  let z;
+  t[19] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((z = (0, N.jsx)(f, {
+        children: (0, N.jsx)(p, {
+          id: `sidebarElectron.deleteThreadDialog.title`,
+          defaultMessage: `Delete task?`,
+          description: `Title of the irreversible Codex task deletion confirmation dialog`,
+        }),
+      })),
+      (t[19] = z))
+    : (z = t[19]);
+  let B;
+  t[20] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((B = (0, N.jsx)(y, {
+        children: (0, N.jsx)(n, {
+          title: z,
+          subtitle: (0, N.jsx)(c, {
+            children: (0, N.jsx)(p, {
+              id: `sidebarElectron.deleteThreadDialog.description`,
+              defaultMessage: `This permanently deletes the task and its subagent tasks. This cannot be undone.`,
+              description: `Warning that deleting a Codex task also deletes its subagent tasks and cannot be undone`,
+            }),
+          }),
+        }),
+      })),
+      (t[20] = B))
+    : (B = t[20]);
+  let V;
+  t[21] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((V = (0, N.jsx)(p, {
+        id: `sidebarElectron.deleteThreadDialog.cancel`,
+        defaultMessage: `Cancel`,
+        description: `Safe default button that closes Codex task deletion confirmation without deleting the task`,
+      })),
+      (t[21] = V))
+    : (V = t[21]);
+  let H;
+  t[22] !== v || t[23] !== u
+    ? ((H = (0, N.jsx)(h, {
+        autoFocus: !0,
+        color: `outline`,
+        disabled: v,
+        type: `button`,
+        onClick: u,
+        children: V,
+      })),
+      (t[22] = v),
+      (t[23] = u),
+      (t[24] = H))
+    : (H = t[24]);
+  let U;
+  t[25] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((U = (0, N.jsx)(p, {
+        id: `sidebarElectron.deleteThreadDialog.confirm`,
+        defaultMessage: `Delete`,
+        description: `Destructive button that confirms irreversible deletion of the Codex task`,
+      })),
+      (t[25] = U))
+    : (U = t[25]);
+  let W;
+  t[26] === v
+    ? (W = t[27])
+    : ((W = (0, N.jsx)(h, { color: `danger`, loading: v, type: `submit`, children: U })),
+      (t[26] = v),
+      (t[27] = W));
+  let G;
+  t[28] !== H || t[29] !== W
+    ? ((G = (0, N.jsx)(y, { children: (0, N.jsxs)(b, { children: [H, W] }) })),
+      (t[28] = H),
+      (t[29] = W),
+      (t[30] = G))
+    : (G = t[30]);
+  let K;
+  t[31] !== G || t[32] !== R
+    ? ((K = (0, N.jsxs)(l, {
+        as: `form`,
+        className: `select-none`,
+        onSubmit: R,
+        children: [B, G],
+      })),
+      (t[31] = G),
+      (t[32] = R),
+      (t[33] = K))
+    : (K = t[33]);
+  let q;
+  return (
+    t[34] !== K || t[35] !== I
+      ? ((q = (0, N.jsx)(a, {
+          open: !0,
+          onOpenChange: I,
+          contentProps: L,
+          size: `compact`,
+          children: K,
+        })),
+        (t[34] = K),
+        (t[35] = I),
+        (t[36] = q))
+      : (q = t[36]),
+    q
+  );
 }
-
-initializeDeleteThreadDialog();
-export { DeleteThreadDialog };
+var j, M, N;
+function P() {
+  return (P = e(() => {
+    ((j = t()), r(), (M = v()), o(), k(), D(), _(), T(), u(), S(), x(), d(), (N = i()));
+  }))();
+}
+P();
+export { A as DeleteThreadDialog };

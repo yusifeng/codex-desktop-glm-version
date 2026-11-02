@@ -1,126 +1,119 @@
-// hotkey-window-new-thread-page —— 热键窗口中的新建线程欢迎页与 Composer。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as threadScrollLayoutChunk from "@rchunk/thread-scroll-layout";
-import * as hotkeyDetailLayoutChunk from "@rchunk/use-hotkey-window-detail-layout";
-void runtimeChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  FX: initializeSignalRuntime,
-  HX: useSignalValue,
-  I3: getJsxRuntime,
-  K2: initializeSharedUi,
-  UB: encodeHotkeyWindowPath,
-  Y2: FormattedMessage,
-  wL: initializeWindowRuntime,
-} = appSharedChunk;
-const {
-  Dht: initializeNewThreadPanelState,
-  Oht: selectedProjectSignal,
-  mnt: initializeAppServices,
-  pnt: appServices,
-} = appInitialChunk;
-const {
-  Oo: ComposerSurface,
-  c: WorkspaceName,
-  dt: initializeNewThreadPanelAnalytics,
-  ko: initializeNewThreadPanelLayout,
-  l: initializeWorkspaceName,
-  nt: HotkeyWindowPageLayout,
-  o: ChatGptMark,
-  rt: initializeNewThreadPanelRouting,
-  s: initializeChatGptMark,
-  ut: NewThreadComposer,
-} = appPrimaryChunk;
-const { n: initializeThreadScrollLayout, t: ThreadScrollLayout } =
-  threadScrollLayoutChunk;
-const { n: initializeHotkeyDetailLayout, r: useHotkeyDetailLayout } =
-  hotkeyDetailLayoutChunk;
-
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function HotkeyWindowNewThreadPage(): unknown {
-  const selectedProject = useSignalValue(selectedProjectSignal);
-  useHotkeyDetailLayout({
-    title: jsx.jsx("span", {
-      className: "max-w-full truncate",
-      children: jsx.jsx(FormattedMessage, {
-        id: "threadPage.newThread",
-        defaultMessage: "New chat",
-        description: "Header title for the home page",
-      }),
-    }),
-    mainWindowPath: "/",
-    canCollapseToHome: false,
-  });
-
-  const footer = jsx.jsx(ComposerSurface, {
-    children: jsx.jsx(NewThreadComposer, {
-      selectedProject,
-      showWorkspaceDropdownInUtilityBar: false,
-      onLocalConversationCreated: openConversationInHotkeyWindow,
-    }),
-  });
-  const welcome = jsx.jsx("div", {
-    className: "flex h-full items-center justify-center px-panel",
-    children: jsx.jsxs("div", {
-      className: "flex flex-col items-center gap-3 text-center",
-      children: [
-        jsx.jsx("div", {
-          "aria-hidden": true,
-          children: jsx.jsx(ChatGptMark, {
-            className: "h-12 w-12 text-text/20",
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  HX as r,
+  I3 as i,
+  K2 as a,
+  UB as o,
+  Y2 as s,
+  wL as c,
+} from "@rchunk/app-shared";
+import { Dht as l, Oht as u, mnt as d, pnt as f } from "@rchunk/app-initial";
+import {
+  Oo as p,
+  c as m,
+  dt as h,
+  ko as g,
+  l as _,
+  nt as v,
+  o as y,
+  rt as b,
+  s as x,
+  ut as S,
+} from "@rchunk/app-primary";
+import { n as C, t as w } from "@rchunk/thread-scroll-layout";
+import { n as T, r as E } from "@rchunk/use-hotkey-window-detail-layout";
+function D() {
+  let e = (0, k.c)(7),
+    t = r(u),
+    n = O,
+    i;
+  (e[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((i = {
+        title: (0, A.jsx)(`span`, {
+          className: `max-w-full truncate`,
+          children: (0, A.jsx)(s, {
+            id: `threadPage.newThread`,
+            defaultMessage: `New chat`,
+            description: `Header title for the home page`,
           }),
         }),
-        jsx.jsxs("div", {
-          className: "flex flex-col items-center gap-1",
+        mainWindowPath: `/`,
+        canCollapseToHome: !1,
+      }),
+      (e[0] = i))
+    : (i = e[0]),
+    E(i));
+  let a;
+  e[1] === t
+    ? (a = e[2])
+    : ((a = (0, A.jsx)(p, {
+        children: (0, A.jsx)(S, {
+          selectedProject: t,
+          showWorkspaceDropdownInUtilityBar: !1,
+          onLocalConversationCreated: n,
+        }),
+      })),
+      (e[1] = t),
+      (e[2] = a));
+  let o;
+  e[3] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((o = (0, A.jsx)(`div`, {
+        "aria-hidden": `true`,
+        children: (0, A.jsx)(y, { className: `h-12 w-12 text-text/20` }),
+      })),
+      (e[3] = o))
+    : (o = e[3]);
+  let c;
+  e[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((c = (0, A.jsx)(`div`, {
+        className: `flex h-full items-center justify-center px-panel`,
+        children: (0, A.jsxs)(`div`, {
+          className: `flex flex-col items-center gap-3 text-center`,
           children: [
-            jsx.jsx("div", {
-              className: "heading-xl mt-2 font-normal text-default select-none",
-              children: jsx.jsx(FormattedMessage, {
-                id: "home.hero.letsBuild",
-                defaultMessage: "Let’s build",
-                description:
-                  "Label above the workspace name on the electron home page",
-              }),
+            o,
+            (0, A.jsxs)(`div`, {
+              className: `flex flex-col items-center gap-1`,
+              children: [
+                (0, A.jsx)(`div`, {
+                  className: `heading-xl mt-2 font-normal text-default select-none`,
+                  children: (0, A.jsx)(s, {
+                    id: `home.hero.letsBuild`,
+                    defaultMessage: `Let’s build`,
+                    description: `Label above the workspace name on the electron home page`,
+                  }),
+                }),
+                (0, A.jsx)(m, { variant: `hero` }),
+              ],
             }),
-            jsx.jsx(WorkspaceName, { variant: "hero" }),
           ],
         }),
-      ],
-    }),
-  });
-  return jsx.jsx(HotkeyWindowPageLayout, {
-    className: "h-full [--padding-panel:calc(var(--padding-panel-base)/2)]",
-    children: jsx.jsx(ThreadScrollLayout, { footer, children: welcome }),
-  });
+      })),
+      (e[4] = c))
+    : (c = e[4]);
+  let l;
+  return (
+    e[5] === a
+      ? (l = e[6])
+      : ((l = (0, A.jsx)(v, {
+          className: `h-full [--padding-panel:calc(var(--padding-panel-base)/2)]`,
+          children: (0, A.jsx)(w, { footer: a, children: c }),
+        })),
+        (e[5] = a),
+        (e[6] = l)),
+    l
+  );
 }
-
-function openConversationInHotkeyWindow(conversationId: string): void {
-  appServices.hotkeyWindowHotkeys?.open({
-    path: encodeHotkeyWindowPath(conversationId),
-  });
+function O(e) {
+  f.hotkeyWindowHotkeys?.open({ path: o(e) });
 }
-
-function initializeHotkeyWindowNewThreadPage(): void {
-  initializeRuntimeLazy();
-  initializeSignalRuntime();
-  initializeWindowRuntime();
-  initializeSharedUi();
-  initializeNewThreadPanelAnalytics();
-  initializeNewThreadPanelLayout();
-  initializeWorkspaceName();
-  initializeChatGptMark();
-  initializeNewThreadPanelState();
-  initializeAppServices();
-  initializeNewThreadPanelRouting();
-  initializeThreadScrollLayout();
-  initializeHotkeyDetailLayout();
-  jsx = getJsxRuntime();
+var k, A;
+function j() {
+  return (j = e(() => {
+    ((k = t()), n(), c(), a(), h(), g(), _(), x(), d(), l(), b(), C(), T(), (A = i()));
+  }))();
 }
-
-initializeHotkeyWindowNewThreadPage();
-export { HotkeyWindowNewThreadPage };
+j();
+export { D as HotkeyWindowNewThreadPage };

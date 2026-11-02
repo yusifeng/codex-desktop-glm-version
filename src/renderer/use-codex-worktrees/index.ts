@@ -1,272 +1,151 @@
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as reactCompilerRuntime,
-  $O as timeConstants,
-  BX as useSignalValue,
-  EU as gitSettings,
-  FX as initializeSignalRuntime,
-  QI as initializeScopeRuntime,
-  SU as normalizeDesktopConfig,
-  TU as worktreeSettings,
-  ZI as appScope,
-  _L as useQuery,
-  ek as initializeQueryHooks,
-  gL as initializeReactQuery,
-  rZ as createDerivedFamily,
-  wL as initializeAutomationRuntime,
+  $3 as t,
+  $O as n,
+  BX as r,
+  EU as i,
+  FX as a,
+  QI as o,
+  SU as s,
+  TU as c,
+  ZI as l,
+  _L as u,
+  ek as d,
+  gL as f,
+  rZ as p,
+  wL as m,
 } from "@rchunk/app-shared";
 import {
-  $sn as initializeHostConfig,
-  Bcn as readSetting,
-  Bfn as initializeAppServices,
-  Con as initializeHostConfigQueries,
-  Gcn as localConfigAvailable,
-  Gsn as hostInvalidationKey,
-  Jht as worktreeRootQueryKey,
-  Jsn as configInvalidationKey,
-  Kht as codexWorktreesQueryKey,
-  Ksn as settingsInvalidationKey,
-  Ucn as writeLocalSetting,
-  Ugn as getHostService,
-  Vcn as initializeGitService,
-  Wgn as initializeHostServices,
-  _cn as initializeRemoteConfig,
-  _on as normalizeHostConfig,
-  aun as initializeQueryInvalidation,
-  lcn as remoteConfigQuery,
-  mcn as worktreesQuery,
-  oun as invalidateQuery,
-  qht as initializeGitQueries,
-  won as getRpcClient,
+  $sn as h,
+  Bcn as g,
+  Bfn as _,
+  Con as v,
+  Gcn as y,
+  Gsn as b,
+  Jht as x,
+  Jsn as S,
+  Kht as C,
+  Ksn as w,
+  Ucn as T,
+  Ugn as E,
+  Vcn as D,
+  Wgn as O,
+  _cn as k,
+  _on as A,
+  aun as j,
+  lcn as M,
+  mcn as N,
+  oun as P,
+  qht as F,
+  won as I,
 } from "@rchunk/app-initial";
-
-interface CompilerRuntime {
-  c(size: number): unknown[];
-}
-
-export interface WorktreeSetting<Value = unknown> {
-  key: string;
-  defaultValue?: Value;
-}
-
-export interface RemoteConfigResponse {
-  config: { desktop: Record<string, unknown> };
-  [key: string]: unknown;
-}
-
-export interface RemoteConfigData {
-  configReadSucceeded?: boolean;
-  configWriteTarget?: { filePath?: string | null };
-  config?: { desktop?: Record<string, unknown> };
-}
-
-export interface WorktreeScope {
-  get(signal: unknown, parameter?: unknown): { data?: RemoteConfigData };
-  query: {
-    snapshot(signal: unknown, parameter: unknown): {
-      cancel(): Promise<void>;
-      getOrFetch(): Promise<{ response: RemoteConfigResponse }>;
-      queryKey: unknown;
-      setData(data: { response: RemoteConfigResponse }): void;
-    };
-  };
-  queryClient: unknown;
-}
-
-let worktreeConfig$: import("@rchunk/app-shared").ScopedDerivedFamily<
-  Record<string, unknown>,
-  string,
-  import("@rchunk/app-shared").ResolvedWorktreeSettings | null
->;
-let compilerRuntime: CompilerRuntime;
-
-async function updateWorktreeSetting<Value>(
-  scope: WorktreeScope,
-  hostId: string,
-  setting: WorktreeSetting<Value>,
-  value: Value,
-): Promise<void> {
-  if (hostId === "local") {
-    await writeLocalSetting(scope, setting, value);
+async function L(e, t, n, r) {
+  if (t === `local`) {
+    await T(e, n, r);
     return;
   }
-  const snapshot = scope.query.snapshot(remoteConfigQuery, hostId);
-  const previous = await snapshot.getOrFetch();
-  await snapshot.cancel();
-  const writeTarget = scope.get(remoteConfigQuery, hostId).data?.configWriteTarget;
-  snapshot.setData({
-    ...previous,
+  let a = e.query.snapshot(M, t),
+    o = await a.getOrFetch();
+  await a.cancel();
+  let s = e.get(M, t).data?.configWriteTarget;
+  a.setData({
+    ...o,
     response: {
-      ...previous.response,
-      config: Object.assign(structuredClone(previous.response.config), {
-        desktop: {
-          ...previous.response.config.desktop,
-          [setting.key]: value,
-        },
+      ...o.response,
+      config: Object.assign(structuredClone(o.response.config), {
+        desktop: { ...o.response.config.desktop, [n.key]: r },
       }),
     },
   });
   try {
-    const service = getHostService(scope, hostId) as {
-      sendRequest(method: string, parameters: unknown): Promise<void>;
-    };
-    await service.sendRequest("config/batchWrite", {
-      edits: [
-        {
-          keyPath: `desktop.${setting.key}`,
-          value,
-          mergeStrategy: "replace",
-        },
-      ],
-      filePath: writeTarget?.filePath ?? null,
+    await E(e, t).sendRequest(`config/batchWrite`, {
+      edits: [{ keyPath: `desktop.${n.key}`, value: r, mergeStrategy: `replace` }],
+      filePath: s?.filePath ?? null,
       expectedVersion: null,
-      reloadUserConfig: true,
+      reloadUserConfig: !0,
     });
-  } catch (error) {
-    snapshot.setData(previous);
-    throw error;
+  } catch (e) {
+    throw (a.setData(o), e);
   } finally {
-    const keys: unknown[] = [
-      [...configInvalidationKey, hostId],
-      [...hostInvalidationKey, hostId],
-      [...settingsInvalidationKey, hostId],
+    let r = [
+      [...S, t],
+      [...b, t],
+      [...w, t],
     ];
-    if (setting.key === gitSettings.worktreeRoot.key) {
-      keys.push(
-        worktreeRootQueryKey(hostId),
-        codexWorktreesQueryKey(hostId),
-        scope.query.snapshot(worktreesQuery, { hostId }).queryKey,
-      );
-    }
-    await Promise.all(keys.map((key) => invalidateQuery(scope.queryClient, key)));
+    (n.key === i.worktreeRoot.key &&
+      r.push(C(t), x(t), e.query.snapshot(N, { hostId: t }).queryKey),
+      await Promise.all(r.map((t) => P(e.queryClient, t))));
   }
 }
-
-function initializeWorktreeConfig(): void {
-  initializeSignalRuntime();
-  initializeAutomationRuntime();
-  initializeHostServices();
-  initializeHostConfig();
-  initializeQueryInvalidation();
-  initializeScopeRuntime();
-  initializeRemoteConfig();
-  initializeGitService();
-  initializeAppServices();
-  initializeGitQueries();
-  worktreeConfig$ = createDerivedFamily(
-    appScope,
-    (hostId: string, { get }) => {
-      if (hostId === "local") {
-        return get(localConfigAvailable)
-          ? normalizeDesktopConfig({
-              [gitSettings.worktreeRoot.key]: readSetting(
-                get,
-                gitSettings.worktreeRoot,
-              ),
-              [worktreeSettings.autoCleanupEnabled.key]: readSetting(
-                get,
-                worktreeSettings.autoCleanupEnabled,
-              ),
-              [worktreeSettings.keepCount.key]: readSetting(
-                get,
-                worktreeSettings.keepCount,
-              ),
-            })
-          : null;
-      }
-      const remote = get(remoteConfigQuery, hostId) as { data?: RemoteConfigData };
-      return remote.data?.configReadSucceeded === true
-        ? normalizeDesktopConfig(remote.data.config?.desktop ?? {})
-        : null;
-    },
+var R;
+function z() {
+  return (z = e(() => {
+    (a(),
+      m(),
+      O(),
+      h(),
+      j(),
+      o(),
+      k(),
+      D(),
+      _(),
+      F(),
+      (R = p(l, (e, { get: t }) => {
+        if (e === `local`)
+          return t(y)
+            ? s({
+                [i.worktreeRoot.key]: g(t, i.worktreeRoot),
+                [c.autoCleanupEnabled.key]: g(t, c.autoCleanupEnabled),
+                [c.keepCount.key]: g(t, c.keepCount),
+              })
+            : null;
+        let n = t(M, e).data;
+        return n?.configReadSucceeded === !0 ? s(n.config.desktop) : null;
+      })));
+  }))();
+}
+function B(e, t, i) {
+  let a = (0, V.c)(13),
+    o;
+  a[0] === e ? (o = a[1]) : ((o = A(e)), (a[0] = e), (a[1] = o));
+  let s = o,
+    c = r(R, s),
+    l = c?.worktreesRoot ?? null,
+    d = c != null && (i?.enabled ?? !0),
+    f;
+  a[2] !== s || a[3] !== l ? ((f = C(s, l)), (a[2] = s), (a[3] = l), (a[4] = f)) : (f = a[4]);
+  let p;
+  a[5] !== e || a[6] !== t || a[7] !== l
+    ? ((p = (n) => {
+        let { signal: r } = n;
+        return I(`git`).request({
+          method: `codex-worktrees`,
+          params: { hostConfig: e, operationSource: t, worktreesRoot: l },
+          signal: r,
+        });
+      }),
+      (a[5] = e),
+      (a[6] = t),
+      (a[7] = l),
+      (a[8] = p))
+    : (p = a[8]);
+  let m;
+  return (
+    a[9] !== d || a[10] !== f || a[11] !== p
+      ? ((m = { enabled: d, queryKey: f, queryFn: p, staleTime: n.INFINITE, gcTime: 18e5 }),
+        (a[9] = d),
+        (a[10] = f),
+        (a[11] = p),
+        (a[12] = m))
+      : (m = a[12]),
+    u(m)
   );
 }
-
-function useCodexWorktrees(
-  host: unknown,
-  operationSource: string,
-  options?: { enabled?: boolean },
-): unknown {
-  const cache = compilerRuntime.c(13);
-  let hostConfig: ReturnType<typeof normalizeHostConfig>;
-  if (cache[0] === host) {
-    hostConfig = cache[1] as ReturnType<typeof normalizeHostConfig>;
-  } else {
-    hostConfig = normalizeHostConfig(host);
-    cache[0] = host;
-    cache[1] = hostConfig;
-  }
-  const config = useSignalValue(worktreeConfig$, hostConfig) as {
-    worktreesRoot?: string | null;
-  } | null;
-  const worktreesRoot = config?.worktreesRoot ?? null;
-  const enabled = config != null && (options?.enabled ?? true);
-  let queryKey: readonly unknown[];
-  if (cache[2] !== hostConfig || cache[3] !== worktreesRoot) {
-    queryKey = codexWorktreesQueryKey(hostConfig, worktreesRoot);
-    cache[2] = hostConfig;
-    cache[3] = worktreesRoot;
-    cache[4] = queryKey;
-  } else {
-    queryKey = cache[4] as readonly unknown[];
-  }
-  let queryFn: (context: { signal: AbortSignal }) => Promise<unknown>;
-  if (
-    cache[5] !== host ||
-    cache[6] !== operationSource ||
-    cache[7] !== worktreesRoot
-  ) {
-    queryFn = ({ signal }) =>
-      getRpcClient("git").request({
-        method: "codex-worktrees",
-        params: { hostConfig: host, operationSource, worktreesRoot },
-        signal,
-      });
-    cache[5] = host;
-    cache[6] = operationSource;
-    cache[7] = worktreesRoot;
-    cache[8] = queryFn;
-  } else {
-    queryFn = cache[8] as typeof queryFn;
-  }
-  let queryOptions: {
-    enabled: boolean;
-    gcTime: number;
-    queryFn: typeof queryFn;
-    queryKey: readonly unknown[];
-    staleTime: number;
-  };
-  if (cache[9] !== enabled || cache[10] !== queryKey || cache[11] !== queryFn) {
-    queryOptions = {
-      enabled,
-      queryKey,
-      queryFn,
-      staleTime: timeConstants.INFINITE,
-      gcTime: 1_800_000,
-    };
-    cache[9] = enabled;
-    cache[10] = queryKey;
-    cache[11] = queryFn;
-    cache[12] = queryOptions;
-  } else {
-    queryOptions = cache[12] as typeof queryOptions;
-  }
-  return useQuery(queryOptions);
+var V;
+function H() {
+  return (H = e(() => {
+    ((V = t()), f(), a(), d(), v(), z(), F());
+  }))();
 }
-
-function initializeUseCodexWorktrees(): void {
-  compilerRuntime = reactCompilerRuntime() as unknown as CompilerRuntime;
-  initializeReactQuery();
-  initializeSignalRuntime();
-  initializeQueryHooks();
-  initializeHostConfigQueries();
-  initializeWorktreeConfig();
-  initializeGitQueries();
-}
-
-export {
-  worktreeConfig$ as a,
-  updateWorktreeSetting as i,
-  useCodexWorktrees as n,
-  initializeWorktreeConfig as r,
-  initializeUseCodexWorktrees as t,
-};
+export { R as a, L as i, B as n, z as r, H as t };

@@ -1,300 +1,219 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as getCompilerRuntime,
-  $h as initializeResourceButtonDependencies,
-  Ah as DialogHeader,
-  I3 as getJsxRuntime,
-  Ih as Dialog,
-  K2 as initializeIntlRuntime,
-  Lh as DialogDescription,
-  Oh as DialogBody,
-  Ph as initializeDialogLayout,
-  Qh as LoadingSpinner,
-  Rh as DialogTitle,
-  Y2 as FormattedMessage,
-  Yh as Button,
-  Zh as initializeButton,
-  kh as DialogFooter,
-  zh as initializeDialog,
+  $3 as t,
+  $h as n,
+  Ah as r,
+  I3 as i,
+  Ih as a,
+  K2 as o,
+  Lh as s,
+  Oh as c,
+  Ph as l,
+  Qh as u,
+  Rh as d,
+  Y2 as f,
+  Yh as p,
+  Zh as m,
+  kh as h,
+  zh as g,
 } from "@rchunk/app-shared";
-import {
-  B$ as initializeConnectorQuery,
-  V$ as useConnectorAppsQuery,
-} from "@rchunk/app-initial";
-import {
-  n as initializeAppConnectModal,
-  t as AppConnectModal,
-} from "@rchunk/app-connect-modal";
-import type { AppInfo } from "@rchunk/app-info";
-
-interface CompilerRuntime {
-  c(size: number): unknown[];
+import { B$ as _, V$ as v } from "@rchunk/app-initial";
+import { n as y, t as b } from "@rchunk/app-connect-modal";
+function x(e) {
+  let t = (0, C.c)(34),
+    n,
+    r,
+    i,
+    a;
+  t[0] === e
+    ? ((n = t[1]), (r = t[2]), (i = t[3]), (a = t[4]))
+    : (({ connectorId: n, hostId: r, onOpenChange: i, ...a } = e),
+      (t[0] = e),
+      (t[1] = n),
+      (t[2] = r),
+      (t[3] = i),
+      (t[4] = a));
+  let o;
+  t[5] === n ? (o = t[6]) : ((o = [n]), (t[5] = n), (t[6] = o));
+  let s;
+  t[7] !== r || t[8] !== o
+    ? ((s = { appIds: o, hostId: r }), (t[7] = r), (t[8] = o), (t[9] = s))
+    : (s = t[9]);
+  let { data: c, isFetching: l, isPending: u, refetch: d } = v(s),
+    f;
+  t[10] !== c || t[11] !== n
+    ? ((f = c?.find((e) => e.id === n)), (t[10] = c), (t[11] = n), (t[12] = f))
+    : (f = t[12]);
+  let p = f;
+  if (p == null) {
+    let e;
+    t[13] === d
+      ? (e = t[14])
+      : ((e = () => {
+          d();
+        }),
+        (t[13] = d),
+        (t[14] = e));
+    let n;
+    return (
+      t[15] !== l || t[16] !== u || t[17] !== i || t[18] !== e
+        ? ((n = (0, w.jsx)(S, { isPending: u, isFetching: l, onOpenChange: i, onRetry: e })),
+          (t[15] = l),
+          (t[16] = u),
+          (t[17] = i),
+          (t[18] = e),
+          (t[19] = n))
+        : (n = t[19]),
+      n
+    );
+  }
+  let m;
+  t[20] !== p.description ||
+  t[21] !== p.distributionChannel ||
+  t[22] !== p.iconUrl ||
+  t[23] !== p.iconUrlDark ||
+  t[24] !== p.id ||
+  t[25] !== p.installUrl ||
+  t[26] !== p.name ||
+  t[27] !== p.pluginDisplayNames
+    ? ((m = {
+        appMetadata: null,
+        branding: null,
+        description: p.description,
+        distributionChannel: p.distributionChannel,
+        iconAssets: null,
+        iconDarkAssets: null,
+        id: p.id,
+        installUrl: p.installUrl,
+        isAccessible: !1,
+        isEnabled: !1,
+        labels: null,
+        logoUrl: p.iconUrl,
+        logoUrlDark: p.iconUrlDark,
+        name: p.name,
+        pluginDisplayNames: p.pluginDisplayNames,
+      }),
+      (t[20] = p.description),
+      (t[21] = p.distributionChannel),
+      (t[22] = p.iconUrl),
+      (t[23] = p.iconUrlDark),
+      (t[24] = p.id),
+      (t[25] = p.installUrl),
+      (t[26] = p.name),
+      (t[27] = p.pluginDisplayNames),
+      (t[28] = m))
+    : (m = t[28]);
+  let h = m,
+    g;
+  return (
+    t[29] !== h || t[30] !== r || t[31] !== i || t[32] !== a
+      ? ((g = (0, w.jsx)(b, { ...a, app: h, hostId: r, onOpenChange: i })),
+        (t[29] = h),
+        (t[30] = r),
+        (t[31] = i),
+        (t[32] = a),
+        (t[33] = g))
+      : (g = t[33]),
+    g
+  );
 }
-interface ConnectorLoadStateProps {
-  isPending: boolean;
-  isFetching: boolean;
-  onOpenChange(open: boolean): void;
-  onRetry(): void;
-}
-interface AppConnectModalByIdProps extends Record<string, unknown> {
-  connectorId: string;
-  hostId?: string;
-  onOpenChange(open: boolean): void;
-}
-
-let compilerRuntime: CompilerRuntime;
-let jsx: ReturnType<typeof getJsxRuntime>;
-
-function AppConnectModalById(props: AppConnectModalByIdProps): unknown {
-  const cache = compilerRuntime.c(34);
-  let connectorId: string;
-  let hostId: string | undefined;
-  let onOpenChange: (open: boolean) => void;
-  let modalProps: Record<string, unknown>;
-  if (cache[0] === props) {
-    connectorId = cache[1] as string;
-    hostId = cache[2] as string | undefined;
-    onOpenChange = cache[3] as typeof onOpenChange;
-    modalProps = cache[4] as Record<string, unknown>;
-  } else {
-    ({ connectorId, hostId, onOpenChange, ...modalProps } = props);
-    cache[0] = props;
-    cache[1] = connectorId;
-    cache[2] = hostId;
-    cache[3] = onOpenChange;
-    cache[4] = modalProps;
-  }
-  let appIds: string[];
-  if (cache[5] === connectorId) {
-    appIds = cache[6] as string[];
-  } else {
-    appIds = [connectorId];
-    cache[5] = connectorId;
-    cache[6] = appIds;
-  }
-  let queryOptions: { appIds: string[]; hostId?: string };
-  if (cache[7] !== hostId || cache[8] !== appIds) {
-    queryOptions = { appIds, hostId };
-    cache[7] = hostId;
-    cache[8] = appIds;
-    cache[9] = queryOptions;
-  } else {
-    queryOptions = cache[9] as typeof queryOptions;
-  }
-  const { data, isFetching, isPending, refetch } = useConnectorAppsQuery(queryOptions);
-  let app: NonNullable<typeof data>[number] | undefined;
-  if (cache[10] !== data || cache[11] !== connectorId) {
-    app = data?.find((candidate) => candidate.id === connectorId);
-    cache[10] = data;
-    cache[11] = connectorId;
-    cache[12] = app;
-  } else {
-    app = cache[12] as typeof app;
-  }
-  if (app == null) {
-    let onRetry: () => void;
-    if (cache[13] === refetch) {
-      onRetry = cache[14] as () => void;
-    } else {
-      onRetry = () => { refetch(); };
-      cache[13] = refetch;
-      cache[14] = onRetry;
-    }
-    let loadState: unknown;
-    if (cache[15] !== isFetching || cache[16] !== isPending || cache[17] !== onOpenChange || cache[18] !== onRetry) {
-      loadState = jsx.jsx(ConnectorLoadState, {
-        isPending,
-        isFetching,
-        onOpenChange,
-        onRetry,
-      });
-      cache[15] = isFetching;
-      cache[16] = isPending;
-      cache[17] = onOpenChange;
-      cache[18] = onRetry;
-      cache[19] = loadState;
-    } else {
-      loadState = cache[19];
-    }
-    return loadState;
-  }
-  let normalizedApp: AppInfo;
-  if (
-    cache[20] !== app.description ||
-    cache[21] !== app.distributionChannel ||
-    cache[22] !== app.iconUrl ||
-    cache[23] !== app.iconUrlDark ||
-    cache[24] !== app.id ||
-    cache[25] !== app.installUrl ||
-    cache[26] !== app.name ||
-    cache[27] !== app.pluginDisplayNames
-  ) {
-    normalizedApp = {
-      appMetadata: null,
-      branding: null,
-      description: app.description,
-      distributionChannel: app.distributionChannel,
-      iconAssets: null,
-      iconDarkAssets: null,
-      id: app.id,
-      installUrl: app.installUrl,
-      isAccessible: false,
-      isEnabled: false,
-      labels: null,
-      logoUrl: app.iconUrl,
-      logoUrlDark: app.iconUrlDark,
-      name: app.name,
-      pluginDisplayNames: app.pluginDisplayNames,
-    };
-    cache[20] = app.description;
-    cache[21] = app.distributionChannel;
-    cache[22] = app.iconUrl;
-    cache[23] = app.iconUrlDark;
-    cache[24] = app.id;
-    cache[25] = app.installUrl;
-    cache[26] = app.name;
-    cache[27] = app.pluginDisplayNames;
-    cache[28] = normalizedApp;
-  } else {
-    normalizedApp = cache[28] as AppInfo;
-  }
-  let result: unknown;
-  if (cache[29] !== normalizedApp || cache[30] !== hostId || cache[31] !== onOpenChange || cache[32] !== modalProps) {
-    result = jsx.jsx(AppConnectModal, {
-      ...modalProps,
-      app: normalizedApp,
-      hostId,
-      onOpenChange,
-    });
-    cache[29] = normalizedApp;
-    cache[30] = hostId;
-    cache[31] = onOpenChange;
-    cache[32] = modalProps;
-    cache[33] = result;
-  } else {
-    result = cache[33];
-  }
-  return result;
-}
-
-function ConnectorLoadState({
-  isPending,
-  isFetching,
-  onOpenChange,
-  onRetry,
-}: ConnectorLoadStateProps): unknown {
-  const cache = compilerRuntime.c(8);
-  let body: unknown;
-  if (cache[0] !== isFetching || cache[1] !== isPending || cache[2] !== onOpenChange || cache[3] !== onRetry) {
-    body = jsx.jsx(DialogBody, {
-      className: "select-none",
-      children: isPending
-        ? jsx.jsx(DialogHeader, {
-          title: jsx.jsx(DialogTitle, {
-            children: jsx.jsx(FormattedMessage, {
-              id: "beacons.connectApp.loading.title",
-              defaultMessage: "Connect app",
-              description: "Title of the dialog shown to an end user while app connection details requested by the user are loading. Keep this concise; there are no placeholders.",
-            }),
-          }),
-          subtitle: jsx.jsxs(DialogDescription, {
-            className: "flex items-center gap-2",
-            children: [
-              jsx.jsx(LoadingSpinner, { className: "icon-xs" }),
-              jsx.jsx(FormattedMessage, {
-                id: "beacons.connectApp.loading.description",
-                defaultMessage: "Loading connection details…",
-                description: "Status message in the app connection dialog shown to an end user while connector details are loading. Keep this concise; there are no placeholders.",
-              }),
-            ],
-          }),
-        })
-        : jsx.jsxs(jsx.Fragment, {
-          children: [
-            jsx.jsx(DialogHeader, {
-              title: jsx.jsx(DialogTitle, {
-                children: jsx.jsx(FormattedMessage, {
-                  id: "beacons.connectApp.loadError.title",
-                  defaultMessage: "Couldn’t load connector",
-                  description: "Error heading in the app connection dialog shown to an end user when connector details requested by the user could not be loaded. Keep this concise and nontechnical; there are no placeholders.",
+function S(e) {
+  let t = (0, C.c)(8),
+    { isPending: n, isFetching: i, onOpenChange: o, onRetry: l } = e,
+    m;
+  t[0] !== i || t[1] !== n || t[2] !== o || t[3] !== l
+    ? ((m = (0, w.jsx)(c, {
+        className: `select-none`,
+        children: n
+          ? (0, w.jsx)(r, {
+              title: (0, w.jsx)(d, {
+                children: (0, w.jsx)(f, {
+                  id: `beacons.connectApp.loading.title`,
+                  defaultMessage: `Connect app`,
+                  description: `Title of the dialog shown to an end user while app connection details requested by the user are loading. Keep this concise; there are no placeholders.`,
                 }),
               }),
-              subtitle: jsx.jsx(DialogDescription, {
-                children: jsx.jsx(FormattedMessage, {
-                  id: "beacons.connectApp.loadError.description",
-                  defaultMessage: "Try again, or cancel and return to the previous page",
-                  description: "Actionable error explanation in the app connection dialog shown to an end user when connector details requested by the user could not be loaded. The dialog offers Retry and Cancel buttons. Keep this concise; there are no placeholders.",
-                }),
+              subtitle: (0, w.jsxs)(s, {
+                className: `flex items-center gap-2`,
+                children: [
+                  (0, w.jsx)(u, { className: `icon-xs` }),
+                  (0, w.jsx)(f, {
+                    id: `beacons.connectApp.loading.description`,
+                    defaultMessage: `Loading connection details…`,
+                    description: `Status message in the app connection dialog shown to an end user while connector details are loading. Keep this concise; there are no placeholders.`,
+                  }),
+                ],
               }),
-            }),
-            jsx.jsxs(DialogFooter, {
+            })
+          : (0, w.jsxs)(w.Fragment, {
               children: [
-                jsx.jsx(Button, {
-                  color: "secondary",
-                  disabled: isFetching,
-                  onClick: () => onOpenChange(false),
-                  type: "button",
-                  children: jsx.jsx(FormattedMessage, {
-                    id: "beacons.connectApp.loadError.button.cancel",
-                    defaultMessage: "Cancel",
-                    description: "Button label in the app connection dialog for closing it after connector details requested by the user failed to load. Keep this short; there are no placeholders.",
+                (0, w.jsx)(r, {
+                  title: (0, w.jsx)(d, {
+                    children: (0, w.jsx)(f, {
+                      id: `beacons.connectApp.loadError.title`,
+                      defaultMessage: `Couldn’t load connector`,
+                      description: `Error heading in the app connection dialog shown to an end user when connector details requested by the user could not be loaded. Keep this concise and nontechnical; there are no placeholders.`,
+                    }),
+                  }),
+                  subtitle: (0, w.jsx)(s, {
+                    children: (0, w.jsx)(f, {
+                      id: `beacons.connectApp.loadError.description`,
+                      defaultMessage: `Try again, or cancel and return to the previous page`,
+                      description: `Actionable error explanation in the app connection dialog shown to an end user when connector details requested by the user could not be loaded. The dialog offers Retry and Cancel buttons. Keep this concise; there are no placeholders.`,
+                    }),
                   }),
                 }),
-                jsx.jsx(Button, {
-                  color: "primary",
-                  loading: isFetching,
-                  onClick: onRetry,
-                  type: "button",
-                  children: jsx.jsx(FormattedMessage, {
-                    id: "beacons.connectApp.loadError.button.retry",
-                    defaultMessage: "Retry",
-                    description: "Button label in the app connection dialog for retrying connector details that failed to load after an end user requested an app connection. Keep this short; there are no placeholders.",
-                  }),
+                (0, w.jsxs)(h, {
+                  children: [
+                    (0, w.jsx)(p, {
+                      color: `secondary`,
+                      disabled: i,
+                      onClick: () => o(!1),
+                      type: `button`,
+                      children: (0, w.jsx)(f, {
+                        id: `beacons.connectApp.loadError.button.cancel`,
+                        defaultMessage: `Cancel`,
+                        description: `Button label in the app connection dialog for closing it after connector details requested by the user failed to load. Keep this short; there are no placeholders.`,
+                      }),
+                    }),
+                    (0, w.jsx)(p, {
+                      color: `primary`,
+                      loading: i,
+                      onClick: l,
+                      type: `button`,
+                      children: (0, w.jsx)(f, {
+                        id: `beacons.connectApp.loadError.button.retry`,
+                        defaultMessage: `Retry`,
+                        description: `Button label in the app connection dialog for retrying connector details that failed to load after an end user requested an app connection. Keep this short; there are no placeholders.`,
+                      }),
+                    }),
+                  ],
                 }),
               ],
             }),
-          ],
-        }),
-    });
-    cache[0] = isFetching;
-    cache[1] = isPending;
-    cache[2] = onOpenChange;
-    cache[3] = onRetry;
-    cache[4] = body;
-  } else {
-    body = cache[4];
-  }
-  let result: unknown;
-  if (cache[5] !== onOpenChange || cache[6] !== body) {
-    result = jsx.jsx(Dialog, {
-      open: true,
-      onOpenChange,
-      size: "compact",
-      children: body,
-    });
-    cache[5] = onOpenChange;
-    cache[6] = body;
-    cache[7] = result;
-  } else {
-    result = cache[7];
-  }
-  return result;
+      })),
+      (t[0] = i),
+      (t[1] = n),
+      (t[2] = o),
+      (t[3] = l),
+      (t[4] = m))
+    : (m = t[4]);
+  let g;
+  return (
+    t[5] !== o || t[6] !== m
+      ? ((g = (0, w.jsx)(a, { open: !0, onOpenChange: o, size: `compact`, children: m })),
+        (t[5] = o),
+        (t[6] = m),
+        (t[7] = g))
+      : (g = t[7]),
+    g
+  );
 }
-
-function initializeAppConnectModalById(): void {
-  compilerRuntime = getCompilerRuntime() as unknown as CompilerRuntime;
-  initializeIntlRuntime();
-  initializeButton();
-  initializeDialog();
-  initializeDialogLayout();
-  initializeResourceButtonDependencies();
-  initializeConnectorQuery();
-  initializeAppConnectModal();
-  jsx = getJsxRuntime();
+var C, w;
+function T() {
+  return (T = e(() => {
+    ((C = t()), o(), m(), g(), l(), n(), _(), y(), (w = i()));
+  }))();
 }
-
-export {
-  AppConnectModalById as n,
-  initializeAppConnectModalById as r,
-  ConnectorLoadState as t,
-};
+export { x as n, T as r, S as t };

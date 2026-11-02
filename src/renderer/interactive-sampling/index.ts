@@ -1,341 +1,254 @@
-// Adaptive function-graph sampling. Release chunk: interactive-sampling-1ac392c5c15b.js.
-import "@rchunk/rolldown-runtime";
-import { G2 as defineMessages, K2 as initializeIntl } from "@rchunk/app-shared";
-import * as graphDataChunk from "@rchunk/build-graph-data";
-
-interface Viewport {
-  xDomain: [number, number];
-  yDomain: [number, number];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { G2 as t, K2 as n } from "@rchunk/app-shared";
+import { a as r, n as i, r as a } from "@rchunk/build-graph-data";
+var o;
+function s() {
+  return (s = e(() => {
+    (n(),
+      (o = t({
+        xIntercept: {
+          id: `learningBlock.graph.xInterceptTooltipLabel`,
+          defaultMessage: `x-intercept`,
+        },
+        yIntercept: {
+          id: `learningBlock.graph.yInterceptTooltipLabel`,
+          defaultMessage: `y-intercept`,
+        },
+        intersection: {
+          id: `learningBlock.graph.intersectionTooltipLabel`,
+          defaultMessage: `intersection`,
+        },
+        minimum: { id: `learningBlock.graph.minimumTooltipLabel`, defaultMessage: `minimum` },
+        maximum: { id: `learningBlock.graph.maximumTooltipLabel`, defaultMessage: `maximum` },
+        undefinedPoint: {
+          id: `learningBlock.graph.undefinedPointTooltipLabel`,
+          defaultMessage: `undefined point`,
+        },
+        resetViewport: {
+          id: `learningBlock.graph.resetViewportButtonLabel`,
+          defaultMessage: `Reset viewport`,
+        },
+      })));
+  }))();
 }
-interface CanvasSize {
-  width?: number;
-  height?: number;
-}
-interface SamplePoint {
-  x: number;
-  y: number;
-}
-interface ScreenSample {
-  x: number;
-  y: number | null;
-  screenX: number;
-  screenY: number;
-  isReal: boolean;
-}
-type SamplingQuality = "interactive" | "settled";
-interface SamplingInput {
-  viewport: Viewport;
-  canvasSize?: CanvasSize;
-  rpn: unknown;
-  constants: unknown;
-  evaluateAt?: (x: number) => number;
-  forcedXs?: number[];
-  quality?: SamplingQuality;
-}
-interface PoleAnalysis {
-  knownPoleXs: number[];
-  periodicAnchorXs: number[];
-  explicitPoleXs: number[];
-}
-interface GraphDataRuntime {
-  a(): void;
-  n(rpn: unknown, x: number, constants: unknown): number;
-  r(
-    rpn: unknown,
-    constants: unknown,
-    minimumX: number,
-    maximumX: number,
-  ): PoleAnalysis;
-}
-interface SamplingConfig {
-  delta: number;
-  maxDepth: number;
-  smoothLevel: number;
-  jumpLevel: number;
-  nanLevel: number;
-  testLevel: number;
-  cuspThreshold: number;
-}
-
-const graphData = graphDataChunk as unknown as GraphDataRuntime;
-let graphMessages: ReturnType<typeof defineMessages>;
-
-function initializeGraphMessages(): void {
-  initializeIntl();
-  graphMessages ??= defineMessages({
-    xIntercept: {
-      id: "learningBlock.graph.xInterceptTooltipLabel",
-      defaultMessage: "x-intercept",
-    },
-    yIntercept: {
-      id: "learningBlock.graph.yInterceptTooltipLabel",
-      defaultMessage: "y-intercept",
-    },
-    intersection: {
-      id: "learningBlock.graph.intersectionTooltipLabel",
-      defaultMessage: "intersection",
-    },
-    minimum: {
-      id: "learningBlock.graph.minimumTooltipLabel",
-      defaultMessage: "minimum",
-    },
-    maximum: {
-      id: "learningBlock.graph.maximumTooltipLabel",
-      defaultMessage: "maximum",
-    },
-    undefinedPoint: {
-      id: "learningBlock.graph.undefinedPointTooltipLabel",
-      defaultMessage: "undefined point",
-    },
-    resetViewport: {
-      id: "learningBlock.graph.resetViewportButtonLabel",
-      defaultMessage: "Reset viewport",
-    },
-  });
-}
-
-const samplingConfig = (quality: SamplingQuality): SamplingConfig =>
-  quality === "interactive"
-    ? {
-        delta: 2,
-        maxDepth: 13,
-        smoothLevel: 7,
-        jumpLevel: 3,
-        nanLevel: 9,
-        testLevel: 1,
-        cuspThreshold: 0.5,
-      }
-    : {
-        delta: 2,
-        maxDepth: 17,
-        smoothLevel: 8,
-        jumpLevel: 2,
-        nanLevel: 13,
-        testLevel: 1,
-        cuspThreshold: 0.5,
-      };
-
-function uniqueSorted(values: number[]): number[] {
-  return Array.from(
-    new Set(values.map((value) => Number(value.toFixed(10)))),
-  ).sort((left, right) => left - right);
-}
-
-function sampleFunction({
-  viewport,
-  canvasSize,
-  rpn,
-  constants,
-  evaluateAt,
-  forcedXs,
-  quality = "settled",
-}: SamplingInput): SamplePoint[][] {
-  const width = Math.max(1, canvasSize?.width ?? 1);
-  const height = Math.max(1, canvasSize?.height ?? width);
-  const config = samplingConfig(quality);
-  const cache = new Map<number, number | null>();
-  const xRange = Math.max(1e-6, viewport.xDomain[1] - viewport.xDomain[0]);
-  const yRange = Math.max(1e-6, viewport.yDomain[1] - viewport.yDomain[0]);
-
-  const evaluate = (x: number): number | null => {
-    const key = Number(x.toFixed(12));
-    if (cache.has(key)) return cache.get(key) ?? null;
-    const result = evaluateAt ? evaluateAt(x) : graphData.n(rpn, x, constants);
-    const finite = Number.isFinite(result) ? result : null;
-    cache.set(key, finite);
-    return finite;
-  };
-  const sample = (x: number): ScreenSample => {
-    const y = evaluate(x);
-    if (y == null) {
-      return {
-        x,
-        y: null,
-        screenX: Number.NaN,
-        screenY: Number.NaN,
-        isReal: false,
-      };
-    }
-    const screenX = ((x - viewport.xDomain[0]) / xRange) * width;
-    const screenY = ((viewport.yDomain[1] - y) / yRange) * height;
-    return {
-      x,
-      y,
-      screenX,
-      screenY,
-      isReal: Number.isFinite(screenX + screenY),
-    };
-  };
-  const outOfBounds = (point: ScreenSample) =>
-    point.isReal &&
-    (point.screenX < -500 ||
-      point.screenY < -500 ||
-      point.screenX > width + 500 ||
-      point.screenY > height + 500);
-  const sameOutsideSide = (left: ScreenSample, right: ScreenSample) =>
-    left.isReal &&
-    right.isReal &&
-    ((left.screenX < -500 && right.screenX < -500) ||
-      (left.screenY < -500 && right.screenY < -500) ||
-      (left.screenX > width + 500 && right.screenX > width + 500) ||
-      (left.screenY > height + 500 && right.screenY > height + 500));
-  const distance = (left: ScreenSample, right: ScreenSample) =>
-    !left.isReal || !right.isReal
-      ? Number.NaN
-      : Math.hypot(right.screenX - left.screenX, right.screenY - left.screenY);
-
-  const analysis = graphData.r(
-    rpn,
-    constants,
-    viewport.xDomain[0],
-    viewport.xDomain[1],
-  );
-  const anchors = uniqueSorted([
-    viewport.xDomain[0],
-    viewport.xDomain[1],
-    ...analysis.periodicAnchorXs,
-    ...analysis.explicitPoleXs,
-    ...(forcedXs ?? []).filter(
-      (x) => x >= viewport.xDomain[0] && x <= viewport.xDomain[1],
-    ),
-  ]);
-  const points: Array<SamplePoint | null> = [];
-  let previous: ScreenSample | null = null;
-  const epsilon = Math.max(1e-9, xRange * 1e-9);
-
-  const breakSegment = () => {
-    if (previous != null) points.push(null);
-    previous = null;
-  };
-  const append = (point: ScreenSample) => {
-    const visible = point.isReal && point.y != null && !outOfBounds(point);
-    if (!visible) {
-      breakSegment();
-      return;
-    }
-    if (
-      previous &&
-      Math.abs(previous.screenX - point.screenX) < 0.8 &&
-      Math.abs(previous.screenY - point.screenY) < 0.8
-    ) {
-      return;
-    }
-    points.push({ x: point.x, y: point.y });
-    previous = point;
-  };
-  const intervalHasNoRealPoint = (leftX: number, rightX: number) => {
-    if (sample(leftX).isReal || sample(rightX).isReal) return false;
-    for (let index = 0; index < 20; index += 1) {
-      if (sample(leftX + ((index + 0.5) * (rightX - leftX)) / 20).isReal) {
-        return false;
-      }
-    }
-    return true;
-  };
-  const isNearUndefined = (x: number) =>
-    !sample(x + epsilon).isReal || !sample(x - epsilon).isReal;
-
-  const refine = (
-    left: ScreenSample,
-    right: ScreenSample,
-    depth: number,
-  ): void => {
-    if (
-      depth < config.nanLevel &&
-      (intervalHasNoRealPoint(left.x, right.x) || sameOutsideSide(left, right))
-    ) {
-      return;
-    }
-    const middle = sample((left.x + right.x) * 0.5);
-    if (depth <= config.testLevel) {
-      const oneUndefined = !left.isReal || !middle.isReal || !right.isReal;
-      if (oneUndefined) {
-        const candidates = [left, middle, right].filter(
-          (point) => point.isReal,
-        );
-        if (
-          candidates.length === 1 &&
-          !isNearUndefined(candidates[0]?.x ?? 0)
-        ) {
-          append(candidates[0] as ScreenSample);
-          return;
+var c, l, u, d, f, p, m;
+function h() {
+  return (h = e(() => {
+    (r(),
+      (c = 500),
+      (l = 0.8),
+      (u = 30),
+      (d = (e) =>
+        e === `interactive`
+          ? {
+              delta: 2,
+              maxDepth: 13,
+              smoothLevel: 7,
+              jumpLevel: 3,
+              nanLevel: 9,
+              testLevel: 1,
+              cuspThreshold: 0.5,
+            }
+          : {
+              delta: 2,
+              maxDepth: 17,
+              smoothLevel: 8,
+              jumpLevel: 2,
+              nanLevel: 13,
+              testLevel: 1,
+              cuspThreshold: 0.5,
+            }),
+      (f = (e) => Array.from(new Set(e.map((e) => Number(e.toFixed(10))))).sort((e, t) => e - t)),
+      (p = ({
+        viewport: e,
+        canvasSize: t,
+        rpn: n,
+        constants: r,
+        evaluateAt: o,
+        forcedXs: s,
+        quality: p = `settled`,
+      }) => {
+        let m = Math.max(1, t?.width ?? 1),
+          h = Math.max(1, t?.height ?? m),
+          g = d(p),
+          _ = new Map(),
+          v = Math.max(1e-6, e.xDomain[1] - e.xDomain[0]),
+          y = Math.max(1e-6, e.yDomain[1] - e.yDomain[0]),
+          b = (e) => {
+            let t = Number(e.toFixed(12));
+            if (_.has(t)) return _.get(t) ?? null;
+            let a = o ? o(e) : i(n, e, r),
+              s = Number.isFinite(a) ? a : null;
+            return (_.set(t, s), s);
+          },
+          x = (t, n) => ({ x: ((t - e.xDomain[0]) / v) * m, y: ((e.yDomain[1] - n) / y) * h }),
+          S = (e) => {
+            let t = b(e);
+            if (t == null) return { x: e, y: null, screenX: NaN, screenY: NaN, isReal: !1 };
+            let n = x(e, t);
+            return { x: e, y: t, screenX: n.x, screenY: n.y, isReal: Number.isFinite(n.x + n.y) };
+          },
+          C = (e) =>
+            e.isReal &&
+            (e.screenX < -500 || e.screenY < -500 || e.screenX > m + c || e.screenY > h + c),
+          w = (e, t) =>
+            e.isReal &&
+            t.isReal &&
+            ((e.screenX < -500 && t.screenX < -500) ||
+              (e.screenY < -500 && t.screenY < -500) ||
+              (e.screenX > m + c && t.screenX > m + c) ||
+              (e.screenY > h + c && t.screenY > h + c)),
+          T = (e, t, n) => {
+            let r = (e, t) =>
+              !e.isReal || !t.isReal
+                ? NaN
+                : Math.hypot(t.screenX - e.screenX, t.screenY - e.screenY);
+            if (!e.isReal || !n.isReal || !t.isReal)
+              return { ab: r(e, n), ac: r(e, t), cb: r(t, n), cd: NaN };
+            let i = (e.screenX + n.screenX) * 0.5,
+              a = (e.screenY + n.screenY) * 0.5;
+            return {
+              ab: r(e, n),
+              ac: r(e, t),
+              cb: r(t, n),
+              cd: Math.hypot(t.screenX - i, t.screenY - a),
+            };
+          },
+          E = a(n, r, e.xDomain[0], e.xDomain[1]),
+          D = (e) => E.knownPoleXs.some((t) => Math.abs(t - e) <= 1e-7),
+          O = f(
+            [e.xDomain[0], e.xDomain[1]].concat(
+              E.periodicAnchorXs,
+              E.explicitPoleXs,
+              (s ?? []).filter((t) => t >= e.xDomain[0] && t <= e.xDomain[1]),
+            ),
+          ),
+          k = [],
+          A = null,
+          j = Math.max(1e-9, v * 1e-9),
+          M = () => {
+            A != null && (k.push(null), (A = null));
+          },
+          N = (e) => {
+            let t = e.isReal && e.y != null && !C(e),
+              n = A != null;
+            if (
+              (n || t) &&
+              !(
+                t &&
+                n &&
+                Math.abs(A.screenX - e.screenX) < l &&
+                Math.abs(A.screenY - e.screenY) < l
+              )
+            ) {
+              if (!t) {
+                M();
+                return;
+              }
+              (k.push({ x: e.x, y: e.y }), (A = e));
+            }
+          },
+          P = (e, t) => {
+            let n = S(e),
+              r = S(t);
+            if (n.isReal || r.isReal) return !1;
+            for (let n = 0; n < 20; n += 1) {
+              let r = e + ((n + 0.5) * (t - e)) / 20;
+              if (S(r).isReal) return !1;
+            }
+            return !0;
+          },
+          F = (e) => !S(e + j).isReal || !S(e - j).isReal,
+          I = (e, t, n, r) => {
+            if (r > g.testLevel) return !1;
+            let i = !e.isReal,
+              a = !n.isReal,
+              o = !t.isReal;
+            if ((i && !o && !F(e.x)) || (a && !o && !F(n.x)) || (o && (!i || !a) && !F(t.x)))
+              return !1;
+            let s, c;
+            if (i && !o) ((s = e.x), (c = t.x));
+            else if (a && !o) ((s = n.x), (c = t.x));
+            else if (o && !a) ((s = t.x), (c = n.x));
+            else if (o && !i) ((s = t.x), (c = e.x));
+            else return !1;
+            let l = S(c);
+            if (!l.isReal) return !1;
+            for (let e = 0; e < u; e += 1) {
+              let e = (s + c) * 0.5,
+                t = S(e);
+              t.isReal ? ((c = e), (l = t)) : (s = e);
+            }
+            return (N(l), !0);
+          },
+          L = (e, t, n) => {
+            if (n < g.nanLevel && (P(e.x, t.x) || w(e, t))) return;
+            let r = S((e.x + t.x) * 0.5),
+              i = T(e, r, t);
+            if (I(e, r, t, n)) return;
+            let a = 0,
+              o = n < g.smoothLevel && Number.isFinite(i.cd) && i.cd < g.delta,
+              s =
+                (n <= g.jumpLevel &&
+                  (!Number.isFinite(i.ab) || !Number.isFinite(i.ac) || !Number.isFinite(i.cb))) ||
+                (n < g.jumpLevel &&
+                  (i.cb > 0.99 * i.ab ||
+                    i.ac > 0.99 * i.ab ||
+                    i.ab === 1 / 0 ||
+                    i.ac === 1 / 0 ||
+                    i.cb === 1 / 0));
+            if (
+              (n < g.smoothLevel + 2 &&
+                Number.isFinite(i.ab) &&
+                i.ab < g.cuspThreshold * (i.ac + i.cb) &&
+                ((a = 0), (o = !1)),
+              --n,
+              s)
+            ) {
+              M();
+              return;
+            }
+            if (n <= a || o) {
+              N(r);
+              return;
+            }
+            (L(e, r, n), r.isReal && N(r), L(r, t, n));
+          };
+        for (let e = 0; e < O.length - 1; e += 1) {
+          let t = S(O[e]),
+            n = S(O[e + 1]);
+          (N(t), L(t, n, g.maxDepth), N(n), (!n.isReal || D(O[e + 1])) && M());
         }
-      }
-    }
-    const whole = distance(left, right);
-    const leftHalf = distance(left, middle);
-    const rightHalf = distance(middle, right);
-    const midpointDistance =
-      left.isReal && middle.isReal && right.isReal
-        ? Math.hypot(
-            middle.screenX - (left.screenX + right.screenX) * 0.5,
-            middle.screenY - (left.screenY + right.screenY) * 0.5,
-          )
-        : Number.NaN;
-    const smooth =
-      depth < config.smoothLevel &&
-      Number.isFinite(midpointDistance) &&
-      midpointDistance < config.delta;
-    const jump =
-      (depth <= config.jumpLevel &&
-        (!Number.isFinite(whole) ||
-          !Number.isFinite(leftHalf) ||
-          !Number.isFinite(rightHalf))) ||
-      (depth < config.jumpLevel &&
-        (rightHalf > 0.99 * whole || leftHalf > 0.99 * whole));
-    if (jump) {
-      breakSegment();
-      return;
-    }
-    if (depth <= 0 || smooth) {
-      append(middle);
-      return;
-    }
-    refine(left, middle, depth - 1);
-    if (middle.isReal) append(middle);
-    refine(middle, right, depth - 1);
-  };
-
-  for (let index = 0; index < anchors.length - 1; index += 1) {
-    const left = sample(anchors[index] as number);
-    const right = sample(anchors[index + 1] as number);
-    append(left);
-    refine(left, right, config.maxDepth);
-    append(right);
-    if (
-      !right.isReal ||
-      analysis.knownPoleXs.some(
-        (poleX) => Math.abs(poleX - (anchors[index + 1] as number)) <= 1e-7,
-      )
-    ) {
-      breakSegment();
-    }
-  }
-
-  const segments: SamplePoint[][] = [];
-  let segment: SamplePoint[] = [];
-  for (const point of points) {
-    if (point == null) {
-      if (segment.length > 1) segments.push(segment);
-      segment = [];
-    } else segment.push(point);
-  }
-  if (segment.length > 1) segments.push(segment);
-  return segments;
+        let R = [],
+          z = [];
+        for (let e of k) {
+          if (e == null) {
+            (z.length > 1 && R.push(z), (z = []));
+            continue;
+          }
+          z.push(e);
+        }
+        return (z.length > 1 && R.push(z), R);
+      }),
+      (m = ({
+        viewport: e,
+        canvasSize: t,
+        rpn: n,
+        constants: r,
+        evaluateAt: i,
+        forcedXs: a,
+        quality: o = `settled`,
+      }) =>
+        p({
+          viewport: e,
+          canvasSize: t,
+          rpn: n,
+          constants: r,
+          evaluateAt: i,
+          forcedXs: a,
+          quality: o,
+        })));
+  }))();
 }
-
-function initializeInteractiveSampling(): void {
-  graphData.a();
-}
-
-function sampleInteractiveGraph(input: SamplingInput): SamplePoint[][] {
-  return sampleFunction(input);
-}
-
-export {
-  graphMessages as a,
-  initializeGraphMessages as i,
-  sampleFunction as n,
-  initializeInteractiveSampling as r,
-  sampleInteractiveGraph as t,
-};
+export { o as a, s as i, p as n, h as r, m as t };

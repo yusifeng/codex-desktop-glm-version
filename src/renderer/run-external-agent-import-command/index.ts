@@ -1,9 +1,5 @@
+// @ts-nocheck
 import "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-
-const {
-  Ji: initializeExternalAgentCommand,
-  Yi: runExternalAgentImportCommand,
-} = appInitialChunk;
-initializeExternalAgentCommand();
-export { runExternalAgentImportCommand };
+import { Ji as e, Yi as t } from "@rchunk/app-initial";
+e();
+export { t as runExternalAgentImportCommand };

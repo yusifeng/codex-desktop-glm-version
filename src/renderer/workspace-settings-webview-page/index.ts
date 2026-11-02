@@ -1,895 +1,781 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as compactEmptyStateChunk from "@rchunk/compact-empty-state";
-import * as surfaceChunk from "@rchunk/workspace-webview-surface";
-
-type LoadState = "failed" | "loading" | "ready";
-
-interface JsxRuntime {
-  Fragment: unknown;
-  jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown;
-  jsxs(type: unknown, props: Record<string, unknown>, key?: string): unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  G3 as i,
+  H4 as a,
+  HX as o,
+  I3 as s,
+  K2 as c,
+  LX as l,
+  NX as u,
+  QI as d,
+  W3 as f,
+  Y2 as p,
+  Yh as m,
+  ZI as h,
+  Zh as g,
+  e6 as _,
+  g4 as v,
+  h4 as y,
+  m4 as ee,
+  oZ as b,
+  q4 as x,
+  wL as S,
+  yG as C,
+} from "@rchunk/app-shared";
+import {
+  A9 as w,
+  Dft as T,
+  Dln as te,
+  M6t as E,
+  MTt as D,
+  N6t as ne,
+  Oft as O,
+  Oln as k,
+  PTt as A,
+  Qgn as j,
+  Udn as M,
+  Wdn as re,
+  Ygn as ie,
+  c$t as ae,
+  d_n as N,
+  dfn as oe,
+  eEt as P,
+  gT as F,
+  i_n as se,
+  idn as ce,
+  ifn as I,
+  j9 as L,
+  l$t as R,
+  lfn as le,
+  oS as z,
+  rdn as ue,
+  rht as B,
+  sS as V,
+  ufn as de,
+  uht as fe,
+} from "@rchunk/app-initial";
+import { n as H, t as U } from "@rchunk/compact-empty-state";
+import { n as pe, t as me } from "@rchunk/mcp-view-surface";
+function he(e) {
+  let t = (0, W.c)(14),
+    { accountId: n, onRetry: r } = e,
+    i = l(h),
+    a,
+    o;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((a = (0, G.jsx)(p, {
+        id: `workspaceSettings.webview.loadFailed`,
+        defaultMessage: `Couldn't load workspace settings`,
+        description: `Title shown in Codex when the authenticated workspace-settings page still cannot load after automatic retries`,
+      })),
+      (o = (0, G.jsx)(p, {
+        id: `workspaceSettings.webview.loadFailed.description`,
+        defaultMessage: `Try again or open this workspace's settings in your browser`,
+        description: `Recovery guidance for a workspace administrator when embedded settings fail to load; the browser action opens the same workspace`,
+      })),
+      (t[0] = a),
+      (t[1] = o))
+    : ((a = t[0]), (o = t[1]));
+  let s;
+  t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((s = (0, G.jsx)(p, {
+        id: `workspaceSettings.webview.retry`,
+        defaultMessage: `Try again`,
+        description: `Button that retries loading the current workspace's settings inside Codex after an embedded-page failure`,
+      })),
+      (t[2] = s))
+    : (s = t[2]);
+  let c;
+  t[3] === r
+    ? (c = t[4])
+    : ((c = (0, G.jsx)(m, { color: `primary`, onClick: r, children: s })), (t[3] = r), (t[4] = c));
+  let u;
+  t[5] !== n || t[6] !== i
+    ? ((u = (e) => {
+        V(i, { action: `browser_fallback_requested`, destination: `browser_link` });
+        let t = new URL(A);
+        (t.searchParams.set(`account_id`, n),
+          O({
+            event: e,
+            href: t.toString(),
+            initiator: `open_in_browser_bridge`,
+            openTarget: `external-browser`,
+          }));
+      }),
+      (t[5] = n),
+      (t[6] = i),
+      (t[7] = u))
+    : (u = t[7]);
+  let d;
+  t[8] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((d = (0, G.jsx)(p, {
+        id: `workspaceSettings.webview.openInBrowser`,
+        defaultMessage: `Open in browser`,
+        description: `Button that opens the same workspace's settings in the external browser when the embedded settings page cannot load`,
+      })),
+      (t[8] = d))
+    : (d = t[8]);
+  let f;
+  t[9] === u
+    ? (f = t[10])
+    : ((f = (0, G.jsx)(m, { color: `secondary`, onClick: u, children: d })),
+      (t[9] = u),
+      (t[10] = f));
+  let g;
+  return (
+    t[11] !== c || t[12] !== f
+      ? ((g = (0, G.jsx)(U, {
+          className: `select-none`,
+          icon: null,
+          title: a,
+          description: o,
+          actions: (0, G.jsxs)(G.Fragment, { children: [c, f] }),
+        })),
+        (t[11] = c),
+        (t[12] = f),
+        (t[13] = g))
+      : (g = t[13]),
+    g
+  );
 }
-
-interface ReactRuntime {
-  useEffect(
-    effect: () => (() => void) | void,
-    dependencies: readonly unknown[],
-  ): void;
-  useLayoutEffect(
-    effect: () => (() => void) | void,
-    dependencies: readonly unknown[],
-  ): void;
-  useRef<Value>(initialValue: Value): { current: Value };
-  useState<Value>(
-    initialValue: Value,
-  ): [Value, (value: Value | ((previous: Value) => Value)) => void];
+var W, G;
+function K() {
+  return (K = e(() => {
+    ((W = t()), r(), c(), P(), g(), H(), T(), d(), z(), (G = s()));
+  }))();
 }
-
-interface WorkspaceAccount {
-  id: string;
-  plan_type?: string | null;
-  structure: string;
+function ge() {
+  let e = (0, Ce.c)(2),
+    [t] = N(),
+    n;
+  return (
+    e[0] === t
+      ? (n = e[1])
+      : ((n = be(t) == null ? (0, Z.jsx)(ie, { to: `/`, replace: !0 }) : null),
+        (e[0] = t),
+        (e[1] = n)),
+    n
+  );
 }
-
-interface WorkspaceWebviewState {
-  accountId: string | null;
-  failedAttemptCount: number;
-  generation: number;
-  loadState: LoadState;
-  userId?: string;
-}
-
-interface FailureDetails {
-  failureReason: "load_timeout" | "navigation_failed" | "unexpected_navigation";
-  navigationErrorCode?: number;
-  navigationPhase:
-    "authentication" | "checkout" | "other" | "startup" | "workspace_settings";
-}
-
-interface WebviewNavigationEvent {
-  errorCode?: number;
-  isMainFrame?: boolean;
-  validatedURL?: string;
-}
-
-interface WebviewElement {
-  addEventListener(
-    name: string,
-    listener: (event: WebviewNavigationEvent) => void,
-  ): void;
-  getURL(): string;
-  isLoading(): boolean;
-  removeEventListener(
-    name: string,
-    listener: (event: WebviewNavigationEvent) => void,
-  ): void;
-}
-
-interface ScopeApi {
-  get(family: unknown, partition: string): WorkspaceWebviewState;
-  query: {
-    invalidate(family: unknown, accountId: string): Promise<unknown> | unknown;
-  };
-  queryClient: {
-    cancelQueries(options: { queryKey: readonly unknown[] }): Promise<unknown>;
-  };
-  set(family: unknown, partition: string, value: WorkspaceWebviewState): void;
-}
-
-interface Experiment {
-  get<Value>(key: string, fallback: Value): Value;
-}
-
-interface TelemetrySession {
-  getContext(): { user: { customIDs?: { workspace_id?: string } } };
-  getDynamicConfig(
-    id: string,
-    options: { disableExposureLog: boolean },
-  ): Experiment;
-}
-
-interface RouteSchema {
-  safeParse(value: Record<string, string>): {
-    data?: { accountId: string };
-    success: boolean;
-  };
-}
-
-interface SurfaceProps {
-  isLoading: boolean;
-  loadingContent?: unknown;
-  partition: string;
-  src: string;
-  webviewRef(element: unknown): void;
-}
-
-const sharedRuntime = appSharedChunk as unknown as {
-  $3?(): void;
-  BX?<Value>(family: unknown, partition: string): Value;
-  FX?(): void;
-  G3?: {
-    dispatchMessage(type: string, payload: Record<string, unknown>): void;
-  };
-  H4?<Value extends Record<string, unknown>>(
-    shape: Record<string, unknown>,
-  ): { safeParse(value: unknown): { data?: Value; success: boolean } };
-  HX?<Value>(signal: unknown): Value;
-  I3(): JsxRuntime;
-  K2?(): void;
-  LX?(scope: unknown): ScopeApi;
-  NX?: string;
-  QI?(): void;
-  W3?(): void;
-  Y2?: (props: Record<string, unknown>) => unknown;
-  Yh?: (props: Record<string, unknown>) => unknown;
-  ZI?: unknown;
-  Zh?(): void;
-  e6(): ReactRuntime;
-  g4?(): void;
-  h4?(): void;
-  m4?(...values: unknown[]): string;
-  oZ?(
-    scope: unknown,
-    initialValue: (partition: string) => WorkspaceWebviewState,
-  ): unknown;
-  q4?(): { min(length: number): unknown };
-  wL?(): void;
-  yG?: string;
-};
-
-const initialRuntime = appInitialChunk as unknown as {
-  A9?(): boolean;
-  Dft?(): void;
-  Dln?: unknown;
-  M6t?(): void;
-  MTt?: string;
-  N6t?(): {
-    authMethod?: string | null;
-    isLoading?: boolean;
-    userId?: string | null;
-  };
-  Oft?(input: {
-    event: unknown;
-    href: string;
-    initiator: "open_in_browser_bridge";
-    openTarget: "external-browser";
-  }): void;
-  Oln?(): void;
-  PTt?: string;
-  Qgn?(): void;
-  Udn?(): void;
-  Wdn?(): boolean;
-  Ygn?: (props: { replace: boolean; to: string }) => unknown;
-  c$t?: unknown;
-  d_n?(): [URLSearchParams];
-  dfn?(): boolean;
-  eEt?(): void;
-  gT?(): void;
-  i_n?(): { pathname: string; search: string };
-  idn?(accountId: string): Promise<unknown> | unknown;
-  ifn?(): void;
-  j9?(): void;
-  l$t?(): void;
-  lfn?(): TelemetrySession;
-  oS?(): void;
-  rdn?(): void;
-  rht?(): void;
-  sS?(scope: ScopeApi, event: Record<string, unknown>): void;
-  ufn?(id: string, options: { disableExposureLog: boolean }): Experiment;
-  uht?(): { data?: WorkspaceAccount; isLoading: boolean };
-};
-
-const emptyStateRuntime = compactEmptyStateChunk as unknown as {
-  n?(): void;
-  t?: (props: Record<string, unknown>) => unknown;
-};
-const webviewRuntime = surfaceChunk as unknown as {
-  n?(): void;
-  t?: (props: SurfaceProps) => unknown;
-};
-
-const {
-  $3: initializeSharedRuntime,
-  BX: useSignalFamilyValue,
-  FX: initializeSignalRuntime,
-  G3: messageBridge,
-  H4: objectSchema,
-  HX: useSignalValue,
-  I3: getJsxRuntime,
-  K2: initializeSharedUi,
-  LX: useScope,
-  NX: codexWebUrl,
-  QI: initializeSharedQueries,
-  W3: initializeMessageBridge,
-  Y2: Message,
-  Yh: Button,
-  ZI: appScope,
-  Zh: initializeSharedMessages,
-  e6: getReactRuntime,
-  g4: initializeDialogRuntime,
-  h4: initializeClassNames,
-  m4: classNames,
-  oZ: createSignalFamily,
-  q4: stringSchema,
-  wL: initializeWebRuntime,
-  yG: partitionPrefix,
-} = sharedRuntime;
-const {
-  A9: useCompactToolbar,
-  Dft: initializeExternalLinking,
-  Dln: workspacePermissionsQuery,
-  M6t: initializeAccountState,
-  MTt: workspaceSettingsTarget,
-  N6t: useAccountState,
-  Oft: openExternalLink,
-  Oln: initializeWorkspaceSettings,
-  PTt: workspaceSettingsBrowserUrl,
-  Qgn: initializeQueries,
-  Udn: initializeAccountQueries,
-  Wdn: isUnsupportedEnvironment,
-  Ygn: Navigate,
-  c$t: authOriginSignal,
-  d_n: useSearchParams,
-  dfn: useAccountTransitionPending,
-  eEt: initializeApplicationRuntime,
-  gT: initializeRoutingRuntime,
-  i_n: useLocation,
-  idn: releaseAccountSettings,
-  ifn: initializeRouteState,
-  j9: initializeReactRuntime,
-  l$t: initializeTelemetry,
-  lfn: useTelemetrySession,
-  oS: initializeNavigationRuntime,
-  rdn: initializeAccountRuntime,
-  rht: initializeWorkspaceRuntime,
-  sS: logWorkspaceSettingsEvent,
-  ufn: useExperiment,
-  uht: useCurrentAccount,
-} = initialRuntime;
-const { n: initializeEmptyState, t: CompactEmptyState } = emptyStateRuntime;
-const { n: initializeWebviewSurface, t: WebviewSurface } = webviewRuntime;
-
-initializeSharedRuntime?.();
-initializeClassNames?.();
-initializeSignalRuntime?.();
-initializeWebRuntime?.();
-const React = getReactRuntime();
-initializeQueries?.();
-initializeDialogRuntime?.();
-initializeReactRuntime?.();
-initializeAccountRuntime?.();
-initializeWorkspaceSettings?.();
-initializeAccountState?.();
-initializeWorkspaceRuntime?.();
-initializeAccountQueries?.();
-initializeApplicationRuntime?.();
-initializeWebviewSurface?.();
-initializeTelemetry?.();
-initializeMessageBridge?.();
-initializeSharedQueries?.();
-initializeRouteState?.();
-initializeNavigationRuntime?.();
-initializeRoutingRuntime?.();
-initializeSharedRuntime?.();
-initializeSignalRuntime?.();
-initializeSharedUi?.();
-initializeApplicationRuntime?.();
-initializeSharedMessages?.();
-initializeEmptyState?.();
-initializeExternalLinking?.();
-initializeSharedQueries?.();
-initializeNavigationRuntime?.();
-
-const jsx = getJsxRuntime();
-const routeSchema = objectSchema?.<{ accountId: string }>({
-  accountId: stringSchema?.().min(1) ?? {},
-});
-const defaultOrigin = new URL(codexWebUrl ?? "https://chatgpt.com/codex")
-  .origin;
-const authPath = "/api/auth/";
-const checkoutPath = "/checkout/";
-const creditSuccessPath = "/payments/success-credit-purchase";
-const settingsPath = "/admin";
-const experimentId = "2493655517";
-const inactiveRetryDelay = 240_000;
-const navigationTimeout = 30_000;
-const retryBaseDelay = 1_000;
-const retryMaximumDelay = 60_000;
-const maximumAttempts = 5;
-const partitionCache = new Map<string, string>();
-const webviewStateFamily =
-  createSignalFamily?.(appScope, () => initialWebviewState()) ??
-  Symbol("workspace-settings-webview-state");
-
-function initialWebviewState(): WorkspaceWebviewState {
-  return {
-    accountId: null,
-    failedAttemptCount: 0,
-    generation: 0,
-    loadState: "loading",
-    userId: undefined,
-  };
-}
-
-function parseRoute(params: URLSearchParams): { accountId: string } | null {
-  const values = Object.fromEntries(params.entries());
-  if (routeSchema != null) {
-    const parsed = routeSchema.safeParse(values);
-    return parsed.success && parsed.data != null ? parsed.data : null;
-  }
-  const accountId = values.accountId;
-  return typeof accountId === "string" && accountId.length > 0
-    ? { accountId }
-    : null;
-}
-
-function partitionFor(
-  accountId: string | undefined,
-  userId: string | null | undefined,
-): string {
-  const key = JSON.stringify([userId, accountId]);
-  const cached = partitionCache.get(key);
-  if (cached != null) return cached;
-  const partition = `${partitionPrefix ?? "persist:workspace-settings-"}${crypto.randomUUID()}`;
-  partitionCache.set(key, partition);
-  return partition;
-}
-
-function WorkspaceSettingsWebviewPage(): unknown {
-  const [params] = useSearchParams?.() ?? [new URLSearchParams()];
-  return parseRoute(params) == null
-    ? jsx.jsx(Navigate ?? "a", { to: "/", replace: true })
-    : null;
-}
-
-function WorkspaceSettingsLoadFailure({
-  accountId,
-  onRetry,
-}: {
-  accountId: string;
-  onRetry(): void;
-}): unknown {
-  const scope = useScope?.(appScope);
-  const openInBrowser = (event: unknown) => {
-    if (scope != null)
-      logWorkspaceSettingsEvent?.(scope, {
-        action: "browser_fallback_requested",
-        destination: "browser_link",
-      });
-    const url = new URL(
-      workspaceSettingsBrowserUrl ?? "https://chatgpt.com/admin",
-    );
-    url.searchParams.set("account_id", accountId);
-    openExternalLink?.({
-      event,
-      href: url.toString(),
-      initiator: "open_in_browser_bridge",
-      openTarget: "external-browser",
-    });
-  };
-  const retryButton = jsx.jsx(Button ?? "button", {
-    color: "primary",
-    onClick: onRetry,
-    children: jsx.jsx(Message ?? "span", {
-      id: "workspaceSettings.webview.retry",
-      defaultMessage: "Try again",
-      description:
-        "Button that retries loading the current workspace's settings inside Codex after an embedded-page failure",
-    }),
-  });
-  const browserButton = jsx.jsx(Button ?? "button", {
-    color: "secondary",
-    onClick: openInBrowser,
-    children: jsx.jsx(Message ?? "span", {
-      id: "workspaceSettings.webview.openInBrowser",
-      defaultMessage: "Open in browser",
-      description:
-        "Button that opens the same workspace's settings in the external browser when the embedded settings page cannot load",
-    }),
-  });
-  return jsx.jsx(CompactEmptyState ?? "section", {
-    className: "select-none",
-    icon: null,
-    title: jsx.jsx(Message ?? "span", {
-      id: "workspaceSettings.webview.loadFailed",
-      defaultMessage: "Couldn't load workspace settings",
-      description:
-        "Title shown in Codex when the authenticated workspace-settings page still cannot load after automatic retries",
-    }),
-    description: jsx.jsx(Message ?? "span", {
-      id: "workspaceSettings.webview.loadFailed.description",
-      defaultMessage:
-        "Try again or open this workspace's settings in your browser",
-      description:
-        "Recovery guidance for a workspace administrator when embedded settings fail to load; the browser action opens the same workspace",
-    }),
-    actions: jsx.jsxs(jsx.Fragment, { children: [retryButton, browserButton] }),
-  });
-}
-
-function WorkspaceSettingsWebviewHost(): unknown {
-  const scope = useScope?.(appScope);
-  const {
-    authMethod,
-    isLoading: authLoading = false,
-    userId,
-  } = useAccountState?.() ?? {};
-  const { data: account, isLoading: accountLoading = false } =
-    useCurrentAccount?.() ?? { isLoading: false };
-  const location = useLocation?.() ?? { pathname: "/", search: "" };
-  const experiment = useExperiment?.(experimentId, {
-    disableExposureLog: true,
-  });
-  const accountTransitionPending = useAccountTransitionPending?.() ?? false;
-  const telemetry = useTelemetrySession?.();
-  const workspaceId = telemetry?.getContext().user.customIDs?.workspace_id;
-  const partition = partitionFor(account?.id, userId);
-  const routeAccountId =
-    location.pathname === "/workspace-settings/web"
-      ? (parseRoute(new URLSearchParams(location.search))?.accountId ?? null)
-      : null;
-  const eligibleAccountId =
-    !isUnsupportedEnvironment?.() &&
-    authMethod === "chatgpt" &&
-    !authLoading &&
-    userId != null &&
-    !accountTransitionPending &&
-    account?.structure === "workspace" &&
-    account.plan_type !== "quorum" &&
-    workspaceId === account.id &&
-    experiment?.get<boolean>("enable_workspace_settings_webview", false) ===
-      true
-      ? account.id
-      : null;
-  const loading = authLoading || accountLoading || accountTransitionPending;
-  const presentedAccountId =
-    !loading && routeAccountId === eligibleAccountId ? routeAccountId : null;
-  const routingOverride =
-    presentedAccountId != null && workspaceId === presentedAccountId
-      ? telemetry
-          ?.getDynamicConfig("762342243", { disableExposureLog: true })
-          .get("override", "")
-          .trim()
-          .toLowerCase() || undefined
-      : undefined;
-  const storedState =
-    useSignalFamilyValue?.<WorkspaceWebviewState>(
-      webviewStateFamily,
-      partition,
-    ) ?? initialWebviewState();
-  const stateMatches =
-    presentedAccountId != null &&
-    storedState.accountId === presentedAccountId &&
-    storedState.userId === userId;
-  const generation = stateMatches
-    ? storedState.generation
-    : storedState.generation + 1;
-  const previousPresentedAccount = React.useRef<string | null>(null);
-
-  React.useLayoutEffect(() => {
-    messageBridge?.dispatchMessage(
-      "workspace-settings-webview-presentation-changed",
-      { partition, presented: presentedAccountId != null },
-    );
-    return () =>
-      messageBridge?.dispatchMessage(
-        "workspace-settings-webview-presentation-changed",
-        { partition, presented: false },
-      );
-  }, [partition, presentedAccountId]);
-
-  React.useLayoutEffect(() => {
-    if (scope == null) return;
-    const current = scope.get(webviewStateFamily, partition);
-    if (presentedAccountId == null) {
-      if (
-        current.accountId != null &&
-        !authLoading &&
-        !accountLoading &&
-        !accountTransitionPending
-      )
-        scope.set(webviewStateFamily, partition, {
-          accountId: null,
-          failedAttemptCount: 0,
-          generation: current.generation + 1,
-          loadState: "loading",
-          userId: undefined,
-        });
-      return;
-    }
-    if (current.accountId !== presentedAccountId || current.userId !== userId)
-      scope.set(webviewStateFamily, partition, {
-        accountId: presentedAccountId,
-        failedAttemptCount: 0,
-        generation,
-        loadState: "loading",
-        userId: userId ?? undefined,
-      });
-  }, [
-    accountLoading,
-    accountTransitionPending,
-    authLoading,
-    generation,
-    partition,
-    presentedAccountId,
-    scope,
-    userId,
-  ]);
-
-  React.useLayoutEffect(() => {
-    if (scope == null) return;
-    const previous = previousPresentedAccount.current;
-    const becamePresented =
-      presentedAccountId != null && previous !== presentedAccountId;
-    previousPresentedAccount.current = presentedAccountId;
-    if (previous != null && previous !== presentedAccountId)
-      void scope.queryClient
-        .cancelQueries({ queryKey: ["accounts", "settings", previous] })
-        .then(() => releaseAccountSettings?.(previous))
-        .catch(ignore)
-        .then(() =>
-          scope.query.invalidate(workspacePermissionsQuery, previous),
-        );
-    if (!becamePresented) return;
-    const current = scope.get(webviewStateFamily, partition);
-    if (
-      current.accountId === presentedAccountId &&
-      current.userId === userId &&
-      current.loadState === "failed" &&
-      current.failedAttemptCount >= maximumAttempts
-    )
-      scope.set(webviewStateFamily, partition, {
-        ...current,
-        failedAttemptCount: 0,
-        generation: current.generation + 1,
-        loadState: "loading",
-      });
-  }, [partition, presentedAccountId, scope, userId]);
-
-  const onLoadStateChange = (
-    loadState: LoadState,
-    failure?: FailureDetails,
-  ) => {
-    if (scope == null) return;
-    const current = scope.get(webviewStateFamily, partition);
-    if (
-      current.accountId !== presentedAccountId ||
-      current.generation !== generation ||
-      current.userId !== userId ||
-      current.loadState === loadState ||
-      (loadState === "loading" &&
-        current.loadState === "failed" &&
-        current.failedAttemptCount >= maximumAttempts)
-    )
-      return;
-    if (loadState === "failed" || loadState === "ready") {
-      const failedAttemptCount =
-        current.failedAttemptCount + Number(loadState === "failed");
-      logWorkspaceSettingsEvent?.(scope, {
-        action: loadState === "failed" ? "webview_failed" : "webview_ready",
-        destination: "embedded_webview",
-        failedAttemptCount,
-        retriesExhausted:
-          loadState === "failed"
-            ? failedAttemptCount >= maximumAttempts
-            : undefined,
-        failure,
-      });
-    }
-    scope.set(webviewStateFamily, partition, {
-      ...current,
-      failedAttemptCount:
-        loadState === "failed"
-          ? current.failedAttemptCount + 1
-          : loadState === "ready"
-            ? 0
-            : current.failedAttemptCount,
-      loadState,
-    });
-  };
-
-  React.useEffect(() => {
-    if (
-      scope == null ||
-      storedState.accountId == null ||
-      (presentedAccountId != null && storedState.loadState !== "failed") ||
-      (storedState.loadState === "failed" &&
-        storedState.failedAttemptCount >= maximumAttempts)
-    )
-      return;
-    const timer = window.setTimeout(
-      () => {
-        const current = scope.get(webviewStateFamily, partition);
+function q() {
+  let e = (0, Ce.c)(73),
+    t = l(h),
+    { authMethod: r, isLoading: a, userId: o } = ne(),
+    { data: s, isLoading: c } = fe(),
+    u = se(),
+    d;
+  e[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((d = { disableExposureLog: !0 }), (e[0] = d))
+    : (d = e[0]);
+  let f = de(Ae, d),
+    p = oe(),
+    m = le(),
+    g;
+  e[1] === m
+    ? (g = e[2])
+    : ((g = m.getContext().user.customIDs?.workspace_id), (e[1] = m), (e[2] = g));
+  let _ = g,
+    v = s?.id,
+    y;
+  e[3] !== v || e[4] !== o
+    ? ((y = ye({ accountId: v, userId: o })), (e[3] = v), (e[4] = o), (e[5] = y))
+    : (y = e[5]);
+  let b = y,
+    x;
+  e[6] !== u.pathname || e[7] !== u.search
+    ? ((x =
+        u.pathname === `/workspace-settings/web`
+          ? (be(new URLSearchParams(u.search))?.accountId ?? null)
+          : null),
+      (e[6] = u.pathname),
+      (e[7] = u.search),
+      (e[8] = x))
+    : (x = e[8]);
+  let S = x,
+    C =
+      !re() &&
+      r === `chatgpt` &&
+      !a &&
+      o != null &&
+      !p &&
+      s?.structure === `workspace` &&
+      s.plan_type !== `quorum` &&
+      _ === s.id &&
+      f.get(`enable_workspace_settings_webview`, !1)
+        ? s.id
+        : null,
+    T = a || c || p,
+    E = !T && S === C ? S : null,
+    D = E,
+    O;
+  e[9] !== D || e[10] !== m || e[11] !== _
+    ? ((O =
+        (D != null &&
+          _ === D &&
+          m
+            .getDynamicConfig(`762342243`, { disableExposureLog: !0 })
+            .get(`override`, ``)
+            .trim()
+            .toLowerCase()) ||
+        void 0),
+      (e[9] = D),
+      (e[10] = m),
+      (e[11] = _),
+      (e[12] = O))
+    : (O = e[12]);
+  let k = O,
+    A = n($, b),
+    j = D != null && A.accountId === D && A.userId === o,
+    M = j ? A.generation : A.generation + 1,
+    ae = (0, X.useRef)(null),
+    N,
+    P;
+  (e[13] !== b || e[14] !== E
+    ? ((N = () => (
+        i.dispatchMessage(`workspace-settings-webview-presentation-changed`, {
+          partition: b,
+          presented: E != null,
+        }),
+        () => {
+          i.dispatchMessage(`workspace-settings-webview-presentation-changed`, {
+            partition: b,
+            presented: !1,
+          });
+        }
+      )),
+      (P = [b, E]),
+      (e[13] = b),
+      (e[14] = E),
+      (e[15] = N),
+      (e[16] = P))
+    : ((N = e[15]), (P = e[16])),
+    (0, X.useLayoutEffect)(N, P));
+  let F, I;
+  (e[17] !== D ||
+  e[18] !== M ||
+  e[19] !== a ||
+  e[20] !== c ||
+  e[21] !== p ||
+  e[22] !== b ||
+  e[23] !== t ||
+  e[24] !== o
+    ? ((F = () => {
+        let e = t.get($, b);
+        if (D == null) {
+          e.accountId != null &&
+            !a &&
+            !c &&
+            !p &&
+            t.set($, b, {
+              accountId: null,
+              failedAttemptCount: 0,
+              generation: e.generation + 1,
+              loadState: `loading`,
+              userId: void 0,
+            });
+          return;
+        }
+        (e.accountId !== D || e.userId !== o) &&
+          t.set($, b, {
+            accountId: D,
+            failedAttemptCount: 0,
+            generation: M,
+            loadState: `loading`,
+            userId: o,
+          });
+      }),
+      (I = [D, M, a, c, p, b, t, o]),
+      (e[17] = D),
+      (e[18] = M),
+      (e[19] = a),
+      (e[20] = c),
+      (e[21] = p),
+      (e[22] = b),
+      (e[23] = t),
+      (e[24] = o),
+      (e[25] = F),
+      (e[26] = I))
+    : ((F = e[25]), (I = e[26])),
+    (0, X.useLayoutEffect)(F, I));
+  let L, R;
+  (e[27] !== b || e[28] !== E || e[29] !== t || e[30] !== o
+    ? ((L = () => {
+        let e = ae.current,
+          n = E != null && e !== E;
         if (
-          current.accountId !== storedState.accountId ||
-          current.generation !== storedState.generation ||
-          current.userId !== storedState.userId
+          ((ae.current = E),
+          e != null &&
+            e !== E &&
+            t.queryClient
+              .cancelQueries({ queryKey: [`accounts`, `settings`, e] })
+              .then(() => ce(e))
+              .catch(_e)
+              .then(() => t.query.invalidate(te, e)),
+          !n)
         )
           return;
-        if (current.loadState === "failed")
-          logWorkspaceSettingsEvent?.(scope, {
-            action: "automatic_retry",
-            destination: "embedded_webview",
-            failedAttemptCount: current.failedAttemptCount,
-          });
-        scope.set(webviewStateFamily, partition, {
-          ...current,
-          generation: current.generation + 1,
-          loadState: "loading",
-        });
-      },
-      storedState.loadState === "failed"
-        ? Math.min(
-            retryBaseDelay *
-              2 ** Math.max(0, storedState.failedAttemptCount - 1),
-            retryMaximumDelay,
-          )
-        : inactiveRetryDelay,
-    );
-    return () => window.clearTimeout(timer);
-  }, [
-    partition,
-    presentedAccountId,
-    scope,
-    storedState.accountId,
-    storedState.failedAttemptCount,
-    storedState.generation,
-    storedState.loadState,
-    storedState.userId,
-  ]);
-
-  if (routeAccountId != null && !loading && presentedAccountId == null)
-    return jsx.jsx(Navigate ?? "a", { to: "/", replace: true });
-  if (presentedAccountId == null || scope == null) return null;
-
-  const presented = presentedAccountId != null;
-  const compactToolbar = useCompactToolbar?.() ?? false;
-  const hiddenClass = presented ? false : "pointer-events-none invisible";
-  const className =
-    classNames?.(
-      "fixed inset-x-0 bottom-0 z-30",
-      compactToolbar ? "top-(--height-toolbar-sm)" : "top-0",
-      hiddenClass,
-    ) ?? "fixed inset-0";
-  const loadingContent =
-    stateMatches &&
-    storedState.loadState === "failed" &&
-    storedState.failedAttemptCount >= maximumAttempts
-      ? jsx.jsx(WorkspaceSettingsLoadFailure, {
-          accountId: presentedAccountId,
-          onRetry: () => {
-            const current = scope.get(webviewStateFamily, partition);
-            if (
-              current.accountId !== presentedAccountId ||
-              current.userId !== userId ||
-              current.generation !== generation
-            )
-              return;
-            logWorkspaceSettingsEvent?.(scope, {
-              action: "manual_retry",
-              destination: "embedded_webview",
-              failedAttemptCount: current.failedAttemptCount,
-            });
-            scope.set(webviewStateFamily, partition, {
-              ...current,
-              failedAttemptCount: 0,
-              generation: generation + 1,
-              loadState: "loading",
-            });
-          },
-        })
-      : undefined;
-  const key = `${userId ?? ""}|${presentedAccountId}|${routingOverride ?? ""}|${generation}`;
-  return jsx.jsx("div", {
-    "aria-hidden": !presented,
-    inert: !presented,
-    className,
-    children: jsx.jsx(
-      WorkspaceSettingsWebview,
-      {
-        accountId: presentedAccountId,
-        loadingContent,
-        onLoadStateChange,
-        partition,
-        routingOverride,
-      },
-      key,
-    ),
-  });
-}
-
-function WorkspaceSettingsWebview({
-  accountId,
-  loadingContent,
-  onLoadStateChange,
-  partition,
-  routingOverride,
-}: {
-  accountId: string;
-  loadingContent?: unknown;
-  onLoadStateChange(loadState: LoadState, failure?: FailureDetails): void;
-  partition: string;
-  routingOverride?: string;
-}): unknown {
-  const authOriginQuery =
-    useSignalValue?.<{
-      data?: { chatGptDesktopAuthOrigin?: string };
-      isLoading?: boolean;
-    }>(authOriginSignal) ?? {};
-  const origin =
-    authOriginQuery.data?.chatGptDesktopAuthOrigin ?? defaultOrigin;
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [webview, setWebview] = React.useState<WebviewElement | null>(null);
-  const webviewRef = (element: unknown) =>
-    setWebview(isWebviewElement(element) ? element : null);
-
-  React.useEffect(() => {
-    if (webview == null || authOriginQuery.isLoading === true) return;
-    let ready = false;
-    let failed = false;
-    let disposed = false;
-    let timeout: number | null = null;
-    const clearLoadTimeout = () => {
-      if (timeout != null) {
-        window.clearTimeout(timeout);
-        timeout = null;
-      }
-    };
-    const startLoadTimeout = () => {
-      clearLoadTimeout();
-      timeout = window.setTimeout(() => {
-        const url = safeWebviewUrl(webview);
+        let r = t.get($, b);
         if (
-          failed ||
-          url == null ||
-          !isAllowedWebviewUrl(url, origin) ||
-          webview.isLoading()
+          r.accountId !== E ||
+          r.userId !== o ||
+          r.loadState !== `failed` ||
+          r.failedAttemptCount < Q
+        )
+          return;
+        let i = { ...r, failedAttemptCount: 0, generation: r.generation + 1, loadState: `loading` };
+        t.set($, b, i);
+      }),
+      (R = [b, E, t, o]),
+      (e[27] = b),
+      (e[28] = E),
+      (e[29] = t),
+      (e[30] = o),
+      (e[31] = L),
+      (e[32] = R))
+    : ((L = e[31]), (R = e[32])),
+    (0, X.useLayoutEffect)(L, R));
+  let z;
+  e[33] !== D || e[34] !== M || e[35] !== b || e[36] !== t || e[37] !== o
+    ? ((z = (e, n) => {
+        let r = t.get($, b);
+        if (
+          r.accountId === D &&
+          r.generation === M &&
+          r.userId === o &&
+          r.loadState !== e &&
+          !(e === `loading` && r.loadState === `failed` && r.failedAttemptCount >= Q)
         ) {
-          onLoadStateChange("failed", {
-            failureReason: "load_timeout",
-            navigationPhase: navigationPhase(url, origin),
+          if (e === `failed` || e === `ready`) {
+            let i = r.failedAttemptCount + +(e === `failed`);
+            V(t, {
+              action: e === `failed` ? `webview_failed` : `webview_ready`,
+              destination: `embedded_webview`,
+              failedAttemptCount: i,
+              retriesExhausted: e === `failed` ? i >= Q : void 0,
+              failure: n,
+            });
+          }
+          t.set($, b, {
+            ...r,
+            failedAttemptCount:
+              e === `failed` ? r.failedAttemptCount + 1 : e === `ready` ? 0 : r.failedAttemptCount,
+            loadState: e,
           });
-          if (!disposed) setIsLoading(true);
         }
-      }, navigationTimeout);
-    };
-    const finishNavigation = () => {
-      if (failed) return;
-      const url = safeWebviewUrl(webview);
-      if (url == null || url.protocol === "about:") return;
-      if (isAllowedWebviewUrl(url, origin)) {
-        if (webview.isLoading()) return;
-        ready = true;
-        clearLoadTimeout();
-        onLoadStateChange("ready");
-        if (!disposed) setIsLoading(false);
-        return;
-      }
-      if (url.origin === origin && !url.pathname.startsWith(authPath)) {
-        onLoadStateChange("failed", {
-          failureReason: "unexpected_navigation",
-          navigationPhase: navigationPhase(url, origin),
-        });
-        if (!disposed) setIsLoading(true);
-      }
-    };
-    const onNavigationStart = (event: WebviewNavigationEvent) => {
-      if (event.isMainFrame !== false) {
-        failed = false;
-        startLoadTimeout();
-        onLoadStateChange("loading");
-        if (!disposed && !ready) setIsLoading(true);
-      }
-    };
-    const onNavigationFailure = (event: WebviewNavigationEvent) => {
-      if (event.isMainFrame === false) return;
-      if (event.errorCode === -3) {
-        finishNavigation();
-        return;
-      }
-      failed = true;
-      onLoadStateChange("failed", {
-        failureReason: "navigation_failed",
-        navigationPhase: navigationPhase(
-          safeWebviewUrl(webview, event.validatedURL),
-          origin,
-        ),
-        navigationErrorCode: event.errorCode,
-      });
-      if (!disposed) setIsLoading(true);
-    };
-    for (const eventName of [
-      "dom-ready",
-      "did-finish-load",
-      "did-stop-loading",
-      "did-navigate-in-page",
-    ])
-      webview.addEventListener(eventName, finishNavigation);
-    webview.addEventListener("did-start-navigation", onNavigationStart);
-    webview.addEventListener("did-fail-load", onNavigationFailure);
-    startLoadTimeout();
-    finishNavigation();
-    return () => {
-      disposed = true;
-      clearLoadTimeout();
-      for (const eventName of [
-        "dom-ready",
-        "did-finish-load",
-        "did-stop-loading",
-        "did-navigate-in-page",
-      ])
-        webview.removeEventListener(eventName, finishNavigation);
-      webview.removeEventListener("did-start-navigation", onNavigationStart);
-      webview.removeEventListener("did-fail-load", onNavigationFailure);
-    };
-  }, [authOriginQuery.isLoading, onLoadStateChange, origin, webview]);
-
-  if (authOriginQuery.isLoading === true) return null;
-  const target = new URL(
-    workspaceSettingsTarget ?? "https://chatgpt.com/admin",
+      }),
+      (e[33] = D),
+      (e[34] = M),
+      (e[35] = b),
+      (e[36] = t),
+      (e[37] = o),
+      (e[38] = z))
+    : (z = e[38]);
+  let ue = z,
+    B,
+    H;
+  if (
+    (e[39] !== A.accountId ||
+    e[40] !== A.failedAttemptCount ||
+    e[41] !== A.generation ||
+    e[42] !== A.loadState ||
+    e[43] !== A.userId ||
+    e[44] !== b ||
+    e[45] !== E ||
+    e[46] !== t
+      ? ((B = () => {
+          if (
+            A.accountId == null ||
+            (E != null && A.loadState !== `failed`) ||
+            (A.loadState === `failed` && A.failedAttemptCount >= Q)
+          )
+            return;
+          let e = window.setTimeout(
+            () => {
+              let e = t.get($, b);
+              if (
+                e.accountId !== A.accountId ||
+                e.generation !== A.generation ||
+                e.userId !== A.userId
+              )
+                return;
+              e.loadState === `failed` &&
+                V(t, {
+                  action: `automatic_retry`,
+                  destination: `embedded_webview`,
+                  failedAttemptCount: e.failedAttemptCount,
+                });
+              let n = { ...e, generation: e.generation + 1, loadState: `loading` };
+              t.set($, b, n);
+            },
+            A.loadState === `failed`
+              ? Math.min(Ne * 2 ** Math.max(0, A.failedAttemptCount - 1), Pe)
+              : je,
+          );
+          return () => {
+            window.clearTimeout(e);
+          };
+        }),
+        (H = [A.accountId, A.failedAttemptCount, A.generation, A.loadState, A.userId, b, E, t]),
+        (e[39] = A.accountId),
+        (e[40] = A.failedAttemptCount),
+        (e[41] = A.generation),
+        (e[42] = A.loadState),
+        (e[43] = A.userId),
+        (e[44] = b),
+        (e[45] = E),
+        (e[46] = t),
+        (e[47] = B),
+        (e[48] = H))
+      : ((B = e[47]), (H = e[48])),
+    (0, X.useEffect)(B, H),
+    S != null && !T && E == null)
+  ) {
+    let t;
+    return (
+      e[49] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, Z.jsx)(ie, { to: `/`, replace: !0 })), (e[49] = t))
+        : (t = e[49]),
+      t
+    );
+  }
+  if (D == null) return null;
+  let U = E != null,
+    pe = w(),
+    me = !U,
+    W = !U,
+    G = !U && `pointer-events-none invisible`,
+    K;
+  e[50] === G
+    ? (K = e[51])
+    : ((K = ee(`fixed inset-x-0 bottom-0 z-30`, pe ? `top-(--height-toolbar-sm)` : `top-0`, G)),
+      (e[50] = G),
+      (e[51] = K));
+  let ge = `${o ?? ``}|${D}|${k ?? ``}|${M}`,
+    q;
+  e[52] !== A.failedAttemptCount ||
+  e[53] !== A.loadState ||
+  e[54] !== D ||
+  e[55] !== M ||
+  e[56] !== j ||
+  e[57] !== b ||
+  e[58] !== t ||
+  e[59] !== o
+    ? ((q =
+        j && A.loadState === `failed` && A.failedAttemptCount >= Q
+          ? (0, Z.jsx)(he, {
+              accountId: D,
+              onRetry: () => {
+                let e = t.get($, b);
+                if (e.accountId !== D || e.userId !== o || e.generation !== M) return;
+                V(t, {
+                  action: `manual_retry`,
+                  destination: `embedded_webview`,
+                  failedAttemptCount: e.failedAttemptCount,
+                });
+                let n = { ...e, failedAttemptCount: 0, generation: M + 1, loadState: `loading` };
+                t.set($, b, n);
+              },
+            })
+          : void 0),
+      (e[52] = A.failedAttemptCount),
+      (e[53] = A.loadState),
+      (e[54] = D),
+      (e[55] = M),
+      (e[56] = j),
+      (e[57] = b),
+      (e[58] = t),
+      (e[59] = o),
+      (e[60] = q))
+    : (q = e[60]);
+  let J;
+  e[61] !== D || e[62] !== ue || e[63] !== b || e[64] !== ge || e[65] !== q || e[66] !== k
+    ? ((J = (0, Z.jsx)(
+        ve,
+        {
+          accountId: D,
+          loadingContent: q,
+          onLoadStateChange: ue,
+          partition: b,
+          routingOverride: k,
+        },
+        ge,
+      )),
+      (e[61] = D),
+      (e[62] = ue),
+      (e[63] = b),
+      (e[64] = ge),
+      (e[65] = q),
+      (e[66] = k),
+      (e[67] = J))
+    : (J = e[67]);
+  let Y;
+  return (
+    e[68] !== me || e[69] !== W || e[70] !== K || e[71] !== J
+      ? ((Y = (0, Z.jsx)(`div`, { "aria-hidden": me, inert: W, className: K, children: J })),
+        (e[68] = me),
+        (e[69] = W),
+        (e[70] = K),
+        (e[71] = J),
+        (e[72] = Y))
+      : (Y = e[72]),
+    Y
   );
-  const src = new URL("about:blank");
-  src.searchParams.set("toUrl", `${target.pathname}${target.search}`);
-  src.searchParams.set("accountId", accountId);
-  if (routingOverride != null)
-    src.searchParams.set("routingOverride", routingOverride);
-  return jsx.jsx(WebviewSurface ?? "webview", {
-    isLoading,
-    loadingContent,
-    partition,
-    src: src.toString(),
-    webviewRef,
-  });
 }
-
-function safeWebviewUrl(
-  webview: WebviewElement,
-  override?: string,
-): URL | null {
+function _e() {}
+function ve(e) {
+  let t = (0, Ce.c)(24),
+    { accountId: n, loadingContent: r, onLoadStateChange: i, partition: a, routingOverride: s } = e,
+    { data: c, isLoading: l } = o(ae),
+    u = c?.chatGptDesktopAuthOrigin ?? Te,
+    [d, f] = (0, X.useState)(!0),
+    [p, m] = (0, X.useState)(null),
+    h;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((h = (e) => {
+        m(Se(e) ? e : null);
+      }),
+      (t[0] = h))
+    : (h = t[0]);
+  let g = h,
+    _,
+    v;
+  if (
+    (t[1] !== u || t[2] !== l || t[3] !== i || t[4] !== p
+      ? ((_ = () => {
+          if (p == null || l) return;
+          let e = !1,
+            t = !1,
+            n = !1,
+            r = null,
+            a = () => {
+              r != null && (window.clearTimeout(r), (r = null));
+            },
+            o = () => {
+              (a(),
+                (r = window.setTimeout(() => {
+                  let e = J(p);
+                  (t || e == null || !Y(e, u) || p.isLoading()) &&
+                    (i(`failed`, { failureReason: `load_timeout`, navigationPhase: xe(e, u) }),
+                    n || f(!0));
+                }, Me)));
+            },
+            s = () => {
+              if (t) return;
+              let r = J(p);
+              if (r != null && r.protocol !== `about:`) {
+                if (Y(r, u)) {
+                  if (p.isLoading()) return;
+                  ((e = !0), a(), i(`ready`), n || f(!1));
+                  return;
+                }
+                r.origin === u &&
+                  !r.pathname.startsWith(Ee) &&
+                  (i(`failed`, {
+                    failureReason: `unexpected_navigation`,
+                    navigationPhase: xe(r, u),
+                  }),
+                  n || f(!0));
+              }
+            },
+            c = (r) => {
+              r.isMainFrame !== !1 && ((t = !1), o(), i(`loading`), !n && !e && f(!0));
+            },
+            d = (e) => {
+              let r = e;
+              if (r.isMainFrame !== !1) {
+                if (r.errorCode === -3) {
+                  s();
+                  return;
+                }
+                ((t = !0),
+                  i(`failed`, {
+                    failureReason: `navigation_failed`,
+                    navigationPhase: xe(J(p, r.validatedURL), u),
+                    navigationErrorCode: r.errorCode,
+                  }),
+                  n || f(!0));
+              }
+            };
+          return (
+            p.addEventListener(`dom-ready`, s),
+            p.addEventListener(`did-start-navigation`, c),
+            p.addEventListener(`did-fail-load`, d),
+            p.addEventListener(`did-finish-load`, s),
+            p.addEventListener(`did-stop-loading`, s),
+            p.addEventListener(`did-navigate-in-page`, s),
+            o(),
+            s(),
+            () => {
+              ((n = !0),
+                a(),
+                p.removeEventListener(`dom-ready`, s),
+                p.removeEventListener(`did-start-navigation`, c),
+                p.removeEventListener(`did-fail-load`, d),
+                p.removeEventListener(`did-finish-load`, s),
+                p.removeEventListener(`did-stop-loading`, s),
+                p.removeEventListener(`did-navigate-in-page`, s));
+            }
+          );
+        }),
+        (v = [u, l, i, p]),
+        (t[1] = u),
+        (t[2] = l),
+        (t[3] = i),
+        (t[4] = p),
+        (t[5] = _),
+        (t[6] = v))
+      : ((_ = t[5]), (v = t[6])),
+    (0, X.useEffect)(_, v),
+    l)
+  )
+    return null;
+  let y;
+  t[7] === Symbol.for(`react.memo_cache_sentinel`) ? ((y = new URL(D)), (t[7] = y)) : (y = t[7]);
+  let ee = y,
+    b,
+    x,
+    S,
+    C,
+    w;
+  if (t[8] !== n || t[9] !== d || t[10] !== r || t[11] !== a || t[12] !== s) {
+    let e = new URL(`about:blank`);
+    (e.searchParams.set(`toUrl`, `${ee.pathname}${ee.search}`),
+      e.searchParams.set(`accountId`, n),
+      s != null && e.searchParams.set(`routingOverride`, s),
+      (b = me),
+      (x = d),
+      (S = r),
+      (C = a),
+      (w = e.toString()),
+      (t[8] = n),
+      (t[9] = d),
+      (t[10] = r),
+      (t[11] = a),
+      (t[12] = s),
+      (t[13] = b),
+      (t[14] = x),
+      (t[15] = S),
+      (t[16] = C),
+      (t[17] = w));
+  } else ((b = t[13]), (x = t[14]), (S = t[15]), (C = t[16]), (w = t[17]));
+  let T;
+  return (
+    t[18] !== b || t[19] !== x || t[20] !== S || t[21] !== C || t[22] !== w
+      ? ((T = (0, Z.jsx)(b, {
+          isLoading: x,
+          loadingContent: S,
+          partition: C,
+          src: w,
+          webviewRef: g,
+        })),
+        (t[18] = b),
+        (t[19] = x),
+        (t[20] = S),
+        (t[21] = C),
+        (t[22] = w),
+        (t[23] = T))
+      : (T = t[23]),
+    T
+  );
+}
+function ye({ accountId: e, userId: t }) {
+  let n = JSON.stringify([t, e]),
+    r = Fe.get(n);
+  return (r ?? ((r = `${C}${crypto.randomUUID()}`), Fe.set(n, r)), r);
+}
+function be(e) {
+  let t = we.safeParse(Object.fromEntries(e.entries()));
+  return t.success ? t.data : null;
+}
+function J(e, t) {
   try {
-    return new URL(override ?? webview.getURL());
+    return new URL(t ?? e.getURL());
   } catch {
     return null;
   }
 }
-
-function isAllowedWebviewUrl(url: URL, origin: string): boolean {
+function Y(e, t) {
   return (
-    url.origin === origin &&
-    (url.pathname === settingsPath ||
-      url.pathname.startsWith(`${settingsPath}/`) ||
-      url.pathname.startsWith(checkoutPath) ||
-      url.pathname === creditSuccessPath)
+    e.origin === t &&
+    (e.pathname === ke ||
+      e.pathname.startsWith(`${ke}/`) ||
+      e.pathname.startsWith(De) ||
+      e.pathname === Oe)
   );
 }
-
-function navigationPhase(
-  url: URL | null,
-  origin: string,
-): FailureDetails["navigationPhase"] {
-  if (url == null || url.protocol === "about:") return "startup";
-  if (url.origin !== origin) return "other";
-  if (url.pathname.startsWith(authPath)) return "authentication";
-  if (isAllowedWebviewUrl(url, origin))
-    return url.pathname.startsWith(settingsPath)
-      ? "workspace_settings"
-      : "checkout";
-  return "other";
+function xe(e, t) {
+  return e == null || e.protocol === `about:`
+    ? `startup`
+    : e.origin === t
+      ? e.pathname.startsWith(Ee)
+        ? `authentication`
+        : Y(e, t)
+          ? e.pathname.startsWith(ke)
+            ? `workspace_settings`
+            : `checkout`
+          : `other`
+      : `other`;
 }
-
-function isWebviewElement(value: unknown): value is WebviewElement {
+function Se(e) {
   return (
-    value != null &&
-    typeof value === "object" &&
-    "getURL" in value &&
-    typeof value.getURL === "function" &&
-    "isLoading" in value &&
-    typeof value.isLoading === "function"
+    e != null &&
+    `getURL` in e &&
+    typeof e.getURL == `function` &&
+    `isLoading` in e &&
+    typeof e.isLoading == `function`
   );
 }
-
-function ignore(): void {}
-
-export { WorkspaceSettingsWebviewHost, WorkspaceSettingsWebviewPage };
+var Ce, X, Z, we, Te, Ee, De, Oe, ke, Ae, je, Me, Ne, Pe, Q, Fe, $;
+function Ie() {
+  return (Ie = e(() => {
+    ((Ce = t()),
+      y(),
+      r(),
+      S(),
+      (X = _()),
+      j(),
+      v(),
+      L(),
+      ue(),
+      k(),
+      E(),
+      B(),
+      M(),
+      P(),
+      pe(),
+      R(),
+      f(),
+      d(),
+      I(),
+      z(),
+      F(),
+      K(),
+      (Z = s()),
+      (we = a({ accountId: x().min(1) })),
+      (Te = new URL(u).origin),
+      (Ee = `/api/auth/`),
+      (De = `/checkout/`),
+      (Oe = `/payments/success-credit-purchase`),
+      (ke = `/admin`),
+      (Ae = `2493655517`),
+      (je = 24e4),
+      (Me = 3e4),
+      (Ne = 1e3),
+      (Pe = 6e4),
+      (Q = 5),
+      (Fe = new Map()),
+      ($ = b(h, (e) => ({
+        accountId: null,
+        failedAttemptCount: 0,
+        generation: 0,
+        loadState: `loading`,
+        userId: void 0,
+      }))));
+  }))();
+}
+Ie();
+export { q as WorkspaceSettingsWebviewHost, ge as WorkspaceSettingsWebviewPage };

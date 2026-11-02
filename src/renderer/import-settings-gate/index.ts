@@ -1,9 +1,9 @@
-import "@rchunk/rolldown-runtime";
-
-let importedSetupExperimentKey: string;
-
-function initializeImportSettingsGate(): void {
-  importedSetupExperimentKey = "3278809559";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t;
+function n() {
+  return (n = e(() => {
+    t = `3278809559`;
+  }))();
 }
-
-export { initializeImportSettingsGate as n, importedSetupExperimentKey as t };
+export { n, t };

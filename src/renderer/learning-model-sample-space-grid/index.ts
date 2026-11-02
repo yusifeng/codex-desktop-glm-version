@@ -1,80 +1,69 @@
-// Two-dice sample-space-grid learning model. Release chunk: model-f4dbaa3dfc38.js.
-import "@rchunk/rolldown-runtime";
-
-type SampleEvent = "sum equals 5" | "sum equals 7" | "sum at least 10" | "matching values";
-interface SampleSpaceValues { event?: string | null }
-interface SampleOutcome { firstDie: number; secondDie: number; sum: number; favorable: boolean }
-interface SampleSpaceManifest {
-  type: string; version: number; thumbnailAssetKey: string;
-  parameters: { event: { kind: "enum"; defaultValue: SampleEvent; allowedValues: SampleEvent[] } };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `SAMPLE_SPACE_GRID`),
+      (n = `sample-space-grid-v1`),
+      (r = {
+        event: {
+          kind: `enum`,
+          defaultValue: `sum equals 7`,
+          allowedValues: [`sum equals 5`, `sum equals 7`, `sum at least 10`, `matching values`],
+        },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-let sampleSpaceManifest: SampleSpaceManifest;
-let defaultSampleSpaceValues: { event: SampleEvent };
-let sampleEvents: SampleEvent[];
-let calculateSampleSpace: (values: SampleSpaceValues) => {
-  event: SampleEvent; outcomes: SampleOutcome[]; favorableCount: number; totalCount: number;
-  simplifiedNumerator: number; simplifiedDenominator: number;
-};
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeSampleSpaceManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  sampleSpaceManifest = {
-    type: "SAMPLE_SPACE_GRID", version: 2, thumbnailAssetKey: "sample-space-grid-v1",
-    parameters: {
-      event: {
-        kind: "enum", defaultValue: "sum equals 7",
-        allowedValues: ["sum equals 5", "sum equals 7", "sum at least 10", "matching values"],
-      },
-    },
-  };
+var o, s, c, l, u, d, f;
+function p() {
+  return (p = e(() => {
+    (a(),
+      (o = (e) => typeof e == `string` && i.parameters.event.allowedValues.some((t) => t === e)),
+      (s = () => {
+        let e = i.parameters.event.defaultValue;
+        if (!o(e)) throw Error(`Invalid default event in sample-space grid manifest`);
+        return e;
+      }),
+      (c = i.parameters.event.allowedValues.filter(o)),
+      (l = { event: s() }),
+      (u = (e, t, n) => {
+        switch (e) {
+          case `sum equals 5`:
+            return t + n === 5;
+          case `sum equals 7`:
+            return t + n === 7;
+          case `sum at least 10`:
+            return t + n >= 10;
+          case `matching values`:
+            return t === n;
+        }
+      }),
+      (d = (e, t) => {
+        let n = e,
+          r = t;
+        for (; r !== 0;) [n, r] = [r, n % r];
+        return n;
+      }),
+      (f = (e) => {
+        let t = o(e.event) ? e.event : l.event,
+          n = Array.from({ length: 36 }, (e, n) => {
+            let r = Math.floor(n / 6) + 1,
+              i = (n % 6) + 1;
+            return { firstDie: r, secondDie: i, sum: r + i, favorable: u(t, r, i) };
+          }),
+          r = n.filter(({ favorable: e }) => e).length,
+          i = n.length,
+          a = d(r, i);
+        return {
+          event: t,
+          outcomes: n,
+          favorableCount: r,
+          totalCount: i,
+          simplifiedNumerator: r / a,
+          simplifiedDenominator: i / a,
+        };
+      }));
+  }))();
 }
-
-function initializeSampleSpaceGridModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializeSampleSpaceManifest();
-  const isSampleEvent = (value: unknown): value is SampleEvent =>
-    typeof value === "string" && sampleSpaceManifest.parameters.event.allowedValues.some(event => event === value);
-  const defaultEvent = sampleSpaceManifest.parameters.event.defaultValue;
-  if (!isSampleEvent(defaultEvent)) throw Error("Invalid default event in sample-space grid manifest");
-  sampleEvents = sampleSpaceManifest.parameters.event.allowedValues.filter(isSampleEvent);
-  defaultSampleSpaceValues = { event: defaultEvent };
-  const isFavorable = (event: SampleEvent, firstDie: number, secondDie: number): boolean => {
-    switch (event) {
-      case "sum equals 5": return firstDie + secondDie === 5;
-      case "sum equals 7": return firstDie + secondDie === 7;
-      case "sum at least 10": return firstDie + secondDie >= 10;
-      case "matching values": return firstDie === secondDie;
-    }
-  };
-  const greatestCommonDivisor = (left: number, right: number): number => {
-    let dividend = left;
-    let divisor = right;
-    while (divisor !== 0) [dividend, divisor] = [divisor, dividend % divisor];
-    return dividend;
-  };
-  calculateSampleSpace = values => {
-    const event = isSampleEvent(values.event) ? values.event : defaultSampleSpaceValues.event;
-    const outcomes = Array.from({ length: 36 }, (_unused, index): SampleOutcome => {
-      const firstDie = Math.floor(index / 6) + 1;
-      const secondDie = index % 6 + 1;
-      return { firstDie, secondDie, sum: firstDie + secondDie, favorable: isFavorable(event, firstDie, secondDie) };
-    });
-    const favorableCount = outcomes.filter(outcome => outcome.favorable).length;
-    const totalCount = outcomes.length;
-    const divisor = greatestCommonDivisor(favorableCount, totalCount);
-    return {
-      event, outcomes, favorableCount, totalCount,
-      simplifiedNumerator: favorableCount / divisor, simplifiedDenominator: totalCount / divisor,
-    };
-  };
-}
-
-export {
-  initializeSampleSpaceManifest as a, calculateSampleSpace as i, defaultSampleSpaceValues as n,
-  sampleSpaceManifest as o, initializeSampleSpaceGridModel as r, sampleEvents as t,
-};
+export { a, f as i, l as n, i as o, p as r, c as t };

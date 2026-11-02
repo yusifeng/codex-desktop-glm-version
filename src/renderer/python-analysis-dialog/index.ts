@@ -1,101 +1,89 @@
-// python-analysis-dialog —— 展示助手响应背后的只读 Python 源码与输出。
-// 原版：app/webview/assets/analysis-dialog-4ded90e8b816.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as analysisDetailsChunk from "@rchunk/python-analysis-details";
-import type { PythonAnalysisItem } from "@rchunk/python-analysis-details";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-void runtimeChunk;
-const {
-  $3: initializeJsxRuntime,
-  I3: getJsxRuntime,
-  Ih: Dialog,
-  K2: initializeIntlRuntime,
-  Oh: DialogBody,
-  Ph: initializeDialogLayout,
-  Rh: DialogTitle,
-  Y2: FormattedMessage,
-  zh: initializeDialog,
-} = appSharedChunk;
-const {
-  n: initializePythonAnalysisDetails,
-  t: PythonAnalysisDetails,
-} = analysisDetailsChunk;
-
-let jsxRuntime: JsxRuntime | null = null;
-
-interface PythonAnalysisDialogProps {
-  items: PythonAnalysisItem[];
-  onClose(): void;
-  onCloseAutoFocus?: (event: unknown) => void;
-}
-
-function PythonAnalysisDialog({
-  items,
-  onClose,
-  onCloseAutoFocus,
-}: PythonAnalysisDialogProps): unknown {
-  const jsx = getInitializedJsxRuntime();
-  const content = jsx.jsxs(DialogBody, {
-    className:
-      "max-h-[calc(100dvh/var(--codex-window-zoom)-2rem)] min-h-0 overflow-hidden",
-    variant: "chatgpt",
-    children: [
-      jsx.jsx(DialogTitle, {
-        className: "shrink-0 p-4 pe-14 text-lg font-normal select-none",
-        children: jsx.jsx(FormattedMessage, {
-          id: "chatgpt.pythonExecution.analysisTitle",
-          defaultMessage: "Analysis",
-          description:
-            "Title of the dialog displaying read-only Python source and output",
-        }),
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  I3 as n,
+  Ih as r,
+  K2 as i,
+  Oh as a,
+  Ph as o,
+  Rh as s,
+  Y2 as c,
+  zh as l,
+} from "@rchunk/app-shared";
+import { n as u, t as d } from "@rchunk/python-analysis-details";
+function f(e) {
+  let t = (0, m.c)(13),
+    { items: n, onClose: i, onCloseAutoFocus: o } = e,
+    l;
+  t[0] === o
+    ? (l = t[1])
+    : ((l = { "aria-describedby": void 0, onCloseAutoFocus: o }), (t[0] = o), (t[1] = l));
+  let u;
+  t[2] === i
+    ? (u = t[3])
+    : ((u = (e) => {
+        e || i();
       }),
-      jsx.jsx("div", {
-        className: "min-h-0 overflow-y-auto p-4 pt-1",
-        children: jsx.jsx("div", {
-          className: "flex min-w-0 flex-col gap-4",
-          children: items.map((item) =>
-            jsx.jsx(PythonAnalysisDetails, { item }, item.id),
-          ),
+      (t[2] = i),
+      (t[3] = u));
+  let d;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((d = (0, h.jsx)(s, {
+        className: `shrink-0 p-4 pe-14 text-lg font-normal select-none`,
+        children: (0, h.jsx)(c, {
+          id: `chatgpt.pythonExecution.analysisTitle`,
+          defaultMessage: `Analysis`,
+          description: `Title of the dialog displaying the read-only Python source and output behind an assistant response`,
         }),
-      }),
-    ],
-  });
-  return jsx.jsx(Dialog, {
-    open: true,
-    contentProps: {
-      "aria-describedby": undefined,
-      onCloseAutoFocus,
-    },
-    onOpenChange: (open: boolean) => {
-      if (!open) onClose();
-    },
-    size: "large",
-    variant: "chatgpt",
-    children: content,
-  });
+      })),
+      (t[4] = d))
+    : (d = t[4]);
+  let f;
+  t[5] === n ? (f = t[6]) : ((f = n.map(p)), (t[5] = n), (t[6] = f));
+  let g;
+  t[7] === f
+    ? (g = t[8])
+    : ((g = (0, h.jsxs)(a, {
+        className: `max-h-[calc(100dvh/var(--codex-window-zoom)-2rem)] min-h-0 overflow-hidden`,
+        variant: `chatgpt`,
+        children: [
+          d,
+          (0, h.jsx)(`div`, {
+            className: `min-h-0 overflow-y-auto p-4 pt-1`,
+            children: (0, h.jsx)(`div`, { className: `flex min-w-0 flex-col gap-4`, children: f }),
+          }),
+        ],
+      })),
+      (t[7] = f),
+      (t[8] = g));
+  let _;
+  return (
+    t[9] !== l || t[10] !== u || t[11] !== g
+      ? ((_ = (0, h.jsx)(r, {
+          open: !0,
+          contentProps: l,
+          onOpenChange: u,
+          size: `large`,
+          variant: `chatgpt`,
+          children: g,
+        })),
+        (t[9] = l),
+        (t[10] = u),
+        (t[11] = g),
+        (t[12] = _))
+      : (_ = t[12]),
+    _
+  );
 }
-
-function initializePythonAnalysisDialog(): void {
-  if (jsxRuntime != null) return;
-  initializeJsxRuntime();
-  initializeIntlRuntime();
-  initializeDialog();
-  initializeDialogLayout();
-  initializePythonAnalysisDetails();
-  jsxRuntime = getJsxRuntime();
+function p(e) {
+  return (0, h.jsx)(d, { item: e }, e.id);
 }
-
-function getInitializedJsxRuntime(): JsxRuntime {
-  initializePythonAnalysisDialog();
-  if (jsxRuntime == null) {
-    throw new Error("Python analysis dialog JSX runtime failed to initialize");
-  }
-  return jsxRuntime;
+var m, h;
+function g() {
+  return (g = e(() => {
+    ((m = t()), i(), l(), o(), u(), (h = n()));
+  }))();
 }
-
-initializePythonAnalysisDialog();
-
-export { PythonAnalysisDialog };
+g();
+export { f as PythonAnalysisDialog };

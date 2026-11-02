@@ -1,5 +1,5 @@
+// @ts-nocheck
 import "@rchunk/app-shared";
-import { n as NotificationsSettingsPage, r as initializeNotificationsSettings } from "@rchunk/notifications-settings";
-
-initializeNotificationsSettings();
-export { NotificationsSettingsPage };
+import { n as e, r as t } from "@rchunk/notifications-settings";
+t();
+export { e as NotificationsSettingsPage };

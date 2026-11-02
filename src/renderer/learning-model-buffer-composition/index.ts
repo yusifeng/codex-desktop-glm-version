@@ -1,31 +1,16 @@
-// Buffer composition specification. Release chunk: type-b5d60db25e60.js.
-import "@rchunk/rolldown-runtime";
-
-interface NumberParameter {
-  kind: "number";
-  defaultValue: number;
-  min: number;
-  max: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `BUFFER_COMPOSITION`),
+      (n = `buffer-composition-v1`),
+      (r = `\\mathrm{pH}=\\mathrm{p}K_a+\\log_{10}\\!\\left(\\frac{[A^-]}{[HA]}\\right)`),
+      (i = {
+        pKa: { kind: `number`, defaultValue: 4.76, min: 2, max: 12 },
+        baseToAcidRatio: { kind: `number`, defaultValue: 1, min: 0.01, max: 100 },
+      }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-interface Specification {
-  type: "BUFFER_COMPOSITION";
-  version: 2;
-  thumbnailAssetKey: "buffer-composition-v1";
-  canonicalFormula: "\\mathrm{pH}=\\mathrm{p}K_a+\\log_{10}\\!\\left(\\frac{[A^-]}{[HA]}\\right)";
-  parameters: { pKa: NumberParameter; baseToAcidRatio: NumberParameter };
-}
-let specification: Specification;
-function initializeSpecification(): void {
-  specification ??= {
-    type: "BUFFER_COMPOSITION",
-    version: 2,
-    thumbnailAssetKey: "buffer-composition-v1",
-    canonicalFormula:
-      "\\mathrm{pH}=\\mathrm{p}K_a+\\log_{10}\\!\\left(\\frac{[A^-]}{[HA]}\\right)",
-    parameters: {
-      pKa: { kind: "number", defaultValue: 4.76, min: 2, max: 12 },
-      baseToAcidRatio: { kind: "number", defaultValue: 1, min: 0.01, max: 100 },
-    },
-  };
-}
-export { specification as n, initializeSpecification as t };
+export { a as n, o as t };

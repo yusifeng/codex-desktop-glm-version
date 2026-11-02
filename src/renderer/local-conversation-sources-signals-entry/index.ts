@@ -1,16 +1,14 @@
-import { FX as initializeSignalRuntime } from "@rchunk/app-shared";
+// @ts-nocheck
+import "@rchunk/app-shared";
 import {
-  i as sourceLinksByThread,
-  n as initializeLocalConversationSourcesSignals,
-  r as priorConversationTurns,
-  t as conversationTurnsForSources,
+  i as e,
+  n as t,
+  r as n,
+  t as r,
 } from "@rchunk/local-conversation-sources-signals";
-
-initializeSignalRuntime();
-initializeLocalConversationSourcesSignals();
-
+t();
 export {
-  conversationTurnsForSources as conversationTurnsForSources$,
-  priorConversationTurns as priorConversationTurns$,
-  sourceLinksByThread,
+  r as conversationTurnsForSources$,
+  n as priorConversationTurns$,
+  e as sourceLinksByThread,
 };

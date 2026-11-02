@@ -1,95 +1,74 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  I3 as n,
+  IK as r,
+  RI as i,
+  VI as a,
+  WK as o,
+  kC as s,
+  lw as c,
+} from "@rchunk/app-shared";
+import { Xd as l, Zd as u } from "@rchunk/app-initial";
 import "@rchunk/terminal-panel-bootstrap";
-
-const {
-  $3: initializeRuntimeLazy,
-  I3: getJsxRuntime,
-  IK: pathsEqual,
-  RI: initializePathRuntime,
-  VI: normalizePath,
-  WK: joinPath,
-  kC: TerminalIcon,
-  lw: initializeTerminalIcon,
-} = appSharedChunk;
-const {
-  Xd: ConversationThumbnail,
-  Zd: initializeConversationThumbnail,
-} = appInitialChunk as typeof appInitialChunk & {
-  Xd: (props: Record<string, unknown>) => unknown;
-  Zd: () => void;
-};
-
-export interface TerminalOutputSpan {
-  style?: Record<string, string | number>;
-  text: string;
+function d(e) {
+  let t = (0, m.c)(13),
+    { title: n, cwd: r, homeDirectory: i, outputTail: a } = e,
+    o;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((o = (0, h.jsx)(s, {})), (t[0] = o))
+    : (o = t[0]);
+  let c;
+  t[1] !== r || t[2] !== i || t[3] !== n
+    ? ((c = p(n, r, i)), (t[1] = r), (t[2] = i), (t[3] = n), (t[4] = c))
+    : (c = t[4]);
+  let u;
+  t[5] === a
+    ? (u = t[6])
+    : ((u = a?.length
+        ? {
+            kind: `text`,
+            content: (0, h.jsx)(`span`, {
+              className: `text-codex-terminal-foreground`,
+              "data-codex-xterm": !0,
+              children: a.map(f),
+            }),
+            lines: 8,
+            variant: `code`,
+          }
+        : null),
+      (t[5] = a),
+      (t[6] = u));
+  let d;
+  t[7] === u ? (d = t[8]) : ((d = [u]), (t[7] = u), (t[8] = d));
+  let g;
+  return (
+    t[9] !== c || t[10] !== d || t[11] !== n
+      ? ((g = (0, h.jsx)(l, { icon: o, subtitle: c, title: n, sections: d })),
+        (t[9] = c),
+        (t[10] = d),
+        (t[11] = n),
+        (t[12] = g))
+      : (g = t[12]),
+    g
+  );
 }
-
-export interface TerminalThumbnailProps {
-  cwd?: string | null;
-  homeDirectory?: string | null;
-  outputTail?: readonly TerminalOutputSpan[] | null;
-  title: string;
+function f(e, t) {
+  return (0, h.jsx)(`span`, { style: e.style, children: e.text }, t);
 }
-
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function getTerminalSubtitle(
-  title: string,
-  cwd?: string | null,
-  homeDirectory?: string | null,
-): string | null {
-  if (cwd == null) return null;
-  let normalizedTitle = normalizePath(title.trim());
-  if (
-    homeDirectory != null &&
-    (normalizedTitle === "~" || normalizedTitle.startsWith("~/"))
-  ) {
-    normalizedTitle = joinPath(homeDirectory, normalizedTitle.slice(2));
-  }
-  return pathsEqual(normalizedTitle, cwd) ? null : cwd;
+function p(e, t, n) {
+  if (t == null) return null;
+  let i = a(e.trim());
+  return (
+    n != null && (i === `~` || i.startsWith(`~/`)) && (i = o(n, i.slice(2))),
+    r(i, t) ? null : t
+  );
 }
-
-function TerminalThumbnail({
-  title,
-  cwd,
-  homeDirectory,
-  outputTail,
-}: TerminalThumbnailProps): unknown {
-  initializeTerminalThumbnail();
-  const subtitle = getTerminalSubtitle(title, cwd, homeDirectory);
-  const outputSection = outputTail?.length
-    ? {
-        kind: "text",
-        content: jsx.jsx("span", {
-          className: "text-codex-terminal-foreground",
-          "data-codex-xterm": true,
-          children: outputTail.map((span, index) =>
-            jsx.jsx("span", { style: span.style, children: span.text }, index),
-          ),
-        }),
-        lines: 8,
-        variant: "code",
-      }
-    : null;
-  return jsx.jsx(ConversationThumbnail, {
-    icon: jsx.jsx(TerminalIcon, {}),
-    subtitle,
-    title,
-    sections: [outputSection],
-  });
+var m, h;
+function g() {
+  return (g = e(() => {
+    ((m = t()), u(), c(), i(), (h = n()));
+  }))();
 }
-
-let initialized = false;
-function initializeTerminalThumbnail(): void {
-  if (initialized) return;
-  initializeRuntimeLazy();
-  initializeConversationThumbnail();
-  initializeTerminalIcon();
-  initializePathRuntime();
-  jsx = getJsxRuntime();
-  initialized = true;
-}
-
-export { initializeTerminalThumbnail as n, TerminalThumbnail as t };
+export { g as n, d as t };

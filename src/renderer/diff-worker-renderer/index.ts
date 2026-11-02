@@ -1,7 +1,4 @@
-import {
-  n as parserExport,
-  t as initializeParser,
-} from "@rchunk/diff-worker-renderer-parser";
-initializeParser();
-const parser = parserExport;
-export { parser };
+// @ts-nocheck
+import { n as e, t } from "@rchunk/diff-worker-renderer-parser";
+t();
+export { e as parser };

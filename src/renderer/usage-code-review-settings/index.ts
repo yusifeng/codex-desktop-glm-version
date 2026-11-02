@@ -1,485 +1,466 @@
-// usage-code-review-settings —— Codex code review 使用量图表与汇总指标。
-
-import * as activityChartChunk from "@rchunk/activity-chart";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as codeReviewQueriesChunk from "@rchunk/command-menu-queries";
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import type { IntlShape, JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
-
-void runtimeChunk;
-
-type Scope = "business" | "consumer";
-type ChartKey = "issues" | "reviews" | "priorities" | "reactions" | "sentiment";
-type ChartUnit = "issues" | "reviews" | "reactions" | "percent";
-type Visualization = "area" | "bar" | "stacked-bar";
-
-interface CodeReviewMetricRow extends Record<string, number | string> {
-  date: string;
-  n_comments: number;
-  n_comments_p0: number;
-  n_comments_p1: number;
-  n_comments_p2: number;
-  n_reactions: number;
-  n_reactions_minus1: number;
-  n_reactions_other: number;
-  n_reactions_plus1: number;
-  n_reviews: number;
-}
-
-interface CodeReviewMetrics {
-  data: CodeReviewMetricRow[];
-}
-
-interface ChartField {
-  field: keyof CodeReviewMetricRow;
-  key: string;
-}
-
-interface ChartDefinition {
-  fields: ChartField[];
-  key: ChartKey;
-  unit: ChartUnit;
-}
-
-interface ChartPoint {
-  date: string;
-  total: number;
-  values: Record<string, number>;
-}
-
-interface ActivityChartData {
-  data: ChartPoint[];
-  dataFreshnessTimestamp: null;
-  series: Array<{ key: string; name: string; total: number }>;
-  total: number;
-}
-
-interface QueryResult<Data> {
-  data?: Data | null;
-  isError: boolean;
-  isLoading: boolean;
-  refetch(): unknown;
-}
-
-interface AccountState {
-  accountId?: string | null;
-  authMethod?: string | null;
-  userId?: string | null;
-}
-
-interface ChartStatus {
-  animateDataChanges: boolean;
-  isError: boolean;
-  isLoading: boolean;
-  isUpdating: boolean;
-  onRetry(): void;
-  reduceMotion: boolean;
-}
-
-type Component = (props: Record<string, unknown>) => unknown;
-
-interface SharedRuntime {
-  $3(): void;
-  FX(): void;
-  HX<Value>(signal: unknown): Value;
-  I3(): JsxRuntime;
-  _L<Data>(options: Record<string, unknown>): QueryResult<Data>;
-  e6: (() => ReactRuntime) & ReactRuntime;
-  gL(): void;
-  n4(): IntlShape;
-}
-
-interface SettingsLayoutComponent extends Component {
-  Content: Component;
-  Header: Component;
-}
-
-interface InitialRuntime {
-  Hln(plan: unknown): boolean;
-  M6t(): void;
-  N6t(): AccountState;
-  Rln(): void;
-  Slt(): boolean;
-  aa: SettingsLayoutComponent;
-  d0t(): void;
-  dS(hasCreditBalance: boolean): { plan?: unknown };
-  f0t: unknown;
-  ifn(): void;
-  oa(): void;
-  ofn(gateId: string): boolean;
-  uS(): void;
-  xlt(): void;
-}
-
-interface ActivityChartRuntime {
-  H: Component;
-  U(): void;
-  n(): void;
-  t: Component;
-}
-
-interface QueryRuntime {
-  n(options: Record<string, unknown>): Record<string, unknown>;
-  t(): void;
-}
-
-const {
-  $3: initializeRuntimeLazy,
-  FX: initializeSignalRuntime,
-  HX: useSignalValue,
-  I3: getJsxRuntime,
-  _L: useQuery,
-  e6: getReactRuntime,
-  gL: initializeUseQuery,
-  n4: useIntl,
-} = appSharedChunk as unknown as SharedRuntime;
-const {
-  Hln: isBusinessPlan,
-  M6t: initializeAccountState,
-  N6t: useAccountState,
-  Rln: initializeUsagePlan,
-  Slt: useReduceMotion,
-  aa: SettingsLayout,
-  d0t: initializeUsageSignal,
-  dS: useUsagePlan,
-  f0t: usageSignal,
-  ifn: initializeExperimentRuntime,
-  oa: initializeSettingsLayout,
-  ofn: isGateEnabled,
-  uS: initializeUsageRuntime,
-  xlt: initializeMotionRuntime,
-} = appInitialChunk as unknown as InitialRuntime;
-const {
-  H: DateRangeControl,
-  U: initializeDateRangeControl,
-  n: initializeActivityChart,
-  t: ActivityChart,
-} = activityChartChunk as unknown as ActivityChartRuntime;
-const { n: createCodeReviewQuery, t: initializeCodeReviewQueries } =
-  codeReviewQueriesChunk as unknown as QueryRuntime;
-
-const CHARTS: ChartDefinition[] = [
-  {
-    key: "issues",
-    unit: "issues",
-    fields: [{ key: "issues", field: "n_comments" }],
-  },
-  {
-    key: "reviews",
-    unit: "reviews",
-    fields: [{ key: "reviews", field: "n_reviews" }],
-  },
-  {
-    key: "priorities",
-    unit: "issues",
-    fields: [
-      { key: "p0", field: "n_comments_p0" },
-      { key: "p1", field: "n_comments_p1" },
-      { key: "p2", field: "n_comments_p2" },
-    ],
-  },
-  {
-    key: "reactions",
-    unit: "reactions",
-    fields: [
-      { key: "plus1", field: "n_reactions_plus1" },
-      { key: "minus1", field: "n_reactions_minus1" },
-      { key: "other", field: "n_reactions_other" },
-    ],
-  },
-  {
-    key: "sentiment",
-    unit: "percent",
-    fields: [
-      { key: "plus1", field: "n_reactions_plus1" },
-      { key: "minus1", field: "n_reactions_minus1" },
-      { key: "other", field: "n_reactions_other" },
-    ],
-  },
-];
-
-const CHART_TITLES: Record<ChartKey, string> = {
-  issues: "Issues found",
-  reviews: "PRs reviewed",
-  priorities: "Issues by priority",
-  reactions: "Reactions",
-  sentiment: "Reaction sentiment",
-};
-
-const SERIES_NAMES: Record<string, string> = {
-  issues: "Issues found",
-  reviews: "PRs reviewed",
-  p0: "P0",
-  p1: "P1",
-  p2: "P2",
-  plus1: "👍 reactions",
-  minus1: "👎 reactions",
-  other: "Other reactions",
-};
-
-let jsx: JsxRuntime;
-let React: ReactRuntime;
-
-function metric(
-  row: CodeReviewMetricRow,
-  field: keyof CodeReviewMetricRow,
-): number {
-  const value = row[field];
-  return typeof value === "number" ? value : 0;
-}
-
-function chartDefinitions(
-  metrics?: CodeReviewMetrics | null,
-): ChartDefinition[] {
-  return CHARTS.filter((chart) => {
-    if (chart.key !== "reactions" && chart.key !== "sentiment") return true;
-    return metrics == null || metrics.data.some((row) => row.n_reactions > 0);
-  });
-}
-
-function seriesName(key: string, chart: ChartKey): string {
-  if (key === "other" && chart === "priorities") return "Other";
-  return SERIES_NAMES[key] ?? key;
-}
-
-function buildChartData(
-  chart: ChartDefinition,
-  metrics?: CodeReviewMetrics | null,
-): ActivityChartData | undefined {
-  if (metrics == null) return undefined;
-  const isPriorities = chart.key === "priorities";
-  const points = metrics.data.map((row) => {
-    const fieldsTotal = chart.fields.reduce(
-      (sum, field) => sum + metric(row, field.field),
-      0,
-    );
-    const total =
-      chart.key === "reactions" || chart.key === "sentiment"
-        ? row.n_reactions
-        : isPriorities
-          ? row.n_comments
-          : fieldsTotal;
-    const values = Object.fromEntries(
-      chart.fields.map((field) => [
-        field.key,
-        chart.key === "sentiment" && total > 0
-          ? (metric(row, field.field) / total) * 100
-          : metric(row, field.field),
-      ]),
-    );
-    if (isPriorities) values.other = Math.max(row.n_comments - fieldsTotal, 0);
-    return { date: row.date, total, values };
-  });
-  const series = chart.fields.map((field) => ({
-    key: field.key,
-    name: seriesName(field.key, chart.key),
-    total: metrics.data.reduce((sum, row) => sum + metric(row, field.field), 0),
-  }));
-  if (isPriorities) {
-    series.push({
-      key: "other",
-      name: "Other",
-      total: points.reduce((sum, point) => sum + (point.values.other ?? 0), 0),
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  C_ as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  K2 as o,
+  S_ as s,
+  Y2 as c,
+  _L as l,
+  c_ as u,
+  cm as d,
+  e6 as f,
+  gL as p,
+  lm as m,
+  n4 as h,
+  o_ as g,
+} from "@rchunk/app-shared";
+import {
+  Hln as _,
+  M6t as v,
+  N6t as y,
+  Rln as b,
+  Slt as x,
+  aa as S,
+  d0t as C,
+  dS as w,
+  f0t as T,
+  ifn as E,
+  oa as D,
+  ofn as ee,
+  uS as O,
+  xlt as k,
+} from "@rchunk/app-initial";
+import { n as A, t as j } from "@rchunk/command-menu-queries";
+import { H as te, U as M, n as N, t as P } from "@rchunk/activity-chart";
+function F(e) {
+  let t = (0, B.c)(34),
+    { chart: n, metrics: r, consumerAnalytics: i, scope: a, status: o } = e,
+    l = i !== void 0 && i,
+    u = h(),
+    f = n.key === `priorities`,
+    p;
+  if (t[0] !== n.fields || t[1] !== n.key || t[2] !== u || t[3] !== f || t[4] !== r) {
+    let e = r?.data.map((e) => {
+      let t = n.fields.reduce((t, n) => {
+          let { field: r } = n;
+          return t + e[r];
+        }, 0),
+        r = t;
+      n.key === `reactions` ? (r = e.n_reactions) : f && (r = e.n_comments);
+      let i = Object.fromEntries(
+        n.fields.map((t) => {
+          let { key: i, field: a } = t;
+          return [i, n.key === `sentiment` && r > 0 ? (e[a] / r) * 100 : e[a]];
+        }),
+      );
+      return (
+        f && (i.other = Math.max(e.n_comments - t, 0)),
+        { date: e.date, total: r, values: i }
+      );
     });
-  }
-  return {
-    total: points.reduce((sum, point) => sum + point.total, 0),
-    dataFreshnessTimestamp: null,
-    series,
-    data: points,
-  };
-}
-
-function sentimentSummary(metrics: CodeReviewMetrics, intl: IntlShape): string {
-  const total = metrics.data.reduce((sum, row) => sum + row.n_reactions, 0);
-  const positive = metrics.data.reduce(
-    (sum, row) => sum + row.n_reactions_plus1,
-    0,
-  );
+    ((p =
+      e == null || r == null
+        ? void 0
+        : {
+            total: e.reduce(z, 0),
+            dataFreshnessTimestamp: null,
+            series: [
+              ...n.fields.map((e) => {
+                let { key: t, field: n } = e;
+                return {
+                  key: t,
+                  name: u.formatMessage(
+                    {
+                      id: `settings.usage.billing.codeReview.series`,
+                      defaultMessage: `{series, select, issues {Issues found} reviews {PRs reviewed} p0 {P0} p1 {P1} p2 {P2} plus1 {👍 reactions} minus1 {👎 reactions} other {Other reactions}}`,
+                      description: `Localized legend or tooltip label for a Codex code review chart series: total issues, reviewed pull requests, P0 through P2 issue priorities, thumbs-up reactions, thumbs-down reactions, or other reactions`,
+                    },
+                    { series: t },
+                  ),
+                  total: r.data.reduce((e, t) => e + t[n], 0),
+                };
+              }),
+              ...(f
+                ? [
+                    {
+                      key: `other`,
+                      name: u.formatMessage({
+                        id: `settings.usage.billing.codeReview.priorityOther`,
+                        defaultMessage: `Other`,
+                        description: `Legend and tooltip label for Codex code review issues without a P0, P1, or P2 priority`,
+                      }),
+                      total: e.reduce(R, 0),
+                    },
+                  ]
+                : []),
+            ],
+            data: e,
+          }),
+      (t[0] = n.fields),
+      (t[1] = n.key),
+      (t[2] = u),
+      (t[3] = f),
+      (t[4] = r),
+      (t[5] = p));
+  } else p = t[5];
+  let m = p,
+    _ = `area`;
+  f ? (_ = `stacked-bar`) : (n.key === `issues` || n.key === `reviews`) && (_ = `bar`);
+  let v;
+  t[6] !== n.key || t[7] !== u
+    ? ((v = u.formatMessage(
+        {
+          id: `settings.usage.billing.codeReview.chartLabel`,
+          defaultMessage: `{chart, select, issues {Issues found} reviews {PRs reviewed} priorities {Issues by priority} reactions {Reactions} sentiment {Reaction sentiment} other {Code review}}`,
+          description: `Accessible label identifying a Codex code review analytics chart: issues found, pull requests reviewed, issues by priority, reactions, or reaction sentiment`,
+        },
+        { chart: n.key },
+      )),
+      (t[6] = n.key),
+      (t[7] = u),
+      (t[8] = v))
+    : (v = t[8]);
+  let y = n.key === `sentiment`,
+    b;
+  t[9] !== n.key || t[10] !== u || t[11] !== r
+    ? ((b =
+        n.key === `sentiment` && r != null
+          ? (0, V.jsx)(c, {
+              id: `settings.usage.billing.codeReview.sentiment.summary`,
+              defaultMessage: `{percentage} positive`,
+              description: `Summary below the reaction sentiment chart title showing the percentage of positive Codex code review reactions during the selected period`,
+              values: {
+                percentage: u.formatNumber(r.data.reduce(L, 0) / r.data.reduce(I, 0), {
+                  maximumFractionDigits: 0,
+                  style: `percent`,
+                }),
+              },
+            })
+          : void 0),
+      (t[9] = n.key),
+      (t[10] = u),
+      (t[11] = r),
+      (t[12] = b))
+    : (b = t[12]);
+  let x;
+  t[13] === n.key
+    ? (x = t[14])
+    : ((x = (0, V.jsx)(c, {
+        id: `settings.usage.billing.codeReview.chart.title`,
+        defaultMessage: `{chart, select, issues {Issues found} reviews {PRs reviewed} priorities {Issues by priority} reactions {Reactions} sentiment {Reaction sentiment} other {Code review}}`,
+        description: `Title of a desktop Codex code review analytics chart: issues found, pull requests reviewed, issues by priority, reactions, or reaction sentiment`,
+        values: { chart: n.key },
+      })),
+      (t[13] = n.key),
+      (t[14] = x));
+  let S;
+  t[15] !== n.key || t[16] !== l || t[17] !== u || t[18] !== f
+    ? ((S =
+        l || f
+          ? null
+          : (0, V.jsx)(g, {
+              tooltipContent: (0, V.jsx)(c, {
+                id: `settings.usage.billing.codeReview.chart.info`,
+                defaultMessage: `{chart, select, issues {Issues found by Codex code review during the selected time period} reviews {Pull requests reviewed by Codex during the selected time period} priorities {Issues found by Codex code review grouped by priority during the selected time period} reactions {Reactions to Codex code review comments during the selected time period} sentiment {Share of code review reactions grouped by reaction type during the selected time period} other {Code review activity during the selected time period}}`,
+                description: `Information tooltip explaining what the selected Codex code review analytics chart measures: issues found, reviewed pull requests, issues grouped by priority, reactions, or reaction sentiment`,
+                values: { chart: n.key },
+              }),
+              children: (0, V.jsx)(`button`, {
+                "aria-label": u.formatMessage(
+                  {
+                    id: `settings.usage.billing.codeReview.chart.infoLabel`,
+                    defaultMessage: `{chart, select, issues {More information about issues found} reviews {More information about PRs reviewed} priorities {More information about issues by priority} reactions {More information about reactions} sentiment {More information about reaction sentiment} other {More information about code review}}`,
+                    description: `Accessible label for the information button explaining a Codex code review analytics chart: issues found, reviewed pull requests, issues by priority, reactions, or reaction sentiment`,
+                  },
+                  { chart: n.key },
+                ),
+                className: `cursor-interaction text-tertiary`,
+                type: `button`,
+                children: (0, V.jsx)(s, { asset: d }),
+              }),
+            })),
+      (t[15] = n.key),
+      (t[16] = l),
+      (t[17] = u),
+      (t[18] = f),
+      (t[19] = S))
+    : (S = t[19]);
+  let C;
+  t[20] !== x || t[21] !== S
+    ? ((C = (0, V.jsxs)(`span`, { className: `inline-flex items-center gap-1`, children: [x, S] })),
+      (t[20] = x),
+      (t[21] = S),
+      (t[22] = C))
+    : (C = t[22]);
+  let w;
   return (
-    intl.formatNumber(total === 0 ? 0 : positive / total, {
-      maximumFractionDigits: 0,
-      style: "percent",
-    }) + " positive"
+    t[23] !== n.unit ||
+    t[24] !== l ||
+    t[25] !== m ||
+    t[26] !== a ||
+    t[27] !== o ||
+    t[28] !== v ||
+    t[29] !== y ||
+    t[30] !== b ||
+    t[31] !== C ||
+    t[32] !== _
+      ? ((w = (0, V.jsx)(P, {
+          consumerAnalytics: l,
+          ariaLabel: v,
+          data: m,
+          hideTotal: y,
+          scope: a,
+          status: o,
+          totalLabel: b,
+          title: C,
+          unit: n.unit,
+          visualization: _,
+        })),
+        (t[23] = n.unit),
+        (t[24] = l),
+        (t[25] = m),
+        (t[26] = a),
+        (t[27] = o),
+        (t[28] = v),
+        (t[29] = y),
+        (t[30] = b),
+        (t[31] = C),
+        (t[32] = _),
+        (t[33] = w))
+      : (w = t[33]),
+    w
   );
 }
-
-function CodeReviewChart({
-  chart,
-  consumerAnalytics,
-  metrics,
-  scope,
-  status,
-}: {
-  chart: ChartDefinition;
-  consumerAnalytics: boolean;
-  metrics?: CodeReviewMetrics | null;
-  scope: Scope;
-  status: ChartStatus;
-}): unknown {
-  const intl = useIntl();
-  const visualization: Visualization =
-    chart.key === "priorities"
-      ? "stacked-bar"
-      : chart.key === "issues" || chart.key === "reviews"
-        ? "bar"
-        : "area";
-  return jsx.jsx(ActivityChart, {
-    consumerAnalytics,
-    ariaLabel: CHART_TITLES[chart.key],
-    data: buildChartData(chart, metrics),
-    hideTotal: chart.key === "sentiment",
-    scope,
-    status,
-    totalLabel:
-      chart.key === "sentiment" && metrics != null
-        ? sentimentSummary(metrics, intl)
-        : undefined,
-    title: CHART_TITLES[chart.key],
-    unit: chart.unit,
-    visualization,
-    chartKey: chart.key,
-  });
+function I(e, t) {
+  return e + t.n_reactions;
 }
-
-function CodeReviewSettingsContent({
-  isActive,
-  isPolling = true,
-  reduceMotion,
-  scope,
-}: {
-  isActive: boolean;
-  isPolling?: boolean;
-  reduceMotion: boolean;
-  scope: Scope;
-}): unknown {
-  const consumerAnalytics = scope === "consumer" && isGateEnabled("393259752");
-  const account = useAccountState();
-  const intl = useIntl();
-  const [days, setDays] = React.useState(30);
-  const [cached, setCached] = React.useState<{
-    accountId: string | null;
-    data: CodeReviewMetrics;
-    userId: string | null;
-  } | null>(null);
-  const query = useQuery<CodeReviewMetrics>(
-    createCodeReviewQuery({
-      isPolling,
-      auth: account,
-      days,
-      enabled: isActive,
-      scope,
-    }),
+function L(e, t) {
+  return e + t.n_reactions_plus1;
+}
+function R(e, t) {
+  return e + (t.values.other ?? 0);
+}
+function z(e, t) {
+  return e + t.total;
+}
+var B, V;
+function H() {
+  return (H = e(() => {
+    ((B = t()), m(), o(), n(), u(), N(), (V = a()));
+  }))();
+}
+function U(e) {
+  return W.filter(
+    ({ key: t }) =>
+      (t !== `reactions` && t !== `sentiment`) ||
+      e == null ||
+      e.data.some(({ n_reactions: e }) => e > 0),
   );
-  const sameAccount =
-    cached?.accountId === (account.accountId ?? null) &&
-    cached.userId === (account.userId ?? null);
-  const isUpdating =
-    query.isLoading && !query.isError && query.data == null && sameAccount;
-  const metrics = isUpdating ? cached?.data : query.data;
-  const animateDataChanges =
-    !reduceMotion &&
-    query.data != null &&
-    sameAccount &&
-    cached?.data !== query.data;
-  const status: ChartStatus = {
-    animateDataChanges,
-    isError: query.isError,
-    isLoading: query.isLoading,
-    isUpdating,
-    reduceMotion,
-    onRetry: () => {
-      query.refetch();
-    },
-  };
-  const changeDays = (nextDays: number) => {
-    if (metrics?.data.some(hasActivity)) {
-      setCached({
-        accountId: account.accountId ?? null,
-        data: metrics,
-        userId: account.userId ?? null,
-      });
-    } else {
-      setCached(null);
-    }
-    setDays(nextDays);
-  };
-  const header = jsx.jsx(SettingsLayout.Header, {
-    actionsAlignment: "end",
-    title: "Code review",
-    actions: jsx.jsx(DateRangeControl, {
-      ariaLabel: intl.formatMessage({
-        id: "settings.usage.billing.codeReview.periodLabel",
-        defaultMessage: "Code review time range",
-        description:
-          "Accessible label for the seven-day or thirty-day date-range selector shared by all desktop Codex code review analytics charts",
-      }),
-      days,
-      onChange: changeDays,
-    }),
-  });
-  const charts = chartDefinitions(metrics).map((chart) =>
-    jsx.jsx(
-      CodeReviewChart,
+}
+var W;
+function G() {
+  return (G = e(() => {
+    W = [
+      { key: `issues`, unit: `issues`, fields: [{ key: `issues`, field: `n_comments` }] },
+      { key: `reviews`, unit: `reviews`, fields: [{ key: `reviews`, field: `n_reviews` }] },
       {
-        chart,
-        consumerAnalytics,
-        metrics,
-        scope,
-        status,
+        key: `priorities`,
+        unit: `issues`,
+        fields: [
+          { key: `p0`, field: `n_comments_p0` },
+          { key: `p1`, field: `n_comments_p1` },
+          { key: `p2`, field: `n_comments_p2` },
+        ],
       },
-      chart.key,
-    ),
+      {
+        key: `reactions`,
+        unit: `reactions`,
+        fields: [
+          { key: `plus1`, field: `n_reactions_plus1` },
+          { key: `minus1`, field: `n_reactions_minus1` },
+          { key: `other`, field: `n_reactions_other` },
+        ],
+      },
+      {
+        key: `sentiment`,
+        unit: `percent`,
+        fields: [
+          { key: `plus1`, field: `n_reactions_plus1` },
+          { key: `minus1`, field: `n_reactions_minus1` },
+          { key: `other`, field: `n_reactions_other` },
+        ],
+      },
+    ];
+  }))();
+}
+function ne(e) {
+  let t = (0, q.c)(35),
+    { isActive: n, isPolling: r, reduceMotion: i, scope: a } = e,
+    o = r === void 0 || r,
+    s = ee(a === `consumer` && `393259752`),
+    u = a === `consumer` && s,
+    d = y(),
+    f = h(),
+    [p, m] = (0, J.useState)(30),
+    [g, _] = (0, J.useState)(null),
+    v;
+  t[0] !== d || t[1] !== p || t[2] !== n || t[3] !== o || t[4] !== a
+    ? ((v = A({ isPolling: o, auth: d, days: p, enabled: n, scope: a })),
+      (t[0] = d),
+      (t[1] = p),
+      (t[2] = n),
+      (t[3] = o),
+      (t[4] = a),
+      (t[5] = v))
+    : (v = t[5]);
+  let { data: b, isError: x, isLoading: C, refetch: w } = l(v),
+    T =
+      C &&
+      !x &&
+      b == null &&
+      g?.accountId === (d.accountId ?? null) &&
+      g.userId === (d.userId ?? null),
+    E = T ? g.data : b,
+    D =
+      !i &&
+      b != null &&
+      g?.accountId === (d.accountId ?? null) &&
+      g.userId === (d.userId ?? null) &&
+      g.data !== b,
+    O;
+  t[6] === w
+    ? (O = t[7])
+    : ((O = () => {
+        w();
+      }),
+      (t[6] = w),
+      (t[7] = O));
+  let k;
+  t[8] !== T || t[9] !== x || t[10] !== C || t[11] !== i || t[12] !== D || t[13] !== O
+    ? ((k = {
+        animateDataChanges: D,
+        isError: x,
+        isLoading: C,
+        isUpdating: T,
+        reduceMotion: i,
+        onRetry: O,
+      }),
+      (t[8] = T),
+      (t[9] = x),
+      (t[10] = C),
+      (t[11] = i),
+      (t[12] = D),
+      (t[13] = O),
+      (t[14] = k))
+    : (k = t[14]);
+  let j = k,
+    M;
+  t[15] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((M = (0, Y.jsx)(c, {
+        id: `settings.usage.billing.codeReview.title`,
+        defaultMessage: `Code review`,
+        description: `Heading for analytics about the account holder's Codex code reviews, discovered issues, and reactions`,
+      })),
+      (t[15] = M))
+    : (M = t[15]);
+  let N;
+  t[16] === f
+    ? (N = t[17])
+    : ((N = f.formatMessage({
+        id: `settings.usage.billing.codeReview.periodLabel`,
+        defaultMessage: `Code review time range`,
+        description: `Accessible label for the seven-day or thirty-day date-range selector shared by all desktop Codex code review analytics charts`,
+      })),
+      (t[16] = f),
+      (t[17] = N));
+  let P;
+  t[18] !== d || t[19] !== E
+    ? ((P = (e) => {
+        (_(
+          E?.data.some(K)
+            ? { accountId: d.accountId ?? null, data: E, userId: d.userId ?? null }
+            : null,
+        ),
+          m(e));
+      }),
+      (t[18] = d),
+      (t[19] = E),
+      (t[20] = P))
+    : (P = t[20]);
+  let I;
+  t[21] !== p || t[22] !== N || t[23] !== P
+    ? ((I = (0, Y.jsx)(S.Header, {
+        actionsAlignment: `end`,
+        title: M,
+        actions: (0, Y.jsx)(te, { ariaLabel: N, days: p, onChange: P }),
+      })),
+      (t[21] = p),
+      (t[22] = N),
+      (t[23] = P),
+      (t[24] = I))
+    : (I = t[24]);
+  let L;
+  t[25] !== u || t[26] !== E || t[27] !== a || t[28] !== j
+    ? ((L = U(E).map((e) =>
+        (0, Y.jsx)(F, { consumerAnalytics: u, chart: e, metrics: E, scope: a, status: j }, e.key),
+      )),
+      (t[25] = u),
+      (t[26] = E),
+      (t[27] = a),
+      (t[28] = j),
+      (t[29] = L))
+    : (L = t[29]);
+  let R;
+  t[30] === L
+    ? (R = t[31])
+    : ((R = (0, Y.jsx)(S.Content, { className: `gap-3`, children: L })), (t[30] = L), (t[31] = R));
+  let z;
+  return (
+    t[32] !== R || t[33] !== I
+      ? ((z = (0, Y.jsxs)(S, { children: [I, R] })), (t[32] = R), (t[33] = I), (t[34] = z))
+      : (z = t[34]),
+    z
   );
-  const content = jsx.jsx(SettingsLayout.Content, {
-    className: "gap-3",
-    children: charts,
-  });
-  return jsx.jsxs(SettingsLayout, { children: [header, content] });
 }
-
-function hasActivity(row: CodeReviewMetricRow): boolean {
-  return row.n_comments > 0 || row.n_reactions > 0 || row.n_reviews > 0;
+function K(e) {
+  let { n_comments: t, n_reactions: n, n_reviews: r } = e;
+  return t > 0 || n > 0 || r > 0;
 }
-
-function UsageCodeReviewSettings({
-  isPolling = true,
-}: {
-  isPolling?: boolean;
-}): unknown {
-  const usage = useSignalValue<{
-    data?: { credits?: { balance?: unknown } } | null;
-  }>(usageSignal);
-  const { plan } = useUsagePlan(usage.data?.credits?.balance != null);
-  const scope: Scope = isBusinessPlan(plan) ? "business" : "consumer";
-  return jsx.jsx(CodeReviewSettingsContent, {
-    isActive: true,
-    isPolling,
-    reduceMotion: useReduceMotion(),
-    scope,
-  });
+var q, J, Y;
+function X() {
+  return (X = e(() => {
+    ((q = t()), p(), (J = f()), o(), v(), j(), D(), E(), M(), H(), G(), (Y = a()));
+  }))();
 }
-
-function initializeUsageCodeReviewSettings(): void {
-  initializeRuntimeLazy?.();
-  initializeSignalRuntime?.();
-  initializeUseQuery?.();
-  initializeAccountState?.();
-  initializeUsageRuntime?.();
-  initializeUsageSignal?.();
-  initializeMotionRuntime?.();
-  initializeUsagePlan?.();
-  initializeExperimentRuntime?.();
-  initializeSettingsLayout?.();
-  initializeCodeReviewQueries?.();
-  initializeDateRangeControl?.();
-  initializeActivityChart?.();
-  React =
-    typeof getReactRuntime === "function" ? getReactRuntime() : getReactRuntime;
-  jsx = typeof getJsxRuntime === "function" ? getJsxRuntime() : getJsxRuntime;
+function re(e) {
+  let t = (0, Z.c)(4),
+    { isPolling: n } = e,
+    r = n === void 0 || n,
+    { data: a } = i(T),
+    { plan: o } = w(a?.credits?.balance != null),
+    s = x(),
+    c = _(o) ? `business` : `consumer`,
+    l;
+  return (
+    t[0] !== r || t[1] !== s || t[2] !== c
+      ? ((l = (0, Q.jsx)(ne, { isActive: !0, isPolling: r, reduceMotion: s, scope: c })),
+        (t[0] = r),
+        (t[1] = s),
+        (t[2] = c),
+        (t[3] = l))
+      : (l = t[3]),
+    l
+  );
 }
-
-initializeUsageCodeReviewSettings();
-
-export { UsageCodeReviewSettings };
+var Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((Z = t()), r(), O(), C(), k(), b(), X(), (Q = a()));
+  }))();
+}
+$();
+export { re as UsageCodeReviewSettings };

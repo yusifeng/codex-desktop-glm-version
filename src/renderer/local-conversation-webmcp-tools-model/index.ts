@@ -1,82 +1,40 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-initial";
-import { wL as initializeUtilities } from "@rchunk/app-shared";
-import { isWebMcpServer } from "../app-shared/runtime/is-web-mcp-server";
-import { flattenConversationItems } from "../app-initial/runtime/flatten-conversation-items";
-import {
-  n as initializeWebMcpToolCalls,
-  t as getWebMcpCallsFromMetadata,
-} from "@rchunk/webmcp-tool-calls";
-
-export interface WebMcpToolCallItem {
-  result?: { _meta?: unknown } | null;
-  server: unknown;
-  status: string;
-  type: string;
-}
-
-export interface ConversationTurnWithItems {
-  items?: unknown[] | null;
-}
-
-export interface WebMcpCall {
-  name: string;
-  [key: string]: unknown;
-}
-
-export interface WebMcpCallGroup {
-  calls: WebMcpCall[];
-  name: string;
-}
-
-function collectCompletedWebMcpCalls(turns: ConversationTurnWithItems[]): WebMcpCall[] {
-  const calls: WebMcpCall[] = [];
-  for (let turnIndex = turns.length - 1; turnIndex >= 0; turnIndex -= 1) {
-    const items = flattenConversationItems(turns[turnIndex]?.items ?? []);
-    for (let itemIndex = items.length - 1; itemIndex >= 0; itemIndex -= 1) {
-      const item = items[itemIndex] as WebMcpToolCallItem | null | undefined;
-      if (
-        item?.type === "mcpToolCall" &&
-        item.status !== "inProgress" &&
-        isWebMcpServer(item.server)
-      ) {
-        calls.push(
-          ...(getWebMcpCallsFromMetadata(item.result?._meta) as WebMcpCall[])
-            .slice()
-            .reverse(),
-        );
-      }
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { hq as t, wL as n } from "@rchunk/app-shared";
+import { w$t as r } from "@rchunk/app-initial";
+import { n as i, t as a } from "@rchunk/webmcp-tool-calls";
+function o(e) {
+  let n = [];
+  for (let i = e.length - 1; i >= 0; --i) {
+    let o = r(e[i]?.items ?? []);
+    for (let e = o.length - 1; e >= 0; --e) {
+      let r = o[e];
+      r?.type === `mcpToolCall` &&
+        r.status !== `inProgress` &&
+        t(r.server) &&
+        n.push(...a(r.result?._meta).slice().reverse());
     }
   }
-  return calls;
+  return n;
 }
-
-function groupWebMcpCallsByName(calls: WebMcpCall[]): WebMcpCallGroup[] {
-  const groups = new Map<string, WebMcpCallGroup>();
-  for (const call of calls) {
-    const group = groups.get(call.name);
-    if (group == null) groups.set(call.name, { calls: [call], name: call.name });
-    else group.calls.push(call);
+function s(e) {
+  let t = new Map();
+  for (let n of e) {
+    let e = t.get(n.name);
+    e == null ? t.set(n.name, { calls: [n], name: n.name }) : e.calls.push(n);
   }
-  return Array.from(groups.values());
+  return Array.from(t.values());
 }
-
-function getHostname(url: string): string | undefined {
+function c(e) {
   try {
-    return new URL(url).hostname || undefined;
+    return new URL(e).hostname || void 0;
   } catch {
-    return undefined;
+    return;
   }
 }
-
-function initializeLocalConversationWebMcpToolsModel(): void {
-  initializeUtilities();
-  initializeWebMcpToolCalls();
+function l() {
+  return (l = e(() => {
+    (n(), i());
+  }))();
 }
-
-export {
-  initializeLocalConversationWebMcpToolsModel as i,
-  collectCompletedWebMcpCalls as n,
-  groupWebMcpCallsByName as r,
-  getHostname as t,
-};
+export { l as i, o as n, s as r, c as t };

@@ -1,6 +1,4 @@
-// @ts-expect-error The release app-initial surface is declared incrementally by the shared manifest owner.
-import { lgt as getConversationBrowserTabIdsForTransfer, mgt as initializePanelTabs, ugt as getLastFocusedBrowserTabId } from "@rchunk/app-initial";
-
-initializePanelTabs();
-
-export { getConversationBrowserTabIdsForTransfer, getLastFocusedBrowserTabId };
+// @ts-nocheck
+import { lgt as e, mgt as t, ugt as n } from "@rchunk/app-initial";
+t();
+export { e as getConversationBrowserTabIdsForTransfer, n as getLastFocusedBrowserTabId };

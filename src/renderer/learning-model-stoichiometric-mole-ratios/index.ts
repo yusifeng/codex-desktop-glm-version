@@ -1,48 +1,44 @@
-// Stoichiometric mole ratios for forming water from hydrogen and oxygen.
-import "@rchunk/rolldown-runtime";
-
-type Species = "h2" | "o2" | "h2o";
-interface NumberParameter { kind: "number"; defaultValue: number; min: number; max: number }
-interface StoichiometricValues { reactionExtentMoles?: unknown; selectedSpecies?: unknown }
-
-const stoichiometricMoleRatiosType = "STOICHIOMETRIC_MOLE_RATIOS";
-const stoichiometricMoleRatiosThumbnail = "stoichiometric-mole-ratios-v1";
-const stoichiometricReaction = "2\\mathrm{H_2} + \\mathrm{O_2} \\rightarrow 2\\mathrm{H_2O}";
-const stoichiometricParameters: { reactionExtentMoles: NumberParameter } = {
-  reactionExtentMoles: { kind: "number", defaultValue: 1, min: 0.5, max: 5 },
-};
-const stoichiometricMoleRatiosSpecification = { type: stoichiometricMoleRatiosType, version: 2, thumbnailAssetKey: stoichiometricMoleRatiosThumbnail, canonicalFormula: stoichiometricReaction, parameters: stoichiometricParameters };
-const species: Species[] = ["h2", "o2", "h2o"];
-const speciesMetadata: Record<Species, { coefficient: number; formula: string }> = {
-  h2: { coefficient: 2, formula: "H₂" },
-  o2: { coefficient: 1, formula: "O₂" },
-  h2o: { coefficient: 2, formula: "H₂O" },
-};
-const reactionExtentParameter = stoichiometricMoleRatiosSpecification.parameters.reactionExtentMoles;
-const defaultSpecies: Species = "h2";
-const reactionExtentControl = { min: reactionExtentParameter.min, max: reactionExtentParameter.max, step: 0.5 };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const isSpecies = (value: unknown): value is Species => typeof value === "string" && species.includes(value as Species);
-const normalizeStoichiometricValues = (values: StoichiometricValues) => {
-  const extent = Number(values.reactionExtentMoles);
-  return {
-    reactionExtentMoles: Number.isFinite(extent) ? clamp(extent, reactionExtentParameter.min, reactionExtentParameter.max) : reactionExtentParameter.defaultValue,
-    selectedSpecies: isSpecies(values.selectedSpecies) ? values.selectedSpecies : defaultSpecies,
-  };
-};
-const molesForSpecies = (selectedSpecies: Species, reactionExtentMoles: number): number => speciesMetadata[selectedSpecies].coefficient * reactionExtentMoles;
-const speciesAmounts = (reactionExtentMoles: number): Record<Species, number> => ({
-  h2: molesForSpecies("h2", reactionExtentMoles),
-  o2: molesForSpecies("o2", reactionExtentMoles),
-  h2o: molesForSpecies("h2o", reactionExtentMoles),
-});
-const controlForSpecies = (selectedSpecies: Species) => {
-  const coefficient = speciesMetadata[selectedSpecies].coefficient;
-  return { min: reactionExtentControl.min * coefficient, max: reactionExtentControl.max * coefficient, step: reactionExtentControl.step * coefficient };
-};
-const reactionExtentFromMoles = (selectedSpecies: Species, moles: number): number => moles / speciesMetadata[selectedSpecies].coefficient;
-
-function initializeStoichiometricMoleRatiosSpecification(): void {}
-function initializeStoichiometricMoleRatiosModel(): void {}
-
-export { reactionExtentFromMoles as a, initializeStoichiometricMoleRatiosSpecification as c, speciesAmounts as i, stoichiometricMoleRatiosSpecification as l, species as n, initializeStoichiometricMoleRatiosModel as o, controlForSpecies as r, normalizeStoichiometricValues as s, speciesMetadata as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `STOICHIOMETRIC_MOLE_RATIOS`),
+      (n = `stoichiometric-mole-ratios-v1`),
+      (r = `2\\mathrm{H_2} + \\mathrm{O_2} \\rightarrow 2\\mathrm{H_2O}`),
+      (i = { reactionExtentMoles: { kind: `number`, defaultValue: 1, min: 0.5, max: 5 } }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+var s, c, l, u, d, f, p, m, h, g, _, v;
+function y() {
+  return (y = e(() => {
+    (o(),
+      (s = [`h2`, `o2`, `h2o`]),
+      (c = {
+        h2: { coefficient: 2, formula: `H₂` },
+        o2: { coefficient: 1, formula: `O₂` },
+        h2o: { coefficient: 2, formula: `H₂O` },
+      }),
+      (l = a.parameters.reactionExtentMoles),
+      (u = `h2`),
+      (d = { min: l.min, max: l.max, step: 0.5 }),
+      (f = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (p = (e) => typeof e == `string` && s.includes(e)),
+      (m = (e) => {
+        let t = Number(e.reactionExtentMoles);
+        return {
+          reactionExtentMoles: Number.isFinite(t) ? f(t, l.min, l.max) : l.defaultValue,
+          selectedSpecies: p(e.selectedSpecies) ? e.selectedSpecies : u,
+        };
+      }),
+      (h = (e, t) => c[e].coefficient * t),
+      (g = (e) => Object.fromEntries(s.map((t) => [t, h(t, e)]))),
+      (_ = (e) => {
+        let t = c[e].coefficient;
+        return { min: d.min * t, max: d.max * t, step: d.step * t };
+      }),
+      (v = (e, t) => t / c[e].coefficient));
+  }))();
+}
+export { v as a, o as c, g as i, a as l, s as n, y as o, _ as r, m as s, c as t };

@@ -1,615 +1,475 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  RH as parseMcpResourceMetadata,
-  wL as initializeUtilities,
+  E4 as t,
+  H4 as n,
+  R4 as r,
+  RH as i,
+  g4 as a,
+  q4 as o,
+  wL as s,
 } from "@rchunk/app-shared";
 import {
-  Brn as formatMcpServerName,
-  Drn as initializeMcpServerNames,
-  Ern as findMatchingApp,
-  F9t as parseGoogleWorkspaceStructuredContent,
-  I9t as initializeMcpResourceMetadata,
-  M9t as getGoogleWorkspaceToolName,
-  M_n as walkMarkdown,
-  N9t as initializeGoogleWorkspaceTools,
-  P9t as isGoogleWorkspaceToolCall,
-  P_n as initializeMarkdownParser,
-  Vrn as initializeAppMatching,
-  j9t as getGoogleWorkspaceActivity,
-  non as parseMarkdown,
-  ton as initializeMarkdownLinks,
+  Brn as c,
+  Drn as l,
+  Ern as u,
+  F9t as d,
+  I9t as f,
+  M9t as p,
+  M_n as m,
+  N9t as ee,
+  P9t as te,
+  P_n as h,
+  Vrn as ne,
+  j9t as re,
+  non as ie,
+  ton as g,
+  w$t as _,
 } from "@rchunk/app-initial";
-import { flattenConversationItems } from "../app-initial/runtime/flatten-conversation-items";
-
-const once = onceExport as (initializer: () => void) => () => void;
-
-export type ExternalResourceActivity =
-  "provided" | "read" | "created" | "updated";
-
-export interface ExternalResourceProvider {
-  id: string;
-  logoUrl: string | null;
-  logoUrlDark: string | null;
-  name: string;
-  pluginDisplayNames: string[];
+function v(e) {
+  return b(e)?.identity ?? null;
 }
-
-export interface ExternalResource extends Record<string, unknown> {
-  activities: ExternalResourceActivity[];
-  isSource: boolean;
-  key: string;
-  mimeType: string | null;
-  openInitiator: "markdown_link_click" | "mcp_app_resource";
-  provider: ExternalResourceProvider | null;
-  title: string;
-  url: string;
+function y(e) {
+  return b(e)?.getResourceKey(e) ?? null;
 }
-
-interface ResourceCandidate {
-  activities: ExternalResourceActivity[];
-  aliases: string[];
-  key: string;
-  mimeType: string | null;
-  openInitiator: ExternalResource["openInitiator"];
-  openInitiatorPriority: number;
-  provider: ExternalResourceProvider | null;
-  providerPriority: number;
-  title: string;
-  titlePriority: number;
-  url: string;
+function b(e) {
+  return T.find((t) => t.matches(e)) ?? null;
 }
-
-interface MergedResource extends Omit<
-  ResourceCandidate,
-  "activities" | "aliases"
-> {
-  activities: Set<ExternalResourceActivity>;
-  aliases: Set<string>;
-  activitiesByTurn: Map<number, Set<ExternalResourceActivity>>;
+function x(e) {
+  let t = e.pathname.match(/^\/(document|spreadsheets|presentation)\/d\/(?:e\/)?([^/]+)/u);
+  if (
+    [`docs.google.com`, `sheets.google.com`, `slides.google.com`].includes(e.hostname) &&
+    t != null
+  )
+    return `google:${t[1] === `spreadsheets` ? `spreadsheet` : t[1]}:${t[2]}`;
+  if (e.hostname !== `drive.google.com`) return null;
+  let n =
+    e.pathname.match(/^\/(?:file\/d|drive\/folders)\/([^/]+)/u)?.[1] ?? e.searchParams.get(`id`);
+  return n == null || n.length === 0 ? null : `google:drive:${n}`;
 }
-
-interface ConversationTurn {
-  items: unknown[];
-  params: { input?: unknown[] };
+function S(e) {
+  let t = Array.from(e.pathname.matchAll(/[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f-]{27}/giu)).at(-1)?.[0];
+  return t == null ? null : `notion:${t.replaceAll(`-`, ``).toLowerCase()}`;
 }
-
-interface McpToolCall {
-  appContext?: { appName?: string; connectorId: string } | null;
-  error?: unknown;
-  id?: string;
-  pluginId?: string;
-  result?: {
-    _meta?: unknown;
-    content?: Array<{ text?: string; type?: string }>;
-    structuredContent?: unknown;
-  } | null;
-  server: string;
-  status?: string;
-  tool: string;
-  type: string;
+function C(e) {
+  let t = e.pathname.match(/^\/([^/]+)\/(issue|project|document)\/([^/]+)/u);
+  return t == null ? null : `linear:${t[1]?.toLowerCase()}:${t[2]}:${t[3]?.toLowerCase()}`;
 }
-
-interface ProviderMatcher {
-  identity: { id: string; name: string };
-  matches(url: URL): boolean;
-  getResourceKey(url: URL): string | null;
+function w(e) {
+  let t = e.pathname.match(/^\/(?:board|design|file|make|proto|slides)\/([^/]+)/u);
+  return t?.[1] == null ? null : `figma:${t[1]}`;
 }
-
-const PROVIDER_MATCHERS: ProviderMatcher[] = [
-  {
-    identity: { id: "google-drive", name: "Google Drive" },
-    matches: (url) =>
-      [
-        "docs.google.com",
-        "drive.google.com",
-        "sheets.google.com",
-        "slides.google.com",
-      ].includes(url.hostname),
-    getResourceKey: (url) => {
-      const documentMatch = url.pathname.match(
-        /^\/(document|spreadsheets|presentation)\/d\/(?:e\/)?([^/]+)/u,
-      );
-      if (
-        ["docs.google.com", "sheets.google.com", "slides.google.com"].includes(
-          url.hostname,
-        ) &&
-        documentMatch != null
-      ) {
-        const kind =
-          documentMatch[1] === "spreadsheets"
-            ? "spreadsheet"
-            : documentMatch[1];
-        return `google:${kind}:${documentMatch[2]}`;
+var T;
+function E() {
+  return (E = e(() => {
+    T = [
+      {
+        identity: { id: `google-drive`, name: `Google Drive` },
+        matches: (e) =>
+          [
+            `docs.google.com`,
+            `drive.google.com`,
+            `sheets.google.com`,
+            `slides.google.com`,
+          ].includes(e.hostname),
+        getResourceKey: x,
+      },
+      {
+        identity: { id: `notion`, name: `Notion` },
+        matches: (e) =>
+          e.hostname === `notion.so` ||
+          e.hostname.endsWith(`.notion.so`) ||
+          e.hostname === `app.notion.com`,
+        getResourceKey: S,
+      },
+      {
+        identity: { id: `linear`, name: `Linear` },
+        matches: (e) => e.hostname === `linear.app`,
+        getResourceKey: C,
+      },
+      {
+        identity: { id: `figma`, name: `Figma` },
+        matches: (e) => e.hostname === `figma.com` || e.hostname.endsWith(`.figma.com`),
+        getResourceKey: w,
+      },
+      {
+        identity: { id: `github`, name: `GitHub` },
+        matches: (e) => e.hostname === `github.com` || e.hostname.endsWith(`.github.com`),
+        getResourceKey: () => null,
+      },
+    ];
+  }))();
+}
+function D(e) {
+  let t = ae(e);
+  if (t != null) return [t];
+  let n = O(e);
+  if (n != null) return [n];
+  let r = oe(e);
+  return r == null ? se(e) : [r];
+}
+function O(e) {
+  if (!k(e.tool).endsWith(`figma-create-new-file`)) return null;
+  for (let t of A(e))
+    try {
+      let e = P.safeParse(JSON.parse(t));
+      if (e.success) {
+        let t = e.data.message?.match(/^File\s+"(.+)"\s+created successfully\.?$/u)?.[1]?.trim();
+        return {
+          activity: `created`,
+          providerResourceId: e.data.file_key,
+          title: t || null,
+          url: e.data.file_url,
+        };
       }
-      if (url.hostname !== "drive.google.com") return null;
-      const id =
-        url.pathname.match(/^\/(?:file\/d|drive\/folders)\/([^/]+)/u)?.[1] ??
-        url.searchParams.get("id");
-      return id == null || id.length === 0 ? null : `google:drive:${id}`;
-    },
-  },
-  {
-    identity: { id: "notion", name: "Notion" },
-    matches: (url) =>
-      url.hostname === "notion.so" ||
-      url.hostname.endsWith(".notion.so") ||
-      url.hostname === "app.notion.com",
-    getResourceKey: (url) => {
-      const id = Array.from(
-        url.pathname.matchAll(/[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f-]{27}/giu),
-      ).at(-1)?.[0];
-      return id == null
-        ? null
-        : `notion:${id.replaceAll("-", "").toLowerCase()}`;
-    },
-  },
-  {
-    identity: { id: "linear", name: "Linear" },
-    matches: (url) => url.hostname === "linear.app",
-    getResourceKey: (url) => {
-      const match = url.pathname.match(
-        /^\/([^/]+)\/(issue|project|document)\/([^/]+)/u,
-      );
-      return match == null
-        ? null
-        : `linear:${match[1]?.toLowerCase()}:${match[2]}:${match[3]?.toLowerCase()}`;
-    },
-  },
-  {
-    identity: { id: "figma", name: "Figma" },
-    matches: (url) =>
-      url.hostname === "figma.com" || url.hostname.endsWith(".figma.com"),
-    getResourceKey: (url) => {
-      const key = url.pathname.match(
-        /^\/(?:board|design|file|make|proto|slides)\/([^/]+)/u,
-      )?.[1];
-      return key == null ? null : `figma:${key}`;
-    },
-  },
-  {
-    identity: { id: "github", name: "GitHub" },
-    matches: (url) =>
-      url.hostname === "github.com" || url.hostname.endsWith(".github.com"),
-    getResourceKey: () => null,
-  },
-];
-
-function parseHttpUrl(value: string): URL | null {
+    } catch {
+      continue;
+    }
+  return null;
+}
+function ae(e) {
+  if (!te(e)) return null;
+  let t = p(e.tool),
+    n = re(t);
+  if (n === `unknown` || t === `delete_file`) return null;
+  let r = d(e.result?.structuredContent),
+    i = r?.urls[0];
+  return r == null || i == null
+    ? null
+    : {
+        activity: n === `read` ? `read` : F.has(t) ? `created` : `updated`,
+        mimeType: r.mimeType ?? void 0,
+        title: r.title,
+        url: i,
+      };
+}
+function oe(e) {
+  if (k(e.tool) !== `notion-fetch`) return null;
+  for (let t of A(e))
+    try {
+      let e = M.safeParse(JSON.parse(t));
+      if (e.success) return { activity: `read`, title: e.data.title, url: e.data.url };
+    } catch {
+      continue;
+    }
+  return null;
+}
+function se(e) {
+  if (!k(e.tool).endsWith(`notion-create-pages`)) return [];
+  for (let t of A(e))
+    try {
+      let e = N.safeParse(JSON.parse(t));
+      if (e.success)
+        return e.data.pages.map((e) => ({
+          activity: `created`,
+          providerResourceId: e.id,
+          title: e.properties.title,
+          url: e.url,
+        }));
+    } catch {
+      continue;
+    }
+  return [];
+}
+function k(e) {
+  return e
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/gu, `-`);
+}
+function A(e) {
+  return (e.result?.content ?? []).flatMap((e) => {
+    let t = j.safeParse(e);
+    return t.success ? [t.data.text] : [];
+  });
+}
+var j, M, N, P, F;
+function I() {
+  return (I = e(() => {
+    (a(),
+      f(),
+      ee(),
+      (j = n({ type: r(`text`), text: o() }).loose()),
+      (M = n({ metadata: n({ type: r(`page`) }).loose(), title: o(), url: o() }).loose()),
+      (N = n({
+        pages: t(n({ id: o(), url: o(), properties: n({ title: o() }).loose() }).loose()),
+      }).loose()),
+      (P = n({ file_key: o(), file_url: o(), message: o().optional() }).loose()),
+      (F = new Set([
+        `copy_file`,
+        `create_file`,
+        `create_folder`,
+        `create_presentation_from_template`,
+        `duplicate_sheet_in_new_spreadsheet`,
+        `import_document`,
+        `import_presentation`,
+        `import_spreadsheet`,
+      ])));
+  }))();
+}
+function L(e, t = [], n = !1, r) {
+  let a = [],
+    o = (e, t) => {
+      let n = a.filter((t) => e.aliases.some((e) => t.aliases.has(e))),
+        r = n[0];
+      if (r == null) {
+        a.push({
+          key: e.key,
+          aliases: new Set(e.aliases),
+          url: e.url,
+          title: e.title,
+          titlePriority: e.titlePriority,
+          mimeType: e.mimeType,
+          activities: new Set(e.activities),
+          activitiesByTurn: new Map([[t, new Set(e.activities)]]),
+          provider: e.provider,
+          providerPriority: e.providerPriority,
+          openInitiator: e.openInitiator,
+          openInitiatorPriority: e.openInitiatorPriority,
+        });
+        return;
+      }
+      for (let e of n.slice(1)) {
+        for (let t of e.aliases) r.aliases.add(t);
+        for (let t of e.activities) r.activities.add(t);
+        (ce(r, e), W(r, e), a.splice(a.indexOf(e), 1));
+      }
+      for (let t of e.aliases) r.aliases.add(t);
+      for (let t of e.activities) r.activities.add(t);
+      (G(r, t, e.activities), W(r, e));
+    };
+  for (let a = e.length - 1; a >= 0; --a) {
+    let s = e[a],
+      c = (e) => {
+        o(e, a);
+      },
+      l = _(s.items);
+    for (let e = l.length - 1; e >= 0; --e) {
+      let a = l[e];
+      if (a.type === `userMessage`) V(a.content, c, n, r);
+      else if (a.type === `steeringUserMessage`) V(a.input, c, n, r);
+      else if (
+        a.type === `webSearch` &&
+        (a.action?.type === `openPage` || a.action?.type === `findInPage`) &&
+        a.action.url != null
+      ) {
+        let e = q({ activities: [`read`], url: a.action.url });
+        e != null && c(e);
+      } else if (
+        a.type === `mcpToolCall` &&
+        a.status === `completed` &&
+        a.error == null &&
+        a.result != null
+      ) {
+        let e = a.result._meta == null ? null : i(a.result._meta);
+        if (e == null || e.status === `absent`) {
+          let e = D(a);
+          if (e.length === 0) continue;
+          let n = X(a, t);
+          for (let t of e) {
+            let e = q({
+              activities: [t.activity],
+              mimeType: t.mimeType,
+              provider: n,
+              providerResourceId: t.providerResourceId,
+              providerScope: a.pluginId ?? n.id,
+              title: t.title,
+              titlePriority: 2,
+              url: t.url,
+            });
+            e != null && c(e);
+          }
+          continue;
+        }
+        if (e.status === `invalid` || e.resources.length === 0) continue;
+        let n = X(a, t);
+        for (let t of e.resources) {
+          let e = q({
+            activities: t.activities,
+            mimeType: t.mimeType,
+            provider: n,
+            providerResourceId: t.id,
+            providerScope: a.pluginId ?? n.id,
+            title: t.title,
+            titlePriority: 2,
+            url: t.url,
+          });
+          e != null && c(e);
+        }
+      }
+    }
+    V(s.params.input, c, n, r);
+  }
+  return a.map((e) => ({
+    key: e.key,
+    url: e.url,
+    title: e.title,
+    mimeType: e.mimeType,
+    activities: Z.filter((t) => e.activities.has(t)),
+    isSource: K(e),
+    provider: e.provider,
+    openInitiator: e.openInitiator,
+  }));
+}
+function R(e) {
+  return e.isSource;
+}
+function z(e) {
+  return e.activities.includes(`created`) || e.activities.includes(`updated`);
+}
+function B(e) {
+  let t = J(e);
+  return t == null ? null : (y(t) ?? `url:${Y(t)}`);
+}
+function V(e, t, n, r) {
+  for (let i of e) {
+    if (i.type !== `text`) continue;
+    let e = r?.get(i);
+    e ?? ((e = H(i.text)), r?.set(i, e));
+    for (let r of e) {
+      let e = q({
+        activities: [`provided`],
+        title: r.label,
+        titlePriority: r.label == null ? 0 : 1,
+        url: r.url,
+        includePages: n,
+      });
+      e != null && t(e);
+    }
+  }
+}
+function H(e) {
+  if (!Q.test(e)) return [];
+  let t = [];
+  return (
+    m(ie(e, void 0), (e) => {
+      if (!U(e)) return;
+      let n = e.text.trim();
+      t.push({ label: n.length === 0 || n === e.href ? null : n, url: e.href });
+    }),
+    t
+  );
+}
+function U(e) {
+  return e.type === `link`;
+}
+function W(e, t) {
+  (t.titlePriority > e.titlePriority && ((e.title = t.title), (e.titlePriority = t.titlePriority)),
+    e.mimeType == null && t.mimeType != null && (e.mimeType = t.mimeType),
+    t.providerPriority > e.providerPriority &&
+      ((e.provider = t.provider), (e.providerPriority = t.providerPriority)),
+    t.openInitiatorPriority > e.openInitiatorPriority &&
+      ((e.openInitiator = t.openInitiator), (e.openInitiatorPriority = t.openInitiatorPriority)));
+}
+function G(e, t, n) {
+  let r = e.activitiesByTurn.get(t) ?? new Set();
+  for (let e of n) r.add(e);
+  e.activitiesByTurn.set(t, r);
+}
+function ce(e, t) {
+  for (let [n, r] of t.activitiesByTurn) G(e, n, r);
+}
+function K(e) {
+  for (let t of e.activitiesByTurn.values())
+    if (t.has(`provided`) || (t.has(`read`) && !t.has(`created`))) return !0;
+  return !1;
+}
+function q({
+  activities: e,
+  mimeType: t,
+  provider: n = null,
+  providerResourceId: r,
+  providerScope: i,
+  title: a,
+  titlePriority: o = 0,
+  url: s,
+  includePages: c = !1,
+}) {
+  let l = J(s);
+  if (l == null) return null;
+  let u = `url:${Y(l)}`,
+    d = y(l) ?? (r == null || i == null ? u : `provider:${i}:${r}`),
+    f = [d, u];
+  r != null && i != null && d !== `provider:${i}:${r}` && f.push(`provider:${i}:${r}`);
+  let p = n ?? ue(l),
+    m = a?.trim();
+  return {
+    key: d,
+    aliases: f,
+    url: l.href,
+    title: m || le(l),
+    titlePriority: m == null || m.length === 0 ? 0 : o,
+    mimeType: t?.trim() || null,
+    activities: e,
+    provider: p,
+    providerPriority: n == null ? (p == null ? 0 : 1) : 2,
+    openInitiator: n == null ? `markdown_link_click` : `mcp_app_resource`,
+    openInitiatorPriority: n == null ? 1 : 2,
+  };
+}
+function J(e) {
   try {
-    const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:"
-      ? url.username === "" && url.password === ""
-        ? url
-        : null
-      : null;
+    let t = new URL(e);
+    return (t.protocol !== `http:` && t.protocol !== `https:`) ||
+      t.username !== `` ||
+      t.password !== ``
+      ? null
+      : t;
   } catch {
     return null;
   }
 }
-
-function normalizeUrl(url: URL): string {
-  const normalized = new URL(url);
-  normalized.hash = "";
-  if (normalized.pathname.length > 1) {
-    normalized.pathname = normalized.pathname.replace(/\/$/u, "");
-  }
-  return normalized.href;
+function Y(e) {
+  let t = new URL(e);
+  return (
+    (t.hash = ``),
+    t.pathname.length > 1 && (t.pathname = t.pathname.replace(/\/$/u, ``)),
+    t.href
+  );
 }
-
-function getProviderMatcher(url: URL): ProviderMatcher | null {
-  return PROVIDER_MATCHERS.find((matcher) => matcher.matches(url)) ?? null;
+function le(e) {
+  return `${e.host.replace(/^www\./u, ``)}${e.pathname === `/` ? `` : e.pathname}`;
 }
-
-function getProviderIdentity(url: URL): ExternalResourceProvider | null {
-  const identity = getProviderMatcher(url)?.identity;
-  return identity == null
-    ? null
-    : { ...identity, pluginDisplayNames: [], logoUrl: null, logoUrlDark: null };
+function ue(e) {
+  let t = v(e);
+  return t == null ? null : { ...t, pluginDisplayNames: [], logoUrl: null, logoUrlDark: null };
 }
-
-function getUrlResourceKey(url: URL): string | null {
-  return getProviderMatcher(url)?.getResourceKey(url) ?? null;
-}
-
-function getExternalResourceKey(value: string): string | null {
-  const url = parseHttpUrl(value);
-  return url == null
-    ? null
-    : (getUrlResourceKey(url) ?? `url:${normalizeUrl(url)}`);
-}
-
-function titleFromUrl(url: URL): string {
-  return `${url.host.replace(/^www\./u, "")}${url.pathname === "/" ? "" : url.pathname}`;
-}
-
-function buildCandidate({
-  activities,
-  mimeType,
-  provider = null,
-  providerResourceId,
-  providerScope,
-  title,
-  titlePriority = 0,
-  url: value,
-}: {
-  activities: ExternalResourceActivity[];
-  mimeType?: string | null;
-  provider?: ExternalResourceProvider | null;
-  providerResourceId?: string;
-  providerScope?: string;
-  title?: string | null;
-  titlePriority?: number;
-  url: string;
-}): ResourceCandidate | null {
-  const url = parseHttpUrl(value);
-  if (url == null) return null;
-  const normalizedKey = `url:${normalizeUrl(url)}`;
-  const canonicalKey =
-    getUrlResourceKey(url) ??
-    (providerResourceId == null || providerScope == null
-      ? normalizedKey
-      : `provider:${providerScope}:${providerResourceId}`);
-  const aliases = [canonicalKey, normalizedKey];
-  const providerKey =
-    providerResourceId == null || providerScope == null
-      ? null
-      : `provider:${providerScope}:${providerResourceId}`;
-  if (providerKey != null && canonicalKey !== providerKey)
-    aliases.push(providerKey);
-  const resolvedProvider = provider ?? getProviderIdentity(url);
-  const trimmedTitle = title?.trim();
-  return {
-    activities,
-    aliases,
-    key: canonicalKey,
-    mimeType: mimeType?.trim() || null,
-    openInitiator:
-      provider == null ? "markdown_link_click" : "mcp_app_resource",
-    openInitiatorPriority: provider == null ? 1 : 2,
-    provider: resolvedProvider,
-    providerPriority: provider == null ? (resolvedProvider == null ? 0 : 1) : 2,
-    title: trimmedTitle || titleFromUrl(url),
-    titlePriority:
-      trimmedTitle == null || trimmedTitle.length === 0 ? 0 : titlePriority,
-    url: url.href,
-  };
-}
-
-function extractMarkdownLinks(
-  text: string,
-): Array<{ label: string | null; url: string }> {
-  const links: Array<{ label: string | null; url: string }> = [];
-  const markdownPattern = /\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/giu;
-  const seenRanges: Array<[number, number]> = [];
-  for (const match of text.matchAll(markdownPattern)) {
-    const label = match[1]?.trim();
-    links.push({
-      label: label === "" || label === match[2] ? null : (label ?? null),
-      url: match[2],
-    });
-    seenRanges.push([match.index, match.index + match[0].length]);
-  }
-  for (const match of text.matchAll(/https?:\/\/[^\s<>)\]]+/giu)) {
-    if (
-      seenRanges.some(
-        ([start, end]) => match.index >= start && match.index < end,
-      )
-    )
-      continue;
-    links.push({ label: null, url: match[0] });
-  }
-  return links;
-}
-
-function collectTextResources(
-  content: unknown,
-  includePages: boolean,
-  labelCache?: WeakMap<object, unknown>,
-): ResourceCandidate[] {
-  if (!Array.isArray(content)) return [];
-  const resources: ResourceCandidate[] = [];
-  for (const item of content) {
-    if (
-      typeof item !== "object" ||
-      item == null ||
-      (item as { type?: string }).type !== "text"
-    ) {
-      continue;
-    }
-    const textItem = item as { text: string };
-    let links = labelCache?.get(item) as
-      ReturnType<typeof extractMarkdownLinks> | undefined;
-    if (links == null) {
-      links = extractMarkdownLinks(textItem.text);
-      labelCache?.set(item, links);
-    }
-    for (const link of links) {
-      const candidate = buildCandidate({
-        activities: ["provided"],
-        title: link.label,
-        titlePriority: link.label == null ? 0 : 1,
-        url: link.url,
-      });
-      if (
-        candidate != null &&
-        (includePages || !candidate.url.startsWith("page://"))
-      ) {
-        resources.push(candidate);
-      }
-    }
-  }
-  return resources;
-}
-
-function getProviderForToolCall(
-  call: McpToolCall,
-  apps: unknown[],
-): ExternalResourceProvider {
-  const matchingApp = findMatchingApp({
-    appContext: call.appContext,
-    apps,
-    functionName: `${call.server}__${call.tool}`,
-    serverName: call.server,
-    toolName: call.tool,
-  }) as unknown as ExternalResourceProvider | null;
-  return matchingApp == null
+function X(e, t) {
+  let n = u({
+    appContext: e.appContext,
+    apps: t,
+    functionName: `${e.server}__${e.tool}`,
+    serverName: e.server,
+    toolName: e.tool,
+  });
+  return n == null
     ? {
-        id:
-          call.appContext?.connectorId ??
-          call.pluginId ??
-          `mcp-server:${call.server}`,
-        name:
-          call.appContext?.appName ??
-          call.appContext?.connectorId ??
-          formatMcpServerName(call.server),
+        id: e.appContext?.connectorId ?? e.pluginId ?? `mcp-server:${e.server}`,
+        name: e.appContext?.appName ?? e.appContext?.connectorId ?? c(e.server),
         pluginDisplayNames: [],
         logoUrl: null,
         logoUrlDark: null,
       }
     : {
-        id: matchingApp.id,
-        name: matchingApp.name,
-        pluginDisplayNames: matchingApp.pluginDisplayNames ?? [],
-        logoUrl: matchingApp.logoUrl,
-        logoUrlDark: matchingApp.logoUrlDark,
+        id: n.id,
+        name: n.name,
+        pluginDisplayNames: n.pluginDisplayNames ?? [],
+        logoUrl: n.logoUrl,
+        logoUrlDark: n.logoUrlDark,
       };
 }
-
-function getToolCallCandidates(
-  call: McpToolCall,
-  apps: unknown[],
-): ResourceCandidate[] {
-  const provider = getProviderForToolCall(call, apps);
-  const metadata =
-    call.result?._meta == null
-      ? null
-      : parseMcpResourceMetadata(call.result._meta);
-  if (
-    metadata != null &&
-    typeof metadata === "object" &&
-    (metadata as { status?: string }).status !== "absent"
-  ) {
-    const parsed = metadata as {
-      resources?: Array<{
-        activities: ExternalResourceActivity[];
-        id?: string;
-        mimeType?: string;
-        title?: string;
-        url: string;
-      }>;
-      status?: string;
-    };
-    if (parsed.status === "invalid") return [];
-    return (parsed.resources ?? []).flatMap((resource) => {
-      const candidate = buildCandidate({
-        activities: resource.activities,
-        mimeType: resource.mimeType,
-        provider,
-        providerResourceId: resource.id,
-        providerScope: call.pluginId ?? provider.id,
-        title: resource.title,
-        titlePriority: 2,
-        url: resource.url,
-      });
-      return candidate == null ? [] : [candidate];
-    });
-  }
-
-  if (isGoogleWorkspaceToolCall(call as unknown as Record<string, unknown>)) {
-    const toolName = getGoogleWorkspaceToolName(call.tool);
-    const activity = getGoogleWorkspaceActivity(toolName);
-    const resource = parseGoogleWorkspaceStructuredContent(
-      call.result?.structuredContent,
-    ) as { mimeType?: string; title?: string; urls?: string[] } | null;
-    if (
-      resource == null ||
-      resource.urls?.[0] == null ||
-      activity === "unknown"
-    )
-      return [];
-    const candidate = buildCandidate({
-      activities: [activity === "read" ? "read" : "updated"],
-      mimeType: resource.mimeType,
-      provider,
-      title: resource.title,
-      titlePriority: 2,
-      url: resource.urls[0],
-    });
-    return candidate == null ? [] : [candidate];
-  }
-  return [];
+var Z, Q;
+function $() {
+  return ($ = e(() => {
+    (h(),
+      s(),
+      ne(),
+      l(),
+      g(),
+      E(),
+      I(),
+      (Z = [`provided`, `read`, `created`, `updated`]),
+      (Q = /h\t*t\t*t\t*p|www\.|page:\/\//iu));
+  }))();
 }
-
-function mergeCandidate(
-  target: MergedResource,
-  candidate: ResourceCandidate,
-  turnIndex: number,
-): void {
-  for (const alias of candidate.aliases) target.aliases.add(alias);
-  for (const activity of candidate.activities) target.activities.add(activity);
-  const turnActivities = target.activitiesByTurn.get(turnIndex) ?? new Set();
-  for (const activity of candidate.activities) turnActivities.add(activity);
-  target.activitiesByTurn.set(turnIndex, turnActivities);
-  if (candidate.titlePriority > target.titlePriority) {
-    target.title = candidate.title;
-    target.titlePriority = candidate.titlePriority;
-  }
-  if (target.mimeType == null && candidate.mimeType != null)
-    target.mimeType = candidate.mimeType;
-  if (candidate.providerPriority > target.providerPriority) {
-    target.provider = candidate.provider;
-    target.providerPriority = candidate.providerPriority;
-  }
-  if (candidate.openInitiatorPriority > target.openInitiatorPriority) {
-    target.openInitiator = candidate.openInitiator;
-    target.openInitiatorPriority = candidate.openInitiatorPriority;
-  }
-}
-
-function collectExternalResources(
-  turns: ConversationTurn[],
-  apps: unknown[] = [],
-  includePages = false,
-  labelCache?: WeakMap<object, unknown>,
-): ExternalResource[] {
-  const merged: MergedResource[] = [];
-  const addCandidate = (candidate: ResourceCandidate, turnIndex: number) => {
-    const matches = merged.filter((resource) =>
-      candidate.aliases.some((alias) => resource.aliases.has(alias)),
-    );
-    let target = matches[0];
-    if (target == null) {
-      target = {
-        ...candidate,
-        aliases: new Set(candidate.aliases),
-        activities: new Set(candidate.activities),
-        activitiesByTurn: new Map([[turnIndex, new Set(candidate.activities)]]),
-      };
-      merged.push(target);
-      return;
-    }
-    mergeCandidate(target, candidate, turnIndex);
-    for (const duplicate of matches.slice(1)) {
-      mergeCandidate(
-        target,
-        {
-          ...duplicate,
-          aliases: [...duplicate.aliases],
-          activities: [...duplicate.activities],
-        },
-        turnIndex,
-      );
-      merged.splice(merged.indexOf(duplicate), 1);
-    }
-  };
-
-  for (let turnIndex = turns.length - 1; turnIndex >= 0; turnIndex -= 1) {
-    const turn = turns[turnIndex];
-    const items = flattenConversationItems(turn.items) as Array<
-      Record<string, unknown>
-    >;
-    for (let itemIndex = items.length - 1; itemIndex >= 0; itemIndex -= 1) {
-      const item = items[itemIndex];
-      if (item.type === "userMessage") {
-        for (const candidate of collectTextResources(
-          item.content,
-          includePages,
-          labelCache,
-        )) {
-          addCandidate(candidate, turnIndex);
-        }
-      } else if (item.type === "steeringUserMessage") {
-        for (const candidate of collectTextResources(
-          item.input,
-          includePages,
-          labelCache,
-        )) {
-          addCandidate(candidate, turnIndex);
-        }
-      } else if (
-        item.type === "webSearch" &&
-        ((item.action as { type?: string } | null)?.type === "openPage" ||
-          (item.action as { type?: string } | null)?.type === "findInPage")
-      ) {
-        const url = (item.action as { url?: string }).url;
-        if (url != null) {
-          const candidate = buildCandidate({ activities: ["read"], url });
-          if (candidate != null) addCandidate(candidate, turnIndex);
-        }
-      } else if (
-        item.type === "mcpToolCall" &&
-        item.status === "completed" &&
-        item.error == null &&
-        item.result != null
-      ) {
-        for (const candidate of getToolCallCandidates(
-          item as unknown as McpToolCall,
-          apps,
-        )) {
-          addCandidate(candidate, turnIndex);
-        }
-      }
-    }
-    for (const candidate of collectTextResources(
-      turn.params.input,
-      includePages,
-      labelCache,
-    )) {
-      addCandidate(candidate, turnIndex);
-    }
-  }
-
-  const activityOrder: ExternalResourceActivity[] = [
-    "provided",
-    "read",
-    "created",
-    "updated",
-  ];
-  return merged.map((resource) => ({
-    key: resource.key,
-    url: resource.url,
-    title: resource.title,
-    mimeType: resource.mimeType,
-    activities: activityOrder.filter((activity) =>
-      resource.activities.has(activity),
-    ),
-    isSource: Array.from(resource.activitiesByTurn.values()).some(
-      (activities) =>
-        activities.has("provided") ||
-        (activities.has("read") && !activities.has("created")),
-    ),
-    provider: resource.provider,
-    openInitiator: resource.openInitiator,
-  }));
-}
-
-function isExternalSource(resource: ExternalResource): boolean {
-  return resource.isSource;
-}
-
-function isWrittenExternalResource(resource: ExternalResource): boolean {
-  return (
-    resource.activities.includes("created") ||
-    resource.activities.includes("updated")
-  );
-}
-
-const initializeLocalConversationExternalResources = once((): void => {
-  initializeMarkdownParser();
-  initializeUtilities();
-  initializeAppMatching();
-  initializeMcpServerNames();
-  initializeMarkdownLinks();
-  initializeMcpResourceMetadata();
-  initializeGoogleWorkspaceTools();
-  void parseMarkdown;
-  void walkMarkdown;
-});
-
-export {
-  isExternalSource as a,
-  isWrittenExternalResource as i,
-  collectExternalResources as n,
-  initializeLocalConversationExternalResources as r,
-  getExternalResourceKey as t,
-};
+export { R as a, z as i, L as n, $ as r, B as t };

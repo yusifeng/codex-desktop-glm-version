@@ -1,53 +1,53 @@
-// Hardy-Weinberg-equilibrium learning model.
-import "@rchunk/rolldown-runtime";
-
-type Genotype = "AA" | "Aa" | "aa";
-interface HardyWeinbergValues { allele_frequency_p?: number | null }
-
-const hardyWeinbergType = "HARDY_WEINBERG_EQUILIBRIUM";
-const hardyWeinbergThumbnail = "hardy-weinberg-equilibrium-v2";
-const hardyWeinbergFormula = "p^2 + 2pq + q^2 = 1";
-const hardyWeinbergParameters = { allele_frequency_p: { kind: "number", defaultValue: 0.5, min: 0, max: 1 } };
-const hardyWeinbergDefinition = { type: hardyWeinbergType, version: 2, thumbnailAssetKey: hardyWeinbergThumbnail, canonicalFormula: hardyWeinbergFormula, parameters: hardyWeinbergParameters };
-const alleleFrequencyParameter = hardyWeinbergDefinition.parameters.allele_frequency_p;
-const alleleFrequencyControl = { defaultValue: alleleFrequencyParameter.defaultValue, min: alleleFrequencyParameter.min, max: alleleFrequencyParameter.max, step: 0.01 };
-
-function normalizeHardyWeinbergValues(values: HardyWeinbergValues) {
-  const frequency = values.allele_frequency_p;
-  return {
-    allele_frequency_p: Number.isFinite(frequency)
-      ? Math.min(alleleFrequencyControl.max, Math.max(alleleFrequencyControl.min, frequency ?? alleleFrequencyParameter.defaultValue))
-      : alleleFrequencyParameter.defaultValue,
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `HARDY_WEINBERG_EQUILIBRIUM`),
+      (n = `hardy-weinberg-equilibrium-v2`),
+      (r = `p^2 + 2pq + q^2 = 1`),
+      (i = { allele_frequency_p: { kind: `number`, defaultValue: 0.5, min: 0, max: 1 } }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-
-function calculateHardyWeinbergEquilibrium(values: HardyWeinbergValues) {
-  const normalized = normalizeHardyWeinbergValues(values);
-  const p = normalized.allele_frequency_p;
-  const q = 1 - p;
-  const pq = p * q;
-  const aaDominant = p * p;
-  const heterozygous = 2 * pq;
-  const aaRecessive = q * q;
-  return { ...normalized, q, aaDominant, heterozygous, aaRecessive, pq, total: aaDominant + heterozygous + aaRecessive };
+var s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    (o(),
+      (s = a.parameters.allele_frequency_p),
+      (c = { defaultValue: s.defaultValue, min: s.min, max: s.max, step: 0.01 }),
+      (l = (e) => {
+        let t = e.allele_frequency_p;
+        return {
+          allele_frequency_p: Number.isFinite(t)
+            ? Math.min(c.max, Math.max(c.min, t ?? s.defaultValue))
+            : s.defaultValue,
+        };
+      }),
+      (u = (e) => {
+        let t = l(e),
+          n = t.allele_frequency_p,
+          r = 1 - n,
+          i = n * r,
+          a = n * n,
+          o = 2 * i,
+          s = r * r;
+        return {
+          ...t,
+          q: r,
+          aaDominant: a,
+          heterozygous: o,
+          aaRecessive: s,
+          pq: i,
+          total: a + o + s,
+        };
+      }),
+      (d = (e) =>
+        Array.from({ length: 101 }, (t, n) => {
+          let r = n / 100,
+            i = 1 - r;
+          return { x: r, y: e === `AA` ? r * r : e === `Aa` ? 2 * r * i : i * i };
+        })));
+  }))();
 }
-
-const buildGenotypeFrequencySeries = (genotype: Genotype) =>
-  Array.from({ length: 101 }, (_unused, index) => {
-    const p = index / 100;
-    const q = 1 - p;
-    return { x: p, y: genotype === "AA" ? p * p : genotype === "Aa" ? 2 * p * q : q * q };
-  });
-
-function initializeHardyWeinbergSchema(): void {}
-function initializeHardyWeinbergModel(): void {}
-
-export {
-  normalizeHardyWeinbergValues as a,
-  initializeHardyWeinbergModel as i,
-  calculateHardyWeinbergEquilibrium as n,
-  initializeHardyWeinbergSchema as o,
-  buildGenotypeFrequencySeries as r,
-  hardyWeinbergDefinition as s,
-  alleleFrequencyControl as t,
-};
+export { l as a, f as i, u as n, o, d as r, a as s, c as t };

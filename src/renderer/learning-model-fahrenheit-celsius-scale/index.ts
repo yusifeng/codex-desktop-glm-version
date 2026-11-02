@@ -1,33 +1,13 @@
-// Fahrenheit/Celsius conversion metadata. Release chunk: type-7ff60fd7b3ba.js.
-import "@rchunk/rolldown-runtime";
-
-interface FahrenheitCelsiusSpecification {
-  type: "FAHRENHEIT_CELSIUS_SCALE";
-  version: 1;
-  thumbnailAssetKey: "fahrenheit-celsius-scale-v1";
-  canonicalFormula: "F = \\frac{9}{5}C + 32";
-  parameters: {
-    celsius: { kind: "number"; defaultValue: 0; min: -40; max: 120 };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `FAHRENHEIT_CELSIUS_SCALE`),
+      (n = `fahrenheit-celsius-scale-v1`),
+      (r = `F = \\frac{9}{5}C + 32`),
+      (i = { celsius: { kind: `number`, defaultValue: 0, min: -40, max: 120 } }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-
-let fahrenheitCelsiusSpecification: FahrenheitCelsiusSpecification;
-let initialized = false;
-function initializeFahrenheitCelsiusSpecification(): void {
-  if (initialized) return;
-  initialized = true;
-  fahrenheitCelsiusSpecification = {
-    type: "FAHRENHEIT_CELSIUS_SCALE",
-    version: 1,
-    thumbnailAssetKey: "fahrenheit-celsius-scale-v1",
-    canonicalFormula: "F = \\frac{9}{5}C + 32",
-    parameters: {
-      celsius: { kind: "number", defaultValue: 0, min: -40, max: 120 },
-    },
-  };
-}
-
-export {
-  fahrenheitCelsiusSpecification as n,
-  initializeFahrenheitCelsiusSpecification as t,
-};
+export { a as n, o as t };

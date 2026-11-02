@@ -1,66 +1,62 @@
-// Light-dismiss shake feedback hook. Release chunk: comment-light-dismiss-4ad7bc38388a.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-
-interface StyleTarget {
-  style: { animation: string; removeProperty(name: string): void };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, e6 as n } from "@rchunk/app-shared";
+function r(e, t) {
+  let n = (0, i.c)(13),
+    r = t ?? (typeof window > `u` ? void 0 : window),
+    o = (0, a.useRef)(null),
+    s;
+  n[0] !== r || n[1] !== e
+    ? ((s = () => {
+        (o.current != null && (r?.cancelAnimationFrame(o.current), (o.current = null)),
+          e.current?.style.removeProperty(`animation`));
+      }),
+      (n[0] = r),
+      (n[1] = e),
+      (n[2] = s))
+    : (s = n[2]);
+  let c = s,
+    l;
+  n[3] !== r || n[4] !== e || n[5] !== c
+    ? ((l = () => {
+        (c(),
+          r != null &&
+            e.current != null &&
+            (o.current = r.requestAnimationFrame(() => {
+              ((o.current = null),
+                e.current != null && (e.current.style.animation = `shake 900ms linear both`));
+            })));
+      }),
+      (n[3] = r),
+      (n[4] = e),
+      (n[5] = c),
+      (n[6] = l))
+    : (l = n[6]);
+  let u = l,
+    d,
+    f;
+  (n[7] === c
+    ? ((d = n[8]), (f = n[9]))
+    : ((d = () => c), (f = [c]), (n[7] = c), (n[8] = d), (n[9] = f)),
+    (0, a.useEffect)(d, f));
+  let p;
+  return (
+    n[10] !== u || n[11] !== c
+      ? ((p = { shake: u, stopShake: c }), (n[10] = u), (n[11] = c), (n[12] = p))
+      : (p = n[12]),
+    p
+  );
 }
-interface MutableRef<T> {
-  current: T;
+var i, a;
+function o() {
+  return (o = e(() => {
+    ((i = t()), (a = n()));
+  }))();
 }
-interface FrameWindow {
-  requestAnimationFrame(callback: () => void): number;
-  cancelAnimationFrame(handle: number): void;
+function s({ isLightDismissible: e, isLightDismissArmed: t }) {
+  return e || t ? `dismiss` : `shake`;
 }
-interface ReactRuntime {
-  useRef<T>(initial: T): MutableRef<T>;
-  useEffect(effect: () => void | (() => void), dependencies: unknown[]): void;
+function c() {
+  return (c = e(() => {}))();
 }
-let React: ReactRuntime;
-function useShakeFeedback(
-  target: MutableRef<StyleTarget | null>,
-  frameWindow: FrameWindow | undefined = typeof window === "undefined"
-    ? undefined
-    : window,
-) {
-  const frame = React.useRef<number | null>(null);
-  const stopShake = () => {
-    if (frame.current != null) {
-      frameWindow?.cancelAnimationFrame(frame.current);
-      frame.current = null;
-    }
-    target.current?.style.removeProperty("animation");
-  };
-  const shake = () => {
-    stopShake();
-    if (frameWindow && target.current) {
-      frame.current = frameWindow.requestAnimationFrame(() => {
-        frame.current = null;
-        if (target.current)
-          target.current.style.animation = "shake 900ms linear both";
-      });
-    }
-  };
-  React.useEffect(() => stopShake, [stopShake]);
-  return { shake, stopShake };
-}
-function initializeShakeFeedback(): void {
-  React = (appSharedChunk as unknown as { e6(): ReactRuntime }).e6();
-}
-function lightDismissAction({
-  isLightDismissible,
-  isLightDismissArmed,
-}: {
-  isLightDismissible: boolean;
-  isLightDismissArmed: boolean;
-}): "dismiss" | "shake" {
-  return isLightDismissible || isLightDismissArmed ? "dismiss" : "shake";
-}
-function initializeLightDismissAction(): void {}
-
-export {
-  useShakeFeedback as i,
-  initializeLightDismissAction as n,
-  initializeShakeFeedback as r,
-  lightDismissAction as t,
-};
+export { r as i, c as n, o as r, s as t };

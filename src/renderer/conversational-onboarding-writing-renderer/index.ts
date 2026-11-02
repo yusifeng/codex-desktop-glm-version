@@ -1,196 +1,192 @@
-// Conversational onboarding writing tabs. Release chunk: renderer-d200041fe18f.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as tabsChunk from "@rchunk/tabs";
-import * as writingBlockChunk from "@rchunk/quick-chat-writing-block-adapter";
-
-interface JsxRuntime {
-  Fragment: unknown;
-  jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown;
-  jsxs(type: unknown, props: Record<string, unknown>): unknown;
-}
-interface ReactRuntime {
-  useId(): string;
-  useState<Value>(initial: Value): [Value, (value: Value) => void];
-}
-interface SharedRuntime {
-  $3(): unknown;
-  I3(): JsxRuntime;
-  e6(): ReactRuntime;
-}
-interface InitialRuntime {
-  XW: unknown;
-  ZW(): void;
-}
-interface TabsRuntime {
-  n(): void;
-  t: unknown;
-}
-interface WritingRuntime {
-  r(): void;
-  t: unknown;
-}
-type TabKey = "translation" | "professional_email" | "birthday_message";
-interface WritingContent {
-  id: string;
-  content: string;
-}
-interface WritingState {
-  tab: TabKey;
-  ask_me_label: string;
-  translation_tab_label: string;
-  translation_question: string;
-  email_tab_label: string;
-  email_question: string;
-  message_tab_label: string;
-  message_question: string;
-  translation: {
-    source_text: string;
-    translated_text: string;
-    source_language: string;
-    target_language: string;
-  };
-  email: WritingContent & { subject: string };
-  message: WritingContent;
-}
-interface Props {
-  state: WritingState;
-  sourceMessageId: string;
-  turnContext: unknown;
-}
-
-const sharedRuntime = appSharedChunk as unknown as SharedRuntime;
-const initialRuntime = appInitialChunk as unknown as InitialRuntime;
-const tabsRuntime = tabsChunk as unknown as TabsRuntime;
-const writingRuntime = writingBlockChunk as unknown as WritingRuntime;
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-const tabs = [
-  {
-    key: "translation",
-    label: "translation_tab_label",
-    question: "translation_question",
-  },
-  {
-    key: "professional_email",
-    label: "email_tab_label",
-    question: "email_question",
-  },
-  {
-    key: "birthday_message",
-    label: "message_tab_label",
-    question: "message_question",
-  },
-] as const;
-
-function ConversationalOnboardingWriting({
-  state,
-  sourceMessageId,
-  turnContext,
-}: Props): unknown {
-  const [selectedKey, setSelectedKey] = React.useState<TabKey>(state.tab);
-  const id = React.useId();
-  const selected = tabs.find((tab) => tab.key === selectedKey) ?? tabs[0];
-  const panelId = `${id}-${selected.key}`;
-  const isEmail = selectedKey === "professional_email";
-  const content = isEmail ? state.email : state.message;
-  const tabItems = tabs.map((tab) => ({
-    key: tab.key,
-    name: state[tab.label],
-    panelId: `${id}-${tab.key}`,
-  }));
-  const tabList = jsx.jsx(tabsRuntime.t, {
-    className: "flex-wrap",
-    ariaLabel: state.ask_me_label,
-    onSelect: setSelectedKey,
-    selectedKey,
-    tabs: tabItems,
-    variant: "pill",
-  });
-  const prompt = jsx.jsxs("div", {
-    className: "flex w-full flex-col",
-    children: [
-      jsx.jsx("div", {
-        className: "text-sm font-medium text-secondary",
-        children: state.ask_me_label,
-      }),
-      jsx.jsx("div", {
-        className: "text-lg font-semibold text-default",
-        children: jsx.jsx("q", { children: state[selected.question] }),
-      }),
-    ],
-  });
-  const body =
-    selectedKey === "translation"
-      ? jsx.jsx(initialRuntime.XW, {
-          reference: {
-            type: "client_defined_widget",
-            category: "translation_block",
-            data: {
-              content: state.translation.source_text,
-              translated_text: state.translation.translated_text,
-              source_language: state.translation.source_language,
-              target_language: state.translation.target_language,
-              widget_type: "translation_block_widget_v5",
-              metadata: JSON.stringify({ version: "trigger_v5" }),
-            },
-          },
-        })
-      : jsx.jsx(
-          writingRuntime.t,
-          {
-            id: content.id,
-            directive: {
-              id: content.id,
-              bodyContent: content.content,
-              content: content.content,
-              emailMetadata: {
-                bcc: undefined,
-                cc: undefined,
-                recipient: undefined,
-                subject: isEmail ? state.email.subject : undefined,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, e6 as r } from "@rchunk/app-shared";
+import { XW as i, ZW as a } from "@rchunk/app-initial";
+import { n as o, t as s } from "@rchunk/security-tabs";
+import { r as c, t as l } from "@rchunk/quick-chat-writing-block-adapter";
+function u(e) {
+  let t = (0, d.c)(33),
+    { state: n, sourceMessageId: r, turnContext: a } = e,
+    [o, c] = (0, f.useState)(n.tab),
+    u = (0, f.useId)(),
+    h;
+  t[0] === o
+    ? (h = t[1])
+    : ((h =
+        m.find((e) => {
+          let { key: t } = e;
+          return t === o;
+        }) ?? m[0]),
+      (t[0] = o),
+      (t[1] = h));
+  let g = h,
+    _ = `${u}-${g.key}`,
+    v = o === `professional_email`,
+    y = v ? n.email : n.message,
+    b = n.ask_me_label,
+    x;
+  t[2] !== n || t[3] !== u
+    ? ((x = m.map((e) => {
+        let { key: t, label: r } = e;
+        return { key: t, name: n[r], panelId: `${u}-${t}` };
+      })),
+      (t[2] = n),
+      (t[3] = u),
+      (t[4] = x))
+    : (x = t[4]);
+  let S;
+  t[5] !== o || t[6] !== n.ask_me_label || t[7] !== x
+    ? ((S = (0, p.jsx)(s, {
+        className: `flex-wrap`,
+        ariaLabel: b,
+        onSelect: c,
+        selectedKey: o,
+        tabs: x,
+        variant: `pill`,
+      })),
+      (t[5] = o),
+      (t[6] = n.ask_me_label),
+      (t[7] = x),
+      (t[8] = S))
+    : (S = t[8]);
+  let C = `${_}-tab`,
+    w;
+  t[9] === n.ask_me_label
+    ? (w = t[10])
+    : ((w = (0, p.jsx)(`div`, {
+        className: `text-sm font-medium text-secondary`,
+        children: n.ask_me_label,
+      })),
+      (t[9] = n.ask_me_label),
+      (t[10] = w));
+  let T = n[g.question],
+    E;
+  t[11] === T
+    ? (E = t[12])
+    : ((E = (0, p.jsx)(`div`, {
+        className: `text-lg font-semibold text-default`,
+        children: (0, p.jsx)(`q`, { children: T }),
+      })),
+      (t[11] = T),
+      (t[12] = E));
+  let D;
+  t[13] !== w || t[14] !== E
+    ? ((D = (0, p.jsxs)(`div`, { className: `flex w-full flex-col`, children: [w, E] })),
+      (t[13] = w),
+      (t[14] = E),
+      (t[15] = D))
+    : (D = t[15]);
+  let O;
+  t[16] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((O = (0, p.jsx)(`div`, {
+        className: `w-full border-t border-subtle`,
+        "aria-hidden": `true`,
+      })),
+      (t[16] = O))
+    : (O = t[16]);
+  let k;
+  t[17] !== y ||
+  t[18] !== v ||
+  t[19] !== o ||
+  t[20] !== r ||
+  t[21] !== n.email ||
+  t[22] !== n.translation ||
+  t[23] !== a
+    ? ((k =
+        o === `translation`
+          ? (0, p.jsx)(i, {
+              reference: {
+                type: `client_defined_widget`,
+                category: `translation_block`,
+                data: {
+                  content: n.translation.source_text,
+                  translated_text: n.translation.translated_text,
+                  source_language: n.translation.source_language,
+                  target_language: n.translation.target_language,
+                  widget_type: `translation_block_widget_v5`,
+                  metadata: JSON.stringify({ version: `trigger_v5` }),
+                },
               },
-              metadata: undefined,
-              title: undefined,
-              toneSections: null,
-              variant: isEmail ? "email" : "chat_message",
-            },
-            index: Number(!isEmail),
-            isLastNodeInMessage: true,
-            sourceMessageId,
-            turnContext,
-          },
-          selectedKey,
-        );
-  const panel = jsx.jsxs("div", {
-    id: panelId,
-    className: "flex w-full flex-col gap-3 py-4",
-    role: "tabpanel",
-    "aria-labelledby": `${panelId}-tab`,
-    children: [
-      prompt,
-      jsx.jsx("div", {
-        className: "w-full border-t border-subtle",
-        "aria-hidden": "true",
-      }),
-      body,
-    ],
-  });
-  return jsx.jsxs("div", {
-    className: "not-prose my-4 flex w-full min-w-0 flex-col",
-    children: [tabList, panel],
-  });
+            })
+          : (0, p.jsx)(
+              l,
+              {
+                id: y.id,
+                directive: {
+                  id: y.id,
+                  bodyContent: y.content,
+                  content: y.content,
+                  emailMetadata: {
+                    bcc: void 0,
+                    cc: void 0,
+                    recipient: void 0,
+                    subject: v ? n.email.subject : void 0,
+                  },
+                  metadata: void 0,
+                  title: void 0,
+                  toneSections: null,
+                  variant: v ? `email` : `chat_message`,
+                },
+                index: +!v,
+                isLastNodeInMessage: !0,
+                sourceMessageId: r,
+                turnContext: a,
+              },
+              o,
+            )),
+      (t[17] = y),
+      (t[18] = v),
+      (t[19] = o),
+      (t[20] = r),
+      (t[21] = n.email),
+      (t[22] = n.translation),
+      (t[23] = a),
+      (t[24] = k))
+    : (k = t[24]);
+  let A;
+  t[25] !== _ || t[26] !== k || t[27] !== C || t[28] !== D
+    ? ((A = (0, p.jsxs)(`div`, {
+        id: _,
+        className: `flex w-full flex-col gap-3 py-4`,
+        role: `tabpanel`,
+        "aria-labelledby": C,
+        children: [D, O, k],
+      })),
+      (t[25] = _),
+      (t[26] = k),
+      (t[27] = C),
+      (t[28] = D),
+      (t[29] = A))
+    : (A = t[29]);
+  let j;
+  return (
+    t[30] !== A || t[31] !== S
+      ? ((j = (0, p.jsxs)(`div`, {
+          className: `not-prose my-4 flex w-full min-w-0 flex-col`,
+          children: [S, A],
+        })),
+        (t[30] = A),
+        (t[31] = S),
+        (t[32] = j))
+      : (j = t[32]),
+    j
+  );
 }
-
-function initialize(): void {
-  sharedRuntime.$3();
-  React = sharedRuntime.e6();
-  tabsRuntime.n();
-  writingRuntime.r();
-  initialRuntime.ZW();
-  jsx = sharedRuntime.I3();
+var d, f, p, m;
+function h() {
+  return (h = e(() => {
+    ((d = t()),
+      (f = r()),
+      o(),
+      c(),
+      a(),
+      (p = n()),
+      (m = [
+        { key: `translation`, label: `translation_tab_label`, question: `translation_question` },
+        { key: `professional_email`, label: `email_tab_label`, question: `email_question` },
+        { key: `birthday_message`, label: `message_tab_label`, question: `message_question` },
+      ]));
+  }))();
 }
-initialize();
-
-export { ConversationalOnboardingWriting };
+h();
+export { u as ConversationalOnboardingWriting };

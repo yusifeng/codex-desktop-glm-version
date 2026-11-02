@@ -1,44 +1,32 @@
-// Addition-polymerization learning model: normalize monomer and displayed repeat-unit count.
-import "@rchunk/rolldown-runtime";
-
-type Monomer = "chloroethene" | "ethene" | "propene" | "tetrafluoroethene";
-interface PolymerValues { monomer?: string | null; unitStage?: number | null }
-interface PolymerState {
-  leftBottom: string;
-  leftTop: string;
-  monomer: Monomer;
-  rightBottom: string;
-  rightTop: string;
-  units: number;
-  unitStage: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = [`ethene`, `propene`, `chloroethene`, `tetrafluoroethene`]),
+      (n = [1, 2, 3, 4, 6]),
+      (r = (e) => t.some((t) => t === e)),
+      (i = (e) => {
+        let t = r(e.monomer) ? e.monomer : `ethene`,
+          i = Number.isFinite(e.unitStage)
+            ? Math.min(n.length - 1, Math.max(0, Math.round(e.unitStage)))
+            : 2,
+          [a, o, s, c] = {
+            ethene: [`H`, `H`, `H`, `H`],
+            propene: [`H`, `H`, `CH₃`, `H`],
+            chloroethene: [`H`, `H`, `Cl`, `H`],
+            tetrafluoroethene: [`F`, `F`, `F`, `F`],
+          }[t];
+        return {
+          monomer: t,
+          unitStage: i,
+          units: n[i] ?? 3,
+          leftTop: a,
+          leftBottom: o,
+          rightTop: s,
+          rightBottom: c,
+        };
+      }));
+  }))();
 }
-
-const monomers: readonly Monomer[] = ["ethene", "propene", "chloroethene", "tetrafluoroethene"];
-const repeatUnitCounts = [1, 2, 3, 4, 6] as const;
-const isMonomer = (value: string | null | undefined): value is Monomer => monomers.some((monomer) => monomer === value);
-
-function normalizePolymerValues(values: PolymerValues): PolymerState {
-  const monomer = isMonomer(values.monomer) ? values.monomer : "ethene";
-  const unitStage = Number.isFinite(values.unitStage)
-    ? Math.min(repeatUnitCounts.length - 1, Math.max(0, Math.round(values.unitStage as number)))
-    : 2;
-  const [leftTop, leftBottom, rightTop, rightBottom] = {
-    ethene: ["H", "H", "H", "H"],
-    propene: ["H", "H", "CH₃", "H"],
-    chloroethene: ["H", "H", "Cl", "H"],
-    tetrafluoroethene: ["F", "F", "F", "F"],
-  }[monomer];
-  return {
-    monomer,
-    unitStage,
-    units: repeatUnitCounts[unitStage] ?? 3,
-    leftTop,
-    leftBottom,
-    rightTop,
-    rightBottom,
-  };
-}
-
-function initializeAdditionPolymerizationModel(): void {}
-
-export { initializeAdditionPolymerizationModel as i, repeatUnitCounts as n, normalizePolymerValues as r, monomers as t };
+export { a as i, n, i as r, t };

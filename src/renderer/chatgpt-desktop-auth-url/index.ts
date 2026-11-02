@@ -1,201 +1,124 @@
-// chatgpt-desktop-auth-url —— 桌面登录会话启动与授权 URL 参数装配。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-void runtimeChunk;
-
-const { VJ: readHostCapability, wL: initializeWindowRuntime } = appSharedChunk;
-const {
-  Bfn: initializeAnalyticsRuntime,
-  Bgn: initializeStableIdRuntime,
-  Eon: initializeLoginSessionRuntime,
-  Ifn: hostCapabilitiesSignal,
-  Lfn: initializeHostRuntime,
-  Ton: createAbortError,
-  Ugn: getHostServices,
-  Vgn: getStableIdRegistry,
-  Wgn: initializeHostServices,
-  c$t: appVersionSignal,
-  l$t: initializeAppVersion,
-  ugn: defaultHostId,
-  zgn: originStableIdKey,
-} = appInitialChunk;
-
-interface StartDesktopLoginOptions {
-  hostId?: string;
-  scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>;
-  signal?: AbortSignal;
-  useHostedLoginSuccessPage?: boolean;
-  useStreamlinedLogin?: boolean;
-}
-
-interface BuildDesktopAuthUrlOptions {
-  allowedWorkspaceId?: string | null;
-  authUrl: string;
-  codexAppVersion?: string | null;
-  currentWorkspaceId?: string | null;
-  desktopAuthOrigin?: string | null;
-  includeCodexOriginStableId?: boolean;
-  loginHint?: string | null;
-  sourceSurfaceStableId?: string | null;
-  useDesktopAuth: boolean;
-  useStreamlinedLoginUx: boolean;
-}
-
-async function startDesktopLogin({
-  scope,
-  hostId = defaultHostId,
-  signal,
-  useHostedLoginSuccessPage,
-  useStreamlinedLogin,
-}: StartDesktopLoginOptions): Promise<
-  import("@rchunk/app-initial").DesktopLoginStartResult
-> {
-  const hostedSuccess =
-    useHostedLoginSuccessPage === true &&
-    readHostCapability(
-      scope.get(hostCapabilitiesSignal, hostId),
-      "hostedLoginSuccess",
-    );
-  return startCancelableLogin(
-    getHostServices(scope, hostId).createChatGptLoginSession({
-      ...(hostedSuccess ? { appBrand: "chatgpt" as const } : {}),
-      useHostedLoginSuccessPage: hostedSuccess,
-      useStreamlinedLogin,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { VJ as t, wL as n } from "@rchunk/app-shared";
+import {
+  Bfn as r,
+  Bgn as i,
+  Eon as a,
+  Ifn as o,
+  Lfn as s,
+  Ton as c,
+  Ugn as l,
+  Vgn as u,
+  Wgn as d,
+  c$t as f,
+  l$t as p,
+  ugn as m,
+  zgn as h,
+} from "@rchunk/app-initial";
+async function g({
+  scope: e,
+  hostId: n = m,
+  signal: r,
+  useHostedLoginSuccessPage: i,
+  useStreamlinedLogin: a,
+}) {
+  let s = i === !0 && t(e.get(o, n), `hostedLoginSuccess`);
+  return _(
+    l(e, n).createChatGptLoginSession({
+      ...(s ? { appBrand: `chatgpt` } : {}),
+      useHostedLoginSuccessPage: s,
+      useStreamlinedLogin: a,
     }),
-    signal,
+    r,
   );
 }
-
-async function startCancelableLogin(
-  session: import("@rchunk/app-initial").DesktopLoginSession,
-  signal?: AbortSignal,
-): Promise<import("@rchunk/app-initial").DesktopLoginStartResult> {
-  const cancel = (): void => {
-    void session.cancel().catch(() => undefined);
+async function _(e, t) {
+  let n = () => {
+    e.cancel().catch(() => void 0);
   };
-  if (signal?.aborted) cancel();
-  else signal?.addEventListener("abort", cancel, { once: true });
+  t?.aborted ? n() : t?.addEventListener(`abort`, n, { once: !0 });
   try {
-    const startResult = await session.getStartResult();
     return {
-      ...startResult,
-      completion: session
+      ...(await e.getStartResult()),
+      completion: e
         .waitForCompletion()
-        .catch((error: unknown) => {
-          throw signal?.aborted ? createAbortError() : error;
+        .catch((e) => {
+          throw t?.aborted ? c() : e;
         })
         .finally(() => {
-          signal?.removeEventListener("abort", cancel);
-          session[Symbol.dispose]();
+          (t?.removeEventListener(`abort`, n), e[Symbol.dispose]());
         }),
     };
-  } catch (error) {
-    signal?.removeEventListener("abort", cancel);
-    session[Symbol.dispose]();
-    throw signal?.aborted ? createAbortError() : error;
+  } catch (r) {
+    throw (t?.removeEventListener(`abort`, n), e[Symbol.dispose](), t?.aborted ? c() : r);
   }
 }
-
-function initializeDesktopLoginRuntime(): void {
-  initializeWindowRuntime();
-  initializeHostServices();
-  initializeHostRuntime();
-  initializeAnalyticsRuntime();
-  initializeLoginSessionRuntime();
+function v() {
+  return (v = e(() => {
+    (n(), d(), s(), r(), a());
+  }))();
 }
-
-function buildDesktopAuthUrl(options: BuildDesktopAuthUrlOptions): string {
-  const {
-    allowedWorkspaceId,
-    authUrl,
-    codexAppVersion,
-    currentWorkspaceId,
-    desktopAuthOrigin,
-    loginHint,
-    sourceSurfaceStableId = getStableIdRegistry().StableID.get(
-      originStableIdKey,
-    ),
-    includeCodexOriginStableId = false,
-    useDesktopAuth,
-    useStreamlinedLoginUx,
-  } = options;
-  const hasContext = Boolean(
-    allowedWorkspaceId ||
-    codexAppVersion ||
-    currentWorkspaceId ||
-    loginHint ||
-    sourceSurfaceStableId,
-  );
-  if (!hasContext && !useDesktopAuth && !useStreamlinedLoginUx) return authUrl;
+function y({
+  allowedWorkspaceId: e,
+  authUrl: t,
+  codexAppVersion: n,
+  currentWorkspaceId: r,
+  desktopAuthOrigin: i,
+  loginHint: a,
+  sourceSurfaceStableId: o = S.StableID.get(h),
+  includeCodexOriginStableId: s = !1,
+  useDesktopAuth: c,
+  useStreamlinedLoginUx: l,
+}) {
+  let u = !!(e || n || r || a || o);
+  if (!u && !c && !l) return t;
   try {
-    const url = new URL(authUrl);
-    if (url.pathname === "/codex/desktop-auth") {
-      const authorizeUrl = url.searchParams.get("authorize_url");
-      if (hasContext && authorizeUrl) {
-        const nested = new URL(authorizeUrl);
-        appendAuthContext(nested, options, sourceSurfaceStableId);
-        url.searchParams.set("authorize_url", nested.toString());
+    let d = new URL(t);
+    if (d.pathname === C) {
+      let t = d.searchParams.get(`authorize_url`);
+      if (u && t) {
+        let i = new URL(t);
+        (x(i, e, n, r, a, o, s), d.searchParams.set(`authorize_url`, i.toString()));
       }
-      if (useStreamlinedLoginUx)
-        url.searchParams.set("codex_streamlined_login", "true");
-      return url.toString();
+      return (l && d.searchParams.set(D, `true`), d.toString());
     }
-    if (hasContext) appendAuthContext(url, options, sourceSurfaceStableId);
-    if (useStreamlinedLoginUx)
-      url.searchParams.set("codex_streamlined_login", "true");
-    if (!useDesktopAuth) return url.toString();
-    const wrapper = new URL(
-      "/codex/desktop-auth",
-      desktopAuthOrigin?.trim() || "https://chatgpt.com",
+    if ((u && x(d, e, n, r, a, o, s), l && d.searchParams.set(D, `true`), !c)) return d.toString();
+    let f = new URL(C, i?.trim() || w);
+    return (
+      f.searchParams.set(`authorize_url`, d.toString()),
+      l && f.searchParams.set(D, `true`),
+      f.toString()
     );
-    wrapper.searchParams.set("authorize_url", url.toString());
-    if (useStreamlinedLoginUx)
-      wrapper.searchParams.set("codex_streamlined_login", "true");
-    return wrapper.toString();
   } catch {
-    return authUrl;
+    return t;
   }
 }
-
-function getCodexAppVersion(
-  scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
-): string | undefined {
-  const appVersion = scope.get(appVersionSignal) as {
-    data?: { version?: string };
-  };
-  return appVersion.data?.version;
+function b(e) {
+  return e.get(f).data?.version;
 }
-
-function appendAuthContext(
-  url: URL,
-  options: BuildDesktopAuthUrlOptions,
-  sourceSurfaceStableId: string | null | undefined,
-): void {
-  if (options.allowedWorkspaceId)
-    url.searchParams.set("allowed_workspace_id", options.allowedWorkspaceId);
-  if (options.codexAppVersion)
-    url.searchParams.set("codex_app_version", options.codexAppVersion);
-  if (options.currentWorkspaceId)
-    url.searchParams.set("current_workspace_id", options.currentWorkspaceId);
-  if (options.loginHint) url.searchParams.set("login_hint", options.loginHint);
-  if (sourceSurfaceStableId) {
-    url.searchParams.set("source_surface_stable_id", sourceSurfaceStableId);
-    if (options.includeCodexOriginStableId)
-      url.searchParams.set("codex_origin_stable_id", sourceSurfaceStableId);
-  }
+function x(e, t, n, r, i, a, o) {
+  (t && e.searchParams.set(O, t),
+    n && e.searchParams.set(T, n),
+    r && e.searchParams.set(k, r),
+    i && e.searchParams.set(A, i),
+    a && (e.searchParams.set(j, a), o && e.searchParams.set(E, a)));
 }
-
-function initializeDesktopAuthUrl(): void {
-  getStableIdRegistry();
-  initializeAppVersion();
-  initializeStableIdRuntime();
+var S, C, w, T, E, D, O, k, A, j;
+function M() {
+  return (M = e(() => {
+    ((S = u()),
+      p(),
+      i(),
+      (C = `/codex/desktop-auth`),
+      (w = `https://chatgpt.com`),
+      (T = `codex_app_version`),
+      (E = `codex_origin_stable_id`),
+      (D = `codex_streamlined_login`),
+      (O = `allowed_workspace_id`),
+      (k = `current_workspace_id`),
+      (A = `login_hint`),
+      (j = `source_surface_stable_id`));
+  }))();
 }
-
-export {
-  startDesktopLogin as a,
-  initializeDesktopLoginRuntime as i,
-  getCodexAppVersion as n,
-  initializeDesktopAuthUrl as r,
-  buildDesktopAuthUrl as t,
-};
+export { g as a, v as i, b as n, M as r, y as t };

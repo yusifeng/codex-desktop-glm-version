@@ -1,61 +1,43 @@
-import "@rchunk/rolldown-runtime";
-import {
-  $3 as initializeCompilerCache,
-  $O as timeConstants,
-  BX as useSignalFamilyValue,
-  FX as initializeSignalRuntime,
-  ek as initializeQueryRuntime,
-} from "@rchunk/app-shared";
-import {
-  MXt as initializeSubmoduleQueries,
-  fon as normalizeQueryOptions,
-  gon as initializeQueryOptions,
-  jXt as createHostQuery,
-} from "@rchunk/app-initial";
-
-let submodulePathsFromTarget: unknown;
-
-function initializeSubmodulePathsQuery(): void {
-  initializeSubmoduleQueries();
-  const query = createHostQuery({
-    method: "submodule-paths",
-    getParams: (input: { operationSource: string; root: string }) => ({
-      operationSource: input.operationSource,
-      root: input.root,
-    }),
-    getOptions: (input: { staleTime?: number }) => ({
-      select: (result: { paths: string[] }) => result.paths,
-      staleTime: input.staleTime,
-    }),
-  });
-  submodulePathsFromTarget = query.fromTarget$;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, $O as n, BX as r, FX as i, ek as a } from "@rchunk/app-shared";
+import { MXt as o, fon as s, gon as c, jXt as l } from "@rchunk/app-initial";
+var u, d;
+function f() {
+  return (f = e(() => {
+    (o(),
+      (u = l({
+        method: `submodule-paths`,
+        getParams: (e) => ({ operationSource: e.operationSource, root: e.root }),
+        getOptions: (e) => ({ select: (e) => e.paths, staleTime: e.staleTime }),
+      })),
+      (d = u.fromTarget$));
+  }))();
 }
-
-function useGitSubmodulePaths(
-  cwd: string | null,
-  hostConfig: unknown,
-  operationSource: string,
-  options?: Record<string, unknown> | null,
-): unknown {
-  const normalizedOptions = normalizeQueryOptions(options, timeConstants.ONE_MINUTE);
-  const lookup = cwd == null ? null : { cwd, hostConfig };
-  const readSignalFamily = useSignalFamilyValue as unknown as (
-    signal: unknown,
-    parameter: unknown,
-  ) => unknown;
-  return readSignalFamily(submodulePathsFromTarget, {
-    ...normalizedOptions,
-    operationSource,
-    lookup,
-  });
+function p(e, t, i, a) {
+  let o = (0, m.c)(9),
+    c;
+  o[0] === a ? (c = o[1]) : ((c = s(a, n.ONE_MINUTE)), (o[0] = a), (o[1] = c));
+  let l;
+  o[2] !== e || o[3] !== t
+    ? ((l = e == null ? null : { cwd: e, hostConfig: t }), (o[2] = e), (o[3] = t), (o[4] = l))
+    : (l = o[4]);
+  let u;
+  return (
+    o[5] !== i || o[6] !== c || o[7] !== l
+      ? ((u = { ...c, operationSource: i, lookup: l }),
+        (o[5] = i),
+        (o[6] = c),
+        (o[7] = l),
+        (o[8] = u))
+      : (u = o[8]),
+    r(d, u)
+  );
 }
-
-function initializeUseGitSubmodulePaths(): void {
-  initializeCompilerCache();
-  initializeSignalRuntime();
-  initializeQueryRuntime();
-  initializeQueryOptions();
-  initializeSubmodulePathsQuery();
+var m;
+function h() {
+  return (h = e(() => {
+    ((m = t()), i(), a(), c(), f());
+  }))();
 }
-
-export { useGitSubmodulePaths as n, initializeUseGitSubmodulePaths as t };
+export { p as n, h as t };

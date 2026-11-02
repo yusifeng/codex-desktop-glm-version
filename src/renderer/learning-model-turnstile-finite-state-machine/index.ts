@@ -1,54 +1,50 @@
-// Turnstile finite-state-machine learning model.
-import "@rchunk/rolldown-runtime";
-
-type TurnstileInput = "coin" | "push";
-type TurnstileState = "locked" | "unlocked";
-interface TurnstileHistoryValues { history?: unknown; priorState?: unknown; processedCount?: number | null }
-interface TurnstileStoredValues { history: TurnstileInput[]; priorState: TurnstileState; processedCount: number }
-
-const createDefaultTurnstileValues = (): TurnstileStoredValues => ({ history: [], priorState: "locked", processedCount: 0 });
-const transitionTurnstile = (state: TurnstileState, input: TurnstileInput): TurnstileState =>
-  state === "locked" ? input === "coin" ? "unlocked" : "locked" : input === "push" ? "locked" : "unlocked";
-const isTurnstileInput = (value: unknown): value is TurnstileInput => value === "coin" || value === "push";
-
-function deriveTurnstileState(values: TurnstileHistoryValues) {
-  const allHistory = (Array.isArray(values.history) ? values.history : []).filter(isTurnstileInput);
-  const omittedHistory = allHistory.slice(0, -12);
-  const history = allHistory.slice(-12);
-  const priorState = omittedHistory.reduce(transitionTurnstile, values.priorState === "unlocked" ? "unlocked" : "locked");
-  const processedCount = Math.max(
-    allHistory.length,
-    Number.isSafeInteger(values.processedCount) && (values.processedCount as number) > 0 ? values.processedCount as number : 0,
-  );
-  const latestInput = history.at(-1) ?? null;
-  const previousState = latestInput ? history.slice(0, -1).reduce(transitionTurnstile, priorState) : null;
-  return {
-    history,
-    state: history.reduce(transitionTurnstile, priorState),
-    previousState,
-    latestInput,
-    processedCount,
-    omittedCount: Math.max(0, processedCount - history.length),
-    priorState,
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = () => ({ history: [], priorState: `locked`, processedCount: 0 })),
+      (n = (e, t) =>
+        e === `locked`
+          ? t === `coin`
+            ? `unlocked`
+            : `locked`
+          : t === `push`
+            ? `locked`
+            : `unlocked`),
+      (r = (e) => {
+        let t = (Array.isArray(e.history) ? e.history : []).filter(
+            (e) => e === `coin` || e === `push`,
+          ),
+          r = t.slice(0, -12),
+          i = t.slice(-12),
+          a = r.reduce(n, e.priorState === `unlocked` ? `unlocked` : `locked`),
+          o = Math.max(
+            t.length,
+            Number.isSafeInteger(e.processedCount) && e.processedCount > 0 ? e.processedCount : 0,
+          ),
+          s = i.at(-1) ?? null,
+          c = s ? i.slice(0, -1).reduce(n, a) : null;
+        return {
+          history: i,
+          state: i.reduce(n, a),
+          previousState: c,
+          latestInput: s,
+          processedCount: o,
+          omittedCount: Math.max(0, o - i.length),
+          priorState: a,
+        };
+      }),
+      (i = (e, t) => {
+        let i = r(e),
+          a = [...i.history, t],
+          o = a.length > 12 ? a.shift() : void 0;
+        return {
+          history: a,
+          priorState: o ? n(i.priorState, o) : i.priorState,
+          processedCount: Math.min(2 ** 53 - 1, i.processedCount + 1),
+        };
+      }));
+  }))();
 }
-
-function appendTurnstileInput(values: TurnstileHistoryValues, input: TurnstileInput): TurnstileStoredValues {
-  const current = deriveTurnstileState(values);
-  const history = [...current.history, input];
-  const omittedInput = history.length > 12 ? history.shift() : undefined;
-  return {
-    history,
-    priorState: omittedInput ? transitionTurnstile(current.priorState, omittedInput) : current.priorState,
-    processedCount: Math.min(2 ** 53 - 1, current.processedCount + 1),
-  };
-}
-
-function initializeTurnstileFiniteStateMachineModel(): void {}
-
-export {
-  initializeTurnstileFiniteStateMachineModel as i,
-  appendTurnstileInput as n,
-  createDefaultTurnstileValues as r,
-  deriveTurnstileState as t,
-};
+export { a as i, i as n, t as r, r as t };

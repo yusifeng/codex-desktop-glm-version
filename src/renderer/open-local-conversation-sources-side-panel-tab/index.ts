@@ -1,109 +1,103 @@
-import "@rchunk/rolldown-runtime";
-import {
-  H3 as initializeLazyComponents,
-  I3 as getJsxRuntime,
-  Jm as createLazyComponent,
-  V3 as preloadDynamicImport,
-  qm as initializePanelComponents,
-} from "@rchunk/app-shared";
-import {
-  FDt as initializeSidePanelDefinitions,
-  IDt as registerSidePanelTabType,
-  Qen as initializeSourcesPanelModel,
-  Zen as sidePanelKinds,
-} from "@rchunk/app-initial";
-import {
-  n as openSourcesSidePanelTab,
-  t as initializeOpenSourcesSidePanelTab,
-} from "@rchunk/open-sources-side-panel-tab";
-
-let jsx: ReturnType<typeof getJsxRuntime>;
-let SourcesPanel: (props: Record<string, unknown>) => unknown;
-let SourcesThumbnail: (props: Record<string, unknown>) => unknown;
-let sourcesPanelDefinition: unknown;
-
-function createSourcesPanelDefinition({
-  open,
-}: {
-  open: (...arguments_: unknown[]) => unknown;
-}): unknown {
-  return registerSidePanelTabType(sidePanelKinds.SOURCES, SourcesPanel, {
-    dropDestinations: ["left", "right", "bottom"],
-    getId: () => sidePanelKinds.SOURCES,
-    isAvailable: (scope: { value: { routeKind?: string } }) =>
-      scope.value.routeKind === "local-thread",
-    open,
-    renderThumbnail: (
-      scope: { conversationId: string; hostId: string },
-      tab: { title: string },
-    ) => jsx.jsx(SourcesThumbnail, {
-      conversationId: scope.conversationId,
-      hostId: scope.hostId,
-      title: tab.title,
-    }),
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/local-conversation-sources-side-panel-tab-core",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/artifact-file-preview-icon",
+      "@rchunk/local-conversation-webmcp-tools-model",
+      "@rchunk/webmcp-tool-calls",
+      "@rchunk/local-conversation-external-resource-icon",
+      "@rchunk/google-drive-resource-icon",
+      "@rchunk/use-local-conversation-sources",
+      "@rchunk/local-conversation-external-resources",
+      "@rchunk/local-conversation-sources-signals",
+      "@rchunk/local-conversation-summary-panel-sources-model",
+      "@rchunk/mcp-tool-activity-label",
+      "@rchunk/presentation",
+      "@rchunk/mcp-app-analytics",
+      "@rchunk/tool-activity-disclosure",
+      "@rchunk/mcp-tool-item-content",
+      "@rchunk/open-automation-side-panel-tab",
+      "@rchunk/elicitation-events",
+      "@rchunk/site-automation-setup-state",
+      "@rchunk/chatgpt-tasks-runtime",
+      "@rchunk/computer-use-native-app-metadata",
+      "@rchunk/registered-sources",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import { H3 as t, I3 as n, Jm as r, V3 as i, qm as a } from "@rchunk/app-shared";
+import { FDt as o, IDt as s, Qen as c, Zen as l } from "@rchunk/app-initial";
+import { n as u, t as d } from "@rchunk/open-sources-side-panel-tab";
+function f({ open: e }) {
+  return s(l.SOURCES, m, {
+    dropDestinations: [`left`, `right`, `bottom`],
+    getId: () => l.SOURCES,
+    isAvailable: (e) => e.value.routeKind === `local-thread`,
+    open: e,
+    renderThumbnail: (e, t) =>
+      (0, p.jsx)(h, { conversationId: e.conversationId, hostId: e.hostId, title: t.title }),
   });
 }
-
-function initializeSourcesPanelComponents(): void {
-  initializeSidePanelDefinitions();
-  initializePanelComponents();
-  initializeSourcesPanelModel();
-  jsx = getJsxRuntime();
-  initializeLazyComponents();
-  SourcesPanel = createLazyComponent(
-    async () => {
-      const { LocalConversationSourcesSidePanelTab } = await preloadDynamicImport(
+var p, m, h;
+function g() {
+  return (g = e(() => {
+    (o(),
+      a(),
+      c(),
+      (p = n()),
+      t(),
+      (m = r(
         async () => {
-          const { LocalConversationSourcesSidePanelTab } = await import("@rchunk/local-conversation-sources-side-panel-tab-core");
-          return { LocalConversationSourcesSidePanelTab };
+          let { LocalConversationSourcesSidePanelTab: e } = await i(
+            async () => {
+              let { LocalConversationSourcesSidePanelTab: e } = await import(
+                `@rchunk/local-conversation-sources-side-panel-tab-core`
+              );
+              return { LocalConversationSourcesSidePanelTab: e };
+            },
+            __vite__mapDeps([
+              0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+              24,
+            ]),
+            import.meta.url,
+          );
+          return e;
         },
-        [],
-        import.meta.url,
-      );
-      return LocalConversationSourcesSidePanelTab;
-    },
-    { propagateLoadError: true },
-  );
-  SourcesThumbnail = createLazyComponent(
-    async () => {
-      const { RegisteredLocalSourcesThumbnail } = await preloadDynamicImport(
+        { propagateLoadError: !0 },
+      )),
+      (h = r(
         async () => {
-          const { RegisteredLocalSourcesThumbnail } = await import("@rchunk/registered-sources");
-          return { RegisteredLocalSourcesThumbnail };
+          let { RegisteredLocalSourcesThumbnail: e } = await i(
+            async () => {
+              let { RegisteredLocalSourcesThumbnail: e } = await import(
+                `@rchunk/registered-sources`
+              );
+              return { RegisteredLocalSourcesThumbnail: e };
+            },
+            __vite__mapDeps([25, 1, 2, 3, 4, 5, 12, 7, 8, 14, 15, 16, 17]),
+            import.meta.url,
+          );
+          return e;
         },
-        [],
-        import.meta.url,
-      );
-      return RegisteredLocalSourcesThumbnail;
-    },
-    { propagateLoadError: true },
-  );
+        { propagateLoadError: !0 },
+      )));
+  }))();
 }
-
-function openLocalConversationSourcesSidePanelTab(
-  scope: unknown,
-  props: unknown,
-  title: string,
-  openerTabId?: string,
-): void {
-  openSourcesSidePanelTab(
-    scope,
-    sourcesPanelDefinition,
-    props,
-    title,
-    openerTabId,
-  );
+function _(e, t, n, r) {
+  u(e, v, t, n, r);
 }
-
-function initializeOpenLocalConversationSourcesSidePanelTab(): void {
-  initializeSourcesPanelComponents();
-  initializeOpenSourcesSidePanelTab();
-  sourcesPanelDefinition = createSourcesPanelDefinition({
-    open: openLocalConversationSourcesSidePanelTab,
-  });
+var v;
+function y() {
+  return (y = e(() => {
+    (g(), d(), (v = f({ open: _ })));
+  }))();
 }
-
-export {
-  openLocalConversationSourcesSidePanelTab as n,
-  initializeOpenLocalConversationSourcesSidePanelTab as t,
-};
+export { _ as n, y as t };

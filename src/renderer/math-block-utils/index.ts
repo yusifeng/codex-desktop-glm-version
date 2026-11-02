@@ -1,47 +1,44 @@
-let initialized = false;
-
-function findUnescapedEquals(source: string): number[] {
-  const positions: number[] = [];
-  for (let index = 0; index < source.length; index += 1) {
-    if (source[index] === "=" && source[index - 1] !== "\\") positions.push(index);
-  }
-  return positions;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s;
+function c() {
+  return (c = e(() => {
+    ((t = (e) => {
+      let t = [];
+      for (let n = 0; n < e.length; n += 1) e[n] === `=` && e[n - 1] !== `\\` && t.push(n);
+      return t;
+    }),
+      (n = (e) => {
+        for (let t = 0; t < e.length; t += 1) if (e[t] === `_` && e[t - 1] !== `\\`) return !0;
+        return !1;
+      }),
+      (r = /(\\?[a-zA-Z]+)\s*_\s*(\{[^}]+\}|[a-zA-Z0-9]+)/g),
+      (i = /^\d+$/),
+      (a = (e) => {
+        let t = e.trim();
+        return t.startsWith(`{`) && t.endsWith(`}`) ? t.slice(1, -1).trim() : t;
+      }),
+      (o = (e) => (e.startsWith(`\\`) ? e.slice(1) : e)),
+      (s = (e) => {
+        let t = new Map(),
+          s = !1,
+          c = Array.from(e.matchAll(r));
+        for (let e of c) {
+          let n = e[1],
+            r = e[2],
+            c = o(n).toLowerCase(),
+            l = a(r);
+          if (c === `log`) continue;
+          if (!i.test(l)) {
+            s = !0;
+            continue;
+          }
+          let u = `${c}_${l}`;
+          t.set(u, l);
+        }
+        let l = e.replace(r, `$1`);
+        return (n(l) && (s = !0), { hasInvalidSubscript: s, numericSubscripts: t });
+      }));
+  }))();
 }
-
-const subscriptPattern = /(\\?[a-zA-Z]+)\s*_\s*(\{[^}]+\}|[a-zA-Z0-9]+)/g;
-
-function analyzeSubscripts(source: string): {
-  hasInvalidSubscript: boolean;
-  numericSubscripts: Map<string, string>;
-} {
-  const numericSubscripts = new Map<string, string>();
-  let hasInvalidSubscript = false;
-
-  for (const match of source.matchAll(subscriptPattern)) {
-    const command = match[1].replace(/^\\/, "").toLowerCase();
-    const value = match[2].replace(/^\{\s*|\s*\}$/g, "").trim();
-    if (command === "log") continue;
-    if (!/^\d+$/.test(value)) {
-      hasInvalidSubscript = true;
-      continue;
-    }
-    numericSubscripts.set(`${command}_${value}`, value);
-  }
-
-  const remainder = source.replace(subscriptPattern, "$1");
-  if (/(^|[^\\])_/.test(remainder)) hasInvalidSubscript = true;
-  return { hasInvalidSubscript, numericSubscripts };
-}
-
-function initializeMathBlockUtils(): void {
-  initialized = true;
-}
-
-initializeMathBlockUtils();
-void initialized;
-
-export {
-  findUnescapedEquals as n,
-  initializeMathBlockUtils as r,
-  analyzeSubscripts as t,
-};
+export { t as n, c as r, s as t };

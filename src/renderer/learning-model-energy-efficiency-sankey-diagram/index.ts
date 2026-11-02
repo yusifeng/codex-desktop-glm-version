@@ -1,54 +1,21 @@
-// Energy-efficiency Sankey diagram specification. Release chunk: type-835190510733.js.
-import "@rchunk/rolldown-runtime";
-
-interface NumberParameter {
-  kind: "number";
-  defaultValue: number;
-  min: number;
-  max: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `ENERGY_EFFICIENCY_SANKEY_DIAGRAM`),
+      (n = `energy-efficiency-sankey-diagram-v1`),
+      (r = `\\text{Efficiency}=\\frac{\\text{useful output}}{\\text{total input}}`),
+      (i = {
+        energy_system: {
+          kind: `enum`,
+          defaultValue: `light bulb`,
+          allowedValues: [`light bulb`, `electric motor`, `car engine`],
+        },
+        input_energy_joules: { kind: `number`, defaultValue: 100, min: 1, max: 1e4 },
+        initial_efficiency_percent: { kind: `number`, defaultValue: 40, min: 0, max: 100 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-interface Specification {
-  type: "ENERGY_EFFICIENCY_SANKEY_DIAGRAM";
-  version: 1;
-  thumbnailAssetKey: "energy-efficiency-sankey-diagram-v1";
-  canonicalFormula: "\\text{Efficiency}=\\frac{\\text{useful output}}{\\text{total input}}";
-  parameters: {
-    energy_system: {
-      kind: "enum";
-      defaultValue: "light bulb";
-      allowedValues: ["light bulb", "electric motor", "car engine"];
-    };
-    input_energy_joules: NumberParameter;
-    initial_efficiency_percent: NumberParameter;
-  };
-}
-let specification: Specification;
-function initializeSpecification(): void {
-  specification ??= {
-    type: "ENERGY_EFFICIENCY_SANKEY_DIAGRAM",
-    version: 1,
-    thumbnailAssetKey: "energy-efficiency-sankey-diagram-v1",
-    canonicalFormula:
-      "\\text{Efficiency}=\\frac{\\text{useful output}}{\\text{total input}}",
-    parameters: {
-      energy_system: {
-        kind: "enum",
-        defaultValue: "light bulb",
-        allowedValues: ["light bulb", "electric motor", "car engine"],
-      },
-      input_energy_joules: {
-        kind: "number",
-        defaultValue: 100,
-        min: 1,
-        max: 10_000,
-      },
-      initial_efficiency_percent: {
-        kind: "number",
-        defaultValue: 40,
-        min: 0,
-        max: 100,
-      },
-    },
-  };
-}
-export { specification as n, initializeSpecification as t };
+export { a as n, o as t };

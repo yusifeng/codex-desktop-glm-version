@@ -1,63 +1,42 @@
-// Two-set counting model: derive exclusive and union cardinalities from an overlap.
-import "@rchunk/rolldown-runtime";
-
-interface SetCardinalityValues {
-  setACount?: number;
-  setBCount?: number;
-  overlapCount?: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o;
+function s() {
+  return (s = e(() => {
+    ((t = { min: 1, max: 12, step: 1, defaultValue: 8 }),
+      (n = { min: 1, max: 12, step: 1, defaultValue: 7 }),
+      (r = { min: 0, max: Math.min(t.max, n.max), step: 1, defaultValue: 3 }),
+      (i = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (a = (e) => {
+        let a =
+            typeof e.setACount == `number` && Number.isFinite(e.setACount)
+              ? Math.round(e.setACount)
+              : t.defaultValue,
+          o =
+            typeof e.setBCount == `number` && Number.isFinite(e.setBCount)
+              ? Math.round(e.setBCount)
+              : n.defaultValue,
+          s = i(a, t.min, t.max),
+          c = i(o, n.min, n.max),
+          l =
+            typeof e.overlapCount == `number` && Number.isFinite(e.overlapCount)
+              ? Math.round(e.overlapCount)
+              : r.defaultValue;
+        return { setACount: s, setBCount: c, overlapCount: i(l, r.min, Math.min(s, c)) };
+      }),
+      (o = (e) => {
+        let t = a(e),
+          { setACount: n, setBCount: r } = t,
+          i = t.overlapCount;
+        return {
+          setACount: n,
+          setBCount: r,
+          overlapCount: i,
+          onlyACount: n - i,
+          onlyBCount: r - i,
+          unionCount: n + r - i,
+        };
+      }));
+  }))();
 }
-
-const setACountControl = { min: 1, max: 12, step: 1, defaultValue: 8 };
-const setBCountControl = { min: 1, max: 12, step: 1, defaultValue: 7 };
-const overlapCountControl = {
-  min: 0,
-  max: Math.min(setACountControl.max, setBCountControl.max),
-  step: 1,
-  defaultValue: 3,
-};
-
-const clamp = (value: number, minimum: number, maximum: number): number =>
-  Math.min(Math.max(value, minimum), maximum);
-
-function normalizeSetCardinalityValues(values: SetCardinalityValues) {
-  const setACandidate =
-    typeof values.setACount === "number" && Number.isFinite(values.setACount)
-      ? Math.round(values.setACount)
-      : setACountControl.defaultValue;
-  const setBCandidate =
-    typeof values.setBCount === "number" && Number.isFinite(values.setBCount)
-      ? Math.round(values.setBCount)
-      : setBCountControl.defaultValue;
-  const setACount = clamp(setACandidate, setACountControl.min, setACountControl.max);
-  const setBCount = clamp(setBCandidate, setBCountControl.min, setBCountControl.max);
-  const overlapCandidate =
-    typeof values.overlapCount === "number" && Number.isFinite(values.overlapCount)
-      ? Math.round(values.overlapCount)
-      : overlapCountControl.defaultValue;
-  return {
-    setACount,
-    setBCount,
-    overlapCount: clamp(overlapCandidate, overlapCountControl.min, Math.min(setACount, setBCount)),
-  };
-}
-
-function calculateSetCardinalities(values: SetCardinalityValues) {
-  const normalized = normalizeSetCardinalityValues(values);
-  return {
-    ...normalized,
-    onlyACount: normalized.setACount - normalized.overlapCount,
-    onlyBCount: normalized.setBCount - normalized.overlapCount,
-    unionCount: normalized.setACount + normalized.setBCount - normalized.overlapCount,
-  };
-}
-
-function initializeSetCardinalityOverlapModel(): void {}
-
-export {
-  initializeSetCardinalityOverlapModel as a,
-  calculateSetCardinalities as i,
-  setACountControl as n,
-  normalizeSetCardinalityValues as o,
-  setBCountControl as r,
-  overlapCountControl as t,
-};
+export { s as a, o as i, t as n, a as o, n as r, r as t };

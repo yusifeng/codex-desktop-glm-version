@@ -1,23 +1,23 @@
-import { $3 as getCompilerRuntime, I3 as getJsxRuntime, h4 as initializeClassNames, m4 as classNames } from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
-
-export interface ControlGroupProps {
-  children?: unknown;
-  className?: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, h4 as r, m4 as i } from "@rchunk/app-shared";
+function a(e) {
+  let t = (0, o.c)(5),
+    { children: n, className: r } = e,
+    a;
+  t[0] === r ? (a = t[1]) : ((a = i(`flex items-center gap-2`, r)), (t[0] = r), (t[1] = a));
+  let c;
+  return (
+    t[2] !== n || t[3] !== a
+      ? ((c = (0, s.jsx)(`div`, { className: a, children: n })), (t[2] = n), (t[3] = a), (t[4] = c))
+      : (c = t[4]),
+    c
+  );
 }
-
-let jsxRuntime: ReturnType<typeof getJsxRuntime> | undefined;
-function ControlGroup({ children, className }: ControlGroupProps): unknown {
-  return jsxRuntime?.jsx("div", { className: classNames("flex items-center gap-2", className), children });
+var o, s;
+function c() {
+  return (c = e(() => {
+    ((o = t()), r(), (s = n()));
+  }))();
 }
-
-let initialized = false;
-function initializeControlGroup(): void {
-  if (initialized) return;
-  initialized = true;
-  getCompilerRuntime();
-  initializeClassNames();
-  jsxRuntime = getJsxRuntime();
-}
-
-export { initializeControlGroup as n, ControlGroup as t };
+export { c as n, a as t };
