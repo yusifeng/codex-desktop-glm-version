@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { formatRecipientField as De } from "../app-primary/runtime/normalize-recipient-fields";
 import { classNames as h, initializeClassNames as f } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -61,7 +62,6 @@ import {
   Cs as Ee,
   Gd as k,
   Kd as A,
-  Ld as De,
   Ou as Oe,
   Rd as ke,
   Ss as j,

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getFirstPrompt as In } from "../app-primary/runtime/prompt-and-markdown-policy";
 import { parseConversationRoute as Lt } from "../app-initial/runtime/parse-conversation-route";
 import { createPrefilledPluginPrompt as Fn } from "../app-primary/runtime/create-prefilled-plugin-prompt";
 import { classNames as De, initializeClassNames as pe } from "../app-shared/ui/class-names";
@@ -195,7 +196,6 @@ import {
 } from "@rchunk/app-initial";
 import {
   Bf as Pn,
-  zf as In,
 } from "@rchunk/app-primary";
 import { n as Ln, t as Rn } from "@rchunk/toolbar-breadcrumb";
 import { n as zn, t as Bn } from "@rchunk/compact-empty-state";

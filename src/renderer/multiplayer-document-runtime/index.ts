@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { stripMarkdownExtension as Nn } from "../app-primary/runtime/prompt-and-markdown-policy";
 import { classNames as ge, initializeClassNames as ce } from "../app-shared/ui/class-names";
 import { n as e, t } from "@rchunk/rolldown-runtime";
 import {
@@ -181,7 +182,6 @@ import {
   z as Mn,
 } from "@rchunk/yjs-runtime";
 import {
-  Su as Nn,
   id as Pn,
   rd as Fn,
   xu as In,

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getFirstPrompt as ri } from "../app-primary/runtime/prompt-and-markdown-policy";
 import { CODEX_WEB_URL as _ } from "../app-shared/runtime/codex-links";
 import { createCommandQueryKey as Oe } from "../app-initial/runtime/create-command-query-key";
 import { createPrefilledPluginPrompt as ni } from "../app-primary/runtime/create-prefilled-plugin-prompt";
@@ -267,7 +268,6 @@ import {
   Bf as ei,
   Fl as ti,
   Pl as K,
-  zf as ri,
 } from "@rchunk/app-primary";
 import { n as ii, t as ai } from "@rchunk/toolbar-breadcrumb";
 import { n as oi, t as si } from "@rchunk/app-connect-link-navigation";

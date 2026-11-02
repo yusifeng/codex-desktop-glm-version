@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { selectCyclicItem as Se } from "../app-primary/runtime/cyclic-selection";
 import { getAnnotationSelectionStyle as ye } from "../app-primary/runtime/annotation-selection-style";
 import { classNames as b, initializeClassNames as _ } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
@@ -62,7 +63,6 @@ import { gt as _e, mt as R, nt as z, rt as ve } from "@rchunk/artifact-source-bo
 import {
   Dg as be,
   Hg as xe,
-  Ig as Se,
   Og as Ce,
   Rg as we,
   Ug as Te,

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getEligibilityStatus as at } from "../app-primary/runtime/availability-status";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -107,7 +108,9 @@ import {
   yun as rt,
   zBt as it,
 } from "@rchunk/app-initial";
-import { $p as at, em as ot } from "@rchunk/app-primary";
+import {
+  em as ot,
+} from "@rchunk/app-primary";
 import { n as st, t as ct } from "@rchunk/announcement-modal-source-bridge";
 import { n as lt, t as ut } from "@rchunk/file-blank-icon";
 var G, dt;

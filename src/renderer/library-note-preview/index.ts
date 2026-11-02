@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { stripMarkdownExtension as W } from "../app-primary/runtime/prompt-and-markdown-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -61,7 +62,9 @@ import {
   ydn as fe,
   ypn as pe,
 } from "@rchunk/app-initial";
-import { Su as W, xu as G } from "@rchunk/app-primary";
+import {
+  xu as G,
+} from "@rchunk/app-primary";
 import { n as me, t as he } from "@rchunk/right-panel-composer-overlay";
 import { i as ge, t as _e } from "@rchunk/writing-block-surface";
 import { n as ve, t as ye } from "@rchunk/editable-writing-block";

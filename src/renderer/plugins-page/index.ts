@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getFirstPrompt as mi } from "../app-primary/runtime/prompt-and-markdown-policy";
 import { createPrefilledPluginPrompt as li } from "../app-primary/runtime/create-prefilled-plugin-prompt";
 import { formatErrorMessage as p } from "../app-shared/runtime/format-error-message";
 import { classNames as xe, initializeClassNames as fe } from "../app-shared/ui/class-names";
@@ -277,7 +278,6 @@ import {
   Zh as di,
   _o as fi,
   go as pi,
-  zf as mi,
 } from "@rchunk/app-primary";
 import { n as hi, r as gi } from "@rchunk/computer-history-suggestion-prompt";
 import { a as _i, n as vi, r as yi } from "@rchunk/computer-history-suggestions";

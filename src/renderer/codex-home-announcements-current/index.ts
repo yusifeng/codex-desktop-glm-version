@@ -17,6 +17,7 @@ const __vite__mapDeps = (
       "@rchunk/use-codex-worktrees",
     ]),
 ) => i.map((i) => d[i]);
+import { getEligibilityStatus as Te } from "../app-primary/runtime/availability-status";
 import { FAST_MODE_BANNER_CTA_CLICKED as h, FAST_MODE_BANNER_DISMISSED as T, FAST_MODE_BANNER_VIEWED as E } from "../app-shared/runtime/fast-mode-analytics-events";
 import { findFastServiceTier as x } from "../app-shared/runtime/service-tiers";
 import { classNames as S, initializeClassNames as y } from "../app-shared/ui/class-names";
@@ -95,7 +96,6 @@ import {
   ypn as we,
 } from "@rchunk/app-initial";
 import {
-  $p as Te,
   Ch as Ee,
   Cm as De,
   Kp as Oe,

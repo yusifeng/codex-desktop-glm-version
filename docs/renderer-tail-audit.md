@@ -1,5 +1,21 @@
 # Renderer 尾部资产审计
 
+2026-11-02 App-primary semantic policy batch：一次性将 14 个仍由压缩 hub 直出的纯业务
+契约迁移到 6 个具名 TypeScript owner，覆盖 action URL 安全与 `/tasks` 判定、资格/接管状态、
+循环选择、消息发送状态与 `senderLinkId`、prompt/Markdown 文件名，以及邮件收件人的解析、
+标准化、owner 查找、兼容格式和未完成输入合并；共移除 21 个 renderer 调用点对压缩别名的
+直接依赖。新增聚合契约测试锁定 45 个分支，test-index 增至 1,918。严格 ABI 门禁在收敛中
+发现 `Pr` 的旧分类把导入区的 `Z3` 矩形函数误认成公开导出；当前公开 `Pr` 实际为图片
+运行时初始化器 `I2`。本批因此恢复两个初始化调用点并将分类修正为真实 0 参数 lazy
+bootstrap，避免把它错误替换为需要两个矩形参数的纯函数。最终 app-primary 压缩 hub 直接
+消费由 758 降至 744，三 hub 继续保持 0 unreviewed、0 invalid consumers，迁移检查为
+0 个遗漏绑定。`npm run check` 完成 12,464/12,464 transform、11/11 main roots、
+1,916/1,916 renderer chunks 与 33/33 preserved vendor/generated route sources；typecheck、
+严格分类及 test-index 均通过。当前构建随后通过真实登录态 `npm run e2e:critical`：
+settings/general、Git、worktrees、Browser/IAB、conversation history/add-context 全部通过，
+并实际发送 `E2E_REPLY_20261102080717`、在 assistant message 收到同 marker。该批已闭合，
+但剩余 hub 语义迁移和最终全项目完成审计仍继续，不把本次矩阵通过宣称为长期目标完成。
+
 2026-11-02 Signed-in runtime-contract closure：在语义 hub 迁移后立即重建、打包并使用现有
 登录账号运行真实 Electron E2E，连续发现并修复三类仅在发布运行链路中暴露的问题。首先，
 五个新恢复的 Zod schema owner 曾被 renderer 构建器保留为浏览器无法解析的 bare `zod`

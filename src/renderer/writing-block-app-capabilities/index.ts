@@ -13,7 +13,8 @@ const __vite__mapDeps = (
       "@rchunk/home-artifact-template-card",
     ]),
 ) => i.map((i) => d[i]);
-import { projectRecipientContacts as on } from "../app-primary/runtime/normalize-recipient-fields";
+import { getSenderLinkId as tn, isMessageSendPresented as nn } from "../app-primary/runtime/message-projections";
+import { findContactIdByOwnerEmail as cn, normalizeRecipientContacts as sn, projectRecipientContacts as on } from "../app-primary/runtime/normalize-recipient-fields";
 import { createPrefilledPluginPrompt as dn } from "../app-primary/runtime/create-prefilled-plugin-prompt";
 import { dedupeValidValues as ln } from "../app-primary/runtime/dedupe-valid-values";
 import { hasRecipientContacts as wn } from "../app-primary/runtime/has-recipient-contacts";
@@ -185,10 +186,6 @@ import {
   Ar as Qt,
   Bd as $t,
   Bf as en,
-  Cd as tn,
-  Dd as nn,
-  Md as sn,
-  Nd as cn,
   Td as pn,
   _d as hn,
   bd as gn,

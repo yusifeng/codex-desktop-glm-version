@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getFirstPrompt as Dr } from "../app-primary/runtime/prompt-and-markdown-policy";
 import { createPrefilledPluginPrompt as Er } from "../app-primary/runtime/create-prefilled-plugin-prompt";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -243,7 +244,6 @@ import {
   Bf as Cr,
   Fl as wr,
   Pl as Tr,
-  zf as Dr,
 } from "@rchunk/app-primary";
 import { n as Or, t as kr } from "@rchunk/app-connect-link-navigation";
 import {

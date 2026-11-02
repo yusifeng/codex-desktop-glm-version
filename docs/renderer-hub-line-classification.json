@@ -103,32 +103,32 @@
     "hub": "app-primary",
     "alias": "Qm",
     "sourceSymbol": "nA",
-    "startLine": 5754,
-    "endLine": 5760,
-    "classification": "generated-local-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The URL-scheme classifier is an implementation detail of rA/tAe in the generated hub and has no independent renderer call site; preserve the coupled scope until a named consumer establishes a stable contract."
+    "startLine": 5767,
+    "endLine": 5773,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/action-url-policy.ts",
+    "evidence": "The action URL allowlist is a pure navigation-safety contract now owned by a typed runtime module and consumed directly by named renderer surfaces instead of the compressed hub export."
   },
   {
     "hub": "app-primary",
     "alias": "Zm",
     "sourceSymbol": "tA",
-    "startLine": 5751,
-    "endLine": 5753,
-    "classification": "generated-local-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The /tasks local-action predicate is only called by the adjacent eAe URL projection; no renderer module imports the public alias, so extracting it would create an unowned action-surface facade."
+    "startLine": 5764,
+    "endLine": 5766,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/action-url-policy.ts",
+    "evidence": "The legacy /tasks action predicate is a deterministic action-v2 policy now extracted behind a named typed contract and imported directly by renderer consumers."
   },
 
   {
     "hub": "app-primary",
     "alias": "$p",
     "sourceSymbol": "IAe",
-    "startLine": 10340,
-    "endLine": 10342,
-    "classification": "generated-local-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The loading/eligibility status projection is a two-branch local formatter exported only through the generated hub; there is no named renderer consumer or independent lifecycle boundary to own a facade."
+    "startLine": 10353,
+    "endLine": 10355,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/availability-status.ts",
+    "evidence": "The loading/eligibility projection is a pure status contract now extracted to a typed runtime owner and consumed without the compressed hub alias."
   },
 
   {
@@ -155,11 +155,11 @@
     "hub": "app-primary",
     "alias": "Eh",
     "sourceSymbol": "sk",
-    "startLine": 5014,
-    "endLine": 5016,
-    "classification": "generated-local-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The pending/unavailable projection is a two-flag local formatter consumed by the adjacent takeover UI assembly and has no named renderer import or independent lifecycle boundary; retain the coupled generated helper rather than creating an unowned status facade."
+    "startLine": 5027,
+    "endLine": 5029,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/availability-status.ts",
+    "evidence": "The takeover pending/unavailable projection is a deterministic capability contract now owned by a typed runtime module and directly imported by its renderer consumers."
   },
   {
     "hub": "app-primary",
@@ -395,41 +395,41 @@
     "hub": "app-primary",
     "alias": "Fd",
     "sourceSymbol": "JMe",
-    "startLine": 17530,
-    "endLine": 17540,
-    "classification": "generated-local-recipient-parser",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The recipient parser splits and trims comma/semicolon/newline-delimited addresses for the adjacent generated email surface. It has no named renderer consumer or independent validation lifecycle, so its delimiter and casing policy remains hub-local until a typed recipient boundary owns it."
+    "startLine": 17543,
+    "endLine": 17552,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/normalize-recipient-fields.ts",
+    "evidence": "Delimited recipient parsing and case-insensitive contact enrichment now have a typed semantic owner shared by the mail renderer consumers instead of the compressed hub export."
   },
   {
     "hub": "app-primary",
     "alias": "Dd",
     "sourceSymbol": "eNe",
-    "startLine": 17666,
-    "endLine": 17669,
-    "classification": "generated-local-message-status-predicate",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The predicate recognizes terminal message-send states for the adjacent generated message projection. Its status vocabulary is coupled to the neighboring HI/tNe helpers and has no independent renderer consumer or lifecycle."
+    "startLine": 17679,
+    "endLine": 17681,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/message-projections.ts",
+    "evidence": "The message presentation-state predicate is now an explicit typed contract with focused status-vocabulary tests and direct renderer consumers."
   },
   {
     "hub": "app-primary",
     "alias": "Cd",
     "sourceSymbol": "iNe",
-    "startLine": 17685,
-    "endLine": 17690,
-    "classification": "generated-local-message-metadata-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The helper reads a generated message metadata key and normalizes string values for one adjacent message surface. No named renderer module consumes the alias, so extracting it would create an unowned metadata facade."
+    "startLine": 17698,
+    "endLine": 17701,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/message-projections.ts",
+    "evidence": "The senderLinkId metadata projection is now a named, type-checked boundary imported directly by renderer consumers and tested for non-string values."
   },
   {
     "hub": "app-primary",
     "alias": "Ig",
     "sourceSymbol": "VE",
-    "startLine": 3636,
-    "endLine": 3641,
-    "classification": "generated-local-cyclic-selection-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The helper performs wraparound selection in the generated annotation control using the supplied index and offset. It is consumed only by the local control state machine and has no standalone renderer contract."
+    "startLine": 3649,
+    "endLine": 3655,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/cyclic-selection.ts",
+    "evidence": "Wraparound selection, including the release fallback for an unknown current item, now has a generic typed runtime owner and focused boundary tests."
   },
   {
     "hub": "app-primary",
@@ -1775,11 +1775,11 @@
     "hub": "app-primary",
     "alias": "Su",
     "sourceSymbol": "sPe",
-    "startLine": 21898,
-    "endLine": 21900,
-    "classification": "generated-local-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The markdown filename stem normalizer is consumed only by the neighboring generated editor flow and has no independently named renderer import or teardown owner."
+    "startLine": 21911,
+    "endLine": 21913,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/prompt-and-markdown-policy.ts",
+    "evidence": "Case-insensitive Markdown suffix normalization is now a named pure policy directly consumed by renderer surfaces and covered by suffix-boundary tests."
   },
   {
     "hub": "app-primary",
@@ -1845,11 +1845,11 @@
     "hub": "app-primary",
     "alias": "zf",
     "sourceSymbol": "PP",
-    "startLine": 14861,
-    "endLine": 14863,
-    "classification": "generated-local-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The helper trims an adjacent generated prompt list and selects its first non-empty entry, returning null for empty input; it has no independently named renderer consumer or lifecycle boundary."
+    "startLine": 14874,
+    "endLine": 14875,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/prompt-and-markdown-policy.ts",
+    "evidence": "First non-empty prompt selection now has a named typed owner, direct renderer imports, and focused trimming/null behavior tests."
   },
   {
     "hub": "app-primary",
@@ -1885,51 +1885,51 @@
     "hub": "app-primary",
     "alias": "Md",
     "sourceSymbol": "VMe",
-    "startLine": 17452,
-    "endLine": 17466,
-    "classification": "generated-local-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The helper normalizes contact records by trimming email/name/photo fields and dropping empty addresses; it is a local data projection owned by the adjacent generated mail runtime with no independent renderer consumer."
+    "startLine": 17465,
+    "endLine": 17479,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/normalize-recipient-fields.ts",
+    "evidence": "Contact record normalization is now part of the typed recipient-field boundary, preserving trim/drop/photo mapping behavior with direct renderer imports and focused tests."
   },
   {
     "hub": "app-primary",
     "alias": "Nd",
     "sourceSymbol": "HMe",
-    "startLine": 17467,
-    "endLine": 17471,
-    "classification": "generated-local-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The helper resolves a contact id by case-insensitive owner-email matching; its pure lookup is consumed only within the neighboring generated mail flow and has no independent lifecycle owner."
+    "startLine": 17480,
+    "endLine": 17484,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/normalize-recipient-fields.ts",
+    "evidence": "Case-insensitive owner-email contact lookup now lives in the typed recipient boundary and is consumed directly by named mail surfaces."
   },
   {
     "hub": "app-primary",
     "alias": "Ld",
     "sourceSymbol": "WMe",
-    "startLine": 17492,
-    "endLine": 17501,
-    "classification": "generated-local-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The helper formats normalized contact emails or legacy string fields for display; it is a deterministic local projection without JSX, store ownership, or teardown semantics."
+    "startLine": 17505,
+    "endLine": 17514,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/normalize-recipient-fields.ts",
+    "evidence": "Normalized-contact and legacy-string display compatibility now has a typed semantic owner with direct consumers and both representations under test."
   },
   {
     "hub": "app-primary",
     "alias": "Ud",
     "sourceSymbol": "qMe",
-    "startLine": 17525,
-    "endLine": 17529,
-    "classification": "generated-local-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The helper joins known recipient emails with an unfinished input token for the adjacent generated recipient editor; no separately named renderer consumer or lifecycle boundary owns this formatting helper."
+    "startLine": 17538,
+    "endLine": 17542,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/normalize-recipient-fields.ts",
+    "evidence": "Committed-recipient and unfinished-token merging now belongs to the typed recipient editor boundary and is tested across empty and mixed branches."
   },
   {
     "hub": "app-primary",
     "alias": "Pr",
-    "sourceSymbol": "Z3",
-    "startLine": 91668,
-    "endLine": 91674,
-    "classification": "generated-local-geometry-helper",
+    "sourceSymbol": "I2",
+    "startLine": 81697,
+    "endLine": 81701,
+    "classification": "generated-local-image-runtime-bootstrap",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The helper computes the intersection rectangle for two DOMRect-like bounds and returns null for empty overlap; it is consumed only by the adjacent generated selection overlay traversal and has no independent renderer owner or teardown boundary."
+    "evidence": "The public Pr export is the I2 lazy initializer (not the unrelated local Z3 rectangle helper). It orders image/runtime dependencies and initializes a hub-local WeakMap, so it remains coupled to the generated image lifecycle."
   },
   {
     "hub": "app-primary",

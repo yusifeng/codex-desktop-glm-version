@@ -22,6 +22,7 @@ const __vite__mapDeps = (
       "@rchunk/api",
     ]),
 ) => i.map((i) => d[i]);
+import { getFirstPrompt as ir } from "../app-primary/runtime/prompt-and-markdown-policy";
 import { createPrefilledPluginPrompt as rr } from "../app-primary/runtime/create-prefilled-plugin-prompt";
 import { classNames as K, initializeClassNames as U } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
@@ -241,7 +242,6 @@ import {
   Bf as er,
   Fl as tr,
   Pl as nr,
-  zf as ir,
 } from "@rchunk/app-primary";
 import { a as ar, n as or, r as sr } from "@rchunk/computer-history-suggestions";
 import { n as cr, t as lr } from "@rchunk/toolbar-breadcrumb";

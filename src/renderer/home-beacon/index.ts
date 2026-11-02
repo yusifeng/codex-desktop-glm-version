@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getTakeoverAvailabilityStatus as ge } from "../app-primary/runtime/availability-status";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -40,7 +41,6 @@ import {
 } from "@rchunk/app-initial";
 import {
   Dh as y,
-  Eh as ge,
   Fh as b,
   Ih as _e,
   Lh as x,
