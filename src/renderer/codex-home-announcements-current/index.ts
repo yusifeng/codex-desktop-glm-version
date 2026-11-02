@@ -17,6 +17,7 @@ const __vite__mapDeps = (
       "@rchunk/use-codex-worktrees",
     ]),
 ) => i.map((i) => d[i]);
+import { HomeAnnouncementBanner as ke, initializeHomeAnnouncementBanner as De } from "../app-primary/runtime/home-announcement-banner";
 import { getEligibilityStatus as Te } from "../app-primary/runtime/availability-status";
 import { FAST_MODE_BANNER_CTA_CLICKED as h, FAST_MODE_BANNER_DISMISSED as T, FAST_MODE_BANNER_VIEWED as E } from "../app-shared/runtime/fast-mode-analytics-events";
 import { findFastServiceTier as x } from "../app-shared/runtime/service-tiers";
@@ -97,9 +98,7 @@ import {
 } from "@rchunk/app-initial";
 import {
   Ch as Ee,
-  Cm as De,
   Kp as Oe,
-  Sm as ke,
   Xp as Ae,
   Zp as je,
   bh as Me,

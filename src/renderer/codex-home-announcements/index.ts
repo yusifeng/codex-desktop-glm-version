@@ -22,6 +22,7 @@ const __vite__mapDeps = (
       "@rchunk/entry-point-availability",
     ]),
 ) => i.map((i) => d[i]);
+import { HomeAnnouncementBanner as je, initializeHomeAnnouncementBanner as ke } from "../app-primary/runtime/home-announcement-banner";
 import { getEligibilityStatus as I } from "../app-primary/runtime/availability-status";
 import { FAST_MODE_BANNER_CTA_CLICKED as m, FAST_MODE_BANNER_DISMISSED as w, FAST_MODE_BANNER_VIEWED as T } from "../app-shared/runtime/fast-mode-analytics-events";
 import { findFastServiceTier as b } from "../app-shared/runtime/service-tiers";
@@ -90,9 +91,7 @@ import {
   ypn as Oe,
 } from "@rchunk/app-initial";
 import {
-  Cm as ke,
   Kp as Ae,
-  Sm as je,
   Xp as Me,
   Zp as Ne,
   em as L,

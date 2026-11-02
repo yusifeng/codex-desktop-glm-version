@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { HomeAnnouncementBanner as me, initializeHomeAnnouncementBanner as pe } from "../app-primary/runtime/home-announcement-banner";
 import { formatKeyboardShortcut as A } from "../app-shared/runtime/keyboard-shortcut-label";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -63,10 +64,7 @@ import {
   yA as de,
   ypn as fe,
 } from "@rchunk/app-initial";
-import {
-  Cm as pe,
-  Sm as me,
-} from "@rchunk/app-primary";
+
 var q;
 function he() {
   return (he = e(() => {

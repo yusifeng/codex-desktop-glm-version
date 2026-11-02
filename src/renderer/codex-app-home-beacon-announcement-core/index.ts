@@ -20,6 +20,7 @@ const __vite__mapDeps = (
       "@rchunk/plaid-link",
     ]),
 ) => i.map((i) => d[i]);
+import { HomeAnnouncementBanner as $e, initializeHomeAnnouncementBanner as We } from "../app-primary/runtime/home-announcement-banner";
 import { isAbsoluteHttpUrl as He } from "../app-primary/runtime/action-url-policy";
 import { isAllowedActionUrl as Ze, isTasksLocalAction as at } from "../app-primary/runtime/action-url-policy";
 import { formatBeaconActionKey as ft } from "../app-primary/runtime/format-beacon-action-key";
@@ -120,14 +121,12 @@ import {
 } from "@rchunk/app-initial";
 import {
   Bp as Ue,
-  Cm as We,
   Dh as Ge,
   Hm as Ke,
   Hp as qe,
   Km as Ye,
   Oh as Xe,
   Sh as Qe,
-  Sm as $e,
   Th as et,
   Up as tt,
   Vm as nt,

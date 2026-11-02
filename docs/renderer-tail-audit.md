@@ -1,5 +1,25 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Final semantic-hub and runtime-source boundary closure：将最后 7 个仍由 renderer
+直接消费的 `app-primary` 语义 alias 作为两个完整簇移出聚合 Hub，而不是保留兼容转发。
+Home announcement 簇恢复 Banner action placement、beacon dismiss、badge、leading visual、
+responsive CTA 与共享 surface 初始化；GPT plugin migration 簇恢复 account/user/visit scoped
+mutable family、conversation visit bridge、eligibility/dismissal derived family 及 continued/dismiss
+原子转换。连同抽取过程中自动迁移的 3 个已具名依赖，本批共移除 10 个 compressed alias、
+30 个绑定和 14 个文件的直接 Hub 导入；当前三个 Hub 的 `semantic-business-logic` 直接消费者
+均为 0，app-primary 总直接消费由 722 降至 715。新增 13 条簇行为断言，并建立 runtime-source
+完成门禁：main、renderer、webview、preserved/recovered 运行源码树不得包含原始 `.js/.cjs/.mjs`
+源码，conversation compatibility manifest 必须保持 0，exact fallback map 必须保持 0，33 个
+vendor/generated route dependency 必须逐项存在 checked-in TypeScript。完成审计同时发现并修复
+debug-window 专项在 Node 22 直接 import TypeScript 的测试假阴性，并新增 logger buffer flush、tag、
+memoization、elapsed timestamp 契约覆盖。Git core/stable/node/turn-diff 与 worker dispatcher、
+BrowserHostManager/service、IAB、browser/detached/debug/quick-chat window、jank/sampler/worker sampler、
+2,247 app-code coverage、604 route override、397 preserved inventory 和 0 semantic tail 的专项全部
+通过；`npm run check` 通过 12,464 transform、11 main roots、1,916 renderer chunks，真实登录态
+`npm run e2e:critical` 覆盖 settings、Git、worktrees、Browser/IAB、conversation history/add-context，
+并发送 `E2E_REPLY_20261102084739` 后收到 assistant 同 marker。该记录证明当前自审边界已闭合，
+最终完成结论仍须经过独立 review，不以本记录单独代替 review。
+
 2026-11-02 Checkout/editor/runtime utility convergence：一次迁移 10 个公开压缩 alias、40 个
 renderer 调用绑定和 32 个调用文件。app-primary 范围包括 current/legacy checkout return-path
 校验与传播、五类 connector link/active-auth 判定、四个编辑器共用的严格 Cmd/Ctrl+S 事件边界，

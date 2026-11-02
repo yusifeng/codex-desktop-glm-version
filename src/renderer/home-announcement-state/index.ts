@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { HomeAnnouncementBanner as U, initializeHomeAnnouncementBanner as V } from "../app-primary/runtime/home-announcement-banner";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -73,11 +74,9 @@ import {
   ypn as De,
 } from "@rchunk/app-initial";
 import {
-  Cm as V,
   Lh as H,
   Mh as Oe,
   Ph as ke,
-  Sm as U,
   zp as Ae,
 } from "@rchunk/app-primary";
 var W;

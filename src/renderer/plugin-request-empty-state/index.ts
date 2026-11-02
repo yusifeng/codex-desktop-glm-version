@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { HomeAnnouncementBanner as Gn, initializeHomeAnnouncementBanner as Hn } from "../app-primary/runtime/home-announcement-banner";
 import { configurationQueryKey as at } from "../app-initial/runtime/configuration-query-key";
 import { classNames as ve, initializeClassNames as oe } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -202,10 +203,8 @@ import {
   zv as Vn,
 } from "@rchunk/app-initial";
 import {
-  Cm as Hn,
   Ir as Un,
   Lr as Wn,
-  Sm as Gn,
 } from "@rchunk/app-primary";
 import { n as Kn, t as qn } from "@rchunk/app-connect-modal";
 import { n as Jn, t as Yn } from "@rchunk/use-app-connect-flow";

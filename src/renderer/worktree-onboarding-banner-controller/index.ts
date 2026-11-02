@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { HomeAnnouncementBanner as M, initializeHomeAnnouncementBanner as j } from "../app-primary/runtime/home-announcement-banner";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -34,7 +35,7 @@ import {
   xvt as k,
   ypn as A,
 } from "@rchunk/app-initial";
-import { Cm as j, Sm as M } from "@rchunk/app-primary";
+
 import { r as N, t as P } from "@rchunk/worktree-onboarding-state";
 function F(e) {
   let t = (0, I.c)(18),

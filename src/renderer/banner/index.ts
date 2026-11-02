@@ -19,6 +19,7 @@ const __vite__mapDeps = (
       "@rchunk/migrated-plugin-notice",
     ]),
 ) => i.map((i) => d[i]);
+import { initializeGptPluginMigrationState as y, markGptPluginMigrationContinued as b, migrationVisitEligible as x } from "../app-primary/runtime/gpt-plugin-migration-state";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -42,7 +43,7 @@ import {
   o_n as _,
   pfn as v,
 } from "@rchunk/app-initial";
-import { Lp as y, Mp as b, Pp as x } from "@rchunk/app-primary";
+
 import { n as S, t as C } from "@rchunk/chat-choice-view";
 function w(e) {
   let t = (0, E.c)(3),

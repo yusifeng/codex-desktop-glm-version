@@ -28,6 +28,7 @@ const __vite__mapDeps = (
       "./app-primary-484df789f2f5.css",
     ]),
 ) => i.map((i) => d[i]);
+import { initializeGptPluginMigrationState as dc } from "../app-primary/runtime/gpt-plugin-migration-state";
 import { initializeMountedState as Ie, useIsMounted as Ce } from "../app-shared/runtime/mounted-state";
 import { isTerminalConversationStatus as Ki } from "../app-initial/runtime/is-terminal-conversation-status";
 import { classNames as je, initializeClassNames as Se } from "../app-shared/ui/class-names";
@@ -519,7 +520,6 @@ import {
   In as cc,
   K as lc,
   Li as uc,
-  Lp as dc,
   Nn as fc,
   Oa as pc,
   Oo as mc,

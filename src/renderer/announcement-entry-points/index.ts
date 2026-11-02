@@ -12,6 +12,7 @@ const __vite__mapDeps = (
       "./app-initial-e8ceb32eb626.css",
     ]),
 ) => i.map((i) => d[i]);
+import { HomeAnnouncementBanner as at, initializeHomeAnnouncementBanner as tt } from "../app-primary/runtime/home-announcement-banner";
 import { createPrefilledPluginPrompt as it } from "../app-primary/runtime/create-prefilled-plugin-prompt";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -123,10 +124,8 @@ import {
 } from "@rchunk/app-initial";
 import {
   Bf as et,
-  Cm as tt,
   Nf as nt,
   Pf as rt,
-  Sm as at,
   Xh as ot,
   Zh as st,
 } from "@rchunk/app-primary";

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { HomeAnnouncementBanner as l, initializeHomeAnnouncementBanner as c } from "../app-primary/runtime/home-announcement-banner";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -9,7 +10,7 @@ import {
   ig as o,
   n4 as s,
 } from "@rchunk/app-shared";
-import { Cm as c, Sm as l } from "@rchunk/app-primary";
+
 function u(e) {
   let t = (0, d.c)(18),
     { entryPoint: n, onDismiss: r, onStart: a, orbSrc: c } = e,

@@ -170,6 +170,13 @@ const EXPLICIT_EXPORTS = new Map([
   ["app-primary:qg", ["src/renderer/app-primary/runtime/annotation-color-policy.ts", "getAnnotationAccentColor"]],
   ["app-primary:Yg", ["src/renderer/app-primary/runtime/annotation-color-policy.ts", "formatAnnotationRgbColor"]],
   ["app-primary:Jg", ["src/renderer/app-primary/runtime/annotation-color-policy.ts", "formatAnnotationMutedColor"]],
+  ["app-primary:Cm", ["src/renderer/app-primary/runtime/home-announcement-banner.ts", "initializeHomeAnnouncementBanner"]],
+  ["app-primary:Sm", ["src/renderer/app-primary/runtime/home-announcement-banner.ts", "HomeAnnouncementBanner"]],
+  ["app-primary:Ip", ["src/renderer/app-primary/runtime/gpt-plugin-migration-state.ts", "migrationNoticeDismissed"]],
+  ["app-primary:Lp", ["src/renderer/app-primary/runtime/gpt-plugin-migration-state.ts", "initializeGptPluginMigrationState"]],
+  ["app-primary:Mp", ["src/renderer/app-primary/runtime/gpt-plugin-migration-state.ts", "markGptPluginMigrationContinued"]],
+  ["app-primary:Np", ["src/renderer/app-primary/runtime/gpt-plugin-migration-state.ts", "dismissGptPluginMigrationNotice"]],
+  ["app-primary:Pp", ["src/renderer/app-primary/runtime/gpt-plugin-migration-state.ts", "migrationVisitEligible"]],
 ]);
 
 function walk(directory) {

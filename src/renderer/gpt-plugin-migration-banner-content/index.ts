@@ -18,6 +18,7 @@ const __vite__mapDeps = (
       "@rchunk/gpt-plugin-migration-failure",
     ]),
 ) => i.map((i) => d[i]);
+import { dismissGptPluginMigrationNotice as ee, initializeGptPluginMigrationState as j, markGptPluginMigrationContinued as M, migrationNoticeDismissed as A, migrationVisitEligible as N } from "../app-primary/runtime/gpt-plugin-migration-state";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -52,7 +53,7 @@ import {
   u1 as O,
   uht as k,
 } from "@rchunk/app-initial";
-import { Ip as A, Lp as j, Mp as M, Np as ee, Pp as N } from "@rchunk/app-primary";
+
 import { n as P, t as F } from "@rchunk/chat-choice-view";
 import { i as I, n as L, o as R, r as z, t as B } from "@rchunk/migrated-plugin-access";
 import { i as V, n as H, r as U, t as W } from "@rchunk/gpt-plugin-migration-notices";

@@ -1,6 +1,20 @@
 import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
 import fs from "node:fs";
-import { createDebugWindowRuntime } from "../src/main/main-app/debug/debug-window-manager.ts";
+import * as esbuild from "esbuild";
+
+const built = await esbuild.build({
+  entryPoints: ["src/main/main-app/debug/debug-window-manager.ts"],
+  bundle: true,
+  format: "esm",
+  platform: "node",
+  target: "node22",
+  write: false,
+  logLevel: "silent",
+});
+const { createDebugWindowRuntime } = await import(
+  `data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`
+);
 
 let assertions = 0;
 const equal = (actual, expected) => {
