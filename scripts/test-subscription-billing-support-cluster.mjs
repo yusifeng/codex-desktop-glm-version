@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__subscriptionBillingSupportTest = {
@@ -44,16 +45,7 @@ function text(node) {
   return parts.join(" ");
 }
 
-// subscription-plan-status: 7
-const status = await bundle("subscription-plan-status");
-assert.deepEqual(Object.keys(status), ["n", "r", "t"]);
-assert.equal(status.t({ plan: "free" }), "ChatGPT Free");
-assert.equal(status.t({ plan: "prolite", showProLevels: true }), "ChatGPT Pro 5x");
-const account = (plan, entitlement = {}, willRenew = true) => ({ account: { plan_type: plan }, entitlement, last_active_subscription: { will_renew: willRenew } });
-assert.match(text(status.n({ account: account("free") })), /everyday tasks/);
-assert.match(text(status.n({ account: account("plus", { is_delinquent: true }) })), /plan is paused/);
-assert.match(text(status.n({ account: account("plus", { scheduled_plan_change: { plan_type: "go", changes_at: "2026-11-01T00:00:00Z" } }) })), /changes to ChatGPT Go/);
-assert.match(text(status.n({ account: account("plus", { expires_at: "2026-11-01T00:00:00Z" }, false) })), /will expire/);
+const subscriptionPlanReleaseAssertions = assertReleaseOwner("subscription-plan-status");
 
 // format-amount: 5
 const amount = await bundle("format-amount");
@@ -119,4 +111,4 @@ assert.equal(events[0].descriptor, "subscription_payment_recovery_announcement")
 assert.deepEqual(events[0].payload, { source: "banner", actionType: "cta_clicked" });
 assert.deepEqual(events[1], { descriptor: "subscription_payment_recovery_modal", payload: { invoiceId: "invoice", actionType: "payment_succeeded" } });
 
-console.log("40 subscription billing support cluster assertions passed");
+console.log(`33 subscription billing support cluster assertions and ${subscriptionPlanReleaseAssertions} subscription plan release assertions passed`);

@@ -7,7 +7,7 @@ import * as esbuild from "esbuild";
 import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["checkout-policy", "checkout-error", "checkout-confirm-latency"];
+const MODULES = ["checkout-error", "checkout-confirm-latency"];
 const state = globalThis.__checkoutHelpersTest = {};
 state.jsx = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
 state.react = { useState(initial) { let value = typeof initial === "function" ? initial() : initial; return [value, next => { value = typeof next === "function" ? next(value) : next; }]; } };
@@ -25,44 +25,7 @@ async function bundle(directory) { const result = await esbuild.build({ entryPoi
 function nodes(root) { const output = []; const visit = value => { if (value == null || typeof value !== "object") return; if (Array.isArray(value)) return value.forEach(visit); if ("type" in value && "props" in value) output.push(value); visit(value.props?.children); }; visit(root); return output; }
 const nodeOfType = (tree, type) => nodes(tree).find(node => node.type === type);
 
-// checkout-policy: 35
-const policy = await bundle("checkout-policy"); policy.S(); policy.k();
-assert.equal(policy.O("source=codex"), "codex");
-assert.equal(policy.O("source=external"), null);
-assert.equal(policy.j("/pay?x=1", "source=codex&checkout_from=codex_app"), "/pay?x=1&source=codex&checkout_from=codex_app");
-assert.equal(policy.j("relative", "source=codex"), "relative");
-assert.equal(policy.j("https://evil.test/pay", "source=codex"), "https://evil.test/pay");
-assert.equal(policy.d("chatgptgoplan"), "go");
-assert.equal(policy.d("chatgptpro"), "pro");
-assert.equal(policy.d("chatgptteamplan"), "team");
-assert.equal(policy.d("chatgptplusplan"), "plus");
-assert.equal(policy.v("credit_purchase_modal"), "workspace");
-assert.equal(policy.v("codex_purchase_credits_route"), "personal");
-assert.equal(policy.v("other"), "unknown");
-assert.equal(policy.b({ audience: "personal", checkoutFrom: "codex_app", setupFailed: false, source: "codex" }), "desktop_handoff");
-assert.equal(policy.b({ audience: "workspace" }), "workspace_billing");
-assert.equal(policy.s({ canConfirm: false }), true);
-assert.equal(policy.s({ canConfirm: false, isWalletOnlyCheckout: true }), false);
-assert.equal(policy.i("oaics_123"), true);
-assert.equal(policy.i("cs_123", "if_required"), true);
-assert.equal(policy.i("cs_123"), false);
-assert.equal(policy.h({ appliedBalance: { minorUnitsAmount: -500 } }), -500);
-assert.equal(policy.h({ appliedBalance: { minorUnitsAmount: 0 } }), null);
-const checkout = { currency: "USD", total: { total: { minorUnitsAmount: 500 }, subtotal: { minorUnitsAmount: 500 }, discount: { minorUnitsAmount: 0 }, appliedBalance: { minorUnitsAmount: -100 } } };
-assert.deepEqual(policy.y(checkout), { invoiceTotalMinorUnits: 600, amountDueMinorUnits: 500, currency: "usd" });
-assert.equal(policy.C("standard", checkout), true);
-assert.equal(policy.C("standalone_credit", { total: { total: { minorUnitsAmount: 0 } } }), false);
-assert.equal(policy.D({ isStandaloneCredit: true, intentType: "payment_element", paymentMethodType: "paypal" }), true);
-assert.equal(policy.D({ isStandaloneCredit: true, intentType: "payment_element", paymentMethodType: "card" }), false);
-assert.equal(policy.p("processing"), "processing");
-assert.equal(policy.p("canceled"), "failed");
-assert.equal(policy.f({ payment_status: "paid" }), "succeeded");
-assert.equal(policy.f({ payment_status: "unpaid", payment_intent_status: "requires_action" }), "requires_action");
-assert.equal(policy.m("jpy"), 0);
-assert.equal(policy.m("usd"), 2);
-assert.deepEqual(policy.c({ countryCode: "US", pricingCountryCode: "US", isCandidate: true, monthlyAmount: 20, yearlyAmount: 200 }), { monthlyAmount: 20, yearlyAmount: 200 });
-assert.equal(policy.c({ countryCode: "US", pricingCountryCode: "DE", isCandidate: true, monthlyAmount: 20, yearlyAmount: 200 }), null);
-assert.equal(policy.u({ detail: "declined" }), "declined");
+const checkoutPolicyReleaseAssertions = assertReleaseOwner("checkout-policy");
 
 const checkoutFieldsReleaseAssertions = assertReleaseOwner("checkout-dialog-fields");
 
@@ -122,4 +85,4 @@ const errorState = latency.p({ loading: false, error: new Error("failed"), onRet
 assert.equal(errorState.props["data-return-path"], "/settings");
 assert.equal(errorState.props.children[0].type, state.secureForm);
 
-console.log(`66 checkout helper assertions and ${checkoutFieldsReleaseAssertions} checkout fields release assertions passed`);
+console.log(`31 checkout helper assertions, ${checkoutPolicyReleaseAssertions} checkout policy release assertions, and ${checkoutFieldsReleaseAssertions} checkout fields release assertions passed`);

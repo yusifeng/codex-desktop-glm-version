@@ -1,86 +1,474 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import { r as terminalWorkspaceWarningState, t as initializeTerminalWorkspaceWarningState } from "@rchunk/terminal-workspace-warning-state";
-
-type TerminalPanel = "bottom" | "right";
-interface TerminalSessionSnapshot { cwd?: string; hostId?: string; title?: string; [key: string]: unknown }
-interface TerminalTab { panel: TerminalPanel; sessionId: string; title: string }
-interface TerminalRoute { clientThreadId?: string; conversationId?: string; conversationTitle?: string | null; cwd?: string; hostId?: string; routeKind: "home" | "local-thread" | "client-local-thread" | "new-thread-panel" | "chatgpt-thread" | "remote-thread" | "other" }
-interface TerminalScope {
-  route: TerminalRoute;
-  defaultTerminalLocation?: TerminalPanel;
-  isTerminalDisabled?: boolean;
-  isWorkspaceReady?: boolean;
-  locale?: { formatMessage(descriptor: { defaultMessage: string }, values: { index: number }): string };
-  onTabsChanged?(tabs: readonly TerminalTab[]): void;
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  FX as n,
+  II as r,
+  RI as i,
+  iz as a,
+  l3 as o,
+  pZ as s,
+  sZ as c,
+  wL as l,
+} from "@rchunk/app-shared";
+import {
+  $en as u,
+  AD as d,
+  Bcn as f,
+  Dyt as p,
+  Ebt as m,
+  Evt as h,
+  Ftn as g,
+  Gst as _,
+  Gvt as ee,
+  Ibt as v,
+  Jvt as y,
+  Kst as b,
+  LCt as x,
+  Lbt as te,
+  Lgn as ne,
+  RCt as re,
+  Rgn as S,
+  Syt as ie,
+  T_t as ae,
+  Vcn as oe,
+  Vvt as C,
+  Wst as se,
+  Wvt as ce,
+  Yvt as le,
+  _vt as ue,
+  atn as w,
+  byt as de,
+  hvt as T,
+  itn as fe,
+  jD as pe,
+  mbt as E,
+  mpn as me,
+  pbt as he,
+  ppn as ge,
+  pvt as D,
+  qbt as _e,
+  qst as ve,
+  qvt as O,
+  v_t as ye,
+  vbt as k,
+  vvt as A,
+  wtn as be,
+  wvt as xe,
+  xvt as Se,
+} from "@rchunk/app-initial";
+import { r as j, t as Ce } from "@rchunk/terminal-workspace-warning-state";
+function M(e, t, n, i, a) {
+  let o = e?.trim();
+  if (o != null && o.length > 0) return o;
+  if (t != null && t.trim().length > 0) {
+    let e = r(t) || t;
+    return i > 1 ? `${e} ${n + 1}` : e;
+  }
+  return a.formatMessage(
+    {
+      id: `terminal.tabs.title`,
+      defaultMessage: `Terminal {index}`,
+      description: `Terminal tab title with a 1-based tab index`,
+    },
+    { index: n + 1 },
+  );
 }
-interface OpenTerminalOptions { cwd?: string; hostId?: string; insertPosition?: number; revealAndFocus?: boolean }
-interface SeedTerminalOptions { panel: TerminalPanel; sessionId: string; snapshot: TerminalSessionSnapshot }
-interface ConversationTerminalState { activeSessionId: string | null; counter: number; sessions: Map<string, TerminalSessionSnapshot>; tabs: TerminalTab[] }
-
-const states = new WeakMap<TerminalScope, ConversationTerminalState>();
-const watchers = new WeakMap<TerminalScope, Set<() => void>>();
-function stateFor(scope: TerminalScope): ConversationTerminalState { let state = states.get(scope); if (state == null) { state = { activeSessionId: null, counter: 0, sessions: new Map(), tabs: [] }; states.set(scope, state); } return state; }
-function notify(scope: TerminalScope): void { scope.onTabsChanged?.(stateFor(scope).tabs); watchers.get(scope)?.forEach(listener => listener()); }
-function conversationId(scope: TerminalScope): string | null { if (scope.isTerminalDisabled) return null; if (scope.route.routeKind === "home") return scope.route.clientThreadId ?? null; if (scope.route.routeKind === "local-thread") return scope.route.conversationId ?? null; return null; }
-function terminalTitle(scope: TerminalScope, snapshot: TerminalSessionSnapshot, index: number, count: number): string {
-  const explicit = snapshot.title?.trim(); if (explicit) return explicit;
-  const cwd = snapshot.cwd?.trim(); if (cwd) { const basename = cwd.replaceAll("\\", "/").split("/").filter(Boolean).at(-1) ?? cwd; return count > 1 ? `${basename} ${index + 1}` : basename; }
-  return scope.locale?.formatMessage({ defaultMessage: "Terminal {index}" }, { index: index + 1 }) ?? `Terminal ${index + 1}`;
+function N() {
+  return (N = e(() => {
+    i();
+  }))();
 }
-function refreshTabs(scope: TerminalScope): void {
-  const state = stateFor(scope); const counts = new Map<TerminalPanel, number>();
-  for (const tab of state.tabs) counts.set(tab.panel, (counts.get(tab.panel) ?? 0) + 1);
-  state.tabs = state.tabs.map(tab => { const snapshot = state.sessions.get(tab.sessionId) ?? {}; const siblings = state.tabs.filter(item => item.panel === tab.panel); return { ...tab, title: terminalTitle(scope, snapshot, siblings.findIndex(item => item.sessionId === tab.sessionId), counts.get(tab.panel) ?? 1) }; });
-  notify(scope);
+function we(e) {
+  (D(e, `right`), requestAnimationFrame(Se));
 }
-function createSession(scope: TerminalScope, snapshot: TerminalSessionSnapshot = {}): string { const state = stateFor(scope); const id = `terminal-${++state.counter}`; state.sessions.set(id, { ...snapshot, cwd: snapshot.cwd ?? scope.route.cwd, hostId: snapshot.hostId ?? scope.route.hostId }); return id; }
-function openTerminal(scope: TerminalScope, requestedSessionId?: string, panel: TerminalPanel = defaultTerminalLocation(scope), options: OpenTerminalOptions = {}): string | null {
-  if (conversationId(scope) == null) return null;
-  const state = stateFor(scope); let sessionId = requestedSessionId;
-  if (sessionId == null) sessionId = state.tabs.find(tab => tab.panel === panel && state.sessions.has(tab.sessionId))?.sessionId ?? createSession(scope, { cwd: options.cwd, hostId: options.hostId });
-  else if (!state.sessions.has(sessionId)) state.sessions.set(sessionId, { cwd: options.cwd ?? scope.route.cwd, hostId: options.hostId ?? scope.route.hostId });
-  const existing = state.tabs.find(tab => tab.sessionId === sessionId);
-  if (existing != null) existing.panel = panel;
-  else { const tab: TerminalTab = { panel, sessionId, title: "" }; const position = options.insertPosition; if (position == null || position < 0 || position >= state.tabs.length) state.tabs.push(tab); else state.tabs.splice(position, 0, tab); }
-  if (options.revealAndFocus !== false) state.activeSessionId = sessionId;
-  refreshTabs(scope); return sessionId;
+function Te(e) {
+  P(e, void 0, `bottom`);
 }
-function canOpenTerminal(scope: TerminalScope): boolean { return conversationId(scope) != null; }
-function openBottomTerminal(scope: TerminalScope): void { openNewTerminalAt(scope, "bottom"); }
-function openNewTerminalAt(scope: TerminalScope, panel: TerminalPanel, replaceSessionId?: string): void { const state = stateFor(scope); if (replaceSessionId != null) { state.tabs = state.tabs.filter(tab => tab.sessionId !== replaceSessionId); state.sessions.delete(replaceSessionId); } const sessionId = createSession(scope); openTerminal(scope, sessionId, panel); }
-function showBottomTerminal(scope: TerminalScope): void { if (!bottomPanelHasActiveTerminal(scope)) openTerminal(scope, undefined, "bottom"); }
-function showTerminal(scope: TerminalScope, panel: TerminalPanel = defaultTerminalLocation(scope)): void { if (panel === "bottom") showBottomTerminal(scope); else if (!rightPanelHasActiveTerminal(scope)) openTerminal(scope, undefined, "right"); }
-function seedTerminalSession(scope: TerminalScope, { panel, sessionId, snapshot }: SeedTerminalOptions): void { stateFor(scope).sessions.set(sessionId, { ...snapshot }); openTerminal(scope, sessionId, panel, { revealAndFocus: false }); }
-function defaultTerminalLocation(scope: TerminalScope): TerminalPanel { return scope.defaultTerminalLocation ?? "right"; }
-function panelHasActiveTerminal(scope: TerminalScope, panel: TerminalPanel): boolean { const state = stateFor(scope); return state.activeSessionId != null && state.tabs.some(tab => tab.panel === panel && tab.sessionId === state.activeSessionId); }
-function bottomPanelHasActiveTerminal(scope: TerminalScope): boolean { return panelHasActiveTerminal(scope, "bottom"); }
-function rightPanelHasActiveTerminal(scope: TerminalScope): boolean { return panelHasActiveTerminal(scope, "right"); }
-function scheduleTerminalAutoOpen(scope: TerminalScope): void { if (canOpenTerminal(scope) && scope.isWorkspaceReady !== false && stateFor(scope).tabs.length === 0) openBottomTerminal(scope); }
-function watchAutoOpenTerminal(scope: TerminalScope): () => void { const listener = () => scheduleTerminalAutoOpen(scope); let listeners = watchers.get(scope); if (listeners == null) { listeners = new Set(); watchers.set(scope, listeners); } listeners.add(listener); scheduleTerminalAutoOpen(scope); return () => listeners?.delete(listener); }
-
-const terminalController = Object.freeze({
-  open: openTerminal,
-  preloadExisting(scope: TerminalScope, sessionId: string, snapshot: TerminalSessionSnapshot, panel: TerminalPanel = defaultTerminalLocation(scope)): Promise<boolean> { if (!canOpenTerminal(scope)) return Promise.resolve(false); seedTerminalSession(scope, { panel, sessionId, snapshot }); return Promise.resolve(true); },
-  close(scope: TerminalScope, sessionId: string): TerminalSessionSnapshot | null { const state = stateFor(scope); const snapshot = state.sessions.get(sessionId) ?? null; state.sessions.delete(sessionId); state.tabs = state.tabs.filter(tab => tab.sessionId !== sessionId); if (state.activeSessionId === sessionId) state.activeSessionId = state.tabs.at(-1)?.sessionId ?? null; refreshTabs(scope); return snapshot; },
-  getTabs(scope: TerminalScope): readonly TerminalTab[] { return stateFor(scope).tabs; },
-});
-function initializeTerminalRuntime(): void { initializeTerminalWorkspaceWarningState(); void terminalWorkspaceWarningState; }
-
+function Ee(e, t, n = B(e), r = {}) {
+  return Q.open(e, t, n, r);
+}
+function P(e, t, n = B(e), { revealAndFocus: r = !0, cwd: i, hostId: a, insertPosition: o } = {}) {
+  let s = t == null ? n : je(e, t, n),
+    c = W(e);
+  if (c == null) return null;
+  let l = { ...c, cwd: i === void 0 ? c.cwd : i, hostId: a === void 0 ? c.hostId : a },
+    u = S.getConversationSnapshot(l.conversationId);
+  t != null &&
+    !u?.sessionIds.includes(t) &&
+    S.addSessionForConversation(l.conversationId, t, { activate: r });
+  let d =
+    t ??
+    Pe(e, s, u?.sessionIds ?? []) ??
+    S.addSessionForConversation(l.conversationId, void 0, { activate: r });
+  return (
+    S.claimPreloadedSessionForConversation(l.conversationId, d),
+    r && S.setActiveSessionForConversation(l.conversationId, d),
+    U(e, l, s),
+    V(e, l, {
+      activeSessionId: d,
+      revealAndFocus: r,
+      panel: s,
+      addedSessionId: d,
+      insertPosition: o,
+    }),
+    d
+  );
+}
+function F(e) {
+  return W(e) != null;
+}
+function I(e) {
+  R(e, `bottom`);
+}
+function De(e) {
+  A(e, `bottom`, { allowEmpty: !0 }) && e.set(J, !0);
+}
+function Oe(e) {
+  return e.watch((e) => {
+    if (e.get(J)) {
+      if (!e.get(E) || e.get(C.tabs$).length > 0 || e.get(ae) === `failed`) {
+        e.set(J, !1);
+        return;
+      }
+      e.get(te) && F(e) && (e.set(J, !1), I(e));
+    }
+  });
+}
+function L(e) {
+  R(e, `right`);
+}
+function R(e, t, n) {
+  let r = W(e);
+  if (r == null) return;
+  let i = S.addSessionForConversation(r.conversationId);
+  (U(e, r, t),
+    V(e, r, {
+      activeSessionId: i,
+      revealAndFocus: !0,
+      panel: t,
+      addedSessionId: i,
+      replaceTabId: n,
+    }));
+}
+function ke(e, { panel: t, sessionId: n, snapshot: r }) {
+  let i = W(e);
+  i != null &&
+    (S.seedSessionForConversation(i.conversationId, n, r, i.cwd),
+    U(e, i, t),
+    V(e, i, { activeSessionId: n, revealAndFocus: !1, panel: t, addedSessionId: n }));
+}
+function z(e) {
+  if (!e.get(w)) {
+    if (e.get(Y)) {
+      D(e, `bottom`);
+      return;
+    }
+    Te(e);
+  }
+}
+function Ae(e, t = B(e)) {
+  if (!e.get(w)) {
+    if (t === `bottom`) {
+      z(e);
+      return;
+    }
+    if (e.get(X)) {
+      we(e);
+      return;
+    }
+    P(e, void 0, `right`);
+  }
+}
+function B(e) {
+  return e.get(Z);
+}
+function je(e, t, n) {
+  let r = _(t);
+  return e.get(C.tabs$).some((e) => e.tabId === r)
+    ? `bottom`
+    : e.get(O.tabs$).some((e) => e.tabId === r)
+      ? `right`
+      : n;
+}
+function V(
+  e,
+  t,
+  {
+    activeSessionId: n,
+    revealAndFocus: r,
+    panel: i,
+    addedSessionId: a,
+    insertPosition: o,
+    replaceTabId: s,
+  },
+) {
+  let c = S.getConversationSnapshot(t.conversationId),
+    l = c?.sessionIds ?? [],
+    u = e.get(me),
+    d = T(i);
+  Ne(e, l, i);
+  let f = Fe(e, i, l, a),
+    p = new Map(e.get(d.tabs$).map((e) => [e.tabId, e]));
+  for (let [n, r] of f.entries()) {
+    let l = _(r),
+      m = S.getWorkspaceBinding(r),
+      h = c?.cwdBySessionId[r] || (m == null ? t.cwd : m.workspaceRoot),
+      g = m == null ? t.hostId : m.hostId,
+      v = M(c?.tabTitlesBySessionId[r], h, n, f.length, u),
+      y = { ...t, cwd: h, hostId: g, onNewTerminalTab: i === `bottom` ? I : L, sessionId: r },
+      b = p.get(l);
+    if (b != null) {
+      (b.title !== v || !(0, Le.default)(b.props, y)) && d.updateTab(e, l, { props: y, title: v });
+      continue;
+    }
+    let x = null;
+    ee(e, Q, {
+      revealAndFocus: !1,
+      insertPosition: r === a ? o : void 0,
+      target: i,
+      replaceTabId: r === a ? s : void 0,
+      onActivate: (e) => {
+        H(e, t, r, i);
+      },
+      onClose: (e) => {
+        let n = S.getSnapshot(r);
+        if (n != null) {
+          ((x = n), e.set(j, r, null), q.add(r));
+          try {
+            S.closeSessionForConversation(t.conversationId, r);
+          } finally {
+            q.delete(r);
+          }
+        }
+      },
+      onUndoClose: (e, n) => {
+        x != null && (S.seedSessionForConversation(t.conversationId, r, x, h), U(e, t, n));
+      },
+      onMove: (e, n) => {
+        if (n.panelId !== `bottom` && n.panelId !== `right`) return;
+        let i = n.panelId;
+        return (
+          U(e, t, i),
+          {
+            onActivate: (e) => {
+              H(e, t, r, i);
+            },
+            props: {
+              ...t,
+              cwd: h,
+              hostId: g,
+              onNewTerminalTab: i === `bottom` ? I : L,
+              sessionId: r,
+            },
+          }
+        );
+      },
+      requiresWorkspaceReady: !1,
+      props: y,
+    });
+  }
+  r && (d.activateTab(e, _(n)), A(e, i));
+}
+function Me(e, { conversationId: t, cwd: n, onNewTerminalTab: r, sessionId: i }) {
+  let a = S.getConversationSnapshot(t),
+    o = Fe(e, r === I ? `bottom` : `right`, a?.sessionIds ?? [], i),
+    s = S.getWorkspaceBinding(i);
+  return M(
+    a?.tabTitlesBySessionId[i],
+    a?.cwdBySessionId[i] || (s == null ? n : s.workspaceRoot),
+    o.indexOf(i),
+    o.length,
+    e.get(me),
+  );
+}
+function H(e, t, n, r) {
+  let i = T(r);
+  if (!S.getConversationSnapshot(t.conversationId)?.sessionIds.includes(n)) {
+    let t = _(n);
+    i.closeTab(e, t, { recordCloseUndo: !1 });
+    return;
+  }
+  (S.setActiveSessionForConversation(t.conversationId, n),
+    V(e, t, { activeSessionId: n, revealAndFocus: !1, panel: r }));
+  let a = _(n),
+    o = r === `bottom` ? `bottom-panel` : `right-panel`;
+  requestAnimationFrame(() => {
+    let t = document.querySelector(
+      `[role="tabpanel"][data-app-shell-tab-panel-controller="${r}"][data-tab-id="${a}"]`,
+    );
+    if (t == null) return;
+    let n = () =>
+      !(r === `bottom` ? e.get(E) : e.get(k)) ||
+      e.get(v) !== o ||
+      e.get(i.activeTab$)?.tabId !== a ||
+      !t.isConnected ||
+      (t.querySelector(`textarea`) != null && (xe(t), !0));
+    if (n()) return;
+    let s = new MutationObserver(() => {
+      n() && s.disconnect();
+    });
+    s.observe(t, { childList: !0, subtree: !0 });
+  });
+}
+function U(e, t, n) {
+  let r = String(t.conversationId),
+    i = K.get(r);
+  if (i != null) {
+    i.panels.add(n);
+    return;
+  }
+  let a = S.subscribeToConversation(t.conversationId, () => {
+    let n = S.getConversationSnapshot(t.conversationId);
+    if (n == null) {
+      let t = K.get(r);
+      if (t != null) {
+        for (let n of t.panels) Ne(e, [], n);
+        t.unsubscribe();
+      }
+      K.delete(r);
+      return;
+    }
+    let i = K.get(r);
+    if (i != null) {
+      i.target = W(e) ?? i.target;
+      for (let t of i.panels)
+        V(e, i.target, { activeSessionId: n.activeSessionId, revealAndFocus: !1, panel: t });
+    }
+  });
+  K.set(r, { panels: new Set([n]), target: t, unsubscribe: a });
+}
+function Ne(e, t, n) {
+  let r = T(n),
+    i = new Set(t),
+    a = !1;
+  for (let t of e.get(r.tabs$)) {
+    let n = G(t.tabId);
+    n != null &&
+      !i.has(n) &&
+      !q.has(n) &&
+      !le(e, r, t.tabId) &&
+      (e.set(j, n, null), r.closeTab(e, t.tabId, { recordCloseUndo: !1 }), (a = !0));
+  }
+  a && e.get(r.tabs$).length === 0 && D(e, n);
+}
+function Pe(e, t, n) {
+  let r = new Set(n),
+    i = T(t),
+    a = G(e.get(i.activeTab$)?.tabId ?? null);
+  if (a != null && r.has(a)) return a;
+  for (let t of e.get(i.tabs$)) {
+    let e = G(t.tabId);
+    if (e != null && r.has(e)) return e;
+  }
+  return null;
+}
+function Fe(e, t, n, r) {
+  let i = new Set(n),
+    a = e.get(T(t).tabs$).flatMap((e) => {
+      let t = G(e.tabId);
+      return t != null && i.has(t) ? [t] : [];
+    });
+  return r == null || !i.has(r) || a.includes(r) ? a : [...a, r];
+}
+function W(e) {
+  if (e.get(w)) return null;
+  switch (e.value.routeKind) {
+    case `home`: {
+      let t = e.get(ie),
+        n = e.get(p);
+      return { conversationId: e.value.clientThreadId, conversationTitle: null, cwd: t, hostId: n };
+    }
+    case `local-thread`:
+      return {
+        conversationId: d(e, e.value.conversationId),
+        conversationTitle: e.get(re, e.value.conversationId),
+        cwd: e.get(ie),
+        hostId: e.get(p),
+      };
+    case `new-thread-panel`:
+    case `chatgpt-thread`:
+    case `client-local-thread`:
+    case `remote-thread`:
+    case `other`:
+      return null;
+  }
+}
+function G(e) {
+  return e?.startsWith(`terminal:`) ? e.slice(se.length) : null;
+}
+function Ie(e) {
+  return e.startsWith(se);
+}
+var Le, K, q, J, Y, X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((Le = t(o(), 1)),
+      n(),
+      l(),
+      _e(),
+      ce(),
+      y(),
+      m(),
+      h(),
+      ge(),
+      x(),
+      fe(),
+      de(),
+      g(),
+      oe(),
+      pe(),
+      ne(),
+      N(),
+      Ce(),
+      ue(),
+      ye(),
+      b(),
+      (K = new Map()),
+      (q = new Set()),
+      (J = s(be, !1)),
+      (Y = c(u, ({ get: e }) => {
+        let t = e(C.activeTab$);
+        return e(E) && t != null && Ie(t.tabId);
+      })),
+      (X = c(u, ({ get: e }) => {
+        let t = e(O.activeTab$);
+        return e(k) && t != null && Ie(t.tabId);
+      })),
+      (Z = c(u, ({ get: e, scope: t }) =>
+        e(he) === !1 ? `right` : f(t.get, a.defaultTerminalLocation),
+      )),
+      (Q = ve({
+        conversationTransfer: {
+          canTransfer: (e, t, n) =>
+            S.canTransferSessionToConversation(t.conversationId, d(e, n.threadId), t.sessionId),
+          start: (e, t, n, r) =>
+            S.transferSessionOwnership(t.conversationId, d(e, n.threadId), t.sessionId, r),
+        },
+        getId: _,
+        getTitle: Me,
+        open: P,
+        preloadExisting: (e, t, n, r) => {
+          let i = W(e);
+          return i == null
+            ? Promise.resolve(!1)
+            : S.attachExistingForConversation(i.conversationId, t, n, r);
+        },
+      })));
+  }))();
+}
 export {
-  openBottomTerminal as a,
-  bottomPanelHasActiveTerminal as c,
-  terminalController as d,
-  showBottomTerminal as f,
-  seedTerminalSession as i,
-  defaultTerminalLocation as l,
-  watchAutoOpenTerminal as m,
-  initializeTerminalRuntime as n,
-  openNewTerminalAt as o,
-  showTerminal as p,
-  openTerminal as r,
-  scheduleTerminalAutoOpen as s,
-  canOpenTerminal as t,
-  rightPanelHasActiveTerminal as u,
+  I as a,
+  Y as c,
+  Q as d,
+  z as f,
+  ke as i,
+  Z as l,
+  Oe as m,
+  $ as n,
+  R as o,
+  Ae as p,
+  Ee as r,
+  De as s,
+  F as t,
+  X as u,
 };

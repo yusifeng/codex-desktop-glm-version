@@ -254,35 +254,6 @@ const skillShareReleaseAssertions = assertReleaseOwner("skill-share-dialog-runti
 const pluginShareAssertions = assertReleaseOwner("plugin-share-dialog-core");
 const pullRequestModalAssertions = assertReleaseOwner("create-pull-request-modal-content");
 
-// gitlab-merge-request-form-dialog: 7
-const gitlab = await bundle("gitlab-merge-request-form-dialog");
-const mergeRequests = [];
-let gitlabClosed = false;
-const gitlabTree = gitlab.GitLabMergeRequestFormDialog({
-  form: {
-    title: "Ship feature",
-    description: "Ready",
-    headBranch: "feature",
-    targetBranch: "main",
-    targetProjectPath: "group/repo",
-  },
-  target: { hostId: "host-1" },
-  onClose: () => {
-    gitlabClosed = true;
-  },
-  onSubmit: (input) => mergeRequests.push(input),
-});
-assert.equal(gitlabTree.props["data-host-id"], "host-1");
-assert.equal(byText(gitlabTree, "Create merge request").type, "h2");
-assert.equal(
-  nodes(gitlabTree).some((node) => node.props?.children === "New branch"),
-  false,
-);
-byText(gitlabTree, "Create draft").props.onClick();
-await new Promise((resolve) => setImmediate(resolve));
-assert.equal(mergeRequests[0].createAsDraft, true);
-assert.equal(mergeRequests[0].title, "Ship feature");
-assert.equal(gitlabClosed, true);
-assert.equal(byText(gitlabTree, "Open in browser").type, "button");
+const gitlabAssertions = assertReleaseOwner("gitlab-merge-request-form-dialog");
 
-console.log(`report/sharing dialogs passed with ${remoteConnectionReleaseAssertions + sharedTaskReleaseAssertions + skillShareReleaseAssertions + pluginShareAssertions + pullRequestModalAssertions} release assertions`);
+console.log(`report/sharing dialogs passed with ${remoteConnectionReleaseAssertions + sharedTaskReleaseAssertions + skillShareReleaseAssertions + pluginShareAssertions + pullRequestModalAssertions + gitlabAssertions} release assertions`);

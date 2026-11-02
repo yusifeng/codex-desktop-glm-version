@@ -1,5 +1,22 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Safety/worktree/checkout release-owner recovery：一次性恢复
+`chatgpt-code-block-editor`、`stable-worktree-status-dialog`、terminal `runtime`、
+`result-card`、`hotkey-window-detail-layout`、`verify-age-page`、
+`learning-model-gcf-lcm-shape-renderer`、`icloud-hosted-page`、
+`gitlab-merge-request-form-dialog`、`slides-outline-template-picker`、
+`model-picker-upsell-modal`、`verify-guardian-page`、
+`personal-workspace-access-blocked-dialog`、`subscription-plan-status` 与
+`checkout-policy` 十五个发布 owner，净恢复 5,625 行发布 TypeScript。旧精简 ABI/mock
+测试已迁移为发布一致性验证，同时保留同簇 workspace migration、browser account、report、
+activity、billing、checkout error/latency 等相邻行为覆盖。18 组聚焦测试、12,448/12,448
+transform check、1,888/1,888 renderer build/verify、2,247/2,247 app-code coverage、
+0 semantic tail 与 typecheck 通过。严格 hub 消费推进到 app-shared 1,773/3,185、
+app-initial 5,646/8,204、app-primary 736/917，仍为 0 unreviewed、0 invalid consumers。
+按发布源码正向行数缺口口径，剩余由 66,559 行降至 60,934 行，覆盖率约由 93.5%
+推进到 94.0%；425 个 preserved 边界、三个聚合 hub 的剩余耦合导出与最终真实 E2E
+仍未完成，因此分类/构建通过不等于完整反编译完成。
+
 2026-11-02 Announcement/purchase/secrets/queue/browser release-owner recovery：一次性恢复
 `thread-usage-breakdown`、`create-pull-request-modal-content`、`codex-home-announcements`、
 `tax-types`、`codex-home-announcements-current`、`purchase-page`、

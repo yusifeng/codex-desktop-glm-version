@@ -1,94 +1,481 @@
-// Environment-setup result card. This owns the release component contract
-// instead of exposing the earlier repository/branch mock.
-
-import { I3 as getJsxRuntime } from "@rchunk/app-shared";
-import * as appInitial from "@rchunk/app-initial";
-import "@rchunk/result-values";
-
-type OpenSection = "repositories" | "secrets" | "connections" | "network" | "scripts" | "privacy";
-interface NetworkPolicy { type?: "restricted" | "unrestricted" | "disabled" | string; egress_rules?: Array<{ host?: string }>; [key: string]: unknown }
-interface ResultDetails {
-  access?: string; name: string; networkDomains?: string[]; networkEnabled?: boolean; networkPolicy?: NetworkPolicy;
-  outboundIdentityRequirements?: unknown[] | null; repositories: string[]; runtime?: string | null; secretNames: string[];
-  setupScript?: string | null; startSkill?: string | null; [key: string]: unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  K2 as o,
+  LX as s,
+  Y2 as c,
+  Yh as l,
+  Zh as u,
+  e6 as d,
+  h4 as f,
+  lw as p,
+  m4 as m,
+  mv as h,
+  n4 as g,
+  sZ as _,
+} from "@rchunk/app-shared";
+import {
+  $en as v,
+  DLt as y,
+  SLt as b,
+  Ypt as x,
+  Zpt as S,
+  itn as C,
+  mfn as w,
+  pfn as T,
+  qpt as E,
+  vb as D,
+  xLt as O,
+  yb as k,
+} from "@rchunk/app-initial";
+import { a as A, i as j, n as ee, r as te, t as ne } from "@rchunk/result-values";
+function M(e) {
+  let t = (0, I.c)(84),
+    { actions: r, configuration: i, details: a, onOpen: o } = e,
+    s = g(),
+    u = n(w, `1180331538`),
+    d;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((d = (0, R.jsx)(D, { className: `icon-sm shrink-0` })), (t[0] = d))
+    : (d = t[0]);
+  let f;
+  t[1] === a.name
+    ? (f = t[2])
+    : ((f = (0, R.jsxs)(`div`, {
+        className: `flex min-w-0 items-center gap-2 text-size-chat font-medium text-default`,
+        children: [d, (0, R.jsx)(`span`, { className: `truncate`, children: a.name })],
+      })),
+      (t[1] = a.name),
+      (t[2] = f));
+  let p;
+  t[3] !== s || t[4] !== o
+    ? ((p =
+        o == null
+          ? null
+          : (0, R.jsx)(l, {
+              "aria-label": s.formatMessage({
+                id: `restricted.environmentSetup.result.open`,
+                defaultMessage: `Open environment settings`,
+                description: `Accessible label for opening the environment settings panel from its inline setup summary`,
+              }),
+              color: `ghost`,
+              size: `compact`,
+              onClick: () => o(),
+              children: (0, R.jsx)(h, {}),
+            })),
+      (t[3] = s),
+      (t[4] = o),
+      (t[5] = p))
+    : (p = t[5]);
+  let m;
+  t[6] !== f || t[7] !== p
+    ? ((m = (0, R.jsxs)(`div`, {
+        className: `mb-3 flex items-center justify-between gap-2`,
+        children: [f, p],
+      })),
+      (t[6] = f),
+      (t[7] = p),
+      (t[8] = m))
+    : (m = t[8]);
+  let _;
+  t[9] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((_ = (0, R.jsx)(c, {
+        id: `restricted.environmentSetup.result.repositories`,
+        defaultMessage: `Repository`,
+        description: `Label for repositories in an environment setup result`,
+      })),
+      (t[9] = _))
+    : (_ = t[9]);
+  let v;
+  t[10] !== a.repositories[0] || t[11] !== a.repositories.length
+    ? ((v =
+        a.repositories.length === 1
+          ? a.repositories[0]
+          : (0, R.jsx)(c, {
+              id: `restricted.environmentSetup.result.repositoryCount`,
+              defaultMessage: `{count, plural, =0 {None} one {# repository} other {# repositories}}`,
+              description: `Summary for an environment with zero or multiple repositories`,
+              values: { count: a.repositories.length },
+            })),
+      (t[10] = a.repositories[0]),
+      (t[11] = a.repositories.length),
+      (t[12] = v))
+    : (v = t[12]);
+  let y;
+  t[13] === o
+    ? (y = t[14])
+    : ((y = o == null ? void 0 : () => o(`repositories`)), (t[13] = o), (t[14] = y));
+  let b;
+  t[15] !== v || t[16] !== y
+    ? ((b = (0, R.jsx)(F, { label: _, value: v, onOpen: y })),
+      (t[15] = v),
+      (t[16] = y),
+      (t[17] = b))
+    : (b = t[17]);
+  let x;
+  t[18] !== a.runtime || t[19] !== o
+    ? ((x =
+        a.runtime == null
+          ? null
+          : (0, R.jsx)(F, {
+              label: (0, R.jsx)(c, {
+                id: `restricted.environmentSetup.result.runtime`,
+                defaultMessage: `Runtime`,
+                description: `Label for the runtime in an environment setup result`,
+              }),
+              value: a.runtime,
+              onOpen: o,
+            })),
+      (t[18] = a.runtime),
+      (t[19] = o),
+      (t[20] = x))
+    : (x = t[20]);
+  let S;
+  t[21] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((S = (0, R.jsx)(c, {
+        id: `restricted.environmentSetup.result.secrets`,
+        defaultMessage: `Secrets`,
+        description: `Label for network secrets in an environment setup result`,
+      })),
+      (t[21] = S))
+    : (S = t[21]);
+  let C;
+  t[22] !== a.secretNames[0] || t[23] !== a.secretNames.length
+    ? ((C =
+        a.secretNames.length === 1
+          ? a.secretNames[0]
+          : (0, R.jsx)(c, {
+              id: `restricted.environmentSetup.result.secretCount`,
+              defaultMessage: `{count, plural, =0 {None} one {# secret} other {# secrets}}`,
+              description: `Summary for an environment with zero or multiple secrets; values are never displayed`,
+              values: { count: a.secretNames.length },
+            })),
+      (t[22] = a.secretNames[0]),
+      (t[23] = a.secretNames.length),
+      (t[24] = C))
+    : (C = t[24]);
+  let T;
+  t[25] === o
+    ? (T = t[26])
+    : ((T = o == null ? void 0 : () => o(`secrets`)), (t[25] = o), (t[26] = T));
+  let E;
+  t[27] !== C || t[28] !== T
+    ? ((E = (0, R.jsx)(F, { label: S, value: C, onOpen: T })),
+      (t[27] = C),
+      (t[28] = T),
+      (t[29] = E))
+    : (E = t[29]);
+  let k;
+  t[30] !== i || t[31] !== a.outboundIdentityRequirements || t[32] !== o || t[33] !== u
+    ? ((k =
+        u && a.outboundIdentityRequirements != null
+          ? (0, R.jsx)(F, {
+              label: (0, R.jsx)(c, {
+                id: `restricted.environmentSetup.result.outboundIdentity`,
+                defaultMessage: `Outbound identity`,
+                description: `Connection aliases and IDs in the saved environment configuration`,
+              }),
+              value:
+                a.outboundIdentityRequirements.length === 1
+                  ? (0, R.jsx)(te, {
+                      configuration: i,
+                      requirement: a.outboundIdentityRequirements[0],
+                    })
+                  : (0, R.jsx)(c, {
+                      id: `restricted.environmentSetup.result.connectionCount`,
+                      defaultMessage: `{count, plural, =0 {None} one {# connection} other {# connections}}`,
+                      description: `Summary for an environment with zero or multiple outbound identity connections`,
+                      values: { count: a.outboundIdentityRequirements.length },
+                    }),
+              onOpen: o == null ? void 0 : () => o(`connections`),
+            })
+          : null),
+      (t[30] = i),
+      (t[31] = a.outboundIdentityRequirements),
+      (t[32] = o),
+      (t[33] = u),
+      (t[34] = k))
+    : (k = t[34]);
+  let A;
+  t[35] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((A = (0, R.jsx)(c, {
+        id: `restricted.environmentSetup.result.network`,
+        defaultMessage: `Network`,
+        description: `Label for network access in an environment setup result`,
+      })),
+      (t[35] = A))
+    : (A = t[35]);
+  let M;
+  t[36] === a.networkPolicy
+    ? (M = t[37])
+    : ((M = (0, R.jsx)(ne, { policy: a.networkPolicy })), (t[36] = a.networkPolicy), (t[37] = M));
+  let N;
+  t[38] === o
+    ? (N = t[39])
+    : ((N = o == null ? void 0 : () => o(`network`)), (t[38] = o), (t[39] = N));
+  let P;
+  t[40] !== M || t[41] !== N
+    ? ((P = (0, R.jsx)(F, { label: A, value: M, onOpen: N })),
+      (t[40] = M),
+      (t[41] = N),
+      (t[42] = P))
+    : (P = t[42]);
+  let L;
+  t[43] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((L = (0, R.jsx)(c, {
+        id: `restricted.environmentSetup.result.installScript`,
+        defaultMessage: `Install script`,
+        description: `Label for installation commands in an environment setup summary`,
+      })),
+      (t[43] = L))
+    : (L = t[43]);
+  let z;
+  t[44] === a.setupScript
+    ? (z = t[45])
+    : ((z = (0, R.jsx)(j, { script: a.setupScript })), (t[44] = a.setupScript), (t[45] = z));
+  let B;
+  t[46] === o
+    ? (B = t[47])
+    : ((B = o == null ? void 0 : () => o(`scripts`)), (t[46] = o), (t[47] = B));
+  let V;
+  t[48] !== z || t[49] !== B
+    ? ((V = (0, R.jsx)(F, { label: L, value: z, onOpen: B })),
+      (t[48] = z),
+      (t[49] = B),
+      (t[50] = V))
+    : (V = t[50]);
+  let H;
+  t[51] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((H = (0, R.jsx)(c, {
+        id: `restricted.environmentSetup.result.startSkill`,
+        defaultMessage: `Start skill`,
+        description: `Label for startup instructions in an environment setup summary`,
+      })),
+      (t[51] = H))
+    : (H = t[51]);
+  let U;
+  t[52] === a.startSkill
+    ? (U = t[53])
+    : ((U = (0, R.jsx)(j, { script: a.startSkill })), (t[52] = a.startSkill), (t[53] = U));
+  let W;
+  t[54] === o
+    ? (W = t[55])
+    : ((W = o == null ? void 0 : () => o(`scripts`)), (t[54] = o), (t[55] = W));
+  let G;
+  t[56] !== U || t[57] !== W
+    ? ((G = (0, R.jsx)(F, { label: H, value: U, onOpen: W })),
+      (t[56] = U),
+      (t[57] = W),
+      (t[58] = G))
+    : (G = t[58]);
+  let K;
+  t[59] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((K = (0, R.jsx)(c, {
+        id: `restricted.environmentSetup.result.access`,
+        defaultMessage: `Access`,
+        description: `Label for access in an environment setup result`,
+      })),
+      (t[59] = K))
+    : (K = t[59]);
+  let q;
+  t[60] === a.access
+    ? (q = t[61])
+    : ((q =
+        a.access === `private`
+          ? (0, R.jsx)(c, {
+              id: `restricted.environmentSetup.result.access.private`,
+              defaultMessage: `Private`,
+              description: `Private access value in an environment setup result`,
+            })
+          : (0, R.jsx)(ee, {})),
+      (t[60] = a.access),
+      (t[61] = q));
+  let J;
+  t[62] === o
+    ? (J = t[63])
+    : ((J = o == null ? void 0 : () => o(`privacy`)), (t[62] = o), (t[63] = J));
+  let Y;
+  t[64] !== q || t[65] !== J
+    ? ((Y = (0, R.jsx)(F, { label: K, value: q, onOpen: J })),
+      (t[64] = q),
+      (t[65] = J),
+      (t[66] = Y))
+    : (Y = t[66]);
+  let X;
+  t[67] !== E ||
+  t[68] !== k ||
+  t[69] !== P ||
+  t[70] !== V ||
+  t[71] !== G ||
+  t[72] !== Y ||
+  t[73] !== b ||
+  t[74] !== x
+    ? ((X = (0, R.jsxs)(`dl`, {
+        className: `grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 text-size-chat-sm`,
+        children: [b, x, E, k, P, V, G, Y],
+      })),
+      (t[67] = E),
+      (t[68] = k),
+      (t[69] = P),
+      (t[70] = V),
+      (t[71] = G),
+      (t[72] = Y),
+      (t[73] = b),
+      (t[74] = x),
+      (t[75] = X))
+    : (X = t[75]);
+  let Z;
+  t[76] === r
+    ? (Z = t[77])
+    : ((Z =
+        r ??
+        (0, R.jsx)(c, {
+          id: `restricted.environmentSetup.result.prototype`,
+          defaultMessage: `Prototype draft — execution and validation are not connected yet`,
+          description: `Notice that a prototype environment result is not yet runnable`,
+        })),
+      (t[76] = r),
+      (t[77] = Z));
+  let Q;
+  t[78] === Z
+    ? (Q = t[79])
+    : ((Q = (0, R.jsx)(`div`, {
+        className: `mt-3 border-t border-default pt-2 text-size-chat-sm text-codex-description`,
+        children: Z,
+      })),
+      (t[78] = Z),
+      (t[79] = Q));
+  let $;
+  return (
+    t[80] !== X || t[81] !== Q || t[82] !== m
+      ? (($ = (0, R.jsx)(O, {
+          className: `my-2`,
+          children: (0, R.jsxs)(`div`, { className: `px-4 py-3`, children: [m, X, Q] }),
+        })),
+        (t[80] = X),
+        (t[81] = Q),
+        (t[82] = m),
+        (t[83] = $))
+      : ($ = t[83]),
+    $
+  );
 }
-interface ResultCardProps { actions?: unknown; configuration?: unknown; details: ResultDetails; onOpen?(section?: OpenSection): void }
-const jsx = getJsxRuntime();
-
-function countLabel(values: unknown[], plural: string): string {
-  if (values.length === 0) return "None";
-  if (values.length === 1) return String(values[0]);
-  return `${values.length} ${plural}`;
+function N(e) {
+  let t = (0, I.c)(5),
+    { details: r } = e,
+    a = s(v).value,
+    o = i(z),
+    c = n(x, a.routeKind === `local-thread` ? a.conversationId : null),
+    l;
+  return (
+    t[0] !== c || t[1] !== r || t[2] !== o?.setupScript || t[3] !== o?.startSkill
+      ? ((l =
+          c == null
+            ? (0, R.jsx)(M, {
+                details: {
+                  ...r,
+                  setupScript: o?.setupScript,
+                  startSkill: o?.startSkill,
+                  networkPolicy: r.networkDomains?.length
+                    ? { type: `restricted`, egress_rules: r.networkDomains.map(P) }
+                    : { type: r.networkEnabled ? `unrestricted` : `disabled` },
+                },
+              })
+            : null),
+        (t[0] = c),
+        (t[1] = r),
+        (t[2] = o?.setupScript),
+        (t[3] = o?.startSkill),
+        (t[4] = l))
+      : (l = t[4]),
+    l
+  );
 }
-function networkLabel(policy: NetworkPolicy | undefined): string {
-  if (policy == null || policy.type === "disabled") return "Disabled";
-  if (policy.type === "unrestricted") return "Unrestricted";
-  const hosts = (policy.egress_rules ?? []).map((rule) => rule.host).filter((host): host is string => Boolean(host));
-  return hosts.length === 0 ? "Restricted" : hosts.join(", ");
+function P(e) {
+  return { host: e };
 }
-function scriptLabel(script: string | null | undefined): string {
-  const normalized = script?.trim();
-  if (!normalized) return "None";
-  const firstLine = normalized.split(/\r?\n/, 1)[0] ?? normalized;
-  return firstLine.length > 80 ? `${firstLine.slice(0, 77)}…` : firstLine;
+function F(e) {
+  let t = (0, I.c)(19),
+    { label: n, value: r, onOpen: i } = e,
+    a = (0, L.useId)(),
+    o = (0, L.useId)(),
+    s = i != null && `select-none`,
+    c;
+  t[0] === s
+    ? (c = t[1])
+    : ((c = m(`relative col-span-2 grid grid-cols-subgrid items-center`, s)),
+      (t[0] = s),
+      (t[1] = c));
+  let l;
+  t[2] !== n || t[3] !== a
+    ? ((l = (0, R.jsx)(`dt`, { id: a, className: `text-secondary`, children: n })),
+      (t[2] = n),
+      (t[3] = a),
+      (t[4] = l))
+    : (l = t[4]);
+  let u;
+  t[5] !== r || t[6] !== o
+    ? ((u = (0, R.jsx)(`span`, { id: o, className: `min-w-0 flex-1 truncate`, children: r })),
+      (t[5] = r),
+      (t[6] = o),
+      (t[7] = u))
+    : (u = t[7]);
+  let d;
+  t[8] !== a || t[9] !== i || t[10] !== o
+    ? ((d = i == null ? null : (0, R.jsx)(b, { "aria-labelledby": `${a} ${o}`, onClick: i })),
+      (t[8] = a),
+      (t[9] = i),
+      (t[10] = o),
+      (t[11] = d))
+    : (d = t[11]);
+  let f;
+  t[12] !== u || t[13] !== d
+    ? ((f = (0, R.jsxs)(`dd`, {
+        className: `flex min-w-0 items-center text-default`,
+        children: [u, d],
+      })),
+      (t[12] = u),
+      (t[13] = d),
+      (t[14] = f))
+    : (f = t[14]);
+  let p;
+  return (
+    t[15] !== c || t[16] !== l || t[17] !== f
+      ? ((p = (0, R.jsxs)(`div`, { className: c, children: [l, f] })),
+        (t[15] = c),
+        (t[16] = l),
+        (t[17] = f),
+        (t[18] = p))
+      : (p = t[18]),
+    p
+  );
 }
-function DetailRow({ label, value, onOpen }: { label: string; value: unknown; onOpen?(): void }): unknown {
-  return jsx.jsxs("div", { className: `relative col-span-2 grid grid-cols-subgrid items-center${onOpen == null ? "" : " select-none"}`, children: [
-    jsx.jsx("dt", { className: "text-secondary", children: label }),
-    jsx.jsxs("dd", { className: "flex min-w-0 items-center text-default", children: [
-      jsx.jsx("span", { className: "min-w-0 flex-1 truncate", children: value }),
-      onOpen == null ? null : jsx.jsx("button", { type: "button", onClick: onOpen, "aria-label": `Open ${label.toLowerCase()} settings`, children: "›" }),
-    ] }),
-  ] });
+var I, L, R, z;
+function B() {
+  return (B = e(() => {
+    ((I = t()),
+      f(),
+      r(),
+      (L = d()),
+      o(),
+      u(),
+      p(),
+      k(),
+      C(),
+      T(),
+      y(),
+      S(),
+      A(),
+      (R = a()),
+      (z = _(v, ({ get: e, scope: t }) => {
+        let n = t.value;
+        return n.routeKind === `local-thread` ? e(E, n.conversationId) : null;
+      })));
+  }))();
 }
-function ResultCard({ actions, configuration, details, onOpen }: ResultCardProps): unknown {
-  void configuration;
-  const repositories = Array.isArray(details.repositories) ? details.repositories : [];
-  const secretNames = Array.isArray(details.secretNames) ? details.secretNames : [];
-  const identities = Array.isArray(details.outboundIdentityRequirements) ? details.outboundIdentityRequirements : null;
-  return jsx.jsx("article", { className: "my-2", "data-environment-result": true, children: jsx.jsxs("div", { className: "px-4 py-3", children: [
-    jsx.jsxs("div", { className: "mb-3 flex items-center justify-between gap-2", children: [
-      jsx.jsxs("div", { className: "flex min-w-0 items-center gap-2 text-size-chat font-medium text-default", children: [jsx.jsx("span", { "aria-hidden": true, children: "◈" }), jsx.jsx("span", { className: "truncate", children: details.name })] }),
-      onOpen == null ? null : jsx.jsx("button", { type: "button", onClick: () => onOpen(), "aria-label": "Open environment settings", children: "⋯" }),
-    ] }),
-    jsx.jsxs("dl", { className: "grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 text-size-chat-sm", children: [
-      jsx.jsx(DetailRow, { label: "Repository", value: countLabel(repositories, "repositories"), onOpen: onOpen == null ? undefined : () => onOpen("repositories") }),
-      details.runtime == null ? null : jsx.jsx(DetailRow, { label: "Runtime", value: details.runtime, onOpen: onOpen == null ? undefined : () => onOpen() }),
-      jsx.jsx(DetailRow, { label: "Secrets", value: countLabel(secretNames, "secrets"), onOpen: onOpen == null ? undefined : () => onOpen("secrets") }),
-      identities == null ? null : jsx.jsx(DetailRow, { label: "Outbound identity", value: identities.length === 1 ? describeIdentity(identities[0]) : `${identities.length} connections`, onOpen: onOpen == null ? undefined : () => onOpen("connections") }),
-      jsx.jsx(DetailRow, { label: "Network", value: networkLabel(details.networkPolicy), onOpen: onOpen == null ? undefined : () => onOpen("network") }),
-      jsx.jsx(DetailRow, { label: "Install script", value: scriptLabel(details.setupScript), onOpen: onOpen == null ? undefined : () => onOpen("scripts") }),
-      jsx.jsx(DetailRow, { label: "Start skill", value: scriptLabel(details.startSkill), onOpen: onOpen == null ? undefined : () => onOpen("scripts") }),
-      jsx.jsx(DetailRow, { label: "Access", value: details.access === "private" ? "Private" : "Shared", onOpen: onOpen == null ? undefined : () => onOpen("privacy") }),
-    ] }),
-    jsx.jsx("footer", { className: "mt-3 border-t border-default pt-2 text-size-chat-sm text-codex-description", children: actions ?? "Prototype draft — execution and validation are not connected yet" }),
-  ] }) });
-}
-function describeIdentity(value: unknown): string {
-  if (value == null) return "Connection";
-  if (typeof value === "string") return value;
-  if (typeof value !== "object") return String(value);
-  const identity = value as Record<string, unknown>;
-  return String(identity.alias ?? identity.name ?? identity.id ?? "Connection");
-}
-function readCurrentThreadScripts(): { setupScript?: string | null; startSkill?: string | null; environmentExists?: boolean } | null {
-  const reader = (appInitial as Record<string, unknown>).getCurrentThreadEnvironmentSummary;
-  if (typeof reader !== "function") return null;
-  try { return (reader as () => { setupScript?: string | null; startSkill?: string | null; environmentExists?: boolean } | null)(); }
-  catch { return null; }
-}
-function ResultCardForCurrentThread({ details }: Pick<ResultCardProps, "details">): unknown {
-  const current = readCurrentThreadScripts();
-  if (current?.environmentExists === true) return null;
-  const networkPolicy = details.networkPolicy ?? (details.networkDomains?.length
-    ? { type: "restricted", egress_rules: details.networkDomains.map((host) => ({ host })) }
-    : { type: details.networkEnabled ? "unrestricted" : "disabled" });
-  return jsx.jsx(ResultCard, { details: { ...details, setupScript: current?.setupScript ?? details.setupScript, startSkill: current?.startSkill ?? details.startSkill, networkPolicy } });
-}
-function initializeResultCard(): void {
-  for (const name of ["yb", "itn", "pfn", "DLt", "Zpt"] as const) {
-    const initializer = (appInitial as Record<string, unknown>)[name];
-    if (typeof initializer === "function") (initializer as () => void)();
-  }
-}
-export { ResultCard as n, initializeResultCard as r, ResultCardForCurrentThread as t };
+export { M as n, B as r, N as t };

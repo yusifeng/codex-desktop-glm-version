@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
@@ -44,15 +45,7 @@ quietModal.props.children[2].props.onClick();
 assert.equal(quietClosed, true);
 assert.equal(quiet.QuietHoursActiveDialog({ accountId: "a", userId: "u", timeZone: "UTC", eligible: false, onClose() {} }), null);
 
-const model = await load("model-picker-upsell-modal");
-let cta = null;
-const modelModal = model.ModelPickerUpsellModal({ model: { displayName: "GPT", model: "gpt" }, rateLimitStatus: { model_picker_upsell: { title: "Upgrade model access", message: "More capacity", ctas: [{ id: "upgrade", label: "Upgrade" }] } }, onClose() {}, onSelectCta: (id) => { cta = id; } });
-assert.equal(modelModal.type, "dialog");
-assert.equal(modelModal.props.children[1].props.children, "Upgrade model access");
-assert.equal(modelModal.props.children[2].props.children, "More capacity");
-modelModal.props.children[3].props.children[0].props.onClick();
-assert.equal(cta, "upgrade");
-assert.equal(model.ModelPickerUpsellModal({ model: { displayName: "GPT", model: "gpt" }, rateLimitStatus: {}, onClose() {} }), null);
+const modelPickerReleaseAssertions = assertReleaseOwner("model-picker-upsell-modal");
 
 const first = await load("first-limit-dialog");
 let upgradeVariant = null;
@@ -83,4 +76,4 @@ const colorOnly = remote.RemoteConnectionEditorModal({ connection: { displayName
 assert.equal(colorOnly.props["data-connection-kind"], "remote-control");
 assert.equal(colorOnly.props.children[1].props.children.filter(Boolean).some(node => node.props?.children?.[0] === "Host"), false);
 
-console.log("account modals cluster complete");
+console.log(`account modals cluster complete (${modelPickerReleaseAssertions} model picker release assertions)`);

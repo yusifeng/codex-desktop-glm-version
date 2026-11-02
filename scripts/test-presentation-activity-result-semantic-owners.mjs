@@ -60,25 +60,7 @@ const appInitial = `
 
 assertReleaseOwner("presentation");
 
-const resultCard = await bundle("result-card", { "app-shared": appShared, "app-initial": appInitial });
-const opened = [];
-const card = resultCard.n({
-  actions: "Ready",
-  configuration: {},
-  details: {
-    access: "private", name: "Dev environment", networkPolicy: { type: "restricted", egress_rules: [{ host: "api.example.test" }] },
-    outboundIdentityRequirements: [{ alias: "GitHub" }], repositories: ["one", "two"], runtime: "node22", secretNames: ["TOKEN"],
-    setupScript: "npm install\nnpm test", startSkill: "Start the app",
-  },
-  onOpen: section => opened.push(section ?? "root"),
-});
-const cardNodes = walk(card);
-assert(cardNodes.some(node => node.props?.children === "Dev environment"));
-assert.match(JSON.stringify(card), /2 repositories/);
-assert.match(JSON.stringify(card), /api\.example\.test/);
-assert.match(JSON.stringify(card), /GitHub/);
-cardNodes.find(node => node.props?.label === "Network").props.onOpen();
-assert.deepEqual(opened, ["network"]);
+assertReleaseOwner("result-card");
 
 const activity = await bundle("agent-activity-item", {
   "app-shared": appShared,

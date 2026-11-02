@@ -1,47 +1,404 @@
-import "@rchunk/rolldown-runtime";
-
-const SOURCE_KEY = "source";
-const CHECKOUT_FROM_KEY = "checkout_from";
-const CODEX_SOURCE = "codex";
-const CODEX_APP = "codex_app";
-const EMBEDDED_SOURCE = "codex-embedded-checkout";
-const BASE_ORIGIN = "https://chatgpt.com";
-const CheckoutKind = { Standard: "standard", CodexTeam: "codex_team", StandaloneCredit: "standalone_credit", RateLimitReset: "codex_rate_limit_reset" } as const;
-const PRICE_REFRESH_REQUIRED = "credit_checkout_price_refresh_required";
-const SESSION_EXPIRED = "openai_checkout_session_expired";
-const PERSONAL_PLANS = new Set(["chatgptgoplan", "chatgptplusplan", "chatgptprolite", "chatgptpro"]);
-const CURRENCY_EXPONENT: Record<string, number> = Object.fromEntries("USD AUD GBP EUR INR IDR PKR THB MYR TWD PHP NGN ZAR KZT TZS EGP BRL SEK CZK PLN DKK NOK COP MXN PEN HUF QAR RON CAD ILS AED SGD NZD CHF SAR DZD LBP MAD YER".split(" ").map(code => [code, 2]));
-for (const code of ["CLP", "JPY", "VND", "KRW"]) CURRENCY_EXPONENT[code] = 0;
-type SearchInput = string | URLSearchParams;
-function checkoutSource(input: SearchInput): string | null { const source = (typeof input === "string" ? new URLSearchParams(input) : input).get(SOURCE_KEY); return source === CODEX_SOURCE || source === EMBEDDED_SOURCE ? source : null; }
-function hasCodexCheckoutSource(input: SearchInput): boolean { return checkoutSource(input) != null; }
-function copyCheckoutSource(input: SearchInput, output: URLSearchParams): URLSearchParams { const source = checkoutSource(input); if (source != null) { output.set(SOURCE_KEY, source); const sourceParams = typeof input === "string" ? new URLSearchParams(input) : input; if (source === CODEX_SOURCE && sourceParams.get(CHECKOUT_FROM_KEY) === CODEX_APP) output.set(CHECKOUT_FROM_KEY, CODEX_APP); } return output; }
-function appendLocalQuery(url: string, query: SearchInput | null): string { if (!url || query == null) return url; const absolute = /^[a-z][a-z\d+.-]*:/i.test(url) || url.startsWith("//"); if (!absolute && !url.startsWith("/")) return url; try { const parsed = new URL(url, BASE_ORIGIN); if (parsed.origin !== BASE_ORIGIN) return url; for (const [key, value] of typeof query === "string" ? new URLSearchParams(query) : query) parsed.searchParams.set(key, value); return absolute ? parsed.toString() : `${parsed.pathname}${parsed.search}${parsed.hash}`; } catch { return url; } }
-function appendCheckoutSource(url: string, input: SearchInput): string { return checkoutSource(input) == null ? url : appendLocalQuery(url, copyCheckoutSource(input, new URLSearchParams())); }
-function paypalPromotionConfig({ promoCode, eligibleCampaign, isCampaignFromQuery }: { promoCode?: string; eligibleCampaign?: string; isCampaignFromQuery?: boolean }) { return { plan_name: "chatgptplusplan", billing_details: { country: "DE", currency: "EUR" }, checkout_ui_mode: "custom", entry_point: "paypal_promo_checkout", promo_code: promoCode, promo_campaign: eligibleCampaign == null ? undefined : { promo_campaign_id: eligibleCampaign, is_coupon_from_query_param: isCampaignFromQuery } }; }
-function planType(plan?: string): string { return plan === "chatgptgoplan" ? "go" : plan === "chatgptpro" ? "pro" : plan === "chatgptprolite" ? "prolite" : plan === "chatgptteamplan" || plan === "chatgptbusiness_usage_based" ? "team" : "plus"; }
-function teamSuccessPath(checkout: Record<string, unknown>, query: SearchInput, allowedPath = "/payments/success-team"): string | null { const plan = String(checkout.plan_name ?? "").toLowerCase(); if (!["chatgptteamplan", "chatgptbusiness_usage_based", "team", "self_serve_business_prolite"].includes(plan) || typeof checkout.confirm_return_url !== "string" || !URL.canParse(checkout.confirm_return_url)) return null; const url = new URL(checkout.confirm_return_url); if (!["/payments/success-team", allowedPath].includes(url.pathname) || !url.searchParams.get("account_id") || url.searchParams.get("stripe_session_id") !== checkout.checkout_session_id || url.searchParams.get("processor_entity") !== checkout.processor_entity) return null; copyCheckoutSource(query, url.searchParams); return `/payments/success-team${url.search}`; }
-function blocksConfirmation({ canConfirm, isWalletOnlyCheckout, isNoPaymentRequired, isExpressCheckout }: { canConfirm?: boolean; isWalletOnlyCheckout?: boolean; isNoPaymentRequired?: boolean; isExpressCheckout?: boolean }): boolean { return canConfirm === false && !isWalletOnlyCheckout && !isNoPaymentRequired && !isExpressCheckout; }
-function initialAutoTopUp(checkout: Record<string, unknown>, query: SearchInput) { const purchase = checkout.credit_purchase_auto_top_up as Record<string, unknown> | undefined; const offer = checkout.credit_discount_offer as Record<string, unknown> | undefined; const experiments = checkout.experiments as Record<string, unknown> | undefined; const enabled = experiments?.auto_top_up_enabled === "true" && purchase?.enabled === true && !(hasCodexCheckoutSource(query) && (typeof query === "string" ? new URLSearchParams(query) : query).get("auto_top_up_enabled") === "false"); return { quantity: null, autoTopUpEnabled: enabled, monthlyLimit: purchase?.recharge_limit ?? "", enrollInDiscount: offer?.auto_reload != null && (purchase?.enroll_in_discount ?? enabled) }; }
-function autoTopUpUpdate(checkout: Record<string, unknown>, preview: { lineItems?: Array<{ quantity?: number }> }, draft: { quantity?: string | null; autoTopUpEnabled?: boolean; monthlyLimit: string; enrollInDiscount?: boolean }) { const purchase = checkout.credit_purchase_auto_top_up as Record<string, unknown> | undefined; const experiments = checkout.experiments as Record<string, unknown> | undefined; const offer = checkout.credit_discount_offer as Record<string, unknown> | undefined; const quantity = draft.quantity == null ? undefined : Number(draft.quantity); const enabled = experiments?.auto_top_up_enabled === "true" ? draft.autoTopUpEnabled : undefined; const limit = enabled ? draft.monthlyLimit.trim() || null : undefined; const discount = enabled != null && offer?.auto_reload != null ? enabled && draft.enrollInDiscount : undefined; if ((quantity == null || quantity === preview.lineItems?.[0]?.quantity) && (enabled == null || enabled === purchase?.enabled) && (limit === undefined || limit === (purchase?.recharge_limit ?? null)) && (discount == null || discount === (purchase?.enroll_in_discount ?? false))) return null; return { checkout_session_id: checkout.checkout_session_id, processor_entity: checkout.processor_entity, credit_purchase_quantity: quantity === preview.lineItems?.[0]?.quantity ? undefined : quantity, auto_top_up_enabled: enabled, auto_top_up_recharge_limit: limit, enroll_in_auto_reload_discount: discount }; }
-function checkoutAudience(source: string): "workspace" | "personal" | "unknown" { return source === "credit_purchase_modal" ? "workspace" : source === "codex_purchase_credits_route" || source === "codex_credit_purchase_modal" ? "personal" : "unknown"; }
-function checkoutDestination({ audience, checkoutFrom, setupFailed, source }: { audience: string; checkoutFrom?: string | null; setupFailed?: boolean; source?: string | null }): "desktop_handoff" | "workspace_billing" | "personal_usage" { return !setupFailed && source === CODEX_SOURCE && checkoutFrom === CODEX_APP ? "desktop_handoff" : audience === "workspace" ? "workspace_billing" : "personal_usage"; }
-function appliedBalance(total: Record<string, unknown>): number | null { const balance = (total.appliedBalance as { minorUnitsAmount?: number } | undefined)?.minorUnitsAmount; return balance == null || balance === 0 || total.balanceAppliedToNextInvoice === true ? null : balance; }
-function isNegativeInvoice(checkout: Record<string, unknown>): boolean { const total = checkout.total as Record<string, { minorUnitsAmount: number }> & Record<string, unknown>; return total.total.minorUnitsAmount === 0 && total.subtotal.minorUnitsAmount > 0 && total.discount.minorUnitsAmount === 0 && !(checkout.discountAmounts as unknown[] | undefined)?.length && (appliedBalance(total) ?? 0) < 0; }
-function isPersonalNegativeInvoice({ checkoutKind, isPersonalSubscription, hasPromotion, checkout }: { checkoutKind: string; isPersonalSubscription: boolean; hasPromotion: boolean; checkout: Record<string, unknown> }): boolean { return checkoutKind === CheckoutKind.Standard && isPersonalSubscription && !hasPromotion && isNegativeInvoice(checkout); }
-function isConfirmationToken(id: string, intentType?: string): boolean { return id.startsWith("oaics_") || intentType === "if_required"; }
-function creditConfirmationAmounts(checkout: Record<string, unknown>) { const total = checkout.total as Record<string, { minorUnitsAmount: number }> & Record<string, unknown>; return { invoiceTotalMinorUnits: total.total.minorUnitsAmount - (appliedBalance(total) ?? 0), amountDueMinorUnits: total.total.minorUnitsAmount, currency: String(checkout.currency).toLowerCase() }; }
-function shouldCollectPayment(kind: string, checkout: Record<string, unknown>, override = false): boolean { const total = checkout.total as Record<string, { minorUnitsAmount: number }>; return kind !== CheckoutKind.StandaloneCredit || total.total.minorUnitsAmount > 0 || override; }
-function unsupportedStandaloneMethod({ isStandaloneCredit, intentType, paymentMethodType }: { isStandaloneCredit: boolean; intentType?: string; paymentMethodType?: string | null }): boolean { return isStandaloneCredit && intentType === "payment_element" && paymentMethodType != null && paymentMethodType !== "card" && !paymentMethodType.startsWith("cpmt_"); }
-function paymentIntentStatus(status?: string | null): string { return ["succeeded", "requires_action", "processing"].includes(status ?? "") ? String(status) : "failed"; }
-function checkoutResultStatus(checkout: Record<string, unknown>): string { return checkout.payment_status === "paid" || checkout.payment_status === "no_payment_required" || (checkout.payment_intent_status == null && checkout.amount_total === 0) ? "succeeded" : paymentIntentStatus(checkout.payment_intent_status as string | null | undefined); }
-function confirmationPayload(sessionId: string, selection: Record<string, unknown>, amounts?: { invoiceTotalMinorUnits: number; amountDueMinorUnits: number; currency: string } | null) { const confirmed = amounts == null ? {} : { confirmed_credit_invoice_total_minor_units: amounts.invoiceTotalMinorUnits, confirmed_credit_amount_due_minor_units: amounts.amountDueMinorUnits, confirmed_credit_currency: amounts.currency }; if (selection.type === "saved_payment_method") return { checkout_session_id: sessionId, ...confirmed, selected_payment_method_type: "card", saved_payment_method_id: selection.savedPaymentMethodId }; if (selection.type === "custom_payment_method") return { checkout_session_id: sessionId, ...confirmed, selected_payment_method_type: selection.selectedPaymentMethodType }; if (selection.type === "confirmation_token") return { checkout_session_id: sessionId, ...confirmed, ...(selection.confirmToken == null ? {} : { confirm_token: selection.confirmToken }), ...(selection.selectedPaymentMethodType == null ? {} : { selected_payment_method_type: selection.selectedPaymentMethodType }) }; return { checkout_session_id: sessionId, ...confirmed }; }
-function errorMessage(error: unknown): string | undefined { if (typeof error === "string") return error; if (typeof error === "object" && error != null) { if ("detail" in error && typeof error.detail === "string") return error.detail; if ("message" in error && typeof error.message === "string") return error.message; } return undefined; }
-function isPersonalPlan(checkout: Record<string, unknown>): boolean { return typeof checkout.plan_name === "string" && PERSONAL_PLANS.has(checkout.plan_name) && checkout.credit_purchase_data == null && checkout.usage_based_workspace_credit_purchase_data == null; }
-function customModeRequested(checkout: Record<string, unknown>, context?: { fromiOSWebview?: boolean }): boolean { return checkout.checkout_ui_mode === "custom" || (checkout.checkout_ui_mode == null && !context?.fromiOSWebview && isPersonalPlan(checkout)); }
-function forceHostedCheckout(checkout: Record<string, unknown>, context?: { fromiOSWebview?: boolean }): boolean { return checkout.purchased_gift_checkout_data != null || checkout.entry_point === "students_2026" || checkout.entry_point === "codex_rate_limit_reset" || (!customModeRequested(checkout, context) && isPersonalPlan(checkout)); }
-function checkoutUiMode(checkout: Record<string, unknown>, context: { fromiOSWebview?: boolean; isServerOwnedModeEnabled(): boolean; isStandaloneCreditCustomModeEnabled?(): boolean; isCustomModeEnabled(gate: string): boolean }): string | undefined { if (checkout.purchased_gift_checkout_data != null || checkout.entry_point === "paypal_promo_checkout") return "custom"; if (checkout.entry_point === "students_2026" || (!context.fromiOSWebview && isPersonalPlan(checkout) && context.isServerOwnedModeEnabled())) return undefined; if (checkout.checkout_ui_mode != null) return String(checkout.checkout_ui_mode); if (context.fromiOSWebview) return "redirect"; if (checkout.usage_based_workspace_credit_purchase_data != null) return "custom"; if (checkout.credit_purchase_data != null) return context.isStandaloneCreditCustomModeEnabled?.() ? "custom" : "redirect"; const gates: Record<string, string> = { chatgptplusplan: "enabled_custom_checkout_for_plus", chatgptgoplan: "enabled_custom_checkout_for_go", chatgptprolite: "enabled_custom_checkout_for_pro", chatgptpro: "enabled_custom_checkout_for_pro", chatgptteamplan: "enabled_custom_checkout_for_team" }; const gate = gates[String(checkout.plan_name)]; return gate && context.isCustomModeEnabled(gate) ? "custom" : "redirect"; }
-function currencyExponent(currency: string): number | undefined { return CURRENCY_EXPONENT[currency.toUpperCase()]; }
-function annualPricingCandidate({ countryCode, pricingCountryCode, isCandidate, monthlyAmount, yearlyAmount }: { countryCode?: string | null; pricingCountryCode?: string; isCandidate: boolean; monthlyAmount?: number | null; yearlyAmount?: number | null }) { return !isCandidate || countryCode == null || pricingCountryCode !== countryCode || monthlyAmount == null || yearlyAmount == null ? null : { monthlyAmount, yearlyAmount }; }
-function initializeCheckoutPolicy(): void {}
-export { copyCheckoutSource as A, shouldCollectPayment as C, unsupportedStandaloneMethod as D, checkoutUiMode as E, checkoutSource as O, initializeCheckoutPolicy as S, forceHostedCheckout as T, paypalPromotionConfig as _, confirmationPayload as a, checkoutDestination as b, annualPricingCandidate as c, planType as d, checkoutResultStatus as f, initialAutoTopUp as g, appliedBalance as h, isConfirmationToken as i, appendCheckoutSource as j, initializeCheckoutPolicy as k, teamSuccessPath as l, currencyExponent as m, CheckoutKind as n, autoTopUpUpdate as o, paymentIntentStatus as p, SESSION_EXPIRED as r, blocksConfirmation as s, PRICE_REFRESH_REQUIRED as t, errorMessage as u, checkoutAudience as v, isPersonalNegativeInvoice as w, isNegativeInvoice as x, creditConfirmationAmounts as y };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e) {
+  let t = (typeof e == `string` ? new URLSearchParams(e) : e).get(o);
+  return t === c || t === u ? t : null;
+}
+function n(e) {
+  return t(e) != null;
+}
+function r(e, n) {
+  let r = t(e);
+  if (r != null) {
+    n.set(o, r);
+    let t = typeof e == `string` ? new URLSearchParams(e) : e;
+    r === c && t.get(s) === l && n.set(s, l);
+  }
+  return n;
+}
+function i(e, t) {
+  if (!e || t == null) return e;
+  let n = /^[a-z][a-z\d+.-]*:/i.test(e) || e.startsWith(`//`);
+  if (!n && !e.startsWith(`/`)) return e;
+  try {
+    let r = new URL(e, d);
+    if (r.origin !== d) return e;
+    let i = typeof t == `string` ? new URLSearchParams(t) : t;
+    for (let [e, t] of i) r.searchParams.set(e, t);
+    return n ? r.toString() : `${r.pathname}${r.search}${r.hash}`;
+  } catch {
+    return e;
+  }
+}
+function a(e, n) {
+  return t(n) == null ? e : i(e, r(n, new URLSearchParams()));
+}
+var o, s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    ((o = `source`),
+      (s = `checkout_from`),
+      (c = `codex`),
+      (l = `codex_app`),
+      (u = `codex-embedded-checkout`),
+      (d = `https://chatgpt.com`));
+  }))();
+}
+function p({ promoCode: e, eligibleCampaign: t, isCampaignFromQuery: n }) {
+  return {
+    plan_name: `chatgptplusplan`,
+    billing_details: { country: `DE`, currency: `EUR` },
+    checkout_ui_mode: `custom`,
+    entry_point: `paypal_promo_checkout`,
+    promo_code: e,
+    promo_campaign: t == null ? void 0 : { promo_campaign_id: t, is_coupon_from_query_param: n },
+  };
+}
+function m(e) {
+  return e === `chatgptgoplan`
+    ? `go`
+    : e === `chatgptpro`
+      ? `pro`
+      : e === `chatgptprolite`
+        ? `prolite`
+        : e === `chatgptteamplan` || e === `chatgptbusiness_usage_based`
+          ? `team`
+          : `plus`;
+}
+function h(e, t, n = `/payments/success-team`) {
+  let i = e.plan_name?.toLowerCase();
+  if (
+    (i !== `chatgptteamplan` &&
+      i !== `chatgptbusiness_usage_based` &&
+      i !== `team` &&
+      i !== `self_serve_business_prolite`) ||
+    !e.confirm_return_url ||
+    !URL.canParse(e.confirm_return_url)
+  )
+    return null;
+  let a = new URL(e.confirm_return_url);
+  return (a.pathname !== `/payments/success-team` && a.pathname !== n) ||
+    !a.searchParams.get(`account_id`) ||
+    a.searchParams.get(`stripe_session_id`) !== e.checkout_session_id ||
+    a.searchParams.get(`processor_entity`) !== e.processor_entity
+    ? null
+    : (r(t, a.searchParams), `/payments/success-team${a.search}`);
+}
+function g({
+  canConfirm: e,
+  isWalletOnlyCheckout: t,
+  isNoPaymentRequired: n,
+  isExpressCheckout: r,
+}) {
+  return e === !1 && !t && !n && !r;
+}
+function _(e, t) {
+  let r = typeof t == `string` ? new URLSearchParams(t) : t,
+    i = e.credit_purchase_auto_top_up,
+    a =
+      e.experiments?.auto_top_up_enabled === `true` &&
+      i?.enabled === !0 &&
+      !(n(r) && r.get(`auto_top_up_enabled`) === `false`);
+  return {
+    quantity: null,
+    autoTopUpEnabled: a,
+    monthlyLimit: i?.recharge_limit ?? ``,
+    enrollInDiscount: e.credit_discount_offer?.auto_reload != null && (i?.enroll_in_discount ?? a),
+  };
+}
+function v(e, t, n) {
+  let r = e.credit_purchase_auto_top_up,
+    i = n.quantity == null ? void 0 : Number(n.quantity),
+    a = e.experiments?.auto_top_up_enabled === `true` ? n.autoTopUpEnabled : void 0,
+    o = a ? n.monthlyLimit.trim() || null : void 0,
+    s =
+      a != null && e.credit_discount_offer?.auto_reload != null ? a && n.enrollInDiscount : void 0;
+  return (i == null || i === t.lineItems[0]?.quantity) &&
+    (a == null || a === r?.enabled) &&
+    (o === void 0 || o === (r?.recharge_limit ?? null)) &&
+    (s == null || s === (r?.enroll_in_discount ?? !1))
+    ? null
+    : {
+        checkout_session_id: e.checkout_session_id,
+        processor_entity: e.processor_entity,
+        credit_purchase_quantity: i === t.lineItems[0]?.quantity ? void 0 : i,
+        auto_top_up_enabled: a,
+        auto_top_up_recharge_limit: o,
+        enroll_in_auto_reload_discount: s,
+      };
+}
+function y(e) {
+  return e === `credit_purchase_modal`
+    ? `workspace`
+    : e === `codex_purchase_credits_route` || e === `codex_credit_purchase_modal`
+      ? `personal`
+      : `unknown`;
+}
+function b({ audience: e, checkoutFrom: t, setupFailed: n, source: r }) {
+  return !n && r === `codex` && t === `codex_app`
+    ? `desktop_handoff`
+    : e === `workspace`
+      ? `workspace_billing`
+      : `personal_usage`;
+}
+function x(e) {
+  return (
+    e.total.total.minorUnitsAmount === 0 &&
+    e.total.subtotal.minorUnitsAmount > 0 &&
+    e.total.discount.minorUnitsAmount === 0 &&
+    !e.discountAmounts?.length &&
+    (w(e.total) ?? 0) < 0
+  );
+}
+function S({ checkoutKind: e, isPersonalSubscription: t, hasPromotion: n, checkout: r }) {
+  return e === R.Standard && t && !n && x(r);
+}
+function C(e, t) {
+  return e.startsWith(`oaics_`) || t === `if_required`;
+}
+function w(e) {
+  let t = e.appliedBalance?.minorUnitsAmount;
+  return t == null || t === 0 || e.balanceAppliedToNextInvoice === !0 ? null : t;
+}
+function T(e) {
+  return {
+    invoiceTotalMinorUnits: e.total.total.minorUnitsAmount - (w(e.total) ?? 0),
+    amountDueMinorUnits: e.total.total.minorUnitsAmount,
+    currency: e.currency.toLowerCase(),
+  };
+}
+function E(e, t, n = !1) {
+  return e !== R.StandaloneCredit || t.total.total.minorUnitsAmount > 0 || n;
+}
+function D({ isStandaloneCredit: e, intentType: t, paymentMethodType: n }) {
+  return e && t === `payment_element` && n != null && n !== `card` && !n.startsWith(`cpmt_`);
+}
+function O(e) {
+  return e.payment_status === `paid` ||
+    e.payment_status === `no_payment_required` ||
+    (e.payment_intent_status == null && e.amount_total === 0)
+    ? `succeeded`
+    : k(e.payment_intent_status);
+}
+function k(e) {
+  switch (e) {
+    case `succeeded`:
+    case `requires_action`:
+    case `processing`:
+      return e;
+    case `requires_payment_method`:
+    case `requires_confirmation`:
+    case `requires_capture`:
+    case `canceled`:
+    case null:
+    case void 0:
+      return `failed`;
+  }
+}
+function A(e, t, n) {
+  let r =
+    n == null
+      ? {}
+      : {
+          confirmed_credit_invoice_total_minor_units: n.invoiceTotalMinorUnits,
+          confirmed_credit_amount_due_minor_units: n.amountDueMinorUnits,
+          confirmed_credit_currency: n.currency,
+        };
+  switch (t.type) {
+    case `confirmation_token`:
+      return {
+        checkout_session_id: e,
+        ...r,
+        ...(t.confirmToken == null ? {} : { confirm_token: t.confirmToken }),
+        ...(t.selectedPaymentMethodType == null
+          ? {}
+          : { selected_payment_method_type: t.selectedPaymentMethodType }),
+      };
+    case `saved_payment_method`:
+      return {
+        checkout_session_id: e,
+        ...r,
+        selected_payment_method_type: `card`,
+        saved_payment_method_id: t.savedPaymentMethodId,
+      };
+    case `custom_payment_method`:
+      return {
+        checkout_session_id: e,
+        ...r,
+        selected_payment_method_type: t.selectedPaymentMethodType,
+      };
+    case `conditional_offer_continuation`:
+      return { checkout_session_id: e, ...r };
+  }
+}
+function j(e) {
+  if (typeof e == `string`) return e;
+  if (typeof e == `object` && e) {
+    if (`detail` in e && typeof e.detail == `string`) return e.detail;
+    if (`message` in e && typeof e.message == `string`) return e.message;
+  }
+}
+function M(e) {
+  return (
+    e.plan_name != null &&
+    V.has(e.plan_name) &&
+    e.credit_purchase_data == null &&
+    e.usage_based_workspace_credit_purchase_data == null
+  );
+}
+function N(e, t) {
+  return (
+    e.checkout_ui_mode === `custom` || (e.checkout_ui_mode == null && !t?.fromiOSWebview && M(e))
+  );
+}
+function P(e, t) {
+  return (
+    e.purchased_gift_checkout_data != null ||
+    e.entry_point === `students_2026` ||
+    e.entry_point === `codex_rate_limit_reset` ||
+    (!N(e, t) && M(e))
+  );
+}
+function F(e, t) {
+  if (e.purchased_gift_checkout_data != null || e.entry_point === `paypal_promo_checkout`)
+    return `custom`;
+  if (
+    e.entry_point === `students_2026` ||
+    (!t.fromiOSWebview && M(e) && t.isServerOwnedModeEnabled())
+  )
+    return;
+  if (e.checkout_ui_mode != null) return e.checkout_ui_mode;
+  if (t.fromiOSWebview) return `redirect`;
+  if (e.usage_based_workspace_credit_purchase_data != null) return `custom`;
+  if (e.credit_purchase_data != null)
+    return t.isStandaloneCreditCustomModeEnabled?.() ? `custom` : `redirect`;
+  let n;
+  switch (e.plan_name) {
+    case `chatgptplusplan`:
+      n = `enabled_custom_checkout_for_plus`;
+      break;
+    case `chatgptgoplan`:
+      n = `enabled_custom_checkout_for_go`;
+      break;
+    case `chatgptprolite`:
+    case `chatgptpro`:
+      n = `enabled_custom_checkout_for_pro`;
+      break;
+    case `chatgptteamplan`:
+      n = `enabled_custom_checkout_for_team`;
+      break;
+    default:
+      return `redirect`;
+  }
+  return t.isCustomModeEnabled(n) ? `custom` : `redirect`;
+}
+function I(e) {
+  return H[e.toUpperCase()];
+}
+function L({
+  countryCode: e,
+  pricingCountryCode: t,
+  isCandidate: n,
+  monthlyAmount: r,
+  yearlyAmount: i,
+}) {
+  return !n || e == null || t !== e || r == null || i == null
+    ? null
+    : { monthlyAmount: r, yearlyAmount: i };
+}
+var R, z, B, V, H;
+function U() {
+  return (U = e(() => {
+    (f(),
+      (R = (function (e) {
+        return (
+          (e.Standard = `standard`),
+          (e.CodexTeam = `codex_team`),
+          (e.StandaloneCredit = `standalone_credit`),
+          (e.RateLimitReset = `codex_rate_limit_reset`),
+          e
+        );
+      })({})),
+      (z = `credit_checkout_price_refresh_required`),
+      (B = `openai_checkout_session_expired`),
+      (V = new Set([`chatgptgoplan`, `chatgptplusplan`, `chatgptprolite`, `chatgptpro`])),
+      (H = {
+        USD: 2,
+        AUD: 2,
+        CLP: 0,
+        GBP: 2,
+        EUR: 2,
+        JPY: 0,
+        INR: 2,
+        IDR: 2,
+        PKR: 2,
+        THB: 2,
+        MYR: 2,
+        TWD: 2,
+        VND: 0,
+        PHP: 2,
+        NGN: 2,
+        ZAR: 2,
+        KZT: 2,
+        TZS: 2,
+        EGP: 2,
+        BRL: 2,
+        SEK: 2,
+        CZK: 2,
+        PLN: 2,
+        DKK: 2,
+        NOK: 2,
+        KRW: 0,
+        COP: 2,
+        MXN: 2,
+        PEN: 2,
+        HUF: 2,
+        QAR: 2,
+        RON: 2,
+        CAD: 2,
+        ILS: 2,
+        AED: 2,
+        SGD: 2,
+        NZD: 2,
+        CHF: 2,
+        SAR: 2,
+        DZD: 2,
+        LBP: 2,
+        MAD: 2,
+        YER: 2,
+      }));
+  }))();
+}
+export {
+  r as A,
+  E as C,
+  D,
+  F as E,
+  t as O,
+  U as S,
+  P as T,
+  p as _,
+  A as a,
+  b,
+  L as c,
+  m as d,
+  O as f,
+  _ as g,
+  w as h,
+  C as i,
+  a as j,
+  f as k,
+  h as l,
+  I as m,
+  R as n,
+  v as o,
+  k as p,
+  B as r,
+  g as s,
+  z as t,
+  j as u,
+  y as v,
+  S as w,
+  x,
+  T as y,
+};
