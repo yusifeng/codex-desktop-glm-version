@@ -1,4 +1,9 @@
-import "@rchunk/rolldown-runtime";
-import { r as initializeLibraryCloudFilePreview } from "@rchunk/library-cloud-file-preview";
-function t(): void { initializeLibraryCloudFilePreview(); }
-export { t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { r as t } from "@rchunk/library-cloud-file-preview";
+function n() {
+  return (n = e(() => {
+    t();
+  }))();
+}
+export { n as t };

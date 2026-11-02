@@ -1,7 +1,16 @@
-import "@rchunk/rolldown-runtime";
-import { N3 as getReactDomRuntime } from "@rchunk/app-shared";
-import { Dt as loadApplication, Et as initializeApplication } from "@rchunk/app-initial";
-interface Root { render(node: unknown): void }
-interface RootWindow extends Window { __codexRoot?: Root }
-async function initialize(): Promise<void> { initializeApplication(); if (typeof document === "undefined") return; const container = document.getElementById("root"); if (container == null) throw new Error("Root container not found"); const reactDom = getReactDomRuntime() as { createRoot(element: HTMLElement): Root }; const rootWindow = window as RootWindow; rootWindow.__codexRoot ??= reactDom.createRoot(container); rootWindow.__codexRoot.render(await loadApplication()); }
-void initialize();
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { I3 as t, N3 as n, e6 as r } from "@rchunk/app-shared";
+import { Dt as i, Et as a } from "@rchunk/app-initial";
+var o, s, c, l;
+function u() {
+  return (u = e(() => {
+    if ((r(), (o = n()), a(), t(), (s = document.getElementById(`root`)), !s))
+      throw Error(`Root container not found`);
+    ((c = window),
+      c.__codexRoot ?? (c.__codexRoot = (0, o.createRoot)(s)),
+      (l = c.__codexRoot),
+      i().then((e) => l.render(e)));
+  }))();
+}
+u();

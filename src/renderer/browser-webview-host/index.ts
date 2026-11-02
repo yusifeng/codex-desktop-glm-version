@@ -1,354 +1,251 @@
-import '@rchunk/rolldown-runtime';
-import * as SharedChunk from '@rchunk/app-shared';
-import * as InitialChunk from '@rchunk/app-initial';
-
-interface ReactRuntime {
-  useId(): string;
-  useLayoutEffect(effect: () => void | (() => void), dependencies: unknown[]): void;
-  useRef<Value>(initialValue: Value): { current: Value };
-  useSyncExternalStore<Value>(
-    subscribe: (listener: () => void) => () => void,
-    getSnapshot: () => Value,
-    getServerSnapshot: () => Value,
-  ): Value;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, P3 as n, __ as r, e6 as i, g_ as a } from "@rchunk/app-shared";
+import { _gt as o, ggt as s } from "@rchunk/app-initial";
+function c(e) {
+  let t = (0, f.c)(51),
+    {
+      adoptionLease: n,
+      adoptedWebContentsId: i,
+      bounds: a,
+      browserTabId: o,
+      children: c,
+      clipBounds: h,
+      conversationId: g,
+      hostKind: _,
+      initialUrl: v,
+      isPrewarmedEmptyTab: y,
+      isExiting: b,
+      isVisible: x,
+      opacity: S,
+      scale: C,
+      shouldBootstrapWhenHidden: w,
+      shouldDisposeOnUnmount: T,
+      shouldPaint: E,
+      webviewRef: D,
+      windowZoom: O,
+    } = e,
+    k = _ === void 0 ? `right-panel` : _,
+    A = y !== void 0 && y,
+    j = b !== void 0 && b,
+    M = (0, p.useRef)(null),
+    N = (0, p.useId)(),
+    P = (0, p.useRef)(!1),
+    F = (0, p.useRef)(!1),
+    I;
+  t[0] !== o || t[1] !== g
+    ? ((I = s.pages.getMountGeneration(g, o)), (t[0] = o), (t[1] = g), (t[2] = I))
+    : (I = t[2]);
+  let L = (0, p.useRef)(I),
+    R;
+  t[3] !== o || t[4] !== g ? ((R = () => d(g, o)), (t[3] = o), (t[4] = g), (t[5] = R)) : (R = t[5]);
+  let z = r(R),
+    B;
+  t[6] !== o || t[7] !== g
+    ? ((B = () => s.pages.getCursorOverlayHost(g, o)), (t[6] = o), (t[7] = g), (t[8] = B))
+    : (B = t[8]);
+  let V = (0, p.useSyncExternalStore)(s.subscribe, B, l),
+    H,
+    U;
+  (t[9] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((H = () => (
+        (F.current = !0),
+        () => {
+          F.current = !1;
+        }
+      )),
+      (U = []),
+      (t[9] = H),
+      (t[10] = U))
+    : ((H = t[9]), (U = t[10])),
+    (0, p.useLayoutEffect)(H, U));
+  let W = (x || j) && a != null,
+    G,
+    K;
+  (t[11] !== o || t[12] !== g || t[13] !== z || t[14] !== W || t[15] !== N || t[16] !== w
+    ? ((K = () => {
+        let e = d(g, o);
+        if (
+          u({
+            hasManagedWebview: M.current != null,
+            isPresented: W,
+            shouldBootstrapWhenHidden: w,
+          }) === `skip`
+        ) {
+          ((P.current = !1), (L.current = s.pages.getMountGeneration(g, o)));
+          return;
+        }
+        let t = s.pages.claimMountGeneration(g, o, N);
+        return (
+          (L.current = t),
+          (P.current = !0),
+          () => {
+            ((P.current = !1),
+              queueMicrotask(() => {
+                if (F.current && z() === e && P.current) return;
+                let n = s.pages.releaseMountGeneration(g, o, N, t);
+                L.current === t && (L.current = n);
+              }));
+          }
+        );
+      }),
+      (G = [o, g, z, W, N, w]),
+      (t[11] = o),
+      (t[12] = g),
+      (t[13] = z),
+      (t[14] = W),
+      (t[15] = N),
+      (t[16] = w),
+      (t[17] = G),
+      (t[18] = K))
+    : ((G = t[17]), (K = t[18])),
+    (0, p.useLayoutEffect)(K, G));
+  let q, J;
+  (t[19] !== o ||
+  t[20] !== g ||
+  t[21] !== z ||
+  t[22] !== k ||
+  t[23] !== N ||
+  t[24] !== T ||
+  t[25] !== D
+    ? ((q = () => {
+        let e = d(g, o);
+        return () => {
+          let t = M.current,
+            n = L.current,
+            r = T?.() ?? !1;
+          queueMicrotask(() => {
+            let i = z();
+            (F.current && i === e) ||
+              s.pages.hasOtherMountGenerationClaim(g, o, N, n) ||
+              (t != null &&
+                (r &&
+                s.pages.getHost(g, o) === t &&
+                s.pages.getMountGeneration(g, o) === n &&
+                !t.isPainted()
+                  ? s.pages.disposeHost(g, o, `web`)
+                  : s.pages.detachElectronWebview(t, D, k, n),
+                M.current === t && (M.current = null)));
+          });
+        };
+      }),
+      (J = [o, g, z, k, N, T, D]),
+      (t[19] = o),
+      (t[20] = g),
+      (t[21] = z),
+      (t[22] = k),
+      (t[23] = N),
+      (t[24] = T),
+      (t[25] = D),
+      (t[26] = q),
+      (t[27] = J))
+    : ((q = t[26]), (J = t[27])),
+    (0, p.useLayoutEffect)(q, J));
+  let Y, X;
+  if (
+    (t[28] !== i ||
+    t[29] !== n ||
+    t[30] !== a ||
+    t[31] !== o ||
+    t[32] !== h ||
+    t[33] !== g ||
+    t[34] !== k ||
+    t[35] !== v ||
+    t[36] !== j ||
+    t[37] !== W ||
+    t[38] !== A ||
+    t[39] !== N ||
+    t[40] !== S ||
+    t[41] !== C ||
+    t[42] !== w ||
+    t[43] !== E ||
+    t[44] !== D ||
+    t[45] !== O
+      ? ((Y = () => {
+          M.current?.disposed && (M.current = null);
+          let e = M.current,
+            t = u({ hasManagedWebview: e != null, isPresented: W, shouldBootstrapWhenHidden: w });
+          if (t === `skip`) {
+            if (e != null) {
+              let t = L.current;
+              s.pages.hasOtherMountGenerationClaim(g, o, N, t) ||
+                s.pages.detachElectronWebview(e, D, k, t);
+            }
+            M.current === e && (M.current = null);
+            return;
+          }
+          let r = s.pages.getWebview(g, o, v, {
+            adoptionLease: n,
+            adoptedWebContentsId: i,
+            hostKind: k,
+          });
+          ((M.current = r),
+            s.pages.setPrewarmedEmptyWebview(r, A),
+            s.pages.syncElectronWebview(
+              r,
+              {
+                bounds: a,
+                clipBounds: h,
+                isExiting: j,
+                isVisible: W,
+                mountGeneration: L.current,
+                opacity: S,
+                scale: C,
+                shouldBootstrap: t === `bootstrap` || (!W && w && !r.hasRegisteredNativeHost()),
+                shouldPaint: E,
+                windowZoom: O,
+              },
+              D,
+              k,
+            ));
+        }),
+        (X = [o, g, k, v, A, n, i, a, h, j, W, N, S, C, E, w, D, O]),
+        (t[28] = i),
+        (t[29] = n),
+        (t[30] = a),
+        (t[31] = o),
+        (t[32] = h),
+        (t[33] = g),
+        (t[34] = k),
+        (t[35] = v),
+        (t[36] = j),
+        (t[37] = W),
+        (t[38] = A),
+        (t[39] = N),
+        (t[40] = S),
+        (t[41] = C),
+        (t[42] = w),
+        (t[43] = E),
+        (t[44] = D),
+        (t[45] = O),
+        (t[46] = Y),
+        (t[47] = X))
+      : ((Y = t[46]), (X = t[47])),
+    (0, p.useLayoutEffect)(Y, X),
+    V == null || c == null)
+  )
+    return null;
+  let Z;
+  return (
+    t[48] !== c || t[49] !== V
+      ? ((Z = (0, m.createPortal)(c, V)), (t[48] = c), (t[49] = V), (t[50] = Z))
+      : (Z = t[50]),
+    Z
+  );
 }
-
-interface PortalRuntime {
-  createPortal(children: unknown, container: Element): unknown;
-}
-
-interface ManagedWebview {
-  disposed: boolean;
-  hasRegisteredNativeHost(): boolean;
-  isPainted(): boolean;
-}
-
-interface BrowserPagesRuntime {
-  claimMountGeneration(conversationId: string, browserTabId: string, ownerId: string): number;
-  detachElectronWebview(
-    webview: ManagedWebview,
-    webviewRef: unknown,
-    hostKind: string,
-    mountGeneration: number,
-  ): void;
-  disposeHost(conversationId: string, browserTabId: string, reason: 'web'): void;
-  getCursorOverlayHost(conversationId: string, browserTabId: string): Element | null;
-  getHost(conversationId: string, browserTabId: string): ManagedWebview | null;
-  getMountGeneration(conversationId: string, browserTabId: string): number;
-  getWebview(
-    conversationId: string,
-    browserTabId: string,
-    initialUrl: string | undefined,
-    options: {
-      adoptionLease: unknown;
-      adoptedWebContentsId: unknown;
-      hostKind: string;
-    },
-  ): ManagedWebview;
-  hasOtherMountGenerationClaim(
-    conversationId: string,
-    browserTabId: string,
-    ownerId: string,
-    mountGeneration: number,
-  ): boolean;
-  releaseMountGeneration(
-    conversationId: string,
-    browserTabId: string,
-    ownerId: string,
-    mountGeneration: number,
-  ): number;
-  setPrewarmedEmptyWebview(webview: ManagedWebview, value: boolean): void;
-  syncElectronWebview(
-    webview: ManagedWebview,
-    state: {
-      bounds: unknown;
-      clipBounds: unknown;
-      isExiting: boolean;
-      isVisible: boolean;
-      mountGeneration: number;
-      opacity: unknown;
-      scale: unknown;
-      shouldBootstrap: boolean;
-      shouldPaint: unknown;
-      windowZoom: unknown;
-    },
-    webviewRef: unknown,
-    hostKind: string,
-  ): void;
-}
-
-interface BrowserWebviewHostProps {
-  adoptionLease?: unknown;
-  adoptedWebContentsId?: unknown;
-  bounds?: unknown;
-  browserTabId: string;
-  children?: unknown;
-  clipBounds?: unknown;
-  conversationId: string;
-  hostKind?: string;
-  initialUrl?: string;
-  isPrewarmedEmptyTab?: boolean;
-  isExiting?: boolean;
-  isVisible?: boolean;
-  opacity?: unknown;
-  scale?: unknown;
-  shouldBootstrapWhenHidden?: boolean;
-  shouldDisposeOnUnmount?: () => boolean;
-  shouldPaint?: unknown;
-  webviewRef?: unknown;
-  windowZoom?: unknown;
-}
-
-interface SharedRuntime {
-  P3(): PortalRuntime;
-  __<Callback extends (...arguments_: never[]) => unknown>(callback: Callback): Callback;
-  e6(): ReactRuntime;
-  g_(): void;
-}
-
-interface InitialRuntime {
-  _gt(): void;
-  ggt: {
-    pages: BrowserPagesRuntime;
-    subscribe(listener: () => void): () => void;
-  };
-}
-
-const shared = SharedChunk as unknown as SharedRuntime;
-const initial = InitialChunk as unknown as InitialRuntime;
-let React: ReactRuntime;
-let portals: PortalRuntime;
-
-function readNull(): null {
+function l() {
   return null;
 }
-
-function syncMode(input: {
-  hasManagedWebview: boolean;
-  isPresented: boolean;
-  shouldBootstrapWhenHidden?: boolean;
-}): 'bootstrap' | 'skip' | 'sync' {
-  return input.isPresented
-    ? 'sync'
-    : input.shouldBootstrapWhenHidden
-      ? input.hasManagedWebview ? 'sync' : 'bootstrap'
-      : 'skip';
+function u({ hasManagedWebview: e, isPresented: t, shouldBootstrapWhenHidden: n }) {
+  return t ? `sync` : n ? (e ? `sync` : `bootstrap`) : `skip`;
 }
-
-function webviewKey(conversationId: string, browserTabId: string): string {
-  return `${conversationId}\0${browserTabId}`;
+function d(e, t) {
+  return `${e}\0${t}`;
 }
-
-function BrowserWebviewHost(props: BrowserWebviewHostProps): unknown {
-  const {
-    adoptionLease,
-    adoptedWebContentsId,
-    bounds,
-    browserTabId,
-    children,
-    clipBounds,
-    conversationId,
-    hostKind = 'right-panel',
-    initialUrl,
-    isPrewarmedEmptyTab = false,
-    isExiting = false,
-    isVisible,
-    opacity,
-    scale,
-    shouldBootstrapWhenHidden,
-    shouldDisposeOnUnmount,
-    shouldPaint,
-    webviewRef,
-    windowZoom,
-  } = props;
-  const managedWebview = React.useRef<ManagedWebview | null>(null);
-  const ownerId = React.useId();
-  const claimed = React.useRef(false);
-  const mounted = React.useRef(false);
-  const mountGeneration = React.useRef(
-    initial.ggt.pages.getMountGeneration(conversationId, browserTabId),
-  );
-  const readCurrentKey = shared.__(
-    () => webviewKey(conversationId, browserTabId),
-  );
-  const cursorOverlayHost = React.useSyncExternalStore(
-    initial.ggt.subscribe,
-    () => initial.ggt.pages.getCursorOverlayHost(conversationId, browserTabId),
-    readNull,
-  );
-
-  React.useLayoutEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
-
-  const isPresented = Boolean(isVisible || isExiting) && bounds != null;
-  React.useLayoutEffect(() => {
-    const keyAtClaim = webviewKey(conversationId, browserTabId);
-    const mode = syncMode({
-      hasManagedWebview: managedWebview.current != null,
-      isPresented,
-      shouldBootstrapWhenHidden,
-    });
-    if (mode === 'skip') {
-      claimed.current = false;
-      mountGeneration.current = initial.ggt.pages.getMountGeneration(
-        conversationId,
-        browserTabId,
-      );
-      return;
-    }
-
-    const generation = initial.ggt.pages.claimMountGeneration(
-      conversationId,
-      browserTabId,
-      ownerId,
-    );
-    mountGeneration.current = generation;
-    claimed.current = true;
-    return () => {
-      claimed.current = false;
-      queueMicrotask(() => {
-        if (mounted.current && readCurrentKey() === keyAtClaim && claimed.current) return;
-        const nextGeneration = initial.ggt.pages.releaseMountGeneration(
-          conversationId,
-          browserTabId,
-          ownerId,
-          generation,
-        );
-        if (mountGeneration.current === generation) {
-          mountGeneration.current = nextGeneration;
-        }
-      });
-    };
-  }, [browserTabId, conversationId, readCurrentKey, isPresented, ownerId, shouldBootstrapWhenHidden]);
-
-  React.useLayoutEffect(() => {
-    const keyAtMount = webviewKey(conversationId, browserTabId);
-    return () => {
-      const webview = managedWebview.current;
-      const generation = mountGeneration.current;
-      const shouldDispose = shouldDisposeOnUnmount?.() ?? false;
-      queueMicrotask(() => {
-        if (mounted.current && readCurrentKey() === keyAtMount) return;
-        if (initial.ggt.pages.hasOtherMountGenerationClaim(
-          conversationId,
-          browserTabId,
-          ownerId,
-          generation,
-        )) return;
-        if (webview != null) {
-          if (
-            shouldDispose
-            && initial.ggt.pages.getHost(conversationId, browserTabId) === webview
-            && initial.ggt.pages.getMountGeneration(conversationId, browserTabId) === generation
-            && !webview.isPainted()
-          ) {
-            initial.ggt.pages.disposeHost(conversationId, browserTabId, 'web');
-          } else {
-            initial.ggt.pages.detachElectronWebview(
-              webview,
-              webviewRef,
-              hostKind,
-              generation,
-            );
-          }
-          if (managedWebview.current === webview) managedWebview.current = null;
-        }
-      });
-    };
-  }, [browserTabId, conversationId, readCurrentKey, hostKind, ownerId, shouldDisposeOnUnmount, webviewRef]);
-
-  React.useLayoutEffect(() => {
-    if (managedWebview.current?.disposed) managedWebview.current = null;
-    const previous = managedWebview.current;
-    const mode = syncMode({
-      hasManagedWebview: previous != null,
-      isPresented,
-      shouldBootstrapWhenHidden,
-    });
-    if (mode === 'skip') {
-      if (previous != null) {
-        const generation = mountGeneration.current;
-        if (!initial.ggt.pages.hasOtherMountGenerationClaim(
-          conversationId,
-          browserTabId,
-          ownerId,
-          generation,
-        )) {
-          initial.ggt.pages.detachElectronWebview(
-            previous,
-            webviewRef,
-            hostKind,
-            generation,
-          );
-        }
-      }
-      if (managedWebview.current === previous) managedWebview.current = null;
-      return;
-    }
-
-    const webview = initial.ggt.pages.getWebview(
-      conversationId,
-      browserTabId,
-      initialUrl,
-      { adoptionLease, adoptedWebContentsId, hostKind },
-    );
-    managedWebview.current = webview;
-    initial.ggt.pages.setPrewarmedEmptyWebview(webview, isPrewarmedEmptyTab);
-    initial.ggt.pages.syncElectronWebview(
-      webview,
-      {
-        bounds,
-        clipBounds,
-        isExiting,
-        isVisible: isPresented,
-        mountGeneration: mountGeneration.current,
-        opacity,
-        scale,
-        shouldBootstrap:
-          mode === 'bootstrap'
-          || (!isPresented && Boolean(shouldBootstrapWhenHidden) && !webview.hasRegisteredNativeHost()),
-        shouldPaint,
-        windowZoom,
-      },
-      webviewRef,
-      hostKind,
-    );
-  }, [
-    browserTabId,
-    conversationId,
-    hostKind,
-    initialUrl,
-    isPrewarmedEmptyTab,
-    adoptionLease,
-    adoptedWebContentsId,
-    bounds,
-    clipBounds,
-    isExiting,
-    isPresented,
-    ownerId,
-    opacity,
-    scale,
-    shouldPaint,
-    shouldBootstrapWhenHidden,
-    webviewRef,
-    windowZoom,
-  ]);
-
-  if (cursorOverlayHost == null || children == null) return null;
-  return portals.createPortal(children, cursorOverlayHost);
+var f, p, m;
+function h() {
+  return (h = e(() => {
+    ((f = t()), (p = i()), (m = n()), a(), o());
+  }))();
 }
-
-function initialize(): void {
-  React = shared.e6();
-  portals = shared.P3();
-  shared.g_();
-  initial._gt();
-}
-
-initialize();
-
-export { initialize as n, BrowserWebviewHost as t };
+export { h as n, c as t };

@@ -1,3 +1,20 @@
-import "@rchunk/app-initial";
-interface PluginSummary{summary:{id:string};apps:Array<{id:string}>;mcpServers:Array<{name?:string;server?:string}>}interface View{appId?:string;pluginId?:string;server?:string}
-function findView(plugin:PluginSummary|null,views:View[]):View|null{return plugin==null?null:views.find(view=>view.appId!=null?plugin.apps.some(app=>app.id===view.appId):view.pluginId!=null?view.pluginId===plugin.summary.id:plugin.mcpServers.some(server=>(server.name??server.server)===view.server))??null}const initialize=():void=>{};export{initialize as n,findView as t};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $Et as t, dXt as n, pXt as r, rDt as i } from "@rchunk/app-initial";
+function a(e, r) {
+  return e == null
+    ? null
+    : (r.find((r) => {
+        let i = n(r);
+        if (i != null) return e.apps.some((e) => e.id === i);
+        if (r.pluginId !== void 0) return r.pluginId === e.summary.id;
+        let a = t(r.server);
+        return e.mcpServers.some((e) => t(e) === a);
+      }) ?? null);
+}
+function o() {
+  return (o = e(() => {
+    (r(), i());
+  }))();
+}
+export { o as n, a as t };

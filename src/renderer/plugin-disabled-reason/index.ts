@@ -1,7 +1,124 @@
-import { I3 as getJsxRuntime,type JsxRuntime,type IntlShape } from "@rchunk/app-shared";import "@rchunk/app-initial";
-type Reason="plan_not_eligible"|"required_app_unavailable"|"unknown"|"disabled_by_admin"|null|undefined;let jsx:JsxRuntime;const messages={plan_not_eligible:{id:"plugins.disabledReason.planNotEligible",defaultMessage:"Not available on your plan"},required_app_unavailable:{id:"plugins.disabledReason.requiredAppUnavailable",defaultMessage:"Required app unavailable"},unknown:{id:"plugins.disabledReason.unknown",defaultMessage:"Unavailable"}};
-function descriptor(reason:Reason){if(reason==null||reason==="disabled_by_admin")return null;return messages[reason]}
-function label(input:{disabledReason:Reason;fallback:string;intl:IntlShape}):string{const message=descriptor(input.disabledReason);return message==null?input.fallback:String(input.intl.formatMessage(message))}
-function DisabledReason(props:{children?:unknown;disabledReason:Reason}):unknown{const message=descriptor(props.disabledReason);return message==null?props.children:ensure().jsx("span",{children:message.defaultMessage})}
-function RewardBadge(props:{credits:number;showRequirements?:boolean}):unknown{return ensure().jsx("span",{className:"reward-badge",children:props.showRequirements?`Get ${props.credits} credits for installing and using`:`${props.credits} credits`})}
-const initialize=():void=>{jsx=getJsxRuntime()};function ensure(){if(jsx==null)initialize();return jsx}export{RewardBadge as a,initialize as i,initialize as n,initialize as o,label as r,DisabledReason as t};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  G2 as n,
+  I3 as r,
+  K2 as i,
+  Nb as a,
+  Y2 as o,
+  lw as s,
+} from "@rchunk/app-shared";
+import { fit as c, pit as l } from "@rchunk/app-initial";
+function u(e) {
+  let t = (0, d.c)(7),
+    { ref: n, credits: r, showRequirements: i } = e,
+    s = i !== void 0 && i,
+    l;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((l = (0, f.jsx)(a, {})), (t[0] = l))
+    : (l = t[0]);
+  let u;
+  t[1] !== r || t[2] !== s
+    ? ((u = (0, f.jsxs)(`span`, {
+        className: `inline-flex items-center gap-2 whitespace-normal`,
+        children: [
+          l,
+          s
+            ? (0, f.jsx)(o, {
+                id: `plugins.incentive.installAndUseRewardBadge`,
+                defaultMessage: `Get {credits, plural, one {# credit} other {# credits}} for installing and using`,
+                description: `Reward badge on a plugin's own detail page. The page identifies the plugin, so its name is intentionally omitted. Installation and successful use are both required; credits is the server-provided reward amount.`,
+                values: { credits: r },
+              })
+            : (0, f.jsx)(o, {
+                id: `plugins.incentive.rewardBadge`,
+                defaultMessage: `{credits, plural, one {# credit} other {# credits}}`,
+                description: `Promotional workspace credit amount on a plugin offer pill; credits is the server-provided credit count`,
+                values: { credits: r },
+              }),
+        ],
+      })),
+      (t[1] = r),
+      (t[2] = s),
+      (t[3] = u))
+    : (u = t[3]);
+  let p;
+  return (
+    t[4] !== n || t[5] !== u
+      ? ((p = (0, f.jsx)(c, { ref: n, variant: `tip`, children: u })),
+        (t[4] = n),
+        (t[5] = u),
+        (t[6] = p))
+      : (p = t[6]),
+    p
+  );
+}
+var d, f;
+function p() {
+  return (p = e(() => {
+    ((d = t()), i(), l(), s(), (f = r()));
+  }))();
+}
+function m(e) {
+  switch (e) {
+    case `plan_not_eligible`:
+      return g.planNotEligible;
+    case `required_app_unavailable`:
+      return g.requiredAppUnavailable;
+    case `unknown`:
+      return g.unknown;
+    case `disabled_by_admin`:
+    case null:
+    case void 0:
+      return null;
+  }
+}
+function h({ disabledReason: e, fallback: t, intl: n }) {
+  let r = m(e);
+  return r == null ? t : n.formatMessage(r);
+}
+var g;
+function _() {
+  return (_ = e(() => {
+    (i(),
+      (g = n({
+        planNotEligible: {
+          id: `plugins.disabledReason.planNotEligible`,
+          defaultMessage: `Not available on your plan`,
+          description: `Label and tooltip shown for an unavailable plugin when the user's current plan is not eligible`,
+        },
+        requiredAppUnavailable: {
+          id: `plugins.disabledReason.requiredAppUnavailable`,
+          defaultMessage: `Required app unavailable`,
+          description: `Label and tooltip shown for an unavailable plugin when one of its required apps is unavailable`,
+        },
+        unknown: {
+          id: `plugins.disabledReason.unknown`,
+          defaultMessage: `Unavailable`,
+          description: `Label and tooltip shown for an unavailable plugin when its specific restriction is not recognized`,
+        },
+      })));
+  }))();
+}
+function v(e) {
+  let t = (0, y.c)(5),
+    { children: n, disabledReason: r } = e,
+    i;
+  t[0] === r ? (i = t[1]) : ((i = m(r)), (t[0] = r), (t[1] = i));
+  let a = i,
+    s;
+  return (
+    t[2] !== n || t[3] !== a
+      ? ((s = a == null ? n : (0, b.jsx)(o, { ...a })), (t[2] = n), (t[3] = a), (t[4] = s))
+      : (s = t[4]),
+    s
+  );
+}
+var y, b;
+function x() {
+  return (x = e(() => {
+    ((y = t()), i(), _(), (b = r()));
+  }))();
+}
+export { u as a, _ as i, x as n, p as o, h as r, v as t };

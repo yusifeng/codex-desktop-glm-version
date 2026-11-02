@@ -1,5 +1,95 @@
-import "@rchunk/app-shared";import "@rchunk/app-initial";
-interface Setup{accountId:string;userId:string;connectorId:string;options?:unknown;addAccountAttemptId?:string;installationKey?:string}interface Location{key:string;state?:{connectorSetup?:Setup;[key:string]:unknown}}
-function normalize(value:string):string{return value.trim().toLowerCase().replaceAll("-","_")}
-async function resume(input:{accountId:string;userId:string;connectorId:string;location:Location;handledKey:{current?:string};canResumeAttempt?(id:string):boolean;continueSetupAfterInstall?:boolean;onInstall?(after?:()=>void,setup?:Setup,options?:unknown):boolean;onSetup?(options:unknown,attemptId:string):Promise<void>|void;navigate(location:Location,options:unknown):void;scope:unknown;intl?:unknown}):Promise<void>{const setup=input.location.state?.connectorSetup;if(input.handledKey.current===input.location.key||setup?.addAccountAttemptId==null||setup.installationKey!=null||setup.accountId!==input.accountId||setup.userId!==input.userId||normalize(setup.connectorId)!==normalize(input.connectorId)||input.canResumeAttempt?.(setup.addAccountAttemptId)===false||input.onSetup==null)return;const pending=input.continueSetupAfterInstall?{...setup,installationKey:input.location.key}:undefined;if(input.onInstall!=null&&!input.onInstall(undefined,pending,setup.options))return;input.handledKey.current=input.location.key;input.navigate(input.location,{replace:true,state:{...input.location.state,connectorSetup:pending}});await input.onSetup(setup.options,setup.addAccountAttemptId)}
-function clearInstallation(input:{navigate(location:Location,options:unknown):void;setup:Setup;location?:Location|null}):void{const location=input.location;if(location?.state?.connectorSetup?.installationKey!==input.setup.installationKey)return;input.navigate(location,{replace:true,state:{...location.state,connectorSetup:{...input.setup,installationKey:undefined}}})}const initialize=():void=>{};export{initialize as n,resume as r,clearInstallation as t};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $4 as t, H4 as n, g4 as r, lk as i, pk as a, q4 as o } from "@rchunk/app-shared";
+import {
+  Z3t as s,
+  _6t as c,
+  fpn as l,
+  lpn as u,
+  m6t as d,
+  q6t as f,
+  s6t as p,
+} from "@rchunk/app-initial";
+async function m({
+  scope: e,
+  accountId: t,
+  userId: n,
+  connectorId: r,
+  location: i,
+  navigate: o,
+  handledKey: c,
+  canResumeAttempt: l,
+  intl: u,
+  onInstall: d,
+  onSetup: p,
+  continueSetupAfterInstall: m,
+}) {
+  if (c.current === i.key) return;
+  let _ = g.safeParse(i.state);
+  if (
+    !_.success ||
+    (_.data.connectorSetup.addAccountAttemptId != null &&
+      !l?.(_.data.connectorSetup.addAccountAttemptId)) ||
+    p == null ||
+    _.data.connectorSetup.addAccountAttemptId == null ||
+    _.data.connectorSetup.installationKey != null ||
+    _.data.connectorSetup.accountId !== t ||
+    _.data.connectorSetup.userId !== n ||
+    f(_.data.connectorSetup.connectorId) !== f(r)
+  )
+    return;
+  let v = m ? { ..._.data.connectorSetup, installationKey: i.key } : void 0,
+    y = () => {
+      v != null && h({ scope: e, navigate: o, setup: v });
+    };
+  try {
+    if (d != null && !d(m ? y : void 0, v, _.data.connectorSetup.options)) return;
+    ((c.current = i.key),
+      o(i, { replace: !0, state: { ...i.state, connectorSetup: v } }),
+      await p?.(_.data.connectorSetup.options, _.data.connectorSetup.addAccountAttemptId));
+  } catch {
+    e.get(a).danger(s(u), {
+      errorAnalytics: { toastId: `pluginConnectorSetup.startPluginConnectorSetup` },
+    });
+  }
+}
+function h({ scope: e, navigate: t, setup: n }) {
+  let r = e.get(u),
+    i = g.safeParse(r?.state);
+  r != null &&
+    i.success &&
+    i.data.connectorSetup.installationKey === n.installationKey &&
+    t(r, {
+      replace: !0,
+      state: {
+        ...r.state,
+        connectorSetup: {
+          accountId: n.accountId,
+          userId: n.userId,
+          connectorId: n.connectorId,
+          options: n.options,
+        },
+      },
+    });
+}
+var g;
+function _() {
+  return (_ = e(() => {
+    (r(),
+      p(),
+      c(),
+      i(),
+      l(),
+      (g = n({
+        connectorSetup: n({
+          accountId: o().min(1),
+          userId: o().min(1),
+          connectorId: o().min(1),
+          options: d.optional(),
+          addAccountAttemptId: t().optional(),
+          installationKey: o().min(1).optional(),
+        }),
+      }).loose()));
+  }))();
+}
+export { _ as n, m as r, h as t };

@@ -1,35 +1,149 @@
-// Bootstrap resampling distributions for means, medians, and proportions.
-import "@rchunk/rolldown-runtime";
-
-type BootstrapStatistic = "mean" | "median" | "proportion";
-interface BootstrapState { statistic: BootstrapStatistic; confidenceLevel: number; statistics: number[]; latestResample: number[] }
-
-const bootstrapStatistics: BootstrapStatistic[] = ["mean", "median", "proportion"];
-const confidenceLevels = [80, 90, 95, 99];
-const observedByStatistic: Record<BootstrapStatistic, number[]> = { mean: [4, 6, 7, 8, 9, 11, 12, 15], median: [2, 4, 4, 7, 9, 12, 18, 24], proportion: [1, 0, 1, 1, 0, 1, 0, 1] };
-const initialResampleCount = 320;
-const maximumBootstrapResamples = 5000;
-const histogramBinCount = 18;
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-const seededRandom = (seed: number): (() => number) => { let state = seed >>> 0; return () => { state = state + 1831565813 >>> 0; let value = Math.imul(state ^ state >>> 15, state | 1); value ^= value + Math.imul(value ^ value >>> 7, value | 61); return ((value ^ value >>> 14) >>> 0) / 4294967296; }; };
-const isBootstrapStatistic = (value: unknown): value is BootstrapStatistic => value === "mean" || value === "median" || value === "proportion";
-const isConfidenceLevel = (value: unknown): value is number => typeof value === "number" && confidenceLevels.includes(value);
-const statisticOf = (values: number[], statistic: BootstrapStatistic): number => { if (statistic === "median") { const sorted = [...values].sort((left, right) => left - right); const middle = Math.floor(sorted.length / 2); return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle]; } return values.reduce((sum, value) => sum + value, 0) / values.length; };
-const bootstrapSample = (observed: number[], random: () => number): number[] => observed.map(() => observed[Math.floor(clamp(random(), 0, 1 - 2 ** -52) * observed.length)]);
-const generateBootstrapState = (statisticValue: unknown): BootstrapState => { const statistic = isBootstrapStatistic(statisticValue) ? statisticValue : "mean"; const observed = observedByStatistic[statistic]; const random = seededRandom(statistic === "mean" ? 2087 : statistic === "median" ? 4099 : 8111); const statistics: number[] = []; let latestResample = [...observed]; for (let index = 0; index < initialResampleCount; index += 1) { latestResample = bootstrapSample(observed, random); statistics.push(statisticOf(latestResample, statistic)); } return { statistic, confidenceLevel: 95, statistics, latestResample }; };
-const createEmptyBootstrapState = (statisticValue: unknown): BootstrapState => { const statistic = isBootstrapStatistic(statisticValue) ? statisticValue : "mean"; return { statistic, confidenceLevel: 95, statistics: [], latestResample: [...observedByStatistic[statistic]] }; };
-const normalizeBootstrapState = (state: Partial<BootstrapState>): BootstrapState => { const statistic = isBootstrapStatistic(state.statistic) ? state.statistic : "mean"; const observed = observedByStatistic[statistic]; const confidenceLevel = isConfidenceLevel(state.confidenceLevel) ? state.confidenceLevel : 95; const minimum = Math.min(...observed); const maximum = Math.max(...observed); const statistics = Array.isArray(state.statistics) ? state.statistics.filter((value) => Number.isFinite(value) && value >= minimum && value <= maximum && (statistic !== "proportion" || Math.abs(value * observed.length - Math.round(value * observed.length)) < 1e-9)).slice(-maximumBootstrapResamples) : []; const latest = Array.isArray(state.latestResample) ? state.latestResample.filter((value) => Number.isFinite(value) && observed.includes(value)).slice(0, observed.length) : []; return { statistic, confidenceLevel, statistics, latestResample: latest.length === observed.length ? latest : [...observed] }; };
-const addBootstrapResamples = (state: Partial<BootstrapState>, count: number, random: () => number): BootstrapState => { const normalized = normalizeBootstrapState(state); const observed = observedByStatistic[normalized.statistic]; const statistics = [...normalized.statistics]; let latestResample = [...normalized.latestResample]; const remainingCapacity = maximumBootstrapResamples - statistics.length; const safeCount = Number.isFinite(count) ? clamp(Math.floor(count), 0, remainingCapacity) : 0; for (let index = 0; index < safeCount; index += 1) { latestResample = bootstrapSample(observed, random); statistics.push(statisticOf(latestResample, normalized.statistic)); } return { ...normalized, statistics, latestResample }; };
-const percentile = (sorted: number[], fraction: number): number => { const position = (sorted.length - 1) * fraction; const lower = Math.floor(position); const upper = Math.ceil(position); const remainder = position - lower; return sorted[lower] * (1 - remainder) + sorted[upper] * remainder; };
-const summaryCache = new WeakMap<object, object>();
-const summarizeBootstrapDistribution = (state: BootstrapState) => {
-  const cached = summaryCache.get(state); if (cached) return cached;
-  const normalized = normalizeBootstrapState(state); const observed = observedByStatistic[normalized.statistic]; const observedStatistic = statisticOf(observed, normalized.statistic); const statistics = normalized.statistics; const sorted = [...statistics].sort((left, right) => left - right); const tailFraction = (100 - normalized.confidenceLevel) / 200; const lower = sorted.length ? percentile(sorted, tailFraction) : observedStatistic; const upper = sorted.length ? percentile(sorted, 1 - tailFraction) : observedStatistic; const average = statistics.length > 0 ? statistics.reduce((sum, value) => sum + value, 0) / statistics.length : observedStatistic; const standardError = statistics.length > 1 ? Math.sqrt(statistics.reduce((sum, value) => sum + (value - average) ** 2, 0) / (statistics.length - 1)) : 0; const binMin = Math.min(...observed); const binMax = Math.max(...observed); const binWidth = Math.max((binMax - binMin) / histogramBinCount, 2 ** -52); const binCounts = Array.from({ length: histogramBinCount }, () => 0); const binTailCounts = Array.from({ length: histogramBinCount }, () => 0); let lowerTailCount = 0; let upperTailCount = 0;
-  statistics.forEach((value) => { const binIndex = clamp(Math.floor((value - binMin) / binWidth), 0, histogramBinCount - 1); binCounts[binIndex] += 1; if (value < lower) { lowerTailCount += 1; binTailCounts[binIndex] += 1; } else if (value > upper) { upperTailCount += 1; binTailCounts[binIndex] += 1; } });
-  const summary = { statistic: normalized.statistic, confidenceLevel: normalized.confidenceLevel, observed, observedStatistic, latestResample: normalized.latestResample, latestStatistic: statisticOf(normalized.latestResample, normalized.statistic), statistics, lower, upper, standardError, tailPercent: (100 - normalized.confidenceLevel) / 2, lowerTailCount, centralCount: statistics.length - lowerTailCount - upperTailCount, upperTailCount, binCounts, binTailCounts, binMin, binMax, maxCount: Math.max(...binCounts, 1) };
-  summaryCache.set(state, summary); return summary;
-};
-
-function initializeBootstrapDistributionModel(): void {}
-
-export { createEmptyBootstrapState as a, summarizeBootstrapDistribution as i, maximumBootstrapResamples as n, generateBootstrapState as o, addBootstrapResamples as r, initializeBootstrapDistributionModel as s, confidenceLevels as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d, f, p, m, h, g, _, v, y;
+function b() {
+  return (b = e(() => {
+    ((t = [`mean`, `median`, `proportion`]),
+      (n = [80, 90, 95, 99]),
+      (r = {
+        mean: [4, 6, 7, 8, 9, 11, 12, 15],
+        median: [2, 4, 4, 7, 9, 12, 18, 24],
+        proportion: [1, 0, 1, 1, 0, 1, 0, 1],
+      }),
+      (i = 320),
+      (a = 5e3),
+      (o = 18),
+      (s = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (c = (e) => {
+        let t = e >>> 0;
+        return () => {
+          t = (t + 1831565813) >>> 0;
+          let e = Math.imul(t ^ (t >>> 15), t | 1);
+          return (
+            (e ^= e + Math.imul(e ^ (e >>> 7), e | 61)),
+            ((e ^ (e >>> 14)) >>> 0) / 4294967296
+          );
+        };
+      }),
+      (l = (e) => t.includes(e)),
+      (u = (e) => n.includes(e)),
+      (d = (e, t) => {
+        if (t === `median`) {
+          let t = [...e].sort((e, t) => e - t),
+            n = Math.floor(t.length / 2);
+          return t.length % 2 == 0 ? (t[n - 1] + t[n]) / 2 : t[n];
+        }
+        return e.reduce((e, t) => e + t, 0) / e.length;
+      }),
+      (f = (e, t) => e.map(() => e[Math.floor(s(t(), 0, 1 - 2 ** -52) * e.length)])),
+      (p = (e) => {
+        let t = l(e) ? e : `mean`,
+          n = r[t],
+          a = c(t === `mean` ? 2087 : t === `median` ? 4099 : 8111),
+          o = [],
+          s = [...n];
+        for (let e = 0; e < i; e += 1) ((s = f(n, a)), o.push(d(s, t)));
+        return { statistic: t, confidenceLevel: 95, statistics: o, latestResample: s };
+      }),
+      (m = (e) => {
+        let t = l(e) ? e : `mean`;
+        return { statistic: t, confidenceLevel: 95, statistics: [], latestResample: [...r[t]] };
+      }),
+      (h = (e) => {
+        let t = l(e.statistic) ? e.statistic : `mean`,
+          n = r[t],
+          i = u(e.confidenceLevel) ? e.confidenceLevel : 95,
+          a = Math.min(...n),
+          o = Math.max(...n),
+          s = Array.isArray(e.statistics)
+            ? e.statistics
+                .filter(
+                  (e) =>
+                    Number.isFinite(e) &&
+                    e >= a &&
+                    e <= o &&
+                    (t !== `proportion` ||
+                      Math.abs(e * n.length - Math.round(e * n.length)) < 1e-9),
+                )
+                .slice(-5e3)
+            : [],
+          c = Array.isArray(e.latestResample)
+            ? e.latestResample.filter((e) => Number.isFinite(e) && n.includes(e)).slice(0, n.length)
+            : [];
+        return {
+          statistic: t,
+          confidenceLevel: i,
+          statistics: s,
+          latestResample: c.length === n.length ? c : [...n],
+        };
+      }),
+      (g = (e, t, n) => {
+        let i = h(e),
+          o = r[i.statistic],
+          c = [...i.statistics],
+          l = [...i.latestResample],
+          u = a - c.length,
+          p = Number.isFinite(t) ? s(Math.floor(t), 0, u) : 0;
+        for (let e = 0; e < p; e += 1) ((l = f(o, n)), c.push(d(l, i.statistic)));
+        return { ...i, statistics: c, latestResample: l };
+      }),
+      (_ = (e, t) => {
+        let n = (e.length - 1) * t,
+          r = Math.floor(n),
+          i = Math.ceil(n),
+          a = n - r;
+        return e[r] * (1 - a) + e[i] * a;
+      }),
+      (v = new WeakMap()),
+      (y = (e) => {
+        let t = v.get(e);
+        if (t) return t;
+        let n = h(e),
+          i = r[n.statistic],
+          a = d(i, n.statistic),
+          c = n.statistics,
+          l = [...c].sort((e, t) => e - t),
+          u = (100 - n.confidenceLevel) / 200,
+          f = l.length ? _(l, u) : a,
+          p = l.length ? _(l, 1 - u) : a,
+          m = c.length > 0 ? c.reduce((e, t) => e + t, 0) / c.length : a,
+          g =
+            c.length > 1 ? Math.sqrt(c.reduce((e, t) => e + (t - m) ** 2, 0) / (c.length - 1)) : 0,
+          y = Math.min(...i),
+          b = Math.max(...i),
+          x = Math.max((b - y) / o, 2 ** -52),
+          S = Array.from({ length: o }, () => 0),
+          C = Array.from({ length: o }, () => 0),
+          w = 0,
+          T = 0;
+        c.forEach((e) => {
+          let t = s(Math.floor((e - y) / x), 0, 17);
+          ((S[t] += 1), e < f ? ((w += 1), (C[t] += 1)) : e > p && ((T += 1), (C[t] += 1)));
+        });
+        let E = c.length - w - T,
+          D = {
+            statistic: n.statistic,
+            confidenceLevel: n.confidenceLevel,
+            observed: i,
+            observedStatistic: a,
+            latestResample: n.latestResample,
+            latestStatistic: d(n.latestResample, n.statistic),
+            statistics: c,
+            lower: f,
+            upper: p,
+            standardError: g,
+            tailPercent: (100 - n.confidenceLevel) / 2,
+            lowerTailCount: w,
+            centralCount: E,
+            upperTailCount: T,
+            binCounts: S,
+            binTailCounts: C,
+            binMin: y,
+            binMax: b,
+            maxCount: Math.max(...S, 1),
+          };
+        return (v.set(e, D), D);
+      }));
+  }))();
+}
+export { m as a, y as i, a as n, p as o, g as r, b as s, n as t };

@@ -1,404 +1,521 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  QX as createScopedQueryFamily,
-  YX as createScopedMutation,
-  ZI as appScope,
-  eZ as createScopedQuery,
+  $3 as t,
+  BX as n,
+  CL as r,
+  FX as i,
+  G4 as a,
+  HX as o,
+  I4 as s,
+  LW as c,
+  LX as l,
+  Q3 as u,
+  QI as d,
+  QX as f,
+  SL as p,
+  YX as m,
+  Z3 as h,
+  ZI as g,
+  eZ as _,
+  g4 as v,
+  iL as y,
+  lk as ee,
+  pk as te,
+  q4 as ne,
+  rL as b,
+  wL as re,
 } from "@rchunk/app-shared";
-import { pnt as desktopBridge } from "@rchunk/app-initial";
 import {
-  a as initializeComputerHistoryQueries,
-  t as historyQueryKey,
-} from "@rchunk/computer-history-query";
-import {
-  n as initializeChronicleSettings,
-  t as chronicleFeatureKey,
-} from "@rchunk/chronicle-settings";
-
-type ObservationBehavior = "ignore" | "observe";
-
-interface ObservationRule {
-  bundleID: string | null;
-  scope: string;
-  urlDomain: string | null;
+  $sn as x,
+  DE as ie,
+  HZt as ae,
+  Jsn as S,
+  OE as oe,
+  Opt as se,
+  PZt as ce,
+  Tpt as le,
+  Ugn as C,
+  Wgn as ue,
+  aun as w,
+  lcn as T,
+  mnt as de,
+  mpn as fe,
+  oun as E,
+  pi as pe,
+  pnt as D,
+  ppn as me,
+  sun as O,
+} from "@rchunk/app-initial";
+import { a as he, t as k } from "@rchunk/computer-history-query";
+import { n as ge, t as A } from "@rchunk/chronicle-settings";
+function _e(e) {
+  let t = (0, j.c)(17),
+    i = l(g),
+    a = r(),
+    { data: o } = n(T, e),
+    s = O(),
+    c;
+  t[0] === e ? (c = t[1]) : ((c = [...S, e]), (t[0] = e), (t[1] = c));
+  let d = c,
+    f;
+  t[2] !== e || t[3] !== i || t[4] !== o?.configWriteTarget?.filePath
+    ? ((f = (t) =>
+        C(i, e).sendRequest(`config/batchWrite`, {
+          edits: t.edits.map(ve),
+          filePath: o?.configWriteTarget?.filePath ?? null,
+          expectedVersion: null,
+          reloadUserConfig: !0,
+        })),
+      (t[2] = e),
+      (t[3] = i),
+      (t[4] = o?.configWriteTarget?.filePath),
+      (t[5] = f))
+    : (f = t[5]);
+  let p, m;
+  t[6] !== a || t[7] !== d
+    ? ((p = async (e) => {
+        await a.cancelQueries({ queryKey: d });
+        let t = a.getQueryData(d);
+        return (
+          a.setQueryData(d, (t) =>
+            t == null
+              ? t
+              : { ...t, response: { ...t.response, config: le(t.response.config, e.edits) } },
+          ),
+          { previousUserConfig: t }
+        );
+      }),
+      (m = (e, t, n) => {
+        (u.error(`Failed to update memory config`, { safe: {}, sensitive: { error: e } }),
+          a.setQueryData(d, n?.previousUserConfig));
+      }),
+      (t[6] = a),
+      (t[7] = d),
+      (t[8] = p),
+      (t[9] = m))
+    : ((p = t[8]), (m = t[9]));
+  let h;
+  t[10] === s
+    ? (h = t[11])
+    : ((h = async () => {
+        await Promise.all([s(S), s([`user-saved-config`])]);
+      }),
+      (t[10] = s),
+      (t[11] = h));
+  let _;
+  return (
+    t[12] !== f || t[13] !== p || t[14] !== m || t[15] !== h
+      ? ((_ = { mutationFn: f, onMutate: p, onError: m, onSettled: h }),
+        (t[12] = f),
+        (t[13] = p),
+        (t[14] = m),
+        (t[15] = h),
+        (t[16] = _))
+      : (_ = t[16]),
+    y(_)
+  );
 }
-
-interface ChronicleSettings {
-  observation: {
-    allowlist: ObservationRule[];
-    blocklist: ObservationRule[];
-    defaultApplicationBehavior: ObservationBehavior;
-    defaultURLBehavior: ObservationBehavior;
-  };
-  [key: string]: unknown;
+function ve(e) {
+  let { keyPath: t, value: n } = e;
+  return { keyPath: t, value: n, mergeStrategy: `upsert` };
 }
-
-interface ChronicleService {
-  clearHistory(scope: unknown, interval: unknown): Promise<unknown>;
-  getSettings(): Promise<ChronicleSettings>;
-  getState(): Promise<Record<string, unknown>>;
-  listApplications(): Promise<unknown[]>;
-  pause(): Promise<Record<string, unknown>>;
-  resolveApplications(bundleIdentifiers: string[]): Promise<unknown[]>;
-  resume(): Promise<Record<string, unknown>>;
-  retryActivation(): Promise<Record<string, unknown>>;
-  setEnabled(enabled: boolean): Promise<Record<string, unknown>>;
-  updateSettings(settings: ChronicleSettings): Promise<ChronicleSettings>;
+var j;
+function M() {
+  return (M = e(() => {
+    ((j = t()), b(), p(), i(), ue(), x(), w(), d(), h(), se());
+  }))();
 }
-
-interface MemorySettingsState extends Record<string, unknown> {
-  chronicleResearchPreviewEnabled: boolean;
-  chronicleResearchPreviewVisible: boolean;
-  isMemoryFeatureEnabled: boolean;
-  memoryConfig: Record<string, unknown> & { disableOnExternalContext?: boolean };
-}
-
-interface ChronicleFormSettings {
-  applicationBundleIdentifiers: string[];
-  defaultApplicationBehavior: ObservationBehavior;
-  defaultURLBehavior: ObservationBehavior;
-  urlDomains: string[];
-}
-
-interface ProductLogger {
-  logProductEvent(event: unknown, fields: Record<string, unknown>): void;
-}
-
-const bridge = desktopBridge as { chronicle?: ChronicleService | null };
-const stateQueryKey = ["chronicle-state"];
-const settingsQueryKey = ["chronicle-settings"];
-const applicationsQueryKey = ["chronicle-applications"];
-let chronicleStateQuery: unknown;
-let chronicleSettingsQuery: unknown;
-let chronicleApplicationsQuery: unknown;
-let resolvedApplicationsQuery: unknown;
-let setChronicleEnabledMutation: unknown;
-let retryChronicleActivationMutation: unknown;
-let pauseResumeChronicleMutation: unknown;
-let updateChronicleApplicationMutation: unknown;
-let clearChronicleHistoryMutation: unknown;
-let saveChronicleSettingsMutation: unknown;
-
-function requireChronicle(): ChronicleService {
-  if (bridge.chronicle == null) throw new Error("Computer history is unavailable");
-  return bridge.chronicle;
-}
-
-function memorySettingsState({
-  chronicleResearchPreviewEnabled,
-  chronicleResearchPreviewVisible,
-  isMemoryFeatureEnabled,
-  memoryConfig,
-}: MemorySettingsState): Record<string, unknown> {
-  const generateMemoriesEnabled = memoryConfig.generateMemories !== false;
-  const useMemoriesEnabled = memoryConfig.useMemories !== false;
+function ye({
+  chronicleResearchPreviewEnabled: e,
+  chronicleResearchPreviewVisible: t,
+  isMemoryFeatureEnabled: n,
+  memoryConfig: r,
+}) {
   return {
-    chronicleResearchPreviewEnabled,
-    chronicleResearchPreviewVisible,
-    isMemoryFeatureEnabled,
-    memoryConfig,
-    memoryFeatureEnabled: isMemoryFeatureEnabled,
-    generateMemoriesEnabled,
-    useMemoriesEnabled,
-    memoriesEnabled:
-      isMemoryFeatureEnabled && generateMemoriesEnabled && useMemoriesEnabled,
-    skipToolAssistedChatsEnabled: memoryConfig.disableOnExternalContext,
+    chronicleResearchPreviewEnabled: e,
+    chronicleResearchPreviewVisible: t,
+    ...pe({ isMemoryFeatureEnabled: n, memoryConfig: r }),
+    skipToolAssistedChatsEnabled: r.disableOnExternalContext,
   };
 }
-
-function patchMemorySettings(
-  current: MemorySettingsState,
-  patch: {
-    chronicleResearchPreviewEnabled?: boolean;
-    isMemoryFeatureEnabled?: boolean;
-    memoryConfigPatch?: Record<string, unknown>;
-  } = {},
-): Record<string, unknown> {
-  return memorySettingsState({
-    ...current,
-    chronicleResearchPreviewEnabled:
-      patch.chronicleResearchPreviewEnabled
-      ?? current.chronicleResearchPreviewEnabled,
-    isMemoryFeatureEnabled:
-      patch.isMemoryFeatureEnabled ?? current.isMemoryFeatureEnabled,
-    memoryConfig: { ...current.memoryConfig, ...patch.memoryConfigPatch },
+function be(
+  e,
+  { chronicleResearchPreviewEnabled: t, isMemoryFeatureEnabled: n, memoryConfigPatch: r } = {},
+) {
+  return ye({
+    chronicleResearchPreviewEnabled: t ?? e.chronicleResearchPreviewEnabled,
+    chronicleResearchPreviewVisible: e.chronicleResearchPreviewVisible,
+    isMemoryFeatureEnabled: n ?? e.isMemoryFeatureEnabled,
+    memoryConfig: { ...e.memoryConfig, ...r },
   });
 }
-
-function logMemorySetting({
-  productLogger,
-  previousEnabled,
-  selectedEnabled,
-  settingName,
-  state,
-}: {
-  previousEnabled: boolean;
-  productLogger: ProductLogger;
-  selectedEnabled: boolean;
-  settingName: string;
-  state: Record<string, unknown>;
-}): void {
-  productLogger.logProductEvent("memory_setting_updated", {
-    settingName,
-    previousEnabled,
-    selectedEnabled,
-    ...state,
-  });
+function N({ productLogger: e, previousEnabled: t, selectedEnabled: n, settingName: r, state: i }) {
+  e.logProductEvent(ie, { settingName: r, previousEnabled: t, selectedEnabled: n, ...i });
 }
-
-async function writeAndLogMemorySetting({
-  productLogger,
-  write,
-  ...details
-}: {
-  previousEnabled: boolean;
-  productLogger: ProductLogger;
-  selectedEnabled: boolean;
-  settingName: string;
-  state: Record<string, unknown>;
-  write(): Promise<unknown>;
-}): Promise<void> {
+async function xe({ productLogger: e, write: t, ...n }) {
   try {
-    await write();
+    await t();
   } catch {
     return;
   }
-  logMemorySetting({ productLogger, ...details });
+  N({ productLogger: e, ...n });
 }
-
-function selectedRules(
-  behavior: ObservationBehavior,
-  allowlist: ObservationRule[],
-  blocklist: ObservationRule[],
-): ObservationRule[] {
-  return behavior === "observe" ? blocklist : allowlist;
-}
-
-function chronicleSettingsToForm(settings: ChronicleSettings): ChronicleFormSettings {
-  const read = (scope: "app" | "url", behavior: ObservationBehavior) =>
-    selectedRules(
-      behavior,
-      settings.observation.allowlist,
-      settings.observation.blocklist,
-    ).flatMap((rule) => {
-      if (rule.scope !== scope) return [];
-      const value = scope === "app" ? rule.bundleID : rule.urlDomain;
-      return value == null ? [] : [value];
+async function Se({
+  productLogger: e,
+  previousState: t,
+  selectedEnabled: n,
+  featureWrite: r,
+  configWrite: i,
+  chronicleDisable: a,
+}) {
+  let [o, s, c] = await Promise.allSettled([r(), i(), a?.() ?? Promise.resolve()]),
+    l = o.status === `fulfilled` ? n : t.memoryFeatureEnabled,
+    u = s.status === `fulfilled` ? n : t.generateMemoriesEnabled,
+    d = s.status === `fulfilled` ? n : t.useMemoriesEnabled,
+    f = {
+      ...t,
+      chronicleResearchPreviewEnabled:
+        a != null && c.status === `fulfilled` ? !1 : t.chronicleResearchPreviewEnabled,
+      memoryFeatureEnabled: l,
+      generateMemoriesEnabled: u,
+      useMemoriesEnabled: d,
+      memoriesEnabled: l && u && d,
+    };
+  f.memoriesEnabled !== t.memoriesEnabled &&
+    N({
+      productLogger: e,
+      previousEnabled: t.memoriesEnabled,
+      selectedEnabled: n,
+      settingName: `memories`,
+      state: f,
     });
+}
+function P() {
+  return (P = e(() => {
+    oe();
+  }))();
+}
+function Ce() {
+  let e = (0, I.c)(17),
+    t = l(g),
+    i = r(),
+    a = o(ce),
+    { data: s } = n(T, a),
+    c = O(),
+    d;
+  e[0] === a ? (d = e[1]) : ((d = [...S, a]), (e[0] = a), (e[1] = d));
+  let f = d,
+    p;
+  e[2] !== a || e[3] !== t || e[4] !== s?.configWriteTarget?.filePath
+    ? ((p = (e) => {
+        let { enabled: n } = e;
+        return C(t, a).sendRequest(`config/batchWrite`, {
+          edits: [{ keyPath: L, value: n, mergeStrategy: `upsert` }],
+          filePath: s?.configWriteTarget?.filePath ?? null,
+          expectedVersion: null,
+          reloadUserConfig: !0,
+        });
+      }),
+      (e[2] = a),
+      (e[3] = t),
+      (e[4] = s?.configWriteTarget?.filePath),
+      (e[5] = p))
+    : (p = e[5]);
+  let m, h;
+  e[6] !== i || e[7] !== f
+    ? ((m = async (e) => {
+        let { enabled: t } = e;
+        await i.cancelQueries({ queryKey: f });
+        let n = i.getQueryData(f);
+        return (
+          i.setQueryData(f, (e) =>
+            e == null ? e : { ...e, response: { ...e.response, config: F(e.response.config, t) } },
+          ),
+          { previousUserConfig: n }
+        );
+      }),
+      (h = (e, t, n) => {
+        (u.error(`Failed to update Chronicle config`, {
+          safe: { error: String(e) },
+          sensitive: {},
+        }),
+          i.setQueryData(f, n?.previousUserConfig));
+      }),
+      (e[6] = i),
+      (e[7] = f),
+      (e[8] = m),
+      (e[9] = h))
+    : ((m = e[8]), (h = e[9]));
+  let _;
+  e[10] === c
+    ? (_ = e[11])
+    : ((_ = async () => {
+        await Promise.all([c(S), c([`user-saved-config`])]);
+      }),
+      (e[10] = c),
+      (e[11] = _));
+  let v;
+  return (
+    e[12] !== p || e[13] !== m || e[14] !== h || e[15] !== _
+      ? ((v = { mutationFn: p, onMutate: m, onError: h, onSettled: _ }),
+        (e[12] = p),
+        (e[13] = m),
+        (e[14] = h),
+        (e[15] = _),
+        (e[16] = v))
+      : (v = e[16]),
+    y(v)
+  );
+}
+function F(e, t) {
+  return Object.assign(structuredClone(e), { features: { ...we(e.features, A, t) } });
+}
+function we(e, t, n) {
+  let r = R.safeParse(e);
+  return { ...(r.success ? r.data : {}), [t]: n };
+}
+var I, L, R;
+function z() {
+  return (z = e(() => {
+    ((I = t()),
+      b(),
+      p(),
+      i(),
+      re(),
+      v(),
+      ue(),
+      ae(),
+      x(),
+      w(),
+      d(),
+      h(),
+      ge(),
+      (L = c(A)),
+      (R = a(ne(), s())));
+  }))();
+}
+var B, V, H;
+function U() {
+  return (U = e(() => {
+    (he(),
+      (B = [`chronicle-state`]),
+      (V = [`chronicle-settings`]),
+      (H = [`chronicle-applications`]));
+  }))();
+}
+function Te(e) {
   return {
-    defaultApplicationBehavior: settings.observation.defaultApplicationBehavior,
-    applicationBundleIdentifiers: read(
-      "app",
-      settings.observation.defaultApplicationBehavior,
-    ),
-    defaultURLBehavior: settings.observation.defaultURLBehavior,
-    urlDomains: read("url", settings.observation.defaultURLBehavior),
+    defaultApplicationBehavior: e.observation.defaultApplicationBehavior,
+    applicationBundleIdentifiers: W(e, `app`, e.observation.defaultApplicationBehavior),
+    defaultURLBehavior: e.observation.defaultURLBehavior,
+    urlDomains: W(e, `url`, e.observation.defaultURLBehavior),
   };
 }
-
-function formToChronicleSettings(
-  settings: ChronicleSettings,
-  form: ChronicleFormSettings,
-): ChronicleSettings {
-  const allowlist = settings.observation.allowlist.filter(
-    (rule) => rule.scope !== "app" && rule.scope !== "url",
+function Ee(e, t) {
+  let n = e.observation.allowlist.filter((e) => e.scope !== `app` && e.scope !== `url`),
+    r = e.observation.blocklist.filter((e) => e.scope !== `app` && e.scope !== `url`),
+    i = t.applicationBundleIdentifiers.map((e) => ({ scope: `app`, bundleID: e, urlDomain: null })),
+    a = t.urlDomains.map((e) => ({ scope: `url`, bundleID: null, urlDomain: e }));
+  return (
+    G(t.defaultApplicationBehavior, n, r).push(...i),
+    G(t.defaultURLBehavior, n, r).push(...a),
+    {
+      ...e,
+      observation: {
+        ...e.observation,
+        defaultApplicationBehavior: t.defaultApplicationBehavior,
+        defaultURLBehavior: t.defaultURLBehavior,
+        allowlist: n,
+        blocklist: r,
+      },
+    }
   );
-  const blocklist = settings.observation.blocklist.filter(
-    (rule) => rule.scope !== "app" && rule.scope !== "url",
-  );
-  const applicationRules = form.applicationBundleIdentifiers.map((bundleID) => ({
-    scope: "app",
-    bundleID,
-    urlDomain: null,
-  }));
-  const urlRules = form.urlDomains.map((urlDomain) => ({
-    scope: "url",
-    bundleID: null,
-    urlDomain,
-  }));
-  (form.defaultApplicationBehavior === "observe" ? blocklist : allowlist)
-    .push(...applicationRules);
-  (form.defaultURLBehavior === "observe" ? blocklist : allowlist)
-    .push(...urlRules);
-  return {
-    ...settings,
-    observation: {
-      ...settings.observation,
-      defaultApplicationBehavior: form.defaultApplicationBehavior,
-      defaultURLBehavior: form.defaultURLBehavior,
-      allowlist,
-      blocklist,
-    },
-  };
 }
-
-function isApplicationObserved(
-  settings: ChronicleSettings,
-  bundleIdentifier: string,
-): boolean {
-  const observation = settings.observation;
-  const allowed = observation.allowlist.some(
-    (rule) => rule.scope === "app" && rule.bundleID === bundleIdentifier,
-  );
-  const blocked = observation.blocklist.some(
-    (rule) => rule.scope === "app" && rule.bundleID === bundleIdentifier,
-  );
-  return observation.defaultApplicationBehavior === "observe" ? !blocked : allowed;
+function De(e, t) {
+  let n = e.observation,
+    r = n.allowlist.some((e) => e.scope === `app` && e.bundleID === t),
+    i = n.blocklist.some((e) => e.scope === `app` && e.bundleID === t);
+  return n.defaultApplicationBehavior === `observe` ? !i : r;
 }
-
-function updateApplicationObservation(
-  settings: ChronicleSettings,
-  bundleIdentifier: string,
-  observed: boolean,
-): ChronicleSettings {
-  const rule = { scope: "app", bundleID: bundleIdentifier, urlDomain: null };
-  const allowlist = settings.observation.allowlist.filter(
-    (entry) => entry.scope !== "app" || entry.bundleID !== bundleIdentifier,
+function Oe(e, t, n) {
+  let r = { scope: `app`, bundleID: t, urlDomain: null },
+    i = K(e.observation.allowlist, t),
+    a = K(e.observation.blocklist, t);
+  return (
+    e.observation.defaultApplicationBehavior === `observe` ? n || a.push(r) : n && i.push(r),
+    { ...e, observation: { ...e.observation, allowlist: i, blocklist: a } }
   );
-  const blocklist = settings.observation.blocklist.filter(
-    (entry) => entry.scope !== "app" || entry.bundleID !== bundleIdentifier,
-  );
-  if (settings.observation.defaultApplicationBehavior === "observe") {
-    if (!observed) blocklist.push(rule);
-  } else if (observed) {
-    allowlist.push(rule);
-  }
-  return {
-    ...settings,
-    observation: { ...settings.observation, allowlist, blocklist },
-  };
 }
-
-function initializeMemoryConfigMutation(): void {}
-function initializeChronicleConfigMutation(): void {
-  initializeChronicleSettings();
+function W(e, t, n) {
+  return G(n, e.observation.allowlist, e.observation.blocklist).flatMap((e) => {
+    if (e.scope !== t) return [];
+    let n = t === `app` ? e.bundleID : e.urlDomain;
+    return n == null ? [] : [n];
+  });
 }
-function initializeMemorySettingsLogging(): void {}
-function initializeChronicleServiceRuntime(): void {}
-
-function initializeChronicleServiceQueries(): void {
-  initializeComputerHistoryQueries();
-  initializeChronicleSettings();
-  const createQuery = createScopedQuery as unknown as (
-    scope: unknown,
-    factory: () => Record<string, unknown>,
-  ) => unknown;
-  const createFamily = createScopedQueryFamily as unknown as (
-    scope: unknown,
-    factory: (parameter: string[]) => Record<string, unknown>,
-  ) => unknown;
-  const createMutation = createScopedMutation as unknown as (
-    scope: unknown,
-    factory: () => Record<string, unknown>,
-  ) => unknown;
-  chronicleStateQuery = createQuery(appScope, () => ({
-    enabled: bridge.chronicle != null,
-    queryKey: stateQueryKey,
-    queryFn: () => requireChronicle().getState(),
-    retry: false,
-    staleTime: 1000,
-  }));
-  chronicleSettingsQuery = createQuery(appScope, () => ({
-    enabled: bridge.chronicle != null,
-    queryKey: settingsQueryKey,
-    queryFn: () => requireChronicle().getSettings(),
-    retry: false,
-    staleTime: 0,
-  }));
-  chronicleApplicationsQuery = createQuery(appScope, () => ({
-    enabled: bridge.chronicle != null,
-    queryKey: applicationsQueryKey,
-    queryFn: () => requireChronicle().listApplications(),
-    retry: false,
-    staleTime: Infinity,
-  }));
-  resolvedApplicationsQuery = createFamily(appScope, (bundleIdentifiers) => ({
-    enabled: bridge.chronicle != null && bundleIdentifiers.length > 0,
-    queryKey: [...applicationsQueryKey, "selected", bundleIdentifiers],
-    queryFn: () => requireChronicle().resolveApplications(bundleIdentifiers),
-    retry: false,
-    staleTime: Infinity,
-  }));
-  setChronicleEnabledMutation = createMutation(appScope, () => ({
-    mutationKey: ["chronicle", "set-enabled"],
-    mutationFn: ({ enabled }: { enabled: boolean }) =>
-      requireChronicle().setEnabled(enabled),
-  }));
-  retryChronicleActivationMutation = createMutation(appScope, () => ({
-    mutationKey: ["chronicle", "retry-activation"],
-    mutationFn: () => requireChronicle().retryActivation(),
-  }));
-  pauseResumeChronicleMutation = createMutation(appScope, () => ({
-    mutationKey: ["chronicle", "pause-resume"],
-    mutationFn: (state: string) => state === "paused"
-      ? requireChronicle().resume()
-      : requireChronicle().pause(),
-  }));
-  updateChronicleApplicationMutation = createMutation(appScope, () => ({
-    mutationKey: ["chronicle", "update-application"],
-    mutationFn: async ({ application, observed }: {
-      application: { bundleIdentifier: string };
-      observed: boolean;
-    }) => {
-      const service = requireChronicle();
-      const settings = await service.getSettings();
-      return service.updateSettings(
-        updateApplicationObservation(settings, application.bundleIdentifier, observed),
-      );
-    },
-  }));
-  clearChronicleHistoryMutation = createMutation(appScope, () => ({
-    mutationKey: ["chronicle", "clear-history"],
-    mutationFn: ({ interval, scope }: { interval: unknown; scope: unknown }) =>
-      requireChronicle().clearHistory(scope, interval),
-    invalidates: historyQueryKey,
-  }));
-  saveChronicleSettingsMutation = createMutation(appScope, () => ({
-    mutationKey: ["chronicle", "save-settings"],
-    mutationFn: async (form: ChronicleFormSettings) => {
-      const service = requireChronicle();
-      return service.updateSettings(
-        formToChronicleSettings(await service.getSettings(), form),
-      );
-    },
-  }));
-  void chronicleFeatureKey;
+function G(e, t, n) {
+  return e === `observe` ? n : t;
 }
-
+function K(e, t) {
+  return e.filter((e) => e.scope !== `app` || e.bundleID !== t);
+}
+function q() {
+  return (q = e(() => {}))();
+}
+function J() {
+  let e = D.chronicle;
+  if (e == null) throw Error(`Computer history is unavailable`);
+  return e;
+}
+var Y, X, Z, ke, Ae, je, Q, Me, Ne, Pe, Fe;
+function $() {
+  return ($ = e(() => {
+    (i(),
+      ee(),
+      me(),
+      x(),
+      w(),
+      de(),
+      d(),
+      z(),
+      U(),
+      (Y = { id: `chronicle-settings` }),
+      (X = _(g, () => ({
+        enabled: D.chronicle != null,
+        queryKey: B,
+        queryFn: () => J().getState(),
+        refetchOnMount: `always`,
+        refetchOnWindowFocus: !0,
+        retry: !1,
+        staleTime: 1e3,
+      }))),
+      (Z = _(g, () => ({
+        enabled: D.chronicle != null,
+        queryKey: V,
+        queryFn: () => J().getSettings(),
+        refetchOnMount: `always`,
+        retry: !1,
+        staleTime: 0,
+      }))),
+      (ke = _(g, () => ({
+        enabled: D.chronicle != null,
+        queryKey: H,
+        queryFn: () => J().listApplications(),
+        retry: !1,
+        staleTime: 1 / 0,
+      }))),
+      (Ae = f(g, (e) => ({
+        enabled: D.chronicle != null && e.length > 0,
+        queryKey: [...H, `selected`, e],
+        queryFn: () => J().resolveApplications(e),
+        retry: !1,
+        staleTime: 1 / 0,
+      }))),
+      (je = m(g, ({ scope: e }) => ({
+        mutationKey: [`chronicle`, `set-enabled`],
+        mutationFn: ({ enabled: e }) => J().setEnabled(e),
+        onSuccess: (t, { hostId: n }) => {
+          (e.query.setData(X, t),
+            e.query.setData(T, n, (e) =>
+              e == null
+                ? e
+                : { ...e, response: { ...e.response, config: F(e.response.config, t.enabled) } },
+            ),
+            Promise.all([
+              E(e.queryClient, S),
+              E(e.queryClient, [`user-saved-config`]),
+              E(e.queryClient, B),
+              e.queryClient.invalidateQueries({ queryKey: [`plugins`] }),
+              e.queryClient.invalidateQueries({ queryKey: [`skills`] }),
+              E(e.queryClient, V),
+              E(e.queryClient, k),
+            ]));
+        },
+      }))),
+      (Q = m(g, ({ scope: e }) => ({
+        mutationKey: [`chronicle`, `retry-activation`],
+        mutationFn: () => J().retryActivation(),
+        onSuccess: async (t) => {
+          (e.query.setData(X, t),
+            await E(e.queryClient, B),
+            t.enabled ||
+              (await Promise.all([E(e.queryClient, S), E(e.queryClient, [`user-saved-config`])])));
+        },
+      }))),
+      (Me = m(g, ({ scope: e }) => ({
+        mutationKey: [`chronicle`, `pause-resume`],
+        mutationFn: (e) => (e === `paused` ? J().resume() : J().pause()),
+        onSuccess: async (t) => {
+          (e.query.setData(X, t), await E(e.queryClient, B));
+        },
+      }))),
+      (Ne = m(g, ({ scope: e }) => ({
+        mutationKey: [`chronicle`, `update-application`],
+        scope: Y,
+        mutationFn: async ({ application: e, observed: t }) => {
+          let n = J(),
+            r = await n.getSettings();
+          return n.updateSettings(Oe(r, e.bundleIdentifier, t));
+        },
+        onSuccess: async (t) => {
+          (e.query.setData(Z, t), await E(e.queryClient, V));
+        },
+      }))),
+      (Pe = m(g, ({ scope: e }) => ({
+        mutationKey: [`chronicle`, `clear-history`],
+        mutationFn: ({ interval: e, scope: t }) => J().clearHistory(t, e),
+        onSuccess: async () => {
+          (await E(e.queryClient, k),
+            e
+              .get(te)
+              .success(
+                e
+                  .get(fe)
+                  .formatMessage({
+                    id: `settings.chronicle.history.clearSuccessToast`,
+                    defaultMessage: `History cleared — ChatGPT memory may take up to 6 hours to update`,
+                    description: `Toast shown after clearing Computer history, explaining that previously consolidated ChatGPT memories can take up to six hours to update`,
+                  }),
+              ));
+        },
+      }))),
+      (Fe = m(g, ({ scope: e }) => ({
+        mutationKey: [`chronicle`, `save-settings`],
+        scope: Y,
+        mutationFn: async (e) => {
+          let t = J(),
+            n = await t.getSettings();
+          return t.updateSettings(Ee(n, e));
+        },
+        onSuccess: async (t) => {
+          (e.query.setData(Z, t), await E(e.queryClient, V));
+        },
+      }))));
+  }))();
+}
 export {
-  useMemoryConfigMutation as C,
-  initializeMemoryConfigMutation as S,
-  patchMemorySettings as _,
-  initializeChronicleServiceQueries as a,
-  saveCombinedMemorySettings as b,
-  retryChronicleActivationMutation as c,
-  updateChronicleApplicationMutation as d,
-  initializeChronicleServiceRuntime as f,
-  useChronicleConfigMutation as g,
-  initializeChronicleConfigMutation as h,
-  clearChronicleHistoryMutation as i,
-  saveChronicleSettingsMutation as l,
-  chronicleSettingsToForm as m,
-  chronicleSettingsQuery as n,
-  pauseResumeChronicleMutation as o,
-  isApplicationObserved as p,
-  chronicleStateQuery as r,
-  resolvedApplicationsQuery as s,
-  chronicleApplicationsQuery as t,
-  setChronicleEnabledMutation as u,
-  initializeMemorySettingsLogging as v,
-  writeAndLogMemorySetting as x,
-  logMemorySetting as y,
+  _e as C,
+  M as S,
+  be as _,
+  $ as a,
+  Se as b,
+  Q as c,
+  Ne as d,
+  q as f,
+  Ce as g,
+  z as h,
+  Pe as i,
+  Fe as l,
+  Te as m,
+  Z as n,
+  Me as o,
+  De as p,
+  X as r,
+  Ae as s,
+  ke as t,
+  je as u,
+  P as v,
+  xe as x,
+  N as y,
 };
-
-function useMemoryConfigMutation(): Record<string, unknown> {
-  return { mutationKey: ["memory", "config"] };
-}
-
-function useChronicleConfigMutation(): Record<string, unknown> {
-  return { mutationKey: ["chronicle", "config"] };
-}
-
-async function saveCombinedMemorySettings(options: Record<string, unknown>): Promise<Record<string, unknown>> {
-  return options;
-}

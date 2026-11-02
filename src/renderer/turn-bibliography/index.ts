@@ -1,9 +1,41 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-export interface BibliographyReference { id?: string; title?: string; url?: string; [key: string]: unknown }
-export interface TurnBibliographyProps { references: readonly BibliographyReference[]; shouldBlockExternalEgress?: boolean }
-let runtime: JsxRuntime | undefined; function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function TurnBibliography({ references, shouldBlockExternalEgress }: TurnBibliographyProps): unknown { return jsx().jsx("ol", { "aria-label": "Sources", "data-external-egress": shouldBlockExternalEgress ? "restricted" : "allow", children: references.map((reference, index) => jsx().jsx("li", { children: reference.url && !shouldBlockExternalEgress ? jsx().jsx("a", { href: reference.url, rel: "noreferrer", children: reference.title ?? reference.url }) : (reference.title ?? reference.url ?? `Source ${index + 1}`) }, reference.id ?? `${index}`)) }); }
-function initializeTurnBibliography(): void { void jsx(); }
-export { initializeTurnBibliography as n, TurnBibliography as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, n4 as i } from "@rchunk/app-shared";
+import {
+  $L as a,
+  Gnt as o,
+  QL as s,
+  Wnt as c,
+  ZL as l,
+  eR as u,
+} from "@rchunk/app-initial";
+function d(e) {
+  let t = (0, f.c)(8),
+    { references: n, shouldBlockExternalEgress: r } = e,
+    o = i(),
+    s;
+  t[0] !== o || t[1] !== n ? ((s = l(o, n)), (t[0] = o), (t[1] = n), (t[2] = s)) : (s = t[2]);
+  let u = s,
+    d = r ? `restricted` : `allow`,
+    m;
+  t[3] === u.sources
+    ? (m = t[4])
+    : ((m = (0, p.jsx)(a, { sources: u.sources })), (t[3] = u.sources), (t[4] = m));
+  let h;
+  return (
+    t[5] !== d || t[6] !== m
+      ? ((h = (0, p.jsx)(c.Provider, { value: d, children: m })),
+        (t[5] = d),
+        (t[6] = m),
+        (t[7] = h))
+      : (h = t[7]),
+    h
+  );
+}
+var f, p;
+function m() {
+  return (m = e(() => {
+    ((f = t()), r(), o(), u(), s(), (p = n()));
+  }))();
+}
+export { m as n, d as t };

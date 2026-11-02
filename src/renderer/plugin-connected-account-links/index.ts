@@ -1,5 +1,40 @@
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared"; import "@rchunk/app-initial";
-let jsx: JsxRuntime; const normalizeConnectorId=(value:string):string=>value.trim().toLowerCase().replaceAll("-","_");
-function ConnectedAccountIcon(props:{ariaLabel:string;icon?:unknown}):unknown{return ensure().jsx("span",{role:"img","aria-label":props.ariaLabel,className:"flex h-7 w-7 items-center justify-center",children:props.icon})}
-function filterLinks(links:Array<{connector_id:string;id:string;visibility?:string}>,connectorId:string){const id=normalizeConnectorId(connectorId);return links.filter(link=>normalizeConnectorId(link.connector_id)===id&&link.visibility!=="HIDDEN"&&!link.id.startsWith("implicit_link::"))}
-const initialize=():void=>{jsx=getJsxRuntime()};const noop=():void=>{};function ensure(){if(jsx==null)initialize();return jsx}export{initialize as i,noop as n,ConnectedAccountIcon as r,filterLinks as t};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n } from "@rchunk/app-shared";
+import { q6t as r } from "@rchunk/app-initial";
+function i(e) {
+  let t = (0, a.c)(3),
+    { ariaLabel: n, icon: r } = e,
+    i;
+  return (
+    t[0] !== n || t[1] !== r
+      ? ((i = (0, o.jsx)(`span`, {
+          role: `img`,
+          "aria-label": n,
+          className: `flex h-7 w-7 items-center justify-center rounded-md text-codex-description`,
+          children: r,
+        })),
+        (t[0] = n),
+        (t[1] = r),
+        (t[2] = i))
+      : (i = t[2]),
+    i
+  );
+}
+var a, o;
+function s() {
+  return (s = e(() => {
+    ((a = t()), (o = n()));
+  }))();
+}
+function c(e, t) {
+  let n = r(t);
+  return e.filter(
+    (e) =>
+      r(e.connector_id) === n && e.visibility !== `HIDDEN` && !e.id.startsWith(`implicit_link::`),
+  );
+}
+function l() {
+  return (l = e(() => {}))();
+}
+export { s as i, l as n, i as r, c as t };

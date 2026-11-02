@@ -1,35 +1,15 @@
-import assert from "node:assert/strict"; import { Buffer } from "node:buffer"; import fs from "node:fs"; import path from "node:path"; import { fileURLToPath } from "node:url"; import * as esbuild from "esbuild"; import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."); const ASSET_ROOT = path.resolve(ROOT, "../chatgpt-desktop-src/app/webview/assets");
-const models = [
-  ["model-f5fc9c2ff44e.js", "learning-model-geothermal-power", ["a", "c", "i", "l", "n", "o", "r", "s", "t", "u"]],
-  ["model-a39f1b9e2e01.js", "learning-model-pedigree", ["a", "c", "i", "n", "o", "r", "s", "t"]],
-  ["model-7f8b73e7da12.js", "learning-model-digestive-tract-absorption", ["a", "c", "d", "f", "i", "l", "n", "o", "r", "s", "t", "u"]],
-  ["model-eed7806c8445.js", "learning-model-chi-square-independence", ["a", "i", "n", "o", "r", "t"]],
-  ["model-8a2addb2a518.js", "learning-model-critical-path-network", ["a", "c", "i", "n", "o", "r", "s", "t"]],
-  ["model-d1116d214359.js", "learning-model-distillation", ["a", "c", "d", "i", "l", "n", "o", "r", "s", "t", "u"]],
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
+
+const owners = [
+  "learning-model-geothermal-power",
+  "learning-model-pedigree",
+  "learning-model-digestive-tract-absorption",
+  "learning-model-chi-square-independence",
+  "learning-model-critical-path-network",
+  "learning-model-distillation"
 ];
-const dependencies = (source, expression) => [...source.matchAll(expression)].map(match => match[1]); const approximatelyEqual = (actual, expected, tolerance = 1e-9) => assert.ok(Math.abs(actual - expected) <= tolerance * Math.max(1, Math.abs(expected)), `${actual} ≈ ${expected}`); let sourceAssertions = 0;
-for (const [asset, directory] of models) { const original = fs.readFileSync(path.join(ASSET_ROOT, asset), "utf8"); const recovered = fs.readFileSync(path.join(ROOT, "src/renderer", directory, "index.ts"), "utf8"); const originalDependencies = dependencies(original, /from "\.\/([^"]+)\.js"/g).map(dependency => dependency.replace(/-[a-f0-9]{12}$/, "")); const recoveredDependencies = dependencies(recovered, /(?:from\s+|import\s*)["']@rchunk\/([^"']+)/g); assert.deepEqual(recoveredDependencies, originalDependencies); assert.equal((original.match(/import\(/g) ?? []).length, 0); assert.equal((recovered.match(/import\(/g) ?? []).length, 0); assert.equal(/\bany\b|@ts-expect-error/.test(recovered), false); sourceAssertions += 4; }
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: modulePath }) => ({ path: modulePath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, () => ({ contents: "export {};", loader: "js" })); } }] }); return import("data:text/javascript;base64," + Buffer.from(result.outputFiles[0].text).toString("base64") + "#" + directory); }
-const loaded = new Map(); let runtimeAssertions = 0; for (const [_asset, directory, expected] of models) { const module = await bundle(directory); loaded.set(directory, module); assert.deepEqual(Object.keys(module).sort(), [...expected].sort()); runtimeAssertions += 1; }
-const formatter = { formatMessage: (message, values) => values?.form ? message.defaultMessage.replace("{form}", values.form) : message.defaultMessage };
 
+let assertions = 0;
+for (const owner of owners) assertions += assertReleaseOwner(owner);
 
-const geothermal = loaded.get("learning-model-geothermal-power"); geothermal.s(); assert.deepEqual(geothermal.c({ plant_type: "bad" }), { plant_type: "dry steam" }); assert.deepEqual([geothermal.o("dry steam"), geothermal.a(2)], [0, "binary cycle"]); assert.equal(geothermal.i(formatter, "flash steam"), "Flash steam"); assert.ok(geothermal.r(formatter, "binary cycle").startsWith("Hot water heats")); assert.ok(geothermal.n(formatter, "dry steam").includes("Natural steam rises")); assert.equal(geothermal.u.type, "GEOTHERMAL_POWER"); runtimeAssertions += 6;
-
-const pedigree = loaded.get("learning-model-pedigree"); pedigree.a(); assert.equal(pedigree.i.length, 9); assert.equal(pedigree.r.length, 12); assert.deepEqual(pedigree.o({ inheritance_pattern: "bad", reveal_genotypes: 1 }), { inheritance_pattern: "autosomal-dominant", reveal_genotypes: false }); assert.deepEqual(pedigree.t["autosomal-recessive"].affected, ["iii1", "iii3"]); assert.equal(pedigree.t["x-linked-recessive"].genotypes.i1, "XᵃY"); assert.deepEqual(pedigree.n.patterns, ["autosomal-dominant", "autosomal-recessive", "x-linked-recessive"]); runtimeAssertions += 6;
-
-const digestion = loaded.get("learning-model-digestive-tract-absorption"); digestion.a(); assert.deepEqual(digestion.u({ nutrient: "bad" }), { nutrient: "carbohydrate" }); assert.deepEqual([digestion.c("protein"), digestion.s(2)], [1, "long-chain fat"]); assert.deepEqual([digestion.i("carbohydrate"), digestion.i("long-chain fat")], ["blood", "lymph"]); assert.deepEqual(digestion.l(formatter), [{ value: 0, label: "Carbohydrate" }, { value: 1, label: "Protein" }, { value: 2, label: "Long-chain fat" }]); assert.equal(digestion.o(formatter, "protein"), "Amino acids"); assert.ok(digestion.n(formatter, "protein").includes("Amino acids move")); runtimeAssertions += 6;
-
-const chi = loaded.get("learning-model-chi-square-independence"); chi.r(); assert.deepEqual(chi.i({}), chi.t); const independent = chi.n({ observedTopLeft: 40, observedTopRight: 40, observedBottomLeft: 40, observedBottomRight: 40 }); approximatelyEqual(independent.statistic, 0); approximatelyEqual(independent.pValue, 1); assert.equal(independent.rejectsIndependence, false); const associated = chi.n({ ...chi.t, associationShift: 20 }); assert.equal(associated.topLeftObserved, 62); assert.ok(associated.statistic > 15); assert.equal(associated.rejectsIndependence, true); assert.deepEqual(associated.rowTotals, [80, 60]); runtimeAssertions += 7;
-
-const network = loaded.get("learning-model-critical-path-network"); network.a(); assert.deepEqual(network.o({ durationADays: -1, durationFDays: 99 }), { ...network.t, durationADays: 1, durationFDays: 10 }); const schedule = network.i({}); assert.equal(schedule.projectDuration, 12); assert.deepEqual(schedule.criticalPaths, [["B", "D", "F"]]); assert.deepEqual([...schedule.criticalEdges], ["B-D", "D-F"]); assert.equal(schedule.tasks.C.slack, 1); assert.equal(schedule.tasks.E.critical, false); assert.equal(schedule.tasks.F.earlyFinish, 12); runtimeAssertions += 7;
-
-
-const distillation = loaded.get("learning-model-distillation"); distillation.c(); assert.deepEqual(distillation.l({ mixture_example: "bad", stage: 9 }), { mixture_example: "salt water", stage: 3 }); assert.deepEqual([distillation.a("colored solution"), distillation.i(2)], [1, "widely separated liquids"]); assert.equal(distillation.s(formatter, 2), "Condensing"); assert.equal(distillation.o(formatter, "salt water"), "Salt water"); assert.equal(distillation.r(formatter, "widely separated liquids"), "Two liquids"); assert.ok(distillation.n(formatter, "salt water", 3).includes("distillate")); runtimeAssertions += 6;
-
-sourceAssertions += assertReleaseOwner("learning-model-hydrocarbon-structures");
-sourceAssertions += assertReleaseOwner("learning-model-acid-base-titration");
-sourceAssertions += assertReleaseOwner("learning-model-combining-like-terms-tiles");
-sourceAssertions += assertReleaseOwner("learning-model-born-haber-cycle");
-console.log(sourceAssertions + " source assertions and " + runtimeAssertions + " runtime assertions passed");
+console.log(`${assertions} learning model release-owner assertions passed`);

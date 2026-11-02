@@ -1,6 +1,93 @@
-// Least-squares regression learning model. Release chunk: model-19c0720a550e.js.
-import "@rchunk/rolldown-runtime";
-type Focus = "data" | "line" | "predictions" | "residuals"; interface Point { x: number; y: number } interface Regression { slope: number; intercept: number; predicted: number[]; residuals: number[]; sse: number; rSquared: number }
-let focuses: Focus[]; let defaultFocus: Focus; let coordinateBounds: { min: number; max: number; pointMin: number; pointMax: number }; let seedControl: { defaultValue: number; min: number; max: number }; let generatePoints: (seed: number) => Point[]; let normalizeState: (state: { points?: Point[] | null; focus?: string | null; seed?: number | null }) => { points: Point[]; focus: Focus; seed: number }; let calculateRegression: (points: Point[]) => Regression; let nextSeed: (seed: number) => number; let equationText: (regression: Regression) => string; let equationLatex: (regression: Regression) => string; let initialized = false;
-function initializeModel(): void { if (initialized) return; initialized = true; focuses = ["data", "line", "predictions", "residuals"]; defaultFocus = "data"; coordinateBounds = { min: 0, max: 10, pointMin: 0.35, pointMax: 9.65 }; seedControl = { defaultValue: 19, min: 0, max: 1_000_000 }; const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value)); const pointValue = (value: number | null | undefined, fallback: number) => typeof value === "number" && Number.isFinite(value) ? clamp(Number(value), coordinateBounds.pointMin, coordinateBounds.pointMax) : fallback; const isFocus = (value: unknown): value is Focus => focuses.some(focus => focus === value); const normalizeSeed = (seed: number | null | undefined) => Math.round(clamp(typeof seed === "number" && Number.isFinite(seed) ? Number(seed) : seedControl.defaultValue, seedControl.min, seedControl.max)); nextSeed = seed => { const normalized = normalizeSeed(seed); return normalized >= seedControl.max ? seedControl.min : normalized + 1; }; const random = (seed: number) => { let state = seed >>> 0; return () => { state += 1_831_565_813; let value = state; value = Math.imul(value ^ value >>> 15, value | 1); value ^= value + Math.imul(value ^ value >>> 7, value | 61); return ((value ^ value >>> 14) >>> 0) / 4_294_967_296; }; }; generatePoints = seed => { const rng = random(normalizeSeed(seed)); const direction = rng() < 0.28 ? -1 : 1; const slope = direction * (0.48 + rng() * 0.38); const intercept = direction > 0 ? 1.1 + rng() * 1.25 : 8.5 + rng() * 0.65; const alternating = rng() < 0.5 ? -1 : 1; return Array.from({ length: 10 }, (_, index) => { const baseX = 0.75 + index * 0.92; const x = clamp(baseX + (rng() - 0.5) * 0.28, coordinateBounds.pointMin, coordinateBounds.pointMax); const noise = (index % 2 === 0 ? -1 : 1) * alternating * (0.55 + rng() * 0.75); const y = clamp(intercept + slope * x + noise, coordinateBounds.pointMin, coordinateBounds.pointMax); return { x: Number(x.toFixed(2)), y: Number(y.toFixed(2)) }; }); }; const fallback = generatePoints(seedControl.defaultValue); normalizeState = state => { const seed = normalizeSeed(state.seed); const source = Array.isArray(state.points) && state.points.length >= 2 ? state.points.slice(0, 14) : generatePoints(seed); return { points: source.map((point, index) => { const defaultPoint = fallback[index % fallback.length] ?? fallback[fallback.length - 1] ?? { x: 5, y: 5 }; return { x: pointValue(point?.x, defaultPoint.x), y: pointValue(point?.y, defaultPoint.y) }; }), focus: isFocus(state.focus) ? state.focus : defaultFocus, seed }; }; calculateRegression = points => { if (points.length === 0) return { slope: 0, intercept: 0, predicted: [], residuals: [], sse: 0, rSquared: 1 }; const meanX = points.reduce((sum, point) => sum + point.x, 0) / points.length; const meanY = points.reduce((sum, point) => sum + point.y, 0) / points.length; const denominator = points.reduce((sum, point) => sum + (point.x - meanX) ** 2, 0); const numerator = points.reduce((sum, point) => sum + (point.x - meanX) * (point.y - meanY), 0); const slope = denominator <= Number.EPSILON ? 0 : numerator / denominator; const intercept = meanY - slope * meanX; const predicted = points.map(point => intercept + slope * point.x); const residuals = points.map((point, index) => point.y - (predicted[index] ?? 0)); const sse = residuals.reduce((sum, residual) => sum + residual * residual, 0); const total = points.reduce((sum, point) => sum + (point.y - meanY) ** 2, 0); const raw = total <= Number.EPSILON ? Number(sse <= Number.EPSILON) : 1 - sse / total; return { slope, intercept, predicted, residuals, sse, rSquared: clamp(raw, 0, 1) }; }; const zeroSmall = (value: number) => Math.abs(value) < 0.005 ? 0 : value; const format = (value: number) => zeroSmall(value).toFixed(2); equationText = regression => { const slope = zeroSmall(regression.slope); return `ŷ = ${format(regression.intercept)} ${slope < 0 ? "-" : "+"} ${format(Math.abs(slope))}x`; }; equationLatex = regression => { const slope = zeroSmall(regression.slope); return `\\hat{y} = ${format(regression.intercept)} ${slope < 0 ? "-" : "+"} ${format(Math.abs(slope))}x`; }; }
-export { calculateRegression as a, generatePoints as c, normalizeState as d, seedControl as i, nextSeed as l, coordinateBounds as n, equationText as o, focuses as r, equationLatex as s, defaultFocus as t, initializeModel as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x;
+function S() {
+  return (S = e(() => {
+    ((t = [`data`, `line`, `predictions`, `residuals`]),
+      (n = `data`),
+      (r = { min: 0, max: 10, pointMin: 0.35, pointMax: 9.65 }),
+      (i = 0.55),
+      (a = 0.75),
+      (o = { defaultValue: 19, min: 0, max: 1e6 }),
+      (s = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (c = (e, t) => (Number.isFinite(e) ? s(Number(e), r.pointMin, r.pointMax) : t)),
+      (l = (e) => t.some((t) => t === e)),
+      (u = (e) => (l(e) ? e : n)),
+      (d = (e) => Math.round(s(Number.isFinite(e) ? Number(e) : o.defaultValue, o.min, o.max))),
+      (f = (e) => {
+        let t = d(e);
+        return t >= o.max ? o.min : t + 1;
+      }),
+      (p = (e) => {
+        let t = e >>> 0;
+        return () => {
+          t += 1831565813;
+          let e = t;
+          return (
+            (e = Math.imul(e ^ (e >>> 15), e | 1)),
+            (e ^= e + Math.imul(e ^ (e >>> 7), e | 61)),
+            ((e ^ (e >>> 14)) >>> 0) / 4294967296
+          );
+        };
+      }),
+      (m = (e) => {
+        let t = d(e),
+          n = p(t),
+          o = n() < 0.28 ? -1 : 1,
+          c = o * (0.48 + n() * 0.38),
+          l = o > 0 ? 1.1 + n() * 1.25 : 8.5 + n() * 0.65,
+          u = n() < 0.5 ? -1 : 1;
+        return Array.from({ length: 10 }, (e, t) => {
+          let o = 0.75 + t * 0.92,
+            d = s(o + (n() - 0.5) * 0.28, r.pointMin, r.pointMax),
+            f = (t % 2 == 0 ? -1 : 1) * u * (i + n() * a),
+            p = s(l + c * d + f, r.pointMin, r.pointMax);
+          return { x: Number(d.toFixed(2)), y: Number(p.toFixed(2)) };
+        });
+      }),
+      (h = m(o.defaultValue)),
+      (g = (e) => {
+        let t = d(e.seed);
+        return {
+          points: (Array.isArray(e.points) && e.points.length >= 2
+            ? e.points.slice(0, 14)
+            : m(t)
+          ).map((e, t) => {
+            let n = h[t % h.length] ?? h[h.length - 1];
+            return { x: c(e?.x, n.x), y: c(e?.y, n.y) };
+          }),
+          focus: u(e.focus),
+          seed: t,
+        };
+      }),
+      (_ = (e) => {
+        if (e.length === 0)
+          return { slope: 0, intercept: 0, predicted: [], residuals: [], sse: 0, rSquared: 1 };
+        let t = e.reduce((e, t) => e + t.x, 0) / e.length,
+          n = e.reduce((e, t) => e + t.y, 0) / e.length,
+          r = e.reduce((e, n) => e + (n.x - t) ** 2, 0),
+          i = e.reduce((e, r) => e + (r.x - t) * (r.y - n), 0),
+          a = r <= 2 ** -52 ? 0 : i / r,
+          o = n - a * t,
+          c = e.map((e) => o + a * e.x),
+          l = e.map((e, t) => e.y - c[t]),
+          u = l.reduce((e, t) => e + t * t, 0),
+          d = e.reduce((e, t) => e + (t.y - n) ** 2, 0),
+          f = d <= 2 ** -52 ? +(u <= 2 ** -52) : 1 - u / d;
+        return { slope: a, intercept: o, predicted: c, residuals: l, sse: u, rSquared: s(f, 0, 1) };
+      }),
+      (v = (e) => (Math.abs(e) < 0.005 ? 0 : e)),
+      (y = (e) => v(e).toFixed(2)),
+      (b = (e) => {
+        let t = v(e.slope),
+          n = t < 0 ? `-` : `+`;
+        return `ŷ = ${y(e.intercept)} ${n} ${y(Math.abs(t))}x`;
+      }),
+      (x = (e) => {
+        let t = v(e.slope),
+          n = t < 0 ? `-` : `+`;
+        return `\\hat{y} = ${y(e.intercept)} ${n} ${y(Math.abs(t))}x`;
+      }));
+  }))();
+}
+export { _ as a, m as c, g as d, o as i, f as l, r as n, b as o, t as r, x as s, n as t, S as u };

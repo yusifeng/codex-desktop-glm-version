@@ -1,342 +1,448 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  BX as useSignalFamilyValue,
-  K2 as initializeInternationalization,
-  LX as useAppScope,
-  e6 as getReact,
-  hG as parseConfigError,
-  n4 as useCurrentAccount,
-  oY as isTransportUnavailableError,
-  pk as toastManager,
-  wL as initializeUtilities,
+  $3 as t,
+  BX as n,
+  FX as r,
+  G3 as i,
+  I3 as a,
+  IH as o,
+  K2 as s,
+  LX as c,
+  Q3 as l,
+  QI as u,
+  W3 as d,
+  Y2 as f,
+  Z3 as p,
+  ZI as ee,
+  aY as m,
+  e6 as h,
+  hG as g,
+  lk as _,
+  n4 as te,
+  oY as ne,
+  pk as v,
+  wL as y,
 } from "@rchunk/app-shared";
-import { formatErrorMessage as getErrorMessage } from "../app-shared/runtime/format-error-message";
 import {
-  B8t as isMissingPullRequestTaskError,
-  DZt as conversationAvailable,
-  Jmn as isRetryableResumeError,
-  PQt as parentConversation,
-  Ugn as getHostConversationService,
-  VZt as resolvedConversationHost,
-  Vsn as readResumeInputs,
-  Yon as resolveWorkspaceRoots,
-  mfn as useAppServerPermissionDefault,
-  o0t as knownConversationCatalogEntry,
-  p4 as useCollaborationMode,
-  ul as isLiveWriterConflict,
-  wQt as conversationHostId,
+  B8t as re,
+  DZt as b,
+  Dpn as ie,
+  GPt as ae,
+  H8t as x,
+  HZt as S,
+  Hon as C,
+  Hsn as w,
+  Jmn as T,
+  Jon as E,
+  Jt as D,
+  KPt as O,
+  PQt as k,
+  Ugn as oe,
+  Uon as se,
+  VZt as ce,
+  Von as le,
+  Vsn as ue,
+  Wgn as A,
+  Yon as de,
+  _sn as j,
+  cln as M,
+  dsn as fe,
+  f4 as N,
+  gsn as P,
+  i0t as F,
+  ll as I,
+  mfn as pe,
+  mnt as L,
+  o0t as me,
+  p4 as he,
+  pfn as R,
+  pnt as ge,
+  qmn as z,
+  sln as B,
+  ul as V,
+  usn as H,
+  wQt as _e,
 } from "@rchunk/app-initial";
-
-interface ResumeState {
-  hasResumeFailed: boolean;
-  isResuming: boolean;
-  isUnavailable: boolean;
-  isWriterConflict: boolean;
-  retryResume(): void;
-}
-
-const once = onceExport as (initializer: () => void) => () => void;
-
-interface ScopeLike {
-  get(signal: unknown, parameter?: unknown): unknown;
-}
-
-interface ToastHandle {
-  close(): void;
-}
-
-interface ReactLike {
-  useEffect(effect: () => void | (() => void), dependencies: unknown[]): void;
-  useRef<Value>(value: Value): { current: Value };
-  useState<Value>(
-    value: Value,
-  ): [Value, (next: Value | ((current: Value) => Value)) => void];
-}
-
-function getConfigErrorDetails(
-  error: unknown,
-): { detail: string; location: string } | null {
-  const parsed = parseConfigError(error) as {
-    column?: number;
-    detail: string;
-    filePath?: string;
-    line?: number;
-  } | null;
-  if (parsed == null) return null;
-  return {
-    location:
-      parsed.filePath == null
-        ? "config.toml"
-        : parsed.line == null || parsed.column == null
-          ? parsed.filePath
-          : `${parsed.filePath}:${parsed.line}:${parsed.column}`,
-    detail: parsed.detail,
-  };
-}
-
-function shouldAutoRetryResume(error: unknown): boolean {
-  const message = (getErrorMessage(error) ?? "").toLowerCase();
+function U(e, t) {
+  let r = (0, Ce.c)(39),
+    a = c(ee),
+    s = te(),
+    u = n(pe, `4226282475`),
+    { activeMode: d } = he(e),
+    p = n(b, e),
+    [m, h] = (0, G.useState)(p),
+    [g, _] = (0, G.useState)(null),
+    [ne, y] = (0, G.useState)(null),
+    [ie, x] = (0, G.useState)(null),
+    S = (0, G.useRef)(null),
+    C = (0, G.useRef)(null),
+    w = (0, G.useRef)(!1),
+    E = (0, G.useRef)(null),
+    D = (0, G.useRef)(null),
+    [O, A] = (0, G.useState)(0),
+    j;
+  r[0] === e
+    ? (j = r[1])
+    : ((j = function () {
+        e != null &&
+          (E.current?.close(), (E.current = null), D.current === e && (D.current = null), A(ye));
+      }),
+      (r[0] = e),
+      (r[1] = j));
+  let M = j,
+    N;
+  r[2] !== d || r[3] !== s || r[4] !== M || r[5] !== a || r[6] !== t || r[7] !== u
+    ? ((N = async (e) => {
+        await (async () => {
+          let n;
+          try {
+            (h(!0), _(null), y(null), (S.current = e));
+            let r = fe.isPending(e),
+              i = !r && B.isInitialThread(e),
+              o = (r ? fe.getTrace(e) : B.getTrace(e)) ?? void 0,
+              s = await de(a, e, { allowProjectSourceRoots: !0 });
+            if (S.current !== e || !a.get(b, e)) return;
+            n = a.get(_e, e);
+            let c = a.get(me, e),
+              l = c?.hostId === n && c?.threadId === e ? c : void 0;
+            (await oe(a, n).resumeConversation(
+              {
+                conversationId: e,
+                threadAccess: t,
+                model: null,
+                reasoningEffort: null,
+                workspaceRoots: s,
+                useAppServerPermissionDefault: u,
+                collaborationMode: d,
+                showThreadGoalResumeConfirmation: !1,
+                trace: o,
+                startupResume: i,
+                ...(l == null ? {} : { knownCatalogEntry: l }),
+              },
+              { readResumeInputs: ue(a, n) },
+            ),
+              x((t) => (t === e ? null : t)));
+          } catch (r) {
+            let i = r,
+              c = S.current === e;
+            if (c && t === `shared` && o(i).toLowerCase().includes(`thread not found`)) {
+              ((D.current = e), y(e));
+              return;
+            }
+            if (c && n != null && re(a, { hostId: n, threadId: e }, i)) {
+              ((D.current = e),
+                (E.current = a
+                  .get(v)
+                  .danger(
+                    (0, K.jsx)(f, {
+                      id: `pullRequestChat.missingTask`,
+                      defaultMessage: `This review task is no longer available. Send a message from the pull request to start a new review`,
+                      description: `Recovery instructions after the server confirms that the task associated with a pull request no longer exists; sending a message from the pull request's composer starts a new review task`,
+                    }),
+                    {
+                      errorAnalytics: { toastId: `pullRequestChat.missingTask` },
+                      id: `resume-task-error-${e}`,
+                    },
+                  )));
+              return;
+            }
+            let u = se(),
+              d = o(i).includes(`session ${e} is archived.`);
+            if (
+              ((!c || !d) &&
+                o(i) !== `FailedPrecondition: history_notes_extension_unsupported` &&
+                l.error(`Failed to resume conversation`, {
+                  safe: {},
+                  sensitive: { conversationId: e, error: i },
+                }),
+              !c)
+            )
+              return;
+            if (d) {
+              if (u) {
+                await ge.hotkeyWindowHotkeys?.collapseToHome();
+                return;
+              }
+              return;
+            }
+            let p = a.get(ce, e) ?? (t === `shared` ? n : null),
+              ee = p != null && (await oe(a, p).isConversationArchiving(e));
+            if (S.current !== e || p == null || ee || !a.get(b, e)) {
+              w.current = !1;
+              return;
+            }
+            let m = a.get(k, e) != null,
+              h = V(i);
+            h && (E.current?.close(), (E.current = null), x(e));
+            let g = xe(i);
+            if (
+              (g || ((D.current = e), _(e)),
+              !h &&
+                Se({
+                  hasShownResumeError: w.current,
+                  isSubagentChildThread: m,
+                  shouldAutoRetry: g,
+                }))
+            ) {
+              let t = T(i);
+              ((E.current = a
+                .get(v)
+                .danger(be(s, i), {
+                  errorAnalytics: {
+                    toastId: `useResumeConversationIfNeeded.resumeConversationEvent`,
+                  },
+                  duration: t ? 0 : void 0,
+                  id: `resume-task-error-${e}`,
+                  primaryAction: t
+                    ? {
+                        label: (0, K.jsx)(f, {
+                          id: `localTaskRow.resumeError.retry`,
+                          defaultMessage: `Retry`,
+                          description: `Button to reconnect to a task after resuming it failed`,
+                        }),
+                        onClick: M,
+                      }
+                    : void 0,
+                })),
+                (w.current = !0));
+            }
+            g &&
+              C.current == null &&
+              (C.current = setTimeout(() => {
+                ((C.current = null), A(ve));
+              }, 750));
+          }
+        })().finally(() => {
+          S.current === e && ((S.current = null), C.current ?? h(!1));
+        });
+      }),
+      (r[2] = d),
+      (r[3] = s),
+      (r[4] = M),
+      (r[5] = a),
+      (r[6] = t),
+      (r[7] = u),
+      (r[8] = N))
+    : (N = r[8]);
+  let P = (0, G.useEffectEvent)(N),
+    F,
+    I;
+  (r[9] !== e || r[10] !== p
+    ? ((F = () => {
+        p ||
+          (E.current?.close(),
+          (E.current = null),
+          (w.current = !1),
+          D.current === e && (D.current = null),
+          C.current != null && (clearTimeout(C.current), (C.current = null)));
+      }),
+      (I = [e, p]),
+      (r[9] = e),
+      (r[10] = p),
+      (r[11] = F),
+      (r[12] = I))
+    : ((F = r[11]), (I = r[12])),
+    (0, G.useEffect)(F, I));
+  let L;
+  r[13] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((L = () => {
+        D.current = null;
+      }),
+      (r[13] = L))
+    : (L = r[13]);
+  let R;
+  (r[14] === e ? (R = r[15]) : ((R = [e]), (r[14] = e), (r[15] = R)), (0, G.useEffect)(L, R));
+  let z, H;
+  (r[16] !== e || r[17] !== a
+    ? ((z = () => {
+        if (e != null)
+          return a.watch((t) => {
+            let { get: n } = t,
+              r = n(ce, e);
+            if (r != null && n(k, e) != null)
+              return (
+                i.dispatchMessage(`subagent-thread-full-fidelity-changed`, {
+                  hostId: r,
+                  conversationId: e,
+                  enabled: !0,
+                }),
+                () => {
+                  i.dispatchMessage(`subagent-thread-full-fidelity-changed`, {
+                    hostId: r,
+                    conversationId: e,
+                    enabled: !1,
+                  });
+                }
+              );
+          });
+      }),
+      (H = [e, a]),
+      (r[16] = e),
+      (r[17] = a),
+      (r[18] = z),
+      (r[19] = H))
+    : ((z = r[18]), (H = r[19])),
+    (0, G.useEffect)(z, H));
+  let U;
+  r[20] !== e || r[21] !== p || r[22] !== P || r[23] !== a
+    ? ((U = () => {
+        let t = () => {
+          e != null && p && e !== S.current && e !== D.current && P(e);
+        };
+        if (!se()) {
+          t();
+          return;
+        }
+        return a.watch((e) => {
+          let { get: n } = e;
+          le({ isHotkeyWindow: !0, isWindowActive: n(ae) }) && t();
+        });
+      }),
+      (r[20] = e),
+      (r[21] = p),
+      (r[22] = P),
+      (r[23] = a),
+      (r[24] = U))
+    : (U = r[24]);
+  let W;
+  (r[25] !== e || r[26] !== p || r[27] !== O || r[28] !== a
+    ? ((W = [e, p, O, a]), (r[25] = e), (r[26] = p), (r[27] = O), (r[28] = a), (r[29] = W))
+    : (W = r[29]),
+    (0, G.useEffect)(U, W));
+  let q;
+  r[30] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((q = () => () => {
+        ((S.current = null),
+          E.current?.close(),
+          (E.current = null),
+          C.current != null && (clearTimeout(C.current), (C.current = null)));
+      }),
+      (r[30] = q))
+    : (q = r[30]);
+  let J;
+  (r[31] === e ? (J = r[32]) : ((J = [e]), (r[31] = e), (r[32] = J)), (0, G.useEffect)(q, J));
+  let Y = p && m,
+    X = p && e != null && g === e,
+    Z = p && e != null && ne === e,
+    Q = p && e != null && ie === e,
+    $;
   return (
-    getConfigErrorDetails(error) == null &&
-    !isLiveWriterConflict(error) &&
-    !message.startsWith("failedprecondition:") &&
-    !isRetryableResumeError(error) &&
-    !(error instanceof Error && isTransportUnavailableError(error)) &&
-    !message.includes("no rollout found for thread id")
+    r[33] !== M || r[34] !== Y || r[35] !== X || r[36] !== Z || r[37] !== Q
+      ? (($ = {
+          isResuming: Y,
+          hasResumeFailed: X,
+          isUnavailable: Z,
+          isWriterConflict: Q,
+          retryResume: M,
+        }),
+        (r[33] = M),
+        (r[34] = Y),
+        (r[35] = X),
+        (r[36] = Z),
+        (r[37] = Q),
+        (r[38] = $))
+      : ($ = r[38]),
+    $
   );
 }
-
-function shouldShowResumeError({
-  hasShownResumeError,
-  isSubagentChildThread,
-  shouldAutoRetry,
-}: {
-  hasShownResumeError: boolean;
-  isSubagentChildThread: boolean;
-  shouldAutoRetry: boolean;
-}): boolean {
-  return !isSubagentChildThread && (!hasShownResumeError || !shouldAutoRetry);
+function ve(e) {
+  return e + 1;
 }
-
-function formatResumeError(
-  intl: {
-    formatMessage(
-      message: Record<string, unknown>,
-      values?: Record<string, unknown>,
-    ): string;
-  },
-  error: unknown,
-): string {
-  const message = getErrorMessage(error);
-  if (message === "FailedPrecondition: history_notes_extension_unsupported") {
-    return intl.formatMessage({
-      id: "localTaskRow.resumeUnsupportedVersion",
-      defaultMessage: "Update Codex to resume this task.",
-    });
-  }
-  const configError = getConfigErrorDetails(error);
-  if (configError != null) {
-    return intl.formatMessage(
-      {
-        id: "localTaskRow.resumeConfigError",
-        defaultMessage:
-          "ChatGPT can't load config.toml, so this thread can't resume. Fix {location}: {detail}.",
-      },
-      configError,
-    );
-  }
-  return isLiveWriterConflict(error)
-    ? intl.formatMessage({
-        id: "localTaskRow.resumeLiveWriterError",
-        defaultMessage:
-          "This task is active elsewhere. Close it there, then retry here.",
-      })
-    : intl.formatMessage(
+function ye(e) {
+  return e + 1;
+}
+function be(e, t) {
+  if (o(t) === `FailedPrecondition: history_notes_extension_unsupported`)
+    return e.formatMessage(j.unsupportedVersion);
+  let n = W(t);
+  return n == null
+    ? V(t)
+      ? e.formatMessage(
+          {
+            id: `localTaskRow.resumeLiveWriterError`,
+            defaultMessage: `This task is active elsewhere.{br}Close it there, then retry here.`,
+            description: `Error shown when a Codex task cannot resume because it is active elsewhere`,
+          },
+          { br: (0, K.jsx)(`br`, {}) },
+        )
+      : e.formatMessage(
+          {
+            id: `localTaskRow.resumeError.v2`,
+            defaultMessage: `Failed to resume chat{br}{error}`,
+            description: `Error shown when resuming a local Codex task fails`,
+          },
+          { br: (0, K.jsx)(`br`, {}), error: o(t) },
+        )
+    : e.formatMessage(
         {
-          id: "localTaskRow.resumeError.v2",
-          defaultMessage: "Failed to resume chat: {error}",
+          id: `localTaskRow.resumeConfigError`,
+          defaultMessage: `ChatGPT can't load config.toml, so this thread can't resume.{br}Fix {location}: {detail}. After saving the file, reopen the thread.`,
+          description: `Error shown when a local Codex task cannot resume because config.toml is invalid`,
         },
-        { error: message },
+        { br: (0, K.jsx)(`br`, {}), location: n.location, detail: n.detail },
       );
 }
-
-function useResumeConversationIfNeeded(
-  conversationId: string | null,
-  threadAccess: "shared" | "private" | string,
-): ResumeState {
-  const React = getReact() as ReactLike;
-  const scope = (useAppScope as unknown as () => ScopeLike)();
-  const account = useCurrentAccount() as {
-    intl?: {
-      formatMessage(
-        message: Record<string, unknown>,
-        values?: Record<string, unknown>,
-      ): string;
-    };
-  };
-  const usePermissionDefault = useSignalFamilyValue(
-    useAppServerPermissionDefault,
-    "4226282475",
+function xe(e) {
+  let t = o(e).toLowerCase();
+  return (
+    W(e) == null &&
+    !V(e) &&
+    !t.startsWith(`failedprecondition:`) &&
+    !T(e) &&
+    !(e instanceof Error && ne(e)) &&
+    !t.includes(`no rollout found for thread id`)
   );
-  const collaboration = useCollaborationMode(conversationId) as {
-    activeMode?: unknown;
-  };
-  const readConversationSignal = useSignalFamilyValue as unknown as (
-    signal: unknown,
-    parameter: string | null,
-  ) => unknown;
-  const available = Boolean(
-    readConversationSignal(conversationAvailable, conversationId),
-  );
-  const [isResuming, setIsResuming] = React.useState(available);
-  const [failedConversationId, setFailedConversationId] = React.useState<
-    string | null
-  >(null);
-  const [unavailableConversationId, setUnavailableConversationId] =
-    React.useState<string | null>(null);
-  const [writerConflictConversationId, setWriterConflictConversationId] =
-    React.useState<string | null>(null);
-  const [retryGeneration, setRetryGeneration] = React.useState(0);
-  const inFlight = React.useRef<string | null>(null);
-  const blocked = React.useRef<string | null>(null);
-  const toast = React.useRef<ToastHandle | null>(null);
-  const retryResume = () => {
-    toast.current?.close();
-    toast.current = null;
-    if (blocked.current === conversationId) blocked.current = null;
-    setRetryGeneration((generation) => generation + 1);
-  };
-
-  React.useEffect(() => {
-    if (
-      conversationId == null ||
-      !available ||
-      inFlight.current === conversationId ||
-      blocked.current === conversationId
-    )
-      return;
-    let cancelled = false;
-    inFlight.current = conversationId;
-    setIsResuming(true);
-    setFailedConversationId(null);
-    setUnavailableConversationId(null);
-    setWriterConflictConversationId(null);
-    void (async () => {
-      let hostId: string | null = null;
-      try {
-        const roots = await resolveWorkspaceRoots(scope, conversationId, {
-          allowProjectSourceRoots: true,
-        });
-        if (cancelled || !scope.get(conversationAvailable, conversationId))
-          return;
-        hostId = scope.get(conversationHostId, conversationId) as string;
-        const catalogEntry = scope.get(
-          knownConversationCatalogEntry,
-          conversationId,
-        ) as { hostId?: string; threadId?: string } | null;
-        const knownCatalogEntry =
-          catalogEntry?.hostId === hostId &&
-          catalogEntry.threadId === conversationId
-            ? catalogEntry
-            : undefined;
-        await (
-          getHostConversationService(scope, hostId) as unknown as {
-            resumeConversation(
-              input: Record<string, unknown>,
-              options: Record<string, unknown>,
-            ): Promise<unknown>;
-          }
-        ).resumeConversation(
-          {
-            conversationId,
-            threadAccess,
-            model: null,
-            reasoningEffort: null,
-            workspaceRoots: roots,
-            useAppServerPermissionDefault: usePermissionDefault,
-            collaborationMode: collaboration.activeMode,
-            showThreadGoalResumeConfirmation: false,
-            ...(knownCatalogEntry == null ? {} : { knownCatalogEntry }),
-          },
-          { readResumeInputs: readResumeInputs(scope, hostId) },
-        );
-      } catch (error) {
-        if (cancelled) return;
-        const message = (getErrorMessage(error) ?? "").toLowerCase();
-        if (threadAccess === "shared" && message.includes("thread not found")) {
-          blocked.current = conversationId;
-          setUnavailableConversationId(conversationId);
-          return;
-        }
-        if (
-          hostId != null &&
-          isMissingPullRequestTaskError(
-            scope,
-            { hostId, threadId: conversationId },
-            error,
-          )
-        ) {
-          blocked.current = conversationId;
-          setUnavailableConversationId(conversationId);
-          return;
-        }
-        if (isLiveWriterConflict(error))
-          setWriterConflictConversationId(conversationId);
-        else setFailedConversationId(conversationId);
-        const autoRetry = shouldAutoRetryResume(error);
-        const isSubagent =
-          scope.get(parentConversation, conversationId) != null;
-        if (
-          shouldShowResumeError({
-            hasShownResumeError: toast.current != null,
-            isSubagentChildThread: isSubagent,
-            shouldAutoRetry: autoRetry,
-          })
-        ) {
-          const intl = account.intl ?? {
-            formatMessage: (descriptor: Record<string, unknown>) =>
-              String(descriptor.defaultMessage ?? ""),
-          };
-          toast.current = (
-            scope.get(toastManager) as {
-              danger(
-                message: string,
-                options: Record<string, unknown>,
-              ): ToastHandle;
-            }
-          ).danger(formatResumeError(intl, error), {
-            id: `resume-task-error-${conversationId}`,
-            primaryAction: isRetryableResumeError(error)
-              ? { label: "Retry", onClick: retryResume }
-              : undefined,
-          });
-        }
-        if (autoRetry) {
-          globalThis.setTimeout(
-            () => setRetryGeneration((generation) => generation + 1),
-            750,
-          );
-        } else {
-          blocked.current = conversationId;
-        }
-      } finally {
-        if (!cancelled && inFlight.current === conversationId) {
-          inFlight.current = null;
-          setIsResuming(false);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-      if (inFlight.current === conversationId) inFlight.current = null;
-    };
-  }, [available, conversationId, retryGeneration, scope, threadAccess]);
-
-  return {
-    isResuming: available && isResuming,
-    hasResumeFailed:
-      available &&
-      conversationId != null &&
-      failedConversationId === conversationId,
-    isUnavailable:
-      available &&
-      conversationId != null &&
-      unavailableConversationId === conversationId,
-    isWriterConflict:
-      available &&
-      conversationId != null &&
-      writerConflictConversationId === conversationId,
-    retryResume,
-  };
 }
-
-const initializeUseResumeConversationIfNeeded = once((): void => {
-  initializeInternationalization();
-  initializeUtilities();
-  void resolvedConversationHost;
-});
-
-export {
-  useResumeConversationIfNeeded as n,
-  initializeUseResumeConversationIfNeeded as t,
-};
+function Se({ hasShownResumeError: e, isSubagentChildThread: t, shouldAutoRetry: n }) {
+  return !t && (!e || !n);
+}
+function W(e) {
+  let t = g(e);
+  return t == null
+    ? null
+    : {
+        location:
+          t.filePath == null
+            ? `config.toml`
+            : t.line == null || t.column == null
+              ? t.filePath
+              : `${t.filePath}:${t.line}:${t.column}`,
+        detail: t.detail,
+      };
+}
+var Ce, G, K;
+function q() {
+  return (q = e(() => {
+    ((Ce = t()),
+      ie(),
+      r(),
+      y(),
+      z(),
+      m(),
+      (G = h()),
+      s(),
+      A(),
+      S(),
+      D(),
+      w(),
+      E(),
+      P(),
+      I(),
+      O(),
+      N(),
+      _(),
+      C(),
+      d(),
+      M(),
+      H(),
+      x(),
+      L(),
+      u(),
+      F(),
+      R(),
+      p(),
+      (K = a()));
+  }))();
+}
+export { U as n, q as t };

@@ -1,74 +1,71 @@
-// Image markup rendering and local preview export. Release chunk: export-6cf67894f30b.js.
-import "@rchunk/rolldown-runtime";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as sketchChunk from "@rchunk/sketch";
-type Bounds = sketchChunk.Bounds;
-type SketchDocument = sketchChunk.SketchDocument;
-type SketchObject = sketchChunk.SketchObject;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { Dan as t, Ert as n, krt as r } from "@rchunk/app-initial";
+import { d as i, i as a, m as o, t as s } from "@rchunk/sketch";
+function c({ width: e, height: t }) {
+  let n = 1024 / Math.max(e, t);
+  return { width: e * n, height: t * n };
+}
+async function l(e, t, n, r) {
+  let { width: s, height: l } = t;
+  if (!Number.isSafeInteger(s) || !Number.isSafeInteger(l) || s <= 0 || l <= 0 || s * l > 2e7)
+    return null;
+  let d = Math.max(s, l) / 1024,
+    f = await a(e, {
+      outputBounds: { x: 0, y: 0, width: (s - 1e-6) / d, height: (l - 1e-6) / d },
+      scale: d,
+      maxDimension: Math.max(s, l),
+      maxPixelCount: s * l,
+      padding: 0,
+      mimeType: `image/png`,
+      drawBackground: r,
+    });
+  if (
+    f.kind !== `success` ||
+    f.width !== s ||
+    f.height !== l ||
+    (r == null && f.blob.size > 20971520)
+  )
+    return null;
+  let p = c(t),
+    m = i(e).map((e, t) => {
+      let n = o(e);
+      return `${t + 1}. (x: ${u(n.x / p.width)}, y: ${u(n.y / p.height)}) ${e.text}`;
+    }),
+    h = n.trim().length > 0 ? [n.trim()] : [];
+  return {
+    overlay: f.blob,
+    promptText: [
+      m.join(`
+`),
+      ...h,
+    ].filter((e) => e.length > 0).join(`
 
-interface AppInitialRuntime {
-  Dan(blob: Blob): Promise<string>;
-  Ert(source: string, options: { image: CanvasImageSource; signal: AbortSignal }): Promise<{ blob: Blob } | null>;
-  krt(): void;
+`),
+  };
 }
-interface SuccessfulRender { kind: "success"; blob: Blob; width: number; height: number }
-interface RenderResult { kind: string; blob?: Blob; width?: number; height?: number }
-interface SketchRuntime {
-  d(document: SketchDocument): Array<SketchObject & { text: string }>;
-  i(document: SketchDocument, options: { outputBounds: Bounds; scale: number; maxDimension: number; maxPixelCount: number; padding: number; mimeType: "image/png"; drawBackground?: (context: CanvasRenderingContext2D, dimensions: { width: number; height: number }) => void }): Promise<RenderResult>;
-  m(object: SketchObject & { text: string }): { x: number; y: number };
-  t(): void;
+function u(e) {
+  return `${(Math.min(Math.max(e, 0), 1) * 100).toFixed(1)}%`;
 }
-interface ImageDimensions { width: number; height: number }
-const appInitial = appInitialChunk as unknown as AppInitialRuntime;
-const sketch = sketchChunk as unknown as SketchRuntime;
-const maximumDimension = 1024;
-const maximumPixelCount = 20_000_000;
-const maximumTransparentOverlayBytes = 20 * 1024 * 1024;
-let initialized = false;
-
-function getMarkupSurfaceSize({ width, height }: ImageDimensions): ImageDimensions {
-  const scale = maximumDimension / Math.max(width, height);
-  return { width: width * scale, height: height * scale };
-}
-function formatPercentage(value: number): string {
-  return (Math.min(Math.max(value, 0), 1) * 100).toFixed(1) + "%";
-}
-function isSuccessfulRender(rendered: RenderResult): rendered is SuccessfulRender {
-  return rendered.kind === "success" && rendered.blob instanceof Blob && typeof rendered.width === "number" && typeof rendered.height === "number";
-}
-async function exportImageMarkup(document: SketchDocument, image: ImageDimensions, prompt: string, drawBackground?: (context: CanvasRenderingContext2D, dimensions: ImageDimensions) => void): Promise<{ overlay: Blob; promptText: string } | null> {
-  const { width, height } = image;
-  if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width <= 0 || height <= 0 || width * height > maximumPixelCount) return null;
-  const scale = Math.max(width, height) / maximumDimension;
-  const rendered = await sketch.i(document, { outputBounds: { x: 0, y: 0, width: (width - 1e-6) / scale, height: (height - 1e-6) / scale }, scale, maxDimension: Math.max(width, height), maxPixelCount: width * height, padding: 0, mimeType: "image/png", drawBackground });
-  if (!isSuccessfulRender(rendered) || rendered.width !== width || rendered.height !== height || (drawBackground == null && rendered.blob.size > maximumTransparentOverlayBytes)) return null;
-  const surface = getMarkupSurfaceSize(image);
-  const annotations = sketch.d(document).map((object, index) => {
-    const point = sketch.m(object);
-    return String(index + 1) + ". (x: " + formatPercentage(point.x / surface.width) + ", y: " + formatPercentage(point.y / surface.height) + ") " + object.text;
-  });
-  return { overlay: rendered.blob, promptText: [annotations.join("\n"), prompt.trim()].filter((value) => value.length > 0).join("\n\n") };
-}
-async function createLocalMarkupPreview(source: string, document: SketchDocument, signal: AbortSignal, image: CanvasImageSource): Promise<{ src: string; prompt: string } | null> {
-  const downloaded = await appInitial.Ert(source, { image, signal });
-  signal.throwIfAborted();
-  if (downloaded == null) return null;
-  const bitmap = await createImageBitmap(downloaded.blob);
+async function d(e, r, i, a) {
+  let o = await n(e, { image: a, signal: i });
+  if ((i.throwIfAborted(), o == null)) return null;
+  let s = await createImageBitmap(o.blob);
   try {
-    signal.throwIfAborted();
-    const exported = await exportImageMarkup(document, bitmap, "", (context, dimensions) => context.drawImage(bitmap, 0, 0, dimensions.width, dimensions.height));
-    signal.throwIfAborted();
-    if (exported == null) return null;
-    const src = await appInitial.Dan(exported.overlay);
-    signal.throwIfAborted();
-    return { src, prompt: exported.promptText };
-  } finally { bitmap.close(); }
+    i.throwIfAborted();
+    let e = await l(r, s, ``, (e, t) => {
+      e.drawImage(s, 0, 0, t.width, t.height);
+    });
+    if ((i.throwIfAborted(), e == null)) return null;
+    let n = await t(e.overlay);
+    return (i.throwIfAborted(), { src: n, prompt: e.promptText });
+  } finally {
+    s.close();
+  }
 }
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  sketch.t();
-  appInitial.krt();
+function f() {
+  return (f = e(() => {
+    (s(), r());
+  }))();
 }
-export { initialize as i, exportImageMarkup as n, getMarkupSurfaceSize as r, createLocalMarkupPreview as t };
+export { f as i, l as n, c as r, d as t };

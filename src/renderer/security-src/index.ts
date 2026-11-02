@@ -1,114 +1,110 @@
-import "@rchunk/rolldown-runtime";
-
-export interface SecurityPermissionMessage {
-  defaultMessage: string;
-  description: string;
-  id: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e) {
+  return e;
 }
-
-const identityPermission: SecurityPermissionMessage = {
-  id: "signInWithChatGPTConsent.resourcePermission.identity",
-  defaultMessage: "Access your basic profile information",
-  description:
-    "Label for identity permissions requested or granted by a third-party app. Covers the openid, profile, and email OAuth scopes.",
-};
-const permissionTitles: Record<string, SecurityPermissionMessage> = {
-  openid: identityPermission,
-  profile: identityPermission,
-  email: identityPermission,
-  "resource.invoke": {
-    id: "signInWithChatGPTConsent.resourcePermission.resourceInvoke",
-    defaultMessage: "Resource actions",
-    description: "Label for permission to invoke an OAuth resource, requested or granted by a third-party app.",
-  },
-  "chatgpt.plugins.invoke": {
-    id: "signInWithChatGPTConsent.resourcePermission.chatgptPlugins",
-    defaultMessage: "Use the apps you’ve connected to ChatGPT",
-    description: "Label for permission to invoke the user's connected ChatGPT apps, requested or granted by a third-party app.",
-  },
-  "chatpass.enable.request": {
-    id: "signInWithChatGPTConsent.resourcePermission.chatgptAllowance",
-    defaultMessage: "Use your ChatGPT plan",
-    description: "Label explaining that a third-party app can consume the user's ChatGPT plan allowance for API requests.",
-  },
-  "ads.admin.all.read": {
-    id: "signInWithChatGPTConsent.resourcePermission.adsRead",
-    defaultMessage: "View Ads Manager data",
-    description: "Label for read access to Ads Manager data requested or granted by a third-party app.",
-  },
-  "ads.admin.all.write": {
-    id: "signInWithChatGPTConsent.resourcePermission.adsWrite",
-    defaultMessage: "Manage Ads Manager data",
-    description: "Label for write access to Ads Manager data requested or granted by a third-party app.",
-  },
-  offline_access: {
-    id: "signInWithChatGPTConsent.resourcePermission.offlineAccess",
-    defaultMessage: "Offline Access",
-    description: "Label for offline access requested or granted by a third-party app.",
-  },
-};
-for (const alias of [
-  "chatgpt.tokens.use.obo",
-  "chatpass.enable.request.direct",
-  "chatgpt.tokens.use.direct",
-]) {
-  permissionTitles[alias] = permissionTitles["chatpass.enable.request"];
+function n(e) {
+  return d[e];
 }
-
-const identityDescription: SecurityPermissionMessage = {
-  id: "signInWithChatGPTConsent.resourcePermission.identity.description",
-  defaultMessage: "Basic information including your name, email, and profile picture.",
-  description:
-    "Description beneath the shared identity permission title in SIWC consent and linked-app settings. The openid, profile, and email scopes share this one description.",
-};
-const permissionDescriptions: Record<string, SecurityPermissionMessage | undefined> = {
-  openid: identityDescription,
-  profile: identityDescription,
-  email: identityDescription,
-  "resource.invoke": undefined,
-  "chatgpt.plugins.invoke": {
-    id: "signInWithChatGPTConsent.resourcePermission.chatgptPlugins.description",
-    defaultMessage: "{appName} will be able to use apps you’ve connected to ChatGPT to work on your requests.",
-    description: "Description beneath the connected-app permission title in SIWC consent and linked-app settings. {appName} is the requesting third-party app display name, such as Acme; ChatGPT is a product name.",
-  },
-  "chatpass.enable.request": {
-    id: "oauthConsentChoices.tokensAndCredits",
-    defaultMessage: "Complete your AI requests in {appName} with usage included in your ChatGPT plan or credits balance.",
-    description: "Description beneath the ChatPass permission title in SIWC consent and linked-app settings. {appName} is the requesting third-party app display name, such as Acme. Tokens and credits refer to ChatGPT usage; this copy does not authorize purchasing credits.",
-  },
-  "ads.admin.all.read": undefined,
-  "ads.admin.all.write": undefined,
-  offline_access: {
-    id: "signInWithChatGPTConsent.adsOfflineDescription",
-    defaultMessage: "Keep this connection active when you’re not using the app.",
-    description: "Description beneath the offline-access permission title in SIWC consent and linked-app settings. Explains that the app can keep the connection active without requiring repeated sign-in.",
-  },
-};
-for (const alias of [
-  "chatgpt.tokens.use.obo",
-  "chatpass.enable.request.direct",
-  "chatgpt.tokens.use.direct",
-]) {
-  permissionDescriptions[alias] = permissionDescriptions["chatpass.enable.request"];
+function r(e) {
+  return g[e];
 }
-
-function getPermissionTitle(scope: string): SecurityPermissionMessage | undefined {
-  return permissionTitles[scope];
+var i, a, o, s, c, l, u, d, f, p, m, h, g;
+function _() {
+  return (_ = e(() => {
+    ((i = t({
+      id: `signInWithChatGPTConsent.resourcePermission.identity`,
+      defaultMessage: `Access your basic profile information`,
+      description: `Label for identity permissions requested or granted by a third-party app. Covers the openid, profile, and email OAuth scopes.`,
+    })),
+      (a = t({
+        id: `signInWithChatGPTConsent.resourcePermission.resourceInvoke`,
+        defaultMessage: `Resource actions`,
+        description: `Label for permission to invoke an OAuth resource, requested or granted by a third-party app.`,
+      })),
+      (o = t({
+        id: `signInWithChatGPTConsent.resourcePermission.chatgptPlugins`,
+        defaultMessage: `Use the apps you’ve connected to ChatGPT`,
+        description: `Label for permission to invoke the user's connected ChatGPT apps, requested or granted by a third-party app.`,
+      })),
+      (s = t({
+        id: `signInWithChatGPTConsent.resourcePermission.chatgptAllowance`,
+        defaultMessage: `Use your ChatGPT plan`,
+        description: `Label explaining that a third-party app can consume the user's ChatGPT plan allowance for API requests.`,
+      })),
+      (c = t({
+        id: `signInWithChatGPTConsent.resourcePermission.adsRead`,
+        defaultMessage: `View Ads Manager data`,
+        description: `Label for read access to Ads Manager data requested or granted by a third-party app.`,
+      })),
+      (l = t({
+        id: `signInWithChatGPTConsent.resourcePermission.adsWrite`,
+        defaultMessage: `Manage Ads Manager data`,
+        description: `Label for write access to Ads Manager data requested or granted by a third-party app.`,
+      })),
+      (u = t({
+        id: `signInWithChatGPTConsent.resourcePermission.offlineAccess`,
+        defaultMessage: `Offline Access`,
+        description: `Label for offline access requested or granted by a third-party app.`,
+      })),
+      (d = {
+        openid: i,
+        profile: i,
+        email: i,
+        "resource.invoke": a,
+        "chatgpt.plugins.invoke": o,
+        "chatpass.enable.request": s,
+        "chatgpt.tokens.use.obo": s,
+        "chatpass.enable.request.direct": s,
+        "chatgpt.tokens.use.direct": s,
+        "ads.admin.all.read": c,
+        "ads.admin.all.write": l,
+        offline_access: u,
+      }),
+      (f = t({
+        id: `signInWithChatGPTConsent.resourcePermission.identity.description`,
+        defaultMessage: `Basic information including your name, email, and profile picture.`,
+        description: `Description beneath the shared identity permission title in SIWC consent and linked-app settings. The openid, profile, and email scopes share this one description.`,
+      })),
+      (p = t({
+        id: `signInWithChatGPTConsent.resourcePermission.chatgptPlugins.description`,
+        defaultMessage: `{appName} will be able to use apps you’ve connected to ChatGPT to work on your requests.`,
+        description: `Description beneath the connected-app permission title in SIWC consent and linked-app settings. {appName} is the requesting third-party app display name, such as Acme; ChatGPT is a product name.`,
+      })),
+      (m = t({
+        id: `oauthConsentChoices.tokensAndCredits`,
+        defaultMessage: `Complete your AI requests in {appName} with usage included in your ChatGPT plan or credits balance.`,
+        description: `Description beneath the ChatPass permission title in SIWC consent and linked-app settings. {appName} is the requesting third-party app display name, such as Acme. Tokens and credits refer to ChatGPT usage; this copy does not authorize purchasing credits.`,
+      })),
+      (h = t({
+        id: `signInWithChatGPTConsent.adsOfflineDescription`,
+        defaultMessage: `Keep this connection active when you’re not using the app.`,
+        description: `Description beneath the offline-access permission title in SIWC consent and linked-app settings. Explains that the app can keep the connection active without requiring repeated sign-in.`,
+      })),
+      (g = {
+        openid: f,
+        profile: f,
+        email: f,
+        "resource.invoke": void 0,
+        "chatgpt.plugins.invoke": p,
+        "chatpass.enable.request": m,
+        "chatgpt.tokens.use.obo": m,
+        "chatpass.enable.request.direct": m,
+        "chatgpt.tokens.use.direct": m,
+        "ads.admin.all.read": void 0,
+        "ads.admin.all.write": void 0,
+        offline_access: h,
+      }));
+  }))();
 }
-
-function getPermissionDescription(scope: string): SecurityPermissionMessage | undefined {
-  return permissionDescriptions[scope];
+function v() {
+  return (v = e(() => {
+    (_(), r(`chatpass.enable.request`), r(`offline_access`));
+  }))();
 }
-
-function initializeSecurityPermissionMessages(): void {}
-function initializeSecurityPermissionDescriptions(): void {}
-function initializeSecurityPermissions(): void {}
-
-export {
-  getPermissionTitle as a,
-  getPermissionDescription as i,
-  permissionDescriptions as n,
-  initializeSecurityPermissionMessages as o,
-  permissionTitles as r,
-  initializeSecurityPermissions as t,
-};
+function y() {
+  return (y = e(() => {
+    (v(), _());
+  }))();
+}
+export { n as a, r as i, g as n, _ as o, d as r, y as t };

@@ -1,26 +1,118 @@
-// Polynomial root-multiplicity and x-intercept behavior learning model.
-import "@rchunk/rolldown-runtime";
-
-type MultiplicityKey = "leftRootMultiplicity" | "rightRootMultiplicity";
-type RootKey = "leftRoot" | "rightRoot";
-interface PolynomialValues { rootCenter?: number | null; rootSeparation?: number | null; leftRootMultiplicity?: number | null; rightRootMultiplicity?: number | null }
-
-const polynomialType = "POLYNOMIAL_MULTIPLICITY_INTERCEPTS"; const polynomialThumbnail = "polynomial-multiplicity-intercepts-v1"; const polynomialFormula = "f(x) = k(x-r_1)^{m_1}(x-r_2)^{m_2}";
-const polynomialParameters = { rootCenter: { kind: "number", defaultValue: 0, min: -2, max: 2 }, rootSeparation: { kind: "number", defaultValue: 4, min: 1, max: 4 }, leftRootMultiplicity: { kind: "integer", defaultValue: 2, min: 1, max: 3 }, rightRootMultiplicity: { kind: "integer", defaultValue: 3, min: 1, max: 3 } };
-const polynomialDefinition = { type: polynomialType, version: 1, thumbnailAssetKey: polynomialThumbnail, canonicalFormula: polynomialFormula, parameters: polynomialParameters };
-const parameterControls = { rootCenter: { min: -2, max: 2, step: 0.5 }, rootSeparation: { min: 1, max: 4, step: 0.5 }, leftRootMultiplicity: { min: 1, max: 3, step: 1 }, rightRootMultiplicity: { min: 1, max: 3, step: 1 } };
-const defaultPolynomialValues = { rootCenter: 0, rootSeparation: 4, leftRootMultiplicity: 2, rightRootMultiplicity: 3 };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value)); const formatPolynomialNumber = (value: number): string => Number(value.toFixed(2)).toString();
-const normalizeNumber = (value: number | null | undefined, control: { min: number; max: number }, fallback: number): number => Number.isFinite(value) ? clamp(value as number, control.min, control.max) : fallback;
-const normalizeMultiplicity = (key: MultiplicityKey, value: number | null | undefined, fallback: number): number => { const control = parameterControls[key]; return Number.isFinite(value) ? clamp(Math.round(value as number), control.min, control.max) : fallback; };
-const normalizePolynomialValues = (values: PolynomialValues) => ({ rootCenter: normalizeNumber(values.rootCenter, parameterControls.rootCenter, defaultPolynomialValues.rootCenter), rootSeparation: normalizeNumber(values.rootSeparation, parameterControls.rootSeparation, defaultPolynomialValues.rootSeparation), leftRootMultiplicity: normalizeMultiplicity("leftRootMultiplicity", values.leftRootMultiplicity, defaultPolynomialValues.leftRootMultiplicity), rightRootMultiplicity: normalizeMultiplicity("rightRootMultiplicity", values.rightRootMultiplicity, defaultPolynomialValues.rightRootMultiplicity) });
-const polynomialRoots = (values: PolynomialValues) => { const safe = normalizePolynomialValues(values); const half = safe.rootSeparation / 2; return { leftRoot: safe.rootCenter - half, rightRoot: safe.rootCenter + half }; };
-const movePolynomialRoot = (values: PolynomialValues, root: RootKey, position: number) => { const safe = normalizePolynomialValues(values); const roots = polynomialRoots(safe); const requested = Number.isFinite(position) ? position : roots[root]; const leftRoot = root === "leftRoot" ? Math.min(requested, roots.rightRoot - parameterControls.rootSeparation.min) : roots.leftRoot; const rightRoot = root === "rightRoot" ? Math.max(requested, roots.leftRoot + parameterControls.rootSeparation.min) : roots.rightRoot; return normalizePolynomialValues({ ...safe, rootCenter: (leftRoot + rightRoot) / 2, rootSeparation: rightRoot - leftRoot }); };
-const updateMultiplicity = (values: PolynomialValues, key: MultiplicityKey, multiplicity: number) => ({ ...normalizePolynomialValues(values), [key]: normalizeMultiplicity(key, multiplicity, normalizePolynomialValues(values)[key]) });
-const interceptBehavior = (multiplicity: number): string => { const safe = normalizeMultiplicity("leftRootMultiplicity", multiplicity, parameterControls.leftRootMultiplicity.min); return safe % 2 === 0 ? "touches" : safe > 1 ? "flatCross" : "crosses"; };
-const polynomialValue = (x: number, values: PolynomialValues): number => { const safe = normalizePolynomialValues(values); const roots = polynomialRoots(safe); return (x - roots.leftRoot) ** safe.leftRootMultiplicity * (x - roots.rightRoot) ** safe.rightRootMultiplicity; };
-const polynomialScale = (values: PolynomialValues): number => { const safe = normalizePolynomialValues(values); const roots = polynomialRoots(safe); let maximum = 0; for (let index = 0; index <= 80; index += 1) { const x = roots.leftRoot + (roots.rightRoot - roots.leftRoot) * index / 80; maximum = Math.max(maximum, Math.abs(polynomialValue(x, safe))); } return !Number.isFinite(maximum) || maximum <= Number.EPSILON ? 1 : clamp(2.7 / maximum, 0.00025, 24); };
-const polynomialExpression = (values: PolynomialValues): string => { const safe = normalizePolynomialValues(values); return "y = k * (x - a)^" + safe.leftRootMultiplicity + " * (x - b)^" + safe.rightRootMultiplicity; };
-function initializePolynomialSchema(): void {}
-function initializePolynomialModel(): void {}
-export { interceptBehavior as a, initializePolynomialModel as c, movePolynomialRoot as d, initializePolynomialSchema as f, formatPolynomialNumber as i, normalizePolynomialValues as l, parameterControls as n, polynomialRoots as o, polynomialDefinition as p, polynomialExpression as r, polynomialScale as s, defaultPolynomialValues as t, updateMultiplicity as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `POLYNOMIAL_MULTIPLICITY_INTERCEPTS`),
+      (n = `polynomial-multiplicity-intercepts-v1`),
+      (r = `f(x) = k(x-r_1)^{m_1}(x-r_2)^{m_2}`),
+      (i = {
+        rootCenter: { kind: `number`, defaultValue: 0, min: -2, max: 2 },
+        rootSeparation: { kind: `number`, defaultValue: 4, min: 1, max: 4 },
+        leftRootMultiplicity: { kind: `integer`, defaultValue: 2, min: 1, max: 3 },
+        rightRootMultiplicity: { kind: `integer`, defaultValue: 3, min: 1, max: 3 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+var s, c, l, u, d, f, p, m, h, g, _, v, y, b, x;
+function S() {
+  return (S = e(() => {
+    (o(),
+      (s = a.parameters),
+      (c = {
+        rootCenter: { min: s.rootCenter.min, max: s.rootCenter.max, step: 0.5 },
+        rootSeparation: { min: s.rootSeparation.min, max: s.rootSeparation.max, step: 0.5 },
+        leftRootMultiplicity: {
+          min: s.leftRootMultiplicity.min,
+          max: s.leftRootMultiplicity.max,
+          step: 1,
+        },
+        rightRootMultiplicity: {
+          min: s.rightRootMultiplicity.min,
+          max: s.rightRootMultiplicity.max,
+          step: 1,
+        },
+      }),
+      (l = {
+        rootCenter: s.rootCenter.defaultValue,
+        rootSeparation: s.rootSeparation.defaultValue,
+        leftRootMultiplicity: s.leftRootMultiplicity.defaultValue,
+        rightRootMultiplicity: s.rightRootMultiplicity.defaultValue,
+      }),
+      a.canonicalFormula,
+      (u = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (d = (e) => Number(e.toFixed(2)).toString()),
+      (f = (e, t, n) => (Number.isFinite(e) ? u(e, t.min, t.max) : n)),
+      (p = (e, t, n) => {
+        let r = c[e];
+        return Number.isFinite(t) ? u(Math.round(t), r.min, r.max) : n;
+      }),
+      (m = (e) => ({
+        rootCenter: f(e.rootCenter, c.rootCenter, l.rootCenter),
+        rootSeparation: f(e.rootSeparation, c.rootSeparation, l.rootSeparation),
+        leftRootMultiplicity: p(
+          `leftRootMultiplicity`,
+          e.leftRootMultiplicity,
+          l.leftRootMultiplicity,
+        ),
+        rightRootMultiplicity: p(
+          `rightRootMultiplicity`,
+          e.rightRootMultiplicity,
+          l.rightRootMultiplicity,
+        ),
+      })),
+      (h = (e) => {
+        let t = m(e),
+          n = t.rootSeparation / 2;
+        return { leftRoot: t.rootCenter - n, rightRoot: t.rootCenter + n };
+      }),
+      (g = (e, t, n) => {
+        let r = m(e),
+          i = h(r),
+          a = Number.isFinite(n) ? n : i[t],
+          o = t === `leftRoot` ? Math.min(a, i.rightRoot - c.rootSeparation.min) : i.leftRoot,
+          s = t === `rightRoot` ? Math.max(a, i.leftRoot + c.rootSeparation.min) : i.rightRoot;
+        return m({ ...r, rootCenter: (o + s) / 2, rootSeparation: s - o });
+      }),
+      (_ = (e, t, n) => ({ ...m(e), [t]: p(t, n, e[t]) })),
+      (v = (e) => {
+        let t = p(`leftRootMultiplicity`, e, c.leftRootMultiplicity.min);
+        return t % 2 == 0 ? `touches` : t > 1 ? `flatCross` : `crosses`;
+      }),
+      (y = (e, t) => {
+        let n = m(t),
+          { leftRoot: r, rightRoot: i } = h(n);
+        return (e - r) ** +n.leftRootMultiplicity * (e - i) ** +n.rightRootMultiplicity;
+      }),
+      (b = (e) => {
+        let t = m(e),
+          { leftRoot: n, rightRoot: r } = h(t),
+          i = 0;
+        for (let e = 0; e <= 80; e += 1) {
+          let a = n + ((r - n) * e) / 80;
+          i = Math.max(i, Math.abs(y(a, t)));
+        }
+        return !Number.isFinite(i) || i <= 2 ** -52 ? 1 : u(2.7 / i, 25e-5, 24);
+      }),
+      (x = (e) => {
+        let t = m(e);
+        return `y = k * (x - a)^${t.leftRootMultiplicity} * (x - b)^${t.rightRootMultiplicity}`;
+      }));
+  }))();
+}
+export {
+  v as a,
+  S as c,
+  g as d,
+  o as f,
+  d as i,
+  m as l,
+  c as n,
+  h as o,
+  a as p,
+  x as r,
+  b as s,
+  l as t,
+  _ as u,
+};

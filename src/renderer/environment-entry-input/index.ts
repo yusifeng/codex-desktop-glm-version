@@ -1,154 +1,268 @@
-import { I3 as getJsxRuntime, e6 as ReactRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-export type EnvironmentParseFailure = {
-  ok: false;
-  reason: "duplicate" | "limit" | "malformed";
-  line: number;
-};
-export type EnvironmentParseResult =
-  { ok: true; entries: Map<string, string> } | EnvironmentParseFailure;
-let jsx: JsxRuntime;
-function ensureJsx(): JsxRuntime {
-  if (jsx == null) jsx = getJsxRuntime();
-  return jsx;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i, e6 as a, n4 as o } from "@rchunk/app-shared";
+import { Xat as s, Yat as c } from "@rchunk/app-initial";
+function l() {
+  let e = (0, u.c)(1),
+    t;
+  return (
+    e[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, d.jsx)(`p`, {
+          className: `text-sm text-danger select-none`,
+          role: `alert`,
+          children: (0, d.jsx)(i, {
+            id: `restricted.environmentSetup.batchSecrets.conflict`,
+            defaultMessage: `This environment changed elsewhere. Close and reopen the editor to load the latest version, then re-enter your edits`,
+            description: `Explains that private batch edits cannot replace a newer environment configuration and how to reopen the latest version`,
+          }),
+        })),
+        (e[0] = t))
+      : (t = e[0]),
+    t
+  );
 }
-function EnvironmentConflictMessage(): unknown {
-  return ensureJsx().jsx("p", {
-    className: "environment-conflict-message",
-    role: "alert",
-    children:
-      "This environment changed elsewhere. Close and reopen the editor to load the latest version, then re-enter your edits",
-  });
+var u, d;
+function f() {
+  return (f = e(() => {
+    ((u = t()), r(), (d = n()));
+  }))();
 }
-function parseEnvironmentEntries(
-  source: string,
-  maxKeyLength: number,
-  unavailableNames: readonly string[] = [],
-  existingNames: readonly string[] = [],
-): EnvironmentParseResult {
-  const trimmed = source.trim(),
-    isKey = /^[A-Za-z_][A-Za-z0-9_]*$/.test(trimmed);
-  if (
-    isKey &&
-    (existingNames.includes(trimmed) || unavailableNames.includes(trimmed))
-  )
-    return { ok: false, reason: "duplicate", line: 1 };
-  const lines = (isKey ? `${trimmed}=` : source).split(/\r?\n/),
-    entries = new Map<string, string>();
-  for (let index = 0; index < lines.length; index++) {
-    let line = lines[index].trim(),
-      lineNumber = index + 1;
-    if (!line || line.startsWith("#") || line.startsWith(";")) continue;
-    const match = /^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=(.*)$/.exec(line);
-    if (!match || match[1].length > maxKeyLength)
-      return { ok: false, reason: "malformed", line: lineNumber };
-    const key = match[1];
-    if (entries.has(key) || unavailableNames.includes(key))
-      return { ok: false, reason: "duplicate", line: lineNumber };
-    let value = match[2].trim(),
-      quote = value[0];
-    if (quote === '"' || quote === "'") {
-      let cursor = 1;
-      for (; ; cursor++) {
-        if (cursor >= value.length) {
-          index++;
-          if (index >= lines.length)
-            return { ok: false, reason: "malformed", line: lineNumber };
-          value += `\n${lines[index]}`;
-        }
-        if (value[cursor] === "\\" && quote === '"') cursor++;
-        else if (value[cursor] === quote) break;
-      }
-      const suffix = value.slice(cursor + 1).trim();
-      if (suffix && !suffix.startsWith("#"))
-        return { ok: false, reason: "malformed", line: lineNumber };
-      value = value.slice(1, cursor);
-    } else value = value.replace(/\s+#.*$/, "").trim();
-    entries.set(key, value);
-  }
-  return { ok: true, entries };
-}
-export interface EnvironmentEntryInputProps {
-  limit: number;
-  entryCount: number;
-  onAddKey(
-    key: string,
-    restoreFocus: (element?: { focus?(): void } | null) => void,
-  ): void;
-  onImport(source: string): EnvironmentParseResult;
-  onPendingChange(pending: boolean): void;
-}
-function EnvironmentEntryInput(props: EnvironmentEntryInputProps): unknown {
-  const runtime = ensureJsx();
-  const [value, setValue] = ReactRuntime.useState("");
-  const [error, setError] = ReactRuntime.useState<EnvironmentParseFailure | null>(null);
-  const consume = (source: string) => {
-    const result = props.onImport(source);
-    if ("entries" in result) {
-      setError(null);
-      setValue("");
-    } else {
-      setError(result);
-    }
-    props.onPendingChange(!result.ok && source.trim().length > 0);
-    return result;
-  };
-  return runtime.jsxs("div", {
-    className: "environment-entry-input",
-    children: [
-      runtime.jsx("textarea", {
-        "aria-label": "Paste .env or type a key",
-        placeholder: "Paste your .env or type a key",
-        onChange: (event: { currentTarget: { value: string } }) => {
-          const next = event.currentTarget.value;
-          setValue(next);
-          props.onPendingChange(next.trim().length > 0);
-        },
-        onKeyDown: (event: {
-          key: string;
-          shiftKey?: boolean;
-          preventDefault(): void;
-          stopPropagation(): void;
-        }) => {
-          if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault();
-            event.stopPropagation();
-            if (
-              value &&
-              !/[=\r\n]/.test(value) &&
-              props.entryCount < props.limit
-            ) {
-              props.onAddKey(value, () => {});
-              setValue("");
-              props.onPendingChange(false);
-            } else consume(value);
-          }
-        },
+function p(e) {
+  let t = (0, m.c)(41),
+    { limit: n, entryCount: r, onAddKey: a, onImport: s, onPendingChange: l } = e,
+    u = o(),
+    d = (0, h.useId)(),
+    [f, p] = (0, h.useState)(``),
+    [_, v] = (0, h.useState)(null),
+    y = (0, h.useRef)(!1),
+    b;
+  t[0] !== s || t[1] !== l
+    ? ((b = function (e) {
+        let t = s(e);
+        (v(t), p(t.ok ? `` : e), l(!t.ok && e.trim().length > 0));
       }),
-      error
-        ? runtime.jsx("p", {
-            role: "alert",
-            children:
-              error.reason === "limit"
-                ? `You can add up to ${props.limit} entries; nothing was imported`
-                : `Line ${error.line} is invalid or repeats an unavailable key; nothing was imported.`,
-          })
-        : null,
-    ],
-  });
+      (t[0] = s),
+      (t[1] = l),
+      (t[2] = b))
+    : (b = t[2]);
+  let x = b,
+    S;
+  t[3] !== r || t[4] !== n || t[5] !== a || t[6] !== l
+    ? ((S = function (e) {
+        let { value: t, selectionStart: i, selectionEnd: o, selectionDirection: s } = e;
+        if ((p(t), v(null), l(t.trim().length > 0), !(y.current || !t || /[=\r\n]/.test(t)))) {
+          if (r >= n) {
+            v({ ok: !1, reason: `limit`, line: 0 });
+            return;
+          }
+          (a(t, (e) => {
+            (e?.focus(), e?.setSelectionRange(i, o, s));
+          }),
+            p(``),
+            l(!1));
+        }
+      }),
+      (t[3] = r),
+      (t[4] = n),
+      (t[5] = a),
+      (t[6] = l),
+      (t[7] = S))
+    : (S = t[7]);
+  let C = S,
+    w;
+  t[8] === u
+    ? (w = t[9])
+    : ((w = u.formatMessage({
+        id: `environmentSetup.entries.input`,
+        defaultMessage: `Paste .env or type a key`,
+        description: `Accessible label for adding entries to the network secret or environment variable editor`,
+      })),
+      (t[8] = u),
+      (t[9] = w));
+  let T = _?.ok === !1,
+    E = _?.ok === !1 ? d : void 0,
+    D;
+  t[10] === u
+    ? (D = t[11])
+    : ((D = u.formatMessage({
+        id: `environmentSetup.entries.placeholder`,
+        defaultMessage: `Paste your .env or type a key`,
+        description: `Input accepts dotenv contents to import multiple entries, or a name to add one entry`,
+      })),
+      (t[10] = u),
+      (t[11] = D));
+  let O;
+  t[12] === C ? (O = t[13]) : ((O = (e) => C(e.currentTarget)), (t[12] = C), (t[13] = O));
+  let k;
+  t[14] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((k = () => {
+        y.current = !0;
+      }),
+      (t[14] = k))
+    : (k = t[14]);
+  let A;
+  t[15] === C
+    ? (A = t[16])
+    : ((A = (e) => {
+        ((y.current = !1), C(e.currentTarget));
+      }),
+      (t[15] = C),
+      (t[16] = A));
+  let j, M;
+  t[17] !== x || t[18] !== f
+    ? ((j = (e) => {
+        e.key === `Enter` &&
+          !e.shiftKey &&
+          !e.nativeEvent.isComposing &&
+          (e.preventDefault(), e.stopPropagation(), x(f));
+      }),
+      (M = (e) => {
+        let t = e.clipboardData.getData(`text/plain`);
+        if (
+          !t.includes(`=`) &&
+          !t.includes(`
+`)
+        )
+          return;
+        e.preventDefault();
+        let n = e.currentTarget;
+        x(f.slice(0, n.selectionStart) + t + f.slice(n.selectionEnd));
+      }),
+      (t[17] = x),
+      (t[18] = f),
+      (t[19] = j),
+      (t[20] = M))
+    : ((j = t[19]), (M = t[20]));
+  let N;
+  t[21] !== j ||
+  t[22] !== M ||
+  t[23] !== w ||
+  t[24] !== T ||
+  t[25] !== E ||
+  t[26] !== D ||
+  t[27] !== O ||
+  t[28] !== A ||
+  t[29] !== f
+    ? ((N = (0, g.jsx)(c, {
+        "aria-label": w,
+        "aria-invalid": T,
+        "aria-describedby": E,
+        autoComplete: `off`,
+        autoFocus: !0,
+        focusIndicator: `border`,
+        spellCheck: !1,
+        placeholder: D,
+        rows: 1,
+        value: f,
+        variant: `settings`,
+        onChange: O,
+        onCompositionStart: k,
+        onCompositionEnd: A,
+        onKeyDown: j,
+        onPaste: M,
+      })),
+      (t[21] = j),
+      (t[22] = M),
+      (t[23] = w),
+      (t[24] = T),
+      (t[25] = E),
+      (t[26] = D),
+      (t[27] = O),
+      (t[28] = A),
+      (t[29] = f),
+      (t[30] = N))
+    : (N = t[30]);
+  let P;
+  t[31] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((P = (0, g.jsx)(`div`, { className: `w-8 shrink-0`, "aria-hidden": !0 })), (t[31] = P))
+    : (P = t[31]);
+  let F;
+  t[32] === N
+    ? (F = t[33])
+    : ((F = (0, g.jsxs)(`div`, { className: `flex gap-2`, children: [N, P] })),
+      (t[32] = N),
+      (t[33] = F));
+  let I;
+  t[34] !== _ || t[35] !== d || t[36] !== n
+    ? ((I =
+        _?.ok === !1
+          ? (0, g.jsx)(`p`, {
+              id: d,
+              className: `text-sm text-danger`,
+              role: `alert`,
+              children:
+                _.reason === `limit`
+                  ? (0, g.jsx)(i, {
+                      id: `environmentSetup.entries.limit`,
+                      defaultMessage: `You can add up to {count} entries; nothing was imported`,
+                      description: `An atomic import exceeded this editor's entry limit`,
+                      values: { count: n },
+                    })
+                  : (0, g.jsx)(i, {
+                      id: `environmentSetup.entries.invalid`,
+                      defaultMessage: `Line {line} is invalid or repeats an unavailable key; nothing was imported. Enter a new key or use unique KEY=value lines with closed quotes.`,
+                      description: `An invalid or duplicate name rejected the entire import without changing any rows`,
+                      values: { line: _.line },
+                    }),
+            })
+          : null),
+      (t[34] = _),
+      (t[35] = d),
+      (t[36] = n),
+      (t[37] = I))
+    : (I = t[37]);
+  let L;
+  return (
+    t[38] !== F || t[39] !== I
+      ? ((L = (0, g.jsxs)(`div`, { className: `flex flex-col gap-2`, children: [F, I] })),
+        (t[38] = F),
+        (t[39] = I),
+        (t[40] = L))
+      : (L = t[40]),
+    L
+  );
 }
-const initializeConflictMessage = (): void => {
-    jsx = getJsxRuntime();
-  },
-  initializeEnvironmentEntryInput = (): void => {
-    jsx = getJsxRuntime();
-  },
-  initializeNoop = (): void => {};
-export {
-  EnvironmentConflictMessage as a,
-  initializeEnvironmentEntryInput as i,
-  parseEnvironmentEntries as n,
-  initializeConflictMessage as o,
-  EnvironmentEntryInput as r,
-  initializeNoop as t,
-};
+var m, h, g;
+function _() {
+  return (_ = e(() => {
+    ((m = t()), (h = a()), r(), s(), (g = n()));
+  }))();
+}
+function v(e, t, n = [], r = []) {
+  let i = e.trim(),
+    a = /^[A-Za-z_][A-Za-z0-9_]*$/.test(i);
+  if (a && (r.includes(i) || n.includes(i))) return { ok: !1, reason: `duplicate`, line: 1 };
+  let o = (a ? `${i}=` : e).split(/\r?\n/),
+    s = new Map();
+  for (let e = 0; e < o.length; e++) {
+    let r = o[e].trim(),
+      i = e + 1;
+    if (r === `` || r.startsWith(`#`) || r.startsWith(`;`)) continue;
+    let a = /^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=(.*)$/.exec(r);
+    if (a == null || a[1].length > t) return { ok: !1, reason: `malformed`, line: i };
+    let c = a[1];
+    if (s.has(c) || n.includes(c)) return { ok: !1, reason: `duplicate`, line: i };
+    let l = a[2].trim(),
+      u = l[0];
+    if (u === `"` || u === `'`) {
+      let t = 1;
+      for (; ; t++) {
+        if (t >= l.length) {
+          if (++e >= o.length) return { ok: !1, reason: `malformed`, line: i };
+          l += `\n${o[e]}`;
+        }
+        if (l[t] === `\\` && u === `"`) t++;
+        else if (l[t] === u) break;
+      }
+      let n = l.slice(t + 1).trim();
+      if (n !== `` && !n.startsWith(`#`)) return { ok: !1, reason: `malformed`, line: i };
+      l = l.slice(1, t);
+    } else l = l.replace(/\s+#.*$/, ``).trim();
+    s.set(c, l);
+  }
+  return { ok: !0, entries: s };
+}
+function y() {
+  return (y = e(() => {}))();
+}
+export { l as a, _ as i, v as n, f as o, p as r, y as t };

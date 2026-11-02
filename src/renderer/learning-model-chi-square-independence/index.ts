@@ -1,7 +1,118 @@
-// Chi-square independence learning model. Release chunk: model-eed7806c8445.js.
-import "@rchunk/rolldown-runtime";
-type Key = "observedTopLeft" | "observedTopRight" | "observedBottomLeft" | "observedBottomRight"; interface Parameter { kind: "integer"; defaultValue: number; min: number; max: number } interface Values { observedTopLeft?: number | null; observedTopRight?: number | null; observedBottomLeft?: number | null; observedBottomRight?: number | null; associationShift?: number | null } interface Manifest { type: string; version: number; thumbnailAssetKey: string; parameters: Record<Key, Parameter> }
-let manifest: Manifest; let defaultValues: Record<Key, number> & { associationShift: number }; let normalizeValues: (values: Values) => Record<Key, number> & { associationShift: number }; let calculate: (values: Values) => { cells: Array<{ observed: number; expected: number; contribution: number }>; rowTotals: number[]; columnTotals: number[]; grandTotal: number; statistic: number; pValue: number; rejectsIndependence: boolean; topLeftObserved: number; minimumTopLeft: number; maximumTopLeft: number; maximumStatistic: number }; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "CHI_SQUARE_INDEPENDENCE", version: 2, thumbnailAssetKey: "chi-square-independence-v1", parameters: { observedTopLeft: { kind: "integer", defaultValue: 54, min: 20, max: 60 }, observedTopRight: { kind: "integer", defaultValue: 26, min: 20, max: 60 }, observedBottomLeft: { kind: "integer", defaultValue: 30, min: 20, max: 60 }, observedBottomRight: { kind: "integer", defaultValue: 30, min: 20, max: 60 } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); const parameters = manifest.parameters; const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max); const normalizedCell = (key: Key, value: number | null | undefined) => { const parameter = parameters[key]; return Math.round(clamp(typeof value === "number" && Number.isFinite(value) ? value : parameter.defaultValue, parameter.min, parameter.max)); }; const topLeftBounds = (values: Record<Key, number>) => { const top = values.observedTopLeft + values.observedTopRight; const bottom = values.observedBottomLeft + values.observedBottomRight; const left = values.observedTopLeft + values.observedBottomLeft; const grand = top + bottom; const expected = top * left / grand; return [Math.min(values.observedTopLeft, Math.max(0, left - bottom, Math.floor(expected - 14))), Math.max(values.observedTopLeft, Math.min(top, left, Math.ceil(expected + 14)))] as const; }; const erfc = (value: number) => { const factor = 1 / (1 + 0.3275911 * value); return ((((1.061405429 * factor - 1.453152027) * factor + 1.421413741) * factor - 0.284496736) * factor + 0.254829592) * factor * Math.exp(-(value * value)); }; const pValueFor = (statistic: number) => clamp(erfc(Math.sqrt(Math.max(0, statistic) / 2)), 0, 1); normalizeValues = values => { const cells = { observedTopLeft: normalizedCell("observedTopLeft", values.observedTopLeft), observedTopRight: normalizedCell("observedTopRight", values.observedTopRight), observedBottomLeft: normalizedCell("observedBottomLeft", values.observedBottomLeft), observedBottomRight: normalizedCell("observedBottomRight", values.observedBottomRight) }; const [minimum, maximum] = topLeftBounds(cells); const shift = Math.round(clamp(typeof values.associationShift === "number" && Number.isFinite(values.associationShift) ? values.associationShift : 0, minimum - cells.observedTopLeft, maximum - cells.observedTopLeft)); return { ...cells, associationShift: shift }; }; calculate = values => { const normalized = normalizeValues(values); const rowTotals = [normalized.observedTopLeft + normalized.observedTopRight, normalized.observedBottomLeft + normalized.observedBottomRight]; const columnTotals = [normalized.observedTopLeft + normalized.observedBottomLeft, normalized.observedTopRight + normalized.observedBottomRight]; const grandTotal = (rowTotals[0] ?? 0) + (rowTotals[1] ?? 0); const expected = [(rowTotals[0] ?? 0) * (columnTotals[0] ?? 0) / grandTotal, (rowTotals[0] ?? 0) * (columnTotals[1] ?? 0) / grandTotal, (rowTotals[1] ?? 0) * (columnTotals[0] ?? 0) / grandTotal, (rowTotals[1] ?? 0) * (columnTotals[1] ?? 0) / grandTotal]; const observed = [normalized.observedTopLeft + normalized.associationShift, normalized.observedTopRight - normalized.associationShift, normalized.observedBottomLeft - normalized.associationShift, normalized.observedBottomRight + normalized.associationShift]; const cells = expected.map((value, index) => ({ observed: observed[index] ?? 0, expected: value, contribution: ((observed[index] ?? 0) - value) ** 2 / value })); const statistic = cells.reduce((sum, cell) => sum + cell.contribution, 0); const pValue = pValueFor(statistic); const [minimumTopLeft, maximumTopLeft] = topLeftBounds(normalized); const expectedTopLeft = expected[0] ?? 0; const reciprocalSum = expected.reduce((sum, value) => sum + 1 / value, 0); const maximumStatistic = Math.max((minimumTopLeft - expectedTopLeft) ** 2 * reciprocalSum, (maximumTopLeft - expectedTopLeft) ** 2 * reciprocalSum); return { cells, rowTotals, columnTotals, grandTotal, statistic, pValue, rejectsIndependence: pValue <= 0.05, topLeftObserved: observed[0] ?? 0, minimumTopLeft, maximumTopLeft, maximumStatistic }; }; defaultValues = { observedTopLeft: parameters.observedTopLeft.defaultValue, observedTopRight: parameters.observedTopRight.defaultValue, observedBottomLeft: parameters.observedBottomLeft.defaultValue, observedBottomRight: parameters.observedBottomRight.defaultValue, associationShift: 0 }; }
-export { initializeManifest as a, normalizeValues as i, calculate as n, manifest as o, initializeModel as r, defaultValues as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `CHI_SQUARE_INDEPENDENCE`),
+      (n = `chi-square-independence-v1`),
+      (r = {
+        observedTopLeft: { kind: `integer`, defaultValue: 54, min: 20, max: 60 },
+        observedTopRight: { kind: `integer`, defaultValue: 26, min: 20, max: 60 },
+        observedBottomLeft: { kind: `integer`, defaultValue: 30, min: 20, max: 60 },
+        observedBottomRight: { kind: `integer`, defaultValue: 30, min: 20, max: 60 },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m;
+function h() {
+  return (h = e(() => {
+    (a(),
+      (o = {
+        observedTopLeft: i.parameters.observedTopLeft,
+        observedTopRight: i.parameters.observedTopRight,
+        observedBottomLeft: i.parameters.observedBottomLeft,
+        observedBottomRight: i.parameters.observedBottomRight,
+      }),
+      (s = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (c = (e, t) => {
+        let n = o[e];
+        return Math.round(s(Number.isFinite(t) ? t : n.defaultValue, n.min, n.max));
+      }),
+      (l = (e) => {
+        let t = e.observedTopLeft + e.observedTopRight,
+          n = e.observedBottomLeft + e.observedBottomRight,
+          r = e.observedTopLeft + e.observedBottomLeft,
+          i = t + n,
+          a = (t * r) / i,
+          o = Math.max(0, r - n),
+          s = Math.min(t, r);
+        return [
+          Math.min(e.observedTopLeft, Math.max(o, Math.floor(a - 14))),
+          Math.max(e.observedTopLeft, Math.min(s, Math.ceil(a + 14))),
+        ];
+      }),
+      (u = (e) => {
+        let t = 1 / (1 + 0.3275911 * e);
+        return (
+          ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) * t +
+            0.254829592) *
+          t *
+          Math.exp(-(e * e))
+        );
+      }),
+      (d = (e) => s(u(Math.sqrt(Math.max(0, e) / 2)), 0, 1)),
+      (f = (e) => {
+        let t = c(`observedTopLeft`, e.observedTopLeft),
+          n = {
+            observedTopLeft: t,
+            observedTopRight: c(`observedTopRight`, e.observedTopRight),
+            observedBottomLeft: c(`observedBottomLeft`, e.observedBottomLeft),
+            observedBottomRight: c(`observedBottomRight`, e.observedBottomRight),
+          },
+          [r, i] = l(n),
+          a = Math.round(
+            s(Number.isFinite(e.associationShift) ? e.associationShift : 0, r - t, i - t),
+          );
+        return { ...n, associationShift: a };
+      }),
+      (p = (e) => {
+        let t = f(e),
+          n = [
+            t.observedTopLeft + t.observedTopRight,
+            t.observedBottomLeft + t.observedBottomRight,
+          ],
+          r = [
+            t.observedTopLeft + t.observedBottomLeft,
+            t.observedTopRight + t.observedBottomRight,
+          ],
+          i = n[0] + n[1],
+          a = [(n[0] * r[0]) / i, (n[0] * r[1]) / i, (n[1] * r[0]) / i, (n[1] * r[1]) / i],
+          o = [
+            t.observedTopLeft + t.associationShift,
+            t.observedTopRight - t.associationShift,
+            t.observedBottomLeft - t.associationShift,
+            t.observedBottomRight + t.associationShift,
+          ],
+          s = (e) => ({ observed: o[e], expected: a[e], contribution: (o[e] - a[e]) ** 2 / a[e] }),
+          c = [s(0), s(1), s(2), s(3)],
+          u = c.reduce((e, t) => e + t.contribution, 0),
+          p = d(u),
+          m = a[0],
+          [h, g] = l(t),
+          _ = a.reduce((e, t) => e + 1 / t, 0),
+          v = Math.max((h - m) ** 2 * _, (g - m) ** 2 * _);
+        return {
+          cells: c,
+          rowTotals: n,
+          columnTotals: r,
+          grandTotal: i,
+          statistic: u,
+          pValue: p,
+          rejectsIndependence: p <= 0.05,
+          topLeftObserved: o[0],
+          minimumTopLeft: h,
+          maximumTopLeft: g,
+          maximumStatistic: v,
+        };
+      }),
+      (m = {
+        observedTopLeft: i.parameters.observedTopLeft.defaultValue,
+        observedTopRight: i.parameters.observedTopRight.defaultValue,
+        observedBottomLeft: i.parameters.observedBottomLeft.defaultValue,
+        observedBottomRight: i.parameters.observedBottomRight.defaultValue,
+        associationShift: 0,
+      }));
+  }))();
+}
+export { a, f as i, p as n, i as o, h as r, m as t };

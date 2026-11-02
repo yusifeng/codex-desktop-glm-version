@@ -1,97 +1,64 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, QI as n, QX as r, ZI as i } from "@rchunk/app-shared";
 import {
-  FX as initializeSignals,
-  QI as initializeQueries,
-  QX as createScopedQueryFamily,
-  ZI as appScope,
-} from "@rchunk/app-shared";
-import {
-  BGt as blobToImageSource,
-  Dan as blobToPreviewUrl,
-  KGt as downloadFile,
-  Sun as initializeAccountRuntime,
-  _un as currentWorkspaceId,
-  cJt as initializeApiClient,
-  mun as currentAccountId,
-  rJt as apiClient,
+  BGt as a,
+  Dan as o,
+  GGt as s,
+  HGt as c,
+  KGt as l,
+  Sun as u,
+  _un as d,
+  cJt as f,
+  mun as p,
+  rJt as m,
 } from "@rchunk/app-initial";
-
-interface RecentUploadRecord {
-  file_id: string;
-}
-
-interface RecentUploadApiClient {
-  safeGet(path: string, options: Record<string, unknown>): Promise<Record<string, unknown>>;
-}
-
-const client = apiClient as RecentUploadApiClient;
-let recentUploadsQueryFamily: unknown;
-
-async function loadRecentUpload(record: RecentUploadRecord): Promise<Record<string, unknown>> {
-  const [metadata, downloaded] = await Promise.all([
-    client.safeGet("/files/{file_id}/simple", {
-      parameters: { path: { file_id: record.file_id } },
-    }),
-    downloadFile(record.file_id, { downloadIntent: false }).then(blobToImageSource),
-  ]);
-  const blob = downloaded as Blob;
-  const bitmap = await createImageBitmap(blob);
-  const { height, width } = bitmap;
-  bitmap.close();
-  return {
-    height,
-    id: metadata.file_id,
-    name: metadata.file_name ?? record.file_id,
-    mimeType: metadata.mime_type ?? (blob.type.startsWith("image/") ? blob.type : "image/png"),
-    libraryFileId: metadata.library_file_id ?? undefined,
-    previewSrc: await blobToPreviewUrl(blob),
-    size: blob.size,
-    source: "library",
-    width,
-  };
-}
-
-function initializeRecentUploads(): void {
-  initializeSignals();
-  initializeAccountRuntime();
-  initializeQueries();
-  initializeApiClient();
-  const createFamily = createScopedQueryFamily as unknown as (
-    scope: unknown,
-    factory: (
-      imagesAppOnly: boolean,
-      context: { get(signal: unknown): unknown },
-    ) => Record<string, unknown>,
-  ) => unknown;
-  recentUploadsQueryFamily = createFamily(
-    appScope,
-    (imagesAppOnly, { get }) => {
-      const accountId = get(currentAccountId) as string | null;
-      const workspaceId = get(currentWorkspaceId) as string | null;
-      return {
-        enabled: accountId != null && workspaceId != null,
-        queryKey: [
-          "chatgpt-images",
-          "recent-uploads",
-          accountId,
-          workspaceId,
-          imagesAppOnly,
-        ],
-        staleTime: 120_000,
-        queryFn: ({ signal }: { signal?: AbortSignal }) =>
-          client.safeGet("/my/recent/uploaded_images", {
-            additionalHeaders:
-              accountId == null ? undefined : { "ChatGPT-Account-ID": accountId },
-            parameters: { query: { limit: 25, images_app_only: imagesAppOnly } },
-            signal,
-          }),
-      };
-    },
+async function h(e) {
+  let [t, n] = await Promise.all([
+      m.safeGet(`/files/{file_id}/simple`, { parameters: { path: { file_id: e.file_id } } }),
+      l(e.file_id, { downloadIntent: !1 }).then((e) => a(e)),
+    ]),
+    r = await createImageBitmap(n),
+    { height: i, width: s } = r;
+  return (
+    r.close(),
+    {
+      height: i,
+      id: t.file_id,
+      name: t.file_name ?? e.file_id,
+      mimeType: t.mime_type ?? (n.type.startsWith(`image/`) ? n.type : `image/png`),
+      libraryFileId: t.library_file_id ?? void 0,
+      previewSrc: await o(n),
+      size: n.size,
+      source: `library`,
+      width: s,
+    }
   );
 }
-
-export {
-  initializeRecentUploads as n,
-  recentUploadsQueryFamily as r,
-  loadRecentUpload as t,
-};
+var g;
+function _() {
+  return (_ = e(() => {
+    (t(),
+      u(),
+      n(),
+      c(),
+      f(),
+      s(),
+      (g = r(i, (e, { get: t }) => {
+        let n = t(p),
+          r = t(d);
+        return {
+          enabled: n != null && r != null,
+          queryKey: [`chatgpt-images`, `recent-uploads`, n, r, e],
+          staleTime: 12e4,
+          queryFn: ({ signal: t }) =>
+            m.safeGet(`/my/recent/uploaded_images`, {
+              additionalHeaders: n == null ? void 0 : { "ChatGPT-Account-ID": n },
+              parameters: { query: { limit: 25, images_app_only: e } },
+              signal: t,
+            }),
+        };
+      })));
+  }))();
+}
+export { _ as n, g as r, h as t };

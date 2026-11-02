@@ -1,18 +1,121 @@
-// Vector components, polar coordinates, and dot-product learning model.
-import "@rchunk/rolldown-runtime";
-
-type VectorName = "a" | "b"; type Component = "x" | "y"; type PolarField = "magnitude" | "angleDeg"; interface Point { x: number; y: number }
-interface VectorValues { inputMode?: unknown; ax?: number | null; ay?: number | null; bx?: number | null; by?: number | null; aThetaDeg?: number | null; bThetaDeg?: number | null }
-const componentsMode = "components"; const polarMode = "polar"; const componentStep = 0.25; const componentControl = { min: -6, max: 6, step: componentStep }; const magnitudeControl = { min: 0, max: 6, step: 0.01 }; const angleControl = { min: -180, max: 180, step: 0.1 };
-const defaultVectorValues = { inputMode: componentsMode, ax: 4, ay: 1, bx: -1, by: 3, aThetaDeg: 14.036, bThetaDeg: 108.435 }; const tolerance = 1e-6;
-const finiteOr = (value: number | null | undefined, fallback: number): number => typeof value === "number" && Number.isFinite(value) ? value : fallback; const cleanZero = (value: number): number => { const clean = Math.abs(value) < tolerance ? 0 : value; return Object.is(clean, -0) ? 0 : clean; }; const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-const clampVector = (vector: Point): Point => { const magnitude = Math.hypot(vector.x, vector.y); if (magnitude <= 6 || magnitude <= tolerance) return { x: cleanZero(vector.x), y: cleanZero(vector.y) }; const scale = 6 / magnitude; return { x: cleanZero(vector.x * scale), y: cleanZero(vector.y * scale) }; };
-const toPolar = (vector: Point) => ({ magnitude: cleanZero(Math.hypot(vector.x, vector.y)), angleDeg: Math.hypot(vector.x, vector.y) <= tolerance ? 0 : cleanZero(Math.atan2(vector.y, vector.x) * 180 / Math.PI) });
-const fromPolar = (magnitude: number, angleDegrees: number): Point => { const safeMagnitude = clamp(finiteOr(magnitude, 0), magnitudeControl.min, magnitudeControl.max); const radians = clamp(finiteOr(angleDegrees, 0), angleControl.min, angleControl.max) * Math.PI / 180; return { x: cleanZero(safeMagnitude * Math.cos(radians)), y: cleanZero(safeMagnitude * Math.sin(radians)) }; };
-const normalizeVectorValues = (values: VectorValues) => { const a = clampVector({ x: finiteOr(values.ax, defaultVectorValues.ax), y: finiteOr(values.ay, defaultVectorValues.ay) }); const b = clampVector({ x: finiteOr(values.bx, defaultVectorValues.bx), y: finiteOr(values.by, defaultVectorValues.by) }); return { inputMode: values.inputMode === polarMode ? polarMode : componentsMode, ax: a.x, ay: a.y, bx: b.x, by: b.y, aThetaDeg: Math.hypot(a.x, a.y) > tolerance ? toPolar(a).angleDeg : clamp(finiteOr(values.aThetaDeg, defaultVectorValues.aThetaDeg), angleControl.min, angleControl.max), bThetaDeg: Math.hypot(b.x, b.y) > tolerance ? toPolar(b).angleDeg : clamp(finiteOr(values.bThetaDeg, defaultVectorValues.bThetaDeg), angleControl.min, angleControl.max) }; };
-const deriveVectorDotProduct = (values: VectorValues) => { const safe = normalizeVectorValues(values); const vectorA = { x: safe.ax, y: safe.ay }; const vectorB = { x: safe.bx, y: safe.by }; const rawA = toPolar(vectorA); const rawB = toPolar(vectorB); const polarA = { ...rawA, angleDeg: rawA.magnitude <= tolerance ? safe.aThetaDeg : rawA.angleDeg }; const polarB = { ...rawB, angleDeg: rawB.magnitude <= tolerance ? safe.bThetaDeg : rawB.angleDeg }; const dotProduct = cleanZero(vectorA.x * vectorB.x + vectorA.y * vectorB.y); const zeroVector = polarA.magnitude <= tolerance || polarB.magnitude <= tolerance; const cosine = zeroVector ? 1 : clamp(dotProduct / (polarA.magnitude * polarB.magnitude), -1, 1); return { inputMode: safe.inputMode, vectorA, vectorB, polarA, polarB, includedAngleDeg: zeroVector ? null : cleanZero(Math.acos(cosine) * 180 / Math.PI), dotProduct, alignment: Math.abs(dotProduct) <= tolerance ? "perpendicular" : dotProduct > 0 ? "positive" : "negative" }; };
-const updateVectorComponent = (values: VectorValues, vector: VectorName, component: Component, value: number) => { const safe = normalizeVectorValues(values); const xKey = vector === "a" ? "ax" : "bx"; const yKey = vector === "a" ? "ay" : "by"; const other = component === "x" ? safe[yKey] : safe[xKey]; const maximum = Math.sqrt(Math.max(0, 36 - other ** 2)); const next = { ...safe, [component === "x" ? xKey : yKey]: cleanZero(clamp(finiteOr(value, 0), -maximum, maximum)) }; const point = vector === "a" ? { x: next.ax, y: next.ay } : { x: next.bx, y: next.by }; return Math.hypot(point.x, point.y) <= tolerance ? next : { ...next, [vector === "a" ? "aThetaDeg" : "bThetaDeg"]: toPolar(point).angleDeg }; };
-const updateVectorPolar = (values: VectorValues, vector: VectorName, field: PolarField, value: number) => { const safe = normalizeVectorValues(values); const point = vector === "a" ? { x: safe.ax, y: safe.ay } : { x: safe.bx, y: safe.by }; const raw = toPolar(point); const angleKey = vector === "a" ? "aThetaDeg" : "bThetaDeg"; const polar = { ...raw, angleDeg: raw.magnitude <= tolerance ? safe[angleKey] : raw.angleDeg }; const nextPoint = fromPolar(field === "magnitude" ? value : polar.magnitude, field === "angleDeg" ? value : polar.angleDeg); const angle = clamp(field === "angleDeg" ? finiteOr(value, polar.angleDeg) : polar.angleDeg, angleControl.min, angleControl.max); return vector === "a" ? { ...safe, ax: nextPoint.x, ay: nextPoint.y, aThetaDeg: angle } : { ...safe, bx: nextPoint.x, by: nextPoint.y, bThetaDeg: angle }; };
-const dragVector = (values: VectorValues, vector: VectorName, point: Point) => { const safe = normalizeVectorValues(values); const snapped = clampVector({ x: Math.round(point.x / componentStep) * componentStep, y: Math.round(point.y / componentStep) * componentStep }); const angle = Math.hypot(snapped.x, snapped.y) <= tolerance ? safe[vector === "a" ? "aThetaDeg" : "bThetaDeg"] : toPolar(snapped).angleDeg; return vector === "a" ? { ...safe, ax: snapped.x, ay: snapped.y, aThetaDeg: angle } : { ...safe, bx: snapped.x, by: snapped.y, bThetaDeg: angle }; };
-function initializeVectorDotProductModel(): void {}
-export { magnitudeControl as a, initializeVectorDotProductModel as c, updateVectorComponent as d, updateVectorPolar as f, defaultVectorValues as i, dragVector as l, componentControl as n, polarMode as o, componentsMode as r, deriveVectorDotProduct as s, angleControl as t, normalizeVectorValues as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d, f, p, m, h, g, _, v, y;
+function b() {
+  return (b = e(() => {
+    ((t = `components`),
+      (n = `polar`),
+      (r = 0.25),
+      (i = { min: -6, max: 6, step: r }),
+      (a = { min: 0, max: 6, step: 0.01 }),
+      (o = { min: -180, max: 180, step: 0.1 }),
+      (s = { inputMode: t, ax: 4, ay: 1, bx: -1, by: 3, aThetaDeg: 14.036, bThetaDeg: 108.435 }),
+      (c = 1e-6),
+      (l = (e, t) => (typeof e == `number` && Number.isFinite(e) ? e : t)),
+      (u = (e) => {
+        let t = Math.abs(e) < c ? 0 : e;
+        return Object.is(t, -0) ? 0 : t;
+      }),
+      (d = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (f = (e) => {
+        let t = Math.hypot(e.x, e.y);
+        if (t <= 6 || t <= c) return { x: u(e.x), y: u(e.y) };
+        let n = 6 / t;
+        return { x: u(e.x * n), y: u(e.y * n) };
+      }),
+      (p = (e) => ({
+        magnitude: u(Math.hypot(e.x, e.y)),
+        angleDeg: Math.hypot(e.x, e.y) <= c ? 0 : u((Math.atan2(e.y, e.x) * 180) / Math.PI),
+      })),
+      (m = (e, t) => {
+        let n = d(l(e, 0), a.min, a.max),
+          r = (d(l(t, 0), o.min, o.max) * Math.PI) / 180;
+        return { x: u(n * Math.cos(r)), y: u(n * Math.sin(r)) };
+      }),
+      (h = (e) => {
+        let r = f({ x: l(e.ax, s.ax), y: l(e.ay, s.ay) }),
+          i = f({ x: l(e.bx, s.bx), y: l(e.by, s.by) });
+        return {
+          inputMode: e.inputMode === `polar` ? n : t,
+          ax: r.x,
+          ay: r.y,
+          bx: i.x,
+          by: i.y,
+          aThetaDeg:
+            Math.hypot(r.x, r.y) > c ? p(r).angleDeg : d(l(e.aThetaDeg, s.aThetaDeg), o.min, o.max),
+          bThetaDeg:
+            Math.hypot(i.x, i.y) > c ? p(i).angleDeg : d(l(e.bThetaDeg, s.bThetaDeg), o.min, o.max),
+        };
+      }),
+      (g = (e) => {
+        let t = h(e),
+          n = { x: t.ax, y: t.ay },
+          r = { x: t.bx, y: t.by },
+          i = p(n),
+          a = p(r),
+          o = { ...i, angleDeg: i.magnitude <= c ? t.aThetaDeg : i.angleDeg },
+          s = { ...a, angleDeg: a.magnitude <= c ? t.bThetaDeg : a.angleDeg },
+          l = u(n.x * r.x + n.y * r.y),
+          f = o.magnitude <= c || s.magnitude <= c,
+          m = f ? 1 : d(l / (o.magnitude * s.magnitude), -1, 1),
+          g = f ? null : u((Math.acos(m) * 180) / Math.PI),
+          _ = Math.abs(l) <= c ? `perpendicular` : l > 0 ? `positive` : `negative`;
+        return {
+          inputMode: t.inputMode,
+          vectorA: n,
+          vectorB: r,
+          polarA: o,
+          polarB: s,
+          includedAngleDeg: g,
+          dotProduct: l,
+          alignment: _,
+        };
+      }),
+      (_ = (e, t, n, r) => {
+        let i = h(e),
+          a = t === `a` ? `ax` : `bx`,
+          o = t === `a` ? `ay` : `by`,
+          s = n === `x` ? i[o] : i[a],
+          f = Math.sqrt(Math.max(0, 36 - s ** 2)),
+          m = { ...i, [n === `x` ? a : o]: u(d(l(r, 0), -f, f)) },
+          g = t === `a` ? { x: m.ax, y: m.ay } : { x: m.bx, y: m.by };
+        return Math.hypot(g.x, g.y) <= c
+          ? m
+          : { ...m, [t === `a` ? `aThetaDeg` : `bThetaDeg`]: p(g).angleDeg };
+      }),
+      (v = (e, t, n, r) => {
+        let i = h(e),
+          a = t === `a` ? { x: i.ax, y: i.ay } : { x: i.bx, y: i.by },
+          s = p(a),
+          u = t === `a` ? `aThetaDeg` : `bThetaDeg`,
+          f = { ...s, angleDeg: s.magnitude <= c ? i[u] : s.angleDeg },
+          g = m(n === `magnitude` ? r : f.magnitude, n === `angleDeg` ? r : f.angleDeg),
+          _ = d(n === `angleDeg` ? l(r, f.angleDeg) : f.angleDeg, o.min, o.max);
+        return t === `a`
+          ? { ...i, ax: g.x, ay: g.y, aThetaDeg: _ }
+          : { ...i, bx: g.x, by: g.y, bThetaDeg: _ };
+      }),
+      (y = (e, t, n) => {
+        let i = h(e),
+          a = f({ x: Math.round(n.x / r) * r, y: Math.round(n.y / r) * r }),
+          o = Math.hypot(a.x, a.y) <= c ? i[t === `a` ? `aThetaDeg` : `bThetaDeg`] : p(a).angleDeg;
+        return t === `a`
+          ? { ...i, ax: a.x, ay: a.y, aThetaDeg: o }
+          : { ...i, bx: a.x, by: a.y, bThetaDeg: o };
+      }));
+  }))();
+}
+export {
+  a,
+  b as c,
+  _ as d,
+  v as f,
+  s as i,
+  y as l,
+  i as n,
+  n as o,
+  t as r,
+  g as s,
+  o as t,
+  h as u,
+};

@@ -1,88 +1,208 @@
-import { I3 as getJsxRuntime, e6 as getReactRuntime, type JsxRuntime, type ReactRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/chatgpt-sites";
-import "@rchunk/rolldown-runtime";
-
-export type ArtifactKind = "document" | "presentation" | "spreadsheet" | "site";
-
-export interface CreateOutputActions {
-  availableArtifactKinds: readonly ArtifactKind[];
-  createArtifact(kind: ArtifactKind): boolean | void;
-  isLoadingApps?: boolean;
-  appsError?: unknown;
-  retryApps?(): void;
-}
-
-export interface ChatGptCreateOutputMenuProps {
-  composerActions: CreateOutputActions;
-  defaultOpen?: boolean;
-}
-
-const labels: Record<ArtifactKind, string> = {
-  document: "Document",
-  presentation: "Presentation",
-  spreadsheet: "Spreadsheet",
-  site: "Site",
-};
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-
-function ChatGptCreateOutputMenu(props: ChatGptCreateOutputMenuProps): unknown {
-  const [open, setOpen] = React.useState(props.defaultOpen ?? false);
-  const actions = props.composerActions;
-  return jsx.jsxs("div", {
-    className: "create-output-menu",
-    children: [
-      jsx.jsx("button", {
-        type: "button",
-        "aria-expanded": open,
-        "aria-label": "Create file or site",
-        onClick: () => setOpen(!open),
-        children: "+",
-      }),
-      open
-        ? jsx.jsxs("menu", {
-            children: [
-              (Object.keys(labels) as ArtifactKind[]).map((kind) => {
-                const available = actions.availableArtifactKinds.includes(kind);
-                return jsx.jsx("li", {
-                  children: jsx.jsx("button", {
-                    type: "button",
-                    disabled: !available,
-                    onClick: () => {
-                      if (!available) return;
-                      actions.createArtifact(kind);
-                      setOpen(false);
-                    },
-                    children: labels[kind],
-                  }),
-                }, kind);
-              }),
-              actions.isLoadingApps
-                ? jsx.jsx("li", { role: "status", children: "Loading apps…" })
-                : null,
-              actions.appsError
-                ? jsx.jsx("li", {
-                    children: jsx.jsx("button", {
-                      type: "button",
-                      onClick: actions.retryApps,
-                      children: "Retry loading apps",
-                    }),
-                  })
-                : null,
-            ],
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  G2 as r,
+  HX as i,
+  I3 as a,
+  If as o,
+  K2 as s,
+  LX as c,
+  Y2 as l,
+  e6 as u,
+  jf as d,
+  kf as f,
+  lw as p,
+  n4 as m,
+  yS as h,
+} from "@rchunk/app-shared";
+import {
+  $Bt as g,
+  $en as _,
+  C3t as v,
+  GBt as y,
+  S3t as b,
+  a3t as x,
+  b3t as S,
+  bS as C,
+  i3t as w,
+  itn as T,
+  v3t as E,
+  x3t as D,
+  xS as O,
+  xpn as k,
+  y3t as A,
+  ypn as j,
+} from "@rchunk/app-initial";
+import { a as M, i as N, n as P, t as F } from "@rchunk/chatgpt-sites";
+function I(e) {
+  let t = (0, L.c)(20),
+    { composerActions: n, defaultOpen: r } = e,
+    a = r !== void 0 && r,
+    o = c(_),
+    s = m(),
+    [u, p] = (0, R.useState)(a),
+    g = (0, R.useRef)(!1),
+    v;
+  t[0] === u ? (v = t[1]) : ((v = { enabled: u }), (t[0] = u), (t[1] = v));
+  let { isError: b, isLoading: x } = i(y, v),
+    S = f,
+    w = (e) => {
+      g.current &&= (e.preventDefault(), !1);
+    },
+    T;
+  t[2] === s
+    ? (T = t[3])
+    : ((T = s.formatMessage({
+        id: `chatgptConversations.summaryPanel.create.label`,
+        defaultMessage: `Create file or site`,
+        description: `Accessible label for the plus button in the Work task Outputs heading. Opens a menu to prefill a document, presentation, spreadsheet, or website request.`,
+      })),
+      (t[2] = s),
+      (t[3] = T));
+  let E;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((E = (0, z.jsx)(h, {})), (t[4] = E))
+    : (E = t[4]);
+  let D;
+  t[5] === T
+    ? (D = t[6])
+    : ((D = (0, z.jsx)(C.IconButton, { disableTooltip: !0, label: T, children: E })),
+      (t[5] = T),
+      (t[6] = D));
+  let O = B.map((e) => {
+      let { kind: t, Icon: r } = e,
+        i = n.availableArtifactKinds.includes(t);
+      return (0, z.jsx)(
+        d.Item,
+        {
+          disabled: !i,
+          LeftIcon: r,
+          onSelect: () => {
+            i &&
+              (t === `site` &&
+                k(o, F, {
+                  source: N.CHATGPT_SITES_SOURCE_SIDEBAR,
+                  interactionType: P.CHATGPT_SITES_INTERACTION_TYPE_CREATE_SITE_CLICKED,
+                }),
+              (g.current = n.createArtifact(t)));
+          },
+          children: (0, z.jsx)(l, { ...V[t] }),
+        },
+        t,
+      );
+    }),
+    A;
+  t[7] === x
+    ? (A = t[8])
+    : ((A = x
+        ? (0, z.jsx)(d.Message, {
+            compact: !0,
+            role: `status`,
+            children: (0, z.jsx)(l, {
+              id: `chatgptConversations.summaryPanel.create.loading`,
+              defaultMessage: `Loading apps…`,
+              description: `Status in the Work output creation menu while available artifact creation apps load`,
+            }),
           })
-        : null,
-    ],
-  });
+        : null),
+      (t[7] = x),
+      (t[8] = A));
+  let j;
+  t[9] !== b || t[10] !== o
+    ? ((j = b
+        ? (0, z.jsx)(d.Item, {
+            onSelect: () => void o.query.invalidate(y),
+            children: (0, z.jsx)(l, {
+              id: `chatgptConversations.summaryPanel.create.retry`,
+              defaultMessage: `Retry loading apps`,
+              description: `Action in the Work output creation menu to retry loading available apps after a request failed`,
+            }),
+          })
+        : null),
+      (t[9] = b),
+      (t[10] = o),
+      (t[11] = j))
+    : (j = t[11]);
+  let M;
+  return (
+    t[12] !== S ||
+    t[13] !== u ||
+    t[14] !== O ||
+    t[15] !== A ||
+    t[16] !== j ||
+    t[17] !== w ||
+    t[18] !== D
+      ? ((M = (0, z.jsxs)(S, {
+          align: `end`,
+          contentWidth: `sm`,
+          open: u,
+          onOpenChange: p,
+          onCloseAutoFocus: w,
+          triggerButton: D,
+          children: [O, A, j],
+        })),
+        (t[12] = S),
+        (t[13] = u),
+        (t[14] = O),
+        (t[15] = A),
+        (t[16] = j),
+        (t[17] = w),
+        (t[18] = D),
+        (t[19] = M))
+      : (M = t[19]),
+    M
+  );
 }
-
-function initializeCreateOutputMenu(): void {
-  React = getReactRuntime();
-  jsx = getJsxRuntime();
+var L, R, z, B, V;
+function H() {
+  return (H = e(() => {
+    ((L = t()),
+      M(),
+      n(),
+      (R = u()),
+      s(),
+      o(),
+      p(),
+      v(),
+      D(),
+      A(),
+      x(),
+      j(),
+      T(),
+      O(),
+      g(),
+      (z = a()),
+      (B = [
+        { kind: `document`, Icon: E },
+        { kind: `presentation`, Icon: b },
+        { kind: `spreadsheet`, Icon: S },
+        { kind: `site`, Icon: w },
+      ]),
+      (V = r({
+        document: {
+          id: `chatgptConversations.summaryPanel.create.document`,
+          defaultMessage: `Document`,
+          description: `Menu item in the Work task Outputs section that prefills the composer to create a document`,
+        },
+        presentation: {
+          id: `chatgptConversations.summaryPanel.create.presentation`,
+          defaultMessage: `Presentation`,
+          description: `Menu item in the Work task Outputs section that prefills the composer to create a slide presentation`,
+        },
+        spreadsheet: {
+          id: `chatgptConversations.summaryPanel.create.spreadsheet`,
+          defaultMessage: `Spreadsheet`,
+          description: `Menu item in the Work task Outputs section that prefills the composer to create a spreadsheet`,
+        },
+        site: {
+          id: `chatgptConversations.summaryPanel.create.site`,
+          defaultMessage: `Site`,
+          description: `Menu item in the Work task Outputs section that prefills the composer to create a hosted website`,
+        },
+      })));
+  }))();
 }
-
-initializeCreateOutputMenu();
-
-export { ChatGptCreateOutputMenu };
+H();
+export { I as ChatGptCreateOutputMenu };

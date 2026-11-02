@@ -1,19 +1,108 @@
-// Mean-versus-median learning model. Release chunk: model-34404a0ff6b5.js.
-import "@rchunk/rolldown-runtime";
-type OutlierMode = "without" | "with";
-interface MeanMedianValues { sampleSeed?: number | null; outlierMode?: string | null }
-interface Summary { values: number[]; mean: number; median: number }
-interface Manifest { type: string; version: number; thumbnailAssetKey: string; parameters: { outlierMode: { kind: "enum"; defaultValue: OutlierMode; allowedValues: OutlierMode[] } } }
-let manifest: Manifest; let sampleSeedControl: { defaultValue: number; min: number; max: number }; let normalizeValues: (values: MeanMedianValues) => { sampleSeed: number; outlierMode: OutlierMode }; let nextSeed: (seed: number) => number; let calculate: (values: MeanMedianValues) => { current: Summary; withoutOutlier: Summary; withOutlier: Summary; comparisonIndex: number }; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "MEAN_VS_MEDIAN", version: 1, thumbnailAssetKey: "mean-vs-median-v1", parameters: { outlierMode: { kind: "enum", defaultValue: "without", allowedValues: ["without", "with"] } } }; }
-function initializeModel(): void {
-  if (modelReady) return; modelReady = true; initializeManifest(); sampleSeedControl = { defaultValue: 314, min: 0, max: 1_000_000 }; const mode = manifest.parameters.outlierMode; const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
-  const random = (seed: number) => { let state = seed >>> 0; return () => { state += 1_831_565_813; let value = state; value = Math.imul(value ^ value >>> 15, value | 1); value ^= value + Math.imul(value ^ value >>> 7, value | 61); return ((value ^ value >>> 14) >>> 0) / 4_294_967_296; }; };
-  const sum = (values: number[]) => values.reduce((total, value) => total + value, 0); const gaps = (count: number, target: number, rng: () => number) => { const values = Array.from({ length: count }, () => 3 + rng() * (target - 3)); values[Math.floor(rng() * count)] = target - rng() * 3; return values; };
-  const apportion = (values: number[], total: number) => { const scale = total / sum(values); const scaled = values.map(value => value * scale); const result = scaled.map(value => Math.max(1, Math.floor(value))); let remaining = total - sum(result); const indexes = scaled.map((value, index) => ({ index, remainder: value - Math.floor(value) })).sort((left, right) => right.remainder - left.remainder).map(item => item.index); for (let index = 0; remaining > 0; index += 1) { const target = indexes[index % indexes.length]; if (target === undefined) break; result[target] = (result[target] ?? 0) + 1; remaining -= 1; } return result; };
-  const summarize = (values: number[]): Summary => { const sorted = [...values].sort((left, right) => left - right); const middle = Math.floor(sorted.length / 2); const median = sorted.length % 2 === 0 ? ((sorted[middle - 1] ?? 0) + (sorted[middle] ?? 0)) / 2 : sorted[middle] ?? 0; return { values, mean: sum(values) / values.length, median }; };
-  normalizeValues = values => ({ sampleSeed: clamp(typeof values.sampleSeed === "number" && Number.isFinite(values.sampleSeed) ? Math.round(values.sampleSeed) : sampleSeedControl.defaultValue, sampleSeedControl.min, sampleSeedControl.max), outlierMode: typeof values.outlierMode === "string" && mode.allowedValues.some(value => value === values.outlierMode) ? values.outlierMode as OutlierMode : mode.defaultValue });
-  nextSeed = seed => { const normalized = normalizeValues({ sampleSeed: seed }).sampleSeed; const range = sampleSeedControl.max - sampleSeedControl.min + 1; const candidate = sampleSeedControl.min + ((Math.imul(normalized + 1, 48_271) % range + range) % range); return candidate === normalized ? sampleSeedControl.min + (candidate + 1) % range : candidate; };
-  calculate = values => { const normalized = normalizeValues(values); const rng = random(normalized.sampleSeed); const center = 32 + Math.floor(rng() * 17); const target = 20 + Math.floor(rng() * 9); const left = gaps(5, target, rng); const right = gaps(4, target, rng); const total = Math.floor(Math.min(sum(left), sum(right))); const base = [...apportion(left, total).map(value => center - value), center, ...apportion(right, total).map(value => center + value)]; const comparisonIndex = base.length; const withoutOutlier = summarize([...base, center]); const withOutlier = summarize([...base, 99 + Math.floor(rng() * 2)]); return { current: normalized.outlierMode === "with" ? withOutlier : withoutOutlier, withoutOutlier, withOutlier, comparisonIndex }; };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `MEAN_VS_MEDIAN`),
+      (n = `mean-vs-median-v1`),
+      (r = {
+        outlierMode: { kind: `enum`, defaultValue: `without`, allowedValues: [`without`, `with`] },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-export { normalizeValues as a, initializeModel as i, calculate as n, initializeManifest as o, nextSeed as r, manifest as s, sampleSeedControl as t };
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y;
+function b() {
+  return (b = e(() => {
+    (a(),
+      (o = { defaultValue: 314, min: 0, max: 1e6 }),
+      (s = i.parameters.outlierMode),
+      (c = 32),
+      (l = 20),
+      (u = 99),
+      (d = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (f = (e) => {
+        let t = e >>> 0;
+        return () => {
+          t += 1831565813;
+          let e = t;
+          return (
+            (e = Math.imul(e ^ (e >>> 15), e | 1)),
+            (e ^= e + Math.imul(e ^ (e >>> 7), e | 61)),
+            ((e ^ (e >>> 14)) >>> 0) / 4294967296
+          );
+        };
+      }),
+      (p = (e) => e.reduce((e, t) => e + t, 0)),
+      (m = (e, t, n) => {
+        let r = Array.from({ length: e }, () => 3 + n() * (t - 3));
+        return ((r[Math.floor(n() * e)] = t - n() * 3), r);
+      }),
+      (h = (e, t) => {
+        let n = t / p(e),
+          r = e.map((e) => e * n),
+          i = r.map((e) => Math.max(1, Math.floor(e))),
+          a = t - p(i),
+          o = r
+            .map((e, t) => ({ index: t, remainder: e - Math.floor(e) }))
+            .sort((e, t) => t.remainder - e.remainder)
+            .map(({ index: e }) => e);
+        for (let e = 0; a > 0; e += 1) {
+          let t = o[e % o.length];
+          if (t === void 0) break;
+          ((i[t] = (i[t] ?? 0) + 1), --a);
+        }
+        return i;
+      }),
+      (g = (e) => {
+        let t = [...e].sort((e, t) => e - t),
+          n = Math.floor(t.length / 2),
+          r = t.length % 2 == 0 ? (t[n - 1] + t[n]) / 2 : t[n];
+        return { values: e, mean: e.reduce((e, t) => e + t, 0) / e.length, median: r };
+      }),
+      (_ = (e) => {
+        let t =
+            typeof e.sampleSeed == `number` && Number.isFinite(e.sampleSeed)
+              ? Math.round(e.sampleSeed)
+              : o.defaultValue,
+          n =
+            typeof e.outlierMode == `string` && s.allowedValues.includes(e.outlierMode)
+              ? e.outlierMode
+              : s.defaultValue;
+        return { sampleSeed: d(t, o.min, o.max), outlierMode: n };
+      }),
+      (v = (e) => {
+        let t = _({ sampleSeed: e }).sampleSeed,
+          n = o.max - o.min + 1,
+          r = ((Math.imul(t + 1, 48271) % n) + n) % n,
+          i = o.min + r;
+        return i === t ? o.min + ((r + 1) % n) : i;
+      }),
+      (y = (e) => {
+        let t = _(e),
+          n = f(t.sampleSeed),
+          r = c + Math.floor(n() * 17),
+          i = l + Math.floor(n() * 9),
+          a = m(5, i, n),
+          o = m(4, i, n),
+          s = Math.floor(Math.min(p(a), p(o))),
+          d = h(a, s),
+          v = h(o, s),
+          y = [...d.map((e) => r - e), r, ...v.map((e) => r + e)],
+          b = y.length,
+          x = r,
+          S = u + Math.floor(n() * 2),
+          C = [...y, x],
+          w = [...y, S],
+          T = g(C),
+          E = g(w);
+        return {
+          current: t.outlierMode === `with` ? E : T,
+          withoutOutlier: T,
+          withOutlier: E,
+          comparisonIndex: b,
+        };
+      }));
+  }))();
+}
+export { _ as a, b as i, y as n, a as o, v as r, i as s, o as t };

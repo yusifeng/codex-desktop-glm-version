@@ -1,3 +1,4 @@
-import { FG as savedEntitiesApiState, IG as savedEntityStatusState, PG as initializeSavedEntities } from "@rchunk/app-initial";
-initializeSavedEntities();
-export { savedEntitiesApiState as savedEntitiesApi$, savedEntityStatusState as savedEntityStatus$ };
+// @ts-nocheck
+import { FG as e, IG as t, PG as n } from "@rchunk/app-initial";
+n();
+export { e as savedEntitiesApi$, t as savedEntityStatus$ };

@@ -1,7 +1,119 @@
-// Digestive-tract nutrient absorption model. Release chunk: model-7f8b73e7da12.js.
-import "@rchunk/rolldown-runtime";
-type Nutrient = "carbohydrate" | "protein" | "long-chain fat"; interface Formatter { formatMessage(message: { id: string; defaultMessage: string }, values?: Record<string, string>): string } interface Manifest { type: string; version: number; thumbnailAssetKey: string; parameters: { nutrient: { kind: "enum"; defaultValue: Nutrient; allowedValues: Nutrient[] } } }
-let manifest: Manifest; let control: { min: number; max: number; step: number; defaultValue: Nutrient }; let normalizeValues: (values: { nutrient?: string | null }) => { nutrient: Nutrient }; let nutrientIndex: (nutrient: Nutrient) => number; let nutrientAtIndex: (index: number) => Nutrient; let destination: (nutrient: Nutrient) => "lymph" | "blood"; let options: (formatter: Formatter) => Array<{ value: number; label: string }>; let formLabel: (formatter: Formatter, nutrient: Nutrient) => string; let caption: (formatter: Formatter, nutrient: Nutrient) => string; let aria: (formatter: Formatter, nutrient: Nutrient) => string; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "DIGESTIVE_TRACT_ABSORPTION", version: 2, thumbnailAssetKey: "digestive-tract-absorption-v3", parameters: { nutrient: { kind: "enum", defaultValue: "carbohydrate", allowedValues: ["carbohydrate", "protein", "long-chain fat"] } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); const supported: Nutrient[] = ["carbohydrate", "protein", "long-chain fat"]; const values = manifest.parameters.nutrient.allowedValues; const isNutrient = (value: unknown): value is Nutrient => typeof value === "string" && supported.some(nutrient => nutrient === value); if (values.some(value => !isNutrient(value))) throw Error("Unsupported nutrient option in digestive-tract-absorption manifest"); const defaultValue = manifest.parameters.nutrient.defaultValue; if (!isNutrient(defaultValue)) throw Error("Invalid nutrient default in digestive-tract-absorption manifest"); control = { min: 0, max: values.length - 1, step: 1, defaultValue }; normalizeValues = input => ({ nutrient: isNutrient(input.nutrient) ? input.nutrient : defaultValue }); nutrientIndex = nutrient => Math.max(0, values.indexOf(nutrient)); nutrientAtIndex = index => { const value = values[Math.min(Math.max(Math.round(index), 0), values.length - 1)]; return isNutrient(value) ? value : defaultValue; }; destination = nutrient => nutrient === "long-chain fat" ? "lymph" : "blood"; const label = (formatter: Formatter, nutrient: Nutrient) => formatter.formatMessage({ id: `learningBlock.digestiveTractAbsorption.control.${nutrient === "long-chain fat" ? "fat" : nutrient}`, defaultMessage: nutrient === "carbohydrate" ? "Carbohydrate" : nutrient === "protein" ? "Protein" : "Long-chain fat" }); options = formatter => values.map((value, index) => { if (!isNutrient(value)) throw Error("Unsupported nutrient option in digestive-tract-absorption manifest"); return { value: index, label: label(formatter, value) }; }); formLabel = (formatter, nutrient) => formatter.formatMessage({ id: `learningBlock.digestiveTractAbsorption.form.${nutrient === "long-chain fat" ? "fat" : nutrient}`, defaultMessage: nutrient === "carbohydrate" ? "Monosaccharides" : nutrient === "protein" ? "Amino acids" : "Lipid products" }); caption = (formatter, nutrient) => formatter.formatMessage({ id: `learningBlock.digestiveTractAbsorption.caption.${nutrient === "long-chain fat" ? "fat" : nutrient}`, defaultMessage: nutrient === "carbohydrate" ? "Monosaccharides → blood capillaries → portal blood" : nutrient === "protein" ? "Amino acids → blood capillaries → portal blood" : "Lipid products → absorptive cells → chylomicrons in lymph" }); aria = (formatter, nutrient) => nutrient === "long-chain fat" ? formatter.formatMessage({ id: "learningBlock.digestiveTractAbsorption.aria.fat", defaultMessage: "Small-intestinal lining with circular folds, villi, and microvilli. Long-chain lipid products move from the lumen across the absorptive epithelium, are repackaged as chylomicrons, and enter the central lacteal and lymph. Blood capillaries remain visible as a separate route." }) : formatter.formatMessage({ id: "learningBlock.digestiveTractAbsorption.aria.blood", defaultMessage: "Small-intestinal lining with circular folds, villi, and microvilli. {form} move from the lumen across the absorptive epithelium into villus blood capillaries and toward the liver in portal blood. The central lacteal remains visible as a separate lymph route." }, { form: formLabel(formatter, nutrient) }); }
-export { initializeModel as a, nutrientIndex as c, initializeManifest as d, manifest as f, destination as i, options as l, aria as n, formLabel as o, caption as r, nutrientAtIndex as s, control as t, normalizeValues as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `DIGESTIVE_TRACT_ABSORPTION`),
+      (n = `digestive-tract-absorption-v3`),
+      (r = {
+        nutrient: {
+          kind: `enum`,
+          defaultValue: `carbohydrate`,
+          allowedValues: [`carbohydrate`, `protein`, `long-chain fat`],
+        },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y, b;
+function x() {
+  return (x = e(() => {
+    if (
+      (a(),
+      (o = [`carbohydrate`, `protein`, `long-chain fat`]),
+      (s = i.parameters.nutrient),
+      (c = s.allowedValues),
+      (l = (e) => typeof e == `string` && o.some((t) => t === e)),
+      c.some((e) => !l(e)))
+    )
+      throw Error(`Unsupported nutrient option in digestive-tract-absorption manifest`);
+    if (((u = s.defaultValue), !l(u)))
+      throw Error(`Invalid nutrient default in digestive-tract-absorption manifest`);
+    ((d = { min: 0, max: c.length - 1, step: 1, defaultValue: u }),
+      (f = (e) => ({ nutrient: l(e.nutrient) ? e.nutrient : u })),
+      (p = (e) => Math.max(0, c.indexOf(e))),
+      (m = (e) => {
+        let t = c[Math.min(Math.max(Math.round(e), 0), c.length - 1)];
+        return l(t) ? t : u;
+      }),
+      (h = (e) => (e === `long-chain fat` ? `lymph` : `blood`)),
+      (g = (e, t) =>
+        t === `carbohydrate`
+          ? e.formatMessage({
+              id: `learningBlock.digestiveTractAbsorption.control.carbohydrate`,
+              defaultMessage: `Carbohydrate`,
+            })
+          : t === `protein`
+            ? e.formatMessage({
+                id: `learningBlock.digestiveTractAbsorption.control.protein`,
+                defaultMessage: `Protein`,
+              })
+            : e.formatMessage({
+                id: `learningBlock.digestiveTractAbsorption.control.fat`,
+                defaultMessage: `Long-chain fat`,
+              })),
+      (_ = (e) =>
+        c.map((t, n) => {
+          if (!l(t))
+            throw Error(`Unsupported nutrient option in digestive-tract-absorption manifest`);
+          return { value: n, label: g(e, t) };
+        })),
+      (v = (e, t) =>
+        t === `carbohydrate`
+          ? e.formatMessage({
+              id: `learningBlock.digestiveTractAbsorption.form.carbohydrate`,
+              defaultMessage: `Monosaccharides`,
+            })
+          : t === `protein`
+            ? e.formatMessage({
+                id: `learningBlock.digestiveTractAbsorption.form.protein`,
+                defaultMessage: `Amino acids`,
+              })
+            : e.formatMessage({
+                id: `learningBlock.digestiveTractAbsorption.form.fat`,
+                defaultMessage: `Lipid products`,
+              })),
+      (y = (e, t) =>
+        t === `carbohydrate`
+          ? e.formatMessage({
+              id: `learningBlock.digestiveTractAbsorption.caption.carbohydrate`,
+              defaultMessage: `Monosaccharides → blood capillaries → portal blood`,
+            })
+          : t === `protein`
+            ? e.formatMessage({
+                id: `learningBlock.digestiveTractAbsorption.caption.protein`,
+                defaultMessage: `Amino acids → blood capillaries → portal blood`,
+              })
+            : e.formatMessage({
+                id: `learningBlock.digestiveTractAbsorption.caption.fat`,
+                defaultMessage: `Lipid products → absorptive cells → chylomicrons in lymph`,
+              })),
+      (b = (e, t) =>
+        t === `long-chain fat`
+          ? e.formatMessage({
+              id: `learningBlock.digestiveTractAbsorption.aria.fat`,
+              defaultMessage: `Small-intestinal lining with circular folds, villi, and microvilli. Long-chain lipid products move from the lumen across the absorptive epithelium, are repackaged as chylomicrons, and enter the central lacteal and lymph. Blood capillaries remain visible as a separate route.`,
+            })
+          : e.formatMessage(
+              {
+                id: `learningBlock.digestiveTractAbsorption.aria.blood`,
+                defaultMessage: `Small-intestinal lining with circular folds, villi, and microvilli. {form} move from the lumen across the absorptive epithelium into villus blood capillaries and toward the liver in portal blood. The central lacteal remains visible as a separate lymph route.`,
+              },
+              { form: v(e, t) },
+            )));
+  }))();
+}
+export {
+  x as a,
+  p as c,
+  a as d,
+  i as f,
+  h as i,
+  _ as l,
+  b as n,
+  v as o,
+  y as r,
+  m as s,
+  d as t,
+  f as u,
+};

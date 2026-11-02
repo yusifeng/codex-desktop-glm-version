@@ -1,13 +1,65 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-export interface ImageGenerationAttachment { asset_pointer?: string | null; generation_id?: string; generation_type: string; height?: number; id: string; kind: string; message_id?: string | null; output_blocked?: boolean; url: string; width?: number }
-export interface ImageValidationSession { attachments: readonly ImageGenerationAttachment[] }
-export interface GeneratedImage { chatGptGenerationId?: string; chatGptMessageId?: string; height?: number; id: string; previewSrc?: string; src: string | null; status: "completed"; type: "generated-image"; width?: number }
-function eligible(session: ImageValidationSession): ImageGenerationAttachment[] { return session.attachments.filter(attachment => attachment.kind === "media_generation" && attachment.generation_type === "image_gen" && !attachment.output_blocked); }
-function generatedImagesFromSession(session: ImageValidationSession): GeneratedImage[] { return eligible(session).map(attachment => ({ type: "generated-image", id: attachment.id, chatGptGenerationId: attachment.generation_id, chatGptMessageId: attachment.message_id ?? undefined, src: attachment.asset_pointer ?? null, width: attachment.width, height: attachment.height, status: "completed" })); }
-function resolveValidatedImages(session: ImageValidationSession, images: readonly GeneratedImage[]): GeneratedImage[] { const attachments = eligible(session); return images.flatMap(image => { const match = attachments.find(attachment => attachment.id === image.id) ?? attachments.find(attachment => attachment.asset_pointer != null && attachment.asset_pointer === image.src); if (!match) return []; const base = typeof window === "undefined" ? "https://desktop.invalid/" : window.location.href; const src = new URL(match.url, base).href; return [{ ...image, src, previewSrc: src, height: image.height ?? match.height, width: image.width ?? match.width }]; }); }
-const imageValidationSessionSignal = { key: "image-validation-session", initialValue: null } as const;
-function initializeImageValidationActions(): void {}
-function initializeImageValidationSession(): void {}
-export { initializeImageValidationActions as a, generatedImagesFromSession as i, initializeImageValidationSession as n, resolveValidatedImages as r, imageValidationSessionSignal as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, pZ as n } from "@rchunk/app-shared";
+import {
+  $en as r,
+  D_n as i,
+  E_n as a,
+  aJt as o,
+  cJt as s,
+  itn as c,
+} from "@rchunk/app-initial";
+function l(e, t) {
+  let n = e.attachments.flatMap((e) =>
+    e.kind === `media_generation` && e.generation_type === `image_gen` && !e.output_blocked
+      ? [e]
+      : [],
+  );
+  return t.flatMap((e) => {
+    let t =
+      n.find((t) => t.id === e.id) ??
+      n.find((t) => t.asset_pointer != null && t.asset_pointer === e.src);
+    if (t == null) return [];
+    let r = new URL(o(t.url) ?? t.url, window.location.href).href;
+    return [
+      { ...e, src: r, previewSrc: r, height: e.height ?? t.height, width: e.width ?? t.width },
+    ];
+  });
+}
+function u(e) {
+  return e.attachments.flatMap((e) =>
+    e.kind !== `media_generation` || e.generation_type !== `image_gen` || e.output_blocked
+      ? []
+      : [
+          {
+            type: `generated-image`,
+            id: e.id,
+            chatGptGenerationId: e.generation_id,
+            chatGptMessageId: e.message_id ?? void 0,
+            src: e.asset_pointer ?? null,
+            width: e.width,
+            height: e.height,
+            status: `completed`,
+          },
+        ],
+  );
+}
+function d() {
+  return (d = e(() => {
+    s();
+  }))();
+}
+var f;
+function p() {
+  return (p = e(() => {
+    (t(),
+      a(),
+      c(),
+      (f = n(r, () => i(), {
+        onMount: (e) => () => {
+          e(i());
+        },
+      })));
+  }))();
+}
+export { d as a, u as i, p as n, l as r, f as t };

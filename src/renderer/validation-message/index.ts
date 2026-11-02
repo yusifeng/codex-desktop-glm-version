@@ -1,4 +1,118 @@
-import { I3 as getJsxRuntime,type JsxRuntime } from"@rchunk/app-shared";
-export type EnvironmentValidationError="missing-key"|"invalid-key"|"reserved-key"|"duplicate"|"missing-value"|"invalid-value";
-const messages:Record<EnvironmentValidationError,string>={"missing-key":"Enter a key","invalid-key":"Start the key with a letter or underscore, then use only letters, numbers or underscores (up to 256 characters)","reserved-key":"This key is reserved by the platform. Choose a different key",duplicate:"This key is already used by another variable or proxy secret","missing-value":"Enter a value; leave it blank only to keep an existing saved value","invalid-value":"Remove null characters from the value"};
-let jsx:JsxRuntime;function ensureJsx():JsxRuntime{if(jsx==null)jsx=getJsxRuntime();return jsx;}function EnvironmentValidationMessage({error}:{error:EnvironmentValidationError}):unknown{return ensureJsx().jsx("span",{children:messages[error]});}function InvalidSavedEnvironmentKeyMessage({name}:{name:string}):unknown{return ensureJsx().jsx("span",{children:`Couldn’t save environment variable “${name}”. Choose a valid, non-reserved key that isn’t used by another variable or proxy secret`});}const initializeEnvironmentValidationMessages=():void=>{jsx=getJsxRuntime();};export{EnvironmentValidationMessage as n,initializeEnvironmentValidationMessages as r,InvalidSavedEnvironmentKeyMessage as t};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i } from "@rchunk/app-shared";
+function a(e) {
+  let t = (0, s.c)(6),
+    { error: n } = e;
+  switch (n) {
+    case `missing-key`: {
+      let e;
+      return (
+        t[0] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, c.jsx)(i, {
+              id: `restricted.environmentSetup.variables.missingKey`,
+              defaultMessage: `Enter a key`,
+              description: `Validation error when an environment variable has no name`,
+            })),
+            (t[0] = e))
+          : (e = t[0]),
+        e
+      );
+    }
+    case `invalid-key`: {
+      let e;
+      return (
+        t[1] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, c.jsx)(i, {
+              id: `restricted.environmentSetup.variables.invalidKey`,
+              defaultMessage: `Start the key with a letter or underscore, then use only letters, numbers or underscores (up to 256 characters)`,
+              description: `Explains the permitted format of an environment variable name`,
+            })),
+            (t[1] = e))
+          : (e = t[1]),
+        e
+      );
+    }
+    case `reserved-key`: {
+      let e;
+      return (
+        t[2] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, c.jsx)(i, {
+              id: `restricted.environmentSetup.variables.reservedKey`,
+              defaultMessage: `This key is reserved by the platform. Choose a different key`,
+              description: `Validation error when a runtime variable name overrides a reserved platform environment variable`,
+            })),
+            (t[2] = e))
+          : (e = t[2]),
+        e
+      );
+    }
+    case `duplicate`: {
+      let e;
+      return (
+        t[3] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, c.jsx)(i, {
+              id: `restricted.environmentSetup.variables.duplicate`,
+              defaultMessage: `This key is already used by another variable or proxy secret`,
+              description: `Error when a variable key conflicts with another runtime variable or network proxy placeholder`,
+            })),
+            (t[3] = e))
+          : (e = t[3]),
+        e
+      );
+    }
+    case `missing-value`: {
+      let e;
+      return (
+        t[4] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, c.jsx)(i, {
+              id: `restricted.environmentSetup.variables.missingValue`,
+              defaultMessage: `Enter a value; leave it blank only to keep an existing saved value`,
+              description: `Validation error for a new environment variable without a value`,
+            })),
+            (t[4] = e))
+          : (e = t[4]),
+        e
+      );
+    }
+    case `invalid-value`: {
+      let e;
+      return (
+        t[5] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, c.jsx)(i, {
+              id: `restricted.environmentSetup.variables.invalidValue`,
+              defaultMessage: `Remove null characters from the value`,
+              description: `Validation error for an environment variable value containing a null character`,
+            })),
+            (t[5] = e))
+          : (e = t[5]),
+        e
+      );
+    }
+  }
+}
+function o(e) {
+  let t = (0, s.c)(2),
+    { name: n } = e,
+    r;
+  return (
+    t[0] === n
+      ? (r = t[1])
+      : ((r = (0, c.jsx)(i, {
+          id: `restricted.environmentSetup.variables.invalidSavedKey`,
+          defaultMessage: `Couldn’t save environment variable “{name}”. Choose a valid, non-reserved key that isn’t used by another variable or proxy secret`,
+          description: `Error identifying the runtime variable whose name is invalid, reserved, or shared with another runtime variable or network secret`,
+          values: { name: n },
+        })),
+        (t[0] = n),
+        (t[1] = r)),
+    r
+  );
+}
+var s, c;
+function l() {
+  return (l = e(() => {
+    ((s = t()), r(), (c = n()));
+  }))();
+}
+export { a as n, l as r, o as t };

@@ -1,37 +1,112 @@
-// ADSR sound-envelope learning model with note-on and note-off interactions.
-import "@rchunk/rolldown-runtime";
-
-type AdsrParameter = "attack" | "decay" | "sustain" | "release";
-interface AdsrValues { attackSeconds?: number | null; decaySeconds?: number | null; sustainLevel?: number | null; releaseSeconds?: number | null; selectedParameter?: unknown; noteHeld?: unknown; noteOffSeconds?: number | null; noteOnTimestampMs?: number | null }
-interface Point { x: number; y: number }
-
-const adsrParameters: AdsrParameter[] = ["attack", "decay", "sustain", "release"];
-const durationControl = { min: 0.05, max: 1.5, step: 0.05 };
-const sustainControl = { min: 0, max: 1, step: 0.05 };
-const plotMaximumSeconds = 4.8;
-const noteOffControl = { min: 0.05, max: plotMaximumSeconds - durationControl.max };
-const defaultAdsrValues = { attackSeconds: 0.45, decaySeconds: 0.65, sustainLevel: 0.6, releaseSeconds: 0.8, selectedParameter: "attack" as AdsrParameter, noteHeld: false, noteOffSeconds: 2.35, noteOnTimestampMs: 0 };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-const finiteOr = (value: number | null | undefined, fallback: number): number => Number.isFinite(value) ? Number(value) : fallback;
-const normalizeAdsrValues = (values: AdsrValues) => ({
-  attackSeconds: clamp(finiteOr(values.attackSeconds, defaultAdsrValues.attackSeconds), durationControl.min, durationControl.max), decaySeconds: clamp(finiteOr(values.decaySeconds, defaultAdsrValues.decaySeconds), durationControl.min, durationControl.max), sustainLevel: clamp(finiteOr(values.sustainLevel, defaultAdsrValues.sustainLevel), sustainControl.min, sustainControl.max), releaseSeconds: clamp(finiteOr(values.releaseSeconds, defaultAdsrValues.releaseSeconds), durationControl.min, durationControl.max), selectedParameter: adsrParameters.includes(values.selectedParameter as AdsrParameter) ? values.selectedParameter as AdsrParameter : defaultAdsrValues.selectedParameter, noteHeld: typeof values.noteHeld === "boolean" ? values.noteHeld : defaultAdsrValues.noteHeld, noteOffSeconds: clamp(finiteOr(values.noteOffSeconds, defaultAdsrValues.noteOffSeconds), noteOffControl.min, noteOffControl.max), noteOnTimestampMs: Math.max(0, finiteOr(values.noteOnTimestampMs, defaultAdsrValues.noteOnTimestampMs)),
-});
-
-function deriveAdsrEnvelope(values: AdsrValues) {
-  const safeValues = normalizeAdsrValues(values); const attackEnd = safeValues.attackSeconds; const decayEnd = attackEnd + safeValues.decaySeconds; const noteOff = safeValues.noteOffSeconds; const releaseEnd = noteOff + safeValues.releaseSeconds;
-  const levelAtNoteOff = noteOff <= attackEnd ? noteOff / attackEnd : noteOff <= decayEnd ? 1 - (noteOff - attackEnd) / safeValues.decaySeconds * (1 - safeValues.sustainLevel) : safeValues.sustainLevel;
-  const stages: Partial<Record<AdsrParameter, { from: Point; to: Point }>> = {};
-  const attackTo = safeValues.noteHeld ? attackEnd : Math.min(attackEnd, noteOff); stages.attack = { from: { x: 0, y: 0 }, to: { x: attackTo, y: attackTo / attackEnd } };
-  if (safeValues.noteHeld || noteOff > attackEnd) { const end = safeValues.noteHeld ? decayEnd : Math.min(decayEnd, noteOff); stages.decay = { from: { x: attackEnd, y: 1 }, to: { x: end, y: end >= decayEnd ? safeValues.sustainLevel : 1 - (end - attackEnd) / safeValues.decaySeconds * (1 - safeValues.sustainLevel) } }; }
-  if (safeValues.noteHeld || noteOff > decayEnd) stages.sustain = { from: { x: decayEnd, y: safeValues.sustainLevel }, to: { x: safeValues.noteHeld ? plotMaximumSeconds : noteOff, y: safeValues.sustainLevel } };
-  if (!safeValues.noteHeld) stages.release = { from: { x: noteOff, y: levelAtNoteOff }, to: { x: releaseEnd, y: 0 } };
-  const orderedStages = adsrParameters.flatMap((parameter) => stages[parameter] ? [{ parameter, ...stages[parameter] }] : []);
-  return { safeValues, attackEnd, decayEnd, noteOff, releaseEnd, levelAtNoteOff, stages, points: [orderedStages[0]?.from ?? { x: 0, y: 0 }, ...orderedStages.map((stage) => stage.to)] };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d, f, p, m, h;
+function g() {
+  return (g = e(() => {
+    ((t = [`attack`, `decay`, `sustain`, `release`]),
+      (n = { min: 0.05, max: 1.5, step: 0.05 }),
+      (r = { min: 0, max: 1, step: 0.05 }),
+      (i = 4.8),
+      (a = { min: 0.05, max: i - n.max }),
+      (o = {
+        attackSeconds: 0.45,
+        decaySeconds: 0.65,
+        sustainLevel: 0.6,
+        releaseSeconds: 0.8,
+        selectedParameter: `attack`,
+        noteHeld: !1,
+        noteOffSeconds: 2.35,
+        noteOnTimestampMs: 0,
+      }),
+      (s = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (c = (e, t) => (Number.isFinite(e) ? Number(e) : t)),
+      (l = (e) => ({
+        attackSeconds: s(c(e.attackSeconds, o.attackSeconds), n.min, n.max),
+        decaySeconds: s(c(e.decaySeconds, o.decaySeconds), n.min, n.max),
+        sustainLevel: s(c(e.sustainLevel, o.sustainLevel), r.min, r.max),
+        releaseSeconds: s(c(e.releaseSeconds, o.releaseSeconds), n.min, n.max),
+        selectedParameter: t.includes(e.selectedParameter)
+          ? e.selectedParameter
+          : o.selectedParameter,
+        noteHeld: typeof e.noteHeld == `boolean` ? e.noteHeld : o.noteHeld,
+        noteOffSeconds: s(c(e.noteOffSeconds, o.noteOffSeconds), a.min, a.max),
+        noteOnTimestampMs: Math.max(0, c(e.noteOnTimestampMs, o.noteOnTimestampMs)),
+      })),
+      (u = (e) => {
+        let n = l(e),
+          r = n.attackSeconds,
+          a = r + n.decaySeconds,
+          o = n.noteOffSeconds,
+          s = o + n.releaseSeconds,
+          c =
+            o <= r
+              ? o / r
+              : o <= a
+                ? 1 - ((o - r) / n.decaySeconds) * (1 - n.sustainLevel)
+                : n.sustainLevel,
+          u = {},
+          d = n.noteHeld ? r : Math.min(r, o);
+        if (((u.attack = { from: { x: 0, y: 0 }, to: { x: d, y: d / r } }), n.noteHeld || o > r)) {
+          let e = n.noteHeld ? a : Math.min(a, o);
+          u.decay = {
+            from: { x: r, y: 1 },
+            to: {
+              x: e,
+              y: e >= a ? n.sustainLevel : 1 - ((e - r) / n.decaySeconds) * (1 - n.sustainLevel),
+            },
+          };
+        }
+        ((n.noteHeld || o > a) &&
+          (u.sustain = {
+            from: { x: a, y: n.sustainLevel },
+            to: { x: n.noteHeld ? i : o, y: n.sustainLevel },
+          }),
+          n.noteHeld || (u.release = { from: { x: o, y: c }, to: { x: s, y: 0 } }));
+        let f = t.flatMap((e) => {
+          let t = u[e];
+          return t ? [{ parameter: e, ...t }] : [];
+        });
+        return {
+          safeValues: n,
+          attackEnd: r,
+          decayEnd: a,
+          noteOff: o,
+          releaseEnd: s,
+          levelAtNoteOff: c,
+          stages: u,
+          points: [f[0]?.from ?? { x: 0, y: 0 }, ...f.map((e) => e.to)],
+        };
+      }),
+      (d = ({ plotWidth: e, noteHeld: t, releaseEnds: n }) => {
+        let r = e < 480,
+          a = t || n.every((e) => e <= 4);
+        return { xMin: r ? -1.2 : -0.35, xMax: a ? 4 : i };
+      }),
+      (f = (e, t) => l({ ...e, noteHeld: !0, noteOnTimestampMs: t })),
+      (p = (e, t) => {
+        let n = l(e),
+          r = (c(t, n.noteOnTimestampMs) - n.noteOnTimestampMs) / 1e3;
+        return l({ ...n, noteHeld: !1, noteOffSeconds: r });
+      }),
+      (m = (e) =>
+        e.selectedParameter === `attack`
+          ? e.attackSeconds
+          : e.selectedParameter === `decay`
+            ? e.decaySeconds
+            : e.selectedParameter === `sustain`
+              ? e.sustainLevel
+              : e.releaseSeconds),
+      (h = (e, t) =>
+        l({
+          ...e,
+          ...(e.selectedParameter === `attack`
+            ? { attackSeconds: t }
+            : e.selectedParameter === `decay`
+              ? { decaySeconds: t }
+              : e.selectedParameter === `sustain`
+                ? { sustainLevel: t }
+                : { releaseSeconds: t }),
+        })));
+  }))();
 }
-const deriveAdsrViewport = ({ plotWidth, noteHeld, releaseEnds }: { plotWidth: number; noteHeld: boolean; releaseEnds: number[] }) => ({ xMin: plotWidth < 480 ? -1.2 : -0.35, xMax: noteHeld || releaseEnds.every((end) => end <= 4) ? 4 : plotMaximumSeconds });
-const startAdsrNote = (values: AdsrValues, timestampMs: number) => normalizeAdsrValues({ ...values, noteHeld: true, noteOnTimestampMs: timestampMs });
-const releaseAdsrNote = (values: AdsrValues, timestampMs: number) => { const safe = normalizeAdsrValues(values); return normalizeAdsrValues({ ...safe, noteHeld: false, noteOffSeconds: (finiteOr(timestampMs, safe.noteOnTimestampMs) - safe.noteOnTimestampMs) / 1000 }); };
-const selectedAdsrValue = (values: ReturnType<typeof normalizeAdsrValues>): number => values.selectedParameter === "attack" ? values.attackSeconds : values.selectedParameter === "decay" ? values.decaySeconds : values.selectedParameter === "sustain" ? values.sustainLevel : values.releaseSeconds;
-const updateSelectedAdsrValue = (values: AdsrValues, value: number) => { const safe = normalizeAdsrValues(values); return normalizeAdsrValues({ ...safe, ...(safe.selectedParameter === "attack" ? { attackSeconds: value } : safe.selectedParameter === "decay" ? { decaySeconds: value } : safe.selectedParameter === "sustain" ? { sustainLevel: value } : { releaseSeconds: value }) }); };
-function initializeAdsrEnvelopeModel(): void {}
-export { durationControl as a, startAdsrNote as c, normalizeAdsrValues as d, selectedAdsrValue as f, plotMaximumSeconds as i, releaseAdsrNote as l, defaultAdsrValues as n, deriveAdsrEnvelope as o, updateSelectedAdsrValue as p, sustainControl as r, initializeAdsrEnvelopeModel as s, adsrParameters as t, deriveAdsrViewport as u };
+export { n as a, f as c, l as d, m as f, i, p as l, o as n, u as o, h as p, r, g as s, t, d as u };

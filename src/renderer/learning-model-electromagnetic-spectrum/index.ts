@@ -1,7 +1,119 @@
-// Electromagnetic-spectrum learning model. Release chunk: model-e044398b5fd7.js.
-import "@rchunk/rolldown-runtime";
-type BandName = "radio" | "microwave" | "infrared" | "visible" | "ultraviolet" | "x-ray" | "gamma-ray"; interface Band { value: BandName; longWavelengthMeters: number; shortWavelengthMeters: number; wavelengthMeters: number; wavelengthValue: number; wavelengthUnit: string; frequencyValue: number; frequencyUnit: string } interface Manifest { type: string; version: number; thumbnailAssetKey: string; parameters: { focus_band: { kind: "enum"; defaultValue: BandName; allowedValues: BandName[] } } }
-let manifest: Manifest; let bands: Band[]; let bandPosition: (band: Band) => { start: number; end: number; width: number }; let calculate: (values: { focus_band?: string | null }) => { selectedBand: Band; selectedIndex: number; start: number; end: number; width: number; marker: number }; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "ELECTROMAGNETIC_SPECTRUM", version: 1, thumbnailAssetKey: "electromagnetic-spectrum-v2", parameters: { focus_band: { kind: "enum", defaultValue: "visible", allowedValues: ["radio", "microwave", "infrared", "visible", "ultraviolet", "x-ray", "gamma-ray"] } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); bands = [{ value: "radio", longWavelengthMeters: 1e3, shortWavelengthMeters: 1, wavelengthMeters: 10, wavelengthValue: 10, wavelengthUnit: "m", frequencyValue: 30, frequencyUnit: "MHz" }, { value: "microwave", longWavelengthMeters: 1, shortWavelengthMeters: 1e-3, wavelengthMeters: 0.01, wavelengthValue: 1, wavelengthUnit: "cm", frequencyValue: 30, frequencyUnit: "GHz" }, { value: "infrared", longWavelengthMeters: 1e-3, shortWavelengthMeters: 7e-7, wavelengthMeters: 1e-5, wavelengthValue: 10, wavelengthUnit: "μm", frequencyValue: 30, frequencyUnit: "THz" }, { value: "visible", longWavelengthMeters: 7e-7, shortWavelengthMeters: 4e-7, wavelengthMeters: 5.5e-7, wavelengthValue: 550, wavelengthUnit: "nm", frequencyValue: 545, frequencyUnit: "THz" }, { value: "ultraviolet", longWavelengthMeters: 4e-7, shortWavelengthMeters: 1e-8, wavelengthMeters: 1e-7, wavelengthValue: 100, wavelengthUnit: "nm", frequencyValue: 3, frequencyUnit: "PHz" }, { value: "x-ray", longWavelengthMeters: 1e-8, shortWavelengthMeters: 1e-11, wavelengthMeters: 1e-10, wavelengthValue: 0.1, wavelengthUnit: "nm", frequencyValue: 3, frequencyUnit: "EHz" }, { value: "gamma-ray", longWavelengthMeters: 1e-11, shortWavelengthMeters: 1e-13, wavelengthMeters: 1e-12, wavelengthValue: 1, wavelengthUnit: "pm", frequencyValue: 300, frequencyUnit: "EHz" }]; const position = (wavelength: number) => (Math.log10(1e3) - Math.log10(wavelength)) / (Math.log10(1e3) - Math.log10(1e-13)) * 100; bandPosition = band => { const start = position(band.longWavelengthMeters); const end = position(band.shortWavelengthMeters); return { start, end, width: end - start }; }; const defaultBand = bands.find(band => band.value === manifest.parameters.focus_band.defaultValue)?.value ?? "visible"; calculate = values => { const requested = bands.findIndex(band => band.value === values.focus_band); const selectedIndex = requested < 0 ? bands.findIndex(band => band.value === defaultBand) : requested; const selectedBand = bands[selectedIndex]; if (!selectedBand) throw Error("Electromagnetic spectrum is missing its selected band."); return { selectedBand, selectedIndex, ...bandPosition(selectedBand), marker: position(selectedBand.wavelengthMeters) }; }; }
-export { initializeManifest as a, initializeModel as i, calculate as n, manifest as o, bandPosition as r, bands as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `ELECTROMAGNETIC_SPECTRUM`),
+      (n = `electromagnetic-spectrum-v2`),
+      (r = {
+        focus_band: {
+          kind: `enum`,
+          defaultValue: `visible`,
+          allowedValues: [
+            `radio`,
+            `microwave`,
+            `infrared`,
+            `visible`,
+            `ultraviolet`,
+            `x-ray`,
+            `gamma-ray`,
+          ],
+        },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f;
+function p() {
+  return (p = e(() => {
+    (a(),
+      (o = 1e3),
+      (s = 1e-13),
+      (c = [
+        {
+          value: `radio`,
+          longWavelengthMeters: 1e3,
+          shortWavelengthMeters: 1,
+          wavelengthMeters: 10,
+          wavelengthValue: 10,
+          wavelengthUnit: `m`,
+          frequencyValue: 30,
+          frequencyUnit: `MHz`,
+        },
+        {
+          value: `microwave`,
+          longWavelengthMeters: 1,
+          shortWavelengthMeters: 0.001,
+          wavelengthMeters: 0.01,
+          wavelengthValue: 1,
+          wavelengthUnit: `cm`,
+          frequencyValue: 30,
+          frequencyUnit: `GHz`,
+        },
+        {
+          value: `infrared`,
+          longWavelengthMeters: 0.001,
+          shortWavelengthMeters: 7e-7,
+          wavelengthMeters: 1e-5,
+          wavelengthValue: 10,
+          wavelengthUnit: `μm`,
+          frequencyValue: 30,
+          frequencyUnit: `THz`,
+        },
+        {
+          value: `visible`,
+          longWavelengthMeters: 7e-7,
+          shortWavelengthMeters: 4e-7,
+          wavelengthMeters: 55e-8,
+          wavelengthValue: 550,
+          wavelengthUnit: `nm`,
+          frequencyValue: 545,
+          frequencyUnit: `THz`,
+        },
+        {
+          value: `ultraviolet`,
+          longWavelengthMeters: 4e-7,
+          shortWavelengthMeters: 1e-8,
+          wavelengthMeters: 1e-7,
+          wavelengthValue: 100,
+          wavelengthUnit: `nm`,
+          frequencyValue: 3,
+          frequencyUnit: `PHz`,
+        },
+        {
+          value: `x-ray`,
+          longWavelengthMeters: 1e-8,
+          shortWavelengthMeters: 1e-11,
+          wavelengthMeters: 1e-10,
+          wavelengthValue: 0.1,
+          wavelengthUnit: `nm`,
+          frequencyValue: 3,
+          frequencyUnit: `EHz`,
+        },
+        {
+          value: `gamma-ray`,
+          longWavelengthMeters: 1e-11,
+          shortWavelengthMeters: 1e-13,
+          wavelengthMeters: 1e-12,
+          wavelengthValue: 1,
+          wavelengthUnit: `pm`,
+          frequencyValue: 300,
+          frequencyUnit: `EHz`,
+        },
+      ]),
+      (l = (e) => ((Math.log10(o) - Math.log10(e)) / (Math.log10(o) - Math.log10(s))) * 100),
+      (u = (e) => {
+        let t = l(e.longWavelengthMeters),
+          n = l(e.shortWavelengthMeters);
+        return { start: t, end: n, width: n - t };
+      }),
+      (d = c.find((e) => e.value === i.parameters.focus_band.defaultValue)?.value ?? `visible`),
+      (f = (e) => {
+        let t = c.findIndex((t) => t.value === e.focus_band),
+          n = t < 0 ? c.findIndex((e) => e.value === d) : t,
+          r = c[n];
+        return { selectedBand: r, selectedIndex: n, ...u(r), marker: l(r.wavelengthMeters) };
+      }));
+  }))();
+}
+export { a, p as i, f as n, i as o, u as r, c as t };

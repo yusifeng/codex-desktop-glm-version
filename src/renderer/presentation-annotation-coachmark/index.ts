@@ -1,23 +1,75 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-
-interface PresentationCoachmarkProps { children?: unknown; onDismiss(): void; open: boolean }
-let runtime: JsxRuntime | undefined;
-function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function t({ children, onDismiss, open }: PresentationCoachmarkProps): unknown {
-  if (!open) return jsx().jsx(jsx().Fragment, { children });
-  return jsx().jsx("section", {
-    "aria-label": "Add an annotation",
-    "data-align": "end",
-    "data-side": "bottom",
-    children: [
-      jsx().jsx("strong", { children: "Add an annotation" }),
-      jsx().jsx("p", { children: "Select part of the file, then request changes or ask a question." }),
-      jsx().jsx("button", { "aria-label": "Dismiss onboarding tip", onClick: onDismiss, type: "button", children: "Dismiss" }),
-      children,
-    ],
-  });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i, n4 as a } from "@rchunk/app-shared";
+import { Gg as o, Kg as s } from "@rchunk/app-initial";
+function c(e) {
+  let t = (0, l.c)(11),
+    { children: n, onDismiss: r, open: s } = e,
+    c = a();
+  if (!s) {
+    let e;
+    return (
+      t[0] === n
+        ? (e = t[1])
+        : ((e = (0, u.jsx)(u.Fragment, { children: n })), (t[0] = n), (t[1] = e)),
+      e
+    );
+  }
+  let d;
+  t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((d = (0, u.jsx)(i, {
+        id: `presentationAnnotationOnboarding.description`,
+        defaultMessage: `Select part of the file, then request changes or ask a question.`,
+        description: `Body copy shown in the presentation annotate coachmark`,
+      })),
+      (t[2] = d))
+    : (d = t[2]);
+  let f;
+  t[3] === c
+    ? (f = t[4])
+    : ((f = c.formatMessage({
+        id: `presentationAnnotationOnboarding.dismiss`,
+        defaultMessage: `Dismiss onboarding tip`,
+        description: `Accessible label for dismissing the presentation annotate coachmark`,
+      })),
+      (t[3] = c),
+      (t[4] = f));
+  let p;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((p = (0, u.jsx)(i, {
+        id: `presentationAnnotationOnboarding.title`,
+        defaultMessage: `Add an annotation`,
+        description: `Title shown in the presentation annotate coachmark`,
+      })),
+      (t[5] = p))
+    : (p = t[5]);
+  let m;
+  return (
+    t[6] !== n || t[7] !== r || t[8] !== s || t[9] !== f
+      ? ((m = (0, u.jsx)(o, {
+          align: `end`,
+          description: d,
+          dismissLabel: f,
+          onDismiss: r,
+          open: s,
+          side: `bottom`,
+          sideOffset: 12,
+          title: p,
+          children: n,
+        })),
+        (t[6] = n),
+        (t[7] = r),
+        (t[8] = s),
+        (t[9] = f),
+        (t[10] = m))
+      : (m = t[10]),
+    m
+  );
 }
-function n(): void {}
-export { n, t };
+var l, u;
+function d() {
+  return (d = e(() => {
+    ((l = t()), r(), s(), (u = n()));
+  }))();
+}
+export { d as n, c as t };

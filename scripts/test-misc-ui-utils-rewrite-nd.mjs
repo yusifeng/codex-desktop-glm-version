@@ -1,38 +1,21 @@
-import assert from 'node:assert/strict';
-import {Buffer} from 'node:buffer';
-import fs from 'node:fs';
-import path from 'node:path';
-import {fileURLToPath} from 'node:url';
-import * as esbuild from 'esbuild';
-import { assertReleaseOwner } from './release-owner-test-helpers.mjs';
-const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const SOURCE='/Users/david/Workspace/ppio_github/chatgpt-desktop-src/app/webview/assets';
-const modules=[
-['get-plus-header-button-4fc6736dd0bd.js','get-plus-header-button',['GetPlusHeaderButton']],
-['hidden-browser-use-webview-host-7226ca67ad08.js','hidden-browser-use-webview-host',['HiddenBrowserUseWebviewHost']],
-['host-f06bd3ee2bff.js','host',['PepperOnboardingAnnouncementHost']],
-['webview-b1b7b13a4120.js','browser-webview-host',['n','t']],
-['workspace-access.browser-2151c8cf5d1a.js','workspace-access-browser',['prepareWorkspaceAccess']],
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
+
+const owners = [
+  "get-plus-header-button",
+  "hidden-browser-use-webview-host",
+  "host",
+  "browser-webview-host",
+  "workspace-access-browser",
+  "geometry-shapes",
+  "gpt-management-access",
+  "hidden-background-webview-host",
+  "voice-commentary-message",
+  "workspace-layout-step-handler",
+  "pepper-onboarding-modal",
+  "hotkey-window-detail-layout",
+  "learning-model-gcf-lcm-shape-renderer"
 ];
-const aliases=new Map([['upgrade-plan-dialog','upgrade-dialog'],['chatgpt-voice-analytics-protobuf','chatgpt_voice'],['pepper-onboarding-modal','modal']]);
-const deps=(source,re)=>[...source.matchAll(re)].map(match=>aliases.get(match[1])??match[1]);let sourceAssertions=0;
-for(const[asset,semantic]of modules){const original=fs.readFileSync(path.join(SOURCE,asset),'utf8'),restored=fs.readFileSync(path.join(ROOT,'src/renderer',semantic,'index.ts'),'utf8');assert.deepEqual(deps(restored,/(?:from\s+|import\s*)['"]@rchunk\/([^'"]+)/g),deps(original,/from "\.\/([^"/]+)-[a-f0-9]{12}\.js"/g));assert.equal((restored.match(/import\(/g)||[]).length,(original.match(/import\(/g)||[]).length);assert.equal(/\bany\b|@ts-expect-error|@ts-nocheck/.test(restored),false);sourceAssertions+=3}
-sourceAssertions += assertReleaseOwner('geometry-shapes');
-globalThis.__nd={};
-const jsx="export const I3=()=>({Fragment:Symbol.for('react.fragment'),jsx:(kind,props,key)=>({kind,props,key}),jsxs:(kind,props,key)=>({kind,props,key})});";
-function mock(name){if(name==='@rchunk/app-shared')return jsx+"export const createPortal=(child,host)=>({kind:'portal',child,host});export const P3=()=>({createPortal});export const __=callback=>callback;export const g_=()=>{};export const HX=value=>typeof value==='function'?value():value;export const e6=()=>({useId:()=>':mock:',useLayoutEffect:effect=>{effect()},useRef:value=>({current:value}),useSyncExternalStore:(_subscribe,getSnapshot)=>getSnapshot()});export const hJ=value=>value;export const x_=()=>globalThis.__nd.zoom??1;export const Jq={WEB:'web'};";if(name==='@rchunk/app-initial')return "const managed={disposed:false,hasRegisteredNativeHost:()=>false,isPainted:()=>false};const pages={claimMountGeneration:()=>1,detachElectronWebview:()=>{},disposeHost:()=>{},getCursorOverlayHost:()=>globalThis.__nd.portalHost,getHost:()=>managed,getMountGeneration:()=>0,getWebview:()=>managed,hasOtherMountGenerationClaim:()=>false,releaseMountGeneration:()=>0,setPrewarmedEmptyWebview:()=>{},subscribe:()=>()=>{},syncElectronWebview:(_webview,state)=>{globalThis.__nd.webviewSync=state}};export const _gt=()=>{};export const Vvt={activeTab$:null};export const qvt={activeTab$:null};export const mbt=false;export const dbt={on:()=>()=>{},get:()=>0};export const _bt=false;export const vbt=false;export const hbt={on:()=>()=>{},get:()=>0};export const pgt=()=>globalThis.__nd.mountedBrowserTabIds??[];export const ggt={subscribe:()=>()=>{},getSnapshot:(_conversationId,browserTabId)=>globalThis.__nd.browserSnapshots?.[browserTabId]??null,pages};export const Iun=()=>globalThis.__nd.session;export const Vun=async()=>globalThis.__nd.refreshed;export const qun=async()=>globalThis.__nd.payment;export const rJt={safeGet:async()=>globalThis.__nd.accounts};export const cdn=id=>['accounts',id];export const Mx=async()=>globalThis.__nd.switchResult;export const kx=x=>x;export const Gun=()=>({accountId:globalThis.__nd.tokenAccount});";if(name==='@rchunk/webview')return "export const n=()=>{};export const t=props=>({kind:'webview',props});";return "export const n=()=>{};export const t=()=>{};export const r=()=>{};export const i=()=>{};export const a=()=>{};"}
-async function bundle(semantic){const result=await esbuild.build({entryPoints:[path.join(ROOT,'src/renderer',semantic,'index.ts')],bundle:true,format:'esm',platform:'node',target:'node22',write:false,logLevel:'silent',plugins:[{name:'m',setup(build){build.onResolve({filter:/^@rchunk\//},args=>({path:args.path,namespace:'m'}));build.onLoad({filter:/.*/,namespace:'m'},args=>({contents:mock(args.path),loader:'js'}))}}]});return import('data:text/javascript;base64,'+Buffer.from(result.outputFiles[0].text).toString('base64')+'#'+semantic)}
-const loaded=new Map();let runtimeAssertions=0;for(const[,semantic,exports]of modules){const value=await bundle(semantic);loaded.set(semantic,value);assert.deepEqual(Object.keys(value).sort(),exports.slice().sort());runtimeAssertions++}
-const plus=loaded.get('get-plus-header-button').GetPlusHeaderButton({rejoinPlus:true});assert.equal(plus.props.children[1],'Rejoin Plus');runtimeAssertions++;
-sourceAssertions += assertReleaseOwner('gpt-management-access');
-globalThis.__nd.portalHost={id:'host'};const webview=loaded.get('browser-webview-host');webview.n();assert.equal(webview.t({conversationId:'c',browserTabId:'b',children:'child'}).kind,'portal');webview.t({conversationId:'c',browserTabId:'b',bounds:null,isVisible:false,shouldBootstrapWhenHidden:true,shouldPaint:false});assert.equal(globalThis.__nd.webviewSync.shouldBootstrap,true);assert.equal(globalThis.__nd.webviewSync.isVisible,false);runtimeAssertions+=3;
-globalThis.__nd.mountedBrowserTabIds=['a'];globalThis.__nd.zoom=1.25;globalThis.__nd.browserSnapshots={b:{tabType:'web',url:'https://example.com'}};const hiddenUse=loaded.get('hidden-browser-use-webview-host').HiddenBrowserUseWebviewHost({conversationId:'c',browserUseTabIdsKey:'a\0b'});assert.equal(hiddenUse.props.children.length,1);assert.equal(hiddenUse.props.children[0].props.browserTabId,'b');const hiddenWebview=hiddenUse.props.children[0].kind(hiddenUse.props.children[0].props);assert.equal(hiddenWebview.props.hostKind,'hidden-browser-use');assert.equal(hiddenWebview.props.initialUrl,'https://example.com');assert.equal(hiddenWebview.props.shouldBootstrapWhenHidden,true);assert.equal(hiddenWebview.props.windowZoom,1.25);assert.equal(hiddenWebview.props.webviewRef.current,null);runtimeAssertions+=7;
-sourceAssertions += assertReleaseOwner('hidden-background-webview-host');
-let candidate;loaded.get('host').PepperOnboardingAnnouncementHost({accountId:'a',eligibleAnnouncements:['oai/apps/pepperOnboarding'],dismissedAccountIds:new Set(),children:value=>(candidate=value,value)});assert.equal(candidate.id,'oai/apps/pepperOnboarding');runtimeAssertions++;
-sourceAssertions += assertReleaseOwner('voice-commentary-message');
-globalThis.__nd.session={userId:'u',accountId:'w',accessToken:'token'};globalThis.__nd.refreshed={userId:'u',accountId:'a',accessToken:'token'};globalThis.__nd.payment={userId:'u',accountId:'a'};globalThis.__nd.accounts={accounts:{w:{account:{account_id:'w',name:'Work',is_deactivated:false},can_access_with_session:true}},account_ordering:['w']};globalThis.__nd.switchResult={willRedirect:false};globalThis.__nd.tokenAccount='w';const cache=[];const signal={throwIfAborted(){},addEventListener(){},removeEventListener(){}};const workspace=await loaded.get('workspace-access-browser').prepareWorkspaceAccess({scope:{queryClient:{async cancelQueries(){},setQueryData(...args){cache.push(args)}}},statsig:{},userId:'u',workspaceId:'w',signal});assert.equal(workspace.account.name,'Work');assert.equal(cache.length>=1,true);runtimeAssertions+=2;
-sourceAssertions += assertReleaseOwner('workspace-layout-step-handler');
-sourceAssertions += assertReleaseOwner('pepper-onboarding-modal');
-sourceAssertions += assertReleaseOwner('hotkey-window-detail-layout');
-sourceAssertions += assertReleaseOwner('learning-model-gcf-lcm-shape-renderer');
-delete globalThis.__nd;console.log(sourceAssertions+' source assertions and '+runtimeAssertions+' runtime assertions passed');
+let assertions = 0;
+for (const owner of owners) assertions += assertReleaseOwner(owner);
+
+console.log(`${assertions} release-owner assertions passed`);

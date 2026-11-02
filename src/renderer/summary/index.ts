@@ -1,8 +1,75 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-export interface WritingBlockEditResult { summary?: string | null }
-export interface WritingBlockSummaryProps { onView?(): void; result?: WritingBlockEditResult | null; title?: string | null }
-let runtime: JsxRuntime | undefined; function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function WritingBlockSummary({ onView, result, title }: WritingBlockSummaryProps): unknown { const label = result == null ? `Created ${title ?? "Document"}` : (result.summary ?? "Edited"); return jsx().jsxs("div", { "data-writing-block-summary": true, children: [jsx().jsx("span", { children: label }), onView ? jsx().jsxs("span", { children: [jsx().jsx("span", { "aria-hidden": true, children: "•" }), jsx().jsx("button", { onClick: onView, type: "button", children: "View" })] }) : null] }); }
-function initializeWritingBlockSummary(): void { void jsx(); }
-export { initializeWritingBlockSummary as n, WritingBlockSummary as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i, Yh as a, Zh as o } from "@rchunk/app-shared";
+function s(e) {
+  let t = (0, u.c)(7),
+    { result: n, title: r, onView: o } = e,
+    s = l,
+    f = c,
+    p;
+  t[0] === o
+    ? (p = t[1])
+    : ((p = (e) =>
+        (0, d.jsx)(`span`, {
+          className: `shrink-0 font-semibold text-secondary`,
+          children: (0, d.jsx)(a, { color: `ghostMuted`, size: `inline`, onClick: o, children: e }),
+        })),
+      (t[0] = o),
+      (t[1] = p));
+  let m = p,
+    h;
+  return (
+    t[2] !== o || t[3] !== n || t[4] !== r || t[5] !== m
+      ? ((h = (0, d.jsx)(`div`, {
+          className: `mt-3 mb-6 flex w-fit max-w-full items-center gap-1.5 text-sm text-tertiary`,
+          children:
+            n == null
+              ? (0, d.jsx)(i, {
+                  id: `chatgptConversations.libraryWritingBlock.createdWithHistorySummaryRow`,
+                  defaultMessage: `<label>Created {hasTitle, select, yes {{title}} other {Document}}</label>{hasView, select, yes { <separator>•</separator> <view>View</view>} other {}}`,
+                  description: `Summary where a Library writing block was originally created. title is the document's name when available, otherwise Document is shown. The optional View link opens the original saved version in history`,
+                  values: {
+                    hasTitle: r == null ? `no` : `yes`,
+                    title: r ?? ``,
+                    hasView: o == null ? `no` : `yes`,
+                    label: s,
+                    separator: f,
+                    view: m,
+                  },
+                })
+              : (0, d.jsx)(i, {
+                  id: `chatgptConversations.writingBlock.patch.summaryWithOptionalHistoryRow`,
+                  defaultMessage: `<label>{hasSummary, select, yes {{summary}} other {Edited}}</label>{hasView, select, yes { <separator>•</separator> <view>View</view>} other {}}`,
+                  description: `Compact status for a successful Library document edit. summary is the tool's description, or Edited is shown when there is no summary. When hasView is yes, the view link opens this edit's saved version in document history. Keep the separator and View link together`,
+                  values: {
+                    hasSummary: n.summary == null ? `no` : `yes`,
+                    summary: n.summary ?? ``,
+                    hasView: o == null ? `no` : `yes`,
+                    label: s,
+                    separator: f,
+                    view: m,
+                  },
+                }),
+        })),
+        (t[2] = o),
+        (t[3] = n),
+        (t[4] = r),
+        (t[5] = m),
+        (t[6] = h))
+      : (h = t[6]),
+    h
+  );
+}
+function c(e) {
+  return (0, d.jsx)(`span`, { className: `select-none`, "aria-hidden": !0, children: e });
+}
+function l(e) {
+  return (0, d.jsx)(`span`, { className: `min-w-0 break-words`, children: e });
+}
+var u, d;
+function f() {
+  return (f = e(() => {
+    ((u = t()), r(), o(), (d = n()));
+  }))();
+}
+export { f as n, s as t };

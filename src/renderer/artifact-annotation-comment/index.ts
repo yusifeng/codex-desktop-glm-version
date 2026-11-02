@@ -1,31 +1,85 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-
-type ArtifactKind = "document" | "presentation" | "site" | "spreadsheet";
-interface ArtifactTarget { type: "document-element-selection" | "document-page-point" | "document-page-region" | "presentation-element-selection" | "presentation-region" | "site-element-selection" | "workbook-floating-element" | "workbook-range"; [key: string]: unknown }
-interface ArtifactPayload { annotationId: string; artifactKind: ArtifactKind; body: string; label?: string; target: ArtifactTarget }
-interface ArtifactComment { localArtifactAnnotationContext?: { annotationId?: string; artifactKind: ArtifactKind; label?: string; path: string }; localArtifactAnnotationMetadata?: { target?: ArtifactTarget }; position: { line: number }; text?: string; [key: string]: unknown }
-
-function isArtifactComment(comment: ArtifactComment): boolean { return comment.localArtifactAnnotationContext != null; }
-function t({ line, path, payload, sourcePath, title }: { line: number; path: string; payload: ArtifactPayload; sourcePath?: string; title?: string }): ArtifactComment | undefined {
-  if (!["presentation-element-selection", "presentation-region", "workbook-floating-element", "workbook-range"].includes(payload.target.type)) return undefined;
-  return { position: { line }, text: payload.body, localArtifactAnnotationContext: { annotationId: payload.annotationId, artifactKind: payload.artifactKind, label: payload.label, path }, localArtifactAnnotationMetadata: { target: payload.target }, sourcePath, title };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { Gq as t, qq as n, wL as r } from "@rchunk/app-shared";
+import { Lpn as i, Rpn as a } from "@rchunk/app-initial";
+function o({ line: e, path: n, payload: r, sourcePath: i, title: a }) {
+  switch (r.target.type) {
+    case `presentation-element-selection`:
+    case `presentation-region`:
+    case `workbook-floating-element`:
+    case `workbook-range`:
+      return t({
+        annotationId: r.annotationId,
+        artifactKind: r.artifactKind,
+        body: r.body,
+        label: r.label,
+        line: e,
+        metadata: { target: r.target },
+        path: n,
+        sourcePath: i,
+        title: a,
+      });
+  }
 }
-function n(comments: ArtifactComment[], path: string): ArtifactComment[] { return comments.filter(comment => isArtifactComment(comment) && comment.localArtifactAnnotationContext?.path === path); }
-function i(comments: ArtifactComment[]): ArtifactPayload[] {
-  return comments.flatMap(comment => {
-    const context = comment.localArtifactAnnotationContext;
-    const target = comment.localArtifactAnnotationMetadata?.target;
-    if (context?.annotationId == null || context.artifactKind === "document" || context.artifactKind === "site" || target == null || !["presentation-element-selection", "presentation-region", "workbook-floating-element", "workbook-range"].includes(target.type)) return [];
-    return [{ annotationId: context.annotationId, artifactKind: context.artifactKind, body: comment.text ?? "", label: context.label, target }];
+function s(e, t) {
+  return e.filter((e) => n(e) && e.localArtifactAnnotationContext?.path === t);
+}
+function c(e) {
+  return e.flatMap((e) => {
+    let t = e.localArtifactAnnotationContext,
+      n = e.localArtifactAnnotationMetadata?.target;
+    if (
+      t?.annotationId == null ||
+      t.artifactKind === `document` ||
+      t.artifactKind === `site` ||
+      n == null
+    )
+      return [];
+    switch (n.type) {
+      case `presentation-element-selection`:
+      case `presentation-region`:
+      case `workbook-floating-element`:
+      case `workbook-range`:
+        return [
+          {
+            annotationId: t.annotationId,
+            artifactKind: t.artifactKind,
+            body: i(e),
+            label: t.label,
+            target: n,
+          },
+        ];
+      case `document-element-selection`:
+      case `document-page-point`:
+      case `document-page-region`:
+      case `site-element-selection`:
+        return [];
+    }
   });
 }
-function a({ currentComments, path, previousComments }: { currentComments: ArtifactComment[]; path: string; previousComments: ArtifactComment[] }): string[] {
-  const current = new Set(n(currentComments, path).flatMap(comment => comment.localArtifactAnnotationContext?.annotationId ?? []));
-  return n(previousComments, path).flatMap(comment => { const id = comment.localArtifactAnnotationContext?.annotationId; return id != null && !current.has(id) ? [id] : []; });
+function l({ currentComments: e, path: t, previousComments: n }) {
+  let r = new Set();
+  for (let n of s(e, t)) {
+    let e = n.localArtifactAnnotationContext?.annotationId;
+    e != null && r.add(e);
+  }
+  let i = [];
+  for (let e of s(n, t)) {
+    let t = e.localArtifactAnnotationContext?.annotationId;
+    t != null && !r.has(t) && i.push(t);
+  }
+  return i;
 }
-function s(comments: ArtifactComment[], path: string): ArtifactComment[] { const filtered = comments.filter(comment => !isArtifactComment(comment) || comment.localArtifactAnnotationContext?.path !== path); return filtered.length === comments.length ? comments : filtered; }
-function r(comments: ArtifactComment[]): number { return Math.max(0, ...comments.map(comment => comment.position.line)) + 1; }
-function o(): void {}
-export { a, i, n, o, r, s, t };
+function u(e, t) {
+  let r = e.filter((e) => !n(e) || e.localArtifactAnnotationContext?.path !== t);
+  return r.length === e.length ? e : r;
+}
+function d(e) {
+  return Math.max(0, ...e.map((e) => e.position.line)) + 1;
+}
+function f() {
+  return (f = e(() => {
+    (r(), a());
+  }))();
+}
+export { l as a, c as i, s as n, f as o, d as r, u as s, o as t };

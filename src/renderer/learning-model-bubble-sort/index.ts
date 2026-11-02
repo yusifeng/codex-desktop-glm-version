@@ -1,27 +1,128 @@
-// Bubble-sort timeline learning model with deterministic shuffling.
-import "@rchunk/rolldown-runtime";
-
-type InitialOrder = "mixed" | "reversed" | "nearly_sorted" | "few_swaps";
-interface BubbleSortValues { initialOrder?: unknown; shuffleIndex?: number | null; step?: number | null }
-interface ComparisonStep { candidateValue: number; comparisonIndex: number; didSwap: boolean; kind: "comparison"; leftValue: number; pass: number; passStartValues: number[]; rightValue: number; sortedStart: number; unsortedEnd: number; values: number[] }
-interface CompletionStep { completionReason: "no-swaps" | "all-fixed" | null; fixedValue: number; kind: "sorted" | "pass-complete"; pass: number; passHadSwaps: boolean; passStartValues: number[]; sortedStart: number; values: number[] }
-type SortStep = ComparisonStep | CompletionStep;
-
-const bubbleSortType = "BUBBLE_SORT"; const bubbleSortThumbnail = "bubble-sort-v1"; const supportedOrders: InitialOrder[] = ["mixed", "reversed", "nearly_sorted", "few_swaps"];
-const bubbleSortParameters = { initialOrder: { kind: "enum", defaultValue: "mixed" as InitialOrder, allowedValues: supportedOrders } }; const bubbleSortDefinition = { type: bubbleSortType, version: 1, thumbnailAssetKey: bubbleSortThumbnail, parameters: bubbleSortParameters };
-const isInitialOrder = (value: unknown): value is InitialOrder => value === "mixed" || value === "reversed" || value === "nearly_sorted" || value === "few_swaps";
-if (!bubbleSortDefinition.parameters.initialOrder.allowedValues.every(isInitialOrder)) throw Error("Bubble sort manifest contains an unsupported initial order");
-const defaultOrder = bubbleSortDefinition.parameters.initialOrder.defaultValue; if (!isInitialOrder(defaultOrder)) throw Error("Bubble sort manifest contains an invalid default order");
-const defaultBubbleSortValues = { initialOrder: defaultOrder, shuffleIndex: 0, step: 0 };
-const orderValues: Record<InitialOrder, number[]> = { mixed: [5,2,7,1,6,3,4], reversed: [7,6,5,4,3,2,1], nearly_sorted: [1,2,3,5,4,6,7], few_swaps: [1,3,2,4,6,5,7] };
-const normalizeInteger = (value: number | null | undefined, minimum: number, maximum: number): number => Number.isFinite(value) ? Math.min(Math.max(Math.round(value as number), minimum), maximum) : minimum;
-const normalizeBubbleSortValues = (values: BubbleSortValues) => ({ initialOrder: isInitialOrder(values.initialOrder) && supportedOrders.includes(values.initialOrder) ? values.initialOrder : defaultBubbleSortValues.initialOrder, shuffleIndex: normalizeInteger(values.shuffleIndex ?? 0, 0, Number.MAX_SAFE_INTEGER), step: normalizeInteger(values.step ?? 0, 0, Number.MAX_SAFE_INTEGER) });
-const nextRandom = (value: number): number => (Math.imul(value, 1664525) + 1013904223) >>> 0;
-const shuffledValues = (seed: number): number[] => { const values = [...orderValues.mixed].sort((a, b) => a - b); let state = (seed ^ 2654435769) >>> 0; for (let index = values.length - 1; index > 0; index -= 1) { state = nextRandom(state); const swap = state % (index + 1); [values[index], values[swap]] = [values[swap], values[index]]; } return values; };
-const initialBubbleSortValues = (values: BubbleSortValues): number[] => { const safe = normalizeBubbleSortValues(values); if (safe.shuffleIndex === 0) return [...orderValues[safe.initialOrder]]; const shuffled = shuffledValues(safe.shuffleIndex); const previous = safe.shuffleIndex === 1 ? orderValues[safe.initialOrder] : shuffledValues(safe.shuffleIndex - 1); return shuffled.every((value, index) => value === previous[index]) ? [...shuffled.slice(1), shuffled[0]] : shuffled; };
-const buildBubbleSortTimeline = (input: number[]): SortStep[] => { if (input.length < 2) return []; const values = [...input]; const timeline: SortStep[] = []; let unsortedEnd = values.length; let pass = 1; while (unsortedEnd > 1) { const passStartValues = [...values]; let swapped = false; for (let index = 0; index < unsortedEnd - 1; index += 1) { const leftValue = values[index]; const rightValue = values[index + 1]; const didSwap = leftValue > rightValue; const candidateValue = Math.max(leftValue, rightValue); if (didSwap) { values[index] = rightValue; values[index + 1] = leftValue; swapped = true; } timeline.push({ candidateValue, comparisonIndex: index, didSwap, kind: "comparison", leftValue, pass, passStartValues, rightValue, sortedStart: unsortedEnd, unsortedEnd, values: [...values] }); } unsortedEnd -= 1; const noSwaps = !swapped; const allFixed = unsortedEnd <= 1; const complete = noSwaps || allFixed; timeline.push({ completionReason: noSwaps ? "no-swaps" : allFixed ? "all-fixed" : null, fixedValue: values[unsortedEnd], kind: complete ? "sorted" : "pass-complete", pass, passHadSwaps: swapped, passStartValues, sortedStart: complete ? 0 : unsortedEnd, values: [...values] }); if (complete) break; pass += 1; } return timeline; };
-const deriveBubbleSortState = (values: BubbleSortValues) => { const safe = normalizeBubbleSortValues(values); const timeline = buildBubbleSortTimeline(initialBubbleSortValues(safe)); const step = normalizeInteger(safe.step, 0, Math.max(0, timeline.length - 1)); return { safeValues: { ...safe, step }, state: timeline[step], timeline }; };
-const nextPassBoundary = (timeline: SortStep[], step: number): number => { const safeStep = normalizeInteger(step, 0, Math.max(0, timeline.length - 1)); const start = timeline[safeStep]?.kind === "comparison" ? safeStep : safeStep + 1; for (let index = start; index < timeline.length; index += 1) if (timeline[index].kind !== "comparison") return index; return safeStep; };
-function initializeBubbleSortSchema(): void {}
-function initializeBubbleSortModel(): void {}
-export { initializeBubbleSortSchema as a, initializeBubbleSortModel as i, deriveBubbleSortState as n, bubbleSortDefinition as o, nextPassBoundary as r, defaultBubbleSortValues as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `BUBBLE_SORT`),
+      (n = `bubble-sort-v1`),
+      (r = {
+        initialOrder: {
+          kind: `enum`,
+          defaultValue: `mixed`,
+          allowedValues: [`mixed`, `reversed`, `nearly_sorted`, `few_swaps`],
+        },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y, b;
+function x() {
+  return (x = e(() => {
+    if (
+      (a(),
+      (o = (e) => e === `mixed` || e === `reversed` || e === `nearly_sorted` || e === `few_swaps`),
+      (s = i.parameters.initialOrder.allowedValues),
+      !s.every(o))
+    )
+      throw Error(`Bubble sort manifest contains an unsupported initial order`);
+    if (((c = i.parameters.initialOrder.defaultValue), !o(c)))
+      throw Error(`Bubble sort manifest contains an invalid default order`);
+    ((l = { allowedValues: s, defaultValue: c }),
+      (u = { initialOrder: l.defaultValue, shuffleIndex: 0, step: 0 }),
+      (d = {
+        mixed: [5, 2, 7, 1, 6, 3, 4],
+        reversed: [7, 6, 5, 4, 3, 2, 1],
+        nearly_sorted: [1, 2, 3, 5, 4, 6, 7],
+        few_swaps: [1, 3, 2, 4, 6, 5, 7],
+      }),
+      (f = (e, t, n) => (Number.isFinite(e) ? Math.min(Math.max(Math.round(e), t), n) : t)),
+      (p = (e) => (o(e) && l.allowedValues.includes(e) ? e : u.initialOrder)),
+      (m = (e) => ({
+        initialOrder: p(e.initialOrder),
+        shuffleIndex: f(e.shuffleIndex ?? u.shuffleIndex, 0, 2 ** 53 - 1),
+        step: f(e.step ?? u.step, 0, 2 ** 53 - 1),
+      })),
+      (h = (e) => (Math.imul(e, 1664525) + 1013904223) >>> 0),
+      (g = (e) => {
+        let t = [...d.mixed].sort((e, t) => e - t),
+          n = (e ^ 2654435769) >>> 0;
+        for (let e = t.length - 1; e > 0; --e) {
+          n = h(n);
+          let r = n % (e + 1);
+          [t[e], t[r]] = [t[r], t[e]];
+        }
+        return t;
+      }),
+      (_ = (e) => {
+        let t = m(e);
+        if (t.shuffleIndex === 0) return [...d[t.initialOrder]];
+        let n = g(t.shuffleIndex),
+          r = t.shuffleIndex === 1 ? d[t.initialOrder] : g(t.shuffleIndex - 1);
+        return n.every((e, t) => e === r[t]) ? [...n.slice(1), n[0]] : n;
+      }),
+      (v = (e) => {
+        if (e.length < 2) return [];
+        let t = [...e],
+          n = [],
+          r = t.length,
+          i = 1;
+        for (; r > 1;) {
+          let e = [...t],
+            a = !1;
+          for (let o = 0; o < r - 1; o += 1) {
+            let s = t[o],
+              c = t[o + 1],
+              l = s > c,
+              u = Math.max(s, c);
+            (l && ((t[o] = c), (t[o + 1] = s), (a = !0)),
+              n.push({
+                candidateValue: u,
+                comparisonIndex: o,
+                didSwap: l,
+                kind: `comparison`,
+                leftValue: s,
+                pass: i,
+                passStartValues: e,
+                rightValue: c,
+                sortedStart: r,
+                unsortedEnd: r,
+                values: [...t],
+              }));
+          }
+          --r;
+          let o = !a,
+            s = r <= 1,
+            c = o || s;
+          if (
+            (n.push({
+              completionReason: o ? `no-swaps` : s ? `all-fixed` : null,
+              fixedValue: t[r],
+              kind: c ? `sorted` : `pass-complete`,
+              pass: i,
+              passHadSwaps: a,
+              passStartValues: e,
+              sortedStart: c ? 0 : r,
+              values: [...t],
+            }),
+            c)
+          )
+            break;
+          i += 1;
+        }
+        return n;
+      }),
+      (y = (e) => {
+        let t = m(e),
+          n = v(_(t)),
+          r = f(t.step, 0, Math.max(0, n.length - 1));
+        return { safeValues: { ...t, step: r }, state: n[r], timeline: n };
+      }),
+      (b = (e, t) => {
+        let n = f(t, 0, Math.max(0, e.length - 1)),
+          r = e[n]?.kind === `comparison` ? n : n + 1;
+        for (let t = r; t < e.length; t += 1) if (e[t].kind !== `comparison`) return t;
+        return n;
+      }));
+  }))();
+}
+export { a, x as i, y as n, i as o, b as r, u as t };

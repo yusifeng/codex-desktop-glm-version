@@ -1,19 +1,130 @@
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/plugin-detail-view";
-
-export interface BrowserPluginSharePageProps { shareKey?: string; resolvedPluginId?: string; isLoading?: boolean; error?: string; search?: string; }
-const BUNDLED_SHARE_KEY = /^[a-z0-9]+(?:-[a-z0-9]+)*@(?:openai-bundled|openai-primary-runtime)$/;
-let jsx: JsxRuntime;
-function ensureJsx(): JsxRuntime { if (jsx == null) jsx = getJsxRuntime(); return jsx; }
-
-function BrowserPluginSharePage(props: BrowserPluginSharePageProps): unknown {
-  const runtime = ensureJsx();
-  if (props.isLoading) return runtime.jsx("div", { "aria-busy": true, children: "Loading plugin…" });
-  const validKey = props.shareKey != null && BUNDLED_SHARE_KEY.test(props.shareKey);
-  if (props.error || !validKey || !props.resolvedPluginId) return runtime.jsxs("div", { role: "alert", children: [runtime.jsx("h1", { children: "Plugin not found" }), props.error] });
-  const query = new URLSearchParams(props.search ?? ""); query.set("open_in_app", "true");
-  return runtime.jsx("a", { "data-redirect": true, href: `/plugins/${encodeURIComponent(props.resolvedPluginId)}?${query.toString()}`, children: "Open plugin" });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $O as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  JB as o,
+  _L as s,
+  ek as c,
+  gL as l,
+  iV as u,
+  wL as d,
+} from "@rchunk/app-shared";
+import {
+  G3t as f,
+  G6t as p,
+  H6t as m,
+  K3t as h,
+  Qgn as g,
+  Ygn as _,
+  i_n as v,
+  l_n as y,
+  pdn as b,
+  udn as x,
+} from "@rchunk/app-initial";
+import { n as S, t as C } from "@rchunk/plugin-detail-view";
+function w() {
+  let e = (0, T.c)(28),
+    { shareKey: t } = y(),
+    { search: r } = v(),
+    a = i(m),
+    c;
+  e[0] === t
+    ? (c = e[1])
+    : ((c =
+        t != null && /^[a-z0-9]+(?:-[a-z0-9]+)*@(?:openai-bundled|openai-primary-runtime)$/.test(t)
+          ? t
+          : null),
+      (e[0] = t),
+      (e[1] = c));
+  let l = c,
+    d;
+  e[2] !== a || e[3] !== t
+    ? ((d = [`plugins`, `share-link`, a, t]), (e[2] = a), (e[3] = t), (e[4] = d))
+    : (d = e[4]);
+  let p = a != null && t != null && l == null,
+    h;
+  e[5] === t
+    ? (h = e[6])
+    : ((h = (e) => {
+        let { signal: n } = e;
+        if (t == null) throw Error(`Plugin share link requires a share key`);
+        return x.safeGet(`/ps/plugin-shares/{share_key}`, {
+          parameters: { path: { share_key: t } },
+          additionalHeaders: f(`chatgpt`),
+          expectedErrorStatuses: [403, 404],
+          signal: n,
+        });
+      }),
+      (e[5] = t),
+      (e[6] = h));
+  let g;
+  e[7] !== d || e[8] !== p || e[9] !== h
+    ? ((g = { queryKey: d, enabled: p, queryFn: h, retry: !1, staleTime: n.FIVE_MINUTES }),
+      (e[7] = d),
+      (e[8] = p),
+      (e[9] = h),
+      (e[10] = g))
+    : (g = e[10]);
+  let { data: b, isPending: S, isError: w } = s(g);
+  if (l == null && S) {
+    let t;
+    return (
+      e[11] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, E.jsx)(C, { state: `loading` })), (e[11] = t))
+        : (t = e[11]),
+      t
+    );
+  }
+  let D = l ?? b?.plugin_id;
+  if (w || D == null || !u(D)) {
+    let t;
+    return (
+      e[12] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, E.jsx)(C, { state: `missing` })), (e[12] = t))
+        : (t = e[12]),
+      t
+    );
+  }
+  let O, k, A, j;
+  if (e[13] !== D || e[14] !== r) {
+    let t = new URLSearchParams(r);
+    (t.set(`open_in_app`, ``),
+      (O = _),
+      (j = !0),
+      e[19] === D ? (k = e[20]) : ((k = o({ pluginId: D })), (e[19] = D), (e[20] = k)),
+      (A = t.toString()),
+      (e[13] = D),
+      (e[14] = r),
+      (e[15] = O),
+      (e[16] = k),
+      (e[17] = A),
+      (e[18] = j));
+  } else ((O = e[15]), (k = e[16]), (A = e[17]), (j = e[18]));
+  let M;
+  e[21] !== k || e[22] !== A
+    ? ((M = { pathname: k, search: A }), (e[21] = k), (e[22] = A), (e[23] = M))
+    : (M = e[23]);
+  let N;
+  return (
+    e[24] !== O || e[25] !== j || e[26] !== M
+      ? ((N = (0, E.jsx)(O, { replace: j, to: M })),
+        (e[24] = O),
+        (e[25] = j),
+        (e[26] = M),
+        (e[27] = N))
+      : (N = e[27]),
+    N
+  );
 }
-
-export { BrowserPluginSharePage };
+var T, E;
+function D() {
+  return (D = e(() => {
+    ((T = t()), l(), r(), d(), g(), p(), c(), b(), S(), h(), (E = a()));
+  }))();
+}
+D();
+export { w as BrowserPluginSharePage };

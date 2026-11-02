@@ -1,111 +1,222 @@
-// Deferred clinician identity-verification banner. Release chunk: deferred-verification-banner-e314c15c65cb.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as personaChunk from "@rchunk/cfc-persona-verification";
-
-interface Identity { accountId: string; userId: string }
-interface VerificationRequirement { required?: boolean; loading?: boolean; accountError?: boolean; identity: Identity }
-interface Scope {
-  get(signal: unknown): { danger(message: unknown, options: Record<string, unknown>): void };
-  set(signal: unknown, key: Identity, value: "closed" | "loading" | "open"): void;
-}
-interface ReactRuntime { useEffect(effect: () => void | (() => void), dependencies: readonly unknown[]): void }
-interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown }
-interface SharedRuntime {
-  $3(): unknown; BX<T>(signal: unknown, key: Identity): T; FX(): void; HX<T>(signal: unknown): T; I3(): JsxRuntime; K2(): void; LX(signal: unknown): Scope; QI(): void;
-  Y2: unknown; Yh: unknown; ZI: unknown; Zh(): void; e6(): ReactRuntime; gx: unknown; lk(): void; lw(): void; pk: unknown;
-}
-interface InitialRuntime {
-  Qgn(): void; aNt(): void; iNt: unknown; i_n(): { pathname: string }; n7: unknown; nNt: unknown; oNt(scope: Scope): void; r7(): void; rNt: unknown;
-}
-interface PersonaRuntime {
-  n(options: { accountId: string; onLoad(): void; onComplete(): void; onCancel(): void; onError(): void }): () => void;
-  t(): void;
-}
-const shared = appSharedChunk as unknown as SharedRuntime;
-const initial = appInitialChunk as unknown as InitialRuntime;
-const persona = personaChunk as unknown as PersonaRuntime;
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let initialized = false;
-
-function translatedMessage(id: string, defaultMessage: string, description: string): unknown {
-  return jsx.jsx(shared.Y2, { id, defaultMessage, description });
-}
-
-function VerificationAnnouncement({ isOpen, isLoading, onVerify }: { isOpen: boolean; isLoading: boolean; onVerify(): void }): unknown {
-  return jsx.jsx(initial.n7, {
-    variant: "announcement",
-    icon: jsx.jsx(shared.gx, {}),
-    title: translatedMessage("healthcareVerificationPage.workspaceVerificationTitle", "Verify your identity to start chatting", "Heading above the composer explaining identity verification is required in a provisional clinician workspace"),
-    content: translatedMessage("healthcareVerificationPage.workspaceVerificationDescription", "Complete verification with Persona before sending your first message.", "Explains that Persona verification must complete before a clinician can send a message"),
-    customCtas: jsx.jsx(shared.Yh, {
-      type: "button", size: "dialog", disabled: isOpen, loading: isLoading, onClick: onVerify,
-      children: translatedMessage("healthcareVerificationPage.workspaceVerificationCta", "Verify", "Button that opens Persona verification to unlock a clinician's message composer"),
-    }),
-  });
-}
-
-function VerificationForIdentity({ identity }: { identity: Identity }): unknown {
-  const scope = shared.LX(shared.ZI);
-  const dialogState = shared.BX<"closed" | "loading" | "open">(initial.iNt, identity);
-  const query = shared.BX<{ refetch(): void }>(initial.nNt, identity);
-  const isOpen = dialogState !== "closed";
-
-  React.useEffect(() => {
-    if (!isOpen) return;
-    let disposed = false;
-    const close = (): void => scope.set(initial.iNt, identity, "closed");
-    const showStartError = (): void => {
-      if (disposed) return;
-      close();
-      scope.get(shared.pk).danger(
-        translatedMessage("healthcareVerificationPage.workspaceVerificationStartError", "We couldn’t start identity verification. Please try again.", "Error shown when Persona identity verification cannot start inside a provisional clinician workspace"),
-        { errorAnalytics: { toastId: "healthcareVerificationPage.workspaceVerificationStartError" } },
-      );
-    };
-    scope.set(initial.iNt, identity, "loading");
-    const disposePersona = persona.n({
-      accountId: identity.accountId,
-      onLoad: () => scope.set(initial.iNt, identity, "open"),
-      onComplete: () => { close(); query.refetch(); },
-      onCancel: close,
-      onError: showStartError,
-    });
-    return () => { disposed = true; disposePersona(); close(); };
-  }, [identity.accountId, isOpen, query.refetch, scope, identity.userId]);
-
-  return jsx.jsx(VerificationAnnouncement, {
-    isOpen,
-    isLoading: dialogState === "loading",
-    onVerify: () => initial.oNt(scope),
-  });
-}
-
-function DeferredClinicianVerificationBanner(): unknown {
-  initialize();
-  const scope = shared.LX(shared.ZI);
-  const requirement = shared.HX<VerificationRequirement | null | undefined>(initial.rNt);
-  const { pathname } = initial.i_n();
-  if (!requirement?.required || requirement.loading || pathname === "/onboarding") return null;
-  if (requirement.accountError) {
-    return jsx.jsx(initial.n7, {
-      type: "error",
-      content: translatedMessage("healthcareVerificationPage.workspaceVerificationStatusError", "We couldn’t check your verification status", "Error shown when the clinician workspace verification requirements cannot be loaded"),
-      primaryCtaText: translatedMessage("healthcareVerificationPage.workspaceVerificationStatusRetry", "Retry", "Button to retry loading clinician workspace verification requirements"),
-      onPrimaryCtaClick: () => initial.oNt(scope),
-    });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  K2 as o,
+  LX as s,
+  QI as c,
+  Y2 as l,
+  Yh as u,
+  ZI as d,
+  Zh as f,
+  e6 as p,
+  gx as m,
+  lk as h,
+  lw as g,
+  pk as _,
+} from "@rchunk/app-shared";
+import {
+  Qgn as v,
+  aNt as y,
+  iNt as b,
+  i_n as x,
+  n7 as S,
+  nNt as C,
+  oNt as w,
+  r7 as T,
+  rNt as E,
+} from "@rchunk/app-initial";
+import { n as D, t as O } from "@rchunk/cfc-persona-verification";
+function k() {
+  let e = (0, M.c)(7),
+    t = s(d),
+    n = i(E),
+    { pathname: r } = x();
+  if (!n?.required || n.loading || r === `/onboarding`) return null;
+  if (n.accountError) {
+    let n, r;
+    e[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((n = (0, P.jsx)(l, {
+          id: `healthcareVerificationPage.workspaceVerificationStatusError`,
+          defaultMessage: `We couldn’t check your verification status`,
+          description: `Error shown when the clinician workspace verification requirements cannot be loaded`,
+        })),
+        (r = (0, P.jsx)(l, {
+          id: `healthcareVerificationPage.workspaceVerificationStatusRetry`,
+          defaultMessage: `Retry`,
+          description: `Button to retry loading clinician workspace verification requirements`,
+        })),
+        (e[0] = n),
+        (e[1] = r))
+      : ((n = e[0]), (r = e[1]));
+    let i;
+    return (
+      e[2] === t
+        ? (i = e[3])
+        : ((i = (0, P.jsx)(S, {
+            type: `error`,
+            content: n,
+            primaryCtaText: r,
+            onPrimaryCtaClick: () => w(t),
+          })),
+          (e[2] = t),
+          (e[3] = i)),
+      i
+    );
   }
-  const { identity } = requirement;
-  return jsx.jsx(VerificationForIdentity, { identity }, identity.accountId + ":" + identity.userId);
+  let a = `${n.identity.accountId}:${n.identity.userId}`,
+    o;
+  return (
+    e[4] !== a || e[5] !== n.identity
+      ? ((o = (0, P.jsx)(A, { identity: n.identity }, a)),
+        (e[4] = a),
+        (e[5] = n.identity),
+        (e[6] = o))
+      : (o = e[6]),
+    o
+  );
 }
-
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  shared.$3(); shared.FX(); React = shared.e6(); shared.K2(); initial.Qgn(); initial.r7(); shared.Zh(); shared.lw(); shared.lk(); shared.QI(); initial.aNt(); persona.t(); jsx = shared.I3();
+function A(e) {
+  let t = (0, M.c)(13),
+    { identity: r } = e,
+    i = s(d),
+    a = n(b, r),
+    { refetch: o } = n(C, r),
+    { accountId: c, userId: u } = r,
+    f = a !== `closed`,
+    p,
+    m;
+  (t[0] !== c || t[1] !== f || t[2] !== o || t[3] !== i || t[4] !== u
+    ? ((p = () => {
+        if (!f) return;
+        let e = !1,
+          t = () => {
+            i.set(b, { accountId: c, userId: u }, `closed`);
+          },
+          n = () => {
+            e ||
+              (t(),
+              i
+                .get(_)
+                .danger(
+                  (0, P.jsx)(l, {
+                    id: `healthcareVerificationPage.workspaceVerificationStartError`,
+                    defaultMessage: `We couldn’t start identity verification. Please try again.`,
+                    description: `Error shown when Persona identity verification cannot start inside a provisional clinician workspace`,
+                  }),
+                  {
+                    errorAnalytics: {
+                      toastId: `healthcareVerificationPage.workspaceVerificationStartError`,
+                    },
+                  },
+                ));
+          };
+        i.set(b, { accountId: c, userId: u }, `loading`);
+        let r = D({
+          accountId: c,
+          onLoad: () => {
+            i.set(b, { accountId: c, userId: u }, `open`);
+          },
+          onComplete: () => {
+            (t(), o());
+          },
+          onCancel: t,
+          onError: n,
+        });
+        return () => {
+          ((e = !0), r(), t());
+        };
+      }),
+      (m = [c, f, o, i, u]),
+      (t[0] = c),
+      (t[1] = f),
+      (t[2] = o),
+      (t[3] = i),
+      (t[4] = u),
+      (t[5] = p),
+      (t[6] = m))
+    : ((p = t[5]), (m = t[6])),
+    (0, N.useEffect)(p, m));
+  let h = a === `loading`,
+    g;
+  t[7] === i ? (g = t[8]) : ((g = () => w(i)), (t[7] = i), (t[8] = g));
+  let v;
+  return (
+    t[9] !== f || t[10] !== h || t[11] !== g
+      ? ((v = (0, P.jsx)(j, { isOpen: f, isLoading: h, onVerify: g })),
+        (t[9] = f),
+        (t[10] = h),
+        (t[11] = g),
+        (t[12] = v))
+      : (v = t[12]),
+    v
+  );
 }
-
-initialize();
-export { DeferredClinicianVerificationBanner };
+function j(e) {
+  let t = (0, M.c)(8),
+    { isOpen: n, isLoading: r, onVerify: i } = e,
+    a,
+    o,
+    s;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((a = (0, P.jsx)(m, {})),
+      (o = (0, P.jsx)(l, {
+        id: `healthcareVerificationPage.workspaceVerificationTitle`,
+        defaultMessage: `Verify your identity to start chatting`,
+        description: `Heading above the composer explaining identity verification is required in a provisional clinician workspace`,
+      })),
+      (s = (0, P.jsx)(l, {
+        id: `healthcareVerificationPage.workspaceVerificationDescription`,
+        defaultMessage: `Complete verification with Persona before sending your first message.`,
+        description: `Explains that Persona verification must complete before a clinician can send a message`,
+      })),
+      (t[0] = a),
+      (t[1] = o),
+      (t[2] = s))
+    : ((a = t[0]), (o = t[1]), (s = t[2]));
+  let c;
+  t[3] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((c = (0, P.jsx)(l, {
+        id: `healthcareVerificationPage.workspaceVerificationCta`,
+        defaultMessage: `Verify`,
+        description: `Button that opens Persona verification to unlock a clinician's message composer`,
+      })),
+      (t[3] = c))
+    : (c = t[3]);
+  let d;
+  return (
+    t[4] !== r || t[5] !== n || t[6] !== i
+      ? ((d = (0, P.jsx)(S, {
+          variant: `announcement`,
+          icon: a,
+          title: o,
+          content: s,
+          customCtas: (0, P.jsx)(u, {
+            type: `button`,
+            size: `dialog`,
+            disabled: n,
+            loading: r,
+            onClick: i,
+            children: c,
+          }),
+        })),
+        (t[4] = r),
+        (t[5] = n),
+        (t[6] = i),
+        (t[7] = d))
+      : (d = t[7]),
+    d
+  );
+}
+var M, N, P;
+function F() {
+  return (F = e(() => {
+    ((M = t()), r(), (N = p()), o(), v(), T(), f(), g(), h(), c(), y(), O(), (P = a()));
+  }))();
+}
+F();
+export { k as DeferredClinicianVerificationBanner };

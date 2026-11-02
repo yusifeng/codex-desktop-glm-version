@@ -1,19 +1,101 @@
-// Net-ionic-equation learning model with spectator-ion cancellation.
-import "@rchunk/rolldown-runtime";
-
-type ReactionExample = "silver-chloride-precipitation" | "barium-sulfate-precipitation" | "strong-acid-base-neutralization";
-interface NetIonicValues { reaction_example?: unknown; step?: number | null }
-interface Species { latex: string; plain: string; spectator: boolean }
-const netIonicType = "NET_IONIC_EQUATIONS"; const netIonicThumbnail = "net-ionic-equations-v1"; const reactionExamples: ReactionExample[] = ["silver-chloride-precipitation", "barium-sulfate-precipitation", "strong-acid-base-neutralization"];
-const netIonicParameters = { reaction_example: { kind: "enum", defaultValue: "silver-chloride-precipitation" as ReactionExample, allowedValues: reactionExamples } }; const netIonicDefinition = { type: netIonicType, version: 2, thumbnailAssetKey: netIonicThumbnail, parameters: netIonicParameters };
-const species = (latex: string, plain: string, spectator = false): Species => ({ latex, plain, spectator });
-const reactions = {
-  "silver-chloride-precipitation": { molecular: "\\mathrm{AgNO_3(aq) + NaCl(aq) \\rightarrow AgCl(s) + NaNO_3(aq)}", molecularPlain: "AgNO₃(aq) + NaCl(aq) → AgCl(s) + NaNO₃(aq)", completeLeft: [species("\\mathrm{Ag^+(aq)}","Ag⁺(aq)"),species("\\mathrm{NO_3^-(aq)}","NO₃⁻(aq)",true),species("\\mathrm{Na^+(aq)}","Na⁺(aq)",true),species("\\mathrm{Cl^-(aq)}","Cl⁻(aq)")], completeRight: [species("\\mathrm{AgCl(s)}","AgCl(s)"),species("\\mathrm{Na^+(aq)}","Na⁺(aq)",true),species("\\mathrm{NO_3^-(aq)}","NO₃⁻(aq)",true)], net: "\\mathrm{Ag^+(aq) + Cl^-(aq) \\rightarrow AgCl(s)}", netPlain: "Ag⁺(aq) + Cl⁻(aq) → AgCl(s)", outcome: "precipitate", spectators: ["Na⁺(aq)","NO₃⁻(aq)"] },
-  "barium-sulfate-precipitation": { molecular: "\\mathrm{BaCl_2(aq) + Na_2SO_4(aq) \\rightarrow BaSO_4(s) + 2NaCl(aq)}", molecularPlain: "BaCl₂(aq) + Na₂SO₄(aq) → BaSO₄(s) + 2NaCl(aq)", completeLeft: [species("\\mathrm{Ba^{2+}(aq)}","Ba²⁺(aq)"),species("\\mathrm{2Cl^-(aq)}","2Cl⁻(aq)",true),species("\\mathrm{2Na^+(aq)}","2Na⁺(aq)",true),species("\\mathrm{SO_4^{2-}(aq)}","SO₄²⁻(aq)")], completeRight: [species("\\mathrm{BaSO_4(s)}","BaSO₄(s)"),species("\\mathrm{2Na^+(aq)}","2Na⁺(aq)",true),species("\\mathrm{2Cl^-(aq)}","2Cl⁻(aq)",true)], net: "\\mathrm{Ba^{2+}(aq) + SO_4^{2-}(aq) \\rightarrow BaSO_4(s)}", netPlain: "Ba²⁺(aq) + SO₄²⁻(aq) → BaSO₄(s)", outcome: "precipitate", spectators: ["2Na⁺(aq)","2Cl⁻(aq)"] },
-  "strong-acid-base-neutralization": { molecular: "\\mathrm{HCl(aq) + NaOH(aq) \\rightarrow NaCl(aq) + H_2O(\\ell)}", molecularPlain: "HCl(aq) + NaOH(aq) → NaCl(aq) + H₂O(l)", completeLeft: [species("\\mathrm{H^+(aq)}","H⁺(aq)"),species("\\mathrm{Cl^-(aq)}","Cl⁻(aq)",true),species("\\mathrm{Na^+(aq)}","Na⁺(aq)",true),species("\\mathrm{OH^-(aq)}","OH⁻(aq)")], completeRight: [species("\\mathrm{Na^+(aq)}","Na⁺(aq)",true),species("\\mathrm{Cl^-(aq)}","Cl⁻(aq)",true),species("\\mathrm{H_2O(\\ell)}","H₂O(l)")], net: "\\mathrm{H^+(aq) + OH^-(aq) \\rightarrow H_2O(\\ell)}", netPlain: "H⁺(aq) + OH⁻(aq) → H₂O(l)", outcome: "water", spectators: ["Na⁺(aq)","Cl⁻(aq)"] },
-} as const;
-const isReactionExample = (value: unknown): value is ReactionExample => typeof value === "string" && Object.hasOwn(reactions, value);
-const deriveNetIonicState = (values: NetIonicValues) => { const fallback = netIonicDefinition.parameters.reaction_example.defaultValue; const reactionExample = isReactionExample(values.reaction_example) && reactionExamples.includes(values.reaction_example) ? values.reaction_example : isReactionExample(fallback) ? fallback : "silver-chloride-precipitation"; const step = Number.isFinite(values.step) ? Math.min(3, Math.max(0, Math.round(values.step ?? 0))) : 0; return { reaction: reactions[reactionExample], reactionExample, step }; };
-function initializeNetIonicSchema(): void {}
-function initializeNetIonicModel(): void {}
-export { initializeNetIonicSchema as a, isReactionExample as i, deriveNetIonicState as n, netIonicDefinition as o, initializeNetIonicModel as r, reactionExamples as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `NET_IONIC_EQUATIONS`),
+      (n = `net-ionic-equations-v1`),
+      (r = {
+        reaction_example: {
+          kind: `enum`,
+          defaultValue: `silver-chloride-precipitation`,
+          allowedValues: [
+            `silver-chloride-precipitation`,
+            `barium-sulfate-precipitation`,
+            `strong-acid-base-neutralization`,
+          ],
+        },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u;
+function d() {
+  return (d = e(() => {
+    (a(),
+      (o = i.parameters.reaction_example.allowedValues),
+      (s = (e, t, n = !1) => ({ latex: e, plain: t, spectator: n })),
+      (c = {
+        "silver-chloride-precipitation": {
+          molecular: `\\mathrm{AgNO_3(aq) + NaCl(aq) \\rightarrow AgCl(s) + NaNO_3(aq)}`,
+          molecularPlain: `AgNO₃(aq) + NaCl(aq) → AgCl(s) + NaNO₃(aq)`,
+          completeLeft: [
+            s(`\\mathrm{Ag^+(aq)}`, `Ag⁺(aq)`),
+            s(`\\mathrm{NO_3^-(aq)}`, `NO₃⁻(aq)`, !0),
+            s(`\\mathrm{Na^+(aq)}`, `Na⁺(aq)`, !0),
+            s(`\\mathrm{Cl^-(aq)}`, `Cl⁻(aq)`),
+          ],
+          completeRight: [
+            s(`\\mathrm{AgCl(s)}`, `AgCl(s)`),
+            s(`\\mathrm{Na^+(aq)}`, `Na⁺(aq)`, !0),
+            s(`\\mathrm{NO_3^-(aq)}`, `NO₃⁻(aq)`, !0),
+          ],
+          net: `\\mathrm{Ag^+(aq) + Cl^-(aq) \\rightarrow AgCl(s)}`,
+          netPlain: `Ag⁺(aq) + Cl⁻(aq) → AgCl(s)`,
+          outcome: `precipitate`,
+          spectators: [`Na⁺(aq)`, `NO₃⁻(aq)`],
+        },
+        "barium-sulfate-precipitation": {
+          molecular: `\\mathrm{BaCl_2(aq) + Na_2SO_4(aq) \\rightarrow BaSO_4(s) + 2NaCl(aq)}`,
+          molecularPlain: `BaCl₂(aq) + Na₂SO₄(aq) → BaSO₄(s) + 2NaCl(aq)`,
+          completeLeft: [
+            s(`\\mathrm{Ba^{2+}(aq)}`, `Ba²⁺(aq)`),
+            s(`\\mathrm{2Cl^-(aq)}`, `2Cl⁻(aq)`, !0),
+            s(`\\mathrm{2Na^+(aq)}`, `2Na⁺(aq)`, !0),
+            s(`\\mathrm{SO_4^{2-}(aq)}`, `SO₄²⁻(aq)`),
+          ],
+          completeRight: [
+            s(`\\mathrm{BaSO_4(s)}`, `BaSO₄(s)`),
+            s(`\\mathrm{2Na^+(aq)}`, `2Na⁺(aq)`, !0),
+            s(`\\mathrm{2Cl^-(aq)}`, `2Cl⁻(aq)`, !0),
+          ],
+          net: `\\mathrm{Ba^{2+}(aq) + SO_4^{2-}(aq) \\rightarrow BaSO_4(s)}`,
+          netPlain: `Ba²⁺(aq) + SO₄²⁻(aq) → BaSO₄(s)`,
+          outcome: `precipitate`,
+          spectators: [`2Na⁺(aq)`, `2Cl⁻(aq)`],
+        },
+        "strong-acid-base-neutralization": {
+          molecular: `\\mathrm{HCl(aq) + NaOH(aq) \\rightarrow NaCl(aq) + H_2O(\\ell)}`,
+          molecularPlain: `HCl(aq) + NaOH(aq) → NaCl(aq) + H₂O(l)`,
+          completeLeft: [
+            s(`\\mathrm{H^+(aq)}`, `H⁺(aq)`),
+            s(`\\mathrm{Cl^-(aq)}`, `Cl⁻(aq)`, !0),
+            s(`\\mathrm{Na^+(aq)}`, `Na⁺(aq)`, !0),
+            s(`\\mathrm{OH^-(aq)}`, `OH⁻(aq)`),
+          ],
+          completeRight: [
+            s(`\\mathrm{Na^+(aq)}`, `Na⁺(aq)`, !0),
+            s(`\\mathrm{Cl^-(aq)}`, `Cl⁻(aq)`, !0),
+            s(`\\mathrm{H_2O(\\ell)}`, `H₂O(l)`),
+          ],
+          net: `\\mathrm{H^+(aq) + OH^-(aq) \\rightarrow H_2O(\\ell)}`,
+          netPlain: `H⁺(aq) + OH⁻(aq) → H₂O(l)`,
+          outcome: `water`,
+          spectators: [`Na⁺(aq)`, `Cl⁻(aq)`],
+        },
+      }),
+      (l = (e) => typeof e == `string` && Object.hasOwn(c, e)),
+      (u = (e) => {
+        let t = i.parameters.reaction_example.defaultValue,
+          n =
+            l(e.reaction_example) && o.includes(e.reaction_example)
+              ? e.reaction_example
+              : l(t)
+                ? t
+                : `silver-chloride-precipitation`,
+          r = Number.isFinite(e.step) ? Math.min(3, Math.max(0, Math.round(e.step ?? 0))) : 0;
+        return { reaction: c[n], reactionExample: n, step: r };
+      }));
+  }))();
+}
+export { a, l as i, u as n, i as o, d as r, o as t };

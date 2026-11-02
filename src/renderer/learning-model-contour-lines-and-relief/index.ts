@@ -1,55 +1,128 @@
-// Synthetic terrain contours and elevation profiles along a transect.
-import "@rchunk/rolldown-runtime";
-
-type TerrainExample = "single-hill" | "two-hills-and-saddle" | "valley-and-ridge";
-interface TerrainValues { terrain_example?: unknown; ax?: number | null; ay?: number | null; bx?: number | null; by?: number | null }
-interface Point { x: number; y: number }
-interface ContourLine { level: number; points: Point[] }
-
-const terrainExamples: TerrainExample[] = ["single-hill", "two-hills-and-saddle", "valley-and-ridge"];
-const contourLevels = Array.from({ length: 10 }, (_, index) => 80 + index * 20);
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-const finiteOrDefault = (value: number | null | undefined, defaultValue: number): number => typeof value === "number" && Number.isFinite(value) ? value : defaultValue;
-const gaussianHill = (x: number, y: number, centerX: number, centerY: number, widthX: number, widthY: number): number => Math.exp(-(((x - centerX) / widthX) ** 2 + ((y - centerY) / widthY) ** 2));
-const normalizeTerrainValues = (values: TerrainValues) => ({ terrain_example: typeof values.terrain_example === "string" && terrainExamples.some((example) => example === values.terrain_example) ? values.terrain_example as TerrainExample : "two-hills-and-saddle" as TerrainExample, ax: clamp(finiteOrDefault(values.ax, 8), 4, 96), ay: clamp(finiteOrDefault(values.ay, 30), 4, 56), bx: clamp(finiteOrDefault(values.bx, 92), 4, 96), by: clamp(finiteOrDefault(values.by, 30), 4, 56) });
-const terrainElevation = (example: TerrainExample, x: number, y: number): number => { if (example === "single-hill") return 72 + 180 * gaussianHill(x, y, 54, 31, 28, 21) + 0.15 * (60 - y); if (example === "two-hills-and-saddle") return 72 + 154 * gaussianHill(x, y, 31, 32, 20, 19) + 138 * gaussianHill(x, y, 72, 28, 18, 17) + 14 * gaussianHill(x, y, 52, 30, 34, 11); const ridgeX = 31 + 0.1 * (y - 30); const valleyDistance = Math.sqrt((x - ridgeX) ** 2 + 16) - 4; return 56 + 1.45 * (60 - y) + 1.55 * valleyDistance + 78 * gaussianHill(x, y, 76, 30, 18, 25); };
-const interpolateCrossing = (left: Point, right: Point, leftValue: number, rightValue: number): Point => { const progress = leftValue === rightValue ? 0.5 : leftValue / (leftValue - rightValue); return { x: left.x + (right.x - left.x) * progress, y: left.y + (right.y - left.y) * progress }; };
-const pointKey = (point: Point): string => `${Math.round(point.x * 1e4)}:${Math.round(point.y * 1e4)}`;
-const generateTerrainContours = (example: TerrainExample): ContourLine[] => {
-  const elevations = Array.from({ length: 39 }, (_, row) => Array.from({ length: 65 }, (_, column) => terrainElevation(example, column / 64 * 100, row / 38 * 60)));
-  const contours: ContourLine[] = [];
-  for (const level of contourLevels) {
-    const segments: Array<[Point, Point]> = [];
-    for (let row = 0; row < 38; row += 1) for (let column = 0; column < 64; column += 1) {
-      const x0 = column / 64 * 100; const x1 = (column + 1) / 64 * 100; const y0 = row / 38 * 60; const y1 = (row + 1) / 38 * 60;
-      const corners: Point[] = [{ x: x0, y: y0 }, { x: x1, y: y0 }, { x: x1, y: y1 }, { x: x0, y: y1 }];
-      const values = [elevations[row][column] - level, elevations[row][column + 1] - level, elevations[row + 1][column + 1] - level, elevations[row + 1][column] - level];
-      const crossings: Point[] = [];
-      for (let edge = 0; edge < 4; edge += 1) { const next = (edge + 1) % 4; if ((values[edge] >= 0) !== (values[next] >= 0)) crossings.push(interpolateCrossing(corners[edge], corners[next], values[edge], values[next])); }
-      if (crossings.length === 2) segments.push([crossings[0], crossings[1]]); else if (crossings.length === 4) segments.push([crossings[0], crossings[1]], [crossings[2], crossings[3]]);
-    }
-    const connected = new Map<string, number[]>();
-    segments.forEach(([start, end], index) => { for (const point of [start, end]) { const indexes = connected.get(pointKey(point)) ?? []; indexes.push(index); connected.set(pointKey(point), indexes); } });
-    const used = new Set<number>();
-    for (let index = 0; index < segments.length; index += 1) {
-      if (used.has(index)) continue; used.add(index); const points = [...segments[index]];
-      for (const side of ["end", "start"] as const) {
-        while (true) { const endpoint = side === "end" ? points.at(-1)! : points[0]; const nextSegment = (connected.get(pointKey(endpoint)) ?? []).find((candidate) => !used.has(candidate)); if (nextSegment === undefined) break; used.add(nextSegment); const [start, end] = segments[nextSegment]; const continuation = pointKey(start) === pointKey(endpoint) ? end : start; if (side === "end") points.push(continuation); else points.unshift(continuation); }
-      }
-      if (points.length > 1) contours.push({ level, points });
-    }
-  }
-  return contours;
-};
-const analyzeTerrainTransect = (values: TerrainValues) => {
-  const state = normalizeTerrainValues(values);
-  const samples = Array.from({ length: 181 }, (_, index) => { const distance = index / 180; const point = { x: state.ax + (state.bx - state.ax) * distance, y: state.ay + (state.by - state.ay) * distance }; return { distance, point, elevation: terrainElevation(state.terrain_example, point.x, point.y) }; });
-  const crossings: Array<{ distance: number; elevation: number; point: Point }> = [];
-  for (const level of contourLevels) for (let index = 1; index < samples.length; index += 1) { const previous = samples[index - 1]; const current = samples[index]; const previousOffset = previous.elevation - level; const currentOffset = current.elevation - level; if ((previousOffset >= 0) === (currentOffset >= 0)) continue; const point = interpolateCrossing(previous.point, current.point, previousOffset, currentOffset); const progress = previousOffset / (previousOffset - currentOffset); crossings.push({ distance: previous.distance + (current.distance - previous.distance) * progress, elevation: level, point }); }
-  crossings.sort((left, right) => left.distance - right.distance);
-  return { state, samples, crossings, minimum: Math.min(...samples.map(({ elevation }) => elevation)), maximum: Math.max(...samples.map(({ elevation }) => elevation)) };
-};
-
-function initializeContourReliefModel(): void {}
-
-export { normalizeTerrainValues as a, initializeContourReliefModel as i, analyzeTerrainTransect as n, generateTerrainContours as r, terrainExamples as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    ((t = [`single-hill`, `two-hills-and-saddle`, `valley-and-ridge`]),
+      (n = Array.from({ length: 10 }, (e, t) => 80 + t * 20)),
+      (r = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (i = (e, t) => (Number.isFinite(e) ? e : t)),
+      (a = (e, t, n, r, i, a) => Math.exp(-(((e - n) / i) ** 2 + ((t - r) / a) ** 2))),
+      (o = (e) => ({
+        terrain_example: t.includes(e.terrain_example) ? e.terrain_example : `two-hills-and-saddle`,
+        ax: r(i(e.ax, 8), 4, 96),
+        ay: r(i(e.ay, 30), 4, 56),
+        bx: r(i(e.bx, 92), 4, 96),
+        by: r(i(e.by, 30), 4, 56),
+      })),
+      (s = (e, t, n) => {
+        if (e === `single-hill`) return 72 + 180 * a(t, n, 54, 31, 28, 21) + 0.15 * (60 - n);
+        if (e === `two-hills-and-saddle`)
+          return (
+            72 +
+            154 * a(t, n, 31, 32, 20, 19) +
+            138 * a(t, n, 72, 28, 18, 17) +
+            14 * a(t, n, 52, 30, 34, 11)
+          );
+        let r = 31 + 0.1 * (n - 30),
+          i = Math.sqrt((t - r) ** 2 + 16) - 4;
+        return 56 + 1.45 * (60 - n) + 1.55 * i + 78 * a(t, n, 76, 30, 18, 25);
+      }),
+      (c = (e, t, n, r) => {
+        let i = n === r ? 0.5 : n / (n - r);
+        return { x: e.x + (t.x - e.x) * i, y: e.y + (t.y - e.y) * i };
+      }),
+      (l = (e) => `${Math.round(e.x * 1e4)}:${Math.round(e.y * 1e4)}`),
+      (u = (e) => {
+        let t = Array.from({ length: 39 }, (t, n) =>
+            Array.from({ length: 65 }, (t, r) => s(e, (r / 64) * 100, (n / 38) * 60)),
+          ),
+          r = [];
+        for (let e of n) {
+          let n = [];
+          for (let r = 0; r < 38; r += 1)
+            for (let i = 0; i < 64; i += 1) {
+              let a = (i / 64) * 100,
+                o = ((i + 1) / 64) * 100,
+                s = (r / 38) * 60,
+                l = ((r + 1) / 38) * 60,
+                u = [
+                  { x: a, y: s },
+                  { x: o, y: s },
+                  { x: o, y: l },
+                  { x: a, y: l },
+                ],
+                d = [t[r][i] - e, t[r][i + 1] - e, t[r + 1][i + 1] - e, t[r + 1][i] - e],
+                f = [];
+              for (let e = 0; e < 4; e += 1) {
+                let t = (e + 1) % 4;
+                d[e] >= 0 != d[t] >= 0 && f.push(c(u[e], u[t], d[e], d[t]));
+              }
+              f.length === 2
+                ? n.push([f[0], f[1]])
+                : f.length === 4 && n.push([f[0], f[1]], [f[2], f[3]]);
+            }
+          let i = new Map();
+          n.forEach(([e, t], n) => {
+            for (let r of [e, t]) {
+              let e = i.get(l(r)) ?? [];
+              (e.push(n), i.set(l(r), e));
+            }
+          });
+          let a = new Set();
+          for (let t = 0; t < n.length; t += 1) {
+            if (a.has(t)) continue;
+            a.add(t);
+            let o = [...n[t]];
+            for (let e of [`end`, `start`])
+              for (;;) {
+                let t = e === `end` ? o.at(-1) : o[0],
+                  r = (i.get(l(t)) ?? []).find((e) => !a.has(e));
+                if (r == null) break;
+                a.add(r);
+                let [s, c] = n[r],
+                  u = l(s) === l(t) ? c : s;
+                e === `end` ? o.push(u) : o.unshift(u);
+              }
+            o.length > 1 && r.push({ level: e, points: o });
+          }
+        }
+        return r;
+      }),
+      (d = (e) => {
+        let t = o(e),
+          r = Array.from({ length: 181 }, (e, n) => {
+            let r = n / 180,
+              i = { x: t.ax + (t.bx - t.ax) * r, y: t.ay + (t.by - t.ay) * r };
+            return { distance: r, point: i, elevation: s(t.terrain_example, i.x, i.y) };
+          }),
+          i = [];
+        for (let e of n)
+          for (let t = 1; t < r.length; t += 1) {
+            let n = r[t - 1],
+              a = r[t],
+              o = n.elevation - e,
+              s = a.elevation - e;
+            if (o >= 0 == s >= 0) continue;
+            let l = c(n.point, a.point, o, s),
+              u = o / (o - s);
+            i.push({
+              distance: n.distance + (a.distance - n.distance) * u,
+              elevation: e,
+              point: l,
+            });
+          }
+        return (
+          i.sort((e, t) => e.distance - t.distance),
+          {
+            state: t,
+            samples: r,
+            crossings: i,
+            minimum: Math.min(...r.map((e) => e.elevation)),
+            maximum: Math.max(...r.map((e) => e.elevation)),
+          }
+        );
+      }));
+  }))();
+}
+export { o as a, f as i, d as n, u as r, t };

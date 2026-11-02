@@ -1,212 +1,330 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  I3 as getJsxRuntime,
-  LX as useScope,
-  _L as useQuery,
-  iL as useMutation,
-  n4 as useIntl,
-  pk as toastManagerSignal,
+  $3 as t,
+  FX as n,
+  HX as r,
+  I3 as i,
+  K2 as a,
+  LX as ee,
+  Y2 as o,
+  Yh as te,
+  Zh as s,
+  _L as ne,
+  gL as c,
+  iL as l,
+  lk as u,
+  n4 as re,
+  pk as ie,
+  rL as d,
 } from "@rchunk/app-shared";
-import { $en as routeScope, pnt as appServices } from "@rchunk/app-initial";
-import { t as EditorHeader } from "@rchunk/editor-header";
-import { t as OpenInLibraryItem } from "@rchunk/open-in-library-item";
-import { r as LibraryBreadcrumb, t as getHeaderContentFade } from "@rchunk/header-content-fade";
-import { r as MarkdownSurface } from "@rchunk/surface";
-import { t as LibraryVersionHistory } from "@rchunk/lazy-version-history";
-import { t as defaultHeaderControls } from "@rchunk/editor-header-controls";
-
-const jsx = getJsxRuntime();
-const MAX_TEXT_DOCUMENT_BYTES = 10 * 1024 * 1024;
-
-interface WorkspaceFileReadResult {
-  blob?: ArrayBuffer | Uint8Array;
-  text?: string;
-}
-
-interface WorkspaceFilesService {
-  downloadCopy?(request: { fileName: string; hostId: string; path: string }): Promise<void>;
-  read(request: {
-    hostId: string;
-    maxBytes: number;
-    path: string;
-    representation: "text";
-  }): Promise<WorkspaceFileReadResult>;
-}
-
-interface LibraryFile {
-  libraryFileId: string;
-}
-
-interface ProviderFile {
-  id?: string;
-  name?: string;
-  [key: string]: unknown;
-}
-
-interface TextDocumentPreviewProps {
-  hostId: string;
-  libraryFile?: LibraryFile | null;
-  onClose(): void;
-  onDownload?(): Promise<void> | void;
-  path: string;
-  previewKind: "markdown" | "text" | string;
-  providerFile?: ProviderFile | null;
-  tabId?: string;
-  title: string;
-}
-
-interface ToastManager {
-  danger(message: string, options?: { errorAnalytics?: { toastId: string } }): void;
-}
-
-interface ScopeApi {
-  get<Value>(signal: unknown): Value;
-}
-
-const services = appServices as unknown as { workspaceFiles?: WorkspaceFilesService };
-
-function formatText(value: string | readonly unknown[]): string {
-  return typeof value === "string" ? value : value.map(String).join("");
-}
-
-function decodeWorkspaceFile(result: WorkspaceFileReadResult): string {
-  if (typeof result.text === "string") return result.text;
-  if (result.blob == null) return "";
-  const bytes = result.blob instanceof Uint8Array ? result.blob : new Uint8Array(result.blob);
-  return new TextDecoder().decode(bytes);
-}
-
-function LoadingState(): unknown {
-  return jsx.jsx("div", {
-    className: "flex h-full items-center justify-center",
-    "aria-busy": true,
-    children: "Loading note…",
-  });
-}
-
-function ChatGptTextDocumentPreview({
-  hostId,
-  libraryFile,
-  onClose,
-  onDownload,
-  path,
-  previewKind,
-  providerFile,
-  tabId,
-  title,
-}: TextDocumentPreviewProps): unknown {
-  const intl = useIntl();
-  const scope = useScope(routeScope) as ScopeApi;
-  const workspaceFiles = services.workspaceFiles;
-  const query = useQuery<string>({
-    queryFn: async () => {
-      if (workspaceFiles == null) throw new Error("Workspace files are unavailable");
-      return decodeWorkspaceFile(await workspaceFiles.read({
-        hostId,
-        maxBytes: MAX_TEXT_DOCUMENT_BYTES,
-        path,
-        representation: "text",
-      }));
-    },
-    queryKey: ["chatgpt-text-document-preview", hostId, path],
-    gcTime: 0,
-    retry: false,
-    staleTime: 0,
-  });
-  const download = useMutation<void>({
-    mutationFn: async () => {
-      if (onDownload != null) {
-        await onDownload();
-        return;
-      }
-      if (workspaceFiles?.downloadCopy == null) throw new Error("File downloads are unavailable");
-      await workspaceFiles.downloadCopy({ fileName: title, hostId, path });
-    },
-    onError: () => {
-      const toasts = scope.get<ToastManager>(toastManagerSignal);
-      toasts.danger(formatText(intl.formatMessage({
-        id: "chatgptTextDocumentPreview.downloadFailed",
-        defaultMessage: "Couldn’t download this file",
-      })), { errorAnalytics: { toastId: "chatgptTextDocumentPreview.downloadFailed" } });
-    },
-  });
-
-  const libraryActions = libraryFile == null ? null : jsx.jsxs(jsx.Fragment, {
-    children: [
-      jsx.jsx(OpenInLibraryItem, { libraryFileId: libraryFile.libraryFileId }),
-      jsx.jsx(LibraryVersionHistory, { file: libraryFile }),
-    ],
-  });
-  const titleActions = jsx.jsxs("div", {
-    className: "flex min-w-0 items-center gap-2",
-    "data-file-name": title,
-    children: [
-      libraryFile == null ? null : jsx.jsx(LibraryBreadcrumb, { libraryFileId: libraryFile.libraryFileId }),
-      jsx.jsx("span", { className: "truncate", children: title }),
-      libraryActions,
-    ],
-  });
-  const supplementalActions = providerFile == null
-    ? defaultHeaderControls.supplementalActions
-    : jsx.jsx("span", { "data-provider-file": providerFile.id ?? providerFile.name ?? "provider-file", children: providerFile.name ?? "Provider file" });
-  const controls = { ...defaultHeaderControls, supplementalActions };
-
-  let content: unknown;
-  if (query.isError) {
-    content = jsx.jsxs("div", {
-      className: "flex h-full flex-col items-center justify-center gap-3",
-      children: [
-        jsx.jsx("span", { children: intl.formatMessage({
-          id: "chatgptTextDocumentPreview.readFailed",
-          defaultMessage: "Couldn’t load this note",
-        }) }),
-        jsx.jsx("button", {
-          type: "button",
-          "aria-disabled": query.isFetching,
-          disabled: query.isFetching,
-          onClick: () => { if (!query.isFetching) void query.refetch(); },
-          children: intl.formatMessage({
-            id: "chatgptTextDocumentPreview.retry",
-            defaultMessage: "Retry",
-          }),
-        }),
-      ],
-    });
-  } else if (query.data == null) {
-    content = jsx.jsx(LoadingState, {});
-  } else {
-    content = jsx.jsx("div", {
-      className: "h-full min-h-0 overflow-y-auto bg-surface text-start",
-      children: jsx.jsx("div", {
-        className: "mx-auto w-full max-w-(--thread-content-max-width) px-toolbar pt-20 pb-8",
-        children: previewKind === "markdown"
-          ? jsx.jsx(MarkdownSurface, { enableMetadataPreview: true, markdown: query.data })
-          : jsx.jsx("div", {
-              className: "text-base leading-7 wrap-anywhere whitespace-pre-wrap text-default select-text",
-              children: query.data,
-            }),
+import {
+  $at as ae,
+  $en as oe,
+  BR as f,
+  C8t as p,
+  KUt as se,
+  Let as ce,
+  Non as le,
+  Ret as m,
+  Rrt as h,
+  S8t as ue,
+  Sun as g,
+  Xrt as _,
+  eot as v,
+  ifn as y,
+  itn as b,
+  mnt as x,
+  mun as de,
+  ofn as fe,
+  pnt as S,
+  qUt as C,
+  zR as pe,
+} from "@rchunk/app-initial";
+import { r as w, t as me } from "@rchunk/editor-header";
+import { n as T, t as E } from "@rchunk/open-in-library-item";
+import { i as D, n as O, r as he, t as ge } from "@rchunk/header-content-fade";
+import { i as k, r as _e } from "@rchunk/surface";
+import { r as A, t as ve } from "@rchunk/lazy-version-history";
+import { n as j, t as M } from "@rchunk/editor-header-controls";
+function N(e) {
+  let t = (0, P.c)(69),
+    {
+      hostId: n,
+      libraryFile: i,
+      providerFile: a,
+      onClose: s,
+      onDownload: c,
+      path: u,
+      previewKind: d,
+      tabId: f,
+      title: p,
+    } = e,
+    m = ee(oe),
+    h = re(),
+    g = r(de),
+    v = r(!1),
+    y = fe(`3765605143`),
+    b;
+  t[0] === p ? (b = t[1]) : ((b = se(p)), (t[0] = p), (t[1] = b));
+  let x = b,
+    C;
+  t[2] !== n || t[3] !== u
+    ? ((C = {
+        queryFn: async () => {
+          let e = await S.workspaceFiles.read({
+            hostId: n,
+            maxBytes: ue,
+            path: u,
+            representation: `text`,
+          });
+          return `text` in e ? e.text : new TextDecoder().decode(le(e.blob));
+        },
+        queryKey: [`chatgpt-text-document-preview`, n, u],
+        gcTime: 0,
+        retry: !1,
+        staleTime: 0,
       }),
-    });
+      (t[2] = n),
+      (t[3] = u),
+      (t[4] = C))
+    : (C = t[4]);
+  let { data: w, errorUpdateCount: T, isError: D, isFetching: O, refetch: k } = ne(C),
+    A;
+  t[5] !== n || t[6] !== c || t[7] !== u || t[8] !== p
+    ? ((A = async () => {
+        if (c != null) {
+          await c();
+          return;
+        }
+        let e = S.workspaceFiles.downloadCopy;
+        if (e == null) throw Error(`File downloads are unavailable`);
+        await e({ fileName: p, hostId: n, path: u });
+      }),
+      (t[5] = n),
+      (t[6] = c),
+      (t[7] = u),
+      (t[8] = p),
+      (t[9] = A))
+    : (A = t[9]);
+  let j;
+  t[10] !== h || t[11] !== m
+    ? ((j = () => {
+        m.get(ie).danger(
+          h.formatMessage({
+            id: `chatgptTextDocumentPreview.downloadFailed`,
+            defaultMessage: `Couldn’t download this file`,
+            description: `Error shown when a plain-text or Markdown attachment cannot be downloaded from its preview`,
+          }),
+          { errorAnalytics: { toastId: `chatgptTextDocumentPreview.downloadFailed` } },
+        );
+      }),
+      (t[10] = h),
+      (t[11] = m),
+      (t[12] = j))
+    : (j = t[12]);
+  let N;
+  t[13] !== A || t[14] !== j
+    ? ((N = { mutationFn: A, onError: j }), (t[13] = A), (t[14] = j), (t[15] = N))
+    : (N = t[15]);
+  let { isPending: I, mutate: L } = l(N),
+    R = y && i != null,
+    z;
+  t[16] !== g || t[17] !== i || t[18] !== m || t[19] !== v || t[20] !== p
+    ? ((z = void 0), (t[16] = g), (t[17] = i), (t[18] = m), (t[19] = v), (t[20] = p), (t[21] = z))
+    : (z = t[21]);
+  let B = z,
+    V;
+  t[22] === i
+    ? (V = t[23])
+    : ((V = i == null ? null : (0, F.jsx)(he, { libraryFileId: i.libraryFileId })),
+      (t[22] = i),
+      (t[23] = V));
+  let H;
+  t[24] !== R || t[25] !== i
+    ? ((H = R ? (0, F.jsx)(E, { libraryFileId: i.libraryFileId }) : null),
+      (t[24] = R),
+      (t[25] = i),
+      (t[26] = H))
+    : (H = t[26]);
+  let U;
+  t[27] !== R || t[28] !== i
+    ? ((U = R ? (0, F.jsx)(ve, { file: i }) : null), (t[27] = R), (t[28] = i), (t[29] = U))
+    : (U = t[29]);
+  let W;
+  t[30] !== x || t[31] !== V || t[32] !== H || t[33] !== U || t[34] !== p
+    ? ((W = (0, F.jsxs)(_, { fileName: p, libraryBreadcrumb: V, title: x, children: [H, U] })),
+      (t[30] = x),
+      (t[31] = V),
+      (t[32] = H),
+      (t[33] = U),
+      (t[34] = p),
+      (t[35] = W))
+    : (W = t[35]);
+  let G = W,
+    K;
+  if (D || (w == null && T > 0)) {
+    let e;
+    t[36] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, F.jsx)(o, {
+          id: `chatgptTextDocumentPreview.readFailed`,
+          defaultMessage: `Couldn’t load this note`,
+          description: `Error shown when a plain-text or Markdown attachment cannot be read for its note-style preview`,
+        })),
+        (t[36] = e))
+      : (e = t[36]);
+    let n;
+    t[37] !== O || t[38] !== k
+      ? ((n = () => {
+          O || k();
+        }),
+        (t[37] = O),
+        (t[38] = k),
+        (t[39] = n))
+      : (n = t[39]);
+    let r;
+    t[40] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((r = (0, F.jsx)(o, {
+          id: `chatgptTextDocumentPreview.retry`,
+          defaultMessage: `Retry`,
+          description: `Button that retries reading a plain-text or Markdown attachment after its note preview failed to load`,
+        })),
+        (t[40] = r))
+      : (r = t[40]);
+    let i;
+    (t[41] !== O || t[42] !== n
+      ? ((i = (0, F.jsxs)(ae, {
+          className: `h-full flex-col gap-3`,
+          children: [
+            e,
+            (0, F.jsx)(te, { "aria-disabled": O, color: `secondary`, onClick: n, children: r }),
+          ],
+        })),
+        (t[41] = O),
+        (t[42] = n),
+        (t[43] = i))
+      : (i = t[43]),
+      (K = i));
+  } else if (w == null) {
+    let e;
+    (t[44] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, F.jsx)(ce, { debugName: `ChatGptTextDocumentPreview`, fillParent: !0 })),
+        (t[44] = e))
+      : (e = t[44]),
+      (K = e));
+  } else {
+    let e;
+    (t[45] !== d || t[46] !== w
+      ? ((e = (0, F.jsx)(`div`, {
+          className: `h-full min-h-0 overflow-y-auto bg-surface text-start`,
+          children: (0, F.jsx)(`div`, {
+            className: `mx-auto w-full max-w-(--thread-content-max-width) px-toolbar pt-20 pb-8`,
+            children:
+              d === `markdown`
+                ? (0, F.jsx)(_e, { enableMetadataPreview: !0, markdown: w })
+                : (0, F.jsx)(`div`, {
+                    className: `text-base leading-7 wrap-anywhere whitespace-pre-wrap text-default select-text`,
+                    children: w,
+                  }),
+          }),
+        })),
+        (t[45] = d),
+        (t[46] = w),
+        (t[47] = e))
+      : (e = t[47]),
+      (K = e));
   }
-
-  const header = jsx.jsx(EditorHeader, {
-    actions: titleActions,
-    contentFade: getHeaderContentFade("text-document"),
-    controls,
-    downloadPending: download.isPending,
-    onClose,
-    onDownload: () => download.mutate(),
-    tabId,
-    title,
-  });
-
-  return jsx.jsxs("section", {
-    className: "relative flex h-full min-h-0 flex-col bg-surface",
-    children: [
-      header,
-      jsx.jsx("div", { className: "relative min-h-0 flex-1", children: content }),
-    ],
-  });
+  let q;
+  t[48] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((q = ge(`text-document`)), (t[48] = q))
+    : (q = t[48]);
+  let J;
+  t[49] === a
+    ? (J = t[50])
+    : ((J = a == null ? null : (0, F.jsx)(pe, { ...a, toolbar: !0 })), (t[49] = a), (t[50] = J));
+  let Y;
+  t[51] === J ? (Y = t[52]) : ((Y = { ...M, supplementalActions: J }), (t[51] = J), (t[52] = Y));
+  let X;
+  t[53] === L ? (X = t[54]) : ((X = () => L()), (t[53] = L), (t[54] = X));
+  let Z;
+  t[55] !== G ||
+  t[56] !== x ||
+  t[57] !== I ||
+  t[58] !== s ||
+  t[59] !== B ||
+  t[60] !== Y ||
+  t[61] !== X ||
+  t[62] !== f
+    ? ((Z = (0, F.jsx)(me, {
+        actions: G,
+        contentFade: q,
+        controls: Y,
+        downloadPending: I,
+        onClose: s,
+        onDownload: X,
+        onShare: B,
+        tabId: f,
+        title: x,
+      })),
+      (t[55] = G),
+      (t[56] = x),
+      (t[57] = I),
+      (t[58] = s),
+      (t[59] = B),
+      (t[60] = Y),
+      (t[61] = X),
+      (t[62] = f),
+      (t[63] = Z))
+    : (Z = t[63]);
+  let Q;
+  t[64] === K
+    ? (Q = t[65])
+    : ((Q = (0, F.jsx)(`div`, { className: `relative min-h-0 flex-1`, children: K })),
+      (t[64] = K),
+      (t[65] = Q));
+  let $;
+  return (
+    t[66] !== Z || t[67] !== Q
+      ? (($ = (0, F.jsxs)(`section`, {
+          className: `relative flex h-full min-h-0 flex-col bg-surface`,
+          children: [Z, Q],
+        })),
+        (t[66] = Z),
+        (t[67] = Q),
+        (t[68] = $))
+      : ($ = t[68]),
+    $
+  );
 }
-
-export { ChatGptTextDocumentPreview };
+var P, F;
+function I() {
+  return (I = e(() => {
+    ((P = t()),
+      d(),
+      c(),
+      n(),
+      a(),
+      w(),
+      j(),
+      O(),
+      g(),
+      s(),
+      v(),
+      u(),
+      p(),
+      D(),
+      f(),
+      m(),
+      k(),
+      x(),
+      b(),
+      y(),
+      h(),
+      A(),
+      T(),
+      C(),
+      (F = i()));
+  }))();
+}
+I();
+export { N as ChatGptTextDocumentPreview };

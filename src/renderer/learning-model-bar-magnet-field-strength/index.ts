@@ -1,7 +1,82 @@
-// Bar-magnet field-strength learning model. Release chunk: model-607b6057cda2.js.
-import "@rchunk/rolldown-runtime";
-interface Point { x: number; y: number }
-interface FieldLine { id: string; side: "above" | "below"; northEndpoint: Point; northOuterControl: Point; northApexControl: Point; arrowFrom: Point; arrowTo: Point; southApexControl: Point; southOuterControl: Point; southEndpoint: Point }
-let canvas: { width: number; height: number }; let magnet: { x: number; y: number; width: number; height: number }; let fieldLines: FieldLine[]; let defaultProbe: { probeX: number; probeY: number }; let constrainProbe: (point: Point) => Point; let normalizeProbe: (values: { probeX?: number | null; probeY?: number | null }) => { probeX: number; probeY: number }; let calculateField: (point: Point) => { x: number; y: number; magnitude: number; angleDegrees: number }; let normalizeStrength: (magnitude: number) => number; let classifyStrength: (strength: number) => "strong" | "medium" | "weak"; let magnetBounds: typeof magnet; let initialized = false;
-function initializeModel(): void { if (initialized) return; initialized = true; canvas = { width: 384, height: 288 }; magnet = { x: 112, y: 144, width: 160, height: 40 }; magnetBounds = magnet; const north = { x: magnet.x, y: magnet.y + magnet.height / 2 }; const south = { x: magnet.x + magnet.width, y: magnet.y + magnet.height / 2 }; const bounds = { minX: 48, maxX: 336, minY: 88, maxY: 240 }; defaultProbe = { probeX: 312, probeY: 112 }; const templates = [{ apexOffset: 32, endpointOffset: 4, controlReach: 36 }, { apexOffset: 56, endpointOffset: 12, controlReach: 48 }, { apexOffset: 80, endpointOffset: 20, controlReach: 60 }]; const centerY = magnet.y + magnet.height / 2; const line = (side: "above" | "below", template: typeof templates[number], index: number): FieldLine => { const direction = side === "above" ? -1 : 1; const endpointY = centerY + direction * template.endpointOffset; const apexY = centerY + direction * template.apexOffset; const centerX = magnet.x + magnet.width / 2; return { id: `${side}-${index}`, side, northEndpoint: { x: magnet.x, y: endpointY }, northOuterControl: { x: magnet.x - template.controlReach, y: endpointY }, northApexControl: { x: magnet.x - template.controlReach, y: apexY }, arrowFrom: { x: centerX - 12, y: apexY }, arrowTo: { x: centerX + 12, y: apexY }, southApexControl: { x: magnet.x + magnet.width + template.controlReach, y: apexY }, southOuterControl: { x: magnet.x + magnet.width + template.controlReach, y: endpointY }, southEndpoint: { x: magnet.x + magnet.width, y: endpointY } }; }; fieldLines = [...templates.map((template, index) => line("above", template, index)), ...templates.map((template, index) => line("below", template, index))]; const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max); const finite = (value: number | null | undefined, fallback: number) => typeof value === "number" && Number.isFinite(value) ? value : fallback; constrainProbe = point => { const constrained = { x: clamp(finite(point.x, defaultProbe.probeX), bounds.minX, bounds.maxX), y: clamp(finite(point.y, defaultProbe.probeY), bounds.minY, bounds.maxY) }; const exclusion = { left: magnet.x - 32, right: magnet.x + magnet.width + 32, top: magnet.y - 32, bottom: magnet.y + magnet.height + 32 }; if (!(constrained.x > exclusion.left && constrained.x < exclusion.right && constrained.y > exclusion.top && constrained.y < exclusion.bottom)) return constrained; const candidates = [{ distance: Math.abs(constrained.x - exclusion.left), point: { x: exclusion.left, y: constrained.y } }, { distance: Math.abs(constrained.x - exclusion.right), point: { x: exclusion.right, y: constrained.y } }, { distance: Math.abs(constrained.y - exclusion.top), point: { x: constrained.x, y: exclusion.top } }, { distance: Math.abs(constrained.y - exclusion.bottom), point: { x: constrained.x, y: exclusion.bottom } }].sort((left, right) => left.distance - right.distance); return candidates[0]?.point ?? constrained; }; normalizeProbe = values => { const point = constrainProbe({ x: finite(values.probeX, defaultProbe.probeX), y: finite(values.probeY, defaultProbe.probeY) }); return { probeX: point.x, probeY: point.y }; }; const poleField = (point: Point, pole: Point, polarity: number) => { const dx = point.x - pole.x; const dy = point.y - pole.y; const denominator = (dx * dx + dy * dy + 256) ** 1.5; return { x: polarity * dx / denominator, y: polarity * dy / denominator }; }; calculateField = point => { const northField = poleField(point, north, 1); const southField = poleField(point, south, -1); const x = northField.x + southField.x; const y = northField.y + southField.y; return { x, y, magnitude: Math.hypot(x, y), angleDegrees: Math.atan2(y, x) * 180 / Math.PI }; }; normalizeStrength = magnitude => !Number.isFinite(magnitude) || magnitude <= 0 ? 0 : clamp(magnitude / 0.00067, 0, 1); classifyStrength = strength => strength >= 0.67 ? "strong" : strength >= 0.25 ? "medium" : "weak"; }
-export { constrainProbe as a, normalizeStrength as c, canvas as i, initializeModel as l, fieldLines as n, classifyStrength as o, magnetBounds as r, calculateField as s, defaultProbe as t, normalizeProbe as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C;
+function w() {
+  return (w = e(() => {
+    ((t = { width: 384, height: 288 }),
+      (n = { x: 112, y: 144, width: 160, height: 40 }),
+      (r = { x: n.x, y: n.y + n.height / 2 }),
+      (i = { x: n.x + n.width, y: n.y + n.height / 2 }),
+      (a = { minX: 48, maxX: 336, minY: 88, maxY: 240 }),
+      (o = { probeX: 312, probeY: 112 }),
+      (s = [
+        { apexOffset: 32, endpointOffset: 4, controlReach: 36 },
+        { apexOffset: 56, endpointOffset: 12, controlReach: 48 },
+        { apexOffset: 80, endpointOffset: 20, controlReach: 60 },
+      ]),
+      (c = n.y + n.height / 2),
+      (l = 12),
+      (u = (e, t, r) => {
+        let i = e === `above` ? -1 : 1,
+          a = c + i * t.endpointOffset,
+          o = c + i * t.apexOffset,
+          s = n.x + n.width / 2;
+        return {
+          id: `${e}-${r}`,
+          side: e,
+          northEndpoint: { x: n.x, y: a },
+          northOuterControl: { x: n.x - t.controlReach, y: a },
+          northApexControl: { x: n.x - t.controlReach, y: o },
+          arrowFrom: { x: s - l, y: o },
+          arrowTo: { x: s + l, y: o },
+          southApexControl: { x: n.x + n.width + t.controlReach, y: o },
+          southOuterControl: { x: n.x + n.width + t.controlReach, y: a },
+          southEndpoint: { x: n.x + n.width, y: a },
+        };
+      }),
+      (d = [...s.map((e, t) => u(`above`, e, t)), ...s.map((e, t) => u(`below`, e, t))]),
+      (f = 32),
+      (p = 67e-5),
+      (m = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (h = (e, t) => (Number.isFinite(e) ? e : t)),
+      (g = (e, t) => Math.abs(e.x - t)),
+      (_ = (e, t) => Math.abs(e.y - t)),
+      (v = (e) => {
+        let t = { x: m(h(e.x, o.probeX), a.minX, a.maxX), y: m(h(e.y, o.probeY), a.minY, a.maxY) },
+          r = { left: n.x - f, right: n.x + n.width + f, top: n.y - f, bottom: n.y + n.height + f };
+        if (!(t.x > r.left && t.x < r.right && t.y > r.top && t.y < r.bottom)) return t;
+        let i = [
+          { distance: g(t, r.left), point: { x: r.left, y: t.y } },
+          { distance: g(t, r.right), point: { x: r.right, y: t.y } },
+          { distance: _(t, r.top), point: { x: t.x, y: r.top } },
+          { distance: _(t, r.bottom), point: { x: t.x, y: r.bottom } },
+        ];
+        return (i.sort((e, t) => e.distance - t.distance), i[0]?.point ?? t);
+      }),
+      (y = (e) => {
+        let t = v({ x: h(e.probeX ?? NaN, o.probeX), y: h(e.probeY ?? NaN, o.probeY) });
+        return { probeX: t.x, probeY: t.y };
+      }),
+      (b = (e, t, n) => {
+        let r = e.x - t.x,
+          i = e.y - t.y,
+          a = (r * r + i * i + 256) ** 1.5;
+        return { x: (n * r) / a, y: (n * i) / a };
+      }),
+      (x = (e) => {
+        let t = b(e, r, 1),
+          n = b(e, i, -1),
+          a = t.x + n.x,
+          o = t.y + n.y;
+        return {
+          x: a,
+          y: o,
+          magnitude: Math.hypot(a, o),
+          angleDegrees: (Math.atan2(o, a) * 180) / Math.PI,
+        };
+      }),
+      (S = (e) => (!Number.isFinite(e) || e <= 0 ? 0 : m(e / p, 0, 1))),
+      (C = (e) => (e >= 0.67 ? `strong` : e >= 0.25 ? `medium` : `weak`)));
+  }))();
+}
+export { v as a, S as c, t as i, w as l, d as n, C as o, n as r, x as s, o as t, y as u };

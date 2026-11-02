@@ -1,51 +1,32 @@
-import "@rchunk/rolldown-runtime";
-
-function stringEnum<const Values extends readonly string[]>(values: Values): {
-  [Key in Values[number]]: Key;
-} {
-  return Object.fromEntries(values.map((value) => [value, value])) as {
-    [Key in Values[number]]: Key;
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = (function (e) {
+      return (
+        (e.CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_UNSPECIFIED = `CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_UNSPECIFIED`),
+        (e.CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_IMAGE_CARD = `CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_IMAGE_CARD`),
+        (e.CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_TEXT_PILL = `CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_TEXT_PILL`),
+        (e.CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_PORTRAIT = `CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_PORTRAIT`),
+        (e.CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_ICON_PILL = `CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_ICON_PILL`),
+        (e.UNRECOGNIZED = `UNRECOGNIZED`),
+        e
+      );
+    })({})),
+      (n = (function (e) {
+        return (
+          (e.CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_UNSPECIFIED = `CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_UNSPECIFIED`),
+          (e.CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_IMAGES = `CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_IMAGES`),
+          (e.CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_PHOTO_BOOTH = `CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_PHOTO_BOOTH`),
+          (e.CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_CHATGPT_HOME = `CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_CHATGPT_HOME`),
+          (e.UNRECOGNIZED = `UNRECOGNIZED`),
+          e
+        );
+      })({})),
+      (r = { $type: `protobuf_analytics_events.v1.ChatgptImagePromptImpression` }),
+      (i = { $type: `protobuf_analytics_events.v1.ChatgptImagePromptSelected` }),
+      (a = { $type: `protobuf_analytics_events.v1.ChatgptImagePromptSent` }));
+  }))();
 }
-
-let promptPresentationType: Record<string, string>;
-let promptSentSurfaceType: Record<string, string>;
-let promptImpressionEvent: { $type: string };
-let promptSelectedEvent: { $type: string };
-let promptSentEvent: { $type: string };
-
-function initializeChatGptImageHomeEvents(): void {
-  promptPresentationType = stringEnum([
-    "CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_UNSPECIFIED",
-    "CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_IMAGE_CARD",
-    "CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_TEXT_PILL",
-    "CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_PORTRAIT",
-    "CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_ICON_PILL",
-    "UNRECOGNIZED",
-  ]);
-  promptSentSurfaceType = stringEnum([
-    "CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_UNSPECIFIED",
-    "CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_IMAGES",
-    "CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_PHOTO_BOOTH",
-    "CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_CHATGPT_HOME",
-    "UNRECOGNIZED",
-  ]);
-  promptImpressionEvent = {
-    $type: "protobuf_analytics_events.v1.ChatgptImagePromptImpression",
-  };
-  promptSelectedEvent = {
-    $type: "protobuf_analytics_events.v1.ChatgptImagePromptSelected",
-  };
-  promptSentEvent = {
-    $type: "protobuf_analytics_events.v1.ChatgptImagePromptSent",
-  };
-}
-
-export {
-  promptSentSurfaceType as a,
-  promptSentEvent as i,
-  promptImpressionEvent as n,
-  initializeChatGptImageHomeEvents as o,
-  promptSelectedEvent as r,
-  promptPresentationType as t,
-};
+export { n as a, a as i, r as n, o, i as r, t };

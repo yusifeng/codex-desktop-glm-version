@@ -1,91 +1,197 @@
-import { e6 as getReactRuntime, type ReactRuntime } from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
-
-export interface PageNavigationOptions {
-  containerRef: { current: Element | null };
-  initialPage?: number;
-  isPageLayoutReady: boolean;
-  onPageChange?(page: number): void;
-  pageSelector: string;
-  totalPages: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, __ as n, e6 as r, g_ as i } from "@rchunk/app-shared";
+function a(e) {
+  let t = (0, l.c)(36),
+    {
+      containerRef: r,
+      initialPage: i,
+      isPageLayoutReady: a,
+      onPageChange: p,
+      pageSelector: m,
+      totalPages: h,
+    } = e,
+    g = i === void 0 ? 1 : i,
+    [_, v] = (0, u.useState)(g),
+    y = (0, u.useRef)(g),
+    b = (0, u.useRef)(g),
+    x = (0, u.useRef)(null),
+    S = (0, u.useRef)(null),
+    C = s(_, h),
+    w;
+  t[0] === p
+    ? (w = t[1])
+    : ((w = (e) => {
+        e !== y.current && ((y.current = e), v(e), p?.(e));
+      }),
+      (t[0] = p),
+      (t[1] = w));
+  let T = n(w),
+    E;
+  t[2] !== r || t[3] !== m || t[4] !== T
+    ? ((E = (e, t) => {
+        let n = r.current;
+        if (n == null) return;
+        let i = o(n, m).at(e - 1);
+        if (i == null) return;
+        (S.current?.(), (S.current = null), (x.current = e));
+        let a = null,
+          s = () => {
+            (a != null && (clearTimeout(a), (a = null)), n.removeEventListener(`scroll`, u));
+          },
+          l = () => {
+            if (x.current !== e) return;
+            ((x.current = null), s());
+            let t = c({ container: n, pageElements: o(n, m), pageVisibilityByElement: new Map() });
+            t != null && T(t);
+          },
+          u = () => {
+            (a != null && clearTimeout(a), (a = setTimeout(l, f)));
+          };
+        ((S.current = s),
+          i.scrollIntoView(t == null ? { block: `start` } : { behavior: t, block: `start` }),
+          T(e),
+          u(),
+          n.addEventListener(`scroll`, u));
+      }),
+      (t[2] = r),
+      (t[3] = m),
+      (t[4] = T),
+      (t[5] = E))
+    : (E = t[5]);
+  let D = n(E),
+    O,
+    k;
+  (t[6] !== r || t[7] !== a || t[8] !== m || t[9] !== D || t[10] !== h || t[11] !== T
+    ? ((O = () => {
+        let e = r.current;
+        if (!a || e == null || h < 1 || b.current == null || o(e, m).length === 0) return;
+        let t = s(b.current, h);
+        ((b.current = null), t > 1 ? D(t, void 0) : T(t));
+      }),
+      (k = [r, a, m, D, h, T]),
+      (t[6] = r),
+      (t[7] = a),
+      (t[8] = m),
+      (t[9] = D),
+      (t[10] = h),
+      (t[11] = T),
+      (t[12] = O),
+      (t[13] = k))
+    : ((O = t[12]), (k = t[13])),
+    (0, u.useLayoutEffect)(O, k));
+  let A, j;
+  (t[14] !== r || t[15] !== a || t[16] !== m || t[17] !== h || t[18] !== T
+    ? ((A = () => {
+        let e = r.current;
+        if (!a || e == null || h < 1 || typeof IntersectionObserver > `u`) return;
+        let t = o(e, m);
+        if (t.length === 0) return;
+        let n = new Map(),
+          i = new IntersectionObserver(
+            (r) => {
+              for (let e of r) n.set(e.target, e.intersectionRatio);
+              let i = c({ container: e, pageElements: t, pageVisibilityByElement: n });
+              i != null &&
+                (x.current == null || i === x.current) &&
+                (i === x.current && ((x.current = null), S.current?.(), (S.current = null)), T(i));
+            },
+            { root: e, threshold: d },
+          );
+        for (let e of t) (n.set(e, 0), i.observe(e));
+        let s = c({ container: e, pageElements: t, pageVisibilityByElement: n });
+        return (
+          s != null && x.current == null && T(s),
+          () => {
+            (i.disconnect(), (x.current = null), S.current?.(), (S.current = null));
+          }
+        );
+      }),
+      (j = [r, a, m, h, T]),
+      (t[14] = r),
+      (t[15] = a),
+      (t[16] = m),
+      (t[17] = h),
+      (t[18] = T),
+      (t[19] = A),
+      (t[20] = j))
+    : ((A = t[19]), (j = t[20])),
+    (0, u.useEffect)(A, j));
+  let M;
+  t[21] !== D || t[22] !== h
+    ? ((M = (e, t) => {
+        let n = t === void 0 ? `smooth` : t;
+        D(s(e, h), n);
+      }),
+      (t[21] = D),
+      (t[22] = h),
+      (t[23] = M))
+    : (M = t[23]);
+  let N = M,
+    P;
+  t[24] !== C || t[25] !== N
+    ? ((P = () => {
+        let e = C - 1;
+        e < 1 || N(e);
+      }),
+      (t[24] = C),
+      (t[25] = N),
+      (t[26] = P))
+    : (P = t[26]);
+  let F = P,
+    I;
+  t[27] !== C || t[28] !== N || t[29] !== h
+    ? ((I = () => {
+        let e = C + 1;
+        e > h || N(e);
+      }),
+      (t[27] = C),
+      (t[28] = N),
+      (t[29] = h),
+      (t[30] = I))
+    : (I = t[30]);
+  let L = I,
+    R;
+  return (
+    t[31] !== C || t[32] !== L || t[33] !== N || t[34] !== F
+      ? ((R = { currentPage: C, goToPage: N, goToNextPage: L, goToPreviousPage: F }),
+        (t[31] = C),
+        (t[32] = L),
+        (t[33] = N),
+        (t[34] = F),
+        (t[35] = R))
+      : (R = t[35]),
+    R
+  );
 }
-
-export interface PageNavigation {
-  currentPage: number;
-  goToPage(page: number, behavior?: ScrollBehavior): void;
-  goToNextPage(): void;
-  goToPreviousPage(): void;
+function o(e, t) {
+  return Array.from(e.querySelectorAll(t));
 }
-
-let React: ReactRuntime;
-
-function clampPage(page: number, totalPages: number): number {
-  return Math.min(Math.max(page, 1), Math.max(totalPages, 1));
+function s(e, t) {
+  return Math.min(Math.max(e, 1), Math.max(t, 1));
 }
-
-function useArtifactPreviewPageNavigation(options: PageNavigationOptions): PageNavigation {
-  const initialPage = clampPage(options.initialPage ?? 1, options.totalPages);
-  const [currentPage, setCurrentPage] = React.useState(initialPage);
-  const currentPageRef = React.useRef(initialPage);
-
-  const setPage = (page: number): void => {
-    if (page === currentPageRef.current) return;
-    currentPageRef.current = page;
-    setCurrentPage(page);
-    options.onPageChange?.(page);
-  };
-  const goToPage = (page: number, behavior: ScrollBehavior = "smooth"): void => {
-    const nextPage = clampPage(page, options.totalPages);
-    const elements = Array.from(
-      options.containerRef.current?.querySelectorAll(options.pageSelector) ?? [],
-    );
-    elements.at(nextPage - 1)?.scrollIntoView({ behavior, block: "start" });
-    setPage(nextPage);
-  };
-
-  React.useLayoutEffect(() => {
-    if (!options.isPageLayoutReady) return;
-    goToPage(initialPage, "auto");
-  }, [options.isPageLayoutReady, options.totalPages, options.pageSelector]);
-
-  React.useEffect(() => {
-    const container = options.containerRef.current;
-    if (!options.isPageLayoutReady || container == null || typeof IntersectionObserver === "undefined")
-      return;
-    const elements = Array.from(container.querySelectorAll(options.pageSelector));
-    const visibility = new Map<Element, number>();
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) visibility.set(entry.target, entry.intersectionRatio);
-      let bestIndex = -1;
-      let bestRatio = 0;
-      visibility.forEach((ratio, element) => {
-        const index = elements.indexOf(element);
-        if (ratio > bestRatio) {
-          bestIndex = index;
-          bestRatio = ratio;
-        }
-      });
-      if (bestIndex >= 0) setPage(bestIndex + 1);
-    }, { root: container, threshold: [0, 0.25, 0.5, 0.75, 1] });
-    for (const element of elements) observer.observe(element);
-    return () => observer.disconnect();
-  }, [options.containerRef, options.isPageLayoutReady, options.pageSelector, options.totalPages]);
-
-  return {
-    currentPage: clampPage(currentPage, options.totalPages),
-    goToPage,
-    goToNextPage: () => {
-      if (currentPageRef.current < options.totalPages)
-        goToPage(currentPageRef.current + 1);
-    },
-    goToPreviousPage: () => {
-      if (currentPageRef.current > 1) goToPage(currentPageRef.current - 1);
-    },
-  };
+function c({ container: e, pageElements: t, pageVisibilityByElement: n }) {
+  if (t.length === 0) return null;
+  let r = 0,
+    i = -1;
+  for (let [e, a] of t.entries()) {
+    let t = n.get(a) ?? 0;
+    t > i && ((i = t), (r = e));
+  }
+  if (i > 0) return r + 1;
+  let a = e.getBoundingClientRect().top,
+    o = 0,
+    s = 1 / 0;
+  for (let [e, n] of t.entries()) {
+    let t = Math.abs(n.getBoundingClientRect().top - a);
+    t < s && ((s = t), (o = e));
+  }
+  return o + 1;
 }
-
-function initializeArtifactPreviewPageNavigation(): void {
-  React = getReactRuntime();
+var l, u, d, f;
+function p() {
+  return (p = e(() => {
+    ((l = t()), (u = r()), i(), (d = [0, 0.25, 0.5, 0.75, 1]), (f = 100));
+  }))();
 }
-
-export { useArtifactPreviewPageNavigation as n, initializeArtifactPreviewPageNavigation as t };
+export { a as n, p as t };

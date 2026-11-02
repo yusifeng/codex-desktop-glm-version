@@ -1,5 +1,23 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Owner-family large convergence：从剩余正向行数缺口最高的 preview、plugin、
+learning-model、Chronicle、conversation resume、artifact navigation 与 workspace owner
+出发，将受旧缩减 ABI/mock 牵连的完整测试家族一并扩展恢复，共收口 84 个发布 owner。
+主要家族包括 34 个 learning models，action/plugin menus，text document preview，
+Chronicle/personalization，security/resume，portable preview/entry data，Valdi account，
+annotation controls，以及轻量 route/dialog owners。renderer 变更为 10,066 行新增、
+4,105 行删除，净恢复 5,961 行发布 TypeScript；18 个旧行为 mock cluster 已迁移为
+84 个发布 owner 的严格全文一致性验证。提交前逐 owner 复验 84/84，并通过
+12,448/12,448 transform check、1,888/1,888 renderer build/verify、
+2,247/2,247 app-code coverage、0 semantic tail、typecheck 与 1,912-script
+test-index。严格 hub 消费为 app-shared 1,806/3,185、app-initial 5,924/8,204、
+app-primary 772/917，仍为 0 unreviewed、0 invalid consumers。按发布源码正向
+行数缺口口径，剩余由 18,791 行降至 12,620 行，覆盖率约 98.78%；可比对 owner
+中已有 617 个与发布证据一致，仍有 1,245 个不完全一致，另有 454 个缺少双方
+可比资产。425 个 preserved 边界和三个聚合 hub 的剩余耦合导出仍需继续收口；
+登录态关键 E2E 已有通过记录，但本批未重跑最终完整矩阵，因此不构成
+“完整反编译完成”。
+
 2026-11-02 Preview/plugin/learning release-owner convergence：按剩余正向行数缺口一次性恢复
 `learning-model-one-sample-t-test`、`learning-model-synthetic-division`、
 `library-file-preview-kind`、`registered-subagents-thumbnail`、`file-image-thumbnail`、

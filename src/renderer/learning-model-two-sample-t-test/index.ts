@@ -1,7 +1,93 @@
-// Two-sample t-test learning model. Release chunk: model-2470e84b6d61.js.
-import "@rchunk/rolldown-runtime";
-interface Parameter { kind: "number"; defaultValue: number; min: number; max: number } interface Manifest { type: string; version: number; thumbnailAssetKey: string; parameters: { meanDifference: Parameter; standardError: Parameter; degreesOfFreedom: Parameter } }
-let manifest: Manifest; let meanDifferenceParameter: Parameter; let standardErrorParameter: Parameter; let degreesOfFreedomParameter: Parameter; let studentTDensity: (value: number, degreesOfFreedom: number) => number; let calculate: (values: { meanDifference?: number | null; standardError?: number | null; degreesOfFreedom?: number | null }) => { meanDifference: number; standardError: number; degreesOfFreedom: number; tStatistic: number; pValue: number }; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "TWO_SAMPLE_T_TEST", version: 2, thumbnailAssetKey: "two-sample-t-test-v1", parameters: { meanDifference: { kind: "number", defaultValue: 1.5, min: -3, max: 3 }, standardError: { kind: "number", defaultValue: 0.75, min: 0.75, max: 3 }, degreesOfFreedom: { kind: "number", defaultValue: 20, min: 2, max: 200 } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); meanDifferenceParameter = manifest.parameters.meanDifference; standardErrorParameter = manifest.parameters.standardError; degreesOfFreedomParameter = manifest.parameters.degreesOfFreedom; const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max); const normalize = (value: number | null | undefined, parameter: Parameter) => clamp(typeof value === "number" && Number.isFinite(value) ? value : parameter.defaultValue, parameter.min, parameter.max); const coefficients = [0.9999999999998099, 676.5203681218851, -1259.1392167224028, 771.3234287776531, -176.6150291621406, 12.507343278686905, -0.13857109526572012, 9.984369578019572e-6, 1.5056327351493116e-7]; const logGamma = (value: number): number => { if (value < 0.5) return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * value)) - logGamma(1 - value); const shifted = value - 1; let sum = coefficients[0] ?? 0; for (let index = 1; index < coefficients.length; index += 1) sum += (coefficients[index] ?? 0) / (shifted + index); const t = shifted + 7.5; return 0.5 * Math.log(2 * Math.PI) + (shifted + 0.5) * Math.log(t) - t + Math.log(sum); }; const fraction = (a: number, b: number, x: number) => { const tiny = 1e-30; let c = 1; let d = 1 - (a + b) * x / (a + 1); if (Math.abs(d) < tiny) d = tiny; d = 1 / d; let result = d; for (let iteration = 1; iteration <= 200; iteration += 1) { const doubled = 2 * iteration; let coefficient = iteration * (b - iteration) * x / ((a + doubled - 1) * (a + doubled)); d = 1 + coefficient * d; if (Math.abs(d) < tiny) d = tiny; c = 1 + coefficient / c; if (Math.abs(c) < tiny) c = tiny; d = 1 / d; result *= d * c; coefficient = -((a + iteration) * (a + b + iteration) * x) / ((a + doubled) * (a + doubled + 1)); d = 1 + coefficient * d; if (Math.abs(d) < tiny) d = tiny; c = 1 + coefficient / c; if (Math.abs(c) < tiny) c = tiny; d = 1 / d; const delta = d * c; result *= delta; if (Math.abs(delta - 1) < 3e-14) break; } return result; }; const incompleteBeta = (x: number, a: number, b: number) => { if (x <= 0) return 0; if (x >= 1) return 1; const front = Math.exp(logGamma(a + b) - logGamma(a) - logGamma(b) + a * Math.log(x) + b * Math.log1p(-x)); return x < (a + 1) / (a + b + 2) ? front * fraction(a, b, x) / a : 1 - front * fraction(b, a, 1 - x) / b; }; const twoSidedP = (t: number, degrees: number) => { const magnitude = Math.abs(t); if (magnitude === 0) return 1; return clamp(incompleteBeta(degrees / (degrees + magnitude ** 2), degrees / 2, 0.5), 0, 1); }; studentTDensity = (value, degrees) => Math.exp(logGamma((degrees + 1) / 2) - logGamma(degrees / 2) - 0.5 * Math.log(degrees * Math.PI)) * (1 + value ** 2 / degrees) ** (-(degrees + 1) / 2); calculate = values => { const normalized = { meanDifference: normalize(values.meanDifference, meanDifferenceParameter), standardError: normalize(values.standardError, standardErrorParameter), degreesOfFreedom: normalize(values.degreesOfFreedom, degreesOfFreedomParameter) }; const tStatistic = normalized.meanDifference / normalized.standardError; return { ...normalized, tStatistic, pValue: twoSidedP(tStatistic, normalized.degreesOfFreedom) }; }; }
-export { studentTDensity as a, manifest as c, calculate as i, meanDifferenceParameter as n, initializeModel as o, standardErrorParameter as r, initializeManifest as s, degreesOfFreedomParameter as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `TWO_SAMPLE_T_TEST`),
+      (n = `two-sample-t-test-v1`),
+      (r = {
+        meanDifference: { kind: `number`, defaultValue: 1.5, min: -3, max: 3 },
+        standardError: { kind: `number`, defaultValue: 0.75, min: 0.75, max: 3 },
+        degreesOfFreedom: { kind: `number`, defaultValue: 20, min: 2, max: 200 },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v;
+function y() {
+  return (y = e(() => {
+    (a(),
+      (o = i.parameters.meanDifference),
+      (s = i.parameters.standardError),
+      (c = i.parameters.degreesOfFreedom),
+      (l = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (u = (e, t) =>
+        l(typeof e == `number` && Number.isFinite(e) ? e : t.defaultValue, t.min, t.max)),
+      (d = (e) => ({
+        meanDifference: u(e.meanDifference, o),
+        standardError: u(e.standardError, s),
+        degreesOfFreedom: u(e.degreesOfFreedom, c),
+      })),
+      (f = [
+        0.9999999999998099, 676.5203681218851, -1259.1392167224028, 771.3234287776531,
+        -176.6150291621406, 12.507343278686905, -0.13857109526572012, 9984369578019572e-21,
+        1.5056327351493116e-7,
+      ]),
+      (p = (e) => {
+        if (e < 0.5) return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * e)) - p(1 - e);
+        let t = e - 1,
+          n = f[0];
+        for (let e = 1; e < f.length; e += 1) n += f[e] / (t + e);
+        let r = t + 7.5;
+        return 0.5 * Math.log(2 * Math.PI) + (t + 0.5) * Math.log(r) - r + Math.log(n);
+      }),
+      (m = (e, t, n) => {
+        let r = 1e-30,
+          i = 1,
+          a = 1 - ((e + t) * n) / (e + 1);
+        (Math.abs(a) < r && (a = r), (a = 1 / a));
+        let o = a;
+        for (let s = 1; s <= 200; s += 1) {
+          let c = 2 * s,
+            l = (s * (t - s) * n) / ((e + c - 1) * (e + c));
+          ((a = 1 + l * a),
+            Math.abs(a) < r && (a = r),
+            (i = 1 + l / i),
+            Math.abs(i) < r && (i = r),
+            (a = 1 / a),
+            (o *= a * i),
+            (l = -((e + s) * (e + t + s) * n) / ((e + c) * (e + c + 1))),
+            (a = 1 + l * a),
+            Math.abs(a) < r && (a = r),
+            (i = 1 + l / i),
+            Math.abs(i) < r && (i = r),
+            (a = 1 / a));
+          let u = a * i;
+          if (((o *= u), Math.abs(u - 1) < 3e-14)) break;
+        }
+        return o;
+      }),
+      (h = (e, t, n) => {
+        if (e <= 0) return 0;
+        if (e >= 1) return 1;
+        let r = Math.exp(p(t + n) - p(t) - p(n) + t * Math.log(e) + n * Math.log1p(-e));
+        return e < (t + 1) / (t + n + 2) ? (r * m(t, n, e)) / t : 1 - (r * m(n, t, 1 - e)) / n;
+      }),
+      (g = (e, t) => {
+        let n = Math.abs(e);
+        if (n === 0) return 1;
+        let r = t / (t + n ** 2);
+        return l(h(r, t / 2, 0.5), 0, 1);
+      }),
+      (_ = (e, t) =>
+        Math.exp(p((t + 1) / 2) - p(t / 2) - 0.5 * Math.log(t * Math.PI)) *
+        (1 + e ** 2 / t) ** (-(t + 1) / 2)),
+      (v = (e) => {
+        let t = d(e),
+          n = t.meanDifference / t.standardError,
+          r = g(n, t.degreesOfFreedom);
+        return { ...t, tStatistic: n, pValue: r };
+      }));
+  }))();
+}
+export { _ as a, i as c, v as i, o as n, y as o, s as r, a as s, c as t };

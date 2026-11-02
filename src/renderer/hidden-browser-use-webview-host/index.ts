@@ -1,152 +1,147 @@
-import '@rchunk/rolldown-runtime';
-import * as SharedChunk from '@rchunk/app-shared';
-import * as InitialChunk from '@rchunk/app-initial';
-import * as WebviewChunk from '@rchunk/webview';
-
-interface JsxRuntime {
-  Fragment: unknown;
-  jsx(type: unknown, props: Record<string, unknown>, key?: unknown): unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  HX as r,
+  I3 as i,
+  Jq as a,
+  e6 as o,
+  hJ as s,
+  wL as c,
+  x_ as l,
+  y_ as u,
+} from "@rchunk/app-shared";
+import {
+  Ebt as d,
+  Vvt as f,
+  Wvt as p,
+  _bt as m,
+  _gt as h,
+  dbt as g,
+  ggt as _,
+  hbt as v,
+  mbt as y,
+  mgt as b,
+  pgt as x,
+  qvt as S,
+  vbt as C,
+} from "@rchunk/app-initial";
+import { n as w, t as T } from "@rchunk/browser-webview-host";
+function E(e) {
+  let t = (0, j.c)(24),
+    { browserUseTabIdsKey: n, conversationId: i } = e,
+    a = r(f.activeTab$),
+    o = r(S.activeTab$),
+    c = r(y),
+    l = r(g),
+    u;
+  t[0] === l ? (u = t[1]) : ((u = (e) => l.on(`change`, e)), (t[0] = l), (t[1] = u));
+  let d;
+  t[2] === l ? (d = t[3]) : ((d = () => l.get()), (t[2] = l), (t[3] = d));
+  let p = (0, M.useSyncExternalStore)(u, d, O),
+    h = r(m),
+    _ = r(C),
+    b = r(v),
+    w;
+  t[4] === b ? (w = t[5]) : ((w = (e) => b.on(`change`, e)), (t[4] = b), (t[5] = w));
+  let T;
+  t[6] === b ? (T = t[7]) : ((T = () => b.get()), (t[6] = b), (t[7] = T));
+  let E = (0, M.useSyncExternalStore)(w, T, D),
+    A = c || p > 0,
+    P = (h && _) || E > 0,
+    F;
+  t[8] !== a || t[9] !== o || t[10] !== A || t[11] !== P
+    ? ((F = new Set(x({ bottom: a, right: o }, { bottom: A, right: P }))),
+      (t[8] = a),
+      (t[9] = o),
+      (t[10] = A),
+      (t[11] = P),
+      (t[12] = F))
+    : (F = t[12]);
+  let I = F,
+    L,
+    R;
+  if (t[13] !== n || t[14] !== i || t[15] !== I) {
+    R = Symbol.for(`react.early_return_sentinel`);
+    bb0: {
+      let e;
+      t[18] === I ? (e = t[19]) : ((e = (e) => !I.has(e)), (t[18] = I), (t[19] = e));
+      let r = n.split(`\0`).map(s).filter(e);
+      if (r.length === 0) {
+        R = null;
+        break bb0;
+      }
+      let a;
+      (t[20] === i
+        ? (a = t[21])
+        : ((a = (e) => (0, N.jsx)(k, { browserTabId: e, conversationId: i }, e)),
+          (t[20] = i),
+          (t[21] = a)),
+        (L = r.map(a)));
+    }
+    ((t[13] = n), (t[14] = i), (t[15] = I), (t[16] = L), (t[17] = R));
+  } else ((L = t[16]), (R = t[17]));
+  if (R !== Symbol.for(`react.early_return_sentinel`)) return R;
+  let z;
+  return (
+    t[22] === L
+      ? (z = t[23])
+      : ((z = (0, N.jsx)(N.Fragment, { children: L })), (t[22] = L), (t[23] = z)),
+    z
+  );
 }
-
-interface ReactRuntime {
-  useRef<Value>(initialValue: Value): { current: Value };
-  useSyncExternalStore<Value>(
-    subscribe: (listener: () => void) => () => void,
-    getSnapshot: () => Value,
-    getServerSnapshot: () => Value,
-  ): Value;
-}
-
-interface ChangeStore<Value> {
-  get(): Value;
-  on(event: 'change', listener: () => void): () => void;
-}
-
-interface BrowserTabSnapshot {
-  tabType: unknown;
-  url: string;
-}
-
-interface BrowserUseManager {
-  getSnapshot(conversationId: string, browserTabId: string): BrowserTabSnapshot | null;
-  subscribe(listener: () => void): () => void;
-}
-
-interface InitialRuntime {
-  Vvt: { activeTab$: unknown };
-  qvt: { activeTab$: unknown };
-  mbt: unknown;
-  dbt: unknown;
-  _bt: unknown;
-  vbt: unknown;
-  hbt: unknown;
-  pgt(
-    tabs: { bottom: unknown; right: unknown },
-    visible: { bottom: boolean; right: boolean },
-  ): string[];
-  ggt: BrowserUseManager;
-}
-
-interface SharedRuntime {
-  HX<Value>(signal: unknown): Value;
-  I3(): JsxRuntime;
-  Jq: { WEB: unknown };
-  e6(): ReactRuntime;
-  hJ(value: string): string;
-  x_(): number;
-}
-
-interface WebviewRuntime {
-  t(props: Record<string, unknown>): unknown;
-}
-
-const shared = SharedChunk as unknown as SharedRuntime;
-const initial = InitialChunk as unknown as InitialRuntime;
-const webview = WebviewChunk as unknown as WebviewRuntime;
-const React = shared.e6();
-const jsx = shared.I3();
-
-function readZero(): number {
+function D() {
   return 0;
 }
-
-function HiddenBrowserUseWebview(props: {
-  browserTabId: string;
-  conversationId: string;
-}): unknown {
-  const { browserTabId, conversationId } = props;
-  const windowZoom = shared.x_();
-  const webviewRef = React.useRef<unknown>(null);
-  const snapshot = React.useSyncExternalStore(
-    initial.ggt.subscribe,
-    () => initial.ggt.getSnapshot(conversationId, browserTabId),
-    () => null,
-  );
-
-  if (snapshot != null && snapshot.tabType !== shared.Jq.WEB) return null;
-
-  const initialUrl = snapshot == null || snapshot.url.length === 0
-    ? 'about:blank'
-    : snapshot.url;
-
-  return jsx.jsx(webview.t, {
-    bounds: null,
-    browserTabId,
-    conversationId,
-    hostKind: 'hidden-browser-use',
-    initialUrl,
-    isVisible: false,
-    scale: 1,
-    shouldBootstrapWhenHidden: true,
-    shouldPaint: false,
-    webviewRef,
-    windowZoom,
-  });
+function O() {
+  return 0;
 }
-
-function HiddenBrowserUseWebviewHost(props: {
-  browserUseTabIdsKey: string;
-  conversationId: string;
-}): unknown {
-  const bottomTab = shared.HX<unknown>(initial.Vvt.activeTab$);
-  const rightTab = shared.HX<unknown>(initial.qvt.activeTab$);
-  const bottomOpen = shared.HX<boolean>(initial.mbt);
-  const bottomAnimationStore = shared.HX<ChangeStore<number>>(initial.dbt);
-  const bottomAnimationCount = React.useSyncExternalStore(
-    (listener) => bottomAnimationStore.on('change', listener),
-    () => bottomAnimationStore.get(),
-    readZero,
+function k(e) {
+  let t = (0, j.c)(8),
+    { browserTabId: n, conversationId: r } = e,
+    i = l(),
+    o = (0, M.useRef)(null),
+    s;
+  t[0] !== n || t[1] !== r
+    ? ((s = () => _.getSnapshot(r, n)), (t[0] = n), (t[1] = r), (t[2] = s))
+    : (s = t[2]);
+  let c = (0, M.useSyncExternalStore)(_.subscribe, s, A);
+  if (c != null && c.tabType !== a.WEB) return null;
+  let u = c == null || c.url.length === 0 ? `about:blank` : c.url,
+    d;
+  return (
+    t[3] !== n || t[4] !== r || t[5] !== u || t[6] !== i
+      ? ((d = (0, N.jsx)(T, {
+          bounds: null,
+          browserTabId: n,
+          conversationId: r,
+          hostKind: `hidden-browser-use`,
+          initialUrl: u,
+          isVisible: !1,
+          scale: 1,
+          shouldBootstrapWhenHidden: !0,
+          shouldPaint: !1,
+          webviewRef: o,
+          windowZoom: i,
+        })),
+        (t[3] = n),
+        (t[4] = r),
+        (t[5] = u),
+        (t[6] = i),
+        (t[7] = d))
+      : (d = t[7]),
+    d
   );
-  const rightMounted = shared.HX<boolean>(initial._bt);
-  const rightOpen = shared.HX<boolean>(initial.vbt);
-  const rightAnimationStore = shared.HX<ChangeStore<number>>(initial.hbt);
-  const rightAnimationCount = React.useSyncExternalStore(
-    (listener) => rightAnimationStore.on('change', listener),
-    () => rightAnimationStore.get(),
-    readZero,
-  );
-
-  const mountedBrowserTabIds = new Set(initial.pgt(
-    { bottom: bottomTab, right: rightTab },
-    {
-      bottom: bottomOpen || bottomAnimationCount > 0,
-      right: (rightMounted && rightOpen) || rightAnimationCount > 0,
-    },
-  ));
-  const browserTabIds = props.browserUseTabIdsKey
-    .split('\0')
-    .map(shared.hJ)
-    .filter((browserTabId) => !mountedBrowserTabIds.has(browserTabId));
-
-  if (browserTabIds.length === 0) return null;
-
-  return jsx.jsx(jsx.Fragment, {
-    children: browserTabIds.map((browserTabId) => jsx.jsx(
-      HiddenBrowserUseWebview,
-      { browserTabId, conversationId: props.conversationId },
-      browserTabId,
-    )),
-  });
 }
-
-export { HiddenBrowserUseWebviewHost };
+function A() {
+  return null;
+}
+var j, M, N;
+function P() {
+  return (P = e(() => {
+    ((j = t()), n(), c(), (M = o()), p(), d(), u(), b(), h(), w(), (N = i()));
+  }))();
+}
+P();
+export { E as HiddenBrowserUseWebviewHost };

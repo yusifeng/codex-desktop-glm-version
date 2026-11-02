@@ -1,34 +1,143 @@
-// Piecewise-linear position data and velocity as each segment's slope.
-import "@rchunk/rolldown-runtime";
-
-interface TrajectoryPoint { t: number; x: number }
-interface VelocityGraphValues { trajectoryRevision?: number | null; positionAt0SecondsMeters?: number | null; positionAt2_5SecondsMeters?: number | null; positionAt5SecondsMeters?: number | null; positionAt7_5SecondsMeters?: number | null; positionAt10SecondsMeters?: number | null }
-
-const velocityGraphSpecification = { type: "VELOCITY_AS_SLOPE_GRAPH", version: 2, thumbnailAssetKey: "velocity-as-slope-graph-v1", canonicalFormula: "v = \\frac{\\Delta x}{\\Delta t}", parameters: { positionAt0SecondsMeters: { kind: "number" as const, defaultValue: -3, min: -10, max: 10 }, positionAt2_5SecondsMeters: { kind: "number" as const, defaultValue: 4, min: -10, max: 10 }, positionAt5SecondsMeters: { kind: "number" as const, defaultValue: 4, min: -10, max: 10 }, positionAt7_5SecondsMeters: { kind: "number" as const, defaultValue: -2, min: -10, max: 10 }, positionAt10SecondsMeters: { kind: "number" as const, defaultValue: 3, min: -10, max: 10 } } };
-const timePoints = [0, 2.5, 5, 7.5, 10];
-const positionParameters = [velocityGraphSpecification.parameters.positionAt0SecondsMeters, velocityGraphSpecification.parameters.positionAt2_5SecondsMeters, velocityGraphSpecification.parameters.positionAt5SecondsMeters, velocityGraphSpecification.parameters.positionAt7_5SecondsMeters, velocityGraphSpecification.parameters.positionAt10SecondsMeters];
-const positionKeys = ["positionAt0SecondsMeters", "positionAt2_5SecondsMeters", "positionAt5SecondsMeters", "positionAt7_5SecondsMeters", "positionAt10SecondsMeters"] as const;
-const minimumTime = timePoints[0]; const maximumTime = timePoints[4];
-const minimumPosition = Math.min(...positionParameters.map(({ min }) => min));
-const maximumPosition = Math.max(...positionParameters.map(({ max }) => max));
-const timeStep = timePoints[1] - timePoints[0];
-const zeroVelocityThreshold = 0.05;
-const defaultTrajectory: TrajectoryPoint[] = [{ t: timePoints[0], x: velocityGraphSpecification.parameters.positionAt0SecondsMeters.defaultValue }, { t: timePoints[1], x: velocityGraphSpecification.parameters.positionAt2_5SecondsMeters.defaultValue }, { t: timePoints[2], x: velocityGraphSpecification.parameters.positionAt5SecondsMeters.defaultValue }, { t: timePoints[3], x: velocityGraphSpecification.parameters.positionAt7_5SecondsMeters.defaultValue }, { t: timePoints[4], x: velocityGraphSpecification.parameters.positionAt10SecondsMeters.defaultValue }];
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-const finiteOrDefault = (value: number | null | undefined, defaultValue: number): number => typeof value === "number" && Number.isFinite(value) ? value : defaultValue;
-const normalizeTrajectoryRevision = (value: number | null | undefined): number => typeof value === "number" && Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
-const snapSmallVelocityToZero = (velocity: number): number => Math.abs(velocity) < zeroVelocityThreshold ? 0 : velocity;
-const valuesFromTrajectory = (trajectory: TrajectoryPoint[], revision = 0) => ({ trajectoryRevision: normalizeTrajectoryRevision(revision), t0: timePoints[0], positionAt0SecondsMeters: trajectory[0]?.x ?? defaultTrajectory[0].x, t1: timePoints[1], positionAt2_5SecondsMeters: trajectory[1]?.x ?? defaultTrajectory[1].x, t2: timePoints[2], positionAt5SecondsMeters: trajectory[2]?.x ?? defaultTrajectory[2].x, t3: timePoints[3], positionAt7_5SecondsMeters: trajectory[3]?.x ?? defaultTrajectory[3].x, t4: timePoints[4], positionAt10SecondsMeters: trajectory[4]?.x ?? defaultTrajectory[4].x });
-const trajectoryFromValues = (values: VelocityGraphValues): TrajectoryPoint[] => { const positions = defaultTrajectory.map((point, index) => clamp(finiteOrDefault(values[positionKeys[index]], point.x), minimumPosition, maximumPosition)); return timePoints.map((t, index) => ({ t, x: positions[index] ?? 0 })); };
-const segmentVelocities = (trajectory: TrajectoryPoint[]) => trajectory.slice(0, -1).map((point, index) => { const next = trajectory[index + 1] ?? point; return { start: point.t, end: next.t, velocity: (next.x - point.x) / (next.t - point.t) }; });
-const knotTolerance = 1e-9;
-const velocityIsDefined = (trajectory: TrajectoryPoint[], time: number): boolean => { const segments = segmentVelocities(trajectory); return !trajectory.slice(1, -1).some((point, index) => { const leftVelocity = segments[index]?.velocity; const rightVelocity = segments[index + 1]?.velocity; return Math.abs(time - point.t) <= knotTolerance && leftVelocity !== undefined && rightVelocity !== undefined && Math.abs(leftVelocity - rightVelocity) > knotTolerance; }); };
-const evaluateTrajectory = (trajectory: TrajectoryPoint[], time: number) => { const first = trajectory[0] ?? defaultTrajectory[0]; const last = trajectory.at(-1) ?? first; const safeTime = clamp(time, first.t, last.t); const segments = segmentVelocities(trajectory); const foundIndex = segments.findIndex((segment) => safeTime < segment.end); const intervalIndex = Math.min(foundIndex, segments.length - 1) < 0 ? segments.length - 1 : Math.min(foundIndex, segments.length - 1); const segment = segments[intervalIndex] ?? { start: first.t, end: last.t, velocity: 0 }; return { time: safeTime, position: (trajectory[intervalIndex] ?? first).x + segment.velocity * (safeTime - segment.start), velocity: segment.velocity, velocityDefined: velocityIsDefined(trajectory, safeTime), intervalIndex }; };
-const velocityGraphDomains = () => { const maximumSlope = (maximumPosition - minimumPosition) / timeStep; return { time: [minimumTime, maximumTime], position: [minimumPosition - 1, maximumPosition + 1], velocity: [-maximumSlope - 1, maximumSlope + 1] }; };
-const isVariedTrajectory = (trajectory: TrajectoryPoint[]): boolean => { const velocities = segmentVelocities(trajectory).map(({ velocity }) => velocity); return Math.max(...velocities) > 0.8 && Math.min(...velocities) < -0.8 && velocities.some((velocity) => Math.abs(velocity) < 0.45); };
-const randomVelocityTrajectory = (random: () => number = Math.random): TrajectoryPoint[] => { const positionRange = maximumPosition - minimumPosition; const margin = positionRange * 0.15; const start = minimumPosition + margin; const usableRange = positionRange - margin * 2; for (let attempt = 0; attempt < 20; attempt += 1) { const positions = Array.from({ length: 5 }, () => start + random() * usableRange); const trajectory = timePoints.map((t, index) => ({ t, x: positions[index] ?? 0 })); if (isVariedTrajectory(trajectory)) return trajectory; } return defaultTrajectory.map((point) => ({ ...point })); };
-
-function initializeVelocityGraphSpecification(): void {}
-function initializeVelocityGraphModel(): void {}
-
-export { randomVelocityTrajectory as a, segmentVelocities as c, valuesFromTrajectory as d, trajectoryFromValues as f, velocityGraphSpecification as h, minimumPosition as i, initializeVelocityGraphModel as l, initializeVelocityGraphSpecification as m, timeStep as n, velocityGraphDomains as o, normalizeTrajectoryRevision as p, maximumPosition as r, evaluateTrajectory as s, defaultTrajectory as t, snapSmallVelocityToZero as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `VELOCITY_AS_SLOPE_GRAPH`),
+      (n = `velocity-as-slope-graph-v1`),
+      (r = `v = \\frac{\\Delta x}{\\Delta t}`),
+      (i = {
+        positionAt0SecondsMeters: { kind: `number`, defaultValue: -3, min: -10, max: 10 },
+        positionAt2_5SecondsMeters: { kind: `number`, defaultValue: 4, min: -10, max: 10 },
+        positionAt5SecondsMeters: { kind: `number`, defaultValue: 4, min: -10, max: 10 },
+        positionAt7_5SecondsMeters: { kind: `number`, defaultValue: -2, min: -10, max: 10 },
+        positionAt10SecondsMeters: { kind: `number`, defaultValue: 3, min: -10, max: 10 },
+      }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+var s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C, w, T, E, D, O, k;
+function A() {
+  return (A = e(() => {
+    (o(),
+      (s = [0, 2.5, 5, 7.5, 10]),
+      (c = [
+        a.parameters.positionAt0SecondsMeters,
+        a.parameters.positionAt2_5SecondsMeters,
+        a.parameters.positionAt5SecondsMeters,
+        a.parameters.positionAt7_5SecondsMeters,
+        a.parameters.positionAt10SecondsMeters,
+      ]),
+      (l = [
+        `positionAt0SecondsMeters`,
+        `positionAt2_5SecondsMeters`,
+        `positionAt5SecondsMeters`,
+        `positionAt7_5SecondsMeters`,
+        `positionAt10SecondsMeters`,
+      ]),
+      (u = s[0]),
+      (d = s[4]),
+      (f = Math.min(...c.map((e) => e.min))),
+      (p = Math.max(...c.map((e) => e.max))),
+      (m = s[1] - s[0]),
+      (h = 0.05),
+      (g = [
+        { t: s[0], x: a.parameters.positionAt0SecondsMeters.defaultValue },
+        { t: s[1], x: a.parameters.positionAt2_5SecondsMeters.defaultValue },
+        { t: s[2], x: a.parameters.positionAt5SecondsMeters.defaultValue },
+        { t: s[3], x: a.parameters.positionAt7_5SecondsMeters.defaultValue },
+        { t: s[4], x: a.parameters.positionAt10SecondsMeters.defaultValue },
+      ]),
+      (_ = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (v = (e, t) => (Number.isFinite(e) ? e : t)),
+      (y = (e) => (typeof e == `number` && Number.isFinite(e) ? Math.max(0, Math.floor(e)) : 0)),
+      (b = (e) => (Math.abs(e) < h ? 0 : e)),
+      (x = (e, t = 0) => ({
+        trajectoryRevision: y(t),
+        t0: s[0],
+        positionAt0SecondsMeters: e[0]?.x ?? g[0].x,
+        t1: s[1],
+        positionAt2_5SecondsMeters: e[1]?.x ?? g[1].x,
+        t2: s[2],
+        positionAt5SecondsMeters: e[2]?.x ?? g[2].x,
+        t3: s[3],
+        positionAt7_5SecondsMeters: e[3]?.x ?? g[3].x,
+        t4: s[4],
+        positionAt10SecondsMeters: e[4]?.x ?? g[4].x,
+      })),
+      (S = (e) => {
+        let t = g.map((t, n) => _(v(e[l[n] ?? `positionAt0SecondsMeters`], t.x), f, p));
+        return s.map((e, n) => ({ t: e, x: t[n] ?? 0 }));
+      }),
+      (C = (e) =>
+        e.slice(0, -1).map((t, n) => {
+          let r = e[n + 1] ?? t;
+          return { start: t.t, end: r.t, velocity: (r.x - t.x) / (r.t - t.t) };
+        })),
+      (w = 1e-9),
+      (T = (e, t) => {
+        let n = C(e);
+        return !e.slice(1, -1).some((e, r) => {
+          let i = n[r]?.velocity,
+            a = n[r + 1]?.velocity;
+          return Math.abs(t - e.t) <= w && i != null && a != null && Math.abs(i - a) > w;
+        });
+      }),
+      (E = (e, t) => {
+        let n = e[0] ?? g[0],
+          r = e[e.length - 1] ?? n,
+          i = _(t, n.t, r.t),
+          a = C(e),
+          o = Math.min(
+            a.findIndex((e) => i < e.end),
+            a.length - 1,
+          ),
+          s = o < 0 ? a.length - 1 : o,
+          c = a[s] ?? { start: n.t, end: r.t, velocity: 0 };
+        return {
+          time: i,
+          position: (e[s] ?? n).x + c.velocity * (i - c.start),
+          velocity: c.velocity,
+          velocityDefined: T(e, i),
+          intervalIndex: s,
+        };
+      }),
+      (D = () => {
+        let e = (p - f) / m;
+        return { time: [u, d], position: [f - 1, p + 1], velocity: [-e - 1, e + 1] };
+      }),
+      (O = (e) => {
+        let t = C(e).map((e) => e.velocity);
+        return Math.max(...t) > 0.8 && Math.min(...t) < -0.8 && t.some((e) => Math.abs(e) < 0.45);
+      }),
+      (k = (e = Math.random) => {
+        let t = p - f,
+          n = t * 0.15,
+          r = f + n,
+          i = t - n * 2;
+        for (let t = 0; t < 20; t += 1) {
+          let t = Array.from({ length: 5 }, () => r + e() * i),
+            n = s.map((e, n) => ({ t: e, x: t[n] ?? 0 }));
+          if (O(n)) return n;
+        }
+        return g.map((e) => ({ ...e }));
+      }));
+  }))();
+}
+export {
+  k as a,
+  C as c,
+  x as d,
+  S as f,
+  a as h,
+  f as i,
+  A as l,
+  o as m,
+  m as n,
+  D as o,
+  y as p,
+  p as r,
+  E as s,
+  g as t,
+  b as u,
+};

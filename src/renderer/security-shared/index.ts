@@ -1,201 +1,261 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  Ah as DialogHeader,
-  I3 as getJsxRuntime,
-  K2 as initializeInternationalization,
-  Lh as DialogDescription,
-  Oh as DialogContent,
-  Ph as DialogTitle,
-  Qh as LoadingSpinner,
-  S_ as Icon,
-  Y2 as FormattedMessage,
-  Yh as Button,
-  e6 as getReact,
-  jh as DialogBody,
-  k as chevronLeftIcon,
-  kh as DialogFooterActions,
+  $3 as t,
+  $h as n,
+  A as r,
+  Ah as i,
+  C_ as a,
+  I3 as o,
+  Ih as s,
+  K2 as c,
+  Lh as l,
+  Oh as u,
+  Ph as d,
+  Qh as f,
+  Rh as p,
+  S_ as m,
+  Y2 as h,
+  Yh as g,
+  Zh as _,
+  jh as v,
+  k as y,
+  kh as b,
+  zh as x,
 } from "@rchunk/app-shared";
-import {
-  au as SettingsSubpageLayout,
-  su as initializeSettingsSubpageLayout,
-} from "@rchunk/app-initial";
-
-interface SecuritySubpageProps {
-  action?: unknown;
-  children?: unknown;
-  onBack(): void;
-  subtitle?: unknown;
-  title: unknown;
+import { au as S, su as C } from "@rchunk/app-initial";
+function w(e) {
+  let t = (0, D.c)(10),
+    { title: n, subtitle: r, action: i, onBack: a, children: o } = e,
+    s,
+    c;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((s = (0, O.jsx)(m, { className: `rtl:rotate-180`, asset: y })),
+      (c = (0, O.jsx)(h, {
+        id: `settings.chatGpt.security.back`,
+        defaultMessage: `Back`,
+        description: `Button in a Security and login settings subpage that returns to its parent page without changing account settings.`,
+      })),
+      (t[0] = s),
+      (t[1] = c))
+    : ((s = t[0]), (c = t[1]));
+  let l;
+  t[2] === a
+    ? (l = t[3])
+    : ((l = (0, O.jsxs)(g, {
+        color: `ghostActive`,
+        size: `toolbar`,
+        onClick: a,
+        children: [s, c],
+      })),
+      (t[2] = a),
+      (t[3] = l));
+  let u;
+  return (
+    t[4] !== i || t[5] !== o || t[6] !== r || t[7] !== l || t[8] !== n
+      ? ((u = (0, O.jsx)(S, { title: n, subtitle: r, action: i, backSlot: l, children: o })),
+        (t[4] = i),
+        (t[5] = o),
+        (t[6] = r),
+        (t[7] = l),
+        (t[8] = n),
+        (t[9] = u))
+      : (u = t[9]),
+    u
+  );
 }
-
-interface LoadingStateProps {
-  isError: boolean;
-  onRetry(): void;
-}
-
-interface ConfirmationDialogProps {
-  children?: unknown;
-  confirmLabel: unknown;
-  informational?: boolean;
-  isError?: boolean;
-  isPending?: boolean;
-  onClose(): void;
-  onConfirm(): void;
-  title: unknown;
-}
-
-const jsx = getJsxRuntime();
-
-function SecuritySubpage({
-  title,
-  subtitle,
-  action,
-  onBack,
-  children,
-}: SecuritySubpageProps): unknown {
-  return jsx.jsx(SettingsSubpageLayout, {
-    title,
-    subtitle,
-    action,
-    backSlot: jsx.jsxs(Button, {
-      color: "ghostActive",
-      size: "toolbar",
-      onClick: onBack,
-      children: [
-        jsx.jsx(Icon, { className: "rtl:rotate-180", asset: chevronLeftIcon }),
-        jsx.jsx(FormattedMessage, {
-          id: "settings.chatGpt.security.back",
-          defaultMessage: "Back",
-          description:
-            "Button in a Security and login settings subpage that returns to its parent page without changing account settings.",
-        }),
-      ],
-    }),
-    children,
-  });
-}
-
-function SecurityLoadingState({ isError, onRetry }: LoadingStateProps): unknown {
-  return isError
-    ? jsx.jsxs("div", {
-        role: "alert",
-        className: "flex flex-col items-start gap-3 text-sm text-secondary",
-        children: [
-          jsx.jsx(FormattedMessage, {
-            id: "settings.chatGpt.security.loadError",
-            defaultMessage: "Couldn’t load security settings. Please try again",
-          }),
-          jsx.jsx(Button, {
-            color: "secondary",
-            size: "toolbar",
-            onClick: onRetry,
-            children: jsx.jsx(FormattedMessage, {
-              id: "settings.chatGpt.security.retry",
-              defaultMessage: "Retry",
-            }),
-          }),
-        ],
-      })
-    : jsx.jsxs("div", {
-        role: "status",
-        className: "flex items-center gap-2 text-sm text-secondary",
-        children: [
-          jsx.jsx(LoadingSpinner, {}),
-          jsx.jsx(FormattedMessage, {
-            id: "settings.chatGpt.security.loading",
-            defaultMessage: "Loading security settings…",
-          }),
-        ],
-      });
-}
-
-function SecurityConfirmationDialog({
-  title,
-  children,
-  confirmLabel,
-  onConfirm,
-  onClose,
-  isPending = false,
-  isError = false,
-  informational = false,
-}: ConfirmationDialogProps): unknown {
-  const handleSubmit = (event: { preventDefault(): void }) => {
-    event.preventDefault();
-    if (!isPending) onConfirm();
-  };
-  return jsx.jsx(DialogContent, {
-    open: true,
-    contentProps: children == null ? { "aria-describedby": undefined } : undefined,
-    onOpenChange: (open: boolean) => {
-      if (!open && !isPending) onClose();
-    },
-    children: jsx.jsxs(DialogBody, {
-      as: "form",
-      onSubmit: handleSubmit,
-      children: [
-        jsx.jsxs(DialogBody, {
-          children: [
-            jsx.jsx(DialogHeader, {
-              title: jsx.jsx(DialogTitle, { className: "select-none", children: title }),
-              subtitle:
-                children == null
-                  ? null
-                  : jsx.jsx(DialogDescription, { asChild: true, children: jsx.jsx("div", { children }) }),
-              subtitleSize: "sm",
-              subtitleTone: "secondary",
-            }),
-            isError
-              ? jsx.jsx("p", {
-                  role: "alert",
-                  className: "text-sm text-danger",
-                  children: jsx.jsx(FormattedMessage, {
-                    id: "settings.chatGpt.security.actionFailed",
-                    defaultMessage: "Couldn’t complete this action. Please try again",
+function T(e) {
+  let t = (0, D.c)(3),
+    { isError: n, onRetry: r } = e,
+    i;
+  return (
+    t[0] !== n || t[1] !== r
+      ? ((i = n
+          ? (0, O.jsxs)(`div`, {
+              role: `alert`,
+              className: `flex flex-col items-start gap-3 text-sm text-secondary`,
+              children: [
+                (0, O.jsx)(h, {
+                  id: `settings.chatGpt.security.loadError`,
+                  defaultMessage: `Couldn’t load security settings. Please try again`,
+                  description: `Error on a ChatGPT Security and login settings page when its account data request fails. The retry button reloads this data.`,
+                }),
+                (0, O.jsx)(g, {
+                  color: `secondary`,
+                  size: `toolbar`,
+                  onClick: r,
+                  children: (0, O.jsx)(h, {
+                    id: `settings.chatGpt.security.retry`,
+                    defaultMessage: `Retry`,
+                    description: `Button beside an error in ChatGPT Security and login settings that retries loading account data.`,
                   }),
-                })
-              : null,
-          ],
-        }),
-        jsx.jsx(DialogBody, {
-          children: jsx.jsxs(DialogFooterActions, {
-            expandSingleButton: informational,
-            children: [
-              informational
-                ? null
-                : jsx.jsx(Button, {
-                    type: "button",
-                    color: "secondary",
-                    disabled: isPending,
-                    onClick: onClose,
-                    children: jsx.jsx(FormattedMessage, {
-                      id: "settings.chatGpt.security.cancel",
-                      defaultMessage: "Cancel",
-                    }),
-                  }),
-              jsx.jsx(Button, {
-                type: "submit",
-                color: informational ? "primary" : "danger",
-                loading: isPending,
-                disabled: isPending,
-                children: confirmLabel,
-              }),
-            ],
-          }),
-        }),
-      ],
-    }),
-  });
+                }),
+              ],
+            })
+          : (0, O.jsxs)(`div`, {
+              role: `status`,
+              className: `flex items-center gap-2 text-sm text-secondary`,
+              children: [
+                (0, O.jsx)(f, {}),
+                (0, O.jsx)(h, {
+                  id: `settings.chatGpt.security.loading`,
+                  defaultMessage: `Loading security settings…`,
+                  description: `Loading status while a ChatGPT Security and login settings page fetches account data.`,
+                }),
+              ],
+            })),
+        (t[0] = n),
+        (t[1] = r),
+        (t[2] = i))
+      : (i = t[2]),
+    i
+  );
 }
-
-function initializeSecurityShared(): void {
-  void getReact;
-  initializeInternationalization();
-  initializeSettingsSubpageLayout();
+function E(e) {
+  let t = (0, D.c)(40),
+    {
+      title: n,
+      children: r,
+      confirmLabel: a,
+      onConfirm: o,
+      onClose: c,
+      isPending: d,
+      isError: f,
+      informational: m,
+    } = e,
+    _ = f !== void 0 && f,
+    y = m !== void 0 && m,
+    x;
+  t[0] === r
+    ? (x = t[1])
+    : ((x = r == null ? { "aria-describedby": void 0 } : void 0), (t[0] = r), (t[1] = x));
+  let S;
+  t[2] !== d || t[3] !== c
+    ? ((S = (e) => {
+        !e && !d && c();
+      }),
+      (t[2] = d),
+      (t[3] = c),
+      (t[4] = S))
+    : (S = t[4]);
+  let C;
+  t[5] !== d || t[6] !== o
+    ? ((C = (e) => {
+        (e.preventDefault(), d || o());
+      }),
+      (t[5] = d),
+      (t[6] = o),
+      (t[7] = C))
+    : (C = t[7]);
+  let w;
+  t[8] === n
+    ? (w = t[9])
+    : ((w = (0, O.jsx)(p, { className: `select-none`, children: n })), (t[8] = n), (t[9] = w));
+  let T;
+  t[10] === r
+    ? (T = t[11])
+    : ((T =
+        r == null
+          ? null
+          : (0, O.jsx)(l, { asChild: !0, children: (0, O.jsx)(`div`, { children: r }) })),
+      (t[10] = r),
+      (t[11] = T));
+  let E;
+  t[12] !== w || t[13] !== T
+    ? ((E = (0, O.jsx)(i, {
+        title: w,
+        subtitle: T,
+        subtitleSize: `sm`,
+        subtitleTone: `secondary`,
+      })),
+      (t[12] = w),
+      (t[13] = T),
+      (t[14] = E))
+    : (E = t[14]);
+  let k;
+  t[15] === _
+    ? (k = t[16])
+    : ((k = _
+        ? (0, O.jsx)(`p`, {
+            role: `alert`,
+            className: `text-sm text-danger`,
+            children: (0, O.jsx)(h, {
+              id: `settings.chatGpt.security.actionFailed`,
+              defaultMessage: `Couldn’t complete this action. Please try again`,
+              description: `Inline error after a confirmed account security action fails. The dialog stays open so the user can retry or cancel.`,
+            }),
+          })
+        : null),
+      (t[15] = _),
+      (t[16] = k));
+  let A;
+  t[17] !== E || t[18] !== k
+    ? ((A = (0, O.jsxs)(v, { children: [E, k] })), (t[17] = E), (t[18] = k), (t[19] = A))
+    : (A = t[19]);
+  let j = !y,
+    M;
+  t[20] !== y || t[21] !== d || t[22] !== c
+    ? ((M = y
+        ? null
+        : (0, O.jsx)(g, {
+            type: `button`,
+            color: `secondary`,
+            disabled: d,
+            onClick: c,
+            children: (0, O.jsx)(h, {
+              id: `settings.chatGpt.security.cancel`,
+              defaultMessage: `Cancel`,
+              description: `Dismisses an account security confirmation without changing authentication, devices, or app access.`,
+            }),
+          })),
+      (t[20] = y),
+      (t[21] = d),
+      (t[22] = c),
+      (t[23] = M))
+    : (M = t[23]);
+  let N = y ? `primary` : `danger`,
+    P;
+  t[24] !== a || t[25] !== d || t[26] !== N
+    ? ((P = (0, O.jsx)(g, { type: `submit`, color: N, loading: d, disabled: d, children: a })),
+      (t[24] = a),
+      (t[25] = d),
+      (t[26] = N),
+      (t[27] = P))
+    : (P = t[27]);
+  let F;
+  t[28] !== j || t[29] !== M || t[30] !== P
+    ? ((F = (0, O.jsx)(v, {
+        children: (0, O.jsxs)(b, { expandSingleButton: j, children: [M, P] }),
+      })),
+      (t[28] = j),
+      (t[29] = M),
+      (t[30] = P),
+      (t[31] = F))
+    : (F = t[31]);
+  let I;
+  t[32] !== A || t[33] !== F || t[34] !== C
+    ? ((I = (0, O.jsxs)(u, { as: `form`, onSubmit: C, children: [A, F] })),
+      (t[32] = A),
+      (t[33] = F),
+      (t[34] = C),
+      (t[35] = I))
+    : (I = t[35]);
+  let L;
+  return (
+    t[36] !== I || t[37] !== x || t[38] !== S
+      ? ((L = (0, O.jsx)(s, { open: !0, contentProps: x, onOpenChange: S, children: I })),
+        (t[36] = I),
+        (t[37] = x),
+        (t[38] = S),
+        (t[39] = L))
+      : (L = t[39]),
+    L
+  );
 }
-
-export {
-  initializeSecurityShared as i,
-  SecurityLoadingState as n,
-  SecuritySubpage as r,
-  SecurityConfirmationDialog as t,
-};
+var D, O;
+function k() {
+  return (k = e(() => {
+    ((D = t()), r(), c(), _(), x(), d(), a(), n(), C(), (O = o()));
+  }))();
+}
+export { k as i, T as n, w as r, E as t };

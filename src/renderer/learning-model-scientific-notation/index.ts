@@ -1,8 +1,94 @@
-// Scientific-notation expansion learning model. Release chunk: model-512171a54d75.js.
-import "@rchunk/rolldown-runtime";
-interface Manifest { type: string; version: number; thumbnailAssetKey: string; canonicalFormula: string; parameters: { coefficient: { kind: "number"; defaultValue: number; min: number; max: number; multipleOf: number }; exponent: { kind: "integer"; defaultValue: number; min: number; max: number } } }
-interface Values { coefficient?: number | null; exponent?: number | null; precision?: number | null }
-let manifest: Manifest; let coefficientControl: { min: number; max: number; defaultValue: number; maxFractionDigits: number }; let exponentControl: { min: number; max: number; step: number; defaultValue: number }; let precisionForCoefficient: (coefficient: number) => number; let coefficientStep: (precision: number) => number; let maximumCoefficient: (precision: number) => number; let normalizeValues: (values: Values) => { coefficient: number; exponent: number; precision: number }; let expandScientificNotation: (values: Values, precision?: number) => { safeValues: { coefficient: number; exponent: number; precision: number }; precision: number; coefficientText: string; expandedText: string; digits: string[]; paddedDigits: string[]; sourceDecimalIndex: number; destinationDecimalIndex: number; direction: "right" | "left" | "none"; places: number }; let equation: (values: Values, precision?: number) => string; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "SCIENTIFIC_NOTATION", version: 1, thumbnailAssetKey: "scientific-notation-v1", canonicalFormula: "a \\times 10^n", parameters: { coefficient: { kind: "number", defaultValue: 2.12, min: 1, max: 9.99, multipleOf: 0.01 }, exponent: { kind: "integer", defaultValue: 5, min: -9, max: 9 } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); const coefficient = manifest.parameters.coefficient; const exponent = manifest.parameters.exponent; coefficientControl = { min: coefficient.min, max: coefficient.max, defaultValue: coefficient.defaultValue, maxFractionDigits: 2 }; exponentControl = { min: exponent.min, max: exponent.max, step: 1, defaultValue: exponent.defaultValue }; const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max); const round = (value: number, places: number) => { const factor = 10 ** places; return Math.round((value + Number.EPSILON) * factor) / factor; }; precisionForCoefficient = value => { if (!Number.isFinite(value)) return 2; const rounded = round(value, coefficientControl.maxFractionDigits); for (let precision = 0; precision <= coefficientControl.maxFractionDigits; precision += 1) if (Math.abs(rounded - round(rounded, precision)) < 1e-9) return precision; return coefficientControl.maxFractionDigits; }; coefficientStep = precision => 10 ** -clamp(Math.round(precision), 0, coefficientControl.maxFractionDigits); maximumCoefficient = precision => { const step = coefficientStep(precision); const count = Math.floor((coefficientControl.max - coefficientControl.min) / step); return round(coefficientControl.min + count * step, coefficientControl.maxFractionDigits); }; normalizeValues = values => { const coefficientValue = typeof values.coefficient === "number" && Number.isFinite(values.coefficient) ? clamp(round(values.coefficient, coefficientControl.maxFractionDigits), coefficientControl.min, coefficientControl.max) : coefficientControl.defaultValue; return { coefficient: coefficientValue, exponent: typeof values.exponent === "number" && Number.isFinite(values.exponent) ? clamp(Math.round(values.exponent), exponentControl.min, exponentControl.max) : exponentControl.defaultValue, precision: typeof values.precision === "number" && Number.isFinite(values.precision) ? clamp(Math.round(values.precision), 0, coefficientControl.maxFractionDigits) : precisionForCoefficient(coefficientValue) }; }; const insertDecimal = (digits: string, index: number) => index <= 0 ? `0.${"0".repeat(-index)}${digits}` : index >= digits.length ? `${digits}${"0".repeat(index - digits.length)}` : `${digits.slice(0, index)}.${digits.slice(index)}`; expandScientificNotation = (values, requestedPrecision = values.precision ?? precisionForCoefficient(values.coefficient ?? coefficientControl.defaultValue)) => { const normalized = normalizeValues(values); const precision = clamp(Math.round(requestedPrecision), 0, coefficientControl.maxFractionDigits); const safeValues = { ...normalized, coefficient: clamp(round(normalized.coefficient, precision), coefficientControl.min, maximumCoefficient(precision)) }; const coefficientText = safeValues.coefficient.toFixed(precision); const decimalPoint = coefficientText.indexOf("."); const sourceIndex = decimalPoint === -1 ? coefficientText.length : decimalPoint; const digits = coefficientText.replace(".", ""); const destinationIndex = sourceIndex + normalized.exponent; const leftPadding = Math.max(0, -destinationIndex); const rightPadding = Math.max(0, destinationIndex - digits.length); const paddedDigits = [..."0".repeat(leftPadding), ...digits, ..."0".repeat(rightPadding)]; return { safeValues, precision, coefficientText, expandedText: insertDecimal(digits, destinationIndex), digits: [...digits], paddedDigits, sourceDecimalIndex: sourceIndex + leftPadding, destinationDecimalIndex: destinationIndex + leftPadding, direction: safeValues.exponent > 0 ? "right" : safeValues.exponent < 0 ? "left" : "none", places: Math.abs(safeValues.exponent) }; }; equation = (values, precision = values.precision ?? precisionForCoefficient(values.coefficient ?? coefficientControl.defaultValue)) => { const result = expandScientificNotation(values, precision); return `${result.coefficientText} \\times 10^{${result.safeValues.exponent}} = ${result.expandedText}`; }; }
-export { maximumCoefficient as a, initializeModel as c, manifest as d, expandScientificNotation as i, normalizeValues as l, exponentControl as n, precisionForCoefficient as o, equation as r, coefficientStep as s, coefficientControl as t, initializeManifest as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `SCIENTIFIC_NOTATION`),
+      (n = `scientific-notation-v1`),
+      (r = `a \\times 10^n`),
+      (i = {
+        coefficient: { kind: `number`, defaultValue: 2.12, min: 1, max: 9.99, multipleOf: 0.01 },
+        exponent: { kind: `integer`, defaultValue: 5, min: -9, max: 9 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+var s, c, l, u, d, f, p, m, h, g, _, v, y;
+function b() {
+  return (b = e(() => {
+    (o(),
+      (s = a.parameters.coefficient),
+      (c = a.parameters.exponent),
+      (l = { min: s.min, max: s.max, defaultValue: s.defaultValue, maxFractionDigits: 2 }),
+      (u = { min: c.min, max: c.max, step: 1, defaultValue: c.defaultValue }),
+      (d = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (f = (e, t) => {
+        let n = 10 ** t;
+        return Math.round((e + 2 ** -52) * n) / n;
+      }),
+      (p = (e) => {
+        if (!Number.isFinite(e)) return 2;
+        let t = f(e ?? l.defaultValue, l.maxFractionDigits);
+        for (let e = 0; e <= l.maxFractionDigits; e += 1)
+          if (Math.abs(t - f(t, e)) < 1e-9) return e;
+        return l.maxFractionDigits;
+      }),
+      (m = (e) => 10 ** -d(Math.round(e), 0, l.maxFractionDigits)),
+      (h = (e) => {
+        let t = m(e),
+          n = Math.floor((l.max - l.min) / t);
+        return f(l.min + n * t, l.maxFractionDigits);
+      }),
+      (g = (e) => {
+        let t = Number.isFinite(e.coefficient)
+          ? d(f(e.coefficient ?? l.defaultValue, l.maxFractionDigits), l.min, l.max)
+          : l.defaultValue;
+        return {
+          coefficient: t,
+          exponent: Number.isFinite(e.exponent)
+            ? d(Math.round(e.exponent ?? u.defaultValue), u.min, u.max)
+            : u.defaultValue,
+          precision: Number.isFinite(e.precision)
+            ? d(Math.round(e.precision ?? l.maxFractionDigits), 0, l.maxFractionDigits)
+            : p(t),
+        };
+      }),
+      (_ = (e, t) =>
+        t <= 0
+          ? `0.${`0`.repeat(-t)}${e}`
+          : t >= e.length
+            ? `${e}${`0`.repeat(t - e.length)}`
+            : `${e.slice(0, t)}.${e.slice(t)}`),
+      (v = (e, t = e.precision ?? p(e.coefficient)) => {
+        let n = g(e),
+          r = d(Math.round(t), 0, l.maxFractionDigits),
+          i = d(f(n.coefficient, r), l.min, h(r)),
+          a = { ...n, coefficient: i },
+          o = i.toFixed(r),
+          s = o.indexOf(`.`),
+          c = s === -1 ? o.length : s,
+          u = o.replace(`.`, ``),
+          m = c + n.exponent,
+          v = Math.max(0, -m),
+          y = Math.max(0, m - u.length),
+          b = [...`0`.repeat(v), ...u, ...`0`.repeat(y)];
+        return {
+          safeValues: a,
+          precision: r,
+          coefficientText: o,
+          expandedText: _(u, m),
+          digits: [...u],
+          paddedDigits: b,
+          sourceDecimalIndex: c + v,
+          destinationDecimalIndex: m + v,
+          direction: a.exponent > 0 ? `right` : a.exponent < 0 ? `left` : `none`,
+          places: Math.abs(a.exponent),
+        };
+      }),
+      (y = (e, t = e.precision ?? p(e.coefficient)) => {
+        let n = v(e, t);
+        return `${n.coefficientText} \\times 10^{${n.safeValues.exponent}} = ${n.expandedText}`;
+      }));
+  }))();
+}
+export { h as a, b as c, a as d, v as i, g as l, u as n, p as o, y as r, m as s, l as t, o as u };

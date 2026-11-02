@@ -1,7 +1,113 @@
-// Critical-path network learning model. Release chunk: model-8a2addb2a518.js.
-import "@rchunk/rolldown-runtime";
-type Task = "A" | "B" | "C" | "D" | "E" | "F"; type DurationKey = "durationADays" | "durationBDays" | "durationCDays" | "durationDDays" | "durationEDays" | "durationFDays"; interface Parameter { kind: "number"; defaultValue: number; min: number; max: number } interface Manifest { type: string; version: number; thumbnailAssetKey: string; parameters: Record<DurationKey, Parameter> } type Input = Partial<Record<DurationKey, number | null>>;
-let manifest: Manifest; let tasks: Task[]; let controls: Record<Task, Parameter & { step: number }>; let defaultValues: Record<DurationKey, number>; let normalizeValues: (values: Input) => Record<DurationKey, number>; let calculate: (values: Input) => { values: Record<DurationKey, number>; tasks: Record<Task, { duration: number; earlyStart: number; earlyFinish: number; lateStart: number; lateFinish: number; slack: number; critical: boolean }>; projectDuration: number; criticalPaths: Task[][]; criticalEdges: Set<string> }; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "CRITICAL_PATH_NETWORK", version: 1, thumbnailAssetKey: "critical-path-network-v2", parameters: { durationADays: { kind: "number", defaultValue: 3, min: 1, max: 10 }, durationBDays: { kind: "number", defaultValue: 4, min: 1, max: 10 }, durationCDays: { kind: "number", defaultValue: 4, min: 1, max: 10 }, durationDDays: { kind: "number", defaultValue: 3, min: 1, max: 10 }, durationEDays: { kind: "number", defaultValue: 4, min: 1, max: 10 }, durationFDays: { kind: "number", defaultValue: 5, min: 1, max: 10 } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); tasks = ["A", "B", "C", "D", "E", "F"]; const key: Record<Task, DurationKey> = { A: "durationADays", B: "durationBDays", C: "durationCDays", D: "durationDDays", E: "durationEDays", F: "durationFDays" }; controls = { A: { ...manifest.parameters.durationADays, step: 1 }, B: { ...manifest.parameters.durationBDays, step: 1 }, C: { ...manifest.parameters.durationCDays, step: 1 }, D: { ...manifest.parameters.durationDDays, step: 1 }, E: { ...manifest.parameters.durationEDays, step: 1 }, F: { ...manifest.parameters.durationFDays, step: 1 } }; defaultValues = { durationADays: manifest.parameters.durationADays.defaultValue, durationBDays: manifest.parameters.durationBDays.defaultValue, durationCDays: manifest.parameters.durationCDays.defaultValue, durationDDays: manifest.parameters.durationDDays.defaultValue, durationEDays: manifest.parameters.durationEDays.defaultValue, durationFDays: manifest.parameters.durationFDays.defaultValue }; const predecessors: Record<Task, Task[]> = { A: [], B: [], C: ["A"], D: ["A", "B"], E: ["C"], F: ["D"] }; const successors: Record<Task, Task[]> = { A: ["C", "D"], B: ["D"], C: ["E"], D: ["F"], E: [], F: [] }; const edges: Array<[Task, Task]> = [["A", "C"], ["A", "D"], ["B", "D"], ["C", "E"], ["D", "F"]]; const clamp = (value: number | null | undefined, parameter: Parameter) => typeof value === "number" && Number.isFinite(value) ? Math.min(Math.max(value, parameter.min), parameter.max) : parameter.defaultValue; normalizeValues = values => ({ durationADays: clamp(values.durationADays, controls.A), durationBDays: clamp(values.durationBDays, controls.B), durationCDays: clamp(values.durationCDays, controls.C), durationDDays: clamp(values.durationDDays, controls.D), durationEDays: clamp(values.durationEDays, controls.E), durationFDays: clamp(values.durationFDays, controls.F) }); const edgeKey = (from: Task, to: Task) => `${from}-${to}`; calculate = values => { const normalized = normalizeValues(values); const schedule = {} as Record<Task, { duration: number; earlyStart: number; earlyFinish: number; lateStart: number; lateFinish: number; slack: number; critical: boolean }>; for (const task of tasks) { const duration = normalized[key[task]]; const earlyStart = Math.max(0, ...predecessors[task].map(previous => schedule[previous]?.earlyFinish ?? 0)); schedule[task] = { duration, earlyStart, earlyFinish: earlyStart + duration, lateStart: 0, lateFinish: 0, slack: 0, critical: false }; } const projectDuration = Math.max(...tasks.filter(task => successors[task].length === 0).map(task => schedule[task].earlyFinish)); for (const task of [...tasks].reverse()) { const following = successors[task]; const lateFinish = following.length === 0 ? projectDuration : Math.min(...following.map(next => schedule[next].lateStart)); const lateStart = lateFinish - schedule[task].duration; const slack = lateStart - schedule[task].earlyStart; schedule[task] = { ...schedule[task], lateStart, lateFinish, slack, critical: slack === 0 }; } const criticalEdges = new Set<string>(); for (const [from, to] of edges) if (schedule[from].critical && schedule[to].critical && schedule[from].earlyFinish === schedule[to].earlyStart) criticalEdges.add(edgeKey(from, to)); const criticalPaths: Task[][] = []; const roots = tasks.filter(task => schedule[task].critical && predecessors[task].length === 0); const visit = (task: Task, path: Task[]) => { const next = successors[task].filter(candidate => criticalEdges.has(edgeKey(task, candidate))); if (next.length === 0) { if (successors[task].length === 0 && schedule[task].earlyFinish === projectDuration) criticalPaths.push(path); return; } next.forEach(candidate => visit(candidate, [...path, candidate])); }; roots.forEach(root => visit(root, [root])); return { values: normalized, tasks: schedule, projectDuration, criticalPaths, criticalEdges }; }; }
-export { initializeModel as a, manifest as c, calculate as i, controls as n, normalizeValues as o, tasks as r, initializeManifest as s, defaultValues as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `CRITICAL_PATH_NETWORK`),
+      (n = `critical-path-network-v2`),
+      (r = {
+        durationADays: { kind: `number`, defaultValue: 3, min: 1, max: 10 },
+        durationBDays: { kind: `number`, defaultValue: 4, min: 1, max: 10 },
+        durationCDays: { kind: `number`, defaultValue: 4, min: 1, max: 10 },
+        durationDDays: { kind: `number`, defaultValue: 3, min: 1, max: 10 },
+        durationEDays: { kind: `number`, defaultValue: 4, min: 1, max: 10 },
+        durationFDays: { kind: `number`, defaultValue: 5, min: 1, max: 10 },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _;
+function v() {
+  return (v = e(() => {
+    (a(),
+      (o = [`A`, `B`, `C`, `D`, `E`, `F`]),
+      (s = {
+        A: `durationADays`,
+        B: `durationBDays`,
+        C: `durationCDays`,
+        D: `durationDDays`,
+        E: `durationEDays`,
+        F: `durationFDays`,
+      }),
+      (c = {
+        A: { ...i.parameters.durationADays, step: 1 },
+        B: { ...i.parameters.durationBDays, step: 1 },
+        C: { ...i.parameters.durationCDays, step: 1 },
+        D: { ...i.parameters.durationDDays, step: 1 },
+        E: { ...i.parameters.durationEDays, step: 1 },
+        F: { ...i.parameters.durationFDays, step: 1 },
+      }),
+      (l = {
+        durationADays: i.parameters.durationADays.defaultValue,
+        durationBDays: i.parameters.durationBDays.defaultValue,
+        durationCDays: i.parameters.durationCDays.defaultValue,
+        durationDDays: i.parameters.durationDDays.defaultValue,
+        durationEDays: i.parameters.durationEDays.defaultValue,
+        durationFDays: i.parameters.durationFDays.defaultValue,
+      }),
+      (u = { A: [], B: [], C: [`A`], D: [`A`, `B`], E: [`C`], F: [`D`] }),
+      (d = { A: [`C`, `D`], B: [`D`], C: [`E`], D: [`F`], E: [], F: [] }),
+      (f = [
+        [`A`, `C`],
+        [`A`, `D`],
+        [`B`, `D`],
+        [`C`, `E`],
+        [`D`, `F`],
+      ]),
+      (p = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (m = (e, t) => (Number.isFinite(e) ? p(e, t.min, t.max) : t.defaultValue)),
+      (h = (e) => ({
+        durationADays: m(e.durationADays, c.A),
+        durationBDays: m(e.durationBDays, c.B),
+        durationCDays: m(e.durationCDays, c.C),
+        durationDDays: m(e.durationDDays, c.D),
+        durationEDays: m(e.durationEDays, c.E),
+        durationFDays: m(e.durationFDays, c.F),
+      })),
+      (g = (e, t) => `${e}-${t}`),
+      (_ = (e) => {
+        let t = h(e),
+          n = {};
+        for (let e of o) {
+          let r = t[s[e]],
+            i = Math.max(0, ...u[e].map((e) => n[e]?.earlyFinish ?? 0));
+          n[e] = {
+            duration: r,
+            earlyStart: i,
+            earlyFinish: i + r,
+            lateStart: 0,
+            lateFinish: 0,
+            slack: 0,
+            critical: !1,
+          };
+        }
+        let r = Math.max(...o.filter((e) => d[e].length === 0).map((e) => n[e]?.earlyFinish ?? 0)),
+          i = n;
+        for (let e of [...o].reverse()) {
+          let t = d[e],
+            n = t.length === 0 ? r : Math.min(...t.map((e) => i[e].lateStart)),
+            a = n - i[e].duration,
+            o = a - i[e].earlyStart;
+          i[e] = { ...i[e], lateStart: a, lateFinish: n, slack: o, critical: o === 0 };
+        }
+        let a = new Set();
+        for (let [e, t] of f)
+          i[e].critical && i[t].critical && i[e].earlyFinish === i[t].earlyStart && a.add(g(e, t));
+        let c = [],
+          l = o.filter((e) => i[e].critical && u[e].length === 0),
+          p = (e, t) => {
+            let n = d[e].filter((t) => a.has(g(e, t)));
+            if (n.length === 0) {
+              d[e].length === 0 && i[e].earlyFinish === r && c.push(t);
+              return;
+            }
+            n.forEach((e) => p(e, [...t, e]));
+          };
+        return (
+          l.forEach((e) => p(e, [e])),
+          { values: t, tasks: i, projectDuration: r, criticalPaths: c, criticalEdges: a }
+        );
+      }));
+  }))();
+}
+export { v as a, i as c, _ as i, c as n, h as o, o as r, a as s, l as t };

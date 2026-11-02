@@ -1,30 +1,146 @@
-// Pearson correlation, pattern classification, and clipped regression line.
-import "@rchunk/rolldown-runtime";
-
-type CorrelationPattern = "negative" | "none" | "positive";
-interface Point { x: number; y: number }
-interface CorrelationValues { pattern?: unknown; points?: unknown }
-
-const correlationSpecification = { type: "CORRELATION", version: 1, thumbnailAssetKey: "correlation-v1", parameters: { pattern: { kind: "enum" as const, defaultValue: "positive" as CorrelationPattern, allowedValues: ["negative", "none", "positive"] as CorrelationPattern[] } } };
-const correlationPatterns = correlationSpecification.parameters.pattern.allowedValues;
-const defaultCorrelationPattern = correlationSpecification.parameters.pattern.defaultValue;
-const correlationBounds = { min: 0, max: 10 };
-const minimumCustomPointCount = 4;
-const epsilon = 1e-9;
-const presets: Record<CorrelationPattern, Point[]> = { negative: [{ x: 0.8, y: 8.6 }, { x: 1.7, y: 7.3 }, { x: 2.6, y: 7.8 }, { x: 3.4, y: 5.9 }, { x: 4.3, y: 6.2 }, { x: 5.2, y: 4.3 }, { x: 6.1, y: 3.7 }, { x: 7, y: 3.3 }, { x: 8, y: 1.5 }, { x: 9.1, y: 1.9 }], none: [{ x: 0.8, y: 5.8 }, { x: 1.7, y: 2 }, { x: 2.6, y: 8.1 }, { x: 3.4, y: 4.2 }, { x: 4.3, y: 6.9 }, { x: 5.2, y: 1.3 }, { x: 6.1, y: 7.5 }, { x: 7, y: 3 }, { x: 8, y: 5.1 }, { x: 9.1, y: 6.2 }], positive: [{ x: 0.8, y: 1.4 }, { x: 1.7, y: 2.6 }, { x: 2.6, y: 2.2 }, { x: 3.4, y: 4.1 }, { x: 4.3, y: 3.8 }, { x: 5.2, y: 5.7 }, { x: 6.1, y: 6.3 }, { x: 7, y: 6.7 }, { x: 8, y: 8.5 }, { x: 9.1, y: 8.1 }] };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const isPoint = (value: unknown): value is Point => typeof value === "object" && value !== null && "x" in value && "y" in value && typeof value.x === "number" && Number.isFinite(value.x) && typeof value.y === "number" && Number.isFinite(value.y);
-const cloneCorrelationPreset = (pattern: CorrelationPattern): Point[] => presets[pattern].map((point) => ({ ...point }));
-const normalizeCorrelationPattern = (value: unknown): CorrelationPattern => typeof value === "string" && correlationPatterns.some((pattern) => pattern === value) ? value as CorrelationPattern : defaultCorrelationPattern;
-const hasVariance = (points: Point[], coordinate: "x" | "y"): boolean => { const mean = points.reduce((sum, point) => sum + point[coordinate], 0) / points.length; return points.reduce((sum, point) => sum + (point[coordinate] - mean) ** 2, 0) > epsilon; };
-const correlationCoefficient = (points: Point[]): number | null => { if (points.length < 2) return null; const meanX = points.reduce((sum, point) => sum + point.x, 0) / points.length; const meanY = points.reduce((sum, point) => sum + point.y, 0) / points.length; let covariance = 0; let varianceX = 0; let varianceY = 0; for (const point of points) { const deltaX = point.x - meanX; const deltaY = point.y - meanY; covariance += deltaX * deltaY; varianceX += deltaX * deltaX; varianceY += deltaY * deltaY; } const scale = Math.sqrt(varianceX * varianceY); return scale <= epsilon ? null : clamp(covariance / scale, -1, 1); };
-const patternForCorrelation = (correlation: number): CorrelationPattern => correlation <= -0.25 ? "negative" : correlation >= 0.25 ? "positive" : "none";
-const normalizeCorrelationValues = (values: CorrelationValues) => { const requestedPattern = normalizeCorrelationPattern(values.pattern); const customPoints = Array.isArray(values.points) ? values.points.filter(isPoint).map((point) => ({ x: clamp(point.x, correlationBounds.min, correlationBounds.max), y: clamp(point.y, correlationBounds.min, correlationBounds.max) })) : []; const points = customPoints.length >= minimumCustomPointCount && hasVariance(customPoints, "x") && hasVariance(customPoints, "y") ? customPoints : cloneCorrelationPreset(requestedPattern); const correlation = correlationCoefficient(points); return { pattern: correlation === null ? requestedPattern : patternForCorrelation(correlation), points }; };
-const regression = (points: Point[]) => { if (points.length < 2) return null; const meanX = points.reduce((sum, point) => sum + point.x, 0) / points.length; const meanY = points.reduce((sum, point) => sum + point.y, 0) / points.length; const varianceX = points.reduce((sum, point) => sum + (point.x - meanX) ** 2, 0); if (varianceX <= epsilon) return null; const slope = points.reduce((sum, point) => sum + (point.x - meanX) * (point.y - meanY), 0) / varianceX; return { slope, intercept: meanY - slope * meanX }; };
-const samePoint = (left: Point, right: Point): boolean => Math.abs(left.x - right.x) <= epsilon && Math.abs(left.y - right.y) <= epsilon;
-const regressionSegment = (points: Point[]): [Point, Point] | null => { const line = regression(points); if (!line) return null; const { min, max } = correlationBounds; const candidates: Point[] = []; const add = (point: Point) => { if (point.x >= min - epsilon && point.x <= max + epsilon && point.y >= min - epsilon && point.y <= max + epsilon && !candidates.some((candidate) => samePoint(candidate, point))) candidates.push({ x: clamp(point.x, min, max), y: clamp(point.y, min, max) }); }; add({ x: min, y: line.intercept + line.slope * min }); add({ x: max, y: line.intercept + line.slope * max }); if (Math.abs(line.slope) > epsilon) { add({ x: (min - line.intercept) / line.slope, y: min }); add({ x: (max - line.intercept) / line.slope, y: max }); } if (candidates.length < 2) return null; let result: [Point, Point] = [candidates[0], candidates[1]]; let longest = -1; for (let left = 0; left < candidates.length; left += 1) for (let right = left + 1; right < candidates.length; right += 1) { const deltaX = candidates[left].x - candidates[right].x; const deltaY = candidates[left].y - candidates[right].y; const distanceSquared = deltaX * deltaX + deltaY * deltaY; if (distanceSquared > longest) { longest = distanceSquared; result = [candidates[left], candidates[right]]; } } return result; };
-
-function initializeCorrelationSpecification(): void {}
-function initializeCorrelationModel(): void {}
-
-export { cloneCorrelationPreset as a, normalizeCorrelationValues as c, correlationCoefficient as i, initializeCorrelationSpecification as l, correlationPatterns as n, regressionSegment as o, defaultCorrelationPattern as r, initializeCorrelationModel as s, correlationBounds as t, correlationSpecification as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `CORRELATION`),
+      (n = `correlation-v1`),
+      (r = {
+        pattern: {
+          kind: `enum`,
+          defaultValue: `positive`,
+          allowedValues: [`negative`, `none`, `positive`],
+        },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S;
+function C() {
+  return (C = e(() => {
+    (a(),
+      (o = i.parameters.pattern.allowedValues),
+      (s = i.parameters.pattern.defaultValue),
+      (c = { min: 0, max: 10 }),
+      (l = 4),
+      (u = 1e-9),
+      (d = {
+        negative: [
+          { x: 0.8, y: 8.6 },
+          { x: 1.7, y: 7.3 },
+          { x: 2.6, y: 7.8 },
+          { x: 3.4, y: 5.9 },
+          { x: 4.3, y: 6.2 },
+          { x: 5.2, y: 4.3 },
+          { x: 6.1, y: 3.7 },
+          { x: 7, y: 3.3 },
+          { x: 8, y: 1.5 },
+          { x: 9.1, y: 1.9 },
+        ],
+        none: [
+          { x: 0.8, y: 5.8 },
+          { x: 1.7, y: 2 },
+          { x: 2.6, y: 8.1 },
+          { x: 3.4, y: 4.2 },
+          { x: 4.3, y: 6.9 },
+          { x: 5.2, y: 1.3 },
+          { x: 6.1, y: 7.5 },
+          { x: 7, y: 3 },
+          { x: 8, y: 5.1 },
+          { x: 9.1, y: 6.2 },
+        ],
+        positive: [
+          { x: 0.8, y: 1.4 },
+          { x: 1.7, y: 2.6 },
+          { x: 2.6, y: 2.2 },
+          { x: 3.4, y: 4.1 },
+          { x: 4.3, y: 3.8 },
+          { x: 5.2, y: 5.7 },
+          { x: 6.1, y: 6.3 },
+          { x: 7, y: 6.7 },
+          { x: 8, y: 8.5 },
+          { x: 9.1, y: 8.1 },
+        ],
+      }),
+      (f = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (p = (e) => {
+        if (!e || typeof e != `object`) return !1;
+        let t = e;
+        return Number.isFinite(t.x) && Number.isFinite(t.y);
+      }),
+      (m = (e) => d[e].map((e) => ({ ...e }))),
+      (h = (e) => (o.includes(e) ? e : s)),
+      (g = (e, t) => {
+        let n = e.reduce((e, n) => e + n[t], 0) / e.length;
+        return e.reduce((e, r) => e + (r[t] - n) ** 2, 0) > u;
+      }),
+      (_ = (e) => {
+        let t = h(e.pattern),
+          n = Array.isArray(e.points)
+            ? e.points.filter(p).map((e) => ({ x: f(e.x, c.min, c.max), y: f(e.y, c.min, c.max) }))
+            : [],
+          r = n.length >= l && g(n, `x`) && g(n, `y`) ? n : m(t),
+          i = v(r);
+        return { pattern: i == null ? t : y(i), points: r };
+      }),
+      (v = (e) => {
+        if (e.length < 2) return null;
+        let t = e.reduce((e, t) => e + t.x, 0) / e.length,
+          n = e.reduce((e, t) => e + t.y, 0) / e.length,
+          r = 0,
+          i = 0,
+          a = 0;
+        e.forEach((e) => {
+          let o = e.x - t,
+            s = e.y - n;
+          ((r += o * s), (i += o * o), (a += s * s));
+        });
+        let o = Math.sqrt(i * a);
+        return o <= u ? null : f(r / o, -1, 1);
+      }),
+      (y = (e) => (e <= -0.25 ? `negative` : e >= 0.25 ? `positive` : `none`)),
+      (b = (e) => {
+        if (e.length < 2) return null;
+        let t = e.reduce((e, t) => e + t.x, 0) / e.length,
+          n = e.reduce((e, t) => e + t.y, 0) / e.length,
+          r = e.reduce((e, n) => e + (n.x - t) ** 2, 0);
+        if (r <= u) return null;
+        let i = e.reduce((e, r) => e + (r.x - t) * (r.y - n), 0) / r;
+        return { slope: i, intercept: n - i * t };
+      }),
+      (x = (e, t) => Math.abs(e.x - t.x) <= u && Math.abs(e.y - t.y) <= u),
+      (S = (e) => {
+        let t = b(e);
+        if (!t) return null;
+        let { min: n, max: r } = c,
+          { slope: i, intercept: a } = t,
+          o = [],
+          s = (e) => {
+            e.x >= n - u &&
+              e.x <= r + u &&
+              e.y >= n - u &&
+              e.y <= r + u &&
+              !o.some((t) => x(t, e)) &&
+              o.push({ x: f(e.x, n, r), y: f(e.y, n, r) });
+          };
+        if (
+          (s({ x: n, y: a + i * n }),
+          s({ x: r, y: a + i * r }),
+          Math.abs(i) > u && (s({ x: (n - a) / i, y: n }), s({ x: (r - a) / i, y: r })),
+          o.length < 2)
+        )
+          return null;
+        let l = [o[0], o[1]],
+          d = -1;
+        for (let e = 0; e < o.length; e += 1)
+          for (let t = e + 1; t < o.length; t += 1) {
+            let n = o[e].x - o[t].x,
+              r = o[e].y - o[t].y,
+              i = n * n + r * r;
+            i > d && ((d = i), (l = [o[e], o[t]]));
+          }
+        return l;
+      }));
+  }))();
+}
+export { m as a, _ as c, v as i, a as l, o as n, S as o, s as r, C as s, c as t, i as u };

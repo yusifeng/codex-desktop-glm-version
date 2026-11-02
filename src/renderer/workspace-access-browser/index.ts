@@ -1,10 +1,126 @@
-import '@rchunk/rolldown-runtime';
-import * as InitialChunk from '@rchunk/app-initial';
-interface SignalLike{throwIfAborted():void;reason?:unknown;addEventListener(type:'abort',handler:()=>void,options?:{once?:boolean}):void;removeEventListener(type:'abort',handler:()=>void):void}
-interface WorkspaceAccount{account:{account_id:string;name?:string|null;profile_picture_url?:string|null;account_residency_region?:string;is_deactivated?:boolean;is_fedramp_compliant_workspace?:boolean};can_access_with_session?:boolean;sso_connection_name?:string|null}
-interface Scope{queryClient:{cancelQueries(input:unknown):Promise<void>;setQueryData(key:unknown,value:unknown):void}}
-interface Runtime{Iun():{userId:string;accountId?:string;accessToken:string}|null;Vun():Promise<{userId:string;accountId:string;accessToken:string}|null>;qun(input:unknown):Promise<{userId:string;accountId:string}>;rJt:{safeGet(path:string,input:unknown):Promise<{accounts:Record<string,WorkspaceAccount>;account_ordering:string[]}>};cdn(accountId:string):unknown;Mx(input:unknown,statsig:unknown,returnUrl?:string):Promise<{willRedirect:boolean}>;kx(statsig:unknown):unknown;Gun(token:string):{accountId?:string}}
-const runtime=InitialChunk as unknown as Runtime;
-function abortable<T>(operation:()=>Promise<T>,signal:SignalLike):Promise<T>{signal.throwIfAborted();return new Promise((resolve,reject)=>{const abort=()=>{signal.removeEventListener('abort',abort);reject(signal.reason instanceof Error?signal.reason:new DOMException('Workspace setup aborted','AbortError'))};signal.addEventListener('abort',abort,{once:true});operation().then(value=>{signal.removeEventListener('abort',abort);resolve(value)},error=>{signal.removeEventListener('abort',abort);reject(error instanceof Error?error:Error(String(error)))})})}
-async function prepareWorkspaceAccess(input:{scope:Scope;statsig:unknown;userId:string;workspaceId:string;workspaceAccount?:WorkspaceAccount|null;returnUrl?:string;signal:SignalLike;onStageChange?:(stage:string)=>void}):Promise<WorkspaceAccount|null>{const check=()=>{input.signal.throwIfAborted();if(runtime.Iun()?.userId!==input.userId)throw new DOMException('Checkout user changed','AbortError')};check();input.onStageChange?.('account_refresh_failed');const session=await abortable(runtime.Vun,input.signal);if(session==null||session.userId!==input.userId)throw Error('Checkout session unavailable');const refreshed=await abortable(()=>runtime.qun({accessToken:session.accessToken,method:'GET',path:'/payments/success-team',reason:'checkout_success'}),input.signal);check();if(refreshed.userId!==input.userId)throw Error('Checkout session refresh failed');input.onStageChange?.('account_discovery_failed');const discovered=await runtime.rJt.safeGet('/accounts/check/{version}',{parameters:{path:{version:'v4-2023-04-27'}},signal:input.signal});check();const merged=input.workspaceAccount==null?discovered:{...discovered,accounts:{...discovered.accounts,[input.workspaceId]:input.workspaceAccount},account_ordering:discovered.account_ordering.includes(input.workspaceId)?discovered.account_ordering:[...discovered.account_ordering,input.workspaceId]};input.scope.queryClient.setQueryData(runtime.cdn(refreshed.accountId),merged);const account=merged.accounts[input.workspaceId];if(account==null||account.account.is_deactivated)return null;input.onStageChange?.('workspace_switch_failed');const result=await abortable(()=>runtime.Mx({workspaceAccountId:input.workspaceId,workspaceName:account.account.name??null,canAccessWithSession:account.can_access_with_session,isDeactivated:account.account.is_deactivated,isPersonalWorkspace:false},runtime.kx(input.statsig),input.returnUrl),input.signal);check();if(result.willRedirect)return null;const current=runtime.Iun();return current?.accountId===input.workspaceId&&runtime.Gun(current.accessToken).accountId===input.workspaceId?account:null}
-export{prepareWorkspaceAccess};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  Gun as t,
+  Iun as n,
+  Mx as r,
+  Run as i,
+  Vun as a,
+  cJt as o,
+  cdn as s,
+  jx as c,
+  kx as l,
+  ldn as u,
+  qun as d,
+  rJt as f,
+} from "@rchunk/app-initial";
+async function p({
+  scope: e,
+  statsig: i,
+  userId: o,
+  workspaceId: c,
+  workspaceAccount: u,
+  returnUrl: p,
+  signal: h,
+  onStageChange: g,
+}) {
+  let _ = () => {
+    if ((h.throwIfAborted(), n()?.userId !== o))
+      throw new DOMException(`Checkout user changed`, `AbortError`);
+  };
+  (_(), g?.(`account_refresh_failed`));
+  let v = await m(a, h);
+  if (v == null || v.userId !== o) throw Error(`Checkout session unavailable`);
+  let y = await m(
+    () =>
+      d({
+        accessToken: v.accessToken,
+        method: `GET`,
+        path: `/payments/success-team`,
+        reason: `checkout_success`,
+      }),
+    h,
+  );
+  if ((_(), y == null || y.userId !== o)) throw Error(`Checkout session refresh failed`);
+  if (
+    u != null &&
+    (u.account.account_id !== c || u.account.is_deactivated || !u.can_access_with_session)
+  )
+    throw Error(`Checkout returned an inaccessible workspace account`);
+  let b = s(y.accountId);
+  g?.(`account_discovery_failed`);
+  let x = await f.safeGet(`/accounts/check/{version}`, {
+    parameters: { path: { version: `v4-2023-04-27` } },
+    signal: h,
+  });
+  (_(), await e.queryClient.cancelQueries({ queryKey: b, exact: !0 }), _());
+  let S =
+    u == null
+      ? x
+      : {
+          ...x,
+          accounts: { ...x.accounts, [c]: u },
+          account_ordering: x.account_ordering.includes(c)
+            ? x.account_ordering
+            : [...x.account_ordering, c],
+        };
+  e.queryClient.setQueryData(b, S);
+  let C = S.accounts[c];
+  if (C == null || C.account.is_deactivated) return null;
+  g?.(`workspace_switch_failed`);
+  let { willRedirect: w } = await m(
+    () =>
+      r(
+        {
+          workspaceAccountId: c,
+          workspaceName: C.account.name ?? null,
+          workspaceImageUrl: C.account.profile_picture_url ?? null,
+          accountResidencyRegion: C.account.account_residency_region,
+          canAccessWithSession: C.can_access_with_session,
+          isDeactivated: C.account.is_deactivated,
+          isPersonalWorkspace: !1,
+          isFedrampCompliantWorkspace: C.account.is_fedramp_compliant_workspace,
+          ssoConnectionName: C.sso_connection_name,
+        },
+        l(i),
+        p,
+      ),
+    h,
+  );
+  if ((_(), w)) return null;
+  let T = n();
+  return T?.accountId !== c || t(T.accessToken)?.accountId !== c
+    ? null
+    : (e.queryClient.setQueryData(s(c), S), C);
+}
+function m(e, t) {
+  return (
+    t.throwIfAborted(),
+    new Promise((n, r) => {
+      let i = () => {
+        (t.removeEventListener(`abort`, i),
+          r(
+            t.reason instanceof Error
+              ? t.reason
+              : new DOMException(`Workspace setup aborted`, `AbortError`),
+          ));
+      };
+      (t.addEventListener(`abort`, i, { once: !0 }),
+        e().then(
+          (e) => {
+            (t.removeEventListener(`abort`, i), n(e));
+          },
+          (e) => {
+            (t.removeEventListener(`abort`, i), r(e instanceof Error ? e : Error(String(e))));
+          },
+        ));
+    })
+  );
+}
+function h() {
+  return (h = e(() => {
+    (u(), i(), o(), c());
+  }))();
+}
+h();
+export { p as prepareWorkspaceAccess };

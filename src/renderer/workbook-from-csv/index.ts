@@ -1,16 +1,126 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/spreadsheet-address-utils";
-
-export interface CsvWorkbookOptions { anchor?: string; separator?: string; sheetName?: string }
-export interface CsvWorkbookResult { rangeRef?: string; rect?: { c1: number; c2: number; r1: number; r2: number }; sheetName: string; values: string[][] }
-const DEFAULT_SHEET_NAME = "CSV import";
-const MAX_SHEET_NAME_LENGTH = 31;
-const INVALID_SHEET_NAME_CHARACTERS = /[|/?*\[\]:]/g;
-function sanitizeSheetName(name?: string | null): string { return ((name ?? DEFAULT_SHEET_NAME).trim().replace(INVALID_SHEET_NAME_CHARACTERS, "").trim() || DEFAULT_SHEET_NAME).slice(0, MAX_SHEET_NAME_LENGTH); }
-function columnToIndex(column: string): number { let value = 0; for (const character of column) value = value * 26 + character.charCodeAt(0) - 64; return value - 1; }
-function indexToColumn(index: number): string { let value = index + 1; let output = ""; while (value > 0) { const remainder = (value - 1) % 26; output = String.fromCharCode(65 + remainder) + output; value = Math.floor((value - 1) / 26); } return output; }
-function parseAnchor(anchor: string): { column: number; row: number; sheetName?: string } | null { const match = anchor.match(/^(?:(?:'([^']+)'|([^!]+))!)?([A-Za-z]+)([1-9]\d*)$/); if (!match) return null; return { column: columnToIndex(match[3]!.toUpperCase()), row: Number(match[4]) - 1, sheetName: (match[1] ?? match[2])?.trim() }; }
-function parseCsv(source: string, separator: string): string[][] { if (!source.trim()) return []; const rows: string[][] = []; let row: string[] = []; let cell = ""; let quoted = false; const pushCell = () => { row.push(cell); cell = ""; }; const pushRow = () => { rows.push(row); row = []; }; for (let index = 0; index < source.length; index++) { const character = source[index]!; if (quoted) { if (character === '"') { if (source[index + 1] === '"') { cell += '"'; index++; } else quoted = false; } else cell += character; continue; } if (character === '"') quoted = true; else if (character === separator) pushCell(); else if (character === "\n" || character === "\r") { if (character === "\r" && source[index + 1] === "\n") index++; pushCell(); pushRow(); } else cell += character; } pushCell(); pushRow(); while (rows.at(-1)?.every(value => value === "")) rows.pop(); const width = rows.reduce((maximum, current) => Math.max(maximum, current.length), 0); return rows.map(current => [...current, ...Array(Math.max(0, width - current.length)).fill("")]); }
-function workbookFromCsv(source: string, options?: CsvWorkbookOptions): CsvWorkbookResult { const separator = options?.separator ?? ","; if (separator.length !== 1) throw new Error(`CSV import separator must be a single character; received "${separator}".`); const anchorText = options?.anchor ?? "A1"; const anchor = parseAnchor(anchorText); if (!anchor) throw new Error(`CSV import anchor must be an A1 cell reference; received "${anchorText}".`); const explicitSheet = options?.sheetName?.trim(); if (anchor.sheetName && explicitSheet && anchor.sheetName !== explicitSheet) throw new Error(`CSV import specifies conflicting sheet names: "${explicitSheet}" (options.sheetName) vs "${anchor.sheetName}" (anchor).`); const sheetName = sanitizeSheetName(anchor.sheetName ?? explicitSheet); const values = parseCsv(source, separator); if (values.length === 0) return { sheetName, values }; const endRow = anchor.row + values.length - 1; const endColumn = anchor.column + values[0]!.length - 1; const rangeRef = `${indexToColumn(anchor.column)}${anchor.row + 1}:${indexToColumn(endColumn)}${endRow + 1}`; return { sheetName, values, rangeRef, rect: { r1: anchor.row, c1: anchor.column, r2: endRow, c2: endColumn } }; }
-function initializeWorkbookFromCsv(): void {}
-export { workbookFromCsv as n, sanitizeSheetName as r, initializeWorkbookFromCsv as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { c as t, n, o as r, r as i } from "@rchunk/spreadsheet-address-utils";
+function a(e) {
+  return ((e ?? u).trim().replace(f, ``).trim() || u).slice(0, d);
+}
+function o(e, i) {
+  let o = s(i?.separator),
+    l = t(i?.anchor ?? `A1`),
+    u = l.sheetName?.trim(),
+    d = i?.sheetName?.trim();
+  if (u && d && u !== d)
+    throw Error(
+      `CSV import specifies conflicting sheet names: "${d}" (options.sheetName) vs "${u}" (anchor).`,
+    );
+  let f = a(u ?? d),
+    p = r(l.ref);
+  if (!p)
+    throw Error(`CSV import anchor must be an A1 cell reference; received "${i?.anchor ?? `A1`}".`);
+  let { bounds: m } = p;
+  if (m.startRow !== m.endRow || m.startCol !== m.endCol)
+    throw Error(
+      `CSV import anchor must be a single cell reference; received "${i?.anchor ?? `A1`}".`,
+    );
+  let h = c(e, o),
+    g = h.length,
+    _ = g > 0 ? (h[0]?.length ?? 0) : 0;
+  if (g === 0 || _ === 0) return { sheetName: f, values: [] };
+  let v = {
+    startRow: m.startRow,
+    startCol: m.startCol,
+    endRow: m.startRow + g - 1,
+    endCol: m.startCol + _ - 1,
+  };
+  return {
+    sheetName: f,
+    values: h,
+    rangeRef: n(v),
+    rect: { r1: v.startRow, c1: v.startCol, r2: v.endRow, c2: v.endCol },
+  };
+}
+function s(e) {
+  let t = e ?? `,`;
+  if (t.length !== 1)
+    throw Error(`CSV import separator must be a single character; received "${t}".`);
+  return t;
+}
+function c(e, t) {
+  if (!e.trim()) return [];
+  let n = l(e, t);
+  if (n.length === 0) return [];
+  let r = n.reduce((e, t) => Math.max(e, t.length), 0);
+  return r === 0
+    ? []
+    : n.map((e) => {
+        if (e.length === r) return e;
+        let t = e.slice();
+        for (; t.length < r;) t.push(``);
+        return t;
+      });
+}
+function l(e, t) {
+  let n = [],
+    r = [],
+    i = ``,
+    a = !1,
+    o = () => {
+      (r.push(i), (i = ``));
+    },
+    s = () => {
+      (n.push(r), (r = []));
+    };
+  for (let n = 0; n < e.length; n += 1) {
+    let r = e[n] ?? ``;
+    if (a) {
+      if (r === `"`) {
+        if (e[n + 1] === `"`) {
+          ((i += `"`), (n += 1));
+          continue;
+        }
+        a = !1;
+        continue;
+      }
+      i += r;
+      continue;
+    }
+    if (r === `"`) {
+      a = !0;
+      continue;
+    }
+    if (r === t) {
+      o();
+      continue;
+    }
+    if (
+      r ===
+      `
+`
+    ) {
+      (o(), s());
+      continue;
+    }
+    if (r === `\r`) {
+      (e[n + 1] ===
+        `
+` && (n += 1),
+        o(),
+        s());
+      continue;
+    }
+    i += r;
+  }
+  for (o(), s(); n.length > 0;) {
+    let e = n[n.length - 1] ?? [];
+    if (!(e.length > 0 && e.every((e) => e === ``))) break;
+    n.pop();
+  }
+  return n;
+}
+var u, d, f;
+function p() {
+  return (p = e(() => {
+    (i(), (u = `CSV import`), (d = 31), (f = /\\|\/|\?|\*|\[|\]|:/g));
+  }))();
+}
+export { o as n, a as r, p as t };

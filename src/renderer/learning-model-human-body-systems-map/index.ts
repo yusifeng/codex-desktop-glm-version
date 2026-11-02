@@ -1,8 +1,93 @@
-// Human body systems collaboration map. Release chunk: model-31563588c1d0.js.
-import "@rchunk/rolldown-runtime";
-type System = "integumentary" | "skeletal" | "muscular" | "nervous" | "endocrine" | "cardiovascular" | "lymphatic-immune" | "respiratory" | "digestive" | "urinary-excretory" | "reproductive"; type BodyNeed = "oxygen-delivery" | "nutrient-delivery" | "waste-removal" | "movement-response";
-interface Manifest { type: string; version: number; thumbnailAssetKey: string; parameters: { focus_system: { kind: "enum"; defaultValue: System; allowedValues: System[] } } }
-let manifest: Manifest; let systems: System[]; let bodyNeeds: BodyNeed[]; let allowedSystems: System[]; let defaultSystem: System; let systemStyles: Record<System, { color: string }>; let collaborationMap: Record<BodyNeed, { participants: System[] }>; let normalizeValues: (values: { focus_system?: string | null; bodyNeed?: string | null }) => { focus_system: System; bodyNeed: BodyNeed }; let activeSystems: (values: { focus_system?: string | null; bodyNeed?: string | null }) => Set<System>; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "HUMAN_BODY_SYSTEMS_MAP", version: 3, thumbnailAssetKey: "human-body-systems-map-v2", parameters: { focus_system: { kind: "enum", defaultValue: "respiratory", allowedValues: ["integumentary", "skeletal", "muscular", "nervous", "endocrine", "cardiovascular", "lymphatic-immune", "respiratory", "digestive", "urinary-excretory", "reproductive"] } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); systems = ["integumentary", "skeletal", "muscular", "nervous", "endocrine", "cardiovascular", "lymphatic-immune", "respiratory", "digestive", "urinary-excretory", "reproductive"]; bodyNeeds = ["oxygen-delivery", "nutrient-delivery", "waste-removal", "movement-response"]; const isSystem = (value: unknown): value is System => typeof value === "string" && systems.some(system => system === value); const isNeed = (value: unknown): value is BodyNeed => typeof value === "string" && bodyNeeds.some(need => need === value); allowedSystems = manifest.parameters.focus_system.allowedValues.filter(isSystem); defaultSystem = isSystem(manifest.parameters.focus_system.defaultValue) ? manifest.parameters.focus_system.defaultValue : "respiratory"; systemStyles = { integumentary: { color: "var(--learning-block-color-orange)" }, skeletal: { color: "color-mix(in srgb, var(--learning-block-color-yellow) 72%, var(--text-primary))" }, muscular: { color: "var(--learning-block-color-orange)" }, nervous: { color: "color-mix(in srgb, var(--learning-block-color-purple) 72%, var(--text-primary))" }, endocrine: { color: "color-mix(in srgb, var(--learning-block-color-purple) 72%, var(--text-primary))" }, cardiovascular: { color: "var(--learning-block-color-primary)" }, "lymphatic-immune": { color: "var(--learning-block-color-green)" }, respiratory: { color: "var(--learning-block-color-orange)" }, digestive: { color: "color-mix(in srgb, var(--learning-block-color-yellow) 72%, var(--text-primary))" }, "urinary-excretory": { color: "var(--learning-block-color-green)" }, reproductive: { color: "color-mix(in srgb, var(--learning-block-color-purple) 72%, var(--text-primary))" } }; collaborationMap = { "oxygen-delivery": { participants: ["respiratory", "cardiovascular"] }, "nutrient-delivery": { participants: ["digestive", "lymphatic-immune", "cardiovascular"] }, "waste-removal": { participants: ["cardiovascular", "respiratory", "urinary-excretory", "digestive"] }, "movement-response": { participants: ["nervous", "muscular", "skeletal"] } }; normalizeValues = values => ({ focus_system: isSystem(values.focus_system) ? values.focus_system : defaultSystem, bodyNeed: isNeed(values.bodyNeed) ? values.bodyNeed : "oxygen-delivery" }); activeSystems = values => { const normalized = normalizeValues(values); return new Set([normalized.focus_system, ...collaborationMap[normalized.bodyNeed].participants]); }; }
-export { systems as a, initializeModel as c, manifest as d, collaborationMap as i, normalizeValues as l, allowedSystems as n, systemStyles as o, bodyNeeds as r, activeSystems as s, defaultSystem as t, initializeManifest as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `HUMAN_BODY_SYSTEMS_MAP`),
+      (n = `human-body-systems-map-v2`),
+      (r = {
+        focus_system: {
+          kind: `enum`,
+          defaultValue: `respiratory`,
+          allowedValues: [
+            `integumentary`,
+            `skeletal`,
+            `muscular`,
+            `nervous`,
+            `endocrine`,
+            `cardiovascular`,
+            `lymphatic-immune`,
+            `respiratory`,
+            `digestive`,
+            `urinary-excretory`,
+            `reproductive`,
+          ],
+        },
+      }),
+      (i = { type: t, version: 3, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h;
+function g() {
+  return (g = e(() => {
+    (a(),
+      (o = [
+        `integumentary`,
+        `skeletal`,
+        `muscular`,
+        `nervous`,
+        `endocrine`,
+        `cardiovascular`,
+        `lymphatic-immune`,
+        `respiratory`,
+        `digestive`,
+        `urinary-excretory`,
+        `reproductive`,
+      ]),
+      (s = [`oxygen-delivery`, `nutrient-delivery`, `waste-removal`, `movement-response`]),
+      (c = i.parameters.focus_system),
+      (l = (e) => typeof e == `string` && o.some((t) => t === e)),
+      (u = c.allowedValues.filter(l)),
+      (d = l(c.defaultValue) ? c.defaultValue : `respiratory`),
+      (f = {
+        integumentary: { color: `var(--learning-block-color-orange)` },
+        skeletal: {
+          color: `color-mix(in srgb, var(--learning-block-color-yellow) 72%, var(--text-primary))`,
+        },
+        muscular: { color: `var(--learning-block-color-orange)` },
+        nervous: {
+          color: `color-mix(in srgb, var(--learning-block-color-purple) 72%, var(--text-primary))`,
+        },
+        endocrine: {
+          color: `color-mix(in srgb, var(--learning-block-color-purple) 72%, var(--text-primary))`,
+        },
+        cardiovascular: { color: `var(--learning-block-color-primary)` },
+        "lymphatic-immune": { color: `var(--learning-block-color-green)` },
+        respiratory: { color: `var(--learning-block-color-orange)` },
+        digestive: {
+          color: `color-mix(in srgb, var(--learning-block-color-yellow) 72%, var(--text-primary))`,
+        },
+        "urinary-excretory": { color: `var(--learning-block-color-green)` },
+        reproductive: {
+          color: `color-mix(in srgb, var(--learning-block-color-purple) 72%, var(--text-primary))`,
+        },
+      }),
+      (p = {
+        "oxygen-delivery": { participants: [`respiratory`, `cardiovascular`] },
+        "nutrient-delivery": { participants: [`digestive`, `lymphatic-immune`, `cardiovascular`] },
+        "waste-removal": {
+          participants: [`cardiovascular`, `respiratory`, `urinary-excretory`, `digestive`],
+        },
+        "movement-response": { participants: [`nervous`, `muscular`, `skeletal`] },
+      }),
+      (m = (e) => ({
+        focus_system: l(e.focus_system) ? e.focus_system : d,
+        bodyNeed: s.includes(e.bodyNeed) ? e.bodyNeed : `oxygen-delivery`,
+      })),
+      (h = (e) => {
+        let t = m(e);
+        return new Set([t.focus_system, ...p[t.bodyNeed].participants]);
+      }));
+  }))();
+}
+export { o as a, g as c, i as d, p as i, m as l, u as n, f as o, s as r, h as s, d as t, a as u };

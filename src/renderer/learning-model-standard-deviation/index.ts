@@ -1,9 +1,120 @@
-// Standard-deviation learning model. Release chunk: model-a45393aa052e.js.
-import "@rchunk/rolldown-runtime";
-interface Manifest { type: string; version: number; thumbnailAssetKey: string; canonicalFormula: string; canonicalFormulaAliases: string[]; parameters: { sigma: { kind: "number"; defaultValue: number; min: number; max: number } } }
-let manifest: Manifest; let sigmaParameter: Manifest["parameters"]["sigma"]; let sigmaMinimum: number; let sigmaMaximum: number; let sigmaDefault: number; let sigmaStep = 0.1; let clampValue: (value: number, minimum: number, maximum: number) => number; let mean: (values: number[]) => number; let populationStandardDeviation: (values: number[]) => number; let normalizeSigma: (sigma: number) => number; let defaultPoints: (sigma: number, center?: number) => number[]; let normalizePoints: (points: number[] | null | undefined, sigma: number) => number[]; let rescalePoints: (points: number[] | null | undefined, sigma: number) => number[]; let editPoint: (points: number[] | null | undefined, index: number, value: number) => number[]; let dotPlotLanes: (points: number[], minimumSeparation?: number) => Array<{ index: number; value: number; lane: number }>; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "STANDARD_DEVIATION", version: 1, thumbnailAssetKey: "standard-deviation-v1", canonicalFormula: "\\sigma = \\sqrt{\\frac{1}{N}\\sum_{i=1}^{N}(x_i-\\mu)^2}", canonicalFormulaAliases: ["\\sigma=\\sqrt{\\frac{\\sum(x_i-\\mu)^2}{N}}", "\\sigma = \\sqrt{E[(X-\\mu)^2]}"], parameters: { sigma: { kind: "number", defaultValue: 1.5, min: 0, max: 3 } } }; }
-function initializeModel(): void {
-  if (modelReady) return; modelReady = true; initializeManifest(); sigmaParameter = manifest.parameters.sigma; sigmaMinimum = sigmaParameter.min; sigmaMaximum = sigmaParameter.max; sigmaDefault = sigmaParameter.defaultValue; const epsilon = 1e-9; const template = [-1.4, -0.9, -0.9, -0.3, -0.3, 0, 0.45, 0.9, 1.24]; clampValue = (value, min, max) => Math.min(Math.max(value, min), max); mean = values => values.length === 0 ? 0 : values.reduce((sum, value) => sum + value, 0) / values.length; populationStandardDeviation = values => { if (values.length === 0) return 0; const average = mean(values); return Math.sqrt(values.reduce((sum, value) => sum + (value - average) ** 2, 0) / values.length); }; const average = mean(template); const centered = template.map(value => value - average); const deviation = populationStandardDeviation(centered); const normalizedTemplate = centered.map(value => value / deviation); normalizeSigma = sigma => clampValue(Number.isFinite(sigma) ? sigma : sigmaDefault, sigmaMinimum, sigmaMaximum); defaultPoints = (sigma, center = 5) => normalizedTemplate.map(value => clampValue(center + value * normalizeSigma(sigma), 0, 10)); normalizePoints = (points, sigma) => !points || points.length !== 9 || points.some(value => !Number.isFinite(value)) ? defaultPoints(sigma) : points.map(value => clampValue(value, 0, 10)); const fitRange = (points: number[]) => { const minimum = Math.min(...points); const maximum = Math.max(...points); if (maximum - minimum > 10.000000001) return null; const shift = minimum < 0 ? -minimum : maximum > 10 ? 10 - maximum : 0; return points.map(value => value + shift); }; rescalePoints = (points, sigma) => { const normalized = normalizePoints(points, sigma); const target = normalizeSigma(sigma); const center = mean(normalized); if (target <= epsilon) return normalized.map(() => center); const current = populationStandardDeviation(normalized); const scaled = current <= epsilon ? normalizedTemplate.map(value => center + value * target) : normalized.map(value => center + (value - center) * target / current); return fitRange(scaled) ?? defaultPoints(target, 5); }; const replace = (points: number[], index: number, value: number) => points.map((point, pointIndex) => pointIndex === index ? value : point); editPoint = (points, index, value) => { const normalized = normalizePoints(points, 1.5); const original = normalized[index]; if (original === undefined) return normalized; const target = clampValue(value, 0, 10); const edited = replace(normalized, index, target); if (populationStandardDeviation(edited) <= sigmaMaximum + epsilon) return edited; let low = 0; let high = 1; for (let iteration = 0; iteration < 24; iteration += 1) { const fraction = (low + high) / 2; populationStandardDeviation(replace(normalized, index, original + (target - original) * fraction)) <= sigmaMaximum + epsilon ? low = fraction : high = fraction; } return replace(normalized, index, original + (target - original) * low); }; dotPlotLanes = (points, minimumSeparation = 0.42) => { const laneEnds: number[] = []; return [...points].map((value, index) => ({ index, value })).sort((left, right) => left.value - right.value || left.index - right.index).map(({ index, value }) => { let lane = laneEnds.findIndex(end => value - end >= minimumSeparation); if (lane === -1) lane = laneEnds.length; laneEnds[lane] = value; return { index, value, lane }; }).sort((left, right) => left.index - right.index); };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o;
+function s() {
+  return (s = e(() => {
+    ((t = `STANDARD_DEVIATION`),
+      (n = `standard-deviation-v1`),
+      (r = `\\sigma = \\sqrt{\\frac{1}{N}\\sum_{i=1}^{N}(x_i-\\mu)^2}`),
+      (i = [`\\sigma=\\sqrt{\\frac{\\sum(x_i-\\mu)^2}{N}}`, `\\sigma = \\sqrt{E[(X-\\mu)^2]}`]),
+      (a = { sigma: { kind: `number`, defaultValue: 1.5, min: 0, max: 3 } }),
+      (o = {
+        type: t,
+        version: 1,
+        thumbnailAssetKey: n,
+        canonicalFormula: r,
+        canonicalFormulaAliases: i,
+        parameters: a,
+      }));
+  }))();
 }
-export { manifest as _, sigmaStep as a, mean as c, initializeModel as d, editPoint as f, initializeManifest as g, normalizeSigma as h, sigmaMinimum as i, populationStandardDeviation as l, normalizePoints as m, sigmaDefault as n, dotPlotLanes as o, rescalePoints as p, sigmaMaximum as r, clampValue as s, sigmaParameter as t, defaultPoints as u };
+var c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C, w, T, E;
+function D() {
+  return (D = e(() => {
+    (s(),
+      (c = o.parameters.sigma),
+      (l = c.min),
+      (u = c.max),
+      (d = c.defaultValue),
+      (f = 0.1),
+      (p = 1e-9),
+      (m = [-1.4, -0.9, -0.9, -0.3, -0.3, 0, 0.45, 0.9, 1.24]),
+      (h = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (g = (e) => (e.length === 0 ? 0 : e.reduce((e, t) => e + t, 0) / e.length)),
+      (_ = (e) => {
+        if (e.length === 0) return 0;
+        let t = g(e),
+          n = e.reduce((e, n) => e + (n - t) ** 2, 0) / e.length;
+        return Math.sqrt(n);
+      }),
+      (v = (() => {
+        let e = g(m),
+          t = m.map((t) => t - e),
+          n = _(t);
+        return t.map((e) => e / n);
+      })()),
+      (y = (e) => h(Number.isFinite(e) ? e : d, l, u)),
+      (b = (e, t = 5) => {
+        let n = y(e);
+        return v.map((e) => h(t + e * n, 0, 10));
+      }),
+      (x = (e, t) =>
+        !e || e.length !== 9 || e.some((e) => !Number.isFinite(e))
+          ? b(t)
+          : e.map((e) => h(e, 0, 10))),
+      (S = (e) => {
+        let t = Math.min(...e),
+          n = Math.max(...e);
+        if (n - t > 10.000000001) return null;
+        let r = t < 0 ? 0 - t : n > 10 ? 10 - n : 0;
+        return e.map((e) => e + r);
+      }),
+      (C = (e, t) => {
+        let n = x(e, t),
+          r = y(t),
+          i = g(n);
+        if (r <= p) return n.map(() => i);
+        let a = _(n),
+          o = a <= p ? v.map((e) => i + e * r) : n.map((e) => i + (e - i) * (r / a));
+        return S(o) || b(r, 5);
+      }),
+      (w = (e, t, n) => e.map((e, r) => (r === t ? n : e))),
+      (T = (e, t, n) => {
+        let r = x(e, 1.5),
+          i = r[t];
+        if (i === void 0) return r;
+        let a = h(n, 0, 10),
+          o = w(r, t, a);
+        if (_(o) <= u + p) return o;
+        let s = 0,
+          c = 1;
+        for (let e = 0; e < 24; e += 1) {
+          let e = (s + c) / 2,
+            n = i + (a - i) * e,
+            o = w(r, t, n);
+          _(o) <= u + p ? (s = e) : (c = e);
+        }
+        return w(r, t, i + (a - i) * s);
+      }),
+      (E = (e, t = 0.42) => {
+        let n = [];
+        return [...e]
+          .map((e, t) => ({ index: t, value: e }))
+          .sort((e, t) => e.value - t.value || e.index - t.index)
+          .map(({ index: e, value: r }) => {
+            let i = n.findIndex((e) => r - e >= t);
+            return (i === -1 && (i = n.length), (n[i] = r), { index: e, value: r, lane: i });
+          })
+          .sort((e, t) => e.index - t.index);
+      }));
+  }))();
+}
+export {
+  o as _,
+  f as a,
+  g as c,
+  D as d,
+  T as f,
+  s as g,
+  y as h,
+  l as i,
+  _ as l,
+  x as m,
+  d as n,
+  E as o,
+  C as p,
+  u as r,
+  h as s,
+  c as t,
+  b as u,
+};

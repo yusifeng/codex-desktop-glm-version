@@ -1,19 +1,126 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, m4 as joinClasses, type JsxRuntime } from "@rchunk/app-shared";
-
-interface SurfaceProps extends Record<string, unknown> { as?: string; children?: unknown; className?: string; style?: Record<string, unknown> }
-interface HeaderActionProps { activeLabel?: string; children?: unknown; disabled?: boolean; expanded?: boolean; label: string; onClick?(): void; pressed?: boolean; showActiveBackground?: boolean; size?: "compact" | "default"; testId?: string }
-let runtime: JsxRuntime | undefined;
-function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function o({ as = "div", className, ...props }: SurfaceProps): unknown { return jsx().jsx(as, { ...props, "data-popcorn-header-surface": "", className: joinClasses("inline-flex h-8 shrink-0 items-center rounded-xl bg-surface-elevated-secondary/90", as === "button" && "cursor-interaction", className) }); }
-function r(): unknown { return jsx().jsx("span", { "aria-hidden": true, "data-popcorn-header-divider": "", className: "h-5 w-px shrink-0 bg-border" }); }
-function i({ title, trailingContent }: { title: unknown; trailingContent?: unknown }): unknown { return o({ className: "max-w-full gap-2 px-2", children: [jsx().jsx("span", { className: "truncate px-1 py-1", children: title }), trailingContent == null ? null : jsx().jsxs(jsx().Fragment, { children: [r(), trailingContent] })] }); }
-function n({ ariaLabel, children, trailingContent }: { ariaLabel: string; children?: unknown; trailingContent?: unknown }): unknown { return o({ "aria-label": ariaLabel, className: "max-w-full px-2", role: "toolbar", children: jsx().jsxs("div", { className: "flex items-center gap-2", children: [children, trailingContent == null ? null : jsx().jsxs(jsx().Fragment, { children: [r(), trailingContent] })] }) }); }
-function t({ activeLabel, children, disabled = false, expanded, label, onClick, pressed, showActiveBackground = true, size = "compact", testId }: HeaderActionProps): unknown {
-  const active = pressed === true && activeLabel != null;
-  const accessibleLabel = active ? activeLabel : label;
-  return jsx().jsx("button", { type: "button", "data-popcorn-header-action": "", "data-active-label": active || undefined, "aria-label": accessibleLabel, "aria-expanded": expanded, "aria-pressed": pressed, "data-testid": testId, disabled, onClick, title: accessibleLabel, className: joinClasses("inline-flex items-center", size === "compact" ? "h-6 min-w-6 rounded-md" : "h-7 min-w-7 rounded-full", showActiveBackground && (expanded || pressed) && "bg-text-info/10 text-info"), children: [children, activeLabel == null ? null : jsx().jsx("span", { children: accessibleLabel })] });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { I3 as t, e6 as n, h4 as r, m4 as i } from "@rchunk/app-shared";
+function a({ as: e = `div`, className: t, style: n, ...r }) {
+  return (0, o.createElement)(e, {
+    "data-popcorn-header-surface": ``,
+    ...r,
+    className: i(
+      `inline-flex h-8 shrink-0 items-center rounded-xl border-0 bg-surface-elevated-secondary/90 font-sans text-sm leading-5 text-default shadow-lg ring-[0.5px] ring-border backdrop-blur-sm select-none`,
+      e === `button` &&
+        `cursor-interaction outline-hidden hover:bg-primary-ghost-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset active:bg-primary-ghost-active`,
+      t,
+    ),
+    style: n,
+  });
 }
-function s(): void {}
-function a(): void {}
-export { a, i, n, o, r, s, t };
+var o;
+function s() {
+  return (s = e(() => {
+    (r(), (o = n()));
+  }))();
+}
+function c() {
+  return (0, f.jsx)(`span`, {
+    "aria-hidden": `true`,
+    "data-popcorn-header-divider": ``,
+    className: `h-5 w-px shrink-0 bg-border`,
+  });
+}
+function l({ title: e, trailingContent: t }) {
+  return (0, f.jsxs)(a, {
+    className: `max-w-full gap-2 px-2`,
+    children: [
+      (0, f.jsx)(`span`, { className: `block max-w-52 min-w-0 truncate px-1 py-1`, children: e }),
+      t == null ? null : (0, f.jsxs)(f.Fragment, { children: [(0, f.jsx)(c, {}), t] }),
+    ],
+  });
+}
+function u({ ariaLabel: e, children: t, trailingContent: n }) {
+  return (0, f.jsx)(a, {
+    "aria-label": e,
+    className: `max-w-full px-2`,
+    role: `toolbar`,
+    children: (0, f.jsxs)(`div`, {
+      className: `flex items-center gap-2 [&_button_svg]:size-4`,
+      children: [
+        t,
+        n == null ? null : (0, f.jsxs)(f.Fragment, { children: [(0, f.jsx)(c, {}), n] }),
+      ],
+    }),
+  });
+}
+function d({
+  children: e,
+  activeLabel: t,
+  disabled: n = !1,
+  expanded: r,
+  label: a,
+  onClick: o,
+  pressed: s,
+  showActiveBackground: c = !0,
+  size: l = `compact`,
+  testId: u,
+}) {
+  let d = s === !0 && t != null,
+    p = d ? t : a;
+  return (0, f.jsx)(`button`, {
+    type: `button`,
+    "data-popcorn-header-action": ``,
+    "data-active-label": d || void 0,
+    "aria-label": p,
+    "aria-expanded": r,
+    "aria-pressed": s,
+    "data-testid": u,
+    disabled: n,
+    onClick: o,
+    title: p,
+    className: i(
+      `inline-flex cursor-interaction items-center overflow-hidden select-none focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset disabled:cursor-default disabled:opacity-40`,
+      l === `compact` ? `h-6 min-w-6 rounded-md` : `h-7 min-w-7 rounded-full`,
+      t == null
+        ? i(l === `compact` ? `w-6` : `w-7`, `justify-center`)
+        : `ease-basic transition-[max-width,padding-inline,background-color,color,transform] duration-relaxed [will-change:max-width] motion-reduce:transition-none`,
+      t != null &&
+        (d
+          ? `max-w-40 justify-start px-2`
+          : i(l === `compact` ? `max-w-6` : `max-w-7`, `justify-center px-0`)),
+      c && (r || s)
+        ? `bg-text-info/10 text-info enabled:hover:bg-text-info/15`
+        : i(
+            l === `compact` ? `text-token-text-secondary` : `text-default`,
+            `enabled:hover:bg-primary-ghost-hover enabled:active:bg-primary-ghost-active enabled:hover:text-default`,
+          ),
+    ),
+    children: (0, f.jsxs)(`span`, {
+      className: i(`flex min-w-0 items-center`, d ? `justify-start` : `w-full justify-center`),
+      children: [
+        (0, f.jsx)(`span`, {
+          className: i(
+            `flex shrink-0 items-center`,
+            t != null &&
+              `ease-basic transition-transform duration-relaxed motion-reduce:transition-none`,
+            d ? `-translate-x-0.5` : `translate-x-0`,
+          ),
+          children: e,
+        }),
+        t == null
+          ? null
+          : (0, f.jsx)(`span`, {
+              className: i(
+                `ease-basic min-w-0 overflow-hidden whitespace-nowrap text-sm transition-[max-width,opacity,margin-inline-start] duration-relaxed motion-reduce:transition-none`,
+                d ? `ms-1 max-w-32 opacity-100` : `ms-0 max-w-0 opacity-0`,
+              ),
+              children: p,
+            }),
+      ],
+    }),
+  });
+}
+var f;
+function p() {
+  return (p = e(() => {
+    (r(), s(), (f = t()));
+  }))();
+}
+export { p as a, l as i, u as n, a as o, c as r, s, d as t };

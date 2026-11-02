@@ -1,7 +1,87 @@
-// Geothermal-power plant selection model. Release chunk: model-f5fc9c2ff44e.js.
-import "@rchunk/rolldown-runtime";
-type Plant = "dry steam" | "flash steam" | "binary cycle"; interface Formatter { formatMessage(message: { id: string; defaultMessage: string }): string } interface Manifest { type: string; version: number; thumbnailAssetKey: string; parameters: { plant_type: { kind: "enum"; defaultValue: Plant; allowedValues: Plant[] } } }
-let manifest: Manifest; let control: { min: number; max: number; step: number; defaultValue: Plant; options: Plant[] }; let indexForPlant: (plant: Plant) => number; let plantForIndex: (index: number) => Plant; let normalizeValues: (values: { plant_type?: string | null }) => { plant_type: Plant }; let label: (formatter: Formatter, plant: Plant) => string; let caption: (formatter: Formatter, plant: Plant) => string; let aria: (formatter: Formatter, plant: Plant) => string; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "GEOTHERMAL_POWER", version: 4, thumbnailAssetKey: "geothermal-power-v2", parameters: { plant_type: { kind: "enum", defaultValue: "dry steam", allowedValues: ["dry steam", "flash steam", "binary cycle"] } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); const options = manifest.parameters.plant_type.allowedValues; control = { min: 0, max: options.length - 1, step: 1, defaultValue: manifest.parameters.plant_type.defaultValue, options }; indexForPlant = plant => Math.max(0, options.indexOf(plant)); plantForIndex = index => options[Math.min(Math.max(Math.round(index), 0), options.length - 1)] ?? control.defaultValue; normalizeValues = values => ({ plant_type: options.some(option => option === values.plant_type) ? values.plant_type as Plant : control.defaultValue }); label = (formatter, plant) => formatter.formatMessage({ id: `learningBlock.geothermalPower.control.${plant === "dry steam" ? "drySteam" : plant === "flash steam" ? "flashSteam" : "binaryCycle"}`, defaultMessage: plant === "dry steam" ? "Dry steam" : plant === "flash steam" ? "Flash steam" : "Binary cycle" }); caption = (formatter, plant) => formatter.formatMessage({ id: `learningBlock.geothermalPower.caption.${plant === "dry steam" ? "drySteam" : plant === "flash steam" ? "flashSteam" : "binaryCycle"}`, defaultMessage: plant === "flash steam" ? "A pressure drop separates steam; brine and condensate return underground" : plant === "binary cycle" ? "Hot water heats a separate fluid; its vapor drives the turbine and cycles back" : "Reservoir steam drives the turbine, condenses, and is reinjected" }); aria = (formatter, plant) => formatter.formatMessage({ id: `learningBlock.geothermalPower.aria.${plant === "dry steam" ? "drySteam" : plant === "flash steam" ? "flashSteam" : "binaryCycle"}`, defaultMessage: plant === "flash steam" ? "Flash-steam geothermal plant. Hot pressurized water rises from a hot, permeable reservoir through the production well. A pressure drop in the flash tank separates steam, which drives the turbine and generator. The remaining liquid joins condensed steam and returns through the injection well. The generator supplies electricity." : plant === "binary cycle" ? "Binary-cycle geothermal plant. Hot water rises from a hot, permeable reservoir through the production well and transfers heat in an exchanger before returning through the injection well. A separate low-boiling fluid vaporizes, drives the turbine and generator, condenses in the cooler, and returns to the exchanger without mixing with geothermal water. The generator supplies electricity." : "Dry-steam geothermal plant. Natural steam rises from a hot, permeable reservoir through the production well and drives the turbine and generator. The steam condenses in the cooler and the cooled geothermal fluid returns through the injection well. The generator supplies electricity." }); }
-export { plantForIndex as a, normalizeValues as c, label as i, initializeManifest as l, aria as n, indexForPlant as o, caption as r, initializeModel as s, control as t, manifest as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `GEOTHERMAL_POWER`),
+      (n = `geothermal-power-v2`),
+      (r = {
+        plant_type: {
+          kind: `enum`,
+          defaultValue: `dry steam`,
+          allowedValues: [`dry steam`, `flash steam`, `binary cycle`],
+        },
+      }),
+      (i = { type: t, version: 4, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m;
+function h() {
+  return (h = e(() => {
+    (a(),
+      (o = i.parameters.plant_type),
+      (s = o.allowedValues),
+      (c = { min: 0, max: s.length - 1, step: 1, defaultValue: o.defaultValue, options: s }),
+      (l = (e) => Math.max(0, s.indexOf(e))),
+      (u = (e) => s[Math.min(Math.max(Math.round(e), 0), s.length - 1)] ?? c.defaultValue),
+      (d = (e) => ({ plant_type: s.includes(e.plant_type ?? ``) ? e.plant_type : c.defaultValue })),
+      (f = (e, t) => {
+        switch (t) {
+          case `dry steam`:
+            return e.formatMessage({
+              id: `learningBlock.geothermalPower.control.drySteam`,
+              defaultMessage: `Dry steam`,
+            });
+          case `flash steam`:
+            return e.formatMessage({
+              id: `learningBlock.geothermalPower.control.flashSteam`,
+              defaultMessage: `Flash steam`,
+            });
+          case `binary cycle`:
+            return e.formatMessage({
+              id: `learningBlock.geothermalPower.control.binaryCycle`,
+              defaultMessage: `Binary cycle`,
+            });
+        }
+      }),
+      (p = (e, t) => {
+        switch (t) {
+          case `flash steam`:
+            return e.formatMessage({
+              id: `learningBlock.geothermalPower.caption.flashSteam`,
+              defaultMessage: `A pressure drop separates steam; brine and condensate return underground`,
+            });
+          case `binary cycle`:
+            return e.formatMessage({
+              id: `learningBlock.geothermalPower.caption.binaryCycle`,
+              defaultMessage: `Hot water heats a separate fluid; its vapor drives the turbine and cycles back`,
+            });
+          case `dry steam`:
+            return e.formatMessage({
+              id: `learningBlock.geothermalPower.caption.drySteam`,
+              defaultMessage: `Reservoir steam drives the turbine, condenses, and is reinjected`,
+            });
+        }
+      }),
+      (m = (e, t) => {
+        switch (t) {
+          case `flash steam`:
+            return e.formatMessage({
+              id: `learningBlock.geothermalPower.aria.flashSteam`,
+              defaultMessage: `Flash-steam geothermal plant. Hot pressurized water rises from a hot, permeable reservoir through the production well. A pressure drop in the flash tank separates steam, which drives the turbine and generator. The remaining liquid joins condensed steam and returns through the injection well. The generator supplies electricity.`,
+            });
+          case `binary cycle`:
+            return e.formatMessage({
+              id: `learningBlock.geothermalPower.aria.binaryCycle`,
+              defaultMessage: `Binary-cycle geothermal plant. Hot water rises from a hot, permeable reservoir through the production well and transfers heat in an exchanger before returning through the injection well. A separate low-boiling fluid vaporizes, drives the turbine and generator, condenses in the cooler, and returns to the exchanger without mixing with geothermal water. The generator supplies electricity.`,
+            });
+          case `dry steam`:
+            return e.formatMessage({
+              id: `learningBlock.geothermalPower.aria.drySteam`,
+              defaultMessage: `Dry-steam geothermal plant. Natural steam rises from a hot, permeable reservoir through the production well and drives the turbine and generator. The steam condenses in the cooler and the cooled geothermal fluid returns through the injection well. The generator supplies electricity.`,
+            });
+        }
+      }));
+  }))();
+}
+export { u as a, d as c, f as i, a as l, m as n, l as o, p as r, h as s, c as t, i as u };

@@ -1,31 +1,136 @@
-// Reflection geometry with equal incident and reflected angles.
-import "@rchunk/rolldown-runtime";
-
-interface ReflectionValues { incidentAngleDeg?: number | null; incidentRayLength?: number | null }
-interface Point { x: number; y: number }
-interface ClientBounds { left: number; top: number; width: number; height: number }
-
-const reflectionSpecification = { type: "LAW_OF_REFLECTION", version: 2, thumbnailAssetKey: "law-of-reflection-v1", canonicalFormula: "\\theta_i = \\theta_r", parameters: { incidentAngleDeg: { kind: "number" as const, defaultValue: 40, min: 10, max: 75 } } };
-const incidentAngleControl = { defaultValue: reflectionSpecification.parameters.incidentAngleDeg.defaultValue, min: reflectionSpecification.parameters.incidentAngleDeg.min, max: reflectionSpecification.parameters.incidentAngleDeg.max, step: 1 };
-const incidentRayLengthControl = { defaultValue: 144, min: 104, max: 176 };
-const reflectionLayout = { viewbox: { width: 448, height: 320 }, incidencePoint: { x: 224, y: 232 }, angleArcRadius: 40, normalLineStartY: 80, mirror: { x: 48, y: 232, width: 352, height: 16 }, labels: { instruction: { x: 224, y: 24, maxWidth: 304 }, normal: { x: 224, y: 48, maxWidth: 96 }, ray: { minX: 72, maxX: 160, endpointOffsetX: 40, minY: 112, endpointOffsetY: 24, maxWidth: 112 }, incidentAngleName: { x: 112, y: 64, maxWidth: 176 }, reflectedAngleName: { x: 336, y: 64, maxWidth: 176 }, angleValue: { incidentOffset: { x: -48, y: -32 }, reflectedOffset: { x: 64, y: -56 }, maxWidth: 64 }, pointOfIncidence: { x: 224, y: 272, maxWidth: 176 }, planeMirror: { x: 224, y: 296, maxWidth: 176 } } };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const degreesToRadians = (degrees: number): number => degrees * Math.PI / 180;
-const normalizeIncidentAngle = (value: unknown): number => clamp(typeof value === "number" && Number.isFinite(value) ? value : incidentAngleControl.defaultValue, incidentAngleControl.min, incidentAngleControl.max);
-const normalizeIncidentRayLength = (value: unknown): number => clamp(typeof value === "number" && Number.isFinite(value) ? value : incidentRayLengthControl.defaultValue, incidentRayLengthControl.min, incidentRayLengthControl.max);
-const normalizeReflectionValues = (values: ReflectionValues) => ({ incidentAngleDeg: normalizeIncidentAngle(values.incidentAngleDeg), incidentRayLength: normalizeIncidentRayLength(values.incidentRayLength) });
-const pointOnRay = (side: "incident" | "reflected", length: number, radians: number): Point => { const direction = side === "incident" ? -1 : 1; return { x: reflectionLayout.incidencePoint.x + direction * length * Math.sin(radians), y: reflectionLayout.incidencePoint.y - length * Math.cos(radians) }; };
-const angleArcPath = (side: "incident" | "reflected", radians: number): string => { const start = { x: reflectionLayout.incidencePoint.x, y: reflectionLayout.incidencePoint.y - reflectionLayout.angleArcRadius }; const end = pointOnRay(side, reflectionLayout.angleArcRadius, radians); return `M ${start.x.toFixed(2)} ${start.y.toFixed(2)} A ${reflectionLayout.angleArcRadius} ${reflectionLayout.angleArcRadius} 0 0 ${side === "incident" ? 0 : 1} ${end.x.toFixed(2)} ${end.y.toFixed(2)}`; };
-const reflectionGeometry = (angle: number, rayLength = incidentRayLengthControl.defaultValue) => {
-  const angleDeg = normalizeIncidentAngle(angle); const safeLength = normalizeIncidentRayLength(rayLength); const radians = degreesToRadians(angleDeg);
-  return { angleDeg, rayLength: safeLength, incidentSource: pointOnRay("incident", safeLength, radians), reflectedEnd: pointOnRay("reflected", safeLength, radians), incidentDirectionPoint: pointOnRay("incident", safeLength / 2, radians), reflectedDirectionPoint: pointOnRay("reflected", safeLength / 2, radians), incidentArcPath: angleArcPath("incident", radians), reflectedArcPath: angleArcPath("reflected", radians) };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `LAW_OF_REFLECTION`),
+      (n = `law-of-reflection-v1`),
+      (r = `\\theta_i = \\theta_r`),
+      (i = { incidentAngleDeg: { kind: `number`, defaultValue: 40, min: 10, max: 75 } }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+var s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C, w;
+function T() {
+  return (T = e(() => {
+    (o(),
+      (s = {
+        defaultValue: a.parameters.incidentAngleDeg.defaultValue,
+        min: a.parameters.incidentAngleDeg.min,
+        max: a.parameters.incidentAngleDeg.max,
+        step: 1,
+      }),
+      (c = { defaultValue: 144, min: 104, max: 176 }),
+      (l = {
+        viewbox: { width: 448, height: 320 },
+        incidencePoint: { x: 224, y: 232 },
+        angleArcRadius: 40,
+        normalLineStartY: 80,
+        mirror: { x: 48, y: 232, width: 352, height: 16 },
+        labels: {
+          instruction: { x: 224, y: 24, maxWidth: 304 },
+          normal: { x: 224, y: 48, maxWidth: 96 },
+          ray: {
+            minX: 72,
+            maxX: 160,
+            endpointOffsetX: 40,
+            minY: 112,
+            endpointOffsetY: 24,
+            maxWidth: 112,
+          },
+          incidentAngleName: { x: 112, y: 64, maxWidth: 176 },
+          reflectedAngleName: { x: 336, y: 64, maxWidth: 176 },
+          angleValue: {
+            incidentOffset: { x: -48, y: -32 },
+            reflectedOffset: { x: 64, y: -56 },
+            maxWidth: 64,
+          },
+          pointOfIncidence: { x: 224, y: 272, maxWidth: 176 },
+          planeMirror: { x: 224, y: 296, maxWidth: 176 },
+        },
+      }),
+      ({ angleArcRadius: u, incidencePoint: d, viewbox: f } = l),
+      (p = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (m = (e) => (e * Math.PI) / 180),
+      (h = (e) => {
+        let t = typeof e == `number` && Number.isFinite(e) ? e : s.defaultValue;
+        return p(t, s.min, s.max);
+      }),
+      (g = (e) => {
+        let t = typeof e == `number` && Number.isFinite(e) ? e : c.defaultValue;
+        return p(t, c.min, c.max);
+      }),
+      (_ = (e) => ({
+        incidentAngleDeg: h(e.incidentAngleDeg),
+        incidentRayLength: g(e.incidentRayLength),
+      })),
+      (v = (e, t, n) => {
+        let r = e === `incident` ? -1 : 1;
+        return { x: d.x + r * t * Math.sin(n), y: d.y - t * Math.cos(n) };
+      }),
+      (y = (e, t) => {
+        let n = { x: d.x, y: d.y - u },
+          r = v(e, u, t),
+          i = e === `incident` ? 0 : 1;
+        return `M ${n.x.toFixed(2)} ${n.y.toFixed(2)} A ${u} ${u} 0 0 ${i} ${r.x.toFixed(2)} ${r.y.toFixed(2)}`;
+      }),
+      (b = (e, t = c.defaultValue) => {
+        let n = h(e),
+          r = g(t),
+          i = m(n);
+        return {
+          angleDeg: n,
+          rayLength: r,
+          incidentSource: v(`incident`, r, i),
+          reflectedEnd: v(`reflected`, r, i),
+          incidentDirectionPoint: v(`incident`, r / 2, i),
+          reflectedDirectionPoint: v(`reflected`, r / 2, i),
+          incidentArcPath: y(`incident`, i),
+          reflectedArcPath: y(`reflected`, i),
+        };
+      }),
+      (x = (e) => {
+        let t = l.labels.ray,
+          n = p(e.incidentSource.x - t.endpointOffsetX, t.minX, t.maxX),
+          r = Math.max(t.minY, e.incidentSource.y - t.endpointOffsetY);
+        return { incident: { x: n, y: r }, reflected: { x: f.width - n, y: r } };
+      }),
+      (S = () => {
+        let e = l.labels.angleValue;
+        return {
+          incident: { x: d.x + e.incidentOffset.x, y: d.y + e.incidentOffset.y },
+          reflected: { x: d.x + e.reflectedOffset.x, y: d.y + e.reflectedOffset.y },
+        };
+      }),
+      (C = (e) => {
+        let t = d.x - e.x,
+          n = d.y - e.y,
+          r = (180 / Math.PI) * Math.atan2(t, n);
+        return { incidentAngleDeg: h(r), incidentRayLength: g(Math.hypot(t, n)) };
+      }),
+      (w = ({ bounds: e, clientX: t, clientY: n }) => {
+        let r = Math.min(e.width / f.width, e.height / f.height),
+          i = f.width * r,
+          a = f.height * r,
+          o = (e.width - i) / 2,
+          s = (e.height - a) / 2;
+        return { x: (t - e.left - o) / r, y: (n - e.top - s) / r };
+      }));
+  }))();
+}
+export {
+  S as a,
+  w as c,
+  g as d,
+  _ as f,
+  C as i,
+  T as l,
+  a as m,
+  c as n,
+  b as o,
+  o as p,
+  l as r,
+  x as s,
+  s as t,
+  h as u,
 };
-const rayLabelPositions = (geometry: ReturnType<typeof reflectionGeometry>) => { const ray = reflectionLayout.labels.ray; const x = clamp(geometry.incidentSource.x - ray.endpointOffsetX, ray.minX, ray.maxX); const y = Math.max(ray.minY, geometry.incidentSource.y - ray.endpointOffsetY); return { incident: { x, y }, reflected: { x: reflectionLayout.viewbox.width - x, y } }; };
-const angleValuePositions = () => { const angle = reflectionLayout.labels.angleValue; return { incident: { x: reflectionLayout.incidencePoint.x + angle.incidentOffset.x, y: reflectionLayout.incidencePoint.y + angle.incidentOffset.y }, reflected: { x: reflectionLayout.incidencePoint.x + angle.reflectedOffset.x, y: reflectionLayout.incidencePoint.y + angle.reflectedOffset.y } }; };
-const reflectionValuesFromPoint = (point: Point) => { const deltaX = reflectionLayout.incidencePoint.x - point.x; const deltaY = reflectionLayout.incidencePoint.y - point.y; return { incidentAngleDeg: normalizeIncidentAngle(180 / Math.PI * Math.atan2(deltaX, deltaY)), incidentRayLength: normalizeIncidentRayLength(Math.hypot(deltaX, deltaY)) }; };
-const clientToReflectionViewbox = ({ bounds, clientX, clientY }: { bounds: ClientBounds; clientX: number; clientY: number }): Point => { const scale = Math.min(bounds.width / reflectionLayout.viewbox.width, bounds.height / reflectionLayout.viewbox.height); const renderedWidth = reflectionLayout.viewbox.width * scale; const renderedHeight = reflectionLayout.viewbox.height * scale; const offsetX = (bounds.width - renderedWidth) / 2; const offsetY = (bounds.height - renderedHeight) / 2; return { x: (clientX - bounds.left - offsetX) / scale, y: (clientY - bounds.top - offsetY) / scale }; };
-
-function initializeReflectionSpecification(): void {}
-function initializeReflectionModel(): void {}
-
-export { angleValuePositions as a, clientToReflectionViewbox as c, normalizeIncidentRayLength as d, normalizeReflectionValues as f, reflectionValuesFromPoint as i, initializeReflectionModel as l, reflectionSpecification as m, incidentRayLengthControl as n, reflectionGeometry as o, initializeReflectionSpecification as p, reflectionLayout as r, rayLabelPositions as s, incidentAngleControl as t, normalizeIncidentAngle as u };
