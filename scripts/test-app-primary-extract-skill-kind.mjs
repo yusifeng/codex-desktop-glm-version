@@ -14,5 +14,9 @@ assert.equal(m.extractSkillKindFromPath("C:\\x\\skills\\.system\\presentations\\
 assert.equal(m.extractSkillKindFromPath("/skills/unknown/skill.md"), null);
 assert.equal(m.extractSkillKindFromMentions([{ type: "paragraph" }, { type: "pluginMention", attrs: { path: "plugin://google-sheets" } }]), "google-sheets");
 assert.equal(m.extractSkillKindFromMentions([{ type: "pluginMention", attrs: { path: "plugin://documents" } }], "spreadsheet"), "document");
+assert.equal(m.extractSkillKindFromPrompt("Use [Sheets](plugin://spreadsheets@1)"), "spreadsheet");
+assert.equal(m.extractSkillKindFromPrompt("[Doc](plugin://documents\\@1) then [Slides](plugin://presentations@2)"), "presentation");
+assert.equal(m.extractSkillKindFromPrompt("[Doc](plugin://documents) [unknown](plugin://unknown)"), "document");
+assert.equal(m.extractSkillKindFromPrompt("[empty]()\n[broken](plugin://documents"), null);
 fs.unlinkSync(output);
-console.log("5 app-primary extract-skill-kind assertions passed");
+console.log("9 app-primary extract-skill-kind assertions passed");

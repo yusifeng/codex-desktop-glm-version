@@ -15242,6 +15242,7 @@ declare module "@rchunk/writing-block-surface" {
   export const t: (props: WritingBlockRegionProps) => unknown;
 }
 declare module "@rchunk/vite-browser-external" { const browserExternal: unknown; export default browserExternal }
+declare module "@rchunk/renderer-zod-runtime" { export { z } from "zod" }
 declare module "@rchunk/artifact-workbook-model-runtime";
 declare module "@rchunk/artifact-document-model-runtime";
 declare module "@rchunk/artifact-presentation-model-runtime";

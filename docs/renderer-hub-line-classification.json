@@ -1619,7 +1619,7 @@
     "endLine": 4105,
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/extract-skill-kind.ts",
-    "evidence": "The skill mention projection walks only skill/plugin mention nodes and maps normalized plugin:// or skills/*/skill.md paths to stable product kinds. It is a deterministic policy with no JSX, store, or lifecycle side effects; the aggregate alias remains unconsumed until a named renderer boundary adopts it."
+    "evidence": "The prompt projection scans inline Markdown links in order, unescapes their paths, and retains the latest recognized plugin or skill kind. It is a deterministic policy now owned by extractSkillKindFromPrompt and consumed directly without aggregate-hub lifecycle state."
   },
   {
     "hub": "app-primary",
@@ -1634,32 +1634,32 @@
   {
     "hub": "app-primary",
     "alias": "Df",
-    "sourceSymbol": "dF",
-    "startLine": 15592,
-    "endLine": 15598,
-    "classification": "generated-local-panel-position-policy",
+    "sourceSymbol": "fF",
+    "startLine": 15615,
+    "endLine": 15617,
+    "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/panel-target-policy.ts",
-    "evidence": "The helper normalizes panel edge availability and selects the bottom/right target for the adjacent generated panel surface; it has no independent renderer consumer or lifecycle boundary."
+    "evidence": "The deterministic preferred-target policy filters bottom/right tabs through availability before applying the fallback layout policy. It is owned by getPreferredPanelTarget and directly consumed by browser-open and panel-visibility boundaries."
   },
   {
     "hub": "app-primary",
     "alias": "Hd",
     "sourceSymbol": "KMe",
-    "startLine": 17508,
-    "endLine": 17525,
-    "classification": "generated-local-recipient-parser",
+    "startLine": 17521,
+    "endLine": 17537,
+    "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/normalize-recipient-fields.ts",
-    "evidence": "The helper parses comma-separated recipient tokens, validates addresses, and projects matching contact metadata for the adjacent generated composer surface; ownership remains local to that surface."
+    "evidence": "The deterministic parser splits comma-separated recipients, validates addresses, and projects matching contact metadata. It is owned by parseRecipientField and directly consumed by the editable writing-block boundary."
   },
   {
     "hub": "app-primary",
     "alias": "Id",
     "sourceSymbol": "GMe",
-    "startLine": 17502,
-    "endLine": 17502,
-    "classification": "generated-local-recipient-projection",
+    "startLine": 17515,
+    "endLine": 17517,
+    "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/normalize-recipient-fields.ts",
-    "evidence": "The helper projects non-empty recipient buckets into a stable object for the neighboring generated composer state; no standalone named renderer consumer owns this projection."
+    "evidence": "The deterministic projection clones only non-empty recipient buckets. It is owned by projectRecipientContacts and directly consumed by the writing-block capability boundary."
   },
   {
     "hub": "app-primary",
@@ -2199,7 +2199,7 @@
     "endLine": 67908,
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-shared/runtime/is-path-within-roots.ts",
-    "evidence": "The pure path containment policy normalizes a candidate path and accepts only exact-root or slash-delimited descendants, preventing prefix collisions without JSX, store, network, or lifecycle effects. It is covered by a focused three-case runtime test."
+    "evidence": "The release-faithful three-argument policy accepts path, codexHome, and optional worktreesRoot; it normalizes POSIX/Windows paths and recognizes the standard, host-provided, and path-inferred Codex worktree roots. Seven focused assertions cover all root families, case folding, negative paths, and null input."
   },
   {
     "hub": "app-shared",
@@ -2362,11 +2362,12 @@
   {
     "hub": "app-primary",
     "alias": "Ct",
-    "startLine": 105683,
-    "endLine": 105686,
-    "classification": "generated-local-style-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The exported V5 value is a generated data-plan-selection-surface marker initialized by adjacent H5 bootstrap; it is a local DOM/test identifier with no standalone renderer consumer or lifecycle owner."
+    "sourceSymbol": "V5",
+    "startLine": 105665,
+    "endLine": 105669,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/plan-selection-surface.ts",
+    "evidence": "The stable plan-selection surface attribute is owned by PLAN_SELECTION_SURFACE_ATTRIBUTE and is directly consumed by both plan summary and plan tab renderer boundaries without aggregate-hub lifecycle state."
   },
   {
     "hub": "app-primary",
@@ -8926,7 +8927,7 @@
   ,{ "hub": "app-initial", "alias": "Won", "sourceSymbol": "Oqt", "startLine": 1715, "endLine": 1723, "classification": "preserved-coupled", "module": "src/webview/assets/app-initial-51da50e6c6e3.ts", "evidence": "Generated initial bootstrap/runtime surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-initial", "alias": "Wot", "sourceSymbol": "JEi", "startLine": 2608, "endLine": 2616, "classification": "preserved-coupled", "module": "src/webview/assets/app-initial-51da50e6c6e3.ts", "evidence": "Generated initial bootstrap/runtime surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-initial", "alias": "Wp", "sourceSymbol": "hUs", "startLine": 6381, "endLine": 6389, "classification": "preserved-coupled", "module": "src/webview/assets/app-initial-51da50e6c6e3.ts", "evidence": "Generated initial bootstrap/runtime surface is coupled to shared renderer lifecycle." }
-  ,{ "hub": "app-initial", "alias": "Wpn", "sourceSymbol": "Im", "startLine": 1693, "endLine": 1701, "classification": "preserved-coupled", "module": "src/webview/assets/app-initial-51da50e6c6e3.ts", "evidence": "Generated initial bootstrap/runtime surface is coupled to shared renderer lifecycle." }
+  ,{ "hub": "app-initial", "alias": "Wpn", "sourceSymbol": "Im", "startLine": 1693, "endLine": 1701, "classification": "semantic-business-logic", "module": "src/renderer/app-initial/runtime/markdown-links.ts", "evidence": "The deterministic inline Markdown-link scanner is owned by findNextMarkdownLink and is consumed directly by skill labels, feedback, navigation, and prompt-kind projection without bootstrap lifecycle state." }
   ,{ "hub": "app-initial", "alias": "Wpt", "sourceSymbol": "Usi", "startLine": 2576, "endLine": 2584, "classification": "preserved-coupled", "module": "src/webview/assets/app-initial-51da50e6c6e3.ts", "evidence": "Generated initial bootstrap/runtime surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-initial", "alias": "Wq", "sourceSymbol": "L1a", "startLine": 5243, "endLine": 5251, "classification": "preserved-coupled", "module": "src/webview/assets/app-initial-51da50e6c6e3.ts", "evidence": "Generated initial bootstrap/runtime surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-initial", "alias": "Wqt", "sourceSymbol": "l1n", "startLine": 526, "endLine": 534, "classification": "preserved-coupled", "module": "src/webview/assets/app-initial-51da50e6c6e3.ts", "evidence": "Generated initial bootstrap/runtime surface is coupled to shared renderer lifecycle." }
@@ -11876,7 +11877,7 @@
   ,{ "hub": "app-initial", "alias": "qon", "sourceSymbol": "Qv", "startLine": 1715, "endLine": 1723, "classification": "preserved-coupled", "module": "src/webview/assets/app-initial-51da50e6c6e3.ts", "evidence": "Generated initial bootstrap/runtime surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-initial", "alias": "qot", "sourceSymbol": "UEi", "startLine": 2608, "endLine": 2616, "classification": "preserved-coupled", "module": "src/webview/assets/app-initial-51da50e6c6e3.ts", "evidence": "Generated initial bootstrap/runtime surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-initial", "alias": "qp", "sourceSymbol": "XHs", "startLine": 6381, "endLine": 6389, "classification": "preserved-coupled", "module": "src/webview/assets/app-initial-51da50e6c6e3.ts", "evidence": "Generated initial bootstrap/runtime surface is coupled to shared renderer lifecycle." }
-  ,{ "hub": "app-initial", "alias": "qpn", "sourceSymbol": "Fm", "startLine": 1693, "endLine": 1701, "classification": "preserved-coupled", "module": "src/webview/assets/app-initial-51da50e6c6e3.ts", "evidence": "Generated initial bootstrap/runtime surface is coupled to shared renderer lifecycle." }
+  ,{ "hub": "app-initial", "alias": "qpn", "sourceSymbol": "Fm", "startLine": 1693, "endLine": 1701, "classification": "semantic-business-logic", "module": "src/renderer/app-initial/runtime/markdown-links.ts", "evidence": "The deterministic Markdown punctuation unescaper is owned by unescapeMarkdownPunctuation and is consumed directly by skill labels, feedback, navigation, and prompt-kind projection without bootstrap lifecycle state." }
   ,{ "hub": "app-initial", "alias": "qpt", "sourceSymbol": "Iz", "startLine": 1, "endLine": 9, "classification": "preserved-coupled", "module": "src/webview/assets/app-initial-51da50e6c6e3.ts", "evidence": "Generated initial bootstrap/runtime surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-initial", "alias": "qq", "sourceSymbol": "j$a", "startLine": 5242, "endLine": 5250, "classification": "preserved-coupled", "module": "src/webview/assets/app-initial-51da50e6c6e3.ts", "evidence": "Generated initial bootstrap/runtime surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-initial", "alias": "qqt", "sourceSymbol": "p1n", "startLine": 526, "endLine": 534, "classification": "preserved-coupled", "module": "src/webview/assets/app-initial-51da50e6c6e3.ts", "evidence": "Generated initial bootstrap/runtime surface is coupled to shared renderer lifecycle." }

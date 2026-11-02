@@ -1,3 +1,8 @@
+import {
+  findNextMarkdownLink,
+  unescapeMarkdownPunctuation,
+} from "../../app-initial/runtime/markdown-links";
+
 /** Maps a skill/plugin path to the stable product kind used by the composer. */
 const SKILL_KINDS: Readonly<Record<string, string>> = {
   documents: "document",
@@ -42,6 +47,21 @@ export function extractSkillKindFromMentions(
     if (kind != null) latest = kind;
   }
   return preferred != null && latest === preferred ? preferred : latest ?? preferred;
+}
+
+/** Projects the latest skill/plugin kind from Markdown links (former app-primary `yg`/`PD`). */
+export function extractSkillKindFromPrompt(prompt: string): string | null {
+  let latest: string | null = null;
+  let cursor = 0;
+  for (
+    let link = findNextMarkdownLink(prompt, cursor);
+    link != null;
+    link = findNextMarkdownLink(prompt, cursor)
+  ) {
+    latest = extractSkillKindFromPath(unescapeMarkdownPunctuation(link.path)) ?? latest;
+    cursor = link.end;
+  }
+  return latest;
 }
 
 /** Projects the latest skill/plugin mention kind from a ProseMirror-like document. */

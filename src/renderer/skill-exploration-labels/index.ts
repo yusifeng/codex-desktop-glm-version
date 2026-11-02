@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { findNextMarkdownLink as d, unescapeMarkdownPunctuation as h } from "../app-initial/runtime/markdown-links";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   G2 as t,
@@ -13,11 +14,9 @@ import {
 } from "@rchunk/app-shared";
 import {
   R5t as u,
-  Wpn as d,
   _9t as f,
   b9t as p,
   g9t as m,
-  qpn as h,
 } from "@rchunk/app-initial";
 function g(e) {
   return !x.test(e) || !S.test(e)

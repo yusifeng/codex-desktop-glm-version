@@ -7,4 +7,19 @@ assert.deepEqual(mod.normalizeRecipientFields({ recipient: "alice@example.com, b
   { value: "Alice", isInvalid: false }, { value: "bad", isInvalid: true }, { value: "bob@example.com", isInvalid: false, prefix: "Bcc: " },
 ]);
 assert.deepEqual(mod.normalizeRecipientFields({ recipient: null }), []);
-console.log("app-primary normalize recipient fields: 3 assertions passed");
+const alice = { email: "alice@example.com", id: "1", name: "Alice" };
+assert.deepEqual(mod.parseRecipientField("Alice@Example.com, unfinished, bob@example.com", [alice]), {
+  recipients: [
+    { email: "Alice@Example.com", id: "1", name: "Alice" },
+    { email: "bob@example.com" },
+  ],
+  unfinishedValue: "unfinished",
+});
+const recipient = [{ email: "alice@example.com" }];
+const projected = mod.projectRecipientContacts({ recipient, cc: [], bcc: [{ email: "hidden@example.com" }] });
+assert.deepEqual(projected, {
+  recipient: [{ email: "alice@example.com" }],
+  bcc: [{ email: "hidden@example.com" }],
+});
+assert.notEqual(projected.recipient, recipient);
+console.log("app-primary normalize recipient fields: 6 assertions passed");

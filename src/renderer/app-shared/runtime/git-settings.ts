@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@rchunk/renderer-zod-runtime";
 
 export type PullRequestMergeMethod = "merge" | "squash";
 export type GitReviewMode = "full" | "last-turn-only";

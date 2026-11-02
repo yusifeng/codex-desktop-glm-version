@@ -2815,6 +2815,7 @@ export const CHUNKS = {
 // preserved 或 incremental hub；其文件仍由原版 transform-only 轨道产出。
 export const IMPORT_ALIASES = {
   proxy: CHUNKS["motion-proxy-runtime"],
+  "renderer-zod-runtime": CHUNKS["vite-browser-external"],
   "learning-block-path": "learning-block-path-74045b6d1532.js",
   "math-block-coordinate-plane": "math-block-coordinate-plane-5112206272ca.js",
   nice: "nice-2b3cc20611af.js",

@@ -1,8 +1,21 @@
 // @ts-nocheck
+import { PLAN_SELECTION_SURFACE_ATTRIBUTE as l } from "../app-primary/runtime/plan-selection-surface";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { $3 as t, FX as n, HX as r, I3 as i, __ as a, g_ as o } from "@rchunk/app-shared";
-import { Dyt as s, byt as c } from "@rchunk/app-initial";
-import { Ct as l, wt as u } from "@rchunk/app-primary";
+import {
+  $3 as t,
+  FX as n,
+  HX as r,
+  I3 as i,
+  __ as a,
+  g_ as o,
+} from "@rchunk/app-shared";
+import {
+  Dyt as s,
+  byt as c,
+} from "@rchunk/app-initial";
+import {
+  wt as u,
+} from "@rchunk/app-primary";
 import { i as d, r as f } from "@rchunk/surface";
 function p(e) {
   let t = (0, m.c)(17),

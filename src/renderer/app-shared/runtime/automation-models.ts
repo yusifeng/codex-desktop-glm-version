@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@rchunk/renderer-zod-runtime";
 
 export type ReasoningEffort =
   "none" | "minimal" | "low" | "medium" | "high" | "xhigh" | "max" | "ultra";

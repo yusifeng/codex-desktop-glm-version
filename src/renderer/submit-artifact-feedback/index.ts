@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { unescapeMarkdownPunctuation as F } from "../app-initial/runtime/markdown-links";
 import { getPathBasename as r } from "../app-shared/runtime/get-path-basename";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -36,7 +37,6 @@ import {
   mXt as M,
   pXt as N,
   pfn as P,
-  qpn as F,
   ypn as I,
 } from "@rchunk/app-initial";
 import { n as L, t as R } from "@rchunk/submit-feedback";

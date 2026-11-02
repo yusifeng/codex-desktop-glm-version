@@ -87,8 +87,10 @@ if (mode === "smoke-readonly") {
     do {
       const ready = await evaluate(`
         document.querySelector('#settings-search') != null ||
+        document.querySelector('[data-codex-composer]') != null ||
         document.querySelector('[aria-label="打开个人资料菜单"]') != null ||
-        (document.body?.innerText ?? '').includes('设置')
+        (document.body?.innerText ?? '').includes('设置') ||
+        (document.body?.innerText ?? '').includes('新对话')
       `);
       if (ready) return;
       await new Promise((resolve) => setTimeout(resolve, 250));

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getPreferredPanelTarget as k } from "../app-primary/runtime/panel-target-policy";
 import { resolvePanelPosition as A } from "../app-primary/runtime/resolve-panel-position";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -32,7 +33,6 @@ import {
 } from "@rchunk/app-initial";
 import {
   Af as O,
-  Df as k,
 } from "@rchunk/app-primary";
 function j(e, { browserTabId: n, initiator: r, open: c, source: u }) {
   let f = o(e),

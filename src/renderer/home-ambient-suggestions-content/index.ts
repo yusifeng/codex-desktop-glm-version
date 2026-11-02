@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { extractSkillKindFromPrompt as Vn } from "../app-primary/runtime/extract-skill-kind";
 import { ambientSuggestionSettings as ie } from "../app-shared/runtime/ambient-suggestion-settings";
 import { getSuggestionTarget as ee, isScienceSuggestionModel as ae } from "../app-shared/runtime/suggestion-targeting";
 import { createCommandQueryKey as ye } from "../app-initial/runtime/create-command-query-key";
@@ -201,7 +202,6 @@ import {
   rg as Rn,
   sg as zn,
   xg as Bn,
-  yg as Vn,
   zh as Hn,
 } from "@rchunk/app-primary";
 import {

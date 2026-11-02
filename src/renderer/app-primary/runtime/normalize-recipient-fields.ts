@@ -11,6 +11,13 @@ export interface NormalizedRecipient {
   prefix?: string;
 }
 
+export interface ParsedRecipientField {
+  recipients: RecipientContact[];
+  unfinishedValue: string;
+}
+
+type RecipientFieldMap = Record<"recipient" | "cc" | "bcc", RecipientContact[]>;
+
 function isValidEmail(value: string): boolean {
   return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/.test(value);
 }
@@ -23,6 +30,38 @@ function normalizeField(value: unknown, contacts: RecipientContact[]): Normalize
     const name = byEmail.get(item.toLowerCase())?.name?.trim();
     return { value: valid && name ? name : item, isInvalid: !valid };
   });
+}
+
+/** Parse a comma-separated recipient input (former app-primary `Hd`/`KMe`). */
+export function parseRecipientField(
+  value: string,
+  contacts: readonly RecipientContact[] = [],
+): ParsedRecipientField {
+  const contactsByEmail = new Map(
+    contacts.map((contact) => [contact.email.trim().toLowerCase(), contact]),
+  );
+  const recipients: RecipientContact[] = [];
+  const unfinished: string[] = [];
+  for (const item of value.split(",").map((entry) => entry.trim()).filter(Boolean)) {
+    if (!isValidEmail(item)) {
+      unfinished.push(item);
+      continue;
+    }
+    const contact = contactsByEmail.get(item.toLowerCase());
+    recipients.push(contact == null ? { email: item } : { ...contact, email: item });
+  }
+  return { recipients, unfinishedValue: unfinished.join(", ") };
+}
+
+/** Drop empty recipient buckets while cloning populated arrays (former app-primary `Id`/`GMe`). */
+export function projectRecipientContacts(
+  fields: RecipientFieldMap,
+): Partial<RecipientFieldMap> {
+  return Object.fromEntries(
+    (["recipient", "cc", "bcc"] as const).flatMap((field) =>
+      fields[field].length > 0 ? [[field, [...fields[field]]]] : [],
+    ),
+  );
 }
 
 export function normalizeRecipientFields(input: {

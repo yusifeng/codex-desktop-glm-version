@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { PLAN_SELECTION_SURFACE_ATTRIBUTE as Me } from "../app-primary/runtime/plan-selection-surface";
 import { classNames as N, initializeClassNames as A } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -77,7 +78,6 @@ import {
   zzt as je,
 } from "@rchunk/app-initial";
 import {
-  Ct as Me,
   wt as H,
 } from "@rchunk/app-primary";
 import { n as U, t as W } from "@rchunk/feedback-legal-notice";

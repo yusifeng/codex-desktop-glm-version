@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getPreferredPanelTarget as rt } from "../app-primary/runtime/panel-target-policy";
 import { parseConversationRoute as Se } from "../app-initial/runtime/parse-conversation-route";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -113,7 +114,6 @@ import {
 } from "@rchunk/app-initial";
 import {
   Af as nt,
-  Df as rt,
   _c as it,
   vc as at,
 } from "@rchunk/app-primary";

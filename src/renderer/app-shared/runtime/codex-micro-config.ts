@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@rchunk/renderer-zod-runtime";
 
 export const codexMicroIdleTimeoutSchema = z.enum([
   "off",

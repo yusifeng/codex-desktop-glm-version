@@ -1,5 +1,20 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Signed-in runtime-contract closure：在语义 hub 迁移后立即重建、打包并使用现有
+登录账号运行真实 Electron E2E，连续发现并修复三类仅在发布运行链路中暴露的问题。首先，
+五个新恢复的 Zod schema owner 曾被 renderer 构建器保留为浏览器无法解析的 bare `zod`
+import；现在由既有 `__vite-browser-external` vendor 边界统一承载 Zod，构建后门禁会扫描全部
+runtime assets 并拒绝任何残留 bare import。其次，app-shared `$z`/`OGe` 曾被误恢复为
+“path + roots 数组”，现已按发布源码恢复为“path + codexHome + 可选 worktreesRoot”，覆盖
+标准、自定义、`.codex-workspaces`、`OpenAI/Codex/workspaces` 与 Windows 大小写路径。最后，
+app-primary `Df`/`fF` 曾错误要求调用方传入 `isPanelTab`，现已内建发布一致的 browser tab ID
+判定并恢复真实三参数 ABI。针对性测试扩展到 path 7 项、panel target 11 项，typecheck、
+renderer build 和 pack 均通过。最终 `npm run e2e:critical` 在本批最终包上依次通过
+settings/general、settings/git、settings/worktrees、settings/browser、conversation/history、
+conversation/add-context，并实际发送 `E2E_CONTRACT_CLOSURE_20261102`、在 assistant-message
+中收到同一 marker；监控期无非白名单 renderer exception/error。该记录证明本批真实运行
+契约已经闭环，但不把一次关键 E2E 当作整个长期反编译目标完成。
+
 2026-11-02 Critical signed-in Electron E2E：在本地重建包、现有登录账号和真实
 `app://-/index.html` renderer 上新增并执行单命令 `npm run e2e:critical`。只读阶段依次
 通过 settings/general、settings/git、settings/worktrees、settings/browser、

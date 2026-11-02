@@ -67,6 +67,14 @@ const chunkImportPlugin = {
       path: `./${path.basename(args.path)}`,
       external: true,
     }));
+    // The browser cannot resolve npm package names at runtime. Keep one copy of
+    // Zod in the existing browser-external vendor boundary; semantic settings
+    // owners import that shared ESM instance through @rchunk/renderer-zod-runtime.
+    build.onResolve({ filter: /^zod$/ }, (args) =>
+      args.importer.endsWith("/src/renderer/vite-browser-external/index.ts")
+        ? { path: path.join(ROOT, "node_modules/zod/index.js") }
+        : { path: args.path, external: true },
+    );
     // npm 依赖（react/react-dom 等）：按 external 处理——renderer 发布包没有
     // node_modules，这些依赖已在被引用的共享 chunk 里，重写模块应通过
     // @rchunk/app-shared 或后续登记的 vendor chunk 引入。
@@ -255,15 +263,19 @@ for (const [name, originalCode] of assetSources) {
 
 const leakedExactAliases = [];
 const leakedRendererAliases = [];
+const leakedZodImports = [];
 for (const name of assetNames) {
   const code = await fs.readFile(path.join(assetsDir, name), "utf8");
   if (code.includes("@exact-chunk/")) leakedExactAliases.push(name);
   if (code.includes("@rchunk/")) leakedRendererAliases.push(name);
+  if (/(?:from\s*|import\(\s*)["']zod["']/.test(code)) leakedZodImports.push(name);
 }
 if (leakedExactAliases.length > 0)
   errors.push(`build-only @exact-chunk aliases leaked into ${leakedExactAliases.length} runtime assets`);
 if (leakedRendererAliases.length > 0)
   errors.push(`build-only @rchunk aliases leaked into ${leakedRendererAliases.length} runtime assets`);
+if (leakedZodImports.length > 0)
+  errors.push(`browser-unresolvable zod imports leaked into ${leakedZodImports.length} runtime assets`);
 
 // ---- CSS：src/renderer/<语义名>/index.css → assets/<chunk 基名>.css ----
 for (const name of REWRITTEN) {

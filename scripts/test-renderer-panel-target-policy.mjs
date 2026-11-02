@@ -17,10 +17,9 @@ const result = await esbuild.build({
   logLevel: "silent",
 });
 const module = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}`);
-const isBrowserTab = (tab) => tab?.type === "browser";
 const tabs = {
-  bottom: { type: "browser", id: "bottom" },
-  right: { type: "browser", id: "right" },
+  bottom: { kind: "browser", tabId: "bottom" },
+  right: { kind: "browser", tabId: "right" },
 };
 let assertions = 0;
 const equal = (actual, expected) => {
@@ -29,12 +28,14 @@ const equal = (actual, expected) => {
 };
 
 equal(/\bany\b/.test(source), false);
-equal(module.getFallbackPanelTarget("bottom-panel", tabs, isBrowserTab), "bottom");
-equal(module.getFallbackPanelTarget("right-panel", tabs, isBrowserTab), "right");
-equal(module.getFallbackPanelTarget("unknown", tabs, isBrowserTab), "right");
-equal(module.getFallbackPanelTarget("right-panel", { bottom: tabs.bottom, right: null }, isBrowserTab), "bottom");
-equal(module.getFallbackPanelTarget("unknown", { bottom: null, right: null }, isBrowserTab), null);
-equal(module.getPreferredPanelTarget("unknown", tabs, { bottom: false, right: true }, isBrowserTab), "right");
-equal(module.getPreferredPanelTarget("unknown", tabs, { bottom: true, right: false }, isBrowserTab), "bottom");
-equal(module.getPreferredPanelTarget("unknown", tabs, { bottom: false, right: false }, isBrowserTab), null);
+equal(module.getFallbackPanelTarget("bottom-panel", tabs), "bottom");
+equal(module.getFallbackPanelTarget("right-panel", tabs), "right");
+equal(module.getFallbackPanelTarget("unknown", tabs), "right");
+equal(module.getFallbackPanelTarget("right-panel", { bottom: tabs.bottom, right: null }), "bottom");
+equal(module.getFallbackPanelTarget("unknown", { bottom: null, right: null }), null);
+equal(module.getFallbackPanelTarget("unknown", { bottom: { kind: "other", tabId: "browser:legacy" }, right: null }), "bottom");
+equal(module.getFallbackPanelTarget("unknown", { bottom: { kind: "other", tabId: "not-browser" }, right: null }), null);
+equal(module.getPreferredPanelTarget("unknown", tabs, { bottom: false, right: true }), "right");
+equal(module.getPreferredPanelTarget("unknown", tabs, { bottom: true, right: false }), "bottom");
+equal(module.getPreferredPanelTarget("unknown", tabs, { bottom: false, right: false }), null);
 console.log(`renderer panel target policy tests passed (${assertions} assertions)`);
