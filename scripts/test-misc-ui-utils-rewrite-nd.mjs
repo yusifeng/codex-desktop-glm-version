@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import * as esbuild from 'esbuild';
+import { assertReleaseOwner } from './release-owner-test-helpers.mjs';
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const SOURCE='/Users/david/Workspace/ppio_github/chatgpt-desktop-src/app/webview/assets';
 const modules=[
@@ -39,4 +40,5 @@ const hotkey=loaded.get('hotkey-window-detail-layout').HotkeyWindowDetailLayout(
 const voice=loaded.get('voice-commentary-message').VoiceCommentaryMessage({message:{spawnId:'s',content:{type:'legacy-text',text:'Working'}}});assert.equal(voice.props.className,'h-10');assert.equal(voice.props.children[0].props.children.props.children,'Working');runtimeAssertions+=2;
 globalThis.__nd.session={userId:'u',accountId:'w',accessToken:'token'};globalThis.__nd.refreshed={userId:'u',accountId:'a',accessToken:'token'};globalThis.__nd.payment={userId:'u',accountId:'a'};globalThis.__nd.accounts={accounts:{w:{account:{account_id:'w',name:'Work',is_deactivated:false},can_access_with_session:true}},account_ordering:['w']};globalThis.__nd.switchResult={willRedirect:false};globalThis.__nd.tokenAccount='w';const cache=[];const signal={throwIfAborted(){},addEventListener(){},removeEventListener(){}};const workspace=await loaded.get('workspace-access-browser').prepareWorkspaceAccess({scope:{queryClient:{async cancelQueries(){},setQueryData(...args){cache.push(args)}}},statsig:{},userId:'u',workspaceId:'w',signal});assert.equal(workspace.account.name,'Work');assert.equal(cache.length>=1,true);runtimeAssertions+=2;
 assert.equal(loaded.get('workspace-layout-step-handler').WorkspaceLayoutStepHandler(),null);runtimeAssertions++;
+sourceAssertions += assertReleaseOwner('pepper-onboarding-modal');
 delete globalThis.__nd;console.log(sourceAssertions+' source assertions and '+runtimeAssertions+' runtime assertions passed');

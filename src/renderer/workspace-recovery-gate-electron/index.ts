@@ -1,102 +1,1031 @@
-// Electron workspace-deactivation recovery gate. Release chunk: gate.electron-622b420b2745.js.
-import "@rchunk/rolldown-runtime";
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-
-interface Account { account_id?: string; account_user_role?: string; eligible_for_reactivation?: boolean; is_deactivated?: boolean; name?: string; plan_type?: string; profile_picture_url?: string; structure: "personal" | "workspace" }
-interface Workspace { account: Account; can_access_with_session?: boolean; entitlement: { has_active_subscription?: boolean } }
-interface AccountsResponse { accountId?: string; userId?: string; account_ordering: string[]; accounts: Record<string, Workspace> }
-interface Identity { accountId?: string | null; authMethod?: string; email?: string | null; userId?: string | null }
-interface Scope { get(signal: unknown): unknown; set(signal: unknown, value: unknown): void; queryClient: { invalidateQueries(options: { queryKey: unknown[] }): void } }
-interface JsxRuntime { Fragment: unknown; jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown; jsxs(type: unknown, props: Record<string, unknown>, key?: string): unknown }
-interface ReactRuntime { useRef<T>(value: T): { current: T }; useState<T>(value: T): [T, (value: T) => void] }
-interface SharedRuntime { $3(): unknown; $h(): unknown; FX(): void; HX<T>(signal: unknown): T; I3(): JsxRuntime; Ih: unknown; K2(): void; LX(signal: unknown): Scope; Oh: unknown; QI(): void; Rh: unknown; Y2: unknown; Yh: unknown; ZI: unknown; Zh(): void; _L<T>(options: Record<string, unknown>): { data?: T; error?: unknown; isLoading: boolean; isFetchedAfterMount?: boolean; refetch(): Promise<{ data?: T; error?: unknown; isError: boolean }> }; e6(): ReactRuntime; lw(): void; wL(): void }
-interface InitialRuntime {
-  Bfn(): void; Dft(): void; Hln(planType?: string): boolean; M6t(): void; N6t(): Identity; Qgn(): void; Rln(): void; Ugn(scope: Scope, signal: unknown): { logout(): Promise<void> }; Wgn(): void; Ygn: unknown; h0(): void; i_n(): { pathname: string }; iot(): void; j6t(): { refetch(): Promise<{ data?: { accountId?: string; userId?: string }; isError: boolean }> }; k6t(): void; kft(options: { href: string; initiator: string; openTarget: string }): void; o_n(): (to: string, options?: { replace?: boolean }) => Promise<void> | void; p0(options: { accountId: string; url: string }): string; pdn(): void; rot(): void; udn: { safeGet(path: string, options: Record<string, unknown>): Promise<unknown>; safePost(path: string, options: Record<string, unknown>): Promise<unknown> }; ugn: unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $h as n,
+  $x as r,
+  FX as i,
+  HX as a,
+  I3 as o,
+  IZ as s,
+  If as c,
+  Ih as l,
+  K2 as u,
+  LX as ee,
+  LZ as d,
+  Lh as te,
+  NX as f,
+  Oh as ne,
+  Ph as p,
+  QI as m,
+  Qh as re,
+  Rh as h,
+  Y2 as g,
+  Yh as _,
+  ZI as v,
+  Zh as y,
+  _L as b,
+  cy as x,
+  e6 as S,
+  gL as C,
+  jf as w,
+  kf as T,
+  lw as E,
+  my as ie,
+  wL as D,
+  zh as O,
+} from "@rchunk/app-shared";
+import {
+  Bfn as k,
+  Dft as A,
+  Hln as j,
+  M6t as M,
+  N6t as N,
+  Qgn as P,
+  Rln as F,
+  Ugn as I,
+  Wgn as ae,
+  Ygn as oe,
+  h0 as se,
+  i_n as ce,
+  iot as le,
+  j6t as L,
+  k6t as R,
+  kft as z,
+  o_n as B,
+  p0 as V,
+  pdn as H,
+  rot as U,
+  udn as ue,
+  ugn as W,
+} from "@rchunk/app-initial";
+import { bc as G, dc as de, uc as fe, yc as pe } from "@rchunk/app-primary";
+function me(e) {
+  let t = e?.account;
+  return t?.structure !== `workspace` ||
+    t.is_deactivated !== !0 ||
+    t.account_user_role !== `account-owner` ||
+    !j(t.plan_type) ||
+    t.eligible_for_reactivation !== !0 ||
+    e?.can_access_with_session === !1
+    ? null
+    : e?.entitlement.has_active_subscription === !0
+      ? `customer_portal`
+      : `checkout`;
 }
-interface AppPrimaryRuntime { bc: unknown; dc: unknown; uc: unknown; yc(): void }
-interface RecoveryActions { chooseWorkspace?(): Promise<void>; isCurrentAccount(accountId: string, userId: string): Promise<boolean>; openCheckout(workspace: Workspace, signal: AbortSignal): Promise<void>; openCustomerPortal(url: string): void; switchWorkspace?(workspace: Workspace, signal: AbortSignal): Promise<boolean> }
-const shared = sharedChunk as unknown as SharedRuntime;
-const initial = initialChunk as unknown as InitialRuntime;
-const appPrimary = appPrimaryChunk as unknown as AppPrimaryRuntime;
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let initialized = false;
-const accountsApiVersion = "v4-2023-04-27";
-const recoveryPath = "/workspace/deactivated";
-
-function recoveryAction(workspace: Workspace | undefined): "customer_portal" | "checkout" | null {
-  const account = workspace?.account;
-  if (account?.structure !== "workspace" || account.is_deactivated !== true || account.account_user_role !== "account-owner" || !initial.Hln(account.plan_type) || account.eligible_for_reactivation !== true || workspace?.can_access_with_session === false) return null;
-  return workspace.entitlement.has_active_subscription === true ? "customer_portal" : "checkout";
+function K() {
+  return (K = e(() => {
+    F();
+  }))();
 }
-function isActiveWorkspace(workspace: Workspace): boolean { return workspace.account.account_id != null && workspace.account.is_deactivated !== true && (workspace.can_access_with_session !== false || workspace.account.structure === "personal"); }
-function isRecoverableWorkspace(workspace: Workspace): boolean { return workspace.account.account_id != null && recoveryAction(workspace) != null; }
-function translated(id: string, defaultMessage: string, description: string): unknown { return jsx.jsx(shared.Y2, { id, defaultMessage, description }); }
-
-function RecoveryDialog({ workspace, activeWorkspaces, recoveryWorkspaces, pending, error, onChooseWorkspace, onRecover, onSelectWorkspace }: { workspace?: Workspace; activeWorkspaces: Workspace[]; recoveryWorkspaces: Workspace[]; pending: string | null; error: boolean; onChooseWorkspace?(): void; onRecover?(): void; onSelectWorkspace(workspace: Workspace): void }): unknown {
-  const action = recoveryAction(workspace);
-  return jsx.jsx(shared.Ih, { open: true, showDialogClose: false, shouldIgnoreClickOutside: true, size: "compact", variant: "chatgpt", children: jsx.jsxs(shared.Oh, { as: "form", "aria-busy": pending != null, className: "gap-4 p-4 select-none", size: "viewport", variant: "chatgpt", children: [
-    jsx.jsx(shared.Rh, { className: "text-lg font-normal", children: translated("workspaceRecovery.title", "Your workspace has been deactivated", "Title of the blocking workspace recovery dialog") }),
-    workspace == null ? null : jsx.jsx("div", { className: "text-base", children: workspace.account.name ?? translated("workspaceRecovery.unnamedWorkspace", "Unnamed workspace", "Fallback label for a workspace whose name is missing in workspace recovery") }),
-    action == null ? null : jsx.jsx(shared.Yh, { color: "outlineGhost", disabled: pending != null, loading: pending === "recover", onClick: onRecover, children: action === "customer_portal" ? "Manage subscription" : "Purchase subscription" }),
-    error ? jsx.jsx("p", { role: "alert", children: translated("workspaceRecovery.error", "We couldn’t complete that request", "Failure while loading workspace recovery or performing a recovery action") }) : null,
-    ...activeWorkspaces.map((candidate) => jsx.jsx(appPrimary.uc, { density: "compact", isDisabled: pending != null, isSelected: false, title: candidate.account.structure === "personal" ? "Personal account" : candidate.account.name, onSelect: () => onSelectWorkspace(candidate) }, candidate.account.account_id)),
-    recoveryWorkspaces.length > 1 ? jsx.jsx(appPrimary.dc, { workspaces: recoveryWorkspaces, current: workspace, onSelect: onSelectWorkspace }) : null,
-    onChooseWorkspace == null ? null : jsx.jsx(shared.Yh, { color: "ghost", disabled: pending != null, loading: pending === "choose-workspace", onClick: onChooseWorkspace, children: "Sign in to another workspace" }),
-  ] }) });
+function he(e) {
+  let t = (0, X.c)(45),
+    {
+      activeWorkspaces: n,
+      recoveryWorkspaces: i,
+      error: a,
+      invoiceContext: o,
+      loading: s,
+      onChooseWorkspace: c,
+      onPersonal: u,
+      onRecover: ee,
+      onSelectWorkspace: d,
+      pending: f,
+      userLabel: p,
+      workspace: m,
+    } = e,
+    v;
+  t[0] === m ? (v = t[1]) : ((v = me(m)), (t[0] = m), (t[1] = v));
+  let y = v,
+    b = f != null,
+    S;
+  t[2] !== n.length || t[3] !== u
+    ? ((S = (e) => {
+        (e.preventDefault(), n.length === 0 && u != null && u());
+      }),
+      (t[2] = n.length),
+      (t[3] = u),
+      (t[4] = S))
+    : (S = t[4]);
+  let C;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((C = (0, Z.jsx)(h, {
+        className: `text-lg font-normal`,
+        children: (0, Z.jsx)(g, {
+          id: `workspaceRecovery.title`,
+          defaultMessage: `Your workspace has been deactivated`,
+          description: `Title of the blocking workspace recovery dialog`,
+        }),
+      })),
+      (t[5] = C))
+    : (C = t[5]);
+  let E;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((E = (0, Z.jsx)(te, {
+        className: `sr-only`,
+        children: (0, Z.jsx)(g, {
+          id: `workspaceRecovery.description`,
+          defaultMessage: `Choose how to continue after this workspace was deactivated`,
+          description: `Screen-reader description of the blocking workspace recovery dialog`,
+        }),
+      })),
+      (t[6] = E))
+    : (E = t[6]);
+  let D;
+  t[7] !== d || t[8] !== f || t[9] !== i || t[10] !== m
+    ? ((D =
+        m != null &&
+        (i.some((e) => e.account.account_id !== m.account.account_id)
+          ? (0, Z.jsx)(T, {
+              disabled: f != null,
+              surface: `chatgpt`,
+              triggerButton: (0, Z.jsxs)(_, {
+                color: `ghost`,
+                size: `dialog`,
+                disabled: f != null,
+                children: [
+                  (0, Z.jsx)(Y, { workspace: m }),
+                  (0, Z.jsx)(`span`, {
+                    className: `truncate`,
+                    children: (0, Z.jsx)(J, { workspace: m }),
+                  }),
+                  (0, Z.jsx)(x, {}),
+                ],
+              }),
+              children: i.map((e) =>
+                (0, Z.jsx)(
+                  w.Item,
+                  {
+                    disabled: f != null || e.account.account_id === m.account.account_id,
+                    onSelect: () => d(e),
+                    children: (0, Z.jsx)(J, { workspace: e }),
+                  },
+                  e.account.account_id,
+                ),
+              ),
+            })
+          : (0, Z.jsxs)(`div`, {
+              className: `flex items-center gap-2 text-base`,
+              children: [
+                (0, Z.jsx)(Y, { workspace: m }),
+                (0, Z.jsx)(`span`, {
+                  className: `truncate`,
+                  children: (0, Z.jsx)(J, { workspace: m }),
+                }),
+              ],
+            }))),
+      (t[7] = d),
+      (t[8] = f),
+      (t[9] = i),
+      (t[10] = m),
+      (t[11] = D))
+    : (D = t[11]);
+  let O;
+  t[12] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((O = (0, Z.jsxs)(`ul`, {
+        className: `flex list-disc flex-col gap-1 ps-5 text-sm`,
+        children: [
+          (0, Z.jsx)(`li`, {
+            children: (0, Z.jsx)(g, {
+              id: `workspaceRecovery.historyUnavailable`,
+              defaultMessage: `Your chat history and settings will not be available`,
+              description: `Explains to users of a deactivated workspace that its history and settings cannot be accessed`,
+            }),
+          }),
+          (0, Z.jsx)(`li`, {
+            children: (0, Z.jsx)(g, {
+              id: `workspaceRecovery.otherWorkspaces`,
+              defaultMessage: `You will still be able to use ChatGPT with the other workspaces associated with this email address`,
+              description: `Reassures users of a deactivated workspace that their other workspaces are still available`,
+            }),
+          }),
+        ],
+      })),
+      (t[12] = O))
+    : (O = t[12]);
+  let k;
+  t[13] !== y || t[14] !== o || t[15] !== ee || t[16] !== f
+    ? ((k =
+        y == null
+          ? null
+          : (0, Z.jsxs)(`div`, {
+              className: `flex flex-col gap-2`,
+              children: [
+                (0, Z.jsx)(`p`, {
+                  className: `text-sm`,
+                  children: (0, Z.jsx)(ge, { action: y, invoiceContext: o }),
+                }),
+                (0, Z.jsx)(_, {
+                  className: `w-full justify-center`,
+                  color: `outlineGhost`,
+                  disabled: f != null,
+                  loading: f === `recover`,
+                  radius: `full`,
+                  size: `dialog`,
+                  onClick: ee,
+                  children:
+                    y === `customer_portal`
+                      ? (0, Z.jsx)(g, {
+                          id: `workspaceRecovery.manageSubscription`,
+                          defaultMessage: `Manage subscription`,
+                          description: `Button that opens payment repair for the deactivated workspace`,
+                        })
+                      : (0, Z.jsx)(g, {
+                          id: `workspaceRecovery.purchaseSubscriptionButton`,
+                          defaultMessage: `Purchase subscription`,
+                          description: `Button that opens existing-workspace reactivation checkout`,
+                        }),
+                }),
+              ],
+            })),
+      (t[13] = y),
+      (t[14] = o),
+      (t[15] = ee),
+      (t[16] = f),
+      (t[17] = k))
+    : (k = t[17]);
+  let A;
+  t[18] === s
+    ? (A = t[19])
+    : ((A = s
+        ? (0, Z.jsx)(`p`, {
+            className: `text-sm text-secondary`,
+            role: `status`,
+            children: (0, Z.jsx)(g, {
+              id: `workspaceRecovery.loading`,
+              defaultMessage: `Loading workspace details…`,
+              description: `Status while workspace recovery eligibility is loading`,
+            }),
+          })
+        : null),
+      (t[18] = s),
+      (t[19] = A));
+  let j;
+  t[20] === a
+    ? (j = t[21])
+    : ((j = a
+        ? (0, Z.jsx)(`p`, {
+            className: `text-sm text-secondary`,
+            role: `alert`,
+            children: (0, Z.jsx)(g, {
+              id: `workspaceRecovery.error`,
+              defaultMessage: `We couldn’t complete that request`,
+              description: `Failure while loading workspace recovery or performing a recovery action`,
+            }),
+          })
+        : null),
+      (t[20] = a),
+      (t[21] = j));
+  let M;
+  t[22] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((M = (0, Z.jsx)(`hr`, { className: `border-default` })), (t[22] = M))
+    : (M = t[22]);
+  let N;
+  t[23] !== n || t[24] !== d || t[25] !== f
+    ? ((N =
+        n.length > 0
+          ? (0, Z.jsxs)(`section`, {
+              "aria-labelledby": `workspace-recovery-select-workspace`,
+              className: `flex flex-col gap-2`,
+              children: [
+                (0, Z.jsx)(`h3`, {
+                  className: `text-base font-normal`,
+                  id: `workspace-recovery-select-workspace`,
+                  children: (0, Z.jsx)(g, {
+                    id: `workspaceRecovery.selectWorkspace`,
+                    defaultMessage: `Select a workspace to continue`,
+                    description: `Heading above active workspaces available from the deactivated workspace dialog`,
+                  }),
+                }),
+                (0, Z.jsx)(`div`, {
+                  className: `flex w-full flex-col gap-2`,
+                  children: n.map((e) => {
+                    let t = e.account.account_id;
+                    return (0, Z.jsx)(
+                      fe,
+                      {
+                        density: `compact`,
+                        icon:
+                          e.account.structure === `personal`
+                            ? (0, Z.jsx)(r, {})
+                            : (0, Z.jsx)(Y, { workspace: e }),
+                        isDisabled: f != null,
+                        isSelected: !1,
+                        rightText: f === t ? (0, Z.jsx)(re, {}) : (0, Z.jsx)(ie, {}),
+                        title:
+                          e.account.structure === `personal`
+                            ? (0, Z.jsx)(g, {
+                                id: `workspaceRecovery.personalAccount`,
+                                defaultMessage: `Personal account`,
+                                description: `Label for the user's existing personal account in workspace recovery`,
+                              })
+                            : (0, Z.jsx)(J, { workspace: e }),
+                        onSelect: () => d(e),
+                      },
+                      t,
+                    );
+                  }),
+                }),
+              ],
+            })
+          : null),
+      (t[23] = n),
+      (t[24] = d),
+      (t[25] = f),
+      (t[26] = N))
+    : (N = t[26]);
+  let P;
+  t[27] !== n.length || t[28] !== u || t[29] !== f || t[30] !== p
+    ? ((P =
+        n.length === 0 && u != null
+          ? (0, Z.jsxs)(`section`, {
+              className: `flex flex-col gap-6 text-sm`,
+              children: [
+                (0, Z.jsxs)(`div`, {
+                  className: `flex flex-col gap-2`,
+                  children: [
+                    (0, Z.jsx)(`h3`, {
+                      className: `text-base font-normal`,
+                      children: (0, Z.jsx)(g, {
+                        id: `workspaceRecovery.createPersonalTitle`,
+                        defaultMessage: `Create a personal workspace to continue`,
+                        description: `Heading above the Personal workspace escape action`,
+                      }),
+                    }),
+                    (0, Z.jsx)(g, {
+                      id: `workspaceRecovery.createPersonalExplanation`,
+                      defaultMessage: `Because your workspace has been deactivated, you need to create a personal workspace to continue using ChatGPT`,
+                      description: `Explains why a user with no active workspaces needs a Personal workspace`,
+                    }),
+                  ],
+                }),
+                (0, Z.jsxs)(`div`, {
+                  className: `flex items-center justify-between gap-4`,
+                  children: [
+                    (0, Z.jsx)(`span`, {
+                      className: `min-w-0 truncate`,
+                      children:
+                        p ??
+                        (0, Z.jsx)(g, {
+                          id: `workspaceRecovery.personalAccountFallback`,
+                          defaultMessage: `Personal account`,
+                          description: `Fallback identity label beside the create Personal workspace action`,
+                        }),
+                    }),
+                    (0, Z.jsx)(_, {
+                      color: `primary`,
+                      disabled: f != null,
+                      loading: f === `personal`,
+                      radius: `full`,
+                      size: `dialog`,
+                      type: `submit`,
+                      children: (0, Z.jsx)(g, {
+                        id: `workspaceRecovery.createPersonal`,
+                        defaultMessage: `Create a personal workspace`,
+                        description: `Creates a Personal workspace from the deactivated workspace dialog`,
+                      }),
+                    }),
+                  ],
+                }),
+              ],
+            })
+          : null),
+      (t[27] = n.length),
+      (t[28] = u),
+      (t[29] = f),
+      (t[30] = p),
+      (t[31] = P))
+    : (P = t[31]);
+  let F;
+  t[32] !== c || t[33] !== f
+    ? ((F =
+        c == null
+          ? null
+          : (0, Z.jsx)(_, {
+              color: `ghost`,
+              disabled: f != null,
+              loading: f === `choose-workspace`,
+              size: `dialog`,
+              onClick: c,
+              children: (0, Z.jsx)(g, {
+                id: `workspaceRecovery.signInToAnotherWorkspace`,
+                defaultMessage: `Sign in to another workspace`,
+                description: `Signs out of the deactivated desktop workspace and opens sign-in so the user can select another workspace`,
+              }),
+            })),
+      (t[32] = c),
+      (t[33] = f),
+      (t[34] = F))
+    : (F = t[34]);
+  let I;
+  return (
+    t[35] !== j ||
+    t[36] !== N ||
+    t[37] !== P ||
+    t[38] !== F ||
+    t[39] !== b ||
+    t[40] !== S ||
+    t[41] !== D ||
+    t[42] !== k ||
+    t[43] !== A
+      ? ((I = (0, Z.jsx)(l, {
+          open: !0,
+          showDialogClose: !1,
+          shouldIgnoreClickOutside: !0,
+          size: `compact`,
+          variant: `chatgpt`,
+          children: (0, Z.jsxs)(ne, {
+            as: `form`,
+            "aria-busy": b,
+            className: `gap-4 p-4 select-none`,
+            size: `viewport`,
+            onSubmit: S,
+            variant: `chatgpt`,
+            children: [C, E, D, O, k, A, j, M, N, P, F],
+          }),
+        })),
+        (t[35] = j),
+        (t[36] = N),
+        (t[37] = P),
+        (t[38] = F),
+        (t[39] = b),
+        (t[40] = S),
+        (t[41] = D),
+        (t[42] = k),
+        (t[43] = A),
+        (t[44] = I))
+      : (I = t[44]),
+    I
+  );
 }
-
-function WorkspaceRecoveryController({ actions, children }: { actions: RecoveryActions; children?: unknown }): unknown {
-  const scope = shared.LX(shared.ZI);
-  const identity = initial.N6t();
-  const { pathname } = initial.i_n();
-  const marker = shared.HX<{ accountId: string; userId: string } | null>(appPrimary.bc);
-  const accountId = marker?.userId === identity.userId ? marker.accountId : identity.accountId;
-  const enabled = (identity.authMethod === "chatgpt" || identity.authMethod === "chatgptAuthTokens") && identity.userId != null && accountId != null && !pathname.startsWith("/checkout/");
-  const query = shared._L<AccountsResponse>({ enabled, queryKey: ["workspace-recovery", "accounts-check", identity.userId, accountId], queryFn: async ({ signal }: { signal: AbortSignal }) => initial.udn.safeGet("/accounts/check/{version}", { parameters: { path: { version: accountsApiVersion } }, signal }), refetchOnMount: "always", refetchOnWindowFocus: false, retry: false, staleTime: 0 });
-  const workspace = accountId == null ? undefined : query.data?.accounts[accountId];
-  const blocked = marker != null || accountId != null && (query.isLoading || query.error != null || workspace?.account.is_deactivated === true);
-  if (!blocked) return pathname === recoveryPath ? jsx.jsx(initial.Ygn, { replace: true, to: "/" }) : jsx.jsx(jsx.Fragment, { children });
-  if (pathname !== recoveryPath && !pathname.startsWith("/checkout/")) return jsx.jsx(initial.Ygn, { replace: true, to: recoveryPath });
-  if (pathname.startsWith("/checkout/")) return jsx.jsx(jsx.Fragment, { children });
-  const ordered = query.data?.account_ordering.flatMap((id) => query.data?.accounts[id] == null ? [] : [query.data.accounts[id]]) ?? [];
-  const active = ordered.filter(isActiveWorkspace);
-  const recoverable = ordered.filter(isRecoverableWorkspace);
-  const [pending, setPending] = React.useState<string | null>(null);
-  const [failed, setFailed] = React.useState(false);
-  const controller = React.useRef<AbortController | null>(null);
-  const run = async (id: string, operation: (signal: AbortSignal) => Promise<void>): Promise<void> => {
-    if (controller.current != null) return;
-    const next = new AbortController(); controller.current = next; setPending(id); setFailed(false);
-    try { await operation(next.signal); } catch { if (!next.signal.aborted) setFailed(true); } finally { if (controller.current === next) { controller.current = null; setPending(null); } }
-  };
-  const selectWorkspace = (candidate: Workspace): void => { const id = candidate.account.account_id; if (id == null || actions.switchWorkspace == null) return; void run(id, async (signal) => { if (!await actions.switchWorkspace?.(candidate, signal)) throw Error("Workspace switch did not complete"); scope.set(appPrimary.bc, candidate.account.is_deactivated === true && identity.userId != null ? { accountId: id, userId: identity.userId } : null); }); };
-  const recover = recoveryAction(workspace) == null || workspace == null ? undefined : (): void => { void run("recover", async (signal) => { if (accountId == null || identity.userId == null || !await actions.isCurrentAccount(accountId, identity.userId)) throw Error("Authenticated workspace changed during recovery"); if (recoveryAction(workspace) === "customer_portal") { const response = await initial.udn.safeGet("/payments/customer_portal", { parameters: { query: { account_id: accountId } }, signal }) as { url: string }; signal.throwIfAborted(); actions.openCustomerPortal(response.url); } else await actions.openCheckout(workspace, signal); }); };
-  return jsx.jsx(RecoveryDialog, { workspace, activeWorkspaces: active, recoveryWorkspaces: recoverable, pending, error: failed || query.error != null, onChooseWorkspace: actions.chooseWorkspace == null ? undefined : () => { void run("choose-workspace", async () => actions.chooseWorkspace?.()); }, onRecover: recover, onSelectWorkspace: selectWorkspace });
+function ge(e) {
+  let t = (0, X.c)(5),
+    { action: n, invoiceContext: r } = e;
+  if (n === `checkout`) {
+    let e;
+    return (
+      t[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Z.jsx)(g, {
+            id: `workspaceRecovery.purchaseSubscription`,
+            defaultMessage: `Purchase a new subscription to reactivate your workspace`,
+            description: `Owner guidance when a deactivated Business workspace can buy a replacement subscription`,
+          })),
+          (t[0] = e))
+        : (e = t[0]),
+      e
+    );
+  }
+  if (r?.available && r.invoice_kind === `renewal`) {
+    let e;
+    return (
+      t[1] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Z.jsx)(g, {
+            id: `workspaceRecovery.renewalPayment`,
+            defaultMessage: `Payment failed when we tried to renew your subscription. Resolve the outstanding payment to reactivate your workspace.`,
+            description: `Owner guidance when a Business workspace was deactivated after a failed subscription renewal`,
+          })),
+          (t[1] = e))
+        : (e = t[1]),
+      e
+    );
+  }
+  if (r?.available && r.invoice_kind === `true_up`) {
+    let e;
+    return (
+      t[2] === r.additional_paid_seats
+        ? (e = t[3])
+        : ((e = (0, Z.jsx)(g, {
+            id: `workspaceRecovery.seatIncreasePayment`,
+            defaultMessage: `{additionalPaidSeats, plural, one {<b># seat</b> was} other {<b># seats</b> were}} recently added to your organization, and payment failed when we tried to charge you. Resolve the outstanding payment to reactivate your workspace.`,
+            description: `Owner guidance when a Business workspace was deactivated after a failed invoice for recently added paid seats`,
+            values: { additionalPaidSeats: r.additional_paid_seats, b: q },
+          })),
+          (t[2] = r.additional_paid_seats),
+          (t[3] = e)),
+      e
+    );
+  }
+  let i;
+  return (
+    t[4] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((i = (0, Z.jsx)(g, {
+          id: `workspaceRecovery.outstandingPayment`,
+          defaultMessage: `Resolve the outstanding payment to reactivate your workspace`,
+          description: `Fallback owner guidance when a deactivated Business workspace still has an active paid subscription`,
+        })),
+        (t[4] = i))
+      : (i = t[4]),
+    i
+  );
 }
-
-function WorkspaceRecoveryGate({ children }: { children?: unknown }): unknown {
-  initialize();
-  const scope = shared.LX(shared.ZI);
-  const { refetch } = initial.j6t();
-  const navigate = initial.o_n();
-  const actions: RecoveryActions = {
-    chooseWorkspace: async () => { await initial.Ugn(scope, initial.ugn).logout(); await navigate("/login?workspaceRecovery=true", { replace: true }); },
-    isCurrentAccount: async (accountId, userId) => { const result = await refetch(); return !result.isError && result.data?.accountId === accountId && result.data.userId === userId; },
-    openCheckout: async (workspace) => { const accountId = workspace.account.account_id; if (accountId == null) return; const url = new URL("/pricing/", "https://chatgpt.com"); url.searchParams.set("reactivateWorkspaceId", accountId); url.hash = "team-pricing-seat-selection"; await navigate(initial.p0({ accountId, url: url.toString() })); },
-    openCustomerPortal: (url) => initial.kft({ href: url, initiator: "open_in_browser_bridge", openTarget: "external-browser" }),
-  };
-  return jsx.jsx(WorkspaceRecoveryController, { actions, children });
+function q(e) {
+  return (0, Z.jsx)(`strong`, { children: e });
 }
-
-function initialize(): void {
-  if (initialized) return; initialized = true;
-  shared.$3(); shared.$h(); shared.FX(); shared.K2(); shared.QI(); shared.Zh(); shared.lw(); shared.wL();
-  initial.Bfn(); initial.Dft(); initial.M6t(); initial.Qgn(); initial.Rln(); initial.Wgn(); initial.h0(); initial.iot(); initial.k6t(); initial.pdn(); initial.rot(); appPrimary.yc();
-  React = shared.e6(); jsx = shared.I3();
+function J(e) {
+  let t = (0, X.c)(2),
+    { workspace: n } = e,
+    r;
+  return (
+    t[0] === n.account.name
+      ? (r = t[1])
+      : ((r =
+          n.account.name ||
+          (0, Z.jsx)(g, {
+            id: `workspaceRecovery.unnamedWorkspace`,
+            defaultMessage: `Unnamed workspace`,
+            description: `Fallback label for a workspace whose name is missing in workspace recovery`,
+          })),
+        (t[0] = n.account.name),
+        (t[1] = r)),
+    r
+  );
 }
-
-initialize();
-export { WorkspaceRecoveryGate };
+function Y(e) {
+  let t = (0, X.c)(3),
+    { workspace: n } = e,
+    r = n.account.name ?? null,
+    i = n.account.profile_picture_url ?? null,
+    a;
+  return (
+    t[0] !== r || t[1] !== i
+      ? ((a = (0, Z.jsx)(U, { alt: ``, name: r, src: i })), (t[0] = r), (t[1] = i), (t[2] = a))
+      : (a = t[2]),
+    a
+  );
+}
+var X, Z;
+function _e() {
+  return (_e = e(() => {
+    ((X = t()), u(), le(), y(), O(), p(), c(), E(), de(), n(), K(), (Z = o()));
+  }))();
+}
+function ve(e) {
+  let t = (0, Ce.c)(81),
+    { actions: n, children: r } = e,
+    i = ee(v),
+    o = N(),
+    c = ce(),
+    l;
+  t[0] === c.pathname
+    ? (l = t[1])
+    : ((l =
+        c.pathname.startsWith(`/checkout/`) ||
+        c.pathname === `/payments/success` ||
+        c.pathname === `/payments/success-team`),
+      (t[0] = c.pathname),
+      (t[1] = l));
+  let u = l,
+    d = a(G),
+    te = d?.userId === o.userId ? d : null,
+    f = te?.accountId ?? o.accountId,
+    ne =
+      (o.authMethod === `chatgpt` || o.authMethod === `chatgptAuthTokens`) &&
+      o.userId != null &&
+      f != null &&
+      !u,
+    p;
+  t[2] !== o.accountId || t[3] !== o.userId || t[4] !== i || t[5] !== f
+    ? ((p = async (e) => {
+        let { signal: t } = e,
+          n = await ue.safeGet(`/accounts/check/{version}`, {
+            parameters: { path: { version: we } },
+            signal: t,
+          });
+        if ((t.throwIfAborted(), f != null && o.userId != null)) {
+          let e = n.accounts[f]?.account,
+            t = i.get(G);
+          e?.is_deactivated === !0 && f === o.accountId
+            ? i.set(G, { accountId: f, userId: o.userId })
+            : e?.is_deactivated === !1 &&
+              t?.accountId === f &&
+              t.userId === o.userId &&
+              (i.set(G, null),
+              i.queryClient.invalidateQueries({ queryKey: [`accounts`, `check`] }));
+        }
+        return n;
+      }),
+      (t[2] = o.accountId),
+      (t[3] = o.userId),
+      (t[4] = i),
+      (t[5] = f),
+      (t[6] = p))
+    : (p = t[6]);
+  let m;
+  t[7] !== o.userId || t[8] !== f
+    ? ((m = [`workspace-recovery`, `accounts-check`, o.userId, f]),
+      (t[7] = o.userId),
+      (t[8] = f),
+      (t[9] = m))
+    : (m = t[9]);
+  let re;
+  t[10] !== ne || t[11] !== p || t[12] !== m
+    ? ((re = {
+        enabled: ne,
+        queryFn: p,
+        queryKey: m,
+        refetchOnMount: `always`,
+        refetchOnWindowFocus: !1,
+        retry: !1,
+        staleTime: 0,
+      }),
+      (t[10] = ne),
+      (t[11] = p),
+      (t[12] = m),
+      (t[13] = re))
+    : (re = t[13]);
+  let { data: h, error: g, isLoading: _, isFetchedAfterMount: y, refetch: x } = b(re),
+    S = f == null ? void 0 : h?.accounts[f],
+    C = o.accountId === f && S?.account.is_deactivated === !0,
+    w = te != null || (f != null && (!(y && g == null && S != null) || C)),
+    T;
+  t[14] === S ? (T = t[15]) : ((T = me(S)), (t[14] = S), (t[15] = T));
+  let E = T,
+    ie = !u && w && E === `customer_portal` && f != null,
+    D;
+  t[16] === f
+    ? (D = t[17])
+    : ((D = (e) => {
+        let { signal: t } = e;
+        return ue.safeGet(`/subscriptions/deactivated_workspace_invoice_context`, {
+          parameters: { query: { account_id: f ?? `` } },
+          signal: t,
+        });
+      }),
+      (t[16] = f),
+      (t[17] = D));
+  let O;
+  t[18] !== o.userId || t[19] !== f
+    ? ((O = [`workspace-recovery`, `invoice-context`, o.userId, f]),
+      (t[18] = o.userId),
+      (t[19] = f),
+      (t[20] = O))
+    : (O = t[20]);
+  let k;
+  t[21] !== ie || t[22] !== D || t[23] !== O
+    ? ((k = {
+        enabled: ie,
+        queryFn: D,
+        queryKey: O,
+        refetchOnWindowFocus: !1,
+        retry: !1,
+        staleTime: 0,
+      }),
+      (t[21] = ie),
+      (t[22] = D),
+      (t[23] = O),
+      (t[24] = k))
+    : (k = t[24]);
+  let { data: A } = b(k),
+    [j, M] = (0, Q.useState)(null),
+    [P, F] = (0, Q.useState)(!1),
+    I = (0, Q.useRef)(null),
+    [ae, se] = (0, Q.useState)(null),
+    le;
+  t[25] !== w || t[26] !== u || t[27] !== j || t[28] !== x
+    ? ((le = () => {
+        w && j == null && !u && x();
+      }),
+      (t[25] = w),
+      (t[26] = u),
+      (t[27] = j),
+      (t[28] = x),
+      (t[29] = le))
+    : (le = t[29]);
+  let L = (0, Q.useEffectEvent)(le),
+    R;
+  t[30] !== w || t[31] !== L
+    ? ((R = () => {
+        if (!w) return;
+        let e = s.subscribe((e) => {
+            e && L();
+          }),
+          t = (e) => {
+            e.persisted && L();
+          };
+        return (
+          window.addEventListener(`pageshow`, t),
+          () => {
+            (e(), window.removeEventListener(`pageshow`, t));
+          }
+        );
+      }),
+      (t[30] = w),
+      (t[31] = L),
+      (t[32] = R))
+    : (R = t[32]);
+  let z;
+  (t[33] === w ? (z = t[34]) : ((z = [w]), (t[33] = w), (t[34] = z)), (0, Q.useEffect)(R, z));
+  let B, V;
+  if (
+    (t[35] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((B = () => () => I.current?.abort()), (V = []), (t[35] = B), (t[36] = V))
+      : ((B = t[35]), (V = t[36])),
+    (0, Q.useEffect)(B, V),
+    !w)
+  ) {
+    let e;
+    return (
+      t[37] !== r || t[38] !== c.pathname
+        ? ((e =
+            c.pathname === Te
+              ? (0, $.jsx)(oe, { replace: !0, to: `/` })
+              : (0, $.jsx)($.Fragment, { children: r })),
+          (t[37] = r),
+          (t[38] = c.pathname),
+          (t[39] = e))
+        : (e = t[39]),
+      e
+    );
+  }
+  if (c.pathname !== Te && !u) {
+    let e;
+    return (
+      t[40] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, $.jsx)(oe, { replace: !0, to: Te })), (t[40] = e))
+        : (e = t[40]),
+      e
+    );
+  }
+  if (u) {
+    let e;
+    return (
+      t[41] === r
+        ? (e = t[42])
+        : ((e = (0, $.jsx)($.Fragment, { children: r })), (t[41] = r), (t[42] = e)),
+      e
+    );
+  }
+  let H, U, W;
+  if (t[43] !== n.switchWorkspace || t[44] !== h) {
+    let e =
+      n.switchWorkspace == null
+        ? []
+        : h?.account_ordering.flatMap((e) => {
+            let t = h.accounts[e];
+            return t == null ? [] : [t];
+          });
+    ((H = (e ?? []).filter(Se)),
+      (U = (e ?? []).filter(xe)),
+      (W = (e ?? []).some(be)),
+      (t[43] = n.switchWorkspace),
+      (t[44] = h),
+      (t[45] = H),
+      (t[46] = U),
+      (t[47] = W));
+  } else ((H = t[45]), (U = t[46]), (W = t[47]));
+  let de = W,
+    fe;
+  t[48] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((fe = async (e, t) => {
+        if (I.current != null) return;
+        let n = new AbortController();
+        ((I.current = n), M({ controller: n, id: e }), F(!1));
+        try {
+          await t(n.signal);
+        } catch {
+          n.signal.aborted || F(!0);
+        }
+        I.current === n && ((I.current = null), M(null));
+      }),
+      (t[48] = fe))
+    : (fe = t[48]);
+  let pe = fe,
+    K = g != null || P,
+    ge = j?.id ?? null,
+    q;
+  t[49] === n
+    ? (q = t[50])
+    : ((q =
+        n.chooseWorkspace == null
+          ? void 0
+          : () => {
+              pe(`choose-workspace`, async () => {
+                await n.chooseWorkspace?.();
+              });
+            }),
+      (t[49] = n),
+      (t[50] = q));
+  let J;
+  t[51] !== n || t[52] !== ae || t[53] !== h || t[54] !== de || t[55] !== x || t[56] !== i
+    ? ((J =
+        n.switchWorkspace != null && h != null && !de
+          ? () => {
+              pe(`personal`, async (e) => {
+                let t = await x();
+                if ((e.throwIfAborted(), t.isError)) throw t.error;
+                let r = t.data?.account_ordering.map((e) => t.data.accounts[e]).find(ye),
+                  a =
+                    ae ??
+                    r?.account.account_id ??
+                    (await ue.safePost(`/accounts/personal`, { signal: e })).id;
+                (se(a), e.throwIfAborted());
+                let o = await x();
+                if ((e.throwIfAborted(), o.isError)) throw o.error;
+                let s = o.data?.accounts[a];
+                if (s == null || !(await n.switchWorkspace?.(s, e)))
+                  throw Error(`Personal workspace switch did not complete`);
+                (e.throwIfAborted(), i.set(G, null));
+              });
+            }
+          : void 0),
+      (t[51] = n),
+      (t[52] = ae),
+      (t[53] = h),
+      (t[54] = de),
+      (t[55] = x),
+      (t[56] = i),
+      (t[57] = J))
+    : (J = t[57]);
+  let Y;
+  t[58] !== E || t[59] !== n || t[60] !== o.userId || t[61] !== f || t[62] !== S
+    ? ((Y = () => {
+        pe(`recover`, async (e) => {
+          if (f != null && S != null && E != null) {
+            if (o.userId == null || !(await n.isCurrentAccount(f, o.userId)))
+              throw Error(`Authenticated workspace changed during recovery`);
+            if ((e.throwIfAborted(), E === `customer_portal`)) {
+              let t = await ue.safeGet(`/payments/customer_portal`, {
+                parameters: { query: { account_id: f } },
+                signal: e,
+              });
+              (e.throwIfAborted(), n.openCustomerPortal(t.url));
+              return;
+            }
+            await n.openCheckout(S, e);
+          }
+        });
+      }),
+      (t[58] = E),
+      (t[59] = n),
+      (t[60] = o.userId),
+      (t[61] = f),
+      (t[62] = S),
+      (t[63] = Y))
+    : (Y = t[63]);
+  let X;
+  t[64] !== n || t[65] !== o.userId || t[66] !== i
+    ? ((X = (e) => {
+        let t = e.account.account_id;
+        t != null &&
+          pe(t, async (r) => {
+            if (!(await n.switchWorkspace?.(e, r)))
+              throw Error(`Workspace switch did not complete`);
+            (r.throwIfAborted(),
+              i.set(
+                G,
+                e.account.is_deactivated === !0 && o.userId != null
+                  ? { accountId: t, userId: o.userId }
+                  : null,
+              ));
+          });
+      }),
+      (t[64] = n),
+      (t[65] = o.userId),
+      (t[66] = i),
+      (t[67] = X))
+    : (X = t[67]);
+  let Z;
+  return (
+    t[68] !== H ||
+    t[69] !== o.email ||
+    t[70] !== A ||
+    t[71] !== _ ||
+    t[72] !== U ||
+    t[73] !== K ||
+    t[74] !== ge ||
+    t[75] !== q ||
+    t[76] !== J ||
+    t[77] !== Y ||
+    t[78] !== X ||
+    t[79] !== S
+      ? ((Z = (0, $.jsx)(he, {
+          activeWorkspaces: H,
+          recoveryWorkspaces: U,
+          error: K,
+          invoiceContext: A,
+          loading: _,
+          pending: ge,
+          userLabel: o.email,
+          workspace: S,
+          onChooseWorkspace: q,
+          onPersonal: J,
+          onRecover: Y,
+          onSelectWorkspace: X,
+        })),
+        (t[68] = H),
+        (t[69] = o.email),
+        (t[70] = A),
+        (t[71] = _),
+        (t[72] = U),
+        (t[73] = K),
+        (t[74] = ge),
+        (t[75] = q),
+        (t[76] = J),
+        (t[77] = Y),
+        (t[78] = X),
+        (t[79] = S),
+        (t[80] = Z))
+      : (Z = t[80]),
+    Z
+  );
+}
+function ye(e) {
+  return e?.account.structure === `personal`;
+}
+function be(e) {
+  return e.account.structure === `personal`;
+}
+function xe(e) {
+  return e.account.account_id != null && me(e) != null;
+}
+function Se(e) {
+  return (
+    e.account.account_id != null &&
+    e.account.is_deactivated !== !0 &&
+    (e.can_access_with_session !== !1 || e.account.structure === `personal`)
+  );
+}
+var Ce, Q, $, we, Te;
+function Ee() {
+  return (Ee = e(() => {
+    ((Ce = t()),
+      d(),
+      C(),
+      i(),
+      (Q = S()),
+      P(),
+      M(),
+      m(),
+      H(),
+      _e(),
+      K(),
+      pe(),
+      ($ = o()),
+      (we = `v4-2023-04-27`),
+      (Te = `/workspace/deactivated`));
+  }))();
+}
+function De(e) {
+  let t = (0, ke.c)(14),
+    { children: n } = e,
+    r = ee(v),
+    { refetch: i } = L(),
+    a = B(),
+    o;
+  t[0] !== a || t[1] !== r
+    ? ((o = async () => {
+        (await I(r, W).logout(), await a(`/login?workspaceRecovery=true`, { replace: !0 }));
+      }),
+      (t[0] = a),
+      (t[1] = r),
+      (t[2] = o))
+    : (o = t[2]);
+  let s;
+  t[3] === i
+    ? (s = t[4])
+    : ((s = async (e, t) => {
+        let n = await i();
+        return !n.isError && n.data?.accountId === e && n.data.userId === t;
+      }),
+      (t[3] = i),
+      (t[4] = s));
+  let c;
+  t[5] === a
+    ? (c = t[6])
+    : ((c = async (e) => {
+        let t = e.account.account_id;
+        if (t == null) return;
+        let n = new URL(`/pricing/`, f);
+        (n.searchParams.set(`reactivateWorkspaceId`, t),
+          (n.hash = `team-pricing-seat-selection`),
+          await a(V({ accountId: t, url: n.toString() })));
+      }),
+      (t[5] = a),
+      (t[6] = c));
+  let l;
+  t[7] !== o || t[8] !== s || t[9] !== c
+    ? ((l = { chooseWorkspace: o, isCurrentAccount: s, openCheckout: c, openCustomerPortal: Oe }),
+      (t[7] = o),
+      (t[8] = s),
+      (t[9] = c),
+      (t[10] = l))
+    : (l = t[10]);
+  let u;
+  return (
+    t[11] !== n || t[12] !== l
+      ? ((u = (0, Ae.jsx)(ve, { actions: l, children: n })), (t[11] = n), (t[12] = l), (t[13] = u))
+      : (u = t[13]),
+    u
+  );
+}
+function Oe(e) {
+  z({ href: e, initiator: `open_in_browser_bridge`, openTarget: `external-browser` });
+}
+var ke, Ae;
+function je() {
+  return (je = e(() => {
+    ((ke = t()), i(), D(), P(), ae(), R(), A(), se(), m(), k(), Ee(), (Ae = o()));
+  }))();
+}
+je();
+export { De as WorkspaceRecoveryGate };

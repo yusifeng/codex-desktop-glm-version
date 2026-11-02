@@ -10,7 +10,6 @@ const root = path.resolve(import.meta.dirname, "..");
 const publishedRoot = "/Users/david/Workspace/ppio_github/chatgpt-desktop-src/app/webview/assets";
 const modules = [
   ["consent-1e345bc20d6a.js", "chatgpt-ads-consent-boundary", ["ChatGptAdsConsentBoundary"]],
-  ["gate.electron-622b420b2745.js", "workspace-recovery-gate-electron", ["WorkspaceRecoveryGate"]],
 ];
 const dependencyAliases = new Map([["ad-control-dialog-runtime", "control-dialog"], ["ads-controls-state", "state"]]);
 const normalize = (name) => { const base = name.replace(/-[a-f0-9]{12}$/u, ""); return dependencyAliases.get(base) ?? base; };
@@ -87,48 +86,8 @@ assertions += assertReleaseOwner("conversation-header", [
   /export \{ ot as Header \}/,
 ]);
 
-const recoverySignal = Symbol("recovery");
-let marker = null;
-let pathname = "/";
-let accountsQuery = { data: { account_ordering: [], accounts: {} }, error: null, isLoading: false, refetch: async () => ({ isError: false }) };
-let navigations = [];
-let logoutCalls = 0;
-let externalUrls = [];
-const recoveryScope = { get: noop, set: (_signal, value) => { marker = value; }, queryClient: { invalidateQueries: noop } };
-globalThis.__nlMocks["app-shared"] = { ...createSharedBase(), HX: () => marker, LX: () => recoveryScope, _L: () => accountsQuery };
-globalThis.__nlMocks["app-initial"] = { Bfn: noop, Dft: noop, Hln: (plan) => plan === "team", M6t: noop, N6t: () => ({ accountId: "workspace-1", authMethod: "chatgpt", email: "user@example.test", userId: "user-1" }), Qgn: noop, Rln: noop, Ugn: () => ({ logout: async () => { logoutCalls += 1; } }), Wgn: noop, Ygn: "Navigate", h0: noop, i_n: () => ({ pathname }), iot: noop, j6t: () => ({ refetch: async () => ({ isError: false, data: { accountId: "workspace-1", userId: "user-1" } }) }), k6t: noop, kft: ({ href }) => externalUrls.push(href), o_n: () => async (to, options) => { navigations.push({ to, options }); }, p0: ({ url }) => "checkout:" + url, pdn: noop, rot: noop, udn: { safeGet: async (path) => path.includes("customer_portal") ? { url: "https://billing.test" } : accountsQuery.data, safePost: async () => ({}) }, ugn: Symbol() };
-globalThis.__nlMocks["app-primary"] = { bc: recoverySignal, dc: "WorkspacePicker", uc: "WorkspaceRow", yc: noop };
-const gate = await load("workspace-recovery-gate-electron");
-assert.deepEqual(Object.keys(gate), ["WorkspaceRecoveryGate"]);
-let gateElement = gate.WorkspaceRecoveryGate({ children: "app" });
-assert.equal(typeof gateElement.type, "function");
-assert.equal((await gateElement.props.actions.isCurrentAccount("workspace-1", "user-1")), true);
-await gateElement.props.actions.chooseWorkspace();
-assert.equal(logoutCalls, 1);
-assert.deepEqual(navigations.at(-1), { to: "/login?workspaceRecovery=true", options: { replace: true } });
-await gateElement.props.actions.openCheckout({ account: { account_id: "workspace-1", structure: "workspace" }, entitlement: {} }, new AbortController().signal);
-assert.equal(navigations.at(-1).to.startsWith("checkout:https://chatgpt.com/pricing/"), true);
-gateElement.props.actions.openCustomerPortal("https://billing.test");
-assert.deepEqual(externalUrls, ["https://billing.test"]);
-let controller = gateElement.type(gateElement.props);
-assert.equal(controller.type, "Fragment");
-assert.equal(controller.props.children, "app");
-accountsQuery = { data: { account_ordering: ["workspace-1", "personal-1"], accounts: { "workspace-1": { account: { account_id: "workspace-1", account_user_role: "account-owner", eligible_for_reactivation: true, is_deactivated: true, name: "Deactivated", plan_type: "team", structure: "workspace" }, entitlement: { has_active_subscription: true } }, "personal-1": { account: { account_id: "personal-1", is_deactivated: false, name: "Personal", structure: "personal" }, entitlement: {} } } }, error: null, isLoading: false, refetch: async () => ({ isError: false }) };
-pathname = "/chat";
-controller = gateElement.type(gateElement.props);
-assert.equal(controller.type, "Navigate");
-assert.equal(controller.props.to, "/workspace/deactivated");
-pathname = "/workspace/deactivated";
-controller = gateElement.type(gateElement.props);
-assert.equal(typeof controller.type, "function");
-const dialog = controller.type(controller.props);
-assert.equal(dialog.type, "Dialog");
-assert.equal(dialog.props.children.props.children.some((child) => child?.type === "WorkspaceRow"), true);
-assertions += 15;
+assertions += assertReleaseOwner("workspace-recovery-gate-electron");
 
-for (const [, directory, expectedExports] of modules) {
-  const loaded = directory === "chatgpt-ads-consent-boundary" ? consent : gate;
-  assert.deepEqual(Object.keys(loaded).sort(), [...expectedExports].sort());
-  assertions += 1;
-}
+assert.deepEqual(Object.keys(consent), ["ChatGptAdsConsentBoundary"]);
+assertions += 1;
 console.log("misc-ui-utils NL: " + assertions + " assertions passed across " + modules.length + " modules.");

@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MODULES = [
@@ -11,7 +12,6 @@ const MODULES = [
   "review-row",
   "file-diff-alt",
   "diff-preview-content",
-  "file-diff-presentation-core",
   "pull-request-code-review-navigation-core",
   "open-thread-pull-request-code-tab",
   "open-thread-pull-request-side-panel-tab",
@@ -273,36 +273,7 @@ assert.equal(opened, 1);
 previewTree.props.onKeyDown({ key: "Enter", preventDefault() {} });
 assert.equal(opened, 2);
 
-// file-diff-presentation-core
-const presentation = await bundle("file-diff-presentation-core");
-presentation.r();
-presentation.n();
-assert.deepEqual(presentation.i(), {
-  diffStyle: "unified",
-  lineDiffType: "word",
-  hunkSeparators: "simple",
-});
-assert.equal(
-  presentation.i({ diffStyle: "split", lineDiffType: "line" }).diffStyle,
-  "split",
-);
-let rendered = false;
-const presentationTree = presentation.t({
-  fileDiff: "-old\n+new",
-  diffStyle: "split",
-  lineDiffType: "line",
-  hunkSeparators: "none",
-  onPostRender: () => {
-    rendered = true;
-  },
-  className: "diff",
-});
-assert.equal(presentationTree.type, "pre");
-assert.equal(presentationTree.props["data-diff-style"], "split");
-assert.equal(presentationTree.props["data-line-diff-type"], "line");
-assert.equal(presentationTree.props["data-hunk-separators"], "none");
-assert.equal(presentationTree.props.children, "-old\n+new");
-assert.equal(rendered, true);
+const fileDiffPresentationReleaseAssertions = assertReleaseOwner("file-diff-presentation-core");
 
 // pull-request-code-review-navigation-core
 const navigation = await bundle("pull-request-code-review-navigation-core");
@@ -453,4 +424,4 @@ assert.equal(
   false,
 );
 
-console.log("66 git review navigation cluster assertions passed");
+console.log(`56 git review navigation assertions and ${fileDiffPresentationReleaseAssertions} file diff presentation release assertions passed`);

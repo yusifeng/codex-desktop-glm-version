@@ -9,7 +9,6 @@ import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = "/Users/david/Workspace/ppio_github/chatgpt-desktop-src/app/webview/assets";
 const modules = [
-  ["image-1b6037d6ba79.js", "mermaid-image-rendering", ["a", "c", "d", "i", "l", "n", "o", "r", "s", "t", "u"]],
   ["workspace-auto-generated-name-aed2cf823284.js", "workspace-auto-generated-name", ["n", "t"]],
 ];
 const aliases = new Map([
@@ -21,6 +20,7 @@ const aliases = new Map([
 const dependencies = (source, dynamic) => [...source.matchAll(dynamic ? /import\("(?:\.\/|@rchunk\/)([^"/]+?)(?:-[a-f0-9]{12}\.js)?"\)/g : /(?:from\s+|import\s*)"(?:\.\/|@rchunk\/)([^"/]+?)(?:-[a-f0-9]{12}\.js)?"/g)].map(match => aliases.get(match[1]) ?? match[1]);
 let sourceAssertions = 0;
 sourceAssertions += assertReleaseOwner("browser-mfa-sms-enrollment");
+sourceAssertions += assertReleaseOwner("mermaid-image-rendering");
 sourceAssertions += assertReleaseOwner("imagegen-request-form", [
   /chatgpt-image-upload-reminder-dialog-entry/,
   /library-file-picker-dialog/,
@@ -50,13 +50,6 @@ async function bundle(semantic) {
 const loaded = new Map(); let runtimeAssertions = 0;
 for (const [, semantic, expected] of modules) { const value = await bundle(semantic); loaded.set(semantic, value); assert.deepEqual(Object.keys(value).sort(), expected.slice().sort()); runtimeAssertions++; }
 
-const mermaid = loaded.get("mermaid-image-rendering");
-const light = mermaid.c({ chatTheme: "green", isDarkMode: false }); const dark = mermaid.c({ chatTheme: "green", isDarkMode: true });
-assert.equal(light.primaryColor, "#d9f4e4"); assert.equal(dark.primaryColor, "#003716"); assert.equal(mermaid.s.background, "transparent");
-globalThis.document = { getElementById: () => null, createElement: () => ({ inert: false, hidden: false, remove() {} }), body: { append() {} } };
-assert.equal(await mermaid.u({ source: "%%{init: {securityLevel: 'loose'}}%%\ngraph TD; A-->B", themeVariables: light, isDarkMode: false, diagramId: "d" }), null);
-assert.match(await mermaid.u({ source: "graph TD; A-->B\nclick A href", themeVariables: light, isDarkMode: false, diagramId: "d2" }), /<svg/); assert.deepEqual(globalThis.__nm.renderSources, ["graph TD; A-->B"]);
-runtimeAssertions += 6;
 
 
 const workspace = loaded.get("workspace-auto-generated-name"); const intl = { formatMessage: (descriptor, values) => values?.name ? descriptor.defaultMessage.replace("{name}", values.name) : descriptor.defaultMessage };

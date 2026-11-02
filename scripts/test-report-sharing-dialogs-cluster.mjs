@@ -11,7 +11,6 @@ const MODULES = [
   "report-dialog-core",
   "codex-thread-report-dialog",
   "remote-connection-editor-dialog",
-  "scheduled-shared-task-dialog-core",
   "plugin-share-dialog-core",
   "gitlab-merge-request-form-dialog",
 ];
@@ -276,34 +275,8 @@ assert.equal(remoteSubmissions[0][0].displayName, "Prod");
 byText(remoteTree, "Cancel").props.onClick();
 assert.equal(state.remoteOpen, false);
 
-// scheduled-shared-task-dialog-core: 5
-const sharedTask = await bundle("scheduled-shared-task-dialog-core");
-let importedPost = null;
-let sharedClosed = false;
-const taskTree = sharedTask.t({
-  postId: "post-1",
-  onClose: () => {
-    sharedClosed = true;
-  },
-  onImport: async (task) => {
-    importedPost = task.post.id;
-  },
-  initialSharedTask: {
-    automation: {
-      importable: true,
-      name: "Daily digest",
-      prompt: "Summarize updates",
-    },
-    post: { id: "post-1", is_owner: false },
-  },
-});
-assert.equal(byText(taskTree, "Shared with you").type, "h2");
-assert.equal(byText(taskTree, "Daily digest").type, "h3");
-byText(taskTree, "Save task").props.onClick();
-await new Promise((resolve) => setImmediate(resolve));
-assert.equal(importedPost, "post-1");
-assert.equal(sharedClosed, true);
-assert.equal(byText(taskTree, "Close").type, "button");
+const sharedTaskReleaseAssertions = assertReleaseOwner("scheduled-shared-task-dialog-core");
+const skillShareReleaseAssertions = assertReleaseOwner("skill-share-dialog-runtime");
 
 const pluginShareAssertions = assertReleaseOwner("plugin-share-dialog-core");
 
@@ -338,4 +311,4 @@ assert.equal(mergeRequests[0].title, "Ship feature");
 assert.equal(gitlabClosed, true);
 assert.equal(byText(gitlabTree, "Open in browser").type, "button");
 
-console.log("42 report and sharing dialogs cluster assertions passed");
+console.log(`37 report/sharing dialog assertions, ${sharedTaskReleaseAssertions} shared task, ${skillShareReleaseAssertions} skill share, and ${pluginShareAssertions} plugin share release assertions passed`);

@@ -1,279 +1,1156 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/linear";
-
-interface GraphDimensions { height: number; padding: number; width: number }
-interface Point { x: number; y: number | null }
-interface GraphData { holes: Point[]; paths: string[]; rawSegments: Point[][]; segments: Point[][]; xDomain: [number, number]; yDomain: [number, number] }
-type ExpressionToken =
-  | { type: "number"; value: number }
-  | { type: "identifier"; value: string }
-  | { type: "operator"; value: string }
-  | { type: "function"; value: string };
-interface BuildGraphOptions {
-  discontinuityMode?: "interactive" | string;
-  evaluateAt?: (x: number) => number;
-  maxEvaluations?: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { n as t, t as n } from "@rchunk/linear";
+var r, i, a, o;
+function s() {
+  return (s = e(() => {
+    ((r = { width: 360, height: 220, padding: 0 }),
+      (i = { width: 360, height: 360, padding: 0 }),
+      (a = r.width),
+      (o = r.height),
+      r.padding);
+  }))();
 }
-interface GraphDomains { xDomain?: [number, number]; yDomain?: [number, number] }
-interface Rational { denominator: number; numerator: number }
-
-let defaultGraphDimensions: GraphDimensions;
-let squareGraphDimensions: GraphDimensions;
-let defaultGraphWidth: number;
-let defaultGraphHeight: number;
-
-function initializeGraphDimensions(): void {
-  defaultGraphDimensions = { width: 360, height: 220, padding: 0 };
-  squareGraphDimensions = { width: 360, height: 360, padding: 0 };
-  defaultGraphWidth = defaultGraphDimensions.width;
-  defaultGraphHeight = defaultGraphDimensions.height;
+var c,
+  l,
+  u,
+  d,
+  f,
+  p,
+  m,
+  h,
+  g,
+  _,
+  v,
+  y,
+  ee,
+  te,
+  b,
+  x,
+  ne,
+  re,
+  ie,
+  S,
+  C,
+  w,
+  T,
+  E,
+  D,
+  ae,
+  oe,
+  O,
+  se,
+  k,
+  ce,
+  A,
+  j,
+  M,
+  N,
+  P,
+  F,
+  I,
+  L,
+  R,
+  z,
+  B,
+  V,
+  H,
+  U,
+  le,
+  W,
+  G,
+  ue,
+  de,
+  K,
+  fe,
+  pe,
+  q,
+  me,
+  J;
+function Y() {
+  return (Y = e(() => {
+    (n(),
+      s(),
+      (c = [-10, 10]),
+      (l = c[1] - c[0]),
+      (u = 1e6),
+      (d = 2 * Math.PI),
+      (f = Math.PI * 0.9),
+      (p = 0.25),
+      (m = 4),
+      (h = 2e3),
+      (g = 321),
+      (_ = 20),
+      (v = 0.1),
+      (y = 600),
+      (ee = 1e4),
+      (te = 2e4),
+      (b = 5e4),
+      (x = 14),
+      (ne = 20),
+      (re = 2),
+      (ie = 0.75),
+      (S = (e, t, n) => Math.max(t, Math.min(n, e))),
+      (C = (e) => typeof e == `number` && Number.isFinite(e)),
+      (w = (e, t) => {
+        let n = Math.abs(e),
+          r = Math.abs(t);
+        for (; r !== 0;) {
+          let e = n % r;
+          ((n = r), (r = e));
+        }
+        return n === 0 ? 1 : n;
+      }),
+      (T = (e, t) => {
+        if (!Number.isInteger(e) || !Number.isInteger(t) || t === 0) return null;
+        let n = t < 0 ? -1 : 1,
+          r = w(e, t);
+        return { numerator: (e / r) * n, denominator: Math.abs(t / r) };
+      }),
+      (E = (e, t) => (Number.isInteger(t) ? T(e.numerator * t, e.denominator) : null)),
+      (D = (e, t, n) => {
+        let r = n === `+` ? 1 : -1;
+        return T(
+          e.numerator * t.denominator + r * t.numerator * e.denominator,
+          e.denominator * t.denominator,
+        );
+      }),
+      (ae = (e, t) => T(e.numerator * t.numerator, e.denominator * t.denominator)),
+      (oe = (e, t) =>
+        t.numerator === 0 ? null : T(e.numerator * t.denominator, e.denominator * t.numerator)),
+      (O = (e, t) => {
+        if (t.denominator === 1) return e ** +t.numerator;
+        if (e === 0 && t.numerator < 0) return NaN;
+        if (e >= 0) return e ** +(t.numerator / t.denominator);
+        if (t.denominator % 2 == 0) return NaN;
+        let n = Math.abs(e) ** +(Math.abs(t.numerator) / t.denominator),
+          r = Math.abs(t.numerator) % 2 == 0 ? n : -n;
+        return t.numerator < 0 ? 1 / r : r;
+      }),
+      (se = (e, t, n) => (e <= 0 && t >= 0 ? !0 : e >= 0 ? e <= n * 2 : Math.abs(t) <= n * 2)),
+      (k = (e, t) => {
+        if (e.length === 0) return NaN;
+        let n = (e.length - 1) * t,
+          r = Math.floor(n),
+          i = n - r,
+          a = e[r];
+        return a + (e[Math.min(r + 1, e.length - 1)] - a) * i;
+      }),
+      (ce = (e, t, n, r, i, a) => {
+        let o = i - n,
+          s = a - r,
+          c = e - n,
+          l = t - r,
+          u = o * o + s * s;
+        if (u === 0) return Math.hypot(e - n, t - r);
+        let d = (c * o + l * s) / u;
+        d = S(d, 0, 1);
+        let f = n + d * o,
+          p = r + d * s;
+        return Math.hypot(e - f, t - p);
+      }),
+      (A = (e, t = {}) =>
+        e === `pi` ? Math.PI : e === `e` ? Math.E : Object.hasOwn(t, e) ? (t[e] ?? NaN) : 1),
+      (j = (e, t) => ({ xCoefficient: e.xCoefficient * t, constant: e.constant * t })),
+      (M = (e, t) => ({
+        quadratic: e.quadratic * t,
+        linear: e.linear * t,
+        constant: e.constant * t,
+      })),
+      (N = (e, t, n) => {
+        if (e == null || t == null) return null;
+        let r = e.quadratic === 0 ? (e.linear === 0 ? 0 : 1) : 2,
+          i = t.quadratic === 0 ? (t.linear === 0 ? 0 : 1) : 2;
+        switch (n) {
+          case `+`:
+            return {
+              quadratic: e.quadratic + t.quadratic,
+              linear: e.linear + t.linear,
+              constant: e.constant + t.constant,
+            };
+          case `-`:
+            return {
+              quadratic: e.quadratic - t.quadratic,
+              linear: e.linear - t.linear,
+              constant: e.constant - t.constant,
+            };
+          case `*`:
+            return r + i > 2
+              ? null
+              : {
+                  quadratic:
+                    e.quadratic * t.constant + e.linear * t.linear + e.constant * t.quadratic,
+                  linear: e.linear * t.constant + e.constant * t.linear,
+                  constant: e.constant * t.constant,
+                };
+          case `/`:
+            return i !== 0 || t.constant === 0 ? null : M(e, 1 / t.constant);
+          case `^`:
+            return i !== 0 || !Number.isInteger(t.constant)
+              ? null
+              : t.constant === 0
+                ? { quadratic: 0, linear: 0, constant: 1 }
+                : t.constant === 1
+                  ? e
+                  : t.constant === 2
+                    ? r > 1
+                      ? null
+                      : {
+                          quadratic: e.linear * e.linear + 2 * e.quadratic * e.constant,
+                          linear: 2 * e.linear * e.constant,
+                          constant: e.constant * e.constant,
+                        }
+                    : null;
+        }
+      }),
+      (P = (e) => {
+        if (Math.abs(e.quadratic) > 1e-9) {
+          let t = e.linear * e.linear - 4 * e.quadratic * e.constant;
+          if (t < 0) return [];
+          let n = Math.sqrt(Math.max(0, t));
+          return [(-e.linear - n) / (2 * e.quadratic), (-e.linear + n) / (2 * e.quadratic)].filter(
+            Number.isFinite,
+          );
+        }
+        return Math.abs(e.linear) > 1e-9 ? [-e.constant / e.linear].filter(Number.isFinite) : [];
+      }),
+      (F = (e, t, n) => {
+        if (e == null || t == null) return null;
+        switch (n) {
+          case `+`:
+            return {
+              xCoefficient: e.xCoefficient + t.xCoefficient,
+              constant: e.constant + t.constant,
+            };
+          case `-`:
+            return {
+              xCoefficient: e.xCoefficient - t.xCoefficient,
+              constant: e.constant - t.constant,
+            };
+          case `*`:
+            return e.xCoefficient === 0
+              ? j(t, e.constant)
+              : t.xCoefficient === 0
+                ? j(e, t.constant)
+                : null;
+          case `/`:
+            return t.xCoefficient !== 0 || t.constant === 0 ? null : j(e, 1 / t.constant);
+          case `^`:
+            return t.xCoefficient === 0
+              ? t.constant === 0
+                ? { xCoefficient: 0, constant: 1 }
+                : t.constant === 1
+                  ? e
+                  : e.xCoefficient === 0
+                    ? { xCoefficient: 0, constant: e.constant ** +t.constant }
+                    : null
+              : null;
+        }
+      }),
+      (I = (e) => (e === `tan` ? f : d)),
+      (L = (e, t, n) =>
+        !Number.isFinite(e) || !Number.isFinite(t) || t <= 1e-9
+          ? null
+          : { offset: e, step: t, pole: n }),
+      (R = (e, t = {}) => {
+        let n = [];
+        for (let r of e) {
+          if (r.type === `number`) {
+            n.push({
+              affine: { xCoefficient: 0, constant: r.value },
+              trigHints: [],
+              polynomial: { quadratic: 0, linear: 0, constant: r.value },
+              periodicAnchors: [],
+              poleXs: [],
+            });
+            continue;
+          }
+          if (r.type === `identifier`) {
+            n.push({
+              affine:
+                r.value === `x`
+                  ? { xCoefficient: 1, constant: 0 }
+                  : { xCoefficient: 0, constant: A(r.value, t) },
+              trigHints: [],
+              polynomial:
+                r.value === `x`
+                  ? { quadratic: 0, linear: 1, constant: 0 }
+                  : { quadratic: 0, linear: 0, constant: A(r.value, t) },
+              periodicAnchors: [],
+              poleXs: [],
+            });
+            continue;
+          }
+          if (r.type === `operator`) {
+            let e = n.pop(),
+              t = n.pop();
+            if (!t || !e) return c;
+            n.push({
+              affine: F(t.affine, e.affine, r.value),
+              trigHints: t.trigHints.concat(e.trigHints),
+              polynomial: N(t.polynomial, e.polynomial, r.value),
+              periodicAnchors: t.periodicAnchors.concat(e.periodicAnchors),
+              poleXs:
+                r.value === `/` && e.polynomial != null
+                  ? t.poleXs.concat(e.poleXs).concat(P(e.polynomial))
+                  : t.poleXs.concat(e.poleXs),
+            });
+            continue;
+          }
+          if (r.type === `function`) {
+            let e = n.pop();
+            if (!e) return c;
+            let t = e.trigHints.slice(),
+              i = e.periodicAnchors.slice();
+            if ((r.value === `sin` || r.value === `cos` || r.value === `tan`) && e.affine != null) {
+              let n = Math.abs(e.affine.xCoefficient);
+              if (n > 1e-9) {
+                let a = Math.min(I(r.value) / n, u);
+                if (Number.isFinite(a) && a > l) {
+                  let n = -e.affine.constant / e.affine.xCoefficient;
+                  Number.isFinite(n) && t.push({ centerX: n, span: a });
+                }
+                let o = ((r.value === `tan` ? Math.PI : d) / n) * (r.value === `tan` ? 3 : 4);
+                if (Number.isFinite(o) && o < l * 0.75) {
+                  let n = -e.affine.constant / e.affine.xCoefficient;
+                  Number.isFinite(n) && t.push({ centerX: n, span: o });
+                }
+                let s = Math.PI / n;
+                if (r.value === `sin`) {
+                  let t = L(-e.affine.constant / e.affine.xCoefficient, s, !1),
+                    n = L((Math.PI / 2 - e.affine.constant) / e.affine.xCoefficient, s, !1);
+                  (t && i.push(t), n && i.push(n));
+                } else if (r.value === `cos`) {
+                  let t = L((Math.PI / 2 - e.affine.constant) / e.affine.xCoefficient, s, !1),
+                    n = L(-e.affine.constant / e.affine.xCoefficient, s, !1);
+                  (t && i.push(t), n && i.push(n));
+                } else if (r.value === `tan`) {
+                  let t = L(-e.affine.constant / e.affine.xCoefficient, s, !1),
+                    n = L((Math.PI / 2 - e.affine.constant) / e.affine.xCoefficient, s, !0);
+                  (t && i.push(t), n && i.push(n));
+                }
+              }
+            }
+            n.push({
+              affine: r.value === `neg` && e.affine != null ? j(e.affine, -1) : null,
+              trigHints: t,
+              polynomial: r.value === `neg` && e.polynomial != null ? M(e.polynomial, -1) : null,
+              periodicAnchors: i,
+              poleXs: e.poleXs,
+            });
+          }
+        }
+        if (n.length !== 1) return c;
+        let r = n[0].trigHints.reduce((e, t) => (e == null || t.span > e.span ? t : e), null);
+        if (!r) return c;
+        let i = r.span / 2;
+        return [r.centerX - i, r.centerX + i];
+      }),
+      (z = (e, t, n, r) => {
+        let [i, a] = e,
+          o = a - i,
+          s = [];
+        for (let e = 0; e < t && !(n.remaining <= 0); e += 1) {
+          let a = i + (o * e) / (t - 1);
+          --n.remaining;
+          let c = r(a);
+          s.push({ x: a, y: Number.isFinite(c) && Math.abs(c) <= 1e100 ? c : null });
+        }
+        return s;
+      }),
+      (B = (e) => {
+        let t = 0,
+          n = null,
+          r = null;
+        for (let i of e)
+          i.y != null &&
+            ((t += 1),
+            (n = n == null ? i.x : Math.min(n, i.x)),
+            (r = r == null ? i.x : Math.max(r, i.x)));
+        return {
+          finiteCount: t,
+          finiteFraction: e.length === 0 ? 0 : t / e.length,
+          finiteMinX: n,
+          finiteMaxX: r,
+        };
+      }),
+      (V = (e) => e.finiteCount < _ || e.finiteFraction < v),
+      (H = (e, t) => {
+        let { finiteMinX: n, finiteMaxX: r } = t;
+        if (
+          n == null ||
+          r == null ||
+          t.finiteCount < 3 ||
+          !Number.isFinite(n) ||
+          !Number.isFinite(r)
+        )
+          return null;
+        let [i, a] = e,
+          o = a - i,
+          s = r - n,
+          c = l * 0.075,
+          u = Math.max(c, s * 0.1),
+          d = (o / 320) * 1.5,
+          f = n <= i + d,
+          p = r >= a - d;
+        if (p && !f) {
+          let e = n - c;
+          return [e, e + l];
+        }
+        if (f && !p) {
+          let e = r + c;
+          return [e - l, e];
+        }
+        let m = Math.min(l, Math.max(l * 0.25, s + u * 2)),
+          h = (n + r) / 2;
+        return [h - m / 2, h + m / 2];
+      }),
+      (U = (e, t, n) => {
+        let r = H(c, B(t));
+        if (r) return r;
+        for (let t of [100, 200, 1e3, 2e4, u]) {
+          if (e.remaining < g) break;
+          let r = [-t / 2, t / 2],
+            i = z(r, g, e, n),
+            a = H(r, B(i));
+          if (a) return a;
+        }
+        return null;
+      }),
+      (le = (e, t = {}, n = (n) => pe(e, n, t)) => {
+        let r = R(e, t);
+        if (Math.abs(r[0] - c[0]) > 1e-9 || Math.abs(r[1] - c[1]) > 1e-9) return r;
+        let i = { remaining: h },
+          a = z(c, g, i, n),
+          o = B(a);
+        return V(o) ? (U(i, a, n) ?? c) : c;
+      }),
+      (W = (e, t, n) => {
+        let r = [];
+        for (let i of e) {
+          let e = Math.ceil((t - i.offset) / i.step),
+            a = Math.floor((n - i.offset) / i.step),
+            o = a - e + 1;
+          if (o <= 0) continue;
+          let s = Math.max(1, Math.ceil(o / 512));
+          for (let t = e; t <= a; t += s) r.push(i.offset + t * i.step);
+          (a - e) % s !== 0 && r.push(i.offset + a * i.step);
+        }
+        return r.filter((e) => e >= t && e <= n);
+      }),
+      (G = (e, t = {}) => {
+        let n = [];
+        for (let r of e) {
+          if (r.type === `number`) {
+            n.push({
+              affine: { xCoefficient: 0, constant: r.value },
+              trigHints: [],
+              polynomial: { quadratic: 0, linear: 0, constant: r.value },
+              periodicAnchors: [],
+              poleXs: [],
+            });
+            continue;
+          }
+          if (r.type === `identifier`) {
+            n.push({
+              affine:
+                r.value === `x`
+                  ? { xCoefficient: 1, constant: 0 }
+                  : { xCoefficient: 0, constant: A(r.value, t) },
+              trigHints: [],
+              polynomial:
+                r.value === `x`
+                  ? { quadratic: 0, linear: 1, constant: 0 }
+                  : { quadratic: 0, linear: 0, constant: A(r.value, t) },
+              periodicAnchors: [],
+              poleXs: [],
+            });
+            continue;
+          }
+          if (r.type === `operator`) {
+            let e = n.pop(),
+              t = n.pop();
+            if (!t || !e) return { periodicAnchors: [], poleXs: [] };
+            n.push({
+              affine: F(t.affine, e.affine, r.value),
+              trigHints: t.trigHints.concat(e.trigHints),
+              polynomial: N(t.polynomial, e.polynomial, r.value),
+              periodicAnchors: t.periodicAnchors.concat(e.periodicAnchors),
+              poleXs:
+                r.value === `/` && e.polynomial != null
+                  ? t.poleXs.concat(e.poleXs).concat(P(e.polynomial))
+                  : t.poleXs.concat(e.poleXs),
+            });
+            continue;
+          }
+          if (r.type === `function`) {
+            let e = n.pop();
+            if (!e) return { periodicAnchors: [], poleXs: [] };
+            let t = e.trigHints.slice(),
+              i = e.periodicAnchors.slice();
+            if ((r.value === `sin` || r.value === `cos` || r.value === `tan`) && e.affine != null) {
+              let t = Math.abs(e.affine.xCoefficient);
+              if (t > 1e-9) {
+                let n = Math.PI / t;
+                if (r.value === `sin`) {
+                  let t = L(-e.affine.constant / e.affine.xCoefficient, n, !1),
+                    r = L((Math.PI / 2 - e.affine.constant) / e.affine.xCoefficient, n, !1);
+                  (t && i.push(t), r && i.push(r));
+                } else if (r.value === `cos`) {
+                  let t = L((Math.PI / 2 - e.affine.constant) / e.affine.xCoefficient, n, !1),
+                    r = L(-e.affine.constant / e.affine.xCoefficient, n, !1);
+                  (t && i.push(t), r && i.push(r));
+                } else if (r.value === `tan`) {
+                  let t = L(-e.affine.constant / e.affine.xCoefficient, n, !1),
+                    r = L((Math.PI / 2 - e.affine.constant) / e.affine.xCoefficient, n, !0);
+                  (t && i.push(t), r && i.push(r));
+                }
+              }
+            }
+            n.push({
+              affine: r.value === `neg` && e.affine != null ? j(e.affine, -1) : null,
+              trigHints: t,
+              polynomial: r.value === `neg` && e.polynomial != null ? M(e.polynomial, -1) : null,
+              periodicAnchors: i,
+              poleXs: e.poleXs,
+            });
+          }
+        }
+        return n.length === 1
+          ? { periodicAnchors: n[0].periodicAnchors, poleXs: n[0].poleXs }
+          : { periodicAnchors: [], poleXs: [] };
+      }),
+      (ue = (e, t, n) => {
+        let r = Math.ceil(e),
+          i = Math.floor(t);
+        if (r > i || n === 0) return [];
+        let a = i - r + 1,
+          o = Math.max(1, Math.ceil(a / n)),
+          s = [];
+        for (let e = r; e <= i; e += o) s.push(e);
+        return (
+          s[s.length - 1] !== i && s.push(i),
+          e <= 0 && t >= 0 && !s.includes(0) && s.push(0),
+          s.sort((e, t) => e - t)
+        );
+      }),
+      (de = (e, t, n) => (e?.y == null || t?.y == null ? !1 : Math.abs(t.y - e.y) <= n)),
+      (K = (e, t) =>
+        e
+          .sort((e, t) => e - t)
+          .filter((e, n, r) => {
+            let i = r[n - 1];
+            return i == null || Math.abs(e - i) > t;
+          })),
+      (fe = (e, t, n) => {
+        let r = e.filter((e) => e.y != null);
+        if (r.length < 3) return null;
+        let i = n - t,
+          a = Math.max(i * 0.01, 0.05),
+          o = [],
+          s = [];
+        for (let e = 1; e < r.length; e += 1) {
+          let t = r[e - 1],
+            n = r[e];
+          if (t.y === 0) {
+            o.push(t.x);
+            continue;
+          }
+          if (n.y === 0) {
+            o.push(n.x);
+            continue;
+          }
+          if (t.y * n.y < 0) {
+            let e = -t.y / (n.y - t.y);
+            o.push(t.x + e * (n.x - t.x));
+          }
+        }
+        for (let e = 1; e < r.length - 1; e += 1) {
+          let t = r[e - 1],
+            n = r[e],
+            i = r[e + 1],
+            a = n.y <= t.y && n.y <= i.y,
+            o = n.y >= t.y && n.y >= i.y;
+          (a || o) && s.push(n.x);
+        }
+        let c = K(
+          o.concat(s).filter((e) => e >= t && e <= n),
+          a,
+        );
+        if (c.length === 0) return null;
+        let l = c[0],
+          u = c[c.length - 1],
+          d = u - l,
+          f = c.length === 1 ? Math.max(i * 0.24, 1.5) : Math.max(d * 2.5, i * 0.2),
+          p = (l + u) / 2,
+          m = f / 2,
+          h = Math.max(t, p - m),
+          g = Math.min(n, p + m),
+          _ = r
+            .filter((e) => e.x >= h && e.x <= g)
+            .map((e) => e.y)
+            .sort((e, t) => e - t);
+        return _.length < 10 ? null : { yMin: _[0], yMax: _[_.length - 1], featureCount: c.length };
+      }),
+      (pe = (e, t, n = {}, r) => {
+        let i = [];
+        for (let a of e) {
+          if (a.type === `number`) {
+            i.push({ value: a.value, rational: Number.isInteger(a.value) ? T(a.value, 1) : null });
+            continue;
+          }
+          if (a.type === `identifier`) {
+            a.value === `x`
+              ? i.push({ value: t, rational: null })
+              : i.push({ value: A(a.value, n), rational: null });
+            continue;
+          }
+          if (a.type === `operator`) {
+            let e = i.pop(),
+              t = i.pop();
+            if (t == null || e == null) return NaN;
+            switch (a.value) {
+              case `+`:
+                i.push({
+                  value: t.value + e.value,
+                  rational: t.rational && e.rational ? D(t.rational, e.rational, `+`) : null,
+                });
+                break;
+              case `-`:
+                i.push({
+                  value: t.value - e.value,
+                  rational: t.rational && e.rational ? D(t.rational, e.rational, `-`) : null,
+                });
+                break;
+              case `*`:
+                i.push({
+                  value: t.value * e.value,
+                  rational: t.rational && e.rational ? ae(t.rational, e.rational) : null,
+                });
+                break;
+              case `/`:
+                i.push({
+                  value: t.value / e.value,
+                  rational: t.rational && e.rational ? oe(t.rational, e.rational) : null,
+                });
+                break;
+              case `^`:
+                i.push({
+                  value: e.rational ? O(t.value, e.rational) : t.value ** +e.value,
+                  rational: null,
+                });
+                break;
+              default:
+                return NaN;
+            }
+            continue;
+          }
+          if (a.type === `function`) {
+            let e = i.pop();
+            if (e == null) return NaN;
+            switch (a.value) {
+              case `arcsin`:
+                i.push({ value: Math.asin(e.value), rational: null });
+                break;
+              case `arccos`:
+                i.push({ value: Math.acos(e.value), rational: null });
+                break;
+              case `arctan`:
+                i.push({ value: Math.atan(e.value), rational: null });
+                break;
+              case `sin`:
+                i.push({ value: Math.sin(e.value), rational: null });
+                break;
+              case `cos`:
+                i.push({ value: Math.cos(e.value), rational: null });
+                break;
+              case `sinh`:
+                i.push({ value: Math.sinh(e.value), rational: null });
+                break;
+              case `cosh`:
+                i.push({ value: Math.cosh(e.value), rational: null });
+                break;
+              case `tan`:
+                i.push({ value: Math.tan(e.value), rational: null });
+                break;
+              case `tanh`:
+                i.push({ value: Math.tanh(e.value), rational: null });
+                break;
+              case `ln`:
+                i.push({ value: Math.log(e.value), rational: null });
+                break;
+              case `log`:
+                i.push({ value: Math.log10(e.value), rational: null });
+                break;
+              case `sqrt`:
+                i.push({ value: Math.sqrt(e.value), rational: null });
+                break;
+              case `abs`:
+                i.push({ value: Math.abs(e.value), rational: null });
+                break;
+              case `exp`:
+                i.push({ value: Math.exp(e.value), rational: null });
+                break;
+              case `sigmoid`:
+                i.push({ value: 1 / (1 + Math.exp(-e.value)), rational: null });
+                break;
+              case `relu`:
+                i.push({ value: Math.max(0, e.value), rational: null });
+                break;
+              case `neg`:
+                i.push({ value: -e.value, rational: e.rational ? E(e.rational, -1) : null });
+                break;
+              default:
+                i.push({ value: r?.(a.value, e.value) ?? NaN, rational: null });
+            }
+          }
+        }
+        return i.length === 1 ? i[0].value : NaN;
+      }),
+      (q = (e, t = {}) => {
+        let n = G(e, t).periodicAnchors.map(({ step: e }) => e);
+        return n.length > 0 ? Math.min(...n) : null;
+      }),
+      (me = (e, t, n, r) => {
+        let i = G(e, t),
+          a = K(
+            i.poleXs.filter((e) => e >= n && e <= r),
+            1e-7,
+          ),
+          o = K(W(i.periodicAnchors, n, r), 1e-7),
+          s = o.filter((e) =>
+            i.periodicAnchors.some(
+              (t) =>
+                t.pole &&
+                Math.abs(e - (t.offset + Math.round((e - t.offset) / t.step) * t.step)) <= 1e-7,
+            ),
+          );
+        return {
+          explicitPoleXs: a,
+          periodicAnchorXs: o,
+          periodicPoleXs: s,
+          knownPoleXs: K(a.concat(s), 1e-7),
+        };
+      }),
+      (J = (e, n, i, a = r, o) => {
+        let s = o?.discontinuityMode === `interactive`,
+          c = s ? te : ee,
+          l = o?.maxEvaluations;
+        if (l != null && (!Number.isFinite(l) || !Number.isInteger(l) || l < y))
+          throw Error(`buildGraphData maxEvaluations must be an integer of at least ${y}`);
+        let u = l == null ? c : Math.min(b, l),
+          d = s ? ne : x,
+          f = Math.max(0, Math.floor(u * 0.6) - y),
+          { width: h, height: g, padding: _ } = a,
+          v = o?.evaluateAt ?? ((t) => pe(e, t, n)),
+          [w, T] = i?.xDomain ?? le(e, n, v),
+          E = g * 0.85,
+          { explicitPoleXs: D, periodicAnchorXs: ae, knownPoleXs: oe } = me(e, n, w, T),
+          O = 0,
+          A = (e) => {
+            if (O >= u || ((O += 1), s && oe.some((t) => Math.abs(e - t) <= 1e-9))) return null;
+            let t = v(e);
+            return !Number.isFinite(t) || Math.abs(t) > 1e100 ? null : t;
+          },
+          j = [],
+          M = (T - w) / 599,
+          N = [];
+        for (let e = 0; e < y; e += 1) N.push(w + M * e);
+        let P = ue(w, T, f),
+          F = s
+            ? N.concat(P)
+                .concat(ae)
+                .concat(D)
+                .sort((e, t) => e - t)
+            : N.concat(P).sort((e, t) => e - t),
+          I = null;
+        for (let e of F)
+          (I != null && Math.abs(e - I) < 1e-9) || (j.push({ x: e, y: A(e) }), (I = e));
+        let L = j.map((e) => e.y).filter(C);
+        if (L.length === 0) return null;
+        let R = i?.yDomain?.[0],
+          z = i?.yDomain?.[1];
+        if (R == null || z == null) {
+          let e = L.slice().sort((e, t) => e - t),
+            t = k(e, 0.25),
+            n = k(e, 0.75),
+            r = n - t,
+            i = t - 4 * r,
+            a = n + 4 * r,
+            o = e.filter((e) => e >= i && e <= a),
+            s = o.length >= Math.max(30, e.length * 0.2) ? o : e,
+            c = k(s, 0.05),
+            l = k(s, 0.95),
+            u = s[0],
+            d = s[s.length - 1],
+            f = d - u > (l - c) * 6,
+            p = f ? c : u,
+            m = f ? l : d;
+          ((R ??= p), (z ??= m));
+        }
+        if ((R === z && (--R, (z += 1)), !i?.yDomain)) {
+          let e = z - R,
+            t = (w + T) / 2,
+            n = (T - w) * 0.2,
+            r = j
+              .filter((e) => C(e.y) && Math.abs(e.x - t) <= n)
+              .map((e) => e.y)
+              .sort((e, t) => e - t);
+          if (e > 0 && r.length >= 30) {
+            let t = k(r, 0.05),
+              n = k(r, 0.95),
+              i = n - t,
+              a = i > 0 ? e / i : 1 / 0;
+            if (i > 0 && a > 8) {
+              let e = i * 0.12;
+              ((R = t - e), (z = n + e));
+            } else if (i > e * 8) {
+              let e = i * 0.12;
+              ((R = Math.min(R, t - e)), (z = Math.max(z, n + e)));
+            }
+          }
+        }
+        let B = R,
+          V = z,
+          H =
+            !i?.yDomain &&
+            (() => {
+              let e = [],
+                t = [];
+              for (let n = 0; n < 7; n += 1) {
+                let r = w + ((T - w) * n) / 6,
+                  i = A(r);
+                if (i == null) return !1;
+                (e.push(r), t.push(i));
+              }
+              let n = t[0],
+                r = (t[t.length - 1] - n) / (T - w);
+              if (!Number.isFinite(r)) return !1;
+              let i = n - r * w,
+                a = Math.max(...t.map((e) => Math.abs(e))),
+                o = 0.001 * Math.max(1, a);
+              return t.every((t, n) => {
+                let a = r * e[n] + i;
+                return Math.abs(t - a) <= o;
+              });
+            })();
+        if (!i?.yDomain && H) {
+          let e = A(w),
+            t = A(T),
+            n = (B + V) / 2,
+            r = null;
+          e != null &&
+            t != null &&
+            Number.isFinite(e) &&
+            Number.isFinite(t) &&
+            (r = (t - e) / (T - w));
+          let i = Math.abs(r ?? 1),
+            a = i < p || i > m;
+          if (a) {
+            let e = Math.max(V - B, 1e-12),
+              t = Math.max(e * 0.1, 1e-12);
+            ((R = B - t), (z = V + t));
+          } else {
+            let e = T - w;
+            ((R = n - e / 2), (z = n + e / 2));
+          }
+          let o = a ? Math.max((z - R) * 0.02, 1e-12) : Math.max((z - R) * 0.02, 0.5);
+          if (
+            e != null &&
+            t != null &&
+            Number.isFinite(e) &&
+            Number.isFinite(t) &&
+            r != null &&
+            Math.abs(r) > 1e-9
+          ) {
+            let t = -(e - r * w) / r;
+            t >= w && t <= T && (R > -o && (R = -o), z < o && (z = o));
+          }
+        } else if (!i?.yDomain) {
+          let e = z - R,
+            t = e * 0.1,
+            n = Math.max(e * 0.02, 0.5);
+          R >= 0 && se(R, z, n)
+            ? ((R = -n), (z += t))
+            : z <= 0 && se(R, z, n)
+              ? ((z = n), (R -= t))
+              : ((R -= t), (z += t));
+        }
+        let U = t()
+            .domain([w, T])
+            .range([_, h - _]),
+          W = t()
+            .domain([R, z])
+            .range([g - _, _]),
+          G = (e) => e >= R && e <= z,
+          K = (e) => S(e, R, z),
+          q = (e, t, n) => {
+            let r = e.x,
+              i = t.x,
+              a = Math.abs(U(i) - U(r));
+            if ((!s && (a < re || n >= d || O >= u)) || (s && (n >= d || O >= u))) return [t];
+            let o = (r + i) / 2,
+              c = A(o),
+              l = { x: o, y: c };
+            if (e.y == null || t.y == null || c == null)
+              return s && a < re * 0.25 ? [t] : q(e, l, n + 1).concat(q(l, t, n + 1));
+            let f = U(r),
+              p = U(i),
+              m = U(o),
+              h = W(K(e.y)),
+              g = W(K(t.y)),
+              _ = W(K(c)),
+              v = ce(m, _, f, h, p, g),
+              y = Math.abs(h - g),
+              ee = G(e.y) && G(t.y),
+              te = !G(c),
+              b = G(e.y) !== G(t.y),
+              x = Math.max(Math.abs(e.y), Math.abs(t.y), 1),
+              ne = Math.abs(c),
+              S = Math.sign(e.y) !== Math.sign(t.y),
+              C = Math.abs(t.y - e.y) > Math.max((z - R) * 0.5, x * 1.5),
+              w = ne > Math.max(x * 1.5, Math.max(Math.abs(R), Math.abs(z))),
+              T = (ee && te) || b || C || (S && w);
+            return (a < re && (!s || !T)) ||
+              !(s
+                ? v > ie || y > E || T || (b && a > 6)
+                : v > ie || y > E || (ee && te) || (b && a > 6))
+              ? [t]
+              : q(e, l, n + 1).concat(q(l, t, n + 1));
+          },
+          J = [];
+        J.push(j[0]);
+        for (let e = 0; e < j.length - 1 && (J.push(...q(j[e], j[e + 1], 0)), !(O >= u)); e += 1);
+        if (!i?.yDomain && !H) {
+          let e = fe(J, w, T);
+          if (e && e.featureCount >= 2) {
+            let t = z - R,
+              n = e.yMax - e.yMin;
+            if (n > 0 && t / n > 2.5) {
+              let t = n + Math.max(n * 0.24, 1),
+                r = (T - w) * 0.8,
+                i = Math.max(t, r),
+                a = (e.yMin + e.yMax) / 2;
+              ((R = a - i / 2), (z = a + i / 2));
+            }
+          }
+          let t = (w + T) / 2,
+            n = (T - w) * 0.3,
+            r = J.filter((e) => Math.abs(e.x - t) <= n)
+              .map((e) => e.y)
+              .filter(C)
+              .sort((e, t) => e - t);
+          if (r.length > 0) {
+            let e = r[0],
+              t = r[r.length - 1],
+              n = e < R ? e : R,
+              i = t > z ? t : z;
+            if (n !== R || i !== z) {
+              let e = i - n,
+                t = z - R;
+              if (t <= 0 || e <= t * 2.5) {
+                let t = Math.max(e * 0.08, 0.25);
+                ((R = n - t), (z = i + t));
+              }
+            }
+          }
+        }
+        W = t()
+          .domain([R, z])
+          .range([g - _, _]);
+        let Y = Math.max((z - R) * 0.05, 0.25),
+          he = j
+            .map((e, t) => {
+              if (e.y != null || t === 0 || t === j.length - 1) return null;
+              let n = j[t - 1],
+                r = j[t + 1];
+              if (
+                n?.y == null ||
+                r?.y == null ||
+                Math.abs(n.y - r.y) > Y ||
+                !de(j[t - 2], n, Y) ||
+                !de(r, j[t + 2], Y)
+              )
+                return null;
+              let i = (n.y + r.y) / 2;
+              return Number.isFinite(i) ? { x: e.x, y: i } : null;
+            })
+            .filter((e) => e != null),
+          X = (e, t) => Math.abs(e.x - t.x) <= 1e-9 && Math.abs(e.y - t.y) <= 1e-9,
+          ge = (e, t) => {
+            let n = 0,
+              r = 1,
+              i = t.y - e.y;
+            if (i === 0) return G(e.y) ? { start: e, end: t } : null;
+            if (
+              (i > 0
+                ? ((n = Math.max(n, (R - e.y) / i)), (r = Math.min(r, (z - e.y) / i)))
+                : ((n = Math.max(n, (z - e.y) / i)), (r = Math.min(r, (R - e.y) / i))),
+              !Number.isFinite(n + r) || n > r)
+            )
+              return null;
+            let a = (n) => ({ x: e.x + n * (t.x - e.x), y: e.y + n * (t.y - e.y) });
+            return { start: a(S(n, 0, 1)), end: a(S(r, 0, 1)) };
+          },
+          _e = () => {
+            let e = [],
+              t = [];
+            for (let n of J) {
+              if (n.y == null) {
+                (t.length > 1 && e.push(t), (t = []));
+                continue;
+              }
+              t.push({ x: n.x, y: n.y });
+            }
+            return (t.length > 1 && e.push(t), e);
+          },
+          ve = (e) => {
+            let t = [];
+            for (let n of e) {
+              let e = [],
+                r = () => {
+                  (e.length > 1 && t.push(e), (e = []));
+                };
+              for (let t = 0; t < n.length - 1; t += 1) {
+                let i = ge(n[t], n[t + 1]);
+                if (!i) {
+                  r();
+                  continue;
+                }
+                if (e.length === 0) e = [i.start];
+                else {
+                  let t = e[e.length - 1];
+                  X(t, i.start) || (r(), (e = [i.start]));
+                }
+                X(e[e.length - 1], i.end) || e.push(i.end);
+              }
+              r();
+            }
+            return t;
+          };
+        if (!s) {
+          let e = _e(),
+            t = ve(e),
+            n = [],
+            r = ``,
+            i = !1,
+            a = () => {
+              (r && n.push(r), (r = ``), (i = !1));
+            },
+            o = (e, t) => {
+              let n = U(e),
+                a = W(t);
+              ((r += `M ${n} ${a}`), (i = !0));
+            },
+            s = (e, t) => {
+              let n = U(e),
+                i = W(t);
+              r += ` L ${n} ${i}`;
+            },
+            c = (e, t, n) => {
+              let r = (n - e.y) / (t.y - e.y);
+              return { x: e.x + r * (t.x - e.x), y: n };
+            },
+            l = null;
+          for (let e of J) {
+            if (e.y == null) {
+              (a(), (l = null));
+              continue;
+            }
+            if (l == null || l.y == null) {
+              (G(e.y) && o(e.x, e.y), (l = e));
+              continue;
+            }
+            let t = { x: l.x, y: l.y },
+              n = { x: e.x, y: e.y },
+              r = G(t.y),
+              u = G(n.y);
+            if (r && u) (i || o(t.x, t.y), s(n.x, n.y));
+            else if (r && !u) {
+              i || o(t.x, t.y);
+              let e = c(t, n, n.y > z ? z : R);
+              (s(e.x, e.y), a());
+            } else if (!r && u) {
+              let e = c(t, n, t.y > z ? z : R);
+              (o(e.x, e.y), s(n.x, n.y));
+            } else a();
+            l = e;
+          }
+          return (
+            a(),
+            { paths: n, segments: t, rawSegments: e, holes: he, xDomain: [w, T], yDomain: [R, z] }
+          );
+        }
+        let ye = (e) => (e.y >= 0 ? z : R),
+          be = (e, t) =>
+            Math.sign(e.y) === 0 || Math.sign(t) === 0 || Math.sign(e.y) === Math.sign(t),
+          xe = (e, t) => {
+            let n = ye(e),
+              r = e,
+              i = t.x,
+              a = !1;
+            for (let t = 0; t < 40; t += 1) {
+              let t = (r.x + i) * 0.5,
+                o = A(t);
+              if (o == null || !C(o) || !be(e, o)) {
+                i = t;
+                continue;
+              }
+              (n === z ? o >= n : o <= n) ? ((i = t), (a = !0)) : (r = { x: t, y: o });
+            }
+            return a ? r : null;
+          },
+          Se = (e, t) => {
+            let n = Math.max(1e-6, T - w),
+              r = Math.abs(t.x - e.x),
+              i = Math.abs(t.y - e.y),
+              a = Math.max(Math.abs(e.y), Math.abs(t.y), 1);
+            return (
+              r < n * 0.02 && (i > a * 3 || (Math.sign(e.y) !== Math.sign(t.y) && i > a * 1.5))
+            );
+          },
+          Z = [],
+          Q = [],
+          $ = null;
+        for (let e = 0; e < J.length; e += 1) {
+          let t = J[e];
+          if (t.y == null) {
+            let t = Q[Q.length - 1],
+              n = J.slice(e + 1).find((e) => e.y != null);
+            if (t && n) {
+              let e = xe(t, n);
+              e && !X(e, t) && !X(e, n) && Q.push(e);
+              let r = xe(n, t);
+              $ = r && !X(r, t) && !X(r, n) ? r : null;
+            } else $ = null;
+            (Q.length > 1 && Z.push(Q), (Q = []));
+            continue;
+          }
+          let n = { x: t.x, y: t.y };
+          ($ && !X($, n) && Q.push($), ($ = null));
+          let r = Q[Q.length - 1];
+          if (r && Se(r, n)) {
+            let e = xe(r, n);
+            (e && !X(e, r) && !X(e, n) && Q.push(e), Q.length > 1 && Z.push(Q));
+            let t = xe(n, r);
+            ((Q = []), t && !X(t, r) && !X(t, n) && Q.push(t), Q.push(n));
+            continue;
+          }
+          Q.push(n);
+        }
+        Q.length > 1 && Z.push(Q);
+        let Ce = ve(Z);
+        return {
+          paths: Ce.map((e) =>
+            e.map((e, t) => `${t === 0 ? `M` : `L`} ${U(e.x)} ${W(e.y)}`).join(` `),
+          ),
+          segments: Ce,
+          rawSegments: Z,
+          holes: he,
+          xDomain: [w, T],
+          yDomain: [R, z],
+        };
+      }));
+  }))();
 }
-
-function greatestCommonDivisor(left: number, right: number): number {
-  let a = Math.abs(left);
-  let b = Math.abs(right);
-  while (b !== 0) [a, b] = [b, a % b];
-  return a === 0 ? 1 : a;
-}
-
-function rational(numerator: number, denominator: number): Rational | null {
-  if (!Number.isInteger(numerator) || !Number.isInteger(denominator) || denominator === 0) return null;
-  const sign = denominator < 0 ? -1 : 1;
-  const divisor = greatestCommonDivisor(numerator, denominator);
-  return { numerator: numerator / divisor * sign, denominator: Math.abs(denominator / divisor) };
-}
-
-function identifierValue(name: string, variables: Record<string, number>): number {
-  if (name === "pi") return Math.PI;
-  if (name === "e") return Math.E;
-  return Object.hasOwn(variables, name) ? variables[name] ?? Number.NaN : 1;
-}
-
-function rationalPower(base: number, exponent: Rational): number {
-  if (exponent.denominator === 1) return base ** exponent.numerator;
-  if (base === 0 && exponent.numerator < 0) return Number.NaN;
-  if (base >= 0) return base ** (exponent.numerator / exponent.denominator);
-  if (exponent.denominator % 2 === 0) return Number.NaN;
-  const magnitude = Math.abs(base) ** (Math.abs(exponent.numerator) / exponent.denominator);
-  const signed = Math.abs(exponent.numerator) % 2 === 0 ? magnitude : -magnitude;
-  return exponent.numerator < 0 ? 1 / signed : signed;
-}
-
-function evaluateExpression(
-  tokens: readonly ExpressionToken[],
-  x: number,
-  variables: Record<string, number> = {},
-  customFunction?: (name: string, value: number) => number,
-): number {
-  const stack: Array<{ rational: Rational | null; value: number }> = [];
-  for (const token of tokens) {
-    if (token.type === "number") {
-      stack.push({ value: token.value, rational: Number.isInteger(token.value) ? rational(token.value, 1) : null });
-      continue;
-    }
-    if (token.type === "identifier") {
-      stack.push({ value: token.value === "x" ? x : identifierValue(token.value, variables), rational: null });
-      continue;
-    }
-    if (token.type === "operator") {
-      const right = stack.pop();
-      const left = stack.pop();
-      if (left == null || right == null) return Number.NaN;
-      if (token.value === "+") stack.push({ value: left.value + right.value, rational: addRational(left.rational, right.rational, 1) });
-      else if (token.value === "-") stack.push({ value: left.value - right.value, rational: addRational(left.rational, right.rational, -1) });
-      else if (token.value === "*") stack.push({ value: left.value * right.value, rational: multiplyRational(left.rational, right.rational) });
-      else if (token.value === "/") stack.push({ value: left.value / right.value, rational: divideRational(left.rational, right.rational) });
-      else if (token.value === "^") stack.push({ value: right.rational == null ? left.value ** right.value : rationalPower(left.value, right.rational), rational: null });
-      else return Number.NaN;
-      continue;
-    }
-    const operand = stack.pop();
-    if (operand == null) return Number.NaN;
-    const value = evaluateFunction(token.value, operand.value, customFunction);
-    stack.push({ value, rational: token.value === "neg" && operand.rational != null ? rational(-operand.rational.numerator, operand.rational.denominator) : null });
-  }
-  return stack.length === 1 ? stack[0].value : Number.NaN;
-}
-
-function addRational(left: Rational | null, right: Rational | null, sign: 1 | -1): Rational | null {
-  if (left == null || right == null) return null;
-  return rational(left.numerator * right.denominator + sign * right.numerator * left.denominator, left.denominator * right.denominator);
-}
-function multiplyRational(left: Rational | null, right: Rational | null): Rational | null {
-  return left == null || right == null ? null : rational(left.numerator * right.numerator, left.denominator * right.denominator);
-}
-function divideRational(left: Rational | null, right: Rational | null): Rational | null {
-  return left == null || right == null ? null : rational(left.numerator * right.denominator, left.denominator * right.numerator);
-}
-
-function evaluateFunction(name: string, value: number, customFunction?: (name: string, value: number) => number): number {
-  switch (name) {
-    case "arcsin": return Math.asin(value);
-    case "arccos": return Math.acos(value);
-    case "arctan": return Math.atan(value);
-    case "sin": return Math.sin(value);
-    case "cos": return Math.cos(value);
-    case "sinh": return Math.sinh(value);
-    case "cosh": return Math.cosh(value);
-    case "tan": return Math.tan(value);
-    case "tanh": return Math.tanh(value);
-    case "ln": return Math.log(value);
-    case "log": return Math.log10(value);
-    case "sqrt": return Math.sqrt(value);
-    case "abs": return Math.abs(value);
-    case "exp": return Math.exp(value);
-    case "sigmoid": return 1 / (1 + Math.exp(-value));
-    case "relu": return Math.max(0, value);
-    case "neg": return -value;
-    default: return customFunction?.(name, value) ?? Number.NaN;
-  }
-}
-
-interface Affine { constant: number; xCoefficient: number }
-function affineExpression(tokens: readonly ExpressionToken[], variables: Record<string, number>): Affine | null {
-  const stack: Array<Affine | null> = [];
-  for (const token of tokens) {
-    if (token.type === "number") stack.push({ xCoefficient: 0, constant: token.value });
-    else if (token.type === "identifier") stack.push(token.value === "x" ? { xCoefficient: 1, constant: 0 } : { xCoefficient: 0, constant: identifierValue(token.value, variables) });
-    else if (token.type === "operator") {
-      const right = stack.pop();
-      const left = stack.pop();
-      if (left == null || right == null) return null;
-      if (token.value === "+" || token.value === "-") {
-        const sign = token.value === "+" ? 1 : -1;
-        stack.push({ xCoefficient: left.xCoefficient + sign * right.xCoefficient, constant: left.constant + sign * right.constant });
-      } else if (token.value === "*" && left.xCoefficient === 0) stack.push({ xCoefficient: right.xCoefficient * left.constant, constant: right.constant * left.constant });
-      else if (token.value === "*" && right.xCoefficient === 0) stack.push({ xCoefficient: left.xCoefficient * right.constant, constant: left.constant * right.constant });
-      else if (token.value === "/" && right.xCoefficient === 0 && right.constant !== 0) stack.push({ xCoefficient: left.xCoefficient / right.constant, constant: left.constant / right.constant });
-      else stack.push(null);
-    } else if (token.value === "neg") {
-      const value = stack.pop();
-      stack.push(value == null ? null : { xCoefficient: -value.xCoefficient, constant: -value.constant });
-    } else stack.push(null);
-  }
-  return stack.length === 1 ? stack[0] : null;
-}
-
-function findTrigAffine(tokens: readonly ExpressionToken[], variables: Record<string, number>): { affine: Affine; name: string } | null {
-  const functionIndex = tokens.findLastIndex((token) => token.type === "function" && (token.value === "sin" || token.value === "cos" || token.value === "tan"));
-  if (functionIndex < 0) return null;
-  const token = tokens[functionIndex];
-  if (token.type !== "function") return null;
-  const affine = affineExpression(tokens.slice(0, functionIndex), variables);
-  return affine == null ? null : { affine, name: token.value };
-}
-
-function getFundamentalPeriod(tokens: readonly ExpressionToken[], variables: Record<string, number> = {}): number | null {
-  const trig = findTrigAffine(tokens, variables);
-  if (trig == null || Math.abs(trig.affine.xCoefficient) <= 1e-9) return null;
-  return (trig.name === "tan" ? Math.PI : 2 * Math.PI) / Math.abs(trig.affine.xCoefficient);
-}
-
-function getDiscontinuityHints(tokens: readonly ExpressionToken[], variables: Record<string, number>, minimumX: number, maximumX: number): { explicitPoleXs: number[]; knownPoleXs: number[]; periodicAnchorXs: number[]; periodicPoleXs: number[] } {
-  const trig = findTrigAffine(tokens, variables);
-  const periodicAnchorXs: number[] = [];
-  const periodicPoleXs: number[] = [];
-  if (trig != null && Math.abs(trig.affine.xCoefficient) > 1e-9) {
-    const step = Math.PI / Math.abs(trig.affine.xCoefficient);
-    const offset = trig.name === "tan" ? (Math.PI / 2 - trig.affine.constant) / trig.affine.xCoefficient : -trig.affine.constant / trig.affine.xCoefficient;
-    const start = Math.ceil((minimumX - offset) / step);
-    const end = Math.floor((maximumX - offset) / step);
-    for (let index = start; index <= end && periodicAnchorXs.length < 512; index += 1) periodicAnchorXs.push(offset + index * step);
-    if (trig.name === "tan") periodicPoleXs.push(...periodicAnchorXs);
-  }
-  const explicitPoleXs = findSimpleDivisionPoles(tokens, variables).filter((value) => value >= minimumX && value <= maximumX);
-  return { explicitPoleXs, periodicAnchorXs, periodicPoleXs, knownPoleXs: uniqueSorted([...explicitPoleXs, ...periodicPoleXs]) };
-}
-
-function findSimpleDivisionPoles(tokens: readonly ExpressionToken[], variables: Record<string, number>): number[] {
-  const division = tokens.findLastIndex((token) => token.type === "operator" && token.value === "/");
-  if (division < 1) return [];
-  const denominator = affineExpression(tokens.slice(1, division), variables);
-  return denominator == null || Math.abs(denominator.xCoefficient) <= 1e-9 ? [] : [-denominator.constant / denominator.xCoefficient];
-}
-
-function uniqueSorted(values: number[]): number[] {
-  return values.filter(Number.isFinite).sort((a, b) => a - b).filter((value, index, all) => index === 0 || Math.abs(value - all[index - 1]) > 1e-7);
-}
-
-function buildGraphData(
-  tokens: readonly ExpressionToken[],
-  variables: Record<string, number>,
-  domains?: GraphDomains,
-  dimensions: GraphDimensions = defaultGraphDimensions,
-  options?: BuildGraphOptions,
-): GraphData | null {
-  const maxEvaluations = options?.maxEvaluations ?? (options?.discontinuityMode === "interactive" ? 20_000 : 10_000);
-  if (!Number.isInteger(maxEvaluations) || maxEvaluations < 600) throw new Error("buildGraphData maxEvaluations must be an integer of at least 600");
-  const xDomain = domains?.xDomain ?? [-10, 10];
-  const evaluate = options?.evaluateAt ?? ((x: number) => evaluateExpression(tokens, x, variables));
-  const hints = getDiscontinuityHints(tokens, variables, xDomain[0], xDomain[1]);
-  const sampleCount = Math.min(600, maxEvaluations);
-  const uniformCount = Math.max(2, sampleCount - hints.knownPoleXs.length);
-  const sampleXs = uniqueSorted([
-    ...Array.from({ length: uniformCount }, (_, index) => xDomain[0] + (xDomain[1] - xDomain[0]) * index / (uniformCount - 1)),
-    ...hints.knownPoleXs,
-  ]);
-  const points: Point[] = [];
-  for (const x of sampleXs) {
-    const nearPole = hints.knownPoleXs.some((pole) => Math.abs(x - pole) <= 1e-9);
-    const value = nearPole ? Number.NaN : evaluate(x);
-    points.push({ x, y: Number.isFinite(value) && Math.abs(value) <= 1e100 ? value : null });
-  }
-  const finiteValues = points.flatMap((point) => point.y == null ? [] : [point.y]);
-  if (finiteValues.length === 0) return null;
-  let yDomain = domains?.yDomain;
-  if (yDomain == null) {
-    const sorted = [...finiteValues].sort((a, b) => a - b);
-    const low = percentile(sorted, 0.05);
-    const high = percentile(sorted, 0.95);
-    const span = high - low || 2;
-    yDomain = [low - span * 0.1, high + span * 0.1];
-    if (yDomain[0] >= 0) yDomain[0] = -Math.max(span * 0.02, 0.5);
-    if (yDomain[1] <= 0) yDomain[1] = Math.max(span * 0.02, 0.5);
-  }
-  const rawSegments = splitSegments(points);
-  const segments = rawSegments.map((segment) => clipSegment(segment, yDomain));
-  const scaleX = (x: number) => dimensions.padding + (x - xDomain[0]) / (xDomain[1] - xDomain[0]) * (dimensions.width - 2 * dimensions.padding);
-  const scaleY = (y: number) => dimensions.height - dimensions.padding - (y - yDomain[0]) / (yDomain[1] - yDomain[0]) * (dimensions.height - 2 * dimensions.padding);
-  const paths = segments.filter((segment) => segment.length > 1).map((segment) => segment.map((point, index) => `${index === 0 ? "M" : "L"} ${scaleX(point.x)} ${scaleY(point.y ?? 0)}`).join(" "));
-  const holes = points.flatMap((point, index) => point.y == null && points[index - 1]?.y != null && points[index + 1]?.y != null ? [{ x: point.x, y: ((points[index - 1].y ?? 0) + (points[index + 1].y ?? 0)) / 2 }] : []);
-  return { holes, paths, rawSegments, segments, xDomain, yDomain };
-}
-
-function percentile(sorted: readonly number[], ratio: number): number {
-  const position = (sorted.length - 1) * ratio;
-  const lower = Math.floor(position);
-  const fraction = position - lower;
-  return (sorted[lower] ?? 0) + ((sorted[Math.min(lower + 1, sorted.length - 1)] ?? 0) - (sorted[lower] ?? 0)) * fraction;
-}
-function splitSegments(points: readonly Point[]): Point[][] {
-  const segments: Point[][] = [];
-  let current: Point[] = [];
-  for (const point of points) {
-    if (point.y == null) { if (current.length > 1) segments.push(current); current = []; }
-    else current.push(point);
-  }
-  if (current.length > 1) segments.push(current);
-  return segments;
-}
-function clipSegment(segment: readonly Point[], yDomain: [number, number]): Point[] {
-  return segment.map((point) => ({ x: point.x, y: point.y == null ? null : Math.max(yDomain[0], Math.min(yDomain[1], point.y)) }));
-}
-
-function initializeBuildGraphData(): void {
-  initializeGraphDimensions();
-}
-
-export {
-  initializeBuildGraphData as a,
-  defaultGraphHeight as c,
-  getFundamentalPeriod as i,
-  defaultGraphWidth as l,
-  evaluateExpression as n,
-  defaultGraphDimensions as o,
-  getDiscontinuityHints as r,
-  squareGraphDimensions as s,
-  buildGraphData as t,
-  initializeGraphDimensions as u,
-};
+export { Y as a, o as c, q as i, a as l, pe as n, r as o, me as r, i as s, J as t, s as u };

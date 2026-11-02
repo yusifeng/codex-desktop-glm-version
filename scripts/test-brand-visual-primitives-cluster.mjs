@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__brandVisualTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
 async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "brand-visual-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__brandVisualTest.jsx;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
@@ -23,19 +24,7 @@ assert.equal(googleUi.props.className, "brand");
 assert.equal(all(googleUi, node => node.type === "path").length, 4);
 assert.equal(google.n(), undefined);
 
-// color-icon: 10
-const color = await bundle("color-icon");
-assert.deepEqual(Object.keys(color), ["n", "t"]);
-const colorUi = color.t({ name: "documents", title: "Documents", className: "icon-lg" });
-assert.equal(colorUi.type, "svg");
-assert.equal(colorUi.props["data-color-icon"], "documents");
-assert.equal(colorUi.props["aria-label"], "Documents");
-assert.equal(colorUi.props.role, "img");
-assert.equal(colorUi.props.className, "icon-lg");
-assert.match(find(colorUi, node => node.type === "circle").props.fill, /^hsl\(/);
-assert.equal(find(colorUi, node => node.type === "path").props.stroke, "white");
-assert.equal(color.t({ name: "plain" }).props["aria-hidden"], true);
-assert.equal(color.n(), undefined);
+const colorIconReleaseAssertions = assertReleaseOwner("color-icon");
 
 // animated-icon: 11
 const animated = await bundle("animated-icon");
@@ -55,4 +44,4 @@ assert.equal(animated.t({ animation: "hello", animated: false }).props["data-ani
 assert.equal(animated.t({ animation: "memory", fallbackIcon: "fallback" }).props.children, "fallback");
 assert.equal(animated.n(), undefined);
 
-console.log("30 brand visual primitives cluster assertions passed");
+console.log(`20 brand visual primitive assertions and ${colorIconReleaseAssertions} color icon release assertions passed`);

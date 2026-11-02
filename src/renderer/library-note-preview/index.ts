@@ -1,89 +1,977 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, e6 as getReactRuntime, n4 as useIntl, type JsxRuntime, type ReactRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/app-primary";
-import { n as initializeRightPanelComposerOverlay, t as RightPanelComposerOverlay } from "@rchunk/right-panel-composer-overlay";
-import { i as initializeWritingBlockSurface, t as WritingBlockEditorRegion } from "@rchunk/writing-block-surface";
-import { n as initializeEditableWritingBlock, t as EditableWritingBlock } from "@rchunk/editable-writing-block";
-import { t as initializeWritingBlockAiTools } from "@rchunk/chatgpt-writing-block-ai-tools";
-import { r as initializeLibraryCloudFilePreview, t as LibraryFilePreviewComposer } from "@rchunk/library-cloud-file-preview";
-import { n as initializePreviewLayout, t as PreviewLayout } from "@rchunk/preview-layout";
-import { t as initializeOpenLibraryItem } from "@rchunk/open-library-item";
-
-interface LibraryFile { file_id?: string; file_size_bytes?: number; gizmo_id?: string; id: string; library_file_category?: string; mime_type?: string; name: string }
-interface LibraryEntry { node: LibraryFile }
-interface SavedNote { content?: string; file: LibraryFile }
-interface SaveInput { accountId: string; analyticsContext?: unknown; content: string; directoryId: string | null; file: LibraryFile | null; fileName: string; noteId: string; userId: string | null }
-interface LibraryNoteRequest { analyticsContext?: unknown; content?: string; directoryId?: string | null; entry?: LibraryEntry | null; loadContent?(file: LibraryFile): Promise<string>; noteId: string; onCopy?(file: LibraryFile): void; saveNote?(input: SaveInput): Promise<SavedNote> }
-interface LibraryNotePreviewProps { accountId: string; onClose(): void; request: LibraryNoteRequest; userId: string | null }
-interface NoteState { content: string; failure: "save" | "size" | "storage" | null; file: LibraryFile | null; fileName: string; savedContent: string; saving: boolean }
-interface IntlRuntime { formatMessage(descriptor: { defaultMessage: string; description?: string; id: string }): string }
-interface StatusError { code?: string; httpStatus?: number; status?: number }
-type LoadState = "error" | "loading" | "ready";
-
-const MAX_TITLE_GRAPHEMES = 50;
-let jsxRuntime: JsxRuntime | undefined;
-let React: ReactRuntime | undefined;
-function jsx(): JsxRuntime { jsxRuntime ??= getJsxRuntime(); return jsxRuntime; }
-function react(): ReactRuntime { React ??= getReactRuntime(); return React; }
-function graphemes(value: string): string[] { return typeof Intl.Segmenter === "function" ? Array.from(new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(value), item => item.segment) : Array.from(value); }
-function firstReadableLine(content: string): string | null { for (const line of content.split(/\r\n?|\n/)) { const cleaned = line.replace(/<!--.*?-->/g, "").replace(/<\/?[A-Za-z][^>]*>/g, "").replace(/^\s{0,3}(?:#{1,6}|>|[-*+]\s+|\d+[.)]\s+)\s*/, "").replace(/^\[[ xX]\]\s+/, "").replace(/[*_\x60~]/g, "").replace(/\s+/g, " ").trim(); if (cleaned !== "") return cleaned; } return null; }
-function truncateTitle(value: string): string { const parts = graphemes(value); if (parts.length <= MAX_TITLE_GRAPHEMES) return value; const prefix = parts.slice(0, MAX_TITLE_GRAPHEMES).join(""); if (parts[MAX_TITLE_GRAPHEMES] === " ") return prefix; const space = prefix.lastIndexOf(" "); return space < 0 ? prefix : prefix.slice(0, space); }
-function fileNameFromContent(content: string): string { const title = firstReadableLine(content); if (title == null) return "Untitled.md"; const safe = truncateTitle(title).replace(/[\/]/g, "-").trim(); return safe === "" ? "Untitled.md" : safe + ".md"; }
-function failureFrom(error: unknown): NoteState["failure"] { const candidate = error as StatusError | null; if (candidate?.code === "storage_full" || candidate?.httpStatus === 409 || candidate?.status === 409) return "storage"; if (candidate?.httpStatus === 413 || candidate?.status === 413) return "size"; return "save"; }
-function failureMessage(failure: NoteState["failure"]): string { if (failure === "storage") return "Your Library storage is full. Free up space and retry"; if (failure === "size") return "This note is too large. Shorten it and retry"; return "Your edits haven’t been saved. Try again"; }
-
-function LibraryNotePreview({ accountId, userId, request, onClose }: LibraryNotePreviewProps): unknown {
-  const hooks = react();
-  const intl = useIntl() as IntlRuntime;
-  const entryFile = request.entry?.node ?? null;
-  const initialContent = request.content;
-  const [loadState, setLoadState] = hooks.useState<LoadState>(entryFile != null && initialContent == null ? "loading" : "ready");
-  const [state, setState] = hooks.useState<NoteState>(() => ({ content: initialContent ?? "", failure: null, file: entryFile, fileName: entryFile?.name ?? "Untitled.md", savedContent: initialContent ?? "", saving: false }));
-  const timerRef = hooks.useRef<ReturnType<typeof setTimeout> | null>(null);
-  const savePromiseRef = hooks.useRef<Promise<boolean> | null>(null);
-  const mountedRef = hooks.useRef(true);
-  const stateRef = hooks.useRef(state);
-  stateRef.current = state;
-  hooks.useEffect(() => () => { mountedRef.current = false; if (timerRef.current != null) clearTimeout(timerRef.current); }, []);
-  const load = hooks.useCallback(async (): Promise<void> => { if (entryFile == null || initialContent != null) return; setLoadState("loading"); try { const content = request.loadContent == null ? "" : await request.loadContent(entryFile); if (!mountedRef.current) return; setState({ content, failure: null, file: entryFile, fileName: entryFile.name, savedContent: content, saving: false }); setLoadState("ready"); } catch { if (mountedRef.current) setLoadState("error"); } }, [entryFile, initialContent, request.loadContent]);
-  hooks.useEffect(() => { void load(); }, [load]);
-  const flush = hooks.useCallback(async (): Promise<boolean> => {
-    if (timerRef.current != null) { clearTimeout(timerRef.current); timerRef.current = null; }
-    if (savePromiseRef.current != null) return savePromiseRef.current;
-    const current = stateRef.current;
-    if (current.file != null && current.content === current.savedContent && current.fileName === current.file.name) return true;
-    if (current.file == null && current.content.trim() === "") return true;
-    const operation = (async (): Promise<boolean> => {
-      setState(value => ({ ...value, failure: null, saving: true }));
-      try {
-        const saved = request.saveNote == null ? { content: current.content, file: current.file ?? { id: request.noteId, name: current.fileName } } : await request.saveNote({ accountId, analyticsContext: request.analyticsContext, content: current.content || "\n", directoryId: request.entry == null ? request.directoryId ?? null : null, file: current.file, fileName: current.fileName, noteId: request.noteId, userId });
-        if (mountedRef.current) setState(value => ({ ...value, failure: null, file: saved.file, fileName: value.fileName === current.fileName ? saved.file.name : value.fileName, savedContent: saved.content ?? current.content, saving: false }));
-        return true;
-      } catch (error) { if (mountedRef.current) setState(value => ({ ...value, failure: failureFrom(error), saving: false })); return false; }
-      finally { savePromiseRef.current = null; }
-    })();
-    savePromiseRef.current = operation;
-    return operation;
-  }, [accountId, request.analyticsContext, request.directoryId, request.entry, request.noteId, request.saveNote, userId]);
-  const edit = hooks.useCallback((content: string): void => { setState(value => ({ ...value, content, failure: null, fileName: value.file == null ? fileNameFromContent(content) : value.fileName })); if (timerRef.current != null) clearTimeout(timerRef.current); timerRef.current = setTimeout(() => { void flush(); }, 500); }, [flush]);
-  const close = hooks.useCallback(async (): Promise<void> => { if (await flush()) onClose(); }, [flush, onClose]);
-  const title = state.fileName.replace(/\.md$/i, "") || "Untitled";
-  const assetName = jsx().jsxs("div", { className: "library-note-breadcrumb", children: [jsx().jsx("button", { onClick: () => void close(), type: "button", children: "Library" }), jsx().jsx("span", { "aria-hidden": true, children: " / " }), jsx().jsx("span", { "aria-current": "page", title, children: title })] });
-  if (loadState !== "ready") return jsx().jsx(PreviewLayout, { assetName, headerVariant: "document", onClose, children: loadState === "error" ? jsx().jsx("button", { onClick: () => void load(), type: "button", children: "Retry loading note" }) : jsx().jsx("div", { role: "status", children: "Loading note" }) });
-  const bottomContent = state.file == null ? null : jsx().jsx(RightPanelComposerOverlay, { children: jsx().jsx(LibraryFilePreviewComposer, { file: { id: state.file.id, file_id: state.file.file_id ?? state.file.id, file_name: state.file.name, file_size_bytes: state.file.file_size_bytes, gizmo_id: state.file.gizmo_id, library_file_category: state.file.library_file_category ?? "text", mime_type: state.file.mime_type }, imageDataUrl: null, onClose, submitDisabled: state.content !== state.savedContent || state.saving || state.failure != null }) });
-  return jsx().jsx(EditableWritingBlock, {
-    content: state.content, editorKey: request.noteId, isEditable: true, libraryFileId: state.file?.id, onBlur: () => void flush(), onContentChange: edit, onCopy: () => { if (state.file != null) request.onCopy?.(state.file); }, placeholder: intl.formatMessage({ id: "libraryNext.note.editor.placeholder", defaultMessage: "Write or type '/' for commands…", description: "Placeholder in the Library note editor" }), testId: "library-note-editor",
-    render: ({ renderView }: { renderView(props?: Record<string, unknown>): unknown }) => jsx().jsx(PreviewLayout, { assetName, bottomContent, headerVariant: "document", onClose: () => void close(), endContent: state.saving && state.failure == null ? jsx().jsx("div", { role: "status", children: "Saving…" }) : null, children: jsx().jsx(WritingBlockEditorRegion, { className: "min-h-0 flex-1 overflow-y-auto", children: jsx().jsxs("div", { children: [state.failure == null ? null : jsx().jsxs("div", { role: "alert", children: [failureMessage(state.failure), jsx().jsx("button", { onClick: () => void flush(), type: "button", children: "Retry" })] }), renderView()] }) }) }),
-  });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $h as n,
+  BX as r,
+  FX as i,
+  HX as a,
+  I3 as o,
+  K2 as s,
+  LX as c,
+  QI as l,
+  QX as u,
+  Qh as d,
+  Y2 as f,
+  Yh as p,
+  ZI as m,
+  Zh as h,
+  _Z as g,
+  e6 as _,
+  lZ as v,
+  lk as y,
+  n4 as b,
+  oZ as x,
+  pk as S,
+  zX as ee,
+} from "@rchunk/app-shared";
+import {
+  A_n as C,
+  HR as w,
+  IK as T,
+  I_n as E,
+  KR as D,
+  N_n as O,
+  Ozt as k,
+  P_n as A,
+  QR as j,
+  RK as M,
+  Sdn as N,
+  Sun as P,
+  XGt as F,
+  XLt as I,
+  ZLt as L,
+  _dn as R,
+  _un as z,
+  cz as te,
+  dK as B,
+  ez as V,
+  fRt as H,
+  kzt as U,
+  lK as ne,
+  lz as re,
+  mpn as ie,
+  mun as ae,
+  pIt as oe,
+  ppn as se,
+  qGt as ce,
+  rIt as le,
+  wdn as ue,
+  xpn as de,
+  ydn as fe,
+  ypn as pe,
+} from "@rchunk/app-initial";
+import { Su as W, xu as G } from "@rchunk/app-primary";
+import { n as me, t as he } from "@rchunk/right-panel-composer-overlay";
+import { i as ge, t as _e } from "@rchunk/writing-block-surface";
+import { n as ve, t as ye } from "@rchunk/editable-writing-block";
+import { n as be, t as xe } from "@rchunk/chatgpt-writing-block-ai-tools";
+import { r as Se, t as Ce } from "@rchunk/library-cloud-file-preview";
+import { n as we, t as K } from "@rchunk/preview-layout";
+import { n as q, t as Te } from "@rchunk/open-library-item";
+function Ee(e) {
+  let t = je(e);
+  if (t == null) return `Untitled.md`;
+  let n = W(t).replaceAll(/[\\/]/g, `-`).trim();
+  return n === `` ? `Untitled.md` : `${Me(n)}.md`;
 }
-
-initializeRightPanelComposerOverlay();
-initializeWritingBlockSurface();
-initializeEditableWritingBlock();
-initializeWritingBlockAiTools();
-initializeLibraryCloudFilePreview();
-initializePreviewLayout();
-initializeOpenLibraryItem();
-
-export { LibraryNotePreview };
+function De(e) {
+  return Y == null ? Array.from(e) : Array.from(Y.segment(e), ({ segment: e }) => e);
+}
+function Oe(e) {
+  return Ne.parseInline(e, Pe);
+}
+function ke(e) {
+  return (
+    e.type === `blockquote` ||
+    e.type === `code` ||
+    e.type === `heading` ||
+    e.type === `list` ||
+    e.type === `paragraph`
+  );
+}
+function Ae(e) {
+  if (e == null || !ke(e)) return ``;
+  switch (e.type) {
+    case `heading`:
+    case `paragraph`:
+      return Oe(e.tokens);
+    case `list`: {
+      let t = e.items[0];
+      return t == null ? `` : Oe(E.lexInline(t.text));
+    }
+    case `blockquote`:
+      return Ae(e.tokens[0]);
+    case `code`:
+      return e.text;
+  }
+}
+function je(e) {
+  for (let t of e.split(/\r\n?|\n/)) {
+    if (t.trim() === ``) continue;
+    let e = Ae(E.lex(t, { gfm: !0 })[0])
+      .replaceAll(/<!--.*?-->/g, ``)
+      .replaceAll(/<\/?[A-Za-z][^>]*>/g, ``)
+      .replace(/^\[[ xX]\]\s+/, ``)
+      .replaceAll(/\s+/g, ` `)
+      .trim();
+    if (e !== ``) return e;
+  }
+  return null;
+}
+function Me(e) {
+  let t = De(e);
+  if (t.length <= J) return e;
+  let n = t.slice(0, J).join(``);
+  if (t[J] === ` `) return n;
+  let r = n.lastIndexOf(` `);
+  return r === -1 ? n : n.slice(0, r);
+}
+var J, Y, Ne, Pe;
+function Fe() {
+  return (Fe = e(() => {
+    (G(),
+      A(),
+      (J = 50),
+      (Y =
+        typeof Intl.Segmenter == `function`
+          ? new Intl.Segmenter(void 0, { granularity: `grapheme` })
+          : null),
+      (Ne = new O()),
+      (Pe = new C()));
+  }))();
+}
+function Ie(e) {
+  return e.file == null
+    ? !!e.content.trim()
+    : e.content !== e.savedContent || e.fileName !== e.file.name;
+}
+var X, Le, Z;
+function Re() {
+  return (Re = e(() => {
+    (H(),
+      i(),
+      P(),
+      k(),
+      F(),
+      y(),
+      se(),
+      l(),
+      ue(),
+      fe(),
+      Fe(),
+      w(),
+      T(),
+      ne(),
+      Te(),
+      V(),
+      (X = x(m, (e) => ({}))),
+      (Le = u(m, ({ id: e, accountId: t, userId: n }, { scope: r }) => ({
+        queryKey: [`library-api`, t, n, `note-content`, e],
+        staleTime: 0,
+        queryFn: async ({ signal: n }) => {
+          let { content_url: i } = await r
+              .get(B, t)
+              .safeGet(`/files/library/files/{library_file_id}/content_url`, {
+                parameters: { path: { library_file_id: e } },
+                signal: n,
+              }),
+            a = ce({ download_url: i });
+          return (
+            await R.getInstance().fetch(a.downloadUrl, {
+              headers:
+                a.requestHeaders == null
+                  ? void 0
+                  : { ...a.requestHeaders, "ChatGPT-Account-ID": t },
+              signal: n,
+            })
+          ).text();
+        },
+      }))),
+      (Z = v(
+        m,
+        (e, { scope: t, signal: n }) => {
+          let {
+              initial: r,
+              id: i,
+              analyticsContext: a,
+              directoryId: o,
+              accountId: s,
+              userId: c,
+            } = e,
+            l = { accountId: s, userId: c },
+            u = n({
+              content: r?.content ?? ``,
+              file: r?.file ?? null,
+              fileName: r?.file.name ?? `Untitled.md`,
+              savedContent: r?.content ?? ``,
+              saving: !1,
+              failure: null,
+            }),
+            d,
+            f,
+            p,
+            m = r != null,
+            h = 0,
+            _ = !1,
+            v = () => {
+              (t.queryClient.invalidateQueries({ queryKey: [`library-api`, s] }),
+                t.queryClient.invalidateQueries({ queryKey: [`4231797315`] }));
+              let e = t.get(u).file;
+              e != null &&
+                t.queryClient.invalidateQueries({ queryKey: [`library-file-preview-text`, e.id] });
+            },
+            y = async () => {
+              t.set(u, (e) => ({ ...e, saving: !0, failure: null }));
+              try {
+                for (;;) {
+                  let e = t.get(u);
+                  if (!Ie(e) && (e.file != null || p == null)) return !0;
+                  let n = e.file == null;
+                  n &&
+                    p == null &&
+                    (p = {
+                      content:
+                        e.content ||
+                        `
+`,
+                      fileName: e.fileName,
+                    });
+                  let { content: r, fileName: d } =
+                      n && p != null ? p : { content: e.content, fileName: e.fileName },
+                    f = t.get(B, s);
+                  if (t.get(ae) !== s || (c != null && t.get(z) !== c))
+                    return (t.set(u, (e) => ({ ...e, failure: `save` })), !1);
+                  let m;
+                  if (
+                    ((m =
+                      e.file == null
+                        ? await f.safePost(`/files/library/files/inline-content`, {
+                            requestBody: {
+                              content: r,
+                              file_name: d,
+                              create_key: i,
+                              directory_id: o,
+                              library_file_info: { library_artifact_type: `writing_block` },
+                            },
+                            expectedErrorStatuses: [413],
+                            isExpectedError: U,
+                          })
+                        : await f.safePatch(`/files/library/files/{library_file_id}`, {
+                            parameters: { path: { library_file_id: e.file.id } },
+                            requestBody: {
+                              inline_content:
+                                r ||
+                                `
+`,
+                              file_name: d,
+                            },
+                            expectedErrorStatuses: [409, 413],
+                            isExpectedError: U,
+                          })),
+                    !m.id || !m.file_id)
+                  )
+                    throw new N(
+                      `Created Library note is missing its file id`,
+                      502,
+                      `missing_library_file`,
+                    );
+                  (t.set(u, (e) => ({
+                    ...e,
+                    file: M(m).node,
+                    savedContent: r,
+                    fileName: e.fileName === d ? m.file_name : e.fileName,
+                  })),
+                    n &&
+                      (t.set(X, l, (e) => ({ ...e, [m.id]: i })),
+                      D(t, a, {
+                        action: I.CHATGPT_FILE_LIBRARY_NOTE_EDITOR_ACTION_CREATED,
+                        libraryFileId: m.id,
+                      })),
+                    v());
+                }
+              } catch (e) {
+                let n = j(e)?.httpStatus,
+                  r = `save`;
+                return (
+                  U(e) ? (r = `storage`) : n === 413 && (r = `size`),
+                  (r === `storage` || r === `size`) && (p = void 0),
+                  t.set(u, (e) => ({ ...e, failure: r })),
+                  D(t, a, {
+                    action: I.CHATGPT_FILE_LIBRARY_NOTE_EDITOR_ACTION_FAILED,
+                    step: L.CHATGPT_FILE_LIBRARY_NOTE_EDITOR_STEP_EDITOR,
+                    error: e,
+                  }),
+                  !1
+                );
+              } finally {
+                (clearTimeout(d), t.set(u, (e) => ({ ...e, saving: !1 })));
+              }
+            },
+            b = () => (
+              clearTimeout(d),
+              (f ??= y().finally(() => {
+                f = void 0;
+              })),
+              f
+            );
+          return {
+            state$: u,
+            edit: (e) => {
+              (t.set(u, (t) => ({ ...t, content: e, fileName: m ? t.fileName : Ee(e) })),
+                clearTimeout(d),
+                t.get(u).failure ??
+                  (d = setTimeout(() => {
+                    b();
+                  }, 500)));
+            },
+            flush: b,
+            attach() {
+              return (
+                (h += 1),
+                r == null &&
+                  !_ &&
+                  ((_ = !0),
+                  D(t, a, {
+                    action: I.CHATGPT_FILE_LIBRARY_NOTE_EDITOR_ACTION_SHOWN,
+                    step: L.CHATGPT_FILE_LIBRARY_NOTE_EDITOR_STEP_EDITOR,
+                  })),
+                () => {
+                  (--h,
+                    b().then((n) => {
+                      if (
+                        (h === 0 &&
+                          !n &&
+                          t
+                            .get(S)
+                            .danger(
+                              t
+                                .get(ie)
+                                .formatMessage({
+                                  id: `libraryNext.note.save.backgroundFailure`,
+                                  defaultMessage: `Note changes weren’t saved. Return to Library to retry; for a new note, choose New → Note to reopen your draft`,
+                                  description: `Persistent warning when autosaving a Library note fails after leaving its editor. Saved notes can be reopened from Library; a new unsaved draft is restored using New then Note.`,
+                                }),
+                              {
+                                duration: 1 / 0,
+                                errorAnalytics: {
+                                  toastId: `libraryNext.note.save.backgroundFailure`,
+                                },
+                              },
+                            ),
+                        h === 0 && n)
+                      ) {
+                        let n = t.get(u).file;
+                        n != null &&
+                          t.set(X, l, (e) => {
+                            let t = { ...e };
+                            return (delete t[n.id], t);
+                          });
+                        let r = t.get(q, l);
+                        (r?.entry == null && r?.noteId === i && t.set(q, l, null), g(t, Z, e));
+                      }
+                    }));
+                }
+              );
+            },
+          };
+        },
+        { key: ({ id: e, accountId: t, userId: n }) => JSON.stringify([t, n, e]) },
+      )));
+  }))();
+}
+function ze(e) {
+  let t = (0, Be.c)(18),
+    { autoFocus: n, context: r, renderFrame: i } = e,
+    { state: a, renderView: o } = r,
+    s;
+  t[0] !== a.editorView || t[1] !== a.generatePluginState
+    ? ((s = {
+        editorView: a.editorView,
+        enableAiTools: !0,
+        generatePluginState: a.generatePluginState,
+        isEditable: !0,
+        serverConversationId: void 0,
+        showMagicEditAction: !1,
+      }),
+      (t[0] = a.editorView),
+      (t[1] = a.generatePluginState),
+      (t[2] = s))
+    : (s = t[2]);
+  let c = be(s),
+    l;
+  t[3] !== c || t[4] !== n
+    ? ((l = (e) => {
+        let t = c.createEditor(e);
+        return (
+          n &&
+            queueMicrotask(() => {
+              t.view.isDestroyed || t.view.focus();
+            }),
+          t
+        );
+      }),
+      (t[3] = c),
+      (t[4] = n),
+      (t[5] = l))
+    : (l = t[5]);
+  let u;
+  return (
+    t[6] !== c.editorOverlays ||
+    t[7] !== c.editorRootRef ||
+    t[8] !== c.isEditorInteractionDisabled ||
+    t[9] !== c.isHistoryInteractionDisabled ||
+    t[10] !== c.magicEdit.isLoading ||
+    t[11] !== c.onEditorKeyDownCapture ||
+    t[12] !== c.onEditorPointerDownCapture ||
+    t[13] !== c.resetAiTools ||
+    t[14] !== i ||
+    t[15] !== o ||
+    t[16] !== l
+      ? ((u = o({
+          actionsPresentation: `menu`,
+          createEditor: l,
+          editorInteractionDisabled: c.isEditorInteractionDisabled,
+          editorOverlays: c.editorOverlays,
+          editorRootRef: c.editorRootRef,
+          historyInteractionDisabled: c.isHistoryInteractionDisabled,
+          isMagicEditSubmitting: c.magicEdit.isLoading,
+          onBeforeExternalContentUpdate: c.resetAiTools,
+          onEditorKeyDownCapture: c.onEditorKeyDownCapture,
+          onEditorPointerDownCapture: c.onEditorPointerDownCapture,
+          renderFrame: i,
+        })),
+        (t[6] = c.editorOverlays),
+        (t[7] = c.editorRootRef),
+        (t[8] = c.isEditorInteractionDisabled),
+        (t[9] = c.isHistoryInteractionDisabled),
+        (t[10] = c.magicEdit.isLoading),
+        (t[11] = c.onEditorKeyDownCapture),
+        (t[12] = c.onEditorPointerDownCapture),
+        (t[13] = c.resetAiTools),
+        (t[14] = i),
+        (t[15] = o),
+        (t[16] = l),
+        (t[17] = u))
+      : (u = t[17]),
+    u
+  );
+}
+var Be;
+function Ve() {
+  return (Ve = e(() => {
+    ((Be = t()), xe());
+  }))();
+}
+function He(e) {
+  let t = (0, Q.c)(10),
+    { accountId: n, userId: r, request: i, onClose: a } = e;
+  if (i.entry == null) {
+    let e;
+    return (
+      t[0] !== n || t[1] !== a || t[2] !== i || t[3] !== r
+        ? ((e = (0, $.jsx)(We, { accountId: n, userId: r, request: i, initial: null, onClose: a })),
+          (t[0] = n),
+          (t[1] = a),
+          (t[2] = i),
+          (t[3] = r),
+          (t[4] = e))
+        : (e = t[4]),
+      e
+    );
+  }
+  let o;
+  return (
+    t[5] !== n || t[6] !== a || t[7] !== i || t[8] !== r
+      ? ((o = (0, $.jsx)(Ue, { accountId: n, userId: r, request: i, onClose: a })),
+        (t[5] = n),
+        (t[6] = a),
+        (t[7] = i),
+        (t[8] = r),
+        (t[9] = o))
+      : (o = t[9]),
+    o
+  );
+}
+function Ue(e) {
+  let t = (0, Q.c)(25),
+    { accountId: n, userId: i, request: a, onClose: o } = e,
+    s = a.entry.node,
+    c;
+  t[0] !== n || t[1] !== s.id || t[2] !== i
+    ? ((c = { id: s.id, accountId: n, userId: i }),
+      (t[0] = n),
+      (t[1] = s.id),
+      (t[2] = i),
+      (t[3] = c))
+    : (c = t[3]);
+  let { data: l, isError: u, isFetchedAfterMount: m, refetch: h } = r(Le, c);
+  if (l == null || !m) {
+    let e;
+    t[4] === s.name ? (e = t[5]) : ((e = W(s.name)), (t[4] = s.name), (t[5] = e));
+    let n;
+    t[6] !== o || t[7] !== e
+      ? ((n = (0, $.jsx)(Ge, { title: e, onClose: o })), (t[6] = o), (t[7] = e), (t[8] = n))
+      : (n = t[8]);
+    let r;
+    t[9] !== u || t[10] !== h
+      ? ((r = u
+          ? (0, $.jsx)(p, {
+              onClick: () => {
+                h();
+              },
+              children: (0, $.jsx)(f, {
+                id: `libraryNext.note.load.retry`,
+                defaultMessage: `Retry loading note`,
+                description: `Button in the Library note editor when loading the saved content fails`,
+              }),
+            })
+          : (0, $.jsx)(d, {})),
+        (t[9] = u),
+        (t[10] = h),
+        (t[11] = r))
+      : (r = t[11]);
+    let i;
+    return (
+      t[12] !== o || t[13] !== n || t[14] !== r
+        ? ((i = (0, $.jsx)(K, {
+            assetName: n,
+            headerVariant: `document`,
+            onClose: o,
+            children: r,
+          })),
+          (t[12] = o),
+          (t[13] = n),
+          (t[14] = r),
+          (t[15] = i))
+        : (i = t[15]),
+      i
+    );
+  }
+  let g;
+  t[16] !== l || t[17] !== s
+    ? ((g = { file: s, content: l }), (t[16] = l), (t[17] = s), (t[18] = g))
+    : (g = t[18]);
+  let _;
+  return (
+    t[19] !== n || t[20] !== o || t[21] !== a || t[22] !== g || t[23] !== i
+      ? ((_ = (0, $.jsx)(We, { accountId: n, userId: i, request: a, initial: g, onClose: o })),
+        (t[19] = n),
+        (t[20] = o),
+        (t[21] = a),
+        (t[22] = g),
+        (t[23] = i),
+        (t[24] = _))
+      : (_ = t[24]),
+    _
+  );
+}
+function We(e) {
+  let t = (0, Q.c)(60),
+    { accountId: n, userId: r, request: i, initial: o, onClose: s } = e,
+    l = c(m),
+    u = b(),
+    d;
+  t[0] !== n || t[1] !== i.entry || t[2] !== i.noteId || t[3] !== l || t[4] !== r
+    ? ((d =
+        i.entry == null
+          ? i.noteId
+          : (l.get(X, { accountId: n, userId: r })[i.entry.node.id] ?? i.entry.node.id)),
+      (t[0] = n),
+      (t[1] = i.entry),
+      (t[2] = i.noteId),
+      (t[3] = l),
+      (t[4] = r),
+      (t[5] = d))
+    : (d = t[5]);
+  let h = d,
+    g = i.entry == null ? i.directoryId : null,
+    _;
+  t[6] !== n ||
+  t[7] !== h ||
+  t[8] !== o ||
+  t[9] !== i.analyticsContext ||
+  t[10] !== g ||
+  t[11] !== r
+    ? ((_ = {
+        accountId: n,
+        userId: r,
+        id: h,
+        initial: o,
+        directoryId: g,
+        analyticsContext: i.analyticsContext,
+      }),
+      (t[6] = n),
+      (t[7] = h),
+      (t[8] = o),
+      (t[9] = i.analyticsContext),
+      (t[10] = g),
+      (t[11] = r),
+      (t[12] = _))
+    : (_ = t[12]);
+  let v = ee(Z, _),
+    y = a(v.state$),
+    x = a(!1),
+    S;
+  t[13] === y ? (S = t[14]) : ((S = Ie(y)), (t[13] = y), (t[14] = S));
+  let C = S,
+    w;
+  t[15] === y.fileName ? (w = t[16]) : ((w = W(y.fileName)), (t[15] = y.fileName), (t[16] = w));
+  let T = w,
+    E,
+    O;
+  (t[17] === v
+    ? ((E = t[18]), (O = t[19]))
+    : ((E = () => v.attach()), (O = [v]), (t[17] = v), (t[18] = E), (t[19] = O)),
+    (0, Je.useEffect)(E, O));
+  let k;
+  t[20] !== s || t[21] !== i.analyticsContext || t[22] !== l || t[23] !== v
+    ? ((k = async () => {
+        (await v.flush()) &&
+          (l.get(v.state$).file ??
+            D(l, i.analyticsContext, {
+              action: I.CHATGPT_FILE_LIBRARY_NOTE_EDITOR_ACTION_CANCELED,
+              step: L.CHATGPT_FILE_LIBRARY_NOTE_EDITOR_STEP_EDITOR,
+            }),
+          s());
+      }),
+      (t[20] = s),
+      (t[21] = i.analyticsContext),
+      (t[22] = l),
+      (t[23] = v),
+      (t[24] = k))
+    : (k = t[24]);
+  let A = k,
+    j = y.file,
+    M = y.content,
+    N = j?.id,
+    P;
+  t[25] === u
+    ? (P = t[26])
+    : ((P = u.formatMessage({
+        id: `libraryNext.note.editor.placeholder`,
+        defaultMessage: `Write or type '/' for commands…`,
+        description: `Placeholder in the full-page Library note editor; typing slash opens formatting commands`,
+      })),
+      (t[25] = u),
+      (t[26] = P));
+  let F;
+  t[27] !== n || t[28] !== i || t[29] !== l || t[30] !== v || t[31] !== r
+    ? ((F = (e) => {
+        (i.entry ?? l.set(q, { accountId: n, userId: r }, i), v.edit(e));
+      }),
+      (t[27] = n),
+      (t[28] = i),
+      (t[29] = l),
+      (t[30] = v),
+      (t[31] = r),
+      (t[32] = F))
+    : (F = t[32]);
+  let R;
+  t[33] === v
+    ? (R = t[34])
+    : ((R = () => {
+        v.flush();
+      }),
+      (t[33] = v),
+      (t[34] = R));
+  let z;
+  t[35] !== j || t[36] !== l
+    ? ((z = () => {
+        j != null && de(l, le, { libraryFileId: j.id, variant: `standard` });
+      }),
+      (t[35] = j),
+      (t[36] = l),
+      (t[37] = z))
+    : (z = t[37]);
+  let B;
+  t[38] !== n ||
+  t[39] !== A ||
+  t[40] !== C ||
+  t[41] !== j ||
+  t[42] !== s ||
+  t[43] !== i.entry ||
+  t[44] !== l ||
+  t[45] !== v ||
+  t[46] !== x ||
+  t[47] !== y.failure ||
+  t[48] !== y.saving ||
+  t[49] !== T
+    ? ((B = (e) =>
+        (0, $.jsx)(ze, {
+          autoFocus: i.entry == null,
+          context: e,
+          renderFrame: (e) => {
+            let { actions: t, children: n } = e;
+            return (0, $.jsx)(K, {
+              assetName: (0, $.jsx)(Ge, {
+                title: T,
+                onClose: () => {
+                  A();
+                },
+              }),
+              headerVariant: `document`,
+              bottomContent:
+                j == null
+                  ? null
+                  : (0, $.jsx)(he, {
+                      children: (0, $.jsx)(
+                        Ce,
+                        {
+                          file: {
+                            id: j.id,
+                            file_id: j.file_id ?? j.id,
+                            file_name: j.name,
+                            file_size_bytes: j.file_size_bytes,
+                            gizmo_id: j.gizmo_id,
+                            library_file_category: j.library_file_category ?? `text`,
+                            mime_type: j.mime_type,
+                          },
+                          imageDataUrl: null,
+                          submitDisabled: C || y.saving || y.failure != null,
+                          onClose: s,
+                        },
+                        j.id,
+                      ),
+                    }),
+              endContent: (0, $.jsxs)(`div`, {
+                className: `flex shrink-0 items-center gap-2`,
+                children: [
+                  y.saving && y.failure == null
+                    ? (0, $.jsx)(`div`, {
+                        role: `status`,
+                        className: `text-sm text-secondary`,
+                        children: (0, $.jsx)(f, {
+                          id: `libraryNext.note.save.pending`,
+                          defaultMessage: `Saving…`,
+                          description: `Status while the Library note is saving automatically`,
+                        }),
+                      })
+                    : null,
+                  t,
+                  j != null && !C && !y.saving && x && te({ node: j })
+                    ? (0, $.jsx)(p, {
+                        color: `ghost`,
+                        size: `toolbar`,
+                        onClick: () => {},
+                        children: (0, $.jsx)(f, {
+                          id: `artifactViewer.share`,
+                          defaultMessage: `Share`,
+                          description: `Button for sharing an artifact from its viewer`,
+                        }),
+                      })
+                    : null,
+                ],
+              }),
+              onClose: () => {
+                A();
+              },
+              children: (0, $.jsx)(`div`, {
+                className: `flex h-full min-h-0 flex-col`,
+                children: (0, $.jsx)(_e, {
+                  className: `min-h-0 flex-1 overflow-y-auto`,
+                  children: (0, $.jsxs)(`div`, {
+                    className: `mx-auto w-[min(48rem,calc(100vw-2rem))] max-w-full px-toolbar py-8`,
+                    children: [
+                      y.failure == null
+                        ? null
+                        : (0, $.jsxs)(`div`, {
+                            role: `alert`,
+                            className: `flex flex-col gap-2 text-danger`,
+                            children: [
+                              (0, $.jsx)(qe, { failure: y.failure }),
+                              (0, $.jsx)(p, {
+                                color: `ghost`,
+                                onClick: () => {
+                                  v.flush();
+                                },
+                                children: (0, $.jsx)(f, {
+                                  id: `libraryNext.note.save.retry`,
+                                  defaultMessage: `Retry`,
+                                  description: `Button to retry saving the preserved Library note draft`,
+                                }),
+                              }),
+                            ],
+                          }),
+                      n,
+                    ],
+                  }),
+                }),
+              }),
+            });
+          },
+        })),
+      (t[38] = n),
+      (t[39] = A),
+      (t[40] = C),
+      (t[41] = j),
+      (t[42] = s),
+      (t[43] = i.entry),
+      (t[44] = l),
+      (t[45] = v),
+      (t[46] = x),
+      (t[47] = y.failure),
+      (t[48] = y.saving),
+      (t[49] = T),
+      (t[50] = B))
+    : (B = t[50]);
+  let V;
+  return (
+    t[51] !== h ||
+    t[52] !== y.content ||
+    t[53] !== N ||
+    t[54] !== P ||
+    t[55] !== F ||
+    t[56] !== R ||
+    t[57] !== z ||
+    t[58] !== B
+      ? ((V = (0, $.jsx)(ye, {
+          content: M,
+          editorKey: h,
+          emailMetadata: void 0,
+          isEditable: !0,
+          libraryFileId: N,
+          title: void 0,
+          variant: void 0,
+          testId: `library-note-editor`,
+          placeholder: P,
+          onContentChange: F,
+          onBlur: R,
+          onCopy: z,
+          render: B,
+        })),
+        (t[51] = h),
+        (t[52] = y.content),
+        (t[53] = N),
+        (t[54] = P),
+        (t[55] = F),
+        (t[56] = R),
+        (t[57] = z),
+        (t[58] = B),
+        (t[59] = V))
+      : (V = t[59]),
+    V
+  );
+}
+function Ge(e) {
+  let t = (0, Q.c)(8),
+    { title: n, onClose: r } = e,
+    i;
+  t[0] === r
+    ? (i = t[1])
+    : ((i = (e) =>
+        (0, $.jsx)(p, { color: `ghostTertiary`, size: `inline`, onClick: r, children: e })),
+      (t[0] = r),
+      (t[1] = i));
+  let a;
+  t[2] === n
+    ? (a = t[3])
+    : ((a = (e) =>
+        (0, $.jsx)(`span`, {
+          "aria-current": `page`,
+          className: `min-w-0 truncate`,
+          title: n,
+          children: e,
+        })),
+      (t[2] = n),
+      (t[3] = a));
+  let o;
+  return (
+    t[4] !== i || t[5] !== a || t[6] !== n
+      ? ((o = (0, $.jsx)(`div`, {
+          className: `flex min-w-0 items-center gap-1 font-normal select-none`,
+          children: (0, $.jsx)(f, {
+            id: `libraryNext.note.breadcrumb`,
+            defaultMessage: `<library>Library</library><separator> / </separator><noteTitle>{name}</noteTitle>`,
+            description: `Navigation breadcrumb above a Library note. The library tag is a button that saves and returns to Library; separator is visual punctuation; noteTitle contains the current note name, supplied by name.`,
+            values: { name: n, library: i, separator: Ke, noteTitle: a },
+          }),
+        })),
+        (t[4] = i),
+        (t[5] = a),
+        (t[6] = n),
+        (t[7] = o))
+      : (o = t[7]),
+    o
+  );
+}
+function Ke(e) {
+  return (0, $.jsx)(`span`, { "aria-hidden": `true`, className: `text-tertiary`, children: e });
+}
+function qe(e) {
+  let t = (0, Q.c)(3),
+    { failure: n } = e;
+  switch (n) {
+    case `storage`: {
+      let e;
+      return (
+        t[0] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, $.jsx)(f, {
+              id: `libraryNext.note.save.storage`,
+              defaultMessage: `Your Library storage is full. Free up space and retry`,
+              description: `Library note autosave failed because storage is full; draft is preserved`,
+            })),
+            (t[0] = e))
+          : (e = t[0]),
+        e
+      );
+    }
+    case `size`: {
+      let e;
+      return (
+        t[1] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, $.jsx)(f, {
+              id: `libraryNext.note.save.size`,
+              defaultMessage: `This note is too large. Shorten it and retry`,
+              description: `Library note autosave failed because the note exceeds the size limit`,
+            })),
+            (t[1] = e))
+          : (e = t[1]),
+        e
+      );
+    }
+    case `save`: {
+      let e;
+      return (
+        t[2] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, $.jsx)(f, {
+              id: `libraryNext.note.save.failed`,
+              defaultMessage: `Your edits haven’t been saved. Try again`,
+              description: `Library note autosave failure; edits remain in the editor for retry`,
+            })),
+            (t[2] = e))
+          : (e = t[2]),
+        e
+      );
+    }
+  }
+}
+var Q, Je, $;
+function Ye() {
+  return (Ye = e(() => {
+    ((Q = t()),
+      oe(),
+      H(),
+      G(),
+      i(),
+      (Je = _()),
+      s(),
+      h(),
+      n(),
+      pe(),
+      l(),
+      me(),
+      ve(),
+      ge(),
+      re(),
+      w(),
+      Te(),
+      Se(),
+      we(),
+      Re(),
+      Ve(),
+      ($ = o()));
+  }))();
+}
+Ye();
+export { He as LibraryNotePreview };

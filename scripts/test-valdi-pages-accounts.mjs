@@ -91,21 +91,7 @@ function assertSource(directory, dependencies, dynamic = []) {
 assertions += assertReleaseOwner("appgen-page");
 
 // Environment review entry
-{
-  const hooks = createHooks();
-  const state = { revision: "rev-1", cleared: 0, accepted: [] };
-  const module = await buildModule("environment-setup-review-entry", {
-    "rolldown-runtime": "export {};",
-    "app-shared": `export const $3=()=>{},K2=()=>{},I3=()=>globalThis.__environment.jsx,e6=()=>globalThis.__environment.React,Y2="Message",ZI={},LX=()=>({get:()=>globalThis.__environment.state.revision,set:(signal,value)=>globalThis.__environment.state.accepted.push(value)});export const BX=(query,param)=>query==="draft"?{data:{draft:{id:"draft-1",revision:"rev-1"}},refetch:async()=>({isError:false})}:query==="sections"?{data:["network","name"],refetch:async()=>({})}:query==="pending"?{data:["network"],refetch:async()=>({})}:query==="save"?{isPending:false,refetch:async()=>({})}:{data:{section:param.section},refetch:async()=>({})};`,
-    "app-initial": `export const Gm="sections",Hm="pending",Qm="accepted",Vm="revision",Xm=()=>{globalThis.__environment.state.cleared+=1},Ypt="draft",Zpt="save",dmt="section-draft",emt="section-error",ifn=()=>{};`,
-    "app-primary": "export {};", "above-composer-fixed-content-surface": `export const n=()=>{},t="FixedSurface";`, "secret-row": "export {};", "environment-variable-row": "export {};", "change-messages": "export {};", "configuration-fields": "export {};",
-  }, "__environment", { state, React: hooks.React, jsx });
-  hooks.reset(); let view = module.EnvironmentSetupReviewEntry({ conversationId: "conv-1" });
-  check(find(view, (node) => node.type === "Message")?.props.defaultMessage === "Needs attention (1)", "environment entry shows pending count");
-  await find(view, (node) => node.type === "button").props.onClick(); hooks.reset(); view = module.EnvironmentSetupReviewEntry({ conversationId: "conv-1" });
-  check(find(view, (node) => node.props?.role === "dialog") != null && state.cleared === 1, "environment entry refreshes and opens review");
-  assertSource("environment-setup-review-entry", ["rolldown-runtime", "app-shared", "app-initial", "app-primary", "above-composer-fixed-content-surface", "secret-row", "environment-variable-row", "change-messages", "configuration-fields"]);
-}
+assertions += assertReleaseOwner("environment-setup-review-entry");
 
 // Workspace agents index
 assertions += assertReleaseOwner("workspace-agents-page");

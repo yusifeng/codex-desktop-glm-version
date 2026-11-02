@@ -1,5 +1,19 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Verification/library/diff/onboarding release-owner recovery：一次性恢复
+`cfc-verification-page`、`workspace-recovery-gate-electron`、`mermaid-image-rendering`、
+`color-icon`、`pepper-onboarding-modal`、`environment-setup-review-entry`、
+`library-image-preview`、`file-diff-presentation-core`、`library-note-preview`、
+`skill-share-dialog-runtime`、`build-graph-data` 与 `scheduled-shared-task-dialog-core`
+十二个发布 owner，净恢复 10,846 行发布 TypeScript。绑定旧手写 ABI 的 verification、recovery、
+Mermaid、brand visual、environment review、Library preview、Git diff、build graph 与 sharing
+dialog 测试已迁移为发布一致性验证，同时保留同簇其他行为覆盖。整批通过 12,448/12,448
+transform check、1,888/1,888 renderer build/verify、2,247/2,247 app-code coverage、
+0 semantic tail 与 typecheck。严格 hub 消费推进到 app-shared 1,679/3,185、app-initial
+5,222/8,204、app-primary 667/917，仍为 0 unreviewed、0 invalid consumers。按发布源码
+正向行数缺口口径，覆盖率由约 86.4% 推进到 87.5%；preserved 边界、聚合 hub 耦合导出与
+最终真实登录态 E2E 仍未完成。
+
 2026-11-02 Settings/environment/browser/Codex Micro release-owner recovery：一次性恢复
 `layout`、`skills-page-core`、`environment-setup-tab-panel`、
 `chatgpt-temporary-chat-ui`、`life-sciences-helix-background`、`notifications-settings`、
