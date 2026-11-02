@@ -12,6 +12,7 @@
     "promote-exact-renderer-route-sources": "node scripts/promote-exact-renderer-route-sources.mjs",
     "recover-renderer-route-source": "node scripts/recover-renderer-route-source.mjs",
     "verify-renderer": "node scripts/verify-renderer.mjs",
+    "verify-renderer-fidelity": "node scripts/test-renderer-owner-fidelity-boundary.mjs",
     "verify-renderer-cluster": "node scripts/verify-renderer-cluster.mjs",
     "e2e:inspect": "node scripts/inspect-electron-renderer.mjs",
     "e2e:readonly": "node scripts/e2e-electron-renderer.mjs smoke-readonly",

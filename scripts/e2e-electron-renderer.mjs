@@ -155,7 +155,7 @@ if (mode === "smoke-readonly") {
         };
         const loadingLeaves = [...document.querySelectorAll('span, p, div')].filter((element) =>
           element.childElementCount === 0 && visible(element) &&
-          (/^正在加载.+…$/.test(element.innerText?.trim() ?? '') || /^Loading .+…$/i.test(element.innerText?.trim() ?? ''))
+          (/^正在加载(?:\s|.)+/.test(element.innerText?.trim() ?? '') || /^Loading(?:\s|$).+/i.test(element.innerText?.trim() ?? ''))
         );
         return loadingLeaves.length === 0;
       })()`);
@@ -170,7 +170,25 @@ if (mode === "smoke-readonly") {
     if (recoveryText.some((text) => bodyText.includes(text))) throw new Error(`${name} entered the recovery error boundary`);
     checkpoints.push({ name, bodyTail: bodyText.slice(-1200) });
   };
+  const waitForVisualStability = async (timeoutMs = 2_000) => {
+    const deadline = Date.now() + timeoutMs;
+    let quietSamples = 0;
+    do {
+      const finiteAnimations = await evaluate(`document.getAnimations().filter((animation) => {
+          if (animation.playState !== 'running') return false;
+          const iterations = animation.effect?.getTiming?.().iterations;
+          return iterations !== Infinity;
+        }).length`);
+      quietSamples = finiteAnimations === 0 ? quietSamples + 1 : 0;
+      if (quietSamples >= 3) return;
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    } while (Date.now() < deadline);
+    // Some application surfaces continuously recreate finite emphasis
+    // animations. The timeout still prevents capturing the initial route
+    // transition without turning a harmless ambient animation into a failure.
+  };
   const assertVisualPage = async (name, expectations) => {
+    await waitForVisualStability();
     const result = await evaluate(`(() => {
       const bodyText = document.body?.innerText ?? '';
       const visible = (element) => {
@@ -413,6 +431,79 @@ if (mode === "smoke-readonly") {
     minimumInteractive: 8,
     allowHorizontalOverflow: true,
   });
+
+  const explorePoint = await evaluate(`(() => {
+    const nav = document.querySelector('nav[aria-label="应用导航"]');
+    const target = [...(nav?.querySelectorAll('button') ?? [])].find((button) => button.innerText?.trim() === '探索');
+    if (target == null) throw new Error('Explore navigation button not found');
+    const rect = target.getBoundingClientRect();
+    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+  })()`);
+  await command('Input.dispatchMouseEvent', { type: 'mouseMoved', ...explorePoint });
+  await command('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...explorePoint });
+  await command('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...explorePoint });
+  await waitForBodyText(['Pull Request', '定时任务'], 30_000);
+  await assertVisualPage('app/explore', {
+    text: ['Pull Request', '站点', '定时任务', '插件'],
+    minimumInteractive: 10,
+    allowHorizontalOverflow: true,
+  });
+  await evaluate(`(() => {
+    const nav = document.querySelector('nav[aria-label="应用导航"]');
+    const target = [...(nav?.querySelectorAll('button') ?? [])].find((button) => button.innerText?.trim() === '聊天');
+    if (target == null) throw new Error('Chat navigation button not found after explore');
+    target.click();
+  })()`);
+  await waitForBodyText('新对话');
+
+  await evaluate(`(() => {
+    const nav = document.querySelector('nav[aria-label="应用导航"]');
+    const target = [...(nav?.querySelectorAll('button') ?? [])].find((button) => button.innerText?.trim() === '项目');
+    if (target == null) throw new Error('Projects navigation button not found');
+    target.click();
+  })()`);
+  await waitForBodyText('搜索项目', 30_000);
+  await assertVisualPage('app/projects', {
+    text: ['项目', '搜索项目', '名称', '已更新'],
+    minimumInteractive: 10,
+  });
+
+  await evaluate(`(() => {
+    const nav = document.querySelector('nav[aria-label="应用导航"]');
+    const target = [...(nav?.querySelectorAll('button') ?? [])].find((button) => button.innerText?.trim() === '聊天');
+    if (target == null) throw new Error('Chat navigation button not found');
+    target.click();
+  })()`);
+  await waitForBodyText('新对话');
+  await clickAriaWithMouse('搜索');
+  await waitForSelector('[role="dialog"]');
+  await assertVisualPage('app/search-command-menu', {
+    text: ['命令菜单', '搜索命令和过往对话记录'],
+    minimumInteractive: 3,
+  });
+  await command('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape' });
+  await command('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape' });
+  await new Promise((resolve) => setTimeout(resolve, 250));
+
+  const activityLabel = await evaluate(`(() =>
+    [...document.querySelectorAll('[aria-label]')]
+      .map((element) => element.getAttribute('aria-label'))
+      .find((label) => label?.startsWith('查看活动')) ?? null
+  )()`);
+  if (activityLabel == null) throw new Error('Activity navigation button not found');
+  await clickAriaWithMouse(activityLabel);
+  await waitForBodyText('优先级', 30_000);
+  await assertVisualPage('app/activity', {
+    text: ['活动', '优先级', '未读'],
+    minimumInteractive: 8,
+  });
+  await evaluate(`(() => {
+    const nav = document.querySelector('nav[aria-label="应用导航"]');
+    const target = [...(nav?.querySelectorAll('button') ?? [])].find((button) => button.innerText?.trim() === '聊天');
+    if (target == null) throw new Error('Chat navigation button not found after activity');
+    target.click();
+  })()`);
+  await waitForBodyText('新对话');
   await clickText(conversationTitle);
   await waitForSelector('[data-content-search-unit-key]');
   const assistantUnitDeadline = Date.now() + 30_000;

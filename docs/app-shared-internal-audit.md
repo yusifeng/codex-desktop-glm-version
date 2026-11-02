@@ -19,13 +19,15 @@ The authoritative executable contract is
 `scripts/audit-renderer-hub-classification.mjs --strict`. It counts named
 imports, namespace member access, namespace destructuring, and typed namespace
 casts with the same parser used by the exhaustive manifest. The current result
-is 375/3,185 consumed exports and 0 unreviewed. The same parser reports
-1,483/8,204 for app-initial and 177/917 for app-primary, all with 0 unreviewed.
+is 1,817/3,185 consumed exports and 0 unreviewed. The same parser reports
+6,376/8,204 for app-initial and 715/917 for app-primary, all with 0 unreviewed.
 The 2026-11-02 recheck also rejects cross-object namespace destructuring so an
-earlier hub's aliases cannot be attributed to a later hub. The older
-`audit-app-shared-consumption.mjs` report remains useful for locating direct
-namespace access, but it is not the exhaustive completion gate and must not be
-cited as proof of zero namespace use.
+earlier hub's aliases cannot be attributed to a later hub.
+`audit-app-shared-consumption.mjs` complements that gate: release-faithful
+`@ts-nocheck` owners are checked against the executable hub ABI, while
+handwritten semantic owners must also resolve to non-`any` ambient declarations.
+It also rejects direct namespace access. The exhaustive export-classification
+gate remains `audit-renderer-hub-manifest.mjs --strict`.
 
 The remaining internal ranges are classified as either shared runtime/UI
 primitives (the semanticization boundary for future work) or vendor/interop

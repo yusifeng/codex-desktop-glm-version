@@ -3,14 +3,26 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import { classifyHub } from "./audit-renderer-hub-classification.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const RENDERER = path.join(ROOT, "src/renderer");
 const DECLARATIONS = path.join(RENDERER, "types/rchunk-modules.d.ts");
 const consumed = new Map();
+const semanticConsumers = new Map();
 const directNamespaceUses = [];
 
-function add(name, file) { if (!consumed.has(name)) consumed.set(name, new Set()); consumed.get(name).add(path.relative(ROOT, file)); }
+function addTo(map, name, file) {
+  if (!map.has(name)) map.set(name, new Set());
+  map.get(name).add(path.relative(ROOT, file));
+}
+function add(name, file, source) {
+  addTo(consumed, name, file);
+  // Exact recovered owners intentionally retain release aliases under
+  // @ts-nocheck. Their executable ABI is guarded by the hub export gate;
+  // handwritten semantic owners must additionally have useful declarations.
+  if (!/^\s*\/\/\s*@ts-nocheck\b/m.test(source)) addTo(semanticConsumers, name, file);
+}
 function walkFiles(directory) { return fs.readdirSync(directory, { withFileTypes: true }).flatMap(entry => { const target = path.join(directory, entry.name); if (entry.isDirectory()) return entry.name === "types" ? [] : walkFiles(target); return entry.isFile() && /\.tsx?$/.test(entry.name) ? [target] : []; }); }
 
 for (const file of walkFiles(RENDERER)) {
@@ -19,7 +31,7 @@ for (const file of walkFiles(RENDERER)) {
   for (const match of source.matchAll(/import\s+(?:type\s+)?\{([^;]*?)\}\s+from\s+["']@rchunk\/app-shared["']/g)) {
     for (const binding of match[1].split(",")) {
       const name = binding.trim().replace(/^type\s+/, "").split(/\s+as\s+/)[0]?.trim();
-      if (name) add(name, file);
+      if (name) add(name, file, source);
     }
   }
   for (const match of source.matchAll(/import\s+\*\s+as\s+([A-Za-z_$][\w$]*)\s+from\s+["']@rchunk\/app-shared["']/g)) namespaces.add(match[1]);
@@ -28,13 +40,13 @@ for (const file of walkFiles(RENDERER)) {
     for (const match of source.matchAll(new RegExp(`(?:const|let|var)\\s*\\{([^;]*?)\\}\\s*=\\s*${escaped}\\s*;`, "g"))) {
       for (const binding of match[1].split(",")) {
         const name = binding.trim().split(/\s*:\s*/)[0]?.trim();
-        if (name && !name.startsWith("...")) add(name, file);
+        if (name && !name.startsWith("...")) add(name, file, source);
       }
     }
     for (const match of source.matchAll(new RegExp(`\\b${escaped}\\.([A-Za-z_$][\\w$]*)`, "g"))) {
       const line = source.slice(0, match.index).split("\n").length;
       directNamespaceUses.push(`${path.relative(ROOT, file)}:${line} ${match[0]}`);
-      add(match[1], file);
+      add(match[1], file, source);
     }
   }
 }
@@ -54,12 +66,18 @@ while (true) {
   for (const match of block.matchAll(/export\s*\{\s*([A-Za-z_$][\w$]*)\s+as\s+([A-Za-z_$][\w$]*)\s*\}\s*;/g)) declarations.set(match[2], localDeclarations.get(match[1]) ?? match[0]);
   searchFrom = end + 1;
   }
-const missing = [...consumed.keys()].filter(name => !declarations.has(name)).sort();
-const unsafe = [...consumed.keys()].filter(name => /\bany\b/.test(declarations.get(name) ?? "")).sort();
-if (missing.length || unsafe.length || directNamespaceUses.length) {
-  if (missing.length) console.error(`缺少 app-shared 声明：${missing.join(", ")}`);
+const hub = classifyHub("app-shared");
+const missing = [...semanticConsumers.keys()].filter(name => !declarations.has(name)).sort();
+const unsafe = [...semanticConsumers.keys()].filter(name => /\bany\b/.test(declarations.get(name) ?? "")).sort();
+if (hub.invalidConsumedAliases.length || missing.length || unsafe.length || directNamespaceUses.length) {
+  if (hub.invalidConsumedAliases.length) console.error(`缺少 app-shared 运行时导出：${hub.invalidConsumedAliases.join(", ")}`);
+  if (missing.length) console.error(`缺少语义源码所需 app-shared 声明：${missing.join(", ")}`);
   if (unsafe.length) console.error(`app-shared 消费声明仍含 any：${unsafe.join(", ")}`);
   if (directNamespaceUses.length) console.error(`直接 namespace 消费：\n${directNamespaceUses.join("\n")}`);
   process.exit(1);
 }
-console.log(`${consumed.size} app-shared exports consumed with semantic declarations; 0 missing, 0 any, 0 direct namespace uses`);
+const preservedAliases = [...consumed.keys()].filter(name => !semanticConsumers.has(name)).length;
+console.log(
+  `${consumed.size} app-shared exports consumed: ${semanticConsumers.size} semantic aliases declared, ` +
+  `${preservedAliases} exact-source aliases runtime-verified; 0 missing exports, 0 missing semantic declarations, 0 any, 0 direct namespace uses`,
+);
