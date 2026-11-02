@@ -1,11 +1,199 @@
-// Neuron action-potential stages. Release chunk: model-1f60271bdbb7.js.
-import "@rchunk/rolldown-runtime";
-import { G2 as defineMessages, K2 as initializeAppShared } from "@rchunk/app-shared";
-type Message = { id: string; defaultMessage: string }; type Formatter = { formatMessage(message: Message): string };
-interface Stage { id: string; label: Message; captionHeading: Message; caption: Message; voltageMillivolts: number; sodiumChannel: string; potassiumChannel: string; flow: string; flowIntensity: number; chargePolarity: string; chargeCount: number }
-let control: { min: number; max: number; step: number; defaultValue: number; thumbnailDefaultValue: number }; let stages: Stage[]; let normalizeValues: (values: { stageIndex?: unknown }) => { stageIndex: number }; let activeStage: (values: { stageIndex?: unknown }) => Stage; let stageLabel: (values: { stageIndex?: unknown }, formatter: Formatter) => string; let stageCaption: typeof stageLabel; let captionHeading: typeof stageLabel; let initialized = false;
-function initializeModel(): void { if (initialized) return; initialized = true; initializeAppShared(); control = { min: 0, max: 6, step: 1, defaultValue: 0, thumbnailDefaultValue: 2 }; const messages = defineMessages({ restingLabel: { id: "learningBlock.actionPotentialNeuron.stage.resting", defaultMessage: "Resting membrane potential" }, restingCaption: { id: "learningBlock.actionPotentialNeuron.caption.resting", defaultMessage: "Voltage-gated sodium and potassium channels are closed. Potassium leak channels help set the resting voltage, while the sodium-potassium pump continuously maintains the ion gradients." }, restingCaptionHeading: { id: "learningBlock.actionPotentialNeuron.captionHeading.resting", defaultMessage: "Ready at rest" }, thresholdLabel: { id: "learningBlock.actionPotentialNeuron.stage.threshold", defaultMessage: "Threshold" }, thresholdCaption: { id: "learningBlock.actionPotentialNeuron.caption.threshold", defaultMessage: "Sodium channels begin to open while potassium channels stay closed. Sodium enters, making the inside less negative." }, thresholdCaptionHeading: { id: "learningBlock.actionPotentialNeuron.captionHeading.threshold", defaultMessage: "The signal starts" }, depolarizationLabel: { id: "learningBlock.actionPotentialNeuron.stage.depolarization", defaultMessage: "Depolarization (rising phase)" }, depolarizationCaption: { id: "learningBlock.actionPotentialNeuron.caption.depolarization", defaultMessage: "Sodium channels are open while potassium channels stay closed. Sodium rushes in and the membrane voltage rises." }, depolarizationCaptionHeading: { id: "learningBlock.actionPotentialNeuron.captionHeading.depolarization", defaultMessage: "The voltage rises" }, peakLabel: { id: "learningBlock.actionPotentialNeuron.stage.peak", defaultMessage: "Peak" }, peakCaption: { id: "learningBlock.actionPotentialNeuron.caption.peak", defaultMessage: "Sodium channels inactivate as voltage-gated potassium channels open, so sodium entry stops and potassium begins to leave." }, peakCaptionHeading: { id: "learningBlock.actionPotentialNeuron.captionHeading.peak", defaultMessage: "The ion flow switches" }, repolarizationLabel: { id: "learningBlock.actionPotentialNeuron.stage.repolarization", defaultMessage: "Repolarization (falling phase)" }, repolarizationCaption: { id: "learningBlock.actionPotentialNeuron.caption.repolarization", defaultMessage: "Sodium channels remain inactivated while potassium channels are open. Potassium leaves and the membrane voltage falls." }, repolarizationCaptionHeading: { id: "learningBlock.actionPotentialNeuron.captionHeading.repolarization", defaultMessage: "The voltage falls" }, hyperpolarizationLabel: { id: "learningBlock.actionPotentialNeuron.stage.hyperpolarization", defaultMessage: "Hyperpolarization (undershoot)" }, hyperpolarizationCaption: { id: "learningBlock.actionPotentialNeuron.caption.hyperpolarization", defaultMessage: "Sodium channels have reset to closed, but potassium channels remain open briefly. Potassium continues to leave, so the voltage dips below rest." }, hyperpolarizationCaptionHeading: { id: "learningBlock.actionPotentialNeuron.captionHeading.hyperpolarization", defaultMessage: "The voltage dips" }, returnLabel: { id: "learningBlock.actionPotentialNeuron.stage.return", defaultMessage: "Return to resting potential" }, returnCaption: { id: "learningBlock.actionPotentialNeuron.caption.return", defaultMessage: "Voltage-gated sodium and potassium channels are closed. Potassium leak channels again set the resting voltage, while the pump continues maintaining the ion gradients." }, returnCaptionHeading: { id: "learningBlock.actionPotentialNeuron.captionHeading.return", defaultMessage: "Back at rest" } });
-  stages = [{ id: "resting", label: messages.restingLabel, captionHeading: messages.restingCaptionHeading, caption: messages.restingCaption, voltageMillivolts: -70, sodiumChannel: "closed", potassiumChannel: "closed", flow: "potassiumLeak", flowIntensity: .35, chargePolarity: "negative", chargeCount: 6 }, { id: "threshold", label: messages.thresholdLabel, captionHeading: messages.thresholdCaptionHeading, caption: messages.thresholdCaption, voltageMillivolts: -55, sodiumChannel: "opening", potassiumChannel: "closed", flow: "sodiumInflux", flowIntensity: .55, chargePolarity: "negative", chargeCount: 5 }, { id: "depolarization", label: messages.depolarizationLabel, captionHeading: messages.depolarizationCaptionHeading, caption: messages.depolarizationCaption, voltageMillivolts: -10, sodiumChannel: "open", potassiumChannel: "closed", flow: "sodiumInflux", flowIntensity: 1, chargePolarity: "negative", chargeCount: 2 }, { id: "peak", label: messages.peakLabel, captionHeading: messages.peakCaptionHeading, caption: messages.peakCaption, voltageMillivolts: 30, sodiumChannel: "inactivated", potassiumChannel: "open", flow: "potassiumEfflux", flowIntensity: .65, chargePolarity: "positive", chargeCount: 4 }, { id: "repolarization", label: messages.repolarizationLabel, captionHeading: messages.repolarizationCaptionHeading, caption: messages.repolarizationCaption, voltageMillivolts: -20, sodiumChannel: "inactivated", potassiumChannel: "open", flow: "potassiumEfflux", flowIntensity: 1, chargePolarity: "negative", chargeCount: 2 }, { id: "hyperpolarization", label: messages.hyperpolarizationLabel, captionHeading: messages.hyperpolarizationCaptionHeading, caption: messages.hyperpolarizationCaption, voltageMillivolts: -80, sodiumChannel: "closed", potassiumChannel: "open", flow: "potassiumEfflux", flowIntensity: .65, chargePolarity: "negative", chargeCount: 7 }, { id: "return", label: messages.returnLabel, captionHeading: messages.returnCaptionHeading, caption: messages.returnCaption, voltageMillivolts: -70, sodiumChannel: "closed", potassiumChannel: "closed", flow: "potassiumLeak", flowIntensity: .25, chargePolarity: "negative", chargeCount: 6 }];
-  normalizeValues = values => { const value = Number.isFinite(values.stageIndex) ? Number(values.stageIndex) : control.defaultValue; return { stageIndex: Math.min(control.max, Math.max(control.min, Math.round(value))) }; }; activeStage = values => stages[normalizeValues(values).stageIndex] ?? stages[0]; stageLabel = (values, formatter) => formatter.formatMessage(activeStage(values).label); stageCaption = (values, formatter) => formatter.formatMessage(activeStage(values).caption); captionHeading = (values, formatter) => formatter.formatMessage(activeStage(values).captionHeading);
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { G2 as t, K2 as n } from "@rchunk/app-shared";
+var r, i, a, o, s, c, l, u;
+function d() {
+  return (d = e(() => {
+    (n(),
+      (r = { min: 0, max: 6, step: 1, defaultValue: 0, thumbnailDefaultValue: 2 }),
+      (i = t({
+        restingLabel: {
+          id: `learningBlock.actionPotentialNeuron.stage.resting`,
+          defaultMessage: `Resting membrane potential`,
+        },
+        restingCaption: {
+          id: `learningBlock.actionPotentialNeuron.caption.resting`,
+          defaultMessage: `Voltage-gated sodium and potassium channels are closed. Potassium leak channels help set the resting voltage, while the sodium-potassium pump continuously maintains the ion gradients.`,
+        },
+        restingCaptionHeading: {
+          id: `learningBlock.actionPotentialNeuron.captionHeading.resting`,
+          defaultMessage: `Ready at rest`,
+        },
+        thresholdLabel: {
+          id: `learningBlock.actionPotentialNeuron.stage.threshold`,
+          defaultMessage: `Threshold`,
+        },
+        thresholdCaption: {
+          id: `learningBlock.actionPotentialNeuron.caption.threshold`,
+          defaultMessage: `Sodium channels begin to open while potassium channels stay closed. Sodium enters, making the inside less negative.`,
+        },
+        thresholdCaptionHeading: {
+          id: `learningBlock.actionPotentialNeuron.captionHeading.threshold`,
+          defaultMessage: `The signal starts`,
+        },
+        depolarizationLabel: {
+          id: `learningBlock.actionPotentialNeuron.stage.depolarization`,
+          defaultMessage: `Depolarization (rising phase)`,
+        },
+        depolarizationCaption: {
+          id: `learningBlock.actionPotentialNeuron.caption.depolarization`,
+          defaultMessage: `Sodium channels are open while potassium channels stay closed. Sodium rushes in and the membrane voltage rises.`,
+        },
+        depolarizationCaptionHeading: {
+          id: `learningBlock.actionPotentialNeuron.captionHeading.depolarization`,
+          defaultMessage: `The voltage rises`,
+        },
+        peakLabel: { id: `learningBlock.actionPotentialNeuron.stage.peak`, defaultMessage: `Peak` },
+        peakCaption: {
+          id: `learningBlock.actionPotentialNeuron.caption.peak`,
+          defaultMessage: `Sodium channels inactivate as voltage-gated potassium channels open, so sodium entry stops and potassium begins to leave.`,
+        },
+        peakCaptionHeading: {
+          id: `learningBlock.actionPotentialNeuron.captionHeading.peak`,
+          defaultMessage: `The ion flow switches`,
+        },
+        repolarizationLabel: {
+          id: `learningBlock.actionPotentialNeuron.stage.repolarization`,
+          defaultMessage: `Repolarization (falling phase)`,
+        },
+        repolarizationCaption: {
+          id: `learningBlock.actionPotentialNeuron.caption.repolarization`,
+          defaultMessage: `Sodium channels remain inactivated while potassium channels are open. Potassium leaves and the membrane voltage falls.`,
+        },
+        repolarizationCaptionHeading: {
+          id: `learningBlock.actionPotentialNeuron.captionHeading.repolarization`,
+          defaultMessage: `The voltage falls`,
+        },
+        hyperpolarizationLabel: {
+          id: `learningBlock.actionPotentialNeuron.stage.hyperpolarization`,
+          defaultMessage: `Hyperpolarization (undershoot)`,
+        },
+        hyperpolarizationCaption: {
+          id: `learningBlock.actionPotentialNeuron.caption.hyperpolarization`,
+          defaultMessage: `Sodium channels have reset to closed, but potassium channels remain open briefly. Potassium continues to leave, so the voltage dips below rest.`,
+        },
+        hyperpolarizationCaptionHeading: {
+          id: `learningBlock.actionPotentialNeuron.captionHeading.hyperpolarization`,
+          defaultMessage: `The voltage dips`,
+        },
+        returnLabel: {
+          id: `learningBlock.actionPotentialNeuron.stage.return`,
+          defaultMessage: `Return to resting potential`,
+        },
+        returnCaption: {
+          id: `learningBlock.actionPotentialNeuron.caption.return`,
+          defaultMessage: `Voltage-gated sodium and potassium channels are closed. Potassium leak channels again set the resting voltage, while the pump continues maintaining the ion gradients.`,
+        },
+        returnCaptionHeading: {
+          id: `learningBlock.actionPotentialNeuron.captionHeading.return`,
+          defaultMessage: `Back at rest`,
+        },
+      })),
+      (a = [
+        {
+          id: `resting`,
+          label: i.restingLabel,
+          captionHeading: i.restingCaptionHeading,
+          caption: i.restingCaption,
+          voltageMillivolts: -70,
+          sodiumChannel: `closed`,
+          potassiumChannel: `closed`,
+          flow: `potassiumLeak`,
+          flowIntensity: 0.35,
+          chargePolarity: `negative`,
+          chargeCount: 6,
+        },
+        {
+          id: `threshold`,
+          label: i.thresholdLabel,
+          captionHeading: i.thresholdCaptionHeading,
+          caption: i.thresholdCaption,
+          voltageMillivolts: -55,
+          sodiumChannel: `opening`,
+          potassiumChannel: `closed`,
+          flow: `sodiumInflux`,
+          flowIntensity: 0.55,
+          chargePolarity: `negative`,
+          chargeCount: 5,
+        },
+        {
+          id: `depolarization`,
+          label: i.depolarizationLabel,
+          captionHeading: i.depolarizationCaptionHeading,
+          caption: i.depolarizationCaption,
+          voltageMillivolts: -10,
+          sodiumChannel: `open`,
+          potassiumChannel: `closed`,
+          flow: `sodiumInflux`,
+          flowIntensity: 1,
+          chargePolarity: `negative`,
+          chargeCount: 2,
+        },
+        {
+          id: `peak`,
+          label: i.peakLabel,
+          captionHeading: i.peakCaptionHeading,
+          caption: i.peakCaption,
+          voltageMillivolts: 30,
+          sodiumChannel: `inactivated`,
+          potassiumChannel: `open`,
+          flow: `potassiumEfflux`,
+          flowIntensity: 0.65,
+          chargePolarity: `positive`,
+          chargeCount: 4,
+        },
+        {
+          id: `repolarization`,
+          label: i.repolarizationLabel,
+          captionHeading: i.repolarizationCaptionHeading,
+          caption: i.repolarizationCaption,
+          voltageMillivolts: -20,
+          sodiumChannel: `inactivated`,
+          potassiumChannel: `open`,
+          flow: `potassiumEfflux`,
+          flowIntensity: 1,
+          chargePolarity: `negative`,
+          chargeCount: 2,
+        },
+        {
+          id: `hyperpolarization`,
+          label: i.hyperpolarizationLabel,
+          captionHeading: i.hyperpolarizationCaptionHeading,
+          caption: i.hyperpolarizationCaption,
+          voltageMillivolts: -80,
+          sodiumChannel: `closed`,
+          potassiumChannel: `open`,
+          flow: `potassiumEfflux`,
+          flowIntensity: 0.65,
+          chargePolarity: `negative`,
+          chargeCount: 7,
+        },
+        {
+          id: `return`,
+          label: i.returnLabel,
+          captionHeading: i.returnCaptionHeading,
+          caption: i.returnCaption,
+          voltageMillivolts: -70,
+          sodiumChannel: `closed`,
+          potassiumChannel: `closed`,
+          flow: `potassiumLeak`,
+          flowIntensity: 0.25,
+          chargePolarity: `negative`,
+          chargeCount: 6,
+        },
+      ]),
+      (o = (e) => {
+        let t = Number.isFinite(e.stageIndex) ? Number(e.stageIndex) : r.defaultValue;
+        return { stageIndex: Math.min(r.max, Math.max(r.min, Math.round(t))) };
+      }),
+      (s = (e) => {
+        let t = o(e);
+        return a[t.stageIndex] ?? a[0];
+      }),
+      (c = (e, t) => t.formatMessage(s(e).label)),
+      (l = (e, t) => t.formatMessage(s(e).caption)),
+      (u = (e, t) => t.formatMessage(s(e).captionHeading)),
+      a.length);
+  }))();
 }
-export { stageLabel as a, activeStage as i, stageCaption as n, initializeModel as o, captionHeading as r, normalizeValues as s, control as t };
+export { c as a, s as i, l as n, d as o, u as r, o as s, r as t };

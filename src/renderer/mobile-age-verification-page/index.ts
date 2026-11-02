@@ -1,20 +1,180 @@
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/datadog-rum-browser";
-
-export type MobileAgeVerificationStatus = "loading" | "active" | "success" | "cancelled" | "error";
-export interface MobileAgeVerificationPageProps { inquiryId?: string; status?: MobileAgeVerificationStatus; errorCode?: string; errorStatus?: string; onStart?(): void; onResult?(url: string): void; }
-let jsx: JsxRuntime;
-function ensureJsx(): JsxRuntime { if (jsx == null) jsx = getJsxRuntime(); return jsx; }
-function resultUrl(props: MobileAgeVerificationPageProps): string | null {
-  if (!props.inquiryId || props.status === "loading" || props.status === "active") return null;
-  const query = new URLSearchParams({ status: props.status ?? "error", inquiry_id: props.inquiryId });
-  if (props.errorCode) query.set("error_code", props.errorCode); if (props.errorStatus) query.set("error_status", props.errorStatus);
-  return `/mobile/age-verification/result?${query.toString()}`;
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f || (m.f = ["@rchunk/persona-runtime", "@rchunk/rolldown-runtime"]),
+) => i.map((i) => d[i]);
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import { $3 as n, H3 as r, I3 as i, V3 as a, vW as o, wL as s } from "@rchunk/app-shared";
+import { r as c } from "@rchunk/datadog-rum-browser";
+import {
+  Aun as l,
+  Iun as u,
+  Let as d,
+  Lun as f,
+  Qgn as p,
+  Ret as m,
+  Run as h,
+  cJt as g,
+  rJt as _,
+  u_n as v,
+} from "@rchunk/app-initial";
+var y;
+function b() {
+  return (b = e(() => {
+    y = `mobile-age-verification`;
+  }))();
 }
-function MobileAgeVerificationPage(props: MobileAgeVerificationPageProps): unknown {
-  const runtime = ensureJsx(); const status = props.status ?? "loading"; const destination = resultUrl(props);
-  if (destination) props.onResult?.(destination);
-  return runtime.jsxs("main", { className: "mobile-age-verification-page", "data-status": status, children: [runtime.jsx("h1", { children: "Verify your age" }), status === "loading" ? runtime.jsx("p", { "aria-live": "polite", children: "Loading…" }) : status === "active" ? runtime.jsx("button", { type: "button", onClick: () => { void import("@rchunk/persona-runtime"); props.onStart?.(); }, children: "Continue verification" }) : runtime.jsx("a", { href: destination ?? "/mobile/age-verification/result?status=error", children: status === "success" ? "Continue" : "Return to the app" })] });
+function x(e) {
+  let n = new AbortController(),
+    r = !1,
+    i = null,
+    s,
+    c = () => {
+      r || ((r = !0), n.abort(), s?.(), i?.destroy(), (i = null));
+    },
+    d = (t, n) => {
+      if (r) return;
+      let i = new URL(`/mobile/age-verification/result`, window.location.origin);
+      if ((i.searchParams.set(`status`, t), i.searchParams.set(`inquiry_id`, e), n != null)) {
+        let e = S(n.code),
+          t = S(n.status);
+        (e && i.searchParams.set(`error_code`, e), t && i.searchParams.set(`error_status`, t));
+      }
+      (c(), window.location.replace(i.toString()));
+    };
+  return (
+    (async () => {
+      try {
+        let c = f(),
+          p = () => {
+            let e = u();
+            return (
+              e?.accountId === c?.accountId &&
+              e?.userId === c?.userId &&
+              (c?.userId != null || e?.accessToken === c?.accessToken)
+            );
+          },
+          m = () => {
+            p() || d(`error`);
+          };
+        if (
+          (window.addEventListener(l, m),
+          (s = () => {
+            window.removeEventListener(l, m);
+          }),
+          !p())
+        ) {
+          d(`error`);
+          return;
+        }
+        let h = {};
+        c?.accountId != null && ((h[`ChatGPT-Account-ID`] = c.accountId), (h[o] = c.accountId));
+        let [{ default: g }] = await Promise.all([
+          a(
+            () => import(`@rchunk/persona-runtime`).then((e) => t(e.default, 1)),
+            __vite__mapDeps([0, 1]),
+            import.meta.url,
+          ),
+          _.safeGet(`/compliance/age_verification/persona/inquiries/{inquiry_id}/status`, {
+            additionalHeaders: h,
+            parameters: { path: { inquiry_id: encodeURIComponent(e) } },
+            signal: n.signal,
+          }),
+        ]);
+        if (r) return;
+        if (!p()) {
+          d(`error`);
+          return;
+        }
+        let v = new g.Client({
+          environmentId: C,
+          inquiryId: e,
+          messageTargetOrigin: window.location.origin,
+          frameAncestors: [window.location.origin],
+          onComplete: ({ status: e }) => {
+            if (!r) {
+              if (!p()) {
+                d(`error`);
+                return;
+              }
+              d(`success`);
+            }
+          },
+          onCancel: () => {
+            if (!r) {
+              if (!p()) {
+                d(`error`);
+                return;
+              }
+              d(`cancelled`);
+            }
+          },
+          onError: (e) => {
+            if (!r) {
+              if (!p()) {
+                d(`error`);
+                return;
+              }
+              d(`error`, e);
+            }
+          },
+        });
+        if (r) {
+          v.destroy();
+          return;
+        }
+        if (((i = v), v.open(), !r && `containerElement` in v)) {
+          let e = v.containerElement;
+          e instanceof HTMLElement && ((e.style.pointerEvents = `auto`), e.focus());
+        }
+      } catch (e) {
+        if (r) return;
+        (e instanceof Error, d(`error`));
+      }
+    })(),
+    c
+  );
 }
-export { MobileAgeVerificationPage };
+function S(e) {
+  if (e != null) return String(e).trim() || void 0;
+}
+var C;
+function w() {
+  return (w = e(() => {
+    (s(), h(), g(), c(), r(), (C = `env_zetVzkozoWTNEz2HmxyPjJ1AH85w`));
+  }))();
+}
+function T(e) {
+  let t = (0, E.c)(5),
+    n = v(y);
+  if (n == null) throw Error(`Mobile age verification input loader is missing`);
+  let { inquiryId: r } = n,
+    i;
+  t[0] === r
+    ? (i = t[1])
+    : ((i = (e) => {
+        if (e != null) return x(r);
+      }),
+      (t[0] = r),
+      (t[1] = i));
+  let a;
+  t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((a = (0, D.jsx)(d, { fillParent: !0 })), (t[2] = a))
+    : (a = t[2]);
+  let o;
+  return (
+    t[3] === i
+      ? (o = t[4])
+      : ((o = (0, D.jsx)(`main`, { ref: i, children: a })), (t[3] = i), (t[4] = o)),
+    o
+  );
+}
+var E, D;
+function O() {
+  return (O = e(() => {
+    ((E = n()), p(), m(), b(), w(), (D = i()));
+  }))();
+}
+O();
+export { T as MobileAgeVerificationPage };

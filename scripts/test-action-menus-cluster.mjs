@@ -64,50 +64,9 @@ assert.equal(outputMenu.props.children[1].props.children[0].length, 4);
 
 assertReleaseOwner("add-source-menu");
 
-const settingsModule = await load("settings-command-menu-section-items");
-let settingsAction = null;
-let closeCount = 0;
-const settings = settingsModule.VisibleSettingsCommandMenuSectionItems({
-  close: () => closeCount++,
-  isSelectedHostLocal: true,
-  selectedHostId: "local",
-  sections: [
-    { label: "General", slug: "general" },
-    { disabled: true, label: "Hidden", slug: "hidden" },
-    { externalUrl: "https://example.com/security", label: "Security", slug: "security" },
-  ],
-  onNavigate: (path) => { settingsAction = path; },
-  onOpenExternal: (url) => { settingsAction = url; },
-});
-assert.equal(settings.props["data-local-host"], true);
-assert.equal(settings.props.children[1].props.children.length, 2);
-settings.props.children[1].props.children[0].props.children.props.onClick();
-assert.equal(settingsAction, "/settings/general");
-settings.props.children[1].props.children[1].props.children.props.onClick();
-assert.equal(settingsAction, "https://example.com/security");
-assert.equal(closeCount, 2);
+assertReleaseOwner("settings-command-menu-section-items");
 
-const agentModule = await load("agent-menu");
-globalThis.__stateOverrides = [true, false];
-let agentAction = null;
-const agentMenu = agentModule.t({
-  agent: { id: "agent-1", name: "Reviewer" },
-  canDelete: true,
-  isPinned: false,
-  isPublished: true,
-  onCopyLink: (id) => { agentAction = `copy:${id}`; return true; },
-  onDelete: (id) => { agentAction = `delete:${id}`; },
-  onDuplicate: (agent) => { agentAction = `duplicate:${agent.id}`; },
-  onPinChange: (agent, pinned) => { agentAction = `pin:${agent.id}:${pinned}`; },
-});
-assert.equal(agentMenu.props.children[0].props["aria-label"], "More actions");
-assert.equal(agentMenu.props.children[1].type, "menu");
-agentMenu.props.children[1].props.children[0].props.children[0].props.children.props.onClick();
-assert.equal(agentAction, "copy:agent-1");
-await agentMenu.props.children[1].props.children[0].props.children[1].props.children.props.onClick();
-assert.equal(agentAction, "pin:agent-1:true");
-agentMenu.props.children[1].props.children[2].props.children.props.onClick();
-assert.equal(agentAction, "delete:agent-1");
+assertReleaseOwner("agent-menu");
 
 const moveReleaseAssertions = assertReleaseOwner("conversation-move-menu-items");
 

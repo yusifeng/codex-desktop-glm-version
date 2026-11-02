@@ -15,7 +15,6 @@ const modules = [
     "registered-subagents-thumbnail",
     ["RegisteredSubagentsThumbnail"],
   ],
-  ["svg-arrow-6f79fa010fe2.js", "svg-arrow", ["n", "t"]],
   ["system-of-equations-a765decfc54f.js", "system-of-equations", ["n", "t"]],
   [
     "template-224b997c2ad7.js",
@@ -55,6 +54,7 @@ for (const [a, d] of modules) {
   sourceAssertions += 3;
 }
 sourceAssertions += assertReleaseOwner("sort-bar-visualization");
+sourceAssertions += assertReleaseOwner("svg-arrow");
 globalThis.__na = {
   cache: Array(100).fill(Symbol.for("react.memo_cache_sentinel")),
   agents: [],
@@ -165,22 +165,6 @@ const sys = L.get("system-of-equations");
 sys.n();
 assert.deepEqual(sys.t("y=x+1\\\\y=2"), ["y=x+1", "y=2"]);
 assert.equal(sys.t("y=1\\\\y=2"), null);
-runtimeAssertions += 2;
-const ar = L.get("svg-arrow");
-ar.n();
-assert.equal(
-  ar.t({ anchor: { x: 0, y: 0 }, toward: { x: 0, y: 0 }, size: 1 }),
-  null,
-);
-assert.equal(
-  ar.t({
-    anchor: { x: 0, y: 0 },
-    toward: { x: 100, y: 0 },
-    size: 1,
-    label: "v",
-  }).kind,
-  "g",
-);
 runtimeAssertions += 2;
 const sub = L.get("registered-subagents-thumbnail");
 assert.equal(

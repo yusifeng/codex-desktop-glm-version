@@ -1,7 +1,171 @@
-// Array queue front/rear learning model. Release chunk: model-a997b73f0b6d.js.
-import "@rchunk/rolldown-runtime";
-type Mode = "linear" | "circular"; type Event = "initial" | "enqueue" | "dequeue" | "reset"; type Pointer = "front" | "rear" | null; interface QueueState { mode: Mode; slots: Array<string | null>; front: number; rear: number; count: number; nextItemNumber: number; lastEvent: Event; lastItem: string | null; wrappedPointer: Pointer } interface Manifest { type: string; version: number; thumbnailAssetKey: string; parameters: { mode: { kind: "enum"; defaultValue: Mode; allowedValues: Mode[] } } }
-let manifest: Manifest; let modeParameter: Manifest["parameters"]["mode"]; let itemLabel: (number: number) => string; let isFull: (state: Partial<QueueState>) => boolean; let normalizeMode: (mode: unknown) => Mode; let defaultState: (mode?: Mode) => QueueState; let normalizeState: (state: Partial<QueueState>) => QueueState; let status: (state: Partial<QueueState>) => "empty" | "full" | "rear-at-last-index" | "ready"; let enqueue: (state: Partial<QueueState>) => QueueState; let dequeue: (state: Partial<QueueState>) => QueueState; let reset: (mode: Mode) => QueueState; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "ARRAY_QUEUE_FRONT_REAR", version: 1, thumbnailAssetKey: "array-queue-front-rear-v1", parameters: { mode: { kind: "enum", defaultValue: "linear", allowedValues: ["linear", "circular"] } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); modeParameter = manifest.parameters.mode; normalizeMode = mode => modeParameter.allowedValues.some(value => value === mode) ? mode as Mode : modeParameter.defaultValue; const event = (value: unknown): value is Event => value === "initial" || value === "enqueue" || value === "dequeue" || value === "reset"; const item = (value: unknown) => { if (typeof value !== "string") return null; const trimmed = value.trim(); return trimmed ? trimmed.slice(0, 4) : null; }; const integer = (value: unknown, minimum: number, maximum: number) => Math.min(Math.max(typeof value === "number" && Number.isFinite(value) ? Math.round(value) : minimum, minimum), maximum); itemLabel = number => { const normalized = Math.max(0, Math.round(number)); return normalized < 26 ? String.fromCharCode(65 + normalized) : `${normalized + 1}`; }; defaultState = (mode = normalizeMode(modeParameter.defaultValue)) => ({ mode, slots: ["A", "B", "C", null, null, null], front: 0, rear: 2, count: 3, nextItemNumber: 3, lastEvent: "initial", lastItem: null, wrappedPointer: null }); const logicalItems = (state: Partial<QueueState>, mode: Mode) => { const slots = Array.from({ length: 6 }, (_, index) => item(state.slots?.[index])); const count = integer(state.count, 0, 6); const front = integer(state.front, 0, 5); const ordered = Array.from({ length: count }, (_, offset) => { const index = mode === "circular" ? (front + offset) % 6 : front + offset; return index < 6 ? slots[index] : null; }); if (ordered.length === count && ordered.every(value => value !== null)) return ordered; const fallbackFront = mode === "circular" && Number.isInteger(state.front) && (state.front ?? -1) >= 0 && (state.front ?? 6) < 6 ? state.front ?? 0 : 0; return Array.from({ length: 6 }, (_, index) => slots[(fallbackFront + index) % 6]).filter((value): value is string => value !== null).slice(0, 6); }; normalizeState = state => { const mode = normalizeMode(state.mode); const items = logicalItems(state, mode); const count = items.length; const slots: Array<string | null> = Array(6).fill(null); let front = -1; let rear = -1; if (count > 0) { const suppliedFront = integer(state.front, 0, 5); front = mode === "linear" ? Math.min(suppliedFront, 6 - count) : suppliedFront; items.forEach((value, offset) => { slots[mode === "circular" ? (front + offset) % 6 : front + offset] = value; }); rear = mode === "circular" ? (front + count - 1) % 6 : front + count - 1; } return { mode, slots, front, rear, count, nextItemNumber: integer(state.nextItemNumber, 0, 999), lastEvent: event(state.lastEvent) ? state.lastEvent : "initial", lastItem: item(state.lastItem), wrappedPointer: state.wrappedPointer === "front" || state.wrappedPointer === "rear" ? state.wrappedPointer : null }; }; isFull = state => { const normalized = normalizeState(state); return normalized.mode === "circular" ? normalized.count === 6 : normalized.count === 6 || normalized.rear === 5; }; status = state => { const normalized = normalizeState(state); return normalized.count === 0 ? "empty" : normalized.count === 6 ? "full" : normalized.mode === "linear" && normalized.rear === 5 ? "rear-at-last-index" : "ready"; }; enqueue = state => { const normalized = normalizeState(state); if (isFull(normalized)) return normalized; const label = itemLabel(normalized.nextItemNumber); const index = normalized.count === 0 ? 0 : normalized.mode === "circular" ? (normalized.rear + 1) % 6 : normalized.rear + 1; const slots = [...normalized.slots]; slots[index] = label; return { ...normalized, slots, front: normalized.count === 0 ? index : normalized.front, rear: index, count: normalized.count + 1, nextItemNumber: normalized.nextItemNumber + 1, lastEvent: "enqueue", lastItem: label, wrappedPointer: normalized.mode === "circular" && normalized.count > 0 && index < normalized.rear ? "rear" : null }; }; dequeue = state => { const normalized = normalizeState(state); if (normalized.count === 0) return normalized; const removed = normalized.slots[normalized.front] ?? null; const slots = [...normalized.slots]; slots[normalized.front] = null; if (normalized.count === 1) return { ...normalized, slots, front: -1, rear: -1, count: 0, lastEvent: "dequeue", lastItem: removed, wrappedPointer: null }; const front = normalized.mode === "circular" ? (normalized.front + 1) % 6 : normalized.front + 1; return { ...normalized, slots, front, count: normalized.count - 1, lastEvent: "dequeue", lastItem: removed, wrappedPointer: normalized.mode === "circular" && front < normalized.front ? "front" : null }; }; reset = mode => ({ ...defaultState(mode), lastEvent: "reset" }); }
-export { itemLabel as a, isFull as c, normalizeMode as d, initializeManifest as f, enqueue as i, reset as l, defaultState as n, status as o, manifest as p, dequeue as r, initializeModel as s, modeParameter as t, normalizeState as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `ARRAY_QUEUE_FRONT_REAR`),
+      (n = `array-queue-front-rear-v1`),
+      (r = {
+        mode: { kind: `enum`, defaultValue: `linear`, allowedValues: [`linear`, `circular`] },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y;
+function b() {
+  return (b = e(() => {
+    (a(),
+      (o = i.parameters.mode),
+      (s = (e) => (o.allowedValues.includes(e) ? e : o.defaultValue)),
+      (c = (e) => e === `initial` || e === `enqueue` || e === `dequeue` || e === `reset`),
+      (l = (e) => {
+        if (typeof e != `string`) return null;
+        let t = e.trim();
+        return t ? t.slice(0, 4) : null;
+      }),
+      (u = (e, t, n) =>
+        Math.min(Math.max(typeof e == `number` && Number.isFinite(e) ? Math.round(e) : t, t), n)),
+      (d = (e) => {
+        let t = Math.max(0, Math.round(e));
+        return t < 26 ? String.fromCharCode(65 + t) : `${t + 1}`;
+      }),
+      (f = (e = s(o.defaultValue)) => ({
+        mode: e,
+        slots: [`A`, `B`, `C`, null, null, null],
+        front: 0,
+        rear: 2,
+        count: 3,
+        nextItemNumber: 3,
+        lastEvent: `initial`,
+        lastItem: null,
+        wrappedPointer: null,
+      })),
+      (p = (e, t) => {
+        let n = Array.from({ length: 6 }, (t, n) => l(e.slots?.[n])),
+          r = u(e.count, 0, 6),
+          i = u(e.front, 0, 5),
+          a = Array.from({ length: r }, (e, r) => {
+            let a = t === `circular` ? (i + r) % 6 : i + r;
+            return a < 6 ? n[a] : null;
+          });
+        if (a.length === r && a.every((e) => e !== null)) return a;
+        let o =
+          t === `circular` &&
+          Number.isInteger(e.front) &&
+          (e.front ?? -1) >= 0 &&
+          (e.front ?? 6) < 6
+            ? (e.front ?? 0)
+            : 0;
+        return Array.from({ length: 6 }, (e, t) => n[(o + t) % 6])
+          .filter((e) => e !== null)
+          .slice(0, 6);
+      }),
+      (m = (e) => {
+        let t = s(e.mode),
+          n = p(e, t),
+          r = n.length,
+          i = [, , , , , ,].fill(null),
+          a = -1,
+          o = -1;
+        if (r > 0) {
+          let s = u(e.front, 0, 5);
+          ((a = t === `linear` ? Math.min(s, 6 - r) : s),
+            n.forEach((e, n) => {
+              let r = t === `circular` ? (a + n) % 6 : a + n;
+              i[r] = e;
+            }),
+            (o = t === `circular` ? (a + r - 1) % 6 : a + r - 1));
+        }
+        return {
+          mode: t,
+          slots: i,
+          front: a,
+          rear: o,
+          count: r,
+          nextItemNumber: u(e.nextItemNumber, 0, 999),
+          lastEvent: c(e.lastEvent) ? e.lastEvent : `initial`,
+          lastItem: l(e.lastItem),
+          wrappedPointer:
+            e.wrappedPointer === `front` || e.wrappedPointer === `rear` ? e.wrappedPointer : null,
+        };
+      }),
+      (h = (e) => {
+        let t = m(e);
+        return t.mode === `circular` ? t.count === 6 : t.count === 6 || t.rear === 5;
+      }),
+      (g = (e) => {
+        let t = m(e);
+        return t.count === 0
+          ? `empty`
+          : t.count === 6
+            ? `full`
+            : t.mode === `linear` && t.rear === 5
+              ? `rear-at-last-index`
+              : `ready`;
+      }),
+      (_ = (e) => {
+        let t = m(e);
+        if (h(t)) return t;
+        let n = d(t.nextItemNumber),
+          r = t.count === 0 ? 0 : t.mode === `circular` ? (t.rear + 1) % 6 : t.rear + 1,
+          i = [...t.slots];
+        return (
+          (i[r] = n),
+          {
+            ...t,
+            slots: i,
+            front: t.count === 0 ? r : t.front,
+            rear: r,
+            count: t.count + 1,
+            nextItemNumber: t.nextItemNumber + 1,
+            lastEvent: `enqueue`,
+            lastItem: n,
+            wrappedPointer: t.mode === `circular` && t.count > 0 && r < t.rear ? `rear` : null,
+          }
+        );
+      }),
+      (v = (e) => {
+        let t = m(e);
+        if (t.count === 0) return t;
+        let n = t.slots[t.front],
+          r = [...t.slots];
+        if (((r[t.front] = null), t.count === 1))
+          return {
+            ...t,
+            slots: r,
+            front: -1,
+            rear: -1,
+            count: 0,
+            lastEvent: `dequeue`,
+            lastItem: n,
+            wrappedPointer: null,
+          };
+        let i = t.mode === `circular` ? (t.front + 1) % 6 : t.front + 1;
+        return {
+          ...t,
+          slots: r,
+          front: i,
+          count: t.count - 1,
+          lastEvent: `dequeue`,
+          lastItem: n,
+          wrappedPointer: t.mode === `circular` && i < t.front ? `front` : null,
+        };
+      }),
+      (y = (e) => ({ ...f(e), lastEvent: `reset` })));
+  }))();
+}
+export {
+  d as a,
+  h as c,
+  s as d,
+  a as f,
+  _ as i,
+  y as l,
+  f as n,
+  g as o,
+  i as p,
+  v as r,
+  b as s,
+  o as t,
+  m as u,
+};

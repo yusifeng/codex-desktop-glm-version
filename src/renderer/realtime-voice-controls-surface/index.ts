@@ -1,7 +1,5 @@
-// @ts-nocheck -- recovered release runtime; dependencies retain their published ABI names.
-// Recovered TypeScript owner for floating realtime voice controls and pet/quick-chat layout.
-// This source is compiled directly and no longer falls back to the shipped JavaScript asset.
-import { n as e, o as t } from "@exact-chunk/rolldown-runtime-2d059c5e81f4.js";
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
   $C as r,
@@ -66,7 +64,7 @@ import {
   wL as fe,
   wu as pe,
   yS as me,
-} from "@exact-chunk/app-shared-7b9edc1bfb7f.js";
+} from "@rchunk/app-shared";
 import {
   Bfn as he,
   EZ as ge,
@@ -115,7 +113,7 @@ import {
   wt as it,
   yLt as at,
   z as ot,
-} from "@exact-chunk/app-initial-51da50e6c6e3.js";
+} from "@rchunk/app-initial";
 import {
   a as st,
   f as ct,
@@ -125,8 +123,8 @@ import {
   p as dt,
   s as ft,
   u as pt,
-} from "@exact-chunk/avatar-mascot-button-ae197b2778b9.js";
-import { n as mt, t as ht } from "@exact-chunk/realtime-voice-handoff-target-f35f43cc3d00.js";
+} from "@rchunk/avatar-mascot-button";
+import { n as mt, t as ht } from "@rchunk/realtime-voice-handoff-target";
 function gt() {
   let e = (0, vt.c)(4),
     t = be(a.petSize),
@@ -144,7 +142,12 @@ function Q(e) {
 var vt, yt, bt, xt;
 function St() {
   return (St = e(() => {
-    ((vt = n()), fe(), Ae(), (yt = a.petSize.default), (bt = 192 / 208), (xt = `--codex-pet-width`));
+    ((vt = n()),
+      fe(),
+      Ae(),
+      (yt = a.petSize.default),
+      (bt = 192 / 208),
+      (xt = `--codex-pet-width`));
   }))();
 }
 function Ct(e) {
@@ -219,7 +222,10 @@ function At({
     d = r.width / 2 + Nt + u,
     f = 2 * Math.asin((t + e) / (2 * d)),
     p = (l - (c - 1) / 2) * f;
-  return { x: Math.round(Math.sin(p) * d + i), y: Math.round(r.height / 2 + Math.cos(p) * d - u + a) };
+  return {
+    x: Math.round(Math.sin(p) * d + i),
+    y: Math.round(r.height / 2 + Math.cos(p) * d - u + a),
+  };
 }
 var jt, Mt, Nt, Pt, Ft;
 function It() {
@@ -285,10 +291,14 @@ function Bt(e) {
     z;
   t[2] !== R || t[3] !== re ? ((z = W(R, re)), (t[2] = R), (t[3] = re), (t[4] = z)) : (z = t[4]);
   let B;
-  t[5] === s ? (B = t[6]) : ((B = s ?? { duration: 0.18, ease: `easeOut` }), (t[5] = s), (t[6] = B));
+  t[5] === s
+    ? (B = t[6])
+    : ((B = s ?? { duration: 0.18, ease: `easeOut` }), (t[5] = s), (t[6] = B));
   let V = F ? `relative h-full overflow-clip rounded-[inherit]` : void 0,
     ie;
-  t[7] !== w || t[8] !== te ? ((ie = { x: w, y: te }), (t[7] = w), (t[8] = te), (t[9] = ie)) : (ie = t[9]);
+  t[7] !== w || t[8] !== te
+    ? ((ie = { x: w, y: te }), (t[7] = w), (t[8] = te), (t[9] = ie))
+    : (ie = t[9]);
   let H;
   t[10] !== n || t[11] !== ie
     ? ((H = (0, Jt.jsx)(q.div, {
@@ -311,7 +321,13 @@ function Bt(e) {
     : (ae = t[16]);
   let U;
   t[17] !== x || t[18] !== L || t[19] !== z || t[20] !== B || t[21] !== ae
-    ? ((U = (0, Jt.jsxs)(q.div, { animate: L, className: z, initial: !1, transition: B, children: [ae, x] })),
+    ? ((U = (0, Jt.jsxs)(q.div, {
+        animate: L,
+        className: z,
+        initial: !1,
+        transition: B,
+        children: [ae, x],
+      })),
       (t[17] = x),
       (t[18] = L),
       (t[19] = z),
@@ -330,7 +346,11 @@ function Bt(e) {
   let ce = N ? `notification-tray-row` : void 0,
     le;
   t[28] !== o || t[29] !== F || t[30] !== C
-    ? ((le = F ? { height: C, width: o } : void 0), (t[28] = o), (t[29] = F), (t[30] = C), (t[31] = le))
+    ? ((le = F ? { height: C, width: o } : void 0),
+      (t[28] = o),
+      (t[29] = F),
+      (t[30] = C),
+      (t[31] = le))
     : (le = t[31]);
   let J;
   t[32] === P
@@ -460,7 +480,14 @@ function Vt(e) {
     d;
   return (
     t[9] !== n || t[10] !== i || t[11] !== a || t[12] !== l || t[13] !== u || t[14] !== c
-      ? ((d = (0, Jt.jsx)(Wt, { ...a, className: l, nativeSurfaceId: i, tone: c, variant: u, children: n })),
+      ? ((d = (0, Jt.jsx)(Wt, {
+          ...a,
+          className: l,
+          nativeSurfaceId: i,
+          tone: c,
+          variant: u,
+          children: n,
+        })),
         (t[9] = n),
         (t[10] = i),
         (t[11] = a),
@@ -551,7 +578,9 @@ function Ut(e) {
     f;
   t[0] === d ? (f = t[1]) : ((f = { opacity: 1, width: d }), (t[0] = d), (t[1] = f));
   let p;
-  t[2] === Symbol.for(`react.memo_cache_sentinel`) ? ((p = { opacity: 0 }), (t[2] = p)) : (p = t[2]);
+  t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((p = { opacity: 0 }), (t[2] = p))
+    : (p = t[2]);
   let m;
   t[3] === r ? (m = t[4]) : ((m = { opacity: 0, width: r }), (t[3] = r), (t[4] = m));
   let h, g;
@@ -634,7 +663,9 @@ function Wt(e) {
   let s = o ?? r,
     c = (o === `quick-chat` || o === `quick-chat-stash`) && lt.QuickChatMaterial,
     l;
-  t[6] !== n || t[7] !== c ? ((l = W(lt.Material, c, n)), (t[6] = n), (t[7] = c), (t[8] = l)) : (l = t[8]);
+  t[6] !== n || t[7] !== c
+    ? ((l = W(lt.Material, c, n)), (t[6] = n), (t[7] = c), (t[8] = l))
+    : (l = t[8]);
   let u;
   return (
     t[9] !== s || t[10] !== r || t[11] !== i || t[12] !== l || t[13] !== a
@@ -743,7 +774,9 @@ function Kt(e) {
     y = f === void 0 ? `subtitle` : f,
     b = _ && `loading-shimmer-pure-text`,
     x;
-  t[12] !== n || t[13] !== b ? ((x = W(lt.ActivityText, b, n)), (t[12] = n), (t[13] = b), (t[14] = x)) : (x = t[14]);
+  t[12] !== n || t[13] !== b
+    ? ((x = W(lt.ActivityText, b, n)), (t[12] = n), (t[13] = b), (t[14] = x))
+    : (x = t[14]);
   let S = (h && g) || void 0,
     C = m || void 0,
     w = _ || void 0,
@@ -847,7 +880,14 @@ function Qt(e, t) {
   };
 }
 function $t(e) {
-  return [e.value, e.selectionStart, e.selectionEnd, e.selectionDirection, e.scrollLeft, e.scrollTop].join(`\0`);
+  return [
+    e.value,
+    e.selectionStart,
+    e.selectionEnd,
+    e.selectionDirection,
+    e.scrollLeft,
+    e.scrollTop,
+  ].join(`\0`);
 }
 function en() {
   return (en = e(() => {}))();
@@ -885,7 +925,10 @@ function mn(e, t, n = !1) {
     a = 172 + (t ? 48 : 0);
   return {
     ...r,
-    left: Math.max(i.left + 16, Math.min(i.left + i.width - a - 16, e.mascot.left + e.mascot.width / 2 - 110)),
+    left: Math.max(
+      i.left + 16,
+      Math.min(i.left + i.width - a - 16, e.mascot.left + e.mascot.width / 2 - 110),
+    ),
     width: a,
   };
 }
@@ -931,7 +974,10 @@ function Sn() {
                 a = e;
               })
               .catch((e) => {
-                S.warning(`Failed to subscribe to orb options`, { safe: {}, sensitive: { error: e } });
+                S.warning(`Failed to subscribe to orb options`, {
+                  safe: {},
+                  sensitive: { error: e },
+                });
               }),
             () => {
               ((i = !1), a?.[Symbol.dispose]());
@@ -1013,7 +1059,11 @@ function Tn({
     A = g(v, k, s).left - D.left;
   (S && (A += ((k - 26) / 2) * (v.quickChat?.stashedEdge === `left` ? 1 : -1)),
     b === `composing` &&
-      (O = (0, En.default)(A + (k - D.width) / 2, w.left - D.left, w.left + w.width - D.left - D.width)));
+      (O = (0, En.default)(
+        A + (k - D.width) / 2,
+        w.left - D.left,
+        w.left + w.width - D.left - D.width,
+      )));
   let j = S ? 12 : 20,
     M = S ? j : 0,
     N = l && v.quickChat?.hasOrbPicker ? 40 : 0,
@@ -1036,7 +1086,12 @@ function Tn({
   r && !S && (V = I ? re + 124 + 8 : P ? _(A, 2) : re + (F ? 0 : On));
   let H = h && r;
   if (
-    (H && !S && ((V = B - (F || b === `expanded` ? N : 0)), (B += On), (re += On), P ? (z -= 40) : F && (z -= On)),
+    (H &&
+      !S &&
+      ((V = B - (F || b === `expanded` ? N : 0)),
+      (B += On),
+      (re += On),
+      P ? (z -= 40) : F && (z -= On)),
     !S && (H || C))
   ) {
     let e = C ? 16 : 0,
@@ -1050,7 +1105,8 @@ function Tn({
   if (
     (S
       ? (U = (0, En.default)((40 - T) / 2, w.top - D.top, w.top + w.height - D.top - T))
-      : T > 40 && (U = (0, En.default)(ae ? 40 - T : 0, w.top - D.top, w.top + w.height - D.top - T)),
+      : T > 40 &&
+        (U = (0, En.default)(ae ? 40 - T : 0, w.top - D.top, w.top + w.height - D.top - T)),
     d && !S)
   ) {
     let e = Math.max(B + z, F ? 0 : re + (I ? 124 : 40), !F && r ? V + 40 : 0),
@@ -1059,7 +1115,11 @@ function Tn({
   }
   if (u && !S) {
     let e = !h && v.placement.startsWith(`bottom`);
-    U = (0, En.default)(U, w.top - D.top + (e ? 0 : 58), w.top + w.height - D.top - T - (e ? 58 : 0));
+    U = (0, En.default)(
+      U,
+      w.top - D.top + (e ? 0 : 58),
+      w.top + w.height - D.top - T - (e ? 58 : 0),
+    );
   }
   return {
     bar: D,
@@ -1118,7 +1178,10 @@ function An(e) {
   o(null, S?.conversationId ?? null);
   let C;
   t[0] !== void 0 || t[1] !== void 0
-    ? ((C = { "--color-background-composer-primary": void 0, "--color-text-composer-primary": void 0 }),
+    ? ((C = {
+        "--color-background-composer-primary": void 0,
+        "--color-text-composer-primary": void 0,
+      }),
       (t[0] = void 0),
       (t[1] = void 0),
       (t[2] = C))
@@ -1158,7 +1221,9 @@ function An(e) {
     I = F === `~` ? null : F,
     L = o(ye, P),
     R;
-  t[8] !== I || t[9] !== N ? ((R = { hostId: N, cwd: I }), (t[8] = I), (t[9] = N), (t[10] = R)) : (R = t[10]);
+  t[8] !== I || t[9] !== N
+    ? ((R = { hostId: N, cwd: I }), (t[8] = I), (t[9] = N), (t[10] = R))
+    : (R = t[10]);
   let re = Le(R),
     z = L?.model ?? re.model,
     B;
@@ -1235,7 +1300,9 @@ function An(e) {
       (t[31] = ue))
     : (ue = t[31]);
   let de;
-  (t[32] !== O || t[33] !== s ? ((de = [O, s]), (t[32] = O), (t[33] = s), (t[34] = de)) : (de = t[34]),
+  (t[32] !== O || t[33] !== s
+    ? ((de = [O, s]), (t[32] = O), (t[33] = s), (t[34] = de))
+    : (de = t[34]),
     (0, In.useEffect)(ue, de));
   let fe;
   t[35] !== O.view.dom || t[36] !== _
@@ -1254,7 +1321,9 @@ function An(e) {
       (t[37] = fe))
     : (fe = t[37]);
   let he;
-  (t[38] !== O || t[39] !== _ ? ((he = [O, _]), (t[38] = O), (t[39] = _), (t[40] = he)) : (he = t[40]),
+  (t[38] !== O || t[39] !== _
+    ? ((he = [O, _]), (t[38] = O), (t[39] = _), (t[40] = he))
+    : (he = t[40]),
     (0, In.useEffect)(fe, he));
   let ve;
   t[41] !== O.view || t[42] !== Y
@@ -1404,7 +1473,10 @@ function An(e) {
     Re = a && `invisible`,
     Ve;
   t[80] !== Ie || t[81] !== Re
-    ? ((Ve = W(`min-w-0 flex-1 cursor-text font-medium`, fn.editor, Ie, Re)), (t[80] = Ie), (t[81] = Re), (t[82] = Ve))
+    ? ((Ve = W(`min-w-0 flex-1 cursor-text font-medium`, fn.editor, Ie, Re)),
+      (t[80] = Ie),
+      (t[81] = Re),
+      (t[82] = Ve))
     : (Ve = t[82]);
   let He;
   t[83] === p ? (He = t[84]) : ((He = { opacity: p }), (t[83] = p), (t[84] = He));
@@ -1440,7 +1512,9 @@ function An(e) {
           n = J.atEnd(t.state.doc),
           r = t.coordsAtPos(n.head);
         if (
-          !(window.getComputedStyle(t.dom).direction === `rtl` ? e.clientX < r.left : e.clientX > r.right) ||
+          !(window.getComputedStyle(t.dom).direction === `rtl`
+            ? e.clientX < r.left
+            : e.clientX > r.right) ||
           e.clientY < r.top ||
           e.clientY > r.bottom
         ) {
@@ -1468,7 +1542,8 @@ function An(e) {
     : (qe = t[99]);
   let Je;
   t[100] !== A.handleMentionEvent || t[101] !== j.handleMentionEvent
-    ? ((Je = (e) => ot(e, { onAtMention: A.handleMentionEvent, onSkillMention: j.handleMentionEvent })),
+    ? ((Je = (e) =>
+        ot(e, { onAtMention: A.handleMentionEvent, onSkillMention: j.handleMentionEvent })),
       (t[100] = A.handleMentionEvent),
       (t[101] = j.handleMentionEvent),
       (t[102] = Je))
@@ -1581,7 +1656,12 @@ function An(e) {
     : (et = t[130]);
   let tt;
   return (
-    t[131] !== O || t[132] !== je || t[133] !== Ne || t[134] !== Fe || t[135] !== Qe || t[136] !== et
+    t[131] !== O ||
+    t[132] !== je ||
+    t[133] !== Ne ||
+    t[134] !== Fe ||
+    t[135] !== Qe ||
+    t[136] !== et
       ? ((tt = (0, Rn.jsxs)($e.Provider, { value: O, children: [je, Ne, Fe, Qe, et] })),
         (t[131] = O),
         (t[132] = je),
@@ -1668,9 +1748,13 @@ function Un(e) {
     s = n ? 0.15 : er,
     c = !n && `pulsing-dot`,
     l;
-  t[0] === c ? (l = t[1]) : ((l = W(`flex size-10 items-center justify-center`, c)), (t[0] = c), (t[1] = l));
+  t[0] === c
+    ? (l = t[1])
+    : ((l = W(`flex size-10 items-center justify-center`, c)), (t[0] = c), (t[1] = l));
   let u;
-  t[2] === Symbol.for(`react.memo_cache_sentinel`) ? ((u = { animationDelay: `${er}s` }), (t[2] = u)) : (u = t[2]);
+  t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((u = { animationDelay: `${er}s` }), (t[2] = u))
+    : (u = t[2]);
   let d;
   t[3] !== s || t[4] !== n
     ? ((d = n
@@ -1740,9 +1824,21 @@ function Un(e) {
         return (0, Yn.jsx)(
           q.rect,
           {
-            animate: { height: p, rx: f.map((e, t) => Math.min(e, p[t]) / 2), width: f, x: m, y: h },
+            animate: {
+              height: p,
+              rx: f.map((e, t) => Math.min(e, p[t]) / 2),
+              width: f,
+              x: m,
+              y: h,
+            },
             display: a && !r ? `none` : void 0,
-            initial: { height: e.height, rx: e.width / 2, width: e.width, x: $n + e.x, y: $n + e.y },
+            initial: {
+              height: e.height,
+              rx: e.width / 2,
+              width: e.width,
+              x: $n + e.x,
+              y: $n + e.y,
+            },
             onAnimationComplete: r
               ? () => {
                   o(!0);
@@ -1759,7 +1855,10 @@ function Un(e) {
     : (g = t[14]);
   let _;
   t[15] !== h || t[16] !== g
-    ? ((_ = (0, Yn.jsx)(`g`, { fill: `white`, filter: h, children: g })), (t[15] = h), (t[16] = g), (t[17] = _))
+    ? ((_ = (0, Yn.jsx)(`g`, { fill: `white`, filter: h, children: g })),
+      (t[15] = h),
+      (t[16] = g),
+      (t[17] = _))
     : (_ = t[17]);
   let v;
   t[18] !== i || t[19] !== _
@@ -1799,7 +1898,10 @@ function Un(e) {
   let x;
   return (
     t[27] !== b || t[28] !== l
-      ? ((x = (0, Yn.jsx)(`span`, { className: l, style: u, children: b })), (t[27] = b), (t[28] = l), (t[29] = x))
+      ? ((x = (0, Yn.jsx)(`span`, { className: l, style: u, children: b })),
+        (t[27] = b),
+        (t[28] = l),
+        (t[29] = x))
       : (x = t[29]),
     x
   );
@@ -1838,7 +1940,13 @@ function rr() {
 }
 function ir(e) {
   let t = (0, ar.c)(75),
-    { audioControlOpacity: n, audioControlWidth: r, reduceMotion: i, showsAudioControls: a, voice: o } = e,
+    {
+      audioControlOpacity: n,
+      audioControlWidth: r,
+      reduceMotion: i,
+      showsAudioControls: a,
+      voice: o,
+    } = e,
     s = K(),
     c = !a || void 0,
     l;
@@ -1851,7 +1959,9 @@ function ir(e) {
   let u = o.phase !== `active`,
     d = !a,
     f;
-  t[3] !== n || t[4] !== r ? ((f = { opacity: n, width: r }), (t[3] = n), (t[4] = r), (t[5] = f)) : (f = t[5]);
+  t[3] !== n || t[4] !== r
+    ? ((f = { opacity: n, width: r }), (t[3] = n), (t[4] = r), (t[5] = f))
+    : (f = t[5]);
   let p;
   t[6] === o.microphoneMuted
     ? (p = t[7])
@@ -1913,7 +2023,9 @@ function ir(e) {
     v;
   t[22] === o ? (v = t[23]) : ((v = () => void o.onStop?.()), (t[22] = o), (t[23] = v));
   let ee;
-  t[24] === Symbol.for(`react.memo_cache_sentinel`) ? ((ee = { scale: 1 }), (t[24] = ee)) : (ee = t[24]);
+  t[24] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((ee = { scale: 1 }), (t[24] = ee))
+    : (ee = t[24]);
   let y;
   t[25] === i ? (y = t[26]) : ((y = !i && { scale: Zn / 28 }), (t[25] = i), (t[26] = y));
   let b;
@@ -2004,12 +2116,17 @@ function ir(e) {
   let E = !a || void 0,
     D;
   t[52] !== s || t[53] !== o.muted
-    ? ((D = s.formatMessage(o.muted ? sr.unmuteOutput : sr.muteOutput)), (t[52] = s), (t[53] = o.muted), (t[54] = D))
+    ? ((D = s.formatMessage(o.muted ? sr.unmuteOutput : sr.muteOutput)),
+      (t[52] = s),
+      (t[53] = o.muted),
+      (t[54] = D))
     : (D = t[54]);
   let O = o.phase !== `active`,
     k = !a,
     A;
-  t[55] !== n || t[56] !== r ? ((A = { opacity: n, width: r }), (t[55] = n), (t[56] = r), (t[57] = A)) : (A = t[57]);
+  t[55] !== n || t[56] !== r
+    ? ((A = { opacity: n, width: r }), (t[55] = n), (t[56] = r), (t[57] = A))
+    : (A = t[57]);
   let j;
   t[58] === o.muted
     ? (j = t[59])
@@ -2143,7 +2260,12 @@ function fr(e) {
       (t[3] = s));
   let c;
   t[4] !== n.text || t[5] !== s
-    ? ((c = (0, mr.jsx)(`blockquote`, { className: o, "aria-label": s, title: n.text, children: n.text })),
+    ? ((c = (0, mr.jsx)(`blockquote`, {
+        className: o,
+        "aria-label": s,
+        title: n.text,
+        children: n.text,
+      })),
       (t[4] = n.text),
       (t[5] = s),
       (t[6] = c))
@@ -2227,7 +2349,9 @@ function vr(e) {
     te = G(+!o),
     E = _ ?? te,
     D;
-  t[0] !== T || t[1] !== E ? ((D = () => T + (1 - T) * E.get()), (t[0] = T), (t[1] = E), (t[2] = D)) : (D = t[2]);
+  t[0] !== T || t[1] !== E
+    ? ((D = () => T + (1 - T) * E.get()), (t[0] = T), (t[1] = E), (t[2] = D))
+    : (D = t[2]);
   let O = L(D),
     k;
   t[3] !== u.compactControlHeight || t[4] !== E
@@ -2269,7 +2393,9 @@ function vr(e) {
     W = G(x.voiceLeft),
     K = G(x.voiceWidth),
     q;
-  t[10] === K ? (q = t[11]) : ((q = () => Math.max(0, ((K.get() - 40) * Or) / 84)), (t[10] = K), (t[11] = q));
+  t[10] === K
+    ? (q = t[11])
+    : ((q = () => Math.max(0, ((K.get() - 40) * Or) / 84)), (t[10] = K), (t[11] = q));
   let se = L(q),
     ce;
   t[12] === se
@@ -2328,7 +2454,9 @@ function vr(e) {
     we;
   t[31] !== s.hasDetachedActivity || t[32] !== J || t[33] !== W || t[34] !== K || t[35] !== C
     ? ((we = () =>
-        C || s.hasDetachedActivity ? 1 : (0, wr.default)((J.get() - W.get() - K.get() + 40) / 20 - 1, 0, 1)),
+        C || s.hasDetachedActivity
+          ? 1
+          : (0, wr.default)((J.get() - W.get() - K.get() + 40) / 20 - 1, 0, 1)),
       (t[31] = s.hasDetachedActivity),
       (t[32] = J),
       (t[33] = W),
@@ -2355,7 +2483,9 @@ function vr(e) {
     : (ke = t[44]);
   let Ae = L(ke),
     je;
-  t[45] === Te ? (je = t[46]) : ((je = () => (Te.get() === 1 ? `auto` : `none`)), (t[45] = Te), (t[46] = je));
+  t[45] === Te
+    ? (je = t[46])
+    : ((je = () => (Te.get() === 1 ? `auto` : `none`)), (t[45] = Te), (t[46] = je));
   let Me = L(je),
     Ne = L(fe),
     Pe = +!o,
@@ -2534,7 +2664,12 @@ function vr(e) {
                 "--quick-chat-orb-icon-blur": S ? { duration: 0 } : ne,
               },
       },
-      stashedAttentionStyle: { left: P, top: z, x: f === `left` ? Oe : `calc(-100% - ${kr}px)`, y: De },
+      stashedAttentionStyle: {
+        left: P,
+        top: z,
+        x: f === `left` ? Oe : `calc(-100% - ${kr}px)`,
+        y: De,
+      },
       presentedComposerLeft: P,
       presentedComposerWidth: F,
       presentedComposerHeight: R,
@@ -2792,8 +2927,13 @@ function Mr(e) {
     _t = we ? M?.nativeTint : void 0,
     Q = Z.state === `stashed`,
     vt =
-      j.quickChat?.stashedEdge ?? j.quickChat?.nearestStashEdge ?? (j.placement.endsWith(`start`) ? `left` : `right`),
-    yt = j.visibleBounds.left - st + (vt === `left` ? -X.width - X.offsetX : j.visibleBounds.width + X.offsetX),
+      j.quickChat?.stashedEdge ??
+      j.quickChat?.nearestStashEdge ??
+      (j.placement.endsWith(`start`) ? `left` : `right`),
+    yt =
+      j.visibleBounds.left -
+      st +
+      (vt === `left` ? -X.width - X.offsetX : j.visibleBounds.width + X.offsetX),
     bt = ft.composerTop + (ft.composerHeight - X.height) / 2 + X.offsetY,
     xt;
   t[29] !== X.height || t[30] !== X.width || t[31] !== yt || t[32] !== bt
@@ -2852,17 +2992,20 @@ function Mr(e) {
             textOffsetX: a == null ? void 0 : a.left - r.left,
             textOffsetY: a == null ? void 0 : a.top - r.top,
             textFontWeight: i == null ? void 0 : Number(getComputedStyle(i).fontWeight),
-            appshots: Array.from(n.querySelectorAll(`[data-avatar-overlay-quick-chat-appshot] img`), (e) => {
-              let t = e.getBoundingClientRect();
-              return {
-                src: e.currentSrc,
-                className: e.className,
-                left: t.left - r.left,
-                top: t.top - r.top,
-                width: t.width,
-                height: t.height,
-              };
-            }),
+            appshots: Array.from(
+              n.querySelectorAll(`[data-avatar-overlay-quick-chat-appshot] img`),
+              (e) => {
+                let t = e.getBoundingClientRect();
+                return {
+                  src: e.currentSrc,
+                  className: e.className,
+                  left: t.left - r.left,
+                  top: t.top - r.top,
+                  width: t.width,
+                  height: t.height,
+                };
+              },
+            ),
           },
           _ ?? void 0,
         );
@@ -2899,7 +3042,12 @@ function Mr(e) {
   (t[47] === Symbol.for(`react.memo_cache_sentinel`) ? ((Lt = []), (t[47] = Lt)) : (Lt = t[47]),
     (0, zr.useEffect)(It, Lt));
   let Rt;
-  t[48] !== ve || t[49] !== Q || t[50] !== j.quickChat?.nearestStashEdge || t[51] !== U || t[52] !== N || t[53] !== vt
+  t[48] !== ve ||
+  t[49] !== Q ||
+  t[50] !== j.quickChat?.nearestStashEdge ||
+  t[51] !== U ||
+  t[52] !== N ||
+  t[53] !== vt
     ? ((Rt = (e) => {
         let t = Qe.avatarOverlay;
         if (
@@ -2917,7 +3065,8 @@ function Mr(e) {
           r = qe.current;
         if (
           ((n - r.lastAt > 180 ||
-            (!r.triggered && (n - r.startedAt > 220 || Math.sign(r.distance) !== Math.sign(e.deltaX)))) &&
+            (!r.triggered &&
+              (n - r.startedAt > 220 || Math.sign(r.distance) !== Math.sign(e.deltaX)))) &&
             ((r = { distance: 0, startedAt: n, lastAt: n, triggered: !1 }), (qe.current = r)),
           (r.lastAt = n),
           (r.distance += e.deltaX),
@@ -2949,7 +3098,10 @@ function Mr(e) {
     : ((Bt = () => {
         let e = Ge.current;
         if (e != null)
-          return (e.addEventListener(`wheel`, zt, { passive: !1 }), () => e.removeEventListener(`wheel`, zt));
+          return (
+            e.addEventListener(`wheel`, zt, { passive: !1 }),
+            () => e.removeEventListener(`wheel`, zt)
+          );
       }),
       (t[55] = zt),
       (t[56] = Bt));
@@ -3095,7 +3247,12 @@ function Mr(e) {
                 ((Ge.current = e), w?.(e));
               },
               ...t,
-              className: W(`absolute z-20 h-10`, fn.controls, !ot && fn.barMaterial, !_e && `invisible`),
+              className: W(
+                `absolute z-20 h-10`,
+                fn.controls,
+                !ot && fn.barMaterial,
+                !_e && `invisible`,
+              ),
               "aria-hidden": we || !_e || void 0,
               inert: we || !_e,
               "data-quick-chat-presentation": we ? `minimized` : Z.state,
@@ -3107,7 +3264,8 @@ function Mr(e) {
                 let t = Xe.current;
                 ((Xe.current = !1),
                   !(
-                    (e.relatedTarget instanceof Node && e.currentTarget.contains(e.relatedTarget)) ||
+                    (e.relatedTarget instanceof Node &&
+                      e.currentTarget.contains(e.relatedTarget)) ||
                     (e.relatedTarget == null && t)
                   ) && (U?.(null, Ye.current), (Ye.current = !1), (Je.current = !1), de?.(!1)));
               },
@@ -3115,7 +3273,8 @@ function Mr(e) {
                 !Q &&
                   Dt &&
                   U?.(
-                    e.target instanceof HTMLElement && e.target.dataset.avatarOverlayCompositionAutofocus === `true`
+                    e.target instanceof HTMLElement &&
+                      e.target.dataset.avatarOverlayCompositionAutofocus === `true`
                       ? `editor`
                       : `controls`,
                   );
@@ -3165,7 +3324,9 @@ function Mr(e) {
                     let t = Dt && n === Ne.current;
                     ((Je.current = t),
                       de?.(t),
-                      n.dataset.avatarOverlayCompositionAutofocus === `true` ? Ie.current?.focus() : n.focus());
+                      n.dataset.avatarOverlayCompositionAutofocus === `true`
+                        ? Ie.current?.focus()
+                        : n.focus());
                   }
                 }
               },
@@ -3184,7 +3345,9 @@ function Mr(e) {
                       style: St,
                       variant: `quick-chat-stash-extension`,
                     }),
-                    Q && ne != null ? (0, $.jsx)(q.div, { className: `absolute z-30`, style: n, children: ne }) : null,
+                    Q && ne != null
+                      ? (0, $.jsx)(q.div, { className: `absolute z-30`, style: n, children: ne })
+                      : null,
                     null,
                     (0, $.jsxs)(q.form, {
                       ref: Pe,
@@ -3215,16 +3378,23 @@ function Mr(e) {
                           "data-avatar-overlay-quick-chat-target-top": pt.top,
                           "data-avatar-overlay-quick-chat-actions": Ot || void 0,
                           "data-avatar-overlay-quick-chat-icon-only": Et || void 0,
-                          "data-avatar-overlay-quick-chat-collapsed": Z.state === `collapsed` || void 0,
+                          "data-avatar-overlay-quick-chat-collapsed":
+                            Z.state === `collapsed` || void 0,
                           "data-avatar-overlay-hit-region": `notification-composer`,
                           nativeSurfaceId: `composer`,
                           variant: Q ? `quick-chat-stash` : `quick-chat`,
                           children: [
                             (0, $.jsxs)(q.div, {
                               "aria-hidden": Q || void 0,
-                              className: W(`flex min-w-0 flex-1`, Q ? `items-center` : `h-full flex-col items-stretch`),
+                              className: W(
+                                `flex min-w-0 flex-1`,
+                                Q ? `items-center` : `h-full flex-col items-stretch`,
+                              ),
                               inert: Q,
-                              style: { opacity: h, visibility: Se && !Ct && !tt && !Be ? `hidden` : void 0 },
+                              style: {
+                                opacity: h,
+                                visibility: Se && !Ct && !tt && !Be ? `hidden` : void 0,
+                              },
                               children: [
                                 (0, $.jsx)(P, {
                                   custom: Se,
@@ -3295,7 +3465,8 @@ function Mr(e) {
                                               ? (0, $.jsx)(`span`, {
                                                   "aria-hidden": `true`,
                                                   className: `pointer-events-none invisible h-18 w-24 shrink-0 rounded-lg`,
-                                                  "data-avatar-overlay-quick-chat-appshot-destination": !0,
+                                                  "data-avatar-overlay-quick-chat-appshot-destination":
+                                                    !0,
                                                 })
                                               : null,
                                           ],
@@ -3428,7 +3599,11 @@ function Mr(e) {
                                       }),
                                     })
                                   : null,
-                                et ? null : (0, $.jsx)(oe, { className: vt === `left` ? `-rotate-90` : `rotate-90` }),
+                                et
+                                  ? null
+                                  : (0, $.jsx)(oe, {
+                                      className: vt === `left` ? `-rotate-90` : `rotate-90`,
+                                    }),
                               ],
                             }),
                           ],
@@ -3447,7 +3622,8 @@ function Mr(e) {
                       onPointerUp: ie,
                       children: (0, $.jsx)(Wt, {
                         className: ut.nativeTint,
-                        "data-avatar-overlay-quick-chat-resizable-background": (!Et && !Q) || void 0,
+                        "data-avatar-overlay-quick-chat-resizable-background":
+                          (!Et && !Q) || void 0,
                         "data-avatar-overlay-hit-region": `realtime-voice`,
                         "data-avatar-overlay-native-tint": _t,
                         nativeSurfaceId: `voice-controls`,
@@ -3483,7 +3659,9 @@ function Mr(e) {
                                   children: (0, $.jsx)(q.span, {
                                     className: `flex items-center justify-center`,
                                     style: { filter: R, opacity: O },
-                                    children: $e ? (0, $.jsx)(Un, { reduceMotion: !!Ze }) : (0, $.jsx)(r, {}),
+                                    children: $e
+                                      ? (0, $.jsx)(Un, { reduceMotion: !!Ze })
+                                      : (0, $.jsx)(r, {}),
                                   }),
                                 }),
                         }),
@@ -3504,13 +3682,15 @@ function Mr(e) {
                       onPointerUp: ie,
                       children: (0, $.jsx)(Wt, {
                         className: ut.nativeTint,
-                        "data-avatar-overlay-quick-chat-resizable-background": (!ot && !Et && !Q) || void 0,
+                        "data-avatar-overlay-quick-chat-resizable-background":
+                          (!ot && !Et && !Q) || void 0,
                         "data-avatar-overlay-hit-region": `mascot-badge`,
                         "data-avatar-overlay-native-tint": wt ? void 0 : _t,
                         nativeSurfaceId: `mascot-badge`,
                         variant: `quick-chat-orb`,
                         children: (0, $.jsx)(`button`, {
-                          "aria-label": M?.ariaLabel ?? Oe.formatMessage(s ? Br.hideActivity : Br.showActivity),
+                          "aria-label":
+                            M?.ariaLabel ?? Oe.formatMessage(s ? Br.hideActivity : Br.showActivity),
                           className: `flex size-full cursor-interaction items-center justify-center rounded-full text-default select-none`,
                           "data-quick-chat-control": `surface`,
                           type: `button`,
@@ -3531,7 +3711,9 @@ function Mr(e) {
                                   })
                                 : (0, $.jsxs)($.Fragment, {
                                     children: [
-                                      (0, $.jsx)(y, { className: W(`text-default`, fn.activityBell) }),
+                                      (0, $.jsx)(y, {
+                                        className: W(`text-default`, fn.activityBell),
+                                      }),
                                       M != null && !M.isIconOnly
                                         ? (0, $.jsx)(`span`, {
                                             className: W(

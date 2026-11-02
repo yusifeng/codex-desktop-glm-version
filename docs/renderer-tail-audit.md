@@ -1,5 +1,32 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Voice/subscription/thumbnail release-owner convergence：继续按正向行数缺口
+一次性恢复 `workspace-seat-banner`、`settings-command-menu-section-items`、
+`work-mode-upsell-modal`、`learning-model-action-potential-neuron`、
+`registered-chatgpt-subagents-thumbnail`、`binary-preview-source`、
+`subscription-platform-dialog`、`realtime-voice-controls-surface`、
+`learning-model-network-fault-tolerance`、`mcp-extension-quick-action-dialog-core`、
+`learning-model-simpsons-rule`、`browser-mobile-handoff-page`、
+`plugin-skill-queries`、`cadence-events`、`agent-menu`、
+`learning-model-co2-and-temperature-time-series`、`subscription-update-dialog`、
+`navigation-blocker`、`learning-model-phase-change-cycle`、`sites-default-thumbnail`、
+`restore-image-preview-tab`、`learning-model-binary-heap-operations`、
+`selected-text-annotation-editor`、`learning-model-array-queue-front-rear`、
+`submit-feedback`、`learning-model-paired-t-test`、`mobile-age-verification-page`、
+`work-mode-pet-content`、`library-empty-trash-dialog` 与 `svg-arrow` 三十个发布
+owner，净恢复 5,176 行发布 TypeScript。旧缩减 ABI/mock 回归已迁移为发布一致性
+验证，同时保留相邻 menu、account、conversation、artifact、extension、billing、
+automation、Browser、安全页、learning model、feedback、library 与 hub 行为覆盖。
+28 组关联测试、12,448/12,448 transform check、1,888/1,888 renderer
+build/verify、2,247/2,247 app-code coverage、0 semantic tail、typecheck 与
+1,912-script test-index 通过。严格 hub 消费推进到 app-shared 1,803/3,185、
+app-initial 5,844/8,204、app-primary 767/917，仍为 0 unreviewed、0 invalid
+consumers。按发布源码正向行数缺口口径，剩余由 32,227 行降至 27,051 行，
+覆盖率约 97.39%；可比对 owner 中已有 473 个与发布证据一致，仍有 1,389 个
+不完全一致，另有 454 个缺少双方可比资产。425 个 preserved 边界、三个聚合 hub
+的剩余耦合导出与最终真实 Electron E2E 尚未完成，因此本批仍不构成
+“完整反编译完成”。
+
 2026-11-02 Largest-gap release-owner convergence：按当前正向行数缺口排序，一次性恢复
 `usage`、`file-diff-alt`、`workspace-agent-detail-page`、
 `thumbnail-worker-font-metrics`、`registered-pull-request-thumbnail`、

@@ -7,13 +7,6 @@ import * as esbuild from "esbuild";
 import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const cases = [
-  [
-    "banner-235b1db18610.js",
-    "workspace-seat-banner",
-    ["rolldown-runtime", "app-shared", "app-initial"],
-    0,
-    ["ViewOnlySeatBanner", "WorkspaceSeatTopBanner"],
-  ],
 ];
 const releaseAliases = new Map([
   ["state-92adb03a8a05", "workspace-renewal-state"],
@@ -116,14 +109,8 @@ for (const [_asset, directory, _deps, _dynamic, exports] of cases) {
   const module = await load(directory);
   assert.deepEqual(Object.keys(module).sort(), [...exports].sort());
   assertions++;
-  if (directory === "workspace-seat-banner") {
-    state.account = null;
-    assert.equal(module.WorkspaceSeatTopBanner(), null);
-    state.account = { accountId: "a", userId: "u", seatType: "view_only" };
-    assert.equal(module.ViewOnlySeatBanner().type.name, "SeatBanner");
-    assertions += 2;
-  }
 }
+assertions += assertReleaseOwner("workspace-seat-banner");
 assertions += assertReleaseOwner("chatgpt-header-upgrade");
 assertions += assertReleaseOwner("subscription-payment-announcement");
 console.log(`misc-ui-utils NK: ${assertions} assertions passed`);

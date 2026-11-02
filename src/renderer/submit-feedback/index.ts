@@ -1,6 +1,169 @@
-import "@rchunk/app-shared";import "@rchunk/app-initial";
-export interface FeedbackAppInfo { version:string;buildNumber?:string;buildFlavor?:string; }
-export interface FeedbackTransport { upload(input:{classification:string;reason:string;threadId?:string;includeLogs:boolean;extraLogFiles?:readonly string[];tags:Record<string,unknown>}):Promise<{threadId:string}>;createDesktopLogArchive?(input:{hostId:string;includeBrowserTabs:boolean;includeDesktopLogs:boolean;includeNativeHostDiagnostics:boolean;includeProcessMemoryDiagnostics:boolean}):Promise<{archiveId:string;filePaths:string[]}>;deleteDesktopLogArchive?(archiveId:string):Promise<void>;remove?(path:string):Promise<void>; }
-export interface SubmitFeedbackOptions { scope?:unknown;attachmentPaths?:readonly string[];classification:string;description:string;extraTags?:Record<string,unknown>;hostId?:string;includeDesktopLogArchive?:boolean;includeBrowserTabs?:boolean;includeLogs?:boolean;includeNativeHostDiagnostics?:boolean;appInfo?:FeedbackAppInfo;threadId?:string;runtimeBundleVersion?:string|null;transport:FeedbackTransport; }
-async function submitFeedback(options:SubmitFeedbackOptions):Promise<{feedbackId:string}>{const hostId=options.hostId==="durable"?"local":options.hostId??"local",appInfo=options.appInfo??{version:"unknown"},tags:Record<string,unknown>={app_version:appInfo.version,...options.extraTags};if(appInfo.buildNumber)tags.app_build=appInfo.buildNumber;if(appInfo.buildFlavor)tags.buildFlavor=appInfo.buildFlavor;if(options.runtimeBundleVersion)tags.runtime_bundle_version=options.runtimeBundleVersion;let archiveId:string|undefined,archivePaths:string[]=[];try{if(options.includeDesktopLogArchive&&(options.includeLogs||options.includeBrowserTabs)&&options.transport.createDesktopLogArchive){const archive=await options.transport.createDesktopLogArchive({hostId,includeBrowserTabs:options.includeBrowserTabs??false,includeDesktopLogs:options.includeLogs??false,includeNativeHostDiagnostics:options.includeNativeHostDiagnostics??false,includeProcessMemoryDiagnostics:Boolean(options.includeLogs&&options.classification==="high-ram-usage")});archiveId=archive.archiveId;archivePaths=archive.filePaths;}const files=[...new Set([...(options.attachmentPaths??[]),...archivePaths])];const result=await options.transport.upload({classification:options.classification,reason:options.description,threadId:options.threadId,includeLogs:options.includeLogs??false,extraLogFiles:files.length?files:undefined,tags});return{feedbackId:result.threadId};}finally{await Promise.all(archivePaths.map(path=>options.transport.remove?.(path)));if(archiveId)await options.transport.deleteDesktopLogArchive?.(archiveId);}}
-const initializeSubmitFeedback=():void=>{};export{submitFeedback as n,initializeSubmitFeedback as t};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  Hz as t,
+  II as n,
+  Q3 as r,
+  RI as i,
+  Z3 as a,
+  wL as o,
+  yI as s,
+} from "@rchunk/app-shared";
+import {
+  Qln as c,
+  Rin as l,
+  Ugn as u,
+  Wgn as d,
+  fgn as f,
+  mnt as p,
+  nun as m,
+  pnt as h,
+  ugn as g,
+  zin as _,
+} from "@rchunk/app-initial";
+async function v({
+  scope: e,
+  attachmentPaths: t,
+  classification: i,
+  description: a,
+  extraTags: o,
+  hostId: s,
+  includeDesktopLogArchive: d,
+  includeBrowserTabs: f,
+  includeLogs: p,
+  includeNativeHostDiagnostics: m,
+  appInfo: _,
+  threadId: v,
+}) {
+  let b = s === `durable` ? g : s,
+    x = null,
+    S = a,
+    C = [],
+    w = t?.length ? Array.from(new Set(t)) : void 0,
+    T = p && i === `high-ram-usage`;
+  try {
+    let [t, r] = await Promise.all([_ ?? h.appInfo.get(), y()]),
+      a = { ...l(v), app_version: t.version };
+    if (
+      (o != null && Object.assign(a, o),
+      t.buildNumber != null && (a.app_build = t.buildNumber),
+      t.buildFlavor != null && (a.buildFlavor = t.buildFlavor),
+      r != null && (a.runtime_bundle_version = r),
+      d && (p || f))
+    ) {
+      let t = await c(`feedback-desktop-log-archive`, {
+        params: {
+          hostId: b,
+          includeBrowserTabs: f,
+          includeDesktopLogs: p,
+          includeNativeHostDiagnostics: m,
+          includeProcessMemoryDiagnostics: T,
+        },
+      });
+      x = t.archiveId;
+      let r = t.filePaths;
+      if (b !== `local` && r.length > 0) {
+        let t = b.startsWith(`remote-ssh`) || b.startsWith(`ssh:`);
+        if (!t) {
+          let e = await Promise.all(
+              r.map((e) => c(`read-file-metadata`, { params: { hostId: g, path: e } })),
+            ),
+            t = [];
+          ((r = r.filter((r, i) => {
+            let { sizeBytes: a } = e[i];
+            return a != null && a > 47185920 ? (t.push(n(r)), !1) : !0;
+          })),
+            t.length > 0 &&
+              (S += `\n\nDesktop diagnostics omitted from remote feedback because they exceed the 45 MiB transfer limit: ${t.join(`, `)}`));
+        }
+        ((C = (
+          await u(e, b).uploadLocalFileAttachments({
+            attachments: r.map((e) => ({ label: n(e), path: e, fsPath: e })),
+            allowSftpUpload: t,
+          })
+        ).map(({ fsPath: e }) => e)),
+          (r = C));
+      }
+      let i = [...(w ?? []), ...r];
+      w = i.length === 0 ? void 0 : i;
+    }
+    return {
+      feedbackId: (
+        await u(e, b).sendRequest(`feedback/upload`, {
+          classification: i,
+          reason: S,
+          threadId: v,
+          includeLogs: p,
+          extraLogFiles: w,
+          tags: a,
+        })
+      ).threadId,
+    };
+  } finally {
+    if (
+      (await Promise.all(
+        C.map(async (t) => {
+          try {
+            await u(e, b).sendRequest(`fs/remove`, { path: t, force: !0 }, { source: `feedback` });
+          } catch (e) {
+            r.warning(`Failed to delete staged remote feedback log`, {
+              safe: {},
+              sensitive: { error: e, path: t },
+            });
+          }
+        }),
+      ),
+      x != null)
+    )
+      try {
+        await c(`delete-feedback-desktop-log-archive`, { params: { archiveId: x } });
+      } catch (e) {
+        r.warning(`Failed to delete feedback desktop log archive`, {
+          safe: {},
+          sensitive: { error: e },
+        });
+      }
+  }
+}
+async function y() {
+  if (h?.primaryRuntime == null) return null;
+  let e = null;
+  try {
+    try {
+      var n = s();
+      let r = n.u(h.primaryRuntime.getInstalledBundleVersion()),
+        i = t.safeParse(
+          await Promise.race([
+            r,
+            new Promise((t, n) => {
+              e = globalThis.setTimeout(() => {
+                n(Error(`Timed out reading bundled runtime version for feedback`));
+              }, b);
+            }),
+          ]),
+        );
+      return i.success ? i.data : null;
+    } catch (e) {
+      n.e = e;
+    } finally {
+      n.d();
+    }
+  } catch (e) {
+    return (
+      r.warning(`Failed to read bundled runtime version for feedback`, {
+        safe: {},
+        sensitive: { error: e },
+      }),
+      null
+    );
+  } finally {
+    e != null && globalThis.clearTimeout(e);
+  }
+}
+var b;
+function x() {
+  return (x = e(() => {
+    (o(), d(), p(), f(), a(), i(), m(), _(), (b = 2e3));
+  }))();
+}
+export { v as n, x as t };

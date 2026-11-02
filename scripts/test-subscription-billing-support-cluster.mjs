@@ -59,28 +59,7 @@ assert.equal(calls[1].options.currency, "JPY");
 
 assertReleaseOwner("payment-method-display");
 
-// cadence-events: 12
-const cadence = await bundle("cadence-events");
-assert.deepEqual(Object.keys(cadence).sort(), ["a", "c", "i", "n", "o", "r", "s", "t"]);
-assert.equal(cadence.c({ amount_due: { amount: 0 }, renewal_date: "2026-11-01T00:00:00Z" }), true);
-assert.equal(cadence.c({ amount_due: { amount: 1 }, renewal_date: "2026-11-01T00:00:00Z" }), false);
-const cadenceState = cadence.i(
-  { plan_type: "plus" },
-  { active_until: "2026-11-01T00:00:00Z", billing_currency: "USD", billing_period: "monthly", will_renew: true },
-  { country_code: "US", currency_config: { symbol_code: "USD", plus: { month: { amount: 20 }, year: { amount: 15 } } } },
-  Date.parse("2026-09-01T00:00:00Z"),
-);
-assert.equal(cadenceState.currentCadence, "monthly");
-assert.equal(cadenceState.annualSavingsAmount, 60);
-assert.equal(cadenceState.annualSavingsPercentage, 25);
-assert.equal(cadenceState.isAcquisitionCandidate, true);
-assert.equal(cadence.a(cadenceState, "yearly"), "change_to_annual");
-assert.equal(cadence.r(new Error("another plan change is pending"), "monthly"), "conflicting_plan_change");
-assert.equal(cadence.s({ structure: "personal", plan_type: "plus" }), true);
-assert.equal(cadence.s({ structure: "team", plan_type: "plus" }), false);
-const cadenceEvents = [];
-cadence.n({ log(event) { cadenceEvents.push(event); } }, { action: "shown" });
-assert.deepEqual(cadenceEvents, [{ action: "shown" }]);
+assertReleaseOwner("cadence-events");
 
 // delinquent-upgrade-preparation: 7
 const preparation = await bundle("delinquent-upgrade-preparation");

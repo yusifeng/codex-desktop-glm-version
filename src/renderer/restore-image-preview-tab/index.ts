@@ -1,33 +1,200 @@
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as turnEntriesChunk from "@rchunk/local-conversation-thread-turn-entries";
-import "@rchunk/rolldown-runtime";
-import { getPathBasename as basename } from "../app-shared/runtime/get-path-basename";
-
-interface RouteState { routeKind?: string; }
-interface Scope { value: RouteState; get(signal: unknown, parameter?: unknown): unknown; query: { getOrFetch(query: unknown, input: unknown): Promise<{ existingPaths: string[] }> }; }
-interface AttachmentIdentity { kind: "asset-pointer"; pointer: string }
-interface LocalAttachmentIdentity { kind: "local-path"; path: string }
-type DurableImageIdentity = { source: "generated-image"; imageItemId: string } | { source: "artifact"; hostId: string; path: string } | { source: string; hostId: string; attachmentIdentity: AttachmentIdentity | LocalAttachmentIdentity };
-interface PreviewOptions { durableIdentity?: DurableImageIdentity; [key: string]: unknown }
-type OpenPreview = (scope: Scope, props: Record<string, unknown>, options: PreviewOptions) => void;
-interface InitialApi { Dyt: unknown; Fut(): void; GZt: unknown; HZt(): void; LCt(): void; M_: unknown; Put: unknown; RCt: unknown; U3t(): void; Ugn(scope: Scope, host: unknown): { ensureConversationHistoryLoaded(id: string): Promise<void> }; V3t(path: string): string; Wgn(): void; bQt: unknown; byt(): void; itn(): void; k_(): void; mpn: unknown; ppn(): void; qB(input: { conversationTitle: string | null; images: GeneratedImage[]; intl: unknown }): PreviewImage[]; ttn(route: RouteState): string | null; wQt: unknown; }
-interface SharedApi { RI(): void; }
-interface GeneratedImage { id: string; src?: string | null; [key: string]: unknown }
-interface PreviewImage { id: string; src: string; previewSrc: string; alt: string; tabTitle: string; }
-const { Dyt: currentHostIdSignal, Fut: initializeImageAttachments, GZt: historyLoadedSignal, HZt: initializeConversationModel, LCt: initializeImagePreviewRuntime, M_: turnEntriesSignal, Put: existingPathsQuery, RCt: conversationTitleSignal, U3t: initializeGeneratedImages, Ugn: conversationHistoryLoader, V3t: normalizeLocalPath, bQt: projectlessOutputDirectorySignal, byt: initializeImageUtilities, itn: initializeRouteState, k_: initializeAttachmentRuntime, mpn: intlSignal, ppn: initializePreviewTabs, qB: buildGeneratedImagePreviews, ttn: getConversationId, wQt: conversationHostSignal } = appInitialChunk as unknown as InitialApi;
-const { RI: initializePathRuntime } = appSharedChunk as unknown as SharedApi;
-const { n: collectGeneratedImageEntries, r: initializeTurnEntries } = turnEntriesChunk as unknown as { n(input: Record<string, unknown>): unknown[]; r(): void };
-function routeMatches(scope: Scope, hostId: string): boolean { return scope.value.routeKind === "local-thread" && scope.get(currentHostIdSignal) === hostId; }
-async function existingPath(scope: Scope, hostId: string, path: string): Promise<boolean> { if (!routeMatches(scope, hostId)) return false; try { const result = await scope.query.getOrFetch(existingPathsQuery, { hostId, paths: [path] }); return result.existingPaths.includes(path) && routeMatches(scope, hostId); } catch { return false; } }
-function normalizePath(path: string): string { return normalizeLocalPath(path); }
-function findInputAttachment(inputs: readonly Record<string, unknown>[], identity: AttachmentIdentity | LocalAttachmentIdentity): string | null { for (const input of inputs) { if (identity.kind === "asset-pointer" && input.type === "image" && input.url === identity.pointer) return String(input.url); if (identity.kind === "local-path" && input.type === "localImage" && typeof input.path === "string" && normalizePath(input.path) === identity.path) return input.path; } return null; }
-function findAttachmentList(attachments: readonly Record<string, unknown>[] | null | undefined, identity: AttachmentIdentity | LocalAttachmentIdentity): string | null { if (attachments == null || identity.kind !== "local-path") return null; for (const attachment of attachments) for (const candidate of [attachment.fsPath, attachment.path]) if (typeof candidate === "string" && normalizePath(candidate) === identity.path) return normalizePath(candidate); return null; }
-function visibleEntries(scope: Scope, conversationId: string): { generatedImageTurnEntries: GeneratedImage[]; visibleTurnEntries: Array<Record<string, unknown>> } { return scope.get(turnEntriesSignal, { conversationId, isBackgroundSubagentsEnabled: true }) as { generatedImageTurnEntries: GeneratedImage[]; visibleTurnEntries: Array<Record<string, unknown>> }; }
-function findUploadedImage(scope: Scope, conversationId: string, durable: Extract<DurableImageIdentity, { attachmentIdentity: AttachmentIdentity | LocalAttachmentIdentity }>): string | null { const entries = visibleEntries(scope, conversationId).visibleTurnEntries; for (const entry of entries) { if (!("turn" in entry)) continue; const turn = entry.turn as Record<string, unknown>; const params = turn.params as Record<string, unknown>; const fromParams = findInputAttachment((params.input as Record<string, unknown>[]) ?? [], durable.attachmentIdentity) ?? findAttachmentList(params.attachments as Record<string, unknown>[] | undefined, durable.attachmentIdentity); if (fromParams != null) return fromParams; for (const item of (turn.items as Record<string, unknown>[]) ?? []) { if (item.type !== "userMessage" && item.type !== "steeringUserMessage") continue; const content = (item.type === "userMessage" ? item.content : item.input) as Record<string, unknown>[]; const found = findInputAttachment(content ?? [], durable.attachmentIdentity) ?? findAttachmentList(item.attachments as Record<string, unknown>[] | undefined, durable.attachmentIdentity); if (found != null) return found; } } return null; }
-async function ensureAndRead<Value>(scope: Scope, conversationId: string, read: () => Value | null): Promise<Value | null> { const current = read(); if (current != null || scope.get(historyLoadedSignal, conversationId) === true) return current; try { await conversationHistoryLoader(scope, scope.get(conversationHostSignal, conversationId)).ensureConversationHistoryLoaded(conversationId); } catch { return null; } return read(); }
-function generatedImages(scope: Scope, conversationId: string): GeneratedImage[] { const entries = visibleEntries(scope, conversationId).generatedImageTurnEntries; return collectGeneratedImageEntries({ isAeonThread: false, isBackgroundSubagentsEnabled: true, requestUserInputAsyncUiEnabled: true, previousEntries: [], projectlessOutputDirectory: scope.get(projectlessOutputDirectorySignal, conversationId) ?? null, visibleTurnEntries: entries }) as GeneratedImage[]; }
-async function restoreGenerated(scope: Scope, conversationId: string, durable: Extract<DurableImageIdentity, { imageItemId: string }>, options: PreviewOptions, open: OpenPreview): Promise<boolean> { const images = await ensureAndRead(scope, conversationId, () => { const values = generatedImages(scope, conversationId); return values.some(image => image.id === durable.imageItemId && image.src != null) ? values : null; }); if (images == null) return false; const previews = buildGeneratedImagePreviews({ conversationTitle: scope.get(conversationTitleSignal, conversationId) as string | null, images, intl: scope.get(intlSignal) }); const selected = previews.find(image => image.id === durable.imageItemId && image.src.length > 0); if (selected == null) return false; open(scope, { alt: selected.alt, attachmentSrc: selected.src, generatedImages: previews, initialImageId: selected.id, initialView: "single", liveTailImagePolicy: "initial-only", referrerPolicy: "no-referrer", src: selected.previewSrc, title: selected.tabTitle }, { ...options, durableIdentity: durable }); return true; }
-async function restoreImagePreviewTab(scope: Scope, durable: DurableImageIdentity, options: PreviewOptions, open: OpenPreview): Promise<boolean> { const conversationId = getConversationId(scope.value); if (conversationId == null) return false; if ("imageItemId" in durable) return restoreGenerated(scope, conversationId, durable, options, open); if (!routeMatches(scope, durable.hostId)) return false; if ("path" in durable) { if (!await existingPath(scope, durable.hostId, durable.path)) return false; const title = basename(durable.path); open(scope, { alt: title, attachmentSrc: durable.path, imageSourceContext: { conversationId, hostId: durable.hostId }, initialView: "single", referrerPolicy: "no-referrer", src: durable.path, title }, { ...options, durableIdentity: durable }); return true; } const source = await ensureAndRead(scope, conversationId, () => findUploadedImage(scope, conversationId, durable)); if (source == null || !routeMatches(scope, durable.hostId) || durable.attachmentIdentity.kind === "local-path" && !await existingPath(scope, durable.hostId, durable.attachmentIdentity.path)) return false; const title = (scope.get(intlSignal) as { formatMessage(descriptor: Record<string, string>): string }).formatMessage({ id: "codex.localConversation.userImageAttachment", defaultMessage: "User attachment", description: "Alt text for user image attachment in local conversation" }); open(scope, { alt: title, attachmentSrc: source, imageSourceContext: { conversationId, hostId: durable.hostId }, imageSource: "uploaded", initialView: "single", referrerPolicy: "no-referrer", src: source, title }, { ...options, durableIdentity: durable }); return true; }
-initializePathRuntime(); initializeConversationModel(); initializePreviewTabs(); initializeImageAttachments(); initializeAttachmentRuntime(); initializeTurnEntries(); initializeImagePreviewRuntime(); initializeGeneratedImages(); initializeRouteState(); initializeImageUtilities();
-export { restoreImagePreviewTab };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { II as t, RI as n } from "@rchunk/app-shared";
+import {
+  Dyt as r,
+  Fut as i,
+  GZt as a,
+  HZt as o,
+  LCt as s,
+  M_ as c,
+  Put as l,
+  RCt as u,
+  U3t as d,
+  Ugn as f,
+  V3t as p,
+  Wgn as m,
+  bQt as h,
+  byt as g,
+  itn as _,
+  k_ as v,
+  mpn as y,
+  ppn as b,
+  qB as x,
+  ttn as S,
+  wQt as C,
+} from "@rchunk/app-initial";
+import { n as w, r as T } from "@rchunk/local-conversation-thread-turn-entries";
+async function E(e, n, r, i) {
+  let a = S(e.value);
+  if (a == null) return !1;
+  if (n.source === `generated-image`) return D(e, a, n, r, i);
+  if (!P(e, n.hostId)) return !1;
+  if (n.source === `artifact`) {
+    if (!(await N(e, n.hostId, n.path))) return !1;
+    let o = t(n.path);
+    return (
+      i(
+        e,
+        {
+          alt: o,
+          attachmentSrc: n.path,
+          imageSourceContext: { conversationId: a, hostId: n.hostId },
+          initialView: `single`,
+          referrerPolicy: `no-referrer`,
+          src: n.path,
+          title: o,
+        },
+        { ...r, durableIdentity: n },
+      ),
+      !0
+    );
+  }
+  let o = await k(e, a, () => A(e, a, n));
+  if (
+    o == null ||
+    !P(e, n.hostId) ||
+    (n.attachmentIdentity.kind === `local-path` &&
+      !(await N(e, n.hostId, n.attachmentIdentity.path)))
+  )
+    return !1;
+  let s = e
+    .get(y)
+    .formatMessage({
+      id: `codex.localConversation.userImageAttachment`,
+      defaultMessage: `User attachment`,
+      description: `Alt text for user image attachment in local conversation`,
+    });
+  return (
+    i(
+      e,
+      {
+        alt: s,
+        attachmentSrc: o,
+        imageSourceContext: { conversationId: a, hostId: n.hostId },
+        imageSource: `uploaded`,
+        initialView: `single`,
+        referrerPolicy: `no-referrer`,
+        src: o,
+        title: s,
+      },
+      { ...r, durableIdentity: n },
+    ),
+    !0
+  );
+}
+async function D(e, t, n, r, i) {
+  let a = await k(e, t, () => {
+    let r = O(e, t);
+    return r.some((e) => e.id === n.imageItemId && e.src != null) ? r : null;
+  });
+  if (a == null) return !1;
+  let o = x({ conversationTitle: e.get(u, t) ?? null, images: a, intl: e.get(y) }),
+    s = o.find((e) => e.id === n.imageItemId && e.src.length > 0);
+  return (
+    s != null &&
+    (i(
+      e,
+      {
+        alt: s.alt,
+        attachmentSrc: s.src,
+        generatedImages: o,
+        initialImageId: s.id,
+        initialView: `single`,
+        liveTailImagePolicy: `initial-only`,
+        referrerPolicy: `no-referrer`,
+        src: s.previewSrc,
+        title: s.tabTitle,
+      },
+      { ...r, durableIdentity: n },
+    ),
+    !0)
+  );
+}
+function O(e, t) {
+  return w({
+    isAeonThread: !1,
+    isBackgroundSubagentsEnabled: !0,
+    requestUserInputAsyncUiEnabled: !0,
+    previousEntries: [],
+    projectlessOutputDirectory: e.get(h, t) ?? null,
+    visibleTurnEntries: e.get(c, { conversationId: t, isBackgroundSubagentsEnabled: !0 })
+      .generatedImageTurnEntries,
+  });
+}
+async function k(e, t, n) {
+  let r = n();
+  if (r != null || e.get(a, t) === !0) return r;
+  try {
+    await f(e, e.get(C, t)).ensureConversationHistoryLoaded(t);
+  } catch {
+    return null;
+  }
+  return n();
+}
+function A(e, t, n) {
+  let { visibleTurnEntries: r } = e.get(c, { conversationId: t, isBackgroundSubagentsEnabled: !0 });
+  for (let e of r) {
+    if (!(`turn` in e)) continue;
+    let { turn: t } = e,
+      r = j(t.params.input, n);
+    if (r != null) return r;
+    let i = M(t.params.attachments, n);
+    if (i != null) return i;
+    for (let e of t.items) {
+      if (e.type !== `userMessage` && e.type !== `steeringUserMessage`) continue;
+      let t = j(e.type === `userMessage` ? e.content : e.input, n);
+      if (t != null) return t;
+      let r = M(e.attachments, n);
+      if (r != null) return r;
+    }
+  }
+  return null;
+}
+function j(e, t) {
+  for (let n of e) {
+    if (
+      t.attachmentIdentity.kind === `asset-pointer` &&
+      n.type === `image` &&
+      `url` in n &&
+      n.url === t.attachmentIdentity.pointer
+    )
+      return n.url;
+    if (
+      t.attachmentIdentity.kind === `local-path` &&
+      n.type === `localImage` &&
+      p(n.path) === t.attachmentIdentity.path
+    )
+      return n.path;
+  }
+  return null;
+}
+function M(e, t) {
+  if (e == null || t.attachmentIdentity.kind !== `local-path`) return null;
+  for (let n of e)
+    for (let e of [n.fsPath, n.path]) {
+      let n = p(e);
+      if (n === t.attachmentIdentity.path) return n;
+    }
+  return null;
+}
+async function N(e, t, n) {
+  if (!P(e, t)) return !1;
+  try {
+    return (
+      (await e.query.getOrFetch(l, { hostId: t, paths: [n] })).existingPaths.includes(n) && P(e, t)
+    );
+  } catch {
+    return !1;
+  }
+}
+function P(e, t) {
+  return e.value.routeKind === `local-thread` && e.get(r) === t;
+}
+function F() {
+  return (F = e(() => {
+    (m(), o(), b(), i(), v(), T(), s(), d(), _(), g(), n());
+  }))();
+}
+F();
+export { E as restoreImagePreviewTab };

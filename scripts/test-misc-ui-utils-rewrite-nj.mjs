@@ -9,7 +9,6 @@ import { assertReleaseOwner } from './release-owner-test-helpers.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCE = '/Users/david/Workspace/ppio_github/chatgpt-desktop-src/app/webview/assets';
 const modules = [
-  ['library-empty-trash-758597c77867.js', 'library-empty-trash-dialog', ['EmptyLibraryTrashDialog']],
   ['open-in-codex-c690ffed81f6.js', 'windows-tabs-open', ['runWindowsTabsOpen']],
 ];
 const aliases = new Map([
@@ -29,6 +28,7 @@ for (const [asset, semantic] of modules) {
   sourceAssertions += 3;
 }
 sourceAssertions += assertReleaseOwner('parental-control-notifications-runtime');
+sourceAssertions += assertReleaseOwner('library-empty-trash-dialog');
 
 globalThis.__nj = { hookIndex: 0, hookState: [], logs: [] };
 const jsxRuntime = `
@@ -64,19 +64,6 @@ async function bundle(semantic) {
 const loaded = new Map();
 let runtimeAssertions = 0;
 for (const [, semantic, expectedExports] of modules) { const value = await bundle(semantic); loaded.set(semantic, value); assert.deepEqual(Object.keys(value).sort(), expectedExports); runtimeAssertions++; }
-
-const toastMessages = [];
-const invalidations = [];
-globalThis.__nj.scope = {
-  queryClient: { invalidateQueries({ queryKey }) { invalidations.push(queryKey); }, getQueryData() { return undefined; }, cancelQueries() {}, removeQueries() {} },
-  get(key) { if (key === Symbol.for('toasts')) return { danger(message) { toastMessages.push(['danger', message]); }, success(message) { toastMessages.push(['success', message]); } }; if (key === Symbol.for('intl')) return { formatMessage: descriptor => descriptor.defaultMessage }; if (key === Symbol.for('api')) return { safeDelete: async () => ({ deleted_count: 3, failed_count: 0 }) }; },
-};
-let closed = 0;
-const dialog = loaded.get('library-empty-trash-dialog').EmptyLibraryTrashDialog({ accountId: 'a', userId: 'u', sessionId: 's', onClose: () => closed++ });
-const form = dialog.props.children;
-await form.props.onSubmit({ preventDefault() {} });
-assert.equal(closed, 1); assert.equal(globalThis.__nj.reset, 1); assert.deepEqual(invalidations, [['library-api'], ['chatgpt-composer-library-files'], ['4231797315']]); assert.deepEqual(toastMessages, [['success', 'Trash emptied']]); assert.deepEqual(globalThis.__nj.logs.map(entry => entry.type), ['delete', 'delete_succeeded']);
-runtimeAssertions += 5;
 
 const scope = { value: { routeKind: 'local-thread', conversationId: 'thread-1' }, get(key) { if (key === Symbol.for('archived')) return false; if (key === Symbol.for('host')) return 'host-1'; if (key === Symbol.for('terminal-tab-ids')) return []; return undefined; } };
 const open = loaded.get('windows-tabs-open').runWindowsTabsOpen;

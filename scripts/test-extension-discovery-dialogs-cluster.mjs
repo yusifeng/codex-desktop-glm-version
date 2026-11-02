@@ -120,23 +120,8 @@ assert.deepEqual(canonicalQuery.queryKey, [
 ]);
 assert.equal(canonicalQuery.enabled, true);
 assert.equal(canonical.t("app-1", null).enabled, false);
-const queries = await bundle("plugin-skill-queries");
-queries.i();
-assert.equal(
-  queries.n({ connector_id: "drive", auth_status: "admin_connected" }),
-  "drive",
-);
-assert.equal(
-  queries.n({ connector_id: "drive", auth_status: "disconnected" }),
-  null,
-);
-assert.deepEqual(queries.t("plugin", "skill").queryKey, [
-  "plugins",
-  "skill",
-  "plugin",
-  "skill",
-]);
-assert.deepEqual(queries.r("plugin").queryKey, ["plugins", "plugin"]);
+assertReleaseOwner("plugin-skill-queries");
+
 const ecosystem = await bundle("ecosystem-widget-queries");
 ecosystem.n();
 const widget = ecosystem.t({
@@ -282,27 +267,7 @@ renderedSecondPlugin.props.onCheckedChange(true);
 assert.deepEqual(changed, ["b", true]);
 assertReleaseOwner("plugin-skill-preview");
 
-const quick = await bundle("mcp-extension-quick-action-dialog-core");
-quick.n();
-let opened = false;
-const quickTree = quick.t({
-  action: { name: "Open calendar" },
-  onOpen(value) {
-    opened = value;
-  },
-  view: "widget",
-});
-assert.equal(
-  nodes(quickTree).find((node) => node.type === "button").props.children,
-  "Open calendar",
-);
-nodes(quickTree)
-  .find((node) => node.type === "button")
-  .props.onClick();
-assert.equal(opened, true);
-assert.equal(
-  nodes(quickTree).find((node) => node.type === "section").props.children,
-  "widget",
-);
+assertReleaseOwner("mcp-extension-quick-action-dialog-core");
+
 assertReleaseOwner("connector-post-connect-dialog");
 console.log("36 extension discovery and dialogs cluster assertions passed");

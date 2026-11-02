@@ -24,16 +24,7 @@ async function load(name) {
   return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${name}`);
 }
 
-const work = await load("work-mode-upsell-modal");
-let workClosed = 0;
-let selectedPlan = null;
-const workModal = work.WorkModeUpsellModal({ accountKind: "business", onClose: () => workClosed++, onUpgrade: (_event, plan) => { selectedPlan = plan; } });
-assert.equal(workModal.type, "dialog");
-assert.equal(workModal.props.children[1].props.children, "Meet ChatGPT Work");
-assert.equal(workModal.props.children[3].props.children, "Unlock with Business");
-workModal.props.children[3].props.onClick({});
-assert.equal(workClosed, 1);
-assert.equal(selectedPlan, "business");
+const workReleaseAssertions = assertReleaseOwner("work-mode-upsell-modal");
 
 const quietHoursReleaseAssertions = assertReleaseOwner("quiet-hours-active-dialog");
 
@@ -43,4 +34,4 @@ const firstLimitReleaseAssertions = assertReleaseOwner("first-limit-dialog");
 
 const remoteReleaseAssertions = assertReleaseOwner("remote-connection-editor-modal");
 
-console.log(`account modals cluster complete (${modelPickerReleaseAssertions + quietHoursReleaseAssertions + firstLimitReleaseAssertions + remoteReleaseAssertions} release assertions)`);
+console.log(`account modals cluster complete (${modelPickerReleaseAssertions + quietHoursReleaseAssertions + firstLimitReleaseAssertions + remoteReleaseAssertions + workReleaseAssertions} release assertions)`);

@@ -1,5 +1,167 @@
-// Paired t-test teaching model. Release chunk: model-e016c396c3b2.js.
-import "@rchunk/rolldown-runtime";
-type Alternative="two-sided"|"greater"|"less"; interface Input{number_of_pairs?:number;alternative?:string;commonChange?:number;differenceSpread?:number}
-const numberOfPairsParameter={kind:"integer",defaultValue:10,min:4,max:16}; const alternativeParameter={kind:"enum",defaultValue:"two-sided",allowedValues:["two-sided","greater","less"]}; const specification={type:"PAIRED_T_TEST",version:3,thumbnailAssetKey:"paired-t-test-v1",parameters:{number_of_pairs:numberOfPairsParameter,alternative:alternativeParameter}}; const commonChangeControl={min:-4,max:4,step:.2,defaultValue:2}; const differenceSpreadControl={min:.6,max:3.6,step:.1,defaultValue:1.8}; const differenceAxis={min:-11,max:11}; const scoreAxis={min:66,max:107}; const beforeScores=[78,92,84,97,73,88,81,94,76,90,85,99,79,87,82,95]; const baseDifferences=[-1.5,.4,1.1,-.7,.1,1.7,-1.1,.8,-.2,1.3,-1.7,.6,-.9,1.5,-.4,.9]; const clamp=(v:number,a:number,b:number)=>Math.min(b,Math.max(a,v)); const finiteOr=(v:number|undefined,f:number)=>Number.isFinite(v)?v??f:f; const normalize=(input:Input)=>({number_of_pairs:Math.round(clamp(finiteOr(input.number_of_pairs,10),4,16)),alternative:(input.alternative==="greater"||input.alternative==="less"||input.alternative==="two-sided"?input.alternative:"two-sided") as Alternative,commonChange:clamp(finiteOr(input.commonChange,2),-4,4),differenceSpread:clamp(finiteOr(input.differenceSpread,1.8),.6,3.6)}); const lanczos=[.9999999999998099,676.5203681218851,-1259.1392167224028,771.3234287776531,-176.6150291621406,12.507343278686905,-.13857109526572012,9984369578019572e-21,15056327351493116e-23]; const logGamma=(value:number):number=>{if(value<.5)return Math.log(Math.PI)-Math.log(Math.sin(Math.PI*value))-logGamma(1-value);const shifted=value-1,sum=lanczos.slice(1).reduce((total,coefficient,index)=>total+coefficient/(shifted+index+1),lanczos[0]),t=shifted+7.5;return.5*Math.log(2*Math.PI)+(shifted+.5)*Math.log(t)-t+Math.log(sum);}; const betaFraction=(a:number,b:number,x:number)=>{const tiny=1e-30;let c=1,d=1-(a+b)*x/(a+1);d=Math.abs(d)<tiny?tiny:d;d=1/d;let result=d;for(let iteration=1;iteration<=120;iteration+=1){const doubled=2*iteration;let delta=iteration*(b-iteration)*x/((a+doubled-1)*(a+doubled));d=1+delta*d;d=Math.abs(d)<tiny?tiny:d;c=1+delta/c;c=Math.abs(c)<tiny?tiny:c;d=1/d;result*=d*c;delta=-((a+iteration)*(a+b+iteration)*x)/((a+doubled)*(a+doubled+1));d=1+delta*d;d=Math.abs(d)<tiny?tiny:d;c=1+delta/c;c=Math.abs(c)<tiny?tiny:c;d=1/d;const change=d*c;result*=change;if(Math.abs(change-1)<3e-12)break;}return result;}; const regularizedBeta=(x:number,a:number,b:number)=>{if(x<=0)return 0;if(x>=1)return 1;const factor=Math.exp(logGamma(a+b)-logGamma(a)-logGamma(b)+a*Math.log(x)+b*Math.log1p(-x));return x<(a+1)/(a+b+2)?factor*betaFraction(a,b,x)/a:1-factor*betaFraction(b,a,1-x)/b;}; const tDensity=(x:number,df:number)=>Math.exp(logGamma((df+1)/2)-logGamma(df/2)-.5*Math.log(df*Math.PI)-(df+1)/2*Math.log1p(x*x/df)); const tCdf=(x:number,df:number)=>{if(x===0)return.5;const beta=.5*regularizedBeta(df/(df+x*x),df/2,.5);return x>0?1-beta:beta;}; const calculate=(input:Input)=>{const safe=normalize(input),raw=baseDifferences.slice(0,safe.number_of_pairs),mean=raw.reduce((a,b)=>a+b,0)/raw.length,deviations=raw.map(value=>value-mean),sd=Math.sqrt(deviations.reduce((sum,value)=>sum+value*value,0)/(deviations.length-1)),differences=deviations.map(value=>safe.commonChange+value/sd*safe.differenceSpread),pairs=differences.map((difference,index)=>({before:beforeScores[index],after:beforeScores[index]+difference,difference})),standardError=safe.differenceSpread/Math.sqrt(safe.number_of_pairs),tStatistic=safe.commonChange/standardError,degreesOfFreedom=safe.number_of_pairs-1,cdf=tCdf(tStatistic,degreesOfFreedom),p=safe.alternative==="greater"?1-cdf:safe.alternative==="less"?cdf:2*Math.min(cdf,1-cdf);return{...safe,pairs,differences,meanDifference:safe.commonChange,standardError,tStatistic,degreesOfFreedom,pValue:clamp(p,0,1)};}; const densityCurve=(df:number,min:number,max:number,samples=100)=>Array.from({length:samples+1},(_value,index)=>{const x=min+index/samples*(max-min);return{x,y:tDensity(x,df)};}); const filledCurve=(df:number,min:number,max:number)=>[{x:min,y:0},...densityCurve(df,min,max,48),{x:max,y:0}]; const stackDots=(values:number[])=>{const last=Array.from({length:8},()=>Number.NEGATIVE_INFINITY),result=values.map(x=>({x,y:0}));values.map((x,index)=>({x,index})).sort((a,b)=>a.x-b.x).forEach(({x,index})=>{let lane=last.findIndex(previous=>x-previous>=1.15);if(lane<0)lane=last.indexOf(Math.min(...last));last[lane]=x;result[index]={x,y:-.43+lane*.16};});return result;}; function initializeSpecification():void{} function initializeModel():void{}
-export{scoreAxis as a,densityCurve as c,stackDots as d,tDensity as f,differenceSpreadControl as i,filledCurve as l,specification as m,commonChangeControl as n,numberOfPairsParameter as o,initializeSpecification as p,differenceAxis as r,calculate as s,alternativeParameter as t,initializeModel as u};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `PAIRED_T_TEST`),
+      (n = `paired-t-test-v1`),
+      (r = {
+        number_of_pairs: { kind: `integer`, defaultValue: 10, min: 4, max: 16 },
+        alternative: {
+          kind: `enum`,
+          defaultValue: `two-sided`,
+          allowedValues: [`two-sided`, `greater`, `less`],
+        },
+      }),
+      (i = { type: t, version: 3, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C, w, T;
+function E() {
+  return (E = e(() => {
+    (a(),
+      (o = i.parameters.number_of_pairs),
+      (s = i.parameters.alternative),
+      (c = { min: -4, max: 4, step: 0.2, defaultValue: 2 }),
+      (l = { min: 0.6, max: 3.6, step: 0.1, defaultValue: 1.8 }),
+      (u = { min: -11, max: 11 }),
+      (d = { min: 66, max: 107 }),
+      (f = [78, 92, 84, 97, 73, 88, 81, 94, 76, 90, 85, 99, 79, 87, 82, 95]),
+      (p = [-1.5, 0.4, 1.1, -0.7, 0.1, 1.7, -1.1, 0.8, -0.2, 1.3, -1.7, 0.6, -0.9, 1.5, -0.4, 0.9]),
+      (m = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (h = (e, t) => (Number.isFinite(e) ? e : t)),
+      (g = (e) => ({
+        number_of_pairs: Math.round(m(h(e.number_of_pairs, o.defaultValue), o.min, o.max)),
+        alternative:
+          e.alternative === `greater` || e.alternative === `less` || e.alternative === `two-sided`
+            ? e.alternative
+            : s.defaultValue,
+        commonChange: m(h(e.commonChange, c.defaultValue), c.min, c.max),
+        differenceSpread: m(h(e.differenceSpread, l.defaultValue), l.min, l.max),
+      })),
+      (_ = (e) => {
+        let t = [
+          0.9999999999998099, 676.5203681218851, -1259.1392167224028, 771.3234287776531,
+          -176.6150291621406, 12.507343278686905, -0.13857109526572012, 9984369578019572e-21,
+          1.5056327351493116e-7,
+        ];
+        if (e < 0.5) return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * e)) - _(1 - e);
+        let n = e - 1,
+          r = t.slice(1).reduce((e, t, r) => e + t / (n + r + 1), t[0]),
+          i = n + 7.5;
+        return 0.5 * Math.log(2 * Math.PI) + (n + 0.5) * Math.log(i) - i + Math.log(r);
+      }),
+      (v = (e, t, n) => {
+        let r = 1e-30,
+          i = 1,
+          a = 1 - ((e + t) * n) / (e + 1);
+        ((a = Math.abs(a) < r ? r : a), (a = 1 / a));
+        let o = a;
+        for (let s = 1; s <= 120; s += 1) {
+          let c = 2 * s,
+            l = (s * (t - s) * n) / ((e + c - 1) * (e + c));
+          ((a = 1 + l * a),
+            (a = Math.abs(a) < r ? r : a),
+            (i = 1 + l / i),
+            (i = Math.abs(i) < r ? r : i),
+            (a = 1 / a),
+            (o *= a * i),
+            (l = -((e + s) * (e + t + s) * n) / ((e + c) * (e + c + 1))),
+            (a = 1 + l * a),
+            (a = Math.abs(a) < r ? r : a),
+            (i = 1 + l / i),
+            (i = Math.abs(i) < r ? r : i),
+            (a = 1 / a));
+          let u = a * i;
+          if (((o *= u), Math.abs(u - 1) < 3e-12)) break;
+        }
+        return o;
+      }),
+      (y = (e, t, n) => {
+        if (e <= 0) return 0;
+        if (e >= 1) return 1;
+        let r = Math.exp(_(t + n) - _(t) - _(n) + t * Math.log(e) + n * Math.log1p(-e));
+        return e < (t + 1) / (t + n + 2) ? (r * v(t, n, e)) / t : 1 - (r * v(n, t, 1 - e)) / n;
+      }),
+      (b = (e, t) =>
+        Math.exp(
+          _((t + 1) / 2) -
+            _(t / 2) -
+            0.5 * Math.log(t * Math.PI) -
+            ((t + 1) / 2) * Math.log1p((e * e) / t),
+        )),
+      (x = (e, t) => {
+        if (e === 0) return 0.5;
+        let n = t / (t + e * e),
+          r = 0.5 * y(n, t / 2, 0.5);
+        return e > 0 ? 1 - r : r;
+      }),
+      (S = (e) => {
+        let t = g(e),
+          n = p.slice(0, t.number_of_pairs),
+          r = n.reduce((e, t) => e + t, 0) / n.length,
+          i = n.map((e) => e - r),
+          a = Math.sqrt(i.reduce((e, t) => e + t * t, 0) / (i.length - 1)),
+          o = i.map((e) => t.commonChange + (e / a) * t.differenceSpread),
+          s = o.map((e, t) => ({ before: f[t], after: f[t] + e, difference: e })),
+          c = t.differenceSpread / Math.sqrt(t.number_of_pairs),
+          l = t.commonChange / c,
+          u = t.number_of_pairs - 1,
+          d = x(l, u),
+          h =
+            t.alternative === `greater`
+              ? 1 - d
+              : t.alternative === `less`
+                ? d
+                : 2 * Math.min(d, 1 - d);
+        return {
+          ...t,
+          pairs: s,
+          differences: o,
+          meanDifference: t.commonChange,
+          standardError: c,
+          tStatistic: l,
+          degreesOfFreedom: u,
+          pValue: m(h, 0, 1),
+        };
+      }),
+      (C = (e, t, n, r = 100) =>
+        Array.from({ length: r + 1 }, (i, a) => {
+          let o = t + (a / r) * (n - t);
+          return { x: o, y: b(o, e) };
+        })),
+      (w = (e, t, n) => [{ x: t, y: 0 }, ...C(e, t, n, 48), { x: n, y: 0 }]),
+      (T = (e) => {
+        let t = Array.from({ length: 8 }, () => -1 / 0),
+          n = e.map((e) => ({ x: e, y: 0 }));
+        return (
+          e
+            .map((e, t) => ({ x: e, index: t }))
+            .sort((e, t) => e.x - t.x)
+            .forEach(({ x: e, index: r }) => {
+              let i = t.findIndex((t) => e - t >= 1.15);
+              (i < 0 && (i = t.indexOf(Math.min(...t))),
+                (t[i] = e),
+                (n[r] = { x: e, y: -0.43 + i * 0.16 }));
+            }),
+          n
+        );
+      }));
+  }))();
+}
+export {
+  d as a,
+  C as c,
+  T as d,
+  b as f,
+  l as i,
+  w as l,
+  i as m,
+  c as n,
+  o,
+  a as p,
+  u as r,
+  S as s,
+  s as t,
+  E as u,
+};

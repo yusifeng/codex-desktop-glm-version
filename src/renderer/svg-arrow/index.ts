@@ -1,21 +1,181 @@
-import "@rchunk/rolldown-runtime";
-import * as Shared from "@rchunk/app-shared";
-import * as Katex from "@rchunk/learning-block-katex";
-import * as Stroke from "@rchunk/learning-block-stroke";
-interface Point { x: number; y: number }
-interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>): unknown; jsxs(type: unknown, props: Record<string, unknown>): unknown }
-const katex = Katex as unknown as { n(): void; t: unknown };
-const stroke = Stroke as unknown as { i(): void; n: string; s(input: Record<string, unknown>): unknown };
-let jsx: JsxRuntime;
-const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), max);
-function geometry({ anchor, toward, size, anchorPointStyle, anchorPointRadius, label, labelFontSize = 10, labelOffsetPx = 14, labelOrientation = "horizontal", labelPlacement, maxLength, minLength, strokeWidth = 2 }: Record<string, unknown>): Record<string, unknown> | null {
-  const from = anchor as Point, to = toward as Point, dx = to.x - from.x, dy = to.y - from.y, distance = Math.hypot(dx, dy), progress = clamp(Number(size), 0, 1), width = Number(strokeWidth);
-  if (distance <= Number.EPSILON || progress <= Number.EPSILON) return null;
-  const ux = dx / distance, uy = dy / distance, px = -uy, py = ux, radius = anchorPointStyle === "hole" ? Number(anchorPointRadius ?? Math.max(4.5, width * 1.7)) : Number(anchorPointRadius ?? 4), reserve = clamp(distance * .16, 12, 24), end = Math.max(0, Number(maxLength ?? distance - reserve)), start = Math.min(end, Number(minLength ?? clamp(distance * .18, 14, 24))), length = start + (end - start) * progress, headLength = clamp(length * .28, 6, 14);
-  if (length <= Number.EPSILON) return null;
-  const tip = { x: from.x + ux * length, y: from.y + uy * length }, shaftEnd = { x: from.x + ux * Math.max(0, length - headLength), y: from.y + uy * Math.max(0, length - headLength) }, base = { x: tip.x - ux * headLength, y: tip.y - uy * headLength }, halfWidth = clamp(headLength * .52, 4, 10);
-  return { anchorPointRadius: radius, head: { tip, left: { x: base.x + px * halfWidth, y: base.y + py * halfWidth }, right: { x: base.x - px * halfWidth, y: base.y - py * halfWidth } }, shaft: { from, to: shaftEnd }, label: label ? stroke.s({ from, to: tip, label, labelFontSize, labelPlacement: labelPlacement ?? "auto", labelOffsetPx, labelOrientation }) : null };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { I3 as t } from "@rchunk/app-shared";
+import { n, t as r } from "@rchunk/learning-block-katex";
+import { i, n as a, s as o } from "@rchunk/learning-block-stroke";
+var s, c, l, u;
+function d() {
+  return (d = e(() => {
+    (n(),
+      i(),
+      (s = t()),
+      (c = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (l = ({
+        anchor: e,
+        anchorPointRadius: t,
+        anchorPointStyle: n,
+        label: r,
+        labelFontSize: i = 10,
+        labelOffsetPx: a = 14,
+        labelOrientation: s = `horizontal`,
+        labelPlacement: l,
+        maxLength: u,
+        minLength: d,
+        size: f,
+        strokeWidth: p = 2,
+        toward: m,
+      }) => {
+        let h = m.x - e.x,
+          g = m.y - e.y,
+          _ = Math.hypot(h, g),
+          v = c(f, 0, 1);
+        if (_ <= 2 ** -52 || v <= 2 ** -52) return null;
+        let y = h / _,
+          b = g / _,
+          x = -b,
+          S = y,
+          C = S > 0 || (Math.abs(S) <= 2 ** -52 && x > 0),
+          w = n === `hole` ? (t ?? Math.max(4.5, p * 1.7)) : (t ?? 4),
+          T = c(_ * 0.16, 12, 24),
+          E = Math.max(0, u ?? _ - T),
+          D = Math.min(E, d ?? c(_ * 0.18, 14, 24)),
+          O = D + (E - D) * v,
+          k = c(O * 0.28, 6, 14),
+          A = Math.max(0, O - k);
+        if (O <= 2 ** -52) return null;
+        let j = { x: e.x + y * O, y: e.y + b * O },
+          M = { x: e.x + y * A, y: e.y + b * A },
+          N = { x: j.x - y * k, y: j.y - b * k },
+          P = c(k * 0.52, 4, 10),
+          F = { x: N.x + x * P, y: N.y + S * P },
+          I = { x: N.x - x * P, y: N.y - S * P },
+          L = r
+            ? o({
+                from: e,
+                label: r,
+                labelFontSize: i,
+                to: j,
+                labelPlacement: l ?? `auto`,
+                labelOffsetPx: l === void 0 && C ? -a : a,
+                labelOrientation: s,
+              })
+            : null;
+        return {
+          anchorPointRadius: w,
+          head: { left: F, right: I, tip: j },
+          label: L,
+          shaft: { from: e, to: M },
+        };
+      }),
+      (u = ({
+        anchor: e,
+        toward: t,
+        size: n,
+        anchorPointStyle: i,
+        anchorPointRadius: o,
+        label: c,
+        labelFormat: u = `text`,
+        labelWidth: d = 64,
+        labelHeight: f = 16,
+        labelOffsetPx: p = 14,
+        labelPlacement: m,
+        labelOrientation: h = `horizontal`,
+        maxLength: g,
+        minLength: _,
+        strokeWidth: v = 2,
+        color: y = `var(--icon-accent)`,
+        labelColor: b = `var(--text-primary)`,
+        labelClassName: x,
+        labelFontSize: S = 10,
+        className: C,
+      }) => {
+        let w = l({
+          anchor: e,
+          anchorPointRadius: o,
+          anchorPointStyle: i,
+          label: c,
+          labelFontSize: S,
+          labelOffsetPx: p,
+          labelOrientation: h,
+          labelPlacement: m,
+          maxLength: g,
+          minLength: _,
+          size: n,
+          strokeWidth: v,
+          toward: t,
+        });
+        return w
+          ? (0, s.jsxs)(`g`, {
+              className: C,
+              children: [
+                (0, s.jsx)(`line`, {
+                  x1: w.shaft.from.x,
+                  y1: w.shaft.from.y,
+                  x2: w.shaft.to.x,
+                  y2: w.shaft.to.y,
+                  stroke: y,
+                  strokeWidth: v,
+                  strokeLinecap: `butt`,
+                  strokeLinejoin: `round`,
+                }),
+                (0, s.jsx)(`polygon`, {
+                  points: `${w.head.tip.x},${w.head.tip.y} ${w.head.left.x},${w.head.left.y} ${w.head.right.x},${w.head.right.y}`,
+                  fill: y,
+                  stroke: y,
+                  strokeLinejoin: `round`,
+                }),
+                i === `hole`
+                  ? (0, s.jsx)(`circle`, {
+                      cx: w.shaft.from.x,
+                      cy: w.shaft.from.y,
+                      r: w.anchorPointRadius,
+                      fill: `white`,
+                      stroke: y,
+                      strokeWidth: Math.max(1.25, v * 0.65),
+                    })
+                  : null,
+                (() => {
+                  if (!c || !w.label) return null;
+                  let e = `translate(${w.label.x} ${w.label.y}) rotate(${w.label.rotation})`;
+                  return u === `katex`
+                    ? (0, s.jsx)(`g`, {
+                        transform: e,
+                        children: (0, s.jsx)(`foreignObject`, {
+                          x: -d / 2,
+                          y: -f / 2,
+                          width: d,
+                          height: f,
+                          style: { overflow: `visible` },
+                          children: (0, s.jsx)(r, {
+                            className: `flex h-full w-full items-center justify-center font-normal${x ? ` ${x}` : ``}`,
+                            latex: c,
+                            style: { color: b, fontSize: S },
+                          }),
+                        }),
+                      })
+                    : (0, s.jsx)(`g`, {
+                        transform: e,
+                        children: (0, s.jsx)(`text`, {
+                          x: 0,
+                          y: 0,
+                          textAnchor: `middle`,
+                          dominantBaseline: `middle`,
+                          fill: b,
+                          fontSize: S ?? 12,
+                          fontWeight: 600,
+                          paintOrder: `stroke`,
+                          stroke: a,
+                          strokeLinejoin: `round`,
+                          strokeWidth: 3,
+                          className: x,
+                          children: c,
+                        }),
+                      });
+                })(),
+              ],
+            })
+          : null;
+      }));
+  }))();
 }
-function SvgArrow(props: Record<string, unknown>): unknown { const g = geometry(props); if (!g) return null; const shaft = g.shaft as { from: Point; to: Point }, head = g.head as { tip: Point; left: Point; right: Point }; return jsx.jsxs("g", { className: props.className, children: [jsx.jsx("line", { x1: shaft.from.x, y1: shaft.from.y, x2: shaft.to.x, y2: shaft.to.y, stroke: props.color ?? "var(--icon-accent)", strokeWidth: props.strokeWidth ?? 2 }), jsx.jsx("polygon", { points: head.tip.x + "," + head.tip.y + " " + head.left.x + "," + head.left.y + " " + head.right.x + "," + head.right.y }), props.anchorPointStyle === "hole" ? jsx.jsx("circle", { cx: shaft.from.x, cy: shaft.from.y, r: g.anchorPointRadius }) : null, props.label && g.label ? jsx.jsx(props.labelFormat === "katex" ? katex.t : "text", { children: props.label, fill: props.labelColor ?? "var(--text-primary)", stroke: stroke.n }) : null] }); }
-function initialize(): void { katex.n(); stroke.i(); jsx = (Shared as unknown as { I3(): JsxRuntime }).I3(); }
-export { initialize as n, SvgArrow as t };
+export { d as n, u as t };

@@ -1,74 +1,234 @@
-import * as RuntimeChunk from "@rchunk/rolldown-runtime";
-import * as SharedChunk from "@rchunk/app-shared";
-import * as InitialChunk from "@rchunk/app-initial";
-import * as ResetLibraryChunk from "@rchunk/reset-image-library-state";
-import * as TrashAnalyticsChunk from "@rchunk/library-trash-analytics";
-
-interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown; jsxs(type: unknown, props: Record<string, unknown>, key?: string): unknown }
-interface QueryClient { invalidateQueries(input: { queryKey: readonly unknown[] }): Promise<unknown> | unknown }
-interface Toasts { danger(message: unknown, options?: Record<string, unknown>): void; success(message: unknown): void }
-interface IntlRuntime { formatMessage(descriptor: { defaultMessage: string; description?: string; id: string }): string }
-interface DeleteResult { deleted_count: number; failed_count: number }
-interface ApiClient { safeDelete(path: string): Promise<DeleteResult> }
-interface DialogScope { get(key: unknown): unknown; queryClient: QueryClient }
-interface Props { accountId: string; userId: string; sessionId: string; onClose(): void }
-interface SharedApi { I3(): JsxRuntime; LX(scope: unknown): DialogScope; Y2: unknown; Yh: unknown; Ih: unknown; Oh: unknown; Ph: unknown; Rh: unknown; UX: unknown; pk: unknown }
-interface InitialApi { fRt: unknown; mpn: unknown; rK: unknown; uK: unknown }
-
-const shared = SharedChunk as unknown as SharedApi;
-const initial = InitialChunk as unknown as InitialApi;
-const jsx = shared.I3();
-const resetLibraryState = (ResetLibraryChunk as unknown as { n(client: QueryClient): Promise<unknown> | unknown }).n;
-const recordTrashEvent = (TrashAnalyticsChunk as unknown as { n(scope: DialogScope, sessionId: string, interactionType: string, error?: unknown): void }).n;
-const interactionTypes = ((InitialChunk as unknown as { HLt?: Record<string, string> }).HLt ?? {}) as Record<string, string>;
-void RuntimeChunk;
-
-function message(id: string, defaultMessage: string, description: string): unknown {
-  return jsx.jsx(shared.Y2, { id, defaultMessage, description });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  HX as r,
+  I3 as i,
+  Ih as a,
+  K2 as o,
+  LX as s,
+  Oh as c,
+  Ph as l,
+  Rh as u,
+  UX as d,
+  Y2 as f,
+  Yh as p,
+  Zh as m,
+  kh as h,
+  lk as g,
+  pZ as _,
+  pk as v,
+  zh as y,
+} from "@rchunk/app-shared";
+import {
+  HLt as b,
+  fRt as x,
+  lK as S,
+  mpn as C,
+  ppn as w,
+  rK as T,
+  uK as E,
+} from "@rchunk/app-initial";
+import { n as D } from "@rchunk/reset-image-library-state";
+import { n as O, t as k } from "@rchunk/library-trash-analytics";
+function A(e) {
+  let t = (0, N.c)(9),
+    { accountId: n, userId: r, sessionId: i, onClose: a } = e,
+    o;
+  t[0] !== n || t[1] !== r
+    ? ((o = { accountId: n, userId: r }), (t[0] = n), (t[1] = r), (t[2] = o))
+    : (o = t[2]);
+  let s;
+  t[3] !== a || t[4] !== i
+    ? ((s = (0, P.jsx)(j, { sessionId: i, onClose: a })), (t[3] = a), (t[4] = i), (t[5] = s))
+    : (s = t[5]);
+  let c;
+  return (
+    t[6] !== o || t[7] !== s
+      ? ((c = (0, P.jsx)(d, { scope: T, value: o, children: s })),
+        (t[6] = o),
+        (t[7] = s),
+        (t[8] = c))
+      : (c = t[8]),
+    c
+  );
 }
-
-function interaction(name: string, fallback: string): string { return interactionTypes[name] ?? fallback; }
-
-async function emptyTrash(scope: DialogScope, sessionId: string): Promise<boolean> {
-  const toasts = scope.get(shared.pk) as Toasts;
-  const intl = scope.get(initial.mpn) as IntlRuntime;
-  const api = scope.get(initial.uK) as ApiClient;
-  recordTrashEvent(scope, sessionId, interaction("CHATGPT_FILE_LIBRARY_FILE_INTERACTION_TYPE_DELETE", "delete"));
+function j(e) {
+  let t = (0, N.c)(25),
+    { sessionId: n, onClose: i } = e,
+    o = s(T),
+    l = r(F),
+    d;
+  t[0] !== i || t[1] !== o
+    ? ((d = (e) => {
+        !e && !o.get(F) && i();
+      }),
+      (t[0] = i),
+      (t[1] = o),
+      (t[2] = d))
+    : (d = t[2]);
+  let m;
+  t[3] !== i || t[4] !== o || t[5] !== n
+    ? ((m = (e) => {
+        (e.preventDefault(),
+          !o.get(F) &&
+            M(o, n).then((e) => {
+              e && i();
+            }));
+      }),
+      (t[3] = i),
+      (t[4] = o),
+      (t[5] = n),
+      (t[6] = m))
+    : (m = t[6]);
+  let g, _;
+  t[7] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((g = (0, P.jsx)(u, {
+        className: `heading-lg`,
+        children: (0, P.jsx)(f, {
+          id: `library.emptyTrash.title`,
+          defaultMessage: `Delete forever?`,
+          description: `Confirmation title before permanently deleting all recently deleted Library files`,
+        }),
+      })),
+      (_ = (0, P.jsx)(`p`, {
+        children: (0, P.jsx)(f, {
+          id: `library.emptyTrash.description`,
+          defaultMessage: `Files in Trash will be deleted forever. This can't be undone.`,
+          description: `Warning in the Empty trash confirmation: confirming permanently deletes every recently deleted Library file, not only visible or selected files`,
+        }),
+      })),
+      (t[7] = g),
+      (t[8] = _))
+    : ((g = t[7]), (_ = t[8]));
+  let v;
+  t[9] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((v = (0, P.jsx)(f, {
+        id: `libraryNext.dialog.cancel`,
+        defaultMessage: `Cancel`,
+        description: `Dismiss a Library action dialog without making changes`,
+      })),
+      (t[9] = v))
+    : (v = t[9]);
+  let y;
+  t[10] !== i || t[11] !== l
+    ? ((y = (0, P.jsx)(p, { color: `ghost`, disabled: l, onClick: i, children: v })),
+      (t[10] = i),
+      (t[11] = l),
+      (t[12] = y))
+    : (y = t[12]);
+  let b;
+  t[13] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((b = (0, P.jsx)(f, {
+        id: `library.emptyTrash.confirm`,
+        defaultMessage: `Delete forever`,
+        description: `Destructive confirmation button that permanently deletes all files in Library Trash`,
+      })),
+      (t[13] = b))
+    : (b = t[13]);
+  let x;
+  t[14] === l
+    ? (x = t[15])
+    : ((x = (0, P.jsx)(p, { type: `submit`, color: `dangerSolid`, loading: l, children: b })),
+      (t[14] = l),
+      (t[15] = x));
+  let S;
+  t[16] !== y || t[17] !== x
+    ? ((S = (0, P.jsxs)(`div`, {
+        className: `flex flex-col gap-4`,
+        children: [g, _, (0, P.jsxs)(h, { children: [y, x] })],
+      })),
+      (t[16] = y),
+      (t[17] = x),
+      (t[18] = S))
+    : (S = t[18]);
+  let C;
+  t[19] !== m || t[20] !== S
+    ? ((C = (0, P.jsx)(c, { as: `form`, onSubmit: m, children: S })),
+      (t[19] = m),
+      (t[20] = S),
+      (t[21] = C))
+    : (C = t[21]);
+  let w;
+  return (
+    t[22] !== d || t[23] !== C
+      ? ((w = (0, P.jsx)(a, { open: !0, onOpenChange: d, children: C })),
+        (t[22] = d),
+        (t[23] = C),
+        (t[24] = w))
+      : (w = t[24]),
+    w
+  );
+}
+async function M(e, t) {
+  let n = e.get(v),
+    r = e.get(C);
+  (e.set(F, !0), O(e, t, b.CHATGPT_FILE_LIBRARY_FILE_INTERACTION_TYPE_DELETE));
   try {
-    const result = await api.safeDelete("/files/library/trash");
-    await Promise.all([
-      result.deleted_count > 0 ? resetLibraryState(scope.queryClient) : undefined,
-      scope.queryClient.invalidateQueries({ queryKey: ["library-api"] }),
-      scope.queryClient.invalidateQueries({ queryKey: ["chatgpt-composer-library-files"] }),
-      scope.queryClient.invalidateQueries({ queryKey: ["4231797315"] }),
-    ]);
-    if (result.failed_count > 0) {
-      recordTrashEvent(scope, sessionId, interaction(result.deleted_count === 0 ? "CHATGPT_FILE_LIBRARY_FILE_INTERACTION_TYPE_DELETE_FAILED" : "CHATGPT_FILE_LIBRARY_FILE_INTERACTION_TYPE_DELETE_PARTIAL", result.deleted_count === 0 ? "delete_failed" : "delete_partial"));
-      toasts.danger(intl.formatMessage({ id: "library.emptyTrash.partialFailure", defaultMessage: "Some files couldn't be deleted. Try again." }), { errorAnalytics: { toastId: "library.emptyTrash.partialFailure" } });
-    } else {
-      recordTrashEvent(scope, sessionId, interaction("CHATGPT_FILE_LIBRARY_FILE_INTERACTION_TYPE_DELETE_SUCCEEDED", "delete_succeeded"));
-      toasts.success(intl.formatMessage({ id: "library.emptyTrash.success", defaultMessage: "Trash emptied" }));
-    }
-    return true;
-  } catch (error) {
-    recordTrashEvent(scope, sessionId, interaction("CHATGPT_FILE_LIBRARY_FILE_INTERACTION_TYPE_DELETE_FAILED", "delete_failed"), error);
-    toasts.danger(intl.formatMessage({ id: "library.emptyTrash.failed", defaultMessage: "Failed to empty Trash" }), { errorAnalytics: { toastId: "library.emptyTrash.failed" } });
-    return false;
+    let i = await e.get(E).safeDelete(`/files/library/trash`);
+    return (
+      await Promise.all([
+        i.deleted_count > 0 ? D(e.queryClient) : void 0,
+        ...[
+          [`library-api`, e.value.accountId],
+          [`chatgpt-composer-library-files`, e.value.accountId],
+          [`4231797315`],
+        ].map((t) => e.queryClient.invalidateQueries({ queryKey: t })),
+      ]),
+      i.failed_count > 0
+        ? (O(
+            e,
+            t,
+            i.deleted_count === 0
+              ? b.CHATGPT_FILE_LIBRARY_FILE_INTERACTION_TYPE_DELETE_FAILED
+              : b.CHATGPT_FILE_LIBRARY_FILE_INTERACTION_TYPE_DELETE_PARTIAL,
+          ),
+          n.danger(
+            r.formatMessage({
+              id: `library.emptyTrash.partialFailure`,
+              defaultMessage: `Some files couldn't be deleted. Try again.`,
+              description: `Library Empty trash result when at least one file could not be permanently deleted; the remaining files can be retried`,
+            }),
+            { errorAnalytics: { toastId: `library.emptyTrash.partialFailure` } },
+          ))
+        : (O(e, t, b.CHATGPT_FILE_LIBRARY_FILE_INTERACTION_TYPE_DELETE_SUCCEEDED),
+          n.success(
+            r.formatMessage({
+              id: `library.emptyTrash.success`,
+              defaultMessage: `Trash emptied`,
+              description: `Success toast after all recently deleted Library files have been permanently deleted`,
+            }),
+          )),
+      !0
+    );
+  } catch (i) {
+    return (
+      O(
+        e,
+        t,
+        b.CHATGPT_FILE_LIBRARY_FILE_INTERACTION_TYPE_DELETE_FAILED,
+        i instanceof Error ? i : void 0,
+      ),
+      n.danger(
+        r.formatMessage({
+          id: `library.emptyTrash.failed`,
+          defaultMessage: `Failed to empty Trash`,
+          description: `Failure toast when the request to permanently delete all recently deleted Library files fails; the confirmation remains open for retry or cancel`,
+        }),
+        { errorAnalytics: { toastId: `library.emptyTrash.failed` } },
+      ),
+      !1
+    );
+  } finally {
+    e.set(F, !1);
   }
 }
-
-function EmptyLibraryTrashDialog({ accountId, userId, sessionId, onClose }: Props): unknown {
-  const scope = shared.LX(initial.rK);
-  const submit = async (event?: { preventDefault(): void }): Promise<void> => { event?.preventDefault(); if (await emptyTrash(scope, sessionId)) onClose(); };
-  const body = jsx.jsxs(shared.Oh, { as: "form", onSubmit: submit, children: [
-    jsx.jsx(shared.Rh, { children: jsx.jsx("h2", { children: message("library.emptyTrash.title", "Delete forever?", "Confirmation before permanently deleting all Library trash") }) }),
-    jsx.jsx(shared.UX, { children: message("library.emptyTrash.description", "Files in Trash will be deleted forever. This can't be undone.", "Warning for emptying Library trash") }),
-    jsx.jsxs(shared.Ph, { children: [
-      jsx.jsx(shared.Yh, { color: "ghost", onClick: onClose, children: message("libraryNext.dialog.cancel", "Cancel", "Dismiss a Library action") }),
-      jsx.jsx(shared.Yh, { color: "danger", type: "submit", children: message("library.emptyTrash.confirm", "Delete forever", "Confirm permanent deletion") }),
-    ] }),
-  ] });
-  return jsx.jsx(shared.Ih, { open: true, onOpenChange: (open: boolean) => { if (!open) onClose(); }, "data-account-id": accountId, "data-user-id": userId, children: body });
+var N, P, F;
+function I() {
+  return (I = e(() => {
+    ((N = t()), x(), n(), o(), m(), y(), l(), g(), w(), S(), k(), (P = i()), (F = _(T, !1)));
+  }))();
 }
-
-export { EmptyLibraryTrashDialog };
+I();
+export { A as EmptyLibraryTrashDialog };

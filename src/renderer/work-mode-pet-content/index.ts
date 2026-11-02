@@ -1,9 +1,169 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/codex-pet-assets";
-export interface WorkModePetContentProps { accessoryId?: string | null; alt?: string; builtInAssets?: Readonly<Record<string, string>>; customPets?: readonly { id: string; spritesheetUrl: string; expiresAt?: string | null }[]; enabled?: boolean }
-let runtime: JsxRuntime | undefined; function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function normalizeAccessoryId(value?: string | null): string { const normalized = value?.replace(/^uploaded:(?=pet_)/u, ""); return normalized?.startsWith("pet_") || normalized === "default" ? normalized : "default"; }
-function WorkModePetContent({ accessoryId, alt = "Work mode pet", builtInAssets = {}, customPets = [], enabled = true }: WorkModePetContentProps): unknown { if (!enabled) return null; const id = normalizeAccessoryId(accessoryId); const custom = customPets.find(pet => pet.id === id); const customValid = custom && (custom.expiresAt == null || Number.isFinite(Date.parse(custom.expiresAt)) && Date.parse(custom.expiresAt) > Date.now()); const src = customValid ? custom.spritesheetUrl : builtInAssets[id] ?? builtInAssets.default; return src ? jsx().jsx("img", { alt, "data-pet-id": id, src }) : null; }
-export { WorkModePetContent };
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  $3 as n,
+  $O as r,
+  FX as i,
+  FZ as a,
+  I3 as o,
+  QI as s,
+  ZI as c,
+  Zh as l,
+  dZ as u,
+  e6 as d,
+  eZ as f,
+  ek as p,
+  jZ as m,
+  l3 as h,
+  sZ as g,
+} from "@rchunk/app-shared";
+import {
+  $c as _,
+  Gc as v,
+  Ic as y,
+  Iln as b,
+  Lc as x,
+  Mc as S,
+  Oln as C,
+  Sqt as w,
+  Sun as T,
+  U6t as E,
+  Xc as D,
+  _un as O,
+  bqt as k,
+  cJt as A,
+  ypn as j,
+} from "@rchunk/app-initial";
+import { n as M, t as N } from "@rchunk/codex-pet-assets";
+function P(e) {
+  let t = e?.replace(/^uploaded:(?=pet_)/u, ``);
+  return t != null && (t.startsWith(`pet_`) || D.some((e) => e.id === t)) ? t : `default`;
+}
+function F(e) {
+  return (
+    !!e.spritesheet_url &&
+    e.spritesheet_url_expires_at != null &&
+    Number.isFinite(Date.parse(e.spritesheet_url_expires_at))
+  );
+}
+var I, L, R;
+function z() {
+  return (z = e(() => {
+    (i(),
+      T(),
+      _(),
+      y(),
+      A(),
+      w(),
+      j(),
+      s(),
+      (I = f(c, ({ get: e }) => {
+        let t = e(E);
+        return { ...S(t, e(O)), enabled: !0 };
+      })),
+      (L = u(
+        c,
+        () => Date.now(),
+        ({ set: e }) => {
+          let t = setInterval(() => e(Date.now()), 6e4);
+          return () => clearInterval(t);
+        },
+      )),
+      (R = g(c, ({ get: e }) => {
+        let t = e(I).data;
+        return t != null && e(L) - t.receivedAt >= 48e4;
+      })));
+  }))();
+}
+function B(e) {
+  "use forget";
+  return null;
+}
+var V, H, U;
+function W() {
+  return (W = e(() => {
+    (n(),
+      x(),
+      m(),
+      (V = t(h(), 1)),
+      i(),
+      d(),
+      T(),
+      C(),
+      w(),
+      l(),
+      j(),
+      s(),
+      z(),
+      p(),
+      M(),
+      _(),
+      o(),
+      (H = f(c, ({ get: e, scope: t }) => ({
+        ...t.query.getOptions(k),
+        enabled: e(b).status === `allowed` && e(E) != null,
+        refetchInterval: r.ONE_MINUTE,
+        refetchOnMount: !0,
+      }))),
+      (U = g(
+        c,
+        ({ get: e }) => {
+          if (e(b).status !== `allowed` || e(E) == null) return null;
+          let t = P(e(H).data?.accessoryId),
+            n = D.find((e) => e.id === t);
+          if (n != null) return { assetRef: n.assetRef };
+          if (!t.startsWith(`pet_`)) return null;
+          let r = e(I).data?.pets.find((e) => e.id === t);
+          return r?.spritesheet_url == null || !F(r) || e(R)
+            ? null
+            : { petId: r.id, spritesheetUrl: r.spritesheet_url };
+        },
+        { isEqual: V.default },
+      )),
+      f(c, ({ get: e, scope: t }) => {
+        let n = e(E),
+          i = e(O),
+          o = P(e(H).data?.accessoryId),
+          s = e(U),
+          c = t.query.snapshot(I);
+        return {
+          queryKey: [`chatgpt-work-pet`, n, i, o, s],
+          placeholderData: (e, t) =>
+            s != null && t?.queryKey[1] === n && t.queryKey[2] === i && t.queryKey[3] === o
+              ? e
+              : void 0,
+          queryFn:
+            n == null || e(b).status !== `allowed`
+              ? a
+              : async ({ signal: e }) => {
+                  if (s == null) {
+                    if (o.startsWith(`pet_`)) {
+                      let t = c.getData();
+                      (t != null && !t.pets.some((e) => e.id === o)
+                        ? await c.invalidate()
+                        : await c.fetch(),
+                        e.throwIfAborted());
+                    }
+                    return null;
+                  }
+                  let t = new Image();
+                  if (
+                    ((t.src = s.spritesheetUrl ?? N[s.assetRef]),
+                    await t.decode(),
+                    s.assetRef != null)
+                  )
+                    return s;
+                  let n = v(t.naturalWidth, t.naturalHeight);
+                  return n == null ? null : { ...s, spriteRowCount: n.rows };
+                },
+          refetchInterval: (e) =>
+            o.startsWith(`pet_`) && e.state.data == null ? r.ONE_MINUTE : !1,
+          refetchOnMount: !0,
+          retry: 1,
+          staleTime: s == null ? r.ONE_MINUTE : 1 / 0,
+        };
+      }));
+  }))();
+}
+W();
+export { B as WorkModePetContent };

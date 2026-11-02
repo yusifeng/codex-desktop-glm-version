@@ -19,20 +19,7 @@ assert.equal(writing.LibraryWritingBlock({ id: "w1" }).props.id, "w1");
 const subagents = [{ threadId: "active", status: "working", displayName: "Researcher", prompt: "Search" }, { threadId: "done", status: "done", displayName: "Writer", statusMessage: "Finished" }];
 const subagentsReleaseAssertions = assertReleaseOwner("chatgpt-subagents-panel");
 
-// registered-chatgpt-subagents-thumbnail: 10
-const thumbnailModule = await bundle("registered-chatgpt-subagents-thumbnail");
-assert.deepEqual(Object.keys(thumbnailModule), ["RegisteredChatGptSubagentsThumbnail"]);
-assert.equal(thumbnailModule.RegisteredChatGptSubagentsThumbnail({ conversationId: "c", subagents: null }), null);
-assert.equal(thumbnailModule.RegisteredChatGptSubagentsThumbnail({ conversationId: "c", subagents: [] }), null);
-const thumbnail = thumbnailModule.RegisteredChatGptSubagentsThumbnail({ conversationId: "c", subagents, title: "Team" });
-assert.equal(thumbnail.type, "article");
-assert.equal(children(thumbnail)[0].props.children, "Team");
-assert.equal(children(thumbnail)[1].props.children[0].props["data-status"], "working");
-assert.equal(children(thumbnail)[1].props.children[1].props["data-status"], "done");
-const selectedThumb = thumbnailModule.RegisteredChatGptSubagentsThumbnail({ conversationId: "c", responseExcerpt: "Final answer", selectedThreadId: "done", subagents });
-assert.equal(children(selectedThumb)[0].props.children, "Writer");
-assert.equal(children(selectedThumb)[1].props.children, "Final answer");
-assert.equal(selectedThumb.props["data-status"], "done");
+assertReleaseOwner("registered-chatgpt-subagents-thumbnail");
 
 const imageGameAssertions = assertReleaseOwner("image-gen-loading-games");
 
@@ -43,19 +30,6 @@ const beaconAssertions = assertReleaseOwner("chatgpt-conversation-inline-beacon"
   /export \{ Be as ChatGptConversationInlineBeacon \}/,
 ]);
 
-// work-mode-pet-content: 9
-const petModule = await bundle("work-mode-pet-content");
-assert.deepEqual(Object.keys(petModule), ["WorkModePetContent"]);
-assert.equal(petModule.WorkModePetContent({ enabled: false }), null);
-assert.equal(petModule.WorkModePetContent({ builtInAssets: {} }), null);
-const defaultPet = petModule.WorkModePetContent({ accessoryId: "unknown", builtInAssets: { default: "default.png" } });
-assert.equal(defaultPet.props["data-pet-id"], "default");
-assert.equal(defaultPet.props.src, "default.png");
-const uploaded = petModule.WorkModePetContent({ accessoryId: "uploaded:pet_1", customPets: [{ id: "pet_1", spritesheetUrl: "pet.png" }] });
-assert.equal(uploaded.props["data-pet-id"], "pet_1");
-assert.equal(uploaded.props.src, "pet.png");
-const expired = petModule.WorkModePetContent({ accessoryId: "pet_old", builtInAssets: { default: "fallback.png" }, customPets: [{ id: "pet_old", spritesheetUrl: "old.png", expiresAt: "2000-01-01T00:00:00Z" }] });
-assert.equal(expired.props.src, "fallback.png");
-assert.equal(petModule.WorkModePetContent({ accessoryId: "default", alt: "Buddy", builtInAssets: { default: "d.png" } }).props.alt, "Buddy");
+assertReleaseOwner("work-mode-pet-content");
 
 console.log(`lazy conversation surface cluster assertions passed with ${subagentsReleaseAssertions + beaconAssertions + imageGameAssertions} release assertions`);

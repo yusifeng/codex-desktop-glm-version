@@ -1,38 +1,218 @@
-// Network fault-tolerance routing model. Release chunk: model-cf3822ac6f6a.js.
-import "@rchunk/rolldown-runtime";
-
-type Topology = "ring" | "mesh" | "star" | "tree";
-type Fault = "healthy" | "link" | "node";
-interface Node { id: string; role: "sender" | "receiver" | "intermediate"; x: number; y: number }
-interface Edge { id: string; from: string; to: string }
-interface Definition { nodes: Node[]; edges: Edge[]; healthyRoute: string[]; failedLinkId: string; failedNodeId: string }
-interface Values { topology?: unknown; fault?: unknown }
-interface SafeValues { topology: Topology; fault: Fault }
-interface Result { definition: Definition; deliveryContinues: boolean; fault: Fault; failedLinkId: string | null; failedNodeId: string | null; routeKind: "healthy" | "alternate" | "blocked"; routeNodeIds: string[]; topology: Topology }
-interface Point { x: number; y: number }
-interface Manifest { type: string; version: number; thumbnailAssetKey: string; parameters: { topology: { kind: "enum"; defaultValue: Topology; allowedValues: Topology[] } } }
-
-let manifest: Manifest; let topologies: Topology[]; let definitions: Record<Topology, Definition>;
-let normalizeValues: (values: Values) => SafeValues; let defaultValues: () => SafeValues; let valuesForTopology: (topology: unknown) => SafeValues; let setFault: (values: Values, fault: Fault) => SafeValues;
-let calculate: (values: Values) => Result; let routePoints: (result: Result) => Point[]; let pointAlongRoute: (points: Point[], progress: number) => Point | null;
-let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "NETWORK_FAULT_TOLERANCE", version: 2, thumbnailAssetKey: "network-fault-tolerance-v3", parameters: { topology: { kind: "enum", defaultValue: "ring", allowedValues: ["ring", "mesh", "star", "tree"] } } }; }
-function initializeModel(): void {
-  if (modelReady) return; modelReady = true; initializeManifest(); topologies = manifest.parameters.topology.allowedValues;
-  definitions = {
-    ring: { nodes: [{ id: "A", role: "sender", x: 92, y: 156 }, { id: "X", role: "intermediate", x: 320, y: 68 }, { id: "B", role: "receiver", x: 548, y: 156 }, { id: "Y", role: "intermediate", x: 320, y: 244 }], edges: [{ id: "A-X", from: "A", to: "X" }, { id: "X-B", from: "X", to: "B" }, { id: "B-Y", from: "B", to: "Y" }, { id: "Y-A", from: "Y", to: "A" }], healthyRoute: ["A", "X", "B"], failedLinkId: "X-B", failedNodeId: "X" },
-    mesh: { nodes: [{ id: "A", role: "sender", x: 84, y: 156 }, { id: "X", role: "intermediate", x: 282, y: 72 }, { id: "Z", role: "intermediate", x: 358, y: 156 }, { id: "Y", role: "intermediate", x: 282, y: 240 }, { id: "B", role: "receiver", x: 556, y: 156 }], edges: [{ id: "A-X", from: "A", to: "X" }, { id: "X-B", from: "X", to: "B" }, { id: "A-Y", from: "A", to: "Y" }, { id: "Y-B", from: "Y", to: "B" }, { id: "X-Z", from: "X", to: "Z" }, { id: "Z-Y", from: "Z", to: "Y" }], healthyRoute: ["A", "X", "B"], failedLinkId: "X-B", failedNodeId: "X" },
-    star: { nodes: [{ id: "A", role: "sender", x: 88, y: 156 }, { id: "C", role: "intermediate", x: 320, y: 66 }, { id: "H", role: "intermediate", x: 320, y: 156 }, { id: "D", role: "intermediate", x: 320, y: 246 }, { id: "B", role: "receiver", x: 552, y: 156 }], edges: [{ id: "A-H", from: "A", to: "H" }, { id: "H-B", from: "H", to: "B" }, { id: "H-C", from: "H", to: "C" }, { id: "H-D", from: "H", to: "D" }], healthyRoute: ["A", "H", "B"], failedLinkId: "H-B", failedNodeId: "H" },
-    tree: { nodes: [{ id: "A", role: "sender", x: 72, y: 246 }, { id: "X", role: "intermediate", x: 204, y: 204 }, { id: "R", role: "intermediate", x: 320, y: 142 }, { id: "Y", role: "intermediate", x: 436, y: 204 }, { id: "B", role: "receiver", x: 568, y: 246 }, { id: "C", role: "intermediate", x: 248, y: 72 }, { id: "D", role: "intermediate", x: 392, y: 72 }], edges: [{ id: "A-X", from: "A", to: "X" }, { id: "X-R", from: "X", to: "R" }, { id: "R-Y", from: "R", to: "Y" }, { id: "Y-B", from: "Y", to: "B" }, { id: "R-C", from: "R", to: "C" }, { id: "R-D", from: "R", to: "D" }], healthyRoute: ["A", "X", "R", "Y", "B"], failedLinkId: "R-Y", failedNodeId: "R" },
-  };
-  const topology = (value: unknown): Topology => topologies.some(item => item === value) ? value as Topology : manifest.parameters.topology.defaultValue;
-  const fault = (value: unknown): value is Fault => value === "healthy" || value === "link" || value === "node";
-  normalizeValues = values => ({ topology: topology(values.topology), fault: fault(values.fault) ? values.fault : "healthy" }); defaultValues = () => ({ topology: topology(manifest.parameters.topology.defaultValue), fault: "healthy" }); valuesForTopology = value => ({ topology: topology(value), fault: "healthy" }); setFault = (values, value) => ({ ...normalizeValues(values), fault: value });
-  const node = (definition: Definition, id: string) => { const found = definition.nodes.find(item => item.id === id); if (!found) throw Error(`Unknown network node: ${id}`); return found; };
-  const alternateRoute = (definition: Definition, failedLinkId: string | null, failedNodeId: string | null) => { if (failedNodeId === "A" || failedNodeId === "B") return null; const queue: string[][] = [["A"]]; const visited = new Set(["A"]); while (queue.length > 0) { const path = queue.shift(); if (!path) break; const current = path.at(-1); if (current === "B") return path; for (const edge of definition.edges) { if (edge.id === failedLinkId || edge.from === failedNodeId || edge.to === failedNodeId) continue; const next = edge.from === current ? edge.to : edge.to === current ? edge.from : null; if (next && !visited.has(next)) { visited.add(next); queue.push([...path, next]); } } } return null; };
-  const blockedRoute = (definition: Definition, value: Fault) => { if (value === "node") return definition.healthyRoute.slice(0, Math.max(1, definition.healthyRoute.indexOf(definition.failedNodeId))); const edge = definition.edges.find(item => item.id === definition.failedLinkId); if (!edge) return ["A"]; const index = definition.healthyRoute.findIndex((id, routeIndex) => routeIndex < definition.healthyRoute.length - 1 && ((id === edge.from && definition.healthyRoute[routeIndex + 1] === edge.to) || (id === edge.to && definition.healthyRoute[routeIndex + 1] === edge.from))); return definition.healthyRoute.slice(0, Math.max(1, index + 1)); };
-  calculate = values => { const safe = normalizeValues(values); const definition = definitions[safe.topology]; if (safe.fault === "healthy") return { definition, deliveryContinues: true, fault: "healthy", failedLinkId: null, failedNodeId: null, routeKind: "healthy", routeNodeIds: definition.healthyRoute, topology: safe.topology }; const failedLinkId = safe.fault === "link" ? definition.failedLinkId : null; const failedNodeId = safe.fault === "node" ? definition.failedNodeId : null; const alternate = alternateRoute(definition, failedLinkId, failedNodeId); return { definition, deliveryContinues: alternate !== null, fault: safe.fault, failedLinkId, failedNodeId, routeKind: alternate ? "alternate" : "blocked", routeNodeIds: alternate ?? blockedRoute(definition, safe.fault), topology: safe.topology }; };
-  routePoints = result => { const points = result.routeNodeIds.map(id => { const value = node(result.definition, id); return { x: value.x, y: value.y }; }); if (result.routeKind !== "blocked") return points; const last = points.at(-1); if (!last) return points; if (result.fault === "link") { const id = result.routeNodeIds.at(-1); const edge = result.definition.edges.find(item => item.id === result.failedLinkId); if (!id || !edge) return points; const adjacent = edge.from === id ? edge.to : edge.to === id ? edge.from : null; if (!adjacent) return points; const target = node(result.definition, adjacent); return [...points, { x: last.x + (target.x - last.x) * 0.38, y: last.y + (target.y - last.y) * 0.38 }]; } const target = result.failedNodeId ? node(result.definition, result.failedNodeId) : null; return target ? [...points, { x: last.x + (target.x - last.x) * 0.7, y: last.y + (target.y - last.y) * 0.7 }] : points; };
-  pointAlongRoute = (points, progress) => { if (points.length === 0) return null; if (points.length === 1) return points[0] ?? null; const lengths = points.slice(1).map((point, index) => Math.hypot(point.x - (points[index]?.x ?? point.x), point.y - (points[index]?.y ?? point.y))); const total = lengths.reduce((sum, value) => sum + value, 0); if (total <= Number.EPSILON) return points[0] ?? null; let remaining = Math.min(Math.max(progress, 0), 1) * total; for (let index = 0; index < lengths.length; index += 1) { const length = lengths[index] ?? 0; const start = points[index]; const end = points[index + 1]; if (start && end && (remaining <= length || index === lengths.length - 1)) { const ratio = length <= Number.EPSILON ? 0 : remaining / length; return { x: start.x + (end.x - start.x) * ratio, y: start.y + (end.y - start.y) * ratio }; } remaining -= length; } return points.at(-1) ?? null; };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `NETWORK_FAULT_TOLERANCE`),
+      (n = `network-fault-tolerance-v3`),
+      (r = {
+        topology: {
+          kind: `enum`,
+          defaultValue: `ring`,
+          allowedValues: [`ring`, `mesh`, `star`, `tree`],
+        },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-export { routePoints as a, setFault as c, manifest as d, pointAlongRoute as i, valuesForTopology as l, calculate as n, initializeModel as o, defaultValues as r, normalizeValues as s, topologies as t, initializeManifest as u };
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x;
+function S() {
+  return (S = e(() => {
+    (a(),
+      (o = i.parameters.topology),
+      (s = o.allowedValues),
+      (c = {
+        ring: {
+          nodes: [
+            { id: `A`, role: `sender`, x: 92, y: 156 },
+            { id: `X`, role: `intermediate`, x: 320, y: 68 },
+            { id: `B`, role: `receiver`, x: 548, y: 156 },
+            { id: `Y`, role: `intermediate`, x: 320, y: 244 },
+          ],
+          edges: [
+            { id: `A-X`, from: `A`, to: `X` },
+            { id: `X-B`, from: `X`, to: `B` },
+            { id: `B-Y`, from: `B`, to: `Y` },
+            { id: `Y-A`, from: `Y`, to: `A` },
+          ],
+          healthyRoute: [`A`, `X`, `B`],
+          failedLinkId: `X-B`,
+          failedNodeId: `X`,
+        },
+        mesh: {
+          nodes: [
+            { id: `A`, role: `sender`, x: 84, y: 156 },
+            { id: `X`, role: `intermediate`, x: 282, y: 72 },
+            { id: `Z`, role: `intermediate`, x: 358, y: 156 },
+            { id: `Y`, role: `intermediate`, x: 282, y: 240 },
+            { id: `B`, role: `receiver`, x: 556, y: 156 },
+          ],
+          edges: [
+            { id: `A-X`, from: `A`, to: `X` },
+            { id: `X-B`, from: `X`, to: `B` },
+            { id: `A-Y`, from: `A`, to: `Y` },
+            { id: `Y-B`, from: `Y`, to: `B` },
+            { id: `X-Z`, from: `X`, to: `Z` },
+            { id: `Z-Y`, from: `Z`, to: `Y` },
+          ],
+          healthyRoute: [`A`, `X`, `B`],
+          failedLinkId: `X-B`,
+          failedNodeId: `X`,
+        },
+        star: {
+          nodes: [
+            { id: `A`, role: `sender`, x: 88, y: 156 },
+            { id: `C`, role: `intermediate`, x: 320, y: 66 },
+            { id: `H`, role: `intermediate`, x: 320, y: 156 },
+            { id: `D`, role: `intermediate`, x: 320, y: 246 },
+            { id: `B`, role: `receiver`, x: 552, y: 156 },
+          ],
+          edges: [
+            { id: `A-H`, from: `A`, to: `H` },
+            { id: `H-B`, from: `H`, to: `B` },
+            { id: `H-C`, from: `H`, to: `C` },
+            { id: `H-D`, from: `H`, to: `D` },
+          ],
+          healthyRoute: [`A`, `H`, `B`],
+          failedLinkId: `H-B`,
+          failedNodeId: `H`,
+        },
+        tree: {
+          nodes: [
+            { id: `A`, role: `sender`, x: 72, y: 246 },
+            { id: `X`, role: `intermediate`, x: 204, y: 204 },
+            { id: `R`, role: `intermediate`, x: 320, y: 142 },
+            { id: `Y`, role: `intermediate`, x: 436, y: 204 },
+            { id: `B`, role: `receiver`, x: 568, y: 246 },
+            { id: `C`, role: `intermediate`, x: 248, y: 72 },
+            { id: `D`, role: `intermediate`, x: 392, y: 72 },
+          ],
+          edges: [
+            { id: `A-X`, from: `A`, to: `X` },
+            { id: `X-R`, from: `X`, to: `R` },
+            { id: `R-Y`, from: `R`, to: `Y` },
+            { id: `Y-B`, from: `Y`, to: `B` },
+            { id: `R-C`, from: `R`, to: `C` },
+            { id: `R-D`, from: `R`, to: `D` },
+          ],
+          healthyRoute: [`A`, `X`, `R`, `Y`, `B`],
+          failedLinkId: `R-Y`,
+          failedNodeId: `R`,
+        },
+      }),
+      (l = (e) => typeof e == `string` && s.some((t) => t === e)),
+      (u = (e) => e === `healthy` || e === `link` || e === `node`),
+      (d = (e) => (l(e) ? e : o.defaultValue)),
+      (f = (e) => ({ topology: d(e.topology), fault: u(e.fault) ? e.fault : `healthy` })),
+      (p = () => ({ topology: d(o.defaultValue), fault: `healthy` })),
+      (m = (e) => ({ topology: d(e), fault: `healthy` })),
+      (h = (e, t) => ({ ...f(e), fault: t })),
+      (g = (e, t) => {
+        let n = e.nodes.find((e) => e.id === t);
+        if (!n) throw Error(`Unknown network node: ${t}`);
+        return n;
+      }),
+      (_ = (e, t, n) => {
+        if (n === `A` || n === `B`) return null;
+        let r = [[`A`]],
+          i = new Set([`A`]);
+        for (; r.length > 0;) {
+          let a = r.shift();
+          if (!a) break;
+          let o = a[a.length - 1];
+          if (o === `B`) return a;
+          for (let s of e.edges) {
+            if (s.id === t || s.from === n || s.to === n) continue;
+            let e = s.from === o ? s.to : s.to === o ? s.from : null;
+            e && !i.has(e) && (i.add(e), r.push([...a, e]));
+          }
+        }
+        return null;
+      }),
+      (v = (e, t) => {
+        if (t === `node`) {
+          let t = e.healthyRoute.indexOf(e.failedNodeId);
+          return e.healthyRoute.slice(0, Math.max(1, t));
+        }
+        let n = e.edges.find((t) => t.id === e.failedLinkId);
+        if (!n) return [`A`];
+        let r = e.healthyRoute.findIndex(
+          (t, r) =>
+            r < e.healthyRoute.length - 1 &&
+            ((t === n.from && e.healthyRoute[r + 1] === n.to) ||
+              (t === n.to && e.healthyRoute[r + 1] === n.from)),
+        );
+        return e.healthyRoute.slice(0, Math.max(1, r + 1));
+      }),
+      (y = (e) => {
+        let t = f(e),
+          n = c[t.topology];
+        if (t.fault === `healthy`)
+          return {
+            definition: n,
+            deliveryContinues: !0,
+            fault: `healthy`,
+            failedLinkId: null,
+            failedNodeId: null,
+            routeKind: `healthy`,
+            routeNodeIds: n.healthyRoute,
+            topology: t.topology,
+          };
+        let r = t.fault === `link` ? n.failedLinkId : null,
+          i = t.fault === `node` ? n.failedNodeId : null,
+          a = _(n, r, i);
+        return {
+          definition: n,
+          deliveryContinues: a !== null,
+          fault: t.fault,
+          failedLinkId: r,
+          failedNodeId: i,
+          routeKind: a ? `alternate` : `blocked`,
+          routeNodeIds: a ?? v(n, t.fault),
+          topology: t.topology,
+        };
+      }),
+      (b = (e) => {
+        let t = e.routeNodeIds.map((t) => {
+          let n = g(e.definition, t);
+          return { x: n.x, y: n.y };
+        });
+        if (e.routeKind !== `blocked`) return t;
+        let n = t[t.length - 1];
+        if (!n) return t;
+        if (e.fault === `link`) {
+          let r = e.routeNodeIds.at(-1),
+            i = e.definition.edges.find((t) => t.id === e.failedLinkId);
+          if (!r || !i) return t;
+          let a = i.from === r ? i.to : i.to === r ? i.from : null;
+          if (!a) return t;
+          let o = g(e.definition, a);
+          return [...t, { x: n.x + (o.x - n.x) * 0.38, y: n.y + (o.y - n.y) * 0.38 }];
+        }
+        let r = e.failedNodeId ? g(e.definition, e.failedNodeId) : null;
+        return r ? [...t, { x: n.x + (r.x - n.x) * 0.7, y: n.y + (r.y - n.y) * 0.7 }] : t;
+      }),
+      (x = (e, t) => {
+        if (e.length === 0) return null;
+        if (e.length === 1) return e[0];
+        let n = e.slice(1).map((t, n) => Math.hypot(t.x - e[n].x, t.y - e[n].y)),
+          r = n.reduce((e, t) => e + t, 0);
+        if (r <= 2 ** -52) return e[0];
+        let i = Math.min(Math.max(t, 0), 1) * r;
+        for (let t = 0; t < n.length; t += 1) {
+          let r = n[t],
+            a = e[t],
+            o = e[t + 1];
+          if (a && o) {
+            if (i <= r || t === n.length - 1) {
+              let e = r <= 2 ** -52 ? 0 : i / r;
+              return { x: a.x + (o.x - a.x) * e, y: a.y + (o.y - a.y) * e };
+            }
+            i -= r;
+          }
+        }
+        return e[e.length - 1];
+      }));
+  }))();
+}
+export { b as a, h as c, i as d, x as i, m as l, y as n, S as o, p as r, f as s, s as t, a as u };

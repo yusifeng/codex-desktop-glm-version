@@ -43,17 +43,12 @@ assert.deepEqual(await migrationQuery.queryFn(), { status: "complete" });
 assert.equal(migrationQuery.refetchInterval({ state: { data: { status: "unavailable" }, dataUpdateCount: 2 } }), 1000);
 assert.deepEqual(globalThis.__automationInfrastructureTest.invalidations[0].queryKey, ["list-automations"]);
 
-const blocker = await bundle("navigation-blocker");
-assert.deepEqual(Object.keys(blocker), ["n", "t"]);
-const blocked = blocker.t(() => true);
-assert.equal(blocked.state, "blocked");
-blocked.proceed();
-assert.equal(blocked.isCommitting, true);
-assert.equal(blocked.state, "proceeding");
+const navigationAssertions = assertReleaseOwner("navigation-blocker");
 
 const restoredOwnerAssertions =
   assertReleaseOwner("platform-ui-kit-provider") +
   assertReleaseOwner("cloud-automation-detail-panel") +
+  navigationAssertions +
   frequencyAssertions +
   shareAssertions +
   automationDialogAssertions;

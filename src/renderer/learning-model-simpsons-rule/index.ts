@@ -1,46 +1,220 @@
-// Simpson's-rule teaching model. Release chunk: model-c91680043005.js.
-import "@rchunk/rolldown-runtime";
-import { a as initializeBuildGraphData, n as evaluateExpression } from "@rchunk/build-graph-data";
-import { n as initializeTokenizer, r as parseMath, t as collectVariables } from "@rchunk/tokenize-math-block";
-import { n as initializeNullThrows, t as nullThrows } from "@rchunk/null-throws";
-import { n as parseNumericalIntegral, t as initializeNumericalIntegration } from "@rchunk/numerical-integration";
-
-interface SimpsonInput { integrand: string; lowerBound: number; subintervalCount: number; upperBound: number }
-type ParsedExpression = ReturnType<typeof parseMath>;
-const defaultInterval = [0, 5] as const;
-const defaultInput: SimpsonInput = { integrand: "x", lowerBound: 0, subintervalCount: 8, upperBound: 5 };
-const subintervalControl = { min: 2, max: 8, step: 1 };
-const defaultExpression = nullThrows(parseMath("y=x"));
-const integrationSteps = 2_000;
-const numberPattern = "-?(?:\\d+(?:\\.\\d*)?|\\.\\d+)";
-const clamp = (value: number, min: number, max: number): number => Math.min(Math.max(value, min), max);
-const finiteOr = (value: number | undefined, fallback: number): number => Number.isFinite(value) ? Number(value) : fallback;
-const normalizeMath = (value: string): string => value.toLowerCase().replace(/\\left|\\right/g, "").replace(/[−–—]/g, "-").replace(/\s+/g, "");
-const validExpression = (value: string): ParsedExpression | null => { const parsed = parseMath(`y=${value}`); const hasFunction = Array.isArray(parsed) && parsed.some((token: unknown) => typeof token === "object" && token !== null && "type" in token && token.type === "function"); return !parsed || hasFunction || collectVariables(parsed).length > 0 ? null : parsed; };
-const safeIntegrand = (value: string): string => { const parsed = parseNumericalIntegral(value); return parsed.hasUnsupportedLetter || !parsed.integrand || !validExpression(parsed.integrand) ? "x" : parsed.integrand; };
-const parseNumber = (value: string | undefined): number | null => { if (value == null) return null; const parsed = Number.parseFloat(value); return Number.isFinite(parsed) ? parsed : null; };
-const parseIntegral = (source: string): Omit<SimpsonInput, "subintervalCount"> => {
-  const compact = normalizeMath(source).replace(/\\,/g, "");
-  const forward = compact.match(RegExp(`\\\\int_(?:\\{(?<lowerBraced>${numberPattern})\\}|(?<lowerPlain>${numberPattern}))\\^(?:\\{(?<upperBraced>${numberPattern})\\}|(?<upperPlain>${numberPattern}))(?<integrand>.+?)dx`));
-  if (forward?.groups?.integrand) return { integrand: forward.groups.integrand, lowerBound: parseNumber(forward.groups.lowerBraced ?? forward.groups.lowerPlain) ?? 0, upperBound: parseNumber(forward.groups.upperBraced ?? forward.groups.upperPlain) ?? 5 };
-  const reverse = compact.match(RegExp(`\\\\int\\^(?:\\{(?<upperBraced>${numberPattern})\\}|(?<upperPlain>${numberPattern}))_(?:\\{(?<lowerBraced>${numberPattern})\\}|(?<lowerPlain>${numberPattern}))(?<integrand>.+?)dx`));
-  if (reverse?.groups?.integrand) return { integrand: reverse.groups.integrand, lowerBound: parseNumber(reverse.groups.lowerBraced ?? reverse.groups.lowerPlain) ?? 0, upperBound: parseNumber(reverse.groups.upperBraced ?? reverse.groups.upperPlain) ?? 5 };
-  return { integrand: source.match(/^\s*f\s*\(\s*x\s*\)\s*=\s*(.+?)\s*$/i)?.[1] ?? source, lowerBound: 0, upperBound: 5 };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { a as t, n } from "@rchunk/build-graph-data";
+import { n as r, r as i, t as a } from "@rchunk/tokenize-math-block";
+import { n as o, t as s } from "@rchunk/null-throws";
+import { n as c, t as l } from "@rchunk/numerical-integration";
+var u,
+  d,
+  f,
+  p,
+  m,
+  h,
+  g,
+  _,
+  v,
+  y,
+  b,
+  x,
+  S,
+  C,
+  w,
+  T,
+  E,
+  D,
+  O,
+  k,
+  A,
+  j,
+  M,
+  N,
+  P,
+  F,
+  I,
+  L,
+  R,
+  z,
+  B,
+  V,
+  H,
+  U,
+  W;
+function G() {
+  return (G = e(() => {
+    (r(),
+      t(),
+      l(),
+      s(),
+      (u = [0, 5]),
+      (d = { integrand: `x`, lowerBound: u[0], subintervalCount: 8, upperBound: u[1] }),
+      (f = { min: 2, max: 8, step: 1 }),
+      (p = o(i(`y=x`))),
+      (m = 2e3),
+      (h = `-?(?:\\d+(?:\\.\\d*)?|\\.\\d+)`),
+      (g = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (_ = (e) => Math.round(e / 2) * 2),
+      (v = (e) => {
+        if (e == null) return null;
+        let t = Number.parseFloat(e);
+        return Number.isFinite(t) ? t : null;
+      }),
+      (y = (e, t) => (Number.isFinite(e) ? Number(e) : t)),
+      (b = (e) =>
+        e
+          .toLowerCase()
+          .replace(/\\left|\\right/g, ``)
+          .replace(/[−–—]/g, `-`)
+          .replace(/\s+/g, ``)),
+      (x = (e) => c(e)),
+      (S = (e) => {
+        let t = i(`y=${e}`);
+        return !t || t.some((e) => e.type === `function`) || a(t).length > 0 ? null : t;
+      }),
+      (C = (e) => {
+        let t = x(e);
+        return t.hasUnsupportedLetter || !t.integrand || !S(t.integrand) ? `x` : t.integrand;
+      }),
+      (w = (e) => {
+        let t = b(e).replace(/\\,/g, ``),
+          n = t.match(
+            RegExp(
+              `\\\\int_(?:\\{(?<lowerBraced>${h})\\}|(?<lowerPlain>${h}))\\^(?:\\{(?<upperBraced>${h})\\}|(?<upperPlain>${h}))(?<integrand>.+?)dx`,
+            ),
+          );
+        if (n?.groups?.integrand)
+          return {
+            integrand: n.groups.integrand,
+            lowerBound: v(n.groups.lowerBraced ?? n.groups.lowerPlain) ?? d.lowerBound,
+            upperBound: v(n.groups.upperBraced ?? n.groups.upperPlain) ?? d.upperBound,
+          };
+        let r = t.match(
+          RegExp(
+            `\\\\int\\^(?:\\{(?<upperBraced>${h})\\}|(?<upperPlain>${h}))_(?:\\{(?<lowerBraced>${h})\\}|(?<lowerPlain>${h}))(?<integrand>.+?)dx`,
+          ),
+        );
+        return r?.groups?.integrand
+          ? {
+              integrand: r.groups.integrand,
+              lowerBound: v(r.groups.lowerBraced ?? r.groups.lowerPlain) ?? d.lowerBound,
+              upperBound: v(r.groups.upperBraced ?? r.groups.upperPlain) ?? d.upperBound,
+            }
+          : {
+              integrand: e.match(/^\s*f\s*\(\s*x\s*\)\s*=\s*(.+?)\s*$/i)?.[1] ?? e,
+              lowerBound: d.lowerBound,
+              upperBound: d.upperBound,
+            };
+      }),
+      (T = (e) => {
+        let t = b(e).replace(/\\,/g, ``),
+          n = `(?:\\{${h}\\}|${h})`;
+        return RegExp(`^\\\\int(?:_${n}\\^${n}|\\^${n}_${n}).+?dx$`).test(t);
+      }),
+      (E = (e) =>
+        C(e)
+          .replace(/pi/g, (e, t, n) => (/[a-z]/.test(n[t + 2] ?? ``) ? `\\pi ` : `\\pi`))
+          .replace(/\*/g, `\\cdot `)),
+      (D = (e) => V(e, 4)),
+      (O = (e) => {
+        let {
+          integrand: t,
+          lowerBound: n,
+          upperBound: r,
+        } = typeof e == `string`
+          ? { integrand: e, lowerBound: d.lowerBound, upperBound: d.upperBound }
+          : e;
+        return `\\int_{${D(n)}}^{${D(r)}} ${E(t)} \\, dx`;
+      }),
+      (k = (e) => {
+        let t = Math.round(Number.isFinite(e) ? (e ?? d.subintervalCount) : 0),
+          n = g(t || d.subintervalCount, f.min, f.max),
+          r = _(n);
+        return g(r, f.min, f.max);
+      }),
+      (A = (e) => {
+        let t = e.match(/\bn\s*=\s*(\d+)/i);
+        if (t?.[1]) return Number.parseInt(t[1], 10);
+        let n = e.match(/(?:with|using)\s+(\d+)\s+subintervals?/i);
+        return n?.[1] ? Number.parseInt(n[1], 10) : d.subintervalCount;
+      }),
+      (j = (e) => ({
+        integrand: C(e.integrand),
+        lowerBound: y(e.lowerBound, d.lowerBound),
+        subintervalCount: k(e.subintervalCount),
+        upperBound:
+          y(e.upperBound, d.upperBound) === y(e.lowerBound, d.lowerBound)
+            ? d.upperBound
+            : y(e.upperBound, d.upperBound),
+      })),
+      (M = (e) => j({ ...w(e), subintervalCount: A(e) })),
+      (N = ({ lowerBound: e, upperBound: t }) => [y(e, d.lowerBound), y(t, d.upperBound)]),
+      (P = (e) => {
+        let [t, n] = N(e),
+          r = Math.min(t, n),
+          i = Math.max(t, n),
+          a = Math.max(i - r, 1),
+          o = Math.max(a * 0.15, 0.75);
+        return [r - o, i + o];
+      }),
+      (F = (e) => S(j(e).integrand) ?? p),
+      (I = (e, t) => n(F(e), t, {})),
+      (L = (e) => O(j(e))),
+      (R = (e) => j(e).integrand),
+      (z = (e) => {
+        let t = j(e),
+          [r, i] = N(t),
+          a = F(t),
+          o = (i - r) / m,
+          s = n(a, r, {}) + n(a, i, {});
+        if (!Number.isFinite(s)) return NaN;
+        let c = 0;
+        for (let e = 1; e < m; e += 1) {
+          let t = n(a, r + e * o, {});
+          if (!Number.isFinite(t)) return NaN;
+          c += (e % 2 == 0 ? 2 : 4) * t;
+        }
+        return (o / 3) * (s + c);
+      }),
+      (B = (e) => z(j(e))),
+      (V = (e, t = 3) => {
+        if (!Number.isFinite(e)) return `0`;
+        let n = Number(e.toFixed(t));
+        return Object.is(n, -0) ? `0` : n.toString();
+      }),
+      (H = (e, t) => {
+        let n = 0;
+        for (let r = 0; r < e; r += 1) n += t(r);
+        return n;
+      }),
+      (U = (e) => {
+        let t = j(e),
+          [n, r] = N(t),
+          i = t.subintervalCount,
+          a = (r - n) / i,
+          o = (e) => I(t, e);
+        return (
+          (a / 3) * (o(n) + o(r) + H(i - 1, (e) => ((e + 1) % 2 == 0 ? 2 : 4) * o(n + (e + 1) * a)))
+        );
+      }),
+      (W = (e) => {
+        let t = j(e),
+          n = U(t),
+          r = B(t);
+        return { estimate: n, exactValue: r, error: n - r };
+      }));
+  }))();
+}
+export {
+  V as a,
+  P as c,
+  G as d,
+  T as f,
+  I as i,
+  R as l,
+  M as n,
+  L as o,
+  j as p,
+  W as r,
+  N as s,
+  f as t,
+  F as u,
 };
-const isIntegralNotation = (source: string): boolean => { const compact = normalizeMath(source).replace(/\\,/g, ""); const bound = `(?:\\{${numberPattern}\\}|${numberPattern})`; return RegExp(`^\\\\int(?:_${bound}\\^${bound}|\\^${bound}_${bound}).+?dx$`).test(compact); };
-const normalizeSubintervalCount = (value: number | undefined): number => clamp(Math.round(clamp(Math.round(Number.isFinite(value) ? value ?? 8 : 0) || 8, 2, 8) / 2) * 2, 2, 8);
-const subintervalsFromText = (source: string): number => Number.parseInt(source.match(/\bn\s*=\s*(\d+)/i)?.[1] ?? source.match(/(?:with|using)\s+(\d+)\s+subintervals?/i)?.[1] ?? "8", 10);
-const normalizeInput = (input: Partial<SimpsonInput>): SimpsonInput => { const lowerBound = finiteOr(input.lowerBound, 0); const upperBound = finiteOr(input.upperBound, 5); return { integrand: safeIntegrand(input.integrand ?? "x"), lowerBound, subintervalCount: normalizeSubintervalCount(input.subintervalCount), upperBound: upperBound === lowerBound ? 5 : upperBound }; };
-const parseInput = (source: string): SimpsonInput => normalizeInput({ ...parseIntegral(source), subintervalCount: subintervalsFromText(source) });
-const bounds = (input: Partial<SimpsonInput>): [number, number] => [finiteOr(input.lowerBound, 0), finiteOr(input.upperBound, 5)];
-const domain = (input: Partial<SimpsonInput>): [number, number] => { const [a, b] = bounds(input); const low = Math.min(a, b); const high = Math.max(a, b); const span = Math.max(high - low, 1); const padding = Math.max(span * 0.15, 0.75); return [low - padding, high + padding]; };
-const expression = (input: Partial<SimpsonInput>): ParsedExpression => validExpression(normalizeInput(input).integrand) ?? defaultExpression;
-const evaluate = (input: Partial<SimpsonInput>, x: number): number => evaluateExpression(expression(input), x, {});
-const formatNumber = (value: number, precision = 3): string => { if (!Number.isFinite(value)) return "0"; const rounded = Number(value.toFixed(precision)); return Object.is(rounded, -0) ? "0" : rounded.toString(); };
-const integrandLabel = (input: Partial<SimpsonInput>): string => normalizeInput(input).integrand;
-const integralLabel = (input: Partial<SimpsonInput>): string => { const safe = normalizeInput(input); const shown = safe.integrand.replace(/pi/g, (_match, offset: number, whole: string) => /[a-z]/.test(whole[offset + 2] ?? "") ? "\\pi " : "\\pi").replace(/\*/g, "\\cdot " ); return `\\int_{${formatNumber(safe.lowerBound, 4)}}^{${formatNumber(safe.upperBound, 4)}} ${shown} \\, dx`; };
-const simpsonsEstimate = (input: Partial<SimpsonInput>): number => { const safe = normalizeInput(input); const [a, b] = bounds(safe); const h = (b - a) / safe.subintervalCount; let weighted = evaluate(safe, a) + evaluate(safe, b); for (let index = 1; index < safe.subintervalCount; index += 1) weighted += (index % 2 === 0 ? 2 : 4) * evaluate(safe, a + index * h); return h / 3 * weighted; };
-const exactValue = (input: Partial<SimpsonInput>): number => { const safe = normalizeInput(input); const [a, b] = bounds(safe); const h = (b - a) / integrationSteps; let weighted = evaluateExpression(expression(safe), a, {}) + evaluateExpression(expression(safe), b, {}); if (!Number.isFinite(weighted)) return Number.NaN; for (let index = 1; index < integrationSteps; index += 1) { const value = evaluateExpression(expression(safe), a + index * h, {}); if (!Number.isFinite(value)) return Number.NaN; weighted += (index % 2 === 0 ? 2 : 4) * value; } return h / 3 * weighted; };
-const result = (input: Partial<SimpsonInput>) => { const safe = normalizeInput(input); const estimate = simpsonsEstimate(safe); const exact = exactValue(safe); return { estimate, exactValue: exact, error: estimate - exact }; };
-function initializeSimpsonsRuleModel(): void { initializeTokenizer(); initializeBuildGraphData(); initializeNumericalIntegration(); initializeNullThrows(); }
-export { formatNumber as a, domain as c, initializeSimpsonsRuleModel as d, isIntegralNotation as f, evaluate as i, integrandLabel as l, parseInput as n, integralLabel as o, normalizeInput as p, result as r, bounds as s, subintervalControl as t, expression as u };

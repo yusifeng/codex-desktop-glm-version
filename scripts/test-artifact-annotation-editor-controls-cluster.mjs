@@ -59,21 +59,7 @@ assert.equal(action.props["aria-pressed"], true);
 action.props.onClick();
 assert.equal(actionClicks, 1);
 
-// binary-preview-source: 11
-const binary = await bundle("binary-preview-source");
-assert.deepEqual(Object.keys(binary), ["a", "i", "n", "o", "r", "s", "t"]);
-assert.deepEqual(binary.n(), { dataUrl: null, isLoading: false, isError: false });
-assert.deepEqual(binary.n({ kind: "git", path: "/dev/null" }), { dataUrl: null, isLoading: false, isError: false });
-assert.deepEqual(binary.n({ kind: "git", path: "a.png", isLoading: true }), { dataUrl: null, isLoading: true, isError: false });
-assert.equal(binary.n({ kind: "git", path: "a.png", contentsBase64: "AA==" }).dataUrl, "data:image/png;base64,AA==");
-assert.equal(binary.n({ kind: "worktree", path: "a.bin", mimeType: "custom/type", contentsBase64: "AQ==" }).dataUrl, "data:custom/type;base64,AQ==");
-const compare = binary.o({ before: "old", after: "new" });
-assert.match(compare.props.className, /overflow-auto/);
-assert.equal(childArray(compare.props.children).length, 2);
-const afterOnly = binary.o({ before: "old", after: "new", showAfterOnly: true });
-assert.match(afterOnly.props.children.props.className, /grid-cols-1/);
-assert.equal(afterOnly.props.children.props.children, "new");
-assert.equal(binary.r({}).props.role, "status");
+assertReleaseOwner("binary-preview-source");
 
 assertReleaseOwner("editor-header");
 

@@ -1,7 +1,173 @@
-// Binary heap operation trace model. Release chunk: model-775baaf06261.js.
-import "@rchunk/rolldown-runtime";
-type HeapKind = "min-heap" | "max-heap"; type Operation = "insert" | "remove-root"; interface Frame { activeIndex: number | null; chosenIndex: number | null; comparisonIndices: number[]; direction: "up" | "down" | null; heap: number[]; phase: string; removedKey: number | null; shouldSwap: boolean | null; swapCount: number } interface Manifest { type: string; version: number; thumbnailAssetKey: string; parameters: { heap_kind: { kind: "enum"; defaultValue: HeapKind; allowedValues: HeapKind[] }; initial_operation: { kind: "enum"; defaultValue: Operation; allowedValues: Operation[] } } }
-let manifest: Manifest; let defaultValues: () => { heap_kind: HeapKind; initial_operation: Operation; step: number }; let calculate: (values: { heap_kind?: string | null; initial_operation?: string | null; step?: number | null }) => { frame: Frame; frames: Frame[]; maxStep: number; values: { heap_kind: HeapKind; initial_operation: Operation; step: number } }; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "BINARY_HEAP_OPERATIONS", version: 2, thumbnailAssetKey: "binary-heap-operations-v1", parameters: { heap_kind: { kind: "enum", defaultValue: "min-heap", allowedValues: ["min-heap", "max-heap"] }, initial_operation: { kind: "enum", defaultValue: "insert", allowedValues: ["insert", "remove-root"] } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); const kind = (value: unknown): HeapKind => value === "max-heap" ? "max-heap" : "min-heap"; const operation = (value: unknown): Operation => value === "remove-root" ? "remove-root" : "insert"; defaultValues = () => ({ heap_kind: kind(manifest.parameters.heap_kind.defaultValue), initial_operation: operation(manifest.parameters.initial_operation.defaultValue), step: 0 }); const base = (heapKind: HeapKind) => heapKind === "min-heap" ? [4, 7, 6, 10, 15, 12, 13] : [16, 13, 14, 10, 5, 8, 7]; const inserted = (heapKind: HeapKind) => heapKind === "min-heap" ? 4 : 16; const precedes = (heapKind: HeapKind, left: number, right: number) => heapKind === "min-heap" ? left < right : left > right; const frame = (heap: number[], phase: string, options: Partial<Omit<Frame, "heap" | "phase">> = {}): Frame => ({ activeIndex: options.activeIndex ?? null, chosenIndex: options.chosenIndex ?? null, comparisonIndices: options.comparisonIndices ?? [], direction: options.direction ?? null, heap: [...heap], phase, removedKey: options.removedKey ?? null, shouldSwap: options.shouldSwap ?? null, swapCount: options.swapCount ?? 0 }); const insertion = (heapKind: HeapKind) => { const heap = base(heapKind); const frames = [frame(heap, "initial")]; heap.push(inserted(heapKind)); let active = heap.length - 1; let swaps = 0; frames.push(frame(heap, "append", { activeIndex: active, direction: "up" })); while (active > 0) { const parent = Math.floor((active - 1) / 2); const childValue = heap[active]; const parentValue = heap[parent]; if (childValue === undefined || parentValue === undefined) throw Error("Binary heap insertion comparison is missing a key."); const shouldSwap = precedes(heapKind, childValue, parentValue); frames.push(frame(heap, "compare", { activeIndex: active, comparisonIndices: [parent], direction: "up", shouldSwap, swapCount: swaps })); if (!shouldSwap) break; heap[active] = parentValue; heap[parent] = childValue; active = parent; swaps += 1; frames.push(frame(heap, "swap", { activeIndex: active, comparisonIndices: [active * 2 + 1], direction: "up", swapCount: swaps })); } frames.push(frame(heap, "complete", { activeIndex: active, swapCount: swaps })); return frames; }; const removal = (heapKind: HeapKind) => { const heap = base(heapKind); const removedKey = heap[0]; const last = heap.pop(); if (removedKey === undefined || last === undefined) throw Error("Binary heap removal requires a root and a last leaf."); const frames = [frame(base(heapKind), "initial", { removedKey })]; heap[0] = last; let active = 0; let swaps = 0; frames.push(frame(heap, "replace", { activeIndex: active, direction: "down", removedKey })); while (true) { const left = active * 2 + 1; const right = left + 1; const leftValue = heap[left]; const rightValue = heap[right]; const current = heap[active]; if (leftValue === undefined || current === undefined) break; const chosenIndex = rightValue !== undefined && precedes(heapKind, rightValue, leftValue) ? right : left; const chosen = heap[chosenIndex]; if (chosen === undefined) throw Error("Binary heap removal is missing the chosen child."); const shouldSwap = precedes(heapKind, chosen, current); frames.push(frame(heap, "compare", { activeIndex: active, chosenIndex, comparisonIndices: rightValue === undefined ? [left] : [left, right], direction: "down", removedKey, shouldSwap, swapCount: swaps })); if (!shouldSwap) break; heap[active] = chosen; heap[chosenIndex] = current; active = chosenIndex; swaps += 1; frames.push(frame(heap, "swap", { activeIndex: active, comparisonIndices: [Math.floor((active - 1) / 2)], direction: "down", removedKey, swapCount: swaps })); } frames.push(frame(heap, "complete", { activeIndex: active, removedKey, swapCount: swaps })); return frames; }; calculate = values => { const heap_kind = kind(values.heap_kind); const initial_operation = operation(values.initial_operation); const frames = initial_operation === "insert" ? insertion(heap_kind) : removal(heap_kind); const maxStep = frames.length - 1; const step = Math.min(Math.max(Math.round(typeof values.step === "number" && Number.isFinite(values.step) ? values.step : 0), 0), maxStep); return { frame: frames[step] ?? frames[0], frames, maxStep, values: { heap_kind, initial_operation, step } }; }; }
-export { manifest as a, initializeManifest as i, defaultValues as n, initializeModel as r, calculate as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `BINARY_HEAP_OPERATIONS`),
+      (n = `binary-heap-operations-v1`),
+      (r = {
+        heap_kind: {
+          kind: `enum`,
+          defaultValue: `min-heap`,
+          allowedValues: [`min-heap`, `max-heap`],
+        },
+        initial_operation: {
+          kind: `enum`,
+          defaultValue: `insert`,
+          allowedValues: [`insert`, `remove-root`],
+        },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y;
+function b() {
+  return (b = e(() => {
+    (a(),
+      (o = i.parameters.heap_kind),
+      (s = i.parameters.initial_operation),
+      (c = (e, t) => Math.min(Math.max(Math.round(Number.isFinite(e) ? (e ?? 0) : 0), 0), t)),
+      (l = (e) => (e === `max-heap` ? `max-heap` : `min-heap`)),
+      (u = (e) => (e === `remove-root` ? `remove-root` : `insert`)),
+      (d = () => ({ heap_kind: l(o.defaultValue), initial_operation: u(s.defaultValue), step: 0 })),
+      (f = (e) => (e === `min-heap` ? [4, 7, 6, 10, 15, 12, 13] : [16, 13, 14, 10, 5, 8, 7])),
+      (p = (e) => (e === `min-heap` ? 4 : 16)),
+      (m = (e, t, n) => (e === `min-heap` ? t < n : t > n)),
+      (h = (
+        e,
+        t,
+        {
+          activeIndex: n = null,
+          chosenIndex: r = null,
+          comparisonIndices: i = [],
+          direction: a = null,
+          removedKey: o = null,
+          shouldSwap: s = null,
+          swapCount: c = 0,
+        } = {},
+      ) => ({
+        activeIndex: n,
+        chosenIndex: r,
+        comparisonIndices: i,
+        direction: a,
+        heap: [...e],
+        phase: t,
+        removedKey: o,
+        shouldSwap: s,
+        swapCount: c,
+      })),
+      (g = (e) => {
+        let t = f(e),
+          n = [h(t, `initial`)];
+        t.push(p(e));
+        let r = t.length - 1,
+          i = 0;
+        for (n.push(h(t, `append`, { activeIndex: r, direction: `up` })); r > 0;) {
+          let a = Math.floor((r - 1) / 2),
+            o = t[r],
+            s = t[a];
+          if (o === void 0 || s === void 0)
+            throw Error(`Binary heap insertion comparison is missing a key.`);
+          let c = m(e, o, s);
+          if (
+            (n.push(
+              h(t, `compare`, {
+                activeIndex: r,
+                comparisonIndices: [a],
+                direction: `up`,
+                shouldSwap: c,
+                swapCount: i,
+              }),
+            ),
+            !c)
+          )
+            break;
+          ((t[r] = s),
+            (t[a] = o),
+            (r = a),
+            (i += 1),
+            n.push(
+              h(t, `swap`, {
+                activeIndex: r,
+                comparisonIndices: [r * 2 + 1],
+                direction: `up`,
+                swapCount: i,
+              }),
+            ));
+        }
+        return (n.push(h(t, `complete`, { activeIndex: r, swapCount: i })), n);
+      }),
+      (_ = (e) => {
+        let t = f(e),
+          n = t[0],
+          r = t.pop();
+        if (n === void 0 || r === void 0)
+          throw Error(`Binary heap removal requires a root and a last leaf.`);
+        let i = [h(f(e), `initial`, { removedKey: n })];
+        t[0] = r;
+        let a = 0,
+          o = 0;
+        for (i.push(h(t, `replace`, { activeIndex: a, direction: `down`, removedKey: n })); ;) {
+          let r = a * 2 + 1,
+            s = r + 1,
+            c = t[r],
+            l = t[s],
+            u = t[a];
+          if (c === void 0 || u === void 0) break;
+          let d = l !== void 0 && m(e, l, c) ? s : r,
+            f = t[d];
+          if (f === void 0) throw Error(`Binary heap removal is missing the chosen child.`);
+          let p = m(e, f, u);
+          if (
+            (i.push(
+              h(t, `compare`, {
+                activeIndex: a,
+                chosenIndex: d,
+                comparisonIndices: l === void 0 ? [r] : [r, s],
+                direction: `down`,
+                removedKey: n,
+                shouldSwap: p,
+                swapCount: o,
+              }),
+            ),
+            !p)
+          )
+            break;
+          ((t[a] = f),
+            (t[d] = u),
+            (a = d),
+            (o += 1),
+            i.push(
+              h(t, `swap`, {
+                activeIndex: a,
+                comparisonIndices: [Math.floor((a - 1) / 2)],
+                direction: `down`,
+                removedKey: n,
+                swapCount: o,
+              }),
+            ));
+        }
+        return (i.push(h(t, `complete`, { activeIndex: a, removedKey: n, swapCount: o })), i);
+      }),
+      (v = (e, t) => {
+        let n = t === `insert` ? g(e) : _(e),
+          r = n[0];
+        if (!r) throw Error(`Binary heap trace did not create an initial frame.`);
+        return [r, ...n.slice(1)];
+      }),
+      (y = (e) => {
+        let t = l(e.heap_kind),
+          n = u(e.initial_operation),
+          r = v(t, n),
+          i = r.length - 1,
+          a = c(e.step, i);
+        return {
+          frame: r[a] ?? r[0],
+          frames: r,
+          maxStep: i,
+          values: { heap_kind: t, initial_operation: n, step: a },
+        };
+      }));
+  }))();
+}
+export { i as a, a as i, d as n, b as r, y as t };

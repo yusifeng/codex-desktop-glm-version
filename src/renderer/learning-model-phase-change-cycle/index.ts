@@ -1,5 +1,173 @@
-// Phase-change-cycle teaching model. Release chunk: model-f0617ef38ba2.js.
-import "@rchunk/rolldown-runtime";
-type Transition="melting"|"freezing"|"vaporization"|"condensation"|"sublimation"|"deposition"; type State="solid"|"liquid"|"gas"; interface IntlLike{formatMessage(descriptor:{id:string;defaultMessage:string},values?:Record<string,string|undefined>):string}
-const transitions:Transition[]=["melting","freezing","vaporization","condensation","sublimation","deposition"]; const control={min:0,max:5,step:1,defaultValue:"melting"}; const definitions:Record<Transition,{source:State;destination:State;absorbsHeat:boolean}>={melting:{source:"solid",destination:"liquid",absorbsHeat:true},freezing:{source:"liquid",destination:"solid",absorbsHeat:false},vaporization:{source:"liquid",destination:"gas",absorbsHeat:true},condensation:{source:"gas",destination:"liquid",absorbsHeat:false},sublimation:{source:"solid",destination:"gas",absorbsHeat:true},deposition:{source:"gas",destination:"solid",absorbsHeat:false}}; const specification={type:"PHASE_CHANGE_CYCLE",version:2,thumbnailAssetKey:"phase-change-cycle-v2",parameters:{initial_transition:{kind:"enum",defaultValue:"melting",allowedValues:transitions}}}; const normalize=(input:{initial_transition?:string})=>({initial_transition:transitions.some(value=>value===input.initial_transition)?input.initial_transition as Transition:control.defaultValue}); const transitionIndex=(transition:string)=>Math.max(0,transitions.indexOf(transition as Transition)); const transitionForIndex=(index:number)=>transitions[Math.min(Math.max(Math.round(index),0),5)]??control.defaultValue; const transitionLabel=(intl:IntlLike,transition:Transition)=>intl.formatMessage({id:`learningBlock.phaseChangeCycle.transition.${transition}`,defaultMessage:transition[0].toUpperCase()+transition.slice(1)}); const stateLabel=(intl:IntlLike,state:State)=>intl.formatMessage({id:`learningBlock.phaseChangeCycle.state.${state}`,defaultMessage:state}); const caption=(intl:IntlLike,transition:Transition)=>{const definition=definitions[transition],values={source:stateLabel(intl,definition.source),destination:stateLabel(intl,definition.destination)},direct=transition==="sublimation"||transition==="deposition",kind=direct?(definition.absorbsHeat?"directAbsorbs":"directReleases"):(definition.absorbsHeat?"absorbs":"releases"),directWord=direct?" directly":"",energy=definition.absorbsHeat?"absorbs":"releases";return intl.formatMessage({id:`learningBlock.phaseChangeCycle.caption.${kind}`,defaultMessage:`{source} changes${directWord} to {destination} and ${energy} thermal energy`},values);}; const aria=(intl:IntlLike,transition:Transition)=>{const definition=definitions[transition];return intl.formatMessage({id:"learningBlock.phaseChangeCycle.visualizationAriaLabel",defaultMessage:"{transition} is highlighted: {source} changes to {destination} and {energy}. Solid particles are closely packed and ordered, liquid particles are close but disordered, and gas particles are widely separated. Sublimation and deposition connect solid and gas directly."},{transition:transitionLabel(intl,transition),source:stateLabel(intl,definition.source),destination:stateLabel(intl,definition.destination),energy:intl.formatMessage({id:`learningBlock.phaseChangeCycle.energy.${definition.absorbsHeat?"absorbs":"releases"}`,defaultMessage:`${definition.absorbsHeat?"absorbs":"releases"} thermal energy`})});}; function initializeSpecification():void{} function initializeModel():void{}
-export{caption as a,transitionLabel as c,initializeSpecification as d,specification as f,aria as i,initializeModel as l,definitions as n,transitionForIndex as o,control as r,transitionIndex as s,transitions as t,normalize as u};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `PHASE_CHANGE_CYCLE`),
+      (n = `phase-change-cycle-v2`),
+      (r = {
+        initial_transition: {
+          kind: `enum`,
+          defaultValue: `melting`,
+          allowedValues: [
+            `melting`,
+            `freezing`,
+            `vaporization`,
+            `condensation`,
+            `sublimation`,
+            `deposition`,
+          ],
+        },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g;
+function _() {
+  return (_ = e(() => {
+    (a(),
+      (o = i.parameters.initial_transition),
+      (s = o.allowedValues),
+      (c = { min: 0, max: s.length - 1, step: 1, defaultValue: o.defaultValue }),
+      (l = {
+        melting: { source: `solid`, destination: `liquid`, absorbsHeat: !0 },
+        freezing: { source: `liquid`, destination: `solid`, absorbsHeat: !1 },
+        vaporization: { source: `liquid`, destination: `gas`, absorbsHeat: !0 },
+        condensation: { source: `gas`, destination: `liquid`, absorbsHeat: !1 },
+        sublimation: { source: `solid`, destination: `gas`, absorbsHeat: !0 },
+        deposition: { source: `gas`, destination: `solid`, absorbsHeat: !1 },
+      }),
+      (u = (e) => ({
+        initial_transition: s.some((t) => t === e.initial_transition)
+          ? e.initial_transition
+          : c.defaultValue,
+      })),
+      (d = (e) => Math.max(0, s.indexOf(e))),
+      (f = (e) => s[Math.min(Math.max(Math.round(e), c.min), c.max)] ?? c.defaultValue),
+      (p = (e, t) => {
+        switch (t) {
+          case `melting`:
+            return e.formatMessage({
+              id: `learningBlock.phaseChangeCycle.transition.melting`,
+              defaultMessage: `Melting`,
+            });
+          case `freezing`:
+            return e.formatMessage({
+              id: `learningBlock.phaseChangeCycle.transition.freezing`,
+              defaultMessage: `Freezing`,
+            });
+          case `vaporization`:
+            return e.formatMessage({
+              id: `learningBlock.phaseChangeCycle.transition.vaporization`,
+              defaultMessage: `Vaporization`,
+            });
+          case `condensation`:
+            return e.formatMessage({
+              id: `learningBlock.phaseChangeCycle.transition.condensation`,
+              defaultMessage: `Condensation`,
+            });
+          case `sublimation`:
+            return e.formatMessage({
+              id: `learningBlock.phaseChangeCycle.transition.sublimation`,
+              defaultMessage: `Sublimation`,
+            });
+          case `deposition`:
+            return e.formatMessage({
+              id: `learningBlock.phaseChangeCycle.transition.deposition`,
+              defaultMessage: `Deposition`,
+            });
+        }
+      }),
+      (m = (e, t) => {
+        switch (t) {
+          case `solid`:
+            return e.formatMessage({
+              id: `learningBlock.phaseChangeCycle.state.solid`,
+              defaultMessage: `solid`,
+            });
+          case `liquid`:
+            return e.formatMessage({
+              id: `learningBlock.phaseChangeCycle.state.liquid`,
+              defaultMessage: `liquid`,
+            });
+          case `gas`:
+            return e.formatMessage({
+              id: `learningBlock.phaseChangeCycle.state.gas`,
+              defaultMessage: `gas`,
+            });
+        }
+      }),
+      (h = (e, t) => {
+        let n = l[t],
+          r = { source: m(e, n.source), destination: m(e, n.destination) };
+        return t === `sublimation` || t === `deposition`
+          ? n.absorbsHeat
+            ? e.formatMessage(
+                {
+                  id: `learningBlock.phaseChangeCycle.caption.directAbsorbs`,
+                  defaultMessage: `{source} changes directly to {destination} and absorbs thermal energy`,
+                },
+                r,
+              )
+            : e.formatMessage(
+                {
+                  id: `learningBlock.phaseChangeCycle.caption.directReleases`,
+                  defaultMessage: `{source} changes directly to {destination} and releases thermal energy`,
+                },
+                r,
+              )
+          : n.absorbsHeat
+            ? e.formatMessage(
+                {
+                  id: `learningBlock.phaseChangeCycle.caption.absorbs`,
+                  defaultMessage: `{source} changes to {destination} and absorbs thermal energy`,
+                },
+                r,
+              )
+            : e.formatMessage(
+                {
+                  id: `learningBlock.phaseChangeCycle.caption.releases`,
+                  defaultMessage: `{source} changes to {destination} and releases thermal energy`,
+                },
+                r,
+              );
+      }),
+      (g = (e, t) => {
+        let n = l[t];
+        return e.formatMessage(
+          {
+            id: `learningBlock.phaseChangeCycle.visualizationAriaLabel`,
+            defaultMessage: `{transition} is highlighted: {source} changes to {destination} and {energy}. Solid particles are closely packed and ordered, liquid particles are close but disordered, and gas particles are widely separated. Sublimation and deposition connect solid and gas directly.`,
+          },
+          {
+            transition: p(e, t),
+            source: m(e, n.source),
+            destination: m(e, n.destination),
+            energy: n.absorbsHeat
+              ? e.formatMessage({
+                  id: `learningBlock.phaseChangeCycle.energy.absorbs`,
+                  defaultMessage: `absorbs thermal energy`,
+                })
+              : e.formatMessage({
+                  id: `learningBlock.phaseChangeCycle.energy.releases`,
+                  defaultMessage: `releases thermal energy`,
+                }),
+          },
+        );
+      }));
+  }))();
+}
+export {
+  h as a,
+  p as c,
+  a as d,
+  i as f,
+  g as i,
+  _ as l,
+  l as n,
+  f as o,
+  c as r,
+  d as s,
+  s as t,
+  u,
+};

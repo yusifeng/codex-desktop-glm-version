@@ -7,17 +7,13 @@ import * as esbuild from "esbuild";
 import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."); const ASSET_ROOT = path.resolve(ROOT, "../chatgpt-desktop-src/app/webview/assets");
 const models = [
-  ["model-cf3822ac6f6a.js", "learning-model-network-fault-tolerance", ["a", "c", "d", "i", "l", "n", "o", "r", "s", "t", "u"]],
-  ["model-1f60271bdbb7.js", "learning-model-action-potential-neuron", ["a", "i", "n", "o", "r", "s", "t"]],
 ];
 const dependencies = (source, expression) => [...source.matchAll(expression)].map(match => match[1]); const approximatelyEqual = (actual, expected, tolerance = 1e-9) => assert.ok(Math.abs(actual - expected) <= tolerance * Math.max(1, Math.abs(expected)), `${actual} ≈ ${expected}`); let sourceAssertions = 0;
 for (const [asset, directory] of models) { const original = fs.readFileSync(path.join(ASSET_ROOT, asset), "utf8"); const recovered = fs.readFileSync(path.join(ROOT, "src/renderer", directory, "index.ts"), "utf8"); const originalDependencies = dependencies(original, /from "\.\/([^"]+)\.js"/g).map(dependency => dependency.replace(/-[a-f0-9]{12}$/, "")); const recoveredDependencies = dependencies(recovered, /(?:from\s+|import\s*)["']@rchunk\/([^"']+)/g); assert.deepEqual(recoveredDependencies, originalDependencies); assert.equal((original.match(/import\(/g) ?? []).length, 0); assert.equal((recovered.match(/import\(/g) ?? []).length, 0); assert.equal(/\bany\b|@ts-expect-error/.test(recovered), false); sourceAssertions += 4; }
 async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: modulePath }) => ({ path: modulePath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: modulePath }) => ({ loader: "js", contents: modulePath === "app-shared" ? "export const G2=value=>value;export const K2=()=>{};" : "export {};" })); } }] }); return import("data:text/javascript;base64," + Buffer.from(result.outputFiles[0].text).toString("base64") + "#" + directory); }
 const loaded = new Map(); let runtimeAssertions = 0; for (const [_asset, directory, expected] of models) { const module = await bundle(directory); loaded.set(directory, module); assert.deepEqual(Object.keys(module).sort(), [...expected].sort()); runtimeAssertions += 1; }
 
-const network = loaded.get("learning-model-network-fault-tolerance"); network.o(); assert.deepEqual(network.r(), { topology: "ring", fault: "healthy" }); assert.deepEqual(network.s({ topology: "bad", fault: "bad" }), { topology: "ring", fault: "healthy" }); assert.deepEqual(network.l("mesh"), { topology: "mesh", fault: "healthy" }); assert.deepEqual(network.c({ topology: "tree" }, "node"), { topology: "tree", fault: "node" }); const healthy = network.n({ topology: "ring", fault: "healthy" }); assert.deepEqual([healthy.routeKind, healthy.routeNodeIds], ["healthy", ["A", "X", "B"]]); const rerouted = network.n({ topology: "ring", fault: "link" }); assert.deepEqual([rerouted.deliveryContinues, rerouted.routeKind, rerouted.routeNodeIds], [true, "alternate", ["A", "Y", "B"]]); const blocked = network.n({ topology: "star", fault: "node" }); assert.deepEqual([blocked.deliveryContinues, blocked.routeKind, blocked.routeNodeIds], [false, "blocked", ["A"]]); assert.equal(network.a(blocked).length, 2); assert.deepEqual(network.i([{ x: 0, y: 0 }, { x: 10, y: 0 }], .25), { x: 2.5, y: 0 }); runtimeAssertions += 9;
 
-const action = loaded.get("learning-model-action-potential-neuron"); action.o(); assert.deepEqual(action.s({ stageIndex: 99 }), { stageIndex: 6 }); assert.deepEqual([action.t.min, action.t.max, action.t.thumbnailDefaultValue], [0, 6, 2]); assert.deepEqual(action.i({ stageIndex: 3 }), { id: "peak", label: action.i({ stageIndex: 3 }).label, captionHeading: action.i({ stageIndex: 3 }).captionHeading, caption: action.i({ stageIndex: 3 }).caption, voltageMillivolts: 30, sodiumChannel: "inactivated", potassiumChannel: "open", flow: "potassiumEfflux", flowIntensity: .65, chargePolarity: "positive", chargeCount: 4 }); const formatter = { formatMessage: message => message.defaultMessage }; assert.equal(action.a({ stageIndex: 2 }, formatter), "Depolarization (rising phase)"); assert.ok(action.n({ stageIndex: 5 }, formatter).includes("dips below rest")); assert.equal(action.r({ stageIndex: 6 }, formatter), "Back at rest"); runtimeAssertions += 6;
 
 
 
@@ -25,6 +21,8 @@ sourceAssertions += assertReleaseOwner("learning-model-linear-inequalities-feasi
 sourceAssertions += assertReleaseOwner("learning-model-anova-decomposition");
 sourceAssertions += assertReleaseOwner("learning-model-quadratic-inequalities");
 sourceAssertions += assertReleaseOwner("learning-model-organic-functional-groups");
+sourceAssertions += assertReleaseOwner("learning-model-network-fault-tolerance");
+sourceAssertions += assertReleaseOwner("learning-model-action-potential-neuron");
 
 
 console.log(sourceAssertions + " source assertions and " + runtimeAssertions + " runtime assertions passed");
