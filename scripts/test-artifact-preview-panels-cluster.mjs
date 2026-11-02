@@ -29,26 +29,7 @@ const invalidJson = jsonPreview.LibraryJsonPreview({ content: "{", fileName: "ba
 assert.equal(invalidJson.props["data-json-valid"], false);
 assert.match(text(invalidJson), /Invalid JSON/);
 
-// notebook-preview-panel: 12
-const notebook = await bundle("notebook-preview-panel");
-assert.deepEqual(Object.keys(notebook), ["NotebookPreviewPanel"]);
-let notebookDownloaded = 0, notebookClosed = 0;
-const notebookUi = notebook.NotebookPreviewPanel({ title: "Analysis", onDownload() { notebookDownloaded++; }, onClose() { notebookClosed++; }, cells: [{ id: "m", cellType: "markdown", source: ["# ", "Summary"] }, { id: "c", cellType: "code", executionCount: 3, source: "print(1)", outputs: ["1", { value: 2 }] }] });
-assert.match(text(notebookUi), /Analysis/);
-assert.equal(findAll(notebookUi, node => node.type === "li").length, 2);
-assert.equal(find(notebookUi, node => node.props?.["data-cell-type"] === "markdown").props.children[1].props.children, "# Summary");
-assert.match(text(notebookUi), /\[3\]/);
-assert.equal(findAll(notebookUi, node => node.props?.["data-notebook-output"]).length, 2);
-assert.match(text(notebookUi), /"value": 2/);
-byText(notebookUi, "Download").props.onClick();
-assert.equal(notebookDownloaded, 1);
-byText(notebookUi, "Close").props.onClick();
-assert.equal(notebookClosed, 1);
-assert.match(text(notebook.NotebookPreviewPanel({ isLoading: true })), /Loading notebook/);
-const notebookError = notebook.NotebookPreviewPanel({ error: "Cannot load", onRetry() { notebookDownloaded++; } });
-assert.equal(find(notebookError, node => node.props?.role === "alert").type, "div");
-byText(notebookError, "Retry").props.onClick();
-assert.equal(notebookDownloaded, 2);
+assertReleaseOwner("notebook-preview-panel");
 
 assertReleaseOwner("docx-preview-panel", [/export \{ [A-Za-z_$][\w$]* as DocxPreviewPanel \}/]);
 assertReleaseOwner("pdf-preview-panel", [/export \{ [A-Za-z_$][\w$]* as PdfPreviewPanel \}/]);

@@ -1,237 +1,1484 @@
-// chatgpt-shared-post-page — Public post loading, content routing, and share continuation.
-
-// @ts-ignore -- semantic module is present in the published renderer graph.
-import * as analyticsChunk from "@rchunk/analytics";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as appSharedChunk from "@rchunk/app-shared";
-// @ts-ignore -- semantic module is present in the published renderer graph.
-import * as browserDisclaimerChunk from "@rchunk/browser-composer-disclaimer";
-// @ts-ignore -- semantic module is present in the published renderer graph.
-import * as conversationPageChunk from "@rchunk/chatgpt-conversation-page";
-// @ts-ignore -- semantic module is present in the published renderer graph.
-import * as imageHomeChunk from "@rchunk/chatgpt_image_home";
-import * as documentTitleChunk from "@rchunk/document-title";
-import * as imageValidationChunk from "@rchunk/image-validation-session";
-import * as rightPanelChunk from "@rchunk/right-panel-composer-overlay";
-import * as threadScrollChunk from "@rchunk/thread-scroll-layout";
-import * as composerControllerChunk from "@rchunk/use-chatgpt-composer-controller";
-// @ts-ignore -- semantic module is present in the published renderer graph.
-import * as viewerChunk from "@rchunk/viewer";
-import "@rchunk/rolldown-runtime";
-
-type UnavailableReason = "deleted" | "general" | "not_found" | "workspace" | string;
-interface JsxRuntime { Fragment: unknown; jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown; jsxs(type: unknown, props: Record<string, unknown>, key?: string): unknown }
-interface ReactRuntime {
-  useEffect(effect: () => void | (() => void), dependencies?: readonly unknown[]): void;
-  useEffectEvent?<Callback extends (...arguments_: never[]) => unknown>(callback: Callback): Callback;
-  useRef<Value>(value: Value): { current: Value };
-  useState<Value>(value: Value | (() => Value)): [Value, (next: Value | ((current: Value) => Value)) => void];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Ah as n,
+  BX as r,
+  FX as i,
+  HX as a,
+  I3 as o,
+  Ih as s,
+  Jm as c,
+  K2 as l,
+  LX as u,
+  Oh as d,
+  P3 as f,
+  Ph as p,
+  Rh as m,
+  UX as h,
+  Y2 as g,
+  Yh as _,
+  Zh as v,
+  e6 as y,
+  hy as b,
+  kh as x,
+  lk as S,
+  lw as C,
+  n4 as w,
+  pk as T,
+  qm as E,
+  zh as D,
+} from "@rchunk/app-shared";
+import {
+  $en as O,
+  Aet as k,
+  B0 as A,
+  CR as j,
+  Ebt as M,
+  F0 as ee,
+  GIt as N,
+  I0 as te,
+  Jbt as P,
+  Kun as F,
+  L0 as ne,
+  Let as I,
+  M6t as L,
+  N0 as re,
+  N6t as ie,
+  P0 as ae,
+  Qgn as R,
+  RIt as oe,
+  Ret as z,
+  Rht as se,
+  Run as B,
+  SR as ce,
+  Sun as V,
+  Wvt as le,
+  _R as ue,
+  _bt as H,
+  _un as de,
+  aHt as fe,
+  aJt as U,
+  bR as W,
+  cJt as pe,
+  f7 as me,
+  fpn as he,
+  gln as ge,
+  itn as G,
+  jX as K,
+  ket as q,
+  kht as J,
+  l_n as _e,
+  lpn as ve,
+  mfn as ye,
+  mun as be,
+  nE as xe,
+  o_n as Se,
+  oqt as Ce,
+  p7 as we,
+  pZ as Te,
+  pfn as Ee,
+  qbt as De,
+  qgn as Oe,
+  qvt as ke,
+  rqt as Ae,
+  tE as je,
+  uHt as Me,
+  vln as Ne,
+  xR as Pe,
+  xpn as Fe,
+  yR as Ie,
+  ypn as Le,
+} from "@rchunk/app-initial";
+import {
+  H as Re,
+  Oo as ze,
+  U as Be,
+  Ui as Ve,
+  Wi as He,
+  au as Ue,
+  iu as We,
+  ko as Ge,
+  nt as Ke,
+  rt as qe,
+  ru as Je,
+  su as Ye,
+  tu as Xe,
+} from "@rchunk/app-primary";
+import { n as Ze, t as Qe } from "@rchunk/use-chatgpt-composer-controller";
+import { r as $e, t as et } from "@rchunk/document-title";
+import { n as tt, t as nt } from "@rchunk/right-panel-composer-overlay";
+import { n as rt, t as it } from "@rchunk/thread-scroll-layout";
+import {
+  c as at,
+  d as ot,
+  f as st,
+  l as ct,
+  t as lt,
+  u as ut,
+} from "@rchunk/chatgpt-conversation-page-core";
+import { n as dt, t as ft } from "@rchunk/browser-composer-disclaimer-core";
+import { c as pt, l as mt, s as ht, u as gt } from "@rchunk/artifact-viewer";
+import { a as _t, i as vt, r as yt } from "@rchunk/image-validation-session";
+import { i as bt, r as xt, t as St } from "@rchunk/analytics-runtime";
+import { a as Ct, o as wt, r as Tt, t as Et } from "@rchunk/chatgpt-image-home";
+var Dt;
+function Ot() {
+  return (Ot = e(() => {
+    Dt = { $type: `protobuf_analytics_events.v1.ChatgptSharePostPageViewed` };
+  }))();
 }
-interface IntlRuntime { formatMessage(descriptor: { defaultMessage: string; description?: string; id: string }, values?: Record<string, unknown>): string }
-interface ToastRuntime { info(message: string): void; warning(message: string, options?: Record<string, unknown>): void }
-interface ScopeApi { get(signal: unknown, parameter?: unknown): unknown; set?(signal: unknown, value: unknown): void; watch?(listener: (input: { get(signal: unknown, parameter?: unknown): unknown }) => void): () => void }
-interface PromptShareContent {
-  generated_image?: { image_url?: string | null; prompt_match?: string | null };
-  prompt: string;
-  title: string;
+function kt(e) {
+  let t = (0, jt.c)(30),
+    { conversationId: n, post: r } = e,
+    i = u(O),
+    o = Se(),
+    [s] = (0, Mt.useState)(At),
+    c;
+  (t[0] === s ? (c = t[1]) : ((c = () => s.abort()), (t[0] = s), (t[1] = c)), Te(c));
+  let l, d;
+  (t[2] !== s || t[3] !== i
+    ? ((l = () => {
+        let e = i.get(be),
+          t = i.get(de),
+          n = i.get(ve);
+        return i.watch((r) => {
+          let { get: i } = r;
+          (i(be) !== e || i(de) !== t || i(ve) !== n) && s.abort();
+        });
+      }),
+      (d = [s, i]),
+      (t[2] = s),
+      (t[3] = i),
+      (t[4] = l),
+      (t[5] = d))
+    : ((l = t[4]), (d = t[5])),
+    (0, Mt.useEffect)(l, d));
+  let f;
+  t[6] === n ? (f = t[7]) : ((f = { conversationId: n }), (t[6] = n), (t[7] = f));
+  let p = Ze(f),
+    m = a(ke.activeTab$),
+    h = a(H),
+    g = a(P),
+    _;
+  t[8] !== m || t[9] !== g || t[10] !== h
+    ? ((_ = h && g && m?.tabType.showComposerInFullWidth?.(m.props) === !0),
+      (t[8] = m),
+      (t[9] = g),
+      (t[10] = h),
+      (t[11] = _))
+    : (_ = t[11]);
+  let v = _,
+    y;
+  t[12] === Symbol.for(`react.memo_cache_sentinel`) ? ((y = [null]), (t[12] = y)) : (y = t[12]);
+  let b;
+  t[13] !== r || t[14] !== i
+    ? ((b = {
+        mimeTypes: y,
+        prepare: async () => {
+          let e = yt(r, vt(r)),
+            t = e.find((e) => e.id === i.get(ce)) ?? e[0];
+          return [await gt(i, t)];
+        },
+      }),
+      (t[13] = r),
+      (t[14] = i),
+      (t[15] = b))
+    : (b = t[15]);
+  let x;
+  t[16] !== n || t[17] !== o || t[18] !== r || t[19] !== i
+    ? ((x = () => {
+        (fe(i, { conversation: null, conversationId: n, post: r }), o(ge(n)));
+      }),
+      (t[16] = n),
+      (t[17] = o),
+      (t[18] = r),
+      (t[19] = i),
+      (t[20] = x))
+    : (x = t[20]);
+  let S;
+  t[21] !== p || t[22] !== n || t[23] !== s.signal || t[24] !== b || t[25] !== x
+    ? ((S = (0, Nt.jsx)(ze, {
+        children: (0, Nt.jsx)(Ve, {
+          autoPrepare: !1,
+          composerController: p,
+          conversationId: n,
+          disableDraftPrepare: !0,
+          hideModelPicker: !0,
+          signal: s.signal,
+          attachmentPreparation: b,
+          onSubmitAccepted: x,
+          showError: !0,
+        }),
+      })),
+      (t[21] = p),
+      (t[22] = n),
+      (t[23] = s.signal),
+      (t[24] = b),
+      (t[25] = x),
+      (t[26] = S))
+    : (S = t[26]);
+  let C = S,
+    w;
+  return (
+    t[27] !== C || t[28] !== v
+      ? ((w = v ? (0, Nt.jsx)(nt, { reserveFullComposerHeight: !0, children: C }) : C),
+        (t[27] = C),
+        (t[28] = v),
+        (t[29] = w))
+      : (w = t[29]),
+    w
+  );
 }
-interface PromptShareAttachment {
-  kind: "prompt_share";
-  prompt_share: { content: PromptShareContent; prompt_share_id: string; recipient_action?: { image_input?: "optional" | "required"; submission?: "auto_send" | "edit" } | null };
+function At() {
+  return new AbortController();
 }
-interface MediaAttachment { generation_type?: string; kind: "media_generation"; output_blocked?: boolean; title?: string | null; [key: string]: unknown }
-interface GenericAttachment { kind: string; [key: string]: unknown }
-type SharedAttachment = PromptShareAttachment | MediaAttachment | GenericAttachment;
-interface SharedPost { attachments: SharedAttachment[]; id: string; preview_image_url?: string | null; text?: string | null }
-interface SharedPostStatus { reason?: UnavailableReason; status: "available" | "unavailable" }
-interface Identity { accountId?: string | null; authMethod?: string | null; isLoading?: boolean; userId?: string | null }
-interface ComposerController {
-  eventEmitter?: { emit(event: string): void };
-  focus?(): void;
-  getPersistedText?(): string;
-  setPromptText?(text: string): void;
-  view?: { isDestroyed?: boolean };
+var jt, Mt, Nt;
+function Pt() {
+  return (Pt = e(() => {
+    ((jt = t()),
+      i(),
+      (Mt = y()),
+      R(),
+      De(),
+      le(),
+      M(),
+      V(),
+      Ge(),
+      he(),
+      K(),
+      G(),
+      tt(),
+      He(),
+      Me(),
+      Qe(),
+      Ne(),
+      _t(),
+      mt(),
+      ue(),
+      (Nt = o()));
+  }))();
 }
-interface AppSharedApi {
-  $3?: () => void; FX?: () => void; K2?: () => void; Zh?: () => void; lk?: () => void; lw?: () => void;
-  BX(family: unknown, parameter: unknown): unknown; HX<Value>(signal: unknown): Value; I3(): JsxRuntime; LX(scope: unknown): ScopeApi; Y2: unknown; Yh: unknown; e6(): ReactRuntime; n4(): IntlRuntime; pk: unknown;
-  Ah: unknown; Ih: unknown; Oh: unknown; Ph: unknown; Rh: unknown; UX: unknown; hy: unknown; kh: unknown;
+function Ft(e) {
+  let t = (0, It.c)(16),
+    { reason: r } = e,
+    i = Se(),
+    a;
+  t[0] === i
+    ? (a = t[1])
+    : ((a = function () {
+        i(`/`);
+      }),
+      (t[0] = i),
+      (t[1] = a));
+  let o = a,
+    c;
+  t[2] === o
+    ? (c = t[3])
+    : ((c = (e) => {
+        e || o();
+      }),
+      (t[2] = o),
+      (t[3] = c));
+  let l;
+  t[4] === o
+    ? (l = t[5])
+    : ((l = (e) => {
+        (e.preventDefault(), o());
+      }),
+      (t[4] = o),
+      (t[5] = l));
+  let u;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((u = (0, Y.jsx)(m, {
+        children: (0, Y.jsx)(g, {
+          id: `postSharingModal.contentUnavailable`,
+          defaultMessage: `Content Unavailable`,
+          description: `Title for the post sharing modal when the content is unavailable`,
+        }),
+      })),
+      (t[6] = u))
+    : (u = t[6]);
+  let f;
+  t[7] === r
+    ? (f = t[8])
+    : ((f = (0, Y.jsx)(n, {
+        title: u,
+        subtitle:
+          r === `workspace`
+            ? (0, Y.jsx)(g, {
+                id: `postSharingModal.unavailableReasonWorkspace`,
+                defaultMessage: `This content was shared from a workspace you don’t have access to. Ask the owner to invite you if you’d like to view it. `,
+                description: `Reason for why the content is unavailable due to lack of workspace access.`,
+              })
+            : (0, Y.jsx)(g, {
+                id: `postSharingModal.unavailableReasonGeneral`,
+                defaultMessage: `This share link is not available because it doesn’t exist or you don’t have access to it.`,
+                description: `Reason for why the content is unavailable due to a general error.`,
+              }),
+      })),
+      (t[7] = r),
+      (t[8] = f));
+  let p;
+  t[9] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((p = (0, Y.jsx)(x, {
+        children: (0, Y.jsx)(_, {
+          className: `w-full`,
+          type: `submit`,
+          color: `primary`,
+          size: `large`,
+          children: (0, Y.jsx)(g, {
+            id: `postSharingModal.ok`,
+            defaultMessage: `OK`,
+            description: `Label for the OK button that closes the modal`,
+          }),
+        }),
+      })),
+      (t[9] = p))
+    : (p = t[9]);
+  let h;
+  t[10] !== l || t[11] !== f
+    ? ((h = (0, Y.jsxs)(d, { as: `form`, variant: `chatgpt`, onSubmit: l, children: [f, p] })),
+      (t[10] = l),
+      (t[11] = f),
+      (t[12] = h))
+    : (h = t[12]);
+  let v;
+  return (
+    t[13] !== c || t[14] !== h
+      ? ((v = (0, Y.jsx)(s, {
+          open: !0,
+          onOpenChange: c,
+          size: `compact`,
+          variant: `chatgpt`,
+          children: h,
+        })),
+        (t[13] = c),
+        (t[14] = h),
+        (t[15] = v))
+      : (v = t[15]),
+    v
+  );
 }
-interface AppInitialApi {
-  Aet?: () => void; M6t?: () => void; Qgn?: () => void; Ret?: () => void; Rht?: () => void; Wvt?: () => void; cJt?: () => void; oqt?: () => void; pfn?: () => void; ypn?: () => void;
-  $en: unknown; CR(post: SharedPost, signal: AbortController): unknown; GIt(scope: ScopeApi, conversationId: string, hints: string[]): void; Kun(): void; Let: unknown; N6t(): Identity; Pe: unknown; yR: unknown; mfn: unknown; ket: unknown; l_n(): { postId?: string }; o_n(): (destination: string, options?: { replace?: boolean }) => void; xpn(scope: ScopeApi, event: unknown, fields: Record<string, unknown>): void;
-  aHt(scope: ScopeApi, input: { conversation: null; conversationId: string; post: SharedPost }): void; gln(conversationId: string): string; f7: { MainContentLayout: unknown; RightPanelOutlet: unknown; RightPanelTabs: unknown }; pnt?: unknown;
+var It, Y;
+function Lt() {
+  return (Lt = e(() => {
+    ((It = t()), l(), R(), v(), D(), p(), (Y = o()));
+  }))();
 }
-interface AppPrimaryApi { H: unknown; Oo: unknown; U: unknown; Ui: unknown; Wi?: () => void; au?: () => void; iu?: () => void; ko?: () => void; nt: unknown; rt?: () => void; ru?: unknown; su?: () => void; tu?: unknown }
-interface ComposerControllerApi { n?: () => void; t(input: { conversationId: string }): ComposerController }
-interface DocumentTitleApi { r?: () => void; t: unknown }
-interface RightPanelApi { n?: () => void; t: unknown }
-interface ThreadScrollApi { n?: () => void; t: unknown }
-interface ConversationPageApi { c?: () => void; d: unknown; f: unknown; l: unknown; t: unknown; u?: () => void }
-interface BrowserDisclaimerApi { n?: () => void; t: unknown }
-interface ViewerApi { c?: () => void; l: unknown; s: unknown; u(scope: ScopeApi, item: unknown): Promise<unknown> }
-interface ImageValidationApi { a?: () => void; i(post: SharedPost): unknown; r(post: SharedPost, session: unknown): Array<{ id?: string }> }
-interface AnalyticsApi { i?: () => void; r(scope: ScopeApi, input: Record<string, unknown>, persistedLength?: number): void; t?: unknown }
-interface ImageHomeApi { a: unknown; o?: () => void; r?: () => void; t: unknown }
-
-const shared = appSharedChunk as unknown as AppSharedApi;
-const initial = appInitialChunk as unknown as AppInitialApi;
-const primary = appPrimaryChunk as unknown as AppPrimaryApi;
-const composerApi = composerControllerChunk as unknown as ComposerControllerApi;
-const titleApi = documentTitleChunk as unknown as DocumentTitleApi;
-const rightPanel = rightPanelChunk as unknown as RightPanelApi;
-const threadScroll = threadScrollChunk as unknown as ThreadScrollApi;
-const conversationPage = conversationPageChunk as unknown as ConversationPageApi;
-const browserDisclaimer = browserDisclaimerChunk as unknown as BrowserDisclaimerApi;
-const viewer = viewerChunk as unknown as ViewerApi;
-const imageValidation = imageValidationChunk as unknown as ImageValidationApi;
-const analytics = analyticsChunk as unknown as AnalyticsApi;
-const imageHome = imageHomeChunk as unknown as ImageHomeApi;
-
-let jsx: JsxRuntime;
-let React: ReactRuntime;
-const SHARE_VIEW_EVENT = { $type: "protobuf_analytics_events.v1.ChatgptSharePostPageViewed" } as const;
-
-function callInitializer(value: unknown): void { if (typeof value === "function") value(); }
-function firstAttachment(post: SharedPost | null | undefined): SharedAttachment | undefined { return post?.attachments[0]; }
-function isPromptShare(attachment: SharedAttachment | undefined): attachment is PromptShareAttachment { return attachment?.kind === "prompt_share"; }
-function isImageAttachment(attachment: SharedAttachment): attachment is MediaAttachment { return attachment.kind === "media_generation" && attachment.generation_type === "image_gen" && attachment.output_blocked !== true; }
-function postTitle(post: SharedPost | null, intl: IntlRuntime): string {
-  if (!post) return intl.formatMessage({ id: "chatgptConversations.sharedPost.privateDocumentTitle", defaultMessage: "ChatGPT - Privately Shared Content" });
-  const attachment = firstAttachment(post);
-  const title = isPromptShare(attachment) ? attachment.prompt_share.content.title : post.text?.trim() || (attachment?.kind === "media_generation" ? String(attachment.title ?? "").trim() : "");
-  return title ? intl.formatMessage({ id: "chatgptConversations.sharedPost.documentTitle", defaultMessage: "ChatGPT - {title}" }, { title }) : intl.formatMessage({ id: "chatgptConversations.sharedPost.untitledDocumentTitle", defaultMessage: "ChatGPT - Shared Content" });
+function Rt(e) {
+  let t = (0, zt.c)(42),
+    { promptShare: n, fallbackImageUrl: r, isLoggedIn: i, disabled: a, onTryPrompt: o } = e,
+    s = w(),
+    { content: c, recipient_action: l } = n,
+    u = c.generated_image?.image_url ?? r,
+    d = l?.image_input === `required`,
+    f = l?.submission === `auto_send`,
+    p;
+  if (!i) {
+    let e;
+    (t[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, X.jsx)(g, {
+          id: `image-gen.images-app.trending.cta.login`,
+          defaultMessage: `Log in to try it`,
+          description: `Button label for logging in before trying a trending Images template`,
+        })),
+        (t[0] = e))
+      : (e = t[0]),
+      (p = e));
+  } else if (d && f) {
+    let e;
+    (t[1] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, X.jsx)(g, {
+          id: `image-gen.images-app.trending.cta.add_image`,
+          defaultMessage: `Try it with an image`,
+          description: `Button on a shared Images template that opens the image picker before generating with the required image`,
+        })),
+        (t[1] = e))
+      : (e = t[1]),
+      (p = e));
+  } else if (d) {
+    let e;
+    (t[2] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, X.jsx)(g, {
+          id: `image-gen.images-app.trending.cta.edit_and_add_image`,
+          defaultMessage: `Edit prompt and add an image`,
+          description: `Button on a shared Images template that opens an editable composer requiring an input image`,
+        })),
+        (t[2] = e))
+      : (e = t[2]),
+      (p = e));
+  } else {
+    let e;
+    (t[3] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, X.jsx)(g, {
+          id: `image-gen.images-app.trending.cta.prompt_share`,
+          defaultMessage: `Try this prompt`,
+          description: `Button on a shared Images template that generates an image or opens an editable prompt according to the shared action`,
+        })),
+        (t[3] = e))
+      : (e = t[3]),
+      (p = e));
+  }
+  let m;
+  t[4] !== c.title || t[5] !== s || t[6] !== i
+    ? ((m = i
+        ? (0, X.jsxs)(`nav`, {
+            "aria-label": s.formatMessage({
+              id: `image-gen.images-app.trending.breadcrumb.aria_label`,
+              defaultMessage: `Images breadcrumb`,
+              description: `Accessible label for navigation from a shared image prompt to Images`,
+            }),
+            className: `absolute start-4 top-4 z-10 flex max-w-105 items-center text-base leading-5 text-tertiary select-none`,
+            children: [
+              (0, X.jsx)(Oe, {
+                className: `inline-flex items-center rounded-full px-3 py-1 text-default hover:bg-surface-secondary focus-visible:bg-surface-secondary`,
+                to: `/images`,
+                children: (0, X.jsx)(g, {
+                  id: `images.page.title`,
+                  defaultMessage: `Images`,
+                  description: `Heading of the image discovery and creation page`,
+                }),
+              }),
+              (0, X.jsx)(b, {}),
+              (0, X.jsx)(`span`, {
+                className: `truncate px-2`,
+                "aria-current": `page`,
+                children: c.title,
+              }),
+            ],
+          })
+        : null),
+      (t[4] = c.title),
+      (t[5] = s),
+      (t[6] = i),
+      (t[7] = m))
+    : (m = t[7]);
+  let h;
+  t[8] !== c.title || t[9] !== u
+    ? ((h = u
+        ? (0, X.jsx)(`div`, {
+            className: `mb-7 w-full max-w-128 overflow-hidden rounded-3xl bg-surface-secondary shadow-xs`,
+            children: (0, X.jsx)(`img`, {
+              alt: c.title,
+              className: `aspect-[4/3] w-full object-cover`,
+              fetchPriority: `high`,
+              src: U(u) ?? u,
+            }),
+          })
+        : null),
+      (t[8] = c.title),
+      (t[9] = u),
+      (t[10] = h))
+    : (h = t[10]);
+  let v;
+  t[11] === c.title
+    ? (v = t[12])
+    : ((v = (0, X.jsx)(`h1`, {
+        className: `max-w-180 text-3xl leading-tight font-semibold text-balance text-default`,
+        children: c.title,
+      })),
+      (t[11] = c.title),
+      (t[12] = v));
+  let y;
+  t[13] !== c.prompt || t[14] !== c.title
+    ? ((y = (0, X.jsx)(`div`, {
+        className: `mt-4 w-full max-w-128 rounded-xl border border-default px-3 py-2 focus-within:border-strong`,
+        children: (0, X.jsx)(`textarea`, {
+          "aria-label": c.title,
+          className: `field-sizing-content max-h-[3lh] min-h-[2lh] w-full resize-none overflow-y-auto border-0 bg-transparent p-0 text-start text-sm leading-5 text-secondary focus:ring-0 focus:outline-none`,
+          readOnly: !0,
+          rows: 2,
+          spellCheck: !1,
+          value: c.prompt,
+        }),
+      })),
+      (t[13] = c.prompt),
+      (t[14] = c.title),
+      (t[15] = y))
+    : (y = t[15]);
+  let x;
+  t[16] === o ? (x = t[17]) : ((x = () => o(!1)), (t[16] = o), (t[17] = x));
+  let S;
+  t[18] !== a || t[19] !== p || t[20] !== x
+    ? ((S = (0, X.jsx)(_, {
+        className: `min-w-44`,
+        color: `primary`,
+        size: `large`,
+        radius: `full`,
+        disabled: a,
+        onClick: x,
+        children: p,
+      })),
+      (t[18] = a),
+      (t[19] = p),
+      (t[20] = x),
+      (t[21] = S))
+    : (S = t[21]);
+  let C;
+  t[22] !== l?.image_input || t[23] !== f || t[24] !== a || t[25] !== i || t[26] !== o
+    ? ((C =
+        i && l?.image_input === `optional` && f
+          ? (0, X.jsx)(_, {
+              className: `min-w-44`,
+              color: `secondary`,
+              size: `large`,
+              radius: `full`,
+              disabled: a,
+              onClick: () => o(!0),
+              children: (0, X.jsx)(g, {
+                id: `image-gen.images-app.trending.cta.try_with_image`,
+                defaultMessage: `Try with an image`,
+                description: `Secondary button on a shared Images template that opens the picker for an optional image`,
+              }),
+            })
+          : null),
+      (t[22] = l?.image_input),
+      (t[23] = f),
+      (t[24] = a),
+      (t[25] = i),
+      (t[26] = o),
+      (t[27] = C))
+    : (C = t[27]);
+  let T;
+  t[28] !== S || t[29] !== C
+    ? ((T = (0, X.jsxs)(`div`, {
+        className: `mt-6 flex flex-wrap justify-center gap-3`,
+        children: [S, C],
+      })),
+      (t[28] = S),
+      (t[29] = C),
+      (t[30] = T))
+    : (T = t[30]);
+  let E;
+  t[31] === c.generated_image?.prompt_match
+    ? (E = t[32])
+    : ((E = (0, X.jsx)(`p`, {
+        className: `mt-2 text-center text-xs text-tertiary select-none`,
+        children:
+          c.generated_image?.prompt_match === `differs_from_shared_prompt`
+            ? (0, X.jsx)(g, {
+                id: `image-gen.images-app.trending.prompt_variation.description.altered`,
+                defaultMessage: `The same prompt may produce different images. This prompt was altered before sharing.`,
+                description: `Disclosure that generation varies and the shared prompt was changed from the prompt used for the preview image`,
+              })
+            : (0, X.jsx)(g, {
+                id: `image-gen.images-app.trending.prompt_variation.description`,
+                defaultMessage: `The same prompt may produce different images.`,
+                description: `Disclosure that the same shared prompt may generate a different image`,
+              }),
+      })),
+      (t[31] = c.generated_image?.prompt_match),
+      (t[32] = E));
+  let D;
+  t[33] !== h || t[34] !== v || t[35] !== y || t[36] !== T || t[37] !== E
+    ? ((D = (0, X.jsxs)(`section`, {
+        className: `mx-auto mt-12 flex w-full flex-col items-center px-4 text-center`,
+        children: [h, v, y, T, E],
+      })),
+      (t[33] = h),
+      (t[34] = v),
+      (t[35] = y),
+      (t[36] = T),
+      (t[37] = E),
+      (t[38] = D))
+    : (D = t[38]);
+  let O;
+  return (
+    t[39] !== m || t[40] !== D
+      ? ((O = (0, X.jsxs)(X.Fragment, { children: [m, D] })), (t[39] = m), (t[40] = D), (t[41] = O))
+      : (O = t[41]),
+    O
+  );
 }
-function trackShareView(scope: ScopeApi, post: SharedPost): void {
-  const attachment = firstAttachment(post);
-  initial.xpn(scope, SHARE_VIEW_EVENT, { postId: post.id, primaryAttachmentType: attachment?.kind, referrer: typeof document === "undefined" ? undefined : document.referrer || undefined });
+var zt, X;
+function Bt() {
+  return (Bt = e(() => {
+    ((zt = t()), l(), R(), v(), C(), pe(), (X = o()));
+  }))();
 }
-
-function ContentUnavailableDialog(props: { reason: "general" | "workspace" }): unknown {
-  const navigate = initial.o_n();
-  const goHome = (): void => navigate("/");
-  const subtitle = props.reason === "workspace" ? "This content was shared from a workspace you don’t have access to. Ask the owner to invite you if you’d like to view it." : "This share link is not available because it doesn’t exist or you don’t have access to it.";
-  return jsx.jsx(shared.Ih, { open: true, onOpenChange: (open: boolean) => { if (!open) goHome(); }, size: "compact", variant: "chatgpt", children: jsx.jsxs(shared.Oh, { as: "form", variant: "chatgpt", onSubmit: (event: { preventDefault(): void }) => { event.preventDefault(); goHome(); }, children: [
-    jsx.jsx(shared.Ah, { title: "Content Unavailable", subtitle }),
-    jsx.jsx(shared.kh, { children: jsx.jsx(shared.Yh, { className: "w-full", type: "submit", color: "primary", size: "large", children: "OK" }) }),
-  ] }) });
+function Vt(e) {
+  let t = (0, Gt.c)(8),
+    { conversationId: n, post: r } = e,
+    i;
+  t[0] === n
+    ? (i = t[1])
+    : ((i = {
+        kind: `chatgpt`,
+        conversationId: n,
+        browserTabMentionConversationId: null,
+        routeConversationId: null,
+      }),
+      (t[0] = n),
+      (t[1] = i));
+  let a;
+  t[2] !== n || t[3] !== r
+    ? ((a = (0, Q.jsx)(Ht, { conversationId: n, post: r })), (t[2] = n), (t[3] = r), (t[4] = a))
+    : (a = t[4]);
+  let o;
+  return (
+    t[5] !== i || t[6] !== a
+      ? ((o = (0, Q.jsx)(h, { scope: J, value: i, children: a })),
+        (t[5] = i),
+        (t[6] = a),
+        (t[7] = o))
+      : (o = t[7]),
+    o
+  );
 }
-
-function PromptSharePreview(props: { disabled: boolean; fallbackImageUrl?: string | null; isLoggedIn: boolean; onTryPrompt(withImage: boolean): void; promptShare: PromptShareAttachment["prompt_share"] }): unknown {
-  const { content, recipient_action: action } = props.promptShare;
-  const imageUrl = content.generated_image?.image_url ?? props.fallbackImageUrl;
-  const requiresImage = action?.image_input === "required";
-  const autoSend = action?.submission === "auto_send";
-  const primaryLabel = !props.isLoggedIn ? "Log in to try it" : requiresImage && autoSend ? "Try it with an image" : requiresImage ? "Edit prompt and add an image" : "Try this prompt";
-  const secondary = props.isLoggedIn && action?.image_input === "optional" && autoSend ? jsx.jsx(shared.Yh, { color: "secondary", size: "large", radius: "full", disabled: props.disabled, onClick: () => props.onTryPrompt(true), children: "Try with an image" }) : null;
-  return jsx.jsxs(jsx.Fragment, { children: [
-    props.isLoggedIn ? jsx.jsxs("nav", { "aria-label": "Images breadcrumb", children: [jsx.jsx(conversationPage.l, { to: "/images", children: "Images" }), "/", content.title] }) : null,
-    jsx.jsxs("section", { className: "shared-prompt-preview", children: [
-      imageUrl ? jsx.jsx("img", { alt: content.title, fetchPriority: "high", src: imageUrl }) : null,
-      jsx.jsx("h1", { children: content.title }),
-      jsx.jsx("textarea", { "aria-label": content.title, readOnly: true, rows: 2, value: content.prompt }),
-      jsx.jsxs("div", { children: [jsx.jsx(shared.Yh, { color: "primary", size: "large", radius: "full", disabled: props.disabled, onClick: () => props.onTryPrompt(false), children: primaryLabel }), secondary] }),
-      jsx.jsx("p", { children: content.generated_image?.prompt_match === "differs_from_shared_prompt" ? "The same prompt may produce different images. This prompt was altered before sharing." : "The same prompt may produce different images." }),
-    ] }),
-  ] });
+function Ht(e) {
+  let t = (0, Gt.c)(86),
+    { conversationId: n, post: i } = e,
+    a = u(O),
+    o = ie(),
+    s = w(),
+    c = Se(),
+    l;
+  t[0] === n ? (l = t[1]) : ((l = { conversationId: n }), (t[0] = n), (t[1] = l));
+  let d = Ze(l),
+    [f, p] = (0, Z.useState)(null),
+    [m, h] = (0, Z.useState)(!0),
+    [g] = (0, Z.useState)(Wt),
+    _;
+  (t[2] === g ? (_ = t[3]) : ((_ = () => g.abort()), (t[2] = g), (t[3] = _)), Te(_));
+  let v = (0, Z.useRef)(!1),
+    y = (0, Z.useRef)(!1),
+    b = (0, Z.useRef)(0),
+    x = (0, Z.useRef)(!1),
+    S = r(Xe, n),
+    C = (0, Z.useRef)(S),
+    [T, E] = (0, Z.useState)(null),
+    D = i.attachments[0];
+  if (D?.kind !== `prompt_share`) return null;
+  let k = D.prompt_share,
+    A = k.recipient_action,
+    j = o.authMethod === `chatgpt`,
+    M = A?.image_input === `optional` || A?.image_input === `required`,
+    P;
+  t[4] !== n || t[5] !== j || t[6] !== i || t[7] !== a
+    ? ((P = function () {
+        return j
+          ? ((v.current ||=
+              (fe(a, { conversation: null, conversationId: n, post: i }),
+              N(a, n, [`picture_v2`]),
+              !0)),
+            !0)
+          : (F(), !1);
+      }),
+      (t[4] = n),
+      (t[5] = j),
+      (t[6] = i),
+      (t[7] = a),
+      (t[8] = P))
+    : (P = t[8]);
+  let I = P,
+    L;
+  t[9] !== A?.submission ||
+  t[10] !== d ||
+  t[11] !== n ||
+  t[12] !== i.id ||
+  t[13] !== k.content ||
+  t[14] !== a ||
+  t[15] !== I
+    ? ((L = function () {
+        return (
+          Fe(a, ne, {
+            actor: ae.CHATGPT_SHARE_FLOW_ACTOR_RECEIVER,
+            action: re.CHATGPT_SHARE_FLOW_ACTION_CONTINUE_SELECTED,
+            attachmentType: ee.CHATGPT_SHARE_FLOW_ATTACHMENT_TYPE_IMAGE_SHARE,
+            contentType: te.CHATGPT_SHARE_FLOW_CONTENT_TYPE_POST_SLICE,
+            shareId: i.id,
+          }),
+          I()
+            ? (Je(a, n),
+              (C.current = null),
+              d.setPromptText(k.content.prompt),
+              (x.current = A?.submission === `auto_send`),
+              !0)
+            : !1
+        );
+      }),
+      (t[9] = A?.submission),
+      (t[10] = d),
+      (t[11] = n),
+      (t[12] = i.id),
+      (t[13] = k.content),
+      (t[14] = a),
+      (t[15] = I),
+      (t[16] = L))
+    : (L = t[16]);
+  let R = L,
+    oe;
+  t[17] !== d || t[18] !== g.signal.aborted
+    ? ((oe = function () {
+        g.signal.aborted ||
+          d.view.isDestroyed ||
+          ((0, Kt.flushSync)(() => h(!1)), d.eventEmitter.emit(`submit`));
+      }),
+      (t[17] = d),
+      (t[18] = g.signal.aborted),
+      (t[19] = oe))
+    : (oe = t[19]);
+  let z = oe,
+    se;
+  t[20] !== o.accountId ||
+  t[21] !== o.userId ||
+  t[22] !== d ||
+  t[23] !== g.signal.aborted ||
+  t[24] !== a
+    ? ((se = function () {
+        return (
+          !g.signal.aborted &&
+          !d.view.isDestroyed &&
+          a.get(be) === o.accountId &&
+          a.get(de) === o.userId &&
+          a.get(ve)?.pathname === a.value.pathname
+        );
+      }),
+      (t[20] = o.accountId),
+      (t[21] = o.userId),
+      (t[22] = d),
+      (t[23] = g.signal.aborted),
+      (t[24] = a),
+      (t[25] = se))
+    : (se = t[25]);
+  let B = se,
+    ce;
+  t[26] !== d || t[27] !== n || t[28] !== B || t[29] !== a || t[30] !== S || t[31] !== z
+    ? ((ce = function () {
+        if (B() && C.current === S && a.get(Xe, n) === S) {
+          if (x.current) z();
+          else {
+            let e = S?.item.action ?? S?.group.action;
+            ((x.current =
+              e?.input_requirements?.source === `styles` &&
+              (e.strategy ?? `auto_send`) === `auto_send`),
+              Ye(a, n, d, S));
+          }
+        }
+      }),
+      (t[26] = d),
+      (t[27] = n),
+      (t[28] = B),
+      (t[29] = a),
+      (t[30] = S),
+      (t[31] = z),
+      (t[32] = ce))
+    : (ce = t[32]);
+  let V = ce,
+    le;
+  t[33] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((le = (0, Q.jsx)(me.MainContentLayout, { layout: `custom-titlebar` })), (t[33] = le))
+    : (le = t[33]);
+  let ue = T?.disabled !== !1 || (m && (!j || A?.submission !== `auto_send` || !M)),
+    H;
+  t[34] !== T || t[35] !== R || t[36] !== m
+    ? ((H = (e) => {
+        let t = m ? e.filter(Ut) : e;
+        t.length !== 0 && (!m || R()) && T?.onFilesDropped(t);
+      }),
+      (t[34] = T),
+      (t[35] = R),
+      (t[36] = m),
+      (t[37] = H))
+    : (H = t[37]);
+  let U;
+  t[38] !== M ||
+  t[39] !== A?.image_input ||
+  t[40] !== A?.submission ||
+  t[41] !== f ||
+  t[42] !== d ||
+  t[43] !== j ||
+  t[44] !== i.preview_image_url ||
+  t[45] !== k ||
+  t[46] !== a ||
+  t[47] !== R ||
+  t[48] !== m ||
+  t[49] !== z
+    ? ((U = m
+        ? (0, Q.jsx)(Rt, {
+            promptShare: k,
+            fallbackImageUrl: i.preview_image_url,
+            isLoggedIn: j,
+            disabled:
+              j && (f == null || (A?.submission === `auto_send` && M && !f.canOpenImagePicker)),
+            onTryPrompt: (e) => {
+              R() &&
+                (Fe(a, Tt, {
+                  promptId: k.prompt_share_id,
+                  promptGroupId: `images_trending_template`,
+                  promptGroupPresentation:
+                    Et.CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_IMAGE_CARD,
+                  position: 0,
+                  surface: Ct.CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_IMAGES,
+                }),
+                x.current
+                  ? M && (A?.image_input === `required` || e)
+                    ? f?.openFileDialog(!0)
+                    : z()
+                  : ((0, Kt.flushSync)(() => h(!1)), d.focus()));
+            },
+          })
+        : null),
+      (t[38] = M),
+      (t[39] = A?.image_input),
+      (t[40] = A?.submission),
+      (t[41] = f),
+      (t[42] = d),
+      (t[43] = j),
+      (t[44] = i.preview_image_url),
+      (t[45] = k),
+      (t[46] = a),
+      (t[47] = R),
+      (t[48] = m),
+      (t[49] = z),
+      (t[50] = U))
+    : (U = t[50]);
+  let W;
+  t[51] !== d ||
+  t[52] !== n ||
+  t[53] !== V ||
+  t[54] !== s ||
+  t[55] !== j ||
+  t[56] !== g.signal ||
+  t[57] !== c ||
+  t[58] !== i.id ||
+  t[59] !== k.content ||
+  t[60] !== k.prompt_share_id ||
+  t[61] !== a ||
+  t[62] !== S ||
+  t[63] !== m
+    ? ((W = j
+        ? (0, Q.jsx)(`div`, {
+            hidden: m,
+            children: (0, Q.jsx)(ze, {
+              children: (0, Q.jsx)(Ve, {
+                ref: p,
+                autoPrepare: !1,
+                composerController: d,
+                conversationId: n,
+                conversationOrigin: null,
+                disableAutoFocus: !0,
+                disableDraftPrepare: !0,
+                hideModelPicker: !0,
+                requiredSystemHints: [`picture_v2`],
+                signal: g.signal,
+                getMessageMetadata: () => {
+                  if (((b.current = d.getPersistedText().length), x.current || S != null))
+                    return {
+                      image_feature: `prompt`,
+                      image_prompt_id: S?.item.id ?? k.prompt_share_id,
+                      image_prompt_group_id: S?.group.id ?? `images_trending_template`,
+                      image_prompt_group_presentation: S?.group.presentation ?? `image_card`,
+                      image_send_uuid: crypto.randomUUID(),
+                      ...(x.current ? { submission_mode: `auto_send` } : {}),
+                    };
+                },
+                getSystemHintsForSubmission: (e) => (S == null ? e : We(S.item, e)),
+                onFileDropTargetChange: E,
+                onFilesSelected: () => h(!1),
+                onFilesUploaded: V,
+                onSubmitAccepted: (e) => {
+                  (y.current ||
+                    ((y.current = !0),
+                    bt(a, { shareId: i.id, promptTextLength: k.content.prompt.length }, b.current),
+                    Fe(a, ne, {
+                      actor: ae.CHATGPT_SHARE_FLOW_ACTOR_RECEIVER,
+                      action: re.CHATGPT_SHARE_FLOW_ACTION_FIRST_MESSAGE_SENT,
+                      attachmentType: ee.CHATGPT_SHARE_FLOW_ATTACHMENT_TYPE_IMAGE_SHARE,
+                      contentType: te.CHATGPT_SHARE_FLOW_CONTENT_TYPE_POST_SLICE,
+                      shareId: i.id,
+                    })),
+                    Je(a, n),
+                    c(ge(e)));
+                },
+                placeholder: s.formatMessage({
+                  id: `images.composer.placeholder`,
+                  defaultMessage: `Describe an image`,
+                  description: `Placeholder in the Images page composer where a person describes an image to create`,
+                }),
+                showError: !0,
+              }),
+            }),
+          })
+        : null),
+      (t[51] = d),
+      (t[52] = n),
+      (t[53] = V),
+      (t[54] = s),
+      (t[55] = j),
+      (t[56] = g.signal),
+      (t[57] = c),
+      (t[58] = i.id),
+      (t[59] = k.content),
+      (t[60] = k.prompt_share_id),
+      (t[61] = a),
+      (t[62] = S),
+      (t[63] = m),
+      (t[64] = W))
+    : (W = t[64]);
+  let pe = !m && S == null,
+    he = j && (T?.disabled ?? !0),
+    G;
+  t[65] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((G = (e) => {
+        ((C.current = e), (x.current = !1), e != null && (0, Kt.flushSync)(() => h(!1)));
+      }),
+      (t[65] = G))
+    : (G = t[65]);
+  let K;
+  t[66] !== f ||
+  t[67] !== d ||
+  t[68] !== n ||
+  t[69] !== V ||
+  t[70] !== B ||
+  t[71] !== k.prompt_share_id ||
+  t[72] !== I ||
+  t[73] !== he
+    ? ((K = (0, Q.jsx)(qt, {
+        conversationId: n,
+        composerController: d,
+        composer: f,
+        disabled: he,
+        excludedPromptId: k.prompt_share_id,
+        isConversationCurrent: B,
+        onReferenceImageSelected: V,
+        onBeforeSelectPrompt: I,
+        onUploadSelectionChange: G,
+      })),
+      (t[66] = f),
+      (t[67] = d),
+      (t[68] = n),
+      (t[69] = V),
+      (t[70] = B),
+      (t[71] = k.prompt_share_id),
+      (t[72] = I),
+      (t[73] = he),
+      (t[74] = K))
+    : (K = t[74]);
+  let q;
+  t[75] !== pe || t[76] !== K
+    ? ((q = (0, Q.jsx)(`div`, { hidden: pe, className: `px-4`, children: K })),
+      (t[75] = pe),
+      (t[76] = K),
+      (t[77] = q))
+    : (q = t[77]);
+  let J;
+  t[78] !== U || t[79] !== W || t[80] !== q
+    ? ((J = (0, Q.jsxs)(`div`, {
+        className: `flex flex-col gap-11 pt-10 pb-24`,
+        children: [U, W, q],
+      })),
+      (t[78] = U),
+      (t[79] = W),
+      (t[80] = q),
+      (t[81] = J))
+    : (J = t[81]);
+  let _e;
+  return (
+    t[82] !== H || t[83] !== J || t[84] !== ue
+      ? ((_e = (0, Q.jsxs)(Q.Fragment, {
+          children: [
+            le,
+            (0, Q.jsx)(Ke, {
+              children: (0, Q.jsx)(it, {
+                scrollOrigin: `top`,
+                children: (0, Q.jsx)(Re, {
+                  className: `mx-auto w-full max-w-3xl`,
+                  disabled: ue,
+                  onFilesDropped: H,
+                  children: J,
+                }),
+              }),
+            }),
+          ],
+        })),
+        (t[82] = H),
+        (t[83] = J),
+        (t[84] = ue),
+        (t[85] = _e))
+      : (_e = t[85]),
+    _e
+  );
 }
-
-function PromptShareContent(props: { conversationId: string; post: SharedPost; attachment: PromptShareAttachment }): unknown {
-  const scope = shared.LX(initial.$en);
-  const identity = initial.N6t();
-  const navigate = initial.o_n();
-  const controller = composerApi.t({ conversationId: props.conversationId });
-  const abortRef = React.useRef(new AbortController());
-  const [showPreview, setShowPreview] = React.useState(true);
-  const [dropTarget, setDropTarget] = React.useState<{ canOpenImagePicker?: boolean; disabled?: boolean; onFilesDropped?(files: File[]): void; openFileDialog?(multiple?: boolean): void } | null>(null);
-  React.useEffect(() => () => abortRef.current.abort(), []);
-  const action = props.attachment.prompt_share.recipient_action;
-  const isLoggedIn = identity.authMethod === "chatgpt";
-  const continueShare = (): boolean => {
-    if (!isLoggedIn) { initial.Kun(); return false; }
-    initial.aHt(scope, { conversation: null, conversationId: props.conversationId, post: props.post });
-    initial.GIt(scope, props.conversationId, ["picture_v2"]);
-    controller.setPromptText?.(props.attachment.prompt_share.content.prompt);
-    return true;
-  };
-  const submit = (): void => { if (!abortRef.current.signal.aborted && controller.view?.isDestroyed !== true) controller.eventEmitter?.emit("submit"); };
-  const tryPrompt = (withImage: boolean): void => {
-    if (!continueShare()) return;
-    analytics.r(scope, { promptId: props.attachment.prompt_share.prompt_share_id, surface: imageHome.a });
-    const autoSend = action?.submission === "auto_send";
-    const wantsImage = action?.image_input === "required" || withImage;
-    if (autoSend && wantsImage) dropTarget?.openFileDialog?.(true);
-    else if (autoSend) submit();
-    else { setShowPreview(false); controller.focus?.(); }
-  };
-  const composer = isLoggedIn ? jsx.jsx(primary.Oo, { children: jsx.jsx(primary.Ui, { autoPrepare: false, composerController: controller, conversationId: props.conversationId, disableAutoFocus: true, disableDraftPrepare: true, hideModelPicker: true, requiredSystemHints: ["picture_v2"], signal: abortRef.current.signal, onFileDropTargetChange: setDropTarget, onFilesSelected: () => setShowPreview(false), onSubmitAccepted: (conversationId: string) => navigate(initial.gln(conversationId)), placeholder: "Describe an image", showError: true }) }) : null;
-  const preview = showPreview ? jsx.jsx(PromptSharePreview, { promptShare: props.attachment.prompt_share, fallbackImageUrl: props.post.preview_image_url, isLoggedIn, disabled: isLoggedIn && (dropTarget == null || (action?.submission === "auto_send" && (action?.image_input === "optional" || action?.image_input === "required") && !dropTarget.canOpenImagePicker)), onTryPrompt: tryPrompt }) : null;
-  return jsx.jsxs(jsx.Fragment, { children: [jsx.jsx(primary.H, { layout: "custom-titlebar" }), jsx.jsx(primary.nt, { children: jsx.jsx(threadScroll.t, { scrollOrigin: "top", children: jsx.jsx(viewer.l, { disabled: !showPreview && (dropTarget?.disabled ?? true), onFilesDropped: (files: File[]) => { const images = files.filter((file) => file.type.startsWith("image/")); if (images.length > 0 && continueShare()) dropTarget?.onFilesDropped?.(images); }, children: jsx.jsxs("div", { children: [preview, jsx.jsx("div", { hidden: showPreview, children: composer })] }) }) }) })] });
+function Ut(e) {
+  return e.type.startsWith(`image/`);
 }
-
-function PromptShareScope(props: { conversationId: string; post: SharedPost; attachment: PromptShareAttachment }): unknown {
-  return jsx.jsx(shared.UX, { scope: initial.$en, value: { kind: "chatgpt", conversationId: props.conversationId, browserTabMentionConversationId: null, routeConversationId: null }, children: jsx.jsx(PromptShareContent, props) });
+function Wt() {
+  return new AbortController();
 }
-
-function ImagePostLayout(props: { conversationId: string; post: SharedPost; attachments: MediaAttachment[]; loggedIn: boolean }): unknown {
-  const footer = props.loggedIn ? jsx.jsx(primary.Oo, { children: jsx.jsx(primary.Ui, { autoPrepare: false, composerController: composerApi.t({ conversationId: props.conversationId }), conversationId: props.conversationId, disableDraftPrepare: true, hideModelPicker: true, showError: true }) }) : null;
-  return jsx.jsxs(jsx.Fragment, { children: [
-    jsx.jsx(conversationPage.c, {}),
-    jsx.jsx(initial.f7.RightPanelOutlet, { children: jsx.jsx(initial.f7.RightPanelTabs, {}) }),
-    jsx.jsx(primary.nt, { children: jsx.jsx(threadScroll.t, { footer, threadEndContent: jsx.jsx(browserDisclaimer.t, { conversationId: props.conversationId, hasUserMessage: true, isTemporaryChat: false, regulatedConnectorKindOverride: null }), children: jsx.jsxs("div", { children: [jsx.jsx(conversationPage.d, {}), jsx.jsx(viewer.s, { conversationId: props.conversationId, attachments: props.attachments })] }) }) }),
-  ] });
+var Gt, Z, Kt, Q, qt;
+function Jt() {
+  return (Jt = e(() => {
+    ((Gt = t()),
+      je(),
+      wt(),
+      A(),
+      i(),
+      (Z = y()),
+      (Kt = f()),
+      l(),
+      R(),
+      we(),
+      V(),
+      B(),
+      L(),
+      Ge(),
+      E(),
+      he(),
+      Le(),
+      K(),
+      se(),
+      G(),
+      qe(),
+      rt(),
+      He(),
+      oe(),
+      Be(),
+      Ue(),
+      Me(),
+      St(),
+      Qe(),
+      Ne(),
+      Bt(),
+      (Q = o()),
+      (qt = c(xe)));
+  }))();
 }
-
-function SharedPostBody(props: { identity: Identity; postId: string }): unknown {
-  const scope = shared.LX(initial.$en);
-  const intl = shared.n4();
-  const navigate = initial.o_n();
-  const viewedPostRef = React.useRef<string | null>(null);
-  const status = shared.BX(initial.Pe, props.identity) as { data?: SharedPostStatus; isPending?: boolean };
-  const post = shared.BX(initial.yR, props.identity) as SharedPost | null;
-  const promptShareUnavailable = shared.BX(initial.mfn, "1939400492") === true;
-  const first = firstAttachment(post);
-  const imageAttachments = post?.attachments.filter(isImageAttachment) ?? [];
-  const hasImage = post?.attachments.some((attachment) => attachment.kind === "media_generation" && attachment.generation_type === "image_gen") ?? false;
-  const abortRef = React.useRef(new AbortController());
-  const conversation = post == null ? null : initial.CR(post, abortRef.current);
-  React.useEffect(() => () => abortRef.current.abort(), []);
-  React.useEffect(() => { if (post && viewedPostRef.current !== post.id) { viewedPostRef.current = post.id; trackShareView(scope, post); } }, [post?.id]);
-  React.useEffect(() => {
-    const reason = status.data?.status === "unavailable" ? status.data.reason : isPromptShare(first) && !first.prompt_share.content.prompt.trim() ? "not_found" : null;
-    if (!reason || reason === "workspace") return;
-    const toast = scope.get(shared.pk) as ToastRuntime;
-    if (reason === "deleted") toast.warning(intl.formatMessage({ id: "chatgptConversations.sharedPost.deleted", defaultMessage: "This shared message was deleted and is no longer available." }), { id: "shared-post-deleted", duration: 5 });
-    else toast.info(intl.formatMessage({ id: "globalToasts.sharedConversationInaccessible", defaultMessage: props.identity.authMethod === "chatgpt" ? "You don’t have access to this conversation. You may need to switch accounts." : "Log in to view this conversation." }));
-    navigate("/", { replace: true });
-  }, [status.data?.status, status.data?.reason, post?.id, props.identity.authMethod]);
-
-  if (props.identity.isLoading || status.isPending) return jsx.jsx(initial.Let, { fillParent: true, debugName: "SharedContent" });
-  if (status.data?.status === "unavailable") return status.data.reason === "workspace" ? jsx.jsx(ContentUnavailableDialog, { reason: "workspace" }) : jsx.jsx(initial.Let, { fillParent: true, debugName: "SharedContentRedirect" });
-  if (isPromptShare(first) && promptShareUnavailable) return jsx.jsx(ContentUnavailableDialog, { reason: "general" });
-  if (post && isPromptShare(first) && first.prompt_share.content.prompt.trim()) return jsx.jsxs(jsx.Fragment, { children: [jsx.jsx(conversationPage.c, {}), jsx.jsx(PromptShareScope, { conversationId: props.postId, post, attachment: first })] });
-  if (post && conversation != null) return jsx.jsx(conversationPage.t, { conversationId: props.postId, isTemporaryChat: false, sharedConversationId: null, conversation });
-  if (post && imageAttachments.length > 0) return jsx.jsx(ImagePostLayout, { conversationId: props.postId, post, attachments: imageAttachments, loggedIn: props.identity.authMethod === "chatgpt" });
-  const title = hasImage ? "This shared image is unavailable" : "This shared content is unavailable";
-  return jsx.jsx(initial.ket, { className: "select-none", layout: "page", title, actions: jsx.jsx(shared.Yh, { color: "secondary", size: "large", onClick: () => navigate("/"), children: "Go to ChatGPT" }) });
+function Yt() {
+  let e = (0, $t.c)(15),
+    t = w(),
+    { postId: n } = _e(),
+    i = n === void 0 ? `` : n,
+    a = ie(),
+    o = r(Ie, a),
+    s = o?.attachments[0],
+    c;
+  if (e[0] !== s || e[1] !== t || e[2] !== o) {
+    let n =
+      s?.kind === `prompt_share`
+        ? s.prompt_share.content.title
+        : o?.text?.trim() || (s?.kind === `media_generation` ? s.title?.trim() : null);
+    if (o == null) {
+      let n;
+      (e[4] === t
+        ? (n = e[5])
+        : ((n = t.formatMessage({
+            id: `chatgptConversations.sharedPost.privateDocumentTitle`,
+            defaultMessage: `ChatGPT - Privately Shared Content`,
+            description: `Browser tab title when shared ChatGPT content is unavailable or has not loaded`,
+          })),
+          (e[4] = t),
+          (e[5] = n)),
+        (c = n));
+    } else if (n)
+      c = t.formatMessage(
+        {
+          id: `chatgptConversations.sharedPost.documentTitle`,
+          defaultMessage: `ChatGPT - {title}`,
+          description: `Browser tab title for shared ChatGPT content. The title is the share's text or image title.`,
+        },
+        { title: n },
+      );
+    else {
+      let n;
+      (e[6] === t
+        ? (n = e[7])
+        : ((n = t.formatMessage({
+            id: `chatgptConversations.sharedPost.untitledDocumentTitle`,
+            defaultMessage: `ChatGPT - Shared Content`,
+            description: `Browser tab title for shared ChatGPT content without share text or an image title`,
+          })),
+          (e[6] = t),
+          (e[7] = n)),
+        (c = n));
+    }
+    ((e[0] = s), (e[1] = t), (e[2] = o), (e[3] = c));
+  } else c = e[3];
+  let l;
+  e[8] === c ? (l = e[9]) : ((l = (0, $.jsx)(et, { title: c })), (e[8] = c), (e[9] = l));
+  let u = `${i}:${a.userId}:${a.accountId}`,
+    d;
+  e[10] === u ? (d = e[11]) : ((d = (0, $.jsx)(Xt, {}, u)), (e[10] = u), (e[11] = d));
+  let f;
+  return (
+    e[12] !== l || e[13] !== d
+      ? ((f = (0, $.jsxs)($.Fragment, { children: [l, d] })), (e[12] = l), (e[13] = d), (e[14] = f))
+      : (f = e[14]),
+    f
+  );
 }
-
-function ChatGptSharedPostPage(): unknown {
-  const intl = shared.n4();
-  const { postId } = initial.l_n();
-  const identity = initial.N6t();
-  const post = shared.BX(initial.yR, identity) as SharedPost | null;
-  const title = postTitle(post, intl);
-  const pageKey = `${postId ?? ""}:${identity.userId ?? ""}:${identity.accountId ?? ""}`;
-  return jsx.jsxs(jsx.Fragment, { children: [jsx.jsx(titleApi.t, { title }), jsx.jsx(SharedPostBody, { identity, postId: postId ?? "" }, pageKey)] });
+function Xt() {
+  let e = (0, $t.c)(60),
+    t = u(O),
+    n = w(),
+    i = ie(),
+    a = Se(),
+    [o] = (0, en.useState)(Ae),
+    s = (0, en.useRef)(null),
+    { data: c, isPending: l } = r(Pe, i),
+    d = r(Ie, i),
+    f = r(ye, `1939400492`),
+    p = d?.attachments.flatMap(Qt),
+    m;
+  e[0] === d?.attachments
+    ? (m = e[1])
+    : ((m = d?.attachments.some(Zt) ?? !1), (e[0] = d?.attachments), (e[1] = m));
+  let h = m,
+    v = d?.id,
+    y = d == null ? null : j(d, o),
+    b;
+  e[2] !== d || e[3] !== f || e[4] !== t
+    ? ((b = () => {
+        if (d == null) return;
+        let e = d.attachments[0];
+        if (e?.kind === `prompt_share`) {
+          if (f || !e.prompt_share.content.prompt.trim()) return;
+          xt(t, { shareId: d.id, promptTextLength: e.prompt_share.content.prompt.length });
+        }
+        let n = d.attachments[0]?.kind;
+        Fe(t, Dt, {
+          postId: d.id,
+          primaryAttachmentType: n,
+          referrer: document.referrer || void 0,
+        });
+        let r = null;
+        (n === `media_generation`
+          ? (r = ee.CHATGPT_SHARE_FLOW_ATTACHMENT_TYPE_MEDIA_GENERATION)
+          : n === `message_slice`
+            ? (r = ee.CHATGPT_SHARE_FLOW_ATTACHMENT_TYPE_MESSAGE_SLICE)
+            : n === `prompt_share`
+              ? (r = ee.CHATGPT_SHARE_FLOW_ATTACHMENT_TYPE_IMAGE_SHARE)
+              : n === `deep_research` && (r = ee.CHATGPT_SHARE_FLOW_ATTACHMENT_TYPE_OTHER),
+          r != null &&
+            Fe(t, ne, {
+              actor: ae.CHATGPT_SHARE_FLOW_ACTOR_RECEIVER,
+              action: re.CHATGPT_SHARE_FLOW_ACTION_SHARED_CONTENT_VIEWED,
+              attachmentType: r,
+              contentType: te.CHATGPT_SHARE_FLOW_CONTENT_TYPE_POST_SLICE,
+              shareId: d.id,
+            }));
+      }),
+      (e[2] = d),
+      (e[3] = f),
+      (e[4] = t),
+      (e[5] = b))
+    : (b = e[5]);
+  let x = (0, en.useEffectEvent)(b),
+    S;
+  e[6] !== x || e[7] !== v
+    ? ((S = () => {
+        v != null && s.current !== v && ((s.current = v), x());
+      }),
+      (e[6] = x),
+      (e[7] = v),
+      (e[8] = S))
+    : (S = e[8]);
+  let C;
+  (e[9] === v ? (C = e[10]) : ((C = [v]), (e[9] = v), (e[10] = C)), (0, en.useEffect)(S, C));
+  let E;
+  e[11] !== i.authMethod || e[12] !== n || e[13] !== a || e[14] !== t
+    ? ((E = (e) => {
+        let r = t.get(T);
+        (e === `deleted`
+          ? r.warning(
+              n.formatMessage({
+                id: `chatgptConversations.sharedPost.deleted`,
+                defaultMessage: `This shared message was deleted and is no longer available.`,
+                description: `Toast when the owner deleted a publicly shared chat message`,
+              }),
+              { id: `shared-post-deleted`, duration: 5 },
+            )
+          : r.info(
+              n.formatMessage(
+                {
+                  id: `globalToasts.sharedConversationInaccessible`,
+                  defaultMessage: `{loggedIn, select, true {You don’t have access to this conversation. You may need to switch accounts.} other {Log in to view this conversation.}}`,
+                  description: `Info toast when a shared conversation link cannot load. loggedIn indicates whether the user is signed in.`,
+                },
+                { loggedIn: i.authMethod === `chatgpt` },
+              ),
+            ),
+          a(`/`, { replace: !0 }));
+      }),
+      (e[11] = i.authMethod),
+      (e[12] = n),
+      (e[13] = a),
+      (e[14] = t),
+      (e[15] = E))
+    : (E = e[15]);
+  let D = (0, en.useEffectEvent)(E),
+    k;
+  e[16] !== i || e[17] !== D || e[18] !== t
+    ? ((k = () => {
+        let e = null,
+          n = !1,
+          r = t.watch((t) => {
+            let { get: r } = t,
+              a = r(Pe, i).data;
+            if (a?.status === `unavailable` && a.reason !== `workspace` && !n) {
+              ((n = !0), D(a.reason));
+              return;
+            }
+            let o = r(Ie, i);
+            o != null &&
+              o.id !== e &&
+              ((e = o.id),
+              o.attachments[0]?.kind === `prompt_share` &&
+                !o.attachments[0].prompt_share.content.prompt.trim() &&
+                D(`not_found`));
+          });
+        return () => {
+          r();
+          for (let e of t.get(W)) ke.closeTab(t, e, { recordCloseUndo: !1 });
+          t.set(W, []);
+        };
+      }),
+      (e[16] = i),
+      (e[17] = D),
+      (e[18] = t),
+      (e[19] = k))
+    : (k = e[19]);
+  let A;
+  if (
+    (e[20] !== i || e[21] !== t
+      ? ((A = [t, i]), (e[20] = i), (e[21] = t), (e[22] = A))
+      : (A = e[22]),
+    (0, en.useEffect)(k, A),
+    i.isLoading || l)
+  ) {
+    let t;
+    return (
+      e[23] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, $.jsx)(I, { fillParent: !0, debugName: `SharedContent` })), (e[23] = t))
+        : (t = e[23]),
+      t
+    );
+  }
+  if (c?.status === `unavailable`) {
+    let t;
+    return (
+      e[24] === c.reason
+        ? (t = e[25])
+        : ((t =
+            c.reason === `workspace`
+              ? (0, $.jsx)(Ft, { reason: `workspace` })
+              : (0, $.jsx)(I, { fillParent: !0, debugName: `SharedContentRedirect` })),
+          (e[24] = c.reason),
+          (e[25] = t)),
+      t
+    );
+  }
+  if (d?.attachments[0]?.kind === `prompt_share` && f) {
+    let t;
+    return (
+      e[26] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, $.jsx)(Ft, { reason: `general` })), (e[26] = t))
+        : (t = e[26]),
+      t
+    );
+  }
+  if (
+    d?.attachments[0]?.kind === `prompt_share` &&
+    !f &&
+    d.attachments[0].prompt_share.content.prompt.trim().length > 0
+  ) {
+    let t;
+    e[27] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, $.jsx)(ct, {})), (e[27] = t))
+      : (t = e[27]);
+    let n;
+    return (
+      e[28] !== o || e[29] !== d
+        ? ((n = (0, $.jsxs)($.Fragment, {
+            children: [t, (0, $.jsx)(Vt, { conversationId: o, post: d })],
+          })),
+          (e[28] = o),
+          (e[29] = d),
+          (e[30] = n))
+        : (n = e[30]),
+      n
+    );
+  }
+  if (d != null && y != null) {
+    let t;
+    return (
+      e[31] === o
+        ? (t = e[32])
+        : ((t = (0, $.jsx)(lt, {
+            conversationId: o,
+            isTemporaryChat: !1,
+            sharedConversationId: null,
+          })),
+          (e[31] = o),
+          (e[32] = t)),
+      t
+    );
+  }
+  if (d != null && p != null && p.length > 0) {
+    let t;
+    e[33] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, $.jsx)(ct, {})), (e[33] = t))
+      : (t = e[33]);
+    let n;
+    e[34] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((n = (0, $.jsx)(me.RightPanelOutlet, { children: (0, $.jsx)(me.RightPanelTabs, {}) })),
+        (e[34] = n))
+      : (n = e[34]);
+    let r;
+    e[35] === o
+      ? (r = e[36])
+      : ((r = (0, $.jsx)(ft, {
+          conversationId: o,
+          hasUserMessage: !0,
+          isTemporaryChat: !1,
+          regulatedConnectorKindOverride: null,
+        })),
+        (e[35] = o),
+        (e[36] = r));
+    let a;
+    e[37] !== i.authMethod || e[38] !== o || e[39] !== d
+      ? ((a = i.authMethod === `chatgpt` ? (0, $.jsx)(kt, { conversationId: o, post: d }) : null),
+        (e[37] = i.authMethod),
+        (e[38] = o),
+        (e[39] = d),
+        (e[40] = a))
+      : (a = e[40]);
+    let s;
+    e[41] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((s = (0, $.jsx)(ot, {})), (e[41] = s))
+      : (s = e[41]);
+    let c;
+    e[42] === o
+      ? (c = e[43])
+      : ((c = (0, $.jsxs)(`div`, {
+          className: `flex min-h-full flex-1 flex-col gap-1.5 py-5`,
+          children: [s, (0, $.jsx)(ht, { conversationId: o })],
+        })),
+        (e[42] = o),
+        (e[43] = c));
+    let l;
+    return (
+      e[44] !== a || e[45] !== c || e[46] !== r
+        ? ((l = (0, $.jsxs)($.Fragment, {
+            children: [
+              t,
+              n,
+              (0, $.jsx)(Ke, {
+                children: (0, $.jsx)(it, { threadEndContent: r, footer: a, children: c }),
+              }),
+            ],
+          })),
+          (e[44] = a),
+          (e[45] = c),
+          (e[46] = r),
+          (e[47] = l))
+        : (l = e[47]),
+      l
+    );
+  }
+  let M;
+  e[48] === h
+    ? (M = e[49])
+    : ((M = h
+        ? (0, $.jsx)(g, {
+            id: `chatgptConversations.sharedPost.unavailable`,
+            defaultMessage: `This shared image is unavailable`,
+            description: `Heading when a shared image was deleted, cannot load, or is unavailable`,
+          })
+        : (0, $.jsx)(g, {
+            id: `chatgptConversations.sharedPost.unavailableContent`,
+            defaultMessage: `This shared content is unavailable`,
+            description: `Heading when shared ChatGPT content was deleted, cannot load, or is unavailable`,
+          })),
+      (e[48] = h),
+      (e[49] = M));
+  let N;
+  e[50] === a
+    ? (N = e[51])
+    : ((N = () => {
+        a(`/`);
+      }),
+      (e[50] = a),
+      (e[51] = N));
+  let P;
+  e[52] === h
+    ? (P = e[53])
+    : ((P = h
+        ? (0, $.jsx)(g, {
+            id: `chatgptConversations.sharedPost.home`,
+            defaultMessage: `Go to ChatGPT`,
+            description: `Button to leave an unavailable shared image and open ChatGPT home`,
+          })
+        : (0, $.jsx)(g, {
+            id: `chatgptConversations.sharedPost.homeContent`,
+            defaultMessage: `Go to ChatGPT`,
+            description: `Button to leave unavailable shared ChatGPT content and open ChatGPT home`,
+          })),
+      (e[52] = h),
+      (e[53] = P));
+  let F;
+  e[54] !== N || e[55] !== P
+    ? ((F = (0, $.jsx)(_, { color: `secondary`, size: `large`, onClick: N, children: P })),
+      (e[54] = N),
+      (e[55] = P),
+      (e[56] = F))
+    : (F = e[56]);
+  let L;
+  return (
+    e[57] !== F || e[58] !== M
+      ? ((L = (0, $.jsx)(q, { className: `select-none`, layout: `page`, title: M, actions: F })),
+        (e[57] = F),
+        (e[58] = M),
+        (e[59] = L))
+      : (L = e[59]),
+    L
+  );
 }
-
-function initializeChatGptSharedPostPage(): void {
-  for (const initializer of [shared.$3, shared.FX, shared.K2, shared.Zh, shared.lk, shared.lw, initial.Aet, initial.M6t, initial.Qgn, initial.Ret, initial.Rht, initial.Wvt, initial.cJt, initial.oqt, initial.pfn, initial.ypn, primary.Wi, primary.au, primary.iu, primary.ko, primary.rt, primary.su, composerApi.n, titleApi.r, rightPanel.n, threadScroll.n, conversationPage.c, conversationPage.u, browserDisclaimer.n, viewer.c, imageValidation.a, analytics.i, imageHome.o, imageHome.r]) callInitializer(initializer);
-  React = shared.e6();
-  jsx = shared.I3();
+function Zt(e) {
+  return e.kind === `media_generation` && e.generation_type === `image_gen`;
 }
-
-initializeChatGptSharedPostPage();
-export { ChatGptSharedPostPage };
+function Qt(e) {
+  return e.kind === `media_generation` && e.generation_type === `image_gen` && !e.output_blocked
+    ? [e]
+    : [];
+}
+var $t, en, $;
+function tn() {
+  return (tn = e(() => {
+    (($t = t()),
+      A(),
+      Ot(),
+      i(),
+      (en = y()),
+      l(),
+      R(),
+      we(),
+      le(),
+      L(),
+      dt(),
+      v(),
+      k(),
+      S(),
+      $e(),
+      z(),
+      Le(),
+      G(),
+      Ee(),
+      qe(),
+      rt(),
+      at(),
+      Ce(),
+      St(),
+      Pt(),
+      Lt(),
+      pt(),
+      st(),
+      Jt(),
+      ut(),
+      ue(),
+      ($ = o()));
+  }))();
+}
+tn();
+export { Yt as ChatGptSharedPostPage };

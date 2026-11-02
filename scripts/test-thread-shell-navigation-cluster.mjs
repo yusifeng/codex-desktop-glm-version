@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
   jsx = {
     Fragment: Symbol("Fragment"),
@@ -169,48 +170,7 @@ const remoteShell = chrome.t({
 });
 assert.equal(remoteShell.props.children[5], null);
 
-const rail = await load("thread-user-message-navigation-rail-app");
-assert.equal(rail.AppThreadUserMessageNavigationRail({ items: [] }), null);
-const items = [1, 2, 3, 4].map((id) => ({
-  id: `m${id}`,
-  title: `Message ${id}`,
-  bookmarked: id === 1,
-}));
-let revealed = null,
-  previewed = null,
-  bookmark = null;
-const nav = rail.AppThreadUserMessageNavigationRail({
-  items,
-  onRevealItem: (item) => {
-    revealed = item.id;
-  },
-  onPreviewItem: (item) => {
-    previewed = item.id;
-  },
-  onBookmarkChange: (item, value) => {
-    bookmark = [item.id, value];
-  },
-});
-assert.equal(nav.type, "nav");
-assert.equal(nav.props["aria-label"], "User message navigation");
-assert.equal(nav.props.children.length, 2);
-const markers = nav.props.children[0].props.children;
-assert.equal(markers.length, 4);
-assert.equal(
-  markers[0].props["data-thread-user-message-navigation-item-id"],
-  "m1",
-);
-markers[1].props.onClick();
-assert.equal(revealed, "m2");
-markers[2].props.onPointerEnter({ currentTarget: {} });
-assert.equal(previewed, "m3");
-assert.equal(markers[0].props["aria-label"], "Bookmarked user message 1");
-const firstMarker = markers[0].props.children.type(
-  markers[0].props.children.props,
-);
-assert.equal(firstMarker.props["data-active"], undefined);
-assert.equal(firstMarker.props.children[1].type, "span");
-assert.equal(bookmark, null);
+assertReleaseOwner("thread-user-message-navigation-rail-app");
 
 const usage = await load("thread-usage-breakdown");
 usage.r();

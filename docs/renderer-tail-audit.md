@@ -1,5 +1,18 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Conversation/artifact/scheduling/settings release-owner recovery：一次性恢复
+`chatgpt-shared-post-page`、`notebook-preview-panel`、`codex-micro-bridge`、
+`model-picker-power-slider-impl`、`use-external-agent-import-setup-actions`、
+`plan-summary-item-content`、`thread-user-message-navigation-rail-app`、
+`image-markup-editor`、`worktree-environment-dropdown`、`schedule-fields`、
+`right-panel-composer-overlay` 与 `safety-settings` 十二个发布 owner，净恢复 13,479 行发布
+TypeScript。绑定旧手写 ABI 的 artifact、schedule、thread navigation、Codex Micro、image markup、
+right-panel 和 settings 测试已迁移为发布一致性验证。整批通过 12,448/12,448 transform check、
+1,888/1,888 renderer build/verify、2,247/2,247 app-code coverage、0 semantic tail 与 typecheck。
+严格 hub 消费推进到 app-shared 1,602/3,185、app-initial 5,003/8,204、app-primary 646/917，
+仍为 0 unreviewed、0 invalid consumers。按发布源码正向行数缺口口径，覆盖率继续由 82.6%
+推进到 84.0%；preserved 边界、聚合 hub 耦合导出与真实登录态 E2E 仍未完成。
+
 2026-11-02 Worktree/automation/Git/project/AppGen release-owner recovery：一次性恢复
 `worktrees-settings-page`、`codex-app-home-beacon-announcement-core`、
 `gpt-plugin-migration-dialog`、`automation-side-panel-tab-core`、

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const calls = [];
@@ -104,4 +105,5 @@ blocks.i(); blocks.i(); blocks.n(); blocks.t();
 assert.equal(calls.filter(value => value === "activity-item").length, 1);
 assert.equal(calls.filter(value => value === "activity-units").length, 1);
 assert.equal(calls.filter(value => value === "elicitation-events").length, 1);
+assertReleaseOwner("plan-summary-item-content");
 console.log("conversation blocks restored cluster assertions passed");

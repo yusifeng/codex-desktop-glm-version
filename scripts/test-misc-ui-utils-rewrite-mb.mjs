@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const assetRoot = path.join(root, "src/webview/assets");
@@ -274,11 +275,6 @@ console.log(
   );
   const mb2Modules = [
     [
-      "impl-70e51521c772.js",
-      "model-picker-power-slider-impl",
-      ["rolldown-runtime", "app-shared"],
-    ],
-    [
       "toggle-b02ae5564000.js",
       "chatgpt-thinking-toggle",
       ["rolldown-runtime", "app-shared", "app-initial", "app-primary"],
@@ -427,56 +423,7 @@ export const Y2='FormattedMessage';export const Uv='ThinkingIcon';export const Y
   assert.deepEqual(updates.at(-1), ["browse"]);
   mb2RuntimeAssertions += 4;
 
-  const slider = await mb2Bundle("model-picker-power-slider-impl");
-  const options = [
-    { id: "a", label: "A" },
-    { id: "b", label: "B", isLocked: true },
-    { id: "c", label: "C", isMax: true },
-    {
-      id: "manual",
-      label: "Manual",
-      requiresExplicitSelection: true,
-    },
-  ];
-  const selected = [];
-  const committed = [];
-  let draggedToMax = 0;
-  const sliderTree = slider.ModelPickerPowerSliderImpl({
-    active: true,
-    fastModeEnabled: false,
-    onCommitOption: (option) => committed.push(option.id),
-    onDragToMax: () => {
-      draggedToMax += 1;
-    },
-    onSelectOption: (option) => selected.push(option.id),
-    options,
-    selectedOptionId: "a",
-  });
-  const track = sliderTree.props.children[0];
-  track.props.onKeyDown({
-    key: "ArrowRight",
-    preventDefault() {},
-    stopPropagation() {},
-  });
-  assert.deepEqual(selected, ["c"]);
-  assert.deepEqual(committed, ["c"]);
-  assert.equal(draggedToMax, 1);
-  assert.throws(
-    () =>
-      slider.ModelPickerPowerSliderImpl({
-        active: true,
-        fastModeEnabled: false,
-        onDragToMax() {},
-        onSelectOption() {},
-        options: [
-          { id: "x", label: "X", requiresExplicitSelection: true },
-          { id: "y", label: "Y" },
-        ],
-        selectedOptionId: "x",
-      }),
-    /Explicit-selection options/,
-  );
-  mb2RuntimeAssertions += 4;
+  mb2SourceAssertions += assertReleaseOwner("model-picker-power-slider-impl");
 
   console.log(
     "MB remaining rewrite: " +

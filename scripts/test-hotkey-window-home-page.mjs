@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sourcePath = path.join(ROOT, "src/renderer/hotkey-window-home-page/index.ts");
@@ -165,5 +166,6 @@ check(state.layouts[0].minimumComposerTopInsetPx===50 && state.layouts[0].restin
 check(state.layouts[0].composerLeftInsetPx===40 && state.layouts[0].composerWidthPx===520, "reports composer horizontal layout metrics");
 state.messageHandler({topInsetPx:72});
 check(state.setStateCalls.at(-1).next===72, "applies host-provided composer top inset");
+assertReleaseOwner("worktree-environment-dropdown");
 
 console.log(`${assertions} Hotkey window home assertions passed`);
