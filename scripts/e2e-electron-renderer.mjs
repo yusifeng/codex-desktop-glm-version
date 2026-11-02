@@ -78,6 +78,81 @@ async function evaluate(expression) {
 await command("Runtime.enable");
 await command("Page.bringToFront");
 
+async function ensureComposerSurface(timeoutMs = 60_000) {
+  const inSettings = await evaluate(`document.querySelector('#settings-search') != null`);
+  if (inSettings) {
+    await evaluate(`(() => {
+      const candidates = [...document.querySelectorAll('button, a, [role="button"]')];
+      const target = candidates.find((element) => element.innerText?.trim() === '返回应用') ??
+        candidates.find((element) => ['聊天', '新对话'].includes(element.innerText?.trim()));
+      if (target == null) throw new Error('Unable to leave settings before composer E2E');
+      target.click();
+    })()`);
+  }
+  const deadline = Date.now() + timeoutMs;
+  do {
+    const ready = await evaluate(`
+      document.querySelector('[data-codex-composer], [contenteditable="true"][aria-label="随心输入"]') != null
+    `);
+    if (ready) return;
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  } while (Date.now() < deadline);
+  const bodyTail = await evaluate(`(document.body?.innerText ?? '').slice(-2000)`);
+  throw new Error(`Composer surface did not appear: ${JSON.stringify(bodyTail)}`);
+}
+
+async function closeActiveBrowserTab(timeoutMs = 30_000) {
+  const closeResult = await evaluate(`(() => {
+    const input = document.querySelector('[data-browser-sidebar-address-input="true"]');
+    if (input == null) return { closed: false, reason: 'not-open' };
+    const tabs = input.closest('[data-app-shell-tabs="true"]');
+    const activeTab = tabs?.querySelector('[role="tab"][aria-selected="true"]');
+    if (tabs == null || activeTab == null) throw new Error('Unable to resolve the active browser tab');
+    const activeRect = activeTab.getBoundingClientRect();
+    const closeButton = [...tabs.querySelectorAll('button')]
+      .filter((element) => {
+        const label = element.getAttribute('aria-label') ?? '';
+        const rect = element.getBoundingClientRect();
+        return /^关闭.*标签页$|^Close .* tab$/u.test(label) &&
+          rect.x >= activeRect.x && rect.x <= activeRect.right &&
+          rect.y >= activeRect.y && rect.y <= activeRect.bottom;
+      })[0];
+    if (closeButton == null) throw new Error('Unable to resolve the active browser tab close button');
+    const label = closeButton.getAttribute('aria-label');
+    const rect = closeButton.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) throw new Error('Browser tab close button is not visible');
+    return {
+      closed: true,
+      label,
+      point: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
+    };
+  })()`);
+  if (!closeResult.closed) return closeResult;
+  await command('Input.dispatchMouseEvent', { type: 'mouseMoved', ...closeResult.point });
+  await command('Input.dispatchMouseEvent', {
+    type: 'mousePressed',
+    button: 'left',
+    clickCount: 1,
+    ...closeResult.point,
+  });
+  await command('Input.dispatchMouseEvent', {
+    type: 'mouseReleased',
+    button: 'left',
+    clickCount: 1,
+    ...closeResult.point,
+  });
+  const deadline = Date.now() + timeoutMs;
+  do {
+    const open = await evaluate(`document.querySelector('[data-browser-sidebar-address-input="true"]') != null`);
+    if (!open) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      return closeResult;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  } while (Date.now() < deadline);
+  throw new Error(`Browser tab did not close: ${JSON.stringify(closeResult)}`);
+}
+
 if (mode === "smoke-readonly") {
   const checkpoints = [];
   const screenshotDirectory = process.env.CODEX_E2E_SCREENSHOT_DIR ?? "/tmp/codex-packaged-e2e/screenshots";
@@ -271,6 +346,7 @@ if (mode === "smoke-readonly") {
   };
   const waitForSettingsPageToSettle = async (timeoutMs = 30_000) => {
     const deadline = Date.now() + timeoutMs;
+    let quietSamples = 0;
     do {
       const settled = await evaluate(`(() => {
         const visible = (element) => {
@@ -284,7 +360,8 @@ if (mode === "smoke-readonly") {
         );
         return loadingLeaves.length === 0;
       })()`);
-      if (settled) return;
+      quietSamples = settled ? quietSamples + 1 : 0;
+      if (quietSamples >= 5) return;
       await new Promise((resolve) => setTimeout(resolve, 250));
     } while (Date.now() < deadline);
     throw new Error('Settings page remained on its loading placeholder');
@@ -314,13 +391,103 @@ if (mode === "smoke-readonly") {
   };
   const assertVisualPage = async (name, expectations) => {
     if (!expectations.preservePointer && expectations.textRootSelector !== '[role="menu"]') {
-      const viewport = await evaluate(`({ width: window.innerWidth, height: window.innerHeight })`);
+      const neutralPoint = await evaluate(`(() => {
+        const candidates = [];
+        for (const yRatio of [0.92, 0.82, 0.72, 0.12]) {
+          for (const xRatio of [0.5, 0.92, 0.08, 0.72, 0.28]) {
+            candidates.push({ x: Math.round(window.innerWidth * xRatio), y: Math.round(window.innerHeight * yRatio) });
+          }
+        }
+        const interactiveSelector = 'button, a, input, select, textarea, [role], [aria-label], [title], [data-radix-collection-item]';
+        return candidates.find(({ x, y }) => {
+          const element = document.elementFromPoint(x, y);
+          return element != null && element.closest(interactiveSelector) == null;
+        }) ?? { x: Math.max(1, window.innerWidth / 2), y: Math.max(1, window.innerHeight - 2) };
+      })()`);
       await command('Input.dispatchMouseEvent', {
         type: 'mouseMoved',
-        x: Math.max(1, viewport.width / 2),
-        y: 1,
+        ...neutralPoint,
       });
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      const knownCoachmark = await evaluate(`(() => {
+        const visible = (element) => {
+          const style = getComputedStyle(element);
+          const rect = element.getBoundingClientRect();
+          return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0' &&
+            rect.width > 0 && rect.height > 0;
+        };
+        const coachmark = [...document.querySelectorAll('[role="tooltip"]')].find((element) => {
+          const text = element.innerText?.trim() ?? '';
+          return visible(element) && (
+            text.includes('查看未读、进行中或待回复的聊天') ||
+            text.includes('See chats that are unread, active, or awaiting a response')
+          );
+        });
+        if (coachmark == null) return { present: false };
+        const dismiss = coachmark.querySelector('button, [role="button"]');
+        if (dismiss == null) throw new Error('Activity coachmark did not expose its dismiss control');
+        const rect = dismiss.getBoundingClientRect();
+        if (!visible(dismiss)) throw new Error('Activity coachmark dismiss control is not visible');
+        return {
+          present: true,
+          point: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
+        };
+      })()`);
+      if (knownCoachmark.present) {
+        await command('Input.dispatchMouseEvent', { type: 'mouseMoved', ...knownCoachmark.point });
+        await command('Input.dispatchMouseEvent', {
+          type: 'mousePressed',
+          button: 'left',
+          clickCount: 1,
+          ...knownCoachmark.point,
+        });
+        await command('Input.dispatchMouseEvent', {
+          type: 'mouseReleased',
+          button: 'left',
+          clickCount: 1,
+          ...knownCoachmark.point,
+        });
+        const coachmarkDeadline = Date.now() + 3_000;
+        do {
+          const coachmarkVisible = await evaluate(`[...document.querySelectorAll('[role="tooltip"]')].some((element) => {
+            const text = element.innerText?.trim() ?? '';
+            const style = getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return (text.includes('查看未读、进行中或待回复的聊天') ||
+              text.includes('See chats that are unread, active, or awaiting a response')) &&
+              style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0' &&
+              rect.width > 0 && rect.height > 0;
+          })`);
+          if (!coachmarkVisible) break;
+          if (Date.now() >= coachmarkDeadline) {
+            throw new Error('Activity coachmark did not dismiss after a real pointer click');
+          }
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        } while (true);
+        await command('Input.dispatchMouseEvent', {
+          type: 'mouseMoved',
+          ...neutralPoint,
+        });
+      }
+      const tooltipDeadline = Date.now() + 3_000;
+      do {
+        const visibleTooltips = await evaluate(`(() => {
+          const visible = (element) => {
+            const style = getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0' &&
+              rect.width > 0 && rect.height > 0;
+          };
+          return [...document.querySelectorAll('[role="tooltip"]')].filter(visible).map((element) => ({
+            text: element.innerText?.trim() ?? '',
+            state: element.getAttribute('data-state'),
+          }));
+        })()`);
+        if (visibleTooltips.length === 0) break;
+        if (Date.now() >= tooltipDeadline) {
+          throw new Error(`${name} retained a pointer tooltip after moving to neutral point ${JSON.stringify(neutralPoint)}: ${JSON.stringify(visibleTooltips)}`);
+        }
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      } while (true);
     }
     await waitForVisualStability();
     const result = await evaluate(`(() => {
@@ -358,11 +525,13 @@ if (mode === "smoke-readonly") {
       }).join(' ');
       const interactive = [...contentRoot.querySelectorAll('button, input, textarea, select, [role="switch"], [role="tab"], [role="combobox"]')].filter(visible);
       const brokenImages = [...contentRoot.querySelectorAll('img')].filter((image) => visible(image) && image.complete && image.naturalWidth === 0);
+      const visibleTooltips = [...contentRoot.querySelectorAll('[role="tooltip"]')].filter(visible);
       const documentWidth = Math.max(document.documentElement.scrollWidth, document.body?.scrollWidth ?? 0);
       return {
         bodyText,
         visibleText,
         brokenImages: brokenImages.length,
+        visibleTooltips: visibleTooltips.map((element) => element.innerText?.trim() ?? ''),
         controlText: interactive.map((element) => [
           element.getAttribute('aria-label'),
           element.getAttribute('placeholder'),
@@ -397,10 +566,20 @@ if (mode === "smoke-readonly") {
         throw new Error(`${name} still contains the skeletal placeholder: ${text}`);
       }
     }
+    if (expectations.allowLoading !== true) {
+      const loadingPattern = /(?:^|\s)(?:正在加载(?:中)?|Loading\b)/m;
+      const loadingMatch = `${result.visibleText}\n${bodyTextAfterScreenshot}`.match(loadingPattern);
+      if (loadingMatch != null) {
+        throw new Error(`${name} was captured in a transient loading state: ${loadingMatch[0].trim()}`);
+      }
+    }
     if (result.interactiveCount < expectations.minimumInteractive) {
       throw new Error(`${name} has only ${result.interactiveCount} visible controls; expected at least ${expectations.minimumInteractive}`);
     }
     if (result.brokenImages !== 0) throw new Error(`${name} contains ${result.brokenImages} broken image(s)`);
+    if (expectations.allowTooltip !== true && result.visibleTooltips.length > 0) {
+      throw new Error(`${name} contains an unintended visible tooltip: ${JSON.stringify(result.visibleTooltips)}`);
+    }
     if (!expectations.allowHorizontalOverflow && result.documentWidth > result.viewportWidth + 2) {
       throw new Error(`${name} horizontally overflows: ${result.documentWidth}px > ${result.viewportWidth}px`);
     }
@@ -593,6 +772,7 @@ if (mode === "smoke-readonly") {
     text: ['主题', 'UI 字体', '代码字体'],
     minimumInteractive: 12,
   });
+  await assertReversibleSwitch('减少动态效果');
 
   await clickText('个性化');
   await waitForBodyText(['Codex 说明', 'Codex instructions']);
@@ -623,25 +803,43 @@ if (mode === "smoke-readonly") {
 
   await clickText('连接');
   await waitForBodyText(['控制这台 Mac', 'Control this Mac']);
+  await waitForBodyTextAbsentStable(
+    ['正在加载设备列表', 'Loading device list'],
+    60_000,
+    2_000,
+  );
   await assertVisualPage('settings/connections', {
     text: ['控制这台 Mac', '控制其他设备', 'SSH', '允许连接'],
-    forbidden: ['Remote connections\nRefreshAdd connection'],
+    forbidden: ['Remote connections\nRefreshAdd connection', '正在加载设备列表', 'Loading device list'],
     minimumInteractive: 5,
   });
+  await assertReversibleSwitch('让这台 Mac 保持唤醒状态');
   await assertCompactVisualPage('settings/connections', {
     text: ['控制这台 Mac', '控制其他设备', 'SSH'],
     minimumInteractive: 5,
   });
   await clickText('控制其他设备');
+  await waitForBodyTextAbsentStable(
+    ['正在加载设备…', 'Loading devices…'],
+    60_000,
+    2_000,
+  );
   await waitForSettingsPageToSettle();
   await assertVisualPage('settings/connections-control-other-devices', {
     text: ['控制其他设备'],
+    forbidden: ['正在加载设备…', 'Loading devices…'],
     minimumInteractive: 3,
   });
   await clickText('SSH');
+  await waitForBodyTextAbsentStable(
+    ['正在加载 SSH 连接…', 'Loading SSH connections…'],
+    60_000,
+    2_000,
+  );
   await waitForSettingsPageToSettle();
   await assertVisualPage('settings/connections-ssh', {
     text: ['SSH'],
+    forbidden: ['正在加载 SSH 连接…', 'Loading SSH connections…'],
     minimumInteractive: 3,
   });
   await clickOneOf(['添加', 'Add']);
@@ -744,6 +942,11 @@ if (mode === "smoke-readonly") {
       });
       await clickText('分析');
       await waitForBodyText(['总用量历史记录', 'Total usage history'], 60_000);
+      await waitForBodyTextAbsentStable(
+        ['正在加载聊天用量', 'Loading chat usage'],
+        60_000,
+        2_000,
+      );
       await waitForSettingsPageToSettle(60_000);
       await assertVisualPage('settings/usage-and-billing-analytics', {
         text: ['总用量历史记录', '聊天用量排行', '工具活动', '消息'],
@@ -1041,6 +1244,13 @@ if (mode === "smoke-readonly") {
   }
   checkpoints.push({ name: 'app/mode-switch-restored', originalMode, alternateMode });
 
+  const neutralViewport = await evaluate(`({ width: window.innerWidth })`);
+  await command('Input.dispatchMouseEvent', {
+    type: 'mouseMoved',
+    x: Math.max(1, neutralViewport.width / 2),
+    y: 1,
+  });
+  await new Promise((resolve) => setTimeout(resolve, 500));
   const explorePoint = await evaluate(`(() => {
     const target = [...document.querySelectorAll('nav button')].find((button) => button.innerText?.trim() === '探索');
     if (target == null) throw new Error('Explore navigation button not found');
@@ -1110,7 +1320,7 @@ if (mode === "smoke-readonly") {
     covered: visibleExploreLabels,
   });
   if (visibleExploreLabels.includes('自定义')) {
-    await clickText('自定义');
+    await clickVisibleMenuItem('自定义');
     await waitForSelectorGone('[role="menu"]');
     await waitForBodyText('调整活动的顺序');
     await assertReversibleListControl({ itemText: '拉取请求', role: 'checkbox' });
@@ -1125,7 +1335,7 @@ if (mode === "smoke-readonly") {
   }
   const enabledExplorePages = explorePages.filter((page) => !page.optional || visibleExploreLabels.includes(page.label));
   for (const [pageIndex, page] of enabledExplorePages.entries()) {
-    await clickText(page.label);
+    await clickVisibleMenuItem(page.label);
     await waitForSelectorGone('[role="menu"]');
     await waitForBodyText(page.readyText, 30_000);
     if (page.name === 'meetings') {
@@ -1639,7 +1849,7 @@ if (mode === "smoke-readonly") {
     `), 60_000);
     await evaluate(`([...document.querySelectorAll('[role="tab"]')].find((element) => element.innerText?.trim() === '分析'))?.click()`);
     await waitUntil("usage analytics content", () => evaluate(`(document.body?.innerText ?? '').includes('总用量历史记录')`), 60_000);
-    await evaluate(`([...document.querySelectorAll('[role="tab"]')].find((element) => element.innerText?.trim() === 'Overview'))?.click()`);
+    await evaluate(`([...document.querySelectorAll('[role="tab"]')].find((element) => element.innerText?.trim() === '概览'))?.click()`);
     await waitUntil("usage overview restore", () => evaluate(`(document.body?.innerText ?? '').includes('当前套餐')`), 60_000);
     deepChecks.push("usage analytics tab");
     await assertNoInteractionException("usage analytics tab");
@@ -1891,6 +2101,7 @@ if (mode === "smoke-readonly") {
 } else if (mode === "send-reply") {
   const marker = argument.length > 0 ? argument : `E2E_REPLY_${new Date().toISOString().replace(/\D/g, '').slice(0, 14)}`;
   const prompt = process.env.CODEX_E2E_PROMPT?.replaceAll('{marker}', marker) ?? `只回复：${marker}`;
+  await ensureComposerSurface();
   await command("Log.enable");
   // Log.enable can replay entries that predate this CDP session. Only failures
   // emitted by the send/reply operation belong to this checkpoint.
@@ -1994,14 +2205,47 @@ if (mode === "smoke-readonly") {
     ariaLabel: element.getAttribute('aria-label'),
     text: element.innerText?.trim().slice(0, 160) ?? '',
     title: element.getAttribute('title'),
+    dataAttributes: Object.fromEntries([...element.attributes]
+      .filter((attribute) => attribute.name.startsWith('data-'))
+      .map((attribute) => [attribute.name, attribute.value])),
+    rect: (() => { const rect = element.getBoundingClientRect(); return { x: rect.x, y: rect.y, width: rect.width, height: rect.height }; })(),
+    outerHTML: element.outerHTML.slice(0, 500),
   })).filter((entry) => entry.ariaLabel || entry.text || entry.title))()`), null, 2));
+} else if (mode === "inspect-browser-sidebar") {
+  console.log(JSON.stringify(await evaluate(`(() => {
+    const input = document.querySelector('[data-browser-sidebar-address-input="true"]');
+    if (input == null) return { present: false };
+    const ancestors = [];
+    let owner = input;
+    for (let depth = 0; owner != null && depth < 20; depth += 1, owner = owner.parentElement) {
+      ancestors.push({
+        depth,
+        tagName: owner.tagName,
+        ariaLabel: owner.getAttribute('aria-label'),
+        role: owner.getAttribute('role'),
+        dataAttributes: Object.fromEntries([...owner.attributes]
+          .filter((attribute) => attribute.name.startsWith('data-'))
+          .map((attribute) => [attribute.name, attribute.value])),
+        className: String(owner.className).slice(0, 300),
+      });
+    }
+    const buttons = [...(input.closest('[data-app-shell-tabs="true"]') ?? input.closest('[role="tabpanel"]') ?? input.parentElement?.parentElement ?? document).querySelectorAll('button')]
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          ariaLabel: element.getAttribute('aria-label'),
+          title: element.getAttribute('title'),
+          text: element.innerText?.trim().slice(0, 120) ?? '',
+          rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+          outerHTML: element.outerHTML.slice(0, 500),
+        };
+      });
+    return { present: true, value: input.value, ancestors, buttons };
+  })()`), null, 2));
 } else if (mode === "iab-navigation") {
   const requestedUrl = argument.length > 0 ? argument : "https://example.com/";
   const selector = '[data-browser-sidebar-address-input="true"]';
-  const appReadyDeadline = Date.now() + 60_000;
-  while (!(await evaluate(`document.querySelector('[data-codex-composer], [contenteditable="true"][aria-label="随心输入"]') != null`)) && Date.now() < appReadyDeadline) {
-    await new Promise((resolve) => setTimeout(resolve, 250));
-  }
+  await ensureComposerSurface();
   if (!(await evaluate(`document.querySelector(${JSON.stringify(selector)}) != null`))) {
     await evaluate(`(async () => {
       const bridge = window.electronBridge;
@@ -2080,12 +2324,37 @@ if (mode === "smoke-readonly") {
   if (browserExceptions.length > 0) {
     throw new Error(`IAB browser preload raised runtime exceptions: ${JSON.stringify(browserExceptions)}`);
   }
+  const cleanup = await closeActiveBrowserTab();
+  const targetCleanupDeadline = Date.now() + 30_000;
+  let remainingBrowserTarget;
+  do {
+    const targets = await fetch(`${endpoint}/json/list`).then((response) => response.json());
+    remainingBrowserTarget = targets.find((target) => target.id === browserTarget.id);
+    if (remainingBrowserTarget == null) break;
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  } while (Date.now() < targetCleanupDeadline);
+  if (remainingBrowserTarget != null) {
+    throw new Error(`IAB browser target remained after closing its tab: ${JSON.stringify({
+      id: remainingBrowserTarget.id,
+      title: remainingBrowserTarget.title,
+      type: remainingBrowserTarget.type,
+      url: remainingBrowserTarget.url,
+    })}`);
+  }
+  cleanup.destroyedTargetId = browserTarget.id;
+  const mainRendererExceptions = protocolEvents
+    .filter((event) => event.method === 'Runtime.exceptionThrown')
+    .map(protocolEventDetails);
+  if (mainRendererExceptions.length > 0) {
+    throw new Error(`IAB main renderer raised runtime exceptions: ${JSON.stringify(mainRendererExceptions.slice(0, 10))}`);
+  }
   console.log(JSON.stringify({
     mode,
     requestedUrl,
     address: state.address,
     browserTargets: browserTargets.map((target) => ({ title: target.title, type: target.type, url: target.url })),
     browserExceptions,
+    cleanup,
   }, null, 2));
 } else if (mode === "find-text") {
   if (argument.length === 0) throw new Error("find-text requires visible text");

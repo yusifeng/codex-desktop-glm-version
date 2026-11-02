@@ -20,7 +20,6 @@ import { fileURLToPath } from "node:url";
 import { CHUNKS, IMPORT_ALIASES, REWRITTEN } from "./renderer-chunk-manifest.mjs";
 import { classifyHub } from "./audit-renderer-hub-classification.mjs";
 import {
-  EXACT_ROUTE_SOURCE_OWNERS,
   PRESERVED_ROUTE_SOURCE_OUTPUTS,
   collectConversationRouteClosure,
 } from "./renderer-route-recovery.mjs";
@@ -107,30 +106,12 @@ const preservedRouteManifest = JSON.parse(
   await fs.readFile(path.join(preservedRouteSourceDir, "manifest.json"), "utf8"),
 );
 const preservedRouteOutputs = new Set(preservedRouteManifest.outputs);
-const exactRouteOutputs = new Set(EXACT_ROUTE_SOURCE_OWNERS.values());
-
 // ---- bundle：已重写的 renderer chunk ----
 const errors = [];
 const bundleSummaries = [];
 let skippedSemanticRouteDrafts = 0;
-let exactRouteSourcesBuilt = 0;
 for (const name of REWRITTEN) {
-  const exactOutput = EXACT_ROUTE_SOURCE_OWNERS.get(name);
-  // Several historical semantic names intentionally point at the same release
-  // chunk. Once one of those names has a release-faithful exact owner, do not
-  // let a later compatibility implementation silently overwrite that output.
-  // This matters for runtime-4b6d... (thread-shell-runtime vs runtime) and for
-  // pending-onboarding, and keeps output ownership deterministic as additional
-  // route dependencies are promoted.
-  if (exactOutput == null && exactRouteOutputs.has(CHUNKS[name])) {
-    skippedSemanticRouteDrafts += 1;
-    continue;
-  }
-  if (exactOutput != null && exactOutput !== CHUNKS[name]) {
-    errors.push(`${name}: exact route owner output ${exactOutput} does not match ${CHUNKS[name]}`);
-    continue;
-  }
-  const entry = path.join(ROOT, "src/renderer", name, exactOutput == null ? "index.ts" : "exact.js");
+  const entry = path.join(ROOT, "src/renderer", name, "index.ts");
   const outfile = path.join(ROOT, "app/webview/assets", CHUNKS[name]);
   if (recoveredRouteChunks.has(CHUNKS[name])) {
     skippedSemanticRouteDrafts += 1;
@@ -149,7 +130,6 @@ for (const name of REWRITTEN) {
       plugins: [chunkImportPlugin],
       logLevel: "warning",
     });
-    if (exactOutput != null) exactRouteSourcesBuilt += 1;
     const code = await fs.readFile(outfile, "utf8");
     // ESM 输出的导出面：匹配 `export { a as b, ... };` 语句。
     const exports = [
@@ -295,7 +275,6 @@ for (const name of REWRITTEN) {
 
 for (const e of errors) console.error(`error: ${e}`);
 console.log(`built ${bundleSummaries.length}/${REWRITTEN.size} rewritten renderer chunks`);
-console.log(`built ${exactRouteSourcesBuilt} release-faithful exact route owners`);
 console.log(`skipped ${skippedSemanticRouteDrafts} superseded semantic route drafts`);
 for (const b of bundleSummaries)
   console.log(`  ${b.file} <- src/renderer/${b.name}/ (exports: ${b.exports.join(", ") || "none"})`);

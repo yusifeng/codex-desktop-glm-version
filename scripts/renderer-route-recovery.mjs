@@ -362,34 +362,11 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
   "worktrees-settings-page-f7e1c38f9bb4.js",
 ]);
 
-// Full release-faithful React/runtime modules promoted into their semantic
-// source directories. Some remain generated exact.js owners while reviewed
-// modules move to maintainable index.ts implementations. The renderer build
-// compiles the selected checked-in owner directly. This lets large UI
-// modules leave the compatibility graph before their local names are manually
-// clarified, without changing their behavior or export surface.
-export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
-  // These settings owners were previously replaced by small structural
-  // approximations. Keep their complete release-faithful React/state graphs
-  // checked in while the readable semantic rewrites are rebuilt and reviewed.
-  ["general-settings", "general-settings-3d550f75d0eb.js"],
-  ["personalization-settings", "personalization-settings-c52a4963cfd3.js"],
-  ["remote-connections-settings", "remote-connections-settings-12e860fd2983.js"],
-  ["security-settings", "security-settings-2da2a3b205ab.js"],
-  ["codex-micro-settings", "codex-micro-settings-cbf47e1d3359.js"],
-  ["settings-plugin-selection", "settings-plugin-selection-e42895d573ba.js"],
-  // Conversation and detached-window owners were readable structural
-  // approximations, but retained only a small fraction of the release UI.
-  // Preserve their full message rendering, turn state, panels, dialogs, and
-  // detached-window chrome until equivalent maintainable rewrites exist.
-  ["conversation-blocks", "conversation-blocks-3f59e850f9fb.js"],
-  ["local-conversation-page", "local-conversation-page-bcc7eca0b3ab.js"],
-  ["local-conversation-thread", "local-conversation-thread-c6e40fdd6d59.js"],
-  ["local-conversation-turn", "local-conversation-turn-14bf296d5217.js"],
-  // Review annotations and file-tree preferences still used a compact model
-  // that replaced the release comment cards and draft interaction surface.
-  ["review-preferences-model", "review-preferences-model-677402e96a42.js"],
-]);
+// Every promoted route dependency now has one complete checked-in TypeScript
+// owner at src/renderer/<semantic-name>/index.ts. Keep this boundary explicit:
+// adding an exact.js escape hatch would reintroduce the split-source state that
+// previously let small structural drafts diverge from the packaged runtime.
+export const EXACT_ROUTE_SOURCE_OWNERS = new Map();
 
 export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   // These keep their published filenames, but are now built from readable

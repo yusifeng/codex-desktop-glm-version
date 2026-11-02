@@ -20,6 +20,7 @@ async function run(script, args = []) {
 }
 
 await run("scripts/e2e-electron-renderer.mjs", ["smoke-readonly"]);
+await run("scripts/e2e-electron-renderer.mjs", ["settings-interactions"]);
 await run("scripts/e2e-packaged-git-worker.mjs");
 await run("scripts/e2e-electron-renderer.mjs", ["iab-navigation", "https://example.com/"]);
 await run("scripts/e2e-electron-renderer.mjs", ["send-reply", marker]);

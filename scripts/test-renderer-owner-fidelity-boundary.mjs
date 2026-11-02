@@ -38,15 +38,10 @@ for (const name of REWRITTEN) {
   }
 }
 
-for (const [name, chunk] of EXACT_ROUTE_SOURCE_OWNERS) {
-  const exactFile = path.join(root, "src/renderer", name, "exact.js");
-  const releaseFile = path.join(releaseAssets, chunk);
-  if (!fs.existsSync(exactFile)) failures.push(`${name}: exact owner is missing`);
-  if (!fs.existsSync(releaseFile)) failures.push(`${name}: exact release evidence is missing (${chunk})`);
-  if (fs.existsSync(exactFile) && fs.existsSync(releaseFile) && fs.statSync(exactFile).size < fs.statSync(releaseFile).size) {
-    failures.push(`${name}: exact owner is smaller than its release evidence`);
-  }
-}
+if (EXACT_ROUTE_SOURCE_OWNERS.size !== 0) failures.push("exact route owners are forbidden after TypeScript promotion");
+const exactFiles = fs.readdirSync(path.join(root, "src/renderer"), { recursive: true })
+  .filter((file) => file.endsWith("exact.js"));
+if (exactFiles.length > 0) failures.push(`unexpected exact owner files: ${exactFiles.join(", ")}`);
 
 if (failures.length > 0) {
   console.error(failures.join("\n"));
@@ -56,5 +51,5 @@ if (failures.length > 0) {
 console.log(
   `renderer owner fidelity boundary: ${REWRITTEN.size}/${REWRITTEN.size} rewritten owners present, ` +
   `${checkedOwners} owners above the reduction floor (${largeOwners} at least 10 KB), ` +
-  `${EXACT_ROUTE_SOURCE_OWNERS.size} exact owners verified`,
+  `0 exact owners`,
 );
