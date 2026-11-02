@@ -1,19 +1,306 @@
-// Linear-inequality feasible-region model. Release chunk: model-84524f724fa2.js.
-import "@rchunk/rolldown-runtime";
-type Relation = "<=" | ">=" | "<" | ">"; type Scenario = "bounded" | "unbounded" | "empty" | "custom"; interface Point { x: number; y: number } interface Line { slope: number; intercept: number; relation: number } interface Bounds { xMin: number; xMax: number; yMin: number; yMax: number }
-interface Values { inequalityCount?: number; activeInequality?: number; scenario?: string; slope1?: number; intercept1?: number; relation1?: string; slope2?: number; intercept2?: number; relation2?: string; slope3?: number; intercept3?: number; relation3?: string } interface SafeValues { inequalityCount: number; activeInequality: number; scenario: Scenario; slope1: number; intercept1: number; relation1: Relation; slope2: number; intercept2: number; relation2: Relation; slope3: number; intercept3: number; relation3: Relation }
-interface NumberParameter { kind: "number"; defaultValue: number; min: number; max: number } interface RelationParameter { kind: "enum"; defaultValue: Relation; allowedValues: Relation[] } interface Manifest { type: string; version: number; thumbnailAssetKey: string; parameters: { slope1: NumberParameter; intercept1: NumberParameter; relation1: RelationParameter; slope2: NumberParameter; intercept2: NumberParameter; relation2: RelationParameter; slope3: NumberParameter; intercept3: NumberParameter; relation3: RelationParameter } }
-let manifest: Manifest; let customScenario: Scenario; let graphBounds: Bounds; let slopeControl: { min: number; max: number; defaultValue: number; step: number }; let interceptControl: typeof slopeControl; let inequalityCountControl: typeof slopeControl; let activeInequalityControl: typeof slopeControl; let relationControl: { min: number; max: number; step: number; allowedValues: Relation[] }; let scenarioControl: { allowedValues: Array<Exclude<Scenario, "custom">>; defaultValue: Exclude<Scenario, "custom"> }; let defaults: SafeValues;
-let normalizeValues: (values: Values) => SafeValues; let applyScenario: (scenario: string, values: Values) => SafeValues; let initialValues: (values?: Values) => SafeValues; let inequalities: (values: Values) => Line[]; let relationIncludesBoundary: (relation: number) => boolean; let clipPolygon: (polygon: Point[], line: Line) => Point[]; let initialPolygon: (bounds: Bounds) => Point[]; let feasiblePolygon: (lines: Line[], bounds: Bounds) => Point[]; let classifyRegion: (lines: Line[]) => "bounded" | "unbounded" | "empty"; let lineSegment: (line: Line, bounds: Bounds) => [Point, Point] | null; let formatInequality: (line: Line) => string; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; const relation = (value: Relation): RelationParameter => ({ kind: "enum", defaultValue: value, allowedValues: ["<=", ">=", "<", ">"] }); manifest = { type: "LINEAR_INEQUALITIES_FEASIBLE_REGION", version: 1, thumbnailAssetKey: "linear-inequalities-feasible-region-v1", parameters: { slope1: { kind: "number", defaultValue: 1, min: -4, max: 4 }, intercept1: { kind: "number", defaultValue: -2, min: -6, max: 6 }, relation1: relation(">="), slope2: { kind: "number", defaultValue: -1, min: -4, max: 4 }, intercept2: { kind: "number", defaultValue: -2, min: -6, max: 6 }, relation2: relation(">="), slope3: { kind: "number", defaultValue: 0, min: -4, max: 4 }, intercept3: { kind: "number", defaultValue: 3, min: -6, max: 6 }, relation3: relation("<=") } }; }
-function initializeModel(): void {
-  if (modelReady) return; modelReady = true; initializeManifest(); customScenario = "custom"; graphBounds = { xMin: -7, xMax: 7, yMin: -7, yMax: 7 }; const parameters = manifest.parameters; const control = (parameter: NumberParameter, step: number) => ({ min: parameter.min, max: parameter.max, defaultValue: parameter.defaultValue, step }); slopeControl = control(parameters.slope1, .25); interceptControl = control(parameters.intercept1, .5); inequalityCountControl = { min: 1, max: 3, defaultValue: 3, step: 1 }; activeInequalityControl = { min: 1, max: 3, defaultValue: 1, step: 1 }; relationControl = { min: 0, max: parameters.relation1.allowedValues.length - 1, step: 1, allowedValues: parameters.relation1.allowedValues }; scenarioControl = { allowedValues: ["bounded", "unbounded", "empty"], defaultValue: "bounded" }; const epsilon = 1e-8; const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value)); const number = (value: number | undefined, fallback: number, min: number, max: number) => Number.isFinite(value) ? clamp(value ?? fallback, min, max) : fallback; const integer = (value: number | undefined, fallback: number, min: number, max: number) => Math.round(number(value, fallback, min, max)); defaults = { inequalityCount: 3, activeInequality: 1, scenario: "bounded", slope1: 1, intercept1: -2, relation1: ">=", slope2: -1, intercept2: -2, relation2: ">=", slope3: 0, intercept3: 3, relation3: "<=" }; const scenarios: Record<Exclude<Scenario, "custom">, SafeValues> = { bounded: defaults, unbounded: { ...defaults, scenario: "unbounded", intercept3: -4, relation3: ">=" }, empty: { ...defaults, scenario: "empty", intercept1: 2, relation1: ">=", slope2: 1, intercept2: -2, relation2: "<=", intercept3: 5, relation3: "<=" } }; const safeRelation = (value: string | undefined, fallback: Relation): Relation => relationControl.allowedValues.includes(value as Relation) ? value as Relation : fallback;
-  normalizeValues = values => { const inequalityCount = integer(values.inequalityCount, defaults.inequalityCount, 1, 3); return { inequalityCount, activeInequality: integer(values.activeInequality, defaults.activeInequality, 1, inequalityCount), scenario: values.scenario === "custom" || scenarioControl.allowedValues.includes(values.scenario as Exclude<Scenario, "custom">) ? values.scenario as Scenario : defaults.scenario, slope1: number(values.slope1, defaults.slope1, -4, 4), intercept1: number(values.intercept1, defaults.intercept1, -6, 6), relation1: safeRelation(values.relation1, defaults.relation1), slope2: number(values.slope2, defaults.slope2, -4, 4), intercept2: number(values.intercept2, defaults.intercept2, -6, 6), relation2: safeRelation(values.relation2, defaults.relation2), slope3: number(values.slope3, defaults.slope3, -4, 4), intercept3: number(values.intercept3, defaults.intercept3, -6, 6), relation3: safeRelation(values.relation3, defaults.relation3) }; };
-  applyScenario = (scenario, values) => scenario in scenarios ? { ...scenarios[scenario as Exclude<Scenario, "custom">] } : normalizeValues(values); initialValues = (values = {}) => { const customized = Object.keys(values).some(key => key !== "scenario" && key !== "activeInequality"); const requested = scenarioControl.allowedValues.includes(values.scenario as Exclude<Scenario, "custom">) ? values.scenario as Exclude<Scenario, "custom"> : defaults.scenario as Exclude<Scenario, "custom">; return normalizeValues({ ...scenarios[requested], ...values, scenario: customized ? "custom" : requested }); }; inequalities = values => { const safe = normalizeValues(values); return [{ slope: safe.slope1, intercept: safe.intercept1, relation: relationControl.allowedValues.indexOf(safe.relation1) }, { slope: safe.slope2, intercept: safe.intercept2, relation: relationControl.allowedValues.indexOf(safe.relation2) }, { slope: safe.slope3, intercept: safe.intercept3, relation: relationControl.allowedValues.indexOf(safe.relation3) }].slice(0, safe.inequalityCount); };
-  const lowerBound = (relation: number) => relation === 1 || relation === 3; relationIncludesBoundary = relation => relation === 2 || relation === 3; const halfPlane = (line: Line) => lowerBound(line.relation) ? { a: line.slope, b: -1, c: -line.intercept } : { a: -line.slope, b: 1, c: line.intercept }; const evaluation = (point: Point, plane: { a: number; b: number; c: number }) => plane.a * point.x + plane.b * point.y - plane.c; const inside = (point: Point, plane: { a: number; b: number; c: number }) => evaluation(point, plane) <= epsilon; const intersection = (start: Point, end: Point, plane: { a: number; b: number; c: number }): Point => { const numerator = evaluation(start, plane); const denominator = numerator - evaluation(end, plane); const ratio = Math.abs(denominator) <= epsilon ? 0 : numerator / denominator; return { x: start.x + (end.x - start.x) * ratio, y: start.y + (end.y - start.y) * ratio }; };
-  clipPolygon = (polygon, line) => { if (polygon.length === 0) return []; const plane = halfPlane(line); const result: Point[] = []; for (let index = 0; index < polygon.length; index += 1) { const current = polygon[index]; const previous = polygon[(index + polygon.length - 1) % polygon.length]; if (!current || !previous) continue; const currentInside = inside(current, plane); const previousInside = inside(previous, plane); if (currentInside) { if (!previousInside) result.push(intersection(previous, current, plane)); result.push(current); } else if (previousInside) result.push(intersection(previous, current, plane)); } return result; }; initialPolygon = bounds => [{ x: bounds.xMin, y: bounds.yMin }, { x: bounds.xMax, y: bounds.yMin }, { x: bounds.xMax, y: bounds.yMax }, { x: bounds.xMin, y: bounds.yMax }]; feasiblePolygon = (lines, bounds) => lines.reduce((polygon, line) => clipPolygon(polygon, line), initialPolygon(bounds));
-  classifyRegion = lines => { const lowers = lines.filter(line => lowerBound(line.relation)); const uppers = lines.filter(line => !lowerBound(line.relation)); if (lowers.length === 0 || uppers.length === 0) return "unbounded"; let lower = -Infinity; let lowerStrict = false; let upper = Infinity; let upperStrict = false; for (const low of lowers) for (const high of uppers) { const slopeDifference = low.slope - high.slope; const interceptDifference = high.intercept - low.intercept; const strict = relationIncludesBoundary(low.relation) || relationIncludesBoundary(high.relation); if (Math.abs(slopeDifference) <= epsilon) { if (!(strict ? interceptDifference > epsilon : interceptDifference >= -epsilon)) return "empty"; continue; } const boundary = interceptDifference / slopeDifference; if (slopeDifference > 0) { if (boundary < upper - epsilon) { upper = boundary; upperStrict = strict; } else if (Math.abs(boundary - upper) <= epsilon) upperStrict ||= strict; } else if (boundary > lower + epsilon) { lower = boundary; lowerStrict = strict; } else if (Math.abs(boundary - lower) <= epsilon) lowerStrict ||= strict; } return lower > upper + epsilon || (Math.abs(lower - upper) <= epsilon && (lowerStrict || upperStrict)) ? "empty" : Number.isFinite(lower) && Number.isFinite(upper) ? "bounded" : "unbounded"; };
-  lineSegment = (line, bounds) => { const candidates: Point[] = []; const add = (point: Point) => { if (point.x >= bounds.xMin - epsilon && point.x <= bounds.xMax + epsilon && point.y >= bounds.yMin - epsilon && point.y <= bounds.yMax + epsilon && candidates.every(value => Math.abs(value.x - point.x) > epsilon || Math.abs(value.y - point.y) > epsilon)) candidates.push(point); }; add({ x: bounds.xMin, y: line.slope * bounds.xMin + line.intercept }); add({ x: bounds.xMax, y: line.slope * bounds.xMax + line.intercept }); if (Math.abs(line.slope) > epsilon) { add({ x: (bounds.yMin - line.intercept) / line.slope, y: bounds.yMin }); add({ x: (bounds.yMax - line.intercept) / line.slope, y: bounds.yMax }); } if (candidates.length < 2) return null; let endpoints: [Point, Point] = [candidates[0] as Point, candidates[1] as Point]; let maximum = -1; for (let left = 0; left < candidates.length; left += 1) for (let right = left + 1; right < candidates.length; right += 1) { const first = candidates[left] as Point; const second = candidates[right] as Point; const distance = (first.x - second.x) ** 2 + (first.y - second.y) ** 2; if (distance > maximum) { endpoints = [first, second]; maximum = distance; } } return endpoints; };
-  const formatNumber = (value: number) => { const rounded = Number(value.toFixed(2)); return Object.is(rounded, -0) ? "0" : String(rounded); }; const expression = (slope: number, intercept: number) => { const roundedSlope = Number(slope.toFixed(2)); const roundedIntercept = Number(intercept.toFixed(2)); const slopeText = roundedSlope === 0 ? "" : roundedSlope === 1 ? "x" : roundedSlope === -1 ? "-x" : `${formatNumber(roundedSlope)}x`; return roundedIntercept === 0 ? slopeText || "0" : slopeText ? `${slopeText} ${roundedIntercept > 0 ? "+" : "−"} ${formatNumber(Math.abs(roundedIntercept))}` : formatNumber(roundedIntercept); }; formatInequality = line => `y ${["≤", "≥", "<", ">"][line.relation]} ${expression(line.slope, line.intercept)}`;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `LINEAR_INEQUALITIES_FEASIBLE_REGION`),
+      (n = `linear-inequalities-feasible-region-v1`),
+      (r = {
+        slope1: { kind: `number`, defaultValue: 1, min: -4, max: 4 },
+        intercept1: { kind: `number`, defaultValue: -2, min: -6, max: 6 },
+        relation1: { kind: `enum`, defaultValue: `>=`, allowedValues: [`<=`, `>=`, `<`, `>`] },
+        slope2: { kind: `number`, defaultValue: -1, min: -4, max: 4 },
+        intercept2: { kind: `number`, defaultValue: -2, min: -6, max: 6 },
+        relation2: { kind: `enum`, defaultValue: `>=`, allowedValues: [`<=`, `>=`, `<`, `>`] },
+        slope3: { kind: `number`, defaultValue: 0, min: -4, max: 4 },
+        intercept3: { kind: `number`, defaultValue: 3, min: -6, max: 6 },
+        relation3: { kind: `enum`, defaultValue: `<=`, allowedValues: [`<=`, `>=`, `<`, `>`] },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-export { normalizeValues as _, relationControl as a, applyScenario as c, formatInequality as d, lineSegment as f, relationIncludesBoundary as g, initializeModel as h, interceptControl as i, classifyRegion as l, inequalities as m, inequalityCountControl as n, slopeControl as o, feasiblePolygon as p, customScenario as r, graphBounds as s, activeInequalityControl as t, initialValues as u, initializeManifest as v, manifest as y };
+var o,
+  s,
+  c,
+  l,
+  u,
+  d,
+  f,
+  p,
+  m,
+  h,
+  g,
+  _,
+  v,
+  y,
+  b,
+  x,
+  S,
+  C,
+  w,
+  T,
+  E,
+  D,
+  O,
+  k,
+  A,
+  j,
+  M,
+  N,
+  P,
+  F,
+  I,
+  L,
+  R,
+  z,
+  B,
+  V;
+function H() {
+  return (H = e(() => {
+    (a(),
+      (o = `custom`),
+      (s = { xMin: -7, xMax: 7, yMin: -7, yMax: 7 }),
+      (c = i.parameters),
+      (l = (e, t) => ({ min: e.min, max: e.max, defaultValue: e.defaultValue, step: t })),
+      (u = l(c.slope1, 0.25)),
+      (d = l(c.intercept1, 0.5)),
+      (f = { min: 1, max: 3, defaultValue: 3, step: 1 }),
+      (p = { min: 1, max: 3, step: 1, defaultValue: 1 }),
+      (m = {
+        min: 0,
+        max: c.relation1.allowedValues.length - 1,
+        step: 1,
+        allowedValues: c.relation1.allowedValues,
+      }),
+      (h = { allowedValues: [`bounded`, `unbounded`, `empty`], defaultValue: `bounded` }),
+      (g = 1e-8),
+      (_ = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (v = (e, t, n, r) => (Number.isFinite(e) ? _(e, n, r) : t)),
+      (y = (e, t, n, r) => Math.round(v(e, t, n, r))),
+      (b = {
+        inequalityCount: f.defaultValue,
+        activeInequality: p.defaultValue,
+        scenario: h.defaultValue,
+        slope1: c.slope1.defaultValue,
+        intercept1: c.intercept1.defaultValue,
+        relation1: c.relation1.defaultValue,
+        slope2: c.slope2.defaultValue,
+        intercept2: c.intercept2.defaultValue,
+        relation2: c.relation2.defaultValue,
+        slope3: c.slope3.defaultValue,
+        intercept3: c.intercept3.defaultValue,
+        relation3: c.relation3.defaultValue,
+      }),
+      (x = {
+        bounded: b,
+        unbounded: {
+          inequalityCount: 3,
+          activeInequality: 1,
+          scenario: `unbounded`,
+          slope1: 1,
+          intercept1: -2,
+          relation1: `>=`,
+          slope2: -1,
+          intercept2: -2,
+          relation2: `>=`,
+          slope3: 0,
+          intercept3: -4,
+          relation3: `>=`,
+        },
+        empty: {
+          inequalityCount: 3,
+          activeInequality: 1,
+          scenario: `empty`,
+          slope1: 1,
+          intercept1: 2,
+          relation1: `>=`,
+          slope2: 1,
+          intercept2: -2,
+          relation2: `<=`,
+          slope3: 0,
+          intercept3: 5,
+          relation3: `<=`,
+        },
+      }),
+      (S = (e) => {
+        let t = y(e.inequalityCount, b.inequalityCount, f.min, f.max);
+        return {
+          inequalityCount: t,
+          activeInequality: y(e.activeInequality, b.activeInequality, p.min, t),
+          scenario:
+            e.scenario === `custom` || h.allowedValues.includes(e.scenario)
+              ? e.scenario
+              : b.scenario,
+          slope1: v(e.slope1, b.slope1, c.slope1.min, c.slope1.max),
+          intercept1: v(e.intercept1, b.intercept1, c.intercept1.min, c.intercept1.max),
+          relation1: m.allowedValues.includes(e.relation1) ? e.relation1 : b.relation1,
+          slope2: v(e.slope2, b.slope2, c.slope2.min, c.slope2.max),
+          intercept2: v(e.intercept2, b.intercept2, c.intercept2.min, c.intercept2.max),
+          relation2: m.allowedValues.includes(e.relation2) ? e.relation2 : b.relation2,
+          slope3: v(e.slope3, b.slope3, c.slope3.min, c.slope3.max),
+          intercept3: v(e.intercept3, b.intercept3, c.intercept3.min, c.intercept3.max),
+          relation3: m.allowedValues.includes(e.relation3) ? e.relation3 : b.relation3,
+        };
+      }),
+      (C = (e, t) => {
+        let n = x[e];
+        return n ? { ...n } : S(t);
+      }),
+      (w = (e = {}) => {
+        let t = Object.keys(e).some((e) => e !== `scenario` && e !== `activeInequality`),
+          n = h.allowedValues.includes(e.scenario) ? e.scenario : b.scenario,
+          r = x[n] ?? b,
+          i = t ? o : n;
+        return S({ ...r, ...e, scenario: i });
+      }),
+      (T = (e) => {
+        let t = S(e);
+        return [
+          {
+            slope: t.slope1,
+            intercept: t.intercept1,
+            relation: m.allowedValues.indexOf(t.relation1),
+          },
+          {
+            slope: t.slope2,
+            intercept: t.intercept2,
+            relation: m.allowedValues.indexOf(t.relation2),
+          },
+          {
+            slope: t.slope3,
+            intercept: t.intercept3,
+            relation: m.allowedValues.indexOf(t.relation3),
+          },
+        ].slice(0, t.inequalityCount);
+      }),
+      (E = (e) => e === 1 || e === 3),
+      (D = (e) => e === 2 || e === 3),
+      (O = ({ slope: e, intercept: t, relation: n }) =>
+        E(n) ? { a: e, b: -1, c: -t } : { a: -e, b: 1, c: t }),
+      (k = (e, t) => t.a * e.x + t.b * e.y - t.c),
+      (A = (e, t) => k(e, t) <= g),
+      (j = (e, t, n) => {
+        let r = k(e, n),
+          i = r - k(t, n),
+          a = Math.abs(i) <= g ? 0 : r / i;
+        return { x: e.x + (t.x - e.x) * a, y: e.y + (t.y - e.y) * a };
+      }),
+      (M = (e, t) => {
+        if (e.length === 0) return [];
+        let n = O(t),
+          r = [];
+        for (let t = 0; t < e.length; t += 1) {
+          let i = e[t],
+            a = e[(t + e.length - 1) % e.length],
+            o = A(i, n),
+            s = A(a, n);
+          o ? (s || r.push(j(a, i, n)), r.push(i)) : s && r.push(j(a, i, n));
+        }
+        return r;
+      }),
+      (N = (e) => [
+        { x: e.xMin, y: e.yMin },
+        { x: e.xMax, y: e.yMin },
+        { x: e.xMax, y: e.yMax },
+        { x: e.xMin, y: e.yMax },
+      ]),
+      (P = (e, t) => e.reduce((e, t) => M(e, t), N(t))),
+      (F = (e) => {
+        let t = e.filter(({ relation: e }) => E(e)),
+          n = e.filter(({ relation: e }) => !E(e));
+        if (t.length === 0 || n.length === 0) return `unbounded`;
+        let r = -1 / 0,
+          i = !1,
+          a = 1 / 0,
+          o = !1;
+        for (let e of t)
+          for (let t of n) {
+            let n = e.slope - t.slope,
+              s = t.intercept - e.intercept,
+              c = D(e.relation) || D(t.relation);
+            if (Math.abs(n) <= g) {
+              if (!(c ? s > g : s >= -1e-8)) return `empty`;
+              continue;
+            }
+            let l = s / n;
+            n > 0
+              ? l < a - g
+                ? ((a = l), (o = c))
+                : Math.abs(l - a) <= g && (o ||= c)
+              : l > r + g
+                ? ((r = l), (i = c))
+                : Math.abs(l - r) <= g && (i ||= c);
+          }
+        return r > a + g || (Math.abs(r - a) <= g && (i || o))
+          ? `empty`
+          : Number.isFinite(r) && Number.isFinite(a)
+            ? `bounded`
+            : `unbounded`;
+      }),
+      (I = (e, t) => {
+        e.every((e) => Math.abs(e.x - t.x) > g || Math.abs(e.y - t.y) > g) && e.push(t);
+      }),
+      (L = (e, t) => {
+        let { slope: n, intercept: r } = e,
+          i = [],
+          a = (e) => {
+            e.x >= t.xMin - g &&
+              e.x <= t.xMax + g &&
+              e.y >= t.yMin - g &&
+              e.y <= t.yMax + g &&
+              I(i, e);
+          };
+        if (
+          (a({ x: t.xMin, y: n * t.xMin + r }),
+          a({ x: t.xMax, y: n * t.xMax + r }),
+          Math.abs(n) > g &&
+            (a({ x: (t.yMin - r) / n, y: t.yMin }), a({ x: (t.yMax - r) / n, y: t.yMax })),
+          i.length < 2)
+        )
+          return null;
+        let o = [i[0], i[1]],
+          s = -1;
+        for (let e = 0; e < i.length; e += 1)
+          for (let t = e + 1; t < i.length; t += 1) {
+            let n = i[e].x - i[t].x,
+              r = i[e].y - i[t].y,
+              a = n * n + r * r;
+            a > s && ((o = [i[e], i[t]]), (s = a));
+          }
+        return o;
+      }),
+      (R = (e) => {
+        let t = Number(e.toFixed(2));
+        return Object.is(t, -0) ? `0` : String(t);
+      }),
+      (z = (e) => [`≤`, `≥`, `<`, `>`][e]),
+      (B = (e, t) => {
+        let n = Number(e.toFixed(2)),
+          r = Number(t.toFixed(2)),
+          i = n === 0 ? `` : n === 1 ? `x` : n === -1 ? `-x` : `${R(n)}x`;
+        return r === 0 ? i || `0` : i ? `${i} ${r > 0 ? `+` : `−`} ${R(Math.abs(r))}` : R(r);
+      }),
+      (V = (e) => `y ${z(e.relation)} ${B(e.slope, e.intercept)}`));
+  }))();
+}
+export {
+  S as _,
+  m as a,
+  C as c,
+  V as d,
+  L as f,
+  D as g,
+  H as h,
+  d as i,
+  F as l,
+  T as m,
+  f as n,
+  u as o,
+  P as p,
+  o as r,
+  s,
+  p as t,
+  w as u,
+  a as v,
+  i as y,
+};

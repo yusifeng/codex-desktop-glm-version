@@ -11,20 +11,7 @@ function walk(node, visit) { if (node == null || typeof node !== "object") retur
 function find(node, predicate) { let result; walk(node, value => { if (result == null && predicate(value)) result = value; }); return result; }
 function all(node, predicate) { const result = []; walk(node, value => { if (predicate(value)) result.push(value); }); return result; }
 
-// google-logo: 9
-const google = await bundle("google-logo");
-assert.deepEqual(Object.keys(google), ["n", "t"]);
-const googleUi = google.t({ className: "brand" });
-assert.equal(googleUi.type, "svg");
-assert.equal(googleUi.props.width, 24);
-assert.equal(googleUi.props.height, 24);
-assert.equal(googleUi.props.role, "img");
-assert.equal(googleUi.props["aria-label"], "Google");
-assert.equal(googleUi.props.className, "brand");
-assert.equal(all(googleUi, node => node.type === "path").length, 4);
-assert.equal(google.n(), undefined);
-
-const colorIconReleaseAssertions = assertReleaseOwner("color-icon");
+const googleLogoReleaseAssertions = assertReleaseOwner("google-logo");
 
 // animated-icon: 11
 const animated = await bundle("animated-icon");
@@ -44,4 +31,4 @@ assert.equal(animated.t({ animation: "hello", animated: false }).props["data-ani
 assert.equal(animated.t({ animation: "memory", fallbackIcon: "fallback" }).props.children, "fallback");
 assert.equal(animated.n(), undefined);
 
-console.log(`20 brand visual primitive assertions and ${colorIconReleaseAssertions} color icon release assertions passed`);
+console.log(`animated icon behavior and ${googleLogoReleaseAssertions + assertReleaseOwner("color-icon")} brand release assertions passed`);

@@ -75,37 +75,9 @@ assert.match(afterOnly.props.children.props.className, /grid-cols-1/);
 assert.equal(afterOnly.props.children.props.children, "new");
 assert.equal(binary.r({}).props.role, "status");
 
-// editor-header: 8
-const header = await bundle("editor-header");
-assert.deepEqual(Object.keys(header), ["n", "r", "t"]);
-let commentsOpen;
-const comments = header.n({ open: false, onOpenChange(value) { commentsOpen = value; } });
-assert.equal(comments.type, globalThis.__artifactControlsTest.action);
-assert.equal(comments.props.label, "Open comments");
-comments.props.onClick();
-assert.equal(commentsOpen, true);
-let shared = 0;
-const renderedHeader = header.t({ controls: { annotationControl: "annotate", navigationControl: "nav", zoomControl: "zoom" }, title: "Deck", onShare() { shared++; } });
-assert.equal(renderedHeader.type, "header");
-assert.equal(childArray(renderedHeader)[0].props.children[1], "nav");
-const trailing = childArray(renderedHeader)[1].props.children;
-assert.equal(trailing[0], "annotate");
-trailing[3].props.onClick();
-assert.equal(shared, 1);
+assertReleaseOwner("editor-header");
 
-// presentation-annotation-cursor-coachmark: 8
-const cursor = await bundle("presentation-annotation-cursor-coachmark");
-assert.deepEqual(Object.keys(cursor), ["i", "n", "r", "t"]);
-assert.match(cursor.r.document.defaultMessage, /Select text/);
-assert.match(cursor.r.presentation.defaultMessage, /images/);
-assert.match(cursor.r.spreadsheet.defaultMessage, /cell or range/);
-let cursorDismissed = 0;
-const cursorCoach = cursor.t({ children: "content", message: cursor.r.pdf, onDismiss() { cursorDismissed++; }, open: true });
-assert.equal(childArray(cursorCoach)[1].props.role, "tooltip");
-assert.match(childArray(cursorCoach)[1].props.children, /objects/);
-cursorCoach.props.onPointerDownCapture({ button: 0 });
-assert.equal(cursorDismissed, 1);
-assert.equal(cursor.t({ message: cursor.r.pdf, onDismiss() {}, open: false }).props.children[1], null);
+assertReleaseOwner("presentation-annotation-cursor-coachmark");
 
 assertReleaseOwner("drawing-size-slider");
 

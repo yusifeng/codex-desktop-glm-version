@@ -4,9 +4,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const directories = ["shopping-bag-fill-icon", "checkout-telemetry", "epic-chart-indicator-entry", "voice-dsp-entry", "code-block-execution-entry", "experimental-feature-visibility", "product-favorite-action-entry", "product-favorite-action-core", "library-file-route", "note-icon", "open-automation-side-panel-tab-entry", "restore-image-preview-tab"];
+const directories = ["shopping-bag-fill-icon", "checkout-telemetry", "epic-chart-indicator-entry", "voice-dsp-entry", "code-block-execution-entry", "experimental-feature-visibility", "product-favorite-action-entry", "product-favorite-action-core", "note-icon", "open-automation-side-panel-tab-entry", "restore-image-preview-tab"];
 const expectedImports = {
   "shopping-bag-fill-icon": ["app-shared", "rolldown-runtime"],
   "checkout-telemetry": ["checkout-policy", "stripe-payment-element-options", "rolldown-runtime"],
@@ -16,7 +17,6 @@ const expectedImports = {
   "experimental-feature-visibility": ["app-initial", "app-shared", "chronicle-settings", "rolldown-runtime"],
   "product-favorite-action-entry": ["app-shared", "product-favorite-action-core"],
   "product-favorite-action-core": ["app-initial", "app-shared", "request-context", "rolldown-runtime"],
-  "library-file-route": ["app-initial", "app-shared", "cloud-file-preview", "library-cloud-file-preview", "library-file-metadata", "library-file-preview-loading", "rolldown-runtime"],
   "note-icon": ["app-shared", "rolldown-runtime"],
   "open-automation-side-panel-tab-entry": ["app-shared", "open-automation-side-panel-tab"],
   "restore-image-preview-tab": ["app-initial", "app-shared", "local-conversation-thread-turn-entries", "rolldown-runtime"],
@@ -68,7 +68,7 @@ const visibility = await bundle("experimental-feature-visibility"); visibility.t
 const favoriteEntry = await bundle("product-favorite-action-entry"); assert.equal(favoriteEntry.ProductFavoriteAction, "ProductFavoriteAction"); runtimeAssertions++;
 state.signals.set("account", "account-1"); state.signals.set("user", "user-1"); state.signals.set("saved-state", null); state.signals.set("request-query", { isSourceCatalog: false, rewrittenQueries: ["laptop"] }); const favorite = await bundle("product-favorite-action-core"); favorite.n(); const favoriteNode = favorite.t({ product: { id: "p1", title: "Laptop", url: "https://example.com", query: "laptop", provider: "shop" }, surface: "product_card" }); assert.equal(favoriteNode.type, "ScopedProvider"); const favoriteAction = favoriteNode.props.children.type(favoriteNode.props.children.props); assert.equal(favoriteAction.type, "SavedEntityAction"); runtimeAssertions += 2;
 const automation = await bundle("open-automation-side-panel-tab-entry"); assert.deepEqual(Object.keys(automation), ["openAutomationSidePanelTab", "openAutomationSuggestionSidePanelTab", "openSiteAutomationSidePanelTab", "restoreAutomationSidePanelTab"]); runtimeAssertions++;
-state.signals.set("access", "loading"); state.signals.set("account", "account-1"); state.signals.set("user", "user-1"); state.signals.set("automation-blocked", true); state.signals.set("availability", false); state.signals.set("feature-enabled|3765605143", true); state.signals.set("feature-disabled|3765605143", false); const library = await bundle("library-file-route"); assert.equal(library.LibraryFileRoute().type, "LibraryFilePreviewLoading"); runtimeAssertions++;
+sourceAssertions += assertReleaseOwner("library-file-route");
 const restore = await bundle("restore-image-preview-tab"); const scope = { value: { routeKind: "local-thread" }, get(signal) { if (signal === "host") return "local"; return null; }, query: { async getOrFetch() { return { existingPaths: ["/tmp/image.png"] }; } } }; const restored = await restore.restoreImagePreviewTab(scope, { source: "artifact", hostId: "local", path: "/tmp/image.png" }, {}, (...args) => state.opened.push(args)); assert.equal(restored, true); assert.equal(state.opened[0][1].title, "image.png"); runtimeAssertions += 2;
 
 console.log(`${sourceAssertions} source assertions and ${runtimeAssertions} runtime assertions passed`);

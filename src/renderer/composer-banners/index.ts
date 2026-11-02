@@ -1,182 +1,478 @@
-import "@rchunk/rolldown-runtime";
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-import * as primaryChunk from "@rchunk/app-primary";
-import * as usageChunk from "@rchunk/usage";
-import * as slotChunk from "@rchunk/composer-announcement-slot";
-
-interface Candidate { content: unknown; id: string; isEligible: boolean; isLoading: boolean }
-interface LegacyWslState { destinationLabel?: string; hostId?: string; kind: string; project?: { hostId: string; remotePath: string } }
-interface EnvironmentBanners { legacyWslState?: LegacyWslState; showFullAccessWarning?: boolean; windowsSandboxWarnings?: unknown }
-export interface ComposerBannersProps {
-  conversationId?: string | null;
-  environmentBanners?: EnvironmentBanners | null;
-  hostId: string;
-  homeComposerBanners?: unknown;
-  latestTurnId?: string | null;
-  misalignmentPolicyViolationBanner?: unknown;
-  onDismissSafetyEvent?(): void;
-  safetyBufferingBanner?: unknown;
-  safetyEvent?: unknown;
-  showUltraWarning?: boolean;
-  ultraWarningModel?: string | null;
-  usageBannerProps?: Record<string, unknown>;
-}
-
-const shared = sharedChunk as unknown as Record<string, unknown>;
-const initial = initialChunk as unknown as Record<string, unknown>;
-const primary = primaryChunk as unknown as Record<string, unknown>;
-const usage = usageChunk as unknown as Record<string, unknown>;
-const slot = slotChunk as unknown as Record<string, unknown>;
-let React: { Suspense: unknown };
-let jsx: { jsx(component: unknown, props: Record<string, unknown>): unknown };
-let TaskAnnouncementCandidates: unknown;
-let ultraWarningDismissed: unknown;
-
-function call(candidate: unknown): void { if (typeof candidate === "function") candidate(); }
-function candidate(id: string, content: unknown): Candidate {
-  return (slot.r as (id: string, content: unknown) => Candidate)(id, content);
-}
-
-function UltraAgentUsageWarning({ conversationId, model }: { conversationId?: string | null; model: string }): unknown {
-  const scope = (shared.LX as (root: unknown) => { set(signal: unknown, value: unknown): void })(shared.ZI);
-  const conversation = (initial.jyt as (id: string | null | undefined) => { cwd?: string; hostId: string })(conversationId);
-  const host = (initial.P6t as (id: string) => { authMethod?: unknown } | null)(conversation.hostId);
-  const modelQuery = (initial.w8 as (options: { hostId: string }) => { data?: { models?: unknown[] } })({ hostId: conversation.hostId });
-  const { data: config } = (shared.BX as (
-    signal: unknown,
-    key: unknown,
-  ) => { data?: unknown })(initial.wst, { cwd: conversation.cwd, hostId: conversation.hostId });
-  const dismissed = (shared.HX as (signal: unknown) => boolean)(ultraWarningDismissed);
-  const matching = (primary.Tp as (models: unknown[] | undefined, model: string) => Array<{ reasoningEffort?: string }>)(modelQuery.data?.models, model);
-  const hasUltra = matching.some(item => item.reasoningEffort === "ultra");
-  const count = hasUltra ? (primary.Cp as (input: { authMethod?: unknown; config: unknown }) => number | undefined)({ authMethod: host?.authMethod, config }) : undefined;
-  if (count == null || dismissed !== false) return null;
-  return jsx.jsx(initial.n7, {
-    ariaLive: "polite",
-    content: jsx.jsx(shared.Y2, {
-      id: "composer.intelligenceDropdown.ultraAgentUsageWarning",
-      defaultMessage: "Ultra with up to {count} agents can use your usage limits quickly",
-      description: "Warning above the composer when a ChatGPT-authenticated user has configured many agents and selected Ultra reasoning",
-      values: { count },
-    }),
-    Icon: primary.Jp,
-    onSecondaryCtaClick: () => scope.set(ultraWarningDismissed, true),
-    role: "status",
-    secondaryCtaText: jsx.jsx(shared.Y2, {
-      id: "composer.intelligenceDropdown.ultraAgentUsageWarning.dismiss",
-      defaultMessage: "Dismiss",
-      description: "Button to permanently dismiss the Ultra reasoning and high agent count usage warning",
-    }),
-    type: "warning",
-  });
-}
-
-function LegacyWslBanner({ state }: { state: LegacyWslState }): unknown {
-  const scope = (shared.LX as (root: unknown) => { get(signal: unknown): unknown; set(signal: unknown, value: unknown): void })(initial.kht);
-  const conversationId = (initial.Fht as (scope: unknown) => string | null)(scope);
-  const navigate = (initial.o_n as () => (path: string) => void)();
-  const conversation = (initial.jyt as (id: string | null) => { cwd?: string; hostConfig?: unknown })(conversationId);
-  const enabled = state.kind === "handoff" && conversation.cwd != null;
-  const branchQuery = (primary.fp as (...args: unknown[]) => { data?: string })(conversation.cwd, conversation.hostConfig, "local_remote_dropdown", { enabled });
-  const project = (initial.GM as (conversationId: string | null) => unknown)(conversationId);
-  const operation = (primary._p as (project: unknown) => { id: string } | null)(project);
-  const { openOperation } = (initial.WM as () => { openOperation(id: string): void })();
-  const fallbackBranch = (shared.BX as (signal: unknown, key: unknown) => string | undefined)(initial.RZt, conversationId);
-  const title = (shared.BX as (signal: unknown, key: unknown) => string | undefined)(initial.RCt, conversationId);
-  if (state.kind === "hidden" || conversationId == null) return null;
-  if (state.kind === "handoff" && operation != null && !(primary.yp as (input: Record<string, unknown>) => boolean)({ destinationHostId: state.project?.hostId, destinationWorkspaceRoot: state.project?.remotePath, operation })) return null;
-  return jsx.jsx(primary.xp, {
-    state,
-    onChooseProject: () => scope.set(initial.k3, "composer"),
-    onCreateProject: () => (initial.Kj as (options: Record<string, unknown>) => void)({ hostId: state.kind === "createProject" ? state.hostId : undefined }),
-    onHandoff: () => {
-      if (state.kind !== "handoff" || conversation.cwd == null || state.project == null) return;
-      (initial.Uzt as (...args: unknown[]) => void)(scope, primary.Zf, {
-        conversationId,
-        composerViewState: scope.get(initial._3),
-        conversationTitle: title,
-        currentBranch: branchQuery.data ?? (primary.hp as (...args: unknown[]) => string | undefined)(operation, conversationId) ?? fallbackBranch ?? "",
-        cwd: (shared.iW as (value: string) => string)(conversation.cwd),
-        destinationHostId: state.project.hostId,
-        destinationWorkspaceRoot: (shared.iW as (value: string) => string)(state.project.remotePath),
-        destinationLabel: state.destinationLabel,
-      });
-      if (operation != null) openOperation(operation.id);
-    },
-    onOpenConnections: () => navigate("/settings/connections/wsl"),
-  });
-}
-
-function ComposerBanners({
-  conversationId, environmentBanners, hostId, homeComposerBanners, latestTurnId,
-  misalignmentPolicyViolationBanner, safetyBufferingBanner, safetyEvent,
-  onDismissSafetyEvent, showUltraWarning, ultraWarningModel, usageBannerProps,
-}: ComposerBannersProps): unknown {
-  initializeComposerBanners();
-  const usageContent = (usage.n as (props: Record<string, unknown>) => unknown)({ ...(usageBannerProps ?? {}), hostId });
-  const legacyState = environmentBanners?.legacyWslState ?? { kind: "hidden" };
-  const legacyContent = jsx.jsx(LegacyWslBanner, { state: legacyState });
-  const ultraContent = showUltraWarning && ultraWarningModel != null
-    ? jsx.jsx(UltraAgentUsageWarning, { conversationId, model: ultraWarningModel })
-    : null;
-  const candidates = [
-    candidate("windows-sandbox", environmentBanners?.windowsSandboxWarnings),
-    candidate("wsl-migration", legacyContent),
-    candidate("full-access", environmentBanners?.showFullAccessWarning ? jsx.jsx(primary.Op, {}) : null),
-    candidate("cyber-safety", safetyEvent == null ? null : jsx.jsx(primary.Vf, { event: safetyEvent, onDismiss: onDismissSafetyEvent })),
-    candidate("codex-usage", usageContent),
-    candidate("ultra-usage", ultraContent),
-    candidate("misalignment-policy", misalignmentPolicyViolationBanner),
-    candidate("safety-buffering", safetyBufferingBanner),
-    candidate("dictation-first-use", jsx.jsx(primary.om, {})),
-  ];
-  if (conversationId == null) {
-    return jsx.jsx(slot.t, { area: "home", candidates, homeCandidates: homeComposerBanners });
-  }
-  return jsx.jsx(React.Suspense, {
-    fallback: jsx.jsx(slot.t, {
-      area: "task",
-      candidates: [...candidates, { id: "workspace-renewal-payment", isEligible: false, isLoading: true, content: null }],
-    }),
-    children: jsx.jsx(TaskAnnouncementCandidates, { conversationId, hostId, turnId: latestTurnId, candidates }),
-  });
-}
-
-function initializeComposerBanners(): void {
-  if (jsx != null) return;
-  call(shared.$3);
-  React = (shared.e6 as () => typeof React)();
-  call(primary.kp);
-  initializeUltraAgentUsageWarning();
-  call(usage.t);
-  initializeLegacyWslBanner();
-  for (const initializer of [slot.i, slot.n, primary.Hf, primary.sm, shared.qm]) call(initializer);
-  jsx = (shared.I3 as () => typeof jsx)();
-  call(shared.H3);
-  const lazy = shared.Jm as (loader: () => Promise<unknown>, options: Record<string, boolean>) => unknown;
-  TaskAnnouncementCandidates = lazy(
-    async () => (await import("@rchunk/task-announcement-candidates")).TaskAnnouncementCandidates,
-    { suspendToParent: true, propagateLoadError: true },
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/task-announcement-candidates",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/app-primary",
+      "./app-primary-484df789f2f5.css",
+      "@rchunk/composer-announcement-slot",
+      "@rchunk/workspace-renewal-payment",
+      "@rchunk/workspace-renewal-state",
+      "@rchunk/task-announcement-state",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  H3 as i,
+  HX as a,
+  I3 as o,
+  Jm as s,
+  K2 as c,
+  LX as l,
+  QI as u,
+  V3 as d,
+  Y2 as f,
+  ZI as p,
+  e6 as m,
+  iW as h,
+  qm as g,
+  wL as _,
+} from "@rchunk/app-shared";
+import {
+  Ayt as v,
+  Fht as y,
+  GM as b,
+  HZt as x,
+  Kj as S,
+  LCt as C,
+  M6t as w,
+  P6t as T,
+  Qgn as E,
+  RCt as D,
+  RZt as O,
+  Rht as k,
+  S8 as A,
+  Tst as j,
+  Uzt as M,
+  VM as N,
+  Vzt as P,
+  WM as F,
+  Wj as I,
+  _3 as L,
+  dun as ee,
+  jyt as R,
+  k3 as te,
+  kht as ne,
+  n7 as re,
+  o_n as ie,
+  r7 as ae,
+  uun as oe,
+  w8 as se,
+  wst as ce,
+  x3 as le,
+} from "@rchunk/app-initial";
+import {
+  Cp as ue,
+  Dp as de,
+  Hf as fe,
+  Jp as pe,
+  Op as me,
+  Qf as he,
+  Sp as ge,
+  Tp as _e,
+  Vf as ve,
+  Yp as ye,
+  Zf as be,
+  _p as xe,
+  dp as Se,
+  fp as Ce,
+  hp as we,
+  kp as Te,
+  om as Ee,
+  sm as De,
+  wp as z,
+  xp as Oe,
+  yp as ke,
+} from "@rchunk/app-primary";
+import { n as Ae, t as je } from "@rchunk/usage";
+import { i as Me, n as Ne, r as B, t as V } from "@rchunk/composer-announcement-slot";
+function Pe(e) {
+  let t = (0, H.c)(16),
+    { conversationId: r, model: i } = e,
+    o = l(p),
+    s = R(r),
+    c = T(s.hostId),
+    u;
+  t[0] === s.hostId ? (u = t[1]) : ((u = { hostId: s.hostId }), (t[0] = s.hostId), (t[1] = u));
+  let { data: d } = se(u),
+    m;
+  t[2] !== s.cwd || t[3] !== s.hostId
+    ? ((m = { cwd: s.cwd, hostId: s.hostId }), (t[2] = s.cwd), (t[3] = s.hostId), (t[4] = m))
+    : (m = t[4]);
+  let { data: h } = n(ce, m),
+    g = a(W),
+    _;
+  t[5] !== d?.models || t[6] !== i
+    ? ((_ = _e(d?.models, i).some(Fe)), (t[5] = d?.models), (t[6] = i), (t[7] = _))
+    : (_ = t[7]);
+  let v = _,
+    y;
+  t[8] !== c?.authMethod || t[9] !== h || t[10] !== v
+    ? ((y = v ? ue({ authMethod: c?.authMethod, config: h }) : void 0),
+      (t[8] = c?.authMethod),
+      (t[9] = h),
+      (t[10] = v),
+      (t[11] = y))
+    : (y = t[11]);
+  let b = y,
+    x;
+  return (
+    t[12] !== g || t[13] !== b || t[14] !== o
+      ? ((x =
+          b == null || g !== !1
+            ? null
+            : (0, U.jsx)(re, {
+                ariaLive: `polite`,
+                content: (0, U.jsx)(f, {
+                  id: `composer.intelligenceDropdown.ultraAgentUsageWarning`,
+                  defaultMessage: `Ultra with up to {count} agents can use your usage limits quickly`,
+                  description: `Warning above the composer when a ChatGPT-authenticated user has configured many agents and selected Ultra reasoning`,
+                  values: { count: b },
+                }),
+                Icon: pe,
+                onSecondaryCtaClick: () => {
+                  o.set(W, !0);
+                },
+                role: `status`,
+                secondaryCtaText: (0, U.jsx)(f, {
+                  id: `composer.intelligenceDropdown.ultraAgentUsageWarning.dismiss`,
+                  defaultMessage: `Dismiss`,
+                  description: `Button to permanently dismiss the Ultra reasoning and high agent count usage warning`,
+                }),
+                type: `warning`,
+              })),
+        (t[12] = g),
+        (t[13] = b),
+        (t[14] = o),
+        (t[15] = x))
+      : (x = t[15]),
+    x
   );
 }
-
-function initializeUltraAgentUsageWarning(): void {
-  for (const initializer of [
-    shared.$3, shared.FX, shared.K2, initial.Tst, initial.M6t, primary.Dp,
-    primary.wp, initial.r7, initial.Ayt, primary.Yp, initial.S8, shared.QI, initial.uun,
-  ]) call(initializer);
-  ultraWarningDismissed = (initial.dun as (key: string, fallback: boolean) => unknown)("ultra-agent-usage-warning-dismissed", false);
+function Fe(e) {
+  let { reasoningEffort: t } = e;
+  return t === `ultra`;
 }
-
-function initializeLegacyWslBanner(): void {
-  for (const initializer of [
-    shared.$3, shared.FX, shared.wL, initial.Qgn, initial.HZt, initial.x3,
-    primary.Sp, initial.Vzt, primary.dp, initial.Ayt, initial.LCt, primary.Qf,
-    initial.VM, initial.Wj, initial.Rht,
-  ]) call(initializer);
+var H, U, W;
+function G() {
+  return (G = e(() => {
+    ((H = t()),
+      r(),
+      c(),
+      j(),
+      w(),
+      de(),
+      z(),
+      ae(),
+      v(),
+      ye(),
+      A(),
+      u(),
+      oe(),
+      (U = o()),
+      (W = ee(`ultra-agent-usage-warning-dismissed`, !1)));
+  }))();
 }
-
-initializeComposerBanners();
-
-export { ComposerBanners };
+function Ie(e) {
+  let t = (0, K.c)(29),
+    { state: r } = e,
+    i = l(ne),
+    a;
+  t[0] === i ? (a = t[1]) : ((a = y(i)), (t[0] = i), (t[1] = a));
+  let o = a,
+    s = ie(),
+    c = R(o),
+    u = r.kind === `handoff` && c.cwd != null,
+    d;
+  t[2] === u ? (d = t[3]) : ((d = { enabled: u }), (t[2] = u), (t[3] = d));
+  let { data: f } = Ce(c.cwd, c.hostConfig, `local_remote_dropdown`, d),
+    p = b(o),
+    m = xe(p),
+    { openOperation: g } = F(),
+    _ = n(O, o),
+    v = n(D, o);
+  if (
+    r.kind === `hidden` ||
+    o == null ||
+    (r.kind === `handoff` &&
+      m != null &&
+      !ke({
+        destinationHostId: r.project.hostId,
+        destinationWorkspaceRoot: r.project.remotePath,
+        operation: m,
+      }))
+  )
+    return null;
+  let x;
+  t[4] === i
+    ? (x = t[5])
+    : ((x = () => {
+        i.set(te, `composer`);
+      }),
+      (t[4] = i),
+      (t[5] = x));
+  let C;
+  t[6] !== r.hostId || t[7] !== r.kind
+    ? ((C = () => {
+        S({ hostId: r.kind === `createProject` ? r.hostId : void 0 });
+      }),
+      (t[6] = r.hostId),
+      (t[7] = r.kind),
+      (t[8] = C))
+    : (C = t[8]);
+  let w;
+  t[9] !== o ||
+  t[10] !== v ||
+  t[11] !== f ||
+  t[12] !== c.cwd ||
+  t[13] !== m ||
+  t[14] !== g ||
+  t[15] !== i ||
+  t[16] !== r.destinationLabel ||
+  t[17] !== r.kind ||
+  t[18] !== r.project ||
+  t[19] !== _
+    ? ((w = () => {
+        r.kind === `handoff` &&
+          c.cwd != null &&
+          (M(i, be, {
+            conversationId: o,
+            composerViewState: i.get(L),
+            conversationTitle: v,
+            currentBranch: f ?? we(m, o) ?? _ ?? ``,
+            cwd: h(c.cwd),
+            destinationHostId: r.project.hostId,
+            destinationWorkspaceRoot: h(r.project.remotePath),
+            destinationLabel: r.destinationLabel,
+          }),
+          m != null && g(m.id));
+      }),
+      (t[9] = o),
+      (t[10] = v),
+      (t[11] = f),
+      (t[12] = c.cwd),
+      (t[13] = m),
+      (t[14] = g),
+      (t[15] = i),
+      (t[16] = r.destinationLabel),
+      (t[17] = r.kind),
+      (t[18] = r.project),
+      (t[19] = _),
+      (t[20] = w))
+    : (w = t[20]);
+  let T;
+  t[21] === s
+    ? (T = t[22])
+    : ((T = () => {
+        s(`/settings/connections/wsl`);
+      }),
+      (t[21] = s),
+      (t[22] = T));
+  let E;
+  return (
+    t[23] !== r || t[24] !== x || t[25] !== C || t[26] !== w || t[27] !== T
+      ? ((E = (0, q.jsx)(Oe, {
+          state: r,
+          onChooseProject: x,
+          onCreateProject: C,
+          onHandoff: w,
+          onOpenConnections: T,
+        })),
+        (t[23] = r),
+        (t[24] = x),
+        (t[25] = C),
+        (t[26] = w),
+        (t[27] = T),
+        (t[28] = E))
+      : (E = t[28]),
+    E
+  );
+}
+var K, q;
+function J() {
+  return (J = e(() => {
+    ((K = t()),
+      r(),
+      _(),
+      E(),
+      x(),
+      le(),
+      ge(),
+      P(),
+      Se(),
+      v(),
+      C(),
+      he(),
+      N(),
+      I(),
+      k(),
+      (q = o()));
+  }))();
+}
+function Le(e) {
+  let t = (0, Y.c)(47),
+    {
+      conversationId: n,
+      environmentBanners: r,
+      hostId: i,
+      homeComposerBanners: a,
+      latestTurnId: o,
+      misalignmentPolicyViolationBanner: s,
+      safetyBufferingBanner: c,
+      safetyEvent: l,
+      onDismissSafetyEvent: u,
+      showUltraWarning: d,
+      ultraWarningModel: f,
+      usageBannerProps: p,
+    } = e,
+    m;
+  t[0] !== i || t[1] !== p
+    ? ((m = { ...p, hostId: i }), (t[0] = i), (t[1] = p), (t[2] = m))
+    : (m = t[2]);
+  let h = Ae(m),
+    g;
+  t[3] === r?.legacyWslState
+    ? (g = t[4])
+    : ((g = r?.legacyWslState ?? { kind: `hidden` }), (t[3] = r?.legacyWslState), (t[4] = g));
+  let _;
+  t[5] === g ? (_ = t[6]) : ((_ = { state: g }), (t[5] = g), (t[6] = _));
+  let v = Ie(_),
+    y = f ?? ``,
+    b;
+  t[7] !== n || t[8] !== y
+    ? ((b = { conversationId: n, model: y }), (t[7] = n), (t[8] = y), (t[9] = b))
+    : (b = t[9]);
+  let x = Pe(b),
+    S = r?.windowsSandboxWarnings,
+    C;
+  t[10] === S ? (C = t[11]) : ((C = B(`windows-sandbox`, S)), (t[10] = S), (t[11] = C));
+  let w;
+  t[12] === v ? (w = t[13]) : ((w = B(`wsl-migration`, v)), (t[12] = v), (t[13] = w));
+  let T;
+  t[14] === r?.showFullAccessWarning
+    ? (T = t[15])
+    : ((T = r?.showFullAccessWarning ? (0, Z.jsx)(me, {}) : null),
+      (t[14] = r?.showFullAccessWarning),
+      (t[15] = T));
+  let E;
+  t[16] === T ? (E = t[17]) : ((E = B(`full-access`, T)), (t[16] = T), (t[17] = E));
+  let D;
+  t[18] !== u || t[19] !== l
+    ? ((D = l == null ? null : (0, Z.jsx)(ve, { event: l, onDismiss: u })),
+      (t[18] = u),
+      (t[19] = l),
+      (t[20] = D))
+    : (D = t[20]);
+  let O;
+  t[21] === D ? (O = t[22]) : ((O = B(`cyber-safety`, D)), (t[21] = D), (t[22] = O));
+  let k;
+  t[23] === h ? (k = t[24]) : ((k = B(`codex-usage`, h)), (t[23] = h), (t[24] = k));
+  let A = d && f != null ? x : null,
+    j;
+  t[25] === A ? (j = t[26]) : ((j = B(`ultra-usage`, A)), (t[25] = A), (t[26] = j));
+  let M;
+  t[27] === s ? (M = t[28]) : ((M = B(`misalignment-policy`, s)), (t[27] = s), (t[28] = M));
+  let N;
+  t[29] === c ? (N = t[30]) : ((N = B(`safety-buffering`, c)), (t[29] = c), (t[30] = N));
+  let P;
+  t[31] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((P = B(`dictation-first-use`, (0, Z.jsx)(Ee, {}))), (t[31] = P))
+    : (P = t[31]);
+  let F;
+  t[32] !== E ||
+  t[33] !== O ||
+  t[34] !== k ||
+  t[35] !== j ||
+  t[36] !== M ||
+  t[37] !== N ||
+  t[38] !== C ||
+  t[39] !== w
+    ? ((F = [C, w, E, O, k, j, M, N, P]),
+      (t[32] = E),
+      (t[33] = O),
+      (t[34] = k),
+      (t[35] = j),
+      (t[36] = M),
+      (t[37] = N),
+      (t[38] = C),
+      (t[39] = w),
+      (t[40] = F))
+    : (F = t[40]);
+  let I = F,
+    L;
+  return (
+    t[41] !== I || t[42] !== n || t[43] !== a || t[44] !== i || t[45] !== o
+      ? ((L =
+          n == null
+            ? (0, Z.jsx)(V, { area: `home`, candidates: I, homeCandidates: a })
+            : (0, Z.jsx)(X.Suspense, {
+                fallback: (0, Z.jsx)(V, {
+                  area: `task`,
+                  candidates: [
+                    ...I,
+                    {
+                      id: `workspace-renewal-payment`,
+                      isEligible: !1,
+                      isLoading: !0,
+                      content: null,
+                    },
+                  ],
+                }),
+                children: (0, Z.jsx)(Q, { conversationId: n, hostId: i, turnId: o, candidates: I }),
+              })),
+        (t[41] = I),
+        (t[42] = n),
+        (t[43] = a),
+        (t[44] = i),
+        (t[45] = o),
+        (t[46] = L))
+      : (L = t[46]),
+    L
+  );
+}
+var Y, X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((Y = t()),
+      (X = m()),
+      Te(),
+      G(),
+      je(),
+      J(),
+      Me(),
+      Ne(),
+      fe(),
+      De(),
+      g(),
+      (Z = o()),
+      i(),
+      (Q = s(
+        async () =>
+          (
+            await d(
+              async () => {
+                let { TaskAnnouncementCandidates: e } = await import(
+                  `@rchunk/task-announcement-candidates`
+                );
+                return { TaskAnnouncementCandidates: e };
+              },
+              __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
+              import.meta.url,
+            )
+          ).TaskAnnouncementCandidates,
+        { suspendToParent: !0, propagateLoadError: !0 },
+      )));
+  }))();
+}
+$();
+export { Le as ComposerBanners };

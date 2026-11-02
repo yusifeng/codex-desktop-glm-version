@@ -90,29 +90,7 @@ assert.equal(debugClose.type, "button");
 debugClose.props.onClick();
 assert.equal(debugClosed, 1);
 
-const pet = await bundle("pet-install-modal-host");
-assert.deepEqual(Object.keys(pet), ["PetInstallModalHost"]);
-assert.equal(pet.PetInstallModalHost({ onClose() {} }), null);
-let petClosed = 0;
-let installed = 0;
-const readyPet = pet.PetInstallModalHost({ session: { name: "Orbit", description: "A calm companion", status: "ready" }, onClose() { petClosed++; }, onInstall() { installed++; } });
-assert.match(text(readyPet), /Install Orbit\?/);
-assert.match(text(readyPet), /A calm companion/);
-const readyInstall = find(readyPet, node => node.type === "button" && node.props.children === "Install");
-assert.equal(readyInstall.props.disabled, false);
-readyInstall.props.onClick();
-assert.equal(installed, 1);
-const installingPet = pet.PetInstallModalHost({ session: { name: "Orbit", status: "installing" }, onClose() {} });
-assert.equal(installingPet.props["aria-busy"], true);
-assert.equal(find(installingPet, node => node.props?.children === "Installing…").props.disabled, true);
-const failedPet = pet.PetInstallModalHost({ session: { name: "Orbit", status: "installError", error: "offline" }, onClose() {} });
-assert.equal(find(failedPet, node => node.props?.role === "alert").props.children, "offline");
-assert.equal(find(failedPet, node => node.props?.children === "Try again").props.disabled, false);
-const installedPet = pet.PetInstallModalHost({ session: { name: "Orbit", status: "installed" }, onClose() { petClosed++; } });
-assert.match(text(installedPet), /Installed Orbit/);
-assert.equal(all(installedPet, node => node.type === "button").length, 1);
-find(installedPet, node => node.type === "button").props.onClick();
-assert.equal(petClosed, 1);
+assertReleaseOwner("pet-install-modal-host");
 
 assertReleaseOwner("subscription-renewal-dialog");
 

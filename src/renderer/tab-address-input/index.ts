@@ -1,254 +1,582 @@
-import "@rchunk/rolldown-runtime";
-import * as sharedChunk from "@rchunk/app-shared";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  i as initializePopupSuggestions,
-  r as AddressSuggestionController,
-  t as AddressSuggestionList,
-  type AddressSuggestion,
-  type AddressSuggestionSnapshot,
-  type AddressSuggestionSource,
-} from "@rchunk/popup";
-
-type Ref<T> = { current: T };
-type ChangeSignal = { on?(event: "change", listener: () => void): (() => void) | undefined };
-interface ExtendedSuggestionSource extends AddressSuggestionSource {
-  onRendered?(snapshot: AddressSuggestionSnapshot): void;
-  submit?(value: string, snapshot: AddressSuggestionSnapshot): boolean;
-}
-
-export interface TabAddressInputProps {
-  addressBarRef?: Ref<HTMLElement | null>;
-  addressInputRef?: Ref<HTMLInputElement | null>;
-  addressValue: string;
-  allowEmptySuggestions?: boolean;
-  bottomPanelAnimation?: ChangeSignal;
-  className?: string;
-  currentAddress?: string;
-  hasEditedAddressRef?: Ref<boolean>;
-  id: string;
-  isAddressEditing?: boolean;
-  isStoppingAddressEditingRef?: Ref<boolean>;
-  isVisible?: boolean;
-  panelTarget?: "bottom" | "right" | string;
-  placeholder?: string;
-  rightPanelLayoutTick?: ChangeSignal;
-  showAddressSuggestionsRef?: Ref<(() => void) | null>;
-  shouldKeepAddressSelectedRef?: Ref<boolean>;
-  sources: ExtendedSuggestionSource[];
-  submittedAddressStillPending?: boolean;
-  onAddressValueChange(value: string): void;
-  onCancelAddressEditing?(target?: EventTarget | null): void;
-  onCommitAddress(address: string, snapshot?: AddressSuggestionSnapshot): void;
-  onEnsureAddressEditing?(): void;
-  onFind?(): void;
-  onFinishAddressEditing?(): void;
-  onStartAddressEditing?(): void;
-  onStopAddressEditing?(): void;
-}
-
-const shared = sharedChunk as unknown as Record<string, any>;
-let React: any;
-let jsx: any;
-let initialized = false;
-
-function call(value: unknown): void { if (typeof value === "function") value(); }
-function classes(...values: unknown[]): string {
-  return typeof shared.m4 === "function" ? shared.m4(...values) : values.flat().filter(Boolean).join(" ");
-}
-function localRef<T>(value: T): Ref<T> { return React.useRef(value); }
-
-function TabAddressInput(props: TabAddressInputProps): unknown {
-  initializeTabAddressInput();
-  const {
-    addressValue,
-    allowEmptySuggestions = false,
-    className,
-    currentAddress = addressValue,
-    id,
-    isAddressEditing = true,
-    isVisible = true,
-    placeholder,
-    sources,
-    submittedAddressStillPending = false,
-  } = props;
-  const internalInputRef = localRef<HTMLInputElement | null>(null);
-  const internalBarRef = localRef<HTMLElement | null>(null);
-  const internalEditedRef = localRef(false);
-  const internalStoppingRef = localRef(false);
-  const internalKeepSelectedRef = localRef(false);
-  const inputRef = props.addressInputRef ?? internalInputRef;
-  const addressBarRef = props.addressBarRef ?? internalBarRef;
-  const hasEditedAddressRef = props.hasEditedAddressRef ?? internalEditedRef;
-  const isStoppingAddressEditingRef = props.isStoppingAddressEditingRef ?? internalStoppingRef;
-  const shouldKeepAddressSelectedRef = props.shouldKeepAddressSelectedRef ?? internalKeepSelectedRef;
-  const [controller] = React.useState(() => new AddressSuggestionController());
-  if (isAddressEditing && isVisible && controller.getSnapshot(sources).query == null && (addressValue.length > 0 || allowEmptySuggestions)) {
-    controller.start({ value: addressValue, selectionStart: addressValue.length, selectionEnd: addressValue.length }, sources);
-  }
-  const subscribe = React.useCallback((changed: () => void) => controller.subscribe(changed, sources), [controller, sources]);
-  const getSnapshot = React.useCallback(() => controller.getSnapshot(sources), [controller, sources]);
-  const snapshot: AddressSuggestionSnapshot = React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-  const { displayedSelectedIndex, preview, selectedSuggestion, suggestions } = snapshot;
-  const listboxId = `address-suggestions-${id}`;
-  const listVisible = isAddressEditing && isVisible && suggestions.length > 0;
-  const sourceAvailable = sources.some(source => source.getSuggestions(addressValue) != null);
-  const displayValue = isAddressEditing ? preview?.value ?? addressValue : addressValue;
-
-  const startSuggestions = React.useCallback((value: string, selectionStart: number, selectionEnd: number, preventInlineAutocomplete = false) => {
-    if (value.length === 0 && !allowEmptySuggestions) { controller.stop("clobbered", false); return; }
-    controller.start({ value, selectionStart, selectionEnd, preventInlineAutocomplete }, sources);
-  }, [allowEmptySuggestions, controller, sources]);
-
-  React.useEffect(() => {
-    if (!isAddressEditing || !isVisible) controller.stop("interaction", true);
-  }, [controller, isAddressEditing, isVisible]);
-  React.useEffect(() => () => controller.stop("interaction", true), [controller]);
-  React.useLayoutEffect(() => {
-    const input = inputRef.current;
-    if (!isAddressEditing || input == null || input !== document.activeElement || preview == null) return;
-    if (input.value !== preview.value) input.value = preview.value;
-    if (input.selectionStart !== preview.selectionStart || input.selectionEnd !== preview.selectionEnd) input.setSelectionRange(preview.selectionStart, preview.selectionEnd, "forward");
-  }, [inputRef, isAddressEditing, preview]);
-  React.useLayoutEffect(() => {
-    if (listVisible && isVisible) for (const source of sources) source.onRendered?.(snapshot);
-  }, [isVisible, listVisible, snapshot, sources]);
-
-  React.useEffect(() => {
-    if (!listVisible) return;
-    const anchor = addressBarRef.current;
-    if (anchor == null || typeof ResizeObserver === "undefined") return;
-    const width = anchor.offsetWidth, height = anchor.offsetHeight;
-    let stopped = false;
-    const stop = () => { if (!stopped) { stopped = true; controller.stop("interaction", false); } };
-    const observer = new ResizeObserver(() => { if (anchor.offsetWidth !== width || anchor.offsetHeight !== height) stop(); });
-    observer.observe(anchor);
-    const onScroll = (event: Event) => {
-      const list = document.getElementById(listboxId);
-      if (!(event.target instanceof Node) || !list?.contains(event.target)) stop();
-    };
-    const removeSignal = props.panelTarget === "bottom" ? props.bottomPanelAnimation?.on?.("change", stop) : props.rightPanelLayoutTick?.on?.("change", stop);
-    window.addEventListener("resize", stop); window.addEventListener("scroll", onScroll, true);
-    window.visualViewport?.addEventListener("resize", stop); window.visualViewport?.addEventListener("scroll", stop);
-    return () => {
-      observer.disconnect(); removeSignal?.(); window.removeEventListener("resize", stop); window.removeEventListener("scroll", onScroll, true);
-      window.visualViewport?.removeEventListener("resize", stop); window.visualViewport?.removeEventListener("scroll", stop);
-    };
-  }, [addressBarRef, controller, listVisible, listboxId, props.bottomPanelAnimation, props.panelTarget, props.rightPanelLayoutTick]);
-
-  React.useImperativeHandle?.(props.showAddressSuggestionsRef, () => () => {
-    const input = inputRef.current;
-    if (input != null && input === document.activeElement && input.value.length === 0 && allowEmptySuggestions && !listVisible) {
-      startSuggestions(input.value, input.selectionStart ?? 0, input.selectionEnd ?? 0, true);
-    }
-  }, [allowEmptySuggestions, inputRef, listVisible, startSuggestions]);
-
-  const finishInteraction = (target: EventTarget | null, force = false): void => {
-    if (typeof HTMLElement !== "undefined" && target instanceof HTMLElement && (target === inputRef.current || target.dataset.browserSidebarAutocompleteDelete === "true")) return;
-    shouldKeepAddressSelectedRef.current = false;
-    controller.stop("interaction", true);
-    const skipCommit = typeof HTMLElement !== "undefined" && target instanceof HTMLElement && (target.dataset.browserSidebarOpenExternal === "true" || target.dataset.browserSidebarSkipAddressCommit === "true");
-    if (force || isStoppingAddressEditingRef.current || target != null) {
-      props.onFinishAddressEditing?.();
-      if (!skipCommit && !submittedAddressStillPending) props.onCancelAddressEditing?.(target);
-      isStoppingAddressEditingRef.current = false;
-    }
-  };
-  const selectSuggestion = (suggestion: AddressSuggestion, method: "suggestion_click" | "suggestion_keyboard" | "typed_enter" | "inline_enter"): void => {
-    const current = controller.getSnapshot(sources);
-    const selected = current.suggestions.find(item => item.id === suggestion.id);
-    if ((selected as any)?.onSelect?.(method, current)) controller.stop("interaction", true);
-    else props.onCommitAddress(suggestion.id, current);
-  };
-  const onPaste = (event: any): void => {
-    const text = event.clipboardData.getData("text");
-    if (text.length === 0) return;
-    event.preventDefault();
-    const input = event.currentTarget as HTMLInputElement;
-    const start = input.selectionStart ?? input.value.length, end = input.selectionEnd ?? start;
-    const value = `${input.value.slice(0, start)}${text}${input.value.slice(end)}`;
-    const cursor = start + text.length;
-    input.value = value; input.setSelectionRange(cursor, cursor);
-    hasEditedAddressRef.current = true; shouldKeepAddressSelectedRef.current = false;
-    props.onAddressValueChange(value); startSuggestions(value, cursor, cursor, true);
-  };
-  const onChange = (event: any): void => {
-    const input = event.currentTarget as HTMLInputElement;
-    const value = input.value, start = input.selectionStart ?? value.length, end = input.selectionEnd ?? start;
-    const prevent = controller.consumePreventInlineAutocompleteOnNextChange();
-    hasEditedAddressRef.current = true; shouldKeepAddressSelectedRef.current = false;
-    props.onAddressValueChange(value); startSuggestions(value, start, end, prevent);
-  };
-  const onKeyDown = (event: any): void => {
-    if (event.nativeEvent?.isComposing || event.isComposing) return;
-    controller.setPreventInlineAutocompleteOnNextChange(event.key === "Backspace" || event.key === "Delete");
-    if (event.key?.toLowerCase() === "f" && (event.metaKey || event.ctrlKey)) { event.preventDefault(); event.stopPropagation?.(); props.onFind?.(); return; }
-    if ((event.key === "ArrowDown" || event.key === "ArrowUp") && suggestions.length > 0) {
-      event.preventDefault(); controller.moveSelection(event.key === "ArrowDown" ? 1 : -1, sources);
-      requestAnimationFrame(() => document.getElementById(`${listboxId}-option-${controller.getSnapshot(sources).selectedIndex}`)?.scrollIntoView?.({ block: "nearest" }));
-      return;
-    }
-    if (event.key === "Escape") { event.preventDefault(); controller.stop("interaction", true); props.onStopAddressEditing?.(); props.onCancelAddressEditing?.(); return; }
-    if (event.key === "Enter" || event.key === "Return") {
-      event.preventDefault();
-      if (snapshot.isSelectedSuggestionMissing) return;
-      if (selectedSuggestion != null) {
-        const method = controller.hasKeyboardSelection() ? "suggestion_keyboard" : preview != null ? "inline_enter" : "typed_enter";
-        selectSuggestion(selectedSuggestion, method); return;
-      }
-      if (!sources.some(source => source.submit?.(event.currentTarget.value, snapshot))) props.onCommitAddress(event.currentTarget.value, snapshot);
-      controller.stop("interaction", true);
-    }
-  };
-  const onSelect = (event: any): void => {
-    const input = event.currentTarget as HTMLInputElement;
-    const start = input.selectionStart ?? input.value.length, end = input.selectionEnd ?? start;
-    if (!controller.shouldPreventInlineAutocompleteOnNextChange() && (hasEditedAddressRef.current || input.value !== currentAddress) && !controller.isAutocompleteSelection(input.value, start, end, sources)) {
-      hasEditedAddressRef.current = true; shouldKeepAddressSelectedRef.current = false;
-      props.onAddressValueChange(input.value); startSuggestions(input.value, start, end);
-    }
-  };
-  const selectedOptionId = displayedSelectedIndex >= 0 && displayedSelectedIndex < suggestions.length ? `${listboxId}-option-${displayedSelectedIndex}` : undefined;
-  const inputClassName = classes(
-    "h-full w-full min-w-0 bg-transparent py-0 text-sm leading-[18px] text-default outline-none select-text placeholder:text-tertiary [&::placeholder]:select-none",
-    isAddressEditing ? "cursor-text ps-2 text-start" : "cursor-text text-center focus:ps-2 focus:text-start", className,
+  $3 as t,
+  I3 as n,
+  K2 as r,
+  e6 as i,
+  h4 as a,
+  m4 as o,
+  n4 as ee,
+  vs as te,
+  ys as s,
+} from "@rchunk/app-shared";
+import { i as c, n as ne, r as l, t as re } from "@rchunk/popup";
+function u(e) {
+  let t = (0, ae.c)(136),
+    {
+      addressBarRef: n,
+      addressInputRef: r,
+      className: i,
+      addressValue: a,
+      bottomPanelAnimation: s,
+      currentAddress: c,
+      id: ne,
+      allowEmptySuggestions: l,
+      hasEditedAddressRef: u,
+      isAddressEditing: p,
+      isStoppingAddressEditingRef: m,
+      isVisible: h,
+      sources: g,
+      onAddressValueChange: _,
+      onCancelAddressEditing: oe,
+      onCommitAddress: se,
+      onEnsureAddressEditing: ce,
+      onFinishAddressEditing: le,
+      onFind: ue,
+      onStartAddressEditing: de,
+      onStopAddressEditing: fe,
+      panelTarget: pe,
+      placeholder: me,
+      rightPanelLayoutTick: he,
+      showAddressSuggestionsRef: ge,
+      shouldKeepAddressSelectedRef: v,
+      submittedAddressStillPending: _e,
+    } = e,
+    ve = ee(),
+    [y] = (0, d.useState)(ie),
+    ye;
+  t[0] !== y || t[1] !== g
+    ? ((ye = (e) => y.subscribe(e, g)), (t[0] = y), (t[1] = g), (t[2] = ye))
+    : (ye = t[2]);
+  let be;
+  t[3] !== y || t[4] !== g
+    ? ((be = () => y.getSnapshot(g)), (t[3] = y), (t[4] = g), (t[5] = be))
+    : (be = t[5]);
+  let b;
+  t[6] !== y || t[7] !== g
+    ? ((b = () => y.getSnapshot(g)), (t[6] = y), (t[7] = g), (t[8] = b))
+    : (b = t[8]);
+  let x = (0, d.useSyncExternalStore)(ye, be, b),
+    { displayedSelectedIndex: S, preview: C, suggestions: w, selectedSuggestion: T } = x,
+    E = `address-suggestions-${ne}`,
+    D = p && w.length > 0,
+    xe = g.some((e) => e.getSuggestions(a) != null),
+    Se = p ? (C?.value ?? a) : a,
+    O,
+    k;
+  (t[9] !== n ||
+  t[10] !== y ||
+  t[11] !== s ||
+  t[12] !== D ||
+  t[13] !== E ||
+  t[14] !== pe ||
+  t[15] !== he
+    ? ((O = () => {
+        if (!D) return;
+        let e = n.current;
+        if (e == null) return;
+        let t = e.offsetWidth,
+          r = e.offsetHeight,
+          i = document.getElementById(E),
+          a = !1,
+          o = () => {
+            a || ((a = !0), y.stop(`interaction`, !1));
+          },
+          ee = new ResizeObserver(() => {
+            (e.offsetWidth !== t || e.offsetHeight !== r) && o();
+          }),
+          te = (e) => {
+            (e.target instanceof Node && i?.contains(e.target)) || o();
+          };
+        ee.observe(e);
+        let c = pe === `bottom` ? s.on(`change`, o) : he.on(`change`, o);
+        return (
+          window.addEventListener(`resize`, o),
+          window.addEventListener(`scroll`, te, !0),
+          window.visualViewport?.addEventListener(`resize`, o),
+          window.visualViewport?.addEventListener(`scroll`, o),
+          () => {
+            (ee.disconnect(),
+              c(),
+              window.removeEventListener(`resize`, o),
+              window.removeEventListener(`scroll`, te, !0),
+              window.visualViewport?.removeEventListener(`resize`, o),
+              window.visualViewport?.removeEventListener(`scroll`, o));
+          }
+        );
+      }),
+      (k = [n, y, s, D, E, pe, he]),
+      (t[9] = n),
+      (t[10] = y),
+      (t[11] = s),
+      (t[12] = D),
+      (t[13] = E),
+      (t[14] = pe),
+      (t[15] = he),
+      (t[16] = O),
+      (t[17] = k))
+    : ((O = t[16]), (k = t[17])),
+    (0, d.useEffect)(O, k));
+  let A, j;
+  (t[18] !== y || t[19] !== p || t[20] !== h
+    ? ((A = () => {
+        (!p || !h) && y.stop(`interaction`, !0);
+      }),
+      (j = [y, p, h]),
+      (t[18] = y),
+      (t[19] = p),
+      (t[20] = h),
+      (t[21] = A),
+      (t[22] = j))
+    : ((A = t[21]), (j = t[22])),
+    (0, d.useEffect)(A, j));
+  let M, N;
+  (t[23] === y
+    ? ((M = t[24]), (N = t[25]))
+    : ((M = () => () => {
+        y.stop(`interaction`, !0);
+      }),
+      (N = [y]),
+      (t[23] = y),
+      (t[24] = M),
+      (t[25] = N)),
+    (0, d.useEffect)(M, N));
+  let P, F;
+  (t[26] !== r || t[27] !== p || t[28] !== C
+    ? ((P = () => {
+        let e = r.current;
+        !p ||
+          e == null ||
+          e !== document.activeElement ||
+          C == null ||
+          (e.value === C.value &&
+            e.selectionStart === C.selectionStart &&
+            e.selectionEnd === C.selectionEnd) ||
+          e.setSelectionRange(C.selectionStart, C.selectionEnd, `forward`);
+      }),
+      (F = [r, p, C]),
+      (t[26] = r),
+      (t[27] = p),
+      (t[28] = C),
+      (t[29] = P),
+      (t[30] = F))
+    : ((P = t[29]), (F = t[30])),
+    (0, d.useLayoutEffect)(P, F));
+  let I, L;
+  (t[31] !== x || t[32] !== D || t[33] !== h || t[34] !== g
+    ? ((I = () => {
+        if (D && h) for (let e of g) e.onRendered?.(x);
+      }),
+      (L = [x, D, h, g]),
+      (t[31] = x),
+      (t[32] = D),
+      (t[33] = h),
+      (t[34] = g),
+      (t[35] = I),
+      (t[36] = L))
+    : ((I = t[35]), (L = t[36])),
+    (0, d.useLayoutEffect)(I, L));
+  let R;
+  t[37] !== l || t[38] !== y || t[39] !== g
+    ? ((R = (e, t, n, r) => {
+        let i = r !== void 0 && r;
+        if (e.length === 0 && !l) {
+          y.stop(`clobbered`, !1);
+          return;
+        }
+        y.start({ preventInlineAutocomplete: i, selectionEnd: n, selectionStart: t, value: e }, g);
+      }),
+      (t[37] = l),
+      (t[38] = y),
+      (t[39] = g),
+      (t[40] = R))
+    : (R = t[40]);
+  let z = R,
+    B;
+  (t[41] !== r || t[42] !== l || t[43] !== D || t[44] !== z
+    ? ((B = () => () => {
+        let e = r.current;
+        e == null ||
+          e !== document.activeElement ||
+          e.value.length > 0 ||
+          !l ||
+          D ||
+          z(e.value, e.selectionStart ?? e.value.length, e.selectionEnd ?? e.value.length, !0);
+      }),
+      (t[41] = r),
+      (t[42] = l),
+      (t[43] = D),
+      (t[44] = z),
+      (t[45] = B))
+    : (B = t[45]),
+    (0, d.useImperativeHandle)(ge, B));
+  let Ce;
+  t[46] !== u || t[47] !== _ || t[48] !== v || t[49] !== z
+    ? ((Ce = (e) => {
+        let t = e.clipboardData.getData(`text`);
+        if (t.length === 0) return;
+        e.preventDefault();
+        let n = e.currentTarget,
+          r = n.selectionStart ?? n.value.length,
+          i = n.selectionEnd ?? r,
+          a = `${n.value.slice(0, r)}${t}${n.value.slice(i)}`;
+        n.value = a;
+        let o = r + t.length;
+        (n.setSelectionRange(o, o), (u.current = !0), (v.current = !1), _(a), z(a, o, o, !0));
+      }),
+      (t[46] = u),
+      (t[47] = _),
+      (t[48] = v),
+      (t[49] = z),
+      (t[50] = Ce))
+    : (Ce = t[50]);
+  let we = Ce,
+    Te;
+  t[51] !== r ||
+  t[52] !== y ||
+  t[53] !== m ||
+  t[54] !== oe ||
+  t[55] !== le ||
+  t[56] !== v ||
+  t[57] !== _e
+    ? ((Te = (e, t) => {
+        let n = t !== void 0 && t;
+        if (
+          e instanceof HTMLElement &&
+          (e === r.current || e.dataset.browserSidebarAutocompleteDelete === `true`)
+        )
+          return;
+        ((v.current = !1), y.stop(`interaction`, !0));
+        let i =
+          e instanceof HTMLElement &&
+          (e.dataset.browserSidebarOpenExternal === `true` ||
+            e.dataset.browserSidebarSkipAddressCommit === `true`);
+        (n || m.current || e != null) && (le(), !i && !_e && oe(e), (m.current = !1));
+      }),
+      (t[51] = r),
+      (t[52] = y),
+      (t[53] = m),
+      (t[54] = oe),
+      (t[55] = le),
+      (t[56] = v),
+      (t[57] = _e),
+      (t[58] = Te))
+    : (Te = t[58]);
+  let V = Te,
+    Ee;
+  t[59] !== y || t[60] !== g
+    ? ((Ee = (e, t) => {
+        let n = y.getSnapshot(g);
+        n.suggestions
+          .find((t) => {
+            let { id: n } = t;
+            return n === e.id;
+          })
+          ?.onSelect(t, n) && y.stop(`interaction`, !0);
+      }),
+      (t[59] = y),
+      (t[60] = g),
+      (t[61] = Ee))
+    : (Ee = t[61]);
+  let H = Ee,
+    De;
+  S >= 0 && S < w.length && (De = `${E}-option-${S}`);
+  let Oe = p
+      ? `cursor-text ps-2 text-start`
+      : `cursor-text text-center focus:ps-2 focus:text-start`,
+    U;
+  t[62] !== i || t[63] !== Oe
+    ? ((U = o(
+        `h-full w-full min-w-0 bg-transparent py-0 text-sm leading-[18px] text-default outline-none select-text placeholder:text-tertiary [&::placeholder]:select-none`,
+        Oe,
+        i,
+      )),
+      (t[62] = i),
+      (t[63] = Oe),
+      (t[64] = U))
+    : (U = t[64]);
+  let ke = xe ? `both` : void 0,
+    Ae = D ? E : void 0,
+    je = xe ? D : void 0,
+    Me = xe ? `combobox` : void 0,
+    W;
+  t[65] !== de || t[66] !== v || t[67] !== ge
+    ? ((W = (e) => {
+        (e.currentTarget === document.activeElement ? (v.current = !1) : (e.preventDefault(), de()),
+          ge.current?.());
+      }),
+      (t[65] = de),
+      (t[66] = v),
+      (t[67] = ge),
+      (t[68] = W))
+    : (W = t[68]);
+  let G;
+  t[69] !== y || t[70] !== u || t[71] !== _ || t[72] !== v || t[73] !== z
+    ? ((G = (e) => {
+        let t = e.currentTarget.value,
+          n = e.currentTarget.selectionStart ?? t.length,
+          r = e.currentTarget.selectionEnd ?? n,
+          i = y.consumePreventInlineAutocompleteOnNextChange();
+        ((u.current = !0), (v.current = !1), _(t), z(t, n, r, i));
+      }),
+      (t[69] = y),
+      (t[70] = u),
+      (t[71] = _),
+      (t[72] = v),
+      (t[73] = z),
+      (t[74] = G))
+    : (G = t[74]);
+  let K, q, J;
+  t[75] === y
+    ? ((K = t[76]), (q = t[77]), (J = t[78]))
+    : ((K = () => y.setComposing(!0)),
+      (q = () => y.setComposing(!1)),
+      (J = (e) => {
+        e.currentTarget.selectionStart !== e.currentTarget.selectionEnd &&
+          y.setPreventInlineAutocompleteOnNextChange(!0);
+      }),
+      (t[75] = y),
+      (t[76] = K),
+      (t[77] = q),
+      (t[78] = J));
+  let Y;
+  t[79] === V
+    ? (Y = t[80])
+    : ((Y = (e) => {
+        V(e.relatedTarget);
+      }),
+      (t[79] = V),
+      (t[80] = Y));
+  let X;
+  t[81] !== y ||
+  t[82] !== x ||
+  t[83] !== E ||
+  t[84] !== se ||
+  t[85] !== ue ||
+  t[86] !== fe ||
+  t[87] !== C ||
+  t[88] !== H ||
+  t[89] !== T ||
+  t[90] !== g ||
+  t[91] !== w
+    ? ((X = (e) => {
+        if (!e.nativeEvent.isComposing) {
+          if (
+            (y.setPreventInlineAutocompleteOnNextChange(
+              e.key === `Backspace` || e.key === `Delete`,
+            ),
+            e.key.toLowerCase() === `f` && (e.metaKey || e.ctrlKey))
+          ) {
+            (e.preventDefault(), e.stopPropagation(), ue());
+            return;
+          }
+          if ((e.key === `ArrowDown` || e.key === `ArrowUp`) && w.length > 0) {
+            (e.preventDefault(),
+              y.moveSelection(e.key === `ArrowDown` ? 1 : -1, g),
+              requestAnimationFrame(() => {
+                let e = `${E}-option-${y.getSnapshot(g).selectedIndex}`;
+                document.getElementById(e)?.scrollIntoView?.({ block: `nearest` });
+              }));
+            return;
+          }
+          if (e.key === `Escape`) {
+            (e.preventDefault(), y.stop(`interaction`, !0), fe());
+            return;
+          }
+          if (
+            (e.key === `Enter` || e.key === `Return`) &&
+            (e.preventDefault(), !x.isSelectedSuggestionMissing)
+          ) {
+            if (T != null) {
+              let e = `typed_enter`;
+              (y.hasKeyboardSelection()
+                ? (e = `suggestion_keyboard`)
+                : C != null && (e = `inline_enter`),
+                H(T, e));
+              return;
+            }
+            (g.some((t) => t.submit?.(e.currentTarget.value, x)) || se(e.currentTarget.value, x),
+              y.stop(`interaction`, !0));
+          }
+        }
+      }),
+      (t[81] = y),
+      (t[82] = x),
+      (t[83] = E),
+      (t[84] = se),
+      (t[85] = ue),
+      (t[86] = fe),
+      (t[87] = C),
+      (t[88] = H),
+      (t[89] = T),
+      (t[90] = g),
+      (t[91] = w),
+      (t[92] = X))
+    : (X = t[92]);
+  let Z;
+  t[93] !== y ||
+  t[94] !== c ||
+  t[95] !== u ||
+  t[96] !== _ ||
+  t[97] !== v ||
+  t[98] !== g ||
+  t[99] !== z
+    ? ((Z = (e) => {
+        let t = e.currentTarget,
+          n = t.selectionStart ?? t.value.length,
+          r = t.selectionEnd ?? n;
+        y.shouldPreventInlineAutocompleteOnNextChange() ||
+          (!u.current && t.value === c) ||
+          y.isAutocompleteSelection(t.value, n, r, g) ||
+          ((u.current = !0), (v.current = !1), _(t.value), z(t.value, n, r));
+      }),
+      (t[93] = y),
+      (t[94] = c),
+      (t[95] = u),
+      (t[96] = _),
+      (t[97] = v),
+      (t[98] = g),
+      (t[99] = z),
+      (t[100] = Z))
+    : (Z = t[100]);
+  let Q;
+  t[101] !== De ||
+  t[102] !== r ||
+  t[103] !== we ||
+  t[104] !== ce ||
+  t[105] !== me ||
+  t[106] !== U ||
+  t[107] !== ke ||
+  t[108] !== Ae ||
+  t[109] !== je ||
+  t[110] !== Me ||
+  t[111] !== W ||
+  t[112] !== G ||
+  t[113] !== K ||
+  t[114] !== q ||
+  t[115] !== J ||
+  t[116] !== Y ||
+  t[117] !== X ||
+  t[118] !== Z ||
+  t[119] !== Se
+    ? ((Q = (0, f.jsx)(`input`, {
+        ref: r,
+        className: U,
+        dir: `ltr`,
+        "data-browser-sidebar-address-input": `true`,
+        "aria-label": me,
+        "aria-activedescendant": De,
+        "aria-autocomplete": ke,
+        "aria-controls": Ae,
+        "aria-expanded": je,
+        role: Me,
+        value: Se,
+        placeholder: me,
+        onFocus: ce,
+        onPointerDown: W,
+        onChange: G,
+        onCompositionStart: K,
+        onCompositionEnd: q,
+        onCut: J,
+        onPaste: we,
+        onBlur: Y,
+        onKeyDown: X,
+        onSelect: Z,
+      })),
+      (t[101] = De),
+      (t[102] = r),
+      (t[103] = we),
+      (t[104] = ce),
+      (t[105] = me),
+      (t[106] = U),
+      (t[107] = ke),
+      (t[108] = Ae),
+      (t[109] = je),
+      (t[110] = Me),
+      (t[111] = W),
+      (t[112] = G),
+      (t[113] = K),
+      (t[114] = q),
+      (t[115] = J),
+      (t[116] = Y),
+      (t[117] = X),
+      (t[118] = Z),
+      (t[119] = Se),
+      (t[120] = Q))
+    : (Q = t[120]);
+  let $;
+  t[121] !== n ||
+  t[122] !== r ||
+  t[123] !== y ||
+  t[124] !== S ||
+  t[125] !== V ||
+  t[126] !== ve ||
+  t[127] !== D ||
+  t[128] !== E ||
+  t[129] !== H ||
+  t[130] !== g ||
+  t[131] !== w
+    ? (($ = D
+        ? (0, f.jsx)(te, {
+            anchorRef: n,
+            constrainHeightToViewport: !0,
+            gap: 0,
+            isActive: !0,
+            minWidth: 360,
+            placement: `bottom`,
+            portalRoot: `body`,
+            zIndexClassName: `z-30`,
+            children: (0, f.jsx)(re, {
+              label: ve.formatMessage({
+                id: `thread.browser.addressSuggestions`,
+                defaultMessage: `Address suggestions`,
+                description: `Accessible label for browser address bar suggestions`,
+              }),
+              listboxId: E,
+              suggestions: w,
+              selectedIndex: S,
+              onDelete: (e) => {
+                y.deleteSuggestion(e, g) && r.current?.focus();
+              },
+              onDeleteBlur: (e) => {
+                V(e, !0);
+              },
+              onSelect: (e) => H(e, `suggestion_click`),
+            }),
+          })
+        : null),
+      (t[121] = n),
+      (t[122] = r),
+      (t[123] = y),
+      (t[124] = S),
+      (t[125] = V),
+      (t[126] = ve),
+      (t[127] = D),
+      (t[128] = E),
+      (t[129] = H),
+      (t[130] = g),
+      (t[131] = w),
+      (t[132] = $))
+    : ($ = t[132]);
+  let Ne;
+  return (
+    t[133] !== Q || t[134] !== $
+      ? ((Ne = (0, f.jsxs)(f.Fragment, { children: [Q, $] })),
+        (t[133] = Q),
+        (t[134] = $),
+        (t[135] = Ne))
+      : (Ne = t[135]),
+    Ne
   );
-  const input = jsx.jsx("input", {
-    ref: inputRef, id, className: inputClassName, dir: "ltr", "data-browser-sidebar-address-input": "true",
-    "aria-label": placeholder, "aria-activedescendant": selectedOptionId,
-    "aria-autocomplete": sourceAvailable ? "both" : undefined, "aria-controls": listVisible ? listboxId : undefined,
-    "aria-expanded": sourceAvailable ? listVisible : undefined, "aria-busy": submittedAddressStillPending,
-    role: sourceAvailable ? "combobox" : undefined, value: displayValue, placeholder,
-    onFocus: props.onEnsureAddressEditing ?? props.onStartAddressEditing,
-    onPointerDown: (event: any) => { if (event.currentTarget === document.activeElement) shouldKeepAddressSelectedRef.current = false; else { event.preventDefault(); props.onStartAddressEditing?.(); } props.showAddressSuggestionsRef?.current?.(); },
-    onChange, onCompositionStart: () => controller.setComposing(true), onCompositionEnd: () => controller.setComposing(false),
-    onCut: (event: any) => { if (event.currentTarget.selectionStart !== event.currentTarget.selectionEnd) controller.setPreventInlineAutocompleteOnNextChange(true); },
-    onPaste, onBlur: (event: any) => finishInteraction(event.relatedTarget), onKeyDown, onSelect,
-  });
-  let list: unknown = null;
-  if (listVisible) {
-    const content = jsx.jsx(AddressSuggestionList, {
-      label: "Address suggestions", listboxId, suggestions, selectedIndex: displayedSelectedIndex,
-      onDelete: (suggestion: AddressSuggestion) => { if (controller.deleteSuggestion(suggestion, sources)) inputRef.current?.focus(); },
-      onDeleteBlur: (target: EventTarget | null) => finishInteraction(target, true),
-      onSelect: (suggestion: AddressSuggestion) => selectSuggestion(suggestion, "suggestion_click"),
-    });
-    const Popover = shared.vs;
-    list = typeof Popover === "function" ? jsx.jsx(Popover, {
-      anchorRef: addressBarRef, constrainHeightToViewport: true, gap: 0, isActive: true, minWidth: 360,
-      placement: "bottom", portalRoot: "body", zIndexClassName: "z-30", children: content,
-    }) : content;
-  }
-  return jsx.jsxs(jsx.Fragment, { children: [input, list] });
 }
-
-function initializeTabAddressInput(): void {
-  if (initialized) return;
-  initialized = true;
-  for (const candidate of [shared.$3, shared.h4, shared.K2]) call(candidate);
-  React = typeof shared.e6 === "function" ? shared.e6() : shared.e6;
-  initializePopupSuggestions();
-  jsx = shared.I3();
+function ie() {
+  return new l();
 }
-initializeTabAddressInput();
-
-export { initializeTabAddressInput as n, TabAddressInput as t };
+var ae, d, f;
+function p() {
+  return (p = e(() => {
+    ((ae = t()), a(), (d = i()), r(), s(), c(), ne(), (f = n()));
+  }))();
+}
+export { p as n, u as t };

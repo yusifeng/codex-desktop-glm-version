@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 import { CHUNKS, IMPORT_ALIASES } from "./renderer-chunk-manifest.mjs";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
   ASSET = path.join(ROOT, "src/webview/assets");
 assert.equal(IMPORT_ALIASES.proxy, CHUNKS["motion-proxy-runtime"]);
@@ -18,11 +19,6 @@ const modules = [
     "subagents-f011dd080466.js",
     "registered-subagents-thumbnail",
     ["RegisteredSubagentsThumbnail"],
-  ],
-  [
-    "surfaces-b85863b30be8.js",
-    "conversation-beacon-surfaces",
-    ["ChatGptConversationBeaconSurfaces"],
   ],
   ["svg-arrow-6f79fa010fe2.js", "svg-arrow", ["n", "t"]],
   ["system-of-equations-a765decfc54f.js", "system-of-equations", ["n", "t"]],
@@ -213,39 +209,7 @@ assert.equal(
   "RegisteredConversation",
 );
 runtimeAssertions++;
-const surf = L.get("conversation-beacon-surfaces");
-globalThis.__na.hookIndex = 0;
-const outer = surf.ChatGptConversationBeaconSurfaces({
-  conversationId: "c",
-  allowConversationSharing: true,
-  allowExternalActions: true,
-  actionOverrides: { copy: 1 },
-});
-assert.equal(outer.kind, "TemporaryChat");
-const beaconCandidate = outer.props.children();
-assert.equal(beaconCandidate.kind, "Announcement");
-const beaconPresentation = beaconCandidate.props.candidate.render();
-assert.equal(beaconPresentation.kind, "HomeBeacon");
-assert.equal(
-  beaconPresentation.props.actionOverrides.regenerate.kind,
-  "regenerate",
-);
-assert.equal(
-  beaconPresentation.props.actionOverrides.share_conversation.kind,
-  "share",
-);
-beaconPresentation.props.onModalOpen();
-assert.notEqual(
-  beaconPresentation.props.renderPresentation({
-    content: "Beacon content",
-    supportStatus: "supported",
-  }),
-  null,
-);
-beaconPresentation.props.onDismiss();
-beaconPresentation.props.onUnsupported();
-assert.deepEqual(globalThis.__na.lifecycle.slice(-2), ["dismiss", "unsupported"]);
-runtimeAssertions += 7;
+sourceAssertions += assertReleaseOwner("conversation-beacon-surfaces");
 const text = L.get("text-file-thumbnail");
 text.n();
 const card = text.t({

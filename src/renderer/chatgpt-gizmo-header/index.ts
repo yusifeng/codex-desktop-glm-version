@@ -1,33 +1,337 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, Yh as Button, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/gpt-report-menu-item";
-import "@rchunk/gpt-header-about-dialog";
-
-export interface ChatGptGizmo { id: string; name: string; canWrite?: boolean; isMigratedPlugin?: boolean; isPinned?: boolean }
-export interface ChatGptGizmoHeaderProps { conversationId?: string | null; gizmo?: ChatGptGizmo | null; gizmoId: string; onAbout?(gizmo: ChatGptGizmo): void; onEdit?(gizmo: ChatGptGizmo): void; onPinChange?(gizmo: ChatGptGizmo, pinned: boolean): Promise<void> | void; onReport?(gizmo: ChatGptGizmo): void }
-let runtime: JsxRuntime | undefined;
-function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-
-function ChatGptGizmoHeader(props: ChatGptGizmoHeaderProps): unknown {
-  const gizmo = props.gizmo;
-  if (gizmo == null) return null;
-  const name = gizmo.name.trim();
-  return jsx().jsxs("div", { className: "flex min-w-0 items-center gap-1", "data-gizmo-id": props.gizmoId, children: [
-    name === "" ? null : jsx().jsx("span", { className: "truncate", children: name }),
-    jsx().jsx(ChatGptGizmoActions, { ...props, gizmo }),
-  ] });
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/gpt-header-about-dialog",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/gpt-about-dialog-core",
+      "@rchunk/gpt-plugin-retirement",
+      "@rchunk/gpt-report-menu-item",
+      "@rchunk/card-tile",
+      "@rchunk/migrated-plugin-access",
+      "@rchunk/gpt-plugin-migration-notices",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  AT as n,
+  BX as r,
+  FX as i,
+  H3 as a,
+  HX as o,
+  Hd as s,
+  I3 as c,
+  If as l,
+  Jm as u,
+  K2 as d,
+  LX as f,
+  QI as p,
+  V3 as m,
+  Vd as ee,
+  Y2 as h,
+  Yb as g,
+  Yh as _,
+  ZI as v,
+  Zh as y,
+  e6 as b,
+  jT as x,
+  jf as S,
+  kf as C,
+  lk as w,
+  lw as T,
+  n4 as E,
+  pk as D,
+  qm as O,
+} from "@rchunk/app-shared";
+import {
+  Dft as k,
+  Oft as te,
+  Sun as A,
+  Uzt as j,
+  Vzt as M,
+  ax as N,
+  fN as P,
+  hN as F,
+  ifn as I,
+  m0t as L,
+  mN as R,
+  mun as z,
+  ofn as B,
+  ox as V,
+  p0t as H,
+  pN as U,
+} from "@rchunk/app-initial";
+import { n as W, t as G } from "@rchunk/gpt-report-menu-item";
+var K, q;
+function J() {
+  return (J = e(() => {
+    (b(),
+      (K = c()),
+      (q = (e) =>
+        (0, K.jsxs)(`svg`, {
+          width: 20,
+          height: 20,
+          viewBox: `0 0 20 20`,
+          fill: `currentColor`,
+          xmlns: `http://www.w3.org/2000/svg`,
+          ...e,
+          children: [
+            (0, K.jsx)(`path`, {
+              d: `M5.14518 8.20723C4.81869 8.30403 4.52965 8.56906 4.36686 8.94649C4.16207 9.42187 4.22381 9.91162 4.53873 10.2268L9.77311 15.4611L9.89908 15.5676C10.2102 15.7875 10.6375 15.8122 11.0534 15.633C11.4312 15.4701 11.6961 15.1806 11.7926 14.8537L12.7868 15.8488C12.4904 16.305 12.0507 16.6517 11.5797 16.8547C10.7869 17.1963 9.76213 17.1946 8.98502 16.5412L8.83268 16.4016L6.68521 14.2541L2.97037 17.9709C2.7107 18.2302 2.28855 18.2303 2.02896 17.9709C1.76958 17.7113 1.7697 17.2892 2.02896 17.0295L5.74479 13.3137L3.5983 11.1672C2.80696 10.3756 2.78071 9.26596 3.14518 8.42012C3.34827 7.94906 3.6947 7.50849 4.15104 7.21211L5.14518 8.20723Z`,
+            }),
+            (0, K.jsx)(`path`, {
+              d: `M17.1364 16.1965C17.3959 16.4562 17.396 16.8773 17.1364 17.1369C16.8767 17.3964 16.4556 17.3964 16.196 17.1369L17.1364 16.1965Z`,
+            }),
+            (0, K.jsx)(`path`, {
+              d: `M2.86197 2.8625C3.08913 2.63535 3.44079 2.60732 3.69889 2.77754L3.80338 2.8625L17.1364 16.1965L16.6657 16.6662L16.196 17.1369L2.86197 3.80391L2.77701 3.69942C2.60677 3.44138 2.63494 3.08969 2.86197 2.8625Z`,
+            }),
+            (0, K.jsx)(`path`, {
+              d: `M10.9372 2.70723C11.8014 1.63068 13.4235 1.53079 14.4137 2.52071L17.4792 5.58614L17.5719 5.68379C18.4618 6.68016 18.3344 8.22636 17.2926 9.0627L17.1852 9.14375L14.2799 11.218L13.3268 10.2648L16.4118 8.06172L16.5016 7.98946C16.8967 7.63429 16.9467 7.02804 16.6159 6.6125L16.5387 6.52657L13.4733 3.46114C13.0597 3.04787 12.391 3.07483 12.0104 3.49825L11.9381 3.58809L9.73502 6.67208L8.78092 5.71895L10.8561 2.81465L10.9372 2.70723Z`,
+            }),
+          ],
+        })));
+  }))();
 }
-
-function ChatGptGizmoActions({ gizmo, onAbout, onEdit, onPinChange, onReport }: ChatGptGizmoHeaderProps & { gizmo: ChatGptGizmo }): unknown {
-  const view = jsx();
-  return view.jsxs("details", { className: "gizmo-actions", children: [
-    view.jsx("summary", { "aria-label": "GPT actions", children: "•••" }),
-    view.jsx("button", { type: "button", onClick: () => onAbout?.(gizmo), children: "About" }),
-    view.jsx("button", { type: "button", onClick: () => onPinChange?.(gizmo, !gizmo.isPinned), children: gizmo.isPinned ? "Unpin GPT" : "Pin GPT" }),
-    gizmo.canWrite === true && gizmo.isMigratedPlugin !== true ? view.jsx("button", { type: "button", onClick: () => onEdit?.(gizmo), children: "Edit GPT" }) : null,
-    view.jsx("button", { type: "button", onClick: () => onReport?.(gizmo), children: "Report GPT" }),
-  ] });
+function ne(e) {
+  let t = (0, X.c)(12),
+    { gizmoId: n, conversationId: i } = e,
+    a;
+  t[0] !== i || t[1] !== n
+    ? ((a = i == null ? n : { gizmoId: n, conversationId: i }), (t[0] = i), (t[1] = n), (t[2] = a))
+    : (a = t[2]);
+  let { data: o } = r(P, a);
+  if (o == null) return null;
+  let s;
+  t[3] === o.gizmo.display.name
+    ? (s = t[4])
+    : ((s = o.gizmo.display.name.trim()), (t[3] = o.gizmo.display.name), (t[4] = s));
+  let c = s,
+    l;
+  t[5] === c
+    ? (l = t[6])
+    : ((l = c ? (0, Z.jsx)(`span`, { className: `truncate`, children: c }) : null),
+      (t[5] = c),
+      (t[6] = l));
+  let u;
+  t[7] === o ? (u = t[8]) : ((u = (0, Z.jsx)(Y, { gizmo: o })), (t[7] = o), (t[8] = u));
+  let d;
+  return (
+    t[9] !== l || t[10] !== u
+      ? ((d = (0, Z.jsxs)(`div`, {
+          className: `flex min-w-0 items-center gap-1 select-none`,
+          children: [l, u],
+        })),
+        (t[9] = l),
+        (t[10] = u),
+        (t[11] = d))
+      : (d = t[11]),
+    d
+  );
 }
-function initializeChatGptGizmoHeader(): void { jsx(); void Button; }
-export { ChatGptGizmoHeader as n, initializeChatGptGizmoHeader as r, ChatGptGizmoActions as t };
+function Y(e) {
+  let t = (0, X.c)(39),
+    { gizmo: n } = e,
+    i = f(v),
+    a = E(),
+    s = B(`2160578039`),
+    c = r(L, `2513446768`),
+    l = s && n.gizmo.gizmo_type === `gpt` && n.gizmo.migrated_plugin_id != null,
+    { data: u } = o(U),
+    d;
+  t[0] !== n.gizmo.id || t[1] !== u
+    ? ((d = u?.some((e) => {
+        let { item: t } = e;
+        return t.gizmo.id === n.gizmo.id;
+      })),
+      (t[0] = n.gizmo.id),
+      (t[1] = u),
+      (t[2] = d))
+    : (d = t[2]);
+  let p = d,
+    m = `https://chatgpt.com/gpts/editor/${encodeURIComponent(n.gizmo.id)}`,
+    y;
+  t[3] === a
+    ? (y = t[4])
+    : ((y = a.formatMessage({
+        id: `chatgptConversations.customGpt.actionsMenu`,
+        defaultMessage: `GPT actions`,
+        description: `Accessible label for the compact overflow menu containing actions for the current custom GPT in Codex Desktop`,
+      })),
+      (t[3] = a),
+      (t[4] = y));
+  let b;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((b = (0, Z.jsx)(ee, { className: `icon-sm` })), (t[5] = b))
+    : (b = t[5]);
+  let w;
+  t[6] === y
+    ? (w = t[7])
+    : ((w = (0, Z.jsx)(_, { "aria-label": y, color: `ghost`, size: `icon`, children: b })),
+      (t[6] = y),
+      (t[7] = w));
+  let T;
+  t[8] !== n || t[9] !== i
+    ? ((T = () => j(i, Q, { accountId: i.get(z), resource: n })),
+      (t[8] = n),
+      (t[9] = i),
+      (t[10] = T))
+    : (T = t[10]);
+  let O, k;
+  t[11] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((O = (0, Z.jsx)(S.ItemIcon, { children: (0, Z.jsx)(g, {}) })),
+      (k = (0, Z.jsx)(h, {
+        id: `chatgptConversations.customGpt.about`,
+        defaultMessage: `About`,
+        description: `GPT menu action that opens its details over the current conversation or landing page`,
+      })),
+      (t[11] = O),
+      (t[12] = k))
+    : ((O = t[11]), (k = t[12]));
+  let A;
+  t[13] === T
+    ? (A = t[14])
+    : ((A = (0, Z.jsxs)(S.Item, { onSelect: T, children: [O, k] })), (t[13] = T), (t[14] = A));
+  let M = p ? q : N,
+    P;
+  t[15] !== n || t[16] !== a || t[17] !== p || t[18] !== i
+    ? ((P = () => {
+        F(i, n, !p).catch(() => {
+          i.get(D).danger(
+            a.formatMessage({
+              id: `chatgptConversations.customGpt.pinFailed`,
+              defaultMessage: `Couldn't update pinned GPT`,
+              description: `Error toast shown when adding or removing a custom GPT from the user's pinned sidebar items fails in Codex Desktop`,
+            }),
+            { errorAnalytics: { toastId: `chatgptConversations.customGpt.pinFailed` } },
+          );
+        });
+      }),
+      (t[15] = n),
+      (t[16] = a),
+      (t[17] = p),
+      (t[18] = i),
+      (t[19] = P))
+    : (P = t[19]);
+  let I;
+  t[20] === p
+    ? (I = t[21])
+    : ((I = p
+        ? (0, Z.jsx)(h, {
+            id: `chatgptConversations.customGpt.unpin`,
+            defaultMessage: `Unpin GPT`,
+            description: `Compact overflow-menu action that removes the current custom GPT from the user's pinned sidebar items in Codex Desktop`,
+          })
+        : (0, Z.jsx)(h, {
+            id: `chatgptConversations.customGpt.pin`,
+            defaultMessage: `Pin GPT`,
+            description: `Compact overflow-menu action that adds the current custom GPT to the user's pinned sidebar items in Codex Desktop`,
+          })),
+      (t[20] = p),
+      (t[21] = I));
+  let R;
+  t[22] !== P || t[23] !== I || t[24] !== M
+    ? ((R = (0, Z.jsx)(S.Item, { LeftIcon: M, onSelect: P, children: I })),
+      (t[22] = P),
+      (t[23] = I),
+      (t[24] = M),
+      (t[25] = R))
+    : (R = t[25]);
+  let V;
+  t[26] !== m || t[27] !== n.gizmo.current_user_permission?.can_write || t[28] !== l || t[29] !== c
+    ? ((V =
+        n.gizmo.current_user_permission?.can_write && !l && !c?.get(`disable_gpt_updates`, !1)
+          ? (0, Z.jsx)(S.Item, {
+              href: m,
+              leftIconAsset: x,
+              onClick: (e) => {
+                te({
+                  event: e,
+                  href: m,
+                  initiator: `open_in_browser_bridge`,
+                  openTarget: `external-browser`,
+                });
+              },
+              children: (0, Z.jsx)(h, {
+                id: `chatgptConversations.customGpt.edit`,
+                defaultMessage: `Edit GPT`,
+                description: `Compact overflow-menu action that opens the current custom GPT in its ChatGPT web editor from Codex Desktop`,
+              }),
+            })
+          : null),
+      (t[26] = m),
+      (t[27] = n.gizmo.current_user_permission?.can_write),
+      (t[28] = l),
+      (t[29] = c),
+      (t[30] = V))
+    : (V = t[30]);
+  let H;
+  t[31] === n ? (H = t[32]) : ((H = (0, Z.jsx)(G, { resource: n })), (t[31] = n), (t[32] = H));
+  let W;
+  return (
+    t[33] !== R || t[34] !== V || t[35] !== H || t[36] !== w || t[37] !== A
+      ? ((W = (0, Z.jsxs)(C, {
+          align: `start`,
+          contentWidth: `menu`,
+          triggerButton: w,
+          children: [A, R, V, H],
+        })),
+        (t[33] = R),
+        (t[34] = V),
+        (t[35] = H),
+        (t[36] = w),
+        (t[37] = A),
+        (t[38] = W))
+      : (W = t[38]),
+    W
+  );
+}
+var X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((X = t()),
+      n(),
+      i(),
+      d(),
+      A(),
+      y(),
+      l(),
+      k(),
+      T(),
+      O(),
+      M(),
+      w(),
+      V(),
+      s(),
+      J(),
+      p(),
+      I(),
+      H(),
+      R(),
+      W(),
+      (Z = c()),
+      a(),
+      (Q = u(
+        async () =>
+          (
+            await m(
+              async () => {
+                let { GptHeaderAboutDialog: e } = await import(
+                  `@rchunk/gpt-header-about-dialog`
+                );
+                return { GptHeaderAboutDialog: e };
+              },
+              __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
+              import.meta.url,
+            )
+          ).GptHeaderAboutDialog,
+      )));
+  }))();
+}
+export { ne as n, $ as r, Y as t };

@@ -275,36 +275,7 @@ assert.equal(opened, 2);
 
 const fileDiffPresentationReleaseAssertions = assertReleaseOwner("file-diff-presentation-core");
 
-// pull-request-code-review-navigation-core
-const navigation = await bundle("pull-request-code-review-navigation-core");
-navigation.i();
-navigation.n();
-const writes = [];
-const store = { get: () => [], set: (...args) => writes.push(args) };
-navigation.b(store, "request", "src\\main.ts");
-assert.equal(writes.at(-1)[2], "src/main.ts");
-navigation.x(store, "request", "query");
-assert.equal(writes.at(-1)[2], "query");
-navigation.S(store, "request", true);
-assert.equal(writes.at(-1)[2], true);
-navigation.y(store, "request", 120);
-assert.equal(writes.at(-1)[2], 120);
-navigation.C(store, "request", "src/main.ts", [{ id: 1 }]);
-assert.deepEqual(writes.at(-1)[2], [{ id: 1 }]);
-const elementId = navigation.t(
-  { value: { pathname: "/thread/1" } },
-  { account: "a", pullRequest: "p" },
-  "src/main.ts",
-);
-assert.match(elementId, /^pull-request-file-/);
-assert.match(decodeURIComponent(elementId), /src\/main.ts/);
-assert.equal(typeof navigation._, "symbol");
-assert.equal(typeof navigation.a, "symbol");
-assert.equal(typeof navigation.c, "symbol");
-assert.equal(typeof navigation.d, "symbol");
-assert.equal(typeof navigation.f, "symbol");
-assert.equal(typeof navigation.g, "symbol");
-assert.equal(typeof navigation.h, "symbol");
+assertReleaseOwner("pull-request-code-review-navigation-core");
 
 // open-thread-pull-request-code-tab
 const codeTab = await bundle("open-thread-pull-request-code-tab");

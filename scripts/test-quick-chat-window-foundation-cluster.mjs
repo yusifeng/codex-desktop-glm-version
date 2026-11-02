@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = {
@@ -159,61 +160,7 @@ const nodes = (root) => {
   return output;
 };
 
-const obstacles = await bundle("quick-chat-obstacles");
-obstacles.f();
-obstacles.r();
-obstacles.s();
-assert.deepEqual(
-  obstacles.u("bottom-left", { height: 100, width: 200 }, 800, 1200),
-  { x: 16, y: 684 },
-);
-assert.deepEqual(obstacles.u(null, { height: 100, width: 200 }, 800, 1200), {
-  x: 500,
-  y: 350,
-});
-assert.equal(
-  obstacles.d({ left: 500, top: 600, width: 200, height: 100 }, 800, 1200),
-  "bottom-center",
-);
-assert.equal(
-  obstacles.d({ left: 10, top: 10, width: 100, height: 100 }, 800, 1200),
-  "top-left",
-);
-assert.equal(
-  obstacles.c({ left: 20, top: 650, width: 200, height: 100 }, 800, 1200),
-  "bottom-left",
-);
-assert.equal(
-  typeof obstacles.l(
-    "bottom-left",
-    "left",
-    { height: 100, width: 300 },
-    0,
-    200,
-    800,
-    1200,
-  ),
-  "number",
-);
-assert.equal(obstacles.n(), "");
-assert.deepEqual(obstacles.t(), []);
-const obstacle = {
-  dataset: { pipObstacle: "quick-chat" },
-  getBoundingClientRect: () => ({ left: 10, top: 20, width: 30, height: 40 }),
-};
-const unregister = obstacles.i(obstacle);
-assert.equal(obstacles.n(), "10,20,30,40");
-unregister();
-assert.equal(obstacles.n(), "");
-const resizeTree = obstacles.o({
-  currentSize: { height: 400, width: 600 },
-  defaultSize: { height: 400, width: 600 },
-  maximumSize: { height: 800, width: 1000 },
-  minimumSize: { height: 200, width: 300 },
-  onResize() {},
-  onResizeEnd() {},
-});
-assert.equal(resizeTree.props.children.length, 5);
+assertReleaseOwner("quick-chat-obstacles");
 
 const frame = await bundle("quick-chat-frame");
 frame.n();

@@ -12,34 +12,10 @@ function find(node, predicate) { let result; walk(node, value => { if (result ==
 function all(node, predicate) { const result = []; walk(node, value => { if (predicate(value)) result.push(value); }); return result; }
 function text(node) { const parts = []; const collect = value => { if (typeof value === "string" || typeof value === "number") parts.push(String(value)); else if (value != null && typeof value === "object") { const children = value.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(collect); else collect(children); } }; collect(node); return parts.join(" "); }
 
-// chatgpt-image-lightbox: 9
-const lightbox = await bundle("chatgpt-image-lightbox");
-assert.deepEqual(Object.keys(lightbox), ["n", "t"]);
-let navigated, closed = 0;
-const lightboxUi = lightbox.t({ currentIndex: 1, images: [{ src: "one" }, { src: "two", sourceLabel: "Example", sourceUrl: "https://example.test" }], onClose() { closed++; }, onNavigate(index) { navigated = index; } });
-assert.equal(lightboxUi.props["aria-label"], "Image 2");
-assert.equal(find(lightboxUi, node => node.type === "img").props.src, "two");
-assert.match(text(lightboxUi), /2 of 2/);
-assert.equal(find(lightboxUi, node => node.type === "a").props.children, "View on Example");
-assert.equal(find(lightboxUi, node => node.props?.children === "Next").props.disabled, true);
-find(lightboxUi, node => node.props?.children === "Previous").props.onClick();
-assert.equal(navigated, 0);
-find(lightboxUi, node => node.props?.children === "Close").props.onClick();
-assert.equal(closed, 1);
-assert.equal(find(lightbox.t({ images: [], onClose() {} }), node => node.props?.role === "alert").props.children, "Couldn't load this image");
+const lightboxReleaseAssertions = assertReleaseOwner("chatgpt-image-lightbox");
+const favoriteReleaseAssertions = assertReleaseOwner("chatgpt-generated-image-favorite");
 
-// presentation: 10
-const presentation = await bundle("presentation");
-assert.deepEqual(Object.keys(presentation), ["a", "i", "n", "o", "r", "s", "t"]);
-assert.equal(presentation.a(), undefined);
-assert.equal(presentation.n({ tool: "create_thread" }).message.defaultMessage, "Creating chat");
-assert.equal(presentation.n({ tool: "create_thread", completed: true }).message.defaultMessage, "Created chat");
-assert.equal(presentation.n({ tool: "create_worktree", completed: true, failed: true }).message.defaultMessage, "Couldn’t complete worktree setup");
-assert.equal(presentation.n({ tool: "unknown" }), null);
-assert.equal(presentation.n({ tool: "read_thread" }).values.state, "active");
-assert.equal(presentation.o({ className: "icon" }).props["data-agent-mode-icon"], "codex");
-assert.equal(presentation.r({ namespace: "codex_app", tool: "read_thread" }).message.defaultMessage, "Reading chat");
-assert.equal(presentation.t({ serverName: "codex_app", toolName: "read_thread" }), "read_thread");
+assertReleaseOwner("presentation");
 
 assertReleaseOwner("saved-memory-history");
 

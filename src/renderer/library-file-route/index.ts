@@ -1,38 +1,321 @@
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import { t as initializeCloudFilePreview } from "@rchunk/cloud-file-preview";
-import { n as LibraryCloudFilePreview } from "@rchunk/library-cloud-file-preview";
-import { n as initializeLibraryFileMetadata, t as fetchLibraryFileMetadata } from "@rchunk/library-file-metadata";
-import { n as initializeLoadingPreview, t as LibraryFilePreviewLoading } from "@rchunk/library-file-preview-loading";
-import "@rchunk/rolldown-runtime";
-
-interface QueryResult<Value> { data?: Value; error?: unknown; isPending: boolean; isFetching: boolean; refetch(): Promise<unknown> | unknown; }
-interface LibraryFile extends Record<string, unknown> { id: string; name?: string; file_name?: string; file_id?: string; directory_id?: string | null; parent_directory_id?: string | null; current_version_number?: number; gizmo_id?: string; library_artifact_type?: string; library_file_category?: string; mime_type?: string | null; file_upload_time?: string | null; file_size_bytes?: number | null; cloud_doc_url?: string; thumbnail_url?: string | null; thumbnail_preview_url?: string | null; }
-interface Scope { get(signal: unknown, parameter?: unknown): unknown; }
-interface SharedApi { $3(): void; BX<Value>(signal: unknown, parameter: string): Value; FX(): void; FZ: () => Promise<never>; HX<Value>(signal: unknown): Value; I3(): import("@rchunk/app-shared").JsxRuntime; K2(): void; LX(scope: unknown): Scope; Y2: unknown; Yh: unknown; Zh(): void; _L<Value>(options: Record<string, unknown>): QueryResult<Value>; gL(): void; hU(value: string): boolean; jZ(): void; wL(): void; }
-interface InitialApi { $en: unknown; Aet(): void; Qgn(): void; Sdn: new (...arguments_: never[]) => Error & { status?: number }; Sun(): void; _fn: unknown; _un: unknown; bun: unknown; bz(id: string): string | null; f7: { MainContentLayout: unknown }; gun: unknown; itn(): void; ket: unknown; l_n(): { libraryFileId?: string }; mfn: unknown; mun: unknown; o_n(): (destination: string) => void; p7(): void; pfn(): void; vfn: unknown; wdn(): void; }
-const { $3: initializeCompilerRuntime, BX: useSignalFamilyValue, FX: initializeSignalRuntime, FZ: disabledQuery, HX: useSignalValue, I3: getJsxRuntime, K2: initializeIntlRuntime, LX: useScope, Y2: FormattedMessage, Yh: Button, Zh: initializeButtonRuntime, _L: useQuery, gL: initializeQueryRuntime, hU: isLibraryFileId, jZ: initializeMotionRuntime, wL: initializeSharedRuntime } = appSharedChunk as unknown as SharedApi;
-const { $en: routeScope, Aet: initializeEmptyState, Qgn: initializeAccountRuntime, Sdn: ApiError, Sun: initializeSessionState, _fn: featureDisabledSignal, _un: userIdSignal, bun: accessSignal, bz: getMountedProvider, f7: AppLayout, gun: automationBlockedSignal, itn: initializeRouteState, ket: EmptyState, l_n: useRouteParameters, mfn: featureEnabledSignal, mun: accountIdSignal, o_n: useNavigate, p7: initializePageRuntime, pfn: initializeFeatureFlags, vfn: availabilityLoadingSignal, wdn: initializeApiErrors } = appInitialChunk as unknown as InitialApi;
-function LibraryFileRoute(): unknown {
-  const jsx = getJsxRuntime();
-  useScope(routeScope);
-  const { libraryFileId } = useRouteParameters();
-  const navigate = useNavigate();
-  const access = useSignalValue<string>(accessSignal);
-  const accountId = useSignalValue<string | null>(accountIdSignal);
-  const userId = useSignalValue<string | null>(userIdSignal);
-  const automationBlocked = useSignalValue<boolean>(automationBlockedSignal);
-  const automationAvailabilityLoading = useSignalValue<boolean>(availabilityLoadingSignal);
-  const featureEnabled = useSignalFamilyValue<boolean>(featureEnabledSignal, "3765605143");
-  const featureDisabled = useSignalFamilyValue<boolean>(featureDisabledSignal, "3765605143");
-  const blocked = access === "loading" || access === "allowed" && !automationBlocked || automationAvailabilityLoading || featureDisabled;
-  const enabledId = !blocked && access === "allowed" && featureEnabled && accountId != null && libraryFileId != null && isLibraryFileId(libraryFileId) ? libraryFileId : null;
-  const query = useQuery<LibraryFile>({ queryKey: ["library-api", accountId, userId, "file", enabledId], queryFn: enabledId != null && accountId != null ? ({ signal }: { signal: AbortSignal }) => fetchLibraryFileMetadata(enabledId, accountId, signal) : disabledQuery, gcTime: 0, staleTime: 0, retry: false, refetchOnWindowFocus: false });
-  if (blocked || enabledId != null && query.isPending) return jsx.jsx(LibraryFilePreviewLoading, {});
-  if (enabledId != null && query.data != null && query.error == null) return jsx.jsxs(jsx.Fragment, { children: [jsx.jsx(AppLayout.MainContentLayout, { layout: "custom-titlebar" }), jsx.jsx(LibraryFileRoutePreview, { data: query.data, onClose: () => navigate("/library") })] });
-  const retryable = enabledId != null && !(query.error instanceof ApiError && (query.error.status === 403 || query.error.status === 404));
-  return jsx.jsx(EmptyState, { className: "select-none", layout: "page", title: jsx.jsx("h1", { role: "alert", children: jsx.jsx(FormattedMessage, { id: "library.file.failed", defaultMessage: "Unable to open this file", description: "Shown when a Library file link is invalid, inaccessible, or fails to load" }) }), actions: jsx.jsxs(jsx.Fragment, { children: [retryable ? jsx.jsx(Button, { disabled: query.isFetching, onClick: () => void query.refetch(), children: jsx.jsx(FormattedMessage, { id: "library.file.retry", defaultMessage: "Try again", description: "Retry loading the file selected by a Library file link" }) }) : null, jsx.jsx(Button, { color: "outline", onClick: () => navigate("/library"), children: jsx.jsx(FormattedMessage, { id: "library.file.back", defaultMessage: "Back to Library", description: "Return from a Library file link error to the Library browse page" }) })] }) });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  FZ as i,
+  HX as a,
+  I3 as o,
+  K2 as s,
+  LX as c,
+  Y2 as l,
+  Yh as u,
+  Zh as d,
+  _L as f,
+  gL as p,
+  hU as m,
+  jZ as h,
+  wL as g,
+} from "@rchunk/app-shared";
+import {
+  $en as _,
+  Aet as v,
+  Qgn as y,
+  Sdn as b,
+  Sun as x,
+  _fn as S,
+  _un as C,
+  bun as w,
+  bz as T,
+  f7 as E,
+  gun as D,
+  itn as O,
+  ket as k,
+  l_n as A,
+  mfn as j,
+  mun as M,
+  o_n as ee,
+  p7 as N,
+  pfn as P,
+  vfn as F,
+  wdn as I,
+} from "@rchunk/app-initial";
+import { n as L, t as R } from "@rchunk/library-file-metadata";
+import { n as z } from "@rchunk/library-cloud-file-preview";
+import { n as B, t as V } from "@rchunk/library-file-preview-loading";
+import { t as H } from "@rchunk/cloud-file-preview";
+function U() {
+  let e = (0, G.c)(46),
+    t = c(_),
+    { libraryFileId: r } = A(),
+    o = ee(),
+    s = a(w),
+    d = a(M),
+    p = a(C),
+    h = a(D),
+    g = a(!1),
+    v = n(j, `3765605143`),
+    y = n(S, `3765605143`),
+    x = a(F),
+    T = s === `loading` || (s === `allowed` && !h) || x || y,
+    E;
+  e[0] !== s || e[1] !== d || e[2] !== r || e[3] !== v || e[4] !== T
+    ? ((E = !T && s === `allowed` && v && d != null && r != null && m(r) ? r : null),
+      (e[0] = s),
+      (e[1] = d),
+      (e[2] = r),
+      (e[3] = v),
+      (e[4] = T),
+      (e[5] = E))
+    : (E = e[5]);
+  let O = E,
+    N;
+  e[6] !== d || e[7] !== O || e[8] !== p
+    ? ((N = [`library-api`, d, p, `file`, O]), (e[6] = d), (e[7] = O), (e[8] = p), (e[9] = N))
+    : (N = e[9]);
+  let P;
+  e[10] !== d || e[11] !== O
+    ? ((P =
+        O != null && d != null
+          ? (e) => {
+              let { signal: t } = e;
+              return R(O, d, t);
+            }
+          : i),
+      (e[10] = d),
+      (e[11] = O),
+      (e[12] = P))
+    : (P = e[12]);
+  let I;
+  e[13] !== N || e[14] !== P
+    ? ((I = {
+        queryKey: N,
+        queryFn: P,
+        gcTime: 0,
+        staleTime: 0,
+        retry: !1,
+        refetchOnWindowFocus: !1,
+      }),
+      (e[13] = N),
+      (e[14] = P),
+      (e[15] = I))
+    : (I = e[15]);
+  let { data: L, error: z, isPending: B, isFetching: H, refetch: U } = f(I);
+  if (T || (O != null && B)) {
+    let t;
+    return (
+      e[16] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, K.jsx)(V, {})), (e[16] = t))
+        : (t = e[16]),
+      t
+    );
+  }
+  if (O != null && L != null && z == null) {
+    let n;
+    e[17] !== d || e[18] !== O || e[19] !== p
+      ? ((n = JSON.stringify([d, p, O])), (e[17] = d), (e[18] = O), (e[19] = p), (e[20] = n))
+      : (n = e[20]);
+    let r;
+    e[21] === o ? (r = e[22]) : ((r = () => void o(`/library`)), (e[21] = o), (e[22] = r));
+    let i;
+    e[23] !== d || e[24] !== L || e[25] !== t || e[26] !== g
+      ? ((i = void 0), (e[23] = d), (e[24] = L), (e[25] = t), (e[26] = g), (e[27] = i))
+      : (i = e[27]);
+    let a;
+    return (
+      e[28] !== L || e[29] !== n || e[30] !== r || e[31] !== i
+        ? ((a = (0, K.jsx)(W, { data: L, onClose: r, onShare: i }, n)),
+          (e[28] = L),
+          (e[29] = n),
+          (e[30] = r),
+          (e[31] = i),
+          (e[32] = a))
+        : (a = e[32]),
+      a
+    );
+  }
+  let q = O != null && !(z instanceof b && (z.status === 403 || z.status === 404)),
+    J;
+  e[33] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((J = (0, K.jsx)(`h1`, {
+        role: `alert`,
+        children: (0, K.jsx)(l, {
+          id: `library.file.failed`,
+          defaultMessage: `Unable to open this file`,
+          description: `Shown when a Library file link is invalid, inaccessible, or fails to load`,
+        }),
+      })),
+      (e[33] = J))
+    : (J = e[33]);
+  let Y;
+  e[34] !== q || e[35] !== H || e[36] !== U
+    ? ((Y = q
+        ? (0, K.jsx)(u, {
+            disabled: H,
+            onClick: () => void U(),
+            children: (0, K.jsx)(l, {
+              id: `library.file.retry`,
+              defaultMessage: `Try again`,
+              description: `Retry loading the file selected by a Library file link`,
+            }),
+          })
+        : null),
+      (e[34] = q),
+      (e[35] = H),
+      (e[36] = U),
+      (e[37] = Y))
+    : (Y = e[37]);
+  let X;
+  e[38] === o ? (X = e[39]) : ((X = () => void o(`/library`)), (e[38] = o), (e[39] = X));
+  let Z;
+  e[40] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((Z = (0, K.jsx)(l, {
+        id: `library.file.back`,
+        defaultMessage: `Back to Library`,
+        description: `Return from a Library file link error to the Library browse page`,
+      })),
+      (e[40] = Z))
+    : (Z = e[40]);
+  let Q;
+  e[41] === X
+    ? (Q = e[42])
+    : ((Q = (0, K.jsx)(u, { color: `outline`, onClick: X, children: Z })),
+      (e[41] = X),
+      (e[42] = Q));
+  let $;
+  return (
+    e[43] !== Y || e[44] !== Q
+      ? (($ = (0, K.jsx)(k, {
+          className: `select-none`,
+          layout: `page`,
+          title: J,
+          actions: (0, K.jsxs)(K.Fragment, { children: [Y, Q] }),
+        })),
+        (e[43] = Y),
+        (e[44] = Q),
+        (e[45] = $))
+      : ($ = e[45]),
+    $
+  );
 }
-function LibraryFileRoutePreview({ data, onClose }: { data: LibraryFile; onClose(): void }): unknown { const jsx = getJsxRuntime(); const fileId = data.file_id ?? data.id; const fileName = data.file_name ?? data.name ?? ""; const modifiedAt = data.file_upload_time ?? null; const cloudFile = { id: data.id, fileId, currentVersion: data.current_version_number, gizmoId: data.gizmo_id, libraryArtifactType: data.library_artifact_type, name: fileName, parentDirectoryId: data.parent_directory_id ?? data.directory_id ?? null, category: data.library_file_category ?? "other", mimeType: data.mime_type ?? null, modifiedAt, provider: getMountedProvider(data.id) ?? undefined, sizeBytes: data.file_size_bytes ?? null, sourceUrl: data.cloud_doc_url, thumbnailUrl: data.thumbnail_url ?? null, thumbnailPreviewUrl: data.thumbnail_preview_url ?? null }; const item = { id: data.id, kind: "cloud-file", fileType: data.library_file_category ?? "other", modifiedAt, cloudFile }; return jsx.jsx(LibraryCloudFilePreview, { item, onClose, onShare: undefined }); }
-initializeCompilerRuntime(); initializeMotionRuntime(); initializeQueryRuntime(); initializeSignalRuntime(); initializeSharedRuntime(); initializeIntlRuntime(); initializeAccountRuntime(); initializePageRuntime(); initializeSessionState(); initializeButtonRuntime(); initializeEmptyState(); initializeLibraryFileMetadata(); initializeRouteState(); initializeFeatureFlags(); initializeApiErrors(); initializeLoadingPreview(); initializeCloudFilePreview();
-export { LibraryFileRoute };
+function W(e) {
+  let t = (0, G.c)(28),
+    { data: n, onClose: r, onShare: i } = e,
+    a;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((a = (0, K.jsx)(E.MainContentLayout, { layout: `custom-titlebar` })), (t[0] = a))
+    : (a = t[0]);
+  let o = n.library_file_category ?? `other`,
+    s = n.file_upload_time ?? null,
+    c = `file_name` in n ? (n.file_id ?? n.id) : n.id,
+    l = `current_version_number` in n ? (n.current_version_number ?? void 0) : void 0,
+    u = `file_name` in n ? n.file_name : n.name,
+    d = `parent_directory_id` in n ? n.parent_directory_id : (n.directory_id ?? null),
+    f = n.library_file_category ?? `other`,
+    p = n.mime_type ?? null,
+    m = n.file_upload_time ?? null,
+    h;
+  t[1] === n.id ? (h = t[2]) : ((h = T(n.id) ?? void 0), (t[1] = n.id), (t[2] = h));
+  let g = n.file_size_bytes ?? null,
+    _ = n.cloud_doc_url ?? void 0,
+    v = n.thumbnail_url ?? null,
+    y = n.thumbnail_preview_url ?? null,
+    b;
+  t[3] !== n.gizmo_id ||
+  t[4] !== n.id ||
+  t[5] !== n.library_artifact_type ||
+  t[6] !== m ||
+  t[7] !== h ||
+  t[8] !== g ||
+  t[9] !== _ ||
+  t[10] !== v ||
+  t[11] !== y ||
+  t[12] !== c ||
+  t[13] !== l ||
+  t[14] !== u ||
+  t[15] !== d ||
+  t[16] !== f ||
+  t[17] !== p
+    ? ((b = {
+        id: n.id,
+        fileId: c,
+        currentVersion: l,
+        gizmoId: n.gizmo_id,
+        libraryArtifactType: n.library_artifact_type,
+        name: u,
+        parentDirectoryId: d,
+        category: f,
+        mimeType: p,
+        modifiedAt: m,
+        provider: h,
+        sizeBytes: g,
+        sourceUrl: _,
+        thumbnailUrl: v,
+        thumbnailPreviewUrl: y,
+      }),
+      (t[3] = n.gizmo_id),
+      (t[4] = n.id),
+      (t[5] = n.library_artifact_type),
+      (t[6] = m),
+      (t[7] = h),
+      (t[8] = g),
+      (t[9] = _),
+      (t[10] = v),
+      (t[11] = y),
+      (t[12] = c),
+      (t[13] = l),
+      (t[14] = u),
+      (t[15] = d),
+      (t[16] = f),
+      (t[17] = p),
+      (t[18] = b))
+    : (b = t[18]);
+  let x;
+  t[19] !== n.id || t[20] !== b || t[21] !== o || t[22] !== s
+    ? ((x = { id: n.id, kind: `cloud-file`, fileType: o, modifiedAt: s, cloudFile: b }),
+      (t[19] = n.id),
+      (t[20] = b),
+      (t[21] = o),
+      (t[22] = s),
+      (t[23] = x))
+    : (x = t[23]);
+  let S;
+  return (
+    t[24] !== r || t[25] !== i || t[26] !== x
+      ? ((S = (0, K.jsxs)(K.Fragment, {
+          children: [a, (0, K.jsx)(z, { item: x, onClose: r, onShare: i })],
+        })),
+        (t[24] = r),
+        (t[25] = i),
+        (t[26] = x),
+        (t[27] = S))
+      : (S = t[27]),
+    S
+  );
+}
+var G, K;
+function q() {
+  return (q = e(() => {
+    ((G = t()),
+      h(),
+      p(),
+      r(),
+      g(),
+      s(),
+      y(),
+      N(),
+      x(),
+      d(),
+      v(),
+      L(),
+      O(),
+      P(),
+      I(),
+      B(),
+      H(),
+      (K = o()));
+  }))();
+}
+q();
+export { U as LibraryFileRoute };

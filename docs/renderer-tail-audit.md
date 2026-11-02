@@ -1,5 +1,30 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Large release-owner convergence batch：一次性恢复
+`workspace-auto-generated-name`、`voice-configuration-manager`、
+`pull-request-code-review-navigation-core`、`tab-address-input`、`editor-header`、
+`conversation-move-menu-items`、`quiet-hours-active-dialog`、`exec-shell-container`、
+`habitat-automation-migration-prompt`、`chatgpt-generated-image-favorite`、
+`presentation-annotation-cursor-coachmark`、`pet-install-modal-host`、
+`first-limit-dialog`、`chatgpt-image-lightbox`、`browser-address-suggestion-overlay`、
+`cloud-preferences-settings`、`conversation-beacon-surfaces`、`voice-commentary-message`、
+`chatgpt-gizmo-header`、`plugin-showcase-skill-details`、
+`local-conversation-subagents-panel-tab`、`card-tile`、`composer-banners`、
+`quick-chat-obstacles`、`learning-model-linear-inequalities-feasible-region`、
+`codex-micro-joystick-hud`、`codex-diff-css`、`chatgpt-ads-consent-boundary`、
+`library-file-route` 与 `google-logo` 三十个发布 owner，净恢复 9,213 行发布
+TypeScript。旧缩减 ABI/mock 回归已迁移为发布一致性验证，保留同簇
+Git review、tab/command、artifact、account/workspace、billing、composer、quick chat、
+code rendering、plugin 与 brand 的相邻行为覆盖。37 组聚焦测试、
+12,448/12,448 transform check、1,888/1,888 renderer build/verify、
+2,247/2,247 app-code coverage、0 semantic tail、typecheck 与 1,912-script test-index
+通过。严格 hub 消费推进到 app-shared 1,785/3,185、app-initial 5,700/8,204、
+app-primary 754/917，仍为 0 unreviewed、0 invalid consumers。按发布源码正向
+行数缺口口径，剩余由 55,773 行降至 46,560 行，覆盖率约 95.51%；
+可比对 owner 中已有 383 个与发布证据一致，仍有 1,479 个不完全一致。
+425 个 preserved 边界、三个聚合 hub 的剩余耦合导出与最终真实 E2E 仍未
+完成，因此本批仍不构成“完整反编译完成”。
+
 2026-11-02 Security/report/plugin release-owner recovery：一次性恢复
 `registered-sources`、`appgen-database-page`、`task-announcement-candidates`、
 `subscription-payment-announcement`、`drawing-size-slider`、

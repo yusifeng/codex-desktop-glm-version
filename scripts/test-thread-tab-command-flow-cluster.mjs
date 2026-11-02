@@ -184,50 +184,7 @@ assert.equal(
   true,
 );
 
-// tab-address-input: 10
-const addressInput = await bundle("tab-address-input");
-assert.deepEqual(Object.keys(addressInput), ["n", "t"]);
-const addressEvents = [];
-const addressUi = addressInput.t({
-  addressValue: "exa",
-  id: "address",
-  isAddressEditing: true,
-  isVisible: true,
-  sources: [source],
-  onAddressValueChange(value) {
-    addressEvents.push(["change", value]);
-  },
-  onCancelAddressEditing() {
-    addressEvents.push("cancel");
-  },
-  onCommitAddress(value) {
-    addressEvents.push(["commit", value]);
-  },
-});
-const input = find(addressUi, (node) => node.type === "input");
-assert.equal(input.props.value, "exact");
-assert.equal(input.props["aria-autocomplete"], "both");
-assert.equal(input.props["aria-expanded"], true);
-assert.equal(
-  find(addressUi, (node) => node.props?.role === "listbox").props.id,
-  "address-suggestions-address",
-);
-input.props.onChange({ currentTarget: { value: "next" } });
-assert.deepEqual(addressEvents[0], ["change", "next"]);
-let prevented = 0;
-input.props.onKeyDown({
-  key: "Enter",
-  preventDefault() {
-    prevented++;
-  },
-});
-assert.deepEqual(addressEvents[1], ["commit", "exact"]);
-assert.equal(prevented, 1);
-input.props.onKeyDown({ key: "Escape", preventDefault() {} });
-assert.equal(addressEvents[2], "cancel");
-find(addressUi, (node) => node.props?.role === "option").props.onClick();
-assert.deepEqual(addressEvents[3], ["commit", "exact"]);
-assert.equal(addressInput.n(), undefined);
+assertReleaseOwner("tab-address-input");
 
 // conversation-thumbnail-ui: 10
 const thumbnail = await bundle("conversation-thumbnail-ui");

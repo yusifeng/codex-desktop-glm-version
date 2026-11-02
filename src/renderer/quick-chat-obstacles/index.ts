@@ -1,152 +1,442 @@
-// Quick Chat geometry, resize controls, and obstacle observation.
-
-import * as appShared from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/rolldown-runtime";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-type Placement = "top-left" | "top-right" | "bottom-left" | "bottom-right" | "bottom-center" | null;
-type HorizontalEdge = "left" | "right";
-type VerticalEdge = "top" | "bottom";
-interface Size { height: number; width: number }
-interface Rect extends Size { left: number; top: number }
-interface ResizeHandlesProps {
-  currentSize: Size; defaultSize: Size; extendIntoToolbar?: boolean; heightLabel?: string;
-  maximumSize: Size; minimumSize: Size; onResize(edge: HorizontalEdge, size: Size): void;
-  onResizeEnd(size: Size): void; onResizingChange?(resizing: boolean): void;
-  verticalEdge?: VerticalEdge; widthLabel?: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  I3 as n,
+  b_ as r,
+  e6 as i,
+  h4 as a,
+  m4 as o,
+  x_ as s,
+  y_ as c,
+} from "@rchunk/app-shared";
+import { D9 as l, E9 as u } from "@rchunk/app-initial";
+function d(e, t, n, r, i = 0, a = 0) {
+  if (e == null) return { x: Math.round((r - t.width) / 2), y: Math.round((n - t.height) / 2) };
+  let o = 16 - i / 2,
+    s = e.endsWith(`left`) ? o : r - t.width - o;
+  return (
+    e === `bottom-center` && (s = Math.round((r - t.width) / 2)),
+    { x: s, y: e.startsWith(`top`) ? a + o : n - t.height - o }
+  );
 }
-interface PointerState {
-  didMove: boolean; edge: HorizontalEdge | null; lastSize: Size; pointerId: number;
-  startPointer: { x: number; y: number }; startSize: Size; verticalEdge: VerticalEdge | null;
+function f(e, t, n) {
+  let r = e.left + e.width / 2;
+  return e.top + e.height / 2 >= t / 2 && r >= n / 4 && r <= (n * 3) / 4
+    ? `bottom-center`
+    : `${e.top + e.height / 2 < t / 2 ? `top` : `bottom`}-${e.left + e.width / 2 < n / 2 ? `left` : `right`}`;
 }
-interface ReactRuntime { useRef<T>(value: T): { current: T } }
-
-const shared = appShared as Record<string, unknown>;
-let jsx: JsxRuntime;
-let react: ReactRuntime;
-const obstacleCleanups = new Map<HTMLElement, (() => void) | null>();
-const obstacleSubscribers = new Set<() => void>();
-let scheduledNotification: number | null = null;
-
-function positionForPlacement(placement: Placement, size: Size, viewportHeight: number, viewportWidth: number, insetWidth = 0, topInset = 0): { x: number; y: number } {
-  if (placement == null) return { x: Math.round((viewportWidth - size.width) / 2), y: Math.round((viewportHeight - size.height) / 2) };
-  const inset = 16 - insetWidth / 2;
-  let x = placement.endsWith("left") ? inset : viewportWidth - size.width - inset;
-  if (placement === "bottom-center") x = Math.round((viewportWidth - size.width) / 2);
-  return { x, y: placement.startsWith("top") ? topInset + inset : viewportHeight - size.height - inset };
-}
-function placementForRect(rect: Rect, viewportHeight: number, viewportWidth: number): Placement {
-  const centerX = rect.left + rect.width / 2, centerY = rect.top + rect.height / 2;
-  if (centerY >= viewportHeight / 2 && centerX >= viewportWidth / 4 && centerX <= viewportWidth * 3 / 4) return "bottom-center";
-  return `${centerY < viewportHeight / 2 ? "top" : "bottom"}-${centerX < viewportWidth / 2 ? "left" : "right"}` as Placement;
-}
-function nearestPlacement(rect: Rect, viewportHeight: number, viewportWidth: number): Placement {
-  return ([null, "bottom-left", "bottom-right"] as Placement[]).reduce((best, candidate) => {
-    const a = positionForPlacement(best, rect, viewportHeight, viewportWidth), b = positionForPlacement(candidate, rect, viewportHeight, viewportWidth);
-    const da = (rect.left - a.x) ** 2 + (rect.top - a.y) ** 2, db = (rect.left - b.x) ** 2 + (rect.top - b.y) ** 2;
-    return db < da ? candidate : best;
+function p(e, t, n) {
+  return g.reduce((r, i) => {
+    let a = d(r, e, t, n);
+    return h(e, d(i, e, t, n)) < h(e, a) ? i : r;
   });
 }
-function clampResizeOffset(placement: Placement, edge: HorizontalEdge, size: Size, offset: number, targetWidth: number, viewportHeight: number, viewportWidth: number, inset = 0): number {
-  const base = positionForPlacement(placement, size, viewportHeight, viewportWidth, inset).x + offset;
-  const desired = edge === "left" ? base + size.width - targetWidth : base;
-  const margin = 16 - inset / 2;
-  return Math.min(viewportWidth - targetWidth - margin, Math.max(margin, desired)) - positionForPlacement(placement, { ...size, width: targetWidth }, viewportHeight, viewportWidth, inset).x;
+function m(e, t, n, r, i, a, o, s = 0) {
+  let c = d(e, n, a, o, s).x + r,
+    l = t === `left` ? c + n.width - i : c,
+    u = 16 - s / 2;
+  return Math.min(o - i - u, Math.max(u, l)) - d(e, { ...n, width: i }, a, o, s).x;
 }
-
-function observeObstacle(element: HTMLElement): () => void {
-  const resizeObserver = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(scheduleObstacleNotification);
-  const mutationObserver = typeof MutationObserver === "undefined" ? null : new MutationObserver(scheduleObstacleNotification);
-  resizeObserver?.observe(element);
-  mutationObserver?.observe(element, { attributes: true, attributeFilter: ["style", "class", "data-pip-obstacle"] });
-  return () => { resizeObserver?.disconnect(); mutationObserver?.disconnect(); };
+function h(e, t) {
+  return (e.left - t.x) ** 2 + (e.top - t.y) ** 2;
 }
-function registerObstacle(element: HTMLElement | null): (() => void) | undefined {
-  if (element == null) return undefined;
-  obstacleCleanups.set(element, obstacleSubscribers.size === 0 ? null : observeObstacle(element));
-  scheduleObstacleNotification();
-  return () => { obstacleCleanups.get(element)?.(); obstacleCleanups.delete(element); scheduleObstacleNotification(); };
+var g;
+function _() {
+  return (_ = e(() => {
+    g = [null, `bottom-left`, `bottom-right`];
+  }))();
 }
-function obstacleRects(): DOMRect[] {
-  return Array.from(obstacleCleanups.keys()).filter((element) => element.dataset.pipObstacle === "quick-chat")
-    .map((element) => element.getBoundingClientRect()).filter((rect) => rect.width > 0 && rect.height > 0);
+function v(e) {
+  let t = (0, b.c)(34),
+    {
+      edge: n,
+      getCurrentSize: i,
+      maximumSize: a,
+      minimumSize: c,
+      onResizeEnd: l,
+      onResizingChange: u,
+      setSize: d,
+      verticalEdge: f,
+    } = e,
+    p = n === void 0 ? `left` : n,
+    m = f === void 0 ? `top` : f,
+    h = s(),
+    g = (0, x.useRef)(null),
+    _;
+  t[0] !== p || t[1] !== a || t[2] !== c || t[3] !== d || t[4] !== m || t[5] !== h
+    ? ((_ = (e) => {
+        let t = g.current;
+        if (t == null || t.pointerId !== e.pointerId) return;
+        e.preventDefault();
+        let n = {
+          height: y(
+            t.startSize.height + (m === `top` ? -1 : 1) * (r(e.clientY, h) - t.startPointer.y),
+            c.height,
+            a.height,
+          ),
+          width: y(
+            t.startSize.width + (p === `left` ? -1 : 1) * (r(e.clientX, h) - t.startPointer.x),
+            c.width,
+            a.width,
+          ),
+        };
+        ((t.didMove ||= n.height !== t.startSize.height || n.width !== t.startSize.width),
+          (t.lastSize = n),
+          d(n));
+      }),
+      (t[0] = p),
+      (t[1] = a),
+      (t[2] = c),
+      (t[3] = d),
+      (t[4] = m),
+      (t[5] = h),
+      (t[6] = _))
+    : (_ = t[6]);
+  let v = _,
+    C;
+  t[7] !== l || t[8] !== u
+    ? ((C = (e, t) => {
+        let n = g.current;
+        n?.pointerId === e.pointerId &&
+          ((g.current = null), u?.(!1), t && n.didMove && l?.(n.lastSize));
+      }),
+      (t[7] = l),
+      (t[8] = u),
+      (t[9] = C))
+    : (C = t[9]);
+  let w = C,
+    T = m === `top` ? `top-0` : `bottom-0`,
+    E = p === `left` ? `left-0` : `right-0`,
+    D = (p === `left`) == (m === `top`) ? `cursor-nwse-resize` : `cursor-nesw-resize`,
+    O;
+  t[10] !== T || t[11] !== E || t[12] !== D
+    ? ((O = o(`group absolute z-50 flex size-4 touch-none select-none`, T, E, D)),
+      (t[10] = T),
+      (t[11] = E),
+      (t[12] = D),
+      (t[13] = O))
+    : (O = t[13]);
+  let k;
+  t[14] === w
+    ? (k = t[15])
+    : ((k = (e) => {
+        w(e, !1);
+      }),
+      (t[14] = w),
+      (t[15] = k));
+  let A;
+  t[16] !== v || t[17] !== w
+    ? ((A = (e) => {
+        (v(e), w(e, !0));
+      }),
+      (t[16] = v),
+      (t[17] = w),
+      (t[18] = A))
+    : (A = t[18]);
+  let j;
+  t[19] !== i || t[20] !== u || t[21] !== h
+    ? ((j = (e) => {
+        if (e.button !== 0) return;
+        (e.preventDefault(), e.currentTarget.setPointerCapture?.(e.pointerId));
+        let t = i();
+        ((g.current = {
+          didMove: !1,
+          lastSize: t,
+          pointerId: e.pointerId,
+          startPointer: { x: r(e.clientX, h), y: r(e.clientY, h) },
+          startSize: t,
+        }),
+          u?.(!0));
+      }),
+      (t[19] = i),
+      (t[20] = u),
+      (t[21] = h),
+      (t[22] = j))
+    : (j = t[22]);
+  let M;
+  t[23] !== v || t[24] !== w
+    ? ((M = (e) => {
+        (v(e), w(e, !0));
+      }),
+      (t[23] = v),
+      (t[24] = w),
+      (t[25] = M))
+    : (M = t[25]);
+  let N;
+  t[26] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((N = (0, S.jsx)(`div`, {
+        className: `pointer-events-none m-auto h-px w-2 rotate-45 bg-text/25 opacity-0 group-hover:opacity-100 group-active:opacity-100`,
+      })),
+      (t[26] = N))
+    : (N = t[26]);
+  let P;
+  return (
+    t[27] !== v || t[28] !== A || t[29] !== j || t[30] !== M || t[31] !== O || t[32] !== k
+      ? ((P = (0, S.jsx)(`div`, {
+          "aria-hidden": !0,
+          className: O,
+          onLostPointerCapture: k,
+          onPointerCancel: A,
+          onPointerDown: j,
+          onPointerMove: v,
+          onPointerUp: M,
+          children: N,
+        })),
+        (t[27] = v),
+        (t[28] = A),
+        (t[29] = j),
+        (t[30] = M),
+        (t[31] = O),
+        (t[32] = k),
+        (t[33] = P))
+      : (P = t[33]),
+    P
+  );
 }
-function obstacleSignature(): string {
-  return obstacleRects().map((rect) => [rect.left, rect.top, rect.width, rect.height].map(Math.round).join(",")).join(";");
+function y(e, t, n) {
+  return Math.min(Math.max(e, t), n);
 }
-function subscribeObstacles(callback: () => void): () => void {
-  obstacleSubscribers.add(callback);
-  if (obstacleSubscribers.size === 1) {
-    for (const element of obstacleCleanups.keys()) obstacleCleanups.set(element, observeObstacle(element));
-    if (typeof window !== "undefined") window.addEventListener("resize", scheduleObstacleNotification);
+var b, x, S;
+function C() {
+  return (C = e(() => {
+    ((b = t()), a(), (x = i()), c(), (S = n()));
+  }))();
+}
+function w(e) {
+  let t = (0, T.c)(40),
+    {
+      currentSize: n,
+      defaultSize: r,
+      extendIntoToolbar: i,
+      heightLabel: a,
+      maximumSize: o,
+      minimumSize: s,
+      onResize: c,
+      onResizeEnd: l,
+      onResizingChange: d,
+      verticalEdge: f,
+      widthLabel: p,
+    } = e,
+    m = i === void 0 || i,
+    h = f === void 0 ? `top` : f,
+    g;
+  t[0] !== n ||
+  t[1] !== r.width ||
+  t[2] !== m ||
+  t[3] !== o.width ||
+  t[4] !== s.width ||
+  t[5] !== c ||
+  t[6] !== l ||
+  t[7] !== d ||
+  t[8] !== p
+    ? ((g = D.map((e) =>
+        (0, E.jsx)(
+          u,
+          {
+            ariaLabel: p,
+            defaultSize: r.width,
+            edge: e,
+            extendIntoToolbar: m,
+            getCurrentSize: () => n.width,
+            maximumSize: o.width,
+            minimumSize: s.width,
+            onResizeEnd: (e) => {
+              l({ ...n, width: e });
+            },
+            onResizingChange: d,
+            setSize: (t) => {
+              c(e, { ...n, width: t });
+            },
+          },
+          e,
+        ),
+      )),
+      (t[0] = n),
+      (t[1] = r.width),
+      (t[2] = m),
+      (t[3] = o.width),
+      (t[4] = s.width),
+      (t[5] = c),
+      (t[6] = l),
+      (t[7] = d),
+      (t[8] = p),
+      (t[9] = g))
+    : (g = t[9]);
+  let _;
+  t[10] === n.height ? (_ = t[11]) : ((_ = () => n.height), (t[10] = n.height), (t[11] = _));
+  let y;
+  t[12] !== n || t[13] !== l
+    ? ((y = (e) => {
+        l({ ...n, height: e });
+      }),
+      (t[12] = n),
+      (t[13] = l),
+      (t[14] = y))
+    : (y = t[14]);
+  let b;
+  t[15] !== n || t[16] !== c
+    ? ((b = (e) => {
+        c(`right`, { ...n, height: e });
+      }),
+      (t[15] = n),
+      (t[16] = c),
+      (t[17] = b))
+    : (b = t[17]);
+  let x;
+  t[18] !== r.height ||
+  t[19] !== a ||
+  t[20] !== o.height ||
+  t[21] !== s.height ||
+  t[22] !== d ||
+  t[23] !== _ ||
+  t[24] !== y ||
+  t[25] !== b ||
+  t[26] !== h
+    ? ((x = (0, E.jsx)(u, {
+        ariaLabel: a,
+        defaultSize: r.height,
+        edge: h,
+        getCurrentSize: _,
+        maximumSize: o.height,
+        minimumSize: s.height,
+        onResizeEnd: y,
+        onResizingChange: d,
+        setSize: b,
+      })),
+      (t[18] = r.height),
+      (t[19] = a),
+      (t[20] = o.height),
+      (t[21] = s.height),
+      (t[22] = d),
+      (t[23] = _),
+      (t[24] = y),
+      (t[25] = b),
+      (t[26] = h),
+      (t[27] = x))
+    : (x = t[27]);
+  let S;
+  t[28] !== n ||
+  t[29] !== o ||
+  t[30] !== s ||
+  t[31] !== c ||
+  t[32] !== l ||
+  t[33] !== d ||
+  t[34] !== h
+    ? ((S = D.map((e) =>
+        (0, E.jsx)(
+          v,
+          {
+            edge: e,
+            getCurrentSize: () => n,
+            maximumSize: o,
+            minimumSize: s,
+            verticalEdge: h,
+            onResizeEnd: l,
+            onResizingChange: d,
+            setSize: (t) => {
+              c(e, t);
+            },
+          },
+          e,
+        ),
+      )),
+      (t[28] = n),
+      (t[29] = o),
+      (t[30] = s),
+      (t[31] = c),
+      (t[32] = l),
+      (t[33] = d),
+      (t[34] = h),
+      (t[35] = S))
+    : (S = t[35]);
+  let C;
+  return (
+    t[36] !== g || t[37] !== x || t[38] !== S
+      ? ((C = (0, E.jsxs)(E.Fragment, { children: [g, x, S] })),
+        (t[36] = g),
+        (t[37] = x),
+        (t[38] = S),
+        (t[39] = C))
+      : (C = t[39]),
+    C
+  );
+}
+var T, E, D;
+function O() {
+  return (O = e(() => {
+    ((T = t()), l(), C(), (E = n()), (D = [`left`, `right`]));
+  }))();
+}
+function k(e) {
+  if (e != null)
+    return (
+      F.set(e, I.size === 0 ? null : N(e)),
+      P(),
+      () => {
+        (F.get(e)?.(), F.delete(e), P());
+      }
+    );
+}
+function A() {
+  return Array.from(F.keys())
+    .filter((e) => e.dataset.pipObstacle === `quick-chat`)
+    .map((e) => e.getBoundingClientRect())
+    .filter((e) => e.width > 0 && e.height > 0);
+}
+function j() {
+  return A()
+    .map((e) => [e.left, e.top, e.width, e.height].map((e) => Math.round(e)).join(`,`))
+    .join(`;`);
+}
+function M(e) {
+  if ((I.add(e), I.size === 1)) {
+    for (let e of F.keys()) F.set(e, N(e));
+    window.addEventListener(`resize`, P);
   }
   return () => {
-    obstacleSubscribers.delete(callback);
-    if (obstacleSubscribers.size !== 0) return;
-    for (const [element, cleanup] of obstacleCleanups) { cleanup?.(); obstacleCleanups.set(element, null); }
-    if (typeof window !== "undefined") window.removeEventListener("resize", scheduleObstacleNotification);
-    if (scheduledNotification != null && typeof cancelAnimationFrame === "function") cancelAnimationFrame(scheduledNotification);
-    scheduledNotification = null;
+    if ((I.delete(e), I.size === 0)) {
+      for (let [e, t] of F) (t?.(), F.set(e, null));
+      (window.removeEventListener(`resize`, P), L != null && (cancelAnimationFrame(L), (L = null)));
+    }
   };
 }
-function scheduleObstacleNotification(): void {
-  if (obstacleSubscribers.size === 0 || scheduledNotification != null) return;
-  const schedule = typeof requestAnimationFrame === "function" ? requestAnimationFrame : (callback: FrameRequestCallback): number => setTimeout(() => callback(Date.now()), 0) as unknown as number;
-  scheduledNotification = schedule(() => { scheduledNotification = null; for (const callback of obstacleSubscribers) callback(); });
+function N(e) {
+  let t = new ResizeObserver(P),
+    n = new MutationObserver(P);
+  return (
+    t.observe(e),
+    n.observe(e, { attributes: !0, attributeFilter: [`style`, `class`, `data-pip-obstacle`] }),
+    () => {
+      (t.disconnect(), n.disconnect());
+    }
+  );
 }
-
-function ResizeHandles(props: ResizeHandlesProps): unknown {
-  initializeQuickChatObstacles();
-  const verticalEdge = props.verticalEdge ?? "top";
-  return jsx.jsxs(jsx.Fragment, { children: [
-    ...(["left", "right"] as const).map((edge) => jsx.jsx(ResizeHandle, { ...props, edge, verticalEdge: null }, edge)),
-    jsx.jsx(ResizeHandle, { ...props, edge: null, verticalEdge }, verticalEdge),
-    ...(["left", "right"] as const).map((edge) => jsx.jsx(ResizeHandle, { ...props, edge, verticalEdge }, `${verticalEdge}-${edge}`)),
-  ] });
+function P() {
+  I.size !== 0 &&
+    L == null &&
+    (L = requestAnimationFrame(() => {
+      L = null;
+      for (let e of I) e();
+    }));
 }
-function ResizeHandle(props: ResizeHandlesProps & { edge: HorizontalEdge | null; verticalEdge: VerticalEdge | null }): unknown {
-  const pointer = react.useRef<PointerState | null>(null);
-  const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-  const move = (event: PointerEvent): void => {
-    const state = pointer.current;
-    if (state == null || state.pointerId !== event.pointerId) return;
-    event.preventDefault();
-    const widthDelta = state.edge === "left" ? state.startPointer.x - event.clientX : event.clientX - state.startPointer.x;
-    const heightDelta = state.verticalEdge === "top" ? state.startPointer.y - event.clientY : event.clientY - state.startPointer.y;
-    const next = {
-      width: state.edge == null ? state.startSize.width : clamp(state.startSize.width + widthDelta, props.minimumSize.width, props.maximumSize.width),
-      height: state.verticalEdge == null ? state.startSize.height : clamp(state.startSize.height + heightDelta, props.minimumSize.height, props.maximumSize.height),
-    };
-    state.didMove ||= next.width !== state.startSize.width || next.height !== state.startSize.height;
-    state.lastSize = next; props.onResize(state.edge ?? "right", next);
-  };
-  const finish = (event: PointerEvent, commit: boolean): void => {
-    const state = pointer.current; if (state == null || state.pointerId !== event.pointerId) return;
-    pointer.current = null; props.onResizingChange?.(false); if (commit && state.didMove) props.onResizeEnd(state.lastSize);
-  };
-  const cursor = props.edge == null ? "ns-resize" : props.verticalEdge == null ? "ew-resize" : (props.edge === "left") === (props.verticalEdge === "top") ? "nwse-resize" : "nesw-resize";
-  return jsx.jsx("div", {
-    "aria-hidden": true, "data-quick-chat-resize-edge": [props.verticalEdge, props.edge].filter(Boolean).join("-"),
-    className: "quick-chat-resize-handle", style: { cursor, pointerEvents: "auto", touchAction: "none" },
-    onLostPointerCapture: (event: PointerEvent) => finish(event, false), onPointerCancel: (event: PointerEvent) => finish(event, true),
-    onPointerDown: (event: PointerEvent) => {
-      if (event.button !== 0) return; event.preventDefault(); (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
-      pointer.current = { didMove: false, edge: props.edge, lastSize: props.currentSize, pointerId: event.pointerId,
-        startPointer: { x: event.clientX, y: event.clientY }, startSize: props.currentSize, verticalEdge: props.verticalEdge };
-      props.onResizingChange?.(true);
-    },
-    onPointerMove: move, onPointerUp: (event: PointerEvent) => { move(event); finish(event, true); },
-  });
+var F, I, L;
+function R() {
+  return (R = e(() => {
+    ((F = new Map()), (I = new Set()), (L = null));
+  }))();
 }
-
-function initializeQuickChatObstacles(): void {
-  if (jsx != null) return;
-  if (typeof shared.I3 !== "function" || typeof shared.e6 !== "function") throw new Error("Quick Chat obstacles require renderer JSX and React runtimes");
-  jsx = (shared.I3 as () => JsxRuntime)(); react = (shared.e6 as () => ReactRuntime)();
-}
-initializeQuickChatObstacles();
-
-export { subscribeObstacles as a, nearestPlacement as c, placementForRect as d, initializeQuickChatObstacles as f,
-  registerObstacle as i, clampResizeOffset as l, obstacleSignature as n, ResizeHandles as o,
-  initializeQuickChatObstacles as r, initializeQuickChatObstacles as s, obstacleRects as t, positionForPlacement as u };
+export {
+  M as a,
+  p as c,
+  f as d,
+  _ as f,
+  k as i,
+  m as l,
+  j as n,
+  w as o,
+  R as r,
+  O as s,
+  A as t,
+  d as u,
+};

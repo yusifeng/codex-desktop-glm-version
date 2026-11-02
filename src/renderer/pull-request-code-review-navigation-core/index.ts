@@ -1,20 +1,349 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/virtualized-file-diff-line-position";
-import "@rchunk/pull-request-actions";
-import "@rchunk/pull-request-revision-queries-core";
-interface Store { get(key: unknown, params?: unknown): unknown; set(key: unknown, params: unknown, value?: unknown): void }
-const selectedFile = Symbol("selectedFile"); const searchQuery = Symbol("searchQuery"); const fileTreeCollapsed = Symbol("fileTreeCollapsed"); const scrollOffset = Symbol("scrollOffset"); const comments = Symbol("comments"); const submissions = Symbol("submissions"); const reviewData = Symbol("reviewData"); const revisionData = Symbol("revisionData"); const diffFiles = Symbol("diffFiles"); const filteredFiles = Symbol("filteredFiles"); const activeFile = Symbol("activeFile"); const threadMap = Symbol("threadMap"); const threadById = Symbol("threadById"); const commentsByFile = Symbol("commentsByFile"); const commentCounts = Symbol("commentCounts"); const pendingCommentKeys = Symbol("pendingCommentKeys"); const submissionErrors = Symbol("submissionErrors");
-function normalizePath(path: string): string { return path.replaceAll("\\", "/"); }
-function selectFile(store: Store, request: unknown, path: string): void { store.set(selectedFile, request, normalizePath(path)); }
-function setSearchQuery(store: Store, request: unknown, query: string): void { store.set(searchQuery, request, query); }
-function setFileTreeCollapsed(store: Store, request: unknown, collapsed: boolean): void { store.set(fileTreeCollapsed, request, collapsed); }
-function setScrollOffset(store: Store, request: unknown, offset: number): void { store.set(scrollOffset, request, offset); }
-function replaceComments(store: Store, request: unknown, path: string, nextComments: unknown[]): void { store.set(comments, { path: normalizePath(path), request }, nextComments); }
-function retryComment(store: Store, request: unknown, submission: { commentKey: string }): void { const current = (store.get(submissions, { path: "", request }) as Array<{ commentKey: string }> | undefined) ?? []; store.set(submissions, { path: "", request }, current.filter(item => item.commentKey !== submission.commentKey)); }
-function fileElementId(scope: { value?: { pathname?: string } }, request: Record<string, unknown>, path: string): string { return `pull-request-file-${encodeURIComponent(JSON.stringify([scope.value?.pathname, request.account, request.pullRequest, path]))}`; }
-function navigateToPosition(store: Store, request: unknown, position: { path: string; line?: number; side?: string }): void { selectFile(store, request, position.path); if (typeof document !== "undefined") document.getElementById(fileElementId({ value: { pathname: location.pathname } }, request as Record<string, unknown>, normalizePath(position.path)))?.scrollIntoView({ block: "center" }); }
-function initializeNavigationSignals(): void {}
-function initializePullRequestNavigation(): void { initializeNavigationSignals(); }
-export { replaceComments as C, setFileTreeCollapsed as S, filteredFiles as _, commentCounts as a, selectFile as b, searchQuery as c, commentsByFile as d, activeFile as f, pendingCommentKeys as g, submissionErrors as h, initializeNavigationSignals as i, fileTreeCollapsed as l, scrollOffset as m, initializePullRequestNavigation as n, revisionData as o, threadById as p, navigateToPosition as r, comments as s, fileElementId as t, diffFiles as u, retryComment as v, setSearchQuery as x, setScrollOffset as y };
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  FX as n,
+  RI as r,
+  VI as i,
+  l3 as a,
+  oZ as o,
+  pZ as s,
+  rZ as c,
+} from "@rchunk/app-shared";
+import {
+  $en as l,
+  Ay as ee,
+  My as te,
+  Ngn as ne,
+  RD as re,
+  XO as ie,
+  YO as ae,
+  by as oe,
+  i5t as se,
+  itn as u,
+  jgn as d,
+  jy as f,
+  n5t as p,
+  t5t as m,
+  xy as ce,
+  yy as le,
+} from "@rchunk/app-initial";
+import { i as h, n as ue, t as de } from "@rchunk/virtualized-file-diff-line-position";
+import { _ as fe, h as g, n as _, t as v, v as y } from "@rchunk/pull-request-actions";
+import { a as pe, n as me } from "@rchunk/pull-request-revision-queries-core";
+function b(e, t, n) {
+  let r = S(e, t, n);
+  r != null && e.set(E, t, r);
+}
+function x(e, t, n) {
+  e.set(D, t, n);
+}
+function he(e, t, n) {
+  e.set(O, t, n);
+}
+function ge(e, t, n) {
+  e.set(k, t, n);
+}
+function _e(e, t, n, r) {
+  let i = S(e, t, n);
+  if (i == null) return;
+  let a = e.get(A, { path: i, request: t }),
+    o = fe({ currentComments: a, nextComments: r });
+  (e.set(A, { path: i, request: t }, r), ye(e, t, i, r));
+  let s = e.get(N, t);
+  if (s.data?.status === `success`)
+    for (let n of o) {
+      let r = g(s.data.headRevision, n),
+        a = e.get(j, { path: i, request: t });
+      a.some((e) => (0, T.default)(e, r)) ||
+        (e.set(j, { path: i, request: t }, [...a, r]), C(e, t, i, r, n));
+    }
+}
+function ve(e, t, n, r) {
+  let i = S(e, t, n);
+  if (i == null) return;
+  let a = e
+    .get(A, { path: i, request: t })
+    .find((e) => g(r.revision, e).commentKey === r.commentKey);
+  if (a == null) {
+    w(e, t, i, r);
+    return;
+  }
+  e.get(_, { request: t, submissionKey: r }).isPending || C(e, t, i, r, a);
+}
+function S(e, t, n) {
+  let r = i(n);
+  return e.get(F, t).find((e) => e.path === r)?.path ?? null;
+}
+function ye(e, t, n, r) {
+  let i = new Set(r.map((e) => g(``, e).commentKey));
+  e.set(
+    j,
+    { path: n, request: t },
+    e
+      .get(j, { path: n, request: t })
+      .filter((n) => i.has(n.commentKey) || e.get(_, { request: t, submissionKey: n }).isPending),
+  );
+}
+function C(e, t, n, r, i) {
+  let a = () => {
+    (e.set(
+      A,
+      { path: n, request: t },
+      e.get(A, { path: n, request: t }).filter((e) => !(0, T.default)(g(r.revision, e), r)),
+    ),
+      w(e, t, n, r));
+  };
+  e.get(_, { request: t, submissionKey: r }).mutate(
+    { comment: i, onSuccess: a },
+    i.replyToReviewThreadId == null ? void 0 : { onSuccess: a },
+  );
+}
+function w(e, t, n, r) {
+  e.set(
+    j,
+    { path: n, request: t },
+    e.get(j, { path: n, request: t }).filter((e) => !(0, T.default)(e, r)),
+  );
+}
+var T, E, D, O, k, A, j, M, N, P, F, I, L, R, z, B, V, H, U;
+function W() {
+  return (W = e(() => {
+    ((T = t(a(), 1)),
+      n(),
+      ae(),
+      f(),
+      u(),
+      r(),
+      v(),
+      le(),
+      y(),
+      me(),
+      (E = o(l, (e) => null)),
+      (D = o(l, (e) => ``)),
+      (O = o(l, (e) => !1)),
+      (k = o(l, (e) => 0)),
+      (A = o(l, (e) => [], { isEqual: T.default })),
+      (j = o(l, (e) => [], { isEqual: T.default })),
+      (M = c(l, (e, { get: t }) => t(oe, { request: e, source: `pull_requests_page` }))),
+      (N = c(l, (e, { get: t }) => {
+        if (`comparison` in e) return t(pe, e);
+        let n = t(M, e).data?.headRevision ?? null,
+          r = t(ce, { headRevision: n, request: e }),
+          i = t(te, ee(e, `diff`));
+        return n != null && i.source === `loading` ? { ...r, isLoading: !0 } : r;
+      })),
+      (P = c(l, (e, { get: t }) => {
+        let n = t(N, e);
+        return n.data?.status === `success` ? ie(n.data.unifiedDiff) : void 0;
+      })),
+      (F = c(
+        l,
+        (e, { get: t }) =>
+          (t(P, e) ?? []).map((e) => {
+            let t = i(e.metadata.name);
+            return { changeKind: re(e.metadata.type), displayPath: t, path: t };
+          }),
+        { isEqual: T.default },
+      )),
+      (I = c(
+        l,
+        (e, { get: t }) => {
+          let n = t(D, e).trim().toLowerCase(),
+            r = t(F, e);
+          return n.length === 0 ? r : r.filter((e) => e.displayPath.toLowerCase().includes(n));
+        },
+        { isEqual: T.default },
+      )),
+      (L = c(l, (e, { get: t }) => {
+        let n = t(E, e),
+          r = t(I, e);
+        return r.find((e) => e.path === n)?.path ?? r[0]?.path ?? null;
+      })),
+      (R = c(l, (e, { get: t }) => {
+        let n = t(M, e).data;
+        if (n == null) return;
+        let r = new Map();
+        for (let e of n.activityItems)
+          e.type === `review_comment` && e.reviewThreadId != null && r.set(e.reviewThreadId, e);
+        return r;
+      })),
+      (z = c(l, ({ request: e, threadId: t }, { get: n }) =>
+        t == null ? void 0 : n(R, e)?.get(t),
+      )),
+      (B = c(
+        l,
+        ({ path: e, request: t }, { get: n }) => {
+          if (`comparison` in t) return;
+          let r = i(e),
+            a = n(M, t).data;
+          if (a == null) return;
+          let o = n(R, t),
+            s = a.commentAttachments
+              .filter((e) => i(e.position.path) === r)
+              .map((e) => {
+                let t = e.reviewThreadId == null ? void 0 : o?.get(e.reviewThreadId);
+                return t == null ? e : { ...e, createdAt: t.createdAt, replies: t.replies };
+              }),
+            c = new Set(s.flatMap((e) => (e.reviewThreadId == null ? [] : [e.reviewThreadId]))),
+            l = a.activityItems.flatMap((e) => {
+              if (
+                e.type !== `review_comment` ||
+                e.reviewThreadId == null ||
+                c.has(e.reviewThreadId) ||
+                e.path == null ||
+                i(e.path) !== r ||
+                e.line == null ||
+                e.side == null
+              )
+                return [];
+              let t = [e, ...(e.replies ?? [])];
+              return [
+                {
+                  authorAvatarUrl: e.authorAvatarUrl,
+                  authorLogin: e.authorLogin,
+                  createdAt: e.createdAt,
+                  content: [
+                    {
+                      content_type: `text`,
+                      text: t.map((e) =>
+                        e.authorLogin == null ? e.body : `@${e.authorLogin}:\n${e.body}`,
+                      ).join(`
+
+`),
+                    },
+                  ],
+                  isResolved: e.isResolved,
+                  position: {
+                    line: e.line,
+                    path: e.path,
+                    side: e.side,
+                    start_line: e.startLine ?? void 0,
+                    start_side: e.startSide ?? void 0,
+                  },
+                  replies: e.replies,
+                  reviewThreadId: e.reviewThreadId,
+                  type: `comment`,
+                  url: e.url,
+                  viewerCanResolve: e.viewerCanResolve,
+                  viewerCanUnresolve: e.viewerCanUnresolve,
+                },
+              ];
+            });
+          return [...s, ...l];
+        },
+        { isEqual: T.default },
+      )),
+      (V = c(
+        l,
+        (e, { get: t }) =>
+          new Map(t(F, e).map((n) => [n.path, (t(B, { path: n.path, request: e }) ?? []).length])),
+        { isEqual: T.default },
+      )),
+      (H = c(
+        l,
+        ({ path: e, request: t }, { get: n }) =>
+          new Set(
+            n(j, { path: i(e), request: t }).flatMap((e) =>
+              n(_, { request: t, submissionKey: e }).isPending ? [e.commentKey] : [],
+            ),
+          ),
+        { isEqual: T.default },
+      )),
+      (U = c(
+        l,
+        ({ path: e, request: t }, { get: n }) =>
+          n(j, { path: i(e), request: t }).flatMap((e) => {
+            let r = n(_, { request: t, submissionKey: e }).error;
+            return r == null ? [] : [{ error: r, submissionKey: e }];
+          }),
+        { isEqual: T.default },
+      )));
+  }))();
+}
+function be(e, t, n) {
+  let r = e.get(Q),
+    i = r == null ? null : J(e, r);
+  i != null && h(i, null);
+  let a = { position: n, request: t };
+  (e.set(Q, a),
+    x(e, t, ``),
+    b(e, t, n.path),
+    requestAnimationFrame(() => {
+      G(e, a, X);
+    }));
+}
+function G(e, t, n) {
+  if (e.get(Q) === t) {
+    if (!K(e, t)) {
+      q(e, t, n);
+      return;
+    }
+    requestAnimationFrame(() => {
+      e.get(Q) === t && (K(e, t) || q(e, t, n));
+    });
+  }
+}
+function K(e, t) {
+  let n = J(e, t);
+  if (n == null) return !1;
+  n.querySelector(d.reviewFileToggleCollapsed)?.click();
+  let { position: r } = t,
+    i = de(n, r.line, r.side === `left` ? `deletions` : `additions`),
+    a = n.closest(`[data-pull-request-code-scroll]`);
+  return i == null || a == null
+    ? (n.scrollIntoView({ behavior: `auto`, block: `start` }), !1)
+    : (a.scrollTo({ behavior: `auto`, top: Math.max(0, i.top - (a.clientHeight - i.height) / 2) }),
+      h(n, { start: r.line, end: r.line, side: r.side === `left` ? `deletions` : `additions` }),
+      !0);
+}
+function q(e, t, n) {
+  if (n <= 1) {
+    e.set(Q, null);
+    return;
+  }
+  window.setTimeout(() => {
+    G(e, t, n - 1);
+  }, Z);
+}
+function J(e, { position: t, request: n }) {
+  let r = i(t.path),
+    a = e
+      .get(P, n)
+      ?.find((e) => i(e.metadata.name) === r || (t.side === `left` && i(e.oldPath) === r)),
+    o = a == null ? r : i(a.metadata.name);
+  return (b(e, n, o), document.getElementById(Y(e, n, o)));
+}
+function Y(e, t, n) {
+  return `pull-request-file-${encodeURIComponent(JSON.stringify([e.value.pathname, m(t.account), p(t.pullRequest), ...(`comparison` in t ? [t.comparison.baseRevision, t.comparison.headRevision] : []), n]))}`;
+}
+var X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    (n(), ne(), ue(), u(), r(), se(), W(), (X = 200), (Z = 50), (Q = s(l, null)));
+  }))();
+}
+export {
+  _e as C,
+  he as S,
+  I as _,
+  V as a,
+  b,
+  D as c,
+  B as d,
+  L as f,
+  H as g,
+  U as h,
+  W as i,
+  O as l,
+  k as m,
+  $ as n,
+  N as o,
+  z as p,
+  be as r,
+  A as s,
+  Y as t,
+  P as u,
+  ve as v,
+  x,
+  ge as y,
+};

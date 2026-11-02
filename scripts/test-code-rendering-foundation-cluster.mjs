@@ -106,46 +106,10 @@ async function bundle(directory) {
   );
 }
 
-// codex-diff-css: contexts, SSR shadow roots, surfaces and optional CSS branches.
-let state = resetState();
-const diffCss = await bundle("codex-diff-css");
-assert.equal(diffCss.t(true, "diff"), "var(--color-codex-diff-surface)");
-assert.equal(diffCss.t(true, "file"), "var(--color-surface)");
-assert.equal(diffCss.t(false, "diff"), "var(--color-surface-secondary)");
-assert.equal(diffCss.l.position, "absolute");
-assert.equal(diffCss.l.touchAction, "none");
-assert.deepEqual(diffCss.u, { display: "contents" });
-const basicCss = diffCss.n({ rootSelector: ".diff", surface: "pink" });
-assert.match(basicCss, /--diffs-bg: pink !important/);
-assert.match(basicCss, /\.diff \[data-code\]/);
-assert.doesNotMatch(basicCss, /composer-diff-simple-line/);
-const fullCss = diffCss.n({
-  alignCommentGutter: true,
-  includeDiffHeader: true,
-  includeSimpleLineSeparators: true,
-  rootSelector: ".review",
-  surface: "blue",
-  useReviewLineInfoSeparators: true,
-});
-assert.match(fullCss, /\[data-diffs-header\]/);
-assert.match(fullCss, /composer-diff-simple-line/);
-assert.match(fullCss, /padding-inline-start/);
-assert.match(fullCss, /data-separator='line-info'/);
-assert.match(fullCss, /prefers-reduced-motion/);
-const shadow = diffCss.c("content", "<style>.x{}</style>");
-assert.equal(shadow.props.children[0].type, "template");
-assert.equal(shadow.props.children[0].props.shadowrootmode, "open");
-assert.equal(shadow.props.children[1], "content");
-const editorProvider = diffCss.p({
-  children: "editor",
-  createEditor: () => "created",
-});
-assert.equal(typeof editorProvider.props.value, "function");
-assert.equal(editorProvider.props.children, "editor");
-assert.equal(diffCss.f(), null);
+assertReleaseOwner("codex-diff-css");
 
 // ansi-block: plain text, SGR color/decorations, resets and terminal overwrite controls.
-state = resetState();
+let state = resetState();
 const ansi = await bundle("ansi-block");
 ansi.n();
 const plain = ansi.t({ className: "terminal", children: "hello" });

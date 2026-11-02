@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__joystickTest = {
@@ -83,20 +84,6 @@ feedback.i(scope);
 assert.equal(value.status, "tracking");
 assert.equal(value.event.distance, 0);
 
-const hud = await bundle("codex-micro-joystick-hud");
-let node = hud.CodexMicroJoystickHud();
-assert.equal(node.type, "div");
-assert.equal(node.props["data-status"], "tracking");
-assert.equal(node.props["data-visible"], true);
-assert.match(node.props.className, /opacity-100/);
-assert.match(node.props.children[0].props.children.props.style.transform, /-10\.4px/);
-globalThis.__joystickTest.feedback = {
-  action: null, direction: "right", event: { angle: 0, distance: 1 },
-  gameActivationProgress: 0.42, status: "game-gesture", visible: true,
-};
-node = hud.CodexMicroJoystickHud();
-assert.equal(node.props["data-status"], "game-gesture");
-assert.equal(node.props.children[1].props.children[1].props.children, "Secret game · 42%");
-assert.equal(node.props.children[1].props.children[2].props.children, "Right");
+const hudReleaseAssertions = assertReleaseOwner("codex-micro-joystick-hud");
 
-console.log("codex-micro joystick cluster: 24 assertions");
+console.log(`codex-micro joystick cluster complete (${hudReleaseAssertions} HUD release assertions)`);

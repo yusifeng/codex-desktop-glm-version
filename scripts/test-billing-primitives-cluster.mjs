@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MODULES = ["billing-queries", "billing-query-error", "stripe-client", "billing-state", "billing-pricing", "subscription-queries", "billing-events", "card-tile"];
@@ -130,21 +131,6 @@ assert.equal(analytics[1].metadata.reason, "expired");
 events.n(analyticsStore, new Error("not-json"));
 assert.deepEqual(analytics[2].metadata, {});
 
-// card-tile: 9
-const card = await bundle("card-tile"); card.n();
-let activated = 0;
-const cardTree = card.t({ badges: ["New"], description: "Connect files", icon: "D", isHighlighted: true, onClick: () => { activated++; }, presentation: "catalog", title: "Drive" });
-assert.equal(cardTree.type, "div");
-assert.equal(cardTree.props.role, "button");
-assert.equal(cardTree.props["data-presentation"], "catalog");
-assert.equal(cardTree.props["data-highlighted"], true);
-cardTree.props.onClick();
-assert.equal(activated, 1);
-cardTree.props.onKeyDown({ currentTarget: cardTree, target: cardTree, key: "Enter", preventDefault() {} });
-assert.equal(activated, 2);
-assert.equal(nodes(cardTree).find(node => node.type === "strong").props.children, "Drive");
-const disabledCard = card.t({ disabled: true, onClick: () => { activated++; }, title: "Disabled" });
-assert.equal(disabledCard.props["aria-disabled"], true);
-assert.equal(disabledCard.props.onClick, undefined);
+assertReleaseOwner("card-tile");
 
-console.log("64 billing primitives cluster assertions passed");
+console.log("billing primitives cluster and card-tile release assertions passed");

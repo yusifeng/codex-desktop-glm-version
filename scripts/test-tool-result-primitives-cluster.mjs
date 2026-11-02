@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MODULES = [
@@ -276,79 +277,7 @@ assert.equal(diffTooltip.props.children, "main.ts");
 assert.equal(diffTooltip.props.delayDuration, 800);
 assert.equal(typeof diffTooltip.props.onPointerEnter, "function");
 
-// exec-shell-container: 17
-const shell = await bundle("exec-shell-container");
-shell.n();
-const shellTree = shell.t({
-  command: "/bin/zsh -lc 'npm test'",
-  cwd: "/repo",
-  output: "passed",
-  surface: "plain",
-});
-assert.equal(shellTree.type, "div");
-assert.equal(shellTree.props["data-surface"], "plain");
-const shellOutputNode = nodes(shellTree).find(
-  (node) => typeof node.type === "function",
-);
-assert.equal(shellOutputNode.props.cwd, "/repo");
-assert.equal(shellOutputNode.props.embeddedAppearance, "plain");
-const shellOutput = shellOutputNode.type(shellOutputNode.props);
-assert.equal(
-  nodes(shellOutput).find((node) => node.props?.["aria-label"] === "$ npm test")
-    ?.props.role,
-  "button",
-);
-assert.equal(
-  nodes(shellOutput).find(
-    (node) =>
-      typeof node.type === "function" && node.props?.children === "passed",
-  )?.props.children,
-  "passed",
-);
-assert.equal(textNode(shellOutput, "Z shell"), undefined);
-assert.equal(
-  nodes(
-    nodes(shell.t({ command: "true", output: "" }))
-      .find((node) => typeof node.type === "function")
-      .type({ command: "true", output: "", variant: "embedded" }),
-  ).find(
-    (node) =>
-      typeof node.type === "function" && node.props?.children === "No output",
-  ).props.children,
-  "No output",
-);
-assert.equal(
-  nodes(
-    nodes(shell.t({ command: "true", output: "", isInProgress: true }))
-      .find((node) => typeof node.type === "function")
-      .type({
-        command: "true",
-        output: "",
-        isInProgress: true,
-        variant: "embedded",
-      }),
-  ).find(
-    (node) => typeof node.type === "function" && node.props?.children === "",
-  ).props.children,
-  "",
-);
-assert.equal(shell.r({ className: "expand" }).props.className, "expand");
-assert.equal(
-  shell.t.Footer({ isInProgress: true }).props["aria-label"],
-  "Command running",
-);
-assert.equal(
-  shell.t.Footer({ wasInterrupted: true }).props.children.props.children,
-  "Stopped",
-);
-assert.equal(
-  shell.t.Footer({ isSuccess: true }).props.children.props.children,
-  "Success",
-);
-assert.equal(
-  shell.t.Footer({ exitCode: 2 }).props.children.props.children,
-  "Exit code 2",
-);
+assertReleaseOwner("exec-shell-container");
 
 // open-in-button: the shared cluster checks the host guard; native-open behavior
 // has a dedicated bridge test because the production component is hook driven.

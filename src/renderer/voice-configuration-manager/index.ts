@@ -1,28 +1,359 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/chatgpt-user-context";
-import "@rchunk/voice-preferences";
-export type VoiceMode = "wingman" | "advanced" | "standard";
-export interface VoicePolicyConfig { rollout_policy?: "unavailable" | "available_opt_in" | "available_default"; rollout_version?: number; unavailable_upsell_policy?: string; wingman_model_name?: string; wingman_model_picker_default_display_name?: string; wingman_model_picker_alternative_options?: Array<{ display_name?: string; slug: string }>; incall_voice_model_picker_available?: boolean }
-export interface VoiceScope { policy?: VoicePolicyConfig; selectedVoiceMode?: VoiceMode; selectedPolicyVersion?: number; authenticated?: boolean; potatoHint?: boolean; unsupportedContext?: boolean }
-class VoiceConfigurationManager {
-  readPolicyConfig(scope: VoiceScope): VoicePolicyConfig { return scope.policy ?? {}; }
-  shouldShowWingmanComingSoon(scope: VoiceScope, sessionType: string): boolean { const policy = this.readPolicyConfig(scope); return sessionType === "vp" && policy.rollout_policy === "unavailable" && policy.unavailable_upsell_policy === "coming_soon"; }
-  wingmanModelName(scope: VoiceScope): string { return this.readPolicyConfig(scope).wingman_model_name || "GPT Live 1"; }
-  wingmanDisplayName(scope: VoiceScope, slug?: string | null): string { const policy = this.readPolicyConfig(scope); return !slug ? policy.wingman_model_picker_default_display_name || "Live" : policy.wingman_model_picker_alternative_options?.find(option => option.slug === slug)?.display_name || slug; }
-  policyVersion(scope: VoiceScope): number | undefined { const value = this.readPolicyConfig(scope).rollout_version; return typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : undefined; }
-  isInCallVoiceModelPickerAvailable(scope: VoiceScope): boolean { return Boolean(this.readPolicyConfig(scope).incall_voice_model_picker_available); }
-  policyResolvedVoice(scope: VoiceScope): VoiceMode | undefined { const policy = this.readPolicyConfig(scope); const selected = scope.selectedVoiceMode; if (!scope.authenticated && policy.rollout_policy === "available_default" && !scope.unsupportedContext) return "wingman"; if (policy.rollout_policy === "unavailable") return selected === "wingman" ? "advanced" : scope.potatoHint && selected === "standard" ? "advanced" : selected; if (policy.rollout_policy === "available_default" && selected !== "standard" && !(scope.selectedPolicyVersion != null && policy.rollout_version != null && scope.selectedPolicyVersion >= policy.rollout_version)) return "wingman"; return selected === "wingman" && policy.rollout_policy == null ? "advanced" : selected; }
-  isWmOptionAvailable(scope: VoiceScope): boolean { const rollout = this.readPolicyConfig(scope).rollout_policy; return rollout === "available_opt_in" || rollout === "available_default"; }
-  getBaseVoiceOptions(scope: VoiceScope): Array<{ modelSlug: string; voiceModel: VoiceMode }> { return (this.isWmOptionAvailable(scope) ? ["wingman", "advanced", "standard"] : ["advanced", "standard"]).map(voiceModel => ({ modelSlug: "", voiceModel: voiceModel as VoiceMode })); }
-  sessionType(mode?: string): "no-microphone" | "vp" { return mode === "no-microphone" ? "no-microphone" : "vp"; }
-  speakingListeningTrigger(mode?: string): "energy" | "server" { return this.sessionType(mode) === "vp" ? "server" : "energy"; }
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  E4 as t,
+  FX as n,
+  H4 as r,
+  QI as i,
+  V4 as a,
+  ZI as o,
+  g4 as ee,
+  k4 as s,
+  lZ as te,
+  pZ as c,
+  q4 as l,
+  sZ as u,
+  x4 as d,
+} from "@rchunk/app-shared";
+import {
+  $gn as f,
+  QHt as p,
+  Qgn as ne,
+  Sqt as re,
+  Sun as ie,
+  VVt as m,
+  YHt as h,
+  _Vt as g,
+  _un as _,
+  bln as v,
+  bqt as y,
+  cjt as b,
+  ffn as x,
+  fpn as ae,
+  gVt as oe,
+  gfn as S,
+  iUt as se,
+  lpn as C,
+  m0t as ce,
+  nH as w,
+  p0t as le,
+  pfn as T,
+  rH as ue,
+  uHt as de,
+  ujt as E,
+  vln as D,
+} from "@rchunk/app-initial";
+import { n as O, t as k } from "@rchunk/chatgpt-user-context";
+import { c as A, o as j } from "@rchunk/voice-preferences";
+var M, N, P;
+function F() {
+  return (F = e(() => {
+    (n(),
+      i(),
+      (M = c(o, !1)),
+      (N = c(o, !1)),
+      (P = {
+        setTomatoHint: (e, t) => e.set(M, t),
+        getTomatoHint: (e) => e.get(M),
+        setPotatoHint: (e, t) => e.set(N, t),
+        getPotatoHint: (e) => e.get(N),
+      }));
+  }))();
 }
-function isWingmanMode(value: string): boolean { return value === "wm"; }
-function initializeVoiceHints(): void {}
-function initializeVoiceConfigurationManager(): void {}
-const voiceConfigurationManager = new VoiceConfigurationManager();
-function isWingmanActive(scope: VoiceScope): boolean { return !scope.unsupportedContext && voiceConfigurationManager.policyResolvedVoice(scope) === "wingman"; }
-function resolveVoiceContextId(pathname: string): string | undefined { const gizmo = pathname.match(/^\/g\/([^/]+)/)?.[1]; if (gizmo != null) { const decoded = decodeURIComponent(gizmo); const [prefix, kind, rest] = decoded.split("-"); return prefix !== "g" || !kind ? decoded : kind === "p" ? `g-p-${rest}` : `g-${kind}`; } return pathname.match(/^\/c\/([^/]+)/)?.[1]; }
-export { initializeVoiceHints as a, voiceConfigurationManager as i, initializeVoiceConfigurationManager as n, isWingmanMode as o, isWingmanActive as r, resolveVoiceContextId as t };
+function I(e) {
+  return e === `wm`;
+}
+function L() {
+  return (L = e(() => {}))();
+}
+function R(e) {
+  let t = e.get(C)?.pathname;
+  return t != null && f(`/scheduled`, t) != null;
+}
+function z(e) {
+  let t = e.get(y).data?.voiceMode;
+  return J.find((e) => e === t);
+}
+function B(e) {
+  let t = e.get(C)?.pathname;
+  if (t == null) return;
+  let n = f(`/g/:gizmoId/*`, t)?.params.gizmoId;
+  if (n != null) {
+    let [e, t, r] = decodeURIComponent(n).split(`-`);
+    return e !== `g` || !t ? n : t === `p` ? `g-p-${r}` : `g-${t}`;
+  }
+  let r = v(t)?.params.conversationId;
+  return r == null ? void 0 : (e.get(m, decodeURIComponent(r)) ?? void 0);
+}
+function V(e) {
+  return B(e) != null;
+}
+function H(e, t) {
+  if (t == null || !se(t)) return !1;
+  let n = e.get(b, t).data;
+  return n != null && n.gizmo.gizmo_snorlax_type == null && !p(n);
+}
+var U, W, G, K, q, J, Y, X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    (n(),
+      ne(),
+      ee(),
+      ie(),
+      E(),
+      h(),
+      de(),
+      O(),
+      re(),
+      D(),
+      ae(),
+      i(),
+      le(),
+      T(),
+      ue(),
+      j(),
+      oe(),
+      F(),
+      (U = `2688454279`),
+      (W = `2438435464`),
+      (G = `no_auth_bidi_enabled`),
+      (K = `no_auth_bidi_composer_enabled`),
+      (q = r({
+        rollout_policy: d([`unavailable`, `available_opt_in`, `available_default`])
+          .optional()
+          .catch(void 0),
+        rollout_version: a()
+          .optional()
+          .catch(void 0),
+        home_takeover_enabled: s()
+          .optional()
+          .catch(void 0),
+        home_takeover_animation_enabled: s()
+          .optional()
+          .catch(void 0),
+        voice_model_picker_available: s()
+          .optional()
+          .catch(void 0),
+        incall_voice_model_picker_available: s()
+          .optional()
+          .catch(void 0),
+        incall_banner_enabled: s()
+          .optional()
+          .catch(void 0),
+        unavailable_upsell_policy: l()
+          .optional()
+          .catch(void 0),
+        wingman_model_name: l()
+          .optional()
+          .catch(void 0),
+        wingman_model_picker_default_display_name: l()
+          .optional()
+          .catch(void 0),
+        wingman_model_picker_alternative_options: t(r({ display_name: l().optional(), slug: l() }))
+          .optional()
+          .catch(void 0),
+        projects_enabled: s()
+          .optional()
+          .catch(void 0),
+      })),
+      (J = [`wingman`, `advanced`, `standard`]),
+      (Y = te(o, (e, { scope: t }) => t)),
+      (X = class {
+        readPolicyConfig(e) {
+          let t = q.safeParse(e.get(ce, U)?.value ?? {});
+          return t.success ? t.data : {};
+        }
+        shouldShowWingmanComingSoon(e, t) {
+          if (t !== `vp`) return !1;
+          let n = this.readPolicyConfig(e);
+          return (
+            n.rollout_policy === `unavailable` && n.unavailable_upsell_policy === `coming_soon`
+          );
+        }
+        wingmanModelName(e) {
+          return this.readPolicyConfig(e).wingman_model_name || `GPT Live 1`;
+        }
+        wingmanDisplayName(e, t) {
+          let n = this.readPolicyConfig(e);
+          return t == null || t.length === 0
+            ? n.wingman_model_picker_default_display_name || `Live`
+            : n.wingman_model_picker_alternative_options?.find(({ slug: e }) => e === t)
+                ?.display_name || t;
+        }
+        policyVersion(e) {
+          let t = this.readPolicyConfig(e).rollout_version;
+          return typeof t == `number` && Number.isInteger(t) && t >= 0 ? t : void 0;
+        }
+        isInCallVoiceModelPickerAvailable(e) {
+          return !!this.readPolicyConfig(e).incall_voice_model_picker_available;
+        }
+        normalizeFeatherTransportOnlyVoiceMode(e, t) {
+          return P.getPotatoHint(e) && t === `standard` ? `advanced` : t;
+        }
+        legacyResolvedVoice$(e) {
+          return (e.get(k).data?.disabled_tools?.includes(`advanced_voice`) ?? !1)
+            ? `standard`
+            : `advanced`;
+        }
+        legacyResolvedVoice(e) {
+          return this.legacyResolvedVoice$(e.get(Y, void 0));
+        }
+        policyResolvedVoice$(e, { disableNoAuthBidiExposureLog: t } = {}) {
+          let n = this.readPolicyConfig(e),
+            r = n.rollout_policy;
+          if (e.get(_) == null) {
+            let n = t ?? !0;
+            return !this.isWingmanUnsupportedContext(e) &&
+              r === `available_default` &&
+              e.get(S)?.getLayer(W, { disableExposureLog: n }).get(G, !1)
+              ? `wingman`
+              : void 0;
+          }
+          let i = z(e),
+            a = e.get(y).data?.voiceModePolicyVersion,
+            o = n.rollout_version;
+          return r === `unavailable`
+            ? i === `wingman`
+              ? `advanced`
+              : this.normalizeFeatherTransportOnlyVoiceMode(e, i)
+            : r === `available_opt_in`
+              ? this.normalizeFeatherTransportOnlyVoiceMode(e, i)
+              : r === `available_default`
+                ? i === `standard` || (a != null && typeof o == `number` && a >= o)
+                  ? this.normalizeFeatherTransportOnlyVoiceMode(e, i)
+                  : `wingman`
+                : this.normalizeFeatherTransportOnlyVoiceMode(e, i === `wingman` ? `advanced` : i);
+        }
+        policyResolvedVoice(e, t = {}) {
+          return this.policyResolvedVoice$(e.get(Y, void 0), t);
+        }
+        isWmOptionAvailable(e) {
+          let t = this.readPolicyConfig(e).rollout_policy;
+          return t === `available_opt_in` || t === `available_default`;
+        }
+        isNoAuthBidiEnabled(e, { disableNoAuthBidiExposureLog: t = !1 } = {}) {
+          return (
+            e.get(_) == null &&
+            this.policyResolvedVoice(e, { disableNoAuthBidiExposureLog: t }) === `wingman`
+          );
+        }
+        exposeNoAuthBidiExperiment(e) {
+          e.get(S)?.getLayer(W).get(G, !1);
+        }
+        isNoAuthBidiComposerEnabled(e, { disableNoAuthBidiExposureLog: t = !1 } = {}) {
+          return (
+            this.isNoAuthBidiEnabled(e, { disableNoAuthBidiExposureLog: t }) &&
+            !!e.get(S)?.getLayer(W, { disableExposureLog: t }).get(K, !1)
+          );
+        }
+        getWingmanAlternativeOptions(e) {
+          return this.readPolicyConfig(e).wingman_model_picker_alternative_options ?? [];
+        }
+        getBaseVoiceOptions(e) {
+          return this.isWmOptionAvailable(e)
+            ? J.map((e) => ({ modelSlug: ``, voiceModel: e }))
+            : [
+                { modelSlug: ``, voiceModel: `advanced` },
+                { modelSlug: ``, voiceModel: `standard` },
+              ];
+        }
+        getVoiceExtraOptions(e) {
+          return this.isWmOptionAvailable(e)
+            ? this.getWingmanAlternativeOptions(e).map(({ slug: e }) => ({
+                modelSlug: e,
+                voiceModel: `wingman`,
+              }))
+            : [];
+        }
+        getVoiceOptions(e) {
+          return [...this.getBaseVoiceOptions(e), ...this.getVoiceExtraOptions(e)];
+        }
+        resolveVoiceOption$(e, t) {
+          let n = e.get(A),
+            r = this.getVoiceOptions(e);
+          return (
+            r.find((e) => e.voiceModel === t && e.modelSlug === n) ??
+            r.find((e) => e.voiceModel === t && e.modelSlug.length === 0) ?? {
+              modelSlug: ``,
+              voiceModel: t,
+            }
+          );
+        }
+        setLocalModelSlug(e, t) {
+          e.set(A, t);
+        }
+        tcLoggingEnabled(e) {
+          return P.getTomatoHint(e);
+        }
+        voicePath(e, t, n) {
+          let r = `/realtime`;
+          return this.sessionType(e, n) === `wm`
+            ? `${r}/wm`
+            : `${r}/vp${t === `standard` ? `s` : ``}`;
+        }
+        isWingmanUnsupportedContext(e, t) {
+          return ((t != null || V(e)) && !this.isBidiProjectContextEnabled(e, t)) || R(e);
+        }
+        isBidiProjectContextEnabled(e, t) {
+          return (
+            (t == null ? H(e, B(e)) : H(e, t)) && this.readPolicyConfig(e).projects_enabled === !0
+          );
+        }
+        sessionType(e, t) {
+          return this.sessionType$(e.get(Y, void 0), t);
+        }
+        sessionType$(e, t) {
+          if (this.isWingmanUnsupportedContext(e, t)) return `vp`;
+          let n = x(e, `2860872286`),
+            r = P.getPotatoHint(e);
+          if (n || r) return `wm`;
+          let i = this.policyResolvedVoice$(e);
+          return i === `standard` || i === `advanced` ? `vp` : i === `wingman` ? `wm` : `vp`;
+        }
+        isStandardVoiceSelected(e) {
+          return this.isStandardVoiceSelected$(e.get(Y, void 0));
+        }
+        isStandardVoiceSelected$(e) {
+          let t = this.policyResolvedVoice$(e);
+          return t
+            ? t === `standard`
+            : this.normalizeFeatherTransportOnlyVoiceMode(e, this.legacyResolvedVoice$(e)) ===
+                `standard`;
+        }
+        shouldDisableProjectMove(e) {
+          return e.get(Y, void 0).get(g) && I(this.sessionType(e));
+        }
+        normalizeVoiceModeForUnsupportedContext(e, t, n = !1) {
+          return (n || this.isWingmanUnsupportedContext(e)) && t === `wingman` ? `advanced` : t;
+        }
+        requestedVoiceMode(e, t, n) {
+          let r,
+            i = n != null && !this.isBidiProjectContextEnabled(e, n),
+            a = this.policyResolvedVoice(e);
+          return (
+            a && (r = a),
+            (r = r ?? t ?? (this.isStandardVoiceSelected(e) ? `standard` : `advanced`)),
+            (r = this.normalizeFeatherTransportOnlyVoiceMode(e, r)),
+            this.normalizeVoiceModeForUnsupportedContext(e, r, i)
+          );
+        }
+        reportedVoiceMode(
+          e,
+          { voiceMode: t, sessionType: n = this.sessionType(e), reason: r, voiceBackend: i },
+        ) {
+          return r === w.IgnoredMicrophonePrompt || r === w.DeniedMicrophonePrompt
+            ? `no-microphone`
+            : J.find((e) => e === i) || (I(n) ? `wingman` : (t ?? `(unknown)`));
+        }
+        speakingListeningTrigger(e) {
+          return this.sessionType(e) === `vp` ? `server` : `energy`;
+        }
+      }),
+      (Z = u(o, ({ scope: e }) => {
+        let t = Q.policyResolvedVoice$(e);
+        return !Q.isWingmanUnsupportedContext(e) && t === `wingman`;
+      })),
+      (Q = new X()));
+  }))();
+}
+export { L as a, Q as i, $ as n, I as o, Z as r, B as t };

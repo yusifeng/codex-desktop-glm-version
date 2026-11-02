@@ -1,105 +1,389 @@
-// Blocking ChatGPT ads-consent boundary. Release chunk: consent-1e345bc20d6a.js.
-import "@rchunk/rolldown-runtime";
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-import * as controlDialogChunk from "@rchunk/ad-control-dialog-runtime";
-import * as adsControlsStateChunk from "@rchunk/ads-controls-state";
-
-type ConsentSelection = "personalized" | "non_personalized";
-type ConsentState = { status: "loading" | "inactive" } | { status: "required"; accountId: string; variant: string; isTwoStep: boolean };
-interface Scope { get(signal: unknown): unknown; set(signal: unknown, value: unknown): void }
-interface Getter { (signal: unknown, parameter?: unknown): unknown }
-interface JsxRuntime { Fragment: unknown; jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown; jsxs(type: unknown, props: Record<string, unknown>, key?: string): unknown }
-interface ReactRuntime { useRef<T>(value: T): { current: T }; useState<T>(value: T): [T, (value: T) => void] }
-interface SharedRuntime {
-  $3(): unknown; FX(): void; HX<T>(signal: unknown): T; I3(): JsxRuntime; Ih: unknown; K2(): void; LX(signal: unknown): Scope; Oh: unknown; QI(): void; Rh: unknown; Yh: unknown; ZI: unknown; Zh(): void;
-  dZ(signal: unknown, read: (context: { get: Getter }) => unknown, subscribe: (context: { get: Getter; set(signal: unknown): void }) => void | (() => void)): unknown;
-  e6(): ReactRuntime; fg(): boolean; h4(): void; iL(options: { mutationFn(selection: ConsentSelection): Promise<boolean>; onSuccess(saved: boolean): void }): { mutate(selection: ConsentSelection): void; isPending: boolean; data?: boolean };
-  m4(...classes: Array<string | false | null | undefined>): string; n4(): unknown; rL(): void; sZ(signal: unknown, read: (context: { get: Getter }) => ConsentState): unknown; zh(): void;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  HX as r,
+  I3 as i,
+  Ih as a,
+  K2 as o,
+  LX as s,
+  Oh as c,
+  Ph as l,
+  QI as u,
+  Rh as d,
+  Yh as f,
+  ZI as p,
+  Zh as m,
+  dZ as h,
+  dg as g,
+  e6 as _,
+  fg as ee,
+  h4 as v,
+  iL as te,
+  m4 as y,
+  n4 as ne,
+  rL as b,
+  sZ as x,
+  zh as S,
+} from "@rchunk/app-shared";
+import {
+  $qt as C,
+  Bqt as w,
+  Dqt as T,
+  Oqt as E,
+  Qgn as D,
+  Sqt as O,
+  Sun as k,
+  U6t as A,
+  Xet as j,
+  Zet as M,
+  _un as N,
+  bqt as P,
+  gfn as F,
+  i_n as re,
+  mfn as ie,
+  pfn as ae,
+  vfn as oe,
+  xpn as I,
+  ypn as se,
+  zqt as L,
+} from "@rchunk/app-initial";
+import {
+  a as ce,
+  d as le,
+  i as ue,
+  n as de,
+  o as R,
+  s as z,
+  u as B,
+} from "@rchunk/ad-control-dialog-runtime";
+import { a as V, i as fe } from "@rchunk/ads-controls-state";
+var H;
+function U() {
+  return (U = e(() => {
+    H = `` + new URL(`consent-modal-restaurant-2888e7130740.png`, import.meta.url).href;
+  }))();
 }
-interface InitialRuntime {
-  $qt(): void; Bqt: Record<string, unknown>; Dqt(value: unknown): { enabled: boolean; variant?: string; isTwoStep: boolean }; Oqt(): void; Qgn(): void; Sqt(): void; Sun(): void; U6t: unknown; Xet: unknown; Zet(): void; _un: unknown; bqt: unknown; gfn: unknown; i_n(): { pathname: string }; mfn: unknown; pfn(): void; vfn: unknown; xpn(scope: Scope, signal: unknown, event: Record<string, unknown>): void; ypn(): void; zqt: unknown;
+var W;
+function G() {
+  return (G = e(() => {
+    W = `` + new URL(`consent-modal-villa-8440051c898b.png`, import.meta.url).href;
+  }))();
 }
-interface ControlDialogRuntime { a(): void; d(formatter: unknown, variant: string): unknown; i(): void; n: unknown; o: { scope: string }; s(): void; u: unknown }
-interface AdsControlsStateRuntime { a(scope: Scope, accountId: string, setting: { feature: string; value: boolean }, source: string): Promise<boolean>; i(): void }
-const shared = sharedChunk as unknown as SharedRuntime;
-const initial = initialChunk as unknown as InitialRuntime;
-const controlDialog = controlDialogChunk as unknown as ControlDialogRuntime;
-const adsControlsState = adsControlsStateChunk as unknown as AdsControlsStateRuntime;
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let consentStateSignal: unknown;
-let initialized = false;
-const firstAdImage = new URL("consent-modal-villa-8440051c898b.png", import.meta.url).href;
-const secondAdImage = new URL("consent-modal-restaurant-2888e7130740.png", import.meta.url).href;
-
-function readConsentState(get: Getter): ConsentState {
-  const capability = get(initial.Xet, { name: "chatgpt.ads" }) as { isLoading?: boolean; isCapable?: boolean };
-  const accountId = get(initial.U6t);
-  if (capability.isLoading) return { status: "loading" };
-  if (!capability.isCapable || typeof accountId !== "string") return { status: "inactive" };
-  const settings = get(initial.bqt) as { isLoading?: boolean; data?: { bazaarConsentRequired?: boolean; bazaarPersonalizationUnavailable?: boolean } };
-  const configClient = get(initial.gfn) as { getValues?(): unknown } | null;
-  const config = configClient == null ? null : initial.Dqt(configClient.getValues?.());
-  const bypass = Boolean(get(initial.mfn, "3274900344"));
-  const suppress = Boolean(get(initial.vfn));
-  if (settings.isLoading || config == null || suppress) return { status: "loading" };
-  if (config.variant == null || (!bypass && (!config.enabled || settings.data?.bazaarConsentRequired !== true || settings.data.bazaarPersonalizationUnavailable))) return { status: "inactive" };
-  return { status: "required", accountId, variant: config.variant, isTwoStep: config.isTwoStep };
+function pe(e, t) {
+  let n = e.get(q);
+  n.status === `required` &&
+    n.accountId === t &&
+    I(e, L, {
+      action: w.CHATGPT_ADS_CONSENT_MODAL_ACTION_TYPE_MODAL_SHOWN,
+      consentRequired: !0,
+      selectionPreselected: !1,
+    });
 }
-
-function recordShown(scope: Scope, accountId: string): void {
-  const state = scope.get(consentStateSignal) as ConsentState;
-  if (state.status !== "required" || state.accountId !== accountId) return;
-  initial.xpn(scope, initial.zqt, { action: initial.Bqt.CHATGPT_ADS_CONSENT_MODAL_ACTION_TYPE_MODAL_SHOWN, consentRequired: true, selectionPreselected: false });
+async function me(e, t, n) {
+  let r = e.get(q);
+  if (r.status !== `required` || r.accountId !== t) return !1;
+  let i = n === `personalized`;
+  return (await V(e, t, { feature: `bazaar_personalization_enabled`, value: i }, `consent`))
+    ? (I(e, L, {
+        action: i
+          ? w.CHATGPT_ADS_CONSENT_MODAL_ACTION_TYPE_SAVE_PERSONALIZATION_ENABLED
+          : w.CHATGPT_ADS_CONSENT_MODAL_ACTION_TYPE_SAVE_PERSONALIZATION_DISABLED,
+        consentRequired: !0,
+        personalizationEnabled: i,
+        selectionPreselected: !1,
+      }),
+      !0)
+    : !1;
 }
-
-async function saveConsent(scope: Scope, accountId: string, selection: ConsentSelection): Promise<boolean> {
-  const state = scope.get(consentStateSignal) as ConsentState;
-  if (state.status !== "required" || state.accountId !== accountId) return false;
-  const personalized = selection === "personalized";
-  const saved = await adsControlsState.a(scope, accountId, { feature: "bazaar_personalization_enabled", value: personalized }, "consent");
-  if (saved) initial.xpn(scope, initial.zqt, { action: personalized ? initial.Bqt.CHATGPT_ADS_CONSENT_MODAL_ACTION_TYPE_SAVE_PERSONALIZATION_ENABLED : initial.Bqt.CHATGPT_ADS_CONSENT_MODAL_ACTION_TYPE_SAVE_PERSONALIZATION_DISABLED, consentRequired: true, personalizationEnabled: personalized, selectionPreselected: false });
-  return saved;
+var K, q;
+function J() {
+  return (J = e(() => {
+    (C(),
+      n(),
+      M(),
+      E(),
+      O(),
+      se(),
+      u(),
+      fe(),
+      ae(),
+      (K = h(
+        p,
+        ({ get: e }) => {
+          let t = e(F);
+          return t == null ? null : T(t);
+        },
+        ({ get: e, set: t }) => {
+          let n = e(F);
+          if (n == null) return;
+          let r = () => t(T(n));
+          return (n.on(`values_updated`, r), () => n.off(`values_updated`, r));
+        },
+      )),
+      (q = x(p, ({ get: e }) => {
+        let t = e(j, { name: `chatgpt.ads` }),
+          n = e(A);
+        if (t.isLoading) return { status: `loading` };
+        if (!t.isCapable || n == null) return { status: `inactive` };
+        let r = e(P),
+          i = e(K),
+          a = e(ie, `3274900344`);
+        return r.isLoading || i == null || e(oe)
+          ? { status: `loading` }
+          : i.variant == null ||
+              (!a &&
+                (!i.enabled ||
+                  r.data?.bazaarConsentRequired !== !0 ||
+                  r.data.bazaarPersonalizationUnavailable))
+            ? { status: `inactive` }
+            : { status: `required`, accountId: n, variant: i.variant, isTwoStep: i.isTwoStep };
+      })));
+  }))();
 }
-
-function ConsentModal({ state, onSaved }: { state: Extract<ConsentState, { status: "required" }>; onSaved(): void }): unknown {
-  const scope = shared.LX(shared.ZI);
-  const formatter = shared.n4();
-  const dark = shared.fg();
-  const [selection, setSelection] = React.useState<ConsentSelection | null>(null);
-  const shown = React.useRef(false);
-  const mutation = shared.iL({ mutationFn: (value) => saveConsent(scope, state.accountId, value), onSuccess: (saved) => { if (saved) onSaved(); } });
-  const onOpenAutoFocus = (): void => { if (!shown.current) { shown.current = true; recordShown(scope, state.accountId); } };
-  const onSubmit = (event: { preventDefault(): void }): void => { event.preventDefault(); if (state.isTwoStep && selection != null && !mutation.isPending) mutation.mutate(selection); };
-  const onSave = (value: ConsentSelection): void => { if (!mutation.isPending) mutation.mutate(value); };
-  const content = jsx.jsx(controlDialog.u, { consentModalVariant: state.variant, isTwoStepModal: state.isTwoStep, isSaving: mutation.isPending, selection, onSelectionChange: setSelection, onSave, firstAdImage, secondAdImage, Button: shared.Yh });
-  return jsx.jsx(shared.Ih, { open: true, variant: "chatgpt", size: "compact", showDialogClose: false, shouldIgnoreClickOutside: true, contentClassName: shared.m4(controlDialog.o.scope, dark && "dark"), contentProps: { "aria-describedby": undefined, onEscapeKeyDown: (event: { preventDefault(): void }) => event.preventDefault(), onOpenAutoFocus }, children: jsx.jsxs(shared.Oh, { as: "form", variant: "chatgpt", onSubmit, children: [jsx.jsx(shared.Rh, { className: "sr-only", children: controlDialog.d(formatter, state.variant) }), content, mutation.data === false ? jsx.jsx(controlDialog.n, {}) : null] }) });
+function he(e) {
+  let t = (0, X.c)(6),
+    { children: n } = e,
+    i = r(q),
+    a = r(N),
+    { pathname: o } = re();
+  if (i.status === `inactive`) {
+    let e;
+    return (
+      t[0] === n
+        ? (e = t[1])
+        : ((e = (0, Q.jsx)(Q.Fragment, { children: n })), (t[0] = n), (t[1] = e)),
+      e
+    );
+  }
+  if (i.status === `loading` || o.startsWith(`/settings`)) return null;
+  let s = `${i.accountId}:${a}`,
+    c;
+  return (
+    t[2] !== n || t[3] !== i || t[4] !== s
+      ? ((c = (0, Q.jsx)(Y, { state: i, children: n }, s)),
+        (t[2] = n),
+        (t[3] = i),
+        (t[4] = s),
+        (t[5] = c))
+      : (c = t[5]),
+    c
+  );
 }
-
-function ChatGptAdsConsentBoundary({ children }: { children?: unknown }): unknown {
-  initialize();
-  const state = shared.HX<ConsentState>(consentStateSignal);
-  const userId = shared.HX<string | null>(initial._un);
-  const { pathname } = initial.i_n();
-  if (state.status === "inactive") return jsx.jsx(jsx.Fragment, { children });
-  if (state.status === "loading" || pathname.startsWith("/settings")) return null;
-  if (state.status !== "required") return null;
-  const [saved, setSaved] = React.useState(false);
-  if (saved) return jsx.jsx(jsx.Fragment, { children });
-  return jsx.jsx(ConsentModal, { state, onSaved: () => setSaved(true) }, state.accountId + ":" + userId);
+function Y(e) {
+  let t = (0, X.c)(4),
+    { state: n, children: r } = e,
+    [i, a] = (0, Z.useState)(!1),
+    o;
+  return (
+    t[0] !== r || t[1] !== i || t[2] !== n
+      ? ((o = i
+          ? (0, Q.jsx)(Q.Fragment, { children: r })
+          : (0, Q.jsx)(ge, {
+              accountId: n.accountId,
+              variant: n.variant,
+              isTwoStep: n.isTwoStep,
+              onSaved: () => a(!0),
+            })),
+        (t[0] = r),
+        (t[1] = i),
+        (t[2] = n),
+        (t[3] = o))
+      : (o = t[3]),
+    o
+  );
 }
-
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  initial.$qt(); shared.FX(); initial.Zet(); initial.Oqt(); initial.Sqt(); initial.ypn(); shared.QI(); adsControlsState.i(); initial.pfn(); controlDialog.s(); shared.rL(); shared.h4(); shared.K2(); initial.Qgn(); initial.Sun(); shared.Zh(); shared.zh(); controlDialog.a(); controlDialog.i();
-  const configSignal = shared.dZ(shared.ZI, ({ get }) => { const client = get(initial.gfn) as { getValues?(): unknown } | null; return client == null ? null : initial.Dqt(client.getValues?.()); }, ({ get, set }) => { const client = get(initial.gfn) as { on?(event: string, listener: () => void): void; off?(event: string, listener: () => void): void } | null; if (client == null) return; const update = () => set(configSignal); client.on?.("values_updated", update); return () => client.off?.("values_updated", update); });
-  void configSignal;
-  consentStateSignal = shared.sZ(shared.ZI, ({ get }) => readConsentState(get));
-  React = shared.e6();
-  jsx = shared.I3();
+function ge(e) {
+  let t = (0, X.c)(43),
+    { accountId: n, variant: r, isTwoStep: i, onSaved: o } = e,
+    l = s(p),
+    u = ne(),
+    f = ee(),
+    [m, h] = (0, Z.useState)(null),
+    g = (0, Z.useRef)(!1),
+    _;
+  t[0] !== n || t[1] !== l
+    ? ((_ = (e) => me(l, n, e)), (t[0] = n), (t[1] = l), (t[2] = _))
+    : (_ = t[2]);
+  let v;
+  t[3] === o
+    ? (v = t[4])
+    : ((v = (e) => {
+        e && o();
+      }),
+      (t[3] = o),
+      (t[4] = v));
+  let b;
+  t[5] !== _ || t[6] !== v
+    ? ((b = { mutationFn: _, onSuccess: v }), (t[5] = _), (t[6] = v), (t[7] = b))
+    : (b = t[7]);
+  let { mutate: x, isPending: S, data: C } = te(b),
+    w = f && `dark`,
+    T;
+  t[8] === w ? (T = t[9]) : ((T = y(R.scope, w)), (t[8] = w), (t[9] = T));
+  let E;
+  t[10] !== n || t[11] !== l
+    ? ((E = {
+        "aria-describedby": void 0,
+        onEscapeKeyDown: _e,
+        onOpenAutoFocus: () => {
+          g.current || ((g.current = !0), pe(l, n));
+        },
+      }),
+      (t[10] = n),
+      (t[11] = l),
+      (t[12] = E))
+    : (E = t[12]);
+  let D;
+  t[13] !== S || t[14] !== i || t[15] !== x || t[16] !== m
+    ? ((D = (e) => {
+        (e.preventDefault(), i && m != null && !S && x(m));
+      }),
+      (t[13] = S),
+      (t[14] = i),
+      (t[15] = x),
+      (t[16] = m),
+      (t[17] = D))
+    : (D = t[17]);
+  let O;
+  t[18] !== u || t[19] !== r
+    ? ((O = le(u, r)), (t[18] = u), (t[19] = r), (t[20] = O))
+    : (O = t[20]);
+  let k;
+  t[21] === O
+    ? (k = t[22])
+    : ((k = (0, Q.jsx)(d, { className: `sr-only`, children: O })), (t[21] = O), (t[22] = k));
+  let A;
+  t[23] !== S || t[24] !== x
+    ? ((A = (e) => {
+        S || x(e);
+      }),
+      (t[23] = S),
+      (t[24] = x),
+      (t[25] = A))
+    : (A = t[25]);
+  let j;
+  t[26] !== S || t[27] !== i || t[28] !== m || t[29] !== A || t[30] !== r
+    ? ((j = (0, Q.jsx)(B, {
+        consentModalVariant: r,
+        isTwoStepModal: i,
+        isSaving: S,
+        selection: m,
+        onSelectionChange: h,
+        onSave: A,
+        firstAdImage: W,
+        secondAdImage: H,
+        Button: ve,
+      })),
+      (t[26] = S),
+      (t[27] = i),
+      (t[28] = m),
+      (t[29] = A),
+      (t[30] = r),
+      (t[31] = j))
+    : (j = t[31]);
+  let M;
+  t[32] === C
+    ? (M = t[33])
+    : ((M = C === !1 ? (0, Q.jsx)(de, {}) : null), (t[32] = C), (t[33] = M));
+  let N;
+  t[34] !== j || t[35] !== M || t[36] !== D || t[37] !== k
+    ? ((N = (0, Q.jsxs)(c, { as: `form`, variant: `chatgpt`, onSubmit: D, children: [k, j, M] })),
+      (t[34] = j),
+      (t[35] = M),
+      (t[36] = D),
+      (t[37] = k),
+      (t[38] = N))
+    : (N = t[38]);
+  let P;
+  return (
+    t[39] !== N || t[40] !== T || t[41] !== E
+      ? ((P = (0, Q.jsx)(a, {
+          open: !0,
+          variant: `chatgpt`,
+          size: `compact`,
+          showDialogClose: !1,
+          shouldIgnoreClickOutside: !0,
+          contentClassName: T,
+          contentProps: E,
+          children: N,
+        })),
+        (t[39] = N),
+        (t[40] = T),
+        (t[41] = E),
+        (t[42] = P))
+      : (P = t[42]),
+    P
+  );
 }
-
-initialize();
-export { ChatGptAdsConsentBoundary };
+function _e(e) {
+  return e.preventDefault();
+}
+function ve(e) {
+  let t = (0, X.c)(15),
+    n,
+    r,
+    i,
+    a;
+  if (t[0] !== e) {
+    let { as: o, fullWidth: s, visuallyDisabled: c, className: l, ...u } = e;
+    ((r = s),
+      (a = c),
+      (n = l),
+      (i = u),
+      (t[0] = e),
+      (t[1] = n),
+      (t[2] = r),
+      (t[3] = i),
+      (t[4] = a));
+  } else ((n = t[1]), (r = t[2]), (i = t[3]), (a = t[4]));
+  let o = r && `w-full`,
+    s;
+  t[5] !== n || t[6] !== o ? ((s = y(n, o)), (t[5] = n), (t[6] = o), (t[7] = s)) : (s = t[7]);
+  let c = i.color === `primary` ? `submit` : `button`,
+    l = i.color === `primary` ? void 0 : i.onClick,
+    u = i.size ?? `dialogAction`,
+    d = i.disabled || a,
+    p;
+  return (
+    t[8] !== i || t[9] !== s || t[10] !== c || t[11] !== l || t[12] !== u || t[13] !== d
+      ? ((p = (0, Q.jsx)(f, { ...i, className: s, type: c, onClick: l, size: u, disabled: d })),
+        (t[8] = i),
+        (t[9] = s),
+        (t[10] = c),
+        (t[11] = l),
+        (t[12] = u),
+        (t[13] = d),
+        (t[14] = p))
+      : (p = t[14]),
+    p
+  );
+}
+var X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((X = t()),
+      z(),
+      b(),
+      v(),
+      n(),
+      (Z = _()),
+      o(),
+      D(),
+      k(),
+      m(),
+      S(),
+      l(),
+      u(),
+      g(),
+      U(),
+      G(),
+      J(),
+      ue(),
+      ce(),
+      (Q = i()));
+  }))();
+}
+$();
+export { he as ChatGptAdsConsentBoundary };

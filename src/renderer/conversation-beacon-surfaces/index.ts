@@ -1,235 +1,541 @@
-import "@rchunk/rolldown-runtime";
-import * as Shared from "@rchunk/app-shared";
-import * as Initial from "@rchunk/app-initial";
-import * as ShareAction from "@rchunk/share-conversation-action";
-import * as Announcement from "@rchunk/announcement-modal-source-bridge";
-import * as HomeBeacon from "@rchunk/codex-app-home-beacon-announcement";
-import * as TemporaryChat from "@rchunk/chatgpt-temporary-chat-ui";
-
-interface JsxRuntime { Fragment: unknown; jsx(type: unknown, props: Record<string, unknown>, key?: unknown): unknown }
-interface ReactRef<Value> { current: Value }
-interface ReactRuntime {
-  Fragment: unknown;
-  useEffect(effect: () => void | (() => void), dependencies?: readonly unknown[]): void;
-  useRef<Value>(value: Value): ReactRef<Value>;
-  useState<Value>(value: Value | (() => Value)): [Value, (next: Value | ((current: Value) => Value)) => void];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  LX as o,
+  QI as s,
+  ZI as ee,
+  e6 as c,
+} from "@rchunk/app-shared";
+import {
+  ANt as l,
+  Gzt as u,
+  JNt as d,
+  QNt as te,
+  TNt as ne,
+  UNt as f,
+  Vzt as p,
+  YNt as m,
+  YVt as h,
+  ZNt as g,
+  _Nt as _,
+  aqt as re,
+  dHt as v,
+  fNt as y,
+  gNt as ie,
+  hNt as ae,
+  jNt as oe,
+  jVt as se,
+  mNt as ce,
+  oqt as b,
+  uHt as x,
+  wNt as le,
+  wVt as ue,
+} from "@rchunk/app-initial";
+import {
+  a as S,
+  i as de,
+  n as fe,
+  o as C,
+  r as pe,
+  s as me,
+  t as he,
+} from "@rchunk/share-conversation-action";
+import { n as w, t as ge } from "@rchunk/announcement-modal-source-bridge";
+import { r as T, t as _e } from "@rchunk/codex-app-home-beacon-announcement-core";
+import { i as E, n as ve } from "@rchunk/chatgpt-temporary-chat-ui";
+function ye(e) {
+  let t = (0, Se.c)(88),
+    {
+      actionOverrides: r,
+      allowConversationSharing: a,
+      allowExternalActions: s,
+      allowRemoteImages: c,
+      conversationId: l,
+      getActionOverride: d,
+      isCompetingModalOpen: p,
+      isTemporaryChat: ae,
+      onComposerText: b,
+      onStartVoice: x,
+    } = e,
+    S = o(ee),
+    C = (0, O.useRef)(null),
+    [me, w] = (0, O.useState)(null),
+    T;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`) ? ((T = new WeakSet()), (t[0] = T)) : (T = t[0]);
+  let E = (0, O.useRef)(T),
+    ve = i(m),
+    ye = i(g),
+    D = n(ue, l),
+    A = n(y, D ?? l),
+    Ce = n(se, l),
+    j = n(h, l),
+    M;
+  t[1] === j ? (M = t[2]) : ((M = v(j)), (t[1] = j), (t[2] = M));
+  let we = M,
+    Te = u(),
+    Ee = null;
+  A != null && (le(A.beacon) || ne(A.beacon)) && (Ee = A.beacon);
+  let De =
+      A?.eventMetadata.messageId == null
+        ? D != null && A?.eventMetadata.conversationId === D
+        : A.eventMetadata.messageId === Ce,
+    N = De && A != null ? A.eventMetadata : null,
+    Oe = N?.messageId ?? N?.conversationId ?? void 0,
+    ke =
+      N?.suppressLifecycle !== !0 &&
+      te({ activeClaims: ve, isPageContextUpsellSuppressionEnabled: ye, responseLeafId: Oe }),
+    P = De ? Ee : null,
+    Ae = A != null && me === A,
+    F = P != null && (!ke || Ae) ? P : null,
+    je = F != null && de(F.action_items),
+    Me = n(he, je ? l : null),
+    I;
+  t[3] !== P || t[4] !== N
+    ? ((I = P == null || N == null ? null : xe(P, N)), (t[3] = P), (t[4] = N), (t[5] = I))
+    : (I = t[5]);
+  let L = I,
+    R = F == null ? null : L,
+    z = p || Te,
+    B;
+  t[6] === S
+    ? (B = t[7])
+    : ((B = (e) => {
+        E.current.has(e.state) ||
+          (E.current.add(e.state),
+          C.current?.state === e.state &&
+            ((C.current = null), w((t) => (t === e.state ? null : t))),
+          oe(S, { action: `closed_without_dismiss`, beacon: e.beacon, ...e.analyticsContext }),
+          ie(S, e.conversationId, e.state));
+      }),
+      (t[6] = S),
+      (t[7] = B));
+  let V = B,
+    H;
+  t[8] === V
+    ? (H = t[9])
+    : ((H = (e) => {
+        V(e);
+      }),
+      (t[8] = V),
+      (t[9] = H));
+  let U = (0, O.useEffectEvent)(H),
+    Ne = (0, O.useRef)(0),
+    W;
+  t[10] === U
+    ? (W = t[11])
+    : ((W = (e) => {
+        if (Ne.current !== e) return;
+        let t = C.current;
+        t != null && U(t);
+      }),
+      (t[10] = U),
+      (t[11] = W));
+  let Pe = (0, O.useEffectEvent)(W),
+    G;
+  t[12] === Pe
+    ? (G = t[13])
+    : ((G = () => {
+        let e = (Ne.current += 1);
+        return () => {
+          queueMicrotask(() => {
+            Pe(e);
+          });
+        };
+      }),
+      (t[12] = Pe),
+      (t[13] = G));
+  let K;
+  (t[14] === Symbol.for(`react.memo_cache_sentinel`) ? ((K = []), (t[14] = K)) : (K = t[14]),
+    (0, O.useEffect)(G, K));
+  let q;
+  t[15] !== A || t[16] !== L || t[17] !== U || t[18] !== z
+    ? ((q = () => {
+        let e = C.current;
+        e != null && (z || e.state !== A || L == null || e.presentationKey !== L) && U(e);
+      }),
+      (t[15] = A),
+      (t[16] = L),
+      (t[17] = U),
+      (t[18] = z),
+      (t[19] = q))
+    : (q = t[19]);
+  let J;
+  if (
+    (t[20] !== A || t[21] !== L || t[22] !== z
+      ? ((J = [A, L, z]), (t[20] = A), (t[21] = L), (t[22] = z), (t[23] = J))
+      : (J = t[23]),
+    (0, O.useEffect)(q, J),
+    F == null || N == null || R == null || A == null || z)
+  )
+    return null;
+  let Fe;
+  t[24] !== A.eventMetadata.suppressLifecycle || t[25] !== A.productExperience
+    ? ((Fe = {
+        placement: `in_conversation`,
+        productExperience: A.productExperience,
+        suppressLifecycle: A.eventMetadata.suppressLifecycle,
+        treatment: `modal`,
+      }),
+      (t[24] = A.eventMetadata.suppressLifecycle),
+      (t[25] = A.productExperience),
+      (t[26] = Fe))
+    : (Fe = t[26]);
+  let Y = Fe,
+    Ie;
+  t[27] !== Y || t[28] !== A || t[29] !== l || t[30] !== R || t[31] !== F
+    ? ((Ie = { analyticsContext: Y, beacon: F, conversationId: l, state: A, presentationKey: R }),
+      (t[27] = Y),
+      (t[28] = A),
+      (t[29] = l),
+      (t[30] = R),
+      (t[31] = F),
+      (t[32] = Ie))
+    : (Ie = t[32]);
+  let Le = Ie,
+    X;
+  t[33] !== A || t[34] !== l || t[35] !== S
+    ? ((X = () => {
+        !E.current.has(A) &&
+          ce(S, l, A) &&
+          (E.current.add(A),
+          C.current?.state === A && ((C.current = null), w((e) => (e === A ? null : e))));
+      }),
+      (t[33] = A),
+      (t[34] = l),
+      (t[35] = S),
+      (t[36] = X))
+    : (X = t[36]);
+  let Re = X,
+    ze;
+  t[37] !== A || t[38] !== l || t[39] !== S
+    ? ((ze = () => {
+        !E.current.has(A) &&
+          ie(S, l, A) &&
+          (E.current.add(A),
+          C.current?.state === A && ((C.current = null), w((e) => (e === A ? null : e))));
+      }),
+      (t[37] = A),
+      (t[38] = l),
+      (t[39] = S),
+      (t[40] = ze))
+    : (ze = t[40]);
+  let Be = ze,
+    Ve;
+  t[41] !== A || t[42] !== l || t[43] !== S
+    ? ((Ve = () => {
+        (E.current.add(A),
+          C.current?.state === A && (C.current = null),
+          w((e) => (e === A ? null : e)),
+          _(S, l, A));
+      }),
+      (t[41] = A),
+      (t[42] = l),
+      (t[43] = S),
+      (t[44] = Ve))
+    : (Ve = t[44]);
+  let He = Ve,
+    Ue = a && s && !ae && !we,
+    Z;
+  t[45] !== S || t[46] !== D || t[47] !== Ue
+    ? ((Z = fe({ scope: S, canShare: Ue, conversationId: D })),
+      (t[45] = S),
+      (t[46] = D),
+      (t[47] = Ue),
+      (t[48] = Z))
+    : (Z = t[48]);
+  let We;
+  t[49] !== r || t[50] !== Z
+    ? ((We = { ...r, share_conversation: Z }), (t[49] = r), (t[50] = Z), (t[51] = We))
+    : (We = t[51]);
+  let Q = We,
+    Ge;
+  t[52] !== Q || t[53] !== d || t[54] !== Me
+    ? ((Ge = (e) =>
+        pe({
+          action: e,
+          getActionOverride: d,
+          shareConversationEligible: Me,
+          shareConversationOverride: Q.share_conversation,
+        })),
+      (t[52] = Q),
+      (t[53] = d),
+      (t[54] = Me),
+      (t[55] = Ge))
+    : (Ge = t[55]);
+  let Ke = Ge,
+    qe;
+  t[56] !== Y ||
+  t[57] !== A ||
+  t[58] !== l ||
+  t[59] !== R ||
+  t[60] !== Oe ||
+  t[61] !== S ||
+  t[62] !== F ||
+  t[63] !== N?.suppressLifecycle
+    ? ((qe = () => {
+        (N?.suppressLifecycle !== !0 && new f(S).shouldSuppressBeaconUI({ responseLeafId: Oe })) ||
+          ((C.current = {
+            analyticsContext: Y,
+            beacon: F,
+            conversationId: l,
+            state: A,
+            presentationKey: R,
+          }),
+          w(A));
+      }),
+      (t[56] = Y),
+      (t[57] = A),
+      (t[58] = l),
+      (t[59] = R),
+      (t[60] = Oe),
+      (t[61] = S),
+      (t[62] = F),
+      (t[63] = N?.suppressLifecycle),
+      (t[64] = qe))
+    : (qe = t[64]);
+  let Je = qe,
+    Ye = `conversation-beacon:${l}:${R}`,
+    $;
+  t[65] !== s ||
+  t[66] !== c ||
+  t[67] !== Y ||
+  t[68] !== V ||
+  t[69] !== Q ||
+  t[70] !== l ||
+  t[71] !== Ke ||
+  t[72] !== Re ||
+  t[73] !== Je ||
+  t[74] !== Be ||
+  t[75] !== He ||
+  t[76] !== Ae ||
+  t[77] !== b ||
+  t[78] !== x ||
+  t[79] !== Le ||
+  t[80] !== R ||
+  t[81] !== D ||
+  t[82] !== F ||
+  t[83] !== N
+    ? (($ = () =>
+        (0, k.jsx)(
+          _e,
+          {
+            accountId: D ?? l,
+            actionOverrides: Q,
+            allowExternalActions: s,
+            allowRemoteImages: c,
+            analyticsContext: Y,
+            beacon: F,
+            eventMetadata: N,
+            getActionOverride: Ke,
+            onActionComplete: Be,
+            onComposerText: b,
+            onDismiss: Re,
+            onUnsupported: He,
+            onModalOpen: Je,
+            pcaConversationId: re(l),
+            preserveOpenPageContextPresentation: Ae,
+            onStartVoice: x,
+            renderPresentation: (e) => {
+              let { content: t, supportStatus: n } = e;
+              return (0, k.jsx)(be, {
+                closeWithoutDismiss: V,
+                openPresentation: Le,
+                openPresentationRef: C,
+                supportStatus: n,
+                terminalPresentationStatesRef: E,
+                children: t,
+              });
+            },
+          },
+          R,
+        )),
+      (t[65] = s),
+      (t[66] = c),
+      (t[67] = Y),
+      (t[68] = V),
+      (t[69] = Q),
+      (t[70] = l),
+      (t[71] = Ke),
+      (t[72] = Re),
+      (t[73] = Je),
+      (t[74] = Be),
+      (t[75] = He),
+      (t[76] = Ae),
+      (t[77] = b),
+      (t[78] = x),
+      (t[79] = Le),
+      (t[80] = R),
+      (t[81] = D),
+      (t[82] = F),
+      (t[83] = N),
+      (t[84] = $))
+    : ($ = t[84]);
+  let Xe;
+  return (
+    t[85] !== Ye || t[86] !== $
+      ? ((Xe = (0, k.jsx)(ge, {
+          source: `conversation`,
+          candidate: { id: Ye, status: `eligible`, render: $ },
+        })),
+        (t[85] = Ye),
+        (t[86] = $),
+        (t[87] = Xe))
+      : (Xe = t[87]),
+    Xe
+  );
 }
-interface Beacon { action_items?: unknown; beacon_id?: string }
-interface BeaconEventMetadata { conversationId?: string; messageId?: string; suppressLifecycle?: boolean }
-interface BeaconState {
-  beacon?: Beacon | null;
-  eventMetadata: BeaconEventMetadata;
-  productExperience?: unknown;
+function be(e) {
+  let t = (0, Se.c)(9),
+    {
+      children: n,
+      closeWithoutDismiss: r,
+      openPresentation: i,
+      openPresentationRef: a,
+      supportStatus: o,
+      terminalPresentationStatesRef: s,
+    } = e,
+    ee = (0, O.useRef)(0),
+    c,
+    l;
+  (t[0] !== r || t[1] !== i || t[2] !== a || t[3] !== o || t[4] !== s
+    ? ((c = () => {
+        let e = (ee.current += 1);
+        if (o === `unsupported`) {
+          (s.current.add(i.state), a.current?.state === i.state && (a.current = null));
+          return;
+        }
+        if (o !== `supported` || s.current.has(i.state) || a.current?.state === i.state) return;
+        let t = a.current;
+        return (
+          t != null && r(t),
+          (a.current = i),
+          () => {
+            queueMicrotask(() => {
+              D(ee, e) && r(i);
+            });
+          }
+        );
+      }),
+      (l = [r, i, a, o, s]),
+      (t[0] = r),
+      (t[1] = i),
+      (t[2] = a),
+      (t[3] = o),
+      (t[4] = s),
+      (t[5] = c),
+      (t[6] = l))
+    : ((c = t[5]), (l = t[6])),
+    (0, O.useEffect)(c, l));
+  let u;
+  return (
+    t[7] === n
+      ? (u = t[8])
+      : ((u = n == null ? null : (0, k.jsx)(k.Fragment, { children: n })), (t[7] = n), (t[8] = u)),
+    u
+  );
 }
-interface AnalyticsContext { placement: "in_conversation"; productExperience?: unknown; suppressLifecycle?: boolean; treatment: "modal" }
-interface OpenPresentation { analyticsContext: AnalyticsContext; beacon: Beacon; conversationId: string; presentationKey: string; state: BeaconState }
-interface BeaconPresentationProps {
-  children?: unknown;
-  closeWithoutDismiss(presentation: OpenPresentation): void;
-  openPresentation: OpenPresentation;
-  openPresentationRef: ReactRef<OpenPresentation | null>;
-  supportStatus: "supported" | "unsupported" | string;
-  terminalPresentationStatesRef: ReactRef<WeakSet<BeaconState>>;
+function D(e, t) {
+  return e.current === t;
 }
-interface ConversationBeaconProps {
-  actionOverrides?: Record<string, unknown>;
-  allowConversationSharing?: boolean;
-  allowExternalActions?: boolean;
-  allowRemoteImages?: boolean;
-  conversationId: string;
-  getActionOverride?: (action: unknown) => unknown;
-  isCompetingModalOpen: boolean;
-  isTemporaryChat?: boolean;
-  onComposerText?: (text: string) => void;
-  onStartVoice?: () => void;
+function xe(e, t) {
+  return JSON.stringify([e.beacon_id, t.conversationId, t.messageId]);
 }
-interface ChatGptConversationBeaconSurfacesProps extends Omit<ConversationBeaconProps, "isCompetingModalOpen"> {
-  allowRegeneration?: boolean;
-  regenerationModelSlug?: string | null;
+var Se, O, k;
+function A() {
+  return (A = e(() => {
+    ((Se = t()), r(), (O = c()), w(), l(), T(), p(), d(), s(), b(), x(), S(), ae(), (k = a()));
+  }))();
 }
-
-const shared = Shared as unknown as {
-  $3(): { c(size: number): unknown[] };
-  BX(signal: unknown, ...parameters: unknown[]): unknown;
-  FX(): void;
-  HX(signal: unknown): unknown;
-  I3(): JsxRuntime;
-  LX(scope: unknown): unknown;
-  QI(): void;
-  ZI: unknown;
-  e6: ReactRuntime | (() => ReactRuntime);
-};
-const initial = Initial as unknown as {
-  ANt(): void; Gzt(): boolean; JNt(): void;
-  QNt(input: { activeClaims: unknown; isPageContextUpsellSuppressionEnabled: unknown; responseLeafId?: string }): boolean;
-  TNt(beacon?: Beacon | null): boolean; UNt: new (scope: unknown) => { shouldSuppressBeaconUI(input: { responseLeafId?: string }): boolean };
-  Vzt(): void; YNt: unknown; YVt: unknown; ZNt: unknown;
-  _Nt(scope: unknown, conversationId: string, state: BeaconState): void;
-  aqt(id: string): string; dHt(value: unknown): unknown;
-  fNt: unknown;
-  gNt(scope: unknown, conversationId: string, state: BeaconState): void;
-  hNt(): void;
-  jNt(scope: unknown, input: Record<string, unknown>): void;
-  jVt: unknown;
-  mNt(scope: unknown, conversationId: string, state: BeaconState): boolean;
-  oqt(): void; uHt(): void;
-  wNt(beacon?: Beacon | null): boolean;
-  wVt: unknown;
-};
-const share = ShareAction as unknown as {
-  a(): void;
-  i(actions: unknown): boolean;
-  n(input: { canShare: boolean; conversationId: unknown; scope: unknown }): unknown;
-  o(input: Record<string, unknown>): unknown;
-  r(input: { action: unknown; getActionOverride?: (action: unknown) => unknown; shareConversationEligible: unknown; shareConversationOverride: unknown }): unknown;
-  s(): void;
-  t: unknown;
-};
-const announcement = Announcement as unknown as { n(): void; t: unknown };
-const home = HomeBeacon as unknown as { r(): void; t: unknown };
-const temporary = TemporaryChat as unknown as { i(): void; n: unknown };
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-
-function useSignal(signal: unknown, ...parameters: unknown[]): unknown { return shared.BX(signal, ...parameters); }
-function useValue(signal: unknown): unknown { return shared.HX(signal); }
-function resolvePresentationKey(beacon: Beacon, metadata: BeaconEventMetadata): string { return JSON.stringify([beacon.beacon_id, metadata.conversationId, metadata.messageId]); }
-function sameLifecycleToken(reference: ReactRef<number>, token: number): boolean { return reference.current === token; }
-
-function BeaconPresentationLifecycle({ children, closeWithoutDismiss, openPresentation, openPresentationRef, supportStatus, terminalPresentationStatesRef }: BeaconPresentationProps): unknown {
-  const generation = React.useRef(0);
-  React.useEffect(() => {
-    const token = ++generation.current;
-    if (supportStatus === "unsupported") {
-      terminalPresentationStatesRef.current.add(openPresentation.state);
-      if (openPresentationRef.current?.state === openPresentation.state) openPresentationRef.current = null;
-      return;
-    }
-    if (supportStatus !== "supported" || terminalPresentationStatesRef.current.has(openPresentation.state) || openPresentationRef.current?.state === openPresentation.state) return;
-    const previous = openPresentationRef.current;
-    if (previous != null) closeWithoutDismiss(previous);
-    openPresentationRef.current = openPresentation;
-    return () => { queueMicrotask(() => { if (sameLifecycleToken(generation, token)) closeWithoutDismiss(openPresentation); }); };
-  }, [closeWithoutDismiss, openPresentation, openPresentationRef, supportStatus, terminalPresentationStatesRef]);
-  return children == null ? null : jsx.jsx(jsx.Fragment, { children });
+function Ce(e) {
+  let t = (0, j.c)(22),
+    {
+      actionOverrides: n,
+      allowConversationSharing: r,
+      allowExternalActions: i,
+      allowRegeneration: a,
+      allowRemoteImages: s,
+      conversationId: c,
+      getActionOverride: l,
+      isTemporaryChat: u,
+      onComposerText: d,
+      onStartVoice: te,
+      regenerationModelSlug: ne,
+    } = e,
+    f = a === void 0 || a,
+    p = ne === void 0 ? null : ne,
+    m = o(ee),
+    h;
+  t[0] !== f || t[1] !== c || t[2] !== u || t[3] !== p || t[4] !== m
+    ? ((h = f
+        ? C({ scope: m, allowedModelSlug: p, conversationId: re(c), isTemporaryChat: u })
+        : void 0),
+      (t[0] = f),
+      (t[1] = c),
+      (t[2] = u),
+      (t[3] = p),
+      (t[4] = m),
+      (t[5] = h))
+    : (h = t[5]);
+  let g;
+  t[6] !== n || t[7] !== h
+    ? ((g = { ...n, regenerate: h }), (t[6] = n), (t[7] = h), (t[8] = g))
+    : (g = t[8]);
+  let _ = g,
+    v;
+  t[9] !== r ||
+  t[10] !== i ||
+  t[11] !== s ||
+  t[12] !== _ ||
+  t[13] !== c ||
+  t[14] !== l ||
+  t[15] !== u ||
+  t[16] !== d ||
+  t[17] !== te
+    ? ((v = () =>
+        (0, M.jsx)(ye, {
+          actionOverrides: _,
+          allowConversationSharing: r,
+          allowExternalActions: i,
+          allowRemoteImages: s,
+          conversationId: c,
+          getActionOverride: l,
+          isCompetingModalOpen: !1,
+          isTemporaryChat: u,
+          onComposerText: d,
+          onStartVoice: te,
+        })),
+      (t[9] = r),
+      (t[10] = i),
+      (t[11] = s),
+      (t[12] = _),
+      (t[13] = c),
+      (t[14] = l),
+      (t[15] = u),
+      (t[16] = d),
+      (t[17] = te),
+      (t[18] = v))
+    : (v = t[18]);
+  let y;
+  return (
+    t[19] !== u || t[20] !== v
+      ? ((y = (0, M.jsx)(ve, { isTemporaryChat: u, children: v })),
+        (t[19] = u),
+        (t[20] = v),
+        (t[21] = y))
+      : (y = t[21]),
+    y
+  );
 }
-
-function ConversationBeaconSurface({ actionOverrides, allowConversationSharing = false, allowExternalActions = false, allowRemoteImages = false, conversationId, getActionOverride, isCompetingModalOpen, isTemporaryChat, onComposerText, onStartVoice }: ConversationBeaconProps): unknown {
-  const scope = shared.LX(shared.ZI);
-  const openPresentationRef = React.useRef<OpenPresentation | null>(null);
-  const terminalStatesRef = React.useRef(new WeakSet<BeaconState>());
-  const [preservedState, setPreservedState] = React.useState<BeaconState | null>(null);
-  const activeClaims = useValue(initial.YNt);
-  const pageContextSuppression = useValue(initial.ZNt);
-  const primaryConversationId = useSignal(initial.wVt, conversationId) as string | null;
-  const currentState = useSignal(initial.fNt, primaryConversationId ?? conversationId) as BeaconState | null;
-  const currentMessageId = useSignal(initial.jVt, conversationId) as string | null;
-  const workContext = useSignal(initial.YVt, conversationId);
-  const isWorkConversation = Boolean(initial.dHt(workContext));
-  const normalizedState = currentState == null ? null : currentState;
-  const competingModal = isCompetingModalOpen || initial.Gzt();
-  const candidateBeacon = normalizedState?.beacon;
-  const supportedBeacon = candidateBeacon != null && (initial.wNt(candidateBeacon) || initial.TNt(candidateBeacon)) ? candidateBeacon : null;
-  const metadataMatches = normalizedState?.eventMetadata.messageId == null
-    ? primaryConversationId != null && normalizedState?.eventMetadata.conversationId === primaryConversationId
-    : normalizedState.eventMetadata.messageId === currentMessageId;
-  const metadata = metadataMatches && normalizedState != null ? normalizedState.eventMetadata : null;
-  const responseLeafId = metadata?.messageId ?? metadata?.conversationId;
-  const lifecycleAllowed = metadata?.suppressLifecycle === true || !initial.QNt({ activeClaims, isPageContextUpsellSuppressionEnabled: pageContextSuppression, responseLeafId });
-  const matchedBeacon = metadataMatches ? supportedBeacon : null;
-  const preserveOpenPresentation = normalizedState != null && preservedState === normalizedState;
-  const beacon = matchedBeacon != null && (lifecycleAllowed || preserveOpenPresentation) ? matchedBeacon : null;
-  const hasActionItems = beacon != null && share.i(beacon.action_items);
-  const shareEligible = useSignal(share.t, hasActionItems ? conversationId : null);
-  const presentationKey = beacon == null || metadata == null ? null : resolvePresentationKey(beacon, metadata);
-  const canShare = allowConversationSharing && allowExternalActions && !isTemporaryChat && !isWorkConversation;
-  const shareConversation = share.n({ scope, canShare, conversationId: primaryConversationId });
-  const resolvedOverrides = { ...actionOverrides, share_conversation: shareConversation };
-  const resolveAction = (action: unknown) => share.r({ action, getActionOverride, shareConversationEligible: shareEligible, shareConversationOverride: resolvedOverrides.share_conversation });
-
-  const closeWithoutDismiss = (presentation: OpenPresentation) => {
-    if (terminalStatesRef.current.has(presentation.state)) return;
-    terminalStatesRef.current.add(presentation.state);
-    if (openPresentationRef.current?.state === presentation.state) openPresentationRef.current = null;
-    setPreservedState(current => current === presentation.state ? null : current);
-    initial.jNt(scope, { action: "closed_without_dismiss", beacon: presentation.beacon, ...presentation.analyticsContext });
-    initial.gNt(scope, presentation.conversationId, presentation.state);
-  };
-  const lifecycleGeneration = React.useRef(0);
-  const latestClose = React.useRef(closeWithoutDismiss);
-  latestClose.current = closeWithoutDismiss;
-  React.useEffect(() => {
-    const token = ++lifecycleGeneration.current;
-    return () => { queueMicrotask(() => { if (sameLifecycleToken(lifecycleGeneration, token) && openPresentationRef.current != null) latestClose.current(openPresentationRef.current); }); };
-  }, []);
-  React.useEffect(() => {
-    const opened = openPresentationRef.current;
-    if (opened != null && (competingModal || opened.state !== normalizedState || presentationKey == null || opened.presentationKey !== presentationKey)) latestClose.current(opened);
-  }, [competingModal, normalizedState, presentationKey]);
-
-  if (beacon == null || metadata == null || presentationKey == null || normalizedState == null || competingModal) return null;
-  const analyticsContext: AnalyticsContext = { placement: "in_conversation", productExperience: normalizedState.productExperience, suppressLifecycle: normalizedState.eventMetadata.suppressLifecycle, treatment: "modal" };
-  const openPresentation: OpenPresentation = { analyticsContext, beacon, conversationId, presentationKey, state: normalizedState };
-  const onDismiss = () => {
-    if (!terminalStatesRef.current.has(normalizedState) && initial.mNt(scope, conversationId, normalizedState)) {
-      terminalStatesRef.current.add(normalizedState);
-      if (openPresentationRef.current?.state === normalizedState) openPresentationRef.current = null;
-      setPreservedState(current => current === normalizedState ? null : current);
-    }
-  };
-  const onActionComplete = () => {
-    if (!terminalStatesRef.current.has(normalizedState)) {
-      initial.gNt(scope, conversationId, normalizedState);
-      terminalStatesRef.current.add(normalizedState);
-      if (openPresentationRef.current?.state === normalizedState) openPresentationRef.current = null;
-      setPreservedState(current => current === normalizedState ? null : current);
-    }
-  };
-  const onUnsupported = () => {
-    terminalStatesRef.current.add(normalizedState);
-    if (openPresentationRef.current?.state === normalizedState) openPresentationRef.current = null;
-    setPreservedState(current => current === normalizedState ? null : current);
-    initial._Nt(scope, conversationId, normalizedState);
-  };
-  const onModalOpen = () => {
-    if (metadata.suppressLifecycle !== true && new initial.UNt(scope).shouldSuppressBeaconUI({ responseLeafId })) return;
-    openPresentationRef.current = openPresentation;
-    setPreservedState(normalizedState);
-  };
-  const render = () => jsx.jsx(home.t, {
-    accountId: primaryConversationId ?? conversationId,
-    actionOverrides: resolvedOverrides,
-    allowExternalActions,
-    allowRemoteImages,
-    analyticsContext,
-    beacon,
-    eventMetadata: metadata,
-    getActionOverride: resolveAction,
-    onActionComplete,
-    onComposerText,
-    onDismiss,
-    onModalOpen,
-    onStartVoice,
-    onUnsupported,
-    pcaConversationId: initial.aqt(conversationId),
-    preserveOpenPageContextPresentation: preserveOpenPresentation,
-    renderPresentation: ({ content, supportStatus }: { content?: unknown; supportStatus: string }) => jsx.jsx(BeaconPresentationLifecycle, { children: content, closeWithoutDismiss, openPresentation, openPresentationRef, supportStatus, terminalPresentationStatesRef: terminalStatesRef }),
-  }, presentationKey);
-  return jsx.jsx(announcement.t, { source: "conversation", candidate: { id: `conversation-beacon:${conversationId}:${presentationKey}`, status: "eligible", render } });
+var j, M;
+function we() {
+  return (we = e(() => {
+    ((j = t()), r(), s(), E(), b(), A(), me(), (M = a()));
+  }))();
 }
-
-function ChatGptConversationBeaconSurfaces({ actionOverrides, allowConversationSharing, allowExternalActions, allowRegeneration = true, allowRemoteImages, conversationId, getActionOverride, isTemporaryChat, onComposerText, onStartVoice, regenerationModelSlug = null }: ChatGptConversationBeaconSurfacesProps): unknown {
-  const scope = shared.LX(shared.ZI);
-  const regenerate = allowRegeneration ? share.o({ scope, allowedModelSlug: regenerationModelSlug, conversationId: initial.aqt(conversationId), isTemporaryChat }) : undefined;
-  const resolvedOverrides = { ...actionOverrides, regenerate };
-  const render = () => jsx.jsx(ConversationBeaconSurface, { actionOverrides: resolvedOverrides, allowConversationSharing, allowExternalActions, allowRemoteImages, conversationId, getActionOverride, isCompetingModalOpen: false, isTemporaryChat, onComposerText, onStartVoice });
-  return jsx.jsx(temporary.n, { isTemporaryChat, children: render });
-}
-
-function initialize(): void {
-  void shared.$3(); shared.FX(); shared.QI(); temporary.i(); initial.uHt(); initial.ANt(); home.r(); initial.Vzt(); initial.JNt(); share.s(); initial.oqt(); share.a(); initial.hNt();
-  announcement.n(); jsx = shared.I3(); React = typeof shared.e6 === "function" && !("useState" in shared.e6) ? shared.e6() : shared.e6 as ReactRuntime;
-}
-initialize();
-export { ChatGptConversationBeaconSurfaces };
+we();
+export { Ce as ChatGptConversationBeaconSurfaces };

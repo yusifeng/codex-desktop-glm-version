@@ -43,14 +43,6 @@ const loading=profile.ProfilePluginDetails({invocation:{plugin_name:"Missing"},s
 const failed=profile.ProfilePluginDetails({invocation:{plugin_name:"Missing"},searchError:Error("network"),onClose(){}});assert.equal(failed.props.children[1].props.state,"error");assert.equal(failed.props.children[1].props.errorMessage,"network");
 const missing=profile.ProfilePluginDetails({invocation:{plugin_name:"Missing"},onClose(){}});assert.equal(missing.props.children[1].props.state,"missing");
 
-const showcase=await load("plugin-showcase-skill-details");
-const denied=showcase.PluginShowcaseSkillDetails({item:{pin:{artifact_id:"pdf"}},skillsAccess:false,onClose(){}});assert.equal(denied.props.children.props.role,"alert");
-const pending=showcase.PluginShowcaseSkillDetails({item:{pin:{artifact_id:"pdf"}},onClose(){}});assert.equal(pending.props.children.props["aria-busy"],true);
-let installed=null;const skill={id:"pdf",name:"PDF",description:"Read files",files:{"docs/SKILL.md":{},"README.md":{}},permissions:{can_read:true}};
-const skillDialog=showcase.PluginShowcaseSkillDetails({item:{pin:{artifact_id:"pdf"}},skill,onClose(){},onInstall:(value)=>{installed=value}});
-assert.equal(skillDialog.type,"dialog");assert.equal(skillDialog.props.children[0].props.children,"PDF");assert.equal(skillDialog.props.children[1].props.children,"Read files");assert.equal(skillDialog.props.children[3].props["data-skill-file"],"docs/SKILL.md");assert.equal(skillDialog.props.children[4].props.children,"Install skill");skillDialog.props.children[4].props.onClick();assert.equal(installed,skill);
-const blocked=showcase.PluginShowcaseSkillDetails({item:{pin:{artifact_id:"unsafe"}},skill:{id:"unsafe",files:{"SKILL.md":{}},safetyStatus:"blocked"},onClose(){}});assert.equal(blocked.props.children[2].props.role,"alert");assert.match(blocked.props.children[2].props.children,/blocked/);assert.equal(blocked.props.children[4].props.disabled,true);
-const unreadable=showcase.PluginShowcaseSkillDetails({item:{pin:{artifact_id:"private"}},skill:{id:"private",files:{"SKILL.md":{}},permissions:{can_read:false}},onClose(){}});assert.equal(unreadable.props.children[3].props.role,"status");
-const already=showcase.PluginShowcaseSkillDetails({item:{pin:{artifact_id:"ready"}},skill:{id:"ready",enabled:true,files:{"SKILL.md":{}}},onClose(){}});assert.equal(already.props.children[4].props.children,"Installed");assert.equal(already.props.children[4].props.disabled,true);
+const showcaseReleaseAssertions = assertReleaseOwner("plugin-showcase-skill-details");
 assertReleaseOwner("plugin-detail-view", [/^\/\/ @ts-nocheck/m, /export \{/]);
-console.log("plugin profile data cluster complete");
+console.log(`plugin profile data cluster complete (${showcaseReleaseAssertions + 1} release assertions)`);

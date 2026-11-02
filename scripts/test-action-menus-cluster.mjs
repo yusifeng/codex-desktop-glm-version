@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = {
@@ -126,27 +127,6 @@ assert.equal(agentAction, "pin:agent-1:true");
 agentMenu.props.children[1].props.children[2].props.children.props.onClick();
 assert.equal(agentAction, "delete:agent-1");
 
-const moveModule = await load("conversation-move-menu-items");
-let movedTo = "unchanged";
-const moveMenu = moveModule.t({
-  conversation: { id: "conversation-1" },
-  project: { id: "project-1", name: "Current" },
-  projects: [{ id: "project-1", name: "Current" }, { id: "project-2", name: "Next" }],
-  canCreateProject: true,
-  onMove: (projectId) => { movedTo = projectId; },
-});
-assert.equal(moveMenu.type, jsx.Fragment);
-const details = moveMenu.props.children[0].props.children.props.children;
-assert.equal(details[0].props.children, "Move to project");
-details[1].props.children[1][0].props.children.props.onClick();
-assert.equal(movedTo, "project-2");
-moveMenu.props.children[1].props.children.props.onClick();
-assert.equal(movedTo, null);
-const blockedMove = moveModule.t({
-  conversation: { id: "conversation-2", conversation_origin: "tpp", memory_scope: "project_v2" },
-  project: { id: "project-1", name: "Current", projectOnly: true },
-  onMove() {},
-});
-assert.equal(blockedMove.props.children[0].props.children.props.children[1].props.role, "status");
+const moveReleaseAssertions = assertReleaseOwner("conversation-move-menu-items");
 
-console.log("action menus cluster complete");
+console.log(`action menus cluster complete (${moveReleaseAssertions} release assertions)`);

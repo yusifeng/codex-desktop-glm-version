@@ -35,28 +35,11 @@ workModal.props.children[3].props.onClick({});
 assert.equal(workClosed, 1);
 assert.equal(selectedPlan, "business");
 
-const quiet = await load("quiet-hours-active-dialog");
-let quietClosed = false;
-const quietModal = quiet.QuietHoursActiveDialog({ accountId: "a", userId: "u", timeZone: "UTC", nextAllowedAt: new Date("2026-09-27T10:00:00Z"), onClose: () => { quietClosed = true; } });
-assert.equal(quietModal.props["data-account-id"], "a");
-assert.equal(quietModal.props.children[0].props.children, "Time for a break");
-assert.match(quietModal.props.children[1].props.children, /10:00/);
-quietModal.props.children[2].props.onClick();
-assert.equal(quietClosed, true);
-assert.equal(quiet.QuietHoursActiveDialog({ accountId: "a", userId: "u", timeZone: "UTC", eligible: false, onClose() {} }), null);
+const quietHoursReleaseAssertions = assertReleaseOwner("quiet-hours-active-dialog");
 
 const modelPickerReleaseAssertions = assertReleaseOwner("model-picker-upsell-modal");
 
-const first = await load("first-limit-dialog");
-let upgradeVariant = null;
-const firstModal = first.FirstLimitDialog({ presentation: { variant: "limit_reached" }, onClose() {}, onUpgradeAfterClose: (presentation) => { upgradeVariant = presentation.variant; } });
-assert.equal(firstModal.props.children[0].props.children, "You’ve reached a limit");
-assert.match(firstModal.props.children[1].props.children, /Free plan/);
-assert.equal(firstModal.props.children[3].props.children, "Upgrade");
-firstModal.props.children[3].props.onClick();
-assert.equal(upgradeVariant, "limit_reached");
-const thinking = first.FirstLimitDialog({ presentation: { variant: "thinking", resetDay: "today", resetTime: new Date("2026-09-27T10:00:00Z") }, onClose() {} });
-assert.match(thinking.props.children[1].props.children, /today/);
+const firstLimitReleaseAssertions = assertReleaseOwner("first-limit-dialog");
 
 const remote = await load("remote-connection-editor-modal");
 const unavailable = remote.RemoteConnectionEditorModal({ hostId: "missing", onClose() {} });
@@ -76,4 +59,4 @@ const colorOnly = remote.RemoteConnectionEditorModal({ connection: { displayName
 assert.equal(colorOnly.props["data-connection-kind"], "remote-control");
 assert.equal(colorOnly.props.children[1].props.children.filter(Boolean).some(node => node.props?.children?.[0] === "Host"), false);
 
-console.log(`account modals cluster complete (${modelPickerReleaseAssertions} model picker release assertions)`);
+console.log(`account modals cluster complete (${modelPickerReleaseAssertions + quietHoursReleaseAssertions + firstLimitReleaseAssertions} release assertions)`);

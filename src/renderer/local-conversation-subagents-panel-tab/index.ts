@@ -1,151 +1,453 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import { sortByRecency as sortSubagents } from "../app-primary/runtime/sort-by-recency";
-import * as localConversationThreadChunk from "@rchunk/local-conversation-thread";
-import * as subagentPanelChunk from "@rchunk/subagent-panel";
-
-type SubagentStatus = "done" | "running" | "waiting";
-interface ReactRuntime { useState<Value>(initialValue: Value | (() => Value)): [Value, (next: Value | ((previous: Value) => Value)) => void] }
-interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown; jsxs(type: unknown, props: Record<string, unknown>, key?: string): unknown }
-interface IntlShape { formatMessage(message: { defaultMessage: string; id: string }, values?: Record<string, unknown>): string }
-interface Subagent {
-  canInteract?: boolean;
-  conversationId: string;
-  displayName: string;
-  lastAssistantMessageAtMs?: number | null;
-  objective?: string | null;
-  recencyAtMs?: number | null;
-  startedAtMs?: number | null;
-  status: SubagentStatus;
-  statusSummary?: string | null;
-}
-interface ThreadConfiguration { model?: string | null; reasoningEffort?: string | null }
-interface PanelItem { avatarSeed: string; id: string; label: string; preview?: unknown; previewLineCount?: 1; trailing?: unknown }
-interface PanelSection { className?: string; emptyState?: unknown; id: string; items: PanelItem[]; title: unknown; titleTrailing?: unknown; visibleItemLimit: number }
-interface PanelProps { onSelect(id: string): void; sections: PanelSection[] }
-interface HeaderProps { backAriaLabel: string; label: string; onBack(): void; seed: string; trailing?: unknown }
-interface ThreadProps { canInteract: boolean; conversationId: string; header: unknown; hostId: string; onClose(): void; onOpenBackgroundAgent(agent: { conversationId: string; displayName: string }): void }
-interface Props {
-  hostId: string;
-  isLoading: boolean;
-  onSelect(conversationId: string | null, displayName: string | null): void;
-  parentConversationId: string;
-  requestedConversationId?: string | null;
-  requestedDisplayName?: string | null;
-}
-
-const sharedRuntime = appSharedChunk as unknown as {
-  $3?(): void;
-  BX?<Value>(query: unknown, key: unknown): Value;
-  FX?(): void;
-  I3(): JsxRuntime;
-  K2?(): void;
-  e6(): ReactRuntime;
-  n4?(): IntlShape;
-};
-const initialRuntime = appInitialChunk as unknown as {
-  Dpn?(): void; HZt?(): void; Jit?(): void; M0t?(): void; RS?(): void; Ret?(): void; Vhn?(): void; Zit?(): void; ojt?(): void; sP?(): void;
-  IS?: (props: { dateString: string }) => unknown;
-  KQt?: unknown;
-  Let?: (props: { debugName: string; fillParent: boolean }) => unknown;
-  N0t?(value: string | null | undefined): boolean;
-  Qmn?(value: string, length: number): string;
-  X5?(model: string): string;
-  Xit?(durationMs: number): string;
-  Yit?(callback: () => void, intervalMs: number | null): void;
-  lP?(): Date;
-  nN?(): boolean;
-  sjt?(objective: string): string;
-};
-const primaryRuntime = appPrimaryChunk as unknown as { gn?(): void; mn?(): void; pn?: unknown };
-const threadRuntime = localConversationThreadChunk as unknown as { s?(): void; t?: (props: ThreadProps) => unknown };
-const panelRuntime = subagentPanelChunk as unknown as { n?: (props: PanelProps) => unknown; r?(): void; t?: (props: HeaderProps) => unknown };
-const { $3: initializeSharedRuntime, BX: useQueryData, FX: initializeSharedFeatures, I3: getJsxRuntime, K2: initializeSharedUi, e6: getReactRuntime, n4: useIntl } = sharedRuntime;
-const { Dpn: initializeConversationState, HZt: initializeRelativeTime, IS: RelativeTime, Jit: initializeThreadQueries, KQt: threadConfigurationQuery, Let: LoadingIndicator, M0t: initializeModels, N0t: isReasoningEffort, Qmn: truncateText, RS: initializeTimers, Ret: initializeThreadState, Vhn: initializeSubagentState, X5: modelDisplayName, Xit: formatDuration, Yit: useInterval, Zit: initializeStatus, lP: useNow, nN: useBackgroundSubagentsEnabled, ojt: initializeConversationQueries, sP: initializeDateTime, sjt: plainObjective } = initialRuntime;
-const { gn: initializePrimaryState, mn: initializePrimaryQueries, pn: subagentQuery } = primaryRuntime;
-const { s: initializeLocalConversationThread, t: LocalConversationThread } = threadRuntime;
-const { n: SubagentPanel, r: initializeSubagentPanel, t: SubagentPanelHeader } = panelRuntime;
-
-initializeSharedRuntime?.();
-initializeConversationState?.();
-initializeSharedFeatures?.();
-initializeModels?.();
-initializeSubagentState?.();
-initializeSharedUi?.();
-initializeRelativeTime?.();
-initializeTimers?.();
-initializeDateTime?.();
-initializeThreadState?.();
-initializeStatus?.();
-initializeConversationQueries?.();
-initializePrimaryState?.();
-initializePrimaryQueries?.();
-initializeSubagentPanel?.();
-initializeThreadQueries?.();
-initializeLocalConversationThread?.();
-
-const React = getReactRuntime();
-const jsx = getJsxRuntime();
-
-function text(message: string, values?: Record<string, unknown>): string { return useIntl?.().formatMessage({ defaultMessage: message, id: message }, values) ?? message.replace(/\{(\w+)\}/g, (_match, key: string) => String(values?.[key] ?? "")); }
-function normalizeObjective(value: string): string { const normalized = plainObjective?.(value) ?? value.trim().replace(/\s+/g, " " ); return truncateText?.(normalized, 60) ?? (normalized.length > 60 ? normalized.slice(0, 57) + "…" : normalized); }
-function displayDuration(durationMs: number): string { if (formatDuration != null) return formatDuration(durationMs); const seconds = Math.floor(durationMs / 1000); if (seconds < 60) return seconds + "s"; const minutes = Math.floor(seconds / 60); return minutes < 60 ? minutes + "m" : Math.floor(minutes / 60) + "h"; }
-function isDone(subagent: Subagent): boolean { return subagent.status === "done"; }
-function isActive(subagent: Subagent): boolean { return subagent.status !== "done"; }
-function isWaiting(subagent: Subagent): boolean { return subagent.status === "waiting"; }
-function StatusTrailing({ subagent }: { subagent: Subagent }): unknown {
-  const nowDate = useNow?.() ?? new Date();
-  const [nowMs, setNowMs] = React.useState(nowDate.getTime());
-  useInterval?.(() => setNowMs(Date.now()), subagent.status === "done" ? null : 1000);
-  if (subagent.status === "waiting") return jsx.jsx("span", { children: "Waiting" });
-  if (subagent.status !== "done" && subagent.startedAtMs != null) return jsx.jsx("span", { children: displayDuration(Math.max(nowMs - subagent.startedAtMs, 0)) });
-  const completedAt = subagent.lastAssistantMessageAtMs ?? subagent.recencyAtMs ?? null;
-  if (completedAt == null) return null;
-  const dateString = new Date(completedAt).toISOString();
-  return jsx.jsx("time", { dateTime: dateString, children: RelativeTime == null ? text("Completed") : jsx.jsxs("span", { children: [jsx.jsx(RelativeTime, { dateString }, "completed-at"), " ago"] }) });
-}
-function toPanelItem(subagent: Subagent): PanelItem {
-  const preview = subagent.objective == null ? subagent.statusSummary ?? (subagent.status === "done" ? null : "Working") : normalizeObjective(subagent.objective);
-  return { avatarSeed: subagent.conversationId, id: subagent.conversationId, label: subagent.displayName, preview, previewLineCount: 1, trailing: jsx.jsx(StatusTrailing, { subagent }) };
-}
-function SubagentOverview({ onSelect, subagents }: { onSelect(conversationId: string, displayName: string): void; subagents: Subagent[] }): unknown {
-  const sorted = sortSubagents(subagents);
-  const byId = new Map(sorted.map((subagent) => [subagent.conversationId, subagent]));
-  const active = sorted.filter(isActive);
-  const done = sorted.filter(isDone);
-  const waitingCount = active.filter(isWaiting).length;
-  const sections: PanelSection[] = [
-    { emptyState: "No active subagents", id: "active", items: active.map(toPanelItem), title: `Active · ${active.length}`, titleTrailing: waitingCount === 0 ? null : `${waitingCount} waiting`, visibleItemLimit: 4 },
-    { className: "mt-6", id: "done", items: done.map(toPanelItem), title: `Done · ${done.length}`, visibleItemLimit: 10 },
-  ];
-  if (SubagentPanel == null) return null;
-  return jsx.jsx(SubagentPanel, { sections, onSelect: (id: string) => { const selected = byId.get(id); if (selected != null) onSelect(selected.conversationId, selected.displayName); } });
-}
-function SelectedSubagentHeader({ conversationId, displayName, hostId, onBack }: { conversationId: string; displayName: string; hostId: string; onBack(): void }): unknown {
-  const configuration = useQueryData?.<ThreadConfiguration | null>(threadConfigurationQuery, { hostId, threadId: conversationId }) ?? null;
-  let trailing: unknown = null;
-  if (configuration?.model) {
-    const model = modelDisplayName?.(configuration.model) ?? configuration.model;
-    trailing = configuration.reasoningEffort != null && (isReasoningEffort?.(configuration.reasoningEffort) ?? true) ? `${model} · ${configuration.reasoningEffort}` : model;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  I3 as i,
+  K2 as a,
+  Y2 as o,
+  e6 as s,
+  n4 as c,
+} from "@rchunk/app-shared";
+import {
+  Bhn as l,
+  Dpn as u,
+  HZt as d,
+  IS as f,
+  Jit as p,
+  KQt as m,
+  Let as h,
+  M0t as g,
+  N0t as _,
+  Qmn as v,
+  RS as y,
+  Ret as b,
+  Vhn as x,
+  X5 as S,
+  Xit as C,
+  Yit as w,
+  Zit as T,
+  lP as E,
+  nN as D,
+  ojt as O,
+  sP as k,
+  sjt as A,
+} from "@rchunk/app-initial";
+import { _n as j, gn as M, mn as N, pn as P } from "@rchunk/app-primary";
+import { s as F, t as I } from "@rchunk/local-conversation-thread";
+import { n as L, r as R, t as z } from "@rchunk/subagent-panel";
+function B(e) {
+  let t = (0, X.c)(32),
+    {
+      hostId: r,
+      isLoading: i,
+      parentConversationId: a,
+      requestedConversationId: o,
+      requestedDisplayName: s,
+      onSelect: c,
+    } = e,
+    l = D(),
+    u;
+  t[0] !== r || t[1] !== l || t[2] !== a
+    ? ((u = l ? { conversationId: a, hostId: r } : null),
+      (t[0] = r),
+      (t[1] = l),
+      (t[2] = a),
+      (t[3] = u))
+    : (u = t[3]);
+  let d = n(P, u);
+  if (o != null) {
+    let e;
+    if (t[4] !== d || t[5] !== o) {
+      let n;
+      (t[7] === o
+        ? (n = t[8])
+        : ((n = (e) => {
+            let { conversationId: t } = e;
+            return t === o;
+          }),
+          (t[7] = o),
+          (t[8] = n)),
+        (e = d.find(n)),
+        (t[4] = d),
+        (t[5] = o),
+        (t[6] = e));
+    } else e = t[6];
+    let n = e,
+      a = n?.displayName ?? s ?? ``,
+      l;
+    t[9] === c ? (l = t[10]) : ((l = () => c(null, null)), (t[9] = c), (t[10] = l));
+    let u;
+    t[11] !== a || t[12] !== r || t[13] !== o || t[14] !== l
+      ? ((u = (0, Q.jsx)(G, { conversationId: o, displayName: a, hostId: r, onBack: l })),
+        (t[11] = a),
+        (t[12] = r),
+        (t[13] = o),
+        (t[14] = l),
+        (t[15] = u))
+      : (u = t[15]);
+    let f = u;
+    if (i) {
+      let e;
+      t[16] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Q.jsx)(`div`, {
+            className: `relative min-h-0 flex-1`,
+            children: (0, Q.jsx)(h, { fillParent: !0, debugName: `Subagent transcript` }),
+          })),
+          (t[16] = e))
+        : (e = t[16]);
+      let n;
+      return (
+        t[17] === f
+          ? (n = t[18])
+          : ((n = (0, Q.jsxs)(`div`, { className: `flex h-full flex-col`, children: [f, e] })),
+            (t[17] = f),
+            (t[18] = n)),
+        n
+      );
+    }
+    let p = n?.canInteract === !0,
+      m,
+      g;
+    t[19] === c
+      ? ((m = t[20]), (g = t[21]))
+      : ((m = () => c(null, null)),
+        (g = (e) => c(e.conversationId, e.displayName)),
+        (t[19] = c),
+        (t[20] = m),
+        (t[21] = g));
+    let _;
+    return (
+      t[22] !== f || t[23] !== r || t[24] !== o || t[25] !== p || t[26] !== m || t[27] !== g
+        ? ((_ = (0, Q.jsx)(I, {
+            canInteract: p,
+            conversationId: o,
+            header: f,
+            hostId: r,
+            onClose: m,
+            onOpenBackgroundAgent: g,
+          })),
+          (t[22] = f),
+          (t[23] = r),
+          (t[24] = o),
+          (t[25] = p),
+          (t[26] = m),
+          (t[27] = g),
+          (t[28] = _))
+        : (_ = t[28]),
+      _
+    );
   }
-  if (SubagentPanelHeader == null) return null;
-  return jsx.jsx(SubagentPanelHeader, { backAriaLabel: "Back to subagents", label: displayName, seed: conversationId, trailing, onBack });
+  let f;
+  return (
+    t[29] !== d || t[30] !== c
+      ? ((f = (0, Q.jsx)(V, { subagents: d, onSelect: c })), (t[29] = d), (t[30] = c), (t[31] = f))
+      : (f = t[31]),
+    f
+  );
 }
-function LocalConversationSubagentsPanelTab(props: Props): unknown {
-  const enabled = useBackgroundSubagentsEnabled?.() ?? true;
-  const queryKey = enabled ? { conversationId: props.parentConversationId, hostId: props.hostId } : null;
-  const subagents = useQueryData?.<Subagent[]>(subagentQuery, queryKey) ?? [];
-  if (props.requestedConversationId == null) return jsx.jsx(SubagentOverview, { subagents, onSelect: props.onSelect });
-
-  const selected = subagents.find((subagent) => subagent.conversationId === props.requestedConversationId);
-  const displayName = selected?.displayName ?? props.requestedDisplayName ?? "";
-  const close = () => props.onSelect(null, null);
-  const header = jsx.jsx(SelectedSubagentHeader, { conversationId: props.requestedConversationId, displayName, hostId: props.hostId, onBack: close });
-  if (props.isLoading) return jsx.jsxs("div", { className: "flex h-full flex-col", children: [header, jsx.jsx("div", { className: "relative min-h-0 flex-1", children: LoadingIndicator == null ? jsx.jsx("div", { role: "status", children: "Loading subagent transcript…" }) : jsx.jsx(LoadingIndicator, { fillParent: true, debugName: "Subagent transcript" }) })] });
-  if (LocalConversationThread == null) return header;
-  return jsx.jsx(LocalConversationThread, { canInteract: selected?.canInteract === true, conversationId: props.requestedConversationId, header, hostId: props.hostId, onClose: close, onOpenBackgroundAgent: (agent: { conversationId: string; displayName: string }) => props.onSelect(agent.conversationId, agent.displayName) });
+function V(e) {
+  let t = (0, X.c)(26),
+    { subagents: n, onSelect: r } = e,
+    i,
+    a,
+    s,
+    c,
+    l,
+    u,
+    d;
+  if (t[0] !== n) {
+    let e = j(n);
+    s = new Map(e.map(W));
+    let r = e.filter(U);
+    ((a = e.filter(H)), (i = L));
+    let f;
+    (t[8] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((f = (0, Q.jsx)(o, {
+          id: `localConversation.subagentsPanel.noActive`,
+          defaultMessage: `No active subagents`,
+          description: `Empty state for the active subagents section`,
+        })),
+        (t[8] = f))
+      : (f = t[8]),
+      (d = {
+        emptyState: f,
+        id: `active`,
+        items: r.map(K),
+        title: (0, Q.jsx)(o, {
+          id: `localConversation.subagentsPanel.active`,
+          defaultMessage: `Active · {count}`,
+          description: `Heading and count for active subagents in the subagents side panel`,
+          values: { count: r.length },
+        }),
+        titleTrailing: (0, Q.jsx)(q, { subagents: r }),
+        visibleItemLimit: 4,
+      }),
+      (c = `mt-6`),
+      (l = `done`),
+      (u = a.map(K)),
+      (t[0] = n),
+      (t[1] = i),
+      (t[2] = a),
+      (t[3] = s),
+      (t[4] = c),
+      (t[5] = l),
+      (t[6] = u),
+      (t[7] = d));
+  } else ((i = t[1]), (a = t[2]), (s = t[3]), (c = t[4]), (l = t[5]), (u = t[6]), (d = t[7]));
+  let f;
+  t[9] === a.length
+    ? (f = t[10])
+    : ((f = (0, Q.jsx)(o, {
+        id: `localConversation.subagentsPanel.done`,
+        defaultMessage: `Done · {count}`,
+        description: `Heading and count for completed subagents in the subagents side panel`,
+        values: { count: a.length },
+      })),
+      (t[9] = a.length),
+      (t[10] = f));
+  let p;
+  t[11] !== c || t[12] !== l || t[13] !== u || t[14] !== f
+    ? ((p = { className: c, id: l, items: u, title: f, visibleItemLimit: 10 }),
+      (t[11] = c),
+      (t[12] = l),
+      (t[13] = u),
+      (t[14] = f),
+      (t[15] = p))
+    : (p = t[15]);
+  let m;
+  t[16] !== d || t[17] !== p ? ((m = [d, p]), (t[16] = d), (t[17] = p), (t[18] = m)) : (m = t[18]);
+  let h;
+  t[19] !== r || t[20] !== s
+    ? ((h = (e) => {
+        let t = s.get(e);
+        t != null && r(t.conversationId, t.displayName);
+      }),
+      (t[19] = r),
+      (t[20] = s),
+      (t[21] = h))
+    : (h = t[21]);
+  let g;
+  return (
+    t[22] !== i || t[23] !== m || t[24] !== h
+      ? ((g = (0, Q.jsx)(i, { sections: m, onSelect: h })),
+        (t[22] = i),
+        (t[23] = m),
+        (t[24] = h),
+        (t[25] = g))
+      : (g = t[25]),
+    g
+  );
 }
-
-export { LocalConversationSubagentsPanelTab };
+function H(e) {
+  let { status: t } = e;
+  return t === `done`;
+}
+function U(e) {
+  let { status: t } = e;
+  return t !== `done`;
+}
+function W(e) {
+  return [e.conversationId, e];
+}
+function G(e) {
+  let t = (0, X.c)(16),
+    { conversationId: r, displayName: i, hostId: a, onBack: s } = e,
+    l = c(),
+    u;
+  t[0] !== r || t[1] !== a
+    ? ((u = { hostId: a, threadId: r }), (t[0] = r), (t[1] = a), (t[2] = u))
+    : (u = t[2]);
+  let d = n(m, u),
+    f = null;
+  if (d?.model) {
+    let e;
+    t[3] === d.model ? (e = t[4]) : ((e = S(d.model)), (t[3] = d.model), (t[4] = e));
+    let n = e,
+      r;
+    (t[5] !== n || t[6] !== d.reasoningEffort
+      ? ((r = _(d.reasoningEffort)
+          ? (0, Q.jsx)(o, {
+              id: `localConversation.subagentsPanel.modelAndReasoningEffort`,
+              defaultMessage: `{model} · {reasoning, select, none {None} minimal {Minimal} low {Light} medium {Medium} high {High} xhigh {Extra High} max {Max} ultra {Ultra} persistent {Persistent} other {Medium}}`,
+              description: `Model and reasoning effort shown in a selected subagent's details header. The model is a product name such as GPT-5.4. The reasoning value describes how much computational effort that subagent used.`,
+              values: { reasoning: d.reasoningEffort, model: n },
+            })
+          : n),
+        (t[5] = n),
+        (t[6] = d.reasoningEffort),
+        (t[7] = r))
+      : (r = t[7]),
+      (f = r));
+  }
+  let p;
+  t[8] === l
+    ? (p = t[9])
+    : ((p = l.formatMessage({
+        id: `localConversation.subagentsPanel.back`,
+        defaultMessage: `Back to subagents`,
+        description: `Accessible label for returning from a subagent transcript to the subagent list`,
+      })),
+      (t[8] = l),
+      (t[9] = p));
+  let h;
+  return (
+    t[10] !== r || t[11] !== i || t[12] !== f || t[13] !== s || t[14] !== p
+      ? ((h = (0, Q.jsx)(z, { backAriaLabel: p, label: i, seed: r, trailing: f, onBack: s })),
+        (t[10] = r),
+        (t[11] = i),
+        (t[12] = f),
+        (t[13] = s),
+        (t[14] = p),
+        (t[15] = h))
+      : (h = t[15]),
+    h
+  );
+}
+function K(e) {
+  let t = e.objective == null ? null : v(A(l(e.objective)), 60);
+  return {
+    avatarSeed: e.conversationId,
+    id: e.conversationId,
+    label: e.displayName,
+    preview:
+      t ??
+      e.statusSummary ??
+      (e.status === `done`
+        ? null
+        : (0, Q.jsx)(o, {
+            id: `localConversation.subagentsPanel.working`,
+            defaultMessage: `Working`,
+            description: `Fallback preview shown when an active subagent has no objective or response yet`,
+          })),
+    previewLineCount: 1,
+    trailing: (0, Q.jsx)(Y, { subagent: e }),
+  };
+}
+function q(e) {
+  let t = (0, X.c)(4),
+    { subagents: n } = e,
+    r;
+  t[0] === n ? (r = t[1]) : ((r = n.filter(J)), (t[0] = n), (t[1] = r));
+  let i = r.length;
+  if (i === 0) return null;
+  let a;
+  return (
+    t[2] === i
+      ? (a = t[3])
+      : ((a = (0, Q.jsx)(`span`, {
+          className: `flex min-w-0 shrink items-center gap-1.5 truncate text-xs tabular-nums`,
+          children: (0, Q.jsx)(o, {
+            id: `localConversation.subagentsPanel.summary.waiting`,
+            defaultMessage: `{count, plural, one {# waiting} other {# waiting}}`,
+            description: `Count of currently waiting subagents in the overview header`,
+            values: { count: i },
+          }),
+        })),
+        (t[2] = i),
+        (t[3] = a)),
+    a
+  );
+}
+function J(e) {
+  let { status: t } = e;
+  return t === `waiting`;
+}
+function Y(e) {
+  let t = (0, X.c)(16),
+    { subagent: n } = e,
+    r = E(),
+    i;
+  t[0] === r ? (i = t[1]) : ((i = r.getTime()), (t[0] = r), (t[1] = i));
+  let [a, s] = (0, Z.useState)(i),
+    c;
+  (t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((c = () => {
+        s(Date.now());
+      }),
+      (t[2] = c))
+    : (c = t[2]),
+    w(c, n.status === `done` ? null : 1e3));
+  let l = n.lastAssistantMessageAtMs ?? n.recencyAtMs ?? null,
+    u = n.status === `done` || n.startedAtMs == null ? null : Math.max(a - n.startedAtMs, 0),
+    d;
+  t[3] !== l || t[4] !== n.status
+    ? ((d = n.status !== `done` || l == null ? null : new Date(l).toISOString()),
+      (t[3] = l),
+      (t[4] = n.status),
+      (t[5] = d))
+    : (d = t[5]);
+  let p = d,
+    m;
+  t[6] === n.status
+    ? (m = t[7])
+    : ((m =
+        n.status === `waiting`
+          ? (0, Q.jsx)(o, {
+              id: `localConversation.subagentsPanel.status.waiting`,
+              defaultMessage: `Waiting`,
+              description: `Status label for a subagent awaiting work in the overview`,
+            })
+          : null),
+      (t[6] = n.status),
+      (t[7] = m));
+  let h;
+  t[8] === u
+    ? (h = t[9])
+    : ((h = u == null ? null : (0, Q.jsx)(`span`, { children: C(u) })), (t[8] = u), (t[9] = h));
+  let g;
+  t[10] === p
+    ? (g = t[11])
+    : ((g =
+        p == null
+          ? null
+          : (0, Q.jsx)(`time`, {
+              dateTime: p,
+              children: (0, Q.jsx)(o, {
+                id: `localConversation.subagentsPanel.status.completedAgo`,
+                defaultMessage: `{time} ago`,
+                description: `Relative completion time for a finished subagent in the overview`,
+                values: { time: (0, Q.jsx)(f, { dateString: p }, `completed-at`) },
+              }),
+            })),
+      (t[10] = p),
+      (t[11] = g));
+  let _;
+  return (
+    t[12] !== m || t[13] !== h || t[14] !== g
+      ? ((_ = (0, Q.jsxs)(`span`, { className: `flex items-center gap-3`, children: [m, h, g] })),
+        (t[12] = m),
+        (t[13] = h),
+        (t[14] = g),
+        (t[15] = _))
+      : (_ = t[15]),
+    _
+  );
+}
+var X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((X = t()),
+      u(),
+      r(),
+      g(),
+      x(),
+      (Z = s()),
+      a(),
+      d(),
+      y(),
+      k(),
+      b(),
+      T(),
+      O(),
+      M(),
+      N(),
+      R(),
+      p(),
+      F(),
+      (Q = i()));
+  }))();
+}
+$();
+export { B as LocalConversationSubagentsPanelTab };
