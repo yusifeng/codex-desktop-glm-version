@@ -12,7 +12,9 @@ import "@rchunk/conversation-summary";
 import "@rchunk/timestamps";
 import "@rchunk/platform-ui-kit-provider";
 import "@rchunk/navigation-blocker";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import { I3 as getJsxRuntime, e6 as getReactRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import { i as draftValidationError, n as automationToDraft, s as isDraftDirty, type AutomationDraft, type AutomationRecord as ScheduleAutomationRecord } from "@rchunk/schedule-draft";
+import { t as ScheduleFields } from "@rchunk/schedule-fields";
 
 interface Action {
   disabled?: boolean;
@@ -29,6 +31,7 @@ interface AutomationRecord {
   is_enabled?: boolean;
   name?: string;
   prompt?: string;
+  schedule?: string;
   status?: string;
   title?: string;
 }
@@ -72,9 +75,16 @@ interface EditorProps {
   item?: AutomationItem;
   mode?: "dialog" | "panel";
   onClose(): void;
-  onDelete?(): void;
-  onSave?(draft: Record<string, unknown>): void | Promise<void>;
+  onDelete?(): void | Promise<void>;
+  onSave?(draft: AutomationDraft | Record<string, unknown>): unknown | Promise<unknown>;
+  onSaved?(result: unknown, draft: AutomationDraft | Record<string, unknown>): void;
   presentation?: "dialog" | "panel";
+}
+
+interface ReactHooks {
+  useEffect(effect: () => void | (() => void), dependencies: readonly unknown[]): void;
+  useRef<Value>(value: Value): { current: Value };
+  useState<Value>(value: Value | (() => Value)): [Value, (next: Value | ((current: Value) => Value)) => void];
 }
 
 let runtime: JsxRuntime | undefined;
@@ -83,6 +93,51 @@ function jsx(): JsxRuntime {
   return runtime;
 }
 function initialize(): void {}
+
+function react(): ReactHooks {
+  return getReactRuntime() as unknown as ReactHooks;
+}
+
+function normalizedAutomation(automation: AutomationRecord): ScheduleAutomationRecord {
+  const schedule = automation.schedule ?? "RRULE:FREQ=DAILY;BYHOUR=9;BYMINUTE=0";
+  return {
+    default_timezone: (automation as { default_timezone?: string }).default_timezone,
+    id: automation.id ?? "draft",
+    is_enabled: automation.is_enabled !== false,
+    next_run_times: (automation as { next_run_times?: string[] }).next_run_times ?? [],
+    prompt: automation.prompt ?? "",
+    schedule,
+    schedule_components: (automation as { schedule_components?: ScheduleAutomationRecord["schedule_components"] }).schedule_components ?? {
+      frequency: /FREQ=([^;\r\n]+)/i.exec(schedule)?.[1]?.toLocaleLowerCase() ?? "daily",
+    },
+    schedule_time_of_day: (automation as { schedule_time_of_day?: ScheduleAutomationRecord["schedule_time_of_day"] }).schedule_time_of_day,
+    target_time_utc: (automation as { target_time_utc?: string | null }).target_time_utc,
+    thread_mode: (automation as { thread_mode?: string | null }).thread_mode,
+    timing_mode: (automation as { timing_mode?: string | number }).timing_mode,
+    title: automation.title ?? automation.name ?? "",
+  };
+}
+
+function createInitialDraft(item?: AutomationItem, initialDraft?: EditorProps["initialDraft"]): AutomationDraft | Record<string, unknown> {
+  if (item?.automation != null) return automationToDraft(normalizedAutomation(item.automation));
+  return {
+    destination: initialDraft?.destination,
+    instructions: initialDraft?.instructions ?? "",
+    kind: "cron",
+    name: initialDraft?.name ?? "",
+    prompt: initialDraft?.instructions ?? "",
+    schedule: initialDraft?.schedule,
+    scheduleConfig: initialDraft?.schedule == null ? undefined : { customRrule: initialDraft.schedule, mode: "custom" },
+  };
+}
+
+function draftName(draft: Record<string, unknown>): string { return String(draft.name ?? ""); }
+function draftPrompt(draft: Record<string, unknown>): string { return String(draft.prompt ?? draft.instructions ?? ""); }
+function comparableDraft(draft: Record<string, unknown>): string {
+  const copy = { ...draft };
+  delete copy.error;
+  return JSON.stringify(copy);
+}
 
 function actionLabel(fallback: string, action?: Action): string {
   return action?.label ?? fallback;
@@ -238,30 +293,111 @@ function AutomationDetail({ item, onClose, onEdit }: { item?: AutomationItem; on
   });
 }
 
-function AutomationEditor({ initialDraft, isPending = false, item, mode = "dialog", onClose, onDelete, onSave, presentation }: EditorProps): unknown {
+function AutomationEditor({ initialDraft, isPending = false, item, mode = "dialog", onClose, onDelete, onSave, onSaved, presentation }: EditorProps): unknown {
+  const React = react();
+  const identity = item?.automation?.id ?? `new:${initialDraft?.name ?? ""}:${initialDraft?.schedule ?? ""}`;
+  const makeInitial = (): AutomationDraft | Record<string, unknown> => createInitialDraft(item, initialDraft);
+  const [draft, setDraft] = React.useState<AutomationDraft | Record<string, unknown>>(makeInitial);
+  const [baseline, setBaseline] = React.useState<AutomationDraft | Record<string, unknown>>(makeInitial);
+  const [saving, setSaving] = React.useState(false);
+  const [hasSaved, setHasSaved] = React.useState(false);
+  const [deleting, setDeleting] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const [discardOpen, setDiscardOpen] = React.useState(false);
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const operation = React.useRef<AbortController | null>(null);
+  React.useEffect(() => {
+    const next = makeInitial();
+    setDraft(next);
+    setBaseline(next);
+    setSaving(false);
+    setHasSaved(false);
+    setDeleting(false);
+    setError(null);
+    setDiscardOpen(false);
+    setDeleteOpen(false);
+    return () => operation.current?.abort();
+  }, [identity]);
   const automation = item?.automation;
-  const draft: Record<string, unknown> = initialDraft == null
-    ? { name: automation?.title ?? automation?.name ?? "", instructions: automation?.prompt ?? "" }
-    : { ...initialDraft };
+  const scheduleAutomation = automation == null ? null : normalizedAutomation(automation);
+  const record = draft as Record<string, unknown>;
+  const changed = scheduleAutomation == null
+    ? !hasSaved && (initialDraft != null || comparableDraft(record) !== comparableDraft(baseline as Record<string, unknown>))
+    : isDraftDirty(scheduleAutomation, draft as AutomationDraft);
+  const validation = scheduleAutomation == null ? null : draftValidationError(scheduleAutomation, draft as AutomationDraft, new Date());
+  const busy = isPending || saving || deleting;
+  const valid = draftName(record).trim().length > 0 && draftPrompt(record).trim().length > 0 && validation == null;
+  const update = (patch: Record<string, unknown>): void => setDraft((current) => ({ ...current, ...patch }));
+  const close = (): void => { if (busy) return; if (changed) setDiscardOpen(true); else onClose(); };
+  const save = async (): Promise<void> => {
+    if (busy || !valid || !changed || onSave == null) return;
+    operation.current?.abort();
+    operation.current = new AbortController();
+    setSaving(true);
+    setError(null);
+    try {
+      const result = await onSave(draft);
+      if (operation.current.signal.aborted) return;
+      setBaseline(draft);
+      setHasSaved(true);
+      onSaved?.(result, draft);
+      if ((presentation ?? mode) === "dialog") onClose();
+    } catch (caught) {
+      if (!operation.current.signal.aborted) setError(caught instanceof Error ? caught.message : "Couldn’t save task");
+    } finally {
+      if (!operation.current.signal.aborted) setSaving(false);
+    }
+  };
+  const remove = async (): Promise<void> => {
+    if (busy || onDelete == null) return;
+    setDeleting(true);
+    setError(null);
+    let removed = false;
+    try { await onDelete(); removed = true; }
+    catch (caught) { setError(caught instanceof Error ? caught.message : "Couldn’t delete task"); }
+    finally { setDeleting(false); }
+    if (removed) { setDeleteOpen(false); onClose(); }
+  };
   const shell = presentation ?? mode;
   return jsx().jsxs(shell === "dialog" ? "dialog" : "aside", {
     open: shell === "dialog" ? true : undefined,
+    "aria-busy": busy,
     children: [
       jsx().jsx("h2", { children: automation == null ? "Scheduled task" : "Edit scheduled task" }),
+      error == null ? null : jsx().jsx("div", { role: "alert", children: error }),
       jsx().jsx("input", {
         "aria-label": automation == null ? "Task name" : "Name",
-        value: String(draft.name ?? ""),
-        onChange: (event: { currentTarget: { value: string } }) => { draft.name = event.currentTarget.value; },
+        disabled: busy,
+        value: draftName(record),
+        onChange: (event: { currentTarget: { value: string } }) => update({ name: event.currentTarget.value }),
       }),
       jsx().jsx("textarea", {
         "aria-label": "Instructions",
-        value: String(draft.instructions ?? ""),
-        onChange: (event: { currentTarget: { value: string } }) => { draft.instructions = event.currentTarget.value; },
+        disabled: busy,
+        value: draftPrompt(record),
+        onChange: (event: { currentTarget: { value: string } }) => update({ instructions: event.currentTarget.value, prompt: event.currentTarget.value }),
       }),
-      item == null ? null : jsx().jsx("fieldset", { draft: { ...draft, name: draft.name, prompt: draft.instructions } }),
-      jsx().jsx("button", { type: "button", onClick: onClose, children: "Close" }),
-      onDelete == null ? null : jsx().jsx("button", { type: "button", onClick: onDelete, children: "Delete" }),
-      jsx().jsx("button", { type: "button", disabled: isPending || item != null, onClick: () => onSave?.(draft), children: "Save" }),
+      scheduleAutomation == null ? null : jsx().jsx(ScheduleFields, {
+        automation: scheduleAutomation,
+        draft: draft as AutomationDraft,
+        onChange: setDraft,
+      }),
+      validation == null ? null : jsx().jsx("p", { role: "alert", children: validation === "past" ? "Choose a future time" : validation === "too-far" ? "Choose a time within two years" : "End repeat must be in the future" }),
+      jsx().jsx("button", { type: "button", disabled: busy, onClick: close, children: "Close" }),
+      onDelete == null ? null : jsx().jsx("button", { type: "button", disabled: busy, onClick: () => setDeleteOpen(true), children: "Delete" }),
+      jsx().jsx("button", { type: "button", disabled: busy || !valid || !changed || onSave == null, onClick: () => void save(), children: saving ? "Saving…" : error == null ? "Save" : "Try again" }),
+      discardOpen ? jsx().jsxs("div", { role: "dialog", "aria-label": "Discard scheduled task changes?", children: [
+        jsx().jsx("h3", { children: "Discard scheduled task changes?" }),
+        jsx().jsx("p", { children: "Your changes to this scheduled task will be lost" }),
+        jsx().jsx("button", { type: "button", onClick: () => setDiscardOpen(false), children: "Keep editing" }),
+        jsx().jsx("button", { type: "button", onClick: onClose, children: "Discard" }),
+      ] }) : null,
+      deleteOpen ? jsx().jsxs("div", { role: "dialog", "aria-label": "Delete scheduled task?", children: [
+        jsx().jsx("h3", { children: "Delete scheduled task?" }),
+        jsx().jsx("p", { children: "This action can’t be undone" }),
+        jsx().jsx("button", { type: "button", disabled: deleting, onClick: () => setDeleteOpen(false), children: "Cancel" }),
+        jsx().jsx("button", { type: "button", disabled: deleting, onClick: () => void remove(), children: deleting ? "Deleting…" : "Delete task" }),
+      ] }) : null,
     ],
   });
 }

@@ -31,11 +31,14 @@ for (const directory of MODULES) {
 }
 const marker = (name) => `() => globalThis.__conversationRegistrationTest.initialized.push(${JSON.stringify(name)})`;
 const component = (name) => JSON.stringify(name);
+const initialImports = imports.get("app-initial") ?? new Set();
+initialImports.add("att").add("Ftt").add("htt").add("ptt").add("Vtt").add("iun");
+imports.set("app-initial", initialImports);
 const overrides = {
   "app-shared": {
-    BX: `() => globalThis.__conversationRegistrationTest.signalValue`, FX: marker("signals"), I3: `() => globalThis.__conversationRegistrationTest.jsx`,
+    BX: `signal => globalThis.__conversationRegistrationTest.signals?.[signal?.id] ?? globalThis.__conversationRegistrationTest.signalValue`, FX: marker("signals"), I3: `() => globalThis.__conversationRegistrationTest.jsx`,
     Ib: component("SourcesIcon"), LX: `() => globalThis.__conversationRegistrationTest.scope`, Qh: component("LoadingSpinner"),
-    Y2: component("FormattedMessage"), Yh: component("Button"), ZI: `{ id: "app" }`, e6: `globalThis.__conversationRegistrationTest.react`,
+    Y2: component("FormattedMessage"), Yh: component("Button"), ZI: `{ id: "app" }`, e6: `globalThis.__conversationRegistrationTest.react`, HX: `signal => globalThis.__conversationRegistrationTest.signals?.[signal?.id] ?? globalThis.__conversationRegistrationTest.signalValue`,
     mg: `path => "FileIcon:" + path`, oZ: `(scope, factory) => ({ scope, factory })`, wy: component("AutomationIcon"),
   },
   "app-initial": {
@@ -45,12 +48,17 @@ const overrides = {
     Xd: component("TabThumbnail"), _Bt: `() => globalThis.__conversationRegistrationTest.alreadyOpen ?? false`,
     qvt: `{ activeTab$: { id: "active-tab" }, closeTab: id => { globalThis.__conversationRegistrationTest.closedTab = id; }, updateTab: (id, update) => { globalThis.__conversationRegistrationTest.updatedTab = [id, update]; } }`,
     vbt: `{ id: "revision" }`, zl: `projectId => projectId == null ? null : ({ isOpen: true, projectId })`,
+    Ftt: `input => ({ kind: "create", ...input })`, Vtt: `input => ({ kind: "update", ...input })`,
+    QCt: `{ id: "automations" }`, ttt: `{ id: "automation-detail" }`, ptt: `{ id: "cloud-update" }`, att: `{ id: "cloud-delete" }`,
+    htt: `(draft, timezone) => ({ ...draft, timezone })`,
+    iun: `operation => ({ isPending: false, mutate(input, options) { globalThis.__conversationRegistrationTest.lastMutation = [operation, input]; options?.onSuccess?.({ id: input?.draft?.id ?? "saved-1", name: input?.name ?? "Saved" }); } })`,
   },
   "app-primary": { pf: `{ id: "current-conversation" }` },
   "appgen-query": { appgenProjectQuery$: `{ id: "project-query" }` },
   "conversation-thumbnail-ui": { n: marker("thumbnail-ui"), t: component("ConversationThumbnail") },
   "local-conversation-webmcp-tools-model": { t: `url => new URL(url).hostname` },
   "cloud-automation-detail-panel": { t: component("AutomationEditorPanel") },
+  "automation-editor-dialog": { t: component("LocalAutomationEditor") },
 };
 
 function mockModule(name) {
@@ -160,14 +168,28 @@ assert.equal(automationNode.type, "section");
 find(automationNode, (node) => node.type === "Button").props.onClick();
 assert.equal(tabState.savedAutomationId, "site:p1");
 automationNode = automation.AutomationSidePanelTabContent({ request: { automation: { id: "a1", name: "Daily" }, type: "automation" }, setTabState, tabId: "tab-1", tabState });
-assert.equal(automationNode.type, "AutomationEditorPanel");
+assert.equal(automationNode.type, "LocalAutomationEditor");
 automationNode.props.onClose();
 assert.equal(state.closedTab, "tab-1");
 automationNode.props.onSaved({ id: "a2", name: "Weekly" });
 assert.equal(tabState.savedAutomationId, "a2");
 assert.deepEqual(state.updatedTab, ["tab-1", { title: "Weekly", tooltip: "Weekly" }]);
 automationNode = automation.AutomationSidePanelTabContent({ request: { seed: { directiveKey: "weekly", prompt: "Summarize", title: "Weekly digest" }, type: "suggestion" }, setTabState, tabId: "tab-1", tabState });
+assert.equal(automationNode.type, "LocalAutomationEditor");
+assert.equal(automationNode.props.initialDraft.name, "Weekly digest");
+state.signals = {
+  automations: { data: { items: [] } },
+  "automation-detail": { data: { automation: { id: "cloud-1", name: "Cloud daily", prompt: "Report" }, teamId: "team-1" } },
+  "cloud-update": { mutate(input, options) { state.cloudUpdate = input; options.onSuccess({ id: "cloud-1", name: "Cloud weekly" }); } },
+  "cloud-delete": { mutate(input, options) { state.cloudDelete = input; options.onSuccess({ id: "cloud-1", name: "Cloud daily" }); } },
+};
+automationNode = automation.AutomationSidePanelTabContent({ request: { automationId: "cloud-1", type: "persisted" }, setTabState, tabId: "tab-1", tabState });
 assert.equal(automationNode.type, "AutomationEditorPanel");
-assert.equal(automationNode.props.item.automation.id, "suggestion:weekly");
+assert.equal(automationNode.props.item.teamId, "team-1");
+await automationNode.props.onSave({ name: "Cloud weekly", prompt: "Report", executionLocation: "cloud" });
+assert.equal(state.cloudUpdate.automationId, "cloud-1");
+assert.equal(state.cloudUpdate.teamId, "team-1");
+await automationNode.props.onDelete();
+assert.deepEqual(state.cloudDelete, { automationId: "cloud-1", teamId: "team-1" });
 
 console.log("conversation preview registration cluster tests passed");

@@ -41,6 +41,19 @@ exports were previously classified. Current completion requires source-backed bu
 
 ## Current runtime-source recovery status
 
+The Automations editor/detail/side-panel convergence batch removes the remaining static form shells from the three
+separately tracked presentation owners. The local editor now owns an immutable controlled draft, schedule validation and
+the recovered schedule-fields surface, dirty-state calculation, async save/retry, operation cancellation, discard blocking,
+and confirmed deletion; existing tasks are no longer made permanently unsaveable. The cloud detail owner now switches
+between detail and edit state, retains cloud location/model/project/schedule/time-zone fields, preserves a failed draft,
+and confirms discard and deletion. Side-panel routing now keeps local persisted tasks and suggestions on the local
+create/update/delete protocol, preserves the cloud `{automation, teamId}` response contract, and binds cloud update/delete
+signals and request serialization instead of wrapping every request as a synthetic team-less cloud item. Stateful tests
+exercise save, discard, confirmation, local mutation selection, cloud team identity, and cloud mutation serialization.
+The complete Automations family, typecheck, source-build, semantic override, test-index, and 1,888-chunk renderer build pass.
+This closes the three named Automations presentation owners; it does not by itself resolve unrelated Settings/Home owners
+or the remaining aggregate-hub migration inventory.
+
 The schedule draft/fields fidelity pass restores behavior that was still hidden behind the earlier common-case form.
 `exact_schedule` classification, invalid weekday/hourly rejection, future one-time candidate selection, timezone-aware
 UNTIL parsing, and mode-switch baselines now follow the published owner. Update serialization preserves DTSTART and unknown

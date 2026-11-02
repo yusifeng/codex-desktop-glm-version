@@ -12,9 +12,13 @@ globalThis.__automationInfrastructureTest = {
     jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; },
     jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; },
   },
+  hookState: { cursor: 0, values: [] },
   react: {
-    useState(initialValue) { let value = typeof initialValue === "function" ? initialValue() : initialValue; return [value, nextValue => { value = typeof nextValue === "function" ? nextValue(value) : nextValue; }]; },
+    useEffect() {},
+    useState(initialValue) { const state = globalThis.__automationInfrastructureTest.hookState; const index = state.cursor++; if (!(index in state.values)) state.values[index] = typeof initialValue === "function" ? initialValue() : initialValue; return [state.values[index], nextValue => { state.values[index] = typeof nextValue === "function" ? nextValue(state.values[index]) : nextValue; }]; },
   },
+  render(component, props) { this.hookState.cursor = 0; return component(props); },
+  resetHooks() { this.hookState.cursor = 0; this.hookState.values = []; },
 };
 async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "automation-infrastructure-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__automationInfrastructureTest.jsx;export const e6=()=>globalThis.__automationInfrastructureTest.react;export const $O={ONE_MINUTE:60000};export const FX=()=>{};export const QI=()=>{};export const ZI='scope';export const ek=()=>{};export const pZ=(scope,initialValue)=>({scope,initialValue});export const eZ=(scope,derive)=>({scope,derive});" : importPath === "app-initial" ? "export const $ln=name=>[name];export const Rln=()=>{};export const Sun=()=>{};export const Wln=()=>false;export const _un='user';export const cJt=()=>globalThis.__automationInfrastructureTest.initialized.push('automation-api');export const mfn=id=>'gate:'+id;export const mnt=()=>{};export const mun='account';export const nun=()=>{};export const pfn=()=>{};export const pnt={automations:{getState:async()=>({status:'complete'})}};export const vun='auth';export const w8=()=>({data:{models:[{model:'gpt-5',displayName:'GPT-5',supportedReasoningEfforts:['medium','high']}]}});" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
 function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(child => walk(child, visit)); else walk(children, visit); }
@@ -96,12 +100,17 @@ assert.equal(providerUi.props["data-time-zone"], "Asia/Shanghai");
 const detail = await bundle("cloud-automation-detail-panel");
 assert.deepEqual(Object.keys(detail).sort(), ["a", "c", "i", "n", "o", "r", "s", "t"]);
 let edited = 0, ran = 0, paused = 0, detailDeleted = 0;
-const detailUi = detail.t({ automation: { id: "task", name: "Daily report", instructions: "Summarize", schedule: "Daily", destination: "Email", status: "ACTIVE" }, onEdit() { edited++; }, onRunNow() { ran++; }, onPause() { paused++; }, onDelete() { detailDeleted++; } });
+globalThis.__automationInfrastructureTest.resetHooks();
+const detailProps = { automation: { id: "task", name: "Daily report", instructions: "Summarize", schedule: "Daily", destination: "Email", status: "ACTIVE" }, onEdit() { edited++; }, onRunNow() { ran++; }, onPause() { paused++; }, onDelete() { detailDeleted++; } };
+let detailUi = globalThis.__automationInfrastructureTest.render(detail.t, detailProps);
 assert.match(text(detailUi), /Daily report.*Summarize.*Daily.*Email/);
 find(detailUi, node => node.props?.children === "Edit").props.onClick();
 find(detailUi, node => node.props?.children === "Run now").props.onClick();
 find(detailUi, node => node.props?.children === "Pause").props.onClick();
 find(detailUi, node => node.props?.children === "Delete").props.onClick();
+detailUi = globalThis.__automationInfrastructureTest.render(detail.t, detailProps);
+find(detailUi, node => node.props?.children === "Delete task").props.onClick();
+await new Promise(resolve => setTimeout(resolve, 0));
 assert.equal(edited, 1);
 assert.equal(ran, 1);
 assert.equal(paused, 1);

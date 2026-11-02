@@ -5,14 +5,24 @@ import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-globalThis.__automationEditorTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
+const hookState = { cursor: 0, values: [] };
+globalThis.__automationEditorTest = {
+  jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } },
+  react: {
+    useEffect() {},
+    useRef(value) { const index = hookState.cursor++; hookState.values[index] ??= { current: value }; return hookState.values[index]; },
+    useState(initial) { const index = hookState.cursor++; if (!(index in hookState.values)) hookState.values[index] = typeof initial === "function" ? initial() : initial; return [hookState.values[index], next => { hookState.values[index] = typeof next === "function" ? next(hookState.values[index]) : next; }]; },
+  },
+  render(component, props) { hookState.cursor = 0; return component(props); },
+  reset() { hookState.cursor = 0; hookState.values = []; },
+};
 async function bundle(directory) {
   const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "automation-editor-mocks", setup(build) {
     build.onResolve({ filter: /^@rchunk\/automation-editor-dialog$/ }, () => ({ path: path.join(ROOT, "src/renderer/automation-editor-dialog/index.ts") }));
     build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" }));
     build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => {
-      if (importPath === "app-shared") return { contents: "export const I3=()=>globalThis.__automationEditorTest.jsx;", loader: "js" };
-      if (importPath === "schedule-draft") return { contents: `export const n=(automation)=>({id:automation.id,kind:"cron",name:automation.title,prompt:automation.prompt,rawRrule:null,scheduleConfig:{mode:"daily",time:"09:00",weekdays:[],customRrule:"",intervalHours:1,intervalMinutes:null,monthDay:1},scheduleDirty:false,status:automation.is_enabled?"ACTIVE":"PAUSED"}); export const s=()=>false;`, loader: "js" };
+      if (importPath === "app-shared") return { contents: "export const I3=()=>globalThis.__automationEditorTest.jsx; export const e6=()=>globalThis.__automationEditorTest.react;", loader: "js" };
+      if (importPath === "schedule-draft") return { contents: `export const n=(automation)=>({id:automation.id,kind:"cron",name:automation.title,prompt:automation.prompt,rawRrule:null,scheduleConfig:{mode:"daily",time:"09:00",weekdays:[],customRrule:"",intervalHours:1,intervalMinutes:null,monthDay:1},scheduleDirty:false,status:automation.is_enabled?"ACTIVE":"PAUSED"}); export const s=(automation,draft)=>draft.name!==automation.title||draft.prompt!==automation.prompt||draft.scheduleDirty; export const i=()=>null;`, loader: "js" };
       if (importPath === "schedule-fields") return { contents: "export const t=(props)=>globalThis.__automationEditorTest.jsx.jsx('fieldset',{draft:props.draft});", loader: "js" };
       return { contents: "export {};", loader: "js" };
     });
@@ -81,11 +91,35 @@ assert.match(text(detail), /Daily brief/);
 assert.match(text(detail), /Summarize updates/);
 const completedDetail = editor.r({ item: { automation: { ...base, status: "completed" } }, onClose: () => {}, onEdit: () => {} });
 assert.equal(find(completedDetail, node => node.props?.["aria-label"] === "Edit task"), undefined);
-const editorUi = editor.t({ item, onClose: () => {}, presentation: "dialog" });
+globalThis.__automationEditorTest.reset();
+const editorUi = globalThis.__automationEditorTest.render(editor.t, { item, onClose: () => {}, presentation: "dialog" });
 assert.equal(editorUi.type, "dialog");
 assert.equal(find(editorUi, node => node.props?.["aria-label"] === "Name").props.value, "Daily brief");
 assert.equal(find(editorUi, node => node.type === "fieldset").props.draft.name, "Daily brief");
 assert.equal(find(editorUi, node => node.type === "button" && node.props.children === "Save").props.disabled, true);
+globalThis.__automationEditorTest.reset();
+let editorClosed = 0, editorSaved, editorDeleted = 0;
+const editorProps = { item, mode: "panel", onClose: () => { editorClosed++; }, onSave: async draft => { editorSaved = draft; return { id: "task-1", name: draft.name }; }, onDelete: async () => { editorDeleted++; } };
+let statefulEditor = globalThis.__automationEditorTest.render(editor.t, editorProps);
+find(statefulEditor, node => node.props?.["aria-label"] === "Name").props.onChange({ currentTarget: { value: "Morning brief" } });
+statefulEditor = globalThis.__automationEditorTest.render(editor.t, editorProps);
+assert.equal(find(statefulEditor, node => node.type === "button" && node.props.children === "Save").props.disabled, false);
+find(statefulEditor, node => node.type === "button" && node.props.children === "Close").props.onClick();
+statefulEditor = globalThis.__automationEditorTest.render(editor.t, editorProps);
+assert.match(text(statefulEditor), /Discard scheduled task changes/);
+find(statefulEditor, node => node.type === "button" && node.props.children === "Keep editing").props.onClick();
+statefulEditor = globalThis.__automationEditorTest.render(editor.t, editorProps);
+find(statefulEditor, node => node.type === "button" && node.props.children === "Save").props.onClick();
+await new Promise(resolve => setTimeout(resolve, 0));
+assert.equal(editorSaved.name, "Morning brief");
+statefulEditor = globalThis.__automationEditorTest.render(editor.t, editorProps);
+find(statefulEditor, node => node.type === "button" && node.props.children === "Delete").props.onClick();
+statefulEditor = globalThis.__automationEditorTest.render(editor.t, editorProps);
+assert.match(text(statefulEditor), /This action can’t be undone/);
+find(statefulEditor, node => node.type === "button" && node.props.children === "Delete task").props.onClick();
+await new Promise(resolve => setTimeout(resolve, 0));
+assert.equal(editorDeleted, 1);
+assert.equal(editorClosed, 1);
 editor.a(); editor.d(); editor.h(); editor.l(); editor.n(); editor.p(); editor.s();
 assert.equal(typeof editor.t, "function");
 
@@ -102,7 +136,7 @@ assert.match(text(requirements), /Choose a model/);
 let changed;
 const form = cloud.s({ draft: validDraft, setDraft: updater => { changed = typeof updater === "function" ? updater(validDraft) : updater; }, resolvedProjects: [{ projectId: "empty", title: "Empty", worktreePaths: [] }, { projectId: "repo", title: "Repo", worktreePaths: ["/repo"] }] });
 assert.equal(form.type, "form");
-assert.equal(all(form, node => node.type === "option").length, 2);
+assert.equal(all(form, node => node.type === "option").length, 4);
 find(form, node => node.type === "input").props.onChange({ currentTarget: { value: "Renamed" } });
 assert.equal(changed.name, "Renamed");
 assert.equal(find(form, node => node.type === "button" && node.props.children === "Save").props.disabled, false);
@@ -117,11 +151,29 @@ assert.equal(renamed, "New");
 find(panel, node => node.props?.["aria-label"] === "Close").props.onClick();
 assert.equal(panelClosed, 1);
 let openedChat = 0;
-const cloudEditor = cloud.t({ item, onClose: () => {}, onOpenConversation: () => { openedChat++; } });
+globalThis.__automationEditorTest.reset();
+const cloudEditor = globalThis.__automationEditorTest.render(cloud.t, { item, onClose: () => {}, onOpenConversation: () => { openedChat++; } });
 assert.equal(find(cloudEditor, node => node.props?.id === "automation-detail-panel-title").props.value, "Daily brief");
 assert.match(text(cloudEditor), /Summarize updates/);
 find(cloudEditor, node => node.type === "button" && node.props.children === "Open chat").props.onClick();
 assert.equal(openedChat, 1);
+globalThis.__automationEditorTest.reset();
+let cloudSaved, cloudClosed = 0, cloudDeleted = 0;
+const cloudProps = { item, onClose: () => { cloudClosed++; }, onSave: async draft => { cloudSaved = draft; return { ...base, title: draft.name, name: draft.name, prompt: draft.prompt }; }, onSaved() {}, onDelete: async () => { cloudDeleted++; } };
+let cloudState = globalThis.__automationEditorTest.render(cloud.t, cloudProps);
+find(cloudState, node => node.type === "button" && node.props.children === "Edit").props.onClick();
+cloudState = globalThis.__automationEditorTest.render(cloud.t, cloudProps);
+find(cloudState, node => node.props?.id === "automation-detail-panel-title").props.onChange({ currentTarget: { value: "Cloud morning brief" } });
+cloudState = globalThis.__automationEditorTest.render(cloud.t, cloudProps);
+await find(cloudState, node => node.type === "form").props.onSubmit({ preventDefault() {} });
+assert.equal(cloudSaved.name, "Cloud morning brief");
+cloudState = globalThis.__automationEditorTest.render(cloud.t, cloudProps);
+find(cloudState, node => node.type === "button" && node.props.children === "Delete").props.onClick();
+cloudState = globalThis.__automationEditorTest.render(cloud.t, cloudProps);
+find(cloudState, node => node.type === "button" && node.props.children === "Delete task").props.onClick();
+await new Promise(resolve => setTimeout(resolve, 0));
+assert.equal(cloudDeleted, 1);
+assert.equal(cloudClosed, 1);
 cloud.c(); cloud.i(); cloud.n(); cloud.o();
 assert.equal(typeof cloud.t, "function");
 
