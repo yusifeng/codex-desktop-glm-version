@@ -103,6 +103,14 @@ if (mode === "smoke-readonly") {
     target.click();
     return { tagName: target.tagName, text: target.innerText?.trim() ?? '' };
   })()`);
+  const clickTextStartingWith = async (text) => evaluate(`(() => {
+    const target = [...document.querySelectorAll('button, a, [role="button"], [role="tab"], [role="menuitem"]')]
+      .filter((element) => element.innerText?.trim().split('\\n')[0] === ${JSON.stringify(text)})
+      .sort((left, right) => Number(left.getAttribute('aria-label') != null) - Number(right.getAttribute('aria-label') != null))[0];
+    if (target == null) throw new Error(${JSON.stringify("No clickable element starting with: ")} + ${JSON.stringify(text)});
+    target.click();
+    return { tagName: target.tagName, text: target.innerText?.trim() ?? '' };
+  })()`);
   const clickAriaWithMouse = async (label) => {
     const point = await evaluate(`(() => {
       const target = document.querySelector('[aria-label=${JSON.stringify(label)}]');
@@ -129,7 +137,8 @@ if (mode === "smoke-readonly") {
     do {
       const ready = await evaluate(`
         document.querySelector('#settings-search') != null ||
-        document.querySelector('[aria-label="打开个人资料菜单"], [aria-label="Open profile menu"]') != null
+        document.querySelector('[aria-label="打开个人资料菜单"], [aria-label="Open profile menu"]') != null ||
+        (document.querySelector('nav') != null && (document.body?.innerText?.trim().length ?? 0) > 20)
       `);
       if (ready) return;
       await new Promise((resolve) => setTimeout(resolve, 250));
@@ -143,6 +152,14 @@ if (mode === "smoke-readonly") {
       await new Promise((resolve) => setTimeout(resolve, 250));
     } while (Date.now() < deadline);
     throw new Error(`Timed out waiting for selector: ${selector}`);
+  };
+  const waitForSelectorGone = async (selector, timeoutMs = 30_000) => {
+    const deadline = Date.now() + timeoutMs;
+    do {
+      if (!(await evaluate(`document.querySelector(${JSON.stringify(selector)}) != null`))) return;
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    } while (Date.now() < deadline);
+    throw new Error(`Timed out waiting for selector to disappear: ${selector}`);
   };
   const waitForSettingsPageToSettle = async (timeoutMs = 30_000) => {
     const deadline = Date.now() + timeoutMs;
@@ -264,6 +281,16 @@ if (mode === "smoke-readonly") {
 
   await waitForAppReady();
   if (!(await evaluate(`document.querySelector('#settings-search') != null`))) {
+    if (!(await evaluate(`document.querySelector('[aria-label="打开个人资料菜单"], [aria-label="Open profile menu"]') != null`))) {
+      await evaluate(`(() => {
+        const target = [...document.querySelectorAll('button')].find((button) =>
+          ['聊天', '新对话'].includes(button.innerText?.trim())
+        );
+        if (target == null) throw new Error('Chat navigation button not found before settings');
+        target.click();
+      })()`);
+      await waitForSelector('[aria-label="打开个人资料菜单"], [aria-label="Open profile menu"]');
+    }
     const profileMenuLabel = await evaluate(`
       document.querySelector('[aria-label="打开个人资料菜单"]') != null ? '打开个人资料菜单' : 'Open profile menu'
     `);
@@ -328,8 +355,18 @@ if (mode === "smoke-readonly") {
     forbidden: ['Remote connections\nRefreshAdd connection'],
     minimumInteractive: 5,
   });
+  await clickText('控制其他设备');
+  await waitForSettingsPageToSettle();
+  await assertVisualPage('settings/connections-control-other-devices', {
+    text: ['控制其他设备'],
+    minimumInteractive: 3,
+  });
   await clickText('SSH');
   await waitForSettingsPageToSettle();
+  await assertVisualPage('settings/connections-ssh', {
+    text: ['SSH'],
+    minimumInteractive: 3,
+  });
   await clickOneOf(['添加', 'Add']);
   await waitForSelector('[role="dialog"]');
   await assertVisualPage('settings/connections-add-ssh-dialog', {
@@ -355,6 +392,8 @@ if (mode === "smoke-readonly") {
     { label: '已归档的聊天', name: 'archived-chats' },
   ]) {
     await clickText(page.label);
+    await waitForSelectorGone('[role="menu"]');
+    await new Promise((resolve) => setTimeout(resolve, 250));
     await waitForSettingsPageToSettle();
     await assertVisualPage(`settings/${page.name}`, {
       text: [page.label],
@@ -375,6 +414,20 @@ if (mode === "smoke-readonly") {
     text: ['浏览目录', '搜索插件'],
     minimumInteractive: 5,
   });
+  for (const tab of [
+    { label: '应用', name: 'apps' },
+    { label: 'MCP', name: 'mcp' },
+    { label: '技能', name: 'skills' },
+    { label: '插件', name: 'plugins' },
+  ]) {
+    await clickTextStartingWith(tab.label);
+    await waitForSettingsPageToSettle();
+    await assertVisualPage(`settings/plugins-${tab.name}`, {
+      text: [tab.label],
+      minimumInteractive: 3,
+      allowHorizontalOverflow: true,
+    });
+  }
 
   await clickText('钩子');
   await waitForSettingsPageToSettle();
@@ -414,18 +467,19 @@ if (mode === "smoke-readonly") {
     minimumInteractive: 2,
   });
 
-  if (await evaluate(`document.querySelector('nav[aria-label="应用导航"]') != null`)) {
+  if (await evaluate(`[...document.querySelectorAll('button, a')].some((element) => element.innerText?.trim() === '返回应用')`)) {
+    await clickText('返回应用');
+  } else {
     await evaluate(`(() => {
-      const target = [...document.querySelector('nav[aria-label="应用导航"]').querySelectorAll('button')].find((button) =>
-        button.innerText?.trim() === '聊天'
+      const target = [...document.querySelectorAll('button')].find((button) =>
+        ['聊天', '新对话'].includes(button.innerText?.trim())
       );
-      if (target == null) throw new Error('Chat navigation button not found');
+      if (target == null) throw new Error('New chat navigation button not found after settings');
       target.click();
     })()`);
-  } else {
-    await clickText('返回应用');
   }
   await waitForBodyText('新对话');
+  await waitForBodyText('探索');
   await assertVisualPage('app/shell', {
     text: ['新对话'],
     minimumInteractive: 8,
@@ -433,8 +487,7 @@ if (mode === "smoke-readonly") {
   });
 
   const explorePoint = await evaluate(`(() => {
-    const nav = document.querySelector('nav[aria-label="应用导航"]');
-    const target = [...(nav?.querySelectorAll('button') ?? [])].find((button) => button.innerText?.trim() === '探索');
+    const target = [...document.querySelectorAll('nav button')].find((button) => button.innerText?.trim() === '探索');
     if (target == null) throw new Error('Explore navigation button not found');
     const rect = target.getBoundingClientRect();
     return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
@@ -442,23 +495,63 @@ if (mode === "smoke-readonly") {
   await command('Input.dispatchMouseEvent', { type: 'mouseMoved', ...explorePoint });
   await command('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...explorePoint });
   await command('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...explorePoint });
+  await waitForSelector('[role="menu"]');
   await waitForBodyText(['Pull Request', '定时任务'], 30_000);
   await assertVisualPage('app/explore', {
     text: ['Pull Request', '站点', '定时任务', '插件'],
     minimumInteractive: 10,
     allowHorizontalOverflow: true,
   });
-  await evaluate(`(() => {
-    const nav = document.querySelector('nav[aria-label="应用导航"]');
-    const target = [...(nav?.querySelectorAll('button') ?? [])].find((button) => button.innerText?.trim() === '聊天');
-    if (target == null) throw new Error('Chat navigation button not found after explore');
-    target.click();
-  })()`);
-  await waitForBodyText('新对话');
+  const navigateToChat = async (context) => {
+    await evaluate(`(() => {
+      const target = [...document.querySelectorAll('nav button')].find((button) =>
+        ['聊天', '新对话'].includes(button.innerText?.trim())
+      );
+      if (target == null) throw new Error(${JSON.stringify('Chat navigation button not found after ')} + ${JSON.stringify(context)});
+      target.click();
+    })()`);
+    await waitForBodyText('新对话');
+  };
+  const openExploreMenu = async () => {
+    const point = await evaluate(`(() => {
+      const target = [...document.querySelectorAll('nav button')].find((button) => button.innerText?.trim() === '探索');
+      if (target == null) throw new Error('Explore navigation button not found');
+      const rect = target.getBoundingClientRect();
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    })()`);
+    await command('Input.dispatchMouseEvent', { type: 'mouseMoved', ...point });
+    await command('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...point });
+    await command('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...point });
+    await waitForSelector('[role="menu"]');
+    await waitForBodyText(['Pull Request', '定时任务'], 30_000);
+  };
+  const explorePages = [
+    { label: 'Meetings', name: 'meetings', readyText: 'Connect Google Calendar' },
+    { label: '站点', name: 'sites', readyText: '“站点”使用前须知' },
+    { label: 'Pull Request', name: 'pull-requests', readyText: '搜索 Pull Request' },
+    { label: '定时任务', name: 'automations', readyText: '搜索已安排任务' },
+    { label: '插件', name: 'plugins', readyText: '热门' },
+  ];
+  for (const [pageIndex, page] of explorePages.entries()) {
+    await clickText(page.label);
+    await waitForSelectorGone('[role="menu"]');
+    await waitForBodyText(page.readyText, 30_000);
+    if (page.name === 'meetings') {
+      await waitForBodyText(['No meeting notes found', "Couldn't load meetings"], 60_000);
+    }
+    await waitForSettingsPageToSettle();
+    await assertVisualPage(`app/${page.name}`, {
+      text: [page.label],
+      forbidden: page.name === 'meetings' ? ['Loading meetings', '正在加载会议'] : [],
+      minimumInteractive: 1,
+      allowHorizontalOverflow: true,
+    });
+    await navigateToChat(page.name);
+    if (pageIndex < explorePages.length - 1) await openExploreMenu();
+  }
 
   await evaluate(`(() => {
-    const nav = document.querySelector('nav[aria-label="应用导航"]');
-    const target = [...(nav?.querySelectorAll('button') ?? [])].find((button) => button.innerText?.trim() === '项目');
+    const target = [...document.querySelectorAll('nav button')].find((button) => button.innerText?.trim() === '项目');
     if (target == null) throw new Error('Projects navigation button not found');
     target.click();
   })()`);
@@ -469,8 +562,9 @@ if (mode === "smoke-readonly") {
   });
 
   await evaluate(`(() => {
-    const nav = document.querySelector('nav[aria-label="应用导航"]');
-    const target = [...(nav?.querySelectorAll('button') ?? [])].find((button) => button.innerText?.trim() === '聊天');
+    const target = [...document.querySelectorAll('nav button')].find((button) =>
+      ['聊天', '新对话'].includes(button.innerText?.trim())
+    );
     if (target == null) throw new Error('Chat navigation button not found');
     target.click();
   })()`);
@@ -498,8 +592,9 @@ if (mode === "smoke-readonly") {
     minimumInteractive: 8,
   });
   await evaluate(`(() => {
-    const nav = document.querySelector('nav[aria-label="应用导航"]');
-    const target = [...(nav?.querySelectorAll('button') ?? [])].find((button) => button.innerText?.trim() === '聊天');
+    const target = [...document.querySelectorAll('nav button')].find((button) =>
+      ['聊天', '新对话'].includes(button.innerText?.trim())
+    );
     if (target == null) throw new Error('Chat navigation button not found after activity');
     target.click();
   })()`);
@@ -723,17 +818,51 @@ if (mode === "smoke-readonly") {
   let browserTargets = [];
   do {
     const targets = await fetch(`${endpoint}/json/list`).then((response) => response.json());
-    browserTargets = targets
-      .filter((target) => target.type === "page" && target.url === requestedUrl)
-      .map((target) => ({ title: target.title, type: target.type, url: target.url }));
+    browserTargets = targets.filter((target) => target.type === "page" && target.url === requestedUrl);
     if (browserTargets.length === 0) await new Promise((resolve) => setTimeout(resolve, 250));
   } while (browserTargets.length === 0 && Date.now() < targetDeadline);
   if (browserTargets.length === 0) throw new Error(`No browser target committed ${requestedUrl}`);
+  const browserTarget = browserTargets[0];
+  const browserSocket = new WebSocket(browserTarget.webSocketDebuggerUrl);
+  await new Promise((resolve, reject) => {
+    browserSocket.addEventListener("open", resolve, { once: true });
+    browserSocket.addEventListener("error", reject, { once: true });
+  });
+  let browserCommandId = 0;
+  const browserPending = new Map();
+  const browserExceptions = [];
+  browserSocket.addEventListener("message", (event) => {
+    const message = JSON.parse(String(event.data));
+    if (message.method === "Runtime.exceptionThrown") {
+      const details = message.params?.exceptionDetails ?? {};
+      browserExceptions.push(details.exception?.description ?? details.text ?? "Unknown browser exception");
+    }
+    const waiter = browserPending.get(message.id);
+    if (waiter == null) return;
+    browserPending.delete(message.id);
+    if (message.error != null) waiter.reject(new Error(message.error.message));
+    else waiter.resolve(message.result);
+  });
+  const browserCommand = (method, params = {}) => {
+    const id = ++browserCommandId;
+    browserSocket.send(JSON.stringify({ id, method, params }));
+    return new Promise((resolve, reject) => browserPending.set(id, { resolve, reject }));
+  };
+  await browserCommand("Runtime.enable");
+  for (const [x, y] of [[10, 10], [100, 100], [300, 200], [600, 400], [200, 500]]) {
+    await browserCommand("Input.dispatchMouseEvent", { type: "mouseMoved", x, y });
+  }
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  browserSocket.close();
+  if (browserExceptions.length > 0) {
+    throw new Error(`IAB browser preload raised runtime exceptions: ${JSON.stringify(browserExceptions)}`);
+  }
   console.log(JSON.stringify({
     mode,
     requestedUrl,
     address: state.address,
-    browserTargets,
+    browserTargets: browserTargets.map((target) => ({ title: target.title, type: target.type, url: target.url })),
+    browserExceptions,
   }, null, 2));
 } else if (mode === "find-text") {
   if (argument.length === 0) throw new Error("find-text requires visible text");

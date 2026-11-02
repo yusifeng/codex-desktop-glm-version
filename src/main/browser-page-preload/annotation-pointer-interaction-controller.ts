@@ -1,8 +1,8 @@
 function createAnnotationPointerInteractionController(deps: any) {
-  const { De, gt, w, E, f, o, c, Ne, Ue, yt, Oe, x, selectionModifierNotifier, g, xl, bl, e, t, Lc, k, D, mc, Jc, A, fc, wl, Ce, pl, vl, tv, Yy, ac, isAnnotationPointInViewport, Te, document, me, xe, Se, u_, oe, ut, al, G_, iv, j, window, T, C_, S, be, m, pe, updateAnnotationRegionDrag, pb, gu, ec, pd, rt, st, Ze, Je, le, ce, ot, ml, dc, P_, hl, Lv, Iv, O, _l, od, _b, installAnnotationPointerEventLifecycle } = deps;
+  const { De, updateAnnotationTextPointer, w, E, f, o, c, Ne, Ue, yt, Oe, x, selectionModifierNotifier, g, xl, bl, e, t, Lc, k, D, mc, Jc, A, fc, wl, Ce, pl, vl, tv, Yy, ac, isAnnotationPointInViewport, Te, document, me, xe, Se, u_, oe, ut, al, G_, iv, j, window, T, C_, S, be, m, pe, updateAnnotationRegionDrag, pb, gu, ec, pd, rt, st, Ze, Je, le, ce, ot, ml, dc, P_, hl, Lv, Iv, O, _l, od, _b, installAnnotationPointerEventLifecycle } = deps;
   if (De) return;
   let n = () => {
-          (gt(null, !1), w.current?.clearHover(), (E.current = null), f(null), o(null), c(null));
+          (updateAnnotationTextPointer(null, !1), w.current?.clearHover(), (E.current = null), f(null), o(null), c(null));
         },
         r = (e, t) => Ne && (t || (Ue && !w.current?.hasSurfaceAtPoint(e))),
         i = (e) => {
@@ -39,7 +39,7 @@ function createAnnotationPointerInteractionController(deps: any) {
             (f(u), o(null), c(null));
             return;
           }
-          if (gt(u, A && x == null)) return;
+          if (updateAnnotationTextPointer(u, A && x == null)) return;
           if ((fc(t.document, wl), _l(u, e), f(u), Ce.current)) {
             (o(null), c(null));
             return;

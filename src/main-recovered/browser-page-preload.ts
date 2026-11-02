@@ -23770,7 +23770,11 @@ function Wy({ rootHost: e, bridge: t }) {
       removeSelectionController, editorCommentReconciliationController, interactionResetController,
       hoverSyncController, editorAnchorRestoreController, selectionModifierController,
     }),
-    { qe, Je, Ye, Xe, Ze, $e, nt, rt, it, at, ot, st, ct, lt, ut, dt, ft, pt, mt, ht, _t, vt, yt } = interactionCommands;
+    { qe, Je, Ye, Xe, Ze, $e, nt, rt, it, at, ot, st, ct, lt, ut, dt, ft, pt, mt, ht, _t, vt, yt } = interactionCommands,
+    updateAnnotationTextPointer = (0, G.useEffectEvent)((point, enabled) => {
+      let handled = Te.updatePointer(point, enabled);
+      return (handled && w.current?.clearHover(), handled);
+    });
   ((0, G.useEffect)(() => installAnnotationHostMessageController({
     t, dispatchAnnotationWyHostMessage, Ne, Oe, i, nt, _t, unavailableSiteInteractionController, ve, ft,
     commentInteractionDisposalController, u, r, projectAnnotationRuntimeSyncState, T, C_, g, ie,
@@ -23802,14 +23806,14 @@ function Wy({ rootHost: e, bridge: t }) {
       toViewportPoint: (windowLike, point) => Lc(windowLike, point), pointerRef: E, document,
     }),
     (0, G.useEffect)(() => createAnnotationPointerInteractionController({
-      De, gt, w, E, f, o, c, Ne, Ue, yt, Oe, x, selectionModifierNotifier, g, xl, bl, e, t, Lc, k, D, mc, Jc, A, fc, wl, Ce, pl, vl, tv, Yy, ac, isAnnotationPointInViewport, Te, document, me, xe, Se, u_, oe, ut, al, G_, iv, j, window, T, C_, S, be, m, pe, updateAnnotationRegionDrag, pb, gu, ec, pd, rt, st, Ze, Je, le, ce, ot, ml, dc, P_, hl, Lv, Iv, O, _l, od, _b, installAnnotationPointerEventLifecycle,
+      De, updateAnnotationTextPointer, w, E, f, o, c, Ne, Ue, yt, Oe, x, selectionModifierNotifier, g, xl, bl, e, t, Lc, k, D, mc, Jc, A, fc, wl, Ce, pl, vl, tv, Yy, ac, isAnnotationPointInViewport, Te, document, me, xe, Se, u_, oe, ut, al, G_, iv, j, window, T, C_, S, be, m, pe, updateAnnotationRegionDrag, pb, gu, ec, pd, rt, st, Ze, Je, le, ce, ot, ml, dc, P_, hl, Lv, Iv, O, _l, od, _b, installAnnotationPointerEventLifecycle,
     }), [x, t, Oe, A, Ne, ut, ot, k, De, Ue, Te, e, st, Ze, Je, n.viewportScale, Me, rt, j]),
     useAnnotationHoverRefreshLifecycle({
       useEffect: G.useEffect, interactionMode: k, isSuspended: De, editor: x,
       canUseSiteAnnotationApi: A, rootHost: e, showMetadata: Me,
       createHoverRefreshController: () => createAnnotationHoverRefreshController({
         enabled: () => k === `comment` && !De && x == null, getPointer: () => E.current,
-        shouldSkipPointer: (point) => gt(point, A),
+        shouldSkipPointer: (point) => updateAnnotationTextPointer(point, A),
         isSurfaceAtPointer: (point) => point != null && Boolean(w.current?.hover(point)),
         resolveHover: (point) => point == null ? null : Yy(Xy(point, e, A)), setHover: o,
         clearSelectionHover: () => c(null), setScrollSuppressed: (value) => { Ce.current = value; },
