@@ -1,6 +1,9 @@
 // @ts-nocheck
+import { classNames as r, initializeClassNames as n } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { I3 as t, h4 as n, m4 as r } from "@rchunk/app-shared";
+import {
+  I3 as t,
+} from "@rchunk/app-shared";
 import { n as i, t as a } from "@rchunk/learning-block-katex";
 var o, s;
 function c() {

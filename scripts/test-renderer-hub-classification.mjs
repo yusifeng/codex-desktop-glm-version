@@ -7,8 +7,14 @@ for (const result of results) {
   assert.ok(result.exportCount > 0);
   assert.ok(result.consumedCount > 0);
   assert.ok(result.consumedCount <= result.exportCount);
-  assert.ok(result.unconsumed.every((alias) => /^[A-Za-z_$][\w$]*$/.test(alias)));
-  assert.deepEqual(result.unreviewed, [], `${result.hub} must not contain unknown exports`);
+  assert.ok(
+    result.unconsumed.every((alias) => /^[A-Za-z_$][\w$]*$/.test(alias)),
+  );
+  assert.deepEqual(
+    result.unreviewed,
+    [],
+    `${result.hub} must not contain unknown exports`,
+  );
   assert.deepEqual(
     result.invalidConsumedAliases,
     [],
@@ -18,28 +24,68 @@ for (const result of results) {
 const primary = results[2];
 // Cast-narrowed namespace bindings are real consumers too.  Keep a floor for
 // each hub so a future audit cannot silently regress to dot-access-only scans.
-assert.ok(results[0].consumedCount >= 350, "app-shared named/cast consumers must be counted");
-assert.ok(results[1].consumedCount >= 1400, "app-initial named/cast consumers must be counted");
-assert.ok(results[1].consumedAliases.includes("ggt"), "multi-character named imports must be counted");
-assert.ok(primary.consumedCount >= 160, "app-primary named/cast consumers must be counted");
-assert.ok(results[1].consumedAliases.includes("Ewt"), "sidebar view telemetry must use the published Ewt alias");
-assert.ok(results[1].consumedAliases.includes("o_n"), "beacon navigation must use the published o_n alias");
-assert.ok(primary.consumedAliases.includes("dr"), "announcement entries must use the published dr alias");
-// Some generated aliases overlap across aggregate hubs. Release-faithful
-// Writing Block evidence imports Du/Rf from app-primary explicitly, while the
-// promoted conversation page, sources panel, and inline beacon evidence all
-// import Jm from app-primary explicitly.
-assert.ok(primary.consumedAliases.includes("Du"), "Writing Block capabilities must consume app-primary.Du");
-assert.ok(primary.consumedAliases.includes("Rf"), "Writing Block capabilities must consume app-primary.Rf");
-assert.ok(primary.consumedAliases.includes("Jm"), "conversation surfaces must consume app-primary.Jm");
+assert.ok(
+  results[0].consumedCount >= 350,
+  "app-shared named/cast consumers must be counted",
+);
+assert.ok(
+  results[1].consumedCount >= 1400,
+  "app-initial named/cast consumers must be counted",
+);
+assert.ok(
+  results[1].consumedAliases.includes("ggt"),
+  "multi-character named imports must be counted",
+);
+assert.ok(
+  primary.consumedCount >= 160,
+  "app-primary named/cast consumers must be counted",
+);
+assert.ok(
+  results[1].consumedAliases.includes("Ewt"),
+  "sidebar view telemetry must use the published Ewt alias",
+);
+assert.ok(
+  results[1].consumedAliases.includes("o_n"),
+  "beacon navigation must use the published o_n alias",
+);
+assert.ok(
+  primary.consumedAliases.includes("dr"),
+  "announcement entries must use the published dr alias",
+);
+// These business helpers now have focused TypeScript owners. They must remain
+// off the aggregate ABI after the bulk semantic-import migration.
+assert.ok(
+  !primary.consumedAliases.includes("Du"),
+  "suggested followups must use its semantic owner",
+);
+assert.ok(
+  !primary.consumedAliases.includes("Rf"),
+  "prefilled plugin prompts must use its semantic owner",
+);
+assert.ok(
+  !primary.consumedAliases.includes("Jm"),
+  "displayable-action checks must use its semantic owner",
+);
 // Namespace imports are frequently narrowed through a destructuring binding
 // (`const { Sm: AnnouncementShell } = appPrimaryChunk`).  The audit must count
 // the public alias on the left-hand side as a real consumer, not classify it as
 // an unreferenced export merely because no `chunk.Sm` member expression exists.
-assert.ok(primary.consumedCount >= 10, "namespace destructuring consumers must be counted");
-assert.ok(primary.unconsumed.length > 0, "A5 gate must expose the remaining app-primary surface");
-assert.ok(primary.reviewedCount >= 225, "line-level A5 classifications must be registered");
-const audit = fs.readFileSync(new URL("../docs/renderer-tail-audit.md", import.meta.url), "utf8");
+assert.ok(
+  primary.consumedCount >= 10,
+  "namespace destructuring consumers must be counted",
+);
+assert.ok(
+  primary.unconsumed.length > 0,
+  "A5 gate must expose the remaining app-primary surface",
+);
+assert.ok(
+  primary.reviewedCount >= 225,
+  "line-level A5 classifications must be registered",
+);
+const audit = fs.readFileSync(
+  new URL("../docs/renderer-tail-audit.md", import.meta.url),
+  "utf8",
+);
 assert.match(audit, /`rA`\/`nA`[\s\S]*URL predicate/);
 assert.match(audit, /aggregation-runtime/);
 assert.match(audit, /没有对应的\n?named consumer/);

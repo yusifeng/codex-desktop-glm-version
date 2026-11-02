@@ -1,4 +1,7 @@
 // @ts-nocheck
+import { formatKeyboardShortcut as tt } from "../app-primary/runtime/format-keyboard-shortcut";
+import { isCapabilitySupported as nt } from "../app-primary/runtime/is-capability-supported";
+import { splitWhitespaceTokens as I } from "../app-shared/runtime/split-whitespace-tokens";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -51,7 +54,6 @@ import {
   sy as fe,
   uz as pe,
   wL as me,
-  wp as I,
   xp as he,
   zh as ge,
 } from "@rchunk/app-shared";
@@ -108,8 +110,6 @@ import {
   dm as q,
   gm as et,
   lm as J,
-  um as tt,
-  vm as nt,
   xm as rt,
 } from "@rchunk/app-primary";
 import { n as it, t as at } from "@rchunk/keyboard-shortcuts-gate";

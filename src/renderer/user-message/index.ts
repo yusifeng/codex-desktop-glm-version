@@ -26,6 +26,7 @@
 // 依赖：app-shared/app-initial/app-primary + hooks/hooks-settings-copy/
 // hooks-settings-model/plan-implementation-request/timestamps。
 
+import { classNames, initializeClassNames as intlContextInit } from "../app-shared/ui/class-names";
 import {
   $3 as runtimeLazy,
   I3 as getJsxRuntime,
@@ -33,15 +34,17 @@ import {
   Y2 as FormattedMessage,
   Yh as Button,
   e6 as ReactRuntime,
-  h4 as intlContextInit,
-  m4 as classNames,
   n4 as useIntl,
   o_ as Tooltip,
 } from "@rchunk/app-shared";
 import * as sharedChunk from "@rchunk/app-shared";
-import { C as appInitialInit } from "@rchunk/app-initial";
+import {
+  C as appInitialInit,
+} from "@rchunk/app-initial";
 import * as initialChunk from "@rchunk/app-initial";
-import { d as appPrimaryInit } from "@rchunk/app-primary";
+import {
+  d as appPrimaryInit,
+} from "@rchunk/app-primary";
 import * as primaryChunk from "@rchunk/app-primary";
 import { n as initializeHooks, t as HooksIcon } from "@rchunk/hooks";
 import { a as initializeHooksSettingsCopy, n as formatHookEventName } from "@rchunk/hooks-settings-copy";

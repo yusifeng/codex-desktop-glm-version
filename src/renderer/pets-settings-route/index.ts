@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { createPrefilledPluginPrompt as Ot } from "../app-primary/runtime/create-prefilled-plugin-prompt";
+import { classNames as U, initializeClassNames as I } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -36,14 +38,12 @@ import {
   e6 as N,
   fI as P,
   gA as F,
-  h4 as I,
   hA as L,
   jh as R,
   lC as z,
   lk as B,
   lw as V,
   ly as H,
-  m4 as U,
   n4 as W,
   nO as ee,
   o$ as G,
@@ -135,7 +135,11 @@ import {
   ypn as Tt,
   z5t as Et,
 } from "@rchunk/app-initial";
-import { Bf as Dt, Rf as Ot, Xh as kt, Zh as At } from "@rchunk/app-primary";
+import {
+  Bf as Dt,
+  Xh as kt,
+  Zh as At,
+} from "@rchunk/app-primary";
 import {
   B as jt,
   E as Mt,

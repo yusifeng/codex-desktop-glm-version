@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isDisplayableAction as be } from "../app-primary/runtime/is-displayable-action";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -48,7 +49,6 @@ import {
 } from "@rchunk/app-initial";
 import {
   Hm as ye,
-  Jm as be,
   Km as w,
   Vm as xe,
   eh as Se,

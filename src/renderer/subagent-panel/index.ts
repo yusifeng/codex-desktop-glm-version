@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { classNames as s, initializeClassNames as o } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -6,12 +7,16 @@ import {
   I3 as r,
   S_ as i,
   bO as a,
-  h4 as o,
-  m4 as s,
   xO as c,
 } from "@rchunk/app-shared";
-import { CS as l, wS as u } from "@rchunk/app-initial";
-import { Bl as d, Vl as f } from "@rchunk/app-primary";
+import {
+  CS as l,
+  wS as u,
+} from "@rchunk/app-initial";
+import {
+  Bl as d,
+  Vl as f,
+} from "@rchunk/app-primary";
 function p(e) {
   let t = (0, v.c)(7),
     { sections: n, onSelect: r } = e,

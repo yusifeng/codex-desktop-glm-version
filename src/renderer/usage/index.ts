@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { accountSpendKey as ie } from "../app-primary/runtime/account-spend-key";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -52,7 +53,6 @@ import {
   Fm as H,
   Im as re,
   Om as U,
-  Pm as ie,
   Tm as W,
   wm as G,
 } from "@rchunk/app-primary";

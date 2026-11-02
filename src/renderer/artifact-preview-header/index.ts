@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getPathBasename as l } from "../app-shared/runtime/get-path-basename";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -9,7 +10,6 @@ import {
   Gd as o,
   Hl as s,
   I3 as c,
-  II as l,
   If as u,
   Is as d,
   K2 as f,
@@ -70,7 +70,12 @@ import {
   sft as ke,
   uft as Ae,
 } from "@rchunk/app-initial";
-import { Kl as je, dp as Me, fp as Ne, ql as I } from "@rchunk/app-primary";
+import {
+  Kl as je,
+  dp as Me,
+  fp as Ne,
+  ql as I,
+} from "@rchunk/app-primary";
 import { n as Pe, t as Fe } from "@rchunk/use-app-connect-flow";
 import {
   a as Ie,

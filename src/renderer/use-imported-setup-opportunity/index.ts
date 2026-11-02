@@ -31,6 +31,8 @@ const __vite__mapDeps = (
       "@rchunk/canonical-plugin-query",
     ]),
 ) => i.map((i) => d[i]);
+import { getPathBasename as h } from "../app-shared/runtime/get-path-basename";
+import { classNames as Te, initializeClassNames as ye } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -46,7 +48,6 @@ import {
   H4 as f,
   HX as p,
   I3 as m,
-  II as h,
   K2 as g,
   Km as _,
   LX as v,
@@ -92,13 +93,11 @@ import {
   g4 as ge,
   gL as _e,
   gg as ve,
-  h4 as ye,
   hq as be,
   iW as xe,
   jZ as Se,
   k4 as Ce,
   kE as we,
-  m4 as Te,
   mg as Ee,
   n4 as De,
   o$ as Oe,

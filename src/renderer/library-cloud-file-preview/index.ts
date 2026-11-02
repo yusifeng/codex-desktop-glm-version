@@ -54,6 +54,9 @@ const __vite__mapDeps = (
       "./chatgpt-code-block-highlighting-a44c30b43d60.css",
     ]),
 ) => i.map((i) => d[i]);
+import { resolveBoxFilePreview as yt } from "../app-primary/runtime/resolve-box-file-preview";
+import { getPathBasename as d } from "../app-shared/runtime/get-path-basename";
+import { classNames as se, initializeClassNames as re } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -66,7 +69,6 @@ import {
   H3 as c,
   HX as l,
   I3 as u,
-  II as d,
   If as f,
   Jm as p,
   K2 as m,
@@ -89,13 +91,11 @@ import {
   eu as A,
   gL as te,
   gg as ne,
-  h4 as re,
   jf as j,
   lg as ie,
   lk as M,
   lv as ae,
   lw as oe,
-  m4 as se,
   mg as ce,
   n4 as le,
   nu as ue,
@@ -177,7 +177,6 @@ import {
 } from "@rchunk/app-initial";
 import {
   $d as vt,
-  Jd as yt,
   Ms as bt,
   Oo as xt,
   Ui as St,

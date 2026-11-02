@@ -48,6 +48,7 @@
 //   - app-shared / app-initial 的压缩导出（React 运行时、i18n、面板 atoms、
 //     弹簧动画、ResizeObserver 工具等）经 @rchunk 别名保持契约。
 
+import { classNames as intlMessage, initializeClassNames as intlContextInit } from "../app-shared/ui/class-names";
 import {
   $3 as runtimeLazy,
   BX as appSharedLazyInit,
@@ -72,10 +73,8 @@ import {
   e6 as React,
   fk as setPanelDisplayModeEffect,
   g_ as iconScaleContextInit,
-  h4 as intlContextInit,
   i$ as subscribeAtomSignal,
   lk as toastRuntimeInit,
-  m4 as intlMessage,
   n$ as readAtomSignal,
   pZ as createDerivedFamily,
   qQ as dropdownMenuInit,
@@ -95,7 +94,11 @@ import {
   t as computeTurnLayout,
 } from "@rchunk/thread-virtualizer";
 import { n as threadScrollContextInit, r as useThreadScrollController } from "@rchunk/thread-scroll-controller-context-value";
-import { $en as panelLayerLazy, bS as panelContentSurface, CS as panelComponentLazy } from "@rchunk/app-initial";
+import {
+  $en as panelLayerLazy,
+  bS as panelContentSurface,
+  CS as panelComponentLazy,
+} from "@rchunk/app-initial";
 import * as initialChunk from "@rchunk/app-initial";
 
 let reactRuntime: any;

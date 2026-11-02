@@ -1,8 +1,8 @@
 // @ts-nocheck
+import { selectModeDescriptor as n } from "../app-shared/runtime/select-mode-descriptor";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
-  $B as n,
   BX as r,
   FX as i,
   HX as a,

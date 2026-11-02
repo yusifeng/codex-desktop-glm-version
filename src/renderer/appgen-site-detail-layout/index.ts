@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { formatBrowserUrl as R } from "../app-primary/runtime/format-browser-url";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -61,7 +62,9 @@ import {
   vfn as ye,
   wan as be,
 } from "@rchunk/app-initial";
-import { Sf as L, xf as R } from "@rchunk/app-primary";
+import {
+  Sf as L,
+} from "@rchunk/app-primary";
 import { n as z, t as xe } from "@rchunk/security-tabs";
 import { n as B, t as V } from "@rchunk/toolbar-breadcrumb";
 import { s as H, t as Se } from "@rchunk/appgen-access";

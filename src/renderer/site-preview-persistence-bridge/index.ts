@@ -12,8 +12,16 @@ const __vite__mapDeps = (
       "./app-initial-e8ceb32eb626.css",
     ]),
 ) => i.map((i) => d[i]);
+import { matchesThreadRoute as D } from "../app-primary/runtime/matches-thread-route";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { $3 as t, FX as n, H3 as r, LX as i, V3 as a, e6 as o } from "@rchunk/app-shared";
+import {
+  $3 as t,
+  FX as n,
+  H3 as r,
+  LX as i,
+  V3 as a,
+  e6 as o,
+} from "@rchunk/app-shared";
 import {
   $en as s,
   Bl as c,
@@ -35,7 +43,10 @@ import {
   vbt as w,
   zl as T,
 } from "@rchunk/app-initial";
-import { df as E, ff as D, pf as O } from "@rchunk/app-primary";
+import {
+  df as E,
+  pf as O,
+} from "@rchunk/app-primary";
 function k() {
   let e = (0, j.c)(6),
     t = i(s),

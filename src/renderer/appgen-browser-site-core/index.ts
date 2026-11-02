@@ -1,6 +1,9 @@
 // @ts-nocheck
+import { isSiteUrlMatch as n } from "../app-primary/runtime/is-site-url-match";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { Sf as t, yf as n } from "@rchunk/app-primary";
+import {
+  Sf as t,
+} from "@rchunk/app-primary";
 function r(e, t) {
   let n = null;
   for (let r of e)

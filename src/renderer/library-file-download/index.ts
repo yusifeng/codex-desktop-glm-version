@@ -1,8 +1,19 @@
 // @ts-nocheck
+import { getPathBasename as t } from "../app-shared/runtime/get-path-basename";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { II as t, RI as n } from "@rchunk/app-shared";
-import { BGt as r, HGt as i, bz as a } from "@rchunk/app-initial";
-import { Qd as o, Yd as s, Zd as c } from "@rchunk/app-primary";
+import {
+  RI as n,
+} from "@rchunk/app-shared";
+import {
+  BGt as r,
+  HGt as i,
+  bz as a,
+} from "@rchunk/app-initial";
+import {
+  Qd as o,
+  Yd as s,
+  Zd as c,
+} from "@rchunk/app-primary";
 async function l(e, t) {
   return r(await s(e, { showInline: !0 }), t);
 }

@@ -1,6 +1,11 @@
 // @ts-nocheck
+import { ensureConversationReady as g } from "../app-primary/runtime/ensure-conversation-ready";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { I3 as t, wL as n, zU as r } from "@rchunk/app-shared";
+import {
+  I3 as t,
+  wL as n,
+  zU as r,
+} from "@rchunk/app-shared";
 import {
   Ag as i,
   Gvt as a,
@@ -14,7 +19,11 @@ import {
   vZt as p,
   zZt as m,
 } from "@rchunk/app-initial";
-import { Bl as h, Ur as g, Vl as _, Wr as v } from "@rchunk/app-primary";
+import {
+  Bl as h,
+  Vl as _,
+  Wr as v,
+} from "@rchunk/app-primary";
 import { r as y } from "@rchunk/open-target";
 async function b(
   e,

@@ -18,6 +18,8 @@ const __vite__mapDeps = (
       "./terminal-panel-e74d48fceaac.css",
     ]),
 ) => i.map((i) => d[i]);
+import { getPathBasename as s } from "../app-shared/runtime/get-path-basename";
+import { classNames as T, initializeClassNames as C } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -26,7 +28,6 @@ import {
   H3 as i,
   HX as a,
   I3 as o,
-  II as s,
   IK as c,
   Jm as l,
   K2 as u,
@@ -42,9 +43,7 @@ import {
   c_ as b,
   e6 as x,
   g_ as S,
-  h4 as C,
   iZ as w,
-  m4 as T,
   n4 as E,
   o_ as D,
   qm as O,
@@ -72,7 +71,10 @@ import {
   r7 as fe,
   wtn as pe,
 } from "@rchunk/app-initial";
-import { Jp as me, Yp as he } from "@rchunk/app-primary";
+import {
+  Jp as me,
+  Yp as he,
+} from "@rchunk/app-primary";
 import { n as ge, r as I, t as _e } from "@rchunk/terminal-workspace-warning-state";
 import { n as ve, t as ye } from "@rchunk/shell-label";
 function L(e) {

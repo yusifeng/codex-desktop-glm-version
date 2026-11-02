@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { classNames as d, initializeClassNames as o } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -6,15 +7,16 @@ import {
   If as r,
   Yh as i,
   Zh as a,
-  h4 as o,
   iy as s,
   jf as c,
   kf as l,
   lw as u,
-  m4 as d,
   sy as f,
 } from "@rchunk/app-shared";
-import { dat as p, uat as m } from "@rchunk/app-initial";
+import {
+  dat as p,
+  uat as m,
+} from "@rchunk/app-initial";
 function h(e) {
   let t = (0, v.c)(22),
     { children: n, diffStats: r, label: a, onOpenChange: o, reviewV2Enabled: s } = e,

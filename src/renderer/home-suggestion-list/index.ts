@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { classNames as h, initializeClassNames as p } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -13,13 +14,14 @@ import {
   d$ as u,
   e6 as d,
   f$ as f,
-  h4 as p,
   lw as m,
-  m4 as h,
   n4 as g,
   o_ as _,
 } from "@rchunk/app-shared";
-import { A2 as v, j2 as y } from "@rchunk/app-initial";
+import {
+  A2 as v,
+  j2 as y,
+} from "@rchunk/app-initial";
 import { n as b, t as x } from "@rchunk/home-suggestion-staggered-item";
 function S(e) {
   let t = (0, C.c)(12),

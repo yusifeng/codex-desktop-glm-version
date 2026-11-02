@@ -1,4 +1,7 @@
 // @ts-nocheck
+import { deriveLayoutMotionVariant as Ft } from "../app-primary/runtime/derive-layout-motion-variant";
+import { formatComposerPlaceholder as ot } from "../app-primary/runtime/format-composer-placeholder";
+import { classNames as se, initializeClassNames as ae } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -12,9 +15,7 @@ import {
   __ as re,
   e6 as o,
   g_ as ie,
-  h4 as ae,
   if as oe,
-  m4 as se,
   n4 as ce,
   rf as le,
   wL as ue,
@@ -89,7 +90,6 @@ import {
   Dh as rt,
   Do as it,
   E as at,
-  Eo as ot,
   F as st,
   H as ct,
   I as T,
@@ -126,7 +126,6 @@ import {
   ln as j,
   m as Pt,
   or as M,
-  ot as Ft,
   p as It,
   rt as N,
   us as Lt,

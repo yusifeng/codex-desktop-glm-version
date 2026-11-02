@@ -1,8 +1,7 @@
 import assert from "node:assert/strict";
-import fs from "node:fs/promises";
 import * as esbuild from "esbuild";
-const source = await fs.readFile("src/main/worker/git-review-search-utils.ts", "utf8");
-const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const build = await esbuild.build({ entryPoints: ["src/main/worker/git-review-search-utils.ts"], bundle: true, platform: "node", format: "cjs", write: false });
+const code = build.outputFiles[0].text;
 const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = module.exports;
 assert.equal(formatReviewSearchPath({ oldPath: "a", newPath: "a" }), "a");

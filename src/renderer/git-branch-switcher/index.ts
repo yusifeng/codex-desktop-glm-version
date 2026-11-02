@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { stripTerminalCommandToken as Xe } from "../app-primary/runtime/strip-terminal-command-token";
+import { getPathBasename as f } from "../app-shared/runtime/get-path-basename";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -12,7 +14,6 @@ import {
   FX as l,
   HX as u,
   I3 as d,
-  II as f,
   If as p,
   Ih as m,
   K2 as h,
@@ -105,7 +106,6 @@ import {
 } from "@rchunk/app-initial";
 import {
   Cf as Ye,
-  cp as Xe,
   ir as Ze,
   rr as Qe,
   sp as $e,

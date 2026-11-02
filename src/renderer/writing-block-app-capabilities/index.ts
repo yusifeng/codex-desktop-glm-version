@@ -13,6 +13,15 @@ const __vite__mapDeps = (
       "@rchunk/home-artifact-template-card",
     ]),
 ) => i.map((i) => d[i]);
+import { createPrefilledPluginPrompt as dn } from "../app-primary/runtime/create-prefilled-plugin-prompt";
+import { dedupeValidValues as ln } from "../app-primary/runtime/dedupe-valid-values";
+import { hasRecipientContacts as wn } from "../app-primary/runtime/has-recipient-contacts";
+import { isSentMessage as fn } from "../app-primary/runtime/is-sent-message";
+import { isValidRecipientEmail as mn } from "../app-primary/runtime/is-valid-recipient-email";
+import { isMessageSendingOrPolling as an } from "../app-primary/runtime/message-status";
+import { normalizeRecipientContacts as un } from "../app-primary/runtime/normalize-recipient-contacts";
+import { normalizeSuggestedFollowups as rn } from "../app-primary/runtime/normalize-suggested-followups";
+import { classNames as ye, initializeClassNames as ue } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -72,7 +81,6 @@ import {
   g4 as se,
   gL as ce,
   g_ as le,
-  h4 as ue,
   ir as de,
   j2 as fe,
   jZ as pe,
@@ -82,7 +90,6 @@ import {
   lm as ge,
   lr as _e,
   lw as ve,
-  m4 as ye,
   n4 as be,
   nr as xe,
   o$ as Se,
@@ -179,17 +186,10 @@ import {
   Bf as en,
   Cd as tn,
   Dd as nn,
-  Du as rn,
-  Ed as an,
   Id as on,
   Md as sn,
   Nd as cn,
-  Od as ln,
-  Pd as un,
-  Rf as dn,
-  Sd as fn,
   Td as pn,
-  Vd as mn,
   _d as hn,
   bd as gn,
   gd as _n,
@@ -199,7 +199,6 @@ import {
   kd as xn,
   rd as Sn,
   vd as Cn,
-  wd as wn,
   xd as Tn,
   yd as En,
 } from "@rchunk/app-primary";

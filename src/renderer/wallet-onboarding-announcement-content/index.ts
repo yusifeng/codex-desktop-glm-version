@@ -13,10 +13,10 @@ const __vite__mapDeps = (
       "./wallet-onboarding-announcement-modal-8f48697b05eb.css",
     ]),
 ) => i.map((i) => d[i]);
+import { stableJsonStringify as n } from "../app-shared/runtime/stable-json-stringify";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
-  AZ as n,
   Ah as r,
   BX as i,
   C_ as a,

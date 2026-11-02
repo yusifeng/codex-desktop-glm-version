@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { execFileSync } from "node:child_process";
 import {
   CHUNKS,
   INCREMENTAL_HUBS,
@@ -11,6 +12,11 @@ import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const RENDERER = path.join(ROOT, "src/renderer");
+execFileSync(
+  process.execPath,
+  ["scripts/migrate-renderer-hub-semantic-imports.mjs", "--check"],
+  { cwd: ROOT, stdio: "pipe" },
+);
 function walk(directory) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const target = path.join(directory, entry.name);
@@ -64,7 +70,11 @@ assert.ok(
 assert.ok(
   artifactSource.imports
     .filter((item) => item.clause != null)
-    .every((item) => /popcorn-(document|workbook|presentation)-panel|popcorn-electron-surface-style/.test(item.file)),
+    .every((item) =>
+      /popcorn-(document|workbook|presentation)-panel|popcorn-electron-surface-style/.test(
+        item.file,
+      ),
+    ),
 );
 const textUnderline = inspectHub("text-underline-icon");
 assert.equal(textUnderline.rewritten, true);
@@ -126,33 +136,27 @@ assert.equal(checkoutSession.rewritten, true);
 assert.equal(checkoutSession.strategy, undefined);
 assert.equal(typeof checkoutSession.chunk, "string");
 assert.equal(checkoutSession.exportCount, 60);
-assert.ok(checkoutSession.imports.some((item) => item.clause == null));
 const checkoutSessionConsumers = checkoutSession.imports.filter(
   (item) => item.clause != null,
 );
-assert.equal(checkoutSessionConsumers.length, 3);
-assert.ok(
-  checkoutSessionConsumers.some((item) =>
-    item.clause?.includes("* as checkoutSessionChunk"),
-  ) &&
-    checkoutSessionConsumers.some(
-      (item) =>
-        /checkout-success-page/.test(item.file) &&
-        item.clause?.includes("c as Bt"),
-    ) &&
-    checkoutSessionConsumers.some(
-      (item) =>
-        /checkout-page-core/.test(item.file) &&
-        item.clause?.includes("_ as gn"),
-    ),
+assert.deepEqual(
+  checkoutSessionConsumers
+    .map(({ file }) => path.basename(path.dirname(file)))
+    .sort(),
+  [
+    "checkout-confirm-latency",
+    "checkout-page-core",
+    "checkout-success-page",
+    "create-session",
+    "create-workspace-page",
+    "credit-purchase-page-core",
+    "purchase-page",
+    "verify-page",
+  ],
 );
-for (const { file } of checkoutSessionConsumers.filter((item) =>
-  item.clause?.includes("* as checkoutSessionChunk"),
-)) {
-  const source = fs.readFileSync(file, "utf8");
-  assert.match(source, /checkoutSessionChunk as unknown as CheckoutSessionApi/);
-  assert.doesNotMatch(source, /checkoutSessionChunk\./);
-}
+assert.ok(
+  checkoutSessionConsumers.every((item) => !item.clause?.includes("* as")),
+);
 
 const billingAnalytics = inspectHub("billing-analytics");
 assert.equal(billingAnalytics.rewritten, true);
@@ -163,8 +167,8 @@ assert.equal(billingAnalytics.imports.length, 2);
 assert.ok(
   billingAnalytics.imports.every(
     (item) =>
-      item.clause?.includes("initializeBillingAnalytics") &&
-      item.clause.includes("BillingAnalytics"),
+      /\bn\s+as\s+\w+/.test(item.clause ?? "") &&
+      /\bt\s+as\s+\w+/.test(item.clause ?? ""),
   ),
 );
 const billingDeclaration = declarationSource.slice(

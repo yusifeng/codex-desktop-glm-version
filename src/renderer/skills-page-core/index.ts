@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { formatSkillScopeLabel as Ve } from "../app-primary/runtime/format-skill-scope-label";
+import { resolveSkillRepoLabel as Be } from "../app-primary/runtime/resolve-skill-repo-label";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -72,7 +74,11 @@ import {
   yE as Le,
   ypn as A,
 } from "@rchunk/app-initial";
-import { _f as Re, _o as ze, ho as Be, mo as Ve, vf as j } from "@rchunk/app-primary";
+import {
+  _f as Re,
+  _o as ze,
+  vf as j,
+} from "@rchunk/app-primary";
 import { a as He, t as M } from "@rchunk/computer-history-suggestions";
 import { n as Ue, t as We } from "@rchunk/use-element-in-view";
 import { n as N, r as Ge, t as Ke } from "@rchunk/skills-page-grid";

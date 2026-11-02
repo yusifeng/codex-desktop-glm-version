@@ -1,4 +1,12 @@
 // @ts-nocheck
+import { deriveCloudUnavailableReason as ia } from "../app-primary/runtime/derive-cloud-unavailable-reason";
+import { isStandardWindowLayout as sa } from "../app-primary/runtime/is-compact-window-enabled";
+import { isLocalExecutionTarget as ca } from "../app-primary/runtime/is-local-execution-target";
+import { selectHandoffBranch as ra } from "../app-primary/runtime/select-handoff-branch";
+import { selectHandoffDirection as na } from "../app-primary/runtime/select-handoff-direction";
+import { shouldUseHandoffBranch as Ji } from "../app-primary/runtime/should-use-handoff-branch";
+import { isPathWithinRoots as s } from "../app-shared/runtime/is-path-within-roots";
+import { classNames as Ee, initializeClassNames as me } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -6,7 +14,6 @@ import {
   $T as i,
   $h as a,
   $p as o,
-  $z as s,
   AO as c,
   A_ as l,
   Ad as u,
@@ -60,7 +67,6 @@ import {
   ek as de,
   em as fe,
   fI as pe,
-  h4 as me,
   iW as he,
   ix as ge,
   iy as _e,
@@ -73,7 +79,6 @@ import {
   kf as Ce,
   lD as we,
   lw as Te,
-  m4 as Ee,
   n4 as De,
   nx as Oe,
   o_ as J,
@@ -315,7 +320,6 @@ import {
   Yt as Gi,
   Zf as Ki,
   _p as qi,
-  bp as Ji,
   c as Yi,
   cg as Xi,
   dg as Zi,
@@ -323,13 +327,8 @@ import {
   eg as $i,
   fg as ea,
   fp as ta,
-  gp as na,
-  hp as ra,
-  ig as ia,
   j as aa,
   l as oa,
-  mp as sa,
-  og as ca,
   pp as la,
   qt as ua,
   sg as da,

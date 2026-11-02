@@ -1,4 +1,7 @@
 // @ts-nocheck
+import { getBrowserTabUrlState as C, hasBrowserCommentHandler as se, setBrowserTabUrlState as x, submitBrowserComment as ce, waitForBrowserCommentHandler as oe } from "../app-primary-browser-comment-runtime/index";
+import { isBrowserCommentForTab as S } from "../app-primary/runtime/is-browser-comment-for-tab";
+import { projectAnnotationItems as re } from "../app-shared/runtime/project-annotation-items";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -16,7 +19,6 @@ import {
   ZI as te,
   e6 as f,
   iK as ne,
-  wJ as re,
   wL as p,
 } from "@rchunk/app-shared";
 import {
@@ -31,13 +33,7 @@ import {
   zDt as b,
 } from "@rchunk/app-initial";
 import {
-  Bs as x,
-  Hi as S,
-  Ks as oe,
-  Rs as C,
-  Us as se,
   Vi as w,
-  Vs as ce,
   Ws as T,
   zs as E,
 } from "@rchunk/app-primary";

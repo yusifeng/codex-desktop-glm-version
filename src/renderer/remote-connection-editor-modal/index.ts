@@ -1,11 +1,11 @@
 // @ts-nocheck
+import { isManagedHostSource as a } from "../app-shared/runtime/is-managed-host-source";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
   Ah as n,
   FP as r,
   FX as i,
-  HU as a,
   HX as o,
   I3 as s,
   IP as c,

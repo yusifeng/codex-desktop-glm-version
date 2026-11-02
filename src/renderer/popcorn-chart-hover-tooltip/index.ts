@@ -1,20 +1,27 @@
 // @ts-nocheck
+import { classNames as s, initializeClassNames as i } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   I3 as t,
   d1 as n,
   e6 as r,
-  h4 as i,
   l1 as a,
   m1 as o,
-  m4 as s,
   p1 as c,
   s1 as l,
   u1 as u,
 } from "@rchunk/app-shared";
 import { I as d, g as f, i as p, n as m } from "@rchunk/popcorn-icons";
-import { nt as h, rt as g } from "@rchunk/artifact-source-bootstrap";
 import { c as _, i as v, u as y } from "@rchunk/freeze-panes";
+function screenToCanvasPoint(e, t, n) {
+  let r = e.getBoundingClientRect(), i = r.width > 0 && e.clientWidth > 0 ? e.clientWidth / r.width : 1, a = r.height > 0 && e.clientHeight > 0 ? e.clientHeight / r.height : 1;
+  return { x: (t - r.left) * i, y: (n - r.top) * a };
+}
+function canvasToScreenPoint(e, t, n) {
+  let r = e.getBoundingClientRect(), i = r.width > 0 && e.clientWidth > 0 ? r.width / e.clientWidth : 1, a = r.height > 0 && e.clientHeight > 0 ? r.height / e.clientHeight : 1;
+  return { x: r.left + t * i, y: r.top + n * a };
+}
+const h = canvasToScreenPoint, g = screenToCanvasPoint;
 function b({
   open: e,
   query: t,

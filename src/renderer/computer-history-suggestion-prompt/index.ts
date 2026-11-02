@@ -1,7 +1,16 @@
 // @ts-nocheck
+import { createPrefilledPluginPrompt as s } from "../app-primary/runtime/create-prefilled-plugin-prompt";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { $K as t, K2 as n, W2 as r, oq as i, wL as a } from "@rchunk/app-shared";
-import { Bf as o, Rf as s } from "@rchunk/app-primary";
+import {
+  $K as t,
+  K2 as n,
+  W2 as r,
+  oq as i,
+  wL as a,
+} from "@rchunk/app-shared";
+import {
+  Bf as o,
+} from "@rchunk/app-primary";
 function c({ intl: e, memoryFilePath: n, suggestion: r }) {
   return s({
     defaultPrompt:

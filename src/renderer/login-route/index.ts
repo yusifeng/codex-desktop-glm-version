@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { formatErrorMessage as ee } from "../app-shared/runtime/format-error-message";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -10,7 +11,6 @@ import {
   G2 as c,
   HX as l,
   I3 as u,
-  IH as ee,
   K2 as d,
   LX as f,
   QI as p,
@@ -89,7 +89,10 @@ import {
   ypn as Fe,
   yst as Ie,
 } from "@rchunk/app-initial";
-import { Ar as Le, jr as Re } from "@rchunk/app-primary";
+import {
+  Ar as Le,
+  jr as Re,
+} from "@rchunk/app-primary";
 import { n as ze, t as Be } from "@rchunk/google-logo";
 import { n as Ve } from "@rchunk/page-layout";
 import { n as He, r as Ue, t as We } from "@rchunk/browser-session-queries";

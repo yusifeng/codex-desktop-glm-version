@@ -1,6 +1,13 @@
 // @ts-nocheck
+import { isRealtimeVoiceCommand as r } from "../app-shared/runtime/is-realtime-voice-command";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { Dp as t, Ep as n, Gp as r, Np as i, kp as a, zp as o } from "@rchunk/app-shared";
+import {
+  Dp as t,
+  Ep as n,
+  Np as i,
+  kp as a,
+  zp as o,
+} from "@rchunk/app-shared";
 function s(
   e,
   {

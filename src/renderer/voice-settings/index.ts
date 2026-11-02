@@ -12,6 +12,7 @@ const __vite__mapDeps = (
       "./app-initial-e8ceb32eb626.css",
     ]),
 ) => i.map((i) => d[i]);
+import { isCapabilitySupported as Qt } from "../app-primary/runtime/is-capability-supported";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -171,7 +172,6 @@ import {
   lm as Yt,
   mm as Xt,
   pm as Zt,
-  vm as Qt,
   ym as $t,
 } from "@rchunk/app-primary";
 import { n as en, t as tn } from "@rchunk/settings-loading-row";

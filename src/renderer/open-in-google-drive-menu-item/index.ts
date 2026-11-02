@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getPathBasename as u } from "../app-shared/runtime/get-path-basename";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -11,7 +12,6 @@ import {
   HI as ee,
   HX as c,
   I3 as l,
-  II as u,
   If as d,
   K2 as f,
   LX as te,
@@ -89,7 +89,10 @@ import {
   ydn as We,
   ypn as Ge,
 } from "@rchunk/app-initial";
-import { Xh as Ke, Zh as qe } from "@rchunk/app-primary";
+import {
+  Xh as Ke,
+  Zh as qe,
+} from "@rchunk/app-primary";
 import { n as Je, t as Ye } from "@rchunk/app-connect-modal";
 function Xe({ clickAction: e, clickSource: t, context: n, productLogger: r, resourceKind: i }) {
   let a = Ze(i);

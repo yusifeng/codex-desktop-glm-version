@@ -12,6 +12,10 @@ const __vite__mapDeps = (
       "./app-initial-e8ceb32eb626.css",
     ]),
 ) => i.map((i) => d[i]);
+import { createPrefilledPluginPrompt as lt } from "../app-primary/runtime/create-prefilled-plugin-prompt";
+import { extractSiteSubdomain as dt } from "../app-primary/runtime/extract-site-subdomain";
+import { formatBrowserUrl as ft } from "../app-primary/runtime/format-browser-url";
+import { classNames as de, initializeClassNames as ie } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -59,7 +63,6 @@ import {
   e6 as H,
   fI as ne,
   gL as re,
-  h4 as ie,
   j$ as ae,
   jZ as oe,
   jh as U,
@@ -69,7 +72,6 @@ import {
   lk as G,
   lm as le,
   lw as ue,
-  m4 as de,
   n4 as K,
   nO as fe,
   nf as pe,
@@ -127,7 +129,10 @@ import {
   xpn as ot,
   ypn as st,
 } from "@rchunk/app-initial";
-import { Bf as ct, Rf as lt, Sf as ut, bf as dt, xf as ft } from "@rchunk/app-primary";
+import {
+  Bf as ct,
+  Sf as ut,
+} from "@rchunk/app-primary";
 import { r as pt, s as mt, t as ht } from "@rchunk/appgen-access";
 import { n as gt, t as _t } from "@rchunk/appgen-site-detail-layout";
 import { a as vt, i as yt, o as bt, t as xt } from "@rchunk/appgen-access-state-messages";

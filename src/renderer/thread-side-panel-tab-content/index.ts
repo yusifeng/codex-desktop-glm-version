@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { classNames as de, initializeClassNames as W } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -45,7 +46,6 @@ import {
   fI as te,
   gL as H,
   g_ as U,
-  h4 as W,
   hD as ne,
   iW as re,
   iZ as ie,
@@ -58,7 +58,6 @@ import {
   kh as le,
   lk as q,
   lw as ue,
-  m4 as de,
   mD as fe,
   n4 as pe,
   oO as me,
@@ -238,7 +237,10 @@ import {
   yy as Cr,
   zE as wr,
 } from "@rchunk/app-initial";
-import { Jp as Tr, Yp as Er } from "@rchunk/app-primary";
+import {
+  Jp as Tr,
+  Yp as Er,
+} from "@rchunk/app-primary";
 import { i as Dr, n as Or, r as kr, t as Ar } from "@rchunk/diff-source";
 import { i as jr, n as Mr, r as Nr, t as Pr } from "@rchunk/review-preferences-model";
 import { i as Fr, r as Ir } from "@rchunk/file-diff-alt";

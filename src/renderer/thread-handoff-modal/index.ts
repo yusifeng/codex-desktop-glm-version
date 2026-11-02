@@ -1,8 +1,12 @@
 // @ts-nocheck
+import { rankProjectsByQuery as He } from "../app-primary/runtime/rank-projects-by-query";
+import { selectHandoffBranch as X } from "../app-primary/runtime/select-handoff-branch";
+import { selectHandoffDirection as Xe } from "../app-primary/runtime/select-handoff-direction";
+import { stripTerminalCommandToken as qe } from "../app-primary/runtime/strip-terminal-command-token";
+import { isPathWithinRoots as n } from "../app-shared/runtime/is-path-within-roots";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
-  $z as n,
   AO as r,
   BI as i,
   BX as a,
@@ -95,17 +99,13 @@ import {
   xcn as Ve,
 } from "@rchunk/app-initial";
 import {
-  $ as He,
   $f as Ue,
   Cf as We,
   Q as Ge,
   _p as Ke,
-  cp as qe,
   dp as Y,
   ep as Je,
   fp as Ye,
-  gp as Xe,
-  hp as X,
   lp as Ze,
   np as Qe,
   sp as $e,

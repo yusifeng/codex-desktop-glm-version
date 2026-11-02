@@ -1,9 +1,10 @@
 // @ts-nocheck
+import { deriveCloudUnavailableReason as xt } from "../app-primary/runtime/derive-cloud-unavailable-reason";
+import { isPathWithinRoots as i } from "../app-shared/runtime/is-path-within-roots";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
   $T as r,
-  $z as i,
   AO as a,
   BX as o,
   CH as s,
@@ -120,7 +121,6 @@ import {
   dt as bt,
   eg as B,
   fg as V,
-  ig as xt,
   kn as St,
   ko as Ct,
   l as wt,

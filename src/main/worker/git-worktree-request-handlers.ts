@@ -1,4 +1,11 @@
 import { dispatchWorktreeOwnerRequest } from "./git-worktree-owner-dispatch";
+export {
+  cleanupHostHandoffTransfer,
+  createHandoffProgressReporter,
+  moveThreadToHostWorktree,
+  moveThreadToLocal,
+  moveThreadToWorktree,
+} from "./git-worktree-handoff-dispatch";
 
 type WorktreeRequestDependencies = {
   gitManager: any;
@@ -98,4 +105,5 @@ if (typeof module !== `undefined`) module.exports = {
   resolveWorktrees,
   restoreWorktree,
   setWorktreeOwnerThread,
+  ...require("./git-worktree-handoff-dispatch"),
 };

@@ -30,6 +30,7 @@ const __vite__mapDeps = (
       "@rchunk/app-info",
     ]),
 ) => i.map((i) => d[i]);
+import { lookupConnectorId as Ye } from "../app-primary/runtime/lookup-connector-id";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -133,7 +134,6 @@ import {
   am as Ke,
   nm as qe,
   om as Je,
-  rm as Ye,
   sm as Xe,
   tm as Ze,
 } from "@rchunk/app-primary";

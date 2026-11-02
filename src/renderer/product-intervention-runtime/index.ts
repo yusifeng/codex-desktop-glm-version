@@ -11,6 +11,7 @@ const __vite__mapDeps = (
       "./app-shared-fa570b9eb9dd.css",
     ]),
 ) => i.map((i) => d[i]);
+import { classNames as T, initializeClassNames as S } from "../app-shared/ui/class-names";
 import { n as e, o as t, r as n, t as r } from "@rchunk/rolldown-runtime";
 import {
   $3 as i,
@@ -31,10 +32,8 @@ import {
   e6 as y,
   fp as b,
   gp as x,
-  h4 as S,
   hp as C,
   lp as w,
-  m4 as T,
   mp as E,
   n4 as D,
   op as O,
@@ -188,7 +187,9 @@ import {
   yd as Dn,
   zu as On,
 } from "@rchunk/app-initial";
-import { hh as kn } from "@rchunk/app-primary";
+import {
+  hh as kn,
+} from "@rchunk/app-primary";
 import {
   C as R,
   a as An,

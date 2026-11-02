@@ -22,6 +22,8 @@ const __vite__mapDeps = (
       "@rchunk/api",
     ]),
 ) => i.map((i) => d[i]);
+import { createPrefilledPluginPrompt as rr } from "../app-primary/runtime/create-prefilled-plugin-prompt";
+import { classNames as K, initializeClassNames as U } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -66,7 +68,6 @@ import {
   e6 as V,
   ek as ee,
   fI as H,
-  h4 as U,
   jf as W,
   kf as G,
   lL as te,
@@ -74,7 +75,6 @@ import {
   lZ as re,
   lk as ie,
   lw as ae,
-  m4 as K,
   n4 as oe,
   nN as se,
   o_ as ce,
@@ -237,7 +237,12 @@ import {
   ypn as Qn,
   zv as $n,
 } from "@rchunk/app-initial";
-import { Bf as er, Fl as tr, Pl as nr, Rf as rr, zf as ir } from "@rchunk/app-primary";
+import {
+  Bf as er,
+  Fl as tr,
+  Pl as nr,
+  zf as ir,
+} from "@rchunk/app-primary";
 import { a as ar, n as or, r as sr } from "@rchunk/computer-history-suggestions";
 import { n as cr, t as lr } from "@rchunk/toolbar-breadcrumb";
 import { r as ur, t as dr } from "@rchunk/document-title";

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { classNames as s, initializeClassNames as o } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -6,8 +7,6 @@ import {
   I3 as r,
   K2 as i,
   Y2 as a,
-  h4 as o,
-  m4 as s,
 } from "@rchunk/app-shared";
 function c(e) {
   let t = (0, l.c)(10),

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { resolvePanelPosition as A } from "../app-primary/runtime/resolve-panel-position";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   Bgt as t,
@@ -29,7 +30,10 @@ import {
   vbt as E,
   ygt as D,
 } from "@rchunk/app-initial";
-import { Af as O, Df as k, Of as A } from "@rchunk/app-primary";
+import {
+  Af as O,
+  Df as k,
+} from "@rchunk/app-primary";
 function j(e, { browserTabId: n, initiator: r, open: c, source: u }) {
   let f = o(e),
     p = f != null && n != null ? w(n) : void 0,

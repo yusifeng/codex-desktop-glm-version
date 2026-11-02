@@ -24,6 +24,8 @@ const __vite__mapDeps = (
       "@rchunk/import-settings-gate",
     ]),
 ) => i.map((i) => d[i]);
+import { deriveBranchSearchPreview as ur } from "../app-primary/runtime/derive-branch-search-preview";
+import { classNames as Te, initializeClassNames as xe } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -96,11 +98,9 @@ import {
   ek as ve,
   gE as ye,
   gL as be,
-  h4 as xe,
   h_ as Se,
   l3 as Ce,
   lw as we,
-  m4 as Te,
   m_ as Ee,
   n4 as De,
   nO as Oe,
@@ -250,7 +250,6 @@ import {
   Ol as sr,
   Tl as cr,
   kl as lr,
-  wl as ur,
 } from "@rchunk/app-primary";
 import { n as dr, t as fr } from "@rchunk/thread-emoji";
 import { r as pr, t as mr } from "@rchunk/command-messages";

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { formatBrowserUrl as Zt } from "../app-primary/runtime/format-browser-url";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -160,7 +161,6 @@ import {
   of as Jt,
   rf as Yt,
   sf as Xt,
-  xf as Zt,
 } from "@rchunk/app-primary";
 import { r as Qt, t as $t } from "@rchunk/artifact-annotation-batch-controls";
 import { s as en, t as tn } from "@rchunk/appgen-access";

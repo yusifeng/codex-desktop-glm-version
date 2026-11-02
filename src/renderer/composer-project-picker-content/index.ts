@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { rankProjectsByQuery as O } from "../app-primary/runtime/rank-projects-by-query";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -32,7 +33,6 @@ import {
   vm as D,
 } from "@rchunk/app-initial";
 import {
-  $ as O,
   B as k,
   L as A,
   Q as j,

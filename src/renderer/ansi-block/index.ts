@@ -1,6 +1,10 @@
 // @ts-nocheck
+import { classNames as o, initializeClassNames as a } from "../app-shared/ui/class-names";
 import { n as e, o as t, t as n } from "@rchunk/rolldown-runtime";
-import { $3 as r, I3 as i, h4 as a, m4 as o } from "@rchunk/app-shared";
+import {
+  $3 as r,
+  I3 as i,
+} from "@rchunk/app-shared";
 var s = n((e, t) => {
   var n = [
       [

@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { hasQueryParamValue as ct } from "../app-primary/runtime/has-query-param-value";
+import { stripBeaconQueryParams as at } from "../app-primary/runtime/strip-beacon-query-params";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -93,10 +95,8 @@ import {
   ypn as it,
 } from "@rchunk/app-initial";
 import {
-  dh as at,
   lh as ot,
   nh as st,
-  oh as ct,
   rh as lt,
   sh as ut,
   uh as dt,

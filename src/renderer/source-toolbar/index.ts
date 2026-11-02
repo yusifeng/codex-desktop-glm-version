@@ -51,11 +51,14 @@ const __vite__mapDeps = (
       "@rchunk/permission-dropdown",
     ]),
 ) => i.map((i) => d[i]);
+import { resolveBrowserContext as ze, subscribeBrowserCommentReadiness as Le } from "../app-primary-browser-comment-runtime/index";
+import { isBrowserCommentForTab as Re } from "../app-primary/runtime/is-browser-comment-for-tab";
+import { parseUrlOrFallback as Ue } from "../app-primary/runtime/parse-url-or-fallback";
+import { hasQueuedDesignChange as r } from "../app-shared/runtime/has-queued-design-change";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $j as t,
   DF as n,
-  DJ as r,
   EF as i,
   EI as a,
   EJ as o,
@@ -136,13 +139,9 @@ import {
   ypn as Ie,
 } from "@rchunk/app-initial";
 import {
-  Gs as Le,
-  Hi as Re,
-  Hs as ze,
   Vi as Be,
   Ws as Ve,
   Xf as He,
-  Yf as Ue,
   cf as We,
   lf as Ge,
   of as U,

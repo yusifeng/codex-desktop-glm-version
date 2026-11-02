@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { formatBrowserUrl as Xe } from "../app-primary/runtime/format-browser-url";
+import { classNames as ee, initializeClassNames as N } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -33,10 +35,8 @@ import {
   fI as A,
   g4 as j,
   gL as M,
-  h4 as N,
   k4 as P,
   lw as F,
-  m4 as ee,
   n4 as te,
   nO as I,
   o_ as ne,
@@ -102,7 +102,11 @@ import {
   ydn as Ge,
   ypn as Ke,
 } from "@rchunk/app-initial";
-import { Sf as qe, _f as Je, vf as Ye, xf as Xe } from "@rchunk/app-primary";
+import {
+  Sf as qe,
+  _f as Je,
+  vf as Ye,
+} from "@rchunk/app-primary";
 import { r as Ze, s as Qe } from "@rchunk/appgen-access";
 import { n as $e, t as et } from "@rchunk/appgen-disabled-tooltip";
 import { n as tt, t as nt } from "@rchunk/start-appgen-conversation";

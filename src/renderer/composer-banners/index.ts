@@ -18,6 +18,8 @@ const __vite__mapDeps = (
       "@rchunk/task-announcement-state",
     ]),
 ) => i.map((i) => d[i]);
+import { selectHandoffBranch as we } from "../app-primary/runtime/select-handoff-branch";
+import { selectModelReasoningEfforts as _e } from "../app-primary/runtime/select-model-reasoning-efforts";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -79,14 +81,12 @@ import {
   Op as me,
   Qf as he,
   Sp as ge,
-  Tp as _e,
   Vf as ve,
   Yp as ye,
   Zf as be,
   _p as xe,
   dp as Se,
   fp as Ce,
-  hp as we,
   kp as Te,
   om as Ee,
   sm as De,

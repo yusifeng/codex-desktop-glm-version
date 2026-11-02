@@ -15,6 +15,7 @@ const __vite__mapDeps = (
       "@rchunk/conversation-thumbnail-ui",
     ]),
 ) => i.map((i) => d[i]);
+import { formatErrorMessage as l } from "../app-shared/runtime/format-error-message";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -25,7 +26,6 @@ import {
   FX as o,
   H3 as s,
   I3 as c,
-  IH as l,
   Ih as u,
   Jm as d,
   K2 as f,
@@ -127,7 +127,12 @@ import {
   wq as pt,
   zi as mt,
 } from "@rchunk/app-initial";
-import { Bn as ht, Ff as gt, If as _t, Vn as vt } from "@rchunk/app-primary";
+import {
+  Bn as ht,
+  Ff as gt,
+  If as _t,
+  Vn as vt,
+} from "@rchunk/app-primary";
 function yt(e) {
   let t = (0, bt.c)(6),
     n,

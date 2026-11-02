@@ -205,6 +205,10 @@ const __vite__mapDeps = (
       "@rchunk/thread-tab-entity",
     ]),
 ) => i.map((i) => d[i]);
+import { formatBrowserUrl as Xi } from "../app-primary/runtime/format-browser-url";
+import { getPathBasename as S } from "../app-shared/runtime/get-path-basename";
+import { isAbsolutePath as f } from "../app-shared/runtime/is-absolute-path";
+import { classNames as We, initializeClassNames as je } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -217,7 +221,6 @@ import {
   Cf as l,
   Db as u,
   Df as d,
-  EL as f,
   Ef as p,
   Ep as m,
   FQ as h,
@@ -227,7 +230,6 @@ import {
   H3 as y,
   HX as b,
   I3 as x,
-  II as S,
   IQ as C,
   Ib as w,
   If as T,
@@ -283,7 +285,6 @@ import {
   ev as Oe,
   g_ as ke,
   gg as Ae,
-  h4 as je,
   hJ as Me,
   h_ as Ne,
   hg as Pe,
@@ -297,7 +298,6 @@ import {
   l_ as Ve,
   lk as He,
   lw as Ue,
-  m4 as We,
   m_ as Ge,
   n4 as Ke,
   o$ as qe,
@@ -521,7 +521,9 @@ import {
   zct as qi,
   zvt as Ji,
 } from "@rchunk/app-initial";
-import { Sf as Yi, xf as Xi } from "@rchunk/app-primary";
+import {
+  Sf as Yi,
+} from "@rchunk/app-primary";
 import { d as Zi, n as Qi, o as $i, t as ea } from "@rchunk/thread-shell-runtime";
 import { a as ta, r as na, t as ra } from "@rchunk/appgen-card-layout";
 import { n as ia, t as aa } from "@rchunk/google-drive-resource-icon";

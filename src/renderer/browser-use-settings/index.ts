@@ -1,4 +1,7 @@
 // @ts-nocheck
+import { parseConversationRoute as Lt } from "../app-initial/runtime/parse-conversation-route";
+import { createPrefilledPluginPrompt as Fn } from "../app-primary/runtime/create-prefilled-plugin-prompt";
+import { classNames as De, initializeClassNames as pe } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -61,7 +64,6 @@ import {
   gI as ue,
   gK as de,
   gu as fe,
-  h4 as pe,
   hF as me,
   hI as he,
   hK as ge,
@@ -75,7 +77,6 @@ import {
   l3 as we,
   lK as Te,
   lk as Ee,
-  m4 as De,
   mK as Oe,
   n4 as ke,
   oK as Ae,
@@ -141,7 +142,6 @@ import {
   Yl as Pt,
   Ysn as Ft,
   _cn as It,
-  _n as Lt,
   a_n as Rt,
   aa as Y,
   au as zt,
@@ -193,7 +193,10 @@ import {
   yn as Mn,
   ypn as Nn,
 } from "@rchunk/app-initial";
-import { Bf as Pn, Rf as Fn, zf as In } from "@rchunk/app-primary";
+import {
+  Bf as Pn,
+  zf as In,
+} from "@rchunk/app-primary";
 import { n as Ln, t as Rn } from "@rchunk/toolbar-breadcrumb";
 import { n as zn, t as Bn } from "@rchunk/compact-empty-state";
 import {

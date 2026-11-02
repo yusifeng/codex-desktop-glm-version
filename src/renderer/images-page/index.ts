@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { normalizeSystemHints as N } from "../app-primary/runtime/normalize-system-hints";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -37,7 +38,6 @@ import {
   Ui as A,
   Wi as j,
   au as M,
-  iu as N,
   ko as P,
   ru as F,
   su as I,

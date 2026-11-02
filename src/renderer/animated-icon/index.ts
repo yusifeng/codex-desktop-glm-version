@@ -22,6 +22,7 @@ const __vite__mapDeps = (
       "./app-shared-fa570b9eb9dd.css",
     ]),
 ) => i.map((i) => d[i]);
+import { classNames as c, initializeClassNames as s } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -29,8 +30,6 @@ import {
   I3 as i,
   V3 as a,
   e6 as o,
-  h4 as s,
-  m4 as c,
 } from "@rchunk/app-shared";
 import {
   $v as l,
@@ -43,7 +42,10 @@ import {
   vmn as g,
   xlt as _,
 } from "@rchunk/app-initial";
-import { o as v, s as y } from "@rchunk/app-primary";
+import {
+  o as v,
+  s as y,
+} from "@rchunk/app-primary";
 function b(e) {
   let t = getComputedStyle(e).color;
   if (!t) return null;

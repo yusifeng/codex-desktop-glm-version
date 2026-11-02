@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createPrefilledPluginPrompt as Er } from "../app-primary/runtime/create-prefilled-plugin-prompt";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -238,7 +239,12 @@ import {
   yTt as xr,
   ypn as Sr,
 } from "@rchunk/app-initial";
-import { Bf as Cr, Fl as wr, Pl as Tr, Rf as Er, zf as Dr } from "@rchunk/app-primary";
+import {
+  Bf as Cr,
+  Fl as wr,
+  Pl as Tr,
+  zf as Dr,
+} from "@rchunk/app-primary";
 import { n as Or, t as kr } from "@rchunk/app-connect-link-navigation";
 import {
   c as Ar,

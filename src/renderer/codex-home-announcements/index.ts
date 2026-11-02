@@ -22,6 +22,7 @@ const __vite__mapDeps = (
       "@rchunk/entry-point-availability",
     ]),
 ) => i.map((i) => d[i]);
+import { classNames as x, initializeClassNames as v } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -41,10 +42,8 @@ import {
   ag as h,
   e6 as g,
   fI as _,
-  h4 as v,
   ig as y,
   kz as b,
-  m4 as x,
   n4 as S,
   qm as C,
   vj as w,

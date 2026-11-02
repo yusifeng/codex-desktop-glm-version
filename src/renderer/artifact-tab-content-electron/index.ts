@@ -110,6 +110,8 @@ const __vite__mapDeps = (
       "./pdf-preview-panel-cc39ef9f5913.css",
     ]),
 ) => i.map((i) => d[i]);
+import { getPathBasename as g } from "../app-shared/runtime/get-path-basename";
+import { classNames as de, initializeClassNames as oe } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -126,7 +128,6 @@ import {
   HX as p,
   Hw as m,
   I3 as h,
-  II as g,
   If as _,
   K2 as v,
   LX as y,
@@ -154,7 +155,6 @@ import {
   fI as ie,
   g_ as ae,
   gu as L,
-  h4 as oe,
   iL as R,
   jf as se,
   js as ce,
@@ -162,7 +162,6 @@ import {
   lg as le,
   lk as B,
   lw as ue,
-  m4 as de,
   mA as fe,
   n4 as pe,
   nD as me,
@@ -315,7 +314,10 @@ import {
   zX as Jn,
 } from "@rchunk/app-initial";
 import { Un as Yn, Wn as Xn } from "@rchunk/spreadsheet-editor";
-import { dl as Zn, fl as Qn } from "@rchunk/app-primary";
+import {
+  dl as Zn,
+  fl as Qn,
+} from "@rchunk/app-primary";
 import {
   a as $n,
   i as er,

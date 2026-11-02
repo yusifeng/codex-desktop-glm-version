@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { formatBrowserUrl as _ } from "../app-primary/runtime/format-browser-url";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -15,8 +16,13 @@ import {
   o_ as f,
   xE as p,
 } from "@rchunk/app-shared";
-import { a3t as m, i3t as h } from "@rchunk/app-initial";
-import { Sf as g, xf as _ } from "@rchunk/app-primary";
+import {
+  a3t as m,
+  i3t as h,
+} from "@rchunk/app-initial";
+import {
+  Sf as g,
+} from "@rchunk/app-primary";
 function v(e) {
   let t = (0, y.c)(21),
     { liveUrl: n, title: r, onOpenSettings: i, settingsHref: c } = e,

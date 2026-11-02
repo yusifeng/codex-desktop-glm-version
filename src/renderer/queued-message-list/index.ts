@@ -1,4 +1,7 @@
 // @ts-nocheck
+import { formatAnnotationSummary as B } from "../app-primary/runtime/format-annotation-summary";
+import { partitionCommentAttachments as H } from "../app-primary/runtime/partition-comment-attachments";
+import { classNames as ie, initializeClassNames as h } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -16,12 +19,10 @@ import {
   d$ as ee,
   e6 as p,
   f$ as m,
-  h4 as h,
   iT as g,
   jT as te,
   jf as ne,
   kf as re,
-  m4 as ie,
   n4 as ae,
   o$ as oe,
   o_ as se,
@@ -65,9 +66,7 @@ import {
   as as R,
   gr as be,
   hr as z,
-  is as B,
   li as V,
-  ui as H,
 } from "@rchunk/app-primary";
 import { i as U, n as xe, t as W } from "@rchunk/floating-ui-modifiers";
 var G, Se;

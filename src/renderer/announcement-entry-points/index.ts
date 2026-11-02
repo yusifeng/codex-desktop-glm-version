@@ -12,6 +12,7 @@ const __vite__mapDeps = (
       "./app-initial-e8ceb32eb626.css",
     ]),
 ) => i.map((i) => d[i]);
+import { createPrefilledPluginPrompt as it } from "../app-primary/runtime/create-prefilled-plugin-prompt";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -125,7 +126,6 @@ import {
   Cm as tt,
   Nf as nt,
   Pf as rt,
-  Rf as it,
   Sm as at,
   Xh as ot,
   Zh as st,

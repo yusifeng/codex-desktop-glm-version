@@ -1,6 +1,12 @@
 // @ts-nocheck
+import { classNames as o, initializeClassNames as a } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { $3 as t, FX as n, I3 as r, QI as i, h4 as a, m4 as o } from "@rchunk/app-shared";
+import {
+  $3 as t,
+  FX as n,
+  I3 as r,
+  QI as i,
+} from "@rchunk/app-shared";
 import {
   Dft as s,
   E6t as c,

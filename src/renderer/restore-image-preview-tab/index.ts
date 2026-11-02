@@ -1,6 +1,9 @@
 // @ts-nocheck
+import { getPathBasename as t } from "../app-shared/runtime/get-path-basename";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { II as t, RI as n } from "@rchunk/app-shared";
+import {
+  RI as n,
+} from "@rchunk/app-shared";
 import {
   Dyt as r,
   Fut as i,

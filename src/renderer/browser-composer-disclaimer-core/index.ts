@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { classNames as u, initializeClassNames as l } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -9,8 +10,6 @@ import {
   I3 as o,
   K2 as s,
   Y2 as c,
-  h4 as l,
-  m4 as u,
 } from "@rchunk/app-shared";
 import {
   $un as d,

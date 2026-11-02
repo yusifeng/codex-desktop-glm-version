@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { createPrefilledPluginPrompt as Ke } from "../app-primary/runtime/create-prefilled-plugin-prompt";
+import { classNames as H, initializeClassNames as R } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -39,7 +41,6 @@ import {
   dX as F,
   e6 as I,
   f_ as L,
-  h4 as R,
   jf as z,
   jh as B,
   kf as V,
@@ -47,7 +48,6 @@ import {
   kh as ne,
   lk as re,
   lm as ie,
-  m4 as H,
   n4 as ae,
   o_ as oe,
   oq as U,
@@ -97,7 +97,9 @@ import {
   vp as Ue,
   xlt as We,
 } from "@rchunk/app-initial";
-import { Bf as Ge, Rf as Ke } from "@rchunk/app-primary";
+import {
+  Bf as Ge,
+} from "@rchunk/app-primary";
 import { n as qe, t as Je } from "@rchunk/color-icon";
 import { n as Ye, r as Xe, t as Ze } from "@rchunk/computer-history-suggestion-prompt";
 import { a as Qe, n as $e } from "@rchunk/computer-history-query";

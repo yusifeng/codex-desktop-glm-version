@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { classNames as w, initializeClassNames as S } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -22,9 +23,7 @@ import {
   f$ as y,
   g4 as b,
   g_ as x,
-  h4 as S,
   m$ as C,
-  m4 as w,
   n4 as T,
   o$ as E,
   p$ as D,
@@ -74,7 +73,10 @@ import {
   ypn as Ee,
   zVt as De,
 } from "@rchunk/app-initial";
-import { la as U, ua as Oe } from "@rchunk/app-primary";
+import {
+  la as U,
+  ua as Oe,
+} from "@rchunk/app-primary";
 import { n as ke, r as Ae } from "@rchunk/thread-scroll-controller-context-value";
 import { n as je, t as Me } from "@rchunk/conversation-navigation-state";
 var W, Ne, Pe;

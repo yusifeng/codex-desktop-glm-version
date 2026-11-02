@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { formatBrowserUrl as me } from "../app-primary/runtime/format-browser-url";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -60,7 +61,11 @@ import {
   wb as le,
   ydn as ue,
 } from "@rchunk/app-initial";
-import { Sf as de, dc as fe, uc as pe, xf as me } from "@rchunk/app-primary";
+import {
+  Sf as de,
+  dc as fe,
+  uc as pe,
+} from "@rchunk/app-primary";
 import { n as he, t as ge } from "@rchunk/appgen-project-row";
 import { n as _e, t as ve } from "@rchunk/showcase-items";
 function ye(e, t, n) {

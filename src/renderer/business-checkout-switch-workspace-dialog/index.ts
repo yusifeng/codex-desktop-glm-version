@@ -1,11 +1,11 @@
 // @ts-nocheck
+import { formatErrorMessage as a } from "../app-shared/runtime/format-error-message";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
   Ah as n,
   FX as r,
   I3 as i,
-  IH as a,
   Ih as o,
   K2 as s,
   LX as c,
@@ -25,7 +25,13 @@ import {
   wL as x,
   zh as S,
 } from "@rchunk/app-shared";
-import { Dft as C, F6t as w, M6t as T, N6t as E, kft as D } from "@rchunk/app-initial";
+import {
+  Dft as C,
+  F6t as w,
+  M6t as T,
+  N6t as E,
+  kft as D,
+} from "@rchunk/app-initial";
 import { n as O, t as k } from "@rchunk/building";
 import { a as A, i as j, n as M, r as N, t as P } from "@rchunk/chatgpt-desktop-auth-url";
 function F(e) {

@@ -1,6 +1,9 @@
 // @ts-nocheck
+import { createPrefilledPluginPrompt as y } from "../app-primary/runtime/create-prefilled-plugin-prompt";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { wL as t } from "@rchunk/app-shared";
+import {
+  wL as t,
+} from "@rchunk/app-shared";
 import {
   Dft as n,
   GWt as r,
@@ -17,7 +20,11 @@ import {
   ppn as m,
   snn as h,
 } from "@rchunk/app-initial";
-import { Bf as g, Bh as _, Hh as v, Rf as y } from "@rchunk/app-primary";
+import {
+  Bf as g,
+  Bh as _,
+  Hh as v,
+} from "@rchunk/app-primary";
 function b(e, t, n, r) {
   let a = e.get(f),
     o;

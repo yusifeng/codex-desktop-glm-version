@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { formatBrowserUrl as A } from "../app-primary/runtime/format-browser-url";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -39,7 +40,9 @@ import {
   i7 as O,
   wan as oe,
 } from "@rchunk/app-initial";
-import { Sf as k, xf as A } from "@rchunk/app-primary";
+import {
+  Sf as k,
+} from "@rchunk/app-primary";
 import { n as j, t as M } from "@rchunk/appgen-project-row";
 function N(e) {
   let t = (0, P.c)(58),

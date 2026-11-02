@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getPathBasename as l } from "../app-shared/runtime/get-path-basename";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -9,7 +10,6 @@ import {
   HI as o,
   HX as s,
   I3 as c,
-  II as l,
   If as u,
   K2 as d,
   LX as f,
@@ -113,7 +113,12 @@ import {
   yut as it,
   yy as at,
 } from "@rchunk/app-initial";
-import { Il as ot, Ll as st, dp as ct, fp as lt } from "@rchunk/app-primary";
+import {
+  Il as ot,
+  Ll as st,
+  dp as ct,
+  fp as lt,
+} from "@rchunk/app-primary";
 import { n as ut, t as dt } from "@rchunk/review-preferences-model";
 import { n as ft, r as pt } from "@rchunk/pull-request-readonly-comment";
 import { g as mt, v as ht } from "@rchunk/pull-request-actions";

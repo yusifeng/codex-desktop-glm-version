@@ -20,6 +20,8 @@ const __vite__mapDeps = (
       "@rchunk/app-connect-availability",
     ]),
 ) => i.map((i) => d[i]);
+import { extractActionLabel as ue } from "../app-primary/runtime/extract-action-label";
+import { hasDisplayableAction as J } from "../app-primary/runtime/has-displayable-action";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -82,10 +84,8 @@ import {
   Km as G,
   Um as K,
   Vm as q,
-  Wm as ue,
   Wp as de,
   eh as fe,
-  qm as J,
   th as pe,
 } from "@rchunk/app-primary";
 function me(e, t) {

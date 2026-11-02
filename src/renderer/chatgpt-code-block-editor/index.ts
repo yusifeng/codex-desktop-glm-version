@@ -51,6 +51,7 @@ const __vite__mapDeps = (
       "@rchunk/dockerfile-syntax-definition",
     ]),
 ) => i.map((i) => d[i]);
+import { classNames as c, initializeClassNames as s } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -59,8 +60,6 @@ import {
   K2 as i,
   V3 as a,
   e6 as o,
-  h4 as s,
-  m4 as c,
   n4 as l,
 } from "@rchunk/app-shared";
 import {

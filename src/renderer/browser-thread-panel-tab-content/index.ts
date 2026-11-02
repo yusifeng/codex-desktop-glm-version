@@ -27,6 +27,13 @@ const __vite__mapDeps = (
       "@rchunk/browser-site-annotation-permission-dialog",
     ]),
 ) => i.map((i) => d[i]);
+import { setBrowserTabUrlState as Fr } from "../app-primary-browser-comment-runtime/index";
+import { isBrowserCommentForTab as Lr } from "../app-primary/runtime/is-browser-comment-for-tab";
+import { parseUrlOrFallback as Vr } from "../app-primary/runtime/parse-url-or-fallback";
+import { hasQueuedDesignChange as u } from "../app-shared/runtime/has-queued-design-change";
+import { isHttpUrl as p } from "../app-shared/runtime/is-http-url";
+import { projectAnnotationItems as lt } from "../app-shared/runtime/project-annotation-items";
+import { classNames as Ke, initializeClassNames as Pe } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -38,10 +45,8 @@ import {
   C_ as s,
   Ch as c,
   DF as l,
-  DJ as u,
   E4 as d,
   EJ as f,
-  FK as p,
   FX as m,
   G3 as h,
   H3 as g,
@@ -106,7 +111,6 @@ import {
   g_ as je,
   gh as Me,
   gs as Ne,
-  h4 as Pe,
   iK as Fe,
   iM as Ie,
   iZ as Le,
@@ -118,7 +122,6 @@ import {
   lY as Ue,
   lh as We,
   lk as Ge,
-  m4 as Ke,
   mK as qe,
   n4 as Je,
   nc as Ye,
@@ -135,7 +138,6 @@ import {
   uw as ot,
   vh as st,
   vz as ct,
-  wJ as lt,
   wL as ut,
   x_ as dt,
   xh as ft,
@@ -276,13 +278,10 @@ import {
 } from "@rchunk/app-initial";
 import {
   Bi as Pr,
-  Bs as Fr,
   Fs as Ir,
-  Hi as Lr,
   Is as Rr,
   Vi as zr,
   Xf as Br,
-  Yf as Vr,
   cf as Hr,
   lf as Ur,
   ml as Wr,
