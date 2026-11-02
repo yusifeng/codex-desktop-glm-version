@@ -16,6 +16,20 @@ const runtimeSettingDescriptors = require("./main-app/settings/runtime-descripto
 const mcpSandboxContracts = require("./main-app/mcp-sandbox/contracts.js");
 const routeContracts = require("./main-app/window/route-contracts.js");
 const sharedHostContracts = require("./shared/host-config.js");
+const sharedStreams = require("./shared/streams-runtime.js");
+const sharedMisc = require("./shared/misc-runtime.js");
+const sharedMcpTransport = require("./shared/mcp-2-runtime.js");
+const sharedLocalEnvironments = require("./shared/local-environments.js");
+const applicationList = require("./main-app/open-target/application-list.js");
+const { GithubRequestClient } = require("./main-app/github/request-client.js");
+const { stopGitFsmonitor } = require("./main-app/startup/git-fsmonitor.js");
+const sharedStructuredGeneration = require("./shared/structured-generation.js");
+const sharedAutomationRegistry = require("./shared/automation-registry.js");
+const sharedProcessExec = require("./shared/process-exec.js");
+const sharedAmbientSuggestions = require("./shared/ambient-suggestions-store.js");
+const sharedTail = require("./shared/tail-runtime.js");
+const sharedThreadProjectMembership = require("./shared/thread-project-membership.js");
+const sharedClientCoordination = require("./shared/client-coordination-service.js");
 const { NODE_REPL_MODULE_DIR_ENV_KEY } = require("./shared/app-constants.js");
 const { resolveAutomationModelRouting: Ln } = require("./main-app/misc/model-routing.js");
 const {
@@ -384,7 +398,7 @@ const { createWorkspaceFileServiceClass } = require("./main-app/workspace/files.
 const { createWorkspaceFileRuntimeSupport } = require("./main-app/workspace/file-runtime-support.js");
 const { createWindowRpcServiceAdapters } = require("./main-app/window/rpc-service-adapters.js");
 const { createBrowserProfileImportServiceClass, createDetachedBrowserTabsServiceClass, createDownloadsServiceClass } = require("./main-app/window/browser-window-rpc-services.js");
-const { createDesktopFileServicesRuntime } = require("./main-app/files/desktop-file-services.js");
+const { createDesktopFileServicesRuntime, countFolderFiles } = require("./main-app/files/desktop-file-services.js");
 const { createLibraryFilesBackendRuntime } = require("./main-app/files/library-files-backend.js");
 const { createDictationAudioServiceClass } = require("./main-app/dictation/audio.js");
 const { createAuthorizedThreadCatalogServiceClass } = require("./main-app/thread-catalog/authorized-service.js");
@@ -759,7 +773,7 @@ const {
   firstWorkspaceRoot: n.Wo,
   getSelectedLocalProject: Pr,
   homeDirectory: require("node:os").homedir,
-  readAmbientSuggestions: n.pi,
+  readAmbientSuggestions: sharedAmbientSuggestions.readAmbientSuggestions,
   generateAmbientSuggestions: n.hi,
   resolveModelRouting: Ln,
   scheduleDeferredStartupWork: Br,
@@ -2649,7 +2663,7 @@ var {
   defaultPermissions: n.Od,
   permissionProfileOf: n.Md,
   managedRequirementsAllow: n.Fd,
-  parseIntervalMs: n.wr,
+  parseIntervalMs: sharedAutomationRegistry.parseAutomationIntervalMs,
   computeNextRun: n.Er,
   withHostedAutomationInstructions: n.zt,
   selectAutomationModel: n.yd,
@@ -2722,7 +2736,7 @@ var {
   runAutomationNow: mae,
 } = createAutomationSchedulerRuntime({
   defaultDesktopFeatureAvailability: vr,
-  listDueAutomations: n.jr,
+  listDueAutomations: sharedAutomationRegistry.listDueAutomations,
   updateAutomationNextRun: n.zr,
   isHeartbeatAutomation: n.xd,
   runScheduledHeartbeat: vae,
@@ -2750,7 +2764,6 @@ var ChunkedWebContentsMessageSender = createChunkedWebContentsMessageSenderClass
   createLogger: r.i,
   inlineMessageChannel: a.At,
 });
-var yu = e.a(n.en());
 var {
   migrations: projectLocalDataMigrations,
   runLocalDataMigrations,
@@ -2760,7 +2773,7 @@ var {
   createHash: _.createHash,
   randomUUID: _.randomUUID,
   path: h.default,
-  uniqueBy: yu.default,
+  uniqueBy: sharedStreams.uniqueBy,
   createLogger: r.i,
   readSelectedProject: Nr,
 });
@@ -8436,9 +8449,6 @@ function lp(e, t) {
 }
 var Zfe = e.a(n.jo()),
   up = e.a(n.Ra()),
-  Qfe = e.a(n.Yi()),
-  dp = e.a(n.xi()),
-  fp = e.a(n.Gr()),
   pp = e.a(n.dr()),
   $fe = a.pn();
 function epe(e) {
@@ -14780,10 +14790,10 @@ configureStatsigAdapterRuntime({
 const iconBaseName = (e) => resolveFlavorIconBaseName(e, { agent: a.in.Agent, nightly: a.in.Nightly, internalAlpha: a.in.InternalAlpha, publicBeta: a.in.PublicBeta, dev: a.in.Dev, prod: a.in.Prod });
 var HostClientCoordination = createHostClientCoordinationClass({
   ClientCoordination: n.v,
-  ClientCoordinationService: n.p,
-  createThreadOwnerRegistration: n.h,
+  ClientCoordinationService: sharedClientCoordination.ClientCoordinationService,
+  createThreadOwnerRegistration: sharedClientCoordination.createThreadOwnerRegistration,
   protocolVersion: n.mu,
-  waitUntilInitialized: n._,
+  waitUntilInitialized: sharedTail.waitUntilIpcInitialized,
 });
 var createHostedAppServerManager = createHostedAppServerManagerFactory({
   HostClientCoordination,
@@ -14932,7 +14942,7 @@ var {
   findExecutable: Yi,
   mimeLookup: $fe.lookup,
 });
-var BO = createQueryCacheHostServiceClass({ HostServiceBase: n.p, invalidatePluginCache: Oo });
+var BO = createQueryCacheHostServiceClass({ HostServiceBase: sharedClientCoordination.ClientCoordinationService, invalidatePluginCache: Oo });
 var environmentConfigSchemas = createEnvironmentConfigSchemas(n);
 var EnvironmentConfigService = createEnvironmentConfigServiceClass({
   RpcHandlerBase: n.Uf,
@@ -25369,14 +25379,6 @@ var TRe = (e) => {
         ? (n, r) => t(n, r) && !((e.mtimeCache?.get(n) ?? r.mtime ?? 0) > (r.mtime ?? 0))
         : (t, n) => !((e.mtimeCache?.get(t) ?? n.mtime ?? 0) > (n.mtime ?? 0))));
   };
-var Zze = e.t((e, t) => {
-    var r = n.tn();
-    function i(e) {
-      return e && e.length ? r(e) : [];
-    }
-    t.exports = i;
-  }),
-  mH = e.a(Zze());
 var {
     affectedStateGuardsMatch: SH,
     applyAffectedState: wH,
@@ -25391,7 +25393,7 @@ var {
     reconcileHostSectionMembers,
     stripSectionAppearance: Wb,
   } = createSavedSectionPolicy({
-    dedupe: mH.default,
+    dedupe: sharedStreams.unique,
     deepEqual: G.default,
     isInternalThreadId: n.hu,
     pinnedThreadIdsKey: n.iu.PINNED_THREAD_IDS,
@@ -25474,7 +25476,7 @@ var jH = createPinnedThreadsServiceClass({
     DisposableBase: n.Uf,
     PinnedThreadServer: $ze,
     SavedCustomSectionsManager: iBe,
-    dedupe: mH.default,
+    dedupe: sharedStreams.unique,
     pinnedSectionId: PINNED_THREAD_SECTION_ID,
     pinnedThreadIdsKey: n.iu.PINNED_THREAD_IDS,
     readPinnedThreadIds: hH,
@@ -26559,10 +26561,10 @@ var OZ = createRemoteLocalhostNavigationForwarder({
     freeMemory: p.freemem,
     getSystemMetrics: CO,
     isInternalBuild: a.in.isInternal,
-    listDescendantProcesses: n.nn,
+    listDescendantProcesses: sharedStreams.listDescendantProcesses,
     now: () => R.performance.now(),
     processApi: process,
-    summarizeDescendantProcesses: n.an,
+    summarizeDescendantProcesses: sharedStreams.summarizeDescendantProcesses,
   });
 var {
   cancelTraceRecordingStart,
@@ -26628,7 +26630,7 @@ var JQe = 32e3,
     crypto: _,
     featureFlags: Tr,
     logger: ZZ,
-    chunkItems: dp,
+    chunkItems: sharedStreams.chunk,
     cleanupChunkSize: XZ,
     isProtectedWorkspaceRoot,
     readThreadMetadata,
@@ -26730,7 +26732,7 @@ var { AppServerClientRegistry: a$e, FileAttachmentsService: s$e, FileDragService
     streamPromises: F,
     util: d,
     childProcess: P,
-    countFolderFiles: n.$,
+    countFolderFiles,
     isRemoteHostConfig: n.Es,
     resolveLocalWorkspacePath,
     resolveElectronResourcesPath: o.t,
@@ -26807,9 +26809,9 @@ var {
 } = createWindowRpcServiceAdapters({
   RpcHandlerBase: n.Uf,
   watchKeyboardRelease: FV,
-  listLocalEnvironments: n.K,
-  readLocalEnvironment: n.q,
-  saveLocalEnvironment: n.R,
+  listLocalEnvironments: sharedLocalEnvironments.listLocalEnvironments,
+  readLocalEnvironment: sharedLocalEnvironments.readLocalEnvironment,
+  saveLocalEnvironment: sharedLocalEnvironments.saveLocalEnvironment,
   getUseWslPaths: n.zi,
   isRemoteHostConfig: n.Es,
   convertPathForDesktopHost: Vn,
@@ -34916,8 +34918,8 @@ var {
   fsPromises: b.default,
   crypto: _,
   resolveExecutable: (e) => n.qn.resolve(e),
-  readProcessResult: (e) => n.xc(e),
-  readHostFile: (e) => n.bc(e),
+  readProcessResult: (e) => sharedStreams.readProcessResult(e),
+  readHostFile: (e) => sharedStreams.readHostFile(e),
   resolveElectronResourcesPath: (e) => o.t(e),
   resolveNodeExecutable: (e) => n.Ln(e),
   filePathToUri: languageServerFilePathToUri,
@@ -35189,7 +35191,7 @@ var {
   getWindowsSystemPath: aa,
   parseShellWords: (command) => n.er(command),
   shellEscape: (value) => n.$n(value),
-  shellJoin: (values) => n.Qn(values),
+  shellJoin: (values) => sharedMisc.shellJoin(values),
   toWslPath: (value) => n.Vi(value),
   getWslDistro: (value) => n.Hi(value),
   getWslInfo: () => n.Ni(),
@@ -35264,12 +35266,12 @@ var {
   getApplicationIcon: oH,
   includeCodexTargets: Sl,
   listLinuxApplicationsForFile: NAe,
-  listApplicationsForFile: (options) => n.N(options, { listApplicationsForFile: Nj }),
+  listApplicationsForFile: (options) => applicationList.listApplicationsForFile(options, { listApplicationsForFile: Nj }),
   discoverLinuxBrowsers: uO,
   scanNativeBrowsers: Fj,
   discoverKnownBrowsers: (options) => n.P(options),
   codexBundleIds: a.in.values.map((e) => a.rn(e)),
-  uniqueBy: yu.default,
+  uniqueBy: sharedStreams.uniqueBy,
 });
 var N0 = createOpenInServiceClass({
     DisposableBase: n.Uf,
@@ -35369,7 +35371,7 @@ var L6e = createPrimaryRuntimeHostClass({
 var R6e = 5e3,
   z6e = createProcessMemorySnapshotCacheClass({
     RpcHandlerBase: n.Uf,
-    listChildProcesses: n.nn,
+    listChildProcesses: sharedStreams.listDescendantProcesses,
     processRef: process,
     cacheDurationMs: R6e,
   });
@@ -35445,7 +35447,7 @@ var U6e = 100,
       canonicalizeRoots: Kn,
       normalizeRoots: Gn,
       basename: re.basename,
-      chunk: dp.default,
+      chunk: sharedStreams.chunk,
       hintReadBatchSize: 8,
       threadListPageSize: 100,
     });
@@ -40114,13 +40116,13 @@ var I5 = createThreadMetadataGenerationServiceClass({
     RpcHandlerBase: n.Uf,
     createLogger: r.r,
     getFeatureConfig: Ln,
-    generateTitle: n.a,
-    generateDescription: n.r,
-    generateSummary: n.i,
+    generateTitle: sharedStructuredGeneration.generateThreadTitle,
+    generateDescription: sharedStructuredGeneration.generateThreadDescription,
+    generateSummary: sharedStructuredGeneration.generateThreadSummary,
   }),
   Snt = createThreadProjectMembershipOwnerClass({
     runtime: n,
-    MembershipStoreBase: n.n,
+    MembershipStoreBase: sharedThreadProjectMembership.ThreadProjectMembershipStore,
   }),
   Dnt = createCronTurnReadStatePreparer({
     runtime: n,
@@ -40139,9 +40141,9 @@ var { ThreadReadStateOwner: Ont } = createThreadReadStateOwnerClass({
 var Ant = createThreadReadStateRuntime({
   DisposableStore: n.Wr,
   ThreadReadStateOwner: Ont,
-  ClientCoordination: n.v,
-  readAuthenticatedIdentity: n.sn,
-  hostConfigKey: n.ln,
+    ClientCoordination: n.v,
+    readAuthenticatedIdentity: sharedStreams.resolveAuthPrincipal,
+    hostConfigKey: sharedStreams.hostConfigKey,
   protocolVersion: n.mu,
   deepEqual: G.default,
   prepareCronTurnReadState: Dnt,
@@ -40167,7 +40169,7 @@ var Fnt = createTracingRpcServiceClass({
   Rnt = createTriggerSubscriptionReaderClass({
     runtime: n,
     RpcHandlerBase: n.Uf,
-    chunkArray: dp.default,
+    chunkArray: sharedStreams.chunk,
   }),
   { UserVerificationService: znt, UserVerificationAttempt: Bnt } =
     createUserVerificationRpcServices({ RpcHandlerBase: n.Uf }),
@@ -40182,7 +40184,7 @@ var Fnt = createTracingRpcServiceClass({
     getFeatureFlags: Tr,
     temporaryDirectory: p.tmpdir,
     realpathSync: v.realpathSync,
-    uniqueBy: yu.default,
+    uniqueBy: sharedStreams.uniqueBy,
   });
 var qnt = createWebsitePreviewFetch({ request: (options) => l.net.request(options) });
 var Jnt = createDownloadsViewPublisherClass({
@@ -40214,10 +40216,10 @@ var { resolveAppServerWebsocketUrl: W5, resolveAppServerSocksProxyUrl: Ynt } =
   createAppServerTransportPolicy({
     environment: process.env,
     isCloudHostId: n.Cs,
-    resolveHostWebsocketUrl: n.mn,
+    resolveHostWebsocketUrl: sharedMcpTransport.resolveAppServerWebsocketUrl,
   });
 var Xnt = createHistorySwipeNavigationServiceClass({ RpcHandlerBase: n.Uf });
-var Znt = createGithubRequestClientFactory({ RequestClient: n.E });
+var Znt = createGithubRequestClientFactory({ RequestClient: GithubRequestClient });
 var G5 = r.r(`WindowContext`),
   Qnt = new z6e(),
   $nt = 100;
@@ -40237,7 +40239,7 @@ var { hostKindForConfig: trt, createAppServerTransport: K5 } =
     protocolsForToken: appServerProtocolsForToken,
     resolveSocksProxyUrl: Ynt,
     getCACertificates: ne.getCACertificates,
-    WebsocketTransport: n.pn,
+    WebsocketTransport: sharedMcpTransport.WebsocketTransport,
     AuthenticatedTransport: HybridWebsocketHttpTransport,
     DesktopApiTokenClient: AppServerHttpClient,
     LocalStdioTransport: n.dn,
@@ -45858,10 +45860,10 @@ async function Ust() {
       process.platform === `darwin` &&
       (await configureBundledGitEnvironment({
         env: process.env,
-        getPath: n.Yn,
+        getPath: sharedProcessExec.getPathEnvironment,
         resolveExecutable: (command, env) => n.qn.resolve(command, { env }),
         resourcesPath: o.t({ env: process.env, resourcesPath: process.resourcesPath }),
-        setPath: n.Xn,
+        setPath: sharedProcessExec.setPathEnvironment,
       })),
       B(e));
   }
@@ -46169,11 +46171,7 @@ async function Ust() {
       markAppQuitting: W.markAppQuitting,
       quitState: ye,
       registerBridgeHandlers: y,
-      stopFsmonitor: (root, client) =>
-        n.H(root, [`fsmonitor--daemon`, `stop`], client, {
-          allowedNonZeroExitCodes: [128],
-          timeoutMs: 2e3,
-        }),
+      stopFsmonitor: stopGitFsmonitor,
       stopService: Me,
       terminateProcessTree: hrt,
     });
@@ -46492,7 +46490,7 @@ async function Ust() {
       getNativeIntl: a.hn,
       shouldBlockQuit: nc,
       hasInProgressLocalConversation: isRemoteControlEnabled,
-      getAutomations: n.Ar,
+      getAutomations: sharedAutomationRegistry.listLocalAutomations,
       observeSystemShutdown: _rt,
       armWindowsForcedExit: n7,
       waitForContextCleanup,
@@ -46627,9 +46625,9 @@ async function Ust() {
         startupPhases: _,
       }),
     ),
-    I.add(n.bi((e) => K.sendAmbientSuggestionGenerationEvent(e))),
+    I.add(sharedAmbientSuggestions.subscribeAmbientSuggestionGeneration((e) => K.sendAmbientSuggestionGenerationEvent(e))),
     I.add(
-      n.yi((e) => {
+      sharedAmbientSuggestions.subscribeEphemeralGenerationTokenUsage((e) => {
         let t = W.getPrimaryWindow();
         t != null &&
           W.windowManager.sendMessageToWebContents(t.webContents, {

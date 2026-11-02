@@ -58,7 +58,7 @@ declare module "@chunk/shared" {
   export interface ArraySchema<T = any> extends Schema<T> {
     length(n: number): ArraySchema<T>;
   }
-  export const $: any; // 内部符号: Qie
+  export { countFolderFiles as $ } from "../../main-app/files/desktop-file-services";
   export const $c: any; // 内部符号: Px
   export const $d: any; // 内部符号: qh
   export { NODE_REPL_TRUSTED_SERVICES_ENV_KEY as $l } from "../../shared/app-constants";
@@ -74,7 +74,7 @@ declare module "@chunk/shared" {
   export { CHROME_DEV_PLUGIN_NAME as Al } from "../../shared/app-constants";
   export const An: any; // 内部符号: jX
   export const Ao: any; // 内部符号: gO
-  export const Ar: any; // 内部符号: LB
+  export { listLocalAutomations as Ar } from "../../shared/automation-registry";
   export const As: any; // 内部符号: IT
   export { acceleratorsForCommand as At } from "../../shared/command-registry";
   export const Au: any; // 内部符号: Ly
@@ -117,7 +117,7 @@ declare module "@chunk/shared" {
   export const Ds: any; // 内部符号: jT
   export { WEBVIEW_THREAD_COMMANDS as Dt } from "../../shared/command-registry";
   export const Du: any; // 内部符号: Py
-  export const E: any; // 内部符号: _se
+  export { GithubRequestClient as E } from "../../main-app/github/request-client";
   export { dynamicAppToolResultSchema as Ec } from "../../shared/app-config";
   export { permissionProfileSchema as Ed } from "../../shared/sandbox-permissions";
   export { Ef } from "../../shared/zod-facade";
@@ -141,7 +141,7 @@ declare module "@chunk/shared" {
   export const Fs: any; // 内部符号: bT
   export { COMMAND_DEFINITIONS as Ft } from "../../shared/command-registry";
   export { parseElementName as Fu } from "../../shared/browser-context";
-  export const G: any; // 内部符号: k5
+  export { normalizeDesktopWorktreePath as G } from "../../shared/wsl-paths";
   export const Ga: any; // 内部符号: kA
   export { deserializeBrowserTabMention as Gc } from "../../shared/browser-tab-mentions";
   export { Gd } from "../../shared/zod-facade";
@@ -149,7 +149,7 @@ declare module "@chunk/shared" {
   export { CODEX_CLI_PATH_ENV_KEY as Gl } from "../../shared/app-constants";
   export { Gn } from "../../shared/runtime-state";
   export const Go: any; // 内部符号: aD
-  export const Gr: any; // 内部符号: NI
+  export const Gr: any; // 内部符号: NI (unconsumed CommonJS compatibility wrapper)
   export { shouldAttachAuthHeaders as Gs } from "../../shared/http-headers";
   export { chromeNativeHostsV2Path as Gt } from "../../shared/streams-runtime";
   export { supportsRecencySortKey as Gu } from "../../shared/app-server-version";
@@ -188,7 +188,7 @@ declare module "@chunk/shared" {
   export { wantsIntegrityState as Js } from "../../shared/http-headers";
   export { reconcileChromeNativeHost as Jt } from "../../shared/streams-runtime";
   export { parseVersionOutput as Ju } from "../../shared/app-server-version";
-  export const K: any; // 内部符号: pae
+  export { listLocalEnvironments as K } from "../../shared/local-environments";
   export const Ka: any; // 内部符号: SA
   export { hasValidUnicode as Kc } from "../../shared/browser-tab-mentions";
   export const Kd: any; // 内部符号: Mg
@@ -225,7 +225,7 @@ declare module "@chunk/shared" {
   export const Ms: any; // 内部符号: xT
   export { menuTitleForCommand as Mt } from "../../shared/command-registry";
   export const Mu: any; // 内部符号: zy
-  export const N: any; // 内部符号: Doe
+  export { listApplicationsForFile as N } from "../../main-app/open-target/application-list";
   export const Na: any; // 内部符号: YA
   export { dedupeTabCandidates as Nc } from "../../shared/browser-tab-mentions";
   export { permissionParamsOf as Nd } from "../../shared/sandbox-permissions";
@@ -266,13 +266,13 @@ declare module "@chunk/shared" {
   export const Qd: any; // 内部符号: Zh
   export const Qi: any; // 内部符号: Tj
   export const Ql: any; // 内部符号: wb
-  export const Qn: any; // 内部符号: XK
+  export { shellJoin as Qn } from "../../shared/misc-runtime";
   export const Qo: any; // 内部符号: CE
   export { recordAutomationRunStart as Qr } from "../../shared/sql-git-registry";
   export { joinBackendApiPath as Qs } from "../../shared/http-headers";
   export { installChromeNativeHostManifest as Qt } from "../../shared/streams-runtime";
   export { isValidSemver as Qu } from "../../shared/app-server-version";
-  export const R: any; // 内部符号: noe
+  export { saveLocalEnvironment as R } from "../../shared/local-environments";
   export { chromeExtensionIdsForChannel as Rc } from "../../shared/browser-tab-mentions";
   export const Rd: any; // 内部符号: i_
   export { Rf } from "../../shared/zod-facade";
@@ -353,7 +353,7 @@ declare module "@chunk/shared" {
   export const Xc: any; // 内部符号: nS
   export const Xd: any; // 内部符号: Dg
   export { NODE_REPL_MCP_SERVER_NAME as Xl } from "../../shared/app-constants";
-  export const Xn: any; // 内部符号: $q
+  export { setPathEnvironment as Xn } from "../../shared/process-exec";
   export const Xr: any; // 内部符号: gI
   export { errorKindOf as Xs } from "../../shared/http-headers";
   export { uninstallChromePluginRuntime as Xt } from "../../shared/streams-runtime";
@@ -363,7 +363,7 @@ declare module "@chunk/shared" {
   export const Yd: any; // 内部符号: Og
   export const Yi: any; // 内部符号: Aj
   export { NODE_REPL_REQUEST_META_ENV_KEY as Yl } from "../../shared/app-constants";
-  export const Yn: any; // 内部符号: Qq
+  export { getPathEnvironment as Yn } from "../../shared/process-exec";
   export { buildBaseThreadConfig as Yo } from "../../shared/hosts-runtime";
   export const Yr: any; // 内部符号: _I
   export { expectedAccountIdOf as Ys } from "../../shared/http-headers";
@@ -379,7 +379,7 @@ declare module "@chunk/shared" {
   export { hasHeader as Zs } from "../../shared/http-headers";
   export { uninstallChromePluginRuntime as Zt } from "../../shared/streams-runtime";
   export { compareSemver as Zu } from "../../shared/app-server-version";
-  export const _: any; // 内部符号: v9
+  export { waitUntilIpcInitialized as _ } from "../../shared/tail-runtime";
   export const _a: any; // 内部符号: Une
   export const _c: any; // 内部符号: KC
   export { reasoningEffortSchema as _d } from "../../shared/automation-settings";
@@ -392,14 +392,14 @@ declare module "@chunk/shared" {
   export { DURABLE_HOST_ID as _s } from "../../shared/host-config";
   export { listCustomAvatars as _t } from "../../shared/pet-spritesheet";
   export const _u: any; // 内部符号: Gy
-  export const a: any; // 内部符号: Wce
+  export { generateThreadTitle as a } from "../../shared/structured-generation";
   export const aa: any; // 内部符号: wj
   export { jsonSchema as ac } from "../../shared/app-config";
   export const ad: any; // 内部符号: hv
   export { af } from "../../shared/zod-facade";
   export { closeSqlite as ai } from "../../shared/sql-git-registry";
   export const al: any; // 内部符号: wx
-  export const an: any; // 内部符号: I1
+  export { summarizeDescendantProcesses as an } from "../../shared/streams-runtime";
   export const ao: any; // 内部符号: sk
   export const ar: any; // 内部符号: uK
   export const as: any; // 内部符号: RE
@@ -407,10 +407,10 @@ declare module "@chunk/shared" {
   export { getAtomStateDefault as au } from "../../shared/app-constants";
   export { markAllAutomationRunsRead as b } from "../../shared/lowlevel-runtime";
   export const ba: any; // 内部符号: oj
-  export const bc: any; // 内部符号: NC
+  export { readHostFile as bc } from "../../shared/streams-runtime";
   export { isCronAutomation as bd } from "../../shared/automation-settings";
   export { bf } from "../../shared/zod-facade";
-  export const bi: any; // 内部符号: dN
+  export { subscribeAmbientSuggestionGeneration as bi } from "../../shared/ambient-suggestions-store";
   export { isWindowsPath as bl } from "../../shared/app-constants";
   export const bn: any; // 内部符号: pX
   export const bo: any; // 内部符号: Vk
@@ -450,7 +450,7 @@ declare module "@chunk/shared" {
   export { DEFAULT_OPEN_TARGET_PREFERENCE as ef } from "../../shared/automation-settings";
   export { removeRuntimeDirectory as ei } from "../../shared/sql-git-registry";
   export const el: any; // 内部符号: bx
-  export const en: any; // 内部符号: G1
+  export { uniqueBy as en } from "../../shared/streams-runtime";
   export { shellSplit as er } from "../../shared/misc-runtime";
   export const es: any; // 内部符号: LE
   export const et: any; // 内部符号: Zie
@@ -480,7 +480,7 @@ declare module "@chunk/shared" {
   export const gs: any; // 内部符号: ZT
   export { readCustomAvatar as gt } from "../../shared/pet-spritesheet";
   export { ANNOTATION_FLOWS as gu } from "../../shared/browser-context";
-  export const h: any; // 内部符号: b9
+  export { createThreadOwnerRegistration as h } from "../../shared/client-coordination-service";
   export const ha: any; // 内部符号: fj
   export const hc: any; // 内部符号: JC
   export const hd: any; // 内部符号: B_
@@ -493,7 +493,7 @@ declare module "@chunk/shared" {
   export const hs: any; // 内部符号: QT
   export { installCustomPet as ht } from "../../shared/pet-spritesheet";
   export { isValidThreadId as hu } from "../../shared/browser-context";
-  export const i: any; // 内部符号: Kce
+  export { generateThreadSummary as i } from "../../shared/structured-generation";
   export { versionedFeatureOverrides as ic } from "../../shared/app-config";
   export { last as id } from "../../shared/app-config";
   declare const if_: any; // 内部符号: ph（保留字导出）
@@ -513,7 +513,7 @@ declare module "@chunk/shared" {
   export { wslToWindowsPath as ji } from "../../shared/wsl-paths";
   export { CHROME_INTERNAL_PLUGIN_NAME as jl } from "../../shared/app-constants";
   export { jn } from "../../shared/runtime-state";
-  export const jr: any; // 内部符号: GB
+  export { listDueAutomations as jr } from "../../shared/automation-registry";
   export { GIT_SOURCE_HEADER_KEY as js } from "../../shared/host-config";
   export { defaultAcceleratorsForCommand as jt } from "../../shared/command-registry";
   export const ju: any; // 内部符号: Iy
@@ -535,7 +535,7 @@ declare module "@chunk/shared" {
   export { lf } from "../../shared/zod-facade";
   export { getChatGptComposerItems as li } from "../../shared/sql-git-registry";
   export const ll: any; // 内部符号: Ox
-  export const ln: any; // 内部符号: a1
+  export { hostConfigKey as ln } from "../../shared/streams-runtime";
   export const lo: any; // 内部符号: Tk
   export { elicitationForTurn as lr } from "../../shared/misc-runtime";
   export { PULL_REQUEST_GENERATION_BUNDLE as lt } from "../../shared/structured-generation";
@@ -547,18 +547,18 @@ declare module "@chunk/shared" {
   export { mf } from "../../shared/zod-facade";
   export { recordComposerItemInteraction as mi } from "../../shared/sql-git-registry";
   export const ml: any; // 内部符号: px
-  export const mn: any; // 内部符号: wQ
+  export { resolveAppServerWebsocketUrl as mn } from "../../shared/mcp-2-runtime";
   export const mo: any; // 内部符号: jk
   export { AppServerRequestDeliveryError as mr } from "../../shared/process-exec";
   export { telemetryIntakeUrl as mt } from "../../shared/telemetry";
   export { broadcastVersionOf as mu } from "../../shared/browser-context";
-  export const n: any; // 内部符号: Yce
+  export { ThreadProjectMembershipStore as n } from "../../shared/thread-project-membership";
   export { applyFeatureOverrides as nc } from "../../shared/app-config";
   export const nd: any; // 内部符号: Cv
   export const nf: any; // 内部符号: bte
   export { removeRuntimeDirectory as ni } from "../../shared/sql-git-registry";
   export const nl: any; // 内部符号: _x
-  export const nn: any; // 内部符号: x1
+  export { listDescendantProcesses as nn } from "../../shared/streams-runtime";
   export { parseMarkdownPathLinks as nr } from "../../shared/misc-runtime";
   export const ns: any; // 内部符号: BE
   export { TextGenerator as nt } from "../../shared/structured-generation";
@@ -576,18 +576,18 @@ declare module "@chunk/shared" {
   export const os: any; // 内部符号: jE
   export { PULL_REQUEST_GENERATION_TIMEOUT_MS as ot } from "../../shared/structured-generation";
   export { BROWSER_PLUGIN_NAME as ou } from "../../shared/app-constants";
-  export const p: any; // 内部符号: tce
+  export { ClientCoordinationService as p } from "../../shared/client-coordination-service";
   export const pc: any; // 内部符号: ZC
   export { NO_FUTURE_RUNS_ERROR as pd } from "../../shared/automation-settings";
   export { pf } from "../../shared/zod-facade";
-  export const pi: any; // 内部符号: xP
+  export { readAmbientSuggestions as pi } from "../../shared/ambient-suggestions-store";
   export const pl: any; // 内部符号: mx
-  export const pn: any; // 内部符号: CQ
+  export { WebsocketTransport as pn } from "../../shared/mcp-2-runtime";
   export const po: any; // 内部符号: Ak
   export { WebSocketReadyState as pr } from "../../shared/process-exec";
   export { TelemetryHttpTransport as pt } from "../../shared/telemetry";
   export { MAX_DIRECT_TRANSFER_BYTES as pu } from "../../shared/hosts-runtime";
-  export const q: any; // 内部符号: x5
+  export { readLocalEnvironment as q } from "../../shared/local-environments";
   export { matchesBrowserTabQuery as qc } from "../../shared/browser-tab-mentions";
   export const qd: any; // 内部符号: jg
   export { visualizationDateOf as qi } from "../../shared/browser-context";
@@ -598,7 +598,7 @@ declare module "@chunk/shared" {
   export { wantsDeviceCheckToken as qs } from "../../shared/http-headers";
   export { chromeHostsConfigPath as qt } from "../../shared/streams-runtime";
   export { APP_SERVER_UNSUPPORTED_PREFIX as qu } from "../../shared/app-server-version";
-  export const r: any; // 内部符号: Gce
+  export { generateThreadDescription as r } from "../../shared/structured-generation";
   export const ra: any; // 内部符号: Ej
   export { composeDefaultEnableFeatures as rc } from "../../shared/app-config";
   export const rd: any; // 内部符号: bv
@@ -618,7 +618,7 @@ declare module "@chunk/shared" {
   export { sf } from "../../shared/zod-facade";
   export { stateDatabasePath as si } from "../../shared/sql-git-registry";
   export const sl: any; // 内部符号: Dx
-  export const sn: any; // 内部符号: o1
+  export { resolveAuthPrincipal as sn } from "../../shared/streams-runtime";
   export const so: any; // 内部符号: ak
   export { parseElicitationUrl as sr } from "../../shared/elicitation-protocol";
   export const ss: any; // 内部符号: NE
@@ -631,7 +631,7 @@ declare module "@chunk/shared" {
   export { colorForThreadStatus as tf } from "../../shared/browser-context";
   export { archiveAutomationRun as ti } from "../../shared/sql-git-registry";
   export const tl: any; // 内部符号: xx
-  export const tn: any; // 内部符号: W1
+  export { unique as tn } from "../../shared/streams-runtime";
   export const tr: any; // 内部符号: jK
   export const ts: any; // 内部符号: zE
   export { searchFileNames as tt } from "../../shared/file-search";
@@ -670,15 +670,15 @@ declare module "@chunk/shared" {
   export { normalizeUncPath as wl } from "../../shared/app-constants";
   export const wn: any; // 内部符号: TX
   export const wo: any; // 内部符号: JO
-  export const wr: any; // 内部符号: MB
+  export { parseAutomationIntervalMs as wr } from "../../shared/automation-registry";
   export const ws: any; // 内部符号: NT
   export { resetKeybindings as wt } from "../../shared/command-registry";
   export const wu: any; // 内部符号: jy
   export { markInboxItemsReadState as x } from "../../shared/lowlevel-runtime";
-  export const xc: any; // 内部符号: FC
+  export { readProcessResult as xc } from "../../shared/streams-runtime";
   export { isHeartbeatAutomation as xd } from "../../shared/automation-settings";
   export { xf } from "../../shared/zod-facade";
-  export const xi: any; // 内部符号: sN
+  export { chunk as xi } from "../../shared/streams-runtime";
   export { isUncPath as xl } from "../../shared/app-constants";
   export const xn: any; // 内部符号: CX
   export const xo: any; // 内部符号: Fk
@@ -691,7 +691,7 @@ declare module "@chunk/shared" {
   export const yc: any; // 内部符号: MC
   export { effectiveModelForAutomation as yd } from "../../shared/automation-settings";
   export { yf } from "../../shared/zod-facade";
-  export const yi: any; // 内部符号: CN
+  export { subscribeEphemeralGenerationTokenUsage as yi } from "../../shared/ambient-suggestions-store";
   export { isNotNetworkUncPath as yl } from "../../shared/app-constants";
   export const yn: any; // 内部符号: XY
   export const yo: any; // 内部符号: Bk
@@ -878,7 +878,7 @@ declare module "@chunk/bootstrap" {
   export { "hn" as "hn" } from "../../bootstrap/index";
   export { "ht" as "ht" } from "../../bootstrap/index";
   export { "i" as "i" } from "../../bootstrap/index";
-  export { resolveAuthPrincipal as in } from "../../shared/streams-runtime";
+  export { registerProcessListProvider as in } from "../../shared/streams-runtime";
   export { "it" as "it" } from "../../bootstrap/index";
   export { "j" as "j" } from "../../bootstrap/index";
   export { "jt" as "jt" } from "../../bootstrap/index";

@@ -27,7 +27,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Al` | `Ob` | 17861 | settings-threads | semantic | `app-constants` (`CHROME_DEV_PLUGIN_NAME`) |
 | `An` | `jX` | 43190 | mcp-rpc | preserved | original mcp-rpc implementation retained for compatibility |
 | `Ao` | `gO` | 21416 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
-| `Ar` | `LB` | 31825 | process-exec | preserved | original process-exec implementation retained for compatibility |
+| `Ar` | `LB` | 31825 | process-exec | semantic | `automation-registry` (`listLocalAutomations`) |
 | `As` | `IT` | 20178 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `At` | `U6` | 58195 | keymap-menus | semantic | `command-registry` (`acceleratorsForCommand`) |
 | `Au` | `Ly` | 17448 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
@@ -96,7 +96,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Fs` | `bT` | 20131 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `Ft` | `E6` | 56847 | keymap-menus | semantic | `command-registry` (`COMMAND_DEFINITIONS`) |
 | `Fu` | `Oy` | 17400 | settings-threads | semantic | `browser-context` (`parseElementName`) |
-| `G` | `k5` | 60846 | lowlevel-export-shim | preserved | original lowlevel-export-shim implementation retained for compatibility |
+| `G` | `k5` | 60846 | lowlevel-export-shim | semantic | `wsl-paths` (`normalizeDesktopWorktreePath`) |
 | `Ga` | `kA` | 22380 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `Gc` | `bS` | 18538 | settings-threads | semantic | `browser-tab-mentions` (`deserializeBrowserTabMention`) |
 | `Gd` | `Pg` | 15958 | settings-threads | semantic | `zod-facade` (`Gd`) |
@@ -146,7 +146,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Js` | `Ww` | 19945 | settings-threads | semantic | `http-headers` (`wantsIntegrityState`) |
 | `Jt` | `h2` | 53929 | streams | semantic | `streams-runtime` (`reconcileChromeNativeHost`) |
 | `Ju` | `qv` | 17200 | settings-threads | semantic | `app-server-version` (`parseVersionOutput`) |
-| `K` | `pae` | 60666 | lowlevel-export-shim | preserved | original lowlevel-export-shim implementation retained for compatibility |
+| `K` | `pae` | 60666 | lowlevel-export-shim | semantic | `local-environments` (`listLocalEnvironments`) |
 | `Ka` | `SA` | 22364 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `Kc` | `cS` | 18486 | settings-threads | semantic | `browser-tab-mentions` (`hasValidUnicode`) |
 | `Kd` | `Mg` | 15935 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
@@ -229,13 +229,13 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Qd` | `Zh` | 15462 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `Qi` | `Tj` | 23431 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `Ql` | `wb` | 17798 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `Qn` | `XK` | 39363 | misc | preserved | original misc implementation retained for compatibility |
+| `Qn` | `XK` | 39363 | misc | semantic | `misc-runtime` (`shellJoin`) |
 | `Qo` | `CE` | 20653 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `Qr` | `ZF` | 27652 | sql-git-registry | semantic | `sql-git-registry` (`recordAutomationRunStart`) |
 | `Qs` | `Bw` | 19924 | settings-threads | semantic | `http-headers` (`joinBackendApiPath`) |
 | `Qt` | `g2` | 53961 | streams | semantic | `streams-runtime` (`installChromeNativeHostManifest`) |
 | `Qu` | `Lv` | 17165 | settings-threads | semantic | `app-server-version` (`isValidSemver`) |
-| `R` | `noe` | 61858 | lowlevel-export-shim | preserved | original lowlevel-export-shim implementation retained for compatibility |
+| `R` | `noe` | 61858 | lowlevel-export-shim | semantic | `local-environments` (`saveLocalEnvironment`) |
 | `Ra` | `HA` | 22638 | hosts-wsl-plugins | semantic | `hosts-runtime` (`mapValuesModule`) |
 | `Rc` | `US` | 18966 | settings-threads | semantic | `browser-tab-mentions` (`chromeExtensionIdsForChannel`) |
 | `Rd` | `i_` | 16238 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
@@ -319,7 +319,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Xd` | `Dg` | 15900 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `Xi` | `Oj` | 23443 | hosts-wsl-plugins | semantic | `hosts-runtime` (`turnSummaryKind`) |
 | `Xl` | `xb` | 17794 | settings-threads | semantic | `app-constants` (`NODE_REPL_MCP_SERVER_NAME`) |
-| `Xn` | `$q` | 41192 | mcp-rpc | preserved | original mcp-rpc implementation retained for compatibility |
+| `Xn` | `$q` | 41192 | mcp-rpc | semantic | `process-exec` (`setPathEnvironment`) |
 | `Xo` | `XE` | 20845 | hosts-wsl-plugins | semantic | `hosts-runtime` (`permissionSelectionToRequestFields`) |
 | `Xr` | `gI` | 27837 | sql-git-registry | preserved | original sql-git-registry implementation retained for compatibility |
 | `Xs` | `Xw` | 19983 | settings-threads | semantic | `http-headers` (`errorKindOf`) |
@@ -331,7 +331,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Yd` | `Og` | 15907 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `Yi` | `Aj` | 23447 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `Yl` | `bb` | 17793 | settings-threads | semantic | `app-constants` (`NODE_REPL_REQUEST_META_ENV_KEY`) |
-| `Yn` | `Qq` | 41189 | mcp-rpc | preserved | original mcp-rpc implementation retained for compatibility |
+| `Yn` | `Qq` | 41189 | mcp-rpc | semantic | `process-exec` (`getPathEnvironment`) |
 | `Yo` | `$E` | 20860 | hosts-wsl-plugins | semantic | `hosts-runtime` (`buildBaseThreadConfig`) |
 | `Yr` | `_I` | 27840 | sql-git-registry | preserved | original sql-git-registry implementation retained for compatibility |
 | `Ys` | `Gw` | 19948 | settings-threads | semantic | `http-headers` (`expectedAccountIdOf`) |
@@ -349,7 +349,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Zs` | `qw` | 19960 | settings-threads | semantic | `http-headers` (`hasHeader`) |
 | `Zt` | `m2` | 53906 | streams | semantic | `streams-runtime` (`uninstallChromePluginRuntime`) |
 | `Zu` | `Iv` | 17137 | settings-threads | semantic | `app-server-version` (`compareSemver`) |
-| `_` | `v9` | 64969 | lowlevel-export-shim | preserved | original lowlevel-export-shim implementation retained for compatibility |
+| `_` | `v9` | 64969 | lowlevel-export-shim | semantic | `tail-runtime` (`waitUntilIpcInitialized`) |
 | `_a` | `Une` | 23190 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `_c` | `KC` | 19504 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `_d` | `R_` | 16588 | settings-threads | semantic | `automation-settings` (`reasoningEffortSchema`) |
@@ -362,14 +362,14 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `_s` | `wT` | 20143 | hosts-wsl-plugins | semantic | `host-config` (`DURABLE_HOST_ID`) |
 | `_t` | `Gre` | 58788 | keymap-menus | semantic | `pet-spritesheet` (`listCustomAvatars`) |
 | `_u` | `Gy` | 17477 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `a` | `Wce` | 65785 | tail | preserved | original tail implementation retained for compatibility |
+| `a` | `Wce` | 65785 | tail | semantic | `structured-generation` (`generateThreadTitle`) |
 | `aa` | `wj` | 23428 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `ac` | `Tw` | 19855 | settings-threads | semantic | `app-config` (`jsonSchema`) |
 | `ad` | `hv` | 16832 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `af` | `Hp` | 13933 | schema-primitives | semantic | `zod-facade` (`af`) |
 | `ai` | `JF` | 27636 | sql-git-registry | semantic | `sql-git-registry` (`closeSqlite`) |
 | `al` | `wx` | 18071 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `an` | `I1` | 53286 | streams | preserved | original streams implementation retained for compatibility |
+| `an` | `I1` | 53286 | streams | semantic | `streams-runtime` (`summarizeDescendantProcesses`) |
 | `ao` | `sk` | 21974 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `ar` | `uK` | 38728 | misc | preserved | original misc implementation retained for compatibility |
 | `as` | `RE` | 20713 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
@@ -377,10 +377,10 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `au` | `tne` | 17786 | settings-threads | semantic | `app-constants` (`getAtomStateDefault`) |
 | `b` | `Lse` | 63822 | lowlevel-export-shim | semantic | `lowlevel-runtime` (`markAllAutomationRunsRead`) |
 | `ba` | `oj` | 23165 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
-| `bc` | `NC` | 19422 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
+| `bc` | `NC` | 19422 | settings-threads | semantic | `streams-runtime` (`readHostFile`) |
 | `bd` | `H_` | 16614 | settings-threads | semantic | `automation-settings` (`isCronAutomation`) |
 | `bf` | `Y` | 14149 | schema-primitives | semantic | `zod-facade` (`bf`) |
-| `bi` | `dN` | 25445 | sql-git-registry | preserved | original sql-git-registry implementation retained for compatibility |
+| `bi` | `dN` | 25445 | sql-git-registry | semantic | `ambient-suggestions-store` (`subscribeAmbientSuggestionGeneration`) |
 | `bl` | `Jb` | 17941 | settings-threads | semantic | `app-constants` (`isWindowsPath`) |
 | `bn` | `pX` | 42943 | mcp-rpc | preserved | original mcp-rpc implementation retained for compatibility |
 | `bo` | `Vk` | 22164 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
@@ -420,7 +420,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `ef` | `Lh` | 15310 | settings-threads | semantic | `automation-settings` (`DEFAULT_OPEN_TARGET_PREFERENCE`) |
 | `ei` | `cI` | 27794 | sql-git-registry | semantic | `sql-git-registry` (`removeRuntimeDirectory`) |
 | `el` | `bx` | 18067 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `en` | `G1` | 53416 | streams | preserved | original streams implementation retained for compatibility |
+| `en` | `G1` | 53416 | streams | semantic | `streams-runtime` (`uniqueBy`) |
 | `eo` | `Qk` | 22225 | hosts-wsl-plugins | semantic | `hosts-runtime` (`enrollmentRecordSchema`) |
 | `er` | `JK` | 39353 | misc | semantic | `misc-runtime` (`shellSplit`) |
 | `es` | `LE` | 20700 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
@@ -452,7 +452,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `gs` | `ZT` | 20304 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `gt` | `Kre` | 58809 | keymap-menus | semantic | `pet-spritesheet` (`readCustomAvatar`) |
 | `gu` | `My` | 17430 | settings-threads | semantic | `browser-context` (`ANNOTATION_FLOWS`) |
-| `h` | `b9` | 65009 | tail | preserved | original tail implementation retained for compatibility |
+| `h` | `b9` | 65009 | tail | semantic | `client-coordination-service` (`createThreadOwnerRegistration`) |
 | `ha` | `fj` | 23229 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `hc` | `JC` | 19520 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `hd` | `B_` | 16612 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
@@ -465,14 +465,14 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `hs` | `QT` | 20383 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `ht` | `qre` | 58830 | keymap-menus | semantic | `pet-spritesheet` (`installCustomPet`) |
 | `hu` | `cb` | 17634 | settings-threads | semantic | `browser-context` (`isValidThreadId`) |
-| `i` | `Kce` | 65850 | tail | preserved | original tail implementation retained for compatibility |
+| `i` | `Kce` | 65850 | tail | semantic | `structured-generation` (`generateThreadSummary`) |
 | `ia` | `nre` | 23434 | hosts-wsl-plugins | semantic | `hosts-runtime` (`withSpawnTracing`) |
 | `ic` | `Aw` | 19874 | settings-threads | semantic | `app-config` (`versionedFeatureOverrides`) |
 | `id` | `yv` | 16882 | settings-threads | semantic | `app-config` (`last`) |
 | `if` | `ph` | 14737 | schema-primitives | preserved | original schema-primitives implementation retained for compatibility |
 | `ii` | `eI` | 27692 | sql-git-registry | semantic | `sql-git-registry` (`deleteRunsForAutomation`) |
 | `il` | `Sx` | 18069 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `in` | `v1` | 53063 | streams | semantic | `streams-runtime` (`resolveAuthPrincipal`) |
+| `in` | `v1` | 53063 | streams | semantic | `streams-runtime` (`registerProcessListProvider`) |
 | `io` | `Xk` | 22218 | hosts-wsl-plugins | semantic | `hosts-runtime` (`queueContextPredicate`) |
 | `ir` | `dK` | 38735 | misc | preserved | original misc implementation retained for compatibility |
 | `is` | `IE` | 20693 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
@@ -487,7 +487,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `jl` | `kb` | 17862 | settings-threads | semantic | `app-constants` (`CHROME_INTERNAL_PLUGIN_NAME`) |
 | `jn` | `gX` | 42952 | mcp-rpc | semantic | `runtime-state` (`jn`) |
 | `jo` | `lO` | 21327 | hosts-wsl-plugins | semantic | `hosts-runtime` (`hostValueMap`) |
-| `jr` | `GB` | 32030 | process-exec | preserved | original process-exec implementation retained for compatibility |
+| `jr` | `GB` | 32030 | process-exec | semantic | `automation-registry` (`listDueAutomations`) |
 | `js` | `gT` | 20112 | hosts-wsl-plugins | semantic | `host-config` (`GIT_SOURCE_HEADER_KEY`) |
 | `jt` | `V6` | 58167 | keymap-menus | semantic | `command-registry` (`defaultAcceleratorsForCommand`) |
 | `ju` | `Iy` | 17445 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
@@ -511,7 +511,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `lf` | `vm` | 14189 | schema-primitives | semantic | `zod-facade` (`lf`) |
 | `li` | `TP` | 26597 | sql-git-registry | semantic | `sql-git-registry` (`getChatGptComposerItems`) |
 | `ll` | `Ox` | 18075 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `ln` | `a1` | 53011 | streams | preserved | original streams implementation retained for compatibility |
+| `ln` | `a1` | 53011 | streams | semantic | `streams-runtime` (`hostConfigKey`) |
 | `lo` | `Tk` | 22013 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `lr` | `TW` | 35833 | misc | semantic | `misc-runtime` (`elicitationForTurn`) |
 | `ls` | `hE` | 20625 | hosts-wsl-plugins | semantic | `hosts-runtime` (`isNotificationMethod`) |
@@ -524,20 +524,20 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `mf` | `kp` | 13887 | schema-primitives | semantic | `zod-facade` (`mf`) |
 | `mi` | `EP` | 26627 | sql-git-registry | semantic | `sql-git-registry` (`recordComposerItemInteraction`) |
 | `ml` | `px` | 18043 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `mn` | `wQ` | 49088 | mcp-2 | preserved | original mcp-2 implementation retained for compatibility |
+| `mn` | `wQ` | 49088 | mcp-2 | semantic | `mcp-2-runtime` (`resolveAppServerWebsocketUrl`) |
 | `mo` | `jk` | 22062 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `mr` | `DV` | 32706 | process-exec | semantic | `process-exec` (`AppServerRequestDeliveryError`) |
 | `ms` | `$T` | 20406 | hosts-wsl-plugins | semantic | `hosts-runtime` (`readDesktopTomlSection`) |
 | `mt` | `P8` | 59247 | keymap-menus | semantic | `telemetry` (`telemetryIntakeUrl`) |
 | `mu` | `ib` | 17615 | settings-threads | semantic | `browser-context` (`broadcastVersionOf`) |
-| `n` | `Yce` | 65993 | tail | preserved | original tail implementation retained for compatibility |
+| `n` | `Yce` | 65993 | tail | semantic | `thread-project-membership` (`ThreadProjectMembershipStore`) |
 | `na` | `tre` | 23422 | hosts-wsl-plugins | semantic | `hosts-runtime` (`installSharedTracingBridge`) |
 | `nc` | `jw` | 19906 | settings-threads | semantic | `app-config` (`applyFeatureOverrides`) |
 | `nd` | `Cv` | 16921 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `nf` | `bte` | 15003 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `ni` | `oI` | 27780 | sql-git-registry | semantic | `sql-git-registry` (`removeRuntimeDirectory`) |
 | `nl` | `_x` | 18064 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `nn` | `x1` | 53072 | streams | preserved | original streams implementation retained for compatibility |
+| `nn` | `x1` | 53072 | streams | semantic | `streams-runtime` (`listDescendantProcesses`) |
 | `no` | `Yk` | 22217 | hosts-wsl-plugins | semantic | `hosts-runtime` (`queueContextError`) |
 | `nr` | `bK` | 38859 | misc | semantic | `misc-runtime` (`parseMarkdownPathLinks`) |
 | `ns` | `BE` | 20725 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
@@ -556,20 +556,20 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `os` | `jE` | 20674 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `ot` | `H8` | 59528 | keymap-menus | semantic | `structured-generation` (`PULL_REQUEST_GENERATION_TIMEOUT_MS`) |
 | `ou` | `pb` | 17669 | settings-threads | semantic | `app-constants` (`BROWSER_PLUGIN_NAME`) |
-| `p` | `tce` | 64846 | lowlevel-export-shim | preserved | original lowlevel-export-shim implementation retained for compatibility |
+| `p` | `tce` | 64846 | lowlevel-export-shim | semantic | `client-coordination-service` (`ClientCoordinationService`) |
 | `pa` | `uj` | 23195 | hosts-wsl-plugins | semantic | `hosts-runtime` (`sourceKinds`) |
 | `pc` | `ZC` | 19546 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `pd` | `I_` | 16581 | settings-threads | semantic | `automation-settings` (`NO_FUTURE_RUNS_ERROR`) |
 | `pf` | `jp` | 13893 | schema-primitives | semantic | `zod-facade` (`pf`) |
-| `pi` | `xP` | 26352 | sql-git-registry | preserved | original sql-git-registry implementation retained for compatibility |
+| `pi` | `xP` | 26352 | sql-git-registry | semantic | `ambient-suggestions-store` (`readAmbientSuggestions`) |
 | `pl` | `mx` | 18051 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `pn` | `CQ` | 49045 | mcp-2 | preserved | original mcp-2 implementation retained for compatibility |
+| `pn` | `CQ` | 49045 | mcp-2 | semantic | `mcp-2-runtime` (`WebsocketTransport`) |
 | `po` | `Ak` | 22058 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `pr` | `jV` | 32812 | process-exec | semantic | `process-exec` (`WebSocketReadyState`) |
 | `ps` | `nE` | 20420 | hosts-wsl-plugins | semantic | `hosts-runtime` (`isAddedFileAttachment`) |
 | `pt` | `N8` | 59057 | keymap-menus | semantic | `telemetry` (`TelemetryHttpTransport`) |
 | `pu` | `$y` | 17584 | settings-threads | semantic | `hosts-runtime` (`MAX_DIRECT_TRANSFER_BYTES`) |
-| `q` | `x5` | 60710 | lowlevel-export-shim | preserved | original lowlevel-export-shim implementation retained for compatibility |
+| `q` | `x5` | 60710 | lowlevel-export-shim | semantic | `local-environments` (`readLocalEnvironment`) |
 | `qa` | `lA` | 22296 | hosts-wsl-plugins | semantic | `hosts-runtime` (`tabMentionSearchSchema`) |
 | `qc` | `sS` | 18477 | settings-threads | semantic | `browser-tab-mentions` (`matchesBrowserTabQuery`) |
 | `qd` | `jg` | 15929 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
@@ -581,7 +581,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `qs` | `Uw` | 19942 | settings-threads | semantic | `http-headers` (`wantsDeviceCheckToken`) |
 | `qt` | `A2` | 54213 | streams | semantic | `streams-runtime` (`chromeHostsConfigPath`) |
 | `qu` | `Vv` | 17191 | settings-threads | semantic | `app-server-version` (`APP_SERVER_UNSUPPORTED_PREFIX`) |
-| `r` | `Gce` | 65819 | tail | preserved | original tail implementation retained for compatibility |
+| `r` | `Gce` | 65819 | tail | semantic | `structured-generation` (`generateThreadDescription`) |
 | `ra` | `Ej` | 23437 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `rc` | `Ew` | 19856 | settings-threads | semantic | `app-config` (`composeDefaultEnableFeatures`) |
 | `rd` | `bv` | 16889 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
@@ -601,7 +601,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `sf` | `Sm` | 14207 | schema-primitives | semantic | `zod-facade` (`sf`) |
 | `si` | `KF` | 27617 | sql-git-registry | semantic | `sql-git-registry` (`stateDatabasePath`) |
 | `sl` | `Dx` | 18074 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `sn` | `o1` | 53029 | streams | preserved | original streams implementation retained for compatibility |
+| `sn` | `o1` | 53029 | streams | semantic | `streams-runtime` (`resolveAuthPrincipal`) |
 | `so` | `ak` | 21972 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `sr` | `FW` | 35990 | misc | semantic | `elicitation-protocol` (`parseElicitationUrl`) |
 | `ss` | `NE` | 20684 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
@@ -614,7 +614,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `tf` | `Cte` | 15225 | settings-threads | semantic | `browser-context` (`colorForThreadStatus`) |
 | `ti` | `tI` | 27707 | sql-git-registry | semantic | `sql-git-registry` (`archiveAutomationRun`) |
 | `tl` | `xx` | 18068 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `tn` | `W1` | 53383 | streams | preserved | original streams implementation retained for compatibility |
+| `tn` | `W1` | 53383 | streams | semantic | `streams-runtime` (`unique`) |
 | `to` | `$k` | 22233 | hosts-wsl-plugins | semantic | `hosts-runtime` (`parseJwt`) |
 | `tr` | `jK` | 39011 | misc | preserved | original misc implementation retained for compatibility |
 | `ts` | `zE` | 20719 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
@@ -655,16 +655,16 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `wl` | `Qb` | 17953 | settings-threads | semantic | `app-constants` (`normalizeUncPath`) |
 | `wn` | `TX` | 43055 | mcp-rpc | preserved | original mcp-rpc implementation retained for compatibility |
 | `wo` | `JO` | 21884 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
-| `wr` | `MB` | 31734 | process-exec | preserved | original process-exec implementation retained for compatibility |
+| `wr` | `MB` | 31734 | process-exec | semantic | `automation-registry` (`parseAutomationIntervalMs`) |
 | `ws` | `NT` | 20169 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `wt` | `c8` | 58376 | keymap-menus | semantic | `command-registry` (`resetKeybindings`) |
 | `wu` | `jy` | 17429 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `x` | `Ise` | 63808 | lowlevel-export-shim | semantic | `lowlevel-runtime` (`markInboxItemsReadState`) |
 | `xa` | `Vne` | 23172 | hosts-wsl-plugins | semantic | `hosts-runtime` (`isAllowedAttachmentType`) |
-| `xc` | `FC` | 19432 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
+| `xc` | `FC` | 19432 | settings-threads | semantic | `streams-runtime` (`readProcessResult`) |
 | `xd` | `U_` | 16617 | settings-threads | semantic | `automation-settings` (`isHeartbeatAutomation`) |
 | `xf` | `Kp` | 14016 | schema-primitives | semantic | `zod-facade` (`xf`) |
-| `xi` | `sN` | 25427 | sql-git-registry | preserved | original sql-git-registry implementation retained for compatibility |
+| `xi` | `sN` | 25427 | sql-git-registry | semantic | `streams-runtime` (`chunk`) |
 | `xl` | `Yb` | 17944 | settings-threads | semantic | `app-constants` (`isUncPath`) |
 | `xn` | `CX` | 43033 | mcp-rpc | preserved | original mcp-rpc implementation retained for compatibility |
 | `xo` | `Fk` | 22144 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
@@ -677,7 +677,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `yc` | `MC` | 19394 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `yd` | `Y_` | 16644 | settings-threads | semantic | `automation-settings` (`effectiveModelForAutomation`) |
 | `yf` | `ch` | 14398 | schema-primitives | semantic | `zod-facade` (`yf`) |
-| `yi` | `CN` | 25840 | sql-git-registry | preserved | original sql-git-registry implementation retained for compatibility |
+| `yi` | `CN` | 25840 | sql-git-registry | semantic | `ambient-suggestions-store` (`subscribeEphemeralGenerationTokenUsage`) |
 | `yl` | `Xb` | 17947 | settings-threads | semantic | `app-constants` (`isNotNetworkUncPath`) |
 | `yn` | `XY` | 42825 | mcp-rpc | preserved | original mcp-rpc implementation retained for compatibility |
 | `yo` | `Bk` | 22161 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |

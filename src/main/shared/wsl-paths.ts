@@ -107,6 +107,16 @@ export function windowsToWslPath(path: string): string {
   return driveMatch ? `/mnt/${driveMatch[1].toLowerCase()}/${driveMatch[2].replace(/\\/g, "/")}` : path.replace(/\\/g, "/");
 }
 
+/** Canonical comparison key for local/WSL worktree paths (original `k5`, export `G`). */
+export function normalizeDesktopWorktreePath(path: string): string {
+  let value = path.replace(/^\/([A-Za-z]:[\\/])/u, "$1").replace(/\\/g, "/");
+  if (isWslUncPath(value)) return windowsToWslPath(value);
+  if (isWslPath(value)) return value.toLowerCase();
+  if (/^[A-Za-z]:\//u.test(value)) return windowsToWslPath(value).toLowerCase();
+  if (value.startsWith("//")) return value.toLowerCase();
+  return value;
+}
+
 // ---------------------------------------------------------------------------
 // 进程 env 消毒（原 `dre`/`Bj`）
 // ---------------------------------------------------------------------------
@@ -680,6 +690,7 @@ export {
   wslDistroFromUnc as Hi,
   windowsToWslPath as Vi,
   sanitizedProcessEnv as Bi,
+  normalizeDesktopWorktreePath as G,
   setShouldSpawnInsideWsl as Li,
   shouldSpawnInsideWsl as Ri,
   shouldUseWslPaths as zi,

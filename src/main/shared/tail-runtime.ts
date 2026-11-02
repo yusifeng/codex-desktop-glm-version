@@ -52,4 +52,14 @@ export async function workspaceAuthErrorOf(response: ResponseLike): Promise<{ er
   }
 }
 
-export { isPathlike as f, StartupConfigClient as o, workspaceAuthErrorOf as t };
+/** Wait for IPC initialization and return the remaining request timeout (original `v9`). */
+export async function waitUntilIpcInitialized(
+  client: { waitUntilInitialized(options: { timeoutMs: number }): Promise<unknown> },
+  timeoutMs = 5_000,
+): Promise<number> {
+  const startedAt = Date.now();
+  await client.waitUntilInitialized({ timeoutMs });
+  return Math.max(0, timeoutMs - (Date.now() - startedAt));
+}
+
+export { isPathlike as f, StartupConfigClient as o, workspaceAuthErrorOf as t, waitUntilIpcInitialized as _ };

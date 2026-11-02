@@ -13,7 +13,7 @@ node scripts/build-renderer.mjs
 # Copy their installed package trees into the app payload before creating the
 # asar so Node's ESM resolver can load them at runtime.
 mkdir -p app/node_modules
-for package_name in immer yaml zod; do
+for package_name in agent-base debug immer ip-address ms smart-buffer smol-toml socks socks-proxy-agent ws yaml zod; do
   rm -rf "app/node_modules/$package_name"
   cp -R "node_modules/$package_name" "app/node_modules/$package_name"
 done

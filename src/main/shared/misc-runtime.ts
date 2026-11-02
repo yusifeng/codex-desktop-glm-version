@@ -81,6 +81,11 @@ export function shellQuote(value: string): string {
       : value;
 }
 
+export function shellJoin(values: readonly string[]): string {
+  if (!Array.isArray(values)) throw new TypeError("args should be an array");
+  return values.map(shellQuote).join(" ");
+}
+
 /** POSIX-compatible argument splitting used for ssh ProxyCommand output. */
 export function shellSplit(command: string): string[] {
   const result: string[] = [];
@@ -168,6 +173,7 @@ export function requestErrorOf(requestId: string, response: JsonRpcErrorLike): E
 
 export {
   shellQuote as $n,
+  shellJoin as Qn,
   requireMemoize as dr,
   shellSplit as er,
   elicitationForTurn as lr,

@@ -1,5 +1,7 @@
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { EventEmitter } from "node:events";
+import WebSocketClient from "ws";
+import { SocksProxyAgent } from "socks-proxy-agent";
 interface WebSocketLike {
   readyState: number;
   on(event: string, listener: (...args: never[]) => void): this;
@@ -12,8 +14,13 @@ interface WebSocketConstructor {
   new (url: string, options?: Record<string, unknown>): WebSocketLike;
   OPEN: number;
 }
-const WebSocketClient = require("ws") as WebSocketConstructor;
 export const WebSocket = WebSocketClient;
+
+export function resolveAppServerWebsocketUrl(config: { websocket_url?: unknown }): string | null {
+  if (process.env.CODEX_APP_SERVER_FORCE_CLI === "1") return null;
+  const value = process.env.CODEX_APP_SERVER_WS_URL ?? config.websocket_url;
+  return typeof value === "string" && value.length > 0 ? value : null;
+}
 
 export class WebSocketWrapper {
   readonly ws: WebSocketLike;
@@ -53,6 +60,48 @@ export function attachHeartbeat(socket: WebSocketLike, options: { onPongTimeout:
   const dispose = () => { if (stopped) return; stopped = true; clearInterval(interval); socket.off("pong", onPong); socket.off("close", dispose); };
   socket.on("pong", onPong); socket.on("close", dispose);
   return dispose;
+}
+
+export interface WebsocketTransportOptions {
+  websocketUrl: string;
+  getWebsocketHandshake?: () => Promise<{ headers?: Record<string, string>; protocols?: string | string[]; authenticatedPrincipal?: unknown } | null>;
+  handshakeTimeoutMs?: number;
+  ca?: string | Buffer | Array<string | Buffer>;
+  createConnection?: (...args: any[]) => any;
+  socksProxyUrl?: string | null;
+}
+
+/** Reconnectable app-server WebSocket transport (original `CQ`). */
+export class WebsocketTransport {
+  readonly kind = "websocket";
+  constructor(readonly options: WebsocketTransportOptions) {}
+  supportsReconnect(): boolean { return true; }
+  async connect(): Promise<WebSocketWrapper> {
+    const handshake = await this.options.getWebsocketHandshake?.();
+    const timeoutMs = this.options.handshakeTimeoutMs ?? 15_000;
+    const websocketOptions: Record<string, unknown> = {
+      ca: this.options.ca,
+      createConnection: this.options.createConnection,
+      handshakeTimeout: timeoutMs,
+      headers: handshake?.headers ?? {},
+      ...(this.options.socksProxyUrl == null ? {} : { agent: new SocksProxyAgent(this.options.socksProxyUrl) }),
+      perMessageDeflate: false,
+    };
+    const socket = handshake?.protocols == null
+      ? new WebSocketClient(this.options.websocketUrl, websocketOptions)
+      : new WebSocketClient(this.options.websocketUrl, handshake.protocols, websocketOptions);
+    const timeout = setTimeout(() => socket.terminate(), timeoutMs);
+    timeout.unref();
+    const clearHandshakeTimeout = () => {
+      clearTimeout(timeout);
+      socket.off("open", clearHandshakeTimeout);
+      socket.off("close", clearHandshakeTimeout);
+    };
+    socket.on("open", clearHandshakeTimeout);
+    socket.on("close", clearHandshakeTimeout);
+    attachHeartbeat(socket as unknown as WebSocketLike, { onPongTimeout: () => socket.terminate() });
+    return new WebSocketWrapper(socket as unknown as WebSocketLike, handshake?.authenticatedPrincipal);
+  }
 }
 
 export interface StdioTransportOptions {
@@ -97,4 +146,4 @@ export class StdioTransport extends EventEmitter {
   getIoStatsSnapshot(): { bytesRead: number; bytesWritten: number } { return { bytesRead: 0, bytesWritten: 0 }; }
 }
 
-export { WebSocketWrapper as gn, attachHeartbeat as hn, StdioTransport as dn, WebSocket as _n };
+export { WebSocketWrapper as gn, attachHeartbeat as hn, resolveAppServerWebsocketUrl as mn, StdioTransport as dn, WebSocket as _n, WebsocketTransport as pn };

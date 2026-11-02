@@ -25,6 +25,28 @@ export class AppServerSshSetupError extends Error {
 
 export const WebSocketReadyState = { Connecting: 0, Open: 1, Closing: 2, Closed: 3 } as const;
 
+/** Read PATH using the platform's canonical environment-key casing (original `Qq`). */
+export function getPathEnvironment(environment: NodeJS.ProcessEnv): string | undefined {
+  return environment[pathEnvironmentKey(environment)];
+}
+
+/** Replace PATH without leaving case-insensitive duplicates on Windows (original `$q`). */
+export function setPathEnvironment(environment: NodeJS.ProcessEnv, value: string): void {
+  const key = pathEnvironmentKey(environment);
+  if (process.platform === "win32") {
+    for (const candidate of Object.keys(environment))
+      if (candidate !== key && candidate.toLowerCase() === "path") delete environment[candidate];
+  }
+  environment[key] = value;
+}
+
+function pathEnvironmentKey(environment: NodeJS.ProcessEnv): string {
+  if (process.platform !== "win32") return "PATH";
+  if (environment.Path != null) return "Path";
+  if (environment.PATH != null) return "PATH";
+  return Object.keys(environment).find((key) => key.toLowerCase() === "path") ?? "Path";
+}
+
 export function classifyComputerUseError(error: unknown): { code: string; source: "computer_use" | "os_status" } | null {
   if (error instanceof AggregateError) {
     for (const nested of error.errors) {
@@ -61,4 +83,6 @@ export {
   WebSocketReadyState as pr,
   classifyComputerUsePermission as gr,
   classifyComputerUseError as hr,
+  getPathEnvironment as Yn,
+  setPathEnvironment as Xn,
 };

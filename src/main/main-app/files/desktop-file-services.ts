@@ -32,6 +32,34 @@ const IMAGE_EXTENSIONS = new Map([
 ]);
 const THUMBNAIL_SIZES = { compact: 96, large: 320 } as const;
 const QUICK_LOOK_TIMEOUT_MS = 5_000;
+const MAX_FOLDER_FILE_COUNT = 1_000;
+
+export async function countFolderFiles(folderPath: string, host: any): Promise<number | null> {
+  const path = await host.platformPath();
+  let remainingDirectoryBudget = MAX_FOLDER_FILE_COUNT;
+  async function visit(directory: string, remainingFiles: number): Promise<number | null> {
+    const entries = await host.readDirectory(directory, { withFileTypes: true });
+    let count = 0;
+    for (const entry of entries) {
+      if (entry.isFile()) {
+        count += 1;
+        if (count === remainingFiles) return count;
+        continue;
+      }
+      if (!entry.isDirectory()) continue;
+      if (remainingDirectoryBudget === 0) return null;
+      remainingDirectoryBudget -= 1;
+      const child = path.join(directory, entry.name);
+      if ((await host.stat(child, { followSymlinks: false })).isSymbolicLink()) continue;
+      const nested = await visit(child, remainingFiles - count);
+      if (nested == null) return null;
+      count += nested;
+      if (count === remainingFiles) return count;
+    }
+    return count;
+  }
+  return visit(folderPath, MAX_FOLDER_FILE_COUNT);
+}
 
 export function createDesktopFileServicesRuntime(dependencies: DesktopFileServiceDependencies) {
   const {

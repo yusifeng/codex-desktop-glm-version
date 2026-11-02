@@ -113,6 +113,34 @@ export function listLocalAutomations(): AutomationRecord[] {
   return [...records.values()].filter((record) => record.status !== "DELETED").map(clone).sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
+/** Active automations due at or before `now`, ordered by their scheduled time (original `GB`). */
+export function listDueAutomations(now: number, limit = 10): AutomationRecord[] {
+  return listLocalAutomations()
+    .filter((record) => record.status === "ACTIVE")
+    .map((record) => {
+      if (record.nextRunAt != null) return record;
+      return { ...record, nextRunAt: computeNextRunAtFromRrule({ rrule: record.rrule, now }) };
+    })
+    .filter((record) => record.nextRunAt != null && record.nextRunAt <= now)
+    .sort((left, right) => (left.nextRunAt ?? 0) - (right.nextRunAt ?? 0))
+    .slice(0, limit);
+}
+
+/** Return the fixed interval represented by a minute/hour RRULE, otherwise null (original `MB`). */
+export function parseAutomationIntervalMs(input: string | Pick<AutomationRecord, "rrule">): number | null {
+  const parts = ruleParts(typeof input === "string" ? input : input.rrule);
+  const frequency = parts.get("FREQ")?.toUpperCase();
+  const interval = Number(parts.get("INTERVAL") ?? 1);
+  if (!Number.isFinite(interval) || interval <= 0) return null;
+  if (frequency === "MINUTELY") return parts.has("BYHOUR") ? null : interval * 60_000;
+  if (frequency !== "HOURLY") return null;
+  const minutes = parts.get("BYMINUTE")?.split(",").map(Number);
+  if (minutes != null && (minutes.length !== 1 || minutes[0] !== 0)) return null;
+  const weekdays = parts.get("BYDAY")?.split(",").filter(Boolean);
+  if (weekdays != null && new Set(weekdays).size !== 7) return null;
+  return interval * 3_600_000;
+}
+
 export function getCanonicalAutomation(id: string): AutomationRecord | null {
   const record = records.get(id);
   return record == null || record.status === "DELETED" || !ownerMatches(id) ? null : clone(record);
@@ -328,6 +356,8 @@ export {
   cacheCloudAutomation as vr,
   createLocalAutomation as yr,
   updateAutomationNextRunAt as zr,
+  listDueAutomations as jr,
+  parseAutomationIntervalMs as wr,
 };
 
 function migrateLegacyAutomations(resolveTarget: (cwd: string) => Promise<{ type: string; projectId?: string } | null>): Promise<number> {
