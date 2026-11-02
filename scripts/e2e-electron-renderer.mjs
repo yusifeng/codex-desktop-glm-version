@@ -231,15 +231,22 @@ if (mode === "smoke-readonly") {
   } while (sendResult == null && Date.now() < sendDeadline);
   if (sendResult == null) throw new Error('Enabled send button did not appear');
 
-  const replyDeadline = Date.now() + 180_000;
+  const replyDeadline = Date.now() + 300_000;
   let assistantReply = null;
   let assistantMessages = [];
+  let conversationUnits = [];
+  let bodyText = '';
   do {
-    assistantMessages = await evaluate(`[...document.querySelectorAll('[data-conversation-block="assistant-message"]')].map((element) => element.innerText ?? '')`);
-    assistantReply = assistantMessages.find((text) => text.replaceAll('\\', '').includes(marker)) ?? null;
+    assistantMessages = await evaluate(`[...document.querySelectorAll('[data-conversation-block="assistant-message"]')].map((element) => element.innerText || element.textContent || '')`);
+    conversationUnits = await evaluate(`[...document.querySelectorAll('[data-content-search-unit-key]')].map((element) => element.innerText || element.textContent || '')`);
+    bodyText = await evaluate(`document.body?.innerText ?? ''`);
+    const normalizedMarker = marker.replaceAll('\\', '');
+    assistantReply = assistantMessages.find((text) => text.replaceAll('\\', '').includes(normalizedMarker)) ??
+      conversationUnits.find((text) => text.includes('ChatGPT 说：') && text.replaceAll('\\', '').includes(normalizedMarker)) ??
+      null;
     if (assistantReply == null) await new Promise((resolve) => setTimeout(resolve, 500));
   } while (assistantReply == null && Date.now() < replyDeadline);
-  if (assistantReply == null) throw new Error(`Timed out waiting for assistant reply marker: ${marker}`);
+  if (assistantReply == null) throw new Error(`Timed out waiting for assistant reply marker: ${marker}; assistant messages=${JSON.stringify(assistantMessages.slice(-5))}; conversation units=${JSON.stringify(conversationUnits.slice(-5))}; body tail=${JSON.stringify(bodyText.slice(-2000))}`);
 
   const fatalEvents = protocolEvents.filter((event) => {
     const eventText = event.method === 'Log.entryAdded'
@@ -320,11 +327,13 @@ if (mode === "smoke-readonly") {
     state = await evaluate(`(() => ({
       bodyText: document.body?.innerText ?? '',
       composerText: document.querySelector('[contenteditable="true"][aria-label="随心输入"]')?.innerText ?? null,
-      conversationUnits: [...document.querySelectorAll('[data-content-search-unit-key]')].map((element) => element.innerText ?? ''),
-      assistantMessages: [...document.querySelectorAll('[data-conversation-block="assistant-message"]')].map((element) => element.innerText ?? ''),
+      conversationUnits: [...document.querySelectorAll('[data-content-search-unit-key]')].map((element) => element.innerText || element.textContent || ''),
+      assistantMessages: [...document.querySelectorAll('[data-conversation-block="assistant-message"]')].map((element) => element.innerText || element.textContent || ''),
     }))()`);
-    const assistantReply = state.assistantMessages.find((text) => text.replaceAll('\\', '').includes(argument)) ??
-      state.conversationUnits.find((text) => text.includes('ChatGPT 说：') && text.replaceAll('\\', '').includes(argument));
+    const normalizedMarker = argument.replaceAll('\\', '');
+    const assistantReply = state.assistantMessages.find((text) => text.replaceAll('\\', '').includes(normalizedMarker)) ??
+      state.conversationUnits.find((text) => text.includes('ChatGPT 说：') && text.replaceAll('\\', '').includes(normalizedMarker)) ??
+      null;
     if (assistantReply != null) {
       console.log(JSON.stringify({ mode, assistantReply, conversationUnits: state.conversationUnits }, null, 2));
       socket.close();
@@ -332,7 +341,7 @@ if (mode === "smoke-readonly") {
     }
     await new Promise((resolve) => setTimeout(resolve, 1000));
   } while (Date.now() < deadline);
-  throw new Error(`Timed out waiting for response marker: ${argument}`);
+  throw new Error(`Timed out waiting for response marker: ${argument}; assistant messages=${JSON.stringify(state?.assistantMessages?.slice(-5) ?? [])}; conversation units=${JSON.stringify(state?.conversationUnits?.slice(-5) ?? [])}; body tail=${JSON.stringify(state?.bodyText?.slice(-2000) ?? '')}`);
 } else if (mode === "watch-errors") {
   const durationMs = argument.length === 0 ? 120_000 : Number(argument);
   if (!Number.isFinite(durationMs) || durationMs <= 0) throw new Error("watch-errors duration must be a positive number");
@@ -341,6 +350,13 @@ if (mode === "smoke-readonly") {
   console.log(JSON.stringify({ mode, protocolEvents }, null, 2));
 } else if (mode === "inspect") {
   console.log(JSON.stringify(await composerState(), null, 2));
+} else if (mode === "dump-conversation") {
+  console.log(JSON.stringify(await evaluate(`(() => ({
+    bodyText: document.body?.innerText ?? '',
+    conversationUnits: [...document.querySelectorAll('[data-content-search-unit-key]')].map((element) => element.innerText || element.textContent || ''),
+    assistantMessages: [...document.querySelectorAll('[data-conversation-block="assistant-message"]')].map((element) => element.innerText || element.textContent || ''),
+    userMessages: [...document.querySelectorAll('[data-conversation-block="user-message"]')].map((element) => element.innerText || element.textContent || ''),
+  }))()`), null, 2));
 } else {
   throw new Error(`Unknown mode: ${mode}`);
 }

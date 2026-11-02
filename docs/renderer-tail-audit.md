@@ -1,5 +1,17 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Critical signed-in Electron E2E：在本地重建包、现有登录账号和真实
+`app://-/index.html` renderer 上新增并执行单命令 `npm run e2e:critical`。只读阶段依次
+通过 settings/general、settings/git、settings/worktrees、settings/browser、
+conversation/history 与 conversation/add-context；真实消息阶段填入并发送唯一 marker
+`E2E_CRITICAL_20261102_STRICT`，随后在 assistant-message 节点观察到转义后的同一 marker，
+assistant 节点数为 13，且监控期内无 renderer exception/error 事件。E2E 驱动同时修复
+虚拟化会话节点 `innerText` 为空导致的假超时，改用 `innerText || textContent`；调试中发现
+并移除了会误命中用户 prompt 的 body-text fallback，最终严格判定只接受 assistant-message
+或明确带“ChatGPT 说：”的搜索单元。该矩阵证明本批构建可启动、可访问关键设置/Git/
+Worktree/Browser 路径并完成一次真实发送-回复闭环，但不把单次 E2E 等同于整个聚合 hub
+已经完全拆分。
+
 2026-11-02 Preserved application-surface promotion：对“454 个缺少双方可比资产”与
 “425 个 preserved 边界”完成集合去重，确认 454 项精确由 425 个 preserved、3 个
 incremental hubs 和 26 个 source-owned 无发布 TS 资产 owner 构成，并非 879 项独立
