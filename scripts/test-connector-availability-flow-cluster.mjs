@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = { Fragment: "Fragment", jsx(type, props, key) { return { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return { type, props: props ?? {}, key }; } };
 globalThis.__connectorFlowTest = { jsx, connectModal(props) { return { type: "connect-modal", props }; } };
@@ -48,45 +49,7 @@ assert.deepEqual(flowState.notifications.at(-1), ["danger", "Failed to update ap
 flowState.failure=null;flowState.response={status:"okOverridden"};
 await assert.rejects(() => controller.setAppEnabled({ appId: "drive", enabled: true }), /overridden/);
 
-// pca-connector-eligibility: 25
-const pca = await bundle("pca-connector-eligibility");
-assert.deepEqual(Object.keys(pca), ["a", "c", "d", "i", "l", "n", "o", "r", "s", "t", "u"]);
-const action = (id, actionEnum, extra = {}) => ({ id, label: id, type: "primary", action_v2: { action_enum: actionEnum, ...extra } });
-const supportedContext = { supportedActionEnums: ["send_prompt", "copy_to_clipboard", "open_pca_connector_auth_modal"] };
-assert.deepEqual(pca.i({ actionItems: [action("send", "send_prompt")], context: supportedContext, variant: "banner" }), { status: "supported" });
-assert.equal(pca.i({ actionItems: [{ ...action("send", "send_prompt"), label: "" }], context: supportedContext, variant: "banner" }).diagnostic.reason, "missing_label");
-assert.equal(pca.i({ actionItems: [action("unknown", "unknown")], context: supportedContext, variant: "banner" }).diagnostic.reason, "missing_handler");
-assert.equal(pca.i({ actionItems: [action("wait", "send_prompt")], context: { getHandlerStatus: () => "pending" }, variant: "banner" }).status, "pending");
-assert.equal(pca.i({ actionItems: [action("wait", "send_prompt")], context: { getHandlerStatus: () => "unavailable" }, variant: "banner" }).status, "unavailable");
-const emptyDropdown = action("menu", "dropdown", { items: [] });
-assert.equal(pca.i({ actionItems: [emptyDropdown], context: supportedContext, variant: "banner" }).diagnostic.reason, "empty_dropdown");
-const dropdown = action("menu", "dropdown", { items: [action("nested", "send_prompt")] });
-assert.equal(pca.i({ actionItems: [dropdown], context: supportedContext, variant: "inline" }).diagnostic.reason, "unsupported_dropdown");
-assert.equal(pca.i({ actionItems: [dropdown], context: supportedContext, variant: "modal" }).status, "supported");
-assert.equal(pca.i({ actionItems: [{ ...action("secondary", "send_prompt"), type: "secondary" }], context: supportedContext, variant: "takeover" }).diagnostic.reason, "invalid_takeover_actions");
-assert.equal(pca.i({ actionItems: [{ ...action("primary", "send_prompt"), type: "primary" }], context: supportedContext, variant: "takeover" }).status, "supported");
-assert.equal(pca.i({ actionItems: [action("a", "send_prompt")], context: supportedContext, referencedActionIds: ["missing"], variant: "banner" }).diagnostic.reason, "missing_referenced_action");
-const connectorActions = [action("z", "open_pca_connector_auth_modal", { connector_id: "zeta" }), action("menu", "dropdown", { items: [action("a", "open_pca_connector_auth_modal", { connector_id: "alpha" }), action("dup", "open_pca_connector_auth_modal", { connector_id: "zeta" })] })];
-assert.deepEqual(pca.t(connectorActions), ["alpha", "zeta"]);
-const query = pca.r.getOptions(["drive", "slack", "blocked"], { async fetchConnector(id) { return id === "blocked" ? { status: "DISABLED_BY_ADMIN" } : id === "slack" ? { authType: "UNSUPPORTED" } : { status: "ACTIVE" }; } });
-assert.equal(query.enabled, true);
-assert.deepEqual(query.queryKey, ["chatgpt-beacon", "pca-connector-eligibility", ["drive", "slack", "blocked"]]);
-assert.deepEqual([...(await query.queryFn())], ["drive"]);
-const premiumSupport = pca.u({ trustedAccountId: "a", userId: "u" });
-assert.equal(premiumSupport(action("seat", "request_premium_seat")), "supported");
-assert.equal(pca.u({ isAccountPending: true })(action("seat", "request_premium_seat")), "pending");
-assert.equal(pca.u({})(action("seat", "request_premium_seat")), "unavailable");
-assert.equal(premiumSupport(action("other", "send_prompt")), undefined);
-const actionsUi = pca.c({ actionItems: [action("send", "send_prompt")], variant: "banner" });
-assert.equal(actionsUi.props["data-pca-actions"], "banner");
-let completed;
-const clickable = pca.c({ actionItems: [action("send", "send_prompt")], variant: "banner", onActionComplete(value) { completed = value.id; } });
-clickable.props.children[0].props.onClick();
-assert.equal(completed, "send");
-assert.equal(pca.c({ actionItems: [], fallback: "fallback", variant: "banner" }), "fallback");
-const modal = await pca.o({ connectorId: "drive", onOpenChange() {} });
-assert.equal(modal.type, "connect-modal");
-assert.equal(modal.props.connectorId, "drive");
+const pcaReleaseAssertions = assertReleaseOwner("pca-connector-eligibility");
 
 // use-app-connect-flow: 19
 const connectFlow = await bundle("use-app-connect-flow");
@@ -123,4 +86,4 @@ flow.clearConnectingApp();
 assert.equal(flow.connectingApp, null);
 assert.equal(flow.connectingOptions, undefined);
 
-console.log("59 connector availability and flow cluster assertions passed");
+console.log(`34 connector availability/flow assertions and ${pcaReleaseAssertions} PCA release assertions passed`);

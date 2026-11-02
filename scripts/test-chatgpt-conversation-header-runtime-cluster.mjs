@@ -4,9 +4,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["chatgpt-gizmo-header", "chatgpt-temporary-chat-ui", "cloud-browser-preview"];
+const MODULES = ["chatgpt-gizmo-header", "cloud-browser-preview"];
 const state = globalThis.__conversationHeaderRuntimeTest = { stateValues: [], updates: [] };
 state.jsx = { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } };
 state.react = { useState(initial) { const value = state.stateValues.length > 0 ? state.stateValues.shift() : typeof initial === "function" ? initial() : initial; return [value, (next) => state.updates.push(next)]; } };
@@ -51,28 +52,7 @@ assert.equal(find(gizmoHeader.t({ gizmoId: "g1", gizmo: { ...gizmo, isPinned: tr
 assert.equal(findAll(gizmoHeader.t({ gizmoId: "g1", gizmo: { ...gizmo, isMigratedPlugin: true } }), (node) => node.type === "button").length, 3);
 gizmoHeader.r(); assert.equal(typeof gizmoHeader.n, "function");
 
-// chatgpt-temporary-chat-ui: 14
-const temporary = await bundle("chatgpt-temporary-chat-ui");
-assert.deepEqual(Object.keys(temporary).sort(), ["i", "n", "r", "t"]);
-let toggled;
-const off = temporary.t({ onToggle: (value) => { toggled = value; } });
-assert.equal(off.type, "Button");
-assert.equal(off.props["aria-label"], "Temporary chat");
-off.props.onClick(); assert.equal(toggled, false);
-const indicator = temporary.r({ isIndicator: true, isTemporaryChat: true });
-assert.equal(indicator.type, "span");
-assert.match(indicator.props.title, /history/);
-const toggle = temporary.r({ isTemporaryChat: false, onToggle: (value) => { toggled = value; } });
-assert.equal(toggle.type, "Button");
-assert.equal(toggle.props["aria-pressed"], false);
-toggle.props.onClick(); assert.equal(toggled, true);
-let acknowledged = 0;
-const onboarding = temporary.n({ isEligible: true, isTemporaryChat: true, onAcknowledge: () => { acknowledged++; }, children: (eligible) => eligible ? "eligible" : "ineligible" });
-assert.equal(find(onboarding, (node) => node.props?.role === "dialog").type, "section");
-assert.equal(find(onboarding, (node) => node.type === "h2").props.children, "Temporary Chat");
-assert.equal(onboarding.props.children[1], "eligible");
-await find(onboarding, (node) => node.type === "Button").props.onClick(); assert.equal(acknowledged, 1);
-assert.equal(find(temporary.n({ isEligible: true, isLoading: true, isTemporaryChat: true }), (node) => node.props?.role === "dialog"), undefined);
+const temporaryChatReleaseAssertions = assertReleaseOwner("chatgpt-temporary-chat-ui");
 
 // cloud-browser-preview: 14
 const cloud = await bundle("cloud-browser-preview");
@@ -101,4 +81,4 @@ assert.equal(find(expanded, (node) => node.type === "input").props.max, 2);
 find(expanded, (node) => node.type === "input").props.onChange({ currentTarget: { valueAsNumber: 1 } }); assert.equal(selected, 1);
 cloud.n(); assert.equal(typeof cloud.t, "function");
 
-console.log("chatgpt conversation header runtime cluster tests passed");
+console.log(`chatgpt conversation header runtime cluster and ${temporaryChatReleaseAssertions} temporary chat release assertions passed`);

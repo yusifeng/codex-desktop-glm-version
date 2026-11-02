@@ -7,7 +7,7 @@ import * as esbuild from "esbuild";
 import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["chatgpt-work-home-page-core", "credit-purchase-page-core", "skills-page-core", "mcp-extension-view-page-core"];
+const MODULES = ["chatgpt-work-home-page-core", "credit-purchase-page-core", "mcp-extension-view-page-core"];
 const state = globalThis.__pageCoresTest = { apiCalls: [], initialized: [] };
 const jsxRuntime = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
 const reactRuntime = { useState(initial) { let value = typeof initial === "function" ? initial() : initial; return [value, next => { value = typeof next === "function" ? next(value) : next; }]; } };
@@ -83,26 +83,8 @@ const invalidPurchaseTree = purchase.t({ defaultQuantity: 501 });
 assert.equal(button(invalidPurchaseTree, "Continue").props.disabled, true);
 assert.equal(nodes(invalidPurchaseTree).filter(node => node.props.role === "alert").length, 1);
 
-// skills-page-core: 10
-const skills = await bundle("skills-page-core");
-skills.r();
-let openedSkill = null;
-let installedSkill = null;
-const skillsTree = skills.t({ initialQuery: "code", initialTab: "plugins", onInstall: async skill => { installedSkill = skill; }, onOpen: skill => { openedSkill = skill; }, skills: [{ id: "review", name: "Code review", description: "Review changes" }, { id: "docs", name: "Documents", installed: true }] });
-assert.equal(byText(skillsTree, "Skills and plugins").type, "h1");
-assert.equal(button(skillsTree, "Plugins").props["aria-pressed"], true);
-assert.equal(button(skillsTree, "Skills").props["aria-pressed"], false);
-assert.equal(nodes(skillsTree).find(node => node.type === "input").props.value, "code");
-assert.equal(button(skillsTree, "Code review").type, "button");
-assert.equal(button(skillsTree, "Documents"), undefined);
-button(skillsTree, "Code review").props.onClick();
-assert.equal(openedSkill.id, "review");
-await button(skillsTree, "Install").props.onClick();
-assert.equal(installedSkill.id, "review");
-const managedSkills = skills.n();
-assert.equal(managedSkills.type, skills.t);
-assert.equal(managedSkills.props.initialTab, "skills");
+const skillsReleaseAssertions = assertReleaseOwner("skills-page-core");
 
 const mcpReleaseAssertions = assertReleaseOwner("mcp-extension-view-page-core");
 
-console.log(`31 page cores assertions and ${mcpReleaseAssertions} MCP release assertions passed`);
+console.log(`21 page core assertions, ${skillsReleaseAssertions} skills release assertions, and ${mcpReleaseAssertions} MCP release assertions passed`);

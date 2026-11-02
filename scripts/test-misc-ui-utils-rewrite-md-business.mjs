@@ -8,7 +8,6 @@ import { assertReleaseOwner } from './release-owner-test-helpers.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const modules = [
-  ['open-handler-391752d0848c.ts', 'browser-open-handler', ['BrowserOpenHandler']],
   ['shelf-364dc403e149.ts', 'conversation-followup-shelf', ['ConversationFollowupShelf']],
 ];
 const dependencyAliases = new Map([['pepper-persona', 'persona'], ['settings-parental-presentation', 'presentation']]);
@@ -48,16 +47,8 @@ for (const [, semantic, exports] of modules) {
 }
 
 sourceAssertions += assertReleaseOwner('shopping-browse-tab-open');
+sourceAssertions += assertReleaseOwner('browser-open-handler');
 
-const browser = loaded.get('browser-open-handler');
-browser.BrowserOpenHandler();
-globalThis.__md.handlers['toggle-browser-panel']({ open: true, url: 'https://example.com' });
-assert.equal(globalThis.__md.queued.at(-1).source, 'manual');
-assert.deepEqual(globalThis.__md.host.at(-1), { type: 'navigate-to-route', path: '/' });
-globalThis.__md.capability = { isCapable: false, isLoading: false };
-browser.BrowserOpenHandler(); globalThis.__md.handlers['toggle-browser-panel']({ url: 'https://example.com' });
-assert.equal(globalThis.__md.unavailable, 1);
-runtimeAssertions += 3;
 
 const shelf = loaded.get('conversation-followup-shelf');
 const resetShelfHooks = () => { globalThis.__md.hooks = []; globalThis.__md.effects = []; globalThis.__md.hookIndex = 0; };

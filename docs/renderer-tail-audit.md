@@ -1,5 +1,19 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Settings/environment/browser/Codex Micro release-owner recovery：一次性恢复
+`layout`、`skills-page-core`、`environment-setup-tab-panel`、
+`chatgpt-temporary-chat-ui`、`life-sciences-helix-background`、`notifications-settings`、
+`pca-connector-eligibility`、`browser-open-handler`、`codex-micro-mini-game-composer`、
+`browser-mfa-sms-enrollment`、`use-visible-settings-sections` 与 `workspace-agents-page`
+十二个发布 owner，净恢复 12,050 行发布 TypeScript。绑定旧手写 ABI 的 settings、environment、
+temporary chat、connector、browser、MFA、Codex Micro 和 workspace agents 测试已迁移为发布
+一致性验证，并补齐此前已恢复的 `environment-configuration-fields` 与 `appgen-settings-page`
+遗留测试。整批通过 12,448/12,448 transform check、1,888/1,888 renderer build/verify、
+2,247/2,247 app-code coverage、0 semantic tail 与 typecheck。严格 hub 消费推进到 app-shared
+1,676/3,185、app-initial 5,180/8,204、app-primary 659/917，仍为 0 unreviewed、0 invalid
+consumers。按发布源码正向行数缺口口径，覆盖率由约 85.3% 推进到 86.4%；preserved 边界、
+聚合 hub 耦合导出与最终真实登录态 E2E 仍未完成。
+
 2026-11-02 Git/home/plugin/artifact release-owner recovery：一次性恢复
 `draw-presence-label`、`shopping-browse-tab-open`、`register-pierre-themes`、
 `family-notification-surface`、`artifact-preview-header`、`hotkey-window-home-page`、

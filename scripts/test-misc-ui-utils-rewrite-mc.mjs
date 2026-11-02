@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const assetRoot = path.join(root, "src/webview/assets");
@@ -48,11 +49,6 @@ const modules = [
       "x",
       "y",
     ],
-  ],
-  [
-    "rosalind-helix-db030adb2faf.js",
-    "life-sciences-helix-background",
-    ["LifeSciencesHelixBackground"],
   ],
   [
     "tsrx.types-and-jsx-7076429c22c1.js",
@@ -308,7 +304,6 @@ async function bundle(directory) {
 }
 
 const metric = await bundle("analytics-metric-helpers");
-const helix = await bundle("life-sciences-helix-background");
 let grammar;
 try {
   grammar = await bundle("tsrx-types-and-jsx");
@@ -319,12 +314,7 @@ try {
 }
 let runtimeAssertions = 0;
 for (const [asset, directory, expectedExports] of modules) {
-  const target =
-    directory === "analytics-metric-helpers"
-      ? metric
-      : directory === "life-sciences-helix-background"
-        ? helix
-        : grammar;
+  const target = directory === "analytics-metric-helpers" ? metric : grammar;
   assert.deepEqual(
     Object.keys(target).sort(),
     [...expectedExports].sort(),
@@ -404,14 +394,7 @@ assert.equal(pluginResult, context);
 assert.equal(context.stats.gauges[0].metric, "plugin_time");
 runtimeAssertions += 2;
 
-const canvas = helix.LifeSciencesHelixBackground({
-  className: "helix",
-  disableRendering: true,
-});
-assert.equal(canvas.type, "canvas");
-assert.equal(canvas.props.className, "helix");
-assert.equal(canvas.props["aria-hidden"], "true");
-runtimeAssertions += 3;
+const helixReleaseAssertions = assertReleaseOwner("life-sciences-helix-background");
 
 assert.equal(Object.keys(grammar.default).length, 75);
 runtimeAssertions += 1;
@@ -511,5 +494,5 @@ assert.deepEqual(JSON.parse(JSON.stringify(grammar.default)), grammar.default);
 runtimeAssertions += 1;
 
 console.log(
-  `${sourceAssertions} source assertions and ${runtimeAssertions} runtime assertions passed`,
+  `${sourceAssertions} source assertions, ${helixReleaseAssertions} helix release assertions, and ${runtimeAssertions} runtime assertions passed`,
 );

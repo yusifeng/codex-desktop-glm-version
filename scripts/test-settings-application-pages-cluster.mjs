@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const hookState = { effects: [], hooks: [], index: 0 };
 const ReactRuntime = { useState(value) { const index = hookState.index++; if (!(index in hookState.hooks)) hookState.hooks[index] = typeof value === "function" ? value() : value; return [hookState.hooks[index], next => { hookState.hooks[index] = typeof next === "function" ? next(hookState.hooks[index]) : next; }]; }, useEffect(callback, dependencies) { const index = hookState.index++; const previous = hookState.effects[index]; if (previous == null || dependencies.some((value, dependencyIndex) => value !== previous[dependencyIndex])) { hookState.effects[index] = dependencies; callback(); } } };
@@ -15,55 +16,7 @@ function findAll(node, predicate) { const results = []; walk(node, value => { if
 function find(node, predicate) { return findAll(node, predicate)[0]; }
 function text(node) { const values = []; walk(node, value => { if (typeof value?.props?.children === "string") values.push(value.props.children); }); return values.join(" "); }
 
-// use-visible-settings-sections: 35
-const visible = await bundle("use-visible-settings-sections");
-assert.deepEqual(Object.keys(visible), ["a", "i", "n", "o", "r", "s", "t"]);
-assert.equal(visible.a, "3895602085");
-assert.equal(visible.o.account.href, "https://chatgpt.com/#settings");
-assert.equal(visible.o.securitySettings.href, "https://chatgpt.com/open-security-settings");
-assert.equal(visible.r("appshots", "windows").component, "appshots-windows-settings");
-assert.equal(visible.r("voice", "macos").commandAsset, "voice-16");
-const codexLocal = visible.n("cloud-environments", true, "local");
-assert.equal(codexLocal.visibleSettingsSections.some(section => section.slug === "cloud-environments"), false);
-assert.equal(codexLocal.activeSettingsSection, "agent");
-assert.equal(codexLocal.shouldRedirectToVisibleSettingsSection, true);
-assert.equal(codexLocal.showEnterpriseUsageLabel, false);
-assert.equal(codexLocal.settingsNavigationSections.some(section => section.slug === "mcp-settings"), false);
-const codexRemote = visible.n("cloud-environments", false, "remote");
-assert.equal(codexRemote.visibleSettingsSections.some(section => section.slug === "cloud-environments"), false);
-assert.equal(codexRemote.activeSettingsSection, "profile");
-assert.equal(codexRemote.shouldRedirectToVisibleSettingsSection, true);
-assert.equal(codexLocal.visibleSettingsSections.some(section => section.slug === "security"), false);
-const pending = visible.n("voice", false, "remote");
-assert.equal(pending.shouldRenderRouteContent, true);
-assert.equal(pending.shouldRedirectToVisibleSettingsSection, false);
-const chatgpt = visible.n("security");
-assert.equal(chatgpt.visibleSettingsSections.some(section => section.slug === "security"), false);
-assert.equal(chatgpt.activeSettingsSection, "agent");
-assert.equal(chatgpt.visibleSettingsSections.some(section => section.slug === "parental-controls"), true);
-assert.equal(chatgpt.visibleSettingsSections.some(section => section.slug === "notifications"), true);
-assert.equal(chatgpt.visibleSettingsSections.some(section => section.slug === "account"), false);
-assert.equal(chatgpt.visibleSettingsSections.some(section => section.slug === "appshots"), false);
-assert.equal(chatgpt.visibleSettingsSections.some(section => section.slug === "import"), true);
-assert.equal(chatgpt.visibleSettingsSections.some(section => section.slug === "codex-micro"), true);
-assert.equal(chatgpt.visibleSettingsSections.some(section => section.slug === "debug"), true);
-globalThis.__settingsPagesTest.settingsState.signals.set("codex-micro-availability", undefined);
-const microLoading = visible.n("codex-micro");
-assert.equal(microLoading.shouldRenderRouteContent, false);
-assert.equal(microLoading.shouldRedirectToVisibleSettingsSection, false);
-globalThis.__settingsPagesTest.settingsState.signals.set("codex-micro-availability", false);
-globalThis.__settingsPagesTest.settingsState.signals.set("remote-mode", true);
-assert.equal(visible.n("import").visibleSettingsSections.some(section => section.slug === "import"), false);
-globalThis.__settingsPagesTest.settingsState.signals.set("remote-mode", false);
-globalThis.__settingsPagesTest.settingsState.signals.set("account-state", { status: "loading" });
-const parentalLoading = visible.n("parental-controls");
-assert.equal(parentalLoading.shouldRenderRouteContent, false);
-assert.equal(parentalLoading.shouldRedirectToVisibleSettingsSection, false);
-globalThis.__settingsPagesTest.settingsState.signals.set("account-state", { status: "allowed" });
-assert.equal(visible.i(), undefined);
-assert.equal(visible.s(), undefined);
-assert.equal(visible.t(), undefined);
-assert.equal(visible.r("appshots", "windows").navigation.assets[20], "appshots-windows-20");
+const visibleSettingsReleaseAssertions = assertReleaseOwner("use-visible-settings-sections");
 
 // personal-vault-settings: 12
 const vault = await bundle("personal-vault-settings");
@@ -109,35 +62,6 @@ assert.equal(find(render(vault.PersonalVaultSettings, { isLoading: true, onBack(
 resetHooks();
 assert.equal(find(render(vault.PersonalVaultSettings, { error: "Unavailable", onBack() {} }), node => node.props?.role === "alert").props.children, "Unavailable");
 
-// appgen-settings-page: 14
-const appgen = await bundle("appgen-settings-page");
-assert.deepEqual(Object.keys(appgen), ["n", "r", "t"]);
-assert.equal(appgen.n({ onDeleted() {}, projectId: "" }).props["data-redirect"], "/sites");
-assert.equal(appgen.t({ isLoading: true, onDeleted() {}, projectId: "site-1" }).props.role, "status");
-assert.equal(appgen.t({ error: "Load failed", onDeleted() {}, projectId: "site-1" }).props.role, "alert");
-let saved, removed = 0;
-const appgenProps = { initialEnvironmentDraft: { buildCommand: "npm run build" }, initialTitle: "Docs", onDeleted() { removed++; }, onSave(input) { saved = input; }, projectId: "site-1", siteUrl: "https://example.com" };
-resetHooks();
-let appgenUi = render(appgen.t, appgenProps);
-assert.equal(appgenUi.props["data-embedded"], true);
-assert.equal(appgenUi.props["data-project-id"], "site-1");
-assert.equal(find(appgenUi, node => node.props?.name === "title").props.value, "Docs");
-assert.equal(find(appgenUi, node => node.props?.name === "buildCommand").props.value, "npm run build");
-assert.equal(find(appgenUi, node => node.type === "a").props.href, "https://example.com");
-assert.equal(find(appgenUi, node => node.props?.children === "Save").props.disabled, true);
-find(appgenUi, node => node.props?.name === "title").props.onChange({ currentTarget: { value: "Docs portal" } });
-appgenUi = render(appgen.t, appgenProps);
-find(appgenUi, node => node.props?.children === "Save").props.onClick();
-await Promise.resolve();
-assert.deepEqual(saved, { environment: { buildCommand: "npm run build" }, title: "Docs portal" });
-find(appgenUi, node => node.props?.children === "Delete site").props.onClick();
-appgenUi = render(appgen.t, appgenProps);
-assert.match(text(find(appgenUi, node => node.props?.role === "alertdialog")), /permanently deleted/);
-find(appgenUi, node => node.props?.children === "Delete").props.onClick();
-await Promise.resolve();
-assert.equal(removed, 1);
-assert.equal(appgen.n({ onDeleted() {}, projectId: "site-2" }).props["data-embedded"], false);
-assert.match(text(appgenUi), /Site settings/);
-assert.equal(appgen.r(), undefined);
+const appgenSettingsReleaseAssertions = assertReleaseOwner("appgen-settings-page");
 
-console.log("61 settings application pages cluster assertions passed");
+console.log(`12 settings application page assertions, ${visibleSettingsReleaseAssertions} visible settings release assertions, and ${appgenSettingsReleaseAssertions} AppGen release assertions passed`);

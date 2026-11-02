@@ -108,22 +108,7 @@ assertions += assertReleaseOwner("appgen-page");
 }
 
 // Workspace agents index
-{
-  const hooks = createHooks();
-  const state = { requests: [], navigated: [] };
-  const module = await buildModule("workspace-agents-page", {
-    "rolldown-runtime": "export {};",
-    "app-shared": `export const $3=()=>{},K2=()=>{},I3=()=>globalThis.__agents.jsx,e6=()=>globalThis.__agents.React,Y2="Message",Yh="Button",n4=()=>({formatMessage:m=>m.defaultMessage}),HX=signal=>signal==="account"?"acct-1":true;`,
-    "app-initial": `export const Bw="build",mun="account",Qgn=()=>{},stn=()=>{},utn=()=>{},o_n=()=> (path,options)=>globalThis.__agents.state.navigated.push({path,options}),rJt={safeGet:async path=>{globalThis.__agents.state.requests.push(path);return {items:[{id:"agent-1",name:"Finance helper",tagline:"Weekly reports",latest_published_version_id:"v1"}]}}};`,
-    "app-primary": "export {};", "skills-page-grid": `export const n="GridContent",r=()=>{},t="Grid";`, "agent-menu": `export const n=()=>{},t="AgentMenu";`,
-  }, "__agents", { state, React: hooks.React, jsx });
-  hooks.reset(); let view = module.WorkspaceAgentsPage(); hooks.runEffects(); await settle(); hooks.reset(); view = module.WorkspaceAgentsPage();
-  check(text(view).includes("Finance helper") && text(view).includes("Weekly reports"), "agents index loads cards");
-  find(view, (node) => node.type === "Button" && text(node) === "Create").props.onClick();
-  check(state.navigated.at(-1).path === "/agents/new/edit", "agents index opens the native editor");
-  assertSource("workspace-agents-page", ["rolldown-runtime", "app-shared", "app-initial", "app-primary", "skills-page-grid", "agent-menu"]);
-}
-
+assertions += assertReleaseOwner("workspace-agents-page");
 assertions += assertReleaseOwner("workspace-agent-landing");
 
 // The two Valdi assets must stay byte-for-byte release artifacts.

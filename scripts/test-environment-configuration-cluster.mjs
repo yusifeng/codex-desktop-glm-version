@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = {
@@ -146,101 +147,7 @@ const expanded = disclosure.t({
 assert.equal(expanded.props.children[1].props.id, "details");
 assert.equal(expanded.props.children[1].props.children, "details");
 
-const fields = await load("environment-configuration-fields");
-fields.n();
-fields.i();
-let domainChanges = null;
-const domainMount = mount(fields.r, {
-  domains: ["api.example.com"],
-  issues: [{ code: "invalid", field: "network-0", message: "Invalid domain" }],
-  onChange: (domains) => {
-    domainChanges = domains;
-  },
-});
-let domainField = domainMount.render();
-assert.equal(domainField.props["data-environment-invalid"], true);
-const domainEditor = domainField.props.children[1].type(
-  domainField.props.children[1].props,
-);
-assert.equal(domainEditor.type, "allowed-domains");
-domainField.props.children[1].props.onChange(["openai.com"]);
-assert.deepEqual(domainChanges, ["openai.com"]);
-domainField.props.children[1].props.onInputChange("api.openai.com");
-domainField = domainMount.render();
-assert.equal(domainField.props.children[1].props.value, "api.openai.com");
-const domainIssue = domainField.props.children[2].type(
-  domainField.props.children[2].props,
-);
-assert.equal(domainIssue.props.children, "Invalid domain");
-
-let draftChange = null;
-let secretChanges = null;
-let variableChanges = null;
-const configuration = fields.t({
-  draft: {
-    repositories: ["openai/codex"],
-    setupScript: "npm install",
-    maintenanceSetupScript: "npm update",
-    networkEnabled: true,
-    networkPreset: "package_managers",
-    networkDomains: ["registry.npmjs.org"],
-    access: "private",
-    outboundIdentityRequirements: [{ id: "github" }],
-  },
-  secrets: [
-    {
-      id: 1,
-      name: "TOKEN",
-      value: "saved",
-      injectionTarget: { type: "environment_variable", name: "TOKEN" },
-    },
-  ],
-  environmentVariables: [{ name: "NODE_ENV", value: "test" }],
-  issues: [{ code: "invalid", field: "connection-0", message: "Reconnect" }],
-  onDraftChange: (change) => {
-    draftChange = change;
-  },
-  setSecrets: (secrets) => {
-    secretChanges = secrets;
-  },
-  setEnvironmentVariables: (variablesList) => {
-    variableChanges = variablesList;
-  },
-});
-const [repositories, scripts, network, variableSection, privacy, connections] =
-  configuration.props.children;
-assert.equal(repositories.props["data-environment-section"], "repositories");
-repositories.props.children[1].props.onChange({
-  currentTarget: { value: "openai/gpt" },
-});
-assert.deepEqual(draftChange, { repositories: ["openai/gpt"] });
-scripts.props.children[1].props.onChange({
-  currentTarget: { value: "pnpm install" },
-});
-assert.deepEqual(draftChange, { setupScript: "pnpm install" });
-assert.equal(network.props["data-environment-section"], "network");
-network.props.children[0].props.children[1].props.onChange({
-  currentTarget: { checked: false },
-});
-assert.deepEqual(draftChange, {
-  networkEnabled: false,
-  networkPreset: "package_managers",
-});
-network.props.children[1].props.children[1].props.children[2].props.onClick();
-assert.deepEqual(secretChanges, []);
-variableSection.props.children[1].props.children[1].props.onChange({
-  currentTarget: { value: "production" },
-});
-assert.equal(variableChanges[0].value, "production");
-privacy.props.children[1].props.onChange({
-  currentTarget: { value: "organization" },
-});
-assert.deepEqual(draftChange, { access: "organization" });
-assert.equal(connections.props.children[1].props.children, "1 connections");
-const connectionIssue = connections.props.children[2].type(
-  connections.props.children[2].props,
-);
-assert.equal(connectionIssue.props.children, "Reconnect");
+const environmentFieldsReleaseAssertions = assertReleaseOwner("environment-configuration-fields");
 
 const publishActions = await load("publish-actions");
 publishActions.n();
@@ -323,70 +230,6 @@ assert.equal(
 );
 assert.equal(published.props.children[1], "next");
 
-const setupPanel = await load("environment-setup-tab-panel");
-globalThis.__scopedValues = {
-  pending: { accountId: "account", userId: "user", name: "Creating" },
-  conversation: null,
-  configuration: null,
-  queryConfig: null,
-  operation: null,
-  setup: { phase: "creating" },
-  draftSave: null,
-};
-const creatingPanel = setupPanel.EnvironmentSetupTabPanel({
-  conversationId: "client-1",
-});
-assert.equal(creatingPanel.type, "aside");
-assert.equal(creatingPanel.props.children[0].props.children, "Creating");
-assert.equal(
-  creatingPanel.props.children[1].props.children,
-  "Creating environment configuration…",
-);
+const setupPanelReleaseAssertions = assertReleaseOwner("environment-setup-tab-panel");
 
-globalThis.__scopedValues.pending = null;
-globalThis.__scopedValues.queryConfig = { isPending: true };
-const loadingPanel = setupPanel.EnvironmentSetupTabPanel({
-  conversationId: "server-1",
-});
-assert.equal(loadingPanel.props.role, "status");
-assert.match(loadingPanel.props.children, /Loading/);
-
-let savedPanelInput = null;
-globalThis.__scopedValues = {
-  pending: null,
-  conversation: { title: "Task environment" },
-  configuration: { configId: "config", name: "Environment" },
-  queryConfig: {
-    data: {
-      id: "config",
-      name: "Environment",
-      draft: { networkEnabled: false },
-    },
-  },
-  operation: { repositories: ["openai/codex"] },
-  setup: { phase: "ready" },
-  draftSave: {
-    isPending: false,
-    mutate: (input) => {
-      savedPanelInput = input;
-    },
-  },
-};
-const readyPanel = setupPanel.EnvironmentSetupTabPanel({
-  conversationId: "server-1",
-});
-assert.equal(readyPanel.props["data-conversation-id"], "server-1");
-assert.match(readyPanel.props.children[1].props.children, /1 changes/);
-const readyFields = readyPanel.props.children[2].type(
-  readyPanel.props.children[2].props,
-);
-assert.equal(readyFields.type, "environment-fields");
-readyPanel.props.children[2].props.onDraftChange({ networkEnabled: true });
-readyPanel.props.children[3].props.children[1].props.onClick();
-assert.equal(savedPanelInput.changes.networkEnabled, true);
-const readyPublish = readyPanel.props.children[3].props.children[2].type(
-  readyPanel.props.children[3].props.children[2].props,
-);
-assert.equal(readyPublish.type, "publish-actions");
-
-console.log("environment configuration cluster complete");
+console.log(`environment configuration cluster with ${environmentFieldsReleaseAssertions} fields and ${setupPanelReleaseAssertions} setup panel release assertions complete`);

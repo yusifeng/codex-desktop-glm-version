@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const state = {
@@ -77,40 +78,7 @@ async function bundle(directory) {
   return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}-${Math.random()}`);
 }
 
-const visible = await bundle("use-visible-settings-sections");
-let result = visible.n("usage", true, "local");
-assert.equal(result.visibleSettingsSections.some((section) => section.slug === "usage"), true);
-assert.equal(result.visibleSettingsSections.some((section) => section.slug === "analytics"), true);
-assert.equal(result.visibleSettingsSections.some((section) => section.slug === "usage-code-review"), true);
-assert.equal(result.visibleSettingsSections.some((section) => section.slug === "profile"), true);
-assert.equal(result.visibleSettingsSections.some((section) => section.slug === "trusted-contact"), true);
-assert.equal(result.showEnterpriseUsageLabel, false);
-
-state.plan = { isUsageSettingsAccessLoading: true, isUsageSettingsVisible: false, plan: null };
-result = visible.n("usage", true, "local");
-assert.equal(result.shouldRenderRouteContent, false);
-assert.equal(result.shouldRedirectToVisibleSettingsSection, false);
-
-state.plan = { isUsageSettingsAccessLoading: false, isUsageSettingsVisible: true, plan: "enterprise" };
-state.gates.set("1748121887", true);
-result = visible.n("analytics", true, "local");
-assert.equal(result.visibleSettingsSections.some((section) => section.slug === "analytics"), true);
-assert.equal(result.showEnterpriseUsageLabel, true);
-
-state.gates.set("998088620", true);
-result = visible.n("profile", true, "local");
-assert.equal(result.visibleSettingsSections.some((section) => section.slug === "profile"), false);
-assert.equal(result.shouldRedirectToVisibleSettingsSection, true);
-state.gates.set("998088620", false);
-
-state.trustedQuery = { data: undefined, isError: false, isLoading: true, isPending: true };
-result = visible.n("trusted-contact", true, "local");
-assert.equal(result.shouldRenderRouteContent, false);
-assert.equal(result.shouldRedirectToVisibleSettingsSection, false);
-state.trustedQuery = { data: undefined, isError: true, isLoading: false, isPending: false };
-result = visible.n("trusted-contact", true, "local");
-assert.equal(result.shouldRenderRouteContent, true);
-assert.equal(result.shouldRedirectToVisibleSettingsSection, false);
+const visibleSettingsReleaseAssertions = assertReleaseOwner("use-visible-settings-sections");
 
 const client = await bundle("command-menu-client");
 const trusted = client.i("user-7", "account-9");
@@ -130,4 +98,4 @@ assert.equal(state.apiCalls.at(-1).path, "/wham/analytics/daily-code-review-metr
 assert.equal(state.apiCalls.at(-1).options.parameters.query.group_by, "day");
 assert.equal(state.apiCalls.at(-1).options.parameters.query.workspace_user, true);
 
-console.log("24 settings runtime/query contract assertions passed");
+console.log(`8 settings runtime/query contract assertions and ${visibleSettingsReleaseAssertions} visible settings release assertions passed`);

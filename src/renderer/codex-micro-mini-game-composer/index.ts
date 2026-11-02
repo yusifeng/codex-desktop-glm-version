@@ -1,320 +1,1278 @@
-// Codex Micro disconnect composer games. This readable owner replaces the
-// formatted release module while preserving its published component contract.
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-import * as miniGamesChunk from "@rchunk/codex-micro-mini-games";
-
-export type MiniGameKind = "asteroids" | "brick-breaker" | "snake";
-interface Glyph { id: string; character: string; bonus: boolean }
-interface Level { blocks: Array<{ glyphs: Glyph[] }>; fontSize: number; key: string }
-interface PointerInput { angle: number; distance: number }
-interface ReactRuntime {
-  useEffect(effect: () => void | (() => void), dependencies: readonly unknown[]): void;
-  useRef<Value>(initialValue: Value): { current: Value };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  K3 as o,
+  LX as s,
+  QI as c,
+  W3 as l,
+  ZI as u,
+  a$ as d,
+  e6 as f,
+  o$ as p,
+} from "@rchunk/app-shared";
+import {
+  $C as m,
+  HZt as h,
+  Iht as g,
+  Rht as _,
+  Slt as v,
+  aw as y,
+  dw as b,
+  kht as x,
+  lQt as S,
+  non as C,
+  ton as w,
+  uw as T,
+  xlt as E,
+} from "@rchunk/app-initial";
+import {
+  d as ee,
+  l as D,
+  n as te,
+  s as O,
+  t as ne,
+} from "@rchunk/codex-micro-mini-games";
+function re(e, t = ``) {
+  let n = A(
+    (e?.items ?? []).flatMap((e) => (e.type === `agentMessage` ? j(C(e.text, void 0), e.id) : [])),
+    le,
+  );
+  return n.key.length > 0 || t.trim().length === 0 ? n : A(j(C(t, void 0), `home-title`), ue);
 }
-interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown }
-interface Scope { get?(signal: unknown): unknown; set?(signal: unknown, value: unknown): void }
-interface RuntimeSelection { composerId?: string | null; game?: MiniGameKind | null }
-interface DeviceStatus { status?: string }
-interface Conversation { items?: Array<{ id: string; type?: string; text: string }> }
-
-const shared = sharedChunk as unknown as {
-  BX?: (query: unknown, parameter: unknown) => Conversation | null;
-  HX?: <Value>(signal: unknown) => Value;
-  I3: () => JsxRuntime;
-  K3?: (eventName: string, listener: (payload: { event: unknown }) => void) => void;
-  LX?: (signal: unknown) => Scope;
-  ZI?: unknown;
-  e6: () => ReactRuntime;
-};
-const initial = initialChunk as unknown as {
-  $C?: unknown;
-  Iht?: (value: unknown) => string;
-  Rht?: (event: unknown) => boolean;
-  Slt?: () => boolean;
-  kht?: { value?: unknown };
-  lQt?: unknown;
-  non?: (markdown: string, options?: unknown) => unknown[];
-};
-const miniGames = miniGamesChunk as unknown as {
-  d?: (composerId: string, composerInput: unknown, onRemoved: () => void) => void | (() => void);
-  n?: unknown;
-  t?: (scope: Scope) => void;
-};
-const React = shared.e6();
-const jsx = shared.I3();
-const segmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
-const GAME_HEIGHT = 192;
-
-function nonWhitespace(glyph: Glyph): boolean { return !/\s/u.test(glyph.character); }
-function tokenizeText(text: string, id: string, bonus = false): Glyph[] {
-  let previousWasSpace = true;
-  const result: Glyph[] = [];
-  for (const { index, segment } of segmenter.segment(text)) {
-    const isSpace = /\s/u.test(segment);
-    if (isSpace && previousWasSpace) continue;
-    previousWasSpace = isSpace;
-    const character = isSpace ? " " : segment;
-    result.push({ id: `${id}:${index}`, character, bonus: bonus || (!isSpace && /[^\p{L}\p{N}]/u.test(character)) });
+function k(e) {
+  return e ? 20 : 10;
+}
+function A(e, t) {
+  let n = [],
+    r = 0;
+  for (let t = e.length - 1; t >= 0 && !(r >= se); --t) {
+    let i = e[t];
+    if (i == null) continue;
+    let a = ie(i.glyphs, ce - r);
+    a.some(P) && (n.unshift({ glyphs: a }), (r += a.filter(P).length));
   }
-  if (result.at(-1)?.character === " ") result.pop();
-  return result;
-}
-function flattenMarkdownTokens(tokens: unknown[], messageId: string, path = ""): Glyph[] {
-  return tokens.flatMap((token, index) => {
-    if (token == null || typeof token !== "object") return [];
-    const value = token as Record<string, unknown>;
-    const id = `${messageId}:${path}${index}`;
-    if (["space", "hr", "def", "html", "image"].includes(String(value.type))) return [];
-    if (value.type === "list" && Array.isArray(value.items)) return value.items.flatMap((item, itemIndex) => {
-      const nested = (item as { tokens?: unknown[] }).tokens;
-      return Array.isArray(nested) ? flattenMarkdownTokens(nested, id, `:item:${itemIndex}:`) : [];
-    });
-    if (value.type === "table") {
-      const rows = [value.header, ...(Array.isArray(value.rows) ? value.rows : [])].filter(Array.isArray) as unknown[][][];
-      return rows.flatMap((row, rowIndex) => row.flatMap((cell, cellIndex) => {
-        const nested = (cell as { tokens?: unknown[] }).tokens;
-        const prefix = cellIndex === 0 ? [] : tokenizeText(" ", `${id}:row:${rowIndex}:${cellIndex}`);
-        return [...prefix, ...(Array.isArray(nested) ? flattenMarkdownTokens(nested, id, `:row:${rowIndex}:${cellIndex}:`) : [])];
-      }));
-    }
-    if (Array.isArray(value.tokens)) {
-      const nested = flattenMarkdownTokens(value.tokens, id, ":");
-      return value.type === "strong" || value.type === "codespan" ? nested.map(glyph => ({ ...glyph, bonus: true })) : nested;
-    }
-    return typeof value.text === "string" ? tokenizeText(value.text, id, value.type === "code" || value.type === "codespan") : [];
-  });
-}
-function buildLevel(conversation: Conversation | null | undefined, fallback: string): Level {
-  const parsedBlocks = (conversation?.items ?? []).flatMap(item => {
-    if (item.type !== "agentMessage") return [];
-    const parsed = initial.non?.(item.text, undefined);
-    const glyphs = Array.isArray(parsed) ? flattenMarkdownTokens(parsed, item.id) : tokenizeText(item.text, item.id);
-    return glyphs.some(nonWhitespace) ? [{ glyphs }] : [];
-  });
-  const source = parsedBlocks.length > 0 ? parsedBlocks : fallback.trim().length > 0 ? [{ glyphs: tokenizeText(fallback, "home-title") }] : [];
-  const selected: Array<{ glyphs: Glyph[] }> = [];
-  let count = 0;
-  for (let index = source.length - 1; index >= 0 && count < 50; index -= 1) {
-    const block = source[index];
-    if (block == null) continue;
-    let glyphs = block.glyphs;
-    const available = 120 - count;
-    if (glyphs.filter(nonWhitespace).length > available) {
-      let remaining = 0; let start = glyphs.length;
-      while (start > 0 && remaining < available) { start -= 1; if (nonWhitespace(glyphs[start]!)) remaining += 1; }
-      const nextSpace = glyphs.findIndex((glyph, glyphIndex) => glyphIndex >= start && /\s/u.test(glyph.character));
-      glyphs = glyphs.slice(nextSpace < 0 ? start : nextSpace + 1);
-    }
-    if (glyphs.some(nonWhitespace)) { selected.unshift({ glyphs }); count += glyphs.filter(nonWhitespace).length; }
-  }
-  const fontSize = parsedBlocks.length > 0 ? 13 : 28;
-  return { blocks: selected, fontSize, key: selected.length === 0 ? "" : `${fontSize}:${selected.flatMap(block => block.glyphs).map(glyph => `${glyph.id}:${glyph.character}`).join("|")}` };
-}
-
-interface CanvasSurfaceProps {
-  playing: boolean;
-  reducedMotion: boolean;
-  onFrame(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement, elapsed: number, now: number): boolean;
-  onResize(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement, width: number, animateEntrance: boolean): void;
-}
-function CanvasSurface(props: CanvasSurfaceProps): unknown {
-  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
-  React.useEffect(() => {
-    const canvas = canvasRef.current;
-    const context = canvas?.getContext("2d");
-    const view = canvas?.ownerDocument.defaultView;
-    if (canvas == null || context == null || view == null) return;
-    let frame = 0; let previous: number | null = null;
-    const resize = () => {
-      const width = canvas.clientWidth;
-      if (width <= 0) return;
-      const ratio = view.devicePixelRatio;
-      canvas.width = Math.round(width * ratio); canvas.height = Math.round(GAME_HEIGHT * ratio);
-      context.setTransform(ratio, 0, 0, ratio, 0, 0);
-      props.onResize(context, canvas, width, props.playing && !props.reducedMotion);
-    };
-    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(resize);
-    observer?.observe(canvas); resize();
-    const draw = (now: number) => {
-      const elapsed = previous == null ? 0 : (now - previous) / 1_000; previous = now;
-      if (props.onFrame(context, canvas, elapsed, now)) frame = view.requestAnimationFrame(draw);
-    };
-    if (props.playing) frame = view.requestAnimationFrame(draw);
-    return () => { observer?.disconnect(); view.cancelAnimationFrame(frame); };
-  }, [props.playing, props.reducedMotion, props.onFrame, props.onResize]);
-  return jsx.jsx("div", { className: "codex-micro-mini-game-surface", "data-feature": "game-surface", children: jsx.jsx("canvas", { ref: canvasRef, "aria-hidden": true, className: "pointer-events-none block h-48 w-full text-secondary" }) });
-}
-function canvasFont(element: HTMLElement, size: number): string { return `${size}px ${getComputedStyle(element).fontFamily}`; }
-function drawScore(context: CanvasRenderingContext2D, element: HTMLElement, score: number, opacity: number, suffix = ""): void { context.fillStyle = getComputedStyle(element).color; context.globalAlpha = 0.5 * opacity; context.font = canvasFont(element, 11); context.textAlign = "left"; context.textBaseline = "alphabetic"; context.fillText(`${String(score).padStart(5, "0")}${suffix.length > 0 ? `  ${suffix}` : ""}`, 8, 176); }
-function clamp(value: number, minimum: number, maximum: number): number { return Math.min(Math.max(value, minimum), maximum); }
-function scoreFor(bonus: boolean): number { return bonus ? 20 : 10; }
-
-interface Asteroid extends Glyph { x: number; y: number; radius: number; velocityX: number; velocityY: number }
-interface AsteroidsState { width: number; height: number; elapsed: number; score: number; level: Level; ship: { x: number; y: number; angle: number; radius: number }; joystick: PointerInput; asteroids: Asteroid[]; bullets: Array<{ x: number; y: number; radius: number; velocityX: number; velocityY: number }>; status: "playing" | "lost"; animateEntrance: boolean }
-function makeAsteroid(glyph: Glyph, index: number, width: number, height: number): Asteroid {
-  const side = index % 4; const spread = ((Math.floor(index / 4) * 47 + side * 23) % 100) / 100; const speed = 24 + side * 5; const radius = glyph.bonus ? 9 : 7;
-  const axis = (size: number) => { const half = Math.max(size / 2 - 29, 0); const distance = spread * half * 2; return distance <= half ? 10 + distance : size / 2 + 19 + distance - half; };
-  if (side === 0) return { ...glyph, radius, velocityX: 0, velocityY: speed, x: axis(width), y: -radius };
-  if (side === 1) return { ...glyph, radius, velocityX: -speed, velocityY: 0, x: width + radius, y: axis(height) };
-  if (side === 2) return { ...glyph, radius, velocityX: 0, velocityY: -speed, x: axis(width), y: height + radius };
-  return { ...glyph, radius, velocityX: speed, velocityY: 0, x: -radius, y: axis(height) };
-}
-function asteroidGlyphs(level: Level): Glyph[] { const glyphs = level.blocks.flatMap(block => block.glyphs).filter(nonWhitespace); const fallback = Array.from("CODEX", (character, index) => ({ id: `fallback:${index}`, character, bonus: false })); const source = glyphs.length > 0 ? glyphs : fallback; const step = Math.max(Math.ceil(source.length / 18), 1); return source.filter((_glyph, index) => index % step === 0).slice(0, 18); }
-function createAsteroids(level: Level, width: number, animateEntrance: boolean): AsteroidsState { return { width, height: GAME_HEIGHT, elapsed: 0, score: 0, level, ship: { x: width / 2, y: GAME_HEIGHT / 2, angle: 0.75, radius: 6 }, joystick: { angle: 0, distance: 0 }, asteroids: asteroidGlyphs(level).map((glyph, index) => makeAsteroid(glyph, index, width, GAME_HEIGHT)), bullets: [], status: "playing", animateEntrance }; }
-function circlesCollide(first: { x: number; y: number; radius: number }, second: { x: number; y: number; radius: number }): boolean { const x = first.x - second.x; const y = first.y - second.y; return x * x + y * y <= (first.radius + second.radius) ** 2; }
-function stepAsteroids(state: AsteroidsState, elapsed: number): void {
-  state.elapsed += Math.max(0, elapsed); let remaining = Math.min(Math.max(0, elapsed), 0.05);
-  while (remaining > 0 && state.status === "playing") {
-    const step = Math.min(1 / 120, remaining); remaining -= step;
-    if (state.joystick.distance >= 0.08) { state.ship.angle = state.joystick.angle; const power = Math.min(state.joystick.distance, 1); const radians = state.ship.angle * Math.PI * 2; state.ship.x = clamp(state.ship.x + Math.cos(radians) * 180 * power * step, 6, state.width - 6); state.ship.y = clamp(state.ship.y + Math.sin(radians) * 180 * power * step, 6, state.height - 6); }
-    state.bullets.forEach(bullet => { bullet.x += bullet.velocityX * step; bullet.y += bullet.velocityY * step; });
-    state.bullets = state.bullets.filter(bullet => bullet.x >= -2 && bullet.x <= state.width + 2 && bullet.y >= -2 && bullet.y <= state.height + 2);
-    for (let index = state.asteroids.length - 1; index >= 0; index -= 1) {
-      const asteroid = state.asteroids[index]!; asteroid.x += asteroid.velocityX * step; asteroid.y += asteroid.velocityY * step;
-      if (asteroid.x < -asteroid.radius) asteroid.x = state.width + asteroid.radius; else if (asteroid.x > state.width + asteroid.radius) asteroid.x = -asteroid.radius;
-      if (asteroid.y < -asteroid.radius) asteroid.y = state.height + asteroid.radius; else if (asteroid.y > state.height + asteroid.radius) asteroid.y = -asteroid.radius;
-      const hit = state.bullets.findIndex(bullet => circlesCollide(bullet, asteroid));
-      if (hit >= 0) { state.score += scoreFor(asteroid.bonus); state.bullets.splice(hit, 1); state.asteroids[index] = makeAsteroid(asteroid, index, state.width, state.height); }
-      else if (circlesCollide(state.ship, asteroid)) state.status = "lost";
-    }
-  }
-}
-function fireAsteroid(state: AsteroidsState): void { if (state.status !== "playing") return; const radians = state.ship.angle * Math.PI * 2; const x = Math.cos(radians); const y = Math.sin(radians); state.bullets.push({ x: state.ship.x + x * 9, y: state.ship.y + y * 9, radius: 2, velocityX: x * 320, velocityY: y * 320 }); }
-function drawAsteroids(context: CanvasRenderingContext2D, state: AsteroidsState, canvas: HTMLCanvasElement): void { const color = getComputedStyle(canvas).color; const opacity = state.animateEntrance ? clamp(state.elapsed / 0.28, 0, 1) : 1; context.clearRect(0, 0, state.width, state.height); context.fillStyle = color; context.font = canvasFont(canvas, state.level.fontSize); context.textAlign = "center"; context.textBaseline = "middle"; state.asteroids.forEach(asteroid => { context.globalAlpha = (asteroid.bonus ? 0.85 : 0.55) * opacity; context.fillText(asteroid.character, asteroid.x, asteroid.y); }); context.globalAlpha = 0.95 * opacity; state.bullets.forEach(bullet => { context.beginPath(); context.arc(bullet.x, bullet.y, bullet.radius, 0, Math.PI * 2); context.fill(); }); drawScore(context, canvas, state.score, opacity); context.globalAlpha = 0.95 * opacity; context.save(); context.translate(state.ship.x, state.ship.y); context.rotate(state.ship.angle * Math.PI * 2); context.beginPath(); context.moveTo(9, 0); context.lineTo(-6, -5); context.lineTo(-3, 0); context.lineTo(-6, 5); context.closePath(); context.fill(); context.restore(); context.globalAlpha = 1; }
-
-type Direction = "up" | "right" | "down" | "left";
-interface SnakeState { body: Array<{ x: number; y: number }>; columns: number; rows: number; direction: Direction; nextDirection: Direction; inputState: "waiting-for-neutral" | "waiting-for-direction" | "moving"; food: { x: number; y: number; character: string; bonus: boolean }; foodGlyphs: Array<{ character: string; bonus: boolean }>; foodCollected: number; score: number; status: "playing" | "lost"; accumulator: number }
-function snakeFood(level: Level): Array<{ character: string; bonus: boolean }> { const result = level.blocks.flatMap(block => block.glyphs).filter(nonWhitespace).map(({ character, bonus }) => ({ character, bonus })); return result.length > 0 ? result : [{ character: "•", bonus: false }]; }
-function placeFood(state: SnakeState, random = Math.random): void { const available: Array<{ x: number; y: number }> = []; for (let y = 0; y < state.rows; y += 1) for (let x = 0; x < state.columns; x += 1) if (!state.body.some(point => point.x === x && point.y === y)) available.push({ x, y }); const point = available[Math.floor(random() * available.length)]; if (point != null) state.food = { ...state.foodGlyphs[state.foodCollected % state.foodGlyphs.length]!, ...point }; }
-function createSnake(level: Level, columns: number): SnakeState { const center = { x: Math.floor(columns / 2), y: 6 }; const state: SnakeState = { body: [center, { x: center.x - 1, y: center.y }, { x: center.x - 2, y: center.y }], columns, rows: 12, direction: "right", nextDirection: "right", inputState: "waiting-for-neutral", food: { x: 0, y: 0, character: "•", bonus: false }, foodGlyphs: snakeFood(level), foodCollected: 0, score: 0, status: "playing", accumulator: 0 }; placeFood(state); return state; }
-function inputDirection(pointer: PointerInput): Direction | null { if (pointer.distance < 0.65) return null; const angle = ((pointer.angle % 1) + 1) % 1; if (angle >= 0.875 || angle < 0.125) return "right"; if (angle < 0.375) return "down"; if (angle < 0.625) return "left"; return "up"; }
-function opposite(first: Direction, second: Direction): boolean { return (first === "up" && second === "down") || (first === "down" && second === "up") || (first === "left" && second === "right") || (first === "right" && second === "left"); }
-function controlSnake(state: SnakeState, pointer: PointerInput): void { if (state.inputState === "waiting-for-neutral") { if (pointer.distance < 0.35) state.inputState = "waiting-for-direction"; return; } const direction = inputDirection(pointer); if (direction == null) return; state.inputState = "moving"; if (!opposite(direction, state.direction)) state.nextDirection = direction; }
-function stepSnake(state: SnakeState, elapsed: number): void {
-  if (state.status !== "playing" || state.inputState !== "moving") return;
-  const interval = Math.max(0.08, 0.16 - state.foodCollected * 0.006);
-  state.accumulator = Math.min(state.accumulator + Math.max(0, elapsed), interval);
-  if (state.accumulator < interval) return;
-  state.accumulator = 0; state.direction = state.nextDirection;
-  const head = state.body[0]!;
-  const next = state.direction === "up" ? { x: head.x, y: head.y - 1 } : state.direction === "right" ? { x: head.x + 1, y: head.y } : state.direction === "down" ? { x: head.x, y: head.y + 1 } : { x: head.x - 1, y: head.y };
-  const ate = next.x === state.food.x && next.y === state.food.y;
-  const collisionBody = ate ? state.body : state.body.slice(0, -1);
-  if (next.x < 0 || next.x >= state.columns || next.y < 0 || next.y >= state.rows || collisionBody.some(point => point.x === next.x && point.y === next.y)) { state.status = "lost"; return; }
-  state.body.unshift(next);
-  if (ate) { state.foodCollected += 1; state.score += scoreFor(state.food.bonus); placeFood(state); } else state.body.pop();
-}
-function drawSnake(context: CanvasRenderingContext2D, state: SnakeState, canvas: HTMLCanvasElement): void { const width = canvas.clientWidth; const size = Math.min((width - 16) / state.columns, (GAME_HEIGHT - 16) / state.rows); const left = (width - size * state.columns) / 2; const top = (GAME_HEIGHT - size * state.rows) / 2; const color = getComputedStyle(canvas).color; context.clearRect(0, 0, width, GAME_HEIGHT); context.fillStyle = color; context.font = canvasFont(canvas, Math.min(16, size * 0.9)); context.textAlign = "center"; context.textBaseline = "middle"; context.globalAlpha = state.food.bonus ? 0.95 : 0.7; context.fillText(state.food.character, left + (state.food.x + 0.5) * size, top + (state.food.y + 0.5) * size); context.shadowColor = color; state.body.forEach((point, index) => { const inset = index === 0 ? 1 : 2; context.globalAlpha = Math.max(0.34, 0.92 - index * 0.06); context.shadowBlur = index === 0 ? 10 : 0; context.beginPath(); context.roundRect(left + point.x * size + inset, top + point.y * size + inset, size - inset * 2, size - inset * 2, Math.max(2, (size - inset * 2) / 3)); context.fill(); }); context.shadowBlur = 0; drawScore(context, canvas, state.score, 1); context.globalAlpha = 1; }
-
-interface BrickGlyph extends Glyph { x: number; y: number; width: number; height: number; falling: boolean; velocityX: number; velocityY: number }
-interface BrickState { width: number; elapsed: number; score: number; combo: number; lastHit: number | null; level: Level; glyphs: BrickGlyph[]; ball: { x: number; y: number; radius: number; velocityX: number; velocityY: number }; paddle: { x: number; y: number; width: number; height: number }; status: "playing" | "lost" | "cleared"; completedAt: number | null }
-function layoutBricks(level: Level, width: number, context: CanvasRenderingContext2D): BrickGlyph[] {
-  const glyphs = level.blocks.flatMap(block => block.glyphs).filter(nonWhitespace).slice(-80);
-  const rows: Glyph[][] = []; let row: Glyph[] = []; let rowWidth = 0; context.font = canvasFont(context.canvas, level.fontSize);
-  glyphs.forEach(glyph => { const glyphWidth = Math.max(context.measureText(glyph.character).width, 4) + 1; if (row.length > 0 && rowWidth + glyphWidth > width - 16) { rows.push(row); row = []; rowWidth = 0; } row.push(glyph); rowWidth += glyphWidth; });
-  if (row.length > 0) rows.push(row);
-  return rows.slice(-4).flatMap((line, rowIndex) => { const widths = line.map(glyph => Math.max(context.measureText(glyph.character).width, 4)); let x = (width - widths.reduce((sum, value) => sum + value + 1, -1)) / 2; return line.map((glyph, index) => { const result = { ...glyph, x, y: 8 + rowIndex * (Math.max(16, level.fontSize + 3) + 1), width: widths[index]!, height: Math.max(16, level.fontSize + 3), falling: false, velocityX: 0, velocityY: 0 }; x += result.width + 1; return result; }); });
-}
-function createBricks(level: Level, width: number, context: CanvasRenderingContext2D): BrickState { const glyphs = layoutBricks(level, width, context); const paddleWidth = clamp(width * (0.3 - Math.min(glyphs.length / 120, 1) * 0.1), 52, 96); return { width, elapsed: 0, score: 0, combo: 0, lastHit: null, level, glyphs, ball: { x: width / 2, y: GAME_HEIGHT - 29, radius: 5, velocityX: 105, velocityY: -145 }, paddle: { x: width / 2, y: GAME_HEIGHT - 15, width: paddleWidth, height: 6 }, status: "playing", completedAt: null }; }
-function brickCollision(ball: BrickState["ball"], glyph: BrickGlyph): boolean { const x = clamp(ball.x, glyph.x - 1, glyph.x + glyph.width + 1); const y = clamp(ball.y, glyph.y - 1, glyph.y + glyph.height + 1); return (ball.x - x) ** 2 + (ball.y - y) ** 2 <= ball.radius ** 2; }
-function stepBricks(state: BrickState, elapsed: number, paddleInput: number): void {
-  state.elapsed += Math.max(0, elapsed);
-  if (state.lastHit != null && state.elapsed - state.lastHit > 1.5) { state.combo = 0; state.lastHit = null; }
-  state.glyphs.filter(glyph => glyph.falling).forEach(glyph => { glyph.velocityY += 420 * Math.min(elapsed, 0.05); glyph.x += glyph.velocityX * elapsed; glyph.y += glyph.velocityY * elapsed; });
-  if (state.status !== "playing") return;
-  let remaining = Math.min(Math.max(0, elapsed), 0.05);
-  while (remaining > 0 && state.status === "playing") {
-    const step = Math.min(1 / 120, remaining); remaining -= step; const half = state.paddle.width / 2;
-    state.paddle.x = clamp(state.paddle.x + clamp(paddleInput, -1, 1) * 440 * step, half, state.width - half);
-    const ball = state.ball; ball.x += ball.velocityX * step; ball.y += ball.velocityY * step;
-    if (ball.x - ball.radius <= 0 && ball.velocityX < 0) { ball.x = ball.radius; ball.velocityX *= -1; } else if (ball.x + ball.radius >= state.width && ball.velocityX > 0) { ball.x = state.width - ball.radius; ball.velocityX *= -1; }
-    if (ball.y - ball.radius <= 0 && ball.velocityY < 0) { ball.y = ball.radius; ball.velocityY *= -1; }
-    const top = state.paddle.y - state.paddle.height / 2;
-    if (ball.velocityY > 0 && ball.y + ball.radius >= top && ball.y - ball.radius <= state.paddle.y + state.paddle.height / 2 && Math.abs(ball.x - state.paddle.x) <= half + ball.radius) { ball.y = top - ball.radius; ball.velocityY = -Math.abs(ball.velocityY); ball.velocityX += ((ball.x - state.paddle.x) / half) * Math.abs(ball.velocityY) * 0.45; }
-    const hit = state.glyphs.find(glyph => !glyph.falling && brickCollision(ball, glyph));
-    if (hit != null) { hit.falling = true; hit.velocityX = ball.velocityX * 0.18; hit.velocityY = -55; state.combo = state.lastHit != null && state.elapsed - state.lastHit <= 1.5 ? Math.min(state.combo + 1, 5) : 1; state.lastHit = state.elapsed; state.score += scoreFor(hit.bonus) * state.combo; ball.velocityY *= -1; const speed = Math.hypot(ball.velocityX, ball.velocityY); if (speed > 0 && speed < 240) { const scale = Math.min(speed * 1.015, 240) / speed; ball.velocityX *= scale; ball.velocityY *= scale; } if (state.glyphs.every(glyph => glyph.falling)) { state.status = "cleared"; state.completedAt = state.elapsed; } }
-    if (ball.y - ball.radius > GAME_HEIGHT) { state.status = "lost"; state.completedAt = state.elapsed; }
-  }
-}
-function drawBricks(context: CanvasRenderingContext2D, state: BrickState, canvas: HTMLCanvasElement): void { const color = getComputedStyle(canvas).color; context.clearRect(0, 0, state.width, GAME_HEIGHT); context.fillStyle = color; context.font = canvasFont(canvas, state.level.fontSize); context.textBaseline = "top"; state.glyphs.forEach(glyph => { context.globalAlpha = glyph.falling ? 0.7 : glyph.bonus ? 0.65 : 0.5; context.fillText(glyph.character, glyph.x, glyph.y); }); drawScore(context, canvas, state.score, 1, `×${Math.max(state.combo, 1)}`); context.globalAlpha = 0.95; context.beginPath(); context.roundRect(state.paddle.x - state.paddle.width / 2, state.paddle.y - state.paddle.height / 2, state.paddle.width, state.paddle.height, state.paddle.height / 2); context.fill(); context.shadowBlur = 10; context.shadowColor = color; context.beginPath(); context.arc(state.ball.x, state.ball.y, state.ball.radius, 0, Math.PI * 2); context.fill(); context.shadowBlur = 0; context.globalAlpha = 1; }
-
-function GameCanvas({ game, level, onExit, playing }: { game: MiniGameKind; level: Level; onExit(): void; playing: boolean }): unknown {
-  const stateRef = React.useRef<AsteroidsState | SnakeState | BrickState | null>(null);
-  const horizontalRef = React.useRef({ value: 0, expiresAt: 0 });
-  const reducedMotion = initial.Slt?.() ?? false;
-  shared.K3?.("codex-micro-joystick-event", payload => {
-    const pointer = payload.event as PointerInput;
-    const state = stateRef.current;
-    if (game === "asteroids" && state != null) (state as AsteroidsState).joystick = pointer;
-    else if (game === "snake" && state != null) controlSnake(state as SnakeState, pointer);
-    else horizontalRef.current = { value: pointer.distance < 0.08 ? 0 : Math.cos(pointer.angle * Math.PI * 2) * Math.min(pointer.distance / 0.7, 1), expiresAt: performance.now() + 600 };
-  });
-  shared.K3?.("codex-micro-hid-event", payload => { const state = stateRef.current; if (game === "asteroids" && state != null && (initial.Rht?.(payload.event) ?? true)) fireAsteroid(state as AsteroidsState); });
-  React.useEffect(() => { stateRef.current = null; }, [game]);
-  React.useEffect(() => { if (!playing && game === "asteroids" && stateRef.current != null) (stateRef.current as AsteroidsState).joystick = { angle: 0, distance: 0 }; }, [game, playing]);
-  const onResize = (context: CanvasRenderingContext2D, canvas: HTMLCanvasElement, width: number, animateEntrance: boolean) => {
-    if (game === "asteroids") {
-      const previous = stateRef.current as AsteroidsState | null;
-      if (previous == null) stateRef.current = createAsteroids(level, width, animateEntrance);
-      else if (previous.width !== width) { const scale = width / previous.width; previous.ship.x *= scale; previous.asteroids.forEach(value => { value.x *= scale; }); previous.bullets.forEach(value => { value.x *= scale; }); previous.width = width; }
-      drawAsteroids(context, stateRef.current as AsteroidsState, canvas);
-    } else if (game === "snake") {
-      const columns = Math.max(6, Math.floor((width - 16) / ((GAME_HEIGHT - 16) / 12)));
-      const previous = stateRef.current as SnakeState | null;
-      if (previous == null) stateRef.current = createSnake(level, columns);
-      else { previous.foodGlyphs = snakeFood(level); if (columns > previous.columns) { const shift = Math.floor(columns / 2) - Math.floor(previous.columns / 2); previous.columns = columns; previous.body.forEach(point => { point.x += shift; }); previous.food.x += shift; } }
-      drawSnake(context, stateRef.current as SnakeState, canvas);
-    } else {
-      const previous = stateRef.current as BrickState | null;
-      if (previous == null || previous.width !== width || previous.level.key !== level.key) stateRef.current = createBricks(level, width, context);
-      drawBricks(context, stateRef.current as BrickState, canvas);
-    }
+  return {
+    blocks: n,
+    fontSize: t,
+    key:
+      n.length === 0
+        ? ``
+        : `${t}:${n
+            .flatMap((e) => e.glyphs)
+            .map((e) => `${e.id}:${e.character}`)
+            .join(`|`)}`,
   };
-  const onFrame = (context: CanvasRenderingContext2D, canvas: HTMLCanvasElement, elapsed: number, now: number) => {
-    const state = stateRef.current;
-    if (state == null) return true;
-    if (game === "asteroids") { stepAsteroids(state as AsteroidsState, elapsed); drawAsteroids(context, state as AsteroidsState, canvas); if ((state as AsteroidsState).status === "lost") { onExit(); return false; } }
-    else if (game === "snake") { stepSnake(state as SnakeState, elapsed); drawSnake(context, state as SnakeState, canvas); if ((state as SnakeState).status === "lost") { onExit(); return false; } }
-    else { const input = now < horizontalRef.current.expiresAt ? horizontalRef.current.value : 0; stepBricks(state as BrickState, elapsed, input); drawBricks(context, state as BrickState, canvas); const bricks = state as BrickState; if (bricks.status === "lost" || (bricks.status === "cleared" && bricks.completedAt != null && bricks.elapsed - bricks.completedAt >= 0.8)) { onExit(); return false; } }
-    return true;
+}
+function j(e, t, n = ``) {
+  return e.flatMap((e, r) => {
+    let i = `${t}:${n}${r}`;
+    return ae(e)
+      ? e.items.flatMap((e, t) => N(M(e.tokens), `${i}:item:${t}`))
+      : oe(e)
+        ? [e.header, ...e.rows].flatMap((e, t) =>
+            N(
+              e.flatMap((e, t) => [...(t === 0 ? [] : [{ bonus: !1, text: ` ` }]), ...M(e.tokens)]),
+              `${i}:row:${t}`,
+            ),
+          )
+        : e.type === `blockquote` && `tokens` in e && Array.isArray(e.tokens)
+          ? j(e.tokens, t, `${n}${r}:`)
+          : e.type === `code` && `text` in e
+            ? N([{ bonus: !0, text: e.text }], i)
+            : e.type === `space` ||
+                e.type === `hr` ||
+                e.type === `def` ||
+                e.type === `html` ||
+                e.type === `image`
+              ? []
+              : `tokens` in e && Array.isArray(e.tokens)
+                ? N(M(e.tokens, e.type === `heading`), i)
+                : `text` in e && typeof e.text == `string`
+                  ? N([{ bonus: !1, text: e.text }], i)
+                  : [];
+  });
+}
+function M(e, t = !1) {
+  return e.flatMap((e) =>
+    e.type === `image`
+      ? []
+      : e.type === `br`
+        ? [{ bonus: !1, text: ` ` }]
+        : `tokens` in e && Array.isArray(e.tokens)
+          ? M(e.tokens, t || e.type === `strong` || e.type === `codespan`)
+          : `text` in e && typeof e.text == `string`
+            ? [{ bonus: t || e.type === `codespan`, text: e.text }]
+            : [],
+  );
+}
+function N(e, t) {
+  let n = !0,
+    r = e.flatMap((e, r) =>
+      Array.from(de.segment(e.text)).flatMap(({ index: i, segment: a }) => {
+        let o = /\s/u.test(a);
+        if (o && n) return [];
+        n = o;
+        let s = o ? ` ` : a;
+        return [
+          {
+            bonus: e.bonus || (!o && /[^\p{L}\p{N}]/u.test(s)),
+            character: s,
+            id: `${t}:${r}:${i}`,
+          },
+        ];
+      }),
+    );
+  return (r.at(-1)?.character === ` ` && r.pop(), r.some(P) ? [{ glyphs: r }] : []);
+}
+function ie(e, t) {
+  if (e.filter(P).length <= t) return e;
+  let n = 0,
+    r = e.length;
+  for (; r > 0 && n < t;) {
+    --r;
+    let t = e[r];
+    t != null && P(t) && (n += 1);
+  }
+  let i = e.findIndex((e, t) => t >= r && /\s/u.test(e.character));
+  return e.slice(i === -1 ? r : i + 1);
+}
+function P(e) {
+  return !/\s/u.test(e.character);
+}
+function ae(e) {
+  return e.type === `list` && `items` in e && Array.isArray(e.items);
+}
+function oe(e) {
+  return (
+    e.type === `table` &&
+    `header` in e &&
+    Array.isArray(e.header) &&
+    `rows` in e &&
+    Array.isArray(e.rows)
+  );
+}
+var se, ce, le, ue, de;
+function F() {
+  return (F = e(() => {
+    (w(),
+      (se = 50),
+      (ce = 120),
+      (le = 13),
+      (ue = 28),
+      (de = new Intl.Segmenter(void 0, { granularity: `grapheme` })));
+  }))();
+}
+function fe({ animateEntrance: e = !0, height: t, level: n, width: r }) {
+  return {
+    animatesEntrance: e,
+    asteroids: ve(n, r, t),
+    bullets: [],
+    elapsedSeconds: 0,
+    height: t,
+    joystick: { angle: 0, distance: 0 },
+    level: n,
+    score: 0,
+    ship: { angle: 0.75, radius: Ae, x: r / 2, y: t / 2 },
+    status: `playing`,
+    width: r,
   };
-  return jsx.jsx(CanvasSurface, { playing, reducedMotion, onResize, onFrame });
 }
-
-function CodexMicroMiniGameComposer(input: {
-  composerInput: unknown;
-  conversationId?: string | null;
-  isSideChat?: boolean;
-  playing?: boolean;
-  showPendingRequest?: boolean;
-  status?: "connected" | "not-detected" | string;
-  activeComposer?: boolean;
-  game?: MiniGameKind | null;
-  conversationItems?: Array<{ id: string; type?: string; text: string }>;
-  fallbackText?: string;
-  onExit?(): void;
-}) {
-  const scope = shared.LX?.(shared.ZI) ?? {};
-  const selected = shared.HX?.<RuntimeSelection>(miniGames.n) ?? null;
-  const statusState = shared.HX?.<DeviceStatus>(initial.$C) ?? null;
-  const composerId = initial.Iht?.(initial.kht?.value);
-  const active = input.activeComposer ?? (selected?.composerId != null && selected.composerId === composerId);
-  const status = input.status ?? statusState?.status;
-  const game = input.game ?? selected?.game ?? null;
-  const available = input.isSideChat !== true && input.showPendingRequest !== true && (status === "connected" || (active && status !== "not-detected"));
-  React.useEffect(() => {
-    if (!available || composerId == null) return;
-    return miniGames.d?.(composerId, input.composerInput, () => {
-      const current = scope.get?.(miniGames.n) as RuntimeSelection | null;
-      if (current?.composerId === composerId) miniGames.t?.(scope);
+function pe(e) {
+  if (e.status !== `playing`) return;
+  let t = e.ship.angle * Math.PI * 2,
+    n = Math.cos(t),
+    r = Math.sin(t);
+  e.bullets.push({
+    radius: Oe,
+    velocityX: n * R,
+    velocityY: r * R,
+    x: e.ship.x + n * ke,
+    y: e.ship.y + r * ke,
+  });
+}
+function me(e, t) {
+  e.joystick = t;
+}
+function he(e, t) {
+  if (e.status === `lost`) return;
+  let n = e.elapsedSeconds;
+  e.elapsedSeconds += Math.max(0, t);
+  let r = e.animatesEntrance ? Ie : 0,
+    i = Math.min(Math.max(0, e.elapsedSeconds - Math.max(n, r)), 0.05);
+  for (; i > 0 && e.status === `playing`;) {
+    let t = Math.min(Pe, i);
+    (be(e, t), (i -= t));
+  }
+}
+function ge(e, { height: t, width: n }) {
+  let r = n / e.width,
+    i = t / e.height;
+  ((e.ship.x *= r), (e.ship.y *= i));
+  for (let t of e.asteroids) ((t.x *= r), (t.y *= i));
+  for (let t of e.bullets) ((t.x *= r), (t.y *= i));
+  ((e.height = t), (e.width = n));
+}
+function _e(e) {
+  return e.animatesEntrance ? we(e.elapsedSeconds / Ie, 0, 1) : 1;
+}
+function ve(e, t, n) {
+  let r = e.blocks.flatMap((e) => e.glyphs).filter(P),
+    i = r.length > 0 ? r : Fe,
+    a = Math.max(Math.ceil(i.length / Te), 1);
+  return i
+    .filter((e, t) => t % a === 0)
+    .slice(0, Te)
+    .map((e, r) => ye(e, r, t, n));
+}
+function ye(e, t, n, r) {
+  let i = t % 4,
+    a = ((Math.floor(t / 4) * 47 + i * 23) % 100) / 100,
+    o = 24 + (t % 4) * 5,
+    s = e.bonus ? De : Ee;
+  return i === 0
+    ? { ...e, radius: s, velocityX: 0, velocityY: o, x: I(n, a), y: -s }
+    : i === 1
+      ? { ...e, radius: s, velocityX: -o, velocityY: 0, x: n + s, y: I(r, a) }
+      : i === 2
+        ? { ...e, radius: s, velocityX: 0, velocityY: -o, x: I(n, a), y: r + s }
+        : { ...e, radius: s, velocityX: o, velocityY: 0, x: -s, y: I(r, a) };
+}
+function I(e, t) {
+  let n = Math.max(e / 2 - je - L, 0),
+    r = t * n * 2;
+  return r <= n ? L + r : e / 2 + je + r - n;
+}
+function be(e, t) {
+  let { joystick: n } = e;
+  if (n.distance >= Ne) {
+    e.ship.angle = n.angle;
+    let r = Math.min(n.distance, 1),
+      i = n.angle * Math.PI * 2;
+    ((e.ship.x = we(e.ship.x + Math.cos(i) * Me * r * t, e.ship.radius, e.width - e.ship.radius)),
+      (e.ship.y = we(
+        e.ship.y + Math.sin(i) * Me * r * t,
+        e.ship.radius,
+        e.height - e.ship.radius,
+      )));
+  }
+  for (let n of e.bullets) ((n.x += n.velocityX * t), (n.y += n.velocityY * t));
+  e.bullets = e.bullets.filter((t) => xe(e, t));
+  for (let n = e.asteroids.length - 1; n >= 0; --n) {
+    let r = e.asteroids[n];
+    if (r == null) continue;
+    ((r.x += r.velocityX * t),
+      (r.y += r.velocityY * t),
+      r.x < -r.radius ? (r.x = e.width + r.radius) : r.x > e.width + r.radius && (r.x = -r.radius),
+      r.y < -r.radius
+        ? (r.y = e.height + r.radius)
+        : r.y > e.height + r.radius && (r.y = -r.radius));
+    let i = e.bullets.findIndex((e) => Se(e, r));
+    if (i !== -1) {
+      ((e.asteroids[n] = ye(r, n, e.width, e.height)),
+        e.bullets.splice(i, 1),
+        (e.score += k(r.bonus)));
+      continue;
+    }
+    if (Ce(e, r)) {
+      e.status = `lost`;
+      return;
+    }
+  }
+}
+function xe(e, t) {
+  return (
+    t.x >= -t.radius && t.x <= e.width + t.radius && t.y >= -t.radius && t.y <= e.height + t.radius
+  );
+}
+function Se(e, t) {
+  let n = e.x - t.x,
+    r = e.y - t.y;
+  return n * n + r * r <= (e.radius + t.radius) ** 2;
+}
+function Ce(e, t) {
+  let n = e.ship.x - t.x,
+    r = e.ship.y - t.y;
+  return n * n + r * r <= (e.ship.radius + t.radius) ** 2;
+}
+function we(e, t, n) {
+  return Math.min(Math.max(e, t), n);
+}
+var Te, L, Ee, De, Oe, R, ke, Ae, je, Me, Ne, Pe, Fe, Ie;
+function Le() {
+  return (Le = e(() => {
+    (F(),
+      (Te = 18),
+      (L = 10),
+      (Ee = 7),
+      (De = 9),
+      (Oe = 2),
+      (R = 320),
+      (ke = 9),
+      (Ae = 6),
+      (je = 19),
+      (Me = 180),
+      (Ne = 0.08),
+      (Pe = 1 / 120),
+      (Fe = Array.from(`CODEX`, (e, t) => ({ bonus: !1, character: e, id: `fallback:${t}` }))),
+      (Ie = 0.28));
+  }))();
+}
+function Re(e) {
+  return 1 - (1 - e) ** 3;
+}
+function z(e, t) {
+  return `${t}px ${getComputedStyle(e).fontFamily}`;
+}
+function ze(e, t, n, r, i) {
+  ((e.fillStyle = getComputedStyle(t).color),
+    (e.globalAlpha = 0.5 * r),
+    (e.font = z(t, 11)),
+    (e.textAlign = `left`),
+    (e.textBaseline = `alphabetic`),
+    e.fillText(`${String(n).padStart(5, `0`)}${i == null ? `` : `  ${i}`}`, 8, 176));
+}
+function B() {
+  return (B = e(() => {}))();
+}
+function Be(e) {
+  let t = (0, Ve.c)(17),
+    { onFrame: n, onResize: r, playing: i, reducedMotion: a } = e,
+    o = i === void 0 || i,
+    s = (0, V.useRef)(null),
+    c = (0, V.useEffectEvent)(n),
+    l = (0, V.useEffectEvent)(r),
+    u = v(),
+    d = a ?? u,
+    f = o && !d,
+    m = !1;
+  if (o) {
+    let e;
+    (t[0] === d
+      ? (e = t[1])
+      : ((e = d ? { opacity: 0 } : { height: 0, opacity: 0 }), (t[0] = d), (t[1] = e)),
+      (m = e));
+  }
+  let h;
+  t[2] !== f || t[3] !== c || t[4] !== l || t[5] !== o
+    ? ((h = () => {
+        let e = s.current,
+          t = e?.getContext(`2d`);
+        if (e == null || t == null) return;
+        let n = 0,
+          r = null,
+          i = new ResizeObserver(() => {
+            let n = e.clientWidth;
+            if (n <= 0) return;
+            let r = window.devicePixelRatio;
+            ((e.width = Math.round(n * r)),
+              (e.height = Math.round(192 * r)),
+              t.setTransform(r, 0, 0, r, 0, 0),
+              l(t, e, n, f));
+          });
+        i.observe(e);
+        let a = (i) => {
+          let o = r == null ? 0 : (i - r) / 1e3;
+          ((r = i), c(t, e, o, i) && (n = window.requestAnimationFrame(a)));
+        };
+        return (
+          o && (n = window.requestAnimationFrame(a)),
+          () => {
+            (i.disconnect(), window.cancelAnimationFrame(n));
+          }
+        );
+      }),
+      (t[2] = f),
+      (t[3] = c),
+      (t[4] = l),
+      (t[5] = o),
+      (t[6] = h))
+    : (h = t[6]);
+  let g;
+  (t[7] !== f || t[8] !== o ? ((g = [f, o]), (t[7] = f), (t[8] = o), (t[9] = g)) : (g = t[9]),
+    (0, V.useEffect)(h, g));
+  let _;
+  t[10] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((_ = { height: 192, opacity: 1 }), (t[10] = _))
+    : (_ = t[10]);
+  let y = d ? 0.12 : He,
+    b;
+  t[11] === y ? (b = t[12]) : ((b = { duration: y, ease: Ue }), (t[11] = y), (t[12] = b));
+  let x;
+  t[13] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((x = (0, H.jsx)(`canvas`, {
+        ref: s,
+        "aria-hidden": !0,
+        className: `pointer-events-none block h-48 w-full text-secondary`,
+      })),
+      (t[13] = x))
+    : (x = t[13]);
+  let S;
+  return (
+    t[14] !== m || t[15] !== b
+      ? ((S = (0, H.jsx)(p.div, {
+          initial: m,
+          animate: _,
+          className: `w-full overflow-hidden`,
+          "data-feature": `game-surface`,
+          transition: b,
+          children: x,
+        })),
+        (t[14] = m),
+        (t[15] = b),
+        (t[16] = S))
+      : (S = t[16]),
+    S
+  );
+}
+var Ve, V, H, He, Ue;
+function U() {
+  return (U = e(() => {
+    ((Ve = t()), d(), (V = f()), E(), B(), (H = a()), (He = 0.28), (Ue = [0.23, 1, 0.32, 1]));
+  }))();
+}
+function We(e) {
+  let t = (0, Ke.c)(14),
+    { playing: n, reducedMotion: r, level: i, onExit: a } = e,
+    s = n === void 0 || n,
+    c = (0, W.useRef)(null),
+    l,
+    u;
+  (t[0] === s
+    ? ((l = t[1]), (u = t[2]))
+    : ((l = () => {
+        let e = c.current;
+        !s && e != null && me(e, { angle: 0, distance: 0 });
+      }),
+      (u = [s]),
+      (t[0] = s),
+      (t[1] = l),
+      (t[2] = u)),
+    (0, W.useEffect)(l, u));
+  let d;
+  (t[3] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((d = (e) => {
+        let { event: t } = e,
+          n = c.current;
+        n != null && me(n, t);
+      }),
+      (t[3] = d))
+    : (d = t[3]),
+    o(`codex-micro-joystick-event`, d));
+  let f;
+  (t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((f = (e) => {
+        let { event: t } = e,
+          n = c.current;
+        n != null && D(t) && pe(n);
+      }),
+      (t[4] = f))
+    : (f = t[4]),
+    o(`codex-micro-hid-event`, f));
+  let p;
+  t[5] === i
+    ? (p = t[6])
+    : ((p = function (e, t, n, r) {
+        (c.current == null
+          ? (c.current = fe({ animateEntrance: r, height: 192, level: i, width: n }))
+          : (c.current.width !== n || c.current.height !== 192) &&
+            ge(c.current, { height: 192, width: n }),
+          Ge(e, c.current, t));
+      }),
+      (t[5] = i),
+      (t[6] = p));
+  let m = p,
+    h;
+  t[7] === a
+    ? (h = t[8])
+    : ((h = function (e, t, n) {
+        let r = c.current;
+        return r == null || (he(r, n), Ge(e, r, t), r.status !== `lost` || (a(), !1));
+      }),
+      (t[7] = a),
+      (t[8] = h));
+  let g = h,
+    _;
+  return (
+    t[9] !== g || t[10] !== m || t[11] !== s || t[12] !== r
+      ? ((_ = (0, qe.jsx)(Be, { onFrame: g, onResize: m, playing: s, reducedMotion: r })),
+        (t[9] = g),
+        (t[10] = m),
+        (t[11] = s),
+        (t[12] = r),
+        (t[13] = _))
+      : (_ = t[13]),
+    _
+  );
+}
+function Ge(e, t, n) {
+  let r = getComputedStyle(n).color,
+    i = Re(_e(t));
+  (e.clearRect(0, 0, t.width, t.height),
+    (e.fillStyle = r),
+    (e.font = z(n, t.level.fontSize)),
+    (e.textAlign = `center`),
+    (e.textBaseline = `middle`));
+  for (let n of t.asteroids)
+    ((e.globalAlpha = (n.bonus ? 0.85 : 0.55) * i), e.fillText(n.character, n.x, n.y));
+  e.globalAlpha = 0.95 * i;
+  for (let n of t.bullets) (e.beginPath(), e.arc(n.x, n.y, n.radius, 0, Math.PI * 2), e.fill());
+  (ze(e, n, t.score, i),
+    (e.globalAlpha = 0.95 * i),
+    e.save(),
+    e.translate(t.ship.x, t.ship.y),
+    e.rotate(t.ship.angle * Math.PI * 2),
+    e.beginPath(),
+    e.moveTo(9, 0),
+    e.lineTo(-6, -5),
+    e.lineTo(-3, 0),
+    e.lineTo(-6, 5),
+    e.closePath(),
+    e.fill(),
+    e.restore(),
+    (e.globalAlpha = 1));
+}
+var Ke, W, qe;
+function Je() {
+  return (Je = e(() => {
+    ((Ke = t()), (W = f()), l(), Le(), U(), B(), O(), (qe = a()));
+  }))();
+}
+function Ye({ animateEntrance: e = !0, height: t, level: n, measureText: r, width: i }) {
+  let a = G(n, i, 0, e, r),
+    o = dt(i, a.length);
+  return {
+    animatesEntrance: e,
+    ball: { radius: yt, velocityX: 105, velocityY: -145, x: i / 2, y: t - Y - J - yt - 6 },
+    combo: 0,
+    completedAtSeconds: null,
+    elapsedSeconds: 0,
+    glyphs: a,
+    height: t,
+    lastHitAtSeconds: null,
+    level: n,
+    measureText: r,
+    nextLevelUpdateAtSeconds: null,
+    pendingLevel: null,
+    paddle: { height: J, width: o, x: i / 2, y: t - Y - J / 2 },
+    score: 0,
+    status: `playing`,
+    width: i,
+  };
+}
+function Xe(e, t, n) {
+  if (e.status === `lost`) return;
+  let r = e.elapsedSeconds;
+  if (
+    ((e.elapsedSeconds += Math.max(0, t)),
+    e.lastHitAtSeconds != null &&
+      e.elapsedSeconds - e.lastHitAtSeconds > bt &&
+      ((e.combo = 0), (e.lastHitAtSeconds = null)),
+    e.pendingLevel != null &&
+      e.nextLevelUpdateAtSeconds != null &&
+      e.elapsedSeconds >= e.nextLevelUpdateAtSeconds &&
+      (it(e, e.pendingLevel), (e.pendingLevel = null), (e.nextLevelUpdateAtSeconds = null)),
+    e.status === `cleared`)
+  ) {
+    for (let n of e.glyphs) n.falling && rt(n, Math.min(t, 0.05));
+    return;
+  }
+  let i = e.animatesEntrance ? xt : 0,
+    a = Math.min(Math.max(0, e.elapsedSeconds - Math.max(r, i)), 0.05);
+  if (a === 0) return;
+  let o = a;
+  for (; o > 0 && e.status === `playing`;) {
+    let t = Math.min(vt, o);
+    (nt(e, t, n), (o -= t));
+  }
+}
+function Ze(e, { height: t, measureText: n, width: r }) {
+  let i = r / e.width,
+    a = t / e.height,
+    o = new Map(e.glyphs.map((e) => [e.id, e])),
+    s = G(e.level, r, e.elapsedSeconds, e.animatesEntrance, n).map((e) => {
+      let t = o.get(e.id);
+      return t == null
+        ? e
+        : t.falling
+          ? { ...t, x: t.x * i, y: t.y * a }
+          : { ...e, appearsAtSeconds: t.appearsAtSeconds };
+    }),
+    c = new Set(s.map((e) => e.id));
+  (s.push(
+    ...e.glyphs
+      .filter((e) => e.falling && !c.has(e.id))
+      .map((e) => ({ ...e, x: e.x * i, y: e.y * a })),
+  ),
+    (e.ball.x = K(e.ball.x * i, e.ball.radius, r - e.ball.radius)),
+    (e.ball.y = K(e.ball.y * a, e.ball.radius, t - e.ball.radius)),
+    (e.glyphs = s),
+    (e.height = t),
+    (e.measureText = n),
+    (e.paddle.width = dt(r, s.length)),
+    (e.paddle.x = K(e.paddle.x * i, e.paddle.width / 2, r - e.paddle.width / 2)),
+    (e.paddle.y = t - Y - e.paddle.height / 2),
+    (e.width = r));
+}
+function Qe(e, t) {
+  if (e.level.key === t.key) {
+    ((e.pendingLevel = null), (e.nextLevelUpdateAtSeconds = null));
+    return;
+  }
+  e.pendingLevel?.key !== t.key &&
+    ((e.pendingLevel = t), (e.nextLevelUpdateAtSeconds ??= e.elapsedSeconds + gt));
+}
+function $e(e) {
+  return e.animatesEntrance ? K(e.elapsedSeconds / xt, 0, 1) : 1;
+}
+function et(e, t) {
+  return e.animatesEntrance ? K((e.elapsedSeconds - t.appearsAtSeconds) / mt, 0, 1) : 1;
+}
+function G(e, t, n, r, i) {
+  let a = new Map(),
+    o = (e, t) => {
+      let n = a.get(e);
+      if (n != null) return n;
+      let r = i(e, t);
+      return (a.set(e, r), r);
+    };
+  return at(e, t - 16, o)
+    .slice(-4)
+    .flatMap((i, a) => {
+      let s = (t - st(i, e.fontSize, o)) / 2;
+      return i.flatMap((t) => {
+        let i = Math.max(o(t.character, e.fontSize), 4),
+          c = /\s/u.test(t.character)
+            ? []
+            : [
+                {
+                  appearsAtSeconds: r ? n + a * ht : n - mt,
+                  bonus: t.bonus,
+                  character: t.character,
+                  falling: !1,
+                  height: Math.max(ft, e.fontSize + 3),
+                  id: t.id,
+                  velocityX: 0,
+                  velocityY: 0,
+                  width: i,
+                  x: s,
+                  y: pt + a * (Math.max(ft, e.fontSize + 3) + q),
+                },
+              ];
+        return ((s += i + q), c);
+      });
     });
-  }, [available, composerId, input.composerInput, scope]);
-  if (!available || !active || game == null) return null;
-  const conversation = input.conversationItems == null ? shared.BX?.(initial.lQt, active ? input.conversationId ?? null : null) : { items: input.conversationItems };
-  const fallback = input.fallbackText ?? globalThis.document?.querySelector?.("[data-feature='game-source']")?.textContent?.trim() ?? "";
-  const level = buildLevel(conversation, fallback);
-  return jsx.jsx(GameCanvas, { game, level, playing: (input.playing ?? true) && status === "connected", onExit: input.onExit ?? (() => miniGames.t?.(scope)) });
 }
-
-export { CodexMicroMiniGameComposer };
+function tt(e, t) {
+  let n = K(e.ball.x, t.x - 1, t.x + t.width + 1),
+    r = K(e.ball.y, t.y - 1, t.y + t.height + 1),
+    i = e.ball.x - n,
+    a = e.ball.y - r;
+  return i * i + a * a <= e.ball.radius * e.ball.radius;
+}
+function nt(e, t, n) {
+  let r = e.paddle.width / 2;
+  e.paddle.x = K(e.paddle.x + K(n, -1, 1) * 440 * t, r, e.width - r);
+  let i = e.ball;
+  ((i.x += i.velocityX * t),
+    (i.y += i.velocityY * t),
+    i.x - i.radius <= 0 && i.velocityX < 0
+      ? ((i.x = i.radius), (i.velocityX *= -1))
+      : i.x + i.radius >= e.width &&
+        i.velocityX > 0 &&
+        ((i.x = e.width - i.radius), (i.velocityX *= -1)),
+    i.y - i.radius <= 0 && i.velocityY < 0 && ((i.y = i.radius), (i.velocityY *= -1)));
+  let a = e.paddle.y - e.paddle.height / 2;
+  i.velocityY > 0 &&
+    i.y + i.radius >= a &&
+    i.y - i.radius <= e.paddle.y + e.paddle.height / 2 &&
+    Math.abs(i.x - e.paddle.x) <= r + i.radius &&
+    ((i.y = a - i.radius),
+    (i.velocityY = -Math.abs(i.velocityY)),
+    (i.velocityX += ((i.x - e.paddle.x) / r) * Math.abs(i.velocityY) * 0.45));
+  for (let n of e.glyphs) {
+    if (n.falling) {
+      rt(n, t);
+      continue;
+    }
+    if (!(et(e, n) < 1 || !tt(e, n))) {
+      ((n.falling = !0),
+        (n.velocityX = i.velocityX * 0.18),
+        (n.velocityY = -55),
+        (e.combo =
+          e.lastHitAtSeconds != null && e.elapsedSeconds - e.lastHitAtSeconds <= bt
+            ? Math.min(e.combo + 1, 5)
+            : 1),
+        (e.lastHitAtSeconds = e.elapsedSeconds),
+        (e.score += k(n.bonus) * e.combo),
+        (i.velocityY *= -1),
+        ut(e),
+        e.pendingLevel == null &&
+          e.glyphs.every((e) => e.falling) &&
+          ((e.status = `cleared`), (e.completedAtSeconds = e.elapsedSeconds)));
+      break;
+    }
+  }
+  i.y - i.radius > e.height && ((e.status = `lost`), (e.completedAtSeconds = e.elapsedSeconds));
+}
+function rt(e, t) {
+  ((e.velocityY += 420 * t), (e.x += e.velocityX * t), (e.y += e.velocityY * t));
+}
+function it(e, t) {
+  let n = new Map(e.glyphs.map((e) => [e.id, e]));
+  ((e.level = t),
+    (e.glyphs = G(t, e.width, e.elapsedSeconds, e.animatesEntrance, e.measureText).map((e) => {
+      let t = n.get(e.id);
+      return t?.character === e.character ? t : e;
+    })),
+    e.status === `cleared` &&
+      e.glyphs.some((e) => !e.falling) &&
+      ((e.status = `playing`), (e.completedAtSeconds = null)));
+}
+function at(e, t, n) {
+  let r = [];
+  for (let i of e.blocks) {
+    let a = [];
+    for (let o of ot(i.glyphs)) {
+      let i = a.length === 0 ? lt(o) : o;
+      for (
+        a.length > 0 && st([...a, ...i], e.fontSize, n) > t
+          ? (r.push(a), (a = lt(i)))
+          : a.push(...i);
+        st(a, e.fontSize, n) > t;
+      ) {
+        let i = ct(a, t, e.fontSize, n);
+        (r.push(a.slice(0, i)), (a = lt(a.slice(i))));
+      }
+    }
+    a.length > 0 && r.push(a);
+  }
+  return r;
+}
+function ot(e) {
+  let t = [],
+    n = [];
+  for (let r of e) /\s/u.test(r.character) && n.some(P) ? (t.push(n), (n = [r])) : n.push(r);
+  return (n.some(P) && t.push(n), t);
+}
+function st(e, t, n) {
+  return e.reduce((e, r) => e + Math.max(n(r.character, t), 4) + q, -1);
+}
+function ct(e, t, n, r) {
+  let i = 0;
+  for (let [a, o] of e.entries())
+    if (((i += Math.max(r(o.character, n), 4) + q), i > t)) return Math.max(a, 1);
+  return e.length;
+}
+function lt(e) {
+  let t = e.findIndex(P);
+  return t === -1 ? [] : e.slice(t);
+}
+function ut(e) {
+  let t = Math.hypot(e.ball.velocityX, e.ball.velocityY);
+  if (t === 0 || t >= _t) return;
+  let n = Math.min(t * 1.015, _t) / t;
+  ((e.ball.velocityX *= n), (e.ball.velocityY *= n));
+}
+function dt(e, t) {
+  return K(e * (0.3 - Math.min(t / 120, 1) * 0.1), 52, 96);
+}
+function K(e, t, n) {
+  return Math.min(Math.max(e, t), n);
+}
+var ft, q, pt, mt, ht, gt, _t, vt, J, Y, yt, bt, xt;
+function St() {
+  return (St = e(() => {
+    (F(),
+      (ft = 16),
+      (q = 1),
+      (pt = 8),
+      (mt = 0.19),
+      (ht = 0.03),
+      (gt = 0.2),
+      (_t = 240),
+      (vt = 1 / 120),
+      (J = 6),
+      (Y = 12),
+      (yt = 5),
+      (bt = 1.5),
+      (xt = 0.28));
+  }))();
+}
+function Ct(e) {
+  let t = (0, Dt.c)(14),
+    { playing: n, reducedMotion: r, level: i, onExit: a } = e,
+    s = n === void 0 || n,
+    c = (0, X.useRef)(null),
+    l;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((l = { expiresAt: 0, value: 0 }), (t[0] = l))
+    : (l = t[0]);
+  let u = (0, X.useRef)(l),
+    d;
+  (t[1] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((d = (e) => {
+        let { event: t } = e;
+        u.current = { expiresAt: globalThis.performance.now() + jt, value: wt(t) };
+      }),
+      (t[1] = d))
+    : (d = t[1]),
+    o(`codex-micro-joystick-event`, d));
+  let f, p;
+  (t[2] === i
+    ? ((f = t[3]), (p = t[4]))
+    : ((f = () => {
+        let e = c.current;
+        e != null && Qe(e, i);
+      }),
+      (p = [i]),
+      (t[2] = i),
+      (t[3] = f),
+      (t[4] = p)),
+    (0, X.useEffect)(f, p));
+  let m;
+  t[5] === i
+    ? (m = t[6])
+    : ((m = function (e, t, n, r) {
+        let a = (n, r) => ((e.font = z(t, r)), e.measureText(n).width);
+        (c.current == null
+          ? (c.current = Ye({
+              animateEntrance: r,
+              height: 192,
+              level: i,
+              measureText: a,
+              width: n,
+            }))
+          : (c.current.width !== n || c.current.height !== 192) &&
+            Ze(c.current, { height: 192, measureText: a, width: n }),
+          Tt(e, c.current, t));
+      }),
+      (t[5] = i),
+      (t[6] = m));
+  let h = m,
+    g;
+  t[7] === a
+    ? (g = t[8])
+    : ((g = function (e, t, n, r) {
+        let i = c.current;
+        return (
+          i == null ||
+          (Xe(i, n, r < u.current.expiresAt ? u.current.value : 0),
+          Tt(e, i, t),
+          i.status === `lost` ||
+          (i.status === `cleared` &&
+            i.completedAtSeconds != null &&
+            i.elapsedSeconds - i.completedAtSeconds >= At)
+            ? (a(), !1)
+            : !0)
+        );
+      }),
+      (t[7] = a),
+      (t[8] = g));
+  let _ = g,
+    v;
+  return (
+    t[9] !== _ || t[10] !== h || t[11] !== s || t[12] !== r
+      ? ((v = (0, Ot.jsx)(Be, { onFrame: _, onResize: h, playing: s, reducedMotion: r })),
+        (t[9] = _),
+        (t[10] = h),
+        (t[11] = s),
+        (t[12] = r),
+        (t[13] = v))
+      : (v = t[13]),
+    v
+  );
+}
+function wt(e) {
+  return e.distance < 0.08 ? 0 : Math.cos(e.angle * Math.PI * 2) * Math.min(e.distance / 0.7, 1);
+}
+function Tt(e, t, n) {
+  let r = getComputedStyle(n).color,
+    i = Re(Et(($e(t) - 0.55) / 0.45, 0, 1));
+  (e.clearRect(0, 0, t.width, t.height),
+    (e.fillStyle = r),
+    (e.font = z(n, t.level.fontSize)),
+    (e.textBaseline = `top`));
+  for (let n of t.glyphs) {
+    let r = Re(et(t, n));
+    ((e.globalAlpha = (n.falling ? 0.7 : n.bonus ? 0.65 : 0.5) * r),
+      e.fillText(n.character, n.x, n.y + (1 - r) * kt));
+  }
+  (ze(e, n, t.score, i, `×${Math.max(t.combo, 1)}`),
+    (e.globalAlpha = 0.95 * i),
+    e.beginPath(),
+    e.roundRect(
+      t.paddle.x - t.paddle.width / 2,
+      t.paddle.y - t.paddle.height / 2,
+      t.paddle.width,
+      t.paddle.height,
+      t.paddle.height / 2,
+    ),
+    e.fill(),
+    (e.globalAlpha = i),
+    (e.shadowBlur = 10),
+    (e.shadowColor = r),
+    e.beginPath(),
+    e.arc(t.ball.x, t.ball.y, t.ball.radius, 0, Math.PI * 2),
+    e.fill(),
+    (e.shadowBlur = 0),
+    (e.globalAlpha = 1));
+}
+function Et(e, t, n) {
+  return Math.min(Math.max(e, t), n);
+}
+var Dt, X, Ot, kt, At, jt;
+function Mt() {
+  return (Mt = e(() => {
+    ((Dt = t()), (X = f()), l(), St(), U(), B(), (Ot = a()), (kt = 8), (At = 0.8), (jt = 600));
+  }))();
+}
+function Nt(e) {
+  let t = (192 - Q.inset * 2) / Q.rows;
+  return Math.max(6, Math.floor((e - Q.inset * 2) / t));
+}
+function Pt({ columns: e, level: t, random: n = Math.random, rows: r }) {
+  let i = { x: Math.floor(e / 2), y: Math.floor(r / 2) },
+    a = {
+      body: [i, { x: i.x - 1, y: i.y }, { x: i.x - 2, y: i.y }],
+      columns: e,
+      direction: `right`,
+      food: { bonus: !1, character: `•`, x: 0, y: 0 },
+      foodCollected: 0,
+      foodGlyphs: Ut(t),
+      inputState: `waiting-for-neutral`,
+      nextDirection: `right`,
+      random: n,
+      rows: r,
+      score: 0,
+      status: `playing`,
+      stepAccumulatorSeconds: 0,
+    };
+  return (Ht(a), a);
+}
+function Ft(e, t) {
+  if (e.status !== `playing` || e.inputState !== `moving`) return;
+  let n = Gt(e);
+  ((e.stepAccumulatorSeconds = Math.min(e.stepAccumulatorSeconds + Math.max(0, t), n)),
+    e.stepAccumulatorSeconds >= n && ((e.stepAccumulatorSeconds = 0), zt(e)));
+}
+function It(e, t) {
+  if (e.status !== `playing`) return;
+  if (e.inputState === `waiting-for-neutral`) {
+    t.distance < qt && (e.inputState = `waiting-for-direction`);
+    return;
+  }
+  let n = T(t, Kt);
+  if (n != null) {
+    if (n === e.nextDirection) {
+      e.inputState = `moving`;
+      return;
+    }
+    Wt(n, e.direction) || ((e.inputState = `moving`), (e.nextDirection = n));
+  }
+}
+function Lt(e, t) {
+  e.foodGlyphs = Ut(t);
+}
+function Rt(e, t) {
+  if (t <= e.columns) return;
+  let n = Math.floor(t / 2) - Math.floor(e.columns / 2);
+  e.columns = t;
+  for (let t of e.body) t.x += n;
+  e.food.x += n;
+}
+function zt(e) {
+  e.direction = e.nextDirection;
+  let t = Bt(e);
+  if (Vt(e, t)) {
+    e.status = `lost`;
+    return;
+  }
+  let n = Z(t, e.food);
+  if ((e.body.unshift(t), n)) {
+    ((e.foodCollected += 1), (e.score += k(e.food.bonus)), Ht(e));
+    return;
+  }
+  e.body.pop();
+}
+function Bt(e) {
+  let t = e.body[0];
+  switch (e.direction) {
+    case `up`:
+      return { x: t.x, y: t.y - 1 };
+    case `right`:
+      return { x: t.x + 1, y: t.y };
+    case `down`:
+      return { x: t.x, y: t.y + 1 };
+    case `left`:
+      return { x: t.x - 1, y: t.y };
+  }
+}
+function Vt(e, t) {
+  return (
+    t.x < 0 ||
+    t.x >= e.columns ||
+    t.y < 0 ||
+    t.y >= e.rows ||
+    (Z(t, e.food) ? e.body : e.body.slice(0, -1)).some((e) => Z(e, t))
+  );
+}
+function Ht(e) {
+  let t = [];
+  for (let n = 0; n < e.rows; n += 1)
+    for (let r = 0; r < e.columns; r += 1)
+      e.body.some((e) => e.x === r && e.y === n) || t.push({ x: r, y: n });
+  let n = t[Math.floor(e.random() * t.length)];
+  n != null &&
+    (e.food = {
+      ...(e.foodGlyphs[e.foodCollected % e.foodGlyphs.length] ?? { bonus: !1, character: `•` }),
+      ...n,
+    });
+}
+function Ut(e) {
+  let t = e.blocks
+    .flatMap((e) => e.glyphs)
+    .filter(P)
+    .map(({ bonus: e, character: t }) => ({ bonus: e, character: t }));
+  return t.length > 0 ? t : [{ bonus: !1, character: `•` }];
+}
+function Wt(e, t) {
+  switch (t) {
+    case `up`:
+      return e === `down`;
+    case `right`:
+      return e === `left`;
+    case `down`:
+      return e === `up`;
+    case `left`:
+      return e === `right`;
+  }
+}
+function Z(e, t) {
+  return e.x === t.x && e.y === t.y;
+}
+function Gt(e) {
+  return Math.max(Yt, Jt - e.foodCollected * Xt);
+}
+var Q, Kt, qt, Jt, Yt, Xt;
+function Zt() {
+  return (Zt = e(() => {
+    (b(),
+      B(),
+      F(),
+      (Q = { inset: 8, rows: 12 }),
+      (Kt = 0.65),
+      (qt = 0.35),
+      (Jt = 0.16),
+      (Yt = 0.08),
+      (Xt = 0.006));
+  }))();
+}
+function Qt(e) {
+  let t = (0, en.c)(13),
+    { playing: n, reducedMotion: r, level: i, onExit: a } = e,
+    s = n === void 0 || n,
+    c = (0, tn.useRef)(null),
+    l;
+  (t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((l = (e) => {
+        let { event: t } = e,
+          n = c.current;
+        n != null && It(n, t);
+      }),
+      (t[0] = l))
+    : (l = t[0]),
+    o(`codex-micro-joystick-event`, l));
+  let u, d;
+  (t[1] === i
+    ? ((u = t[2]), (d = t[3]))
+    : ((u = () => {
+        let e = c.current;
+        e != null && Lt(e, i);
+      }),
+      (d = [i]),
+      (t[1] = i),
+      (t[2] = u),
+      (t[3] = d)),
+    (0, tn.useEffect)(u, d));
+  let f;
+  t[4] === i
+    ? (f = t[5])
+    : ((f = function (e, t, n) {
+        let r = Nt(n),
+          a = (c.current ??= Pt({ columns: r, level: i, rows: Q.rows }));
+        (Rt(a, r), $t(e, a, t, n));
+      }),
+      (t[4] = i),
+      (t[5] = f));
+  let p = f,
+    m;
+  t[6] === a
+    ? (m = t[7])
+    : ((m = function (e, t, n) {
+        let r = c.current;
+        return (
+          r == null || (Ft(r, n), $t(e, r, t, t.clientWidth), r.status === `playing` || (a(), !1))
+        );
+      }),
+      (t[6] = a),
+      (t[7] = m));
+  let h = m,
+    g;
+  return (
+    t[8] !== h || t[9] !== p || t[10] !== s || t[11] !== r
+      ? ((g = (0, nn.jsx)(Be, { onFrame: h, onResize: p, playing: s, reducedMotion: r })),
+        (t[8] = h),
+        (t[9] = p),
+        (t[10] = s),
+        (t[11] = r),
+        (t[12] = g))
+      : (g = t[12]),
+    g
+  );
+}
+function $t(e, t, n, r) {
+  let i = Math.min((r - Q.inset * 2) / t.columns, (192 - Q.inset * 2) / t.rows),
+    a = (r - i * t.columns) / 2,
+    o = (192 - i * t.rows) / 2,
+    s = getComputedStyle(n).color;
+  (e.clearRect(0, 0, r, 192),
+    (e.fillStyle = s),
+    (e.font = z(n, Math.min(16, i * 0.9))),
+    (e.textAlign = `center`),
+    (e.textBaseline = `middle`),
+    (e.globalAlpha = t.food.bonus ? 0.95 : 0.7),
+    e.fillText(t.food.character, a + (t.food.x + 0.5) * i, o + (t.food.y + 0.5) * i),
+    (e.shadowColor = s));
+  for (let [n, r] of t.body.entries()) {
+    let t = n === 0 ? 1 : 2;
+    ((e.globalAlpha = Math.max(0.34, 0.92 - n * 0.06)),
+      (e.shadowBlur = n === 0 ? 10 : 0),
+      e.beginPath(),
+      e.roundRect(
+        a + r.x * i + t,
+        o + r.y * i + t,
+        i - t * 2,
+        i - t * 2,
+        Math.max(2, (i - t * 2) / 3),
+      ),
+      e.fill());
+  }
+  ((e.shadowBlur = 0), ze(e, n, t.score, 1), (e.globalAlpha = 1), (e.textAlign = `start`));
+}
+var en, tn, nn;
+function rn() {
+  return (rn = e(() => {
+    ((en = t()), (tn = f()), l(), U(), B(), Zt(), (nn = a()));
+  }))();
+}
+function an(e) {
+  let t = (0, on.c)(24),
+    { composerInput: r, conversationId: a, isSideChat: o, playing: c, showPendingRequest: l } = e,
+    d = c === void 0 || c,
+    f = s(u),
+    p = s(x),
+    h;
+  t[0] === p.value ? (h = t[1]) : ((h = g(p.value)), (t[0] = p.value), (t[1] = h));
+  let _ = h,
+    v = i(te),
+    { status: y } = i(m),
+    b = v?.composerId === _,
+    C = n(S, b ? a : null),
+    w = !o && !l && (y === `connected` || (b && y !== `not-detected`)),
+    T = d && y === `connected`,
+    E;
+  t[2] === f
+    ? (E = t[3])
+    : ((E = function () {
+        ne(f);
+      }),
+      (t[2] = f),
+      (t[3] = E));
+  let D = E,
+    O,
+    k;
+  if (
+    (t[4] !== w || t[5] !== _ || t[6] !== r || t[7] !== f
+      ? ((O = () => {
+          if (w)
+            return ee(_, r, () => {
+              f.get(te)?.composerId === _ && ne(f);
+            });
+        }),
+        (k = [w, _, r, f]),
+        (t[4] = w),
+        (t[5] = _),
+        (t[6] = r),
+        (t[7] = f),
+        (t[8] = O),
+        (t[9] = k))
+      : ((O = t[8]), (k = t[9])),
+    (0, sn.useEffect)(O, k),
+    !w || !b)
+  )
+    return null;
+  let A;
+  t[10] === C
+    ? (A = t[11])
+    : ((A = re(
+        C,
+        document.querySelector(`[data-feature='game-source']`)?.textContent?.trim() ?? ``,
+      )),
+      (t[10] = C),
+      (t[11] = A));
+  let j = A;
+  switch (v.game) {
+    case `asteroids`: {
+      let e;
+      return (
+        t[12] !== D || t[13] !== T || t[14] !== j
+          ? ((e = (0, $.jsx)(We, { level: j, onExit: D, playing: T })),
+            (t[12] = D),
+            (t[13] = T),
+            (t[14] = j),
+            (t[15] = e))
+          : (e = t[15]),
+        e
+      );
+    }
+    case `brick-breaker`: {
+      let e;
+      return (
+        t[16] !== D || t[17] !== T || t[18] !== j
+          ? ((e = (0, $.jsx)(Ct, { level: j, onExit: D, playing: T })),
+            (t[16] = D),
+            (t[17] = T),
+            (t[18] = j),
+            (t[19] = e))
+          : (e = t[19]),
+        e
+      );
+    }
+    case `snake`: {
+      let e;
+      return (
+        t[20] !== D || t[21] !== T || t[22] !== j
+          ? ((e = (0, $.jsx)(Qt, { level: j, onExit: D, playing: T })),
+            (t[20] = D),
+            (t[21] = T),
+            (t[22] = j),
+            (t[23] = e))
+          : (e = t[23]),
+        e
+      );
+    }
+  }
+}
+var on, sn, $;
+function cn() {
+  return (cn = e(() => {
+    ((on = t()), r(), (sn = f()), h(), y(), c(), _(), Je(), Mt(), F(), O(), rn(), ($ = a()));
+  }))();
+}
+cn();
+export { an as CodexMicroMiniGameComposer };
