@@ -20,22 +20,6 @@ assert.equal(availability.t({ ...available, isLocked: true }), false);
 assert.equal(availability.t({ ...available, client: { getDynamicConfig() { return { get() { return true; } }; } } }), false);
 
 const queryReleaseAssertions = assertReleaseOwner("command-menu-queries");
+const searchReleaseAssertions = assertReleaseOwner("command-menu-search-results");
 
-const search = await bundle("command-menu-search-results");
-assert.deepEqual(Object.keys(search).sort(), ["a", "i", "n", "o", "r", "t"]);
-const items = [
-  { id: "1", source_type: "conversation", source_key: "conversation", title: "Launch plan", snippet: "Budget", match_kind: "title", update_time: 2, payload: { conversation_id: "c1" } },
-  { id: "2", source_type: "library", source_key: "library:document", title: "Launch notes", snippet: "Draft", payload: { library_item_id: "l1" } },
-  { id: "3", source_type: "library", source_key: "library:document", title: "Launch duplicate", payload: { library_item_id: "l1" } },
-];
-const allResults = search.n({ items, search: "launch", searchFilter: "all" });
-assert.equal(allResults.searchItems.length, 2);
-assert.equal(allResults.searchResults[0].conversationId, "c1");
-assert.equal(allResults.searchResults[0].updatedAt, 2000);
-const documents = search.n({ items, search: "launch", searchFilter: "documents" });
-assert.equal(documents.searchItems.length, 1);
-assert.equal(documents.searchItems[0].id, "2");
-assert.equal(search.o(items, "l1").length, 1);
-assert.deepEqual(search.r, []);
-
-console.log(`command menu support cluster tests passed with ${queryReleaseAssertions} query release assertions`);
+console.log(`command menu support cluster tests passed with ${queryReleaseAssertions + searchReleaseAssertions} query/search release assertions`);

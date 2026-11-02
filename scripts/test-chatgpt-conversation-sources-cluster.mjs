@@ -7,7 +7,7 @@ import * as esbuild from "esbuild";
 import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["open-audio-summary-dialog", "open-conversation-files"];
+const MODULES = ["open-conversation-files"];
 const state = globalThis.__conversationSourcesTest = {};
 state.jsx = { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } };
 const imports = new Map();
@@ -37,15 +37,7 @@ const releaseAssertions = assertReleaseOwner("chatgpt-sources-side-panel-tab", [
   /export \{ kn as ChatGptSourcesSidePanelTab, Dn as ChatGptSummarySourcesCount \}/,
 ]);
 
-// open-audio-summary-dialog: 5
-const audio = await bundle("open-audio-summary-dialog");
-assert.deepEqual(Object.keys(audio), ["openAudioSummaryDialog"]);
-let dialogId, dialogRequest;
-audio.openAudioSummaryDialog({ openDialog(id, request) { dialogId = id; dialogRequest = request; } }, "conversation-1");
-assert.equal(dialogId, "audio-summary");
-assert.deepEqual(dialogRequest, { conversationId: "conversation-1" });
-assert.equal(audio.openAudioSummaryDialog({}, "conversation-2"), undefined);
-assert.equal(typeof audio.openAudioSummaryDialog, "function");
+const audioReleaseAssertions = assertReleaseOwner("open-audio-summary-dialog");
 
 // open-conversation-files: 8
 const files = await bundle("open-conversation-files");
@@ -61,4 +53,4 @@ assert.deepEqual(panelRequest.props, { accountId: "account", conversationId: "co
 panelRequest = undefined; files.openConversationFiles({ ...filesHost, accountId: null }); assert.equal(panelRequest, undefined);
 assert.equal(typeof files.openConversationFiles, "function");
 
-console.log(`chatgpt conversation sources cluster tests passed with ${releaseAssertions} release assertions`);
+console.log(`chatgpt conversation sources cluster tests passed with ${releaseAssertions + audioReleaseAssertions} release assertions`);

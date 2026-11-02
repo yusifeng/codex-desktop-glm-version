@@ -1,217 +1,911 @@
-// Thread overflow actions.  The release component derives actions from the
-// current app scope; callers provide thread identity/context, not callbacks.
-
-import * as shared from "@rchunk/app-shared";
-import * as initial from "@rchunk/app-initial";
-import * as automationPanel from "@rchunk/open-automation-side-panel-tab";
-import * as targetApps from "@rchunk/use-target-apps";
-import * as sideChat from "@rchunk/local-conversation-side-chat";
-import * as pinBridge from "@rchunk/thread-pin-shortcut-bridge";
-
-interface ThreadOverflowMenuProps {
-  archiveNavigation?: "home" | string;
-  archiveSource?: string;
-  canPin?: boolean;
-  conversationId?: string | null;
-  cwd?: string;
-  dropdownAlign?: "start" | "center" | "end";
-  getConversationMarkdown?: (() => Promise<string> | string) | null;
-  hostId?: string;
-  isWorktreeThread?: boolean;
-  leadingItems?: unknown[];
-  markdownParentConversationId?: string | null;
-  onRenamePendingWorktree?(title: string): void;
-  pendingClientThreadId?: string | null;
-  pendingWorktreeId?: string | null;
-  sideChatTab?: unknown;
-  title?: string;
-  triggerButtonClassName?: string;
-  triggerButtonColor?: string;
-  triggerButtonSize?: string;
-  triggerIconClassName?: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  C_ as r,
+  Df as ee,
+  Di as te,
+  FX as i,
+  HX as ne,
+  Hd as a,
+  I3 as o,
+  JF as re,
+  K2 as s,
+  K3 as c,
+  KF as ie,
+  LX as ae,
+  Of as oe,
+  Oi as l,
+  Q3 as se,
+  QI as u,
+  S_ as ce,
+  Vd as le,
+  W3 as ue,
+  Yh as de,
+  Z3 as d,
+  ZI as fe,
+  Zh as pe,
+  e6 as me,
+  fI as he,
+  iW as ge,
+  lY as _e,
+  lk as ve,
+  n4 as ye,
+  pk as be,
+  qF as xe,
+  wL as Se,
+} from "@rchunk/app-shared";
+import {
+  $en as Ce,
+  B0t as we,
+  Bxt as Te,
+  DY as Ee,
+  GSt as De,
+  HSt as Oe,
+  HZt as ke,
+  Hf as Ae,
+  Hp as je,
+  JQt as Me,
+  JZt as Ne,
+  Lh as Pe,
+  Lxt as Fe,
+  Mm as Ie,
+  N7 as Le,
+  Nm as f,
+  Nxt as p,
+  OY as Re,
+  P7 as m,
+  QCt as ze,
+  Qft as Be,
+  Qgn as Ve,
+  Qln as He,
+  Rh as Ue,
+  S_t as We,
+  Udn as h,
+  Up as g,
+  Uxt as Ge,
+  V1t as Ke,
+  Vf as qe,
+  Vp as Je,
+  Wdn as Ye,
+  X1t as Xe,
+  ZCt as _,
+  _lt as Ze,
+  aet as v,
+  dlt as Qe,
+  ept as $e,
+  fEt as y,
+  flt as et,
+  glt as tt,
+  hlt as nt,
+  i$t as rt,
+  itn as b,
+  net as x,
+  nun as S,
+  o_n as it,
+  pEt as at,
+  plt as C,
+  qSt as ot,
+  rM as w,
+  rQt as st,
+  t0t as T,
+  tM as ct,
+  vQt as lt,
+  v_t as E,
+  vlt as ut,
+  wQt as dt,
+  xpn as ft,
+  y_t as pt,
+  ypn as D,
+  z1t as O,
+} from "@rchunk/app-initial";
+import { n as mt, r as ht, t as k } from "@rchunk/open-automation-side-panel-tab";
+import { n as A, t as gt } from "@rchunk/use-target-apps";
+import { n as _t, r as vt } from "@rchunk/local-conversation-side-chat";
+import { n as j, t as yt } from "@rchunk/thread-pin-shortcut-bridge";
+function M(e) {
+  let t = (0, xt.c)(206),
+    {
+      conversationId: r,
+      getConversationMarkdown: i,
+      markdownParentConversationId: a,
+      pendingClientThreadId: o,
+      pendingWorktreeId: s,
+      onRenamePendingWorktree: oe,
+      sideChatTab: l,
+      cwd: u,
+      hostId: ue,
+      title: d,
+      canPin: pe,
+      isWorktreeThread: me,
+      archiveNavigation: he,
+      archiveSource: ve,
+      dropdownAlign: Se,
+      triggerButtonClassName: Te,
+      triggerButtonColor: Ee,
+      triggerButtonSize: Oe,
+      triggerIconClassName: ke,
+      leadingItems: Ae,
+    } = e,
+    f = pe === void 0 || pe,
+    p = me !== void 0 && me,
+    m = he === void 0 ? `home` : he,
+    Be = ve === void 0 ? `thread_overflow_menu` : ve,
+    Ve = Se === void 0 ? `start` : Se,
+    Ue = Ee === void 0 ? `ghost` : Ee,
+    h = Oe === void 0 ? `icon` : Oe,
+    g = ae(Ce),
+    _ = ae(fe),
+    v = ye(),
+    y = ut(),
+    { cancelPendingWorktree: nt } = ot(),
+    {
+      archiveThread: b,
+      markThreadAsUnread: S,
+      renameThread: C,
+      copyAppLink: w,
+      copyConversationMarkdown: T,
+      copyWorkingDirectory: E,
+    } = y,
+    D = it(),
+    [O, k] = (0, N.useState)(!1),
+    [A, _t] = (0, N.useState)(null),
+    [j, M] = (0, N.useState)(null),
+    [F, St] = (0, N.useState)(null),
+    Ct = n(dt, r),
+    wt = n(Ne, r),
+    Tt = n(Re, r),
+    I = wt || Tt,
+    L = ue ?? Ct,
+    Et;
+  t[0] !== r || t[1] !== L
+    ? ((Et = { conversationId: r, hostId: L }), (t[0] = r), (t[1] = L), (t[2] = Et))
+    : (Et = t[2]);
+  let Dt = n(g.value.routeKind === `local-thread` && g.value.conversationId === r && Je, Et),
+    R = n(Me, r)?.type === `active`,
+    z;
+  t[3] === r ? (z = t[4]) : ((z = r ?? _e(`missing-conversation`)), (t[3] = r), (t[4] = z));
+  let Ot;
+  t[5] === z ? (Ot = t[6]) : ((Ot = Xe(z)), (t[5] = z), (t[6] = Ot));
+  let kt = n(Fe, Ot),
+    At = ne(Ge),
+    jt = n(rt, r),
+    B = n(!1, r),
+    Mt;
+  t[7] === f ? (Mt = t[8]) : ((Mt = { canPin: f }), (t[7] = f), (t[8] = Mt));
+  let { isPinned: Nt, togglePin: Pt } = Ze(r, Mt),
+    Ft = n(We, o ?? null) ?? Nt,
+    It;
+  t[9] !== f || t[10] !== I || t[11] !== Ft || t[12] !== s || t[13] !== g || t[14] !== Pt
+    ? ((It = () => {
+        if (f && !I) {
+          if (s != null) {
+            De(g, s, !Ft);
+            return;
+          }
+          Pt();
+        }
+      }),
+      (t[9] = f),
+      (t[10] = I),
+      (t[11] = Ft),
+      (t[12] = s),
+      (t[13] = g),
+      (t[14] = Pt),
+      (t[15] = It))
+    : (It = t[15]);
+  let Lt = It,
+    Rt = n(x, `toggleThreadPin`),
+    zt = f ? Rt : null,
+    Bt = n(x, `renameThread`),
+    Vt = n(x, `archiveThread`),
+    Ht = n(x, `copyWorkingDirectory`),
+    Ut = n(x, `copyDeeplink`),
+    Wt = n(x, `copyConversationMarkdown`),
+    Gt = n(x, `openSideChat`);
+  n(lt, r);
+  let Kt;
+  t[16] !== r || t[17] !== I || t[18] !== l
+    ? ((Kt = r != null && !I && l != null && !Ye()),
+      (t[16] = r),
+      (t[17] = I),
+      (t[18] = l),
+      (t[19] = Kt))
+    : (Kt = t[19]);
+  let qt = Kt,
+    Jt = n(st, r),
+    Yt = ne($e) ?? {},
+    V;
+  t[20] !== m ||
+  t[21] !== b ||
+  t[22] !== r ||
+  t[23] !== L ||
+  t[24] !== D ||
+  t[25] !== At ||
+  t[26] !== kt ||
+  t[27] !== jt
+    ? ((V = (e) => {
+        if (r == null) return;
+        let t = kt ?? (jt === `projectless` || At?.includes(r) === !0 ? null : void 0),
+          n =
+            m === `home`
+              ? () => {
+                  D(`/`, {
+                    replace: !0,
+                    state: {
+                      focusComposerNonce: Date.now(),
+                      ...(t === void 0 ? {} : { project: Le(t) }),
+                    },
+                  });
+                }
+              : void 0;
+        b({
+          conversationId: r,
+          hostId: L,
+          source: e,
+          onArchiveStart: n,
+          appHistory: {
+            onRedoStart: (e) => {
+              e && n?.();
+            },
+          },
+        });
+      }),
+      (t[20] = m),
+      (t[21] = b),
+      (t[22] = r),
+      (t[23] = L),
+      (t[24] = D),
+      (t[25] = At),
+      (t[26] = kt),
+      (t[27] = jt),
+      (t[28] = V))
+    : (V = t[28]);
+  let H = V,
+    Xt;
+  t[29] !== _ || t[30] !== r || t[31] !== H || t[32] !== L || t[33] !== I || t[34] !== R
+    ? ((Xt = (e) => {
+        r == null ||
+          I ||
+          (async () => {
+            let t = null;
+            try {
+              let e = await He(`list-automations`);
+              t = ct({ automations: e.items, conversationId: r, includePausedAutomations: !0 });
+            } catch (e) {
+              let t = e;
+              se.error(`Error checking heartbeat automation before archive`, {
+                safe: {},
+                sensitive: { error: t },
+              });
+            }
+            if (t == null && !R) {
+              H(e);
+              return;
+            }
+            (_t(e), St(t?.name ?? null), k(!0));
+          })();
+      }),
+      (t[29] = _),
+      (t[30] = r),
+      (t[31] = H),
+      (t[32] = L),
+      (t[33] = I),
+      (t[34] = R),
+      (t[35] = Xt))
+    : (Xt = t[35]);
+  let U = Xt,
+    Zt;
+  t[36] !== r || t[37] !== v || t[38] !== g || t[39] !== d
+    ? ((Zt = (e) => {
+        if (e != null) {
+          mt({ scope: g, automationId: e.id, title: e.name });
+          return;
+        }
+        ht({
+          scope: g,
+          seed: {
+            directiveKey: `thread-overflow-${r}`,
+            mode: null,
+            id: null,
+            kind: `heartbeat`,
+            name: d ?? ``,
+            prompt: ``,
+            rrule: ``,
+            cwds: [],
+            executionEnvironment: null,
+            localEnvironmentConfigPath: null,
+            model: null,
+            reasoningEffort: null,
+            targetThreadId: r,
+            status: `ACTIVE`,
+          },
+          title:
+            d ??
+            v.formatMessage({
+              id: `localConversation.automation.newTabTitle`,
+              defaultMessage: `New scheduled task`,
+              description: `Right panel tab title for a scheduled task created from a task`,
+            }),
+        });
+      }),
+      (t[36] = r),
+      (t[37] = v),
+      (t[38] = g),
+      (t[39] = d),
+      (t[40] = Zt))
+    : (Zt = t[40]);
+  let Qt = Zt,
+    $t;
+  t[41] !== Jt ||
+  t[42] !== r ||
+  t[43] !== u ||
+  t[44] !== L ||
+  t[45] !== v ||
+  t[46] !== g ||
+  t[47] !== l
+    ? (($t = () => {
+        r != null &&
+          l != null &&
+          vt(g, l, {
+            sourceConversationId: r,
+            cwd: u,
+            hostId: L,
+            collaborationMode: Jt,
+            intl: v,
+          }).catch((e) => {
+            (se.error(`Error opening side chat`, { safe: {}, sensitive: { error: e } }),
+              g
+                .get(be)
+                .danger(
+                  v.formatMessage({
+                    id: `threadHeader.openSideChatError`,
+                    defaultMessage: `Failed to open side chat`,
+                    description: `Error message shown when opening a side chat fails`,
+                  }),
+                  { errorAnalytics: { toastId: `threadHeader.openSideChatError` } },
+                ));
+          });
+      }),
+      (t[41] = Jt),
+      (t[42] = r),
+      (t[43] = u),
+      (t[44] = L),
+      (t[45] = v),
+      (t[46] = g),
+      (t[47] = l),
+      (t[48] = $t))
+    : ($t = t[48]);
+  let en = $t,
+    tn;
+  t[49] !== r || t[50] !== T || t[51] !== i || t[52] !== a
+    ? ((tn = () => {
+        r != null &&
+          i != null &&
+          T({ conversationId: r, parentConversationId: a ?? null, getMarkdown: i });
+      }),
+      (t[49] = r),
+      (t[50] = T),
+      (t[51] = i),
+      (t[52] = a),
+      (t[53] = tn))
+    : (tn = t[53]);
+  let nn = r != null && i != null,
+    rn;
+  (t[54] === nn ? (rn = t[55]) : ((rn = { enabled: nn }), (t[54] = nn), (t[55] = rn)),
+    at(`copyConversationMarkdown`, tn, rn));
+  let an = r != null && qt,
+    on;
+  (t[56] === an ? (on = t[57]) : ((on = { enabled: an }), (t[56] = an), (t[57] = on)),
+    at(`openSideChat`, en, on));
+  let sn;
+  t[58] !== r || t[59] !== L || t[60] !== S
+    ? ((sn = () => {
+        r != null && S({ conversationId: r, hostId: L });
+      }),
+      (t[58] = r),
+      (t[59] = L),
+      (t[60] = S),
+      (t[61] = sn))
+    : (sn = t[61]);
+  let cn = g.value.routeKind === `local-thread` && g.value.conversationId === r,
+    ln;
+  (t[62] === cn ? (ln = t[63]) : ((ln = { enabled: cn }), (t[62] = cn), (t[63] = ln)),
+    at(`markThreadUnread`, sn, ln));
+  let un, dn;
+  (t[64] !== r || t[65] !== I || t[66] !== s || t[67] !== d
+    ? ((un = () => {
+        I || (s ?? r) == null || M({ title: d ?? ``, pendingWorktreeId: s });
+      }),
+      (dn = [r, I, s, d]),
+      (t[64] = r),
+      (t[65] = I),
+      (t[66] = s),
+      (t[67] = d),
+      (t[68] = un),
+      (t[69] = dn))
+    : ((un = t[68]), (dn = t[69])),
+    c(`rename-thread`, un, dn));
+  let fn, pn;
+  (t[70] === U
+    ? ((fn = t[71]), (pn = t[72]))
+    : ((fn = (e) => {
+        let { source: t } = e;
+        U(t);
+      }),
+      (pn = [U]),
+      (t[70] = U),
+      (t[71] = fn),
+      (t[72] = pn)),
+    c(`archive-thread`, fn, pn));
+  let mn;
+  t[73] !== E || t[74] !== u
+    ? ((mn = () => {
+        E(u);
+      }),
+      (t[73] = E),
+      (t[74] = u),
+      (t[75] = mn))
+    : (mn = t[75]);
+  let hn;
+  (t[76] === u ? (hn = t[77]) : ((hn = [u]), (t[76] = u), (t[77] = hn)),
+    c(`copy-conversation-path`, mn, hn));
+  let gn;
+  t[78] !== E || t[79] !== u
+    ? ((gn = () => {
+        E(u);
+      }),
+      (t[78] = E),
+      (t[79] = u),
+      (t[80] = gn))
+    : (gn = t[80]);
+  let _n;
+  (t[81] === u ? (_n = t[82]) : ((_n = [u]), (t[81] = u), (t[82] = _n)),
+    c(`copy-working-directory`, gn, _n));
+  let vn;
+  t[83] !== r || t[84] !== w
+    ? ((vn = () => {
+        r && w(r);
+      }),
+      (t[83] = r),
+      (t[84] = w),
+      (t[85] = vn))
+    : (vn = t[85]);
+  let yn;
+  (t[86] === r ? (yn = t[87]) : ((yn = [r]), (t[86] = r), (t[87] = yn)),
+    c(`copy-deeplink`, vn, yn));
+  let bn;
+  t[88] !== r || t[89] !== u || t[90] !== p || t[91] !== D || t[92] !== g
+    ? ((bn = async () => {
+        if (r == null) return;
+        ft(g, xe, {
+          destination: p
+            ? ie.CODEX_THREAD_FORK_DESTINATION_SAME_WORKTREE
+            : ie.CODEX_THREAD_FORK_DESTINATION_LOCAL,
+          source: re.CODEX_THREAD_FORK_SOURCE_THREAD_OVERFLOW_MENU,
+        });
+        let e = await Qe(g, { sourceConversationId: r, sourceWorkspaceRoot: u });
+        e != null && D(`/local/${e}`);
+      }),
+      (t[88] = r),
+      (t[89] = u),
+      (t[90] = p),
+      (t[91] = D),
+      (t[92] = g),
+      (t[93] = bn))
+    : (bn = t[93]);
+  let xn = bn,
+    Sn;
+  t[94] !== r || t[95] !== u || t[96] !== Yt || t[97] !== D || t[98] !== g
+    ? ((Sn = async () => {
+        if (r == null) return;
+        ft(g, xe, {
+          destination: ie.CODEX_THREAD_FORK_DESTINATION_NEW_WORKTREE,
+          source: re.CODEX_THREAD_FORK_SOURCE_THREAD_OVERFLOW_MENU,
+        });
+        let e = await et(g, {
+          localEnvironmentSelectionsByWorkspace: Yt,
+          sourceConversationId: r,
+          sourceWorkspaceRoot: u,
+        });
+        e != null && u != null && D(`/local/${e.clientThreadId}`);
+      }),
+      (t[94] = r),
+      (t[95] = u),
+      (t[96] = Yt),
+      (t[97] = D),
+      (t[98] = g),
+      (t[99] = Sn))
+    : (Sn = t[99]);
+  let Cn = Sn,
+    wn;
+  t[100] !== H || t[101] !== A
+    ? ((wn = () => {
+        A != null && (k(!1), H(A));
+      }),
+      (t[100] = H),
+      (t[101] = A),
+      (t[102] = wn))
+    : (wn = t[102]);
+  let Tn = wn,
+    En;
+  t[103] !== v || t[104] !== B
+    ? ((En = v.formatMessage(tt.moreActions)), (t[103] = v), (t[104] = B), (t[105] = En))
+    : (En = t[105]);
+  let Dn = En,
+    On = ke ?? `icon-sm`,
+    kn;
+  t[106] !== _ ||
+  t[107] !== m ||
+  t[108] !== f ||
+  t[109] !== nt ||
+  t[110] !== E ||
+  t[111] !== D ||
+  t[112] !== o ||
+  t[113] !== s ||
+  t[114] !== d
+    ? ((kn = () => {
+        let e = _.get(pt, o ?? null);
+        if (e == null) return [];
+        let t = e.clientThreadId == null ? null : we(Xe(e.clientThreadId));
+        return qe({
+          scope: _,
+          surface: `header`,
+          pendingWorktree: e,
+          canPin: f,
+          onPinnedChange: (n) => {
+            (De(_, e.id, n), n && t != null && Ke(_, t));
+          },
+          onRename: () => M({ title: d ?? ``, pendingWorktreeId: s }),
+          onArchive: () => {
+            (nt(e.id), t != null && Ke(_, t), m === `home` && D(`/`));
+          },
+          onCopyWorkingDirectory: E,
+        });
+      }),
+      (t[106] = _),
+      (t[107] = m),
+      (t[108] = f),
+      (t[109] = nt),
+      (t[110] = E),
+      (t[111] = D),
+      (t[112] = o),
+      (t[113] = s),
+      (t[114] = d),
+      (t[115] = kn))
+    : (kn = t[115]);
+  let An = kn,
+    jn;
+  t[116] !== _ ||
+  t[117] !== r ||
+  t[118] !== xn ||
+  t[119] !== Cn ||
+  t[120] !== Qt ||
+  t[121] !== en ||
+  t[122] !== I
+    ? ((jn = (e) => {
+        if (!(I && e !== `scheduled-task`))
+          bb343: switch (e) {
+            case `open-side-chat`:
+              en();
+              break bb343;
+            case `fork-into-local`:
+              xn();
+              break bb343;
+            case `fork-into-worktree`:
+              Cn();
+              break bb343;
+            case `scheduled-task`:
+              Qt(
+                ct({
+                  automations: _.get(ze).data?.items ?? [],
+                  conversationId: r,
+                  includePausedAutomations: !0,
+                }),
+              );
+          }
+      }),
+      (t[116] = _),
+      (t[117] = r),
+      (t[118] = xn),
+      (t[119] = Cn),
+      (t[120] = Qt),
+      (t[121] = en),
+      (t[122] = I),
+      (t[123] = jn))
+    : (jn = t[123]);
+  let Mn = jn,
+    Nn;
+  t[124] !== _ ||
+  t[125] !== Be ||
+  t[126] !== qt ||
+  t[127] !== f ||
+  t[128] !== r ||
+  t[129] !== u ||
+  t[130] !== Mn ||
+  t[131] !== i ||
+  t[132] !== An ||
+  t[133] !== U ||
+  t[134] !== L ||
+  t[135] !== p ||
+  t[136] !== Ae ||
+  t[137] !== s ||
+  t[138] !== y ||
+  t[139] !== d
+    ? ((Nn = () => [
+        ...(Ae ?? []),
+        ...(r == null
+          ? An()
+          : je({
+              scope: _,
+              surface: `header`,
+              isWorktreeThread: p,
+              canOpenSideChat: qt,
+              target: { conversationId: r, hostId: L, cwd: u },
+              actions: y,
+              canPin: f,
+              executeAction: Mn,
+              getConversationMarkdown: i,
+              onRename: () => M({ title: d ?? ``, pendingWorktreeId: s }),
+              onArchive: () => U(Be),
+            })),
+      ]),
+      (t[124] = _),
+      (t[125] = Be),
+      (t[126] = qt),
+      (t[127] = f),
+      (t[128] = r),
+      (t[129] = u),
+      (t[130] = Mn),
+      (t[131] = i),
+      (t[132] = An),
+      (t[133] = U),
+      (t[134] = L),
+      (t[135] = p),
+      (t[136] = Ae),
+      (t[137] = s),
+      (t[138] = y),
+      (t[139] = d),
+      (t[140] = Nn))
+    : (Nn = t[140]);
+  let Pn = Nn;
+  if (r == null && s == null) return null;
+  let Fn;
+  t[141] !== _.query || t[142] !== r
+    ? ((Fn = async () => {
+        r != null && (await _.query.getOrFetch(ze).catch(bt));
+      }),
+      (t[141] = _.query),
+      (t[142] = r),
+      (t[143] = Fn))
+    : (Fn = t[143]);
+  let In = Fn,
+    W;
+  t[144] !== r || t[145] !== I || t[146] !== g.value.conversationId || t[147] !== g.value.routeKind
+    ? ((W = null),
+      (t[144] = r),
+      (t[145] = I),
+      (t[146] = g.value.conversationId),
+      (t[147] = g.value.routeKind),
+      (t[148] = W))
+    : (W = t[148]);
+  let G;
+  t[149] !== Dt || t[150] !== u || t[151] !== L
+    ? ((G = Dt && u != null ? (0, P.jsx)(gt, { cwd: ge(u), hostId: L }) : null),
+      (t[149] = Dt),
+      (t[150] = u),
+      (t[151] = L),
+      (t[152] = G))
+    : (G = t[152]);
+  let K;
+  t[153] !== f || t[154] !== r || t[155] !== I || t[156] !== Lt
+    ? ((K = r == null ? null : (0, P.jsx)(yt, { enabled: f && !I, onToggle: Lt })),
+      (t[153] = f),
+      (t[154] = r),
+      (t[155] = I),
+      (t[156] = Lt),
+      (t[157] = K))
+    : (K = t[157]);
+  let q;
+  t[158] !== _ || t[159] !== r || t[160] !== B || t[161] !== In
+    ? ((q = () => {
+        In();
+      }),
+      (t[158] = _),
+      (t[159] = r),
+      (t[160] = B),
+      (t[161] = In),
+      (t[162] = q))
+    : (q = t[162]);
+  let J;
+  t[163] !== Vt ||
+  t[164] !== Wt ||
+  t[165] !== Ut ||
+  t[166] !== Ht ||
+  t[167] !== Gt ||
+  t[168] !== Bt ||
+  t[169] !== zt
+    ? ((J = {
+        "archive-thread": Vt,
+        "copy-conversation-markdown": Wt,
+        "copy-deeplink": Ut,
+        "copy-working-directory": Ht,
+        "open-side-chat": Gt,
+        "pin-thread": zt,
+        "rename-thread": Bt,
+        "unpin-thread": zt,
+      }),
+      (t[163] = Vt),
+      (t[164] = Wt),
+      (t[165] = Ut),
+      (t[166] = Ht),
+      (t[167] = Gt),
+      (t[168] = Bt),
+      (t[169] = zt),
+      (t[170] = J))
+    : (J = t[170]);
+  let Ln = h === `toolbar`,
+    Y;
+  t[171] !== On || t[172] !== h
+    ? ((Y =
+        h === `iconMd`
+          ? (0, P.jsx)(`span`, {
+              className: `flex shrink-0`,
+              children: (0, P.jsx)(ce, { "aria-hidden": !1, asset: te }),
+            })
+          : (0, P.jsx)(le, { className: On })),
+      (t[171] = On),
+      (t[172] = h),
+      (t[173] = Y))
+    : (Y = t[173]);
+  let X;
+  t[174] !== Dn || t[175] !== Ln || t[176] !== Y || t[177] !== Te || t[178] !== Ue || t[179] !== h
+    ? ((X = (0, P.jsx)(de, {
+        className: Te,
+        size: h,
+        uniform: Ln,
+        color: Ue,
+        "aria-label": Dn,
+        children: Y,
+      })),
+      (t[174] = Dn),
+      (t[175] = Ln),
+      (t[176] = Y),
+      (t[177] = Te),
+      (t[178] = Ue),
+      (t[179] = h),
+      (t[180] = X))
+    : (X = t[180]);
+  let Z;
+  t[181] !== Ve || t[182] !== Pn || t[183] !== q || t[184] !== J || t[185] !== X
+    ? ((Z = (0, P.jsx)(ee, {
+        awaitBeforeOpen: !1,
+        getItems: Pn,
+        onBeforeOpen: q,
+        shortcuts: J,
+        trigger: `click`,
+        align: Ve,
+        contentWidth: `menu`,
+        children: X,
+      })),
+      (t[181] = Ve),
+      (t[182] = Pn),
+      (t[183] = q),
+      (t[184] = J),
+      (t[185] = X),
+      (t[186] = Z))
+    : (Z = t[186]);
+  let Q;
+  t[187] !== r || t[188] !== B || t[189] !== oe || t[190] !== s || t[191] !== j || t[192] !== C
+    ? ((Q =
+        j == null
+          ? null
+          : (0, P.jsx)(Pe, {
+              draftKey: j.pendingWorktreeId,
+              metadataThreadId: s == null ? r : null,
+              initialValue: j.title,
+              messages: void 0,
+              onClose: () => M(null),
+              requireNonEmpty: s != null,
+              trimOnSave: s != null,
+              onSave: (e) => {
+                if (s != null) {
+                  oe?.(e);
+                  return;
+                }
+                if (r != null) return C({ conversationId: r, previousTitle: j.title, title: e });
+              },
+            })),
+      (t[187] = r),
+      (t[188] = B),
+      (t[189] = oe),
+      (t[190] = s),
+      (t[191] = j),
+      (t[192] = C),
+      (t[193] = Q))
+    : (Q = t[193]);
+  let $;
+  t[194] !== F || t[195] !== Tn || t[196] !== O || t[197] !== R
+    ? (($ =
+        O &&
+        (0, P.jsx)(Ie, {
+          heartbeatAutomationName: F,
+          isRunning: R,
+          open: !0,
+          onOpenChange: k,
+          onConfirm: Tn,
+        })),
+      (t[194] = F),
+      (t[195] = Tn),
+      (t[196] = O),
+      (t[197] = R),
+      (t[198] = $))
+    : ($ = t[198]);
+  let Rn;
+  return (
+    t[199] !== W || t[200] !== G || t[201] !== K || t[202] !== Z || t[203] !== Q || t[204] !== $
+      ? ((Rn = (0, P.jsxs)(P.Fragment, { children: [W, G, K, Z, Q, $] })),
+        (t[199] = W),
+        (t[200] = G),
+        (t[201] = K),
+        (t[202] = Z),
+        (t[203] = Q),
+        (t[204] = $),
+        (t[205] = Rn))
+      : (Rn = t[205]),
+    Rn
+  );
 }
-interface ThreadActions {
-  archiveThread?(input: Record<string, unknown>): void;
-  copyAppLink?(conversationId: string): void;
-  copyConversationMarkdown?(input: Record<string, unknown>): void;
-  copyWorkingDirectory?(cwd?: string): void;
-  markThreadAsUnread?(input: Record<string, unknown>): void;
-  renameThread?(input: Record<string, unknown>): Promise<void> | void;
+function bt() {}
+var xt, N, P;
+function F() {
+  return (F = e(() => {
+    ((xt = t()),
+      he(),
+      l(),
+      i(),
+      Se(),
+      (N = me()),
+      s(),
+      Ve(),
+      ke(),
+      _(),
+      w(),
+      k(),
+      v(),
+      y(),
+      h(),
+      pe(),
+      oe(),
+      r(),
+      ve(),
+      a(),
+      nt(),
+      ue(),
+      D(),
+      m(),
+      u(),
+      b(),
+      Ee(),
+      O(),
+      Te(),
+      Ue(),
+      T(),
+      p(),
+      d(),
+      S(),
+      E(),
+      Oe(),
+      f(),
+      C(),
+      _t(),
+      Be(),
+      Ae(),
+      g(),
+      j(),
+      A(),
+      (P = o()));
+  }))();
 }
-
-const sh = shared as Record<string, unknown>;
-const init = initial as Record<string, unknown>;
-const automation = automationPanel as Record<string, unknown>;
-const apps = targetApps as Record<string, unknown>;
-const chat = sideChat as Record<string, unknown>;
-const pin = pinBridge as Record<string, unknown>;
-let jsx: { Fragment: unknown; jsx(type: unknown, props: Record<string, unknown>, key?: unknown): unknown; jsxs(type: unknown, props: Record<string, unknown>, key?: unknown): unknown };
-let react: { useState<T>(initial: T): [T, (next: T | ((current: T) => T)) => void] };
-let initialized = false;
-
-function useScope(): { value: Record<string, unknown>; get<T = unknown>(signal: unknown, ...args: unknown[]): T; query?: { getOrFetch?(signal: unknown): Promise<unknown> } } | null {
-  const hook = sh.LX;
-  if (typeof hook !== "function") return null;
-  try { return (hook as (signal: unknown) => ReturnType<typeof useScope>)(init.$en); } catch { return null; }
-}
-function useSignal<T>(signal: unknown, fallback: T, ...args: unknown[]): T {
-  const hook = sh.BX ?? sh.HX;
-  if (typeof hook !== "function" || signal == null) return fallback;
-  try { return (hook as (...values: unknown[]) => T)(signal, ...args); } catch { return fallback; }
-}
-function useThreadActions(): ThreadActions {
-  const hook = init.vlt;
-  if (typeof hook !== "function") return {};
-  try { return (hook as () => ThreadActions)(); } catch { return {}; }
-}
-function useNavigation(): ((path: string, options?: unknown) => void) | null {
-  const hook = init.o_n;
-  if (typeof hook !== "function") return null;
-  try { return (hook as () => (path: string, options?: unknown) => void)(); } catch { return null; }
-}
-function usePinState(conversationId: string | null | undefined, canPin: boolean): { isPinned: boolean; togglePin(): void } {
-  const hook = init._lt;
-  if (typeof hook !== "function") return { isPinned: false, togglePin() {} };
-  try { return (hook as (id: string | null | undefined, options: { canPin: boolean }) => { isPinned: boolean; togglePin(): void })(conversationId, { canPin }); }
-  catch { return { isPinned: false, togglePin() {} }; }
-}
-function registerShortcut(action: string, handler: () => void, enabled = true): void {
-  const hook = init.pEt;
-  if (typeof hook === "function") (hook as (...args: unknown[]) => void)(action, handler, { enabled });
-}
-
-function ThreadOverflowMenu(props: ThreadOverflowMenuProps): unknown {
-  ensureInitialized();
-  const scope = useScope();
-  const actions = useThreadActions();
-  const navigate = useNavigation();
-  const canPin = props.canPin !== false;
-  const isWorktreeThread = props.isWorktreeThread === true;
-  const { isPinned, togglePin } = usePinState(props.conversationId, canPin);
-  const [renameDraft, setRenameDraft] = react.useState<string | null>(null);
-  const [archiveConfirmation, setArchiveConfirmation] = react.useState(false);
-  const resolvedHostId = props.hostId ?? useSignal<string | undefined>(init.wQt, undefined, props.conversationId);
-  const threadBusy = useSignal<boolean>(init.JZt, false, props.conversationId) || useSignal<boolean>(init.OY, false, props.conversationId);
-  const collaborationMode = useSignal<string | null>(init.rQt, null, props.conversationId);
-  const activeOperation = useSignal<{ type?: string } | null>(init.JQt, null, props.conversationId);
-  const hasAutomation = activeOperation?.type === "active";
-  const routeIsCurrent = scope?.value.routeKind === "local-thread" && scope.value.conversationId === props.conversationId;
-  const canOpenSideChat = props.conversationId != null && !threadBusy && props.sideChatTab != null;
-
-  if (props.conversationId == null && props.pendingWorktreeId == null) return null;
-
-  const onPin = (): void => { if (canPin && !threadBusy) togglePin(); };
-  const onRename = (): void => { if (!threadBusy) setRenameDraft(props.title ?? ""); };
-  const onMarkUnread = (): void => {
-    if (props.conversationId != null) actions.markThreadAsUnread?.({ conversationId: props.conversationId, hostId: resolvedHostId });
-  };
-  const onCopyLink = (): void => { if (props.conversationId != null) actions.copyAppLink?.(props.conversationId); };
-  const onCopyMarkdown = (): void => {
-    if (props.conversationId != null && props.getConversationMarkdown != null) actions.copyConversationMarkdown?.({ conversationId: props.conversationId, parentConversationId: props.markdownParentConversationId ?? null, getMarkdown: props.getConversationMarkdown });
-  };
-  const onCopyCwd = (): void => { actions.copyWorkingDirectory?.(props.cwd); };
-  const onOpenSideChat = (): void => {
-    if (scope == null || props.conversationId == null || props.sideChatTab == null || typeof chat.r !== "function") return;
-    Promise.resolve((chat.r as (...args: unknown[]) => unknown)(scope, props.sideChatTab, { sourceConversationId: props.conversationId, cwd: props.cwd, hostId: resolvedHostId, collaborationMode })).catch(() => undefined);
-  };
-  const archive = (): void => {
-    if (props.conversationId == null || threadBusy) return;
-    actions.archiveThread?.({
-      conversationId: props.conversationId,
-      hostId: resolvedHostId,
-      source: props.archiveSource ?? "thread_overflow_menu",
-      onArchiveStart: props.archiveNavigation === "home" && navigate != null ? () => navigate("/", { replace: true, state: { focusComposerNonce: Date.now() } }) : undefined,
-    });
-    setArchiveConfirmation(false);
-  };
-  const onArchive = (): void => {
-    if (hasAutomation) setArchiveConfirmation(true); else archive();
-  };
-  const onSchedule = (): void => {
-    if (scope == null || typeof automation.r !== "function") return;
-    (automation.r as (input: Record<string, unknown>) => void)({
-      scope,
-      seed: { directiveKey: `thread-overflow-${props.conversationId}`, kind: "heartbeat", name: props.title ?? "", prompt: "", targetThreadId: props.conversationId, status: "ACTIVE" },
-      title: props.title ?? "New scheduled task",
-    });
-  };
-  const onForkLocal = (): void => { if (scope != null && typeof init.Qln === "function" && props.conversationId != null) void (init.Qln as (...args: unknown[]) => unknown)(scope, { sourceConversationId: props.conversationId, sourceWorkspaceRoot: props.cwd }); };
-  const onForkWorktree = (): void => { if (scope != null && typeof init.flt === "function" && props.conversationId != null) void (init.flt as (...args: unknown[]) => unknown)(scope, { sourceConversationId: props.conversationId, sourceWorkspaceRoot: props.cwd }); };
-
-  registerShortcut("toggleThreadPin", onPin, canPin && !threadBusy);
-  registerShortcut("renameThread", onRename, !threadBusy);
-  registerShortcut("archiveThread", onArchive, !threadBusy);
-  registerShortcut("copyWorkingDirectory", onCopyCwd, props.cwd != null);
-  registerShortcut("copyDeeplink", onCopyLink, props.conversationId != null);
-  registerShortcut("copyConversationMarkdown", onCopyMarkdown, props.conversationId != null && props.getConversationMarkdown != null);
-  registerShortcut("openSideChat", onOpenSideChat, canOpenSideChat);
-
-  const items = [
-    ...(props.leadingItems ?? []),
-    menuItem(isPinned ? "Unpin" : "Pin", onPin, !canPin || threadBusy),
-    menuItem("Rename", onRename, threadBusy),
-    routeIsCurrent ? menuItem("Mark as unread", onMarkUnread, false) : null,
-    menuItem("Copy link", onCopyLink, props.conversationId == null),
-    menuItem("Copy conversation", onCopyMarkdown, props.getConversationMarkdown == null),
-    menuItem("Copy working directory", onCopyCwd, props.cwd == null),
-    menuItem("Open side chat", onOpenSideChat, !canOpenSideChat),
-    menuItem("Schedule task", onSchedule, props.conversationId == null),
-    menuItem(isWorktreeThread ? "Fork locally" : "Fork in this worktree", onForkLocal, props.conversationId == null),
-    menuItem("Fork into new worktree", onForkWorktree, props.conversationId == null),
-    menuItem("Archive", onArchive, threadBusy),
-  ].filter((item): item is unknown => item != null);
-
-  const trigger = jsx.jsx("button", {
-    type: "button",
-    className: props.triggerButtonClassName,
-    "aria-label": "More actions",
-    "data-color": props.triggerButtonColor ?? "ghost",
-    "data-size": props.triggerButtonSize ?? "icon",
-    children: jsx.jsx("span", { className: props.triggerIconClassName ?? "icon-sm", "aria-hidden": true, children: "•••" }),
-  });
-  const dropdown = jsx.jsxs("details", {
-    className: "thread-overflow-menu",
-    "data-align": props.dropdownAlign ?? "start",
-    children: [jsx.jsx("summary", { children: trigger }), jsx.jsx("div", { role: "menu", "aria-label": "Thread actions", children: items })],
-  });
-
-  return jsx.jsxs(jsx.Fragment, {
-    children: [
-      dropdown,
-      renameDraft == null ? null : renameDialog(renameDraft, setRenameDraft, props, actions),
-      archiveConfirmation ? confirmationDialog("Archive this chat and its scheduled task?", archive, () => setArchiveConfirmation(false)) : null,
-    ],
-  });
-}
-
-function menuItem(label: string, onSelect: () => void, disabled: boolean): unknown {
-  return jsx.jsx("button", { type: "button", role: "menuitem", disabled, onClick: onSelect, children: label }, label);
-}
-function renameDialog(value: string, setValue: (next: string | null) => void, props: ThreadOverflowMenuProps, actions: ThreadActions): unknown {
-  const save = (): void => {
-    const title = value.trim();
-    if (props.pendingWorktreeId != null) props.onRenamePendingWorktree?.(title);
-    else if (props.conversationId != null) void actions.renameThread?.({ conversationId: props.conversationId, previousTitle: props.title ?? "", title });
-    setValue(null);
-  };
-  return jsx.jsxs("div", { role: "dialog", "aria-label": "Rename chat", children: [
-    jsx.jsx("input", { value, onChange: (event: { currentTarget: { value: string } }) => setValue(event.currentTarget.value) }),
-    jsx.jsx("button", { type: "button", disabled: value.trim().length === 0, onClick: save, children: "Save" }),
-    jsx.jsx("button", { type: "button", onClick: () => setValue(null), children: "Cancel" }),
-  ] });
-}
-function confirmationDialog(message: string, confirm: () => void, cancel: () => void): unknown {
-  return jsx.jsxs("div", { role: "alertdialog", children: [jsx.jsx("p", { children: message }), jsx.jsx("button", { type: "button", onClick: confirm, children: "Archive" }), jsx.jsx("button", { type: "button", onClick: cancel, children: "Cancel" })] });
-}
-
-function initializeThreadOverflowMenu(): void {
-  if (initialized) return;
-  initialized = true;
-  if (typeof sh.I3 !== "function" || typeof sh.e6 !== "function") throw new Error("Thread overflow menu requires renderer JSX and React runtimes");
-  jsx = (sh.I3 as () => typeof jsx)();
-  react = (sh.e6 as () => typeof react)();
-  for (const value of [automation.n, apps.n, chat.n, pin.n]) if (typeof value === "function") (value as () => void)();
-}
-function ensureInitialized(): void { if (!initialized) initializeThreadOverflowMenu(); }
-
-export { initializeThreadOverflowMenu as n, ThreadOverflowMenu as t };
+export { F as n, M as t };

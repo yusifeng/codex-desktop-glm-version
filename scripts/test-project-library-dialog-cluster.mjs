@@ -50,31 +50,12 @@ assert.equal(dictionaryRetried, 1);
 
 const libraryItemReleaseAssertions = assertReleaseOwner("library-item-dialogs");
 const libraryMoveReleaseAssertions = assertReleaseOwner("library-move-dialog");
-
-const create = await bundle("chatgpt-project-create-dialog");
-assert.deepEqual(Object.keys(create), ["ChatGptProjectCreateDialog"]);
-let createdInput, createdProject, createClosed = 0;
-const createMount = mount(create.ChatGptProjectCreateDialog, { onClose() { createClosed++; }, onCreate(input) { createdInput = input; return { id: "p1", name: input.name, type: input.type }; }, onCreated(project) { createdProject = project; } });
-let createUi = createMount.render();
-assert.match(text(createUi), /Create project/);
-assert.equal(all(createUi, node => node.props?.name === "project-type").length, 2);
-find(createUi, node => node.props?.name === "project-name").props.onChange({ currentTarget: { value: " Launch " } });
-createUi = createMount.render();
-find(createUi, node => node.type === "select").props.onChange({ currentTarget: { value: "global" } });
-createUi = createMount.render();
-find(createUi, node => node.type === "form").props.onSubmit({ preventDefault() {} });
-await new Promise(resolve => setTimeout(resolve, 0));
-assert.equal(createdInput.name, "Launch");
-assert.equal(createdInput.memoryScope, "global");
-assert.equal(createdProject.id, "p1");
-assert.equal(createClosed, 1);
-const cloudOnly = mount(create.ChatGptProjectCreateDialog, { allowLocalProjectCreation: false, forceGlobalMemory: true, onClose() {} }).render();
-assert.equal(find(cloudOnly, node => node.type === "fieldset"), undefined);
-assert.equal(find(cloudOnly, node => node.type === "select"), undefined);
+const projectCreateReleaseAssertions = assertReleaseOwner("chatgpt-project-create-dialog");
 
 const restoredOwnerAssertions =
   libraryItemReleaseAssertions +
   libraryMoveReleaseAssertions +
+  projectCreateReleaseAssertions +
   assertReleaseOwner("chatgpt-project-add-sources-dialog") +
   assertReleaseOwner("create-project-dialog-core");
 

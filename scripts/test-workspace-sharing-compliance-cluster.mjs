@@ -15,23 +15,7 @@ function find(node, predicate) { let result; walk(node, value => { if (result ==
 function all(node, predicate) { const result = []; walk(node, value => { if (predicate(value)) result.push(value); }); return result; }
 function text(node) { const parts = []; const collect = value => { if (typeof value === "string" || typeof value === "number") { parts.push(String(value)); return; } if (value == null || typeof value !== "object") return; const children = value.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(collect); else collect(children); }; collect(node); return parts.join(" "); }
 
-const report = await bundle("product-report-dialog");
-assert.deepEqual(Object.keys(report), ["ProductReportDialog"]);
-let reportSubmission, reportClosed = 0;
-const reportMount = mount(report.ProductReportDialog, { initialTarget: "product-report", product: { id: "p", title: "A very useful product", url: "https://shop/item" }, onClose() { reportClosed++; }, onSubmit(value) { reportSubmission = value; } });
-let reportUi = reportMount.render();
-assert.match(text(reportUi), /Report A very useful product/);
-assert.equal(all(reportUi, node => node.type === "option").length, 4);
-find(reportUi, node => node.props?.["aria-label"] === "Report reason").props.onChange({ currentTarget: { value: "scam" } });
-find(reportUi, node => node.props?.["aria-label"] === "Additional details").props.onChange({ currentTarget: { value: "Suspicious" } });
-reportUi = reportMount.render();
-find(reportUi, node => node.type === "form").props.onSubmit({ preventDefault() {} });
-await Promise.resolve();
-assert.equal(reportSubmission.reason.id, "scam");
-assert.equal(reportSubmission.details, "Suspicious");
-find(reportUi, node => node.props?.["aria-label"] === "Close").props.onClick();
-assert.equal(reportClosed, 1);
-assert.match(text(mount(report.ProductReportDialog, { product: { title: "Item" }, onClose() {} }).render()), /What would you like to report/);
+const reportAssertions = assertReleaseOwner("product-report-dialog");
 
 const shareAssertions = assertReleaseOwner("chatgpt-project-share-dialog", [
   /@rchunk\/project-share-model/,
@@ -43,4 +27,4 @@ const restoredOwnerAssertions =
   assertReleaseOwner("workspace-agent-schedules-dialog") +
   assertReleaseOwner("cme-dialog");
 
-console.log(`workspace sharing compliance cluster tests passed with ${shareAssertions + restoredOwnerAssertions} release assertions`);
+console.log(`workspace sharing compliance cluster tests passed with ${reportAssertions + shareAssertions + restoredOwnerAssertions} release assertions`);

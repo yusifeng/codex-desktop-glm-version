@@ -1,5 +1,20 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Login/workspace/thread/secrets/source release-owner recovery：一次性恢复
+`chatgpt-project-create-dialog`、`command-menu-search-results`、`login-route`、
+`select-workspace-page`、`codex-micro-onboarding-host`、`thread-overflow-menu`、
+`conversation-followup-shelf`、`global-dictation-page`、`tweaks-toolbar-view`、
+`secret-scope`、`product-report-dialog`、`environment-secret-row`、
+`chatgpt-work-home-page-core`、`open-audio-summary-dialog` 与 `source-toolbar` 十五个发布
+owner，净恢复 10,371 行发布 TypeScript。绑定旧手写 ABI 或源码形态的 project、command
+search、login、workspace、Codex Micro、thread、dictation、secrets、report、home、audio 与 source
+toolbar 测试已迁移为发布一致性验证，并保留同簇其他行为覆盖。整批通过 12,448/12,448
+transform check、1,888/1,888 renderer build/verify、2,247/2,247 app-code coverage、
+0 semantic tail 与 typecheck。严格 hub 消费推进到 app-shared 1,738/3,185、app-initial
+5,434/8,204、app-primary 713/917，仍为 0 unreviewed、0 invalid consumers。按发布源码
+正向行数缺口口径，覆盖率由约 89.5% 推进到约 90.5%；425 个 preserved 边界、三个聚合
+hub 的耦合导出与最终真实登录态 E2E 仍未完成。
+
 2026-11-02 Automation/subscription/history/command release-owner recovery：一次性恢复
 `local-conversation-side-chat`、`automation-dialog`、`open-in-google-drive-menu-item`、
 `history`、`publish-actions`、`subscription-recovery-dialog`、`subscription-onboarding`、

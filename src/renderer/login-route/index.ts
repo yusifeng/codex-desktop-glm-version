@@ -1,830 +1,1539 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeJsxRuntime,
-  BX as useSignalFamilyValue,
-  FX as initializeScopedRuntime,
-  I3 as getJsxRuntime,
-  LX as getScope,
-  QI as initializeScopeRuntime,
-  Qh as LoadingSpinner,
-  Y2 as FormattedMessage,
-  Yh as Button,
-  Ym as copyText,
-  ZI as appScope,
-  Zh as initializeButton,
-  e6 as getReactRuntime,
-  fI as initializeIntlRuntime,
-  n4 as useIntl,
-  pk as toastManagerSignal,
-  wL as initializeCapabilityRuntime,
+  $3 as n,
+  $h as r,
+  BX as i,
+  CL as a,
+  Cy as o,
+  FX as s,
+  G2 as c,
+  HX as l,
+  I3 as u,
+  IH as ee,
+  K2 as d,
+  LX as f,
+  QI as p,
+  Qh as te,
+  SL as m,
+  Xm as h,
+  Y2 as g,
+  Yh as _,
+  Ym as ne,
+  ZI as v,
+  Zh as y,
+  _M as re,
+  e6 as b,
+  fI as x,
+  gM as S,
+  lk as C,
+  lw as w,
+  n4 as ie,
+  of as T,
+  pk as E,
+  tm as D,
+  wL as O,
+  yM as ae,
 } from "@rchunk/app-shared";
 import {
-  M6t as initializeAccountRuntime,
-  Qgn as initializeHostRuntime,
-  Sdn as ApiError,
-  Ugn as getHostClient,
-  d_n as useSearchParams,
-  kft as openExternalLink,
-  o_n as useNavigate,
-  pnt as appServices,
-  ugn as desktopHostId,
-  xpn as trackAnalyticsEvent,
-  ypn as initializeAnalyticsRuntime,
+  $ln as oe,
+  $yt as k,
+  Bfn as A,
+  Dft as j,
+  F6t as se,
+  Fa as ce,
+  I6t as M,
+  Ia as le,
+  Ix as N,
+  M6t as P,
+  Qgn as F,
+  R6t as ue,
+  Sdn as de,
+  UA as I,
+  Ugn as fe,
+  WA as pe,
+  Wgn as L,
+  XF as R,
+  Xat as z,
+  Yln as me,
+  Yyt as he,
+  ZF as B,
+  _C as V,
+  a7 as H,
+  d_n as U,
+  eC as W,
+  gst as G,
+  hst as K,
+  ibt as q,
+  ifn as J,
+  kft as ge,
+  lfn as _e,
+  mn as ve,
+  mnt as ye,
+  nbt as be,
+  nun as xe,
+  o3t as Se,
+  o_n as Ce,
+  ofn as we,
+  pnt as Te,
+  rbt as Ee,
+  rfn as De,
+  s3t as Oe,
+  ufn as ke,
+  ugn as Ae,
+  un as je,
+  vC as Me,
+  vot as Ne,
+  xpn as Y,
+  ydn as Pe,
+  ypn as Fe,
+  yst as Ie,
 } from "@rchunk/app-initial";
-import "@rchunk/app-primary";
+import { Ar as Le, jr as Re } from "@rchunk/app-primary";
+import { n as ze, t as Be } from "@rchunk/google-logo";
+import { n as Ve } from "@rchunk/page-layout";
+import { n as He, r as Ue, t as We } from "@rchunk/browser-session-queries";
 import {
-  n as initializeGoogleLogo,
-  t as GoogleLogo,
-} from "@rchunk/google-logo";
-import {
-  n as initializePageLayout,
-  t as PageLayout,
-} from "@rchunk/page-layout";
-import "@rchunk/browser-session-queries";
-import {
-  a as startChatGptLogin,
-  i as initializeDesktopAuthSession,
-  n as getCodexAppVersion,
-  r as initializeDesktopAuthUrl,
-  t as buildDesktopAuthUrl,
+  a as Ge,
+  i as Ke,
+  n as qe,
+  r as Je,
+  t as Ye,
 } from "@rchunk/chatgpt-desktop-auth-url";
-import "@rchunk/browser-login-handoff-page-core";
-import "@rchunk/ascii-engine";
-import { t as initializeOnboardingEntrypoint } from "@rchunk/onboarding-entrypoint";
+import { n as Xe, r as Ze } from "@rchunk/browser-login-handoff-page-core";
+import { i as Qe, n as $e, r as et, t as tt } from "@rchunk/ascii-engine";
+import { n as nt, t as rt } from "@rchunk/onboarding-entrypoint";
 import {
-  a as initializeOnboardingLoginMessages,
-  i as initializeOnboardingLoginState,
-  n as initializeOnboardingLoginContent,
-  o as loginMethodState,
-  r as LoginMethodUnavailable,
-  t as LoginContent,
+  a as it,
+  i as at,
+  n as ot,
+  o as st,
+  r as ct,
+  t as lt,
 } from "@rchunk/onboarding-login-content";
-
-initializeJsxRuntime();
-initializeScopedRuntime();
-initializeScopeRuntime();
-initializeButton();
-initializeIntlRuntime();
-initializeCapabilityRuntime();
-initializeAccountRuntime();
-initializeHostRuntime();
-initializeAnalyticsRuntime();
-initializeGoogleLogo();
-initializePageLayout();
-initializeDesktopAuthSession();
-initializeDesktopAuthUrl();
-initializeOnboardingEntrypoint();
-initializeOnboardingLoginMessages();
-initializeOnboardingLoginState();
-initializeOnboardingLoginContent();
-
-const React = getReactRuntime();
-const jsx = getJsxRuntime();
-
-type LoginIntent =
-  "signin" | "signup" | "google" | "microsoft" | "other-account";
-type LoginErrorKind = "abort" | "auth" | "network" | "unknown";
-
-interface BrowserProfile {
-  avatarUrl?: string | null;
-  email: string;
-  name?: string | null;
+function ut() {
+  return (ut = e(() => {
+    J();
+  }))();
 }
-
-interface LoginCompletion {
-  error?: unknown;
-  onboardingEntrypoint?: string;
-  success: boolean;
+function dt() {
+  return (dt = e(() => {
+    (n(),
+      ve(),
+      s(),
+      b(),
+      d(),
+      P(),
+      y(),
+      w(),
+      z(),
+      ze(),
+      Re(),
+      Fe(),
+      p(),
+      J(),
+      Ze(),
+      Xe(),
+      ut(),
+      Ve(),
+      N(),
+      u(),
+      je.ACCESS_FLOW_USER_ACTION_TYPE_CONTINUE_WITH_GOOGLE,
+      je.ACCESS_FLOW_USER_ACTION_TYPE_CONTINUE_WITH_APPLE,
+      je.ACCESS_FLOW_USER_ACTION_TYPE_CONTINUE_WITH_MICROSOFT,
+      je.ACCESS_FLOW_USER_ACTION_TYPE_CONTINUE,
+      je.ACCESS_FLOW_USER_ACTION_TYPE_CONTINUE,
+      c({
+        google: {
+          id: `browser.auth.login.google`,
+          defaultMessage: `Continue with Google`,
+          description: `Button on the ChatGPT browser login page that starts Google sign-in`,
+        },
+        apple: {
+          id: `browser.auth.login.apple`,
+          defaultMessage: `Continue with Apple`,
+          description: `Button on the ChatGPT browser login page that starts Apple sign-in`,
+        },
+        microsoft: {
+          id: `browser.auth.login.microsoft`,
+          defaultMessage: `Continue with Microsoft`,
+          description: `Button on the ChatGPT browser login page that starts Microsoft sign-in`,
+        },
+        email: {
+          id: `browser.auth.login.continueWithEmail`,
+          defaultMessage: `Continue with email`,
+          description: `Button switching the browser login form from phone number entry to email address entry`,
+        },
+        phone_number: {
+          id: `browser.auth.login.continueWithPhone`,
+          defaultMessage: `Continue with phone`,
+          description: `Button switching the browser login form from email address entry to phone number entry`,
+        },
+      }));
+  }))();
 }
-
-interface LoginStartResult {
-  authUrl?: string;
-  completion: Promise<unknown>;
-}
-
-interface ApiKeyClient {
-  loginWithApiKey?(apiKey: string): Promise<unknown>;
-  sendRequest?(method: string, parameters: unknown): Promise<unknown>;
-}
-
-interface BrowserSessionService {
-  cancelProbe(probeId: string): void;
-  getLookupEligibility(): Promise<{ eligible?: boolean } | null>;
-  probe(
-    probeId: string,
-    desktopSessionUrl: string,
-    securityLevel: string,
-  ): Promise<unknown>;
-}
-
-interface BrowserAuthState {
-  browserUrl: string | null;
-  controller: AbortController;
-}
-
-const networkCodes = new Set([
-  "EAI_AGAIN",
-  "ECONNREFUSED",
-  "ECONNRESET",
-  "ENOTFOUND",
-  "ETIMEDOUT",
-  "ERR_CONNECTION_RESET",
-  "ERR_NETWORK_CHANGED",
-  "ERR_TIMED_OUT",
-]);
-const authCodes = new Set([
-  "authentication_error",
-  "forbidden",
-  "invalid_api_key",
-  "token_invalidated",
-  "unauthorized",
-]);
-const networkMessages = new Set([
-  "failed to fetch",
-  "fetch failed",
-  "load failed",
-  "network request failed",
-  "networkerror when attempting to fetch resource.",
-  "request timed out",
-]);
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function addLoginIntent(authUrl: string, intent: LoginIntent): string {
-  if (intent === "signin") return authUrl;
-  try {
-    const url = new URL(authUrl);
-    if (intent === "signup") url.searchParams.set("screen_hint", "signup");
-    if (intent === "google") {
-      url.searchParams.set("screen_hint", "login_or_signup");
-      url.searchParams.set("connection", "google-oauth2");
-    }
-    if (intent === "microsoft") {
-      url.searchParams.set("screen_hint", "login_or_signup");
-      url.searchParams.set("connection", "windowslive");
-    }
-    if (intent === "other-account")
-      url.searchParams.set("prompt", "select_account");
-    return url.toString();
-  } catch {
-    return authUrl;
-  }
-}
-
-function classifyLoginError(error: unknown): LoginErrorKind {
-  if (error instanceof Error && error.name === "AbortError") return "abort";
-  if (error instanceof Error && error.name === "TimeoutError") return "network";
-  if (error instanceof ApiError) {
-    if (error.status === 401 || error.status === 403) return "auth";
-    if (error.status === 0 || error.status === 408 || error.status === 504)
-      return "network";
-    if (error.errorCode != null && networkCodes.has(error.errorCode))
-      return "network";
-    if (error.errorCode != null && authCodes.has(error.errorCode))
-      return "auth";
-  }
-  if (
-    isRecord(error) &&
-    typeof error.code === "string" &&
-    networkCodes.has(error.code)
-  )
-    return "network";
-  const message = (
-    typeof error === "string"
-      ? error
-      : error instanceof Error
-        ? error.message
-        : ""
-  )
-    .trim()
-    .toLowerCase();
-  if (networkMessages.has(message)) return "network";
-  if (
-    authCodes.has(message) ||
-    message === "auth failed" ||
-    message === "invalid api key"
-  )
-    return "auth";
-  return "unknown";
-}
-
-function normalizeStartResult(value: unknown): LoginStartResult | null {
-  if (!isRecord(value) || !(value.completion instanceof Promise)) return null;
-  return {
-    authUrl: typeof value.authUrl === "string" ? value.authUrl : undefined,
-    completion: value.completion,
-  };
-}
-
-function normalizeCompletion(value: unknown): LoginCompletion {
-  if (!isRecord(value)) return { success: false, error: value };
-  return {
-    error: value.error,
-    onboardingEntrypoint:
-      typeof value.onboardingEntrypoint === "string"
-        ? value.onboardingEntrypoint
-        : undefined,
-    success: value.success === true,
-  };
-}
-
-function normalizeBrowserProfile(value: unknown): BrowserProfile | null {
-  if (
-    !isRecord(value) ||
-    typeof value.email !== "string" ||
-    value.email.trim() === ""
-  )
-    return null;
-  return {
-    avatarUrl: typeof value.avatarUrl === "string" ? value.avatarUrl : null,
-    email: value.email,
-    name: typeof value.name === "string" ? value.name : null,
-  };
-}
-
-function getErrorMessage(error: unknown): string {
-  return error instanceof Error
-    ? error.message
-    : typeof error === "string"
-      ? error
-      : "Unknown error";
-}
-
-function providerForIntent(
-  intent: LoginIntent,
-): "chatgpt" | "google" | "microsoft" {
-  if (intent === "google" || intent === "microsoft") return intent;
-  return "chatgpt";
-}
-
-function initials(profile: BrowserProfile): string {
-  const label = profile.name?.trim() || profile.email;
-  return label
-    .split(/\s+/)
-    .map((part) => part[0] ?? "")
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
-
-function LoginSurface(props: {
-  allowApiKey: boolean;
-  allowChatGpt: boolean;
-  apiKey: string;
-  browserAuth: BrowserAuthState | null;
-  browserProfile: BrowserProfile | null | undefined;
-  browserProfileLoading: boolean;
-  isApiKeyEntryVisible: boolean;
-  isApiKeyPending: boolean;
-  onApiKeyChange(value: string): void;
-  onApiKeyReset(): void;
-  onApiKeySubmit(): void;
-  onChatGptSignIn(intent?: LoginIntent, loginHint?: string): void;
-  onCopySignInLink(): void;
-  onPlaySnake(): void;
-  onShowApiKeyEntry(): void;
-}): unknown {
-  const intl = useIntl();
-  const chatPending = props.browserAuth !== null;
-
-  if (props.allowChatGpt && chatPending && !props.isApiKeyEntryVisible) {
-    return jsx.jsx("div", {
-      className:
-        "flex h-full w-full items-center justify-center bg-surface text-default",
-      children: jsx.jsxs("div", {
-        className: "flex w-[340px] flex-col items-center gap-8",
-        children: [
-          jsx.jsx(LoadingSpinner, { className: "size-10" }),
-          jsx.jsx("p", {
-            className: "text-center text-base text-codex-description",
-            children: jsx.jsx(FormattedMessage, {
-              id: "electron.onboarding.login.browserPending.welcomeV2",
-              defaultMessage: "Continue signing in with your browser",
+var ft, pt, mt;
+function ht() {
+  return (ht = e(() => {
+    ((ft = n()),
+      s(),
+      O(),
+      (pt = t(b(), 1)),
+      L(),
+      Ke(),
+      P(),
+      ue(),
+      y(),
+      j(),
+      H(),
+      z(),
+      C(),
+      me(),
+      M(),
+      D(),
+      T(),
+      p(),
+      A(),
+      Je(),
+      h(),
+      xe(),
+      Qe(),
+      tt(),
+      (mt = u()),
+      pt.memo(function () {
+        let e = (0, ft.c)(5),
+          t;
+        e[0] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((t = {
+              initialColumns: 130,
+              initialRows: 100,
+              initialMode: `composite`,
+              preferredVideoKeyword: `blossom`,
             }),
-          }),
-          jsx.jsx(Button, {
-            color: "outlineSurface",
-            size: "dialog",
-            onClick: () => props.onChatGptSignIn(),
-            children: jsx.jsx(FormattedMessage, {
-              id: "electron.onboarding.login.chatgpt.cancel.welcomeV2",
-              defaultMessage: "Cancel sign-in",
-            }),
-          }),
-          props.browserAuth?.browserUrl == null
-            ? null
-            : jsx.jsx(Button, {
-                color: "ghost",
-                size: "dialog",
-                onClick: props.onCopySignInLink,
-                children: jsx.jsx(FormattedMessage, {
-                  id: "electron.onboarding.login.copyLink",
-                  defaultMessage: "Copy sign-in link",
-                }),
-              }),
-        ],
+            (e[0] = t))
+          : (t = e[0]);
+        let { columns: n, rows: r, lines: i } = $e(t),
+          a;
+        return (
+          e[1] !== n || e[2] !== i || e[3] !== r
+            ? ((a = (0, mt.jsx)(et, { lines: i, columns: n, rows: r, autoCover: !0 })),
+              (e[1] = n),
+              (e[2] = i),
+              (e[3] = r),
+              (e[4] = a))
+            : (a = e[4]),
+          a
+        );
+      }));
+  }))();
+}
+function gt(e) {
+  let t = e.get(`enabled`, !1);
+  return {
+    useDesktopAuth: e.get(`use_desktop_auth`, t),
+    useStreamlinedLoginUx: e.get(`use_streamlined_login_ux`, t),
+  };
+}
+function _t(e) {
+  return e;
+}
+var vt, yt;
+function bt() {
+  return (bt = e(() => {
+    ((vt = `3446609779`), (yt = `1561420571`));
+  }))();
+}
+function xt(e) {
+  let t = (0, St.c)(21),
+    { onExit: n, audioContextRef: r } = e,
+    i = (0, X.useRef)(null),
+    a = (0, X.useRef)(null),
+    o = (0, X.useRef)(null),
+    s;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`) ? ((s = []), (t[0] = s)) : (s = t[0]);
+  let c = (0, X.useRef)(s),
+    l;
+  t[1] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((l = { x: 0, y: 0 }), (t[1] = l))
+    : (l = t[1]);
+  let u = (0, X.useRef)(l),
+    ee = (0, X.useRef)(`right`),
+    d = (0, X.useRef)(`right`),
+    f;
+  t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((f = { columns: wt, rows: wt, cellSize: Tt, width: 216, height: 216 }), (t[2] = f))
+    : (f = t[2]);
+  let p = (0, X.useRef)(f),
+    te = (0, X.useRef)(null),
+    m = (0, X.useEffectEvent)(n),
+    h;
+  t[3] === r
+    ? (h = t[4])
+    : ((h = (e, t, n) => {
+        if (r.current == null) return;
+        let i = r.current;
+        i.state === `suspended` && i.resume();
+        let a = t / 1e3,
+          o = i.createOscillator(),
+          s = i.createGain();
+        ((o.type = n),
+          (o.frequency.value = e),
+          s.gain.setValueAtTime(1e-4, i.currentTime),
+          s.gain.exponentialRampToValueAtTime(0.18, i.currentTime + 0.01),
+          s.gain.exponentialRampToValueAtTime(1e-4, i.currentTime + a),
+          o.connect(s),
+          s.connect(i.destination),
+          o.start(),
+          o.stop(i.currentTime + a),
+          (o.onended = () => {
+            (o.disconnect(), s.disconnect());
+          }));
       }),
-    });
+      (t[3] = r),
+      (t[4] = h));
+  let g = (0, X.useEffectEvent)(h),
+    _;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((_ = () => {
+        o.current != null && (window.clearInterval(o.current), (o.current = null));
+      }),
+      (t[5] = _))
+    : (_ = t[5]);
+  let ne = _,
+    v;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((v = () => {
+        if (te.current) return te.current;
+        let e = i.current;
+        if (e == null) return { snake: `#ffffff`, food: `#f97316` };
+        let t = getComputedStyle(e).color || `#ffffff`,
+          n = getComputedStyle(document.documentElement),
+          r = {
+            snake: t,
+            food:
+              n.getPropertyValue(`--color-chart-red`).trim() ||
+              n.getPropertyValue(`--color-chart-orange`).trim() ||
+              `#f97316`,
+          };
+        return ((te.current = r), r);
+      }),
+      (t[6] = v))
+    : (v = t[6]);
+  let y = v,
+    re;
+  t[7] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((re = () => {
+        if (i.current == null) return null;
+        let e = Math.max(1, Math.floor(window.devicePixelRatio || 1));
+        ((i.current.width = Math.max(1, Math.floor(p.current.width * e))),
+          (i.current.height = Math.max(1, Math.floor(p.current.height * e))),
+          (i.current.style.width = `${p.current.width}px`),
+          (i.current.style.height = `${p.current.height}px`));
+        let t = i.current.getContext(`2d`);
+        return t == null
+          ? null
+          : (t.setTransform(e, 0, 0, e, 0, 0), (t.imageSmoothingEnabled = !1), t);
+      }),
+      (t[7] = re))
+    : (re = t[7]);
+  let b = re,
+    x;
+  t[8] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((x = (e) => {
+        let t = {
+          x: Math.floor(Math.random() * p.current.columns),
+          y: Math.floor(Math.random() * p.current.rows),
+        };
+        for (; e.some((e) => e.x === t.x && e.y === t.y);)
+          t = {
+            x: Math.floor(Math.random() * p.current.columns),
+            y: Math.floor(Math.random() * p.current.rows),
+          };
+        return t;
+      }),
+      (t[8] = x))
+    : (x = t[8]);
+  let S = x,
+    C;
+  t[9] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((C = () => {
+        let e = b();
+        if (e == null) return;
+        let t = y();
+        (e.clearRect(0, 0, p.current.width, p.current.height), (e.fillStyle = t.snake));
+        for (let t of c.current)
+          e.fillRect(
+            t.x * p.current.cellSize,
+            t.y * p.current.cellSize,
+            p.current.cellSize,
+            p.current.cellSize,
+          );
+        ((e.fillStyle = t.food),
+          e.fillRect(
+            u.current.x * p.current.cellSize,
+            u.current.y * p.current.cellSize,
+            p.current.cellSize,
+            p.current.cellSize,
+          ));
+      }),
+      (t[9] = C))
+    : (C = t[9]);
+  let w = (0, X.useEffectEvent)(C),
+    ie;
+  t[10] === w
+    ? (ie = t[11])
+    : ((ie = () => {
+        let e = Math.floor(p.current.columns / 2),
+          t = Math.floor(p.current.rows / 2);
+        ((c.current = [
+          { x: e, y: t },
+          { x: e - 1, y: t },
+          { x: e - 2, y: t },
+        ]),
+          (ee.current = `right`),
+          (d.current = `right`),
+          (u.current = S(c.current)),
+          w());
+      }),
+      (t[10] = w),
+      (t[11] = ie));
+  let T = (0, X.useEffectEvent)(ie),
+    E;
+  t[12] === T
+    ? (E = t[13])
+    : ((E = () => {
+        if (a.current == null) return;
+        let e = a.current.getBoundingClientRect(),
+          t = Math.max(1, Math.floor(e.width)),
+          n = Math.max(1, Math.floor(e.height)),
+          r = Math.max(wt, Math.floor(t / Tt)),
+          i = t / r,
+          o = Math.max(wt, Math.floor(n / i));
+        ((p.current = { columns: r, rows: o, cellSize: i, width: t, height: n }), T());
+      }),
+      (t[12] = T),
+      (t[13] = E));
+  let D = (0, X.useEffectEvent)(E),
+    O;
+  t[14] !== w || t[15] !== m || t[16] !== g || t[17] !== D
+    ? ((O = () => {
+        D();
+        let e = (e) => {
+          let t = null;
+          (e.key === `ArrowUp` || e.key === `w` || e.key === `W`
+            ? (t = `up`)
+            : e.key === `ArrowDown` || e.key === `s` || e.key === `S`
+              ? (t = `down`)
+              : e.key === `ArrowLeft` || e.key === `a` || e.key === `A`
+                ? (t = `left`)
+                : (e.key === `ArrowRight` || e.key === `d` || e.key === `D`) && (t = `right`),
+            t != null && (e.preventDefault(), Ot[ee.current] !== t && (d.current = t)));
+        };
+        return (
+          window.addEventListener(`keydown`, e),
+          (o.current = window.setInterval(() => {
+            let e = c.current,
+              t = e[0],
+              n = d.current,
+              r = Dt[n],
+              i = { x: t.x + r.x, y: t.y + r.y };
+            if (i.x < 0 || i.y < 0 || i.x >= p.current.columns || i.y >= p.current.rows) {
+              (ne(), g(140, 220, `sawtooth`), m());
+              return;
+            }
+            let a = i.x === u.current.x && i.y === u.current.y;
+            if ((a ? e : e.slice(0, -1)).some((e) => e.x === i.x && e.y === i.y)) {
+              (ne(), g(160, 220, `sawtooth`), m());
+              return;
+            }
+            let o = a ? [i, ...e] : [i, ...e.slice(0, -1)];
+            ((c.current = o),
+              (ee.current = n),
+              a && ((u.current = S(o)), g(660, 120, `square`)),
+              w());
+          }, Et)),
+          () => {
+            (ne(), window.removeEventListener(`keydown`, e));
+          }
+        );
+      }),
+      (t[14] = w),
+      (t[15] = m),
+      (t[16] = g),
+      (t[17] = D),
+      (t[18] = O))
+    : (O = t[18]);
+  let ae;
+  (t[19] === Symbol.for(`react.memo_cache_sentinel`) ? ((ae = []), (t[19] = ae)) : (ae = t[19]),
+    (0, X.useEffect)(O, ae));
+  let oe;
+  return (
+    t[20] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((oe = (0, Ct.jsx)(`div`, {
+          className: `h-full w-full`,
+          ref: a,
+          children: (0, Ct.jsx)(`canvas`, { className: `h-full w-full text-default`, ref: i }),
+        })),
+        (t[20] = oe))
+      : (oe = t[20]),
+    oe
+  );
+}
+var St, X, Ct, wt, Tt, Et, Dt, Ot;
+function kt() {
+  return (kt = e(() => {
+    ((St = n()),
+      (X = b()),
+      (Ct = u()),
+      (wt = 12),
+      (Tt = 18),
+      (Et = 120),
+      (Dt = {
+        up: { x: 0, y: -1 },
+        down: { x: 0, y: 1 },
+        left: { x: -1, y: 0 },
+        right: { x: 1, y: 0 },
+      }),
+      (Ot = { up: `down`, down: `up`, left: `right`, right: `left` }));
+  }))();
+}
+function At(e, t) {
+  if (t === `signin`) return e;
+  try {
+    let n = new URL(e);
+    switch (t) {
+      case `signup`:
+        n.searchParams.set(`screen_hint`, `signup`);
+        break;
+      case `google`:
+        (n.searchParams.set(`screen_hint`, `login_or_signup`),
+          n.searchParams.set(`connection`, `google-oauth2`));
+        break;
+      case `microsoft`:
+        (n.searchParams.set(`screen_hint`, `login_or_signup`),
+          n.searchParams.set(`connection`, `windowslive`));
+        break;
+      case `other-account`:
+        n.searchParams.set(`prompt`, `select_account`);
+    }
+    return n.toString();
+  } catch {
+    return e;
   }
-
-  if (
-    props.allowChatGpt &&
-    props.browserProfileLoading &&
-    !props.isApiKeyEntryVisible
-  ) {
-    return jsx.jsxs("div", {
-      className:
-        "flex h-full items-center justify-center gap-3 text-codex-description",
-      children: [
-        jsx.jsx(LoadingSpinner, { className: "size-4" }),
-        jsx.jsx(FormattedMessage, {
-          id: "electron.onboarding.login.loading",
-          defaultMessage: "Loading…",
-        }),
-      ],
-    });
+}
+function jt(e) {
+  if (e instanceof Error && e.name === `AbortError`) return `abort`;
+  if (e instanceof Error && e.name === `TimeoutError`) return `network`;
+  if (e instanceof de) {
+    if (e.status === 401 || e.status === 403) return `auth`;
+    if (
+      e.status === 0 ||
+      e.status === 408 ||
+      e.status === 504 ||
+      (e.errorCode != null && Mt.has(e.errorCode))
+    )
+      return `network`;
+    let t = R(e);
+    return (t?.type != null && Nt.has(t.type)) || (e.errorCode != null && Nt.has(e.errorCode))
+      ? `auth`
+      : `unknown`;
   }
-
-  const profile = props.browserProfile ?? null;
-  return jsx.jsx("div", {
-    className:
-      "flex h-full w-full items-center justify-center bg-surface pb-6 text-default",
-    children: jsx.jsxs("div", {
-      className: "flex w-[340px] flex-col items-center gap-8",
-      children: [
-        jsx.jsxs("div", {
-          className: "flex w-full flex-col items-center gap-4",
-          children: [
-            jsx.jsx(Button, {
-              color: "ghostMuted",
-              radius: "full",
-              size: "inline",
-              "aria-label": intl.formatMessage({
-                id: "electron.onboarding.login.snake.start",
-                defaultMessage: "Play Snake",
-              }),
-              onClick: props.onPlaySnake,
-              children: "ChatGPT",
-            }),
-            jsx.jsx("h1", {
-              className: "text-center text-[28px] leading-9",
-              children: jsx.jsx(FormattedMessage, {
-                id:
-                  props.allowChatGpt && profile != null
-                    ? "electron.onboarding.login.browserSession.welcomeBack"
-                    : props.allowChatGpt
-                      ? "electron.onboarding.login.welcomeV2.title.chatgptSignIn"
-                      : "electron.onboarding.login.welcomeV2.title.apiKey",
-                defaultMessage:
-                  props.allowChatGpt && profile != null
-                    ? "Welcome back"
-                    : props.allowChatGpt
-                      ? "Sign in to ChatGPT"
-                      : "Sign in with an API key",
-              }),
-            }),
-          ],
-        }),
-        props.isApiKeyEntryVisible
-          ? jsx.jsx(LoginContent, {
-              allowApiKey: props.allowApiKey,
-              allowChatGpt: props.allowChatGpt,
-              apiKeySecondaryActionLabel: jsx.jsx(FormattedMessage, {
-                id: "electron.onboarding.login.apikey.cancel",
-                defaultMessage: "Cancel",
-              }),
-              apiKeyValue: props.apiKey,
-              isApiKeyEntryVisible: true,
-              isApiKeySignInPending: props.isApiKeyPending,
-              isChatGptSignInPending: chatPending,
-              onApiKeySecondaryAction: props.onApiKeyReset,
-              onApiKeySubmit: props.onApiKeySubmit,
-              onApiKeyValueChange: props.onApiKeyChange,
-              onChatGptSignIn: () => props.onChatGptSignIn(),
-              onShowApiKeyEntry: props.onShowApiKeyEntry,
+  if (e instanceof Error && `code` in e && typeof e.code == `string` && Mt.has(e.code))
+    return `network`;
+  let t = (typeof e == `string` ? e : e instanceof Error ? e.message : ``).trim().toLowerCase();
+  return Pt.has(t)
+    ? `network`
+    : Nt.has(t) || t === `auth failed` || t === `invalid api key`
+      ? `auth`
+      : `unknown`;
+}
+var Mt, Nt, Pt;
+function Ft() {
+  return (Ft = e(() => {
+    (B(),
+      Pe(),
+      (Mt = new Set([
+        `EAI_AGAIN`,
+        `ECONNREFUSED`,
+        `ECONNRESET`,
+        `ENOTFOUND`,
+        `ETIMEDOUT`,
+        `ERR_CONNECTION_RESET`,
+        `ERR_NETWORK_CHANGED`,
+        `ERR_TIMED_OUT`,
+      ])),
+      (Nt = new Set([
+        `authentication_error`,
+        `forbidden`,
+        `invalid_api_key`,
+        `token_invalidated`,
+        `unauthorized`,
+      ])),
+      (Pt = new Set([
+        `failed to fetch`,
+        `fetch failed`,
+        `load failed`,
+        `network request failed`,
+        `networkerror when attempting to fetch resource.`,
+        `request timed out`,
+      ])));
+  }))();
+}
+function It(e) {
+  let t = (0, Lt.c)(42),
+    {
+      allowApiKey: n,
+      allowChatGpt: r,
+      apiKeyValue: a,
+      browserSessionProfile: s,
+      canCopySignInLink: c,
+      isApiKeyEntryVisible: u,
+      isApiKeySignInPending: ee,
+      isChatGptSignInPending: d,
+      showChatGptProviderSignIn: f,
+      onApiKeySubmit: p,
+      onApiKeyValueChange: m,
+      onChatGptSignIn: h,
+      onChatGptSignUp: ne,
+      onCopySignInLink: v,
+      onPlaySnake: y,
+      onResetApiKeyEntry: re,
+      onShowApiKeyEntry: b,
+    } = e,
+    x = ie(),
+    S = n && u,
+    C = we(d && !S ? `2502927686` : !1),
+    w = Te.chatGptBrowserSession,
+    T = r && s === void 0 && w != null,
+    E;
+  t[0] === T ? (E = t[1]) : ((E = { enabled: T }), (t[0] = T), (t[1] = E));
+  let { data: D, isPending: O } = l(We, E),
+    ae = D?.eligibleWithoutDeviceCheck ?? !1,
+    oe = T && O,
+    k = ke(zt),
+    A = k.get(`update_cta_for_sign_in_with_api_key`, !1),
+    j = T && ae,
+    se = j && k.get(`update_cta_for_sign_in_with_api_key_with_browser_lookup`, !1),
+    ce = A || se,
+    M;
+  t[2] !== k || t[3] !== j
+    ? ((M = j && k.get(`enabled`, !1)), (t[2] = k), (t[3] = j), (t[4] = M))
+    : (M = t[4]);
+  let le = M,
+    N = j && k.get(`security_level`, `high`) === `low` ? `low` : `high`,
+    P = le && (N === `low` ? D?.eligibleWithoutDeviceCheck === !0 : D?.eligible === !0),
+    F;
+  t[5] === P ? (F = t[6]) : ((F = { enabled: P }), (t[5] = P), (t[6] = F));
+  let { data: ue, isPending: de } = i(He, N, F),
+    fe = ue === void 0 ? null : ue,
+    pe = P && de,
+    L = r ? (s ?? null) : null;
+  r && s === void 0 && !pe && (L = fe);
+  let R = Me(L?.avatarUrl),
+    [z, me] = (0, Rt.useState)(null),
+    he = L?.name?.trim() || null,
+    B = he ?? L?.email ?? ``,
+    V = L != null && !S,
+    H;
+  if (r) {
+    let e;
+    (t[8] === V
+      ? (e = t[9])
+      : ((e = V
+          ? (0, Z.jsx)(g, {
+              id: `electron.onboarding.login.browserSession.welcomeBack`,
+              defaultMessage: `Welcome back`,
+              description: `Title on desktop onboarding when a signed-in ChatGPT browser session was found`,
             })
-          : jsx.jsxs("div", {
-              className: "flex w-full flex-col items-center gap-3",
+          : (0, Z.jsx)(g, {
+              id: `electron.onboarding.login.welcomeV2.title.chatgptSignIn`,
+              defaultMessage: `Sign in to ChatGPT`,
+              description: `Title on the v2 desktop onboarding login page for streamlined ChatGPT sign-in`,
+            })),
+        (t[8] = V),
+        (t[9] = e)),
+      (H = e));
+  } else {
+    let e;
+    (t[7] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, Z.jsx)(g, {
+          id: `electron.onboarding.login.welcomeV2.title.apiKey`,
+          defaultMessage: `Sign in with an API key`,
+          description: `Title on desktop onboarding when only API key sign-in is allowed`,
+        })),
+        (t[7] = e))
+      : (e = t[7]),
+      (H = e));
+  }
+  if (r && d && !S) {
+    let e;
+    t[10] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, Z.jsx)(I, { className: `size-10 shrink-0` })), (t[10] = e))
+      : (e = t[10]);
+    let n;
+    t[11] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((n = (0, Z.jsx)(`p`, {
+          className: `text-center text-base leading-5 font-normal text-codex-description`,
+          children: (0, Z.jsx)(g, {
+            id: `electron.onboarding.login.browserPending.welcomeV2`,
+            defaultMessage: `Continue signing in with your browser`,
+            description: `Message shown while ChatGPT sign-in continues in the browser`,
+          }),
+        })),
+        (t[11] = n))
+      : (n = t[11]);
+    let r;
+    t[12] === h ? (r = t[13]) : ((r = () => void h()), (t[12] = h), (t[13] = r));
+    let i;
+    t[14] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((i = (0, Z.jsx)(g, {
+          id: `electron.onboarding.login.chatgpt.cancel.welcomeV2`,
+          defaultMessage: `Cancel sign-in`,
+          description: `Cancel button label while ChatGPT sign-in is in progress on desktop onboarding`,
+        })),
+        (t[14] = i))
+      : (i = t[14]);
+    let a;
+    t[15] === r
+      ? (a = t[16])
+      : ((a = (0, Z.jsx)(`button`, {
+          className: `flex h-[42px] w-full cursor-interaction items-center justify-center rounded-full border border-default bg-surface text-[14px] leading-5 font-medium text-codex-description hover:bg-primary-ghost-hover`,
+          type: `button`,
+          onClick: r,
+          children: i,
+        })),
+        (t[15] = r),
+        (t[16] = a));
+    let s;
+    t[17] !== c || t[18] !== v || t[19] !== C
+      ? ((s = C
+          ? (0, Z.jsxs)(`div`, {
+              className: `flex flex-wrap items-center justify-center gap-2`,
               children: [
-                props.allowChatGpt && profile != null
-                  ? jsx.jsxs(jsx.Fragment, {
-                      children: [
-                        jsx.jsxs(Button, {
-                          className: "w-full justify-start",
-                          color: "outlineSurface",
-                          radius: "large",
-                          size: "auth",
-                          onClick: () =>
-                            props.onChatGptSignIn("signin", profile.email),
-                          children: [
-                            profile.avatarUrl == null
-                              ? jsx.jsx("span", {
-                                  className:
-                                    "flex size-10 items-center justify-center rounded-full bg-chart-yellow/20",
-                                  children: initials(profile),
-                                })
-                              : jsx.jsx("img", {
-                                  alt: "",
-                                  className: "size-10 rounded-full",
-                                  src: profile.avatarUrl,
-                                }),
-                            jsx.jsxs("span", {
-                              className: "min-w-0 flex-1 text-start",
-                              children: [
-                                jsx.jsx("span", {
-                                  className: "block truncate font-medium",
-                                  children:
-                                    profile.name?.trim() || profile.email,
-                                }),
-                                profile.name == null
-                                  ? null
-                                  : jsx.jsx("span", {
-                                      className:
-                                        "block truncate text-codex-description",
-                                      children: profile.email,
-                                    }),
-                              ],
-                            }),
-                          ],
-                        }),
-                        jsx.jsx(Button, {
-                          className: "w-full",
-                          color: "outlineSurface",
-                          size: "auth",
-                          onClick: () => props.onChatGptSignIn("other-account"),
-                          children: jsx.jsx(FormattedMessage, {
-                            id: "electron.onboarding.login.browserSession.otherAccount",
-                            defaultMessage: "Use another account",
-                          }),
-                        }),
-                      ],
-                    })
-                  : props.allowChatGpt
-                    ? jsx.jsx(Button, {
-                        className: "w-full",
-                        color: "primary",
-                        size: "auth",
-                        onClick: () => props.onChatGptSignIn(),
-                        children: jsx.jsx(FormattedMessage, {
-                          id: "electron.onboarding.login.chatgpt.continueToSignIn",
-                          defaultMessage: "Continue to sign in",
-                        }),
-                      })
-                    : null,
-                props.allowChatGpt
-                  ? jsx.jsxs(jsx.Fragment, {
-                      children: [
-                        jsx.jsxs(Button, {
-                          className: "w-full",
-                          color: "outlineSurface",
-                          size: "auth",
-                          onClick: () => props.onChatGptSignIn("google"),
-                          children: [
-                            jsx.jsx(GoogleLogo, { className: "size-5" }),
-                            "Continue with Google",
-                          ],
-                        }),
-                        jsx.jsx(Button, {
-                          className: "w-full",
-                          color: "outlineSurface",
-                          size: "auth",
-                          onClick: () => props.onChatGptSignIn("microsoft"),
-                          children: "Continue with Microsoft",
-                        }),
-                      ],
-                    })
-                  : null,
-                props.allowApiKey
-                  ? jsx.jsx(Button, {
-                      className: "w-full",
-                      color: "outlineSurface",
-                      size: "auth",
-                      onClick: props.onShowApiKeyEntry,
-                      children: props.allowChatGpt
-                        ? "Sign in another way"
-                        : "Sign in with an API key",
-                    })
-                  : null,
-                props.allowChatGpt
-                  ? jsx.jsx(Button, {
-                      color: "ghostMuted",
-                      size: "inline",
-                      onClick: () => props.onChatGptSignIn("signup"),
-                      children: jsx.jsx(FormattedMessage, {
-                        id: "electron.onboarding.login.signup.welcomeV2",
-                        defaultMessage: "Sign up",
-                      }),
-                    })
-                  : null,
+                (0, Z.jsx)(`span`, {
+                  className: `py-2 text-sm leading-5 font-normal text-codex-description select-none`,
+                  children: (0, Z.jsx)(g, {
+                    id: `electron.onboarding.login.browserDidNotOpen`,
+                    defaultMessage: `Browser didn't open?`,
+                    description: `Helper text before the Copy sign-in link action while desktop browser sign-in is pending`,
+                  }),
+                }),
+                (0, Z.jsxs)(_, {
+                  color: `ghost`,
+                  disabled: !c,
+                  size: `dialog`,
+                  onClick: () => void v(),
+                  children: [
+                    (0, Z.jsx)(o, {}),
+                    (0, Z.jsx)(g, {
+                      id: `electron.onboarding.login.copyLink`,
+                      defaultMessage: `Copy sign-in link`,
+                      description: `Button that copies the active sign-in URL so the user can continue signing in in another browser without restarting`,
+                    }),
+                  ],
+                }),
+              ],
+            })
+          : null),
+        (t[17] = c),
+        (t[18] = v),
+        (t[19] = C),
+        (t[20] = s))
+      : (s = t[20]);
+    let l;
+    return (
+      t[21] !== s || t[22] !== a
+        ? ((l = (0, Z.jsx)(`div`, {
+            className: `flex h-full w-full items-center justify-center overflow-hidden bg-surface pb-12 text-default`,
+            children: (0, Z.jsxs)(`div`, {
+              className: `flex w-[340px] flex-col items-center gap-8`,
+              children: [
+                e,
+                n,
+                (0, Z.jsxs)(`div`, {
+                  className: `flex w-full flex-col items-center gap-6`,
+                  children: [a, s],
+                }),
               ],
             }),
-      ],
-    }),
-  });
-}
-
-function SnakeGame({ onExit }: { onExit(): void }): unknown {
-  return jsx.jsx("div", {
-    className: "flex h-full w-full items-center justify-center bg-surface",
-    onKeyDown: (event: { key?: string }) => {
-      if (event.key === "Escape") onExit();
-    },
-    children: jsx.jsxs("div", {
-      className: "flex flex-col items-center gap-4",
-      children: [
-        jsx.jsx("div", {
-          className:
-            "grid size-52 grid-cols-6 gap-1 rounded-xl border border-default p-4",
-          role: "img",
-          "aria-label": "Snake game",
-          children: "■■■■  ●",
+          })),
+          (t[21] = s),
+          (t[22] = a),
+          (t[23] = l))
+        : (l = t[23]),
+      l
+    );
+  }
+  if (!S && (oe || pe)) {
+    let e;
+    return (
+      t[24] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Z.jsxs)(`div`, {
+            className: `flex h-full w-full flex-col items-center justify-center gap-3 bg-surface text-codex-description`,
+            children: [
+              (0, Z.jsx)(te, { className: `h-4 w-4 text-default` }),
+              (0, Z.jsx)(g, {
+                id: `electron.onboarding.login.loading`,
+                defaultMessage: `Loading…`,
+                description: `Loading state while the desktop login page prepares the sign-in experience`,
+              }),
+            ],
+          })),
+          (t[24] = e))
+        : (e = t[24]),
+      e
+    );
+  }
+  let U;
+  t[25] === x
+    ? (U = t[26])
+    : ((U = x.formatMessage({
+        id: `electron.onboarding.login.snake.start`,
+        defaultMessage: `Play Snake`,
+        description: `Aria label for the ChatGPT logo button to start Snake`,
+      })),
+      (t[25] = x),
+      (t[26] = U));
+  let W;
+  t[27] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((W = (0, Z.jsx)(I, { className: `shrink-0` })), (t[27] = W))
+    : (W = t[27]);
+  let G;
+  t[28] !== y || t[29] !== U
+    ? ((G = (0, Z.jsx)(_, {
+        className: `group justify-center`,
+        color: `ghostMuted`,
+        radius: `full`,
+        size: `inline`,
+        type: `button`,
+        "aria-label": U,
+        onClick: y,
+        children: W,
+      })),
+      (t[28] = y),
+      (t[29] = U),
+      (t[30] = G))
+    : (G = t[30]);
+  let K;
+  t[31] === H
+    ? (K = t[32])
+    : ((K = (0, Z.jsx)(`h1`, {
+        className: `w-[316px] text-center text-[28px] leading-9 font-normal text-default`,
+        children: H,
+      })),
+      (t[31] = H),
+      (t[32] = K));
+  let q;
+  t[33] === V
+    ? (q = t[34])
+    : ((q = V
+        ? (0, Z.jsx)(`p`, {
+            className: `text-center text-[14px] leading-5 text-codex-description`,
+            children: (0, Z.jsx)(g, {
+              id: `electron.onboarding.login.browserSession.chooseAccount`,
+              defaultMessage: `Choose an account to continue to ChatGPT`,
+              description: `Instruction on desktop onboarding when a signed-in ChatGPT browser session was found`,
+            }),
+          })
+        : null),
+      (t[33] = V),
+      (t[34] = q));
+  let J;
+  t[35] !== K || t[36] !== q || t[37] !== G
+    ? ((J = (0, Z.jsxs)(`div`, {
+        className: `flex w-full flex-col items-center gap-4`,
+        children: [G, K, q],
+      })),
+      (t[35] = K),
+      (t[36] = q),
+      (t[37] = G),
+      (t[38] = J))
+    : (J = t[38]);
+  let ge = S
+      ? (0, Z.jsx)(`div`, {
+          className: `w-full`,
+          children: (0, Z.jsx)(lt, {
+            allowApiKey: n,
+            allowChatGpt: r,
+            apiKeyValue: a,
+            isApiKeyEntryVisible: u,
+            isApiKeySignInPending: ee,
+            isChatGptSignInPending: d,
+            onApiKeySecondaryAction: re,
+            onApiKeySubmit: p,
+            onApiKeyValueChange: m,
+            onChatGptSignIn: h,
+            onShowApiKeyEntry: b,
+            apiKeySecondaryActionLabel: (0, Z.jsx)(g, {
+              id: `electron.onboarding.login.apikey.cancel`,
+              defaultMessage: `Cancel`,
+              description: `Cancel button label for API key entry on desktop onboarding`,
+            }),
+          }),
+        })
+      : (0, Z.jsxs)(`div`, {
+          className: `flex w-full flex-col items-center gap-3`,
+          children: [
+            r &&
+              (L == null
+                ? (0, Z.jsxs)(`button`, {
+                    className: `flex h-[48px] w-full cursor-interaction items-center justify-center gap-2 rounded-full border border-transparent bg-primary-solid text-[14px] leading-5 font-medium text-primary-solid hover:bg-text/80`,
+                    type: `button`,
+                    onClick: () => h(),
+                    children: [
+                      (0, Z.jsx)(Se, { className: `size-6 shrink-0 text-primary-solid` }),
+                      (0, Z.jsx)(g, {
+                        id: `electron.onboarding.login.chatgpt.continueToSignIn`,
+                        defaultMessage: `Continue to sign in`,
+                        description: `Button label for streamlined ChatGPT sign-in on desktop onboarding`,
+                      }),
+                    ],
+                  })
+                : (0, Z.jsxs)(Z.Fragment, {
+                    children: [
+                      (0, Z.jsxs)(_, {
+                        className: `w-full justify-start text-start`,
+                        color: `outlineSurface`,
+                        radius: `large`,
+                        size: `auth`,
+                        type: `button`,
+                        "aria-label": x.formatMessage(
+                          {
+                            id: `electron.onboarding.login.browserSession.continueAs`,
+                            defaultMessage: `Continue as {accountName}`,
+                            description: `Accessible label for the recognized ChatGPT browser account button on desktop onboarding`,
+                          },
+                          { accountName: B },
+                        ),
+                        onClick: () => h(`signin`, L.email),
+                        children: [
+                          R != null && R !== z
+                            ? (0, Z.jsx)(`img`, {
+                                src: R,
+                                alt: ``,
+                                className: `size-10 shrink-0 rounded-full`,
+                                onError: () => {
+                                  me(R);
+                                },
+                              })
+                            : (0, Z.jsx)(`span`, {
+                                className: `flex size-10 shrink-0 items-center justify-center rounded-full bg-chart-yellow/20 text-[14px] font-medium text-default`,
+                                children: Ne(B),
+                              }),
+                          (0, Z.jsxs)(`span`, {
+                            className: `min-w-0 flex-1`,
+                            children: [
+                              (0, Z.jsx)(`span`, {
+                                className: `block truncate text-[14px] leading-5 font-medium text-default`,
+                                children: B,
+                              }),
+                              he == null
+                                ? null
+                                : (0, Z.jsx)(`span`, {
+                                    className: `block truncate text-[13px] leading-5 text-codex-description`,
+                                    children: L.email,
+                                  }),
+                            ],
+                          }),
+                        ],
+                      }),
+                      (0, Z.jsxs)(`div`, {
+                        className: `flex w-full items-center gap-4 py-2`,
+                        "aria-hidden": `true`,
+                        children: [
+                          (0, Z.jsx)(`span`, { className: `h-px flex-1 bg-border` }),
+                          (0, Z.jsx)(`span`, {
+                            className: `text-[12px] font-medium text-codex-description`,
+                            children: (0, Z.jsx)(g, {
+                              id: `electron.onboarding.login.browserSession.or`,
+                              defaultMessage: `OR`,
+                              description: `Divider label between the recognized ChatGPT browser account and other sign-in options`,
+                            }),
+                          }),
+                          (0, Z.jsx)(`span`, { className: `h-px flex-1 bg-border` }),
+                        ],
+                      }),
+                      (0, Z.jsx)(`button`, {
+                        className: `flex h-[46px] w-full cursor-interaction items-center justify-center rounded-full border border-default bg-surface text-[14px] leading-5 font-medium text-default hover:bg-primary-ghost-hover`,
+                        type: `button`,
+                        onClick: () => h(`other-account`),
+                        children: (0, Z.jsx)(g, {
+                          id: `electron.onboarding.login.browserSession.otherAccount`,
+                          defaultMessage: `Use another account`,
+                          description: `Button label to sign in with a different ChatGPT account after a browser account was recognized`,
+                        }),
+                      }),
+                    ],
+                  })),
+            r && f
+              ? (0, Z.jsxs)(Z.Fragment, {
+                  children: [
+                    (0, Z.jsxs)(`button`, {
+                      className: `flex h-[46px] w-full cursor-interaction items-center justify-center gap-2 rounded-full border border-default bg-surface text-[14px] leading-5 font-medium text-default hover:bg-primary-ghost-hover`,
+                      type: `button`,
+                      onClick: () => h(`google`),
+                      children: [
+                        (0, Z.jsx)(Be, { className: `size-5 shrink-0`, "aria-hidden": `true` }),
+                        (0, Z.jsx)(g, {
+                          id: `electron.onboarding.login.google.signIn`,
+                          defaultMessage: `Continue with Google`,
+                          description: `Button label for Google sign-in on desktop onboarding`,
+                        }),
+                      ],
+                    }),
+                    (0, Z.jsxs)(`button`, {
+                      className: `flex h-[46px] w-full cursor-interaction items-center justify-center gap-2 rounded-full border border-default bg-surface text-[14px] leading-5 font-medium text-default hover:bg-primary-ghost-hover`,
+                      type: `button`,
+                      onClick: () => h(`microsoft`),
+                      children: [
+                        (0, Z.jsx)(Le, { className: `size-5 shrink-0`, "aria-hidden": `true` }),
+                        (0, Z.jsx)(g, {
+                          id: `electron.onboarding.login.microsoft.signIn`,
+                          defaultMessage: `Continue with Microsoft`,
+                          description: `Button label for Microsoft sign-in on desktop onboarding`,
+                        }),
+                      ],
+                    }),
+                  ],
+                })
+              : null,
+            n
+              ? (0, Z.jsx)(`button`, {
+                  className: `flex h-[46px] w-full cursor-interaction items-center justify-center rounded-full border border-default bg-surface text-[14px] leading-5 font-medium text-default hover:bg-primary-ghost-hover`,
+                  type: `button`,
+                  onClick: b,
+                  children:
+                    !r || ce
+                      ? (0, Z.jsx)(g, {
+                          id: `electron.onboarding.login.apikey.open.explicit.welcomeV2`,
+                          defaultMessage: `Sign in with an API key`,
+                          description: `Button label to open API key sign-in on v2 desktop onboarding`,
+                        })
+                      : (0, Z.jsx)(g, {
+                          id: `electron.onboarding.login.apikey.open.welcomeV2`,
+                          defaultMessage: `Sign in another way`,
+                          description: `Button label to open another sign-in method on v2 desktop onboarding`,
+                        }),
+                })
+              : null,
+            r
+              ? (0, Z.jsx)(`button`, {
+                  className: `flex h-9 cursor-interaction items-center justify-center px-2 text-[14px] leading-5 font-medium text-codex-description underline hover:text-default`,
+                  type: `button`,
+                  onClick: ne,
+                  children: (0, Z.jsx)(g, {
+                    id: `electron.onboarding.login.signup.welcomeV2`,
+                    defaultMessage: `Sign up`,
+                    description: `Sign-up link on v2 desktop onboarding`,
+                  }),
+                })
+              : null,
+          ],
         }),
-        jsx.jsx(Button, {
-          color: "ghost",
-          size: "dialog",
-          onClick: onExit,
-          children: "Exit game",
-        }),
-      ],
-    }),
-  });
+    _e;
+  return (
+    t[39] !== J || t[40] !== ge
+      ? ((_e = (0, Z.jsx)(`div`, {
+          className: `flex h-full w-full items-center justify-center overflow-hidden bg-surface pb-6 text-default`,
+          children: (0, Z.jsxs)(`div`, {
+            className: `flex w-[340px] flex-col items-center gap-8`,
+            children: [J, ge],
+          }),
+        })),
+        (t[39] = J),
+        (t[40] = ge),
+        (t[41] = _e))
+      : (_e = t[41]),
+    _e
+  );
 }
-
-function LoginRouteContent({
-  workspaceRecovery,
-}: {
-  workspaceRecovery: boolean;
-}): unknown {
-  const scope = getScope(appScope);
-  const navigate = useNavigate();
-  const intl = useIntl();
-  const methods = useSignalFamilyValue(loginMethodState, desktopHostId);
-  const allowChatGpt = methods.status === "ready" && methods.chatgpt;
-  const allowApiKey = methods.status === "ready" && methods.api;
-  const [apiKey, setApiKey] = React.useState("");
-  const [isApiKeyEntryVisible, setApiKeyEntryVisible] = React.useState(false);
-  const [apiController, setApiController] =
-    React.useState<AbortController | null>(null);
-  const [browserAuth, setBrowserAuth] = React.useState<BrowserAuthState | null>(
-    null,
-  );
-  const apiControllerRef = React.useRef<AbortController | null>(null);
-  const browserControllerRef = React.useRef<AbortController | null>(null);
-  const [browserProfile, setBrowserProfile] = React.useState<
-    BrowserProfile | null | undefined
-  >(undefined);
-  const [browserProfileLoading, setBrowserProfileLoading] =
-    React.useState(false);
-  const [playingSnake, setPlayingSnake] = React.useState(false);
-
-  React.useEffect(
-    () => () => {
-      apiControllerRef.current?.abort();
-      browserControllerRef.current?.abort();
-    },
-    [],
-  );
-
-  React.useEffect(() => {
-    if (!allowChatGpt) {
-      setBrowserProfile(null);
-      setBrowserProfileLoading(false);
-      return;
-    }
-    const service = appServices.chatGptBrowserSession as
-      BrowserSessionService | undefined;
-    if (service == null) {
-      setBrowserProfile(null);
-      return;
-    }
-    const controller = new AbortController();
-    const probeId = crypto.randomUUID();
-    setBrowserProfileLoading(true);
-    void (async () => {
-      try {
-        const eligibility = await service.getLookupEligibility();
-        if (controller.signal.aborted || eligibility?.eligible !== true) {
-          if (!controller.signal.aborted) setBrowserProfile(null);
+var Lt, Rt, Z, zt;
+function Bt() {
+  return (Bt = e(() => {
+    ((Lt = n()),
+      s(),
+      (Rt = b()),
+      d(),
+      V(),
+      y(),
+      w(),
+      r(),
+      ze(),
+      Re(),
+      Oe(),
+      pe(),
+      ye(),
+      W(),
+      J(),
+      Ue(),
+      ot(),
+      (Z = u()),
+      (zt = `1504988142`));
+  }))();
+}
+function Vt(e) {
+  let t = (0, Ht.c)(76),
+    { workspaceRecovery: n } = e,
+    r = n !== void 0 && n,
+    o = f(v),
+    s = se(),
+    c = Ce(),
+    u = ie(),
+    d = a(),
+    p = i(st, Ae),
+    m = p.status === `ready` && p.chatgpt,
+    h = p.status === `ready` && p.api,
+    _ = l(he),
+    y;
+  t[0] === _
+    ? (y = t[1])
+    : ((y = _ == null ? null : { hasPreviouslyCompletedOnboarding: _ }), (t[0] = _), (t[1] = y));
+  let b = y,
+    x = _e(),
+    C = ke(yt),
+    w;
+  t[2] === C ? (w = t[3]) : ((w = _t(C.get(`enabled`, !1))), (t[2] = C), (t[3] = w));
+  let T = w,
+    D;
+  t[4] !== u || t[5] !== o
+    ? ((D = (e) => {
+        o.get(E).warning(
+          u.formatMessage(
+            {
+              id: `electron.onboarding.login.error`,
+              defaultMessage: `Sign-in failed: {rawMessage}`,
+              description: `Toast shown when sign-in fails on the desktop onboarding page`,
+            },
+            { rawMessage: e },
+          ),
+        );
+      }),
+      (t[4] = u),
+      (t[5] = o),
+      (t[6] = D))
+    : (D = t[6]);
+  let O = D,
+    [k, A] = (0, Q.useState)(null),
+    j = k != null,
+    M = (0, Q.useRef)(null),
+    le,
+    N;
+  (t[7] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((le = () => () => M.current?.abort()), (N = []), (t[7] = le), (t[8] = N))
+    : ((le = t[7]), (N = t[8])),
+    (0, Q.useEffect)(le, N));
+  let P, F;
+  (t[9] === m
+    ? ((P = t[10]), (F = t[11]))
+    : ((P = () => {
+        m || M.current?.abort();
+      }),
+      (F = [m]),
+      (t[9] = m),
+      (t[10] = P),
+      (t[11] = F)),
+    (0, Q.useEffect)(P, F));
+  let [ue, de] = (0, Q.useState)(!1),
+    [I, pe] = (0, Q.useState)(!1),
+    [L, R] = (0, Q.useState)(``),
+    [z, me] = (0, Q.useState)(null),
+    B = z != null,
+    V,
+    H;
+  (t[12] === z
+    ? ((V = t[13]), (H = t[14]))
+    : ((V = () => () => z?.abort()), (H = [z]), (t[12] = z), (t[13] = V), (t[14] = H)),
+    (0, Q.useEffect)(V, H));
+  let U, W;
+  (t[15] !== h || t[16] !== z
+    ? ((U = () => {
+        h || z?.abort();
+      }),
+      (W = [h, z]),
+      (t[15] = h),
+      (t[16] = z),
+      (t[17] = U),
+      (t[18] = W))
+    : ((U = t[17]), (W = t[18])),
+    (0, Q.useEffect)(U, W));
+  let G = (0, Q.useRef)(null),
+    J;
+  t[19] === o
+    ? (J = t[20])
+    : ((J = () => {
+        (o.set(Ee, !1), o.set(q, !0));
+      }),
+      (t[19] = o),
+      (t[20] = J));
+  let ve = J,
+    ye;
+  t[21] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((ye = () => {
+        (de(!1), me(null), R(``));
+      }),
+      (t[21] = ye))
+    : (ye = t[21]);
+  let xe = ye,
+    Se;
+  t[22] !== p.api || t[23] !== p.status || t[24] !== b || t[25] !== o
+    ? ((Se = () => {
+        b != null &&
+          p.status === `ready` &&
+          p.api &&
+          (Y(o, re, { method: `apikey`, ...b }), de(!0));
+      }),
+      (t[22] = p.api),
+      (t[23] = p.status),
+      (t[24] = b),
+      (t[25] = o),
+      (t[26] = Se))
+    : (Se = t[26]);
+  let we = Se,
+    Oe;
+  t[27] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((Oe = () => {
+        pe(!1);
+      }),
+      (t[27] = Oe))
+    : (Oe = t[27]);
+  let je = Oe,
+    Me;
+  if (t[28] === Symbol.for(`react.memo_cache_sentinel`)) {
+    let e = () => {
+      G.current ??
+        (typeof window > `u` ||
+          (`AudioContext` in window &&
+            ((G.current = new window.AudioContext()),
+            G.current.state === `suspended` && G.current.resume())));
+    };
+    ((Me = () => {
+      (e(), pe(!0));
+    }),
+      (t[28] = Me));
+  } else Me = t[28];
+  let Ne = Me,
+    Pe;
+  t[29] !== k?.browserUrl || t[30] !== u || t[31] !== o
+    ? ((Pe = async () => {
+        let e = k?.browserUrl;
+        e != null &&
+          (await ne(e)) &&
+          o
+            .get(E)
+            .success(
+              u.formatMessage({
+                id: `electron.onboarding.login.linkCopied`,
+                defaultMessage: `Sign-in link copied`,
+                description: `Toast confirming that the active browser sign-in link was copied so the user can paste it into another browser`,
+              }),
+            );
+      }),
+      (t[29] = k?.browserUrl),
+      (t[30] = u),
+      (t[31] = o),
+      (t[32] = Pe))
+    : (Pe = t[32]);
+  let Fe = Pe,
+    Le;
+  t[33] !== p.chatgpt ||
+  t[34] !== p.status ||
+  t[35] !== b ||
+  t[36] !== c ||
+  t[37] !== d ||
+  t[38] !== o ||
+  t[39] !== O ||
+  t[40] !== ve ||
+  t[41] !== x ||
+  t[42] !== s ||
+  t[43] !== r
+    ? ((Le = async (e, t) => {
+        let n = e === void 0 ? `signin` : e;
+        if (M.current != null) {
+          (M.current.abort(), (M.current = null), A(null));
           return;
         }
-        const info = await appServices.appInfo.get();
-        const origin =
-          info.chatGptDesktopAuthOrigin?.trim() || "https://chatgpt.com";
-        const profile = await service.probe(
-          probeId,
-          new URL("/codex/desktop-session", origin).toString(),
-          "high",
-        );
-        if (!controller.signal.aborted)
-          setBrowserProfile(normalizeBrowserProfile(profile));
-      } catch {
-        if (!controller.signal.aborted) setBrowserProfile(null);
-      } finally {
-        if (!controller.signal.aborted) setBrowserProfileLoading(false);
-      }
-    })();
-    return () => {
-      controller.abort();
-      service.cancelProbe(probeId);
-    };
-  }, [allowChatGpt]);
-
-  const showError = (error: unknown) => {
-    scope.get(toastManagerSignal).danger(
-      String(
-        intl.formatMessage(
-          {
-            id: "electron.onboarding.login.error",
-            defaultMessage: "Sign-in failed: {rawMessage}",
-          },
-          { rawMessage: getErrorMessage(error) },
-        ),
-      ),
+        if (b == null || p.status !== `ready` || !p.chatgpt) return;
+        let i = n === `google` || n === `microsoft` ? n : `chatgpt`;
+        Y(o, re, { method: i, ...b });
+        let a = new AbortController();
+        ((M.current = a),
+          A({ controller: a, browserUrl: null }),
+          await (async () => {
+            try {
+              let { useDesktopAuth: e, useStreamlinedLoginUx: l } = gt(De(x, vt)),
+                { authUrl: u, completion: f } = await Ge({
+                  scope: o,
+                  signal: a.signal,
+                  useHostedLoginSuccessPage: !0,
+                  useStreamlinedLogin: l,
+                });
+              if (u && !a.signal.aborted) {
+                let i = e && !r ? (await Te.appInfo.get()).chatGptDesktopAuthOrigin : void 0;
+                if (a.signal.aborted) return;
+                let s = At(u, n),
+                  c = Ye({
+                    authUrl: s,
+                    codexAppVersion: qe(o),
+                    desktopAuthOrigin: i,
+                    includeCodexOriginStableId: !0,
+                    loginHint: t,
+                    useDesktopAuth: e && !r,
+                    useStreamlinedLoginUx: l,
+                  });
+                (A((e) => (e?.controller === a ? { controller: a, browserUrl: c } : e)),
+                  ge({
+                    href: c,
+                    initiator: `open_in_browser_bridge`,
+                    openTarget: `external-browser`,
+                  }));
+              }
+              let p = await f;
+              if (a.signal.aborted) return;
+              if (p.success) {
+                if (
+                  (Y(o, ae, { method: i, ...b, ...K(p.onboardingEntrypoint) }),
+                  d.removeQueries({ queryKey: oe(`account-info`), exact: !0 }),
+                  r)
+                ) {
+                  (s(), await c(`/`, { replace: !0 }));
+                  return;
+                }
+                (ve(),
+                  o.set(be, !0),
+                  p.onboardingEntrypoint != null && Ie(o, p.onboardingEntrypoint),
+                  o.set(nt, p.onboardingEntrypoint),
+                  s(),
+                  c(`/welcome`, { replace: !0 }));
+              } else
+                (Y(o, S, { method: i, errorKind: jt(p.error), ...b }),
+                  O(ee(p.error ?? `Unknown error`)));
+            } catch (e) {
+              let t = e;
+              if (t instanceof Error && t.name === `AbortError`) {
+                Y(o, S, { method: i, errorKind: `abort`, ...b });
+                return;
+              }
+              (Y(o, S, { method: i, errorKind: jt(t), ...b }), O(ee(t)));
+            }
+          })().finally(() => {
+            (M.current === a && (M.current = null), A((e) => (e?.controller === a ? null : e)));
+          }));
+      }),
+      (t[33] = p.chatgpt),
+      (t[34] = p.status),
+      (t[35] = b),
+      (t[36] = c),
+      (t[37] = d),
+      (t[38] = o),
+      (t[39] = O),
+      (t[40] = ve),
+      (t[41] = x),
+      (t[42] = s),
+      (t[43] = r),
+      (t[44] = Le))
+    : (Le = t[44]);
+  let Re = Le,
+    ze;
+  t[45] !== L ||
+  t[46] !== B ||
+  t[47] !== p.api ||
+  t[48] !== p.status ||
+  t[49] !== b ||
+  t[50] !== c ||
+  t[51] !== o ||
+  t[52] !== O ||
+  t[53] !== ve ||
+  t[54] !== s ||
+  t[55] !== r
+    ? ((ze = async () => {
+        let e = L.trim();
+        if (!e || B || b == null || p.status !== `ready` || !p.api) return;
+        let t = new AbortController();
+        (me(t),
+          await (async () => {
+            try {
+              if ((await fe(o, Ae).loginWithApiKey(e), t.signal.aborted)) return;
+              if ((Y(o, ae, { method: `apikey`, ...b }), r)) {
+                (s(), await c(`/`, { replace: !0 }));
+                return;
+              }
+              (ve(), o.set(be, !0), o.set(nt, void 0), s(), c(`/welcome`, { replace: !0 }));
+            } catch (e) {
+              let n = e;
+              if (t.signal.aborted) return;
+              (Y(o, S, { method: `apikey`, errorKind: jt(n), ...b }), O(ee(n)));
+            }
+          })().finally(() => {
+            me((e) => (e === t ? null : e));
+          }));
+      }),
+      (t[45] = L),
+      (t[46] = B),
+      (t[47] = p.api),
+      (t[48] = p.status),
+      (t[49] = b),
+      (t[50] = c),
+      (t[51] = o),
+      (t[52] = O),
+      (t[53] = ve),
+      (t[54] = s),
+      (t[55] = r),
+      (t[56] = ze))
+    : (ze = t[56]);
+  let Be = ze;
+  if (p.status !== `ready` || (!p.api && !p.chatgpt)) {
+    let e;
+    return (
+      t[57] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, $.jsx)(ce, { children: (0, $.jsx)(ct, { hostId: Ae }) })), (t[57] = e))
+        : (e = t[57]),
+      e
     );
-  };
-
-  const finishLogin = async () => {
-    if (workspaceRecovery) {
-      await navigate("/", { replace: true });
-      return;
-    }
-    navigate("/welcome", { replace: true });
-  };
-
-  const onChatGptSignIn = async (
-    intent: LoginIntent = "signin",
-    loginHint?: string,
-  ) => {
-    if (browserControllerRef.current != null) {
-      browserControllerRef.current.abort();
-      browserControllerRef.current = null;
-      setBrowserAuth(null);
-      return;
-    }
-    if (!allowChatGpt) return;
-    const controller = new AbortController();
-    browserControllerRef.current = controller;
-    const provider = providerForIntent(intent);
-    setBrowserAuth({ browserUrl: null, controller });
-    trackAnalyticsEvent(scope, "desktop_login_started", {
-      method: provider,
-      workspaceRecovery,
-    });
-    try {
-      const start = normalizeStartResult(
-        await startChatGptLogin({
-          hostId: desktopHostId,
-          scope,
-          signal: controller.signal,
-          useHostedLoginSuccessPage: true,
-          useStreamlinedLogin: true,
-        }),
-      );
-      if (start == null) throw new Error("Invalid sign-in response");
-      if (start.authUrl != null && !controller.signal.aborted) {
-        const authUrl = addLoginIntent(start.authUrl, intent);
-        const browserUrl = buildDesktopAuthUrl({
-          authUrl,
-          codexAppVersion: getCodexAppVersion(scope),
-          includeCodexOriginStableId: true,
-          loginHint,
-          useDesktopAuth: !workspaceRecovery,
-          useStreamlinedLoginUx: true,
-        });
-        setBrowserAuth((current) =>
-          current?.controller === controller
-            ? { browserUrl, controller }
-            : current,
-        );
-        openExternalLink({
-          href: browserUrl,
-          initiator: "open_in_browser_bridge",
-          openTarget: "external-browser",
-        });
-      }
-      const completion = normalizeCompletion(await start.completion);
-      if (controller.signal.aborted) return;
-      if (!completion.success)
-        throw completion.error ?? new Error("Unknown error");
-      trackAnalyticsEvent(scope, "desktop_login_succeeded", {
-        method: provider,
-        onboardingEntrypoint: completion.onboardingEntrypoint,
-        workspaceRecovery,
-      });
-      await finishLogin();
-    } catch (error) {
-      const errorKind = classifyLoginError(error);
-      trackAnalyticsEvent(scope, "desktop_login_failed", {
-        errorKind,
-        method: provider,
-      });
-      if (errorKind !== "abort") showError(error);
-    } finally {
-      if (browserControllerRef.current === controller)
-        browserControllerRef.current = null;
-      setBrowserAuth((current) =>
-        current?.controller === controller ? null : current,
-      );
-    }
-  };
-
-  const onApiKeySubmit = async () => {
-    const value = apiKey.trim();
-    if (value === "" || apiController != null || !allowApiKey) return;
-    const controller = new AbortController();
-    apiControllerRef.current = controller;
-    setApiController(controller);
-    trackAnalyticsEvent(scope, "desktop_login_started", {
-      method: "apikey",
-      workspaceRecovery,
-    });
-    try {
-      const client = getHostClient(
-        scope,
-        desktopHostId,
-      ) as unknown as ApiKeyClient;
-      if (client.loginWithApiKey != null) await client.loginWithApiKey(value);
-      else if (client.sendRequest != null)
-        await client.sendRequest("loginWithApiKey", { apiKey: value });
-      else throw new Error("API key sign-in is unavailable");
-      if (controller.signal.aborted) return;
-      trackAnalyticsEvent(scope, "desktop_login_succeeded", {
-        method: "apikey",
-        workspaceRecovery,
-      });
-      await finishLogin();
-    } catch (error) {
-      if (controller.signal.aborted) return;
-      trackAnalyticsEvent(scope, "desktop_login_failed", {
-        errorKind: classifyLoginError(error),
-        method: "apikey",
-      });
-      showError(error);
-    } finally {
-      if (apiControllerRef.current === controller)
-        apiControllerRef.current = null;
-      setApiController((current) => (current === controller ? null : current));
-    }
-  };
-
-  if (methods.status !== "ready" || (!methods.api && !methods.chatgpt)) {
-    return jsx.jsx(PageLayout, {
-      title: "",
-      showFooter: false,
-      children: jsx.jsx(LoginMethodUnavailable, { hostId: desktopHostId }),
-    });
   }
-
-  const content = playingSnake
-    ? jsx.jsx(SnakeGame, { onExit: () => setPlayingSnake(false) })
-    : jsx.jsx(LoginSurface, {
-        allowApiKey,
-        allowChatGpt,
-        apiKey,
-        browserAuth,
-        browserProfile,
-        browserProfileLoading,
-        isApiKeyEntryVisible,
-        isApiKeyPending: apiController != null,
-        onApiKeyChange: setApiKey,
-        onApiKeyReset: () => {
-          apiControllerRef.current?.abort();
-          apiControllerRef.current = null;
-          setApiController(null);
-          setApiKey("");
-          setApiKeyEntryVisible(false);
-        },
-        onApiKeySubmit: () => void onApiKeySubmit(),
-        onChatGptSignIn: (intent, hint) => void onChatGptSignIn(intent, hint),
-        onCopySignInLink: () => {
-          const browserUrl = browserAuth?.browserUrl;
-          if (browserUrl == null) return;
-          copyText(browserUrl);
-          scope.get(toastManagerSignal).success(
-            String(
-              intl.formatMessage({
-                id: "electron.onboarding.login.linkCopied",
-                defaultMessage: "Sign-in link copied",
-              }),
-            ),
-          );
-        },
-        onPlaySnake: () => setPlayingSnake(true),
-        onShowApiKeyEntry: () => setApiKeyEntryVisible(true),
-      });
-
-  return jsx.jsx(PageLayout, {
-    title: "",
-    showFooter: false,
-    children: content,
-  });
+  if (b == null) {
+    let e;
+    return (
+      t[58] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, $.jsx)(ce, {
+            children: (0, $.jsxs)(`div`, {
+              className: `flex h-full w-full flex-col items-center justify-center gap-3 text-codex-description`,
+              children: [
+                (0, $.jsx)(te, { className: `h-4 w-4 text-default` }),
+                (0, $.jsx)(g, {
+                  id: `electron.onboarding.login.loading`,
+                  defaultMessage: `Loading…`,
+                  description: `Loading state while the desktop login page prepares the sign-in experience`,
+                }),
+              ],
+            }),
+          })),
+          (t[58] = e))
+        : (e = t[58]),
+      e
+    );
+  }
+  let Ve;
+  t[59] !== L ||
+  t[60] !== k?.browserUrl ||
+  t[61] !== Be ||
+  t[62] !== Re ||
+  t[63] !== Fe ||
+  t[64] !== ue ||
+  t[65] !== B ||
+  t[66] !== j ||
+  t[67] !== I ||
+  t[68] !== p.api ||
+  t[69] !== p.chatgpt ||
+  t[70] !== we ||
+  t[71] !== T
+    ? ((Ve = I
+        ? (0, $.jsx)(`div`, {
+            className: `flex h-full w-full`,
+            children: (0, $.jsx)(xt, { onExit: je, audioContextRef: G }),
+          })
+        : (0, $.jsx)(It, {
+            allowApiKey: p.api,
+            allowChatGpt: p.chatgpt,
+            apiKeyValue: L,
+            canCopySignInLink: k?.browserUrl != null,
+            isApiKeyEntryVisible: ue,
+            isApiKeySignInPending: B,
+            isChatGptSignInPending: j,
+            showChatGptProviderSignIn: T,
+            onApiKeySubmit: Be,
+            onApiKeyValueChange: R,
+            onChatGptSignIn: Re,
+            onChatGptSignUp: () => Re(`signup`),
+            onCopySignInLink: Fe,
+            onPlaySnake: Ne,
+            onResetApiKeyEntry: xe,
+            onShowApiKeyEntry: we,
+          })),
+      (t[59] = L),
+      (t[60] = k?.browserUrl),
+      (t[61] = Be),
+      (t[62] = Re),
+      (t[63] = Fe),
+      (t[64] = ue),
+      (t[65] = B),
+      (t[66] = j),
+      (t[67] = I),
+      (t[68] = p.api),
+      (t[69] = p.chatgpt),
+      (t[70] = we),
+      (t[71] = T),
+      (t[72] = Ve))
+    : (Ve = t[72]);
+  let He;
+  return (
+    t[73] !== I || t[74] !== Ve
+      ? ((He = (0, $.jsx)(ce, { fullBleed: !0, hideHeader: I, children: Ve })),
+        (t[73] = I),
+        (t[74] = Ve),
+        (t[75] = He))
+      : (He = t[75]),
+    He
+  );
 }
-
-export function LoginRoute(): unknown {
-  const [searchParams] = useSearchParams();
-  return jsx.jsx(LoginRouteContent, {
-    workspaceRecovery: searchParams.get("workspaceRecovery") === "true",
-  });
+var Ht, Q, $;
+function Ut() {
+  return (Ut = e(() => {
+    ((Ht = n()),
+      x(),
+      m(),
+      s(),
+      O(),
+      (Q = b()),
+      d(),
+      F(),
+      L(),
+      Ke(),
+      P(),
+      j(),
+      r(),
+      C(),
+      rt(),
+      k(),
+      Fe(),
+      ye(),
+      p(),
+      A(),
+      Je(),
+      J(),
+      bt(),
+      h(),
+      xe(),
+      G(),
+      le(),
+      kt(),
+      it(),
+      at(),
+      Ft(),
+      Bt(),
+      ($ = u()));
+  }))();
 }
+function Wt() {
+  let e = (0, Gt.c)(6),
+    [t] = U();
+  {
+    let n;
+    e[1] === t ? (n = e[2]) : ((n = t.get(`workspaceRecovery`)), (e[1] = t), (e[2] = n));
+    let r = n === `true`,
+      i;
+    return (
+      e[3] === r
+        ? (i = e[4])
+        : ((i = (0, Kt.jsx)(Vt, { workspaceRecovery: r })), (e[3] = r), (e[4] = i)),
+      i
+    );
+  }
+}
+var Gt, Kt;
+function qt() {
+  return (qt = e(() => {
+    ((Gt = n()), F(), dt(), ht(), Ut(), (Kt = u()));
+  }))();
+}
+qt();
+export { Wt as LoginRoute };

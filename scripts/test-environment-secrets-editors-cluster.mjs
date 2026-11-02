@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
   jsx = {
     Fragment: Symbol("Fragment"),
@@ -164,47 +165,7 @@ assert.equal(variableView.props.children[3].props.role, "alert");
 variableView.props.children[4].props.onClick();
 assert.equal(variableDeleted, 1);
 
-const secretRow = await load("environment-secret-row");
-secretRow.n();
-let secret = null,
-  secretDeleted = 0;
-const secretView = secretRow.t({
-  secret: {
-    id: 1,
-    name: "KEY",
-    value: "secret",
-    injectionTarget: {
-      type: "environment_variable",
-      name: "KEY",
-      domain: "example.com",
-    },
-  },
-  secrets: [],
-  issues: ["Conflict"],
-  onChange: (value) => {
-    secret = value;
-  },
-  onDelete: () => {
-    secretDeleted++;
-  },
-});
-assert.equal(secretView.props.children[1].props.type, "password");
-secretView.props.children[2].props.onChange({
-  currentTarget: { value: "openai.com" },
-});
-assert.equal(secret.injectionTarget.domain, "openai.com");
-assert.equal(secretView.props.children[3][0].props.role, "alert");
-secretView.props.children[4].props.onClick();
-assert.equal(secretDeleted, 1);
-const requested = secretRow.t({
-  secret: { id: 2, name: "REQ", value: "", requested: true },
-  secrets: [],
-  readOnly: true,
-  onChange() {},
-  onDelete() {},
-});
-assert.equal(requested.props.children[0].props.disabled, true);
-assert.equal(requested.props.children[4].props.children, "Remove requirement");
+const secretRowReleaseAssertions = assertReleaseOwner("environment-secret-row");
 
 const service = await load("personal-secrets-service");
 let preflightInput = null;
@@ -363,4 +324,4 @@ assert.equal(requestedInput.namespace, "sensitive");
 assert.equal(requestedInput.secrets[0].value, "secret");
 assert.equal(personalClosed, 1);
 
-console.log("environment secrets editors cluster complete");
+console.log(`environment secrets editors cluster complete with ${secretRowReleaseAssertions} secret row release assertions`);

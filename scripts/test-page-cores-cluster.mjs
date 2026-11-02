@@ -7,7 +7,7 @@ import * as esbuild from "esbuild";
 import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["chatgpt-work-home-page-core", "credit-purchase-page-core", "mcp-extension-view-page-core"];
+const MODULES = ["credit-purchase-page-core", "mcp-extension-view-page-core"];
 const state = globalThis.__pageCoresTest = { apiCalls: [], initialized: [] };
 const jsxRuntime = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
 const reactRuntime = { useState(initial) { let value = typeof initial === "function" ? initial() : initial; return [value, next => { value = typeof next === "function" ? next(value) : next; }]; } };
@@ -44,25 +44,7 @@ function nodes(root) { const output = []; const visit = value => { if (value == 
 const byText = (tree, text) => nodes(tree).find(node => node.props?.children === text);
 const button = (tree, text) => nodes(tree).find(node => node.type === "button" && node.props.children === text);
 
-// chatgpt-work-home-page-core: 10
-const workHome = await bundle("chatgpt-work-home-page-core");
-workHome.n();
-let submitted = null;
-let selectedSuggestion = null;
-let homeContext = null;
-const workTree = workHome.t({ additionalDeveloperInstructions: "Use the repository conventions", initialPrompt: "Fix the renderer", onSubmit: input => { submitted = input; }, onTaskSuggestionSelected: value => { selectedSuggestion = value; }, renderHomeContent: context => { homeContext = context; return "ambient"; }, suggestions: ["Review my changes"] });
-assert.equal(workTree.props["data-testid"], "chatgpt-work-home-page");
-assert.match(workTree.props["data-vscode-context"], /supportsNewChatMenu/);
-assert.equal(byText(workTree, "What are you working on?").type, "h1");
-assert.equal(nodes(workTree).find(node => node.type === "textarea").props.value, "Fix the renderer");
-assert.equal(typeof homeContext.setPrompt, "function");
-button(workTree, "Review my changes").props.onClick();
-assert.equal(selectedSuggestion, "Review my changes");
-await nodes(workTree).find(node => node.type === "form").props.onSubmit({ preventDefault() {} });
-assert.equal(submitted.prompt, "Fix the renderer");
-assert.equal(submitted.developerInstructions, "Use the repository conventions");
-assert.equal(button(workTree, "Send").props.disabled, false);
-assert.equal(state.initialized.includes("api"), true);
+const workHomeReleaseAssertions = assertReleaseOwner("chatgpt-work-home-page-core");
 
 // credit-purchase-page-core: 11
 const purchase = await bundle("credit-purchase-page-core");
@@ -91,4 +73,4 @@ const homeTaskSuggestionsReleaseAssertions = assertReleaseOwner("home-task-sugge
 
 const viewFrameReleaseAssertions = assertReleaseOwner("view-frame");
 
-console.log(`21 page core assertions, ${skillsReleaseAssertions} skills, ${mcpReleaseAssertions} MCP, ${homeTaskSuggestionsReleaseAssertions} home task suggestions, and ${viewFrameReleaseAssertions} view frame release assertions passed`);
+console.log(`11 page core assertions, ${workHomeReleaseAssertions} work home, ${skillsReleaseAssertions} skills, ${mcpReleaseAssertions} MCP, ${homeTaskSuggestionsReleaseAssertions} home task suggestions, and ${viewFrameReleaseAssertions} view frame release assertions passed`);

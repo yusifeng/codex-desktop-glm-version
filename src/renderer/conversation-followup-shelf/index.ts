@@ -1,194 +1,887 @@
-import "@rchunk/rolldown-runtime";
-import * as Shared from "@rchunk/app-shared";
-import * as Initial from "@rchunk/app-initial";
-import * as Primary from "@rchunk/app-primary";
-import * as ScrollController from "@rchunk/thread-scroll-controller-context-value";
-import * as NavigationState from "@rchunk/conversation-navigation-state";
-
-interface Suggestion { body: string; icon?: string | null; id: string; source_id?: string | null; tier: "t1" | "t2" | "t3"; title: string }
-interface Identity { assistantMessageId: string; conversationId: string }
-interface SubmissionOptions {
-  chosenSuggestion: { index: number; originating_assistant_message_id: string; source: "conversation_followup_suggestions"; suggestion_id: string; suggestion_source_id?: string | null; suggestion_tier: Suggestion["tier"]; type: "reply" };
-  isSubmissionCurrent(): boolean;
-  suggestions: string[];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  H4 as i,
+  HX as a,
+  I3 as o,
+  K2 as s,
+  LX as c,
+  QI as l,
+  QX as u,
+  Y2 as d,
+  Yh as f,
+  ZI as p,
+  Zh as m,
+  __ as h,
+  a$ as g,
+  d$ as _,
+  e6 as v,
+  f$ as y,
+  g4 as b,
+  g_ as x,
+  h4 as S,
+  m$ as C,
+  m4 as w,
+  n4 as T,
+  o$ as E,
+  p$ as D,
+  q4 as O,
+  rZ as k,
+  x4 as A,
+} from "@rchunk/app-shared";
+import {
+  $9t as j,
+  $en as M,
+  EYt as N,
+  GVt as P,
+  Gzt as F,
+  MM as I,
+  PM as L,
+  Pgn as R,
+  Q9t as z,
+  Qgn as ee,
+  RVt as te,
+  Sdn as ne,
+  Slt as re,
+  Sun as ie,
+  Vzt as ae,
+  XVt as oe,
+  Xet as se,
+  YVt as ce,
+  Zet as le,
+  _D as ue,
+  _un as B,
+  cJt as de,
+  i_n as fe,
+  ifn as pe,
+  itn as me,
+  jVt as he,
+  lfn as ge,
+  mun as V,
+  pD as H,
+  rJt as _e,
+  rfn as ve,
+  uHt as ye,
+  ufn as be,
+  wVt as xe,
+  wdn as Se,
+  xlt as Ce,
+  xpn as we,
+  xun as Te,
+  ypn as Ee,
+  zVt as De,
+} from "@rchunk/app-initial";
+import { la as U, ua as Oe } from "@rchunk/app-primary";
+import { n as ke, r as Ae } from "@rchunk/thread-scroll-controller-context-value";
+import { n as je, t as Me } from "@rchunk/conversation-navigation-state";
+var W, Ne, Pe;
+function Fe() {
+  return (Fe = e(() => {
+    ((W = (function (e) {
+      return (
+        (e.CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_INTERACTION_TYPE_UNSPECIFIED = `CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_INTERACTION_TYPE_UNSPECIFIED`),
+        (e.CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_INTERACTION_TYPE_SHOWN = `CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_INTERACTION_TYPE_SHOWN`),
+        (e.CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_INTERACTION_TYPE_CLICKED = `CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_INTERACTION_TYPE_CLICKED`),
+        (e.UNRECOGNIZED = `UNRECOGNIZED`),
+        e
+      );
+    })({})),
+      (Ne = (function (e) {
+        return (
+          (e.CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_SURFACE_UNSPECIFIED = `CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_SURFACE_UNSPECIFIED`),
+          (e.CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_SURFACE_CONTENT_REFERENCE = `CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_SURFACE_CONTENT_REFERENCE`),
+          (e.CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_SURFACE_ACTION_LIST = `CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_SURFACE_ACTION_LIST`),
+          (e.CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_SURFACE_INLINE_TEXT = `CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_SURFACE_INLINE_TEXT`),
+          (e.CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_SURFACE_ABOVE_COMPOSER = `CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_SURFACE_ABOVE_COMPOSER`),
+          (e.UNRECOGNIZED = `UNRECOGNIZED`),
+          e
+        );
+      })({})),
+      (Pe = {
+        $type: `protobuf_analytics_events.v1.ChatgptConversationFollowupSuggestionInteraction`,
+      }));
+  }))();
 }
-interface Props {
-  conversationId: string;
-  isSubmissionCurrent?(): boolean;
-  loading?: boolean;
-  onSelect?(index: number, suggestion: Suggestion): void;
-  onSubmit?(body: string, options: SubmissionOptions): Promise<boolean>;
-  onVisible?(index: number, suggestion: Suggestion): void;
-  ready?: boolean;
-  suggestions?: Suggestion[];
-  visible?: boolean;
+function Ie(e) {
+  let t = (0, G.c)(4),
+    n;
+  t[0] === e
+    ? (n = t[1])
+    : ((n = e.loading || e.suggestions.length > 0 ? (0, q.jsx)(Le, { ...e }) : null),
+      (t[0] = e),
+      (t[1] = n));
+  let r;
+  return (
+    t[2] === n
+      ? (r = t[3])
+      : ((r = (0, q.jsx)(_, { initial: !1, children: n })), (t[2] = n), (t[3] = r)),
+    r
+  );
 }
-interface JsxRuntime { Fragment: unknown; jsx(type: unknown, props: Record<string, unknown>, key?: unknown): unknown; jsxs(type: unknown, props: Record<string, unknown>, key?: unknown): unknown }
-interface ReactRef<Value> { current: Value }
-interface ReactRuntime {
-  Fragment: unknown;
-  useEffect(effect: () => void | (() => void), dependencies?: readonly unknown[]): void;
-  useLayoutEffect(effect: () => void | (() => void), dependencies?: readonly unknown[]): void;
-  useRef<Value>(value: Value): ReactRef<Value>;
-  useState<Value>(value: Value | (() => Value)): [Value, (next: Value | ((current: Value) => Value)) => void];
+function Le(e) {
+  let t = (0, G.c)(53),
+    { loading: n, suggestions: r, visible: i, onSelect: a, onVisible: o } = e,
+    s = T(),
+    c = C(),
+    l = i && c,
+    u = re(),
+    p = (0, K.useRef)(null),
+    m;
+  t[0] !== l || t[1] !== o
+    ? ((m = (e) => {
+        l && o(e);
+      }),
+      (t[0] = l),
+      (t[1] = o),
+      (t[2] = m))
+    : (m = t[2]);
+  let h = (0, K.useEffectEvent)(m),
+    g = u ? 0 : 0.35,
+    _;
+  t[3] === g ? (_ = t[4]) : ((_ = { duration: g, ease: `easeOut` }), (t[3] = g), (t[4] = _));
+  let v = _,
+    y;
+  t[5] !== l || t[6] !== n || t[7] !== h
+    ? ((y = () => {
+        let e = p.current;
+        if (e == null || n || !l) return;
+        let t = new IntersectionObserver(
+          (e) => {
+            for (let t of e) {
+              let e = t.target.getAttribute(`data-suggestion-index`);
+              t.isIntersecting &&
+                t.intersectionRect.width > 0 &&
+                t.intersectionRect.height > 0 &&
+                e != null &&
+                h(Number(e));
+            }
+          },
+          { root: e },
+        );
+        for (let n of e.querySelectorAll(`[data-suggestion-index]`)) t.observe(n);
+        return () => t.disconnect();
+      }),
+      (t[5] = l),
+      (t[6] = n),
+      (t[7] = h),
+      (t[8] = y))
+    : (y = t[8]);
+  let b;
+  (t[9] !== l || t[10] !== n || t[11] !== r
+    ? ((b = [l, n, r]), (t[9] = l), (t[10] = n), (t[11] = r), (t[12] = b))
+    : (b = t[12]),
+    (0, K.useEffect)(y, b));
+  let x = !l && `pointer-events-none`,
+    S;
+  t[13] === x
+    ? (S = t[14])
+    : ((S = w(`flow-root h-14 min-w-0 pb-4 select-none`, x)), (t[13] = x), (t[14] = S));
+  let D = !l,
+    O = !l,
+    k;
+  t[15] === s
+    ? (k = t[16])
+    : ((k = s.formatMessage({
+        id: `chatgptConversations.followups.label`,
+        defaultMessage: `Follow-up suggestions`,
+        description: `Accessible label for suggested questions above the ChatGPT conversation composer`,
+      })),
+      (t[15] = s),
+      (t[16] = k));
+  let A;
+  t[17] === u ? (A = t[18]) : ((A = !u && { opacity: 0 }), (t[17] = u), (t[18] = A));
+  let j = +!!i,
+    M;
+  t[19] === j ? (M = t[20]) : ((M = { opacity: j }), (t[19] = j), (t[20] = M));
+  let N;
+  t[21] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((N = { opacity: 0 }), (t[21] = N))
+    : (N = t[21]);
+  let P;
+  t[22] === n
+    ? (P = t[23])
+    : ((P = n
+        ? (0, q.jsx)(`span`, {
+            role: `status`,
+            className: `sr-only`,
+            children: (0, q.jsx)(d, {
+              id: `chatgptConversations.followups.loading`,
+              defaultMessage: `Loading suggestions`,
+              description: `Screen reader status while follow-up suggestions for the completed ChatGPT answer are loading`,
+            }),
+          })
+        : null),
+      (t[22] = n),
+      (t[23] = P));
+  let F;
+  t[24] !== n || t[25] !== r
+    ? ((F = n ? [null, null, null] : r), (t[24] = n), (t[25] = r), (t[26] = F))
+    : (F = t[26]);
+  let L;
+  if (t[27] !== l || t[28] !== n || t[29] !== a || t[30] !== u || t[31] !== F || t[32] !== v) {
+    let e;
+    (t[34] !== l || t[35] !== n || t[36] !== a || t[37] !== u || t[38] !== v
+      ? ((e = (e, t) =>
+          (0, q.jsx)(
+            E.div,
+            {
+              className: `shrink-0`,
+              layout: !u,
+              initial: n || u ? !1 : { opacity: 0 },
+              animate: { opacity: 1 },
+              transition: v,
+              children:
+                e == null
+                  ? (0, q.jsx)(I, { variant: `conversation-followup` })
+                  : (0, q.jsx)(f, {
+                      color: `conversationFollowup`,
+                      size: `conversationFollowup`,
+                      "data-suggestion-index": t,
+                      onClick: () => {
+                        l && a(t);
+                      },
+                      children: (0, q.jsx)(
+                        E.span,
+                        {
+                          className: `block`,
+                          layout: !u,
+                          initial: !u && { opacity: 0 },
+                          animate: { opacity: 1 },
+                          transition: v,
+                          children: e.title,
+                        },
+                        e.id,
+                      ),
+                    }),
+            },
+            t,
+          )),
+        (t[34] = l),
+        (t[35] = n),
+        (t[36] = a),
+        (t[37] = u),
+        (t[38] = v),
+        (t[39] = e))
+      : (e = t[39]),
+      (L = F.map(e)),
+      (t[27] = l),
+      (t[28] = n),
+      (t[29] = a),
+      (t[30] = u),
+      (t[31] = F),
+      (t[32] = v),
+      (t[33] = L));
+  } else L = t[33];
+  let R;
+  t[40] === L
+    ? (R = t[41])
+    : ((R = (0, q.jsx)(E.div, {
+        ref: p,
+        className: `-my-2 hide-scrollbar flex min-w-0 overflow-x-auto py-2`,
+        layoutScroll: !0,
+        children: (0, q.jsx)(`div`, {
+          className: `flex w-max shrink-0 items-center gap-2 px-toolbar md:mx-auto md:px-0`,
+          children: L,
+        }),
+      })),
+      (t[40] = L),
+      (t[41] = R));
+  let z;
+  return (
+    t[42] !== n ||
+    t[43] !== k ||
+    t[44] !== A ||
+    t[45] !== M ||
+    t[46] !== P ||
+    t[47] !== R ||
+    t[48] !== S ||
+    t[49] !== D ||
+    t[50] !== O ||
+    t[51] !== v
+      ? ((z = (0, q.jsxs)(E.div, {
+          className: S,
+          role: `group`,
+          "aria-hidden": D,
+          inert: O,
+          "aria-label": k,
+          "aria-busy": n,
+          "data-conversation-followup-shelf": !0,
+          initial: A,
+          animate: M,
+          exit: N,
+          transition: v,
+          children: [P, R],
+        })),
+        (t[42] = n),
+        (t[43] = k),
+        (t[44] = A),
+        (t[45] = M),
+        (t[46] = P),
+        (t[47] = R),
+        (t[48] = S),
+        (t[49] = D),
+        (t[50] = O),
+        (t[51] = v),
+        (t[52] = z))
+      : (z = t[52]),
+    z
+  );
 }
-interface ScrollRuntime {
-  addScrollListener?(listener: () => void): () => void;
-  addUserScrollListener?(listener: (distanceFromBottom: number) => void): () => void;
-  getScrollElement?(): HTMLElement | null;
+var G, K, q;
+function Re() {
+  return (Re = e(() => {
+    ((G = t()), S(), y(), g(), D(), (K = v()), s(), m(), L(), Ce(), (q = o()));
+  }))();
 }
-interface FollowupPayload { assistant_message_id?: string; conversation_id?: string; suggestions?: unknown[] }
-interface ConversationMessage { author?: { role?: string }; metadata?: { conversation_followup_suggestions_eligible?: boolean; is_error?: boolean; is_visually_hidden_from_conversation?: boolean }; status?: string }
-interface ConversationMapping { [messageId: string]: { message?: ConversationMessage } }
-
-const shared = Shared as unknown as {
-  $3(): { c(size: number): unknown[] }; BX(signal: unknown, ...parameters: unknown[]): unknown; FX(): void; I3(): JsxRuntime; LX(scope: unknown): { queryClient?: unknown }; QI(): void; Yh: unknown; ZI: unknown;
-  d$: unknown; e6: ReactRuntime | (() => ReactRuntime); m4(...values: unknown[]): string; o$: { div: unknown; span: unknown };
-};
-const initial = Initial as unknown as {
-  $9t(value: number): unknown; GVt: unknown; J9t?(): void; Pgn?(): void; RVt: unknown; Vzt(): void; XVt: unknown; YVt: unknown; _un: unknown;
-  jVt: unknown; mun: unknown; pD: unknown; rJt?: { safePost(path: string, input: Record<string, unknown>): Promise<FollowupPayload> };
-  uHt(): void; wVt: unknown; xpn?(scope: unknown, descriptor: unknown, event: Record<string, unknown>): void; xun: unknown; zVt: unknown;
-};
-const primary = Primary as unknown as { la: unknown; ua(): void };
-const scrollChunk = ScrollController as unknown as { n(): void; r(): ScrollRuntime };
-const navigation = NavigationState as unknown as { n: unknown; t(): void };
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-const shownIds = new Set<string>();
-const interactionDescriptor = { $type: "protobuf_analytics_events.v1.ChatgptConversationFollowupSuggestionInteraction" };
-
-function useSignal(signal: unknown, ...parameters: unknown[]): unknown { return shared.BX(signal, ...parameters); }
-function isSuggestion(value: unknown): value is Suggestion {
-  if (value == null || typeof value !== "object") return false;
-  const candidate = value as Record<string, unknown>;
-  return typeof candidate.id === "string" && candidate.id.trim().length > 0 && typeof candidate.title === "string" && candidate.title.trim().length > 0 && typeof candidate.body === "string" && candidate.body.trim().length > 0 && (candidate.tier === "t1" || candidate.tier === "t2" || candidate.tier === "t3");
+var ze, J, Y;
+function Be() {
+  return (Be = e(() => {
+    (r(),
+      b(),
+      ie(),
+      l(),
+      Se(),
+      de(),
+      ye(),
+      Oe(),
+      (ze = i({
+        id: O().trim().min(1),
+        title: O().trim().min(1),
+        body: O().trim().min(1),
+        icon: O().nullable().optional(),
+        tier: A([`t1`, `t2`, `t3`]),
+        source_id: O().nullable().optional(),
+      })),
+      (J = k(
+        p,
+        (e, { get: t }) => {
+          let n = t(B),
+            r = t(V),
+            i = t(xe, e),
+            a = t(he, e),
+            o = t(P, e);
+          if (
+            n == null ||
+            r == null ||
+            i == null ||
+            a == null ||
+            !t(Te) ||
+            t(U) == null ||
+            t(ce, e) !== `idle` ||
+            t(oe, e) ||
+            o?.active ||
+            o?.retryPending
+          )
+            return null;
+          let s = t(te, e);
+          if (s == null) return null;
+          let c = s[a]?.message;
+          if (
+            o?.protectionType != null &&
+            N({ current_node: a, mapping: s })[0]?.id === o.promptMessageId
+          )
+            return null;
+          let l = t(De, e)[a];
+          return c?.author.role !== `assistant` ||
+            c.status !== `finished_successfully` ||
+            c.metadata?.conversation_followup_suggestions_eligible !== !0 ||
+            c.metadata.is_visually_hidden_from_conversation === !0 ||
+            c.metadata.is_error === !0 ||
+            l != null
+            ? null
+            : { userId: n, accountId: r, conversationId: i, assistantMessageId: a };
+        },
+        {
+          isEqual: (e, t) =>
+            e?.userId === t?.userId &&
+            e?.accountId === t?.accountId &&
+            e?.conversationId === t?.conversationId &&
+            e?.assistantMessageId === t?.assistantMessageId,
+        },
+      )),
+      (Y = u(p, (e, { get: t }) => ({
+        queryKey: [`conversation-followup-suggestions`, e],
+        staleTime: 1 / 0,
+        gcTime: 18e5,
+        retry: (e, t) =>
+          e < 1 &&
+          ((t instanceof ne &&
+            (t.errorKind === `network` || t.status === 408 || t.status >= 500)) ||
+            (t instanceof DOMException && t.name === `TimeoutError`)),
+        retryDelay: 500,
+        retryOnMount: !1,
+        refetchOnMount: !1,
+        refetchOnWindowFocus: !1,
+        refetchOnReconnect: !1,
+        queryFn: async ({ signal: n }) => {
+          let r = t(U),
+            i = () => {
+              if (
+                (n.throwIfAborted(),
+                r == null ||
+                  t(U) !== r ||
+                  t(B) !== e.userId ||
+                  t(V) !== e.accountId ||
+                  r.get(`enable_web`, !1) !== !0)
+              )
+                throw new DOMException(
+                  `Conversation followups are no longer eligible`,
+                  `AbortError`,
+                );
+            };
+          i();
+          let a = new AbortController(),
+            o;
+          try {
+            let t = await Promise.race([
+              _e.safePost(`/conversation/{conversation_id}/followup_suggestions`, {
+                parameters: { path: { conversation_id: e.conversationId } },
+                requestBody: { assistant_message_id: e.assistantMessageId },
+                signal: AbortSignal.any([n, a.signal]),
+              }),
+              new Promise((e, t) => {
+                o = setTimeout(() => {
+                  (t(new DOMException(`Conversation followups timed out`, `TimeoutError`)),
+                    a.abort());
+                }, 13e3);
+              }),
+            ]);
+            if (
+              (i(),
+              t.conversation_id !== e.conversationId ||
+                t.assistant_message_id !== e.assistantMessageId)
+            )
+              return [];
+            let r = new Set();
+            return (t.suggestions ?? []).flatMap((e) => {
+              let t = ze.safeParse(e);
+              return !t.success || r.has(t.data.id) ? [] : (r.add(t.data.id), [t.data]);
+            });
+          } finally {
+            clearTimeout(o);
+          }
+        },
+      }))));
+  }))();
 }
-function normalizeSuggestions(values: unknown): Suggestion[] {
-  if (!Array.isArray(values)) return [];
-  const ids = new Set<string>();
-  return values.flatMap(value => isSuggestion(value) && !ids.has(value.id) ? (ids.add(value.id), [value]) : []);
+function Ve(e) {
+  let t = (0, X.c)(14),
+    r = n(J, e.conversationId),
+    i = fe(),
+    a = new URLSearchParams(i.search),
+    o;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((o = { name: `automations.cloud.scheduled-tasks` }), (t[0] = o))
+    : (o = t[0]);
+  let { isCapable: s } = n(se, o),
+    c = a.get(`messageId`) === `finalAgentTurnStart` && !!a.get(`automationId`) && s,
+    l = r?.accountId ?? null,
+    u;
+  t[1] !== i.key || t[2] !== l
+    ? ((u = { locationKey: i.key, accountId: l }), (t[1] = i.key), (t[2] = l), (t[3] = u))
+    : (u = t[3]);
+  let d = n(je, u);
+  if (r == null || (c && !d)) return null;
+  let f = He,
+    p;
+  t[4] !== r || t[5] !== i.key || t[6] !== d
+    ? ((p = JSON.stringify([r, i.key, d])), (t[4] = r), (t[5] = i.key), (t[6] = d), (t[7] = p))
+    : (p = t[7]);
+  let m = a.has(`message`) || (a.has(`messageId`) && a.get(`messageId`) !== `finalAgentTurn` && !c),
+    h;
+  return (
+    t[8] !== f || t[9] !== r || t[10] !== e || t[11] !== p || t[12] !== m
+      ? ((h = (0, Q.jsx)(f, { ...e, identity: r, hasMessageTarget: m }, p)),
+        (t[8] = f),
+        (t[9] = r),
+        (t[10] = e),
+        (t[11] = p),
+        (t[12] = m),
+        (t[13] = h))
+      : (h = t[13]),
+    h
+  );
 }
-function distanceFromBottom(element: HTMLElement): number { return Math.max(0, element.scrollHeight - element.scrollTop - element.clientHeight); }
-function hasBlockingOverlay(): boolean { return typeof document !== "undefined" && document.querySelector(":is(:popover-open, dialog[open])") != null; }
-function isAtBottom(controller: ScrollRuntime): boolean {
-  const element = controller.getScrollElement?.();
-  return element != null && element.clientHeight > 0 && (typeof document === "undefined" || document.visibilityState === "visible") && distanceFromBottom(element) <= 2;
+function He(e) {
+  let t = (0, X.c)(36),
+    {
+      identity: n,
+      hasMessageTarget: r,
+      conversationId: i,
+      isSubmissionCurrent: o,
+      onSubmit: s,
+      ready: l,
+    } = e,
+    u = c(M),
+    d = a(U),
+    f = ge(),
+    p = Ae(),
+    m = F(),
+    g = a(H),
+    _;
+  t[0] === p ? (_ = t[1]) : ((_ = () => Je(p)), (t[0] = p), (t[1] = _));
+  let [v] = (0, Z.useState)(_),
+    y = (0, Z.useSyncExternalStore)(v.subscribe, v.getSnapshot, v.getServerSnapshot),
+    [b, x] = (0, Z.useState)(!1),
+    S = l && !m && !g && !b && !y.overlayOpen && (!r || y.userReachedBottom),
+    C = S && y.atBottom,
+    w;
+  t[2] !== i ||
+  t[3] !== n ||
+  t[4] !== o ||
+  t[5] !== d ||
+  t[6] !== C ||
+  t[7] !== l ||
+  t[8] !== u ||
+  t[9] !== v
+    ? ((w = (e) => v.attach(e, C, d, () => l && u.get(J, i) === n && o())),
+      (t[2] = i),
+      (t[3] = n),
+      (t[4] = o),
+      (t[5] = d),
+      (t[6] = C),
+      (t[7] = l),
+      (t[8] = u),
+      (t[9] = v),
+      (t[10] = w))
+    : (w = t[10]);
+  let T = w,
+    E = C && d != null && y.admittedLayer === d,
+    D = !E,
+    O;
+  t[11] === D ? (O = t[12]) : ((O = { disableExposureLog: D }), (t[11] = D), (t[12] = O));
+  let k = be(`1811711706`, O),
+    A;
+  t[13] === k ? (A = t[14]) : ((A = k.get(`enable_web`, !1)), (t[13] = k), (t[14] = A));
+  let j = A === !0,
+    N;
+  t[15] !== i ||
+  t[16] !== r ||
+  t[17] !== n ||
+  t[18] !== o ||
+  t[19] !== d ||
+  t[20] !== m ||
+  t[21] !== u ||
+  t[22] !== f ||
+  t[23] !== v
+    ? ((N = () =>
+        u.get(J, i) === n &&
+        u.get(U) === d &&
+        ve(f, `1811711706`, { disableExposureLog: !0 }).get(`enable_web`, !1) === !0 &&
+        o() &&
+        !m &&
+        !u.get(H) &&
+        v.isAtBottom() &&
+        !v.hasOverlay() &&
+        (!r || v.getSnapshot().userReachedBottom)),
+      (t[15] = i),
+      (t[16] = r),
+      (t[17] = n),
+      (t[18] = o),
+      (t[19] = d),
+      (t[20] = m),
+      (t[21] = u),
+      (t[22] = f),
+      (t[23] = v),
+      (t[24] = N))
+    : (N = t[24]);
+  let P = h(N),
+    I;
+  t[25] !== n ||
+  t[26] !== P ||
+  t[27] !== d ||
+  t[28] !== s ||
+  t[29] !== S ||
+  t[30] !== j ||
+  t[31] !== E
+    ? ((I = j
+        ? (0, Q.jsx)(Ue, {
+            identity: n,
+            retainSuggestions: S && d != null,
+            visible: E,
+            isSubmissionCurrent: P,
+            onSubmit: s,
+            onSubmittingChange: x,
+          })
+        : null),
+      (t[25] = n),
+      (t[26] = P),
+      (t[27] = d),
+      (t[28] = s),
+      (t[29] = S),
+      (t[30] = j),
+      (t[31] = E),
+      (t[32] = I))
+    : (I = t[32]);
+  let L;
+  return (
+    t[33] !== T || t[34] !== I
+      ? ((L = (0, Q.jsx)(`div`, { ref: T, children: I })), (t[33] = T), (t[34] = I), (t[35] = L))
+      : (L = t[35]),
+    L
+  );
 }
-function logInteraction(identity: Identity, suggestion: Suggestion, index: number, interaction: "clicked" | "shown"): void {
-  if (initial.xpn == null) return;
-  const scope = shared.LX(shared.ZI);
-  initial.xpn(scope, interactionDescriptor, {
-    interactionType: interaction === "shown" ? "CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_INTERACTION_TYPE_SHOWN" : "CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_INTERACTION_TYPE_CLICKED",
-    surface: "CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_SURFACE_ABOVE_COMPOSER",
-    source: "conversation_followup_shelf", presentationMode: "horizontal_carousel",
-    conversationId: identity.conversationId, messageId: identity.assistantMessageId,
-    position: initial.$9t(index + 1), suggestionId: suggestion.id, suggestionTier: suggestion.tier, suggestionSourceId: suggestion.source_id ?? undefined,
+function Ue(e) {
+  let t = (0, X.c)(35),
+    {
+      identity: r,
+      retainSuggestions: i,
+      visible: a,
+      isSubmissionCurrent: o,
+      onSubmit: s,
+      onSubmittingChange: l,
+    } = e,
+    u = c(M),
+    d = (0, Z.useRef)(!1),
+    [f] = (0, Z.useState)(Ke),
+    p;
+  t[0] === a ? (p = t[1]) : ((p = { enabled: a }), (t[0] = a), (t[1] = p));
+  let { data: m, isFetching: h } = n(Y, r, p),
+    g = !a || !h,
+    _;
+  t[2] === g ? (_ = t[3]) : ((_ = { disableExposureLog: g }), (t[2] = g), (t[3] = _));
+  let v = be(`1811711706`, _),
+    y;
+  t[4] === v ? (y = t[5]) : ((y = v.get(`show_loading_state`, !0)), (t[4] = v), (t[5] = y));
+  let b = y,
+    x,
+    S;
+  (t[6] !== r || t[7] !== u || t[8] !== a
+    ? ((x = () => {
+        if (a)
+          return () => {
+            u.query.cancel(Y, r, { exact: !0 });
+          };
+      }),
+      (S = [u, r, a]),
+      (t[6] = r),
+      (t[7] = u),
+      (t[8] = a),
+      (t[9] = x),
+      (t[10] = S))
+    : ((x = t[9]), (S = t[10])),
+    (0, Z.useLayoutEffect)(x, S));
+  let C;
+  t[11] !== r ||
+  t[12] !== o ||
+  t[13] !== s ||
+  t[14] !== l ||
+  t[15] !== u ||
+  t[16] !== m ||
+  t[17] !== a
+    ? ((C = (e) => {
+        let t = m?.[e];
+        a &&
+          !d.current &&
+          m != null &&
+          t != null &&
+          o() &&
+          ((d.current = !0),
+          l(!0),
+          s(t.body, {
+            chosenSuggestion: {
+              type: `reply`,
+              source: `conversation_followup_suggestions`,
+              index: e,
+              suggestion_id: t.id,
+              suggestion_tier: t.tier,
+              suggestion_source_id: t.source_id,
+              originating_assistant_message_id: r.assistantMessageId,
+            },
+            suggestions: m.map(Ge),
+            isSubmissionCurrent: o,
+          })
+            .then((n) => {
+              n === !0 &&
+                u.get(B) === r.userId &&
+                u.get(V) === r.accountId &&
+                (qe(u, r, t, e, `clicked`), u.query.setData(Y, r, []));
+            })
+            .catch(We)
+            .finally(() => {
+              ((d.current = !1), l(!1));
+            }));
+      }),
+      (t[11] = r),
+      (t[12] = o),
+      (t[13] = s),
+      (t[14] = l),
+      (t[15] = u),
+      (t[16] = m),
+      (t[17] = a),
+      (t[18] = C))
+    : (C = t[18]);
+  let w = C,
+    T = a && h && b,
+    E;
+  t[19] !== i || t[20] !== m
+    ? ((E = i ? (m ?? []) : []), (t[19] = i), (t[20] = m), (t[21] = E))
+    : (E = t[21]);
+  let D;
+  t[22] !== r || t[23] !== o || t[24] !== u || t[25] !== f || t[26] !== m || t[27] !== a
+    ? ((D = (e) => {
+        let t = m?.[e];
+        a && t != null && !f.has(t.id) && o() && (f.add(t.id), qe(u, r, t, e, `shown`));
+      }),
+      (t[22] = r),
+      (t[23] = o),
+      (t[24] = u),
+      (t[25] = f),
+      (t[26] = m),
+      (t[27] = a),
+      (t[28] = D))
+    : (D = t[28]);
+  let O;
+  return (
+    t[29] !== w || t[30] !== E || t[31] !== D || t[32] !== T || t[33] !== a
+      ? ((O = (0, Q.jsx)(Ie, {
+          loading: T,
+          suggestions: E,
+          visible: a,
+          onSelect: w,
+          onVisible: D,
+        })),
+        (t[29] = w),
+        (t[30] = E),
+        (t[31] = D),
+        (t[32] = T),
+        (t[33] = a),
+        (t[34] = O))
+      : (O = t[34]),
+    O
+  );
+}
+function We() {}
+function Ge(e) {
+  return e.title;
+}
+function Ke() {
+  return new Set();
+}
+function qe(e, t, n, r, i) {
+  we(e, Pe, {
+    interactionType:
+      i === `shown`
+        ? W.CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_INTERACTION_TYPE_SHOWN
+        : W.CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_INTERACTION_TYPE_CLICKED,
+    surface: Ne.CHATGPT_CONVERSATION_FOLLOWUP_SUGGESTION_SURFACE_ABOVE_COMPOSER,
+    source: `conversation_followup_shelf`,
+    presentationMode: `horizontal_carousel`,
+    conversationId: t.conversationId,
+    messageId: t.assistantMessageId,
+    position: j(r + 1),
+    suggestionId: n.id,
+    suggestionTier: n.tier,
+    suggestionSourceId: n.source_id ?? void 0,
   });
 }
-async function requestSuggestions(identity: Identity, signal: AbortSignal): Promise<Suggestion[]> {
-  const controller = new AbortController();
-  const forwardAbort = () => controller.abort();
-  signal.addEventListener("abort", forwardAbort, { once: true });
-  let timeout: ReturnType<typeof setTimeout> | undefined;
-  try {
-    const timeoutPromise = new Promise<never>((_resolve, reject) => { timeout = setTimeout(() => { controller.abort(); reject(new DOMException("Conversation followups timed out", "TimeoutError")); }, 13_000); });
-    const request = initial.rJt?.safePost != null
-      ? initial.rJt.safePost("/conversation/{conversation_id}/followup_suggestions", { parameters: { path: { conversation_id: identity.conversationId } }, requestBody: { assistant_message_id: identity.assistantMessageId }, signal: controller.signal })
-      : fetch(`/conversation/${encodeURIComponent(identity.conversationId)}/followup_suggestions`, { body: JSON.stringify({ assistant_message_id: identity.assistantMessageId }), headers: { "content-type": "application/json" }, method: "POST", signal: controller.signal }).then(async response => { if (!response.ok) throw new Error(`Request failed (${response.status})`); return response.json() as Promise<FollowupPayload>; });
-    const payload = await Promise.race([request, timeoutPromise]);
-    signal.throwIfAborted();
-    if (payload.conversation_id !== identity.conversationId || payload.assistant_message_id !== identity.assistantMessageId) return [];
-    return normalizeSuggestions(payload.suggestions);
-  } finally { signal.removeEventListener("abort", forwardAbort); if (timeout != null) clearTimeout(timeout); }
-}
-
-function FollowupShelfView({ loading, onSelect, onVisible, suggestions, visible }: { loading: boolean; onSelect(index: number): void; onVisible(index: number): void; suggestions: readonly Suggestion[]; visible: boolean }): unknown {
-  const rootRef = React.useRef<HTMLElement | null>(null);
-  React.useEffect(() => {
-    const root = rootRef.current;
-    if (root == null || loading || !visible || typeof IntersectionObserver === "undefined") return;
-    const observer = new IntersectionObserver(entries => { for (const entry of entries) { const index = entry.target.getAttribute("data-suggestion-index"); if (entry.isIntersecting && entry.intersectionRect.width > 0 && entry.intersectionRect.height > 0 && index != null) onVisible(Number(index)); } }, { root });
-    for (const element of root.querySelectorAll("[data-suggestion-index]")) observer.observe(element);
-    return () => observer.disconnect();
-  }, [loading, onVisible, suggestions, visible]);
-  const items: Array<Suggestion | null> = loading ? [null, null, null] : [...suggestions];
-  return jsx.jsxs("div", { className: shared.m4("flow-root h-14 min-w-0 pb-4 select-none", !visible && "pointer-events-none"), role: "group", "aria-hidden": !visible, inert: !visible, "aria-label": "Follow-up suggestions", "aria-busy": loading, "data-conversation-followup-shelf": true, children: [
-    loading ? jsx.jsx("span", { role: "status", className: "sr-only", children: "Loading suggestions" }) : null,
-    jsx.jsx("div", { ref: rootRef, className: "-my-2 hide-scrollbar flex min-w-0 overflow-x-auto py-2", children: jsx.jsx("div", { className: "flex w-max shrink-0 items-center gap-2 px-toolbar md:mx-auto md:px-0", children: items.map((suggestion, index) => suggestion == null ? jsx.jsx("span", { "data-followup-skeleton": true }, index) : jsx.jsx(shared.Yh, { color: "conversationFollowup", size: "conversationFollowup", "data-suggestion-index": index, disabled: !visible, onClick: () => { if (visible) onSelect(index); }, children: suggestion.title }, suggestion.id)) }) }),
-  ] });
-}
-
-function ConversationFollowupShelf(props: Props): unknown {
-  const canonicalConversationId = useSignal(initial.wVt, props.conversationId) as string | null;
-  const assistantMessageId = useSignal(initial.jVt, props.conversationId) as string | null;
-  const userId = useSignal(initial._un) as string | null;
-  const accountId = useSignal(initial.mun) as string | null;
-  const featureEnabled = useSignal(initial.xun);
-  const runtimeConfig = useSignal(primary.la);
-  const conversationStatus = useSignal(initial.YVt, props.conversationId);
-  const hiddenConversation = useSignal(initial.XVt, props.conversationId);
-  const activeTurn = useSignal(initial.GVt, props.conversationId) as { active?: boolean; retryPending?: boolean } | null;
-  const mapping = useSignal(initial.RVt, props.conversationId) as ConversationMapping | null;
-  const branchState = useSignal(initial.zVt, props.conversationId) as Record<string, unknown> | null;
-  const controller = scrollChunk.r();
-  const assistantMessage = assistantMessageId == null ? null : mapping?.[assistantMessageId]?.message;
-  const stateGraphAvailable = userId != null || accountId != null || mapping != null;
-  const releaseEligible = userId != null && accountId != null && canonicalConversationId != null && assistantMessageId != null && featureEnabled === true && runtimeConfig != null && conversationStatus === "idle" && !hiddenConversation && !activeTurn?.active && !activeTurn?.retryPending && assistantMessage?.author?.role === "assistant" && assistantMessage.status === "finished_successfully" && assistantMessage.metadata?.conversation_followup_suggestions_eligible === true && assistantMessage.metadata.is_visually_hidden_from_conversation !== true && assistantMessage.metadata.is_error !== true && branchState?.[assistantMessageId] == null;
-  const identity = releaseEligible ? { conversationId: canonicalConversationId, assistantMessageId } : !stateGraphAvailable && (props.suggestions != null || props.loading != null) && canonicalConversationId != null && assistantMessageId != null ? { conversationId: canonicalConversationId, assistantMessageId } : null;
-  const [remoteSuggestions, setRemoteSuggestions] = React.useState<Suggestion[]>([]);
-  const [loading, setLoading] = React.useState(false);
-  const [submitting, setSubmitting] = React.useState(false);
-  const [userReachedBottom, setUserReachedBottom] = React.useState(false);
-  const explicit = props.suggestions != null || props.loading != null;
-  const submissionCurrent = props.isSubmissionCurrent?.() ?? true;
-  const routeHasMessageTarget = typeof location !== "undefined" && new URLSearchParams(location.search).has("message");
-  const eligible = (props.ready ?? true) && submissionCurrent && identity != null && !routeHasMessageTarget;
-
-  React.useLayoutEffect(() => {
-    const update = () => { if (isAtBottom(controller) && !hasBlockingOverlay()) setUserReachedBottom(true); };
-    update();
-    const removeScroll = controller.addScrollListener?.(update) ?? (() => undefined);
-    const removeUserScroll = controller.addUserScrollListener?.(distance => { if (distance <= 2) update(); }) ?? (() => undefined);
-    if (typeof window !== "undefined") window.addEventListener("resize", update);
-    if (typeof document !== "undefined") { document.addEventListener("visibilitychange", update); document.addEventListener("toggle", update, true); }
-    return () => { removeScroll(); removeUserScroll(); if (typeof window !== "undefined") window.removeEventListener("resize", update); if (typeof document !== "undefined") { document.removeEventListener("visibilitychange", update); document.removeEventListener("toggle", update, true); } };
-  }, [controller]);
-
-  React.useEffect(() => {
-    if (explicit || !eligible || identity == null || (!userReachedBottom && controller.getScrollElement != null)) { if (!eligible) setRemoteSuggestions([]); return; }
-    const abort = new AbortController();
-    setLoading(true);
-    void requestSuggestions(identity, abort.signal).then(values => { if (!abort.signal.aborted && (props.isSubmissionCurrent?.() ?? true)) setRemoteSuggestions(values); }).catch(reason => { if (!(reason instanceof DOMException && reason.name === "AbortError")) setRemoteSuggestions([]); }).finally(() => { if (!abort.signal.aborted) setLoading(false); });
-    return () => abort.abort();
-  }, [assistantMessageId, canonicalConversationId, eligible, explicit, userReachedBottom]);
-
-  const suggestions = props.suggestions ?? remoteSuggestions;
-  const isLoading = props.loading ?? loading;
-  const visible = props.visible ?? (eligible && !submitting && (userReachedBottom || controller.getScrollElement == null));
-  if (!isLoading && suggestions.length === 0) return null;
-  const select = (index: number) => {
-    const suggestion = suggestions[index];
-    if (!visible || suggestion == null || submitting || !(props.isSubmissionCurrent?.() ?? true)) return;
-    props.onSelect?.(index, suggestion);
-    if (props.onSubmit == null || identity == null) return;
-    setSubmitting(true);
-    void props.onSubmit(suggestion.body, { chosenSuggestion: { type: "reply", source: "conversation_followup_suggestions", index, suggestion_id: suggestion.id, suggestion_tier: suggestion.tier, suggestion_source_id: suggestion.source_id, originating_assistant_message_id: identity.assistantMessageId }, suggestions: suggestions.map(value => value.title), isSubmissionCurrent: props.isSubmissionCurrent ?? (() => true) })
-      .then(submitted => { if (submitted) { logInteraction(identity, suggestion, index, "clicked"); setRemoteSuggestions([]); } })
-      .finally(() => setSubmitting(false));
+function Je(e) {
+  let t = { atBottom: !1, admittedLayer: null, userReachedBottom: !1, overlayOpen: !1 },
+    n = t,
+    r = !1,
+    i = !1,
+    a = null,
+    o = () => !1,
+    s = new Set(),
+    c = () => document.querySelector(`:is(:popover-open, dialog[open])`) != null,
+    l = () => {
+      let t = e.getScrollElement();
+      return !!(t && t.clientHeight > 0 && document.visibilityState === `visible` && R(t) <= 2);
+    },
+    u = (e = n.userReachedBottom) => {
+      let t = l(),
+        u = c(),
+        d = r && t && !u && i && o() ? a : null;
+      if (
+        n.atBottom !== t ||
+        n.admittedLayer !== d ||
+        n.userReachedBottom !== e ||
+        n.overlayOpen !== u
+      ) {
+        n = { atBottom: t, admittedLayer: d, userReachedBottom: e, overlayOpen: u };
+        for (let e of s) e();
+      }
+    };
+  return {
+    getSnapshot: () => n,
+    getServerSnapshot: () => t,
+    isAtBottom: l,
+    hasOverlay: c,
+    subscribe: (e) => (
+      s.add(e),
+      () => {
+        s.delete(e);
+      }
+    ),
+    attach: (t, c, d, f) => {
+      if (t == null) return;
+      ((i = c), (a = d), (o = f));
+      let p = () => {
+          r && u();
+        },
+        m = new ResizeObserver(p);
+      m.observe(t);
+      let h = requestAnimationFrame(() => {
+          h = requestAnimationFrame(() => {
+            let t = e.getScrollElement();
+            (t != null &&
+              (m.observe(t), t.firstElementChild != null && m.observe(t.firstElementChild)),
+              (r = !0),
+              u());
+          });
+        }),
+        g = e.addScrollListener(p),
+        _ = e.addUserScrollListener((e) => {
+          e <= 2 && l() && u(!0);
+        });
+      return (
+        window.addEventListener(`resize`, p),
+        document.addEventListener(`visibilitychange`, p),
+        document.addEventListener(`toggle`, p, !0),
+        () => {
+          if (((r = !1), n.admittedLayer != null)) {
+            n = { ...n, admittedLayer: null };
+            for (let e of s) e();
+          }
+          (cancelAnimationFrame(h),
+            g(),
+            _(),
+            m.disconnect(),
+            window.removeEventListener(`resize`, p),
+            document.removeEventListener(`visibilitychange`, p),
+            document.removeEventListener(`toggle`, p, !0));
+        }
+      );
+    },
   };
-  const markVisible = (index: number) => {
-    const suggestion = suggestions[index];
-    if (!visible || suggestion == null || shownIds.has(suggestion.id) || !(props.isSubmissionCurrent?.() ?? true)) return;
-    shownIds.add(suggestion.id); props.onVisible?.(index, suggestion); if (identity != null) logInteraction(identity, suggestion, index, "shown");
-  };
-  return jsx.jsx(shared.d$, { initial: false, children: jsx.jsx(FollowupShelfView, { loading: isLoading, suggestions, visible, onSelect: select, onVisible: markVisible }) });
 }
-
-function initialize(): void {
-  void shared.$3(); shared.FX(); shared.QI(); initial.uHt(); initial.Vzt(); primary.ua(); scrollChunk.n(); navigation.t();
-  jsx = shared.I3(); React = typeof shared.e6 === "function" && !("useState" in shared.e6) ? shared.e6() : shared.e6 as ReactRuntime;
+var X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((X = t()),
+      z(),
+      Fe(),
+      r(),
+      (Z = v()),
+      ee(),
+      le(),
+      ie(),
+      Me(),
+      ue(),
+      ae(),
+      Ee(),
+      me(),
+      pe(),
+      ke(),
+      x(),
+      Oe(),
+      Re(),
+      Be(),
+      (Q = o()));
+  }))();
 }
-initialize();
-export { ConversationFollowupShelf };
+$();
+export { Ve as ConversationFollowupShelf };
