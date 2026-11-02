@@ -60,7 +60,7 @@ const [misc, mcp, wsl, files, environments, applications, github, fsmonitor, str
   compile("src/main/shared/structured-generation.ts", [loggerMock]),
   compile("src/main/shared/automation-registry.ts"),
   compile("src/main/shared/process-exec.ts"),
-  compile("src/main/shared/ambient-suggestions-store.ts"),
+  compile("src/main/shared/ambient-suggestions-store.ts", [loggerMock]),
   compile("src/main/shared/tail-runtime.ts"),
   compile("src/main/shared/thread-project-membership.ts", [rpcTargetMock]),
   compile("src/main/shared/client-coordination-service.ts", [rpcTargetMock]),

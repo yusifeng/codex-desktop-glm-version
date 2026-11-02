@@ -112,7 +112,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Ha` | `LA` | 22426 | hosts-wsl-plugins | semantic | `hosts-runtime` (`appearanceSettings`) |
 | `Hc` | `yS` | 18533 | settings-threads | semantic | `browser-tab-mentions` (`mentionsWithinBudget`) |
 | `Hd` | `Ug` | 16079 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `Hf` | `lt` | 2676 | core-path-utils | preserved | original core-path-utils implementation retained for compatibility |
+| `Hf` | `lt` | 2676 | core-path-utils | semantic | `rpc-core` (`RpcStub`) |
 | `Hi` | `lre` | 24111 | hosts-wsl-plugins | semantic | `wsl-paths` (`wslDistroFromUnc`) |
 | `Hl` | `Bb` | 17912 | settings-threads | semantic | `app-constants` (`buildAutoInstallOptOutKey`) |
 | `Hn` | `dY` | 42234 | mcp-rpc | semantic | `mcp-runtime` (`setWindowsCoreRoot`) |
@@ -291,7 +291,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Va` | `RA` | 22512 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `Vc` | `uS` | 18500 | settings-threads | semantic | `browser-tab-mentions` (`BROWSER_PLUGIN_DESCRIPTORS`) |
 | `Vd` | `Xg` | 16158 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `Vf` | `ut` | 2677 | core-path-utils | preserved | original core-path-utils implementation retained for compatibility |
+| `Vf` | `ut` | 2677 | core-path-utils | semantic | `rpc-core` (`RpcSession`) |
 | `Vi` | `Rj` | 24127 | hosts-wsl-plugins | semantic | `wsl-paths` (`windowsToWslPath`) |
 | `Vl` | `Eb` | 17859 | settings-threads | semantic | `app-constants` (`DEFAULT_MARKETPLACE_NAME`) |
 | `Vn` | `mY` | 42252 | mcp-rpc | semantic | `mcp-runtime` (`recordExecutableResolution`) |
@@ -304,7 +304,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Wa` | `PA` | 22408 | hosts-wsl-plugins | semantic | `hosts-runtime` (`resolveModelServiceTier`) |
 | `Wc` | `_S` | 18516 | settings-threads | semantic | `browser-tab-mentions` (`tabDedupeKey`) |
 | `Wd` | `Rg` | 15995 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `Wf` | `ft` | 2679 | core-path-utils | preserved | original core-path-utils implementation retained for compatibility |
+| `Wf` | `ft` | 2679 | core-path-utils | semantic | `rpc-core` (`newMessagePortRpcSession`) |
 | `Wi` | `Pj` | 24102 | hosts-wsl-plugins | semantic | `wsl-paths` (`isWslPath`) |
 | `Wl` | `Rb` | 17905 | settings-threads | semantic | `app-constants` (`isBundledMarketplaceName`) |
 | `Wn` | `XJ` | 42154 | mcp-rpc | semantic | `runtime-state` (`Wn`) |
@@ -457,7 +457,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `hc` | `JC` | 19520 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `hd` | `B_` | 16612 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `hf` | `K` | 13956 | schema-primitives | semantic | `zod-facade` (`hf`) |
-| `hi` | `wP` | 26389 | sql-git-registry | preserved | original sql-git-registry implementation retained for compatibility |
+| `hi` | `wP` | 26389 | sql-git-registry | semantic | `ambient-suggestions-store` (`generateAmbientSuggestions`) |
 | `hl` | `sx` | 18006 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `hn` | `xQ` | 49024 | mcp-2 | semantic | `mcp-2-runtime` (`attachHeartbeat`) |
 | `ho` | `Ck` | 22008 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
@@ -633,7 +633,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `us` | `_E` | 20629 | hosts-wsl-plugins | semantic | `hosts-runtime` (`isMcpMethodNotFoundError`) |
 | `ut` | `R8` | 59447 | keymap-menus | semantic | `structured-generation` (`runStructuredGeneration`) |
 | `uu` | `lb` | 17637 | settings-threads | semantic | `app-constants` (`COWORK_MARKETPLACE_NAME`) |
-| `v` | `Qse` | 64488 | lowlevel-export-shim | preserved | original lowlevel-export-shim implementation retained for compatibility |
+| `v` | `Qse` | 64488 | lowlevel-export-shim | semantic | `ipc-client` (`IpcClient`) |
 | `va` | `Hne` | 23186 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `vc` | `GC` | 19490 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `vd` | `K_` | 16626 | settings-threads | semantic | `automation-settings` (`findModel`) |
@@ -672,7 +672,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `xs` | `kT` | 20154 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `xt` | `o8` | 58324 | keymap-menus | semantic | `command-registry` (`acceleratorsForCommandSync`) |
 | `xu` | `Zy` | 17580 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `y` | `s9` | 63849 | lowlevel-export-shim | preserved | original lowlevel-export-shim implementation retained for compatibility |
+| `y` | `s9` | 63849 | lowlevel-export-shim | semantic | `ipc-metrics` (`ipcMetrics`) |
 | `ya` | `cj` | 23176 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `yc` | `MC` | 19394 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
 | `yd` | `Y_` | 16644 | settings-threads | semantic | `automation-settings` (`effectiveModelForAutomation`) |

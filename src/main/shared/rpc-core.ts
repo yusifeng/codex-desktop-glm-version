@@ -9,16 +9,16 @@
 //     cancel + Symbol.dispose
 //   - tn = ABORTED（L3350）：Object.freeze({ status: 'aborted' })
 //
-// RpcStub/RpcConnection/connectRpc 是强耦合 wire protocol，继续由发布 shared
-// chunk 唯一持有；本文件不复制一份会抛错的假实现。
+// Wire protocol is supplied by the same Cap'n Web package used by the release.
+import {
+  RpcSession,
+  RpcStub,
+  RpcTarget as CapnWebRpcTarget,
+  newMessagePortRpcSession,
+} from "capnweb";
 
 /** RPC 目标基类（原 `D`：dist chunk 的 RpcTarget，无则空类回退）。 */
-type RpcTargetConstructor = new (...args: any[]) => object;
-const workersModule = (globalThis as Record<PropertyKey, unknown>)[
-  Symbol.for("workers-module")
-] as { RpcTarget?: RpcTargetConstructor } | undefined;
-const RpcTargetBase: RpcTargetConstructor = workersModule?.RpcTarget ?? class {};
-export class RpcTarget extends RpcTargetBase {}
+export class RpcTarget extends CapnWebRpcTarget {}
 
 /** 可中止的 fetch 分发器（原 `mt`，extends RpcTarget）。 */
 export class AbortableFetchDispatcher {
@@ -68,7 +68,13 @@ export const ABORTED = Object.freeze({ status: "aborted" } as const);
 // 兼容导出：Uf/Bf/zf 可安全独立；Hf/Vf/Wf wire protocol 在
 // chunk-modules.d.ts 中直接声明为 preserved shared-chunk exports。
 export {
+  RpcStub,
+  RpcSession,
+  newMessagePortRpcSession,
   RpcTarget as Uf,
   AbortableFetchDispatcher as Bf,
   ABORTED as zf,
+  RpcStub as Hf,
+  RpcSession as Vf,
+  newMessagePortRpcSession as Wf,
 };

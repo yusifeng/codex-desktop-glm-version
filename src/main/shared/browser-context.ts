@@ -78,6 +78,16 @@ export function broadcastVersionOf(messageType: string): number {
   return version === undefined ? 0 : version;
 }
 
+export function requestVersionOf(messageType: string, params?: unknown, hostId?: string): number {
+  if (hostId != null && messageType.startsWith("thread-follower-")) return broadcastVersionOf(messageType) + 1;
+  if (messageType === "thread-follower-interrupt-turn" && params != null && typeof params === "object" && (!("expectedTurnId" in params) || (params as any).expectedTurnId == null)) return 3;
+  return broadcastVersionOf(messageType);
+}
+
+export function acceptsRequestVersion(messageType: string, version: number, hostId?: string): boolean {
+  return version === requestVersionOf(messageType, undefined, hostId) || (hostId == null && messageType === "thread-follower-interrupt-turn" && version === 3);
+}
+
 // ---------------------------------------------------------------------------
 // 浏览器上下文种类（原 `xy`/`Sy`）
 // ---------------------------------------------------------------------------

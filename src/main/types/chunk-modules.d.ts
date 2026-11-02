@@ -156,8 +156,7 @@ declare module "@chunk/shared" {
   export const H: any; // 内部符号: q5
   export { mentionsWithinBudget as Hc } from "../../shared/browser-tab-mentions";
   export const Hd: any; // 内部符号: Ug
-  /** Preserved shared-chunk RpcStub wire protocol. */
-  export const Hf: any;
+  export { RpcStub as Hf } from "../../shared/rpc-core";
   export { wslDistroFromUnc as Hi } from "../../shared/wsl-paths";
   export { buildAutoInstallOptOutKey as Hl } from "../../shared/app-constants";
   export { setWindowsCoreRoot as Hn } from "../../shared/mcp-runtime";
@@ -323,8 +322,7 @@ declare module "@chunk/shared" {
   export const Va: any; // 内部符号: RA
   export { BROWSER_PLUGIN_DESCRIPTORS as Vc } from "../../shared/browser-tab-mentions";
   export const Vd: any; // 内部符号: Xg
-  /** Preserved shared-chunk RpcConnection wire protocol. */
-  export const Vf: any;
+  export { RpcSession as Vf } from "../../shared/rpc-core";
   export { windowsToWslPath as Vi } from "../../shared/wsl-paths";
   export { DEFAULT_MARKETPLACE_NAME as Vl } from "../../shared/app-constants";
   export { recordExecutableResolution as Vn } from "../../shared/mcp-runtime";
@@ -336,12 +334,7 @@ declare module "@chunk/shared" {
   export { resolveModelServiceTier as Wa } from "../../shared/hosts-runtime";
   export { tabDedupeKey as Wc } from "../../shared/browser-tab-mentions";
   export const Wd: any; // 内部符号: Rg
-  /** Preserved shared-chunk MessagePort RPC connector. */
-  export const Wf: (
-    port: MessagePort,
-    mainObject: unknown,
-    options?: Record<string, unknown>,
-  ) => unknown;
+  export { newMessagePortRpcSession as Wf } from "../../shared/rpc-core";
   export { isWslPath as Wi } from "../../shared/wsl-paths";
   export { isBundledMarketplaceName as Wl } from "../../shared/app-constants";
   export { Wn } from "../../shared/runtime-state";
@@ -485,7 +478,7 @@ declare module "@chunk/shared" {
   export const hc: any; // 内部符号: JC
   export const hd: any; // 内部符号: B_
   export { hf } from "../../shared/zod-facade";
-  export const hi: any; // 内部符号: wP
+  export { generateAmbientSuggestions as hi } from "../../shared/ambient-suggestions-store";
   export const hl: any; // 内部符号: sx
   export { attachHeartbeat as hn } from "../../shared/mcp-2-runtime";
   export const ho: any; // 内部符号: Ck
@@ -648,7 +641,7 @@ declare module "@chunk/shared" {
   export { isElicitationApprovalSafe as ur } from "../../shared/elicitation-protocol";
   export { runStructuredGeneration as ut } from "../../shared/structured-generation";
   export { COWORK_MARKETPLACE_NAME as uu } from "../../shared/app-constants";
-  export const v: any; // 内部符号: Qse
+  export { IpcClient as v } from "../../shared/ipc-client";
   export const va: any; // 内部符号: Hne
   export const vc: any; // 内部符号: GC
   export { findModel as vd } from "../../shared/automation-settings";
@@ -686,7 +679,7 @@ declare module "@chunk/shared" {
   export const xs: any; // 内部符号: kT
   export { acceleratorsForCommandSync as xt } from "../../shared/command-registry";
   export const xu: any; // 内部符号: Zy
-  export const y: any; // 内部符号: s9
+  export { ipcMetrics as y } from "../../shared/ipc-metrics";
   export const ya: any; // 内部符号: cj
   export const yc: any; // 内部符号: MC
   export { effectiveModelForAutomation as yd } from "../../shared/automation-settings";
