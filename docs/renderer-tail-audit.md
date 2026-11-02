@@ -1,5 +1,23 @@
 # Renderer 尾部资产审计
 
+2026-11-02 App-shared path/command policy batch：一次迁移 12 个公开压缩别名、20 个 renderer
+调用绑定，恢复 SVG data URL、command metadata narrowing、平台主修饰键、鼠标导航键、
+webview command menu、跨平台 path join/extended-prefix/final segments、project appearance、
+通用数值 clamp 与二维距离。严格公开 ABI 门禁同时阻止了两次错误迁移：`JF` 实际是
+`CodexThreadForkSource` 生成枚举 `jJ`，不是邻近 basename helper；`PM` 实际是
+`CodexNewChatSuggestionLevel` 生成枚举 `kq`，不是 file-change helper，相关 consumers 均已
+保留在 hub。发布源码复核还发现既有 `$G` 恢复错误地与三参数 `KO` 共用 generic clamp，
+使单参数浏览器 zoom 路径可能产生 `NaN`；当前 `$G` 已按固定 25–500 的一参数 ABI 与
+三参数 inclusive clamp 分离。新增聚合回归覆盖 35 条断言，独立 clamp suite 扩至 7 条，
+test-index 增至 1,920；app-shared 直接 hub 消费由 1,855 降至 1,843，三 hub 保持
+0 unreviewed、0 invalid consumers，迁移检查为 0 个遗漏绑定。该批继续收缩压缩 hub
+依赖。typecheck、严格 ABI 与全量 `npm run check`（12,464 transform、11 main roots、
+1,916 renderer chunks、33 preserved vendor/generated route sources）均通过；当前构建随后
+通过真实登录态 `npm run e2e:critical`，覆盖 settings、Git、worktrees、Browser/IAB、
+conversation history/add-context，并实际发送 `E2E_REPLY_20261102081948`、收到 assistant
+同 marker。该结果不把纯生成/枚举 surface 的有意保留误记为待实现业务功能，也不把本批
+关键矩阵通过宣称为整个长期目标完成。
+
 2026-11-02 Cross-hub navigation/path policy batch：以一个大批次迁移 13 个公开压缩别名、
 25 个 renderer 调用绑定。app-primary 范围包括 HTTP(S) asset URL、Git-backed project target、
 local/remote/ChatGPT thread search key、navigation cache tuple、annotation anchor、device onboarding、

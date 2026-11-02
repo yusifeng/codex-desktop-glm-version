@@ -24,6 +24,7 @@ const __vite__mapDeps = (
       "@rchunk/import-settings-gate",
     ]),
 ) => i.map((i) => d[i]);
+import { isWebviewCommandMenu as ue } from "../app-shared/runtime/command-metadata-policy";
 import { getThreadSearchKey as ir } from "../app-primary/runtime/thread-navigation-keys";
 import { hasRequiredCommandAccess as Ge } from "../app-shared/runtime/command-visibility-predicates";
 import { isElectronCommandEnabled as Nn } from "../app-initial/runtime/electron-command-policy";
@@ -82,7 +83,6 @@ import {
   Vs as B,
   WG as V,
   Wc as H,
-  Wp as ue,
   Xp as de,
   Y2 as U,
   Yh as W,

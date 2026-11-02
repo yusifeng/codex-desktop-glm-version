@@ -1,5 +1,6 @@
 // @ts-nocheck
-import { clampWithinRange as i } from "../app-shared/runtime/clamp-within-range";
+import { clampWithinRange as L, clampZoomPercent as i } from "../app-shared/runtime/clamp-within-range";
+import { getPointDistance as Oe } from "../app-shared/runtime/point-geometry";
 import { classNames as Y, initializeClassNames as Dt } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -39,7 +40,6 @@ import {
   Jf as F,
   Jw as te,
   K2 as I,
-  KO as L,
   Kl as R,
   Km as z,
   Kw as B,
@@ -76,7 +76,6 @@ import {
   W3 as Te,
   WT as Ee,
   XD as De,
-  XO as Oe,
   XQ as ke,
   XT as Ae,
   Xf as je,

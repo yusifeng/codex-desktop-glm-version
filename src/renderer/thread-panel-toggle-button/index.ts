@@ -205,6 +205,7 @@ const __vite__mapDeps = (
       "@rchunk/thread-tab-entity",
     ]),
 ) => i.map((i) => d[i]);
+import { getPrimaryModifierPressed as V } from "../app-shared/runtime/command-metadata-policy";
 import { formatBrowserUrl as Xi } from "../app-primary/runtime/format-browser-url";
 import { getPathBasename as S } from "../app-shared/runtime/get-path-basename";
 import { isAbsolutePath as f } from "../app-shared/runtime/is-absolute-path";
@@ -250,7 +251,6 @@ import {
   QI as B,
   QX as ee,
   Q_ as te,
-  Qm as V,
   RI as H,
   RQ as U,
   Rb as W,

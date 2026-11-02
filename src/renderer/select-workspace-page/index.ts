@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { stripExtendedWindowsPathPrefix as C } from "../app-shared/runtime/path-key-policy";
 import { createCaseInsensitivePathKey as a } from "../app-shared/runtime/path-key-policy";
 import { getPathBasename as d } from "../app-shared/runtime/get-path-basename";
 import { isPathWithinRoots as i } from "../app-shared/runtime/is-path-within-roots";
@@ -24,7 +25,6 @@ import {
   W3 as b,
   XM as x,
   Y2 as S,
-  YK as C,
   YM as te,
   Yh as w,
   ZI as ne,

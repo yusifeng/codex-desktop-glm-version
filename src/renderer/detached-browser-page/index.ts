@@ -16,6 +16,7 @@ const __vite__mapDeps = (
       "./tweaks-toolbar-view-7c0f5f44eb6e.css",
     ]),
 ) => i.map((i) => d[i]);
+import { getPrimaryModifierPressed as E } from "../app-shared/runtime/command-metadata-policy";
 import { hasItems as u } from "../app-shared/runtime/non-empty-collection";
 import { classNames as pe, initializeClassNames as X } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -44,7 +45,6 @@ import {
   P3 as C,
   Pm as w,
   Q0 as T,
-  Qm as E,
   Rm as D,
   SL as O,
   SZ as k,

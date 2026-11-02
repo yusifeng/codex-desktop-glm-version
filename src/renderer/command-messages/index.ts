@@ -1,7 +1,16 @@
 // @ts-nocheck
+import { hasDescriptionIntlId as r } from "../app-shared/runtime/command-metadata-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { Ep as t, G2 as n, Ip as r, K2 as i, W2 as a } from "@rchunk/app-shared";
-import { Mdn as o, Ndn as s } from "@rchunk/app-initial";
+import {
+  Ep as t,
+  G2 as n,
+  K2 as i,
+  W2 as a,
+} from "@rchunk/app-shared";
+import {
+  Mdn as o,
+  Ndn as s,
+} from "@rchunk/app-initial";
 function c(e) {
   return { title: e.formatMessage(l.title), description: e.formatMessage(l.description) };
 }

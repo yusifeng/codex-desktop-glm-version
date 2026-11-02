@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { updateProjectAppearance as g } from "../app-shared/runtime/project-appearance-policy";
 import { getPathBasename as m } from "../app-shared/runtime/get-path-basename";
 import { isManagedHostSource as d } from "../app-shared/runtime/is-managed-host-source";
 import { normalizeWorkspacePath as r } from "../app-shared/runtime/normalize-workspace-path";
@@ -17,7 +18,6 @@ import {
   HX as f,
   I3 as p,
   IP as h,
-  IV as g,
   If as _,
   Ih as ee,
   K2 as v,

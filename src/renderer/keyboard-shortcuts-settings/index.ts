@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { allowsBareOsGlobalModifiers as _ } from "../app-shared/runtime/command-metadata-policy";
 import { isOsGlobalShortcut as l } from "../app-shared/runtime/shortcut-scope-policy";
 import { createCommandQueryKey as ye } from "../app-initial/runtime/create-command-query-key";
 import { formatKeyboardShortcut as tt } from "../app-primary/runtime/format-keyboard-shortcut";
@@ -21,7 +22,6 @@ import {
   LX as m,
   Lh as h,
   Lp as g,
-  Mp as _,
   Oh as v,
   Ph as y,
   Pp as b,

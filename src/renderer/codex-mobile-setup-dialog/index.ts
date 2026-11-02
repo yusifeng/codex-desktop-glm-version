@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { encodeSvgDataUrl as h } from "../app-shared/runtime/svg-data-url";
 import { classNames as R, initializeClassNames as I } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -15,7 +16,6 @@ import {
   FX as f,
   HX as p,
   I3 as m,
-  I_ as h,
   Ih as g,
   K2 as _,
   LX as v,

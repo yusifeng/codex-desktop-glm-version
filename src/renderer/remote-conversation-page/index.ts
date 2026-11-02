@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { isNavigationMouseButton as z } from "../app-shared/runtime/command-metadata-policy";
+import { encodeSvgDataUrl as _ } from "../app-shared/runtime/svg-data-url";
 import { createWorkspaceWritePermissionState as Se } from "../app-shared/runtime/permission-profiles";
 import { CODEX_WEB_URL as E } from "../app-shared/runtime/codex-links";
 import { gitSettings as l } from "../app-shared/runtime/git-settings";
@@ -19,7 +21,6 @@ import {
   HX as m,
   Hd as h,
   I3 as g,
-  I_ as _,
   If as v,
   Ih as y,
   K2 as b,
@@ -40,7 +41,6 @@ import {
   S_ as I,
   UX as L,
   Vd as R,
-  Vp as z,
   W3 as B,
   XB as V,
   Y2 as H,

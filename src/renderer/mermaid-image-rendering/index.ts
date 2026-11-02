@@ -54,6 +54,7 @@ const __vite__mapDeps = (
       "@exact-chunk/chunk-ZIRB5QZD-2e8b5796aa29.js",
     ]),
 ) => i.map((i) => d[i]);
+import { encodeSvgDataUrl as c } from "../app-shared/runtime/svg-data-url";
 import { classNames as ne, initializeClassNames as y } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -64,7 +65,6 @@ import {
   H3 as a,
   H4 as o,
   I3 as s,
-  I_ as c,
   K2 as l,
   QI as u,
   R4 as d,
